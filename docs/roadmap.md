@@ -4,18 +4,19 @@ The platform name is undecided; neoCLR names the runtime only. The existing code
 is a small semantic testbed. It is not a commitment to Rust for every component,
 JSON for distribution, or the exact instruction extensions used here.
 
-## Strategy review: implementation paused
+## Strategy review and verifier foundation
 
-The user requested a strategy review after the marker-attribute slice. The milestones
-below retain earlier direction; they are not authorization to resume runtime work.
-The [construction, mutation, and initialization proposal](construction-and-initialization.md)
-recommends settling addressed access and initialization contracts, developing verifier
-and member-reference foundations, then introducing a small high-level compiler as
-another producer of the same metadata/IL. Library code can migrate from handwritten
-IL incrementally; compiler self-hosting is not required. This sequence is proposed,
-not an accepted change to executable semantics. The [addressed-access proposal](addressed-access.md)
-recommends a basic control-flow verifier as the first executable slice when work resumes,
-followed by explicit receiver/reference capabilities with lifetime and access checks.
+Following the strategy review, the first [verifier pass](verification.md) is implemented.
+It checks evaluation-stack heights, definite local initialization, returns, and
+reachable fallthrough. It is explicit rather than mandatory and does not yet track
+stack types. Typed stack analysis and stable member identity remain the next
+foundations before addressed mutation and constructor verification.
+
+The [construction proposal](construction-and-initialization.md) and
+[addressed-access proposal](addressed-access.md) remain design discussions, not
+implemented receiver/lifetime contracts. A small high-level compiler can eventually
+produce the same metadata/IL as the assembler, enabling incremental runtime-library
+migration without requiring compiler self-hosting.
 
 ## Immediate focus: heap allocation and pointers
 
@@ -57,8 +58,9 @@ must preserve explicit allocation and avoid requiring null or boxing for absence
 1. `brfalse`, label-based `switch` tables, and equality/ordered comparison branches
    are implemented. Conditional branches
    support Boolean, integer, pointer, and prototype Ref operands. Compact constant and slot aliases are implemented; short branches remain pending.
-   Add a control-flow verifier: typed stack states at joins, definite local
-   initialization, valid return paths, and maximum stack calculation.
+   Stack-height joins, definite local initialization, reachable returns, and maximum
+   stack analysis are implemented by the explicit verifier. Add typed stack states
+   and decide when verification becomes mandatory.
 2. Extend type/generic metadata and implement arrays when their storage contracts
    are ready; see [arrays and pointers](arrays-and-pointers.md).
 3. Implement a CLI-based binary reader/writer for the supported subset, preserving

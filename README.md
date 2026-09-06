@@ -59,6 +59,7 @@ cargo run -- run examples/generic-values.neoil
 cargo run -- run examples/generic-methods.neoil
 cargo run -- run examples/generic-memory.neoil
 cargo run -- run examples/attributes.neoil
+cargo run -- verify examples/generic-methods.neoil
 cargo run -- run examples/native-integers.neoil
 cargo run -- run examples/integers.neoil
 cargo run -- run examples/bits.neoil
@@ -222,7 +223,9 @@ types. Dedicated union opcodes are not planned.
 methods/functions. The System library supplies UnionAttribute as an ordinary marker;
 union behavior and guest reflection remain pending.
 
-Implementation is paused for a strategy review. The
+Following the strategy review, the [control-flow verifier foundation](docs/verification.md)
+is implemented as an explicit `verify` command. It checks stack heights, local
+initialization, and returns; typed stack and reference analysis remain pending. The
 [construction, mutation, and initialization proposal](docs/construction-and-initialization.md)
 connects the next type-system decisions with verification and a future high-level
 language for the runtime library; its contracts are proposals, not implemented features.

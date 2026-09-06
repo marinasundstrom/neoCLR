@@ -53,3 +53,6 @@ mod floating;
 mod checked;
 
 pub mod interop;
+
+pub mod verifier;
+pub use verifier::{Verification, verify, verify_with_library};

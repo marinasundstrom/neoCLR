@@ -1,7 +1,7 @@
 # Construction, mutation, and initialization proposal
 
 Status: proposed contracts for discussion, not implemented or approved semantics.
-Runtime implementation is paused after the marker-attribute slice. This document
+The [basic verifier](verification.md) is now implemented; this document
 identifies prerequisites for ordinary library types and a future high-level language.
 It does not change current newobj, stfld, receiver, pointer, or ownership behavior.
 

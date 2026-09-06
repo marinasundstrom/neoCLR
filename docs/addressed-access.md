@@ -1,7 +1,8 @@
 # Addressed access: proposed first contract
 
-Status: discussion proposal. No byref signatures, addressed receiver modes, verifier,
-or new instructions are implemented by this document. Runtime work remains paused.
+Status: discussion proposal. No byref signatures, addressed receiver modes,
+or new instructions are implemented by this document. The [basic verifier](verification.md)
+is implemented separately; the reference contracts here remain proposals.
 This refines the [construction proposal](construction-and-initialization.md).
 
 ## Recommended boundary
@@ -138,8 +139,8 @@ should exercise the same contracts.
 
 ## Next decisions and implementation gate
 
-Recommended next executable slice, when implementation resumes: the basic control-flow
-verifier, not reference execution. In parallel with its design, settle definition/member
+The basic control-flow verifier is implemented as an explicit pass; typed stack states
+remain pending. Alongside that extension, settle definition/member
 identity so receiver modes and generic overload targets can be encoded unambiguously.
 Then add addressed access and its checks together.
 

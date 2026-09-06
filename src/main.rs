@@ -28,9 +28,14 @@ fn execute(args: &[String]) -> Result<Vec<String>, String> {
                 lines
             }).map_err(|e| e.to_string())
         }
-        [command, input] if command == "run" || command == "check" => {
+        [command, input] if command == "run" || command == "check" || command == "verify" => {
             let source = fs::read_to_string(input).map_err(|e| format!("Cannot read {input}: {e}"))?;
             let module = if input.ends_with(".neoil") { assemble(&source) } else { load(&source) }.map_err(|e| e.to_string())?;
+            if command == "verify" {
+                let report = neoclr::verify(&module).map_err(|e| e.to_string())?;
+                let maximum = report.functions.iter().map(|f| f.maximum_stack).max().unwrap_or(0);
+                return Ok(vec![format!("{}: stack/control-flow verification passed ({} IL functions; maximum stack {maximum}; types checked at runtime)", module.name, report.functions.len())]);
+            }
             if command == "check" { return Ok(vec![format!("{}: metadata valid (execution types checked at runtime)", module.name)]); }
             // CLI run executes the user-selected program and its native imports as trusted code.
             unsafe { run_with_native(&module, neoclr::library::system().map_err(|e| e.to_string())?, Limits::default()) }.map(|execution| {
@@ -39,7 +44,7 @@ fn execute(args: &[String]) -> Result<Vec<String>, String> {
                 lines
             }).map_err(|fault: Fault| fault.to_string())
         }
-        _ => Err("Usage:\n  neoclr assemble <source.neoil> <output.neo.json>\n  neoclr run <source.neoil|module.neo.json> [System.neo.json]\n  neoclr check <source.neoil|module.neo.json>".into()),
+        _ => Err("Usage:\n  neoclr assemble <source.neoil> <output.neo.json>\n  neoclr run <source.neoil|module.neo.json> [System.neo.json]\n  neoclr check <source.neoil|module.neo.json>\n  neoclr verify <source.neoil|module.neo.json>".into()),
     }
 }
 

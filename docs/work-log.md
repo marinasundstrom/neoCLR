@@ -791,3 +791,32 @@ receiver mode, opcode, or lifetime behavior is implemented.
 
 Validation: documentation diff checks pass. Runtime code is unchanged; the previously
 passing 209-test suite was not rerun.
+
+## 2026-09-06 — Explicit control-flow verifier foundation
+
+Started the executable verifier foundation following the strategy discussion. Added
+verify/verify_with_library APIs and a verify CLI command for source or serialized
+modules. The pass analyzes validated linked IL without execution, reports per-function
+maximum stack/reachability, and rejects underflow, inconsistent join heights, invalid
+returns, reachable fallthrough, and locals uninitialized on any incoming path.
+
+Worklist propagation intersects local assignment facts and revisits weakened joins.
+All IL methods are analyzed, including unused/open generic definitions. Instruction
+stack effects are exhaustive; calls produce the inhabited return value and newobj
+consumes one logical value per declared field, including Void fields. Native methods
+remain metadata-validated without execution. Fault and ret terminate paths.
+
+Verification is opt-in; check, assemble/load, and runtime diagnostic behavior remain
+unchanged. This is not type or memory-safety verification. Typed stack states and
+reference/constructor verification are pending, and the prior addressed-access
+proposals are not implemented by this slice.
+
+Added nine tests covering every shipped IL sample, stack maximum/reachability, joins,
+switches, loop backedges, late-arriving assignment facts, generic bodies, prefix
+validation, metadata rejection, CLI source/JSON inputs, and the explicit type-safety
+limitation. Added verification documentation and updated strategy status/README.
+
+Validation: all 218 integration tests pass on macOS ARM64. After a clippy-only
+condition rewrite, the nine verifier tests pass again; formatting, clippy, and diff
+checks pass. CLI verification of generic-methods succeeds without execution. Linux
+and Windows execution remain for CI.
