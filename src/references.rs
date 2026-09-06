@@ -1,0 +1,136 @@
+//! Direct metadata-reference visibility, not a security or runtime value boundary.
+use crate::{
+    Fault, Module,
+    metadata::{CustomAttribute, FunctionRef, Instruction, Type},
+};
+
+pub(crate) fn validate_list(source: &Module, supplied: &[&Module]) -> Result<(), Fault> {
+    let Some(references) = &source.references else {
+        return Ok(());
+    };
+    let mut seen = std::collections::HashSet::new();
+    for name in references {
+        if name.is_empty() || name == &source.name || !seen.insert(name) {
+            return Err(Fault::new(format!(
+                "invalid or duplicate module reference {name:?} in {}",
+                source.name
+            )));
+        }
+        if !supplied.iter().any(|m| &m.name == name) {
+            return Err(Fault::new(format!(
+                "missing referenced module {name} for {}",
+                source.name
+            )));
+        }
+    }
+    Ok(())
+}
+
+fn check_module(source: &Module, target: &str) -> Result<(), Fault> {
+    if source.references.as_ref().is_some_and(|references| {
+        target != source.name && target != "System" && !references.iter().any(|r| r == target)
+    }) {
+        return Err(Fault::new(format!(
+            "module {} does not reference {target}",
+            source.name
+        )));
+    }
+    Ok(())
+}
+
+// Called after structural type validation has enforced the signature nesting limit.
+pub(crate) fn check_type(linked: &Module, source: &Module, ty: &Type) -> Result<(), Fault> {
+    if source.references.is_none() {
+        return Ok(());
+    }
+    match ty {
+        Type::Option(t) | Type::Ref(t) | Type::Ptr(t) => check_type(linked, source, t)?,
+        Type::Result(t, e) => {
+            check_type(linked, source, t)?;
+            check_type(linked, source, e)?;
+        }
+        Type::Constructed {
+            definition,
+            arguments,
+        } => {
+            check_named(linked, source, definition)?;
+            for argument in arguments {
+                check_type(linked, source, argument)?;
+            }
+        }
+        Type::Named(name) => check_named(linked, source, name)?,
+        // Primitive signatures refer to implicit System; parameters are contextual.
+        _ => (),
+    }
+    Ok(())
+}
+
+fn check_named(linked: &Module, source: &Module, name: &str) -> Result<(), Fault> {
+    let owner = linked
+        .types
+        .iter()
+        .find(|d| d.name == name)
+        .and_then(|d| d.definition.as_ref())
+        .ok_or_else(|| Fault::new(format!("missing definition identity for {name}")))?;
+    check_module(source, &owner.module)
+}
+
+fn check_call(linked: &Module, source: &Module, target: &FunctionRef) -> Result<(), Fault> {
+    let function = crate::vm::resolve(linked, target)?;
+    let definition = function
+        .definition
+        .ok_or_else(|| Fault::new("missing function identity"))?;
+    check_module(source, &definition.module)?;
+    if let Some(owner) = &target.owner {
+        check_type(linked, source, owner)?;
+    }
+    for parameter in &target.parameters {
+        check_type(linked, source, parameter)?;
+    }
+    Ok(())
+}
+
+fn check_attributes(
+    linked: &Module,
+    source: &Module,
+    attributes: &[CustomAttribute],
+) -> Result<(), Fault> {
+    for attribute in attributes {
+        check_call(linked, source, &attribute.constructor)?;
+    }
+    Ok(())
+}
+
+pub(crate) fn validate_uses(linked: &Module, source: &Module) -> Result<(), Fault> {
+    if source.references.is_none() {
+        return Ok(());
+    }
+    if !source.entry.is_empty() {
+        let entry = linked
+            .functions
+            .iter()
+            .find(|f| f.name == source.entry && f.parameters.is_empty() && !f.instance)
+            .and_then(|f| f.definition.as_ref())
+            .ok_or_else(|| Fault::new("missing entry definition"))?;
+        check_module(source, &entry.module)?;
+    }
+    for definition in &source.types {
+        for field in &definition.fields {
+            check_type(linked, source, &field.ty)?;
+        }
+        check_attributes(linked, source, &definition.custom_attributes)?;
+    }
+    for function in &source.functions {
+        function.map_types(|ty| {
+            check_type(linked, source, ty)?;
+            Ok(ty.clone())
+        })?;
+        for instruction in &function.body {
+            if let Instruction::Call(target) = instruction {
+                check_call(linked, source, target)?;
+            }
+        }
+        check_attributes(linked, source, &function.custom_attributes)?;
+    }
+    Ok(())
+}

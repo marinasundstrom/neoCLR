@@ -1,4 +1,5 @@
 .module Operations
+.references (Models)
 
 .function Operations.Compute(Int32 value) -> Int32
     ldarg value

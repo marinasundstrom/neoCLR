@@ -21,6 +21,9 @@ escapes. Identifiers contain ASCII letters, digits, underscores, and dots.
 
 - `.module Name` occurs exactly once. Executables declare one `.entry FunctionName`;
   library modules omit it.
+- Optional `.references (Module, ...)` declares direct dependencies; `.references ()`
+  permits only local definitions and implicit System. Omission retains legacy load-set
+  visibility. See [module references](module-references.md) for validation and limits.
 - `.type Name` begins a type (known System primitives use runtime representation); `.field Name Type` declares ordered fields;
   `.end` closes the type. `.method static/instance Name(...) -> Type` declares
   a nested method with its own `.end`; see [type system](type-system.md).
@@ -454,8 +457,9 @@ The emitted operand is just the field index, identical to authoring that index
 directly. The qualifier selects the mapping table during assembly; it adds no runtime
 receiver-type assertion. The interpreter applies the index to the actual record
 operand, using its existing bounds and storage checks. This is the temporary
-prototype's index representation, not yet a CLI FieldDef/MemberRef token. General
-external-module field resolution remains pending. Parameter/local name tables and
+prototype's index representation, not yet a CLI FieldDef/MemberRef token.
+[Group assembly](module-sets.md) resolves aliases across supplied modules and checks
+explicit reference lists. Scoped field references remain pending. Parameter/local name tables and
 field declaration names may remain in metadata for tools; instruction execution
 uses indices exclusively.
 

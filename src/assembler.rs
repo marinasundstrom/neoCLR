@@ -55,6 +55,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
     let mut module = Module {
         format: 3,
         name: String::new(),
+        references: None,
         entry: String::new(),
         types: vec![],
         functions: vec![],
@@ -384,6 +385,23 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     }
                     module.entry = rest.into();
                 }
+                ".references" => {
+                    if module.references.is_some() {
+                        return Err(Fault::new("duplicate .references"));
+                    }
+                    let names = rest
+                        .strip_prefix('(')
+                        .and_then(|s| s.strip_suffix(')'))
+                        .ok_or_else(|| Fault::new("expected .references (Module, ...)"))?;
+                    let mut references = Vec::new();
+                    if !names.trim().is_empty() {
+                        for name in names.split(',') {
+                            identifier(name.trim())?;
+                            references.push(name.trim().to_owned());
+                        }
+                    }
+                    module.references = Some(references);
+                }
                 ".type" => {
                     let (name, generic_parameters) = parse_type_declaration(rest)?;
                     let ty = Type::from_name(&name);
@@ -521,6 +539,7 @@ fn resolve_fields(
             .ok_or_else(|| {
                 Fault::new(format!("line {line}: unknown field {name:?} on {owner:?}"))
             })?;
+        crate::references::check_type(context, module, &owner)?;
         match &mut module.functions[function].body[pc] {
             Instruction::Field(slot)
             | Instruction::SetField(slot)

@@ -58,7 +58,8 @@ necessary before persistent caching or cross-build handles.
 
 Type operands still use the prototype's globally unique names across the
 [supplied module set](module-sets.md). This slice does not
-add module-qualified type syntax, imports, same-name types from multiple modules,
+add module-qualified type syntax, same-name types from multiple modules,
 or replace interpreter value/layout keys with resolved identities. It provides the
 definition metadata and structural keys needed for that future resolution work.
 Function references retain their separate [binding rules](member-identities.md).
+Root type queries respect [explicit reference lists](module-references.md) when present.

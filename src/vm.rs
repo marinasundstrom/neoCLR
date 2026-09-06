@@ -143,6 +143,7 @@ pub(crate) fn record_fields(
 
 pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
     if module.name == "System" {
+        crate::references::validate_list(module, &[module])?;
         if !module.entry.is_empty() {
             return Err(Fault::new(
                 "System is reserved for the runtime library without an entry point",

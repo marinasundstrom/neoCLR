@@ -13,7 +13,13 @@ const SOURCES: &[&str] = &[
 
 #[test]
 fn source_group_resolves_generic_calls_and_cross_module_field_aliases() {
-    let modules = assemble_modules(SOURCES).unwrap();
+    let mut modules = assemble_modules(SOURCES).unwrap();
+    // This test also asks the root to resolve a Models type directly.
+    modules[0]
+        .references
+        .as_mut()
+        .unwrap()
+        .push("Models".into());
     let original = serde_json::to_value(&modules).unwrap();
     let program =
         LoadedProgram::with_modules(&modules[0], library::system().unwrap(), &modules[1..])

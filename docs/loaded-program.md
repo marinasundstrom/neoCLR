@@ -50,7 +50,8 @@ cannot mutate bound identities or accidentally treat the combined table as a sou
 artifact whose rows should be renumbered.
 
 Type lookup still uses globally unique names within the explicitly supplied module set.
-Module-scoped references and revisions remain necessary for general loading.
+Optional [direct reference lists](module-references.md) now constrain metadata uses
+and root type queries; scoped type operands and revisions remain pending.
 Definition identities retain their existing build-local limits. No compiled-code
 cache, generic specialization cache, automatic memory-management policy, or implicit
 execution-mode fallback is introduced.

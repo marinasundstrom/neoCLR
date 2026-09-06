@@ -27,6 +27,7 @@ pub(crate) fn link_modules(
     let mut library = library.clone();
     library.normalize_definition_ids()?;
     crate::vm::validate_linked(&library)?;
+    crate::references::validate_list(&library, &[&library])?;
     let mut names = std::collections::HashSet::from([library.name.as_str()]);
     for (index, module) in std::iter::once(application).chain(dependencies).enumerate() {
         if module.name.is_empty() || !names.insert(module.name.as_str()) {
@@ -41,6 +42,13 @@ pub(crate) fn link_modules(
             ));
         }
     }
+    let supplied: Vec<_> = std::iter::once(application)
+        .chain(std::iter::once(&library))
+        .chain(dependencies)
+        .collect();
+    for module in std::iter::once(application).chain(dependencies) {
+        crate::references::validate_list(module, &supplied)?;
+    }
     let mut linked = application.clone();
     linked.normalize_definition_ids()?;
     linked.types.extend(library.types.iter().cloned());
@@ -53,6 +61,9 @@ pub(crate) fn link_modules(
     }
     crate::vm::validate_linked(&linked)?;
     bind_member_references(&mut linked)?;
+    for source in std::iter::once(application).chain(dependencies) {
+        crate::references::validate_uses(&linked, source)?;
+    }
     Ok(linked)
 }
 

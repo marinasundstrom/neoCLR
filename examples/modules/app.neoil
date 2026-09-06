@@ -1,4 +1,5 @@
 .module Application
+.references (Operations)
 .entry Main
 
 .function Main() -> Void

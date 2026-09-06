@@ -1,4 +1,5 @@
 .module Models
+.references ()
 
 .type Box<T>
     .field Value T

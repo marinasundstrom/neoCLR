@@ -18,7 +18,9 @@ Module-local function identities and generic call binding are now implemented; s
 are also implemented. Module revision identity and general
 module-scoped resolution remain shared foundations. [LoadedProgram](loaded-program.md)
 now shares a prepared metadata snapshot across execution and analysis, with
-[explicit module sets](module-sets.md) supporting additional libraries. Invocation,
+[explicit module sets](module-sets.md) supporting additional libraries. Optional
+[direct module reference lists](module-references.md) constrain metadata uses while
+retaining legacy compatibility. Invocation,
 target-layout, runtime-service, and Fault boundaries
 then support a minimal hosting experiment and an early native AOT experiment. A small
 language compiler should target the same metadata/IL and enable incremental library

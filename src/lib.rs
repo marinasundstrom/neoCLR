@@ -5,6 +5,7 @@ pub mod memory;
 pub mod metadata;
 mod native;
 mod program;
+mod references;
 mod type_identity;
 pub mod value;
 mod vm;

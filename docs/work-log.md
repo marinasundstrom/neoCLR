@@ -978,3 +978,27 @@ and a multi-module CLI remain future work. No execution or ownership policy chan
 Validation: all 252 integration tests pass on macOS ARM64; formatting, clippy with
 warnings denied, and diff checks pass. The modules example verifies and prints 42.
 Linux and Windows execution remain for CI.
+
+## 2026-09-06 — Explicit direct module reference lists
+
+Added optional module references metadata and `.references (Module, ...)` authoring.
+An explicit empty list allows local definitions and implicit System; omission retains
+legacy load-set visibility. The loader rejects missing declared modules, duplicate or
+self references, and checks uses against each declaring source's direct list without
+granting transitive visibility. System remains independently validated.
+
+Checks cover recursive type signatures, fields, locals, typed operands, calls,
+attribute constructors, entry references, and root type identity queries. Explicit
+function rows do not bypass the lists. Group assembly checks qualified field aliases
+before normalizing them to indices. References govern encoded names/definitions, not
+all values flowing through calls or a security boundary.
+
+Added seven tests for roundtrips, implicit System, explicit call rows, direct rather
+than transitive dependencies, type uses and queries, attributes and entry points,
+malformed lists, and legacy behavior. Updated the three-module sample with explicit
+Application → Operations → Models references and documented syntax and compatibility.
+Names still share one namespace; scoped operands and artifact revisions remain pending.
+
+Validation: all 259 integration tests pass on macOS ARM64; formatting, clippy with
+warnings denied, and diff checks pass. The updated modules example prints 42.
+Linux and Windows execution remain for CI.

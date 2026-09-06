@@ -48,10 +48,11 @@ and existing duplicate function-signature rules apply across the set. Duplicate 
 fail rather than selecting whichever dependency appeared first. Source namespace
 prefixes are ordinary parts of names; they do not imply module ownership or imports.
 
-Every supplied module can refer to any other supplied module, apart from System, which
-is validated independently. There are no declared import edges, visibility rules,
-module-qualified type operands, revision constraints, or side-by-side same-name modules
-yet. This slice broadens explicit loading; it does not complete scoped resolution.
+Sources can declare [direct module references](module-references.md) with `.references`.
+Sources without a list retain visibility of the supplied set, apart from System,
+which is validated independently. Module-qualified type operands, accessibility flags,
+revision constraints, and side-by-side same-name modules remain pending.
+This broadens explicit loading; it does not complete scoped resolution.
 Build-local row identities do not establish compatibility across artifact replacements.
 
 The example under `examples/modules/` separates the entry point, an operation, and a

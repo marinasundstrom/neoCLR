@@ -113,6 +113,9 @@ impl Type {
 pub struct Module {
     pub format: u32,
     pub name: String,
+    /// None retains legacy load-set visibility; Some lists direct references.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub references: Option<Vec<String>>,
     #[serde(default)]
     pub entry: String,
     #[serde(default)]
