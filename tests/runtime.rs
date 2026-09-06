@@ -149,8 +149,8 @@ fn invalid_execution_faults_with_location() {
         ("Void", "ldvoid", "fell through"),
         (
             "Void",
-            "ldc.i4 1\nbrtrue End\nEnd:\nldvoid\nret",
-            "requires Boolean",
+            "ldc.r8 1\nbrtrue End\nEnd:\nldvoid\nret",
+            "conditional branch requires",
         ),
         ("Boolean", "ldvoid\nldc.i4 1\nceq\nret", "expected Void"),
     ] {

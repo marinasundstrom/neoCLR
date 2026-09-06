@@ -174,8 +174,8 @@ normalization; other checks use exact type equality. See [integer storage](integ
 | `ceq` | `T,T → Boolean` | Structural equality; reference identity |
 | `clt` | `N,N → Boolean` | Signed left operand less than right |
 | `br Label` | `→` | Unconditional branch |
-| `brtrue Label` | `Boolean →` | Branch when true |
-| `brfalse Label` | `Boolean →` | Branch when false |
+| `brtrue Label` | `condition →` | Branch when true, nonzero, or non-null |
+| `brfalse Label` | `condition →` | Branch when false, zero, or null |
 | `switch (Label, ...)` | `Int32 →` | Branch by zero-based index; otherwise fall through |
 | `call Name(T0, …, Tn)` | `P0,…,Pn → R` | Call declared IL or InternalCall function |
 | `ret` | `R → caller` | Return exactly one value; no extra stack items |
@@ -319,9 +319,23 @@ representation. A future CIL writer must translate the table to relative byte
 offsets from the instruction after the switch, as specified in
 [Microsoft's switch reference](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.switch).
 
-`brfalse Label` consumes a Boolean and branches for false; `brtrue` branches for
-true. Both currently require Boolean. CLR integer/reference conditional operands
-and short-form branch aliases remain compatibility work, not intentional semantic
-differences. Tables do not add implicit default branches, union destructuring, or
-a static stack verifier. Stack types and instruction budgets remain checked during
-execution. See `examples/control-flow.neoil` for a loop and multi-way dispatch.
+`brfalse Label` consumes a condition and branches for false or zero; `brtrue`
+branches for true or nonzero. Supported conditions are Boolean, Int32, Int64,
+IntPtr, UIntPtr, native pointers, and the prototype Ref arena references. Small
+integer and unsigned storage types normalize to their usual integer stack category
+before branching. Every current Ref is non-null, including arena index zero.
+
+Pointer conditions test only the numeric address. A non-null pointer can be foreign,
+one-past-end, or stale and still test true. This instruction neither dereferences it
+nor establishes that it is safe to access. Both paths consume exactly one condition
+and preserve older stack entries. These zero/null tests follow the familiar
+[CLR conditional branch contract](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.brfalse).
+
+String, records, Error, unions, Void, and floating-point values are not conditions.
+neoCLR does not infer reference semantics for value types based on their .NET names,
+or infer truth from string length or Option/Result cases. Use `is.case` for unions
+and explicit comparisons for floats. Managed byrefs and short-form branch aliases
+remain pending. Tables do not add implicit default branches, union destructuring,
+or a static stack verifier. Stack types and instruction budgets remain checked during
+execution. See `examples/control-flow.neoil` for pointer testing, an integer-controlled
+loop, and multi-way dispatch.

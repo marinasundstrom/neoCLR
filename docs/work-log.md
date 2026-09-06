@@ -444,3 +444,27 @@ instance receiver indices, and metadata roundtrip.
 
 Validation: all 141 integration tests pass on macOS ARM64; clippy, formatting, and
 diff checks pass. The names sample prints 42 and returns Ok(Void).
+
+## 2026-09-06 — Integer and pointer branch conditions
+
+Extended `brtrue` and `brfalse` beyond Boolean operands to Int32, Int64, IntPtr,
+UIntPtr, native pointers, and the prototype Ref arena. Integer zero and pointer
+address zero test false; current Ref values are always non-null, including index
+zero. Small and unsigned integer storage values use their normalized stack categories.
+Both branch paths consume the condition and preserve older stack entries.
+
+Pointer conditions do not dereference memory or validate lifetime: nonzero foreign,
+one-past-end, and stale pointers test true. Value records, String, Error, unions,
+Void, and floats remain invalid conditions, without implicit truth conversion or
+an inferred class/reference distinction. Documented the supported CLR-like zero/null
+contract and remaining byref/alias work.
+
+Updated the control-flow sample to test a null pointer and use an integer loop
+condition. Added three table-driven tests spanning both branches, integer widths,
+zero/nonzero boundaries, normalized small integers, native addresses, stale and
+foreign pointers, Ref index zero, stack preservation, and rejected value categories.
+Updated earlier Boolean-only rejection tests to use unsupported floating operands.
+
+Validation: all 144 integration tests pass on macOS ARM64; formatting, clippy, and
+diff checks pass. The control-flow sample retains its expected four output lines.
+Linux and Windows execution remain for the existing CI matrix.

@@ -19,12 +19,17 @@ Many:
 
 .function Main() -> Void
     .local Int32 index
+    ptr.null Int32
+    brfalse Start
+    fault "null pointer condition was true"
+Start:
     ldc.i4 0
     stloc index
 Loop:
-    ldloc index
+    ; Zero remaining iterations exits without a Boolean comparison.
     ldc.i4 4
-    clt
+    ldloc index
+    sub
     brfalse Done
     ldloc index
     call Describe(Int32)

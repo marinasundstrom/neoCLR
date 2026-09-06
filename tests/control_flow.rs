@@ -109,8 +109,8 @@ fn operand_types_and_instruction_budget_are_checked() {
             "switch requires Int32",
         ),
         (
-            "ldc.i4 0\nbrfalse End\nEnd:\nldc.i4 42\nret",
-            "brfalse requires Boolean",
+            "ldc.r8 0\nbrfalse End\nEnd:\nldc.i4 42\nret",
+            "conditional branch requires",
         ),
         ("switch ()\nldc.i4 42\nret", "underflow"),
     ] {
@@ -134,4 +134,75 @@ fn operand_types_and_instruction_budget_are_checked() {
         .to_string()
         .contains("instruction limit")
     );
+}
+
+#[test]
+fn conditional_branches_test_zero_across_integer_stack_categories() {
+    for (operand, truth) in [
+        ("ldc.i4 0", false),
+        ("ldc.i4 -1", true),
+        ("ldc.i8 0", false),
+        ("ldc.i8 -9223372036854775808", true),
+        ("ldc.i4 0\nconv.i", false),
+        ("ldc.i4 -1\nconv.i", true),
+        ("ldc.i4 0\nconv.u", false),
+        ("ldc.i4 -1\nconv.u", true),
+        ("ldc.i4 256\nconv.u1", false),
+        ("ldc.i4 255\nconv.u1", true),
+        ("ldc.i4 0\nconv.u8", false),
+        ("ldc.i4 -1\nconv.u8", true),
+    ] {
+        check_condition(operand, truth);
+    }
+}
+
+fn check_condition(operand: &str, truth: bool) {
+    for (branch, taken) in [("brtrue", truth), ("brfalse", !truth)] {
+        // Preserve an older stack value and consume the condition on either path.
+        let module = program(&format!(
+            "ldc.i4 40\n{operand}\n{branch} Taken\nldc.i4 1\nadd\nret\nTaken:\nldc.i4 2\nadd\nret"
+        ));
+        assert_eq!(
+            run(&module, Limits::default()).unwrap().value,
+            Value::Int32(if taken { 42 } else { 41 }),
+            "{branch}: {operand}"
+        );
+    }
+}
+
+#[test]
+fn pointer_conditions_test_addresses_without_dereferencing() {
+    for (operand, truth) in [
+        ("ptr.null Int32", false),
+        ("ldc.i4 0\nheap.alloc Int32", true),
+        ("ldc.i4 1\nheap.alloc Int32\nldc.i4 4\nptr.add", true),
+        ("ldc.i4 1\nconv.u\nptr.fromint Int32", true),
+        ("ldc.i4 1\nheap.alloc Int32\ndup\nheap.free\npop", true),
+        ("ldc.i4 0\nheap.new", true),
+    ] {
+        check_condition(operand, truth);
+    }
+}
+
+#[test]
+fn conditional_branches_do_not_infer_truth_from_other_values() {
+    for operand in [
+        "ldvoid",
+        "ldc.r8 0",
+        "ldc.r8 NaN",
+        "ldstr \"\"",
+        "none Int32",
+        "ldvoid\nok Error",
+        "error \"failure\"",
+    ] {
+        for branch in ["brtrue", "brfalse"] {
+            let module = program(&format!("{operand}\n{branch} End\nEnd:\nldc.i4 42\nret"));
+            assert!(
+                run(&module, Limits::default())
+                    .unwrap_err()
+                    .to_string()
+                    .contains("conditional branch requires")
+            );
+        }
+    }
 }

@@ -515,16 +515,27 @@ fn interpret(
                     frame.stack.push(Value::Boolean(left == right));
                 }
                 Op::Branch(i) => frame.pc = *i,
-                Op::BranchTrue(i) => match frame.pop()? {
-                    Value::Boolean(true) => frame.pc = *i,
-                    Value::Boolean(false) => (),
-                    _ => return Err(Fault::new("brtrue requires Boolean")),
-                },
-                Op::BranchFalse(i) => match frame.pop()? {
-                    Value::Boolean(false) => frame.pc = *i,
-                    Value::Boolean(true) => (),
-                    _ => return Err(Fault::new("brfalse requires Boolean")),
-                },
+                Op::BranchTrue(i) | Op::BranchFalse(i) => {
+                    let condition = match frame.pop()? {
+                        Value::Boolean(value) => value,
+                        Value::Int32(value) => value != 0,
+                        Value::Int64(value) => value != 0,
+                        Value::IntPtr(value) => value != 0,
+                        Value::UIntPtr(value) => value != 0,
+                        // A condition tests the address, not pointee validity or lifetime.
+                        Value::Pointer(pointer) => pointer.address != 0,
+                        // The prototype Ref arena has no null reference representation.
+                        Value::Reference { .. } => true,
+                        _ => {
+                            return Err(Fault::new(
+                                "conditional branch requires Boolean, integer, pointer, or Ref",
+                            ));
+                        }
+                    };
+                    if condition == matches!(op, Op::BranchTrue(_)) {
+                        frame.pc = *i;
+                    }
+                }
                 Op::Switch(targets) => {
                     let Value::Int32(index) = frame.pop()? else {
                         return Err(Fault::new("switch requires Int32"));
