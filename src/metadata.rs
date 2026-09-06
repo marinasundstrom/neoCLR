@@ -320,6 +320,8 @@ pub enum Instruction {
     Void,
     #[serde(rename = "ldarg")]
     Arg(usize),
+    #[serde(rename = "starg")]
+    StoreArg(usize),
     #[serde(rename = "ldloc")]
     Load(usize),
     #[serde(rename = "stloc")]

@@ -72,7 +72,7 @@ Names are optional: `Parse(string)` and `.local Point` remain valid. Named and
 unnamed slots can be mixed. Legacy `.param string value` is also accepted with
 headers that omit an inline parameter list. Names are unquoted; the former `name: Type` syntax is no longer accepted.
 
-`ldarg value`, `ldloc point`, and `stloc point` resolve to numeric indices during
+`ldarg value`, `starg value`, `ldloc point`, and `stloc point` resolve to numeric indices during
 assembly. Numeric operands remain valid even when slots have names. Calls continue
 using types only, such as `call Parse(string)`; names do not participate in overload
 identity. Field operands remain numeric in this slice.
@@ -142,6 +142,7 @@ normalization; other checks use exact type equality. See [integer storage](integ
 | `ldstr "text"` | `→ String` | String literal |
 | `ldvoid` | `→ Void` | The one Void value |
 | `ldarg i` | `→ T` | Copy argument at zero-based index |
+| `starg i` | `T →` | Replace typed argument in the current frame |
 | `ldloc i` | `→ T` | Copy initialized local |
 | `stloc i` | `T →` | Replace typed local |
 | `dup` | `T → T,T` | Copy value; references preserve identity |
@@ -339,3 +340,31 @@ remain pending. Tables do not add implicit default branches, union destructuring
 or a static stack verifier. Stack types and instruction budgets remain checked during
 execution. See `examples/control-flow.neoil` for pointer testing, an integer-controlled
 loop, and multi-way dispatch.
+
+
+## Argument assignment
+
+`starg index` or `starg name` consumes one value and replaces an argument slot in
+the current invocation. It emits a numeric argument index, with the same name
+resolution as `ldarg`. In instance methods, `this` is slot zero and explicit
+parameters start at one. Under neoCLR's existing value receiver semantics,
+`starg this` replaces the callee's receiver value; it does not mutate the caller's
+record. A free/static function has no implicit `this` slot.
+
+Stores use the declared argument type. Small integer values truncate to their
+storage width, Single rounds to binary32, and subsequent `ldarg` normalizes back
+to the evaluation-stack category. Other values require the matching storage type.
+These rules follow the [CLR argument-store contract](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.starg).
+A Void argument can be replaced with the real Void value, consistent with neoCLR's
+inhabited Void type.
+
+Replacing a pointer argument changes the pointer slot, not the pointed-to storage,
+and never frees or retains the allocation. Replacing an ordinary argument does not
+write back into a caller's local or argument. Pointee writes still use the separate
+memory instructions. Invalid indices are rejected during validation, including in
+unreachable code; bad types and stack underflow Fault at the executing instruction.
+The short encoding and argument address-taking (`ldarga`) remain pending.
+
+The `examples/arguments.neoil` sample sums down by updating its `count` argument,
+then demonstrates that the caller's local retains its original value. It prints
+6 followed by 3.

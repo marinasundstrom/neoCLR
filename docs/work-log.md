@@ -468,3 +468,25 @@ Updated earlier Boolean-only rejection tests to use unsupported floating operand
 Validation: all 144 integration tests pass on macOS ARM64; formatting, clippy, and
 diff checks pass. The control-flow sample retains its expected four output lines.
 Linux and Windows execution remain for the existing CI matrix.
+
+## 2026-09-06 — Argument-slot assignment
+
+Implemented `starg` in metadata, assembler name/index resolution, validation, and
+interpretation. Stores replace a typed slot in the current invocation and consume
+one value. Declared storage contracts handle narrow-integer truncation and Single
+rounding. Instance methods resolve `this` to slot zero and explicit parameters to
+subsequent slots, matching `ldarg`.
+
+Replacing a value receiver, record, or pointer argument does not write back to the
+caller's slot. Pointer assignment has no ownership or allocation side effects.
+The existing neoCLR value receiver model also permits replacing the local `this`
+value. Argument addresses and short instruction encodings remain pending.
+
+Added a sum-down sample that modifies its parameter while preserving the caller's
+local. Five tests cover named/numeric equivalence and metadata roundtrip, storage
+conversions including Void, instance receiver/parameter indices and value copies,
+pointer replacement, malformed operands, load-time bounds, bad types, and underflow.
+
+Validation: all 149 integration tests pass on macOS ARM64; formatting, clippy, and
+diff checks pass. The sample prints 6 followed by 3. Linux and Windows execution
+remain for the existing CI matrix.

@@ -169,7 +169,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 Op::Switch(targets) if targets.iter().any(|i| *i >= function.body.len()) => {
                     return Err(Fault::new("switch target outside function"));
                 }
-                Op::Arg(i) if *i >= function.argument_types().len() => {
+                Op::Arg(i) | Op::StoreArg(i) if *i >= function.argument_types().len() => {
                     return Err(Fault::new("argument index outside signature"));
                 }
                 Op::Load(i) | Op::Store(i) if *i >= function.locals.len() => {
@@ -408,6 +408,10 @@ fn interpret(
                 Op::Void => frame.stack.push(Value::Void),
                 Op::Error(s) => frame.stack.push(Value::Error(s.clone())),
                 Op::Arg(i) => frame.stack.push(frame.args[*i].clone().on_stack()),
+                Op::StoreArg(i) => {
+                    let value = frame.pop()?;
+                    frame.args[*i] = value.for_storage(&function.argument_types()[*i])?;
+                }
                 Op::Load(i) => frame.stack.push(
                     frame.locals[*i]
                         .clone()

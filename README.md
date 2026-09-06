@@ -50,6 +50,7 @@ cargo run -- run examples/pointers.neoil
 cargo run -- run examples/memory.neoil
 cargo run -- run examples/stack.neoil
 cargo run -- run examples/control-flow.neoil
+cargo run -- run examples/arguments.neoil
 cargo run -- run examples/native-integers.neoil
 cargo run -- run examples/integers.neoil
 cargo run -- run examples/bits.neoil

@@ -1,0 +1,37 @@
+.module Arguments
+.entry Main
+
+.function SumDown(Int32 count) -> Int32
+    .local Int32 sum
+    ldc.i4 0
+    stloc sum
+Loop:
+    ldarg count
+    brfalse Done
+    ldloc sum
+    ldarg count
+    add
+    stloc sum
+    ldarg count
+    ldc.i4 1
+    sub
+    starg count
+    br Loop
+Done:
+    ldloc sum
+    ret
+.end
+
+.function Main() -> Void
+    .local Int32 count
+    ldc.i4 3
+    stloc count
+    ldloc count
+    call SumDown(Int32)
+    call System.Console::WriteLine(Int32)
+    pop
+    ; Replacing the callee's argument does not replace this local.
+    ldloc count
+    call System.Console::WriteLine(Int32)
+    ret
+.end

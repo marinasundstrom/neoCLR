@@ -175,11 +175,9 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                             serde_json::from_str::<String>(rest)
                                 .map_err(|_| Fault::new("expected JSON-quoted string"))?
                         )),
-                        "ldarg" | "ldloc" | "stloc" => Some(serde_json::json!(resolve_slot(
-                            &pending.function,
-                            word,
-                            rest
-                        )?)),
+                        "ldarg" | "starg" | "ldloc" | "stloc" => Some(serde_json::json!(
+                            resolve_slot(&pending.function, word, rest)?
+                        )),
                         "ldfld" | "stfld" | "ldflda" => Some(serde_json::json!(
                             rest.parse::<usize>()
                                 .map_err(|_| Fault::new("expected nonnegative index"))?
@@ -527,10 +525,10 @@ fn resolve_slot(function: &Function, op: &str, operand: &str) -> Result<usize, F
     if let Ok(index) = operand.parse::<usize>() {
         return Ok(index);
     }
-    if op == "ldarg" && function.instance && operand == "this" {
+    if matches!(op, "ldarg" | "starg") && function.instance && operand == "this" {
         return Ok(0);
     }
-    let (names, offset) = if op == "ldarg" {
+    let (names, offset) = if matches!(op, "ldarg" | "starg") {
         (&function.parameter_names, usize::from(function.instance))
     } else {
         (&function.local_names, 0)
@@ -542,7 +540,11 @@ fn resolve_slot(function: &Function, op: &str, operand: &str) -> Result<usize, F
         .ok_or_else(|| {
             Fault::new(format!(
                 "unknown {} name {operand:?}",
-                if op == "ldarg" { "parameter" } else { "local" }
+                if matches!(op, "ldarg" | "starg") {
+                    "parameter"
+                } else {
+                    "local"
+                }
             ))
         })
 }
