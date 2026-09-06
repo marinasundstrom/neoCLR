@@ -192,7 +192,8 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                             Some(serde_json::json!(rest))
                         }
                         "none" | "ok" | "err" | "sizeof" | "alignof" | "heap.alloc"
-                        | "ptr.null" | "ptr.cast" | "ptr.fromint" | "ldobj" | "stobj" => Some(
+                        | "ptr.null" | "ptr.cast" | "ptr.fromint" | "ldobj" | "stobj" | "cpobj"
+                        | "initobj" => Some(
                             serde_json::to_value(parse_type(rest)?)
                                 .map_err(|e| Fault::new(e.to_string()))?,
                         ),

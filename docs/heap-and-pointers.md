@@ -132,3 +132,52 @@ See the [pointer sample](../examples/pointers.neoil), [opcode reference](neoil.m
 and [memory layers](memory-model.md).
 
 A first P/Invoke subset now supports scalar and pointer calls; see [native interop](native-interop.md).
+
+## Copying and initializing memory
+
+The assembler and interpreter support four familiar CIL operations. Stack operands
+below are listed bottom to top; each instruction consumes them and pushes nothing.
+
+| Instruction | Operands | Behavior |
+| --- | --- | --- |
+| `initobj T` | `T* destination` | Zero the supported native layout, without calling a constructor |
+| `cpobj T` | `T* destination, T* source` | Read an initialized value and copy it into the destination |
+| `initblk` | `pointer destination, Int32 fill, integer size` | Fill `size` bytes with the low eight bits of `fill` |
+| `cpblk` | `pointer destination, pointer source, integer size` | Copy `size` bytes and their initialization state |
+
+Typed operations require matching pointee types and natural type alignment. Their
+layouts are the same as `sizeof`, `ldobj`, and `stobj`: native scalars, pointers,
+Void, and records composed of supported fields. Zero initialization produces numeric
+zero, false, null pointers, and recursively zeroed records. It initializes padding
+as well. It does not allocate storage or imply ownership. String, Error, unions,
+and Ref still lack native layouts and cannot use these operations. This is not a
+promise that every future type has a valid all-zero representation.
+
+`cpobj` copies fields by value; source padding need not be initialized, and destination
+padding becomes uninitialized, as with `stobj`. Pointer fields copy their addresses
+and diagnostic identities; pointees are not cloned. Both typed and block copies
+snapshot the source before writing, including when the ranges overlap.
+
+Block operations accept nonnegative Int32/IntPtr counts or UIntPtr counts, measured
+in bytes. They accept any pointer target and use byte alignment. These are explicit
+prototype choices: CLR documents unsigned 32-bit counts, natural machine alignment
+unless prefixed with `unaligned.`, and unspecified overlapping `cpblk` behavior.
+See Microsoft's [cpblk documentation](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.cpblk)
+and [initblk documentation](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.initblk).
+No volatile or unaligned prefixes are implemented yet.
+
+All four operations require live tracked allocations with in-bounds ranges. Even
+zero-length operations validate addresses (one-past-end is permitted; null, stale,
+and foreign pointers Fault), but change no bytes or pointer identities. Block copies
+can carry uninitialized bytes; subsequent typed reads still Fault on those bytes.
+Fill operations mark written bytes initialized, but arbitrary fills can still produce
+invalid values, such as a Boolean other than zero or one.
+
+A whole pointer representation copied by `cpblk` retains its diagnostic identity.
+Partial writes and fills discard overlapping identities; pointer bits alone do not
+establish tracked ownership. Copying pointer bytes in separate fragments therefore
+does not reconstruct tracking. Range checks happen before mutation. These diagnostics
+are interpreter checks, not reference counting or garbage collection.
+
+Run `cargo run -- run examples/memory.neoil` for typed initialization, independent
+record copying, byte filling/copying, and explicit freeing; it prints 42 twice.

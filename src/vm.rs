@@ -200,7 +200,9 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 | Op::AlignOf(ty)
                 | Op::Allocate(ty)
                 | Op::LoadObject(ty)
-                | Op::StoreObject(ty) => {
+                | Op::StoreObject(ty)
+                | Op::CopyObject(ty)
+                | Op::InitializeObject(ty) => {
                     check_type(ty, module)?;
                     crate::memory::layout(module, ty)?;
                 }
@@ -649,6 +651,50 @@ fn interpret(
                     frame
                         .stack
                         .push(Value::Pointer(memory.field(&pointer, &layout, *index)?));
+                }
+                Op::CopyObject(ty) | Op::InitializeObject(ty) => {
+                    let source = if matches!(op, Op::CopyObject(_)) {
+                        Some(frame.pointer()?)
+                    } else {
+                        None
+                    };
+                    let destination = frame.pointer()?;
+                    if destination.target != *ty || source.as_ref().is_some_and(|p| p.target != *ty)
+                    {
+                        return Err(Fault::new("memory operation pointer type mismatch"));
+                    }
+                    let layout = crate::memory::layout(module, ty)?;
+                    if let Some(source) = source {
+                        let value = memory.read(&source, &layout)?;
+                        memory.write(&destination, &layout, &value)?;
+                    } else {
+                        memory.fill(&destination, &layout, 0)?;
+                    }
+                }
+                Op::CopyBlock | Op::InitializeBlock => {
+                    let size = match frame.pop()? {
+                        Value::Int32(n) => usize::try_from(n).ok(),
+                        Value::IntPtr(n) => usize::try_from(n).ok(),
+                        Value::UIntPtr(n) => Some(n),
+                        _ => return Err(Fault::new("block size requires integer")),
+                    }
+                    .ok_or_else(|| Fault::new("negative block size"))?;
+                    let layout = crate::memory::Layout {
+                        size,
+                        alignment: 1,
+                        fields: vec![],
+                    };
+                    if matches!(op, Op::CopyBlock) {
+                        let source = frame.pointer()?;
+                        let destination = frame.pointer()?;
+                        memory.copy_block(&destination, &source, &layout)?;
+                    } else {
+                        let Value::Int32(value) = frame.pop()? else {
+                            return Err(Fault::new("initblk fill requires Int32"));
+                        };
+                        let destination = frame.pointer()?;
+                        memory.fill(&destination, &layout, value as u8)?;
+                    }
                 }
                 Op::LoadObject(_)
                 | Op::LoadIndirectInt32

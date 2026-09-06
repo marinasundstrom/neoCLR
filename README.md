@@ -46,6 +46,7 @@ cargo run -- run examples/overloads.neoil
 cargo run -- run examples/types.neoil
 cargo run -- run examples/names.neoil
 cargo run -- run examples/pointers.neoil
+cargo run -- run examples/memory.neoil
 cargo run -- run examples/native-integers.neoil
 cargo run -- run examples/integers.neoil
 cargo run -- run examples/bits.neoil
@@ -187,3 +188,7 @@ cargo test --locked
 
 The CI matrix runs these checks on Linux, macOS, and Windows. Local validation
 has been performed on macOS ARM64; the other platforms still require CI execution.
+
+Typed memory initialization/copying (`initobj`, `cpobj`) and byte-range operations
+(`initblk`, `cpblk`) are implemented with explicit pointer checks. See
+[heap and pointer semantics](docs/heap-and-pointers.md#copying-and-initializing-memory).

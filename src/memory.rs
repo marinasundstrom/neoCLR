@@ -372,6 +372,64 @@ impl PointerHeap {
         decode(&pointer.target, layout, pointer.offset, allocation)
     }
 
+    pub(crate) fn fill(
+        &mut self,
+        pointer: &Pointer,
+        layout: &Layout,
+        byte: u8,
+    ) -> Result<(), Fault> {
+        let range = self.range(pointer, layout)?;
+        if range.is_empty() {
+            return Ok(());
+        }
+        // range() has verified that this allocation is present and live.
+        let allocation = self.allocations[pointer.allocation.unwrap()]
+            .as_mut()
+            .unwrap();
+        allocation.bytes.slice_mut()[range.clone()].fill(byte);
+        allocation.initialized[range.clone()].fill(true);
+        allocation.pointers.retain(|offset, _| {
+            *offset + std::mem::size_of::<usize>() <= range.start || *offset >= range.end
+        });
+        Ok(())
+    }
+
+    pub(crate) fn copy_block(
+        &mut self,
+        destination: &Pointer,
+        source: &Pointer,
+        layout: &Layout,
+    ) -> Result<(), Fault> {
+        let dst = self.range(destination, layout)?;
+        let src = self.range(source, layout)?;
+        if dst.is_empty() {
+            return Ok(());
+        }
+        // Snapshot before mutation: overlap is deliberately supported, like memmove.
+        let allocation = self.allocation(source)?;
+        let bytes = allocation.bytes.slice()[src.clone()].to_vec();
+        let initialized = allocation.initialized[src.clone()].to_vec();
+        let pointers: Vec<_> = allocation
+            .pointers
+            .iter()
+            .filter(|(offset, _)| {
+                **offset >= src.start && **offset + std::mem::size_of::<usize>() <= src.end
+            })
+            .map(|(offset, pointer)| (dst.start + offset - src.start, pointer.clone()))
+            .collect();
+        // Both ranges were validated before taking the source snapshot.
+        let allocation = self.allocations[destination.allocation.unwrap()]
+            .as_mut()
+            .unwrap();
+        allocation.bytes.slice_mut()[dst.clone()].copy_from_slice(&bytes);
+        allocation.initialized[dst.clone()].copy_from_slice(&initialized);
+        allocation.pointers.retain(|offset, _| {
+            *offset + std::mem::size_of::<usize>() <= dst.start || *offset >= dst.end
+        });
+        allocation.pointers.extend(pointers);
+        Ok(())
+    }
+
     pub(crate) fn write(
         &mut self,
         pointer: &Pointer,
@@ -403,7 +461,9 @@ impl PointerHeap {
             .ok_or_else(|| Fault::new("invalid allocation"))?;
         allocation.bytes.slice_mut()[range.clone()].copy_from_slice(&bytes);
         allocation.pointers.retain(|offset, _| {
-            *offset + std::mem::size_of::<usize>() <= range.start || *offset >= range.end
+            range.is_empty()
+                || *offset + std::mem::size_of::<usize>() <= range.start
+                || *offset >= range.end
         });
         for (offset, value) in pointers {
             allocation.pointers.insert(range.start + offset, value);

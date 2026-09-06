@@ -354,3 +354,25 @@ mutation/returns, foreign pointer forwarding, lazy loading, safe embedding rejec
 metadata shape checks, and loader/symbol failure diagnostics. Clippy and formatting
 pass on macOS ARM64. The native sample prints 42 and frees its guest allocation.
 Linux/Windows execution remains for the existing CI matrix to verify.
+
+## 2026-09-06 — Typed and block memory operations
+
+Added `initobj T`, `cpobj T`, `initblk`, and `cpblk` to metadata, assembly parsing,
+and interpretation. Typed operations use existing native layouts and alignment;
+block operations use byte alignment and explicit counts. Copies snapshot before
+mutation so overlapping ranges work. No allocation, constructors, ownership, or
+memory-management policy is implied.
+
+Block copies preserve initialization bits and complete pointer identities. Partial
+writes invalidate overlapping identities. Zero-length operations validate addresses
+but preserve tracking, also correcting zero-sized `stobj Void` writes that previously
+could discard a pointer identity without changing its bytes. Unsupported native
+layouts remain rejected. Documented the prototype's block semantics relative to CLR.
+
+Added the memory sample and nine integration tests covering metadata roundtrip,
+record copy/init, overlap, fill truncation, uninitialized copies, checked ranges,
+counts/types/alignment, native count widths, stale and partial pointer copies,
+zero-length operations, and explicit freeing. The sample prints 42 twice.
+
+Validation: all 122 integration tests pass on macOS ARM64; formatting and clippy
+pass. Linux and Windows execution remain for the existing CI matrix.

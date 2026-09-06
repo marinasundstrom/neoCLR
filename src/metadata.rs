@@ -422,6 +422,14 @@ pub enum Instruction {
     LoadObject(Type),
     #[serde(rename = "stobj")]
     StoreObject(Type),
+    #[serde(rename = "cpobj")]
+    CopyObject(Type),
+    #[serde(rename = "initobj")]
+    InitializeObject(Type),
+    #[serde(rename = "cpblk")]
+    CopyBlock,
+    #[serde(rename = "initblk")]
+    InitializeBlock,
     #[serde(rename = "ldind.i4")]
     LoadIndirectInt32,
     #[serde(rename = "stind.i4")]

@@ -190,6 +190,10 @@ normalization; other checks use exact type equality. See [integer storage](integ
 | `ldflda i` | `Ptr<Record> → Ptr<T>` | Address field at zero-based index |
 | `ldobj T` | `Ptr<T> → T` | Copy initialized value from native storage |
 | `stobj T` | `Ptr<T>,T →` | Copy value into native storage |
+| `initobj T` | `Ptr<T> →` | Zero a supported native layout without a constructor |
+| `cpobj T` | `Ptr<T>,Ptr<T> →` | Copy initialized value from source to destination |
+| `initblk` | `Ptr<T>,Int32,integer →` | Fill a byte range with the low byte of the value |
+| `cpblk` | `Ptr<T>,Ptr<U>,integer →` | Copy a byte range and initialization state (overlap supported) |
 | `ldind.i4` | `Ptr<Int32 or UInt32> → Int32` | Indirect 32-bit load |
 | `stind.i4` | `Ptr<Int32 or UInt32>,Int32 →` | Indirect 32-bit store |
 | `ldind.i1/u1/i2/u2/u4` | `Ptr<Integer> → Int32` | Load indicated width with signed/unsigned interpretation |
@@ -289,3 +293,5 @@ This is an additive format-3 metadata extension. Earlier format-3 artifacts with
 names still load; serialized opcode operands are unchanged. The eventual binary
 backend can map parameter names to parameter metadata and local names to appropriate
 local/debug metadata without putting names into instruction operands.
+
+See [memory operations](heap-and-pointers.md#copying-and-initializing-memory) for block counts, alignment, pointer tracking, and zero-length behavior.
