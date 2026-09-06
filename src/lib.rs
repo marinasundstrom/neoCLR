@@ -49,3 +49,5 @@ pub fn load(source: &str) -> Result<Module, Fault> {
 mod numeric;
 
 mod floating;
+
+mod checked;

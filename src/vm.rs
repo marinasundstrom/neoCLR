@@ -417,6 +417,29 @@ fn interpret(module: &Module, limits: Limits) -> Result<Execution, Fault> {
                     let left = frame.pop()?;
                     frame.stack.push(crate::numeric::binary(op, left, right)?);
                 }
+                Op::CheckedInt8
+                | Op::CheckedUInt8
+                | Op::CheckedInt16
+                | Op::CheckedUInt16
+                | Op::CheckedInt32
+                | Op::CheckedUInt32
+                | Op::CheckedInt64
+                | Op::CheckedUInt64
+                | Op::CheckedNativeInt
+                | Op::CheckedNativeUInt
+                | Op::CheckedInt8Unsigned
+                | Op::CheckedUInt8Unsigned
+                | Op::CheckedInt16Unsigned
+                | Op::CheckedUInt16Unsigned
+                | Op::CheckedInt32Unsigned
+                | Op::CheckedUInt32Unsigned
+                | Op::CheckedInt64Unsigned
+                | Op::CheckedUInt64Unsigned
+                | Op::CheckedNativeIntUnsigned
+                | Op::CheckedNativeUIntUnsigned => {
+                    let value = frame.pop()?;
+                    frame.stack.push(crate::checked::convert(op, value)?);
+                }
                 Op::ConvertNativeInt
                 | Op::ConvertNativeUInt
                 | Op::ConvertInt32

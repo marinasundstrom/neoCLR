@@ -35,7 +35,7 @@ gap, not an intended new platform rule.
 
 These conversions are unchecked; narrowing truncates. Converting a pointer to Int32
 requires explicitly passing through a native integer. Float conversions are now supported; see [floating-point rules](floating-point.md).
-Checked conversion instructions remain pending. Native arithmetic and conversion vocabulary
+Checked conversion instructions are now available; see [checked conversions](checked-conversions.md). Native arithmetic and conversion vocabulary
 follow the [CLI instruction specification](https://ecma-international.org/publications-and-standards/standards/ecma-335/)
 and [conv.i documentation](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.conv_i).
 

@@ -69,7 +69,8 @@ explicitly chooses destination-range saturation and NaN-to-zero. This includes t
 small integer destination ranges before stack widening. This policy is not a claim
 of bit-for-bit agreement with every .NET implementation's out-of-range result. See
 [conv.i4](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.conv_i4).
-Checked conversion instructions remain pending.
+Checked conversion instructions now diagnose these cases; see
+[checked conversions](checked-conversions.md).
 
 ldind.r4/r8 and stind.r4/r8 access matching Single/Double pointers. ldobj/stobj also
 support both types. Single stores round to binary32; loads widen to F. Existing

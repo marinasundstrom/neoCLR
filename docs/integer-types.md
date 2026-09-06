@@ -48,14 +48,13 @@ the corresponding signed bit pattern in UInt64. There is no floating-point step.
 conv.i1/u1/i2/u2 truncate and sign/zero-extend into Int32. conv.u4 retains 32 bits.
 conv.i8 sign-extends narrower integer stack values; conv.u8 zero-extends their bit
 patterns. Both produce Int64 stack values. Existing native conversions now also
-accept Int64, truncating when the host native width is smaller. Checked conversions
-remain unimplemented.
+accept Int64, truncating when the host native width is smaller. Checked conversions are implemented; see [checked conversions](checked-conversions.md).
 
 Int64 supports the existing wrapping, signed/unsigned checked arithmetic, division,
 and comparison instructions. Arithmetic uses the opcode's signedness, not the storage
 signature. Overflow Faults only for checked arithmetic (and signed division's
 minimum/-1 case); division by zero always Faults. Floating-point arithmetic is now supported; see [floating-point rules](floating-point.md).
-Checked conversions remain a follow-up.
+Checked conversions are also available; see [checked conversions](checked-conversions.md).
 
 Indirect instructions now cover ldind.i1/u1/i2/u2/i4/u4/i8/i and
 stind.i1/i2/i4/i8/i. A typed pointer must name a member of the corresponding storage

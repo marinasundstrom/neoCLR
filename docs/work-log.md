@@ -304,3 +304,23 @@ across locals/calls/fields, a double-rounding regression, non-finite arithmetic,
 comparison behavior, conversions, and instruction-located Faults. Clippy and formatting
 pass on macOS ARM64. The sample prints 42 and frees its allocations. Existing integer,
 pointer, library, and CLI suites remain passing; other hosts still require CI execution.
+
+
+## 2026-09-06 — Checked numeric conversions
+
+Implemented all 20 conv.ovf integer/native destination forms, including unsigned-source
+.un variants. Integer range checks preserve full precision. Floating inputs truncate
+before bounds checking; non-finite and out-of-range results Fault with instruction
+locations. Power-of-two exclusive upper bounds avoid the rounded Int64/UInt64 maximum
+pitfall. Source interpretation remains explicit and independent of storage names.
+
+Added an executable sample, opcode reference entries, and checked-conversion contracts.
+These operations use existing stack categories and do not change unchecked conversion,
+allocation, or ownership behavior. Recoverable conversions still require a validating
+Result-returning library surface rather than catching a Fault.
+
+Validation: all 106 integration tests pass, including six new checked-conversion tests
+covering every opcode, exact integer boundaries, unsigned source interpretation, native
+widths, floating-point boundary rounding, non-finite values, invalid operands, metadata
+round-trip, and sample execution. Clippy and formatting pass on macOS ARM64. The sample
+prints 42 and 255 and returns Void. Other hosts remain subject to the existing CI matrix.

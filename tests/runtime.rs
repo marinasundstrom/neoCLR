@@ -265,6 +265,7 @@ fn all_implemented_opcodes_have_a_sample() {
         include_str!("../examples/integers.neoil"),
         include_str!("../examples/bits.neoil"),
         include_str!("../examples/floating.neoil"),
+        include_str!("../examples/checked-conversions.neoil"),
     ];
     let mut covered = std::collections::HashSet::new();
     for source in samples {
@@ -281,6 +282,26 @@ fn all_implemented_opcodes_have_a_sample() {
     }
     for op in [
         "ldc.i4",
+        "conv.ovf.i1",
+        "conv.ovf.u1",
+        "conv.ovf.i2",
+        "conv.ovf.u2",
+        "conv.ovf.i4",
+        "conv.ovf.u4",
+        "conv.ovf.i8",
+        "conv.ovf.u8",
+        "conv.ovf.i",
+        "conv.ovf.u",
+        "conv.ovf.i1.un",
+        "conv.ovf.u1.un",
+        "conv.ovf.i2.un",
+        "conv.ovf.u2.un",
+        "conv.ovf.i4.un",
+        "conv.ovf.u4.un",
+        "conv.ovf.i8.un",
+        "conv.ovf.u8.un",
+        "conv.ovf.i.un",
+        "conv.ovf.u.un",
         "ldc.r4",
         "ldc.r8",
         "conv.r4",

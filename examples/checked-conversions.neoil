@@ -1,0 +1,53 @@
+.module CheckedConversions
+.entry Main
+
+; Checked narrowing truncates a floating-point fraction, then validates its range.
+.function ToByte(value: Double) -> Byte
+    ldarg value
+    conv.ovf.u1
+    ret
+.end
+
+.function SignedConversions(value: Int32) -> Int32
+    ldarg value
+    conv.ovf.i1
+    conv.ovf.u1
+    conv.ovf.i2
+    conv.ovf.u2
+    conv.ovf.i4
+    conv.ovf.u4
+    conv.ovf.i8
+    conv.ovf.u8
+    conv.ovf.i
+    conv.ovf.u
+    conv.i4
+    ret
+.end
+
+.function UnsignedConversions(value: Int32) -> Int32
+    ldarg value
+    conv.ovf.i1.un
+    conv.ovf.u1.un
+    conv.ovf.i2.un
+    conv.ovf.u2.un
+    conv.ovf.i4.un
+    conv.ovf.u4.un
+    conv.ovf.i8.un
+    conv.ovf.u8.un
+    conv.ovf.i.un
+    conv.ovf.u.un
+    conv.i4
+    ret
+.end
+
+.function Main() -> Void
+    ldc.i4 42
+    call SignedConversions(Int32)
+    call UnsignedConversions(Int32)
+    call System.Console.WriteLine(Int32)
+    pop
+    ldc.r8 255.9
+    call ToByte(Double)
+    call System.Console.WriteLine(Int32)
+    ret
+.end

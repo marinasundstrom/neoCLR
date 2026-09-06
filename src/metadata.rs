@@ -200,6 +200,46 @@ pub enum Instruction {
     Int(i32),
     #[serde(rename = "ldc.i8")]
     Int64(i64),
+    #[serde(rename = "conv.ovf.i1")]
+    CheckedInt8,
+    #[serde(rename = "conv.ovf.u1")]
+    CheckedUInt8,
+    #[serde(rename = "conv.ovf.i2")]
+    CheckedInt16,
+    #[serde(rename = "conv.ovf.u2")]
+    CheckedUInt16,
+    #[serde(rename = "conv.ovf.i4")]
+    CheckedInt32,
+    #[serde(rename = "conv.ovf.u4")]
+    CheckedUInt32,
+    #[serde(rename = "conv.ovf.i8")]
+    CheckedInt64,
+    #[serde(rename = "conv.ovf.u8")]
+    CheckedUInt64,
+    #[serde(rename = "conv.ovf.i")]
+    CheckedNativeInt,
+    #[serde(rename = "conv.ovf.u")]
+    CheckedNativeUInt,
+    #[serde(rename = "conv.ovf.i1.un")]
+    CheckedInt8Unsigned,
+    #[serde(rename = "conv.ovf.u1.un")]
+    CheckedUInt8Unsigned,
+    #[serde(rename = "conv.ovf.i2.un")]
+    CheckedInt16Unsigned,
+    #[serde(rename = "conv.ovf.u2.un")]
+    CheckedUInt16Unsigned,
+    #[serde(rename = "conv.ovf.i4.un")]
+    CheckedInt32Unsigned,
+    #[serde(rename = "conv.ovf.u4.un")]
+    CheckedUInt32Unsigned,
+    #[serde(rename = "conv.ovf.i8.un")]
+    CheckedInt64Unsigned,
+    #[serde(rename = "conv.ovf.u8.un")]
+    CheckedUInt64Unsigned,
+    #[serde(rename = "conv.ovf.i.un")]
+    CheckedNativeIntUnsigned,
+    #[serde(rename = "conv.ovf.u.un")]
+    CheckedNativeUIntUnsigned,
     #[serde(rename = "conv.i1")]
     ConvertInt8,
     #[serde(rename = "conv.u1")]

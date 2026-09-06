@@ -156,6 +156,8 @@ normalization; other checks use exact type equality. See [integer storage](integ
 | `clt.un` | `N,N → Boolean` | Unsigned comparison |
 | `conv.i` | `Integer or Ptr<T> → IntPtr` | Native signed conversion |
 | `conv.u` | `Integer or Ptr<T> → UIntPtr` | Native unsigned conversion |
+| `conv.ovf.i1/u1/i2/u2/i4/u4/i8/u8/i/u` | `Integer or F → destination stack category` | Check signed source against destination range; overflow Fault |
+| `conv.ovf.i1/u1/i2/u2/i4/u4/i8/u8/i/u.un` | `Integer or F → destination stack category` | Same check with unsigned integer source interpretation |
 | `conv.r4`, `conv.r8` | `Integer or F → F` | Convert/round to binary32 or binary64 |
 | `conv.r.un` | `Integer → F` | Convert unsigned integer interpretation |
 | `ckfinite` | `F → F` | Fault on NaN or infinity |
@@ -209,7 +211,8 @@ normalization; other checks use exact type equality. See [integer storage](integ
 clt.un also accept floating-point operands; .un comparisons test unordered values.
 Floating division by zero produces infinity/NaN, not the integer Fault. Integer
 conversions accept F with truncation; see [floating-point rules](floating-point.md)
-for rounding and the explicit out-of-range policy. Float constants serialize as
+for rounding and the explicit unchecked out-of-range policy. All 20 checked integer
+conversion forms are described in [checked conversions](checked-conversions.md). Float constants serialize as
 `arg: {"bits": unsignedInteger}` to preserve non-finite values in JSON.
 
 Here `N` is Int32, Int64, IntPtr, or UIntPtr; binary operands currently require matching
