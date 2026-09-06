@@ -168,3 +168,50 @@ operations. Reference counting, GC, automatic lifetime management, and allocator
 policy integration are deferred. No runtime behavior changed in this documentation
 update; existing type-system work is preserved. Validation: diff whitespace and
 local Markdown links checked; no additional runtime tests needed for these edits.
+
+## 2026-09-06 — Optional parameter and local names
+
+Chose consistent `name: Type` syntax for inline parameters, legacy .param declarations,
+and locals (`.local point: Point`). Type-only declarations and numeric instruction
+operands remain valid. ldarg/ldloc/stloc also accept names, resolved to indices by
+the assembler. Instance methods expose `this` at argument zero and offset declared
+parameter names appropriately. Call references remain type-only.
+
+Added optional name arrays alongside parameter/local type signatures. Names survive
+metadata serialization without affecting overload identity or execution. The loader
+checks array alignment, valid names, duplicate names, and the reserved instance
+receiver alias. Earlier format-3 artifacts with omitted names still load.
+
+Named runtime library parameters and added a sample using a named Point local.
+Validation: all 55 integration tests pass, including six new name-resolution and
+metadata tests. Clippy, formatting, and diff whitespace checks pass.
+
+
+## 2026-09-06 — Native heap allocation and pointers
+
+Added real native allocations with explicit free, native-address pointer values,
+native-sized pointer storage, sequential record layout, and twelve instructions:
+sizeof/alignof, heap.alloc/free, ptr.null/cast/add, ldflda, ldobj/stobj, and
+ldind.i4/stind.i4. Allocation consumes an element count; pointer offsets use bytes.
+Construction remains a separate value operation. Copies of pointer-bearing records
+copy addresses without imposing ownership or automatic retain/release behavior.
+
+Interpreter side tables check allocation identity, initialization, bounds, alignment,
+and invalid release. Pointer stores retain diagnostic tracking alongside real address
+bytes; overlapping nonpointer stores discard it. Native interop, external addresses,
+native integers, and stack address operations remain pending. The current checks are
+prototype restrictions, not a universal memory-management model. Ref's existing
+execution-owned arena is unchanged; RC, GC, and allocator policy remain deferred.
+
+Recorded the platform principle: types provide data and behavior, while allocation
+and lifetime remain separate choices. Preserve familiar CLR behavior except for
+intentional departures, and distinguish incomplete implementation from new semantics.
+Added a pointer sample and the detailed heap/pointer contract; updated README,
+assembly reference, semantics, memory/type notes, and roadmap.
+
+Validation: all 72 integration tests pass, including 17 pointer tests covering native
+address dereference from the host, pointer width/storage/casts, recursive pointer
+fields, aggregate layout/copying, lifetime and invalid-access diagnostics, quota
+reclamation, and metadata validation. Clippy and formatting pass on macOS ARM64.
+The pointer sample prints 42 and returns Ok(Void), with all its allocations freed.
+Cross-platform execution remains subject to the existing CI matrix.

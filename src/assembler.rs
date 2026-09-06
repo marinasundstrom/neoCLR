@@ -100,11 +100,13 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                             "inline parameters cannot be combined with .param",
                         ));
                     }
-                    let ty = parse_type(rest)?;
+                    let (name, ty) = parse_slot(rest)?;
                     if word == ".param" {
                         pending.function.parameters.push(ty);
+                        pending.function.parameter_names.push(name);
                     } else {
                         pending.function.locals.push(ty);
+                        pending.function.local_names.push(name);
                     }
                 } else if let Some(label) = line.strip_suffix(':') {
                     identifier(label)?;
@@ -130,7 +132,12 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                             serde_json::from_str::<String>(rest)
                                 .map_err(|_| Fault::new("expected JSON-quoted string"))?
                         )),
-                        "ldarg" | "ldloc" | "stloc" | "ldfld" | "stfld" => Some(serde_json::json!(
+                        "ldarg" | "ldloc" | "stloc" => Some(serde_json::json!(resolve_slot(
+                            &pending.function,
+                            word,
+                            rest
+                        )?)),
+                        "ldfld" | "stfld" | "ldflda" => Some(serde_json::json!(
                             rest.parse::<usize>()
                                 .map_err(|_| Fault::new("expected nonnegative index"))?
                         )),
@@ -147,7 +154,8 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                             identifier(rest)?;
                             Some(serde_json::json!(rest))
                         }
-                        "none" | "ok" | "err" => Some(
+                        "none" | "ok" | "err" | "sizeof" | "alignof" | "heap.alloc"
+                        | "ptr.null" | "ptr.cast" | "ldobj" | "stobj" => Some(
                             serde_json::to_value(parse_type(rest)?)
                                 .map_err(|e| Fault::new(e.to_string()))?,
                         ),
@@ -221,16 +229,19 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                         .split_once("->")
                         .ok_or_else(|| Fault::new("expected .function Name -> Type"))?;
                     let inline_parameters = name.contains('(');
-                    let target = if inline_parameters {
-                        parse_function_ref(name.trim())?
+                    let (target, parameter_names) = if inline_parameters {
+                        parse_callable(name.trim(), true)?
                     } else {
                         identifier(name.trim())?;
-                        FunctionRef {
-                            name: name.trim().into(),
-                            parameters: vec![],
-                            owner: None,
-                            instance: false,
-                        }
+                        (
+                            FunctionRef {
+                                name: name.trim().into(),
+                                parameters: vec![],
+                                owner: None,
+                                instance: false,
+                            },
+                            vec![],
+                        )
                     };
                     if target.owner.is_some() || target.instance {
                         return Err(Fault::new(
@@ -257,8 +268,10 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                             owner,
                             instance,
                             parameters: target.parameters,
+                            parameter_names,
                             returns: parse_type(result)?,
                             locals: vec![],
+                            local_names: vec![],
                             body: vec![],
                             impl_flags: 0,
                         },
@@ -349,6 +362,10 @@ pub fn parse_type(text: &str) -> Result<Type, Fault> {
 
 /// Parse an explicit call signature, including nested constructed parameter types.
 pub fn parse_function_ref(text: &str) -> Result<FunctionRef, Fault> {
+    parse_callable(text, false).map(|(target, _)| target)
+}
+
+fn parse_callable(text: &str, named: bool) -> Result<(FunctionRef, Vec<Option<String>>), Fault> {
     let (name, parameters) = text.trim().split_once('(').ok_or_else(|| {
         Fault::new("call requires an explicit signature: Name(Type, ...) or Name()")
     })?;
@@ -378,6 +395,17 @@ pub fn parse_function_ref(text: &str) -> Result<FunctionRef, Fault> {
         .strip_suffix(')')
         .ok_or_else(|| Fault::new("unclosed call signature"))?;
     let mut types = vec![];
+    let mut names = vec![];
+    let mut parameter = |text: &str| -> Result<(), Fault> {
+        let (name, ty) = if named {
+            parse_slot(text)?
+        } else {
+            (None, parse_type(text)?)
+        };
+        names.push(name);
+        types.push(ty);
+        Ok(())
+    };
     if !parameters.trim().is_empty() {
         let mut nesting = 0i32;
         let mut start = 0;
@@ -386,7 +414,7 @@ pub fn parse_function_ref(text: &str) -> Result<FunctionRef, Fault> {
                 '<' => nesting += 1,
                 '>' => nesting -= 1,
                 ',' if nesting == 0 => {
-                    types.push(parse_type(&parameters[start..index])?);
+                    parameter(&parameters[start..index])?;
                     start = index + 1;
                 }
                 _ => (),
@@ -398,12 +426,52 @@ pub fn parse_function_ref(text: &str) -> Result<FunctionRef, Fault> {
         if nesting != 0 {
             return Err(Fault::new("unbalanced call parameter type"));
         }
-        types.push(parse_type(&parameters[start..])?);
+        parameter(&parameters[start..])?;
     }
-    Ok(FunctionRef {
-        name,
-        owner,
-        instance,
-        parameters: types,
-    })
+    Ok((
+        FunctionRef {
+            name,
+            owner,
+            instance,
+            parameters: types,
+        },
+        names,
+    ))
+}
+
+fn parse_slot(text: &str) -> Result<(Option<String>, Type), Fault> {
+    match text.split_once(':') {
+        Some((name, ty)) => {
+            let name = name.trim();
+            if !crate::metadata::valid_slot_name(name) {
+                return Err(Fault::new("invalid parameter/local name"));
+            }
+            Ok((Some(name.into()), parse_type(ty)?))
+        }
+        None => Ok((None, parse_type(text)?)),
+    }
+}
+
+fn resolve_slot(function: &Function, op: &str, operand: &str) -> Result<usize, Fault> {
+    if let Ok(index) = operand.parse::<usize>() {
+        return Ok(index);
+    }
+    if op == "ldarg" && function.instance && operand == "this" {
+        return Ok(0);
+    }
+    let (names, offset) = if op == "ldarg" {
+        (&function.parameter_names, usize::from(function.instance))
+    } else {
+        (&function.local_names, 0)
+    };
+    names
+        .iter()
+        .position(|name| name.as_deref() == Some(operand))
+        .map(|index| index + offset)
+        .ok_or_else(|| {
+            Fault::new(format!(
+                "unknown {} name {operand:?}",
+                if op == "ldarg" { "parameter" } else { "local" }
+            ))
+        })
 }

@@ -10,12 +10,13 @@ authorization to redefine otherwise unchanged CLR behavior permanently.
 
 A type describes its data, not whether it is a “struct” or “class.” There is no
 value/reference flag on a type definition. A record and an integer can both be
-held directly or explicitly placed behind `Ref<T>`.
+held directly or placed in explicitly allocated native storage accessed through
+`Ptr<T>`. The legacy `Ref<T>` arena is another separate storage abstraction.
 
 Locals, arguments, and evaluation-stack slots own values. Loading an argument or
 local, duplicating a value, and selecting a field copy the value. Copying a record
-recursively copies its fields. Embedded `Ref<T>` values copy their identity, not
-their target. `stfld` consumes a record and a replacement field and produces an
+recursively copies its fields. Embedded `Ref<T>` values copy their identity and
+`Ptr<T>` values copy their addresses, not their targets. `stfld` consumes a record and a replacement field and produces an
 updated record; it does not mutate some hidden receiver identity.
 
 A call consumes its arguments and transfers them into a new frame. `ret` transfers
@@ -30,8 +31,9 @@ value of exactly the same type, visible through all aliases, and produces `Void`
 References cannot be constructed from integers or forged by guest instructions.
 They are non-null and identify arena slots. The execution result retains the arena
 so a returned reference remains meaningful within that result; indices have no
-meaning across executions. No pointer arithmetic, reclamation, or raw native
-addresses are exposed.
+meaning across executions. This arena exposes no pointer arithmetic or individual
+reclamation. Separately, `heap.alloc/free` and pointer instructions operate on native
+storage with explicit release; see [heap and pointers](heap-and-pointers.md).
 
 Native stack placement is not established by these semantics. A future backend
 may use native stack storage, frame arenas, registers, or scalar replacement while
@@ -124,8 +126,9 @@ claiming a full .NET-compatible library or final binary CIL emission.
 ## Memory-policy independence
 
 Rust's host memory rules do not define the guest VM. Fundamental `Ptr<T>`/`T*`
-signatures are separate from ownership wrappers; executable pointer semantics remain
-pending. Reference-counted `Ref<T>` is the intended first explicit ownership policy,
+values are separate from ownership wrappers. Native heap allocation and pointer
+access are implemented in a checked interpreter subset. Reference-counted `Ref<T>`
+is a deferred candidate for explicit ownership,
 but the implementation still uses an arena. General generic metadata and lifetime
 operations are prerequisites for a library-defined Ref abstraction. No global GC or
 Rust-style borrowing policy is implied. See [memory layers](memory-model.md).

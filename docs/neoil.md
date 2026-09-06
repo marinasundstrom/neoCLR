@@ -46,6 +46,42 @@ escapes. Identifiers contain ASCII letters, digits, underscores, and dots.
 declaration order. The entry function may return any supported type.
 The CLI displays the return value in a diagnostic Rust-style representation.
 
+## Parameter and local names
+
+Use `name: Type` consistently in declarations:
+
+```text
+.method static Parse(value: string) -> Result<Int32,Error>
+    ldarg value
+    call neoCLR.Runtime.ParseInt32(string)
+    ret
+.end
+
+.function Main() -> Result<Void,Error>
+    .local point: Point
+    ...
+.end
+```
+
+Names are optional: `Parse(string)` and `.local Point` remain valid. Named and
+unnamed slots can be mixed. Legacy `.param value: string` is also accepted with
+headers that omit an inline parameter list. Type-first quoted names are not syntax.
+
+`ldarg value`, `ldloc point`, and `stloc point` resolve to numeric indices during
+assembly. Numeric operands remain valid even when slots have names. Calls continue
+using types only, such as `call Parse(string)`; names do not participate in overload
+identity. Field operands remain numeric in this slice.
+
+Names are case-sensitive ASCII identifiers beginning with a letter or underscore,
+followed by letters, digits, or underscores. Parameter and local name scopes are
+separate; each rejects duplicates. Unknown names are assembly errors. Declarations
+must precede instructions and labels.
+
+In an instance method, `ldarg this` denotes receiver index zero; an explicitly named
+parameter resolves to its declared index plus one. `this` is reserved in instance
+parameter declarations. It does not add a parameter to the signature. See the
+[named-slot sample](../examples/names.neoil).
+
 ## Call signatures and overloads
 
 Every call specifies its ordered parameter types, including empty parentheses for
@@ -64,7 +100,7 @@ There is no implicit conversion or runtime overload selection. After selecting a
 target, the interpreter checks the actual argument values against that signature.
 Omitting parentheses or naming a nonexistent overload is an error.
 
-Definitions use the same parameter type list as calls:
+Definitions use the same parameter types as calls, with optional names:
 
 ```text
 .function Describe(int32) -> string
@@ -114,6 +150,18 @@ denote actual runtime types; all checks use exact type equality.
 | `newobj Name` | `F0,…,Fn → Name` | Construct frame-owned record in field declaration order |
 | `ldfld i` | `Record → T` | Copy field |
 | `stfld i` | `Record,T → Record` | Produce updated record value |
+| `sizeof T` | `→ Int32` | Byte size of supported native layout |
+| `alignof T` | `→ Int32` | Native layout alignment |
+| `heap.alloc T` | `Int32 → Ptr<T>` | Allocate uninitialized storage for count elements |
+| `heap.free` | `Ptr<T> → Void` | Free allocation base; null is a no-op |
+| `ptr.null T` | `→ Ptr<T>` | Actual null address |
+| `ptr.cast T` | `Ptr<U> → Ptr<T>` | Reinterpret target type, preserving address |
+| `ptr.add` | `Ptr<T>,Int32 → Ptr<T>` | Signed byte offset; checked prototype bounds |
+| `ldflda i` | `Ptr<Record> → Ptr<T>` | Address field at zero-based index |
+| `ldobj T` | `Ptr<T> → T` | Copy initialized value from native storage |
+| `stobj T` | `Ptr<T>,T →` | Copy value into native storage |
+| `ldind.i4` | `Ptr<Int32> → Int32` | Indirect Int32 load |
+| `stind.i4` | `Ptr<Int32>,Int32 →` | Indirect Int32 store |
 | `heap.new` | `T → Ref<T>` | Explicitly allocate shared identity |
 | `heap.load` | `Ref<T> → T` | Copy heap contents |
 | `heap.store` | `Ref<T>,T → Void` | Replace heap contents |
@@ -173,4 +221,22 @@ Call targets store as structured references rather than untyped names:
 The parameter array is required, including `[]` for zero arguments. Return types
 remain on function definitions/runtime binding contracts. Format 3 adds declaring-type and instance-call semantics. Older modules and System
 libraries must be reassembled. Pointer signatures use `{"Ptr":"Int32"}` and imply
-no ownership, pointer operations, or automatic memory management.
+no ownership or automatic memory management. Pointer instructions are additive
+format-3 opcodes; older runtimes reject them as unknown instructions. See
+[heap and pointers](heap-and-pointers.md) for layout, native-address representation,
+checked interpreter restrictions, and the remaining native pointer capabilities.
+
+Optional `parameter_names` and `local_names` arrays preserve declaration names
+separately from type signatures. Entries are strings or null for unnamed slots.
+Parameter names exclude the implicit receiver. A nonempty name array must have the
+same length as its corresponding type array; an omitted or empty array means all
+slots are unnamed. For example:
+
+```json
+{"parameters":["String"],"parameter_names":["value"],"locals":["Int32"],"local_names":["count"]}
+```
+
+This is an additive format-3 metadata extension. Earlier format-3 artifacts without
+names still load; serialized opcode operands are unchanged. The eventual binary
+backend can map parameter names to parameter metadata and local names to appropriate
+local/debug metadata without putting names into instruction operands.

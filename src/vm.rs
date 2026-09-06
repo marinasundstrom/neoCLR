@@ -10,6 +10,8 @@ pub struct Limits {
     pub frames: usize,
     pub stack: usize,
     pub heap_objects: usize,
+    pub pointer_bytes: usize,
+    pub pointer_allocations: usize,
 }
 
 impl Default for Limits {
@@ -19,6 +21,8 @@ impl Default for Limits {
             frames: 256,
             stack: 4096,
             heap_objects: 4096,
+            pointer_bytes: 16 * 1024 * 1024,
+            pointer_allocations: 4096,
         }
     }
 }
@@ -29,6 +33,7 @@ pub struct Execution {
     pub output: Vec<String>,
     /// Retained until the execution result is dropped; references index this arena.
     pub heap: Vec<Value>,
+    pub memory: crate::memory::PointerHeap,
 }
 
 fn resolve(module: &Module, target: &FunctionRef) -> Option<usize> {
@@ -101,6 +106,12 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         }
     }
     for function in &module.functions {
+        crate::metadata::validate_slot_names(
+            &function.parameter_names,
+            function.parameters.len(),
+            function.instance,
+        )?;
+        crate::metadata::validate_slot_names(&function.local_names, function.locals.len(), false)?;
         if function.instance && function.owner.is_none() {
             return Err(Fault::new("instance method requires a declaring type"));
         }
@@ -179,7 +190,19 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                         ));
                     }
                 }
-                Op::None(ty) | Op::Ok(ty) | Op::Err(ty) => check_type(ty, module)?,
+                Op::SizeOf(ty)
+                | Op::AlignOf(ty)
+                | Op::Allocate(ty)
+                | Op::LoadObject(ty)
+                | Op::StoreObject(ty) => {
+                    check_type(ty, module)?;
+                    crate::memory::layout(module, ty)?;
+                }
+                Op::None(ty)
+                | Op::Ok(ty)
+                | Op::Err(ty)
+                | Op::NullPointer(ty)
+                | Op::PointerCast(ty) => check_type(ty, module)?,
                 _ => (),
             }
         }
@@ -237,6 +260,12 @@ impl Frame {
             .pop()
             .ok_or_else(|| Fault::new("evaluation stack underflow"))
     }
+    fn pointer(&mut self) -> Result<crate::memory::Pointer, Fault> {
+        match self.pop()? {
+            Value::Pointer(p) => Ok(p),
+            _ => Err(Fault::new("expected Ptr")),
+        }
+    }
     fn int(&mut self) -> Result<i32, Fault> {
         match self.pop()? {
             Value::Int32(n) => Ok(n),
@@ -293,6 +322,7 @@ fn interpret(module: &Module, limits: Limits) -> Result<Execution, Fault> {
         .ok_or_else(|| Fault::new("missing entry"))?;
     let mut frames = vec![Frame::new(entry, vec![], module)];
     let mut heap: Vec<Value> = vec![];
+    let mut memory = crate::memory::PointerHeap::default();
     let mut output = vec![];
     for _ in 0..limits.instructions {
         let frame = frames
@@ -451,6 +481,86 @@ fn interpret(module: &Module, limits: Limits) -> Result<Execution, Fault> {
                     *field = value;
                     frame.stack.push(Value::Object { name, fields });
                 }
+                Op::SizeOf(ty) | Op::AlignOf(ty) => {
+                    let layout = crate::memory::layout(module, ty)?;
+                    let value = if matches!(op, Op::SizeOf(_)) {
+                        layout.size
+                    } else {
+                        layout.alignment
+                    };
+                    frame.stack.push(Value::Int32(
+                        i32::try_from(value)
+                            .map_err(|_| Fault::new("layout exceeds Int32 range"))?,
+                    ));
+                }
+                Op::Allocate(ty) => {
+                    let count = frame.int()?;
+                    let layout = crate::memory::layout(module, ty)?;
+                    let pointer = memory.allocate(
+                        ty.clone(),
+                        &layout,
+                        count,
+                        limits.pointer_bytes,
+                        limits.pointer_allocations,
+                    )?;
+                    frame.stack.push(Value::Pointer(pointer));
+                }
+                Op::Free => {
+                    memory.free(&frame.pointer()?)?;
+                    frame.stack.push(Value::Void);
+                }
+                Op::NullPointer(ty) => frame
+                    .stack
+                    .push(Value::Pointer(crate::memory::Pointer::null(ty.clone()))),
+                Op::PointerCast(ty) => {
+                    let mut pointer = frame.pointer()?;
+                    pointer.target = ty.clone();
+                    frame.stack.push(Value::Pointer(pointer));
+                }
+                Op::PointerAdd => {
+                    let offset = frame.int()?;
+                    let pointer = frame.pointer()?;
+                    frame
+                        .stack
+                        .push(Value::Pointer(memory.offset(&pointer, offset)?));
+                }
+                Op::FieldAddress(index) => {
+                    let pointer = frame.pointer()?;
+                    if !matches!(pointer.target, Type::Named(_)) {
+                        return Err(Fault::new("ldflda requires pointer to record"));
+                    }
+                    let layout = crate::memory::layout(module, &pointer.target)?;
+                    frame
+                        .stack
+                        .push(Value::Pointer(memory.field(&pointer, &layout, *index)?));
+                }
+                Op::LoadObject(_) | Op::LoadIndirectInt32 => {
+                    let ty = if let Op::LoadObject(ty) = op {
+                        ty.clone()
+                    } else {
+                        Type::Int32
+                    };
+                    let pointer = frame.pointer()?;
+                    if pointer.target != ty {
+                        return Err(Fault::new("memory load pointer type mismatch"));
+                    }
+                    let layout = crate::memory::layout(module, &ty)?;
+                    frame.stack.push(memory.read(&pointer, &layout)?);
+                }
+                Op::StoreObject(_) | Op::StoreIndirectInt32 => {
+                    let ty = if let Op::StoreObject(ty) = op {
+                        ty.clone()
+                    } else {
+                        Type::Int32
+                    };
+                    let value = frame.pop()?;
+                    let pointer = frame.pointer()?;
+                    if pointer.target != ty {
+                        return Err(Fault::new("memory store pointer type mismatch"));
+                    }
+                    let layout = crate::memory::layout(module, &ty)?;
+                    memory.write(&pointer, &layout, &value)?;
+                }
                 Op::HeapNew => {
                     if heap.len() >= limits.heap_objects {
                         return Err(Fault::new("heap object limit exceeded"));
@@ -539,6 +649,7 @@ fn interpret(module: &Module, limits: Limits) -> Result<Execution, Fault> {
                     value,
                     output,
                     heap,
+                    memory,
                 });
             }
             Err(mut fault) => {

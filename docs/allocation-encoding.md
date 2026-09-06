@@ -6,6 +6,12 @@ should be able to choose allocation implementation; an explicit allocator operan
 every allocation site is not a requirement. The earlier alternatives below remain
 recorded proposals, not settled encodings or additional work for this milestone.
 
+The first implementation now uses `heap.alloc T` (element count to `Ptr<T>`) and
+`heap.free`, with `stobj T` for copying a constructed value into storage. It uses the
+host native allocator; pluggable allocator services remain deferred. See
+[implemented contract](heap-and-pointers.md). The alternatives below are historical
+design options, not additional implemented instructions.
+
 Separate storage allocation, object construction, and ownership policy. None of
 these should be selected by a permanent value/reference bit on the type.
 

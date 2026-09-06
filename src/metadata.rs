@@ -95,9 +95,14 @@ pub struct Function {
     pub instance: bool,
     #[serde(default)]
     pub parameters: Vec<Type>,
+    /// Optional names aligned with declared parameters (excluding the receiver).
+    #[serde(default)]
+    pub parameter_names: Vec<Option<String>>,
     pub returns: Type,
     #[serde(default)]
     pub locals: Vec<Type>,
+    #[serde(default)]
+    pub local_names: Vec<Option<String>>,
     /// CLR MethodImplAttributes values: IL = 0, InternalCall = 0x1000.
     #[serde(default)]
     pub impl_flags: u16,
@@ -188,6 +193,30 @@ pub enum Instruction {
     Field(usize),
     #[serde(rename = "stfld")]
     SetField(usize),
+    #[serde(rename = "sizeof")]
+    SizeOf(Type),
+    #[serde(rename = "alignof")]
+    AlignOf(Type),
+    #[serde(rename = "heap.alloc")]
+    Allocate(Type),
+    #[serde(rename = "heap.free")]
+    Free,
+    #[serde(rename = "ptr.null")]
+    NullPointer(Type),
+    #[serde(rename = "ptr.cast")]
+    PointerCast(Type),
+    #[serde(rename = "ptr.add")]
+    PointerAdd,
+    #[serde(rename = "ldflda")]
+    FieldAddress(usize),
+    #[serde(rename = "ldobj")]
+    LoadObject(Type),
+    #[serde(rename = "stobj")]
+    StoreObject(Type),
+    #[serde(rename = "ldind.i4")]
+    LoadIndirectInt32,
+    #[serde(rename = "stind.i4")]
+    StoreIndirectInt32,
     #[serde(rename = "heap.new")]
     HeapNew,
     #[serde(rename = "heap.load")]
@@ -225,4 +254,33 @@ impl Module {
         let name = ty.definition_name()?;
         self.types.iter().find(|def| def.name == name)
     }
+}
+
+pub(crate) fn valid_slot_name(name: &str) -> bool {
+    let mut chars = name.chars();
+    chars
+        .next()
+        .is_some_and(|c| c.is_ascii_alphabetic() || c == '_')
+        && chars.all(|c| c.is_ascii_alphanumeric() || c == '_')
+}
+
+pub(crate) fn validate_slot_names(
+    names: &[Option<String>],
+    count: usize,
+    reserve_this: bool,
+) -> Result<(), crate::Fault> {
+    if !names.is_empty() && names.len() != count {
+        return Err(crate::Fault::new(
+            "slot names must align with their type signatures",
+        ));
+    }
+    let mut seen = std::collections::HashSet::new();
+    for name in names.iter().flatten() {
+        if !valid_slot_name(name) || (reserve_this && name == "this") || !seen.insert(name) {
+            return Err(crate::Fault::new(format!(
+                "invalid, duplicate or reserved slot name {name:?}"
+            )));
+        }
+    }
+    Ok(())
 }

@@ -12,10 +12,10 @@ automatic destruction, ownership-aware copy/move behavior, and language lifetime
 integration. The ideas below are recorded architectural direction, not requirements
 to finish before the raw allocation/pointer slice.
 
-That slice should define allocation size/alignment, initialization, pointer values,
-addressing and indirect access, explicit release, and invalid-access behavior. Exact
-opcodes and pointer representation are still open; accepting pointer signatures
-alone does not implement these operations.
+The initial subset now implements native heap allocation/free, native addresses,
+layout, casts, byte offsets, and indirect access. Its precise current contract is in
+[heap and pointers](heap-and-pointers.md). This is a small proof of concept toward
+familiar CLR capabilities, with specific departures documented rather than assumed.
 
 ## Core VM
 
@@ -23,12 +23,9 @@ Types, storage, addresses, loads/stores, layout, and call frames belong in the V
 model. Raw pointers are fundamental, even when a higher-level language discourages
 or restricts their use. A pointer carries no automatic ownership or lifetime policy.
 
-`Ptr<T>`/`T*` are now recognized in signatures. The executable pointer layer remains
-to be designed: address width, alignment, layout, pointer arithmetic, zero-sized
-values, null addresses, validity, allocation/deallocation, and boundary failures.
-These contracts must be explicit. They should not be inferred from Rust references
-or require a Rust borrow checker. Checked borrowing can later be an additional
-facility for languages that want it.
+`Ptr<T>`/`T*` values are native addresses, with interpreter side tables for checked
+access to its own allocations. Side tracking is a prototype diagnostic mechanism,
+not a language borrow checker or mandatory future ownership abstraction.
 
 The original default-local-storage direction remains separate from physical native
 stack placement. The current interpreter models frame-owned values but uses host
@@ -82,16 +79,16 @@ tracing GC, Rust-style borrow checker, or count header on every object is implie
 
 Current `Ref<T>` values index an execution-owned arena. They support explicit shared
 identity, loads, and stores. Allocations are retained until the execution result is
-dropped. **There is no reference counting**, per-allocation release, or raw guest
-address today. This arena is scaffolding, not the final managed memory model.
+dropped. **There is no reference counting** or per-allocation release within that
+arena. This arena is scaffolding, not the final managed memory model.
 
 Instance method receivers are currently read-only value snapshots. They do not
-establish a borrow model or mutable receiver semantics. No guest pointer operation
-is implemented merely because pointer signatures are accepted.
+establish a borrow model or mutable receiver semantics. Native pointers have a
+separate allocation store and explicit access operations.
 
-The next implementation target is heap allocation and pointer operations. General
-generic metadata and lifetime-aware wrappers can be revisited afterward; reference
-counting and GC are not prerequisites for that target.
+Native allocations stay live until explicit free or execution teardown. Copies of
+pointers neither retain nor release storage. General generic metadata and lifetime-aware
+wrappers can be revisited afterward; reference counting and GC are not prerequisites.
 
 ## Deferred environment and allocator integration
 

@@ -53,6 +53,10 @@ multi-assembly identity is complete.
 .end
 ```
 
+Parameters may be named, for example `Parse(value: string)`, and locals use
+`.local point: Point`. Names are optional metadata, not part of type identity or
+overload selection. `ldarg value` and `ldarg this` resolve to numeric indices.
+
 `.method static Name(...) -> T` and `.method instance Name(...) -> T` are declared
 inside `.type` blocks. Each `.end` closes the innermost method/type. Free functions
 use `.function` outside type blocks and have no declaring owner.
@@ -103,13 +107,15 @@ receiver indexing, overloads, primitive conversion, and free-function entry poin
 
 `Ptr<T>` and `T*` are equivalent fundamental pointer signature forms, distinct from
 `Ref<T>`. Nested pointers and pointer types inside constructed signatures round-trip
-through metadata. This supports declarations and values such as `None<Ptr<Int32>>`;
-it does not implement pointer creation, dereference, arithmetic, null-address
-representation, native layout, or P/Invoke yet.
+through metadata. Pointer values now contain native addresses. Explicit heap
+allocation/free, pointer casts, byte offsets, field addresses, and indirect access
+are implemented for the supported layouts; see [heap and pointers](heap-and-pointers.md).
+Pointers carry no ownership. Native interop and externally supplied addresses remain
+unimplemented. Value copying a record copies its fields, including pointer addresses;
+it does not copy the pointed-to storage or acquire ownership.
 
 The existing Option/Result/Ref constructors are special-cased signatures, not general
 generic definitions. A library-defined, reference-counted `Ref<T>` requires real
-generic metadata, layout, and lifetime operations. It remains deferred, not implemented; heap allocation and executable pointers are
-the immediate priority.
+generic metadata, layout, and lifetime operations. It remains deferred, not implemented. The native heap/pointer subset does not depend on this wrapper.
 See [memory model layers](memory-model.md) for the separation between raw VM memory
 and ownership policies.

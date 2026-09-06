@@ -1,0 +1,36 @@
+.module NamedSlots
+.entry Main
+
+.type Point
+    .field X int32
+    .field Y int32
+
+    .method instance Sum(offset: int32) -> int32
+        ldarg this
+        ldfld 0
+        ldarg this
+        ldfld 1
+        add
+        ldarg offset
+        add
+        ret
+    .end
+.end
+
+.function Main() -> Result<Void,Error>
+    .local point: Point
+    .local message: string
+    ldc.i4 10
+    ldc.i4 20
+    newobj Point
+    stloc point
+    ldloc point
+    ldc.i4 12
+    call instance Point::Sum(int32)
+    call instance System.Int32::ToString()
+    stloc message
+    ldloc message
+    call System.Console::WriteLine(string)
+    ok Error
+    ret
+.end

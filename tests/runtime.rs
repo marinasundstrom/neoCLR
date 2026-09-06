@@ -256,6 +256,7 @@ fn all_implemented_opcodes_have_a_sample() {
         include_str!("../examples/hello.neoil"),
         include_str!("../examples/features.neoil"),
         include_str!("../examples/fault.neoil"),
+        include_str!("../examples/pointers.neoil"),
     ];
     let mut covered = std::collections::HashSet::new();
     for source in samples {
@@ -296,6 +297,18 @@ fn all_implemented_opcodes_have_a_sample() {
         "newobj",
         "ldfld",
         "stfld",
+        "sizeof",
+        "alignof",
+        "heap.alloc",
+        "heap.free",
+        "ptr.null",
+        "ptr.cast",
+        "ptr.add",
+        "ldflda",
+        "ldobj",
+        "stobj",
+        "ldind.i4",
+        "stind.i4",
         "heap.new",
         "heap.load",
         "heap.store",

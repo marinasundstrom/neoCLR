@@ -1,0 +1,76 @@
+.module Pointers
+.entry Main
+
+.type Point
+    .field X int32
+    .field Y int32
+.end
+
+.function Main() -> Result<Void,Error>
+    .local point: Point*
+    .local copy: Point
+
+    sizeof Point
+    ldc.i4 8
+    ceq
+    brtrue SizePassed
+    fault "unexpected Point size"
+SizePassed:
+    alignof Point
+    ldc.i4 4
+    ceq
+    brtrue AlignmentPassed
+    fault "unexpected Point alignment"
+AlignmentPassed:
+    ldc.i4 1
+    heap.alloc Point
+    stloc point
+
+    ; Initialize individual fields in previously uninitialized storage.
+    ldloc point
+    ldflda 0
+    ldc.i4 10
+    stind.i4
+    ldloc point
+    ldflda 1
+    ldc.i4 32
+    stobj int32
+
+    ldloc point
+    ldflda 0
+    ldind.i4
+    ldloc point
+    ptr.cast int32
+    ldc.i4 4
+    ptr.add
+    ldobj int32
+    add
+    call System.Console::WriteLine(int32)
+    pop
+
+    ; Whole-record copies are separate from pointer aliasing.
+    ldloc point
+    ldobj Point
+    stloc copy
+    ldloc point
+    ldc.i4 1
+    ldc.i4 2
+    newobj Point
+    stobj Point
+    ldloc copy
+    ldfld 0
+    ldc.i4 10
+    ceq
+    brtrue CopyPassed
+    fault "record snapshot changed"
+CopyPassed:
+    ldloc point
+    heap.free
+    pop
+
+    ; Freeing an actual null pointer is a no-op.
+    ptr.null Point
+    heap.free
+    ok Error
+    ret
+.end

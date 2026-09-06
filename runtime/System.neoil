@@ -14,30 +14,30 @@
 .end
 
 .type System.Int32
-    .method static Parse(string) -> Result<Int32,Error>
+    .method static Parse(value: string) -> Result<Int32,Error>
         ldarg 0
         call neoCLR.Runtime.ParseInt32(string)
         ret
     .end
 
-    .method static Divide(int32, int32) -> Result<Int32,Error>
-        ldarg 1
+    .method static Divide(dividend: int32, divisor: int32) -> Result<Int32,Error>
+        ldarg divisor
         ldc.i4 0
         ceq
         brtrue DivisionByZero
-        ldarg 0
+        ldarg dividend
         ldc.i4 -2147483648
         ceq
         brtrue CheckOverflow
         br Divide
         CheckOverflow:
-        ldarg 1
+        ldarg divisor
         ldc.i4 -1
         ceq
         brtrue Overflow
         Divide:
-        ldarg 0
-        ldarg 1
+        ldarg dividend
+        ldarg divisor
         div
         ok Error
         ret
@@ -52,21 +52,21 @@
     .end
 
     .method instance ToString() -> string
-        ldarg 0
+        ldarg this
         call neoCLR.Runtime.Int32ToString(int32)
         ret
     .end
 .end
 
 .type System.Console
-    .method static WriteLine(string) -> Void
-        ldarg 0
+    .method static WriteLine(value: string) -> Void
+        ldarg value
         call neoCLR.Runtime.WriteLine(string)
         ret
     .end
 
-    .method static WriteLine(int32) -> Void
-        ldarg 0
+    .method static WriteLine(value: int32) -> Void
+        ldarg value
         call instance System.Int32::ToString()
         call System.Console.WriteLine(string)
         ret
@@ -75,21 +75,21 @@
 .end
 
 .type System.Math
-    .method static Abs(int32) -> Result<Int32,Error>
-        ldarg 0
+    .method static Abs(value: int32) -> Result<Int32,Error>
+        ldarg value
         ldc.i4 -2147483648
         ceq
         brtrue Overflow
-        ldarg 0
+        ldarg value
         ldc.i4 0
         clt
         brtrue Negative
-        ldarg 0
+        ldarg value
         ok Error
         ret
         Negative:
         ldc.i4 0
-        ldarg 0
+        ldarg value
         sub
         ok Error
         ret
@@ -100,14 +100,14 @@
     .end
 .end
 
-.function neoCLR.Runtime.WriteLine(string) -> Void
+.function neoCLR.Runtime.WriteLine(value: string) -> Void
     .methodimpl InternalCall
 .end
 
-.function neoCLR.Runtime.Int32ToString(int32) -> string
+.function neoCLR.Runtime.Int32ToString(value: int32) -> string
     .methodimpl InternalCall
 .end
 
-.function neoCLR.Runtime.ParseInt32(string) -> Result<Int32,Error>
+.function neoCLR.Runtime.ParseInt32(value: string) -> Result<Int32,Error>
     .methodimpl InternalCall
 .end

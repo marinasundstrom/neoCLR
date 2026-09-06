@@ -6,12 +6,13 @@ JSON for distribution, or the exact instruction extensions used here.
 
 ## Immediate focus: heap allocation and pointers
 
-Build on the existing Ptr<T>/T* signatures with executable heap allocation and
-pointer access. Define size/alignment and initialization, address representation,
-indirect loads/stores, pointer offset rules, explicit release, and failure behavior.
-Keep object construction separate from obtaining storage. Start with a small
-coherent subset and tests for valid access and the supported invalid-access checks.
-Opcode spelling, pointer representation, and the exact first subset remain open.
+The initial subset implements native allocation/free, layout, casts, byte offsets,
+field addresses, and indirect loads/stores. Construction remains separate from
+storage. See [heap and pointers](heap-and-pointers.md) for current checks and limits.
+Next pointer capabilities include native integers/address conversions, external
+addresses and P/Invoke, stack addresses/allocation, more scalar layouts and indirect
+instructions, and explicit layout/ABI controls. Diagnostic side tracking must not
+become a compulsory ownership policy for the platform.
 
 Defer reference counting, GC, automatic destruction, lifetime-aware wrappers, and
 allocator/collector integration. These are recorded in [memory layers](memory-model.md)
@@ -50,7 +51,7 @@ namespaces, signatures where meaning permits, and ordinary arithmetic/control-fl
 structure. Each incompatible behavior needs an explicit mapping or diagnostic.
 
 Prefer a source recompile path first. Imported .NET class instances generally need
-explicit `Ref<T>` to retain aliasing and identity; converting them to frame-owned
+an explicit identity/ownership representation to retain aliasing and lifetime; converting them to frame-owned
 copies silently would change programs. Imported structs can often remain owned
 values, but boxing, reflection, interface dispatch, and layout still need work.
 

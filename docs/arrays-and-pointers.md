@@ -1,7 +1,7 @@
 # Arrays and pointers: direction and remaining work
 
-Pointer signatures `Ptr<T>`/`T*` are implemented. Array storage and executable pointer
-operations remain proposals. Raw pointers are foundational VM capabilities; managed
+Native `Ptr<T>`/`T*` values and a first heap/access subset are implemented; see
+[heap and pointers](heap-and-pointers.md). Array storage remains a proposal. Raw pointers are foundational VM capabilities; managed
 ownership policies are separate. The current Ref arena is not reference-counted.
 See [memory layers](memory-model.md) for the updated architectural direction.
 
@@ -58,7 +58,7 @@ lower bounds can wait until migration requirements justify them.
 | `Ref<T>` | Non-null shared heap identity with checked typed access | Implemented with execution-owned arena |
 | `Borrow<T>` / `BorrowMut<T>` | Temporary checked access; cannot outlive owner | Design only; naming provisional |
 | `Span<T>` / `SpanMut<T>` | Borrow plus length, with bounds checks | Design only |
-| `Ptr<T>` | Unmanaged address type, with no implied ownership | Signatures implemented; operations pending |
+| `Ptr<T>` | Unmanaged address type, with no implied ownership | Native heap/access subset implemented |
 
 `Ref<T>` is not an address into the native stack, and `Ptr<T>` must not be an
 unchecked alias for it. Managed references may need stable handles or relocation
@@ -93,7 +93,7 @@ lifetime or must be rejected. Physical “always native stack” placement is th
 not a sustainable universal promise. Frame ownership is the semantic promise;
 backend placement and explicit shared identity are separate concerns.
 
-Heap allocation and pointer operations are the immediate priority. The array
+The initial heap allocation and pointer operations are now available. The array
 experiment above, checked spans, and ownership-policy decisions remain deferred
 follow-ups. Array tests should eventually cover empty arrays, bounds, aliasing versus
 copies, invalid lengths, and zero-sized elements; they do not block the initial

@@ -1,6 +1,7 @@
 pub mod assembler;
 pub use assembler::assemble;
 pub mod library;
+pub mod memory;
 pub mod metadata;
 mod native;
 pub mod value;

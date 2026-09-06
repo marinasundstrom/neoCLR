@@ -18,18 +18,20 @@ output is a temporary internal format, not that final binary representation. See
 [assembler expressiveness](docs/assembler-design.md).
 
 The goal is familiar runtime and library structure with deliberately different
-semantics: one model for data types, frame-owned values by default, explicit shared
-allocation, a real `Void` value, functions outside types, `Option<T>` for absence,
+semantics: one model for data types, value semantics by default, explicit storage
+and lifetime choices, a real `Void` value, functions outside types, `Option<T>` for absence,
 `Result<T,E>` for recoverable errors, and terminal Faults instead of exceptions.
 Interfaces will use ordinary names without an `I` prefix.
 
 ## Current focus
 
-Heap allocation and executable pointer operations are next. Reference counting,
-GC, and higher-level lifetime management are deferred; the explicit-memory philosophy
-and environment-provided allocation ideas are recorded in
-[memory layers](docs/memory-model.md). This is a roadmap update, not a claim that
-raw pointer operations are already implemented.
+The first native heap/pointer slice is implemented: explicit allocation/free,
+native addresses, pointer casts and byte offsets, indirect access, and sequential
+record layout. See [heap and pointers](docs/heap-and-pointers.md).
+Reference counting, GC, and higher-level lifetime management remain deferred.
+Types describe values and behavior; allocation and lifetime are separate choices,
+with no class/struct bit deciding either. The proof of concept aims to make migration
+familiar where possible, without committing every program to one memory model.
 
 ## Run
 
@@ -40,6 +42,8 @@ cargo run -- run examples/hello.neoil
 cargo run -- run examples/features.neoil
 cargo run -- run examples/overloads.neoil
 cargo run -- run examples/types.neoil
+cargo run -- run examples/names.neoil
+cargo run -- run examples/pointers.neoil
 cargo run -- run examples/fault.neoil
 ```
 
@@ -97,9 +101,12 @@ reference resolution. See [runtime library design](docs/runtime-library.md).
 
 - Module, type/field, and free-function metadata, with typed parameters and locals.
 - Signature-based overload resolution and structured call references.
+- Optional parameter/local names (`value: string`, `.local point: Point`), preserved
+  in metadata; named operands assemble to indices.
 - Canonical System primitive definitions, type-owned static methods, and read-only
   instance receiver snapshots; see [type system](docs/type-system.md).
-- Fundamental pointer signatures `Ptr<T>`/`T*`, separate from ownership wrappers.
+- Native `Ptr<T>`/`T*` values, explicit heap allocation/free, casts, byte offsets,
+  field addresses, typed loads/stores, and native-sized pointer fields.
 - `Void`, `Int32`, `Boolean`, `String`, `Error`, records, and constructed
   `Option<T>`, `Result<T,E>`, and `Ref<T>` types, including nested uses of `Void`.
 - An iterative interpreter with explicit call frames and an IL-style evaluation stack.
@@ -112,7 +119,7 @@ reference resolution. See [runtime library design](docs/runtime-library.md).
 - Three host primitives for console output, Int32 string conversion, and parsing,
   explicitly declared with CLR-style `MethodImpl`/`InternalCall` metadata.
 - Configurable limits on instruction count, call depth, stack slots per frame,
-  and explicit heap object count.
+  explicit heap object count, native payload bytes, and allocation identities.
 
 This is an original experiment informed by the
 [ECMA-335 CLI specification](https://ecma-international.org/publications-and-standards/standards/ecma-335/),
@@ -127,14 +134,13 @@ call form. Reassemble earlier source and System artifacts before loading them.
 “Stack by default” is a **guest semantic model** here: interpreter frames own
 values, and copying an object copies its fields. Rust currently uses `Vec`,
 `String`, and `Box` internally, so this does not demonstrate physical native-stack
-allocation or its performance. Explicit guest references address a heap arena
-retained until the execution result is dropped. There is no reference counting, GC,
-or individual free. Counted `Ref<T>` remains a deferred ownership abstraction;
+allocation or its performance. Legacy `Ref<T>` values address an arena retained until the execution result is
+dropped. Native `Ptr<T>` allocations separately support individual free. There is
+no reference counting or GC. Counted `Ref<T>` remains a deferred ownership abstraction;
 Rust's memory model does not define guest behavior. See [memory layers](docs/memory-model.md).
 
 The library is a bootstrap surface, not a complete BCL. General user-defined
-generics/unions, interfaces/virtual dispatch, arrays, borrows, executable raw-pointer
-operations, native interop,
+generics/unions, interfaces/virtual dispatch, arrays, borrows, native interop,
 threading, runtime async, JIT compilation, and full verification are unimplemented.
 Resource limits are guardrails, not a memory quota or a hostile-code sandbox.
 Console output is collected and emitted by the CLI only on successful completion.

@@ -16,6 +16,7 @@ pub enum Value {
         case: Case,
         payload: Box<Value>,
     },
+    Pointer(crate::memory::Pointer),
     Reference {
         index: usize,
         target: Type,
@@ -32,6 +33,7 @@ impl Value {
             Self::Error(_) => Type::Error,
             Self::Object { name, .. } => Type::Named(name.clone()),
             Self::Union { ty, .. } => ty.clone(),
+            Self::Pointer(pointer) => Type::Ptr(Box::new(pointer.target.clone())),
             Self::Reference { target, .. } => Type::Ref(Box::new(target.clone())),
         }
     }
