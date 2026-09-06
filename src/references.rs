@@ -9,18 +9,30 @@ pub(crate) fn validate_list(source: &Module, supplied: &[&Module]) -> Result<(),
         return Ok(());
     };
     let mut seen = std::collections::HashSet::new();
-    for name in references {
-        if name.is_empty() || name == &source.name || !seen.insert(name) {
+    for reference in references {
+        let name = reference.name();
+        if name.is_empty() || name == source.name || !seen.insert(name) {
             return Err(Fault::new(format!(
                 "invalid or duplicate module reference {name:?} in {}",
                 source.name
             )));
         }
-        if !supplied.iter().any(|m| &m.name == name) {
-            return Err(Fault::new(format!(
+        let target = supplied.iter().find(|m| m.name == name).ok_or_else(|| {
+            Fault::new(format!(
                 "missing referenced module {name} for {}",
                 source.name
-            )));
+            ))
+        })?;
+        match reference.revision() {
+            Some(revision)
+                if !crate::metadata::valid_revision(revision)
+                    || target.revision.as_deref() != Some(revision) =>
+            {
+                return Err(Fault::new(format!(
+                    "module revision mismatch for {name}: expected {revision}"
+                )));
+            }
+            _ => (),
         }
     }
     Ok(())
@@ -28,7 +40,9 @@ pub(crate) fn validate_list(source: &Module, supplied: &[&Module]) -> Result<(),
 
 fn check_module(source: &Module, target: &str) -> Result<(), Fault> {
     if source.references.as_ref().is_some_and(|references| {
-        target != source.name && target != "System" && !references.iter().any(|r| r == target)
+        target != source.name
+            && target != "System"
+            && !references.iter().any(|r| r.name() == target)
     }) {
         return Err(Fault::new(format!(
             "module {} does not reference {target}",

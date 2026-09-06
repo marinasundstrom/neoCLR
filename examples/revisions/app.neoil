@@ -1,0 +1,9 @@
+.module RevisionDemo
+.references (Answers#sample-1)
+.entry Main
+
+.function Main() -> Void
+    call Answer() @ Answers#sample-1:0
+    call System.Console::WriteLine(Int32)
+    ret
+.end

@@ -75,8 +75,10 @@ can acquire identical substituted parameter types and still denote different mem
 Linking must map those references deliberately. [Function call binding](member-identities.md)
 and [type definition rows/closed signature keys](type-identities.md) are implemented.
 [Scoped type operands](scoped-types.md) now check origin before binding. Internal
-scoped type keys and revision identity remain prerequisites for general loading,
+scoped type keys and content provenance remain prerequisites for general loading,
 compilation, tooling, and embedding with colliding names or multiple artifact versions.
+Optional [revision labels and exact pins](module-revisions.md) distinguish producer-declared
+builds without implying compatibility or verifying contents.
 
 Free functions remain functions without a required synthetic type container in the
 semantic model. Preserve familiar CLI concepts where they fit; do not conflate a

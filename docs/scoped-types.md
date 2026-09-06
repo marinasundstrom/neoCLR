@@ -47,8 +47,8 @@ The supplied set must still have globally unique type names. Qualifiers check or
 in this slice; they do not yet allow two modules to define the same type name. The
 interpreter's stored values and native layouts still use normalized name-based keys.
 Supporting duplicate names requires moving those internal keys to scoped definition
-identities throughout execution. Module revisions and side-by-side versions remain
-separate work.
+identities throughout execution. Optional [revision labels](module-revisions.md) now
+distinguish declared artifacts; side-by-side versions remain separate work.
 
 Lower-level helpers that operate directly on raw Module/Type values expect resolved
 signatures; prepare a LoadedProgram for execution, verification, and scoped identity

@@ -15,8 +15,8 @@ the permanent platform ABI.
 
 Module-local function identities and generic call binding are now implemented; see
 [function identities](member-identities.md). [Type definition rows and closed signature keys](type-identities.md)
-are also implemented. Module revision identity and general
-module-scoped resolution remain shared foundations. [Scoped operands](scoped-types.md)
+are also implemented, along with [exact revision labels and pins](module-revisions.md).
+Content provenance and general module-scoped resolution remain shared foundations. [Scoped operands](scoped-types.md)
 now check origin, while duplicate type names still require new internal keys.
 [LoadedProgram](loaded-program.md)
 now shares a prepared metadata snapshot across execution and analysis, with

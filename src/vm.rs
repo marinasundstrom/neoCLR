@@ -49,6 +49,7 @@ pub(crate) fn resolve(
             .clone()
             .unwrap_or_else(|| crate::metadata::MemberId {
                 module: module.name.clone(),
+                revision: module.revision.clone(),
                 index: index as u32,
             });
         if target

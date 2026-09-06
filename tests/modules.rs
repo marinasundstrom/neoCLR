@@ -44,6 +44,7 @@ fn source_group_resolves_generic_calls_and_cross_module_field_aliases() {
         definition,
         TypeDefId {
             module: "Models".into(),
+            revision: None,
             index: 0
         }
     );

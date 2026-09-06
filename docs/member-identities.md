@@ -4,11 +4,13 @@ Implemented subset: module-local function identities, identity-qualified referen
 and call binding before generic specialization. [Type definition rows and closed keys](type-identities.md)
 are also implemented; type lookup remains name-based. The bootstrap linker still
 combines an application with System and [explicitly supplied dependencies](module-sets.md). General module
-versioning and independently scoped type namespaces are not implemented.
+side-by-side version loading and independently scoped type namespaces are not implemented.
+Optional [revision labels and pins](module-revisions.md) distinguish declared artifact builds.
 
 ## Definition identity
 
-Each assembled function definition carries `definition: { module, index }`. The index
+Each assembled function definition carries `definition: { module, index }`, with an
+optional `revision` component for revisioned artifacts. The index
 is its zero-based row in that source module's function table, including free functions,
 static/instance methods, constructors, and native declarations. Declaration order
 assigns the rows; names and parameter/local aliases do not determine those numbers.
@@ -19,8 +21,8 @@ array position is an implementation index, not the definition's module-local row
 Verifier reports include both the definition identity and the linked function index.
 
 This is not a permanent identifier across rebuilds. Reordering definitions changes
-rows; module names are currently identifiers, not version/content hashes. External
-artifact versioning and provenance need a future module-identity contract. Do not
+rows; optional revisions label artifacts but are not content hashes. Content
+provenance still needs a stronger contract. Do not
 cache these rows across unrelated builds or assume same-name replacement modules
 are compatible merely because a row exists.
 
@@ -86,7 +88,8 @@ identity-bearing definitions/references; no binary CLI token encoding is assigne
 
 Signature guards catch mismatched references but cannot establish compatibility with
 a different same-name artifact whose row/signature happens to match. Revision-qualified
-module identities remain necessary before persistent cross-build handles or caches.
+identities now distinguish declared labels, but producers must not reuse a label for
+changed artifacts. Persistent handles or caches need additional provenance guarantees.
 Type resolution and duplicate-signature rules retain the prototype's global namespace
 limits. Entry selection is still name-based and parameterless.
 

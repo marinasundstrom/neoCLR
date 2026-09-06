@@ -1,0 +1,8 @@
+.module Answers
+.revision sample-1
+.references ()
+
+.function Answer() -> Int32
+    ldc.i4 42
+    ret
+.end

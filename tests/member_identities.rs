@@ -19,6 +19,7 @@ fn symbolic_calls_bind_before_generic_substitution_and_roundtrip() {
         loaded.functions[0].definition,
         Some(MemberId {
             module: "MemberIdentities".into(),
+            revision: None,
             index: 0
         })
     );
@@ -63,6 +64,7 @@ fn module_local_identity_does_not_change_when_library_rows_are_appended() {
         function.definition,
         Some(MemberId {
             module: "System".into(),
+            revision: None,
             index: index as u32
         })
     );

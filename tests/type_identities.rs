@@ -23,6 +23,7 @@ fn definition_rows_roundtrip_independently_of_function_rows() {
         loaded.types[0].definition,
         Some(TypeDefId {
             module: "App".into(),
+            revision: None,
             index: 0
         })
     );
@@ -54,6 +55,7 @@ fn closed_keys_preserve_definition_and_distinguish_arguments() {
         TypeIdentity::Definition {
             definition: TypeDefId {
                 module: "App".into(),
+                revision: None,
                 index: 0
             },
             arguments: vec![int],
@@ -68,6 +70,7 @@ fn closed_keys_preserve_definition_and_distinguish_arguments() {
         TypeIdentity::Definition {
             definition: TypeDefId {
                 module: "App".into(),
+                revision: None,
                 index: 0
             },
             arguments: vec![boxed_int],
@@ -97,6 +100,7 @@ fn system_rows_and_primitive_aliases_survive_linking() {
         TypeIdentity::Definition {
             definition: TypeDefId {
                 module: "System".into(),
+                revision: None,
                 index: row as u32
             },
             arguments: vec![]

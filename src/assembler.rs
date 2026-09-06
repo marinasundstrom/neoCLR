@@ -55,6 +55,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
     let mut module = Module {
         format: 3,
         name: String::new(),
+        revision: None,
         references: None,
         entry: String::new(),
         types: vec![],
@@ -396,11 +397,16 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     let mut references = Vec::new();
                     if !names.trim().is_empty() {
                         for name in names.split(',') {
-                            identifier(name.trim())?;
-                            references.push(name.trim().to_owned());
+                            references.push(parse_module_reference(name.trim())?);
                         }
                     }
                     module.references = Some(references);
+                }
+                ".revision" => {
+                    if module.revision.is_some() || !crate::metadata::valid_revision(rest) {
+                        return Err(Fault::new("invalid or duplicate .revision"));
+                    }
+                    module.revision = Some(rest.into());
                 }
                 ".type" => {
                     let (name, generic_parameters) = parse_type_declaration(rest)?;
@@ -564,6 +570,22 @@ fn identifier(text: &str) -> Result<(), Fault> {
     }
 }
 
+fn parse_module_reference(text: &str) -> Result<crate::metadata::ModuleReference, Fault> {
+    if let Some((name, revision)) = text.split_once('#') {
+        identifier(name)?;
+        if !crate::metadata::valid_revision(revision) {
+            return Err(Fault::new("invalid module revision"));
+        }
+        Ok(crate::metadata::ModuleReference::Exact {
+            name: name.into(),
+            revision: revision.into(),
+        })
+    } else {
+        identifier(text)?;
+        Ok(text.into())
+    }
+}
+
 pub fn parse_type(text: &str) -> Result<Type, Fault> {
     fn parse(text: &str, depth: usize) -> Result<Type, Fault> {
         if depth > 32 {
@@ -672,7 +694,7 @@ fn parse_callable(text: &str, named: bool) -> Result<(FunctionRef, Vec<Option<St
                 .trim()
                 .split_once(':')
                 .ok_or_else(|| Fault::new("expected @ Module:index"))?;
-            identifier(module.trim())?;
+            let module = parse_module_reference(module.trim())?;
             let index = index
                 .trim()
                 .parse::<u32>()
@@ -680,7 +702,8 @@ fn parse_callable(text: &str, named: bool) -> Result<(FunctionRef, Vec<Option<St
             (
                 signature.trim(),
                 Some(crate::metadata::MemberId {
-                    module: module.trim().into(),
+                    module: module.name().into(),
+                    revision: module.revision().map(str::to_owned),
                     index,
                 }),
             )

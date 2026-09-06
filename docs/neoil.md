@@ -21,6 +21,9 @@ escapes. Identifiers contain ASCII letters, digits, underscores, and dots.
 
 - `.module Name` occurs exactly once. Executables declare one `.entry FunctionName`;
   library modules omit it.
+- Optional `.revision build-1` labels an artifact revision. `.references (Models#build-1)`
+  pins a dependency and `@ Models#build-1:0` selects an exact definition row;
+  see [module revisions](module-revisions.md).
 - Optional `.references (Module, ...)` declares direct dependencies; `.references ()`
   permits only local definitions and implicit System. Omission retains legacy load-set
   visibility. See [module references](module-references.md) for validation and limits.

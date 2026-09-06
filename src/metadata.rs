@@ -119,9 +119,11 @@ impl Type {
 pub struct Module {
     pub format: u32,
     pub name: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub revision: Option<String>,
     /// None retains legacy load-set visibility; Some lists direct references.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub references: Option<Vec<String>>,
+    pub references: Option<Vec<ModuleReference>>,
     #[serde(default)]
     pub entry: String,
     #[serde(default)]
@@ -727,6 +729,8 @@ pub struct CustomAttribute {
 #[serde(deny_unknown_fields)]
 pub struct MemberId {
     pub module: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub revision: Option<String>,
     pub index: u32,
 }
 
@@ -735,14 +739,24 @@ pub struct MemberId {
 #[serde(deny_unknown_fields)]
 pub struct TypeDefId {
     pub module: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub revision: Option<String>,
     pub index: u32,
 }
 
 impl Module {
     pub(crate) fn normalize_definition_ids(&mut self) -> Result<(), crate::Fault> {
+        if self
+            .revision
+            .as_ref()
+            .is_some_and(|revision| !valid_revision(revision))
+        {
+            return Err(crate::Fault::new("invalid module revision"));
+        }
         for (index, definition) in self.types.iter_mut().enumerate() {
             let identity = TypeDefId {
                 module: self.name.clone(),
+                revision: self.revision.clone(),
                 index: u32::try_from(index)
                     .map_err(|_| crate::Fault::new("too many type definitions"))?,
             };
@@ -758,6 +772,7 @@ impl Module {
         for (index, function) in self.functions.iter_mut().enumerate() {
             let identity = MemberId {
                 module: self.name.clone(),
+                revision: self.revision.clone(),
                 index: u32::try_from(index)
                     .map_err(|_| crate::Fault::new("too many function definitions"))?,
             };
@@ -774,4 +789,44 @@ impl Module {
         }
         Ok(())
     }
+}
+
+/// A name-only dependency or an exact revision requirement (no version ranges).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(untagged, deny_unknown_fields)]
+pub enum ModuleReference {
+    Name(String),
+    Exact { name: String, revision: String },
+}
+
+impl ModuleReference {
+    pub fn name(&self) -> &str {
+        match self {
+            Self::Name(name) | Self::Exact { name, .. } => name,
+        }
+    }
+    pub fn revision(&self) -> Option<&str> {
+        match self {
+            Self::Name(_) => None,
+            Self::Exact { revision, .. } => Some(revision),
+        }
+    }
+}
+
+impl From<String> for ModuleReference {
+    fn from(name: String) -> Self {
+        Self::Name(name)
+    }
+}
+impl From<&str> for ModuleReference {
+    fn from(name: &str) -> Self {
+        Self::Name(name.into())
+    }
+}
+
+pub(crate) fn valid_revision(revision: &str) -> bool {
+    !revision.is_empty()
+        && revision
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || matches!(c, '_' | '.' | '-'))
 }

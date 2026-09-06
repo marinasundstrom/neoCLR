@@ -1,6 +1,7 @@
 # Type definition rows and closed signature identities
 
-Type definitions now carry `definition: { module, index }` metadata. Each index is
+Type definitions carry `definition: { module, index }` metadata, plus an optional
+`revision` component for revisioned artifacts. Each index is
 a zero-based row in the source module's type table. Type rows and function rows are
 independent tables, represented by distinct Rust types (`TypeDefId` and `MemberId`).
 There is no value-type/reference-type distinction in either identity.
@@ -53,8 +54,9 @@ having an identity does not prove a type is allocatable or valid for a native AB
 
 These are identities within a particular set of module artifacts. Rebuilding or
 reordering a definition table can change rows. Same-name replacement modules are
-not proven compatible by matching rows or names. Module revision identity remains
-necessary before persistent caching or cross-build handles.
+not proven compatible by matching rows or names. Optional [revision labels](module-revisions.md)
+now distinguish declared artifact revisions, but do not verify contents or compatibility.
+Persistent caching and cross-build handles still require a stronger provenance contract.
 
 Type names remain globally unique across the [supplied module set](module-sets.md).
 [Scoped operands](scoped-types.md) now check a named module before binding to those

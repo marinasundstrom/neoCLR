@@ -52,7 +52,8 @@ artifact whose rows should be renumbered.
 Type lookup still uses globally unique names within the explicitly supplied module set.
 Optional [direct reference lists](module-references.md) now constrain metadata uses
 and root type queries. [Scoped type operands](scoped-types.md) check origin during
-preparation; duplicate type names and module revisions remain pending.
+preparation, and [revision pins](module-revisions.md) check declared artifact labels.
+Duplicate type names and side-by-side module versions remain pending.
 Definition identities retain their existing build-local limits. No compiled-code
 cache, generic specialization cache, automatic memory-management policy, or implicit
 execution-mode fallback is introduced.

@@ -52,7 +52,8 @@ Sources can declare [direct module references](module-references.md) with `.refe
 Sources without a list retain visibility of the supplied set, apart from System,
 which is validated independently. [Module-qualified type operands](scoped-types.md)
 check origin but do not allow duplicate names. Accessibility flags,
-revision constraints, and side-by-side same-name modules remain pending.
+and side-by-side same-name modules remain pending. [Revision pins](module-revisions.md)
+can require an exact declared artifact label.
 This broadens explicit loading; it does not complete scoped resolution.
 Build-local row identities do not establish compatibility across artifact replacements.
 

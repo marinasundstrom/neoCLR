@@ -252,4 +252,6 @@ to prepare HelloWorld once and execute it twice with fresh guest state.
 generic calls, and field-name aliases. Run `cargo run --example modules` for a three-module
 sample. Optional [`.references` lists](docs/module-references.md) enforce direct module
 dependencies. [Scoped type operands](docs/scoped-types.md), such as `[Models]Box<Int32>`,
-check the definition's module. Duplicate type names and module revisions remain pending.
+check the definition's module. Optional [artifact revision labels](docs/module-revisions.md)
+support exact dependency pins and definition identities. Duplicate type names and
+side-by-side module versions remain pending.

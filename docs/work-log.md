@@ -1031,3 +1031,33 @@ remain future work; no opcode or ownership policy changes were introduced.
 Validation: all 265 integration tests pass on macOS ARM64; formatting, clippy with
 warnings denied, and diff checks pass. The updated modules example verifies and prints
 42. Linux and Windows execution remain for CI.
+
+
+## 2026-09-06 — Exact artifact revision labels and dependency pins
+
+Added optional `.revision` labels to module metadata and included the label in type
+and function definition identities. Canonical row validation now checks revision as
+well as module name and index. Legacy missing identities derive the containing
+module's revision, while unversioned artifacts retain their existing JSON encoding.
+
+Added exact dependency pins through `.references (Models#build-1)` and explicit
+function/attribute row syntax `@ Models#build-1:0`. Name-only dependencies remain
+unpinned; explicit row identities always match exactly, including absence of a
+revision. A mismatching or missing declared revision fails without name fallback.
+Scoped type names continue to select the single supplied module, and resolved type
+keys and verifier function identities retain its revision.
+
+Added six tests for serialization/execution, replacement and unused dependency pins,
+explicit row matching, distinct revision type keys, stale/legacy rows, malformed
+labels, duplicate module sets, System pins, and unversioned encoding. Existing identity
+fixtures now state their unversioned component. Added a revision-pinned library sample
+and refreshed syntax, identity, and architectural documentation.
+
+Labels are producer assertions, not content hashes or compatibility guarantees.
+Producers must assign new labels for distinct artifacts. Side-by-side versions,
+content verification, version ranges, and persistent cross-build handles remain
+future work. No runtime ownership or execution-mode policy changes were introduced.
+
+Validation: all 271 integration tests pass on macOS ARM64; formatting, clippy with
+warnings denied, and diff checks pass. The revisions example verifies and prints 42.
+Linux and Windows execution remain for CI.
