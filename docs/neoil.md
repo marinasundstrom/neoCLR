@@ -471,3 +471,8 @@ Unions will follow an [ordinary type convention](unions-and-enums.md), expressed
 through metadata and member calls. No `.union`/`.variant` directives or general
 union opcodes are implemented. Existing Option/Result instructions remain bootstrap
 facilities until library types can replace them.
+
+Methods inside a generic type use its indexed parameters in signatures, locals, and
+IL operands. Calls specify a constructed owner: `call Box<Int32>::Create(Int32)` or
+`call instance Box<Int32>::Get()`. See [methods on generic types](generic-metadata.md#methods-on-generic-types)
+for substitution, receiver semantics, overload limitations, and validation.

@@ -73,6 +73,13 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                             _ => return Err(Fault::new("invalid branch fixup")),
                         }
                     }
+                    if let Some(def) = &typedef {
+                        let owner = pending.function.owner.clone();
+                        pending.function = pending.function.map_types(|ty| {
+                            Ok(bind_type_parameters(ty.clone(), &def.generic_parameters))
+                        })?;
+                        pending.function.owner = owner;
+                    }
                     module.functions.push(pending.function);
                 } else if let Some(def) = typedef.take() {
                     module.types.push(def);
@@ -226,7 +233,13 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                                 let (owner, field) = rest.split_once("::").ok_or_else(|| {
                                     Fault::new("expected field index or Type::Field")
                                 })?;
-                                let owner = parse_type(owner)?;
+                                let owner = bind_type_parameters(
+                                    parse_type(owner)?,
+                                    &typedef
+                                        .as_ref()
+                                        .map(|d| d.generic_parameters.clone())
+                                        .unwrap_or_default(),
+                                );
                                 let field = field.trim();
                                 identifier(field)?;
                                 field_fixups.push((
@@ -341,11 +354,6 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                         let def = typedef
                             .as_ref()
                             .ok_or_else(|| Fault::new(".method requires an enclosing .type"))?;
-                        if !def.generic_parameters.is_empty() {
-                            return Err(Fault::new(
-                                "methods on generic definitions are not implemented yet",
-                            ));
-                        }
                         let (kind, signature) =
                             rest.split_once(char::is_whitespace).ok_or_else(|| {
                                 Fault::new("expected .method static/instance Name(...) -> Type")
@@ -431,7 +439,12 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
     }
     // Resolve after all declarations so field aliases can name later types.
     for (function, pc, owner, name, line) in field_fixups {
-        let fields = module.instantiated_fields(&owner).map_err(|e| {
+        let arity = module.functions[function]
+            .owner
+            .as_ref()
+            .and_then(|t| module.type_definition(t))
+            .map_or(0, |d| d.generic_parameters.len());
+        let fields = crate::vm::record_fields(&module, &owner, arity).map_err(|e| {
             Fault::new(format!(
                 "line {line}: invalid field owner {owner:?}: {}",
                 e.message
@@ -559,9 +572,12 @@ fn parse_callable(text: &str, named: bool) -> Result<(FunctionRef, Vec<Option<St
         let owner = parse_type(owner)?;
         let full_name = format!(
             "{}.{}",
-            owner
-                .definition_name()
-                .ok_or_else(|| Fault::new("constructed method owners are not supported yet"))?,
+            match &owner {
+                Type::Constructed { definition, .. } => definition.as_str(),
+                _ => owner
+                    .definition_name()
+                    .ok_or_else(|| Fault::new("invalid method owner"))?,
+            },
             member.trim()
         );
         (Some(owner), full_name)

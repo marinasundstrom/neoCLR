@@ -606,32 +606,7 @@ impl Type {
 impl Module {
     /// Resolve closed record field signatures without allocating a runtime value.
     pub fn instantiated_fields(&self, ty: &Type) -> Result<Vec<Field>, crate::Fault> {
-        crate::vm::check_type(ty, self)?;
-        let (name, arguments): (&str, &[Type]) = match ty {
-            Type::Named(name) => (name, &[]),
-            Type::Constructed {
-                definition,
-                arguments,
-            } => (definition, arguments),
-            _ => return Err(crate::Fault::new("expected record type reference")),
-        };
-        let def = self
-            .types
-            .iter()
-            .find(|def| def.name == name)
-            .ok_or_else(|| crate::Fault::new("unknown record definition"))?;
-        if def.representation != Representation::Record {
-            return Err(crate::Fault::new("expected record definition"));
-        }
-        def.fields
-            .iter()
-            .map(|field| {
-                Ok(Field {
-                    name: field.name.clone(),
-                    ty: field.ty.substitute_type_parameters(arguments)?,
-                })
-            })
-            .collect()
+        crate::vm::record_fields(self, ty, 0)
     }
 }
 
@@ -659,5 +634,54 @@ mod construction_type {
             Operand::Signature(ty) => ty,
             Operand::LegacyName(name) => Type::from_name(&name),
         })
+    }
+}
+
+impl Function {
+    /// Transform every signature in a method, including instruction operands.
+    pub(crate) fn map_types(
+        &self,
+        mut map: impl FnMut(&Type) -> Result<Type, crate::Fault>,
+    ) -> Result<Self, crate::Fault> {
+        let mut result = self.clone();
+        if let Some(owner) = &mut result.owner {
+            *owner = map(owner)?;
+        }
+        for ty in result
+            .parameters
+            .iter_mut()
+            .chain(&mut result.locals)
+            .chain([&mut result.returns])
+        {
+            *ty = map(ty)?;
+        }
+        for op in &mut result.body {
+            match op {
+                Instruction::Call(target) => {
+                    if let Some(owner) = &mut target.owner {
+                        *owner = map(owner)?;
+                    }
+                    for ty in &mut target.parameters {
+                        *ty = map(ty)?;
+                    }
+                }
+                Instruction::New(ty)
+                | Instruction::SizeOf(ty)
+                | Instruction::AlignOf(ty)
+                | Instruction::Allocate(ty)
+                | Instruction::LoadObject(ty)
+                | Instruction::StoreObject(ty)
+                | Instruction::CopyObject(ty)
+                | Instruction::InitializeObject(ty)
+                | Instruction::None(ty)
+                | Instruction::Ok(ty)
+                | Instruction::Err(ty)
+                | Instruction::NullPointer(ty)
+                | Instruction::PointerCast(ty)
+                | Instruction::PointerFromInt(ty) => *ty = map(ty)?,
+                _ => (),
+            }
+        }
+        Ok(result)
     }
 }

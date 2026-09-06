@@ -678,3 +678,29 @@ Updated README, type documentation, assembler reference, union sequence, and roa
 Validation: all 188 integration tests pass on macOS ARM64; formatting, clippy, and
 diff checks pass. The new sample prints Generic values passed. Linux and Windows
 execution remain for CI.
+
+## 2026-09-06 — IL methods on generic types
+
+Implemented static and instance methods on generic definitions. Declaring-type
+parameter aliases normalize to indices across signatures, locals, and typed IL
+operands. Calls name constructed owners; execution substitutes type arguments into
+method copies, including nested call/construction/pointer operands. Receivers carry
+exact closed identities and retain value-copy behavior. Definitions remain open in
+serialized metadata and are not rewritten by execution.
+
+Extended validation to method parameter contexts and symbolic calls, while retaining
+branch/slot checks on unused definitions. Closed types are checked at call time;
+parameter-dependent native layouts are checked at the executed memory operation.
+Overloads that collide after substitution produce an ambiguity Fault. Method-level
+generics, definition-token overload disambiguation, generic native imports, and a
+specialization cache remain pending. Open methods cannot serve as entry points.
+
+Added a Box<T> sample and seven tests covering roundtrip/indexed metadata, static and
+instance calls, copied updates, Void/nested values, byte storage, symbolic forwarding,
+recursion limits, overload collisions, invalid metadata/owners, and substituted
+native layout operands. Updated the type documentation, README, roadmap, and union
+prerequisites to reflect the implemented member support.
+
+Validation: all 195 integration tests pass on macOS ARM64; formatting, clippy, and
+diff checks pass. The sample prints 42 and Generic methods passed. Linux and Windows
+execution remain for CI.

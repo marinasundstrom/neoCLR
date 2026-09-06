@@ -31,9 +31,9 @@ Follow a .NET 11-inspired attribute/member convention instead of introducing a
 union type category or dedicated instructions. See [the convention](unions-and-enums.md).
 
 The [generic metadata foundation and closed record values](generic-metadata.md)
-are implemented, including field access and value copying. Next come members on
-generic types, custom attributes, and the typed access/storage needed for ordinary
-library carriers.
+are implemented, including field access, value copying, and static/instance members
+on generic types. Next come custom attributes and the typed access/storage needed
+for ordinary library carriers.
 Then migrate System Option/Result from their bootstrap implementation. This work
 must preserve explicit allocation and avoid requiring null or boxing for absence.
 

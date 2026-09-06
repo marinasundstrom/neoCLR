@@ -38,16 +38,89 @@ pub struct Execution {
     pub native_libraries: Option<crate::interop::NativeLibraries>,
 }
 
-fn resolve(module: &Module, target: &FunctionRef) -> Option<usize> {
-    module.functions.iter().position(|f| {
-        f.name == target.name
-            && f.parameters == target.parameters
-            && f.instance == target.instance
-            && target
+fn resolve(module: &Module, target: &FunctionRef) -> Result<crate::metadata::Function, Fault> {
+    let mut found = None;
+    for definition in &module.functions {
+        if definition.name != target.name || definition.instance != target.instance {
+            continue;
+        }
+        let arity = definition
+            .owner
+            .as_ref()
+            .and_then(|o| module.type_definition(o))
+            .map_or(0, |d| d.generic_parameters.len());
+        let candidate = if arity > 0 {
+            let Some(Type::Constructed {
+                definition: owner,
+                arguments,
+            }) = &target.owner
+            else {
+                continue;
+            };
+            if definition.owner.as_ref().and_then(Type::definition_name) != Some(owner.as_str())
+                || arguments.len() != arity
+            {
+                continue;
+            }
+            let mut instantiated =
+                definition.map_types(|ty| ty.substitute_type_parameters(arguments))?;
+            instantiated.owner = target.owner.clone();
+            instantiated
+        } else {
+            if target
                 .owner
                 .as_ref()
-                .is_none_or(|owner| f.owner.as_ref() == Some(owner))
+                .is_some_and(|owner| definition.owner.as_ref() != Some(owner))
+            {
+                continue;
+            }
+            definition.clone()
+        };
+        if candidate.parameters == target.parameters {
+            if found.is_some() {
+                return Err(Fault::new(
+                    "ambiguous function overload after type substitution",
+                ));
+            }
+            found = Some(candidate);
+        }
+    }
+    found.ok_or_else(|| {
+        Fault::new(format!(
+            "unknown function overload {}({:?})",
+            target.name, target.parameters
+        ))
     })
+}
+
+pub(crate) fn record_fields(
+    module: &Module,
+    ty: &Type,
+    arity: usize,
+) -> Result<Vec<crate::metadata::Field>, Fault> {
+    check_type_context(ty, module, arity, 0)?;
+    let (name, arguments): (&str, &[Type]) = match ty {
+        Type::Named(name) => (name, &[]),
+        Type::Constructed {
+            definition,
+            arguments,
+        } => (definition, arguments),
+        _ => return Err(Fault::new("expected record type reference")),
+    };
+    let def = module
+        .types
+        .iter()
+        .find(|d| d.name == name && d.representation == Representation::Record)
+        .ok_or_else(|| Fault::new("expected record definition"))?;
+    def.fields
+        .iter()
+        .map(|f| {
+            Ok(crate::metadata::Field {
+                name: f.name.clone(),
+                ty: f.ty.substitute_type_parameters(arguments)?,
+            })
+        })
+        .collect()
 }
 
 pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
@@ -151,8 +224,16 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         if function.instance && function.owner.is_none() {
             return Err(Fault::new("instance method requires a declaring type"));
         }
+        let arity = function
+            .owner
+            .as_ref()
+            .and_then(|owner| module.type_definition(owner))
+            .map_or(0, |d| d.generic_parameters.len());
+        let check = |ty: &Type| check_type_context(ty, module, arity, 0);
         if let Some(owner) = &function.owner {
-            check_type(owner, module)?;
+            if arity == 0 {
+                check_type(owner, module)?;
+            }
             let def = module
                 .type_definition(owner)
                 .ok_or_else(|| Fault::new("method owner has no type definition"))?;
@@ -171,7 +252,10 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             .chain(&function.locals)
             .chain([&function.returns])
         {
-            check_type(ty, module)?;
+            check(ty)?;
+        }
+        if arity > 0 && (function.pinvoke.is_some() || function.impl_flags != 0) {
+            return Err(Fault::new("generic owners require IL methods"));
         }
         if function.pinvoke.is_some() {
             crate::interop::validate(function)?;
@@ -241,20 +325,15 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 }
                 Op::Call(target) => {
                     if let Some(owner) = &target.owner {
-                        check_type(owner, module)?;
+                        check(owner)?;
                     }
                     for ty in &target.parameters {
-                        check_type(ty, module)?;
+                        check(ty)?;
                     }
-                    if resolve(module, target).is_none() {
-                        return Err(Fault::new(format!(
-                            "unknown function overload {}({:?})",
-                            target.name, target.parameters
-                        )));
-                    }
+                    resolve(module, target)?;
                 }
                 Op::New(ty) => {
-                    module.instantiated_fields(ty)?;
+                    record_fields(module, ty, arity)?;
                 }
                 Op::SizeOf(ty)
                 | Op::AlignOf(ty)
@@ -263,15 +342,17 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 | Op::StoreObject(ty)
                 | Op::CopyObject(ty)
                 | Op::InitializeObject(ty) => {
-                    check_type(ty, module)?;
-                    crate::memory::layout(module, ty)?;
+                    check(ty)?;
+                    if check_type(ty, module).is_ok() {
+                        crate::memory::layout(module, ty)?;
+                    }
                 }
                 Op::None(ty)
                 | Op::Ok(ty)
                 | Op::Err(ty)
                 | Op::NullPointer(ty)
                 | Op::PointerCast(ty)
-                | Op::PointerFromInt(ty) => check_type(ty, module)?,
+                | Op::PointerFromInt(ty) => check(ty)?,
                 _ => (),
             }
         }
@@ -283,6 +364,10 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 && !f.is_internal_call()
                 && f.pinvoke.is_none()
                 && !f.instance
+                && f.owner
+                    .as_ref()
+                    .and_then(|o| module.type_definition(o))
+                    .is_none_or(|d| d.generic_parameters.is_empty())
         })
     {
         return Err(Fault::new("parameterless entry function not found"));
@@ -347,7 +432,7 @@ fn check_type_context(ty: &Type, module: &Module, arity: usize, depth: usize) ->
 }
 
 struct Frame {
-    function: usize,
+    function: std::rc::Rc<crate::metadata::Function>,
     pc: usize,
     args: Vec<Value>,
     locals: Vec<Option<Value>>,
@@ -356,12 +441,13 @@ struct Frame {
 }
 
 impl Frame {
-    fn new(function: usize, args: Vec<Value>, module: &Module) -> Self {
+    fn new(function: crate::metadata::Function, args: Vec<Value>) -> Self {
+        let local_count = function.locals.len();
         Self {
-            function,
+            function: std::rc::Rc::new(function),
             pc: 0,
             args,
-            locals: vec![None; module.functions[function].locals.len()],
+            locals: vec![None; local_count],
             stack: vec![],
             allocations: vec![],
         }
@@ -454,7 +540,7 @@ fn interpret(
         .iter()
         .position(|f| f.name == module.entry && f.parameters.is_empty() && !f.instance)
         .ok_or_else(|| Fault::new("missing entry"))?;
-    let mut frames = vec![Frame::new(entry, vec![], module)];
+    let mut frames = vec![Frame::new(module.functions[entry].clone(), vec![])];
     let mut heap: Vec<Value> = vec![];
     let mut memory = crate::memory::PointerHeap::default();
     let mut output = vec![];
@@ -462,7 +548,7 @@ fn interpret(
         let frame = frames
             .last_mut()
             .ok_or_else(|| Fault::new("missing frame"))?;
-        let function = &module.functions[frame.function];
+        let function = frame.function.clone();
         let pc = frame.pc;
         let op = function.body.get(pc).ok_or_else(|| Fault {
             message: "function fell through without ret".into(),
@@ -664,9 +750,11 @@ fn interpret(
                     }
                 }
                 Op::Call(target) => {
-                    let index = resolve(module, target)
-                        .ok_or_else(|| Fault::new("unknown function overload"))?;
-                    let callee = &module.functions[index];
+                    let callee = resolve(module, target)?;
+                    callee.map_types(|ty| {
+                        check_type(ty, module)?;
+                        Ok(ty.clone())
+                    })?;
                     let args = frame.args(&callee.argument_types())?;
                     if callee.pinvoke.is_some() {
                         let libraries = native_libraries.as_mut().ok_or_else(|| {
@@ -674,18 +762,18 @@ fn interpret(
                         })?;
                         // SAFETY: a native library session is only supplied by run_with_native,
                         // whose caller accepts the native ABI and memory safety contract.
-                        let value = unsafe { libraries.invoke(callee, args, &memory)? };
+                        let value = unsafe { libraries.invoke(&callee, args, &memory)? };
                         expect(&value, &callee.returns)?;
                         frame.stack.push(value.on_stack());
                     } else if callee.is_internal_call() {
-                        let value = crate::native::bind(callee)?.invoke(args, &mut output)?;
+                        let value = crate::native::bind(&callee)?.invoke(args, &mut output)?;
                         expect(&value, &callee.returns)?;
                         frame.stack.push(value);
                     } else {
                         if frames.len() >= limits.frames {
                             return Err(Fault::new("frame limit exceeded"));
                         }
-                        frames.push(Frame::new(index, args, module));
+                        frames.push(Frame::new(callee, args));
                     }
                 }
                 Op::Return => {

@@ -56,7 +56,6 @@ fn bad_arity_open_context_and_duplicate_parameters_are_rejected() {
         ".type Box\n.end\n.function F(Box<Int32> value) -> Void\nldvoid\nret\n.end",
         ".type System.Int32<T>\n.end",
         ".type Option<T>\n.end",
-        ".type Box<T>\n.method static F() -> Void\nldvoid\nret\n.end\n.end",
         ".type Box<T>\n.end\n.function F() -> Void\nnewobj Box\npop\nldvoid\nret\n.end",
     ] {
         assert!(

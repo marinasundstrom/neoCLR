@@ -91,7 +91,7 @@ Fault remains for violated execution contracts.
 1. Completed: indexed generic references, arity checks, and field substitution.
 2. Completed: ordinary closed generic record construction and field operations,
    preserving value copies, storage conversions, and exact closed type identity.
-3. Support members on generic definitions and substitute their signatures/bodies
+3. Completed: IL members on generic definitions with substitution of signatures/bodies
    for closed owners. Keep unrelated generic method features separate.
 4. Add general custom-attribute metadata and the member/access/storage fundamentals
    required by the convention. Finalize its construction and typed-query contract.

@@ -1,0 +1,41 @@
+.module GenericMethods
+.entry Main
+
+.type Box<T>
+    .field Value T
+
+    .method static Create(T value) -> Box<T>
+        ldarg value
+        newobj Box<T>
+        ret
+    .end
+
+    .method instance Get() -> T
+        ldarg this
+        ldfld Box<T>::Value
+        ret
+    .end
+
+    .method instance WithValue(T value) -> Box<T>
+        .local Box<T> copy
+        ldarg this
+        ldarg value
+        stfld Box<T>::Value
+        stloc copy
+        ldloc copy
+        ret
+    .end
+.end
+
+.function Main() -> Void
+    ldc.i4 42
+    call Box<Int32>::Create(Int32)
+    call instance Box<Int32>::Get()
+    call System.Console::WriteLine(Int32)
+    pop
+    ldstr "Generic methods passed"
+    call Box<String>::Create(String)
+    call instance Box<String>::Get()
+    call System.Console::WriteLine(String)
+    ret
+.end
