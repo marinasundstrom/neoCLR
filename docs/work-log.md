@@ -592,3 +592,18 @@ branch and switch entry restrictions, and block operations.
 Validation: all 176 integration tests pass on macOS ARM64; formatting, clippy, and
 diff checks pass. The packed layout sample prints 42 and 8 through a prefixed load.
 Linux and Windows execution remain for the existing CI matrix.
+
+## 2026-09-06 — Prioritize union and generic fundamentals
+
+Recorded the user's priority: execution/metadata fundamentals before broad type-system
+features and reflection, with a representation for library-defined Option and Result.
+Proposed union for tagged typed payloads and enum for integer-backed named constants.
+Outlined closed type references, indexed generic parameters, stable case tags and
+payload-field indices, general construction/test/extraction operations, and a staged
+migration away from hard-coded Option/Result runtime cases. Names remain mappings.
+
+The proposal distinguishes interpreter values from a future native ABI, preserves
+Void payloads and value copying, and avoids implicit null sentinels or ownership.
+Updated the roadmap to focus next on generic references/substitution, union metadata
+and execution, then platform-written System definitions. Reflection is not required.
+This is design documentation, not an implementation of general unions or generics.

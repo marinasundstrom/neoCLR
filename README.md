@@ -202,3 +202,7 @@ Typed memory initialization/copying (`initobj`, `cpobj`) and byte-range operatio
 
 Parameter, local, and qualified field names are assembly conveniences mapped to
 canonical indices. See [identifier mappings](docs/neoil.md#identifier-mappings-and-field-aliases).
+
+The next fundamental milestone is library-defined Option and Result through minimal
+generic metadata and tagged unions. See the [union/enum proposal](docs/unions-and-enums.md);
+reflection remains outside that milestone.

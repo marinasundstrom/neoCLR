@@ -22,6 +22,15 @@ allocator/collector integration. These are recorded in [memory layers](memory-mo
 and [allocation proposals](allocation-encoding.md). The current Ref arena is
 scaffolding, not a prerequisite ownership policy for the pointer layer.
 
+## Next focus: library-defined unions
+
+Prioritize execution and metadata fundamentals for Option<T> and Result<T,TError>
+before reflection or broader object-model features. Use union for tagged payload
+cases and reserve enum for integer-backed constants. The proposed representation
+and sequence are in [unions and enums](unions-and-enums.md): minimal generic type
+references/substitution, case definitions and operations, then System library migration.
+This is focused type machinery needed for ordinary library code, not a reflection API.
+
 ## Later milestones
 
 1. `brfalse`, label-based `switch` tables, and equality/ordered comparison branches
