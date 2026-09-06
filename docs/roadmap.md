@@ -25,7 +25,7 @@ scaffolding, not a prerequisite ownership policy for the pointer layer.
 
 1. `brfalse`, label-based `switch` tables, and equality/ordered comparison branches
    are implemented. Conditional branches
-   support Boolean, integer, pointer, and prototype Ref operands. Add short-form aliases.
+   support Boolean, integer, pointer, and prototype Ref operands. Compact constant and slot aliases are implemented; short branches remain pending.
    Add a control-flow verifier: typed stack states at joins, definite local
    initialization, valid return paths, and maximum stack calculation.
 2. Extend type/generic metadata and implement arrays when their storage contracts

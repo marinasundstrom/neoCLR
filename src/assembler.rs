@@ -161,6 +161,12 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                         return Err(Fault::new("duplicate label"));
                     }
                 } else {
+                    if let Some(instruction) =
+                        parse_compact_instruction(word, rest, &pending.function)?
+                    {
+                        pending.function.body.push(instruction);
+                        return Ok(());
+                    }
                     let pc = pending.function.body.len();
                     let argument = match word {
                         "ldc.i4" => Some(serde_json::json!(
@@ -558,4 +564,65 @@ fn resolve_slot(function: &Function, op: &str, operand: &str) -> Result<usize, F
                 }
             ))
         })
+}
+
+/// Compact source spellings normalize to one canonical metadata instruction.
+fn parse_compact_instruction(
+    word: &str,
+    operand: &str,
+    function: &Function,
+) -> Result<Option<Instruction>, Fault> {
+    if word == "ldc.i4.s" {
+        let value = operand
+            .parse::<i8>()
+            .map_err(|_| Fault::new("ldc.i4.s requires a signed 8-bit literal"))?;
+        return Ok(Some(Instruction::Int(value as i32)));
+    }
+    if let Some(suffix) = word.strip_prefix("ldc.i4.") {
+        let value = match suffix {
+            "m1" => -1,
+            "0" => 0,
+            "1" => 1,
+            "2" => 2,
+            "3" => 3,
+            "4" => 4,
+            "5" => 5,
+            "6" => 6,
+            "7" => 7,
+            "8" => 8,
+            _ => return Err(Fault::new("invalid compact Int32 opcode")),
+        };
+        if !operand.is_empty() {
+            return Err(Fault::new("compact constant has no operand"));
+        }
+        return Ok(Some(Instruction::Int(value)));
+    }
+    for base in ["ldarg", "starg", "ldloc", "stloc"] {
+        let Some(suffix) = word.strip_prefix(base).and_then(|s| s.strip_prefix('.')) else {
+            continue;
+        };
+        let index = if suffix == "s" {
+            let index = resolve_slot(function, base, operand)?;
+            if index > u8::MAX as usize {
+                return Err(Fault::new("short slot index exceeds 255"));
+            }
+            index
+        } else {
+            if base == "starg" || !matches!(suffix, "0" | "1" | "2" | "3") {
+                return Err(Fault::new("invalid compact slot opcode"));
+            }
+            if !operand.is_empty() {
+                return Err(Fault::new("compact slot opcode has no operand"));
+            }
+            suffix.parse::<usize>().unwrap()
+        };
+        return Ok(Some(match base {
+            "ldarg" => Instruction::Arg(index),
+            "starg" => Instruction::StoreArg(index),
+            "ldloc" => Instruction::Load(index),
+            "stloc" => Instruction::Store(index),
+            _ => unreachable!(),
+        }));
+    }
+    Ok(None)
 }

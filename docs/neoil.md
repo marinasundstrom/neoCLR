@@ -366,7 +366,7 @@ and never frees or retains the allocation. Replacing an ordinary argument does n
 write back into a caller's local or argument. Pointee writes still use the separate
 memory instructions. Invalid indices are rejected during validation, including in
 unreachable code; bad types and stack underflow Fault at the executing instruction.
-The short encoding and argument address-taking (`ldarga`) remain pending.
+The `starg.s` spelling is supported; argument address-taking (`ldarga`) remains pending.
 
 The `examples/arguments.neoil` sample sums down by updating its `count` argument,
 then demonstrates that the caller's local retains its original value. It prints
@@ -403,3 +403,31 @@ managed-byref comparisons remain unsupported; convert a pointer to a native inte
 explicitly if address ordering is intended. Unsupported operand types and stack
 underflow Fault at execution. Run `examples/comparison-branches.neoil` for checks of
 all ten opcodes, including unsigned integer and unordered floating cases.
+
+
+## Compact constant and slot spellings
+
+The assembler accepts these CIL spellings as aliases for existing instructions:
+
+| Source spelling | Canonical instruction | Operand rule |
+| --- | --- | --- |
+| `ldc.i4.m1`, `ldc.i4.0` through `ldc.i4.8` | `ldc.i4` | No operand; value is in the opcode |
+| `ldc.i4.s n` | `ldc.i4 n` | Signed decimal value from -128 to 127 |
+| `ldarg.0` through `ldarg.3` | `ldarg index` | No operand |
+| `ldloc.0` through `ldloc.3` | `ldloc index` | No operand |
+| `stloc.0` through `stloc.3` | `stloc index` | No operand |
+| `ldarg.s`, `starg.s`, `ldloc.s`, `stloc.s` | Corresponding full instruction | Index or name resolving to index 0 through 255 |
+
+The limits match the CLI's signed-byte constant and unsigned-byte slot operands;
+see [ldc.i4.s](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.ldc_i4_s)
+and [ldarg.s](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.ldarg_s).
+A slot must also exist in the signature or local table. Instance argument indices
+still include `this` at zero. There is no `starg.0` opcode; use `starg.s 0` or
+`starg.s this` in an instance method.
+
+Each spelling emits exactly one canonical instruction in JSON. Source spellings
+and byte-width hints are not retained, and this does not produce a compact binary
+file yet. A future CIL writer will choose encodings from the canonical instructions.
+Short branch forms still require binary offset handling and remain pending.
+Labels, instruction budgets, and stack behavior are identical to the full spelling.
+The `examples/compact.neoil` sample prints 42 using compact constants and slot access.

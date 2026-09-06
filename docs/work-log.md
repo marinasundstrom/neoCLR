@@ -513,3 +513,21 @@ mixed-type rejection, backward branches, instruction budgets, and stack preserva
 Validation: all 156 integration tests pass on macOS ARM64; formatting, clippy, and
 diff checks pass. The sample prints Comparison branches passed. Linux and Windows
 execution remain for the existing CI matrix.
+
+## 2026-09-06 — Compact CIL constant and slot spellings
+
+Added ldc.i4.m1/0–8, ldc.i4.s, ldarg.0–3, ldloc.0–3, stloc.0–3, and
+ldarg.s/starg.s/ldloc.s/stloc.s source aliases. Short slot operands support numeric
+indices and optional names, including instance this. The assembler enforces signed
+8-bit constant and unsigned 8-bit slot limits, then emits one canonical instruction.
+Existing metadata, runtime execution, and label indices are unchanged.
+
+Documented that JSON retains no byte-width preference and that binary compactness
+is still future writer work. Short branch forms remain pending. Added a compact
+sample and five tests for every fixed alias, canonical output equivalence, named
+short forms, boundary values/indices, malformed spellings, missing slots, roundtrip
+execution, instance receiver indexing, and labels around compact instructions.
+
+Validation: all 161 integration tests pass on macOS ARM64; formatting, clippy, and
+diff checks pass. The compact sample prints 42. Linux and Windows execution remain
+for the existing CI matrix.

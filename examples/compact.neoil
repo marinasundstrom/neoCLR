@@ -1,0 +1,22 @@
+.module Compact
+.entry Main
+
+.function Add(Int32 left, Int32 right) -> Int32
+    ldarg.0
+    ldarg.1
+    add
+    starg.s left
+    ldarg.s left
+    ret
+.end
+
+.function Main() -> Void
+    .local Int32 answer
+    ldc.i4.s 40
+    ldc.i4.2
+    call Add(Int32,Int32)
+    stloc.0
+    ldloc.s answer
+    call System.Console::WriteLine(Int32)
+    ret
+.end
