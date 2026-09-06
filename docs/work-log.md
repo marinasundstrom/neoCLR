@@ -772,3 +772,22 @@ These are discussion proposals; no receiver, ownership, constructor, opcode, or
 binary-format decision was implemented. README and roadmap link the proposal and
 record the strategy pause. Validation: documentation diff checks pass; runtime code
 is unchanged and the previously passing 209-test suite was not rerun.
+
+## 2026-09-06 — Addressed-access strategy proposal
+
+Refined the proposed boundary between plain values, native pointers, and checked
+read-only/writable addressed access. Kept ownership independent and permitted aliases
+without assuming Rust-style exclusivity. Specified a possible first subset limited
+to initialized local/argument/field locations, reference locals, and call forwarding;
+reference returns, aggregate containment, native conversions, and initialization
+capabilities remain separate design questions.
+
+Recorded location identity across slot replacement, read-only access versus immutable
+data, zero-sized values, generic fields, and addressable String locals without native
+String layout. Included source-to-IL mutation behavior and proposed verifier acceptance
+cases. Recommended the basic control-flow verifier as the next executable slice when
+implementation resumes. Runtime implementation remains paused; no proposed signature,
+receiver mode, opcode, or lifetime behavior is implemented.
+
+Validation: documentation diff checks pass. Runtime code is unchanged; the previously
+passing 209-test suite was not rerun.

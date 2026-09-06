@@ -13,7 +13,9 @@ recommends settling addressed access and initialization contracts, developing ve
 and member-reference foundations, then introducing a small high-level compiler as
 another producer of the same metadata/IL. Library code can migrate from handwritten
 IL incrementally; compiler self-hosting is not required. This sequence is proposed,
-not an accepted change to executable semantics.
+not an accepted change to executable semantics. The [addressed-access proposal](addressed-access.md)
+recommends a basic control-flow verifier as the first executable slice when work resumes,
+followed by explicit receiver/reference capabilities with lifetime and access checks.
 
 ## Immediate focus: heap allocation and pointers
 

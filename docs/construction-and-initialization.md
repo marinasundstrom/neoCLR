@@ -23,6 +23,9 @@ Clone/Drop must not become the future guest copy/destruction contract.
 
 ## Addressable values and receivers first
 
+The [addressed-access proposal](addressed-access.md) develops this boundary, its first
+scoped subset, and the checks needed before implementation.
+
 Recommend a CLI-like by-reference signature, provisionally written T&, alongside
 native T*. Its meaning is addressed access to existing storage, not counted Ref<T>
 and not a GC-selected allocation. Begin with addresses of locals, arguments, and
