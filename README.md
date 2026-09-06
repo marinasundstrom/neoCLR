@@ -229,3 +229,8 @@ operands, local initialization, and returns; reference-lifetime analysis remains
 [construction, mutation, and initialization proposal](docs/construction-and-initialization.md)
 connects the next type-system decisions with verification and a future high-level
 language for the runtime library; its contracts are proposals, not implemented features.
+
+[Execution architecture](docs/execution-architecture.md) treats interpretation, JIT,
+and native AOT as platform-wide targets, with shared semantics and explicit capability
+boundaries. Only interpretation exists today. Embedding and a future high-level
+language are separate architectural requirements; hosting does not define the modes.

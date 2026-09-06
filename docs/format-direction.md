@@ -1,5 +1,11 @@
 # Assembly syntax and CLI format direction
 
+Interpretation, JIT, and native AOT share the semantic metadata/IL contract described
+in [execution architecture](execution-architecture.md). This format is an input to
+multiple backends, not a serialization of interpreter-only execution state. Native
+artifacts and exports need additional target/linkage information; their schema remains
+open. Hosting consumes these contracts and does not define the execution modes.
+
 ## Guiding constraint
 
 neoIL does not have to mimic CLR assembly syntax. The output should retain familiar

@@ -849,3 +849,21 @@ No byref, constructor, ownership, or mandatory-verification contract is added.
 Validation: all 226 integration tests pass on macOS ARM64; formatting, clippy, and
 diff checks pass. CLI typed verification of generic-methods succeeds. Linux and
 Windows execution remain for CI.
+
+## 2026-09-06 — Execution modes as platform architecture
+
+Recorded the user's requirements for embedding, native AOT, and interpretation/JIT/AOT
+as architectural concerns across the whole platform. Corrected the earlier framing
+around hosting: hosting consumes execution contracts, and does not define mode semantics.
+Documented common metadata/IL, backend lowering, target ABI, generics, runtime services,
+Fault propagation, capability discovery, and explicit fallback decisions.
+
+Recorded native executable/library AOT experiments, a minimal embedding experiment,
+and a future high-level compiler feeding the same platform model. Recommended stable
+module/type/member identities as the next common prerequisite. Mixed execution,
+code-sharing strategy, native backend selection, public ABI, and memory-management
+protocols remain open; no runtime implementation or mode policy was introduced.
+
+Updated README, roadmap priorities, and format direction. Validation: documentation
+diff checks pass. Runtime code is unchanged; the previously passing 226-test suite
+was not rerun.

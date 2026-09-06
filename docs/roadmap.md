@@ -4,6 +4,22 @@ The platform name is undecided; neoCLR names the runtime only. The existing code
 is a small semantic testbed. It is not a commitment to Rust for every component,
 JSON for distribution, or the exact instruction extensions used here.
 
+## Architectural targets and next priorities
+
+Interpretation, JIT compilation, and native AOT are platform-wide architectural
+requirements. Embedding and a future high-level language are additional consumers
+of the same semantic model. See [execution architecture](execution-architecture.md)
+for shared contracts, capability boundaries, unresolved choices, and staged experiments.
+Only interpretation is implemented today; this does not make interpreter internals
+the permanent platform ABI.
+
+The next shared foundation is stable module/type/member identity, particularly generic
+overload references. Invocation, target-layout, runtime-service, and Fault boundaries
+then support a minimal hosting experiment and an early native AOT experiment. A small
+language compiler should target the same metadata/IL and enable incremental library
+migration. Native backend/code-sharing choices remain open; no hidden fallback or
+universal ownership policy is implied.
+
 ## Strategy review and verifier foundation
 
 Following the strategy review, the first [verifier pass](verification.md) is implemented.
@@ -18,7 +34,7 @@ implemented receiver/lifetime contracts. A small high-level compiler can eventua
 produce the same metadata/IL as the assembler, enabling incremental runtime-library
 migration without requiring compiler self-hosting.
 
-## Immediate focus: heap allocation and pointers
+## Implemented foundation: heap allocation and pointers
 
 The initial subset implements native allocation/free, layout, casts, byte offsets,
 field addresses, and indirect loads/stores. Construction remains separate from
@@ -36,7 +52,7 @@ allocator/collector integration. These are recorded in [memory layers](memory-mo
 and [allocation proposals](allocation-encoding.md). The current Ref arena is
 scaffolding, not a prerequisite ownership policy for the pointer layer.
 
-## Next focus: library-defined unions
+## Library milestone: ordinary Option and Result types
 
 Prioritize execution and metadata fundamentals for Option<T> and Result<T,TError>
 before reflection or broader object-model features. A union is an ordinary carrier
