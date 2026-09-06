@@ -753,3 +753,22 @@ execution remain for CI.
 Implementation pauses after this slice at the user's request for a strategy review.
 The review must include a future high-level language and migration of the runtime
 library from authored IL to that language, targeting the same metadata and IL.
+
+## 2026-09-06 — Construction and initialization strategy proposal
+
+Kept runtime implementation paused and documented proposed contracts for values,
+storage, addressed receivers, construction, initialization, and recoverable factories.
+Recorded scoped byrefs as a possible first verified subset without adopting Rust
+exclusivity or implicit ownership. Distinguished addressable interpreter values from
+native layout, and partial initialization from null/default values.
+
+Proposed verifier/member-reference/visibility foundations before mutable receivers
+and constructor execution. Identified versioned migration questions for current
+newobj/stfld semantics and conditional-output initialization for union extraction.
+Included the future high-level compiler and incremental runtime-library migration
+through the same metadata/IL, without requiring compiler self-hosting.
+
+These are discussion proposals; no receiver, ownership, constructor, opcode, or
+binary-format decision was implemented. README and roadmap link the proposal and
+record the strategy pause. Validation: documentation diff checks pass; runtime code
+is unchanged and the previously passing 209-test suite was not rerun.

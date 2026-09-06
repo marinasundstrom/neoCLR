@@ -221,3 +221,8 @@ types. Dedicated union opcodes are not planned.
 [Marker custom attributes](docs/custom-attributes.md) are supported on types and
 methods/functions. The System library supplies UnionAttribute as an ordinary marker;
 union behavior and guest reflection remain pending.
+
+Implementation is paused for a strategy review. The
+[construction, mutation, and initialization proposal](docs/construction-and-initialization.md)
+connects the next type-system decisions with verification and a future high-level
+language for the runtime library; its contracts are proposals, not implemented features.

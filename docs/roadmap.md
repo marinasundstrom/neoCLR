@@ -4,6 +4,17 @@ The platform name is undecided; neoCLR names the runtime only. The existing code
 is a small semantic testbed. It is not a commitment to Rust for every component,
 JSON for distribution, or the exact instruction extensions used here.
 
+## Strategy review: implementation paused
+
+The user requested a strategy review after the marker-attribute slice. The milestones
+below retain earlier direction; they are not authorization to resume runtime work.
+The [construction, mutation, and initialization proposal](construction-and-initialization.md)
+recommends settling addressed access and initialization contracts, developing verifier
+and member-reference foundations, then introducing a small high-level compiler as
+another producer of the same metadata/IL. Library code can migrate from handwritten
+IL incrementally; compiler self-hosting is not required. This sequence is proposed,
+not an accepted change to executable semantics.
+
 ## Immediate focus: heap allocation and pointers
 
 The initial subset implements native allocation/free, layout, casts, byte offsets,
