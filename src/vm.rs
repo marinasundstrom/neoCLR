@@ -89,18 +89,46 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 "runtime primitive types cannot declare record fields",
             ));
         }
+        if def.generic_parameters.len() > u16::MAX as usize + 1 {
+            return Err(Fault::new("too many type parameters"));
+        }
+        let mut parameter_names = HashSet::new();
+        for name in def.generic_parameters.iter().flatten() {
+            if !crate::metadata::valid_slot_name(name)
+                || Type::from_name(name).is_primitive()
+                || !parameter_names.insert(name)
+            {
+                return Err(Fault::new("invalid or duplicate type parameter name"));
+            }
+        }
+        if !def.generic_parameters.is_empty()
+            && (def.representation != Representation::Record
+                || matches!(def.name.as_str(), "Option" | "Result" | "Ref" | "Ptr"))
+        {
+            return Err(Fault::new(
+                "reserved type cannot declare generic parameters",
+            ));
+        }
         if def.packing.is_some() || def.minimum_size.is_some() {
             if def.representation != Representation::Record {
                 return Err(Fault::new("runtime types cannot override layout"));
             }
-            crate::memory::layout(module, &ty)?;
+            if def.generic_parameters.is_empty() {
+                crate::memory::layout(module, &ty)?;
+            } else if def
+                .packing
+                .is_some_and(|p| !matches!(p, 0 | 1 | 2 | 4 | 8 | 16 | 32 | 64 | 128))
+                || def.minimum_size.is_some_and(|s| s > i32::MAX as u32)
+            {
+                return Err(Fault::new("invalid generic record layout controls"));
+            }
         }
         let mut fields = HashSet::new();
         for field in &def.fields {
             if field.name.is_empty() || !fields.insert(&field.name) {
                 return Err(Fault::new("empty or duplicate field name"));
             }
-            check_type(&field.ty, module)?;
+            check_type_context(&field.ty, module, def.generic_parameters.len(), 0)?;
         }
     }
     let mut signatures = HashSet::new();
@@ -231,9 +259,11 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                         .iter()
                         .find(|t| &t.name == name)
                         .ok_or_else(|| Fault::new(format!("unknown type {name}")))?;
-                    if def.representation != Representation::Record {
+                    if def.representation != Representation::Record
+                        || !def.generic_parameters.is_empty()
+                    {
                         return Err(Fault::new(
-                            "newobj cannot construct a runtime primitive as a record",
+                            "newobj requires a non-generic record definition",
                         ));
                     }
                 }
@@ -271,18 +301,57 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
     Ok(())
 }
 
-fn check_type(ty: &Type, module: &Module) -> Result<(), Fault> {
+pub(crate) fn check_type(ty: &Type, module: &Module) -> Result<(), Fault> {
+    check_type_context(ty, module, 0, 0)
+}
+
+fn check_type_context(ty: &Type, module: &Module, arity: usize, depth: usize) -> Result<(), Fault> {
+    if depth > 32 {
+        return Err(Fault::new("type nesting exceeds 32"));
+    }
+    let nested = |ty: &Type| check_type_context(ty, module, arity, depth + 1);
     match ty {
-        Type::Named(name) if Type::from_name(name).is_primitive() => Err(Fault::new(
-            "primitive type requires canonical primitive signature encoding",
-        )),
-        Type::Named(name) if !module.types.iter().any(|t| &t.name == name) => {
-            Err(Fault::new(format!("unknown type {name}")))
+        Type::TypeParameter(index) if *index as usize >= arity => {
+            Err(Fault::new("type parameter outside declaring context"))
         }
-        Type::Option(t) | Type::Ref(t) | Type::Ptr(t) => check_type(t, module),
+        Type::Named(name) => {
+            if Type::from_name(name).is_primitive() {
+                return Err(Fault::new(
+                    "primitive type requires canonical primitive signature encoding",
+                ));
+            }
+            let def = module
+                .types
+                .iter()
+                .find(|t| &t.name == name)
+                .ok_or_else(|| Fault::new(format!("unknown type {name}")))?;
+            if !def.generic_parameters.is_empty() {
+                return Err(Fault::new("generic type requires type arguments"));
+            }
+            Ok(())
+        }
+        Type::Constructed {
+            definition,
+            arguments,
+        } => {
+            let def = module
+                .types
+                .iter()
+                .find(|t| &t.name == definition)
+                .ok_or_else(|| Fault::new(format!("unknown generic type {definition}")))?;
+            if def.generic_parameters.is_empty() || def.generic_parameters.len() != arguments.len()
+            {
+                return Err(Fault::new("generic type argument count mismatch"));
+            }
+            for argument in arguments {
+                nested(argument)?;
+            }
+            Ok(())
+        }
+        Type::Option(t) | Type::Ref(t) | Type::Ptr(t) => nested(t),
         Type::Result(t, e) => {
-            check_type(t, module)?;
-            check_type(e, module)
+            nested(t)?;
+            nested(e)
         }
         _ => Ok(()),
     }

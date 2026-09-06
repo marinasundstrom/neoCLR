@@ -54,6 +54,7 @@ cargo run -- run examples/arguments.neoil
 cargo run -- run examples/comparison-branches.neoil
 cargo run -- run examples/compact.neoil
 cargo run -- run examples/layout.neoil
+cargo run -- run examples/generic-metadata.neoil
 cargo run -- run examples/native-integers.neoil
 cargo run -- run examples/integers.neoil
 cargo run -- run examples/bits.neoil
@@ -206,3 +207,7 @@ canonical indices. See [identifier mappings](docs/neoil.md#identifier-mappings-a
 The next fundamental milestone is library-defined Option and Result through minimal
 generic metadata and tagged unions. See the [union/enum proposal](docs/unions-and-enums.md);
 reflection remains outside that milestone.
+
+Indexed generic parameters, constructed references, and field substitution are now
+implemented as the [generic metadata foundation](docs/generic-metadata.md). Generic
+value construction and union definitions are the next steps.

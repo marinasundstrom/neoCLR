@@ -1,0 +1,26 @@
+.module GenericMetadata
+.entry Main
+
+.type Envelope<T>
+    .field Value T
+    .field Next Envelope<T>*
+.end
+
+.function IsNull(Envelope<Int32>* value) -> Boolean
+    ldarg value
+    ptr.null Envelope<Int32>
+    ceq
+    ret
+.end
+
+.function Main() -> Void
+    ; Closed generic pointer signatures do not require a native record layout.
+    ptr.null Envelope<Int32>
+    call IsNull(Envelope<Int32>*)
+    brtrue Passed
+    fault "generic pointer signature failed"
+Passed:
+    ldstr "Generic signatures passed"
+    call System.Console::WriteLine(String)
+    ret
+.end

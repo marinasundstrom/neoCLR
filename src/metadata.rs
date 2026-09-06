@@ -22,6 +22,12 @@ pub enum Type {
     String,
     Error,
     Named(String),
+    /// Indexed parameter of the declaring type (CLI VAR-like signature).
+    TypeParameter(u16),
+    Constructed {
+        definition: String,
+        arguments: Vec<Type>,
+    },
     Option(Box<Type>),
     Result(Box<Type>, Box<Type>),
     Ref(Box<Type>),
@@ -121,6 +127,8 @@ pub struct TypeDef {
     pub fields: Vec<Field>,
     #[serde(default)]
     pub representation: Representation,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub generic_parameters: Vec<Option<String>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub packing: Option<u16>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -562,5 +570,64 @@ impl Instruction {
                 | Self::CopyBlock
                 | Self::InitializeBlock
         )
+    }
+}
+
+impl Type {
+    pub fn substitute_type_parameters(&self, arguments: &[Type]) -> Result<Type, crate::Fault> {
+        fn substitute(ty: &Type, arguments: &[Type], depth: usize) -> Result<Type, crate::Fault> {
+            if depth > 32 {
+                return Err(crate::Fault::new("type substitution nesting exceeds 32"));
+            }
+            let nested = |ty: &Type| substitute(ty, arguments, depth + 1);
+            Ok(match ty {
+                Type::TypeParameter(index) => arguments
+                    .get(*index as usize)
+                    .cloned()
+                    .ok_or_else(|| crate::Fault::new("type parameter index outside arguments"))?,
+                Type::Constructed {
+                    definition,
+                    arguments: types,
+                } => Type::Constructed {
+                    definition: definition.clone(),
+                    arguments: types.iter().map(nested).collect::<Result<_, _>>()?,
+                },
+                Type::Option(t) => Type::Option(Box::new(nested(t)?)),
+                Type::Result(t, e) => Type::Result(Box::new(nested(t)?), Box::new(nested(e)?)),
+                Type::Ptr(t) => Type::Ptr(Box::new(nested(t)?)),
+                Type::Ref(t) => Type::Ref(Box::new(nested(t)?)),
+                other => other.clone(),
+            })
+        }
+        substitute(self, arguments, 0)
+    }
+}
+
+impl Module {
+    /// Resolve closed record field signatures without allocating a runtime value.
+    pub fn instantiated_fields(&self, ty: &Type) -> Result<Vec<Field>, crate::Fault> {
+        crate::vm::check_type(ty, self)?;
+        let (name, arguments): (&str, &[Type]) = match ty {
+            Type::Named(name) => (name, &[]),
+            Type::Constructed {
+                definition,
+                arguments,
+            } => (definition, arguments),
+            _ => return Err(crate::Fault::new("expected record type reference")),
+        };
+        let def = self
+            .types
+            .iter()
+            .find(|def| def.name == name)
+            .ok_or_else(|| crate::Fault::new("unknown record definition"))?;
+        def.fields
+            .iter()
+            .map(|field| {
+                Ok(Field {
+                    name: field.name.clone(),
+                    ty: field.ty.substitute_type_parameters(arguments)?,
+                })
+            })
+            .collect()
     }
 }

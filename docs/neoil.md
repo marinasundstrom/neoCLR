@@ -462,3 +462,7 @@ uses indices exclusively.
 Record declarations accept `.pack n` and `.size n`; see [sequential layout controls](heap-and-pointers.md#sequential-packing-and-size-controls) for alignment, minimum-size, and native-access rules.
 
 See [unaligned access](heap-and-pointers.md#unaligned-memory-access) for supported prefix targets and control-flow restrictions.
+
+Generic record headers use `.type Pair<T, U>` (or indexed unnamed parameters such
+as `!0`); field signatures resolve names to indexed type parameters. See
+[generic metadata](generic-metadata.md) for supported references and current execution limits.

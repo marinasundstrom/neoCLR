@@ -607,3 +607,28 @@ Void payloads and value copying, and avoids implicit null sentinels or ownership
 Updated the roadmap to focus next on generic references/substitution, union metadata
 and execution, then platform-written System definitions. Reflection is not required.
 This is design documentation, not an implementation of general unions or generics.
+
+## 2026-09-06 — Generic type references and field substitution
+
+Implemented indexed TypeParameter and Constructed type signatures, optional generic
+parameter name tables, and `.type Pair<T, !1>` declarations. Field names for generic
+parameters resolve to indices; indexed references are canonical. The parser now
+accepts user-defined constructed type syntax, while validation resolves definitions,
+checks arity, rejects open references outside their type context, and validates names
+and nesting. Existing builtin Option/Result/Ref/Ptr encodings remain reserved.
+
+Added field-signature substitution APIs for closed types, preserving nested wrappers,
+pointer layers, and constructed arguments without recursively expanding definitions.
+Void remains an ordinary type argument. The APIs support interpreter implementation;
+no guest reflection facility is added. Generic construction, native layouts, methods,
+constraints, and variance remain explicitly unsupported. This is the prerequisite
+for general union case definitions and execution, not a claim of complete generics.
+
+Added a generic-pointer signature sample and six tests for named/indexed equivalence,
+Void and nested substitution, recursive reference signatures, arity/context rejection,
+malformed metadata, legacy definitions, substitution errors, and sample execution.
+Updated the roadmap and union proposal to mark this foundation complete.
+
+Validation: all 182 integration tests pass on macOS ARM64; formatting, clippy, and
+diff checks pass. The sample prints Generic signatures passed. Linux and Windows
+execution remain for the existing CI matrix.

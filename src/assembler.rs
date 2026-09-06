@@ -111,7 +111,7 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                 identifier(name)?;
                 def.fields.push(Field {
                     name: name.into(),
-                    ty: parse_type(ty)?,
+                    ty: bind_type_parameters(parse_type(ty)?, &def.generic_parameters),
                 });
                 return Ok(());
             }
@@ -317,10 +317,11 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                     module.entry = rest.into();
                 }
                 ".type" => {
-                    identifier(rest)?;
-                    let ty = Type::from_name(rest);
+                    let (name, generic_parameters) = parse_type_declaration(rest)?;
+                    let ty = Type::from_name(&name);
                     typedef = Some(TypeDef {
-                        name: ty.definition_name().unwrap_or(rest).into(),
+                        name: ty.definition_name().unwrap_or(&name).into(),
+                        generic_parameters,
                         fields: vec![],
                         packing: None,
                         minimum_size: None,
@@ -336,6 +337,11 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                         let def = typedef
                             .as_ref()
                             .ok_or_else(|| Fault::new(".method requires an enclosing .type"))?;
+                        if !def.generic_parameters.is_empty() {
+                            return Err(Fault::new(
+                                "methods on generic definitions are not implemented yet",
+                            ));
+                        }
                         let (kind, signature) =
                             rest.split_once(char::is_whitespace).ok_or_else(|| {
                                 Fault::new("expected .method static/instance Name(...) -> Type")
@@ -459,6 +465,16 @@ pub fn parse_type(text: &str) -> Result<Type, Fault> {
             return Err(Fault::new("type nesting exceeds 32"));
         }
         let text = text.trim();
+        if let Some(index) = text.strip_prefix('!') {
+            // Pointer suffixes are parsed first below; !0* is not a bare index.
+            if !text.ends_with('*') {
+                return Ok(Type::TypeParameter(
+                    index
+                        .parse()
+                        .map_err(|_| Fault::new("expected type parameter index !0"))?,
+                ));
+            }
+        }
         if let Some(element) = text.strip_suffix('*') {
             return Ok(Type::Ptr(Box::new(parse(element, depth + 1)?)));
         }
@@ -495,9 +511,19 @@ pub fn parse_type(text: &str) -> Result<Type, Fault> {
                     Box::new(parse(t, depth + 1)?),
                     Box::new(parse(e, depth + 1)?),
                 )),
-                _ => Err(Fault::new(
-                    "expected Option<T>, Ref<T>, Ptr<T> or Result<T,E>",
-                )),
+                ("Option" | "Ref" | "Ptr" | "Result", _) => {
+                    Err(Fault::new("incorrect built-in generic arity"))
+                }
+                _ => {
+                    identifier(name.trim())?;
+                    Ok(Type::Constructed {
+                        definition: name.trim().into(),
+                        arguments: parts
+                            .iter()
+                            .map(|part| parse(part, depth + 1))
+                            .collect::<Result<_, _>>()?,
+                    })
+                }
             };
         }
         identifier(text)?;
@@ -688,4 +714,58 @@ fn parse_compact_instruction(
         }));
     }
     Ok(None)
+}
+
+fn parse_type_declaration(text: &str) -> Result<(String, Vec<Option<String>>), Fault> {
+    let Some((name, parameters)) = text.split_once('<') else {
+        identifier(text)?;
+        return Ok((text.into(), vec![]));
+    };
+    let name = name.trim();
+    identifier(name)?;
+    let parameters = parameters
+        .strip_suffix('>')
+        .ok_or_else(|| Fault::new("unclosed type parameters"))?;
+    let mut names = vec![];
+    for parameter in parameters.split(',') {
+        if names.len() > u16::MAX as usize {
+            return Err(Fault::new("too many type parameters"));
+        }
+        let parameter = parameter.trim();
+        if parameter == format!("!{}", names.len()) {
+            names.push(None);
+        } else if crate::metadata::valid_slot_name(parameter) {
+            names.push(Some(parameter.into()));
+        } else {
+            return Err(Fault::new("expected type parameter name or its index"));
+        }
+    }
+    Ok((name.into(), names))
+}
+
+fn bind_type_parameters(ty: Type, names: &[Option<String>]) -> Type {
+    match ty {
+        Type::Named(name) => names
+            .iter()
+            .position(|n| n.as_deref() == Some(&name))
+            .map_or(Type::Named(name), |index| Type::TypeParameter(index as u16)),
+        Type::Constructed {
+            definition,
+            arguments,
+        } => Type::Constructed {
+            definition,
+            arguments: arguments
+                .into_iter()
+                .map(|t| bind_type_parameters(t, names))
+                .collect(),
+        },
+        Type::Option(t) => Type::Option(Box::new(bind_type_parameters(*t, names))),
+        Type::Result(t, e) => Type::Result(
+            Box::new(bind_type_parameters(*t, names)),
+            Box::new(bind_type_parameters(*e, names)),
+        ),
+        Type::Ref(t) => Type::Ref(Box::new(bind_type_parameters(*t, names))),
+        Type::Ptr(t) => Type::Ptr(Box::new(bind_type_parameters(*t, names))),
+        other => other,
+    }
 }

@@ -29,7 +29,9 @@ before reflection or broader object-model features. Use union for tagged payload
 cases and reserve enum for integer-backed constants. The proposed representation
 and sequence are in [unions and enums](unions-and-enums.md): minimal generic type
 references/substitution, case definitions and operations, then System library migration.
-This is focused type machinery needed for ordinary library code, not a reflection API.
+The [generic metadata foundation](generic-metadata.md) is implemented. Next comes
+user-defined union case metadata and execution. This is focused type machinery
+needed for ordinary library code, not a reflection API.
 
 ## Later milestones
 

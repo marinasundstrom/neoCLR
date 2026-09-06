@@ -1,8 +1,9 @@
 # Unions, enums, and the next fundamental milestone
 
 Status: proposed direction for the next implementation slices. The interpreter
-still special-cases Option and Result; this document does not claim general generic
-or union definitions are implemented. Reflection is not required for this work.
+still special-cases Option and Result. The [generic metadata foundation](generic-metadata.md)
+is now implemented; general union definitions and generic execution remain pending.
+Reflection is not required for this work.
 
 ## Terminology
 
@@ -87,8 +88,8 @@ marshaling are separate work; the interpreter representation is not a promised A
 
 The unaligned-access slice is complete. Next:
 
-1. Add generic-parameter and constructed-type references with arity validation and
-   substitution for fields. Keep this focused on closed types needed by unions.
+1. Completed: generic-parameter and constructed-type references with arity validation
+   and substitution for fields. Generic execution remains separate.
 2. Add user-defined union case metadata and the three case operations, with tests
    for nested Option/Result, Void payloads, wrong-case access, and value copying.
 3. Define Option and Result in the platform-written System library, then remove

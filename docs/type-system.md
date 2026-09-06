@@ -6,7 +6,7 @@ mechanics remain foundational alongside free functions.
 
 This implementation adds primitive type definitions, declared method ownership,
 static methods, and read-only instance receiver snapshots. Inheritance, interfaces,
-virtual dispatch, mutable/by-reference receivers, general generic definitions,
+virtual dispatch, mutable/by-reference receivers, general generic execution,
 properties, and assembly-qualified identities remain future work.
 
 ## Primitive identity and representation
@@ -123,7 +123,8 @@ and ownership policies.
 
 Native-sized integers use canonical System.IntPtr/System.UIntPtr type identities,
 with nint/nuint aliases. Their arithmetic and native storage are executable; see
-[native integers](native-integers.md). General generic type definitions remain pending.
+[native integers](native-integers.md). Basic generic record definitions, constructed references, and field substitution are
+now available; see [generic metadata](generic-metadata.md). Generic execution remains pending.
 
 Future modeling should place more emphasis on types to express contracts. Ref<T>
 may express reference-counted ownership, while Ptr<T> expresses address access without

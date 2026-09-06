@@ -16,7 +16,6 @@ fn nested_types_and_void_parse() {
         "Option<Void>>",
         "Ref<Option<Void>",
         "",
-        "Array<Int32>",
     ] {
         assert!(parse_type(text).is_err(), "{text}");
     }
