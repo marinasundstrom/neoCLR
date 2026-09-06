@@ -263,3 +263,22 @@ aliases/layout, metadata round-trip, exact 64-bit values, narrow storage boundar
 sign/zero extension, overflow and invalid memory access. Clippy and formatting pass
 on macOS ARM64. The sample prints 255 and -1, checks 64-bit storage, and frees its
 allocations. Cross-platform execution remains covered by the existing CI matrix.
+
+
+## 2026-09-06 — Bitwise, shift, remainder, and negation instructions
+
+Added and/or/xor/not, neg, shl/shr/shr.un, and rem/rem.un across Int32, Int64, and
+native integer stack categories. Shift counts accept Int32 or native integers.
+Signedness remains opcode-controlled, including when the storage signature is unsigned.
+No ownership or allocation behavior changes.
+
+Documented wrapping negation, divisor-zero Faults, and deterministic prototype
+choices at CLI platform-dependent boundaries: masked shift counts and a Fault for
+signed minimum rem -1. These choices are explicit rather than accidental Rust
+semantics. Added a packed-field sample and opcode coverage for all ten instructions.
+
+Validation: all 92 integration tests pass, including six new bit-operation tests
+covering every integer stack category, high bits, negative and oversized counts,
+sign behavior, minimum values, invalid operands, and instruction-located Faults.
+Clippy and formatting pass on macOS ARM64. The bits sample prints 18, -1, 5, -4
+and returns Void. Existing integer, pointer, library, and CLI tests remain passing.

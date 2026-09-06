@@ -366,7 +366,21 @@ fn interpret(module: &Module, limits: Limits) -> Result<Execution, Fault> {
                 Op::Pop => {
                     frame.pop()?;
                 }
-                Op::Add
+                Op::BitNot | Op::Negate => {
+                    let value = frame.pop()?;
+                    frame.stack.push(crate::numeric::unary(op, value)?);
+                }
+                Op::ShiftLeft | Op::ShiftRight | Op::ShiftRightUnsigned => {
+                    let count = frame.pop()?;
+                    let value = frame.pop()?;
+                    frame.stack.push(crate::numeric::shift(op, value, count)?);
+                }
+                Op::BitAnd
+                | Op::BitOr
+                | Op::BitXor
+                | Op::Remainder
+                | Op::RemainderUnsigned
+                | Op::Add
                 | Op::Sub
                 | Op::Mul
                 | Op::AddChecked

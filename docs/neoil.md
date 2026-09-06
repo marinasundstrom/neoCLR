@@ -144,6 +144,11 @@ normalization; other checks use exact type equality. See [integer storage](integ
 | `pop` | `T →` | Discard value |
 | `add`, `sub`, `mul` | `N,N → N` | Wrapping integer arithmetic |
 | `add.ovf`, `sub.ovf`, `mul.ovf` | `N,N → N` | Signed checked integer arithmetic; overflow Fault |
+| `and`, `or`, `xor` | `N,N → N` | Bitwise logic |
+| `not` | `N → N` | Bitwise complement |
+| `neg` | `N → N` | Wrapping two's-complement negation |
+| `shl`, `shr`, `shr.un` | `N,Int32 or Native → N` | Left, arithmetic-right, or logical-right shift; count masked to width |
+| `rem`, `rem.un` | `N,N → N` | Signed/unsigned remainder; zero divisor Faults |
 | `div` | `N,N → N` | Signed quotient truncated toward zero; zero/overflow Fault |
 | `add.ovf.un`, `sub.ovf.un`, `mul.ovf.un` | `N,N → N` | Unsigned checked arithmetic; overflow Fault |
 | `div.un` | `N,N → N` | Unsigned quotient; zero Fault |

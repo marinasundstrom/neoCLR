@@ -244,6 +244,26 @@ pub enum Instruction {
     Dup,
     #[serde(rename = "pop")]
     Pop,
+    #[serde(rename = "and")]
+    BitAnd,
+    #[serde(rename = "or")]
+    BitOr,
+    #[serde(rename = "xor")]
+    BitXor,
+    #[serde(rename = "not")]
+    BitNot,
+    #[serde(rename = "neg")]
+    Negate,
+    #[serde(rename = "shl")]
+    ShiftLeft,
+    #[serde(rename = "shr")]
+    ShiftRight,
+    #[serde(rename = "shr.un")]
+    ShiftRightUnsigned,
+    #[serde(rename = "rem")]
+    Remainder,
+    #[serde(rename = "rem.un")]
+    RemainderUnsigned,
     #[serde(rename = "add")]
     Add,
     #[serde(rename = "sub")]

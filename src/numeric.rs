@@ -11,6 +11,13 @@ pub(crate) fn binary(op: &Op, left: Value, right: Value) -> Result<Value, Fault>
             let result = match op {
                 Op::Less => return Ok(Value::Boolean(left < right)),
                 Op::LessUnsigned => return Ok(Value::Boolean(unsigned_left < unsigned_right)),
+                Op::BitAnd => Some(left & right),
+                Op::BitOr => Some(left | right),
+                Op::BitXor => Some(left ^ right),
+                Op::Remainder => left.checked_rem(right),
+                Op::RemainderUnsigned => unsigned_left
+                    .checked_rem(unsigned_right)
+                    .map(|n| n as $signed),
                 Op::Add => Some(left.wrapping_add(right)),
                 Op::Sub => Some(left.wrapping_sub(right)),
                 Op::Mul => Some(left.wrapping_mul(right)),
@@ -34,7 +41,12 @@ pub(crate) fn binary(op: &Op, left: Value, right: Value) -> Result<Value, Fault>
             };
             result.map(|n| Value::$variant(n as _)).ok_or_else(|| {
                 Fault::new(
-                    if right == 0 && matches!(op, Op::Divide | Op::DivideUnsigned) {
+                    if right == 0
+                        && matches!(
+                            op,
+                            Op::Divide | Op::DivideUnsigned | Op::Remainder | Op::RemainderUnsigned
+                        )
+                    {
                         "division by zero"
                     } else {
                         concat!(stringify!($variant), " overflow")
@@ -121,5 +133,54 @@ pub(crate) fn indirect_type(
         Ok(read_type)
     } else {
         Err(Fault::new("memory pointer type mismatch"))
+    }
+}
+
+pub(crate) fn unary(op: &Op, value: Value) -> Result<Value, Fault> {
+    macro_rules! apply {
+        ($n:expr, $variant:ident) => {
+            Ok(Value::$variant(match op {
+                Op::BitNot => !$n,
+                Op::Negate => $n.wrapping_neg(),
+                _ => return Err(Fault::new("invalid unary integer operation")),
+            }))
+        };
+    }
+    match value {
+        Value::Int32(n) => apply!(n, Int32),
+        Value::Int64(n) => apply!(n, Int64),
+        Value::IntPtr(n) => apply!(n, IntPtr),
+        Value::UIntPtr(n) => apply!(n, UIntPtr),
+        _ => Err(Fault::new("unary operation requires integer")),
+    }
+}
+
+pub(crate) fn shift(op: &Op, value: Value, count: Value) -> Result<Value, Fault> {
+    let count = match count {
+        Value::Int32(n) => n as u32,
+        Value::IntPtr(n) => n as u32,
+        Value::UIntPtr(n) => n as u32,
+        _ => return Err(Fault::new("shift count requires Int32 or native integer")),
+    };
+    macro_rules! apply {
+        ($n:expr, $signed:ty, $unsigned:ty, $variant:ident) => {{
+            let n = $n as $signed;
+            // Explicit prototype rule for CLI-unspecified out-of-range counts.
+            let count = count & (<$signed>::BITS - 1);
+            let bits = match op {
+                Op::ShiftLeft => n.wrapping_shl(count),
+                Op::ShiftRight => n.wrapping_shr(count),
+                Op::ShiftRightUnsigned => ((n as $unsigned) >> count) as $signed,
+                _ => return Err(Fault::new("invalid shift operation")),
+            };
+            Ok(Value::$variant(bits as _))
+        }};
+    }
+    match value {
+        Value::Int32(n) => apply!(n, i32, u32, Int32),
+        Value::Int64(n) => apply!(n, i64, u64, Int64),
+        Value::IntPtr(n) => apply!(n, isize, usize, IntPtr),
+        Value::UIntPtr(n) => apply!(n, isize, usize, UIntPtr),
+        _ => Err(Fault::new("shift requires integer value")),
     }
 }

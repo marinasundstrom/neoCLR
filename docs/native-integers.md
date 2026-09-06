@@ -15,7 +15,8 @@ complete BCL implementation. No new literal instruction is needed for small cons
 
 The existing add/sub/mul instructions wrap at the operand width. Signed checked
 add.ovf/sub.ovf/mul.ovf and unsigned checked .ovf.un variants Fault on overflow.
-Signed div and unsigned div.un Fault on zero; signed minimum divided by -1 also
+Bitwise logic, negation, shifts, and signed/unsigned remainder are also available;
+see [integer operations](integer-types.md). Signed div and unsigned div.un Fault on zero; signed minimum divided by -1 also
 Faults. clt and clt.un compare signed and unsigned interpretations. Signedness comes
 from the opcode even when the signature is UIntPtr. Comparisons produce Boolean.
 

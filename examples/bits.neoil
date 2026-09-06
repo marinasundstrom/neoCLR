@@ -1,0 +1,46 @@
+.module Bits
+.entry Main
+
+.function Main() -> Void
+    .local packed: UInt32
+    ; Pack two bytes, then recover the high byte.
+    ldc.i4 18
+    ldc.i4 8
+    shl
+    ldc.i4 52
+    or
+    stloc packed
+    ldloc packed
+    ldc.i4 8
+    shr.un
+    ldc.i4 255
+    and
+    call System.Console.WriteLine(int32)
+    pop
+
+    ; Flip and clear selected flag bits.
+    ldloc packed
+    ldc.i4 15
+    xor
+    ldc.i4 15
+    not
+    and
+    pop
+
+    ldc.i4 7
+    neg
+    ldc.i4 3
+    rem
+    call System.Console.WriteLine(int32)
+    pop
+    ldc.i4 -1
+    ldc.i4 10
+    rem.un
+    call System.Console.WriteLine(int32)
+    pop
+    ldc.i4 -8
+    ldc.i4 1
+    shr
+    call System.Console.WriteLine(int32)
+    ret
+.end

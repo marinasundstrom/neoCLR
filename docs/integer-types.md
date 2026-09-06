@@ -54,8 +54,7 @@ remain unimplemented.
 Int64 supports the existing wrapping, signed/unsigned checked arithmetic, division,
 and comparison instructions. Arithmetic uses the opcode's signedness, not the storage
 signature. Overflow Faults only for checked arithmetic (and signed division's
-minimum/-1 case); division by zero always Faults. Floating-point arithmetic and
-bitwise/remainder/shift instructions remain follow-ups.
+minimum/-1 case); division by zero always Faults. Floating-point arithmetic and checked conversions remain follow-ups.
 
 Indirect instructions now cover ldind.i1/u1/i2/u2/i4/u4/i8/i and
 stind.i1/i2/i4/i8/i. A typed pointer must name a member of the corresponding storage
@@ -69,3 +68,36 @@ The existing null, alignment, bounds, initialization, and lifetime checks still 
 The [sample](../examples/integers.neoil) demonstrates byte truncation, signed versus
 unsigned reads, exact 64-bit storage, and explicit cleanup. These operations do not
 add reference counting, GC, or automatic resource destruction.
+
+
+## Bitwise operations, shifts, and remainder
+
+and/or/xor operate on two matching integer stack categories. not complements all
+bits, and neg uses wrapping two's-complement negation: negating the signed minimum
+returns the same bit pattern without a Fault. This follows the [CLI neg instruction](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.neg).
+These operations accept Int32, Int64, IntPtr, and UIntPtr. Boolean remains a separate
+prototype category and is not accepted by integer bitwise instructions.
+
+shl shifts in zero bits; shr extends the sign bit; shr.un shifts in zero bits from
+the high end. Opcode signedness controls behavior even for UIntPtr values. The count
+can be Int32 or either native integer representation; it need not have the value's
+width. Int64 counts are not accepted. The result preserves the shifted value's
+category, and shifted-out bits are discarded.
+
+The interpreter explicitly masks counts to five bits for Int32, six for Int64,
+and the corresponding native width for native integers. Thus shifting an Int32 by
+32 acts like shifting by zero, and a count of -1 acts like 31. This is a deterministic
+prototype choice for cases the [CLI shift contract leaves unspecified](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.shl),
+not a claim that CLI requires masking on every platform. Source compilers that need
+a particular portable shift policy should emit it explicitly.
+
+rem computes a remainder with the dividend's sign; rem.un interprets both operands
+as unsigned bit patterns. Zero divisors Fault. The signed minimum rem -1 also Faults
+in this interpreter, consistently across hosts, rather than allowing a host-language
+panic. CLI implementations have historically differed on that boundary; the
+[rem documentation](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.rem)
+permits an overflow failure on Intel platforms. No catchable exceptions are introduced.
+
+The [bits sample](../examples/bits.neoil) packs and extracts fields and exercises
+signed/unsigned remainder and right shifts. Masking, native widths, invalid operand
+types, and exceptional arithmetic boundaries are covered by integration tests.
