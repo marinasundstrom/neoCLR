@@ -376,3 +376,28 @@ zero-length operations, and explicit freeing. The sample prints 42 twice.
 
 Validation: all 122 integration tests pass on macOS ARM64; formatting and clippy
 pass. Linux and Windows execution remain for the existing CI matrix.
+
+## 2026-09-06 — Frame-local byte allocation
+
+Implemented `localloc`: an explicit byte count produces aligned, uninitialized
+Byte* storage owned by the current function invocation. The evaluation stack must
+otherwise be empty. Each frame releases its local buffers on return. Heap and local
+buffers share existing budgets and pointer diagnostics, while `heap.free` rejects
+local buffers even after pointer/address conversion. Escaped tracked pointers become
+stale on return; copied record values remain independent.
+
+The interpreter uses host buffers rather than the host call stack. This implements
+frame lifetime without adding GC, reference counting, implicit type-based ownership,
+or a guest borrow model. Method initialization flags and argument/local addresses
+remain pending. Documented the lifetime and native interop contracts and updated the
+allocation proposals and roadmap.
+
+Added a sample constructing a local Point, passing its pointer to another function,
+and returning a value copy. Eight tests cover metadata roundtrip, initialization,
+manual-free rejection, escaped pointers (including heap-stored aliases), nested frame
+lifetimes, byte-budget reclamation, retained heap storage, limits, stack/count checks,
+zero-size allocations, and primitive alignment.
+
+Validation: all 130 integration tests pass on macOS ARM64; formatting, clippy, and
+diff checks pass. The stack sample prints 42 and leaves no live allocations.
+Linux and Windows execution remain for the existing CI matrix.

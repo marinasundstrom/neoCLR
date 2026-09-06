@@ -1,0 +1,41 @@
+.module StackStorage
+.entry Main
+
+.type Point
+    .field X Int32
+    .field Y Int32
+.end
+
+.function SetX(point: Point*, value: Int32) -> Void
+    ldarg point
+    ldflda 0
+    ldarg value
+    stind.i4
+    ldvoid
+    ret
+.end
+
+.function MakePoint() -> Point
+    .local point: Point*
+    sizeof Point
+    localloc
+    ptr.cast Point
+    stloc point
+    ldloc point
+    initobj Point
+    ldloc point
+    ldc.i4 42
+    call SetX(Point*,Int32)
+    pop
+    ; Return an independent value before this frame's storage is released.
+    ldloc point
+    ldobj Point
+    ret
+.end
+
+.function Main() -> Void
+    call MakePoint()
+    ldfld 0
+    call System.Console::WriteLine(Int32)
+    ret
+.end

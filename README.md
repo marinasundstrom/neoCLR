@@ -27,7 +27,8 @@ Interfaces will use ordinary names without an `I` prefix.
 
 The first native heap/pointer slice is implemented: explicit allocation/free,
 native addresses, pointer casts and byte offsets, indirect access, and sequential
-record layout. Native integers and explicit pointer/address conversions are also
+record layout. `localloc` provides explicit frame-local byte storage, released on
+return. Native integers and explicit pointer/address conversions are also
 available. See [heap and pointers](docs/heap-and-pointers.md).
 Reference counting, GC, and higher-level lifetime management remain deferred.
 Types describe values and behavior; allocation and lifetime are separate choices,
@@ -47,6 +48,7 @@ cargo run -- run examples/types.neoil
 cargo run -- run examples/names.neoil
 cargo run -- run examples/pointers.neoil
 cargo run -- run examples/memory.neoil
+cargo run -- run examples/stack.neoil
 cargo run -- run examples/native-integers.neoil
 cargo run -- run examples/integers.neoil
 cargo run -- run examples/bits.neoil

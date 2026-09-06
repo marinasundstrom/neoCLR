@@ -1,6 +1,6 @@
 # Allocation encoding: proposals and current scope
 
-Current priority: heap allocation and pointer operations. Ownership management,
+Current priority: explicit allocation and pointer operations. Ownership management,
 reference counting, GC, and allocator-policy composition are deferred. The environment
 should be able to choose allocation implementation; an explicit allocator operand at
 every allocation site is not a requirement. The earlier alternatives below remain
@@ -10,13 +10,14 @@ The first implementation now uses `heap.alloc T` (element count to `Ptr<T>`) and
 `heap.free`, with `stobj T` for copying a constructed value into storage. It uses the
 host native allocator; pluggable allocator services remain deferred. See
 [implemented contract](heap-and-pointers.md). The alternatives below are historical
-design options, not additional implemented instructions.
+design options. `localloc` is now implemented as frame-local byte storage; see the
+[frame-local contract](heap-and-pointers.md#frame-local-allocation).
 
 Separate storage allocation, object construction, and ownership policy. None of
 these should be selected by a permanent value/reference bit on the type.
 
-- Stack storage: a core operation such as `localloc`, with defined frame lifetime,
-  size, and alignment semantics.
+- Stack storage: `localloc`, with explicit frame lifetime, byte size, and primitive
+  alignment. The interpreter backs it with host buffers.
 - Heap storage: an explicit allocator call returning an unmanaged pointer (or a
   Result carrying that pointer and a recoverable allocation error). The allocator
   is an implementation/ABI contract, not an ambient managed-object heap.

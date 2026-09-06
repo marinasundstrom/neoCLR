@@ -182,6 +182,7 @@ normalization; other checks use exact type equality. See [integer storage](integ
 | `stfld i` | `Record,T → Record` | Produce updated record value |
 | `sizeof T` | `→ Int32` | Byte size of supported native layout |
 | `alignof T` | `→ Int32` | Native layout alignment |
+| `localloc` | `integer → Ptr<Byte>` | Allocate uninitialized frame-local bytes; stack must otherwise be empty |
 | `heap.alloc T` | `Integer → Ptr<T>` | Allocate uninitialized storage for count elements |
 | `heap.free` | `Ptr<T> → Void` | Free allocation base; null is a no-op |
 | `ptr.null T` | `→ Ptr<T>` | Actual null address |
@@ -295,3 +296,5 @@ backend can map parameter names to parameter metadata and local names to appropr
 local/debug metadata without putting names into instruction operands.
 
 See [memory operations](heap-and-pointers.md#copying-and-initializing-memory) for block counts, alignment, pointer tracking, and zero-length behavior.
+
+See [frame-local allocation](heap-and-pointers.md#frame-local-allocation) for `localloc` lifetime, alignment, and limits.

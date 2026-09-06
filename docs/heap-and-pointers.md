@@ -91,7 +91,7 @@ access must fit within the allocation, including for zero-sized values.
 
 ## Checked interpreter scope
 
-This implementation supports access to allocations created by its own `heap.alloc`.
+This implementation supports access to allocations created by its own `heap.alloc` or `localloc`.
 It checks null, live allocation identity, address consistency, alignment, bounds,
 initialization, and load/store types. Invalid operations terminate with a Fault and
 instruction location. Pointer offsets are restricted to the allocation through its
@@ -111,7 +111,7 @@ at the address, if any. An address may therefore identify reused storage; no his
 lifetime is inferred from integer bits. See [native integers](native-integers.md).
 
 Defaults allow 16 MiB of live payload and 4096 allocation identities per execution.
-Free returns payload budget, but identities include freed allocations. The byte
+Free and frame return restore payload budget, but identities include freed allocations. The byte
 limit excludes side tables, initialization maps, padding for zero-sized physical
 allocations, and other host overhead; it is not a total memory quota or sandbox.
 Layout expansion also has depth/complexity limits. Resource failures are currently
@@ -119,7 +119,7 @@ Faults; a recoverable allocation API can expose Result later.
 
 ## Remaining capabilities
 
-Direct guest access to externally supplied memory, stack allocation/address-taking,
+Direct guest access to externally supplied memory, argument/local address-taking,
 block operations, unaligned access, explicit layout/packing, and foreign ownership
 contracts remain unimplemented. The current native pointer subset is groundwork
 for those capabilities, not a claim of .NET binary or unsafe-code compatibility.
@@ -181,3 +181,43 @@ are interpreter checks, not reference counting or garbage collection.
 
 Run `cargo run -- run examples/memory.neoil` for typed initialization, independent
 record copying, byte filling/copying, and explicit freeing; it prints 42 twice.
+
+
+## Frame-local allocation
+
+`localloc` consumes a byte count and produces `Byte*`. The evaluation stack must
+contain only the count when it executes. Nonnegative Int32/IntPtr and UIntPtr counts
+are accepted, matching the prototype's block-operation count convention. Use
+`sizeof T`, `localloc`, and `ptr.cast T` to obtain storage for a native-layout value.
+The address is aligned for all currently supported primitive layouts, including
+Double, Int64, and native pointers. Zero bytes still produces a distinct tracked,
+non-null allocation with no accessible payload.
+
+The storage starts uninitialized. Use `initobj`, `initblk`, or explicit stores before
+reading it. There is no method-level `localsinit` flag yet. Each allocation belongs
+to the current function invocation and lasts until that invocation returns, including
+allocations inside loops. Returning releases all its local buffers before resuming
+the caller. Terminal Faults drop the entire execution and its buffers. `heap.free`
+rejects frame-local storage, including through casts or address conversions.
+
+Pointers can be passed to callees and copied into records or other storage. Such
+copies do not extend lifetime. After the allocating frame returns, tracked accesses
+through escaped pointers Fault; returning a record copied with `ldobj` instead
+preserves its independent value (but any pointer fields keep their original lifetime).
+Native code may use a local pointer during a synchronous call, under the existing
+P/Invoke safety contract, but must not retain it past the owning frame's lifetime.
+This is an explicit frame-lifetime instruction, not inferred ownership or GC.
+
+The interpreter uses aligned host buffers for these local pools, not the host
+machine's call stack. Their guest lifetime is tied to a neoCLR frame. Both local
+and heap buffers share `pointer_bytes` and `pointer_allocations` limits. Frame return
+restores the live byte budget; allocation identities are never recycled, so repeated
+calls can still reach the per-execution identity limit. `Execution.memory` statistics
+include both storage kinds while live; completed entry-frame local storage is gone.
+
+The instruction follows CLR's local-pool lifetime and primitive alignment contract;
+see [Microsoft's localloc reference](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.localloc).
+The prototype adds tracked pointer diagnostics and explicit uninitialized-read Faults.
+It does not yet implement `ldloca`, `ldarga`, a byref type, or method initialization flags.
+Run `cargo run -- run examples/stack.neoil` for local record storage passed to a callee
+and returned by value; it prints 42 and leaves no live allocations.

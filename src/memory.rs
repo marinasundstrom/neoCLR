@@ -168,6 +168,7 @@ impl Drop for NativeBytes {
 
 #[derive(Debug)]
 struct Allocation {
+    frame_owned: bool,
     bytes: NativeBytes,
     initialized: Vec<bool>,
     // Stored pointer provenance is diagnostics only; the bytes contain real addresses.
@@ -223,6 +224,7 @@ impl PointerHeap {
         let address = bytes.address();
         let id = self.allocations.len();
         self.allocations.push(Some(Allocation {
+            frame_owned: false,
             bytes,
             initialized,
             pointers: Default::default(),
@@ -234,6 +236,33 @@ impl PointerHeap {
             offset: 0,
             target: ty,
         })
+    }
+
+    pub(crate) fn allocate_local(
+        &mut self,
+        size: usize,
+        byte_limit: usize,
+        allocation_limit: usize,
+    ) -> Result<Pointer, Fault> {
+        // Local pools are frame-owned host buffers in the interpreter. Their
+        // alignment supports every currently implemented native primitive.
+        let layout = Layout {
+            size: 1,
+            alignment: std::mem::align_of::<u64>()
+                .max(std::mem::align_of::<f64>())
+                .max(std::mem::align_of::<usize>()),
+            fields: vec![],
+        };
+        let pointer = self.allocate(Type::Byte, &layout, size, byte_limit, allocation_limit)?;
+        self.allocations[pointer.allocation.unwrap()]
+            .as_mut()
+            .unwrap()
+            .frame_owned = true;
+        Ok(pointer)
+    }
+
+    pub(crate) fn release_local(&mut self, pointer: &Pointer) -> Result<(), Fault> {
+        self.release(pointer, true)
     }
 
     /// Integer conversions have address semantics: recover only a current live
@@ -344,6 +373,10 @@ impl PointerHeap {
     }
 
     pub(crate) fn free(&mut self, pointer: &Pointer) -> Result<(), Fault> {
+        self.release(pointer, false)
+    }
+
+    fn release(&mut self, pointer: &Pointer, frame_owned: bool) -> Result<(), Fault> {
         if pointer.address == 0 {
             return Ok(());
         }
@@ -358,6 +391,9 @@ impl PointerHeap {
             .get_mut(id)
             .ok_or_else(|| Fault::new("invalid allocation identity"))?;
         let allocation = slot.as_ref().ok_or_else(|| Fault::new("double free"))?;
+        if allocation.frame_owned != frame_owned {
+            return Err(Fault::new("heap.free cannot release frame-owned storage"));
+        }
         if pointer.address != allocation.bytes.address() {
             return Err(Fault::new("free requires allocation base address"));
         }

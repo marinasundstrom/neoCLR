@@ -408,6 +408,8 @@ pub enum Instruction {
     AlignOf(Type),
     #[serde(rename = "heap.alloc")]
     Allocate(Type),
+    #[serde(rename = "localloc")]
+    AllocateLocal,
     #[serde(rename = "heap.free")]
     Free,
     #[serde(rename = "ptr.null")]

@@ -253,6 +253,7 @@ struct Frame {
     args: Vec<Value>,
     locals: Vec<Option<Value>>,
     stack: Vec<Value>,
+    allocations: Vec<crate::memory::Pointer>,
 }
 
 impl Frame {
@@ -263,6 +264,7 @@ impl Frame {
             args,
             locals: vec![None; module.functions[function].locals.len()],
             stack: vec![],
+            allocations: vec![],
         }
     }
     fn pop(&mut self) -> Result<Value, Fault> {
@@ -544,6 +546,9 @@ fn interpret(
                     if !frame.stack.is_empty() {
                         return Err(Fault::new("ret requires exactly one value"));
                     }
+                    for pointer in &frame.allocations {
+                        memory.release_local(pointer)?;
+                    }
                     frames.pop();
                     if let Some(caller) = frames.last_mut() {
                         caller.stack.push(value.on_stack());
@@ -600,6 +605,27 @@ fn interpret(
                         i32::try_from(value)
                             .map_err(|_| Fault::new("layout exceeds Int32 range"))?,
                     ));
+                }
+                Op::AllocateLocal => {
+                    let size = match frame.pop()? {
+                        Value::Int32(n) => usize::try_from(n).ok(),
+                        Value::IntPtr(n) => usize::try_from(n).ok(),
+                        Value::UIntPtr(n) => Some(n),
+                        _ => return Err(Fault::new("localloc size requires integer")),
+                    }
+                    .ok_or_else(|| Fault::new("negative localloc size"))?;
+                    if !frame.stack.is_empty() {
+                        return Err(Fault::new(
+                            "localloc requires only its size on the evaluation stack",
+                        ));
+                    }
+                    let pointer = memory.allocate_local(
+                        size,
+                        limits.pointer_bytes,
+                        limits.pointer_allocations,
+                    )?;
+                    frame.allocations.push(pointer.clone());
+                    frame.stack.push(Value::Pointer(pointer));
                 }
                 Op::Allocate(ty) => {
                     let count = match frame.pop()? {

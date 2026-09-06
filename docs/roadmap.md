@@ -10,7 +10,8 @@ The initial subset implements native allocation/free, layout, casts, byte offset
 field addresses, and indirect loads/stores. Construction remains separate from
 storage. See [heap and pointers](heap-and-pointers.md) for current checks and limits.
 Native integers/address conversions are also implemented. Next pointer capabilities
-include direct foreign memory access, broader P/Invoke marshalling, stack addresses/allocation, explicit layout/ABI controls. Checked numeric conversions are now implemented. Integer and floating-point
+include direct foreign memory access, broader P/Invoke marshalling, argument/local addresses and explicit layout/ABI controls. Frame-local byte allocation
+(`localloc`) and typed/block memory initialization and copying are implemented. Checked numeric conversions are now implemented. Integer and floating-point
 layouts, arithmetic, and indirect access are now available, along with a first
 [native interop subset](native-interop.md). Diagnostic side tracking must not
 become a compulsory ownership policy for the platform.

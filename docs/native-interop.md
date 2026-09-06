@@ -48,6 +48,8 @@ matches. Other addresses stay untracked and can be passed to later native calls,
 but guest ldobj/ldind and heap.free still reject untracked non-null pointers. Foreign
 allocation and deallocation must remain with the matching foreign API. Native code
 must not free guest allocations or retain their pointers beyond the agreed lifetime.
+This includes `localloc` buffers: their addresses expire when the owning guest frame
+returns, even if native code or another guest value retains a copy.
 Pointer-field writes do not have full provenance/initialization integration yet;
 this slice demonstrates scalar memory mutation, not a complete foreign heap model.
 
