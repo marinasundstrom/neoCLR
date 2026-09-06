@@ -46,7 +46,7 @@ fn aggregate_reads_require_fields_but_not_padding_to_be_initialized() {
     assert_eq!(
         run(&module, Limits::default()).unwrap().value,
         Value::Object {
-            name: "Mixed".into(),
+            ty: Type::Named("Mixed".into()),
             fields: vec![Value::Boolean(true), Value::Int32(42)]
         }
     );

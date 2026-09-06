@@ -653,3 +653,28 @@ The next implementation slice is closed generic record construction and field ac
 Validation: all 182 integration tests pass on macOS ARM64 after removing the
 experiment. Formatting, clippy, and diff checks pass. Linux and Windows execution
 remain for CI. No published module format or committed runtime behavior changed.
+
+## 2026-09-06 — Closed generic record values
+
+Implemented newobj with a closed type reference and substituted field signatures.
+Record values retain their complete Type identity, including generic arguments;
+locals, arguments, returns, copies, and field updates preserve that identity.
+Nested records, empty generic records, Void fields, and ordinary storage/stack
+conversions work without adding a union category or memory-management policy.
+Qualified field aliases accept closed generic owners and normalize to indices.
+
+Preserved the legacy serialized name operand for non-generic newobj; constructed
+operands use structured type signatures. Invalid/open operands are rejected by the
+loader. The Rust embedding API now uses Instruction::New(Type) and Object { ty,
+fields } rather than name-only construction/values. Native generic layouts and
+methods on generic definitions remain pending. The next type-system slice is
+members on generic types, with substitution of their signatures and execution.
+
+Added examples/generic-values.neoil and six integration tests covering roundtrip,
+field alias normalization, independent copies, nested identity, storage conversions,
+Void/empty values, recursive pointer signatures, and malformed operands/access.
+Updated README, type documentation, assembler reference, union sequence, and roadmap.
+
+Validation: all 188 integration tests pass on macOS ARM64; formatting, clippy, and
+diff checks pass. The new sample prints Generic values passed. Linux and Windows
+execution remain for CI.

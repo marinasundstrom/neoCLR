@@ -1,8 +1,9 @@
 # Generic metadata foundation
 
 This slice implements type parameter references, constructed type references, generic
-record field signatures, validation, and substitution. It is preparation for general
-union values and library-defined Option/Result, not generic execution or reflection.
+record field signatures, validation, substitution, and closed generic record values.
+Generic members and library-defined Option/Result remain pending; no reflection
+facility is introduced.
 
 ```text
 .type Pair<Left, !1>
@@ -43,17 +44,41 @@ level `Type::substitute_type_parameters` helper substitutes a supplied argument 
 and rejects missing parameter indices. These are implementation APIs, not guest
 reflection facilities.
 
-Constructed pointer signatures and overload resolution can already be exercised
-without allocating generic records. `examples/generic-metadata.neoil` passes and tests
-a null `Envelope<Int32>*`. General generic record construction, native layouts, field
-alias resolution on constructed owners, and generic methods are not implemented;
-`newobj` still requires a non-generic record definition. Layout controls on a generic
-definition are recorded and checked structurally; concrete layout is deferred.
+## Closed generic record values
+
+`newobj Pair<Int32, String>` consumes the substituted field types in declaration
+order and produces one value with the complete closed type identity. The same rules
+apply to non-generic records. Small integer and floating-point fields use the normal
+storage conversions; `ldfld` restores their evaluation-stack representation.
+`stfld` returns an updated copy and checks the substituted field's storage type.
+Nested generic records, zero-field generic records, and Void fields are supported.
+No native allocation or ownership operation is implied by construction.
+
+Field aliases such as `Pair<Int32, String>::First` resolve to indices, just as for
+non-generic owners. The owner must be a valid closed record type, but is only an
+assembly mapping: no owner assertion is retained in the normalized instruction.
+Numeric field operations act on the actual record value. Closed generic values can
+be used in locals, parameters, return values, and free-function overload signatures;
+`Pair<Int32, String>` and `Pair<String, Int32>` remain distinct types.
+
+The interpreter's Object value now stores a Type rather than a definition-name
+string. This is a Rust embedding API change. The serialized `newobj` operand retains
+the legacy name string for non-generic records; constructed operands use structural
+Constructed signatures, including indexed argument order. Legacy modules still load.
+Older readers reject the new structured operands rather than erasing type arguments.
+
+`examples/generic-values.neoil` demonstrates construction, field aliases, independent
+copies, and a function accepting a closed generic value. The earlier
+`examples/generic-metadata.neoil` demonstrates closed generic pointer signatures.
+Native generic layouts/allocation, methods on generic definitions, and generic
+methods remain unsupported. Layout controls on generic definitions are recorded
+and checked structurally; concrete layout is deferred. A recursive pointer signature
+does not expand its pointee or acquire a lifetime/ownership policy.
 
 Option, Result, Ref, and Ptr retain their bootstrap signature encodings for now.
 They cannot be redeclared as generic definitions under those reserved short names.
-The next slice will use these references/substitution for ordinary generic record
-construction. Generic members, custom attributes, and typed access/storage support
+Ordinary generic record construction is implemented. Generic members, custom
+attributes, and typed access/storage support
 will then enable the [union convention](unions-and-enums.md), before migrating
 Option and Result into the System library. No union-specific type category or
 instructions are planned.

@@ -55,6 +55,7 @@ cargo run -- run examples/comparison-branches.neoil
 cargo run -- run examples/compact.neoil
 cargo run -- run examples/layout.neoil
 cargo run -- run examples/generic-metadata.neoil
+cargo run -- run examples/generic-values.neoil
 cargo run -- run examples/native-integers.neoil
 cargo run -- run examples/integers.neoil
 cargo run -- run examples/bits.neoil
@@ -209,7 +210,7 @@ generic support and a convention for ordinary carrier types, inspired by .NET 11
 See the [union convention](docs/unions-and-enums.md);
 reflection remains outside that milestone.
 
-Indexed generic parameters, constructed references, and field substitution are now
-implemented as the [generic metadata foundation](docs/generic-metadata.md). Generic
-value construction is the next step, followed by generic members and the metadata
-needed for the library convention. Dedicated union opcodes are not planned.
+Indexed generic parameters, constructed references, field substitution, and closed
+generic record values are implemented; see [generic types](docs/generic-metadata.md).
+Members on generic types are next, followed by the metadata and storage needed for
+the library convention. Dedicated union opcodes are not planned.

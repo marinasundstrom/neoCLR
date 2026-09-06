@@ -183,7 +183,7 @@ normalization; other checks use exact type equality. See [integer storage](integ
 | `switch (Label, ...)` | `Int32 →` | Branch by zero-based index; otherwise fall through |
 | `call Name(T0, …, Tn)` | `P0,…,Pn → R` | Call declared IL or InternalCall function |
 | `ret` | `R → caller` | Return exactly one value; no extra stack items |
-| `newobj Name` | `F0,…,Fn → Name` | Construct frame-owned record in field declaration order |
+| `newobj Type` | `F0,…,Fn → Type` | Construct a closed record value in substituted field declaration order |
 | `ldfld i` | `Record → T` | Copy field |
 | `stfld i` | `Record,T → Record` | Produce updated record value |
 | `sizeof T` | `→ Int32` | Byte size of supported native layout |

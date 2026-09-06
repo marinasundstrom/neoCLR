@@ -21,7 +21,7 @@ pub enum Value {
     String(String),
     Error(String),
     Object {
-        name: String,
+        ty: Type,
         fields: Vec<Value>,
     },
     Union {
@@ -56,7 +56,7 @@ impl Value {
             Self::Boolean(_) => Type::Boolean,
             Self::String(_) => Type::String,
             Self::Error(_) => Type::Error,
-            Self::Object { name, .. } => Type::Named(name.clone()),
+            Self::Object { ty, .. } => ty.clone(),
             Self::Union { ty, .. } => ty.clone(),
             Self::Pointer(pointer) => Type::Ptr(Box::new(pointer.target.clone())),
             Self::Reference { target, .. } => Type::Ref(Box::new(target.clone())),

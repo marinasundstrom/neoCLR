@@ -273,7 +273,11 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                             serde_json::to_value(parse_function_ref(rest)?)
                                 .map_err(|e| Fault::new(e.to_string()))?,
                         ),
-                        "newobj" | "is.case" | "ldcase" => {
+                        "newobj" => Some(
+                            serde_json::to_value(parse_type(rest)?)
+                                .map_err(|e| Fault::new(e.to_string()))?,
+                        ),
+                        "is.case" | "ldcase" => {
                             identifier(rest)?;
                             Some(serde_json::json!(rest))
                         }
@@ -427,11 +431,13 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
     }
     // Resolve after all declarations so field aliases can name later types.
     for (function, pc, owner, name, line) in field_fixups {
-        let definition = module
-            .type_definition(&owner)
-            .ok_or_else(|| Fault::new(format!("line {line}: unknown field owner {owner:?}")))?;
-        let index = definition
-            .fields
+        let fields = module.instantiated_fields(&owner).map_err(|e| {
+            Fault::new(format!(
+                "line {line}: invalid field owner {owner:?}: {}",
+                e.message
+            ))
+        })?;
+        let index = fields
             .iter()
             .position(|field| field.name == name)
             .ok_or_else(|| {

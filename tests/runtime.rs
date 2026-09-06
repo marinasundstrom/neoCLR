@@ -47,7 +47,7 @@ fn feature_tour() {
     assert_eq!(
         execution.heap[0],
         Value::Object {
-            name: "Point".into(),
+            ty: Type::Named("Point".into()),
             fields: vec![Value::Int32(42), Value::Int32(20)]
         }
     );

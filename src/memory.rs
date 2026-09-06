@@ -534,7 +534,7 @@ fn decode(
                 .map(|f| decode(&f.ty, &f.layout, offset + f.offset, allocation))
                 .collect::<Result<_, _>>()?;
             Ok(Value::Object {
-                name: name.clone(),
+                ty: Type::Named(name.clone()),
                 fields,
             })
         }

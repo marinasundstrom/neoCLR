@@ -30,9 +30,10 @@ of one of a fixed set of variant types; reserve enum for integer-backed constant
 Follow a .NET 11-inspired attribute/member convention instead of introducing a
 union type category or dedicated instructions. See [the convention](unions-and-enums.md).
 
-The [generic metadata foundation](generic-metadata.md) is implemented. Next comes
-generic record construction and field access, followed by generic members, custom
-attributes, and the typed access/storage needed for ordinary library carriers.
+The [generic metadata foundation and closed record values](generic-metadata.md)
+are implemented, including field access and value copying. Next come members on
+generic types, custom attributes, and the typed access/storage needed for ordinary
+library carriers.
 Then migrate System Option/Result from their bootstrap implementation. This work
 must preserve explicit allocation and avoid requiring null or boxing for absence.
 

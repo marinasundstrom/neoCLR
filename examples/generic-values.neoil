@@ -1,0 +1,40 @@
+.module GenericValues
+.entry Main
+
+.type Pair<T, U>
+    .field First T
+    .field Second U
+.end
+
+.function Describe(Pair<Int32, String> value) -> String
+    ldarg value
+    ldfld Pair<Int32, String>::Second
+    ret
+.end
+
+.function Main() -> Void
+    .local Pair<Int32, String> original
+    .local Pair<Int32, String> updated
+    ldc.i4 42
+    ldstr "Generic values passed"
+    newobj Pair<Int32, String>
+    stloc original
+    ldloc original
+    ldc.i4 99
+    stfld Pair<Int32, String>::First
+    stloc updated
+    ldloc original
+    ldfld Pair<Int32, String>::First
+    ldc.i4 42
+    bne.un Failed
+    ldloc updated
+    ldfld 0
+    ldc.i4 99
+    bne.un Failed
+    ldloc original
+    call Describe(Pair<Int32, String>)
+    call System.Console::WriteLine(String)
+    ret
+Failed:
+    fault "generic record copy failed"
+.end

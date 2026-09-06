@@ -437,7 +437,7 @@ pub enum Instruction {
     #[serde(rename = "ret")]
     Return,
     #[serde(rename = "newobj")]
-    New(String),
+    New(#[serde(with = "construction_type")] Type),
     #[serde(rename = "ldfld")]
     Field(usize),
     #[serde(rename = "stfld")]
@@ -620,6 +620,9 @@ impl Module {
             .iter()
             .find(|def| def.name == name)
             .ok_or_else(|| crate::Fault::new("unknown record definition"))?;
+        if def.representation != Representation::Record {
+            return Err(crate::Fault::new("expected record definition"));
+        }
         def.fields
             .iter()
             .map(|field| {
@@ -629,5 +632,32 @@ impl Module {
                 })
             })
             .collect()
+    }
+}
+
+// Preserve the prototype's non-generic newobj string operand on disk, while
+// constructed operands use the same structural signatures as other instructions.
+mod construction_type {
+    use super::Type;
+    use serde::{Deserialize, Deserializer, Serialize, Serializer};
+
+    pub fn serialize<S: Serializer>(ty: &Type, serializer: S) -> Result<S::Ok, S::Error> {
+        match ty {
+            Type::Named(name) => name.serialize(serializer),
+            _ => ty.serialize(serializer),
+        }
+    }
+
+    pub fn deserialize<'de, D: Deserializer<'de>>(deserializer: D) -> Result<Type, D::Error> {
+        #[derive(Deserialize)]
+        #[serde(untagged)]
+        enum Operand {
+            Signature(Type),
+            LegacyName(String),
+        }
+        Ok(match Operand::deserialize(deserializer)? {
+            Operand::Signature(ty) => ty,
+            Operand::LegacyName(name) => Type::from_name(&name),
+        })
     }
 }

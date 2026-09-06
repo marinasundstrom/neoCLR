@@ -253,19 +253,8 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                         )));
                     }
                 }
-                Op::New(name) => {
-                    let def = module
-                        .types
-                        .iter()
-                        .find(|t| &t.name == name)
-                        .ok_or_else(|| Fault::new(format!("unknown type {name}")))?;
-                    if def.representation != Representation::Record
-                        || !def.generic_parameters.is_empty()
-                    {
-                        return Err(Fault::new(
-                            "newobj requires a non-generic record definition",
-                        ));
-                    }
+                Op::New(ty) => {
+                    module.instantiated_fields(ty)?;
                 }
                 Op::SizeOf(ty)
                 | Op::AlignOf(ty)
@@ -715,16 +704,12 @@ fn interpret(
                         return Ok(Some(value));
                     }
                 }
-                Op::New(name) => {
-                    let def = module
-                        .types
-                        .iter()
-                        .find(|t| &t.name == name)
-                        .ok_or_else(|| Fault::new("unknown type"))?;
-                    let types: Vec<_> = def.fields.iter().map(|f| f.ty.clone()).collect();
+                Op::New(ty) => {
+                    let definitions = module.instantiated_fields(ty)?;
+                    let types: Vec<_> = definitions.iter().map(|f| f.ty.clone()).collect();
                     let fields = frame.args(&types)?;
                     frame.stack.push(Value::Object {
-                        name: name.clone(),
+                        ty: ty.clone(),
                         fields,
                     });
                 }
@@ -744,14 +729,14 @@ fn interpret(
                 }
                 Op::SetField(i) => {
                     let value = frame.pop()?;
-                    let Value::Object { name, mut fields } = frame.pop()? else {
+                    let Value::Object { ty, mut fields } = frame.pop()? else {
                         return Err(Fault::new("stfld requires object value"));
                     };
                     let field = fields
                         .get_mut(*i)
                         .ok_or_else(|| Fault::new("field index out of range"))?;
                     *field = value.for_storage(&field.ty())?;
-                    frame.stack.push(Value::Object { name, fields });
+                    frame.stack.push(Value::Object { ty, fields });
                 }
                 Op::SizeOf(ty) | Op::AlignOf(ty) => {
                     let layout = crate::memory::layout(module, ty)?;

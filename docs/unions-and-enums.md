@@ -89,7 +89,7 @@ Fault remains for violated execution contracts.
 ## Implementation sequence
 
 1. Completed: indexed generic references, arity checks, and field substitution.
-2. Support ordinary closed generic record construction and field operations,
+2. Completed: ordinary closed generic record construction and field operations,
    preserving value copies, storage conversions, and exact closed type identity.
 3. Support members on generic definitions and substitute their signatures/bodies
    for closed owners. Keep unrelated generic method features separate.
