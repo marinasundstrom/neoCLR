@@ -632,3 +632,24 @@ Updated the roadmap and union proposal to mark this foundation complete.
 Validation: all 182 integration tests pass on macOS ARM64; formatting, clippy, and
 diff checks pass. The sample prints Generic signatures passed. Linux and Windows
 execution remain for the existing CI matrix.
+
+## 2026-09-06 — Ordinary type convention for unions
+
+Adopted a .NET 11-inspired attribute/member convention for ordinary carrier types.
+Replaced the earlier case-table/opcode proposal and removed the uncommitted general
+union experiment, including its dedicated type/value category, assembler directives,
+opcodes, and experiment-only sample/tests. The committed generic metadata foundation
+and existing bootstrap Option/Result behavior are preserved.
+
+Documented ordinary variant and optional synthesized case types, typed access,
+explicit None, Void payloads, and distinct Ok/Err wrappers for Result<T,T>. Recorded
+that generic records alone do not solve inactive payload storage. The exact custom
+attribute/member contract, generic members, addressable output initialization, and
+storage remain pending; the convention is not claimed as executable support.
+
+Updated README, assembler documentation, generic metadata notes, and roadmap.
+The next implementation slice is closed generic record construction and field access.
+
+Validation: all 182 integration tests pass on macOS ARM64 after removing the
+experiment. Formatting, clippy, and diff checks pass. Linux and Windows execution
+remain for CI. No published module format or committed runtime behavior changed.

@@ -205,9 +205,11 @@ Parameter, local, and qualified field names are assembly conveniences mapped to
 canonical indices. See [identifier mappings](docs/neoil.md#identifier-mappings-and-field-aliases).
 
 The next fundamental milestone is library-defined Option and Result through minimal
-generic metadata and tagged unions. See the [union/enum proposal](docs/unions-and-enums.md);
+generic support and a convention for ordinary carrier types, inspired by .NET 11.
+See the [union convention](docs/unions-and-enums.md);
 reflection remains outside that milestone.
 
 Indexed generic parameters, constructed references, and field substitution are now
 implemented as the [generic metadata foundation](docs/generic-metadata.md). Generic
-value construction and union definitions are the next steps.
+value construction is the next step, followed by generic members and the metadata
+needed for the library convention. Dedicated union opcodes are not planned.

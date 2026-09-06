@@ -1,104 +1,106 @@
-# Unions, enums, and the next fundamental milestone
+# Union convention and library fundamentals
 
-Status: proposed direction for the next implementation slices. The interpreter
-still special-cases Option and Result. The [generic metadata foundation](generic-metadata.md)
-is now implemented; general union definitions and generic execution remain pending.
-Reflection is not required for this work.
+Status: design direction, not an implemented custom-union facility. Indexed generic
+references and field substitution are implemented. Option and Result still use
+bootstrap runtime encodings and instructions. This proposal supersedes the earlier
+union case-table and dedicated-opcode design.
 
-## Terminology
+## Ordinary carrier and variant types
 
-Use **union** for a tagged choice whose cases may carry typed payloads. Option and
-Result are unions. Use **enum** for named constants with an integer underlying type,
-including flag sets. Keeping these terms separate avoids implying that Result's
-error payload is merely an integer. An untagged overlapping native layout is a
-separate explicit-layout capability, not what union means here.
+A **union** is a carrier that holds one value of one of its permitted variant types.
+The carrier and its variants are ordinary types with value semantics. Allocation
+and ownership remain separate choices. Use **enum** for named integer constants,
+including flags; native overlapping storage is a separate layout capability.
 
-## Minimum metadata model
+Follow the attribute/member approach described in the
+[.NET 11-era C# union documentation](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/union)
+(reviewed 2026-09-06; preview contracts may change). Its custom union pattern marks
+an ordinary type with UnionAttribute, derives alternatives from single-parameter
+public constructors, and requires an object/object? Value getter. Optional typed
+TryGetValue access avoids boxing when matching. A nested member-provider interface
+can instead expose the construction and access members, including Create factories.
+The generated C# form uses an object? backing value; adopting the convention does
+not require adopting that generated representation.
 
-A union definition needs a type identity, an ordered generic parameter table, and
-a case table. Each case has a unique numeric tag, an optional tooling name, and an
-ordered list of typed payload fields. Payload fields have indices and optional names.
-Generic parameter references use indices into their declaring definition. A closed
-type reference consists of the definition identity and its ordered type arguments.
-Names are mappings for authoring/tooling and need not match higher-level source
-identifiers; execution resolves identities, indices, and tags.
+For neoCLR, use ordinary custom-attribute metadata to identify a carrier and ordinary
+member signatures to describe its alternatives. Construction, testing, and extraction
+execute through calls, fields, and branches. The VM needs no union-specific type
+category, global tag table, or wrap/test/extract opcodes. Compilers and tools can
+recognize the convention without guest reflection or runtime discovery.
 
-Case tags should be explicit stable unsigned 32-bit values. Source order must not
-silently change their meaning. A compiler may assign tags, but the resulting metadata
-must record them. Names and tags are unique within a union; tags need not be dense.
-Generic arity, parameter indices, payload types, and duplicate tags are validated
-before execution. Open types cannot be instantiated as runtime values.
+The exact attribute/member contract and assembler spelling remain to be implemented.
+UnionAttribute in System.Runtime.CompilerServices is the intended familiar marker;
+its presence alone will not grant a type special execution semantics. Constructor
+and factory recognition must be specified explicitly rather than treating every
+one-parameter method as a variant constructor. Metadata indices/tokens identify
+members; source names remain authoring mappings.
 
-Proposed library definitions, shown as a schema rather than new assembler syntax:
+## Intended library shapes
 
-| Definition | Type parameters | Tag | Case | Payload fields |
-| --- | --- | --- | --- | --- |
-| System.Option | 0: T | 0 | None | none |
-| System.Option | 0: T | 1 | Some | 0: value of T |
-| System.Result | 0: T, 1: TError | 0 | Ok | 0: value of T |
-| System.Result | 0: T, 1: TError | 1 | Err | 0: error of TError |
+| Carrier | Permitted variant types |
+| --- | --- |
+| System.Option<T> | None, Some<T> |
+| System.Result<T, TError> | Ok<T>, Err<TError> |
 
-Retain the current Ok/Err vocabulary initially. TError is an ordinary type parameter;
-it need not inherit from a universal Error class. System.Error can remain the basic
-library error representation while structured library error types become possible.
-None carries no payload. Some<Void> and Ok<Void> each carry one actual Void value:
-zero-sized storage does not erase the distinction between a case with a Void field
-and a case with no fields.
+These are conceptual signatures, not new assembler declarations. Some<T>, Ok<T>,
+and Err<TError> own their payload fields as ordinary generic records. None is an
+ordinary zero-field type. Distinct wrappers preserve success/error identity even
+for Result<T,T>. TError need not inherit from a universal Error type. Some<Void>
+and Ok<Void> contain a real Void value; they remain distinct from None.
 
-## Interpreter values and instructions
+Case declaration syntax may later synthesize ordinary variant types and carrier
+members. It adds no new runtime kind. This preserves the carrier/variant distinction
+in the user's [Raven reference](https://marinasundstrom.github.io/raven/lang/spec/unions.html?q=union).
+Implicit conversions, wrapping inference, and exhaustiveness checking belong to
+compilers above the IL convention.
 
-Start with a union value containing its closed type identity, its active case tag,
-and the active case's typed payload values. This has value-copy semantics, like a
-record. Pointer fields copy addresses and lifetime information; copying a union does
-not allocate pointees, acquire ownership, or choose a memory-management policy.
+## neoCLR access and storage requirements
 
-Provide three fundamental operations: construct a selected case from its payload
-fields; test whether a value has a selected case; extract a selected payload field
-from a matching case. Case operands identify the closed union type and numeric tag;
-payload operands additionally use a field index. Assembly names may resolve to these
-operands. No runtime string lookup or reflective API is needed.
+Typed access should be the primary path. Requiring the .NET pattern's object? Value
+fallback would introduce boxing and null assumptions that do not fit neoCLR's
+current model. Our eventual contract will therefore be similar, not binary identical.
+No interface naming prefix is required, and no struct/class distinction determines
+storage or lifetime.
 
-Construction consumes exactly the declared payload values after generic substitution
-and produces one union value. Case testing produces Boolean. Extraction checks the
-active case and field index; a mismatch is a Fault, not a recoverable Error. Programs
-must test the case before extracting when it is not already established. An error
-case is an ordinary value and does not transfer control or unwind frames.
+A TryGetValue-like member needs an explicit output contract. Addressable locals,
+byrefs, and initialization rules must be settled before copying the .NET out pattern.
+An unsuccessful query must not expose an uninitialized or fabricated T. Do not make
+implementing Option depend recursively on already having Option-based extraction.
+Constructed carriers must preserve the selected variant and value; their queries
+must agree and must not change the active alternative. Absence is an explicit None
+value, not an implicit null or uninitialized state. A zeroed allocation is not
+necessarily a constructed carrier.
 
-The current some/none/ok/err/is.case/ldcase instructions are bootstrap scaffolding.
-Migrate their implementations to the general case mechanism; convenient spellings
-can lower to it. Legacy metadata needs an explicit version/migration decision when
-hard-coded Type::Option/Result and the global Case enum are replaced. Do not silently
-reinterpret existing serialized modules with a changed schema.
+Storage remains an ordinary type implementation detail. A discriminant plus payload
+storage is a possible implementation, but the convention mandates neither an integer
+tag nor its numeric values. Generic records alone do not solve storage for alternatives
+without valid defaults: storing every alternative as an initialized field is not a
+general solution. Before implementing native overlapping storage, specify alignment,
+active initialization, copying, and pointer tracking. Do not introduce mandatory heap
+allocation or ownership merely to fit every variant into a uniform slot.
 
-## Native representation comes separately
+A convention does not by itself enforce these invariants against arbitrary IL.
+Ordinary member visibility, verification, and library implementation must provide
+the available guarantees. Incorrect library implementations can violate the pattern;
+a marker attribute is not a runtime proof. Extraction behavior must be specified by
+the API without exceptions. Recoverable failure uses the platform's error model;
+Fault remains for violated execution contracts.
 
-Do not infer that an all-zero byte pattern constructs a union, even when tag zero
-names a case. Its payload might not have a valid zero value. Native heap allocation
-and case construction stay separate operations. No null sentinel or spare-bit
-optimization is needed for the interpreter milestone.
+## Implementation sequence
 
-A future baseline native representation can use an explicit discriminant plus storage
-large/aligned enough for the largest payload. Before implementing it, specify padding,
-initialization of inactive bytes, nested layouts, and copying of stored pointers.
-String and other values without native layouts prevent blindly assigning such a layout
-today. Native union ABI compatibility, representation optimizations, and native enum
-marshaling are separate work; the interpreter representation is not a promised ABI.
+1. Completed: indexed generic references, arity checks, and field substitution.
+2. Support ordinary closed generic record construction and field operations,
+   preserving value copies, storage conversions, and exact closed type identity.
+3. Support members on generic definitions and substitute their signatures/bodies
+   for closed owners. Keep unrelated generic method features separate.
+4. Add general custom-attribute metadata and the member/access/storage fundamentals
+   required by the convention. Finalize its construction and typed-query contract.
+5. Implement carrier and variant types in the platform-written System library;
+   test None/Some, Ok/Err, Void, nested carriers, failed queries, and independent copies.
+6. Migrate bootstrap Option/Result signatures and some/none/ok/err/is.case/ldcase
+   deliberately, with an explicit serialized-module compatibility decision.
 
-## Implementation order
-
-The unaligned-access slice is complete. Next:
-
-1. Completed: generic-parameter and constructed-type references with arity validation
-   and substitution for fields. Generic execution remains separate.
-2. Add user-defined union case metadata and the three case operations, with tests
-   for nested Option/Result, Void payloads, wrong-case access, and value copying.
-3. Define Option and Result in the platform-written System library, then remove
-   runtime recognition of those names wherever the general mechanism suffices.
-4. Add integer-backed enums as a distinct metadata form. Set the underlying integer
-   width and named constants explicitly; decide flags and unnamed bit-pattern rules
-   in that slice instead of inheriting union payload behavior.
-
-Continue verifier work around stack joins, initialization, and case access as these
-operations settle. Broad reflection, inheritance/dispatch, generic constraints and
-variance, managed ownership wrappers, and runtime async are not prerequisites for
-this milestone. Array storage contracts also remain separate.
+The bootstrap operations remain supported until that migration; they are not the
+proposed general union ABI. Integer-backed enums remain a separate milestone.
+Reflection, GC, reference counting, runtime async, and high-level pattern syntax
+are not prerequisites for establishing this convention.

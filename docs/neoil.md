@@ -466,3 +466,8 @@ See [unaligned access](heap-and-pointers.md#unaligned-memory-access) for support
 Generic record headers use `.type Pair<T, U>` (or indexed unnamed parameters such
 as `!0`); field signatures resolve names to indexed type parameters. See
 [generic metadata](generic-metadata.md) for supported references and current execution limits.
+
+Unions will follow an [ordinary type convention](unions-and-enums.md), expressed
+through metadata and member calls. No `.union`/`.variant` directives or general
+union opcodes are implemented. Existing Option/Result instructions remain bootstrap
+facilities until library types can replace them.

@@ -52,7 +52,10 @@ definition are recorded and checked structurally; concrete layout is deferred.
 
 Option, Result, Ref, and Ptr retain their bootstrap signature encodings for now.
 They cannot be redeclared as generic definitions under those reserved short names.
-The next slice can use the new references/substitution for general union case
-metadata and values, before migrating Option and Result into the System library.
+The next slice will use these references/substitution for ordinary generic record
+construction. Generic members, custom attributes, and typed access/storage support
+will then enable the [union convention](unions-and-enums.md), before migrating
+Option and Result into the System library. No union-specific type category or
+instructions are planned.
 Existing modules without the new optional metadata continue to load; old readers
 will reject the new signature variants instead of interpreting them as old types.

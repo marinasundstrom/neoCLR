@@ -25,13 +25,16 @@ scaffolding, not a prerequisite ownership policy for the pointer layer.
 ## Next focus: library-defined unions
 
 Prioritize execution and metadata fundamentals for Option<T> and Result<T,TError>
-before reflection or broader object-model features. Use union for tagged payload
-cases and reserve enum for integer-backed constants. The proposed representation
-and sequence are in [unions and enums](unions-and-enums.md): minimal generic type
-references/substitution, case definitions and operations, then System library migration.
+before reflection or broader object-model features. A union is an ordinary carrier
+of one of a fixed set of variant types; reserve enum for integer-backed constants.
+Follow a .NET 11-inspired attribute/member convention instead of introducing a
+union type category or dedicated instructions. See [the convention](unions-and-enums.md).
+
 The [generic metadata foundation](generic-metadata.md) is implemented. Next comes
-user-defined union case metadata and execution. This is focused type machinery
-needed for ordinary library code, not a reflection API.
+generic record construction and field access, followed by generic members, custom
+attributes, and the typed access/storage needed for ordinary library carriers.
+Then migrate System Option/Result from their bootstrap implementation. This work
+must preserve explicit allocation and avoid requiring null or boxing for absence.
 
 ## Later milestones
 
