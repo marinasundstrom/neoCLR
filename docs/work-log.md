@@ -921,3 +921,32 @@ artifacts, and no ownership or native ABI policy is introduced.
 
 Validation: all 239 integration tests pass on macOS ARM64; formatting, clippy with
 warnings denied, and diff checks pass. Linux and Windows execution remain for CI.
+
+## 2026-09-06 — Shared loaded program snapshot
+
+Added LoadedProgram as an immutable owner of validated, linked metadata with calls
+bound before specialization. Preparation snapshots an application and bundled or
+supplied System library; System alone can be prepared for analysis. Run, verification,
+and closed type identity helpers now use this shared boundary. Retaining the object
+avoids relinking between those operations, while the existing free helpers remain
+available. The internal linked Module is not exposed for mutation or serialization.
+
+Each execution starts fresh guest state and resource limits. Returned execution state
+belongs to that run, and a Fault does not alter the loaded metadata. Preparation does
+not execute code, activate native imports, or make typed verification mandatory.
+Native execution remains a separate unsafe operation with its existing contract;
+foreign process-global state is not isolated by fresh guest executions.
+
+Added six tests for retained generic bindings/type identities, source independence,
+custom library snapshots, repeated execution and recovery after a limit Fault,
+explicit verification, metadata rejection, library-only analysis, and inactive native
+imports during preparation. Added a Rust embedding sample that prepares/verifies
+HelloWorld once, drops its source, and runs twice. Updated architectural and API docs.
+
+This preparation boundary precedes module-scoped lookup and revision identity; those
+remain pending. No arbitrary function invocation, persistent guest session, native
+hosting ABI, or JIT/AOT backend interface is introduced.
+
+Validation: all 245 integration tests pass on macOS ARM64; formatting, clippy with
+warnings denied, and diff checks pass. The embedding sample prints Hello, world!
+twice. Linux and Windows execution remain for CI.

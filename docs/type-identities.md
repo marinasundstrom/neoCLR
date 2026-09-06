@@ -17,8 +17,9 @@ The Rust API `resolve_type_identity(module, ty)` resolves a closed signature usi
 the bundled System library. `resolve_type_identity_with_library(module, library, ty)`
 uses a supplied System module. Both follow execution's metadata validation/linking
 rules without executing code or modifying inputs. Resolving a System module directly
-uses that module's definitions. Each call currently prepares a fresh resolution copy;
-this is not a cached loader context or a permanent hosting ABI.
+uses that module's definitions. Each free helper call prepares a fresh resolution copy.
+Retain a [LoadedProgram](loaded-program.md) and use its `resolve_type_identity` method
+to query the same bound snapshot repeatedly. Neither API is a permanent hosting ABI.
 
 The returned `TypeIdentity` supports equality and hashing:
 

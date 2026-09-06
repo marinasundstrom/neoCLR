@@ -153,6 +153,11 @@ neoCLR should be embeddable through a deliberate hosting API, eventually with a
 versioned native boundary suitable for applications written in other languages.
 The existing Rust run helpers are a starting point, not that final ABI.
 
+[LoadedProgram](loaded-program.md) now provides an immutable resolved metadata
+snapshot shared by interpreter execution, verification, and type identity queries.
+It supports repeated entry-point execution with fresh state. This establishes a
+preparation boundary without specifying a native hosting ABI or backend interface.
+
 A minimal hosting milestone should load a module, resolve a function by identity and
 signature, invoke it repeatedly with typed inputs, return values/Faults, and provide
 host services. Value/handle lifetimes, resource limits, cancellation, callbacks,

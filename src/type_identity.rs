@@ -20,14 +20,7 @@ pub enum TypeIdentity {
 
 /// Resolve a closed signature with the bundled System library, without executing IL.
 pub fn resolve_type_identity(module: &Module, ty: &Type) -> Result<TypeIdentity, Fault> {
-    if module.name == "System" {
-        crate::vm::validate(module)?;
-        let mut normalized = module.clone();
-        normalized.normalize_definition_ids()?;
-        resolve(&normalized, ty)
-    } else {
-        resolve_type_identity_with_library(module, crate::library::system()?, ty)
-    }
+    crate::LoadedProgram::new(module)?.resolve_type_identity(ty)
 }
 
 /// Resolve using the same application/System linking rules as execution.
@@ -36,10 +29,10 @@ pub fn resolve_type_identity_with_library(
     library: &Module,
     ty: &Type,
 ) -> Result<TypeIdentity, Fault> {
-    resolve(&crate::library::link(module, library)?, ty)
+    crate::LoadedProgram::with_library(module, library)?.resolve_type_identity(ty)
 }
 
-fn resolve(module: &Module, ty: &Type) -> Result<TypeIdentity, Fault> {
+pub(crate) fn resolve(module: &Module, ty: &Type) -> Result<TypeIdentity, Fault> {
     // Enforce canonical signatures, arity, closedness, and the shared nesting limit.
     crate::vm::check_type(ty, module)?;
     build(module, ty)

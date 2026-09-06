@@ -549,8 +549,7 @@ pub fn run_with_library(
             "cannot execute a library without an entry point",
         ));
     }
-    let linked = crate::library::link(module, library)?;
-    interpret(&linked, limits, None)
+    crate::LoadedProgram::with_library(module, library)?.run(limits)
 }
 
 /// Execute a trusted module with native imports enabled.
@@ -570,15 +569,11 @@ pub unsafe fn run_with_native(
             "cannot execute a library without an entry point",
         ));
     }
-    let linked = crate::library::link(module, library)?;
-    interpret(
-        &linked,
-        limits,
-        Some(crate::interop::NativeLibraries::default()),
-    )
+    // SAFETY: the caller accepts the same native-code contract as LoadedProgram.
+    unsafe { crate::LoadedProgram::with_library(module, library)?.run_with_native(limits) }
 }
 
-fn interpret(
+pub(crate) fn interpret(
     module: &Module,
     limits: Limits,
     mut native_libraries: Option<crate::interop::NativeLibraries>,

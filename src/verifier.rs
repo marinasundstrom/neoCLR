@@ -26,23 +26,14 @@ pub struct Verification {
 }
 
 pub fn verify(module: &Module) -> Result<Verification, Fault> {
-    if module.name == "System" {
-        crate::vm::validate(module)?;
-        let mut normalized = module.clone();
-        normalized.normalize_definition_ids()?;
-        crate::library::bind_member_references(&mut normalized)?;
-        analyze(&normalized)
-    } else {
-        verify_with_library(module, crate::library::system()?)
-    }
+    crate::LoadedProgram::new(module)?.verify()
 }
 
 pub fn verify_with_library(module: &Module, library: &Module) -> Result<Verification, Fault> {
-    let linked = crate::library::link(module, library)?;
-    analyze(&linked)
+    crate::LoadedProgram::with_library(module, library)?.verify()
 }
 
-fn analyze(module: &Module) -> Result<Verification, Fault> {
+pub(crate) fn analyze(module: &Module) -> Result<Verification, Fault> {
     let mut functions = Vec::new();
     for (index, function) in module.functions.iter().enumerate() {
         if function.is_internal_call() || function.pinvoke.is_some() {

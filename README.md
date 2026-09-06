@@ -243,3 +243,7 @@ distinguish overloads with identical substituted signatures.
 [Type identities](docs/type-identities.md) preserve module-local type definition rows
 and expose resolved closed signature keys, including generic arguments and pointers.
 Module-scoped type lookup and revision identities remain future work.
+
+[LoadedProgram](docs/loaded-program.md) prepares an immutable metadata snapshot shared
+by execution, verification, and type queries. Run `cargo run --example loaded_program`
+to prepare HelloWorld once and execute it twice with fresh guest state.

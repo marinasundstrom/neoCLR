@@ -4,6 +4,7 @@ pub mod library;
 pub mod memory;
 pub mod metadata;
 mod native;
+mod program;
 mod type_identity;
 pub mod value;
 mod vm;
@@ -11,6 +12,7 @@ mod vm;
 pub use type_identity::{TypeIdentity, resolve_type_identity, resolve_type_identity_with_library};
 
 pub use metadata::Module;
+pub use program::LoadedProgram;
 pub use value::Value;
 pub use vm::{Execution, Limits, run, run_with_library, run_with_native};
 
