@@ -28,9 +28,9 @@ execute through calls, fields, and branches. The VM needs no union-specific type
 category, global tag table, or wrap/test/extract opcodes. Compilers and tools can
 recognize the convention without guest reflection or runtime discovery.
 
-The exact attribute/member contract and assembler spelling remain to be implemented.
-UnionAttribute in System.Runtime.CompilerServices is the intended familiar marker;
-its presence alone will not grant a type special execution semantics. Constructor
+The [marker attribute encoding](custom-attributes.md) and library UnionAttribute in
+System.Runtime.CompilerServices are implemented. The union member contract remains
+to be finalized; the marker grants no special execution semantics. Constructor
 and factory recognition must be specified explicitly rather than treating every
 one-parameter method as a variant constructor. Metadata indices/tokens identify
 members; source names remain authoring mappings.
@@ -93,8 +93,9 @@ Fault remains for violated execution contracts.
    preserving value copies, storage conversions, and exact closed type identity.
 3. Completed: IL members on generic definitions with substitution of signatures/bodies
    for closed owners. Keep unrelated generic method features separate.
-4. Add general custom-attribute metadata and the member/access/storage fundamentals
-   required by the convention. Finalize its construction and typed-query contract.
+4. Marker custom-attribute metadata is implemented. Extend attributes as needed and
+   supply the member/access/storage fundamentals required by the convention.
+   Finalize its construction and typed-query contract.
 5. Implement carrier and variant types in the platform-written System library;
    test None/Some, Ok/Err, Void, nested carriers, failed queries, and independent copies.
 6. Migrate bootstrap Option/Result signatures and some/none/ok/err/is.case/ldcase

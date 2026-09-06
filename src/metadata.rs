@@ -123,6 +123,8 @@ pub struct Module {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct TypeDef {
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub custom_attributes: Vec<CustomAttribute>,
     pub name: String,
     pub fields: Vec<Field>,
     #[serde(default)]
@@ -153,6 +155,8 @@ pub struct Field {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Function {
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub custom_attributes: Vec<CustomAttribute>,
     pub name: String,
     #[serde(default)]
     pub owner: Option<Type>,
@@ -684,4 +688,12 @@ impl Function {
         }
         Ok(result)
     }
+}
+
+/// Marker-only subset of CLI custom attributes. The constructor is metadata,
+/// not an instruction to execute when loading the annotated definition.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct CustomAttribute {
+    pub constructor: FunctionRef,
 }

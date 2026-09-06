@@ -89,6 +89,13 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                 return Ok(());
             }
             if let (true, Some(def)) = (function.is_none() && word != ".method", typedef.as_mut()) {
+                if word == ".custom" {
+                    def.custom_attributes
+                        .push(crate::metadata::CustomAttribute {
+                            constructor: parse_function_ref(rest)?,
+                        });
+                    return Ok(());
+                }
                 if word == ".pack" {
                     if def.packing.is_some() {
                         return Err(Fault::new("duplicate .pack"));
@@ -110,7 +117,9 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                     return Ok(());
                 }
                 if word != ".field" {
-                    return Err(Fault::new("expected .field, .pack, .size, .method or .end"));
+                    return Err(Fault::new(
+                        "expected .field, .pack, .size, .custom, .method or .end",
+                    ));
                 }
                 let (name, ty) = rest
                     .split_once(char::is_whitespace)
@@ -123,7 +132,17 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                 return Ok(());
             }
             if let Some(pending) = function.as_mut() {
-                if word == ".pinvoke" {
+                if word == ".custom" {
+                    if !pending.function.body.is_empty() || !pending.labels.is_empty() {
+                        return Err(Fault::new(".custom must precede instructions and labels"));
+                    }
+                    pending
+                        .function
+                        .custom_attributes
+                        .push(crate::metadata::CustomAttribute {
+                            constructor: parse_function_ref(rest)?,
+                        });
+                } else if word == ".pinvoke" {
                     if pending.function.pinvoke.is_some()
                         || !pending.function.body.is_empty()
                         || !pending.labels.is_empty()
@@ -337,6 +356,7 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                     let (name, generic_parameters) = parse_type_declaration(rest)?;
                     let ty = Type::from_name(&name);
                     typedef = Some(TypeDef {
+                        custom_attributes: vec![],
                         name: ty.definition_name().unwrap_or(&name).into(),
                         generic_parameters,
                         fields: vec![],
@@ -392,7 +412,7 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                             "declaration names must not contain an owner or instance prefix",
                         ));
                     }
-                    if owner.is_some() && target.name.contains('.') {
+                    if owner.is_some() && target.name.contains('.') && target.name != ".ctor" {
                         return Err(Fault::new(
                             "method name must be unqualified within its type",
                         ));
@@ -408,6 +428,7 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                     };
                     function = Some(PendingFunction {
                         function: Function {
+                            custom_attributes: vec![],
                             name,
                             owner,
                             instance,
@@ -566,7 +587,7 @@ fn parse_callable(text: &str, named: bool) -> Result<(FunctionRef, Vec<Option<St
     };
     let (owner, name) = if let Some((owner, member)) = name.split_once("::") {
         identifier(member.trim())?;
-        if member.trim().contains('.') {
+        if member.trim().contains('.') && member.trim() != ".ctor" {
             return Err(Fault::new("expected an unqualified member name"));
         }
         let owner = parse_type(owner)?;

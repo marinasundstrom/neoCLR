@@ -76,7 +76,7 @@ pointer signature does not expand its pointee or acquire a lifetime/ownership po
 Option, Result, Ref, and Ptr retain their bootstrap signature encodings for now.
 They cannot be redeclared as generic definitions under those reserved short names.
 Ordinary generic record construction and members on generic types are implemented.
-Custom attributes and typed access/storage support
+Marker custom attributes are implemented. Typed access/storage support
 will then enable the [union convention](unions-and-enums.md), before migrating
 Option and Result into the System library. No union-specific type category or
 instructions are planned.

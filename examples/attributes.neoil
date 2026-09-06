@@ -1,0 +1,29 @@
+.module Attributes
+.entry Main
+
+.type MarkerAttribute
+    .method instance .ctor() -> Void
+        ; Applying an attribute records metadata and never executes this body.
+        fault "attribute constructor must not execute during loading"
+    .end
+.end
+
+.type Box<T>
+    .custom instance MarkerAttribute::.ctor()
+    .field Value T
+    .method instance Get() -> T
+        .custom instance MarkerAttribute::.ctor()
+        ldarg this
+        ldfld Box<T>::Value
+        ret
+    .end
+.end
+
+.function Main() -> Void
+    .custom instance MarkerAttribute::.ctor()
+    ldstr "Attribute metadata passed"
+    newobj Box<String>
+    call instance Box<String>::Get()
+    call System.Console::WriteLine(String)
+    ret
+.end

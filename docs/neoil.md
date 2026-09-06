@@ -476,3 +476,8 @@ Methods inside a generic type use its indexed parameters in signatures, locals, 
 IL operands. Calls specify a constructed owner: `call Box<Int32>::Create(Int32)` or
 `call instance Box<Int32>::Get()`. See [methods on generic types](generic-metadata.md#methods-on-generic-types)
 for substitution, receiver semantics, overload limitations, and validation.
+
+`.custom instance MarkerAttribute::.ctor()` attaches a parameterless marker to the
+enclosing type or method/function. In methods it must precede instructions and
+labels. `.ctor` declarations must be instance methods returning Void. See
+[custom attributes](custom-attributes.md) for metadata validation and current limits.

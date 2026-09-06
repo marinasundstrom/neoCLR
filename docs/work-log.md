@@ -726,3 +726,30 @@ to use Box<String>, and refreshed README, generic/pointer documentation, and roa
 
 Validation: all 203 integration tests pass on macOS ARM64; formatting, clippy, and
 diff checks pass. The sample prints 42 and 4. Linux and Windows execution remain for CI.
+
+## 2026-09-06 — Marker custom-attribute metadata
+
+Added constructor-reference marker attributes on types and methods/functions, with
+.custom instance Type::.ctor() assembly syntax. Metadata validates closed owners,
+parameterless instance constructor identity, and Void returns without executing
+attribute constructors. Repeated entries preserve order; empty lists are omitted
+for legacy module compatibility. Added the .ctor member name with instance/Void
+signature checks; newobj retains existing field-based construction.
+
+Defined System.Runtime.CompilerServices.UnionAttribute in the platform-written library
+as an ordinary marker. It adds no special union behavior. Attribute arguments,
+additional targets, AttributeUsage, inheritance, reflection, and automatic constructor
+invocation remain pending. Existing InternalCall and P/Invoke metadata are unchanged.
+
+Added an annotated generic-type sample and six tests covering metadata roundtrip,
+non-execution, library linking, repeated/forward references, malformed metadata,
+source placement, and closed attribute owners. Updated README, assembler reference,
+type notes, roadmap, and union convention; added custom-attributes documentation.
+
+Validation: all 209 integration tests pass on macOS ARM64; formatting, clippy, and
+diff checks pass. The sample prints Attribute metadata passed. Linux and Windows
+execution remain for CI.
+
+Implementation pauses after this slice at the user's request for a strategy review.
+The review must include a future high-level language and migration of the runtime
+library from authored IL to that language, targeting the same metadata and IL.

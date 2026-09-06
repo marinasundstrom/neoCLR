@@ -58,6 +58,7 @@ cargo run -- run examples/generic-metadata.neoil
 cargo run -- run examples/generic-values.neoil
 cargo run -- run examples/generic-methods.neoil
 cargo run -- run examples/generic-memory.neoil
+cargo run -- run examples/attributes.neoil
 cargo run -- run examples/native-integers.neoil
 cargo run -- run examples/integers.neoil
 cargo run -- run examples/bits.neoil
@@ -216,3 +217,7 @@ Indexed generic parameters, constructed references, field substitution, and clos
 generic record values, methods, and native layouts are implemented; see [generic types](docs/generic-metadata.md).
 Next are further type metadata and storage fundamentals needed for ordinary library
 types. Dedicated union opcodes are not planned.
+
+[Marker custom attributes](docs/custom-attributes.md) are supported on types and
+methods/functions. The System library supplies UnionAttribute as an ordinary marker;
+union behavior and guest reflection remain pending.

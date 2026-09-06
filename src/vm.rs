@@ -242,8 +242,13 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 .name
                 .strip_prefix(&prefix)
                 .ok_or_else(|| Fault::new("method name does not match its declaring type"))?;
-            if member.is_empty() || member.contains('.') {
+            if member.is_empty() || (member.contains('.') && member != ".ctor") {
                 return Err(Fault::new("invalid member name"));
+            }
+            if member == ".ctor" && (!function.instance || function.returns != Type::Void) {
+                return Err(Fault::new(
+                    ".ctor requires an instance method returning Void",
+                ));
             }
         }
         for ty in function
@@ -355,6 +360,16 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 | Op::PointerFromInt(ty) => check(ty)?,
                 _ => (),
             }
+        }
+    }
+    for attributes in module
+        .types
+        .iter()
+        .map(|d| &d.custom_attributes)
+        .chain(module.functions.iter().map(|f| &f.custom_attributes))
+    {
+        for attribute in attributes {
+            validate_attribute(module, attribute)?;
         }
     }
     if !module.entry.is_empty()
@@ -1112,4 +1127,32 @@ fn interpret(
         }
     }
     Err(Fault::new("instruction limit exceeded"))
+}
+
+fn validate_attribute(
+    module: &Module,
+    attribute: &crate::metadata::CustomAttribute,
+) -> Result<(), Fault> {
+    let target = &attribute.constructor;
+    let owner = target
+        .owner
+        .as_ref()
+        .ok_or_else(|| Fault::new("attribute requires a constructor owner"))?;
+    // Attribute metadata is closed even when attached to an open generic definition.
+    record_fields(module, owner, 0)?;
+    let name = match owner {
+        Type::Named(name) => name,
+        Type::Constructed { definition, .. } => definition,
+        _ => return Err(Fault::new("attribute owner must be a record type")),
+    };
+    if !target.instance || !target.parameters.is_empty() || target.name != format!("{name}..ctor") {
+        return Err(Fault::new(
+            "marker attribute requires instance Type::.ctor()",
+        ));
+    }
+    let constructor = resolve(module, target)?;
+    if constructor.returns != Type::Void {
+        return Err(Fault::new("attribute constructor must return Void"));
+    }
+    Ok(())
 }
