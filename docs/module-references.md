@@ -45,7 +45,8 @@ contract; they are not guest module references.
 The complete [module set](module-sets.md) remains caller-supplied, and all its modules
 are validated, including unused ones. Names still share one namespace: a reference
 list does not permit duplicate type names or choose between colliding definitions.
-Scoped type operands, visibility/accessibility flags, revision-qualified references,
+[Scoped type operands](scoped-types.md) check origin while retaining the unique-name
+restriction. Visibility/accessibility flags, revision-qualified references,
 and side-by-side module versions remain future work.
 
 The example under `examples/modules/` now declares Application → Operations → Models,

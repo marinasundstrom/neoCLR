@@ -22,6 +22,12 @@ pub enum Type {
     String,
     Error,
     Named(String),
+    /// An explicit source-module scope, checked and bound during preparation.
+    Scoped {
+        module: String,
+        name: String,
+        arguments: Vec<Type>,
+    },
     /// Indexed parameter of the declaring type (CLI VAR-like signature).
     TypeParameter(u16),
     Constructed {
@@ -603,6 +609,15 @@ impl Type {
                     arguments: types,
                 } => Type::Constructed {
                     definition: definition.clone(),
+                    arguments: types.iter().map(nested).collect::<Result<_, _>>()?,
+                },
+                Type::Scoped {
+                    module,
+                    name,
+                    arguments: types,
+                } => Type::Scoped {
+                    module: module.clone(),
+                    name: name.clone(),
                     arguments: types.iter().map(nested).collect::<Result<_, _>>()?,
                 },
                 Type::Option(t) => Type::Option(Box::new(nested(t)?)),

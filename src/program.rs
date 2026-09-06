@@ -18,6 +18,7 @@ impl LoadedProgram {
             crate::vm::validate(module)?;
             let mut module = module.clone();
             module.normalize_definition_ids()?;
+            let mut module = crate::scope::normalize_module(&module, &module)?;
             crate::library::bind_member_references(&mut module)?;
             Ok(Self { module })
         } else {

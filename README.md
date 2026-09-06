@@ -251,4 +251,5 @@ to prepare HelloWorld once and execute it twice with fresh guest state.
 [Explicit module sets](docs/module-sets.md) support additional libraries, cross-module
 generic calls, and field-name aliases. Run `cargo run --example modules` for a three-module
 sample. Optional [`.references` lists](docs/module-references.md) enforce direct module
-dependencies. Symbols still share one namespace; scoped type operands and revisions remain pending.
+dependencies. [Scoped type operands](docs/scoped-types.md), such as `[Models]Box<Int32>`,
+check the definition's module. Duplicate type names and module revisions remain pending.

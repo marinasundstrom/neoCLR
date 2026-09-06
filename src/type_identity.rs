@@ -33,10 +33,11 @@ pub fn resolve_type_identity_with_library(
 }
 
 pub(crate) fn resolve(module: &Module, ty: &Type) -> Result<TypeIdentity, Fault> {
+    let ty = crate::scope::normalize_type(module, ty)?;
     // Enforce canonical signatures, arity, closedness, and the shared nesting limit.
-    crate::vm::check_type(ty, module)?;
-    crate::references::check_type(module, module, ty)?;
-    build(module, ty)
+    crate::vm::check_type(&ty, module)?;
+    crate::references::check_type(module, module, &ty)?;
+    build(module, &ty)
 }
 
 fn build(module: &Module, ty: &Type) -> Result<TypeIdentity, Fault> {

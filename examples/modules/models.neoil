@@ -4,9 +4,9 @@
 .type Box<T>
     .field Value T
 
-    .method static Create(T value) -> Box<T>
+    .method static Create(T value) -> [Models]Box<T>
         ldarg value
-        newobj Box<T>
+        newobj [Models]Box<T>
         ret
     .end
 .end

@@ -24,6 +24,8 @@ escapes. Identifiers contain ASCII letters, digits, underscores, and dots.
 - Optional `.references (Module, ...)` declares direct dependencies; `.references ()`
   permits only local definitions and implicit System. Omission retains legacy load-set
   visibility. See [module references](module-references.md) for validation and limits.
+- `[Module]Type` explicitly scopes a type operand, including generic owners and
+  pointer element types; see [scoped types](scoped-types.md). Definition names remain unqualified.
 - `.type Name` begins a type (known System primitives use runtime representation); `.field Name Type` declares ordered fields;
   `.end` closes the type. `.method static/instance Name(...) -> Type` declares
   a nested method with its own `.end`; see [type system](type-system.md).

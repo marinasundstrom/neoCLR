@@ -151,6 +151,7 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
         }
         let mut normalized = module.clone();
         normalized.normalize_definition_ids()?;
+        let normalized = crate::scope::normalize_module(&normalized, &normalized)?;
         validate_linked(&normalized)
     } else {
         crate::library::link(module, crate::library::system()?).map(|_| ())
@@ -443,6 +444,7 @@ fn check_type_context(ty: &Type, module: &Module, arity: usize, depth: usize) ->
     }
     let nested = |ty: &Type| check_type_context(ty, module, arity, depth + 1);
     match ty {
+        Type::Scoped { .. } => Err(Fault::new("unresolved scoped type signature")),
         Type::TypeParameter(index) if *index as usize >= arity => {
             Err(Fault::new("type parameter outside declaring context"))
         }

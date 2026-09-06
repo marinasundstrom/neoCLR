@@ -520,14 +520,16 @@ fn resolve_fields(
     context: &Module,
     field_fixups: Vec<FieldFixup>,
 ) -> Result<(), Fault> {
+    let context = crate::scope::normalize_module(context, context)?;
     // Resolve after all declarations, including other modules in a source group.
     for (function, pc, owner, name, line) in field_fixups {
+        let owner = crate::scope::normalize_type(&context, &owner)?;
         let arity = module.functions[function]
             .owner
             .as_ref()
             .and_then(|t| context.type_definition(t))
             .map_or(0, |d| d.generic_parameters.len());
-        let fields = crate::vm::record_fields(context, &owner, arity).map_err(|e| {
+        let fields = crate::vm::record_fields(&context, &owner, arity).map_err(|e| {
             Fault::new(format!(
                 "line {line}: invalid field owner {owner:?}: {}",
                 e.message
@@ -539,7 +541,7 @@ fn resolve_fields(
             .ok_or_else(|| {
                 Fault::new(format!("line {line}: unknown field {name:?} on {owner:?}"))
             })?;
-        crate::references::check_type(context, module, &owner)?;
+        crate::references::check_type(&context, module, &owner)?;
         match &mut module.functions[function].body[pc] {
             Instruction::Field(slot)
             | Instruction::SetField(slot)
@@ -580,6 +582,29 @@ pub fn parse_type(text: &str) -> Result<Type, Fault> {
         }
         if let Some(element) = text.strip_suffix('*') {
             return Ok(Type::Ptr(Box::new(parse(element, depth + 1)?)));
+        }
+        if let Some(scoped) = text.strip_prefix('[') {
+            let (module, rest) = scoped
+                .split_once(']')
+                .ok_or_else(|| Fault::new("unclosed module scope"))?;
+            identifier(module)?;
+            let (name, arguments) = match parse(rest, depth + 1)? {
+                Type::Constructed {
+                    definition,
+                    arguments,
+                } => (definition, arguments),
+                ty => (
+                    ty.definition_name()
+                        .ok_or_else(|| Fault::new("module scope requires a named type definition"))?
+                        .to_owned(),
+                    vec![],
+                ),
+            };
+            return Ok(Type::Scoped {
+                module: module.into(),
+                name,
+                arguments,
+            });
         }
         if let Some((name, args)) = text.split_once('<') {
             let args = args
@@ -682,6 +707,7 @@ fn parse_callable(text: &str, named: bool) -> Result<(FunctionRef, Vec<Option<St
             "{}.{}",
             match &owner {
                 Type::Constructed { definition, .. } => definition.as_str(),
+                Type::Scoped { name, .. } => name.as_str(),
                 _ => owner
                     .definition_name()
                     .ok_or_else(|| Fault::new("invalid method owner"))?,
@@ -876,6 +902,18 @@ fn parse_type_declaration(text: &str) -> Result<(String, Vec<Option<String>>), F
 
 fn bind_type_parameters(ty: Type, names: &[Option<String>]) -> Type {
     match ty {
+        Type::Scoped {
+            module,
+            name,
+            arguments,
+        } => Type::Scoped {
+            module,
+            name,
+            arguments: arguments
+                .into_iter()
+                .map(|t| bind_type_parameters(t, names))
+                .collect(),
+        },
         Type::Named(name) => names
             .iter()
             .position(|n| n.as_deref() == Some(&name))

@@ -1002,3 +1002,32 @@ Names still share one namespace; scoped operands and artifact revisions remain p
 Validation: all 259 integration tests pass on macOS ARM64; formatting, clippy with
 warnings denied, and diff checks pass. The updated modules example prints 42.
 Linux and Windows execution remain for CI.
+
+
+## 2026-09-06 — Explicit scoped type operands
+
+Added `[Module]Type` source operands and structural Scoped metadata for named types,
+including generic arguments, pointer elements, method owners, and attribute constructors.
+Primitive spellings normalize to canonical System names. Declaration names remain
+unqualified, and qualifiers cannot apply to contextual parameters or bootstrap wrappers.
+
+Preparation checks module origin before lowering scopes to the current unique-name
+signatures. Source artifacts retain their scoped operands through assembly and JSON
+roundtrip. Generic substitution and function definition binding remain intact. Group
+field aliases and loaded type identity queries accept scoped signatures, and explicit
+reference lists still apply. A wrong scope fails without unqualified fallback.
+
+Added six tests covering generic calls/signatures/aliases, source preservation and
+roundtrip, wrong scopes and reference restrictions, native pointer/storage operations,
+attribute constructors, canonical primitive syntax, malformed signatures, and System
+analysis. Updated the three-module sample to use scoped Box operands and refreshed
+syntax, identity, loading, and architectural documentation.
+
+This does not yet allow duplicate type names across modules: execution and layout
+still use normalized name-based keys. Lower-level raw Module/Type helpers expect
+resolved signatures. Internal scoped keys, module revisions, and binary encoding
+remain future work; no opcode or ownership policy changes were introduced.
+
+Validation: all 265 integration tests pass on macOS ARM64; formatting, clippy with
+warnings denied, and diff checks pass. The updated modules example verifies and prints
+42. Linux and Windows execution remain for CI.

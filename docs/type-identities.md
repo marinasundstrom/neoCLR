@@ -56,10 +56,9 @@ reordering a definition table can change rows. Same-name replacement modules are
 not proven compatible by matching rows or names. Module revision identity remains
 necessary before persistent caching or cross-build handles.
 
-Type operands still use the prototype's globally unique names across the
-[supplied module set](module-sets.md). This slice does not
-add module-qualified type syntax, same-name types from multiple modules,
-or replace interpreter value/layout keys with resolved identities. It provides the
-definition metadata and structural keys needed for that future resolution work.
+Type names remain globally unique across the [supplied module set](module-sets.md).
+[Scoped operands](scoped-types.md) now check a named module before binding to those
+keys. Same-name types from multiple modules and replacement of interpreter value/layout
+keys with resolved identities remain future work.
 Function references retain their separate [binding rules](member-identities.md).
 Root type queries respect [explicit reference lists](module-references.md) when present.

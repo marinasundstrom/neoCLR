@@ -74,8 +74,9 @@ Closed instantiations must not replace definition identity: two declared overloa
 can acquire identical substituted parameter types and still denote different members.
 Linking must map those references deliberately. [Function call binding](member-identities.md)
 and [type definition rows/closed signature keys](type-identities.md) are implemented.
-Module-scoped type references and revision identity remain shared prerequisites for
-general loading, compilation, tooling, and embedding.
+[Scoped type operands](scoped-types.md) now check origin before binding. Internal
+scoped type keys and revision identity remain prerequisites for general loading,
+compilation, tooling, and embedding with colliding names or multiple artifact versions.
 
 Free functions remain functions without a required synthetic type container in the
 semantic model. Preserve familiar CLI concepts where they fit; do not conflate a

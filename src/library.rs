@@ -26,6 +26,7 @@ pub(crate) fn link_modules(
     }
     let mut library = library.clone();
     library.normalize_definition_ids()?;
+    let library = crate::scope::normalize_module(&library, &library)?;
     crate::vm::validate_linked(&library)?;
     crate::references::validate_list(&library, &[&library])?;
     let mut names = std::collections::HashSet::from([library.name.as_str()]);
@@ -59,10 +60,12 @@ pub(crate) fn link_modules(
         linked.types.extend(dependency.types);
         linked.functions.extend(dependency.functions);
     }
+    let mut linked = crate::scope::normalize_module(&linked, &linked)?;
     crate::vm::validate_linked(&linked)?;
     bind_member_references(&mut linked)?;
     for source in std::iter::once(application).chain(dependencies) {
-        crate::references::validate_uses(&linked, source)?;
+        let normalized = crate::scope::normalize_module(&linked, source)?;
+        crate::references::validate_uses(&linked, &normalized)?;
     }
     Ok(linked)
 }
