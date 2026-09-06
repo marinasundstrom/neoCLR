@@ -190,6 +190,10 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                     }
                     let pc = pending.function.body.len();
                     let argument = match word {
+                        "unaligned." => Some(serde_json::json!(
+                            rest.parse::<u8>()
+                                .map_err(|_| Fault::new("expected unaligned. 1, 2, or 4"))?
+                        )),
                         "ldc.i4" => Some(serde_json::json!(
                             rest.parse::<i32>()
                                 .map_err(|_| Fault::new("expected Int32 literal"))?

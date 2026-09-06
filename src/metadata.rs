@@ -216,6 +216,8 @@ pub struct FunctionRef {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "op", content = "arg", deny_unknown_fields)]
 pub enum Instruction {
+    #[serde(rename = "unaligned.")]
+    Unaligned(u8),
     #[serde(rename = "ldc.i4")]
     Int(i32),
     #[serde(rename = "ldc.i8")]
@@ -532,4 +534,33 @@ pub(crate) fn validate_slot_names(
         }
     }
     Ok(())
+}
+
+impl Instruction {
+    pub(crate) fn accepts_unaligned(&self) -> bool {
+        matches!(
+            self,
+            Self::LoadObject(_)
+                | Self::StoreObject(_)
+                | Self::LoadIndirectInt8
+                | Self::LoadIndirectUInt8
+                | Self::LoadIndirectInt16
+                | Self::LoadIndirectUInt16
+                | Self::LoadIndirectInt32
+                | Self::LoadIndirectUInt32
+                | Self::LoadIndirectInt64
+                | Self::LoadIndirectNative
+                | Self::LoadIndirectFloat32
+                | Self::LoadIndirectFloat64
+                | Self::StoreIndirectInt8
+                | Self::StoreIndirectInt16
+                | Self::StoreIndirectInt32
+                | Self::StoreIndirectInt64
+                | Self::StoreIndirectNative
+                | Self::StoreIndirectFloat32
+                | Self::StoreIndirectFloat64
+                | Self::CopyBlock
+                | Self::InitializeBlock
+        )
+    }
 }

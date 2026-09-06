@@ -165,8 +165,22 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         if function.body.is_empty() {
             return Err(Fault::new("empty function body"));
         }
-        for op in &function.body {
+        let valid_target = |index: usize| {
+            index < function.body.len()
+                && (index == 0 || !matches!(function.body[index - 1], Op::Unaligned(_)))
+        };
+        for (pc, op) in function.body.iter().enumerate() {
             match op {
+                Op::Unaligned(alignment) => {
+                    if !matches!(alignment, 1 | 2 | 4) {
+                        return Err(Fault::new("unaligned. requires alignment 1, 2, or 4"));
+                    }
+                    if !function.body.get(pc + 1).is_some_and(Op::accepts_unaligned) {
+                        return Err(Fault::new(
+                            "unaligned. must immediately precede a supported memory access",
+                        ));
+                    }
+                }
                 Op::Branch(i)
                 | Op::BranchTrue(i)
                 | Op::BranchFalse(i)
@@ -180,12 +194,16 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 | Op::BranchGreaterEqualUnsigned(i)
                 | Op::BranchLessEqual(i)
                 | Op::BranchLessEqualUnsigned(i)
-                    if *i >= function.body.len() =>
+                    if !valid_target(*i) =>
                 {
-                    return Err(Fault::new("branch outside function"));
+                    return Err(Fault::new(
+                        "branch outside function or into prefixed instruction",
+                    ));
                 }
-                Op::Switch(targets) if targets.iter().any(|i| *i >= function.body.len()) => {
-                    return Err(Fault::new("switch target outside function"));
+                Op::Switch(targets) if targets.iter().any(|i| !valid_target(*i)) => {
+                    return Err(Fault::new(
+                        "switch target outside function or into prefixed instruction",
+                    ));
                 }
                 Op::Arg(i) | Op::StoreArg(i) if *i >= function.argument_types().len() => {
                     return Err(Fault::new("argument index outside signature"));
@@ -393,6 +411,10 @@ fn interpret(
             function: Some(function.name.clone()),
             instruction: Some(pc),
         })?;
+        let access_alignment = match pc.checked_sub(1).and_then(|i| function.body.get(i)) {
+            Some(Op::Unaligned(alignment)) => Some(*alignment as usize),
+            _ => None,
+        };
         frame.pc += 1;
         let context = function.name.clone();
         // Host Result propagates terminal faults; there is no guest exception machinery.
@@ -401,6 +423,7 @@ fn interpret(
                 .last_mut()
                 .ok_or_else(|| Fault::new("missing frame"))?;
             match op {
+                Op::Unaligned(_) => (),
                 Op::Int(n) => frame.stack.push(Value::Int32(*n)),
                 Op::Float32 { bits } => frame
                     .stack
@@ -810,7 +833,10 @@ fn interpret(
                         crate::numeric::indirect_type(op, &pointer.target)?
                     };
                     pointer.target = ty.clone();
-                    let layout = crate::memory::layout(module, &ty)?;
+                    let mut layout = crate::memory::layout(module, &ty)?;
+                    if let Some(alignment) = access_alignment {
+                        layout.alignment = layout.alignment.min(alignment);
+                    }
                     frame.stack.push(memory.read(&pointer, &layout)?.on_stack());
                 }
                 Op::StoreObject(_)
@@ -834,7 +860,10 @@ fn interpret(
                     let value = value
                         .for_storage(ty)
                         .map_err(|_| Fault::new("memory store type mismatch"))?;
-                    let layout = crate::memory::layout(module, ty)?;
+                    let mut layout = crate::memory::layout(module, ty)?;
+                    if let Some(alignment) = access_alignment {
+                        layout.alignment = layout.alignment.min(alignment);
+                    }
                     memory.write(&pointer, &layout, &value)?;
                 }
                 Op::HeapNew => {

@@ -574,3 +574,21 @@ metadata compatibility, packed field alignment Faults, roundtrip execution, and 
 Validation: all 170 integration tests pass on macOS ARM64; formatting, clippy, and
 diff checks pass. The layout sample prints 42 and 8, then releases its allocation.
 Linux and Windows execution remain for the existing CI matrix.
+
+## 2026-09-06 — Unaligned memory access prefix
+
+Implemented unaligned. with alignment values 1, 2, and 4 for typed/indirect loads
+and stores and byte-block operations. Typed accesses relax natural alignment to the
+specified cap while retaining all other pointer, type, initialization, and bounds
+checks. The prefix modifies one following instruction and is represented explicitly
+in prototype metadata. Validation rejects unsupported targets, invalid/dangling or
+repeated prefixes, and control flow entering the modified operation past its prefix.
+Current value-based ldfld/stfld are not prefix targets; use ldflda plus indirect access.
+
+Updated the packed layout sample. Six tests cover typed/indirect roundtrip, one-access
+scope, alignment promises, preserved memory diagnostics, source/metadata validation,
+branch and switch entry restrictions, and block operations.
+
+Validation: all 176 integration tests pass on macOS ARM64; formatting, clippy, and
+diff checks pass. The packed layout sample prints 42 and 8 through a prefixed load.
+Linux and Windows execution remain for the existing CI matrix.

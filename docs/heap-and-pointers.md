@@ -164,7 +164,7 @@ prototype choices: CLR documents unsigned 32-bit counts, natural machine alignme
 unless prefixed with `unaligned.`, and unspecified overlapping `cpblk` behavior.
 See Microsoft's [cpblk documentation](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.cpblk)
 and [initblk documentation](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.initblk).
-No volatile or unaligned prefixes are implemented yet.
+The `unaligned.` prefix is now supported for these accesses; volatile remains pending.
 
 All four operations require live tracked allocations with in-bounds ranges. Even
 zero-length operations validate addresses (one-past-end is permitted; null, stale,
@@ -260,9 +260,34 @@ see [Microsoft's packing reference](https://learn.microsoft.com/en-us/dotnet/api
 Whole-record `ldobj`, `stobj`, `cpobj`, and `initobj` honor the packed layout, with
 byte-based encoding and decoding. A field address may be unaligned for its own type;
 ordinary indirect access still checks that type's natural alignment and can Fault.
-Load the whole record and extract a value field when appropriate. The `unaligned.`
-prefix, explicit field offsets/overlap, and struct-by-value native calls remain pending.
+Load the whole record and extract a value field when appropriate. Use `unaligned. 1` immediately before a supported indirect access to a byte-packed
+field. Explicit field offsets/overlap and struct-by-value native calls remain pending.
 Packing alone does not establish a foreign ABI or perform marshaling.
 
 Run `examples/layout.neoil` for packed storage; it prints 42 and the reserved size 8,
 then frees its allocation.
+
+
+## Unaligned memory access
+
+`unaligned. 1`, `unaligned. 2`, or `unaligned. 4` immediately precedes `ldobj`,
+`stobj`, an implemented `ldind`/`stind` instruction, `cpblk`, or `initblk`. Typed
+access requires the smaller of its natural alignment and the declared alignment.
+The interpreter uses byte copying, so no misaligned host typed dereference is needed.
+Bounds, initialization, pointer tracking, type checks, and lifetime checks still apply.
+Block operations already use byte alignment in this prototype, so the prefix has
+no further effect on them. The declared alignment does not strengthen an access's
+natural alignment requirement.
+
+The prefix modifies only the next instruction. Validation rejects other values,
+a dangling or repeated prefix, unsupported following instructions, and branch/switch
+targets that enter the modified instruction instead of its prefix. The prefix is a
+separate JSON instruction and consumes one interpreter instruction-budget step.
+Labels may point at the prefix. No volatile prefix or prefix combinations are supported.
+
+Unlike CLR pointer field access, neoCLR's current ldfld/stfld work on record values;
+they do not accept this prefix. Obtain the field pointer with ldflda and prefix the
+following indirect access instead. `initobj` and `cpobj` are not valid prefix targets.
+See [Microsoft's unaligned reference](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.unaligned)
+for the CLI alignment values and instruction family. The layout sample now uses an
+unaligned indirect load to read Packet::Number.

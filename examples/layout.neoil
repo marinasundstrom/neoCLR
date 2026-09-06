@@ -18,10 +18,11 @@
     ldc.i4.s 42
     newobj Packet
     stobj Packet
-    ; Whole-value access handles packed fields without an unaligned pointer load.
+    ; Access the packed Int32 field using an explicit alignment prefix.
     ldloc packet
-    ldobj Packet
-    ldfld Packet::Number
+    ldflda Packet::Number
+    unaligned. 1
+    ldind.i4
     call System.Console::WriteLine(Int32)
     pop
     sizeof Packet

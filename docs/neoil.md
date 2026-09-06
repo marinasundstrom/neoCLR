@@ -195,6 +195,7 @@ normalization; other checks use exact type equality. See [integer storage](integ
 | `ptr.cast T` | `Ptr<U> → Ptr<T>` | Reinterpret target type, preserving address |
 | `ptr.add` | `Ptr<T>,Int32 or IntPtr → Ptr<T>` | Signed byte offset; checked prototype bounds |
 | `ldflda i` | `Ptr<Record> → Ptr<T>` | Address field at zero-based index |
+| `unaligned. n` | `→` | Prefix a supported memory access with alignment 1, 2, or 4 |
 | `ldobj T` | `Ptr<T> → T` | Copy initialized value from native storage |
 | `stobj T` | `Ptr<T>,T →` | Copy value into native storage |
 | `initobj T` | `Ptr<T> →` | Zero a supported native layout without a constructor |
@@ -459,3 +460,5 @@ field declaration names may remain in metadata for tools; instruction execution
 uses indices exclusively.
 
 Record declarations accept `.pack n` and `.size n`; see [sequential layout controls](heap-and-pointers.md#sequential-packing-and-size-controls) for alignment, minimum-size, and native-access rules.
+
+See [unaligned access](heap-and-pointers.md#unaligned-memory-access) for supported prefix targets and control-flow restrictions.
