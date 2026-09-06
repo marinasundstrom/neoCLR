@@ -47,7 +47,7 @@ fn escaped_local_pointers_fault_after_return_even_when_stored_in_heap() {
     let extra = ".function Escape() -> Int32*\nldc.i4 4\nlocalloc\nptr.cast Int32\ndup\ninitobj Int32\nret\n.end";
     for body in [
         "call Escape()\nldobj Int32",
-        ".local slot: Int32**\nldc.i4 1\nheap.alloc Int32*\nstloc slot\nldloc slot\ncall Escape()\nstobj Int32*\nldloc slot\nldobj Int32*\nldobj Int32",
+        ".local Int32** slot\nldc.i4 1\nheap.alloc Int32*\nstloc slot\nldloc slot\ncall Escape()\nstobj Int32*\nldloc slot\nldobj Int32*\nldobj Int32",
     ] {
         assert!(
             run(&program(body, extra), Limits::default())
@@ -60,8 +60,8 @@ fn escaped_local_pointers_fault_after_return_even_when_stored_in_heap() {
 
 #[test]
 fn callee_release_keeps_caller_storage_live() {
-    let body = ".local p: Int32*\nldc.i4 4\nlocalloc\nptr.cast Int32\nstloc p\nldloc p\ncall Mutate(Int32*)\npop\nldloc p\nldobj Int32";
-    let extra = ".function Mutate(p: Int32*) -> Void\nldc.i4 8\nlocalloc\npop\nldarg p\nldc.i4 42\nstobj Int32\nldvoid\nret\n.end";
+    let body = ".local Int32* p\nldc.i4 4\nlocalloc\nptr.cast Int32\nstloc p\nldloc p\ncall Mutate(Int32*)\npop\nldloc p\nldobj Int32";
+    let extra = ".function Mutate(Int32* p) -> Void\nldc.i4 8\nlocalloc\npop\nldarg p\nldc.i4 42\nstobj Int32\nldvoid\nret\n.end";
     let result = run(&program(body, extra), Limits::default()).unwrap();
     assert_eq!(result.value, Value::Int32(42));
     assert_eq!(result.memory.live_allocations(), 0);
@@ -141,7 +141,7 @@ fn zero_size_and_native_counts_have_frame_lifetime() {
 
 #[test]
 fn local_storage_supports_widest_primitive_alignment() {
-    let body = ".local p: Double*\nldc.i4 8\nlocalloc\nptr.cast Double\nstloc p\nldloc p\nldc.r8 42\nstind.r8\nldloc p\nldind.r8\nconv.i4";
+    let body = ".local Double* p\nldc.i4 8\nlocalloc\nptr.cast Double\nstloc p\nldloc p\nldc.r8 42\nstind.r8\nldloc p\nldind.r8\nconv.i4";
     assert_eq!(
         run(&program(body, ""), Limits::default()).unwrap().value,
         Value::Int32(42)

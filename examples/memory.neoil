@@ -7,8 +7,8 @@
 .end
 
 .function Main() -> Void
-    .local source: Point*
-    .local destination: Point*
+    .local Point* source
+    .local Point* destination
     ldc.i4 1
     heap.alloc Point
     stloc source

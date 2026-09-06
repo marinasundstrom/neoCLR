@@ -1,7 +1,7 @@
 .module ControlFlow
 .entry Main
 
-.function Describe(value: Int32) -> String
+.function Describe(Int32 value) -> String
     ldarg value
     switch (Zero, One, Many)
     ldstr "outside table"
@@ -18,7 +18,7 @@ Many:
 .end
 
 .function Main() -> Void
-    .local index: Int32
+    .local Int32 index
     ldc.i4 0
     stloc index
 Loop:

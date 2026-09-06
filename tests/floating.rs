@@ -130,11 +130,11 @@ fn single_storage_and_explicit_conversion_round_but_stack_keeps_binary64() {
     assert_eq!(number("ldc.r8 16777217\nconv.r4"), 16777216.0);
     assert_eq!(number("ldc.r4 16777216\nldc.r4 1\nadd"), 16777217.0);
     assert_eq!(
-        number(".local s: Single\nldc.r8 16777217\nstloc s\nldloc s"),
+        number(".local Single s\nldc.r8 16777217\nstloc s\nldloc s"),
         16777216.0
     );
     assert_eq!(eval("Single", "ldc.r8 16777217"), Value::Single(16777216.0));
-    let source = ".module Test\n.entry Main\n.type Box\n.field s Single\n.end\n.function Round(s: Single) -> Single\nldarg s\nret\n.end\n.function Main() -> Double\nldc.r8 16777217\ncall Round(Single)\nnewobj Box\nldfld 0\nret\n.end";
+    let source = ".module Test\n.entry Main\n.type Box\n.field s Single\n.end\n.function Round(Single s) -> Single\nldarg s\nret\n.end\n.function Main() -> Double\nldc.r8 16777217\ncall Round(Single)\nnewobj Box\nldfld 0\nret\n.end";
     assert_eq!(
         run(&assemble(source).unwrap(), Limits::default())
             .unwrap()

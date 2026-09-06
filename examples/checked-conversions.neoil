@@ -2,13 +2,13 @@
 .entry Main
 
 ; Checked narrowing truncates a floating-point fraction, then validates its range.
-.function ToByte(value: Double) -> Byte
+.function ToByte(Double value) -> Byte
     ldarg value
     conv.ovf.u1
     ret
 .end
 
-.function SignedConversions(value: Int32) -> Int32
+.function SignedConversions(Int32 value) -> Int32
     ldarg value
     conv.ovf.i1
     conv.ovf.u1
@@ -24,7 +24,7 @@
     ret
 .end
 
-.function UnsignedConversions(value: Int32) -> Int32
+.function UnsignedConversions(Int32 value) -> Int32
     ldarg value
     conv.ovf.i1.un
     conv.ovf.u1.un

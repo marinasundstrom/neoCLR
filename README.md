@@ -124,7 +124,7 @@ reference resolution. See [runtime library design](docs/runtime-library.md).
 
 - Module, type/field, and free-function metadata, with typed parameters and locals.
 - Signature-based overload resolution and structured call references.
-- Optional parameter/local names (`value: string`, `.local point: Point`), preserved
+- Optional parameter/local names (`string value`, `.local Point point`), preserved
   in metadata; named operands assemble to indices.
 - Canonical System primitive definitions, type-owned static methods, and read-only
   instance receiver snapshots; see [type system](docs/type-system.md).

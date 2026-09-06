@@ -4,7 +4,7 @@ A free function or static method can declare a native import:
 
 ```text
 .type Native
-    .method static Add(a: Int32, b: Int32) -> Int32
+    .method static Add(Int32 a, Int32 b) -> Int32
         .pinvoke "./target/native/neoclr_sample" "neoclr_add" cdecl
     .end
 .end

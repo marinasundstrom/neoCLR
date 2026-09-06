@@ -42,7 +42,7 @@ fn layout_has_deterministic_field_alignment_and_tail_padding() {
 
 #[test]
 fn aggregate_reads_require_fields_but_not_padding_to_be_initialized() {
-    let module = assemble(".module Test\n.entry Main\n.type Mixed\n.field flag Boolean\n.field value Int32\n.end\n.function Main() -> Mixed\n.local p: Mixed*\nldc.i4 1\nheap.alloc Mixed\nstloc p\nldloc p\nldflda 0\nldc.bool true\nstobj Boolean\nldloc p\nldflda 1\nldc.i4 42\nstind.i4\nldloc p\nldobj Mixed\nldloc p\nheap.free\npop\nret\n.end").unwrap();
+    let module = assemble(".module Test\n.entry Main\n.type Mixed\n.field flag Boolean\n.field value Int32\n.end\n.function Main() -> Mixed\n.local Mixed* p\nldc.i4 1\nheap.alloc Mixed\nstloc p\nldloc p\nldflda 0\nldc.bool true\nstobj Boolean\nldloc p\nldflda 1\nldc.i4 42\nstind.i4\nldloc p\nldobj Mixed\nldloc p\nheap.free\npop\nret\n.end").unwrap();
     assert_eq!(
         run(&module, Limits::default()).unwrap().value,
         Value::Object {
@@ -57,7 +57,7 @@ fn pointer_aliases_observe_writes_and_offsets_can_move_back_from_one_past() {
     assert_eq!(
         eval(
             "Int32",
-            ".local p: int32*\nldc.i4 2\nheap.alloc int32\nstloc p\nldloc p\nldc.i4 4\nptr.add\nldc.i4 -123\nstind.i4\nldloc p\nldc.i4 8\nptr.add\nldc.i4 -4\nptr.add\nldind.i4\nldloc p\nheap.free\npop"
+            ".local int32* p\nldc.i4 2\nheap.alloc int32\nstloc p\nldloc p\nldc.i4 4\nptr.add\nldc.i4 -123\nstind.i4\nldloc p\nldc.i4 8\nptr.add\nldc.i4 -4\nptr.add\nldind.i4\nldloc p\nheap.free\npop"
         ),
         Value::Int32(-123)
     );
@@ -120,7 +120,7 @@ fn invalid_pointer_operations_fault_with_instruction_locations() {
 
 #[test]
 fn allocation_identities_are_not_reused_after_free() {
-    let fault = run(&program("Int32", ".local stale: int32*\nldc.i4 1\nheap.alloc int32\ndup\nstloc stale\nheap.free\npop\nldc.i4 1\nheap.alloc int32\nldc.i4 42\nstind.i4\nldloc stale\nldind.i4"), Limits::default()).unwrap_err();
+    let fault = run(&program("Int32", ".local int32* stale\nldc.i4 1\nheap.alloc int32\ndup\nstloc stale\nheap.free\npop\nldc.i4 1\nheap.alloc int32\nldc.i4 42\nstind.i4\nldloc stale\nldind.i4"), Limits::default()).unwrap_err();
     assert!(fault.message.contains("use after free"));
 }
 
@@ -191,7 +191,7 @@ fn freeing_releases_byte_budget_but_not_allocation_identity_budget() {
 
 #[test]
 fn pointer_can_escape_call_frame_until_explicit_free() {
-    let module = assemble(".module Test\n.entry Main\n.function Make() -> int32*\nldc.i4 1\nheap.alloc int32\ndup\nldc.i4 42\nstind.i4\nret\n.end\n.function Main() -> int32\n.local p: int32*\ncall Make()\nstloc p\nldloc p\nldind.i4\nldloc p\nheap.free\npop\nret\n.end").unwrap();
+    let module = assemble(".module Test\n.entry Main\n.function Make() -> int32*\nldc.i4 1\nheap.alloc int32\ndup\nldc.i4 42\nstind.i4\nret\n.end\n.function Main() -> int32\n.local int32* p\ncall Make()\nstloc p\nldloc p\nldind.i4\nldloc p\nheap.free\npop\nret\n.end").unwrap();
     assert_eq!(
         run(&module, Limits::default()).unwrap().value,
         Value::Int32(42)
@@ -216,7 +216,7 @@ fn unsupported_and_recursive_layouts_are_rejected_before_execution() {
 
 #[test]
 fn records_can_be_allocated_as_contiguous_elements() {
-    let module = assemble(".module Test\n.entry Main\n.type Box\n.field value Int32\n.end\n.function Main() -> Int32\n.local p: Box*\nldc.i4 2\nheap.alloc Box\nstloc p\nldloc p\nsizeof Box\nptr.add\nldc.i4 42\nnewobj Box\nstobj Box\nldloc p\nsizeof Box\nptr.add\nldflda 0\nldind.i4\nldloc p\nheap.free\npop\nret\n.end").unwrap();
+    let module = assemble(".module Test\n.entry Main\n.type Box\n.field value Int32\n.end\n.function Main() -> Int32\n.local Box* p\nldc.i4 2\nheap.alloc Box\nstloc p\nldloc p\nsizeof Box\nptr.add\nldc.i4 42\nnewobj Box\nstobj Box\nldloc p\nsizeof Box\nptr.add\nldflda 0\nldind.i4\nldloc p\nheap.free\npop\nret\n.end").unwrap();
     assert_eq!(
         run(&module, Limits::default()).unwrap().value,
         Value::Int32(42)
@@ -252,7 +252,7 @@ fn pointers_round_trip_through_native_storage_and_casts() {
     assert_eq!(
         eval(
             "int32",
-            ".local p: int32*\n.local slot: int32**\nldc.i4 1\nheap.alloc int32\nstloc p\nldloc p\nldc.i4 42\nstind.i4\nldc.i4 1\nheap.alloc int32*\nstloc slot\nldloc slot\nldloc p\nstobj int32*\nldloc slot\nptr.cast Void\nptr.cast int32*\nldobj int32*\nldind.i4\nldloc p\nheap.free\npop\nldloc slot\nheap.free\npop"
+            ".local int32* p\n.local int32** slot\nldc.i4 1\nheap.alloc int32\nstloc p\nldloc p\nldc.i4 42\nstind.i4\nldc.i4 1\nheap.alloc int32*\nstloc slot\nldloc slot\nldloc p\nstobj int32*\nldloc slot\nptr.cast Void\nptr.cast int32*\nldobj int32*\nldind.i4\nldloc p\nheap.free\npop\nldloc slot\nheap.free\npop"
         ),
         Value::Int32(42)
     );
@@ -267,7 +267,7 @@ fn pointers_round_trip_through_native_storage_and_casts() {
 
 #[test]
 fn recursive_pointer_fields_have_finite_layout_and_preserve_aliases() {
-    let module = assemble(".module Test\n.entry Main\n.type Node\n.field next Node*\n.field value int32\n.end\n.function Main() -> int32\n.local node: Node*\nldc.i4 1\nheap.alloc Node\nstloc node\nldloc node\nldloc node\nldc.i4 42\nnewobj Node\nstobj Node\nldloc node\nldobj Node\nldfld 0\nldflda 1\nldind.i4\nldloc node\nheap.free\npop\nret\n.end").unwrap();
+    let module = assemble(".module Test\n.entry Main\n.type Node\n.field next Node*\n.field value int32\n.end\n.function Main() -> int32\n.local Node* node\nldc.i4 1\nheap.alloc Node\nstloc node\nldloc node\nldloc node\nldc.i4 42\nnewobj Node\nstobj Node\nldloc node\nldobj Node\nldfld 0\nldflda 1\nldind.i4\nldloc node\nheap.free\npop\nret\n.end").unwrap();
     assert_eq!(
         run(&module, Limits::default()).unwrap().value,
         Value::Int32(42)
@@ -276,7 +276,7 @@ fn recursive_pointer_fields_have_finite_layout_and_preserve_aliases() {
 
 #[test]
 fn stored_pointers_retain_use_after_free_diagnostics() {
-    let fault = run(&program("int32", ".local p: int32*\nldc.i4 1\nheap.alloc int32\nstloc p\nldc.i4 1\nheap.alloc int32*\ndup\nldloc p\nstobj int32*\nldloc p\nheap.free\npop\nldobj int32*\nldind.i4"), Limits::default()).unwrap_err();
+    let fault = run(&program("int32", ".local int32* p\nldc.i4 1\nheap.alloc int32\nstloc p\nldc.i4 1\nheap.alloc int32*\ndup\nldloc p\nstobj int32*\nldloc p\nheap.free\npop\nldobj int32*\nldind.i4"), Limits::default()).unwrap_err();
     assert!(fault.message.contains("use after free"));
 }
 

@@ -423,3 +423,24 @@ serialized targets, operand types, underflow, and instruction budgets.
 Validation: all 138 integration tests pass on macOS ARM64; formatting, clippy, and
 diff checks pass. The sample prints zero, one, two, and outside table in order.
 Linux and Windows execution remain for the existing CI matrix.
+
+## 2026-09-06 — Type-first parameter and local syntax
+
+Changed inline parameters to `Type` or `Type name`, and locals to `.local Type`
+or `.local Type name`, following the revised assembly syntax decision. Legacy
+`.param` declarations use the same type-first order. Names remain unquoted and
+optional; the former colon syntax is rejected. Call signatures remain type-only,
+and name tables and numeric instruction operands retain their existing encoding.
+
+The parser recognizes a complete type before separating an optional trailing name,
+so whitespace in generic arguments and pointer types remains valid. Migrated the
+System library, samples, test programs, and current documentation. Historical work
+log entries retain the earlier decision for context; this entry supersedes it.
+
+Added coverage for nested/spaced generic and pointer declarations, omitted names,
+execution through numeric slots, and rejection of old syntax, quoted names, and
+extra names. Existing checks cover duplicate names, reserved names, overload identity,
+instance receiver indices, and metadata roundtrip.
+
+Validation: all 141 integration tests pass on macOS ARM64; clippy, formatting, and
+diff checks pass. The names sample prints 42 and returns Ok(Void).

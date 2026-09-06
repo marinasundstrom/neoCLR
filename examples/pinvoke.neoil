@@ -2,19 +2,19 @@
 .entry Main
 
 .type Native
-    .method static Add(a: Int32, b: Int32) -> Int32
+    .method static Add(Int32 a, Int32 b) -> Int32
         .pinvoke "./target/native/neoclr_sample" "neoclr_add" cdecl
     .end
-    .method static Set(destination: Int32*, value: Int32) -> Void
+    .method static Set(Int32* destination, Int32 value) -> Void
         .pinvoke "./target/native/neoclr_sample" "neoclr_set_i32" cdecl
     .end
-    .method static Identity(value: Int32*) -> Int32*
+    .method static Identity(Int32* value) -> Int32*
         .pinvoke "./target/native/neoclr_sample" "neoclr_identity_ptr" cdecl
     .end
 .end
 
 .function Main() -> Void
-    .local value: Int32*
+    .local Int32* value
     ldc.i4 1
     heap.alloc Int32
     stloc value

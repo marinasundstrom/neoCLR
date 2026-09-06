@@ -53,24 +53,24 @@ The CLI displays the return value in a diagnostic Rust-style representation.
 
 ## Parameter and local names
 
-Use `name: Type` consistently in declarations:
+Use `Type name` consistently in declarations:
 
 ```text
-.method static Parse(value: string) -> Result<Int32,Error>
+.method static Parse(string value) -> Result<Int32,Error>
     ldarg value
     call neoCLR.Runtime.ParseInt32(string)
     ret
 .end
 
 .function Main() -> Result<Void,Error>
-    .local point: Point
+    .local Point point
     ...
 .end
 ```
 
 Names are optional: `Parse(string)` and `.local Point` remain valid. Named and
-unnamed slots can be mixed. Legacy `.param value: string` is also accepted with
-headers that omit an inline parameter list. Type-first quoted names are not syntax.
+unnamed slots can be mixed. Legacy `.param string value` is also accepted with
+headers that omit an inline parameter list. Names are unquoted; the former `name: Type` syntax is no longer accepted.
 
 `ldarg value`, `ldloc point`, and `stloc point` resolve to numeric indices during
 assembly. Numeric operands remain valid even when slots have names. Calls continue

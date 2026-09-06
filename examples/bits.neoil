@@ -2,7 +2,7 @@
 .entry Main
 
 .function Main() -> Void
-    .local packed: UInt32
+    .local UInt32 packed
     ; Pack two bytes, then recover the high byte.
     ldc.i4 18
     ldc.i4 8

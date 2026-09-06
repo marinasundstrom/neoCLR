@@ -17,7 +17,7 @@ storage. `ldobj T` copies it out. Changing storage later does not change that co
 For records containing pointers, the copied pointer fields still alias their targets.
 
 ```text
-.local point: Point*
+.local Point* point
 ldc.i4 1
 heap.alloc Point
 stloc point

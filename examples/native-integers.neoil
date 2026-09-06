@@ -2,8 +2,8 @@
 .entry Main
 
 .function Main() -> Void
-    .local storage: int32*
-    .local address: nuint
+    .local int32* storage
+    .local nuint address
 
     ; Allocate two integers using a native-sized count.
     ldc.i4 2

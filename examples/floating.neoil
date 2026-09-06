@@ -1,7 +1,7 @@
 .module Floating
 .entry Main
 
-.function Half(value: Double) -> Single
+.function Half(Double value) -> Single
     ldarg value
     ldc.r8 2.0
     div
@@ -9,8 +9,8 @@
 .end
 
 .function Main() -> Void
-    .local single: Single*
-    .local double: Double*
+    .local Single* single
+    .local Double* double
 
     ldc.i4 1
     heap.alloc Single

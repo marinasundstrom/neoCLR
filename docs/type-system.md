@@ -53,8 +53,8 @@ multi-assembly identity is complete.
 .end
 ```
 
-Parameters may be named, for example `Parse(value: string)`, and locals use
-`.local point: Point`. Names are optional metadata, not part of type identity or
+Parameters may be named, for example `Parse(string value)`, and locals use
+`.local Point point`. Names are optional metadata, not part of type identity or
 overload selection. `ldarg value` and `ldarg this` resolve to numeric indices.
 
 `.method static Name(...) -> T` and `.method instance Name(...) -> T` are declared

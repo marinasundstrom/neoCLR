@@ -50,7 +50,7 @@ fn empty_switch_pops_index_and_preserves_older_stack_values() {
 #[test]
 fn switch_supports_backward_targets() {
     let module = program(
-        ".local index: Int32\nldc.i4 0\nstloc index\nbr Test\nIncrement:\nldloc index\nldc.i4 1\nadd\nstloc index\nTest:\nldloc index\nswitch (Increment, Increment)\nldloc index\nret",
+        ".local Int32 index\nldc.i4 0\nstloc index\nbr Test\nIncrement:\nldloc index\nldc.i4 1\nadd\nstloc index\nTest:\nldloc index\nswitch (Increment, Increment)\nldloc index\nret",
     );
     assert_eq!(
         run(&module, Limits::default()).unwrap().value,

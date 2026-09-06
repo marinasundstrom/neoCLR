@@ -508,16 +508,19 @@ fn parse_callable(text: &str, named: bool) -> Result<(FunctionRef, Vec<Option<St
 }
 
 fn parse_slot(text: &str) -> Result<(Option<String>, Type), Fault> {
-    match text.split_once(':') {
-        Some((name, ty)) => {
-            let name = name.trim();
-            if !crate::metadata::valid_slot_name(name) {
-                return Err(Fault::new("invalid parameter/local name"));
-            }
-            Ok((Some(name.into()), parse_type(ty)?))
-        }
-        None => Ok((None, parse_type(text)?)),
+    let text = text.trim();
+    // Try the complete type first: whitespace inside generic arguments and
+    // between pointer suffixes does not introduce a name.
+    if let Ok(ty) = parse_type(text) {
+        return Ok((None, ty));
     }
+    let (ty, name) = text
+        .rsplit_once(char::is_whitespace)
+        .ok_or_else(|| Fault::new("expected Type or Type name"))?;
+    if !crate::metadata::valid_slot_name(name) {
+        return Err(Fault::new("invalid parameter/local name"));
+    }
+    Ok((Some(name.into()), parse_type(ty)?))
 }
 
 fn resolve_slot(function: &Function, op: &str, operand: &str) -> Result<usize, Fault> {

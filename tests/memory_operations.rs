@@ -1,7 +1,7 @@
 use neoclr::{Limits, Value, assemble, load, run};
 
 fn execute(body: &str) -> Result<Value, neoclr::Fault> {
-    let module = assemble(&format!(".module Test\n.entry Main\n.function Main() -> Int32\n.local p: Int32*\n.local q: Int32*\nldc.i4 2\nheap.alloc Int32\nstloc p\nldc.i4 2\nheap.alloc Int32\nstloc q\n{body}\nret\n.end")).unwrap();
+    let module = assemble(&format!(".module Test\n.entry Main\n.function Main() -> Int32\n.local Int32* p\n.local Int32* q\nldc.i4 2\nheap.alloc Int32\nstloc p\nldc.i4 2\nheap.alloc Int32\nstloc q\n{body}\nret\n.end")).unwrap();
     run(&module, Limits::default()).map(|e| e.value)
 }
 
@@ -84,7 +84,7 @@ fn block_counts_accept_native_integers_and_zero_at_one_past_end() {
 
 #[test]
 fn block_copy_preserves_full_pointer_tracking() {
-    let module = assemble(".module Test\n.entry Main\n.function Main() -> Int32\n.local p: Int32*\n.local src: Int32**\n.local dst: Int32**\nldc.i4 1\nheap.alloc Int32\nstloc p\nldc.i4 1\nheap.alloc Int32*\nstloc src\nldc.i4 1\nheap.alloc Int32*\nstloc dst\nldloc src\nldloc p\nstobj Int32*\nldloc dst\nldloc src\nsizeof Int32*\ncpblk\nldloc p\nheap.free\npop\nldloc dst\nldobj Int32*\nldobj Int32\nret\n.end").unwrap();
+    let module = assemble(".module Test\n.entry Main\n.function Main() -> Int32\n.local Int32* p\n.local Int32** src\n.local Int32** dst\nldc.i4 1\nheap.alloc Int32\nstloc p\nldc.i4 1\nheap.alloc Int32*\nstloc src\nldc.i4 1\nheap.alloc Int32*\nstloc dst\nldloc src\nldloc p\nstobj Int32*\nldloc dst\nldloc src\nsizeof Int32*\ncpblk\nldloc p\nheap.free\npop\nldloc dst\nldobj Int32*\nldobj Int32\nret\n.end").unwrap();
     assert!(
         run(&module, Limits::default())
             .unwrap_err()
@@ -95,7 +95,7 @@ fn block_copy_preserves_full_pointer_tracking() {
 
 #[test]
 fn unsupported_native_layouts_cannot_be_zero_initialized() {
-    assert!(assemble(".module Test\n.function Zero(p: String*) -> Void\nldarg p\ninitobj String\nldvoid\nret\n.end").is_err());
+    assert!(assemble(".module Test\n.function Zero(String* p) -> Void\nldarg p\ninitobj String\nldvoid\nret\n.end").is_err());
 }
 
 #[test]
@@ -120,7 +120,7 @@ fn zero_length_writes_preserve_pointer_tracking_but_partial_writes_invalidate_it
             "untracked native pointer access",
         ),
     ] {
-        let module = assemble(&format!(".module Test\n.entry Main\n.function Main() -> Int32\n.local p: Int32*\n.local slot: Int32**\nldc.i4 1\nheap.alloc Int32\nstloc p\nldc.i4 1\nheap.alloc Int32*\nstloc slot\nldloc slot\nldloc p\nstobj Int32*\n{operation}\nldloc p\nheap.free\npop\nldloc slot\nldobj Int32*\nldobj Int32\nret\n.end")).unwrap();
+        let module = assemble(&format!(".module Test\n.entry Main\n.function Main() -> Int32\n.local Int32* p\n.local Int32** slot\nldc.i4 1\nheap.alloc Int32\nstloc p\nldc.i4 1\nheap.alloc Int32*\nstloc slot\nldloc slot\nldloc p\nstobj Int32*\n{operation}\nldloc p\nheap.free\npop\nldloc slot\nldobj Int32*\nldobj Int32\nret\n.end")).unwrap();
         assert!(
             run(&module, Limits::default())
                 .unwrap_err()

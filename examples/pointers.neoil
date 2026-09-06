@@ -7,8 +7,8 @@
 .end
 
 .function Main() -> Result<Void,Error>
-    .local point: Point*
-    .local copy: Point
+    .local Point* point
+    .local Point copy
 
     sizeof Point
     ldc.i4 8

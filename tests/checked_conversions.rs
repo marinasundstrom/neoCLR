@@ -93,7 +93,7 @@ fn source_unsignedness_is_independent_of_destination() {
     assert_eq!(
         eval(
             "Int64",
-            ".local u: UInt32\nldc.i4 -1\nstloc u\nldloc u\nconv.ovf.u8.un"
+            ".local UInt32 u\nldc.i4 -1\nstloc u\nldloc u\nconv.ovf.u8.un"
         ),
         Value::Int64(u32::MAX as i64)
     );

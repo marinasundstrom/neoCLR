@@ -69,7 +69,7 @@ fn small_integer_conversions_produce_int32_stack_values() {
 
 #[test]
 fn locals_arguments_returns_and_fields_preserve_storage_width() {
-    let source = ".module Test\n.entry Main\n.type Pair\n.field b Byte\n.field c Char\n.end\n.function Narrow(value: Byte) -> SByte\nldarg value\nret\n.end\n.function Main() -> int32\n.local pair: Pair\n.local small: Int16\nldc.i4 65535\nstloc small\nldloc small\ncall Narrow(Byte)\nldc.i4 55296\nnewobj Pair\nstloc pair\nldloc pair\nldfld 1\nldloc pair\nldfld 0\nadd\nret\n.end";
+    let source = ".module Test\n.entry Main\n.type Pair\n.field b Byte\n.field c Char\n.end\n.function Narrow(Byte value) -> SByte\nldarg value\nret\n.end\n.function Main() -> int32\n.local Pair pair\n.local Int16 small\nldc.i4 65535\nstloc small\nldloc small\ncall Narrow(Byte)\nldc.i4 55296\nnewobj Pair\nstloc pair\nldloc pair\nldfld 1\nldloc pair\nldfld 0\nadd\nret\n.end";
     assert_eq!(
         run(&assemble(source).unwrap(), Limits::default())
             .unwrap()
@@ -83,7 +83,7 @@ fn locals_arguments_returns_and_fields_preserve_storage_width() {
     assert_eq!(
         eval(
             "int32",
-            ".local u: UInt32\nldc.i4 -1\nstloc u\nldloc u\nldc.i4 1\nadd"
+            ".local UInt32 u\nldc.i4 -1\nstloc u\nldloc u\nldc.i4 1\nadd"
         ),
         Value::Int32(0)
     );

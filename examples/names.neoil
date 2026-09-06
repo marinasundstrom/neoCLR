@@ -5,7 +5,7 @@
     .field X int32
     .field Y int32
 
-    .method instance Sum(offset: int32) -> int32
+    .method instance Sum(int32 offset) -> int32
         ldarg this
         ldfld 0
         ldarg this
@@ -18,8 +18,8 @@
 .end
 
 .function Main() -> Result<Void,Error>
-    .local point: Point
-    .local message: string
+    .local Point point
+    .local string message
     ldc.i4 10
     ldc.i4 20
     newobj Point

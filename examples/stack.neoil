@@ -6,7 +6,7 @@
     .field Y Int32
 .end
 
-.function SetX(point: Point*, value: Int32) -> Void
+.function SetX(Point* point, Int32 value) -> Void
     ldarg point
     ldflda 0
     ldarg value
@@ -16,7 +16,7 @@
 .end
 
 .function MakePoint() -> Point
-    .local point: Point*
+    .local Point* point
     sizeof Point
     localloc
     ptr.cast Point

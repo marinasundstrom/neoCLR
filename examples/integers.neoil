@@ -2,11 +2,11 @@
 .entry Main
 
 .function Main() -> Void
-    .local octet: Byte*
-    .local word: UInt16*
-    .local wide: UInt64*
-    .local native: nint*
-    .local dword: UInt32*
+    .local Byte* octet
+    .local UInt16* word
+    .local UInt64* wide
+    .local nint* native
+    .local UInt32* dword
 
     ldc.i4 1
     heap.alloc Byte
