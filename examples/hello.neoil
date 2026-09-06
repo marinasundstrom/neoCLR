@@ -1,0 +1,8 @@
+.module HelloWorld
+.entry Main
+
+.function Main -> Void
+    ldstr "Hello, world!"
+    call System.Console.WriteLine
+    ret
+.end

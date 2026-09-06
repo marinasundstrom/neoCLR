@@ -1,0 +1,154 @@
+; Free functions, frame-owned records, explicit sharing, unions and loop control.
+.module Features
+.entry Main
+
+.type Point
+    .field X Int32
+    .field Y Int32
+.end
+
+.function Increment -> Int32
+    .param Int32
+    ldarg 0
+    ldc.i4 1
+    add
+    ret
+.end
+
+.function Main -> Result<Void,Error>
+    .local Point
+    .local Point
+    .local Ref<Point>
+    .local Ref<Point>
+    .local Int32
+
+    ldstr "neoCLR feature tour"
+    call System.Console.WriteLine
+    pop
+
+    ; Copy an aggregate, change the copy, and prove the original survived.
+    ldc.i4 10
+    ldc.i4 20
+    newobj Point
+    stloc 0
+    ldloc 0
+    ldc.i4 99
+    stfld 0
+    stloc 1
+    ldloc 0
+    ldfld 0
+    ldc.i4 10
+    ceq
+    brtrue CopyPassed
+    fault "aggregate copy failed"
+CopyPassed:
+    ; Promote a copy to the heap; duplicate references share identity.
+    ldloc 1
+    heap.new
+    dup
+    stloc 2
+    stloc 3
+    ldloc 2
+    ldloc 2
+    heap.load
+    ldc.i4 42
+    stfld 0
+    heap.store
+    pop
+    ldloc 3
+    heap.load
+    ldfld 0
+    ldc.i4 42
+    ceq
+    brtrue SharingPassed
+    fault "heap sharing failed"
+SharingPassed:
+    ldvoid
+    some
+    dup
+    is.case Some
+    brtrue SomePassed
+    fault "Some<Void> failed"
+SomePassed:
+    ldcase Some
+    pop
+    none Void
+    dup
+    is.case None
+    brtrue NonePassed
+    fault "None<Void> failed"
+NonePassed:
+    ldcase None
+    pop
+
+    ; A parse failure is data; explicitly handle it and continue.
+    ldstr "not a number"
+    call System.Int32.Parse
+    dup
+    is.case Err
+    brtrue ParseFailed
+    fault "expected parse error"
+ParseFailed:
+    ldcase Err
+    error "InvalidInt32"
+    ceq
+    brtrue ParseHandled
+    fault "wrong parse error"
+ParseHandled:
+    ldc.i4 84
+    ldc.i4 2
+    call System.Int32.Divide
+    ldcase Ok
+    ldc.i4 42
+    ceq
+    brtrue DivisionPassed
+    fault "division failed"
+DivisionPassed:
+    ; Construct both Result cases with Void as success type.
+    error "Demonstration"
+    err Void
+    ldcase Err
+    pop
+
+    ldc.i4 0
+    stloc 4
+Loop:
+    ldloc 4
+    call Increment
+    stloc 4
+    ldloc 4
+    ldc.i4 3
+    clt
+    brtrue Loop
+    br Arithmetic
+Arithmetic:
+    ldc.i4 7
+    ldc.i4 2
+    sub
+    ldc.i4 3
+    mul
+    ldc.i4 15
+    ceq
+    ldc.bool true
+    ceq
+    brtrue Done
+    fault "arithmetic failed"
+Done:
+    ; Familiar explicit checked arithmetic; overflow would be a terminal Fault.
+    ldc.i4 10
+    ldc.i4 2
+    add.ovf
+    ldc.i4 3
+    sub.ovf
+    ldc.i4 2
+    mul.ovf
+    ldc.i4 18
+    ceq
+    brtrue CheckedPassed
+    fault "checked arithmetic failed"
+CheckedPassed:
+    ldstr "All feature checks passed."
+    call System.Console.WriteLine
+    ok Error
+    ret
+.end
