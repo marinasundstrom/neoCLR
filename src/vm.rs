@@ -1,6 +1,6 @@
 use crate::{
     Fault, Module, Value,
-    metadata::{Case, FunctionRef, Instruction as Op, Type},
+    metadata::{Case, FunctionRef, Instruction as Op, Representation, Type},
 };
 use std::collections::HashSet;
 
@@ -32,10 +32,15 @@ pub struct Execution {
 }
 
 fn resolve(module: &Module, target: &FunctionRef) -> Option<usize> {
-    module
-        .functions
-        .iter()
-        .position(|f| f.name == target.name && f.parameters == target.parameters)
+    module.functions.iter().position(|f| {
+        f.name == target.name
+            && f.parameters == target.parameters
+            && f.instance == target.instance
+            && target
+                .owner
+                .as_ref()
+                .is_none_or(|owner| f.owner.as_ref() == Some(owner))
+    })
 }
 
 pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
@@ -55,13 +60,27 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
     if module.name.is_empty() {
         return Err(Fault::new("module name must not be empty"));
     }
-    if module.format != 2 {
-        return Err(Fault::new("unsupported module format (expected 2)"));
+    if module.format != 3 {
+        return Err(Fault::new("unsupported module format (expected 3)"));
     }
     let mut names = HashSet::new();
     for def in &module.types {
         if def.name.is_empty() || !names.insert(&def.name) {
             return Err(Fault::new("empty or duplicate type name"));
+        }
+        let ty = Type::from_name(&def.name);
+        if ty.definition_name() != Some(def.name.as_str()) {
+            return Err(Fault::new("type definitions must use canonical names"));
+        }
+        if (def.representation == Representation::Runtime) != ty.is_primitive() {
+            return Err(Fault::new(
+                "runtime representation is reserved for canonical primitive types",
+            ));
+        }
+        if def.representation == Representation::Runtime && !def.fields.is_empty() {
+            return Err(Fault::new(
+                "runtime primitive types cannot declare record fields",
+            ));
         }
         let mut fields = HashSet::new();
         for field in &def.fields {
@@ -73,13 +92,32 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
     }
     let mut signatures = HashSet::new();
     for function in &module.functions {
-        if function.name.is_empty() || !signatures.insert((&function.name, &function.parameters)) {
+        if function.name.is_empty()
+            || !signatures.insert((&function.name, &function.parameters, function.instance))
+        {
             return Err(Fault::new(
                 "empty name, duplicate or reserved function signature",
             ));
         }
     }
     for function in &module.functions {
+        if function.instance && function.owner.is_none() {
+            return Err(Fault::new("instance method requires a declaring type"));
+        }
+        if let Some(owner) = &function.owner {
+            check_type(owner, module)?;
+            let def = module
+                .type_definition(owner)
+                .ok_or_else(|| Fault::new("method owner has no type definition"))?;
+            let prefix = format!("{}.", def.name);
+            let member = function
+                .name
+                .strip_prefix(&prefix)
+                .ok_or_else(|| Fault::new("method name does not match its declaring type"))?;
+            if member.is_empty() || member.contains('.') {
+                return Err(Fault::new("invalid member name"));
+            }
+        }
         for ty in function
             .parameters
             .iter()
@@ -109,13 +147,16 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 Op::Branch(i) | Op::BranchTrue(i) if *i >= function.body.len() => {
                     return Err(Fault::new("branch outside function"));
                 }
-                Op::Arg(i) if *i >= function.parameters.len() => {
+                Op::Arg(i) if *i >= function.argument_types().len() => {
                     return Err(Fault::new("argument index outside signature"));
                 }
                 Op::Load(i) | Op::Store(i) if *i >= function.locals.len() => {
                     return Err(Fault::new("local index outside signature"));
                 }
                 Op::Call(target) => {
+                    if let Some(owner) = &target.owner {
+                        check_type(owner, module)?;
+                    }
                     for ty in &target.parameters {
                         check_type(ty, module)?;
                     }
@@ -126,8 +167,17 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                         )));
                     }
                 }
-                Op::New(name) if !module.types.iter().any(|t| &t.name == name) => {
-                    return Err(Fault::new(format!("unknown type {name}")));
+                Op::New(name) => {
+                    let def = module
+                        .types
+                        .iter()
+                        .find(|t| &t.name == name)
+                        .ok_or_else(|| Fault::new(format!("unknown type {name}")))?;
+                    if def.representation != Representation::Record {
+                        return Err(Fault::new(
+                            "newobj cannot construct a runtime primitive as a record",
+                        ));
+                    }
                 }
                 Op::None(ty) | Op::Ok(ty) | Op::Err(ty) => check_type(ty, module)?,
                 _ => (),
@@ -135,10 +185,12 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         }
     }
     if !module.entry.is_empty()
-        && !module
-            .functions
-            .iter()
-            .any(|f| f.name == module.entry && f.parameters.is_empty() && !f.is_internal_call())
+        && !module.functions.iter().any(|f| {
+            f.name == module.entry
+                && f.parameters.is_empty()
+                && !f.is_internal_call()
+                && !f.instance
+        })
     {
         return Err(Fault::new("parameterless entry function not found"));
     }
@@ -147,10 +199,13 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
 
 fn check_type(ty: &Type, module: &Module) -> Result<(), Fault> {
     match ty {
+        Type::Named(name) if Type::from_name(name).is_primitive() => Err(Fault::new(
+            "primitive type requires canonical primitive signature encoding",
+        )),
         Type::Named(name) if !module.types.iter().any(|t| &t.name == name) => {
             Err(Fault::new(format!("unknown type {name}")))
         }
-        Type::Option(t) | Type::Ref(t) => check_type(t, module),
+        Type::Option(t) | Type::Ref(t) | Type::Ptr(t) => check_type(t, module),
         Type::Result(t, e) => {
             check_type(t, module)?;
             check_type(e, module)
@@ -234,7 +289,7 @@ fn interpret(module: &Module, limits: Limits) -> Result<Execution, Fault> {
     let entry = module
         .functions
         .iter()
-        .position(|f| f.name == module.entry && f.parameters.is_empty())
+        .position(|f| f.name == module.entry && f.parameters.is_empty() && !f.instance)
         .ok_or_else(|| Fault::new("missing entry"))?;
     let mut frames = vec![Frame::new(entry, vec![], module)];
     let mut heap: Vec<Value> = vec![];
@@ -333,7 +388,7 @@ fn interpret(module: &Module, limits: Limits) -> Result<Execution, Fault> {
                     let index = resolve(module, target)
                         .ok_or_else(|| Fault::new("unknown function overload"))?;
                     let callee = &module.functions[index];
-                    let args = frame.args(&callee.parameters)?;
+                    let args = frame.args(&callee.argument_types())?;
                     if callee.is_internal_call() {
                         let value = crate::native::bind(callee)?.invoke(args, &mut output)?;
                         expect(&value, &callee.returns)?;

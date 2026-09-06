@@ -4,10 +4,10 @@ use neoclr::{Limits, Value, assemble, assembler::parse_function_ref, load, metad
 fn overload_sample_resolves_by_type_and_arity_and_round_trips() {
     let module = assemble(include_str!("../examples/overloads.neoil")).unwrap();
     let json = serde_json::to_value(&module).unwrap();
-    assert_eq!(json["format"], 2);
+    assert_eq!(json["format"], 3);
     assert_eq!(
         json["functions"][3]["body"][1]["arg"],
-        serde_json::json!({"name":"Describe","parameters":["String"]})
+        serde_json::json!({"name":"Describe","parameters":["String"],"owner":null,"instance":false})
     );
     let loaded = load(&json.to_string()).unwrap();
     let result = run(&loaded, Limits::default()).unwrap();
@@ -144,7 +144,7 @@ fn loader_checks_structured_signatures_and_rejects_old_format() {
         load(&old.to_string())
             .unwrap_err()
             .message
-            .contains("expected 2")
+            .contains("expected 3")
     );
 }
 

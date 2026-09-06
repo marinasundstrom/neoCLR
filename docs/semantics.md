@@ -89,17 +89,18 @@ than applying integer/reference truthiness.
 ## Metadata and library shape
 
 A module has a format version, name, entry-function name, type definitions, and
-free-function definitions. Functions have no required owner type. Dotted names
-are ordinary names; `System.Int32.Parse` is a library function symbol, not a
-method container with dispatch. Function identity includes the ordered parameter
-types. Calls select that exact overload; return types are not overload keys.
-`.entry Main` selects `Main()` even when other Main overloads exist. Types have
-named, ordered fields. Prototype
-instructions index fields and locals from zero, and assembled branch labels become
-absolute instruction indices within one function.
+function definitions. Free functions have no owner. Static and instance methods
+have a declaring type; primitives resolve to canonical System definitions and can
+own members. `.entry Main` selects a parameterless non-instance entry. Ordinary
+instance methods currently use read-only receiver snapshots, with the receiver at
+argument zero; see [type system](type-system.md) for explicit limitations.
+
+Types have named, ordered fields unless their representation is runtime-known.
+Prototype instructions index fields and locals from zero, and assembled branch
+labels become absolute instruction indices within one function.
 
 Constructed `Option`, `Result`, and `Ref` signatures are supported; general generic
-definitions, constraints, interfaces, method dispatch, inheritance, attributes,
+definitions, constraints, interfaces, virtual dispatch, inheritance, general custom attributes,
 assembly references, metadata tokens, and binary tables are not yet implemented.
 Future interfaces use names such as `Enumerable<T>` and `Disposable` without an
 `I` prefix. This is a naming convention, not a rule forbidding identifiers that
@@ -119,3 +120,12 @@ quotient semantics and Faults on those invalid cases. `System.Math.Abs` implemen
 its numeric logic in IL and returns `Result` for overflow. Console and parse APIs
 wrap the small host primitive surface. This establishes the library boundary without
 claiming a full .NET-compatible library or final binary CIL emission.
+
+## Memory-policy independence
+
+Rust's host memory rules do not define the guest VM. Fundamental `Ptr<T>`/`T*`
+signatures are separate from ownership wrappers; executable pointer semantics remain
+pending. Reference-counted `Ref<T>` is the intended first explicit ownership policy,
+but the implementation still uses an arena. General generic metadata and lifetime
+operations are prerequisites for a library-defined Ref abstraction. No global GC or
+Rust-style borrowing policy is implied. See [memory layers](memory-model.md).

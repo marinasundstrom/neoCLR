@@ -1,4 +1,4 @@
-# neoIL assembler reference, format 2
+# neoIL assembler reference, format 3
 
 The assembler converts readable neoIL into the JSON module format understood by
 the interpreter. This is a prototype assembler, not an ECMA-335 `ilasm` replacement.
@@ -21,8 +21,9 @@ escapes. Identifiers contain ASCII letters, digits, underscores, and dots.
 
 - `.module Name` occurs exactly once. Executables declare one `.entry FunctionName`;
   library modules omit it.
-- `.type Name` begins a record; `.field Name Type` declares ordered fields;
-  `.end` closes the type.
+- `.type Name` begins a type (known System primitives use runtime representation); `.field Name Type` declares ordered fields;
+  `.end` closes the type. `.method static/instance Name(...) -> Type` declares
+  a nested method with its own `.end`; see [type system](type-system.md).
 - `.function Name(T0, ..., Tn) -> Type` begins a free function; parameter types
   appear inline and are addressed by `ldarg` index. `.local Type` declares local
   slots before instructions/labels; `.end` closes the function.
@@ -36,9 +37,9 @@ escapes. Identifiers contain ASCII letters, digits, underscores, and dots.
   function; labels can be forward references. A label past the last instruction
   cannot be a branch target.
 - Types are `Void`, `Int32`, `Boolean`, `String`, `Error`, a record name,
-  `Option<T>`, `Result<T,E>`, or `Ref<T>`. Spaces inside generic signatures are allowed.
+  `Option<T>`, `Result<T,E>`, `Ref<T>`, or `Ptr<T>` (also spelled `T*`). Spaces inside generic signatures are allowed.
   Primitive aliases `void`, `int32`/`int`, `boolean`/`bool`, and `string`
-  normalize to the corresponding canonical types in every type context.
+  and fully qualified names such as `System.Int32` normalize to canonical types.
   There is a nesting limit of 32 in assembly type expressions.
 
 `.entry Main` selects the parameterless `Main()` overload, independently of
@@ -76,6 +77,13 @@ Multiple definitions can share a name if their parameter signatures differ; two
 definitions of the same signature are rejected. Return-only overloads are a current
 prototype limitation; richer assembly-level signatures remain a design requirement. See
 [the overload sample](../examples/overloads.neoil).
+
+Instance calls use `call instance Owner::Member(...)`; static methods use
+`call Owner::Member(...)`. Dotted qualified-name shorthand is still accepted.
+An explicit owner is encoded separately in the call reference. Instance calls
+consume a receiver before the declared parameters; `ldarg 0` is the receiver and
+`ldarg 1` is the first declared parameter. Receivers are read-only snapshots in this
+prototype. Static and instance overloads are distinct.
 
 ## Instructions
 
@@ -129,6 +137,7 @@ These are ordinary functions compiled from [System.neoil](../runtime/System.neoi
 | --- | --- | --- |
 | `System.Console.WriteLine` | `String` | `Void` |
 | `System.Console.WriteLine` | `Int32` | `Void` |
+| `System.Int32.ToString` | instance receiver `Int32`, no parameters | `String` |
 | `System.Int32.Parse` | `String` | `Result<Int32,Error>` |
 | `System.Int32.Divide` | `Int32, Int32` | `Result<Int32,Error>` |
 | `System.Math.Abs` | `Int32` | `Result<Int32,Error>` |
@@ -143,7 +152,8 @@ until successful execution. See [library design](runtime-library.md).
 
 The assembler emits a versioned JSON object containing `format`, `name`, `entry`,
 `types`, and `functions`. Functions carry `name`, `parameters`, `returns`, `locals`,
-and `body`, plus `impl_flags` for the implementation kind; no owning class is needed. Instruction objects use `op` and optional
+and `body`, plus `impl_flags`, `owner`, and `instance`. Free functions have no
+owner; methods have a validated declaring type. Type definitions carry `representation`. Instruction objects use `op` and optional
 `arg`. Primitive types serialize as strings; constructed types serialize as tagged
 objects, for example `{"Option":"Void"}`, `{"Ref":{"Named":"Point"}}`, and
 `{"Result":["Void","Error"]}`. Unknown fields and opcode names are rejected.
@@ -154,13 +164,13 @@ control-flow stack consistency, all return paths, or definite initialization.
 Metadata validation errors do not currently retain assembler source locations;
 syntax errors carry line numbers and execution Faults carry function/PC locations.
 
-Format 2 stores call targets as structured references rather than untyped names:
+Call targets store as structured references rather than untyped names:
 
 ```json
-{"op":"call","arg":{"name":"System.Console.WriteLine","parameters":["String"]}}
+{"op":"call","arg":{"name":"System.Console.WriteLine","owner":{"Named":"System.Console"},"instance":false,"parameters":["String"]}}
 ```
 
 The parameter array is required, including `[]` for zero arguments. Return types
-remain on function definitions/runtime binding contracts. The format version was bumped
-because this changes the call operand schema. Format 1 JSON modules must be
-reassembled from source after updating calls with explicit signatures.
+remain on function definitions/runtime binding contracts. Format 3 adds declaring-type and instance-call semantics. Older modules and System
+libraries must be reassembled. Pointer signatures use `{"Ptr":"Int32"}` and imply
+no ownership, pointer operations, or automatic memory management.

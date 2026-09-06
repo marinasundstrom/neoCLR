@@ -12,6 +12,41 @@ pub enum Type {
     Option(Box<Type>),
     Result(Box<Type>, Box<Type>),
     Ref(Box<Type>),
+    /// Fundamental unmanaged pointer signature; no ownership policy is implied.
+    Ptr(Box<Type>),
+}
+
+impl Type {
+    /// Primitive spellings are signature aliases for canonical System type identities.
+    pub fn from_name(name: &str) -> Self {
+        match name {
+            "Void" | "void" | "System.Void" => Self::Void,
+            "Int32" | "int32" | "int" | "System.Int32" => Self::Int32,
+            "Boolean" | "boolean" | "bool" | "System.Boolean" => Self::Boolean,
+            "String" | "string" | "System.String" => Self::String,
+            "Error" | "System.Error" => Self::Error,
+            _ => Self::Named(name.into()),
+        }
+    }
+
+    pub fn definition_name(&self) -> Option<&str> {
+        match self {
+            Self::Void => Some("System.Void"),
+            Self::Int32 => Some("System.Int32"),
+            Self::Boolean => Some("System.Boolean"),
+            Self::String => Some("System.String"),
+            Self::Error => Some("System.Error"),
+            Self::Named(name) => Some(name),
+            _ => None,
+        }
+    }
+
+    pub fn is_primitive(&self) -> bool {
+        matches!(
+            self,
+            Self::Void | Self::Int32 | Self::Boolean | Self::String | Self::Error
+        )
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -31,6 +66,16 @@ pub struct Module {
 pub struct TypeDef {
     pub name: String,
     pub fields: Vec<Field>,
+    #[serde(default)]
+    pub representation: Representation,
+}
+
+/// Representation is independent of ownership and reference identity.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum Representation {
+    #[default]
+    Record,
+    Runtime,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -44,6 +89,10 @@ pub struct Field {
 #[serde(deny_unknown_fields)]
 pub struct Function {
     pub name: String,
+    #[serde(default)]
+    pub owner: Option<Type>,
+    #[serde(default)]
+    pub instance: bool,
     #[serde(default)]
     pub parameters: Vec<Type>,
     pub returns: Type,
@@ -59,6 +108,15 @@ pub struct Function {
 pub const INTERNAL_CALL: u16 = 0x1000;
 
 impl Function {
+    pub fn argument_types(&self) -> Vec<Type> {
+        let mut types = Vec::new();
+        if let (true, Some(owner)) = (self.instance, &self.owner) {
+            types.push(owner.clone());
+        }
+        types.extend(self.parameters.iter().cloned());
+        types
+    }
+
     pub fn is_internal_call(&self) -> bool {
         self.impl_flags == INTERNAL_CALL
     }
@@ -70,6 +128,10 @@ impl Function {
 #[serde(deny_unknown_fields)]
 pub struct FunctionRef {
     pub name: String,
+    #[serde(default)]
+    pub owner: Option<Type>,
+    #[serde(default)]
+    pub instance: bool,
     pub parameters: Vec<Type>,
 }
 
@@ -156,4 +218,11 @@ pub enum Case {
     None,
     Ok,
     Err,
+}
+
+impl Module {
+    pub fn type_definition(&self, ty: &Type) -> Option<&TypeDef> {
+        let name = ty.definition_name()?;
+        self.types.iter().find(|def| def.name == name)
+    }
 }

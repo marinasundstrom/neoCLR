@@ -1,4 +1,9 @@
-# Arrays and pointers: proposal, not implemented
+# Arrays and pointers: direction and remaining work
+
+Pointer signatures `Ptr<T>`/`T*` are implemented. Array storage and executable pointer
+operations remain proposals. Raw pointers are foundational VM capabilities; managed
+ownership policies are separate. The current Ref arena is not reference-counted.
+See [memory layers](memory-model.md) for the updated architectural direction.
 
 Arrays should follow the same separation between data type and storage as every
 other type. Making every array implicitly reference-allocated would reintroduce
@@ -53,7 +58,7 @@ lower bounds can wait until migration requirements justify them.
 | `Ref<T>` | Non-null shared heap identity with checked typed access | Implemented with execution-owned arena |
 | `Borrow<T>` / `BorrowMut<T>` | Temporary checked access; cannot outlive owner | Design only; naming provisional |
 | `Span<T>` / `SpanMut<T>` | Borrow plus length, with bounds checks | Design only |
-| `Ptr<T>` | Native address; unsafe dereference and arithmetic | Design only |
+| `Ptr<T>` | Unmanaged address type, with no implied ownership | Signatures implemented; operations pending |
 
 `Ref<T>` is not an address into the native stack, and `Ptr<T>` must not be an
 unchecked alias for it. Managed references may need stable handles or relocation
@@ -63,13 +68,14 @@ A foreign pointer cannot become managed ownership without a declared ownership
 transfer and deallocator contract.
 
 Checked borrows would need lifetime metadata or verifiable provenance, an escape
-rule, and an aliasing rule (multiple read-only borrows or one mutable borrow is a
-reasonable starting point). A span can view stack or heap storage; its origin
+rule, and an aliasing contract. Rust-style exclusivity is not a default VM rule;
+checked borrowing should be an explicit facility rather than a host-language assumption. A span can view stack or heap storage; its origin
 must stay live. Returning a borrow to callee-owned storage must fail verification.
 Array element access through borrows must retain bounds and allocation provenance.
 These rules are prerequisites for address-taking instructions such as `ldelema`.
 
-Raw pointers belong at native/unsafe boundaries. The design needs alignment,
+Raw pointers belong to the core low-level VM, independently of whether a high-level
+language restricts them to unsafe or interop code. The design needs alignment,
 address width, bounds/provenance, null, arithmetic overflow, and deallocation
 contracts; pretending a raw address is safe does not supply those contracts.
 BCL absence should remain `Option`. A future foreign ABI may represent an actual
@@ -87,8 +93,8 @@ lifetime or must be rejected. Physical “always native stack” placement is th
 not a sustainable universal promise. Frame ownership is the semantic promise;
 backend placement and explicit shared identity are separate concerns.
 
-The next bounded experiment should implement owned `Array<Int32>` and `Array<Void>`,
-explicit heap promotion, initialization, copy/return behavior, and checked indexed
-access. Tests should cover empty arrays, bounds, aliasing versus copies, invalid
-lengths, and zero-sized elements. Add checked spans only after choosing a borrow
-verification model. Raw pointers and native interop can remain deferred.
+Heap allocation and pointer operations are the immediate priority. The array
+experiment above, checked spans, and ownership-policy decisions remain deferred
+follow-ups. Array tests should eventually cover empty arrays, bounds, aliasing versus
+copies, invalid lengths, and zero-sized elements; they do not block the initial
+heap/pointer slice.

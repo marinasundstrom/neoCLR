@@ -5,10 +5,12 @@ and instruction representation, and executed by neoCLR. Host Rust implements the
 interpreter and unavoidable bootstrap services; it should not become the BCL's
 implementation language by accident.
 
-[System.neoil](../runtime/System.neoil) currently provides five platform-written functions and three native declarations:
+[System.neoil](../runtime/System.neoil) currently provides six platform-written methods and three native declarations:
 
 - `System.Console.WriteLine(string)` calls the host output primitive.
-- `System.Console.WriteLine(int32)` converts the integer and calls the string overload.
+- `System.Console.WriteLine(int32)` calls the Int32 receiver's `ToString()` and then
+  the string overload.
+- `System.Int32.ToString()` is an instance method that calls the formatting helper.
 - `System.Int32.Parse(string)` wraps a temporary host parsing primitive.
 - `System.Int32.Divide(int32, int32)` checks zero and overflow, then executes `div`
   or returns an Error. Its control flow and Result construction are platform IL.
@@ -21,7 +23,8 @@ The remaining host calls are `neoCLR.Runtime.WriteLine(string) -> Void`,
 are temporary host implementations until character/string operations can support
 their platform versions. Console output is buffered until successful execution.
 
-The public `System.*` functions are not hard-coded interpreter dispatch cases.
+The public `System.*` methods are not hard-coded interpreter dispatch cases.
+Their declaring types are explicit, including runtime-known `System.Int32`.
 They consume guest frames and instruction budget, and their metadata/IL bodies are
 serialized just like application functions. Tests replace the compiled Divide body
 and confirm execution follows the replacement, rather than a hidden intrinsic.

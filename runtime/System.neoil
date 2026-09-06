@@ -1,83 +1,105 @@
-; Bootstrap System library. Public APIs execute as ordinary neoCLR functions.
+; Runtime-known data representations with ordinary library-defined members.
 .module System
 
-.function System.Console.WriteLine(string) -> Void
-    ldarg 0
-    call neoCLR.Runtime.WriteLine(string)
-    ret
+.type System.Void
 .end
 
-.function System.Console.WriteLine(int32) -> Void
-    ldarg 0
-    call neoCLR.Runtime.Int32ToString(int32)
-    call System.Console.WriteLine(string)
-    ret
+.type System.Boolean
 .end
 
-; Parsing remains a host primitive until the string/character surface exists.
-.function System.Int32.Parse(string) -> Result<Int32,Error>
-    ldarg 0
-    call neoCLR.Runtime.ParseInt32(string)
-    ret
+.type System.String
 .end
 
-; Recoverable arithmetic errors are checked and constructed in platform IL.
-.function System.Int32.Divide(int32, int32) -> Result<Int32,Error>
-    ldarg 1
-    ldc.i4 0
-    ceq
-    brtrue DivisionByZero
-    ldarg 0
-    ldc.i4 -2147483648
-    ceq
-    brtrue CheckOverflow
-    br Divide
-CheckOverflow:
-    ldarg 1
-    ldc.i4 -1
-    ceq
-    brtrue Overflow
-Divide:
-    ldarg 0
-    ldarg 1
-    div
-    ok Error
-    ret
-DivisionByZero:
-    error "DivisionByZero"
-    err Int32
-    ret
-Overflow:
-    error "Overflow"
-    err Int32
-    ret
+.type System.Error
 .end
 
-.function System.Math.Abs(int32) -> Result<Int32,Error>
-    ldarg 0
-    ldc.i4 -2147483648
-    ceq
-    brtrue Overflow
-    ldarg 0
-    ldc.i4 0
-    clt
-    brtrue Negative
-    ldarg 0
-    ok Error
-    ret
-Negative:
-    ldc.i4 0
-    ldarg 0
-    sub
-    ok Error
-    ret
-Overflow:
-    error "Overflow"
-    err Int32
-    ret
+.type System.Int32
+    .method static Parse(string) -> Result<Int32,Error>
+        ldarg 0
+        call neoCLR.Runtime.ParseInt32(string)
+        ret
+    .end
+
+    .method static Divide(int32, int32) -> Result<Int32,Error>
+        ldarg 1
+        ldc.i4 0
+        ceq
+        brtrue DivisionByZero
+        ldarg 0
+        ldc.i4 -2147483648
+        ceq
+        brtrue CheckOverflow
+        br Divide
+        CheckOverflow:
+        ldarg 1
+        ldc.i4 -1
+        ceq
+        brtrue Overflow
+        Divide:
+        ldarg 0
+        ldarg 1
+        div
+        ok Error
+        ret
+        DivisionByZero:
+        error "DivisionByZero"
+        err Int32
+        ret
+        Overflow:
+        error "Overflow"
+        err Int32
+        ret
+    .end
+
+    .method instance ToString() -> string
+        ldarg 0
+        call neoCLR.Runtime.Int32ToString(int32)
+        ret
+    .end
 .end
 
-; Runtime implementations are declared in metadata, without IL bodies.
+.type System.Console
+    .method static WriteLine(string) -> Void
+        ldarg 0
+        call neoCLR.Runtime.WriteLine(string)
+        ret
+    .end
+
+    .method static WriteLine(int32) -> Void
+        ldarg 0
+        call instance System.Int32::ToString()
+        call System.Console.WriteLine(string)
+        ret
+    .end
+
+.end
+
+.type System.Math
+    .method static Abs(int32) -> Result<Int32,Error>
+        ldarg 0
+        ldc.i4 -2147483648
+        ceq
+        brtrue Overflow
+        ldarg 0
+        ldc.i4 0
+        clt
+        brtrue Negative
+        ldarg 0
+        ok Error
+        ret
+        Negative:
+        ldc.i4 0
+        ldarg 0
+        sub
+        ok Error
+        ret
+        Overflow:
+        error "Overflow"
+        err Int32
+        ret
+    .end
+.end
+
 .function neoCLR.Runtime.WriteLine(string) -> Void
     .methodimpl InternalCall
 .end

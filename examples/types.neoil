@@ -1,0 +1,57 @@
+.module Types
+.entry Main
+
+.type Point
+    .field X int32
+    .field Y int32
+
+    .method static Origin() -> Point
+        ldc.i4 0
+        ldc.i4 0
+        newobj Point
+        ret
+    .end
+
+    .method instance Sum() -> int32
+        ldarg 0
+        ldfld 0
+        ldarg 0
+        ldfld 1
+        add
+        ret
+    .end
+
+    .method instance Sum(int32) -> int32
+        ldarg 0
+        call instance Point::Sum()
+        ldarg 1
+        add
+        ret
+    .end
+.end
+
+.function Main() -> Void
+    .local Point
+    ldc.i4 10
+    ldc.i4 20
+    newobj Point
+    stloc 0
+    ldloc 0
+    ldc.i4 12
+    call instance Point::Sum(int32)
+    call instance System.Int32::ToString()
+    call System.Console::WriteLine(string)
+    pop
+
+    call Point::Origin()
+    call instance Point::Sum()
+    call System.Console::WriteLine(int32)
+    pop
+
+    ldstr "42"
+    call System.Int32::Parse(string)
+    ldcase Ok
+    call instance int32::ToString()
+    call System.Console::WriteLine(string)
+    ret
+.end

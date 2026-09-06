@@ -26,10 +26,11 @@ alone do not justify additional consumer-visible differences.
 | `System.Int32.Divide(int32,int32)` | Uses the familiar Int32 domain | Experimental neoCLR extension for recoverable division, not a claim of a matching .NET member |
 | `neoCLR.Runtime.*` | Internal implementation boundary | Not intended as consumer-facing replacements for System APIs |
 
-The current assembler uses dotted symbols for these functions; it does not yet
-model static members versus namespace functions. Familiar spelling alone is not
-full metadata compatibility. Method ownership, visibility, member dispatch, complete
-signatures, and assembly references must be added as the model grows.
+The current assembler models declaring types and static/instance methods alongside
+free functions. Primitive members belong to canonical System type definitions.
+Read-only receiver snapshots are a prototype limitation, not full .NET by-reference
+receiver mechanics. Visibility, virtual/interface dispatch, complete signatures,
+and assembly references remain to be added.
 
 The Divide helper is a proof-of-concept extension whose final API location remains
 open. Existing .NET APIs should be preferred when an appropriate equivalent exists.

@@ -1,7 +1,7 @@
 //! Small line-oriented assembler. The serialized output is the prototype metadata format.
 use crate::{
     Fault, Module,
-    metadata::{Field, Function, FunctionRef, Instruction, Type, TypeDef},
+    metadata::{Field, Function, FunctionRef, Instruction, Representation, Type, TypeDef},
 };
 use std::collections::HashMap;
 
@@ -21,7 +21,7 @@ pub fn assemble(source: &str) -> Result<Module, Fault> {
 
 pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
     let mut module = Module {
-        format: 2,
+        format: 3,
         name: String::new(),
         entry: String::new(),
         types: vec![],
@@ -64,9 +64,9 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                 }
                 return Ok(());
             }
-            if let Some(def) = typedef.as_mut() {
+            if let (true, Some(def)) = (function.is_none() && word != ".method", typedef.as_mut()) {
                 if word != ".field" {
-                    return Err(Fault::new("expected .field or .end"));
+                    return Err(Fault::new("expected .field, .method or .end"));
                 }
                 let (name, ty) = rest
                     .split_once(char::is_whitespace)
@@ -186,13 +186,38 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                 }
                 ".type" => {
                     identifier(rest)?;
+                    let ty = Type::from_name(rest);
                     typedef = Some(TypeDef {
-                        name: rest.into(),
+                        name: ty.definition_name().unwrap_or(rest).into(),
                         fields: vec![],
+                        representation: if ty.is_primitive() {
+                            Representation::Runtime
+                        } else {
+                            Representation::Record
+                        },
                     });
                 }
-                ".function" => {
-                    let (name, result) = rest
+                ".function" | ".method" => {
+                    let (owner, instance, declaration) = if word == ".method" {
+                        let def = typedef
+                            .as_ref()
+                            .ok_or_else(|| Fault::new(".method requires an enclosing .type"))?;
+                        let (kind, signature) =
+                            rest.split_once(char::is_whitespace).ok_or_else(|| {
+                                Fault::new("expected .method static/instance Name(...) -> Type")
+                            })?;
+                        if kind != "static" && kind != "instance" {
+                            return Err(Fault::new("expected static or instance method"));
+                        }
+                        (
+                            Some(Type::from_name(&def.name)),
+                            kind == "instance",
+                            signature.trim(),
+                        )
+                    } else {
+                        (None, false, rest)
+                    };
+                    let (name, result) = declaration
                         .split_once("->")
                         .ok_or_else(|| Fault::new("expected .function Name -> Type"))?;
                     let inline_parameters = name.contains('(');
@@ -203,11 +228,34 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                         FunctionRef {
                             name: name.trim().into(),
                             parameters: vec![],
+                            owner: None,
+                            instance: false,
                         }
+                    };
+                    if target.owner.is_some() || target.instance {
+                        return Err(Fault::new(
+                            "declaration names must not contain an owner or instance prefix",
+                        ));
+                    }
+                    if owner.is_some() && target.name.contains('.') {
+                        return Err(Fault::new(
+                            "method name must be unqualified within its type",
+                        ));
+                    }
+                    let name = match &owner {
+                        Some(ty) => format!(
+                            "{}.{}",
+                            ty.definition_name()
+                                .ok_or_else(|| Fault::new("invalid method owner"))?,
+                            target.name
+                        ),
+                        None => target.name,
                     };
                     function = Some(PendingFunction {
                         function: Function {
-                            name: target.name,
+                            name,
+                            owner,
+                            instance,
                             parameters: target.parameters,
                             returns: parse_type(result)?,
                             locals: vec![],
@@ -252,6 +300,9 @@ pub fn parse_type(text: &str) -> Result<Type, Fault> {
             return Err(Fault::new("type nesting exceeds 32"));
         }
         let text = text.trim();
+        if let Some(element) = text.strip_suffix('*') {
+            return Ok(Type::Ptr(Box::new(parse(element, depth + 1)?)));
+        }
         if let Some((name, args)) = text.split_once('<') {
             let args = args
                 .strip_suffix('>')
@@ -280,22 +331,18 @@ pub fn parse_type(text: &str) -> Result<Type, Fault> {
             return match (name.trim(), parts.as_slice()) {
                 ("Option", [t]) => Ok(Type::Option(Box::new(parse(t, depth + 1)?))),
                 ("Ref", [t]) => Ok(Type::Ref(Box::new(parse(t, depth + 1)?))),
+                ("Ptr", [t]) => Ok(Type::Ptr(Box::new(parse(t, depth + 1)?))),
                 ("Result", [t, e]) => Ok(Type::Result(
                     Box::new(parse(t, depth + 1)?),
                     Box::new(parse(e, depth + 1)?),
                 )),
-                _ => Err(Fault::new("expected Option<T>, Ref<T> or Result<T,E>")),
+                _ => Err(Fault::new(
+                    "expected Option<T>, Ref<T>, Ptr<T> or Result<T,E>",
+                )),
             };
         }
         identifier(text)?;
-        Ok(match text {
-            "Void" | "void" => Type::Void,
-            "Int32" | "int32" | "int" => Type::Int32,
-            "Boolean" | "boolean" | "bool" => Type::Boolean,
-            "String" | "string" => Type::String,
-            "Error" => Type::Error,
-            _ => Type::Named(text.into()),
-        })
+        Ok(Type::from_name(text))
     }
     parse(text, 0)
 }
@@ -305,7 +352,28 @@ pub fn parse_function_ref(text: &str) -> Result<FunctionRef, Fault> {
     let (name, parameters) = text.trim().split_once('(').ok_or_else(|| {
         Fault::new("call requires an explicit signature: Name(Type, ...) or Name()")
     })?;
-    identifier(name.trim())?;
+    let (instance, name) = match name.trim().strip_prefix("instance ") {
+        Some(name) => (true, name.trim()),
+        None => (false, name.trim()),
+    };
+    let (owner, name) = if let Some((owner, member)) = name.split_once("::") {
+        identifier(member.trim())?;
+        if member.trim().contains('.') {
+            return Err(Fault::new("expected an unqualified member name"));
+        }
+        let owner = parse_type(owner)?;
+        let full_name = format!(
+            "{}.{}",
+            owner
+                .definition_name()
+                .ok_or_else(|| Fault::new("constructed method owners are not supported yet"))?,
+            member.trim()
+        );
+        (Some(owner), full_name)
+    } else {
+        identifier(name)?;
+        (None, name.to_owned())
+    };
     let parameters = parameters
         .strip_suffix(')')
         .ok_or_else(|| Fault::new("unclosed call signature"))?;
@@ -333,7 +401,9 @@ pub fn parse_function_ref(text: &str) -> Result<FunctionRef, Fault> {
         types.push(parse_type(&parameters[start..])?);
     }
     Ok(FunctionRef {
-        name: name.trim().into(),
+        name,
+        owner,
+        instance,
         parameters: types,
     })
 }

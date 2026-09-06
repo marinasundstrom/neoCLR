@@ -4,27 +4,40 @@ The platform name is undecided; neoCLR names the runtime only. The existing code
 is a small semantic testbed. It is not a commitment to Rust for every component,
 JSON for distribution, or the exact instruction extensions used here.
 
-## Next milestones
+## Immediate focus: heap allocation and pointers
+
+Build on the existing Ptr<T>/T* signatures with executable heap allocation and
+pointer access. Define size/alignment and initialization, address representation,
+indirect loads/stores, pointer offset rules, explicit release, and failure behavior.
+Keep object construction separate from obtaining storage. Start with a small
+coherent subset and tests for valid access and the supported invalid-access checks.
+Opcode spelling, pointer representation, and the exact first subset remain open.
+
+Defer reference counting, GC, automatic destruction, lifetime-aware wrappers, and
+allocator/collector integration. These are recorded in [memory layers](memory-model.md)
+and [allocation proposals](allocation-encoding.md). The current Ref arena is
+scaffolding, not a prerequisite ownership policy for the pointer layer.
+
+## Later milestones
 
 1. Add a control-flow verifier: typed stack states at joins, definite local
-   initialization, valid return paths, and maximum stack calculation. Make
-   `check` a meaningful pre-execution guarantee within its stated safety scope.
-2. Settle array ownership and borrow rules, then implement the bounded experiment
-   in [arrays and pointers](arrays-and-pointers.md).
+   initialization, valid return paths, and maximum stack calculation.
+2. Extend type/generic metadata and implement arrays when their storage contracts
+   are ready; see [arrays and pointers](arrays-and-pointers.md).
 3. Implement a CLI-based binary reader/writer for the supported subset, preserving
    standard table/heap/token and opcode encodings where semantics permit. Define
    versioned extensions only for required deviations; see [format direction](format-direction.md).
 4. Extend the platform-written System library and bootstrap linker into general
-   loadable modules, structured error definitions, user-defined unions and generic
-   definitions. Keep familiar
-   namespaces while defining contracts around `Option` and `Result`.
+   loadable modules, structured error definitions, and generic unions. Keep familiar
+   namespaces while defining contracts around Option and Result.
 5. Introduce interfaces without naming prefixes, explicit dispatch metadata, and
-   a modest collections library; choose equality and mutation contracts deliberately.
-6. Build a .NET metadata/IL inspection and translation tool for a supported subset,
-   with actionable diagnostics for semantic differences.
-7. Choose heap lifetime management and implement reclamation before treating this
-   as a long-running runtime. Then evaluate layout, native interop, concurrency,
-   and runtime async against measured needs.
+   a modest collections library.
+6. Build .NET metadata/IL inspection and translation for a supported subset, with
+   actionable diagnostics for semantic differences.
+7. Revisit explicit lifetime operations and generic ownership abstractions such as
+   counted Ref<T>. Decide library versus VM support then, keeping optional memory
+   management independent of the low-level VM. Evaluate native interop, concurrency,
+   and runtime async against the required contracts.
 
 The assembler must grow toward full platform expressiveness, with .NET ilasm as
 the capability baseline; see [assembler design](assembler-design.md).

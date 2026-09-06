@@ -11,7 +11,7 @@ pub(crate) enum Binding {
 }
 
 pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
-    if !function.is_internal_call() {
+    if !function.is_internal_call() || function.instance || function.owner.is_some() {
         return Err(Fault::new("native binding requires InternalCall metadata"));
     }
     let (binding, returns) = match (function.name.as_str(), function.parameters.as_slice()) {

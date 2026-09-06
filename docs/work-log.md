@@ -118,3 +118,53 @@ limitations are not permanent API design decisions.
 
 Validation: all 41 integration tests pass, including five new metadata/binding
 checks. Clippy, formatting, and diff whitespace checks pass.
+
+## 2026-09-06 — Canonical types and declared methods
+
+Added canonical System primitive definitions and alias resolution, explicit type
+representation metadata, method owners, and static/instance call form. Methods can
+be declared inside types; free functions remain available. The System APIs now have
+declaring types, and Int32.ToString executes as an instance method. Added the Point
+method sample and metadata/receiver tests. Format 3 requires reassembling earlier
+application and System artifacts.
+
+Instance methods currently consume read-only value snapshots: receiver at argument
+zero, declared parameters afterward. Mutable/by-reference receivers are unimplemented;
+no Rust borrowing semantics or hidden heap allocation are implied. Method calls check
+receiver types and distinguish static/instance overloads explicitly.
+
+Added foundational Ptr<T>/T* signatures, distinct from Ref<T>. These do not yet expose
+raw address values or executable pointer operations. Recorded that the VM memory model
+is independent of Rust, and that reference-counted Ref is the intended first explicit
+ownership policy. Current Ref storage remains an arena and general generic definitions
+are still pending. Added an allocation-encoding proposal separating storage,
+construction, and optional ownership abstractions.
+
+Validation: all 49 integration tests pass, including eight new type/method/pointer
+signature tests. Clippy and formatting pass. The types sample prints 42, 0, 42 and
+returns Void without explicit heap allocations.
+
+Allocator follow-up: updated the allocation proposal to select an allocator rather
+than permanently encode only stack versus heap. Allocator selection is distinct
+from construction and lifetime ownership. Documented moving-GC requirements for
+roots/handles, allocator lifetime, and Ref-counted ownership composition. No new
+allocation opcode or managed-memory behavior is claimed by this documentation.
+
+## 2026-09-06 — Defer ownership management; prioritize heap and pointers
+
+Recorded the explicit-memory philosophy: languages may hide ownership wrappers or
+insert operations, but metadata/IL must make applicable lifetime behavior explicit.
+Plain T and Ptr<T> do not imply counted ownership. Ref<T> is a deferred explicit
+counted wrapper; generic support and type-aware copy/move/destruction would be
+needed. The split between library implementation and optional VM counter/retain/
+release support remains open. Rust Clone/Drop are not the guest specification.
+
+Clarified that the environment chooses allocation implementation and optional
+collection services while preserving declared contracts. Requiring a concrete
+allocator operand on every allocation was an earlier proposal, not a settled rule.
+
+Updated README, roadmap, and design notes to prioritize heap allocation and pointer
+operations. Reference counting, GC, automatic lifetime management, and allocator
+policy integration are deferred. No runtime behavior changed in this documentation
+update; existing type-system work is preserved. Validation: diff whitespace and
+local Markdown links checked; no additional runtime tests needed for these edits.
