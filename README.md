@@ -198,3 +198,6 @@ has been performed on macOS ARM64; the other platforms still require CI executio
 Typed memory initialization/copying (`initobj`, `cpobj`) and byte-range operations
 (`initblk`, `cpblk`) are implemented with explicit pointer checks. See
 [heap and pointer semantics](docs/heap-and-pointers.md#copying-and-initializing-memory).
+
+Parameter, local, and qualified field names are assembly conveniences mapped to
+canonical indices. See [identifier mappings](docs/neoil.md#identifier-mappings-and-field-aliases).

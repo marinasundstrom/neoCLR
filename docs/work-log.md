@@ -531,3 +531,23 @@ execution, instance receiver indexing, and labels around compact instructions.
 Validation: all 161 integration tests pass on macOS ARM64; formatting, clippy, and
 diff checks pass. The compact sample prints 42. Linux and Windows execution remain
 for the existing CI matrix.
+
+## 2026-09-06 — Identifier mappings and qualified field aliases
+
+Recorded the clarified contract: names are context-specific assembly/metadata aliases
+for normalized indices, not necessarily higher-level source identifiers. Parameters,
+locals, and fields have independent scopes, with field names unique per declaring type.
+
+Extended ldfld/stfld/ldflda authoring to accept Type::Field aliases. Resolution happens
+after declarations so forward-declared types work, then emits the same numeric index
+as explicit index syntax. The qualifier selects an assembly mapping table and is not
+retained as a runtime receiver-type assertion. Existing storage and index checks still
+apply; CLI field tokens and general external-module field resolution remain pending.
+
+Updated the names sample and documentation. Three tests cover all three field opcodes,
+forward declarations, exact normalized metadata equivalence, loading/execution,
+independent scopes, and source-line diagnostics for unknown/malformed names.
+
+Validation: all 164 integration tests pass on macOS ARM64; formatting, clippy, and
+diff checks pass. The names sample prints 42 and returns Ok(Void). Linux and Windows
+execution remain for the existing CI matrix.

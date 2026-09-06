@@ -75,7 +75,7 @@ headers that omit an inline parameter list. Names are unquoted; the former `name
 `ldarg value`, `starg value`, `ldloc point`, and `stloc point` resolve to numeric indices during
 assembly. Numeric operands remain valid even when slots have names. Calls continue
 using types only, such as `call Parse(string)`; names do not participate in overload
-identity. Field operands remain numeric in this slice.
+identity. Field operands accept an index or a qualified alias such as `Point::X`.
 
 Names are case-sensitive ASCII identifiers beginning with a letter or underscore,
 followed by letters, digits, or underscores. Parameter and local name scopes are
@@ -431,3 +431,29 @@ file yet. A future CIL writer will choose encodings from the canonical instructi
 Short branch forms still require binary offset handling and remain pending.
 Labels, instruction budgets, and stack behavior are identical to the full spelling.
 The `examples/compact.neoil` sample prints 42 using compact constants and slot access.
+
+
+## Identifier mappings and field aliases
+
+Indices are the normalized addresses for parameters, locals, and record fields in
+this prototype. Identifiers are optional assembly conveniences, resolved in their
+own context. Parameter names are unique within the parameter table of a function;
+local names are unique within its separate local table; field names are unique
+within their declaring type. The same spelling can appear independently in each
+scope. These are assembly/metadata names and need not correspond to identifiers in
+a higher-level source language. They do not participate in runtime slot lookup.
+
+`ldfld Point::X`, `stfld Point::X`, and `ldflda Point::X` resolve X's declaration
+index in Point. The owner is mandatory for named field operands, so no evaluation
+stack type inference is required. Types declared later in the same module are
+supported. Unknown owners/fields and malformed aliases produce source-line errors.
+Names are case-sensitive. Numeric operands remain valid.
+
+The emitted operand is just the field index, identical to authoring that index
+directly. The qualifier selects the mapping table during assembly; it adds no runtime
+receiver-type assertion. The interpreter applies the index to the actual record
+operand, using its existing bounds and storage checks. This is the temporary
+prototype's index representation, not yet a CLI FieldDef/MemberRef token. General
+external-module field resolution remains pending. Parameter/local name tables and
+field declaration names may remain in metadata for tools; instruction execution
+uses indices exclusively.

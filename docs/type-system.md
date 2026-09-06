@@ -139,3 +139,10 @@ without deciding String's encoding. UTF-8 text is a [proposed direction](text-mo
 Single/Double are also canonical System primitives. Both use one internal F stack
 category (binary64 in this interpreter), with explicit precision at storage and
 conversion boundaries. See [floating-point rules](floating-point.md).
+
+
+Parameter, local, and field identifiers are context-specific mappings to indices;
+they need not match a higher-level language's source identifiers. Parameter and
+local scopes are separate, and each declaring type defines its own field scope.
+Qualified field aliases such as `Point::X` resolve during assembly to the same
+numeric operands as explicit field indices. See [identifier mappings](neoil.md#identifier-mappings-and-field-aliases).

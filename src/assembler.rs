@@ -27,6 +27,7 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
         types: vec![],
         functions: vec![],
     };
+    let mut field_fixups: Vec<(usize, usize, Type, String, usize)> = vec![];
     let mut function: Option<PendingFunction> = None;
     let mut typedef: Option<TypeDef> = None;
     for (index, raw) in source.lines().enumerate() {
@@ -194,10 +195,27 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                         "ldarg" | "starg" | "ldloc" | "stloc" => Some(serde_json::json!(
                             resolve_slot(&pending.function, word, rest)?
                         )),
-                        "ldfld" | "stfld" | "ldflda" => Some(serde_json::json!(
-                            rest.parse::<usize>()
-                                .map_err(|_| Fault::new("expected nonnegative index"))?
-                        )),
+                        "ldfld" | "stfld" | "ldflda" => {
+                            let index = if let Ok(index) = rest.parse::<usize>() {
+                                index
+                            } else {
+                                let (owner, field) = rest.split_once("::").ok_or_else(|| {
+                                    Fault::new("expected field index or Type::Field")
+                                })?;
+                                let owner = parse_type(owner)?;
+                                let field = field.trim();
+                                identifier(field)?;
+                                field_fixups.push((
+                                    module.functions.len(),
+                                    pc,
+                                    owner,
+                                    field.into(),
+                                    line_number,
+                                ));
+                                0
+                            };
+                            Some(serde_json::json!(index))
+                        }
                         "br" | "brtrue" | "brfalse" | "beq" | "bne.un" | "bgt" | "bgt.un"
                         | "blt" | "blt.un" | "bge" | "bge.un" | "ble" | "ble.un" => {
                             identifier(rest)?;
@@ -374,6 +392,25 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
     }
     if module.name.is_empty() {
         return Err(Fault::new(".module is required"));
+    }
+    // Resolve after all declarations so field aliases can name later types.
+    for (function, pc, owner, name, line) in field_fixups {
+        let definition = module
+            .type_definition(&owner)
+            .ok_or_else(|| Fault::new(format!("line {line}: unknown field owner {owner:?}")))?;
+        let index = definition
+            .fields
+            .iter()
+            .position(|field| field.name == name)
+            .ok_or_else(|| {
+                Fault::new(format!("line {line}: unknown field {name:?} on {owner:?}"))
+            })?;
+        match &mut module.functions[function].body[pc] {
+            Instruction::Field(slot)
+            | Instruction::SetField(slot)
+            | Instruction::FieldAddress(slot) => *slot = index,
+            _ => return Err(Fault::new("invalid field fixup")),
+        }
     }
     Ok(module)
 }

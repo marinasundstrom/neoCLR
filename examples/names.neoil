@@ -7,9 +7,9 @@
 
     .method instance Sum(int32 offset) -> int32
         ldarg this
-        ldfld 0
+        ldfld Point::X
         ldarg this
-        ldfld 1
+        ldfld Point::Y
         add
         ldarg offset
         add
