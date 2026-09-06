@@ -392,6 +392,10 @@ pub enum Instruction {
     Branch(usize),
     #[serde(rename = "brtrue")]
     BranchTrue(usize),
+    #[serde(rename = "brfalse")]
+    BranchFalse(usize),
+    #[serde(rename = "switch")]
+    Switch(Vec<usize>),
     #[serde(rename = "call")]
     Call(FunctionRef),
     #[serde(rename = "ret")]

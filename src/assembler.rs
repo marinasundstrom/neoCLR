@@ -8,7 +8,7 @@ use std::collections::HashMap;
 struct PendingFunction {
     function: Function,
     labels: HashMap<String, usize>,
-    branches: Vec<(usize, String, usize)>,
+    branches: Vec<(usize, Option<usize>, String, usize)>,
     inline_parameters: bool,
 }
 
@@ -45,14 +45,20 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                     return Err(Fault::new(".end has no operand"));
                 }
                 if let Some(mut pending) = function.take() {
-                    for (pc, label, source_line) in pending.branches {
+                    for (pc, slot, label, source_line) in pending.branches {
                         let target = *pending.labels.get(&label).ok_or_else(|| {
                             Fault::new(format!(
                                 "undefined label {label} used on line {source_line}"
                             ))
                         })?;
                         match &mut pending.function.body[pc] {
-                            Instruction::Branch(i) | Instruction::BranchTrue(i) => *i = target,
+                            Instruction::Branch(i)
+                            | Instruction::BranchTrue(i)
+                            | Instruction::BranchFalse(i) => *i = target,
+                            Instruction::Switch(targets) => {
+                                targets[slot.ok_or_else(|| Fault::new("invalid switch fixup"))?] =
+                                    target
+                            }
                             _ => return Err(Fault::new("invalid branch fixup")),
                         }
                     }
@@ -178,10 +184,33 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                             rest.parse::<usize>()
                                 .map_err(|_| Fault::new("expected nonnegative index"))?
                         )),
-                        "br" | "brtrue" => {
+                        "br" | "brtrue" | "brfalse" => {
                             identifier(rest)?;
-                            pending.branches.push((pc, rest.into(), line_number));
+                            pending.branches.push((pc, None, rest.into(), line_number));
                             Some(serde_json::json!(0))
+                        }
+                        "switch" => {
+                            let labels = rest
+                                .strip_prefix('(')
+                                .and_then(|s| s.strip_suffix(')'))
+                                .ok_or_else(|| {
+                                Fault::new("expected switch (Label, Label, ...)")
+                            })?;
+                            let mut targets = vec![];
+                            if !labels.trim().is_empty() {
+                                for label in labels.split(',') {
+                                    let label = label.trim();
+                                    identifier(label)?;
+                                    pending.branches.push((
+                                        pc,
+                                        Some(targets.len()),
+                                        label.into(),
+                                        line_number,
+                                    ));
+                                    targets.push(0usize);
+                                }
+                            }
+                            Some(serde_json::json!(targets))
                         }
                         "call" => Some(
                             serde_json::to_value(parse_function_ref(rest)?)

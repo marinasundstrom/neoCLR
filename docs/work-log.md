@@ -401,3 +401,25 @@ zero-size allocations, and primitive alignment.
 Validation: all 130 integration tests pass on macOS ARM64; formatting, clippy, and
 diff checks pass. The stack sample prints 42 and leaves no live allocations.
 Linux and Windows execution remain for the existing CI matrix.
+
+## 2026-09-06 — Switch tables and false branches
+
+Added `switch (Label, ...)` and `brfalse Label` to assembly, metadata, validation,
+and interpretation. Switch labels resolve to instruction indices in the temporary
+JSON format, including repeated and backward targets. Selection uses an unsigned
+Int32 index; out-of-range indices fall through. Empty tables still consume the index.
+The loader validates every table target, including unreachable instructions.
+
+`brfalse` mirrors the existing Boolean-only `brtrue` contract. Broader CLR conditional
+operands and short aliases remain explicitly documented compatibility work. No static
+stack verifier or automatic union matching is implied. Documented the future mapping
+from instruction indices to CIL relative byte offsets.
+
+Added a loop/dispatch sample and eight tests for roundtrip execution, target selection,
+negative and boundary indices, empty tables, preserved stack entries, backward and
+repeated targets, both false-branch paths, malformed/unresolved labels, invalid
+serialized targets, operand types, underflow, and instruction budgets.
+
+Validation: all 138 integration tests pass on macOS ARM64; formatting, clippy, and
+diff checks pass. The sample prints zero, one, two, and outside table in order.
+Linux and Windows execution remain for the existing CI matrix.

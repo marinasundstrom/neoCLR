@@ -1,0 +1,41 @@
+.module ControlFlow
+.entry Main
+
+.function Describe(value: Int32) -> String
+    ldarg value
+    switch (Zero, One, Many)
+    ldstr "outside table"
+    ret
+Zero:
+    ldstr "zero"
+    ret
+One:
+    ldstr "one"
+    ret
+Many:
+    ldstr "two"
+    ret
+.end
+
+.function Main() -> Void
+    .local index: Int32
+    ldc.i4 0
+    stloc index
+Loop:
+    ldloc index
+    ldc.i4 4
+    clt
+    brfalse Done
+    ldloc index
+    call Describe(Int32)
+    call System.Console::WriteLine(String)
+    pop
+    ldloc index
+    ldc.i4 1
+    add
+    stloc index
+    br Loop
+Done:
+    ldvoid
+    ret
+.end

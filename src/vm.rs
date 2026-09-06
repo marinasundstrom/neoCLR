@@ -161,8 +161,13 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         }
         for op in &function.body {
             match op {
-                Op::Branch(i) | Op::BranchTrue(i) if *i >= function.body.len() => {
+                Op::Branch(i) | Op::BranchTrue(i) | Op::BranchFalse(i)
+                    if *i >= function.body.len() =>
+                {
                     return Err(Fault::new("branch outside function"));
+                }
+                Op::Switch(targets) if targets.iter().any(|i| *i >= function.body.len()) => {
+                    return Err(Fault::new("switch target outside function"));
                 }
                 Op::Arg(i) if *i >= function.argument_types().len() => {
                     return Err(Fault::new("argument index outside signature"));
@@ -515,6 +520,19 @@ fn interpret(
                     Value::Boolean(false) => (),
                     _ => return Err(Fault::new("brtrue requires Boolean")),
                 },
+                Op::BranchFalse(i) => match frame.pop()? {
+                    Value::Boolean(false) => frame.pc = *i,
+                    Value::Boolean(true) => (),
+                    _ => return Err(Fault::new("brfalse requires Boolean")),
+                },
+                Op::Switch(targets) => {
+                    let Value::Int32(index) = frame.pop()? else {
+                        return Err(Fault::new("switch requires Int32"));
+                    };
+                    if let Some(target) = targets.get(index as u32 as usize) {
+                        frame.pc = *target;
+                    }
+                }
                 Op::Call(target) => {
                     let index = resolve(module, target)
                         .ok_or_else(|| Fault::new("unknown function overload"))?;

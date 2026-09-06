@@ -23,7 +23,9 @@ scaffolding, not a prerequisite ownership policy for the pointer layer.
 
 ## Later milestones
 
-1. Add a control-flow verifier: typed stack states at joins, definite local
+1. `brfalse` and label-based `switch` tables are implemented. Extend conditional
+   branches beyond the current Boolean-only subset and add short-form aliases.
+   Add a control-flow verifier: typed stack states at joins, definite local
    initialization, valid return paths, and maximum stack calculation.
 2. Extend type/generic metadata and implement arrays when their storage contracts
    are ready; see [arrays and pointers](arrays-and-pointers.md).

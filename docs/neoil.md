@@ -175,6 +175,8 @@ normalization; other checks use exact type equality. See [integer storage](integ
 | `clt` | `N,N → Boolean` | Signed left operand less than right |
 | `br Label` | `→` | Unconditional branch |
 | `brtrue Label` | `Boolean →` | Branch when true |
+| `brfalse Label` | `Boolean →` | Branch when false |
+| `switch (Label, ...)` | `Int32 →` | Branch by zero-based index; otherwise fall through |
 | `call Name(T0, …, Tn)` | `P0,…,Pn → R` | Call declared IL or InternalCall function |
 | `ret` | `R → caller` | Return exactly one value; no extra stack items |
 | `newobj Name` | `F0,…,Fn → Name` | Construct frame-owned record in field declaration order |
@@ -298,3 +300,28 @@ local/debug metadata without putting names into instruction operands.
 See [memory operations](heap-and-pointers.md#copying-and-initializing-memory) for block counts, alignment, pointer tracking, and zero-length behavior.
 
 See [frame-local allocation](heap-and-pointers.md#frame-local-allocation) for `localloc` lifetime, alignment, and limits.
+
+
+## Switch tables and conditional branches
+
+`switch (Zero, One, Other)` consumes one Int32 and selects the corresponding
+zero-based target. Targets can repeat and refer forward or backward within the
+current function. An out-of-range index falls through to the next instruction;
+negative Int32 values are interpreted as unsigned for selection and therefore
+fall through for ordinary tables. `switch ()` is valid and consumes its index
+without branching. Older evaluation-stack entries are preserved.
+
+Parentheses are required, labels are separated by commas, and trailing commas are
+rejected. Undefined labels receive source-line diagnostics. The JSON prototype
+encodes `switch` with an `arg` array of absolute instruction indices, checked at
+load time even for unreachable instructions. This follows the existing branch
+representation. A future CIL writer must translate the table to relative byte
+offsets from the instruction after the switch, as specified in
+[Microsoft's switch reference](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.switch).
+
+`brfalse Label` consumes a Boolean and branches for false; `brtrue` branches for
+true. Both currently require Boolean. CLR integer/reference conditional operands
+and short-form branch aliases remain compatibility work, not intentional semantic
+differences. Tables do not add implicit default branches, union destructuring, or
+a static stack verifier. Stack types and instruction budgets remain checked during
+execution. See `examples/control-flow.neoil` for a loop and multi-way dispatch.
