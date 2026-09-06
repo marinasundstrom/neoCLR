@@ -5,6 +5,8 @@ use serde::{Deserialize, Serialize};
 pub enum Type {
     Void,
     Int32,
+    IntPtr,
+    UIntPtr,
     Boolean,
     String,
     Error,
@@ -22,6 +24,8 @@ impl Type {
         match name {
             "Void" | "void" | "System.Void" => Self::Void,
             "Int32" | "int32" | "int" | "System.Int32" => Self::Int32,
+            "IntPtr" | "nint" | "System.IntPtr" => Self::IntPtr,
+            "UIntPtr" | "nuint" | "System.UIntPtr" => Self::UIntPtr,
             "Boolean" | "boolean" | "bool" | "System.Boolean" => Self::Boolean,
             "String" | "string" | "System.String" => Self::String,
             "Error" | "System.Error" => Self::Error,
@@ -33,6 +37,8 @@ impl Type {
         match self {
             Self::Void => Some("System.Void"),
             Self::Int32 => Some("System.Int32"),
+            Self::IntPtr => Some("System.IntPtr"),
+            Self::UIntPtr => Some("System.UIntPtr"),
             Self::Boolean => Some("System.Boolean"),
             Self::String => Some("System.String"),
             Self::Error => Some("System.Error"),
@@ -44,7 +50,13 @@ impl Type {
     pub fn is_primitive(&self) -> bool {
         matches!(
             self,
-            Self::Void | Self::Int32 | Self::Boolean | Self::String | Self::Error
+            Self::Void
+                | Self::Int32
+                | Self::IntPtr
+                | Self::UIntPtr
+                | Self::Boolean
+                | Self::String
+                | Self::Error
         )
     }
 }
@@ -175,6 +187,24 @@ pub enum Instruction {
     MulChecked,
     #[serde(rename = "div")]
     Divide,
+    #[serde(rename = "add.ovf.un")]
+    AddCheckedUnsigned,
+    #[serde(rename = "sub.ovf.un")]
+    SubCheckedUnsigned,
+    #[serde(rename = "mul.ovf.un")]
+    MulCheckedUnsigned,
+    #[serde(rename = "div.un")]
+    DivideUnsigned,
+    #[serde(rename = "clt.un")]
+    LessUnsigned,
+    #[serde(rename = "conv.i")]
+    ConvertNativeInt,
+    #[serde(rename = "conv.u")]
+    ConvertNativeUInt,
+    #[serde(rename = "conv.i4")]
+    ConvertInt32,
+    #[serde(rename = "ptr.fromint")]
+    PointerFromInt(Type),
     #[serde(rename = "ceq")]
     Equal,
     #[serde(rename = "clt")]

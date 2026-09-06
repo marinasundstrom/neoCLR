@@ -27,7 +27,8 @@ Interfaces will use ordinary names without an `I` prefix.
 
 The first native heap/pointer slice is implemented: explicit allocation/free,
 native addresses, pointer casts and byte offsets, indirect access, and sequential
-record layout. See [heap and pointers](docs/heap-and-pointers.md).
+record layout. Native integers and explicit pointer/address conversions are also
+available. See [heap and pointers](docs/heap-and-pointers.md).
 Reference counting, GC, and higher-level lifetime management remain deferred.
 Types describe values and behavior; allocation and lifetime are separate choices,
 with no class/struct bit deciding either. The proof of concept aims to make migration
@@ -44,6 +45,7 @@ cargo run -- run examples/overloads.neoil
 cargo run -- run examples/types.neoil
 cargo run -- run examples/names.neoil
 cargo run -- run examples/pointers.neoil
+cargo run -- run examples/native-integers.neoil
 cargo run -- run examples/fault.neoil
 ```
 
@@ -105,6 +107,8 @@ reference resolution. See [runtime library design](docs/runtime-library.md).
   in metadata; named operands assemble to indices.
 - Canonical System primitive definitions, type-owned static methods, and read-only
   instance receiver snapshots; see [type system](docs/type-system.md).
+- `System.IntPtr`/`System.UIntPtr` (`nint`/`nuint`), native-width arithmetic,
+  conversions, and native storage; see [native integers](docs/native-integers.md).
 - Native `Ptr<T>`/`T*` values, explicit heap allocation/free, casts, byte offsets,
   field addresses, typed loads/stores, and native-sized pointer fields.
 - `Void`, `Int32`, `Boolean`, `String`, `Error`, records, and constructed

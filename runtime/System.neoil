@@ -13,6 +13,12 @@
 .type System.Error
 .end
 
+.type System.IntPtr
+.end
+
+.type System.UIntPtr
+.end
+
 .type System.Int32
     .method static Parse(value: string) -> Result<Int32,Error>
         ldarg 0

@@ -55,6 +55,13 @@ services are not a reason to make guest ownership implicit.
 
 ## Deferred ownership abstractions
 
+Future modeling should emphasize explicit types for semantic contracts. For example,
+Ref<T> may represent counted ownership; its type can communicate the applicable
+copy/release behavior. This is a direction for generic types and library abstractions,
+not a requirement that all allocations carry counts. Optional collection policies
+must likewise have explicit access/lifetime contracts. The current Ref arena does
+not yet implement these contracts.
+
 A plain value should not automatically contain a reference count. Ref<T> is an
 explicit candidate for counted ownership: creation establishes a reference, copying
 retains it, release decrements its count, and final release destroys the value and

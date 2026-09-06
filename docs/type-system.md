@@ -119,3 +119,14 @@ generic definitions. A library-defined, reference-counted `Ref<T>` requires real
 generic metadata, layout, and lifetime operations. It remains deferred, not implemented. The native heap/pointer subset does not depend on this wrapper.
 See [memory model layers](memory-model.md) for the separation between raw VM memory
 and ownership policies.
+
+
+Native-sized integers use canonical System.IntPtr/System.UIntPtr type identities,
+with nint/nuint aliases. Their arithmetic and native storage are executable; see
+[native integers](native-integers.md). General generic type definitions remain pending.
+
+Future modeling should place more emphasis on types to express contracts. Ref<T>
+may express reference-counted ownership, while Ptr<T> expresses address access without
+ownership. Such abstractions should build on the core type system instead of restoring
+a permanent class/struct allocation distinction. The exact ownership operations and
+the division between library code and runtime support remain open.

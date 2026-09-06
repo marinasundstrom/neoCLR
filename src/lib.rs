@@ -45,3 +45,5 @@ pub fn load(source: &str) -> Result<Module, Fault> {
     vm::validate(&module)?;
     Ok(module)
 }
+
+mod numeric;

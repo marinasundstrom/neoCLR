@@ -9,7 +9,7 @@ intentional departures and incomplete prototype behavior distinguished below.
 
 ## Allocation, initialization, and access
 
-`heap.alloc T` consumes an Int32 element count and returns `Ptr<T>` (`T*`). Storage
+`heap.alloc T` consumes a nonnegative Int32, IntPtr, or UIntPtr element count and returns `Ptr<T>` (`T*`). Storage
 comes from the host native allocator and is aligned for T. It is logically
 uninitialized: reads require initialization through stores. Allocation does not
 construct a value. `newobj T` constructs a record value; `stobj T` copies it into
@@ -35,7 +35,7 @@ heap.free
 pop
 ```
 
-`ldflda` uses a field index to select its address. `ptr.add` consumes a signed Int32
+`ldflda` uses a field index to select its address. `ptr.add` consumes an Int32 or IntPtr
 **byte** offset, not an element index. Multiply by `sizeof T` for element stepping.
 `ptr.cast T` preserves the address and changes its target type. Casts do not perform
 access or confer validity. Typed loads/stores require a matching pointer target;
@@ -67,6 +67,7 @@ Supported storage layouts:
 | Int32 | 4 | 4 |
 | Boolean | 1 | 1 |
 | Void | 0 | 1 |
+| IntPtr / UIntPtr | Native pointer width | Native pointer alignment |
 | Ptr<T> | Native pointer width | Native pointer alignment |
 | Record | Sequential fields, padding between fields and at end | Largest field alignment, or 1 |
 
@@ -99,7 +100,10 @@ the tracking, even if they happen to write identical bytes. Reading those bytes 
 a pointer is allowed; dereferencing/freeing an untracked non-null pointer currently
 Faults. This limitation must be addressed alongside external native memory access.
 Freed allocation identities are never reused, so tracked dangling pointers Fault
-even if the native allocator later reuses an address.
+even if the native allocator later reuses an address. Explicit conversion through
+an integer discards that identity: `ptr.fromint T` resolves the current live allocation
+at the address, if any. An address may therefore identify reused storage; no historical
+lifetime is inferred from integer bits. See [native integers](native-integers.md).
 
 Defaults allow 16 MiB of live payload and 4096 allocation identities per execution.
 Free returns payload budget, but identities include freed allocations. The byte
@@ -110,8 +114,7 @@ Faults; a recoverable allocation API can expose Result later.
 
 ## Remaining capabilities
 
-Native integers and integer/address conversion, externally supplied pointers,
-P/Invoke, stack allocation/address-taking, more numeric types and indirect opcodes,
+Externally supplied memory access, P/Invoke, stack allocation/address-taking, more numeric types and indirect opcodes,
 block operations, unaligned access, explicit layout/packing, and foreign ownership
 contracts remain unimplemented. The current native pointer subset is groundwork
 for those capabilities, not a claim of .NET binary or unsafe-code compatibility.

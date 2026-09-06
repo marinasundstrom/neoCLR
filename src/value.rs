@@ -4,6 +4,8 @@ use crate::metadata::{Case, Type};
 pub enum Value {
     Void,
     Int32(i32),
+    IntPtr(isize),
+    UIntPtr(usize),
     Boolean(bool),
     String(String),
     Error(String),
@@ -28,6 +30,8 @@ impl Value {
         match self {
             Self::Void => Type::Void,
             Self::Int32(_) => Type::Int32,
+            Self::IntPtr(_) => Type::IntPtr,
+            Self::UIntPtr(_) => Type::UIntPtr,
             Self::Boolean(_) => Type::Boolean,
             Self::String(_) => Type::String,
             Self::Error(_) => Type::Error,

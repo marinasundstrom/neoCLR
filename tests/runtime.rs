@@ -127,7 +127,11 @@ fn invalid_execution_faults_with_location() {
             "ldc.i4 2147483647\nldc.i4 2\nmul.ovf\nret",
             "overflow",
         ),
-        ("Void", "ldc.i4 1\nldvoid\nadd\nret", "expected Int32"),
+        (
+            "Void",
+            "ldc.i4 1\nldvoid\nadd\nret",
+            "matching integer types",
+        ),
         ("Void", "none Void\nldcase Some\nret", "case mismatch"),
         ("Void", "none Void\nis.case Ok\nret", "does not belong"),
         ("Void", "ldvoid\nheap.load\nret", "requires Ref"),
@@ -257,6 +261,7 @@ fn all_implemented_opcodes_have_a_sample() {
         include_str!("../examples/features.neoil"),
         include_str!("../examples/fault.neoil"),
         include_str!("../examples/pointers.neoil"),
+        include_str!("../examples/native-integers.neoil"),
     ];
     let mut covered = std::collections::HashSet::new();
     for source in samples {
@@ -286,6 +291,15 @@ fn all_implemented_opcodes_have_a_sample() {
         "mul",
         "div",
         "add.ovf",
+        "add.ovf.un",
+        "sub.ovf.un",
+        "mul.ovf.un",
+        "div.un",
+        "clt.un",
+        "conv.i",
+        "conv.u",
+        "conv.i4",
+        "ptr.fromint",
         "sub.ovf",
         "mul.ovf",
         "ceq",

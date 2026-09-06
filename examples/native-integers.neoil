@@ -1,0 +1,63 @@
+.module NativeIntegers
+.entry Main
+
+.function Main() -> Void
+    .local storage: int32*
+    .local address: nuint
+
+    ; Allocate two integers using a native-sized count.
+    ldc.i4 2
+    conv.u
+    heap.alloc int32
+    stloc storage
+    ldloc storage
+    conv.u
+    stloc address
+
+    ; Compute the second element's address with native integer arithmetic.
+    ldloc address
+    sizeof int32
+    conv.u
+    add.ovf.un
+    ptr.fromint int32
+    ldc.i4 42
+    stind.i4
+    ldloc storage
+    sizeof int32
+    conv.i
+    ptr.add
+    ldind.i4
+    call System.Console.WriteLine(int32)
+    pop
+
+    ; The signedness of the opcode controls comparison and overflow checking.
+    ldc.i4 7
+    conv.u
+    ldc.i4 3
+    conv.u
+    sub.ovf.un
+    ldc.i4 2
+    conv.u
+    mul.ovf.un
+    ldc.i4 2
+    conv.u
+    div.un
+    conv.i4
+    ldc.i4 4
+    ceq
+    brtrue ArithmeticPassed
+    fault "native arithmetic failed"
+ArithmeticPassed:
+    ldc.i4 -1
+    conv.i
+    ldc.i4 0
+    conv.i
+    clt.un
+    brtrue UnexpectedComparison
+    ldloc address
+    ptr.fromint int32
+    heap.free
+    ret
+UnexpectedComparison:
+    fault "unsigned native comparison failed"
+.end

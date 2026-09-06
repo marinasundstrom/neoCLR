@@ -215,3 +215,26 @@ fields, aggregate layout/copying, lifetime and invalid-access diagnostics, quota
 reclamation, and metadata validation. Clippy and formatting pass on macOS ARM64.
 The pointer sample prints 42 and returns Ok(Void), with all its allocations freed.
 Cross-platform execution remains subject to the existing CI matrix.
+
+## 2026-09-06 — Native integers and address conversions
+
+Added canonical System.IntPtr/System.UIntPtr primitive definitions with nint/nuint
+aliases, native layouts, and native storage loads/stores. Extended integer arithmetic
+to native width, added unsigned checked arithmetic, div.un and clt.un, and kept
+signedness controlled by opcodes. Added conv.i/conv.u/conv.i4 and ptr.fromint T.
+Allocation counts accept native integers and ptr.add accepts signed native offsets.
+
+Integer conversions discard diagnostic pointer identity. Reconstruction resolves
+current live native storage at an address; unknown addresses can be represented but
+cannot yet be accessed. Documented allocation reuse implications and the remaining
+mixed-type evaluation-stack limitations. Native interop, other scalar widths, and
+full IntPtr/UIntPtr library members remain future work.
+
+Recorded the direction of modeling more contracts through explicit types, including
+Ref<T> as a possible counted-ownership abstraction. This does not introduce reference
+counting or couple plain values and pointer allocations to an ownership policy.
+
+Validation: all 80 integration tests pass, including eight new native-integer tests.
+Clippy, formatting, and diff whitespace checks pass. The native-integer sample
+prints 42, returns Void, and frees its allocation. Local validation is macOS ARM64;
+the tests derive expected native widths from the host for the existing CI matrix.

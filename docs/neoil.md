@@ -36,9 +36,9 @@ escapes. Identifiers contain ASCII letters, digits, underscores, and dots.
 - `Label:` identifies the following instruction. Branches name labels in the same
   function; labels can be forward references. A label past the last instruction
   cannot be a branch target.
-- Types are `Void`, `Int32`, `Boolean`, `String`, `Error`, a record name,
+- Types are `Void`, `Int32`, `IntPtr`, `UIntPtr`, `Boolean`, `String`, `Error`, a record name,
   `Option<T>`, `Result<T,E>`, `Ref<T>`, or `Ptr<T>` (also spelled `T*`). Spaces inside generic signatures are allowed.
-  Primitive aliases `void`, `int32`/`int`, `boolean`/`bool`, and `string`
+  Primitive aliases `void`, `int32`/`int`, `nint`, `nuint`, `boolean`/`bool`, and `string`
   and fully qualified names such as `System.Int32` normalize to canonical types.
   There is a nesting limit of 32 in assembly type expressions.
 
@@ -138,11 +138,18 @@ denote actual runtime types; all checks use exact type equality.
 | `stloc i` | `T →` | Replace typed local |
 | `dup` | `T → T,T` | Copy value; references preserve identity |
 | `pop` | `T →` | Discard value |
-| `add`, `sub`, `mul` | `Int32,Int32 → Int32` | Wrapping arithmetic |
-| `add.ovf`, `sub.ovf`, `mul.ovf` | `Int32,Int32 → Int32` | Checked arithmetic; overflow Fault |
-| `div` | `Int32,Int32 → Int32` | Signed quotient truncated toward zero; zero/overflow Fault |
+| `add`, `sub`, `mul` | `N,N → N` | Wrapping integer arithmetic |
+| `add.ovf`, `sub.ovf`, `mul.ovf` | `N,N → N` | Signed checked integer arithmetic; overflow Fault |
+| `div` | `N,N → N` | Signed quotient truncated toward zero; zero/overflow Fault |
+| `add.ovf.un`, `sub.ovf.un`, `mul.ovf.un` | `N,N → N` | Unsigned checked arithmetic; overflow Fault |
+| `div.un` | `N,N → N` | Unsigned quotient; zero Fault |
+| `clt.un` | `N,N → Boolean` | Unsigned comparison |
+| `conv.i` | `Integer or Ptr<T> → IntPtr` | Native signed conversion |
+| `conv.u` | `Integer or Ptr<T> → UIntPtr` | Native unsigned conversion |
+| `conv.i4` | `Integer → Int32` | Retain low 32 bits |
+| `ptr.fromint T` | `IntPtr or UIntPtr → Ptr<T>` | Interpret native address bits |
 | `ceq` | `T,T → Boolean` | Structural equality; reference identity |
-| `clt` | `Int32,Int32 → Boolean` | Left operand less than right |
+| `clt` | `N,N → Boolean` | Signed left operand less than right |
 | `br Label` | `→` | Unconditional branch |
 | `brtrue Label` | `Boolean →` | Branch when true |
 | `call Name(T0, …, Tn)` | `P0,…,Pn → R` | Call declared IL or InternalCall function |
@@ -152,11 +159,11 @@ denote actual runtime types; all checks use exact type equality.
 | `stfld i` | `Record,T → Record` | Produce updated record value |
 | `sizeof T` | `→ Int32` | Byte size of supported native layout |
 | `alignof T` | `→ Int32` | Native layout alignment |
-| `heap.alloc T` | `Int32 → Ptr<T>` | Allocate uninitialized storage for count elements |
+| `heap.alloc T` | `Integer → Ptr<T>` | Allocate uninitialized storage for count elements |
 | `heap.free` | `Ptr<T> → Void` | Free allocation base; null is a no-op |
 | `ptr.null T` | `→ Ptr<T>` | Actual null address |
 | `ptr.cast T` | `Ptr<U> → Ptr<T>` | Reinterpret target type, preserving address |
-| `ptr.add` | `Ptr<T>,Int32 → Ptr<T>` | Signed byte offset; checked prototype bounds |
+| `ptr.add` | `Ptr<T>,Int32 or IntPtr → Ptr<T>` | Signed byte offset; checked prototype bounds |
 | `ldflda i` | `Ptr<Record> → Ptr<T>` | Address field at zero-based index |
 | `ldobj T` | `Ptr<T> → T` | Copy initialized value from native storage |
 | `stobj T` | `Ptr<T>,T →` | Copy value into native storage |
@@ -173,6 +180,11 @@ denote actual runtime types; all checks use exact type equality.
 | `ldcase Case` | `Union → Payload` | Extract matching case; mismatch Faults; None yields Void |
 | `error "code"` | `→ Error` | Construct bootstrap error value |
 | `fault "message"` | `→ termination` | End guest execution |
+
+Here `N` is Int32, IntPtr, or UIntPtr; binary operands currently require matching
+types. Signedness comes from the opcode, not the type name. This subset does not yet
+implement full CIL evaluation-stack normalization or mixed-width arithmetic. See
+[native integers](native-integers.md) for conversions and address tracking.
 
 Use `dup; is.case …; brtrue …` to preserve a union for extraction on a matching
 branch. There is no implicit error propagation or unsafe successful-case assumption.

@@ -60,7 +60,9 @@ pub fn layout(module: &Module, ty: &Type) -> Result<Layout, Fault> {
             Type::Int32 => (4, 4),
             Type::Boolean => (1, 1),
             Type::Void => (0, 1),
-            Type::Ptr(_) => (std::mem::size_of::<usize>(), std::mem::align_of::<usize>()),
+            Type::IntPtr | Type::UIntPtr | Type::Ptr(_) => {
+                (std::mem::size_of::<usize>(), std::mem::align_of::<usize>())
+            }
             Type::Named(name) => {
                 if path.contains(name) || path.len() >= 64 {
                     return Err(Fault::new("recursive or excessively nested record layout"));
@@ -186,11 +188,10 @@ impl PointerHeap {
         &mut self,
         ty: Type,
         layout: &Layout,
-        count: i32,
+        count: usize,
         byte_limit: usize,
         allocation_limit: usize,
     ) -> Result<Pointer, Fault> {
-        let count = usize::try_from(count).map_err(|_| Fault::new("negative allocation count"))?;
         let size = layout
             .size
             .checked_mul(count)
@@ -230,6 +231,37 @@ impl PointerHeap {
         })
     }
 
+    /// Integer conversions have address semantics: recover only a current live
+    /// allocation, not a historical identity. Prefer exact bases over one-past aliases.
+    pub(crate) fn pointer_at_address(&self, address: usize, target: Type) -> Pointer {
+        if address == 0 {
+            return Pointer::null(target);
+        }
+        let candidates = || {
+            self.allocations
+                .iter()
+                .enumerate()
+                .filter_map(|(id, slot)| slot.as_ref().map(|allocation| (id, allocation)))
+        };
+        let found = candidates()
+            .find(|(_, a)| a.bytes.address() == address)
+            .or_else(|| {
+                candidates().find(|(_, a)| {
+                    address
+                        .checked_sub(a.bytes.address())
+                        .is_some_and(|offset| offset <= a.bytes.len())
+                })
+            });
+        let (allocation, offset) =
+            found.map_or((None, 0), |(id, a)| (Some(id), address - a.bytes.address()));
+        Pointer {
+            address,
+            allocation,
+            offset,
+            target,
+        }
+    }
+
     fn allocation(&self, pointer: &Pointer) -> Result<&Allocation, Fault> {
         if pointer.address == 0 {
             return Err(Fault::new("null pointer access"));
@@ -264,7 +296,7 @@ impl PointerHeap {
         Ok(pointer.offset..end)
     }
 
-    pub(crate) fn offset(&self, pointer: &Pointer, bytes: i32) -> Result<Pointer, Fault> {
+    pub(crate) fn offset(&self, pointer: &Pointer, bytes: isize) -> Result<Pointer, Fault> {
         let allocation = self.allocation(pointer)?;
         let offset = pointer.offset as i128 + bytes as i128;
         if offset < 0 || offset > allocation.bytes.len() as i128 {
@@ -385,12 +417,22 @@ fn decode(
             })
         }
         Type::Void => Ok(Value::Void),
-        Type::Int32 | Type::Boolean | Type::Ptr(_) => {
+        Type::Int32 | Type::IntPtr | Type::UIntPtr | Type::Boolean | Type::Ptr(_) => {
             if !allocation.initialized[offset..offset + layout.size]
                 .iter()
                 .all(|b| *b)
             {
                 return Err(Fault::new("read of uninitialized memory"));
+            }
+            if matches!(ty, Type::IntPtr | Type::UIntPtr) {
+                let mut bytes = [0; std::mem::size_of::<usize>()];
+                bytes.copy_from_slice(&allocation.bytes.slice()[offset..offset + layout.size]);
+                let bits = usize::from_ne_bytes(bytes);
+                return Ok(if *ty == Type::IntPtr {
+                    Value::IntPtr(bits as isize)
+                } else {
+                    Value::UIntPtr(bits)
+                });
             }
             if let Type::Ptr(target) = ty {
                 let mut bytes = [0; std::mem::size_of::<usize>()];
@@ -441,6 +483,16 @@ fn encode(
         Value::Int32(n) => {
             bytes[offset..offset + 4].copy_from_slice(&n.to_ne_bytes());
             initialized[offset..offset + 4].fill(true);
+        }
+        Value::IntPtr(_) | Value::UIntPtr(_) => {
+            let bits = match value {
+                Value::IntPtr(n) => *n as usize,
+                Value::UIntPtr(n) => *n,
+                _ => unreachable!(),
+            };
+            let size = std::mem::size_of::<usize>();
+            bytes[offset..offset + size].copy_from_slice(&bits.to_ne_bytes());
+            initialized[offset..offset + size].fill(true);
         }
         Value::Boolean(b) => {
             bytes[offset] = u8::from(*b);

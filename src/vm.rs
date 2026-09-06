@@ -202,7 +202,8 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 | Op::Ok(ty)
                 | Op::Err(ty)
                 | Op::NullPointer(ty)
-                | Op::PointerCast(ty) => check_type(ty, module)?,
+                | Op::PointerCast(ty)
+                | Op::PointerFromInt(ty) => check_type(ty, module)?,
                 _ => (),
             }
         }
@@ -264,12 +265,6 @@ impl Frame {
         match self.pop()? {
             Value::Pointer(p) => Ok(p),
             _ => Err(Fault::new("expected Ptr")),
-        }
-    }
-    fn int(&mut self) -> Result<i32, Fault> {
-        match self.pop()? {
-            Value::Int32(n) => Ok(n),
-            _ => Err(Fault::new("expected Int32")),
         }
     }
     fn args(&mut self, types: &[Type]) -> Result<Vec<Value>, Fault> {
@@ -370,43 +365,42 @@ fn interpret(module: &Module, limits: Limits) -> Result<Execution, Fault> {
                 Op::Pop => {
                     frame.pop()?;
                 }
-                Op::Add | Op::Sub | Op::Mul | Op::AddChecked | Op::SubChecked | Op::MulChecked => {
-                    let right = frame.int()?;
-                    let left = frame.int()?;
-                    let value = match op {
-                        Op::Add => Some(left.wrapping_add(right)),
-                        Op::Sub => Some(left.wrapping_sub(right)),
-                        Op::Mul => Some(left.wrapping_mul(right)),
-                        Op::AddChecked => left.checked_add(right),
-                        Op::SubChecked => left.checked_sub(right),
-                        _ => left.checked_mul(right),
-                    };
-                    frame.stack.push(Value::Int32(
-                        value.ok_or_else(|| Fault::new("Int32 overflow"))?,
-                    ));
+                Op::Add
+                | Op::Sub
+                | Op::Mul
+                | Op::AddChecked
+                | Op::SubChecked
+                | Op::MulChecked
+                | Op::AddCheckedUnsigned
+                | Op::SubCheckedUnsigned
+                | Op::MulCheckedUnsigned
+                | Op::Divide
+                | Op::DivideUnsigned
+                | Op::Less
+                | Op::LessUnsigned => {
+                    let right = frame.pop()?;
+                    let left = frame.pop()?;
+                    frame.stack.push(crate::numeric::binary(op, left, right)?);
                 }
-                Op::Divide => {
-                    let right = frame.int()?;
-                    let left = frame.int()?;
-                    let value = left.checked_div(right).ok_or_else(|| {
-                        Fault::new(if right == 0 {
-                            "division by zero"
-                        } else {
-                            "Int32 overflow"
-                        })
-                    })?;
-                    frame.stack.push(Value::Int32(value));
+                Op::ConvertNativeInt | Op::ConvertNativeUInt | Op::ConvertInt32 => {
+                    let value = frame.pop()?;
+                    frame.stack.push(crate::numeric::convert(op, value)?);
+                }
+                Op::PointerFromInt(ty) => {
+                    let address = match frame.pop()? {
+                        Value::IntPtr(n) => n as usize,
+                        Value::UIntPtr(n) => n,
+                        _ => return Err(Fault::new("ptr.fromint requires native integer")),
+                    };
+                    frame.stack.push(Value::Pointer(
+                        memory.pointer_at_address(address, ty.clone()),
+                    ));
                 }
                 Op::Equal => {
                     let right = frame.pop()?;
                     let left = frame.pop()?;
                     expect(&right, &left.ty())?;
                     frame.stack.push(Value::Boolean(left == right));
-                }
-                Op::Less => {
-                    let right = frame.int()?;
-                    let left = frame.int()?;
-                    frame.stack.push(Value::Boolean(left < right));
                 }
                 Op::Branch(i) => frame.pc = *i,
                 Op::BranchTrue(i) => match frame.pop()? {
@@ -494,7 +488,13 @@ fn interpret(module: &Module, limits: Limits) -> Result<Execution, Fault> {
                     ));
                 }
                 Op::Allocate(ty) => {
-                    let count = frame.int()?;
+                    let count = match frame.pop()? {
+                        Value::Int32(n) => usize::try_from(n).ok(),
+                        Value::IntPtr(n) => usize::try_from(n).ok(),
+                        Value::UIntPtr(n) => Some(n),
+                        _ => return Err(Fault::new("allocation count requires integer")),
+                    }
+                    .ok_or_else(|| Fault::new("negative allocation count"))?;
                     let layout = crate::memory::layout(module, ty)?;
                     let pointer = memory.allocate(
                         ty.clone(),
@@ -518,7 +518,11 @@ fn interpret(module: &Module, limits: Limits) -> Result<Execution, Fault> {
                     frame.stack.push(Value::Pointer(pointer));
                 }
                 Op::PointerAdd => {
-                    let offset = frame.int()?;
+                    let offset = match frame.pop()? {
+                        Value::Int32(n) => n as isize,
+                        Value::IntPtr(n) => n,
+                        _ => return Err(Fault::new("pointer offset requires Int32 or IntPtr")),
+                    };
                     let pointer = frame.pointer()?;
                     frame
                         .stack
