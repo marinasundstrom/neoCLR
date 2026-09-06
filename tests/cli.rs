@@ -53,3 +53,35 @@ fn cli_fault_has_failure_exit_code() {
             .contains("at Main:0")
     );
 }
+
+#[test]
+fn cli_compiles_and_loads_platform_runtime_library() {
+    let binary = env!("CARGO_BIN_EXE_neoclr");
+    let path = std::env::temp_dir().join(format!(
+        "neoclr-system-{}-{}.neo.json",
+        std::process::id(),
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
+    ));
+    let compiled = Command::new(binary)
+        .args(["assemble", "runtime/System.neoil"])
+        .arg(&path)
+        .output()
+        .unwrap();
+    assert!(compiled.status.success(), "{compiled:?}");
+    let output = Command::new(binary)
+        .args(["run", "examples/hello.neoil"])
+        .arg(&path)
+        .output()
+        .unwrap();
+    assert!(output.status.success(), "{output:?}");
+    assert_eq!(
+        String::from_utf8(output.stdout)
+            .unwrap()
+            .replace("\r\n", "\n"),
+        "Hello, world!\n=> Void\n"
+    );
+    std::fs::remove_file(path).unwrap();
+}

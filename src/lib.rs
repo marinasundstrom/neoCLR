@@ -1,12 +1,14 @@
 pub mod assembler;
 pub use assembler::assemble;
+pub mod library;
 pub mod metadata;
+mod native;
 pub mod value;
 mod vm;
 
 pub use metadata::Module;
 pub use value::Value;
-pub use vm::{Execution, Limits, run};
+pub use vm::{Execution, Limits, run, run_with_library};
 
 /// A terminal runtime/loader failure. Guest code cannot catch a Fault.
 #[derive(Debug, Clone, PartialEq, Eq)]

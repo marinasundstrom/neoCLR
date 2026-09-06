@@ -77,15 +77,15 @@ fn void_is_a_value_and_a_generic_argument() {
 fn arithmetic_failures_are_errors_when_requested() {
     for (body, expected) in [
         (
-            "ldc.i4 1\nldc.i4 0\ncall System.Int32.Divide\nldcase Err\nret",
+            "ldc.i4 1\nldc.i4 0\ncall System.Int32.Divide(int32, int32)\nldcase Err\nret",
             "DivisionByZero",
         ),
         (
-            "ldc.i4 -2147483648\nldc.i4 -1\ncall System.Int32.Divide\nldcase Err\nret",
+            "ldc.i4 -2147483648\nldc.i4 -1\ncall System.Int32.Divide(int32, int32)\nldcase Err\nret",
             "Overflow",
         ),
         (
-            "ldstr \"2147483648\"\ncall System.Int32.Parse\nldcase Err\nret",
+            "ldstr \"2147483648\"\ncall System.Int32.Parse(string)\nldcase Err\nret",
             "InvalidInt32",
         ),
     ] {
@@ -94,7 +94,7 @@ fn arithmetic_failures_are_errors_when_requested() {
     assert_eq!(
         eval(
             "Int32",
-            "ldstr \"42\"\ncall System.Int32.Parse\nldcase Ok\nret"
+            "ldstr \"42\"\ncall System.Int32.Parse(string)\nldcase Ok\nret"
         ),
         Value::Int32(42)
     );
@@ -138,7 +138,7 @@ fn invalid_execution_faults_with_location() {
         ),
         (
             "Void",
-            "ldvoid\ncall System.Int32.Parse\nret",
+            "ldvoid\ncall System.Int32.Parse(string)\nret",
             "expected String",
         ),
         ("Void", "fault \"stop\"", "stop"),
@@ -156,7 +156,7 @@ fn invalid_execution_faults_with_location() {
 
 #[test]
 fn calls_copy_frame_owned_records_across_return() {
-    let module = assemble(".module Copy\n.entry Main\n.type Box\n.field Value Int32\n.end\n.function Make -> Box\nldc.i4 7\nnewobj Box\nret\n.end\n.function Main -> Int32\ncall Make\nldfld 0\nret\n.end").unwrap();
+    let module = assemble(".module Copy\n.entry Main\n.type Box\n.field Value Int32\n.end\n.function Make -> Box\nldc.i4 7\nnewobj Box\nret\n.end\n.function Main -> Int32\ncall Make()\nldfld 0\nret\n.end").unwrap();
     let result = run(&module, Limits::default()).unwrap();
     assert_eq!(result.value, Value::Int32(7));
     assert!(result.heap.is_empty());
@@ -196,7 +196,7 @@ fn limits_stop_loops_recursion_stack_and_heap_growth() {
         .message
         .contains("instruction limit")
     );
-    let recursive = program("Void", "call Main\nret");
+    let recursive = program("Void", "call Main()\nret");
     assert!(
         run(
             &recursive,
@@ -283,6 +283,7 @@ fn all_implemented_opcodes_have_a_sample() {
         "add",
         "sub",
         "mul",
+        "div",
         "add.ovf",
         "sub.ovf",
         "mul.ovf",

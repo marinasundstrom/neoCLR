@@ -1,6 +1,6 @@
 ; Expected terminal Fault: no guest catch/unwind machinery exists.
 .module FaultDemo
 .entry Main
-.function Main -> Void
+.function Main() -> Void
     fault "A non-recoverable invariant failed"
 .end

@@ -1,7 +1,10 @@
 # Initial semantic decisions
 
 These decisions describe the executable prototype. They are revisable design
-choices, not a frozen platform specification.
+choices, not a frozen platform specification. The default is .NET/CLR semantics
+where we have not intentionally diverged. Incomplete primitive coverage, simplified
+metadata, structural equality in this prototype, and restricted parsing are not
+authorization to redefine otherwise unchanged CLR behavior permanently.
 
 ## Type and storage are separate
 
@@ -51,7 +54,7 @@ handlers, catch clauses, or guest unwind semantics. Errors are ordinary values;
 callers inspect the case, branch, and handle or return them explicitly.
 `E` can be any supported type. The bootstrap `Error` type currently stores an
 error code string, with `InvalidInt32`, `DivisionByZero`, and `Overflow` produced
-by numeric intrinsics. Structured error types remain future library work.
+by numeric library operations and the parsing primitive. Structured error types remain future library work.
 
 A Fault terminates the entire guest execution and is not catchable by guest code.
 Invalid instructions/metadata, invalid types or stack use, failed invariants,
@@ -87,8 +90,11 @@ than applying integer/reference truthiness.
 
 A module has a format version, name, entry-function name, type definitions, and
 free-function definitions. Functions have no required owner type. Dotted names
-are ordinary names; `System.Int32.Parse` is currently an intrinsic symbol, not a
-method container with dispatch. Types have named, ordered fields. Prototype
+are ordinary names; `System.Int32.Parse` is a library function symbol, not a
+method container with dispatch. Function identity includes the ordered parameter
+types. Calls select that exact overload; return types are not overload keys.
+`.entry Main` selects `Main()` even when other Main overloads exist. Types have
+named, ordered fields. Prototype
 instructions index fields and locals from zero, and assembled branch labels become
 absolute instruction indices within one function.
 
@@ -103,3 +109,13 @@ Library organization should retain familiar `System`, `System.Collections`,
 `System.IO`, and related areas. APIs with meaningful absence return `Option<T>`;
 recoverable failure returns `Result<T,E>`. Runtime async has no representation yet:
 no existing opcode is being given a speculative scheduling contract.
+
+## Platform-written library
+
+The System library is assembled from neoIL using the same front end as application
+code and executes through guest frames. `System.Int32.Divide` checks exceptional
+numeric cases explicitly and returns Errors; ordinary `div` follows signed integer
+quotient semantics and Faults on those invalid cases. `System.Math.Abs` implements
+its numeric logic in IL and returns `Result` for overflow. Console and parse APIs
+wrap the small host primitive surface. This establishes the library boundary without
+claiming a full .NET-compatible library or final binary CIL emission.

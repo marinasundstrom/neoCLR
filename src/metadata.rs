@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 /// No value-type/reference-type bit: Ref is an explicit storage capability.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Type {
     Void,
     Int32,
@@ -19,6 +19,7 @@ pub enum Type {
 pub struct Module {
     pub format: u32,
     pub name: String,
+    #[serde(default)]
     pub entry: String,
     #[serde(default)]
     pub types: Vec<TypeDef>,
@@ -48,7 +49,28 @@ pub struct Function {
     pub returns: Type,
     #[serde(default)]
     pub locals: Vec<Type>,
+    /// CLR MethodImplAttributes values: IL = 0, InternalCall = 0x1000.
+    #[serde(default)]
+    pub impl_flags: u16,
+    #[serde(default)]
     pub body: Vec<Instruction>,
+}
+
+pub const INTERNAL_CALL: u16 = 0x1000;
+
+impl Function {
+    pub fn is_internal_call(&self) -> bool {
+        self.impl_flags == INTERNAL_CALL
+    }
+}
+
+/// A call identifies an overload by name and ordered parameter types.
+/// Return types remain on definitions and cannot distinguish overloads.
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct FunctionRef {
+    pub name: String,
+    pub parameters: Vec<Type>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -84,6 +106,8 @@ pub enum Instruction {
     SubChecked,
     #[serde(rename = "mul.ovf")]
     MulChecked,
+    #[serde(rename = "div")]
+    Divide,
     #[serde(rename = "ceq")]
     Equal,
     #[serde(rename = "clt")]
@@ -93,7 +117,7 @@ pub enum Instruction {
     #[serde(rename = "brtrue")]
     BranchTrue(usize),
     #[serde(rename = "call")]
-    Call(String),
+    Call(FunctionRef),
     #[serde(rename = "ret")]
     Return,
     #[serde(rename = "newobj")]

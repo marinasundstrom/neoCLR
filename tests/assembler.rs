@@ -34,7 +34,7 @@ fn invalid_source_is_rejected() {
         "ldvoid extra\nret",
         "ldarg 0\nret",
         "ldloc 0\nret",
-        "call Missing\nret",
+        "call Missing()\nret",
         "newobj Missing\nret",
         "none Missing\nret",
         "ldvoid\n.local Void\nret",
@@ -76,7 +76,7 @@ fn loader_rejects_invalid_metadata_even_for_unused_functions() {
         serde_json::to_value(assemble(include_str!("../examples/hello.neoil")).unwrap()).unwrap();
     let mut variants = vec![];
     let mut value = base.clone();
-    value["format"] = 2.into();
+    value["format"] = 999.into();
     variants.push(value);
     let mut value = base.clone();
     value["extra"] = true.into();

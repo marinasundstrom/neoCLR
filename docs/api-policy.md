@@ -1,0 +1,50 @@
+# Familiar .NET APIs, explicit platform differences
+
+Keep the consumer-facing API surface as close to .NET as possible wherever neoCLR
+does not intentionally diverge. Familiarity is a goal independent of implementation:
+a platform-written function, native runtime call, interpreter operation, and future
+JIT implementation should expose the same documented consumer contract.
+
+Preserve established namespaces, type/member names, overload families, parameter
+order, and observable behavior unless a specific platform decision requires change.
+Implement a small coherent subset first instead of inventing unrelated substitutes
+for missing framework functionality. A missing implementation remains a documented
+gap, not a reason to redefine the API silently.
+
+Intentional changes include Result-based recoverable errors, Option-based absence,
+first-class Void, explicit ownership/sharing, free functions, and interface names
+without the `I` convention. These need explicit API mappings. Implementation details
+alone do not justify additional consumer-visible differences.
+
+## Current examples
+
+| API | Familiar surface | Deliberate change or current limitation |
+| --- | --- | --- |
+| `System.Console.WriteLine(string/int32)` | Familiar name and overloads | Produces the real Void value; console buffering is a prototype limitation |
+| `System.Int32.Parse(string)` | Familiar parsing entry point | Returns Result instead of throwing; culture and whitespace coverage remain incomplete |
+| `System.Math.Abs(int32)` | Familiar name and numeric result on success | Returns Result for the overflow case |
+| `System.Int32.Divide(int32,int32)` | Uses the familiar Int32 domain | Experimental neoCLR extension for recoverable division, not a claim of a matching .NET member |
+| `neoCLR.Runtime.*` | Internal implementation boundary | Not intended as consumer-facing replacements for System APIs |
+
+The current assembler uses dotted symbols for these functions; it does not yet
+model static members versus namespace functions. Familiar spelling alone is not
+full metadata compatibility. Method ownership, visibility, member dispatch, complete
+signatures, and assembly references must be added as the model grows.
+
+The Divide helper is a proof-of-concept extension whose final API location remains
+open. Existing .NET APIs should be preferred when an appropriate equivalent exists.
+BCL error/absence adaptations should be documented alongside behavior and migration
+examples rather than buried in runtime implementation notes.
+
+## Runtime implementation declarations
+
+Use the recognizable `MethodImpl`/`InternalCall` metadata mechanism for functions
+provided by native runtime code. The public library remains written for neoCLR and
+calls declared helpers at an explicit boundary. A future source compiler should be
+able to accept the familiar attribute form and lower it to the implementation flags.
+Runtime binding is separate from public API naming and from eventual native interop.
+See [runtime library](runtime-library.md) for the implemented mapping and limits.
+
+As APIs are added, tests should cover ordinary observable .NET behavior and the
+intentional neoCLR adaptations separately. Do not promise compatibility for a
+member until its supported inputs, outputs, errors, and other effects are defined.

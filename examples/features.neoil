@@ -7,15 +7,14 @@
     .field Y Int32
 .end
 
-.function Increment -> Int32
-    .param Int32
+.function Increment(Int32) -> Int32
     ldarg 0
     ldc.i4 1
     add
     ret
 .end
 
-.function Main -> Result<Void,Error>
+.function Main() -> Result<Void,Error>
     .local Point
     .local Point
     .local Ref<Point>
@@ -23,7 +22,7 @@
     .local Int32
 
     ldstr "neoCLR feature tour"
-    call System.Console.WriteLine
+    call System.Console.WriteLine(string)
     pop
 
     ; Copy an aggregate, change the copy, and prove the original survived.
@@ -83,7 +82,7 @@ NonePassed:
 
     ; A parse failure is data; explicitly handle it and continue.
     ldstr "not a number"
-    call System.Int32.Parse
+    call System.Int32.Parse(string)
     dup
     is.case Err
     brtrue ParseFailed
@@ -97,7 +96,7 @@ ParseFailed:
 ParseHandled:
     ldc.i4 84
     ldc.i4 2
-    call System.Int32.Divide
+    call System.Int32.Divide(int32, int32)
     ldcase Ok
     ldc.i4 42
     ceq
@@ -114,7 +113,7 @@ DivisionPassed:
     stloc 4
 Loop:
     ldloc 4
-    call Increment
+    call Increment(int32)
     stloc 4
     ldloc 4
     ldc.i4 3
@@ -147,8 +146,16 @@ Done:
     brtrue CheckedPassed
     fault "checked arithmetic failed"
 CheckedPassed:
+    ldc.i4 9
+    ldc.i4 2
+    div
+    ldc.i4 4
+    ceq
+    brtrue IntegerDivisionPassed
+    fault "integer division failed"
+IntegerDivisionPassed:
     ldstr "All feature checks passed."
-    call System.Console.WriteLine
+    call System.Console.WriteLine(string)
     ok Error
     ret
 .end

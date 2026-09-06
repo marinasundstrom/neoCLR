@@ -14,8 +14,9 @@ JSON for distribution, or the exact instruction extensions used here.
 3. Implement a CLI-based binary reader/writer for the supported subset, preserving
    standard table/heap/token and opcode encodings where semantics permit. Define
    versioned extensions only for required deviations; see [format direction](format-direction.md).
-4. Replace intrinsic-only library scaffolding with loadable modules, structured
-   error definitions, user-defined unions and generic definitions. Keep familiar
+4. Extend the platform-written System library and bootstrap linker into general
+   loadable modules, structured error definitions, user-defined unions and generic
+   definitions. Keep familiar
    namespaces while defining contracts around `Option` and `Result`.
 5. Introduce interfaces without naming prefixes, explicit dispatch metadata, and
    a modest collections library; choose equality and mutation contracts deliberately.
@@ -24,6 +25,9 @@ JSON for distribution, or the exact instruction extensions used here.
 7. Choose heap lifetime management and implement reclamation before treating this
    as a long-running runtime. Then evaluate layout, native interop, concurrency,
    and runtime async against measured needs.
+
+The assembler must grow toward full platform expressiveness, with .NET ilasm as
+the capability baseline; see [assembler design](assembler-design.md).
 
 ## Migration principles
 

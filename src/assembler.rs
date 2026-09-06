@@ -1,7 +1,7 @@
 //! Small line-oriented assembler. The serialized output is the prototype metadata format.
 use crate::{
     Fault, Module,
-    metadata::{Field, Function, Instruction, Type, TypeDef},
+    metadata::{Field, Function, FunctionRef, Instruction, Type, TypeDef},
 };
 use std::collections::HashMap;
 
@@ -9,12 +9,19 @@ struct PendingFunction {
     function: Function,
     labels: HashMap<String, usize>,
     branches: Vec<(usize, String, usize)>,
+    inline_parameters: bool,
 }
 
 /// Assemble neoIL into a validated module. Errors include source line numbers.
 pub fn assemble(source: &str) -> Result<Module, Fault> {
+    let module = parse_module(source)?;
+    crate::vm::validate(&module)?;
+    Ok(module)
+}
+
+pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
     let mut module = Module {
-        format: 1,
+        format: 2,
         name: String::new(),
         entry: String::new(),
         types: vec![],
@@ -72,10 +79,25 @@ pub fn assemble(source: &str) -> Result<Module, Fault> {
                 return Ok(());
             }
             if let Some(pending) = function.as_mut() {
-                if word == ".param" || word == ".local" {
+                if word == ".methodimpl" {
+                    if rest != "InternalCall" || pending.function.impl_flags != 0 {
+                        return Err(Fault::new(
+                            "expected one .methodimpl InternalCall directive",
+                        ));
+                    }
+                    if !pending.function.body.is_empty() || !pending.labels.is_empty() {
+                        return Err(Fault::new(".methodimpl must precede any body"));
+                    }
+                    pending.function.impl_flags = crate::metadata::INTERNAL_CALL;
+                } else if word == ".param" || word == ".local" {
                     if !pending.function.body.is_empty() || !pending.labels.is_empty() {
                         return Err(Fault::new(
                             "parameters and locals must precede instructions",
+                        ));
+                    }
+                    if word == ".param" && pending.inline_parameters {
+                        return Err(Fault::new(
+                            "inline parameters cannot be combined with .param",
                         ));
                     }
                     let ty = parse_type(rest)?;
@@ -117,7 +139,11 @@ pub fn assemble(source: &str) -> Result<Module, Fault> {
                             pending.branches.push((pc, rest.into(), line_number));
                             Some(serde_json::json!(0))
                         }
-                        "call" | "newobj" | "is.case" | "ldcase" => {
+                        "call" => Some(
+                            serde_json::to_value(parse_function_ref(rest)?)
+                                .map_err(|e| Fault::new(e.to_string()))?,
+                        ),
+                        "newobj" | "is.case" | "ldcase" => {
                             identifier(rest)?;
                             Some(serde_json::json!(rest))
                         }
@@ -169,17 +195,28 @@ pub fn assemble(source: &str) -> Result<Module, Fault> {
                     let (name, result) = rest
                         .split_once("->")
                         .ok_or_else(|| Fault::new("expected .function Name -> Type"))?;
-                    identifier(name.trim())?;
-                    function = Some(PendingFunction {
-                        function: Function {
+                    let inline_parameters = name.contains('(');
+                    let target = if inline_parameters {
+                        parse_function_ref(name.trim())?
+                    } else {
+                        identifier(name.trim())?;
+                        FunctionRef {
                             name: name.trim().into(),
                             parameters: vec![],
+                        }
+                    };
+                    function = Some(PendingFunction {
+                        function: Function {
+                            name: target.name,
+                            parameters: target.parameters,
                             returns: parse_type(result)?,
                             locals: vec![],
                             body: vec![],
+                            impl_flags: 0,
                         },
                         labels: HashMap::new(),
                         branches: vec![],
+                        inline_parameters,
                     });
                 }
                 _ => return Err(Fault::new("expected .module, .entry, .type or .function")),
@@ -191,10 +228,9 @@ pub fn assemble(source: &str) -> Result<Module, Fault> {
     if function.is_some() || typedef.is_some() {
         return Err(Fault::new("missing .end"));
     }
-    if module.name.is_empty() || module.entry.is_empty() {
-        return Err(Fault::new(".module and .entry are required"));
+    if module.name.is_empty() {
+        return Err(Fault::new(".module is required"));
     }
-    crate::vm::validate(&module)?;
     Ok(module)
 }
 
@@ -253,13 +289,51 @@ pub fn parse_type(text: &str) -> Result<Type, Fault> {
         }
         identifier(text)?;
         Ok(match text {
-            "Void" => Type::Void,
-            "Int32" => Type::Int32,
-            "Boolean" => Type::Boolean,
-            "String" => Type::String,
+            "Void" | "void" => Type::Void,
+            "Int32" | "int32" | "int" => Type::Int32,
+            "Boolean" | "boolean" | "bool" => Type::Boolean,
+            "String" | "string" => Type::String,
             "Error" => Type::Error,
             _ => Type::Named(text.into()),
         })
     }
     parse(text, 0)
+}
+
+/// Parse an explicit call signature, including nested constructed parameter types.
+pub fn parse_function_ref(text: &str) -> Result<FunctionRef, Fault> {
+    let (name, parameters) = text.trim().split_once('(').ok_or_else(|| {
+        Fault::new("call requires an explicit signature: Name(Type, ...) or Name()")
+    })?;
+    identifier(name.trim())?;
+    let parameters = parameters
+        .strip_suffix(')')
+        .ok_or_else(|| Fault::new("unclosed call signature"))?;
+    let mut types = vec![];
+    if !parameters.trim().is_empty() {
+        let mut nesting = 0i32;
+        let mut start = 0;
+        for (index, character) in parameters.char_indices() {
+            match character {
+                '<' => nesting += 1,
+                '>' => nesting -= 1,
+                ',' if nesting == 0 => {
+                    types.push(parse_type(&parameters[start..index])?);
+                    start = index + 1;
+                }
+                _ => (),
+            }
+            if nesting < 0 {
+                return Err(Fault::new("unbalanced call parameter type"));
+            }
+        }
+        if nesting != 0 {
+            return Err(Fault::new("unbalanced call parameter type"));
+        }
+        types.push(parse_type(&parameters[start..])?);
+    }
+    Ok(FunctionRef {
+        name: name.trim().into(),
+        parameters: types,
+    })
 }

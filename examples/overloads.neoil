@@ -1,0 +1,38 @@
+.module Overloads
+.entry Main
+
+.function Describe(string) -> string
+    ldstr "string overload"
+    ret
+.end
+
+.function Describe(int32) -> string
+    ldstr "integer overload"
+    ret
+.end
+
+.function Describe() -> string
+    ldstr "parameterless overload"
+    ret
+.end
+
+.function Main() -> Void
+    ldstr "hello"
+    call Describe(string)
+    call System.Console.WriteLine(string)
+    pop
+
+    ldc.i4 42
+    call Describe(int32)
+    call System.Console.WriteLine(string)
+    pop
+
+    call Describe()
+    call System.Console.WriteLine(string)
+    pop
+
+    ; The bootstrap library also has string and Int32 overloads.
+    ldc.i4 42
+    call System.Console.WriteLine(int32)
+    ret
+.end

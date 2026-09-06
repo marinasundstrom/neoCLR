@@ -1,4 +1,4 @@
-use neoclr::{Fault, Limits, assemble, load, run};
+use neoclr::{Fault, Limits, assemble, load, run, run_with_library};
 use std::{
     env, fs,
     io::{self, Write},
@@ -16,6 +16,17 @@ fn execute(args: &[String]) -> Result<Vec<String>, String> {
             file.write_all(json.as_bytes()).map_err(|e| e.to_string())?;
             Ok(vec![format!("Assembled {} -> {output}", module.name)])
         }
+        [command, input, library] if command == "run" => {
+            let source = fs::read_to_string(input).map_err(|e| e.to_string())?;
+            let module = if input.ends_with(".neoil") { assemble(&source) } else { load(&source) }.map_err(|e| e.to_string())?;
+            let source = fs::read_to_string(library).map_err(|e| e.to_string())?;
+            let library = load(&source).map_err(|e| e.to_string())?;
+            run_with_library(&module, &library, Limits::default()).map(|execution| {
+                let mut lines = execution.output;
+                lines.push(format!("=> {:?}", execution.value));
+                lines
+            }).map_err(|e| e.to_string())
+        }
         [command, input] if command == "run" || command == "check" => {
             let source = fs::read_to_string(input).map_err(|e| format!("Cannot read {input}: {e}"))?;
             let module = if input.ends_with(".neoil") { assemble(&source) } else { load(&source) }.map_err(|e| e.to_string())?;
@@ -26,7 +37,7 @@ fn execute(args: &[String]) -> Result<Vec<String>, String> {
                 lines
             }).map_err(|fault: Fault| fault.to_string())
         }
-        _ => Err("Usage:\n  neoclr assemble <source.neoil> <output.neo.json>\n  neoclr run <source.neoil|module.neo.json>\n  neoclr check <source.neoil|module.neo.json>".into()),
+        _ => Err("Usage:\n  neoclr assemble <source.neoil> <output.neo.json>\n  neoclr run <source.neoil|module.neo.json> [System.neo.json]\n  neoclr check <source.neoil|module.neo.json>".into()),
     }
 }
 

@@ -1,6 +1,6 @@
 use crate::{
     Fault, Module, Value,
-    metadata::{Case, Instruction as Op, Type},
+    metadata::{Case, FunctionRef, Instruction as Op, Type},
 };
 use std::collections::HashSet;
 
@@ -31,27 +31,32 @@ pub struct Execution {
     pub heap: Vec<Value>,
 }
 
-fn signature(name: &str) -> Option<(Vec<Type>, Type)> {
-    Some(match name {
-        "System.Int32.Parse" => (
-            vec![Type::String],
-            Type::Result(Box::new(Type::Int32), Box::new(Type::Error)),
-        ),
-        "System.Int32.Divide" => (
-            vec![Type::Int32, Type::Int32],
-            Type::Result(Box::new(Type::Int32), Box::new(Type::Error)),
-        ),
-        "System.Console.WriteLine" => (vec![Type::String], Type::Void),
-        _ => return None,
-    })
+fn resolve(module: &Module, target: &FunctionRef) -> Option<usize> {
+    module
+        .functions
+        .iter()
+        .position(|f| f.name == target.name && f.parameters == target.parameters)
 }
 
 pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
+    if module.name == "System" {
+        if !module.entry.is_empty() {
+            return Err(Fault::new(
+                "System is reserved for the runtime library without an entry point",
+            ));
+        }
+        validate_linked(module)
+    } else {
+        crate::library::link(module, crate::library::system()?).map(|_| ())
+    }
+}
+
+pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
     if module.name.is_empty() {
         return Err(Fault::new("module name must not be empty"));
     }
-    if module.format != 1 {
-        return Err(Fault::new("unsupported module format (expected 1)"));
+    if module.format != 2 {
+        return Err(Fault::new("unsupported module format (expected 2)"));
     }
     let mut names = HashSet::new();
     for def in &module.types {
@@ -66,14 +71,15 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             check_type(&field.ty, module)?;
         }
     }
-    names.clear();
+    let mut signatures = HashSet::new();
     for function in &module.functions {
-        if function.name.is_empty()
-            || !names.insert(&function.name)
-            || signature(&function.name).is_some()
-        {
-            return Err(Fault::new("empty, duplicate or reserved function name"));
+        if function.name.is_empty() || !signatures.insert((&function.name, &function.parameters)) {
+            return Err(Fault::new(
+                "empty name, duplicate or reserved function signature",
+            ));
         }
+    }
+    for function in &module.functions {
         for ty in function
             .parameters
             .iter()
@@ -81,6 +87,19 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             .chain([&function.returns])
         {
             check_type(ty, module)?;
+        }
+        match function.impl_flags {
+            crate::metadata::INTERNAL_CALL => {
+                if !function.body.is_empty() || !function.locals.is_empty() {
+                    return Err(Fault::new(
+                        "InternalCall must not have an IL body or locals",
+                    ));
+                }
+                crate::native::bind(function)?;
+                continue;
+            }
+            0 => (),
+            _ => return Err(Fault::new("unsupported method implementation flags")),
         }
         if function.body.is_empty() {
             return Err(Fault::new("empty function body"));
@@ -96,11 +115,16 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
                 Op::Load(i) | Op::Store(i) if *i >= function.locals.len() => {
                     return Err(Fault::new("local index outside signature"));
                 }
-                Op::Call(name)
-                    if signature(name).is_none()
-                        && !module.functions.iter().any(|f| &f.name == name) =>
-                {
-                    return Err(Fault::new(format!("unknown function {name}")));
+                Op::Call(target) => {
+                    for ty in &target.parameters {
+                        check_type(ty, module)?;
+                    }
+                    if resolve(module, target).is_none() {
+                        return Err(Fault::new(format!(
+                            "unknown function overload {}({:?})",
+                            target.name, target.parameters
+                        )));
+                    }
                 }
                 Op::New(name) if !module.types.iter().any(|t| &t.name == name) => {
                     return Err(Fault::new(format!("unknown type {name}")));
@@ -110,13 +134,13 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             }
         }
     }
-    let entry = module
-        .functions
-        .iter()
-        .find(|f| f.name == module.entry)
-        .ok_or_else(|| Fault::new("entry function not found"))?;
-    if !entry.parameters.is_empty() {
-        return Err(Fault::new("entry must have no parameters"));
+    if !module.entry.is_empty()
+        && !module
+            .functions
+            .iter()
+            .any(|f| f.name == module.entry && f.parameters.is_empty() && !f.is_internal_call())
+    {
+        return Err(Fault::new("parameterless entry function not found"));
     }
     Ok(())
 }
@@ -185,14 +209,32 @@ fn expect(value: &Value, ty: &Type) -> Result<(), Fault> {
 }
 
 pub fn run(module: &Module, limits: Limits) -> Result<Execution, Fault> {
-    validate(module)?;
+    run_with_library(module, crate::library::system()?, limits)
+}
+
+/// Execute against an explicitly compiled System library artifact.
+pub fn run_with_library(
+    module: &Module,
+    library: &Module,
+    limits: Limits,
+) -> Result<Execution, Fault> {
+    if module.entry.is_empty() {
+        return Err(Fault::new(
+            "cannot execute a library without an entry point",
+        ));
+    }
+    let linked = crate::library::link(module, library)?;
+    interpret(&linked, limits)
+}
+
+fn interpret(module: &Module, limits: Limits) -> Result<Execution, Fault> {
     if limits.frames == 0 {
         return Err(Fault::new("frame limit exceeded"));
     }
     let entry = module
         .functions
         .iter()
-        .position(|f| f.name == module.entry)
+        .position(|f| f.name == module.entry && f.parameters.is_empty())
         .ok_or_else(|| Fault::new("missing entry"))?;
     let mut frames = vec![Frame::new(entry, vec![], module)];
     let mut heap: Vec<Value> = vec![];
@@ -258,6 +300,18 @@ pub fn run(module: &Module, limits: Limits) -> Result<Execution, Fault> {
                         value.ok_or_else(|| Fault::new("Int32 overflow"))?,
                     ));
                 }
+                Op::Divide => {
+                    let right = frame.int()?;
+                    let left = frame.int()?;
+                    let value = left.checked_div(right).ok_or_else(|| {
+                        Fault::new(if right == 0 {
+                            "division by zero"
+                        } else {
+                            "Int32 overflow"
+                        })
+                    })?;
+                    frame.stack.push(Value::Int32(value));
+                }
                 Op::Equal => {
                     let right = frame.pop()?;
                     let left = frame.pop()?;
@@ -275,17 +329,16 @@ pub fn run(module: &Module, limits: Limits) -> Result<Execution, Fault> {
                     Value::Boolean(false) => (),
                     _ => return Err(Fault::new("brtrue requires Boolean")),
                 },
-                Op::Call(name) => {
-                    if let Some((parameters, _)) = signature(name) {
-                        let args = frame.args(&parameters)?;
-                        frame.stack.push(intrinsic(name, args, &mut output)?);
+                Op::Call(target) => {
+                    let index = resolve(module, target)
+                        .ok_or_else(|| Fault::new("unknown function overload"))?;
+                    let callee = &module.functions[index];
+                    let args = frame.args(&callee.parameters)?;
+                    if callee.is_internal_call() {
+                        let value = crate::native::bind(callee)?.invoke(args, &mut output)?;
+                        expect(&value, &callee.returns)?;
+                        frame.stack.push(value);
                     } else {
-                        let index = module
-                            .functions
-                            .iter()
-                            .position(|f| &f.name == name)
-                            .ok_or_else(|| Fault::new("unknown function"))?;
-                        let args = frame.args(&module.functions[index].parameters)?;
                         if frames.len() >= limits.frames {
                             return Err(Fault::new("frame limit exceeded"));
                         }
@@ -445,41 +498,4 @@ pub fn run(module: &Module, limits: Limits) -> Result<Execution, Fault> {
         }
     }
     Err(Fault::new("instruction limit exceeded"))
-}
-
-fn intrinsic(name: &str, args: Vec<Value>, output: &mut Vec<String>) -> Result<Value, Fault> {
-    match (name, args.as_slice()) {
-        ("System.Int32.Parse", [Value::String(text)]) => Ok(match text.parse::<i32>() {
-            Ok(n) => Value::result(Value::Int32(n), Type::Int32, Type::Error, Case::Ok),
-            Err(_) => Value::result(
-                Value::Error("InvalidInt32".into()),
-                Type::Int32,
-                Type::Error,
-                Case::Err,
-            ),
-        }),
-        ("System.Int32.Divide", [Value::Int32(a), Value::Int32(b)]) => {
-            Ok(match a.checked_div(*b) {
-                Some(n) => Value::result(Value::Int32(n), Type::Int32, Type::Error, Case::Ok),
-                None => Value::result(
-                    Value::Error(
-                        if *b == 0 {
-                            "DivisionByZero"
-                        } else {
-                            "Overflow"
-                        }
-                        .into(),
-                    ),
-                    Type::Int32,
-                    Type::Error,
-                    Case::Err,
-                ),
-            })
-        }
-        ("System.Console.WriteLine", [Value::String(text)]) => {
-            output.push(text.clone());
-            Ok(Value::Void)
-        }
-        _ => Err(Fault::new("invalid intrinsic invocation")),
-    }
 }
