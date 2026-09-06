@@ -238,3 +238,28 @@ Validation: all 80 integration tests pass, including eight new native-integer te
 Clippy, formatting, and diff whitespace checks pass. The native-integer sample
 prints 42, returns Void, and frees its allocation. Local validation is macOS ARM64;
 the tests derive expected native widths from the host for the existing CI matrix.
+
+
+## 2026-09-06 — Fixed-width integer fundamentals
+
+Implemented SByte/Byte, Int16/UInt16, Char, UInt32, Int64/UInt64 as canonical System
+primitives with native layouts. Added ldc.i8, fixed-width integer conversions, and
+byte/short/32-bit unsigned/64-bit/native indirect operations. Int64 participates in
+wrapping and checked arithmetic, signed/unsigned division, and comparisons.
+
+Separated declared integer storage from evaluation-stack categories: narrow integers
+load as Int32; UInt32 and UInt64 preserve bits in Int32 and Int64. Storage boundaries
+truncate to the declared width. Applied this to locals, parameters, returns, fields,
+and native memory. Kept the remaining native/Boolean normalization and generic
+constructor limitations explicit rather than treating them as platform decisions.
+
+Added the integer sample and storage/opcode documentation. Recorded valid UTF-8 as
+a proposed String direction, with Rune/scalar versus Char/UTF-16 code-unit distinctions;
+String.Length/indexing and migration contracts remain undecided. This proposal does
+not change the current String API or introduce Unicode scalar validation for Char.
+
+Validation: all 86 integration tests pass, including six new integer suites covering
+aliases/layout, metadata round-trip, exact 64-bit values, narrow storage boundaries,
+sign/zero extension, overflow and invalid memory access. Clippy and formatting pass
+on macOS ARM64. The sample prints 255 and -1, checks 64-bit storage, and frees its
+allocations. Cross-platform execution remains covered by the existing CI matrix.

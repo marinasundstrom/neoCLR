@@ -124,6 +124,10 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                             rest.parse::<i32>()
                                 .map_err(|_| Fault::new("expected Int32 literal"))?
                         )),
+                        "ldc.i8" => Some(serde_json::json!(
+                            rest.parse::<i64>()
+                                .map_err(|_| Fault::new("expected Int64 literal"))?
+                        )),
                         "ldc.bool" => Some(serde_json::json!(
                             rest.parse::<bool>()
                                 .map_err(|_| Fault::new("expected true or false"))?

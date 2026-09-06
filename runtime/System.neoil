@@ -13,6 +13,30 @@
 .type System.Error
 .end
 
+.type System.SByte
+.end
+
+.type System.Byte
+.end
+
+.type System.Int16
+.end
+
+.type System.UInt16
+.end
+
+.type System.Char
+.end
+
+.type System.UInt32
+.end
+
+.type System.Int64
+.end
+
+.type System.UInt64
+.end
+
 .type System.IntPtr
 .end
 

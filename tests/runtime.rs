@@ -262,6 +262,7 @@ fn all_implemented_opcodes_have_a_sample() {
         include_str!("../examples/fault.neoil"),
         include_str!("../examples/pointers.neoil"),
         include_str!("../examples/native-integers.neoil"),
+        include_str!("../examples/integers.neoil"),
     ];
     let mut covered = std::collections::HashSet::new();
     for source in samples {
@@ -278,6 +279,25 @@ fn all_implemented_opcodes_have_a_sample() {
     }
     for op in [
         "ldc.i4",
+        "ldc.i8",
+        "conv.i1",
+        "conv.u1",
+        "conv.i2",
+        "conv.u2",
+        "conv.u4",
+        "conv.i8",
+        "conv.u8",
+        "ldind.i1",
+        "ldind.u1",
+        "ldind.i2",
+        "ldind.u2",
+        "ldind.u4",
+        "ldind.i8",
+        "ldind.i",
+        "stind.i1",
+        "stind.i2",
+        "stind.i8",
+        "stind.i",
         "ldc.bool",
         "ldstr",
         "ldvoid",

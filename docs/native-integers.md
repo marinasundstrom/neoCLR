@@ -19,7 +19,7 @@ Signed div and unsigned div.un Fault on zero; signed minimum divided by -1 also
 Faults. clt and clt.un compare signed and unsigned interpretations. Signedness comes
 from the opcode even when the signature is UIntPtr. Comparisons produce Boolean.
 
-Int32, IntPtr, and UIntPtr participate in these operations. The interpreter currently
+Int32, Int64, IntPtr, and UIntPtr participate in these operations. The interpreter currently
 requires both operands to have the same signature type and preserves that type for
 arithmetic results. Mixed native signedness and mixed Int32/native arithmetic require
 explicit conversions. Full CIL evaluation-stack normalization remains an implementation
@@ -27,8 +27,8 @@ gap, not an intended new platform rule.
 
 | Conversion | Implemented behavior |
 | --- | --- |
-| conv.i | Int32 sign-extends to native width; native integers/pointers preserve native bits, producing IntPtr |
-| conv.u | Int32 zero-extends its 32-bit representation; native integers/pointers preserve native bits, producing UIntPtr |
+| conv.i | Int32 sign-extends; Int64 truncates on narrower hosts; otherwise converts to native width; native integers/pointers preserve native bits, producing IntPtr |
+| conv.u | Int32 zero-extends its 32-bit representation; Int64 truncates on narrower hosts; native integers/pointers preserve native bits, producing UIntPtr |
 | conv.i4 | Integer values retain their low 32 bits, interpreted as Int32 |
 | ptr.fromint T | IntPtr/UIntPtr address bits become Ptr<T> |
 
@@ -65,3 +65,5 @@ still produce Int32 sizes; current layouts are capped to that range.
 
 See the [executable sample](../examples/native-integers.neoil) and
 [heap/pointer contract](heap-and-pointers.md). No ownership policy is introduced.
+
+Fixed-width storage types and normalization are described in [integer types](integer-types.md).

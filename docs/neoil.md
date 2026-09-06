@@ -36,9 +36,11 @@ escapes. Identifiers contain ASCII letters, digits, underscores, and dots.
 - `Label:` identifies the following instruction. Branches name labels in the same
   function; labels can be forward references. A label past the last instruction
   cannot be a branch target.
-- Types are `Void`, `Int32`, `IntPtr`, `UIntPtr`, `Boolean`, `String`, `Error`, a record name,
+- Types include `Void`, `SByte`, `Byte`, `Int16`, `UInt16`, `Char`, `Int32`,
+  `UInt32`, `Int64`, `UInt64`, `IntPtr`, `UIntPtr`, `Boolean`, `String`, `Error`, a record name,
   `Option<T>`, `Result<T,E>`, `Ref<T>`, or `Ptr<T>` (also spelled `T*`). Spaces inside generic signatures are allowed.
-  Primitive aliases `void`, `int32`/`int`, `nint`, `nuint`, `boolean`/`bool`, and `string`
+  Primitive aliases `int8`, `uint8`, `int16`, `uint16`, `char`, `uint32`,
+  `int64`, `uint64`, `void`, `int32`/`int`, `nint`, `nuint`, `boolean`/`bool`, and `string`
   and fully qualified names such as `System.Int32` normalize to canonical types.
   There is a nesting limit of 32 in assembly type expressions.
 
@@ -125,11 +127,13 @@ prototype. Static and instance overloads are distinct.
 
 In this table the rightmost item is the top of the evaluation stack. Every
 instruction consumes its operands unless stated otherwise. `T`, `E`, and `U`
-denote actual runtime types; all checks use exact type equality.
+denote actual runtime types. Integer storage has CLI-style truncation and stack
+normalization; other checks use exact type equality. See [integer storage](integer-types.md).
 
 | Instruction | Stack effect | Meaning |
 | --- | --- | --- |
 | `ldc.i4 n` | `→ Int32` | Signed decimal 32-bit literal |
+| `ldc.i8 n` | `→ Int64` | Signed decimal 64-bit literal |
 | `ldc.bool true/false` | `→ Boolean` | Boolean literal |
 | `ldstr "text"` | `→ String` | String literal |
 | `ldvoid` | `→ Void` | The one Void value |
@@ -146,6 +150,8 @@ denote actual runtime types; all checks use exact type equality.
 | `clt.un` | `N,N → Boolean` | Unsigned comparison |
 | `conv.i` | `Integer or Ptr<T> → IntPtr` | Native signed conversion |
 | `conv.u` | `Integer or Ptr<T> → UIntPtr` | Native unsigned conversion |
+| `conv.i1/u1/i2/u2/u4` | `Integer → Int32` | Truncate then sign/zero-extend to stack width |
+| `conv.i8/u8` | `Integer → Int64` | Signed/unsigned widening or retain 64 bits |
 | `conv.i4` | `Integer → Int32` | Retain low 32 bits |
 | `ptr.fromint T` | `IntPtr or UIntPtr → Ptr<T>` | Interpret native address bits |
 | `ceq` | `T,T → Boolean` | Structural equality; reference identity |
@@ -167,8 +173,14 @@ denote actual runtime types; all checks use exact type equality.
 | `ldflda i` | `Ptr<Record> → Ptr<T>` | Address field at zero-based index |
 | `ldobj T` | `Ptr<T> → T` | Copy initialized value from native storage |
 | `stobj T` | `Ptr<T>,T →` | Copy value into native storage |
-| `ldind.i4` | `Ptr<Int32> → Int32` | Indirect Int32 load |
-| `stind.i4` | `Ptr<Int32>,Int32 →` | Indirect Int32 store |
+| `ldind.i4` | `Ptr<Int32 or UInt32> → Int32` | Indirect 32-bit load |
+| `stind.i4` | `Ptr<Int32 or UInt32>,Int32 →` | Indirect 32-bit store |
+| `ldind.i1/u1/i2/u2/u4` | `Ptr<Integer> → Int32` | Load indicated width with signed/unsigned interpretation |
+| `ldind.i8` | `Ptr<Int64 or UInt64> → Int64` | Load 64 bits |
+| `ldind.i` | `Ptr<Native> → Native` | Load native integer |
+| `stind.i1/i2` | `Ptr<Integer>,Int32 →` | Truncate into byte/short storage |
+| `stind.i8` | `Ptr<Int64 or UInt64>,Int64 →` | Store 64 bits |
+| `stind.i` | `Ptr<Native>,Native →` | Store native integer |
 | `heap.new` | `T → Ref<T>` | Explicitly allocate shared identity |
 | `heap.load` | `Ref<T> → T` | Copy heap contents |
 | `heap.store` | `Ref<T>,T → Void` | Replace heap contents |
@@ -181,7 +193,7 @@ denote actual runtime types; all checks use exact type equality.
 | `error "code"` | `→ Error` | Construct bootstrap error value |
 | `fault "message"` | `→ termination` | End guest execution |
 
-Here `N` is Int32, IntPtr, or UIntPtr; binary operands currently require matching
+Here `N` is Int32, Int64, IntPtr, or UIntPtr; binary operands currently require matching
 types. Signedness comes from the opcode, not the type name. This subset does not yet
 implement full CIL evaluation-stack normalization or mixed-width arithmetic. See
 [native integers](native-integers.md) for conversions and address tracking.

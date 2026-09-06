@@ -272,10 +272,10 @@ impl Frame {
             return Err(Fault::new("not enough arguments"));
         }
         let args = self.stack.split_off(self.stack.len() - types.len());
-        for (value, ty) in args.iter().zip(types) {
-            expect(value, ty)?;
-        }
-        Ok(args)
+        args.into_iter()
+            .zip(types)
+            .map(|(value, ty)| value.for_storage(ty))
+            .collect()
     }
 }
 
@@ -339,20 +339,21 @@ fn interpret(module: &Module, limits: Limits) -> Result<Execution, Fault> {
                 .ok_or_else(|| Fault::new("missing frame"))?;
             match op {
                 Op::Int(n) => frame.stack.push(Value::Int32(*n)),
+                Op::Int64(n) => frame.stack.push(Value::Int64(*n)),
                 Op::Bool(b) => frame.stack.push(Value::Boolean(*b)),
                 Op::String(s) => frame.stack.push(Value::String(s.clone())),
                 Op::Void => frame.stack.push(Value::Void),
                 Op::Error(s) => frame.stack.push(Value::Error(s.clone())),
-                Op::Arg(i) => frame.stack.push(frame.args[*i].clone()),
+                Op::Arg(i) => frame.stack.push(frame.args[*i].clone().on_stack()),
                 Op::Load(i) => frame.stack.push(
                     frame.locals[*i]
                         .clone()
-                        .ok_or_else(|| Fault::new("read of uninitialized local"))?,
+                        .ok_or_else(|| Fault::new("read of uninitialized local"))?
+                        .on_stack(),
                 ),
                 Op::Store(i) => {
                     let value = frame.pop()?;
-                    expect(&value, &function.locals[*i])?;
-                    frame.locals[*i] = Some(value);
+                    frame.locals[*i] = Some(value.for_storage(&function.locals[*i])?);
                 }
                 Op::Dup => {
                     let value = frame
@@ -382,7 +383,16 @@ fn interpret(module: &Module, limits: Limits) -> Result<Execution, Fault> {
                     let left = frame.pop()?;
                     frame.stack.push(crate::numeric::binary(op, left, right)?);
                 }
-                Op::ConvertNativeInt | Op::ConvertNativeUInt | Op::ConvertInt32 => {
+                Op::ConvertNativeInt
+                | Op::ConvertNativeUInt
+                | Op::ConvertInt32
+                | Op::ConvertInt8
+                | Op::ConvertUInt8
+                | Op::ConvertInt16
+                | Op::ConvertUInt16
+                | Op::ConvertUInt32
+                | Op::ConvertInt64
+                | Op::ConvertUInt64 => {
                     let value = frame.pop()?;
                     frame.stack.push(crate::numeric::convert(op, value)?);
                 }
@@ -426,13 +436,13 @@ fn interpret(module: &Module, limits: Limits) -> Result<Execution, Fault> {
                 }
                 Op::Return => {
                     let value = frame.pop()?;
-                    expect(&value, &function.returns)?;
+                    let value = value.for_storage(&function.returns)?;
                     if !frame.stack.is_empty() {
                         return Err(Fault::new("ret requires exactly one value"));
                     }
                     frames.pop();
                     if let Some(caller) = frames.last_mut() {
-                        caller.stack.push(value);
+                        caller.stack.push(value.on_stack());
                     } else {
                         return Ok(Some(value));
                     }
@@ -460,7 +470,8 @@ fn interpret(module: &Module, limits: Limits) -> Result<Execution, Fault> {
                         fields
                             .get(*i)
                             .ok_or_else(|| Fault::new("field index out of range"))?
-                            .clone(),
+                            .clone()
+                            .on_stack(),
                     );
                 }
                 Op::SetField(i) => {
@@ -471,8 +482,7 @@ fn interpret(module: &Module, limits: Limits) -> Result<Execution, Fault> {
                     let field = fields
                         .get_mut(*i)
                         .ok_or_else(|| Fault::new("field index out of range"))?;
-                    expect(&value, &field.ty())?;
-                    *field = value;
+                    *field = value.for_storage(&field.ty())?;
                     frame.stack.push(Value::Object { name, fields });
                 }
                 Op::SizeOf(ty) | Op::AlignOf(ty) => {
@@ -538,31 +548,48 @@ fn interpret(module: &Module, limits: Limits) -> Result<Execution, Fault> {
                         .stack
                         .push(Value::Pointer(memory.field(&pointer, &layout, *index)?));
                 }
-                Op::LoadObject(_) | Op::LoadIndirectInt32 => {
+                Op::LoadObject(_)
+                | Op::LoadIndirectInt32
+                | Op::LoadIndirectInt8
+                | Op::LoadIndirectUInt8
+                | Op::LoadIndirectInt16
+                | Op::LoadIndirectUInt16
+                | Op::LoadIndirectUInt32
+                | Op::LoadIndirectInt64
+                | Op::LoadIndirectNative => {
+                    let mut pointer = frame.pointer()?;
                     let ty = if let Op::LoadObject(ty) = op {
+                        if pointer.target != *ty {
+                            return Err(Fault::new("memory load pointer type mismatch"));
+                        }
                         ty.clone()
                     } else {
-                        Type::Int32
+                        crate::numeric::indirect_type(op, &pointer.target)?
                     };
-                    let pointer = frame.pointer()?;
-                    if pointer.target != ty {
-                        return Err(Fault::new("memory load pointer type mismatch"));
-                    }
+                    pointer.target = ty.clone();
                     let layout = crate::memory::layout(module, &ty)?;
-                    frame.stack.push(memory.read(&pointer, &layout)?);
+                    frame.stack.push(memory.read(&pointer, &layout)?.on_stack());
                 }
-                Op::StoreObject(_) | Op::StoreIndirectInt32 => {
-                    let ty = if let Op::StoreObject(ty) = op {
-                        ty.clone()
-                    } else {
-                        Type::Int32
-                    };
+                Op::StoreObject(_)
+                | Op::StoreIndirectInt32
+                | Op::StoreIndirectInt8
+                | Op::StoreIndirectInt16
+                | Op::StoreIndirectInt64
+                | Op::StoreIndirectNative => {
                     let value = frame.pop()?;
                     let pointer = frame.pointer()?;
-                    if pointer.target != ty {
-                        return Err(Fault::new("memory store pointer type mismatch"));
+                    if let Op::StoreObject(ty) = op {
+                        if pointer.target != *ty {
+                            return Err(Fault::new("memory store pointer type mismatch"));
+                        }
+                    } else {
+                        crate::numeric::indirect_type(op, &pointer.target)?;
                     }
-                    let layout = crate::memory::layout(module, &ty)?;
+                    let ty = &pointer.target;
+                    let value = value
+                        .for_storage(ty)
+                        .map_err(|_| Fault::new("memory store type mismatch"))?;
+                    let layout = crate::memory::layout(module, ty)?;
                     memory.write(&pointer, &layout, &value)?;
                 }
                 Op::HeapNew => {

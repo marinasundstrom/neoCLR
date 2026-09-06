@@ -64,7 +64,10 @@ Supported storage layouts:
 
 | Type | Size | Alignment |
 | --- | --- | --- |
-| Int32 | 4 | 4 |
+| SByte / Byte | 1 | 1 |
+| Int16 / UInt16 / Char | 2 | 2 |
+| Int32 / UInt32 | 4 | 4 |
+| Int64 / UInt64 | 8 | Host u64 alignment |
 | Boolean | 1 | 1 |
 | Void | 0 | 1 |
 | IntPtr / UIntPtr | Native pointer width | Native pointer alignment |
@@ -114,7 +117,7 @@ Faults; a recoverable allocation API can expose Result later.
 
 ## Remaining capabilities
 
-Externally supplied memory access, P/Invoke, stack allocation/address-taking, more numeric types and indirect opcodes,
+Externally supplied memory access, P/Invoke, stack allocation/address-taking, floating-point types and indirect opcodes,
 block operations, unaligned access, explicit layout/packing, and foreign ownership
 contracts remain unimplemented. The current native pointer subset is groundwork
 for those capabilities, not a claim of .NET binary or unsafe-code compatibility.

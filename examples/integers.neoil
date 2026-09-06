@@ -1,0 +1,102 @@
+.module Integers
+.entry Main
+
+.function Main() -> Void
+    .local octet: Byte*
+    .local word: UInt16*
+    .local wide: UInt64*
+    .local native: nint*
+    .local dword: UInt32*
+
+    ldc.i4 1
+    heap.alloc Byte
+    stloc octet
+    ldloc octet
+    ldc.i4 511
+    stind.i1
+    ldloc octet
+    ldind.u1
+    call System.Console.WriteLine(int32)
+    pop
+    ldloc octet
+    ldind.i1
+    call System.Console.WriteLine(int32)
+    pop
+    ldloc octet
+    heap.free
+    pop
+
+    ldc.i4 1
+    heap.alloc UInt16
+    stloc word
+    ldloc word
+    ldc.i4 65535
+    stind.i2
+    ldloc word
+    ldind.i2
+    pop
+    ldloc word
+    ldind.u2
+    pop
+    ldloc word
+    heap.free
+    pop
+
+    ldc.i4 1
+    heap.alloc UInt32
+    stloc dword
+    ldloc dword
+    ldc.i4 -1
+    stind.i4
+    ldloc dword
+    ldind.u4
+    conv.u8
+    pop
+    ldloc dword
+    heap.free
+    pop
+
+    ; Preserve a 64-bit integer larger than floating-point can exactly represent.
+    ldc.i4 1
+    heap.alloc UInt64
+    stloc wide
+    ldloc wide
+    ldc.i8 9007199254740993
+    stind.i8
+    ldloc wide
+    ldind.i8
+    ldc.i8 9007199254740993
+    ceq
+    brtrue WidePassed
+    fault "64-bit memory lost precision"
+WidePassed:
+    ldloc wide
+    heap.free
+    pop
+
+    ldc.i4 1
+    heap.alloc nint
+    stloc native
+    ldloc native
+    ldc.i4 42
+    conv.i
+    stind.i
+    ldloc native
+    ldind.i
+    pop
+    ldloc native
+    heap.free
+    pop
+
+    ; Integer conversions truncate, then widen to the evaluation-stack category.
+    ldc.i4 255
+    conv.i1
+    conv.u1
+    conv.i2
+    conv.u2
+    conv.u4
+    conv.i8
+    pop
+    ldvoid
+    ret
+.end

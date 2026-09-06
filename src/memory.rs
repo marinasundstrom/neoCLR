@@ -57,7 +57,10 @@ pub fn layout(module: &Module, ty: &Type) -> Result<Layout, Fault> {
         }
         *budget -= 1;
         let (size, alignment) = match ty {
-            Type::Int32 => (4, 4),
+            Type::SByte | Type::Byte => (1, 1),
+            Type::Int16 | Type::UInt16 | Type::Char => (2, 2),
+            Type::Int32 | Type::UInt32 => (4, 4),
+            Type::Int64 | Type::UInt64 => (8, std::mem::align_of::<u64>()),
             Type::Boolean => (1, 1),
             Type::Void => (0, 1),
             Type::IntPtr | Type::UIntPtr | Type::Ptr(_) => {
@@ -416,6 +419,78 @@ fn decode(
                 fields,
             })
         }
+        Type::SByte => {
+            let end = offset + std::mem::size_of::<i8>();
+            if !allocation.initialized[offset..end].iter().all(|b| *b) {
+                return Err(Fault::new("read of uninitialized memory"));
+            }
+            let mut bytes = [0; std::mem::size_of::<i8>()];
+            bytes.copy_from_slice(&allocation.bytes.slice()[offset..end]);
+            Ok(Value::SByte(i8::from_ne_bytes(bytes)))
+        }
+        Type::Byte => {
+            let end = offset + std::mem::size_of::<u8>();
+            if !allocation.initialized[offset..end].iter().all(|b| *b) {
+                return Err(Fault::new("read of uninitialized memory"));
+            }
+            let mut bytes = [0; std::mem::size_of::<u8>()];
+            bytes.copy_from_slice(&allocation.bytes.slice()[offset..end]);
+            Ok(Value::Byte(u8::from_ne_bytes(bytes)))
+        }
+        Type::Int16 => {
+            let end = offset + std::mem::size_of::<i16>();
+            if !allocation.initialized[offset..end].iter().all(|b| *b) {
+                return Err(Fault::new("read of uninitialized memory"));
+            }
+            let mut bytes = [0; std::mem::size_of::<i16>()];
+            bytes.copy_from_slice(&allocation.bytes.slice()[offset..end]);
+            Ok(Value::Int16(i16::from_ne_bytes(bytes)))
+        }
+        Type::UInt16 => {
+            let end = offset + std::mem::size_of::<u16>();
+            if !allocation.initialized[offset..end].iter().all(|b| *b) {
+                return Err(Fault::new("read of uninitialized memory"));
+            }
+            let mut bytes = [0; std::mem::size_of::<u16>()];
+            bytes.copy_from_slice(&allocation.bytes.slice()[offset..end]);
+            Ok(Value::UInt16(u16::from_ne_bytes(bytes)))
+        }
+        Type::Char => {
+            let end = offset + std::mem::size_of::<u16>();
+            if !allocation.initialized[offset..end].iter().all(|b| *b) {
+                return Err(Fault::new("read of uninitialized memory"));
+            }
+            let mut bytes = [0; std::mem::size_of::<u16>()];
+            bytes.copy_from_slice(&allocation.bytes.slice()[offset..end]);
+            Ok(Value::Char(u16::from_ne_bytes(bytes)))
+        }
+        Type::UInt32 => {
+            let end = offset + std::mem::size_of::<u32>();
+            if !allocation.initialized[offset..end].iter().all(|b| *b) {
+                return Err(Fault::new("read of uninitialized memory"));
+            }
+            let mut bytes = [0; std::mem::size_of::<u32>()];
+            bytes.copy_from_slice(&allocation.bytes.slice()[offset..end]);
+            Ok(Value::UInt32(u32::from_ne_bytes(bytes)))
+        }
+        Type::Int64 => {
+            let end = offset + std::mem::size_of::<i64>();
+            if !allocation.initialized[offset..end].iter().all(|b| *b) {
+                return Err(Fault::new("read of uninitialized memory"));
+            }
+            let mut bytes = [0; std::mem::size_of::<i64>()];
+            bytes.copy_from_slice(&allocation.bytes.slice()[offset..end]);
+            Ok(Value::Int64(i64::from_ne_bytes(bytes)))
+        }
+        Type::UInt64 => {
+            let end = offset + std::mem::size_of::<u64>();
+            if !allocation.initialized[offset..end].iter().all(|b| *b) {
+                return Err(Fault::new("read of uninitialized memory"));
+            }
+            let mut bytes = [0; std::mem::size_of::<u64>()];
+            bytes.copy_from_slice(&allocation.bytes.slice()[offset..end]);
+            Ok(Value::UInt64(u64::from_ne_bytes(bytes)))
+        }
         Type::Void => Ok(Value::Void),
         Type::Int32 | Type::IntPtr | Type::UIntPtr | Type::Boolean | Type::Ptr(_) => {
             if !allocation.initialized[offset..offset + layout.size]
@@ -480,6 +555,46 @@ fn encode(
         return Err(Fault::new("memory store type mismatch"));
     }
     match value {
+        Value::SByte(n) => {
+            let end = offset + std::mem::size_of::<i8>();
+            bytes[offset..end].copy_from_slice(&n.to_ne_bytes());
+            initialized[offset..end].fill(true);
+        }
+        Value::Byte(n) => {
+            let end = offset + std::mem::size_of::<u8>();
+            bytes[offset..end].copy_from_slice(&n.to_ne_bytes());
+            initialized[offset..end].fill(true);
+        }
+        Value::Int16(n) => {
+            let end = offset + std::mem::size_of::<i16>();
+            bytes[offset..end].copy_from_slice(&n.to_ne_bytes());
+            initialized[offset..end].fill(true);
+        }
+        Value::UInt16(n) => {
+            let end = offset + std::mem::size_of::<u16>();
+            bytes[offset..end].copy_from_slice(&n.to_ne_bytes());
+            initialized[offset..end].fill(true);
+        }
+        Value::Char(n) => {
+            let end = offset + std::mem::size_of::<u16>();
+            bytes[offset..end].copy_from_slice(&n.to_ne_bytes());
+            initialized[offset..end].fill(true);
+        }
+        Value::UInt32(n) => {
+            let end = offset + std::mem::size_of::<u32>();
+            bytes[offset..end].copy_from_slice(&n.to_ne_bytes());
+            initialized[offset..end].fill(true);
+        }
+        Value::Int64(n) => {
+            let end = offset + std::mem::size_of::<i64>();
+            bytes[offset..end].copy_from_slice(&n.to_ne_bytes());
+            initialized[offset..end].fill(true);
+        }
+        Value::UInt64(n) => {
+            let end = offset + std::mem::size_of::<u64>();
+            bytes[offset..end].copy_from_slice(&n.to_ne_bytes());
+            initialized[offset..end].fill(true);
+        }
         Value::Int32(n) => {
             bytes[offset..offset + 4].copy_from_slice(&n.to_ne_bytes());
             initialized[offset..offset + 4].fill(true);

@@ -5,6 +5,15 @@ use serde::{Deserialize, Serialize};
 pub enum Type {
     Void,
     Int32,
+    SByte,
+    Byte,
+    Int16,
+    UInt16,
+    Char,
+    UInt32,
+    Int64,
+    UInt64,
+
     IntPtr,
     UIntPtr,
     Boolean,
@@ -24,6 +33,14 @@ impl Type {
         match name {
             "Void" | "void" | "System.Void" => Self::Void,
             "Int32" | "int32" | "int" | "System.Int32" => Self::Int32,
+            "SByte" | "int8" | "System.SByte" => Self::SByte,
+            "Byte" | "uint8" | "System.Byte" => Self::Byte,
+            "Int16" | "int16" | "System.Int16" => Self::Int16,
+            "UInt16" | "uint16" | "System.UInt16" => Self::UInt16,
+            "Char" | "char" | "System.Char" => Self::Char,
+            "UInt32" | "uint32" | "System.UInt32" => Self::UInt32,
+            "Int64" | "int64" | "System.Int64" => Self::Int64,
+            "UInt64" | "uint64" | "System.UInt64" => Self::UInt64,
             "IntPtr" | "nint" | "System.IntPtr" => Self::IntPtr,
             "UIntPtr" | "nuint" | "System.UIntPtr" => Self::UIntPtr,
             "Boolean" | "boolean" | "bool" | "System.Boolean" => Self::Boolean,
@@ -37,6 +54,14 @@ impl Type {
         match self {
             Self::Void => Some("System.Void"),
             Self::Int32 => Some("System.Int32"),
+            Self::SByte => Some("System.SByte"),
+            Self::Byte => Some("System.Byte"),
+            Self::Int16 => Some("System.Int16"),
+            Self::UInt16 => Some("System.UInt16"),
+            Self::Char => Some("System.Char"),
+            Self::UInt32 => Some("System.UInt32"),
+            Self::Int64 => Some("System.Int64"),
+            Self::UInt64 => Some("System.UInt64"),
             Self::IntPtr => Some("System.IntPtr"),
             Self::UIntPtr => Some("System.UIntPtr"),
             Self::Boolean => Some("System.Boolean"),
@@ -52,6 +77,14 @@ impl Type {
             self,
             Self::Void
                 | Self::Int32
+                | Self::SByte
+                | Self::Byte
+                | Self::Int16
+                | Self::UInt16
+                | Self::Char
+                | Self::UInt32
+                | Self::Int64
+                | Self::UInt64
                 | Self::IntPtr
                 | Self::UIntPtr
                 | Self::Boolean
@@ -157,6 +190,44 @@ pub struct FunctionRef {
 pub enum Instruction {
     #[serde(rename = "ldc.i4")]
     Int(i32),
+    #[serde(rename = "ldc.i8")]
+    Int64(i64),
+    #[serde(rename = "conv.i1")]
+    ConvertInt8,
+    #[serde(rename = "conv.u1")]
+    ConvertUInt8,
+    #[serde(rename = "conv.i2")]
+    ConvertInt16,
+    #[serde(rename = "conv.u2")]
+    ConvertUInt16,
+    #[serde(rename = "conv.u4")]
+    ConvertUInt32,
+    #[serde(rename = "conv.i8")]
+    ConvertInt64,
+    #[serde(rename = "conv.u8")]
+    ConvertUInt64,
+    #[serde(rename = "ldind.i1")]
+    LoadIndirectInt8,
+    #[serde(rename = "ldind.u1")]
+    LoadIndirectUInt8,
+    #[serde(rename = "ldind.i2")]
+    LoadIndirectInt16,
+    #[serde(rename = "ldind.u2")]
+    LoadIndirectUInt16,
+    #[serde(rename = "ldind.u4")]
+    LoadIndirectUInt32,
+    #[serde(rename = "ldind.i8")]
+    LoadIndirectInt64,
+    #[serde(rename = "ldind.i")]
+    LoadIndirectNative,
+    #[serde(rename = "stind.i1")]
+    StoreIndirectInt8,
+    #[serde(rename = "stind.i2")]
+    StoreIndirectInt16,
+    #[serde(rename = "stind.i8")]
+    StoreIndirectInt64,
+    #[serde(rename = "stind.i")]
+    StoreIndirectNative,
     #[serde(rename = "ldc.bool")]
     Bool(bool),
     #[serde(rename = "ldstr")]

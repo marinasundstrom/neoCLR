@@ -130,3 +130,8 @@ may express reference-counted ownership, while Ptr<T> expresses address access w
 ownership. Such abstractions should build on the core type system instead of restoring
 a permanent class/struct allocation distinction. The exact ownership operations and
 the division between library code and runtime support remain open.
+
+Fixed-width integer definitions now cover SByte/Byte, Int16/UInt16, Char, UInt32,
+Int64/UInt64. Their declared storage types are separate from integer evaluation-stack
+categories; see [integer storage](integer-types.md). Char remains a UTF-16 code unit
+without deciding String's encoding. UTF-8 text is a [proposed direction](text-model.md).
