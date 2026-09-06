@@ -221,3 +221,48 @@ The prototype adds tracked pointer diagnostics and explicit uninitialized-read F
 It does not yet implement `ldloca`, `ldarga`, a byref type, or method initialization flags.
 Run `cargo run -- run examples/stack.neoil` for local record storage passed to a callee
 and returned by value; it prints 42 and leaves no live allocations.
+
+
+## Sequential packing and size controls
+
+Record declarations may include `.pack n` and `.size n` once each:
+
+```text
+.type Packet
+    .pack 1
+    .size 8
+    .field Tag Byte
+    .field Number Int32
+.end
+```
+
+`.pack` caps each field's placement alignment. Accepted values are 0, 1, 2, 4, 8,
+16, 32, 64, and 128; zero or omission uses natural platform alignment in this
+prototype. The field alignment is the smaller of its natural layout alignment and
+the packing limit. Record alignment is the largest resulting field alignment, with
+one as the minimum. Fields remain in declaration order. A nested record keeps its
+own internal layout while the outer packing controls its placement.
+
+`.size` reserves at least that many bytes, including fields and padding. Final size
+is the greater of the field extent and the reservation, rounded up to record
+alignment. A reservation smaller than the fields does not truncate them. Zero or
+omission adds no reservation. Layouts remain limited to Int32-sized extents. Invalid
+packing, oversized layouts, and primitive layout overrides fail validation even if
+no layout opcode references the type. Layout controls currently require fields
+with supported native layouts; they do not create layouts for String or unions.
+
+The example has offsets 0 and 1, alignment 1, and size 8. Without the directives it
+has offsets 0 and 4, alignment 4, and size 8. Without `.size` but with `.pack 1`, its
+size is 5. The optional metadata fields are `packing` and `minimum_size`; omitted
+fields preserve earlier modules' layout. The vocabulary follows CLI layout controls;
+see [Microsoft's packing reference](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.interopservices.structlayoutattribute.pack).
+
+Whole-record `ldobj`, `stobj`, `cpobj`, and `initobj` honor the packed layout, with
+byte-based encoding and decoding. A field address may be unaligned for its own type;
+ordinary indirect access still checks that type's natural alignment and can Fault.
+Load the whole record and extract a value field when appropriate. The `unaligned.`
+prefix, explicit field offsets/overlap, and struct-by-value native calls remain pending.
+Packing alone does not establish a foreign ABI or perform marshaling.
+
+Run `examples/layout.neoil` for packed storage; it prints 42 and the reserved size 8,
+then frees its allocation.

@@ -121,6 +121,10 @@ pub struct TypeDef {
     pub fields: Vec<Field>,
     #[serde(default)]
     pub representation: Representation,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub packing: Option<u16>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub minimum_size: Option<u32>,
 }
 
 /// Representation is independent of ownership and reference identity.

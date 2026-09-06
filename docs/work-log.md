@@ -551,3 +551,26 @@ independent scopes, and source-line diagnostics for unknown/malformed names.
 Validation: all 164 integration tests pass on macOS ARM64; formatting, clippy, and
 diff checks pass. The names sample prints 42 and returns Ok(Void). Linux and Windows
 execution remain for the existing CI matrix.
+
+## 2026-09-06 — Sequential record packing and minimum size
+
+Added optional packing and minimum_size metadata with `.pack` and `.size` assembly
+directives. Record fields retain declaration order, with placement alignment capped
+by packing. Nested records retain their internal layouts. Minimum size reserves
+space without truncating fields; final stride rounds up to record alignment.
+Omitted metadata preserves previous layouts. Invalid controls and primitive overrides
+are rejected during validation, even without an executing layout instruction.
+
+The packed layout applies to allocation, size/alignment queries, field addresses,
+and whole-record memory operations. Individual field pointers retain their natural
+typed-access alignment checks. Documented this boundary and deferred unaligned
+prefixes, explicit field offsets/overlap, and struct-by-value native calls. Layout
+controls do not introduce an allocation or ownership policy.
+
+Added a packed Packet sample and six tests for packing sizes, offsets/alignment,
+minimum reservation and stride, nested placement, invalid source/metadata, omitted
+metadata compatibility, packed field alignment Faults, roundtrip execution, and free.
+
+Validation: all 170 integration tests pass on macOS ARM64; formatting, clippy, and
+diff checks pass. The layout sample prints 42 and 8, then releases its allocation.
+Linux and Windows execution remain for the existing CI matrix.

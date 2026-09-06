@@ -82,8 +82,28 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                 return Ok(());
             }
             if let (true, Some(def)) = (function.is_none() && word != ".method", typedef.as_mut()) {
+                if word == ".pack" {
+                    if def.packing.is_some() {
+                        return Err(Fault::new("duplicate .pack"));
+                    }
+                    def.packing = Some(
+                        rest.parse()
+                            .map_err(|_| Fault::new("expected unsigned packing size"))?,
+                    );
+                    return Ok(());
+                }
+                if word == ".size" {
+                    if def.minimum_size.is_some() {
+                        return Err(Fault::new("duplicate .size"));
+                    }
+                    def.minimum_size = Some(
+                        rest.parse()
+                            .map_err(|_| Fault::new("expected unsigned record size"))?,
+                    );
+                    return Ok(());
+                }
                 if word != ".field" {
-                    return Err(Fault::new("expected .field, .method or .end"));
+                    return Err(Fault::new("expected .field, .pack, .size, .method or .end"));
                 }
                 let (name, ty) = rest
                     .split_once(char::is_whitespace)
@@ -298,6 +318,8 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                     typedef = Some(TypeDef {
                         name: ty.definition_name().unwrap_or(rest).into(),
                         fields: vec![],
+                        packing: None,
+                        minimum_size: None,
                         representation: if ty.is_primitive() {
                             Representation::Runtime
                         } else {

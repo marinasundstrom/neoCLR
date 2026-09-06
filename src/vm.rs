@@ -89,6 +89,12 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 "runtime primitive types cannot declare record fields",
             ));
         }
+        if def.packing.is_some() || def.minimum_size.is_some() {
+            if def.representation != Representation::Record {
+                return Err(Fault::new("runtime types cannot override layout"));
+            }
+            crate::memory::layout(module, &ty)?;
+        }
         let mut fields = HashSet::new();
         for field in &def.fields {
             if field.name.is_empty() || !fields.insert(&field.name) {

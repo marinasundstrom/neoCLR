@@ -1,0 +1,33 @@
+.module Layout
+.entry Main
+
+.type Packet
+    .pack 1
+    .size 8
+    .field Tag Byte
+    .field Number Int32
+.end
+
+.function Main() -> Void
+    .local Packet* packet
+    ldc.i4.1
+    heap.alloc Packet
+    stloc packet
+    ldloc packet
+    ldc.i4.1
+    ldc.i4.s 42
+    newobj Packet
+    stobj Packet
+    ; Whole-value access handles packed fields without an unaligned pointer load.
+    ldloc packet
+    ldobj Packet
+    ldfld Packet::Number
+    call System.Console::WriteLine(Int32)
+    pop
+    sizeof Packet
+    call System.Console::WriteLine(Int32)
+    pop
+    ldloc packet
+    heap.free
+    ret
+.end

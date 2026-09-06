@@ -44,7 +44,7 @@ pub struct FieldLayout {
     pub layout: Layout,
 }
 
-/// Sequential prototype layout with native-size pointer fields.
+/// Sequential prototype layout with optional packing and native-size pointer fields.
 pub fn layout(module: &Module, ty: &Type) -> Result<Layout, Fault> {
     fn build(
         module: &Module,
@@ -78,14 +78,25 @@ pub fn layout(module: &Module, ty: &Type) -> Result<Layout, Fault> {
                 if def.representation != Representation::Record {
                     return Err(Fault::new("unsupported memory representation"));
                 }
+                if def
+                    .packing
+                    .is_some_and(|pack| !matches!(pack, 0 | 1 | 2 | 4 | 8 | 16 | 32 | 64 | 128))
+                {
+                    return Err(Fault::new("invalid record packing size"));
+                }
+                let packing = def
+                    .packing
+                    .filter(|p| *p != 0)
+                    .map_or(usize::MAX, usize::from);
                 path.push(name.clone());
                 let mut size = 0usize;
                 let mut alignment = 1usize;
                 let mut fields = vec![];
                 for field in &def.fields {
                     let layout = build(module, &field.ty, path, budget)?;
-                    alignment = alignment.max(layout.alignment);
-                    size = align_up(size, layout.alignment)?;
+                    let field_alignment = layout.alignment.min(packing);
+                    alignment = alignment.max(field_alignment);
+                    size = align_up(size, field_alignment)?;
                     fields.push(FieldLayout {
                         offset: size,
                         ty: field.ty.clone(),
@@ -96,7 +107,7 @@ pub fn layout(module: &Module, ty: &Type) -> Result<Layout, Fault> {
                         .ok_or_else(|| Fault::new("layout size overflow"))?;
                 }
                 path.pop();
-                size = align_up(size, alignment)?;
+                size = align_up(size.max(def.minimum_size.unwrap_or(0) as usize), alignment)?;
                 if size > i32::MAX as usize {
                     return Err(Fault::new("layout exceeds prototype Int32 size range"));
                 }

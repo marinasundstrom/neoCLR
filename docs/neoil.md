@@ -457,3 +457,5 @@ prototype's index representation, not yet a CLI FieldDef/MemberRef token. Genera
 external-module field resolution remains pending. Parameter/local name tables and
 field declaration names may remain in metadata for tools; instruction execution
 uses indices exclusively.
+
+Record declarations accept `.pack n` and `.size n`; see [sequential layout controls](heap-and-pointers.md#sequential-packing-and-size-controls) for alignment, minimum-size, and native-access rules.

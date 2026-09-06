@@ -53,6 +53,7 @@ cargo run -- run examples/control-flow.neoil
 cargo run -- run examples/arguments.neoil
 cargo run -- run examples/comparison-branches.neoil
 cargo run -- run examples/compact.neoil
+cargo run -- run examples/layout.neoil
 cargo run -- run examples/native-integers.neoil
 cargo run -- run examples/integers.neoil
 cargo run -- run examples/bits.neoil
