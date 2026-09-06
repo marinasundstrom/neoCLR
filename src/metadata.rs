@@ -123,6 +123,8 @@ pub struct Module {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct TypeDef {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub definition: Option<TypeDefId>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub custom_attributes: Vec<CustomAttribute>,
     pub name: String,
@@ -710,8 +712,31 @@ pub struct MemberId {
     pub index: u32,
 }
 
+/// Module-local type-definition row; separate from the function-definition table.
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct TypeDefId {
+    pub module: String,
+    pub index: u32,
+}
+
 impl Module {
-    pub(crate) fn normalize_member_ids(&mut self) -> Result<(), crate::Fault> {
+    pub(crate) fn normalize_definition_ids(&mut self) -> Result<(), crate::Fault> {
+        for (index, definition) in self.types.iter_mut().enumerate() {
+            let identity = TypeDefId {
+                module: self.name.clone(),
+                index: u32::try_from(index)
+                    .map_err(|_| crate::Fault::new("too many type definitions"))?,
+            };
+            if definition
+                .definition
+                .as_ref()
+                .is_some_and(|existing| existing != &identity)
+            {
+                return Err(crate::Fault::new("noncanonical type definition identity"));
+            }
+            definition.definition = Some(identity);
+        }
         for (index, function) in self.functions.iter_mut().enumerate() {
             let identity = MemberId {
                 module: self.name.clone(),

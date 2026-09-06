@@ -239,3 +239,7 @@ language are separate architectural requirements; hosting does not define the mo
 [Function identities](docs/member-identities.md) now preserve module-local call targets
 through linking and generic specialization. Explicit `@ Module:index` references can
 distinguish overloads with identical substituted signatures.
+
+[Type identities](docs/type-identities.md) preserve module-local type definition rows
+and expose resolved closed signature keys, including generic arguments and pointers.
+Module-scoped type lookup and revision identities remain future work.

@@ -4,8 +4,11 @@ pub mod library;
 pub mod memory;
 pub mod metadata;
 mod native;
+mod type_identity;
 pub mod value;
 mod vm;
+
+pub use type_identity::{TypeIdentity, resolve_type_identity, resolve_type_identity_with_library};
 
 pub use metadata::Module;
 pub use value::Value;

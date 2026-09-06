@@ -17,10 +17,10 @@ pub(crate) fn link(application: &Module, library: &Module) -> Result<Module, Fau
         ));
     }
     let mut library = library.clone();
-    library.normalize_member_ids()?;
+    library.normalize_definition_ids()?;
     crate::vm::validate_linked(&library)?;
     let mut linked = application.clone();
-    linked.normalize_member_ids()?;
+    linked.normalize_definition_ids()?;
     linked.types.extend(library.types.iter().cloned());
     linked.functions.extend(library.functions.iter().cloned());
     crate::vm::validate_linked(&linked)?;

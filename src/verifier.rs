@@ -29,7 +29,7 @@ pub fn verify(module: &Module) -> Result<Verification, Fault> {
     if module.name == "System" {
         crate::vm::validate(module)?;
         let mut normalized = module.clone();
-        normalized.normalize_member_ids()?;
+        normalized.normalize_definition_ids()?;
         crate::library::bind_member_references(&mut normalized)?;
         analyze(&normalized)
     } else {

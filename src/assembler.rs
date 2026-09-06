@@ -356,6 +356,7 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                     let (name, generic_parameters) = parse_type_declaration(rest)?;
                     let ty = Type::from_name(&name);
                     typedef = Some(TypeDef {
+                        definition: None,
                         custom_attributes: vec![],
                         name: ty.definition_name().unwrap_or(&name).into(),
                         generic_parameters,
@@ -460,7 +461,7 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
     if module.name.is_empty() {
         return Err(Fault::new(".module is required"));
     }
-    module.normalize_member_ids()?;
+    module.normalize_definition_ids()?;
     // Resolve after all declarations so field aliases can name later types.
     for (function, pc, owner, name, line) in field_fixups {
         let arity = module.functions[function]

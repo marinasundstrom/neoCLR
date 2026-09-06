@@ -1,8 +1,9 @@
 # Function definition identities and call binding
 
 Implemented subset: module-local function identities, identity-qualified references,
-and call binding before generic specialization. Type identities remain name-based,
-and the bootstrap linker still combines one application with System. General module
+and call binding before generic specialization. [Type definition rows and closed keys](type-identities.md)
+are also implemented; type lookup remains name-based. The bootstrap linker still
+combines one application with System. General module
 versioning and independently scoped type namespaces are not implemented.
 
 ## Definition identity

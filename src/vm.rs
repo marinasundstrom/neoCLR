@@ -149,7 +149,7 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             ));
         }
         let mut normalized = module.clone();
-        normalized.normalize_member_ids()?;
+        normalized.normalize_definition_ids()?;
         validate_linked(&normalized)
     } else {
         crate::library::link(module, crate::library::system()?).map(|_| ())
@@ -164,7 +164,15 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         return Err(Fault::new("unsupported module format (expected 3)"));
     }
     let mut names = HashSet::new();
+    let mut type_identities = HashSet::new();
     for def in &module.types {
+        if def
+            .definition
+            .as_ref()
+            .is_some_and(|id| !type_identities.insert(id))
+        {
+            return Err(Fault::new("duplicate type definition identity"));
+        }
         if def.name.is_empty() || !names.insert(&def.name) {
             return Err(Fault::new("empty or duplicate type name"));
         }

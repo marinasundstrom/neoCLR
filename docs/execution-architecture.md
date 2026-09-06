@@ -72,8 +72,10 @@ Types and members need definition identities distinct from display names and sou
 aliases. References must retain their declaring module/type and generic context.
 Closed instantiations must not replace definition identity: two declared overloads
 can acquire identical substituted parameter types and still denote different members.
-Linking must map those references deliberately. This is the next shared prerequisite
-for interpretation, compilation, tooling, and embedding.
+Linking must map those references deliberately. [Function call binding](member-identities.md)
+and [type definition rows/closed signature keys](type-identities.md) are implemented.
+Module-scoped type references and revision identity remain shared prerequisites for
+general loading, compilation, tooling, and embedding.
 
 Free functions remain functions without a required synthetic type container in the
 semantic model. Preserve familiar CLI concepts where they fit; do not conflate a

@@ -14,7 +14,8 @@ Only interpretation is implemented today; this does not make interpreter interna
 the permanent platform ABI.
 
 Module-local function identities and generic call binding are now implemented; see
-[function identities](member-identities.md). Type/module version identity and general
+[function identities](member-identities.md). [Type definition rows and closed signature keys](type-identities.md)
+are also implemented. Module revision identity and general
 module-scoped resolution remain shared foundations. Invocation, target-layout, runtime-service, and Fault boundaries
 then support a minimal hosting experiment and an early native AOT experiment. A small
 language compiler should target the same metadata/IL and enable incremental library

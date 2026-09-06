@@ -140,3 +140,11 @@ pointer provenance. A pointer copied through a generic record does not extend th
 pointee's lifetime. `initobj` uses the supported fields' existing zero representations;
 it does not run a constructor. See `examples/generic-memory.neoil` for allocation,
 field addresses, and a size query executed through a method on a generic type.
+
+## Resolved signature keys
+
+Generic definitions now carry module-local type rows. The separate
+[type identity resolver](type-identities.md) produces closed keys from the definition
+row and ordered argument identities, including nested constructions and pointers.
+It does not expand fields or replace the interpreter's existing signature-based
+value and layout checks. Module-scoped type references remain future work.

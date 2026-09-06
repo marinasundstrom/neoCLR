@@ -893,3 +893,31 @@ future work. No JIT, native AOT backend, or public invocation ABI is added.
 Validation: all 233 integration tests pass on macOS ARM64; formatting, clippy with
 warnings denied, and diff checks pass. The member-identities sample executes both
 intended overloads. Linux and Windows execution remain for CI.
+
+## 2026-09-06 — Type definition identities and closed signature keys
+
+Added module-local type definition rows, independent of function rows. Assembly
+assigns canonical identities; loading checks supplied identities and derives omitted
+legacy rows on resolution copies. Linking preserves System's original rows and
+rejects duplicate linked identities. Normalization now covers both definition tables.
+
+Added Rust APIs for resolving a closed signature with the bundled or supplied System
+library. Structural keys retain the definition row and ordered generic arguments,
+including nested constructions and distinct pointer/bootstrap wrapper signatures.
+Primitive aliases resolve to the same canonical definition without conflating storage
+types through stack normalization. Void remains usable throughout signatures.
+Resolution shares canonical signature, arity, closedness, and nesting checks, performs
+no execution, and does not mutate input modules or require a native layout.
+
+Added six tests covering row serialization/validation, independent definition tables,
+closed generic keys, primitive alias/System row preservation, wrappers/Void, invalid
+or open signatures, nesting limits, and legacy application/library metadata. Updated
+the README, identity documentation, generic metadata, and architecture priorities.
+
+Type lookup and interpreter value/layout checks still use the prototype's globally
+unique names. General module-scoped resolution, module revisions, persistent caching,
+and a prepared hosting context remain future work. Keys are not stable across rebuilt
+artifacts, and no ownership or native ABI policy is introduced.
+
+Validation: all 239 integration tests pass on macOS ARM64; formatting, clippy with
+warnings denied, and diff checks pass. Linux and Windows execution remain for CI.
