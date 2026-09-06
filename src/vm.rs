@@ -43,7 +43,21 @@ pub(crate) fn resolve(
     target: &FunctionRef,
 ) -> Result<crate::metadata::Function, Fault> {
     let mut found = None;
-    for definition in &module.functions {
+    for (index, definition) in module.functions.iter().enumerate() {
+        let identity = definition
+            .definition
+            .clone()
+            .unwrap_or_else(|| crate::metadata::MemberId {
+                module: module.name.clone(),
+                index: index as u32,
+            });
+        if target
+            .definition
+            .as_ref()
+            .is_some_and(|wanted| wanted != &identity)
+        {
+            continue;
+        }
         if definition.name != target.name || definition.instance != target.instance {
             continue;
         }
@@ -52,7 +66,7 @@ pub(crate) fn resolve(
             .as_ref()
             .and_then(|o| module.type_definition(o))
             .map_or(0, |d| d.generic_parameters.len());
-        let candidate = if arity > 0 {
+        let mut candidate = if arity > 0 {
             let Some(Type::Constructed {
                 definition: owner,
                 arguments,
@@ -79,6 +93,7 @@ pub(crate) fn resolve(
             }
             definition.clone()
         };
+        candidate.definition = Some(identity);
         if candidate.parameters == target.parameters {
             if found.is_some() {
                 return Err(Fault::new(
@@ -133,7 +148,9 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
                 "System is reserved for the runtime library without an entry point",
             ));
         }
-        validate_linked(module)
+        let mut normalized = module.clone();
+        normalized.normalize_member_ids()?;
+        validate_linked(&normalized)
     } else {
         crate::library::link(module, crate::library::system()?).map(|_| ())
     }
@@ -207,8 +224,16 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             check_type_context(&field.ty, module, def.generic_parameters.len(), 0)?;
         }
     }
+    let mut identities = HashSet::new();
     let mut signatures = HashSet::new();
     for function in &module.functions {
+        if function
+            .definition
+            .as_ref()
+            .is_some_and(|identity| !identities.insert(identity))
+        {
+            return Err(Fault::new("duplicate function definition identity"));
+        }
         if function.name.is_empty()
             || !signatures.insert((&function.name, &function.parameters, function.instance))
         {

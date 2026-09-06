@@ -13,8 +13,9 @@ for shared contracts, capability boundaries, unresolved choices, and staged expe
 Only interpretation is implemented today; this does not make interpreter internals
 the permanent platform ABI.
 
-The next shared foundation is stable module/type/member identity, particularly generic
-overload references. Invocation, target-layout, runtime-service, and Fault boundaries
+Module-local function identities and generic call binding are now implemented; see
+[function identities](member-identities.md). Type/module version identity and general
+module-scoped resolution remain shared foundations. Invocation, target-layout, runtime-service, and Fault boundaries
 then support a minimal hosting experiment and an early native AOT experiment. A small
 language compiler should target the same metadata/IL and enable incremental library
 migration. Native backend/code-sharing choices remain open; no hidden fallback or

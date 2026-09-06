@@ -16,10 +16,35 @@ pub(crate) fn link(application: &Module, library: &Module) -> Result<Module, Fau
             "expected a System library module without an entry point",
         ));
     }
-    crate::vm::validate_linked(library)?;
+    let mut library = library.clone();
+    library.normalize_member_ids()?;
+    crate::vm::validate_linked(&library)?;
     let mut linked = application.clone();
+    linked.normalize_member_ids()?;
     linked.types.extend(library.types.iter().cloned());
     linked.functions.extend(library.functions.iter().cloned());
     crate::vm::validate_linked(&linked)?;
+    bind_member_references(&mut linked)?;
     Ok(linked)
+}
+
+// Bind symbolic references while their declaring generic context is still open.
+// Specialization later substitutes signatures, but preserves the selected definition.
+pub(crate) fn bind_member_references(module: &mut Module) -> Result<(), Fault> {
+    let mut calls = Vec::new();
+    for (function, definition) in module.functions.iter().enumerate() {
+        for (pc, op) in definition.body.iter().enumerate() {
+            if let crate::metadata::Instruction::Call(target) = op {
+                let identity = crate::vm::resolve(module, target)?.definition;
+                calls.push((function, pc, identity));
+            }
+        }
+    }
+    for (function, pc, identity) in calls {
+        if let crate::metadata::Instruction::Call(target) = &mut module.functions[function].body[pc]
+        {
+            target.definition = identity;
+        }
+    }
+    Ok(())
 }

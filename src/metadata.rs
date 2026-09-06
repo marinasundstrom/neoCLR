@@ -155,6 +155,8 @@ pub struct Field {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Function {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub definition: Option<MemberId>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub custom_attributes: Vec<CustomAttribute>,
     pub name: String,
@@ -217,6 +219,8 @@ impl Function {
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct FunctionRef {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub definition: Option<MemberId>,
     pub name: String,
     #[serde(default)]
     pub owner: Option<Type>,
@@ -696,4 +700,35 @@ impl Function {
 #[serde(deny_unknown_fields)]
 pub struct CustomAttribute {
     pub constructor: FunctionRef,
+}
+
+/// Module-local function-definition row, not a durable identifier across rebuilds.
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct MemberId {
+    pub module: String,
+    pub index: u32,
+}
+
+impl Module {
+    pub(crate) fn normalize_member_ids(&mut self) -> Result<(), crate::Fault> {
+        for (index, function) in self.functions.iter_mut().enumerate() {
+            let identity = MemberId {
+                module: self.name.clone(),
+                index: u32::try_from(index)
+                    .map_err(|_| crate::Fault::new("too many function definitions"))?,
+            };
+            if function
+                .definition
+                .as_ref()
+                .is_some_and(|existing| existing != &identity)
+            {
+                return Err(crate::Fault::new(
+                    "noncanonical function definition identity",
+                ));
+            }
+            function.definition = Some(identity);
+        }
+        Ok(())
+    }
 }

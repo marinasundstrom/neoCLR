@@ -8,6 +8,7 @@ use std::collections::VecDeque;
 
 #[derive(Debug, Clone)]
 pub struct FunctionVerification {
+    pub definition: Option<crate::metadata::MemberId>,
     /// Index in the linked module (application functions precede library functions).
     pub function_index: usize,
     pub name: String,
@@ -27,7 +28,10 @@ pub struct Verification {
 pub fn verify(module: &Module) -> Result<Verification, Fault> {
     if module.name == "System" {
         crate::vm::validate(module)?;
-        analyze(module)
+        let mut normalized = module.clone();
+        normalized.normalize_member_ids()?;
+        crate::library::bind_member_references(&mut normalized)?;
+        analyze(&normalized)
     } else {
         verify_with_library(module, crate::library::system()?)
     }
@@ -161,6 +165,7 @@ fn analyze_function(
         }
     }
     Ok(FunctionVerification {
+        definition: function.definition.clone(),
         function_index: index,
         name: function.name.clone(),
         owner: function.owner.clone(),

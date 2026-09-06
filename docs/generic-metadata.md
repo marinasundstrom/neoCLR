@@ -101,10 +101,11 @@ zero (`this`) has the exact closed owner type. Receivers remain values: returnin
 updated receiver does not mutate the caller's original. Existing frame/instruction
 limits apply to recursion. The prototype does not yet cache specializations.
 
-Overload resolution uses the closed owner, static/instance kind, and substituted
-parameter types. If substitution makes two overloads identical, the call is rejected
-as ambiguous rather than selecting declaration order. The current call representation
-does not yet carry a separate definition token to disambiguate those overloads.
+Overload resolution uses the owner, static/instance kind, and parameter types.
+[Definition identities](member-identities.md) bind calls in their declaring context
+before specialization. A call selected in an open generic body keeps its target when
+substitution makes another overload's signature identical. Direct ambiguous closed
+calls can select a definition with `@ Module:index`; without it, ambiguity is rejected.
 Return types do not distinguish overloads. Generic owners cannot currently declare
 InternalCall or P/Invoke methods, and an open method cannot be the module entry point.
 

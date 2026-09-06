@@ -59,6 +59,7 @@ cargo run -- run examples/generic-values.neoil
 cargo run -- run examples/generic-methods.neoil
 cargo run -- run examples/generic-memory.neoil
 cargo run -- run examples/attributes.neoil
+cargo run -- run examples/member-identities.neoil
 cargo run -- verify examples/generic-methods.neoil
 cargo run -- run examples/native-integers.neoil
 cargo run -- run examples/integers.neoil
@@ -234,3 +235,7 @@ language for the runtime library; its contracts are proposals, not implemented f
 and native AOT as platform-wide targets, with shared semantics and explicit capability
 boundaries. Only interpretation exists today. Embedding and a future high-level
 language are separate architectural requirements; hosting does not define the modes.
+
+[Function identities](docs/member-identities.md) now preserve module-local call targets
+through linking and generic specialization. Explicit `@ Module:index` references can
+distinguish overloads with identical substituted signatures.

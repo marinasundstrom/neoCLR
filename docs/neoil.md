@@ -481,3 +481,7 @@ for substitution, receiver semantics, overload limitations, and validation.
 enclosing type or method/function. In methods it must precede instructions and
 labels. `.ctor` declarations must be instance methods returning Void. See
 [custom attributes](custom-attributes.md) for metadata validation and current limits.
+
+Call and attribute-constructor references may append `@ Module:index` to select a
+module-local function definition while retaining signature validation. Ordinary calls
+are bound before generic specialization. See [function identities](member-identities.md).

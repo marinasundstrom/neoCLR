@@ -867,3 +867,29 @@ protocols remain open; no runtime implementation or mode policy was introduced.
 Updated README, roadmap priorities, and format direction. Validation: documentation
 diff checks pass. Runtime code is unchanged; the previously passing 226-test suite
 was not rerun.
+
+## 2026-09-06 — Function definition identities and generic call binding
+
+Added module-local function definition rows to metadata. The assembler assigns rows
+in declaration order; linking preserves each source module's rows and rejects supplied
+identities that disagree with the definition table. Legacy metadata without identities
+remains accepted. Call and attribute constructor references can select a definition
+explicitly with `@ Module:index`, retaining signature checks and no name fallback.
+
+The linker binds IL calls before generic specialization. An open generic call retains
+its chosen declaration when substitution makes another overload's parameters identical.
+The interpreter and verifier share this resolution, and verifier reports distinguish
+source definition identities from linked array positions. Binding changes only the
+linked copy, leaving input artifacts intact.
+
+Added a sample and seven tests for overload collisions, serialization, library row
+preservation, legacy metadata, invalid identities/signatures, and attribute references.
+Updated the missing-native-declaration fixture to regenerate row identities after
+removing a definition, preserving its original missing-overload assertion. Documented
+syntax, compatibility, and architectural limits. These identities survive linking and
+specialization, not arbitrary rebuilds; module versioning and type identities remain
+future work. No JIT, native AOT backend, or public invocation ABI is added.
+
+Validation: all 233 integration tests pass on macOS ARM64; formatting, clippy with
+warnings denied, and diff checks pass. The member-identities sample executes both
+intended overloads. Linux and Windows execution remain for CI.

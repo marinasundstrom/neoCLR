@@ -399,6 +399,7 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                         identifier(name.trim())?;
                         (
                             FunctionRef {
+                                definition: None,
                                 name: name.trim().into(),
                                 parameters: vec![],
                                 owner: None,
@@ -428,6 +429,7 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                     };
                     function = Some(PendingFunction {
                         function: Function {
+                            definition: None,
                             custom_attributes: vec![],
                             name,
                             owner,
@@ -458,6 +460,7 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
     if module.name.is_empty() {
         return Err(Fault::new(".module is required"));
     }
+    module.normalize_member_ids()?;
     // Resolve after all declarations so field aliases can name later types.
     for (function, pc, owner, name, line) in field_fixups {
         let arity = module.functions[function]
@@ -578,6 +581,30 @@ pub fn parse_function_ref(text: &str) -> Result<FunctionRef, Fault> {
 }
 
 fn parse_callable(text: &str, named: bool) -> Result<(FunctionRef, Vec<Option<String>>), Fault> {
+    let (text, definition) = if !named {
+        if let Some((signature, identity)) = text.rsplit_once('@') {
+            let (module, index) = identity
+                .trim()
+                .split_once(':')
+                .ok_or_else(|| Fault::new("expected @ Module:index"))?;
+            identifier(module.trim())?;
+            let index = index
+                .trim()
+                .parse::<u32>()
+                .map_err(|_| Fault::new("expected unsigned definition index"))?;
+            (
+                signature.trim(),
+                Some(crate::metadata::MemberId {
+                    module: module.trim().into(),
+                    index,
+                }),
+            )
+        } else {
+            (text, None)
+        }
+    } else {
+        (text, None)
+    };
     let (name, parameters) = text.trim().split_once('(').ok_or_else(|| {
         Fault::new("call requires an explicit signature: Name(Type, ...) or Name()")
     })?;
@@ -645,6 +672,7 @@ fn parse_callable(text: &str, named: bool) -> Result<(FunctionRef, Vec<Option<St
     }
     Ok((
         FunctionRef {
+            definition,
             name,
             owner,
             instance,

@@ -68,6 +68,10 @@ fn missing_native_declarations_are_not_resolved_by_name() {
     system
         .functions
         .retain(|f| f.name != "neoCLR.Runtime.WriteLine");
+    // Rebuild row identities after changing the definition table.
+    for (index, function) in system.functions.iter_mut().enumerate() {
+        function.definition.as_mut().unwrap().index = index as u32;
+    }
     assert!(
         load(&serde_json::to_string(&system).unwrap())
             .unwrap_err()

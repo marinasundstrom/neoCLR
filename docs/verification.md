@@ -48,7 +48,8 @@ this analysis does not prove termination. Unreachable instructions still undergo
 ordinary metadata validation, but are not checked for stack types or assignment.
 Calls are assumed to return one value; there is no interprocedural non-return analysis.
 
-Reports identify each IL definition by its index in the linked module, name, owner,
+Reports identify each IL definition by its module-local definition identity, index
+in the linked module, name, owner,
 parameter signature, and instance flag. They contain its maximum reachable stack
 height and reachable instruction count. Maximum height is per frame, not a claim
 about total process memory or recursion depth. The pass does not rewrite metadata
@@ -83,7 +84,8 @@ execution. Pointer validity/lifetime/alignment, memory initialization, active un
 cases, allocation sizes, numerical overflow, divide-by-zero, and resource limits
 remain runtime checks. For example, a load through a correctly typed null pointer
 passes type analysis and Faults at execution. Type-dependent native layout and generic
-specialization constraints (including later overload collisions) can still fail.
+specialization constraints can still fail. Calls bind definition identities before
+specialization so ordinary generic overload collisions do not change their targets.
 The pass does not specialize and reanalyze every possible closed generic body.
 
 The analysis is conservative: an unconstrained generic arithmetic operation can be

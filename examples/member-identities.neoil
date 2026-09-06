@@ -1,0 +1,32 @@
+.module MemberIdentities
+.entry Main
+
+.type Choice<T>
+    ; Function-definition row 0 in MemberIdentities.
+    .method static Describe(T value) -> String
+        ldstr "generic declaration"
+        ret
+    .end
+    ; Function-definition row 1 in MemberIdentities.
+    .method static Describe(Int32 value) -> String
+        ldstr "integer declaration"
+        ret
+    .end
+    .method static Forward(T value) -> String
+        ldarg value
+        ; Binding in the open generic context selects row 0 before specialization.
+        call Choice<T>::Describe(T)
+        ret
+    .end
+.end
+
+.function Main() -> Void
+    ldc.i4 42
+    call Choice<Int32>::Forward(Int32)
+    call System.Console::WriteLine(String)
+    pop
+    ldc.i4 42
+    call Choice<Int32>::Describe(Int32) @ MemberIdentities:1
+    call System.Console::WriteLine(String)
+    ret
+.end
