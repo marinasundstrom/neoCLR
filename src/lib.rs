@@ -9,7 +9,7 @@ mod vm;
 
 pub use metadata::Module;
 pub use value::Value;
-pub use vm::{Execution, Limits, run, run_with_library};
+pub use vm::{Execution, Limits, run, run_with_library, run_with_native};
 
 /// A terminal runtime/loader failure. Guest code cannot catch a Fault.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -51,3 +51,5 @@ mod numeric;
 mod floating;
 
 mod checked;
+
+pub mod interop;

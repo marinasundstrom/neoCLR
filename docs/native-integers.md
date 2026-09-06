@@ -51,7 +51,8 @@ allocation's one-past address. Otherwise it accepts an interior or one-past addr
 A nonzero address outside those allocations remains untracked. It can be copied,
 compared, cast, stored, or converted back to an integer, but its memory cannot yet
 be accessed or freed by guest instructions. Conversion does not make foreign memory
-valid. Externally supplied memory access and P/Invoke remain a later slice.
+valid. Direct guest access to externally supplied memory remains pending. A first
+[P/Invoke subset](native-interop.md) now supports native calls and foreign pointer forwarding.
 
 Integer reconstruction does not recover an old lifetime. If a freed address has
 been reused, the reconstructed pointer can identify the new live allocation. A

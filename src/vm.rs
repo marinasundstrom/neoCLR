@@ -34,6 +34,8 @@ pub struct Execution {
     /// Retained until the execution result is dropped; references index this arena.
     pub heap: Vec<Value>,
     pub memory: crate::memory::PointerHeap,
+    /// Retains libraries for the lifetime of returned native addresses.
+    pub native_libraries: Option<crate::interop::NativeLibraries>,
 }
 
 fn resolve(module: &Module, target: &FunctionRef) -> Option<usize> {
@@ -137,6 +139,10 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         {
             check_type(ty, module)?;
         }
+        if function.pinvoke.is_some() {
+            crate::interop::validate(function)?;
+            continue;
+        }
         match function.impl_flags {
             crate::metadata::INTERNAL_CALL => {
                 if !function.body.is_empty() || !function.locals.is_empty() {
@@ -213,6 +219,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             f.name == module.entry
                 && f.parameters.is_empty()
                 && !f.is_internal_call()
+                && f.pinvoke.is_none()
                 && !f.instance
         })
     {
@@ -303,10 +310,39 @@ pub fn run_with_library(
         ));
     }
     let linked = crate::library::link(module, library)?;
-    interpret(&linked, limits)
+    interpret(&linked, limits, None)
 }
 
-fn interpret(module: &Module, limits: Limits) -> Result<Execution, Fault> {
+/// Execute a trusted module with native imports enabled.
+///
+/// # Safety
+/// Every executed native declaration must match its exported C ABI signature.
+/// Native code and library initializers/destructors must uphold pointer validity,
+/// allocation lifetimes, and Rust's memory safety requirements. Guest metadata alone
+/// cannot establish these guarantees. The caller must trust the code being executed.
+pub unsafe fn run_with_native(
+    module: &Module,
+    library: &Module,
+    limits: Limits,
+) -> Result<Execution, Fault> {
+    if module.entry.is_empty() {
+        return Err(Fault::new(
+            "cannot execute a library without an entry point",
+        ));
+    }
+    let linked = crate::library::link(module, library)?;
+    interpret(
+        &linked,
+        limits,
+        Some(crate::interop::NativeLibraries::default()),
+    )
+}
+
+fn interpret(
+    module: &Module,
+    limits: Limits,
+    mut native_libraries: Option<crate::interop::NativeLibraries>,
+) -> Result<Execution, Fault> {
     if limits.frames == 0 {
         return Err(Fault::new("frame limit exceeded"));
     }
@@ -480,7 +516,16 @@ fn interpret(module: &Module, limits: Limits) -> Result<Execution, Fault> {
                         .ok_or_else(|| Fault::new("unknown function overload"))?;
                     let callee = &module.functions[index];
                     let args = frame.args(&callee.argument_types())?;
-                    if callee.is_internal_call() {
+                    if callee.pinvoke.is_some() {
+                        let libraries = native_libraries.as_mut().ok_or_else(|| {
+                            Fault::new("native imports require trusted run_with_native execution")
+                        })?;
+                        // SAFETY: a native library session is only supplied by run_with_native,
+                        // whose caller accepts the native ABI and memory safety contract.
+                        let value = unsafe { libraries.invoke(callee, args, &memory)? };
+                        expect(&value, &callee.returns)?;
+                        frame.stack.push(value.on_stack());
+                    } else if callee.is_internal_call() {
                         let value = crate::native::bind(callee)?.invoke(args, &mut output)?;
                         expect(&value, &callee.returns)?;
                         frame.stack.push(value);
@@ -742,6 +787,7 @@ fn interpret(module: &Module, limits: Limits) -> Result<Execution, Fault> {
                     output,
                     heap,
                     memory,
+                    native_libraries,
                 });
             }
             Err(mut fault) => {

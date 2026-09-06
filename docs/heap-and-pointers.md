@@ -119,7 +119,7 @@ Faults; a recoverable allocation API can expose Result later.
 
 ## Remaining capabilities
 
-Externally supplied memory access, P/Invoke, stack allocation/address-taking,
+Direct guest access to externally supplied memory, stack allocation/address-taking,
 block operations, unaligned access, explicit layout/packing, and foreign ownership
 contracts remain unimplemented. The current native pointer subset is groundwork
 for those capabilities, not a claim of .NET binary or unsafe-code compatibility.
@@ -130,3 +130,5 @@ The older `heap.new/load/store` instructions and execution-owned Ref arena remai
 separate scaffolding, without reference counting or per-object free.
 See the [pointer sample](../examples/pointers.neoil), [opcode reference](neoil.md),
 and [memory layers](memory-model.md).
+
+A first P/Invoke subset now supports scalar and pointer calls; see [native interop](native-interop.md).

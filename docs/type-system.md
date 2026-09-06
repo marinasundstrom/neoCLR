@@ -110,8 +110,8 @@ receiver indexing, overloads, primitive conversion, and free-function entry poin
 through metadata. Pointer values now contain native addresses. Explicit heap
 allocation/free, pointer casts, byte offsets, field addresses, and indirect access
 are implemented for the supported layouts; see [heap and pointers](heap-and-pointers.md).
-Pointers carry no ownership. Native interop and externally supplied addresses remain
-unimplemented. Value copying a record copies its fields, including pointer addresses;
+Pointers carry no ownership. A first native interop subset supports scalar/pointer calls; direct guest access to
+externally supplied memory remains unimplemented. See [native interop](native-interop.md). Value copying a record copies its fields, including pointer addresses;
 it does not copy the pointed-to storage or acquire ownership.
 
 The existing Option/Result/Ref constructors are special-cased signatures, not general

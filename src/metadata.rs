@@ -160,7 +160,23 @@ pub struct Function {
     #[serde(default)]
     pub impl_flags: u16,
     #[serde(default)]
+    pub pinvoke: Option<NativeImport>,
+    #[serde(default)]
     pub body: Vec<Instruction>,
+}
+
+/// Prototype equivalent of an ImplMap entry; does not imply managed ownership.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct NativeImport {
+    pub library: String,
+    pub entry_point: String,
+    pub calling_convention: CallingConvention,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub enum CallingConvention {
+    Cdecl,
 }
 
 pub const INTERNAL_CALL: u16 = 0x1000;

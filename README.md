@@ -36,7 +36,8 @@ familiar where possible, without committing every program to one memory model.
 
 ## Run
 
-Install stable Rust with support for edition 2024 (Rust 1.85 or newer), then:
+Install stable Rust with support for edition 2024 (Rust 1.85 or newer) and a native
+C toolchain for vendored libffi (compiler/make on Unix, MSVC tools on Windows), then:
 
 ```sh
 cargo run -- run examples/hello.neoil
@@ -85,6 +86,18 @@ metadata and instruction operands; it is **not** a complete static verifier.
 Evaluation-stack types, initialization, and return contracts are checked as code
 executes. `run` accepts `.neoil` source directly or serialized JSON modules.
 
+## Native interop sample
+
+```sh
+cargo run --locked --example build_native
+cargo run --locked -- run examples/pinvoke.neoil
+```
+
+This builds a native C-ABI library, then demonstrates a native function modifying
+explicitly allocated guest storage. The CLI executes native imports as trusted code;
+metadata checking does not load libraries. See [P/Invoke](docs/native-interop.md) for
+supported signatures, embedding APIs, and the current memory boundaries.
+
 ## Runtime library
 
 The runtime library is written for neoCLR in neoIL, then assembled into our metadata
@@ -129,6 +142,7 @@ reference resolution. See [runtime library design](docs/runtime-library.md).
 - A platform-written [System library](runtime/System.neoil): overloaded
   `System.Console.WriteLine`, `System.Int32.Parse`, `System.Int32.Divide`, and
   `System.Math.Abs`, plus instance `Int32.ToString()`, assembled into the same metadata/IL representation as apps.
+- Explicit `.pinvoke` imports with dynamic library loading and scalar/pointer C-ABI calls.
 - Three host primitives for console output, Int32 string conversion, and parsing,
   explicitly declared with CLR-style `MethodImpl`/`InternalCall` metadata.
 - Configurable limits on instruction count, call depth, stack slots per frame,
@@ -153,7 +167,7 @@ no reference counting or GC. Counted `Ref<T>` remains a deferred ownership abstr
 Rust's memory model does not define guest behavior. See [memory layers](docs/memory-model.md).
 
 The library is a bootstrap surface, not a complete BCL. General user-defined
-generics/unions, interfaces/virtual dispatch, arrays, borrows, native interop,
+generics/unions, interfaces/virtual dispatch, arrays, borrows, full native marshalling,
 threading, runtime async, JIT compilation, and full verification are unimplemented.
 Resource limits are guardrails, not a memory quota or a hostile-code sandbox.
 Console output is collected and emitted by the CLI only on successful completion.

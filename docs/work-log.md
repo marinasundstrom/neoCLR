@@ -324,3 +324,33 @@ covering every opcode, exact integer boundaries, unsigned source interpretation,
 widths, floating-point boundary rounding, non-finite values, invalid operands, metadata
 round-trip, and sample execution. Clippy and formatting pass on macOS ARM64. The sample
 prints 42 and 255 and returns Void. Other hosts remain subject to the existing CI matrix.
+
+
+## 2026-09-06 — First P/Invoke slice
+
+Added optional native-import metadata and `.pinvoke "library" "entry" cdecl` for
+free functions/static methods. Native declarations cannot contain IL/locals, be
+entry points, or combine with InternalCall. Metadata validation does not load libraries.
+
+Added libloading/libffi dispatch for numeric scalars, pointers, and void returns.
+Calls preserve declared ABI storage widths and normalize results back to the guest
+stack. Libraries load lazily and are retained with Execution. Tracked stale pointers
+Fault before dispatch; returned foreign addresses can be forwarded without claiming
+guest ownership. String/Boolean/Char marshalling, struct-by-value, other conventions,
+and direct interpreter access to foreign memory remain pending.
+
+Safe Rust embedding APIs reject executed imports; a separate unsafe run_with_native
+entry point makes the ABI/trust contract explicit. CLI run enables native execution
+for its selected program. Native memory ownership, side effects, and unsupported
+initialization/provenance tracking are documented rather than inferred.
+
+Added a C-ABI native fixture, portable build helper, guest allocation/mutation/free
+sample, and CI sample commands. The new dependencies require a native build toolchain;
+the default build uses vendored libffi. The System InternalCall registry remains separate.
+
+Validation: all 113 integration tests pass, including seven native interop tests for
+all supported scalar signatures, mixed integer/floating ABI arguments, native pointer
+mutation/returns, foreign pointer forwarding, lazy loading, safe embedding rejection,
+metadata shape checks, and loader/symbol failure diagnostics. Clippy and formatting
+pass on macOS ARM64. The native sample prints 42 and frees its guest allocation.
+Linux/Windows execution remains for the existing CI matrix to verify.

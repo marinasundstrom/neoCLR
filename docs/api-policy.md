@@ -43,7 +43,7 @@ Use the recognizable `MethodImpl`/`InternalCall` metadata mechanism for function
 provided by native runtime code. The public library remains written for neoCLR and
 calls declared helpers at an explicit boundary. A future source compiler should be
 able to accept the familiar attribute form and lower it to the implementation flags.
-Runtime binding is separate from public API naming and from eventual native interop.
+Runtime binding is separate from public API naming and from native interop imports.
 See [runtime library](runtime-library.md) for the implemented mapping and limits.
 
 As APIs are added, tests should cover ordinary observable .NET behavior and the

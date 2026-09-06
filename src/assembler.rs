@@ -79,7 +79,34 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                 return Ok(());
             }
             if let Some(pending) = function.as_mut() {
-                if word == ".methodimpl" {
+                if word == ".pinvoke" {
+                    if pending.function.pinvoke.is_some()
+                        || !pending.function.body.is_empty()
+                        || !pending.labels.is_empty()
+                    {
+                        return Err(Fault::new(
+                            "expected one .pinvoke directive before any body",
+                        ));
+                    }
+                    let mut strings =
+                        serde_json::Deserializer::from_str(rest).into_iter::<String>();
+                    let library = strings
+                        .next()
+                        .ok_or_else(|| Fault::new("expected quoted native library"))?
+                        .map_err(|_| Fault::new("expected quoted native library"))?;
+                    let entry_point = strings
+                        .next()
+                        .ok_or_else(|| Fault::new("expected quoted native entry point"))?
+                        .map_err(|_| Fault::new("expected quoted native entry point"))?;
+                    if rest[strings.byte_offset()..].trim() != "cdecl" {
+                        return Err(Fault::new("expected cdecl calling convention"));
+                    }
+                    pending.function.pinvoke = Some(crate::metadata::NativeImport {
+                        library,
+                        entry_point,
+                        calling_convention: crate::metadata::CallingConvention::Cdecl,
+                    });
+                } else if word == ".methodimpl" {
                     if rest != "InternalCall" || pending.function.impl_flags != 0 {
                         return Err(Fault::new(
                             "expected one .methodimpl InternalCall directive",
@@ -284,6 +311,7 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                             local_names: vec![],
                             body: vec![],
                             impl_flags: 0,
+                            pinvoke: None,
                         },
                         labels: HashMap::new(),
                         branches: vec![],

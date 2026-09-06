@@ -78,6 +78,6 @@ initialization, type, null, bounds, alignment, and lifetime checks apply. Explic
 pointer casts permit interpretation of the stored IEEE bits as integer storage.
 
 See the [floating-point sample](../examples/floating.neoil). Decimal, Half, math
-library coverage, full comparison/branch opcode coverage, native interop, and the
+library coverage, full comparison/branch opcode coverage, full native marshalling, and the
 remaining verifier work are separate follow-ups. This slice changes no allocation
 or ownership policy.

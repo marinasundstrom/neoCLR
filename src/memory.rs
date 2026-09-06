@@ -286,6 +286,16 @@ impl PointerHeap {
         Ok(allocation)
     }
 
+    pub(crate) fn validate_native_pointer(&self, pointer: &Pointer) -> Result<(), Fault> {
+        if pointer.allocation.is_some() {
+            let allocation = self.allocation(pointer)?;
+            if pointer.offset > allocation.bytes.len() {
+                return Err(Fault::new("native pointer out of bounds"));
+            }
+        }
+        Ok(())
+    }
+
     fn range(&self, pointer: &Pointer, layout: &Layout) -> Result<std::ops::Range<usize>, Fault> {
         let allocation = self.allocation(pointer)?;
         if pointer.address & (layout.alignment - 1) != 0 {

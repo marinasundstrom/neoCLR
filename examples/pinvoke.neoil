@@ -1,0 +1,39 @@
+.module PInvoke
+.entry Main
+
+.type Native
+    .method static Add(a: Int32, b: Int32) -> Int32
+        .pinvoke "./target/native/neoclr_sample" "neoclr_add" cdecl
+    .end
+    .method static Set(destination: Int32*, value: Int32) -> Void
+        .pinvoke "./target/native/neoclr_sample" "neoclr_set_i32" cdecl
+    .end
+    .method static Identity(value: Int32*) -> Int32*
+        .pinvoke "./target/native/neoclr_sample" "neoclr_identity_ptr" cdecl
+    .end
+.end
+
+.function Main() -> Void
+    .local value: Int32*
+    ldc.i4 1
+    heap.alloc Int32
+    stloc value
+    ; Initialize guest storage before handing it to native code.
+    ldloc value
+    ldc.i4 0
+    stind.i4
+    ldloc value
+    ldc.i4 19
+    ldc.i4 23
+    call Native.Add(Int32,Int32)
+    call Native.Set(Int32*,Int32)
+    pop
+    ldloc value
+    call Native.Identity(Int32*)
+    ldind.i4
+    call System.Console.WriteLine(Int32)
+    pop
+    ldloc value
+    heap.free
+    ret
+.end

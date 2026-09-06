@@ -1,4 +1,4 @@
-use neoclr::{Fault, Limits, assemble, load, run, run_with_library};
+use neoclr::{Fault, Limits, assemble, load, run_with_native};
 use std::{
     env, fs,
     io::{self, Write},
@@ -21,7 +21,8 @@ fn execute(args: &[String]) -> Result<Vec<String>, String> {
             let module = if input.ends_with(".neoil") { assemble(&source) } else { load(&source) }.map_err(|e| e.to_string())?;
             let source = fs::read_to_string(library).map_err(|e| e.to_string())?;
             let library = load(&source).map_err(|e| e.to_string())?;
-            run_with_library(&module, &library, Limits::default()).map(|execution| {
+            // CLI run executes the user-selected program and its native imports as trusted code.
+            unsafe { run_with_native(&module, &library, Limits::default()) }.map(|execution| {
                 let mut lines = execution.output;
                 lines.push(format!("=> {:?}", execution.value));
                 lines
@@ -31,7 +32,8 @@ fn execute(args: &[String]) -> Result<Vec<String>, String> {
             let source = fs::read_to_string(input).map_err(|e| format!("Cannot read {input}: {e}"))?;
             let module = if input.ends_with(".neoil") { assemble(&source) } else { load(&source) }.map_err(|e| e.to_string())?;
             if command == "check" { return Ok(vec![format!("{}: metadata valid (execution types checked at runtime)", module.name)]); }
-            run(&module, Limits::default()).map(|execution| {
+            // CLI run executes the user-selected program and its native imports as trusted code.
+            unsafe { run_with_native(&module, neoclr::library::system().map_err(|e| e.to_string())?, Limits::default()) }.map(|execution| {
                 let mut lines = execution.output;
                 lines.push(format!("=> {:?}", execution.value));
                 lines

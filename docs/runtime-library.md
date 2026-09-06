@@ -80,8 +80,8 @@ implemented yet.
 
 The runtime owns a typed registry in `src/native.rs`. `call` first resolves the
 metadata declaration; an InternalCall declaration binds to the corresponding Rust
-implementation. Parameter and return contracts are checked. There is no dynamic
-native-library loader or P/Invoke here. `InternalCall` is a CLR implementation
+implementation. Parameter and return contracts are checked. Dynamic library imports
+use a separate [P/Invoke path](native-interop.md). `InternalCall` is a CLR implementation
 mechanism; it is distinct from the `Runtime` code-type flag and does not claim that
 all existing CLI tools support it unchanged.
 
