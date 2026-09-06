@@ -134,9 +134,9 @@ fn structural_validation_precedes_analysis_and_fault_is_terminal() {
 }
 
 #[test]
-fn verifier_is_explicit_and_does_not_claim_type_safety() {
+fn verifier_is_explicit_and_rejects_incorrect_return_types() {
     let invalid = program("ldstr \"wrong return type\"\nret");
-    assert!(verify(&invalid).is_ok());
+    assert!(verify(&invalid).is_err());
     assert!(run(&invalid, Limits::default()).is_err());
     let uninitialized = program(".local Int32 value\nldloc value\nret");
     assert!(verify(&uninitialized).is_err());
@@ -154,7 +154,7 @@ fn cli_verify_accepts_source_and_serialized_metadata_without_execution() {
     assert!(
         String::from_utf8(output.stdout)
             .unwrap()
-            .contains("types checked at runtime")
+            .contains("runtime value checks remain")
     );
     let path = std::env::temp_dir().join(format!("neoclr-verify-{}.neo.json", std::process::id()));
     let module = program("pop\nret");

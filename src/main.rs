@@ -34,7 +34,7 @@ fn execute(args: &[String]) -> Result<Vec<String>, String> {
             if command == "verify" {
                 let report = neoclr::verify(&module).map_err(|e| e.to_string())?;
                 let maximum = report.functions.iter().map(|f| f.maximum_stack).max().unwrap_or(0);
-                return Ok(vec![format!("{}: stack/control-flow verification passed ({} IL functions; maximum stack {maximum}; types checked at runtime)", module.name, report.functions.len())]);
+                return Ok(vec![format!("{}: typed-stack/control-flow verification passed ({} IL functions; maximum stack {maximum}; runtime value checks remain)", module.name, report.functions.len())]);
             }
             if command == "check" { return Ok(vec![format!("{}: metadata valid (execution types checked at runtime)", module.name)]); }
             // CLI run executes the user-selected program and its native imports as trusted code.

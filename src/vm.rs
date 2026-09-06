@@ -38,7 +38,10 @@ pub struct Execution {
     pub native_libraries: Option<crate::interop::NativeLibraries>,
 }
 
-fn resolve(module: &Module, target: &FunctionRef) -> Result<crate::metadata::Function, Fault> {
+pub(crate) fn resolve(
+    module: &Module,
+    target: &FunctionRef,
+) -> Result<crate::metadata::Function, Fault> {
     let mut found = None;
     for definition in &module.functions {
         if definition.name != target.name || definition.instance != target.instance {

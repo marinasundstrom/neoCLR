@@ -820,3 +820,32 @@ Validation: all 218 integration tests pass on macOS ARM64. After a clippy-only
 condition rewrite, the nine verifier tests pass again; formatting, clippy, and diff
 checks pass. CLI verification of generic-methods succeeds without execution. Linux
 and Windows execution remain for CI.
+
+## 2026-09-06 — Typed evaluation-stack verification
+
+Extended the explicit verifier with abstract stack types and exact type joins.
+Calls use resolved/substituted signatures; receivers, argument/local stores, returns,
+record construction and field access, numeric categories, and typed pointer/memory
+operands are checked before execution. Existing stack-height and definite-assignment
+analysis remains in place. The interpreter's callable resolution helper is shared
+internally with the verifier; runtime execution semantics are unchanged.
+
+Distinguished stored types from evaluation-stack normalization, including symbolic
+loaded generic parameters. Byte/UInt32 loads become Int32, UInt64 becomes Int64,
+and Single becomes Double. Raw ldcase/heap.load payloads and exact heap.store rules
+retain their current bootstrap semantics. Unconstrained open operations that cannot
+be proven are conservatively rejected rather than erasing parameter normalization.
+
+Added eight focused tests covering wrong calls/receivers/returns/stores, same-height
+type conflicts, generic record identity, storage normalization, numeric/branch types,
+pointer operand contracts, raw union/heap payloads, and open generic normalization.
+Updated the earlier verifier tests and CLI message for typed checks. All shipped
+examples still verify without execution. Refreshed verification/strategy documentation.
+
+Verification remains opt-in and does not prove pointer validity, memory initialization,
+active union cases, arithmetic success, or every generic specialization constraint.
+No byref, constructor, ownership, or mandatory-verification contract is added.
+
+Validation: all 226 integration tests pass on macOS ARM64; formatting, clippy, and
+diff checks pass. CLI typed verification of generic-methods succeeds. Linux and
+Windows execution remain for CI.

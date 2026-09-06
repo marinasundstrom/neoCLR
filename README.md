@@ -224,8 +224,8 @@ methods/functions. The System library supplies UnionAttribute as an ordinary mar
 union behavior and guest reflection remain pending.
 
 Following the strategy review, the [control-flow verifier foundation](docs/verification.md)
-is implemented as an explicit `verify` command. It checks stack heights, local
-initialization, and returns; typed stack and reference analysis remain pending. The
+is implemented as an explicit `verify` command. It checks stack types, call/field
+operands, local initialization, and returns; reference-lifetime analysis remains pending. The
 [construction, mutation, and initialization proposal](docs/construction-and-initialization.md)
 connects the next type-system decisions with verification and a future high-level
 language for the runtime library; its contracts are proposals, not implemented features.

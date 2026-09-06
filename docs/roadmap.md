@@ -7,10 +7,10 @@ JSON for distribution, or the exact instruction extensions used here.
 ## Strategy review and verifier foundation
 
 Following the strategy review, the first [verifier pass](verification.md) is implemented.
-It checks evaluation-stack heights, definite local initialization, returns, and
-reachable fallthrough. It is explicit rather than mandatory and does not yet track
-stack types. Typed stack analysis and stable member identity remain the next
-foundations before addressed mutation and constructor verification.
+It checks evaluation-stack types, operands, definite local initialization, returns,
+and reachable fallthrough. It is explicit rather than mandatory. Stable member
+identity, reference contracts, and constructor initialization remain foundations
+before addressed mutation and constructor verification.
 
 The [construction proposal](construction-and-initialization.md) and
 [addressed-access proposal](addressed-access.md) remain design discussions, not
@@ -59,8 +59,8 @@ must preserve explicit allocation and avoid requiring null or boxing for absence
    are implemented. Conditional branches
    support Boolean, integer, pointer, and prototype Ref operands. Compact constant and slot aliases are implemented; short branches remain pending.
    Stack-height joins, definite local initialization, reachable returns, and maximum
-   stack analysis are implemented by the explicit verifier. Add typed stack states
-   and decide when verification becomes mandatory.
+   stack analysis are implemented by the explicit verifier, along with typed stack
+   states and instruction operand checks. Decide when verification becomes mandatory.
 2. Extend type/generic metadata and implement arrays when their storage contracts
    are ready; see [arrays and pointers](arrays-and-pointers.md).
 3. Implement a CLI-based binary reader/writer for the supported subset, preserving

@@ -139,8 +139,8 @@ should exercise the same contracts.
 
 ## Next decisions and implementation gate
 
-The basic control-flow verifier is implemented as an explicit pass; typed stack states
-remain pending. Alongside that extension, settle definition/member
+The control-flow verifier includes typed stack states and definite local initialization
+as an explicit pass. Next, settle definition/member
 identity so receiver modes and generic overload targets can be encoded unambiguously.
 Then add addressed access and its checks together.
 
