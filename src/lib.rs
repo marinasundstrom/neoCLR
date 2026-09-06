@@ -51,6 +51,23 @@ pub fn load(source: &str) -> Result<Module, Fault> {
     Ok(module)
 }
 
+/// Load a JSON artifact set with bundled System. First artifact is the root;
+/// remaining artifacts are dependencies. Returns validated source modules in order.
+pub fn load_modules(sources: &[&str]) -> Result<Vec<Module>, Fault> {
+    let modules = sources
+        .iter()
+        .map(|source| {
+            serde_json::from_str(source)
+                .map_err(|error| Fault::new(format!("invalid module: {error}")))
+        })
+        .collect::<Result<Vec<Module>, _>>()?;
+    let (root, dependencies) = modules
+        .split_first()
+        .ok_or_else(|| Fault::new("expected at least one module artifact"))?;
+    library::link_modules(root, library::system()?, dependencies)?;
+    Ok(modules)
+}
+
 mod numeric;
 
 mod floating;

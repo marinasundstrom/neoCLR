@@ -273,6 +273,12 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             let def = module
                 .type_definition(owner)
                 .ok_or_else(|| Fault::new("method owner has no type definition"))?;
+            if matches!((&def.definition, &function.definition), (Some(ty), Some(method)) if ty.module != method.module)
+            {
+                return Err(Fault::new(
+                    "method and declaring type must belong to the same module",
+                ));
+            }
             let prefix = format!("{}.", def.name);
             let member = function
                 .name

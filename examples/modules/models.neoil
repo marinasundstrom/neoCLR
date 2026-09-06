@@ -1,0 +1,11 @@
+.module Models
+
+.type Box<T>
+    .field Value T
+
+    .method static Create(T value) -> Box<T>
+        ldarg value
+        newobj Box<T>
+        ret
+    .end
+.end

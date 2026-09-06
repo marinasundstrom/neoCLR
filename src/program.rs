@@ -32,6 +32,18 @@ impl LoadedProgram {
         })
     }
 
+    /// Prepare an explicit load set. Additional modules must have unique names and
+    /// no entry points. Symbol lookup currently uses one shared namespace.
+    pub fn with_modules(
+        module: &Module,
+        library: &Module,
+        dependencies: &[Module],
+    ) -> Result<Self, Fault> {
+        Ok(Self {
+            module: crate::library::link_modules(module, library, dependencies)?,
+        })
+    }
+
     /// Analyze the already-bound metadata without executing code.
     pub fn verify(&self) -> Result<Verification, Fault> {
         crate::verifier::analyze(&self.module)

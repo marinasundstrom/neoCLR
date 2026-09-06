@@ -247,3 +247,7 @@ Module-scoped type lookup and revision identities remain future work.
 [LoadedProgram](docs/loaded-program.md) prepares an immutable metadata snapshot shared
 by execution, verification, and type queries. Run `cargo run --example loaded_program`
 to prepare HelloWorld once and execute it twice with fresh guest state.
+
+[Explicit module sets](docs/module-sets.md) support additional libraries, cross-module
+generic calls, and field-name aliases. Run `cargo run --example modules` for a three-module
+sample. Symbols still share one namespace; scoped imports and revisions remain pending.

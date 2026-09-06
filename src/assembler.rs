@@ -19,7 +19,39 @@ pub fn assemble(source: &str) -> Result<Module, Fault> {
     Ok(module)
 }
 
+/// Assemble sources together with bundled System. The first source is the root;
+/// remaining sources are library modules. Returns source artifacts in input order.
+pub fn assemble_modules(sources: &[&str]) -> Result<Vec<Module>, Fault> {
+    if sources.is_empty() {
+        return Err(Fault::new("expected at least one module source"));
+    }
+    let parsed = sources
+        .iter()
+        .map(|source| parse_parts(source))
+        .collect::<Result<Vec<_>, _>>()?;
+    let mut context = crate::library::system()?.clone();
+    for (module, _) in &parsed {
+        context.types.extend(module.types.iter().cloned());
+    }
+    let mut modules = Vec::new();
+    for (mut module, fixups) in parsed {
+        resolve_fields(&mut module, &context, fixups)?;
+        modules.push(module);
+    }
+    crate::library::link_modules(&modules[0], crate::library::system()?, &modules[1..])?;
+    Ok(modules)
+}
+
+type FieldFixup = (usize, usize, Type, String, usize);
+
 pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
+    let (mut module, fixups) = parse_parts(source)?;
+    let context = module.clone();
+    resolve_fields(&mut module, &context, fixups)?;
+    Ok(module)
+}
+
+fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
     let mut module = Module {
         format: 3,
         name: String::new(),
@@ -27,7 +59,7 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
         types: vec![],
         functions: vec![],
     };
-    let mut field_fixups: Vec<(usize, usize, Type, String, usize)> = vec![];
+    let mut field_fixups: Vec<FieldFixup> = vec![];
     let mut function: Option<PendingFunction> = None;
     let mut typedef: Option<TypeDef> = None;
     for (index, raw) in source.lines().enumerate() {
@@ -462,14 +494,22 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
         return Err(Fault::new(".module is required"));
     }
     module.normalize_definition_ids()?;
-    // Resolve after all declarations so field aliases can name later types.
+    Ok((module, field_fixups))
+}
+
+fn resolve_fields(
+    module: &mut Module,
+    context: &Module,
+    field_fixups: Vec<FieldFixup>,
+) -> Result<(), Fault> {
+    // Resolve after all declarations, including other modules in a source group.
     for (function, pc, owner, name, line) in field_fixups {
         let arity = module.functions[function]
             .owner
             .as_ref()
-            .and_then(|t| module.type_definition(t))
+            .and_then(|t| context.type_definition(t))
             .map_or(0, |d| d.generic_parameters.len());
-        let fields = crate::vm::record_fields(&module, &owner, arity).map_err(|e| {
+        let fields = crate::vm::record_fields(context, &owner, arity).map_err(|e| {
             Fault::new(format!(
                 "line {line}: invalid field owner {owner:?}: {}",
                 e.message
@@ -488,7 +528,7 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
             _ => return Err(Fault::new("invalid field fixup")),
         }
     }
-    Ok(module)
+    Ok(())
 }
 
 fn identifier(text: &str) -> Result<(), Fault> {

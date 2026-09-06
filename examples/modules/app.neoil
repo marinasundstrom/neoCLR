@@ -1,0 +1,9 @@
+.module Application
+.entry Main
+
+.function Main() -> Void
+    ldc.i4 21
+    call Operations.Compute(Int32)
+    call System.Console::WriteLine(Int32)
+    ret
+.end

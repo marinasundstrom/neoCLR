@@ -1,0 +1,10 @@
+.module Operations
+
+.function Operations.Compute(Int32 value) -> Int32
+    ldarg value
+    call Box<Int32>::Create(Int32) @ Models:0
+    ldfld Box<Int32>::Value
+    ldc.i4 2
+    mul
+    ret
+.end

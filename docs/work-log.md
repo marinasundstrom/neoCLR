@@ -950,3 +950,31 @@ hosting ABI, or JIT/AOT backend interface is introduced.
 Validation: all 245 integration tests pass on macOS ARM64; formatting, clippy with
 warnings denied, and diff checks pass. The embedding sample prints Hello, world!
 twice. Linux and Windows execution remain for CI.
+
+## 2026-09-06 — Explicit module sets
+
+Extended the linker and LoadedProgram with an explicit set of additional library
+modules. Each source is checked for supported format, unique nonempty module name,
+entry-point restrictions, and canonical definition rows before combination. System
+remains independently validated. The combined set retains duplicate-symbol checks,
+and method declarations must belong to their declaring type's source module.
+
+Added assemble_modules and load_modules for groups of neoIL sources and JSON
+artifacts. Group assembly resolves field-name aliases after all type declarations,
+including external generic records. Forward and mutual module references can resolve
+without staging incomplete artifacts through standalone validation. Returned Modules
+remain separate source artifacts; linked indices may change with supplied order,
+while module-local identities and explicit call targets remain unchanged.
+
+Added seven tests for cross-module generic calls/field aliases, module-order independence,
+separate artifact roundtrips and legacy identities, malformed load sets, duplicate or
+missing symbols, mutual references, and cross-module method declaration rejection.
+Added a three-module neoIL sample with a Rust launcher, and documented the loading APIs.
+
+Symbols still share one namespace. The caller supplies the complete load set; imports,
+visibility, scoped type references, artifact revision constraints, resolver callbacks,
+and a multi-module CLI remain future work. No execution or ownership policy changes.
+
+Validation: all 252 integration tests pass on macOS ARM64; formatting, clippy with
+warnings denied, and diff checks pass. The modules example verifies and prints 42.
+Linux and Windows execution remain for CI.

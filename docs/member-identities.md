@@ -3,7 +3,7 @@
 Implemented subset: module-local function identities, identity-qualified references,
 and call binding before generic specialization. [Type definition rows and closed keys](type-identities.md)
 are also implemented; type lookup remains name-based. The bootstrap linker still
-combines one application with System. General module
+combines an application with System and [explicitly supplied dependencies](module-sets.md). General module
 versioning and independently scoped type namespaces are not implemented.
 
 ## Definition identity

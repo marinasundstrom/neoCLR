@@ -56,7 +56,8 @@ reordering a definition table can change rows. Same-name replacement modules are
 not proven compatible by matching rows or names. Module revision identity remains
 necessary before persistent caching or cross-build handles.
 
-Type operands still use the prototype's globally unique names. This slice does not
+Type operands still use the prototype's globally unique names across the
+[supplied module set](module-sets.md). This slice does not
 add module-qualified type syntax, imports, same-name types from multiple modules,
 or replace interpreter value/layout keys with resolved identities. It provides the
 definition metadata and structural keys needed for that future resolution work.

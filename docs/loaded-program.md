@@ -14,7 +14,8 @@ let second = program.run(neoclr::Limits::default())?;
 ```
 
 `new` prepares an application with bundled System. `with_library` accepts an explicit
-System artifact. Preparing System alone through `new` supports analysis. Modules
+System artifact. Additional dependencies can be supplied through [with_modules](module-sets.md).
+Preparing System alone through `new` supports analysis. Modules
 without an entry point can be prepared, verified, and queried, but cannot be executed.
 All existing free run/verify/type-identity helpers remain available and prepare a fresh
 LoadedProgram per call; hosts that want reuse retain the object themselves.
@@ -48,7 +49,7 @@ format, or general module loader. The linked Module remains private so consumers
 cannot mutate bound identities or accidentally treat the combined table as a source
 artifact whose rows should be renumbered.
 
-Type lookup still uses globally unique names within the application/System pair.
+Type lookup still uses globally unique names within the explicitly supplied module set.
 Module-scoped references and revisions remain necessary for general loading.
 Definition identities retain their existing build-local limits. No compiled-code
 cache, generic specialization cache, automatic memory-management policy, or implicit
