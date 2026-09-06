@@ -902,7 +902,7 @@ fn interpret(
                 }
                 Op::FieldAddress(index) => {
                     let pointer = frame.pointer()?;
-                    if !matches!(pointer.target, Type::Named(_)) {
+                    if !matches!(pointer.target, Type::Named(_) | Type::Constructed { .. }) {
                         return Err(Fault::new("ldflda requires pointer to record"));
                     }
                     let layout = crate::memory::layout(module, &pointer.target)?;

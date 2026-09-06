@@ -15,6 +15,8 @@ uninitialized: reads require initialization through stores. Allocation does not
 construct a value. `newobj T` constructs a record value; `stobj T` copies it into
 storage. `ldobj T` copies it out. Changing storage later does not change that copy.
 For records containing pointers, the copied pointer fields still alias their targets.
+Closed generic records use substituted field layouts and retain their complete type
+identity when loaded. See [generic native layouts](generic-metadata.md#native-layouts-for-closed-generic-records).
 
 ```text
 .local Point* point

@@ -69,9 +69,9 @@ Older readers reject the new structured operands rather than erasing type argume
 `examples/generic-values.neoil` demonstrates construction, field aliases, independent
 copies, and a function accepting a closed generic value. The earlier
 `examples/generic-metadata.neoil` demonstrates closed generic pointer signatures.
-Native generic layouts/allocation and method-level generics remain unsupported. Layout controls on generic definitions are recorded
-and checked structurally; concrete layout is deferred. A recursive pointer signature
-does not expand its pointee or acquire a lifetime/ownership policy.
+Native layouts and allocation now support closed generic records whose substituted
+fields have supported layouts. Method-level generics remain unsupported. A recursive
+pointer signature does not expand its pointee or acquire a lifetime/ownership policy.
 
 Option, Result, Ref, and Ptr retain their bootstrap signature encodings for now.
 They cannot be redeclared as generic definitions under those reserved short names.
@@ -115,3 +115,27 @@ checked when executed with its concrete argument: `sizeof !0` works for Int32 an
 Faults for String, which has no native layout. This is not a generic-constraint or
 full stack-verification implementation. See `examples/generic-methods.neoil` for
 creation, extraction, and updates using methods on Box<T>.
+
+## Native layouts for closed generic records
+
+`sizeof`, `alignof`, `heap.alloc`, `ldobj`, `stobj`, `cpobj`, and `initobj` accept
+closed generic records whose fields support native storage. `ldflda` produces a
+pointer to the substituted field type; qualified aliases still normalize to indices.
+Packing and minimum size apply to each closed instantiation using the existing
+sequential layout rules. `Box<Byte>` and `Box<Int32>` can therefore have different
+sizes and alignment. Loads reconstruct the exact closed type, including nested
+records and zero-sized Void fields. Allocation remains separate from construction.
+
+Layout recursion tracks closed type identities. Finite nesting such as
+`Box<Box<Int32>>` is supported; direct/mutual recursion by value is rejected.
+Expanding generic recursion is bounded by signature nesting, layout depth, and
+complexity limits. Recursive pointers have native pointer size and do not expand
+their pointees. String, Error, bootstrap unions, and Ref still lack native layouts,
+so a closed generic record containing one by value cannot be allocated natively.
+This does not add a native ABI for passing records by value through P/Invoke.
+
+Typed loads/stores preserve initialization checks, packing/alignment rules, and
+pointer provenance. A pointer copied through a generic record does not extend the
+pointee's lifetime. `initobj` uses the supported fields' existing zero representations;
+it does not run a constructor. See `examples/generic-memory.neoil` for allocation,
+field addresses, and a size query executed through a method on a generic type.

@@ -123,7 +123,7 @@ fn loader_validates_construction_operands_and_preserves_legacy_encoding() {
 }
 
 #[test]
-fn malformed_generic_field_owners_and_native_layouts_remain_rejected() {
+fn malformed_generic_field_owners_and_unsupported_native_fields_are_rejected() {
     for operand in [
         "Box::Value",
         "Box<!0>::Value",
@@ -135,5 +135,5 @@ fn malformed_generic_field_owners_and_native_layouts_remain_rejected() {
         );
         assert!(assemble(&source).is_err(), "{operand}");
     }
-    assert!(assemble(".module Test\n.type Box<T>\n.field Value T\n.end\n.function Main() -> Void\nldc.i4 1\nheap.alloc Box<Int32>\npop\nldvoid\nret\n.end").is_err());
+    assert!(assemble(".module Test\n.type Box<T>\n.field Value T\n.end\n.function Main() -> Void\nldc.i4 1\nheap.alloc Box<String>\npop\nldvoid\nret\n.end").is_err());
 }

@@ -49,7 +49,7 @@ pub fn layout(module: &Module, ty: &Type) -> Result<Layout, Fault> {
     fn build(
         module: &Module,
         ty: &Type,
-        path: &mut Vec<String>,
+        path: &mut Vec<Type>,
         budget: &mut usize,
     ) -> Result<Layout, Fault> {
         if *budget == 0 {
@@ -68,12 +68,17 @@ pub fn layout(module: &Module, ty: &Type) -> Result<Layout, Fault> {
             Type::IntPtr | Type::UIntPtr | Type::Ptr(_) => {
                 (std::mem::size_of::<usize>(), std::mem::align_of::<usize>())
             }
-            Type::Named(name) => {
-                if path.contains(name) || path.len() >= 64 {
+            Type::Named(name)
+            | Type::Constructed {
+                definition: name, ..
+            } => {
+                if path.contains(ty) || path.len() >= 64 {
                     return Err(Fault::new("recursive or excessively nested record layout"));
                 }
                 let def = module
-                    .type_definition(ty)
+                    .types
+                    .iter()
+                    .find(|def| &def.name == name)
                     .ok_or_else(|| Fault::new("unknown layout type"))?;
                 if def.representation != Representation::Record {
                     return Err(Fault::new("unsupported memory representation"));
@@ -88,11 +93,12 @@ pub fn layout(module: &Module, ty: &Type) -> Result<Layout, Fault> {
                     .packing
                     .filter(|p| *p != 0)
                     .map_or(usize::MAX, usize::from);
-                path.push(name.clone());
+                let instantiated_fields = module.instantiated_fields(ty)?;
+                path.push(ty.clone());
                 let mut size = 0usize;
                 let mut alignment = 1usize;
                 let mut fields = vec![];
-                for field in &def.fields {
+                for field in &instantiated_fields {
                     let layout = build(module, &field.ty, path, budget)?;
                     let field_alignment = layout.alignment.min(packing);
                     alignment = alignment.max(field_alignment);
@@ -527,14 +533,14 @@ fn decode(
     allocation: &Allocation,
 ) -> Result<Value, Fault> {
     match ty {
-        Type::Named(name) => {
+        Type::Named(_) | Type::Constructed { .. } => {
             let fields = layout
                 .fields
                 .iter()
                 .map(|f| decode(&f.ty, &f.layout, offset + f.offset, allocation))
                 .collect::<Result<_, _>>()?;
             Ok(Value::Object {
-                ty: Type::Named(name.clone()),
+                ty: ty.clone(),
                 fields,
             })
         }

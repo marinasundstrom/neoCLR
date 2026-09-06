@@ -32,7 +32,8 @@ union type category or dedicated instructions. See [the convention](unions-and-e
 
 The [generic metadata foundation and closed record values](generic-metadata.md)
 are implemented, including field access, value copying, and static/instance members
-on generic types. Next come custom attributes and the typed access/storage needed
+on generic types. Closed generic native layouts, allocation, and typed memory access
+are also implemented for supported field types. Next come custom attributes and the typed access/storage needed
 for ordinary library carriers.
 Then migrate System Option/Result from their bootstrap implementation. This work
 must preserve explicit allocation and avoid requiring null or boxing for absence.

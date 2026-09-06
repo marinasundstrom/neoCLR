@@ -704,3 +704,25 @@ prerequisites to reflect the implemented member support.
 Validation: all 195 integration tests pass on macOS ARM64; formatting, clippy, and
 diff checks pass. The sample prints 42 and Generic methods passed. Linux and Windows
 execution remain for CI.
+
+## 2026-09-06 — Native storage for closed generic records
+
+Extended sequential native layout to substitute closed generic field types, applying
+packing and minimum size per instantiation. Layout recursion tracks complete closed
+types, allowing finite Box<Box<Int32>> nesting while rejecting recursive values and
+bounding expanding generic recursion. Recursive pointer fields remain pointer-sized.
+
+Native loads reconstruct complete generic type identities. Heap allocation, typed
+loads/stores, field addresses, initialization, and copying now work for supported
+closed records using the existing pointer checks. No allocation or ownership policy
+is added by the type. String, Error, bootstrap unions, and Ref still lack native
+layouts, and record-by-value P/Invoke remains unsupported.
+
+Added examples/generic-memory.neoil and eight integration tests for packed/nested
+layouts, size reservations, initialized copying, exact loaded types, zero-sized Void
+records, unaligned field access, preserved pointer lifetime tracking, recursion limits,
+and rejected unsupported field layouts. Updated the earlier unsupported-layout test
+to use Box<String>, and refreshed README, generic/pointer documentation, and roadmap.
+
+Validation: all 203 integration tests pass on macOS ARM64; formatting, clippy, and
+diff checks pass. The sample prints 42 and 4. Linux and Windows execution remain for CI.

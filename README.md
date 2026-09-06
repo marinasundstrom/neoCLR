@@ -57,6 +57,7 @@ cargo run -- run examples/layout.neoil
 cargo run -- run examples/generic-metadata.neoil
 cargo run -- run examples/generic-values.neoil
 cargo run -- run examples/generic-methods.neoil
+cargo run -- run examples/generic-memory.neoil
 cargo run -- run examples/native-integers.neoil
 cargo run -- run examples/integers.neoil
 cargo run -- run examples/bits.neoil
@@ -212,6 +213,6 @@ See the [union convention](docs/unions-and-enums.md);
 reflection remains outside that milestone.
 
 Indexed generic parameters, constructed references, field substitution, and closed
-generic record values and methods are implemented; see [generic types](docs/generic-metadata.md).
+generic record values, methods, and native layouts are implemented; see [generic types](docs/generic-metadata.md).
 Next are further type metadata and storage fundamentals needed for ordinary library
 types. Dedicated union opcodes are not planned.

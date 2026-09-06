@@ -1,0 +1,32 @@
+.module GenericMemory
+.entry Main
+
+.type Box<T>
+    .field Value T
+    .method static Size() -> Int32
+        sizeof Box<T>
+        ret
+    .end
+.end
+
+.function Main() -> Void
+    .local Box<Int32>* storage
+    ldc.i4 1
+    heap.alloc Box<Int32>
+    stloc storage
+    ldloc storage
+    ldc.i4 42
+    newobj Box<Int32>
+    stobj Box<Int32>
+    ldloc storage
+    ldflda Box<Int32>::Value
+    ldind.i4
+    call System.Console::WriteLine(Int32)
+    pop
+    ldloc storage
+    heap.free
+    pop
+    call Box<Int32>::Size()
+    call System.Console::WriteLine(Int32)
+    ret
+.end
