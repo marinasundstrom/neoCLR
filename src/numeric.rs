@@ -199,3 +199,34 @@ pub(crate) fn shift(op: &Op, value: Value, count: Value) -> Result<Value, Fault>
         _ => Err(Fault::new("shift requires integer value")),
     }
 }
+
+pub(crate) fn branch_condition(op: &Op, left: Value, right: Value) -> Result<bool, Fault> {
+    if matches!(op, Op::BranchEqual(_) | Op::BranchNotEqual(_)) {
+        if left.ty() != right.ty() {
+            return Err(Fault::new("equality branch requires matching types"));
+        }
+        return Ok((left == right) == matches!(op, Op::BranchEqual(_)));
+    }
+    let floating = matches!((&left, &right), (Value::Double(_), Value::Double(_)));
+    // Ordered >= and <= must reject NaN, while their .un forms accept it.
+    // Invert the opposite comparison with the appropriate unordered behavior.
+    let (comparison, invert) = match op {
+        Op::BranchGreater(_) => (Op::Greater, false),
+        Op::BranchGreaterUnsigned(_) => (Op::GreaterUnsigned, false),
+        Op::BranchLess(_) => (Op::Less, false),
+        Op::BranchLessUnsigned(_) => (Op::LessUnsigned, false),
+        Op::BranchGreaterEqual(_) if floating => (Op::LessUnsigned, true),
+        Op::BranchGreaterEqual(_) => (Op::Less, true),
+        Op::BranchGreaterEqualUnsigned(_) if floating => (Op::Less, true),
+        Op::BranchGreaterEqualUnsigned(_) => (Op::LessUnsigned, true),
+        Op::BranchLessEqual(_) if floating => (Op::GreaterUnsigned, true),
+        Op::BranchLessEqual(_) => (Op::Greater, true),
+        Op::BranchLessEqualUnsigned(_) if floating => (Op::Greater, true),
+        Op::BranchLessEqualUnsigned(_) => (Op::GreaterUnsigned, true),
+        _ => return Err(Fault::new("invalid comparison branch")),
+    };
+    let Value::Boolean(value) = binary(&comparison, left, right)? else {
+        return Err(Fault::new("comparison did not produce Boolean"));
+    };
+    Ok(value != invert)
+}

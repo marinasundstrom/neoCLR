@@ -23,7 +23,8 @@ scaffolding, not a prerequisite ownership policy for the pointer layer.
 
 ## Later milestones
 
-1. `brfalse` and label-based `switch` tables are implemented. Conditional branches
+1. `brfalse`, label-based `switch` tables, and equality/ordered comparison branches
+   are implemented. Conditional branches
    support Boolean, integer, pointer, and prototype Ref operands. Add short-form aliases.
    Add a control-flow verifier: typed stack states at joins, definite local
    initialization, valid return paths, and maximum stack calculation.

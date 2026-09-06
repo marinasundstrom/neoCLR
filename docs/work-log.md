@@ -490,3 +490,26 @@ pointer replacement, malformed operands, load-time bounds, bad types, and underf
 Validation: all 149 integration tests pass on macOS ARM64; formatting, clippy, and
 diff checks pass. The sample prints 6 followed by 3. Linux and Windows execution
 remain for the existing CI matrix.
+
+## 2026-09-06 — Direct comparison branches
+
+Added ten familiar CIL opcodes: beq, bne.un, bgt/blt/bge/ble and their .un variants.
+The assembler resolves labels to metadata instruction indices; validation checks all
+targets. Each instruction consumes two operands, preserves older stack values, and
+either branches or falls through without producing a Boolean.
+
+Ordered branches reuse existing integer/floating comparison rules, including opcode
+signedness and unordered .un behavior. Floating >= and <= use the appropriate opposite
+unordered comparison before inversion, so NaN cannot accidentally take an ordered
+branch. Equality branches retain ceq's exact-type value/pointer equality, including
+the prototype's structural equality extensions. Pointer ordering and mixed numeric
+categories remain unsupported without explicit conversions.
+
+Added an executable sample covering all ten opcodes and seven tests spanning signed
+and unsigned integer boundaries, native widths, NaN in either operand position,
+infinities, signed zero, equality/pointer behavior, metadata roundtrip, invalid targets,
+mixed-type rejection, backward branches, instruction budgets, and stack preservation.
+
+Validation: all 156 integration tests pass on macOS ARM64; formatting, clippy, and
+diff checks pass. The sample prints Comparison branches passed. Linux and Windows
+execution remain for the existing CI matrix.

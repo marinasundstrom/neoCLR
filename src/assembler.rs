@@ -54,7 +54,17 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                         match &mut pending.function.body[pc] {
                             Instruction::Branch(i)
                             | Instruction::BranchTrue(i)
-                            | Instruction::BranchFalse(i) => *i = target,
+                            | Instruction::BranchFalse(i)
+                            | Instruction::BranchEqual(i)
+                            | Instruction::BranchNotEqual(i)
+                            | Instruction::BranchGreater(i)
+                            | Instruction::BranchGreaterUnsigned(i)
+                            | Instruction::BranchLess(i)
+                            | Instruction::BranchLessUnsigned(i)
+                            | Instruction::BranchGreaterEqual(i)
+                            | Instruction::BranchGreaterEqualUnsigned(i)
+                            | Instruction::BranchLessEqual(i)
+                            | Instruction::BranchLessEqualUnsigned(i) => *i = target,
                             Instruction::Switch(targets) => {
                                 targets[slot.ok_or_else(|| Fault::new("invalid switch fixup"))?] =
                                     target
@@ -182,7 +192,8 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                             rest.parse::<usize>()
                                 .map_err(|_| Fault::new("expected nonnegative index"))?
                         )),
-                        "br" | "brtrue" | "brfalse" => {
+                        "br" | "brtrue" | "brfalse" | "beq" | "bne.un" | "bgt" | "bgt.un"
+                        | "blt" | "blt.un" | "bge" | "bge.un" | "ble" | "ble.un" => {
                             identifier(rest)?;
                             pending.branches.push((pc, None, rest.into(), line_number));
                             Some(serde_json::json!(0))

@@ -177,6 +177,9 @@ normalization; other checks use exact type equality. See [integer storage](integ
 | `br Label` | `→` | Unconditional branch |
 | `brtrue Label` | `condition →` | Branch when true, nonzero, or non-null |
 | `brfalse Label` | `condition →` | Branch when false, zero, or null |
+| `beq Label`, `bne.un Label` | `T,T →` | Branch on equality or inequality (including unordered floats) |
+| `bgt Label`, `blt Label`, `bge Label`, `ble Label` | `N,N →` | Signed integer or ordered floating comparison branch |
+| `bgt.un Label`, `blt.un Label`, `bge.un Label`, `ble.un Label` | `N,N →` | Unsigned integer or unordered floating comparison branch |
 | `switch (Label, ...)` | `Int32 →` | Branch by zero-based index; otherwise fall through |
 | `call Name(T0, …, Tn)` | `P0,…,Pn → R` | Call declared IL or InternalCall function |
 | `ret` | `R → caller` | Return exactly one value; no extra stack items |
@@ -368,3 +371,35 @@ The short encoding and argument address-taking (`ldarga`) remain pending.
 The `examples/arguments.neoil` sample sums down by updating its `count` argument,
 then demonstrates that the caller's local retains its original value. It prints
 6 followed by 3.
+
+
+## Comparison branches
+
+Comparison branches pop the right operand, then the left, and compare left against
+right. They push no result and preserve any older stack entries on both the taken
+and fallthrough paths. Every opcode accepts a label and retains its own opcode in
+the temporary metadata, with an absolute instruction-index target. Forward and
+backward targets are validated exactly like other branches. Short forms remain pending.
+
+`beq` and `bne.un` use the same exact-type value equality as the existing `ceq`:
+values compare by value and references by identity. Matching-target pointers compare
+addresses without dereferencing. This also retains the prototype's structural equality
+for records/unions and value equality for strings; it does not introduce CLR object
+reference semantics for those values. NaN is unequal to every floating value, including
+itself, so `beq` falls through and `bne.un` branches. Positive and negative zero compare
+equal.
+
+The ordered branches support matching Int32, Int64, IntPtr, UIntPtr, or internal
+floating-point operands. Opcode spelling determines integer signedness. Plain `bgt`,
+`blt`, `bge`, and `ble` use signed integer comparisons and reject unordered floating
+comparisons (fall through for NaN). Their `.un` forms compare integers as unsigned
+and branch when either floating operand is NaN. In particular, floating `bge` is
+not simply an inverted ordered less-than test: it must also reject NaN. This follows
+the CLR contracts for [bge.un](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.bge_un)
+and [ble](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.ble).
+
+Mixed numeric stack categories require explicit conversions. Pointer ordering and
+managed-byref comparisons remain unsupported; convert a pointer to a native integer
+explicitly if address ordering is intended. Unsupported operand types and stack
+underflow Fault at execution. Run `examples/comparison-branches.neoil` for checks of
+all ten opcodes, including unsigned integer and unordered floating cases.

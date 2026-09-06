@@ -161,7 +161,19 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         }
         for op in &function.body {
             match op {
-                Op::Branch(i) | Op::BranchTrue(i) | Op::BranchFalse(i)
+                Op::Branch(i)
+                | Op::BranchTrue(i)
+                | Op::BranchFalse(i)
+                | Op::BranchEqual(i)
+                | Op::BranchNotEqual(i)
+                | Op::BranchGreater(i)
+                | Op::BranchGreaterUnsigned(i)
+                | Op::BranchLess(i)
+                | Op::BranchLessUnsigned(i)
+                | Op::BranchGreaterEqual(i)
+                | Op::BranchGreaterEqualUnsigned(i)
+                | Op::BranchLessEqual(i)
+                | Op::BranchLessEqualUnsigned(i)
                     if *i >= function.body.len() =>
                 {
                     return Err(Fault::new("branch outside function"));
@@ -537,6 +549,22 @@ fn interpret(
                         }
                     };
                     if condition == matches!(op, Op::BranchTrue(_)) {
+                        frame.pc = *i;
+                    }
+                }
+                Op::BranchEqual(i)
+                | Op::BranchNotEqual(i)
+                | Op::BranchGreater(i)
+                | Op::BranchGreaterUnsigned(i)
+                | Op::BranchLess(i)
+                | Op::BranchLessUnsigned(i)
+                | Op::BranchGreaterEqual(i)
+                | Op::BranchGreaterEqualUnsigned(i)
+                | Op::BranchLessEqual(i)
+                | Op::BranchLessEqualUnsigned(i) => {
+                    let right = frame.pop()?;
+                    let left = frame.pop()?;
+                    if crate::numeric::branch_condition(op, left, right)? {
                         frame.pc = *i;
                     }
                 }

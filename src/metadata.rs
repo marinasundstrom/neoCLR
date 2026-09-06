@@ -396,6 +396,26 @@ pub enum Instruction {
     BranchTrue(usize),
     #[serde(rename = "brfalse")]
     BranchFalse(usize),
+    #[serde(rename = "beq")]
+    BranchEqual(usize),
+    #[serde(rename = "bne.un")]
+    BranchNotEqual(usize),
+    #[serde(rename = "bgt")]
+    BranchGreater(usize),
+    #[serde(rename = "bgt.un")]
+    BranchGreaterUnsigned(usize),
+    #[serde(rename = "blt")]
+    BranchLess(usize),
+    #[serde(rename = "blt.un")]
+    BranchLessUnsigned(usize),
+    #[serde(rename = "bge")]
+    BranchGreaterEqual(usize),
+    #[serde(rename = "bge.un")]
+    BranchGreaterEqualUnsigned(usize),
+    #[serde(rename = "ble")]
+    BranchLessEqual(usize),
+    #[serde(rename = "ble.un")]
+    BranchLessEqualUnsigned(usize),
     #[serde(rename = "switch")]
     Switch(Vec<usize>),
     #[serde(rename = "call")]
