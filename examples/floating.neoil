@@ -1,0 +1,74 @@
+.module Floating
+.entry Main
+
+.function Half(value: Double) -> Single
+    ldarg value
+    ldc.r8 2.0
+    div
+    ret
+.end
+
+.function Main() -> Void
+    .local single: Single*
+    .local double: Double*
+
+    ldc.i4 1
+    heap.alloc Single
+    stloc single
+    ldloc single
+    ldc.r4 84.0
+    call Half(Double)
+    stind.r4
+    ldloc single
+    ldind.r4
+    ckfinite
+    conv.i4
+    call System.Console.WriteLine(int32)
+    pop
+    ldloc single
+    heap.free
+    pop
+
+    ldc.i4 1
+    heap.alloc Double
+    stloc double
+    ldloc double
+    ldc.i4 -1
+    conv.r.un
+    stind.r8
+    ldloc double
+    ldind.r8
+    ldc.i4 -1
+    conv.u8
+    conv.r8
+    ceq
+    brtrue ConversionPassed
+    fault "unsigned floating conversion failed"
+ConversionPassed:
+    ldloc double
+    heap.free
+    pop
+
+    ; Explicitly round a value that is not exactly representable in Single.
+    ldc.r8 16777217.0
+    conv.r4
+    ldc.r8 16777216.0
+    ceq
+    brtrue RoundingPassed
+    fault "Single conversion failed"
+RoundingPassed:
+    ldc.r8 NaN
+    ldc.r8 0
+    cgt.un
+    brtrue UnorderedPassed
+    fault "unordered comparison failed"
+UnorderedPassed:
+    ldc.r8 1
+    ldc.r8 0
+    cgt
+    brtrue ComparisonPassed
+    fault "floating comparison failed"
+ComparisonPassed:
+    ldvoid
+    ret
+.end

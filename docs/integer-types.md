@@ -54,7 +54,8 @@ remain unimplemented.
 Int64 supports the existing wrapping, signed/unsigned checked arithmetic, division,
 and comparison instructions. Arithmetic uses the opcode's signedness, not the storage
 signature. Overflow Faults only for checked arithmetic (and signed division's
-minimum/-1 case); division by zero always Faults. Floating-point arithmetic and checked conversions remain follow-ups.
+minimum/-1 case); division by zero always Faults. Floating-point arithmetic is now supported; see [floating-point rules](floating-point.md).
+Checked conversions remain a follow-up.
 
 Indirect instructions now cover ldind.i1/u1/i2/u2/i4/u4/i8/i and
 stind.i1/i2/i4/i8/i. A typed pointer must name a member of the corresponding storage

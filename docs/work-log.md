@@ -282,3 +282,25 @@ covering every integer stack category, high bits, negative and oversized counts,
 sign behavior, minimum values, invalid operands, and instruction-located Faults.
 Clippy and formatting pass on macOS ARM64. The bits sample prints 18, -1, 5, -4
 and returns Void. Existing integer, pointer, library, and CLI tests remain passing.
+
+
+## 2026-09-06 — Floating-point fundamentals
+
+Added canonical Single/Double types, native layouts, ldc.r4/r8 constants, floating
+conversions, ckfinite, and floating indirect loads/stores. Arithmetic, negation,
+remainder, and comparisons now accept the internal floating category. Added cgt/cgt.un
+for both integer and floating categories. Binary64 is the explicit F representation;
+Single stores and conv.r4 round to binary32. Integer-to-Single conversion avoids
+an intermediate double-rounding error.
+
+Constant metadata stores IEEE bits so JSON preserves signed zero and non-finite
+constants. NaN comparisons, signed zero, infinity, unchecked conversion saturation,
+and pending API/verifier boundaries are documented. Invalid integer-only operations
+on floating operands still Fault. No ownership or allocation policy changed.
+
+Validation: all 100 integration tests pass, including eight floating-point tests
+covering type identity, metadata bit round-trip, native storage, Single precision
+across locals/calls/fields, a double-rounding regression, non-finite arithmetic,
+comparison behavior, conversions, and instruction-located Faults. Clippy and formatting
+pass on macOS ARM64. The sample prints 42 and frees its allocations. Existing integer,
+pointer, library, and CLI suites remain passing; other hosts still require CI execution.

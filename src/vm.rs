@@ -339,6 +339,24 @@ fn interpret(module: &Module, limits: Limits) -> Result<Execution, Fault> {
                 .ok_or_else(|| Fault::new("missing frame"))?;
             match op {
                 Op::Int(n) => frame.stack.push(Value::Int32(*n)),
+                Op::Float32 { bits } => frame
+                    .stack
+                    .push(Value::Double(f32::from_bits(*bits) as f64)),
+                Op::Float64 { bits } => frame.stack.push(Value::Double(f64::from_bits(*bits))),
+                Op::CheckFinite => {
+                    let value = frame.pop()?;
+                    match value {
+                        Value::Double(n) if n.is_finite() => frame.stack.push(value),
+                        Value::Double(_) => {
+                            return Err(Fault::new("non-finite floating-point value"));
+                        }
+                        _ => return Err(Fault::new("ckfinite requires floating-point value")),
+                    }
+                }
+                Op::ConvertFloat32 | Op::ConvertFloat64 | Op::ConvertFloatUnsigned => {
+                    let value = frame.pop()?;
+                    frame.stack.push(crate::floating::convert(op, value)?);
+                }
                 Op::Int64(n) => frame.stack.push(Value::Int64(*n)),
                 Op::Bool(b) => frame.stack.push(Value::Boolean(*b)),
                 Op::String(s) => frame.stack.push(Value::String(s.clone())),
@@ -392,7 +410,9 @@ fn interpret(module: &Module, limits: Limits) -> Result<Execution, Fault> {
                 | Op::Divide
                 | Op::DivideUnsigned
                 | Op::Less
-                | Op::LessUnsigned => {
+                | Op::LessUnsigned
+                | Op::Greater
+                | Op::GreaterUnsigned => {
                     let right = frame.pop()?;
                     let left = frame.pop()?;
                     frame.stack.push(crate::numeric::binary(op, left, right)?);
@@ -570,7 +590,9 @@ fn interpret(module: &Module, limits: Limits) -> Result<Execution, Fault> {
                 | Op::LoadIndirectUInt16
                 | Op::LoadIndirectUInt32
                 | Op::LoadIndirectInt64
-                | Op::LoadIndirectNative => {
+                | Op::LoadIndirectNative
+                | Op::LoadIndirectFloat32
+                | Op::LoadIndirectFloat64 => {
                     let mut pointer = frame.pointer()?;
                     let ty = if let Op::LoadObject(ty) = op {
                         if pointer.target != *ty {
@@ -589,7 +611,9 @@ fn interpret(module: &Module, limits: Limits) -> Result<Execution, Fault> {
                 | Op::StoreIndirectInt8
                 | Op::StoreIndirectInt16
                 | Op::StoreIndirectInt64
-                | Op::StoreIndirectNative => {
+                | Op::StoreIndirectNative
+                | Op::StoreIndirectFloat32
+                | Op::StoreIndirectFloat64 => {
                     let value = frame.pop()?;
                     let pointer = frame.pointer()?;
                     if let Op::StoreObject(ty) = op {

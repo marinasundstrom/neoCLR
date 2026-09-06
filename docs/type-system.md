@@ -135,3 +135,7 @@ Fixed-width integer definitions now cover SByte/Byte, Int16/UInt16, Char, UInt32
 Int64/UInt64. Their declared storage types are separate from integer evaluation-stack
 categories; see [integer storage](integer-types.md). Char remains a UTF-16 code unit
 without deciding String's encoding. UTF-8 text is a [proposed direction](text-model.md).
+
+Single/Double are also canonical System primitives. Both use one internal F stack
+category (binary64 in this interpreter), with explicit precision at storage and
+conversion boundaries. See [floating-point rules](floating-point.md).

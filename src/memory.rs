@@ -59,6 +59,8 @@ pub fn layout(module: &Module, ty: &Type) -> Result<Layout, Fault> {
         let (size, alignment) = match ty {
             Type::SByte | Type::Byte => (1, 1),
             Type::Int16 | Type::UInt16 | Type::Char => (2, 2),
+            Type::Single => (4, std::mem::align_of::<f32>()),
+            Type::Double => (8, std::mem::align_of::<f64>()),
             Type::Int32 | Type::UInt32 => (4, 4),
             Type::Int64 | Type::UInt64 => (8, std::mem::align_of::<u64>()),
             Type::Boolean => (1, 1),
@@ -419,6 +421,24 @@ fn decode(
                 fields,
             })
         }
+        Type::Single => {
+            let end = offset + std::mem::size_of::<f32>();
+            if !allocation.initialized[offset..end].iter().all(|b| *b) {
+                return Err(Fault::new("read of uninitialized memory"));
+            }
+            let mut bytes = [0; std::mem::size_of::<f32>()];
+            bytes.copy_from_slice(&allocation.bytes.slice()[offset..end]);
+            Ok(Value::Single(f32::from_ne_bytes(bytes)))
+        }
+        Type::Double => {
+            let end = offset + std::mem::size_of::<f64>();
+            if !allocation.initialized[offset..end].iter().all(|b| *b) {
+                return Err(Fault::new("read of uninitialized memory"));
+            }
+            let mut bytes = [0; std::mem::size_of::<f64>()];
+            bytes.copy_from_slice(&allocation.bytes.slice()[offset..end]);
+            Ok(Value::Double(f64::from_ne_bytes(bytes)))
+        }
         Type::SByte => {
             let end = offset + std::mem::size_of::<i8>();
             if !allocation.initialized[offset..end].iter().all(|b| *b) {
@@ -555,6 +575,16 @@ fn encode(
         return Err(Fault::new("memory store type mismatch"));
     }
     match value {
+        Value::Single(n) => {
+            let end = offset + std::mem::size_of::<f32>();
+            bytes[offset..end].copy_from_slice(&n.to_ne_bytes());
+            initialized[offset..end].fill(true);
+        }
+        Value::Double(n) => {
+            let end = offset + std::mem::size_of::<f64>();
+            bytes[offset..end].copy_from_slice(&n.to_ne_bytes());
+            initialized[offset..end].fill(true);
+        }
         Value::SByte(n) => {
             let end = offset + std::mem::size_of::<i8>();
             bytes[offset..end].copy_from_slice(&n.to_ne_bytes());

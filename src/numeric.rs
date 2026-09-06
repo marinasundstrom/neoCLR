@@ -9,6 +9,8 @@ pub(crate) fn binary(op: &Op, left: Value, right: Value) -> Result<Value, Fault>
             let unsigned_left = left as $unsigned;
             let unsigned_right = right as $unsigned;
             let result = match op {
+                Op::Greater => return Ok(Value::Boolean(left > right)),
+                Op::GreaterUnsigned => return Ok(Value::Boolean(unsigned_left > unsigned_right)),
                 Op::Less => return Ok(Value::Boolean(left < right)),
                 Op::LessUnsigned => return Ok(Value::Boolean(unsigned_left < unsigned_right)),
                 Op::BitAnd => Some(left & right),
@@ -55,6 +57,9 @@ pub(crate) fn binary(op: &Op, left: Value, right: Value) -> Result<Value, Fault>
             })
         }};
     }
+    if let (Value::Double(left), Value::Double(right)) = (&left, &right) {
+        return crate::floating::binary(op, *left, *right);
+    }
     match (left, right) {
         (Value::Int32(a), Value::Int32(b)) => calculate!(a, b, i32, u32, Int32),
         (Value::Int64(a), Value::Int64(b)) => calculate!(a, b, i64, u64, Int64),
@@ -67,6 +72,9 @@ pub(crate) fn binary(op: &Op, left: Value, right: Value) -> Result<Value, Fault>
 }
 
 pub(crate) fn convert(op: &Op, value: Value) -> Result<Value, Fault> {
+    if let Value::Double(value) = value {
+        return crate::floating::to_integer(op, value);
+    }
     // Widening interpretation is selected by the conversion opcode.
     let unsigned = matches!(op, Op::ConvertNativeUInt | Op::ConvertUInt64);
     let bits = match value {
@@ -102,6 +110,12 @@ pub(crate) fn indirect_type(
 ) -> Result<crate::metadata::Type, Fault> {
     use crate::metadata::Type as T;
     let (valid, read_type) = match op {
+        Op::LoadIndirectFloat32 | Op::StoreIndirectFloat32 => {
+            (matches!(target, T::Single), T::Single)
+        }
+        Op::LoadIndirectFloat64 | Op::StoreIndirectFloat64 => {
+            (matches!(target, T::Double), T::Double)
+        }
         Op::LoadIndirectInt8 | Op::LoadIndirectUInt8 | Op::StoreIndirectInt8 => (
             matches!(target, T::Byte | T::SByte),
             if matches!(op, Op::LoadIndirectUInt8) {
@@ -147,6 +161,7 @@ pub(crate) fn unary(op: &Op, value: Value) -> Result<Value, Fault> {
         };
     }
     match value {
+        Value::Double(n) if matches!(op, Op::Negate) => Ok(Value::Double(-n)),
         Value::Int32(n) => apply!(n, Int32),
         Value::Int64(n) => apply!(n, Int64),
         Value::IntPtr(n) => apply!(n, IntPtr),

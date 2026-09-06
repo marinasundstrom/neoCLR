@@ -48,6 +48,7 @@ cargo run -- run examples/pointers.neoil
 cargo run -- run examples/native-integers.neoil
 cargo run -- run examples/integers.neoil
 cargo run -- run examples/bits.neoil
+cargo run -- run examples/floating.neoil
 cargo run -- run examples/fault.neoil
 ```
 
@@ -111,6 +112,8 @@ reference resolution. See [runtime library design](docs/runtime-library.md).
   instance receiver snapshots; see [type system](docs/type-system.md).
 - Signed/unsigned 8-, 16-, 32-, and 64-bit integer storage, UTF-16 Char,
   integer conversions, bitwise/shift/remainder operations, and indirect loads/stores; see [integer types](docs/integer-types.md).
+- `Single`/`Double` storage, floating-point arithmetic, conversions, comparisons,
+  and finite checks; see [floating point](docs/floating-point.md).
 - `System.IntPtr`/`System.UIntPtr` (`nint`/`nuint`), native-width arithmetic,
   conversions, and native storage; see [native integers](docs/native-integers.md).
 - Native `Ptr<T>`/`T*` values, explicit heap allocation/free, casts, byte offsets,

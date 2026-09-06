@@ -1,8 +1,10 @@
 use crate::metadata::{Case, Type};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Value {
     Void,
+    Single(f32),
+    Double(f64),
     Int32(i32),
     SByte(i8),
     Byte(u8),
@@ -38,6 +40,8 @@ impl Value {
     pub fn ty(&self) -> Type {
         match self {
             Self::Void => Type::Void,
+            Self::Single(_) => Type::Single,
+            Self::Double(_) => Type::Double,
             Self::Int32(_) => Type::Int32,
             Self::SByte(_) => Type::SByte,
             Self::Byte(_) => Type::Byte,
@@ -62,6 +66,7 @@ impl Value {
     /// Storage signatures remain precise; small integers load as Int32.
     pub(crate) fn on_stack(self) -> Self {
         match self {
+            Self::Single(n) => Self::Double(n as f64),
             Self::SByte(n) => Self::Int32(n as _),
             Self::Byte(n) => Self::Int32(n as _),
             Self::Int16(n) => Self::Int32(n as _),
@@ -76,6 +81,7 @@ impl Value {
     /// CLI integer storage truncates a stack integer to the destination width.
     pub(crate) fn for_storage(self, ty: &Type) -> Result<Self, crate::Fault> {
         let value = match (&self, ty) {
+            (Self::Double(n), Type::Single) => Self::Single(*n as f32),
             (Self::Int32(n), Type::SByte) => Self::SByte(*n as i8),
             (Self::Int32(n), Type::Byte) => Self::Byte(*n as u8),
             (Self::Int32(n), Type::Int16) => Self::Int16(*n as i16),

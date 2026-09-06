@@ -128,6 +128,12 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
                             rest.parse::<i64>()
                                 .map_err(|_| Fault::new("expected Int64 literal"))?
                         )),
+                        "ldc.r4" => Some(serde_json::json!({"bits":
+                            rest.parse::<f32>().map_err(|_| Fault::new("expected Float32 literal"))?.to_bits()
+                        })),
+                        "ldc.r8" => Some(serde_json::json!({"bits":
+                            rest.parse::<f64>().map_err(|_| Fault::new("expected Float64 literal"))?.to_bits()
+                        })),
                         "ldc.bool" => Some(serde_json::json!(
                             rest.parse::<bool>()
                                 .map_err(|_| Fault::new("expected true or false"))?

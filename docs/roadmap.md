@@ -10,8 +10,8 @@ The initial subset implements native allocation/free, layout, casts, byte offset
 field addresses, and indirect loads/stores. Construction remains separate from
 storage. See [heap and pointers](heap-and-pointers.md) for current checks and limits.
 Native integers/address conversions are also implemented. Next pointer capabilities
-include external memory access and P/Invoke, stack addresses/allocation, floating-point layouts and indirect
-instructions, and explicit layout/ABI controls. Diagnostic side tracking must not
+include external memory access and P/Invoke, stack addresses/allocation, checked numeric conversions, and explicit layout/ABI controls. Integer and floating-point
+layouts, arithmetic, and indirect access are now available. Diagnostic side tracking must not
 become a compulsory ownership policy for the platform.
 
 Defer reference counting, GC, automatic destruction, lifetime-aware wrappers, and

@@ -37,6 +37,12 @@
 .type System.UInt64
 .end
 
+.type System.Single
+.end
+
+.type System.Double
+.end
+
 .type System.IntPtr
 .end
 

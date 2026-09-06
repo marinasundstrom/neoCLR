@@ -4,6 +4,8 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Type {
     Void,
+    Single,
+    Double,
     Int32,
     SByte,
     Byte,
@@ -32,6 +34,8 @@ impl Type {
     pub fn from_name(name: &str) -> Self {
         match name {
             "Void" | "void" | "System.Void" => Self::Void,
+            "Single" | "single" | "float32" | "System.Single" => Self::Single,
+            "Double" | "double" | "float64" | "System.Double" => Self::Double,
             "Int32" | "int32" | "int" | "System.Int32" => Self::Int32,
             "SByte" | "int8" | "System.SByte" => Self::SByte,
             "Byte" | "uint8" | "System.Byte" => Self::Byte,
@@ -53,6 +57,8 @@ impl Type {
     pub fn definition_name(&self) -> Option<&str> {
         match self {
             Self::Void => Some("System.Void"),
+            Self::Single => Some("System.Single"),
+            Self::Double => Some("System.Double"),
             Self::Int32 => Some("System.Int32"),
             Self::SByte => Some("System.SByte"),
             Self::Byte => Some("System.Byte"),
@@ -76,6 +82,8 @@ impl Type {
         matches!(
             self,
             Self::Void
+                | Self::Single
+                | Self::Double
                 | Self::Int32
                 | Self::SByte
                 | Self::Byte
@@ -228,6 +236,26 @@ pub enum Instruction {
     StoreIndirectInt64,
     #[serde(rename = "stind.i")]
     StoreIndirectNative,
+    #[serde(rename = "ldc.r4")]
+    Float32 { bits: u32 },
+    #[serde(rename = "ldc.r8")]
+    Float64 { bits: u64 },
+    #[serde(rename = "conv.r4")]
+    ConvertFloat32,
+    #[serde(rename = "conv.r8")]
+    ConvertFloat64,
+    #[serde(rename = "conv.r.un")]
+    ConvertFloatUnsigned,
+    #[serde(rename = "ckfinite")]
+    CheckFinite,
+    #[serde(rename = "ldind.r4")]
+    LoadIndirectFloat32,
+    #[serde(rename = "ldind.r8")]
+    LoadIndirectFloat64,
+    #[serde(rename = "stind.r4")]
+    StoreIndirectFloat32,
+    #[serde(rename = "stind.r8")]
+    StoreIndirectFloat64,
     #[serde(rename = "ldc.bool")]
     Bool(bool),
     #[serde(rename = "ldstr")]
@@ -298,6 +326,10 @@ pub enum Instruction {
     PointerFromInt(Type),
     #[serde(rename = "ceq")]
     Equal,
+    #[serde(rename = "cgt")]
+    Greater,
+    #[serde(rename = "cgt.un")]
+    GreaterUnsigned,
     #[serde(rename = "clt")]
     Less,
     #[serde(rename = "br")]

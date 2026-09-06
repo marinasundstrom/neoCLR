@@ -37,10 +37,10 @@ escapes. Identifiers contain ASCII letters, digits, underscores, and dots.
   function; labels can be forward references. A label past the last instruction
   cannot be a branch target.
 - Types include `Void`, `SByte`, `Byte`, `Int16`, `UInt16`, `Char`, `Int32`,
-  `UInt32`, `Int64`, `UInt64`, `IntPtr`, `UIntPtr`, `Boolean`, `String`, `Error`, a record name,
+  `UInt32`, `Int64`, `UInt64`, `Single`, `Double`, `IntPtr`, `UIntPtr`, `Boolean`, `String`, `Error`, a record name,
   `Option<T>`, `Result<T,E>`, `Ref<T>`, or `Ptr<T>` (also spelled `T*`). Spaces inside generic signatures are allowed.
   Primitive aliases `int8`, `uint8`, `int16`, `uint16`, `char`, `uint32`,
-  `int64`, `uint64`, `void`, `int32`/`int`, `nint`, `nuint`, `boolean`/`bool`, and `string`
+  `int64`, `uint64`, `float32`/`single`, `float64`/`double`, `void`, `int32`/`int`, `nint`, `nuint`, `boolean`/`bool`, and `string`
   and fully qualified names such as `System.Int32` normalize to canonical types.
   There is a nesting limit of 32 in assembly type expressions.
 
@@ -133,6 +133,7 @@ normalization; other checks use exact type equality. See [integer storage](integ
 | Instruction | Stack effect | Meaning |
 | --- | --- | --- |
 | `ldc.i4 n` | `→ Int32` | Signed decimal 32-bit literal |
+| `ldc.r4 x`, `ldc.r8 x` | `→ F` | Binary32/64 constant, loaded into internal floating-point category |
 | `ldc.i8 n` | `→ Int64` | Signed decimal 64-bit literal |
 | `ldc.bool true/false` | `→ Boolean` | Boolean literal |
 | `ldstr "text"` | `→ String` | String literal |
@@ -155,6 +156,12 @@ normalization; other checks use exact type equality. See [integer storage](integ
 | `clt.un` | `N,N → Boolean` | Unsigned comparison |
 | `conv.i` | `Integer or Ptr<T> → IntPtr` | Native signed conversion |
 | `conv.u` | `Integer or Ptr<T> → UIntPtr` | Native unsigned conversion |
+| `conv.r4`, `conv.r8` | `Integer or F → F` | Convert/round to binary32 or binary64 |
+| `conv.r.un` | `Integer → F` | Convert unsigned integer interpretation |
+| `ckfinite` | `F → F` | Fault on NaN or infinity |
+| `cgt`, `cgt.un` | `N,N or F,F → Boolean` | Greater-than; unsigned integer or unordered floating comparison for .un |
+| `ldind.r4`, `ldind.r8` | `Ptr<Single or Double> → F` | Load matching floating-point storage |
+| `stind.r4`, `stind.r8` | `Ptr<Single or Double>,F →` | Store matching floating-point width |
 | `conv.i1/u1/i2/u2/u4` | `Integer → Int32` | Truncate then sign/zero-extend to stack width |
 | `conv.i8/u8` | `Integer → Int64` | Signed/unsigned widening or retain 64 bits |
 | `conv.i4` | `Integer → Int32` | Retain low 32 bits |
@@ -197,6 +204,13 @@ normalization; other checks use exact type equality. See [integer storage](integ
 | `ldcase Case` | `Union → Payload` | Extract matching case; mismatch Faults; None yields Void |
 | `error "code"` | `→ Error` | Construct bootstrap error value |
 | `fault "message"` | `→ termination` | End guest execution |
+
+`F` is represented by binary64 internally. add/sub/mul/div/rem, neg, ceq, clt, and
+clt.un also accept floating-point operands; .un comparisons test unordered values.
+Floating division by zero produces infinity/NaN, not the integer Fault. Integer
+conversions accept F with truncation; see [floating-point rules](floating-point.md)
+for rounding and the explicit out-of-range policy. Float constants serialize as
+`arg: {"bits": unsignedInteger}` to preserve non-finite values in JSON.
 
 Here `N` is Int32, Int64, IntPtr, or UIntPtr; binary operands currently require matching
 types. Signedness comes from the opcode, not the type name. This subset does not yet
