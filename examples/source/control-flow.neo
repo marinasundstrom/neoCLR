@@ -1,0 +1,23 @@
+import System.Console.*
+
+func Main() -> int {
+    var sum = 0
+    for number in 0..<10 {
+        if number == 3 {
+            continue
+        } else if number > 6 {
+            break
+        }
+        sum = sum + number
+    }
+    var count = 0
+    while count < 3 {
+        count = count + 1
+    }
+    loop {
+        sum = sum + count
+        break
+    }
+    WriteLine(sum)
+    return sum
+}

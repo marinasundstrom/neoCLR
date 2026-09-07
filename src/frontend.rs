@@ -75,9 +75,14 @@ fn lex(source: &str) -> Result<Vec<Token>, Fault> {
                 escaped = !escaped && ch == '\\';
             }
             end.ok_or_else(|| start.error("unterminated string literal"))?
-        } else if rest.starts_with("->") {
+        } else if rest.starts_with("..<") {
+            3
+        } else if ["->", "..", "==", "!=", "<=", ">=", "&&", "||"]
+            .iter()
+            .any(|op| rest.starts_with(op))
+        {
             2
-        } else if "(){}:,.;&*+-=/".contains(first) {
+        } else if "(){}:,.;&*+-=/!<>".contains(first) {
             first.len_utf8()
         } else {
             return Err(start.error(format!("unsupported character {first:?}")));
@@ -164,6 +169,12 @@ enum Stmt {
     Assign(Expr, Expr),
     Return(Token, Option<Expr>),
     Expression(Expr),
+    If(Expr, Vec<Stmt>, Vec<Stmt>),
+    While(Expr, Vec<Stmt>),
+    Loop(Vec<Stmt>),
+    For(Token, Expr, Expr, bool, Vec<Stmt>),
+    Break(Token),
+    Continue(Token),
 }
 struct Parser {
     tokens: Vec<Token>,
@@ -214,7 +225,8 @@ impl Parser {
             return Err(token.error("expected a name"));
         }
         if [
-            "func", "record", "let", "var", "return", "new", "true", "false", "import",
+            "func", "record", "let", "var", "return", "new", "true", "false", "import", "if",
+            "else", "while", "for", "in", "loop", "break", "continue",
         ]
         .contains(&token.text.as_str())
         {
@@ -291,15 +303,7 @@ impl Parser {
                 let parameters = self.fields()?;
                 self.expect("->")?;
                 let returns = self.ty()?;
-                self.newlines();
-                self.expect("{")?;
-                self.lines();
-                let mut body = Vec::new();
-                while !self.at("}") && !self.at("") {
-                    body.push(self.statement()?);
-                    self.lines();
-                }
-                self.expect("}")?;
+                let body = self.block()?;
                 source.functions.push(Function {
                     name,
                     parameters,
@@ -328,7 +332,75 @@ impl Parser {
         self.lines();
         Ok(())
     }
+    fn block(&mut self) -> Result<Vec<Stmt>, Fault> {
+        self.newlines();
+        self.expect("{")?;
+        self.lines();
+        let mut body = Vec::new();
+        while !self.at("}") && !self.at("") {
+            body.push(self.statement()?);
+            self.lines();
+        }
+        self.expect("}")?;
+        Ok(body)
+    }
     fn statement(&mut self) -> Result<Stmt, Fault> {
+        if self.depth >= 32 {
+            return Err(self.current().error("statement nesting limit exceeded"));
+        }
+        self.depth += 1;
+        let result = self.statement_inner();
+        self.depth -= 1;
+        result
+    }
+    fn statement_inner(&mut self) -> Result<Stmt, Fault> {
+        if self.eat("if") {
+            let condition = self.expression(0)?;
+            let yes = self.block()?;
+            let saved = self.position;
+            self.newlines();
+            let no = if self.eat("else") {
+                if self.at("if") {
+                    vec![self.statement()?]
+                } else {
+                    self.block()?
+                }
+            } else {
+                self.position = saved;
+                Vec::new()
+            };
+            return Ok(Stmt::If(condition, yes, no));
+        }
+        if self.eat("while") {
+            let condition = self.expression(0)?;
+            return Ok(Stmt::While(condition, self.block()?));
+        }
+        if self.eat("loop") {
+            return Ok(Stmt::Loop(self.block()?));
+        }
+        if self.eat("for") {
+            let name = self.name()?;
+            self.expect("in")?;
+            let start = self.expression(0)?;
+            let inclusive = if self.eat("..") {
+                true
+            } else {
+                self.expect("..<")?;
+                false
+            };
+            let end = self.expression(0)?;
+            return Ok(Stmt::For(name, start, end, inclusive, self.block()?));
+        }
+        if self.at("break") || self.at("continue") {
+            let at = self.take();
+            let is_break = at.text == "break";
+            self.end_statement()?;
+            return Ok(if is_break {
+                Stmt::Break(at)
+            } else {
+                Stmt::Continue(at)
+            });
+        }
         let statement = if self.at("let") || self.at("var") {
             let mutable = self.take().text == "var";
             let name = self.name()?;
@@ -396,7 +468,7 @@ impl Parser {
             let value = i32::try_from(-value)
                 .map_err(|_| literal.error("integer literal is outside Int32 range"))?;
             self.node(at, ExprKind::Int(value), 1)?
-        } else if ["&", "*", "-", "new"].contains(&at.text.as_str()) {
+        } else if ["&", "*", "-", "!", "new"].contains(&at.text.as_str()) {
             let operand = self.expression(30)?;
             let depth = operand.depth + 1;
             self.node(
@@ -467,6 +539,10 @@ impl Parser {
                 )?;
             } else {
                 let binding = match self.current().text.as_str() {
+                    "||" => 1,
+                    "&&" => 2,
+                    "==" | "!=" => 3,
+                    "<" | ">" | "<=" | ">=" => 4,
                     "+" | "-" => 10,
                     "*" | "/" => 20,
                     _ => break,
@@ -494,6 +570,7 @@ struct Binding {
     mutable: bool,
     load: String,
     address: String,
+    scoped: bool,
 }
 struct Lowerer<'a> {
     source: &'a Source,
@@ -501,6 +578,9 @@ struct Lowerer<'a> {
     bindings: HashMap<String, Binding>,
     locals: Vec<String>,
     body: Vec<String>,
+    labels: usize,
+    scope: usize,
+    loops: Vec<(String, String)>,
 }
 impl Lowerer<'_> {
     fn require(&self, actual: &Ty, expected: &Ty, at: &Token) -> Result<(), Fault> {
@@ -564,7 +644,7 @@ impl Lowerer<'_> {
                 Ok(ty)
             }
             ExprKind::Unary(operation, value) if operation == "&" => {
-                Ok(Ty::Ref(Box::new(self.place(value)?)))
+                Ok(Ty::Ref(Box::new(self.place(value, true)?)))
             }
             ExprKind::Unary(operation, value) if operation == "*" => {
                 let Ty::Ref(target) = self.expression(value)? else {
@@ -592,27 +672,62 @@ impl Lowerer<'_> {
                 self.body.push("heap.new".into());
                 Ok(Ty::Ref(Box::new(ty)))
             }
-            ExprKind::Unary(_, value) => {
+            ExprKind::Unary(operation, value) => {
                 let ty = self.expression(value)?;
-                self.require(&ty, &Ty::Int, &expression.at)?;
-                self.body.push("neg".into());
-                Ok(Ty::Int)
+                if operation == "!" {
+                    self.require(&ty, &Ty::Bool, &expression.at)?;
+                    self.body.extend(["ldc.bool false".into(), "ceq".into()]);
+                    Ok(Ty::Bool)
+                } else {
+                    self.require(&ty, &Ty::Int, &expression.at)?;
+                    self.body.push("neg".into());
+                    Ok(Ty::Int)
+                }
             }
             ExprKind::Binary(operation, left, right) => {
                 let ty = self.expression(left)?;
-                self.require(&ty, &Ty::Int, &left.at)?;
-                let ty = self.expression(right)?;
-                self.require(&ty, &Ty::Int, &right.at)?;
-                self.body.push(
-                    match operation.as_str() {
-                        "+" => "add",
-                        "-" => "sub",
-                        "*" => "mul",
-                        _ => "div",
-                    }
-                    .into(),
-                );
-                Ok(Ty::Int)
+                if operation == "&&" || operation == "||" {
+                    self.require(&ty, &Ty::Bool, &left.at)?;
+                    let skip = self.label();
+                    self.body.push("dup".into());
+                    self.body.push(format!(
+                        "{} {skip}",
+                        if operation == "&&" {
+                            "brfalse"
+                        } else {
+                            "brtrue"
+                        }
+                    ));
+                    self.body.push("pop".into());
+                    let rhs = self.expression(right)?;
+                    self.require(&rhs, &Ty::Bool, &right.at)?;
+                    self.body.push(format!("{skip}:"));
+                    return Ok(Ty::Bool);
+                }
+                let equality = operation == "==" || operation == "!=";
+                if !equality || !matches!(ty, Ty::Int | Ty::Bool) {
+                    self.require(&ty, &Ty::Int, &left.at)?;
+                }
+                let rhs = self.expression(right)?;
+                self.require(&rhs, &ty, &right.at)?;
+                let op = match operation.as_str() {
+                    "+" => "add",
+                    "-" => "sub",
+                    "*" => "mul",
+                    "/" => "div",
+                    "==" | "!=" => "ceq",
+                    "<" | ">=" => "clt",
+                    _ => "cgt",
+                };
+                self.body.push(op.into());
+                if ["!=", "<=", ">="].contains(&operation.as_str()) {
+                    self.body.extend(["ldc.bool false".into(), "ceq".into()]);
+                }
+                Ok(if ["add", "sub", "mul", "div"].contains(&op) {
+                    Ty::Int
+                } else {
+                    Ty::Bool
+                })
             }
             ExprKind::Call(callee, arguments) => self.call(callee, arguments),
         }
@@ -701,7 +816,7 @@ impl Lowerer<'_> {
         Ok(returns)
     }
     // Emit a managed address of an assignable source location.
-    fn place(&mut self, expression: &Expr) -> Result<Ty, Fault> {
+    fn place(&mut self, expression: &Expr, borrowing: bool) -> Result<Ty, Fault> {
         match &expression.kind {
             ExprKind::Name(name) => {
                 let binding = self.binding(name, &expression.at)?;
@@ -714,6 +829,9 @@ impl Lowerer<'_> {
                     return Err(expression
                         .at
                         .error("nested managed addresses are not supported"));
+                }
+                if borrowing && binding.scoped {
+                    return Err(expression.at.error("taking addresses of block-local values is not supported; use an outer local or managed heap storage"));
                 }
                 self.body.push(binding.address);
                 Ok(binding.ty)
@@ -731,7 +849,7 @@ impl Lowerer<'_> {
                     *target
                 } else {
                     self.body.truncate(saved);
-                    self.place(owner)?
+                    self.place(owner, borrowing)?
                 };
                 let field_type = self.field(&target, field)?;
                 if matches!(field_type, Ty::Ref(_)) {
@@ -744,27 +862,149 @@ impl Lowerer<'_> {
             _ => Err(expression.at.error("expected an assignable location")),
         }
     }
-    fn lower(mut self) -> Result<String, Fault> {
-        for (index, parameter) in self.function.parameters.iter().enumerate() {
-            self.bindings.insert(
-                parameter.name.text.clone(),
-                Binding {
-                    ty: parameter.ty.clone(),
-                    mutable: false,
-                    load: format!("ldarg {index}"),
-                    address: format!("ldarga {index}"),
-                },
-            );
-        }
+    fn label(&mut self) -> String {
+        let label = format!("NeoLabel{}", self.labels);
+        self.labels += 1;
+        label
+    }
+    fn temp(&mut self, ty: &Ty) -> usize {
+        let index = self.locals.len();
+        self.locals.push(format!(".local {}", ty.il()));
+        index
+    }
+    fn condition(&mut self, expression: &Expr) -> Result<(), Fault> {
+        let ty = self.expression(expression)?;
+        self.require(&ty, &Ty::Bool, &expression.at)
+    }
+    fn block(&mut self, statements: &[Stmt]) -> Result<bool, Fault> {
+        let saved = self.bindings.clone();
+        self.scope += 1;
+        let result = self.statements(statements);
+        self.scope -= 1;
+        self.bindings = saved;
+        result
+    }
+    fn statements(&mut self, statements: &[Stmt]) -> Result<bool, Fault> {
         let mut returned = false;
-        for statement in &self.function.body {
+        for statement in statements {
             if returned {
                 return Err(self
                     .function
                     .name
-                    .error("statements after return are not supported"));
+                    .error("statements after return, break or continue are not supported"));
             }
             match statement {
+                Stmt::If(condition, yes, no) => {
+                    self.condition(condition)?;
+                    let otherwise = self.label();
+                    let end = self.label();
+                    self.body.push(format!("brfalse {otherwise}"));
+                    let yes_exits = self.block(yes)?;
+                    if !yes_exits {
+                        self.body.push(format!("br {end}"));
+                    }
+                    self.body.push(format!("{otherwise}:"));
+                    let no_exits = self.block(no)?;
+                    returned = yes_exits && no_exits;
+                    if !returned {
+                        self.body.push(format!("{end}:"));
+                    }
+                }
+                Stmt::While(condition, body) => {
+                    let start = self.label();
+                    let end = self.label();
+                    self.body.push(format!("{start}:"));
+                    self.condition(condition)?;
+                    self.body.push(format!("brfalse {end}"));
+                    self.loops.push((end.clone(), start.clone()));
+                    let exits = self.block(body)?;
+                    self.loops.pop();
+                    if !exits {
+                        self.body.push(format!("br {start}"));
+                    }
+                    self.body.push(format!("{end}:"));
+                }
+                Stmt::Loop(body) => {
+                    let start = self.label();
+                    let end = self.label();
+                    self.body.push(format!("{start}:"));
+                    self.loops.push((end.clone(), start.clone()));
+                    let exits = self.block(body)?;
+                    self.loops.pop();
+                    if !exits {
+                        self.body.push(format!("br {start}"));
+                    }
+                    self.body.push(format!("{end}:"));
+                }
+                Stmt::For(name, start, limit, inclusive, body) => {
+                    if self.bindings.contains_key(&name.text) {
+                        return Err(name.error("duplicate binding"));
+                    }
+                    let start_ty = self.expression(start)?;
+                    self.require(&start_ty, &Ty::Int, &start.at)?;
+                    let index = self.temp(&Ty::Int);
+                    self.body.push(format!("stloc {index}"));
+                    let limit_ty = self.expression(limit)?;
+                    self.require(&limit_ty, &Ty::Int, &limit.at)?;
+                    let bound = self.temp(&Ty::Int);
+                    self.body.push(format!("stloc {bound}"));
+                    let head = self.label();
+                    let step = self.label();
+                    let end = self.label();
+                    self.body.extend([
+                        format!("{head}:"),
+                        format!("ldloc {index}"),
+                        format!("ldloc {bound}"),
+                        if *inclusive {
+                            "cgt".into()
+                        } else {
+                            "clt".into()
+                        },
+                        format!("{} {end}", if *inclusive { "brtrue" } else { "brfalse" }),
+                    ]);
+                    self.bindings.insert(
+                        name.text.clone(),
+                        Binding {
+                            ty: Ty::Int,
+                            mutable: false,
+                            load: format!("ldloc {index}"),
+                            address: format!("ldloca {index}"),
+                            scoped: true,
+                        },
+                    );
+                    self.loops.push((end.clone(), step.clone()));
+                    self.block(body)?;
+                    self.loops.pop();
+                    self.bindings.remove(&name.text);
+                    // Test the inclusive endpoint before incrementing to avoid Int32 wraparound.
+                    self.body.extend([
+                        format!("{step}:"),
+                        format!("ldloc {index}"),
+                        format!("ldloc {bound}"),
+                        "ceq".into(),
+                        format!("brtrue {end}"),
+                        format!("ldloc {index}"),
+                        "ldc.i4 1".into(),
+                        "add".into(),
+                        format!("stloc {index}"),
+                        format!("br {head}"),
+                        format!("{end}:"),
+                    ]);
+                }
+                Stmt::Break(at) | Stmt::Continue(at) => {
+                    let Some((end, step)) = self.loops.last() else {
+                        return Err(at.error("break/continue requires a loop"));
+                    };
+                    self.body.push(format!(
+                        "br {}",
+                        if matches!(statement, Stmt::Break(_)) {
+                            end
+                        } else {
+                            step
+                        }
+                    ));
+                    returned = true;
+                }
                 Stmt::Bind {
                     name,
                     mutable,
@@ -788,6 +1028,7 @@ impl Lowerer<'_> {
                             mutable: *mutable,
                             load: format!("ldloc {index}"),
                             address: format!("ldloca {index}"),
+                            scoped: self.scope != 0,
                         },
                     );
                 }
@@ -801,7 +1042,7 @@ impl Lowerer<'_> {
                         self.require(&ty, &binding.ty, &right.at)?;
                         self.body.push(binding.load.replacen("ldloc", "stloc", 1));
                     } else {
-                        let expected = self.place(left)?;
+                        let expected = self.place(left, false)?;
                         let actual = self.expression(right)?;
                         self.require(&actual, &expected, &right.at)?;
                         self.body.push(format!("stobj {}", expected.il()));
@@ -824,6 +1065,22 @@ impl Lowerer<'_> {
                 }
             }
         }
+        Ok(returned)
+    }
+    fn lower(mut self) -> Result<String, Fault> {
+        for (index, parameter) in self.function.parameters.iter().enumerate() {
+            self.bindings.insert(
+                parameter.name.text.clone(),
+                Binding {
+                    ty: parameter.ty.clone(),
+                    mutable: false,
+                    load: format!("ldarg {index}"),
+                    address: format!("ldarga {index}"),
+                    scoped: false,
+                },
+            );
+        }
+        let returned = self.statements(&self.function.body)?;
         if !returned {
             if self.function.returns != Ty::Void {
                 return Err(self
@@ -907,6 +1164,9 @@ pub fn lower_to_il(source: &str) -> Result<String, Fault> {
                 bindings: HashMap::new(),
                 locals: Vec::new(),
                 body: Vec::new(),
+                labels: 0,
+                scope: 0,
+                loops: Vec::new(),
             }
             .lower()?,
         );

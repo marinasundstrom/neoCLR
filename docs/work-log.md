@@ -2864,3 +2864,19 @@ Validation: all 18 focused Neo, CLI, module CLI and GC diagnostics tests passed.
 Clippy across all targets with warnings denied, formatting and whitespace checks
 passed. All 539 local documentation file links resolve. The source counter demo
 returned 42 with one heap allocation reclaimed, including GC statistics/events output.
+
+## Neo structured control flow — 2026-09-07
+
+Implemented if/else, while, integer-range for, loop, break/continue, comparisons and
+short-circuit Boolean expressions using existing IL branches. Ranges evaluate bounds
+once and avoid overflow at inclusive Int32 endpoints. Block names cannot escape or
+shadow active names. Frame storage still outlives lexical blocks; taking addresses
+of block-local values is conservatively rejected while outer and heap references
+remain usable. Branch return checks are explicit; loop termination analysis is
+conservative. Updated grammar, guide, plan and runnable control-flow example.
+
+Validation: 13 Neo/control-flow tests pass, including empty/boundary ranges, nested
+loop control, short-circuit effects, scope/lifetime diagnostics and instruction limits.
+A stress test exposed excessive recursive parser stack use; statement nesting is now
+bounded at 32 and rejected cleanly. Clippy across all targets, formatting and whitespace
+checks passed.

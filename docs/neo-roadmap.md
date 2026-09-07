@@ -1,8 +1,8 @@
 # Upcoming Neo slices
 
-Status: planned follow-ups to the implemented [Neo foundation](neo.md). Control flow,
-patterns and match syntax below are not supported yet and are intentionally absent
-from the [implemented grammar](neo-grammar.md).
+Status: control flow is implemented on the [Neo foundation](neo.md). Union matching
+and the console calculator remain planned. The [implemented grammar](neo-grammar.md)
+tracks shipped syntax only.
 
 Neo is a small companion compiler for testing and explaining neoCLR. Maintain it as
 the runtime changes: update affected lowering, runnable examples, tests and grammar
@@ -11,9 +11,9 @@ runtime instructions only when a concrete semantic need justifies the deviation.
 The current compiler is not intended to become a complex, full-fledged compiler.
 Every addition should make a runtime capability easier to exercise or explain.
 
-## 1. Structured control flow
+## 1. Structured control flow — implemented
 
-Add `if`/`else`, `while`, integer-range `for`, and unconditional `loop`, with `break`
+Implemented `if`/`else`, `while`, integer-range `for`, and unconditional `loop`, with `break`
 and `continue`. Introduce Boolean conditions, primitive comparisons and short-circuit
 Boolean operators as needed. Lower these to existing branch instructions.
 
@@ -22,11 +22,10 @@ excludes the upper endpoint. General iteration protocols, custom steps and broad
 collection syntax can wait. Specify empty ranges and Int32 boundary behavior before
 lowering so the final increment cannot wrap into an unintended infinite loop.
 
-This slice must define block name visibility, branch return checking, and reference
-validity across loop iterations. Lexical name scope alone does not provide runtime
-block-lifetime enforcement; do not claim deterministic block cleanup without the
-corresponding storage/lifetime support. Decide how reusable loop-local storage is
-handled before permitting references to it to survive an iteration.
+Block names do not escape or shadow active names. Branch return checking is
+implemented; loop termination analysis stays conservative. Storage remains frame-lived,
+so taking addresses of block-local values is rejected. References to outer locals and
+heap objects remain available; deterministic block cleanup is not claimed.
 
 Acceptance: small sum/search programs exercise each construct, both branches,
 zero-iteration loops, nested break/continue, and boundary ranges. Verify that the

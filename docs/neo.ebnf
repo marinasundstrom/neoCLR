@@ -1,4 +1,4 @@
-(* Neo concept language: implemented first subset. *)
+(* Neo concept language: implemented subset. *)
 program          = separators, { declaration, separators }, end_of_input ;
 declaration      = import_decl | record_decl | function_decl ;
 import_decl      = "import", "System", ".", "Console", ".", "*", terminator ;
@@ -10,15 +10,23 @@ field_list       = "(", newlines,
 field            = identifier, ":", type ;
 type             = (identifier | "(", ")"), [ "&" ] ;
 
-statement        = (binding | return_statement | expression_statement), terminator ;
+block            = newlines, "{", separators, { statement, separators }, "}" ;
+statement        = (binding | return_statement | expression_statement | "break" | "continue"), terminator
+                 | if_statement | "while", expression, block | "loop", block
+                 | "for", identifier, "in", expression, (".." | "..<"), expression, block ;
+if_statement     = "if", expression, block, [ newlines, "else", (if_statement | block) ] ;
 binding          = ("let" | "var"), identifier, [ ":", type ], "=", expression ;
 return_statement = "return", [ expression ] ;
 expression_statement = expression, [ "=", expression ] ;
 
-expression       = additive ;
+expression       = logical_or ;
+logical_or       = logical_and, { "||", logical_and } ;
+logical_and      = equality, { "&&", equality } ;
+equality         = comparison, { ("==" | "!="), comparison } ;
+comparison       = additive, { ("<" | ">" | "<=" | ">="), additive } ;
 additive         = multiplicative, { ("+" | "-"), multiplicative } ;
 multiplicative   = unary, { ("*" | "/"), unary } ;
-unary            = ("&" | "*" | "-" | "new"), unary | postfix ;
+unary            = ("&" | "*" | "-" | "!" | "new"), unary | postfix ;
 postfix          = primary, { ".", identifier | arguments } ;
 arguments        = "(", newlines,
                    [ expression, newlines,

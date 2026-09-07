@@ -118,7 +118,7 @@ inheritance, synthesized equality methods, or deep-copy behavior.
 
 The [Neo grammar](neo-grammar.md) gives the implemented EBNF and lexical rules.
 
-## Supported first slice
+## Supported subset
 
 - One parameterless `func Main()`, plus typed free functions and forward calls.
 - Records, positional construction, nested field access and mutation.
@@ -128,9 +128,12 @@ The [Neo grammar](neo-grammar.md) gives the implemented EBNF and lexical rules.
 - Integer, Boolean and double-quoted string literals; strings use JSON-style escapes.
 - Explicit references, dereferencing, heap construction and typed returns.
 - `Console.WriteLine` for int and string. `import System.Console.*` enables unqualified `WriteLine`.
+- `if`/`else`, `while`, integer-range `for`, `loop`, `break` and `continue`.
+- Int32 comparisons, Int32/Boolean equality, and short-circuit `&&`/`||` with `!`.
 - Newline or semicolon statement separators and `//` comments.
 
-Non-Void functions need an explicit return. Void functions may end without one.
+Non-Void functions need an explicit return on every fallthrough path. Both `if` arms
+may return; loops conservatively require a following return even when visibly infinite. Void functions may end without one.
 Field/parameter lists can span lines. There are no implicit conversions between the
 supported source types. The parser bounds source size and expression nesting.
 
@@ -143,8 +146,7 @@ Reference-valued fields may contain heap-backed references; scoped targets in th
 fields fault at runtime. This compiler does not perform complete static lifetime
 analysis, so some invalid programs fail only during execution.
 
-The current subset has function scopes only. Nested block scopes, uninitialized
-bindings, loops/branches, generics, overload declarations, instance methods,
+Uninitialized bindings, generics, overload declarations, instance methods,
 inheritance, pattern matching, native pointers/interop, pinning and full Raven syntax
 are not implemented. It does not expose the entire standard library yet. These are
 candidate future slices, chosen around end-to-end scenarios rather than added as a
@@ -175,3 +177,18 @@ See [managed heap references](heap-references.md), [GC](garbage-collection.md) a
 A future [bootstrapping exercise](neo-bootstrapping.md) may port ordinary library
 functions to Neo and later attempt a Neo-written compiler. Neither is part of this
 initial implementation.
+
+## Structured control flow
+
+Run `cargo run -- run examples/source/control-flow.neo` (prints and returns 21).
+`for i in 0..9` includes 9; `0..<10` excludes 10. Bounds are evaluated once from
+left to right. Ranges ascend by one, are empty when their bounds exclude every value,
+and stop safely at Int32.MaxValue. The iteration binding is immutable. `continue`
+in a for loop advances to the next element; `break` exits the innermost loop.
+
+Block names disappear at block exit and cannot shadow active names. Local storage
+currently lasts for the call frame and is reused across loop iterations; lexical
+scope does not imply block cleanup. To avoid aliases to reused block-local values,
+this subset rejects taking their addresses. Put addressed values in an outer
+function local or use managed heap storage. Field mutation within a block and
+references to heap objects or existing outer values remain supported.

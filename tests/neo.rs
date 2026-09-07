@@ -134,7 +134,7 @@ fn unsupported_and_malformed_source_has_bounded_diagnostics() {
         "record Counter(Age: int, Age: int)\nfunc Main() -> int { return 0 }",
         "func Main() -> int { let x = 1; let x = 2; return x }",
         "func Main(x: int) -> int { return x }",
-        "func Main() -> int { while true {} return 0 }",
+        "func Main() -> int { while 1 {} return 0 }",
         "func Main() -> int { return 1; return 2 }",
         "func Main() -> int { let value = 1 }",
         "func Main() -> int { return \"unterminated }",
