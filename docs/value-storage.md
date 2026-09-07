@@ -15,8 +15,9 @@ These operations work independently of union attributes, variants and case names
 they can also implement a heterogeneous value slot. Their spellings and canonical
 `Value` type encoding are additions to prototype JSON format 4. Older readers reject
 them; no CLI binary opcode assignment or compatibility is claimed. Compared with CLR
-boxing/casting, this contract has no mandatory reference identity, null sentinel,
-heap allocation, subtype conversion or shared mutable box. Distinct instruction
+boxing/casting, this contract has no reference identity, null sentinel, subtype
+conversion or shared mutable box. The interpreter does allocate host heap storage
+when packing; this is an explicit cost, not an allocation-free operation. Distinct instruction
 spellings make those semantic differences explicit.
 
 ## Slot model
@@ -67,9 +68,14 @@ erased values; extracting and updating a copy does not mutate the original. Poin
 and Ref handles retain existing alias/lifetime contracts: erasure does not retain an
 allocation, extend frame lifetime, or acquire ownership.
 
-The Rust interpreter uses an owned tree internally. That host implementation may
-allocate, as records and strings already do; it does not create an addressable guest
-heap object or promise allocation-free execution. Each pack limits payload traversal
+The Rust interpreter uses an owned tree internally. Every successful pack creates a
+Box<Value> on the host heap. Copying an erased value recursively clones its owned
+payload, including record fields, strings and nested erased values. Pointer and Ref
+handles are copied as handles; their targets are not recursively copied or retained.
+This does not create an addressable guest heap object. These allocations follow the
+Rust host allocator; host allocation failure is not universally converted into a guest
+Fault. No total memory quota or guest allocator-selection mechanism is implied.
+Each pack limits payload traversal
 to depth 64 and 16,384 nodes to bound recursive value shapes. These are prototype
 limits, not a total memory quota. Service analysis reports `ValueStorage`; future
 backends must supply its copy, identity, checking and storage behavior.

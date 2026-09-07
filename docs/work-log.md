@@ -2093,3 +2093,15 @@ import regression also passes in its focused suite. Formatting, clippy with warn
 denied and diff checks pass. The feature tour and host union-input sample run on
 macOS ARM64. The owner selected MIT; LICENSE, Cargo metadata and the README link
 were committed separately.
+
+## Explicit erased-storage preview contract
+
+Documented the actual System.Value interpreter cost: packing allocates a host
+Box<Value>, and value copying recursively clones owned payloads. Pointer/Ref handles
+retain their separate alias and lifetime rules. There is no allocation-free claim,
+guest heap identity, native layout or ABI, total memory quota, or universal conversion
+of host allocation failures to Faults. This records the existing implementation and
+keeps future allocator/native-layout work open without hidden boxing semantics.
+
+Validation: checked against Value::erase and the derived owned Value clone behavior;
+existing erased-storage, copy and lifetime tests passed in the preceding full run.
