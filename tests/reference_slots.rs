@@ -315,3 +315,73 @@ fn conditional_out_requires_assignment_on_true_but_not_false() {
         .is_err()
     );
 }
+
+#[test]
+fn conditional_output_forwarding_preserves_each_invocations_obligation() {
+    let extra = r#"
+.function Try(out(true) Int32& destination, Boolean success) -> Boolean
+    ldarg success
+    brfalse Miss
+    ldarg destination
+    ldc.i4 42
+    stobj Int32
+    ldc.bool true
+    ret
+Miss:
+    ldc.bool false
+    ret
+.end
+.function Forward(out(true) Int32& destination, Boolean success) -> Boolean
+    ldarg destination
+    ldarg success
+    call Try(Int32&,Boolean)
+    ret
+.end
+"#;
+    for success in [true, false] {
+        let body = format!(
+            ".local Int32 value\nldloca value\nldc.bool {success}\ncall Forward(Int32&,Boolean)\nbrfalse Miss\nldloc value\nret\nMiss:\nldc.i4 -1"
+        );
+        let p = program(extra, &body, "Int32").unwrap();
+        p.verify().unwrap();
+        assert_eq!(
+            p.run(Limits::default()).unwrap().value,
+            Value::Int32(if success { 42 } else { -1 })
+        );
+    }
+    // Forwarding a miss cannot satisfy an unconditional output promise, even
+    // when the caller supplied a previously initialized slot.
+    let unconditional = extra.replace("Forward(out(true)", "Forward(out");
+    let p = program(&unconditional, ".local Int32 value\nldc.i4 7\nstloc value\nldloca value\nldc.bool false\ncall Forward(Int32&,Boolean)", "Boolean").unwrap();
+    p.verify().unwrap();
+    let fault = p.run(Limits::default()).unwrap_err();
+    assert!(fault.message.contains("out parameter"), "{fault}");
+    assert_eq!(fault.function.as_deref(), Some("Forward"));
+}
+
+#[test]
+fn conditional_output_alias_writes_satisfy_only_the_slots_actually_written() {
+    let extra = r#"
+.function Try(out(true) Int32& left, out(true) Int32& right) -> Boolean
+    ldarg left
+    ldc.i4 42
+    stobj Int32
+    ldc.bool true
+    ret
+.end
+"#;
+    for alias in [true, false] {
+        let right = if alias { "left" } else { "right" };
+        let body = format!(
+            ".local Int32 left\n.local Int32 right\nldloca left\nldloca {right}\ncall Try(Int32&,Int32&)\nbrfalse Miss\nldloc left\nret\nMiss:\nldc.i4 -1"
+        );
+        let p = program(extra, &body, "Int32").unwrap();
+        p.verify().unwrap();
+        let result = p.run(Limits::default());
+        if alias {
+            assert_eq!(result.unwrap().value, Value::Int32(42));
+        } else {
+            assert!(result.unwrap_err().message.contains("out parameter"));
+        }
+    }
+}

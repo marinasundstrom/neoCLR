@@ -2408,3 +2408,23 @@ Validation: all 28 tests pass across console (11), file input (5), preview
 walkthrough (3) and verification (9), including verification of every IL sample.
 Formatting and git diff checks pass. This slice changes samples and documentation;
 no runtime or metadata semantics change.
+
+## Reference contract review
+
+Reviewed slot identity, assignment baselines, call setup, verifier propagation and
+interface dispatch together. Added regressions for conditional-output forwarding,
+aliased versus distinct output slots, and byref interface receiver mutation combined
+with conditional output. The tests also require ordinary/conditional/unconditional
+parameter contracts to match at interface implementation boundaries and verify that
+missing writes fault in the concrete callee. All reviewed paths retain their current
+semantics; no runtime change was necessary.
+
+Updated verification documentation to distinguish caller-side initialization proofs
+from per-invocation runtime assignment checks. Recorded conservative Boolean-flow,
+alias and stack-join limits, and clarified the actual weak slot-identity implementation.
+Removed stale claims that reference receivers and constructor verification are absent,
+and corrected the remaining reference to removed pointer-returning TryGet methods.
+
+Validation: 19 reference tests and 19 interface tests pass, including metadata
+round trips and execution without mandatory verification. Strict Clippy, formatting
+and diff checks pass.

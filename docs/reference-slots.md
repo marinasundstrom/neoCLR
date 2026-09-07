@@ -59,7 +59,7 @@ differ only in out versus ordinary reference access. Names remain authoring alia
 for indices. A future readonly parameter contract must restrict the capability,
 including forwarding, rather than merely attach an advisory annotation.
 
-| Operation | Proposed behavior |
+| Operation | Implemented behavior |
 | --- | --- |
 | ldloca index/name | Form T& for that local; does not read or initialize it |
 | ldarga index/name | Form T& for a by-value argument slot in the current frame |
@@ -74,7 +74,7 @@ Taking ldarga of a T& parameter would create a reference-to-reference slot and i
 excluded initially; forwarding uses ldarg instead. Taking ldarga of an ordinary
 by-value parameter refers to the callee's own copy, not its caller's argument.
 
-A future language can project the example as `Assign(out result, 42)`. It can also
+The illustrative language projection uses `Assign(out &result, 42)`. It can also
 hide this lowering behind assignment or multiple-result syntax. An ordinary return
 followed by stloc remains preferable when a single returned value is sufficient.
 
@@ -120,11 +120,12 @@ helpers, or imported/exported through host calls or P/Invoke. Ordinary local val
 remain addressable. Reference-valued locals and longer-lived references can be added
 once their escape contracts exist; this first restriction is not a permanent VM limit.
 
-The interpreter should identify a slot with an execution identity, a stable frame
-identity and slot category/index, plus its exact type and access contract. Do not
-use addresses of Rust Vec elements or frame indices that could be reused. Every
-indirect access checks the originating frame is still live, the slot type matches,
-and the access is permitted. A native backend can lower proven call-scoped references
+The interpreter represents each slot with a stable host cell. Managed references
+hold weak identity to that cell, its exact type and an optional output-write baseline.
+They neither keep the frame alive nor alias a later slot when frame storage is reused.
+Every indirect access checks that the slot is still live, the slot type matches,
+and the access is permitted. Host reference counting supports this implementation;
+it does not impose reference-counted ownership on guest values. A native backend can lower proven call-scoped references
 to ordinary addresses, while preserving these rules for paths it cannot prove safe.
 No fixed fat-pointer layout or stable native ABI is implied.
 
@@ -160,7 +161,7 @@ no new initialization guarantee on false. The verifier recognizes direct success
 edges from brtrue/brfalse on a call result; runtime assignment obligations cover
 forwarding and aliases. It does not infer success through Boolean locals or arbitrary
 comparisons yet. The union TryGet methods use this contract without inventing defaults.
-Pointer-returning variants use unconditional out T*& and explicitly store null on false.
+The union API extracts case values; pointer-returning TryGet variants were removed.
 See the [pseudocode and IL guide](references-in-pseudocode.md).
 
 ## Interface integration and implementation order

@@ -75,6 +75,39 @@ storage conversions and stack normalization as other members. `heap.load` still
 returns its stored payload without normalization, and `heap.store` requires an exact
 type. Loading through a typed local can normalize a raw small-integer payload.
 
+## Managed references and output contracts
+
+The call-scoped `T&` subset checks exact slot types, explicit reference receivers
+and interface views. Metadata rejects reference locals, fields, returns and native
+boundary signatures; runtime guards also reject forbidden reference values without
+requiring this optional analysis pass. See [reference contracts](reference-slots.md).
+
+For a directly addressed local, `ldloca` preserves its origin in the abstract stack.
+`stobj` establishes initialization, while `ldobj`, interface formation and ordinary
+reference arguments require initialization. All ordinary input preconditions are
+checked before a call's output promises are applied, including when output and input
+arguments alias the same local.
+
+| Callee parameter | Caller-side initialization proof |
+| --- | --- |
+| T& | The directly addressed local must already be initialized |
+| out T& | A normal return establishes initialization |
+| out(true) T& | The direct brtrue success target or brfalse fallthrough establishes initialization |
+
+Conditional proof follows the Boolean evaluation-stack value. Storing it in a Boolean
+local or comparing it does not preserve that proof. Stack joins require identical
+abstract reference origins and conditional-output facts; they can reject otherwise
+valid programs. The analysis does not infer arbitrary aliases or prove each callee's
+output assignment obligation from its body.
+
+Execution independently checks output assignments on every invocation, including
+forwarding and interface dispatch. A preexisting slot value is insufficient: a
+successful typed write after entry is required. One write through an alias can satisfy
+multiple output references to the same slot. A miss from a conditional-output callee
+does not satisfy an enclosing unconditional output promise. Missing writes on a
+required normal return produce a Fault in the concrete callee before control returns
+to the caller. Interface implementations must match receiver mode and output contracts.
+
 ## Deliberate limits
 
 Passing verification is not a memory-safety guarantee or a promise of successful
@@ -92,10 +125,11 @@ Generic constraints and more expressive joins remain separate work. Invalid meta
 is rejected regardless of reachability, but typed analysis applies only to paths
 reachable from each function's entry under the conservative branch model.
 
-Reference lifetime/permission analysis, partial field initialization, and constructor
-verification await their contracts. No checked-byref or mutable-receiver semantics
-are introduced. Making verification mandatory needs an explicit compatibility choice;
-current tests can still assemble malformed execution fixtures deliberately.
+Whole-value constructor initialization and call-scoped references are implemented.
+Partial field initialization, returned/stored managed references, readonly permissions
+and broader lifetime analysis remain future work. Making verification mandatory needs
+an explicit compatibility choice; current tests can still assemble malformed execution
+fixtures deliberately.
 
 Tests cover every shipped IL example without execution, including native-import and
 terminal-Fault examples. Negative cases exercise joins, loops, assignment propagation,

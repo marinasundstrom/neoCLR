@@ -361,3 +361,57 @@ fn raw_interface_views_cannot_supply_managed_reference_receivers() {
             .contains("managed slot")
     );
 }
+
+#[test]
+fn managed_dispatch_preserves_conditional_output_contracts_and_receiver_mutation() {
+    let extra = r#"
+.interface Source
+    .method instance byref Try(out(true) Int32& destination, Boolean success) -> Boolean
+    .end
+.end
+.type Counter
+    .implements Source
+    .field Value Int32
+    .method instance byref Try(out(true) Int32& destination, Boolean success) -> Boolean
+        ldarg success
+        brfalse Miss
+        ldarg destination
+        ldarg this
+        ldobj Counter
+        ldfld Counter::Value
+        stobj Int32
+        ldarg this
+        ldc.i4 7
+        newobj Counter
+        stobj Counter
+        ldc.bool true
+        ret
+    Miss:
+        ldc.bool false
+        ret
+    .end
+.end
+"#;
+    for success in [true, false] {
+        let body = format!(
+            ".local Counter counter\n.local Int32 output\nldc.i4 42\nnewobj Counter\nstloc counter\nldloca counter\ninterface.borrow Source\nldloca output\nldc.bool {success}\ncallvirt instance Source::Try(Int32&,Boolean)\nbrfalse Miss\nldloc output\nldloc counter\nldfld Counter::Value\nadd\nret\nMiss:\nldloc counter\nldfld Counter::Value"
+        );
+        let p = program(extra, &body).unwrap();
+        p.verify().unwrap();
+        assert_eq!(
+            p.run(Limits::default()).unwrap().value,
+            Value::Int32(if success { 49 } else { 42 })
+        );
+    }
+    // Neither ordinary ref nor unconditional out matches conditional out.
+    for mode in ["", "out "] {
+        let mismatched = extra.replacen("Try(out(true) Int32&", &format!("Try({mode}Int32&"), 1);
+        assert!(program(&mismatched, "ldc.i4 0").is_err());
+    }
+    let unwritten = extra.replace("        stobj Int32", "        pop\n        pop");
+    let p = program(&unwritten, ".local Counter counter\n.local Int32 output\nldc.i4 42\nnewobj Counter\nstloc counter\nldloca counter\ninterface.borrow Source\nldloca output\nldc.bool true\ncallvirt instance Source::Try(Int32&,Boolean)\npop\nldc.i4 0").unwrap();
+    p.verify().unwrap();
+    let fault = p.run(Limits::default()).unwrap_err();
+    assert!(fault.message.contains("out parameter"), "{fault}");
+    assert_eq!(fault.function.as_deref(), Some("Counter.Try"));
+}
