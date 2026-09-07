@@ -9,6 +9,7 @@ pub struct Limits {
     pub instructions: usize,
     pub frames: usize,
     pub stack: usize,
+    /// Maximum simultaneously live managed heap objects, checked after collection.
     pub heap_objects: usize,
     pub pointer_bytes: usize,
     pub pointer_allocations: usize,
@@ -32,8 +33,8 @@ pub struct Execution {
     pub value: Value,
     /// Captured lines when no host console is supplied; empty with live console I/O.
     pub output: Vec<String>,
-    /// Retained until the execution result is dropped; references index this arena.
-    pub heap: Vec<Value>,
+    /// Objects reachable from the returned value; identities may contain gaps.
+    pub heap: crate::ManagedHeap,
     pub memory: crate::memory::PointerHeap,
     /// Retains libraries for the lifetime of returned native addresses.
     pub native_libraries: Option<crate::interop::NativeLibraries>,
@@ -1015,7 +1016,8 @@ fn interpret_frames(
     mut native_libraries: Option<crate::interop::NativeLibraries>,
 ) -> Result<Execution, Fault> {
     let limits = options.limits;
-    let mut heap: Vec<Value> = vec![];
+    let mut heap = crate::ManagedHeap::default();
+    let mut collection_threshold = limits.heap_objects.min(64);
     let mut memory = crate::memory::PointerHeap::default();
     let mut output = vec![];
     for _ in 0..limits.instructions {
@@ -1038,6 +1040,25 @@ fn interpret_frames(
         };
         frame.pc += 1;
         let context = function.name.clone();
+        // Collect only between instructions, before allocation operands leave roots.
+        if matches!(op, Op::HeapNew) && heap.len() >= collection_threshold {
+            let mut roots = vec![];
+            for frame in frames.iter() {
+                for cell in frame.args.iter().chain(&frame.locals) {
+                    cell.borrow().trace_heap(&mut roots);
+                }
+                for value in &frame.stack {
+                    crate::gc::trace(value, &mut roots);
+                }
+            }
+            heap.collect(roots)?;
+            collection_threshold = heap
+                .len()
+                .saturating_mul(2)
+                .max(64)
+                .min(limits.heap_objects);
+        }
+
         // Host Result propagates terminal faults; there is no guest exception machinery.
         let step = (|| -> Result<Option<Value>, Fault> {
             let frame = frames
@@ -1722,8 +1743,7 @@ fn interpret_frames(
                             "managed references cannot escape into heap storage",
                         ));
                     }
-                    let index = heap.len();
-                    heap.push(value);
+                    let index = heap.allocate(value)?;
                     frame.stack.push(Value::Reference { index, target });
                 }
                 Op::HeapLoad => {
@@ -1753,6 +1773,9 @@ fn interpret_frames(
         })();
         match step {
             Ok(Some(value)) => {
+                let mut roots = vec![];
+                crate::gc::trace(&value, &mut roots);
+                heap.collect(roots)?;
                 return Ok(Execution {
                     value,
                     output,

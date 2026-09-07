@@ -2767,3 +2767,41 @@ run exposed an outdated native-only service expectation for initobj; corrected i
 reran that target and completed every remaining target plus doc tests. Final
 cargo clippy --all-targets -- -D warnings, cargo fmt --check and diff whitespace
 checks passed. All 150 local documentation links and heading targets resolve.
+
+## Tracing GC as the managed heap foundation — 2026-09-07
+
+The platform direction retains GC as normal managed memory management. Explicit
+value/reference semantics improve the CLR experience without requiring manual
+ownership or invalidation. This supersedes the earlier reference-counting/acyclic
+heap proposal and its last-reference destruction expectation. Dispose/Close remain
+resource protocols; guest destructors and finalizers are not implemented.
+
+Added a nonmoving mark-and-sweep collector over the transitional Ref heap. Allocation
+safepoints trace every active frame's initialized cells and evaluation stack before
+operands are popped, then follow inline records, erased values and heap edges. Cycles
+are collected when unreachable. Live-object limits are checked after collection;
+identities never repeat. Final collection preserves the returned value's reachable
+graph. Execution.heap now exposes read-only identity lookup instead of a mutable Vec.
+Native pointer memory remains separate. Heap-backed T& and interior heap references
+remain the next representation change, with current-frame escape checks preserved.
+
+Added regression coverage for cycles, transitive references, caller and byref roots,
+pending allocation operands and repeated allocations within a one-object budget.
+Updated the architecture, lifecycle, heap strategy and hosting documents to reflect
+standard GC and distinguish memory reclamation from deterministic resource cleanup.
+Clarified the developer's choice of scoped value storage versus managed heap storage,
+with references in both cases; block lifetime enforcement remains future work.
+Recorded future explicit copying of a scoped value to a fresh managed heap object,
+preserving original aliases and ordinary field-copy semantics.
+
+Added initial GC monitoring through a typed per-execution GcStatistics snapshot and
+`run --gc-stats` reporting on stderr. Counters cover total allocations, remaining and
+peak resident objects, collections and reclamation. Tests check counter consistency,
+opt-in reporting without stdout changes, and CLI flag validation. Live events, pause
+timings, byte accounting and fault-time diagnostics remain follow-up work.
+
+Validation: the full 561-test suite passed for the collector. After adding monitoring,
+all 39 focused library, GC, diagnostics, runtime, hosting and CLI tests passed,
+including two new CLI diagnostics tests. Final cargo clippy --all-targets -- -D warnings,
+cargo fmt --check and whitespace checks passed. All 496 local documentation links
+and heading targets resolve.

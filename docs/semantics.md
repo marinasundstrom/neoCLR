@@ -32,15 +32,16 @@ initialization and output assignment; no exclusive-borrow policy is implied.
 Explicit heap allocation through T&, reference fields and guest destructors remain
 future work. See [managed slot references](reference-slots.md).
 
-`heap.new` transfers a value into an execution-owned arena and produces `Ref<T>`.
+`heap.new` transfers a value into the managed heap and produces transitional `Ref<T>`.
 `heap.load` copies its current contents. `heap.store` replaces its contents with a
 value of exactly the same type, visible through all aliases, and produces `Void`.
-References cannot be constructed from integers or forged by guest instructions.
-They are non-null and identify arena slots. The execution result retains the arena
-so a returned reference remains meaningful within that result; indices have no
-meaning across executions. This arena exposes no pointer arithmetic or individual
-reclamation. Separately, `heap.alloc/free` and pointer instructions operate on native
-storage with explicit release; see [heap and pointers](heap-and-pointers.md).
+References cannot be forged by guest instructions. They are non-null and carry
+identities that are never reused within an execution. Tracing GC preserves reachable
+objects and collects unreachable graphs, including cycles. The execution result
+retains only its reachable heap graph; identities have no meaning across executions.
+See [garbage collection](garbage-collection.md). Separately, `heap.alloc/free` and
+pointer instructions operate on native storage with explicit release; see
+[heap and pointers](heap-and-pointers.md).
 
 Native stack placement is not established by these semantics. A future backend
 may use native stack storage, frame arenas, registers, or scalar replacement while
@@ -143,4 +144,4 @@ values are separate from ownership wrappers. Native heap allocation and pointer
 access are implemented in a checked interpreter subset. The next managed lifetime model extends
 CLR-style T&/ByRef with automatic retention and safe escapes. Ref<T> is a historical
 proposal and current arena encoding, not the selected future reference abstraction.
-No global GC or Rust-style borrowing policy is implied. See [memory layers](memory-model.md).
+Tracing GC manages the heap; a Rust-style borrowing policy is not required. See [memory layers](memory-model.md).

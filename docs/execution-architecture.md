@@ -133,11 +133,11 @@ hosting proposal recommends returning control to the host for an invocation Faul
 but this is not a promise of rollback or safety after arbitrary native failures.
 Resolve this before making a stable public invocation ABI.
 
-Allocation remains separate from construction and ownership. Optional reference
-counting or collection must have explicit protocols. If a future profile permits
-moving collection, compiled code would need the agreed roots/relocation/pinning and
-barrier contracts; unrestricted stable raw addresses cannot silently become movable.
-Neither JIT nor AOT should require a universal GC or count header on every value.
+Allocation remains separate from construction and resource cleanup. Tracing GC is
+the normal managed heap policy. Future compiled backends need equivalent root and
+safepoint contracts; moving collection additionally needs relocation, pinning and
+write-barrier rules. Stable raw addresses cannot silently become movable. Inline
+values do not require individual GC headers. See [GC](garbage-collection.md).
 
 ### Verification, checks, and observability
 
@@ -209,7 +209,7 @@ without embedding the interpreter.
 5. Expand native compilation using library workloads and conformance results. Introduce
    JIT compilation through the shared native/runtime contracts when useful. This is
    a proposed implementation order; JIT remains an architectural target from the start.
-6. Consider mixed execution, broader dynamic discovery, optional ownership/GC protocols,
+6. Consider mixed execution, broader dynamic discovery, advanced collector policies,
    richer native interop, and runtime async after their concrete contracts are ready.
 
 For each backend, test values, copies, calls, generics, initialization, explicit memory

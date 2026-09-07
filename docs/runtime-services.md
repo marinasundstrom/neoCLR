@@ -50,7 +50,8 @@ heap.alloc/free report both NativeAllocation and PointerMemory; localloc reports
 FrameAllocation and PointerMemory. PointerMemory names the current pointer-access and
 diagnostic contracts, not a mandate to retain the interpreter's side tables in all
 backends. Frame storage can use a backend's own stack implementation. BootstrapReferences
-identifies the existing prototype arena, not a permanent reference-counting or GC model.
+identifies the transitional Ref heap, now backed by [tracing GC](garbage-collection.md).
+Its name does not select the final reference encoding or collector implementation.
 
 Runtime helpers are classified through the same validated binding registry used by the
 interpreter. A similar method name without InternalCall metadata grants no service

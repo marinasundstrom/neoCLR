@@ -1,10 +1,9 @@
 # Managed heap strategy
 
-Status: proposed next implementation strategy after checked managed reference
-returns. The [slot contract](reference-slots.md) is implemented; this document does
-not change newobj or the legacy Ref arena. The first
-[managed initobj subset](managed-initialization.md) is now implemented; constructor
-destinations and managed heap allocation remain future work.
+Status: managed typed initobj, checked frame-backed references and an initial
+[tracing collector](garbage-collection.md) are implemented. The collector currently
+uses the transitional Ref encoding. Unified heap-backed T&, constructor destinations
+and explicit heap construction lowering remain future work.
 
 ## One reference type, distinct storage lifetimes
 
@@ -16,7 +15,7 @@ the referent; the root records the storage lifetime.
 | Root | Lifetime and return rule |
 | --- | --- |
 | Ordinary frame storage | The frame owns the value. Returning an address into the current frame faults; a caller-backed address can return while the caller remains active |
-| Managed heap storage | Independent of the allocating frame. Each live retaining reference keeps the allocation alive; returning it transfers a valid reference to the caller |
+| Managed heap storage | Independent of the allocating frame. Reachability keeps the allocation alive; returning a reference adds it to the caller's roots |
 
 An interior field reference retains the whole heap root, even when it is the only
 remaining reference to that root. Replacing the root's value preserves identity and
@@ -69,7 +68,10 @@ from Ref<T> to T& would reuse the managed address/load/store path and remove the
 separate arena-access model. A sequence that constructs an ordinary value then
 places it on the heap is adequate only when construction has not exposed that
 temporary's identity. Construction directly into the final destination is needed
-before supporting heap-self references or publication during construction. Resolve
+before supporting heap-self references or publication during construction. An explicit
+copy of an existing scoped value to a fresh heap root remains useful independently:
+it creates a new identity, preserves old aliases to the original and applies ordinary
+value-copy semantics. See [copying to the heap](lifecycle.md#explicitly-copy-an-existing-value-to-the-heap). Resolve
 that contract before choosing a fused opcode or prefix; no encoding is assigned here.
 
 CLR boxing is useful comparison material, but does not automatically select NeoCLR's
@@ -105,53 +107,40 @@ destructor on an incompletely constructed instance. Constructor failure remains 
 terminal Fault under the current runtime model. Recoverable factories can return
 ordinary Result values.
 
-## Automatic retention and deterministic cleanup
+## Automatic memory management and resource cleanup
 
-Start with an acyclic managed heap subset. Reference copies preserve the root;
-reference replacement or discard releases the old claim automatically. Once no
-live roots/references retain an allocation, reclaim its storage. A heap registry
-must use non-retaining bookkeeping so Execution does not accidentally own every
-allocation until teardown as the current arena does.
+Tracing GC is the normal managed heap policy. Copies of references preserve identity;
+roots and their transitive reference graphs keep allocations alive. Unreachable
+objects, including cycles, become eligible for collection. Losing the final reference
+does not promise immediate destruction. No manual ownership discipline is required.
 
-Keep live-allocation limits separate from identity generation. Repeated allocate,
-use and release must stay within a live-object limit; stale identities must never
-refer to reused objects. Host implementation temporaries must not extend observable
-guest lifetimes when destructor execution is introduced.
+The implemented collector separates live-object limits from monotonically increasing
+identities and scans active frames, inline values and heap edges. It also collects
+at execution completion, retaining the result's reachable graph. See
+[the collector contract](garbage-collection.md) for boundaries and limitations.
 
-Next, reference-valued fields must participate in ordinary value-copy and release
-rules. Copying an inline record copies its value fields and retains its reference
-fields; Clonable remains an explicit operation. Retain incoming references before
-releasing replaced ones so self-assignment and overlapping aliases remain safe.
+Copying an inline record copies its value fields and preserves embedded reference
+identity; Clonable remains an explicit operation. The future T& heap representation
+must participate in tracing at every root and field path before replacing Ref.
+General cycles are supported by GC; an acyclic ownership restriction is unnecessary.
 
-Reference counting alone does not reclaim cycles. Do not silently enable arbitrary
-cyclic stores and claim deterministic cleanup. Decide between checked cycle
-restrictions for an initial subset, weak edges, and supplemental cycle handling
-before enabling general reference-valued fields. A scoped borrow checker or manual
-ownership discipline is not a prerequisite for the ordinary language experience.
-
-Guest destruction is a separate next layer over these storage events. Dispatch it
-through the runtime at defined execution boundaries, not from arbitrary Rust Drop
-callbacks while slot storage is borrowed. Specify reentrancy, order, Fault cleanup
-and cancellation first. Dispose and Close remain explicit resource protocols;
-reference liveness does not mean a resource is still open.
+Dispose and Close provide timely resource cleanup independently of GC reachability.
+Frame-owned value destruction, if introduced, has separate deterministic boundaries.
+Guest destructors/finalizers need explicit ordering, reentrancy and failure contracts;
+do not dispatch them from arbitrary Rust Drop callbacks or infer them from Disposable.
 
 ## Bounded implementation order
 
-1. Build on the implemented managed initobj subset and define constructor
-   destinations. Keep unsupported default states explicit and enforce runtime
-   initialization checks independently of optional verification.
-2. Add managed heap root provenance, automatic retention and live-object accounting.
-   Select explicit heap placement producing T&, using an existing operation where
-   possible, while preserving ordinary value construction. Initially keep
-   reference-valued fields gated.
-3. Exercise heap-root and interior-field returns across frames, shared mutation,
-   final-reference release, failed construction and repeated allocation under a
-   live-object limit. Ensure current-frame address returns still fault.
-4. Retire the legacy Ref/heap.new/load/store path in a coordinated preview migration.
-   Review whether any existing heap operation remains useful as an internal lowering;
-   retain no public ownership wrapper merely for compatibility.
-5. Add reference-valued fields with a cycle policy, then destruction and host-rooted
-   handles. Define native pinning and concurrency before permitting those boundaries.
+1. Preserve the implemented tracing collector and its reachability tests while
+   adding heap-root provenance to ByRef. Interior references must root their owner.
+2. Build on managed initobj and define construction into supplied storage, including
+   rooting partially initialized destinations and handling construction failure.
+3. Select explicit heap placement producing T&, preserving ordinary value construction.
+   Test heap and interior-field returns while current-frame address returns still fault.
+4. Retire the transitional Ref/heap.new/load/store split in a coordinated preview
+   migration. Trace reference-valued fields and interface receivers through T&.
+5. Specify host roots, native pinning, weak references and concurrency as needed.
+   Define value destruction and any heap finalization separately from GC reclamation.
 
 Changing an existing allocation instruction's result type requires a format/version
 transition, reassembly and

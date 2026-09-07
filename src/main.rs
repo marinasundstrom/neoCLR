@@ -7,7 +7,7 @@ use std::{
 
 const USAGE: &str = "Usage:
   neoclr assemble <source.neoil> <output.neo.json> [--module <input>]... [--system <input>]
-  neoclr run <input> [System.neo.json] [--module <input>]... [--system <input>]
+  neoclr run <input> [System.neo.json] [--module <input>]... [--system <input>] [--gc-stats]
   neoclr check <input> [--module <input>]... [--system <input>]
   neoclr verify <input> [--module <input>]... [--system <input>]
 Inputs ending in .neoil are sources; other module inputs are JSON artifacts.";
@@ -32,9 +32,11 @@ fn execute(args: &[String]) -> Result<Vec<String>, String> {
     }
     let mut paths = vec![args[1].as_str()];
     let mut system_path = None;
+    let mut gc_stats = false;
     let mut options = args[required..].iter();
     while let Some(option) = options.next() {
         match option.as_str() {
+            "--gc-stats" if command == "run" && !gc_stats => gc_stats = true,
             "--module" | "--system" => {
                 let path = options
                     .next()
@@ -139,6 +141,19 @@ fn execute(args: &[String]) -> Result<Vec<String>, String> {
                 })
             }
             .map_err(|e| e.to_string())?;
+            if gc_stats {
+                let stats = execution.heap.statistics();
+                writeln!(
+                    io::stderr().lock(),
+                    "GC: allocated={} live={} peak={} collections={} reclaimed={}",
+                    stats.allocated_objects,
+                    stats.live_objects,
+                    stats.peak_objects,
+                    stats.collections,
+                    stats.reclaimed_objects
+                )
+                .map_err(|error| format!("GC diagnostics output failed: {error}"))?;
+            }
             let mut lines = execution.output;
             lines.push(format!("=> {:?}", execution.value));
             Ok(lines)

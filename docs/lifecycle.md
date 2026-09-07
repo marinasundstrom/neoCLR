@@ -1,12 +1,11 @@
-# Managed references, deterministic lifetimes and cleanup
+# Managed references, lifetimes and cleanup
 
 Status: agreed platform direction with implementation decisions still open. Values
 are the default; reference semantics are chosen explicitly; the runtime manages
 reference lifetimes. Clonable, Disposable and Closable are implemented ordinary
 interfaces. T& locals, managed field addresses and checked guest reference returns
-are implemented. Returning a reference into the current frame faults. Explicit
-managed heap allocation, reference-valued fields and automatic guest destruction
-remain future work. The current Ref arena is a prototype limitation.
+are implemented. Returning a reference into the current frame faults. The transitional Ref heap now uses tracing GC. Heap allocation through T&,
+ByRef-valued fields and automatic guest destruction remain future work.
 
 Ref<T> was a proposal, not a selected public reference abstraction. The source
 direction is T&. Prefer .NET CLR instructions and semantics wherever they fit;
@@ -26,7 +25,7 @@ compatibility with execution on an unmodified CLR.
 | Form | Programmer's choice | Runtime responsibility |
 | --- | --- | --- |
 | T | Pass or store a value | Preserve value-copy semantics and clean up its contained state at the appropriate lifetime boundary |
-| Managed heap reference to T | Allocate a value with shared identity and hold a reference to it | Keep the value alive while reachable through live retaining references; release it under the selected deterministic lifetime contract |
+| Managed heap reference to T | Allocate a value with shared identity and hold a reference to it | Keep the value alive while reachable through live retaining references; reclaim unreachable storage through tracing GC |
 | T& parameter or receiver | Access an existing value, including one in a caller's stack frame | Preserve identity and mutations through nested calls, with automatic validity checks and no manual reference cleanup |
 | T* or Void* | Use low-level memory or native interop | Enforce the declared raw-pointer boundary; a raw address does not automatically retain its target |
 
@@ -34,8 +33,8 @@ Heap allocation in the managed programming model produces a managed reference.
 The referenced value has the same type T that could otherwise be held directly;
 there is no class/struct bit that forces allocation policy onto the type.
 Current heap.alloc/free remain raw memory operations, while heap.new/Ref expose
-an execution-retained arena. Implementation may replace obsolete encodings in a
-breaking preview revision.
+a transitional heap encoding now managed by tracing GC. Implementation may replace
+obsolete encodings in a breaking preview revision.
 The selected high-level spelling is new T(...); its CLI-based IL lowering remains open.
 
 A byref parameter can refer to a caller's local and be passed further down the call
@@ -49,6 +48,26 @@ not clone their targets. The runtime accounts for any required retention. Inline
 value fields retain their value semantics. Physical stack/heap location and whether
 reference access retains storage are separate concepts; a byref can also access a
 value backed by managed heap storage when that access contract is implemented.
+
+## Choose storage to match the intended lifetime
+
+The developer chooses whether an object is local to a method/block or allocated on
+the managed heap. Many objects are temporary working values that need only exist
+within one method or block. Ordinary local value construction expresses that scoped
+lifetime; explicit managed heap construction expresses an independent lifetime.
+Both support explicit reference access. Choosing a reference does not itself request
+heap allocation or extend the lifetime of its owner.
+
+A reference to a scoped value can be passed to code that completes within the
+owner's lifetime. It cannot survive that scope. A heap reference can outlive the
+allocating method and remains valid while reachable. Developers reason about the
+required lifetime without manually freeing managed objects or invalidating aliases.
+
+The prototype enforces frame lifetime boundaries today. Lexical block lifetimes,
+earlier local cleanup and their runtime representation remain future work for the
+language/compiler and runtime contract; a block is not currently a distinct runtime
+scope. Physical native-stack placement also remains a backend implementation task.
+Optimizations may change placement while preserving the declared lifetime rules.
 
 ## High-level allocation syntax
 
@@ -73,6 +92,25 @@ new explicitly requests managed heap allocation, with automatic reference retent
 and cleanup rather than a raw pointer or manual free. No type declaration chooses
 class-versus-struct allocation semantics. This source syntax is selected direction,
 not implemented compiler syntax or a change to neoIL newobj.
+
+## Explicitly copy an existing value to the heap
+
+A future language operation may copy a scoped value into a new managed heap object.
+This supports starting with a local value and choosing independent storage later.
+The original remains in its scope; the heap copy has a new identity and GC-managed
+lifetime. Existing references continue to address the original, so this operation
+must not silently promote storage or retarget aliases.
+
+Use ordinary value-copy semantics: inline fields are copied and embedded managed
+heap references preserve their targets. Deep or custom copying remains an explicit
+Clonable policy. Reference-containing copies still need lifetime validation: a
+reference into scoped storage cannot become a longer-lived heap edge merely because
+its containing value was copied. General ByRef-valued fields are currently rejected.
+
+The prototype can already load a local value and pass that copy to heap.new, yielding
+the transitional Ref encoding. The future source spelling and heap-backed T& result
+remain to be defined. This does not authorize returning &local or automatically
+converting a scoped reference into a heap reference.
 
 ## Storage and escape
 
@@ -112,39 +150,24 @@ is replaced by a value of the same type. It does not become a detached copy.
 Raw native pointers remain a separate capability and do not inherit these retention
 or relocation rules. Future pinning and interop bridges need their own contracts.
 
-## Deterministic destruction
+## Value lifetime, collection and destruction
 
-Scope exit ends that scope's claim on a value. A local with no surviving references
-is destroyed there; a retained value is destroyed after its last lifetime-retaining
-reference is released. Passing a scoped byref down an active call chain preserves
-access to the caller's value until the call completes.
+Frame-owned values end their storage lifetime when the frame exits. Scoped byrefs
+preserve access through active callers; returning an address into the current frame
+faults. Managed heap storage instead follows reachability and tracing GC. Unreachable
+objects, including cycles, are eligible for collection; the last reference loss does
+not promise immediate reclamation or resource cleanup.
 
-Destruction belongs to the value's stored instance. Releasing one reference does
-not destroy the target while another live reference keeps it alive. Replacing an
-inline field or local must account for the outgoing value and any referenced
-storage separately. Calls and returns transfer their operands/results without
-premature destruction. There is no requirement to call an explicit invalidation
-instruction in source code or manually manage reference handles.
+Copies, stores and returns must preserve reference identity and root visibility.
+There is no source-level retain/release or manual invalidation requirement. The
+implemented [collector](garbage-collection.md) scans active frames and heap graphs;
+unified heap-backed T& remains the next representation change.
 
-The runtime and compiler may use internal lifetime metadata or generated operations
-to implement these rules. Their spelling and representation are not selected yet.
-The uncommitted endloc experiment was set aside; it is not a prerequisite or a
-published opcode. Build the managed-reference behavior before choosing additional
-lifetime instructions.
-
-Automatic reference counting is a candidate implementation for deterministic
-release, not an obligation to maintain a count on every ordinary stack value.
-Counters or equivalent retention mechanisms belong to managed shared storage.
-Cycles remain a real open decision: simple counting cannot reclaim a cycle.
-Weak references, restrictions or supplementary collection must be assessed against
-both usability and the promised timing of destruction. Do not claim universal
-deterministic reclamation before the cycle policy is resolved.
-
-A destructor observes its still-valid fields before their automatic cleanup.
-Destruction ordering, partial initialization, reentrancy and resurrection need
-explicit rules before executing user-defined destruction bodies. Ordinary value
-copying and reference retention must work for nested records, strings and active
-union payloads. Clonable is not an implicit substitute for those runtime contracts.
+Guest destructors, heap finalizers and automatic scope cleanup are not implemented.
+Any deterministic value destruction needs ordering, partial initialization, reentrancy
+and failure rules. Heap finalization would need additional resurrection and scheduling
+contracts and must not be presented as timely cleanup. Dispose/Close remain the
+explicit resource protocols. Clonable is not an implicit substitute for value copying.
 
 ## Cloning, disposal and closing
 
@@ -159,7 +182,8 @@ union payloads. Clonable is not an implicit substitute for those runtime contrac
 The [cloning](cloning.md) and [cleanup](disposal.md) interfaces use byref receivers
 so calls access the original value without first copying it. Their implementation
 requires ordinary IL and explicit conformance. It does not yet provide destruction
-hooks, using syntax, managed heap retention or automatic scope cleanup.
+hooks, using syntax or automatic scope cleanup. Managed heap reachability is
+handled separately by the collector.
 
 A destructor may share release logic with Dispose, but implementing Disposable
 does not alone register that hook. Closing or disposing a reference target may
@@ -190,16 +214,16 @@ or rollback. Raw memory release remains distinct from destroying typed managed v
 1. Specify managed allocation and reference identity/retention, keeping ordinary
    value copies and explicit T& calls as the default contracts. Audit all paths that
    copy, store, return or erase reference-containing values and cross host boundaries.
-2. Implement automatic lifetime retention/release for managed heap references and
-   safe call-scoped access to their values. Test final-reference release through
-   aliases, nested fields and returns before attaching user destructor bodies.
+2. Extend the implemented collector to unified heap-backed T& and safe call-scoped
+   access. Test reachability through aliases, nested fields and returns before
+   considering guest finalization.
 3. Build on checked T& locals, field addresses and caller-backed guest returns.
    Introduce managed heap targets without weakening the rule against returning
    addresses into the current frame. Allocation optimizations must preserve that rule.
 4. Add destruction metadata, initialization tracking and execution/failure rules.
    Demonstrate real resource release alongside Disposable/Closable and explicit Clone.
-5. Resolve cycles, weak references, concurrency and native pinning before broadening
-   the lifetime guarantee to those cases. Unique ownership may be a later optional
+5. Build on implemented cycle collection; define weak references, concurrency and
+   native pinning before exposing those features. Unique ownership may be a later optional
    capability; it is not the foundation users must adopt to use managed references.
 
 Interpretation, JIT and AOT must preserve the same observable value/reference and

@@ -11,7 +11,8 @@ encoding, which remains open.
 
 The sections below describe implemented raw-memory operations and earlier encoding
 proposals. They do not define new T(...) as returning a raw pointer. Managed heap
-retention, reference counting, GC and allocator-policy composition remain unimplemented.
+allocation through T& and allocator-policy composition remain future work.
+[Tracing GC](garbage-collection.md) now manages the transitional Ref heap.
 An explicit allocator operand at every high-level allocation site is not required.
 
 The first implementation now uses `heap.alloc T` (element count to `Ptr<T>`) and
@@ -52,7 +53,7 @@ layout, alignment, partial initialization, allocation-error behavior, and constr
 receiver semantics remain open contracts before implementation.
 
 Today `newobj Name` constructs a record from field values and produces an owned
-interpreter value. `heap.new` transfers that value to an arena and produces Ref.
+interpreter value. `heap.new` transfers that value to the GC-managed heap and produces transitional Ref.
 Neither instruction proves physical native-stack layout, raw allocation, placement
 construction, or reference counting. This proposal does not silently change those
 existing instructions.

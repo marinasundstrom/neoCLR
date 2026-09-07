@@ -22,6 +22,11 @@ impl Slot {
             replacements: HashMap::new(),
         }))
     }
+    pub(crate) fn trace_heap(&self, roots: &mut Vec<usize>) {
+        if let Some(value) = &self.value {
+            crate::gc::trace(value, roots);
+        }
+    }
     pub(crate) fn get(&self) -> Result<Value, Fault> {
         self.value
             .clone()

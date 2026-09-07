@@ -7,8 +7,9 @@
 
 **An experimental, .NET-inspired virtual machine with values by default and explicit control over memory and references.**
 
-neoCLR is a managed, type-safe virtual machine with an intentionally low-level
-instruction set. It provides explicit memory access, typed pointers, native calls,
+neoCLR is a managed, type-safe virtual machine with garbage-collected heap storage
+and explicit value versus reference semantics. Its intentionally low-level instruction
+set also provides explicit memory access, typed pointers, native calls,
 and allocation controls when a program needs them. It is a runtime platform rather
 than a high-level language: language authors may build safer or more ergonomic
 abstractions above the same capabilities.
@@ -38,8 +39,8 @@ Interfaces use ordinary names without an `I` prefix.
 [Borrowed interface references](docs/interfaces.md) make dispatch explicit without boxing or ownership.
 [Typed equality](docs/equality.md) uses System.Equatable<T> and Equals(T).
 [Explicit cloning](docs/cloning.md) uses System.Clonable<T> and Clone(), independently
-of ordinary value copies. [Deterministic lifecycle design](docs/lifecycle.md)
-develops destruction, ownership and Disposable/Closable contracts as the next foundation.
+of ordinary value copies. The [lifecycle design](docs/lifecycle.md) separates
+value lifetimes, managed heap collection and resource cleanup.
 [Explicit cleanup](docs/disposal.md) is available through System.Disposable and
 System.Closable<E>; automatic destruction remains future work.
 
@@ -61,7 +62,8 @@ native addresses, pointer casts and byte offsets, indirect access, and sequentia
 record layout. `localloc` provides explicit frame-local byte storage, released on
 return. Native integers and explicit pointer/address conversions are also
 available. See [heap and pointers](docs/heap-and-pointers.md).
-Reference counting, GC, and higher-level lifetime management remain deferred.
+Managed heap allocations now use [tracing garbage collection](docs/garbage-collection.md).
+Heap-backed T& and guest destruction remain future work.
 [System.Collections.ArrayList<T>](docs/array-list.md) provides a small growable list
 for native-layout values, with ordinary indexers, shared aliases and explicit release.
 The [pointer-backed carrier example](docs/pointer-carriers.md) demonstrates how ordinary
@@ -307,10 +309,11 @@ union-specific encodings. Reassemble earlier source and System artifacts before 
 “Stack by default” is a **guest semantic model** here: interpreter frames own
 values, and copying an object copies its fields. Rust currently uses `Vec`,
 `String`, and `Box` internally, so this does not demonstrate physical native-stack
-allocation or its performance. Legacy `Ref<T>` values address an arena retained until the execution result is
-dropped. Native `Ptr<T>` allocations separately support individual free. There is
-no reference counting or GC. Counted `Ref<T>` remains a deferred ownership abstraction;
-Rust's memory model does not define guest behavior. See [memory layers](docs/memory-model.md).
+allocation or its performance. The managed heap uses a nonmoving tracing collector;
+legacy `Ref<T>` is its transitional encoding, while T& remains the selected unified
+reference direction. Native `Ptr<T>` allocations separately support individual free.
+GC does not provide deterministic resource cleanup or guest finalizers. See
+[memory layers](docs/memory-model.md) and [GC](docs/garbage-collection.md).
 
 Option/Result still use temporary [System.Value storage](docs/value-storage.md),
 which explicitly packs payloads into owned host value trees and recursively copies

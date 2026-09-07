@@ -72,10 +72,11 @@ to the published Preview 1 release gates.
 Prioritize the storage/lifetime design and a small frontend workload over broad new
 library APIs. Keep binary round-trip and AOT experiments bounded so they test the
 shared contracts before any public ABI is frozen. General OOP, networking, async,
-GC and reference counting remain later work justified by concrete programs.
+[Tracing GC](garbage-collection.md) now manages the prototype heap, including cycles.
+Unified heap-backed T& and advanced collector policies remain future work.
 
 The [lifecycle direction](lifecycle.md) develops the next storage foundation:
-managed heap references, stack-backed byref calls and deterministic destruction.
+GC-managed heap references, stack-backed byref calls and separate value cleanup rules.
 Preserve values by default and explicit reference passing; the runtime handles
 retention and validity without manual reference management. Prioritize managed
 reference copying/release and safe escape before user destructor execution.
@@ -291,7 +292,7 @@ own contracts and demonstrable need.
    [the interface subset](interfaces.md).
 6. Build .NET metadata/IL inspection and translation for a supported subset, with
    actionable diagnostics for semantic differences.
-7. Extend CLR-style T&/ByRef with automatic retention, safe escapes and deterministic
+7. Extend CLR-style T&/ByRef with GC-rooted heap references, safe escapes and value
    cleanup under the [managed-reference plan](managed-reference-implementation.md).
    Ref<T> is a historical proposal, not a required ownership wrapper. Evaluate native
    interop, concurrency and runtime async against these lifetime contracts.

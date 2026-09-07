@@ -3,8 +3,8 @@
 neoCLR types describe values and their behavior. They do not choose allocation or
 lifetime through a class/struct distinction. Values copy by default; a pointer is
 itself a value whose copy aliases the same storage. Neither copying nor dropping a
-pointer acquires or releases ownership. Counted references and optional GC remain
-separate future abstractions. Familiar CLR capabilities are the baseline, with
+pointer acquires or releases ownership. The [managed tracing heap](garbage-collection.md)
+is separate from this explicit native-memory path. Familiar CLR capabilities are the baseline, with
 intentional departures and incomplete prototype behavior distinguished below.
 
 ## Allocation, initialization, and access

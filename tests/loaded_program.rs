@@ -41,11 +41,13 @@ fn execution_state_and_limits_do_not_persist_between_runs() {
             .message
             .contains("instruction limit")
     );
-    let mut first = program.run(Limits::default()).unwrap();
-    first.heap[0] = Value::Int32(99);
+    let first = program.run(Limits::default()).unwrap();
     let second = program.run(Limits::default()).unwrap();
-    assert_eq!(second.heap, [Value::Int32(42)]);
+    assert_eq!(second.heap.get(0), Some(&Value::Int32(42)));
+    assert_eq!(first.heap.get(0), Some(&Value::Int32(42)));
     assert_eq!(first.value, second.value);
+    drop(first);
+    assert_eq!(second.heap.get(0), Some(&Value::Int32(42)));
 }
 
 #[test]

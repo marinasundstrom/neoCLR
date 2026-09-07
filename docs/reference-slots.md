@@ -151,8 +151,8 @@ executing its body; suitable guest calls to the same function are supported.
 The [reference-return sample](../examples/reference_returns.neoil) implements
 MakeCounter(Counter& counter) -> Int32& with ldarg, ldflda Counter::Age and ret.
 It uses no arena handle, new instruction or manual lifetime operation. The legacy
-heap.new/Ref arena and its heap_objects limit are unchanged; host slot cells are
-separate from that arena. Future explicit managed allocation and reference-valued
+heap.new/Ref encoding now uses [tracing GC](garbage-collection.md); heap_objects
+bounds live allocations after collection. Host slot cells remain separate. Future explicit managed allocation and reference-valued
 fields need their own allocation limits and lifecycle rules.
 
 Typed verification rejects forbidden reference storage/escape and invalid operand
@@ -224,7 +224,7 @@ Implementation slices (implemented and committed separately):
    dispatch, lifetime and backend reachability coverage.
 
 Each slice must update the opcode/deviation reference, executable samples and runtime
-service planning. No compiler, GC, reference counting or full borrowing language is
+service planning. No compiler, reference counting or full borrowing language is
 required to establish these contracts.
 
 [Managed initobj](managed-initialization.md) supplies typed defaults for scalar and

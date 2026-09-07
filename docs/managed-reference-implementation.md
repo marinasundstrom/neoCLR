@@ -4,7 +4,8 @@ Status: the first checked reference-return slice is implemented for the agreed
 [lifecycle model](lifecycle.md). T& locals, managed record-field addresses and guest
 reference returns reuse ByRef, ldloca/ldarga, ldflda, ldobj/stobj and ret. Runtime
 checks reject references into the returning frame, including field/interface views
-and aliases. Explicit managed heap allocation and destruction remain future work.
+and aliases. The transitional Ref heap uses tracing GC; heap allocation through T& and guest
+destruction remain future work.
 
 Use CLR metadata and instruction semantics as the baseline. Ref<T> is a historical
 proposal and current arena encoding, not a selected future wrapper. Preview changes
@@ -45,7 +46,7 @@ targets; Clonable remains explicit.
 | Area | Current implementation | Next gate |
 | --- | --- | --- |
 | Slots | Stable host cells; references identify a root and field path; every ret rejects current-frame roots | Introduce explicit managed heap targets with independent lifetime provenance |
-| Managed heap prototype | Value.Reference is an index into execution-owned storage with Type::Ref | Replace with the selected T& semantics and automatic reclamation |
+| Managed heap prototype | Value.Reference carries a nonreused identity into a tracing heap with Type::Ref | Unify heap roots with T& and trace interior references |
 | Copies | Reference handles retain host cells; slot reads copy values; fields preserve inline semantics | Define copy/release behavior for records containing managed references |
 | Metadata and verification | T& locals, record-field addresses and caller-backed returns supported | Define reference-valued fields, broader escape analysis and safe initialization |
 | Output obligations | Root/path write history tracks field or ancestor replacement; sibling writes do not satisfy outputs | Extend to additional storage kinds without weakening per-invocation obligations |
@@ -66,11 +67,11 @@ slot-reference cycles in this slice. Array-element references are not implemente
 2. Returning a reference into the current frame always faults. A heap root has a
    separately established lifetime; physical host placement cannot substitute for
    that semantic distinction. Forwarding through another function changes neither.
-3. Copying a heap reference preserves its target and retention. Discarding an alias
-   releases only its own claim. Bookkeeping registries must not retain dead objects.
+3. Copying a heap reference preserves identity and reachability. Discarding an alias
+   does not affect surviving aliases. Collection reclaims unreachable graphs.
 4. Reads copy T under ordinary value semantics. Replacing a value accounts for its
    embedded references while preserving aliases to the same logical location.
-   Retain incoming state before releasing outgoing state, including self-assignment.
+   Keep incoming state rooted through replacement, including self-assignment.
 5. Construction and allocation are separate internally. Uninitialized storage must
    not escape as a readable reference. Preserve out/out(true) obligations and field
    identity across ancestor replacement; failed stores must not satisfy outputs.
@@ -81,15 +82,14 @@ slot-reference cycles in this slice. Array-element references are not implemente
 
 ## Boundaries and acceptance cases
 
-Automatic reference counting is a candidate for managed heap reclamation. Cycles,
-weak references, concurrency and pinning require decisions before claiming general
-deterministic reclamation. Reference-valued fields introduce new retention graphs;
-the current acyclic slot subset does not resolve those policies.
+The initial [tracing GC](garbage-collection.md) supports managed heap cycles using
+the transitional Ref encoding. Heap-backed T& must participate in the same root and
+edge tracing before it is exposed. Weak references, concurrency and native pinning
+remain separate decisions. Collection does not promise deterministic resource cleanup.
 
-The heap_objects limit currently bounds the legacy arena length. A reclaiming
-managed heap must separate live-object budgets from identity bookkeeping. Repeated
-allocation/release should not exhaust a live-object budget; identity reuse must
-remain safe. Frame cells and native pointer-byte budgets remain separate.
+The heap_objects limit bounds live objects after collection. Identities are never
+reused within an execution; repeated allocation of unreachable objects can stay within
+a small live-object budget. Frame cells and native pointer-byte budgets are separate.
 
 A host reference must retain required context/metadata/code or use a checked
 context-owned handle. Releasing a Rust handle on an arbitrary thread must not

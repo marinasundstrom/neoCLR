@@ -27,10 +27,14 @@ foreign libraries, allocate guest objects, or perform typed verification automat
 `verify()` remains an explicit analysis. A structurally valid program can still fail
 typed verification or terminate with a runtime Fault.
 
-Every `run` starts fresh frames, output, bootstrap heap, and native allocation tracking
+Every `run` starts fresh frames, output, managed tracing heap, and native allocation tracking
 with the supplied resource limits. A prior result or Fault does not change the loaded
 snapshot. Returned execution values and allocations belong to their own Execution;
 pointer/Ref values from one execution are not transferable handles into another.
+Execution.heap is now a read-only ManagedHeap, replacing the earlier Vec<Value> API.
+It retains only the returned value's reachable heap graph after final collection;
+use get(identity) rather than vector indexing. Identities can have gaps. See
+[garbage collection](garbage-collection.md).
 [Resolved function handles](invocation.md) additionally support primitive and
 [owned record arguments](record-inputs.md) and [ordinary Option/Result inputs](union-inputs.md)
 to static and instance IL functions without an entry point.

@@ -36,14 +36,8 @@ fn feature_tour() {
         ["neoCLR feature tour", "All feature checks passed."]
     );
     assert_eq!(execution.value, ordinary_success());
-    assert_eq!(execution.heap.len(), 1);
-    assert_eq!(
-        execution.heap[0],
-        Value::Object {
-            ty: Type::Named("Point".into()),
-            fields: vec![Value::Int32(42), Value::Int32(20)]
-        }
-    );
+    assert!(execution.heap.is_empty());
+    assert_eq!(execution.heap.reclaimed_objects(), 1);
 }
 
 #[test]

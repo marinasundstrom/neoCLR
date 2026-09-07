@@ -6,7 +6,7 @@ not become guest semantics accidentally. Implementations in another host languag
 should be able to preserve the same explicit VM contract.
 
 The platform direction is value semantics by default, explicit reference access and
-runtime-managed deterministic lifetimes. Managed heap allocation produces a reference;
+runtime-managed lifetimes, with GC for managed heap storage. Managed heap allocation produces a reference;
 byref parameters can access existing caller values without requiring heap allocation.
 Programmers do not manually retain, release or invalidate ordinary managed references.
 The compiler/runtime arranges storage and retention to satisfy the reference contract.
@@ -98,8 +98,7 @@ language through a policy box. Typed values, fixed and dynamic array views, raw
 and stores are platform primitives. A language may expose them safely, restrict
 them, or make them ergonomic, but those choices belong to the language profile.
 
-Reference counting, cycle collection, nullability and escape analysis are distinct
-design concerns. The selected public reference feature is CLR-style T&/ByRef; the
+Tracing GC, nullability and escape analysis are distinct design concerns. The selected public reference feature is CLR-style T&/ByRef; the
 runtime manages its lifetime automatically. Ref<T> is not a required library wrapper.
 Preserve CLR metadata and instruction semantics where they fit, documenting the
 extensions needed for retained and escaping references.
@@ -119,8 +118,8 @@ Keep these concepts distinct:
 - `T&`/ByRef supplies managed reference access with automatic lifetime handling.
 - `Ref<T>` is a historical ownership proposal and prototype arena encoding; it may
   be removed as the managed-reference implementation develops.
-- The environment supplies allocation services and may supply optional collection
-  facilities. Programs need not select a concrete allocator at every allocation site.
+- The environment supplies allocation services; tracing GC is the normal managed
+  heap policy. Programs need not select a concrete allocator at every allocation site.
 - Construction, copy, move, retain, release, and destruction have explicit contracts
   where applicable. A compiler can emit calls or operations implementing them.
 
@@ -128,36 +127,22 @@ The environment may choose where and how allocation occurs, but its implementati
 choices must preserve the declared access and lifetime contract. Environment-provided
 services must preserve explicit reference semantics and automatic lifetime handling.
 
-## Retention implementation decisions
+## Managed heap collection and native memory
 
-A plain value does not inherently require a reference count. Managed references
-must preserve their target and identity automatically; reference counting is a
-candidate implementation, not a separate source-level Ref<T> obligation. The older
-generic ownership-wrapper proposal is superseded as the platform reference model.
+Managed heap allocation uses [tracing GC](garbage-collection.md) as the normal policy.
+The collector preserves reachable objects and reclaims unreachable graphs, including
+cycles. Reference copies preserve identity automatically. Heap reclamation has no
+last-reference timing guarantee; Dispose/Close provide timely resource cleanup.
 
-Copies and replacement of records containing managed references need specified
-retention and cleanup behavior. Those semantics must not emerge accidentally from
-Rust Clone or Drop. Weak references, cycles, threading/atomicity, destruction order
-and foreign ownership still need explicit contracts. No ambient tracing GC or
-Rust-style borrow checker is implied. See the
-[implementation gate](managed-reference-implementation.md).
+The current Ref<T> encoding is transitional and collected; the selected future
+abstraction remains T&/ByRef with explicit frame or heap provenance. Execution.heap
+retains only the result's reachable heap graph after successful execution. Live-object
+limits are checked after collection and are separate from identity generation.
 
-## Current implementation
-
-Current `Ref<T>` values index an execution-owned arena. They support explicit shared
-identity, loads, and stores. Allocations are retained until the execution result is
-dropped. **There is no reference counting** or per-allocation release within that
-arena. This arena is scaffolding, not the final managed memory model.
-
-Instance methods use copied receiver values unless they declare a byref receiver.
-Byref receivers access the original initialized slot through the same retaining
-managed-reference contract as parameters. Updating a copied receiver does not
-write back to the caller. Native pointers have a separate allocation store and
-explicit access operations.
-
-Native allocations stay live until explicit free or execution teardown. Copies of
-pointers neither retain nor release storage. General generic metadata and lifetime-aware
-wrappers can be revisited afterward; reference counting and GC are not prerequisites.
+Native heap.alloc/free and pointer instructions remain an explicit low-level path.
+Copies of pointers neither retain nor release managed storage. Native buffers and
+frame cells have separate budgets. Managed/native handles, pinning, weak references
+and concurrent collection need additional contracts.
 
 ## Deferred environment and allocator integration
 
@@ -167,9 +152,8 @@ required at every source or IL allocation site. A frame allocator was an earlier
 proposal, not a committed universal default for this heap/pointer milestone.
 
 Movable storage needs roots/handles, relocation support, or pinning; a naked stable
-pointer contract cannot silently become a movable reference. Ref counting could own
-storage from a suitable allocation environment, whose lifetime must outlast those
-allocations. Cleanup on construction failure and avoiding conflicting reclamation
+pointer contract cannot silently become a movable reference. A collection-integrated allocation environment must remain valid for the
+allocations it owns. Cleanup on construction failure and avoiding conflicting reclamation
 policies also need contracts. These integration questions are recorded for later.
 See [allocation encoding](allocation-encoding.md).
 
