@@ -1869,3 +1869,8 @@ over `T*` plus length, independent of whether the storage is frame-local or heap
 allocated. This follows the same primitive-wrapper model as `System.Int32`; type
 safety comes from typed values and checked pointer provenance, not a value/reference
 classification.
+
+Recorded the platform policy principle: neoCLR standardizes low-level typed values,
+array views, pointers, allocation regions, layouts and checked memory operations as
+VM capabilities. Language authors may add safety or ownership profiles above that
+surface; C#-specific historical restrictions are not implicit runtime rules.

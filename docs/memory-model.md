@@ -31,6 +31,20 @@ The original default-local-storage direction remains separate from physical nati
 stack placement. The current interpreter models frame-owned values but uses host
 allocations internally. It does not establish native layout or ABI guarantees.
 
+## A standard low-level surface
+
+The VM should standardize low-level capabilities directly instead of forcing each
+language through a policy box. Typed values, fixed and dynamic array views, raw
+`Ptr<T>` addresses, explicit allocation regions, layout queries, and checked loads
+and stores are platform primitives. A language may expose them safely, restrict
+them, or make them ergonomic, but those choices belong to the language profile.
+
+Ownership, reference counting, garbage collection, nullability, and escape analysis
+are separate layers. They may be expressed through library types such as `Ref<T>`
+and compiler-generated calls, while the VM continues to provide the underlying
+address and lifetime contracts. This keeps the platform CLR-like in its metadata and
+type signatures without inheriting C#-specific historical restrictions.
+
 ## Deferred philosophy: explicit VM memory operations
 
 Memory management should be explicit in metadata and IL. Languages may hide Ref
