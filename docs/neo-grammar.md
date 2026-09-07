@@ -22,7 +22,8 @@ function_decl    = "func", identifier, field_list, "->", type, newlines,
 field_list       = "(", newlines,
                    [ field, newlines, { ",", newlines, field, newlines } ], ")" ;
 field            = identifier, ":", type ;
-type             = (identifier | "(", ")"), [ "&" ] ;
+type             = (qualified_name, [ "<", type, { ",", type }, ">" ] | "(", ")"), [ "&" ] ;
+qualified_name   = identifier, { ".", identifier } ;
 
 block            = newlines, "{", separators, { statement, separators }, "}" ;
 statement        = (binding | return_statement | expression_statement | "break" | "continue"), terminator
@@ -41,13 +42,19 @@ function expression bodies and standalone blocks are unsupported. Structured sta
 introduce nested scopes; active names cannot be shadowed, but sibling scopes may reuse names.
 
 Types resolve to `int`/`Int32`, `string`/`String`, `bool`/`Boolean`, `unit`/`Void`/`()`,
-or a declared record. One `&` suffix forms a managed reference. Qualified type names,
-generic types and raw pointer syntax are not part of this grammar.
+or a declared record or bundled System type. Qualified names and closed generic
+arguments are supported; Option/Result abbreviate System.Option/System.Result. One
+`&` suffix forms a managed reference. Raw pointer syntax and generic declarations
+are unsupported. Runtime restrictions on ByRef generic arguments still apply.
 
 ## Expressions
 
 ```ebnf
-expression       = logical_or ;
+expression       = logical_or, { "match", newlines, "{", separators,
+                   [ match_arm, { arm_separator, match_arm }, [ arm_separator ] ], "}" } ;
+match_arm        = pattern, "=>", newlines, (expression | block) ;
+pattern          = "_" | identifier, [ "(", ("let", identifier | "_"), ")" ] ;
+arm_separator    = ("," | newline), separators ;
 logical_or       = logical_and, { "||", logical_and } ;
 logical_and      = equality, { "&&", equality } ;
 equality         = comparison, { ("==" | "!="), comparison } ;
@@ -71,7 +78,9 @@ short-circuit. Ordering uses Int32; equality supports Int32 and Boolean.
 value. All arithmetic in this subset uses Int32.
 
 The grammar permits general postfix shapes, but semantic checks restrict calls to
-free functions, positional record construction and the supported Console API.
+free functions, positional record construction and public static bundled System calls.
+Library overloads are selected by exact argument types; out/byref-receiver contracts
+are not exposed. Generic method calls and instance calls remain unsupported.
 `new` requires a record-construction call, such as `new Counter(0)`. It does not
 accept arbitrary factory calls or copy expressions in this slice. Assignment and
 `&` require appropriate addressable locations. There is no assignment expression or implicit conversion.
@@ -80,7 +89,7 @@ accept arbitrary factory calls or copy expressions in this slice. Assignment and
 
 Identifiers use ASCII letters, digits and underscore and cannot start with a digit.
 Reserved words are `func`, `record`, `let`, `var`, `return`, `new`, `true`, `false` and
-`import`, `if`, `else`, `while`, `for`, `in`, `loop`, `break`, and `continue`. Type aliases and `Console`/`WriteLine` are additionally reserved declaration
+`import`, `if`, `else`, `while`, `for`, `in`, `loop`, `break`, `continue`, and `match`. Type aliases and `Console`/`WriteLine` are additionally reserved declaration
 names. Fields, parameters and bindings must be unique in their applicable scope.
 
 Integer tokens contain decimal digits only. Positive literals must fit Int32; a
@@ -98,7 +107,31 @@ parentheses of a grouped expression, and before an opening block brace or `else`
 do not implicitly continue a binary expression or split the `name: type` pair.
 Semicolons inside lists/grouped expressions are not layout whitespace.
 
-The implementation bounds source input at 1 MiB, expression nesting at 128 and statement nesting at 32 (sharing the parser depth budget),
+The implementation bounds source input at 1 MiB, recursive parser nesting at 32 (shared by types, statements and expressions),
+expression tree depth at 128,
 record/function declarations at 1024, and fields/parameters per declaration at 1024.
 Backend metadata and execution limits still apply. Source syntax and bounds remain
 preview contracts and can change as end-to-end scenarios require.
+
+## Match semantics
+
+`match` binds below Boolean operators. Its scrutinee is evaluated once and copied
+into temporary value storage (a T& scrutinee is read through its reference). Case
+patterns bind copied payloads with `Case(let name)`, discard them with `Case(_)`, or
+use a bare name for a payload-free case. Nested unions use nested matches. `_` covers
+all remaining cases. Arms are separated by commas or newlines, with a trailing
+separator permitted. Block arms are available only for a standalone match statement;
+that form needs no trailing statement terminator.
+
+Both forms require exhaustive coverage and reject duplicate or unreachable cases.
+Expression arms have one exact result type. Statement arms may perform actions,
+return, break or continue; their expression results are discarded. Payload names
+are immutable, arm-local and cannot shadow active names. References follow the
+ordinary lifetime rules; no address to copied arm payload storage can escape.
+
+Coverage is limited to bundled System unions with the UnionAttribute marker,
+constructor-declared cases, and typed public test/extraction/payload accessors.
+The compiler validates that contract; arbitrary source records are not unions merely
+because their names resemble Option or Result. Unsupported contracts are diagnosed.
+Guards, nested destructuring patterns, user-declared unions and subtype patterns are
+future features.

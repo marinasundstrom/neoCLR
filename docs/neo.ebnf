@@ -8,7 +8,8 @@ function_decl    = "func", identifier, field_list, "->", type, newlines,
 field_list       = "(", newlines,
                    [ field, newlines, { ",", newlines, field, newlines } ], ")" ;
 field            = identifier, ":", type ;
-type             = (identifier | "(", ")"), [ "&" ] ;
+type             = (qualified_name, [ "<", type, { ",", type }, ">" ] | "(", ")"), [ "&" ] ;
+qualified_name   = identifier, { ".", identifier } ;
 
 block            = newlines, "{", separators, { statement, separators }, "}" ;
 statement        = (binding | return_statement | expression_statement | "break" | "continue"), terminator
@@ -19,7 +20,11 @@ binding          = ("let" | "var"), identifier, [ ":", type ], "=", expression ;
 return_statement = "return", [ expression ] ;
 expression_statement = expression, [ "=", expression ] ;
 
-expression       = logical_or ;
+expression       = logical_or, { "match", newlines, "{", separators,
+                   [ match_arm, { arm_separator, match_arm }, [ arm_separator ] ], "}" } ;
+match_arm        = pattern, "=>", newlines, (expression | block) ;
+pattern          = "_" | identifier, [ "(", ("let", identifier | "_"), ")" ] ;
+arm_separator    = ("," | newline), separators ;
 logical_or       = logical_and, { "||", logical_and } ;
 logical_and      = equality, { "&&", equality } ;
 equality         = comparison, { ("==" | "!="), comparison } ;
@@ -47,6 +52,7 @@ letter_or_underscore = "A".."Z" | "a".."z" | "_" ;
 digit            = "0".."9" ;
 integer          = digit, { digit } ;
 string           = ? JSON double-quoted string, with no raw CR or LF ? ;
-(* Whitespace other than LF and // comments through the next LF are ignored.
+(* A standalone match with block arms needs no statement terminator.
+   Whitespace other than LF and // comments through the next LF are ignored.
    Keywords cannot be identifiers; static semantics further restrict names,
    calls, lvalues, type use, literal ranges and reference lifetimes. *)

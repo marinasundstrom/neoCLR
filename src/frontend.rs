@@ -1,5 +1,7 @@
 //! Neo concept-language front end for exercising NeoCLR end to end.
 //! This is a separate experimental language subset, not a Raven compiler.
+mod library;
+
 use crate::{Fault, Module};
 use std::collections::HashMap;
 
@@ -77,7 +79,7 @@ fn lex(source: &str) -> Result<Vec<Token>, Fault> {
             end.ok_or_else(|| start.error("unterminated string literal"))?
         } else if rest.starts_with("..<") {
             3
-        } else if ["->", "..", "==", "!=", "<=", ">=", "&&", "||"]
+        } else if ["->", "=>", "..", "==", "!=", "<=", ">=", "&&", "||"]
             .iter()
             .any(|op| rest.starts_with(op))
         {
@@ -113,6 +115,33 @@ enum Ty {
     Ref(Box<Ty>),
 }
 impl Ty {
+    fn from_metadata(ty: &crate::metadata::Type) -> Result<Self, Fault> {
+        use crate::metadata::Type;
+        Ok(match ty {
+            Type::Int32 => Self::Int,
+            Type::Boolean => Self::Bool,
+            Type::String => Self::String,
+            Type::Void => Self::Void,
+            Type::ByRef(target) => Self::Ref(Box::new(Self::from_metadata(target)?)),
+            Type::Constructed {
+                definition,
+                arguments,
+            } => Self::Record(format!(
+                "{}<{}>",
+                definition,
+                arguments
+                    .iter()
+                    .map(|a| Self::from_metadata(a).map(|t| t.il()))
+                    .collect::<Result<Vec<_>, _>>()?
+                    .join(",")
+            )),
+            _ => Self::Record(
+                ty.definition_name()
+                    .ok_or_else(|| Fault::new("unsupported source type"))?
+                    .into(),
+            ),
+        })
+    }
     fn il(&self) -> String {
         match self {
             Self::Int => "Int32".into(),
@@ -158,6 +187,19 @@ enum ExprKind {
     Call(Box<Expr>, Vec<Expr>),
     Unary(String, Box<Expr>),
     Binary(String, Box<Expr>, Box<Expr>),
+    Match(Box<Expr>, Vec<Arm>),
+}
+enum Pattern {
+    Wildcard(Token),
+    Case(Token, Option<Option<Token>>), // None: no payload; Some(None): discarded payload.
+}
+struct Arm {
+    pattern: Pattern,
+    body: ArmBody,
+}
+enum ArmBody {
+    Expression(Expr),
+    Block(Vec<Stmt>),
 }
 enum Stmt {
     Bind {
@@ -226,7 +268,7 @@ impl Parser {
         }
         if [
             "func", "record", "let", "var", "return", "new", "true", "false", "import", "if",
-            "else", "while", "for", "in", "loop", "break", "continue",
+            "else", "while", "for", "in", "loop", "break", "continue", "match",
         ]
         .contains(&token.text.as_str())
         {
@@ -235,17 +277,45 @@ impl Parser {
         Ok(token)
     }
     fn ty(&mut self) -> Result<Ty, Fault> {
+        if self.depth >= 32 {
+            return Err(self.current().error("type nesting limit exceeded"));
+        }
+        self.depth += 1;
+        let result = self.ty_inner();
+        self.depth -= 1;
+        result
+    }
+    fn ty_inner(&mut self) -> Result<Ty, Fault> {
         let mut ty = if self.eat("(") {
             self.expect(")")?;
             Ty::Void
         } else {
-            let token = self.name()?;
-            match token.text.as_str() {
-                "int" | "Int32" => Ty::Int,
-                "string" | "String" => Ty::String,
-                "bool" | "Boolean" => Ty::Bool,
-                "Void" | "unit" => Ty::Void,
-                _ => Ty::Record(token.text),
+            let mut name = self.name()?.text;
+            while self.eat(".") {
+                name.push('.');
+                name.push_str(&self.name()?.text);
+            }
+            let name = match name.as_str() {
+                "Option" => "System.Option",
+                "Result" => "System.Result",
+                "bool" => "Boolean",
+                "unit" => "Void",
+                "byte" => "Byte",
+                _ => &name,
+            }
+            .to_owned();
+            if self.eat("<") {
+                let mut arguments = vec![self.ty()?];
+                while self.eat(",") {
+                    arguments.push(self.ty()?);
+                }
+                self.expect(">")?;
+                Ty::Record(format!(
+                    "{name}<{}>",
+                    arguments.iter().map(Ty::il).collect::<Vec<_>>().join(",")
+                ))
+            } else {
+                Ty::from_metadata(&crate::metadata::Type::from_name(&name))?
             }
         };
         if self.eat("&") {
@@ -432,7 +502,11 @@ impl Parser {
                 Stmt::Expression(left)
             }
         };
-        self.end_statement()?;
+        if !matches!(&statement, Stmt::Expression(Expr { kind: ExprKind::Match(_, arms), .. })
+            if arms.iter().any(|a| matches!(a.body, ArmBody::Block(_))))
+        {
+            self.end_statement()?;
+        }
         Ok(statement)
     }
     fn node(&self, at: Token, kind: ExprKind, depth: usize) -> Result<Expr, Fault> {
@@ -442,7 +516,7 @@ impl Parser {
         Ok(Expr { at, kind, depth })
     }
     fn expression(&mut self, minimum: u8) -> Result<Expr, Fault> {
-        if self.depth >= 128 {
+        if self.depth >= 32 {
             return Err(self.current().error("expression nesting limit exceeded"));
         }
         self.depth += 1;
@@ -501,7 +575,54 @@ impl Parser {
             return Err(at.error("expected expression"));
         };
         loop {
-            if self.at(".") {
+            if self.at("match") && minimum == 0 {
+                self.take();
+                self.newlines();
+                self.expect("{")?;
+                self.lines();
+                let mut arms = Vec::new();
+                let mut depth = left.depth + 1;
+                while !self.at("}") && !self.at("") {
+                    let pattern = if self.at("_") {
+                        Pattern::Wildcard(self.take())
+                    } else {
+                        let name = self.name()?;
+                        let payload = if self.eat("(") {
+                            let binding = if self.eat("_") {
+                                None
+                            } else {
+                                self.expect("let")?;
+                                Some(self.name()?)
+                            };
+                            self.expect(")")?;
+                            Some(binding)
+                        } else {
+                            None
+                        };
+                        Pattern::Case(name, payload)
+                    };
+                    self.expect("=>")?;
+                    self.newlines();
+                    let body = if self.at("{") {
+                        ArmBody::Block(self.block()?)
+                    } else {
+                        let value = self.expression(0)?;
+                        depth = depth.max(value.depth + 1);
+                        ArmBody::Expression(value)
+                    };
+                    arms.push(Arm { pattern, body });
+                    if !self.at("}") && !self.eat(",") {
+                        self.expect("\n")?;
+                    }
+                    self.lines();
+                }
+                self.expect("}")?;
+                left = self.node(
+                    left.at.clone(),
+                    ExprKind::Match(Box::new(left), arms),
+                    depth,
+                )?;
+            } else if self.at(".") {
                 self.take();
                 let field = self.name()?;
                 let depth = left.depth + 1;
@@ -730,20 +851,12 @@ impl Lowerer<'_> {
                 })
             }
             ExprKind::Call(callee, arguments) => self.call(callee, arguments),
+            ExprKind::Match(value, arms) => self.match_arms(value, arms, false).map(|(ty, _)| ty),
         }
     }
     fn call(&mut self, callee: &Expr, arguments: &[Expr]) -> Result<Ty, Fault> {
-        let binding = match &callee.kind {
-            ExprKind::Name(name) => Some(name),
-            ExprKind::Field(owner, _) => {
-                if let ExprKind::Name(name) = &owner.kind {
-                    Some(name)
-                } else {
-                    None
-                }
-            }
-            _ => None,
-        };
+        let path = Self::qualified_name(callee);
+        let binding = path.as_ref().and_then(|p| p.split('.').next());
         if binding.is_some_and(|name| self.bindings.contains_key(name)) {
             return Err(callee
                 .at
@@ -764,6 +877,28 @@ impl Lowerer<'_> {
             self.body
                 .push(format!("call System.Console::WriteLine({})", ty.il()));
             return Ok(Ty::Void);
+        }
+        if let Some(path) = Self::qualified_name(callee) {
+            if path.contains('.') {
+                let (owner, member) = path.rsplit_once('.').unwrap();
+                let owner = if owner.starts_with("System.") {
+                    owner.to_owned()
+                } else {
+                    format!("System.{owner}")
+                };
+                let types = arguments
+                    .iter()
+                    .map(|a| self.expression(a))
+                    .collect::<Result<Vec<_>, _>>()?;
+                let signature = format!(
+                    "{owner}::{member}({})",
+                    types.iter().map(Ty::il).collect::<Vec<_>>().join(",")
+                );
+                let function =
+                    library::resolve(&signature).map_err(|e| callee.at.error(e.message))?;
+                self.body.push(format!("call {signature}"));
+                return Ty::from_metadata(&function.returns);
+            }
         }
         let ExprKind::Name(name) = &callee.kind else {
             return Err(callee
@@ -861,6 +996,135 @@ impl Lowerer<'_> {
             }
             _ => Err(expression.at.error("expected an assignable location")),
         }
+    }
+    fn qualified_name(expression: &Expr) -> Option<String> {
+        match &expression.kind {
+            ExprKind::Name(name) => Some(name.clone()),
+            ExprKind::Field(owner, field) => {
+                Some(format!("{}.{}", Self::qualified_name(owner)?, field.text))
+            }
+            _ => None,
+        }
+    }
+    fn match_arms(
+        &mut self,
+        value: &Expr,
+        arms: &[Arm],
+        statement: bool,
+    ) -> Result<(Ty, bool), Fault> {
+        let mut ty = self.expression(value)?;
+        if let Ty::Ref(target) = ty {
+            self.body.push(format!("ldobj {}", target.il()));
+            ty = *target;
+        }
+        let cases = library::cases(&ty).map_err(|e| value.at.error(e.message))?;
+        let scrutinee = self.temp(&ty);
+        self.body.push(format!("stloc {scrutinee}"));
+        let mut seen = std::collections::HashSet::new();
+        let mut wildcard = false;
+        let end = self.label();
+        let mut result_type = None;
+        let mut result_local = None;
+        let mut all_exit = true;
+        for arm in arms {
+            let at = match &arm.pattern {
+                Pattern::Wildcard(at) | Pattern::Case(at, _) => at,
+            };
+            if wildcard || seen.len() == cases.len() {
+                return Err(at.error("unreachable match arm"));
+            }
+            let next = self.label();
+            let saved = self.bindings.clone();
+            self.scope += 1;
+            match &arm.pattern {
+                Pattern::Wildcard(_) => {
+                    wildcard = true;
+                }
+                Pattern::Case(name, binding) => {
+                    let case = cases
+                        .iter()
+                        .find(|c| c.name == name.text)
+                        .ok_or_else(|| name.error("unknown union case"))?;
+                    if !seen.insert(name.text.clone()) {
+                        return Err(name.error("duplicate match case"));
+                    }
+                    if binding.is_some() != case.payload.is_some() {
+                        return Err(name.error("case payload pattern does not match its shape"));
+                    }
+                    self.body.extend([
+                        format!("ldloc {scrutinee}"),
+                        format!("call {}", case.test),
+                        format!("brfalse {next}"),
+                    ]);
+                    if let Some(Some(name)) = binding {
+                        if self.bindings.contains_key(&name.text) {
+                            return Err(name.error("duplicate binding"));
+                        }
+                        let (payload, accessor) = case.payload.as_ref().unwrap();
+                        self.body.extend([
+                            format!("ldloc {scrutinee}"),
+                            format!("call {}", case.extract),
+                            format!("call {accessor}"),
+                        ]);
+                        let index = self.temp(payload);
+                        self.body.push(format!("stloc {index}"));
+                        self.bindings.insert(
+                            name.text.clone(),
+                            Binding {
+                                ty: payload.clone(),
+                                mutable: false,
+                                load: format!("ldloc {index}"),
+                                address: format!("ldloca {index}"),
+                                scoped: true,
+                            },
+                        );
+                    }
+                }
+            }
+            let exits = match &arm.body {
+                ArmBody::Expression(expression) => {
+                    let actual = self.expression(expression)?;
+                    if statement {
+                        self.body.push("pop".into());
+                    } else {
+                        if let Some(expected) = &result_type {
+                            self.require(&actual, expected, &expression.at)?;
+                        } else {
+                            result_type = Some(actual.clone());
+                            result_local = Some(self.temp(&actual));
+                        }
+                        self.body.push(format!("stloc {}", result_local.unwrap()));
+                    }
+                    false
+                }
+                ArmBody::Block(body) => {
+                    if !statement {
+                        return Err(at.error("match expressions require expression arms"));
+                    }
+                    self.statements(body)?
+                }
+            };
+            self.scope -= 1;
+            self.bindings = saved;
+            all_exit &= exits;
+            if !exits {
+                self.body.push(format!("br {end}"));
+            }
+            self.body.push(format!("{next}:"));
+        }
+        if !wildcard && seen.len() != cases.len() {
+            return Err(value.at.error("non-exhaustive match"));
+        }
+        // Even exhaustive source matches must fault on a malformed carrier.
+        self.body
+            .push("fault \"invalid union case in match\"".into());
+        if !all_exit {
+            self.body.push(format!("{end}:"));
+            if let Some(index) = result_local {
+                self.body.push(format!("ldloc {index}"));
+            }
+        }
+        Ok((result_type.unwrap_or(Ty::Void), all_exit))
     }
     fn label(&mut self) -> String {
         let label = format!("NeoLabel{}", self.labels);
@@ -1060,8 +1324,12 @@ impl Lowerer<'_> {
                     returned = true;
                 }
                 Stmt::Expression(expression) => {
-                    self.expression(expression)?;
-                    self.body.push("pop".into());
+                    if let ExprKind::Match(value, arms) = &expression.kind {
+                        returned = self.match_arms(value, arms, true)?.1;
+                    } else {
+                        self.expression(expression)?;
+                        self.body.push("pop".into());
+                    }
                 }
             }
         }
@@ -1134,6 +1402,9 @@ pub fn lower_to_il(source: &str) -> Result<String, Fault> {
                 "unit",
                 "Console",
                 "WriteLine",
+                "System",
+                "Option",
+                "Result",
             ]
             .contains(&name.text.as_str())
         {

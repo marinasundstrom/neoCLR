@@ -1,7 +1,7 @@
 # Upcoming Neo slices
 
-Status: control flow is implemented on the [Neo foundation](neo.md). Union matching
-and the console calculator remain planned. The [implemented grammar](neo-grammar.md)
+Status: control flow and union matching are implemented on the [Neo foundation](neo.md).
+The console calculator remains planned. The [implemented grammar](neo-grammar.md)
 tracks shipped syntax only.
 
 Neo is a small companion compiler for testing and explaining neoCLR. Maintain it as
@@ -32,14 +32,14 @@ zero-iteration loops, nested break/continue, and boundary ranges. Verify that th
 runtime instruction limit still stops an unbounded loop. Include negative scope,
 condition-type and missing-return cases.
 
-## 2. Patterns and union-aware match
+## 2. Patterns and union-aware match — implemented
 
 Add match expressions and match statements so callers can handle ordinary union
 results explicitly. Begin with case patterns, payload bindings and a wildcard,
 covering the library's Option and Result contracts. Add only the closed generic type
 and library-call binding support needed to reach those APIs.
 
-Proposed expression spelling, subject to implementation review:
+Implemented expression spelling:
 
 ```text
 let value = parsed match {
@@ -52,7 +52,8 @@ An expression produces a value with a consistent arm result type; statement arms
 perform actions and allow ordinary control flow. Start with exhaustive coverage in
 both forms, including a wildcard where needed. Define arm-local bindings, single
 evaluation of the scrutinee, duplicate/unreachable cases and safe payload extraction.
-Union coverage must come from a validated contract, not guesses based on type names.
+Coverage is derived from bundled System union markers, constructors and typed public
+accessors. User-declared unions are not yet exposed.
 Guards, arbitrary destructuring, subtype patterns and open hierarchy coverage can wait.
 
 Use existing union/library operations where sufficient. Audit their representation

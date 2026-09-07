@@ -2880,3 +2880,25 @@ loop control, short-circuit effects, scope/lifetime diagnostics and instruction 
 A stress test exposed excessive recursive parser stack use; statement nesting is now
 bounded at 32 and rejected cleanly. Clippy across all targets, formatting and whitespace
 checks passed.
+
+## Neo union-aware matching — 2026-09-07
+
+Implemented exhaustive match expressions and statements with named cases, copied
+payload bindings, discards and wildcard coverage. Scrutinees evaluate once. Arms have
+local scopes; expressions require one exact result type, while statement blocks may
+return or transfer loop control. Nested matches handle Option/Result and error unions.
+Coverage requires bundled System's union marker, constructor cases and typed public
+accessors, not a source name convention alone. Lowering uses ordinary library calls
+and branches, including a defensive fault for malformed carriers; no new VM opcodes.
+
+Added closed generic/qualified type annotations and exact-signature public static
+System calls, with a parse/error example and matching grammar. Parser recursion now
+shares a limit of 32 across types, expressions and statements after deeper expression
+stress coverage exposed excessive host-stack use; expression tree depth remains 128.
+
+Validation: 18 tests passed across the Neo foundation, control flow and corrected
+matching targets. Tests cover input/EOF/unavailable, invalid/overflow parse cases,
+exhaustiveness, payload/type/scope failures, single evaluation, loop control and frame
+escape versus valid heap-backed returns. Conditional frame escapes remain runtime
+checked rather than universally diagnosed statically. Clippy across all targets with
+warnings denied, formatting and whitespace checks passed.

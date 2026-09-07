@@ -127,6 +127,8 @@ The [Neo grammar](neo-grammar.md) gives the implemented EBNF and lexical rules.
 - Int32 arithmetic with `+`, `-`, `*`, `/`, parentheses and unary minus; runtime arithmetic semantics apply.
 - Integer, Boolean and double-quoted string literals; strings use JSON-style escapes.
 - Explicit references, dereferencing, heap construction and typed returns.
+- Exhaustive union match expressions/statements, case payload bindings and wildcards.
+- Closed generic type annotations and qualified public static bundled System calls.
 - `Console.WriteLine` for int and string. `import System.Console.*` enables unqualified `WriteLine`.
 - `if`/`else`, `while`, integer-range `for`, `loop`, `break` and `continue`.
 - Int32 comparisons, Int32/Boolean equality, and short-circuit `&&`/`||` with `!`.
@@ -146,8 +148,8 @@ Reference-valued fields may contain heap-backed references; scoped targets in th
 fields fault at runtime. This compiler does not perform complete static lifetime
 analysis, so some invalid programs fail only during execution.
 
-Uninitialized bindings, generics, overload declarations, instance methods,
-inheritance, pattern matching, native pointers/interop, pinning and full Raven syntax
+Uninitialized bindings, generic declarations, overload declarations, instance methods,
+inheritance, general patterns, native pointers/interop, pinning and full Raven syntax
 are not implemented. It does not expose the entire standard library yet. These are
 candidate future slices, chosen around end-to-end scenarios rather than added as a
 complete language up front.
@@ -192,3 +194,29 @@ scope does not imply block cleanup. To avoid aliases to reused block-local value
 this subset rejects taking their addresses. Put addressed values in an outer
 function local or use managed heap storage. Field mutation within a block and
 references to heap objects or existing outer values remain supported.
+
+## Union results and matching
+
+Run `cargo run -- run examples/source/match.neo`. It prints `Invalid number`, then
+`42`. `Int32.Parse(text)` returns `Result<int, System.Int32ParseError>`; no exception
+handling or boxing is needed to select its result:
+
+```text
+let value = Int32.Parse("42") match {
+    Ok(let number) => number,
+    Error(_) => 0
+}
+```
+
+Use block arms in a standalone match statement for actions, return or loop control.
+Both forms require all cases to be covered; `_` can cover the remainder. Payload
+bindings are immutable copies scoped to their arm. Match a nested union with another
+match, as demonstrated by `Console.ReadByte()` returning
+`Result<Option<byte>, System.IO.ConsoleReadError>`. Without a supplied console,
+input reports the recoverable Unavailable case. The CLI supplies process stdin/stdout.
+
+Qualified public static System methods bind by exact parameter types; `Console` and
+`Int32` abbreviate their System names. Current union coverage comes from the trusted
+bundled library's marker, constructors and typed case accessors. Runtime faults remain
+separate from recoverable results, including malformed union representations. See the
+[grammar and matching rules](neo-grammar.md) for limits.
