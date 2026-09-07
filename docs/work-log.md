@@ -2163,3 +2163,14 @@ Validation: preview walkthrough, verifier (including all IL samples), console an
 file-input suites pass. Formatting, clippy with warnings denied and diff checks pass
 on macOS ARM64. CI already runs these integration tests through cargo test --locked;
 no remote run is claimed here.
+
+## Tagged unions and try-get design direction
+
+Clarified that the pointer carrier already uses a Byte discriminator, while current
+System.Value-backed carriers query the concrete stored wrapper type. Recorded proposed
+ordinary copying and borrowing try-get contracts and distinguished them from .NET's
+out-value non-boxing pattern, checked against Microsoft's union reference. A tag
+selects interpretation but does not establish pointer validity or ownership. Explicit
+pointer output slots can support an experiment without union opcodes or managed out
+parameter semantics. These members remain proposals; no runtime behavior changed.
+Validation: documentation review and git diff --check.

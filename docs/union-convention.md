@@ -144,3 +144,44 @@ GetOk/GetErr accessors have been removed. Constructors now accept only the neste
 case family listed above, and predicates test those same concrete identities. Rebuild
 System and applications together: this changes member/type rows as well as available
 signatures. The obsolete names are not compatibility aliases. JSON format 4 also removes the separate bootstrap VM representation.
+
+## Tagged storage and prospective try-get access
+
+A union's discriminator belongs to its ordinary carrier representation. It does not
+need a VM union category or instruction. The pointer-backed experiment stores Byte
+Tag plus Void* Payload; its two factories set distinct tags even when T equals E.
+The current System carriers instead distinguish the concrete wrapper type held by
+System.Value. They do not yet use numeric tags. Their storage will change as part of
+the System.Value retirement, not through an invisible change in copy semantics.
+
+The tag tells the implementation how to interpret the payload. It cannot establish
+pointer liveness, alignment, initialization or correctness of a tag/pointer pair
+constructed by arbitrary low-level code. Normal access checks and caller obligations
+still apply. A null pointer does not select a union case.
+
+Consider adding ordinary try-get members after the current sample-packaging slice.
+The [.NET non-boxing access pattern](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/union#non-boxing-access-pattern)
+returns Boolean and supplies a case value through an out parameter. It avoids boxing
+during extraction; it does not inherently borrow an address into the carrier.
+neoCLR should distinguish these two possible contracts:
+
+| Proposed method shape | Matching tag | Different tag |
+| --- | --- | --- |
+| TryGetOk(T* destination) -> Boolean | Copy the payload into caller-provided storage; return true | Return false and leave destination unchanged |
+| TryGetOkPointer(T** destination) -> Boolean | Write the borrowed payload pointer; return true | Write a null pointer; return false |
+
+These names and contracts are proposals, not implemented members or a finalized
+compiler convention. Use separate case names (Ok/Error) or distinct case-wrapper
+parameter types to avoid signature collisions when payload types coincide. The
+copying form deliberately makes no generic default-value or out-assignment promise
+on failure. A language can enforce that the caller reads the output only after success.
+The borrowing form gives no ownership and no lifetime extension; true identifies the
+case, not validity of the returned address. A matching stale or null pointer may be
+returned without dereferencing it, and later access can Fault. Output storage itself
+must be valid whenever the method writes it.
+
+Existing T* parameters, localloc, ptr.cast and stobj can express these output-storage
+operations as ordinary IL. CLR-style managed byrefs, out metadata, address-taking of
+ordinary locals and flow-sensitive out initialization are separate features that are
+not required to experiment with explicit pointer output slots. No union-specific
+instruction is needed for a Boolean result, tag check or output store.
