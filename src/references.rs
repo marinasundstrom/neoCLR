@@ -89,7 +89,11 @@ fn check_named(linked: &Module, source: &Module, name: &str) -> Result<(), Fault
     check_module(source, &owner.module)
 }
 
-fn check_call(linked: &Module, source: &Module, target: &FunctionRef) -> Result<(), Fault> {
+pub(crate) fn check_call(
+    linked: &Module,
+    source: &Module,
+    target: &FunctionRef,
+) -> Result<(), Fault> {
     let function = crate::vm::resolve(linked, target)?;
     let definition = function
         .definition

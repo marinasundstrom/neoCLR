@@ -586,17 +586,33 @@ pub unsafe fn run_with_native(
 pub(crate) fn interpret(
     module: &Module,
     limits: Limits,
-    mut native_libraries: Option<crate::interop::NativeLibraries>,
+    native_libraries: Option<crate::interop::NativeLibraries>,
 ) -> Result<Execution, Fault> {
-    if limits.frames == 0 {
-        return Err(Fault::new("frame limit exceeded"));
-    }
     let entry = module
         .functions
         .iter()
         .position(|f| f.name == module.entry && f.parameters.is_empty() && !f.instance)
         .ok_or_else(|| Fault::new("missing entry"))?;
-    let mut frames = vec![Frame::new(module.functions[entry].clone(), vec![])];
+    interpret_function(
+        module,
+        module.functions[entry].clone(),
+        vec![],
+        limits,
+        native_libraries,
+    )
+}
+
+pub(crate) fn interpret_function(
+    module: &Module,
+    function: crate::metadata::Function,
+    arguments: Vec<Value>,
+    limits: Limits,
+    mut native_libraries: Option<crate::interop::NativeLibraries>,
+) -> Result<Execution, Fault> {
+    if limits.frames == 0 {
+        return Err(Fault::new("frame limit exceeded"));
+    }
+    let mut frames = vec![Frame::new(function, arguments)];
     let mut heap: Vec<Value> = vec![];
     let mut memory = crate::memory::PointerHeap::default();
     let mut output = vec![];

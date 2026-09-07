@@ -161,6 +161,11 @@ snapshot shared by interpreter execution, verification, and type identity querie
 It supports repeated entry-point execution with fresh state. This establishes a
 preparation boundary without specifying a native hosting ABI or backend interface.
 
+[Resolved function handles](invocation.md) now permit repeated static IL calls with
+exact primitive input Values, including closed generic methods and revision-qualified
+targets. This is a Rust embedding subset with fresh execution state. Instance receivers,
+aggregate inputs, persistent sessions, and a native hosting ABI remain pending.
+
 A minimal hosting milestone should load a module, resolve a function by identity and
 signature, invoke it repeatedly with typed inputs, return values/Faults, and provide
 host services. Value/handle lifetimes, resource limits, cancellation, callbacks,

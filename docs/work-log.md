@@ -1091,3 +1091,33 @@ resource limits are unchanged.
 Validation: all 275 integration tests pass on macOS ARM64; formatting, clippy with
 warnings denied, and diff checks pass. CLI tests run the scoped and revision-pinned
 samples and confirm their outputs. Linux and Windows execution remain for CI.
+
+
+## 2026-09-07 — Resolved static function invocation
+
+Added LoadedProgram::resolve_function and borrowing LoadedFunction handles for closed
+static IL functions. Resolution observes signatures, scoped owners, explicit revision
+rows, and the root's direct reference list. Handles retain their selected specialized
+function and expose its identity and signature without permitting mutation.
+
+Invocation accepts exact primitive storage Values, including String, Error, and Void;
+guest argument loads still use the normal evaluation-stack conversions. Argument count
+and concrete value checks happen before execution. Each invocation owns fresh state
+and limits, uses the existing interpreter, and starts directly in the target function
+without a synthetic caller frame or instruction charge. Faults leave the handle reusable.
+An explicit unsafe variant enables native imports under the existing trust contract.
+
+Instance receivers, aggregate/pointer/Ref inputs, and direct native declaration targets
+remain unsupported; IL wrappers can call native declarations. Outputs retain the existing
+Execution ownership model and can include guest-created aggregates/Result values. This
+is a Rust embedding subset, not a native ABI, persistent session, or backend interface.
+
+Added six tests for overload selection and reuse, exact Byte/Single/Void argument rules,
+invalid arguments, guest budget accounting and Fault recovery, generic/revision/scoped
+resolution, reference restrictions, unsupported targets, and per-invocation output and
+Result values. Added an entry-point-free library and Rust invocation sample; updated
+hosting and architecture documentation.
+
+Validation: all 281 integration tests pass on macOS ARM64; formatting, clippy with
+warnings denied, and diff checks pass. The invocation sample prints Hello, world!,
+Int32(42), and Int32(60). Linux and Windows execution remain for CI.

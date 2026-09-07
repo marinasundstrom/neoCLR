@@ -31,8 +31,9 @@ Every `run` starts fresh frames, output, bootstrap heap, and native allocation t
 with the supplied resource limits. A prior result or Fault does not change the loaded
 snapshot. Returned execution values and allocations belong to their own Execution;
 pointer/Ref values from one execution are not transferable handles into another.
-There is no persistent guest state, argument passing, cancellation, or arbitrary
-function invocation API in this slice.
+[Resolved function handles](invocation.md) additionally support primitive arguments
+to static IL functions without an entry point. Persistent guest state, cancellation,
+instance invocation, and aggregate input transfer remain pending.
 
 Native imports remain disabled in safe `run`. The separate unsafe `run_with_native`
 method has the same C ABI and native-code trust requirements as the existing helper.

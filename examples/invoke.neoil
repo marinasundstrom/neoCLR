@@ -1,0 +1,15 @@
+.module Invocation
+.references ()
+
+.function Greet(String text) -> Void
+    ldarg text
+    call System.Console::WriteLine(String)
+    ret
+.end
+
+.function Double(Int32 value) -> Int32
+    ldarg value
+    ldc.i4 2
+    mul
+    ret
+.end
