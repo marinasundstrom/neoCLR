@@ -55,7 +55,7 @@ impl LoadedProgram {
         crate::type_identity::resolve(&self.module, ty)
     }
 
-    /// Resolve a closed static IL function with primitive input parameters.
+    /// Resolve a closed static IL function with owned primitive/record input parameters.
     /// The returned handle borrows this immutable program and needs no entry point.
     pub fn resolve_function(
         &self,
@@ -82,11 +82,7 @@ impl LoadedProgram {
                 "host invocation currently requires an IL function; use an IL wrapper for native declarations",
             ));
         }
-        if !function.parameters.iter().all(Type::is_primitive) {
-            return Err(Fault::new(
-                "host invocation currently requires primitive input parameters",
-            ));
-        }
+        let inputs = crate::input::resolve(&self.module, &function.parameters)?;
         let definition = function
             .definition
             .clone()
@@ -95,6 +91,7 @@ impl LoadedProgram {
             program: self,
             function,
             definition,
+            inputs,
         })
     }
 
@@ -136,6 +133,7 @@ pub struct LoadedFunction<'program> {
     program: &'program LoadedProgram,
     function: crate::metadata::Function,
     definition: crate::metadata::MemberId,
+    inputs: Vec<crate::input::Input>,
 }
 
 impl LoadedFunction<'_> {
@@ -149,9 +147,9 @@ impl LoadedFunction<'_> {
         &self.function.returns
     }
 
-    /// Invoke with exact primitive storage values and fresh guest state.
+    /// Invoke with validated owned storage values and fresh guest state.
     pub fn invoke(&self, arguments: Vec<crate::Value>, limits: Limits) -> Result<Execution, Fault> {
-        self.check_arguments(&arguments)?;
+        let arguments = self.import_arguments(arguments)?;
         crate::vm::interpret_function(
             &self.program.module,
             self.function.clone(),
@@ -172,7 +170,7 @@ impl LoadedFunction<'_> {
         arguments: Vec<crate::Value>,
         limits: Limits,
     ) -> Result<Execution, Fault> {
-        self.check_arguments(&arguments)?;
+        let arguments = self.import_arguments(arguments)?;
         crate::vm::interpret_function(
             &self.program.module,
             self.function.clone(),
@@ -182,36 +180,28 @@ impl LoadedFunction<'_> {
         )
     }
 
-    fn check_arguments(&self, arguments: &[crate::Value]) -> Result<(), Fault> {
+    fn import_arguments(&self, arguments: Vec<crate::Value>) -> Result<Vec<crate::Value>, Fault> {
         let fault = |message| Fault {
             message,
             function: Some(self.function.name.clone()),
             instruction: None,
         };
-        if arguments.len() != self.function.parameters.len() {
+        if arguments.len() != self.inputs.len() {
             return Err(fault(format!(
                 "invocation expected {} arguments, got {}",
-                self.function.parameters.len(),
+                self.inputs.len(),
                 arguments.len()
             )));
         }
-        for (index, (argument, expected)) in
-            arguments.iter().zip(&self.function.parameters).enumerate()
-        {
-            if matches!(
-                argument,
-                crate::Value::Object { .. }
-                    | crate::Value::Union { .. }
-                    | crate::Value::Pointer(_)
-                    | crate::Value::Reference { .. }
-            ) || argument.ty() != *expected
-            {
-                return Err(fault(format!(
-                    "invocation argument {index}: expected {expected:?}, got {:?}",
-                    argument.ty()
-                )));
-            }
-        }
-        Ok(())
+        arguments
+            .into_iter()
+            .zip(&self.inputs)
+            .enumerate()
+            .map(|(index, (value, schema))| {
+                schema.import(&self.program.module, value).map_err(|error| {
+                    fault(format!("invocation argument {index}: {}", error.message))
+                })
+            })
+            .collect()
     }
 }

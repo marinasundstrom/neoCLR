@@ -1121,3 +1121,29 @@ hosting and architecture documentation.
 Validation: all 281 integration tests pass on macOS ARM64; formatting, clippy with
 warnings denied, and diff checks pass. The invocation sample prints Hello, world!,
 Int32(42), and Int32(60). Linux and Windows execution remain for CI.
+
+
+## 2026-09-07 — Validated owned record inputs
+
+Extended resolved static function invocation to accept owned record inputs, including
+nested and closed generic records. Function resolution builds a schema from substituted
+fields, independently of native layout. Primitive leaves remain exact storage Values.
+Import validates nominal tags, concrete value shapes, field counts, and nested values
+before execution, and checks/normalizes scoped record tags for the loaded representation.
+
+Recursive by-value schemas are rejected. Import schemas are bounded to depth 64 and
+16,384 total nodes across input parameters, in addition to existing signature limits.
+Stored pointer, Ref, and bootstrap union inputs remain unsupported; unused phantom
+generic arguments do not imply stored pointers. Record results can be imported again
+as owned data against the destination schema, not as preserved execution identities.
+No constructors, lifetime extension, or implicit memory management are introduced.
+
+Added six tests for independent record updates and result reuse, malformed/fake tags
+and fields, scoped tag checks, nested generic Byte and Void fields, nested unsupported
+storage, phantom type arguments, recursion, and schema depth. Updated the previous
+primitive-only rejection test and added a record invocation sample. Refreshed API,
+architecture, and ownership-boundary documentation.
+
+Validation: all 287 integration tests pass on macOS ARM64; formatting, clippy with
+warnings denied, and diff checks pass. The record sample preserves the original sum
+Int32(42) while its updated copy produces Int32(62). Linux and Windows remain for CI.

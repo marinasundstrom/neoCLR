@@ -1,0 +1,23 @@
+.module RecordInputs
+.references ()
+
+.type Point
+    .field X Int32
+    .field Y Int32
+.end
+
+.function Sum(Point point) -> Int32
+    ldarg point
+    ldfld Point::X
+    ldarg point
+    ldfld Point::Y
+    add
+    ret
+.end
+
+.function WithX(Point point, Int32 x) -> Point
+    ldarg point
+    ldarg x
+    stfld Point::X
+    ret
+.end

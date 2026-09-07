@@ -19,16 +19,16 @@ parameter, and return-type accessors expose the resolved contract without mutati
 
 ## Argument and execution contract
 
-This subset accepts primitive input types only: numeric types, Boolean, String, Error,
-and inhabited Void. Arguments must be their exact storage Values. A Byte parameter
+Inputs include primitives (numeric types, Boolean, String, Error, and inhabited Void)
+and [validated owned records](record-inputs.md). Arguments must be their exact storage Values. A Byte parameter
 requires Value::Byte, not Value::Int32; Single requires Value::Single, not Double.
 Guest ldarg still performs the existing evaluation-stack normalization, and stores
 and returns retain their existing conversions. This distinguishes the typed host
 boundary from the normalized evaluation stack used by IL call instructions.
 
 Arity and argument values are checked before executing any instruction. A Void
-parameter still requires one Value::Void argument. Records, union values, raw pointers,
-and prototype Ref values cannot be supplied as arguments in this slice. Instance
+parameter still requires one Value::Void argument. Union values, raw pointers,
+and prototype Ref values cannot be supplied as arguments, including inside records. Instance
 receivers and direct native/InternalCall targets are rejected during resolution; IL
 wrappers can call native declarations using the existing instruction contracts.
 
@@ -42,8 +42,8 @@ The result is the existing Execution, with a precise stored return Value. Return
 are not restricted to primitive types: a guest function may produce records, Result,
 Option, or pointers using the runtime's implemented operations. Its returned allocations
 and native-library retention belong to that Execution. These results are not transferable
-guest handles into a later invocation. Persistent state and aggregate input marshalling
-need separate lifetime and validity contracts.
+guest handles into a later invocation. Owned primitive/record results can be imported
+as data with validation; pointer/Ref transfer and persistent state need separate contracts.
 
 Safe invoke disables native imports. The separate unsafe invoke_with_native method
 retains the existing native ABI/trust requirements. Foreign code may maintain its own
