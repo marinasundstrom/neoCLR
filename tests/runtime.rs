@@ -1,8 +1,4 @@
-use neoclr::{
-    Limits, Value, assemble, load,
-    metadata::{Case, Type},
-    run,
-};
+use neoclr::{Limits, Value, assemble, load, metadata::Type, run};
 
 fn program(returns: &str, body: &str) -> neoclr::Module {
     assemble(&format!(
@@ -39,10 +35,7 @@ fn feature_tour() {
         execution.output,
         ["neoCLR feature tour", "All feature checks passed."]
     );
-    assert_eq!(
-        execution.value,
-        Value::result(Value::Void, Type::Void, Type::Error, Case::Ok)
-    );
+    assert_eq!(execution.value, ordinary_success());
     assert_eq!(execution.heap.len(), 1);
     assert_eq!(
         execution.heap[0],
@@ -56,20 +49,23 @@ fn feature_tour() {
 #[test]
 fn void_is_a_value_and_a_generic_argument() {
     assert_eq!(eval("Void", "ldvoid\nret"), Value::Void);
-    let some = eval("Option<Void>", "ldvoid\nsome\nret");
-    let none = eval("Option<Void>", "none Void\nret");
+    let some = eval(
+        "System.Option<Void>",
+        "ldvoid\nnewobj instance System.Option.Some<Void>::.ctor(Void)\nnewobj instance System.Option<Void>::.ctor(System.Option.Some<Void>)\nret",
+    );
+    let none = eval(
+        "System.Option<Void>",
+        "newobj instance System.Option.None::.ctor()\nnewobj instance System.Option<Void>::.ctor(System.Option.None)\nret",
+    );
     assert_eq!(some.ty(), none.ty());
     assert_ne!(some, none);
     assert_eq!(
-        eval("Result<Void,Void>", "ldvoid\nok Void\nret").ty(),
-        Type::Result(Box::new(Type::Void), Box::new(Type::Void))
+        eval("System.Result<Void,Void>", "ldvoid\nnewobj instance System.Result.Ok<Void>::.ctor(Void)\nnewobj instance System.Result<Void,Void>::.ctor(System.Result.Ok<Void>)\nret").ty(),
+        Type::Constructed { definition: "System.Result".into(), arguments: vec![Type::Void, Type::Void] }
     );
     assert_eq!(
-        eval("Option<Result<Void,Error>>", "ldvoid\nok Error\nsome\nret").ty(),
-        Type::Option(Box::new(Type::Result(
-            Box::new(Type::Void),
-            Box::new(Type::Error)
-        )))
+        eval("System.Option<System.Result<Void,Error>>", "ldvoid\nnewobj instance System.Result.Ok<Void>::.ctor(Void)\nnewobj instance System.Result<Void,Error>::.ctor(System.Result.Ok<Void>)\nnewobj instance System.Option.Some<System.Result<Void,Error>>::.ctor(System.Result<Void,Error>)\nnewobj instance System.Option<System.Result<Void,Error>>::.ctor(System.Option.Some<System.Result<Void,Error>>)\nret").ty(),
+        Type::Constructed { definition: "System.Option".into(), arguments: vec![Type::Constructed { definition: "System.Result".into(), arguments: vec![Type::Void, Type::Error] }] }
     );
 }
 
@@ -132,8 +128,6 @@ fn invalid_execution_faults_with_location() {
             "ldc.i4 1\nldvoid\nadd\nret",
             "matching integer types",
         ),
-        ("Void", "none Void\nldcase Some\nret", "case mismatch"),
-        ("Void", "none Void\nis.case Ok\nret", "does not belong"),
         ("Void", "ldvoid\nheap.load\nret", "requires Ref"),
         (
             "Void",
@@ -416,12 +410,6 @@ fn all_implemented_opcodes_have_a_sample() {
         "heap.new",
         "heap.load",
         "heap.store",
-        "some",
-        "none",
-        "ok",
-        "err",
-        "is.case",
-        "ldcase",
         "error",
         "fault",
     ] {
@@ -454,4 +442,9 @@ fn ordinary_arithmetic_preserves_cil_wrapping_behavior() {
         eval("Int32", "ldc.i4 2147483647\nldc.i4 2\nmul\nret"),
         Value::Int32(-2)
     );
+}
+
+fn ordinary_success() -> Value {
+    let module = assemble(".module Expected\n.entry Main\n.function Main() -> System.Result<Void,Error>\nldvoid\nnewobj instance System.Result.Ok<Void>::.ctor(Void)\nnewobj instance System.Result<Void,Error>::.ctor(System.Result.Ok<Void>)\nret\n.end").unwrap();
+    neoclr::run(&module, Limits::default()).unwrap().value
 }

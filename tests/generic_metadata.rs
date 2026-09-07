@@ -2,7 +2,7 @@ use neoclr::{Limits, assemble, assembler::parse_type, load, metadata::Type, run}
 
 #[test]
 fn generic_parameter_names_map_to_indices_and_closed_fields_substitute() {
-    let source = ".module Test\n.type Pair<Left, !1>\n.field First Left\n.field Second !1\n.field Wrapped Result<Option<Left>, !1>\n.end";
+    let source = ".module Test\n.type Pair<Left, !1>\n.field First Left\n.field Second !1\n.field Wrapped System.Result<System.Option<Left>, !1>\n.end";
     let module = assemble(source).unwrap();
     assert_eq!(
         module.types[0].generic_parameters,
@@ -17,12 +17,12 @@ fn generic_parameter_names_map_to_indices_and_closed_fields_substitute() {
     assert_eq!(fields[1].ty, Type::Error);
     assert_eq!(
         fields[2].ty,
-        parse_type("Result<Option<Void>, Error>").unwrap()
+        parse_type("System.Result<System.Option<Void>, Error>").unwrap()
     );
     let numeric = assemble(
         &source
             .replace(".field First Left", ".field First !0")
-            .replace("Option<Left>", "Option<!0>"),
+            .replace("System.Option<Left>", "System.Option<!0>"),
     )
     .unwrap();
     assert_eq!(
@@ -33,7 +33,7 @@ fn generic_parameter_names_map_to_indices_and_closed_fields_substitute() {
 
 #[test]
 fn nested_constructed_fields_substitute_without_expanding_recursive_definitions() {
-    let module = assemble(".module Test\n.type Node<T>\n.field Next Node<T>*\n.field Value T\n.end\n.type Wrapper<U>\n.field Node Node<Option<U>>\n.end").unwrap();
+    let module = assemble(".module Test\n.type Node<T>\n.field Next Node<T>*\n.field Value T\n.end\n.type Wrapper<U>\n.field Node Node<System.Option<U>>\n.end").unwrap();
     let fields = module
         .instantiated_fields(&parse_type("Node<Int32>").unwrap())
         .unwrap();
@@ -41,7 +41,10 @@ fn nested_constructed_fields_substitute_without_expanding_recursive_definitions(
     let fields = module
         .instantiated_fields(&parse_type("Wrapper<Void>").unwrap())
         .unwrap();
-    assert_eq!(fields[0].ty, parse_type("Node<Option<Void>>").unwrap());
+    assert_eq!(
+        fields[0].ty,
+        parse_type("Node<System.Option<Void>>").unwrap()
+    );
 }
 
 #[test]
@@ -55,7 +58,7 @@ fn bad_arity_open_context_and_duplicate_parameters_are_rejected() {
         ".type Box<T>\n.end\n.function F(Box<!0> value) -> Void\nldvoid\nret\n.end",
         ".type Box\n.end\n.function F(Box<Int32> value) -> Void\nldvoid\nret\n.end",
         ".type System.Int32<T>\n.end",
-        ".type Option<T>\n.end",
+        ".type System.Option<T>\n.end",
         ".type Box<T>\n.end\n.function F() -> Void\nnewobj Box\npop\nldvoid\nret\n.end",
     ] {
         assert!(
@@ -85,14 +88,17 @@ fn loader_checks_generic_metadata_and_accepts_legacy_definitions() {
 
 #[test]
 fn substitution_rejects_missing_arguments_and_does_not_mutate_definitions() {
-    let ty = parse_type("Result<!0, Option<!1>>").unwrap();
+    let ty = parse_type("System.Result<!0, System.Option<!1>>").unwrap();
     assert!(ty.substitute_type_parameters(&[Type::Int32]).is_err());
     assert_eq!(
         ty.substitute_type_parameters(&[Type::Int32, Type::Void])
             .unwrap(),
-        parse_type("Result<Int32, Option<Void>>").unwrap()
+        parse_type("System.Result<Int32, System.Option<Void>>").unwrap()
     );
-    assert_eq!(ty, parse_type("Result<!0, Option<!1>>").unwrap());
+    assert_eq!(
+        ty,
+        parse_type("System.Result<!0, System.Option<!1>>").unwrap()
+    );
 }
 
 #[test]

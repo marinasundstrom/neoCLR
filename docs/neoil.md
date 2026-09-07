@@ -1,4 +1,4 @@
-# neoIL assembler reference, format 3
+# neoIL assembler reference, format 4
 
 The assembler converts readable neoIL into the JSON module format understood by
 the interpreter. This is a prototype assembler, not an ECMA-335 `ilasm` replacement.
@@ -237,7 +237,7 @@ normalization; other checks use exact type equality. See [integer storage](integ
 
 ## Opcode status inventory
 
-The instruction table above is the complete format-3 opcode inventory. Their
+The instruction table above is the complete format-4 opcode inventory. Their
 implementation status is grouped here so additions and temporary operations are
 visible during Preview 1 review.
 
@@ -246,7 +246,6 @@ visible during Preview 1 review.
 | CLI-aligned | `ldc.*`, `ldarg`, `starg`, `ldloc`, `stloc`, arithmetic, comparisons, branches, `call`, `ret`, `newobj`, field access, conversions, `sizeof`, `alignof`, indirect memory access, `cpobj`, `initobj`, `cpblk`, `initblk` | Familiar CLI concepts with neoCLR's documented typed stack and fault rules |
 | neoCLR explicit memory | `localloc`, `heap.alloc`, `heap.free`, `ptr.null`, `ptr.cast`, `ptr.add`, `ptr.fromint`, `ldflda` | Explicit allocation, address and lifetime capabilities |
 | neoCLR value storage | `value.pack`, `value.is`, `value.unpack` | Visible erased storage; never implicit boxing |
-| Temporary bootstrap | `some`, `none`, `ok`, `err`, `is.case`, `ldcase` | Compatibility operations scheduled for removal after ordinary Option/Result migration |
 
 The status labels describe the current prototype, not a promise that every backend
 already exists. New instructions must be added to both tables, assigned a status,
@@ -262,12 +261,6 @@ and given a format-version and runtime-service note when applicable.
 | `heap.new` | `T → Ref<T>` | Explicitly allocate shared identity |
 | `heap.load` | `Ref<T> → T` | Copy heap contents |
 | `heap.store` | `Ref<T>,T → Void` | Replace heap contents |
-| `some` | `T → Option<T>` | Construct Some |
-| `none T` | `→ Option<T>` | Construct None with explicit element type |
-| `ok E` | `T → Result<T,E>` | Construct Ok; operand specifies error type |
-| `err T` | `E → Result<T,E>` | Construct Err; operand specifies success type |
-| `is.case Case` | `Union → Boolean` | Test Some/None or Ok/Err; invalid case family Faults |
-| `ldcase Case` | `Union → Payload` | Extract matching case; mismatch Faults; None yields Void |
 | `error "code"` | `→ Error` | Construct bootstrap error value |
 | `fault "message"` | `→ termination` | End guest execution |
 
@@ -284,8 +277,8 @@ types. Signedness comes from the opcode, not the type name. This subset does not
 implement full CIL evaluation-stack normalization or mixed-width arithmetic. See
 [native integers](native-integers.md) for conversions and address tracking.
 
-Use `dup; is.case …; brtrue …` to preserve a union for extraction on a matching
-branch. There is no implicit error propagation or unsafe successful-case assumption.
+Use ordinary carrier predicates, conditional branches and checked case accessors.
+Format 4 removes some/none/ok/err/is.case/ldcase and the special Option/Result encodings.
 
 ## Runtime library contracts
 
@@ -335,7 +328,7 @@ The parameter array is required, including `[]` for zero arguments. Return types
 remain on function definitions/runtime binding contracts. Format 3 adds declaring-type and instance-call semantics. Older modules and System
 libraries must be reassembled. Pointer signatures use `{"Ptr":"Int32"}` and imply
 no ownership or automatic memory management. Pointer instructions are additive
-format-3 opcodes; older runtimes reject them as unknown instructions. See
+format-4 opcodes; older runtimes reject them as unknown instructions. See
 [heap and pointers](heap-and-pointers.md) for layout, native-address representation,
 checked interpreter restrictions, and the remaining native pointer capabilities.
 
@@ -349,7 +342,7 @@ slots are unnamed. For example:
 {"parameters":["String"],"parameter_names":["value"],"locals":["Int32"],"local_names":["count"]}
 ```
 
-This is an additive format-3 metadata extension. Earlier format-3 artifacts without
+This is an additive format-4 metadata extension. Earlier format-4 artifacts without
 names still load; serialized opcode operands are unchanged. The eventual binary
 backend can map parameter names to parameter metadata and local names to appropriate
 local/debug metadata without putting names into instruction operands.
@@ -390,7 +383,7 @@ and preserve older stack entries. These zero/null tests follow the familiar
 
 String, records, Error, unions, Void, and floating-point values are not conditions.
 neoCLR does not infer reference semantics for value types based on their .NET names,
-or infer truth from string length or Option/Result cases. Use `is.case` for unions
+or infer truth from string length or Option/Result cases. Use ordinary discriminator methods for unions
 and explicit comparisons for floats. Managed byrefs and short-form branch aliases
 remain pending. Tables do not add implicit default branches, union destructuring,
 or a static stack verifier. Stack types and instruction budgets remain checked during
@@ -520,10 +513,9 @@ Generic record headers use `.type Pair<T, U>` (or indexed unnamed parameters suc
 as `!0`); field signatures resolve names to indexed type parameters. See
 [generic metadata](generic-metadata.md) for supported references and current execution limits.
 
-Unions will follow an [ordinary type convention](unions-and-enums.md), expressed
+Unions follow an [ordinary type convention](unions-and-enums.md), expressed
 through metadata and member calls. No `.union`/`.variant` directives or general
-union opcodes are implemented. Existing Option/Result instructions remain bootstrap
-facilities until library types can replace them.
+union opcodes are implemented. System.Option/Result use ordinary records and calls.
 
 Methods inside a generic type use its indexed parameters in signatures, locals, and
 IL operands. Calls specify a constructed owner: `call Box<Int32>::Create(Int32)` or

@@ -135,7 +135,10 @@ fn native_parse_protocol_carries_only_erased_primitive_payloads() {
         .iter_mut()
         .find(|f| f.name == "neoCLR.Runtime.ParseInt32")
         .unwrap()
-        .returns = Type::Result(Box::new(Type::Int32), Box::new(Type::Error));
+        .returns = Type::Constructed {
+        definition: "System.Result".into(),
+        arguments: vec![Type::Int32, Type::Error],
+    };
     assert!(
         LoadedProgram::with_library(&module, &library)
             .unwrap_err()
@@ -146,10 +149,7 @@ fn native_parse_protocol_carries_only_erased_primitive_payloads() {
 
 #[test]
 fn old_union_extraction_is_not_an_implicit_compatibility_bridge() {
-    let module = assemble(".module App\n.entry Main\n.function Main() -> Int32\nldstr \"42\"\ncall System.Int32::Parse(String)\nldcase Ok\nret\n.end").unwrap();
-    let program = LoadedProgram::new(&module).unwrap();
-    assert!(program.verify().is_err());
-    assert!(program.run(Limits::default()).is_err());
+    assert!(assemble(".module App\n.entry Main\n.function Main() -> Int32\nldstr \"42\"\ncall System.Int32::Parse(String)\nldcase Ok\nret\n.end").is_err());
 }
 
 #[test]

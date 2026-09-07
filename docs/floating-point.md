@@ -31,7 +31,7 @@ not JSON floating-point numbers, so special constants and signed zero round-trip
 ```
 
 That constant is Single 1.0. ldc.r8 uses a 64-bit unsigned bits field. These are
-additive format-3 instruction operands, not a new proposed binary CLI encoding.
+additive format-4 instruction operands, not a new proposed binary CLI encoding.
 NaN payloads are preserved in serialized constants; payload propagation through
 arithmetic or precision changes is not guaranteed.
 

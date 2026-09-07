@@ -58,11 +58,7 @@ pub(crate) fn check_type(linked: &Module, source: &Module, ty: &Type) -> Result<
         return Ok(());
     }
     match ty {
-        Type::Option(t) | Type::Ref(t) | Type::Ptr(t) => check_type(linked, source, t)?,
-        Type::Result(t, e) => {
-            check_type(linked, source, t)?;
-            check_type(linked, source, e)?;
-        }
+        Type::Ref(t) | Type::Ptr(t) => check_type(linked, source, t)?,
         Type::Constructed {
             definition,
             arguments,

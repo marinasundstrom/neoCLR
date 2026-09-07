@@ -4,7 +4,7 @@ use neoclr::{Limits, Value, assemble, assembler::parse_function_ref, load, metad
 fn overload_sample_resolves_by_type_and_arity_and_round_trips() {
     let module = assemble(include_str!("../examples/overloads.neoil")).unwrap();
     let json = serde_json::to_value(&module).unwrap();
-    assert_eq!(json["format"], 3);
+    assert_eq!(json["format"], 4);
     assert_eq!(
         json["functions"][3]["body"][1]["arg"],
         serde_json::json!({"name":"Describe","parameters":["String"],"owner":null,"instance":false})
@@ -25,17 +25,24 @@ fn overload_sample_resolves_by_type_and_arity_and_round_trips() {
 
 #[test]
 fn signatures_parse_aliases_and_nested_generic_commas() {
-    let target =
-        parse_function_ref("Choose ( Result<Option<void>, Error>, Ref<Int32>, string, bool, int )")
-            .unwrap();
+    let target = parse_function_ref(
+        "Choose ( System.Result<System.Option<void>, Error>, Ref<Int32>, string, bool, int )",
+    )
+    .unwrap();
     assert_eq!(target.name, "Choose");
     assert_eq!(
         target.parameters,
         vec![
-            Type::Result(
-                Box::new(Type::Option(Box::new(Type::Void))),
-                Box::new(Type::Error)
-            ),
+            Type::Constructed {
+                definition: "System.Result".into(),
+                arguments: vec![
+                    Type::Constructed {
+                        definition: "System.Option".into(),
+                        arguments: vec![Type::Void]
+                    },
+                    Type::Error
+                ]
+            },
             Type::Ref(Box::new(Type::Int32)),
             Type::String,
             Type::Boolean,
@@ -60,7 +67,7 @@ fn malformed_or_missing_call_signatures_are_rejected_with_lines() {
         "Main(,string)",
         "Main(string) junk",
         "Main((string))",
-        "Main(Option<string)",
+        "Main(System.Option<string)",
         "Main(string>)",
         "Main(string int32)",
     ] {
@@ -116,7 +123,7 @@ fn entry_selects_parameterless_overload_regardless_of_definition_order() {
 
 #[test]
 fn parameter_order_and_constructed_types_are_part_of_identity() {
-    let module = assemble(".module Test\n.entry Main\n.function Choose -> Int32\n.param Option<Void>\n.param Result<Int32,Error>\nldc.i4 1\nret\n.end\n.function Choose -> Int32\n.param Result<Int32,Error>\n.param Option<Void>\nldc.i4 2\nret\n.end\n.function Main -> Int32\nldc.i4 42\nok Error\nnone void\ncall Choose(Result<int32,Error>, Option<void>)\nret\n.end").unwrap();
+    let module = assemble(".module Test\n.entry Main\n.function Choose -> Int32\n.param System.Option<Void>\n.param System.Result<Int32,Error>\nldc.i4 1\nret\n.end\n.function Choose -> Int32\n.param System.Result<Int32,Error>\n.param System.Option<Void>\nldc.i4 2\nret\n.end\n.function Main -> Int32\nldc.i4 42\nnewobj instance System.Result.Ok<Int32>::.ctor(Int32)\nnewobj instance System.Result<Int32,Error>::.ctor(System.Result.Ok<Int32>)\nnewobj instance System.Option.None::.ctor()\nnewobj instance System.Option<Void>::.ctor(System.Option.None)\ncall Choose(System.Result<int32,Error>, System.Option<void>)\nret\n.end").unwrap();
     assert_eq!(
         run(&module, Limits::default()).unwrap().value,
         Value::Int32(2)
@@ -144,7 +151,7 @@ fn loader_checks_structured_signatures_and_rejects_old_format() {
         load(&old.to_string())
             .unwrap_err()
             .message
-            .contains("expected 3")
+            .contains("expected 4")
     );
 }
 
@@ -177,7 +184,7 @@ fn inline_declaration_signature_matches_call_signature() {
 
 #[test]
 fn inline_parameters_support_nested_types_and_reject_mixed_declarations() {
-    let source = ".module Test\n.entry Main\n.function Accept(Result<Option<void>, Error>, Ref<int32>) -> Void\nldvoid\nret\n.end\n.function Main -> Void\nldvoid\nret\n.end";
+    let source = ".module Test\n.entry Main\n.function Accept(System.Result<System.Option<void>, Error>, Ref<int32>) -> Void\nldvoid\nret\n.end\n.function Main -> Void\nldvoid\nret\n.end";
     let module = assemble(source).unwrap();
     assert_eq!(module.functions[0].parameters.len(), 2);
     for header in ["Accept(int32)", "Accept()"] {

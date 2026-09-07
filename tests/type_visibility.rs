@@ -19,7 +19,7 @@ fn internal_type_sample_round_trips_and_executes_within_its_module() {
 fn foreign_type_references_are_denied_in_signatures_fields_properties_and_operands() {
     for extra in [
         ".function Bad(Hidden value) -> Void\nldvoid\nret\n.end",
-        ".function Bad() -> Void\n.local Option<Hidden*> value\nldvoid\nret\n.end",
+        ".function Bad() -> Void\n.local System.Option<Hidden*> value\nldvoid\nret\n.end",
         ".type Other\n.field Stored [Models]Hidden\n.end",
         ".function Bad() -> Void\nldvoid\nret\nsizeof Hidden\nret\n.end",
         ".function Bad() -> Int32\ncall Hidden.Number()\nret\n.end",

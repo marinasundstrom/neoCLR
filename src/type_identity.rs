@@ -12,10 +12,8 @@ pub enum TypeIdentity {
         arguments: Vec<TypeIdentity>,
     },
     Ptr(Box<TypeIdentity>),
-    // Bootstrap signatures remain distinct until their library migration.
+    // Ref retains its explicit runtime identity during the ownership prototype.
     Ref(Box<TypeIdentity>),
-    Option(Box<TypeIdentity>),
-    Result(Box<TypeIdentity>, Box<TypeIdentity>),
 }
 
 /// Read-only type information resolved within one loaded program.
@@ -79,8 +77,6 @@ fn build(module: &Module, ty: &Type) -> Result<TypeIdentity, Fault> {
     Ok(match ty {
         Type::Ptr(t) => TypeIdentity::Ptr(nested(t)?),
         Type::Ref(t) => TypeIdentity::Ref(nested(t)?),
-        Type::Option(t) => TypeIdentity::Option(nested(t)?),
-        Type::Result(t, e) => TypeIdentity::Result(nested(t)?, nested(e)?),
         _ => {
             let (name, arguments) = match ty {
                 Type::Constructed {

@@ -70,12 +70,10 @@ parameter or forwarded through a compatible signature. Operations requiring a kn
 numeric category or inferring a container type from an unresolved normalized parameter
 are rejected until a suitable proof/constraint mechanism exists.
 
-In particular, `some` constructs Option from the actual stack value type. Wrapping
-a loaded T cannot in general prove an Option<T> result when T might be Byte. Current
-`ldcase` and `heap.load` return their stored payload without normalizing it, and
-`heap.store` requires an exact type rather than a storage conversion. The verifier
-preserves these bootstrap differences instead of silently imposing different runtime
-behavior. Loading through a typed local can normalize a raw small-integer payload.
+Ordinary Option/Result constructors and accessors follow the same signature-based
+storage conversions and stack normalization as other members. `heap.load` still
+returns its stored payload without normalization, and `heap.store` requires an exact
+type. Loading through a typed local can normalize a raw small-integer payload.
 
 ## Deliberate limits
 

@@ -2,7 +2,7 @@ use neoclr::{
     Limits, LoadedProgram, Value, assemble,
     assembler::{assemble_modules, parse_function_ref},
     library,
-    metadata::{Case, Type},
+    metadata::Type,
 };
 
 #[test]
@@ -188,7 +188,7 @@ fn pointer_inputs_and_direct_native_targets_fail_at_resolution() {
 
 #[test]
 fn outputs_and_result_values_belong_to_each_invocation() {
-    let module = assemble(".module App\n.function Report(Int32 value) -> Result<Int32,Error>\nldarg value\ncall System.Console::WriteLine(Int32)\npop\nldarg value\nok Error\nret\n.end").unwrap();
+    let module = assemble(".module App\n.function Report(Int32 value) -> System.Result<Int32,Error>\nldarg value\ncall System.Console::WriteLine(Int32)\npop\nldarg value\nnewobj instance System.Result.Ok<Int32>::.ctor(Int32)\nnewobj instance System.Result<Int32,Error>::.ctor(System.Result.Ok<Int32>)\nret\n.end").unwrap();
     let program = LoadedProgram::new(&module).unwrap();
     let report = program
         .resolve_function(&parse_function_ref("Report(Int32)").unwrap())
@@ -200,10 +200,12 @@ fn outputs_and_result_values_belong_to_each_invocation() {
         assert_eq!(result.output, [value.to_string()]);
         assert_eq!(
             result.value,
-            Value::Union {
-                ty: Type::Result(Box::new(Type::Int32), Box::new(Type::Error)),
-                case: Case::Ok,
-                payload: Box::new(Value::Int32(value))
+            Value::Object {
+                ty: neoclr::assembler::parse_type("System.Result<Int32,Error>").unwrap(),
+                fields: vec![Value::Erased(Box::new(Value::Object {
+                    ty: neoclr::assembler::parse_type("System.Result.Ok<Int32>").unwrap(),
+                    fields: vec![Value::Int32(value)]
+                }))]
             }
         );
     }

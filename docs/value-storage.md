@@ -13,7 +13,7 @@ universal base class, reference type category or implicit conversion target.
 
 These operations work independently of union attributes, variants and case names;
 they can also implement a heterogeneous value slot. Their spellings and canonical
-`Value` type encoding are additions to prototype JSON format 3. Older readers reject
+`Value` type encoding are additions to prototype JSON format 4. Older readers reject
 them; no CLI binary opcode assignment or compatibility is claimed. Compared with CLR
 boxing/casting, this contract has no mandatory reference identity, null sentinel,
 heap allocation, subtype conversion or shared mutable box. Distinct instruction
@@ -105,9 +105,8 @@ compiler-recognized member convention. Ordinary visibility does not prove that e
 implementation honors its own contract; unsafe and trusted host boundaries still apply.
 
 Ordinary System.Option/Result now implement the selected [member convention](union-convention.md)
-in platform IL. [Int32.Parse](int32-parse.md) now uses them; other I/O/text/arithmetic
-APIs and native adapters still need migration. Next: adapt remaining boundaries and callers, then remove
-bootstrap encodings with an explicit artifact compatibility break.
+in platform IL. I/O, text and arithmetic APIs and native adapters use ordinary carriers.
+Format 4 removes bootstrap union encodings and requires source reassembly.
 
 ```sh
 cargo run --locked -- run examples/ordinary_carrier.neoil

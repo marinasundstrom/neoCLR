@@ -36,8 +36,6 @@ pub enum Type {
         definition: String,
         arguments: Vec<Type>,
     },
-    Option(Box<Type>),
-    Result(Box<Type>, Box<Type>),
     Ref(Box<Type>),
     /// Fundamental unmanaged pointer signature; no ownership policy is implied.
     Ptr(Box<Type>),
@@ -597,30 +595,10 @@ pub enum Instruction {
     HeapLoad,
     #[serde(rename = "heap.store")]
     HeapStore,
-    #[serde(rename = "some")]
-    Some,
-    #[serde(rename = "none")]
-    None(Type),
-    #[serde(rename = "ok")]
-    Ok(Type),
-    #[serde(rename = "err")]
-    Err(Type),
-    #[serde(rename = "is.case")]
-    IsCase(Case),
-    #[serde(rename = "ldcase")]
-    LoadCase(Case),
     #[serde(rename = "error")]
     Error(String),
     #[serde(rename = "fault")]
     Fault(String),
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub enum Case {
-    Some,
-    None,
-    Ok,
-    Err,
 }
 
 impl Module {
@@ -731,8 +709,6 @@ impl Type {
                     name: name.clone(),
                     arguments: types.iter().map(nested).collect::<Result<_, _>>()?,
                 },
-                Type::Option(t) => Type::Option(Box::new(nested(t)?)),
-                Type::Result(t, e) => Type::Result(Box::new(nested(t)?), Box::new(nested(e)?)),
                 Type::Ptr(t) => Type::Ptr(Box::new(nested(t)?)),
                 Type::Ref(t) => Type::Ref(Box::new(nested(t)?)),
                 other => other.clone(),
@@ -815,9 +791,6 @@ impl Function {
                 | Instruction::StoreObject(ty)
                 | Instruction::CopyObject(ty)
                 | Instruction::InitializeObject(ty)
-                | Instruction::None(ty)
-                | Instruction::Ok(ty)
-                | Instruction::Err(ty)
                 | Instruction::NullPointer(ty)
                 | Instruction::PointerCast(ty)
                 | Instruction::PointerFromInt(ty) => *ty = map(ty)?,

@@ -17,7 +17,7 @@ cannot be instance methods or entry points, and cannot also use InternalCall.
 Metadata stores an optional pinvoke record containing library, entry_point, and
 calling_convention (Cdecl). It is a prototype equivalent of the CLI ImplMap concept,
 not a MethodImpl/InternalCall flag. A future CLI binary writer should map this to
-ModuleRef/ImplMap and the method's PInvokeImpl attribute. Existing format-3 modules
+ModuleRef/ImplMap and the method's PInvokeImpl attribute. Existing format-4 modules
 that omit the optional record continue to load. General custom attributes remain
 unimplemented; no DllImport source-attribute parser is claimed.
 

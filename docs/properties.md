@@ -84,9 +84,8 @@ property attributes, and a guest reflection API remain unimplemented.
 
 System.Error.Message and System.Array<T>.Length now explicitly associate their existing
 get_Message and get_Length methods. Their implementations and signatures are unchanged.
-This is one ordinary-type foundation for future carrier/variant unions; it does not
-implement their storage or invariants, and bootstrap union instructions remain pending
-replacement and removal.
+Properties are one ordinary-type foundation used by carrier/variant unions. Their
+storage and invariants are supplied by ordinary fields and methods; no union instructions remain.
 
 ## Run the sample
 

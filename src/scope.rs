@@ -59,8 +59,6 @@ pub(crate) fn normalize_type(context: &Module, ty: &Type) -> Result<Type, Fault>
             },
             Type::Ptr(t) => Type::Ptr(Box::new(nested(t)?)),
             Type::Ref(t) => Type::Ref(Box::new(nested(t)?)),
-            Type::Option(t) => Type::Option(Box::new(nested(t)?)),
-            Type::Result(t, e) => Type::Result(Box::new(nested(t)?), Box::new(nested(e)?)),
             other => other.clone(),
         })
     }

@@ -92,7 +92,6 @@ fn syntax_qualifies_definitions_and_preserves_canonical_primitive_names() {
         "[ModelsBox",
         "[Models]",
         "[Models]!0",
-        "[Models]Option<Int32>",
         "[Models][Models]Box",
         "[Bad/Name]Box",
     ] {

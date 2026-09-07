@@ -1,15 +1,11 @@
 //! Owned host input schemas, independent of native memory layout.
-use crate::{
-    Fault, Module, Value,
-    metadata::{Case, Type},
-};
+use crate::{Fault, Module, Value, metadata::Type};
 
 #[derive(Debug)]
 pub(crate) enum Input {
     Primitive(Type),
     Erased,
     Record { ty: Type, fields: Vec<Input> },
-    Union { ty: Type, cases: Vec<(Case, Input)> },
 }
 
 pub(crate) fn resolve(module: &Module, parameters: &[Type]) -> Result<Vec<Input>, Fault> {
@@ -45,32 +41,6 @@ fn resolve_with_budget(
         }
         active.push(ty.clone());
         let schema = match ty {
-            Type::Option(payload) => Input::Union {
-                ty: ty.clone(),
-                cases: vec![
-                    (
-                        Case::Some,
-                        build(module, payload, depth + 1, remaining, active)?,
-                    ),
-                    (
-                        Case::None,
-                        build(module, &Type::Void, depth + 1, remaining, active)?,
-                    ),
-                ],
-            },
-            Type::Result(success, error) => Input::Union {
-                ty: ty.clone(),
-                cases: vec![
-                    (
-                        Case::Ok,
-                        build(module, success, depth + 1, remaining, active)?,
-                    ),
-                    (
-                        Case::Err,
-                        build(module, error, depth + 1, remaining, active)?,
-                    ),
-                ],
-            },
             Type::Named(_) | Type::Constructed { .. } => Input::Record {
                 ty: ty.clone(),
                 fields: crate::vm::record_fields(module, ty, 0)?
@@ -80,7 +50,7 @@ fn resolve_with_budget(
             },
             _ => {
                 return Err(Fault::new(
-                    "host input requires owned primitives, records, or bootstrap Option/Result; pointer and Ref inputs are not supported",
+                    "host input requires owned primitives or records; pointer and Ref inputs are not supported",
                 ));
             }
         };
@@ -131,9 +101,7 @@ impl Input {
                     return Err(Fault::new("expected explicit System.Value payload"));
                 };
                 let ty = match payload.as_ref() {
-                    Value::Object { ty, .. } | Value::Union { ty, .. } => {
-                        crate::scope::normalize_type(module, ty)?
-                    }
+                    Value::Object { ty, .. } => crate::scope::normalize_type(module, ty)?,
                     Value::Pointer(_) | Value::Reference { .. } => {
                         return Err(Fault::new(
                             "pointer and Ref host payloads are not supported",
@@ -151,7 +119,6 @@ impl Input {
                     value,
                     Value::Object { .. }
                         | Value::Erased(_)
-                        | Value::Union { .. }
                         | Value::Pointer(_)
                         | Value::Reference { .. }
                 ) {
@@ -164,36 +131,6 @@ impl Input {
                     )));
                 }
                 Ok(value)
-            }
-            Input::Union {
-                ty: expected,
-                cases,
-            } => {
-                let Value::Union { ty, case, payload } = value else {
-                    return Err(Fault::new(format!("expected union {expected:?}")));
-                };
-                let actual = crate::scope::normalize_type(module, &ty)?;
-                if actual != *expected {
-                    return Err(Fault::new(format!(
-                        "expected union {expected:?}, got {actual:?}"
-                    )));
-                }
-                let schema = cases
-                    .iter()
-                    .find_map(|(candidate, schema)| (*candidate == case).then_some(schema))
-                    .ok_or_else(|| {
-                        Fault::new(format!("case {case:?} does not belong to {expected:?}"))
-                    })?;
-                let payload = schema
-                    .import_checked(module, *payload, budget, depth + 1)
-                    .map_err(|error| {
-                        Fault::new(format!("case {case:?} payload: {}", error.message))
-                    })?;
-                Ok(Value::Union {
-                    ty: expected.clone(),
-                    case,
-                    payload: Box::new(payload),
-                })
             }
             Input::Record {
                 ty: expected,

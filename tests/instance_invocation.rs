@@ -211,12 +211,7 @@ fn scoped_receivers_normalize_and_unsupported_stored_fields_fail_resolution() {
         get.invoke_instance(scoped("Wrong"), vec![], Limits::default())
             .is_err()
     );
-    for ty in [
-        "Int32*",
-        "Ref<Int32>",
-        "Option<Int32*>",
-        "Result<Int32,Ref<Error>>",
-    ] {
+    for ty in ["Int32*", "Ref<Int32>"] {
         assert!(
             program
                 .resolve_function(

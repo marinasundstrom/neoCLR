@@ -1,6 +1,6 @@
 use crate::{
     ExecutionOptions, Fault, Module, Value,
-    metadata::{Case, FunctionRef, Instruction as Op, Representation, Type},
+    metadata::{FunctionRef, Instruction as Op, Representation, Type},
 };
 use std::collections::HashSet;
 
@@ -200,8 +200,8 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
     if module.name.is_empty() {
         return Err(Fault::new("module name must not be empty"));
     }
-    if module.format != 3 {
-        return Err(Fault::new("unsupported module format (expected 3)"));
+    if module.format != 4 {
+        return Err(Fault::new("unsupported module format (expected 4)"));
     }
     // Validate ownership before any traversal by access checking or execution.
     for def in &module.types {
@@ -509,12 +509,9 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                         crate::memory::layout(module, ty)?;
                     }
                 }
-                Op::None(ty)
-                | Op::PackValue(ty)
+                Op::PackValue(ty)
                 | Op::IsValue(ty)
                 | Op::UnpackValue(ty)
-                | Op::Ok(ty)
-                | Op::Err(ty)
                 | Op::NullPointer(ty)
                 | Op::PointerCast(ty)
                 | Op::PointerFromInt(ty) => check(ty)?,
@@ -675,11 +672,7 @@ fn check_type_context(ty: &Type, module: &Module, arity: usize, depth: usize) ->
             }
             Ok(())
         }
-        Type::Option(t) | Type::Ref(t) | Type::Ptr(t) => nested(t),
-        Type::Result(t, e) => {
-            nested(t)?;
-            nested(e)
-        }
+        Type::Ref(t) | Type::Ptr(t) => nested(t),
         _ => Ok(()),
     }
 }
@@ -1403,53 +1396,6 @@ fn interpret_frames(
                         .get_mut(index)
                         .ok_or_else(|| Fault::new("invalid reference"))? = value;
                     frame.stack.push(Value::Void);
-                }
-                Op::Some => {
-                    let value = frame.pop()?;
-                    frame.stack.push(Value::Union {
-                        ty: Type::Option(Box::new(value.ty())),
-                        case: Case::Some,
-                        payload: Box::new(value),
-                    });
-                }
-                Op::None(ty) => frame.stack.push(Value::Union {
-                    ty: Type::Option(Box::new(ty.clone())),
-                    case: Case::None,
-                    payload: Box::new(Value::Void),
-                }),
-                Op::Ok(error) => {
-                    let value = frame.pop()?;
-                    let success = value.ty();
-                    frame
-                        .stack
-                        .push(Value::result(value, success, error.clone(), Case::Ok));
-                }
-                Op::Err(success) => {
-                    let value = frame.pop()?;
-                    let error = value.ty();
-                    frame
-                        .stack
-                        .push(Value::result(value, success.clone(), error, Case::Err));
-                }
-                Op::IsCase(wanted) | Op::LoadCase(wanted) => {
-                    let Value::Union { ty, case, payload } = frame.pop()? else {
-                        return Err(Fault::new("case instruction requires union"));
-                    };
-                    let valid = match ty {
-                        Type::Option(_) => matches!(wanted, Case::Some | Case::None),
-                        Type::Result(_, _) => matches!(wanted, Case::Ok | Case::Err),
-                        _ => false,
-                    };
-                    if !valid {
-                        return Err(Fault::new("case does not belong to union type"));
-                    }
-                    if matches!(op, Op::IsCase(_)) {
-                        frame.stack.push(Value::Boolean(case == *wanted));
-                    } else if case == *wanted {
-                        frame.stack.push(*payload);
-                    } else {
-                        return Err(Fault::new("union case mismatch"));
-                    }
                 }
                 Op::Fault(message) => return Err(Fault::new(message)),
             }

@@ -1,4 +1,4 @@
-use crate::metadata::{Case, Type};
+use crate::metadata::Type;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Value {
@@ -26,11 +26,6 @@ pub enum Value {
         ty: Type,
         fields: Vec<Value>,
     },
-    Union {
-        ty: Type,
-        case: Case,
-        payload: Box<Value>,
-    },
     Pointer(crate::memory::Pointer),
     Reference {
         index: usize,
@@ -53,7 +48,7 @@ impl Value {
             }
             remaining -= 1;
             match item {
-                Self::Erased(payload) | Self::Union { payload, .. } => {
+                Self::Erased(payload) => {
                     pending.push((payload, depth + 1));
                 }
                 Self::Object { fields, .. } => {
@@ -86,7 +81,6 @@ impl Value {
             Self::Error(_) => Type::Error,
             Self::Erased(_) => Type::Value,
             Self::Object { ty, .. } => ty.clone(),
-            Self::Union { ty, .. } => ty.clone(),
             Self::Pointer(pointer) => Type::Ptr(Box::new(pointer.target.clone())),
             Self::Reference { target, .. } => Type::Ref(Box::new(target.clone())),
         }
@@ -127,14 +121,6 @@ impl Value {
                 "expected {ty:?}, got {:?}",
                 value.ty()
             )))
-        }
-    }
-
-    pub fn result(value: Value, success: Type, error: Type, case: Case) -> Self {
-        Self::Union {
-            ty: Type::Result(Box::new(success), Box::new(error)),
-            case,
-            payload: Box::new(value),
         }
     }
 }

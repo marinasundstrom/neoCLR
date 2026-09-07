@@ -1,8 +1,8 @@
 .module UnionInputs
 
-.function Describe(Result<Void,Error> value) -> String
+.function Describe(System.Result<Void,Error> value) -> String
     ldarg value
-    is.case Ok
+    call instance System.Result<Void,Error>::get_IsOkCase()
     brtrue Success
     ldstr "Failed"
     ret
@@ -11,7 +11,14 @@ Success:
     ret
 .end
 
-.function Echo(Option<String> value) -> Option<String>
+.function Echo(System.Option<String> value) -> System.Option<String>
     ldarg value
     ret
+.end
+
+.function Success() -> System.Result<Void,Error>
+ldvoid
+newobj instance System.Result.Ok<Void>::.ctor(Void)
+newobj instance System.Result<Void,Error>::.ctor(System.Result.Ok<Void>)
+ret
 .end

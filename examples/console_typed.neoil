@@ -1,7 +1,7 @@
 .module ConsoleTyped
 .entry Main
 
-; Demonstrates the ordinary nested Result<Option<Byte>,Error> Console API.
+; Demonstrates the ordinary nested System.Result<System.Option<Byte>,Error> Console API.
 .function Main() -> Void
     call System.Console::ReadByte()
     dup

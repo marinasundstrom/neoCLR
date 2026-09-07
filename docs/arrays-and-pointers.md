@@ -72,7 +72,7 @@ borrow provenance or a permanent array ownership model.
 
 The initial subset supports T only where native layout and typed loads/stores exist:
 numeric types, Boolean, Char, Void, pointers, and supported closed records. String, Error,
-Ref, and bootstrap union elements fail allocation layout checks, even for empty arrays.
+Ref, and erased carrier elements fail allocation layout checks, even for empty arrays.
 Nested descriptors store pointer/length values; they do not deep-copy inner buffers.
 
 Negative lengths and out-of-range indices produce terminal Faults. Access is invariant,

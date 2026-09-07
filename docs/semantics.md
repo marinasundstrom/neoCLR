@@ -46,17 +46,16 @@ returns one value, including a function returning `Void`. `ret` requires exactly
 one stack value of the declared return type. A caller discards unused results with
 `pop`. This is an intentional departure from ordinary CIL void-return stack effects.
 
-`Option<T>` has `None` and `Some(T)` cases. `Option<Void>` therefore has two
-observable values. Internally the no-payload `None` case uses the unit `Void`
-value, and `ldcase None` yields that value. `Void` is not a bottom/uninhabited type;
-if non-returning functions need a type later, that should be a separate `Never`.
+`System.Option<T>` has ordinary `None` and `Some<T>` cases. Option<Void> therefore
+has two observable cases: an empty None record and Some<Void> containing the unit
+value. Void is not a bottom/uninhabited type; a future Never would be separate.
 
-`Result<T,E>` has `Ok(T)` and `Err(E)`. There are no exception instructions,
-handlers, catch clauses, or guest unwind semantics. Errors are ordinary values;
-callers inspect the case, branch, and handle or return them explicitly.
-`E` can be any supported type. The bootstrap `Error` type currently stores an
-error code string, with `InvalidInt32`, `DivisionByZero`, and `Overflow` produced
-by numeric library operations and the parsing primitive. Structured error types remain future library work.
+`System.Result<T,E>` carries ordinary `Ok<T>` or `Error<E>` records. There are no
+exception instructions, handlers, catch clauses or guest unwind semantics. Callers
+inspect cases through ordinary methods and handle or return errors explicitly.
+E can be any supported type. Numeric, parsing, text and I/O APIs expose their specific
+[error contracts](runtime-error-contracts.md). The prototype Error string remains
+available for application-defined diagnostic codes.
 
 A Fault terminates the entire guest execution and is not catchable by guest code.
 Invalid instructions/metadata, invalid types or stack use, failed invariants,

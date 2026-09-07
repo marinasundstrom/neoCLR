@@ -136,7 +136,7 @@ Layout recursion tracks closed type identities. Finite nesting such as
 `Box<Box<Int32>>` is supported; direct/mutual recursion by value is rejected.
 Expanding generic recursion is bounded by signature nesting, layout depth, and
 complexity limits. Recursive pointers have native pointer size and do not expand
-their pointees. String, Error, bootstrap unions, and Ref still lack native layouts,
+their pointees. String, Error, System.Value, and Ref still lack native layouts,
 so a closed generic record containing one by value cannot be allocated natively.
 This does not add a native ABI for passing records by value through P/Invoke.
 

@@ -78,10 +78,20 @@ impl std::fmt::Display for Fault {
 }
 
 pub fn load(source: &str) -> Result<Module, Fault> {
-    let module: Module = serde_json::from_str(source)
-        .map_err(|error| Fault::new(format!("invalid module: {error}")))?;
+    let module = decode_module(source)?;
     vm::validate(&module)?;
     Ok(module)
+}
+
+pub(crate) fn decode_module(source: &str) -> Result<Module, Fault> {
+    let value: serde_json::Value = serde_json::from_str(source)
+        .map_err(|error| Fault::new(format!("invalid module: {error}")))?;
+    if value.get("format").and_then(|v| v.as_u64()) != Some(4) {
+        return Err(Fault::new(
+            "unsupported module format (expected 4); reassemble source",
+        ));
+    }
+    serde_json::from_value(value).map_err(|error| Fault::new(format!("invalid module: {error}")))
 }
 
 /// Load a JSON artifact set with bundled System. First artifact is the root;

@@ -1,7 +1,7 @@
 # Owned record inputs for host invocation
 
 Resolved IL functions can accept ordinary record Values in addition to
-primitive and bootstrap Option/Result inputs. Parameters may contain nested records,
+primitive and ordinary Option/Result inputs. Parameters may contain nested records,
 closed generic records, and [validated union payloads](union-inputs.md).
 Input fields are positional and must have their exact declared storage types:
 
@@ -47,7 +47,7 @@ of an execution handle, pointer identity, or originating artifact provenance. It
 not run constructors or establish additional library invariants.
 
 Pointer and Ref fields remain unsupported at this boundary, including when nested
-in a record or a bootstrap Option/Result alternative, or ignored by the function body.
+in a record or a erased Option/Result payload, or ignored by the function body.
 An unused generic argument is not a stored field: Empty<Ptr<Int32>> with no fields
 can be imported because it carries no pointer value. Raw pointer/Ref transfer still
 needs its own contract. Explicit instance receivers use the

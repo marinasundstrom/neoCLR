@@ -118,21 +118,11 @@ Fault remains for violated execution contracts.
    foundation, with a selected [constructor/query convention](union-convention.md).
 5. Completed: fully qualified System carrier and wrapper types in platform IL, with
    tests for None/Some, Ok/Err, Void, nesting, failed queries and independent copies.
-6. Replace bootstrap Option/Result signatures with ordinary constructed library types.
-   Rewrite library, native result construction, host input validation, samples, and tests
-   to use the ordinary carrier/member contract. Replace some/none/ok/err with ordinary
-   construction/calls and is.case/ldcase with ordinary queries/accessors and branches.
-7. Remove the six bootstrap instructions from the assembler, metadata instruction model,
-   verifier, interpreter, and service analysis. Remove union-specific Option/Result type
-   categories and value handling once the replacements are executable. Make an explicit
-   serialized-module compatibility decision: migrate or reject old artifacts clearly,
-   rather than retaining a hidden special union execution path.
+6. Completed: library, native adapters, host inputs, samples and tests use ordinary
+   constructed carriers, constructors, queries and accessors.
+7. Completed: format 4 removes the six bootstrap union instructions, special signature
+   categories and Union value representation. Old artifacts are rejected; reassemble source.
 
-There must be no union-specific IL instructions in the resulting platform contract.
-Existing bootstrap operations are temporary migration debt, not an alternative ABI to
-retain or extend. They have not been removed in the current implementation; even the
-console sample still consumes bootstrap Result/Option until ordinary carriers can
-replace them. The migration is complete only when those programs run through ordinary
-type operations without special union dispatch. Integer-backed enums remain a separate milestone.
-Reflection, GC, reference counting, runtime async, and high-level pattern syntax
-are not prerequisites for establishing this convention.
+There are no union-specific IL instructions in the platform contract. Integer-backed
+enums remain a separate milestone. Reflection, GC, reference counting, runtime async
+and high-level pattern syntax are not prerequisites for this convention.

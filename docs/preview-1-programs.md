@@ -32,10 +32,9 @@ generated union representation and runtime dependencies are not adopted here.
 
 The existing files are groundwork, not a claim that every program contract below is
 already implemented or has an exact fixture. Preview 1 must give each row a checked-in
-neoIL equivalent, expected output/exit behavior and automated coverage. P2 still uses
-bootstrap unions; P3 has ordinary System carriers and a selected member convention,
-but still needs API/host/native migration; P6 lacks guest APIs. Those gaps prevent
-declaring Preview 1 complete.
+neoIL equivalent, expected output/exit behavior and automated coverage. P2 and P3 now use ordinary System carriers across their API/host/native paths. P6
+still lacks guest APIs, and the final acceptance fixtures and release checks remain.
+These gaps prevent declaring Preview 1 complete.
 
 ## P1 — Hello and a free helper
 

@@ -2073,3 +2073,23 @@ remove the separate bootstrap Option/Result VM categories or their six opcodes.
 Validation: all 452 tests pass. Formatting, clippy with warnings denied and diff checks
 pass. Ordinary union and companion samples assemble, verify and run against a rebuilt
 System artifact on macOS ARM64.
+
+## Remove the bootstrap union machine representation
+
+Removed the special Option/Result type categories, Union value representation and
+some/none/ok/err/is.case/ldcase instructions from parsing, metadata, validation,
+execution, verification, identity, service analysis and host input handling. All
+samples and host fixtures use ordinary System carriers and member calls. Unqualified
+Option/Result names now follow normal type lookup; they are not aliases.
+
+Artifacts now use format 4. JSON loading checks the version before decoding and
+rejects older artifacts with a source-reassembly diagnostic. There is no automatic
+conversion. Host import checks an ordinary carrier's actual erased payload: None
+can cross the boundary even for Option<Int32*>, while a stored pointer case is
+rejected before execution. This is ordinary record validation, not union awareness.
+
+Validation: all 449 tests in the full suite pass; the additional erased pointer-case
+import regression also passes in its focused suite. Formatting, clippy with warnings
+denied and diff checks pass. The feature tour and host union-input sample run on
+macOS ARM64. The owner selected MIT; LICENSE, Cargo metadata and the README link
+were committed separately.

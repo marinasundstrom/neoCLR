@@ -72,7 +72,7 @@ fn references_are_direct_and_checked_in_each_declaring_module() {
 fn type_fields_signatures_operands_and_queries_require_references() {
     let types = ".module Types\n.references ()\n.type Marker\n.end";
     for declaration in [
-        ".type Local\n.field Value Ptr<Option<Marker>>\n.end",
+        ".type Local\n.field Value Ptr<System.Option<Marker>>\n.end",
         ".function F(Marker value) -> Void\nldvoid\nret\n.end",
         ".function F() -> Void\n.local Marker value\nldvoid\nret\n.end",
         ".function F() -> Void\nsizeof Marker\npop\nldvoid\nret\n.end",

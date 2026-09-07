@@ -148,12 +148,7 @@ fn nested_closed_generics_retain_exact_primitive_fields_and_void() {
 
 #[test]
 fn stored_pointers_and_refs_are_rejected_even_in_nested_records() {
-    for field in [
-        "Int32*",
-        "Ref<Int32>",
-        "Option<Int32*>",
-        "Result<Int32,Ref<Error>>",
-    ] {
+    for field in ["Int32*", "Ref<Int32>"] {
         let source = format!(
             ".module App\n.type Inner\n.field Value {field}\n.end\n.type Outer\n.field Value Inner\n.end\n.function Ignore(Outer value) -> Void\nldvoid\nret\n.end"
         );

@@ -92,4 +92,4 @@ Unknown payload types/statuses Fault. The helper no longer constructs bootstrap 
 
 Reassemble applications and System together. Replace ldcase/is.case after SliceUtf8 with
 ordinary Result and error-case accessors, using the specific error type in signatures.
-There is no parallel Typed method, and JSON format 3 does not imply library ABI stability.
+There is no parallel Typed method, and JSON format 4 does not imply library ABI stability.

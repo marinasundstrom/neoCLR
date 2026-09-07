@@ -48,7 +48,7 @@ declaration order and checking access to every field. Ordinary `call instance
 Type::.ctor(...)` still receives an already complete copied receiver and returns
 `Void`; it does not write a caller's local back. These remain distinct operations.
 
-The assembler normalizes `newobj instance Type::.ctor(...)` to the additive format-3
+The assembler normalizes `newobj instance Type::.ctor(...)` to the additive format-4
 JSON instruction `newobj.ctor` with a normal function-reference operand. Explicit
 `newobj.ctor instance Type::.ctor(...)` is also accepted. Older readers cannot execute
 this new operation. This prototype encoding is not a CLI binary opcode assignment.

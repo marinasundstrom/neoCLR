@@ -46,9 +46,7 @@ pub fn read_modules(inputs: &[ModuleInput<'_>], library: &Module) -> Result<Vec<
         .iter()
         .map(|input| match input {
             ModuleInput::Source(source) => parse_parts(source),
-            ModuleInput::Json(json) => serde_json::from_str::<Module>(json)
-                .map(|module| (module, vec![]))
-                .map_err(|error| Fault::new(format!("invalid module: {error}"))),
+            ModuleInput::Json(json) => crate::decode_module(json).map(|module| (module, vec![])),
         })
         .collect::<Result<Vec<_>, _>>()?;
     let mut context = library.clone();
@@ -78,7 +76,7 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
 
 fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
     let mut module = Module {
-        format: 3,
+        format: 4,
         name: String::new(),
         revision: None,
         references: None,
@@ -457,13 +455,9 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                             serde_json::to_value(parse_type(rest)?)
                                 .map_err(|e| Fault::new(e.to_string()))?,
                         ),
-                        "is.case" | "ldcase" => {
-                            identifier(rest)?;
-                            Some(serde_json::json!(rest))
-                        }
-                        "none" | "ok" | "err" | "sizeof" | "alignof" | "heap.alloc"
-                        | "ptr.null" | "ptr.cast" | "ptr.fromint" | "ldobj" | "stobj" | "cpobj"
-                        | "initobj" | "value.pack" | "value.is" | "value.unpack" => Some(
+                        "sizeof" | "alignof" | "heap.alloc" | "ptr.null" | "ptr.cast"
+                        | "ptr.fromint" | "ldobj" | "stobj" | "cpobj" | "initobj"
+                        | "value.pack" | "value.is" | "value.unpack" => Some(
                             serde_json::to_value(parse_type(rest)?)
                                 .map_err(|e| Fault::new(e.to_string()))?,
                         ),
@@ -832,16 +826,9 @@ pub fn parse_type(text: &str) -> Result<Type, Fault> {
             }
             parts.push(&args[start..]);
             return match (name.trim(), parts.as_slice()) {
-                ("Option", [t]) => Ok(Type::Option(Box::new(parse(t, depth + 1)?))),
                 ("Ref", [t]) => Ok(Type::Ref(Box::new(parse(t, depth + 1)?))),
                 ("Ptr", [t]) => Ok(Type::Ptr(Box::new(parse(t, depth + 1)?))),
-                ("Result", [t, e]) => Ok(Type::Result(
-                    Box::new(parse(t, depth + 1)?),
-                    Box::new(parse(e, depth + 1)?),
-                )),
-                ("Option" | "Ref" | "Ptr" | "Result", _) => {
-                    Err(Fault::new("incorrect built-in generic arity"))
-                }
+                ("Ref" | "Ptr", _) => Err(Fault::new("incorrect built-in generic arity")),
                 _ => {
                     identifier(name.trim())?;
                     Ok(Type::Constructed {
@@ -1129,11 +1116,6 @@ fn bind_type_parameters(ty: Type, names: &[Option<String>]) -> Type {
                 .map(|t| bind_type_parameters(t, names))
                 .collect(),
         },
-        Type::Option(t) => Type::Option(Box::new(bind_type_parameters(*t, names))),
-        Type::Result(t, e) => Type::Result(
-            Box::new(bind_type_parameters(*t, names)),
-            Box::new(bind_type_parameters(*e, names)),
-        ),
         Type::Ref(t) => Type::Ref(Box::new(bind_type_parameters(*t, names))),
         Type::Ptr(t) => Type::Ptr(Box::new(bind_type_parameters(*t, names))),
         other => other,

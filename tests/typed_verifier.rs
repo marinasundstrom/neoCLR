@@ -107,21 +107,8 @@ fn pointer_type_checks_do_not_claim_pointer_validity() {
 
 #[test]
 fn union_payloads_and_heap_values_preserve_raw_storage_types() {
-    let source = ".module Test\n.function F(Option<Byte> value) -> Int32\nldarg value\nldcase Some\nldc.i4 1\nadd\nret\n.end";
-    // ldcase currently returns the stored Byte without stack normalization.
-    assert!(verify(&assemble(source).unwrap()).is_err());
-    assert!(
-        verify(
-            &assemble(
-                &source
-                    .replace("ldc.i4 1\nadd", "stloc copy\nldloc copy")
-                    .replace("ldarg value", ".local Byte copy\nldarg value")
-            )
-            .unwrap()
-        )
-        .is_ok()
-    );
-    assert!(verify(&program("none Int32\nldcase Ok\nret", "Int32")).is_err());
+    let source = ".module Test\n.function F(System.Option<Byte> value) -> Int32\nldarg value\ncall instance System.Option<Byte>::GetSomeCase()\ncall instance System.Option.Some<Byte>::get_Value()\nldc.i4 1\nadd\nret\n.end";
+    assert!(verify(&assemble(source).unwrap()).is_ok());
     let source = ".module Test\n.function F(Ref<Byte> value) -> Void\nldarg value\nldc.i4 1\nheap.store\nret\n.end";
     assert!(verify(&assemble(source).unwrap()).is_err());
 }
@@ -130,13 +117,8 @@ fn union_payloads_and_heap_values_preserve_raw_storage_types() {
 fn generic_parameters_are_symbolic_and_do_not_erase_normalization() {
     let source = ".module Test\n.type Box<T>\n.field Value T\n.method instance Get() -> T\nldarg this\nldfld Box<T>::Value\nret\n.end\n.end";
     assert!(verify(&assemble(source).unwrap()).is_ok());
-    let source = ".module Test\n.type Wrap<T>\n.method static Make(T value) -> Option<T>\nldarg value\nsome\nret\n.end\n.end";
-    assert!(
-        verify(&assemble(source).unwrap())
-            .unwrap_err()
-            .message
-            .contains("normalization")
-    );
+    let source = ".module Test\n.type Wrap<T>\n.method static Make(T value) -> System.Option<T>\nldarg value\nnewobj instance System.Option.Some<T>::.ctor(T)\nnewobj instance System.Option<T>::.ctor(System.Option.Some<T>)\nret\n.end\n.end";
+    assert!(verify(&assemble(source).unwrap()).is_ok());
     let source = ".module Test\n.type Identity<T>\n.method static F(T value) -> T\n.local T copy\nldarg value\nstloc copy\nldloc copy\nret\n.end\n.end";
     assert!(verify(&assemble(source).unwrap()).is_ok());
 }

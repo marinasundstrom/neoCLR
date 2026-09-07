@@ -32,14 +32,14 @@ may remain unnamed; neoCLR is sufficient as the runtime codename for the preview
 | Execution fundamentals | Primitive values, free functions, calls/overloads, indexed parameters/locals, control flow, real Void, value copying | Implemented; preserve semantics through remaining changes |
 | Metadata and modules | Explicit types/members/signatures, generic type definitions and closed use, properties/accessors, module references and member identities | Implemented; current JSON is a documented prototype representation |
 | Ordinary type contracts | Public/internal type visibility, public/internal/private members, usable constructors with defined receiver and initialization behavior | Visibility, properties and whole-value constructor initialization implemented; carrier requirements still need proving |
-| Ordinary unions | Carrier/variant convention sufficient for Option<T> and Result<T,TError>, including Void, nested carriers, and Result<T,T> | Selected convention, System carriers and bounded erased host input implemented; existing API/native/bootstrap host-path migration remains |
-| No union-specific IL | Library, samples, native result construction and host inputs use ordinary types; remove special union operations and encodings | Not done; current some/none/ok/err/is.case/ldcase and special Option/Result handling are bootstrap debt |
+| Ordinary unions | Carrier/variant convention sufficient for Option<T> and Result<T,TError>, including Void, nested carriers, and Result<T,T> | Implemented: ordinary System carriers, native boundaries, samples and bounded erased host input |
+| No union-specific IL | Library, samples, native result construction and host inputs use ordinary types; remove special union operations and encodings | Implemented in format 4; old artifacts require reassembly |
 | Minimal library and console | Useful Int32/String/Error APIs; console input/output; EOF distinct from input failure; an interactive program | Implemented using raw byte input and immediate line output; `ReadByte` uses the ordinary nested Result/Option boundary. General ReadLine is not required |
 | Minimal reflection | Obtain a System.Type-style descriptor from a type token or value, compare identity, read its name, inspect closed generic arguments | Existing host type identities are groundwork; guest read-only type inspection is not implemented |
 | Memory and arrays | Explicit pointers/allocation/free, record storage, small usable array/buffer example, documented lifetime and copy rules | Implemented; native-layout Array<T> descriptors are sufficient. No promise of general owned arrays or automatic cleanup |
 | Errors and diagnostics | Recoverable failures through Result; terminal Faults with owned logical stack frames shown by CLI/host | All six reviewed library Result APIs use ordinary typed errors. Legacy VM/sample union uses remain; source-line maps and guest StackTrace classes are not required for Preview 1 |
 | Embedding and native boundary | One runnable embedding example and one supported scalar/pointer native interop example | Implemented experimental Rust hosting and P/Invoke subset; validate the published examples and platform requirements |
-| Publication readiness | Accurate README/design limits, explicit license, release notes, tested supported platforms and source release instructions | Work remains; no LICENSE file was found during this planning review |
+| Publication readiness | Accurate README/design limits, explicit license, release notes, tested supported platforms and source release instructions | MIT license added; release notes, platform validation and source release checks remain |
 
 "Implemented" does not mean release-validated on every platform. Local validation so far
 is on macOS ARM64; CI is configured for Linux, macOS, and Windows, but this plan does not
@@ -66,29 +66,26 @@ and compatibility with existing .NET tooling are later work, not achieved by usi
    and their extraction methods are removed.
 3. **Preserve the tested ordinary library carriers through migration.** System.Option and
    System.Result cover None versus Some<Void>, Ok<Void>, Result<T,T>, nested carriers,
-   failed queries and independent value copies. Fully qualified names select them while
-   short Option/Result spellings still denote bootstrap categories. Migrate existing
-   APIs and host/native adapters before removing that temporary distinction.
+   failed queries and independent value copies. Names follow ordinary type lookup; no special Option/Result categories remain.
    Int32.Parse, Int32.Divide, Math.Abs, Console.ReadByte and File.ReadAllText use canonical ordinary
    nested-case returns, including the console/file native boundaries. There are no
    parallel Typed APIs. SliceUtf8 now uses ordinary results and Utf8SliceError too;
    the public native bindings no longer construct bootstrap union values.
-4. **Replace and remove the bootstrap union system.** Migrate library methods, native/host
-   adapters, samples, and tests to ordinary types and calls. Delete the six special
-   instructions and special Option/Result type/value dispatch. Make the metadata break
-   explicit: version the new representation and clearly reject unsupported old artifacts;
-   an automatic migration tool is not required for this preview.
+4. **Replace and remove the bootstrap union system — implemented.** Library methods,
+   native/host adapters, samples and tests use ordinary types and calls. Format 4 removes
+   all six special instructions and Option/Result type/value dispatch. Older artifacts
+   are rejected before decoding; reassemble source.
 5. **Add minimal read-only type inspection.** Expose type identity, names and closed
    generic arguments through a small System.Type-style API. Specify descriptor lifetime
    and identity scope. Inspection grants no invocation, construction or mutation rights.
    Use existing metadata; do not introduce a second type model or reflection-dependent
    union execution. Member enumeration and dynamic invocation remain outside Preview 1.
 6. **Freeze the demonstration set and complete release validation.** Correct documentation
-   against the final implementation, run the release checks below, and resolve licensing.
+   against the final implementation, run the release checks below, and verify license notices.
    Fix failures and contradictions before adding more features.
 
 The interpreter's carrier-storage decision and limits are recorded in
-[value storage](value-storage.md). API/host/native migration, bootstrap removal and
+[value storage](value-storage.md). Minimal guest reflection and
 minimal guest inspection remain substantial work. The
 prototype is not evidence of a settled native ABI or a publication date.
 
@@ -136,8 +133,8 @@ not justify expanding Preview 1 into streams, filesystem abstractions or network
       external sample data paths, expected failure exits and output-file overwrite rules.
 - [ ] README and API/metadata documents distinguish implemented behavior, intentional
       divergences, temporary helpers, unsafe/trusted boundaries, and deferred features.
-- [ ] Select and add a repository license approved by the project owner; verify source
-      provenance and required dependency notices. Do not infer a license from public hosting.
+- [x] Add the project-owner-selected MIT license and Cargo license metadata.
+- [ ] Verify source provenance and required dependency notices.
 - [ ] Choose the preview version/tag and add release notes with capabilities, known limits,
       breaking metadata changes, build instructions, and tested platform evidence.
 - [ ] Confirm the source release contains the lockfile, runtime IL, fixtures, samples,

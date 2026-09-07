@@ -84,7 +84,7 @@ specified before claiming that a carrier's representation is protected. Accessib
 is not a security sandbox or an ownership policy, and it cannot contain arbitrary native
 code. It does not add a value/reference distinction or any union-specific instruction.
 
-The additive metadata field remains in prototype format 3. Old readers that reject unknown
+The additive metadata field remains in prototype format 4. Old readers that reject unknown
 fields cannot read new non-public declarations; this is not a CLI binary metadata writer.
 
 ## Demonstration

@@ -37,7 +37,7 @@ target-layout, runtime-service, and Fault boundaries
 then support a minimal hosting experiment and an early native AOT experiment.
 [Static and instance invocation](invocation.md) is now available as a Rust embedding subset
 with exact primitive and [validated record inputs](record-inputs.md), explicitly copied
-receivers, [validated bootstrap Option/Result inputs](union-inputs.md), and fresh state.
+receivers, [validated ordinary Option/Result inputs](union-inputs.md), and fresh state.
 [Cooperative cancellation](cancellation.md) now supports stopping interpreter execution
 from the host. Addressed mutation and shared receiver lifetimes remain open. A small
 language compiler should target the same metadata/IL and enable incremental library
@@ -220,7 +220,7 @@ on extensive OOP or reflection. Stage the work around a small carrier/variant ex
 
 Choose the dependency order after checking the current construction/addressed-access
 proposals. Demonstrate public construction and reading with restricted representation
-mutation before migrating bootstrap unions. Define behavior at raw-pointer and unsafe
+mutation through the ordinary carrier convention. Define behavior at raw-pointer and unsafe
 boundaries explicitly; accessibility is not a memory-safety sandbox.
 
 Prioritize execution and metadata fundamentals for Option<T> and Result<T,TError>

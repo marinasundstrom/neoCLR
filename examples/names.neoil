@@ -17,7 +17,7 @@
     .end
 .end
 
-.function Main() -> Result<Void,Error>
+.function Main() -> System.Result<Void,Error>
     .local Point point
     .local string message
     ldc.i4 10
@@ -31,6 +31,7 @@
     stloc message
     ldloc message
     call System.Console::WriteLine(string)
-    ok Error
+    newobj instance System.Result.Ok<Void>::.ctor(Void)
+    newobj instance System.Result<Void,Error>::.ctor(System.Result.Ok<Void>)
     ret
 .end

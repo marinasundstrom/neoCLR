@@ -106,10 +106,9 @@ The [Raven-like program contracts](preview-1-programs.md) explain the source-lev
 
 ## Migration boundary
 
-Use **fully qualified** System.Option<T> and System.Result<T,E> for the new library
-types. At this stage, unqualified Option<T>/Result<T,E> still encode the old bootstrap
-VM categories. They are not aliases and cannot be passed interchangeably. This is
-temporary migration scaffolding, not the final language naming policy.
+Use ordinary System.Option<T> and System.Result<T,E> library types. Unqualified names
+now follow ordinary type lookup, with no special signature categories or aliases.
+Format 4 rejects old artifacts and removes the six union-specific instructions.
 
 Int32.Parse now returns an ordinary carrier through a [migrated native boundary](int32-parse.md).
 Console.ReadByte, File.ReadAllText and Math.Abs now return ordinary nested cases under
@@ -118,9 +117,8 @@ platform IL constructs the carriers. Divide returns ordinary IntegerDivisionErro
 cases. The public library/native result paths no longer construct bootstrap unions.
 [Host invocation now imports](erased-inputs.md) records containing
 System.Value with bounded shape checks; this does not recognize or enforce the convention.
-No automatic conversion or extra host intrinsic bridges the two representations.
-Those boundaries must be migrated, then the bootstrap instructions and type categories
-removed with an explicit serialized-format break before Preview 1 is complete.
+The library, native boundaries, host inputs and samples now use ordinary records.
+Format 4 removes the old representation; reassemble source rather than converting artifacts.
 
 ```sh
 cargo run --locked -- run examples/ordinary_unions.neoil
@@ -145,5 +143,4 @@ The older top-level System.None/Some/Ok/Err wrapper family and its GetNone/GetSo
 GetOk/GetErr accessors have been removed. Constructors now accept only the nested
 case family listed above, and predicates test those same concrete identities. Rebuild
 System and applications together: this changes member/type rows as well as available
-signatures. The obsolete names are not compatibility aliases. JSON format 3 remains
-in use while the separate bootstrap VM representation is still being removed.
+signatures. The obsolete names are not compatibility aliases. JSON format 4 also removes the separate bootstrap VM representation.

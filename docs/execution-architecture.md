@@ -172,7 +172,7 @@ It supports repeated entry-point execution with fresh state. This establishes a
 preparation boundary without specifying a native hosting ABI or backend interface.
 
 [Resolved function handles](invocation.md) now permit repeated static and instance IL calls with
-exact primitive, [owned record](record-inputs.md), and [bootstrap Option/Result inputs](union-inputs.md), including closed generic methods and revision-qualified
+exact primitive, [owned record](record-inputs.md), and [ordinary Option/Result inputs](union-inputs.md), including closed generic methods and revision-qualified
 targets. This is a Rust embedding subset with fresh execution state and explicitly copied receivers. Addressed receivers,
 pointer/Ref inputs, persistent sessions, and a native hosting ABI remain pending.
 

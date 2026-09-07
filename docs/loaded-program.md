@@ -32,7 +32,7 @@ with the supplied resource limits. A prior result or Fault does not change the l
 snapshot. Returned execution values and allocations belong to their own Execution;
 pointer/Ref values from one execution are not transferable handles into another.
 [Resolved function handles](invocation.md) additionally support primitive and
-[owned record arguments](record-inputs.md) and [bootstrap Option/Result inputs](union-inputs.md)
+[owned record arguments](record-inputs.md) and [ordinary Option/Result inputs](union-inputs.md)
 to static and instance IL functions without an entry point.
 [Cooperative cancellation](cancellation.md) is available through ExecutionOptions.
 Persistent guest state, addressed receivers, and pointer/Ref transfer remain pending.

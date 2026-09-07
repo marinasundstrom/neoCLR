@@ -219,7 +219,6 @@ fn effect(module: &Module, op: &Op, arity: usize) -> Result<(usize, usize), Faul
         | SizeOf(_)
         | AlignOf(_)
         | NullPointer(_)
-        | None(_)
         | Error(_) => (0, 1),
         Pop | Store(_) | StoreArg(_) | Return | BranchTrue(_) | BranchFalse(_) | Switch(_)
         | InitializeObject(_) => (1, 0),
@@ -308,12 +307,7 @@ fn effect(module: &Module, op: &Op, arity: usize) -> Result<(usize, usize), Faul
         | PointerCast(_)
         | LoadObject(_)
         | HeapNew
-        | HeapLoad
-        | Some
-        | Ok(_)
-        | Err(_)
-        | IsCase(_)
-        | LoadCase(_) => (1, 1),
+        | HeapLoad => (1, 1),
     })
 }
 
@@ -574,30 +568,6 @@ fn typed_effect(
             } else {
                 one(*ty.clone())
             }
-        }
-        Some => one(T::Option(Box::new(exact(&values[0])?.clone()))),
-        None(ty) => one(T::Option(Box::new(ty.clone()))),
-        Ok(error) => one(T::Result(
-            Box::new(exact(&values[0])?.clone()),
-            Box::new(error.clone()),
-        )),
-        Err(success) => one(T::Result(
-            Box::new(success.clone()),
-            Box::new(exact(&values[0])?.clone()),
-        )),
-        IsCase(case) | LoadCase(case) => {
-            use crate::metadata::Case;
-            let payload = match (exact(&values[0])?, case) {
-                (T::Option(ty), Case::Some) => *ty.clone(),
-                (T::Option(_), Case::None) => T::Void,
-                (T::Result(ty, _), Case::Ok) | (T::Result(_, ty), Case::Err) => *ty.clone(),
-                _ => return Result::Err(crate::Fault::new("case does not belong to union type")),
-            };
-            one(if matches!(op, IsCase(_)) {
-                T::Boolean
-            } else {
-                payload
-            })
         }
         Equal | BranchEqual(_) | BranchNotEqual(_) => {
             require(

@@ -14,7 +14,7 @@
     ret
 .end
 
-.function Main() -> Result<Void,Error>
+.function Main() -> System.Result<Void,Error>
     .local Point
     .local Point
     .local Ref<Point>
@@ -63,21 +63,24 @@ CopyPassed:
     fault "heap sharing failed"
 SharingPassed:
     ldvoid
-    some
+    newobj instance System.Option.Some<Void>::.ctor(Void)
+    newobj instance System.Option<Void>::.ctor(System.Option.Some<Void>)
     dup
-    is.case Some
+    call instance System.Option<Void>::get_IsSome()
     brtrue SomePassed
     fault "Some<Void> failed"
 SomePassed:
-    ldcase Some
+    call instance System.Option<Void>::GetSomeCase()
+    call instance System.Option.Some<Void>::get_Value()
     pop
-    none Void
+    newobj instance System.Option.None::.ctor()
+    newobj instance System.Option<Void>::.ctor(System.Option.None)
     dup
-    is.case None
+    call instance System.Option<Void>::get_IsNone()
     brtrue NonePassed
     fault "None<Void> failed"
 NonePassed:
-    ldcase None
+    call instance System.Option<Void>::GetNoneCase()
     pop
 
     ; A parse failure is data; explicitly handle it and continue.
@@ -106,8 +109,10 @@ ParseHandled:
 DivisionPassed:
     ; Construct both Result cases with Void as success type.
     error "Demonstration"
-    err Void
-    ldcase Err
+    newobj instance System.Result.Error<Error>::.ctor(Error)
+    newobj instance System.Result<Void,Error>::.ctor(System.Result.Error<Error>)
+    call instance System.Result<Void,Error>::GetErrorCase()
+    call instance System.Result.Error<Error>::get_Value()
     pop
 
     ldc.i4 0
@@ -157,6 +162,7 @@ CheckedPassed:
 IntegerDivisionPassed:
     ldstr "All feature checks passed."
     call System.Console.WriteLine(string)
-    ok Error
+    newobj instance System.Result.Ok<Void>::.ctor(Void)
+    newobj instance System.Result<Void,Error>::.ctor(System.Result.Ok<Void>)
     ret
 .end

@@ -1,7 +1,6 @@
 use neoclr::{
     Console, ExecutionOptions, Limits, LoadedProgram, RuntimeService, Value, assemble,
-    assembler::parse_function_ref,
-    metadata::{Case, Type},
+    assembler::parse_function_ref, metadata::Type,
 };
 use std::{
     collections::VecDeque,
@@ -197,17 +196,17 @@ fn console_dependencies_are_discovered_without_executing_host_io() {
 
 #[test]
 fn byte_input_uses_typed_local_storage_before_integer_arithmetic() {
-    let module = assemble(".module App\n.function Increment(Option<Byte> value) -> Int32\n.local Byte byte\nldarg value\nldcase Some\nstloc byte\nldloc byte\nldc.i4 1\nadd\nret\n.end").unwrap();
+    let module = assemble(".module App\n.function Increment(System.Option<Byte> value) -> Int32\n.local Byte byte\nldarg value\ncall instance System.Option<Byte>::GetSomeCase()\ncall instance System.Option.Some<Byte>::get_Value()\nstloc byte\nldloc byte\nldc.i4 1\nadd\nret\n.end").unwrap();
     let program = LoadedProgram::new(&module).unwrap();
     program.verify().unwrap();
     let function = program
-        .resolve_function(&parse_function_ref("Increment(Option<Byte>)").unwrap())
+        .resolve_function(&parse_function_ref("Increment(System.Option<Byte>)").unwrap())
         .unwrap();
-    let value = Value::Union {
-        ty: Type::Option(Box::new(Type::Byte)),
-        case: Case::Some,
-        payload: Box::new(Value::Byte(255)),
-    };
+    let value = carrier(
+        "System.Option<Byte>",
+        "System.Option.Some<Byte>",
+        vec![Value::Byte(255)],
+    );
     assert_eq!(
         function
             .invoke(vec![value], Limits::default())
@@ -317,7 +316,6 @@ fn console_case_sample_handles_bytes_eof_and_read_failures() {
 
 #[test]
 fn migrated_library_has_one_canonical_api_and_no_union_instructions_at_these_boundaries() {
-    use neoclr::metadata::Instruction;
     let system = neoclr::library::system().unwrap();
     for name in [
         "System.Console.ReadByte",
@@ -327,15 +325,7 @@ fn migrated_library_has_one_canonical_api_and_no_union_instructions_at_these_bou
         let functions: Vec<_> = system.functions.iter().filter(|f| f.name == name).collect();
         assert_eq!(functions.len(), 1);
         assert!(matches!(functions[0].returns, Type::Constructed { .. }));
-        assert!(!functions[0].body.iter().any(|op| matches!(
-            op,
-            Instruction::Some
-                | Instruction::None(_)
-                | Instruction::Ok(_)
-                | Instruction::Err(_)
-                | Instruction::IsCase(_)
-                | Instruction::LoadCase(_)
-        )));
+
         assert!(
             !system
                 .functions

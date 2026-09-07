@@ -216,12 +216,6 @@ fn instruction_services(op: &Op) -> &'static [RuntimeService] {
         | Op::AlignOf(..)
         | Op::NullPointer(..)
         | Op::PointerCast(..)
-        | Op::Some
-        | Op::None(..)
-        | Op::Ok(..)
-        | Op::Err(..)
-        | Op::IsCase(..)
-        | Op::LoadCase(..)
         | Op::Error(..)
         | Op::Fault(..) => &[],
     }

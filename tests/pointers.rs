@@ -200,7 +200,7 @@ fn pointer_can_escape_call_frame_until_explicit_free() {
 
 #[test]
 fn unsupported_and_recursive_layouts_are_rejected_before_execution() {
-    for ty in ["String", "Error", "Ref<Int32>", "Option<Int32>"] {
+    for ty in ["String", "Error", "Ref<Int32>", "System.Option<Int32>"] {
         let source =
             format!(".module Test\n.entry Main\n.function Main() -> Int32\nsizeof {ty}\nret\n.end");
         assert!(

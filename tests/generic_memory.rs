@@ -111,7 +111,7 @@ fn recursive_by_value_and_unsupported_layouts_fail_without_unbounded_expansion()
         "Loop<Int32>",
         "Grow<Int32>",
         "Box<String>",
-        "Box<Option<Int32>>",
+        "Box<System.Option<Int32>>",
         "Box<!0>",
         "Box",
         "Box<Int32,Int32>",

@@ -1,7 +1,4 @@
-use neoclr::{
-    Limits, LoadedProgram, Value, assemble,
-    metadata::{Instruction, Type},
-};
+use neoclr::{Limits, LoadedProgram, Value, assemble, metadata::Type};
 
 const SAMPLE: &str = include_str!("../examples/ordinary_unions.neoil");
 
@@ -110,15 +107,6 @@ fn carrier_execution_does_not_depend_on_markers_or_bootstrap_union_opcodes() {
     for method in new_methods {
         count += 1;
         assert!(!method.is_internal_call());
-        assert!(method.body.iter().all(|op| !matches!(
-            op,
-            Instruction::Some
-                | Instruction::None(_)
-                | Instruction::Ok(_)
-                | Instruction::Err(_)
-                | Instruction::IsCase(_)
-                | Instruction::LoadCase(_)
-        )));
     }
     assert!(count > 0, "carrier method checks must not be vacuous");
     let module = assemble(SAMPLE).unwrap();
@@ -128,20 +116,12 @@ fn carrier_execution_does_not_depend_on_markers_or_bootstrap_union_opcodes() {
 }
 
 #[test]
-fn migration_spellings_remain_explicitly_distinct() {
-    assert!(matches!(
-        neoclr::assembler::parse_type("Option<Int32>").unwrap(),
-        Type::Option(_)
-    ));
+fn unqualified_carrier_names_have_no_special_runtime_meaning() {
     assert!(
-        matches!(neoclr::assembler::parse_type("System.Option<Int32>").unwrap(), Type::Constructed { definition, .. } if definition == "System.Option")
+        matches!(neoclr::assembler::parse_type("Option<Int32>").unwrap(), Type::Constructed { definition, .. } if definition == "Option")
     );
-    assert!(matches!(
-        neoclr::assembler::parse_type("Result<Int32,Error>").unwrap(),
-        Type::Result(..)
-    ));
     assert!(
-        matches!(neoclr::assembler::parse_type("System.Result<Int32,Error>").unwrap(), Type::Constructed { definition, .. } if definition == "System.Result")
+        matches!(neoclr::assembler::parse_type("Result<Int32,Error>").unwrap(), Type::Constructed { definition, .. } if definition == "Result")
     );
 }
 

@@ -6,7 +6,7 @@
     .field Y int32
 .end
 
-.function Main() -> Result<Void,Error>
+.function Main() -> System.Result<Void,Error>
     .local Point* point
     .local Point copy
 
@@ -71,6 +71,7 @@ CopyPassed:
     ; Freeing an actual null pointer is a no-op.
     ptr.null Point
     heap.free
-    ok Error
+    newobj instance System.Result.Ok<Void>::.ctor(Void)
+    newobj instance System.Result<Void,Error>::.ctor(System.Result.Ok<Void>)
     ret
 .end

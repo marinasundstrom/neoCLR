@@ -46,7 +46,7 @@ to different supplied modules; a false scope or missing required reference is re
 Same-name, same-arity definitions still cannot coexist across the prototype load set:
 general duplicate-name module isolation remains a separate limitation.
 
-This updates the prototype's generic method-owner encoding within JSON format 3.
+This updates the prototype's generic method-owner encoding within JSON format 4.
 Reassemble older generic-method artifacts whose owner is an unqualified Named signature;
 there is no ambiguous legacy-owner inference. These preview encodings and hosting APIs
 remain changeable. Ordinary nongeneric owner signatures are unchanged.
