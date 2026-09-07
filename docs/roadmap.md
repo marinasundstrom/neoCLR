@@ -257,8 +257,9 @@ library/host/sample uses first and explicitly migrate or reject older serialized
 4. Extend the platform-written System library and bootstrap linker into general
    loadable modules, structured error definitions, and generic unions. Keep familiar
    namespaces while defining contracts around Option and Result.
-5. Introduce interfaces without naming prefixes, explicit dispatch metadata, and
-   a modest collections library.
+5. Basic borrowed interface dispatch and ArrayList<T>/List<T> are implemented.
+   Extend them only with explicit receiver, lifetime and backend contracts; see
+   [the interface subset](interfaces.md).
 6. Build .NET metadata/IL inspection and translation for a supported subset, with
    actionable diagnostics for semantic differences.
 7. Revisit explicit lifetime operations and generic ownership abstractions such as

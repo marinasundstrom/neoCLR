@@ -105,6 +105,7 @@ fn walkthrough_sources_and_artifacts_have_the_documented_outputs_and_exits() {
             "array_list",
             vec![(b"", "ArrayList count:\n5\n0\n1\n4\n9\n16\n=> Void\n".into())],
         ),
+        ("interfaces", vec![(b"", "42\n2\n=> Void\n".into())]),
         ("array_bounds", vec![]),
         ("fault_trace", vec![]),
     ];

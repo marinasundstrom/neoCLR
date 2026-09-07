@@ -27,7 +27,8 @@ The goal is familiar runtime and library structure with deliberately different
 semantics: one model for data types, value semantics by default, explicit storage
 and lifetime choices, a real `Void` value, functions outside types, `Option<T>` for absence,
 `Result<T,E>` for recoverable errors, and terminal Faults instead of exceptions.
-Interfaces will use ordinary names without an `I` prefix.
+Interfaces use ordinary names without an `I` prefix.
+[Borrowed interface references](docs/interfaces.md) make dispatch explicit without boxing or ownership.
 
 ## Current focus
 
@@ -288,7 +289,7 @@ no reference counting or GC. Counted `Ref<T>` remains a deferred ownership abstr
 Rust's memory model does not define guest behavior. See [memory layers](docs/memory-model.md).
 
 The library is a bootstrap surface, not a complete BCL. General user-defined
-generics/unions, interfaces/virtual dispatch, arrays, borrows, full native marshalling,
+generic methods, interface inheritance/class virtual dispatch, static lifetime verification, full native marshalling,
 threading, runtime async, JIT compilation, and full verification are unimplemented.
 Resource limits are guardrails, not a memory quota or a hostile-code sandbox.
 The CLI writes console output immediately and flushes each line, so prompts are visible

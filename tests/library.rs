@@ -17,7 +17,14 @@ fn runtime_library_is_assembled_platform_code() {
         module
             .functions
             .iter()
-            .filter(|f| !f.is_internal_call())
+            .filter(|f| !f.is_internal_call()
+                && !f
+                    .owner
+                    .as_ref()
+                    .and_then(|ty| module.type_definition(ty))
+                    .is_some_and(
+                        |d| d.representation == neoclr::metadata::Representation::Interface
+                    ))
             .all(|f| !f.body.is_empty())
     );
     assert_eq!(

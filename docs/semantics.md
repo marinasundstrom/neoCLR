@@ -100,12 +100,12 @@ Types have named, ordered fields unless their representation is runtime-known.
 Prototype instructions index fields and locals from zero, and assembled branch
 labels become absolute instruction indices within one function.
 
-Constructed `Option`, `Result`, and `Ref` signatures are supported; general generic
-definitions, constraints, interfaces, virtual dispatch, inheritance, general custom attributes,
-assembly references, metadata tokens, and binary tables are not yet implemented.
-Future interfaces use names such as `Enumerable<T>` and `Disposable` without an
-`I` prefix. This is a naming convention, not a rule forbidding identifiers that
-happen to begin with I.
+Ordinary generic carrier types model Option and Result. Generic type definitions,
+assembly references and selected custom attributes are supported; generic methods,
+constraints, inheritance and binary metadata tables remain deferred. Explicit
+[borrowed interface references](interfaces.md) provide a limited dispatch contract.
+Interfaces use names such as `List<T>` without an `I` prefix. This is a naming
+convention, not a rule forbidding identifiers that happen to begin with I.
 
 Library organization should retain familiar `System`, `System.Collections`,
 `System.IO`, and related areas. APIs with meaningful absence return `Option<T>`;

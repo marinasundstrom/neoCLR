@@ -3,9 +3,9 @@
 System.Collections.ArrayList<T> is a small platform-written growable list for
 native-layout values. It uses ordinary generic types, pointer fields, member calls
 and existing heap instructions. There is no Collections.Generic namespace, reference
-type flag, special collection opcode, interface implementation or built-in GC.
-A future System.Collections.List<T> interface can describe its list contract without
-an I prefix. The interface and its final member set are not implemented here.
+type flag, special collection opcode or built-in GC.
+It implements System.Collections.List<T> through an explicit borrowed interface view;
+see [interfaces](interfaces.md) for dispatch and lifetime rules.
 
 | Member | Contract |
 | --- | --- |

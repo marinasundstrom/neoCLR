@@ -104,7 +104,10 @@ impl LoadedProgram {
         let function = crate::vm::resolve(&self.module, &target)?;
         crate::access::check_call(&self.module, None, &function)?;
         crate::access::check_signature(&self.module, None, &function)?;
-        if function.is_internal_call() || function.pinvoke.is_some() {
+        if function.is_internal_call()
+            || function.pinvoke.is_some()
+            || crate::interfaces::is_contract(&self.module, &function)
+        {
             return Err(Fault::new(
                 "host invocation currently requires an IL function; use an IL wrapper for native declarations",
             ));

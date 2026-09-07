@@ -1,0 +1,18 @@
+; Borrowed list contract: allocation and release belong to the concrete owner.
+.interface System.Collections.List<T>
+    .property instance Count() -> Int32
+        .get instance System.Collections.List<T>::get_Count()
+    .end
+    .method instance get_Count() -> Int32
+    .end
+    .property instance Item(Int32) -> T
+        .get instance System.Collections.List<T>::get_Item(Int32)
+        .set instance System.Collections.List<T>::set_Item(Int32,T)
+    .end
+    .method instance get_Item(Int32 index) -> T
+    .end
+    .method instance set_Item(Int32 index, T value) -> Void
+    .end
+    .method instance Add(T value) -> Void
+    .end
+.end

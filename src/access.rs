@@ -164,7 +164,7 @@ fn check_type(module: &Module, source: Scope<'_>, ty: &Type) -> Result<(), Fault
                     nested(argument)?;
                 }
             }
-            Type::Ref(t) | Type::Ptr(t) => nested(t)?,
+            Type::Ref(t) | Type::Ptr(t) | Type::InterfaceRef(t) => nested(t)?,
             Type::Scoped { .. } => {
                 return Err(Fault::new("unresolved type scope during access checking"));
             }
@@ -221,6 +221,9 @@ pub(crate) fn validate_types(module: &Module) -> Result<(), Fault> {
             .definition
             .as_ref()
             .map(|id| (id.module.as_str(), id.revision.as_deref()));
+        for ty in &definition.implements {
+            check_type(module, source, ty)?;
+        }
         for field in &definition.fields {
             check_type(module, source, &field.ty)?;
         }
@@ -242,6 +245,7 @@ pub(crate) fn validate_types(module: &Module) -> Result<(), Fault> {
         // A free call can expose a type through its return without spelling it in IL.
         for op in &function.body {
             if let crate::metadata::Instruction::Call(target)
+            | crate::metadata::Instruction::CallVirtual(target)
             | crate::metadata::Instruction::Construct(target) = op
             {
                 check_signature(module, source, &crate::vm::resolve(module, target)?)?;

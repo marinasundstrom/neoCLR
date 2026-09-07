@@ -39,6 +39,8 @@ pub enum Type {
         arguments: Vec<Type>,
     },
     Ref(Box<Type>),
+    /// Explicit borrowed interface receiver, separate from the interface declaration.
+    InterfaceRef(Box<Type>),
     /// Fundamental unmanaged pointer signature; no ownership policy is implied.
     Ptr(Box<Type>),
 }
@@ -157,6 +159,8 @@ pub struct TypeDef {
     pub name: String,
     pub fields: Vec<Field>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub implements: Vec<Type>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub properties: Vec<Property>,
     #[serde(default)]
     pub representation: Representation,
@@ -225,6 +229,7 @@ pub enum Representation {
     #[default]
     Record,
     Runtime,
+    Interface,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -551,6 +556,10 @@ pub enum Instruction {
     /// CLI-shaped type-token acquisition; method and field tokens are not supported.
     #[serde(rename = "ldtoken")]
     LoadTypeToken(Type),
+    #[serde(rename = "interface.borrow")]
+    BorrowInterface(Type),
+    #[serde(rename = "callvirt")]
+    CallVirtual(FunctionRef),
     #[serde(rename = "value.is")]
     IsValue(Type),
     #[serde(rename = "value.unpack")]
@@ -719,6 +728,7 @@ impl Type {
                 },
                 Type::Ptr(t) => Type::Ptr(Box::new(nested(t)?)),
                 Type::Ref(t) => Type::Ref(Box::new(nested(t)?)),
+                Type::InterfaceRef(t) => Type::InterfaceRef(Box::new(nested(t)?)),
                 other => other.clone(),
             })
         }
@@ -780,7 +790,9 @@ impl Function {
         }
         for op in &mut result.body {
             match op {
-                Instruction::Call(target) | Instruction::Construct(target) => {
+                Instruction::Call(target)
+                | Instruction::CallVirtual(target)
+                | Instruction::Construct(target) => {
                     if let Some(owner) = &mut target.owner {
                         *owner = map(owner)?;
                     }
@@ -789,6 +801,7 @@ impl Function {
                     }
                 }
                 Instruction::New(ty)
+                | Instruction::BorrowInterface(ty)
                 | Instruction::LoadTypeToken(ty)
                 | Instruction::PackValue(ty)
                 | Instruction::IsValue(ty)

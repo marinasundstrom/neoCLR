@@ -58,7 +58,7 @@ pub(crate) fn check_type(linked: &Module, source: &Module, ty: &Type) -> Result<
         return Ok(());
     }
     match ty {
-        Type::Ref(t) | Type::Ptr(t) => check_type(linked, source, t)?,
+        Type::Ref(t) | Type::Ptr(t) | Type::InterfaceRef(t) => check_type(linked, source, t)?,
         Type::Constructed {
             definition,
             arguments,
@@ -138,6 +138,9 @@ pub(crate) fn validate_uses(linked: &Module, source: &Module) -> Result<(), Faul
                 check_call(linked, source, accessor)?;
             }
         }
+        for ty in &definition.implements {
+            check_type(linked, source, ty)?;
+        }
         for field in &definition.fields {
             check_type(linked, source, &field.ty)?;
         }
@@ -149,7 +152,10 @@ pub(crate) fn validate_uses(linked: &Module, source: &Module) -> Result<(), Faul
             Ok(ty.clone())
         })?;
         for instruction in &function.body {
-            if let Instruction::Call(target) | Instruction::Construct(target) = instruction {
+            if let Instruction::Call(target)
+            | Instruction::CallVirtual(target)
+            | Instruction::Construct(target) = instruction
+            {
                 check_call(linked, source, target)?;
             }
         }

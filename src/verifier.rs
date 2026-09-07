@@ -44,7 +44,10 @@ pub(crate) fn analyze(module: &Module) -> Result<Verification, Fault> {
     }
     let mut functions = Vec::new();
     for (index, function) in module.functions.iter().enumerate() {
-        if function.is_internal_call() || function.pinvoke.is_some() {
+        if function.is_internal_call()
+            || function.pinvoke.is_some()
+            || crate::interfaces::is_contract(module, function)
+        {
             continue;
         }
         let mut report = analyze_function(module, index, function, false)?;
@@ -225,9 +228,11 @@ fn effect(module: &Module, op: &Op, arity: usize) -> Result<(usize, usize), Faul
         | InitializeObject(_) => (1, 0),
         Dup => (1, 2),
         New(ty) => (crate::vm::record_fields(module, ty, arity)?.len(), 1),
-        Call(target) => (target.parameters.len() + usize::from(target.instance), 1),
+        Call(target) | CallVirtual(target) => {
+            (target.parameters.len() + usize::from(target.instance), 1)
+        }
         Construct(target) => (target.parameters.len(), 1),
-        PackValue(_) | IsValue(_) | UnpackValue(_) => (1, 1),
+        BorrowInterface(_) | PackValue(_) | IsValue(_) | UnpackValue(_) => (1, 1),
         SetField(_) | PointerAdd | HeapStore | BitAnd | BitOr | BitXor | ShiftLeft | ShiftRight
         | ShiftRightUnsigned | Remainder | RemainderUnsigned | Add | Sub | Mul | AddChecked
         | SubChecked | MulChecked | Divide | AddCheckedUnsigned | SubCheckedUnsigned
@@ -417,6 +422,22 @@ fn typed_effect(
             Result::Ok(vec![])
         }
         Dup => Result::Ok(vec![values[0].clone(), values[0].clone()]),
+        BorrowInterface(interface) => {
+            crate::interfaces::ensure_implementation(module, pointer(&values[0])?, interface)?;
+            one(T::InterfaceRef(Box::new(interface.clone())))
+        }
+        CallVirtual(target) => {
+            let callee = crate::vm::resolve(module, target)?;
+            let interface = callee
+                .owner
+                .clone()
+                .ok_or_else(|| crate::Fault::new("interface call requires owner"))?;
+            stored(&values[0], &T::InterfaceRef(Box::new(interface)))?;
+            for (value, ty) in values[1..].iter().zip(&callee.parameters) {
+                stored(value, ty)?;
+            }
+            Result::Ok(vec![loaded(&callee.returns)])
+        }
         Call(target) => {
             let callee = crate::vm::resolve(module, target)?;
             for (value, ty) in values.iter().zip(callee.argument_types()) {

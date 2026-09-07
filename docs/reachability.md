@@ -68,3 +68,12 @@ indirect or virtual dispatch features will need an explicit reachability contrac
 `cargo run --example reachability` reports Main, System.Console.WriteLine(String),
 and neoCLR.Runtime.WriteLine(String), including the two call edges, without printing
 the guest HelloWorld message.
+
+## Borrowed interface dispatch
+
+Each callvirt expands conservatively to all matching implementations in the loaded
+module set, including implementations not otherwise constructed by reachable code.
+Multiple call edges can share an instruction index. Abstract declarations are not
+executable graph nodes or valid roots. Generic implementation arguments are inferred
+from the closed interface; if some cannot be inferred, analysis returns a Fault
+instead of silently omitting potential targets. See [interfaces](interfaces.md).

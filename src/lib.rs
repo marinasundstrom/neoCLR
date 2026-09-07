@@ -5,6 +5,7 @@ mod console;
 mod execution;
 pub use console::{Console, StdioConsole};
 mod input;
+mod interfaces;
 pub use execution::{CancellationToken, ExecutionOptions};
 mod file_io;
 pub mod library;

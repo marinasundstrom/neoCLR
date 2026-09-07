@@ -59,6 +59,7 @@ pub(crate) fn normalize_type(context: &Module, ty: &Type) -> Result<Type, Fault>
             },
             Type::Ptr(t) => Type::Ptr(Box::new(nested(t)?)),
             Type::Ref(t) => Type::Ref(Box::new(nested(t)?)),
+            Type::InterfaceRef(t) => Type::InterfaceRef(Box::new(nested(t)?)),
             other => other.clone(),
         })
     }
@@ -81,6 +82,9 @@ fn attributes(context: &Module, attributes: &mut [CustomAttribute]) -> Result<()
 pub(crate) fn normalize_module(context: &Module, source: &Module) -> Result<Module, Fault> {
     let mut result = source.clone();
     for definition in &mut result.types {
+        for ty in &mut definition.implements {
+            *ty = normalize_type(context, ty)?;
+        }
         for property in &mut definition.properties {
             property.map_types(|ty| normalize_type(context, ty))?;
         }

@@ -179,7 +179,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                 return Ok(());
             }
             if let (true, Some(def)) = (
-                function.is_none() && word != ".method" && word != ".type",
+                function.is_none() && word != ".method" && word != ".type" && word != ".interface",
                 typedef.as_mut(),
             ) {
                 if word == ".property" {
@@ -242,9 +242,16 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     );
                     return Ok(());
                 }
+                if word == ".implements" {
+                    def.implements.push(bind_type_parameters(
+                        parse_type(rest)?,
+                        &def.generic_parameters,
+                    ));
+                    return Ok(());
+                }
                 if word != ".field" {
                     return Err(Fault::new(
-                        "expected .type, .field, .property, .pack, .size, .custom, .method or .end",
+                        "expected .type, .interface, .implements, .field, .property, .pack, .size, .custom, .method or .end",
                     ));
                 }
                 let (name, ty) = rest
@@ -443,7 +450,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                             }
                             Some(serde_json::json!(targets))
                         }
-                        "call" | "newobj.ctor" => Some(
+                        "call" | "callvirt" | "newobj.ctor" => Some(
                             serde_json::to_value(parse_function_ref(rest)?)
                                 .map_err(|e| Fault::new(e.to_string()))?,
                         ),
@@ -457,7 +464,8 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         ),
                         "sizeof" | "alignof" | "heap.alloc" | "ptr.null" | "ptr.cast"
                         | "ptr.fromint" | "ldobj" | "stobj" | "cpobj" | "initobj"
-                        | "value.pack" | "value.is" | "value.unpack" | "ldtoken" => Some(
+                        | "value.pack" | "value.is" | "value.unpack" | "ldtoken"
+                        | "interface.borrow" => Some(
                             serde_json::to_value(parse_type(rest)?)
                                 .map_err(|e| Fault::new(e.to_string()))?,
                         ),
@@ -521,7 +529,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     }
                     module.revision = Some(rest.into());
                 }
-                ".type" => {
+                ".type" | ".interface" => {
                     let (visibility, rest) = match rest.split_once(char::is_whitespace) {
                         Some(("public", rest)) => {
                             (crate::metadata::Visibility::Public, rest.trim())
@@ -566,10 +574,13 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         name: ty.definition_name().unwrap_or(&name).into(),
                         generic_parameters,
                         fields: vec![],
+                        implements: vec![],
                         properties: vec![],
                         packing: None,
                         minimum_size: None,
-                        representation: if ty.is_primitive() {
+                        representation: if word == ".interface" {
+                            Representation::Interface
+                        } else if ty.is_primitive() {
                             Representation::Runtime
                         } else {
                             Representation::Record
@@ -826,9 +837,12 @@ pub fn parse_type(text: &str) -> Result<Type, Fault> {
             }
             parts.push(&args[start..]);
             return match (name.trim(), parts.as_slice()) {
+                ("InterfaceRef", [t]) => Ok(Type::InterfaceRef(Box::new(parse(t, depth + 1)?))),
                 ("Ref", [t]) => Ok(Type::Ref(Box::new(parse(t, depth + 1)?))),
                 ("Ptr", [t]) => Ok(Type::Ptr(Box::new(parse(t, depth + 1)?))),
-                ("Ref" | "Ptr", _) => Err(Fault::new("incorrect built-in generic arity")),
+                ("Ref" | "Ptr" | "InterfaceRef", _) => {
+                    Err(Fault::new("incorrect built-in generic arity"))
+                }
                 _ => {
                     identifier(name.trim())?;
                     Ok(Type::Constructed {
@@ -1117,6 +1131,7 @@ fn bind_type_parameters(ty: Type, names: &[Option<String>]) -> Type {
                 .collect(),
         },
         Type::Ref(t) => Type::Ref(Box::new(bind_type_parameters(*t, names))),
+        Type::InterfaceRef(t) => Type::InterfaceRef(Box::new(bind_type_parameters(*t, names))),
         Type::Ptr(t) => Type::Ptr(Box::new(bind_type_parameters(*t, names))),
         other => other,
     }

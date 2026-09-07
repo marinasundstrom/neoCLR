@@ -6,6 +6,7 @@
 .end
 
 .type System.Collections.ArrayList<T>
+    .implements System.Collections.List<T>
     .field private State System.Collections.ArrayListStorage<T>*
     .method static Allocate(Int32 capacity) -> System.Collections.ArrayList<T>
         .local T* data

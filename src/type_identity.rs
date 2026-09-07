@@ -12,6 +12,7 @@ pub enum TypeIdentity {
         arguments: Vec<TypeIdentity>,
     },
     Ptr(Box<TypeIdentity>),
+    InterfaceRef(Box<TypeIdentity>),
     // Ref retains its explicit runtime identity during the ownership prototype.
     Ref(Box<TypeIdentity>),
 }
@@ -31,6 +32,7 @@ pub(crate) fn describe(module: &Module, ty: &Type) -> Result<TypeDescriptor, Fau
     let name = match &normalized {
         Type::Ptr(element) => format!("{}*", signature_name(element)?),
         Type::Ref(element) => format!("Ref<{}>", signature_name(element)?),
+        Type::InterfaceRef(element) => format!("InterfaceRef<{}>", signature_name(element)?),
         _ => normalized
             .definition_name()
             .ok_or_else(|| Fault::new("type has no metadata name"))?
@@ -58,6 +60,7 @@ fn signature_name(ty: &Type) -> Result<String, Fault> {
     Ok(match ty {
         Type::Ptr(element) => format!("{}*", signature_name(element)?),
         Type::Ref(element) => format!("Ref<{}>", signature_name(element)?),
+        Type::InterfaceRef(element) => format!("InterfaceRef<{}>", signature_name(element)?),
         Type::Constructed {
             definition,
             arguments,
@@ -104,6 +107,7 @@ fn build(module: &Module, ty: &Type) -> Result<TypeIdentity, Fault> {
     Ok(match ty {
         Type::Ptr(t) => TypeIdentity::Ptr(nested(t)?),
         Type::Ref(t) => TypeIdentity::Ref(nested(t)?),
+        Type::InterfaceRef(t) => TypeIdentity::InterfaceRef(nested(t)?),
         _ => {
             let (name, arguments) = match ty {
                 Type::Constructed {

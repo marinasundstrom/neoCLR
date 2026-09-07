@@ -210,6 +210,8 @@ normalization; other checks use exact type equality. See [integer storage](integ
 | `bgt.un Label`, `blt.un Label`, `bge.un Label`, `ble.un Label` | `N,N →` | Unsigned integer or unordered floating comparison branch |
 | `switch (Label, ...)` | `Int32 →` | Branch by zero-based index; otherwise fall through |
 | `call Name(T0, …, Tn)` | `P0,…,Pn → R` | Call declared IL or InternalCall function |
+| `callvirt instance I::Member(T0, …)` | `InterfaceRef<I>,P0,… → R` | Dispatch an exact interface contract to the pointed concrete value; receiver copy semantics |
+| `interface.borrow I` | `Ptr<Concrete> → InterfaceRef<I>` | Explicit non-owning interface view; requires declared implementation and native concrete layout |
 | `ret` | `R → caller` | Return exactly one value; no extra stack items |
 | `newobj Type` | `F0,…,Fn → Type` | Construct a closed record value in substituted field declaration order |
 | `ldtoken T` | `→ RuntimeTypeHandle` | Read-only closed type token; type operands only; see [type inspection](type-inspection.md) |
@@ -244,7 +246,7 @@ visible during Preview 1 review.
 
 | Status | Opcodes | Meaning |
 | --- | --- | --- |
-| CLI-aligned | `ldc.*`, `ldarg`, `starg`, `ldloc`, `stloc`, arithmetic, comparisons, branches, `call`, `ret`, `newobj`, field access, conversions, `sizeof`, `alignof`, indirect memory access, `cpobj`, `initobj`, `cpblk`, `initblk` | Familiar CLI concepts with neoCLR's documented typed stack and fault rules |
+| CLI-aligned | `ldc.*`, `ldarg`, `starg`, `ldloc`, `stloc`, arithmetic, comparisons, branches, `call`, `callvirt`, `ret`, `newobj`, field access, conversions, `sizeof`, `alignof`, indirect memory access, `cpobj`, `initobj`, `cpblk`, `initblk` | Familiar CLI concepts with neoCLR's documented typed stack and fault rules |
 | neoCLR explicit memory | `localloc`, `heap.alloc`, `heap.free`, `ptr.null`, `ptr.cast`, `ptr.add`, `ptr.fromint`, `ldflda` | Explicit allocation, address and lifetime capabilities |
 | CLI-shaped type tokens | `ldtoken` | Type-only subset; owned metadata handle, not a native pointer |
 | neoCLR value storage | `value.pack`, `value.is`, `value.unpack` | Visible erased storage; never implicit boxing |
@@ -554,3 +556,12 @@ declaring type/module rules; see [field accessibility](accessibility.md#field-ac
 Top-level types accept `.type [public|internal] Name`, defaulting to public. See
 [type visibility](accessibility.md#top-level-type-visibility) for explicit type-use checks,
 generic contexts, and the distinction between invocation and metadata inspection.
+
+## Interface metadata and explicit views (format 4)
+
+`.interface Name<T>` declares a storage-free contract with public instance method
+declarations and optional property/indexer metadata. `.implements I<T>` on an
+ordinary type declares conformance. `InterfaceRef<I>` is a distinct borrowed signature.
+`interface.borrow` is a neoCLR addition; `callvirt` is a CLI-shaped interface-only
+subset. Both report InterfaceDispatch. Neither boxes nor owns a receiver.
+See [interfaces](interfaces.md) for exact matching, copy and lifetime rules.

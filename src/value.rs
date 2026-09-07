@@ -29,6 +29,10 @@ pub enum Value {
         fields: Vec<Value>,
     },
     Pointer(crate::memory::Pointer),
+    InterfaceRef {
+        interface: Type,
+        receiver: crate::memory::Pointer,
+    },
     Reference {
         index: usize,
         target: Type,
@@ -84,6 +88,7 @@ impl Value {
             Self::Erased(_) => Type::Value,
             Self::RuntimeTypeHandle(_) => Type::RuntimeTypeHandle,
             Self::Object { ty, .. } => ty.clone(),
+            Self::InterfaceRef { interface, .. } => Type::InterfaceRef(Box::new(interface.clone())),
             Self::Pointer(pointer) => Type::Ptr(Box::new(pointer.target.clone())),
             Self::Reference { target, .. } => Type::Ref(Box::new(target.clone())),
         }

@@ -5,9 +5,9 @@ representation; primitive types are not a second, memberless world. Object-orien
 mechanics remain foundational alongside free functions.
 
 This implementation adds primitive type definitions, declared method ownership,
-static methods, and read-only instance receiver snapshots. Inheritance, interfaces,
-virtual dispatch, mutable/by-reference receivers, general generic execution,
-and assembly-qualified identities remain future work. [Property metadata](properties.md)
+static methods, and instance receiver snapshots. The current platform also supports
+type generics and [explicit borrowed interface dispatch](interfaces.md). Inheritance,
+class virtual dispatch and by-reference receiver writeback remain future work. [Property metadata](properties.md)
 now explicitly associates ordinary getter/setter methods with declared signatures.
 [Accessibility](accessibility.md) enforces public/internal/private method calls and
 ordinary field access, plus public/internal top-level type visibility.

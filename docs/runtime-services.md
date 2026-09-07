@@ -29,6 +29,7 @@ Duplicate entries in the supplied service set have no additional effect.
 
 | Service | Direct uses |
 | --- | --- |
+| InterfaceDispatch | interface.borrow and callvirt: explicit borrowed view formation, receiver access and implementation selection |
 | TypeInspection | Type-only ldtoken and validated TypeName/TypeEquals/TypeArgumentCount/TypeArgument InternalCalls |
 | ValueStorage | Explicit value.pack/value.is/value.unpack and current erased native return boundaries |
 | NativeAllocation | heap.alloc and heap.free |

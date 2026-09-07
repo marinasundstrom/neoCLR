@@ -81,6 +81,11 @@ pub(crate) fn analyze(
     let mut nodes = Vec::new();
     while nodes.len() < functions.len() {
         let function = functions[nodes.len()].clone();
+        if crate::interfaces::is_contract(module, &function) {
+            return Err(crate::Fault::new(
+                "an abstract interface declaration is not an executable graph root",
+            ));
+        }
         let implementation = if let Some(import) = &function.pinvoke {
             FunctionImplementation::NativeImport(import.clone())
         } else if function.is_internal_call() {
@@ -90,14 +95,21 @@ pub(crate) fn analyze(
         };
         let mut calls = Vec::new();
         for (instruction, op) in function.body.iter().enumerate() {
-            if let Instruction::Call(target) | Instruction::Construct(target) = op {
-                // Prepared metadata already enforces the declaring module's reference list.
-                // Do not apply the root module's direct-reference list to transitive calls.
-                let callee = crate::vm::resolve(module, target).map_err(|mut fault| {
-                    fault.function = Some(function.name.clone());
-                    fault.instruction = Some(instruction);
-                    fault
-                })?;
+            let callees = match op {
+                Instruction::CallVirtual(target) => crate::vm::resolve(module, target)
+                    .and_then(|contract| crate::interfaces::dispatch_targets(module, &contract)),
+                Instruction::Call(target) | Instruction::Construct(target) => {
+                    // The loader already checked the declaring module's references.
+                    crate::vm::resolve(module, target).map(|callee| vec![callee])
+                }
+                _ => continue,
+            }
+            .map_err(|mut fault| {
+                fault.function = Some(function.name.clone());
+                fault.instruction = Some(instruction);
+                fault
+            })?;
+            for callee in callees {
                 let target = intern(callee, &mut functions).map_err(|mut fault| {
                     fault.function = Some(function.name.clone());
                     fault.instruction = Some(instruction);

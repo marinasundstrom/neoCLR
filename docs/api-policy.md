@@ -37,8 +37,8 @@ leaving room for better designs as the runtime develops.
 The current assembler models declaring types and static/instance methods alongside
 free functions. Primitive members belong to canonical System type definitions.
 Read-only receiver snapshots are a prototype limitation, not full .NET by-reference
-receiver mechanics. Visibility, virtual/interface dispatch, complete signatures,
-and assembly references remain to be added.
+receiver mechanics. Basic visibility, assembly references and explicit borrowed
+interface dispatch are implemented; class virtual dispatch remains deferred.
 
 The Divide helper is a proof-of-concept extension whose final API location remains
 open. Existing .NET APIs should be preferred when an appropriate equivalent exists.
@@ -63,6 +63,6 @@ member until its supported inputs, outputs, errors, and other effects are define
 Place generic collections directly in System.Collections. Generic arity already
 distinguishes type identities; a separate Generic namespace is unnecessary. The
 preview implements System.Collections.ArrayList<T> for native-layout values, with
-explicit allocation/release. A future list interface will use the name List<T>,
-without an I prefix. No interface implementation is implied by the present type.
+explicit allocation/release. It implements List<T>, without an I prefix, through
+[explicit borrowed interface references](interfaces.md).
 See [ArrayList](array-list.md) for the concrete API and current element limits.

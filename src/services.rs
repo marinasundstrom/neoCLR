@@ -20,6 +20,7 @@ pub enum RuntimeService {
     ConsoleInput,
     ValueStorage,
     TypeInspection,
+    InterfaceDispatch,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -97,6 +98,7 @@ fn instruction_services(op: &Op) -> &'static [RuntimeService] {
         Op::AllocateLocal => &[FrameAllocation, PointerMemory],
         Op::PackValue(..) | Op::IsValue(..) | Op::UnpackValue(..) => &[ValueStorage],
         Op::LoadTypeToken(..) => &[TypeInspection],
+        Op::BorrowInterface(..) | Op::CallVirtual(..) => &[InterfaceDispatch],
         Op::PointerFromInt(..)
         | Op::PointerAdd
         | Op::FieldAddress(..)

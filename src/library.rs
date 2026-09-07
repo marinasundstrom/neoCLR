@@ -95,6 +95,7 @@ pub(crate) fn bind_member_references(module: &mut Module) -> Result<(), Fault> {
     for (function, definition) in module.functions.iter().enumerate() {
         for (pc, op) in definition.body.iter().enumerate() {
             if let crate::metadata::Instruction::Call(target)
+            | crate::metadata::Instruction::CallVirtual(target)
             | crate::metadata::Instruction::Construct(target) = op
             {
                 let identity = crate::vm::resolve(module, target)?.definition;
@@ -104,6 +105,7 @@ pub(crate) fn bind_member_references(module: &mut Module) -> Result<(), Fault> {
     }
     for (function, pc, identity) in calls {
         if let crate::metadata::Instruction::Call(target)
+        | crate::metadata::Instruction::CallVirtual(target)
         | crate::metadata::Instruction::Construct(target) =
             &mut module.functions[function].body[pc]
         {

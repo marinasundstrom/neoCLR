@@ -156,7 +156,7 @@ Preview 1 release. This plan performs neither a remote push nor a publication.
   backend implementation a source-preview gate.
 - GC, production reference counting, automatic destruction, or a universal ownership model.
   Existing bootstrap Ref behavior must not be advertised as a completed counted Ref<T>.
-- Inheritance, interface/virtual dispatch, closed hierarchies, member enumeration, dynamic
+- Inheritance, class virtual dispatch, interface inheritance/defaults/variance, closed hierarchies, member enumeration, dynamic
   invocation, reflective construction/mutation, broad reflection or redesigned
   access modifiers. Keep the familiar implemented access levels for now.
 - A Stream hierarchy, sockets, HttpClient, runtime async or general concurrency libraries.
@@ -194,3 +194,6 @@ Keep this independent of member enumeration, runtime code generation and JIT ava
 Document the metadata needed by the descriptors so a future AOT backend can retain it
 explicitly. Read-only method/field/property enumeration can follow after Preview 1 if it
 proves useful; it is not needed to execute the ordinary union convention.
+
+The implemented [interface subset](interfaces.md) supports explicit borrowed dispatch,
+generic contracts and List<T> access to ArrayList<T>, without boxing or ownership.

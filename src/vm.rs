@@ -288,8 +288,13 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             }
         }
         if !def.generic_parameters.is_empty()
-            && (def.representation != Representation::Record
-                || matches!(def.name.as_str(), "Option" | "Result" | "Ref" | "Ptr"))
+            && (!matches!(
+                def.representation,
+                Representation::Record | Representation::Interface
+            ) || matches!(
+                def.name.as_str(),
+                "Option" | "Result" | "Ref" | "Ptr" | "InterfaceRef"
+            ))
         {
             return Err(Fault::new(
                 "reserved type cannot declare generic parameters",
@@ -308,6 +313,9 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             {
                 return Err(Fault::new("invalid generic record layout controls"));
             }
+        }
+        for interface in &def.implements {
+            check_type_context(interface, module, def.generic_parameters.len(), 0)?;
         }
         let mut fields = HashSet::new();
         for field in &def.fields {
@@ -414,6 +422,10 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         if arity > 0 && (function.pinvoke.is_some() || function.impl_flags != 0) {
             return Err(Fault::new("generic owners require IL methods"));
         }
+        if crate::interfaces::is_contract(module, function) {
+            crate::interfaces::validate_contract(function)?;
+            continue;
+        }
         if function.pinvoke.is_some() {
             crate::interop::validate(function)?;
             continue;
@@ -480,7 +492,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 Op::Load(i) | Op::Store(i) if *i >= function.locals.len() => {
                     return Err(Fault::new("local index outside signature"));
                 }
-                Op::Call(target) | Op::Construct(target) => {
+                Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {
                     if let Some(owner) = &target.owner {
                         check(owner)?;
                     }
@@ -488,6 +500,13 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                         check(ty)?;
                     }
                     let callee = resolve(module, target)?;
+                    if matches!(op, Op::CallVirtual(_))
+                        != crate::interfaces::is_contract(module, &callee)
+                    {
+                        return Err(Fault::new(
+                            "interface declarations require callvirt; class virtual calls are not supported",
+                        ));
+                    }
                     if matches!(op, Op::Construct(_)) {
                         resolve_constructor(module, target)?;
                     }
@@ -508,6 +527,10 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                     if check_type(ty, module).is_ok() {
                         crate::memory::layout(module, ty)?;
                     }
+                }
+                Op::BorrowInterface(ty) => {
+                    check(ty)?;
+                    crate::interfaces::interface_definition(module, ty)?;
                 }
                 Op::LoadTypeToken(ty)
                 | Op::PackValue(ty)
@@ -607,6 +630,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
     {
         crate::access::check_entry(module, entry)?;
     }
+    crate::interfaces::validate(module)?;
     if !module.entry.is_empty()
         && !module.functions.iter().any(|f| {
             f.name == module.entry
@@ -671,6 +695,11 @@ fn check_type_context(ty: &Type, module: &Module, arity: usize, depth: usize) ->
             for argument in arguments {
                 nested(argument)?;
             }
+            Ok(())
+        }
+        Type::InterfaceRef(t) => {
+            nested(t)?;
+            crate::interfaces::interface_definition(module, t)?;
             Ok(())
         }
         Type::Ref(t) | Type::Ptr(t) => nested(t),
@@ -1045,6 +1074,44 @@ fn interpret_frames(
                         frame.pc = *target;
                     }
                 }
+                Op::BorrowInterface(interface) => {
+                    let Value::Pointer(receiver) = frame.pop()? else {
+                        return Err(Fault::new("interface.borrow requires typed pointer"));
+                    };
+                    crate::interfaces::ensure_implementation(module, &receiver.target, interface)?;
+                    crate::memory::layout(module, &receiver.target)?;
+                    frame.stack.push(Value::InterfaceRef {
+                        interface: interface.clone(),
+                        receiver,
+                    });
+                }
+                Op::CallVirtual(target) => {
+                    let contract = resolve(module, target)?;
+                    crate::access::check_call(module, Some(&function), &contract)?;
+                    let mut args = frame.args(&contract.parameters)?;
+                    let Value::InterfaceRef {
+                        interface,
+                        receiver,
+                    } = frame.pop()?
+                    else {
+                        return Err(Fault::new("callvirt requires InterfaceRef receiver"));
+                    };
+                    if contract.owner.as_ref() != Some(&interface) {
+                        return Err(Fault::new("interface receiver type mismatch"));
+                    }
+                    let callee = crate::interfaces::implementation(
+                        module,
+                        &receiver.target,
+                        &interface,
+                        &contract,
+                    )?;
+                    let layout = crate::memory::layout(module, &receiver.target)?;
+                    args.insert(0, memory.read(&receiver, &layout)?);
+                    if frames.len() >= limits.frames {
+                        return Err(Fault::new("frame limit exceeded"));
+                    }
+                    frames.push(Frame::new(callee, args));
+                }
                 Op::LoadTypeToken(ty) => {
                     frame.stack.push(Value::RuntimeTypeHandle(Box::new(
                         crate::type_identity::describe(module, ty)?,
@@ -1099,6 +1166,9 @@ fn interpret_frames(
                 }
                 Op::Call(target) => {
                     let callee = resolve(module, target)?;
+                    if crate::interfaces::is_contract(module, &callee) {
+                        return Err(Fault::new("interface declarations require callvirt"));
+                    }
                     crate::access::check_call(module, Some(&function), &callee)?;
                     callee.map_types(|ty| {
                         check_type(ty, module)?;

@@ -2244,3 +2244,40 @@ was added for the collection.
 Validation: all 477 tests pass in the complete suite, including the prior reflection
 slice and all sample verification. Formatting, clippy with warnings denied and diff
 checks pass on macOS ARM64. Remote exact-release platform validation remains open.
+
+## Explicit borrowed interface dispatch
+
+Added interface declarations and implementation metadata, generic contract matching,
+property/indexer accessor contracts, explicit InterfaceRef<I> signatures and
+interface.borrow formation. The CLI-shaped callvirt subset resolves public IL instance
+implementations through a typed receiver pointer. Interfaces are contracts, not base
+storage types; there is no implicit boxing, allocation, ownership or retention.
+
+ArrayList<T> now implements System.Collections.List<T> (Count, Item and Add).
+The sample stores its concrete descriptor in explicit frame storage, passes a borrowed
+view to a function that knows only List<T>, mutates shared backing storage and releases
+through the concrete owner. Instance receivers retain existing value-copy semantics;
+inline field changes do not write back, while pointer-field side effects remain shared.
+General reference receivers, interface inheritance/defaults/variance and a native view
+layout/ABI remain separate work.
+
+Integrated the new signatures and instructions with substitution, module references,
+visibility, metadata roundtripping, verification, type identity, host-input rejection,
+Fault traces and runtime-service reporting. Conservative call graphs include every
+matching loaded implementation and fail explicitly when generic arguments cannot be
+inferred, rather than omit a possible target. Abstract declarations cannot be directly
+invoked by guest calls, host handles or graph roots.
+
+Fifteen focused tests cover stack/heap receiver dispatch, expired storage, null and
+uninitialized access, generic list mutation, overloads, exact interface identity,
+conformance failures, receiver copies, host erasure boundaries, module visibility,
+concrete Fault frames and conservative reachability. The source/artifact walkthrough
+and opcode inventory include the new sample. Documentation records the explicit
+reference cast as illustrative Raven-like syntax, plus current native-layout limits.
+
+Validation covered 492 tests on macOS ARM64. The full run passed 488 tests and
+reported one source-manifest mismatch because whitespace was edited after compilation;
+the rebuilt source-files target passes all four checks. The final 15 interface tests
+(including three added after the full run started), seven reachability tests and six
+erased-input tests pass. Clippy with warnings denied, formatting and diff checks pass.
+No other full-suite target failed. Cross-platform release validation remains open.

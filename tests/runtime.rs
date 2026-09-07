@@ -252,6 +252,7 @@ fn all_implemented_opcodes_have_a_sample() {
     // Keep every advertised opcode represented in the sample sources.
     let samples = [
         include_str!("../examples/hello.neoil"),
+        include_str!("../examples/interfaces.neoil"),
         include_str!("../examples/type_inspection.neoil"),
         include_str!("../examples/features.neoil"),
         include_str!("../examples/fault.neoil"),
@@ -388,6 +389,8 @@ fn all_implemented_opcodes_have_a_sample() {
         "brfalse",
         "switch",
         "call",
+        "callvirt",
+        "interface.borrow",
         "ret",
         "newobj",
         "ldfld",
