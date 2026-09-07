@@ -350,6 +350,8 @@ Run `cargo run --example invoke` for the Rust embedding sample.
 `cargo run --example union_inputs` demonstrates Option/Result arguments and result reuse.
 [Cooperative cancellation](docs/cancellation.md) is available through ExecutionOptions.
 `cargo run --example cancellation` stops an invocation from another host thread.
+[Interrupt and native boundaries](docs/interrupts-and-native.md) define the VM-level
+contracts available to managed and native-oriented language profiles.
 [Closed call-graph analysis](docs/reachability.md) follows explicit roots for backend planning.
 `cargo run --example reachability` reports HelloWorld's IL calls, runtime import, and
 [runtime-service requirements](docs/runtime-services.md).

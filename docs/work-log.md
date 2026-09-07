@@ -1874,3 +1874,8 @@ Recorded the platform policy principle: neoCLR standardizes low-level typed valu
 array views, pointers, allocation regions, layouts and checked memory operations as
 VM capabilities. Language authors may add safety or ownership profiles above that
 surface; C#-specific historical restrictions are not implicit runtime rules.
+
+Added the interrupt/native architecture note: execution modes share explicit
+interrupt state and safepoints, while native calls declare ABI, layout, pointer and
+ownership boundaries. Managed language profiles may restrict these capabilities,
+but the low-level VM does not remove them.
