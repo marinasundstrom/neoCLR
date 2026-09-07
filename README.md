@@ -1,5 +1,12 @@
 # neoCLR
 
+[![CI](https://github.com/marinasundstrom/neoCLR/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/marinasundstrom/neoCLR/actions/workflows/ci.yml)
+[![Preview 1](https://img.shields.io/badge/release-v0.1.0--preview.1-blue)](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.1)
+[![MIT license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Rust 1.85+](https://img.shields.io/badge/Rust-1.85%2B-orange)](Cargo.toml)
+
+**An experimental, .NET-inspired virtual machine with values by default and explicit control over memory and references.**
+
 neoCLR is a managed, type-safe virtual machine with an intentionally low-level
 instruction set. It provides explicit memory access, typed pointers, native calls,
 and allocation controls when a program needs them. It is a runtime platform rather
@@ -31,11 +38,12 @@ Interfaces use ordinary names without an `I` prefix.
 [Borrowed interface references](docs/interfaces.md) make dispatch explicit without boxing or ownership.
 [Typed equality](docs/equality.md) uses System.Equatable<T> and Equals(T).
 
-## Current focus
+## Preview 1
 
-The first publication target is **Preview 1**, a runnable source preview. The [Preview 1 plan](docs/preview-1.md)
-defines required capabilities, remaining work, demonstrations, release checks, and exclusions.
-The current checkout is not yet declared ready for Preview 1.
+**Preview 1 (v0.1.0-preview.1)** is a runnable source preview. Read the
+[release notes](docs/preview-1-release-notes.md) for capabilities and known limits,
+and the [scope and release checks](docs/preview-1.md) for the milestone boundaries.
+The GitHub prerelease records the tagged commit, CI evidence and source checksums.
 Start with the [runnable walkthrough](docs/preview-1-walkthrough.md): console calculation,
 array loops, file input, explicit pointers, ordinary errors and Fault traces, with
 source/artifact commands and tested expected output.
@@ -426,9 +434,9 @@ demonstrates that form.
 neoCLR is licensed under the [MIT License](LICENSE). [Third-party notices](THIRD_PARTY_NOTICES.md)
 record the locked dependency licenses, including native libffi and its build-tool notices.
 
-[Draft Preview 1 release notes](docs/preview-1-release-notes.md) describe the proposed
-source preview. [Source packaging](docs/source-release.md) records the audit and
-remaining publication checks; no release candidate or final tag has been selected.
+[Preview 1 release notes](docs/preview-1-release-notes.md) describe this experimental
+source release. [Source packaging](docs/source-release.md) records the audit and
+archive validation process.
 
 [Managed references in Raven-like pseudocode](docs/references-in-pseudocode.md)
 explains &value, T&, output parameters, reference receivers, interface views and

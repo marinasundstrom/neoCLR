@@ -1,8 +1,9 @@
-# neoCLR Preview 1 — draft release notes
+# neoCLR Preview 1 — release notes
 
-Status: draft for review. No release candidate, final version, tag or publication date
-has been selected. Cargo's development version is currently 0.1.0. See the
-[release checklist](preview-1.md) and [validation evidence](preview-1-validation.md).
+Version: **0.1.0-preview.1** · Tag: **v0.1.0-preview.1** · Source-only prerelease.
+The [GitHub release](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.1)
+records the exact commit, successful CI run and source-archive checksum. See also
+[scope and release checks](preview-1.md) and [validation evidence](preview-1-validation.md).
 
 neoCLR is an experimental, standalone .NET-inspired virtual machine. This first
 source preview demonstrates a platform where values are the default and allocation,
@@ -80,17 +81,26 @@ subsets. The verifier is optional and conservative; successful verification does
 not guarantee memory safety for arbitrary native pointer operations. No production
 sandbox, stable ABI, binary compatibility or performance parity is claimed.
 
-## Validation and remaining release gates
+## Validation and supported preview environments
 
-Local macOS ARM64 evidence includes a clean Rust 1.85.0 build, an uninterrupted
-521-test run, and source/artifact, external-library, embedding and native workflows.
-Stable-toolchain regression coverage and strict Clippy are also recorded. CI is
-configured for stable and minimum Rust on Linux, macOS and Windows; results for an
-exact release candidate have not yet been recorded. These draft notes do not announce
-validated support for every OS/CPU combination.
+The preceding implementation commit passed all six jobs in
+[Actions run 34145375938](https://github.com/marinasundstrom/neoCLR/actions/runs/34145375938).
+The release process also requires a passing run on the exact tagged commit; that
+run is linked from the GitHub release alongside the archive checksum.
 
-Before publication, choose the candidate/version, collect its platform results,
-complete first-install and final source-package checks, and finalize these notes.
+The tested preview environments are Linux x86-64 (Ubuntu 24.04), macOS ARM64
+(macOS 26) and Windows x86-64 (Windows Server 2025/MSVC), on Rust 1.85.0 and stable.
+These are tested runner configurations, not a claim of support for every OS/CPU
+combination. The stable job runs formatting, strict Clippy and the full test suite;
+both toolchains test source/artifact programs, embedding and native sample execution.
+
+Local evidence additionally includes a clean Rust 1.85.0 build, an uninterrupted
+521-test run, and external-library, console/file and expected-Fault workflows. The
+CRLF regression is exercised with both LF and CRLF source. Final archive contents
+and notice hashes are checked before publishing the source assets.
+
 The project is MIT-licensed. [Third-party notices](../THIRD_PARTY_NOTICES.md) inventory
 locked dependencies, their license texts and the separate native libffi/build-tool
-notices. Dependencies are downloaded by Cargo and are not vendored in the source archive.
+notices. Dependencies are downloaded by Cargo and are not vendored in the source
+archive. This prerelease includes no prebuilt runtime binaries and is not published
+to crates.io. Interfaces, APIs and artifact formats may change in later previews.

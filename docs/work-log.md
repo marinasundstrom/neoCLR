@@ -2546,3 +2546,18 @@ Clippy and formatting/diff checks pass. The targeted test also passes under 1.85
 in the independent source snapshot with its included sample actually stored as CRLF.
 Updated the platform evidence with the observed CI results. A new Windows run of
 the fix remains necessary; no push or workflow rerun was performed in this slice.
+
+## Preview 1 release finalization
+
+Confirmed all six jobs passed for 4fb1f9e in Actions run 34145375938. The user
+requested release finalization and README badges. Selected 0.1.0-preview.1 and
+v0.1.0-preview.1 for a source-only GitHub prerelease; Cargo publish remains disabled.
+Added CI, release, MIT and minimum-Rust badges and the project tagline to README.
+Updated package version/repository metadata and finalized release notes and scope.
+No runtime semantics or third-party dependency versions changed.
+
+The release procedure requires a passing six-job run on this finalization commit,
+then checks an archive of that exact tree, notice hashes and extracted build/sample
+execution before publishing. The GitHub release records that final run, commit and
+asset checksums; the validated source does not need a post-validation documentation
+edit. Earlier failure records remain historical evidence, not current release status.

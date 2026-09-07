@@ -1,8 +1,18 @@
 # Preview 1 validation evidence
 
-This is a record of development evidence and outstanding release checks. It does
-not designate a release candidate or claim that the publication checklist is complete.
+This records development evidence and release checks. Final v0.1.0-preview.1
+candidate CI and archive checksums are linked from the GitHub prerelease without
+modifying its tagged source.
 The [Preview 1 plan](preview-1.md) remains the scope and acceptance checklist.
+
+## Successful cross-platform baseline
+
+[Run 34145375938](https://github.com/marinasundstrom/neoCLR/actions/runs/34145375938)
+passed all six jobs for 4fb1f9e1f85979dcf7540816a7120ac9f69b5bac, confirming the
+Windows CRLF test correction. Minimum Rust 1.85.0 and stable jobs passed on Ubuntu
+x86-64, macOS ARM64 and Windows x86-64/MSVC, including embedding and native examples.
+The failed-run analysis below is retained as history. Final release metadata and
+badges are a subsequent commit that must pass the same workflow before publication.
 
 ## Observed CI run for a133046
 

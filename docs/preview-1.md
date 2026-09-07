@@ -1,10 +1,9 @@
 # Preview 1: public source release
 
 Target: a runnable developer source preview containing the neoIL assembler, interpreter,
-small platform-written runtime library, and demonstrative programs. This publication
-shape was selected on 2026-09-07. Prebuilt binaries and a high-level compiler are not
-required. This document defines the proposed feature and release gates for that target;
-it does not declare the current checkout ready for Preview 1 or authorize publication.
+small platform-written runtime library, and demonstrative programs. The release is **v0.1.0-preview.1**, a GitHub prerelease. Prebuilt binaries and a
+high-level compiler are not required. This document records the feature boundaries
+and checks required before publishing that source release.
 
 The milestone's name is **Preview 1**. Its behavioral scope is defined by the six
 [Raven-like program contracts and IL mappings](preview-1-programs.md). This checklist
@@ -40,7 +39,7 @@ may remain unnamed; neoCLR is sufficient as the runtime codename for the preview
 | Managed references and interfaces | Call-scoped typed references, output parameters, explicit receiver views and a small useful interface set | Implemented: T&, out/out(true), reference receivers, List<T> and Equatable<T>; no escaping references or automatic ownership |
 | Errors and diagnostics | Recoverable failures through Result; terminal Faults with owned logical stack frames shown by CLI/host | All six reviewed library Result APIs use ordinary typed errors. Source-line maps and guest StackTrace classes are not required for Preview 1 |
 | Embedding and native boundary | One runnable embedding example and one supported scalar/pointer native interop example | Implemented experimental Rust hosting and P/Invoke subset; validate the published examples and platform requirements |
-| Publication readiness | Accurate README/design limits, explicit license, release notes, tested supported platforms and source release instructions | MIT license and dependency notice inventory present; release notes drafted; final provenance, candidate/platform and archive checks remain |
+| Publication readiness | Accurate README/design limits, explicit license, release notes, tested supported platforms and source release instructions | MIT license and dependency notice inventory present; release notes finalized; candidate CI and archive checks are enforced before publication |
 
 "Implemented" does not mean release-validated on every platform. Local validation so far
 is on macOS ARM64; CI is configured for Linux, macOS, and Windows, but this plan does not
@@ -91,29 +90,22 @@ Release documentation must disclose this limitation and the retirement direction
 If complete removal is selected as a Preview 1 requirement, revise the milestone
 scope and acceptance tests before starting that migration.
 
-## Remaining work, in order
+## Release process
 
-1. **Finish the documentation audit.** Keep the README, opcode table, API contracts and
-   language mappings consistent. Explain value copies, native pointers, managed views,
-   interpreter allocation costs, verification limits and the temporary storage above.
-2. **Validate the build contract on claimed platforms.** Rust 1.85.0 is recorded in
-   Cargo metadata and tested locally from a clean source snapshot. Minimum/stable CI
-   jobs are configured for three operating systems. Collect their results and verify
-   first-install prerequisites and clean-clone instructions for the release candidate.
-3. **Finalize the source package.** Review the [dependency notices](../THIRD_PARTY_NOTICES.md)
-   and [source audit](source-release.md) against the candidate. Finish provenance review
-   and the [draft release notes](preview-1-release-notes.md), then select the version/tag
-   explicitly. Recheck archive membership after any further changes.
-4. **Validate the candidate commit.** Run formatting, strict Clippy, the full suite,
-   representative embedding/native examples and source/artifact demonstrations on the
-   exact candidate. Record OS, architecture and toolchain for local and CI evidence.
-5. **Review publication readiness.** Resolve failures or narrow unsupported claims,
-   then complete the checklist below. Publication, tagging and pushing remain separate
-   actions; completing implementation does not perform them.
+Preview 1 implementation is complete within the boundaries below. The user has
+requested finalization of the source release. Keep dependency versions and runtime
+semantics fixed during this step; fix any candidate-validation failure explicitly.
 
-See [validation evidence](preview-1-validation.md) for the current local baseline and
-what still needs to be recorded. Prioritize failures and gaps in these gates over
-expanding the runtime library.
+1. Record version 0.1.0-preview.1 and final release documentation in a commit.
+2. Require all six minimum/stable platform jobs to pass on that commit.
+3. Create a source archive from that exact commit, verify tracked-file membership
+   and notice hashes, and build/run representative programs from its extraction.
+4. Publish v0.1.0-preview.1 as a GitHub prerelease with the source archive, checksums,
+   release notes and a link to the successful candidate CI run.
+
+The [validation record](preview-1-validation.md) contains preceding evidence; the
+GitHub release records the final commit and run so publication does not require
+editing the already validated source tree. No crates.io publication is planned.
 
 ## Required demonstrations
 
@@ -143,44 +135,26 @@ define the central behavioral set; embedding/native checks below cover its platf
 The existing file-input example can ship as an additional bounded integration. It does
 not justify expanding Preview 1 into streams, filesystem abstractions or networking.
 
-## Release acceptance checklist
+## Implementation and package review
 
-- [x] The ordinary constructor/carrier milestones above are implemented and tested.
-- [x] No special union instructions or Option/Result runtime categories remain; final
-      samples and library code execute through ordinary metadata and IL operations.
-- [x] Minimal guest type inspection is implemented without dynamic invocation, reflective
-      construction, field mutation, or an accessibility bypass.
-- [x] Managed reference/output contracts and explicit interface dispatch are implemented
-      and regression-tested; Equatable<T> demonstrates typed equality.
-- [ ] All required demonstrations run from source and, where applicable, assembled artifacts.
-- [ ] `cargo fmt --check`, `cargo clippy --locked --all-targets -- -D warnings`, and
-      `cargo test --locked` pass for the exact proposed release commit.
-- [ ] Linux, macOS and Windows source builds/tests and representative console/native samples
-      pass in CI for that commit. Record actual architectures; do not imply every OS/CPU
-      combination is supported. Narrow any unsupported claim explicitly before release.
-- [x] Declare the minimum Rust toolchain in Cargo metadata and configure minimum/stable
-      CI coverage. Rust 1.85.0 build/tests passed locally; see the validation record.
-- [ ] Minimum and stable toolchain jobs pass on the claimed platforms for the exact
-      proposed release commit.
-- [ ] A fresh clone follows the README successfully, including native build prerequisites,
-      external sample data paths, expected failure exits and output-file overwrite rules.
-- [ ] README and API/metadata documents distinguish implemented behavior, intentional
-      divergences, temporary helpers, unsafe/trusted boundaries, and deferred features.
-- [x] Add the project-owner-selected MIT license and Cargo license metadata.
-- [ ] Release notes and public documentation disclose System.Value allocation/copy costs,
-      its retirement direction and the limits of the Void* storage experiment.
-- [x] Inventory locked dependency licenses and preserve notice texts with provenance/hashes,
-      including native libffi and separately licensed build/test tooling.
-- [ ] Complete maintainer provenance review and refresh dependency/source notices for the
-      exact candidate and chosen distribution shape.
-- [x] Draft release notes covering capabilities, known limits, format changes and build instructions.
-- [ ] Choose the preview version/tag and finalize release notes with exact-candidate platform evidence.
-- [ ] Confirm the source release contains the lockfile, runtime IL, fixtures, samples,
-      docs and tests, with no generated local artifacts or credentials.
+- [x] Ordinary types, constructors, properties, accessibility, generic carriers and
+      read-only type inspection are implemented and tested.
+- [x] Union-specific VM instructions/categories are removed. TryGet uses ordinary IL.
+- [x] Managed references, output contracts, interfaces and typed equality are tested.
+- [x] Source/artifact demonstrations, embedding and native examples are automated.
+- [x] Rust 1.85 is declared and minimum/stable platform jobs are configured; all six
+      passed for the preceding implementation commit.
+- [x] Clean-source minimum-toolchain builds and README workflows passed locally.
+- [x] Documentation discloses explicit copying, memory/reference boundaries,
+      interpreter limitations and System.Value allocation costs/retirement direction.
+- [x] MIT licensing, locked dependency notices and bounded source-provenance review
+      are recorded in the source audit. No dependency implementation is vendored.
+- [x] Version/tag selected and release notes finalized for the source-only scope.
 
-A crates.io release is not part of this target; Cargo.toml currently has publish=false.
-Publishing a work-in-progress repository earlier is a separate choice from declaring a
-Preview 1 release. This plan performs neither a remote push nor a publication.
+Publication requires successful exact-commit CI and final archive verification, as
+specified above. The release's linked run and checksums provide the completion
+record for those gates. The source audit is a bounded review, not an assertion of
+complete historical provenance for every line or a binary-distribution license audit.
 
 ## Explicitly outside Preview 1
 
