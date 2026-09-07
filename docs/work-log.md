@@ -1821,3 +1821,24 @@ regression; restored that check and reran the full suite successfully.
 Validation: all 429 integration tests pass; formatting, Clippy with warnings denied,
 diff and documentation-link checks pass. The sample assembled, verified and executed
 from JSON with expected output. No push or publication performed.
+
+## 2026-09-07 — Ordinary nested type ownership
+
+Added optional declaring-type definition IDs to prototype metadata and nested `.type`
+declarations to the assembler. Nested case types under non-generic companions own
+all their generic parameters locally. Qualified references use existing type lookup,
+method binding, record storage, layout, verification and host input machinery.
+There are no new instructions or union-specific runtime semantics.
+
+The loader validates owner existence, same module/revision, matching immediate
+qualified names and bounded acyclic ownership. Public/internal nested type access
+includes enclosing visibility. Generic outer nesting and private nested types are
+explicitly deferred; private member access retains exact declaring-type semantics.
+A dotted top-level name alone does not establish ownership.
+
+Recorded that a future Raven-like frontend can expose one union declaration while
+lowering its carrier and non-generic companion to separate ordinary types. Added
+`examples/nested_types.neoil`, which prints 42, and four integration tests covering
+serialized execution, nested generic host receivers and identities, Void payloads,
+multiple levels, module linking, effective visibility and malformed ownership.
+The existing System wrapper names remain intact pending the next migration slice.

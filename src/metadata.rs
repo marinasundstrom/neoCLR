@@ -146,6 +146,9 @@ pub struct TypeDef {
     pub visibility: Visibility,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub definition: Option<TypeDefId>,
+    /// Explicit lexical owner; dotted names alone do not imply nesting.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub declaring_type: Option<TypeDefId>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub custom_attributes: Vec<CustomAttribute>,
     pub name: String,

@@ -203,12 +203,52 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
     if module.format != 3 {
         return Err(Fault::new("unsupported module format (expected 3)"));
     }
+    // Validate ownership before any traversal by access checking or execution.
+    for def in &module.types {
+        let mut current = def;
+        let mut seen = HashSet::new();
+        while let Some(owner) = &current.declaring_type {
+            if !seen.insert(owner) || seen.len() > 32 {
+                return Err(Fault::new("cyclic or excessive type ownership nesting"));
+            }
+            let parent = module
+                .types
+                .iter()
+                .find(|candidate| candidate.definition.as_ref() == Some(owner))
+                .ok_or_else(|| Fault::new("missing nested type owner"))?;
+            if current
+                .definition
+                .as_ref()
+                .is_none_or(|id| id.module != owner.module || id.revision != owner.revision)
+            {
+                return Err(Fault::new(
+                    "nested type owner must belong to the same module and revision",
+                ));
+            }
+            if !parent.generic_parameters.is_empty() {
+                return Err(Fault::new(
+                    "nesting under generic types is not supported yet",
+                ));
+            }
+            let prefix = format!("{}.", parent.name);
+            if current
+                .name
+                .strip_prefix(&prefix)
+                .is_none_or(|name| name.is_empty() || name.contains('.'))
+            {
+                return Err(Fault::new(
+                    "nested type name must qualify its immediate owner",
+                ));
+            }
+            current = parent;
+        }
+    }
     let mut names = HashSet::new();
     let mut type_identities = HashSet::new();
     for def in &module.types {
         if def.visibility == crate::metadata::Visibility::Private {
             return Err(Fault::new(
-                "top-level types support public or internal visibility",
+                "types currently support public or internal visibility",
             ));
         }
         if def

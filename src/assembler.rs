@@ -89,6 +89,8 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
     let mut field_fixups: Vec<FieldFixup> = vec![];
     let mut function: Option<PendingFunction> = None;
     let mut typedef: Option<TypeDef> = None;
+    let mut enclosing_types = Vec::new();
+    let mut nesting_fixups = Vec::new();
     let mut property: Option<crate::metadata::Property> = None;
     for (index, raw) in source.lines().enumerate() {
         let line_number = index + 1;
@@ -172,12 +174,16 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     module.functions.push(pending.function);
                 } else if let Some(def) = typedef.take() {
                     module.types.push(def);
+                    typedef = enclosing_types.pop();
                 } else {
                     return Err(Fault::new("unexpected .end"));
                 }
                 return Ok(());
             }
-            if let (true, Some(def)) = (function.is_none() && word != ".method", typedef.as_mut()) {
+            if let (true, Some(def)) = (
+                function.is_none() && word != ".method" && word != ".type",
+                typedef.as_mut(),
+            ) {
                 if word == ".property" {
                     let (kind, signature) =
                         rest.split_once(char::is_whitespace).ok_or_else(|| {
@@ -240,7 +246,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                 }
                 if word != ".field" {
                     return Err(Fault::new(
-                        "expected .field, .property, .pack, .size, .custom, .method or .end",
+                        "expected .type, .field, .property, .pack, .size, .custom, .method or .end",
                     ));
                 }
                 let (name, ty) = rest
@@ -534,11 +540,34 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         }
                         _ => (crate::metadata::Visibility::Public, rest),
                     };
-                    let (name, generic_parameters) = parse_type_declaration(rest)?;
+                    let (mut name, generic_parameters) = parse_type_declaration(rest)?;
+                    if let Some(parent) = typedef.take() {
+                        if !parent.generic_parameters.is_empty() {
+                            return Err(Fault::new(
+                                "nesting under generic types is not supported yet",
+                            ));
+                        }
+                        if name.contains('.') {
+                            return Err(Fault::new(
+                                "nested type declaration requires a simple name",
+                            ));
+                        }
+                        if enclosing_types.len() >= 31 {
+                            return Err(Fault::new("type ownership nesting exceeds 32"));
+                        }
+                        name = format!("{}.{}", parent.name, name);
+                        nesting_fixups.push((
+                            name.clone(),
+                            generic_parameters.len(),
+                            parent.name.clone(),
+                        ));
+                        enclosing_types.push(parent);
+                    }
                     let ty = Type::from_name(&name);
                     typedef = Some(TypeDef {
                         visibility,
                         definition: None,
+                        declaring_type: None,
                         custom_attributes: vec![],
                         name: ty.definition_name().unwrap_or(&name).into(),
                         generic_parameters,
@@ -654,6 +683,19 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
         return Err(Fault::new(".module is required"));
     }
     module.normalize_definition_ids()?;
+    for (child, arity, parent) in nesting_fixups {
+        let owner = module
+            .types
+            .iter()
+            .find(|def| def.name == parent && def.generic_parameters.is_empty())
+            .and_then(|def| def.definition.clone())
+            .ok_or_else(|| Fault::new("missing nested type owner"))?;
+        for def in &mut module.types {
+            if def.name == child && def.generic_parameters.len() == arity {
+                def.declaring_type = Some(owner.clone());
+            }
+        }
+    }
     Ok((module, field_fixups))
 }
 

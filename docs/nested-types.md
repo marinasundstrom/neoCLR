@@ -1,13 +1,18 @@
 # Nested case types and generic union companions
 
-Status: selected design direction. [Name-plus-arity identity](type-arities.md) is
-implemented; nested ownership and the companion case migration remain unfinished.
+Status: [name-plus-arity identity](type-arities.md) and ordinary nested ownership
+under non-generic types are implemented. The System companion case migration remains
+unfinished.
 The user clarified that case types
 are ordinary nested types and generic unions should use a non-generic companion type.
 This supersedes the earlier exploration of selectively capturing outer parameters.
 No inheritance relation is implied by either nesting or union membership.
 
 ## Separate companion and carrier definitions
+
+A future Raven-like frontend can present the companion and carrier as a single
+source declaration, lowering it to these separate ordinary metadata definitions.
+The runtime does not merge them or infer a relationship.
 
 Use this Raven-like pseudocode shape (not accepted assembler syntax):
 
@@ -70,16 +75,46 @@ existing message-bearing System.Error payload type.
    emitted reference must resolve unambiguously before generic substitution. Update
    linking, member owners, verification, type identity and host validation together.
 
-CLI-inspired nesting and arity concepts can remain familiar. Do not copy a legacy
-binary spelling into the language as a semantic requirement. Choose the precise neoIL
-and prototype JSON encoding during implementation; no new syntax or format is promised
-by this design note.
+## Implemented assembly and metadata
+
+```text
+.type Demo.Result
+    .type Ok<T>
+        .field Value T
+    .end
+    .type Error<E>
+        .field Value E
+    .end
+.end
+.type Demo.Result<T,E>
+    .field Payload System.Value
+.end
+```
+
+Nested declarations use simple names. References use the qualified name and explicit
+local arguments, such as `Demo.Result.Ok<Int32>`. Each nested definition stores a
+`declaring_type` definition ID (module, revision, row); the loader checks that its
+qualified name agrees with that immediate owner. A top-level dotted declaration does
+not imply ownership. Existing global name-plus-arity collision rules still apply;
+a top-level type cannot duplicate a nested type's qualified name and arity.
+
+Ownership must stay within one module/revision, resolve to a real definition, and
+be acyclic with bounded depth (32). Generic cases declare only their own parameters.
+Nesting under a generic outer definition is rejected for this initial subset.
+No new opcode, allocation rule, implicit outer instance, field, generic argument,
+or inheritance relation is introduced. Existing metadata artifacts without the
+optional ownership field remain top-level definitions.
+
+Run `cargo run -- run examples/nested_types.neoil` to print `42` using a nested
+generic case and its ordinary instance method. `Demo.Result` avoids the temporary
+reserved unqualified bootstrap `Result` spelling.
 
 ## Access and ordinary union behavior
 
-Use the current access levels. Specify effective visibility through owner chains and
-any containing/nested private-member access before implementation; do not derive access
-rights from matching name prefixes. An access-modifier redesign is not a prerequisite.
+This subset permits public/internal type visibility. A public nested type remains
+subject to every enclosing type's visibility. Private nested types are deferred;
+private members retain exact-declaring-type access with no extra nesting privileges.
+Access follows ownership IDs, never matching name prefixes.
 
 The generic carrier owns its representation and defines its permitted constructor
 inputs and read-only queries. The non-generic companion organizes ordinary case types;
@@ -92,9 +127,9 @@ and callable values are still separate prerequisites.
 
 ## Implementation order and proof
 
-Same-name definitions with different generic arities are implemented. Next implement
-ordinary nested ownership and generic nested definitions under the non-generic companion.
-Only then move Option/Result cases and migrate their constructor/query references.
+Same-name definitions with different generic arities and nested generic definitions
+under non-generic companions are implemented. Next move Option/Result cases and
+migrate their constructor/query references.
 Preserve the currently working top-level carriers during those foundational slices.
 
 The proof must include coexisting Result and Result<T,TError>, nested Ok<T> and

@@ -371,3 +371,6 @@ dependencies. [Scoped type operands](docs/scoped-types.md), such as `[Models]Box
 check the definition's module. Optional [artifact revision labels](docs/module-revisions.md)
 support exact dependency pins and definition identities. Duplicate type names and
 side-by-side module versions remain pending.
+
+[Ordinary nested types](docs/nested-types.md) support generic cases under non-generic
+companions. Run `cargo run -- run examples/nested_types.neoil` for a minimal example.

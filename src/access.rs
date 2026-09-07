@@ -132,17 +132,30 @@ fn check_type(module: &Module, source: Scope<'_>, ty: &Type) -> Result<(), Fault
         if depth > 32 {
             return Err(Fault::new("type nesting exceeds 32"));
         }
-        if let Some(definition) = module.type_definition(ty).filter(|definition| {
-            definition.visibility != Visibility::Public
-                && definition
+        let mut definition = module.type_definition(ty);
+        let mut owners = 0;
+        while let Some(def) = definition {
+            if owners > 32 {
+                return Err(Fault::new("type ownership nesting exceeds 32"));
+            }
+            if def.visibility != Visibility::Public
+                && def
                     .definition
                     .as_ref()
                     .is_none_or(|id| source != Some((id.module.as_str(), id.revision.as_deref())))
-        }) {
-            return Err(Fault::new(format!(
-                "type access denied: {} is {:?}",
-                definition.name, definition.visibility
-            )));
+            {
+                return Err(Fault::new(format!(
+                    "type access denied: {} is {:?}",
+                    def.name, def.visibility
+                )));
+            }
+            definition = def.declaring_type.as_ref().and_then(|owner| {
+                module
+                    .types
+                    .iter()
+                    .find(|candidate| candidate.definition.as_ref() == Some(owner))
+            });
+            owners += 1;
         }
         let nested = |ty| visit(module, source, ty, depth + 1);
         match ty {

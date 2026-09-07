@@ -1,0 +1,27 @@
+.module NestedTypes
+.entry Main
+
+.type Demo.Result
+    .type Ok<T>
+        .field Value T
+        .method instance Read() -> T
+            ldarg this
+            ldfld Demo.Result.Ok<T>::Value
+            ret
+        .end
+    .end
+    .type Error<E>
+        .field Value E
+    .end
+.end
+.type Demo.Result<T,E>
+    .field Payload System.Value
+.end
+
+.function Main() -> Void
+    ldc.i4 42
+    newobj Demo.Result.Ok<Int32>
+    call instance Demo.Result.Ok<Int32>::Read()
+    call System.Console::WriteLine(Int32)
+    ret
+.end
