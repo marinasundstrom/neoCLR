@@ -1,0 +1,112 @@
+.module ConsoleInput
+.entry Main
+
+; Read up to nine ASCII digits, terminated by LF or EOF.
+; CR is ignored so redirected CRLF input works too.
+.function ReadNumber() -> Result<Option<Int32>,Error>
+    .local Int32 number
+    .local Int32 digits
+    .local Byte byte
+    ldc.i4 0
+    stloc number
+    ldc.i4 0
+    stloc digits
+Read:
+    call System.Console::ReadByte()
+    dup
+    is.case Err
+    brtrue InputFailed
+    ldcase Ok
+    dup
+    is.case None
+    brtrue Eof
+    ldcase Some
+    stloc byte
+    ldloc byte
+    ldc.i4 13
+    beq Read
+    ldloc byte
+    ldc.i4 10
+    beq Finish
+    ldloc byte
+    ldc.i4 48
+    blt Invalid
+    ldloc byte
+    ldc.i4 57
+    bgt Invalid
+    ldloc digits
+    ldc.i4 9
+    beq TooLong
+    ldloc number
+    ldc.i4 10
+    mul
+    ldloc byte
+    ldc.i4 48
+    sub
+    add
+    stloc number
+    ldloc digits
+    ldc.i4 1
+    add
+    stloc digits
+    br Read
+Eof:
+    pop
+    ldloc digits
+    brtrue Finish
+    none Int32
+    ok Error
+    ret
+Finish:
+    ldloc digits
+    brfalse Empty
+    ldloc number
+    some
+    ok Error
+    ret
+InputFailed:
+    ldcase Err
+    err Option<Int32>
+    ret
+Invalid:
+    error "Expected ASCII digits"
+    err Option<Int32>
+    ret
+TooLong:
+    error "At most nine digits"
+    err Option<Int32>
+    ret
+Empty:
+    error "Empty input"
+    err Option<Int32>
+    ret
+.end
+
+.function Main() -> Void
+    ldstr "Enter an unsigned number (up to nine digits):"
+    call System.Console::WriteLine(String)
+    pop
+    call ReadNumber()
+    dup
+    is.case Err
+    brtrue Failed
+    ldcase Ok
+    dup
+    is.case None
+    brtrue Eof
+    ldcase Some
+    ldc.i4 2
+    mul
+    call System.Console::WriteLine(Int32)
+    ret
+Failed:
+    ldcase Err
+    call instance System.Error::ToString()
+    call System.Console::WriteLine(String)
+    ret
+Eof:
+    pop
+    ldstr "End of input"
+    call System.Console::WriteLine(String)
+    ret
+.end

@@ -13,7 +13,7 @@ In particular, the current whole-file text helper is a bounded demonstration, no
 foundation of a permanent Stream API. General I/O abstractions should follow concrete
 needs and the primitives required to implement them in platform code.
 
-[System.neoil](../runtime/System.neoil) currently provides twenty-two platform-written methods and nine native declarations:
+[System.neoil](../runtime/System.neoil) currently provides twenty-three platform-written methods and ten native declarations:
 
 - `System.IO.File` provides bounded ReadAllText; see [file input](file-input.md).
 - `System.Error` provides FromMessage, get_Message, and ToString; see [Error values](errors.md).
@@ -22,6 +22,8 @@ needs and the primitives required to implement them in platform code.
 - `System.String` provides Concat, Equals, IsEmpty, GetUtf8ByteCount, and SliceUtf8;
   see [the text contract](text-model.md).
 - The UnionAttribute marker has an ordinary IL constructor.
+- `System.Console.ReadByte()` exposes optional raw input through a host-supplied console;
+  see [console I/O](console-io.md).
 - `System.Console.WriteLine(string)` calls the host output primitive.
 - `System.Console.WriteLine(int32)` calls the Int32 receiver's `ToString()` and then
   the string overload.
@@ -35,9 +37,10 @@ needs and the primitives required to implement them in platform code.
 The remaining host calls are `neoCLR.Runtime.WriteLine(string) -> Void`,
 `neoCLR.Runtime.Int32ToString(int32) -> String`, and
 `neoCLR.Runtime.ParseInt32(string) -> Result<Int32,Error>`, plus StringConcat,
-StringByteCount, StringSliceUtf8, ErrorFromMessage, ErrorMessage, and ReadAllText. Parsing and formatting
+StringByteCount, StringSliceUtf8, ErrorFromMessage, ErrorMessage, ReadAllText, and ConsoleReadByte. Parsing and formatting
 are temporary host implementations until character/string operations can support
-their platform versions. Console output is buffered until successful execution.
+their platform versions. Console output is captured by default in Rust embedding, or delivered immediately to
+an explicitly supplied host console. The CLI uses live output.
 
 The public `System.*` methods are not hard-coded interpreter dispatch cases.
 Their declaring types are explicit, including runtime-known `System.Int32`.

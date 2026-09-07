@@ -9,6 +9,7 @@ let token = neoclr::CancellationToken::new();
 let options = neoclr::ExecutionOptions {
     limits: neoclr::Limits::default(),
     cancellation: Some(token.clone()),
+    ..neoclr::ExecutionOptions::default()
 };
 // Supply options to program.run or a resolved function's invoke method.
 // Another host thread holding token can request cancellation:
@@ -46,7 +47,8 @@ than transferring an Execution across threads.
 
 Each run still owns fresh frames, allocations, and output. Cancellation drops this
 execution state through the existing Fault path; it does not return a partial Execution.
-External native side effects are not rolled back. The immutable program and resolved
+External native side effects and already delivered [live console output](console-io.md)
+are not rolled back. Console host calls cannot be interrupted by cancellation. The immutable program and resolved
 handles remain reusable, and executions with independent tokens are unaffected.
 Native-enabled APIs retain all existing unsafe ABI and lifetime requirements.
 

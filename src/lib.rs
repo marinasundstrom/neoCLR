@@ -1,6 +1,8 @@
 pub mod assembler;
 pub use assembler::assemble;
+mod console;
 mod execution;
+pub use console::{Console, StdioConsole};
 mod input;
 pub use execution::{CancellationToken, ExecutionOptions};
 mod file_io;

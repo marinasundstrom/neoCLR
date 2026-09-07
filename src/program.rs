@@ -7,7 +7,8 @@ use crate::{
 ///
 /// Loading does not perform typed verification or execute code. Each execution owns
 /// fresh frames, allocations, output, and native-library state. This Rust API is not
-/// a stable native hosting ABI or a serialized artifact format.
+/// a stable native hosting ABI or a serialized artifact format. An explicitly supplied
+/// host console may share external I/O state across executions.
 #[derive(Debug)]
 pub struct LoadedProgram {
     module: Module,

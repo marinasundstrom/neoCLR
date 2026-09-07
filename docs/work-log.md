@@ -1475,3 +1475,33 @@ that bootstrap helpers are not automatically permanent runtime services. Console
 remains next, without requiring a Stream hierarchy or general I/O framework.
 
 Validation: documentation-only change; diff checks pass. No runtime behavior changed.
+
+## 2026-09-07 — Minimal host console and interactive IL demonstration
+
+Added an optional host Console to ExecutionOptions with synchronous raw byte input
+and immediate line output. Default Rust embedding retains captured output and reports
+ConsoleUnavailable for reads. The CLI explicitly selects StdioConsole and flushes each
+line before returning to guest execution, preserving prompts before input and avoiding
+duplicate output. Shared console objects retain their external input position across
+otherwise fresh executions.
+
+System.Console.ReadByte is a platform-IL wrapper over one declared InternalCall,
+returning Result<Option<Byte>,Error>. EOF is ordinary absence; input failures are Error
+values. Existing Void-returning WriteLine reports host write failure as a terminal Fault.
+Documented blocking calls, partial/external side effects, embedding defaults, and the
+experimental Rust API addition. No Stream API or general text reader was introduced.
+
+The sample parses at most nine ASCII digits using ordinary arithmetic and branches,
+then doubles the result. It handles empty input, EOF, nondigits, and input failures.
+A Byte local bridges raw bootstrap case payloads to normal integer stack loads;
+existing union instruction semantics remain unchanged. General line decoding remains
+future platform-library work rather than another high-level host helper.
+
+Eight tests cover the runnable/serialized/verified sample, immediate prompt ordering
+in a real CLI subprocess, default and injected hosts, exact byte/EOF values, shared
+input position, expected errors, output Fault context, cancellation, and service
+planning. Updated cancellation callers and runtime-library counts.
+
+Validation: all 361 integration tests pass on macOS ARM64; formatting, clippy with
+warnings denied, and diff checks pass. Source and assembled sample execution print
+the prompt, then 42 for input 21, and return Void. Linux and Windows remain for CI.

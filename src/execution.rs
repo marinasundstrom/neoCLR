@@ -28,12 +28,14 @@ impl CancellationToken {
     }
 }
 
-/// Interpreter limits and optional cooperative cancellation for one execution.
+/// Interpreter limits, optional cooperative cancellation, and an optional host console.
 /// Existing calls may pass Limits directly; this is an experimental Rust API.
 #[derive(Debug, Clone, Default)]
 pub struct ExecutionOptions {
     pub limits: Limits,
     pub cancellation: Option<CancellationToken>,
+    /// None captures output and leaves input unavailable; Some performs live host I/O.
+    pub console: Option<Arc<dyn crate::Console>>,
 }
 
 impl From<Limits> for ExecutionOptions {
@@ -41,6 +43,7 @@ impl From<Limits> for ExecutionOptions {
         Self {
             limits,
             cancellation: None,
+            console: None,
         }
     }
 }

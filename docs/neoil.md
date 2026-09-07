@@ -252,6 +252,7 @@ These are ordinary functions compiled from [System.neoil](../runtime/System.neoi
 
 | Symbol | Parameters | Return |
 | --- | --- | --- |
+| `System.Console.ReadByte` | none | `Result<Option<Byte>,Error>` |
 | `System.Console.WriteLine` | `String` | `Void` |
 | `System.Console.WriteLine` | `Int32` | `Void` |
 | `System.Int32.ToString` | instance receiver `Int32`, no parameters | `String` |
@@ -259,11 +260,11 @@ These are ordinary functions compiled from [System.neoil](../runtime/System.neoi
 | `System.Int32.Divide` | `Int32, Int32` | `Result<Int32,Error>` |
 | `System.Math.Abs` | `Int32` | `Result<Int32,Error>` |
 
-The library uses three host primitives: `neoCLR.Runtime.WriteLine(string)`,
-`neoCLR.Runtime.Int32ToString(int32)`, and `neoCLR.Runtime.ParseInt32(string)`.
-They have explicit `.methodimpl InternalCall` declarations in the System module. Duplicate library signatures are rejected at link
-time; other overloads of the same names are allowed. Console output is buffered
-until successful execution. See [library design](runtime-library.md).
+Host bindings have explicit `.methodimpl InternalCall` declarations in the System
+module; see the current [library catalog](runtime-library.md). Duplicate library
+signatures are rejected at link time; other overloads of the same names are allowed.
+Console output is captured by default in Rust embedding. An explicitly supplied host
+console receives output immediately; the CLI selects live I/O. See [console I/O](console-io.md).
 
 ## Serialized metadata
 

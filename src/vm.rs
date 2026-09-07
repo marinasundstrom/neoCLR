@@ -30,6 +30,7 @@ impl Default for Limits {
 #[derive(Debug)]
 pub struct Execution {
     pub value: Value,
+    /// Captured lines when no host console is supplied; empty with live console I/O.
     pub output: Vec<String>,
     /// Retained until the execution result is dropped; references index this arena.
     pub heap: Vec<Value>,
@@ -868,7 +869,11 @@ fn interpret_frames(
                         expect(&value, &callee.returns)?;
                         frame.stack.push(value.on_stack());
                     } else if callee.is_internal_call() {
-                        let value = crate::native::bind(&callee)?.invoke(args, &mut output)?;
+                        let value = crate::native::bind(&callee)?.invoke(
+                            args,
+                            &mut output,
+                            options.console.as_deref(),
+                        )?;
                         expect(&value, &callee.returns)?;
                         frame.stack.push(value);
                     } else {

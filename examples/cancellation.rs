@@ -18,6 +18,7 @@ fn main() -> Result<(), neoclr::Fault> {
             ..Limits::default()
         },
         cancellation: Some(token.clone()),
+        ..ExecutionOptions::default()
     };
     std::thread::scope(|scope| {
         let worker = scope.spawn(|| match spin.invoke(vec![], options) {

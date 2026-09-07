@@ -34,6 +34,7 @@ Duplicate entries in the supplied service set have no additional effect.
 | ConsoleOutput | Validated neoCLR.Runtime.WriteLine InternalCall |
 | NativeInterop | P/Invoke declarations |
 | StringOperations | Validated StringConcat, StringByteCount, and StringSliceUtf8 InternalCalls |
+| ConsoleInput | Validated ConsoleReadByte InternalCall |
 | FileInput | Validated bounded ReadAllText InternalCall |
 | ErrorValues | Validated ErrorFromMessage and ErrorMessage InternalCalls |
 

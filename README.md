@@ -95,10 +95,12 @@ output-file overwrite rule applies to `System.neo.json`.
 cargo run --locked -- run examples/strings.neoil
 cargo run --locked -- run examples/errors.neoil
 cargo run --locked -- run examples/file_input.neoil
+cargo run --locked -- run examples/console_input.neoil
 cargo run --locked -- run examples/arrays.neoil
 cargo run --locked -- run examples/array_bounds.neoil
 ```
 
+The [console sample](docs/console-io.md) prompts for a number, reads input, and doubles it.
 The string sample demonstrates Unicode text and recoverable slice Errors. The
 [file-input sample](docs/file-input.md) reads text, computes a result, and handles invalid input. The
 [error sample](docs/errors.md) constructs and reports Error messages, then continues. The array
@@ -221,7 +223,7 @@ reference resolution. See [runtime library design](docs/runtime-library.md).
   `System.Console.WriteLine`, `System.Int32.Parse`, `System.Int32.Divide`, and
   `System.Math.Abs`, plus instance `Int32.ToString()`, assembled into the same metadata/IL representation as apps.
 - Explicit `.pinvoke` imports with dynamic library loading and scalar/pointer C-ABI calls.
-- Three host primitives for console output, Int32 string conversion, and parsing,
+- Explicit bootstrap host bindings for console I/O, text, Error values, file input, and numeric conversion,
   explicitly declared with CLR-style `MethodImpl`/`InternalCall` metadata.
 - Configurable limits on instruction count, call depth, stack slots per frame,
   explicit heap object count, native payload bytes, and allocation identities.
@@ -248,7 +250,9 @@ The library is a bootstrap surface, not a complete BCL. General user-defined
 generics/unions, interfaces/virtual dispatch, arrays, borrows, full native marshalling,
 threading, runtime async, JIT compilation, and full verification are unimplemented.
 Resource limits are guardrails, not a memory quota or a hostile-code sandbox.
-Console output is collected and emitted by the CLI only on successful completion.
+The CLI writes console output immediately and flushes each line, so prompts are visible
+before input. Default Rust embedding still captures output until successful completion;
+an explicitly supplied host console enables live I/O. See [console I/O](docs/console-io.md).
 
 See [semantics](docs/semantics.md), [assembler and opcodes](docs/neoil.md),
 [arrays and pointers proposal](docs/arrays-and-pointers.md), and

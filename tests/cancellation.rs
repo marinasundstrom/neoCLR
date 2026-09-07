@@ -155,6 +155,7 @@ fn cancellation_can_be_requested_from_another_thread() {
             ..Limits::default()
         },
         cancellation: Some(token.clone()),
+        ..ExecutionOptions::default()
     };
     // The instruction limit bounds this test even if cooperative polling regresses.
     std::thread::scope(|scope| {
@@ -183,6 +184,7 @@ fn uncancelled_options_preserve_guest_budgets_and_faults() {
             ..Limits::default()
         },
         cancellation: Some(CancellationToken::new()),
+        ..ExecutionOptions::default()
     };
     assert_eq!(
         echo.invoke(vec![], options.clone()).unwrap().value,

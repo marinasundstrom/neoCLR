@@ -1,4 +1,4 @@
-use neoclr::{Limits, assemble, load};
+use neoclr::{ExecutionOptions, StdioConsole, assemble, load};
 use std::{
     env, fs,
     io::{self, Write},
@@ -127,8 +127,13 @@ fn execute(args: &[String]) -> Result<Vec<String>, String> {
         }
         _ => {
             // SAFETY: CLI run treats the user-selected program and native imports as trusted code.
-            let execution =
-                unsafe { program.run_with_native(Limits::default()) }.map_err(|e| e.to_string())?;
+            let execution = unsafe {
+                program.run_with_native(ExecutionOptions {
+                    console: Some(std::sync::Arc::new(StdioConsole)),
+                    ..ExecutionOptions::default()
+                })
+            }
+            .map_err(|e| e.to_string())?;
             let mut lines = execution.output;
             lines.push(format!("=> {:?}", execution.value));
             Ok(lines)

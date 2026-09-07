@@ -146,6 +146,11 @@
 .end
 
 .type System.Console
+    .method static ReadByte() -> Result<Option<Byte>,Error>
+        call neoCLR.Runtime.ConsoleReadByte()
+        ret
+    .end
+
     .method static WriteLine(string value) -> Void
         ldarg value
         call neoCLR.Runtime.WriteLine(string)
@@ -329,5 +334,9 @@
 .end
 
 .function neoCLR.Runtime.ReadAllText(String path, Int32 maxBytes) -> Result<String,Error>
+    .methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.ConsoleReadByte() -> Result<Option<Byte>,Error>
     .methodimpl InternalCall
 .end
