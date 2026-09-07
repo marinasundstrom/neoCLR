@@ -615,6 +615,10 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     } else {
                         (None, false, rest)
                     };
+                    let (receiver_byref, declaration) = match declaration.strip_prefix("byref ") {
+                        Some(rest) => (true, rest.trim()),
+                        None => (false, declaration),
+                    };
                     let (name, result) = declaration
                         .split_once("->")
                         .ok_or_else(|| Fault::new("expected .function Name -> Type"))?;
@@ -665,6 +669,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                             parameters: target.parameters,
                             parameter_names,
                             out_parameters,
+                            receiver_byref,
                             returns: parse_type(result)?,
                             locals: vec![],
                             local_names: vec![],

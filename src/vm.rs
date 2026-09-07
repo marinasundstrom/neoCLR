@@ -431,6 +431,16 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 "managed references cannot cross native helper boundaries",
             ));
         }
+        if function.receiver_byref
+            && (!function.instance
+                || function.name.ends_with(".ctor")
+                || function.is_internal_call()
+                || function.pinvoke.is_some())
+        {
+            return Err(Fault::new(
+                "byref receiver requires a non-constructor IL instance method",
+            ));
+        }
         let mut out_parameters = HashSet::new();
         for index in &function.out_parameters {
             if !out_parameters.insert(*index)
@@ -1194,6 +1204,11 @@ fn interpret_frames(
                         &interface,
                         &contract,
                     )?;
+                    if callee.receiver_byref {
+                        return Err(Fault::new(
+                            "byref interface receiver requires a managed slot view",
+                        ));
+                    }
                     let layout = crate::memory::layout(module, &receiver.target)?;
                     args.insert(0, memory.read(&receiver, &layout)?);
                     if frames.len() >= limits.frames {

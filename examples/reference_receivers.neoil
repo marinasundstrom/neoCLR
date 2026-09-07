@@ -1,0 +1,36 @@
+.module ReferenceReceivers
+.entry Main
+
+.type Counter
+    .field Value Int32
+    .method instance byref Set(Int32 value) -> Void
+        ldarg this
+        ldarg this
+        ldobj Counter
+        ldarg value
+        stfld Counter::Value
+        stobj Counter
+        ldvoid
+        ret
+    .end
+    .method instance Get() -> Int32
+        ldarg this
+        ldfld Counter::Value
+        ret
+    .end
+.end
+
+.function Main() -> Void
+    .local Counter counter
+    ldc.i4 7
+    newobj Counter
+    stloc counter
+    ldloca counter
+    ldc.i4 42
+    call instance Counter::Set(Int32)
+    pop
+    ldloc counter
+    call instance Counter::Get()
+    call System.Console::WriteLine(Int32)
+    ret
+.end

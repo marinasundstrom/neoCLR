@@ -262,6 +262,9 @@ pub struct Function {
     /// Optional names aligned with declared parameters (excluding the receiver).
     #[serde(default)]
     pub parameter_names: Vec<Option<String>>,
+    /// Instance argument zero addresses the caller slot rather than containing a value copy.
+    #[serde(default)]
+    pub receiver_byref: bool,
     /// Declared parameter indices whose slots must be assigned before normal return.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub out_parameters: Vec<usize>,
@@ -315,7 +318,11 @@ impl Function {
     pub fn argument_types(&self) -> Vec<Type> {
         let mut types = Vec::new();
         if let (true, Some(owner)) = (self.instance, &self.owner) {
-            types.push(owner.clone());
+            types.push(if self.receiver_byref {
+                Type::ByRef(Box::new(owner.clone()))
+            } else {
+                owner.clone()
+            });
         }
         types.extend(self.parameters.iter().cloned());
         types

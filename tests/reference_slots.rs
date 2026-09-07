@@ -211,3 +211,54 @@ fn output_contract_metadata_rejects_invalid_indices_and_nonreferences() {
         assert!(LoadedProgram::new(&module).is_err());
     }
 }
+
+#[test]
+fn reference_receiver_mutates_original_while_value_receiver_reads_a_copy() {
+    let p = LoadedProgram::new(
+        &assemble(include_str!("../examples/reference_receivers.neoil")).unwrap(),
+    )
+    .unwrap();
+    p.verify().unwrap();
+    assert_eq!(p.run(Limits::default()).unwrap().output, ["42"]);
+    let graph = p
+        .analyze_reachability(
+            &[neoclr::assembler::parse_function_ref("Main()").unwrap()],
+            10,
+        )
+        .unwrap();
+    assert!(
+        graph
+            .functions
+            .iter()
+            .find(|f| f.target.name == "Counter.Set")
+            .unwrap()
+            .receiver_byref
+    );
+    let wrong = include_str!("../examples/reference_receivers.neoil")
+        .replace("ldloca counter", "ldloc counter");
+    let p = LoadedProgram::new(&assemble(&wrong).unwrap()).unwrap();
+    assert!(p.verify().is_err());
+    assert!(p.run(Limits::default()).is_err());
+}
+
+#[test]
+fn generic_reference_receivers_can_replace_non_native_payloads() {
+    let extra = ".type Box<T>\n.field Value T\n.method instance byref Set(T value) -> Void\nldarg this\nldarg value\nnewobj Box<T>\nstobj Box<T>\nldvoid\nret\n.end\n.end";
+    let p = program(extra, ".local Box<String> box\nldstr \"before\"\nnewobj Box<String>\nstloc box\nldloca box\nldstr \"after\"\ncall instance Box<String>::Set(String)\npop\nldloc box\nldfld Box<String>::Value", "String").unwrap();
+    p.verify().unwrap();
+    assert_eq!(
+        p.run(Limits::default()).unwrap().value,
+        Value::String("after".into())
+    );
+}
+
+#[test]
+fn receiver_modes_cannot_be_used_for_static_methods_or_constructors_or_overload_identity() {
+    for source in [
+        ".type C\n.method static byref M() -> Void\nldvoid\nret\n.end\n.end",
+        ".type C\n.method instance byref .ctor() -> Void\nldvoid\nret\n.end\n.end",
+        ".type C\n.method instance M() -> Void\nldvoid\nret\n.end\n.method instance byref M() -> Void\nldvoid\nret\n.end\n.end",
+    ] {
+        assert!(program(source, "ldvoid", "Void").is_err());
+    }
+}

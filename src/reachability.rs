@@ -19,6 +19,8 @@ pub struct ReachableFunction {
     /// Canonical closed signature, including the selected definition row.
     pub target: FunctionRef,
     pub returns: Type,
+    pub receiver_byref: bool,
+    pub out_parameters: Vec<usize>,
     pub implementation: FunctionImplementation,
     /// Every syntactic call in the specialized IL body, including unreachable code.
     pub calls: Vec<ReachableCall>,
@@ -131,6 +133,8 @@ pub(crate) fn analyze(
                 parameters: function.parameters,
             },
             returns: function.returns,
+            receiver_byref: function.receiver_byref,
+            out_parameters: function.out_parameters,
             implementation,
             calls,
             services,

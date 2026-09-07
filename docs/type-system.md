@@ -220,3 +220,9 @@ closed hierarchy to represent their variants.
 See the [proposed slot-reference design](reference-slots.md) for typed reference
 parameters, out assignment and explicit reference receivers. This is planned work,
 not a change to the currently implemented pointer or receiver semantics.
+
+`.method instance byref` now takes an explicit T& receiver. Its ldarg this loads
+the reference; ldobj/stobj read and replace the original slot. Ordinary instance
+methods retain copied receivers. Constructors retain their existing convention.
+See [slot references](reference-slots.md) and the
+[reference receiver sample](../examples/reference_receivers.neoil).

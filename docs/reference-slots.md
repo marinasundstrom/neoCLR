@@ -1,7 +1,7 @@
 # Proposed slot references and reference receivers
 
 Status: direct T& parameters, out contracts, ldloca/ldarga and ldobj/stobj slot access
-are implemented. Reference receivers and safe interface slot views remain planned.
+and reference receivers are implemented. Safe interface slot views remain planned.
 Existing pointer and InterfaceRef behavior is unchanged.
 
 ## Purpose
@@ -12,7 +12,7 @@ parameters and methods that mutate their original receiver. The same mechanism
 must work for ordinary interpreter values, including String and generic records;
 it must not depend on the native-layout subset supported by pointer memory.
 
-Use `T&` as the proposed CLI-shaped spelling for a typed slot reference, with a
+Use `T&` as the CLI-shaped spelling for a typed slot reference, with a
 separate ByRef signature node. It is not `T*`, not an interface view and not the
 bootstrap Ref<T> arena handle. Leave Ref<T>'s future counted-ownership meaning
 separate from this non-owning access mechanism.
@@ -24,7 +24,7 @@ replaces that slot immediately. There is no implicit copy-back on method return.
 
 ## Parameters and explicit access
 
-Proposed assembly syntax keeps type before the optional name:
+Assembly syntax keeps type before the optional name:
 
 ```text
 .function Assign(out Int32& destination, Int32 value) -> Void
@@ -80,8 +80,8 @@ followed by stloc remains preferable when a single returned value is sufficient.
 
 ## Reference receivers
 
-Record receiver mode explicitly on methods: existing value receiver versus byref
-receiver. Proposed authoring syntax:
+Methods record their receiver mode explicitly: existing value receiver versus byref
+receiver. Authoring syntax:
 
 ```text
 .type Counter

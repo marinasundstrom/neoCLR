@@ -77,3 +77,6 @@ Multiple call edges can share an instruction index. Abstract declarations are no
 executable graph nodes or valid roots. Generic implementation arguments are inferred
 from the closed interface; if some cannot be inferred, analysis returns a Fault
 instead of silently omitting potential targets. See [interfaces](interfaces.md).
+
+Reachable function nodes also carry receiver_byref and declared out_parameters
+indices so backend planning preserves reference receiver and output contracts.

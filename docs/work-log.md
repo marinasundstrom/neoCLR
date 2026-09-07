@@ -2324,3 +2324,16 @@ local output destinations after calls and remains conservative about alias paths
 The sample now initializes its caller slot through out forwarding. Twelve reference
 tests, ten constructor regressions and fifteen interface tests pass, including invalid
 output metadata, prior initialized values, and distinct versus aliased destinations.
+
+## Explicit reference receivers
+
+Added receiver_byref method metadata and `.method instance byref` syntax. Argument
+zero is T& and direct callers explicitly supply a slot reference. Methods load and
+store the original value through ordinary ldobj/stobj; value receivers retain their
+copy semantics. Constructors, static/native declarations and mode-only overloads
+are rejected. Interface conformance matches receiver mode, and reachability reports
+receiver and output contracts alongside the closed signature.
+
+Fifteen reference tests, fifteen interface regressions and property tests pass. The
+reference_receivers sample demonstrates inline Counter mutation, with generic String
+receiver replacement covered separately. Safe interface slot views follow next.
