@@ -16,6 +16,10 @@ The long-term error parameter may become a closed ordinary union such as
 the VM needs no exception or error-specific instruction. The preview keeps the
 existing `System.Error` payload while carrier migration continues.
 
+`System.Math.AbsTyped` is the first parallel library API using the same ordinary
+nested Result cases. It demonstrates incremental migration without changing the
+legacy `Abs` contract yet.
+
 ## Native service contract
 
 The existing InternalCall helper `neoCLR.Runtime.ParseInt32(String) -> System.Value`
