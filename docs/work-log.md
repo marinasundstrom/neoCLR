@@ -1505,3 +1505,18 @@ planning. Updated cancellation callers and runtime-library counts.
 Validation: all 361 integration tests pass on macOS ARM64; formatting, clippy with
 warnings denied, and diff checks pass. Source and assembled sample execution print
 the prompt, then 42 for input 21, and return Void. Linux and Windows remain for CI.
+
+## 2026-09-07 — Prioritize ordinary union contracts and bootstrap removal
+
+Recorded construction/initialization, property/accessor metadata, and accessibility
+as near-term ordinary-type fundamentals for expressing a union contract. Current
+.ctor-shaped and get_Message-shaped methods do not settle these contracts. Plan the
+minimal dependency order around a carrier/variant example, not extensive OOP.
+
+Made removal of all six bootstrap union instructions and the special Option/Result
+runtime encodings an explicit completion condition. First replace library, host,
+and sample uses with ordinary construction, members, fields, and branches; then
+remove special dispatch and explicitly migrate or reject old serialized artifacts.
+No union instructions or encodings were removed in this documentation slice.
+
+Validation: documentation-only changes; diff checks pass. Runtime tests were not rerun.

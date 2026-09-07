@@ -92,18 +92,18 @@ rich formatting can follow the core programs. [Explicit target layout](target-la
 now separates storage calculations from the host. This does not require starting native
 code generation before the interpreter/library demonstration is coherent.
 
-## Immediate next slice: console input/output
+## Console fundamentals and next text requirements
 
-Prioritize console input alongside the existing Console.WriteLine output before more
-external integrations. Define line input, EOF as ordinary absence, recoverable input
-errors, and prompt/output visibility so a small interactive application can read,
-compute, report, and continue. The file-input demonstration below is a completed
+The [minimal console boundary](console-io.md) now provides raw byte input, EOF as
+ordinary absence, recoverable input errors, and immediate output through a host-supplied
+console. An interactive IL program parses ASCII digits and computes a result. General
+line reading is deferred until the necessary byte/string operations can support its
+implementation in platform code. The file-input demonstration below is a completed
 bounded experiment, not a reason to move on to networking.
 
-First identify the minimal host input/output contract and how platform code composes
-it. Resolve EOF, ownership of returned data, and output visibility for that small
-contract; defer general streams, buffering frameworks, and async abstractions. This
-is an implementation step, not a commitment to a complete console or I/O API design.
+Continue from concrete programs to identify missing byte/string fundamentals. Defer
+general streams, buffering frameworks, and async abstractions. The current byte-read
+and line-output boundary is not a commitment to a complete console or I/O API design.
 
 ## Demonstrations and later external capabilities
 
@@ -192,6 +192,25 @@ scaffolding, not a prerequisite ownership policy for the pointer layer.
 
 ## Library milestone: ordinary Option and Result types
 
+The next type-system slices should supply the minimal ordinary-type contracts needed
+to model a proper union in code. This is part of the fundamentals, not a dependency
+on extensive OOP or reflection. Stage the work around a small carrier/variant example:
+
+1. Construction that establishes a valid value: distinguish existing .ctor-shaped
+   methods and field-based newobj from a defined constructor invocation and
+   initialization contract. Addressed receiver mutation may be a prerequisite.
+2. Property metadata that associates a declared property with its getter and optional
+   setter methods. Accessor-shaped names alone do not express this contract.
+3. Accessibility for types and members, beginning with the needed public/private/internal
+   distinctions and explicit rules for accessors, module boundaries, and host invocation.
+   Decide validation/enforcement alongside metadata rather than treating visibility as
+   an unverified naming convention.
+
+Choose the dependency order after checking the current construction/addressed-access
+proposals. Demonstrate public construction and reading with restricted representation
+mutation before migrating bootstrap unions. Define behavior at raw-pointer and unsafe
+boundaries explicitly; accessibility is not a memory-safety sandbox.
+
 Prioritize execution and metadata fundamentals for Option<T> and Result<T,TError>
 before reflection or broader object-model features. A union is an ordinary carrier
 of one of a fixed set of variant types; reserve enum for integer-backed constants.
@@ -206,6 +225,9 @@ and methods are implemented. Next comes the typed access/storage needed for ordi
 library carriers, with further attribute capabilities as required.
 Then migrate System Option/Result from their bootstrap implementation. This work
 must preserve explicit allocation and avoid requiring null or boxing for absence.
+Completion includes removing the existing union-specific IL instructions and special
+Option/Result runtime encodings, not keeping both models indefinitely. Replace the
+library/host/sample uses first and explicitly migrate or reject older serialized modules.
 
 ## Later milestones
 

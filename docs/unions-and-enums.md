@@ -35,6 +35,22 @@ and factory recognition must be specified explicitly rather than treating every
 one-parameter method as a variant constructor. Metadata indices/tokens identify
 members; source names remain authoring mappings.
 
+## Required ordinary-type contracts
+
+Future implementation slices must let code express and preserve the carrier's contract:
+constructors establish a permitted variant, properties expose that value through explicit
+accessor associations, and accessibility can restrict representation fields and mutation
+while keeping intended constructors/readers public. Public, private, and internal are
+candidate initial visibility levels; their exact scopes and enforcement remain to be
+specified. These are ordinary type-system capabilities, not union-specific instructions.
+
+Current .ctor-shaped methods do not by themselves settle initialization or addressed
+receiver semantics. Current get_Message-style methods do not supply property metadata,
+and fields currently have no enforced accessibility contract. Track these gaps separately
+and validate them with a small carrier/variant example before claiming ordinary Option
+and Result are implementable. Extensive inheritance, virtual dispatch, reflection, and
+a full runtime library are not prerequisites for this milestone.
+
 ## Intended library shapes
 
 | Carrier | Permitted variant types |
@@ -98,10 +114,21 @@ Fault remains for violated execution contracts.
    Finalize its construction and typed-query contract.
 5. Implement carrier and variant types in the platform-written System library;
    test None/Some, Ok/Err, Void, nested carriers, failed queries, and independent copies.
-6. Migrate bootstrap Option/Result signatures and some/none/ok/err/is.case/ldcase
-   deliberately, with an explicit serialized-module compatibility decision.
+6. Replace bootstrap Option/Result signatures with ordinary constructed library types.
+   Rewrite library, native result construction, host input validation, samples, and tests
+   to use the ordinary carrier/member contract. Replace some/none/ok/err with ordinary
+   construction/calls and is.case/ldcase with ordinary queries/accessors and branches.
+7. Remove the six bootstrap instructions from the assembler, metadata instruction model,
+   verifier, interpreter, and service analysis. Remove union-specific Option/Result type
+   categories and value handling once the replacements are executable. Make an explicit
+   serialized-module compatibility decision: migrate or reject old artifacts clearly,
+   rather than retaining a hidden special union execution path.
 
-The bootstrap operations remain supported until that migration; they are not the
-proposed general union ABI. Integer-backed enums remain a separate milestone.
+There must be no union-specific IL instructions in the resulting platform contract.
+Existing bootstrap operations are temporary migration debt, not an alternative ABI to
+retain or extend. They have not been removed in the current implementation; even the
+console sample still consumes bootstrap Result/Option until ordinary carriers can
+replace them. The migration is complete only when those programs run through ordinary
+type operations without special union dispatch. Integer-backed enums remain a separate milestone.
 Reflection, GC, reference counting, runtime async, and high-level pattern syntax
 are not prerequisites for establishing this convention.
