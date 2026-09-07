@@ -1,0 +1,4 @@
+.function neoCLR.Runtime.ReadAllText(String path, Int32 maxBytes) -> System.Value
+    .methodimpl InternalCall
+.end
+

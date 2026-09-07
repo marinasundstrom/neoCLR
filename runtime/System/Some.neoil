@@ -1,0 +1,19 @@
+.type System.Some<T>
+    .field private Payload T
+    .method instance .ctor(T value) -> Void
+        ldarg value
+        newobj System.Some<T>
+        starg this
+        ldvoid
+        ret
+    .end
+    .property instance Value() -> T
+        .get instance System.Some<T>::get_Value()
+    .end
+    .method instance get_Value() -> T
+        ldarg this
+        ldfld 0
+        ret
+    .end
+.end
+

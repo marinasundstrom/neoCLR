@@ -1,0 +1,20 @@
+.type System.IO.File
+    .method static ReadAllText(String path, Int32 maxBytes) -> System.Result<String,System.Error>
+        ldarg path
+        ldarg maxBytes
+        call neoCLR.Runtime.ReadAllText(String,Int32)
+        dup
+        value.is Error
+        brtrue ReadFailed
+        value.unpack String
+        newobj.ctor instance System.Result.Ok<String>::.ctor(String)
+        newobj.ctor instance System.Result<String,System.Error>::.ctor(System.Result.Ok<String>)
+        ret
+    ReadFailed:
+        value.unpack Error
+        newobj.ctor instance System.Result.Error<System.Error>::.ctor(System.Error)
+        newobj.ctor instance System.Result<String,System.Error>::.ctor(System.Result.Error<System.Error>)
+        ret
+    .end
+.end
+

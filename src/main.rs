@@ -13,7 +13,12 @@ const USAGE: &str = "Usage:
 Inputs ending in .neoil are sources; other module inputs are JSON artifacts.";
 
 fn read(path: &str) -> Result<String, String> {
-    fs::read_to_string(path).map_err(|e| format!("Cannot read {path}: {e}"))
+    if path.ends_with(".neoil") {
+        neoclr::source::read_source(path)
+    } else {
+        fs::read_to_string(path)
+    }
+    .map_err(|e| format!("Cannot read {path}: {e}"))
 }
 
 fn execute(args: &[String]) -> Result<Vec<String>, String> {

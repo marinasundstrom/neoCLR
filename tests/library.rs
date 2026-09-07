@@ -13,7 +13,7 @@ fn app(body: &str, returns: &str) -> neoclr::Module {
 
 #[test]
 fn runtime_library_is_assembled_platform_code() {
-    let module = assemble(include_str!("../runtime/System.neoil")).unwrap();
+    let module = assemble(neoclr::library::system_source()).unwrap();
     assert!(module.entry.is_empty());
     assert!(
         module

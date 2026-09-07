@@ -1,0 +1,24 @@
+.type System.Error
+    .property instance Message() -> String
+        .get instance System.Error::get_Message()
+    .end
+
+    .method static FromMessage(String message) -> Error
+        ldarg message
+        call neoCLR.Runtime.ErrorFromMessage(String)
+        ret
+    .end
+
+    .method instance get_Message() -> String
+        ldarg this
+        call neoCLR.Runtime.ErrorMessage(Error)
+        ret
+    .end
+
+    .method instance ToString() -> String
+        ldarg this
+        call instance System.Error::get_Message()
+        ret
+    .end
+.end
+

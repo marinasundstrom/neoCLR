@@ -55,6 +55,29 @@ and confirm execution follows the replacement, rather than a hidden intrinsic.
 
 ## Build and use
 
+`runtime/System.neoil` is an ordered `.include` manifest. Class and feature sources
+live under namespace folders: for example, `System/Console.neoil`,
+`System/IO/File.neoil`, and `System/Runtime/CompilerServices/UnionAttribute.neoil`.
+Generic carriers and their companions share `System/Option.neoil` and
+`System/Result.neoil`. InternalCall declarations live under `neoCLR/Runtime/`.
+
+These are source fragments, not separate modules. Manifest order determines the
+combined declaration order and metadata rows. The initial split preserves the previous
+metadata and IL exactly. Add new files explicitly to the manifest; directory enumeration
+does not determine build order. Cargo's build script expands the manifest and embeds
+the result, rebuilding when runtime sources change. It requires no installed neoCLR
+executable and reads no runtime files when an application executes.
+
+The CLI expands `.include "path"` when reading `.neoil` files, including `--system`
+inputs. Paths resolve relative to the including file. Nested includes are supported;
+cycles and nesting beyond 64 files are rejected. Includes accept a trailing semicolon
+comment, but no wildcard expansion or string escape processing. Include loader errors
+identify the source path; subsequent assembler diagnostics use expanded line numbers.
+
+Embedding code can call `neoclr::source::read_source(path)` before `assemble`.
+The string-only assembler remains independent of filesystem access. The fully expanded
+bundled source is available through `neoclr::library::system_source()`.
+
 ```sh
 cargo run -- assemble runtime/System.neoil System.neo.json
 cargo run -- check System.neo.json

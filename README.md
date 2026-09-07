@@ -93,6 +93,10 @@ it does not automatically run the opt-in typed verifier.
 
 ### Build the runtime library explicitly (optional)
 
+The runtime sources are organized by namespace under `runtime/System/` and
+`runtime/neoCLR/Runtime/`. `runtime/System.neoil` is the ordered source manifest;
+its included files assemble into one System module. Cargo bundles those same files.
+
 ```sh
 cargo run --locked -- assemble runtime/System.neoil System.neo.json
 cargo run --locked -- run hello.neo.json --system System.neo.json

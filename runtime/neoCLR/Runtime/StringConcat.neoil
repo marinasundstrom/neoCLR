@@ -1,0 +1,4 @@
+.function neoCLR.Runtime.StringConcat(String left, String right) -> String
+    .methodimpl InternalCall
+.end
+

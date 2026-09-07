@@ -1,0 +1,127 @@
+; Explicit native buffer descriptor. Copies alias Data; Free is a caller obligation.
+.type System.Array<T>
+    .property instance Length() -> Int32
+        .get instance System.Array<T>::get_Length()
+    .end
+    .property instance Item(Int32) -> T
+        .get instance System.Array<T>::get_Item(Int32)
+        .set instance System.Array<T>::set_Item(Int32,T)
+    .end
+
+    .field Data T*
+    .field Length Int32
+
+    .method static Allocate(Int32 length, T initialValue) -> System.Array<T>
+        .local System.Array<T> array
+        .local Int32 index
+        ldarg length
+        ldc.i4 0
+        blt InvalidLength
+        ldarg length
+        heap.alloc T
+        ldarg length
+        newobj System.Array<T>
+        stloc array
+        ldc.i4 0
+        stloc index
+        br Test
+    Fill:
+        ldloc array
+        ldloc index
+        ldarg initialValue
+        call instance System.Array<T>::Set(Int32,T)
+        pop
+        ldloc index
+        ldc.i4 1
+        add
+        stloc index
+    Test:
+        ldloc index
+        ldarg length
+        blt Fill
+        ldloc array
+        ret
+    InvalidLength:
+        fault "Array length must be non-negative"
+    .end
+
+    .method static View(T* data, Int32 length) -> System.Array<T>
+        ldarg length
+        ldc.i4 0
+        blt InvalidLength
+        ldarg data
+        ldarg length
+        newobj System.Array<T>
+        ret
+    InvalidLength:
+        fault "Array length must be non-negative"
+    .end
+
+    .method instance get_Length() -> Int32
+        ldarg this
+        ldfld System.Array<T>::Length
+        ret
+    .end
+
+    .method instance GetElementAddress(Int32 index) -> T*
+        ldarg index
+        ldc.i4 0
+        blt OutOfRange
+        ldarg index
+        ldarg this
+        ldfld System.Array<T>::Length
+        bge OutOfRange
+        ldarg this
+        ldfld System.Array<T>::Data
+        ldarg index
+        conv.i
+        sizeof T
+        conv.i
+        mul.ovf
+        ptr.add
+        ret
+    OutOfRange:
+        fault "Array index out of range"
+    .end
+
+    .method instance Get(Int32 index) -> T
+        ldarg this
+        ldarg index
+        call instance System.Array<T>::GetElementAddress(Int32)
+        ldobj T
+        ret
+    .end
+
+    .method instance get_Item(Int32 index) -> T
+        ldarg this
+        ldarg index
+        call instance System.Array<T>::Get(Int32)
+        ret
+    .end
+
+    .method instance Set(Int32 index, T value) -> Void
+        ldarg this
+        ldarg index
+        call instance System.Array<T>::GetElementAddress(Int32)
+        ldarg value
+        stobj T
+        ldvoid
+        ret
+    .end
+
+    .method instance set_Item(Int32 index, T value) -> Void
+        ldarg this
+        ldarg index
+        ldarg value
+        call instance System.Array<T>::Set(Int32,T)
+        ret
+    .end
+
+    .method instance Free() -> Void
+        ldarg this
+        ldfld System.Array<T>::Data
+        heap.free
+        ret
+    .end
+.end
+

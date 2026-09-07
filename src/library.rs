@@ -2,10 +2,15 @@
 use crate::{Fault, Module};
 use std::sync::OnceLock;
 
+/// Expanded System source, built from the same manifest used by the CLI.
+pub fn system_source() -> &'static str {
+    include_str!(concat!(env!("OUT_DIR"), "/System.neoil"))
+}
+
 pub fn system() -> Result<&'static Module, Fault> {
     static SYSTEM: OnceLock<Result<Module, Fault>> = OnceLock::new();
     SYSTEM
-        .get_or_init(|| crate::assembler::parse_module(include_str!("../runtime/System.neoil")))
+        .get_or_init(|| crate::assembler::parse_module(system_source()))
         .as_ref()
         .map_err(Clone::clone)
 }

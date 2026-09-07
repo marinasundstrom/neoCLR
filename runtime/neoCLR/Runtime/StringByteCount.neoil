@@ -1,0 +1,4 @@
+.function neoCLR.Runtime.StringByteCount(String value) -> Int32
+    .methodimpl InternalCall
+.end
+

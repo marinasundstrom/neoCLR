@@ -1,0 +1,4 @@
+.function neoCLR.Runtime.StringSliceUtf8(String value, Int32 byteStart, Int32 byteLength) -> Result<String,Error>
+    .methodimpl InternalCall
+.end
+

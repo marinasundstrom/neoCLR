@@ -5,6 +5,12 @@ the interpreter. This is a prototype assembler, not an ECMA-335 `ilasm` replacem
 Instruction spellings are familiar where possible; operand encoding and some
 stack effects intentionally differ.
 
+File-based CLI inputs can use `.include "relative/path.neoil"` to compose one module
+from source fragments. Includes expand in order, relative to the including file;
+they are source-loader directives, not metadata or opcodes. String-based assembly
+requires expanded source. See [runtime source organization](runtime-library.md#build-and-use)
+for the loader contract and diagnostics.
+
 ## Opcode compatibility policy
 
 When an instruction has a useful CLI equivalent, neoIL keeps the familiar mnemonic

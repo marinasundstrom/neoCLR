@@ -1,0 +1,45 @@
+.type System.Console
+    ; The host returns a bounded erased payload; platform IL constructs the carriers.
+    .method static ReadByte() -> System.Result<System.Option<Byte>,System.Error>
+        call neoCLR.Runtime.ConsoleReadByte()
+        dup
+        value.is Error
+        brtrue ReadFailed
+        dup
+        value.is Void
+        brtrue EndOfInput
+        value.unpack Byte
+        newobj.ctor instance System.Option.Some<Byte>::.ctor(Byte)
+        newobj.ctor instance System.Option<Byte>::.ctor(System.Option.Some<Byte>)
+        newobj.ctor instance System.Result.Ok<System.Option<Byte>>::.ctor(System.Option<Byte>)
+        newobj.ctor instance System.Result<System.Option<Byte>,System.Error>::.ctor(System.Result.Ok<System.Option<Byte>>)
+        ret
+    ReadFailed:
+        value.unpack Error
+        newobj.ctor instance System.Result.Error<System.Error>::.ctor(System.Error)
+        newobj.ctor instance System.Result<System.Option<Byte>,System.Error>::.ctor(System.Result.Error<System.Error>)
+        ret
+    EndOfInput:
+        pop
+        newobj.ctor instance System.Option.None::.ctor()
+        newobj.ctor instance System.Option<Byte>::.ctor(System.Option.None)
+        newobj.ctor instance System.Result.Ok<System.Option<Byte>>::.ctor(System.Option<Byte>)
+        newobj.ctor instance System.Result<System.Option<Byte>,System.Error>::.ctor(System.Result.Ok<System.Option<Byte>>)
+        ret
+    .end
+
+    .method static WriteLine(string value) -> Void
+        ldarg value
+        call neoCLR.Runtime.WriteLine(string)
+        ret
+    .end
+
+    .method static WriteLine(int32 value) -> Void
+        ldarg value
+        call instance System.Int32::ToString()
+        call System.Console.WriteLine(string)
+        ret
+    .end
+
+.end
+

@@ -1,0 +1,8 @@
+; Ordinary marker metadata; no union execution semantics are attached to this type.
+.type System.Runtime.CompilerServices.UnionAttribute
+    .method instance .ctor() -> Void
+        ldvoid
+        ret
+    .end
+.end
+

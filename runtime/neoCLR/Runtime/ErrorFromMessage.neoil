@@ -1,0 +1,4 @@
+.function neoCLR.Runtime.ErrorFromMessage(String message) -> Error
+    .methodimpl InternalCall
+.end
+

@@ -6,7 +6,7 @@ use neoclr::{
 
 #[test]
 fn methodimpl_internalcall_round_trips_as_clr_flag() {
-    let compiled = assemble(include_str!("../runtime/System.neoil")).unwrap();
+    let compiled = assemble(neoclr::library::system_source()).unwrap();
     let json = serde_json::to_value(&compiled).unwrap();
     let declared = json["functions"]
         .as_array()

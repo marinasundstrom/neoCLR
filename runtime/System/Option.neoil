@@ -1,0 +1,120 @@
+.type System.Option
+    .type None
+        .method instance .ctor() -> Void
+            ldvoid
+            ret
+        .end
+    .end
+    .type Some<T>
+        .field Value T
+        .property instance Value() -> T
+            .get instance System.Option.Some<T>::get_Value()
+        .end
+        .method instance .ctor(T value) -> Void
+            ldarg value
+            newobj System.Option.Some<T>
+            starg this
+            ldvoid
+            ret
+        .end
+        .method instance get_Value() -> T
+            ldarg this
+            ldfld 0
+            ret
+        .end
+    .end
+.end
+
+.type System.Option<T>
+    .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
+    .field private Stored System.Value
+    .method instance .ctor(System.None value) -> Void
+        ldarg value
+        value.pack System.None
+        newobj System.Option<T>
+        starg this
+        ldvoid
+        ret
+    .end
+    .method instance .ctor(System.Option.None value) -> Void
+        ldarg value
+        value.pack System.Option.None
+        newobj System.Option<T>
+        starg this
+        ldvoid
+        ret
+    .end
+    .property instance IsNone() -> Boolean
+        .get instance System.Option<T>::get_IsNone()
+    .end
+    .method instance get_IsNone() -> Boolean
+        ldarg this
+        ldfld 0
+        dup
+        value.is System.Option.None
+        brtrue Match
+        value.is System.None
+        ret
+    Match:
+        pop
+        ldc.bool true
+        ret
+    .end
+    .method instance GetNone() -> System.None
+        ldarg this
+        ldfld 0
+        value.unpack System.None
+        ret
+    .end
+    .method instance GetNoneCase() -> System.Option.None
+        ldarg this
+        ldfld 0
+        value.unpack System.Option.None
+        ret
+    .end
+    .method instance .ctor(System.Some<T> value) -> Void
+        ldarg value
+        value.pack System.Some<T>
+        newobj System.Option<T>
+        starg this
+        ldvoid
+        ret
+    .end
+    .method instance .ctor(System.Option.Some<T> value) -> Void
+        ldarg value
+        value.pack System.Option.Some<T>
+        newobj System.Option<T>
+        starg this
+        ldvoid
+        ret
+    .end
+    .property instance IsSome() -> Boolean
+        .get instance System.Option<T>::get_IsSome()
+    .end
+    .method instance get_IsSome() -> Boolean
+        ldarg this
+        ldfld 0
+        dup
+        value.is System.Option.Some<T>
+        brtrue Match
+        value.is System.Some<T>
+        ret
+    Match:
+        pop
+        ldc.bool true
+        ret
+    .end
+    .method instance GetSome() -> System.Some<T>
+        ldarg this
+        ldfld 0
+        value.unpack System.Some<T>
+        ret
+    .end
+    .method instance GetSomeCase() -> System.Option.Some<T>
+        ldarg this
+        ldfld 0
+        value.unpack System.Option.Some<T>
+        ret
+    .end
+.end
+

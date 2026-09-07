@@ -1,0 +1,4 @@
+.function neoCLR.Runtime.WriteLine(string value) -> Void
+    .methodimpl InternalCall
+.end
+

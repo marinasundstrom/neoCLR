@@ -1946,3 +1946,23 @@ retaining one assembled System module and a reproducible source build.
 Validation: the full `cargo test --locked --no-fail-fast` suite passes, as do
 `cargo fmt --check`, `cargo clippy --locked --all-targets -- -D warnings` and
 `git diff --check` on macOS ARM64.
+
+## System sources organized by namespace
+
+Split the monolithic runtime source into class/feature files under System and
+neoCLR/Runtime namespace folders. Generic Option/Result companions stay with their
+carriers. The ordered System.neoil manifest still produces one System module and
+preserves all pre-split metadata rows and instruction bodies.
+
+Added an explicit file source loader for quoted relative includes, shared by the
+CLI and Cargo build script. Bundled source comes from the manifest at build time;
+there is no runtime filesystem dependency and no independently maintained combined
+copy. String-based assembly remains filesystem-independent. Existing explicit System
+assembly commands continue to work. Loader tests cover relative paths, nested includes,
+spaces, malformed syntax, missing files, cycles, bundled/source parity, and HelloWorld
+against an explicitly assembled System artifact. Assembler diagnostics currently use
+expanded line numbers; source-map support is deferred.
+
+Validation: pre-split and manifest assembly produce identical serialized metadata/IL;
+all 21 source-loader, CLI, library and native-binding tests pass. Formatting, clippy
+with warnings denied, and diff checks pass on macOS ARM64.

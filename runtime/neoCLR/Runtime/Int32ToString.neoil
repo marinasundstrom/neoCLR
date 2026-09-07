@@ -1,0 +1,4 @@
+.function neoCLR.Runtime.Int32ToString(int32 value) -> string
+    .methodimpl InternalCall
+.end
+
