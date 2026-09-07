@@ -1852,3 +1852,9 @@ a universal base class or implicit boxing target. A native backend may lower a s
 to pointer, layout metadata and size/alignment, while `Ptr<T>` remains the explicit
 unmanaged capability and does not acquire ownership. `System.Object` is reserved
 for a future common object API and is not introduced into Preview 1.
+
+The storage decision was refined: `System.Value` is not the mechanism for C-style
+unions or overlays. Those belong to an explicit future type/layout description with
+size, alignment, offsets and discriminant or unsafe access rules. This preserves the
+low-level memory model and leaves allocator and heap management independent of the
+metadata carrier used for checked heterogeneous values.

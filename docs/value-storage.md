@@ -40,6 +40,22 @@ the backing representation for arbitrary slots, and introducing it does not make
 all values reference-compatible. This keeps the low-level machine model explicit
 while leaving higher-level languages free to provide ergonomic object semantics.
 
+## Physical layouts and unions
+
+Erased storage and overlapping storage solve different problems. `System.Value`
+preserves one complete value together with its exact runtime type. A low-level type
+may instead describe a fixed-size region whose alternatives share bytes, similar to
+a C union, or describe a struct containing such regions. Reading an alternative then
+requires an explicit discriminant or an unsafe operation supplied by the containing
+type; it does not consult `System.Value` and does not create a hidden box.
+
+This is a future metadata/layout capability. The current interpreter keeps record
+fields disjoint and rejects native layout for `System.Value`. When overlapping
+layouts are added, the metadata must state size, alignment, offsets and whether a
+field is an overlay, while the allocator remains responsible for the storage
+location and lifetime. Existing `Ptr<T>` operations are the natural low-level way
+to address that region.
+
 Packing uses normal storage conversion: `ldc.i4 257; value.pack Byte` stores Byte(1).
 It matches Byte, not Int32. Extraction applies normal stack normalization, so unpacking
 Byte puts Int32(1) on the stack. Generic operands are substituted normally. Void is a
