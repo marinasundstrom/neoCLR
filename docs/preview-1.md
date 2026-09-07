@@ -68,8 +68,9 @@ and compatibility with existing .NET tooling are later work, not achieved by usi
    failed queries and independent value copies. Fully qualified names select them while
    short Option/Result spellings still denote bootstrap categories. Migrate existing
    APIs and host/native adapters before removing that temporary distinction.
-   Int32.Parse and its checked-in callers, plus the typed console adapter, are migrated;
-   arithmetic, slicing, file and the legacy ReadByte API still use bootstrap carriers.
+   Int32.Parse and its checked-in callers, plus the typed console and file adapters, are
+   migrated; arithmetic, slicing and the legacy ReadByte/ReadAllText APIs still use
+   bootstrap carriers.
 4. **Replace and remove the bootstrap union system.** Migrate library methods, native/host
    adapters, samples, and tests to ordinary types and calls. Delete the six special
    instructions and special Option/Result type/value dispatch. Make the metadata break

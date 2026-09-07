@@ -442,6 +442,24 @@
         call neoCLR.Runtime.ReadAllText(String,Int32)
         ret
     .end
+
+    .method static ReadAllTextTyped(String path, Int32 maxBytes) -> System.Result<String,System.Error>
+        ldarg path
+        ldarg maxBytes
+        call neoCLR.Runtime.ReadAllText(String,Int32)
+        dup
+        is.case Err
+        brtrue ReadFailed
+        ldcase Ok
+        newobj.ctor instance System.Result.Ok<String>::.ctor(String)
+        newobj.ctor instance System.Result<String,System.Error>::.ctor(System.Result.Ok<String>)
+        ret
+    ReadFailed:
+        ldcase Err
+        newobj.ctor instance System.Result.Error<System.Error>::.ctor(System.Error)
+        newobj.ctor instance System.Result<String,System.Error>::.ctor(System.Result.Error<System.Error>)
+        ret
+    .end
 .end
 
 .function neoCLR.Runtime.ReadAllText(String path, Int32 maxBytes) -> Result<String,Error>

@@ -17,6 +17,9 @@ needs and the primitives required to implement them in platform code.
 
 - Ordinary `System.Option<T>` and `System.Result<T,E>` provide variant constructors, predicates and checked accessors. Their None/Some/Ok/Err wrappers are ordinary types too. All nineteen new methods are platform IL; see the [member convention](union-convention.md).
 - `System.IO.File` provides bounded ReadAllText; see [file input](file-input.md).
+- `System.IO.File.ReadAllTextTyped` adapts bounded file failures to the ordinary
+  `System.Result<String,System.Error>` carrier; the original method remains available
+  while bootstrap migration continues.
 - `System.Error` provides FromMessage, get_Message, and ToString, with explicit Message property metadata; see [Error values](errors.md).
 - `System.Array<T>` provides six IL methods for explicit allocation, length, checked
   access, element addresses, and free, with explicit Length property metadata; see [arrays and pointers](arrays-and-pointers.md).

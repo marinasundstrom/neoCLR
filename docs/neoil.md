@@ -291,6 +291,7 @@ These are ordinary functions compiled from [System.neoil](../runtime/System.neoi
 | `System.Console.ReadByteTyped` | none | `System.Result<System.Option<Byte>,System.Error>` (ordinary nested cases) |
 | `System.Console.WriteLine` | `String` | `Void` |
 | `System.Console.WriteLine` | `Int32` | `Void` |
+| `System.IO.File.ReadAllTextTyped` | `String, Int32` | `System.Result<String,System.Error>` (ordinary carrier) |
 | `System.Int32.ToString` | instance receiver `Int32`, no parameters | `String` |
 | `System.Int32.Parse` | `String` | `System.Result<Int32,Error>` (ordinary carrier; see [migration](int32-parse.md)) |
 | `System.Int32.Divide` | `Int32, Int32` | `Result<Int32,Error>` |
