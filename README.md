@@ -25,9 +25,12 @@ Interfaces will use ordinary names without an `I` prefix.
 
 ## Current focus
 
-The first publication target is a **runnable source preview**. The [MVP plan](docs/mvp.md)
+The first publication target is **Preview 1**, a runnable source preview. The [Preview 1 plan](docs/preview-1.md)
 defines required capabilities, remaining work, demonstrations, release checks, and exclusions.
-The current checkout is not yet declared MVP-complete.
+The current checkout is not yet declared ready for Preview 1.
+The [program contracts and IL mappings](docs/preview-1-programs.md) define the target
+through six small Raven-like pseudocode programs. They are explanatory examples;
+Preview 1 does not require a high-level compiler.
 
 The first native heap/pointer slice is implemented: explicit allocation/free,
 native addresses, pointer casts and byte offsets, indirect access, and sequential

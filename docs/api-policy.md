@@ -23,7 +23,7 @@ alone do not justify additional consumer-visible differences.
 
 For each intentional departure, state the problem it solves, the resulting contract,
 and the migration impact. Keep compatible behavior where useful, but do not add a
-legacy abstraction solely because .NET exposes it. Preserve the small MVP scope while
+legacy abstraction solely because .NET exposes it. Preserve the small Preview 1 scope while
 leaving room for better designs as the runtime develops.
 
 | API | Familiar surface | Deliberate change or current limitation |

@@ -4,7 +4,9 @@ The platform name is undecided; neoCLR names the runtime only. The existing code
 is a small semantic testbed. It is not a commitment to Rust for every component,
 JSON for distribution, or the exact instruction extensions used here.
 
-The first publication target is defined in the [public source MVP plan](mvp.md).
+The first publication target is defined in the [public source Preview 1 plan](preview-1.md).
+Its scope is grounded in six [Raven-like programs and IL mappings](preview-1-programs.md),
+with hand-authored IL acceptance fixtures until a high-level frontend exists.
 Use its required capabilities and release gates to prioritize work; the broader
 directions below are not all prerequisites for the first release.
 

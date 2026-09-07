@@ -1568,6 +1568,26 @@ formatting, Clippy with warnings denied, and diff checks pass. The sample assemb
 to JSON, passed verification and ran from that artifact with expected output.
 No push or publication performed.
 
+## 2026-09-07 — Define Preview 1 through Raven-like program contracts
+
+Named the first public source milestone Preview 1, replacing MVP terminology in
+active planning docs while retaining a link from the old mvp.md path. Added a separate
+document with six original Raven-like pseudocode programs: hello/free functions,
+console computation and recoverable errors, constructed values and ordinary
+alternatives, an explicit buffer, terminal Fault traces, and minimal type inspection.
+Each records acceptance behavior, IL lowering and current gaps. Pseudocode is clearly
+distinguished from runnable IL, an actual Raven syntax contract, or a compiler deliverable.
+
+Updated the release checklist and README/roadmap to derive scope from these programs,
+and recorded the now-executable carrier-storage foundation. The final System carriers,
+bootstrap removal and guest type inspection remain release gates. No high-level compiler,
+Stream API or broader reflection was added to the target.
+
+Validation: local links in changed planning documents and diff checks pass. Extracted
+the complete P1 IL mapping, assembled it to JSON, verified it, and checked its expected
+HelloWorld output. Runtime validation remains the 406 passing integration tests and
+format/Clippy checks from the preceding implementation slice. No release or push performed.
+
 ## 2026-09-07 — Explicit property metadata and accessor associations
 
 Added optional property records to type metadata, with name, static/instance kind,
