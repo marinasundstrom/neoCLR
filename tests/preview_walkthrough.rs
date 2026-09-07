@@ -73,6 +73,10 @@ fn walkthrough_sources_and_artifacts_have_the_documented_outputs_and_exits() {
                 "File contents:\nHello, neoCLR 🌍!\nUTF-8 bytes:\n19\n=> Void\n".into(),
             )],
         ),
+        (
+            "equatable",
+            vec![(b"", "true\nfalse\ntrue\ntrue\n=> Void\n".into())],
+        ),
         ("pointer_union", vec![(b"", "42\n7\n11\n=> Void\n".into())]),
         (
             "ordinary_unions",

@@ -29,6 +29,7 @@ and lifetime choices, a real `Void` value, functions outside types, `Option<T>` 
 `Result<T,E>` for recoverable errors, and terminal Faults instead of exceptions.
 Interfaces use ordinary names without an `I` prefix.
 [Borrowed interface references](docs/interfaces.md) make dispatch explicit without boxing or ownership.
+[Typed equality](docs/equality.md) uses System.Equatable<T> and Equals(T).
 
 ## Current focus
 

@@ -87,7 +87,13 @@ fn unknown_implementation_flags_are_rejected_by_loader() {
     let base = serde_json::to_value(library::system().unwrap()).unwrap();
     for flags in [1, 3, 0x1001, 0x8000] {
         let mut json = base.clone();
-        json["functions"][0]["impl_flags"] = flags.into();
+        let declaration = json["functions"]
+            .as_array_mut()
+            .unwrap()
+            .iter_mut()
+            .find(|f| f["name"] == "neoCLR.Runtime.WriteLine")
+            .unwrap();
+        declaration["impl_flags"] = flags.into();
         assert!(
             load(&json.to_string())
                 .unwrap_err()

@@ -2428,3 +2428,26 @@ and corrected the remaining reference to removed pointer-returning TryGet method
 Validation: 19 reference tests and 19 interface tests pass, including metadata
 round trips and execution without mandatory verification. Strict Clippy, formatting
 and diff checks pass.
+
+## Generic typed equality
+
+Added the platform-written System.Equatable<T> interface with Equals(T other) returning
+Boolean, following the .NET IEquatable<T> member shape and neoCLR's interface naming
+convention. Int32 implements integer equality; String and System.Type expose their
+existing Equals behavior through the interface. The receiver keeps value semantics,
+and callers explicitly supply a managed Equatable<T>& view for interface dispatch.
+No opcode, automatic boxing, ownership rule, comparer discovery or hash API was added.
+
+Added a Point sample demonstrating a user-defined equality implementation, forwarded
+interface calls, and primitive comparisons. The source/artifact walkthrough includes
+it. Regression coverage compares direct and interface calls, exact Unicode text,
+type identity and a generic implementing record that compares against another type.
+Documented the equality laws as implementation obligations, current primitive coverage,
+and the separate future hashing/operator/collection decisions.
+
+Validation: 43 focused tests and strict Clippy pass. The complete regression run
+exposed an index-dependent native-flags test: the new first method is an interface
+member, so mutating row zero exercised a different validation rule. Updated the test
+to locate neoCLR.Runtime.WriteLine explicitly. Reran that suite and every subsequent
+suite; combined coverage is 521 passing tests across 82 test binaries. Doc tests,
+formatting and diff checks also pass. Validation was local on macOS ARM64.

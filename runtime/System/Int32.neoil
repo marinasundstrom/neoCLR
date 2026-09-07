@@ -1,4 +1,5 @@
 .type System.Int32
+    .implements System.Equatable<Int32>
     .method static Parse(string value) -> System.Result<Int32,System.Int32ParseError>
         .local Byte failure
         ldarg 0
@@ -66,6 +67,13 @@
         newobj instance System.IntegerDivisionError::.ctor(System.IntegerDivisionError.Overflow)
         newobj instance System.Result.Error<System.IntegerDivisionError>::.ctor(System.IntegerDivisionError)
         newobj instance System.Result<Int32,System.IntegerDivisionError>::.ctor(System.Result.Error<System.IntegerDivisionError>)
+        ret
+    .end
+
+    .method instance Equals(Int32 other) -> Boolean
+        ldarg this
+        ldarg other
+        ceq
         ret
     .end
 

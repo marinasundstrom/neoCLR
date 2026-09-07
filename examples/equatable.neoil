@@ -1,0 +1,85 @@
+.module EquatableDemo
+.entry Main
+
+.type Point
+    .implements System.Equatable<Point>
+    .field X Int32
+    .field Y Int32
+    .method instance Equals(Point other) -> Boolean
+        ldarg this
+        ldfld Point::X
+        ldarg other
+        ldfld Point::X
+        bne.un Different
+        ldarg this
+        ldfld Point::Y
+        ldarg other
+        ldfld Point::Y
+        ceq
+        ret
+    Different:
+        ldc.bool false
+        ret
+    .end
+.end
+
+.function SamePoint(System.Equatable<Point>& left, Point right) -> Boolean
+    ldarg left
+    ldarg right
+    callvirt instance System.Equatable<Point>::Equals(Point)
+    ret
+.end
+
+.function PrintEquality(Boolean equal) -> Void
+    ldarg equal
+    brfalse Different
+    ldstr "true"
+    call System.Console::WriteLine(String)
+    ret
+Different:
+    ldstr "false"
+    call System.Console::WriteLine(String)
+    ret
+.end
+
+.function Main() -> Void
+    .local Point point
+    .local Int32 number
+    .local String text
+    ldc.i4 2
+    ldc.i4 3
+    newobj Point
+    stloc point
+    ldloca point
+    interface.borrow System.Equatable<Point>
+    ldc.i4 2
+    ldc.i4 3
+    newobj Point
+    call SamePoint(System.Equatable<Point>&,Point)
+    call PrintEquality(Boolean)
+    pop
+    ldloca point
+    interface.borrow System.Equatable<Point>
+    ldc.i4 2
+    ldc.i4 4
+    newobj Point
+    call SamePoint(System.Equatable<Point>&,Point)
+    call PrintEquality(Boolean)
+    pop
+    ldc.i4 42
+    stloc number
+    ldloca number
+    interface.borrow System.Equatable<Int32>
+    ldc.i4 42
+    callvirt instance System.Equatable<Int32>::Equals(Int32)
+    call PrintEquality(Boolean)
+    pop
+    ldstr "hello"
+    stloc text
+    ldloca text
+    interface.borrow System.Equatable<String>
+    ldstr "hello"
+    callvirt instance System.Equatable<String>::Equals(String)
+    call PrintEquality(Boolean)
+    ret
+.end

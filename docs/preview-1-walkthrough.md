@@ -41,6 +41,7 @@ Run these commands from the repository root:
 | Growable list | `cargo run --locked -- run examples/array_list.neoil` | `ArrayList count:`, `5`, `0`, `1`, `4`, `9`, `16` |
 | Borrowed list interface | `cargo run --locked -- run examples/interfaces.neoil` | `42`, `2` |
 | Array loops | `cargo run --locked -- run examples/array_loops.neoil` | `Sum of squares:`, `30` |
+| Typed equality | `cargo run --locked -- run examples/equatable.neoil` | `true`, `false`, `true`, `true` |
 | File summary | `cargo run --locked -- run examples/file_summary.neoil` | `File contents:`, `Hello, neoCLR 🌍!`, `UTF-8 bytes:`, `19` |
 | Read-only type inspection | `cargo run --locked -- run examples/type_inspection.neoil` | `System.Int32`, `Box`, `1`, `System.Int32`, `Same type` |
 | Pointer-backed carrier | `cargo run --locked -- run examples/pointer_union.neoil` | `42`, `7`, `11` |

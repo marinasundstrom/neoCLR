@@ -26,6 +26,9 @@ existing value-receiver methods retain their shared backing-state behavior; a sa
 view alone does not change a method's receiver mode. [The Counter sample](../examples/reference_receivers.neoil)
 demonstrates byref interface dispatch that changes an inline field.
 
+[System.Equatable<T>](equality.md) supplies typed Equals(T) dispatch for primitives,
+type descriptors and user-defined records through the same managed views.
+
 The following sections describe the retained native-pointer view specifically.
 
 ## Native-pointer interface views

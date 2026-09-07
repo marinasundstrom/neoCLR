@@ -1,6 +1,7 @@
 ; System source manifest. Includes are expanded in order into one module.
 .module System
 
+.include "System/Equatable.neoil"
 .include "System/Value.neoil"
 .include "System/Void.neoil"
 .include "System/Boolean.neoil"
