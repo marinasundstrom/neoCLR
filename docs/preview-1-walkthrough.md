@@ -161,7 +161,9 @@ introducing a filesystem object model or Stream abstraction.
 
 [PointerUnion](../examples/pointer_union.neoil) contrasts a copied Int32 snapshot
 (42) with a borrowed carrier that observes mutation through an alias (7), then reads
-an error from stack storage (11). The carrier uses a tag plus Void*. Its caller owns
+an error from stack storage (11). TryGetOk copies into caller-provided storage,
+TryGetOkPointer supplies a borrowed pointer, and TryGetError handles the other case.
+The carrier uses a tag plus Void*. Its caller owns
 the payload and releases heap storage exactly once. See the
 [pointer contract](pointer-carriers.md) for casts, lifetimes and native-layout limits.
 

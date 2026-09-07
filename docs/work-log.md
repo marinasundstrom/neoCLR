@@ -2174,3 +2174,26 @@ selects interpretation but does not establish pointer validity or ownership. Exp
 pointer output slots can support an experiment without union opcodes or managed out
 parameter semantics. These members remain proposals; no runtime behavior changed.
 Validation: documentation review and git diff --check.
+
+## Executable copying and borrowing try-get patterns
+
+Implemented TryGetOk/TryGetError and TryGetOkPointer/TryGetErrorPointer as ordinary
+methods on the sample PointerResult<T,E>. They branch on the Byte tag before payload
+access. Copy extraction writes to T*/E* storage on success and leaves it untouched
+on mismatch. Borrow extraction writes a T*/E* to a pointer output slot on success
+and clears that slot on mismatch. True identifies a case, not pointer validity or
+ownership. Existing GetOk/GetError remain checked accessors that Fault on mismatch.
+
+Updated the main sample to demonstrate explicit localloc output slots, an independent
+copy, a borrowed alias observing mutation, and copying the stack-backed Error case.
+Output remains 42, 7, 11. No runtime semantics, opcodes, managed byrefs, out metadata,
+System.Option/Result members or compiler conventions were added. Updated the carrier,
+union convention and walkthrough documentation to distinguish implemented sample
+behavior from future library and language integration.
+
+Validation: all 24 tests pass across pointer carriers, the CLI source/artifact
+walkthrough and the verifier (including all IL samples). New cases exercise both
+case names with equal payload types, Byte/Void storage, untouched/uninitialized copy
+outputs on mismatch, cleared pointer outputs, invalid output/source addresses,
+alias mutation and access after frame release. Formatting, clippy with warnings
+denied and diff checks pass on macOS ARM64.

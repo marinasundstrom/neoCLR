@@ -145,7 +145,7 @@ case family listed above, and predicates test those same concrete identities. Re
 System and applications together: this changes member/type rows as well as available
 signatures. The obsolete names are not compatibility aliases. JSON format 4 also removes the separate bootstrap VM representation.
 
-## Tagged storage and prospective try-get access
+## Tagged storage and explicit try-get access
 
 A union's discriminator belongs to its ordinary carrier representation. It does not
 need a VM union category or instruction. The pointer-backed experiment stores Byte
@@ -159,20 +159,20 @@ pointer liveness, alignment, initialization or correctness of a tag/pointer pair
 constructed by arbitrary low-level code. Normal access checks and caller obligations
 still apply. A null pointer does not select a union case.
 
-Consider adding ordinary try-get members after the current sample-packaging slice.
+The pointer-backed sample now implements ordinary copying and borrowing try-get members.
 The [.NET non-boxing access pattern](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/union#non-boxing-access-pattern)
 returns Boolean and supplies a case value through an out parameter. It avoids boxing
 during extraction; it does not inherently borrow an address into the carrier.
-neoCLR should distinguish these two possible contracts:
+The sample distinguishes these contracts:
 
-| Proposed method shape | Matching tag | Different tag |
+| Sample method shape | Matching tag | Different tag |
 | --- | --- | --- |
 | TryGetOk(T* destination) -> Boolean | Copy the payload into caller-provided storage; return true | Return false and leave destination unchanged |
 | TryGetOkPointer(T** destination) -> Boolean | Write the borrowed payload pointer; return true | Write a null pointer; return false |
 
-These names and contracts are proposals, not implemented members or a finalized
-compiler convention. Use separate case names (Ok/Error) or distinct case-wrapper
-parameter types to avoid signature collisions when payload types coincide. The
+The sample implements both rows for Ok and Error (using E for the Error payload).
+These are not yet System.Option/Result members or a finalized compiler convention.
+Separate case names avoid signature collisions when payload types coincide. The
 copying form deliberately makes no generic default-value or out-assignment promise
 on failure. A language can enforce that the caller reads the output only after success.
 The borrowing form gives no ownership and no lifetime extension; true identifies the

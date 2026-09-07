@@ -42,10 +42,12 @@ special union encoding, System.Value packing, or implicit ownership is involved.
 The sample demonstrates:
 
 1. Allocate and initialize an Int32 on the heap, then create an Ok view.
-2. Copy the view and extract an independent Int32 snapshot.
+2. Copy the view, use TryGetOk to copy into an Int32 output slot, and use
+   TryGetOkPointer to borrow the payload address through an Int32** output slot.
 3. Update the allocation: the snapshot stays 42 and the alias reads 7.
 4. Free the original allocation exactly once, through a Void* cast.
-5. Create an Error view over frame-local storage and read 11 before returning.
+5. Create an Error view over frame-local storage and use TryGetError to copy 11
+   into the output slot before returning.
 
 Both heap views become dangling after step 4. Copying a view never transfers ownership
 or creates another obligation to free. A returned view into a callee's frame is also
@@ -61,6 +63,37 @@ cargo test --locked --test pointer_unions
 Expected program output is 42, 7, 11 on separate lines, followed by `=> Void`.
 The tests also assemble and load a JSON round trip, reject mismatched case extraction,
 check expired heap/frame payloads, and exercise native carrier storage and Byte/Void.
+
+## Try-get operations
+
+The sample provides four ordinary methods:
+
+| Method | On matching tag | On different tag |
+| --- | --- | --- |
+| TryGetOk(T* destination) -> Boolean | Copy T into destination; true | Leave destination untouched; false |
+| TryGetError(E* destination) -> Boolean | Copy E into destination; true | Leave destination untouched; false |
+| TryGetOkPointer(T** destination) -> Boolean | Write the borrowed T*; true | Write null T*; false |
+| TryGetErrorPointer(E** destination) -> Boolean | Write the borrowed E*; true | Write null E*; false |
+
+Each method branches on the tag before accessing payload storage. Copy extraction
+performs ldobj/stobj and requires valid source and destination storage on success.
+It does not initialize an untouched output on failure. The caller must branch on the
+Boolean before reading newly allocated output storage. A mismatch neither reads the
+payload nor accesses the copy destination, even when those pointers are null.
+
+Borrow extraction writes an address without reading the payload; the output pointer
+slot must be valid on both paths. Its true result means the case matches, not that the
+address is live, initialized or non-null. Reading a borrowed pointer after the owner
+releases storage can still Fault. No guest allocation, reference-count update or ownership transfer
+occurs inside any try-get method. Copying a record payload follows normal value copying;
+its pointer fields still alias their targets.
+
+The main program allocates output slots explicitly with localloc, which requires only
+its size on the evaluation stack. For pointer output, sizeof Int32* reserves one pointer
+slot, and ptr.cast Int32* produces the Int32** destination. These are ordinary native
+pointer parameters; managed byrefs, out metadata and local address-taking are not added.
+The existing checked-accessor precondition is also unchanged: GetOk/GetError still Fault
+on a mismatched tag, while the try-get methods return false for that case mismatch.
 
 ## Limits and next decisions
 

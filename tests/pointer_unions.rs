@@ -89,3 +89,112 @@ fn void_pointer_layout_does_not_require_a_native_layout_for_its_target() {
     );
     assert!(neoclr::memory::layout(&module, &Type::String).is_err());
 }
+
+#[test]
+fn try_get_copies_both_cases_with_exact_storage_types() {
+    for case in ["Ok", "Error"] {
+        for (ty, value, expected) in [
+            ("Int32", "ldc.i4 42", Value::Int32(42)),
+            ("Byte", "ldc.i4 257", Value::Byte(1)),
+            ("Void", "ldvoid", Value::Void),
+        ] {
+            let body = format!(
+                ".local {ty}* payload\n.local {ty}* output\nsizeof {ty}\nlocalloc\nptr.cast {ty}\nstloc payload\nsizeof {ty}\nlocalloc\nptr.cast {ty}\nstloc output\nldloc payload\n{value}\nstobj {ty}\nldloc payload\ncall PointerResult<{ty},{ty}>::From{case}({ty}*)\nldloc output\ncall instance PointerResult<{ty},{ty}>::TryGet{case}({ty}*)\nbrtrue Copied\nfault \"expected match\"\nCopied:\nldloc output\nldobj {ty}"
+            );
+            assert_eq!(
+                run(&program(&body, ty, ""), Limits::default())
+                    .unwrap()
+                    .value,
+                expected
+            );
+        }
+    }
+}
+
+#[test]
+fn mismatch_copy_leaves_output_untouched_and_never_reads_the_payload() {
+    for (case, other) in [("Ok", "Error"), ("Error", "Ok")] {
+        let prefix = format!(
+            ".local Int32* output\nsizeof Int32\nlocalloc\nptr.cast Int32\nstloc output\nldloc output\nldc.i4 99\nstobj Int32\nptr.null Int32\ncall PointerResult<Int32,Int32>::From{case}(Int32*)\nldloc output\ncall instance PointerResult<Int32,Int32>::TryGet{other}(Int32*)\nbrfalse Miss\nfault \"unexpected match\"\nMiss:\nldloc output\nldobj Int32"
+        );
+        assert_eq!(
+            run(&program(&prefix, "Int32", ""), Limits::default())
+                .unwrap()
+                .value,
+            Value::Int32(99)
+        );
+        let uninitialized = prefix.replace("ldloc output\nldc.i4 99\nstobj Int32\n", "");
+        let fault = run(&program(&uninitialized, "Int32", ""), Limits::default()).unwrap_err();
+        assert!(fault.message.contains("uninitialized"), "{fault}");
+        let null_output = format!(
+            "ptr.null Int32\ncall PointerResult<Int32,Int32>::From{case}(Int32*)\nptr.null Int32\ncall instance PointerResult<Int32,Int32>::TryGet{other}(Int32*)"
+        );
+        assert_eq!(
+            run(&program(&null_output, "Boolean", ""), Limits::default())
+                .unwrap()
+                .value,
+            Value::Boolean(false)
+        );
+    }
+}
+
+#[test]
+fn mismatch_borrow_clears_a_previous_pointer_and_checks_output_storage() {
+    for (case, other) in [("Ok", "Error"), ("Error", "Ok")] {
+        let body = format!(
+            ".local Int32** output\n.local Int32* previous\nsizeof Int32*\nlocalloc\nptr.cast Int32*\nstloc output\nsizeof Int32\nlocalloc\nptr.cast Int32\nstloc previous\nldloc output\nldloc previous\nstobj Int32*\nptr.null Int32\ncall PointerResult<Int32,Int32>::From{case}(Int32*)\nldloc output\ncall instance PointerResult<Int32,Int32>::TryGet{other}Pointer(Int32**)\nbrfalse Miss\nfault \"unexpected match\"\nMiss:\nldloc output\nldobj Int32*\nptr.null Int32\nceq"
+        );
+        assert_eq!(
+            run(&program(&body, "Boolean", ""), Limits::default())
+                .unwrap()
+                .value,
+            Value::Boolean(true)
+        );
+        let null_output = format!(
+            "ptr.null Int32\ncall PointerResult<Int32,Int32>::From{case}(Int32*)\nptr.null Int32*\ncall instance PointerResult<Int32,Int32>::TryGet{other}Pointer(Int32**)"
+        );
+        let fault = run(&program(&null_output, "Boolean", ""), Limits::default()).unwrap_err();
+        assert!(fault.message.contains("null"), "{fault}");
+    }
+}
+
+#[test]
+fn borrowed_output_aliases_the_selected_payload_for_both_cases() {
+    for case in ["Ok", "Error"] {
+        let body = format!(
+            ".local Int32* payload\n.local Int32** output\nsizeof Int32\nlocalloc\nptr.cast Int32\nstloc payload\nldloc payload\nldc.i4 42\nstobj Int32\nsizeof Int32*\nlocalloc\nptr.cast Int32*\nstloc output\nldloc payload\ncall PointerResult<Int32,Int32>::From{case}(Int32*)\nldloc output\ncall instance PointerResult<Int32,Int32>::TryGet{case}Pointer(Int32**)\nbrtrue Matched\nfault \"expected match\"\nMatched:\nldloc output\nldobj Int32*\nldc.i4 7\nstobj Int32\nldloc payload\nldobj Int32"
+        );
+        assert_eq!(
+            run(&program(&body, "Int32", ""), Limits::default())
+                .unwrap()
+                .value,
+            Value::Int32(7)
+        );
+    }
+}
+
+#[test]
+fn borrowing_a_stale_payload_does_not_validate_or_extend_its_lifetime() {
+    let extra = ".function Expired() -> PointerResult<Int32,Int32>\nsizeof Int32\nlocalloc\nptr.cast Int32\ncall PointerResult<Int32,Int32>::FromOk(Int32*)\nret\n.end";
+    let prefix = ".local Int32** output\nsizeof Int32*\nlocalloc\nptr.cast Int32*\nstloc output\ncall Expired()\nldloc output\ncall instance PointerResult<Int32,Int32>::TryGetOkPointer(Int32**)";
+    assert_eq!(
+        run(&program(prefix, "Boolean", extra), Limits::default())
+            .unwrap()
+            .value,
+        Value::Boolean(true)
+    );
+    let body = format!("{prefix}\npop\nldloc output\nldobj Int32*\nldobj Int32");
+    let fault = run(&program(&body, "Int32", extra), Limits::default()).unwrap_err();
+    assert!(fault.message.contains("use after free"), "{fault}");
+}
+
+#[test]
+fn matching_copy_requires_valid_payload_and_output_storage() {
+    for body in [
+        ".local Int32* output\nsizeof Int32\nlocalloc\nptr.cast Int32\nstloc output\nptr.null Int32\ncall PointerResult<Int32,Int32>::FromOk(Int32*)\nldloc output\ncall instance PointerResult<Int32,Int32>::TryGetOk(Int32*)",
+        "sizeof Int32\nlocalloc\nptr.cast Int32\ndup\nldc.i4 42\nstobj Int32\ncall PointerResult<Int32,Int32>::FromOk(Int32*)\nptr.null Int32\ncall instance PointerResult<Int32,Int32>::TryGetOk(Int32*)",
+    ] {
+        let fault = run(&program(body, "Boolean", ""), Limits::default()).unwrap_err();
+        assert!(fault.message.contains("null"), "{fault}");
+    }
+}
