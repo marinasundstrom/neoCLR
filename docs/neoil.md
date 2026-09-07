@@ -228,6 +228,23 @@ normalization; other checks use exact type equality. See [integer storage](integ
 | `cpobj T` | `Ptr<T>,Ptr<T> →` | Copy initialized value from source to destination |
 | `initblk` | `Ptr<T>,Int32,integer →` | Fill a byte range with the low byte of the value |
 | `cpblk` | `Ptr<T>,Ptr<U>,integer →` | Copy a byte range and initialization state (overlap supported) |
+
+## Opcode status inventory
+
+The instruction table above is the complete format-3 opcode inventory. Their
+implementation status is grouped here so additions and temporary operations are
+visible during Preview 1 review.
+
+| Status | Opcodes | Meaning |
+| --- | --- | --- |
+| CLI-aligned | `ldc.*`, `ldarg`, `starg`, `ldloc`, `stloc`, arithmetic, comparisons, branches, `call`, `ret`, `newobj`, field access, conversions, `sizeof`, `alignof`, indirect memory access, `cpobj`, `initobj`, `cpblk`, `initblk` | Familiar CLI concepts with neoCLR's documented typed stack and fault rules |
+| neoCLR explicit memory | `localloc`, `heap.alloc`, `heap.free`, `ptr.null`, `ptr.cast`, `ptr.add`, `ptr.fromint`, `ldflda` | Explicit allocation, address and lifetime capabilities |
+| neoCLR value storage | `value.pack`, `value.is`, `value.unpack` | Visible erased storage; never implicit boxing |
+| Temporary bootstrap | `some`, `none`, `ok`, `err`, `is.case`, `ldcase` | Compatibility operations scheduled for removal after ordinary Option/Result migration |
+
+The status labels describe the current prototype, not a promise that every backend
+already exists. New instructions must be added to both tables, assigned a status,
+and given a format-version and runtime-service note when applicable.
 | `ldind.i4` | `Ptr<Int32 or UInt32> → Int32` | Indirect 32-bit load |
 | `stind.i4` | `Ptr<Int32 or UInt32>,Int32 →` | Indirect 32-bit store |
 | `ldind.i1/u1/i2/u2/u4` | `Ptr<Integer> → Int32` | Load indicated width with signed/unsigned interpretation |

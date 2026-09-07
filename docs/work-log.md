@@ -1897,3 +1897,7 @@ native interop remain explicit runtime-service boundaries.
 Defined the opcode policy: preserve CLI mnemonics and useful stack semantics where
 they fit, document neoCLR deviations and additions, and mark temporary bootstrap
 instructions for explicit removal at a metadata-version break.
+
+Added a complete opcode status inventory to the neoIL reference, grouping
+CLI-aligned instructions, explicit neoCLR memory/value operations, and temporary
+bootstrap union operations.
