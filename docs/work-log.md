@@ -2105,3 +2105,25 @@ keeps future allocator/native-layout work open without hidden boxing semantics.
 
 Validation: checked against Value::erase and the derived owned Value clone behavior;
 existing erased-storage, copy and lifetime tests passed in the preceding full run.
+
+## Borrowed union payloads through Void pointers
+
+Added PointerResult<T,E> as an executable low-level storage experiment. Its private
+Byte tag and Void* field use existing pointer casts and ordinary methods; IsOk is
+also declared as a property. The caller allocates and initializes the payload and
+retains responsibility for its lifetime. The carrier neither owns nor frees it.
+Copied carriers alias the same target; extracted values are snapshots. The sample
+shows heap mutation through an alias, explicit release through Void*, and borrowing
+frame-local storage with equal success/error payload types.
+
+Documented that Void* carries no dynamic type or ownership, casts do not validate
+reinterpretation, and the existing zero-sized Void load remains supported. Native
+layout restrictions still prevent replacing general System.Value payload storage.
+Owning carriers, move/clone/release contracts and unit-case allocation elimination
+remain separate work. No opcode, metadata format or runtime semantics changed.
+
+Validation: 39 focused tests pass across pointer carriers, pointers, generic memory
+and stack allocation. The new cases cover source/JSON round trips, native carrier
+storage, Byte/Void payloads, wrong-case Faults before access, and use after heap free
+or frame return. The sample verifies and prints 42, 7, 11, then => Void. Formatting,
+clippy with warnings denied and diff checks pass on macOS ARM64.

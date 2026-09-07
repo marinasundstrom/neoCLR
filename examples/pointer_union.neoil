@@ -1,0 +1,115 @@
+.module PointerUnion
+.entry Main
+
+; A borrowed union view, not an owner. The caller keeps the payload alive.
+; Copying this value aliases storage. No allocation or cleanup is implicit.
+.type PointerResult<T,E>
+    .field private Tag Byte
+    .field private Payload Void*
+
+    .method static FromOk(T* payload) -> PointerResult<T,E>
+        ldc.i4 0
+        ldarg payload
+        ptr.cast Void
+        newobj PointerResult<T,E>
+        ret
+    .end
+    .method static FromError(E* payload) -> PointerResult<T,E>
+        ldc.i4 1
+        ldarg payload
+        ptr.cast Void
+        newobj PointerResult<T,E>
+        ret
+    .end
+    .property instance IsOk() -> Boolean
+        .get instance PointerResult<T,E>::get_IsOk()
+    .end
+    .method instance get_IsOk() -> Boolean
+        ldarg this
+        ldfld 0
+        ldc.i4 0
+        ceq
+        ret
+    .end
+    .method instance GetOk() -> T
+        ldarg this
+        call instance PointerResult<T,E>::get_IsOk()
+        brtrue Read
+        fault "PointerResult does not contain Ok"
+    Read:
+        ldarg this
+        ldfld 1
+        ptr.cast T
+        ldobj T
+        ret
+    .end
+    .method instance GetError() -> E
+        ldarg this
+        ldfld 0
+        ldc.i4 1
+        ceq
+        brtrue Read
+        fault "PointerResult does not contain Error"
+    Read:
+        ldarg this
+        ldfld 1
+        ptr.cast E
+        ldobj E
+        ret
+    .end
+.end
+
+.function Main() -> Void
+    .local Int32* owner
+    .local PointerResult<Int32,Int32> view
+    .local PointerResult<Int32,Int32> alias
+    .local Int32 snapshot
+    .local Int32* stackError
+
+    ldc.i4 1
+    heap.alloc Int32
+    stloc owner
+    ldloc owner
+    ldc.i4 42
+    stobj Int32
+    ldloc owner
+    call PointerResult<Int32,Int32>::FromOk(Int32*)
+    stloc view
+    ldloc view
+    stloc alias
+    ldloc view
+    call instance PointerResult<Int32,Int32>::GetOk()
+    stloc snapshot
+
+    ; Mutation is visible through both views, but not through the value snapshot.
+    ldloc owner
+    ldc.i4 7
+    stobj Int32
+    ldloc snapshot
+    call System.Console::WriteLine(Int32)
+    pop
+    ldloc alias
+    call instance PointerResult<Int32,Int32>::GetOk()
+    call System.Console::WriteLine(Int32)
+    pop
+
+    ; The owner releases once. Both views are now dangling and must not be used.
+    ldloc owner
+    ptr.cast Void
+    heap.free
+    pop
+
+    ; The same carrier can borrow frame-local storage, including when T == E.
+    sizeof Int32
+    localloc
+    ptr.cast Int32
+    stloc stackError
+    ldloc stackError
+    ldc.i4 11
+    stobj Int32
+    ldloc stackError
+    call PointerResult<Int32,Int32>::FromError(Int32*)
+    call instance PointerResult<Int32,Int32>::GetError()
+    call System.Console::WriteLine(Int32)
+    ret
+.end

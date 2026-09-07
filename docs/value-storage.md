@@ -121,3 +121,8 @@ cargo run --locked -- run examples/ordinary_carrier.neoil
 Output: `Success`, `42`, `Failure`, `7`, then `=> Void`. Tests also cover distinct empty
 and Void-carrying records, nested erased records, independent copies, failed queries,
 generic primitive normalization, pointer lifetime and depth limits.
+
+An alternative [pointer-backed carrier experiment](pointer-carriers.md) stores a tag
+and Void* and borrows caller-managed native storage. It demonstrates explicit aliasing
+and release responsibilities. It does not replace System.Value for payloads without
+a native layout, and copying that view does not copy or retain its target.

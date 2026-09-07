@@ -44,6 +44,8 @@ record layout. `localloc` provides explicit frame-local byte storage, released o
 return. Native integers and explicit pointer/address conversions are also
 available. See [heap and pointers](docs/heap-and-pointers.md).
 Reference counting, GC, and higher-level lifetime management remain deferred.
+The [pointer-backed carrier example](docs/pointer-carriers.md) demonstrates how ordinary
+values can refer to shared heap or stack storage through `Void*`, with explicit lifetimes.
 Types describe values and behavior; allocation and lifetime are separate choices,
 with no class/struct bit deciding either. The proof of concept aims to make migration
 familiar where possible, without committing every program to one memory model.

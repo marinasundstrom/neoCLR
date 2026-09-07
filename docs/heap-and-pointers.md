@@ -80,8 +80,8 @@ Supported storage layouts:
 
 Scalars use native byte order. Boolean reads accept only 0 or 1. Record reads require
 initialized fields, but not padding. Pointer fields support recursive structures;
-recursive by-value layouts are rejected. String, Error, Ref, Option, and Result do
-not yet have native storage layouts. Their pointers can be represented and cast,
+recursive by-value layouts are rejected. String, Error, Ref, System.Value and the
+current System.Option/Result carriers do not have native storage layouts. Their pointers can be represented and cast,
 but the unsupported pointee layouts cannot be allocated or dereferenced. Layout is
 computed on the execution host, not serialized as a fixed architecture's offsets.
 This sequential subset is not a complete foreign ABI or StructLayout implementation.
@@ -293,3 +293,11 @@ following indirect access instead. `initobj` and `cpobj` are not valid prefix ta
 See [Microsoft's unaligned reference](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.unaligned)
 for the CLI alignment values and instruction family. The layout sample now uses an
 unaligned indirect load to read Packet::Number.
+
+## Erased pointers and carriers
+
+Void* can occupy a uniform pointer slot for payloads of different sizes. It erases
+the static pointee type, not its lifetime responsibilities. See the
+[pointer-backed carrier example](pointer-carriers.md) for a tagged, borrowed view
+using existing casts, native storage and ordinary methods, including the special
+zero-sized Void semantics and the remaining native-layout limitations.
