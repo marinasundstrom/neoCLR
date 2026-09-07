@@ -2923,3 +2923,25 @@ Coverage includes repeated signed calculations, CRLF/EOF, recovery, malformed/ov
 input, session caps, injected I/O failures, runtime budgets, instance-call typing and
 GC root preservation/reclamation. Clippy across all targets with warnings denied,
 formatting and whitespace checks passed; all 549 local documentation file links resolve.
+
+## Neo typeof and read-only metadata properties — 2026-09-07
+
+Implemented typeof(T) for source type signatures, lowering to existing ldtoken and
+System.Type.GetTypeFromHandle. It returns an ordinary descriptor without evaluating
+a value or constructing/boxing an instance of T. Primitive aliases, source records,
+managed references and closed generic arguments retain existing metadata identities.
+Added reads of non-indexed System properties via declared public getters so descriptors
+support natural Name/GenericArgumentCount syntax. Private fields, property addresses
+and setters remain unavailable. No opcode or module-format change was needed.
+
+Added a source type-inspection example, tests and grammar/guide updates. Clarified the
+existing metadata naming/identity contract and current format in the runtime guide.
+Named nongeneric System.Result is a real container definition, so typeof(Result) is
+valid; the corrected negative test uses an invalid generic arity instead.
+
+Validation: all 30 Neo tests and six existing runtime type-inspection tests passed
+across the combined run and corrected focused targets. The prior 21 CLI/module/console/
+GC tests also passed for these slices. Coverage includes type aliases, generic arguments,
+reference-mode identity, owned returned descriptors, invalid operands, getter boundaries
+and CLI output. Clippy across all targets with warnings denied, formatting and whitespace
+checks passed; all 554 local documentation file links resolve.

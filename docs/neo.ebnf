@@ -37,6 +37,7 @@ arguments        = "(", newlines,
                    [ expression, newlines,
                      { ",", newlines, expression, newlines } ], ")" ;
 primary          = integer | string | "true" | "false" | identifier
+                 | "typeof", "(", newlines, type, newlines, ")"
                  | "(", newlines, expression, newlines, ")" ;
 
 terminator       = separator, { separator }

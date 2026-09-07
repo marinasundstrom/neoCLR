@@ -23,7 +23,7 @@ this helper does not predict its future semantics.
 Name matches the host descriptor's existing naming contract. A Box<Int32> descriptor
 has Name `Box` and a separate System.Int32 argument descriptor. This is not the CLR
 Name/FullName/assembly-qualified-name formatting contract. A pointer to Box<Int32>
-is named `Box<System.Int32>*`; pointer and bootstrap Ref signatures expose no generic
+is named `Box<System.Int32>*`; pointer and managed-reference signatures expose no generic
 argument list of their own. No element-type property is provided in this subset.
 
 ## Identity and lifetime
@@ -63,7 +63,7 @@ retain the required metadata and supply this service. The interpreter's owned sn
 are not a prescribed native handle layout or an implemented AOT backend.
 
 The type-only ldtoken spelling is CLI-aligned. The prototype serializes it as an
-additive format-4 opcode with a type operand and RuntimeTypeHandle as a canonical
+opcode in the current format 5 with a type operand and RuntimeTypeHandle as a canonical
 signature. Older readers reject unsupported instructions/signatures. No CLI binary
 token assignment or .NET artifact compatibility is claimed.
 
@@ -84,3 +84,19 @@ Member enumeration, construction/invocation by descriptor, dynamic object GetTyp
 custom-attribute reflection, mutable metadata and a comprehensive Type API remain
 outside this slice. The prototype names and API may evolve independently of .NET's
 reflection hierarchy.
+
+## Neo source operator
+
+The companion compiler exposes `typeof(T)` as an ordinary System.Type-producing
+expression, using the same ldtoken/GetTypeFromHandle path. It accepts type signatures,
+not value expressions. `typeof(int).Name`, closed generic argument inspection and
+`.Equals(...)` work through existing library getters/methods. Read-only property
+syntax resolves declared public getters without granting access to backing storage.
+
+```sh
+cargo run -- run examples/source/typeof.neo
+cargo test --test neo_typeof --test type_inspection
+```
+
+The [Neo guide](neo.md) and [grammar](neo-grammar.md) describe the source subset.
+This addition changes neither the runtime opcode set nor the module format.

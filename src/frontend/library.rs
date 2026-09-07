@@ -114,3 +114,43 @@ pub(super) fn cases(ty: &Ty) -> Result<Vec<Case>, Fault> {
     }
     Ok(cases)
 }
+
+/// Read an ordinary non-indexed property through its declared public getter.
+pub(super) fn property(ty: &Ty, name: &str) -> Result<Option<(Ty, String)>, Fault> {
+    let module = crate::library::system()?;
+    let metadata = crate::assembler::parse_type(&ty.il())?;
+    let Some(definition) = module.type_definition(&metadata) else {
+        return Ok(None);
+    };
+    let Some(property) = definition
+        .properties
+        .iter()
+        .find(|p| p.name == name && p.instance && p.parameters.is_empty())
+    else {
+        return Ok(None);
+    };
+    let arguments = match &metadata {
+        Type::Constructed { arguments, .. } => arguments.as_slice(),
+        _ => &[],
+    };
+    let mut property = property.clone();
+    property.map_types(|ty| ty.substitute_type_parameters(arguments))?;
+    let Some(getter) = property.getter else {
+        return Err(Fault::new("property has no getter"));
+    };
+    if !getter.instance || getter.owner.as_ref() != Some(&metadata) || !getter.parameters.is_empty()
+    {
+        return Err(Fault::new("unsupported property getter contract"));
+    }
+    let member = getter
+        .name
+        .rsplit('.')
+        .next()
+        .ok_or_else(|| Fault::new("invalid property getter"))?;
+    let signature = format!("instance {}::{member}()", ty.il());
+    let function = resolve(&signature)?;
+    if function.returns != property.ty {
+        return Err(Fault::new("property getter type mismatch"));
+    }
+    Ok(Some((Ty::from_metadata(&property.ty)?, signature)))
+}

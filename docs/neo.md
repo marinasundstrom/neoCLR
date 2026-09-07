@@ -130,6 +130,7 @@ The [Neo grammar](neo-grammar.md) gives the implemented EBNF and lexical rules.
 - Exhaustive union match expressions/statements, case payload bindings and wildcards.
 - Closed generic type annotations and public static/ordinary instance bundled System calls.
 - Explicit `int(byteValue)` conversion using checked Int32 conversion.
+- `typeof(T)` returning System.Type, and read-only public System property access.
 - `Console.WriteLine` for int and string. `import System.Console.*` enables unqualified `WriteLine`.
 - `if`/`else`, `while`, integer-range `for`, `loop`, `break` and `continue`.
 - Int32 comparisons, Int32/Boolean equality, and short-circuit `&&`/`||` with `!`.
@@ -171,7 +172,7 @@ metadata/verifier diagnostics currently refer to generated IL, not a source map.
 Run the front-end and CLI regressions with:
 
 ```sh
-cargo test --test neo --test neo_control_flow --test neo_match --test neo_calculator --test cli --test cli_modules --test gc_diagnostics
+cargo test --test neo --test neo_control_flow --test neo_match --test neo_calculator --test neo_typeof --test cli --test cli_modules --test gc_diagnostics
 ```
 
 See [managed heap references](heap-references.md), [GC](garbage-collection.md) and
@@ -236,3 +237,28 @@ user-defined methods and general overload declarations remain outside this subse
 `int(value)` explicitly converts byte or int to Int32 through `conv.ovf.i4`; no
 implicit numeric conversion is introduced. Existing `String.Concat` provides bounded
 text assembly in the sample. No new runtime instructions or console ABI are needed.
+
+## Type inspection
+
+Run `cargo run -- run examples/source/typeof.neo` to inspect primitive, record,
+managed-reference and closed generic signatures:
+
+```text
+let descriptor = typeof(Result<int, System.Int32ParseError>)
+Console.WriteLine(descriptor.Name)
+Console.WriteLine(descriptor.GenericArgumentCount)
+Console.WriteLine(descriptor.GetGenericArgument(0).Name)
+```
+
+This prints `System.Result`, `2`, and `System.Int32`. `typeof(int)` and
+`typeof(System.Int32)` have the same identity; compare descriptors with `.Equals(...)`.
+`typeof(Counter)` and `typeof(Counter&)` describe different signatures. No Counter
+instance is created, boxed or inspected. `typeof` accepts a type, not a value expression,
+and provides no dynamic object GetType behavior or mandatory Object hierarchy.
+
+Type descriptors are ordinary values with owned read-only metadata handles. Returning
+a descriptor does not return a reference into the function's frame. The runtime's
+[type-inspection contract](type-inspection.md) defines names, identities and limits.
+In particular, Name is a canonical definition name with separate generic arguments,
+and invalid GetGenericArgument indices fault. Public non-indexed System properties
+are read through their getters; setters and property addresses remain unsupported.

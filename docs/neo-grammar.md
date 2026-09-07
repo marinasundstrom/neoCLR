@@ -67,6 +67,7 @@ arguments        = "(", newlines,
                    [ expression, newlines,
                      { ",", newlines, expression, newlines } ], ")" ;
 primary          = integer | string | "true" | "false" | identifier
+                 | "typeof", "(", newlines, type, newlines, ")"
                  | "(", newlines, expression, newlines, ")" ;
 ```
 
@@ -93,7 +94,7 @@ accept arbitrary factory calls or copy expressions in this slice. Assignment and
 
 Identifiers use ASCII letters, digits and underscore and cannot start with a digit.
 Reserved words are `func`, `record`, `let`, `var`, `return`, `new`, `true`, `false` and
-`import`, `if`, `else`, `while`, `for`, `in`, `loop`, `break`, `continue`, and `match`. Type aliases and `Console`/`WriteLine` are additionally reserved declaration
+`import`, `if`, `else`, `while`, `for`, `in`, `loop`, `break`, `continue`, `match`, and `typeof`. Type aliases and `Console`/`WriteLine` are additionally reserved declaration
 names. Fields, parameters and bindings must be unique in their applicable scope.
 
 Integer tokens contain decimal digits only. Positive literals must fit Int32; a
@@ -139,3 +140,17 @@ The compiler validates that contract; arbitrary source records are not unions me
 because their names resemble Option or Result. Unsupported contracts are diagnosed.
 Guards, nested destructuring patterns, user-declared unions and subtype patterns are
 future features.
+
+## Type operands and metadata properties
+
+`typeof(T)` accepts a type signature, including aliases, qualified names, source
+records, closed generic types, `()` and T&. It produces an ordinary System.Type value
+through `ldtoken T` and `System.Type.GetTypeFromHandle`; it does not evaluate an
+expression or create an instance of T. A binding name or function call is not a type
+operand. Unknown/invalid signatures are rejected by the existing metadata checks.
+
+Public non-indexed instance properties of bundled System types can be read with
+member syntax, including `typeof(int).Name` and `descriptor.GenericArgumentCount`.
+The compiler resolves the declared getter and checks its public, typed value-receiver
+contract. It does not expose private backing fields, property assignment or addresses
+of properties. Source record field access keeps its existing rules.

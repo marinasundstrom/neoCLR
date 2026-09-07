@@ -1,0 +1,18 @@
+import System.Console.*
+
+record Counter(Age: int)
+
+func Main() -> () {
+    let integerType = typeof(int)
+    WriteLine(integerType.Name)
+    WriteLine(typeof(Counter).Name)
+    WriteLine(typeof(Counter&).Name)
+
+    let resultType = typeof(Result<int, System.Int32ParseError>)
+    WriteLine(resultType.Name)
+    WriteLine(resultType.GenericArgumentCount)
+    WriteLine(resultType.GetGenericArgument(0).Name)
+    if integerType.Equals(typeof(System.Int32)) {
+        WriteLine("Same type")
+    }
+}

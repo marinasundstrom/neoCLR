@@ -1,6 +1,6 @@
 # Neo slice plan
 
-The [Neo foundation](neo.md) and the three slices below are implemented. The
+The [Neo foundation](neo.md) and the completed slices below are implemented. The
 [grammar](neo-grammar.md) tracks shipped syntax, with future features called out
 separately.
 
@@ -59,6 +59,18 @@ library operations. No new runtime service or opcode was needed.
 input, resource bounds, I/O failures, CLI execution and a separate GC-pressure
 workload. Existing GC monitoring is adequate; expand it when a workload exposes a
 concrete diagnostic gap.
+
+## 4. Type inspection — completed
+
+`typeof(T)` produces the existing System.Type descriptor through ldtoken and
+GetTypeFromHandle. Aliases, records, T& and closed generic signatures use existing
+metadata identities. Read-only System properties expose Name and GenericArgumentCount
+through their declared getters; ordinary calls expose Equals and GetGenericArgument.
+No instance of T, boxing, dynamic GetType behavior or new runtime opcode is involved.
+
+The [source example](../examples/source/typeof.neo) and [tests](../tests/neo_typeof.rs)
+cover descriptor identity, generic arguments, return lifetime, invalid operands,
+property access boundaries and CLI execution.
 
 ## Later platform slices
 

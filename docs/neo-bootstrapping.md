@@ -22,8 +22,9 @@ host-dependent primitives—still need runtime support. Porting the library must
 introduce special behavior based merely on a method name; retain the validated
 InternalCall binding boundary and familiar public contracts.
 
-Record missing features as each port requires them: control flow, collections,
-generics, interfaces, output parameters, strings and richer module compilation.
+Record missing features as each port requires them: collections, generic declarations,
+interfaces, output parameters, broader string operations and richer module compilation.
+The existing control-flow, match and type-inspection subsets provide the starting point.
 Compare semantics, generated IL and diagnostics with the existing implementation.
 Do not require a whole-library rewrite before gaining value from the exercise.
 

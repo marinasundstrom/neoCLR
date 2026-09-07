@@ -188,6 +188,7 @@ enum ExprKind {
     Unary(String, Box<Expr>),
     Binary(String, Box<Expr>, Box<Expr>),
     Match(Box<Expr>, Vec<Arm>),
+    TypeOf(Ty),
 }
 enum Pattern {
     Wildcard(Token),
@@ -268,7 +269,7 @@ impl Parser {
         }
         if [
             "func", "record", "let", "var", "return", "new", "true", "false", "import", "if",
-            "else", "while", "for", "in", "loop", "break", "continue", "match",
+            "else", "while", "for", "in", "loop", "break", "continue", "match", "typeof",
         ]
         .contains(&token.text.as_str())
         {
@@ -526,7 +527,14 @@ impl Parser {
     }
     fn expression_inner(&mut self, minimum: u8) -> Result<Expr, Fault> {
         let at = self.take();
-        let mut left = if at.text == "-"
+        let mut left = if at.text == "typeof" {
+            self.expect("(")?;
+            self.newlines();
+            let ty = self.ty()?;
+            self.newlines();
+            self.expect(")")?;
+            self.node(at, ExprKind::TypeOf(ty), 1)?
+        } else if at.text == "-"
             && self
                 .current()
                 .text
@@ -735,6 +743,12 @@ impl Lowerer<'_> {
     }
     fn expression(&mut self, expression: &Expr) -> Result<Ty, Fault> {
         match &expression.kind {
+            ExprKind::TypeOf(ty) => {
+                self.body.push(format!("ldtoken {}", ty.il()));
+                self.body
+                    .push("call System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)".into());
+                Ok(Ty::Record("System.Type".into()))
+            }
             ExprKind::Int(value) => {
                 self.body.push(format!("ldc.i4 {value}"));
                 Ok(Ty::Int)
@@ -758,6 +772,12 @@ impl Lowerer<'_> {
                 if let Ty::Ref(target) = owner {
                     self.body.push(format!("ldobj {}", target.il()));
                     owner = *target;
+                }
+                if let Some((ty, getter)) =
+                    library::property(&owner, &field.text).map_err(|e| field.error(e.message))?
+                {
+                    self.body.push(format!("call {getter}"));
+                    return Ok(ty);
                 }
                 let ty = self.field(&owner, field)?;
                 self.body
