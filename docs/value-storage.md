@@ -68,8 +68,8 @@ compiler-recognized member convention. Ordinary visibility does not prove that e
 implementation honors its own contract; unsafe and trusted host boundaries still apply.
 
 Ordinary System.Option/Result now implement the selected [member convention](union-convention.md)
-in platform IL. Existing I/O/text/numeric APIs and native adapters have **not** been
-migrated to them. Next: adapt host/native boundaries and their callers, then remove
+in platform IL. [Int32.Parse](int32-parse.md) now uses them; other I/O/text/arithmetic
+APIs and native adapters still need migration. Next: adapt remaining boundaries and callers, then remove
 bootstrap encodings with an explicit artifact compatibility break.
 
 ```sh

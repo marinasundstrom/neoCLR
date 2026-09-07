@@ -1,17 +1,18 @@
 .module Errors
 .entry Main
 
-.function ReadPositive(String text) -> Result<Int32,Error>
-    .local Result<Int32,Error> parsed
+.function ReadPositive(String text) -> System.Result<Int32,Error>
+    .local System.Result<Int32,Error> parsed
     .local Int32 value
     ldarg text
     call System.Int32::Parse(String)
     stloc parsed
     ldloc parsed
-    is.case Err
+    call instance System.Result<Int32,Error>::get_IsErr()
     brtrue ParseFailed
     ldloc parsed
-    ldcase Ok
+    call instance System.Result<Int32,Error>::GetOk()
+    call instance System.Ok<Int32>::get_Value()
     stloc value
     ldloc value
     ldc.i4 0
@@ -20,28 +21,32 @@
     ldarg text
     call System.String::Concat(String,String)
     call System.Error::FromMessage(String)
-    err Int32
+    newobj instance System.Err<Error>::.ctor(Error)
+    newobj instance System.Result<Int32,Error>::.ctor(System.Err<Error>)
     ret
 ParseFailed:
     ldloc parsed
     ret
 Success:
     ldloc value
-    ok Error
+    newobj instance System.Ok<Int32>::.ctor(Int32)
+    newobj instance System.Result<Int32,Error>::.ctor(System.Ok<Int32>)
     ret
 .end
 
-.function Report(Result<Int32,Error> result) -> Void
+.function Report(System.Result<Int32,Error> result) -> Void
     ldarg result
     dup
-    is.case Ok
+    call instance System.Result<Int32,Error>::get_IsOk()
     brtrue Success
-    ldcase Err
+    call instance System.Result<Int32,Error>::GetErr()
+    call instance System.Err<Error>::get_Value()
     call instance System.Error::ToString()
     call System.Console::WriteLine(String)
     ret
 Success:
-    ldcase Ok
+    call instance System.Result<Int32,Error>::GetOk()
+    call instance System.Ok<Int32>::get_Value()
     call System.Console::WriteLine(Int32)
     ret
 .end
@@ -49,15 +54,15 @@ Success:
 .function Main() -> Void
     ldstr "42"
     call ReadPositive(String)
-    call Report(Result<Int32,Error>)
+    call Report(System.Result<Int32,Error>)
     pop
     ldstr "oops"
     call ReadPositive(String)
-    call Report(Result<Int32,Error>)
+    call Report(System.Result<Int32,Error>)
     pop
     ldstr "-1"
     call ReadPositive(String)
-    call Report(Result<Int32,Error>)
+    call Report(System.Result<Int32,Error>)
     pop
     ldstr "Execution continued"
     call System.Console::WriteLine(String)

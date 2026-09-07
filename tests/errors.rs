@@ -1,7 +1,5 @@
 use neoclr::{
-    Limits, LoadedProgram, RuntimeService, Value, assemble,
-    assembler::parse_function_ref,
-    metadata::{Case, Type},
+    Limits, LoadedProgram, RuntimeService, Value, assemble, assembler::parse_function_ref,
 };
 
 #[test]
@@ -68,20 +66,30 @@ fn result_error_payloads_can_be_imported_and_formatted_without_faults() {
         .resolve_function(&parse_function_ref("ReadPositive(String)").unwrap())
         .unwrap();
     let report = program
-        .resolve_function(&parse_function_ref("Report(Result<Int32,Error>)").unwrap())
+        .resolve_function(&parse_function_ref("Report(System.Result<Int32,Error>)").unwrap())
         .unwrap();
     let result = read
         .invoke(vec![Value::String("0".into())], Limits::default())
         .unwrap()
         .value;
-    assert_eq!(
-        result,
-        Value::result(
-            Value::Error("Expected a positive number: 0".into()),
-            Type::Int32,
-            Type::Error,
-            Case::Err
+    let get_error = program
+        .resolve_function(
+            &parse_function_ref("instance System.Result<Int32,Error>::GetErr()").unwrap(),
         )
+        .unwrap();
+    let get_value = program
+        .resolve_function(&parse_function_ref("instance System.Err<Error>::get_Value()").unwrap())
+        .unwrap();
+    let wrapper = get_error
+        .invoke_instance(result.clone(), vec![], Limits::default())
+        .unwrap()
+        .value;
+    assert_eq!(
+        get_value
+            .invoke_instance(wrapper, vec![], Limits::default())
+            .unwrap()
+            .value,
+        Value::Error("Expected a positive number: 0".into())
     );
     assert_eq!(
         report

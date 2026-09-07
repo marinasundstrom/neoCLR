@@ -85,7 +85,7 @@ fn arithmetic_failures_are_errors_when_requested() {
             "Overflow",
         ),
         (
-            "ldstr \"2147483648\"\ncall System.Int32.Parse(string)\nldcase Err\nret",
+            "ldstr \"2147483648\"\ncall System.Int32.Parse(string)\ncall instance System.Result<Int32,Error>::GetErr()\ncall instance System.Err<Error>::get_Value()\nret",
             "InvalidInt32",
         ),
     ] {
@@ -94,7 +94,7 @@ fn arithmetic_failures_are_errors_when_requested() {
     assert_eq!(
         eval(
             "Int32",
-            "ldstr \"42\"\ncall System.Int32.Parse(string)\nldcase Ok\nret"
+            "ldstr \"42\"\ncall System.Int32.Parse(string)\ncall instance System.Result<Int32,Error>::GetOk()\ncall instance System.Ok<Int32>::get_Value()\nret"
         ),
         Value::Int32(42)
     );

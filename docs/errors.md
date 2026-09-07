@@ -49,7 +49,9 @@ Execution continued
 ```
 
 The program uses free functions, primitive-backed library methods, and Result values;
-it needs no exception handling or extensive object model. Returned Error/Result values
+its signatures and operations now use ordinary System.Result and wrapper members,
+including the [migrated Int32.Parse boundary](int32-parse.md).
+It needs no exception handling or extensive object model. Returned Error/Result values
 can also be validated and imported into subsequent host invocations as owned data.
 
 Malformed host inputs, execution limits, and failures of explicit helper allocation

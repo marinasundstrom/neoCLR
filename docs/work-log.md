@@ -1765,3 +1765,22 @@ Validation: all 420 integration tests pass; formatting, Clippy with warnings den
 diff checks and local documentation links pass. The new hosting example prints
 Int32(42). Existing API/native/bootstrap host paths still need migration before union
 opcode removal. No push or publication performed.
+
+## 2026-09-07 — Migrate Int32.Parse to ordinary Result
+
+Changed System.Int32.Parse to return ordinary System.Result<Int32,Error>. Its existing
+InternalCall service now returns an erased Int32 or Error primitive; platform IL
+constructs the appropriate Ok/Err wrapper and Result. The runtime helper no longer
+constructs a bootstrap union for parsing. Service analysis includes ValueStorage for
+InternalCall declarations returning System.Value. Updated every checked-in Parse
+caller, including the Error sample, and adapted host tests to ordinary carrier access.
+The file example explicitly converts its still-bootstrap file error in IL.
+
+Documented the changed public/native return contracts, caller migration, unchanged
+parsing grammar and remaining bootstrap APIs. Added four tests covering limits and
+invalid input, the native payload protocol, old-contract rejection and service graphs.
+
+Validation: all 424 integration tests pass; formatting, Clippy with warnings denied,
+diff checks and local documentation links pass. The Error sample assembled to JSON,
+verified and ran with unchanged output and no bootstrap union instructions. No push
+or publication performed.

@@ -57,10 +57,17 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             | crate::native::Binding::StringByteCount
             | crate::native::Binding::StringSliceUtf8 => RuntimeService::StringOperations,
         };
-        return Ok(vec![ServiceUse {
+        let mut uses = vec![ServiceUse {
             service,
             instruction: None,
-        }]);
+        }];
+        if function.returns == crate::metadata::Type::Value {
+            uses.push(ServiceUse {
+                service: RuntimeService::ValueStorage,
+                instruction: None,
+            });
+        }
+        return Ok(uses);
     }
     Ok(function
         .body

@@ -29,7 +29,8 @@ needs and the primitives required to implement them in platform code.
 - `System.Console.WriteLine(int32)` calls the Int32 receiver's `ToString()` and then
   the string overload.
 - `System.Int32.ToString()` is an instance method that calls the formatting helper.
-- `System.Int32.Parse(string)` wraps a temporary host parsing primitive.
+- `System.Int32.Parse(string)` constructs an ordinary System.Result from an erased
+  host parsing payload; see [the migrated parsing boundary](int32-parse.md).
 - `System.Int32.Divide(int32, int32)` checks zero and overflow, then executes `div`
   or returns an Error. Its control flow and Result construction are platform IL.
 - `System.Math.Abs(int32)` computes absolute value and represents overflow as an
@@ -37,7 +38,7 @@ needs and the primitives required to implement them in platform code.
 
 The remaining host calls are `neoCLR.Runtime.WriteLine(string) -> Void`,
 `neoCLR.Runtime.Int32ToString(int32) -> String`, and
-`neoCLR.Runtime.ParseInt32(string) -> Result<Int32,Error>`, plus StringConcat,
+`neoCLR.Runtime.ParseInt32(string) -> System.Value`, plus StringConcat,
 StringByteCount, StringSliceUtf8, ErrorFromMessage, ErrorMessage, ReadAllText, and ConsoleReadByte. Parsing and formatting
 are temporary host implementations until character/string operations can support
 their platform versions. Console output is captured by default in Rust embedding, or delivered immediately to

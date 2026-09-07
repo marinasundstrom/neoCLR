@@ -109,7 +109,11 @@ fn services_follow_validated_bindings_rather_than_similar_names() {
     assert!(graph.functions[0].services.is_empty());
     assert_eq!(
         graph.required_services(),
-        [Service::ParseInt32, Service::FormatInt32]
+        [
+            Service::ParseInt32,
+            Service::FormatInt32,
+            Service::ValueStorage
+        ]
     );
     assert!(
         graph.functions[1..]

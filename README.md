@@ -120,6 +120,7 @@ The [constructor sample](docs/constructors.md) initializes generic records throu
 The [ordinary carrier sample](docs/value-storage.md) uses explicit typed value storage and ordinary methods without union-specific instructions.
 The [ordinary System union sample](docs/union-convention.md) uses new System.Option/Result library types; existing I/O helpers still need migration.
 The [ordinary carrier hosting example](docs/erased-inputs.md) passes a guest-created Result through the Rust host and back into IL.
+The [parsing boundary](docs/int32-parse.md) now returns ordinary System.Result; the Error sample uses it throughout.
 The [console sample](docs/console-io.md) prompts for a number, reads input, and doubles it.
 The string sample demonstrates Unicode text and recoverable slice Errors. The
 [file-input sample](docs/file-input.md) reads text, computes a result, and handles invalid input. The

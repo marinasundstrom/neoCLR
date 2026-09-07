@@ -22,10 +22,7 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         return Err(Fault::new("native binding requires InternalCall metadata"));
     }
     let (binding, returns) = match (function.name.as_str(), function.parameters.as_slice()) {
-        ("neoCLR.Runtime.ParseInt32", [Type::String]) => (
-            Binding::ParseInt32,
-            Type::Result(Box::new(Type::Int32), Box::new(Type::Error)),
-        ),
+        ("neoCLR.Runtime.ParseInt32", [Type::String]) => (Binding::ParseInt32, Type::Value),
         ("neoCLR.Runtime.Int32ToString", [Type::Int32]) => (Binding::Int32ToString, Type::String),
         ("neoCLR.Runtime.WriteLine", [Type::String]) => (Binding::WriteLine, Type::Void),
         ("neoCLR.Runtime.StringConcat", [Type::String, Type::String]) => {
@@ -112,15 +109,13 @@ impl Binding {
             (Self::ReadAllText, [Value::String(path), Value::Int32(max_bytes)]) => {
                 crate::file_io::read_all_text(path, *max_bytes)
             }
-            (Self::ParseInt32, [Value::String(text)]) => Ok(match text.parse::<i32>() {
-                Ok(n) => Value::result(Value::Int32(n), Type::Int32, Type::Error, Case::Ok),
-                Err(_) => Value::result(
-                    Value::Error("InvalidInt32".into()),
-                    Type::Int32,
-                    Type::Error,
-                    Case::Err,
-                ),
-            }),
+            (Self::ParseInt32, [Value::String(text)]) => {
+                let payload = match text.parse::<i32>() {
+                    Ok(n) => Value::Int32(n),
+                    Err(_) => Value::Error("InvalidInt32".into()),
+                };
+                Ok(Value::Erased(Box::new(payload)))
+            }
             (Self::Int32ToString, [Value::Int32(number)]) => Ok(Value::String(number.to_string())),
             (Self::WriteLine, [Value::String(text)]) => {
                 if let Some(console) = console {

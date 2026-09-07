@@ -92,8 +92,9 @@ types. At this stage, unqualified Option<T>/Result<T,E> still encode the old boo
 VM categories. They are not aliases and cannot be passed interchangeably. This is
 temporary migration scaffolding, not the final language naming policy.
 
-Existing console, parsing, text/file helpers and their native adapters still return
-bootstrap carriers. [Host invocation now imports](erased-inputs.md) records containing
+Int32.Parse now returns an ordinary carrier through a [migrated native boundary](int32-parse.md).
+Console, arithmetic, slicing and file helpers still return bootstrap carriers.
+[Host invocation now imports](erased-inputs.md) records containing
 System.Value with bounded shape checks; this does not recognize or enforce the convention.
 No automatic conversion or extra host intrinsic bridges the two representations.
 Those boundaries must be migrated, then the bootstrap instructions and type categories
