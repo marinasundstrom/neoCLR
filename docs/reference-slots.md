@@ -1,7 +1,7 @@
 # Proposed slot references and reference receivers
 
 Status: direct T& parameters, out contracts, ldloca/ldarga and ldobj/stobj slot access
-and reference receivers are implemented. Safe interface slot views remain planned.
+reference receivers and safe interface slot views are implemented.
 Existing pointer and InterfaceRef behavior is unchanged.
 
 ## Purpose
@@ -163,11 +163,10 @@ pointer-based carrier TryGet patterns are not silently migrated by this proposal
 
 ## Interface integration and implementation order
 
-The existing InterfaceRef contains a typed native pointer and dispatches to a value
-receiver copy. It must not be advertised as this new safe slot-reference facility.
-First implement and test direct slot parameters/receivers. Then add a call-scoped
-interface view over a concrete slot reference, preserving the slot's lifetime and
-access rules, and match receiver modes as part of interface conformance.
+InterfaceRef retains its typed native pointer and value receiver copy. It is separate
+from the implemented managed I& view formed from Concrete& by interface.borrow.
+The managed view preserves slot lifetime and initialization, and conformance matches
+receiver modes and output contracts.
 
 Migrating List<T> contracts and implementations to reference receivers must be an
 explicit change. Preserve or separately spell the raw-pointer interface path; do
@@ -175,7 +174,7 @@ not silently bless it as safe. A receiver reference cannot escape inside an inte
 view any more than it can escape directly. Allocation and Free remain outside the
 borrowed interface contract.
 
-Implementation slices, committed separately:
+Implementation slices (implemented and committed separately):
 
 1. ByRef signatures, ldloca/ldarga, direct read/write parameters, slot access through
    ldobj/stobj, stable slot identities and non-escape enforcement. Test String and

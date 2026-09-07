@@ -1,7 +1,13 @@
 .module ReferenceReceivers
 .entry Main
 
+.interface Settable
+    .method instance byref Set(Int32 value) -> Void
+    .end
+.end
+
 .type Counter
+    .implements Settable
     .field Value Int32
     .method instance byref Set(Int32 value) -> Void
         ldarg this
@@ -26,8 +32,9 @@
     newobj Counter
     stloc counter
     ldloca counter
+    interface.borrow Settable
     ldc.i4 42
-    call instance Counter::Set(Int32)
+    callvirt instance Settable::Set(Int32)
     pop
     ldloc counter
     call instance Counter::Get()

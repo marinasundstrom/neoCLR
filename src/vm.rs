@@ -577,6 +577,11 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 }
                 Op::LoadObject(ty) | Op::StoreObject(ty) => {
                     check(ty)?;
+                    if crate::interfaces::interface_definition(module, ty).is_ok() {
+                        return Err(Fault::new(
+                            "interface views support dispatch, not value storage",
+                        ));
+                    }
                     if crate::slots::contains(ty) {
                         return Err(Fault::new("managed references cannot be indirectly stored"));
                     }
@@ -796,6 +801,14 @@ impl Frame {
         let offset = args.len().saturating_sub(function.parameters.len());
         let mut outputs = vec![];
         for (index, arg) in args.iter_mut().enumerate() {
+            if let Value::SlotInterface { receiver, .. } = arg {
+                if index >= offset && function.out_parameters.contains(&(index - offset)) {
+                    return Err(Fault::new(
+                        "an interface view is not an output storage slot",
+                    ));
+                }
+                receiver.assigned()?;
+            }
             if let Value::SlotReference(reference) = arg {
                 if index >= offset && function.out_parameters.contains(&(index - offset)) {
                     *reference = reference.output()?;
@@ -1174,43 +1187,81 @@ fn interpret_frames(
                     }
                 }
                 Op::BorrowInterface(interface) => {
-                    let Value::Pointer(receiver) = frame.pop()? else {
-                        return Err(Fault::new("interface.borrow requires typed pointer"));
+                    let view = match frame.pop()? {
+                        Value::SlotReference(receiver) => {
+                            receiver.assigned()?;
+                            crate::interfaces::ensure_implementation(
+                                module,
+                                receiver.target(),
+                                interface,
+                            )?;
+                            Value::SlotInterface {
+                                interface: interface.clone(),
+                                receiver,
+                            }
+                        }
+                        Value::Pointer(receiver) => {
+                            crate::interfaces::ensure_implementation(
+                                module,
+                                &receiver.target,
+                                interface,
+                            )?;
+                            crate::memory::layout(module, &receiver.target)?;
+                            Value::InterfaceRef {
+                                interface: interface.clone(),
+                                receiver,
+                            }
+                        }
+                        _ => {
+                            return Err(Fault::new(
+                                "interface.borrow requires a typed pointer or managed slot reference",
+                            ));
+                        }
                     };
-                    crate::interfaces::ensure_implementation(module, &receiver.target, interface)?;
-                    crate::memory::layout(module, &receiver.target)?;
-                    frame.stack.push(Value::InterfaceRef {
-                        interface: interface.clone(),
-                        receiver,
-                    });
+                    frame.stack.push(view);
                 }
                 Op::CallVirtual(target) => {
                     let contract = resolve(module, target)?;
                     crate::access::check_call(module, Some(&function), &contract)?;
                     let mut args = frame.args(&contract.parameters)?;
-                    let Value::InterfaceRef {
-                        interface,
-                        receiver,
-                    } = frame.pop()?
-                    else {
-                        return Err(Fault::new("callvirt requires InterfaceRef receiver"));
+                    let (interface, concrete, storage) = match frame.pop()? {
+                        Value::SlotInterface {
+                            interface,
+                            receiver,
+                        } => (interface, receiver.target().clone(), Ok(receiver)),
+                        Value::InterfaceRef {
+                            interface,
+                            receiver,
+                        } => (interface, receiver.target.clone(), Err(receiver)),
+                        _ => {
+                            return Err(Fault::new("callvirt requires an interface view receiver"));
+                        }
                     };
                     if contract.owner.as_ref() != Some(&interface) {
                         return Err(Fault::new("interface receiver type mismatch"));
                     }
                     let callee = crate::interfaces::implementation(
-                        module,
-                        &receiver.target,
-                        &interface,
-                        &contract,
+                        module, &concrete, &interface, &contract,
                     )?;
-                    if callee.receiver_byref {
-                        return Err(Fault::new(
-                            "byref interface receiver requires a managed slot view",
-                        ));
-                    }
-                    let layout = crate::memory::layout(module, &receiver.target)?;
-                    args.insert(0, memory.read(&receiver, &layout)?);
+                    let receiver = match storage {
+                        Ok(slot) => {
+                            slot.assigned()?;
+                            if callee.receiver_byref {
+                                Value::SlotReference(slot)
+                            } else {
+                                slot.read()?
+                            }
+                        }
+                        Err(pointer) => {
+                            if callee.receiver_byref {
+                                return Err(Fault::new(
+                                    "byref interface receiver requires a managed slot view",
+                                ));
+                            }
+                            memory.read(&pointer, &crate::memory::layout(module, &concrete)?)?
+                        }
+                    };
+                    args.insert(0, receiver);
                     if frames.len() >= limits.frames {
                         return Err(Fault::new("frame limit exceeded"));
                     }

@@ -1,5 +1,35 @@
 # Explicit borrowed interface references
 
+## Managed slot views
+
+The preferred call-scoped view is now `I&`. Start with `ldloca value` or an existing
+Concrete& parameter, then `interface.borrow I`. The resulting view refers to the
+same initialized concrete slot and retains no owner. It can be passed and forwarded
+through active calls, but cannot escape into locals, fields, erasure, returns or native
+calls. It supports ordinary values such as String-containing records without requiring
+native layout. It is used for dispatch, not for loading an abstract interface value.
+
+`callvirt` respects the declared receiver mode: ordinary instance implementations
+receive a copy, while `.method instance byref` implementations receive Concrete& and
+can explicitly write the original slot with stobj. Conformance requires matching
+receiver modes and output contracts. The native-pointer view cannot supply a managed
+byref receiver. See [slot reference contracts](reference-slots.md).
+
+| Spelling | Formation | Lifetime/access |
+| --- | --- | --- |
+| I& | Concrete& followed by interface.borrow I | Managed, initialized, call-scoped concrete slot; value or byref dispatch |
+| InterfaceRef<I> | Concrete* followed by interface.borrow I | Existing explicit native pointer rules; value receiver dispatch only |
+
+[The List sample](../examples/interfaces.neoil) now passes List<Int32>& directly
+from an ArrayList local, without native receiver-descriptor allocation. ArrayList's
+existing value-receiver methods retain their shared backing-state behavior; a safe
+view alone does not change a method's receiver mode. [The Counter sample](../examples/reference_receivers.neoil)
+demonstrates byref interface dispatch that changes an inline field.
+
+The following sections describe the retained native-pointer view specifically.
+
+## Native-pointer interface views
+
 An interface is a contract, not a base storage type. An ordinary value does not
 implicitly convert to an interface value, become boxed, or acquire an owner.
 `InterfaceRef<I>` is an explicit borrowed view of an implementing value in typed
@@ -81,13 +111,13 @@ sandbox guarantee for arbitrary native addresses.
 Instance dispatch preserves the current receiver-copy semantics. Changing inline
 receiver fields does not write them back into pointed storage. Mutations through
 pointer fields affect their shared targets. This makes the current ArrayList state
-model usable through a borrowed List contract. General by-reference `this` and
-writeback semantics require a separate design; a source compiler must not assume them.
+model usable through a borrowed List contract. By-reference `this` is available through the managed slot view described above;
+the native-pointer view does not acquire that capability implicitly.
 
 System.Collections.ArrayList<T> now implements System.Collections.List<T> with Count,
 Item get/set and Add. Allocate and Free remain concrete ownership operations, outside
 the borrowed list contract. See [the executable sample](../examples/interfaces.neoil):
-it stores an ArrayList descriptor in frame storage, borrows a List view, adds values,
+it addresses an ArrayList local, borrows a managed List view, adds values,
 passes the view to Sum and releases through the concrete owner. It prints 42 and 2.
 
 ```sh

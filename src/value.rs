@@ -30,6 +30,11 @@ pub enum Value {
     },
     SlotReference(crate::SlotReference),
     Pointer(crate::memory::Pointer),
+    /// A call-scoped interface projection over a managed concrete slot.
+    SlotInterface {
+        interface: Type,
+        receiver: crate::SlotReference,
+    },
     InterfaceRef {
         interface: Type,
         receiver: crate::memory::Pointer,
@@ -55,7 +60,7 @@ impl Value {
             }
             remaining -= 1;
             match item {
-                Self::SlotReference(_) => {
+                Self::SlotReference(_) | Self::SlotInterface { .. } => {
                     return Err(crate::Fault::new("managed references cannot be erased"));
                 }
                 Self::Erased(payload) => {
@@ -92,6 +97,7 @@ impl Value {
             Self::Erased(_) => Type::Value,
             Self::RuntimeTypeHandle(_) => Type::RuntimeTypeHandle,
             Self::Object { ty, .. } => ty.clone(),
+            Self::SlotInterface { interface, .. } => Type::ByRef(Box::new(interface.clone())),
             Self::InterfaceRef { interface, .. } => Type::InterfaceRef(Box::new(interface.clone())),
             Self::SlotReference(reference) => Type::ByRef(Box::new(reference.target().clone())),
             Self::Pointer(pointer) => Type::Ptr(Box::new(pointer.target.clone())),

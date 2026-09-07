@@ -101,7 +101,7 @@ fn instruction_services(op: &Op) -> &'static [RuntimeService] {
         Op::LoadTypeToken(..) => &[TypeInspection],
         Op::LocalAddress(..) | Op::ArgumentAddress(..) => &[SlotReferences],
         Op::LoadObject(..) | Op::StoreObject(..) => &[PointerMemory, SlotReferences],
-        Op::BorrowInterface(..) | Op::CallVirtual(..) => &[InterfaceDispatch],
+        Op::BorrowInterface(..) | Op::CallVirtual(..) => &[InterfaceDispatch, SlotReferences],
         Op::PointerFromInt(..)
         | Op::PointerAdd
         | Op::FieldAddress(..)

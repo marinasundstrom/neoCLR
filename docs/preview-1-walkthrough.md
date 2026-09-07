@@ -215,7 +215,7 @@ System.Result payloads are not yet supported. The borrowed List<T> contract is d
 ## Borrowed interface dispatch
 
 Run `cargo run --locked -- run examples/interfaces.neoil` to see ArrayList<Int32>
-used through an explicit InterfaceRef<List<Int32>>. Expected lines are `42`, `2`
+used through an explicit List<Int32>&. Expected lines are `42`, `2`
 and `=> Void`. The sample keeps allocation/release on the concrete owner and
 passes only the borrowed contract to Sum. The automated walkthrough assembles
 and runs this sample from both source and an artifact.

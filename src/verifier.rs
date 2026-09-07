@@ -135,7 +135,7 @@ fn analyze_function(
                 }),
             ) => state.initialized[*index] = true,
             (
-                Op::LoadObject(_),
+                Op::LoadObject(_) | Op::BorrowInterface(_),
                 Some(StackType::Slot {
                     local: Some(index), ..
                 }),
@@ -483,17 +483,34 @@ fn typed_effect(
             Result::Ok(vec![])
         }
         Dup => Result::Ok(vec![values[0].clone(), values[0].clone()]),
-        BorrowInterface(interface) => {
-            crate::interfaces::ensure_implementation(module, pointer(&values[0])?, interface)?;
-            one(T::InterfaceRef(Box::new(interface.clone())))
-        }
+        BorrowInterface(interface) => match exact(&values[0])? {
+            T::ByRef(concrete) => {
+                crate::interfaces::ensure_implementation(module, concrete, interface)?;
+                one(T::ByRef(Box::new(interface.clone())))
+            }
+            T::Ptr(concrete) => {
+                crate::interfaces::ensure_implementation(module, concrete, interface)?;
+                one(T::InterfaceRef(Box::new(interface.clone())))
+            }
+            _ => Err(crate::Fault::new(
+                "interface.borrow requires a typed pointer or managed slot reference",
+            )),
+        },
         CallVirtual(target) => {
             let callee = crate::vm::resolve(module, target)?;
             let interface = callee
                 .owner
                 .clone()
                 .ok_or_else(|| crate::Fault::new("interface call requires owner"))?;
-            stored(&values[0], &T::InterfaceRef(Box::new(interface)))?;
+            match exact(&values[0])? {
+                T::ByRef(actual) if **actual == interface => (),
+                T::InterfaceRef(actual) if **actual == interface && !callee.receiver_byref => (),
+                _ => {
+                    return Err(crate::Fault::new(
+                        "interface view or receiver mode mismatch",
+                    ));
+                }
+            }
             for (value, ty) in values[1..].iter().zip(&callee.parameters) {
                 stored(value, ty)?;
             }

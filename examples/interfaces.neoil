@@ -2,7 +2,7 @@
 .entry Main
 
 ; This function knows only the List<T> interface, not ArrayList<T>.
-.function Sum(InterfaceRef<System.Collections.List<Int32>> values) -> Int32
+.function Sum(System.Collections.List<Int32>& values) -> Int32
     .local Int32 index
     .local Int32 sum
     ldc.i4 0
@@ -32,32 +32,22 @@ Test:
 
 .function Main() -> Void
     .local System.Collections.ArrayList<Int32> owner
-    .local System.Collections.ArrayList<Int32>* receiver
-    .local InterfaceRef<System.Collections.List<Int32>> view
     ldc.i4 0
     call System.Collections.ArrayList<Int32>::Allocate(Int32)
     stloc owner
-    ; The borrowed receiver is an explicitly stored descriptor, not a boxed value.
-    sizeof System.Collections.ArrayList<Int32>
-    localloc
-    ptr.cast System.Collections.ArrayList<Int32>
-    stloc receiver
-    ldloc receiver
-    ldloc owner
-    stobj System.Collections.ArrayList<Int32>
-    ldloc receiver
+    ldloca owner
     interface.borrow System.Collections.List<Int32>
-    stloc view
-    ldloc view
     ldc.i4 20
     callvirt instance System.Collections.List<Int32>::Add(Int32)
     pop
-    ldloc view
+    ldloca owner
+    interface.borrow System.Collections.List<Int32>
     ldc.i4 22
     callvirt instance System.Collections.List<Int32>::Add(Int32)
     pop
-    ldloc view
-    call Sum(InterfaceRef<System.Collections.List<Int32>>)
+    ldloca owner
+    interface.borrow System.Collections.List<Int32>
+    call Sum(System.Collections.List<Int32>&)
     call System.Console::WriteLine(Int32)
     pop
     ; The concrete owner observes growth and retains the only release obligation.

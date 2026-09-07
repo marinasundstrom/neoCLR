@@ -197,8 +197,8 @@ fn inline_receiver_fields_keep_existing_copy_semantics() {
 #[test]
 fn interface_indexer_setter_updates_shared_list_storage() {
     let source = include_str!("../examples/interfaces.neoil").replace(
-        "    ldloc view\n    call Sum", 
-        "    ldloc view\n    ldc.i4 0\n    ldc.i4 30\n    callvirt instance System.Collections.List<Int32>::set_Item(Int32,Int32)\n    pop\n    ldloc view\n    call Sum"
+        "    ldloca owner\n    interface.borrow System.Collections.List<Int32>\n    call Sum",
+        "    ldloca owner\n    interface.borrow System.Collections.List<Int32>\n    ldc.i4 0\n    ldc.i4 30\n    callvirt instance System.Collections.List<Int32>::set_Item(Int32,Int32)\n    pop\n    ldloca owner\n    interface.borrow System.Collections.List<Int32>\n    call Sum"
     );
     let p = LoadedProgram::new(&assemble(&source).unwrap()).unwrap();
     p.verify().unwrap();
@@ -301,4 +301,63 @@ fn module_references_and_internal_contract_visibility_are_enforced() {
     let consumer = ".module App\n.references (Contracts)\n.function Invoke(InterfaceRef<[Contracts]Read> view) -> Int32\nldarg view\ncallvirt instance [Contracts]Read::Get()\nret\n.end";
     prepare(consumer, &contract).unwrap().verify().unwrap();
     assert!(prepare(&consumer.replace("(Contracts)", "()"), &contract).is_err());
+}
+
+#[test]
+fn managed_interface_receiver_mutates_inline_fields_through_forwarded_calls() {
+    let extra = ".interface Change\n.method instance byref Set(Int32 value) -> Void\n.end\n.end\n.type Counter\n.implements Change\n.field Value Int32\n.method instance byref Set(Int32 value) -> Void\nldarg this\nldarg value\nnewobj Counter\nstobj Counter\nldvoid\nret\n.end\n.end\n.function Forward(Change& view) -> Void\nldarg view\nldc.i4 42\ncallvirt instance Change::Set(Int32)\nret\n.end";
+    let p = program(extra, ".local Counter value\nldc.i4 7\nnewobj Counter\nstloc value\nldloca value\ninterface.borrow Change\ncall Forward(Change&)\npop\nldloc value\nldfld Counter::Value").unwrap();
+    p.verify().unwrap();
+    let result = p.run(Limits::default()).unwrap();
+    assert_eq!(result.value, Value::Int32(42));
+    assert_eq!(result.memory.live_allocations(), 0);
+    assert!(
+        program(
+            &extra.replace(
+                ".method instance byref Set(Int32 value) -> Void\nldarg this",
+                ".method instance Set(Int32 value) -> Void\nldarg this"
+            ),
+            "ldc.i4 0"
+        )
+        .is_err()
+    );
+}
+
+#[test]
+fn managed_interface_views_support_non_native_records_but_cannot_escape() {
+    let extra = ".interface Length\n.method instance Count() -> Int32\n.end\n.end\n.type Text\n.implements Length\n.field Value String\n.method instance Count() -> Int32\nldarg this\nldfld Text::Value\ncall instance System.String::GetUtf8ByteCount()\nret\n.end\n.end";
+    let prefix = ".local Text value\nldstr \"abc\"\nnewobj Text\nstloc value\nldloca value\ninterface.borrow Length\n";
+    let p = program(extra, &format!("{prefix}callvirt instance Length::Count()")).unwrap();
+    p.verify().unwrap();
+    assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(3));
+    for suffix in [
+        "heap.new\npop\nldc.i4 0",
+        "value.pack Length&\npop\nldc.i4 0",
+    ] {
+        assert!(
+            program(extra, &format!("{prefix}{suffix}"))
+                .and_then(|p| p.run(Limits::default()))
+                .is_err()
+        );
+    }
+    let uninit = program(extra, ".local Text value\nldloca value\ninterface.borrow Length\ncallvirt instance Length::Count()").unwrap();
+    assert!(uninit.verify().is_err());
+    assert!(uninit.run(Limits::default()).is_err());
+}
+
+#[test]
+fn raw_interface_views_cannot_supply_managed_reference_receivers() {
+    let extra = ".interface Change\n.method instance byref Set() -> Int32\n.end\n.end\n.type Counter\n.implements Change\n.method instance byref Set() -> Int32\nldc.i4 42\nret\n.end\n.end";
+    let p = program(
+        extra,
+        "ptr.null Counter\ninterface.borrow Change\ncallvirt instance Change::Set()",
+    )
+    .unwrap();
+    assert!(p.verify().is_err());
+    assert!(
+        p.run(Limits::default())
+            .unwrap_err()
+            .message
+            .contains("managed slot")
+    );
 }

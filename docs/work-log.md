@@ -2337,3 +2337,17 @@ receiver and output contracts alongside the closed signature.
 Fifteen reference tests, fifteen interface regressions and property tests pass. The
 reference_receivers sample demonstrates inline Counter mutation, with generic String
 receiver replacement covered separately. Safe interface slot views follow next.
+
+## Managed interface slot views
+
+Extended interface.borrow with Concrete& to I& projection and callvirt with managed
+slot dispatch. Views retain weak concrete-slot identity and exact interface identity;
+byref implementations mutate the original slot, while value receivers still copy.
+No raw-pointer conversion, boxing, native-layout requirement or ownership is implied.
+Native InterfaceRef remains distinct and cannot supply a managed byref receiver.
+
+Migrated the List sample to managed local addressing and the Counter sample to byref
+interface dispatch. Eighteen interface tests and fifteen reference tests pass, covering
+inline mutation, forwarding, String-containing records, uninitialized formation,
+receiver-mode conformance and rejected escapes. The ArrayList library keeps its
+existing value receivers over shared pointer state, avoiding a silent semantic change.

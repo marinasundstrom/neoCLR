@@ -575,3 +575,10 @@ without native layout requirements. The pointer operand path remains separate.
 These are CLI-shaped operations with the [slot-reference restrictions](reference-slots.md).
 SlotReferences is the service for address formation; ldobj/stobj conservatively report
 both SlotReferences and PointerMemory until operand-sensitive service analysis exists.
+
+`interface.borrow I` also accepts a managed Concrete& and yields a call-scoped I&
+view. `callvirt` accepts that view and preserves the implementation receiver mode.
+`.method instance byref` declares a managed reference receiver; call operands keep
+the same normalized member signature. `out T&` adds output assignment metadata to
+a declared parameter, without creating a distinct overload signature. Interface
+formation/dispatch conservatively report SlotReferences alongside InterfaceDispatch.
