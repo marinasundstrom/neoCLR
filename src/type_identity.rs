@@ -18,6 +18,40 @@ pub enum TypeIdentity {
     Result(Box<TypeIdentity>, Box<TypeIdentity>),
 }
 
+/// Read-only type information resolved within one loaded program.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TypeDescriptor {
+    pub identity: TypeIdentity,
+    pub name: String,
+    pub generic_arguments: Vec<TypeDescriptor>,
+    pub declaring_type: Option<TypeDefId>,
+}
+
+pub(crate) fn describe(module: &Module, ty: &Type) -> Result<TypeDescriptor, Fault> {
+    let normalized = crate::scope::normalize_type(module, ty)?;
+    let identity = resolve(module, &normalized)?;
+    let name = normalized
+        .definition_name()
+        .ok_or_else(|| Fault::new("type has no metadata name"))?
+        .to_owned();
+    let generic_arguments = match &normalized {
+        Type::Constructed { arguments, .. } => arguments
+            .iter()
+            .map(|argument| describe(module, argument))
+            .collect::<Result<_, _>>()?,
+        _ => vec![],
+    };
+    let declaring_type = module
+        .type_definition(&normalized)
+        .and_then(|definition| definition.declaring_type.clone());
+    Ok(TypeDescriptor {
+        identity,
+        name,
+        generic_arguments,
+        declaring_type,
+    })
+}
+
 /// Resolve a closed signature with the bundled System library, without executing IL.
 pub fn resolve_type_identity(module: &Module, ty: &Type) -> Result<TypeIdentity, Fault> {
     crate::LoadedProgram::new(module)?.resolve_type_identity(ty)

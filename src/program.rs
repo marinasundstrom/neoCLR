@@ -58,6 +58,11 @@ impl LoadedProgram {
         crate::type_identity::resolve(&self.module, ty)
     }
 
+    /// Describe a type without granting construction, invocation, or mutation rights.
+    pub fn describe_type(&self, ty: &Type) -> Result<crate::type_identity::TypeDescriptor, Fault> {
+        crate::type_identity::describe(&self.module, ty)
+    }
+
     /// Resolve a closed type in this snapshot and calculate its explicit target layout.
     pub fn layout_of(
         &self,
