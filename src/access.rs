@@ -56,12 +56,7 @@ pub(crate) fn check_entry(module: &Module, entry: &Function) -> Result<(), Fault
 
 fn declaring_type<'a>(module: &'a Module, function: &Function) -> Option<&'a TypeDefId> {
     let owner = function.owner.as_ref()?;
-    let definition = match owner {
-        Type::Constructed { definition, .. } => {
-            module.types.iter().find(|ty| &ty.name == definition)
-        }
-        _ => module.type_definition(owner),
-    }?;
+    let definition = module.type_definition(owner)?;
     definition.definition.as_ref()
 }
 
@@ -69,12 +64,7 @@ fn record_definition<'a>(
     module: &'a Module,
     owner: &Type,
 ) -> Result<&'a crate::metadata::TypeDef, Fault> {
-    let definition = match owner {
-        Type::Constructed { definition, .. } => {
-            module.types.iter().find(|ty| &ty.name == definition)
-        }
-        _ => module.type_definition(owner),
-    };
+    let definition = module.type_definition(owner);
     definition.ok_or_else(|| Fault::new("field owner has no type definition"))
 }
 
@@ -142,13 +132,21 @@ fn check_type(module: &Module, source: Scope<'_>, ty: &Type) -> Result<(), Fault
         if depth > 32 {
             return Err(Fault::new("type nesting exceeds 32"));
         }
+        if let Some(definition) = module.type_definition(ty).filter(|definition| {
+            definition.visibility != Visibility::Public
+                && definition
+                    .definition
+                    .as_ref()
+                    .is_none_or(|id| source != Some((id.module.as_str(), id.revision.as_deref())))
+        }) {
+            return Err(Fault::new(format!(
+                "type access denied: {} is {:?}",
+                definition.name, definition.visibility
+            )));
+        }
         let nested = |ty| visit(module, source, ty, depth + 1);
         match ty {
-            Type::Constructed {
-                definition,
-                arguments,
-            } => {
-                visit(module, source, &Type::from_name(definition), depth + 1)?;
+            Type::Constructed { arguments, .. } => {
                 for argument in arguments {
                     nested(argument)?;
                 }
@@ -162,19 +160,7 @@ fn check_type(module: &Module, source: Scope<'_>, ty: &Type) -> Result<(), Fault
                 return Err(Fault::new("unresolved type scope during access checking"));
             }
             Type::TypeParameter(_) => {}
-            _ => {
-                if let Some(definition) = module.type_definition(ty).filter(|definition| {
-                    definition.visibility != Visibility::Public
-                        && !definition.definition.as_ref().is_some_and(|id| {
-                            source == Some((id.module.as_str(), id.revision.as_deref()))
-                        })
-                }) {
-                    return Err(Fault::new(format!(
-                        "type access denied: {} is {:?}",
-                        definition.name, definition.visibility
-                    )));
-                }
-            }
+            _ => {}
         }
         Ok(())
     }
@@ -184,12 +170,10 @@ fn check_type(module: &Module, source: Scope<'_>, ty: &Type) -> Result<(), Fault
 fn check_owner(module: &Module, source: Scope<'_>, owner: &Type) -> Result<(), Fault> {
     // Runtime specialization does not revoke access to caller-supplied generic arguments.
     // Explicit signature/operand types were checked in their open declaring context.
-    match owner {
-        Type::Constructed { definition, .. } => {
-            check_type(module, source, &Type::from_name(definition))
-        }
-        other => check_type(module, source, other),
-    }
+    let definition = module
+        .type_definition(owner)
+        .ok_or_else(|| Fault::new("owner has no type definition"))?;
+    check_type(module, source, &definition.open_type())
 }
 
 pub(crate) fn check_signature(

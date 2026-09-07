@@ -577,11 +577,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         if kind != "static" && kind != "instance" {
                             return Err(Fault::new("expected static or instance method"));
                         }
-                        (
-                            Some(Type::from_name(&def.name)),
-                            kind == "instance",
-                            signature.trim(),
-                        )
+                        (Some(def.open_type()), kind == "instance", signature.trim())
                     } else {
                         (None, false, rest)
                     };

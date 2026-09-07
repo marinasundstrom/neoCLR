@@ -130,7 +130,11 @@ pub(crate) fn record_fields(
     let def = module
         .types
         .iter()
-        .find(|d| d.name == name && d.representation == Representation::Record)
+        .find(|d| {
+            d.name == name
+                && d.generic_parameters.len() == arguments.len()
+                && d.representation == Representation::Record
+        })
         .ok_or_else(|| Fault::new("expected record definition"))?;
     def.fields
         .iter()
@@ -165,9 +169,8 @@ pub(crate) fn resolve_constructor(
         || function.is_internal_call()
         || function.pinvoke.is_some()
         || !module
-            .types
-            .iter()
-            .any(|def| def.name == name && def.representation == Representation::Record)
+            .type_definition(owner)
+            .is_some_and(|d| d.representation == Representation::Record)
     {
         return Err(Fault::new(
             "newobj constructor requires an instance IL .ctor returning Void on a record type",
@@ -215,7 +218,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         {
             return Err(Fault::new("duplicate type definition identity"));
         }
-        if def.name.is_empty() || !names.insert(&def.name) {
+        if def.name.is_empty() || !names.insert((&def.name, def.generic_parameters.len())) {
             return Err(Fault::new("empty or duplicate type name"));
         }
         let ty = Type::from_name(&def.name);
@@ -276,6 +279,12 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
     }
     let mut identities = HashSet::new();
     let mut signatures = HashSet::new();
+    let free_signatures: HashSet<_> = module
+        .functions
+        .iter()
+        .filter(|function| function.owner.is_none())
+        .map(|function| (&function.name, &function.parameters, function.instance))
+        .collect();
     for function in &module.functions {
         if function
             .definition
@@ -285,7 +294,18 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             return Err(Fault::new("duplicate function definition identity"));
         }
         if function.name.is_empty()
-            || !signatures.insert((&function.name, &function.parameters, function.instance))
+            || (function.owner.is_some()
+                && free_signatures.contains(&(
+                    &function.name,
+                    &function.parameters,
+                    function.instance,
+                )))
+            || !signatures.insert((
+                &function.owner,
+                &function.name,
+                &function.parameters,
+                function.instance,
+            ))
         {
             return Err(Fault::new(
                 "empty name, duplicate or reserved function signature",
@@ -320,6 +340,9 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             let def = module
                 .type_definition(owner)
                 .ok_or_else(|| Fault::new("method owner has no type definition"))?;
+            if owner != &def.open_type() {
+                return Err(Fault::new("method owner must be its open type definition"));
+            }
             if matches!((&def.definition, &function.definition), (Some(ty), Some(method)) if ty.module != method.module)
             {
                 return Err(Fault::new(
@@ -587,7 +610,7 @@ fn check_type_context(ty: &Type, module: &Module, arity: usize, depth: usize) ->
             let def = module
                 .types
                 .iter()
-                .find(|t| &t.name == name)
+                .find(|t| &t.name == name && t.generic_parameters.is_empty())
                 .ok_or_else(|| Fault::new(format!("unknown type {name}")))?;
             if !def.generic_parameters.is_empty() {
                 return Err(Fault::new("generic type requires type arguments"));
@@ -601,7 +624,7 @@ fn check_type_context(ty: &Type, module: &Module, arity: usize, depth: usize) ->
             let def = module
                 .types
                 .iter()
-                .find(|t| &t.name == definition)
+                .find(|t| &t.name == definition && t.generic_parameters.len() == arguments.len())
                 .ok_or_else(|| Fault::new(format!("unknown generic type {definition}")))?;
             if def.generic_parameters.is_empty() || def.generic_parameters.len() != arguments.len()
             {

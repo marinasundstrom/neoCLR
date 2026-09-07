@@ -29,7 +29,7 @@ pub(crate) fn normalize_type(context: &Module, ty: &Type) -> Result<Type, Fault>
                     context
                         .types
                         .iter()
-                        .find(|d| &d.name == name)
+                        .find(|d| &d.name == name && d.generic_parameters.len() == arguments.len())
                         .and_then(|d| d.definition.as_ref())
                         .map(|d| d.module.as_str())
                         .ok_or_else(|| {

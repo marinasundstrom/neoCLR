@@ -1,6 +1,8 @@
 # Nested case types and generic union companions
 
-Status: selected design direction, not implemented. The user clarified that case types
+Status: selected design direction. [Name-plus-arity identity](type-arities.md) is
+implemented; nested ownership and the companion case migration remain unfinished.
+The user clarified that case types
 are ordinary nested types and generic unions should use a non-generic companion type.
 This supersedes the earlier exploration of selectively capturing outer parameters.
 No inheritance relation is implied by either nesting or union membership.
@@ -51,8 +53,8 @@ existing message-bearing System.Error payload type.
 ## Required ordinary metadata foundation
 
 1. **Type name plus generic arity.** The same scope must support Result with zero
-   parameters and Result with two parameters. The current prototype's name-only
-   definition uniqueness and lookup cannot represent this correctly. Distinct metadata
+   parameters and Result with two parameters. This foundation is now implemented in
+   definition lookup and the affected runtime paths. Distinct metadata
    definition IDs must remain authoritative; a dotted string is not sufficient identity.
 2. **Actual nested ownership.** A nested definition needs a declaring-type definition
    reference, distinct from its namespace and display name. Validate owner existence,
@@ -90,7 +92,7 @@ and callable values are still separate prerequisites.
 
 ## Implementation order and proof
 
-First support same-name definitions with different generic arities. Then implement
+Same-name definitions with different generic arities are implemented. Next implement
 ordinary nested ownership and generic nested definitions under the non-generic companion.
 Only then move Option/Result cases and migrate their constructor/query references.
 Preserve the currently working top-level carriers during those foundational slices.

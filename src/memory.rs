@@ -119,17 +119,12 @@ pub fn layout_for(module: &Module, ty: &Type, target: TargetLayout) -> Result<La
                 usize::from(target.pointer_size),
                 usize::from(target.pointer_alignment),
             ),
-            Type::Named(name)
-            | Type::Constructed {
-                definition: name, ..
-            } => {
+            Type::Named(_) | Type::Constructed { .. } => {
                 if path.contains(ty) || path.len() >= 64 {
                     return Err(Fault::new("recursive or excessively nested record layout"));
                 }
                 let def = module
-                    .types
-                    .iter()
-                    .find(|def| &def.name == name)
+                    .type_definition(ty)
                     .ok_or_else(|| Fault::new("unknown layout type"))?;
                 if def.representation != Representation::Record {
                     return Err(Fault::new("unsupported memory representation"));

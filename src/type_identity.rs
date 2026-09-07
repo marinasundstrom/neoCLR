@@ -62,7 +62,7 @@ fn build(module: &Module, ty: &Type) -> Result<TypeIdentity, Fault> {
             let definition = module
                 .types
                 .iter()
-                .find(|d| d.name == name)
+                .find(|d| d.name == name && d.generic_parameters.len() == arguments.len())
                 .and_then(|d| d.definition.clone())
                 .ok_or_else(|| {
                     Fault::new(format!("missing type definition identity for {name}"))

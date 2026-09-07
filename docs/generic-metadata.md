@@ -94,6 +94,11 @@ identify a constructed owner, such as `call Box<Int32>::Create(Int32)` or
 can reference that method's declaring type parameters, e.g. `Box<!0>::Create(!0)`.
 Bare generic owners and omitted generic call owners are rejected.
 
+Generic method definitions now encode their open owner explicitly, for example
+Box<!0>. [Name-plus-arity lookup](type-arities.md) permits Box and Box<T> to coexist
+without ambiguous ownership. Reassemble earlier prototype generic-method artifacts
+that used a Named owner; definition IDs and full call signatures remain authoritative.
+
 The interpreter substitutes the owner's arguments into the method, including nested
 call signatures, construction, pointer, and memory operands. Each frame executes a
 closed method copy; stored definitions remain open and unchanged. Instance argument

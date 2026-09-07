@@ -1802,3 +1802,22 @@ remains a separate contract; no new assembler or metadata encoding is claimed.
 Validation: documentation links and diff checks pass. Runtime validation remains the
 424 passing tests plus format/Clippy checks from the completed Parse migration.
 No push or publication performed.
+
+## 2026-09-07 — Distinguish type definitions by generic arity
+
+Implemented same-name type definitions with different generic arities. Generic method
+definitions now carry explicit open constructed owners, resolving ambiguity between
+non-generic companions and generic carriers. Definition/field/layout lookup, member
+binding, type identity, scoped references, accessibility and host schemas select the
+correct arity. Method signatures distinguish owners, while conflicting free-function
+signatures retain the existing reserved-name check. No nesting or union dispatch was
+added in this slice. Older generic-method artifacts require reassembly.
+
+Added a sample and five tests covering arity-zero/one/two methods, round trips, layout,
+host receivers/identity, cross-module visibility/reference checks, private isolation
+and malformed metadata. The full suite caught a reserved free-function collision
+regression; restored that check and reran the full suite successfully.
+
+Validation: all 429 integration tests pass; formatting, Clippy with warnings denied,
+diff and documentation-link checks pass. The sample assembled, verified and executed
+from JSON with expected output. No push or publication performed.

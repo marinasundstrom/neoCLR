@@ -67,23 +67,23 @@ pub(crate) fn check_type(linked: &Module, source: &Module, ty: &Type) -> Result<
             definition,
             arguments,
         } => {
-            check_named(linked, source, definition)?;
+            check_named(linked, source, definition, arguments.len())?;
             for argument in arguments {
                 check_type(linked, source, argument)?;
             }
         }
-        Type::Named(name) => check_named(linked, source, name)?,
+        Type::Named(name) => check_named(linked, source, name, 0)?,
         // Primitive signatures refer to implicit System; parameters are contextual.
         _ => (),
     }
     Ok(())
 }
 
-fn check_named(linked: &Module, source: &Module, name: &str) -> Result<(), Fault> {
+fn check_named(linked: &Module, source: &Module, name: &str, arity: usize) -> Result<(), Fault> {
     let owner = linked
         .types
         .iter()
-        .find(|d| d.name == name)
+        .find(|d| d.name == name && d.generic_parameters.len() == arity)
         .and_then(|d| d.definition.as_ref())
         .ok_or_else(|| Fault::new(format!("missing definition identity for {name}")))?;
     check_module(source, &owner.module)

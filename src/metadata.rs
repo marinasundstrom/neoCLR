@@ -89,7 +89,10 @@ impl Type {
             Self::String => Some("System.String"),
             Self::Error => Some("System.Error"),
             Self::Value => Some("System.Value"),
-            Self::Named(name) => Some(name),
+            Self::Named(name)
+            | Self::Constructed {
+                definition: name, ..
+            } => Some(name),
             _ => None,
         }
     }
@@ -157,6 +160,21 @@ pub struct TypeDef {
     pub packing: Option<u16>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub minimum_size: Option<u32>,
+}
+
+impl TypeDef {
+    pub(crate) fn open_type(&self) -> Type {
+        if self.generic_parameters.is_empty() {
+            Type::from_name(&self.name)
+        } else {
+            Type::Constructed {
+                definition: self.name.clone(),
+                arguments: (0..self.generic_parameters.len())
+                    .map(|i| Type::TypeParameter(i as u16))
+                    .collect(),
+            }
+        }
+    }
 }
 
 /// An ordinary property signature and explicit method-semantics associations.
@@ -605,7 +623,13 @@ pub enum Case {
 impl Module {
     pub fn type_definition(&self, ty: &Type) -> Option<&TypeDef> {
         let name = ty.definition_name()?;
-        self.types.iter().find(|def| def.name == name)
+        let arity = match ty {
+            Type::Constructed { arguments, .. } => arguments.len(),
+            _ => 0,
+        };
+        self.types
+            .iter()
+            .find(|def| def.name == name && def.generic_parameters.len() == arity)
     }
 }
 

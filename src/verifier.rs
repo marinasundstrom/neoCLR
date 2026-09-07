@@ -379,17 +379,6 @@ fn require(condition: bool, message: &str) -> Result<(), Fault> {
     }
 }
 
-fn argument_types(function: &Function, arity: usize) -> Vec<Type> {
-    let mut args = function.argument_types();
-    if let (true, Some(Type::Named(name))) = (function.instance && arity > 0, &function.owner) {
-        args[0] = Type::Constructed {
-            definition: name.clone(),
-            arguments: (0..arity).map(|i| Type::TypeParameter(i as u16)).collect(),
-        };
-    }
-    args
-}
-
 fn typed_effect(
     module: &Module,
     function: &Function,
@@ -418,14 +407,14 @@ fn typed_effect(
         String(_) => one(T::String),
         Error(_) => one(T::Error),
         Void => one(T::Void),
-        Arg(index) => Result::Ok(vec![loaded(&argument_types(function, arity)[*index])]),
+        Arg(index) => Result::Ok(vec![loaded(&function.argument_types()[*index])]),
         Load(index) => Result::Ok(vec![loaded(&function.locals[*index])]),
         Store(index) => {
             stored(&values[0], &function.locals[*index])?;
             Result::Ok(vec![])
         }
         StoreArg(index) => {
-            stored(&values[0], &argument_types(function, arity)[*index])?;
+            stored(&values[0], &function.argument_types()[*index])?;
             Result::Ok(vec![])
         }
         Return => {
