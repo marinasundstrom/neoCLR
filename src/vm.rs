@@ -264,6 +264,11 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         if function.instance && function.owner.is_none() {
             return Err(Fault::new("instance method requires a declaring type"));
         }
+        if function.visibility == crate::metadata::Visibility::Private && function.owner.is_none() {
+            return Err(Fault::new(
+                "private requires a declaring type; use internal for a module function",
+            ));
+        }
         let arity = function
             .owner
             .as_ref()
@@ -381,7 +386,8 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                     for ty in &target.parameters {
                         check(ty)?;
                     }
-                    resolve(module, target)?;
+                    let callee = resolve(module, target)?;
+                    crate::access::check_call(module, Some(function), &callee)?;
                 }
                 Op::New(ty) => {
                     record_fields(module, ty, arity)?;
@@ -486,6 +492,13 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         for attribute in attributes {
             validate_attribute(module, attribute)?;
         }
+    }
+    if let Some(entry) = module
+        .functions
+        .iter()
+        .find(|f| f.name == module.entry && f.parameters.is_empty() && !f.instance)
+    {
+        crate::access::check_entry(module, entry)?;
     }
     if !module.entry.is_empty()
         && !module.functions.iter().any(|f| {
@@ -665,6 +678,7 @@ pub(crate) fn interpret(
         .iter()
         .position(|f| f.name == module.entry && f.parameters.is_empty() && !f.instance)
         .ok_or_else(|| Fault::new("missing entry"))?;
+    crate::access::check_entry(module, &module.functions[entry])?;
     interpret_function(
         module,
         module.functions[entry].clone(),
@@ -923,6 +937,7 @@ fn interpret_frames(
                 }
                 Op::Call(target) => {
                     let callee = resolve(module, target)?;
+                    crate::access::check_call(module, Some(&function), &callee)?;
                     callee.map_types(|ty| {
                         check_type(ty, module)?;
                         Ok(ty.clone())

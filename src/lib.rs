@@ -1,5 +1,6 @@
 pub mod assembler;
 pub use assembler::assemble;
+mod access;
 mod console;
 mod execution;
 pub use console::{Console, StdioConsole};

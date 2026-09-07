@@ -1552,3 +1552,28 @@ module boundaries, generics, and versioning as open questions. Kept the policy s
 from allocation/value semantics and from ordinary union representation.
 
 Validation: documentation-only change; diff checks pass. No runtime behavior changed.
+
+## 2026-09-07 — Initial method accessibility
+
+Added public/internal/private method metadata and optional declaration modifiers.
+Legacy omissions remain public. Internal uses the declaring module/revision boundary;
+private uses the declaring type definition, including generic instantiations. Private
+free functions are rejected in favor of module-internal helpers.
+
+Loading checks every explicit call, including unreachable calls, and execution checks
+resolved caller/callee access. Host member resolution requires public methods regardless
+of symbolic or bound references. Explicit local entry selection can designate a non-public
+method; a foreign non-public entry is rejected. Read-only analysis and property metadata
+references do not grant invocation access. No field/type visibility, inheritance, or
+construction semantics were added; full representation protection remains future work.
+
+The sample combines a public factory/property reader, a private same-type helper,
+an internal free function, and an internal entry. Seven tests cover round trips,
+legacy defaults, generic type identity, permitted/denied calls, entry selection,
+module revision boundaries, bound-token host checks, and private property accessors.
+The user reaffirmed familiar .NET-style access levels for now; a redesigned model
+is explicitly deferred rather than added to this slice.
+
+Validation: all 374 integration tests pass on macOS ARM64; formatting, clippy with
+warnings denied, and diff checks pass. The sample verifies, prints 42, and returns Void.
+Linux and Windows remain for CI.

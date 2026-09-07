@@ -1,0 +1,55 @@
+.module Accessibility
+.entry Main
+
+.type Gauge
+    .field Stored Int32
+    .property instance Value() -> Int32
+        .get instance Gauge::Read()
+    .end
+
+    .method public static Create(Int32 value) -> Gauge
+        ldarg value
+        call Gauge::Clamp(Int32)
+        newobj Gauge
+        ret
+    .end
+
+    .method private static Clamp(Int32 value) -> Int32
+        ldarg value
+        ldc.i4 0
+        blt Minimum
+        ldarg value
+        ldc.i4 100
+        bgt Maximum
+        ldarg value
+        ret
+    Minimum:
+        ldc.i4 0
+        ret
+    Maximum:
+        ldc.i4 100
+        ret
+    .end
+
+    .method public instance Read() -> Int32
+        ldarg this
+        ldfld Gauge::Stored
+        ret
+    .end
+.end
+
+.function internal Twice(Int32 value) -> Int32
+    ldarg value
+    ldc.i4 2
+    mul
+    ret
+.end
+
+.function internal Main() -> Void
+    ldc.i4 21
+    call Gauge::Create(Int32)
+    call instance Gauge::Read()
+    call Twice(Int32)
+    call System.Console::WriteLine(Int32)
+    ret
+.end

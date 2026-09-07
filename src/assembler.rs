@@ -516,6 +516,18 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     });
                 }
                 ".function" | ".method" => {
+                    let (visibility, rest) = match rest.split_once(char::is_whitespace) {
+                        Some(("public", rest)) => {
+                            (crate::metadata::Visibility::Public, rest.trim())
+                        }
+                        Some(("internal", rest)) => {
+                            (crate::metadata::Visibility::Internal, rest.trim())
+                        }
+                        Some(("private", rest)) => {
+                            (crate::metadata::Visibility::Private, rest.trim())
+                        }
+                        _ => (crate::metadata::Visibility::Public, rest),
+                    };
                     let (owner, instance, declaration) = if word == ".method" {
                         let def = typedef
                             .as_ref()
@@ -575,6 +587,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     };
                     function = Some(PendingFunction {
                         function: Function {
+                            visibility,
                             definition: None,
                             custom_attributes: vec![],
                             name,

@@ -502,3 +502,10 @@ A `.property static/instance Name(IndexTypes...) -> Type` block inside a type us
 `.get` and/or `.set` full method references and its own `.end`. Access remains an
 ordinary method call. See [property metadata](properties.md) for syntax, signature
 validation, generic owners, and current mutation limitations.
+
+## Method accessibility
+
+An optional `public`, `internal`, or `private` precedes static/instance in a method
+declaration. Free functions accept public/internal before their signatures. Omission
+retains public visibility. These flags do not distinguish overloads or change call
+syntax. See [accessibility](accessibility.md) for enforced caller scopes.

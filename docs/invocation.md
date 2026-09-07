@@ -102,3 +102,9 @@ choosing their own calling convention and representation.
 
 `cargo run --example invoke` loads a library with no entry point, prints Hello, world!,
 and invokes Double twice to produce Int32(42) and Int32(60).
+
+## Method accessibility
+
+Host member resolution requires public methods, independent of the root module and
+native-enabled execution. Explicit local entry selection is separate; see
+[accessibility](accessibility.md) for scopes and enforcement.

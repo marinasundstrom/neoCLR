@@ -41,8 +41,8 @@ Future implementation slices must let code express and preserve the carrier's co
 constructors establish a permitted variant, properties expose that value through explicit
 accessor associations, and accessibility can restrict representation fields and mutation
 while keeping intended constructors/readers public. Public, private, and internal are
-candidate initial visibility levels; their exact scopes and enforcement remain to be
-specified. These are ordinary type-system capabilities, not union-specific instructions.
+implemented for [method calls](accessibility.md); type and field visibility and full
+representation enforcement remain to be specified. These are ordinary type-system capabilities, not union-specific instructions.
 
 Current .ctor-shaped methods do not by themselves settle initialization or addressed
 receiver semantics. [Property metadata](properties.md) now supplies explicit getter/setter

@@ -206,6 +206,8 @@ pub struct Field {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Function {
+    #[serde(default, skip_serializing_if = "Visibility::is_public")]
+    pub visibility: Visibility,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub definition: Option<MemberId>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -232,6 +234,22 @@ pub struct Function {
     pub pinvoke: Option<NativeImport>,
     #[serde(default)]
     pub body: Vec<Instruction>,
+}
+
+/// Initial method access levels, independent of type representation and allocation.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Visibility {
+    #[default]
+    Public,
+    Internal,
+    Private,
+}
+
+impl Visibility {
+    fn is_public(&self) -> bool {
+        *self == Self::Public
+    }
 }
 
 /// Prototype equivalent of an ImplMap entry; does not imply managed ownership.

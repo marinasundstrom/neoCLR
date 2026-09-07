@@ -202,10 +202,11 @@ on extensive OOP or reflection. Stage the work around a small carrier/variant ex
 2. Implemented: [property metadata](properties.md) associates a declared property with
    its getter and/or setter methods, validating signatures, owner, and call kind.
    Generic and indexed properties work without new instructions or receiver semantics.
-3. Accessibility for types and members, beginning with the needed public/private/internal
-   distinctions and explicit rules for accessors, module boundaries, and host invocation.
-   Decide validation/enforcement alongside metadata rather than treating visibility as
-   an unverified naming convention.
+3. [Method accessibility](accessibility.md) now enforces public/internal/private calls
+   and public-only host member invocation, with explicit local-entry semantics. Type
+   and field accessibility remain needed to protect representation; accessor methods
+   follow the implemented method rules. Keep familiar .NET-style access levels for
+   now; possible improvements to the access model are deferred.
 
 Choose the dependency order after checking the current construction/addressed-access
 proposals. Demonstrate public construction and reading with restricted representation
