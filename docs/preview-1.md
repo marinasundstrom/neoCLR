@@ -96,9 +96,10 @@ scope and acceptance tests before starting that migration.
 1. **Finish the documentation audit.** Keep the README, opcode table, API contracts and
    language mappings consistent. Explain value copies, native pointers, managed views,
    interpreter allocation costs, verification limits and the temporary storage above.
-2. **Validate the build contract.** Determine and test the minimum Rust version, record
-   it in Cargo metadata and CI, and exercise a clean source checkout using only the
-   documented prerequisites and commands.
+2. **Validate the build contract on claimed platforms.** Rust 1.85.0 is recorded in
+   Cargo metadata and tested locally from a clean source snapshot. Minimum/stable CI
+   jobs are configured for three operating systems. Collect their results and verify
+   first-install prerequisites and clean-clone instructions for the release candidate.
 3. **Prepare the source package.** Review source provenance/dependency notices, inspect
    the tracked release contents, and draft release notes describing capabilities,
    intentional deviations and known limits. Choose the preview version/tag explicitly.
@@ -156,8 +157,10 @@ not justify expanding Preview 1 into streams, filesystem abstractions or network
 - [ ] Linux, macOS and Windows source builds/tests and representative console/native samples
       pass in CI for that commit. Record actual architectures; do not imply every OS/CPU
       combination is supported. Narrow any unsupported claim explicitly before release.
-- [ ] Verify the minimum Rust toolchain claimed in the README, record it in package metadata,
-      and test it as well as the current stable toolchain. CI currently uses stable only.
+- [x] Declare the minimum Rust toolchain in Cargo metadata and configure minimum/stable
+      CI coverage. Rust 1.85.0 build/tests passed locally; see the validation record.
+- [ ] Minimum and stable toolchain jobs pass on the claimed platforms for the exact
+      proposed release commit.
 - [ ] A fresh clone follows the README successfully, including native build prerequisites,
       external sample data paths, expected failure exits and output-file overwrite rules.
 - [ ] README and API/metadata documents distinguish implemented behavior, intentional

@@ -2478,3 +2478,24 @@ This slice changes documentation only. Reviewed claims against metadata loading,
 reference implementation, runtime sources, Cargo metadata, configured CI and prior
 test evidence. Checked changed Markdown links and git diff whitespace; no runtime
 behavior, artifact version or release status changed.
+
+## Minimum Rust version and clean-source workflows
+
+Validated the existing Rust 1.85 minimum rather than raising it speculatively.
+Installed toolchain 1.85.0, inspected the locked dependency requirements, and built
+all targets from a clean tracked-source archive of 2d2d7ac with no build artifacts.
+The uninterrupted minimum-toolchain test suite passed all 521 tests; doc tests
+completed with no cases. Local environment: macOS 26.6.2 ARM64, Apple clang 17.0.0,
+GNU Make 3.81. The source build reused Cargo's registry cache.
+
+Exercised 13 README workflow steps: source/artifact HelloWorld, explicit System
+assembly and loading, output-overwrite refusal, console/file I/O, intentional bounds
+Fault and trace, Rust embedding, and native sample build/execution. Expected exits
+and outputs matched. Generated artifacts remain in the temporary source directory.
+
+Added rust-version = "1.85" to Cargo metadata and reran the minimum all-target build
+with that manifest. CI now has a separate 1.85.0 job on Linux/macOS/Windows while
+retaining stable formatting, Clippy and tests. Verified the toolchain action ref exists.
+Updated README instructions, validation evidence and the release checklist. Remote
+CI, a first-install environment and exact-release-commit validation remain open.
+No runtime code, dependencies, lockfile or publication state changed.

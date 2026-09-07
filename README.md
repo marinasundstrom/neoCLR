@@ -59,9 +59,16 @@ familiar where possible, without committing every program to one memory model.
 
 ## Build and run a sample
 
-Run these commands from the repository root. Install stable Rust 1.85 or newer
-(edition 2024) and a native C toolchain for vendored libffi: compiler/make on Unix,
+Run these commands from the repository root. Rust 1.85.0 is the minimum supported
+toolchain (edition 2024); current stable Rust is also tested. Install Rust and a native
+C toolchain for vendored libffi: compiler/make on Unix,
 or MSVC tools on Windows. No .NET installation is required.
+
+Cargo records this minimum as `rust-version = "1.85"`. CI is configured to test
+1.85.0 and stable on Linux, macOS and Windows; recorded local validation is macOS
+ARM64. See [validation evidence](docs/preview-1-validation.md) for tested snapshots
+and the remaining release checks. Dependencies must be downloaded on the first
+build; the commands use Cargo.lock through `--locked`.
 
 The assembler and interpreter are built together as the `neoclr` executable.
 The bundled `runtime/System.neoil` library is assembled automatically; it does not
@@ -139,7 +146,7 @@ The [accessibility sample](docs/accessibility.md) demonstrates public methods an
 The [property sample](docs/properties.md) demonstrates generic properties backed by ordinary methods.
 The [constructor sample](docs/constructors.md) initializes generic records through public constructors with private fields.
 The [ordinary carrier sample](docs/value-storage.md) uses explicit typed value storage and ordinary methods without union-specific instructions.
-The [ordinary System union sample](docs/union-convention.md) uses new System.Option/Result library types; existing I/O helpers still need migration.
+The [ordinary System union sample](docs/union-convention.md) uses ordinary System.Option/Result library types, including the migrated I/O boundaries.
 The [ordinary carrier hosting example](docs/erased-inputs.md) passes a guest-created Result through the Rust host and back into IL.
 The [parsing boundary](docs/int32-parse.md) now returns ordinary System.Result; the Error sample uses it throughout.
 The [type arity sample](docs/type-arities.md) lets a non-generic companion coexist with generic types of the same name.

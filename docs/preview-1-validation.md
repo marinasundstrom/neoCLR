@@ -4,7 +4,7 @@ This is a record of development evidence and outstanding release checks. It does
 not designate a release candidate or claim that the publication checklist is complete.
 The [Preview 1 plan](preview-1.md) remains the scope and acceptance checklist.
 
-## Current local baseline
+## Stable-toolchain implementation baseline
 
 | Item | Evidence |
 | --- | --- |
@@ -22,7 +22,7 @@ This is comprehensive local coverage, not evidence of one uninterrupted full run
 on a chosen release commit. The work log records the implementation slices.
 
 No Linux or Windows result for this snapshot is recorded here. The configured CI
-matrix targets Ubuntu, macOS and Windows with stable Rust. A configured job is not
+matrix targets Ubuntu, macOS and Windows with stable Rust and a separate 1.85.0 job. A configured job is not
 a passing result, and runner labels do not establish a fixed CPU architecture.
 
 ## Evidence to collect for the release candidate
@@ -39,9 +39,39 @@ a passing result, and runner labels do not establish a fixed CPU architecture.
 - Review license/provenance notices and verify that the source package includes
   runtime sources, fixtures, tests and documentation without local build artifacts.
 
-The README currently claims Rust 1.85 or newer, while Cargo.toml has no rust-version
-and CI tests stable only. That minimum is unverified here. Determining, recording
-and testing a truthful minimum is the next build-validation slice.
+## Minimum-toolchain and clean-source validation
+
+Rust 1.85.0 is now the declared and locally tested minimum. Cargo.toml records
+rust-version = "1.85". CI retains stable formatting/Clippy/tests and adds a separate
+1.85.0 build/test/native-example job on each of the three operating systems. These
+jobs have been configured, not observed passing remotely.
+
+The clean-source check used a git archive of 2d2d7ac, extracted into a new temporary
+directory with no target directory or generated artifacts. It contained only tracked
+source files and used the existing Cargo registry cache. This validates an independent
+source build, not first-time dependency downloading or a remote Git clone. The final
+Cargo minimum-version declaration was copied into the snapshot and its all-target
+build rerun successfully.
+
+| Item | Result |
+| --- | --- |
+| Environment | macOS 26.6.2 ARM64, rustc 1.85.0 (4d91de4e4, 2025-02-17), Apple clang 17.0.0, GNU Make 3.81 |
+| Build | cargo +1.85.0 build --locked --all-targets succeeded from clean source, including vendored libffi |
+| Regression suite | One uninterrupted cargo +1.85.0 test --locked run: 521 tests passed; doc tests completed (no doc test cases) |
+| Quick start | HelloWorld source execution printed Hello, world! and => Void |
+| Artifact workflow | Assemble, verify and run succeeded; a second assembly to the same path was rejected |
+| Separate runtime library | System.neo.json assembled from runtime/System.neoil and ran the HelloWorld artifact successfully |
+| Console/file input | Input 21 printed 42; file sample printed 42, InvalidFormat and File input handled |
+| Expected Fault | Array-bounds sample exited with status 1 and an owned logical stack trace |
+| Embedding | invoke example completed with the documented guest invocation results |
+| Native calls | build_native built the sample library with the selected toolchain; pinvoke printed 42 and => Void |
+
+The workflow ran 13 command steps and checked their expected exit statuses; output
+was also reviewed against the README. Build artifacts remained in the temporary
+snapshot. This evidence supports the local minimum-version claim. It does not close
+the exact-release-commit, remote-platform, packaging or first-install prerequisite
+checks. The earlier stable baseline and this minimum run exercise the same runtime
+implementation; later documentation and CI edits do not designate a release candidate.
 
 Local command logs in temporary directories are development aids, not durable
 release evidence. Release records should use preserved logs or immutable CI links.
