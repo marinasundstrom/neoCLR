@@ -135,3 +135,7 @@ storage from a suitable allocation environment, whose lifetime must outlast thos
 allocations. Cleanup on construction failure and avoiding conflicting reclamation
 policies also need contracts. These integration questions are recorded for later.
 See [allocation encoding](allocation-encoding.md).
+
+See the [proposed slot-reference design](reference-slots.md) for typed reference
+parameters, out assignment and explicit reference receivers. This is planned work,
+not a change to the currently implemented pointer or receiver semantics.

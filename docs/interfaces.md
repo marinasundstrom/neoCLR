@@ -110,3 +110,7 @@ instruction index. If an implementation has generic parameters that cannot be in
 from its interface, analysis faults rather than claim a complete closed graph.
 This limitation does not prevent interpreter dispatch to a known concrete receiver.
 Interface formation and dispatch report the InterfaceDispatch runtime service.
+
+See the [proposed slot-reference design](reference-slots.md) for typed reference
+parameters, out assignment and explicit reference receivers. This is planned work,
+not a change to the currently implemented pointer or receiver semantics.

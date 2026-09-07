@@ -2281,3 +2281,19 @@ the rebuilt source-files target passes all four checks. The final 15 interface t
 (including three added after the full run started), seven reachability tests and six
 erased-input tests pass. Clippy with warnings denied, formatting and diff checks pass.
 No other full-suite target failed. Cross-platform release validation remains open.
+
+
+## Slot-reference and receiver design
+
+Recorded the next executable direction in reference-slots.md: a distinct T& signature
+for call-scoped typed slots, explicit ldloca/ldarga and ldobj/stobj access, out
+assignment contracts and byref receiver metadata. References imply neither raw
+pointer operations nor ownership. The design permits aliasing, requires stable slot
+identity and runtime enforcement independently of optional verification, and keeps
+safe slot references separate from the current pointer-based interface view.
+
+The initial subset prohibits reference escape and separates unconditional out from
+future conditional TryGet assignment. Implementation is ordered into direct references,
+out obligations, reference receivers and an explicit interface/library migration.
+All syntax in the design is marked proposed. No executable behavior changed; checked
+document links and whitespace. Runtime tests are not required for this design slice.

@@ -216,3 +216,7 @@ for exhaustive analysis; an annotation alone must not imply such a guarantee.
 This is deferred design work, not implemented inheritance metadata or syntax. Ordinary
 union carriers remain a separate convention and must not require inheritance or a
 closed hierarchy to represent their variants.
+
+See the [proposed slot-reference design](reference-slots.md) for typed reference
+parameters, out assignment and explicit reference receivers. This is planned work,
+not a change to the currently implemented pointer or receiver semantics.
