@@ -1602,3 +1602,25 @@ remain future fundamentals; no union instructions or ownership policies were add
 Validation: all 380 integration tests pass on macOS ARM64; formatting, clippy with
 warnings denied, and diff checks pass. The sample verifies, prints 21 and 42, and returns
 Void. Linux and Windows remain for CI.
+
+## 2026-09-07 — Top-level type visibility
+
+Added public/internal type declarations with public legacy defaults; private top-level
+types are rejected. Loading checks explicit type uses across signatures, locals,
+fields/properties, attributes and typed operands, plus resolved call signatures that
+could expose an unspelled return type. Member access checks respect declaring-type
+visibility. Host invocation checks closed owner/parameter/return types as well as method
+access. Read-only identity/layout/reachability inspection remains available.
+
+Generic bodies retain their open-context permissions: a public library can operate on
+a caller-supplied internal type through T without acquiring permission to name that type
+explicitly. Ordinary field operations check declared field-type accessibility. Existing
+raw-memory and trusted host-data limitations remain documented.
+
+Six tests cover the serialized sample, foreign type references, implicit return/field
+exposure, host invocation versus inspection, cross-module generic code, and legacy/invalid
+metadata. The sample uses an internal helper type and prints 42.
+
+Validation: all 386 integration tests pass on macOS ARM64; formatting, clippy with
+warnings denied, and diff checks pass. The sample verifies and executes successfully.
+Linux and Windows remain for CI.

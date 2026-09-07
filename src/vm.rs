@@ -171,6 +171,11 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
     let mut names = HashSet::new();
     let mut type_identities = HashSet::new();
     for def in &module.types {
+        if def.visibility == crate::metadata::Visibility::Private {
+            return Err(Fault::new(
+                "top-level types support public or internal visibility",
+            ));
+        }
         if def
             .definition
             .as_ref()
@@ -495,6 +500,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             validate_attribute(module, attribute)?;
         }
     }
+    crate::access::validate_types(module)?;
     if let Some(entry) = module
         .functions
         .iter()

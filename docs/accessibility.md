@@ -2,7 +2,8 @@
 
 Methods and free functions now carry explicit accessibility metadata. This first slice
 restricts calls and host member invocation. Field checks are now implemented as
-described below; type visibility and complete construction invariants remain future work.
+described below; top-level type visibility is also implemented below. Complete construction invariants
+remain future work.
 
 The current direction is to retain familiar .NET-style access levels while building
 the fundamentals. A possible improved access model is deferred; it is not required
@@ -73,12 +74,12 @@ Properties still consist of metadata associations with ordinary methods. A publi
 and private setter are possible; direct calls to each accessor follow that accessor's
 visibility. Properties have no separate visibility field in this slice.
 
-Field accessibility is now implemented below; the original Gauge demonstration still
+Field and top-level type accessibility are now implemented below; the original Gauge demonstration still
 uses a public field. A private helper alone does not prevent code from constructing
 a record through public fields or bypassing a factory's policy. The Gauge example therefore demonstrates
 method boundaries, not a protected representation invariant.
 
-Construction/initialization, type access, and unsafe pointer boundaries must be
+Construction/initialization and unsafe pointer boundaries must be
 specified before claiming that a carrier's representation is protected. Accessibility
 is not a security sandbox or an ownership policy, and it cannot contain arbitrary native
 code. It does not add a value/reference distinction or any union-specific instruction.
@@ -113,8 +114,7 @@ Fields now accept the same public/internal/private levels:
 ```
 
 Omission preserves public visibility. The field JSON record carries an optional
-`visibility` value, and generic field substitution preserves that value. Type visibility
-is still unimplemented.
+`visibility` value, and generic field substitution preserves that value. Top-level type visibility is described below.
 
 `ldfld`, `stfld`, and `ldflda` check the actual declaring type and field index. Names
 remain assembler mappings to indices; neither numeric operands nor aliases grant access.
@@ -155,6 +155,43 @@ including non-public fields, to public methods. Import validates types and shape
 factory provenance or semantic invariants. This slice does not introduce opaque host
 handles, constructor-only imports, or a security boundary against the embedding host.
 
-Ordinary carrier construction and initialization rules, plus type visibility and a
-future policy for unsafe/native/host boundaries, remain necessary before stronger
+Ordinary carrier construction and initialization rules, plus a future policy for unsafe/native/host boundaries, remain necessary before stronger
 representation guarantees can be claimed. No union-specific instruction was added.
+
+## Top-level type visibility
+
+Types now accept `.type public Name` or `.type internal Name`, including generic
+declarations. Omitted visibility remains public for old source and JSON. Top-level
+private/protected types are unsupported; there is no nested-type or inheritance access
+model yet. The same optional JSON visibility field is used on type definitions.
+
+Internal types may be named by their own module/revision. Loading checks explicit type
+uses in method signatures, locals, field/property signatures, attribute type references,
+and typed instruction operands, including unreachable code. It also checks resolved
+call signatures, so an external free call cannot bypass the rule by returning an internal
+type that the caller never spells. Public methods on internal types do not override their
+declaring type's visibility. Field access checks include the field's declared type.
+
+Generic bodies are checked in their open declaring context. A caller may supply its own
+internal type as a generic argument to a public library; specialization does not make the
+library's use of T an illicit explicit reference to that caller's internal type. Explicit
+foreign internal type references remain forbidden. This slice does not add generic
+constraints or a broad public-signature exposure policy: declarations in the owning
+module may mention its internal types, but inaccessible calls are rejected.
+
+Host member resolution checks the closed owner, parameters, and return type against
+public type visibility in addition to method visibility. Explicit local entries remain
+execution roots. Read-only identity/layout/reachability inspection still permits internal
+types: visibility does not make metadata secret. Trusted host record data and raw memory
+retain the previously documented limits.
+
+The [type-visibility sample](../examples/type_visibility.neoil) uses an internal helper
+type from its own module and prints 42:
+
+```sh
+cargo run --locked -- verify examples/type_visibility.neoil
+cargo run --locked -- run examples/type_visibility.neoil
+```
+
+This is independent of future inheritance openness and closed-hierarchy declarations.
+Construction/initialization and ordinary union storage remain unfinished.

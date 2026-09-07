@@ -513,3 +513,7 @@ syntax. See [accessibility](accessibility.md) for enforced caller scopes.
 Fields accept `.field [public|internal|private] Name Type`, defaulting to public.
 Ordinary field loads/stores/addresses and direct aggregate construction enforce the
 declaring type/module rules; see [field accessibility](accessibility.md#field-accessibility).
+
+Top-level types accept `.type [public|internal] Name`, defaulting to public. See
+[type visibility](accessibility.md#top-level-type-visibility) for explicit type-use checks,
+generic contexts, and the distinction between invocation and metadata inspection.

@@ -134,6 +134,8 @@ pub struct Module {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct TypeDef {
+    #[serde(default, skip_serializing_if = "Visibility::is_public")]
+    pub visibility: Visibility,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub definition: Option<TypeDefId>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]

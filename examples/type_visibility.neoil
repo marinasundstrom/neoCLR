@@ -1,0 +1,18 @@
+.module TypeVisibility
+.entry Main
+
+.type internal Arithmetic
+    .method public static Double(Int32 value) -> Int32
+        ldarg value
+        ldc.i4 2
+        mul
+        ret
+    .end
+.end
+
+.function Main() -> Void
+    ldc.i4 21
+    call Arithmetic::Double(Int32)
+    call System.Console::WriteLine(Int32)
+    ret
+.end

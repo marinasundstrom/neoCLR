@@ -79,7 +79,7 @@ Instance receivers still follow existing copied-value semantics. Associating a s
 with a method does not make a copied receiver mutate caller-owned storage. An explicit
 pointer can mutate its target under the existing memory contract; addressed receiver
 mutation and construction/initialization remain separate prerequisites. [Method accessibility](accessibility.md) now governs calls to each accessor independently.
-Ordinary field access also enforces visibility. Type accessibility, automatic properties,
+Ordinary field access also enforces visibility. Top-level type access is also checked. Automatic properties,
 property attributes, and a guest reflection API remain unimplemented.
 
 System.Error.Message and System.Array<T>.Length now explicitly associate their existing

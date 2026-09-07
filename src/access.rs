@@ -9,6 +9,9 @@ pub(crate) fn check_call(
     caller: Option<&Function>,
     callee: &Function,
 ) -> Result<(), Fault> {
+    if let Some(owner) = &callee.owner {
+        check_owner(module, caller.and_then(scope), owner)?;
+    }
     if callee.visibility == Visibility::Public {
         return Ok(());
     }
@@ -81,11 +84,13 @@ pub(crate) fn check_field(
     owner: &Type,
     index: usize,
 ) -> Result<(), Fault> {
+    check_owner(module, scope(caller), owner)?;
     let definition = record_definition(module, owner)?;
     let field = definition
         .fields
         .get(index)
         .ok_or_else(|| Fault::new("field index out of range"))?;
+    check_type(module, scope(caller), &field.ty)?;
     let same_module = definition
         .definition
         .as_ref()
@@ -116,9 +121,137 @@ pub(crate) fn check_construction(
     caller: &Function,
     owner: &Type,
 ) -> Result<(), Fault> {
+    check_owner(module, scope(caller), owner)?;
     let definition = record_definition(module, owner)?;
     for index in 0..definition.fields.len() {
         check_field(module, caller, owner, index)?;
+    }
+    Ok(())
+}
+
+type Scope<'a> = Option<(&'a str, Option<&'a str>)>;
+fn scope(function: &Function) -> Scope<'_> {
+    function
+        .definition
+        .as_ref()
+        .map(|id| (id.module.as_str(), id.revision.as_deref()))
+}
+
+fn check_type(module: &Module, source: Scope<'_>, ty: &Type) -> Result<(), Fault> {
+    fn visit(module: &Module, source: Scope<'_>, ty: &Type, depth: usize) -> Result<(), Fault> {
+        if depth > 32 {
+            return Err(Fault::new("type nesting exceeds 32"));
+        }
+        let nested = |ty| visit(module, source, ty, depth + 1);
+        match ty {
+            Type::Constructed {
+                definition,
+                arguments,
+            } => {
+                visit(module, source, &Type::from_name(definition), depth + 1)?;
+                for argument in arguments {
+                    nested(argument)?;
+                }
+            }
+            Type::Option(t) | Type::Ref(t) | Type::Ptr(t) => nested(t)?,
+            Type::Result(t, e) => {
+                nested(t)?;
+                nested(e)?;
+            }
+            Type::Scoped { .. } => {
+                return Err(Fault::new("unresolved type scope during access checking"));
+            }
+            Type::TypeParameter(_) => {}
+            _ => {
+                if let Some(definition) = module.type_definition(ty).filter(|definition| {
+                    definition.visibility != Visibility::Public
+                        && !definition.definition.as_ref().is_some_and(|id| {
+                            source == Some((id.module.as_str(), id.revision.as_deref()))
+                        })
+                }) {
+                    return Err(Fault::new(format!(
+                        "type access denied: {} is {:?}",
+                        definition.name, definition.visibility
+                    )));
+                }
+            }
+        }
+        Ok(())
+    }
+    visit(module, source, ty, 0)
+}
+
+fn check_owner(module: &Module, source: Scope<'_>, owner: &Type) -> Result<(), Fault> {
+    // Runtime specialization does not revoke access to caller-supplied generic arguments.
+    // Explicit signature/operand types were checked in their open declaring context.
+    match owner {
+        Type::Constructed { definition, .. } => {
+            check_type(module, source, &Type::from_name(definition))
+        }
+        other => check_type(module, source, other),
+    }
+}
+
+pub(crate) fn check_signature(
+    module: &Module,
+    source: Scope<'_>,
+    function: &Function,
+) -> Result<(), Fault> {
+    for ty in function
+        .owner
+        .iter()
+        .chain(&function.parameters)
+        .chain([&function.returns])
+    {
+        check_type(module, source, ty)?;
+    }
+    Ok(())
+}
+
+pub(crate) fn validate_types(module: &Module) -> Result<(), Fault> {
+    let attributes =
+        |source, attributes: &[crate::metadata::CustomAttribute]| -> Result<(), Fault> {
+            for attribute in attributes {
+                for ty in attribute
+                    .constructor
+                    .owner
+                    .iter()
+                    .chain(&attribute.constructor.parameters)
+                {
+                    check_type(module, source, ty)?;
+                }
+            }
+            Ok(())
+        };
+    for definition in &module.types {
+        let source = definition
+            .definition
+            .as_ref()
+            .map(|id| (id.module.as_str(), id.revision.as_deref()));
+        for field in &definition.fields {
+            check_type(module, source, &field.ty)?;
+        }
+        for property in &definition.properties {
+            property.clone().map_types(|ty| {
+                check_type(module, source, ty)?;
+                Ok(ty.clone())
+            })?;
+        }
+        attributes(source, &definition.custom_attributes)?;
+    }
+    for function in &module.functions {
+        let source = scope(function);
+        function.map_types(|ty| {
+            check_type(module, source, ty)?;
+            Ok(ty.clone())
+        })?;
+        attributes(source, &function.custom_attributes)?;
+        // A free call can expose a type through its return without spelling it in IL.
+        for op in &function.body {
+            if let crate::metadata::Instruction::Call(target) = op {
+                check_signature(module, source, &crate::vm::resolve(module, target)?)?;
+            }
+        }
     }
     Ok(())
 }
