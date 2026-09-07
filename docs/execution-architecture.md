@@ -169,7 +169,9 @@ pointer/Ref inputs, persistent sessions, and a native hosting ABI remain pending
 A minimal hosting milestone should load a module, resolve a function by identity and
 signature, invoke it repeatedly with typed inputs, return values/Faults, and provide
 host services. Value/handle lifetimes, resource limits, cancellation, callbacks,
-reentrancy, threading, and teardown require explicit contracts. A versioned C ABI
+reentrancy, threading, and teardown require explicit contracts. The interpreter now supports
+[cooperative host cancellation](cancellation.md) at instruction boundaries; native calls
+are not interrupted, and future backend polling contracts remain open. A versioned C ABI
 with opaque handles is a recommendation, not an implemented choice.
 
 The CLI and language tooling should consume hosting/runtime services rather than

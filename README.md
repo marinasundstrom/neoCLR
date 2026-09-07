@@ -266,6 +266,8 @@ Run `cargo run --example invoke` for the Rust embedding sample.
 `cargo run --example record_inputs` demonstrates copied record inputs and result reuse.
 `cargo run --example instance_invocation` demonstrates explicit copied generic receivers.
 `cargo run --example union_inputs` demonstrates Option/Result arguments and result reuse.
+[Cooperative cancellation](docs/cancellation.md) is available through ExecutionOptions.
+`cargo run --example cancellation` stops an invocation from another host thread.
 
 [Explicit module sets](docs/module-sets.md) support additional libraries, cross-module
 generic calls, and field-name aliases. Run `cargo run --example modules` for a three-module

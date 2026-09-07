@@ -1,5 +1,7 @@
 //! Immutable resolved metadata shared by execution and analysis.
-use crate::{Execution, Fault, Limits, Module, TypeIdentity, Verification, metadata::Type};
+use crate::{
+    Execution, ExecutionOptions, Fault, Module, TypeIdentity, Verification, metadata::Type,
+};
 
 /// A validated, linked metadata snapshot with calls bound before specialization.
 ///
@@ -91,9 +93,9 @@ impl LoadedProgram {
     }
 
     /// Execute the entry point with fresh state and native imports disabled.
-    pub fn run(&self, limits: Limits) -> Result<Execution, Fault> {
+    pub fn run(&self, options: impl Into<ExecutionOptions>) -> Result<Execution, Fault> {
         self.check_entry()?;
-        crate::vm::interpret(&self.module, limits, None)
+        crate::vm::interpret(&self.module, options.into(), None)
     }
 
     /// Execute the entry point with fresh state and native imports enabled.
@@ -103,11 +105,14 @@ impl LoadedProgram {
     /// Native code and library initializers/destructors must uphold pointer validity,
     /// allocation lifetimes, and Rust's memory safety requirements. Guest metadata
     /// alone cannot establish these guarantees. The caller must trust the code.
-    pub unsafe fn run_with_native(&self, limits: Limits) -> Result<Execution, Fault> {
+    pub unsafe fn run_with_native(
+        &self,
+        options: impl Into<ExecutionOptions>,
+    ) -> Result<Execution, Fault> {
         self.check_entry()?;
         crate::vm::interpret(
             &self.module,
-            limits,
+            options.into(),
             Some(crate::interop::NativeLibraries::default()),
         )
     }
@@ -153,13 +158,17 @@ impl LoadedFunction<'_> {
     }
 
     /// Invoke with validated owned storage values and fresh guest state.
-    pub fn invoke(&self, arguments: Vec<crate::Value>, limits: Limits) -> Result<Execution, Fault> {
+    pub fn invoke(
+        &self,
+        arguments: Vec<crate::Value>,
+        options: impl Into<ExecutionOptions>,
+    ) -> Result<Execution, Fault> {
         let arguments = self.import_arguments(None, arguments)?;
         crate::vm::interpret_function(
             &self.program.module,
             self.function.clone(),
             arguments,
-            limits,
+            options.into(),
             None,
         )
     }
@@ -173,14 +182,14 @@ impl LoadedFunction<'_> {
     pub unsafe fn invoke_with_native(
         &self,
         arguments: Vec<crate::Value>,
-        limits: Limits,
+        options: impl Into<ExecutionOptions>,
     ) -> Result<Execution, Fault> {
         let arguments = self.import_arguments(None, arguments)?;
         crate::vm::interpret_function(
             &self.program.module,
             self.function.clone(),
             arguments,
-            limits,
+            options.into(),
             Some(crate::interop::NativeLibraries::default()),
         )
     }
@@ -191,14 +200,14 @@ impl LoadedFunction<'_> {
         &self,
         receiver: crate::Value,
         arguments: Vec<crate::Value>,
-        limits: Limits,
+        options: impl Into<ExecutionOptions>,
     ) -> Result<Execution, Fault> {
         let arguments = self.import_arguments(Some(receiver), arguments)?;
         crate::vm::interpret_function(
             &self.program.module,
             self.function.clone(),
             arguments,
-            limits,
+            options.into(),
             None,
         )
     }
@@ -213,14 +222,14 @@ impl LoadedFunction<'_> {
         &self,
         receiver: crate::Value,
         arguments: Vec<crate::Value>,
-        limits: Limits,
+        options: impl Into<ExecutionOptions>,
     ) -> Result<Execution, Fault> {
         let arguments = self.import_arguments(Some(receiver), arguments)?;
         crate::vm::interpret_function(
             &self.program.module,
             self.function.clone(),
             arguments,
-            limits,
+            options.into(),
             Some(crate::interop::NativeLibraries::default()),
         )
     }

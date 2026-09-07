@@ -85,6 +85,12 @@ interpreter frame and instruction budgets with no synthetic wrapper.
 `cargo run --example instance_invocation` invokes Box<Int32> methods, preserving the
 original Int32(21) while returning an updated copy containing Int32(42).
 
+## Host execution controls
+
+All invoke methods also accept [ExecutionOptions](cancellation.md) in place of Limits
+for cooperative cancellation. Input validation still precedes execution, and cancellation
+returns a terminal Fault without invalidating the handle or its program.
+
 ## Architectural scope
 
 This is a Rust embedding experiment using the shared interpreter call semantics. It

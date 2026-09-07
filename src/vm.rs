@@ -1,5 +1,5 @@
 use crate::{
-    Fault, Module, Value,
+    ExecutionOptions, Fault, Module, Value,
     metadata::{Case, FunctionRef, Instruction as Op, Representation, Type},
 };
 use std::collections::HashSet;
@@ -544,22 +544,22 @@ fn expect(value: &Value, ty: &Type) -> Result<(), Fault> {
     }
 }
 
-pub fn run(module: &Module, limits: Limits) -> Result<Execution, Fault> {
-    run_with_library(module, crate::library::system()?, limits)
+pub fn run(module: &Module, options: impl Into<ExecutionOptions>) -> Result<Execution, Fault> {
+    run_with_library(module, crate::library::system()?, options)
 }
 
 /// Execute against an explicitly compiled System library artifact.
 pub fn run_with_library(
     module: &Module,
     library: &Module,
-    limits: Limits,
+    options: impl Into<ExecutionOptions>,
 ) -> Result<Execution, Fault> {
     if module.entry.is_empty() {
         return Err(Fault::new(
             "cannot execute a library without an entry point",
         ));
     }
-    crate::LoadedProgram::with_library(module, library)?.run(limits)
+    crate::LoadedProgram::with_library(module, library)?.run(options)
 }
 
 /// Execute a trusted module with native imports enabled.
@@ -572,7 +572,7 @@ pub fn run_with_library(
 pub unsafe fn run_with_native(
     module: &Module,
     library: &Module,
-    limits: Limits,
+    options: impl Into<ExecutionOptions>,
 ) -> Result<Execution, Fault> {
     if module.entry.is_empty() {
         return Err(Fault::new(
@@ -580,12 +580,12 @@ pub unsafe fn run_with_native(
         ));
     }
     // SAFETY: the caller accepts the same native-code contract as LoadedProgram.
-    unsafe { crate::LoadedProgram::with_library(module, library)?.run_with_native(limits) }
+    unsafe { crate::LoadedProgram::with_library(module, library)?.run_with_native(options) }
 }
 
 pub(crate) fn interpret(
     module: &Module,
-    limits: Limits,
+    options: ExecutionOptions,
     native_libraries: Option<crate::interop::NativeLibraries>,
 ) -> Result<Execution, Fault> {
     let entry = module
@@ -597,7 +597,7 @@ pub(crate) fn interpret(
         module,
         module.functions[entry].clone(),
         vec![],
-        limits,
+        options,
         native_libraries,
     )
 }
@@ -606,9 +606,11 @@ pub(crate) fn interpret_function(
     module: &Module,
     function: crate::metadata::Function,
     arguments: Vec<Value>,
-    limits: Limits,
+    options: ExecutionOptions,
     mut native_libraries: Option<crate::interop::NativeLibraries>,
 ) -> Result<Execution, Fault> {
+    options.check_cancellation(&function.name, 0)?;
+    let limits = options.limits;
     if limits.frames == 0 {
         return Err(Fault::new("frame limit exceeded"));
     }
@@ -622,6 +624,7 @@ pub(crate) fn interpret_function(
             .ok_or_else(|| Fault::new("missing frame"))?;
         let function = frame.function.clone();
         let pc = frame.pc;
+        options.check_cancellation(&function.name, pc)?;
         let op = function.body.get(pc).ok_or_else(|| Fault {
             message: "function fell through without ret".into(),
             function: Some(function.name.clone()),

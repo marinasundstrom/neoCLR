@@ -34,7 +34,8 @@ pointer/Ref values from one execution are not transferable handles into another.
 [Resolved function handles](invocation.md) additionally support primitive and
 [owned record arguments](record-inputs.md) and [bootstrap Option/Result inputs](union-inputs.md)
 to static and instance IL functions without an entry point.
-Persistent guest state, cancellation, addressed receivers, and pointer/Ref transfer remain pending.
+[Cooperative cancellation](cancellation.md) is available through ExecutionOptions.
+Persistent guest state, addressed receivers, and pointer/Ref transfer remain pending.
 
 Native imports remain disabled in safe `run`. The separate unsafe `run_with_native`
 method has the same C ABI and native-code trust requirements as the existing helper.

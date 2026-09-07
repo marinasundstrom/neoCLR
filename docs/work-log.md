@@ -1194,3 +1194,27 @@ Validation: all 298 integration tests pass on macOS ARM64; formatting, clippy wi
 warnings denied, and diff checks pass. The sample reports Succeeded and Failed from
 Result inputs and reuses an Option<String> result containing Hello, world!.
 Linux and Windows remain for CI.
+
+## 2026-09-07 — Cooperative host cancellation
+
+Added ExecutionOptions with existing Limits and an optional shared CancellationToken.
+Entry helpers and loaded-program/static/instance invocation APIs accept either options
+or explicit Limits. Token clones share a monotonic request flag; cancellation is
+idempotent and cannot be reset. It introduces no guest async or exception mechanism.
+
+The interpreter polls at execution entry and before guest instructions. Observed
+cancellation returns a terminal, instruction-located Fault through existing teardown,
+without invalidating the program or function handle. Loading and input validation run
+first; native calls and in-progress instructions cannot be interrupted. Polling charges
+no guest instructions or frames. Execution results retain their existing thread-local
+ownership; only the cancellation request is shared across threads.
+
+Added six tests covering token behavior, entry helpers, static and instance invocation
+in safe/native modes, validation and limit precedence, cross-thread cancellation,
+program reuse, and unchanged guest budgets/Faults. Added an embedding sample and
+specified races, native limitations, teardown, and future backend polling boundaries.
+
+Validation: all 304 integration tests pass on macOS ARM64; formatting, clippy with
+warnings denied, and diff checks pass. The sample cancels Spin at instruction zero
+and then successfully invokes Ready on the same program. Linux and Windows remain
+for CI.

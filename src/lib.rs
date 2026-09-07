@@ -1,6 +1,8 @@
 pub mod assembler;
 pub use assembler::assemble;
+mod execution;
 mod input;
+pub use execution::{CancellationToken, ExecutionOptions};
 pub mod library;
 pub mod memory;
 pub mod metadata;
