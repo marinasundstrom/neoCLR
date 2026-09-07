@@ -1,5 +1,5 @@
 .type System.Math
-    .method static Abs(int32 value) -> System.Result<Int32,Error>
+    .method static Abs(int32 value) -> System.Result<Int32,System.OverflowError>
         ldarg value
         ldc.i4 -2147483648
         ceq
@@ -10,19 +10,19 @@
         brtrue Negative
         ldarg value
         newobj instance System.Result.Ok<Int32>::.ctor(Int32)
-        newobj instance System.Result<Int32,Error>::.ctor(System.Result.Ok<Int32>)
+        newobj instance System.Result<Int32,System.OverflowError>::.ctor(System.Result.Ok<Int32>)
         ret
         Negative:
         ldc.i4 0
         ldarg value
         sub
         newobj instance System.Result.Ok<Int32>::.ctor(Int32)
-        newobj instance System.Result<Int32,Error>::.ctor(System.Result.Ok<Int32>)
+        newobj instance System.Result<Int32,System.OverflowError>::.ctor(System.Result.Ok<Int32>)
         ret
         Overflow:
-        error "Overflow"
-        newobj instance System.Result.Error<Error>::.ctor(Error)
-        newobj instance System.Result<Int32,Error>::.ctor(System.Result.Error<Error>)
+        newobj instance System.OverflowError::.ctor()
+        newobj instance System.Result.Error<System.OverflowError>::.ctor(System.OverflowError)
+        newobj instance System.Result<Int32,System.OverflowError>::.ctor(System.Result.Error<System.OverflowError>)
         ret
     .end
 

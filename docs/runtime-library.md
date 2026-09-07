@@ -36,9 +36,10 @@ needs and the primitives required to implement them in platform code.
 - `System.Int32.Parse(string)` constructs an ordinary System.Result<Int32,Int32ParseError> from an erased
   host parsing payload; see [the migrated parsing boundary](int32-parse.md).
 - `System.Int32.Divide(int32, int32)` checks zero and overflow, then executes `div`
-  or returns an Error. Its control flow and Result construction are platform IL.
+  or returns IntegerDivisionError with DivisionByZero/Overflow cases. Its control flow
+  and ordinary Result construction are platform IL.
 - `System.Math.Abs(int32)` computes absolute value and represents overflow as an
-  Error. Its logic is entirely platform IL.
+  ordinary OverflowError. Its logic is entirely platform IL.
 
 The remaining host calls are `neoCLR.Runtime.WriteLine(string) -> Void`,
 `neoCLR.Runtime.Int32ToString(int32) -> String`, and
@@ -55,7 +56,8 @@ serialized just like application functions. Tests replace the compiled Divide bo
 and confirm execution follows the replacement, rather than a hidden intrinsic.
 
 The [Result API review](runtime-error-contracts.md) inventories current failure outcomes
-and proposed operation-specific error types. Parse now uses Int32ParseError; the other proposed error signatures remain future work.
+and proposed operation-specific error types. Parse, Divide and Abs use specific error types; text slicing and I/O error signatures
+remain future work. See [arithmetic contracts](arithmetic-errors.md).
 
 ## Build and use
 

@@ -114,7 +114,7 @@ temporary migration scaffolding, not the final language naming policy.
 Int32.Parse now returns an ordinary carrier through a [migrated native boundary](int32-parse.md).
 Console.ReadByte, File.ReadAllText and Math.Abs now return ordinary nested cases under
 their canonical names. Console/file host bindings return explicit erased payloads and
-platform IL constructs the carriers. Divide and slicing still return bootstrap carriers.
+platform IL constructs the carriers. Divide now returns ordinary IntegerDivisionError cases; slicing still returns bootstrap carriers.
 [Host invocation now imports](erased-inputs.md) records containing
 System.Value with bounded shape checks; this does not recognize or enforce the convention.
 No automatic conversion or extra host intrinsic bridges the two representations.

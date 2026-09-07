@@ -33,7 +33,7 @@
         ret
     .end
 
-    .method static Divide(int32 dividend, int32 divisor) -> Result<Int32,Error>
+    .method static Divide(int32 dividend, int32 divisor) -> System.Result<Int32,System.IntegerDivisionError>
         ldarg divisor
         ldc.i4 0
         ceq
@@ -52,15 +52,20 @@
         ldarg dividend
         ldarg divisor
         div
-        ok Error
+        newobj instance System.Result.Ok<Int32>::.ctor(Int32)
+        newobj instance System.Result<Int32,System.IntegerDivisionError>::.ctor(System.Result.Ok<Int32>)
         ret
         DivisionByZero:
-        error "DivisionByZero"
-        err Int32
+        newobj instance System.IntegerDivisionError.DivisionByZero::.ctor()
+        newobj instance System.IntegerDivisionError::.ctor(System.IntegerDivisionError.DivisionByZero)
+        newobj instance System.Result.Error<System.IntegerDivisionError>::.ctor(System.IntegerDivisionError)
+        newobj instance System.Result<Int32,System.IntegerDivisionError>::.ctor(System.Result.Error<System.IntegerDivisionError>)
         ret
         Overflow:
-        error "Overflow"
-        err Int32
+        newobj instance System.IntegerDivisionError.Overflow::.ctor()
+        newobj instance System.IntegerDivisionError::.ctor(System.IntegerDivisionError.Overflow)
+        newobj instance System.Result.Error<System.IntegerDivisionError>::.ctor(System.IntegerDivisionError)
+        newobj instance System.Result<Int32,System.IntegerDivisionError>::.ctor(System.Result.Error<System.IntegerDivisionError>)
         ret
     .end
 

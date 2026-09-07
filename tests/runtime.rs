@@ -77,11 +77,11 @@ fn void_is_a_value_and_a_generic_argument() {
 fn arithmetic_failures_are_errors_when_requested() {
     for (body, expected) in [
         (
-            "ldc.i4 1\nldc.i4 0\ncall System.Int32.Divide(int32, int32)\nldcase Err\nret",
+            "ldc.i4 1\nldc.i4 0\ncall System.Int32.Divide(int32, int32)\ncall instance System.Result<Int32,System.IntegerDivisionError>::GetErrorCase()\ncall instance System.Result.Error<System.IntegerDivisionError>::get_Value()\ncall instance System.IntegerDivisionError::ToString()\ncall System.Error::FromMessage(String)\nret",
             "DivisionByZero",
         ),
         (
-            "ldc.i4 -2147483648\nldc.i4 -1\ncall System.Int32.Divide(int32, int32)\nldcase Err\nret",
+            "ldc.i4 -2147483648\nldc.i4 -1\ncall System.Int32.Divide(int32, int32)\ncall instance System.Result<Int32,System.IntegerDivisionError>::GetErrorCase()\ncall instance System.Result.Error<System.IntegerDivisionError>::get_Value()\ncall instance System.IntegerDivisionError::ToString()\ncall System.Error::FromMessage(String)\nret",
             "Overflow",
         ),
         (

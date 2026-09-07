@@ -1997,3 +1997,18 @@ reassembly of System and applications together.
 Validation: all 446 tests pass, along with formatting, clippy with warnings denied,
 and diff checks. Errors, file-input and features samples assemble, verify and run
 against an explicitly rebuilt System artifact on macOS ARM64.
+
+## Typed checked-arithmetic errors
+
+Added System.OverflowError for Math.Abs and System.IntegerDivisionError with nested
+DivisionByZero/Overflow cases for Int32.Divide. Both canonical methods now construct
+ordinary typed Result cases in IL; Divide's bootstrap union instructions are removed.
+Preserved zero-divisor precedence, minimum/-1 overflow detection and truncation toward
+zero. Raw div still Faults on invalid arithmetic. Updated sample/member-identity callers,
+error assertions and the test proving replacement library bodies execute. New tests check
+success boundaries, concrete case identity, typed Abs overflow, invalid-case Faults,
+old signature rejection and the absence of union opcodes in these methods.
+
+Validation: all 42 focused arithmetic, runtime, library, identity, console and source-loader
+tests pass. Formatting, clippy with warnings denied and diff checks pass. The feature
+sample assembles, verifies and executes against a rebuilt System artifact on macOS ARM64.

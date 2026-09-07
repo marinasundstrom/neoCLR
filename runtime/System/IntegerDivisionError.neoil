@@ -1,0 +1,75 @@
+.type System.IntegerDivisionError
+    .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
+    .field private Stored System.Value
+    .type DivisionByZero
+        .method instance .ctor() -> Void
+            ldvoid
+            ret
+        .end
+    .end
+    .method instance .ctor(System.IntegerDivisionError.DivisionByZero value) -> Void
+        ldarg value
+        value.pack System.IntegerDivisionError.DivisionByZero
+        newobj System.IntegerDivisionError
+        starg this
+        ldvoid
+        ret
+    .end
+    .property instance IsDivisionByZero() -> Boolean
+        .get instance System.IntegerDivisionError::get_IsDivisionByZero()
+    .end
+    .method instance get_IsDivisionByZero() -> Boolean
+        ldarg this
+        ldfld 0
+        value.is System.IntegerDivisionError.DivisionByZero
+        ret
+    .end
+    .method instance GetDivisionByZero() -> System.IntegerDivisionError.DivisionByZero
+        ldarg this
+        ldfld 0
+        value.unpack System.IntegerDivisionError.DivisionByZero
+        ret
+    .end
+    .type Overflow
+        .method instance .ctor() -> Void
+            ldvoid
+            ret
+        .end
+    .end
+    .method instance .ctor(System.IntegerDivisionError.Overflow value) -> Void
+        ldarg value
+        value.pack System.IntegerDivisionError.Overflow
+        newobj System.IntegerDivisionError
+        starg this
+        ldvoid
+        ret
+    .end
+    .property instance IsOverflow() -> Boolean
+        .get instance System.IntegerDivisionError::get_IsOverflow()
+    .end
+    .method instance get_IsOverflow() -> Boolean
+        ldarg this
+        ldfld 0
+        value.is System.IntegerDivisionError.Overflow
+        ret
+    .end
+    .method instance GetOverflow() -> System.IntegerDivisionError.Overflow
+        ldarg this
+        ldfld 0
+        value.unpack System.IntegerDivisionError.Overflow
+        ret
+    .end
+    .method instance ToString() -> String
+        ldarg this
+        call instance System.IntegerDivisionError::get_IsDivisionByZero()
+        brfalse Overflow
+        ldstr "DivisionByZero"
+        ret
+    Overflow:
+        ldarg this
+        call instance System.IntegerDivisionError::GetOverflow()
+        pop
+        ldstr "Overflow"
+        ret
+    .end
+.end

@@ -299,8 +299,8 @@ These are ordinary functions compiled from [System.neoil](../runtime/System.neoi
 | `System.IO.File.ReadAllText` | `String, Int32` | `System.Result<String,System.Error>` (ordinary carrier) |
 | `System.Int32.ToString` | instance receiver `Int32`, no parameters | `String` |
 | `System.Int32.Parse` | `String` | `System.Result<Int32,System.Int32ParseError>` (see [typed errors](int32-parse.md)) |
-| `System.Int32.Divide` | `Int32, Int32` | `Result<Int32,Error>` |
-| `System.Math.Abs` | `Int32` | `System.Result<Int32,Error>` |
+| `System.Int32.Divide` | `Int32, Int32` | `System.Result<Int32,System.IntegerDivisionError>` |
+| `System.Math.Abs` | `Int32` | `System.Result<Int32,System.OverflowError>` |
 
 Host bindings have explicit `.methodimpl InternalCall` declarations in the System
 module; see the current [library catalog](runtime-library.md). Duplicate library

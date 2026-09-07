@@ -1,0 +1,10 @@
+.type System.OverflowError
+    .method instance .ctor() -> Void
+        ldvoid
+        ret
+    .end
+    .method instance ToString() -> String
+        ldstr "Overflow"
+        ret
+    .end
+.end

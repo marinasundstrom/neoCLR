@@ -97,7 +97,8 @@ ParseHandled:
     ldc.i4 84
     ldc.i4 2
     call System.Int32.Divide(int32, int32)
-    ldcase Ok
+    call instance System.Result<Int32,System.IntegerDivisionError>::GetOkCase()
+    call instance System.Result.Ok<Int32>::get_Value()
     ldc.i4 42
     ceq
     brtrue DivisionPassed

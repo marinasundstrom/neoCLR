@@ -68,9 +68,9 @@ and compatibility with existing .NET tooling are later work, not achieved by usi
    failed queries and independent value copies. Fully qualified names select them while
    short Option/Result spellings still denote bootstrap categories. Migrate existing
    APIs and host/native adapters before removing that temporary distinction.
-   Int32.Parse, Math.Abs, Console.ReadByte and File.ReadAllText use canonical ordinary
+   Int32.Parse, Int32.Divide, Math.Abs, Console.ReadByte and File.ReadAllText use canonical ordinary
    nested-case returns, including the console/file native boundaries. There are no
-   parallel Typed APIs. Divide and slicing still use bootstrap carriers.
+   parallel Typed APIs. Slicing still uses bootstrap carriers.
 4. **Replace and remove the bootstrap union system.** Migrate library methods, native/host
    adapters, samples, and tests to ordinary types and calls. Delete the six special
    instructions and special Option/Result type/value dispatch. Make the metadata break

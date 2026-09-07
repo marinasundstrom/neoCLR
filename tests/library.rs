@@ -1,7 +1,5 @@
 use neoclr::{
-    Limits, Value, assemble, library, load,
-    metadata::{Case, Instruction, Type},
-    run, run_with_library,
+    Limits, Value, assemble, library, load, metadata::Instruction, run, run_with_library,
 };
 
 fn app(body: &str, returns: &str) -> neoclr::Module {
@@ -61,7 +59,7 @@ fn platform_abs_handles_signs_and_overflow() {
     ] {
         let result = run(
             &app(
-                &format!("ldc.i4 {value}\ncall System.Math.Abs(int32)\ncall instance System.Result<Int32,Error>::GetOkCase()\ncall instance System.Result.Ok<Int32>::get_Value()"),
+                &format!("ldc.i4 {value}\ncall System.Math.Abs(int32)\ncall instance System.Result<Int32,System.OverflowError>::GetOkCase()\ncall instance System.Result.Ok<Int32>::get_Value()"),
                 "Int32",
             ),
             Limits::default(),
@@ -71,7 +69,7 @@ fn platform_abs_handles_signs_and_overflow() {
     }
     let result = run(
         &app(
-            "ldc.i4 -2147483648\ncall System.Math.Abs(int32)\ncall instance System.Result<Int32,Error>::GetErrorCase()\ncall instance System.Result.Error<Error>::get_Value()",
+            "ldc.i4 -2147483648\ncall System.Math.Abs(int32)\ncall instance System.Result<Int32,System.OverflowError>::GetErrorCase()\ncall instance System.Result.Error<System.OverflowError>::get_Value()\ncall instance System.OverflowError::ToString()\ncall System.Error::FromMessage(String)",
             "Error",
         ),
         Limits::default(),
@@ -109,38 +107,29 @@ fn div_truncates_toward_zero_and_faults_without_library_handling() {
         );
         let result = run(
             &app(
-                &format!("ldc.i4 {a}\nldc.i4 {b}\ncall System.Int32.Divide(int32, int32)"),
-                "Result<Int32,Error>",
+                &format!("ldc.i4 {a}\nldc.i4 {b}\ncall System.Int32.Divide(int32, int32)\ncall instance System.Result<Int32,System.IntegerDivisionError>::get_IsErrorCase()"),
+                "Boolean",
             ),
             Limits::default(),
         )
         .unwrap();
-        assert!(matches!(
-            result.value,
-            Value::Union {
-                case: Case::Err,
-                ..
-            }
-        ));
+        assert_eq!(result.value, Value::Boolean(true));
     }
 }
 
 #[test]
 fn supplied_compiled_library_body_is_executed() {
     let mut compiled = library::system().unwrap().clone();
+    let body = assemble(".module Replacement\n.function F() -> System.Result<Int32,System.IntegerDivisionError>\nldc.i4 123\nnewobj instance System.Result.Ok<Int32>::.ctor(Int32)\nnewobj instance System.Result<Int32,System.IntegerDivisionError>::.ctor(System.Result.Ok<Int32>)\nret\n.end").unwrap().functions[0].body.clone();
     compiled
         .functions
         .iter_mut()
         .find(|f| f.name == "System.Int32.Divide")
         .unwrap()
-        .body = vec![
-        Instruction::Int(123),
-        Instruction::Ok(Type::Error),
-        Instruction::Return,
-    ];
+        .body = body;
     let loaded = load(&serde_json::to_string(&compiled).unwrap()).unwrap();
     let application = app(
-        "ldc.i4 84\nldc.i4 2\ncall System.Int32.Divide(int32, int32)\nldcase Ok",
+        "ldc.i4 84\nldc.i4 2\ncall System.Int32.Divide(int32, int32)\ncall instance System.Result<Int32,System.IntegerDivisionError>::GetOkCase()\ncall instance System.Result.Ok<Int32>::get_Value()",
         "Int32",
     );
     assert_eq!(
