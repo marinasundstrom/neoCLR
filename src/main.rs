@@ -1,50 +1,138 @@
-use neoclr::{Fault, Limits, assemble, load, run_with_native};
+use neoclr::{Limits, assemble, load};
 use std::{
     env, fs,
     io::{self, Write},
     process::ExitCode,
 };
 
+const USAGE: &str = "Usage:
+  neoclr assemble <source.neoil> <output.neo.json> [--module <input>]... [--system <input>]
+  neoclr run <input> [System.neo.json] [--module <input>]... [--system <input>]
+  neoclr check <input> [--module <input>]... [--system <input>]
+  neoclr verify <input> [--module <input>]... [--system <input>]
+Inputs ending in .neoil are sources; other module inputs are JSON artifacts.";
+
+fn read(path: &str) -> Result<String, String> {
+    fs::read_to_string(path).map_err(|e| format!("Cannot read {path}: {e}"))
+}
+
 fn execute(args: &[String]) -> Result<Vec<String>, String> {
-    match args {
-        [command, input, output] if command == "assemble" => {
-            let source = fs::read_to_string(input).map_err(|e| format!("Cannot read {input}: {e}"))?;
-            let module = assemble(&source).map_err(|e| e.to_string())?;
-            let json = serde_json::to_string_pretty(&module).map_err(|e| e.to_string())?;
-            // Refuse to silently overwrite source or existing artifacts.
-            let mut file = fs::OpenOptions::new().write(true).create_new(true).open(output).map_err(|e| format!("Cannot create {output}: {e}"))?;
+    let command = args.first().map(String::as_str).ok_or(USAGE)?;
+    if !matches!(command, "assemble" | "run" | "check" | "verify") {
+        return Err(USAGE.into());
+    }
+    let required = if command == "assemble" { 3 } else { 2 };
+    if args.len() < required || args[1..required].iter().any(|s| s.starts_with("--")) {
+        return Err(USAGE.into());
+    }
+    let mut paths = vec![args[1].as_str()];
+    let mut system_path = None;
+    let mut options = args[required..].iter();
+    while let Some(option) = options.next() {
+        match option.as_str() {
+            "--module" | "--system" => {
+                let path = options
+                    .next()
+                    .filter(|path| !path.starts_with("--"))
+                    .ok_or_else(|| format!("Missing input for {option}\n{USAGE}"))?;
+                if option == "--module" {
+                    paths.push(path.as_str());
+                } else if system_path.replace(path.as_str()).is_some() {
+                    return Err("System input specified more than once".into());
+                }
+            }
+            path if command == "run" && !path.starts_with('-') && system_path.is_none() => {
+                system_path = Some(path);
+            }
+            _ => return Err(format!("Unexpected argument {option}\n{USAGE}")),
+        }
+    }
+
+    let texts = paths
+        .iter()
+        .map(|path| read(path))
+        .collect::<Result<Vec<_>, _>>()?;
+    let (modules, program) = if paths.len() == 1 && system_path.is_none() {
+        // Preserve standalone System assembly/analysis and existing single-input behavior.
+        let module = if command == "assemble" || paths[0].ends_with(".neoil") {
+            assemble(&texts[0])
+        } else {
+            load(&texts[0])
+        }
+        .map_err(|e| e.to_string())?;
+        let program = neoclr::LoadedProgram::new(&module).map_err(|e| e.to_string())?;
+        (vec![module], program)
+    } else {
+        let system = if let Some(path) = system_path {
+            let text = read(path)?;
+            if path.ends_with(".neoil") {
+                assemble(&text)
+            } else {
+                load(&text)
+            }
+            .map_err(|e| e.to_string())?
+        } else {
+            neoclr::library::system()
+                .map_err(|e| e.to_string())?
+                .clone()
+        };
+        let inputs: Vec<_> = texts
+            .iter()
+            .enumerate()
+            .map(|(index, text)| {
+                if (command == "assemble" && index == 0) || paths[index].ends_with(".neoil") {
+                    neoclr::assembler::ModuleInput::Source(text)
+                } else {
+                    neoclr::assembler::ModuleInput::Json(text)
+                }
+            })
+            .collect();
+        let modules =
+            neoclr::assembler::read_modules(&inputs, &system).map_err(|e| e.to_string())?;
+        let program = neoclr::LoadedProgram::with_modules(&modules[0], &system, &modules[1..])
+            .map_err(|e| e.to_string())?;
+        (modules, program)
+    };
+    let module = &modules[0];
+    match command {
+        "assemble" => {
+            let output = &args[2];
+            let json = serde_json::to_string_pretty(module).map_err(|e| e.to_string())?;
+            // Validate everything before creating the one requested artifact; preserve no-overwrite behavior.
+            let mut file = fs::OpenOptions::new()
+                .write(true)
+                .create_new(true)
+                .open(output)
+                .map_err(|e| format!("Cannot create {output}: {e}"))?;
             file.write_all(json.as_bytes()).map_err(|e| e.to_string())?;
             Ok(vec![format!("Assembled {} -> {output}", module.name)])
         }
-        [command, input, library] if command == "run" => {
-            let source = fs::read_to_string(input).map_err(|e| e.to_string())?;
-            let module = if input.ends_with(".neoil") { assemble(&source) } else { load(&source) }.map_err(|e| e.to_string())?;
-            let source = fs::read_to_string(library).map_err(|e| e.to_string())?;
-            let library = load(&source).map_err(|e| e.to_string())?;
-            // CLI run executes the user-selected program and its native imports as trusted code.
-            unsafe { run_with_native(&module, &library, Limits::default()) }.map(|execution| {
-                let mut lines = execution.output;
-                lines.push(format!("=> {:?}", execution.value));
-                lines
-            }).map_err(|e| e.to_string())
+        "check" => Ok(vec![format!(
+            "{}: metadata valid (execution types checked at runtime)",
+            module.name
+        )]),
+        "verify" => {
+            let report = program.verify().map_err(|e| e.to_string())?;
+            let maximum = report
+                .functions
+                .iter()
+                .map(|f| f.maximum_stack)
+                .max()
+                .unwrap_or(0);
+            Ok(vec![format!(
+                "{}: typed-stack/control-flow verification passed ({} IL functions; maximum stack {maximum}; runtime value checks remain)",
+                module.name,
+                report.functions.len()
+            )])
         }
-        [command, input] if command == "run" || command == "check" || command == "verify" => {
-            let source = fs::read_to_string(input).map_err(|e| format!("Cannot read {input}: {e}"))?;
-            let module = if input.ends_with(".neoil") { assemble(&source) } else { load(&source) }.map_err(|e| e.to_string())?;
-            if command == "verify" {
-                let report = neoclr::verify(&module).map_err(|e| e.to_string())?;
-                let maximum = report.functions.iter().map(|f| f.maximum_stack).max().unwrap_or(0);
-                return Ok(vec![format!("{}: typed-stack/control-flow verification passed ({} IL functions; maximum stack {maximum}; runtime value checks remain)", module.name, report.functions.len())]);
-            }
-            if command == "check" { return Ok(vec![format!("{}: metadata valid (execution types checked at runtime)", module.name)]); }
-            // CLI run executes the user-selected program and its native imports as trusted code.
-            unsafe { run_with_native(&module, neoclr::library::system().map_err(|e| e.to_string())?, Limits::default()) }.map(|execution| {
-                let mut lines = execution.output;
-                lines.push(format!("=> {:?}", execution.value));
-                lines
-            }).map_err(|fault: Fault| fault.to_string())
+        _ => {
+            // SAFETY: CLI run treats the user-selected program and native imports as trusted code.
+            let execution =
+                unsafe { program.run_with_native(Limits::default()) }.map_err(|e| e.to_string())?;
+            let mut lines = execution.output;
+            lines.push(format!("=> {:?}", execution.value));
+            Ok(lines)
         }
-        _ => Err("Usage:\n  neoclr assemble <source.neoil> <output.neo.json>\n  neoclr run <source.neoil|module.neo.json> [System.neo.json]\n  neoclr check <source.neoil|module.neo.json>\n  neoclr verify <source.neoil|module.neo.json>".into()),
     }
 }
 

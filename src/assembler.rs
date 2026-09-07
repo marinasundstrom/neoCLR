@@ -22,23 +22,48 @@ pub fn assemble(source: &str) -> Result<Module, Fault> {
 /// Assemble sources together with bundled System. The first source is the root;
 /// remaining sources are library modules. Returns source artifacts in input order.
 pub fn assemble_modules(sources: &[&str]) -> Result<Vec<Module>, Fault> {
-    if sources.is_empty() {
-        return Err(Fault::new("expected at least one module source"));
-    }
-    let parsed = sources
+    let inputs: Vec<_> = sources
         .iter()
-        .map(|source| parse_parts(source))
+        .map(|source| ModuleInput::Source(source))
+        .collect();
+    read_modules(&inputs, crate::library::system()?)
+}
+
+/// An explicitly classified source or serialized metadata artifact.
+pub enum ModuleInput<'a> {
+    Source(&'a str),
+    Json(&'a str),
+}
+
+/// Parse and validate a mixed module set against a supplied System artifact.
+/// First input is the root; remaining inputs are dependencies. Returned source
+/// artifacts retain their identities and scopes, including absent legacy rows.
+pub fn read_modules(inputs: &[ModuleInput<'_>], library: &Module) -> Result<Vec<Module>, Fault> {
+    if inputs.is_empty() {
+        return Err(Fault::new("expected at least one module input"));
+    }
+    let parsed = inputs
+        .iter()
+        .map(|input| match input {
+            ModuleInput::Source(source) => parse_parts(source),
+            ModuleInput::Json(json) => serde_json::from_str::<Module>(json)
+                .map(|module| (module, vec![]))
+                .map_err(|error| Fault::new(format!("invalid module: {error}"))),
+        })
         .collect::<Result<Vec<_>, _>>()?;
-    let mut context = crate::library::system()?.clone();
+    let mut context = library.clone();
+    context.normalize_definition_ids()?;
     for (module, _) in &parsed {
-        context.types.extend(module.types.iter().cloned());
+        let mut normalized = module.clone();
+        normalized.normalize_definition_ids()?;
+        context.types.extend(normalized.types);
     }
     let mut modules = Vec::new();
     for (mut module, fixups) in parsed {
         resolve_fields(&mut module, &context, fixups)?;
         modules.push(module);
     }
-    crate::library::link_modules(&modules[0], crate::library::system()?, &modules[1..])?;
+    crate::library::link_modules(&modules[0], library, &modules[1..])?;
     Ok(modules)
 }
 

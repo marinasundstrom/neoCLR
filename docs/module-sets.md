@@ -59,5 +59,6 @@ Build-local row identities do not establish compatibility across artifact replac
 
 The example under `examples/modules/` separates the entry point, an operation, and a
 generic Box type into three neoIL sources. `cargo run --example modules` assembles the
-set, verifies it, and prints `42`. The existing CLI still operates on one source/artifact
-at a time; module-set loading is currently exposed through the Rust API and example.
+set, verifies it, and prints `42`. The [CLI](cli-module-sets.md) also supports explicit
+sets through repeatable `--module` arguments and an optional `--system` input, including
+mixed sources and JSON artifacts.

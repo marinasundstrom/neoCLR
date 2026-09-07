@@ -1061,3 +1061,33 @@ future work. No runtime ownership or execution-mode policy changes were introduc
 Validation: all 271 integration tests pass on macOS ARM64; formatting, clippy with
 warnings denied, and diff checks pass. The revisions example verifies and prints 42.
 Linux and Windows execution remain for CI.
+
+
+## 2026-09-07 — CLI module sets and mixed source/artifact inputs
+
+Added repeatable --module inputs and an optional --system selection to assemble,
+run, check, and verify. The existing positional System argument for run remains
+supported. Mixed neoIL and JSON inputs now resolve as one explicit module set,
+including scoped field aliases against imported legacy metadata. Assembly validates
+all inputs before creating its one requested artifact and preserves no-overwrite
+behavior; dependencies remain unchanged.
+
+Added ModuleInput and assembler::read_modules as the shared reader for mixed sets,
+with existing source-only and JSON-only group helpers routed through it. Definition
+rows are derived in a resolution context without rewriting absent legacy rows in
+returned artifacts. The CLI prepares LoadedProgram against the selected System from
+initial resolution, fixing the former requirement that an application first resolve
+against bundled System before using a custom runtime library.
+
+Added four CLI integration tests for source-set execution/checking/verification,
+staged mixed compilation and artifact preservation, custom revision-pinned System
+selection including the legacy positional form, malformed flags, and revision mismatch
+failure before output creation. Documented runnable module and artifact workflows.
+
+Module discovery, automatic builds, scoped internal type keys, and side-by-side
+versions remain pending. Native execution trust, verification policy, and default
+resource limits are unchanged.
+
+Validation: all 275 integration tests pass on macOS ARM64; formatting, clippy with
+warnings denied, and diff checks pass. CLI tests run the scoped and revision-pinned
+samples and confirm their outputs. Linux and Windows execution remain for CI.

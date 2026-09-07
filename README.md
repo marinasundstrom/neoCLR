@@ -69,6 +69,16 @@ cargo run -- run examples/checked-conversions.neoil
 cargo run -- run examples/fault.neoil
 ```
 
+Multi-module programs can run directly from sources or artifacts:
+
+```sh
+cargo run -- run examples/modules/app.neoil \
+  --module examples/modules/operations.neoil --module examples/modules/models.neoil
+```
+
+`assemble`, `check`, and `verify` accept the same dependency flags. Use `--system`
+to select a runtime library; see the [CLI module workflow](docs/cli-module-sets.md).
+
 HelloWorld prints:
 
 ```text

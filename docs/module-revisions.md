@@ -58,3 +58,5 @@ versions, automatic dependency discovery, content verification, and binary forma
 mapping remain future work.
 
 `cargo run --example revisions` loads a pinned Answers dependency and prints 42.
+The equivalent CLI invocation is `cargo run -- run examples/revisions/app.neoil
+--module examples/revisions/answers.neoil`.
