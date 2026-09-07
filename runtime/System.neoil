@@ -289,6 +289,18 @@
         fault "Array length must be non-negative"
     .end
 
+    .method static View(T* data, Int32 length) -> System.Array<T>
+        ldarg length
+        ldc.i4 0
+        blt InvalidLength
+        ldarg data
+        ldarg length
+        newobj System.Array<T>
+        ret
+    InvalidLength:
+        fault "Array length must be non-negative"
+    .end
+
     .method instance get_Length() -> Int32
         ldarg this
         ldfld System.Array<T>::Length
