@@ -400,3 +400,5 @@ Non-generic unions can nest cases directly; `cargo run -- run examples/non_gener
 demonstrates that form.
 `cargo run -- run examples/system_companions.neoil` constructs a nested System result case.
 `cargo run -- run examples/union_extract.neoil` demonstrates discriminator-then-accessor extraction.
+
+neoCLR is licensed under the [MIT License](LICENSE).

@@ -3,6 +3,7 @@ name = "neoclr"
 version = "0.1.0"
 edition = "2024"
 description = "An experimental standalone interpreter for neoCLR"
+license = "MIT"
 publish = false
 
 [dependencies]
