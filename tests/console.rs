@@ -220,6 +220,22 @@ fn byte_input_uses_typed_local_storage_before_integer_arithmetic() {
 }
 
 #[test]
+fn typed_console_adapter_exposes_nested_cases() {
+    let module = assemble(
+        ".module App\n.entry Main\n.function Main() -> Int32\ncall System.Console::ReadByteTyped()\ncall instance System.Result<System.Option<Byte>,System.Error>::GetOkCase()\ncall instance System.Result.Ok<System.Option<Byte>>::get_Value()\ncall instance System.Option<System.Byte>::GetSomeCase()\ncall instance System.Option.Some<System.Byte>::get_Value()\nret\n.end",
+    )
+    .unwrap();
+    let module = neoclr::load(&serde_json::to_string(&module).unwrap()).unwrap();
+    let program = LoadedProgram::with_library(&module, neoclr::library::system().unwrap()).unwrap();
+    program.verify().unwrap();
+    let console = TestConsole::input(&[42]);
+    assert_eq!(
+        program.run(options(console)).unwrap().value,
+        Value::Int32(42)
+    );
+}
+
+#[test]
 fn cli_flushes_prompt_before_waiting_for_redirected_input_without_duplicate_output() {
     use std::{
         io::{BufRead, Read, Write},

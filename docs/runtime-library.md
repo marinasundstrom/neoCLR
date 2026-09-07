@@ -25,6 +25,9 @@ needs and the primitives required to implement them in platform code.
 - The UnionAttribute marker has an ordinary IL constructor.
 - `System.Console.ReadByte()` exposes optional raw input through a host-supplied console;
   see [console I/O](console-io.md).
+- `System.Console.ReadByteTyped()` adapts that host boundary to the ordinary nested
+  `System.Result<System.Option<Byte>,System.Error>` carrier. EOF is `Option.None`,
+  a byte is `Option.Some<Byte>`, and host read failures are `Result.Error<System.Error>`.
 - `System.Console.WriteLine(string)` calls the host output primitive.
 - `System.Console.WriteLine(int32)` calls the Int32 receiver's `ToString()` and then
   the string overload.

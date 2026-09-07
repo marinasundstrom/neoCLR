@@ -288,6 +288,7 @@ These are ordinary functions compiled from [System.neoil](../runtime/System.neoi
 | Symbol | Parameters | Return |
 | --- | --- | --- |
 | `System.Console.ReadByte` | none | `Result<Option<Byte>,Error>` |
+| `System.Console.ReadByteTyped` | none | `System.Result<System.Option<Byte>,System.Error>` (ordinary nested cases) |
 | `System.Console.WriteLine` | `String` | `Void` |
 | `System.Console.WriteLine` | `Int32` | `Void` |
 | `System.Int32.ToString` | instance receiver `Int32`, no parameters | `String` |
