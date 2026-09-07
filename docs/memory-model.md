@@ -55,6 +55,11 @@ case requires selecting exclusive borrowing as the only solution.
 
 ## Current priority
 
+The next lifecycle proposal is [destruction, Disposable and Closable](lifecycle.md).
+It develops explicit copy/move and lifetime-ending operations, unique ownership
+before counted ownership, and the normal-exit/Fault boundary. These are proposed
+extensions; the implemented preview contracts below remain unchanged.
+
 Heap allocation and native pointers are implemented, as are call-scoped managed
 references and interface views. Stabilize their contracts and the Preview 1 programs.
 Defer reference counting, GC, automatic destruction, ownership-aware copy/move behavior,

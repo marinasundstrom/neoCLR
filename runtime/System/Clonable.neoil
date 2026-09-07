@@ -1,0 +1,5 @@
+; Explicit cloning through a borrowed receiver; ordinary value copies do not call it.
+.interface System.Clonable<T>
+    .method instance byref Clone() -> T
+    .end
+.end

@@ -2582,3 +2582,33 @@ source/artifact walkthrough and doc-test stage. Checked all 217 local Markdown
 links and heading targets in the twelve edited reference documents, and git diff
 --check passed. This cleanup changes documentation only; runtime behavior and
 artifact encodings are unchanged.
+
+## Lifecycle design follow-up — 2026-09-07
+
+Developed the destructor and Disposable/Closable discussion into lifecycle.md.
+Separated value destruction, explicit resource disposal, fallible close and final
+owning-reference release. Preserved values by default, explicit reference passing
+and deterministic lifetimes as the platform direction. Proposed explicit transfer,
+lifetime-end semantics, runtime reference invalidation, nested-field destruction
+order and bounded ordinary execution of destructor bodies. Recorded the lack of
+a guest-destructor guarantee after terminal Faults and the separate host-resource
+teardown requirement.
+
+Grounded the first implementation gate in current Slot cloning/replacement, frame
+transfers, interface receiver modes, raw native storage and ArrayList descriptor
+aliasing. The proposal includes a copying-path audit and concrete acceptance cases;
+it introduces no executable destruction or ownership behavior. A unique wrapper is
+an optional bounded experiment, not the default contract for types with destructors.
+
+Implemented System.Clonable<T> with ordinary byref Clone() -> T interface dispatch.
+Ordinary value copying remains independent of Clone. Added a generic String-record
+sample and tests for source/artifact execution, original/clone independence, invalid
+conformance and receiver/return signatures, and explicit dispatch versus implicit
+copying. Source preservation and resource sharing are documented implementation
+obligations; readonly enforcement and automatic ownership are not implied.
+
+Validation: all 524 tests passed in one uninterrupted cargo test --locked run;
+doc tests, strict all-target Clippy, formatting and diff whitespace checks passed.
+All 149 local documentation links and heading targets in the changed/new documents
+were checked. The new interface adds ordinary System metadata; no VM opcode or
+artifact format change was needed.

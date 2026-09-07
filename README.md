@@ -37,6 +37,9 @@ and lifetime choices, a real `Void` value, functions outside types, `Option<T>` 
 Interfaces use ordinary names without an `I` prefix.
 [Borrowed interface references](docs/interfaces.md) make dispatch explicit without boxing or ownership.
 [Typed equality](docs/equality.md) uses System.Equatable<T> and Equals(T).
+[Explicit cloning](docs/cloning.md) uses System.Clonable<T> and Clone(), independently
+of ordinary value copies. [Deterministic lifecycle design](docs/lifecycle.md)
+develops destruction, ownership and Disposable/Closable contracts as the next foundation.
 
 ## Preview 1
 

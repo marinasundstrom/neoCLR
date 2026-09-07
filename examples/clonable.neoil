@@ -1,0 +1,42 @@
+.module ClonableDemo
+.entry Main
+
+.type Snapshot<T>
+    .implements System.Clonable<Snapshot<T>>
+    .field Payload T
+    .method instance byref Clone() -> Snapshot<T>
+        ldarg this
+        ldobj Snapshot<T>
+        ret
+    .end
+.end
+
+.function CopySnapshot(System.Clonable<Snapshot<String>>& source) -> Snapshot<String>
+    ldarg source
+    callvirt instance System.Clonable<Snapshot<String>>::Clone()
+    ret
+.end
+
+.function Main() -> Void
+    .local Snapshot<String> original
+    .local Snapshot<String> cloned
+    ldstr "original"
+    newobj Snapshot<String>
+    stloc original
+    ldloca original
+    interface.borrow System.Clonable<Snapshot<String>>
+    call CopySnapshot(System.Clonable<Snapshot<String>>&)
+    stloc cloned
+    ldloc cloned
+    ldstr "changed clone"
+    stfld Snapshot<String>::Payload
+    stloc cloned
+    ldloc original
+    ldfld Snapshot<String>::Payload
+    call System.Console::WriteLine(String)
+    pop
+    ldloc cloned
+    ldfld Snapshot<String>::Payload
+    call System.Console::WriteLine(String)
+    ret
+.end

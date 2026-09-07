@@ -28,6 +28,8 @@ demonstrates byref interface dispatch that changes an inline field.
 
 [System.Equatable<T>](equality.md) supplies typed Equals(T) dispatch for primitives,
 type descriptors and user-defined records through the same managed views.
+[System.Clonable<T>](cloning.md) supplies explicit Clone() dispatch with a byref
+receiver, independently of ordinary value copying.
 
 The following sections describe the retained native-pointer view specifically.
 
