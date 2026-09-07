@@ -109,6 +109,7 @@ cargo run --locked -- run examples/strings.neoil
 cargo run --locked -- run examples/errors.neoil
 cargo run --locked -- run examples/file_input.neoil
 cargo run --locked -- run examples/console_input.neoil
+printf 'A' | cargo run --locked -- run examples/console_typed.neoil
 cargo run --locked -- run examples/properties.neoil
 cargo run --locked -- run examples/constructors.neoil
 cargo run --locked -- run examples/ordinary_carrier.neoil

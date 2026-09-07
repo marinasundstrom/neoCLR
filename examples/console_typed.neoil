@@ -1,0 +1,30 @@
+.module ConsoleTyped
+.entry Main
+
+; Demonstrates the ordinary nested Result<Option<Byte>,Error> Console API.
+.function Main() -> Void
+    call System.Console::ReadByteTyped()
+    dup
+    call instance System.Result<System.Option<Byte>,System.Error>::get_IsErrorCase()
+    brtrue Failed
+    call instance System.Result<System.Option<Byte>,System.Error>::GetOkCase()
+    call instance System.Result.Ok<System.Option<Byte>>::get_Value()
+    dup
+    call instance System.Option<Byte>::get_IsNone()
+    brtrue EndOfInput
+    call instance System.Option<Byte>::GetSomeCase()
+    call instance System.Option.Some<Byte>::get_Value()
+    call System.Console::WriteLine(Int32)
+    ret
+Failed:
+    call instance System.Result<System.Option<Byte>,System.Error>::GetErrorCase()
+    call instance System.Result.Error<System.Error>::get_Value()
+    call instance System.Error::ToString()
+    call System.Console::WriteLine(String)
+    ret
+EndOfInput:
+    pop
+    ldstr "End of input"
+    call System.Console::WriteLine(String)
+    ret
+.end
