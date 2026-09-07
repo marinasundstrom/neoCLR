@@ -1975,3 +1975,25 @@ including Parse's missing format/overflow distinction, checked arithmetic, UTF-8
 console EOF versus failures, and bounded file input. The review specifies canonical API
 migration, ordinary nested error cases, structured native outcomes, and acceptance tests.
 It does not implement these proposed types or silently change output Fault policy.
+
+## Int32 parsing errors as ordinary nested cases
+
+Implemented System.Int32ParseError with directly nested InvalidFormat/Overflow cases,
+constructors, predicate properties, checked extraction and ToString. Canonical Parse
+now returns System.Result<Int32,System.Int32ParseError>; success and error construction
+remain platform IL. The existing native binding returns an explicitly erased Int32
+success or Byte status (1 format, 2 overflow), with unexpected codes faulting in IL.
+It no longer uses diagnostic text or generic Error to classify parse failure.
+
+The host validates the complete optional-sign/ASCII-digit grammar before numeric
+conversion, so malformed input takes precedence over overflow. Tests cover limits,
+long inputs, leading zeros, Unicode digits, whitespace, embedded NUL, format precedence,
+case identity, formatting, and Faults on mismatched extraction. Updated all checked-in
+Parse consumers. Samples combining file/domain failures explicitly translate typed
+parse errors at their application boundary. Added the source to the System manifest
+without reordering existing definitions. The signature/native payload change requires
+reassembly of System and applications together.
+
+Validation: all 446 tests pass, along with formatting, clippy with warnings denied,
+and diff checks. Errors, file-input and features samples assemble, verify and run
+against an explicitly rebuilt System artifact on macOS ARM64.

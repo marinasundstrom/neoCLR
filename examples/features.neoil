@@ -84,14 +84,13 @@ NonePassed:
     ldstr "not a number"
     call System.Int32.Parse(string)
     dup
-    call instance System.Result<Int32,Error>::get_IsErrorCase()
+    call instance System.Result<Int32,System.Int32ParseError>::get_IsErrorCase()
     brtrue ParseFailed
     fault "expected parse error"
 ParseFailed:
-    call instance System.Result<Int32,Error>::GetErrorCase()
-    call instance System.Result.Error<Error>::get_Value()
-    error "InvalidInt32"
-    ceq
+    call instance System.Result<Int32,System.Int32ParseError>::GetErrorCase()
+    call instance System.Result.Error<System.Int32ParseError>::get_Value()
+    call instance System.Int32ParseError::get_IsInvalidFormat()
     brtrue ParseHandled
     fault "wrong parse error"
 ParseHandled:

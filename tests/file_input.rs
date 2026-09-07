@@ -120,7 +120,7 @@ fn sample_round_trips_verifies_computes_and_handles_parse_errors() {
     program.verify().unwrap();
     assert_eq!(
         program.run(Limits::default()).unwrap().output,
-        ["42", "InvalidInt32", "File input handled"]
+        ["42", "InvalidFormat", "File input handled"]
     );
     let fixture = Fixture::new();
     let report = program

@@ -1,0 +1,75 @@
+.type System.Int32ParseError
+    .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
+    .field private Stored System.Value
+    .type InvalidFormat
+        .method instance .ctor() -> Void
+            ldvoid
+            ret
+        .end
+    .end
+    .method instance .ctor(System.Int32ParseError.InvalidFormat value) -> Void
+        ldarg value
+        value.pack System.Int32ParseError.InvalidFormat
+        newobj System.Int32ParseError
+        starg this
+        ldvoid
+        ret
+    .end
+    .property instance IsInvalidFormat() -> Boolean
+        .get instance System.Int32ParseError::get_IsInvalidFormat()
+    .end
+    .method instance get_IsInvalidFormat() -> Boolean
+        ldarg this
+        ldfld 0
+        value.is System.Int32ParseError.InvalidFormat
+        ret
+    .end
+    .method instance GetInvalidFormat() -> System.Int32ParseError.InvalidFormat
+        ldarg this
+        ldfld 0
+        value.unpack System.Int32ParseError.InvalidFormat
+        ret
+    .end
+    .type Overflow
+        .method instance .ctor() -> Void
+            ldvoid
+            ret
+        .end
+    .end
+    .method instance .ctor(System.Int32ParseError.Overflow value) -> Void
+        ldarg value
+        value.pack System.Int32ParseError.Overflow
+        newobj System.Int32ParseError
+        starg this
+        ldvoid
+        ret
+    .end
+    .property instance IsOverflow() -> Boolean
+        .get instance System.Int32ParseError::get_IsOverflow()
+    .end
+    .method instance get_IsOverflow() -> Boolean
+        ldarg this
+        ldfld 0
+        value.is System.Int32ParseError.Overflow
+        ret
+    .end
+    .method instance GetOverflow() -> System.Int32ParseError.Overflow
+        ldarg this
+        ldfld 0
+        value.unpack System.Int32ParseError.Overflow
+        ret
+    .end
+    .method instance ToString() -> String
+        ldarg this
+        call instance System.Int32ParseError::get_IsInvalidFormat()
+        brfalse Overflow
+        ldstr "InvalidFormat"
+        ret
+    Overflow:
+        ldarg this
+        call instance System.Int32ParseError::GetOverflow()
+        pop
+        ldstr "Overflow"
+        ret
+    .end
+.end

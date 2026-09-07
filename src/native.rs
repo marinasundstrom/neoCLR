@@ -82,9 +82,16 @@ impl Binding {
                 crate::file_io::read_all_text(path, *max_bytes)
             }
             (Self::ParseInt32, [Value::String(text)]) => {
-                let payload = match text.parse::<i32>() {
-                    Ok(n) => Value::Int32(n),
-                    Err(_) => Value::Error("InvalidInt32".into()),
+                // Validate the whole grammar first: malformed text wins over overflow.
+                // Byte 1 = InvalidFormat, Byte 2 = Overflow; Int32 = success.
+                let digits = text.strip_prefix(['+', '-']).unwrap_or(text);
+                let payload = if digits.is_empty() || !digits.bytes().all(|b| b.is_ascii_digit()) {
+                    Value::Byte(1)
+                } else {
+                    match text.parse::<i32>() {
+                        Ok(n) => Value::Int32(n),
+                        Err(_) => Value::Byte(2),
+                    }
                 };
                 Ok(Value::Erased(Box::new(payload)))
             }

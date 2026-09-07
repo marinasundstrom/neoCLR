@@ -2,16 +2,16 @@
 .entry Main
 
 .function ReadPositive(String text) -> System.Result<Int32,Error>
-    .local System.Result<Int32,Error> parsed
+    .local System.Result<Int32,System.Int32ParseError> parsed
     .local Int32 value
     ldarg text
     call System.Int32::Parse(String)
     stloc parsed
     ldloc parsed
-    call instance System.Result<Int32,Error>::get_IsErrorCase()
+    call instance System.Result<Int32,System.Int32ParseError>::get_IsErrorCase()
     brtrue ParseFailed
     ldloc parsed
-    call instance System.Result<Int32,Error>::GetOkCase()
+    call instance System.Result<Int32,System.Int32ParseError>::GetOkCase()
     call instance System.Result.Ok<Int32>::get_Value()
     stloc value
     ldloc value
@@ -26,6 +26,12 @@
     ret
 ParseFailed:
     ldloc parsed
+    call instance System.Result<Int32,System.Int32ParseError>::GetErrorCase()
+    call instance System.Result.Error<System.Int32ParseError>::get_Value()
+    call instance System.Int32ParseError::ToString()
+    call System.Error::FromMessage(String)
+    newobj instance System.Result.Error<Error>::.ctor(Error)
+    newobj instance System.Result<Int32,Error>::.ctor(System.Result.Error<Error>)
     ret
 Success:
     ldloc value

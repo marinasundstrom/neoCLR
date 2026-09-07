@@ -1,13 +1,13 @@
 # Runtime error contract review
 
 Review of the six public Result-returning methods in the current System library.
-These are proposed migration targets, not implemented signatures. Every method currently
-uses System.Error, whose message is its only payload. A caller must not have to parse
-that message to decide what to do next.
+Parse now implements the typed contract below; the other rows remain proposed migration
+targets and still use System.Error. A caller must not have to parse diagnostic text to
+decide what to do next.
 
 | Method | Current recoverable outcomes | Proposed error type and cases | Result appropriate? |
 | --- | --- | --- | --- |
-| System.Int32.Parse(String) | InvalidInt32 combines malformed input and values outside Int32 range | System.Int32ParseError: InvalidFormat, Overflow | Yes: parsing caller-supplied text is expected to fail |
+| System.Int32.Parse(String) | InvalidFormat and Overflow, distinguished structurally | System.Int32ParseError: InvalidFormat, Overflow (implemented) | Yes: parsing caller-supplied text is expected to fail |
 | System.Int32.Divide(Int32, Int32) | DivisionByZero, Overflow for minimum Int32 divided by -1 | System.IntegerDivisionError: DivisionByZero, Overflow | Yes for this checked helper; the low-level div instruction retains its Fault contract |
 | System.Math.Abs(Int32) | Overflow for minimum Int32 | System.OverflowError, an ordinary single-purpose type | Yes: preserves the selected checked Abs contract; no union is needed for a single failure kind |
 | System.String.SliceUtf8(Int32, Int32) | ArgumentOutOfRange, InvalidUtf8Boundary | System.Text.Utf8SliceError: OutOfRange, InvalidBoundary | Yes: callers can validate externally supplied byte ranges without Faults |
@@ -53,7 +53,7 @@ Output methods continue returning Void in this review; changing that contract is
 
 ## Migration order and acceptance
 
-1. Implement Int32ParseError and migrate Parse, its host boundary, applications, and tests.
+1. Completed: Int32ParseError and migration of Parse, its host boundary, applications, and tests.
    This proves a typed error union and removes the most visible collapsed classification.
 2. Implement OverflowError and IntegerDivisionError for Abs and Divide. Migrate Divide off
    bootstrap Result at the same time.

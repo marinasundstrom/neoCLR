@@ -40,3 +40,4 @@
 .include "System/Err.neoil"
 .include "System/Option.neoil"
 .include "System/Result.neoil"
+.include "System/Int32ParseError.neoil"

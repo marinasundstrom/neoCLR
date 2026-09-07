@@ -15,7 +15,7 @@ fn sample_handles_parse_and_domain_errors_and_continues() {
         result.output,
         [
             "42",
-            "InvalidInt32",
+            "InvalidFormat",
             "Expected a positive number: -1",
             "Execution continued"
         ]

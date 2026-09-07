@@ -32,7 +32,8 @@ needs and the primitives required to implement them in platform code.
 - `System.Console.WriteLine(int32)` calls the Int32 receiver's `ToString()` and then
   the string overload.
 - `System.Int32.ToString()` is an instance method that calls the formatting helper.
-- `System.Int32.Parse(string)` constructs an ordinary System.Result from an erased
+- `System.Int32ParseError` models InvalidFormat and Overflow with ordinary nested cases.
+- `System.Int32.Parse(string)` constructs an ordinary System.Result<Int32,Int32ParseError> from an erased
   host parsing payload; see [the migrated parsing boundary](int32-parse.md).
 - `System.Int32.Divide(int32, int32)` checks zero and overflow, then executes `div`
   or returns an Error. Its control flow and Result construction are platform IL.
@@ -54,7 +55,7 @@ serialized just like application functions. Tests replace the compiled Divide bo
 and confirm execution follows the replacement, rather than a hidden intrinsic.
 
 The [Result API review](runtime-error-contracts.md) inventories current failure outcomes
-and proposed operation-specific error types. Those proposed signatures are not yet implemented.
+and proposed operation-specific error types. Parse now uses Int32ParseError; the other proposed error signatures remain future work.
 
 ## Build and use
 

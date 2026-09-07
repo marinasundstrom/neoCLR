@@ -11,6 +11,21 @@
     call instance System.Result<String,System.Error>::GetOkCase()
     call instance System.Result.Ok<String>::get_Value()
     call System.Int32::Parse(String)
+    dup
+    call instance System.Result<Int32,System.Int32ParseError>::get_IsErrorCase()
+    brtrue ParseFailed
+    call instance System.Result<Int32,System.Int32ParseError>::GetOkCase()
+    call instance System.Result.Ok<Int32>::get_Value()
+    newobj instance System.Result.Ok<Int32>::.ctor(Int32)
+    newobj instance System.Result<Int32,Error>::.ctor(System.Result.Ok<Int32>)
+    ret
+ParseFailed:
+    call instance System.Result<Int32,System.Int32ParseError>::GetErrorCase()
+    call instance System.Result.Error<System.Int32ParseError>::get_Value()
+    call instance System.Int32ParseError::ToString()
+    call System.Error::FromMessage(String)
+    newobj instance System.Result.Error<Error>::.ctor(Error)
+    newobj instance System.Result<Int32,Error>::.ctor(System.Result.Error<Error>)
     ret
 Failed:
     call instance System.Result<String,System.Error>::GetErrorCase()
