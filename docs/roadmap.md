@@ -203,8 +203,9 @@ on extensive OOP or reflection. Stage the work around a small carrier/variant ex
    its getter and/or setter methods, validating signatures, owner, and call kind.
    Generic and indexed properties work without new instructions or receiver semantics.
 3. [Method accessibility](accessibility.md) now enforces public/internal/private calls
-   and public-only host member invocation, with explicit local-entry semantics. Type
-   and field accessibility remain needed to protect representation; accessor methods
+   and public-only host member invocation, with explicit local-entry semantics. Field
+   visibility now covers ordinary loads/stores/addresses and aggregate construction;
+   type visibility and construction invariants remain needed. Accessor methods
    follow the implemented method rules. Keep familiar .NET-style access levels for
    now; possible improvements to the access model are deferred.
 

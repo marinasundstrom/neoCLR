@@ -1,4 +1,4 @@
-//! Method access checks on resolved identities, not source names or call operands.
+//! Member access checks on resolved identities, not source names or call operands.
 use crate::{
     Fault, Module,
     metadata::{Function, Type, TypeDefId, Visibility},
@@ -60,4 +60,65 @@ fn declaring_type<'a>(module: &'a Module, function: &Function) -> Option<&'a Typ
         _ => module.type_definition(owner),
     }?;
     definition.definition.as_ref()
+}
+
+fn record_definition<'a>(
+    module: &'a Module,
+    owner: &Type,
+) -> Result<&'a crate::metadata::TypeDef, Fault> {
+    let definition = match owner {
+        Type::Constructed { definition, .. } => {
+            module.types.iter().find(|ty| &ty.name == definition)
+        }
+        _ => module.type_definition(owner),
+    };
+    definition.ok_or_else(|| Fault::new("field owner has no type definition"))
+}
+
+pub(crate) fn check_field(
+    module: &Module,
+    caller: &Function,
+    owner: &Type,
+    index: usize,
+) -> Result<(), Fault> {
+    let definition = record_definition(module, owner)?;
+    let field = definition
+        .fields
+        .get(index)
+        .ok_or_else(|| Fault::new("field index out of range"))?;
+    let same_module = definition
+        .definition
+        .as_ref()
+        .zip(caller.definition.as_ref())
+        .is_some_and(|(ty, method)| ty.module == method.module && ty.revision == method.revision);
+    let allowed = match field.visibility {
+        Visibility::Public => true,
+        Visibility::Internal => same_module,
+        Visibility::Private => {
+            same_module
+                && declaring_type(module, caller)
+                    .zip(definition.definition.as_ref())
+                    .is_some_and(|(a, b)| a == b)
+        }
+    };
+    if allowed {
+        Ok(())
+    } else {
+        Err(Fault::new(format!(
+            "field access denied: {}.{} is {:?}",
+            definition.name, field.name, field.visibility
+        )))
+    }
+}
+
+pub(crate) fn check_construction(
+    module: &Module,
+    caller: &Function,
+    owner: &Type,
+) -> Result<(), Fault> {
+    let definition = record_definition(module, owner)?;
+    for index in 0..definition.fields.len() {
+        check_field(module, caller, owner, index)?;
+    }
+    Ok(())
 }

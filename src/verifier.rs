@@ -367,6 +367,7 @@ fn typed_effect(
     use Type as T;
     let one = |ty| Result::Ok(vec![E(ty)]);
     let field = |owner: &Type, index: usize| -> Result<Type, crate::Fault> {
+        crate::access::check_field(module, function, owner, index)?;
         crate::vm::record_fields(module, owner, arity)?
             .get(index)
             .map(|f| f.ty.clone())

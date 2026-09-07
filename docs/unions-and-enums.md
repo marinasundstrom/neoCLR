@@ -41,12 +41,13 @@ Future implementation slices must let code express and preserve the carrier's co
 constructors establish a permitted variant, properties expose that value through explicit
 accessor associations, and accessibility can restrict representation fields and mutation
 while keeping intended constructors/readers public. Public, private, and internal are
-implemented for [method calls](accessibility.md); type and field visibility and full
-representation enforcement remain to be specified. These are ordinary type-system capabilities, not union-specific instructions.
+implemented for [method calls and ordinary field operations](accessibility.md); type
+visibility and complete construction invariants remain to be specified. These are ordinary type-system capabilities, not union-specific instructions.
 
 Current .ctor-shaped methods do not by themselves settle initialization or addressed
 receiver semantics. [Property metadata](properties.md) now supplies explicit getter/setter
-associations, including Error.Message; fields still have no enforced accessibility contract. Track these gaps separately
+associations, including Error.Message; ordinary field operations now enforce visibility.
+Construction and unsafe/host boundary guarantees remain incomplete. Track these gaps separately
 and validate them with a small carrier/variant example before claiming ordinary Option
 and Result are implementable. Extensive inheritance, virtual dispatch, reflection, and
 a full runtime library are not prerequisites for this milestone.

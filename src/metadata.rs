@@ -199,6 +199,8 @@ pub enum Representation {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Field {
+    #[serde(default, skip_serializing_if = "Visibility::is_public")]
+    pub visibility: Visibility,
     pub name: String,
     pub ty: Type,
 }
@@ -236,7 +238,7 @@ pub struct Function {
     pub body: Vec<Instruction>,
 }
 
-/// Initial method access levels, independent of type representation and allocation.
+/// Initial member access levels, independent of type representation and allocation.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Visibility {

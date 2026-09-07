@@ -1577,3 +1577,28 @@ is explicitly deferred rather than added to this slice.
 Validation: all 374 integration tests pass on macOS ARM64; formatting, clippy with
 warnings denied, and diff checks pass. The sample verifies, prints 42, and returns Void.
 Linux and Windows remain for CI.
+
+## 2026-09-07 — Field accessibility and direct construction checks
+
+Added optional public/internal/private field metadata and assembler modifiers, preserving
+public defaults and visibility through generic substitution. Ordinary field reads,
+updated-copy writes, and field-address operations check the declaring type/module
+identity. The typed verifier checks reachable operations with inferred receivers;
+unverified execution checks actual receiver types and reports Fault traces. Direct
+field-based newobj requires access to every initialized field, checked during loading
+and execution. Public factories on the declaring type can construct private fields.
+
+Added a generic Box sample with a private field, public factory/property reader, and
+WithValue method returning an updated copy. It prints both the original 21 and updated
+42. Six tests cover generic metadata/serialization, copy behavior, forbidden direct
+construction including unreachable code, indexed and named field access, field addresses,
+module revision boundaries, legacy defaults, and the trusted host-import boundary.
+
+Documented that raw memory operations and owned Rust host record imports retain their
+explicit low-level/trusted semantics. These checks do not establish constructor provenance,
+make layouts secret, or sandbox native code. Type visibility and full construction rules
+remain future fundamentals; no union instructions or ownership policies were added.
+
+Validation: all 380 integration tests pass on macOS ARM64; formatting, clippy with
+warnings denied, and diff checks pass. The sample verifies, prints 21 and 42, and returns
+Void. Linux and Windows remain for CI.

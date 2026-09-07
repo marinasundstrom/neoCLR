@@ -246,8 +246,24 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                 let (name, ty) = rest
                     .split_once(char::is_whitespace)
                     .ok_or_else(|| Fault::new("expected .field Name Type"))?;
+                let (visibility, name, ty) = match name {
+                    "public" | "internal" | "private" => {
+                        let visibility = match name {
+                            "internal" => crate::metadata::Visibility::Internal,
+                            "private" => crate::metadata::Visibility::Private,
+                            _ => crate::metadata::Visibility::Public,
+                        };
+                        let (name, ty) = ty
+                            .trim()
+                            .split_once(char::is_whitespace)
+                            .ok_or_else(|| Fault::new("expected .field [visibility] Name Type"))?;
+                        (visibility, name, ty)
+                    }
+                    _ => (crate::metadata::Visibility::Public, name, ty),
+                };
                 identifier(name)?;
                 def.fields.push(Field {
+                    visibility,
                     name: name.into(),
                     ty: bind_type_parameters(parse_type(ty)?, &def.generic_parameters),
                 });

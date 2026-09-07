@@ -509,3 +509,7 @@ An optional `public`, `internal`, or `private` precedes static/instance in a met
 declaration. Free functions accept public/internal before their signatures. Omission
 retains public visibility. These flags do not distinguish overloads or change call
 syntax. See [accessibility](accessibility.md) for enforced caller scopes.
+
+Fields accept `.field [public|internal|private] Name Type`, defaulting to public.
+Ordinary field loads/stores/addresses and direct aggregate construction enforce the
+declaring type/module rules; see [field accessibility](accessibility.md#field-accessibility).

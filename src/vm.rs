@@ -136,6 +136,7 @@ pub(crate) fn record_fields(
         .iter()
         .map(|f| {
             Ok(crate::metadata::Field {
+                visibility: f.visibility,
                 name: f.name.clone(),
                 ty: f.ty.substitute_type_parameters(arguments)?,
             })
@@ -391,6 +392,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 }
                 Op::New(ty) => {
                     record_fields(module, ty, arity)?;
+                    crate::access::check_construction(module, function, ty)?;
                 }
                 Op::SizeOf(ty)
                 | Op::AlignOf(ty)
@@ -984,6 +986,7 @@ fn interpret_frames(
                     }
                 }
                 Op::New(ty) => {
+                    crate::access::check_construction(module, &function, ty)?;
                     let definitions = module.instantiated_fields(ty)?;
                     let types: Vec<_> = definitions.iter().map(|f| f.ty.clone()).collect();
                     let fields = frame.args(&types)?;
@@ -993,11 +996,12 @@ fn interpret_frames(
                     });
                 }
                 Op::Field(i) => {
-                    let Value::Object { fields, .. } = frame.pop()? else {
+                    let Value::Object { ty, fields } = frame.pop()? else {
                         return Err(Fault::new(
                             "ldfld requires object value (use heap.load for a reference)",
                         ));
                     };
+                    crate::access::check_field(module, &function, &ty, *i)?;
                     frame.stack.push(
                         fields
                             .get(*i)
@@ -1011,6 +1015,7 @@ fn interpret_frames(
                     let Value::Object { ty, mut fields } = frame.pop()? else {
                         return Err(Fault::new("stfld requires object value"));
                     };
+                    crate::access::check_field(module, &function, &ty, *i)?;
                     let field = fields
                         .get_mut(*i)
                         .ok_or_else(|| Fault::new("field index out of range"))?;
@@ -1096,6 +1101,7 @@ fn interpret_frames(
                     if !matches!(pointer.target, Type::Named(_) | Type::Constructed { .. }) {
                         return Err(Fault::new("ldflda requires pointer to record"));
                     }
+                    crate::access::check_field(module, &function, &pointer.target, *index)?;
                     let layout = crate::memory::layout(module, &pointer.target)?;
                     frame
                         .stack

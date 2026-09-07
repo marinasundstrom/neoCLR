@@ -9,8 +9,8 @@ static methods, and read-only instance receiver snapshots. Inheritance, interfac
 virtual dispatch, mutable/by-reference receivers, general generic execution,
 and assembly-qualified identities remain future work. [Property metadata](properties.md)
 now explicitly associates ordinary getter/setter methods with declared signatures.
-[Method accessibility](accessibility.md) enforces public/internal/private calls; type
-and field visibility remain separate work.
+[Accessibility](accessibility.md) enforces public/internal/private method calls and
+ordinary field access. Type visibility remains separate work.
 
 ## Primitive identity and representation
 

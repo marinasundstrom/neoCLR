@@ -1,0 +1,45 @@
+.module FieldAccess
+.entry Main
+
+.type Box<T>
+    .field private Stored T
+    .property instance Value() -> T
+        .get instance Box<T>::Read()
+    .end
+    .method public static Create(T value) -> Box<T>
+        ldarg value
+        newobj Box<T>
+        ret
+    .end
+    .method public instance Read() -> T
+        ldarg this
+        ldfld Box<T>::Stored
+        ret
+    .end
+    .method public instance WithValue(T value) -> Box<T>
+        ldarg this
+        ldarg value
+        stfld Box<T>::Stored
+        ret
+    .end
+.end
+
+.function Main() -> Void
+    .local Box<Int32> original
+    .local Box<Int32> updated
+    ldc.i4 21
+    call Box<Int32>::Create(Int32)
+    stloc original
+    ldloc original
+    ldc.i4 42
+    call instance Box<Int32>::WithValue(Int32)
+    stloc updated
+    ldloc original
+    call instance Box<Int32>::Read()
+    call System.Console::WriteLine(Int32)
+    pop
+    ldloc updated
+    call instance Box<Int32>::Read()
+    call System.Console::WriteLine(Int32)
+    ret
+.end

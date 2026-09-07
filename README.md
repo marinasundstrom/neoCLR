@@ -98,6 +98,7 @@ cargo run --locked -- run examples/file_input.neoil
 cargo run --locked -- run examples/console_input.neoil
 cargo run --locked -- run examples/properties.neoil
 cargo run --locked -- run examples/accessibility.neoil
+cargo run --locked -- run examples/field_access.neoil
 cargo run --locked -- run examples/arrays.neoil
 cargo run --locked -- run examples/array_bounds.neoil
 ```
