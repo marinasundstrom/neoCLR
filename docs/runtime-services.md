@@ -5,6 +5,10 @@ function. This identifies work a backend must provide through helpers or inline 
 it does not prescribe native symbols, a service ABI, mandatory ownership metadata,
 or a garbage collector.
 
+Explicit erasure reports `ValueStorage`: typed payload storage, value copies, exact
+type testing and checked extraction. It does not imply native allocation or prescribe
+GC/ownership. See [value storage](value-storage.md) for the interpreter subset.
+
 ```rust
 let required = graph.required_services();
 let missing = graph.missing_services(&[

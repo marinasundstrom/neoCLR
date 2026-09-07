@@ -447,6 +447,9 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                     }
                 }
                 Op::None(ty)
+                | Op::PackValue(ty)
+                | Op::IsValue(ty)
+                | Op::UnpackValue(ty)
                 | Op::Ok(ty)
                 | Op::Err(ty)
                 | Op::NullPointer(ty)
@@ -983,6 +986,25 @@ fn interpret_frames(
                     };
                     if let Some(target) = targets.get(index as u32 as usize) {
                         frame.pc = *target;
+                    }
+                }
+                Op::PackValue(ty) => {
+                    let value = frame.pop()?.erase(ty)?;
+                    frame.stack.push(value);
+                }
+                Op::IsValue(ty) | Op::UnpackValue(ty) => {
+                    let Value::Erased(value) = frame.pop()? else {
+                        return Err(Fault::new("expected System.Value"));
+                    };
+                    if matches!(op, Op::IsValue(_)) {
+                        frame.stack.push(Value::Boolean(value.ty() == *ty));
+                    } else if value.ty() == *ty {
+                        frame.stack.push(value.on_stack());
+                    } else {
+                        return Err(Fault::new(format!(
+                            "erased value contains {:?}, requested {ty:?}",
+                            value.ty()
+                        )));
                     }
                 }
                 Op::Construct(target) => {

@@ -18,6 +18,7 @@ pub enum RuntimeService {
     ErrorValues,
     FileInput,
     ConsoleInput,
+    ValueStorage,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -82,6 +83,7 @@ fn instruction_services(op: &Op) -> &'static [RuntimeService] {
     match op {
         Op::Allocate(..) | Op::Free => &[NativeAllocation, PointerMemory],
         Op::AllocateLocal => &[FrameAllocation, PointerMemory],
+        Op::PackValue(..) | Op::IsValue(..) | Op::UnpackValue(..) => &[ValueStorage],
         Op::PointerFromInt(..)
         | Op::PointerAdd
         | Op::FieldAddress(..)

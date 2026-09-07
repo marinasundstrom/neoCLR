@@ -102,6 +102,7 @@ cargo run --locked -- run examples/file_input.neoil
 cargo run --locked -- run examples/console_input.neoil
 cargo run --locked -- run examples/properties.neoil
 cargo run --locked -- run examples/constructors.neoil
+cargo run --locked -- run examples/ordinary_carrier.neoil
 cargo run --locked -- run examples/accessibility.neoil
 cargo run --locked -- run examples/field_access.neoil
 cargo run --locked -- run examples/type_visibility.neoil
@@ -112,6 +113,7 @@ cargo run --locked -- run examples/array_bounds.neoil
 The [accessibility sample](docs/accessibility.md) demonstrates public methods and restricted helpers.
 The [property sample](docs/properties.md) demonstrates generic properties backed by ordinary methods.
 The [constructor sample](docs/constructors.md) initializes generic records through public constructors with private fields.
+The [ordinary carrier sample](docs/value-storage.md) uses explicit typed value storage and ordinary methods without union-specific instructions.
 The [console sample](docs/console-io.md) prompts for a number, reads input, and doubles it.
 The string sample demonstrates Unicode text and recoverable slice Errors. The
 [file-input sample](docs/file-input.md) reads text, computes a result, and handles invalid input. The

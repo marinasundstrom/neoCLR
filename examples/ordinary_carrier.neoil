@@ -1,0 +1,85 @@
+.module OrdinaryCarrier
+.entry Main
+
+.type Success<T>
+    .field Payload T
+.end
+.type Failure<T>
+    .field Payload T
+.end
+
+; An ordinary type with two public construction paths and private storage.
+; No union marker, tag table, or bootstrap union instruction is involved.
+.type Outcome<T,E>
+    .field private Stored System.Value
+    .method instance .ctor(Success<T> value) -> Void
+        ldarg value
+        value.pack Success<T>
+        newobj Outcome<T,E>
+        starg this
+        ldvoid
+        ret
+    .end
+    .method instance .ctor(Failure<E> value) -> Void
+        ldarg value
+        value.pack Failure<E>
+        newobj Outcome<T,E>
+        starg this
+        ldvoid
+        ret
+    .end
+    .method instance IsSuccess() -> Boolean
+        ldarg this
+        ldfld 0
+        value.is Success<T>
+        ret
+    .end
+    .method instance GetSuccess() -> T
+        ldarg this
+        ldfld 0
+        value.unpack Success<T>
+        ldfld 0
+        ret
+    .end
+    .method instance GetFailure() -> E
+        ldarg this
+        ldfld 0
+        value.unpack Failure<E>
+        ldfld 0
+        ret
+    .end
+.end
+
+.function Describe(Outcome<Int32,Int32> result) -> Void
+    ldarg result
+    call instance Outcome<Int32,Int32>::IsSuccess()
+    brfalse Failed
+    ldstr "Success"
+    call System.Console::WriteLine(String)
+    pop
+    ldarg result
+    call instance Outcome<Int32,Int32>::GetSuccess()
+    call System.Console::WriteLine(Int32)
+    ret
+Failed:
+    ldstr "Failure"
+    call System.Console::WriteLine(String)
+    pop
+    ldarg result
+    call instance Outcome<Int32,Int32>::GetFailure()
+    call System.Console::WriteLine(Int32)
+    ret
+.end
+
+.function Main() -> Void
+    ldc.i4 42
+    newobj Success<Int32>
+    newobj instance Outcome<Int32,Int32>::.ctor(Success<Int32>)
+    call Describe(Outcome<Int32,Int32>)
+    pop
+    ldc.i4 7
+    newobj Failure<Int32>
+    newobj instance Outcome<Int32,Int32>::.ctor(Failure<Int32>)
+    call Describe(Outcome<Int32,Int32>)
+    ret
+.end

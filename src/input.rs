@@ -25,6 +25,9 @@ pub(crate) fn resolve(module: &Module, parameters: &[Type]) -> Result<Vec<Input>
             ));
         }
         *remaining -= 1;
+        if *ty == Type::Value {
+            return Err(Fault::new("erased host inputs are not supported yet"));
+        }
         if ty.is_primitive() {
             return Ok(Input::Primitive(ty.clone()));
         }
@@ -90,6 +93,7 @@ impl Input {
                 if matches!(
                     value,
                     Value::Object { .. }
+                        | Value::Erased(_)
                         | Value::Union { .. }
                         | Value::Pointer(_)
                         | Value::Reference { .. }

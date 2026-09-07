@@ -192,6 +192,9 @@ normalization; other checks use exact type equality. See [integer storage](integ
 | `call Name(T0, …, Tn)` | `P0,…,Pn → R` | Call declared IL or InternalCall function |
 | `ret` | `R → caller` | Return exactly one value; no extra stack items |
 | `newobj Type` | `F0,…,Fn → Type` | Construct a closed record value in substituted field declaration order |
+| `value.pack T` | `T → System.Value` | Explicit type erasure preserving exact payload identity |
+| `value.is T` | `System.Value → Boolean` | Exact payload type test; no payload on failure |
+| `value.unpack T` | `System.Value → T` | Checked extraction; mismatch Faults; see [value storage](value-storage.md) |
 | `newobj instance Type::.ctor(T0, …, Tn)` | `P0,…,Pn → Type` | Invoke an IL constructor with a fresh receiver; see [constructor initialization](constructors.md). Normalized opcode: `newobj.ctor` |
 | `ldfld i` | `Record → T` | Copy field |
 | `stfld i` | `Record,T → Record` | Produce updated record value |

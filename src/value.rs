@@ -20,6 +20,8 @@ pub enum Value {
     Boolean(bool),
     String(String),
     Error(String),
+    /// Interpreter storage for explicit erasure, not a guest heap reference.
+    Erased(Box<Value>),
     Object {
         ty: Type,
         fields: Vec<Value>,
@@ -37,6 +39,32 @@ pub enum Value {
 }
 
 impl Value {
+    pub(crate) fn erase(self, ty: &Type) -> Result<Self, crate::Fault> {
+        let value = self.for_storage(ty)?;
+        // Erasure permits recursive value shapes. Bound their copy/drop depth before
+        // installing another wrapper, without following native pointers or Ref handles.
+        let mut pending = vec![(&value, 1usize)];
+        let mut remaining = 16_384usize;
+        while let Some((item, depth)) = pending.pop() {
+            if depth > 64 || remaining == 0 {
+                return Err(crate::Fault::new(
+                    "erased value exceeds depth or complexity limit",
+                ));
+            }
+            remaining -= 1;
+            match item {
+                Self::Erased(payload) | Self::Union { payload, .. } => {
+                    pending.push((payload, depth + 1));
+                }
+                Self::Object { fields, .. } => {
+                    pending.extend(fields.iter().map(|field| (field, depth + 1)));
+                }
+                _ => {}
+            }
+        }
+        Ok(Self::Erased(Box::new(value)))
+    }
+
     pub fn ty(&self) -> Type {
         match self {
             Self::Void => Type::Void,
@@ -56,6 +84,7 @@ impl Value {
             Self::Boolean(_) => Type::Boolean,
             Self::String(_) => Type::String,
             Self::Error(_) => Type::Error,
+            Self::Erased(_) => Type::Value,
             Self::Object { ty, .. } => ty.clone(),
             Self::Union { ty, .. } => ty.clone(),
             Self::Pointer(pointer) => Type::Ptr(Box::new(pointer.target.clone())),

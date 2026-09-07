@@ -227,6 +227,7 @@ fn effect(module: &Module, op: &Op, arity: usize) -> Result<(usize, usize), Faul
         New(ty) => (crate::vm::record_fields(module, ty, arity)?.len(), 1),
         Call(target) => (target.parameters.len() + usize::from(target.instance), 1),
         Construct(target) => (target.parameters.len(), 1),
+        PackValue(_) | IsValue(_) | UnpackValue(_) => (1, 1),
         SetField(_) | PointerAdd | HeapStore | BitAnd | BitOr | BitXor | ShiftLeft | ShiftRight
         | ShiftRightUnsigned | Remainder | RemainderUnsigned | Add | Sub | Mul | AddChecked
         | SubChecked | MulChecked | Divide | AddCheckedUnsigned | SubCheckedUnsigned
@@ -438,6 +439,18 @@ fn typed_effect(
                 stored(value, &ty)?;
             }
             Result::Ok(vec![loaded(&callee.returns)])
+        }
+        PackValue(ty) => {
+            stored(&values[0], ty)?;
+            one(Type::Value)
+        }
+        IsValue(_) => {
+            stored(&values[0], &Type::Value)?;
+            one(Type::Boolean)
+        }
+        UnpackValue(ty) => {
+            stored(&values[0], &Type::Value)?;
+            Result::Ok(vec![loaded(ty)])
         }
         Construct(target) => {
             let callee = crate::vm::resolve_constructor(module, target)?;

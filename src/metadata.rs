@@ -21,6 +21,8 @@ pub enum Type {
     Boolean,
     String,
     Error,
+    /// One explicitly erased, complete value; no reference identity or allocation policy.
+    Value,
     Named(String),
     /// An explicit source-module scope, checked and bound during preparation.
     Scoped {
@@ -62,6 +64,7 @@ impl Type {
             "Boolean" | "boolean" | "bool" | "System.Boolean" => Self::Boolean,
             "String" | "string" | "System.String" => Self::String,
             "Error" | "System.Error" => Self::Error,
+            "Value" | "System.Value" => Self::Value,
             _ => Self::Named(name.into()),
         }
     }
@@ -85,6 +88,7 @@ impl Type {
             Self::Boolean => Some("System.Boolean"),
             Self::String => Some("System.String"),
             Self::Error => Some("System.Error"),
+            Self::Value => Some("System.Value"),
             Self::Named(name) => Some(name),
             _ => None,
         }
@@ -110,6 +114,7 @@ impl Type {
                 | Self::Boolean
                 | Self::String
                 | Self::Error
+                | Self::Value
         )
     }
 }
@@ -517,6 +522,12 @@ pub enum Instruction {
     Call(FunctionRef),
     #[serde(rename = "newobj.ctor")]
     Construct(FunctionRef),
+    #[serde(rename = "value.pack")]
+    PackValue(Type),
+    #[serde(rename = "value.is")]
+    IsValue(Type),
+    #[serde(rename = "value.unpack")]
+    UnpackValue(Type),
     #[serde(rename = "ret")]
     Return,
     #[serde(rename = "newobj")]
@@ -758,6 +769,9 @@ impl Function {
                     }
                 }
                 Instruction::New(ty)
+                | Instruction::PackValue(ty)
+                | Instruction::IsValue(ty)
+                | Instruction::UnpackValue(ty)
                 | Instruction::SizeOf(ty)
                 | Instruction::AlignOf(ty)
                 | Instruction::Allocate(ty)

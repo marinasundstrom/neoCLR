@@ -1,6 +1,9 @@
 ; Runtime-known data representations with ordinary library-defined members.
 .module System
 
+.type System.Value
+.end
+
 .type System.Void
 .end
 

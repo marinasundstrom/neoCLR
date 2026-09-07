@@ -1545,6 +1545,29 @@ and diff checks pass. The sample assembled to JSON, passed the typed verifier, a
 ran from that artifact, printing 42 and its construction message before returning
 Void. No push or publication performed.
 
+## 2026-09-07 — Explicit value storage and an ordinary carrier prototype
+
+Added System.Value and explicit value.pack/value.is/value.unpack operations. They
+store one complete typed value, test exact closed identity, and perform checked
+value extraction without consulting union metadata. Generic operands use existing
+substitution, access and module checks. Packing preserves storage types; extraction
+uses normal evaluation-stack normalization. ValueStorage service reporting records
+the backend requirement without prescribing a guest allocator. Recursive erased
+payloads have depth/complexity limits. Native layout and host inputs containing the
+new representation are explicitly unsupported in this slice.
+
+An ordinary Outcome<T,E> sample uses public overloaded constructors and a private
+erased field, preserving Success/Failure identity when T and E are identical. This
+proves an interpreter carrier representation without inactive/default fields or
+union-specific instructions. It does not migrate System.Option/Result or settle
+the final compiler-recognized member convention. Documented representation/copy
+semantics, pointer lifetime, native/host boundaries and remaining migration work.
+
+Validation: all 406 integration tests pass, including ten new storage/carrier tests;
+formatting, Clippy with warnings denied, and diff checks pass. The sample assembled
+to JSON, passed verification and ran from that artifact with expected output.
+No push or publication performed.
+
 ## 2026-09-07 — Explicit property metadata and accessor associations
 
 Added optional property records to type metadata, with name, static/instance kind,

@@ -457,7 +457,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         }
                         "none" | "ok" | "err" | "sizeof" | "alignof" | "heap.alloc"
                         | "ptr.null" | "ptr.cast" | "ptr.fromint" | "ldobj" | "stobj" | "cpobj"
-                        | "initobj" => Some(
+                        | "initobj" | "value.pack" | "value.is" | "value.unpack" => Some(
                             serde_json::to_value(parse_type(rest)?)
                                 .map_err(|e| Fault::new(e.to_string()))?,
                         ),

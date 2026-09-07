@@ -1,6 +1,8 @@
 # Union convention and library fundamentals
 
-Status: design direction, not an implemented custom-union facility. Indexed generic
+Status: design direction, not a finalized custom-union convention. An executable
+[ordinary carrier prototype](value-storage.md) uses explicit typed value storage,
+ordinary constructors and accessors. Indexed generic
 references and field substitution are implemented. Option and Result still use
 bootstrap runtime encodings and instructions. This proposal supersedes the earlier
 union case-table and dedicated-opcode design.
@@ -44,8 +46,8 @@ while keeping intended constructors/readers public. Public, private, and interna
 implemented for [method calls and ordinary field operations](accessibility.md); top-level types also support public/internal visibility. Complete construction invariants
 remain to be specified. These are ordinary type-system capabilities, not union-specific instructions.
 
-Current .ctor-shaped methods do not by themselves settle initialization or addressed
-receiver semantics. [Property metadata](properties.md) now supplies explicit getter/setter
+The [constructor subset](constructors.md) establishes a whole receiver value;
+addressed receivers remain future work. [Property metadata](properties.md) supplies explicit getter/setter
 associations, including Error.Message; ordinary field operations now enforce visibility.
 Construction and unsafe/host boundary guarantees remain incomplete. Track these gaps separately
 and validate them with a small carrier/variant example before claiming ordinary Option
@@ -88,7 +90,9 @@ must agree and must not change the active alternative. Absence is an explicit No
 value, not an implicit null or uninitialized state. A zeroed allocation is not
 necessarily a constructed carrier.
 
-Storage remains an ordinary type implementation detail. A discriminant plus payload
+Storage remains an ordinary type implementation detail. The interpreter prototype
+selects one private [System.Value field](value-storage.md), holding a complete typed
+value without inactive alternatives. A discriminant plus payload
 storage is a possible implementation, but the convention mandates neither an integer
 tag nor its numeric values. Generic records alone do not solve storage for alternatives
 without valid defaults: storing every alternative as an initialized field is not a
