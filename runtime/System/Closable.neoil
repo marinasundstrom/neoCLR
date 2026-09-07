@@ -1,0 +1,5 @@
+; Explicit completion whose expected failures remain ordinary typed values.
+.interface System.Closable<E>
+    .method instance byref Close() -> System.Result<Void,E>
+    .end
+.end

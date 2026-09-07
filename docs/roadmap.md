@@ -81,6 +81,11 @@ destruction. An explicitly unique buffer wrapper is a proposed bounded experimen
 value copies. The proposal's Fault cleanup limits remain recommendations, not an
 implemented destruction guarantee.
 
+Ordinary [Disposable and Closable<E>](disposal.md) interfaces now provide explicit
+cleanup and fallible completion. The draft sample tests value-state changes through
+borrowed receivers; resource-owning storage and automatic cleanup remain the next
+lifecycle work, not behavior granted by interface conformance.
+
 The first milestone is building and running simple programs without extensive OOP.
 Prioritize the complete path from assembler through metadata/IL, runtime library,
 execution, recoverable Error results, and unrecoverable Fault diagnostics. Add core

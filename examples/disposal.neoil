@@ -1,0 +1,147 @@
+.module DisposalDemo
+.entry Main
+
+; A value-backed draft models the lifecycle protocol without external I/O.
+.type DraftCloseError
+    .field Message String
+.end
+
+.type Draft
+    .implements System.Disposable
+    .implements System.Closable<DraftCloseError>
+    .field Text String
+    .field Closed Boolean
+    .field Disposed Boolean
+    .field ReleaseCount Int32
+
+    .method instance byref Dispose() -> Void
+        .local Draft state
+        ldarg this
+        ldobj Draft
+        stloc state
+        ldloc state
+        ldfld Draft::Disposed
+        brtrue Done
+        ldarg this
+        ldloc state
+        ldstr ""
+        stfld Draft::Text
+        ldc.bool true
+        stfld Draft::Disposed
+        ldloc state
+        ldfld Draft::ReleaseCount
+        ldc.i4 1
+        add
+        stfld Draft::ReleaseCount
+        stobj Draft
+    Done:
+        ldvoid
+        ret
+    .end
+
+    .method instance byref Close() -> System.Result<Void,DraftCloseError>
+        .local Draft state
+        ldarg this
+        ldobj Draft
+        stloc state
+        ldloc state
+        ldfld Draft::Closed
+        brtrue Success
+        ldloc state
+        ldfld Draft::Disposed
+        brtrue Disposed
+        ldloc state
+        ldfld Draft::Text
+        call instance System.String::IsEmpty()
+        brtrue Empty
+        ldarg this
+        ldloc state
+        ldc.bool true
+        stfld Draft::Closed
+        stobj Draft
+    Success:
+        ldvoid
+        newobj instance System.Result.Ok<Void>::.ctor(Void)
+        newobj instance System.Result<Void,DraftCloseError>::.ctor(System.Result.Ok<Void>)
+        ret
+    Disposed:
+        ldstr "Draft is disposed"
+        br Error
+    Empty:
+        ldstr "Draft is empty"
+    Error:
+        newobj DraftCloseError
+        newobj instance System.Result.Error<DraftCloseError>::.ctor(DraftCloseError)
+        newobj instance System.Result<Void,DraftCloseError>::.ctor(System.Result.Error<DraftCloseError>)
+        ret
+    .end
+.end
+
+.function NewDraft(String text) -> Draft
+    ldarg text
+    ldc.bool false
+    ldc.bool false
+    ldc.i4 0
+    newobj Draft
+    ret
+.end
+
+.function Release(System.Disposable& value) -> Void
+    ldarg value
+    callvirt instance System.Disposable::Dispose()
+    ret
+.end
+
+.function Finish(System.Closable<DraftCloseError>& value) -> System.Result<Void,DraftCloseError>
+    ldarg value
+    callvirt instance System.Closable<DraftCloseError>::Close()
+    ret
+.end
+
+.function Main() -> Void
+    .local Draft completed
+    .local Draft incomplete
+    ldstr "A completed draft"
+    call NewDraft(String)
+    stloc completed
+    ldloca completed
+    interface.borrow System.Closable<DraftCloseError>
+    call Finish(System.Closable<DraftCloseError>&)
+    call instance System.Result<Void,DraftCloseError>::GetOkCase()
+    pop
+    ldstr "Draft closed"
+    call System.Console::WriteLine(String)
+    pop
+    ldloca completed
+    interface.borrow System.Disposable
+    call Release(System.Disposable&)
+    pop
+    ldloca completed
+    interface.borrow System.Disposable
+    call Release(System.Disposable&)
+    pop
+    ldloc completed
+    ldfld Draft::ReleaseCount
+    call System.Console::WriteLine(Int32)
+    pop
+
+    ldstr ""
+    call NewDraft(String)
+    stloc incomplete
+    ldloca incomplete
+    interface.borrow System.Closable<DraftCloseError>
+    call Finish(System.Closable<DraftCloseError>&)
+    call instance System.Result<Void,DraftCloseError>::GetErrorCase()
+    call instance System.Result.Error<DraftCloseError>::get_Value()
+    ldfld DraftCloseError::Message
+    call System.Console::WriteLine(String)
+    pop
+    ldloca incomplete
+    interface.borrow System.Disposable
+    call Release(System.Disposable&)
+    pop
+    ldloc incomplete
+    ldfld Draft::ReleaseCount
+    call System.Console::WriteLine(Int32)
+    ret
+.end

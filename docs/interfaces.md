@@ -30,6 +30,8 @@ demonstrates byref interface dispatch that changes an inline field.
 type descriptors and user-defined records through the same managed views.
 [System.Clonable<T>](cloning.md) supplies explicit Clone() dispatch with a byref
 receiver, independently of ordinary value copying.
+[System.Disposable and System.Closable<E>](disposal.md) use byref receivers for
+explicit release and fallible completion; they do not enable automatic destruction.
 
 The following sections describe the retained native-pointer view specifically.
 

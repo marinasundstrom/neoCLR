@@ -49,3 +49,5 @@
 .include "neoCLR/Runtime/TypeInspection.neoil"
 .include "System/Collections/ArrayList.neoil"
 .include "System/Collections/List.neoil"
+.include "System/Disposable.neoil"
+.include "System/Closable.neoil"

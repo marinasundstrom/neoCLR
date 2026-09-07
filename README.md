@@ -40,6 +40,8 @@ Interfaces use ordinary names without an `I` prefix.
 [Explicit cloning](docs/cloning.md) uses System.Clonable<T> and Clone(), independently
 of ordinary value copies. [Deterministic lifecycle design](docs/lifecycle.md)
 develops destruction, ownership and Disposable/Closable contracts as the next foundation.
+[Explicit cleanup](docs/disposal.md) is available through System.Disposable and
+System.Closable<E>; automatic destruction remains future work.
 
 ## Preview 1
 

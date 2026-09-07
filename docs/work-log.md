@@ -2612,3 +2612,25 @@ doc tests, strict all-target Clippy, formatting and diff whitespace checks passe
 All 149 local documentation links and heading targets in the changed/new documents
 were checked. The new interface adds ordinary System metadata; no VM opcode or
 artifact format change was needed.
+
+## Explicit disposal and close interfaces — 2026-09-07
+
+Added ordinary System.Disposable.Dispose() -> Void and System.Closable<E>.Close()
+-> System.Result<Void,E>, both with explicit byref receivers. The existing interface
+machinery handles conformance, dispatch and state mutation. Appended the declarations
+to the System manifest to preserve existing definition-row order.
+
+Added a value-backed draft sample and regression tests for idempotent disposal,
+copy independence, successful/repeated close, recoverable close failure followed by
+disposal, typed errors for an uncompleted disposed draft, and invalid conformance.
+The sample models cleanup of text state; its counter is not evidence of native
+resource release. Automatic destruction, ownership-aware copying and host resource
+teardown remain separate implementation work. Updated lifecycle status and the
+roadmap to distinguish these executable interfaces from the broader proposal.
+
+Validation: 69 tests passed across disposal, cloning, interfaces, library, source
+bundling, verification, type identities, native bindings, runtime services and
+reachability. The verifier run covers every source sample. Strict all-target Clippy,
+formatting, 149 local documentation links/heading targets and diff whitespace checks
+passed. The preceding Clonable commit also passed the full 524-test suite; this
+follow-up adds library declarations and fixtures without changing VM implementation.

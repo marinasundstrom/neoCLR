@@ -1,0 +1,5 @@
+; Explicit resource release; automatic destruction is a separate lifecycle contract.
+.interface System.Disposable
+    .method instance byref Dispose() -> Void
+    .end
+.end

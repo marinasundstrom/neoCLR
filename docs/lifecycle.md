@@ -2,9 +2,10 @@
 
 Status: proposed next foundation following the prototype review. Deterministic
 destruction and explicit ownership are the intended direction; the detailed rules
-below are recommendations for implementation. No destructor metadata, lifetime
-instructions, Disposable/Closable library interfaces or counted Ref implementation
-are introduced by this document. Examples are illustrative contracts.
+below are recommendations for implementation. Destructor metadata, lifetime
+instructions and counted Ref remain unimplemented. Ordinary
+[Disposable/Closable interfaces](disposal.md) and [Clonable](cloning.md) are now
+implemented separately; they do not enable automatic destruction.
 
 The platform direction is values by default, explicit passing by reference and
 deterministic lifetimes. Pointers provide low-level memory access, including native
@@ -26,10 +27,10 @@ and Closable are ordinary interfaces. Implementing either must not by itself
 register a destructor. A destructor may call Dispose, but the lifecycle metadata
 must identify that behavior explicitly, independently of a method name.
 
-Recommend byref receivers for Dispose and Close so state changes affect the original
-value. Existing interface views can dispatch these contracts without boxing.
-Recommend System.Disposable and System.Closable<E> as initial names, subject to the
-first resource workload. Specific E preserves recoverable error information;
+The implemented Dispose and Close interfaces use byref receivers so state changes
+affect the original value. Existing interface views dispatch them without boxing.
+System.Disposable and System.Closable<E> are the initial library contracts.
+Specific E preserves recoverable error information;
 heterogeneous callers can use an explicit adapter to a shared error type later.
 
 Dispose returns no recoverable error. That is an API obligation, not proof that
@@ -38,8 +39,9 @@ Destruction must not silently claim successful flushing, committing or publicati
 An explicit Close caller handles the result before ordinary lifetime cleanup.
 
 For the initial resource protocol, Dispose is idempotent. Close after successful
-close succeeds without repeating effects; Close on a disposed resource reports a
-documented error. A failed Close leaves a valid value that can still be disposed.
+close succeeds without repeating effects, even following subsequent disposal.
+Otherwise, Close on a disposed resource reports a documented error. A failed Close
+leaves a valid value that can still be disposed.
 Whether retry is supported depends on the resource and must be documented; do not
 promise rollback or repeat a partially completed external operation automatically.
 Destruction after either successful Close or Dispose releases nothing twice.
@@ -160,10 +162,12 @@ need host-owned registrations or another specified teardown mechanism.
 2. Add an explicitly identified Void-returning IL destruction body with a restricted
    byref receiver. Schedule it through guest frames on discard, replacement, normal
    return and explicit lifetime end. Preserve existing plain-value behavior.
-3. Add ordinary Disposable and Closable<E> interfaces with byref receivers. Demonstrate
-   a unique buffer owner with idempotent Dispose. Test fallible Close separately
-   through an injected resource service; a native byte buffer has no natural flush
-   error and should not invent one merely to implement Closable.
+3. Build on the implemented ordinary Disposable and Closable<E> interfaces with
+   byref receivers. Their value-backed draft sample establishes explicit dispatch
+   and state contracts. Next demonstrate a resource owner with idempotent Dispose
+   and actual release tracking. Test fallible Close separately through an injected
+   resource service; a native byte buffer has no natural flush error and should not
+   invent one merely to implement Closable.
 4. Cover nested owning fields and active union payloads before generalizing native
    containers and replacing System.Value. Add shared owning Ref and final-release
    destruction afterward, with a deliberate artifact/API migration.
