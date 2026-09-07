@@ -34,6 +34,9 @@ Interfaces will use ordinary names without an `I` prefix.
 The first publication target is **Preview 1**, a runnable source preview. The [Preview 1 plan](docs/preview-1.md)
 defines required capabilities, remaining work, demonstrations, release checks, and exclusions.
 The current checkout is not yet declared ready for Preview 1.
+Start with the [runnable walkthrough](docs/preview-1-walkthrough.md): console calculation,
+array loops, file input, explicit pointers, ordinary errors and Fault traces, with
+source/artifact commands and tested expected output.
 The [program contracts and IL mappings](docs/preview-1-programs.md) define the target
 through six small Raven-like pseudocode programs. They are explanatory examples;
 Preview 1 does not require a high-level compiler.

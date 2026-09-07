@@ -31,13 +31,13 @@ may remain unnamed; neoCLR is sufficient as the runtime codename for the preview
 | Build and tooling | Locked source build; assemble, check, verify, and run workflows; clear malformed-input diagnostics | Implemented; fresh-clone and declared toolchain/platform validation remain release gates |
 | Execution fundamentals | Primitive values, free functions, calls/overloads, indexed parameters/locals, control flow, real Void, value copying | Implemented; preserve semantics through remaining changes |
 | Metadata and modules | Explicit types/members/signatures, generic type definitions and closed use, properties/accessors, module references and member identities | Implemented; current JSON is a documented prototype representation |
-| Ordinary type contracts | Public/internal type visibility, public/internal/private members, usable constructors with defined receiver and initialization behavior | Visibility, properties and whole-value constructor initialization implemented; carrier requirements still need proving |
+| Ordinary type contracts | Public/internal type visibility, public/internal/private members, usable constructors with defined receiver and initialization behavior | Implemented and exercised by ordinary carrier construction, extraction and copy tests |
 | Ordinary unions | Carrier/variant convention sufficient for Option<T> and Result<T,TError>, including Void, nested carriers, and Result<T,T> | Implemented: ordinary System carriers, native boundaries, samples and bounded erased host input |
 | No union-specific IL | Library, samples, native result construction and host inputs use ordinary types; remove special union operations and encodings | Implemented in format 4; old artifacts require reassembly |
 | Minimal library and console | Useful Int32/String/Error APIs; console input/output; EOF distinct from input failure; an interactive program | Implemented using raw byte input and immediate line output; `ReadByte` uses the ordinary nested Result/Option boundary. General ReadLine is not required |
 | Minimal reflection | Obtain a System.Type-style descriptor from a type token or value, compare identity, read its name, inspect closed generic arguments | Existing host type identities are groundwork; guest read-only type inspection is not implemented |
 | Memory and arrays | Explicit pointers/allocation/free, record storage, small usable array/buffer example, documented lifetime and copy rules | Implemented; native-layout Array<T> descriptors are sufficient. No promise of general owned arrays or automatic cleanup |
-| Errors and diagnostics | Recoverable failures through Result; terminal Faults with owned logical stack frames shown by CLI/host | All six reviewed library Result APIs use ordinary typed errors. Legacy VM/sample union uses remain; source-line maps and guest StackTrace classes are not required for Preview 1 |
+| Errors and diagnostics | Recoverable failures through Result; terminal Faults with owned logical stack frames shown by CLI/host | All six reviewed library Result APIs use ordinary typed errors. Source-line maps and guest StackTrace classes are not required for Preview 1 |
 | Embedding and native boundary | One runnable embedding example and one supported scalar/pointer native interop example | Implemented experimental Rust hosting and P/Invoke subset; validate the published examples and platform requirements |
 | Publication readiness | Accurate README/design limits, explicit license, release notes, tested supported platforms and source release instructions | MIT license added; release notes, platform validation and source release checks remain |
 
@@ -86,8 +86,13 @@ and compatibility with existing .NET tooling are later work, not achieved by usi
 
 The interpreter's carrier-storage decision and limits are recorded in
 [value storage](value-storage.md). Minimal guest reflection and
-minimal guest inspection remain substantial work. The
+release validation remain open. The
 prototype is not evidence of a settled native ABI or a publication date.
+
+The [runnable walkthrough](preview-1-walkthrough.md) now tests source/artifact execution
+for console calculation, ordinary unions, array loops, file summaries, borrowed pointer
+carriers and deliberate Faults. It does not close the guest-reflection or remote
+platform-validation gates.
 
 ## Required demonstrations
 
@@ -116,8 +121,8 @@ not justify expanding Preview 1 into streams, filesystem abstractions or network
 
 ## Release acceptance checklist
 
-- [ ] The ordinary constructor/carrier milestones above are implemented and tested.
-- [ ] No special union instructions or Option/Result runtime categories remain; final
+- [x] The ordinary constructor/carrier milestones above are implemented and tested.
+- [x] No special union instructions or Option/Result runtime categories remain; final
       samples and library code execute through ordinary metadata and IL operations.
 - [ ] Minimal guest type inspection is implemented without dynamic invocation, reflective
       construction, field mutation, or an accessibility bypass.

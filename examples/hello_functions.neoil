@@ -1,0 +1,13 @@
+.module HelloFunctions
+.entry Main
+
+.function Message() -> String
+    ldstr "Hello, world!"
+    ret
+.end
+
+.function Main() -> Void
+    call Message()
+    call System.Console::WriteLine(String)
+    ret
+.end

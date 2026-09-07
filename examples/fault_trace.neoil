@@ -1,0 +1,14 @@
+.module FaultTrace
+.entry Main
+
+.function Fail() -> Void
+    fault "Demonstration fault"
+.end
+.function Work() -> Void
+    call Fail()
+    ret
+.end
+.function Main() -> Void
+    call Work()
+    ret
+.end

@@ -1,0 +1,73 @@
+.module ArrayLoops
+.entry Main
+
+; A foreach-style loop lowers to an index and a conditional branch.
+; The descriptor is borrowed; this function must not free its storage.
+.function Sum(System.Array<Int32> values) -> Int32
+    .local Int32 index
+    .local Int32 total
+    ldc.i4 0
+    stloc index
+    ldc.i4 0
+    stloc total
+    br Test
+Next:
+    ldloc total
+    ldarg values
+    ldloc index
+    call instance System.Array<Int32>::get_Item(Int32)
+    add.ovf
+    stloc total
+    ldloc index
+    ldc.i4 1
+    add
+    stloc index
+Test:
+    ldloc index
+    ldarg values
+    call instance System.Array<Int32>::get_Length()
+    blt Next
+    ldloc total
+    ret
+.end
+
+.function Main() -> Void
+    .local System.Array<Int32> values
+    .local Int32 index
+    ldc.i4 5
+    ldc.i4 0
+    call System.Array<Int32>::Allocate(Int32,Int32)
+    stloc values
+    ldc.i4 0
+    stloc index
+    br Test
+Fill:
+    ; for i = 0; i < values.Length; i++: values[i] = i * i
+    ldloc values
+    ldloc index
+    ldloc index
+    ldloc index
+    mul.ovf
+    call instance System.Array<Int32>::set_Item(Int32,Int32)
+    pop
+    ldloc index
+    ldc.i4 1
+    add
+    stloc index
+Test:
+    ldloc index
+    ldloc values
+    call instance System.Array<Int32>::get_Length()
+    blt Fill
+    ldstr "Sum of squares:"
+    call System.Console::WriteLine(String)
+    pop
+    ldloc values
+    call Sum(System.Array<Int32>)
+    call System.Console::WriteLine(Int32)
+    pop
+    ; Exactly one owner releases the storage after all borrowers finish.
+    ldloc values
+    call instance System.Array<Int32>::Free()
+    ret
+.end

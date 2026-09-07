@@ -19,15 +19,19 @@ adaptations include real `Void`, `Err` as the error wrapper, explicit buffer lif
 and one value model without struct/class storage semantics. Raven's full syntax,
 generated union representation and runtime dependencies are not adopted here.
 
+The [runnable walkthrough](preview-1-walkthrough.md) packages the current examples
+and tests their CLI source/artifact paths. It adds file integration and explicit
+pointer borrowing; guest reflection remains unfinished.
+
 ## The program set
 
 | ID | Program | Required evidence | Existing executable groundwork |
 | --- | --- | --- | --- |
-| P1 | Hello and a free helper | UTF-8 text, free calls, real Void, artifact round trip | hello.neoil, strings.neoil |
+| P1 | Hello and a free helper | UTF-8 text, free calls, real Void, artifact round trip | hello_functions.neoil, strings.neoil |
 | P2 | Console calculation | Prompt, byte input, computation, EOF versus recoverable Error | console_input.neoil, errors.neoil |
 | P3 | Typed data and alternatives | Constructors, private storage, properties, generic carriers, independent copies | constructors.neoil, ordinary_unions.neoil, ordinary_unions tests |
-| P4 | Explicit buffer | Array allocation, indexing/loop, aliasing, exactly one free | arrays.neoil |
-| P5 | A deliberate Fault | Terminal failure with guest caller frames and IL locations | stack-trace tests, array_bounds.neoil |
+| P4 | Explicit buffer | Array allocation, indexing/loop, aliasing, exactly one free | array_loops.neoil, arrays.neoil |
+| P5 | A deliberate Fault | Terminal failure with guest caller frames and IL locations | fault_trace.neoil, array_bounds.neoil |
 | P6 | Inspect a type | Type/value acquisition, exact identity, name, closed generic arguments | Host identity APIs only; guest support still missing |
 
 The existing files are groundwork, not a claim that every program contract below is
@@ -112,8 +116,7 @@ extracts only inside the selected branch. Expected absence/failure returns throu
 ordinary functions; it is not a Fault and creates no exception regions.
 
 The final lowering must not contain `some`, `none`, `ok`, `err`, `is.case` or `ldcase`.
-Those still occur in the current console implementation and must be removed before
-this program meets its Preview 1 acceptance contract.
+They were removed in format 4; the console implementation now uses ordinary carriers.
 
 ## P3 — Constructed values and ordinary alternatives
 

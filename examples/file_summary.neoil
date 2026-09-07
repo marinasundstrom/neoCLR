@@ -1,0 +1,50 @@
+.module FileSummary
+.entry Main
+
+.function Report(String path) -> Void
+    .local String text
+    .local System.IO.FileReadError error
+    ldarg path
+    ldc.i4 4096
+    call System.IO.File::ReadAllText(String,Int32)
+    dup
+    call instance System.Result<String,System.IO.FileReadError>::get_IsErrorCase()
+    brtrue Failed
+    call instance System.Result<String,System.IO.FileReadError>::GetOkCase()
+    call instance System.Result.Ok<String>::get_Value()
+    stloc text
+    ldstr "File contents:"
+    call System.Console::WriteLine(String)
+    pop
+    ldloc text
+    call System.Console::WriteLine(String)
+    pop
+    ldstr "UTF-8 bytes:"
+    call System.Console::WriteLine(String)
+    pop
+    ldloc text
+    call instance System.String::GetUtf8ByteCount()
+    call System.Console::WriteLine(Int32)
+    ret
+Failed:
+    call instance System.Result<String,System.IO.FileReadError>::GetErrorCase()
+    call instance System.Result.Error<System.IO.FileReadError>::get_Value()
+    stloc error
+    ldloc error
+    call instance System.IO.FileReadError::get_IsNotFound()
+    brtrue NotFound
+    ldloc error
+    call instance System.IO.FileReadError::ToString()
+    call System.Console::WriteLine(String)
+    ret
+NotFound:
+    ldstr "File not found"
+    call System.Console::WriteLine(String)
+    ret
+.end
+
+.function Main() -> Void
+    ldstr "examples/data/summary.txt"
+    call Report(String)
+    ret
+.end

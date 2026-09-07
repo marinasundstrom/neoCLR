@@ -2142,3 +2142,24 @@ reinterpretation. Libraries or languages supply payload tags, lifetimes and opti
 safe/unsafe policies; existing interpreter checks do not prove arbitrary casts safe.
 No runtime behavior or Preview 1 feature gate changed in this documentation slice.
 Validation: reviewed the cross-links and ran git diff --check.
+
+## Package a runnable Preview 1 walkthrough
+
+Added a free-function HelloWorld, an array example lowering counted initialization
+and foreach-style summation to ordinary indexer calls/branches, a bounded UTF-8 file
+summary with typed NotFound handling, and an explicit Fail/Work/Main Fault chain.
+The walkthrough connects these to existing console, ordinary-union and pointer-carrier
+samples with commands, expected output/exits, Raven-like pseudocode and current limits.
+Its file fixture has 19 UTF-8 bytes and no trailing newline. No new runtime abstraction
+or instruction was required. Corrected stale union migration statements in the plan.
+
+The CLI acceptance test assembles, checks, verifies and runs all eight selected samples
+as source and artifacts. It checks five console input outcomes and both deliberate
+Fault examples. Additional checks cover empty/single-element array traversal with
+explicit release, and missing/empty/oversized/invalid-UTF-8 file input. Guest reflection
+and exact-release platform/toolchain validation remain open gates.
+
+Validation: preview walkthrough, verifier (including all IL samples), console and
+file-input suites pass. Formatting, clippy with warnings denied and diff checks pass
+on macOS ARM64. CI already runs these integration tests through cargo test --locked;
+no remote run is claimed here.
