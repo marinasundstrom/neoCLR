@@ -1,7 +1,7 @@
 //! Explicit runtime binding registry. A name alone never activates host dispatch.
 use crate::{
     Fault, Value,
-    metadata::{Case, Function, Type},
+    metadata::{Function, Type},
 };
 
 pub(crate) enum Binding {
@@ -31,10 +31,9 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         ("neoCLR.Runtime.StringByteCount", [Type::String]) => {
             (Binding::StringByteCount, Type::Int32)
         }
-        ("neoCLR.Runtime.StringSliceUtf8", [Type::String, Type::Int32, Type::Int32]) => (
-            Binding::StringSliceUtf8,
-            Type::Result(Box::new(Type::String), Box::new(Type::Error)),
-        ),
+        ("neoCLR.Runtime.StringSliceUtf8", [Type::String, Type::Int32, Type::Int32]) => {
+            (Binding::StringSliceUtf8, Type::Value)
+        }
         ("neoCLR.Runtime.ErrorFromMessage", [Type::String]) => {
             (Binding::ErrorFromMessage, Type::Error)
         }
@@ -132,35 +131,24 @@ impl Binding {
                     Value::Int32(length),
                 ],
             ) => {
-                let error = |message: &str| {
-                    Value::result(
-                        Value::Error(message.into()),
-                        Type::String,
-                        Type::Error,
-                        Case::Err,
-                    )
-                };
+                // Explicit internal statuses: 1 = OutOfRange, 2 = InvalidBoundary.
+                let error = |status| Value::Erased(Box::new(Value::Byte(status)));
                 let (Ok(start), Ok(length)) = (usize::try_from(*start), usize::try_from(*length))
                 else {
-                    return Ok(error("ArgumentOutOfRange"));
+                    return Ok(error(1));
                 };
                 let Some(end) = start.checked_add(length).filter(|end| *end <= value.len()) else {
-                    return Ok(error("ArgumentOutOfRange"));
+                    return Ok(error(1));
                 };
                 let Some(slice) = value.get(start..end) else {
-                    return Ok(error("InvalidUtf8Boundary"));
+                    return Ok(error(2));
                 };
                 let mut result = String::new();
                 result
                     .try_reserve_exact(slice.len())
                     .map_err(|_| Fault::new("string allocation failed"))?;
                 result.push_str(slice);
-                Ok(Value::result(
-                    Value::String(result),
-                    Type::String,
-                    Type::Error,
-                    Case::Ok,
-                ))
+                Ok(Value::Erased(Box::new(Value::String(result))))
             }
             (Self::ErrorFromMessage, [Value::String(message)])
             | (Self::ErrorMessage, [Value::Error(message)]) => {

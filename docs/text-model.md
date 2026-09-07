@@ -50,17 +50,17 @@ methods. The current methods are compiled by the same assembler as application c
 | instance Equals(String other) -> Boolean | Exact ordinal equality; no culture, case folding, or normalization |
 | instance IsEmpty() -> Boolean | True only for the valid empty String |
 | instance GetUtf8ByteCount() -> Int32 | Count encoded UTF-8 bytes, not UTF-16 units, scalars, or graphemes |
-| instance SliceUtf8(Int32 byteStart, Int32 byteLength) -> Result<String,Error> | Copy a valid UTF-8 byte range into an owned String |
+| instance SliceUtf8(Int32 byteStart, Int32 byteLength) -> System.Result<String,System.Text.Utf8SliceError> | Copy a valid UTF-8 byte range into an owned String |
 
 Concat, byte count, and slicing forward through validated InternalCall declarations.
 Equals and IsEmpty execute ordinary IL. No new IL opcode, array representation, or
 special member dispatch is required. The runtime-service report classifies the three
-helpers as StringOperations.
+helpers as StringOperations; slicing also requires ValueStorage for explicit carrier storage.
 
 SliceUtf8 accepts an empty range at any code-point boundary, including the end of the
 string. Negative arguments or a range beyond the encoded byte length return
-Err(Error("ArgumentOutOfRange")). Both endpoints must be code-point boundaries;
-otherwise the result is Err(Error("InvalidUtf8Boundary")), including an empty range
+an ordinary Utf8SliceError.OutOfRange case. Both endpoints must be code-point boundaries;
+otherwise the error case is Utf8SliceError.InvalidBoundary, including an empty range
 inside a multi-byte encoding. Success is Ok(String), including Ok(""). These checks
 do not require grapheme boundaries: a combining mark can be sliced independently.
 
@@ -77,3 +77,19 @@ quota yet; catastrophic host allocation failure elsewhere is not guaranteed reco
 
 `cargo run -- run examples/strings.neoil` prints Hello, neoCLR!, reports 10 UTF-8 bytes
 for "café 🌍", prints the globe slice, and handles an invalid boundary without terminating.
+
+
+The non-generic System.Text.Utf8SliceError carrier directly nests OutOfRange and
+InvalidBoundary, with constructors, IsOutOfRange/IsInvalidBoundary properties, checked
+GetOutOfRange/GetInvalidBoundary accessors, and ToString. Range validation precedes
+boundary validation: a request extending beyond the string is OutOfRange even when its
+start lies inside a UTF-8 sequence. Case extraction on the wrong variant produces a Fault.
+
+The internal StringSliceUtf8 helper now returns System.Value containing an erased String
+on success, Byte 1 for OutOfRange, or Byte 2 for InvalidBoundary. Library IL constructs
+the public error and Result cases; no message comparison or union-specific IL is used.
+Unknown payload types/statuses Fault. The helper no longer constructs bootstrap unions.
+
+Reassemble applications and System together. Replace ldcase/is.case after SliceUtf8 with
+ordinary Result and error-case accessors, using the specific error type in signatures.
+There is no parallel Typed method, and JSON format 3 does not imply library ABI stability.

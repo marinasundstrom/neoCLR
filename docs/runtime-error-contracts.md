@@ -1,7 +1,7 @@
 # Runtime error contract review
 
 Review of the six public Result-returning methods in the current System library.
-Parse, Divide and Abs now implement the typed contracts below; the remaining rows
+Parse, Divide, Abs and SliceUtf8 now implement the typed contracts below; the remaining rows
 are proposed migration targets and still use System.Error. A caller must not have to parse diagnostic text to
 decide what to do next.
 
@@ -10,7 +10,7 @@ decide what to do next.
 | System.Int32.Parse(String) | InvalidFormat and Overflow, distinguished structurally | System.Int32ParseError: InvalidFormat, Overflow (implemented) | Yes: parsing caller-supplied text is expected to fail |
 | System.Int32.Divide(Int32, Int32) | DivisionByZero, Overflow for minimum Int32 divided by -1 | System.IntegerDivisionError: DivisionByZero, Overflow (implemented) | Yes for this checked helper; the low-level div instruction retains its Fault contract |
 | System.Math.Abs(Int32) | Overflow for minimum Int32 | System.OverflowError, an ordinary single-purpose type (implemented) | Yes: preserves the selected checked Abs contract; no union is needed for a single failure kind |
-| System.String.SliceUtf8(Int32, Int32) | ArgumentOutOfRange, InvalidUtf8Boundary | System.Text.Utf8SliceError: OutOfRange, InvalidBoundary | Yes: callers can validate externally supplied byte ranges without Faults |
+| System.String.SliceUtf8(Int32, Int32) | OutOfRange, InvalidBoundary | System.Text.Utf8SliceError: OutOfRange, InvalidBoundary (implemented) | Yes: callers can validate externally supplied byte ranges without Faults |
 | System.Console.ReadByte() | ConsoleUnavailable, ConsoleReadFailed | System.IO.ConsoleReadError: Unavailable, ReadFailed | Yes: absence of a configured host and failure of a read are distinguishable; EOF remains successful Option.None |
 | System.IO.File.ReadAllText(String, Int32) | ArgumentOutOfRange, InvalidPath, FileNotFound, AccessDenied, NotRegularFile, FileReadFailed, FileTooLarge, InvalidUtf8 | System.IO.FileReadError: InvalidLimit, InvalidPath, NotFound, AccessDenied, NotRegularFile, ReadFailed, TooLarge, InvalidUtf8 | Yes: bounded file input can fail for expected environmental, limit and content reasons |
 
@@ -57,8 +57,8 @@ Output methods continue returning Void in this review; changing that contract is
    This proves a typed error union and removes the most visible collapsed classification.
 2. Completed: OverflowError and IntegerDivisionError for Abs and Divide. Both methods
    construct ordinary Result cases entirely in IL. Divide no longer uses bootstrap Result.
-3. Implement Utf8SliceError and migrate the slicing native/library boundary off bootstrap
-   Result. Keep byte-range validation distinct from UTF-8 boundary validation.
+3. Completed: Utf8SliceError and ordinary slicing native/library results. Byte-range
+   validation remains distinct from UTF-8 boundary validation.
 4. Implement ConsoleReadError and FileReadError. Preserve current EOF, missing-host,
    bounded input, UTF-8, and platform-dependent I/O behavior.
 

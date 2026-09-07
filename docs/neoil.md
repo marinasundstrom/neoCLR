@@ -300,6 +300,7 @@ These are ordinary functions compiled from [System.neoil](../runtime/System.neoi
 | `System.Int32.ToString` | instance receiver `Int32`, no parameters | `String` |
 | `System.Int32.Parse` | `String` | `System.Result<Int32,System.Int32ParseError>` (see [typed errors](int32-parse.md)) |
 | `System.Int32.Divide` | `Int32, Int32` | `System.Result<Int32,System.IntegerDivisionError>` |
+| `System.String.SliceUtf8` | instance String, `Int32, Int32` | `System.Result<String,System.Text.Utf8SliceError>` |
 | `System.Math.Abs` | `Int32` | `System.Result<Int32,System.OverflowError>` |
 
 Host bindings have explicit `.methodimpl InternalCall` declarations in the System

@@ -2012,3 +2012,24 @@ old signature rejection and the absence of union opcodes in these methods.
 Validation: all 42 focused arithmetic, runtime, library, identity, console and source-loader
 tests pass. Formatting, clippy with warnings denied and diff checks pass. The feature
 sample assembles, verifies and executes against a rebuilt System artifact on macOS ARM64.
+
+## Typed UTF-8 slicing errors
+
+Added System.Text.Utf8SliceError with directly nested OutOfRange/InvalidBoundary cases,
+constructors, predicate properties, checked case accessors and ToString. Canonical
+String.SliceUtf8 now returns System.Result<String,System.Text.Utf8SliceError> and constructs
+all public cases in library IL. The native helper returns an explicit erased String or
+Byte status (1 range, 2 boundary), replacing its bootstrap union result; unknown statuses
+Fault. Range validation still precedes boundary validation, including requests whose start
+is inside a UTF-8 sequence but whose end exceeds the string length.
+
+Updated the string sample and tests, including exact ordinary carrier shapes, native status
+payloads, zero-length boundary rules, malformed ranges, multibyte/combining-mark handling,
+wrong-case Faults, and service discovery for explicit ValueStorage. The runtime library
+now contains no bootstrap union instructions and native bindings no longer construct
+bootstrap union values. Bootstrap VM types/opcodes and remaining sample/host uses still
+need removal; console/file errors still need their specific error types.
+
+Validation: all 34 focused string/native/runtime/carrier/source tests pass; formatting,
+clippy with warnings denied and diff checks pass. The string sample assembles, verifies
+and executes against an explicitly rebuilt System artifact on macOS ARM64.

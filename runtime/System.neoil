@@ -43,3 +43,4 @@
 .include "System/Int32ParseError.neoil"
 .include "System/OverflowError.neoil"
 .include "System/IntegerDivisionError.neoil"
+.include "System/Text/Utf8SliceError.neoil"

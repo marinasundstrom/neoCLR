@@ -1,7 +1,5 @@
 use neoclr::{
-    Limits, LoadedProgram, RuntimeService, Value, assemble,
-    assembler::parse_function_ref,
-    metadata::{Case, Type},
+    Limits, LoadedProgram, RuntimeService, Value, assemble, assembler::parse_function_ref,
 };
 fn program() -> LoadedProgram {
     LoadedProgram::new(&assemble(".module App").unwrap()).unwrap()
@@ -9,8 +7,33 @@ fn program() -> LoadedProgram {
 fn text(value: &str) -> Value {
     Value::String(value.into())
 }
-fn result(value: Value, case: Case) -> Value {
-    Value::result(value, Type::String, Type::Error, case)
+fn record(name: &str, fields: Vec<Value>) -> Value {
+    Value::Object {
+        ty: neoclr::assembler::parse_type(name).unwrap(),
+        fields,
+    }
+}
+fn carrier(name: &str, case: Value) -> Value {
+    record(name, vec![Value::Erased(Box::new(case))])
+}
+fn result(value: Value) -> Value {
+    carrier(
+        "System.Result<String,System.Text.Utf8SliceError>",
+        record("System.Result.Ok<String>", vec![value]),
+    )
+}
+fn error(name: &str) -> Value {
+    let error = carrier(
+        "System.Text.Utf8SliceError",
+        record(&format!("System.Text.Utf8SliceError.{name}"), vec![]),
+    );
+    carrier(
+        "System.Result<String,System.Text.Utf8SliceError>",
+        record(
+            "System.Result.Error<System.Text.Utf8SliceError>",
+            vec![error],
+        ),
+    )
 }
 
 #[test]
@@ -129,7 +152,7 @@ fn byte_counts_are_explicit_and_slices_preserve_codepoints() {
                 )
                 .unwrap()
                 .value,
-            result(text(expected), Case::Ok)
+            result(text(expected))
         );
     }
 }
@@ -142,15 +165,16 @@ fn invalid_ranges_and_boundaries_are_results_and_do_not_poison_invocation() {
             &parse_function_ref("instance System.String::SliceUtf8(Int32,Int32)").unwrap(),
         )
         .unwrap();
-    for (start, length, error) in [
-        (-1, 0, "ArgumentOutOfRange"),
-        (0, -1, "ArgumentOutOfRange"),
-        (0, 5, "ArgumentOutOfRange"),
-        (5, 0, "ArgumentOutOfRange"),
-        (i32::MAX, i32::MAX, "ArgumentOutOfRange"),
-        (1, 1, "InvalidUtf8Boundary"),
-        (0, 1, "InvalidUtf8Boundary"),
-        (1, 0, "InvalidUtf8Boundary"),
+    for (start, length, case) in [
+        (-1, 0, "OutOfRange"),
+        (0, -1, "OutOfRange"),
+        (0, 5, "OutOfRange"),
+        (5, 0, "OutOfRange"),
+        (i32::MAX, i32::MAX, "OutOfRange"),
+        (1, 1, "InvalidBoundary"),
+        (0, 1, "InvalidBoundary"),
+        (1, 0, "InvalidBoundary"),
+        (1, 4, "OutOfRange"),
     ] {
         assert_eq!(
             slice
@@ -161,7 +185,7 @@ fn invalid_ranges_and_boundaries_are_results_and_do_not_poison_invocation() {
                 )
                 .unwrap()
                 .value,
-            result(Value::Error(error.into()), Case::Err)
+            error(case)
         );
     }
     assert_eq!(
@@ -173,7 +197,7 @@ fn invalid_ranges_and_boundaries_are_results_and_do_not_poison_invocation() {
             )
             .unwrap()
             .value,
-        result(text("🌍"), Case::Ok)
+        result(text("🌍"))
     );
     let fault = slice
         .invoke_instance(
@@ -204,12 +228,15 @@ fn service_planning_distinguishes_il_members_from_string_runtime_helpers() {
     let graph = program
         .analyze_reachability(
             &[parse_function_ref("instance System.String::SliceUtf8(Int32,Int32)").unwrap()],
-            2,
+            16,
         )
         .unwrap();
     assert_eq!(
         graph.required_services(),
-        [RuntimeService::StringOperations]
+        [
+            RuntimeService::StringOperations,
+            RuntimeService::ValueStorage
+        ]
     );
     assert_eq!(
         graph.functions[1].target.name,
@@ -217,7 +244,102 @@ fn service_planning_distinguishes_il_members_from_string_runtime_helpers() {
     );
     assert!(
         graph
-            .missing_services(&[RuntimeService::StringOperations])
+            .missing_services(&[
+                RuntimeService::StringOperations,
+                RuntimeService::ValueStorage
+            ])
             .is_empty()
     );
+}
+
+#[test]
+fn slice_errors_have_checked_case_accessors_and_native_statuses() {
+    let module = assemble(".module App\n.function Raw(String value, Int32 start, Int32 length) -> System.Value\nldarg value\nldarg start\nldarg length\ncall neoCLR.Runtime.StringSliceUtf8(String,Int32,Int32)\nret\n.end").unwrap();
+    let program = LoadedProgram::new(&module).unwrap();
+    program.verify().unwrap();
+    let resolve = |name: &str| {
+        program
+            .resolve_function(&parse_function_ref(name).unwrap())
+            .unwrap()
+    };
+    for (start, length, expected) in [
+        (0, 4, Value::String("🌍".into())),
+        (1, 4, Value::Byte(1)),
+        (1, 0, Value::Byte(2)),
+    ] {
+        assert_eq!(
+            resolve("Raw(String,Int32,Int32)")
+                .invoke(
+                    vec![text("🌍"), Value::Int32(start), Value::Int32(length)],
+                    Limits::default()
+                )
+                .unwrap()
+                .value,
+            Value::Erased(Box::new(expected))
+        );
+    }
+    for (start, length, name, other) in [
+        (1, 4, "OutOfRange", "InvalidBoundary"),
+        (1, 0, "InvalidBoundary", "OutOfRange"),
+    ] {
+        let result = resolve("instance System.String::SliceUtf8(Int32,Int32)")
+            .invoke_instance(
+                text("🌍"),
+                vec![Value::Int32(start), Value::Int32(length)],
+                Limits::default(),
+            )
+            .unwrap()
+            .value;
+        let case =
+            resolve("instance System.Result<String,System.Text.Utf8SliceError>::GetErrorCase()")
+                .invoke_instance(result, vec![], Limits::default())
+                .unwrap()
+                .value;
+        let error =
+            resolve("instance System.Result.Error<System.Text.Utf8SliceError>::get_Value()")
+                .invoke_instance(case, vec![], Limits::default())
+                .unwrap()
+                .value;
+        assert_eq!(
+            resolve(&format!(
+                "instance System.Text.Utf8SliceError::get_Is{name}()"
+            ))
+            .invoke_instance(error.clone(), vec![], Limits::default())
+            .unwrap()
+            .value,
+            Value::Boolean(true)
+        );
+        assert_eq!(
+            resolve(&format!("instance System.Text.Utf8SliceError::Get{name}()"))
+                .invoke_instance(error.clone(), vec![], Limits::default())
+                .unwrap()
+                .value,
+            record(&format!("System.Text.Utf8SliceError.{name}"), vec![])
+        );
+        assert!(
+            resolve(&format!(
+                "instance System.Text.Utf8SliceError::Get{other}()"
+            ))
+            .invoke_instance(error.clone(), vec![], Limits::default())
+            .is_err()
+        );
+        assert_eq!(
+            resolve("instance System.Text.Utf8SliceError::ToString()")
+                .invoke_instance(error, vec![], Limits::default())
+                .unwrap()
+                .value,
+            text(name)
+        );
+    }
+    let function = neoclr::library::system()
+        .unwrap()
+        .functions
+        .iter()
+        .find(|f| f.name == "System.String.SliceUtf8")
+        .unwrap();
+    use neoclr::metadata::Instruction::*;
+    assert!(!function.body.iter().any(|op| matches!(
+        op,
+        Some | None(_) | Ok(_) | Err(_) | IsCase(_) | LoadCase(_)
+    )));
 }

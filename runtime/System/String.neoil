@@ -26,12 +26,39 @@
         ret
     .end
 
-    .method instance SliceUtf8(Int32 byteStart, Int32 byteLength) -> Result<String,Error>
+    .method instance SliceUtf8(Int32 byteStart, Int32 byteLength) -> System.Result<String,System.Text.Utf8SliceError>
+        .local Byte failure
         ldarg this
         ldarg byteStart
         ldarg byteLength
         call neoCLR.Runtime.StringSliceUtf8(String,Int32,Int32)
+        dup
+        value.is String
+        brfalse Failed
+        value.unpack String
+        newobj instance System.Result.Ok<String>::.ctor(String)
+        newobj instance System.Result<String,System.Text.Utf8SliceError>::.ctor(System.Result.Ok<String>)
+        ret
+    Failed:
+        value.unpack Byte
+        stloc failure
+        ldloc failure
+        ldc.i4 1
+        beq OutOfRange
+        ldloc failure
+        ldc.i4 2
+        beq InvalidBoundary
+        fault "invalid native UTF-8 slice status"
+    OutOfRange:
+        newobj instance System.Text.Utf8SliceError.OutOfRange::.ctor()
+        newobj instance System.Text.Utf8SliceError::.ctor(System.Text.Utf8SliceError.OutOfRange)
+        br WrapError
+    InvalidBoundary:
+        newobj instance System.Text.Utf8SliceError.InvalidBoundary::.ctor()
+        newobj instance System.Text.Utf8SliceError::.ctor(System.Text.Utf8SliceError.InvalidBoundary)
+    WrapError:
+        newobj instance System.Result.Error<System.Text.Utf8SliceError>::.ctor(System.Text.Utf8SliceError)
+        newobj instance System.Result<String,System.Text.Utf8SliceError>::.ctor(System.Result.Error<System.Text.Utf8SliceError>)
         ret
     .end
 .end
-

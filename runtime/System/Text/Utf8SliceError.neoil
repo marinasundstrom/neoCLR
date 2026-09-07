@@ -1,0 +1,75 @@
+.type System.Text.Utf8SliceError
+    .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
+    .field private Stored System.Value
+    .type OutOfRange
+        .method instance .ctor() -> Void
+            ldvoid
+            ret
+        .end
+    .end
+    .method instance .ctor(System.Text.Utf8SliceError.OutOfRange value) -> Void
+        ldarg value
+        value.pack System.Text.Utf8SliceError.OutOfRange
+        newobj System.Text.Utf8SliceError
+        starg this
+        ldvoid
+        ret
+    .end
+    .property instance IsOutOfRange() -> Boolean
+        .get instance System.Text.Utf8SliceError::get_IsOutOfRange()
+    .end
+    .method instance get_IsOutOfRange() -> Boolean
+        ldarg this
+        ldfld 0
+        value.is System.Text.Utf8SliceError.OutOfRange
+        ret
+    .end
+    .method instance GetOutOfRange() -> System.Text.Utf8SliceError.OutOfRange
+        ldarg this
+        ldfld 0
+        value.unpack System.Text.Utf8SliceError.OutOfRange
+        ret
+    .end
+    .type InvalidBoundary
+        .method instance .ctor() -> Void
+            ldvoid
+            ret
+        .end
+    .end
+    .method instance .ctor(System.Text.Utf8SliceError.InvalidBoundary value) -> Void
+        ldarg value
+        value.pack System.Text.Utf8SliceError.InvalidBoundary
+        newobj System.Text.Utf8SliceError
+        starg this
+        ldvoid
+        ret
+    .end
+    .property instance IsInvalidBoundary() -> Boolean
+        .get instance System.Text.Utf8SliceError::get_IsInvalidBoundary()
+    .end
+    .method instance get_IsInvalidBoundary() -> Boolean
+        ldarg this
+        ldfld 0
+        value.is System.Text.Utf8SliceError.InvalidBoundary
+        ret
+    .end
+    .method instance GetInvalidBoundary() -> System.Text.Utf8SliceError.InvalidBoundary
+        ldarg this
+        ldfld 0
+        value.unpack System.Text.Utf8SliceError.InvalidBoundary
+        ret
+    .end
+    .method instance ToString() -> String
+        ldarg this
+        call instance System.Text.Utf8SliceError::get_IsOutOfRange()
+        brfalse InvalidBoundary
+        ldstr "OutOfRange"
+        ret
+    InvalidBoundary:
+        ldarg this
+        call instance System.Text.Utf8SliceError::GetInvalidBoundary()
+        pop
+        ldstr "InvalidBoundary"
+        ret
+    .end
+.end

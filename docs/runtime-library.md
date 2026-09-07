@@ -56,8 +56,8 @@ serialized just like application functions. Tests replace the compiled Divide bo
 and confirm execution follows the replacement, rather than a hidden intrinsic.
 
 The [Result API review](runtime-error-contracts.md) inventories current failure outcomes
-and proposed operation-specific error types. Parse, Divide and Abs use specific error types; text slicing and I/O error signatures
-remain future work. See [arithmetic contracts](arithmetic-errors.md).
+and proposed operation-specific error types. Parse, Divide, Abs and SliceUtf8 use specific error types; typed I/O errors remain
+future work. See [arithmetic contracts](arithmetic-errors.md).
 
 ## Build and use
 
