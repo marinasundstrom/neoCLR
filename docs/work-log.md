@@ -1861,5 +1861,5 @@ metadata carrier used for checked heterogeneous values.
 
 Refined the companion rule: non-generic unions may nest their variants directly;
 only generic carriers require a separate non-generic companion to keep variant
-parameters independent. Runtime wrapper migration remains deferred until the
-assembler can express this distinction without ambiguity.
+parameters independent. Runtime companion declarations are now present alongside
+the existing top-level wrappers, allowing incremental caller migration.

@@ -4,6 +4,14 @@
 .type Demo.Result
     .type Ok<T>
         .field Value T
+        .property instance Value() -> T
+            .get instance Demo.Result.Ok<T>::get_Value()
+        .end
+        .method instance get_Value() -> T
+            ldarg this
+            ldfld 0
+            ret
+        .end
         .method instance Read() -> T
             ldarg this
             ldfld Demo.Result.Ok<T>::Value
