@@ -107,6 +107,10 @@ qualified name agrees with that immediate owner. A top-level dotted declaration 
 not imply ownership. Existing global name-plus-arity collision rules still apply;
 a top-level type cannot duplicate a nested type's qualified name and arity.
 
+Metadata consumers can enumerate nested definitions through the module reflection
+surface, which compares `declaring_type` IDs directly. A matching name prefix alone
+does not establish ownership.
+
 Ownership must stay within one module/revision, resolve to a real definition, and
 be acyclic with bounded depth (32). Generic cases declare only their own parameters.
 Nesting under a generic outer definition is rejected for this initial subset.

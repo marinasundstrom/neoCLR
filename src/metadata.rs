@@ -634,6 +634,15 @@ impl Module {
             .iter()
             .find(|def| def.name == name && def.generic_parameters.len() == arity)
     }
+
+    /// Enumerate ordinary nested definitions owned by a type definition.
+    /// Ownership is resolved by definition identity, never by name prefixes.
+    pub fn nested_type_definitions(&self, owner: &TypeDefId) -> Vec<&TypeDef> {
+        self.types
+            .iter()
+            .filter(|definition| definition.declaring_type.as_ref() == Some(owner))
+            .collect()
+    }
 }
 
 pub(crate) fn valid_slot_name(name: &str) -> bool {

@@ -12,6 +12,14 @@ fn non_generic_union_can_own_direct_nested_case() {
         .unwrap();
     assert_eq!(circle.declaring_type, shape.definition);
     assert!(circle.generic_parameters.is_empty());
+    assert_eq!(
+        module
+            .nested_type_definitions(&shape.definition.clone().unwrap())
+            .iter()
+            .map(|definition| definition.name.as_str())
+            .collect::<Vec<_>>(),
+        ["Shape.Circle"]
+    );
 
     let program = LoadedProgram::new(&module).unwrap();
     program.verify().unwrap();
