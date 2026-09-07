@@ -392,3 +392,4 @@ companions. Run `cargo run -- run examples/nested_types.neoil` for a minimal exa
 Non-generic unions can nest cases directly; `cargo run -- run examples/non_generic_union.neoil`
 demonstrates that form.
 `cargo run -- run examples/system_companions.neoil` constructs a nested System result case.
+`cargo run -- run examples/union_extract.neoil` demonstrates discriminator-then-accessor extraction.

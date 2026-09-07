@@ -628,6 +628,12 @@
         value.is System.Ok<T>
         ret
     .end
+    .method instance get_IsOkCase() -> Boolean
+        ldarg this
+        ldfld 0
+        value.is System.Result.Ok<T>
+        ret
+    .end
     .method instance GetOk() -> System.Ok<T>
         ldarg this
         ldfld 0

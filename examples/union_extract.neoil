@@ -1,0 +1,16 @@
+.module UnionExtract
+.entry Main
+
+.function Main() -> Int32
+    ldc.i4 42
+    newobj instance System.Result.Ok<Int32>::.ctor(Int32)
+    newobj instance System.Result<Int32,Error>::.ctor(System.Result.Ok<Int32>)
+    dup
+    call instance System.Result<Int32,Error>::get_IsOkCase()
+    brfalse WrongCase
+    call instance System.Result<Int32,Error>::GetOkCase()
+    call instance System.Result.Ok<Int32>::get_Value()
+    ret
+WrongCase:
+    fault "expected Ok result"
+.end

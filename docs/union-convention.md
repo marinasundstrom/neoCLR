@@ -49,6 +49,20 @@ over the recognized constructor set; arbitrary IL may omit branches and still be
 well-formed IL. Runtime structural validation and typed verification do not prove the
 behavioral obligations of every user-authored marked type.
 
+The IL extraction pattern mirrors modern .NET usage: query the discriminator, branch
+on it, then call the typed accessor.
+
+```text
+dup
+call instance System.Result<Int32,Error>::get_IsOk()
+brfalse WrongCase
+call instance System.Result<Int32,Error>::GetOkCase()
+call instance System.Result.Ok<Int32>::get_Value()
+```
+
+The `dup` preserves the carrier for the accessor. Calling an accessor for an inactive
+case raises a terminal Fault.
+
 Representation fields are private and public members are read-only except for
 construction. Ordinary value-copy semantics apply. Pointer payloads preserve aliasing
 and do not acquire ownership. Trusted host record construction and unsafe access remain
