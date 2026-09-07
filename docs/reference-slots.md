@@ -14,8 +14,10 @@ it must not depend on the native-layout subset supported by pointer memory.
 
 Use `T&` as the CLI-shaped spelling for a typed slot reference, with a
 separate ByRef signature node. It is not `T*`, not an interface view and not the
-bootstrap Ref<T> arena handle. Leave Ref<T>'s future counted-ownership meaning
-separate from this non-owning access mechanism.
+bootstrap Ref<T> arena handle. Ref<T> was a proposal, not the chosen future
+managed-reference abstraction. This document specifies the implemented call-scoped
+subset; the [T& lifecycle direction](lifecycle.md) adds automatic retention and
+escape without a separate source ownership wrapper.
 
 A slot reference grants access to one exact T slot. It has no null state, integer
 conversion, pointer arithmetic or unchecked cast. Copying the reference aliases

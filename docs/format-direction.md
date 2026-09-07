@@ -18,6 +18,18 @@ as the binary metadata and instruction baseline. Assembly syntax is a front end;
 metadata/CIL encoding is a separate backend contract. A syntax improvement should
 not by itself require a binary format change.
 
+Reuse CLR managed references, represented by T&/ByRef, as the explicit reference
+feature. Extend the existing metadata, verification and address/load/store paths
+rather than introduce a parallel public ownership type. Frame-backed and retained
+storage implement the same reference abstraction. Automatic retention and escapes
+beyond a defining frame require documented semantic extensions; they do not imply
+compatibility with execution on an unmodified CLR.
+
+Preview artifacts and APIs may change incompatibly to implement the selected model.
+Ref<T> is a historical proposal and arena encoding, not a required future wrapper.
+Reject incompatible formats and require reassembly where needed; compatibility
+layers are not a prerequisite for removing obsolete preview representations.
+
 ## Intended representation policy
 
 - Preserve ordinary metadata concepts such as modules, type/field/function

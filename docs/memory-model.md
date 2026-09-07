@@ -31,14 +31,14 @@ the declared copy rules. Allocation, reference access and ownership are separate
 | T& | Explicit managed access to a live, initialized slot when reading; output contracts can initialize it |
 | Interface& | Explicit dispatch view over an implementing value's slot |
 | T* or Void* | Low-level address access with explicit validity and lifetime obligations |
-| Future ownership wrappers/services | A selected retention and release policy, separate from reference access |
+| Future retained T& | The same CLR-style managed-reference feature, with automatic lifetime retention |
 
 Capabilities are expressed through declared types, interfaces, parameter/receiver
 contracts and explicit operations. Current interfaces are declared on types; this
 is not a promise of dynamic per-instance interface attachment. An interface view
 adds access to an existing contract without changing allocation or retaining an owner.
-Future ownership wrappers can add retention semantics without turning all T values
-into implicitly managed references.
+Retained managed references extend T&/ByRef without turning all T values into
+references. Ref<T> remains a historical proposal and current arena encoding.
 
 A Rust-style borrow checker is not a platform requirement. In the current call-scoped
 subset the runtime checks reference identity, liveness, exact type, initialization
@@ -65,9 +65,10 @@ document are implementation options, not requirements for manual reference manag
 
 Heap allocation and native pointers are implemented, as are call-scoped managed
 references and interface views. Stabilize their contracts and the Preview 1 programs.
-Defer reference counting, GC, automatic destruction, ownership-aware copy/move behavior,
-escaping references and language lifetime integration until their intended programs
-and contracts are defined.
+Automatic retention, escaping references and destruction are not implemented yet.
+Their next implementation gate is described in the
+[managed-reference plan](managed-reference-implementation.md); cycle policy and
+concurrency remain open decisions.
 
 The precise native allocation contract is in [heap and pointers](heap-and-pointers.md),
 and the managed-reference contract is in [slot references](reference-slots.md).
@@ -95,11 +96,11 @@ language through a policy box. Typed values, fixed and dynamic array views, raw
 and stores are platform primitives. A language may expose them safely, restrict
 them, or make them ergonomic, but those choices belong to the language profile.
 
-Ownership, reference counting, garbage collection, nullability, and escape analysis
-are separate layers. They may be expressed through library types such as `Ref<T>`
-and compiler-generated calls, while the VM continues to provide the underlying
-address and lifetime contracts. This keeps the platform CLR-like in its metadata and
-type signatures without inheriting C#-specific historical restrictions.
+Reference counting, cycle collection, nullability and escape analysis are distinct
+design concerns. The selected public reference feature is CLR-style T&/ByRef; the
+runtime manages its lifetime automatically. Ref<T> is not a required library wrapper.
+Preserve CLR metadata and instruction semantics where they fit, documenting the
+extensions needed for retained and escaping references.
 
 ## Earlier implementation proposals: explicit VM memory operations
 
@@ -113,7 +114,9 @@ Keep these concepts distinct:
 
 - `T` describes a value and its representation.
 - `Ptr<T>` supplies address access without ownership.
-- `Ref<T>` explicitly represents counted ownership when that abstraction is built.
+- `T&`/ByRef supplies managed reference access with automatic lifetime handling.
+- `Ref<T>` is a historical ownership proposal and prototype arena encoding; it may
+  be removed as the managed-reference implementation develops.
 - The environment supplies allocation services and may supply optional collection
   facilities. Programs need not select a concrete allocator at every allocation site.
 - Construction, copy, move, retain, release, and destruction have explicit contracts
@@ -121,36 +124,21 @@ Keep these concepts distinct:
 
 The environment may choose where and how allocation occurs, but its implementation
 choices must preserve the declared access and lifetime contract. Environment-provided
-services are not a reason to make guest ownership implicit.
+services must preserve explicit reference semantics and automatic lifetime handling.
 
-## Deferred ownership abstractions
+## Retention implementation decisions
 
-Future modeling should emphasize explicit types for semantic contracts. For example,
-Ref<T> may represent counted ownership; its type can communicate the applicable
-copy/release behavior. This is a direction for generic types and library abstractions,
-not a requirement that all allocations carry counts. Optional collection policies
-must likewise have explicit access/lifetime contracts. The current Ref arena does
-not yet implement these contracts.
+A plain value does not inherently require a reference count. Managed references
+must preserve their target and identity automatically; reference counting is a
+candidate implementation, not a separate source-level Ref<T> obligation. The older
+generic ownership-wrapper proposal is superseded as the platform reference model.
 
-A plain value should not automatically contain a reference count. Ref<T> is an
-explicit candidate for counted ownership: creation establishes a reference, copying
-retains it, release decrements its count, and final release destroys the value and
-returns storage through its allocation environment.
-
-Reference counting need not be built into the runtime as the universal object model.
-The VM can supply counters/atomics and construction/destruction facilities, or
-specialized retain/release operations, while a generic library wrapper owns the
-policy. How much is implemented in the library versus optimized by the VM remains
-open. Real generic definitions are needed; the current special-cased Ref signature
-is not that general generic facility.
-
-A record containing Ref fields would need explicit copy/destruction behavior for
-those fields even though the record itself is not counted. That behavior must not
-emerge accidentally from Rust Clone or Drop. Moves, weak references, cycles,
-threading/atomicity, destruction ordering, and foreign ownership all remain deferred.
-
-Optional collection services must preserve explicit ownership contracts. No ambient
-tracing GC, Rust-style borrow checker, or count header on every object is implied.
+Copies and replacement of records containing managed references need specified
+retention and cleanup behavior. Those semantics must not emerge accidentally from
+Rust Clone or Drop. Weak references, cycles, threading/atomicity, destruction order
+and foreign ownership still need explicit contracts. No ambient tracing GC or
+Rust-style borrow checker is implied. See the
+[implementation gate](managed-reference-implementation.md).
 
 ## Current implementation
 

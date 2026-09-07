@@ -6,6 +6,19 @@ reference lifetimes. Clonable, Disposable and Closable are implemented ordinary
 interfaces. Managed heap retention, escaping stack references and automatic guest
 destruction remain future work. The current Ref arena is a prototype limitation.
 
+Ref<T> was a proposal, not a selected public reference abstraction. The source
+direction is T&. Prefer .NET CLR instructions and semantics wherever they fit;
+justify deviations by the improved value/reference/lifetime contract. Preview
+artifacts and APIs may be broken to implement that model. Obsolete encodings need
+not be preserved behind compatibility wrappers.
+
+Reuse CLR managed references, represented by T&/ByRef, as the explicit reference
+feature. Extend the existing metadata, verification and address/load/store paths
+rather than introduce a parallel public ownership type. Frame-backed and retained
+storage implement the same reference abstraction. Automatic retention and escapes
+beyond a defining frame require documented semantic extensions; they do not imply
+compatibility with execution on an unmodified CLR.
+
 ## Values and two reference uses
 
 | Form | Programmer's choice | Runtime responsibility |
@@ -19,9 +32,9 @@ Heap allocation in the managed programming model produces a managed reference.
 The referenced value has the same type T that could otherwise be held directly;
 there is no class/struct bit that forces allocation policy onto the type.
 Current heap.alloc/free remain raw memory operations, while heap.new/Ref expose
-an execution-retained arena. Neither existing mechanism is silently redefined by
-this proposal. The selected high-level spelling is new T(...); its IL lowering
-and artifact transition remain open.
+an execution-retained arena. This document does not change execution behavior;
+implementation may replace obsolete encodings in a breaking preview revision.
+The selected high-level spelling is new T(...); its CLI-based IL lowering remains open.
 
 A byref parameter can refer to a caller's local and be passed further down the call
 chain. The programmer explicitly chooses reference access, then uses that reference
@@ -216,4 +229,8 @@ or rollback. Raw memory release remains distinct from destroying typed managed v
 
 Interpretation, JIT and AOT must preserve the same observable value/reference and
 lifetime behavior. Existing Ref arena artifacts and raw pointer-based collections
-need an explicit migration rather than silently acquiring different ownership rules.
+may be replaced or redesigned. Declare incompatible format changes and require
+reassembly instead of preserving proposals that no longer fit.
+
+The [implementation gate](managed-reference-implementation.md) records current code
+gaps, reference identity/retention invariants and the first acceptance workloads.

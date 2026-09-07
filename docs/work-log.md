@@ -2675,3 +2675,22 @@ placement or promotion is required, preserving every alias to the same value.
 Call-scoped byrefs and by-value returns do not inherently require heap allocation.
 Updated the allocation-encoding proposal to distinguish raw pointer operations
 from the selected managed source syntax. No compiler or runtime behavior changed.
+
+## CLR managed references selected as the lifetime foundation — 2026-09-07
+
+Established existing CLR-style T&/ByRef as the explicit reference feature for both
+scoped access and future automatically retained references. Ref<T> is a historical
+proposal and current arena encoding, not a selected ownership wrapper. Reuse CLR
+metadata and address/load/store instructions wherever their semantics fit; document
+retention and escaping-reference extensions. Breaking preview artifacts and APIs
+is permitted, with explicit incompatibility rejection and reassembly where needed.
+
+Added managed-reference-implementation.md with current representation gaps, stable
+identity and retention invariants, initialization and replacement requirements,
+host/context boundaries, cycle-policy questions and bounded acceptance cases.
+Aligned lifecycle, memory, format, reference and roadmap documents with that model.
+No compiler or runtime behavior changed.
+
+Validation: all 90 local links and heading targets in the changed design documents
+resolve; diff whitespace checks pass. src/tests/examples/runtime match HEAD exactly.
+Runtime tests were not rerun for this documentation-only change.

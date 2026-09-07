@@ -235,10 +235,11 @@ layouts, arithmetic, and indirect access are now available, along with a first
 [native interop subset](native-interop.md). Diagnostic side tracking must not
 become a compulsory ownership policy for the platform.
 
-Defer reference counting, GC, automatic destruction, lifetime-aware wrappers, and
-allocator/collector integration. These are recorded in [memory layers](memory-model.md)
-and [allocation proposals](allocation-encoding.md). The current Ref arena is
-scaffolding, not a prerequisite ownership policy for the pointer layer.
+Automatic retention and destruction are outside this implemented pointer subset.
+The next [managed-reference gate](managed-reference-implementation.md) extends
+T&/ByRef; the current Ref arena may be replaced in a breaking preview revision.
+Allocator/collector integration remains in [memory layers](memory-model.md) and
+[allocation proposals](allocation-encoding.md).
 
 ## Implemented library foundation
 
@@ -288,10 +289,10 @@ own contracts and demonstrable need.
    [the interface subset](interfaces.md).
 6. Build .NET metadata/IL inspection and translation for a supported subset, with
    actionable diagnostics for semantic differences.
-7. Revisit explicit lifetime operations and generic ownership abstractions such as
-   counted Ref<T>. Decide library versus VM support then, keeping optional memory
-   management independent of the low-level VM. Evaluate native interop, concurrency,
-   and runtime async against the required contracts.
+7. Extend CLR-style T&/ByRef with automatic retention, safe escapes and deterministic
+   cleanup under the [managed-reference plan](managed-reference-implementation.md).
+   Ref<T> is a historical proposal, not a required ownership wrapper. Evaluate native
+   interop, concurrency and runtime async against these lifetime contracts.
 
 The assembler must grow toward full platform expressiveness, with .NET ilasm as
 the capability baseline; see [assembler design](assembler-design.md).

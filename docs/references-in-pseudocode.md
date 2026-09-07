@@ -18,7 +18,11 @@ platform operations below remain explicit.
 | Int32* | Raw native pointer with explicit memory/lifetime obligations |
 | Int32*& | Managed reference to a slot whose value is a raw Int32 pointer |
 | Settable& | Managed interface view over an implementing concrete slot |
-| Ref<T> | Separate ownership direction; the current bootstrap arena handle is not a counted owner or this slot-reference mechanism |
+| Ref<T> | Historical proposal/current arena handle; not the selected future reference abstraction |
+
+The examples below cover the implemented call-scoped subset. The
+[lifecycle direction](lifecycle.md) extends the same CLR-style T&/ByRef feature with
+automatic retention for managed heap values and escaping references.
 
 ## Passing a reference
 

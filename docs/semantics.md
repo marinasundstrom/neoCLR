@@ -136,8 +136,7 @@ claiming a full .NET-compatible library or final binary CIL emission.
 
 Rust's host memory rules do not define the guest VM. Fundamental `Ptr<T>`/`T*`
 values are separate from ownership wrappers. Native heap allocation and pointer
-access are implemented in a checked interpreter subset. Reference-counted `Ref<T>`
-is a deferred candidate for explicit ownership,
-but the implementation still uses an arena. General generic metadata and lifetime
-operations are prerequisites for a library-defined Ref abstraction. No global GC or
-Rust-style borrowing policy is implied. See [memory layers](memory-model.md).
+access are implemented in a checked interpreter subset. The next managed lifetime model extends
+CLR-style T&/ByRef with automatic retention and safe escapes. Ref<T> is a historical
+proposal and current arena encoding, not the selected future reference abstraction.
+No global GC or Rust-style borrowing policy is implied. See [memory layers](memory-model.md).
