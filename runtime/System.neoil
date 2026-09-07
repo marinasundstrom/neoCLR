@@ -164,30 +164,23 @@
 .end
 
 .type System.Console
-    .method static ReadByte() -> Result<Option<Byte>,Error>
-        call neoCLR.Runtime.ConsoleReadByte()
-        ret
-    .end
-
-    ; Public ordinary-carrier adapter. The native boundary keeps the
-    ; bootstrap union representation; consumers see nested case types.
-    .method static ReadByteTyped() -> System.Result<System.Option<Byte>,System.Error>
+    ; The host returns a bounded erased payload; platform IL constructs the carriers.
+    .method static ReadByte() -> System.Result<System.Option<Byte>,System.Error>
         call neoCLR.Runtime.ConsoleReadByte()
         dup
-        is.case Err
+        value.is Error
         brtrue ReadFailed
-        ldcase Ok
         dup
-        is.case None
+        value.is Void
         brtrue EndOfInput
-        ldcase Some
+        value.unpack Byte
         newobj.ctor instance System.Option.Some<Byte>::.ctor(Byte)
         newobj.ctor instance System.Option<Byte>::.ctor(System.Option.Some<Byte>)
         newobj.ctor instance System.Result.Ok<System.Option<Byte>>::.ctor(System.Option<Byte>)
         newobj.ctor instance System.Result<System.Option<Byte>,System.Error>::.ctor(System.Result.Ok<System.Option<Byte>>)
         ret
     ReadFailed:
-        ldcase Err
+        value.unpack Error
         newobj.ctor instance System.Result.Error<System.Error>::.ctor(System.Error)
         newobj.ctor instance System.Result<System.Option<Byte>,System.Error>::.ctor(System.Result.Error<System.Error>)
         ret
@@ -216,7 +209,7 @@
 .end
 
 .type System.Math
-    .method static AbsTyped(int32 value) -> System.Result<Int32,Error>
+    .method static Abs(int32 value) -> System.Result<Int32,Error>
         ldarg value
         ldc.i4 -2147483648
         ceq
@@ -243,29 +236,6 @@
         ret
     .end
 
-    .method static Abs(int32 value) -> Result<Int32,Error>
-        ldarg value
-        ldc.i4 -2147483648
-        ceq
-        brtrue Overflow
-        ldarg value
-        ldc.i4 0
-        clt
-        brtrue Negative
-        ldarg value
-        ok Error
-        ret
-        Negative:
-        ldc.i4 0
-        ldarg value
-        sub
-        ok Error
-        ret
-        Overflow:
-        error "Overflow"
-        err Int32
-        ret
-    .end
 .end
 
 .function neoCLR.Runtime.WriteLine(string value) -> Void
@@ -436,37 +406,30 @@
 .end
 
 .type System.IO.File
-    .method static ReadAllText(String path, Int32 maxBytes) -> Result<String,Error>
-        ldarg path
-        ldarg maxBytes
-        call neoCLR.Runtime.ReadAllText(String,Int32)
-        ret
-    .end
-
-    .method static ReadAllTextTyped(String path, Int32 maxBytes) -> System.Result<String,System.Error>
+    .method static ReadAllText(String path, Int32 maxBytes) -> System.Result<String,System.Error>
         ldarg path
         ldarg maxBytes
         call neoCLR.Runtime.ReadAllText(String,Int32)
         dup
-        is.case Err
+        value.is Error
         brtrue ReadFailed
-        ldcase Ok
+        value.unpack String
         newobj.ctor instance System.Result.Ok<String>::.ctor(String)
         newobj.ctor instance System.Result<String,System.Error>::.ctor(System.Result.Ok<String>)
         ret
     ReadFailed:
-        ldcase Err
+        value.unpack Error
         newobj.ctor instance System.Result.Error<System.Error>::.ctor(System.Error)
         newobj.ctor instance System.Result<String,System.Error>::.ctor(System.Result.Error<System.Error>)
         ret
     .end
 .end
 
-.function neoCLR.Runtime.ReadAllText(String path, Int32 maxBytes) -> Result<String,Error>
+.function neoCLR.Runtime.ReadAllText(String path, Int32 maxBytes) -> System.Value
     .methodimpl InternalCall
 .end
 
-.function neoCLR.Runtime.ConsoleReadByte() -> Result<Option<Byte>,Error>
+.function neoCLR.Runtime.ConsoleReadByte() -> System.Value
     .methodimpl InternalCall
 .end
 
@@ -587,7 +550,14 @@
     .method instance get_IsNone() -> Boolean
         ldarg this
         ldfld 0
+        dup
+        value.is System.Option.None
+        brtrue Match
         value.is System.None
+        ret
+    Match:
+        pop
+        ldc.bool true
         ret
     .end
     .method instance GetNone() -> System.None
@@ -624,7 +594,14 @@
     .method instance get_IsSome() -> Boolean
         ldarg this
         ldfld 0
+        dup
+        value.is System.Option.Some<T>
+        brtrue Match
         value.is System.Some<T>
+        ret
+    Match:
+        pop
+        ldc.bool true
         ret
     .end
     .method instance GetSome() -> System.Some<T>
@@ -705,7 +682,14 @@
     .method instance get_IsOk() -> Boolean
         ldarg this
         ldfld 0
+        dup
+        value.is System.Result.Ok<T>
+        brtrue Match
         value.is System.Ok<T>
+        ret
+    Match:
+        pop
+        ldc.bool true
         ret
     .end
     .method instance get_IsOkCase() -> Boolean
@@ -748,7 +732,14 @@
     .method instance get_IsErr() -> Boolean
         ldarg this
         ldfld 0
+        dup
+        value.is System.Result.Error<E>
+        brtrue Match
         value.is System.Err<E>
+        ret
+    Match:
+        pop
+        ldc.bool true
         ret
     .end
     .method instance get_IsErrorCase() -> Boolean

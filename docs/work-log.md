@@ -1915,3 +1915,34 @@ bootstrap union operations.
 Recorded typed parse errors as a future ordinary union domain. `Result<T,TError>`
 can carry cases such as invalid format or overflow without exceptions; the preview
 continues to use `System.Error` until the carrier migration is complete.
+
+
+## Canonical nested-case API migration
+
+Replaced the temporary ReadByteTyped, ReadAllTextTyped and AbsTyped alternatives with
+canonical Console.ReadByte, File.ReadAllText and Math.Abs APIs returning ordinary
+nested System.Result/Option cases. Console/file host bindings return bounded erased
+payloads (Byte/Void/Error and String/Error respectively); library IL owns all case
+construction, with no bootstrap union opcodes in these methods or native union values
+at these boundaries. Explicit System.Value storage remains the existing preview
+representation, not a new memory-management policy.
+
+Migrated the interactive console and file examples and their host expectations. Fixed
+Option/Result predicates to recognize nested cases as well as the older ordinary wrapper
+family; this corrects EOF recognition in the single-byte console example. Also updated
+stale parsing consumers in errors/types samples and made carrier/library tests assert
+behavior instead of obsolete exact method counts. Added EOF, full-byte-range, read
+failure, missing-console and canonical-API regression coverage.
+
+This is a breaking System library/native binding contract: reassemble old applications
+and System artifacts together. The old Typed names are removed, and callers must use
+GetOkCase/GetErrorCase/GetSomeCase plus case Value accessors. JSON encoding has not
+changed; this does not imply old library contracts remain compatible. Divide, slicing,
+older ordinary wrappers and other bootstrap union uses remain explicit Preview 1 debt.
+
+Next slice: split the System library sources by class or feature into namespace folders,
+retaining one assembled System module and a reproducible source build.
+
+Validation: the full `cargo test --locked --no-fail-fast` suite passes, as do
+`cargo fmt --check`, `cargo clippy --locked --all-targets -- -D warnings` and
+`git diff --check` on macOS ARM64.

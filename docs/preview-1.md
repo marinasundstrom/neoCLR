@@ -34,7 +34,7 @@ may remain unnamed; neoCLR is sufficient as the runtime codename for the preview
 | Ordinary type contracts | Public/internal type visibility, public/internal/private members, usable constructors with defined receiver and initialization behavior | Visibility, properties and whole-value constructor initialization implemented; carrier requirements still need proving |
 | Ordinary unions | Carrier/variant convention sufficient for Option<T> and Result<T,TError>, including Void, nested carriers, and Result<T,T> | Selected convention, System carriers and bounded erased host input implemented; existing API/native/bootstrap host-path migration remains |
 | No union-specific IL | Library, samples, native result construction and host inputs use ordinary types; remove special union operations and encodings | Not done; current some/none/ok/err/is.case/ldcase and special Option/Result handling are bootstrap debt |
-| Minimal library and console | Useful Int32/String/Error APIs; console input/output; EOF distinct from input failure; an interactive program | Implemented using raw byte input and immediate line output; `ReadByteTyped` demonstrates the ordinary nested Result/Option boundary. General ReadLine is not required |
+| Minimal library and console | Useful Int32/String/Error APIs; console input/output; EOF distinct from input failure; an interactive program | Implemented using raw byte input and immediate line output; `ReadByte` uses the ordinary nested Result/Option boundary. General ReadLine is not required |
 | Minimal reflection | Obtain a System.Type-style descriptor from a type token or value, compare identity, read its name, inspect closed generic arguments | Existing host type identities are groundwork; guest read-only type inspection is not implemented |
 | Memory and arrays | Explicit pointers/allocation/free, record storage, small usable array/buffer example, documented lifetime and copy rules | Implemented; native-layout Array<T> descriptors are sufficient. No promise of general owned arrays or automatic cleanup |
 | Errors and diagnostics | Recoverable failures through Result; terminal Faults with owned logical stack frames shown by CLI/host | Implemented with bootstrap Results; migrate them. Source-line maps and guest StackTrace classes are not required for Preview 1 |
@@ -68,9 +68,9 @@ and compatibility with existing .NET tooling are later work, not achieved by usi
    failed queries and independent value copies. Fully qualified names select them while
    short Option/Result spellings still denote bootstrap categories. Migrate existing
    APIs and host/native adapters before removing that temporary distinction.
-   Int32.Parse and its checked-in callers, plus the typed console and file adapters, are
-   migrated; arithmetic, slicing and the legacy ReadByte/ReadAllText APIs still use
-   bootstrap carriers.
+   Int32.Parse, Math.Abs, Console.ReadByte and File.ReadAllText use canonical ordinary
+   nested-case returns, including the console/file native boundaries. There are no
+   parallel Typed APIs. Divide and slicing still use bootstrap carriers.
 4. **Replace and remove the bootstrap union system.** Migrate library methods, native/host
    adapters, samples, and tests to ordinary types and calls. Delete the six special
    instructions and special Option/Result type/value dispatch. Make the metadata break

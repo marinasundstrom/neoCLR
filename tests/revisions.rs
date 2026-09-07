@@ -160,6 +160,9 @@ fn system_can_be_pinned_and_unversioned_artifacts_keep_their_encoding() {
     system.revision = Some("runtime-1".into());
     for ty in &mut system.types {
         ty.definition = None;
+        if let Some(owner) = &mut ty.declaring_type {
+            owner.revision = system.revision.clone();
+        }
     }
     for function in &mut system.functions {
         function.definition = None;
@@ -169,7 +172,7 @@ fn system_can_be_pinned_and_unversioned_artifacts_keep_their_encoding() {
         name: "System".into(),
         revision: "runtime-1".into(),
     }]);
-    assert!(LoadedProgram::with_library(&app, &system).is_ok());
+    LoadedProgram::with_library(&app, &system).unwrap();
     assert!(LoadedProgram::with_library(&app, library::system().unwrap()).is_err());
     let json = serde_json::to_value(neoclr::assemble(".module App\n.references (System)").unwrap())
         .unwrap();

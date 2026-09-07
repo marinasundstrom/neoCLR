@@ -1,18 +1,10 @@
 //! Blocking, bounded UTF-8 file input for the initial platform library.
 use std::io::{ErrorKind, Read};
 
-use crate::{
-    Fault, Value,
-    metadata::{Case, Type},
-};
+use crate::{Fault, Value};
 
 fn error(message: &str) -> Value {
-    Value::result(
-        Value::Error(message.into()),
-        Type::String,
-        Type::Error,
-        Case::Err,
-    )
+    Value::Erased(Box::new(Value::Error(message.into())))
 }
 
 fn io_error(error_value: std::io::Error) -> Value {
@@ -60,7 +52,7 @@ pub(crate) fn read_all_text(path: &str, max_bytes: i32) -> Result<Value, Fault> 
         bytes.extend_from_slice(&chunk[..count]);
     }
     Ok(match String::from_utf8(bytes) {
-        Ok(text) => Value::result(Value::String(text), Type::String, Type::Error, Case::Ok),
+        Ok(text) => Value::Erased(Box::new(Value::String(text))),
         Err(_) => error("InvalidUtf8"),
     })
 }

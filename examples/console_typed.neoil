@@ -3,7 +3,7 @@
 
 ; Demonstrates the ordinary nested Result<Option<Byte>,Error> Console API.
 .function Main() -> Void
-    call System.Console::ReadByteTyped()
+    call System.Console::ReadByte()
     dup
     call instance System.Result<System.Option<Byte>,System.Error>::get_IsErrorCase()
     brtrue Failed

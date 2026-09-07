@@ -49,7 +49,7 @@ fn module_local_identity_does_not_change_when_library_rows_are_appended() {
         .iter()
         .position(|f| f.name == "System.Math.Abs")
         .unwrap();
-    let module = assemble(&format!(".module App\n.entry Main\n.function Unused() -> Void\nldvoid\nret\n.end\n.function Main() -> Int32\nldc.i4 -42\ncall System.Math::Abs(Int32) @ System:{index}\nldcase Ok\nret\n.end")).unwrap();
+    let module = assemble(&format!(".module App\n.entry Main\n.function Unused() -> Void\nldvoid\nret\n.end\n.function Main() -> Int32\nldc.i4 -42\ncall System.Math::Abs(Int32) @ System:{index}\ncall instance System.Result<Int32,Error>::GetOkCase()\ncall instance System.Result.Ok<Int32>::get_Value()\nret\n.end")).unwrap();
     assert_eq!(
         run(&module, Limits::default()).unwrap().value,
         Value::Int32(42)

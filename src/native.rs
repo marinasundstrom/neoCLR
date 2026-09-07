@@ -39,17 +39,10 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             (Binding::ErrorFromMessage, Type::Error)
         }
         ("neoCLR.Runtime.ErrorMessage", [Type::Error]) => (Binding::ErrorMessage, Type::String),
-        ("neoCLR.Runtime.ReadAllText", [Type::String, Type::Int32]) => (
-            Binding::ReadAllText,
-            Type::Result(Box::new(Type::String), Box::new(Type::Error)),
-        ),
-        ("neoCLR.Runtime.ConsoleReadByte", []) => (
-            Binding::ConsoleReadByte,
-            Type::Result(
-                Box::new(Type::Option(Box::new(Type::Byte))),
-                Box::new(Type::Error),
-            ),
-        ),
+        ("neoCLR.Runtime.ReadAllText", [Type::String, Type::Int32]) => {
+            (Binding::ReadAllText, Type::Value)
+        }
+        ("neoCLR.Runtime.ConsoleReadByte", []) => (Binding::ConsoleReadByte, Type::Value),
         _ => {
             return Err(Fault::new(format!(
                 "no runtime binding for {}({:?})",
@@ -75,36 +68,15 @@ impl Binding {
     ) -> Result<Value, Fault> {
         match (self, args.as_slice()) {
             (Self::ConsoleReadByte, []) => {
-                let ty = Type::Option(Box::new(Type::Byte));
-                let result = match console {
-                    None => Value::result(
-                        Value::Error("ConsoleUnavailable".into()),
-                        ty,
-                        Type::Error,
-                        Case::Err,
-                    ),
+                let payload = match console {
+                    None => Value::Error("ConsoleUnavailable".into()),
                     Some(console) => match console.read_byte() {
-                        Ok(byte) => {
-                            let value = Value::Union {
-                                ty: ty.clone(),
-                                case: if byte.is_some() {
-                                    Case::Some
-                                } else {
-                                    Case::None
-                                },
-                                payload: Box::new(byte.map(Value::Byte).unwrap_or(Value::Void)),
-                            };
-                            Value::result(value, ty, Type::Error, Case::Ok)
-                        }
-                        Err(_) => Value::result(
-                            Value::Error("ConsoleReadFailed".into()),
-                            ty,
-                            Type::Error,
-                            Case::Err,
-                        ),
+                        Ok(Some(byte)) => Value::Byte(byte),
+                        Ok(None) => Value::Void,
+                        Err(_) => Value::Error("ConsoleReadFailed".into()),
                     },
                 };
-                Ok(result)
+                Ok(Value::Erased(Box::new(payload)))
             }
             (Self::ReadAllText, [Value::String(path), Value::Int32(max_bytes)]) => {
                 crate::file_io::read_all_text(path, *max_bytes)

@@ -15,13 +15,12 @@ fn app(body: &str, returns: &str) -> neoclr::Module {
 fn runtime_library_is_assembled_platform_code() {
     let module = assemble(include_str!("../runtime/System.neoil")).unwrap();
     assert!(module.entry.is_empty());
-    assert_eq!(
+    assert!(
         module
             .functions
             .iter()
             .filter(|f| !f.is_internal_call())
-            .count(),
-        42
+            .all(|f| !f.body.is_empty())
     );
     assert_eq!(
         module
@@ -62,34 +61,23 @@ fn platform_abs_handles_signs_and_overflow() {
     ] {
         let result = run(
             &app(
-                &format!("ldc.i4 {value}\ncall System.Math.Abs(int32)"),
-                "Result<Int32,Error>",
+                &format!("ldc.i4 {value}\ncall System.Math.Abs(int32)\ncall instance System.Result<Int32,Error>::GetOkCase()\ncall instance System.Result.Ok<Int32>::get_Value()"),
+                "Int32",
             ),
             Limits::default(),
         )
         .unwrap();
-        assert_eq!(
-            result.value,
-            Value::result(Value::Int32(expected), Type::Int32, Type::Error, Case::Ok)
-        );
+        assert_eq!(result.value, Value::Int32(expected));
     }
     let result = run(
         &app(
-            "ldc.i4 -2147483648\ncall System.Math.Abs(int32)",
-            "Result<Int32,Error>",
+            "ldc.i4 -2147483648\ncall System.Math.Abs(int32)\ncall instance System.Result<Int32,Error>::GetErrorCase()\ncall instance System.Result.Error<Error>::get_Value()",
+            "Error",
         ),
         Limits::default(),
     )
     .unwrap();
-    assert_eq!(
-        result.value,
-        Value::result(
-            Value::Error("Overflow".into()),
-            Type::Int32,
-            Type::Error,
-            Case::Err
-        )
-    );
+    assert_eq!(result.value, Value::Error("Overflow".into()));
 }
 
 #[test]

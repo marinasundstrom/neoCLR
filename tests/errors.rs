@@ -74,11 +74,13 @@ fn result_error_payloads_can_be_imported_and_formatted_without_faults() {
         .value;
     let get_error = program
         .resolve_function(
-            &parse_function_ref("instance System.Result<Int32,Error>::GetErr()").unwrap(),
+            &parse_function_ref("instance System.Result<Int32,Error>::GetErrorCase()").unwrap(),
         )
         .unwrap();
     let get_value = program
-        .resolve_function(&parse_function_ref("instance System.Err<Error>::get_Value()").unwrap())
+        .resolve_function(
+            &parse_function_ref("instance System.Result.Error<Error>::get_Value()").unwrap(),
+        )
         .unwrap();
     let wrapper = get_error
         .invoke_instance(result.clone(), vec![], Limits::default())

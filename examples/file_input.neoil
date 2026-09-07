@@ -4,7 +4,7 @@
 .function ReadNumber(String path) -> System.Result<Int32,Error>
     ldarg path
     ldc.i4 1024
-    call System.IO.File::ReadAllTextTyped(String,Int32)
+    call System.IO.File::ReadAllText(String,Int32)
     dup
     call instance System.Result<String,System.Error>::get_IsErrorCase()
     brtrue Failed

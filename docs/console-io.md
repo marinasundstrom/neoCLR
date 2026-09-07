@@ -6,18 +6,20 @@ are ordinary platform IL; line decoding and a general text reader are deferred.
 
 ## Platform methods
 
-`System.Console.ReadByte() -> Result<Option<Byte>,Error>` is a neoCLR bootstrap extension.
+`System.Console.ReadByte() -> System.Result<System.Option<Byte>,Error>` provides raw byte input.
 Its IL body calls the explicitly declared `neoCLR.Runtime.ConsoleReadByte` InternalCall.
-The runtime constructs an owned result with exact Byte storage:
+The host returns an explicitly erased Byte, Void (EOF), or Error. Platform IL
+constructs the ordinary nested cases with exact Byte storage:
 
 - Ok(Some(byte)): one byte, including zero or values above 127.
 - Ok(None): end of input, separate from an empty line or an input error.
-- Err(Error("ConsoleUnavailable")): no host console was supplied.
-- Err(Error("ConsoleReadFailed")): the host reported an input failure.
+- Error(Error("ConsoleUnavailable")): no host console was supplied.
+- Error(Error("ConsoleReadFailed")): the host reported an input failure.
 
 Input has no implicit UTF-8 decoding, newline conversion, or -1 EOF sentinel. The sample stores a raw Byte case payload in a Byte local before loading it for
 arithmetic. The local load converts it to the Int32 evaluation-stack category.
-Existing bootstrap union instruction semantics are unchanged pending their removal.
+Both console samples use ordinary case constructors, predicates and checked accessors.
+ReadByte contains no union-specific IL. The former ReadByteTyped name is removed.
 
 Existing WriteLine(String) and WriteLine(Int32) retain their Void return type. When a
 host console is supplied, output is delivered immediately, before another guest

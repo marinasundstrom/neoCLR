@@ -1,9 +1,11 @@
 # Bounded UTF-8 file input
 
-`System.IO.File.ReadAllText(String path, Int32 maxBytes) -> Result<String,Error>`
+`System.IO.File.ReadAllText(String path, Int32 maxBytes) -> System.Result<String,Error>`
 provides the first file integration. Its ordinary platform-IL method calls the declared
 `neoCLR.Runtime.ReadAllText` InternalCall. Runtime-service analysis reports `FileInput`;
-this report describes dependencies, not an access-control mechanism.
+and `ValueStorage`; this report describes dependencies, not an access-control mechanism.
+The host returns an explicitly erased String or Error; platform IL constructs ordinary
+System.Result.Ok<String> or System.Result.Error<Error> cases. ReadAllTextTyped is removed.
 
 The method reads a regular file synchronously under the host process's filesystem
 permissions. Relative paths resolve against the process working directory. Symlinks

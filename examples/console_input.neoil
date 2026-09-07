@@ -3,7 +3,7 @@
 
 ; Read up to nine ASCII digits, terminated by LF or EOF.
 ; CR is ignored so redirected CRLF input works too.
-.function ReadNumber() -> Result<Option<Int32>,Error>
+.function ReadNumber() -> System.Result<System.Option<Int32>,Error>
     .local Int32 number
     .local Int32 digits
     .local Byte byte
@@ -14,13 +14,15 @@
 Read:
     call System.Console::ReadByte()
     dup
-    is.case Err
+    call instance System.Result<System.Option<Byte>,Error>::get_IsErrorCase()
     brtrue InputFailed
-    ldcase Ok
+    call instance System.Result<System.Option<Byte>,Error>::GetOkCase()
+    call instance System.Result.Ok<System.Option<Byte>>::get_Value()
     dup
-    is.case None
+    call instance System.Option<Byte>::get_IsNone()
     brtrue Eof
-    ldcase Some
+    call instance System.Option<Byte>::GetSomeCase()
+    call instance System.Option.Some<Byte>::get_Value()
     stloc byte
     ldloc byte
     ldc.i4 13
@@ -54,31 +56,40 @@ Eof:
     pop
     ldloc digits
     brtrue Finish
-    none Int32
-    ok Error
+    newobj instance System.Option.None::.ctor()
+    newobj instance System.Option<Int32>::.ctor(System.Option.None)
+    newobj instance System.Result.Ok<System.Option<Int32>>::.ctor(System.Option<Int32>)
+    newobj instance System.Result<System.Option<Int32>,Error>::.ctor(System.Result.Ok<System.Option<Int32>>)
     ret
 Finish:
     ldloc digits
     brfalse Empty
     ldloc number
-    some
-    ok Error
+    newobj instance System.Option.Some<Int32>::.ctor(Int32)
+    newobj instance System.Option<Int32>::.ctor(System.Option.Some<Int32>)
+    newobj instance System.Result.Ok<System.Option<Int32>>::.ctor(System.Option<Int32>)
+    newobj instance System.Result<System.Option<Int32>,Error>::.ctor(System.Result.Ok<System.Option<Int32>>)
     ret
 InputFailed:
-    ldcase Err
-    err Option<Int32>
+    call instance System.Result<System.Option<Byte>,Error>::GetErrorCase()
+    call instance System.Result.Error<Error>::get_Value()
+    newobj instance System.Result.Error<Error>::.ctor(Error)
+    newobj instance System.Result<System.Option<Int32>,Error>::.ctor(System.Result.Error<Error>)
     ret
 Invalid:
     error "Expected ASCII digits"
-    err Option<Int32>
+    newobj instance System.Result.Error<Error>::.ctor(Error)
+    newobj instance System.Result<System.Option<Int32>,Error>::.ctor(System.Result.Error<Error>)
     ret
 TooLong:
     error "At most nine digits"
-    err Option<Int32>
+    newobj instance System.Result.Error<Error>::.ctor(Error)
+    newobj instance System.Result<System.Option<Int32>,Error>::.ctor(System.Result.Error<Error>)
     ret
 Empty:
     error "Empty input"
-    err Option<Int32>
+    newobj instance System.Result.Error<Error>::.ctor(Error)
+    newobj instance System.Result<System.Option<Int32>,Error>::.ctor(System.Result.Error<Error>)
     ret
 .end
 
@@ -88,19 +99,22 @@ Empty:
     pop
     call ReadNumber()
     dup
-    is.case Err
+    call instance System.Result<System.Option<Int32>,Error>::get_IsErrorCase()
     brtrue Failed
-    ldcase Ok
+    call instance System.Result<System.Option<Int32>,Error>::GetOkCase()
+    call instance System.Result.Ok<System.Option<Int32>>::get_Value()
     dup
-    is.case None
+    call instance System.Option<Int32>::get_IsNone()
     brtrue Eof
-    ldcase Some
+    call instance System.Option<Int32>::GetSomeCase()
+    call instance System.Option.Some<Int32>::get_Value()
     ldc.i4 2
     mul
     call System.Console::WriteLine(Int32)
     ret
 Failed:
-    ldcase Err
+    call instance System.Result<System.Option<Int32>,Error>::GetErrorCase()
+    call instance System.Result.Error<Error>::get_Value()
     call instance System.Error::ToString()
     call System.Console::WriteLine(String)
     ret

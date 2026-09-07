@@ -13,22 +13,19 @@ In particular, the current whole-file text helper is a bounded demonstration, no
 foundation of a permanent Stream API. General I/O abstractions should follow concrete
 needs and the primitives required to implement them in platform code.
 
-[System.neoil](../runtime/System.neoil) currently provides forty-two platform-written methods and ten native declarations:
+[System.neoil](../runtime/System.neoil) provides platform-written methods and explicit native declarations:
 
 - Ordinary `System.Option<T>` and `System.Result<T,E>` provide variant constructors, predicates and checked accessors. Their None/Some/Ok/Err wrappers are ordinary types too. All nineteen new methods are platform IL; see the [member convention](union-convention.md).
 - `System.IO.File` provides bounded ReadAllText; see [file input](file-input.md).
-- `System.IO.File.ReadAllTextTyped` adapts bounded file failures to the ordinary
-  `System.Result<String,System.Error>` carrier; the original method remains available
-  while bootstrap migration continues.
+- `System.IO.File.ReadAllText` adapts bounded file failures to the ordinary
+  `System.Result<String,System.Error>` carrier; the canonical method now uses nested cases.
 - `System.Error` provides FromMessage, get_Message, and ToString, with explicit Message property metadata; see [Error values](errors.md).
 - `System.Array<T>` provides six IL methods for explicit allocation, length, checked
   access, element addresses, and free, with explicit Length property metadata; see [arrays and pointers](arrays-and-pointers.md).
 - `System.String` provides Concat, Equals, IsEmpty, GetUtf8ByteCount, and SliceUtf8;
   see [the text contract](text-model.md).
 - The UnionAttribute marker has an ordinary IL constructor.
-- `System.Console.ReadByte()` exposes optional raw input through a host-supplied console;
-  see [console I/O](console-io.md).
-- `System.Console.ReadByteTyped()` adapts that host boundary to the ordinary nested
+- `System.Console.ReadByte()` adapts the host console boundary to the ordinary nested
   `System.Result<System.Option<Byte>,System.Error>` carrier. EOF is `Option.None`,
   a byte is `Option.Some<Byte>`, and host read failures are `Result.Error<System.Error>`.
 - `System.Console.WriteLine(string)` calls the host output primitive.

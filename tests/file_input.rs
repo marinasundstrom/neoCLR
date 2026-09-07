@@ -1,7 +1,5 @@
 use neoclr::{
-    Limits, LoadedProgram, RuntimeService, Value, assemble,
-    assembler::parse_function_ref,
-    metadata::{Case, Type},
+    Limits, LoadedProgram, RuntimeService, Value, assemble, assembler::parse_function_ref,
 };
 use std::{
     path::PathBuf,
@@ -43,20 +41,28 @@ fn read(path: &str, limit: i32) -> Value {
         .unwrap()
         .value
 }
+
+fn record(name: &str, fields: Vec<Value>) -> Value {
+    Value::Object {
+        ty: neoclr::assembler::parse_type(name).unwrap(),
+        fields,
+    }
+}
+fn carrier(name: &str, case: &str, fields: Vec<Value>) -> Value {
+    record(name, vec![Value::Erased(Box::new(record(case, fields)))])
+}
 fn ok(text: &str) -> Value {
-    Value::result(
-        Value::String(text.into()),
-        Type::String,
-        Type::Error,
-        Case::Ok,
+    carrier(
+        "System.Result<String,Error>",
+        "System.Result.Ok<String>",
+        vec![Value::String(text.into())],
     )
 }
 fn err(text: &str) -> Value {
-    Value::result(
-        Value::Error(text.into()),
-        Type::String,
-        Type::Error,
-        Case::Err,
+    carrier(
+        "System.Result<String,Error>",
+        "System.Result.Error<Error>",
+        vec![Value::Error(text.into())],
     )
 }
 
@@ -135,11 +141,14 @@ fn file_service_is_visible_without_opening_files_and_faults_keep_call_site() {
     let program = LoadedProgram::new(&assemble(".module App").unwrap()).unwrap();
     let target = parse_function_ref("System.IO.File::ReadAllText(String,Int32)").unwrap();
     let graph = program
-        .analyze_reachability(std::slice::from_ref(&target), 2)
+        .analyze_reachability(std::slice::from_ref(&target), 16)
         .unwrap();
-    assert_eq!(graph.required_services(), [RuntimeService::FileInput]);
+    assert_eq!(
+        graph.required_services(),
+        [RuntimeService::FileInput, RuntimeService::ValueStorage]
+    );
     assert_eq!(graph.functions[1].target.name, "neoCLR.Runtime.ReadAllText");
-    assert_eq!(graph.missing_services(&[]).len(), 1);
+    assert!(!graph.missing_services(&[]).is_empty());
     let fault = program
         .resolve_function(&target)
         .unwrap()

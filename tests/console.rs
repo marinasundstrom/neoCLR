@@ -153,22 +153,20 @@ fn bytes_and_eof_have_exact_owned_union_types_and_shared_host_position() {
         .unwrap();
     let console = TestConsole::input(&[0, 255]);
     for byte in [Some(0), Some(255), None] {
-        let option = Value::Union {
-            ty: Type::Option(Box::new(Type::Byte)),
-            case: if byte.is_some() {
-                Case::Some
-            } else {
-                Case::None
-            },
-            payload: Box::new(byte.map(Value::Byte).unwrap_or(Value::Void)),
+        let option = match byte {
+            Some(byte) => carrier(
+                "System.Option<Byte>",
+                "System.Option.Some<Byte>",
+                vec![Value::Byte(byte)],
+            ),
+            None => carrier("System.Option<Byte>", "System.Option.None", vec![]),
         };
         assert_eq!(
             read.invoke(vec![], options(console.clone())).unwrap().value,
-            Value::result(
-                option,
-                Type::Option(Box::new(Type::Byte)),
-                Type::Error,
-                Case::Ok
+            carrier(
+                "System.Result<System.Option<Byte>,Error>",
+                "System.Result.Ok<System.Option<Byte>>",
+                vec![option]
             )
         );
     }
@@ -177,7 +175,7 @@ fn bytes_and_eof_have_exact_owned_union_types_and_shared_host_position() {
 #[test]
 fn console_dependencies_are_discovered_without_executing_host_io() {
     let graph = program()
-        .analyze_reachability(&[parse_function_ref("Main()").unwrap()], 12)
+        .analyze_reachability(&[parse_function_ref("Main()").unwrap()], 64)
         .unwrap();
     assert!(
         graph
@@ -222,7 +220,7 @@ fn byte_input_uses_typed_local_storage_before_integer_arithmetic() {
 #[test]
 fn typed_console_adapter_exposes_nested_cases() {
     let module = assemble(
-        ".module App\n.entry Main\n.function Main() -> Int32\ncall System.Console::ReadByteTyped()\ncall instance System.Result<System.Option<Byte>,System.Error>::GetOkCase()\ncall instance System.Result.Ok<System.Option<Byte>>::get_Value()\ncall instance System.Option<System.Byte>::GetSomeCase()\ncall instance System.Option.Some<System.Byte>::get_Value()\nret\n.end",
+        ".module App\n.entry Main\n.function Main() -> Int32\ncall System.Console::ReadByte()\ncall instance System.Result<System.Option<Byte>,System.Error>::GetOkCase()\ncall instance System.Result.Ok<System.Option<Byte>>::get_Value()\ncall instance System.Option<System.Byte>::GetSomeCase()\ncall instance System.Option.Some<System.Byte>::get_Value()\nret\n.end",
     )
     .unwrap();
     let module = neoclr::load(&serde_json::to_string(&module).unwrap()).unwrap();
@@ -277,4 +275,72 @@ fn cli_flushes_prompt_before_waiting_for_redirected_input_without_duplicate_outp
     drop(input);
     assert!(child.wait().unwrap().success());
     assert_eq!(reader.join().unwrap(), "42\n=> Void\n");
+}
+
+fn record(name: &str, fields: Vec<Value>) -> Value {
+    Value::Object {
+        ty: neoclr::assembler::parse_type(name).unwrap(),
+        fields,
+    }
+}
+fn carrier(name: &str, case: &str, fields: Vec<Value>) -> Value {
+    record(name, vec![Value::Erased(Box::new(record(case, fields)))])
+}
+
+#[test]
+fn console_case_sample_handles_bytes_eof_and_read_failures() {
+    let module = assemble(include_str!("../examples/console_typed.neoil")).unwrap();
+    let program =
+        LoadedProgram::new(&neoclr::load(&serde_json::to_string(&module).unwrap()).unwrap())
+            .unwrap();
+    program.verify().unwrap();
+    for (input, expected) in [
+        (&b"A"[..], "65"),
+        (&b""[..], "End of input"),
+        (&b"\xff"[..], "255"),
+    ] {
+        let console = TestConsole::input(input);
+        program.run(options(console.clone())).unwrap();
+        assert_eq!(console.state.lock().unwrap().lines, [expected]);
+    }
+    let console = Arc::new(TestConsole {
+        fail_read: true,
+        ..TestConsole::default()
+    });
+    program.run(options(console.clone())).unwrap();
+    assert_eq!(console.state.lock().unwrap().lines, ["ConsoleReadFailed"]);
+    assert_eq!(
+        program.run(Limits::default()).unwrap().output,
+        ["ConsoleUnavailable"]
+    );
+}
+
+#[test]
+fn migrated_library_has_one_canonical_api_and_no_union_instructions_at_these_boundaries() {
+    use neoclr::metadata::Instruction;
+    let system = neoclr::library::system().unwrap();
+    for name in [
+        "System.Console.ReadByte",
+        "System.IO.File.ReadAllText",
+        "System.Math.Abs",
+    ] {
+        let functions: Vec<_> = system.functions.iter().filter(|f| f.name == name).collect();
+        assert_eq!(functions.len(), 1);
+        assert!(matches!(functions[0].returns, Type::Constructed { .. }));
+        assert!(!functions[0].body.iter().any(|op| matches!(
+            op,
+            Instruction::Some
+                | Instruction::None(_)
+                | Instruction::Ok(_)
+                | Instruction::Err(_)
+                | Instruction::IsCase(_)
+                | Instruction::LoadCase(_)
+        )));
+        assert!(
+            !system
+                .functions
+                .iter()
+                .any(|f| f.name == format!("{name}Typed"))
+        );
+    }
 }

@@ -1,8 +1,8 @@
 # Int32.Parse: ordinary Result boundary
 
 `System.Int32.Parse(String) -> System.Result<Int32,Error>` now constructs its result
-through ordinary platform-library constructors. Successful parsing produces System.Ok<Int32>;
-invalid input produces System.Err<Error> containing the existing `InvalidInt32` message.
+through ordinary platform-library constructors. Successful parsing produces System.Result.Ok<Int32>;
+invalid input produces System.Result.Error<Error> containing the existing `InvalidInt32` message.
 The [ordinary carrier convention](union-convention.md) supplies predicates and checked
 accessors. No exception handling or implicit error conversion is involved.
 
@@ -16,9 +16,8 @@ The long-term error parameter may become a closed ordinary union such as
 the VM needs no exception or error-specific instruction. The preview keeps the
 existing `System.Error` payload while carrier migration continues.
 
-`System.Math.AbsTyped` is the first parallel library API using the same ordinary
-nested Result cases. It demonstrates incremental migration without changing the
-legacy `Abs` contract yet.
+`System.Math.Abs` now uses the same ordinary nested Result cases under its canonical
+name. The temporary AbsTyped alternative has been removed.
 
 ## Native service contract
 
@@ -45,7 +44,7 @@ that replacement.
 ldstr "42"
 call System.Int32::Parse(String)
 call instance System.Result<Int32,Error>::GetOk()
-call instance System.Ok<Int32>::get_Value()
+call instance System.Result.Ok<Int32>::get_Value()
 ```
 
 The excerpt assumes success. General code first calls get_IsOk/get_IsErr and branches
@@ -67,8 +66,6 @@ The old native-helper return signature is rejected during binding. There is no h
 adapter. JSON format 3 remains in use during migration; this is not a promise that old
 clients are compatible with a changed System library.
 
-The errors, types, features and file-input callers have been updated. ReadNumber in
-the file example now returns an ordinary Result, but ReadAllText still returns a
-bootstrap Result: its failure branch extracts the Error and constructs an ordinary
-carrier explicitly in application IL. Divide, Abs, slicing, file and console helpers
-still need migration. Final bootstrap removal and its format break remain Preview 1 work.
+The console and file samples now consume canonical ordinary Result/Option returns.
+Divide and slicing still need migration. Removing all bootstrap types/opcodes and
+migrating the older ordinary wrapper family remain Preview 1 work.

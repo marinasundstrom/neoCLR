@@ -50,8 +50,8 @@
 
     ldstr "42"
     call System.Int32::Parse(string)
-    call instance System.Result<Int32,Error>::GetOk()
-    call instance System.Ok<Int32>::get_Value()
+    call instance System.Result<Int32,Error>::GetOkCase()
+    call instance System.Result.Ok<Int32>::get_Value()
     call instance int32::ToString()
     call System.Console::WriteLine(string)
     ret
