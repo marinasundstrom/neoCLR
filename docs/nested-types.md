@@ -23,7 +23,11 @@ Result.Error<TError>(error: TError)
 Result<T, TError>
 ```
 
-There are two distinct Result definitions:
+For a non-generic union, no companion is needed: its case types may be nested
+directly under the union type. The companion pattern exists to keep case generic
+parameters local when the carrier itself has parameters.
+
+For a generic carrier there are two distinct Result definitions:
 
 | Definition | Role |
 | --- | --- |

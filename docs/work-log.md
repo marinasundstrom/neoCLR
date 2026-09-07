@@ -1858,3 +1858,8 @@ unions or overlays. Those belong to an explicit future type/layout description w
 size, alignment, offsets and discriminant or unsafe access rules. This preserves the
 low-level memory model and leaves allocator and heap management independent of the
 metadata carrier used for checked heterogeneous values.
+
+Refined the companion rule: non-generic unions may nest their variants directly;
+only generic carriers require a separate non-generic companion to keep variant
+parameters independent. Runtime wrapper migration remains deferred until the
+assembler can express this distinction without ambiguity.
