@@ -16,17 +16,54 @@ This makes neoCLR managed without making it high-level. The VM validates types,
 signatures, layouts and pointer operations, while explicitly permitting programs
 and native integrations to address memory when their contract requires it.
 
+## Values and explicit capabilities
+
+Values are the default. A type defines the value's shape and available operations;
+it does not decide that every instance must have reference identity, be heap-allocated,
+or participate in one universal ownership scheme. Passing T copies its value under
+the declared copy rules. Allocation, reference access and ownership are separate choices.
+
+| Form | Contract |
+| --- | --- |
+| T | Ordinary typed value; copied by value |
+| T& | Explicit managed access to a live, initialized slot when reading; output contracts can initialize it |
+| Interface& | Explicit dispatch view over an implementing value's slot |
+| T* or Void* | Low-level address access with explicit validity and lifetime obligations |
+| Future ownership wrappers/services | A selected retention and release policy, separate from reference access |
+
+Capabilities are expressed through declared types, interfaces, parameter/receiver
+contracts and explicit operations. Current interfaces are declared on types; this
+is not a promise of dynamic per-instance interface attachment. An interface view
+adds access to an existing contract without changing allocation or retaining an owner.
+Future ownership wrappers can add retention semantics without turning all T values
+into implicitly managed references.
+
+A Rust-style borrow checker is not a platform requirement. In the current call-scoped
+subset the runtime checks reference identity, liveness, exact type, initialization
+and output assignment. Multiple writable aliases are allowed, and sequential reads
+observe preceding writes. There is no exclusive-borrow or no-alias guarantee.
+The optional IL verifier supplies additional static checks; it is not a source-language
+ownership checker. A language may impose stronger rules, but those rules are not
+silently inherited by every language targeting neoCLR.
+
+This separates the required behavior from how it is enforced. An interpreter may
+track slots dynamically; a future compiler may eliminate checks it can prove redundant.
+Both must preserve the reference contract. Longer-lived or stored references still
+need specified invalidation/retention rules, and cross-thread access needs concurrency
+rules. Avoiding a borrow checker does not remove those design obligations. Neither
+case requires selecting exclusive borrowing as the only solution.
+
 ## Current priority
 
-Focus on heap allocation and executable pointers. Defer reference counting, GC,
-automatic destruction, ownership-aware copy/move behavior, and language lifetime
-integration. The ideas below are recorded architectural direction, not requirements
-to finish before the raw allocation/pointer slice.
+Heap allocation and native pointers are implemented, as are call-scoped managed
+references and interface views. Stabilize their contracts and the Preview 1 programs.
+Defer reference counting, GC, automatic destruction, ownership-aware copy/move behavior,
+escaping references and language lifetime integration until their intended programs
+and contracts are defined.
 
-The initial subset now implements native heap allocation/free, native addresses,
-layout, casts, byte offsets, and indirect access. Its precise current contract is in
-[heap and pointers](heap-and-pointers.md). This is a small proof of concept toward
-familiar CLR capabilities, with specific departures documented rather than assumed.
+The precise native allocation contract is in [heap and pointers](heap-and-pointers.md),
+and the managed-reference contract is in [slot references](reference-slots.md).
+The ideas below remain architectural direction rather than additional preview gates.
 
 ## Core VM
 

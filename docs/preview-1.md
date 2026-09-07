@@ -32,11 +32,12 @@ may remain unnamed; neoCLR is sufficient as the runtime codename for the preview
 | Execution fundamentals | Primitive values, free functions, calls/overloads, indexed parameters/locals, control flow, real Void, value copying | Implemented; preserve semantics through remaining changes |
 | Metadata and modules | Explicit types/members/signatures, generic type definitions and closed use, properties/accessors, module references and member identities | Implemented; current JSON is a documented prototype representation |
 | Ordinary type contracts | Public/internal type visibility, public/internal/private members, usable constructors with defined receiver and initialization behavior | Implemented and exercised by ordinary carrier construction, extraction and copy tests |
-| Ordinary unions | Carrier/variant convention sufficient for Option<T> and Result<T,TError>, including Void, nested carriers, and Result<T,T> | Implemented: ordinary System carriers, native boundaries, samples and bounded erased host input |
+| Ordinary unions | Carrier/variant convention sufficient for Option<T> and Result<T,TError>, including Void, nested carriers, and Result<T,T> | Implemented: ordinary carriers and overloaded TryGet(out Case&), using temporary System.Value payload storage; see the storage boundary below |
 | No union-specific IL | Library, samples, native result construction and host inputs use ordinary types; remove special union operations and encodings | Implemented in format 4; old artifacts require reassembly |
 | Minimal library and console | Useful Int32/String/Error APIs; console input/output; EOF distinct from input failure; an interactive program | Implemented using raw byte input and immediate line output; `ReadByte` uses the ordinary nested Result/Option boundary. General ReadLine is not required |
 | Minimal reflection | Obtain a System.Type-style descriptor from a type token or value, compare identity, read its name, inspect closed generic arguments | Implemented via type-only ldtoken, System.Type and declared-type System.TypeOf<T>.Of; no dynamic object dispatch |
 | Memory and arrays | Explicit pointers/allocation/free, record storage, small usable array/buffer example, documented lifetime and copy rules | Implemented: native-layout Array<T> views and ArrayList<T> with explicit release. No automatic cleanup or arbitrary-payload collection promise |
+| Managed references and interfaces | Call-scoped typed references, output parameters, explicit receiver views and a small useful interface set | Implemented: T&, out/out(true), reference receivers, List<T> and Equatable<T>; no escaping references or automatic ownership |
 | Errors and diagnostics | Recoverable failures through Result; terminal Faults with owned logical stack frames shown by CLI/host | All six reviewed library Result APIs use ordinary typed errors. Source-line maps and guest StackTrace classes are not required for Preview 1 |
 | Embedding and native boundary | One runnable embedding example and one supported scalar/pointer native interop example | Implemented experimental Rust hosting and P/Invoke subset; validate the published examples and platform requirements |
 | Publication readiness | Accurate README/design limits, explicit license, release notes, tested supported platforms and source release instructions | MIT license added; release notes, platform validation and source release checks remain |
@@ -51,48 +52,66 @@ It cannot retain union-specific execution as the final Option/Result implementat
 A JSON artifact format is acceptable for the source preview; a CLI binary reader/writer
 and compatibility with existing .NET tooling are later work, not achieved by using JSON.
 
-## Remaining implementation order
+## Current implementation milestone
 
-1. **Use the executable construction/storage foundation.** [Constructors](constructors.md)
-   initialize whole values; [explicit typed storage](value-storage.md) lets a carrier
-   retain one complete wrapper without inactive defaults. The prototype needs no
-   addressed receivers, native overlapping layout or implicit ownership model.
-2. **Use the selected member convention.** The [constructor/query contract](union-convention.md)
-   defines permitted wrappers and match lowering through ordinary calls/branches.
-   A future compiler/tooling recognizer is separate; the VM attaches no special semantics.
-   Add [non-generic companions with ordinary nested generic cases](nested-types.md):
-   name/arity distinction, nested ownership and read-only type descriptors are implemented.
-   Ordinary library carriers now accept only the nested case family; old top-level wrappers
-   and their extraction methods are removed.
-3. **Preserve the tested ordinary library carriers through migration.** System.Option and
-   System.Result cover None versus Some<Void>, Ok<Void>, Result<T,T>, nested carriers,
-   failed queries and independent value copies. Names follow ordinary type lookup; no special Option/Result categories remain.
-   Int32.Parse, Int32.Divide, Math.Abs, Console.ReadByte and File.ReadAllText use canonical ordinary
-   nested-case returns, including the console/file native boundaries. There are no
-   parallel Typed APIs. SliceUtf8 now uses ordinary results and Utf8SliceError too;
-   the public native bindings no longer construct bootstrap union values.
-4. **Replace and remove the bootstrap union system — implemented.** Library methods,
-   native/host adapters, samples and tests use ordinary types and calls. Format 4 removes
-   all six special instructions and Option/Result type/value dispatch. Older artifacts
-   are rejected before decoding; reassemble source.
-5. **Minimal read-only type inspection — implemented.** Expose type identity, names and closed
-   generic arguments through a small System.Type-style API. Specify descriptor lifetime
-   and identity scope. Inspection grants no invocation, construction or mutation rights.
-   Use existing metadata; do not introduce a second type model or reflection-dependent
-   union execution. Member enumeration and dynamic invocation remain outside Preview 1.
-6. **Freeze the demonstration set and complete release validation.** Correct documentation
-   against the final implementation, run the release checks below, and verify license notices.
-   Fix failures and contradictions before adding more features.
+The required execution and library foundation is implemented. It includes ordinary
+constructors/properties/accessibility, nested generic case types, removal of
+union-specific IL, read-only type inspection, arrays and explicit native allocation.
+More recent slices add managed output references, reference receivers, interface
+views, case-based TryGet extraction and generic typed equality. The console and file
+programs use those extraction contracts in ordinary IL.
 
-The interpreter's carrier-storage decision and limits are recorded in
-[value storage](value-storage.md). Minimal guest reflection is [implemented](type-inspection.md);
-release validation remains open. The
-prototype is not evidence of a settled native ABI or a publication date.
+The [runnable walkthrough](preview-1-walkthrough.md) exercises source and artifact
+paths for the principal demonstrations, including references, union extraction and
+Equatable<T>. These are local acceptance fixtures; their existence does not certify
+a proposed release commit across platforms.
 
-The [runnable walkthrough](preview-1-walkthrough.md) now tests source/artifact execution
-for console calculation, ordinary unions, array loops, file summaries, borrowed pointer
-carriers and deliberate Faults. Type inspection now joins the walkthrough; exact-release and remote
-platform-validation gates remain open.
+## Temporary storage boundary
+
+The working Preview 1 scope retains the current System.Value implementation as an
+explicitly documented interpreter shortcut. This follows the existing
+[retirement decision](value-storage.md#retirement-decision): removal is intended,
+but a complete object model or payload-storage migration is not silently added to
+the first source preview. Retention does not make System.Value a permanent public
+platform direction or settle the future System.Object representation.
+
+System.Value packing allocates an owned host value tree; copying recursively copies
+owned payloads. This is a real allocation cost. It is not an allocation-free union
+representation or a native ABI. Option/Result and several host boundaries still rely
+on it, even though their cases, methods and extraction are ordinary library types
+and IL. Managed slot references cannot be stored in it.
+
+The tagged Void* sample proves borrowed storage for native-layout payloads. It does
+not replace arbitrary String, typed error or nested carrier payload storage. Replacing
+System.Value requires explicit representations and allocation/copy/release contracts
+for all those cases, followed by one coordinated library, host-boundary and artifact
+migration. Neither T& nor Void* alone supplies that ownership contract.
+
+Release documentation must disclose this limitation and the retirement direction.
+If complete removal is selected as a Preview 1 requirement, revise the milestone
+scope and acceptance tests before starting that migration.
+
+## Remaining work, in order
+
+1. **Finish the documentation audit.** Keep the README, opcode table, API contracts and
+   language mappings consistent. Explain value copies, native pointers, managed views,
+   interpreter allocation costs, verification limits and the temporary storage above.
+2. **Validate the build contract.** Determine and test the minimum Rust version, record
+   it in Cargo metadata and CI, and exercise a clean source checkout using only the
+   documented prerequisites and commands.
+3. **Prepare the source package.** Review source provenance/dependency notices, inspect
+   the tracked release contents, and draft release notes describing capabilities,
+   intentional deviations and known limits. Choose the preview version/tag explicitly.
+4. **Validate the candidate commit.** Run formatting, strict Clippy, the full suite,
+   representative embedding/native examples and source/artifact demonstrations on the
+   exact candidate. Record OS, architecture and toolchain for local and CI evidence.
+5. **Review publication readiness.** Resolve failures or narrow unsupported claims,
+   then complete the checklist below. Publication, tagging and pushing remain separate
+   actions; completing implementation does not perform them.
+
+See [validation evidence](preview-1-validation.md) for the current local baseline and
+what still needs to be recorded. Prioritize failures and gaps in these gates over
+expanding the runtime library.
 
 ## Required demonstrations
 
@@ -112,6 +131,9 @@ define the central behavioral set; embedding/native checks below cover its platf
   distinct type/module identities and document descriptor lifetime.
 - **Explicit memory and arrays:** allocate, initialize, read/update, and free a small
   buffer. A separate invalid-access example must terminate with a useful Fault trace.
+- **References and typed equality:** pass caller output slots, extract case values with
+  TryGet, dispatch a reference receiver and compare a user-defined value through
+  Equatable<T>&. Demonstrate that a view adds no ownership.
 - **Embedding and native calls:** invoke a public function from a host with owned inputs
   and host-supplied console I/O; build a tiny local native library and call the supported
   ABI subset. Neither example requires networking or external accounts.
@@ -126,6 +148,8 @@ not justify expanding Preview 1 into streams, filesystem abstractions or network
       samples and library code execute through ordinary metadata and IL operations.
 - [x] Minimal guest type inspection is implemented without dynamic invocation, reflective
       construction, field mutation, or an accessibility bypass.
+- [x] Managed reference/output contracts and explicit interface dispatch are implemented
+      and regression-tested; Equatable<T> demonstrates typed equality.
 - [ ] All required demonstrations run from source and, where applicable, assembled artifacts.
 - [ ] `cargo fmt --check`, `cargo clippy --locked --all-targets -- -D warnings`, and
       `cargo test --locked` pass for the exact proposed release commit.
@@ -139,6 +163,8 @@ not justify expanding Preview 1 into streams, filesystem abstractions or network
 - [ ] README and API/metadata documents distinguish implemented behavior, intentional
       divergences, temporary helpers, unsafe/trusted boundaries, and deferred features.
 - [x] Add the project-owner-selected MIT license and Cargo license metadata.
+- [ ] Release notes and public documentation disclose System.Value allocation/copy costs,
+      its retirement direction and the limits of the Void* storage experiment.
 - [ ] Verify source provenance and required dependency notices.
 - [ ] Choose the preview version/tag and add release notes with capabilities, known limits,
       breaking metadata changes, build instructions, and tested platform evidence.

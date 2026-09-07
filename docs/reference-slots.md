@@ -141,7 +141,10 @@ Aliasing is allowed. Two writable parameters can designate the same slot, and re
 observe preceding writes in execution order. This is not Rust-style exclusive
 borrowing and does not imply a no-alias optimization promise. Readonly access, when
 introduced, will not imply that another alias cannot mutate the target. Threads and
-concurrent access rules remain separate work.
+concurrent access rules remain separate work. A borrow checker is not required by
+this contract: runtime validation may enforce it, while compiler proofs may remove
+redundant checks. Languages may choose stronger borrowing rules independently.
+Stored/escaping references will still require explicit validity and retention rules.
 
 The first safe subset has no raw-pointer-to-byref conversion. A pointer is not proof
 of a valid slot or lifetime. Explicit unsafe bridges can be designed later without

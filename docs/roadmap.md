@@ -10,6 +10,11 @@ with hand-authored IL acceptance fixtures until a high-level frontend exists.
 Use its required capabilities and release gates to prioritize work; the broader
 directions below are not all prerequisites for the first release.
 
+The unifying direction is [values with explicit capabilities](memory-model.md#values-and-explicit-capabilities):
+reference access and ownership are choices layered on typed values. Runtime reference
+tracking and optional verification provide enforceable contracts without requiring
+Rust-style exclusive borrowing from every language targeting the platform.
+
 ## Architectural targets and next priorities
 
 Interpretation, JIT compilation, and native AOT are platform-wide architectural
@@ -39,7 +44,8 @@ then support a minimal hosting experiment and an early native AOT experiment.
 with exact primitive and [validated record inputs](record-inputs.md), explicitly copied
 receivers, [validated ordinary Option/Result inputs](union-inputs.md), and fresh state.
 [Cooperative cancellation](cancellation.md) now supports stopping interpreter execution
-from the host. Addressed mutation and shared receiver lifetimes remain open. A small
+from the host. Guest call-scoped addressed mutation is implemented; managed references
+cannot cross host calls or outlive their frames. A small
 language compiler should target the same metadata/IL and enable incremental library
 migration. Native backend/code-sharing choices remain open; no hidden fallback or
 universal ownership policy is implied.
@@ -78,8 +84,8 @@ The immediate demonstration set should include:
 
 - HelloWorld, arithmetic, branches, free functions, and explicit pointer allocation.
 - Primitive-backed System types with a small useful method surface. System.Int32 already
-  demonstrates Parse, Divide, and ToString; extend a few representative primitives before
-  pursuing inheritance, interfaces, or reflection.
+  demonstrates Parse, Divide, ToString and Equals. Basic interfaces and read-only type
+  inspection are implemented; broader object-model features remain later work.
 - [System.Array<T> buffer descriptors](arrays-and-pointers.md) now provide explicit
   allocation/free, initialization, length, and checked access in ordinary library IL.
   Descriptor copies alias storage; owned array values and broader element types remain
@@ -169,13 +175,14 @@ runnable platform and language subset.
 Following the strategy review, the first [verifier pass](verification.md) is implemented.
 It checks evaluation-stack types, operands, definite local initialization, returns,
 and reachable fallthrough. It is explicit rather than mandatory. Stable member
-identities and whole-value constructor verification are also implemented. Addressed
-access still requires explicit reference and lifetime contracts.
+identities and whole-value constructor verification are also implemented.
+[Call-scoped references](reference-slots.md), output contracts and reference receivers
+are implemented, with [documented verifier limits](verification.md).
 
 The [construction proposal](construction-and-initialization.md) and
-[addressed-access proposal](addressed-access.md) remain design discussions, not
-implemented addressed receiver/lifetime contracts; the [constructor subset](constructors.md)
-is documented separately. A small high-level compiler can eventually
+[addressed-access proposal](addressed-access.md) contain broader design discussions; implemented whole-slot references and receivers
+are specified in [reference contracts](reference-slots.md), while the
+[constructor subset](constructors.md) keeps its existing initialization model. A small high-level compiler can eventually
 produce the same metadata/IL as the assembler, enabling incremental runtime-library
 migration without requiring compiler self-hosting.
 
@@ -185,7 +192,9 @@ The initial subset implements native allocation/free, layout, casts, byte offset
 field addresses, and indirect loads/stores. Construction remains separate from
 storage. See [heap and pointers](heap-and-pointers.md) for current checks and limits.
 Native integers/address conversions are also implemented. Next pointer capabilities
-include direct foreign memory access, broader P/Invoke marshalling, argument/local addresses, explicit field offsets, and broader ABI controls. Sequential
+include direct foreign memory access, broader P/Invoke marshalling, explicit field
+offsets and broader ABI controls. ldloca/ldarga now address ordinary slots through
+managed references; they do not expose those slots as native pointers. Sequential
 record packing and minimum-size reservations are implemented. Frame-local byte allocation
 (`localloc`) and typed/block memory initialization and copying are implemented. Checked numeric conversions are now implemented. Integer and floating-point
 layouts, arithmetic, and indirect access are now available, along with a first
@@ -197,49 +206,32 @@ allocator/collector integration. These are recorded in [memory layers](memory-mo
 and [allocation proposals](allocation-encoding.md). The current Ref arena is
 scaffolding, not a prerequisite ownership policy for the pointer layer.
 
-## Library milestone: ordinary Option and Result types
+## Implemented library foundation
 
-The next type-system slices should supply the minimal ordinary-type contracts needed
-to model a proper union in code. This is part of the fundamentals, not a dependency
-on extensive OOP or reflection. Stage the work around a small carrier/variant example:
+Ordinary Option<T> and Result<T,TError> now use constructors, properties, restricted
+representation, nested generic case types and ordinary calls/branches. The generic
+metadata foundation and marker attributes are implemented. Format 4 removed the
+old union-specific instructions and runtime categories; older artifacts require
+reassembly. See [union conventions](union-convention.md).
 
-1. Implemented first subset: [constructor invocation](constructors.md) with whole-value
-   receiver initialization, separate from field-based newobj and ordinary calls.
-   Per-field initialization and addressed receiver mutation remain future work;
-   determine what ordinary carrier storage actually requires before expanding this.
-2. Implemented: [property metadata](properties.md) associates a declared property with
-   its getter and/or setter methods, validating signatures, owner, and call kind.
-   Generic and indexed properties work without new instructions or receiver semantics.
-3. [Method accessibility](accessibility.md) now enforces public/internal/private calls
-   and public-only host member invocation, with explicit local-entry semantics. Field
-   visibility now covers ordinary loads/stores/addresses and aggregate construction;
-   top-level types support public/internal visibility with checked type uses.
-   Construction invariants remain needed. Accessor methods
-   follow the implemented method rules. Keep familiar .NET-style access levels for
-   now; possible improvements to the access model are deferred.
+TryGet overloads extract Some/None or Ok/Error case values into caller-provided
+managed output slots. The metadata contract is out(true) Case&; successful direct
+Boolean branches establish initialization. Console/file samples demonstrate this
+pattern with typed recoverable errors. Raw-pointer TryGet variants were removed.
 
-Choose the dependency order after checking the current construction/addressed-access
-proposals. Demonstrate public construction and reading with restricted representation
-mutation through the ordinary carrier convention. Define behavior at raw-pointer and unsafe
-boundaries explicitly; accessibility is not a memory-safety sandbox.
+The carriers still use temporary [System.Value storage](value-storage.md). Its
+retirement is a separate representation and lifetime migration, not an unfinished
+union-opcode removal. The Preview 1 plan records the current retention boundary.
 
-Prioritize execution and metadata fundamentals for Option<T> and Result<T,TError>
-before reflection or broader object-model features. A union is an ordinary carrier
-of one of a fixed set of variant types; reserve enum for integer-backed constants.
-Follow a .NET 11-inspired attribute/member convention instead of introducing a
-union type category or dedicated instructions. See [the convention](unions-and-enums.md).
+Basic interfaces support managed views and explicit receiver modes. List<T> is the
+small collection contract; [Equatable<T>](equality.md) supplies Equals(T) for Int32,
+String, System.Type and user-defined implementations. No automatic equality comparer,
+hashing, interface variance or ownership abstraction is implied.
 
-The [generic metadata foundation and closed record values](generic-metadata.md)
-are implemented, including field access, value copying, and static/instance members
-on generic types. Closed generic native layouts, allocation, and typed memory access
-are also implemented for supported field types. Marker custom attributes on types
-and methods are implemented. Next comes the typed access/storage needed for ordinary
-library carriers, with further attribute capabilities as required.
-Then migrate System Option/Result from their bootstrap implementation. This work
-must preserve explicit allocation and avoid requiring null or boxing for absence.
-Completion includes removing the existing union-specific IL instructions and special
-Option/Result runtime encodings, not keeping both models indefinitely. Replace the
-library/host/sample uses first and explicitly migrate or reject older serialized modules.
+[Properties](properties.md), including indexers, and the implemented
+[accessibility model](accessibility.md) remain sufficient for this preview. Broader
+construction, inheritance, field-reference and access-model changes require their
+own contracts and demonstrable need.
 
 ## Later milestones
 
@@ -254,9 +246,9 @@ library/host/sample uses first and explicitly migrate or reject older serialized
 3. Implement a CLI-based binary reader/writer for the supported subset, preserving
    standard table/heap/token and opcode encodings where semantics permit. Define
    versioned extensions only for required deviations; see [format direction](format-direction.md).
-4. Extend the platform-written System library and bootstrap linker into general
-   loadable modules, structured error definitions, and generic unions. Keep familiar
-   namespaces while defining contracts around Option and Result.
+4. Build on the existing explicit module sets, typed errors and ordinary generic
+   carriers. Extend loading and library capabilities when real programs require them,
+   preserving explicit storage and lifetime contracts.
 5. Basic borrowed interface dispatch and ArrayList<T>/List<T> are implemented.
    Extend them only with explicit receiver, lifetime and backend contracts; see
    [the interface subset](interfaces.md).

@@ -2451,3 +2451,30 @@ member, so mutating row zero exercised a different validation rule. Updated the 
 to locate neoCLR.Runtime.WriteLine explicitly. Reran that suite and every subsequent
 suite; combined coverage is 521 passing tests across 82 test binaries. Doc tests,
 formatting and diff checks also pass. Validation was local on macOS ARM64.
+
+## Preview 1 scope and architecture refresh
+
+Replaced the release plan's obsolete implementation sequence with remaining documentation,
+build/toolchain, source-package and candidate-validation gates. Recorded the implemented
+managed references, output contracts, interface views, typed equality and migrated
+TryGet examples. Corrected the README's stale format-3 claim to the loader's format 4.
+Added a local validation-evidence record tied to the equality implementation snapshot;
+remote platform, minimum-toolchain and exact-candidate checks remain open.
+
+Made the existing temporary System.Value retention boundary explicit in the preview
+plan and README, including host allocation/copy costs and the coordinated migration
+needed for its removal. Neither managed slot references nor the borrowed Void* sample
+completes storage and ownership for arbitrary String/error/nested-carrier payloads.
+The recorded retirement direction remains unchanged.
+
+Recorded the clarified platform direction: typed values by default, with explicit
+reference access and additional capabilities through declared contracts. Rust-style
+exclusive borrowing is not a VM requirement. Runtime liveness/type/initialization
+checks can coexist with writable aliases and optional compiler proofs. Languages
+may impose stricter rules; stored references and cross-thread access still need
+explicit contracts. No dynamic per-instance interface attachment is implied.
+
+This slice changes documentation only. Reviewed claims against metadata loading,
+reference implementation, runtime sources, Cargo metadata, configured CI and prior
+test evidence. Checked changed Markdown links and git diff whitespace; no runtime
+behavior, artifact version or release status changed.

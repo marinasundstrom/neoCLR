@@ -276,8 +276,8 @@ This is an original experiment informed by the
 particularly its metadata and CIL partitions. It is not a fork of CoreCLR and does
 not yet import CLI metadata, execute .NET assemblies, or provide binary compatibility.
 The prototype's JSON format is not a proposed replacement binary encoding.
-Current format version 3 records type representations, method owners, and instance
-call form. Reassemble earlier source and System artifacts before loading them.
+Current format version 4 uses ordinary Option/Result types and removes the earlier
+union-specific encodings. Reassemble earlier source and System artifacts before loading them.
 
 ## Boundaries
 
@@ -288,6 +288,12 @@ allocation or its performance. Legacy `Ref<T>` values address an arena retained 
 dropped. Native `Ptr<T>` allocations separately support individual free. There is
 no reference counting or GC. Counted `Ref<T>` remains a deferred ownership abstraction;
 Rust's memory model does not define guest behavior. See [memory layers](docs/memory-model.md).
+
+Option/Result still use temporary [System.Value storage](docs/value-storage.md),
+which explicitly packs payloads into owned host value trees and recursively copies
+owned values. This has allocation costs and is not a settled native representation.
+Its planned removal requires a complete payload-storage and lifetime migration;
+managed references and the Void* sample alone do not complete that migration.
 
 The library is a bootstrap surface, not a complete BCL. General user-defined
 generic methods, interface inheritance/class virtual dispatch, static lifetime verification, full native marshalling,
