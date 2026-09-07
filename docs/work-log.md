@@ -1893,3 +1893,7 @@ Recorded the native-lowering requirement: typed stack effects, explicit control
 flow and memory operations form a portable IL subset that interpreters, JITs and
 NativeAOT backends must share. Allocation, I/O, provenance checks, interrupts and
 native interop remain explicit runtime-service boundaries.
+
+Defined the opcode policy: preserve CLI mnemonics and useful stack semantics where
+they fit, document neoCLR deviations and additions, and mark temporary bootstrap
+instructions for explicit removal at a metadata-version break.

@@ -360,6 +360,8 @@ Run `cargo run --example invoke` for the Rust embedding sample.
 contracts available to managed and native-oriented language profiles.
 [Native lowering](docs/native-lowering.md) keeps the typed IL directly translatable
 to machine instructions, with runtime services remaining explicit boundaries.
+[Opcode policy](docs/neoil.md#opcode-compatibility-policy) records CLI-aligned
+instructions, neoCLR additions, deviations, and temporary bootstrap operations.
 [Closed call-graph analysis](docs/reachability.md) follows explicit roots for backend planning.
 `cargo run --example reachability` reports HelloWorld's IL calls, runtime import, and
 [runtime-service requirements](docs/runtime-services.md).

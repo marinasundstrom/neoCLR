@@ -5,6 +5,20 @@ the interpreter. This is a prototype assembler, not an ECMA-335 `ilasm` replacem
 Instruction spellings are familiar where possible; operand encoding and some
 stack effects intentionally differ.
 
+## Opcode compatibility policy
+
+When an instruction has a useful CLI equivalent, neoIL keeps the familiar mnemonic
+and documents the neoCLR stack effect, type rules, and fault behavior beside it.
+Compatibility is semantic rather than a promise of ECMA-335 binary identity. A
+backend may lower the instruction differently as long as the documented contract is
+preserved.
+
+New neoCLR instructions are listed separately with their format version and runtime
+service requirements. Temporary bootstrap instructions and encodings are marked as
+such in this reference and in the Preview 1 plan; they may be removed in an explicit
+metadata-version break. No undocumented opcode is accepted as a compatibility
+shortcut.
+
 ```text
 .module HelloWorld
 .entry Main
