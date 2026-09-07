@@ -374,3 +374,5 @@ side-by-side module versions remain pending.
 
 [Ordinary nested types](docs/nested-types.md) support generic cases under non-generic
 companions. Run `cargo run -- run examples/nested_types.neoil` for a minimal example.
+Non-generic unions can nest cases directly; `cargo run -- run examples/non_generic_union.neoil`
+demonstrates that form.

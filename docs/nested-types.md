@@ -23,6 +23,11 @@ Result.Error<TError>(error: TError)
 Result<T, TError>
 ```
 
+When the union itself is non-generic, a companion is unnecessary. Its cases can be
+nested directly under the union type, such as `Shape.Circle`. The companion pattern
+is needed when the carrier has generic parameters and the cases must keep independent
+generic contexts.
+
 For a non-generic union, no companion is needed: its case types may be nested
 directly under the union type. The companion pattern exists to keep case generic
 parameters local when the carrier itself has parameters.

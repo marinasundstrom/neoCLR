@@ -1,0 +1,21 @@
+.module NonGenericUnion
+.entry Main
+
+.type Shape
+    .type Circle
+        .field Radius Int32
+        .method instance Area() -> Int32
+            ldarg this
+            ldfld 0
+            ret
+        .end
+    .end
+.end
+
+.function Main() -> Void
+    ldc.i4 7
+    newobj Shape.Circle
+    call instance Shape.Circle::Area()
+    call System.Console::WriteLine(Int32)
+    ret
+.end
