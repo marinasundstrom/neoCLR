@@ -493,6 +493,14 @@
         ldvoid
         ret
     .end
+    .method instance .ctor(System.Option.None value) -> Void
+        ldarg value
+        value.pack System.Option.None
+        newobj System.Option<T>
+        starg this
+        ldvoid
+        ret
+    .end
     .property instance IsNone() -> Boolean
         .get instance System.Option<T>::get_IsNone()
     .end
@@ -508,9 +516,23 @@
         value.unpack System.None
         ret
     .end
+    .method instance GetNoneCase() -> System.Option.None
+        ldarg this
+        ldfld 0
+        value.unpack System.Option.None
+        ret
+    .end
     .method instance .ctor(System.Some<T> value) -> Void
         ldarg value
         value.pack System.Some<T>
+        newobj System.Option<T>
+        starg this
+        ldvoid
+        ret
+    .end
+    .method instance .ctor(System.Option.Some<T> value) -> Void
+        ldarg value
+        value.pack System.Option.Some<T>
         newobj System.Option<T>
         starg this
         ldvoid
@@ -529,6 +551,12 @@
         ldarg this
         ldfld 0
         value.unpack System.Some<T>
+        ret
+    .end
+    .method instance GetSomeCase() -> System.Option.Some<T>
+        ldarg this
+        ldfld 0
+        value.unpack System.Option.Some<T>
         ret
     .end
 .end
