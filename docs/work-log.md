@@ -1784,3 +1784,21 @@ Validation: all 424 integration tests pass; formatting, Clippy with warnings den
 diff checks and local documentation links pass. The Error sample assembled to JSON,
 verified and ran with unchanged output and no bootstrap union instructions. No push
 or publication performed.
+
+## 2026-09-07 — Record ordinary nested cases through generic-union companions
+
+Recorded the user's clarified design: a non-generic Result companion contains ordinary
+nested Result.Ok<T> and Result.Error<TError> case types, while Result<T,TError> is the
+separate generic carrier. Nesting and union membership imply no inheritance. This
+replaces the tentative selective outer-parameter capture exploration; no such semantics
+were implemented. The existing top-level library wrappers remain unchanged.
+
+Identified name-plus-generic-arity type identity as the first implementation prerequisite,
+followed by real nested ownership and generic case definitions under the non-generic
+companion. Updated Preview 1 and the union convention with that order and documented
+required cross-layer validation and tests. General nesting under generic outer types
+remains a separate contract; no new assembler or metadata encoding is claimed.
+
+Validation: documentation links and diff checks pass. Runtime validation remains the
+424 passing tests plus format/Clippy checks from the completed Parse migration.
+No push or publication performed.

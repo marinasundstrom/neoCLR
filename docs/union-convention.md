@@ -56,6 +56,11 @@ outside constructor provenance guarantees; visibility is not a memory-safety san
 
 ## Implemented System surface
 
+Nested generic case types are a requested next capability. The current wrappers below
+are top-level types. The selected [companion-type direction](nested-types.md) uses a
+non-generic Result owner for generic cases, separate from Result<T,E>. Name/arity
+identity and ordinary nesting must be implemented before that library migration.
+
 | Carrier | Constructor parameter types | Predicates | Checked wrapper access |
 | --- | --- | --- | --- |
 | System.Option<T> | System.None, System.Some<T> | IsNone, IsSome | GetNone(), GetSome() |
