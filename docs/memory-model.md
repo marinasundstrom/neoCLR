@@ -5,12 +5,14 @@ guest memory model. Rust allocation, borrowing, aliasing, or destruction rules m
 not become guest semantics accidentally. Implementations in another host language
 should be able to preserve the same explicit VM contract.
 
-The base contract is explicit memory management. Allocation location, address
-formation, storage layout, lifetime and destruction are visible capabilities or
-declared runtime services. No plain value silently acquires a heap allocation,
-reference count, garbage-collection root, or destructor. Higher-level languages may
-hide those details behind `Ref<T>`, ownership analysis, arenas, or garbage collection,
-but their generated IL must still make the selected policy explicit.
+The platform direction is value semantics by default, explicit reference access and
+runtime-managed deterministic lifetimes. Managed heap allocation produces a reference;
+byref parameters can access existing caller values without requiring heap allocation.
+Programmers do not manually retain, release or invalidate ordinary managed references.
+The compiler/runtime arranges storage and retention to satisfy the reference contract.
+Raw pointers and explicit memory operations remain low-level capabilities, including
+native interop. See the [managed lifecycle direction](lifecycle.md) for the intended
+heap-reference, stack-byref and escaping-reference distinctions and current limits.
 
 This makes neoCLR managed without making it high-level. The VM validates types,
 signatures, layouts and pointer operations, while explicitly permitting programs
@@ -55,10 +57,11 @@ case requires selecting exclusive borrowing as the only solution.
 
 ## Current priority
 
-The next lifecycle proposal is [destruction, Disposable and Closable](lifecycle.md).
-It develops explicit copy/move and lifetime-ending operations, unique ownership
-before counted ownership, and the normal-exit/Fault boundary. These are proposed
-extensions; the implemented preview contracts below remain unchanged.
+The next lifecycle foundation is [managed references and destruction](lifecycle.md).
+It prioritizes automatic heap-reference retention alongside stack-backed byref calls,
+then safe escaping references and user destructor execution. The implemented preview
+contracts below remain unchanged. Earlier ownership-operation proposals later in this
+document are implementation options, not requirements for manual reference management.
 
 Heap allocation and native pointers are implemented, as are call-scoped managed
 references and interface views. Stabilize their contracts and the Preview 1 programs.
@@ -98,13 +101,13 @@ and compiler-generated calls, while the VM continues to provide the underlying
 address and lifetime contracts. This keeps the platform CLR-like in its metadata and
 type signatures without inheriting C#-specific historical restrictions.
 
-## Deferred philosophy: explicit VM memory operations
+## Earlier implementation proposals: explicit VM memory operations
 
-Memory management should be explicit in metadata and IL. Languages may hide Ref
-wrappers or generate lifetime operations automatically, but their compiled output
-must make the required behavior explicit. The runtime must not infer ownership from
-a plain value's type or silently choose retain/release behavior. Host-language cloning
-and destruction are implementation scaffolding, not the guest lifetime specification.
+Metadata and IL must preserve the chosen value/reference semantics. The runtime can
+automatically implement retention for managed references; explicit retain/release
+opcodes are not a settled requirement. Compiler-generated lifetime operations remain
+an implementation option. Host-language cloning and destruction are implementation
+scaffolding, not the guest lifetime specification.
 
 Keep these concepts distinct:
 

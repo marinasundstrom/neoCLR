@@ -2634,3 +2634,25 @@ reachability. The verifier run covers every source sample. Strict all-target Cli
 formatting, 149 local documentation links/heading targets and diff whitespace checks
 passed. The preceding Clonable commit also passed the full 524-test suite; this
 follow-up adds library declarations and fixtures without changing VM implementation.
+
+## Managed-reference direction clarified — 2026-09-07
+
+Confirmed the programming model: managed heap allocation returns a retaining
+reference, while byref parameters access existing values, including caller stack
+locals, through nested calls. Reference passing does not require manual retain,
+release, moves or invalidation. The runtime arranges lifetime and storage; escaping
+references need retained placement or alias-preserving promotion when implemented.
+Updated lifecycle.md, memory-model.md and the roadmap accordingly. Automatic
+reference counting remains a candidate; cycles, escape encoding, pinning and Fault
+cleanup are explicit open decisions.
+
+Set aside the uncommitted endloc experiment and restored its code, tests and docs
+to the preceding committed state. A temporary local patch and new-file snapshot
+preserve that experiment for reference. No endloc opcode is included in the platform.
+The next runtime slice should establish managed-reference retention before adding
+lifetime instructions or destructor dispatch. Existing Clonable/Disposable/Closable
+interfaces remain implemented. This revision changes design documentation only.
+
+Validation: all 59 local links and heading targets in the changed documents resolve,
+diff whitespace checks pass, and src/tests/examples/runtime match the preceding
+commit exactly. No runtime tests were rerun for this documentation-only revision.

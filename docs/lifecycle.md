@@ -1,189 +1,159 @@
-# Value lifetimes, destruction and resource cleanup
+# Managed references, deterministic lifetimes and cleanup
 
-Status: proposed next foundation following the prototype review. Deterministic
-destruction and explicit ownership are the intended direction; the detailed rules
-below are recommendations for implementation. Destructor metadata, lifetime
-instructions and counted Ref remain unimplemented. Ordinary
-[Disposable/Closable interfaces](disposal.md) and [Clonable](cloning.md) are now
-implemented separately; they do not enable automatic destruction.
+Status: agreed platform direction with implementation decisions still open. Values
+are the default; reference semantics are chosen explicitly; the runtime manages
+reference lifetimes. Clonable, Disposable and Closable are implemented ordinary
+interfaces. Managed heap retention, escaping stack references and automatic guest
+destruction remain future work. The current Ref arena is a prototype limitation.
 
-The platform direction is values by default, explicit passing by reference and
-deterministic lifetimes. Pointers provide low-level memory access, including native
-interop; ordinary resource APIs should use values and explicit managed references.
-The existing pointer APIs remain available, but are not the default resource model.
-[System.Clonable<T>](cloning.md) is implemented separately for explicit cloning.
+## Values and two reference uses
 
-## Three distinct operations
-
-| Operation | Trigger | Result | Meaning |
-| --- | --- | --- | --- |
-| Destruction | Runtime ends an owned value's lifetime | Void | Run its destruction body and destroy its owned fields |
-| Disposable.Dispose | Explicit call or language-generated scope cleanup | Void | Release a resource while leaving a valid disposed value |
-| Closable<E>.Close | Explicit call whose result is handled | System.Result<Void,E> | Complete a potentially fallible close protocol |
-
-A type defines a value's behavior, including a declared destruction contract; it
-does not select stack/heap placement or universal reference counting. Disposable
-and Closable are ordinary interfaces. Implementing either must not by itself
-register a destructor. A destructor may call Dispose, but the lifecycle metadata
-must identify that behavior explicitly, independently of a method name.
-
-The implemented Dispose and Close interfaces use byref receivers so state changes
-affect the original value. Existing interface views dispatch them without boxing.
-System.Disposable and System.Closable<E> are the initial library contracts.
-Specific E preserves recoverable error information;
-heterogeneous callers can use an explicit adapter to a shared error type later.
-
-Dispose returns no recoverable error. That is an API obligation, not proof that
-arbitrary IL cannot Fault. Close exposes expected failures such as flushing output.
-Destruction must not silently claim successful flushing, committing or publication.
-An explicit Close caller handles the result before ordinary lifetime cleanup.
-
-For the initial resource protocol, Dispose is idempotent. Close after successful
-close succeeds without repeating effects, even following subsequent disposal.
-Otherwise, Close on a disposed resource reports a documented error. A failed Close
-leaves a valid value that can still be disposed.
-Whether retry is supported depends on the resource and must be documented; do not
-promise rollback or repeat a partially completed external operation automatically.
-Destruction after either successful Close or Dispose releases nothing twice.
-
-## Ownership and copying must precede automatic destruction
-
-| Form | Copy/transfer contract | End of lifetime |
+| Form | Programmer's choice | Runtime responsibility |
 | --- | --- | --- |
-| Plain copyable T | Copy its contents under their declared contracts | Destroy owned fields where applicable |
-| Unique owner | Transfer explicitly; copying is rejected | Destroy its payload and release its storage |
-| Shared owner | Copy explicitly retains ownership | Release one owner; the final owner destroys the payload and frees storage |
-| T& or interface view | Borrow existing storage | Release no ownership; target lifetime rules still apply |
-| T* or Void* | Copy an address | Do not destroy or free the target |
+| T | Pass or store a value | Preserve value-copy semantics and clean up its contained state at the appropriate lifetime boundary |
+| Managed heap reference to T | Allocate a value with shared identity and hold a reference to it | Keep the value alive while reachable through live retaining references; release it under the selected deterministic lifetime contract |
+| T& parameter or receiver | Access an existing value, including one in a caller's stack frame | Preserve identity and mutations through nested calls, with automatic validity checks and no manual reference cleanup |
+| T* or Void* | Use low-level memory or native interop | Enforce the declared raw-pointer boundary; a raw address does not automatically retain its target |
 
-Destruction of a shared-owner wrapper and destruction of its shared target are
-different events. Only owning references contribute to the target's reference count.
-Borrowed references must remain checked if an owner can be released through an
-alias; they must not silently retain an allocation. Shared target projections need
-a specified liveness mechanism before they are supported. Cycles and weak owners
-are later work; reference counting alone does not collect cycles.
+Heap allocation in the managed programming model produces a managed reference.
+The referenced value has the same type T that could otherwise be held directly;
+there is no class/struct bit that forces allocation policy onto the type.
+Current heap.alloc/free remain raw memory operations, while heap.new/Ref expose
+an execution-retained arena. Neither existing mechanism is silently redefined by
+this proposal; a managed allocation spelling and artifact transition remain open.
 
-Ordinary value semantics remain the default. A destructor declaration alone must
-not silently turn a type into a reference type or change ordinary assignment into
-an explicit Clone call. Resource-owning fields need a declared copy/release protocol
-that preserves those semantics. For explicitly unique ownership wrappers, an opt-in
-move-only contract is a possible bounded first experiment, not a universal rule.
-A record containing such a field inherits that restriction. Generic operations must
-preserve the selected capabilities after substitution, including when verification
-is skipped. The ownership-aware copy protocol remains an implementation prerequisite.
+A byref parameter can refer to a caller's local and be passed further down the call
+chain. The programmer explicitly chooses reference access, then uses that reference
+without retain/release calls, allocator annotations, moves or manual invalidation.
+Multiple writable aliases remain permitted. A language may offer stronger checks,
+but exclusive borrowing and Rust-style lifetime annotations are not platform requirements.
 
-Clonable<T>.Clone is explicit, separate from ordinary copying and moving. An owning
-wrapper might copy by retaining shared storage while Clone duplicates its payload;
-an ordinary record can implement Clone by copying its fields. Document sharing and
-independence per type. Do not make the interface an implicit VM copy hook.
+An ordinary by-value copy copies embedded managed references as references: it does
+not clone their targets. The runtime accounts for any required retention. Inline
+value fields retain their value semantics. Physical stack/heap location and whether
+reference access retains storage are separate concepts; a byref can also access a
+value backed by managed heap storage when that access contract is implemented.
 
-Current ArrayList descriptors are explicit aliases to shared storage. Adding a
-freeing destructor to each copied descriptor would double free that storage.
-Keep that API's existing contract until an explicit ownership migration. Likewise,
-the current Ref arena must not silently become a counted owner in existing artifacts.
+## Storage and escape
 
-## Lifetime events in IL
+Call-scoped references to caller locals do not require heap allocation merely
+because a callee uses them. When the call returns, there is no reference handle
+cleanup for the caller to perform. This is the implemented T& subset today.
 
-The compiler can hide cleanup syntax, but the emitted IL must describe transfers
-and lexical lifetime endings. The runtime invokes destruction at those events;
-Rust Clone/Drop and host Rc counts are not guest lifecycle operations.
+The intended broader direction permits a reference to keep a value alive beyond
+its creating scope. The compiler/runtime must then arrange suitable storage, for
+example by allocating an escaping local in retained storage from the start or
+promoting it while preserving the identity seen by every existing reference.
+Escape analysis may avoid unnecessary allocation; correctness cannot depend on
+requiring programmers to choose the physical placement themselves.
 
-| Event | Proposed behavior |
+Conceptual source, not implemented syntax:
+
+```text
+func MakeCounter() -> reference Counter {
+    let counter = Counter(0)
+    return reference counter
+}
+```
+
+The result refers to the same counter, whose lifetime outlasts the function.
+The encoding of an escaping/retaining reference versus a call-scoped T& remains an
+implementation decision. Current T& returns and stored byrefs are still rejected;
+accept them only when retained storage and alias-preserving promotion exist.
+
+Raw pointers require a stable-address or pinning contract at native boundaries.
+Ordinary managed references should continue to work without exposing those details.
+An unrestricted native address must not be relocated underneath foreign code.
+
+## Deterministic destruction
+
+Scope exit ends that scope's claim on a value. A local with no surviving references
+is destroyed there; a retained value is destroyed after its last lifetime-retaining
+reference is released. Passing a scoped byref down an active call chain preserves
+access to the caller's value until the call completes.
+
+Destruction belongs to the value's stored instance. Releasing one reference does
+not destroy the target while another live reference keeps it alive. Replacing an
+inline field or local must account for the outgoing value and any referenced
+storage separately. Calls and returns transfer their operands/results without
+premature destruction. There is no requirement to call an explicit invalidation
+instruction in source code or manually manage reference handles.
+
+The runtime and compiler may use internal lifetime metadata or generated operations
+to implement these rules. Their spelling and representation are not selected yet.
+The uncommitted endloc experiment was set aside; it is not a prerequisite or a
+published opcode. Build the managed-reference behavior before choosing additional
+lifetime instructions.
+
+Automatic reference counting is a candidate implementation for deterministic
+release, not an obligation to maintain a count on every ordinary stack value.
+Counters or equivalent retention mechanisms belong to managed shared storage.
+Cycles remain a real open decision: simple counting cannot reclaim a cycle.
+Weak references, restrictions or supplementary collection must be assessed against
+both usability and the promised timing of destruction. Do not claim universal
+deterministic reclamation before the cycle policy is resolved.
+
+A destructor observes its still-valid fields before their automatic cleanup.
+Destruction ordering, partial initialization, reentrancy and resurrection need
+explicit rules before executing user-defined destruction bodies. Ordinary value
+copying and reference retention must work for nested records, strings and active
+union payloads. Clonable is not an implicit substitute for those runtime contracts.
+
+## Cloning, disposal and closing
+
+| Operation | Contract |
 | --- | --- |
-| Load or dup | Copy only when the closed type supports copying |
-| Explicit take/move from a slot | Transfer its value and leave the source uninitialized |
-| Store into an empty slot | Transfer the incoming value into that slot |
-| Replace an initialized slot | Validate incoming value, destroy the old value, then install the new value |
-| Discard an owned evaluation-stack value | Destroy it |
-| Call | Transfer arguments into callee slots; do not destroy transferred arguments |
-| Return | Transfer the result first, then destroy remaining callee-owned values |
-| Explicit lexical lifetime end | Destroy the live value and mark its slot uninitialized |
-| Final owning-reference release | Destroy target, then free its allocation |
-| Raw heap.free | Release raw storage under its existing contract; do not infer live objects from bytes |
+| Ordinary value copy | Copy the value, automatically preserving the lifetime of embedded managed references |
+| Clonable<T>.Clone() | Explicitly produce a clone under the type's documented duplication/sharing policy |
+| Disposable.Dispose() | Explicitly release resources or discard state, leaving a valid disposed value; repeated disposal is harmless |
+| Closable<E>.Close() | Complete a resource-specific operation with System.Result<Void,E> for expected failure |
+| Destruction | Runtime-triggered end-of-lifetime cleanup under declared destruction metadata |
 
-These are semantic operations, not selected opcode spellings. A function frame
-cannot infer lexical block exit from an evaluation-stack pop. Branches and early
-returns must lower through explicit cleanup paths where a language promises scope
-cleanup. Returning an owner requires moving it out before destroying the frame's
-other values. An uninitialized or moved-from slot has no value to destroy.
+The [cloning](cloning.md) and [cleanup](disposal.md) interfaces use byref receivers
+so calls access the original value without first copying it. Their implementation
+requires ordinary IL and explicit conformance. It does not yet provide destruction
+hooks, using syntax, managed heap retention or automatic scope cleanup.
 
-Recommend reverse successful-initialization order for frame cleanup. Replacing a
-slot establishes a new value lifetime and updates its cleanup registration. A
-destruction body observes its fields before the runtime destroys those fields in
-reverse declaration order. The body must not manually destroy a still-owned field;
-an explicit take can transfer a field once partial-move rules exist. Initially
-reject partial moves and destruction bodies that replace/move their whole receiver.
+A destructor may share release logic with Dispose, but implementing Disposable
+does not alone register that hook. Closing or disposing a reference target may
+change state visible through its aliases without destroying their managed handles.
+The library must define subsequent operations on the closed/disposed value.
+Reference liveness is not a promise that an external resource remains open.
 
-Lifetime-ending operations must invalidate references to the ended lifetime, even
-if the physical slot is reused. Current weak slot identity distinguishes frames
-but does not distinguish successive value lifetimes within one live slot. Add a
-generation or equivalent runtime check before introducing take/end-lifetime.
-Define replacement invalidation consistently for byref parameters and interface
-views; a destructor receives a restricted view of the value being destroyed.
+Close can report a failure such as flushing output. Destruction must not silently
+stand in for successful flushing, committing or publication. For the initial close
+protocol, a previously successful Close remains successful on repetition, including
+after later disposal. Otherwise, Close on a disposed value returns a documented E.
+A failed Close leaves a value that can be disposed; retryability is resource-specific.
 
-## Construction, native storage and Faults
+## Fault and native boundaries
 
-Only fully initialized values receive their destruction body. The first slice
-retains whole-value construction. Failed construction must account for initialized
-owned temporaries without pretending an incomplete receiver is a valid T. Partial
-field initialization later needs explicit field-state cleanup records.
+Result.Error is an ordinary return and participates in normal cleanup. Terminal
+Faults and cancellation need a separate cleanup execution policy before automatic
+user destructors are promised there. The prototype currently reclaims tracked host
+allocations on teardown but does not execute guest cleanup handlers.
 
-Raw byte allocation and typed value ownership remain separate. Neither heap.free
-nor localloc teardown currently has enough information to discover live resource
-objects inside arbitrary bytes. Owned containers must track initialized elements,
-destroy those elements, and then free the buffer. cpobj/cpblk and pointer loads/stores
-cannot become an unchecked copying route for move-only values; reject unsupported
-placements in the first slice until typed native lifecycle operations exist.
+Specify destructor instruction budgets, secondary failures, native failures and
+host-resource teardown without introducing catchable guest exceptions implicitly.
+Deterministic lifetime management must not imply successful external side effects
+or rollback. Raw memory release remains distinct from destroying typed managed values.
 
-Recommend guaranteed deterministic destruction on normal lifetime endings only
-for the first slice. Result.Error is a normal return and follows the same cleanup
-rules as success. A terminal Fault, cancellation or exhausted execution budget
-continues to terminate guest execution; host teardown reclaims tracked allocations
-but is not a promise to execute guest destructors or close foreign resources.
+## Next implementation gates
 
-A destructor runs as guest IL, consumes the existing instruction/frame budget and
-appears in logical Fault traces. If it Faults, preserve that Fault and stop guest
-execution. Do not retry it, continue arbitrary user cleanup, or introduce guest
-catch/unwind semantics implicitly. A stronger bounded cleanup phase would require
-a separate budget, secondary-Fault reporting and host/native failure contract.
+1. Specify managed allocation and reference identity/retention, keeping ordinary
+   value copies and explicit T& calls as the default contracts. Audit all paths that
+   copy, store, return or erase reference-containing values and cross host boundaries.
+2. Implement automatic lifetime retention/release for managed heap references and
+   safe call-scoped access to their values. Test final-reference release through
+   aliases, nested fields and returns before attaching user destructor bodies.
+3. Define stack-reference escape representation and implement retained placement or
+   promotion without changing alias identity. Preserve simple stack-backed byref calls.
+4. Add destruction metadata, initialization tracking and execution/failure rules.
+   Demonstrate real resource release alongside Disposable/Closable and explicit Clone.
+5. Resolve cycles, weak references, concurrency and native pinning before broadening
+   the lifetime guarantee to those cases. Unique ownership may be a later optional
+   capability; it is not the foundation users must adopt to use managed references.
 
-This qualifies automatic cleanup: applications needing observable completion must
-call Close explicitly; host resources needing release even after guest termination
-need host-owned registrations or another specified teardown mechanism.
-
-## Concrete first implementation slice
-
-1. Introduce closed-type lifecycle capabilities, explicit transfer and lifetime-end
-   operations, slot generation tracking, and runtime/verifier enforcement. Preserve
-   ordinary value copying; specify owner-aware copying before admitting resource
-   fields. An explicitly unique wrapper can be an initial test case. Reject copying
-   or erasing such wrappers, legacy arena storage, host import/export and native
-   payload placement until each boundary supports its lifecycle contract.
-2. Add an explicitly identified Void-returning IL destruction body with a restricted
-   byref receiver. Schedule it through guest frames on discard, replacement, normal
-   return and explicit lifetime end. Preserve existing plain-value behavior.
-3. Build on the implemented ordinary Disposable and Closable<E> interfaces with
-   byref receivers. Their value-backed draft sample establishes explicit dispatch
-   and state contracts. Next demonstrate a resource owner with idempotent Dispose
-   and actual release tracking. Test fallible Close separately through an injected
-   resource service; a native byte buffer has no natural flush error and should not
-   invent one merely to implement Closable.
-4. Cover nested owning fields and active union payloads before generalizing native
-   containers and replacing System.Value. Add shared owning Ref and final-release
-   destruction afterward, with a deliberate artifact/API migration.
-
-Acceptance cases must count actual resource release and destructor calls: explicit
-scope exit, early return, move through a function, overwrite, discarded temporary,
-nested owners, rejected copies, stale byrefs after slot reuse, Dispose twice, Close
-success/error followed by Dispose, and a destructor Fault. Include source/artifact
-round trips, verification and execution without optional verification. Backend
-reachability must include implicit destruction targets and required services.
-
-Before accepting the first owner type, audit every current copying path: slot get/set,
-dup, field extraction/update, arguments/returns, value.pack/unpack, heap.load/store,
-typed native access, interface value receivers and host input/output. A partial
-audit is not sufficient to make resource ownership safe.
-
-The resulting lifecycle contract must be shared by interpretation, JIT and AOT.
-Encode new metadata/operations with an explicit compatibility decision; do not
-reinterpret previously serialized plain values as resource owners.
+Interpretation, JIT and AOT must preserve the same observable value/reference and
+lifetime behavior. Existing Ref arena artifacts and raw pointer-based collections
+need an explicit migration rather than silently acquiring different ownership rules.

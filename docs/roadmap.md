@@ -72,11 +72,11 @@ library APIs. Keep binary round-trip and AOT experiments bounded so they test th
 shared contracts before any public ABI is frozen. General OOP, networking, async,
 GC and reference counting remain later work justified by concrete programs.
 
-The [lifecycle proposal](lifecycle.md) develops the next storage foundation:
-deterministic destruction, explicit move/lifetime operations, and ordinary
-Disposable/Closable contracts. Preserve values by default and explicit reference
-passing; specify ownership-aware copying and invalidation before automatic resource
-destruction. An explicitly unique buffer wrapper is a proposed bounded experiment.
+The [lifecycle direction](lifecycle.md) develops the next storage foundation:
+managed heap references, stack-backed byref calls and deterministic destruction.
+Preserve values by default and explicit reference passing; the runtime handles
+retention and validity without manual reference management. Prioritize managed
+reference copying/release and safe escape before user destructor execution.
 [Clonable<T>](cloning.md) now provides explicit cloning independently of ordinary
 value copies. The proposal's Fault cleanup limits remain recommendations, not an
 implemented destruction guarantee.
