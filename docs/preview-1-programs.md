@@ -188,8 +188,8 @@ ldloc result
 call instance System.Result<Int32,Int32>::get_IsOk()
 brfalse Failed
 ldloc result
-call instance System.Result<Int32,Int32>::GetOk()
-call instance System.Ok<Int32>::get_Value()
+call instance System.Result<Int32,Int32>::GetOkCase()
+call instance System.Result.Ok<Int32>::get_Value()
 ; Consume the success payload and branch to the join.
 ```
 

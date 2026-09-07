@@ -19,7 +19,7 @@ For this first convention:
    and static factories do not add alternatives to the recognized set.
 2. Variant types must be distinct after closing the carrier's type arguments. Their
    unqualified definition names are unique within the carrier. This final name component
-   supplies the member suffix: System.Some<T> uses `Some`, independent of T.
+   supplies the member suffix: System.Option.Some<T> uses `Some`, independent of T.
 3. For each suffix X, the carrier declares a public instance `get_IsX() -> Boolean`
    and an instance read-only `IsX` property associated with it, plus a public instance
    `GetX() -> Variant` method. Both methods have zero declared parameters. Return
@@ -77,8 +77,8 @@ identity and ordinary nesting must be implemented before that library migration.
 
 | Carrier | Constructor parameter types | Predicates | Checked wrapper access |
 | --- | --- | --- | --- |
-| System.Option<T> | System.None, System.Some<T> | IsNone, IsSome | GetNone(), GetSome() |
-| System.Result<T,E> | System.Ok<T>, System.Err<E> | IsOk, IsErr | GetOk(), GetErr() |
+| System.Option<T> | System.Option.None, System.Option.Some<T> | IsNone, IsSome | GetNoneCase(), GetSomeCase() |
+| System.Result<T,E> | System.Result.Ok<T>, System.Result.Error<E> | IsOk, IsErr | GetOkCase(), GetErrorCase() |
 
 Some<Void> contains a real Void payload and differs from None. Ok<Void> is valid.
 Ok<T> and Err<T> remain distinct for Result<T,T>. Error parameters are unconstrained;
@@ -94,14 +94,14 @@ ldloc result
 call instance System.Result<Int32,Int32>::get_IsOk()
 brfalse Failed
 ldloc result
-call instance System.Result<Int32,Int32>::GetOk()
-call instance System.Ok<Int32>::get_Value()
+call instance System.Result<Int32,Int32>::GetOkCase()
+call instance System.Result.Ok<Int32>::get_Value()
 ; The stack now contains the Int32 payload. Consume it and branch to the join.
 ```
 
 Property source syntax becomes ordinary getter calls. Wrapper construction likewise
-becomes two ordinary operations, such as `newobj instance System.Ok<Int32>::.ctor(Int32)`
-followed by `newobj instance System.Result<Int32,Int32>::.ctor(System.Ok<Int32>)`.
+becomes two ordinary operations, such as `newobj instance System.Result.Ok<Int32>::.ctor(Int32)`
+followed by `newobj instance System.Result<Int32,Int32>::.ctor(System.Result.Ok<Int32>)`.
 The [Raven-like program contracts](preview-1-programs.md) explain the source-level intent.
 
 ## Migration boundary
@@ -139,3 +139,11 @@ library methods; they require generic methods and callable values, not union opc
 Broad inheritance or virtual dispatch is not inherently required, but these APIs are
 deferred until their platform prerequisites exist. The current .NET-style access model
 remains sufficient; a redesigned access model is separate future work.
+
+
+The older top-level System.None/Some/Ok/Err wrapper family and its GetNone/GetSome/
+GetOk/GetErr accessors have been removed. Constructors now accept only the nested
+case family listed above, and predicates test those same concrete identities. Rebuild
+System and applications together: this changes member/type rows as well as available
+signatures. The obsolete names are not compatibility aliases. JSON format 3 remains
+in use while the separate bootstrap VM representation is still being removed.

@@ -40,14 +40,6 @@
 .type System.Result<T,E>
     .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
     .field private Stored System.Value
-    .method instance .ctor(System.Ok<T> value) -> Void
-        ldarg value
-        value.pack System.Ok<T>
-        newobj System.Result<T,E>
-        starg this
-        ldvoid
-        ret
-    .end
     .method instance .ctor(System.Result.Ok<T> value) -> Void
         ldarg value
         value.pack System.Result.Ok<T>
@@ -62,14 +54,7 @@
     .method instance get_IsOk() -> Boolean
         ldarg this
         ldfld 0
-        dup
         value.is System.Result.Ok<T>
-        brtrue Match
-        value.is System.Ok<T>
-        ret
-    Match:
-        pop
-        ldc.bool true
         ret
     .end
     .method instance get_IsOkCase() -> Boolean
@@ -78,24 +63,10 @@
         value.is System.Result.Ok<T>
         ret
     .end
-    .method instance GetOk() -> System.Ok<T>
-        ldarg this
-        ldfld 0
-        value.unpack System.Ok<T>
-        ret
-    .end
     .method instance GetOkCase() -> System.Result.Ok<T>
         ldarg this
         ldfld 0
         value.unpack System.Result.Ok<T>
-        ret
-    .end
-    .method instance .ctor(System.Err<E> value) -> Void
-        ldarg value
-        value.pack System.Err<E>
-        newobj System.Result<T,E>
-        starg this
-        ldvoid
         ret
     .end
     .method instance .ctor(System.Result.Error<E> value) -> Void
@@ -112,26 +83,13 @@
     .method instance get_IsErr() -> Boolean
         ldarg this
         ldfld 0
-        dup
         value.is System.Result.Error<E>
-        brtrue Match
-        value.is System.Err<E>
-        ret
-    Match:
-        pop
-        ldc.bool true
         ret
     .end
     .method instance get_IsErrorCase() -> Boolean
         ldarg this
         ldfld 0
         value.is System.Result.Error<E>
-        ret
-    .end
-    .method instance GetErr() -> System.Err<E>
-        ldarg this
-        ldfld 0
-        value.unpack System.Err<E>
         ret
     .end
     .method instance GetErrorCase() -> System.Result.Error<E>

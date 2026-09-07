@@ -58,11 +58,11 @@ arguments nor decides which carriers accept the case. Existing ordinary construc
 and typed queries describe acceptance. This does not create subtype/assignability rules
 between the carrier and its case types or between differently constructed carriers.
 
-The example uses the user's Error case spelling. The currently implemented prototype
-uses top-level System.Err<T>, System.Ok<T>, System.Some<T> and System.None. Those have
-not been renamed or moved. Any public naming change and caller migration must be
-explicit when adopting companions; a nested Result.Error case is distinct from the
-existing message-bearing System.Error payload type.
+The prototype now uses System.Result.Error<T>, System.Result.Ok<T>,
+System.Option.Some<T> and System.Option.None as ordinary nested case types.
+The older top-level wrappers and their extraction methods have been removed, and
+callers must reassemble against the new library. The nested Result.Error case is
+distinct from the message-bearing System.Error payload type.
 
 ## Required ordinary metadata foundation
 

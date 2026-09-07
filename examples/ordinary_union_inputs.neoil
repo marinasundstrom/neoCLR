@@ -2,8 +2,8 @@
 
 .function Create(Int32 value) -> System.Result<Int32,String>
     ldarg value
-    newobj instance System.Ok<Int32>::.ctor(Int32)
-    newobj instance System.Result<Int32,String>::.ctor(System.Ok<Int32>)
+    newobj instance System.Result.Ok<Int32>::.ctor(Int32)
+    newobj instance System.Result<Int32,String>::.ctor(System.Result.Ok<Int32>)
     ret
 .end
 
@@ -12,8 +12,8 @@
     call instance System.Result<Int32,String>::get_IsOk()
     brfalse Failed
     ldarg result
-    call instance System.Result<Int32,String>::GetOk()
-    call instance System.Ok<Int32>::get_Value()
+    call instance System.Result<Int32,String>::GetOkCase()
+    call instance System.Result.Ok<Int32>::get_Value()
     ret
 Failed:
     ldc.i4 -1

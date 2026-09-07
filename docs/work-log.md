@@ -2054,3 +2054,22 @@ host file error-kind mapping. Rebuild System and applications for the signature 
 Validation: all 34 focused host-I/O, carrier, native-binding, string and source tests pass,
 along with formatting, clippy with warnings denied and diff checks. Console input, EOF,
 and file samples assemble, verify and execute against a rebuilt System artifact on macOS ARM64.
+
+## One ordinary Option/Result case family
+
+Removed the legacy System.Some/None/Ok/Err type definitions, their carrier constructor
+overloads, and GetSome/GetNone/GetOk/GetErr extraction methods. Ordinary carriers now
+accept only System.Option.Some/None and System.Result.Ok/Error, with matching predicates
+and GetSomeCase/GetNoneCase/GetOkCase/GetErrorCase extraction. Removed predicate fallback
+branches that previously recognized two unrelated wrapper identities. Updated the ordinary
+union sample, host-input sample, tests and source/IL mapping documentation.
+
+Existing coverage proves Some<Void> versus None, Result<T,T>, arbitrary error payloads,
+nested generic carriers, independent value copies and Faults on mismatched extraction.
+Added rejection coverage for the removed wrapper names and accessor signatures. This
+changes System metadata rows; reassemble applications/System together. It does not yet
+remove the separate bootstrap Option/Result VM categories or their six opcodes.
+
+Validation: all 452 tests pass. Formatting, clippy with warnings denied and diff checks
+pass. Ordinary union and companion samples assemble, verify and run against a rebuilt
+System artifact on macOS ARM64.

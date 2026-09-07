@@ -1,8 +1,0 @@
-; Ordinary library carriers. Fully qualified names distinguish them from bootstrap signatures.
-.type System.None
-    .method instance .ctor() -> Void
-        ldvoid
-        ret
-    .end
-.end
-

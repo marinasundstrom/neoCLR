@@ -61,8 +61,9 @@ and compatibility with existing .NET tooling are later work, not achieved by usi
    defines permitted wrappers and match lowering through ordinary calls/branches.
    A future compiler/tooling recognizer is separate; the VM attaches no special semantics.
    Add [non-generic companions with ordinary nested generic cases](nested-types.md):
-   name/arity distinction, nested ownership and read-only type descriptors are implemented; library case migration
-   is next.
+   name/arity distinction, nested ownership and read-only type descriptors are implemented.
+   Ordinary library carriers now accept only the nested case family; old top-level wrappers
+   and their extraction methods are removed.
 3. **Preserve the tested ordinary library carriers through migration.** System.Option and
    System.Result cover None versus Some<Void>, Ok<Void>, Result<T,T>, nested carriers,
    failed queries and independent value copies. Fully qualified names select them while

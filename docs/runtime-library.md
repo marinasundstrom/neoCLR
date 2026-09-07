@@ -15,7 +15,7 @@ needs and the primitives required to implement them in platform code.
 
 [System.neoil](../runtime/System.neoil) provides platform-written methods and explicit native declarations:
 
-- Ordinary `System.Option<T>` and `System.Result<T,E>` provide variant constructors, predicates and checked accessors. Their None/Some/Ok/Err wrappers are ordinary types too. All nineteen new methods are platform IL; see the [member convention](union-convention.md).
+- Ordinary `System.Option<T>` and `System.Result<T,E>` provide variant constructors, predicates and checked accessors. Their Option.None/Some and Result.Ok/Error cases are ordinary nested types. The carrier methods are platform IL; see the [member convention](union-convention.md).
 - `System.IO.File` provides bounded ReadAllText; see [file input](file-input.md).
 - `System.IO.File.ReadAllText` adapts bounded file failures to the ordinary
   `System.Result<String,System.IO.FileReadError>` carrier; the canonical method now uses nested cases.
