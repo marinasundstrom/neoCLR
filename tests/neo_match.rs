@@ -34,9 +34,9 @@ fn match_expressions_statements_and_error_cases() {
 
 #[test]
 fn single_evaluation_arm_scopes_and_loop_transfers() {
-    let source = "func Parse(n: int&) -> System.Result<int,System.Int32ParseError> { *n = *n + 1; return Int32.Parse(\"1\") }\nfunc Main() -> int { var n = 0; var count = 0; loop { Parse(&n) match { Ok(let v) => { count = count + v; if count < 3 { continue }; break }, Error(_) => { return -1 } } }; return n }";
+    let source = "func Parse(n: int&) -> System.Result<int,System.Int32ParseError> { n = n + 1; return Int32.Parse(\"1\") }\nfunc Main() -> int { var n = 0; var count = 0; loop { Parse(&n) match { Ok(let v) => { count = count + v; if count < 3 { continue }; break }, Error(_) => { return -1 } } }; return n }";
     assert_eq!(run(source).value, Value::Int32(3));
-    assert_eq!(run("func Main() -> int { var x = 1; let result = Int32.Parse(\"42\") match { Ok(_) => &x, Error(_) => &x }; *result = 42; return x }").value, Value::Int32(42));
+    assert_eq!(run("func Main() -> int { var x = 1; let result = Int32.Parse(\"42\") match { Ok(_) => &x, Error(_) => &x }; result = 42; return x }").value, Value::Int32(42));
 }
 
 #[derive(Debug)]

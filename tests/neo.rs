@@ -50,7 +50,7 @@ fn expression_precedence_literals_and_void_calls_lower_to_existing_il() {
 #[test]
 fn mutable_bindings_can_rebind_references_and_mutate_nested_values() {
     let result = execute(
-        "record Inner(Value: int)\nrecord Outer(Child: Inner)\nfunc Main() -> int {\nvar local = Outer(Inner(1))\nlocal.Child.Value = 42\nvar shared = new Outer(Inner(2))\nshared = new Outer(Inner(3))\nshared.Child.Value = local.Child.Value\nreturn shared.Child.Value\n}",
+        "record Inner(Value: int)\nrecord Outer(Child: Inner)\nfunc Main() -> int {\nvar local = Outer(Inner(1))\nlocal.Child.Value = 42\nvar shared = new Outer(Inner(2))\nshared = &new Outer(Inner(3))\nshared.Child.Value = local.Child.Value\nreturn shared.Child.Value\n}",
     );
     assert_eq!(result.value, Value::Int32(42));
     assert_eq!(result.heap.statistics().allocated_objects, 2);
@@ -59,7 +59,7 @@ fn mutable_bindings_can_rebind_references_and_mutate_nested_values() {
 #[test]
 fn forward_calls_and_reference_parameters_are_typed() {
     let result = execute(
-        "func Main() -> int { var value: int = 40; Add(&value, 2); return value }\nfunc Add(value: int&, amount: int) -> () { *value = *value + amount }",
+        "func Main() -> int { var value: int = 40; Add(&value, 2); return value }\nfunc Add(value: int&, amount: int) -> () { value = value + amount }",
     );
     assert_eq!(result.value, Value::Int32(42));
     for source in [

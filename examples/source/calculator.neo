@@ -11,8 +11,8 @@ func Prompt(needsDivisor: bool) -> () {
 func CalculateLine(text: string, dividend: int&, needsDivisor: bool&) -> () {
     Int32.Parse(text) match {
         Ok(let number) => {
-            if *needsDivisor {
-                Int32.Divide(*dividend, number) match {
+            if needsDivisor {
+                Int32.Divide(dividend, number) match {
                     Ok(let quotient) => {
                         WriteLine(String.Concat("= ", quotient.ToString()))
                     },
@@ -23,10 +23,10 @@ func CalculateLine(text: string, dividend: int&, needsDivisor: bool&) -> () {
                         }
                     }
                 }
-                *needsDivisor = false
+                needsDivisor = false
             } else {
-                *dividend = number
-                *needsDivisor = true
+                dividend = number
+                needsDivisor = true
             }
         },
         Error(let error) => {

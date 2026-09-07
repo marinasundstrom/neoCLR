@@ -105,7 +105,8 @@ func Main() -> int {
 managed heap storage and returns `Counter&`; it introduces no boxing step.
 `&local` forms a reference to an existing mutable location. Record field access
 through a reference automatically addresses its referent. `&shared.Age` returns a
-field reference; use `*reference` to read or write a scalar referent explicitly.
+field reference. Managed references are read and written automatically by the compiler;
+`age = age + 2` updates the referenced integer. No explicit dereference is required.
 
 `let` prevents rebinding and writable access to a directly held value. `var` permits
 assignment and taking its writable address. A `let` binding holding T& still permits
@@ -126,7 +127,7 @@ The [Neo grammar](neo-grammar.md) gives the implemented EBNF and lexical rules.
 - `int`/`Int32`, `string`/`String`, `bool`/`Boolean`, `()`/`unit`/`Void`, named records and T&.
 - Int32 arithmetic with `+`, `-`, `*`, `/`, parentheses and unary minus; runtime arithmetic semantics apply.
 - Integer, Boolean and double-quoted string literals; strings use JSON-style escapes.
-- Explicit references, dereferencing, heap construction and typed returns.
+- Explicit reference formation, automatic managed-reference access, heap construction and typed returns.
 - Exhaustive union match expressions/statements, case payload bindings and wildcards.
 - Closed generic type annotations and public static/ordinary instance bundled System calls.
 - Explicit `int(byteValue)` conversion using checked Int32 conversion.
@@ -139,7 +140,9 @@ The [Neo grammar](neo-grammar.md) gives the implemented EBNF and lexical rules.
 Non-Void functions need an explicit return on every fallthrough path. Both `if` arms
 may return; loops conservatively require a following return even when visibly infinite. Void functions may end without one.
 Field/parameter lists can span lines. There are no implicit conversions between the
-supported source types. The parser bounds source size and expression nesting.
+supported numeric types. A T& is automatically read when a T value is needed; this
+is managed-reference access, not a numeric conversion. The parser bounds source size
+and expression nesting.
 
 ## Lifetime checks and current limits
 
@@ -172,7 +175,7 @@ metadata/verifier diagnostics currently refer to generated IL, not a source map.
 Run the front-end and CLI regressions with:
 
 ```sh
-cargo test --test neo --test neo_control_flow --test neo_match --test neo_calculator --test neo_typeof --test cli --test cli_modules --test gc_diagnostics
+cargo test --test neo --test neo_control_flow --test neo_match --test neo_calculator --test neo_typeof --test neo_managed_access --test cli --test cli_modules --test gc_diagnostics
 ```
 
 See [managed heap references](heap-references.md), [GC](garbage-collection.md) and
@@ -217,7 +220,7 @@ match, as demonstrated by `Console.ReadByte()` returning
 `Result<Option<byte>, System.IO.ConsoleReadError>`. Without a supplied console,
 input reports the recoverable Unavailable case. The CLI supplies process stdin/stdout.
 
-Public System methods bind by exact parameter types; `Console` and
+Public System methods bind by exact parameter types after automatic reference reads; `Console` and
 `Int32` abbreviate their System names. Current union coverage comes from the trusted
 bundled library's marker, constructors and typed case accessors. Runtime faults remain
 separate from recoverable results, including malformed union representations. See the
@@ -262,3 +265,40 @@ a descriptor does not return a reference into the function's frame. The runtime'
 In particular, Name is a canonical definition name with separate generic arguments,
 and invalid GetGenericArgument indices fault. Public non-indexed System properties
 are read through their getters; setters and property addresses remain unsupported.
+
+## Managed references are transparent; pointers are explicit
+
+Neo must never require a developer to dereference a managed reference manually.
+The compiler emits the needed ldobj/stobj operations for value access and assignment:
+
+```text
+let age = Age(shared)    // inferred int&, retains the managed reference
+age = age + 2           // reads and updates its target
+Console.WriteLine(age)  // reads the integer
+let copy: int = age     // explicitly requests a value copy
+```
+
+Arithmetic, conditions, range bounds, value parameters and value returns read through
+T& automatically. Record values copy normally, including when read through a reference.
+Inferred bindings preserve the initializer's type; an explicit T annotation requests
+a value, while T& requests a reference. Source function signatures determine whether
+a reference is forwarded or read. Ordinary values still require `&` to be passed as
+references; there is no automatic address-taking.
+
+Assignment to an existing T& binding writes its target, including a `let` binding or
+T& parameter. `left = right` between references copies right's value into left's target.
+Retarget a mutable reference binding explicitly with `reference = &other`; a `let`
+reference cannot be retargeted. `&reference` forwards its existing target rather than
+creating T&&. To retarget to a factory result, use `reference = &MakeCounter()` (or
+`reference = &new Counter(0)`). Assignment through reference-valued fields or returned
+references follows the same target-write rule. Field-slot rebinding is not exposed.
+
+For overloaded System calls, bare reference arguments are read as values; `&argument`
+selects reference access explicitly. Match arms follow an enclosing value/reference
+expectation; without one, inferred arm types must agree as usual. Lifetime and GC
+validation remain the runtime's responsibility, with existing compiler checks retained.
+
+Raw native pointers are different: they retain explicit low-level access and lifetime
+rules. Automatic managed-reference reads do not apply to pointers. Neo does not yet
+expose pointer types/dereferencing. Unary `*` is no longer a managed-reference operator;
+its future role is pointer dereferencing. Binary `*` remains multiplication.

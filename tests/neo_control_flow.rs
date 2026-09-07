@@ -52,7 +52,7 @@ fn ranges_evaluate_bounds_once_and_never_wrap() {
     }
     assert_eq!(
         run(
-            "func Bound(n: int&) -> int { *n = *n + 1; return 3 }\nfunc Main() -> int { var n = 0; for i in 0..<Bound(&n) { }; return n }"
+            "func Bound(n: int&) -> int { n = n + 1; return 3 }\nfunc Main() -> int { var n = 0; for i in 0..<Bound(&n) { }; return n }"
         ),
         Value::Int32(1)
     );
@@ -84,7 +84,7 @@ fn comparisons_and_boolean_short_circuit_preserve_effects() {
     }
     assert_eq!(
         run(
-            "func Touch(x: int&) -> bool { *x = *x + 1; return true }\nfunc Main() -> int { var x = 0; let a = false && Touch(&x); let b = true || Touch(&x); let c = true && Touch(&x); return x }"
+            "func Touch(x: int&) -> bool { x = x + 1; return true }\nfunc Main() -> int { var x = 0; let a = false && Touch(&x); let b = true || Touch(&x); let c = true && Touch(&x); return x }"
         ),
         Value::Int32(1)
     );
@@ -119,7 +119,7 @@ fn scopes_and_loop_control_have_explicit_diagnostics() {
     );
     assert_eq!(
         run(
-            "record R(X: int)\nfunc Main() -> int { var outer = 0; if true { var local = R(1); local.X = 2; let heap = new R(40); let r = &heap.X; *r = *r + local.X; outer = *r }; if true { let local = 3 }; return outer }"
+            "record R(X: int)\nfunc Main() -> int { var outer = 0; if true { var local = R(1); local.X = 2; let heap = new R(40); let r = &heap.X; r = r + local.X; outer = r }; if true { let local = 3 }; return outer }"
         ),
         Value::Int32(42)
     );

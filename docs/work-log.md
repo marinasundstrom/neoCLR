@@ -2945,3 +2945,29 @@ GC tests also passed for these slices. Coverage includes type aliases, generic a
 reference-mode identity, owned returned descriptors, invalid operands, getter boundaries
 and CLI output. Clippy across all targets with warnings denied, formatting and whitespace
 checks passed; all 554 local documentation file links resolve.
+
+## Transparent managed-reference access in Neo — 2026-09-07
+
+Managed T& values no longer require source dereferencing. Arithmetic, Boolean conditions,
+range bounds, value arguments/returns and typed value initializers automatically load
+the referent. Ordinary assignment through a reference writes its target, including
+immutable reference bindings and reference parameters. Updated the counter to use
+age = age + 2 and removed explicit managed dereferences from the calculator and source
+regressions. Match arms receive enclosing value/reference expectations.
+
+Reference formation remains explicit for ordinary values. & on an existing reference
+forwards its target, not a T&& slot. Mutable reference bindings retarget only with an
+explicitly addressed RHS; ordinary reference-to-reference assignment copies the value
+into the target. Inferred bindings preserve reference types. Reference-valued fields
+and reference-returning calls support target access without a dereference operator.
+
+Removed unary * from the managed source subset and documented that native pointers
+are different: low-level pointer dereferencing remains explicit and pointer syntax is
+not yet exposed by Neo. No runtime pointer, managed-lifetime or GC contract changed.
+Updated the grammar, guide and slice plan with these source access rules.
+
+Validation: all 35 Neo tests and 27 pointer/pointer-union regressions pass. Coverage
+includes scalar/record copying and mutation, forwarding/retargeting, conditions/ranges,
+match results, returned references and lifetime failures. Clippy across all targets
+with warnings denied, formatting and whitespace checks passed; all 556 local
+documentation file links resolve.

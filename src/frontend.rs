@@ -550,7 +550,7 @@ impl Parser {
             let value = i32::try_from(-value)
                 .map_err(|_| literal.error("integer literal is outside Int32 range"))?;
             self.node(at, ExprKind::Int(value), 1)?
-        } else if ["&", "*", "-", "!", "new"].contains(&at.text.as_str()) {
+        } else if ["&", "-", "!", "new"].contains(&at.text.as_str()) {
             let operand = self.expression(30)?;
             let depth = operand.depth + 1;
             self.node(
@@ -741,6 +741,42 @@ impl Lowerer<'_> {
             .map(|field| field.ty.clone())
             .ok_or_else(|| name.error(format!("unknown field {}.{}", record, name.text)))
     }
+    fn read(&mut self, ty: Ty) -> Ty {
+        if let Ty::Ref(target) = ty {
+            self.body.push(format!("ldobj {}", target.il()));
+            *target
+        } else {
+            ty
+        }
+    }
+    fn value_expression(&mut self, expression: &Expr) -> Result<Ty, Fault> {
+        if let ExprKind::Match(value, arms) = &expression.kind {
+            return self
+                .match_arms(value, arms, false, None, true)
+                .map(|(ty, _)| ty);
+        }
+        let ty = self.expression(expression)?;
+        Ok(self.read(ty))
+    }
+    fn expression_for(&mut self, expression: &Expr, expected: &Ty) -> Result<Ty, Fault> {
+        let actual = if let ExprKind::Match(value, arms) = &expression.kind {
+            self.match_arms(value, arms, false, Some(expected), false)?
+                .0
+        } else if matches!(expected, Ty::Ref(_)) {
+            self.expression(expression)?
+        } else {
+            self.value_expression(expression)?
+        };
+        self.require(&actual, expected, &expression.at)?;
+        Ok(actual)
+    }
+    fn library_argument(&mut self, expression: &Expr) -> Result<Ty, Fault> {
+        if matches!(&expression.kind, ExprKind::Unary(op, _) if op == "&") {
+            self.expression(expression)
+        } else {
+            self.value_expression(expression)
+        }
+    }
     fn expression(&mut self, expression: &Expr) -> Result<Ty, Fault> {
         match &expression.kind {
             ExprKind::TypeOf(ty) => {
@@ -787,13 +823,6 @@ impl Lowerer<'_> {
             ExprKind::Unary(operation, value) if operation == "&" => {
                 Ok(Ty::Ref(Box::new(self.place(value, true)?)))
             }
-            ExprKind::Unary(operation, value) if operation == "*" => {
-                let Ty::Ref(target) = self.expression(value)? else {
-                    return Err(expression.at.error("dereference requires T&"));
-                };
-                self.body.push(format!("ldobj {}", target.il()));
-                Ok(*target)
-            }
             ExprKind::Unary(operation, value) if operation == "new" => {
                 let ExprKind::Call(callee, _) = &value.kind else {
                     return Err(expression.at.error("new requires record construction"));
@@ -814,7 +843,7 @@ impl Lowerer<'_> {
                 Ok(Ty::Ref(Box::new(ty)))
             }
             ExprKind::Unary(operation, value) => {
-                let ty = self.expression(value)?;
+                let ty = self.value_expression(value)?;
                 if operation == "!" {
                     self.require(&ty, &Ty::Bool, &expression.at)?;
                     self.body.extend(["ldc.bool false".into(), "ceq".into()]);
@@ -826,7 +855,7 @@ impl Lowerer<'_> {
                 }
             }
             ExprKind::Binary(operation, left, right) => {
-                let ty = self.expression(left)?;
+                let ty = self.value_expression(left)?;
                 if operation == "&&" || operation == "||" {
                     self.require(&ty, &Ty::Bool, &left.at)?;
                     let skip = self.label();
@@ -840,7 +869,7 @@ impl Lowerer<'_> {
                         }
                     ));
                     self.body.push("pop".into());
-                    let rhs = self.expression(right)?;
+                    let rhs = self.value_expression(right)?;
                     self.require(&rhs, &Ty::Bool, &right.at)?;
                     self.body.push(format!("{skip}:"));
                     return Ok(Ty::Bool);
@@ -849,7 +878,7 @@ impl Lowerer<'_> {
                 if !equality || !matches!(ty, Ty::Int | Ty::Bool) {
                     self.require(&ty, &Ty::Int, &left.at)?;
                 }
-                let rhs = self.expression(right)?;
+                let rhs = self.value_expression(right)?;
                 self.require(&rhs, &ty, &right.at)?;
                 let op = match operation.as_str() {
                     "+" => "add",
@@ -871,7 +900,9 @@ impl Lowerer<'_> {
                 })
             }
             ExprKind::Call(callee, arguments) => self.call(callee, arguments),
-            ExprKind::Match(value, arms) => self.match_arms(value, arms, false).map(|(ty, _)| ty),
+            ExprKind::Match(value, arms) => self
+                .match_arms(value, arms, false, None, false)
+                .map(|(ty, _)| ty),
         }
     }
     fn call(&mut self, callee: &Expr, arguments: &[Expr]) -> Result<Ty, Fault> {
@@ -887,7 +918,7 @@ impl Lowerer<'_> {
                 }
                 let types = arguments
                     .iter()
-                    .map(|a| self.expression(a))
+                    .map(|a| self.library_argument(a))
                     .collect::<Result<Vec<_>, _>>()?;
                 let signature = format!(
                     "instance {}::{}({})",
@@ -910,7 +941,7 @@ impl Lowerer<'_> {
             if arguments.len() != 1 {
                 return Err(callee.at.error("int conversion requires one argument"));
             }
-            let ty = self.expression(&arguments[0])?;
+            let ty = self.value_expression(&arguments[0])?;
             if ty != Ty::Int && ty != Ty::Record("System.Byte".into()) {
                 return Err(callee
                     .at
@@ -925,7 +956,7 @@ impl Lowerer<'_> {
             if arguments.len() != 1 {
                 return Err(callee.at.error("WriteLine requires one argument"));
             }
-            let ty = self.expression(&arguments[0])?;
+            let ty = self.value_expression(&arguments[0])?;
             if !matches!(ty, Ty::Int | Ty::String) {
                 return Err(callee
                     .at
@@ -945,7 +976,7 @@ impl Lowerer<'_> {
                 };
                 let types = arguments
                     .iter()
-                    .map(|a| self.expression(a))
+                    .map(|a| self.library_argument(a))
                     .collect::<Result<Vec<_>, _>>()?;
                 let signature = format!(
                     "{owner}::{member}({})",
@@ -1001,8 +1032,7 @@ impl Lowerer<'_> {
             return Err(callee.at.error("argument count mismatch"));
         }
         for (argument, parameter) in arguments.iter().zip(parameters) {
-            let ty = self.expression(argument)?;
-            self.require(&ty, &parameter.ty, &argument.at)?;
+            self.expression_for(argument, &parameter.ty)?;
         }
         self.body.push(opcode);
         Ok(returns)
@@ -1012,15 +1042,14 @@ impl Lowerer<'_> {
         match &expression.kind {
             ExprKind::Name(name) => {
                 let binding = self.binding(name, &expression.at)?;
+                if let Ty::Ref(target) = binding.ty {
+                    self.body.push(binding.load);
+                    return Ok(*target);
+                }
                 if !binding.mutable {
                     return Err(expression.at.error(
                         "cannot assign or take a writable address of an immutable binding",
                     ));
-                }
-                if matches!(binding.ty, Ty::Ref(_)) {
-                    return Err(expression
-                        .at
-                        .error("nested managed addresses are not supported"));
                 }
                 if borrowing && binding.scoped {
                     return Err(expression.at.error("taking addresses of block-local values is not supported; use an outer local or managed heap storage"));
@@ -1028,30 +1057,39 @@ impl Lowerer<'_> {
                 self.body.push(binding.address);
                 Ok(binding.ty)
             }
-            ExprKind::Unary(operation, value) if operation == "*" => {
-                let Ty::Ref(target) = self.expression(value)? else {
-                    return Err(expression.at.error("dereference requires T&"));
-                };
-                Ok(*target)
-            }
             ExprKind::Field(owner, field) => {
                 let saved = self.body.len();
                 let ty = self.expression(owner)?;
-                let target = if let Ty::Ref(target) = ty {
-                    *target
+                let (target, referenced_owner) = if let Ty::Ref(target) = ty {
+                    (*target, true)
                 } else {
-                    self.body.truncate(saved);
-                    self.place(owner, borrowing)?
+                    (ty, false)
                 };
                 let field_type = self.field(&target, field)?;
-                if matches!(field_type, Ty::Ref(_)) {
-                    return Err(field.error("nested managed addresses are not supported"));
+                if let Ty::Ref(referent) = field_type {
+                    if referenced_owner {
+                        self.body.push(format!("ldobj {}", target.il()));
+                    }
+                    self.body
+                        .push(format!("ldfld {}::{}", target.il(), field.text));
+                    return Ok(*referent);
+                }
+                if !referenced_owner {
+                    self.body.truncate(saved);
+                    self.place(owner, borrowing)?;
                 }
                 self.body
                     .push(format!("ldflda {}::{}", target.il(), field.text));
                 Ok(field_type)
             }
-            _ => Err(expression.at.error("expected an assignable location")),
+            _ => {
+                let ty = self.expression(expression)?;
+                if let Ty::Ref(target) = ty {
+                    Ok(*target)
+                } else {
+                    Err(expression.at.error("expected an assignable location"))
+                }
+            }
         }
     }
     fn qualified_name(expression: &Expr) -> Option<String> {
@@ -1068,6 +1106,8 @@ impl Lowerer<'_> {
         value: &Expr,
         arms: &[Arm],
         statement: bool,
+        expected: Option<&Ty>,
+        values: bool,
     ) -> Result<(Ty, bool), Fault> {
         let mut ty = self.expression(value)?;
         if let Ty::Ref(target) = ty {
@@ -1140,7 +1180,13 @@ impl Lowerer<'_> {
             }
             let exits = match &arm.body {
                 ArmBody::Expression(expression) => {
-                    let actual = self.expression(expression)?;
+                    let actual = if let Some(expected) = expected {
+                        self.expression_for(expression, expected)?
+                    } else if values {
+                        self.value_expression(expression)?
+                    } else {
+                        self.expression(expression)?
+                    };
                     if statement {
                         self.body.push("pop".into());
                     } else {
@@ -1194,7 +1240,7 @@ impl Lowerer<'_> {
         index
     }
     fn condition(&mut self, expression: &Expr) -> Result<(), Fault> {
-        let ty = self.expression(expression)?;
+        let ty = self.value_expression(expression)?;
         self.require(&ty, &Ty::Bool, &expression.at)
     }
     fn block(&mut self, statements: &[Stmt]) -> Result<bool, Fault> {
@@ -1261,11 +1307,11 @@ impl Lowerer<'_> {
                     if self.bindings.contains_key(&name.text) {
                         return Err(name.error("duplicate binding"));
                     }
-                    let start_ty = self.expression(start)?;
+                    let start_ty = self.value_expression(start)?;
                     self.require(&start_ty, &Ty::Int, &start.at)?;
                     let index = self.temp(&Ty::Int);
                     self.body.push(format!("stloc {index}"));
-                    let limit_ty = self.expression(limit)?;
+                    let limit_ty = self.value_expression(limit)?;
                     self.require(&limit_ty, &Ty::Int, &limit.at)?;
                     let bound = self.temp(&Ty::Int);
                     self.body.push(format!("stloc {bound}"));
@@ -1335,10 +1381,11 @@ impl Lowerer<'_> {
                     if self.bindings.contains_key(&name.text) {
                         return Err(name.error("duplicate binding"));
                     }
-                    let ty = self.expression(value)?;
-                    if let Some(annotation) = annotation {
-                        self.require(&ty, annotation, name)?;
-                    }
+                    let ty = if let Some(annotation) = annotation {
+                        self.expression_for(value, annotation)?
+                    } else {
+                        self.expression(value)?
+                    };
                     let index = self.locals.len();
                     self.locals.push(format!(".local {}", ty.il()));
                     self.body.push(format!("stloc {index}"));
@@ -1356,22 +1403,30 @@ impl Lowerer<'_> {
                 Stmt::Assign(left, right) => {
                     if let ExprKind::Name(name) = &left.kind {
                         let binding = self.binding(name, &left.at)?;
+                        let rebind = matches!(binding.ty, Ty::Ref(_))
+                            && matches!(&right.kind, ExprKind::Unary(op, _) if op == "&");
+                        if let Ty::Ref(target) = &binding.ty {
+                            if !rebind {
+                                self.body.push(binding.load);
+                                self.expression_for(right, target)?;
+                                self.body.push(format!("stobj {}", target.il()));
+                                continue;
+                            }
+                        }
                         if !binding.mutable {
                             return Err(left.at.error("cannot assign an immutable binding"));
                         }
-                        let ty = self.expression(right)?;
-                        self.require(&ty, &binding.ty, &right.at)?;
+                        self.expression_for(right, &binding.ty)?;
                         self.body.push(binding.load.replacen("ldloc", "stloc", 1));
                     } else {
                         let expected = self.place(left, false)?;
-                        let actual = self.expression(right)?;
-                        self.require(&actual, &expected, &right.at)?;
+                        self.expression_for(right, &expected)?;
                         self.body.push(format!("stobj {}", expected.il()));
                     }
                 }
                 Stmt::Return(at, value) => {
                     let ty = if let Some(value) = value {
-                        self.expression(value)?
+                        self.expression_for(value, &self.function.returns)?
                     } else {
                         self.body.push("ldvoid".into());
                         Ty::Void
@@ -1382,7 +1437,7 @@ impl Lowerer<'_> {
                 }
                 Stmt::Expression(expression) => {
                     if let ExprKind::Match(value, arms) = &expression.kind {
-                        returned = self.match_arms(value, arms, true)?.1;
+                        returned = self.match_arms(value, arms, true, None, false)?.1;
                     } else {
                         self.expression(expression)?;
                         self.body.push("pop".into());

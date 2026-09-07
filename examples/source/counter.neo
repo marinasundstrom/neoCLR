@@ -21,7 +21,7 @@ func Main() -> int {
 
     let shared = MakeCounter()
     let age = Age(shared)
-    *age = *age + 2
+    age = age + 2
 
     WriteLine(copy.Age)
     WriteLine(local.Age)

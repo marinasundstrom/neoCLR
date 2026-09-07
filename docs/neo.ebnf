@@ -31,7 +31,7 @@ equality         = comparison, { ("==" | "!="), comparison } ;
 comparison       = additive, { ("<" | ">" | "<=" | ">="), additive } ;
 additive         = multiplicative, { ("+" | "-"), multiplicative } ;
 multiplicative   = unary, { ("*" | "/"), unary } ;
-unary            = ("&" | "*" | "-" | "!" | "new"), unary | postfix ;
+unary            = ("&" | "-" | "!" | "new"), unary | postfix ;
 postfix          = primary, { ".", identifier | arguments } ;
 arguments        = "(", newlines,
                    [ expression, newlines,

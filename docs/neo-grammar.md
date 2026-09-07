@@ -61,7 +61,7 @@ equality         = comparison, { ("==" | "!="), comparison } ;
 comparison       = additive, { ("<" | ">" | "<=" | ">="), additive } ;
 additive         = multiplicative, { ("+" | "-"), multiplicative } ;
 multiplicative   = unary, { ("*" | "/"), unary } ;
-unary            = ("&" | "*" | "-" | "!" | "new"), unary | postfix ;
+unary            = ("&" | "-" | "!" | "new"), unary | postfix ;
 postfix          = primary, { ".", identifier | arguments } ;
 arguments        = "(", newlines,
                    [ expression, newlines,
@@ -75,20 +75,24 @@ Member access and calls bind most tightly, then unary operations, multiplication
 division, addition and subtraction, ordering comparisons, equality, `&&`, then `||`.
 Binary operators associate to the left. Conditions require Boolean; `&&` and `||`
 short-circuit. Ordering uses Int32; equality supports Int32 and Boolean.
-`&counter.Age` therefore addresses the field; `*reference + 1` adds to the dereferenced
-value. All arithmetic in this subset uses Int32.
+`&counter.Age` therefore addresses the field; `reference + 1` automatically reads a
+managed integer reference. All arithmetic in this subset uses Int32. Unary `*` is not
+a managed-reference operator; pointer syntax is still outside this grammar.
 
 The grammar permits general postfix shapes, but semantic checks restrict calls to
 free functions, positional record construction, explicit `int(byteOrInt)` conversion,
 and public static/ordinary instance bundled System calls.
-Library overloads are selected by exact argument types; out/byref-receiver contracts
+Library overloads are selected by exact types after reading bare reference arguments; out/byref-receiver contracts
 are not exposed. Instance receivers are values (T& is read with ldobj). Generic method
 calls and user-declared methods remain unsupported. `int(value)` supports Byte/Int32
 only and lowers to checked Int32 conversion. These are static restrictions on the
 existing call grammar; no new expression production is needed.
 `new` requires a record-construction call, such as `new Counter(0)`. It does not
 accept arbitrary factory calls or copy expressions in this slice. Assignment and
-`&` require appropriate addressable locations. There is no assignment expression or implicit conversion.
+`&` require appropriate addressable locations or existing managed references. There is
+no assignment expression or implicit numeric conversion. T& is read automatically
+when a value is needed. Source signatures retain references for T& parameters/returns;
+System calls use explicit `&argument` for reference arguments.
 
 ## Lexical and layout rules
 
@@ -129,7 +133,7 @@ separator permitted. Block arms are available only for a standalone match statem
 that form needs no trailing statement terminator.
 
 Both forms require exhaustive coverage and reject duplicate or unreachable cases.
-Expression arms have one exact result type. Statement arms may perform actions,
+Expression arms have one exact result type after contextual reference reads. Statement arms may perform actions,
 return, break or continue; their expression results are discarded. Payload names
 are immutable, arm-local and cannot shadow active names. References follow the
 ordinary lifetime rules; no address to copied arm payload storage can escape.
@@ -154,3 +158,10 @@ member syntax, including `typeof(int).Name` and `descriptor.GenericArgumentCount
 The compiler resolves the declared getter and checks its public, typed value-receiver
 contract. It does not expose private backing fields, property assignment or addresses
 of properties. Source record field access keeps its existing rules.
+
+Managed-reference assignment writes the target, including through immutable reference
+bindings. Only `var` reference bindings can be retargeted, using an explicitly addressed
+right-hand side (`r = &other`). `&r` forwards r's reference without constructing T&&.
+Inferred bindings preserve references; explicitly value-typed bindings copy their
+referents. These are source access rules over existing managed references, not changes
+to native pointer semantics. See the [managed-access guide](neo.md#managed-references-are-transparent-pointers-are-explicit).
