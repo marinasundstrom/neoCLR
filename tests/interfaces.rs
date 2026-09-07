@@ -196,13 +196,26 @@ fn inline_receiver_fields_keep_existing_copy_semantics() {
 
 #[test]
 fn interface_indexer_setter_updates_shared_list_storage() {
-    let source = include_str!("../examples/interfaces.neoil").replace(
-        "    ldloca owner\n    interface.borrow System.Collections.List<Int32>\n    call Sum",
+    // include_str! preserves checkout line endings. Normalize before editing,
+    // then exercise both input encodings so this test also covers Windows.
+    let sample = include_str!("../examples/interfaces.neoil").replace("\r\n", "\n");
+    let marker =
+        "    ldloca owner\n    interface.borrow System.Collections.List<Int32>\n    call Sum";
+    assert_eq!(
+        sample.matches(marker).count(),
+        1,
+        "sample edit marker changed"
+    );
+    let source = sample.replace(
+        marker,
         "    ldloca owner\n    interface.borrow System.Collections.List<Int32>\n    ldc.i4 0\n    ldc.i4 30\n    callvirt instance System.Collections.List<Int32>::set_Item(Int32,Int32)\n    pop\n    ldloca owner\n    interface.borrow System.Collections.List<Int32>\n    call Sum"
     );
-    let p = LoadedProgram::new(&assemble(&source).unwrap()).unwrap();
-    p.verify().unwrap();
-    assert_eq!(p.run(Limits::default()).unwrap().output, ["52", "2"]);
+    for newline in ["\n", "\r\n"] {
+        let source = source.replace('\n', newline);
+        let p = LoadedProgram::new(&assemble(&source).unwrap()).unwrap();
+        p.verify().unwrap();
+        assert_eq!(p.run(Limits::default()).unwrap().output, ["52", "2"]);
+    }
 }
 
 #[test]

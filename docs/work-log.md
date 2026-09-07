@@ -2527,3 +2527,22 @@ Checked exact archive membership, dependency coverage against Cargo.lock, all no
 hashes, changed Markdown links and staged diff whitespace. The archive is an
 unversioned local review artifact, not a release. No runtime code or dependency
 versions changed, so prior execution validation remains applicable to this slice.
+
+## Windows Actions failure: line-ending-sensitive test patch
+
+Inspected Actions run 34144893494 for pushed commit a133046. Linux and macOS passed
+on both Rust 1.85.0 and stable 1.98.1. Both Windows jobs failed only the reached
+interface indexer test: output was the original sample's 42 rather than patched 52.
+The include_str! source retained CRLF checkout bytes, so an LF-only multiline
+replacement silently did nothing.
+
+Normalized that test's source before editing, asserted exactly one edit marker,
+and exercised both LF and CRLF program inputs. Reviewed other multiline replacements;
+the inspected alternatives use inline source literals or newline-independent markers.
+No VM/interface semantics or workflow suppression was needed.
+
+Validation: all 19 interface tests pass on the local stable toolchain; strict
+Clippy and formatting/diff checks pass. The targeted test also passes under 1.85.0
+in the independent source snapshot with its included sample actually stored as CRLF.
+Updated the platform evidence with the observed CI results. A new Windows run of
+the fix remains necessary; no push or workflow rerun was performed in this slice.

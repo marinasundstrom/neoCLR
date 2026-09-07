@@ -4,6 +4,30 @@ This is a record of development evidence and outstanding release checks. It does
 not designate a release candidate or claim that the publication checklist is complete.
 The [Preview 1 plan](preview-1.md) remains the scope and acceptance checklist.
 
+## Observed CI run for a133046
+
+[Actions run 34144893494](https://github.com/marinasundstrom/neoCLR/actions/runs/34144893494)
+ran the pushed a133046 snapshot on 2026-09-07. Both Linux and macOS jobs passed
+on minimum and stable toolchains. Both Windows jobs stopped at the same interface
+sample test; later Windows test suites and example steps were not reached.
+
+| Runner / toolchain host | Rust 1.85.0 | Stable Rust 1.98.1 |
+| --- | --- | --- |
+| Ubuntu 24.04 / x86_64-unknown-linux-gnu | Passed | Passed |
+| macOS 26 ARM64 / aarch64-apple-darwin | Passed | Passed |
+| Windows Server 2025 / x86_64-pc-windows-msvc | Failed in interface test | Failed in interface test |
+
+The failing test patched an include_str! sample using an LF-only multiline marker.
+Windows checkout line endings prevented the patch, leaving the unmodified output
+42 instead of the intended 52. The fix normalizes the included source before the
+edit, asserts that the marker occurs exactly once, and executes both LF and CRLF
+variants. Local validation passed all 19 interface tests plus strict Clippy. A
+Rust 1.85.0 run with the included sample physically stored as CRLF also passed.
+
+That local reproduction is not a passing Windows run. CI must run the fix before
+Windows validation is considered complete. This observed run adds platform evidence;
+it does not designate a release candidate or close exact-candidate gates.
+
 ## Stable-toolchain implementation baseline
 
 | Item | Evidence |
