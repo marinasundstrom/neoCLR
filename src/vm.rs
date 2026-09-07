@@ -431,6 +431,16 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 "managed references cannot cross native helper boundaries",
             ));
         }
+        let mut out_parameters = HashSet::new();
+        for index in &function.out_parameters {
+            if !out_parameters.insert(*index)
+                || !matches!(function.parameters.get(*index), Some(Type::ByRef(_)))
+            {
+                return Err(Fault::new(
+                    "out contract requires a unique byref parameter index",
+                ));
+            }
+        }
         for ty in function
             .parameters
             .iter()
@@ -768,16 +778,29 @@ struct Frame {
     locals: Vec<crate::slots::Cell>,
     stack: Vec<Value>,
     allocations: Vec<crate::memory::Pointer>,
+    outputs: Vec<crate::SlotReference>,
 }
 
 impl Frame {
-    fn new(function: crate::metadata::Function, args: Vec<Value>) -> Self {
+    fn new(function: crate::metadata::Function, mut args: Vec<Value>) -> Result<Self, Fault> {
+        let offset = args.len().saturating_sub(function.parameters.len());
+        let mut outputs = vec![];
+        for (index, arg) in args.iter_mut().enumerate() {
+            if let Value::SlotReference(reference) = arg {
+                if index >= offset && function.out_parameters.contains(&(index - offset)) {
+                    *reference = reference.output()?;
+                    outputs.push(reference.clone());
+                } else {
+                    reference.assigned()?;
+                }
+            }
+        }
         let locals = function
             .locals
             .iter()
             .map(|ty| crate::slots::Slot::new(ty.clone(), None))
             .collect();
-        Self {
+        Ok(Self {
             function: std::rc::Rc::new(function),
             pc: 0,
             trace_pc: 0,
@@ -789,7 +812,8 @@ impl Frame {
             locals,
             stack: vec![],
             allocations: vec![],
-        }
+            outputs,
+        })
     }
     fn pop(&mut self) -> Result<Value, Fault> {
         self.stack
@@ -809,12 +833,7 @@ impl Frame {
         let args = self.stack.split_off(self.stack.len() - types.len());
         args.into_iter()
             .zip(types)
-            .map(|(value, ty)| {
-                if let Value::SlotReference(r) = &value {
-                    r.read()?;
-                }
-                value.for_storage(ty)
-            })
+            .map(|(value, ty)| value.for_storage(ty))
             .collect()
     }
 }
@@ -903,7 +922,7 @@ pub(crate) fn interpret_function(
     if limits.frames == 0 {
         return Err(initial_fault(Fault::new("frame limit exceeded")));
     }
-    let mut frames = vec![Frame::new(function, arguments)];
+    let mut frames = vec![Frame::new(function, arguments)?];
     let result = interpret_frames(module, &mut frames, options, native_libraries);
     result.map_err(|fault: Fault| {
         fault.with_stack_trace(crate::StackTrace::capture(
@@ -1180,7 +1199,7 @@ fn interpret_frames(
                     if frames.len() >= limits.frames {
                         return Err(Fault::new("frame limit exceeded"));
                     }
-                    frames.push(Frame::new(callee, args));
+                    frames.push(Frame::new(callee, args)?);
                 }
                 Op::LoadTypeToken(ty) => {
                     frame.stack.push(Value::RuntimeTypeHandle(Box::new(
@@ -1219,7 +1238,7 @@ fn interpret_frames(
                         return Err(Fault::new("frame limit exceeded"));
                     }
                     let empty = module.instantiated_fields(&owner)?.is_empty();
-                    let mut child = Frame::new(callee, args);
+                    let mut child = Frame::new(callee, args)?;
                     child.constructing = true;
                     child.args.insert(
                         0,
@@ -1269,10 +1288,13 @@ fn interpret_frames(
                         if frames.len() >= limits.frames {
                             return Err(Fault::new("frame limit exceeded"));
                         }
-                        frames.push(Frame::new(callee, args));
+                        frames.push(Frame::new(callee, args)?);
                     }
                 }
                 Op::Return => {
+                    for output in &frame.outputs {
+                        output.assigned()?;
+                    }
                     let value = frame.pop()?;
                     let value = value.for_storage(&function.returns)?;
                     if !frame.stack.is_empty() {

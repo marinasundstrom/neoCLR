@@ -130,3 +130,84 @@ fn reference_escape_and_rebinding_are_rejected_in_metadata_or_execution() {
         );
     }
 }
+
+#[test]
+fn out_assigns_uninitialized_string_slots_and_forwards_obligations() {
+    let extra = ".function Write(out String& destination) -> Void\nldarg destination\nldstr \"assigned\"\nstobj String\nldvoid\nret\n.end\n.function Forward(out String& destination) -> Void\nldarg destination\ncall Write(String&)\nret\n.end";
+    let p = program(
+        extra,
+        ".local String value\nldloca value\ncall Forward(String&)\npop\nldloc value",
+        "String",
+    )
+    .unwrap();
+    p.verify().unwrap();
+    assert_eq!(
+        p.run(Limits::default()).unwrap().value,
+        Value::String("assigned".into())
+    );
+}
+
+#[test]
+fn out_requires_a_write_this_invocation_even_when_the_slot_was_initialized() {
+    for body in ["ldvoid", "ldarg destination\nldobj Int32\npop\nldvoid"] {
+        let extra = format!(".function Bad(out Int32& destination) -> Void\n{body}\nret\n.end");
+        let p = program(
+            &extra,
+            ".local Int32 value\nldc.i4 7\nstloc value\nldloca value\ncall Bad(Int32&)",
+            "Void",
+        )
+        .unwrap();
+        assert!(
+            p.run(Limits::default())
+                .unwrap_err()
+                .message
+                .contains("out parameter")
+        );
+    }
+}
+
+#[test]
+fn aliases_can_fulfill_multiple_out_obligations() {
+    let extra = ".function Assign(out Int32& left,out Int32& right) -> Void\nldarg left\nldc.i4 42\nstobj Int32\nldvoid\nret\n.end";
+    let p = program(
+        extra,
+        ".local Int32 value\nldloca value\ndup\ncall Assign(Int32&,Int32&)\npop\nldloc value",
+        "Int32",
+    )
+    .unwrap();
+    p.verify().unwrap();
+    assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+    let distinct = program(extra, ".local Int32 left\n.local Int32 right\nldloca left\nldloca right\ncall Assign(Int32&,Int32&)", "Void").unwrap();
+    assert!(distinct.run(Limits::default()).is_err());
+}
+
+#[test]
+fn an_out_argument_does_not_initialize_a_readwrite_alias_at_call_entry() {
+    let extra = ".function Assign(out Int32& left,Int32& right) -> Void\nldarg left\nldc.i4 42\nstobj Int32\nldvoid\nret\n.end";
+    let p = program(
+        extra,
+        ".local Int32 value\nldloca value\ndup\ncall Assign(Int32&,Int32&)",
+        "Void",
+    )
+    .unwrap();
+    assert!(p.verify().is_err());
+    assert!(p.run(Limits::default()).is_err());
+}
+
+#[test]
+fn output_contract_metadata_rejects_invalid_indices_and_nonreferences() {
+    assert!(
+        program(
+            ".function Bad(out Int32 value) -> Void\nldvoid\nret\n.end",
+            "ldvoid",
+            "Void"
+        )
+        .is_err()
+    );
+    let mut module =
+        assemble(".module App\n.function Assign(Int32& value) -> Void\nldvoid\nret\n.end").unwrap();
+    for indices in [vec![1], vec![0, 0]] {
+        module.functions[0].out_parameters = indices;
+        assert!(LoadedProgram::new(&module).is_err());
+    }
+}

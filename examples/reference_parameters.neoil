@@ -1,7 +1,7 @@
 .module ReferenceParameters
 .entry Main
 
-.function Assign(Int32& destination, Int32 value) -> Void
+.function Assign(out Int32& destination, Int32 value) -> Void
     ldarg destination
     ldarg value
     stobj Int32
@@ -9,7 +9,7 @@
     ret
 .end
 
-.function Forward(Int32& destination) -> Void
+.function Forward(out Int32& destination) -> Void
     ldarg destination
     ldc.i4 42
     call Assign(Int32&,Int32)
@@ -18,8 +18,6 @@
 
 .function Main() -> Void
     .local Int32 answer
-    ldc.i4 0
-    stloc answer
     ldloca answer
     call Forward(Int32&)
     pop

@@ -619,7 +619,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         .split_once("->")
                         .ok_or_else(|| Fault::new("expected .function Name -> Type"))?;
                     let inline_parameters = name.contains('(');
-                    let (target, parameter_names) = if inline_parameters {
+                    let (target, parameter_names, out_parameters) = if inline_parameters {
                         parse_callable(name.trim(), true)?
                     } else {
                         identifier(name.trim())?;
@@ -631,6 +631,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                                 owner: None,
                                 instance: false,
                             },
+                            vec![],
                             vec![],
                         )
                     };
@@ -663,6 +664,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                             instance,
                             parameters: target.parameters,
                             parameter_names,
+                            out_parameters,
                             returns: parse_type(result)?,
                             locals: vec![],
                             local_names: vec![],
@@ -866,10 +868,11 @@ pub fn parse_type(text: &str) -> Result<Type, Fault> {
 
 /// Parse an explicit call signature, including nested constructed parameter types.
 pub fn parse_function_ref(text: &str) -> Result<FunctionRef, Fault> {
-    parse_callable(text, false).map(|(target, _)| target)
+    parse_callable(text, false).map(|(target, _, _)| target)
 }
 
-fn parse_callable(text: &str, named: bool) -> Result<(FunctionRef, Vec<Option<String>>), Fault> {
+type Callable = (FunctionRef, Vec<Option<String>>, Vec<usize>);
+fn parse_callable(text: &str, named: bool) -> Result<Callable, Fault> {
     let (text, definition) = if !named {
         if let Some((signature, identity)) = text.rsplit_once('@') {
             let (module, index) = identity
@@ -929,7 +932,18 @@ fn parse_callable(text: &str, named: bool) -> Result<(FunctionRef, Vec<Option<St
         .ok_or_else(|| Fault::new("unclosed call signature"))?;
     let mut types = vec![];
     let mut names = vec![];
+    let mut out_parameters = vec![];
     let mut parameter = |text: &str| -> Result<(), Fault> {
+        let text = if named {
+            if let Some(rest) = text.trim().strip_prefix("out ") {
+                out_parameters.push(types.len());
+                rest.trim()
+            } else {
+                text
+            }
+        } else {
+            text
+        };
         let (name, ty) = if named {
             parse_slot(text)?
         } else {
@@ -970,6 +984,7 @@ fn parse_callable(text: &str, named: bool) -> Result<(FunctionRef, Vec<Option<St
             parameters: types,
         },
         names,
+        out_parameters,
     ))
 }
 

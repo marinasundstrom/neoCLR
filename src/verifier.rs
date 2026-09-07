@@ -144,8 +144,31 @@ fn analyze_function(
             }
             _ => (),
         }
-        if matches!(op, Op::Call(_) | Op::Construct(_)) && inputs.iter().any(|input| matches!(input, StackType::Slot { local: Some(index), .. } if !state.initialized[*index])) {
-            return Err(fault(pc, "reference argument requires initialized local"));
+        if let Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) = op {
+            let callee = crate::vm::resolve(module, target).map_err(|e| fault(pc, &e.message))?;
+            let offset = inputs.len().saturating_sub(callee.parameters.len());
+            for (argument, input) in inputs.iter().enumerate() {
+                if let StackType::Slot {
+                    local: Some(index), ..
+                } = input
+                {
+                    if argument >= offset && callee.out_parameters.contains(&(argument - offset)) {
+                        continue;
+                    }
+                    if !state.initialized[*index] {
+                        return Err(fault(pc, "reference argument requires initialized local"));
+                    }
+                }
+            }
+            // Check all input preconditions before making any outputs initialized.
+            for index in &callee.out_parameters {
+                if let Some(StackType::Slot {
+                    local: Some(slot), ..
+                }) = inputs.get(index + offset)
+                {
+                    state.initialized[*slot] = true;
+                }
+            }
         }
         let outputs = typed_effect(module, function, op, &inputs, arity, state.stack.is_empty())
             .map_err(|e| fault(pc, &e.message))?;

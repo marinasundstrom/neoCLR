@@ -10,12 +10,17 @@ use std::{
 pub(crate) struct Slot {
     ty: Type,
     value: Option<Value>,
+    writes: u64,
 }
 pub(crate) type Cell = Rc<RefCell<Slot>>;
 
 impl Slot {
     pub(crate) fn new(ty: Type, value: Option<Value>) -> Cell {
-        Rc::new(RefCell::new(Self { ty, value }))
+        Rc::new(RefCell::new(Self {
+            ty,
+            value,
+            writes: 0,
+        }))
     }
     pub(crate) fn get(&self) -> Result<Value, Fault> {
         self.value
@@ -23,7 +28,12 @@ impl Slot {
             .ok_or_else(|| Fault::new("read of uninitialized slot"))
     }
     pub(crate) fn set(&mut self, value: Value) -> Result<(), Fault> {
-        self.value = Some(value.for_storage(&self.ty)?);
+        let value = value.for_storage(&self.ty)?;
+        self.writes = self
+            .writes
+            .checked_add(1)
+            .ok_or_else(|| Fault::new("slot write counter exhausted"))?;
+        self.value = Some(value);
         Ok(())
     }
 }
@@ -33,6 +43,7 @@ impl Slot {
 pub struct SlotReference {
     target: Type,
     slot: Weak<RefCell<Slot>>,
+    after_write: Option<u64>,
 }
 impl PartialEq for SlotReference {
     fn eq(&self, other: &Self) -> bool {
@@ -44,6 +55,7 @@ impl SlotReference {
         Self {
             target: cell.borrow().ty.clone(),
             slot: Rc::downgrade(cell),
+            after_write: None,
         }
     }
     pub(crate) fn target(&self) -> &Type {
@@ -54,7 +66,27 @@ impl SlotReference {
             .upgrade()
             .ok_or_else(|| Fault::new("expired managed slot reference"))
     }
+    pub(crate) fn output(&self) -> Result<Self, Fault> {
+        let mut result = self.clone();
+        result.after_write = Some(self.cell()?.borrow().writes);
+        Ok(result)
+    }
+    pub(crate) fn assigned(&self) -> Result<(), Fault> {
+        let cell = self.cell()?;
+        let slot = cell.borrow();
+        if self
+            .after_write
+            .is_some_and(|baseline| slot.writes <= baseline)
+        {
+            return Err(Fault::new("out parameter has not been assigned"));
+        }
+        if slot.value.is_none() {
+            return Err(Fault::new("read of uninitialized slot"));
+        }
+        Ok(())
+    }
     pub(crate) fn read(&self) -> Result<Value, Fault> {
+        self.assigned()?;
         self.cell()?.borrow().get()
     }
     pub(crate) fn write(&self, value: Value) -> Result<(), Fault> {

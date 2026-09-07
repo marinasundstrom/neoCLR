@@ -2311,3 +2311,16 @@ raw pointers, owning Ref<T>, and current pointer-based interface views.
 Seven focused reference tests, ten constructor regressions and six service tests pass.
 An executable reference_parameters sample covers forwarding and argument addresses.
 Out contracts and reference receivers follow in separate slices.
+
+## Output reference contracts
+
+Added inline out T& parameter syntax and indexed out_parameters metadata. Output
+references carry a per-invocation write baseline: aliases and nested forwarding
+fulfill assignment through writes to the same slot, while a preexisting value cannot.
+Runtime reads and normal returns enforce assignment; all ordinary argument preconditions
+are checked before accepting output initialization. Verification recognizes direct
+local output destinations after calls and remains conservative about alias paths.
+
+The sample now initializes its caller slot through out forwarding. Twelve reference
+tests, ten constructor regressions and fifteen interface tests pass, including invalid
+output metadata, prior initialized values, and distinct versus aliased destinations.

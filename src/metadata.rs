@@ -262,6 +262,9 @@ pub struct Function {
     /// Optional names aligned with declared parameters (excluding the receiver).
     #[serde(default)]
     pub parameter_names: Vec<Option<String>>,
+    /// Declared parameter indices whose slots must be assigned before normal return.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub out_parameters: Vec<usize>,
     pub returns: Type,
     #[serde(default)]
     pub locals: Vec<Type>,

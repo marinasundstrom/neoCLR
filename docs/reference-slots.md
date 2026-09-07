@@ -1,7 +1,7 @@
 # Proposed slot references and reference receivers
 
-Status: direct T& parameters, ldloca/ldarga and ldobj/stobj slot access are implemented.
-Out contracts, reference receivers and safe interface slot views below remain planned.
+Status: direct T& parameters, out contracts, ldloca/ldarga and ldobj/stobj slot access
+are implemented. Reference receivers and safe interface slot views remain planned.
 Existing pointer and InterfaceRef behavior is unchanged.
 
 ## Purpose
