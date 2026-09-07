@@ -8,6 +8,9 @@ pub(crate) enum Binding {
     ParseInt32,
     Int32ToString,
     WriteLine,
+    StringConcat,
+    StringByteCount,
+    StringSliceUtf8,
 }
 
 pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
@@ -21,6 +24,16 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         ),
         ("neoCLR.Runtime.Int32ToString", [Type::Int32]) => (Binding::Int32ToString, Type::String),
         ("neoCLR.Runtime.WriteLine", [Type::String]) => (Binding::WriteLine, Type::Void),
+        ("neoCLR.Runtime.StringConcat", [Type::String, Type::String]) => {
+            (Binding::StringConcat, Type::String)
+        }
+        ("neoCLR.Runtime.StringByteCount", [Type::String]) => {
+            (Binding::StringByteCount, Type::Int32)
+        }
+        ("neoCLR.Runtime.StringSliceUtf8", [Type::String, Type::Int32, Type::Int32]) => (
+            Binding::StringSliceUtf8,
+            Type::Result(Box::new(Type::String), Box::new(Type::Error)),
+        ),
         _ => {
             return Err(Fault::new(format!(
                 "no runtime binding for {}({:?})",
@@ -57,6 +70,62 @@ impl Binding {
             (Self::WriteLine, [Value::String(text)]) => {
                 output.push(text.clone());
                 Ok(Value::Void)
+            }
+            (Self::StringConcat, [Value::String(left), Value::String(right)]) => {
+                let length = left
+                    .len()
+                    .checked_add(right.len())
+                    .ok_or_else(|| Fault::new("string size overflow"))?;
+                let mut value = String::new();
+                value
+                    .try_reserve_exact(length)
+                    .map_err(|_| Fault::new("string allocation failed"))?;
+                value.push_str(left);
+                value.push_str(right);
+                Ok(Value::String(value))
+            }
+            (Self::StringByteCount, [Value::String(value)]) => {
+                let length = i32::try_from(value.len())
+                    .map_err(|_| Fault::new("UTF-8 byte count exceeds Int32 range"))?;
+                Ok(Value::Int32(length))
+            }
+            (
+                Self::StringSliceUtf8,
+                [
+                    Value::String(value),
+                    Value::Int32(start),
+                    Value::Int32(length),
+                ],
+            ) => {
+                let error = |message: &str| {
+                    Value::result(
+                        Value::Error(message.into()),
+                        Type::String,
+                        Type::Error,
+                        Case::Err,
+                    )
+                };
+                let (Ok(start), Ok(length)) = (usize::try_from(*start), usize::try_from(*length))
+                else {
+                    return Ok(error("ArgumentOutOfRange"));
+                };
+                let Some(end) = start.checked_add(length).filter(|end| *end <= value.len()) else {
+                    return Ok(error("ArgumentOutOfRange"));
+                };
+                let Some(slice) = value.get(start..end) else {
+                    return Ok(error("InvalidUtf8Boundary"));
+                };
+                let mut result = String::new();
+                result
+                    .try_reserve_exact(slice.len())
+                    .map_err(|_| Fault::new("string allocation failed"))?;
+                result.push_str(slice);
+                Ok(Value::result(
+                    Value::String(result),
+                    Type::String,
+                    Type::Error,
+                    Case::Ok,
+                ))
             }
             _ => Err(Fault::new("invalid native arguments")),
         }

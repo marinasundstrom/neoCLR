@@ -5,8 +5,11 @@ and instruction representation, and executed by neoCLR. Host Rust implements the
 interpreter and unavoidable bootstrap services; it should not become the BCL's
 implementation language by accident.
 
-[System.neoil](../runtime/System.neoil) currently provides six platform-written methods and three native declarations:
+[System.neoil](../runtime/System.neoil) currently provides twelve platform-written methods and six native declarations:
 
+- `System.String` provides Concat, Equals, IsEmpty, GetUtf8ByteCount, and SliceUtf8;
+  see [the text contract](text-model.md).
+- The UnionAttribute marker has an ordinary IL constructor.
 - `System.Console.WriteLine(string)` calls the host output primitive.
 - `System.Console.WriteLine(int32)` calls the Int32 receiver's `ToString()` and then
   the string overload.
@@ -19,7 +22,8 @@ implementation language by accident.
 
 The remaining host calls are `neoCLR.Runtime.WriteLine(string) -> Void`,
 `neoCLR.Runtime.Int32ToString(int32) -> String`, and
-`neoCLR.Runtime.ParseInt32(string) -> Result<Int32,Error>`. Parsing and formatting
+`neoCLR.Runtime.ParseInt32(string) -> Result<Int32,Error>`, plus StringConcat,
+StringByteCount, and StringSliceUtf8. Parsing and formatting
 are temporary host implementations until character/string operations can support
 their platform versions. Console output is buffered until successful execution.
 
@@ -50,12 +54,11 @@ Native declarations carry `.methodimpl InternalCall`, mapping to CLR-compatible
 implementation flags. The runtime validates name, ordered parameter types, and return
 type against its binding registry. Unknown bindings, unexpected flags, and native
 declarations with IL bodies/locals are rejected. A matching name without the flag
-executes as IL; names do not implicitly activate native code. This is intentionally one-library
-bootstrap linking: general assembly identities, version binding, import tables,
-visibility, and isolated dependency graphs are not implemented. Application
-assembly/loading currently validates against the bundled System API, so an alternate
-compiled System artifact must retain the application's required bundled signatures;
-adding new external APIs needs the forthcoming reference-resolution model.
+executes as IL; names do not implicitly activate native code. Prepared programs now
+support explicit module sets, module/revision identities,
+and direct reference lists; see [module sets](module-sets.md). The CLI and embedding APIs
+can select a supplied System artifact during initial assembly and loading. Native import
+metadata and typed binding checks remain separate from that module selection.
 
 The `.neo.json` artifact contains prototype metadata and IL instructions, not final
 CLI binary tables or byte streams. Platform-written library execution is implemented;
@@ -75,8 +78,7 @@ concept. The assembly directive emits an implementation flag on the function, no
 an ordinary custom-attribute blob. The prototype `impl_flags` field uses the CLR
 [`MethodImplAttributes.InternalCall`](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.methodimplattributes?view=net-10.0)
 value `0x1000`; ordinary IL uses zero. A future higher-level compiler can lower the
-familiar attribute form to the same metadata. General custom attributes are not
-implemented yet.
+familiar attribute form to the same metadata. Marker custom attributes are implemented separately; see [custom attributes](custom-attributes.md).
 
 The runtime owns a typed registry in `src/native.rs`. `call` first resolves the
 metadata declaration; an InternalCall declaration binds to the corresponding Rust

@@ -1334,3 +1334,27 @@ Extensive OOP and broad .NET compatibility are not prerequisites for that subset
 Existing .NET source migration follows the OOP/runtime features those programs require,
 with explicit adaptations for neoCLR semantics. Updated the roadmap, architecture, and
 README. Documentation-only change; diff checks pass, with no runtime changes or tests needed.
+
+## 2026-09-07 — Initial String API and recoverable text errors
+
+Added ordinary platform-library String.Concat, Equals, IsEmpty, GetUtf8ByteCount,
+and SliceUtf8 methods. Equality and emptiness execute IL; concatenation, byte count,
+and checked byte slicing use three validated InternalCall helpers. The service report
+classifies these helpers as StringOperations. No new IL or object-model feature is added.
+
+UTF-8 byte naming makes the units explicit without selecting Length/general indexing
+semantics. SliceUtf8 returns Result<String,Error> for invalid ranges or code-point
+boundaries, including empty ranges inside an encoding. Empty strings, embedded NULs,
+combining marks, and supplementary scalars retain their exact content. Equality is
+ordinal and does not normalize text. Size/allocation failures remain terminal Faults;
+source decoding, Rune, grapheme APIs, and native string marshalling remain deferred.
+
+Added six tests for the runnable Unicode sample, owned concatenation, ordinal equality,
+byte counts, successful/invalid slicing, repeated invocation, Fault traces, and service
+planning. Updated two library tests with the expanded method/import counts. Refreshed
+text, runtime-library, service, and roadmap documentation.
+
+Validation: all 336 integration tests pass on macOS ARM64; formatting, clippy with
+warnings denied, and diff checks pass. The CLI sample prints Hello, neoCLR!, byte count
+10, the globe slice, and Invalid boundary handled, then returns Void. Linux and Windows
+remain for CI.

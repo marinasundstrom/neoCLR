@@ -278,6 +278,8 @@ Run `cargo run --example invoke` for the Rust embedding sample.
 Debug-source resolution and guest StackTrace/StackFrame types remain pending.
 [Explicit target layouts](docs/target-layout.md) support storage planning independently of the host.
 `cargo run --example target_layout` compares two pointer-width/alignment choices.
+[Initial String methods](docs/text-model.md) provide concatenation, equality, and checked UTF-8 slicing.
+`cargo run -- run examples/strings.neoil` demonstrates Unicode text and recoverable slice errors.
 
 [Explicit module sets](docs/module-sets.md) support additional libraries, cross-module
 generic calls, and field-name aliases. Run `cargo run --example modules` for a three-module

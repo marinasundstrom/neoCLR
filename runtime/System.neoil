@@ -8,6 +8,40 @@
 .end
 
 .type System.String
+    .method static Concat(String left, String right) -> String
+        ldarg left
+        ldarg right
+        call neoCLR.Runtime.StringConcat(String,String)
+        ret
+    .end
+
+    .method instance Equals(String other) -> Boolean
+        ldarg this
+        ldarg other
+        ceq
+        ret
+    .end
+
+    .method instance GetUtf8ByteCount() -> Int32
+        ldarg this
+        call neoCLR.Runtime.StringByteCount(String)
+        ret
+    .end
+
+    .method instance IsEmpty() -> Boolean
+        ldarg this
+        ldstr ""
+        ceq
+        ret
+    .end
+
+    .method instance SliceUtf8(Int32 byteStart, Int32 byteLength) -> Result<String,Error>
+        ldarg this
+        ldarg byteStart
+        ldarg byteLength
+        call neoCLR.Runtime.StringSliceUtf8(String,Int32,Int32)
+        ret
+    .end
 .end
 
 .type System.Error
@@ -154,4 +188,16 @@
         ldvoid
         ret
     .end
+.end
+
+.function neoCLR.Runtime.StringConcat(String left, String right) -> String
+    .methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.StringByteCount(String value) -> Int32
+    .methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.StringSliceUtf8(String value, Int32 byteStart, Int32 byteLength) -> Result<String,Error>
+    .methodimpl InternalCall
 .end

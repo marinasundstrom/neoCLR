@@ -54,8 +54,9 @@ The immediate demonstration set should include:
 - Invariant, zero-based, fixed-length arrays with explicit initialization and bounds
   behavior. Define copy semantics and backing-storage lifetime before adding array IL;
   include empty arrays and Void elements. See [arrays and pointers](arrays-and-pointers.md).
-- A usable String API on the existing UTF-8 String value/type. String literals and console
-  output already work; basic text operations need a deliberate indexing/error contract.
+- A usable String API on the existing UTF-8 String value/type. [Initial String members](text-model.md)
+  now provide concatenation, ordinal equality, emptiness, explicit UTF-8 byte count, and
+  checked byte slicing with Result errors. General indexing and decoding remain separate.
 - Recoverable failures through Result and terminal runtime/system Faults with preserved
   stack traces. Error handling is a milestone of its own, not incidental plumbing.
 

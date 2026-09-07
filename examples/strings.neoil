@@ -1,0 +1,36 @@
+.module Strings
+.entry Main
+
+.function Main() -> Void
+    ldstr "Hello, "
+    ldstr "neoCLR!"
+    call System.String::Concat(String,String)
+    call System.Console::WriteLine(String)
+    pop
+
+    ldstr "café 🌍"
+    call instance System.String::GetUtf8ByteCount()
+    call System.Console::WriteLine(Int32)
+    pop
+
+    ldstr "café 🌍"
+    ldc.i4 6
+    ldc.i4 4
+    call instance System.String::SliceUtf8(Int32,Int32)
+    ldcase Ok
+    call System.Console::WriteLine(String)
+    pop
+
+    ; A byte offset inside the globe's encoding is a recoverable Error.
+    ldstr "café 🌍"
+    ldc.i4 7
+    ldc.i4 1
+    call instance System.String::SliceUtf8(Int32,Int32)
+    is.case Err
+    brtrue Handled
+    fault "invalid UTF-8 boundary was accepted"
+Handled:
+    ldstr "Invalid boundary handled"
+    call System.Console::WriteLine(String)
+    ret
+.end

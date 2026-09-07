@@ -14,6 +14,7 @@ pub enum RuntimeService {
     FormatInt32,
     ConsoleOutput,
     NativeInterop,
+    StringOperations,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -43,6 +44,9 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             crate::native::Binding::ParseInt32 => RuntimeService::ParseInt32,
             crate::native::Binding::Int32ToString => RuntimeService::FormatInt32,
             crate::native::Binding::WriteLine => RuntimeService::ConsoleOutput,
+            crate::native::Binding::StringConcat
+            | crate::native::Binding::StringByteCount
+            | crate::native::Binding::StringSliceUtf8 => RuntimeService::StringOperations,
         };
         return Ok(vec![ServiceUse {
             service,
