@@ -1,0 +1,30 @@
+.module StackArrays
+.entry Main
+
+.function Main() -> Int32
+    ldc.i4 2
+    sizeof Int32
+    mul.ovf
+    localloc
+    ptr.cast Int32
+    ldc.i4 2
+    newobj System.Array<Int32>
+    dup
+    ldc.i4 0
+    ldc.i4 21
+    call instance System.Array<Int32>::Set(Int32,Int32)
+    pop
+    dup
+    ldc.i4 1
+    ldc.i4 21
+    call instance System.Array<Int32>::Set(Int32,Int32)
+    pop
+    ldc.i4 0
+    call instance System.Array<Int32>::Get(Int32)
+    ldc.i4 2
+    mul
+    call System.Console::WriteLine(Int32)
+    pop
+    ldc.i4 0
+    ret
+.end

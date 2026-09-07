@@ -363,6 +363,7 @@ Debug-source resolution and guest StackTrace/StackFrame types remain pending.
 [System.Array<T> buffer descriptors](docs/arrays-and-pointers.md) provide explicit allocation/free
 and checked access for native-layout elements. `cargo run -- run examples/arrays.neoil`
 demonstrates descriptor aliasing and mutation; `examples/array_bounds.neoil` produces a bounds Fault.
+`cargo run -- run examples/arrays_stack.neoil` demonstrates a frame-local array backed by `localloc`.
 
 [Explicit module sets](docs/module-sets.md) support additional libraries, cross-module
 generic calls, and field-name aliases. Run `cargo run --example modules` for a three-module

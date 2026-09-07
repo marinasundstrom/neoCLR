@@ -30,6 +30,20 @@ proposal below and from a .NET managed array.
 | instance Free() -> Void | Explicitly release the backing allocation |
 
 Copying the descriptor copies its pointer and length; both copies access the same buffer.
+
+## Stack and heap allocation
+
+Both storage locations are available in the low-level instruction set. The existing
+`System.Array<T>.Allocate` method uses `heap.alloc` and requires an explicit `Free`.
+For frame-lifetime storage, a program computes `length * sizeof(T)`, calls `localloc`,
+casts the resulting `Byte*` to `T*`, and constructs the same `System.Array<T>` descriptor.
+The frame releases that storage automatically when the invocation returns. The
+descriptor and indexer are identical in both cases; only the pointer's allocation
+provenance differs.
+
+`examples/arrays_stack.neoil` demonstrates a two-element frame-local array and prints
+`42`. A pointer to that storage must not escape its owning frame, and the stack form
+has no `Free` operation.
 It does not copy elements or acquire ownership. Element Get/Set and initialization use
 existing value/storage rules: records copy, small scalar storage remains precise, and
 pointer-containing elements copy addresses without acquiring pointee ownership. Free
