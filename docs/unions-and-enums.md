@@ -1,11 +1,10 @@
 # Union convention and library fundamentals
 
-Status: design direction, not a finalized custom-union convention. An executable
-[ordinary carrier prototype](value-storage.md) uses explicit typed value storage,
-ordinary constructors and accessors. Indexed generic
-references and field substitution are implemented. Option and Result still use
-bootstrap runtime encodings and instructions. This proposal supersedes the earlier
-union case-table and dedicated-opcode design.
+Status: the [Preview 1 member convention](union-convention.md) is selected and ordinary
+System.Option/Result implement it using explicit typed value storage and ordinary
+constructors/accessors. Existing APIs and unqualified Option/Result spellings still
+use bootstrap encodings pending migration. This direction supersedes the earlier
+union case-table and dedicated-opcode design; broader tooling remains future work.
 
 ## Ordinary carrier and variant types
 
@@ -31,28 +30,29 @@ category, global tag table, or wrap/test/extract opcodes. Compilers and tools ca
 recognize the convention without guest reflection or runtime discovery.
 
 The [marker attribute encoding](custom-attributes.md) and library UnionAttribute in
-System.Runtime.CompilerServices are implemented. The union member contract remains
-to be finalized; the marker grants no special execution semantics. Constructor
-and factory recognition must be specified explicitly rather than treating every
-one-parameter method as a variant constructor. Metadata indices/tokens identify
+System.Runtime.CompilerServices are implemented. The [member contract](union-convention.md)
+specifies constructor and query recognition; the marker grants no special execution
+semantics. Arbitrary one-parameter methods are not variant constructors. Metadata indices/tokens identify
 members; source names remain authoring mappings.
 
 ## Required ordinary-type contracts
 
-Future implementation slices must let code express and preserve the carrier's contract:
+Implemented ordinary operations let the library express its carrier contract:
 constructors establish a permitted variant, properties expose that value through explicit
 accessor associations, and accessibility can restrict representation fields and mutation
 while keeping intended constructors/readers public. Public, private, and internal are
-implemented for [method calls and ordinary field operations](accessibility.md); top-level types also support public/internal visibility. Complete construction invariants
-remain to be specified. These are ordinary type-system capabilities, not union-specific instructions.
+implemented for [method calls and ordinary field operations](accessibility.md); top-level
+types also support public/internal visibility. These are ordinary type-system capabilities,
+not union-specific instructions. The selected convention states behavioral obligations
+that the VM does not prove for arbitrary implementations.
 
 The [constructor subset](constructors.md) establishes a whole receiver value;
 addressed receivers remain future work. [Property metadata](properties.md) supplies explicit getter/setter
 associations, including Error.Message; ordinary field operations now enforce visibility.
-Construction and unsafe/host boundary guarantees remain incomplete. Track these gaps separately
-and validate them with a small carrier/variant example before claiming ordinary Option
-and Result are implementable. Extensive inheritance, virtual dispatch, reflection, and
-a full runtime library are not prerequisites for this milestone.
+The System carrier tests demonstrate the required value behavior. Host/native adapter
+migration remains separate work; constructor provenance at unsafe/trusted boundaries
+is not guaranteed. Extensive inheritance, virtual dispatch, reflection, and a full
+runtime library are not prerequisites for this milestone.
 
 ## Intended library shapes
 
@@ -114,11 +114,10 @@ Fault remains for violated execution contracts.
    preserving value copies, storage conversions, and exact closed type identity.
 3. Completed: IL members on generic definitions with substitution of signatures/bodies
    for closed owners. Keep unrelated generic method features separate.
-4. Marker custom-attribute metadata is implemented. Extend attributes as needed and
-   supply the member/access/storage fundamentals required by the convention.
-   Finalize its construction and typed-query contract.
-5. Implement carrier and variant types in the platform-written System library;
-   test None/Some, Ok/Err, Void, nested carriers, failed queries, and independent copies.
+4. Completed: marker metadata and the ordinary constructor/property/access/storage
+   foundation, with a selected [constructor/query convention](union-convention.md).
+5. Completed: fully qualified System carrier and wrapper types in platform IL, with
+   tests for None/Some, Ok/Err, Void, nesting, failed queries and independent copies.
 6. Replace bootstrap Option/Result signatures with ordinary constructed library types.
    Rewrite library, native result construction, host input validation, samples, and tests
    to use the ordinary carrier/member contract. Replace some/none/ok/err with ordinary

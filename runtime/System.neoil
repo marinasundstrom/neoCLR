@@ -351,3 +351,170 @@
 .function neoCLR.Runtime.ConsoleReadByte() -> Result<Option<Byte>,Error>
     .methodimpl InternalCall
 .end
+
+; Ordinary library carriers. Fully qualified names distinguish them from bootstrap signatures.
+.type System.None
+    .method instance .ctor() -> Void
+        ldvoid
+        ret
+    .end
+.end
+
+.type System.Some<T>
+    .field private Payload T
+    .method instance .ctor(T value) -> Void
+        ldarg value
+        newobj System.Some<T>
+        starg this
+        ldvoid
+        ret
+    .end
+    .property instance Value() -> T
+        .get instance System.Some<T>::get_Value()
+    .end
+    .method instance get_Value() -> T
+        ldarg this
+        ldfld 0
+        ret
+    .end
+.end
+
+.type System.Ok<T>
+    .field private Payload T
+    .method instance .ctor(T value) -> Void
+        ldarg value
+        newobj System.Ok<T>
+        starg this
+        ldvoid
+        ret
+    .end
+    .property instance Value() -> T
+        .get instance System.Ok<T>::get_Value()
+    .end
+    .method instance get_Value() -> T
+        ldarg this
+        ldfld 0
+        ret
+    .end
+.end
+
+.type System.Err<T>
+    .field private Payload T
+    .method instance .ctor(T value) -> Void
+        ldarg value
+        newobj System.Err<T>
+        starg this
+        ldvoid
+        ret
+    .end
+    .property instance Value() -> T
+        .get instance System.Err<T>::get_Value()
+    .end
+    .method instance get_Value() -> T
+        ldarg this
+        ldfld 0
+        ret
+    .end
+.end
+
+.type System.Option<T>
+    .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
+    .field private Stored System.Value
+    .method instance .ctor(System.None value) -> Void
+        ldarg value
+        value.pack System.None
+        newobj System.Option<T>
+        starg this
+        ldvoid
+        ret
+    .end
+    .property instance IsNone() -> Boolean
+        .get instance System.Option<T>::get_IsNone()
+    .end
+    .method instance get_IsNone() -> Boolean
+        ldarg this
+        ldfld 0
+        value.is System.None
+        ret
+    .end
+    .method instance GetNone() -> System.None
+        ldarg this
+        ldfld 0
+        value.unpack System.None
+        ret
+    .end
+    .method instance .ctor(System.Some<T> value) -> Void
+        ldarg value
+        value.pack System.Some<T>
+        newobj System.Option<T>
+        starg this
+        ldvoid
+        ret
+    .end
+    .property instance IsSome() -> Boolean
+        .get instance System.Option<T>::get_IsSome()
+    .end
+    .method instance get_IsSome() -> Boolean
+        ldarg this
+        ldfld 0
+        value.is System.Some<T>
+        ret
+    .end
+    .method instance GetSome() -> System.Some<T>
+        ldarg this
+        ldfld 0
+        value.unpack System.Some<T>
+        ret
+    .end
+.end
+
+.type System.Result<T,E>
+    .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
+    .field private Stored System.Value
+    .method instance .ctor(System.Ok<T> value) -> Void
+        ldarg value
+        value.pack System.Ok<T>
+        newobj System.Result<T,E>
+        starg this
+        ldvoid
+        ret
+    .end
+    .property instance IsOk() -> Boolean
+        .get instance System.Result<T,E>::get_IsOk()
+    .end
+    .method instance get_IsOk() -> Boolean
+        ldarg this
+        ldfld 0
+        value.is System.Ok<T>
+        ret
+    .end
+    .method instance GetOk() -> System.Ok<T>
+        ldarg this
+        ldfld 0
+        value.unpack System.Ok<T>
+        ret
+    .end
+    .method instance .ctor(System.Err<E> value) -> Void
+        ldarg value
+        value.pack System.Err<E>
+        newobj System.Result<T,E>
+        starg this
+        ldvoid
+        ret
+    .end
+    .property instance IsErr() -> Boolean
+        .get instance System.Result<T,E>::get_IsErr()
+    .end
+    .method instance get_IsErr() -> Boolean
+        ldarg this
+        ldfld 0
+        value.is System.Err<E>
+        ret
+    .end
+    .method instance GetErr() -> System.Err<E>
+        ldarg this
+        ldfld 0
+        value.unpack System.Err<E>
+        ret
+    .end
+.end

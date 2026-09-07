@@ -1722,3 +1722,24 @@ to the .NET reflection hierarchy or a stable compatibility surface. No scope exp
 or runtime implementation change was made.
 
 Validation: documentation-only changes; diff checks pass. Runtime tests were not rerun.
+
+## 2026-09-07 — Ordinary System.Option/Result library carriers
+
+Implemented System.None, Some<T>, Ok<T>, Err<T>, Option<T> and Result<T,E> as ordinary
+platform-defined types. Nineteen new IL methods provide constructors, read-only payload
+properties, variant predicates and checked wrapper accessors. Carriers hold one private
+System.Value; no interpreter dispatch, native intrinsic or union opcode was added.
+Selected and documented the Preview 1 constructor/query convention for future tools,
+including exact wrapper identity, suffix restrictions and behavioral obligations.
+
+Added an executable ordinary-union sample and eight integration tests for serialized
+round trips, equal success/error payload types, Void/None distinctions, arbitrary error
+payloads, nesting, failed accessors, private representation, independent copies, and
+execution without marker metadata. Fully qualified System.Option/Result select ordinary
+types while unqualified spellings and existing APIs remain explicit bootstrap migration
+debt. Updated Preview 1's Raven-like IL mappings and current library documentation.
+
+Validation: all 414 integration tests pass; formatting, Clippy with warnings denied,
+diff checks and local documentation links pass. The sample assembled to JSON, passed
+the typed verifier and ran with expected output. Host/native adapter migration and
+bootstrap removal remain unfinished; no push or publication performed.

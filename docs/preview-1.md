@@ -32,7 +32,7 @@ may remain unnamed; neoCLR is sufficient as the runtime codename for the preview
 | Execution fundamentals | Primitive values, free functions, calls/overloads, indexed parameters/locals, control flow, real Void, value copying | Implemented; preserve semantics through remaining changes |
 | Metadata and modules | Explicit types/members/signatures, generic type definitions and closed use, properties/accessors, module references and member identities | Implemented; current JSON is a documented prototype representation |
 | Ordinary type contracts | Public/internal type visibility, public/internal/private members, usable constructors with defined receiver and initialization behavior | Visibility, properties and whole-value constructor initialization implemented; carrier requirements still need proving |
-| Ordinary unions | Carrier/variant convention sufficient for Option<T> and Result<T,TError>, including Void, nested carriers, and Result<T,T> | Explicit typed storage and an ordinary carrier prototype run; final member convention, System carriers and boundary migration remain |
+| Ordinary unions | Carrier/variant convention sufficient for Option<T> and Result<T,TError>, including Void, nested carriers, and Result<T,T> | Selected member convention and ordinary System carriers implemented; existing API/native/host boundary migration remains |
 | No union-specific IL | Library, samples, native result construction and host inputs use ordinary types; remove special union operations and encodings | Not done; current some/none/ok/err/is.case/ldcase and special Option/Result handling are bootstrap debt |
 | Minimal library and console | Useful Int32/String/Error APIs; console input/output; EOF distinct from input failure; an interactive program | Implemented using raw byte input and immediate line output; migrate existing bootstrap Result/Option uses. General ReadLine is not required |
 | Minimal reflection | Obtain a System.Type-style descriptor from a type token or value, compare identity, read its name, inspect closed generic arguments | Existing host type identities are groundwork; guest read-only type inspection is not implemented |
@@ -57,14 +57,14 @@ and compatibility with existing .NET tooling are later work, not achieved by usi
    initialize whole values; [explicit typed storage](value-storage.md) lets a carrier
    retain one complete wrapper without inactive defaults. The prototype needs no
    addressed receivers, native overlapping layout or implicit ownership model.
-2. **Finalize the ordinary carrier member convention.** Specify how compilers recognize
-   permitted wrappers, constructors and typed queries, and how a match lowers to
-   ordinary calls/branches. Prove the P3 cases before expanding the object model.
-3. **Implement the ordinary library carriers.** Define permitted variants, public construction
-   and typed queries/accessors using the agreed convention. Prove None versus Some<Void>,
-   Ok<Void>, Result<T,T>, nested carriers, failed queries, and independent value copies.
-   A failed query must not expose an uninitialized value. Accessibility and construction
-   rules must express the intended ordinary-code contract.
+2. **Use the selected member convention.** The [constructor/query contract](union-convention.md)
+   defines permitted wrappers and match lowering through ordinary calls/branches.
+   A future compiler/tooling recognizer is separate; the VM attaches no special semantics.
+3. **Preserve the tested ordinary library carriers through migration.** System.Option and
+   System.Result cover None versus Some<Void>, Ok<Void>, Result<T,T>, nested carriers,
+   failed queries and independent value copies. Fully qualified names select them while
+   short Option/Result spellings still denote bootstrap categories. Migrate existing
+   APIs and host/native adapters before removing that temporary distinction.
 4. **Replace and remove the bootstrap union system.** Migrate library methods, native/host
    adapters, samples, and tests to ordinary types and calls. Delete the six special
    instructions and special Option/Result type/value dispatch. Make the metadata break
@@ -80,8 +80,8 @@ and compatibility with existing .NET tooling are later work, not achieved by usi
    Fix failures and contradictions before adding more features.
 
 The interpreter's carrier-storage decision and limits are recorded in
-[value storage](value-storage.md). Final member conventions, System.Option/Result,
-host/native migration and minimal guest inspection remain substantial work. The
+[value storage](value-storage.md). API/host/native migration, bootstrap removal and
+minimal guest inspection remain substantial work. The
 prototype is not evidence of a settled native ABI or a publication date.
 
 ## Required demonstrations

@@ -25,7 +25,7 @@ generated union representation and runtime dependencies are not adopted here.
 | --- | --- | --- | --- |
 | P1 | Hello and a free helper | UTF-8 text, free calls, real Void, artifact round trip | hello.neoil, strings.neoil |
 | P2 | Console calculation | Prompt, byte input, computation, EOF versus recoverable Error | console_input.neoil, errors.neoil |
-| P3 | Typed data and alternatives | Constructors, private storage, properties, generic carriers, independent copies | constructors.neoil, ordinary_carrier.neoil, value_storage tests |
+| P3 | Typed data and alternatives | Constructors, private storage, properties, generic carriers, independent copies | constructors.neoil, ordinary_unions.neoil, ordinary_unions tests |
 | P4 | Explicit buffer | Array allocation, indexing/loop, aliasing, exactly one free | arrays.neoil |
 | P5 | A deliberate Fault | Terminal failure with guest caller frames and IL locations | stack-trace tests, array_bounds.neoil |
 | P6 | Inspect a type | Type/value acquisition, exact identity, name, closed generic arguments | Host identity APIs only; guest support still missing |
@@ -33,8 +33,9 @@ generated union representation and runtime dependencies are not adopted here.
 The existing files are groundwork, not a claim that every program contract below is
 already implemented or has an exact fixture. Preview 1 must give each row a checked-in
 neoIL equivalent, expected output/exit behavior and automated coverage. P2 still uses
-bootstrap unions; P3 does not yet have final System.Option/Result or their compiler
-convention; P6 lacks guest APIs. Those gaps prevent declaring Preview 1 complete.
+bootstrap unions; P3 has ordinary System carriers and a selected member convention,
+but still needs API/host/native migration; P6 lacks guest APIs. Those gaps prevent
+declaring Preview 1 complete.
 
 ## P1 — Hello and a free helper
 
@@ -178,24 +179,25 @@ The last fragment leaves the WriteLine Void result on the stack. Local names map
 indices 0 and 1; source identifiers are not runtime identities. The compiler may use
 different authoring names, but emitted signatures and metadata rows must agree.
 
-Union declarations synthesize ordinary carrier and wrapper types. The prototype
-[Outcome example](value-storage.md) uses a private System.Value field with explicit
-erasure; it needs no union marker to execute. Its representative match lowering is:
+Union declarations synthesize ordinary carrier and wrapper types. The
+[System library carriers](union-convention.md) use a private System.Value field with
+explicit erasure. Their marker aids future tooling, not execution. Match lowering is:
 
 ```text
 ldloc result
-call instance Outcome<Int32,Int32>::IsSuccess()
+call instance System.Result<Int32,Int32>::get_IsOk()
 brfalse Failed
 ldloc result
-call instance Outcome<Int32,Int32>::GetSuccess()
+call instance System.Result<Int32,Int32>::GetOk()
+call instance System.Ok<Int32>::get_Value()
 ; Consume the success payload and branch to the join.
 ```
 
-These are the prototype's member names, not a finalized System.Result API. Generic
+These are the implemented ordinary System member names. Generic
 payload identity is preserved by distinct wrappers, not guessed from payload type.
 Ordinary constructor/accessor bodies do the packing/testing/extraction. A compiler
 recognizes the convention and checks exhaustiveness; the VM does neither. P3 is
-complete only after the System carriers, convention and host/native adapters replace
+complete only after existing API callers and host/native adapters replace
 bootstrap union handling. This representation does not fix a native layout or allocator.
 
 ## P4 — An explicit buffer

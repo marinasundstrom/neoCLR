@@ -67,10 +67,10 @@ does not implement .NET's out-parameter TryGetValue signature or finalize the
 compiler-recognized member convention. Ordinary visibility does not prove that every
 implementation honors its own contract; unsafe and trusted host boundaries still apply.
 
-System Option/Result and native adapters have **not** been migrated. Bootstrap union
-instructions remain removal debt. Next: finalize the member convention, implement
-ordinary Option/Result, adapt host/native boundaries, then remove bootstrap encodings
-with an explicit artifact compatibility break.
+Ordinary System.Option/Result now implement the selected [member convention](union-convention.md)
+in platform IL. Existing I/O/text/numeric APIs and native adapters have **not** been
+migrated to them. Next: adapt host/native boundaries and their callers, then remove
+bootstrap encodings with an explicit artifact compatibility break.
 
 ```sh
 cargo run --locked -- run examples/ordinary_carrier.neoil
