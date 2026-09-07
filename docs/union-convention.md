@@ -93,7 +93,8 @@ VM categories. They are not aliases and cannot be passed interchangeably. This i
 temporary migration scaffolding, not the final language naming policy.
 
 Existing console, parsing, text/file helpers and their native adapters still return
-bootstrap carriers. Host invocation does not yet import records containing System.Value.
+bootstrap carriers. [Host invocation now imports](erased-inputs.md) records containing
+System.Value with bounded shape checks; this does not recognize or enforce the convention.
 No automatic conversion or extra host intrinsic bridges the two representations.
 Those boundaries must be migrated, then the bootstrap instructions and type categories
 removed with an explicit serialized-format break before Preview 1 is complete.
@@ -103,3 +104,15 @@ cargo run --locked -- run examples/ordinary_unions.neoil
 ```
 
 Expected lines: `success`, `7`, `failure`, `7`, `Some<Void> is present`, `=> Void`.
+
+## Later composition APIs
+
+The intended consumer model is Rust-like Option/Result composition expressed through
+Raven-like source syntax. Map transforms a success payload, MapError transforms an
+error payload, and AndThen chains an operation returning another Result. On Err,
+Map/AndThen preserve the error without invoking the success callback. Option should
+offer corresponding Map/AndThen behavior that propagates None. These remain ordinary
+library methods; they require generic methods and callable values, not union opcodes.
+Broad inheritance or virtual dispatch is not inherently required, but these APIs are
+deferred until their platform prerequisites exist. The current .NET-style access model
+remains sufficient; a redesigned access model is separate future work.

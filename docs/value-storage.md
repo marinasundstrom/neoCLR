@@ -39,10 +39,10 @@ backends must supply its copy, identity, checking and storage behavior.
 
 Native layout/ABI, pointers to erased payload storage, guest ownership/destruction,
 and JIT/AOT implementations remain unspecified. Native storage containing System.Value
-and `sizeof System.Value` are rejected. Host invocation currently rejects parameters
-containing System.Value, including nested fields; arbitrary host-built erased trees
-are not imported. Guest functions may return it for host inspection. Bounded host
-import is a separate prerequisite for migrating existing host union inputs.
+and `sizeof System.Value` are rejected. [Bounded host import](erased-inputs.md) now
+validates explicit erased payloads, including nested record fields, so guest-produced
+carriers can be supplied to later invocations. Pointer/Ref payloads remain unsupported;
+shape validation does not certify constructor or union invariants.
 
 ## Carrier decision and proof
 

@@ -7,11 +7,20 @@ use crate::{
 #[derive(Debug)]
 pub(crate) enum Input {
     Primitive(Type),
+    Erased,
     Record { ty: Type, fields: Vec<Input> },
     Union { ty: Type, cases: Vec<(Case, Input)> },
 }
 
 pub(crate) fn resolve(module: &Module, parameters: &[Type]) -> Result<Vec<Input>, Fault> {
+    resolve_with_budget(module, parameters, &mut 16_384)
+}
+
+fn resolve_with_budget(
+    module: &Module,
+    parameters: &[Type],
+    remaining: &mut usize,
+) -> Result<Vec<Input>, Fault> {
     fn build(
         module: &Module,
         ty: &Type,
@@ -26,7 +35,7 @@ pub(crate) fn resolve(module: &Module, parameters: &[Type]) -> Result<Vec<Input>
         }
         *remaining -= 1;
         if *ty == Type::Value {
-            return Err(Fault::new("erased host inputs are not supported yet"));
+            return Ok(Input::Erased);
         }
         if ty.is_primitive() {
             return Ok(Input::Primitive(ty.clone()));
@@ -78,17 +87,65 @@ pub(crate) fn resolve(module: &Module, parameters: &[Type]) -> Result<Vec<Input>
         active.pop();
         Ok(schema)
     }
-    let mut remaining = 16_384;
     let mut active = Vec::new();
     parameters
         .iter()
-        .map(|ty| build(module, ty, 0, &mut remaining, &mut active))
+        .map(|ty| build(module, ty, 0, remaining, &mut active))
         .collect()
+}
+
+struct ImportBudget {
+    values: usize,
+    schemas: usize,
 }
 
 impl Input {
     pub(crate) fn import(&self, module: &Module, value: Value) -> Result<Value, Fault> {
+        self.import_checked(
+            module,
+            value,
+            &mut ImportBudget {
+                values: 16_384,
+                schemas: 16_384,
+            },
+            0,
+        )
+    }
+
+    fn import_checked(
+        &self,
+        module: &Module,
+        value: Value,
+        budget: &mut ImportBudget,
+        depth: usize,
+    ) -> Result<Value, Fault> {
+        if depth > 64 || budget.values == 0 {
+            return Err(Fault::new(
+                "host input value exceeds depth or complexity limit",
+            ));
+        }
+        budget.values -= 1;
         match self {
+            Input::Erased => {
+                let Value::Erased(payload) = value else {
+                    return Err(Fault::new("expected explicit System.Value payload"));
+                };
+                let ty = match payload.as_ref() {
+                    Value::Object { ty, .. } | Value::Union { ty, .. } => {
+                        crate::scope::normalize_type(module, ty)?
+                    }
+                    Value::Pointer(_) | Value::Reference { .. } => {
+                        return Err(Fault::new(
+                            "pointer and Ref host payloads are not supported",
+                        ));
+                    }
+                    other => other.ty(),
+                };
+                crate::vm::check_type(&ty, module)?;
+                let schema = resolve_with_budget(module, &[ty], &mut budget.schemas)?.remove(0);
+                let payload = schema.import_checked(module, *payload, budget, depth + 1)?;
+                Ok(Value::Erased(Box::new(payload)))
+            }
             Input::Primitive(expected) => {
                 if matches!(
                     value,
@@ -127,9 +184,11 @@ impl Input {
                     .ok_or_else(|| {
                         Fault::new(format!("case {case:?} does not belong to {expected:?}"))
                     })?;
-                let payload = schema.import(module, *payload).map_err(|error| {
-                    Fault::new(format!("case {case:?} payload: {}", error.message))
-                })?;
+                let payload = schema
+                    .import_checked(module, *payload, budget, depth + 1)
+                    .map_err(|error| {
+                        Fault::new(format!("case {case:?} payload: {}", error.message))
+                    })?;
                 Ok(Value::Union {
                     ty: expected.clone(),
                     case,
@@ -161,9 +220,11 @@ impl Input {
                     .zip(schema)
                     .enumerate()
                     .map(|(index, (value, field))| {
-                        field.import(module, value).map_err(|error| {
-                            Fault::new(format!("field {index}: {}", error.message))
-                        })
+                        field
+                            .import_checked(module, value, budget, depth + 1)
+                            .map_err(|error| {
+                                Fault::new(format!("field {index}: {}", error.message))
+                            })
                     })
                     .collect::<Result<Vec<_>, _>>()?;
                 Ok(Value::Object {

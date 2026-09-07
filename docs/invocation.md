@@ -55,6 +55,10 @@ typed verifier; callers can verify the program before resolving or invoking.
 
 ## Instance receivers
 
+Explicit System.Value inputs and records containing them support
+[bounded erased-value import](erased-inputs.md), including ordinary library carriers.
+Their shape is validated before execution; constructor provenance is not inferred.
+
 Resolve an instance signature and supply its receiver separately:
 
 ```rust

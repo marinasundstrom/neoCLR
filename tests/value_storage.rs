@@ -180,7 +180,7 @@ fn copied_erased_records_are_independent_values() {
 }
 
 #[test]
-fn erasure_does_not_grant_native_layout_or_host_input_access() {
+fn erasure_does_not_grant_native_layout_or_implicit_host_conversion() {
     assert!(
         assemble(".module App\n.function Main() -> Int32\nsizeof System.Value\nret\n.end").is_err()
     );
@@ -189,12 +189,19 @@ fn erasure_does_not_grant_native_layout_or_host_input_access() {
     )
     .unwrap();
     let loaded = LoadedProgram::new(&module).unwrap();
+    let echo = loaded
+        .resolve_function(&parse_function_ref("Echo(System.Value)").unwrap())
+        .unwrap();
     assert!(
-        loaded
-            .resolve_function(&parse_function_ref("Echo(System.Value)").unwrap())
-            .unwrap_err()
-            .message
-            .contains("erased host inputs")
+        echo.invoke(vec![Value::Int32(42)], Limits::default())
+            .is_err()
+    );
+    let value = Value::Erased(Box::new(Value::Int32(42)));
+    assert_eq!(
+        echo.invoke(vec![value.clone()], Limits::default())
+            .unwrap()
+            .value,
+        value
     );
 }
 

@@ -34,6 +34,11 @@ prototype import limits, not native layout constraints or a universal memory pol
 
 ## Owned data and remaining limits
 
+System.Value fields now use [bounded erased-payload import](erased-inputs.md). Their
+concrete payload schemas are resolved at invocation, with shared per-value traversal
+and dynamic-schema budgets. This supports ordinary Option/Result carrier inputs
+without giving their marker special runtime meaning.
+
 Arguments move into invoke as owned Rust Values. A caller retaining a copy can clone
 the Value first; guest updates do not alter that retained copy. Valid record results
 can be imported into later invocations, with the same validation performed again.

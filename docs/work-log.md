@@ -1743,3 +1743,25 @@ Validation: all 414 integration tests pass; formatting, Clippy with warnings den
 diff checks and local documentation links pass. The sample assembled to JSON, passed
 the typed verifier and ran with expected output. Host/native adapter migration and
 bootstrap removal remain unfinished; no push or publication performed.
+
+## 2026-09-07 — Bounded host input for ordinary carriers
+
+Added explicit erased-value input schemas so System.Value and records containing it
+can be supplied to loaded functions. Concrete payload types are validated against the
+loaded module, then imported with exact primitive/record rules and scoped-name checks.
+Shared per-argument/receiver value-depth, value-count and dynamic-schema budgets prevent
+nested erasure from resetting complexity limits. Pointer and Ref payloads remain
+unsupported. Validation checks shape, not private-constructor provenance or union
+behavior; no carrier-name or marker dispatch was added.
+
+Added a Rust/IL example that constructs System.Result<Int32,String> in guest code and
+passes it through the host to another invocation, plus six tests for reuse, scoped
+normalization, malformed trees, pointer rejection, bounded nesting/complexity and the
+trusted structural boundary. Updated hosting/value-storage and Preview 1 documents.
+Recorded Rust-like Map/MapError/AndThen as future ordinary library composition APIs,
+with generic methods/callables as prerequisites; access-modifier redesign stays deferred.
+
+Validation: all 420 integration tests pass; formatting, Clippy with warnings denied,
+diff checks and local documentation links pass. The new hosting example prints
+Int32(42). Existing API/native/bootstrap host paths still need migration before union
+opcode removal. No push or publication performed.
