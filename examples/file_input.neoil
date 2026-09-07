@@ -2,25 +2,38 @@
 .entry Main
 
 .function ReadNumber(String path) -> System.Result<Int32,Error>
+    .local System.Result.Ok<String> fileText
+    .local System.Result.Ok<Int32> parsedNumber
+    .local System.Result.Error<System.Int32ParseError> parseFailure
+    .local System.Result.Error<System.IO.FileReadError> readFailure
     ldarg path
     ldc.i4 1024
     call System.IO.File::ReadAllText(String,Int32)
     dup
-    call instance System.Result<String,System.IO.FileReadError>::get_IsErrorCase()
-    brtrue Failed
-    call instance System.Result<String,System.IO.FileReadError>::GetOkCase()
+    ldloca fileText
+    call instance System.Result<String,System.IO.FileReadError>::TryGet(System.Result.Ok<String>&)
+    brfalse Failed
+    pop
+    ldloc fileText
     call instance System.Result.Ok<String>::get_Value()
     call System.Int32::Parse(String)
     dup
-    call instance System.Result<Int32,System.Int32ParseError>::get_IsErrorCase()
-    brtrue ParseFailed
-    call instance System.Result<Int32,System.Int32ParseError>::GetOkCase()
+    ldloca parsedNumber
+    call instance System.Result<Int32,System.Int32ParseError>::TryGet(System.Result.Ok<Int32>&)
+    brfalse ParseFailed
+    pop
+    ldloc parsedNumber
     call instance System.Result.Ok<Int32>::get_Value()
     newobj instance System.Result.Ok<Int32>::.ctor(Int32)
     newobj instance System.Result<Int32,Error>::.ctor(System.Result.Ok<Int32>)
     ret
 ParseFailed:
-    call instance System.Result<Int32,System.Int32ParseError>::GetErrorCase()
+    ldloca parseFailure
+    call instance System.Result<Int32,System.Int32ParseError>::TryGet(System.Result.Error<System.Int32ParseError>&)
+    brtrue ParseErrorExtracted
+    fault "Expected Error case"
+ParseErrorExtracted:
+    ldloc parseFailure
     call instance System.Result.Error<System.Int32ParseError>::get_Value()
     call instance System.Int32ParseError::ToString()
     call System.Error::FromMessage(String)
@@ -28,7 +41,12 @@ ParseFailed:
     newobj instance System.Result<Int32,Error>::.ctor(System.Result.Error<Error>)
     ret
 Failed:
-    call instance System.Result<String,System.IO.FileReadError>::GetErrorCase()
+    ldloca readFailure
+    call instance System.Result<String,System.IO.FileReadError>::TryGet(System.Result.Error<System.IO.FileReadError>&)
+    brtrue ReadErrorExtracted
+    fault "Expected Error case"
+ReadErrorExtracted:
+    ldloc readFailure
     call instance System.Result.Error<System.IO.FileReadError>::get_Value()
     call instance System.IO.FileReadError::ToString()
     call System.Error::FromMessage(String)
@@ -38,19 +56,28 @@ Failed:
 .end
 
 .function Report(String path) -> Void
+    .local System.Result.Ok<Int32> success
+    .local System.Result.Error<System.Error> failure
     ldarg path
     call ReadNumber(String)
     dup
-    call instance System.Result<Int32,System.Error>::get_IsErrorCase()
-    brtrue Failed
-    call instance System.Result<Int32,System.Error>::GetOkCase()
+    ldloca success
+    call instance System.Result<Int32,System.Error>::TryGet(System.Result.Ok<Int32>&)
+    brfalse Failed
+    pop
+    ldloc success
     call instance System.Result.Ok<Int32>::get_Value()
     ldc.i4 2
     mul
     call System.Console::WriteLine(Int32)
     ret
 Failed:
-    call instance System.Result<Int32,System.Error>::GetErrorCase()
+    ldloca failure
+    call instance System.Result<Int32,System.Error>::TryGet(System.Result.Error<System.Error>&)
+    brtrue ErrorExtracted
+    fault "Expected Error case"
+ErrorExtracted:
+    ldloc failure
     call instance System.Result.Error<System.Error>::get_Value()
     call instance System.Error::ToString()
     call System.Console::WriteLine(String)

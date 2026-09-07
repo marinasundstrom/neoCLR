@@ -4,6 +4,9 @@
 ; Read up to nine ASCII digits, terminated by LF or EOF.
 ; CR is ignored so redirected CRLF input works too.
 .function ReadNumber() -> System.Result<System.Option<Int32>,Error>
+    .local System.Result.Ok<System.Option<Byte>> success
+    .local System.Option.Some<Byte> some
+    .local System.Result.Error<System.IO.ConsoleReadError> failure
     .local Int32 number
     .local Int32 digits
     .local Byte byte
@@ -14,14 +17,18 @@
 Read:
     call System.Console::ReadByte()
     dup
-    call instance System.Result<System.Option<Byte>,System.IO.ConsoleReadError>::get_IsErrorCase()
-    brtrue InputFailed
-    call instance System.Result<System.Option<Byte>,System.IO.ConsoleReadError>::GetOkCase()
+    ldloca success
+    call instance System.Result<System.Option<Byte>,System.IO.ConsoleReadError>::TryGet(System.Result.Ok<System.Option<Byte>>&)
+    brfalse InputFailed
+    pop
+    ldloc success
     call instance System.Result.Ok<System.Option<Byte>>::get_Value()
     dup
-    call instance System.Option<Byte>::get_IsNone()
-    brtrue Eof
-    call instance System.Option<Byte>::GetSomeCase()
+    ldloca some
+    call instance System.Option<Byte>::TryGet(System.Option.Some<Byte>&)
+    brfalse Eof
+    pop
+    ldloc some
     call instance System.Option.Some<Byte>::get_Value()
     stloc byte
     ldloc byte
@@ -71,7 +78,12 @@ Finish:
     newobj instance System.Result<System.Option<Int32>,Error>::.ctor(System.Result.Ok<System.Option<Int32>>)
     ret
 InputFailed:
-    call instance System.Result<System.Option<Byte>,System.IO.ConsoleReadError>::GetErrorCase()
+    ldloca failure
+    call instance System.Result<System.Option<Byte>,System.IO.ConsoleReadError>::TryGet(System.Result.Error<System.IO.ConsoleReadError>&)
+    brtrue ErrorExtracted
+    fault "Expected Error case"
+ErrorExtracted:
+    ldloc failure
     call instance System.Result.Error<System.IO.ConsoleReadError>::get_Value()
     call instance System.IO.ConsoleReadError::ToString()
     call System.Error::FromMessage(String)
@@ -96,26 +108,38 @@ Empty:
 .end
 
 .function Main() -> Void
+    .local System.Result.Ok<System.Option<Int32>> success
+    .local System.Option.Some<Int32> some
+    .local System.Result.Error<Error> failure
     ldstr "Enter an unsigned number (up to nine digits):"
     call System.Console::WriteLine(String)
     pop
     call ReadNumber()
     dup
-    call instance System.Result<System.Option<Int32>,Error>::get_IsErrorCase()
-    brtrue Failed
-    call instance System.Result<System.Option<Int32>,Error>::GetOkCase()
+    ldloca success
+    call instance System.Result<System.Option<Int32>,Error>::TryGet(System.Result.Ok<System.Option<Int32>>&)
+    brfalse Failed
+    pop
+    ldloc success
     call instance System.Result.Ok<System.Option<Int32>>::get_Value()
     dup
-    call instance System.Option<Int32>::get_IsNone()
-    brtrue Eof
-    call instance System.Option<Int32>::GetSomeCase()
+    ldloca some
+    call instance System.Option<Int32>::TryGet(System.Option.Some<Int32>&)
+    brfalse Eof
+    pop
+    ldloc some
     call instance System.Option.Some<Int32>::get_Value()
     ldc.i4 2
     mul
     call System.Console::WriteLine(Int32)
     ret
 Failed:
-    call instance System.Result<System.Option<Int32>,Error>::GetErrorCase()
+    ldloca failure
+    call instance System.Result<System.Option<Int32>,Error>::TryGet(System.Result.Error<Error>&)
+    brtrue ErrorExtracted
+    fault "Expected Error case"
+ErrorExtracted:
+    ldloc failure
     call instance System.Result.Error<Error>::get_Value()
     call instance System.Error::ToString()
     call System.Console::WriteLine(String)

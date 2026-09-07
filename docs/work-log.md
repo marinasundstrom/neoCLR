@@ -2388,3 +2388,23 @@ checks cover overloaded case extraction with identical payload types, all sample
 verification, source/artifact walkthroughs and pointer lifetime failures after the
 pointer-returning methods were removed. Formatting, diff checks and strict Clippy
 pass. Historical work-log entries retain the earlier pointer API for chronology.
+
+## Case-based extraction in console and file programs
+
+Migrated ConsoleInput, ConsoleTyped, FileInput and FileSummary to overloaded
+TryGet with managed case-output references. Successful paths read Ok/Some Value
+properties; failure paths extract the typed Error case before formatting or
+converting the error. Direct Boolean branches establish output initialization.
+The samples retain the carrier for alternative extraction and discard it on the
+successful path. An impossible absence of both Result cases remains a Fault.
+
+Updated the walkthrough to explain case extraction, evaluation-stack handling and
+the distinction between recoverable I/O errors and broken carrier contracts.
+Existing acceptance tests cover byte input, EOF, invalid/empty input, injected
+console failure, file parse errors, missing files, size/encoding failures and the
+source/artifact walkthrough. Program output and cleanup contracts are preserved.
+
+Validation: all 28 tests pass across console (11), file input (5), preview
+walkthrough (3) and verification (9), including verification of every IL sample.
+Formatting and git diff checks pass. This slice changes samples and documentation;
+no runtime or metadata semantics change.

@@ -2,15 +2,19 @@
 .entry Main
 
 .function Report(String path) -> Void
+    .local System.Result.Ok<String> success
+    .local System.Result.Error<System.IO.FileReadError> failure
     .local String text
     .local System.IO.FileReadError error
     ldarg path
     ldc.i4 4096
     call System.IO.File::ReadAllText(String,Int32)
     dup
-    call instance System.Result<String,System.IO.FileReadError>::get_IsErrorCase()
-    brtrue Failed
-    call instance System.Result<String,System.IO.FileReadError>::GetOkCase()
+    ldloca success
+    call instance System.Result<String,System.IO.FileReadError>::TryGet(System.Result.Ok<String>&)
+    brfalse Failed
+    pop
+    ldloc success
     call instance System.Result.Ok<String>::get_Value()
     stloc text
     ldstr "File contents:"
@@ -27,7 +31,12 @@
     call System.Console::WriteLine(Int32)
     ret
 Failed:
-    call instance System.Result<String,System.IO.FileReadError>::GetErrorCase()
+    ldloca failure
+    call instance System.Result<String,System.IO.FileReadError>::TryGet(System.Result.Error<System.IO.FileReadError>&)
+    brtrue ErrorExtracted
+    fault "Expected Error case"
+ErrorExtracted:
+    ldloc failure
     call instance System.Result.Error<System.IO.FileReadError>::get_Value()
     stloc error
     ldloc error

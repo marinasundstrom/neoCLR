@@ -84,6 +84,19 @@ None represents immediate EOF; an error represents invalid/empty input or a read
 failure. Native console failures have the specific ConsoleReadError type, which
 this application explicitly converts to a displayable application Error.
 
+The console and file samples use overloaded `TryGet(out Case& value)` to extract
+ordinary case values, then read their Value properties. The console first extracts
+`Ok<Option<Byte>>`, then `Some<Byte>`; a missing Some denotes EOF. The Error branch
+extracts `Error<ConsoleReadError>`. Output locals are read only after a successful
+Boolean branch, as required by the conditional output contract.
+
+In neoIL, `ldloca` supplies the output reference and the call signature names the
+case type followed by `&`. These samples use `dup` to retain the carrier for the
+alternative branch and `pop` to discard it after a successful extraction. If both
+Ok and Error queries fail, an explicit Fault reports a broken carrier contract;
+ordinary input and file failures remain handled Error values. See the
+[reference pseudocode guide](references-in-pseudocode.md) for the source mapping.
+
 | Input | Output after the prompt |
 | --- | --- |
 | `21` followed by Enter | `42` |
