@@ -201,8 +201,8 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
     if module.name.is_empty() {
         return Err(Fault::new("module name must not be empty"));
     }
-    if module.format != 4 {
-        return Err(Fault::new("unsupported module format (expected 4)"));
+    if module.format != 5 {
+        return Err(Fault::new("unsupported module format (expected 5)"));
     }
     // Validate ownership before any traversal by access checking or execution.
     for def in &module.types {
@@ -320,9 +320,6 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         }
         let mut fields = HashSet::new();
         for field in &def.fields {
-            if crate::slots::contains(&field.ty) {
-                return Err(Fault::new("managed references cannot be stored in fields"));
-            }
             if field.name.is_empty() || !fields.insert(&field.name) {
                 return Err(Fault::new("empty or duplicate field name"));
             }
@@ -599,9 +596,6 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                     check(ty)?;
                     crate::interfaces::interface_definition(module, ty)?;
                 }
-                Op::PackValue(ty) if crate::slots::contains(ty) => {
-                    return Err(Fault::new("managed references cannot be erased"));
-                }
                 Op::LoadTypeToken(ty)
                 | Op::PackValue(ty)
                 | Op::IsValue(ty)
@@ -781,7 +775,7 @@ fn check_type_context(ty: &Type, module: &Module, arity: usize, depth: usize) ->
             }
             nested(t)
         }
-        Type::Ref(t) | Type::Ptr(t) => {
+        Type::Ptr(t) => {
             if crate::slots::contains(t) {
                 return Err(Fault::new(
                     "managed references cannot be stored in pointer or owner types",
@@ -826,7 +820,7 @@ impl Frame {
                     && (function.out_parameters.contains(&(index - offset))
                         || function.out_when_true.contains(&(index - offset)))
                 {
-                    *reference = reference.output();
+                    *reference = reference.output()?;
                     outputs.push((
                         reference.clone(),
                         function.out_when_true.contains(&(index - offset)),
@@ -988,11 +982,6 @@ pub(crate) fn interpret_function(
     options
         .check_cancellation(&function.name, 0)
         .map_err(initial_fault)?;
-    if crate::slots::contains(&function.returns) {
-        return Err(initial_fault(Fault::new(
-            "managed references cannot cross host result boundaries",
-        )));
-    }
     let limits = options.limits;
     if limits.frames == 0 {
         return Err(initial_fault(Fault::new("frame limit exceeded")));
@@ -1051,7 +1040,7 @@ fn interpret_frames(
                     crate::gc::trace(value, &mut roots);
                 }
             }
-            heap.collect(roots)?;
+            heap.collect(roots, crate::CollectionReason::AllocationPressure)?;
             collection_threshold = heap
                 .len()
                 .saturating_mul(2)
@@ -1223,11 +1212,18 @@ fn interpret_frames(
                         Value::UIntPtr(value) => value != 0,
                         // A condition tests the address, not pointee validity or lifetime.
                         Value::Pointer(pointer) => pointer.address != 0,
-                        // The prototype Ref arena has no null reference representation.
-                        Value::Reference { .. } => true,
+                        Value::SlotReference(reference)
+                        | Value::SlotInterface {
+                            receiver: reference,
+                            ..
+                        } => {
+                            reference.assigned()?;
+                            true
+                        }
+
                         _ => {
                             return Err(Fault::new(
-                                "conditional branch requires Boolean, integer, pointer, or Ref",
+                                "conditional branch requires Boolean, integer, pointer, or managed reference",
                             ));
                         }
                     };
@@ -1465,6 +1461,9 @@ fn interpret_frames(
                     let definitions = module.instantiated_fields(ty)?;
                     let types: Vec<_> = definitions.iter().map(|f| f.ty.clone()).collect();
                     let fields = frame.args(&types)?;
+                    for field in &fields {
+                        field.ensure_heap_references()?;
+                    }
                     frame.stack.push(Value::Object {
                         ty: ty.clone(),
                         fields,
@@ -1473,7 +1472,7 @@ fn interpret_frames(
                 Op::Field(i) => {
                     let Value::Object { ty, fields } = frame.pop()? else {
                         return Err(Fault::new(
-                            "ldfld requires object value (use heap.load for a reference)",
+                            "ldfld requires object value (use ldobj for a reference)",
                         ));
                     };
                     crate::access::check_field(module, &function, &ty, *i)?;
@@ -1494,6 +1493,7 @@ fn interpret_frames(
                     let field = fields
                         .get_mut(*i)
                         .ok_or_else(|| Fault::new("field index out of range"))?;
+                    value.ensure_heap_references()?;
                     *field = value.for_storage(&field.ty())?;
                     frame.stack.push(Value::Object { ty, fields });
                 }
@@ -1744,28 +1744,7 @@ fn interpret_frames(
                         ));
                     }
                     let index = heap.allocate(value)?;
-                    frame.stack.push(Value::Reference { index, target });
-                }
-                Op::HeapLoad => {
-                    let Value::Reference { index, .. } = frame.pop()? else {
-                        return Err(Fault::new("heap.load requires Ref"));
-                    };
-                    frame.stack.push(
-                        heap.get(index)
-                            .ok_or_else(|| Fault::new("invalid reference"))?
-                            .clone(),
-                    );
-                }
-                Op::HeapStore => {
-                    let value = frame.pop()?;
-                    let Value::Reference { index, target } = frame.pop()? else {
-                        return Err(Fault::new("heap.store requires Ref followed by value"));
-                    };
-                    expect(&value, &target)?;
-                    *heap
-                        .get_mut(index)
-                        .ok_or_else(|| Fault::new("invalid reference"))? = value;
-                    frame.stack.push(Value::Void);
+                    frame.stack.push(Value::SlotReference(heap.address(index)?));
                 }
                 Op::Fault(message) => return Err(Fault::new(message)),
             }
@@ -1775,7 +1754,7 @@ fn interpret_frames(
             Ok(Some(value)) => {
                 let mut roots = vec![];
                 crate::gc::trace(&value, &mut roots);
-                heap.collect(roots)?;
+                heap.collect(roots, crate::CollectionReason::ExecutionCompleted)?;
                 return Ok(Execution {
                     value,
                     output,

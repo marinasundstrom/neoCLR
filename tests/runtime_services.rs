@@ -67,8 +67,8 @@ fn generic_memory_calls_report_each_instantiation_and_exact_use_location() {
 }
 
 #[test]
-fn frame_storage_and_bootstrap_references_are_separate_requirements() {
-    let module = assemble(".module App\n.function Scratch() -> Void\nldc.i4 8\nlocalloc\npop\nldc.i4 1\nheap.new\nheap.load\npop\nldvoid\nret\n.end").unwrap();
+fn frame_storage_and_managed_heap_share_reference_services() {
+    let module = assemble(".module App\n.function Scratch() -> Void\nldc.i4 8\nlocalloc\npop\nldc.i4 1\nheap.new\nldobj Int32\npop\nldvoid\nret\n.end").unwrap();
     let program = LoadedProgram::new(&module).unwrap();
     program.verify().unwrap();
     let graph = program
@@ -79,7 +79,8 @@ fn frame_storage_and_bootstrap_references_are_separate_requirements() {
         [
             Service::FrameAllocation,
             Service::PointerMemory,
-            Service::BootstrapReferences
+            Service::ManagedHeap,
+            Service::SlotReferences
         ]
     );
     assert_eq!(
@@ -88,7 +89,7 @@ fn frame_storage_and_bootstrap_references_are_separate_requirements() {
             .iter()
             .map(|m| m.instruction)
             .collect::<Vec<_>>(),
-        [Some(4), Some(5)]
+        [Some(4), Some(4), Some(5)]
     );
     assert!(
         !graph

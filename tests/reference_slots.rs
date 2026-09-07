@@ -95,7 +95,6 @@ fn unsupported_reference_storage_and_parameter_rebinding_are_rejected() {
     for (extra, body, returns) in [
         ("", ".local Int32 value\nldloca value", "Int32&"),
         ("", ".local Int32& value\nldloca value\npop\nldvoid", "Void"),
-        (".type Bad\n.field Value Int32&\n.end", "ldvoid", "Void"),
         (
             ".function Bad() -> Int32&\n.pinvoke \"missing\" \"bad\" cdecl\n.end",
             "ldvoid",
@@ -487,19 +486,19 @@ fn returning_an_out_reference_requires_assignment_during_that_call() {
 }
 
 #[test]
-fn host_reference_results_are_rejected_before_running_guest_code() {
+fn host_frame_reference_results_are_rejected_by_return_provenance() {
     let p = program(
         "",
-        ".local Int32 value\nfault \"must not execute\"\nldc.i4 42\nstloc value\nldloca value",
+        ".local Int32 value\nldc.i4 42\nstloc value\nldloca value",
         "Int32&",
     )
     .unwrap();
-    p.verify().unwrap();
+    assert!(p.verify().is_err());
     assert!(
         p.run(Limits::default())
             .unwrap_err()
             .message
-            .contains("host result")
+            .contains("current frame")
     );
     let target = neoclr::assembler::parse_function_ref("Main()").unwrap();
     assert!(
@@ -508,7 +507,7 @@ fn host_reference_results_are_rejected_before_running_guest_code() {
             .invoke(vec![], Limits::default())
             .unwrap_err()
             .message
-            .contains("host result")
+            .contains("current frame")
     );
 }
 

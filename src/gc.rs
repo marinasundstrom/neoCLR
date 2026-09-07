@@ -1,6 +1,6 @@
 //! Single-threaded, non-moving tracing heap. Object identities are never reused.
 use crate::{Fault, Value};
-use std::collections::{BTreeMap, HashSet};
+use std::collections::{BTreeMap, HashSet, VecDeque};
 
 /// Object-count diagnostics for one execution, including its final collection.
 /// These counts exclude inline values and separately tracked native allocations.
@@ -13,16 +13,38 @@ pub struct GcStatistics {
     pub reclaimed_objects: usize,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CollectionReason {
+    AllocationPressure,
+    ExecutionCompleted,
+}
+
+/// A bounded history entry; roots count incoming edges, not unique allocations.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CollectionEvent {
+    pub sequence: usize,
+    pub reason: CollectionReason,
+    pub roots: usize,
+    pub before: usize,
+    pub after: usize,
+    pub reclaimed: usize,
+}
+
 #[derive(Debug, Default)]
 pub struct ManagedHeap {
-    objects: BTreeMap<usize, Value>,
+    objects: BTreeMap<usize, crate::slots::Cell>,
     next_identity: usize,
     collections: usize,
     reclaimed: usize,
     peak_objects: usize,
+    events: VecDeque<CollectionEvent>,
 }
 
 impl ManagedHeap {
+    /// Most recent 64 collections, in execution order. No guest values are retained.
+    pub fn collection_events(&self) -> impl ExactSizeIterator<Item = &CollectionEvent> {
+        self.events.iter()
+    }
     pub fn statistics(&self) -> GcStatistics {
         GcStatistics {
             allocated_objects: self.next_identity,
@@ -38,9 +60,31 @@ impl ManagedHeap {
     pub fn is_empty(&self) -> bool {
         self.objects.is_empty()
     }
-    /// Look up a live object by the identity carried by a prototype Reference.
-    pub fn get(&self, identity: usize) -> Option<&Value> {
-        self.objects.get(&identity)
+    /// Copy a live object's current value for host inspection without exposing
+    /// a mutable cell or a borrow spanning execution.
+    pub fn get(&self, identity: usize) -> Option<Value> {
+        self.objects
+            .get(&identity)
+            .and_then(|cell| cell.borrow().get().ok())
+    }
+    /// Inspect a heap-backed reference, including an interior field, only within
+    /// the execution that owns it. This does not create a guest invocation handle.
+    pub fn read_reference(&self, reference: &crate::SlotReference) -> Result<Value, Fault> {
+        let cell = reference
+            .allocation_id()
+            .and_then(|id| self.objects.get(&id))
+            .ok_or_else(|| Fault::new("reference does not belong to this managed heap"))?;
+        if !reference.belongs_to_heap_cell(cell) {
+            return Err(Fault::new("reference does not belong to this managed heap"));
+        }
+        reference.read()
+    }
+    pub(crate) fn address(&self, identity: usize) -> Result<crate::SlotReference, Fault> {
+        let cell = self
+            .objects
+            .get(&identity)
+            .ok_or_else(|| Fault::new("invalid reference"))?;
+        Ok(crate::SlotReference::heap(cell, identity))
     }
     pub fn collections(&self) -> usize {
         self.collections
@@ -48,19 +92,23 @@ impl ManagedHeap {
     pub fn reclaimed_objects(&self) -> usize {
         self.reclaimed
     }
-    pub(crate) fn get_mut(&mut self, identity: usize) -> Option<&mut Value> {
-        self.objects.get_mut(&identity)
-    }
     pub(crate) fn allocate(&mut self, value: Value) -> Result<usize, Fault> {
+        value.ensure_heap_references()?;
         let identity = self.next_identity;
         self.next_identity = identity
             .checked_add(1)
             .ok_or_else(|| Fault::new("managed heap identity budget exhausted"))?;
-        self.objects.insert(identity, value);
+        self.objects
+            .insert(identity, crate::slots::Slot::new(value.ty(), Some(value)));
         self.peak_objects = self.peak_objects.max(self.len());
         Ok(identity)
     }
-    pub(crate) fn collect(&mut self, mut pending: Vec<usize>) -> Result<(), Fault> {
+    pub(crate) fn collect(
+        &mut self,
+        mut pending: Vec<usize>,
+        reason: CollectionReason,
+    ) -> Result<(), Fault> {
+        let roots = pending.len();
         let mut live = HashSet::new();
         while let Some(identity) = pending.pop() {
             if !live.insert(identity) {
@@ -70,24 +118,43 @@ impl ManagedHeap {
                 .objects
                 .get(&identity)
                 .ok_or_else(|| Fault::new("invalid managed heap reference during collection"))?;
-            trace(value, &mut pending);
+            value.borrow().trace_heap(&mut pending);
         }
         let before = self.len();
         self.objects.retain(|identity, _| live.contains(identity));
         self.reclaimed = self.reclaimed.saturating_add(before - self.len());
         self.collections = self.collections.saturating_add(1);
+        if self.events.len() == 64 {
+            self.events.pop_front();
+        }
+        self.events.push_back(CollectionEvent {
+            sequence: self.collections,
+            reason,
+            roots,
+            before,
+            after: self.len(),
+            reclaimed: before - self.len(),
+        });
         Ok(())
     }
 }
 
 /// Traverse inline values without recursively traversing reference graphs.
-/// Slot-reference targets currently always belong to active frames, whose cells
-/// are enumerated separately. Heap-backed ByRef will need a root edge here.
+/// Frame-backed targets are scanned through their owning frames. Heap-backed
+/// references and interface views mark their owner, including interior references.
 pub(crate) fn trace(value: &Value, references: &mut Vec<usize>) {
     let mut pending = vec![value];
     while let Some(value) = pending.pop() {
         match value {
-            Value::Reference { index, .. } => references.push(*index),
+            Value::SlotReference(reference)
+            | Value::SlotInterface {
+                receiver: reference,
+                ..
+            } => {
+                if let Some(identity) = reference.allocation_id() {
+                    references.push(identity);
+                }
+            }
             Value::Object { fields, .. } => pending.extend(fields),
             Value::Erased(value) => pending.push(value),
             Value::Void
@@ -109,9 +176,7 @@ pub(crate) fn trace(value: &Value, references: &mut Vec<usize>) {
             | Value::Error(_)
             | Value::RuntimeTypeHandle(_)
             | Value::Pointer(_)
-            | Value::InterfaceRef { .. }
-            | Value::SlotReference(_)
-            | Value::SlotInterface { .. } => (),
+            | Value::InterfaceRef { .. } => (),
         }
     }
 }
@@ -119,14 +184,17 @@ pub(crate) fn trace(value: &Value, references: &mut Vec<usize>) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::metadata::Type;
     #[test]
     fn invalid_roots_do_not_partially_sweep_and_identities_are_not_reused() {
         let mut heap = ManagedHeap::default();
         let first = heap.allocate(Value::Int32(7)).unwrap();
-        assert!(heap.collect(vec![first, 100]).is_err());
-        assert_eq!(heap.get(first), Some(&Value::Int32(7)));
-        heap.collect(vec![]).unwrap();
+        assert!(
+            heap.collect(vec![first, 100], CollectionReason::AllocationPressure)
+                .is_err()
+        );
+        assert_eq!(heap.get(first), Some(Value::Int32(7)));
+        heap.collect(vec![], CollectionReason::AllocationPressure)
+            .unwrap();
         let second = heap.allocate(Value::Int32(42)).unwrap();
         assert_ne!(first, second);
         assert!(heap.get(first).is_none());
@@ -134,20 +202,25 @@ mod tests {
     #[test]
     fn cycles_are_traced_once_and_reclaimed_when_unreachable() {
         let mut heap = ManagedHeap::default();
-        let first = heap.allocate(Value::Void).unwrap();
+        let first = heap.allocate(Value::Erased(Box::new(Value::Void))).unwrap();
         let second = heap
-            .allocate(Value::Reference {
-                index: first,
-                target: Type::Void,
-            })
+            .allocate(Value::Erased(Box::new(Value::SlotReference(
+                heap.address(first).unwrap(),
+            ))))
             .unwrap();
-        *heap.get_mut(first).unwrap() = Value::Reference {
-            index: second,
-            target: Type::Void,
-        };
-        heap.collect(vec![first]).unwrap();
+        heap.address(first)
+            .unwrap()
+            .write(Value::Erased(Box::new(Value::SlotReference(
+                heap.address(second).unwrap(),
+            ))))
+            .unwrap();
+        heap.collect(vec![first], CollectionReason::AllocationPressure)
+            .unwrap();
         assert_eq!(heap.len(), 2);
-        heap.collect(vec![]).unwrap();
+        let observer = heap.address(first).unwrap();
+        heap.collect(vec![], CollectionReason::AllocationPressure)
+            .unwrap();
+        assert!(observer.read().is_err());
         assert!(heap.is_empty());
         assert_eq!(heap.reclaimed_objects(), 2);
     }

@@ -1,5 +1,9 @@
 # References: Raven-like pseudocode and neoIL
 
+Current memory milestone: format 5 uses direct heap-backed T&. Ref and heap.load/store
+are removed; heap-only references can be stored in fields/erased payloads and returned
+to the host for context-bound inspection. See [the current contract](heap-references.md).
+
 These examples explain the implemented platform contracts. They are **pseudocode,
 not inputs to an existing compiler or a specification of Raven**. They follow the
 project's name-before-type source notation, with familiar reference, output and

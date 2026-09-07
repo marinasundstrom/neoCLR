@@ -92,10 +92,23 @@ fn malformed_erased_trees_are_rejected_before_guest_execution() {
             },
             vec![Value::Int32(1)],
         )),
-        erased(erased(Value::Reference {
-            index: 0,
-            target: Type::Int32,
-        })),
+        erased(erased(
+            neoclr::run(
+                &assemble(
+                    ".module Heap
+.entry Main
+.function Main() -> Int32&
+ldc.i4 7
+heap.new
+ret
+.end",
+                )
+                .unwrap(),
+                Limits::default(),
+            )
+            .unwrap()
+            .value,
+        )),
     ] {
         let fault = echo.invoke(vec![input], Limits::default()).unwrap_err();
         assert!(fault.message.contains("invocation argument 0"), "{fault}");
@@ -123,7 +136,7 @@ fn pointer_payloads_remain_unsupported_even_when_returned_by_guest_code() {
         echo.invoke(vec![erased(pointer)], Limits::default())
             .unwrap_err()
             .message
-            .contains("pointer and Ref")
+            .contains("pointer and managed reference")
     );
 }
 

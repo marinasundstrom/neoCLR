@@ -118,8 +118,8 @@ fn structural_wrappers_remain_distinct_and_support_void() {
         TypeIdentity::Ptr(Box::new(void.clone()))
     );
     assert_eq!(
-        resolve_type_identity(&module, &Type::Ref(Box::new(Type::Void))).unwrap(),
-        TypeIdentity::Ref(Box::new(void.clone()))
+        resolve_type_identity(&module, &Type::ByRef(Box::new(Type::Void))).unwrap(),
+        TypeIdentity::ByRef(Box::new(void.clone()))
     );
 }
 

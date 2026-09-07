@@ -122,10 +122,10 @@ fn invalid_execution_faults_with_location() {
             "ldc.i4 1\nldvoid\nadd\nret",
             "matching integer types",
         ),
-        ("Void", "ldvoid\nheap.load\nret", "requires Ref"),
+        ("Void", "ldvoid\nldobj Int32\nret", "expected Ptr"),
         (
             "Void",
-            "ldc.i4 1\nheap.new\nldvoid\nheap.store\nret",
+            "ldc.i4 1\nheap.new\nldvoid\nstobj Int32\nret",
             "expected Int32",
         ),
         (
@@ -167,7 +167,7 @@ fn reference_identity_and_explicit_allocation_apply_to_scalars() {
     assert_eq!(
         eval(
             "Int32",
-            ".local Ref<Int32>\nldc.i4 1\nheap.new\nstloc 0\nldloc 0\nldc.i4 2\nheap.store\npop\nldloc 0\nheap.load\nret"
+            ".local Int32&\nldc.i4 1\nheap.new\nstloc 0\nldloc 0\nldc.i4 2\nstobj Int32\nldloc 0\nldobj Int32\nret"
         ),
         Value::Int32(2)
     );
@@ -214,7 +214,7 @@ fn limits_stop_loops_recursion_stack_and_heap_growth() {
         .message
         .contains("stack limit")
     );
-    let heap = program("Ref<Void>", "ldvoid\nheap.new\nret");
+    let heap = program("Void&", "ldvoid\nheap.new\nret");
     assert!(
         run(
             &heap,
@@ -410,8 +410,6 @@ fn all_implemented_opcodes_have_a_sample() {
         "ldind.i4",
         "stind.i4",
         "heap.new",
-        "heap.load",
-        "heap.store",
         "error",
         "fault",
     ] {

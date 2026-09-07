@@ -1,5 +1,11 @@
 # Direction and migration
 
+Current sequence: finish the direct managed-reference/GC milestone, then select
+the next slices around a concrete end-to-end scenario. The [optional object hierarchy](object-hierarchy.md)
+is a planned subsequent area. Adapt memory
+layout and base-reference tracing during inheritance work; keep allocation mode
+independent of inheritance and value equality independent of reference access.
+
 The platform name is undecided; neoCLR names the runtime only. The existing code
 is a small semantic testbed. It is not a commitment to Rust for every component,
 JSON for distribution, or the exact instruction extensions used here.

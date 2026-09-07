@@ -149,9 +149,9 @@ fn pointer_signatures_are_distinct_from_ownership_and_support_nested_types() {
     );
     assert_ne!(
         parse_type("Ptr<int32>").unwrap(),
-        parse_type("Ref<int32>").unwrap()
+        parse_type("int32&").unwrap()
     );
-    let module = assemble(".module Test\n.entry Main\n.function Unused(Ptr<Int32>, Ref<Int32>) -> Void\nldvoid\nret\n.end\n.function Main() -> System.Option<Ptr<Int32>>\nnewobj instance System.Option.None::.ctor()\nnewobj instance System.Option<Ptr<Int32>>::.ctor(System.Option.None)\nret\n.end").unwrap();
+    let module = assemble(".module Test\n.entry Main\n.function Unused(Ptr<Int32>, Int32&) -> Void\nldvoid\nret\n.end\n.function Main() -> System.Option<Ptr<Int32>>\nnewobj instance System.Option.None::.ctor()\nnewobj instance System.Option<Ptr<Int32>>::.ctor(System.Option.None)\nret\n.end").unwrap();
     let loaded = load(&serde_json::to_string(&module).unwrap()).unwrap();
     assert_eq!(
         run(&loaded, Limits::default()).unwrap().value.ty(),

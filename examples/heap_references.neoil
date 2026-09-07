@@ -1,0 +1,39 @@
+.module HeapReferences
+.entry Main
+
+.type Counter
+    .field Age Int32
+.end
+
+.function MakeCounter() -> Counter&
+    ldc.i4 0
+    newobj Counter
+    heap.new
+    ret
+.end
+
+.function Age(Counter& counter) -> Int32&
+    ldarg counter
+    ldflda Counter::Age
+    ret
+.end
+
+.function Main() -> Int32
+    .local Int32& age
+    call MakeCounter()
+    call Age(Counter&)
+    stloc age
+    ; Only the interior reference now keeps the heap Counter alive.
+    ldc.i4 1
+    heap.new
+    pop
+    ldc.i4 2
+    heap.new
+    pop
+    ldloc age
+    ldc.i4 42
+    stobj Int32
+    ldloc age
+    ldobj Int32
+    ret
+.end

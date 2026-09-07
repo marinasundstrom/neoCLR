@@ -36,7 +36,7 @@ Duplicate entries in the supplied service set have no additional effect.
 | NativeAllocation | heap.alloc and heap.free |
 | FrameAllocation | localloc, including the frame-lifetime release contract |
 | PointerMemory | allocation/free tracking, ptr.fromint, ptr.add, ldflda, typed/indirect memory loads and stores, object/block copy and initialization |
-| BootstrapReferences | heap.new, heap.load, heap.store |
+| ManagedHeap | heap.new (also requires SlotReferences) |
 | ParseInt32 | Validated neoCLR.Runtime.ParseInt32 InternalCall |
 | FormatInt32 | Validated neoCLR.Runtime.Int32ToString InternalCall |
 | ConsoleOutput | Validated neoCLR.Runtime.WriteLine InternalCall |
@@ -49,9 +49,9 @@ Duplicate entries in the supplied service set have no additional effect.
 heap.alloc/free report both NativeAllocation and PointerMemory; localloc reports both
 FrameAllocation and PointerMemory. PointerMemory names the current pointer-access and
 diagnostic contracts, not a mandate to retain the interpreter's side tables in all
-backends. Frame storage can use a backend's own stack implementation. BootstrapReferences
-identifies the transitional Ref heap, now backed by [tracing GC](garbage-collection.md).
-Its name does not select the final reference encoding or collector implementation.
+backends. Frame storage can use a backend's own stack implementation. ManagedHeap
+identifies managed allocation and tracing; SlotReferences supplies common checked
+frame/heap address operations. See [heap references](heap-references.md).
 
 Runtime helpers are classified through the same validated binding registry used by the
 interpreter. A similar method name without InternalCall metadata grants no service

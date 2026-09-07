@@ -26,7 +26,7 @@ fn prepared_generic_calls_and_type_queries_survive_source_changes() {
 #[test]
 fn execution_state_and_limits_do_not_persist_between_runs() {
     let module = assemble(
-        ".module App\n.entry Main\n.function Main() -> Ref<Int32>\nldc.i4 42\nheap.new\nret\n.end",
+        ".module App\n.entry Main\n.function Main() -> Int32&\nldc.i4 42\nheap.new\nret\n.end",
     )
     .unwrap();
     let program = LoadedProgram::new(&module).unwrap();
@@ -43,11 +43,11 @@ fn execution_state_and_limits_do_not_persist_between_runs() {
     );
     let first = program.run(Limits::default()).unwrap();
     let second = program.run(Limits::default()).unwrap();
-    assert_eq!(second.heap.get(0), Some(&Value::Int32(42)));
-    assert_eq!(first.heap.get(0), Some(&Value::Int32(42)));
-    assert_eq!(first.value, second.value);
+    assert_eq!(second.heap.get(0), Some(Value::Int32(42)));
+    assert_eq!(first.heap.get(0), Some(Value::Int32(42)));
+    assert_ne!(first.value, second.value);
     drop(first);
-    assert_eq!(second.heap.get(0), Some(&Value::Int32(42)));
+    assert_eq!(second.heap.get(0), Some(Value::Int32(42)));
 }
 
 #[test]

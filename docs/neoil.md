@@ -1,4 +1,4 @@
-# neoIL assembler reference, format 4
+# neoIL assembler reference, format 5
 
 The assembler converts readable neoIL into the JSON module format understood by
 the interpreter. This is a prototype assembler, not an ECMA-335 `ilasm` replacement.
@@ -69,7 +69,7 @@ escapes. Identifiers contain ASCII letters, digits, underscores, and dots.
   cannot be a branch target.
 - Types include `Void`, `SByte`, `Byte`, `Int16`, `UInt16`, `Char`, `Int32`,
   `UInt32`, `Int64`, `UInt64`, `Single`, `Double`, `IntPtr`, `UIntPtr`, `Boolean`, `String`, `Error`, a record name,
-  `Option<T>`, `Result<T,E>`, `Ref<T>`, or `Ptr<T>` (also spelled `T*`). Spaces inside generic signatures are allowed.
+  `Option<T>`, `Result<T,E>`, `T&`, or `Ptr<T>` (also spelled `T*`). Spaces inside generic signatures are allowed.
   Primitive aliases `int8`, `uint8`, `int16`, `uint16`, `char`, `uint32`,
   `int64`, `uint64`, `float32`/`single`, `float64`/`double`, `void`, `int32`/`int`, `nint`, `nuint`, `boolean`/`bool`, and `string`
   and fully qualified names such as `System.Int32` normalize to canonical types.
@@ -124,7 +124,7 @@ zero parameters:
 call System.Console.WriteLine(string)
 call System.Int32.Divide(int32, int32)
 call Initialize()
-call Handle(Result<Option<Void>, Error>, Ref<Point>)
+call Handle(Result<Option<Void>, Error>, Point&)
 ```
 
 Overloads are identified by name plus exact ordered parameter types. Arity, type,
@@ -263,9 +263,7 @@ and given a format-version and runtime-service note when applicable.
 | `stind.i1/i2` | `Ptr<Integer>,Int32 →` | Truncate into byte/short storage |
 | `stind.i8` | `Ptr<Int64 or UInt64>,Int64 →` | Store 64 bits |
 | `stind.i` | `Ptr<Native>,Native →` | Store native integer |
-| `heap.new` | `T → Ref<T>` | Explicitly allocate shared identity |
-| `heap.load` | `Ref<T> → T` | Copy heap contents |
-| `heap.store` | `Ref<T>,T → Void` | Replace heap contents |
+| `heap.new` | `T → T&` | Allocate managed heap storage with GC-rooted identity; read/write using ldobj/stobj |
 | `error "code"` | `→ Error` | Construct bootstrap error value |
 | `fault "message"` | `→ termination` | End guest execution |
 

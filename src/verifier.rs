@@ -341,7 +341,7 @@ fn effect(module: &Module, op: &Op, arity: usize) -> Result<(usize, usize), Faul
         }
         Construct(target) => (target.parameters.len(), 1),
         BorrowInterface(_) | PackValue(_) | IsValue(_) | UnpackValue(_) => (1, 1),
-        SetField(_) | PointerAdd | HeapStore | BitAnd | BitOr | BitXor | ShiftLeft | ShiftRight
+        SetField(_) | PointerAdd | BitAnd | BitOr | BitXor | ShiftLeft | ShiftRight
         | ShiftRightUnsigned | Remainder | RemainderUnsigned | Add | Sub | Mul | AddChecked
         | SubChecked | MulChecked | Divide | AddCheckedUnsigned | SubCheckedUnsigned
         | MulCheckedUnsigned | DivideUnsigned | Equal | Greater | GreaterUnsigned | Less
@@ -420,8 +420,7 @@ fn effect(module: &Module, op: &Op, arity: usize) -> Result<(usize, usize), Faul
         | Free
         | PointerCast(_)
         | LoadObject(_)
-        | HeapNew
-        | HeapLoad => (1, 1),
+        | HeapNew => (1, 1),
     })
 }
 
@@ -763,21 +762,7 @@ fn typed_effect(
                 !crate::slots::contains(exact(&values[0])?),
                 "managed reference cannot escape into heap storage",
             )?;
-            one(T::Ref(Box::new(exact(&values[0])?.clone())))
-        }
-        HeapLoad | HeapStore => {
-            let T::Ref(ty) = exact(&values[0])? else {
-                return Result::Err(crate::Fault::new("expected Ref value"));
-            };
-            if matches!(op, HeapStore) {
-                require(
-                    values[1] == E(*ty.clone()),
-                    "heap.store requires exact stored type",
-                )?;
-                one(T::Void)
-            } else {
-                one(*ty.clone())
-            }
+            one(T::ByRef(Box::new(exact(&values[0])?.clone())))
         }
         Equal | BranchEqual(_) | BranchNotEqual(_) => {
             require(
@@ -800,7 +785,7 @@ fn typed_effect(
                         | T::IntPtr
                         | T::UIntPtr
                         | T::Ptr(_)
-                        | T::Ref(_)
+                        | T::ByRef(_)
                 ),
                 "invalid branch condition type",
             )?;

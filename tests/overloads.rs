@@ -4,7 +4,7 @@ use neoclr::{Limits, Value, assemble, assembler::parse_function_ref, load, metad
 fn overload_sample_resolves_by_type_and_arity_and_round_trips() {
     let module = assemble(include_str!("../examples/overloads.neoil")).unwrap();
     let json = serde_json::to_value(&module).unwrap();
-    assert_eq!(json["format"], 4);
+    assert_eq!(json["format"], 5);
     assert_eq!(
         json["functions"][3]["body"][1]["arg"],
         serde_json::json!({"name":"Describe","parameters":["String"],"owner":null,"instance":false})
@@ -26,7 +26,7 @@ fn overload_sample_resolves_by_type_and_arity_and_round_trips() {
 #[test]
 fn signatures_parse_aliases_and_nested_generic_commas() {
     let target = parse_function_ref(
-        "Choose ( System.Result<System.Option<void>, Error>, Ref<Int32>, string, bool, int )",
+        "Choose ( System.Result<System.Option<void>, Error>, Int32&, string, bool, int )",
     )
     .unwrap();
     assert_eq!(target.name, "Choose");
@@ -43,7 +43,7 @@ fn signatures_parse_aliases_and_nested_generic_commas() {
                     Type::Error
                 ]
             },
-            Type::Ref(Box::new(Type::Int32)),
+            Type::ByRef(Box::new(Type::Int32)),
             Type::String,
             Type::Boolean,
             Type::Int32
@@ -151,7 +151,7 @@ fn loader_checks_structured_signatures_and_rejects_old_format() {
         load(&old.to_string())
             .unwrap_err()
             .message
-            .contains("expected 4")
+            .contains("expected 5")
     );
 }
 
@@ -184,7 +184,7 @@ fn inline_declaration_signature_matches_call_signature() {
 
 #[test]
 fn inline_parameters_support_nested_types_and_reject_mixed_declarations() {
-    let source = ".module Test\n.entry Main\n.function Accept(System.Result<System.Option<void>, Error>, Ref<int32>) -> Void\nldvoid\nret\n.end\n.function Main -> Void\nldvoid\nret\n.end";
+    let source = ".module Test\n.entry Main\n.function Accept(System.Result<System.Option<void>, Error>, int32&) -> Void\nldvoid\nret\n.end\n.function Main -> Void\nldvoid\nret\n.end";
     let module = assemble(source).unwrap();
     assert_eq!(module.functions[0].parameters.len(), 2);
     for header in ["Accept(int32)", "Accept()"] {

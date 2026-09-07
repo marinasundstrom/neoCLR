@@ -7,7 +7,7 @@ use std::{
 
 const USAGE: &str = "Usage:
   neoclr assemble <source.neoil> <output.neo.json> [--module <input>]... [--system <input>]
-  neoclr run <input> [System.neo.json] [--module <input>]... [--system <input>] [--gc-stats]
+  neoclr run <input> [System.neo.json] [--module <input>]... [--system <input>] [--gc-stats] [--gc-events]
   neoclr check <input> [--module <input>]... [--system <input>]
   neoclr verify <input> [--module <input>]... [--system <input>]
 Inputs ending in .neoil are sources; other module inputs are JSON artifacts.";
@@ -33,10 +33,12 @@ fn execute(args: &[String]) -> Result<Vec<String>, String> {
     let mut paths = vec![args[1].as_str()];
     let mut system_path = None;
     let mut gc_stats = false;
+    let mut gc_events = false;
     let mut options = args[required..].iter();
     while let Some(option) = options.next() {
         match option.as_str() {
             "--gc-stats" if command == "run" && !gc_stats => gc_stats = true,
+            "--gc-events" if command == "run" && !gc_events => gc_events = true,
             "--module" | "--system" => {
                 let path = options
                     .next()
@@ -153,6 +155,21 @@ fn execute(args: &[String]) -> Result<Vec<String>, String> {
                     stats.reclaimed_objects
                 )
                 .map_err(|error| format!("GC diagnostics output failed: {error}"))?;
+            }
+            if gc_events {
+                for event in execution.heap.collection_events() {
+                    writeln!(
+                        io::stderr().lock(),
+                        "GC #{} {:?}: roots={} before={} after={} reclaimed={}",
+                        event.sequence,
+                        event.reason,
+                        event.roots,
+                        event.before,
+                        event.after,
+                        event.reclaimed
+                    )
+                    .map_err(|error| format!("GC diagnostics output failed: {error}"))?;
+                }
             }
             let mut lines = execution.output;
             lines.push(format!("=> {:?}", execution.value));

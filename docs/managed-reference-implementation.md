@@ -4,11 +4,11 @@ Status: the first checked reference-return slice is implemented for the agreed
 [lifecycle model](lifecycle.md). T& locals, managed record-field addresses and guest
 reference returns reuse ByRef, ldloca/ldarga, ldflda, ldobj/stobj and ret. Runtime
 checks reject references into the returning frame, including field/interface views
-and aliases. The transitional Ref heap uses tracing GC; heap allocation through T& and guest
-destruction remain future work.
+and aliases. Heap allocation now directly produces GC-backed T&; guest destruction remains
+future work. See [heap references](heap-references.md).
 
 Use CLR metadata and instruction semantics as the baseline. Ref<T> is a historical
-proposal and current arena encoding, not a selected future wrapper. Preview changes
+proposal whose encoding was removed in format 5. Preview changes
 may replace it and break artifacts/APIs. Reject incompatible artifacts explicitly;
 unnecessary compatibility layers are not an acceptance requirement. New allocation
 and lifetime behavior must have explicit semantics rather than imply compatibility
@@ -45,19 +45,19 @@ targets; Clonable remains explicit.
 
 | Area | Current implementation | Next gate |
 | --- | --- | --- |
-| Slots | Stable host cells; references identify a root and field path; every ret rejects current-frame roots | Introduce explicit managed heap targets with independent lifetime provenance |
-| Managed heap prototype | Value.Reference carries a nonreused identity into a tracing heap with Type::Ref | Unify heap roots with T& and trace interior references |
-| Copies | Reference handles retain host cells; slot reads copy values; fields preserve inline semantics | Define copy/release behavior for records containing managed references |
-| Metadata and verification | T& locals, record-field addresses and caller-backed returns supported | Define reference-valued fields, broader escape analysis and safe initialization |
+| Slots | Stable host cells; references identify a root and field path; every ret rejects current-frame roots | Maintain provenance through future base views and block scopes |
+| Managed heap | heap.new produces T&; tracing follows heap and interior/interface roots | Constructor destinations and inheritance-aware views |
+| Copies | Heap handles use weak host links; tracing owns live roots; fields copy values/references | Preserve those contracts through inheritance |
+| Metadata and verification | T& locals, record-field addresses and caller-backed returns supported | Extend the heap-only stored-reference subset and initialization rules |
 | Output obligations | Root/path write history tracks field or ancestor replacement; sibling writes do not satisfy outputs | Extend to additional storage kinds without weakening per-invocation obligations |
-| Hosting | Owned inputs only; T& results rejected before guest execution | Define context-rooted handles before persistent reference invocation |
+| Hosting | Owned inputs only; heap-backed T& results support context-bound inspection | Define context-rooted handles before persistent reference invocation |
 
 See [slots.rs](../src/slots.rs), [value.rs](../src/value.rs), [vm.rs](../src/vm.rs)
 and [input.rs](../src/input.rs). The interpreter's use of host allocations does not
 make ordinary guest locals managed heap objects. Strong host cells alone are not
 an escape policy; explicit frame-root validation controls returned references.
-Reference-valued fields, nested references and erasure remain rejected, preventing
-slot-reference cycles in this slice. Array-element references are not implemented.
+Stored fields and erased payloads accept heap-backed references; frame-backed
+references are rejected there. Nested addresses remain unsupported. Array-element references are not implemented.
 
 ## Invariants for the next managed heap slice
 
@@ -83,8 +83,7 @@ slot-reference cycles in this slice. Array-element references are not implemente
 ## Boundaries and acceptance cases
 
 The initial [tracing GC](garbage-collection.md) supports managed heap cycles using
-the transitional Ref encoding. Heap-backed T& must participate in the same root and
-edge tracing before it is exposed. Weak references, concurrency and native pinning
+heap-backed T&, including interior/interface references and stored graph edges. Weak references, concurrency and native pinning
 remain separate decisions. Collection does not promise deterministic resource cleanup.
 
 The heap_objects limit bounds live objects after collection. Identities are never
@@ -100,7 +99,7 @@ provenance, roots and copy/release rules; the interpreter layout is not a portab
 Current tests cover caller-root forwarding, field mutation, nested generic String
 fields, parent replacement, reference-local rebinding, output aliases, and Faults
 for direct/indirect current-frame escapes. They also cover uninitialized targets,
-invalid field indices, native result signatures and host-result rejection. Host-cell
+invalid field indices, native result signatures and cross-execution input rejection. Host-cell
 release is tested independently of guest readback.
 
 Next add explicit managed allocation producing T&, safe heap-root returns, reference

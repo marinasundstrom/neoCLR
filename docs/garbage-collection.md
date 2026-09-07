@@ -11,10 +11,9 @@ subject to the owner's lifetime; forming a reference does not promote a local. T
 prototype currently enforces frames, with lexical block lifetime enforcement pending.
 
 The prototype now implements a single-threaded, nonmoving mark-and-sweep collector.
-It traces the existing heap.new/Ref encoding; that encoding remains transitional.
-The selected public direction is T&/ByRef for both frame-backed references and
-managed heap references, without an ownership wrapper. Heap-backed ByRef, interior
-heap references and construction directly into heap destinations remain future work.
+It traces heap-backed T& references, including interior fields and interface views.
+Frame and heap references use the same ByRef feature; heap.new returns T& directly,
+without boxing or an ownership wrapper. See [heap references](heap-references.md).
 
 ## Roots and collection boundaries
 
@@ -25,11 +24,12 @@ fields and System.Value payloads are traversed, and heap references are followed
 transitively. Cycles are supported: reachable cycles survive and unreachable cycles
 are reclaimed. Collection does not require guest retain/release or invalidation.
 
-Current managed slot references always address active frame cells, which are scanned
-independently; they cannot be hidden in heap fields or erased values. Extending ByRef
-to heap storage must add owner-root tracing, including for interior references and
-interface receivers. A heap field reference must keep its entire allocation alive.
-The runtime's prohibition on returning an address into the current frame remains.
+Frame-backed references are covered by their active owning frames. Heap-backed
+references and interface receivers contribute their allocation roots, including
+when only an interior field reference survives. Reference-valued fields and erased
+payloads can hold heap-backed references; runtime checks reject scoped references
+there so containers cannot hide an invalid escape. Returning a current-frame address
+still faults. Heap links use weak host cells; the tracing heap owns live storage.
 
 Collection runs between instructions, before allocation operands are popped. The
 initial threshold is the smaller of 64 objects and the heap_objects limit. After
@@ -40,7 +40,8 @@ replacement or frame exit; this prototype has no compiler-derived last-use maps.
 
 On successful execution completion, another collection preserves only objects
 reachable from the returned value. Execution.heap is a read-only ManagedHeap
-snapshot: get(identity) resolves live objects, len() counts them, and collection and
+snapshot: get(identity) copies live objects, read_reference inspects an owned heap
+reference or interior field, len() counts objects, and collection and
 reclamation counters are available. Identities increase monotonically and are never
 reused within an execution; gaps are expected. Counter exhaustion faults. References
 are meaningful only within their execution; persistent host root registration and
@@ -76,8 +77,14 @@ not byte measurements. Each execution starts fresh counters. The initial report 
 available on successful completion, not continuously during execution or after a
 terminal Fault. It does not invoke extra collections or alter guest output.
 
-The next monitoring layer should provide collection events with reasons, before/after
-counts and pause durations including root scanning; allocation rates and byte counts
+A bounded history of the most recent 64 collections is now exposed through
+collection_events() and `run --gc-events`. Each event records its sequence, reason
+(allocation pressure or execution completion), incoming root-edge count, before/after
+counts and reclamation. The history contains counts only, so it does not root objects.
+It is reported at completion, not streamed live. Root counts include duplicate edges.
+
+The next monitoring layer should provide pause durations including root scanning;
+allocation rates and byte counts
 require a defined managed storage-size model. Hosts will also need snapshots during
 long-running programs and diagnostics on Fault/cancellation. Define bounded buffering
 and observer behavior before callbacks are permitted around GC safepoints. Later
@@ -98,7 +105,9 @@ Moving collection, weak references, concurrent execution, static/host roots, nat
 pinning and finalization need separate contracts and tests before being exposed.
 These are collector improvements, not prerequisites for ordinary managed allocation.
 
-Next, unify heap roots with T& while preserving checked frame provenance, then settle
-explicit heap construction using familiar MSIL initialization/construction patterns.
-See the [managed heap strategy](managed-heap-strategy.md). Changing an instruction's
+Heap-backed T& is now implemented. Next settle heap constructor destinations and
+block scopes, then adapt layout/root tracing for the planned optional object hierarchy.
+See the [managed heap strategy](managed-heap-strategy.md).
+
+Changing an instruction's
 result from Ref<T> to T& requires a coordinated preview format transition.

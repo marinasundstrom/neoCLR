@@ -1,5 +1,9 @@
 # Temporary explicit typed value storage
 
+Current memory milestone: format 5 uses direct heap-backed T&. Ref and heap.load/store
+are removed; heap-only references can be stored in fields/erased payloads and returned
+to the host for context-bound inspection. See [the current contract](heap-references.md).
+
 The interpreter supports `System.Value`: one complete value whose static payload type
 has been explicitly erased. `Value` is its short signature alias. It is a runtime-known
 representation with an ordinary System type definition, like String; it is not a

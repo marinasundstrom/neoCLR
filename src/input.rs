@@ -107,9 +107,9 @@ impl Input {
                 };
                 let ty = match payload.as_ref() {
                     Value::Object { ty, .. } => crate::scope::normalize_type(module, ty)?,
-                    Value::Pointer(_) | Value::Reference { .. } => {
+                    Value::Pointer(_) | Value::SlotReference(_) | Value::SlotInterface { .. } => {
                         return Err(Fault::new(
-                            "pointer and Ref host payloads are not supported",
+                            "pointer and managed reference host payloads are not supported",
                         ));
                     }
                     other => other.ty(),
@@ -125,7 +125,8 @@ impl Input {
                     Value::Object { .. }
                         | Value::Erased(_)
                         | Value::Pointer(_)
-                        | Value::Reference { .. }
+                        | Value::SlotReference(_)
+                        | Value::SlotInterface { .. }
                 ) {
                     return Err(Fault::new(format!("expected primitive {expected:?}")));
                 }

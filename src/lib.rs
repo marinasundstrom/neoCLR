@@ -10,7 +10,7 @@ mod input;
 mod interfaces;
 mod slots;
 pub use execution::{CancellationToken, ExecutionOptions};
-pub use gc::{GcStatistics, ManagedHeap};
+pub use gc::{CollectionEvent, CollectionReason, GcStatistics, ManagedHeap};
 pub use slots::SlotReference;
 mod file_io;
 pub mod library;
@@ -92,9 +92,9 @@ pub fn load(source: &str) -> Result<Module, Fault> {
 pub(crate) fn decode_module(source: &str) -> Result<Module, Fault> {
     let value: serde_json::Value = serde_json::from_str(source)
         .map_err(|error| Fault::new(format!("invalid module: {error}")))?;
-    if value.get("format").and_then(|v| v.as_u64()) != Some(4) {
+    if value.get("format").and_then(|v| v.as_u64()) != Some(5) {
         return Err(Fault::new(
-            "unsupported module format (expected 4); reassemble source",
+            "unsupported module format (expected 5); reassemble source",
         ));
     }
     serde_json::from_value(value).map_err(|error| Fault::new(format!("invalid module: {error}")))

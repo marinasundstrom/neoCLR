@@ -14,8 +14,6 @@ pub enum TypeIdentity {
     ByRef(Box<TypeIdentity>),
     Ptr(Box<TypeIdentity>),
     InterfaceRef(Box<TypeIdentity>),
-    // Ref retains its explicit runtime identity during the ownership prototype.
-    Ref(Box<TypeIdentity>),
 }
 
 /// Read-only type information resolved within one loaded program.
@@ -33,7 +31,6 @@ pub(crate) fn describe(module: &Module, ty: &Type) -> Result<TypeDescriptor, Fau
     let name = match &normalized {
         Type::ByRef(element) => format!("{}&", signature_name(element)?),
         Type::Ptr(element) => format!("{}*", signature_name(element)?),
-        Type::Ref(element) => format!("Ref<{}>", signature_name(element)?),
         Type::InterfaceRef(element) => format!("InterfaceRef<{}>", signature_name(element)?),
         _ => normalized
             .definition_name()
@@ -62,7 +59,6 @@ fn signature_name(ty: &Type) -> Result<String, Fault> {
     Ok(match ty {
         Type::ByRef(element) => format!("{}&", signature_name(element)?),
         Type::Ptr(element) => format!("{}*", signature_name(element)?),
-        Type::Ref(element) => format!("Ref<{}>", signature_name(element)?),
         Type::InterfaceRef(element) => format!("InterfaceRef<{}>", signature_name(element)?),
         Type::Constructed {
             definition,
@@ -110,7 +106,6 @@ fn build(module: &Module, ty: &Type) -> Result<TypeIdentity, Fault> {
     Ok(match ty {
         Type::ByRef(t) => TypeIdentity::ByRef(nested(t)?),
         Type::Ptr(t) => TypeIdentity::Ptr(nested(t)?),
-        Type::Ref(t) => TypeIdentity::Ref(nested(t)?),
         Type::InterfaceRef(t) => TypeIdentity::InterfaceRef(nested(t)?),
         _ => {
             let (name, arguments) = match ty {

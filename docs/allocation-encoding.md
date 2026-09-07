@@ -1,5 +1,9 @@
 # Allocation encoding: proposals and current scope
 
+Current memory milestone: format 5 uses direct heap-backed T&. Ref and heap.load/store
+are removed; heap-only references can be stored in fields/erased payloads and returned
+to the host for context-bound inspection. See [the current contract](heap-references.md).
+
 The selected [high-level allocation direction](lifecycle.md#high-level-allocation-syntax)
 uses T(...) for value construction, &value for a reference to an existing value, and
 new T(...) for explicit managed heap allocation returning T&. Reference retention

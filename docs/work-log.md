@@ -2805,3 +2805,37 @@ all 39 focused library, GC, diagnostics, runtime, hosting and CLI tests passed,
 including two new CLI diagnostics tests. Final cargo clippy --all-targets -- -D warnings,
 cargo fmt --check and whitespace checks passed. All 496 local documentation links
 and heading targets resolve.
+
+## Direct heap-backed managed references — 2026-09-07
+
+Format 5 removes Ref and heap.load/store. heap.new directly produces T&; ordinary
+newobj value construction and initobj defaults keep their existing roles. No boxing
+or unboxing bridge is introduced. Heap roots and interior/interface views use the
+same ldobj/stobj/ldflda access and checked return rules as frame-backed references.
+Current-frame escapes still fault, while heap-backed results can be inspected through
+the owning execution. Cross-execution reference input remains rejected.
+
+Heap cells are collector-owned; managed heap references use weak host links so guest
+cycles cannot leak through host reference counting. Tracing follows reference-valued
+fields and erased payloads. Runtime checks require heap-backed targets in those
+stored positions, preventing scoped references from escaping in containers. Nested
+managed addresses and ByRef generic arguments remain unsupported. Reference identity
+now distinguishes allocations across execution contexts as well as field paths.
+
+Added an end-to-end factory/field-reference sample, heap-reference regressions, and
+read_reference for context-checked host inspection. Collection diagnostics now keep
+the most recent 64 count-only events (reason, roots, before/after, reclaimed), exposed
+through hosting and CLI --gc-events. No live callbacks, pinning or native object ABI
+are introduced. Updated source, tests, services and migration documentation.
+
+Recorded optional Object inheritance, value-based Equals/GetHashCode independent
+of addressing mode, separate reference identity, pinning requirements and speculative
+two-way native interop. These are future slices. Scope stays at the memory foundation;
+subsequent work should serve a concrete end-to-end scenario.
+
+Validation: all 574 tests passed across the full suite and corrected focused targets.
+The full run found one stale Ref-specific host-error assertion; the corrected target
+passed. Focused tests also updated obsolete field-storage/host-return expectations.
+Final clippy --all-targets -D warnings, formatting and whitespace checks passed; 514
+local links and heading targets resolve. The CLI heap-reference sample returned 42
+and reported three allocated/reclaimed objects through --gc-stats and --gc-events.

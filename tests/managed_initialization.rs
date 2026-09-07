@@ -137,7 +137,7 @@ fn invalid_defaults_and_mismatched_destinations_are_rejected() {
         "System.Value",
         "RuntimeTypeHandle",
         "Int32&",
-        "Ref<Int32>",
+        "Int32&",
     ] {
         assert!(
             program(

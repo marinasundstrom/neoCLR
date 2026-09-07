@@ -153,7 +153,7 @@ fn closedness_scopes_and_unsupported_storage_keep_existing_checks() {
         "[Wrong]Box<Int32>",
         "Loop",
         "String",
-        "Ref<Int32>",
+        "Int32&",
         "System.Option<Int32>",
         "System.Result<Int32,Error>",
     ] {

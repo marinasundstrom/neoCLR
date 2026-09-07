@@ -76,7 +76,7 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
 
 fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
     let mut module = Module {
-        format: 4,
+        format: 5,
         name: String::new(),
         revision: None,
         references: None,
@@ -851,7 +851,6 @@ pub fn parse_type(text: &str) -> Result<Type, Fault> {
             parts.push(&args[start..]);
             return match (name.trim(), parts.as_slice()) {
                 ("InterfaceRef", [t]) => Ok(Type::InterfaceRef(Box::new(parse(t, depth + 1)?))),
-                ("Ref", [t]) => Ok(Type::Ref(Box::new(parse(t, depth + 1)?))),
                 ("Ptr", [t]) => Ok(Type::Ptr(Box::new(parse(t, depth + 1)?))),
                 ("Ref" | "Ptr" | "InterfaceRef", _) => {
                     Err(Fault::new("incorrect built-in generic arity"))
@@ -1161,7 +1160,6 @@ fn bind_type_parameters(ty: Type, names: &[Option<String>]) -> Type {
                 .map(|t| bind_type_parameters(t, names))
                 .collect(),
         },
-        Type::Ref(t) => Type::Ref(Box::new(bind_type_parameters(*t, names))),
         Type::InterfaceRef(t) => Type::InterfaceRef(Box::new(bind_type_parameters(*t, names))),
         Type::ByRef(t) => Type::ByRef(Box::new(bind_type_parameters(*t, names))),
         Type::Ptr(t) => Type::Ptr(Box::new(bind_type_parameters(*t, names))),

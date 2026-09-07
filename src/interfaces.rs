@@ -203,9 +203,9 @@ pub(crate) fn dispatch_targets(
                     && a.len() == b.len()
                     && a.iter().zip(b).all(|(a, b)| infer(a, b, bindings))
             }
-            (Type::Ptr(a), Type::Ptr(b))
-            | (Type::Ref(a), Type::Ref(b))
-            | (Type::InterfaceRef(a), Type::InterfaceRef(b)) => infer(a, b, bindings),
+            (Type::Ptr(a), Type::Ptr(b)) | (Type::InterfaceRef(a), Type::InterfaceRef(b)) => {
+                infer(a, b, bindings)
+            }
             _ => pattern == actual,
         }
     }

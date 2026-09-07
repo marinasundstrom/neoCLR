@@ -9,7 +9,7 @@ pub enum RuntimeService {
     NativeAllocation,
     FrameAllocation,
     PointerMemory,
-    BootstrapReferences,
+    ManagedHeap,
     ParseInt32,
     FormatInt32,
     ConsoleOutput,
@@ -127,7 +127,7 @@ fn instruction_services(op: &Op) -> &'static [RuntimeService] {
         | Op::StoreIndirectFloat64
         | Op::LoadIndirectInt32
         | Op::StoreIndirectInt32 => &[PointerMemory],
-        Op::HeapNew | Op::HeapLoad | Op::HeapStore => &[BootstrapReferences],
+        Op::HeapNew => &[ManagedHeap, SlotReferences],
         Op::Unaligned(..)
         | Op::Int(..)
         | Op::Int64(..)

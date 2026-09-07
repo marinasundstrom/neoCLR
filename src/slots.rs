@@ -2,7 +2,11 @@
 //! stable location without retaining frames. Guest returns independently enforce
 //! the lifetime of the owning frame, including for interior field references.
 use crate::{Fault, Value, metadata::Type};
-use std::{cell::RefCell, collections::HashMap, rc::Rc};
+use std::{
+    cell::RefCell,
+    collections::HashMap,
+    rc::{Rc, Weak},
+};
 
 #[derive(Debug)]
 pub(crate) struct Slot {
@@ -45,11 +49,20 @@ impl Slot {
     }
 }
 
+#[derive(Debug, Clone)]
+enum Root {
+    Frame(Cell),
+    Heap {
+        identity: usize,
+        cell: Weak<RefCell<Slot>>,
+    },
+}
+
 /// An execution-local managed reference, with no public fabrication API.
 #[derive(Debug, Clone)]
 pub struct SlotReference {
     target: Type,
-    slot: Cell,
+    root: Root,
     path: Vec<usize>,
     after_write: Option<u64>,
 }
@@ -57,32 +70,67 @@ impl PartialEq for SlotReference {
     fn eq(&self, other: &Self) -> bool {
         self.target == other.target
             && self.path == other.path
-            && Rc::ptr_eq(&self.slot, &other.slot)
+            && match (&self.root, &other.root) {
+                (Root::Frame(a), Root::Frame(b)) => Rc::ptr_eq(a, b),
+                (Root::Heap { cell: a, .. }, Root::Heap { cell: b, .. }) => Weak::ptr_eq(a, b),
+                _ => false,
+            }
     }
 }
 impl SlotReference {
     pub(crate) fn new(cell: &Cell) -> Self {
         Self {
             target: cell.borrow().ty.clone(),
-            slot: Rc::clone(cell),
+            root: Root::Frame(Rc::clone(cell)),
             path: vec![],
             after_write: None,
         }
     }
+    pub(crate) fn heap(cell: &Cell, identity: usize) -> Self {
+        let mut reference = Self::new(cell);
+        reference.root = Root::Heap {
+            identity,
+            cell: Rc::downgrade(cell),
+        };
+        reference
+    }
+    /// Allocation identity for diagnostics; frame-backed references have none.
+    /// Identities are local to one execution and do not authorize host invocation.
+    pub fn allocation_id(&self) -> Option<usize> {
+        match self.root {
+            Root::Heap { identity, .. } => Some(identity),
+            Root::Frame(_) => None,
+        }
+    }
+    pub(crate) fn belongs_to_heap_cell(&self, cell: &Cell) -> bool {
+        matches!(&self.root, Root::Heap { cell: root, .. } if Weak::ptr_eq(root, &Rc::downgrade(cell)))
+    }
+    fn cell(&self) -> Result<Cell, Fault> {
+        match &self.root {
+            Root::Frame(cell) => Ok(Rc::clone(cell)),
+            Root::Heap { cell, .. } => cell
+                .upgrade()
+                .ok_or_else(|| Fault::new("managed heap reference has expired")),
+        }
+    }
     pub(crate) fn addresses(&self, cell: &Cell) -> bool {
-        Rc::ptr_eq(&self.slot, cell)
+        matches!(&self.root, Root::Frame(root) if Rc::ptr_eq(root, cell))
     }
     pub(crate) fn target(&self) -> &Type {
         &self.target
     }
     pub(crate) fn field(&self, index: usize, target: Type) -> Result<Self, Fault> {
         self.assigned()?;
+        if contains(&target) {
+            return Err(Fault::new("nested managed references are not supported"));
+        }
         let mut result = self.clone();
         result.path.push(index);
         result.target = target;
         result.after_write = None;
         {
-            let slot = result.slot.borrow();
+            let cell = result.cell()?;
+            let slot = cell.borrow();
             let value = slot
                 .value
                 .as_ref()
@@ -93,13 +141,14 @@ impl SlotReference {
         }
         Ok(result)
     }
-    pub(crate) fn output(&self) -> Self {
+    pub(crate) fn output(&self) -> Result<Self, Fault> {
         let mut result = self.clone();
-        result.after_write = Some(self.slot.borrow().writes);
-        result
+        result.after_write = Some(self.cell()?.borrow().writes);
+        Ok(result)
     }
     pub(crate) fn assigned(&self) -> Result<(), Fault> {
-        let slot = self.slot.borrow();
+        let cell = self.cell()?;
+        let slot = cell.borrow();
         if self.after_write.is_some_and(|baseline| {
             !slot
                 .replacements
@@ -115,7 +164,8 @@ impl SlotReference {
     }
     pub(crate) fn read(&self) -> Result<Value, Fault> {
         self.assigned()?;
-        let slot = self.slot.borrow();
+        let cell = self.cell()?;
+        let slot = cell.borrow();
         Ok(at_path(
             slot.value
                 .as_ref()
@@ -125,7 +175,11 @@ impl SlotReference {
         .clone())
     }
     pub(crate) fn write(&self, value: Value) -> Result<(), Fault> {
-        let mut slot = self.slot.borrow_mut();
+        if !self.path.is_empty() || self.allocation_id().is_some() {
+            value.ensure_heap_references()?;
+        }
+        let cell = self.cell()?;
+        let mut slot = cell.borrow_mut();
         if self.path.is_empty() {
             return slot.set(value);
         }
@@ -173,7 +227,7 @@ fn at_path<'a>(mut value: &'a Value, path: &[usize]) -> Result<&'a Value, Fault>
 pub(crate) fn contains(ty: &Type) -> bool {
     match ty {
         Type::ByRef(_) => true,
-        Type::Ptr(t) | Type::Ref(t) | Type::InterfaceRef(t) => contains(t),
+        Type::Ptr(t) | Type::InterfaceRef(t) => contains(t),
         Type::Constructed { arguments, .. } | Type::Scoped { arguments, .. } => {
             arguments.iter().any(contains)
         }
@@ -188,7 +242,7 @@ mod tests {
     fn references_retain_storage_and_failed_stores_do_not_fulfill_outputs() {
         let cell = Slot::new(Type::Int32, Some(Value::Int32(7)));
         let reference = SlotReference::new(&cell);
-        let output = reference.output();
+        let output = reference.output().unwrap();
         assert!(output.write(Value::String("wrong".into())).is_err());
         assert!(output.assigned().is_err());
         assert_eq!(reference.read().unwrap(), Value::Int32(7));

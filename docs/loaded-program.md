@@ -1,5 +1,9 @@
 # Loaded program boundary
 
+Current memory milestone: format 5 uses direct heap-backed T&. Ref and heap.load/store
+are removed; heap-only references can be stored in fields/erased payloads and returned
+to the host for context-bound inspection. See [the current contract](heap-references.md).
+
 `LoadedProgram` owns an immutable snapshot of validated, linked metadata. Preparation
 normalizes source definition identities and binds calls before generic specialization.
 Execution, typed verification, and closed type identity resolution consume that same
@@ -30,7 +34,7 @@ typed verification or terminate with a runtime Fault.
 Every `run` starts fresh frames, output, managed tracing heap, and native allocation tracking
 with the supplied resource limits. A prior result or Fault does not change the loaded
 snapshot. Returned execution values and allocations belong to their own Execution;
-pointer/Ref values from one execution are not transferable handles into another.
+pointer/managed-reference values from one execution are not transferable handles into another.
 Execution.heap is now a read-only ManagedHeap, replacing the earlier Vec<Value> API.
 It retains only the returned value's reachable heap graph after final collection;
 use get(identity) rather than vector indexing. Identities can have gaps. See
@@ -39,7 +43,7 @@ use get(identity) rather than vector indexing. Identities can have gaps. See
 [owned record arguments](record-inputs.md) and [ordinary Option/Result inputs](union-inputs.md)
 to static and instance IL functions without an entry point.
 [Cooperative cancellation](cancellation.md) is available through ExecutionOptions.
-Persistent guest state, addressed receivers, and pointer/Ref transfer remain pending.
+Persistent guest state, addressed receivers, and pointer/managed-reference transfer remain pending.
 
 Native imports remain disabled in safe `run`. The separate unsafe `run_with_native`
 method has the same C ABI and native-code trust requirements as the existing helper.

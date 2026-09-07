@@ -39,8 +39,8 @@ pub(crate) fn link_modules(
         if module.name.is_empty() || !names.insert(module.name.as_str()) {
             return Err(Fault::new("empty or duplicate module name in load set"));
         }
-        if module.format != 4 {
-            return Err(Fault::new("unsupported module format (expected 4)"));
+        if module.format != 5 {
+            return Err(Fault::new("unsupported module format (expected 5)"));
         }
         if index > 0 && !module.entry.is_empty() {
             return Err(Fault::new(

@@ -3,7 +3,7 @@ use neoclr::{assemble, assembler::parse_type, load, metadata::Type};
 #[test]
 fn nested_types_and_void_parse() {
     assert_eq!(
-        parse_type("System.Result< System.Option<Void>, Ref<Int32> >").unwrap(),
+        parse_type("System.Result< System.Option<Void>, Int32& >").unwrap(),
         Type::Constructed {
             definition: "System.Result".into(),
             arguments: vec![
@@ -11,7 +11,7 @@ fn nested_types_and_void_parse() {
                     definition: "System.Option".into(),
                     arguments: vec![Type::Void]
                 },
-                Type::Ref(Box::new(Type::Int32))
+                Type::ByRef(Box::new(Type::Int32))
             ]
         }
     );

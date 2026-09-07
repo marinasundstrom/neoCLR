@@ -4,8 +4,8 @@ Status: agreed platform direction with implementation decisions still open. Valu
 are the default; reference semantics are chosen explicitly; the runtime manages
 reference lifetimes. Clonable, Disposable and Closable are implemented ordinary
 interfaces. T& locals, managed field addresses and checked guest reference returns
-are implemented. Returning a reference into the current frame faults. The transitional Ref heap now uses tracing GC. Heap allocation through T&,
-ByRef-valued fields and automatic guest destruction remain future work.
+are implemented. Returning a reference into the current frame faults. Heap allocation now returns T& directly, with tracing through field and interface
+views. Stored references must be heap-backed. Guest destruction remains future work.
 
 Ref<T> was a proposal, not a selected public reference abstraction. The source
 direction is T&. Prefer .NET CLR instructions and semantics wherever they fit;
@@ -32,9 +32,8 @@ compatibility with execution on an unmodified CLR.
 Heap allocation in the managed programming model produces a managed reference.
 The referenced value has the same type T that could otherwise be held directly;
 there is no class/struct bit that forces allocation policy onto the type.
-Current heap.alloc/free remain raw memory operations, while heap.new/Ref expose
-a transitional heap encoding now managed by tracing GC. Implementation may replace
-obsolete encodings in a breaking preview revision.
+heap.alloc/free remain raw memory operations. heap.new directly produces a GC-backed
+T&; format 5 removes Ref and heap.load/store. See [heap references](heap-references.md).
 The selected high-level spelling is new T(...); its CLI-based IL lowering remains open.
 
 A byref parameter can refer to a caller's local and be passed further down the call
@@ -105,11 +104,10 @@ Use ordinary value-copy semantics: inline fields are copied and embedded managed
 heap references preserve their targets. Deep or custom copying remains an explicit
 Clonable policy. Reference-containing copies still need lifetime validation: a
 reference into scoped storage cannot become a longer-lived heap edge merely because
-its containing value was copied. General ByRef-valued fields are currently rejected.
+its containing value was copied. Reference-valued fields currently require heap-backed targets.
 
 The prototype can already load a local value and pass that copy to heap.new, yielding
-the transitional Ref encoding. The future source spelling and heap-backed T& result
-remain to be defined. This does not authorize returning &local or automatically
+T& directly. The future source spelling remains to be defined. This does not authorize returning &local or automatically
 converting a scoped reference into a heap reference.
 
 ## Storage and escape
@@ -161,7 +159,7 @@ not promise immediate reclamation or resource cleanup.
 Copies, stores and returns must preserve reference identity and root visibility.
 There is no source-level retain/release or manual invalidation requirement. The
 implemented [collector](garbage-collection.md) scans active frames and heap graphs;
-unified heap-backed T& remains the next representation change.
+heap-backed T& now uses the same checked address feature.
 
 Guest destructors, heap finalizers and automatic scope cleanup are not implemented.
 Any deterministic value destruction needs ordering, partial initialization, reentrancy

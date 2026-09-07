@@ -41,3 +41,20 @@ fn cli_rejects_gc_statistics_for_analysis_and_duplicate_flags() {
         assert!(String::from_utf8_lossy(&output.stderr).contains("Unexpected argument --gc-stats"));
     }
 }
+
+#[test]
+fn cli_can_report_collection_events_separately_from_stdout() {
+    let output = Command::new(env!("CARGO_BIN_EXE_neoclr"))
+        .args(["run", "examples/features.neoil", "--gc-events"])
+        .output()
+        .unwrap();
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    assert_eq!(
+        String::from_utf8(output.stderr).unwrap(),
+        "GC #1 ExecutionCompleted: roots=0 before=1 after=0 reclaimed=1\n"
+    );
+}

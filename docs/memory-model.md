@@ -38,7 +38,7 @@ contracts and explicit operations. Current interfaces are declared on types; thi
 is not a promise of dynamic per-instance interface attachment. An interface view
 adds access to an existing contract without changing its storage lifetime.
 Retained managed references extend T&/ByRef without turning all T values into
-references. Ref<T> remains a historical proposal and current arena encoding.
+references. Ref<T> is a historical proposal removed in format 5.
 
 A Rust-style borrow checker is not a platform requirement. In the current managed-reference
 subset the runtime checks reference identity, liveness, exact type, initialization
@@ -116,8 +116,7 @@ Keep these concepts distinct:
 - `T` describes a value and its representation.
 - `Ptr<T>` supplies address access without ownership.
 - `T&`/ByRef supplies managed reference access with automatic lifetime handling.
-- `Ref<T>` is a historical ownership proposal and prototype arena encoding; it may
-  be removed as the managed-reference implementation develops.
+- The former `Ref<T>` encoding is removed; managed heap allocation returns `T&` directly.
 - The environment supplies allocation services; tracing GC is the normal managed
   heap policy. Programs need not select a concrete allocator at every allocation site.
 - Construction, copy, move, retain, release, and destruction have explicit contracts
@@ -134,8 +133,7 @@ The collector preserves reachable objects and reclaims unreachable graphs, inclu
 cycles. Reference copies preserve identity automatically. Heap reclamation has no
 last-reference timing guarantee; Dispose/Close provide timely resource cleanup.
 
-The current Ref<T> encoding is transitional and collected; the selected future
-abstraction remains T&/ByRef with explicit frame or heap provenance. Execution.heap
+T&/ByRef now has explicit frame or heap provenance; heap.new produces it directly. Execution.heap
 retains only the result's reachable heap graph after successful execution. Live-object
 limits are checked after collection and are separate from identity generation.
 

@@ -1,5 +1,9 @@
 # Type system: first executable slice
 
+Current memory milestone: format 5 uses direct heap-backed T&. Ref and heap.load/store
+are removed; heap-only references can be stored in fields/erased payloads and returned
+to the host for context-bound inspection. See [the current contract](heap-references.md).
+
 Every guest value has a type. Types can own members regardless of their data
 representation; primitive types are not a second, memberless world. Object-oriented
 mechanics remain foundational alongside free functions.
@@ -32,7 +36,7 @@ Type metadata distinguishes `Runtime` representation for known primitives from
 flag. A primitive cannot be fabricated with `newobj`, declare recursive backing
 fields of its own type, or be redefined as a record. Primitive values are created
 by appropriate instructions and runtime operations. Either representation can be
-held directly or placed behind the current explicit Ref abstraction.
+held directly or placed behind the explicit T& access mode.
 
 User records have nominal names in the current linked image. Assembly identity,
 namespace/name separation, and generic arity will need richer metadata before
@@ -109,7 +113,7 @@ receiver indexing, overloads, primitive conversion, and free-function entry poin
 ## Pointers and generics
 
 `Ptr<T>` and `T*` are equivalent fundamental pointer signature forms, distinct from
-`Ref<T>`. Nested pointers and pointer types inside constructed signatures round-trip
+managed `T&`. Nested pointers and pointer types inside constructed signatures round-trip
 through metadata. Pointer values now contain native addresses. Explicit heap
 allocation/free, pointer casts, byte offsets, field addresses, and indirect access
 are implemented for the supported layouts; see [heap and pointers](heap-and-pointers.md).
@@ -118,8 +122,8 @@ externally supplied memory remains unimplemented. See [native interop](native-in
 it does not copy the pointed-to storage or acquire ownership.
 
 Option and Result are ordinary generic library carriers. Their case extraction can
-use typed managed output references without new union instructions. Ref<T> retains
-its separate bootstrap arena meaning; counted ownership remains deferred. Neither
+use typed managed output references without new union instructions. Heap allocation
+now directly returns T&, rooted by GC. Neither
 native pointers nor managed slot references require a counted wrapper.
 See [memory model layers](memory-model.md) for the separation between raw VM memory
 and ownership policies.

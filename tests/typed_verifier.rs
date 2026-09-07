@@ -109,7 +109,7 @@ fn pointer_type_checks_do_not_claim_pointer_validity() {
 fn union_payloads_and_heap_values_preserve_raw_storage_types() {
     let source = ".module Test\n.function F(System.Option<Byte> value) -> Int32\nldarg value\ncall instance System.Option<Byte>::GetSomeCase()\ncall instance System.Option.Some<Byte>::get_Value()\nldc.i4 1\nadd\nret\n.end";
     assert!(verify(&assemble(source).unwrap()).is_ok());
-    let source = ".module Test\n.function F(Ref<Byte> value) -> Void\nldarg value\nldc.i4 1\nheap.store\nret\n.end";
+    let source = ".module Test\n.function F(Byte& value) -> Void\nldarg value\nldc.i8 1\nstobj Byte\nldvoid\nret\n.end";
     assert!(verify(&assemble(source).unwrap()).is_err());
 }
 

@@ -11,11 +11,11 @@ authorization to redefine otherwise unchanged CLR behavior permanently.
 A type describes its data, not whether it is a “struct” or “class.” There is no
 value/reference flag on a type definition. A record and an integer can both be
 held directly or placed in explicitly allocated native storage accessed through
-`Ptr<T>`. The legacy `Ref<T>` arena is another separate storage abstraction.
+`Ptr<T>`. Managed heap storage uses the same `T&` feature.
 
 Locals, arguments, and evaluation-stack slots own values. Loading an argument or
 local, duplicating a value, and selecting a field copy the value. Copying a record
-recursively copies its fields. Embedded `Ref<T>` values copy their identity and
+recursively copies its fields. Embedded heap-backed `T&` values copy their identity and
 `Ptr<T>` values copy their addresses, not their targets. `stfld` consumes a record and a replacement field and produces an
 updated record; it does not mutate some hidden receiver identity.
 
@@ -26,22 +26,18 @@ address local and argument slots through `ldloca`/`ldarga` and may be passed or
 forwarded within calls. Initialized references can be stored in T& locals and
 returned to guest callers when their root belongs to an active outer frame.
 Managed ldflda addresses record fields with the same lifetime; returning any address
-into the current frame faults, including through aliases. Reference-valued fields,
-erasure and host transfer remain rejected. Runtime checks enforce
-initialization and output assignment; no exclusive-borrow policy is implied.
-Explicit heap allocation through T&, reference fields and guest destructors remain
-future work. See [managed slot references](reference-slots.md).
+into the current frame faults, including through aliases. Fields and erased payloads
+can store heap-backed references; runtime checks reject frame-backed references there.
+Initialization and output obligations remain runtime checked. Host results can carry
+heap-backed references; transferring them into a new invocation remains unsupported.
+See [managed heap references](heap-references.md).
 
-`heap.new` transfers a value into the managed heap and produces transitional `Ref<T>`.
-`heap.load` copies its current contents. `heap.store` replaces its contents with a
-value of exactly the same type, visible through all aliases, and produces `Void`.
-References cannot be forged by guest instructions. They are non-null and carry
-identities that are never reused within an execution. Tracing GC preserves reachable
-objects and collects unreachable graphs, including cycles. The execution result
-retains only its reachable heap graph; identities have no meaning across executions.
-See [garbage collection](garbage-collection.md). Separately, `heap.alloc/free` and
-pointer instructions operate on native storage with explicit release; see
-[heap and pointers](heap-and-pointers.md).
+`heap.new` consumes an ordinary T and returns a heap-backed T&. `ldobj T` copies its
+contents; `stobj T` replaces them without producing a result. Aliases observe shared
+mutation, including stable interior field paths. Tracing GC collects unreachable
+graphs and preserves the execution result's reachable graph. The former Ref and
+heap.load/store encodings are removed in format 5. Native heap.alloc/free and pointer
+operations remain separate. See [GC](garbage-collection.md).
 
 Native stack placement is not established by these semantics. A future backend
 may use native stack storage, frame arenas, registers, or scalar replacement while
@@ -143,5 +139,5 @@ Rust's host memory rules do not define the guest VM. Fundamental `Ptr<T>`/`T*`
 values are separate from ownership wrappers. Native heap allocation and pointer
 access are implemented in a checked interpreter subset. The next managed lifetime model extends
 CLR-style T&/ByRef with automatic retention and safe escapes. Ref<T> is a historical
-proposal and current arena encoding, not the selected future reference abstraction.
+proposal whose encoding is removed in format 5.
 Tracing GC manages the heap; a Rust-style borrowing policy is not required. See [memory layers](memory-model.md).

@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-/// No value-type/reference-type bit: Ref is an explicit storage capability.
+/// No value-type/reference-type bit: ByRef selects explicit managed reference access.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Type {
     Void,
@@ -38,7 +38,6 @@ pub enum Type {
         definition: String,
         arguments: Vec<Type>,
     },
-    Ref(Box<Type>),
     /// Retaining managed slot reference; independent of native layout.
     ByRef(Box<Type>),
     /// Explicit borrowed interface receiver, separate from the interface declaration.
@@ -627,10 +626,6 @@ pub enum Instruction {
     StoreIndirectInt32,
     #[serde(rename = "heap.new")]
     HeapNew,
-    #[serde(rename = "heap.load")]
-    HeapLoad,
-    #[serde(rename = "heap.store")]
-    HeapStore,
     #[serde(rename = "error")]
     Error(String),
     #[serde(rename = "fault")]
@@ -747,7 +742,6 @@ impl Type {
                 },
                 Type::ByRef(t) => Type::ByRef(Box::new(nested(t)?)),
                 Type::Ptr(t) => Type::Ptr(Box::new(nested(t)?)),
-                Type::Ref(t) => Type::Ref(Box::new(nested(t)?)),
                 Type::InterfaceRef(t) => Type::InterfaceRef(Box::new(nested(t)?)),
                 other => other.clone(),
             })

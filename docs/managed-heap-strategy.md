@@ -1,9 +1,9 @@
 # Managed heap strategy
 
-Status: managed typed initobj, checked frame-backed references and an initial
-[tracing collector](garbage-collection.md) are implemented. The collector currently
-uses the transitional Ref encoding. Unified heap-backed T&, constructor destinations
-and explicit heap construction lowering remain future work.
+Status: direct [heap-backed T&](heap-references.md), checked frame references, typed
+initobj and tracing GC are implemented. Constructor destinations and source-language
+heap construction remain future work. Memory management reaches this milestone before
+the next [object-model slices](object-hierarchy.md).
 
 ## One reference type, distinct storage lifetimes
 
@@ -63,9 +63,8 @@ Prefer retaining recognizable patterns unless a concrete lowering gap justifies 
 change; do not make a broad breaking rename merely to match instruction names to
 source keywords.
 
-The existing heap.new is a candidate for explicit placement. Evolving its result
-from Ref<T> to T& would reuse the managed address/load/store path and remove the
-separate arena-access model. A sequence that constructs an ordinary value then
+heap.new now performs explicit placement and returns T&, sharing the managed
+address/load/store path. The former Ref and heap.load/store split is removed. A sequence that constructs an ordinary value then
 places it on the heap is adequate only when construction has not exposed that
 temporary's identity. Construction directly into the final destination is needed
 before supporting heap-self references or publication during construction. An explicit
@@ -74,10 +73,9 @@ it creates a new identity, preserves old aliases to the original and applies ord
 value-copy semantics. See [copying to the heap](lifecycle.md#explicitly-copy-an-existing-value-to-the-heap). Resolve
 that contract before choosing a fused opcode or prefix; no encoding is assigned here.
 
-CLR boxing is useful comparison material, but does not automatically select NeoCLR's
-representation: CLR unbox converts an object reference to a managed address into its
-boxed value. NeoCLR need not introduce another public reference category merely to
-reproduce that sequence. See Microsoft's [unbox reference](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.unbox).
+Managed heap placement is direct. No boxing/unboxing bridge is needed to obtain T&,
+and a future Object base must not impose one. Allocation mode remains independent
+of type inheritance.
 
 initobj is not a substitute for invoking a constructor. A constructor need not first
 fabricate a default value if it fully initializes its destination. Specify which
@@ -120,8 +118,8 @@ at execution completion, retaining the result's reachable graph. See
 [the collector contract](garbage-collection.md) for boundaries and limitations.
 
 Copying an inline record copies its value fields and preserves embedded reference
-identity; Clonable remains an explicit operation. The future T& heap representation
-must participate in tracing at every root and field path before replacing Ref.
+identity; Clonable remains an explicit operation. The T& heap representation
+participates in tracing through fields, erased payloads and interface views.
 General cycles are supported by GC; an acyclic ownership restriction is unnecessary.
 
 Dispose and Close provide timely resource cleanup independently of GC reachability.
@@ -131,16 +129,15 @@ do not dispatch them from arbitrary Rust Drop callbacks or infer them from Dispo
 
 ## Bounded implementation order
 
-1. Preserve the implemented tracing collector and its reachability tests while
-   adding heap-root provenance to ByRef. Interior references must root their owner.
-2. Build on managed initobj and define construction into supplied storage, including
-   rooting partially initialized destinations and handling construction failure.
-3. Select explicit heap placement producing T&, preserving ordinary value construction.
-   Test heap and interior-field returns while current-frame address returns still fault.
-4. Retire the transitional Ref/heap.new/load/store split in a coordinated preview
-   migration. Trace reference-valued fields and interface receivers through T&.
-5. Specify host roots, native pinning, weak references and concurrency as needed.
-   Define value destruction and any heap finalization separately from GC reclamation.
+1. Maintain the direct T& allocation milestone: heap/field/interface roots, cycles,
+   scope escape checks, heap-only stored references, and bounded collection diagnostics.
+2. Begin object-model slices after this memory milestone. Define optional bases,
+   base views and dispatch without making inheritance select an allocation mode.
+   Adapt layout and tracing so a base view preserves the complete derived root.
+3. Define constructor destinations and partial initialization, rooted throughout
+   construction; preserve ordinary value construction and explicit heap placement.
+4. Specify block-scope enforcement, persistent host roots, native pinning, weak
+   guest references and concurrency. Value destruction/finalization remain separate.
 
 Changing an existing allocation instruction's result type requires a format/version
 transition, reassembly and

@@ -63,7 +63,8 @@ record layout. `localloc` provides explicit frame-local byte storage, released o
 return. Native integers and explicit pointer/address conversions are also
 available. See [heap and pointers](docs/heap-and-pointers.md).
 Managed heap allocations now use [tracing garbage collection](docs/garbage-collection.md).
-Heap-backed T& and guest destruction remain future work.
+[Heap-backed T&](docs/heap-references.md) shares the frame-reference operations.
+Guest destruction remains future work.
 [System.Collections.ArrayList<T>](docs/array-list.md) provides a small growable list
 for native-layout values, with ordinary indexers, shared aliases and explicit release.
 The [pointer-backed carrier example](docs/pointer-carriers.md) demonstrates how ordinary
@@ -282,7 +283,7 @@ See [module sets](docs/module-sets.md) and [runtime library design](docs/runtime
 - Native `Ptr<T>`/`T*` values, explicit heap allocation/free, casts, byte offsets,
   field addresses, typed loads/stores, and native-sized pointer fields.
 - `Void`, `Int32`, `Boolean`, `String`, `Error`, records, and constructed
-  `Option<T>`, `Result<T,E>`, and `Ref<T>` types, including nested uses of `Void`.
+  `Option<T>` and `Result<T,E>` types, including nested uses of `Void`, plus managed `T&` references.
 - An iterative interpreter with explicit call frames and an IL-style evaluation stack.
 - Frame-owned aggregate copying and explicit heap allocation/sharing.
 - A line-oriented assembler with quoted strings, labels, source-line diagnostics,
@@ -301,8 +302,9 @@ This is an original experiment informed by the
 particularly its metadata and CIL partitions. It is not a fork of CoreCLR and does
 not yet import CLI metadata, execute .NET assemblies, or provide binary compatibility.
 The prototype's JSON format is not a proposed replacement binary encoding.
-Current format version 4 uses ordinary Option/Result types and removes the earlier
-union-specific encodings. Reassemble earlier source and System artifacts before loading them.
+Current format version 5 makes heap.new produce T& directly and removes the Ref
+signature and heap.load/store instructions. Reassemble source and System artifacts
+from earlier formats before loading them.
 
 ## Boundaries
 
@@ -310,8 +312,7 @@ union-specific encodings. Reassemble earlier source and System artifacts before 
 values, and copying an object copies its fields. Rust currently uses `Vec`,
 `String`, and `Box` internally, so this does not demonstrate physical native-stack
 allocation or its performance. The managed heap uses a nonmoving tracing collector;
-legacy `Ref<T>` is its transitional encoding, while T& remains the selected unified
-reference direction. Native `Ptr<T>` allocations separately support individual free.
+T& is the unified reference feature for frame and heap storage. Native `Ptr<T>` allocations separately support individual free.
 GC does not provide deterministic resource cleanup or guest finalizers. See
 [memory layers](docs/memory-model.md) and [GC](docs/garbage-collection.md).
 

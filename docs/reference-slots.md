@@ -1,5 +1,9 @@
 # Managed slot references and reference receivers
 
+Current memory milestone: format 5 uses direct heap-backed T&. Ref and heap.load/store
+are removed; heap-only references can be stored in fields/erased payloads and returned
+to the host for context-bound inspection. See [the current contract](heap-references.md).
+
 Status: T& parameters, out and out(true) contracts, ldloca/ldarga, ldobj/stobj slot
 access, managed ldflda, reference receivers, T& locals and checked guest returns, and safe
 interface slot views are implemented.
@@ -142,18 +146,17 @@ Native stack placement and a portable reference ABI remain future work.
 T& locals and returns must refer to initialized storage and satisfy any attached
 output-write obligation. Uninitialized capabilities can still be used directly for
 out calls. Taking the address of a T& local/parameter is rejected: nested references
-and indirectly storing references are not supported. Reference-valued fields,
-generic reference arguments, erasure, host transfer and native helper/P/Invoke
-signatures remain rejected. These restrictions prevent managed-reference cycles in
-this slice. A host-invoked function or entry point returning T& is rejected before
-executing its body; suitable guest calls to the same function are supported.
+and indirectly storing references are not supported. Generic reference arguments
+and native helper/P/Invoke signatures remain rejected. Fields and erased payloads
+may carry heap-backed references; scoped targets are rejected at runtime. Heap-backed
+T& results are supported for context-bound host inspection, but invocation inputs do
+not accept references from a prior execution.
 
-The [reference-return sample](../examples/reference_returns.neoil) implements
-MakeCounter(Counter& counter) -> Int32& with ldarg, ldflda Counter::Age and ret.
-It uses no arena handle, new instruction or manual lifetime operation. The legacy
-heap.new/Ref encoding now uses [tracing GC](garbage-collection.md); heap_objects
-bounds live allocations after collection. Host slot cells remain separate. Future explicit managed allocation and reference-valued
-fields need their own allocation limits and lifecycle rules.
+The [frame reference sample](../examples/reference_returns.neoil) implements
+MakeCounter(Counter& counter) -> Int32&. The [heap reference sample](../examples/heap_references.neoil)
+returns a newly allocated Counter& and its field. Both use the same ldobj/stobj/ldflda
+operations. GC roots heap references; heap_objects bounds live allocations after
+collection. There is no Ref ownership wrapper or boxing bridge.
 
 Typed verification rejects forbidden reference storage/escape and invalid operand
 shapes. Execution enforces the same safety boundaries even when optional verification

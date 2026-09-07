@@ -39,13 +39,35 @@ pub enum Value {
         interface: Type,
         receiver: crate::memory::Pointer,
     },
-    Reference {
-        index: usize,
-        target: Type,
-    },
 }
 
 impl Value {
+    /// Values embedded in fields, erased payloads or heap storage may only carry
+    /// heap-backed references. A scoped reference cannot acquire a longer lifetime.
+    pub(crate) fn ensure_heap_references(&self) -> Result<(), crate::Fault> {
+        let mut pending = vec![self];
+        while let Some(value) = pending.pop() {
+            match value {
+                Self::SlotReference(reference)
+                | Self::SlotInterface {
+                    receiver: reference,
+                    ..
+                } => {
+                    if reference.allocation_id().is_none() {
+                        return Err(crate::Fault::new(
+                            "frame-backed references cannot escape into stored values",
+                        ));
+                    }
+                    reference.assigned()?;
+                }
+                Self::Object { fields, .. } => pending.extend(fields),
+                Self::Erased(value) => pending.push(value),
+                _ => (),
+            }
+        }
+        Ok(())
+    }
+
     pub(crate) fn erase(self, ty: &Type) -> Result<Self, crate::Fault> {
         let value = self.for_storage(ty)?;
         // Erasure permits recursive value shapes. Bound their copy/drop depth before
@@ -60,8 +82,14 @@ impl Value {
             }
             remaining -= 1;
             match item {
-                Self::SlotReference(_) | Self::SlotInterface { .. } => {
-                    return Err(crate::Fault::new("managed references cannot be erased"));
+                Self::SlotReference(reference)
+                | Self::SlotInterface {
+                    receiver: reference,
+                    ..
+                } if reference.allocation_id().is_none() => {
+                    return Err(crate::Fault::new(
+                        "frame-backed references cannot be erased",
+                    ));
                 }
                 Self::Erased(payload) => {
                     pending.push((payload, depth + 1));
@@ -101,7 +129,6 @@ impl Value {
             Self::InterfaceRef { interface, .. } => Type::InterfaceRef(Box::new(interface.clone())),
             Self::SlotReference(reference) => Type::ByRef(Box::new(reference.target().clone())),
             Self::Pointer(pointer) => Type::Ptr(Box::new(pointer.target.clone())),
-            Self::Reference { target, .. } => Type::Ref(Box::new(target.clone())),
         }
     }
 
