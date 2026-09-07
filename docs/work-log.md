@@ -1863,3 +1863,9 @@ Refined the companion rule: non-generic unions may nest their variants directly;
 only generic carriers require a separate non-generic companion to keep variant
 parameters independent. Runtime companion declarations are now present alongside
 the existing top-level wrappers, allowing incremental caller migration.
+
+Array representation was clarified: `System.Array<T>` is a typed, non-owning view
+over `T*` plus length, independent of whether the storage is frame-local or heap
+allocated. This follows the same primitive-wrapper model as `System.Int32`; type
+safety comes from typed values and checked pointer provenance, not a value/reference
+classification.

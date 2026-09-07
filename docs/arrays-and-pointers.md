@@ -12,8 +12,11 @@ the distinction neoCLR intends to remove.
 
 ## Implemented first subset: explicit buffer descriptors
 
-System.Array<T> is an ordinary generic record in the platform-written System library:
-Data is T* and Length is Int32. It describes separately allocated native storage.
+System.Array<T> is an ordinary generic interface over a typed memory region. Its
+representation is a `T*` plus a length; the pointer may refer to frame or heap
+storage. This is analogous to `System.Int32`, which provides methods around a
+primitive integer value without changing that value's underlying representation.
+Array<T> is a non-owning view over the region.
 The ordinary indexed `Item(Int32) -> T` property maps to `Get` and `Set`; it adds no
 implicit bounds, allocation or ownership behavior.
 There is no new array signature category, opcode, intrinsic member dispatch, implicit
@@ -22,7 +25,8 @@ proposal below and from a .NET managed array.
 
 | Member | Contract |
 | --- | --- |
-| static Allocate(Int32 length, T initialValue) -> System.Array<T> | Explicitly allocate and initialize each element by copying the supplied value |
+| static Allocate(Int32 length, T initialValue) -> System.Array<T> | Allocate heap storage, initialize each element by copying the supplied value, and return a view |
+| static View(T* data, Int32 length) -> System.Array<T> | Construct a view over existing storage without allocating or taking ownership |
 | instance get_Length() -> Int32 | Read descriptor length; exposed through the ordinary Length property |
 | instance Get(Int32 index) -> T | Bounds-check and return an element value |
 | instance Set(Int32 index, T value) -> Void | Bounds-check and write an element |
@@ -30,6 +34,14 @@ proposal below and from a .NET managed array.
 | instance Free() -> Void | Explicitly release the backing allocation |
 
 Copying the descriptor copies its pointer and length; both copies access the same buffer.
+The view does not record whether storage came from the heap or the current frame. The
+caller must keep the storage alive and must call `Free` only for allocations made by
+`Allocate`.
+
+This separation is part of the type-safety model: the view remains `Array<T>` and
+element operations remain typed regardless of allocation location. Allocation
+provenance and lifetime are checked by the pointer/memory subsystem rather than
+encoded as separate array types.
 
 ## Stack and heap allocation
 
