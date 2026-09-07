@@ -164,7 +164,7 @@ fn bytes_and_eof_have_exact_owned_union_types_and_shared_host_position() {
         assert_eq!(
             read.invoke(vec![], options(console.clone())).unwrap().value,
             carrier(
-                "System.Result<System.Option<Byte>,Error>",
+                "System.Result<System.Option<Byte>,System.IO.ConsoleReadError>",
                 "System.Result.Ok<System.Option<Byte>>",
                 vec![option]
             )
@@ -220,7 +220,7 @@ fn byte_input_uses_typed_local_storage_before_integer_arithmetic() {
 #[test]
 fn typed_console_adapter_exposes_nested_cases() {
     let module = assemble(
-        ".module App\n.entry Main\n.function Main() -> Int32\ncall System.Console::ReadByte()\ncall instance System.Result<System.Option<Byte>,System.Error>::GetOkCase()\ncall instance System.Result.Ok<System.Option<Byte>>::get_Value()\ncall instance System.Option<System.Byte>::GetSomeCase()\ncall instance System.Option.Some<System.Byte>::get_Value()\nret\n.end",
+        ".module App\n.entry Main\n.function Main() -> Int32\ncall System.Console::ReadByte()\ncall instance System.Result<System.Option<Byte>,System.IO.ConsoleReadError>::GetOkCase()\ncall instance System.Result.Ok<System.Option<Byte>>::get_Value()\ncall instance System.Option<System.Byte>::GetSomeCase()\ncall instance System.Option.Some<System.Byte>::get_Value()\nret\n.end",
     )
     .unwrap();
     let module = neoclr::load(&serde_json::to_string(&module).unwrap()).unwrap();

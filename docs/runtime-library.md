@@ -18,7 +18,7 @@ needs and the primitives required to implement them in platform code.
 - Ordinary `System.Option<T>` and `System.Result<T,E>` provide variant constructors, predicates and checked accessors. Their None/Some/Ok/Err wrappers are ordinary types too. All nineteen new methods are platform IL; see the [member convention](union-convention.md).
 - `System.IO.File` provides bounded ReadAllText; see [file input](file-input.md).
 - `System.IO.File.ReadAllText` adapts bounded file failures to the ordinary
-  `System.Result<String,System.Error>` carrier; the canonical method now uses nested cases.
+  `System.Result<String,System.IO.FileReadError>` carrier; the canonical method now uses nested cases.
 - `System.Error` provides FromMessage, get_Message, and ToString, with explicit Message property metadata; see [Error values](errors.md).
 - `System.Array<T>` provides six IL methods for explicit allocation, length, checked
   access, element addresses, and free, with explicit Length property metadata; see [arrays and pointers](arrays-and-pointers.md).
@@ -26,8 +26,8 @@ needs and the primitives required to implement them in platform code.
   see [the text contract](text-model.md).
 - The UnionAttribute marker has an ordinary IL constructor.
 - `System.Console.ReadByte()` adapts the host console boundary to the ordinary nested
-  `System.Result<System.Option<Byte>,System.Error>` carrier. EOF is `Option.None`,
-  a byte is `Option.Some<Byte>`, and host read failures are `Result.Error<System.Error>`.
+  `System.Result<System.Option<Byte>,System.IO.ConsoleReadError>` carrier. EOF is `Option.None`,
+  a byte is `Option.Some<Byte>`, and host read failures are `Result.Error<System.IO.ConsoleReadError>`.
 - `System.Console.WriteLine(string)` calls the host output primitive.
 - `System.Console.WriteLine(int32)` calls the Int32 receiver's `ToString()` and then
   the string overload.
@@ -56,8 +56,7 @@ serialized just like application functions. Tests replace the compiled Divide bo
 and confirm execution follows the replacement, rather than a hidden intrinsic.
 
 The [Result API review](runtime-error-contracts.md) inventories current failure outcomes
-and proposed operation-specific error types. Parse, Divide, Abs and SliceUtf8 use specific error types; typed I/O errors remain
-future work. See [arithmetic contracts](arithmetic-errors.md).
+and proposed operation-specific error types. All six reviewed Result APIs now use specific error types. See [arithmetic contracts](arithmetic-errors.md).
 
 ## Build and use
 

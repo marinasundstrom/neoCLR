@@ -53,16 +53,28 @@ fn carrier(name: &str, case: &str, fields: Vec<Value>) -> Value {
 }
 fn ok(text: &str) -> Value {
     carrier(
-        "System.Result<String,Error>",
+        "System.Result<String,System.IO.FileReadError>",
         "System.Result.Ok<String>",
         vec![Value::String(text.into())],
     )
 }
 fn err(text: &str) -> Value {
+    let case = match text {
+        "ArgumentOutOfRange" => "InvalidLimit",
+        "FileNotFound" => "NotFound",
+        "FileReadFailed" => "ReadFailed",
+        "FileTooLarge" => "TooLarge",
+        other => other,
+    };
+    let error = carrier(
+        "System.IO.FileReadError",
+        &format!("System.IO.FileReadError.{case}"),
+        vec![],
+    );
     carrier(
-        "System.Result<String,Error>",
-        "System.Result.Error<Error>",
-        vec![Value::Error(text.into())],
+        "System.Result<String,System.IO.FileReadError>",
+        "System.Result.Error<System.IO.FileReadError>",
+        vec![error],
     )
 }
 
@@ -141,7 +153,7 @@ fn file_service_is_visible_without_opening_files_and_faults_keep_call_site() {
     let program = LoadedProgram::new(&assemble(".module App").unwrap()).unwrap();
     let target = parse_function_ref("System.IO.File::ReadAllText(String,Int32)").unwrap();
     let graph = program
-        .analyze_reachability(std::slice::from_ref(&target), 16)
+        .analyze_reachability(std::slice::from_ref(&target), 32)
         .unwrap();
     assert_eq!(
         graph.required_services(),

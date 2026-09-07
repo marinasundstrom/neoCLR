@@ -67,12 +67,13 @@ impl Binding {
     ) -> Result<Value, Fault> {
         match (self, args.as_slice()) {
             (Self::ConsoleReadByte, []) => {
+                // Byte = data, Void = EOF; Int32 1 = Unavailable, 2 = ReadFailed.
                 let payload = match console {
-                    None => Value::Error("ConsoleUnavailable".into()),
+                    None => Value::Int32(1),
                     Some(console) => match console.read_byte() {
                         Ok(Some(byte)) => Value::Byte(byte),
                         Ok(None) => Value::Void,
-                        Err(_) => Value::Error("ConsoleReadFailed".into()),
+                        Err(_) => Value::Int32(2),
                     },
                 };
                 Ok(Value::Erased(Box::new(payload)))

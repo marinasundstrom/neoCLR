@@ -1,11 +1,11 @@
 # Bounded UTF-8 file input
 
-`System.IO.File.ReadAllText(String path, Int32 maxBytes) -> System.Result<String,Error>`
+`System.IO.File.ReadAllText(String path, Int32 maxBytes) -> System.Result<String,System.IO.FileReadError>`
 provides the first file integration. Its ordinary platform-IL method calls the declared
-`neoCLR.Runtime.ReadAllText` InternalCall. Runtime-service analysis reports `FileInput`;
+`neoCLR.Runtime.ReadAllText` InternalCall. Runtime-service analysis reports `FileInput`
 and `ValueStorage`; this report describes dependencies, not an access-control mechanism.
-The host returns an explicitly erased String or Error; platform IL constructs ordinary
-System.Result.Ok<String> or System.Result.Error<Error> cases. ReadAllTextTyped is removed.
+The host returns an explicitly erased String or Byte failure status; platform IL constructs
+ordinary System.Result.Ok<String> or System.Result.Error<System.IO.FileReadError> cases.
 
 The method reads a regular file synchronously under the host process's filesystem
 permissions. Relative paths resolve against the process working directory. Symlinks
@@ -37,7 +37,8 @@ newline.
 | FileTooLarge | Read encounters a byte beyond maxBytes |
 | InvalidUtf8 | Complete bounded input is not valid UTF-8 |
 
-These are bootstrap message values, not a finalized structured I/O error taxonomy.
+These display messages are preserved by the typed cases below; the preview taxonomy
+may evolve without making message text a case discriminant.
 Host error classification can differ by OS, especially for directories. Allocation
 reservation failure produces a terminal Fault. Byte overflow is reported before text
 decoding. Interrupted reads retry.
@@ -82,3 +83,29 @@ cargo run --locked -- run file_input.neo.json
 The data files remain external and paths remain relative to the working directory,
 not the assembled artifact. No streams, sockets, async machinery, or new IL instructions
 are required for this example.
+
+
+## Typed failure contract
+
+FileReadError is an ordinary non-generic carrier with nested cases. Each case has a
+constructor, IsCase property and checked GetCase accessor. ToString retains the existing
+message text for presentation; branching uses case identity. The internal Byte protocol is:
+
+| Status | Case | Display text |
+| --- | --- | --- |
+| 1 | InvalidLimit | ArgumentOutOfRange |
+| 2 | InvalidPath | InvalidPath |
+| 3 | NotFound | FileNotFound |
+| 4 | AccessDenied | AccessDenied |
+| 5 | NotRegularFile | NotRegularFile |
+| 6 | ReadFailed | FileReadFailed |
+| 7 | TooLarge | FileTooLarge |
+| 8 | InvalidUtf8 | InvalidUtf8 |
+
+Success is an erased String, including empty text. Unknown statuses or payload types
+Fault. The native implementation classifies outcomes structurally; the IL wrapper does
+not compare messages. Unclassified I/O errors map to ReadFailed. OS-dependent directory
+and path behavior is preserved; tests must not require an unavailable platform-specific
+classification. The file sample explicitly translates file and parse errors into its
+application-level Error carrier. Reassemble applications and System for the changed
+public error parameter and native payload protocol.

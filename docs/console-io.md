@@ -6,15 +6,15 @@ are ordinary platform IL; line decoding and a general text reader are deferred.
 
 ## Platform methods
 
-`System.Console.ReadByte() -> System.Result<System.Option<Byte>,Error>` provides raw byte input.
+`System.Console.ReadByte() -> System.Result<System.Option<Byte>,System.IO.ConsoleReadError>` provides raw byte input.
 Its IL body calls the explicitly declared `neoCLR.Runtime.ConsoleReadByte` InternalCall.
-The host returns an explicitly erased Byte, Void (EOF), or Error. Platform IL
+The host returns an explicitly erased Byte, Void (EOF), or Int32 status. Platform IL
 constructs the ordinary nested cases with exact Byte storage:
 
 - Ok(Some(byte)): one byte, including zero or values above 127.
 - Ok(None): end of input, separate from an empty line or an input error.
-- Error(Error("ConsoleUnavailable")): no host console was supplied.
-- Error(Error("ConsoleReadFailed")): the host reported an input failure.
+- Error(ConsoleReadError.Unavailable): no host console was supplied.
+- Error(ConsoleReadError.ReadFailed): the host reported an input failure.
 
 Input has no implicit UTF-8 decoding, newline conversion, or -1 EOF sentinel. The sample stores a raw Byte case payload in a Byte local before loading it for
 arithmetic. The local load converts it to the Int32 evaluation-stack category.
@@ -111,3 +111,13 @@ and service analysis.
 Next text APIs should follow the byte/string primitives needed to implement their logic
 in platform code. Stream, socket, buffering-framework, and asynchronous APIs remain
 outside this slice.
+
+
+ConsoleReadError is an ordinary non-generic carrier with nested Unavailable/ReadFailed
+cases, constructor overloads, predicate properties and checked case accessors. ToString
+preserves ConsoleUnavailable/ConsoleReadFailed for display. Those strings do not determine
+case identity. Its native helper uses erased Int32 status 1 for Unavailable and 2 for
+ReadFailed; Byte remains reserved for successful data, including 0 and 255. Unknown
+statuses or payload types Fault. The interactive sample explicitly converts these errors
+into its application-level System.Error when combining input and validation failures.
+Reassemble applications and System together for the new error parameter and native payload.

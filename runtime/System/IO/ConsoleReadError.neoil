@@ -1,0 +1,77 @@
+.type System.IO.ConsoleReadError
+    .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
+    .field private Stored System.Value
+    .type Unavailable
+        .method instance .ctor() -> Void
+            ldvoid
+            ret
+        .end
+    .end
+    .method instance .ctor(System.IO.ConsoleReadError.Unavailable value) -> Void
+        ldarg value
+        value.pack System.IO.ConsoleReadError.Unavailable
+        newobj System.IO.ConsoleReadError
+        starg this
+        ldvoid
+        ret
+    .end
+    .property instance IsUnavailable() -> Boolean
+        .get instance System.IO.ConsoleReadError::get_IsUnavailable()
+    .end
+    .method instance get_IsUnavailable() -> Boolean
+        ldarg this
+        ldfld 0
+        value.is System.IO.ConsoleReadError.Unavailable
+        ret
+    .end
+    .method instance GetUnavailable() -> System.IO.ConsoleReadError.Unavailable
+        ldarg this
+        ldfld 0
+        value.unpack System.IO.ConsoleReadError.Unavailable
+        ret
+    .end
+    .type ReadFailed
+        .method instance .ctor() -> Void
+            ldvoid
+            ret
+        .end
+    .end
+    .method instance .ctor(System.IO.ConsoleReadError.ReadFailed value) -> Void
+        ldarg value
+        value.pack System.IO.ConsoleReadError.ReadFailed
+        newobj System.IO.ConsoleReadError
+        starg this
+        ldvoid
+        ret
+    .end
+    .property instance IsReadFailed() -> Boolean
+        .get instance System.IO.ConsoleReadError::get_IsReadFailed()
+    .end
+    .method instance get_IsReadFailed() -> Boolean
+        ldarg this
+        ldfld 0
+        value.is System.IO.ConsoleReadError.ReadFailed
+        ret
+    .end
+    .method instance GetReadFailed() -> System.IO.ConsoleReadError.ReadFailed
+        ldarg this
+        ldfld 0
+        value.unpack System.IO.ConsoleReadError.ReadFailed
+        ret
+    .end
+    .method instance ToString() -> String
+        ldarg this
+        call instance System.IO.ConsoleReadError::get_IsUnavailable()
+        brtrue Unavailable
+        ldarg this
+        call instance System.IO.ConsoleReadError::get_IsReadFailed()
+        brtrue ReadFailed
+        fault "invalid I/O error case"
+    Unavailable:
+        ldstr "ConsoleUnavailable"
+        ret
+    ReadFailed:
+        ldstr "ConsoleReadFailed"
+        ret
+    .end
+.end

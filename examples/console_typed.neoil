@@ -5,9 +5,9 @@
 .function Main() -> Void
     call System.Console::ReadByte()
     dup
-    call instance System.Result<System.Option<Byte>,System.Error>::get_IsErrorCase()
+    call instance System.Result<System.Option<Byte>,System.IO.ConsoleReadError>::get_IsErrorCase()
     brtrue Failed
-    call instance System.Result<System.Option<Byte>,System.Error>::GetOkCase()
+    call instance System.Result<System.Option<Byte>,System.IO.ConsoleReadError>::GetOkCase()
     call instance System.Result.Ok<System.Option<Byte>>::get_Value()
     dup
     call instance System.Option<Byte>::get_IsNone()
@@ -17,9 +17,9 @@
     call System.Console::WriteLine(Int32)
     ret
 Failed:
-    call instance System.Result<System.Option<Byte>,System.Error>::GetErrorCase()
-    call instance System.Result.Error<System.Error>::get_Value()
-    call instance System.Error::ToString()
+    call instance System.Result<System.Option<Byte>,System.IO.ConsoleReadError>::GetErrorCase()
+    call instance System.Result.Error<System.IO.ConsoleReadError>::get_Value()
+    call instance System.IO.ConsoleReadError::ToString()
     call System.Console::WriteLine(String)
     ret
 EndOfInput:

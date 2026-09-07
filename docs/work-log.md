@@ -2033,3 +2033,24 @@ need removal; console/file errors still need their specific error types.
 Validation: all 34 focused string/native/runtime/carrier/source tests pass; formatting,
 clippy with warnings denied and diff checks pass. The string sample assembles, verifies
 and executes against an explicitly rebuilt System artifact on macOS ARM64.
+
+## Typed console and file input errors
+
+Migrated Console.ReadByte to Result<Option<Byte>,ConsoleReadError> with Unavailable and
+ReadFailed cases, and File.ReadAllText to Result<String,FileReadError> with InvalidLimit,
+InvalidPath, NotFound, AccessDenied, NotRegularFile, ReadFailed, TooLarge and InvalidUtf8
+cases. Both errors are ordinary non-generic carriers with directly nested case types,
+constructors, predicate properties, checked extraction and presentation-only ToString.
+
+Native console input reports Byte data, Void EOF or Int32 failure statuses; native file
+input reports String data or Byte statuses. Library IL constructs all public cases without
+message comparisons. Unknown native statuses Fault. Existing diagnostic strings are kept
+for display, as are OS-dependent I/O classification, input limits and output Fault policy.
+The console and file samples explicitly map heterogeneous failures to application-level
+Error where needed. All six reviewed Result APIs now expose their specific error types.
+Updated exact host result expectations and tested every error constructor/accessor and
+host file error-kind mapping. Rebuild System and applications for the signature changes.
+
+Validation: all 34 focused host-I/O, carrier, native-binding, string and source tests pass,
+along with formatting, clippy with warnings denied and diff checks. Console input, EOF,
+and file samples assemble, verify and execute against a rebuilt System artifact on macOS ARM64.

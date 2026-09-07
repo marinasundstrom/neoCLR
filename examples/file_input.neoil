@@ -6,9 +6,9 @@
     ldc.i4 1024
     call System.IO.File::ReadAllText(String,Int32)
     dup
-    call instance System.Result<String,System.Error>::get_IsErrorCase()
+    call instance System.Result<String,System.IO.FileReadError>::get_IsErrorCase()
     brtrue Failed
-    call instance System.Result<String,System.Error>::GetOkCase()
+    call instance System.Result<String,System.IO.FileReadError>::GetOkCase()
     call instance System.Result.Ok<String>::get_Value()
     call System.Int32::Parse(String)
     dup
@@ -28,8 +28,10 @@ ParseFailed:
     newobj instance System.Result<Int32,Error>::.ctor(System.Result.Error<Error>)
     ret
 Failed:
-    call instance System.Result<String,System.Error>::GetErrorCase()
-    call instance System.Result.Error<System.Error>::get_Value()
+    call instance System.Result<String,System.IO.FileReadError>::GetErrorCase()
+    call instance System.Result.Error<System.IO.FileReadError>::get_Value()
+    call instance System.IO.FileReadError::ToString()
+    call System.Error::FromMessage(String)
     newobj instance System.Result.Error<System.Error>::.ctor(System.Error)
     newobj instance System.Result<Int32,System.Error>::.ctor(System.Result.Error<System.Error>)
     ret

@@ -293,10 +293,10 @@ These are ordinary functions compiled from [System.neoil](../runtime/System.neoi
 
 | Symbol | Parameters | Return |
 | --- | --- | --- |
-| `System.Console.ReadByte` | none | `System.Result<System.Option<Byte>,System.Error>` (ordinary nested cases) |
+| `System.Console.ReadByte` | none | `System.Result<System.Option<Byte>,System.IO.ConsoleReadError>` (ordinary nested cases) |
 | `System.Console.WriteLine` | `String` | `Void` |
 | `System.Console.WriteLine` | `Int32` | `Void` |
-| `System.IO.File.ReadAllText` | `String, Int32` | `System.Result<String,System.Error>` (ordinary carrier) |
+| `System.IO.File.ReadAllText` | `String, Int32` | `System.Result<String,System.IO.FileReadError>` (ordinary carrier) |
 | `System.Int32.ToString` | instance receiver `Int32`, no parameters | `String` |
 | `System.Int32.Parse` | `String` | `System.Result<Int32,System.Int32ParseError>` (see [typed errors](int32-parse.md)) |
 | `System.Int32.Divide` | `Int32, Int32` | `System.Result<Int32,System.IntegerDivisionError>` |

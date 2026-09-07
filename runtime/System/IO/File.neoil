@@ -1,20 +1,79 @@
 .type System.IO.File
-    .method static ReadAllText(String path, Int32 maxBytes) -> System.Result<String,System.Error>
+    .method static ReadAllText(String path, Int32 maxBytes) -> System.Result<String,System.IO.FileReadError>
+        .local Byte failure
         ldarg path
         ldarg maxBytes
         call neoCLR.Runtime.ReadAllText(String,Int32)
         dup
-        value.is Error
-        brtrue ReadFailed
+        value.is Byte
+        brtrue Failed
         value.unpack String
         newobj.ctor instance System.Result.Ok<String>::.ctor(String)
-        newobj.ctor instance System.Result<String,System.Error>::.ctor(System.Result.Ok<String>)
+        newobj.ctor instance System.Result<String,System.IO.FileReadError>::.ctor(System.Result.Ok<String>)
         ret
+    Failed:
+        value.unpack Byte
+        stloc failure
+        ldloc failure
+        ldc.i4 1
+        beq InvalidLimit
+        ldloc failure
+        ldc.i4 2
+        beq InvalidPath
+        ldloc failure
+        ldc.i4 3
+        beq NotFound
+        ldloc failure
+        ldc.i4 4
+        beq AccessDenied
+        ldloc failure
+        ldc.i4 5
+        beq NotRegularFile
+        ldloc failure
+        ldc.i4 6
+        beq ReadFailed
+        ldloc failure
+        ldc.i4 7
+        beq TooLarge
+        ldloc failure
+        ldc.i4 8
+        beq InvalidUtf8
+        fault "invalid native I/O status"
+    InvalidLimit:
+        newobj instance System.IO.FileReadError.InvalidLimit::.ctor()
+        newobj instance System.IO.FileReadError::.ctor(System.IO.FileReadError.InvalidLimit)
+        br WrapError
+    InvalidPath:
+        newobj instance System.IO.FileReadError.InvalidPath::.ctor()
+        newobj instance System.IO.FileReadError::.ctor(System.IO.FileReadError.InvalidPath)
+        br WrapError
+    NotFound:
+        newobj instance System.IO.FileReadError.NotFound::.ctor()
+        newobj instance System.IO.FileReadError::.ctor(System.IO.FileReadError.NotFound)
+        br WrapError
+    AccessDenied:
+        newobj instance System.IO.FileReadError.AccessDenied::.ctor()
+        newobj instance System.IO.FileReadError::.ctor(System.IO.FileReadError.AccessDenied)
+        br WrapError
+    NotRegularFile:
+        newobj instance System.IO.FileReadError.NotRegularFile::.ctor()
+        newobj instance System.IO.FileReadError::.ctor(System.IO.FileReadError.NotRegularFile)
+        br WrapError
     ReadFailed:
-        value.unpack Error
-        newobj.ctor instance System.Result.Error<System.Error>::.ctor(System.Error)
-        newobj.ctor instance System.Result<String,System.Error>::.ctor(System.Result.Error<System.Error>)
+        newobj instance System.IO.FileReadError.ReadFailed::.ctor()
+        newobj instance System.IO.FileReadError::.ctor(System.IO.FileReadError.ReadFailed)
+        br WrapError
+    TooLarge:
+        newobj instance System.IO.FileReadError.TooLarge::.ctor()
+        newobj instance System.IO.FileReadError::.ctor(System.IO.FileReadError.TooLarge)
+        br WrapError
+    InvalidUtf8:
+        newobj instance System.IO.FileReadError.InvalidUtf8::.ctor()
+        newobj instance System.IO.FileReadError::.ctor(System.IO.FileReadError.InvalidUtf8)
+        br WrapError
+    WrapError:
+        newobj instance System.Result.Error<System.IO.FileReadError>::.ctor(System.IO.FileReadError)
+        newobj instance System.Result<String,System.IO.FileReadError>::.ctor(System.Result.Error<System.IO.FileReadError>)
         ret
     .end
 .end
-

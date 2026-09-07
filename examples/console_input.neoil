@@ -14,9 +14,9 @@
 Read:
     call System.Console::ReadByte()
     dup
-    call instance System.Result<System.Option<Byte>,Error>::get_IsErrorCase()
+    call instance System.Result<System.Option<Byte>,System.IO.ConsoleReadError>::get_IsErrorCase()
     brtrue InputFailed
-    call instance System.Result<System.Option<Byte>,Error>::GetOkCase()
+    call instance System.Result<System.Option<Byte>,System.IO.ConsoleReadError>::GetOkCase()
     call instance System.Result.Ok<System.Option<Byte>>::get_Value()
     dup
     call instance System.Option<Byte>::get_IsNone()
@@ -71,8 +71,10 @@ Finish:
     newobj instance System.Result<System.Option<Int32>,Error>::.ctor(System.Result.Ok<System.Option<Int32>>)
     ret
 InputFailed:
-    call instance System.Result<System.Option<Byte>,Error>::GetErrorCase()
-    call instance System.Result.Error<Error>::get_Value()
+    call instance System.Result<System.Option<Byte>,System.IO.ConsoleReadError>::GetErrorCase()
+    call instance System.Result.Error<System.IO.ConsoleReadError>::get_Value()
+    call instance System.IO.ConsoleReadError::ToString()
+    call System.Error::FromMessage(String)
     newobj instance System.Result.Error<Error>::.ctor(Error)
     newobj instance System.Result<System.Option<Int32>,Error>::.ctor(System.Result.Error<Error>)
     ret

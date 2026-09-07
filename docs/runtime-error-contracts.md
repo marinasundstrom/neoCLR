@@ -1,18 +1,17 @@
 # Runtime error contract review
 
 Review of the six public Result-returning methods in the current System library.
-Parse, Divide, Abs and SliceUtf8 now implement the typed contracts below; the remaining rows
-are proposed migration targets and still use System.Error. A caller must not have to parse diagnostic text to
+All six methods now implement the typed contracts below. A caller must not have to parse diagnostic text to
 decide what to do next.
 
-| Method | Current recoverable outcomes | Proposed error type and cases | Result appropriate? |
+| Method | Current recoverable outcomes | Error type and cases | Result appropriate? |
 | --- | --- | --- | --- |
 | System.Int32.Parse(String) | InvalidFormat and Overflow, distinguished structurally | System.Int32ParseError: InvalidFormat, Overflow (implemented) | Yes: parsing caller-supplied text is expected to fail |
 | System.Int32.Divide(Int32, Int32) | DivisionByZero, Overflow for minimum Int32 divided by -1 | System.IntegerDivisionError: DivisionByZero, Overflow (implemented) | Yes for this checked helper; the low-level div instruction retains its Fault contract |
 | System.Math.Abs(Int32) | Overflow for minimum Int32 | System.OverflowError, an ordinary single-purpose type (implemented) | Yes: preserves the selected checked Abs contract; no union is needed for a single failure kind |
 | System.String.SliceUtf8(Int32, Int32) | OutOfRange, InvalidBoundary | System.Text.Utf8SliceError: OutOfRange, InvalidBoundary (implemented) | Yes: callers can validate externally supplied byte ranges without Faults |
-| System.Console.ReadByte() | ConsoleUnavailable, ConsoleReadFailed | System.IO.ConsoleReadError: Unavailable, ReadFailed | Yes: absence of a configured host and failure of a read are distinguishable; EOF remains successful Option.None |
-| System.IO.File.ReadAllText(String, Int32) | ArgumentOutOfRange, InvalidPath, FileNotFound, AccessDenied, NotRegularFile, FileReadFailed, FileTooLarge, InvalidUtf8 | System.IO.FileReadError: InvalidLimit, InvalidPath, NotFound, AccessDenied, NotRegularFile, ReadFailed, TooLarge, InvalidUtf8 | Yes: bounded file input can fail for expected environmental, limit and content reasons |
+| System.Console.ReadByte() | ConsoleUnavailable, ConsoleReadFailed | System.IO.ConsoleReadError: Unavailable, ReadFailed (implemented) | Yes: absence of a configured host and failure of a read are distinguishable; EOF remains successful Option.None |
+| System.IO.File.ReadAllText(String, Int32) | ArgumentOutOfRange, InvalidPath, FileNotFound, AccessDenied, NotRegularFile, FileReadFailed, FileTooLarge, InvalidUtf8 | System.IO.FileReadError: InvalidLimit, InvalidPath, NotFound, AccessDenied, NotRegularFile, ReadFailed, TooLarge, InvalidUtf8 (implemented) | Yes: bounded file input can fail for expected environmental, limit and content reasons |
 
 Names are provisional preview choices. Keep the set of cases tied to observable behavior;
 there is no need to reproduce an exception hierarchy. Error types do not inherit from
@@ -59,7 +58,7 @@ Output methods continue returning Void in this review; changing that contract is
    construct ordinary Result cases entirely in IL. Divide no longer uses bootstrap Result.
 3. Completed: Utf8SliceError and ordinary slicing native/library results. Byte-range
    validation remains distinct from UTF-8 boundary validation.
-4. Implement ConsoleReadError and FileReadError. Preserve current EOF, missing-host,
+4. Completed: ConsoleReadError and FileReadError. Preserved current EOF, missing-host,
    bounded input, UTF-8, and platform-dependent I/O behavior.
 
 Use the canonical method names, replacing signatures and updating all callers in the same
