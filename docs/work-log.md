@@ -1420,3 +1420,14 @@ and method compatibility. Preserved Option for semantic absence and kept allocat
 and ownership independent. No implementation or final syntax is chosen.
 
 Validation: documentation-only change; diff checks pass. Runtime tests were not rerun.
+
+## 2026-09-07 — Refine the tooling-nullability candidate
+
+Recorded compiler/tooling enforcement with persisted declaration annotations as a
+candidate, including strict compiler diagnostics across compilation boundaries.
+Annotations should be consistent without a class/struct split or automatic
+Nullable<T> wrapping. Actual null representation remains an independent open question;
+annotations alone cannot add a distinguishable null state to fully occupied storage.
+No runtime behavior or metadata format changed.
+
+Validation: documentation-only change; diff checks pass. Runtime tests were not rerun.

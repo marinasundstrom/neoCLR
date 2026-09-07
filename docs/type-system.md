@@ -156,6 +156,21 @@ identity. Under this proposal, two declarations could refer to the same type whi
 having different permissions to contain null. This is a direction to investigate,
 not implemented syntax, metadata, or verifier behavior.
 
+A candidate is to leave enforcement to compilers and tooling. Persist annotations
+on declaration targets so separately compiled consumers can check contracts; a
+frontend could reject violations rather than merely warn. The runtime would not
+need to enforce these annotations as part of type identity. Annotation encoding,
+defaults for unannotated imports, and any boundary checks remain undecided.
+
+Use a consistent annotation model without separate class and struct rules. A
+nullable annotation should not automatically rewrite a value's declared type to
+Nullable<T>. This does not by itself supply a null representation: an inline value
+whose bit patterns are all valid still needs a distinguishable state if actual null
+storage is allowed. Whether that uses additional storage, an explicit indirection,
+or is unsupported for a particular representation remains a separate decision.
+Tooling-only annotations cannot make that physical distinction disappear. No
+wrapper, boxing rule, or universal null representation is selected here.
+
 This must remain separate from allocation and ownership. A nullable declaration
 would not select heap allocation, garbage collection, or reference counting. The
 library principle also remains: use Option<T> for semantic absence; reserve null

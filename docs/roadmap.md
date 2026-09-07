@@ -211,5 +211,7 @@ behavior in the supported subset.
 
 Explore explicit nullable annotations on locals, parameters, fields, and properties,
 separate from type identity. Resolve enforcement, generic composition, and boundary
-contracts before implementation; preserve Option<T> for semantic absence. See the
+contracts before implementation; compiler/tooling-only enforcement is a candidate.
+Use consistent annotations without class/struct rules or an automatic Nullable<T>
+rewrite, while deciding actual null storage separately. Preserve Option<T> for semantic absence. See the
 [nullability design questions](type-system.md#future-exploration-nullability-on-declarations).
