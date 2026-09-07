@@ -1903,6 +1903,11 @@ verifiable and lowerable; dynamic call sites explicitly request a handler that o
 language lookup while preserving result typing, accessibility, resource limits,
 interrupts and stack traces.
 
+Recorded the compatibility strategy: retain familiar CLR metadata, signatures,
+visibility, properties, calls and stack effects where useful; make fundamental
+improvements explicit, versioned and diagnosable so language migration remains
+incremental.
+
 Added a complete opcode status inventory to the neoIL reference, grouping
 CLI-aligned instructions, explicit neoCLR memory/value operations, and temporary
 bootstrap union operations.

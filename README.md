@@ -364,6 +364,8 @@ to machine instructions, with runtime services remaining explicit boundaries.
 instructions, neoCLR additions, deviations, and temporary bootstrap operations.
 [Dynamic dispatch](docs/dynamic-dispatch.md) is an opt-in VM service for dynamic
 languages, with language-provided handlers and explicit safety/resource contracts.
+[Compatibility strategy](docs/compatibility-strategy.md) describes how familiar CLR
+concepts and deliberate neoCLR improvements coexist during migration.
 [Closed call-graph analysis](docs/reachability.md) follows explicit roots for backend planning.
 `cargo run --example reachability` reports HelloWorld's IL calls, runtime import, and
 [runtime-service requirements](docs/runtime-services.md).
