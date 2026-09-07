@@ -857,10 +857,47 @@ impl Lowerer<'_> {
     fn call(&mut self, callee: &Expr, arguments: &[Expr]) -> Result<Ty, Fault> {
         let path = Self::qualified_name(callee);
         let binding = path.as_ref().and_then(|p| p.split('.').next());
-        if binding.is_some_and(|name| self.bindings.contains_key(name)) {
+        let bound_receiver = binding.is_some_and(|name| self.bindings.contains_key(name));
+        if let ExprKind::Field(owner, member) = &callee.kind {
+            if bound_receiver || path.is_none() {
+                let mut ty = self.expression(owner)?;
+                if let Ty::Ref(target) = ty {
+                    self.body.push(format!("ldobj {}", target.il()));
+                    ty = *target;
+                }
+                let types = arguments
+                    .iter()
+                    .map(|a| self.expression(a))
+                    .collect::<Result<Vec<_>, _>>()?;
+                let signature = format!(
+                    "instance {}::{}({})",
+                    ty.il(),
+                    member.text,
+                    types.iter().map(Ty::il).collect::<Vec<_>>().join(",")
+                );
+                let function =
+                    library::resolve(&signature).map_err(|e| callee.at.error(e.message))?;
+                self.body.push(format!("call {signature}"));
+                return Ty::from_metadata(&function.returns);
+            }
+        }
+        if bound_receiver {
             return Err(callee
                 .at
                 .error("calling through a binding is not supported"));
+        }
+        if matches!(&callee.kind, ExprKind::Name(name) if name == "int") {
+            if arguments.len() != 1 {
+                return Err(callee.at.error("int conversion requires one argument"));
+            }
+            let ty = self.expression(&arguments[0])?;
+            if ty != Ty::Int && ty != Ty::Record("System.Byte".into()) {
+                return Err(callee
+                    .at
+                    .error("int conversion supports byte and int in this subset"));
+            }
+            self.body.push("conv.ovf.i4".into());
+            return Ok(Ty::Int);
         }
         if matches!(&callee.kind, ExprKind::Field(owner, name) if matches!(&owner.kind, ExprKind::Name(owner) if owner == "Console") && name.text == "WriteLine")
             || matches!(&callee.kind, ExprKind::Name(name) if name == "WriteLine" && self.source.console_import)
@@ -1405,6 +1442,8 @@ pub fn lower_to_il(source: &str) -> Result<String, Fault> {
                 "System",
                 "Option",
                 "Result",
+                "Byte",
+                "byte",
             ]
             .contains(&name.text.as_str())
         {

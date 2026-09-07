@@ -2902,3 +2902,24 @@ exhaustiveness, payload/type/scope failures, single evaluation, loop control and
 escape versus valid heap-backed returns. Conditional frame escapes remain runtime
 checked rather than universally diagnosed statically. Clippy across all targets with
 warnings denied, formatting and whitespace checks passed.
+
+## Neo bounded console calculator — 2026-09-07
+
+Added a runnable integer-division calculator combining input, parsing, exhaustive
+matching, loops and managed reference parameters. It accepts signed decimal operands,
+reports recoverable parse/division errors, allows retries, processes partial-line EOF,
+and handles unavailable/failing input separately from runtime faults. Source bounds
+limit lines to 32 characters and an invocation to 256 raw input bytes.
+
+The only additional compiler capabilities are explicit Byte/Int32-to-Int32 conversion
+and ordinary public System instance calls, using existing conversion/call instructions.
+The calculator uses value storage; a separate loop/match regression exercises GC under
+a two-object budget. No collector instrumentation or native console ABI was expanded.
+Documented interactive/redirected commands, input and result semantics, bounds and
+embedding behavior; updated grammar and marked the three planned slices completed.
+
+Validation: all 25 Neo tests and 21 CLI/module/console/GC diagnostics tests pass.
+Coverage includes repeated signed calculations, CRLF/EOF, recovery, malformed/overlong
+input, session caps, injected I/O failures, runtime budgets, instance-call typing and
+GC root preservation/reclamation. Clippy across all targets with warnings denied,
+formatting and whitespace checks passed; all 549 local documentation file links resolve.

@@ -55,4 +55,5 @@ string           = ? JSON double-quoted string, with no raw CR or LF ? ;
 (* A standalone match with block arms needs no statement terminator.
    Whitespace other than LF and // comments through the next LF are ignored.
    Keywords cannot be identifiers; static semantics further restrict names,
-   calls, lvalues, type use, literal ranges and reference lifetimes. *)
+   calls (including int conversion and ordinary System instance calls), lvalues,
+   type use, literal ranges and reference lifetimes. *)

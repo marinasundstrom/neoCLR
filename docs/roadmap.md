@@ -8,8 +8,8 @@ independent of inheritance and value equality independent of reference access.
 The [Neo concept language](neo.md) now supplies the first source-to-runtime scenario.
 Keep this small companion compiler updated alongside neoCLR for testing and
 explanation, without making a full-fledged compiler a current goal. The
-[upcoming Neo slices](neo-roadmap.md) prioritize control flow, union-aware matching
-and a bounded console program.
+[Neo slice plan](neo-roadmap.md) records completed control flow, union-aware matching
+and the bounded console calculator, with the next platform areas kept separate.
 Future [library/compiler bootstrapping](neo-bootstrapping.md) is an exercise to pursue
 only as the required language and library capabilities become useful.
 

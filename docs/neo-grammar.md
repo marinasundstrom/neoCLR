@@ -78,9 +78,13 @@ short-circuit. Ordering uses Int32; equality supports Int32 and Boolean.
 value. All arithmetic in this subset uses Int32.
 
 The grammar permits general postfix shapes, but semantic checks restrict calls to
-free functions, positional record construction and public static bundled System calls.
+free functions, positional record construction, explicit `int(byteOrInt)` conversion,
+and public static/ordinary instance bundled System calls.
 Library overloads are selected by exact argument types; out/byref-receiver contracts
-are not exposed. Generic method calls and instance calls remain unsupported.
+are not exposed. Instance receivers are values (T& is read with ldobj). Generic method
+calls and user-declared methods remain unsupported. `int(value)` supports Byte/Int32
+only and lowers to checked Int32 conversion. These are static restrictions on the
+existing call grammar; no new expression production is needed.
 `new` requires a record-construction call, such as `new Counter(0)`. It does not
 accept arbitrary factory calls or copy expressions in this slice. Assignment and
 `&` require appropriate addressable locations. There is no assignment expression or implicit conversion.

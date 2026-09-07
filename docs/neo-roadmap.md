@@ -1,8 +1,8 @@
-# Upcoming Neo slices
+# Neo slice plan
 
-Status: control flow and union matching are implemented on the [Neo foundation](neo.md).
-The console calculator remains planned. The [implemented grammar](neo-grammar.md)
-tracks shipped syntax only.
+The [Neo foundation](neo.md) and the three slices below are implemented. The
+[grammar](neo-grammar.md) tracks shipped syntax, with future features called out
+separately.
 
 Neo is a small companion compiler for testing and explaining neoCLR. Maintain it as
 the runtime changes: update affected lowering, runnable examples, tests and grammar
@@ -11,71 +11,54 @@ runtime instructions only when a concrete semantic need justifies the deviation.
 The current compiler is not intended to become a complex, full-fledged compiler.
 Every addition should make a runtime capability easier to exercise or explain.
 
-## 1. Structured control flow — implemented
+## 1. Structured control flow — completed
 
-Implemented `if`/`else`, `while`, integer-range `for`, and unconditional `loop`, with `break`
-and `continue`. Introduce Boolean conditions, primitive comparisons and short-circuit
-Boolean operators as needed. Lower these to existing branch instructions.
-
-Keep Raven-inspired range spelling: `0..9` includes both endpoints, while `0..<10`
-excludes the upper endpoint. General iteration protocols, custom steps and broader
-collection syntax can wait. Specify empty ranges and Int32 boundary behavior before
-lowering so the final increment cannot wrap into an unintended infinite loop.
+Implemented if/else, while, integer-range for, loop, break/continue, primitive
+comparisons and short-circuit Boolean operators with existing IL branches.
+`0..9` includes both endpoints; `0..<10` excludes the upper endpoint. Bounds evaluate
+once, empty ranges skip the body, and inclusive Int32.MaxValue does not wrap.
 
 Block names do not escape or shadow active names. Branch return checking is
 implemented; loop termination analysis stays conservative. Storage remains frame-lived,
 so taking addresses of block-local values is rejected. References to outer locals and
 heap objects remain available; deterministic block cleanup is not claimed.
 
-Acceptance: small sum/search programs exercise each construct, both branches,
-zero-iteration loops, nested break/continue, and boundary ranges. Verify that the
-runtime instruction limit still stops an unbounded loop. Include negative scope,
-condition-type and missing-return cases.
+[Acceptance tests](../tests/neo_control_flow.rs) cover ranges, nested transfers,
+short-circuit effects, scope/lifetime diagnostics and instruction limits. Run the
+[control-flow example](../examples/source/control-flow.neo) to print and return 21.
+General iteration protocols, custom steps and broader collection syntax remain future.
 
-## 2. Patterns and union-aware match — implemented
+## 2. Patterns and union-aware match — completed
 
-Add match expressions and match statements so callers can handle ordinary union
-results explicitly. Begin with case patterns, payload bindings and a wildcard,
-covering the library's Option and Result contracts. Add only the closed generic type
-and library-call binding support needed to reach those APIs.
+Implemented match expressions and statements with case payload bindings, discarded
+payloads, payload-free cases and a wildcard. Both forms require exhaustive coverage
+and reject duplicate/unreachable arms. Expressions have one exact result type;
+statement blocks allow actions, return and loop transfers. Scrutinees evaluate once.
 
-Implemented expression spelling:
+Closed generic annotations and typed System calls expose Option/Result. Coverage
+requires bundled System's union marker, constructor cases and typed public accessors;
+matching lowers to existing library calls and branches. Payload bindings are ordinary
+copies scoped to their arm. Runtime provenance checks still reject indirect frame
+escapes; heap-backed field references can remain valid match results.
 
-```text
-let value = parsed match {
-    Ok(let number) => number,
-    Error(let error) => 0
-}
-```
+[Acceptance tests](../tests/neo_match.rs) exercise parsing, nested Option/Result input
+and EOF, type/coverage failures and lifetimes. The [match example](../examples/source/match.neo)
+prints an error message and 42. Guards, nested destructuring patterns, user-declared
+unions and subtype patterns remain future work; nested unions currently use nested
+matches. No general open-world exhaustiveness contract is claimed.
 
-An expression produces a value with a consistent arm result type; statement arms
-perform actions and allow ordinary control flow. Start with exhaustive coverage in
-both forms, including a wildcard where needed. Define arm-local bindings, single
-evaluation of the scrutinee, duplicate/unreachable cases and safe payload extraction.
-Coverage is derived from bundled System union markers, constructors and typed public
-accessors. User-declared unions are not yet exposed.
-Guards, arbitrary destructuring, subtype patterns and open hierarchy coverage can wait.
+## 3. A bounded console calculator — completed
 
-Use existing union/library operations where sufficient. Audit their representation
-and verifier contracts before deciding whether any new metadata or opcode is needed.
-Pattern bindings must obey ordinary copy/reference rules; matching must not silently
-box values or allow references into expired scrutinee/arm storage.
+The [calculator](neo-calculator.md) combines input, parsing, matching, loops and
+reference parameters. It reports recoverable parse/division errors, permits retries,
+and stops at EOF or its explicit input cap. The only additional compiler support is
+explicit byte-to-int conversion and ordinary System instance calls for existing
+library operations. No new runtime service or opcode was needed.
 
-Acceptance: handle successful and failed `System.Int32.Parse` results, then nested
-Option/Result cases for input and end-of-input. Test non-exhaustive matches, mismatched
-expression arm types, invalid payload access and lifetime failures independently of
-the happy-path examples.
-
-## 3. A bounded console calculator
-
-Combine input, parsing, matching and loops in one small program: read input, report
-recoverable parse errors, calculate a result, repeat, and terminate on end-of-input.
-Add only missing string/input and arithmetic support that this program actually
-needs. Document one command to run it and automate representative input/output cases.
-
-Use it to check that recoverable union results remain distinct from runtime faults,
-and that repeated work respects memory and execution limits. Expand GC monitoring
-only if this workload reveals a concrete diagnostic gap.
+[Acceptance tests](../tests/neo_calculator.rs) cover representative and malformed
+input, resource bounds, I/O failures, CLI execution and a separate GC-pressure
+workload. Existing GC monitoring is adequate; expand it when a workload exposes a
+concrete diagnostic gap.
 
 ## Later platform slices
 

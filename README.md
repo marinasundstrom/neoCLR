@@ -58,7 +58,12 @@ cargo run -- run examples/source/counter.neo --gc-stats --gc-events
 ```
 
 It prints `1`, `2`, and `42`. See the [Neo guide](docs/neo.md) for source syntax,
-artifact compilation and current limits.
+artifact compilation and current limits. The [bounded calculator](docs/neo-calculator.md)
+combines control flow, union results and console input:
+
+```sh
+cargo run -- run examples/source/calculator.neo
+```
 
 ## Preview 1
 

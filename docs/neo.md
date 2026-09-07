@@ -128,7 +128,8 @@ The [Neo grammar](neo-grammar.md) gives the implemented EBNF and lexical rules.
 - Integer, Boolean and double-quoted string literals; strings use JSON-style escapes.
 - Explicit references, dereferencing, heap construction and typed returns.
 - Exhaustive union match expressions/statements, case payload bindings and wildcards.
-- Closed generic type annotations and qualified public static bundled System calls.
+- Closed generic type annotations and public static/ordinary instance bundled System calls.
+- Explicit `int(byteValue)` conversion using checked Int32 conversion.
 - `Console.WriteLine` for int and string. `import System.Console.*` enables unqualified `WriteLine`.
 - `if`/`else`, `while`, integer-range `for`, `loop`, `break` and `continue`.
 - Int32 comparisons, Int32/Boolean equality, and short-circuit `&&`/`||` with `!`.
@@ -148,7 +149,7 @@ Reference-valued fields may contain heap-backed references; scoped targets in th
 fields fault at runtime. This compiler does not perform complete static lifetime
 analysis, so some invalid programs fail only during execution.
 
-Uninitialized bindings, generic declarations, overload declarations, instance methods,
+Uninitialized bindings, generic declarations, overload declarations, user-defined instance methods,
 inheritance, general patterns, native pointers/interop, pinning and full Raven syntax
 are not implemented. It does not expose the entire standard library yet. These are
 candidate future slices, chosen around end-to-end scenarios rather than added as a
@@ -170,7 +171,7 @@ metadata/verifier diagnostics currently refer to generated IL, not a source map.
 Run the front-end and CLI regressions with:
 
 ```sh
-cargo test --test neo --test cli --test cli_modules --test gc_diagnostics
+cargo test --test neo --test neo_control_flow --test neo_match --test neo_calculator --test cli --test cli_modules --test gc_diagnostics
 ```
 
 See [managed heap references](heap-references.md), [GC](garbage-collection.md) and
@@ -215,8 +216,23 @@ match, as demonstrated by `Console.ReadByte()` returning
 `Result<Option<byte>, System.IO.ConsoleReadError>`. Without a supplied console,
 input reports the recoverable Unavailable case. The CLI supplies process stdin/stdout.
 
-Qualified public static System methods bind by exact parameter types; `Console` and
+Public System methods bind by exact parameter types; `Console` and
 `Int32` abbreviate their System names. Current union coverage comes from the trusted
 bundled library's marker, constructors and typed case accessors. Runtime faults remain
 separate from recoverable results, including malformed union representations. See the
 [grammar and matching rules](neo-grammar.md) for limits.
+
+## Bounded console calculator
+
+Run `cargo run -- run examples/source/calculator.neo`, then enter a dividend and a
+divisor on separate lines. For example, `84` followed by `2` prints `= 42`. Continue
+with another pair or signal EOF (Ctrl-D on Unix with an empty input line).
+The [calculator guide](neo-calculator.md) documents redirected input, errors and limits.
+
+This slice adds ordinary System instance calls such as `number.ToString()` and
+`text.SliceUtf8(start, length)`, with exact argument types and value receivers. A
+T& receiver is read through its reference. Byref receiver/out-parameter methods,
+user-defined methods and general overload declarations remain outside this subset.
+`int(value)` explicitly converts byte or int to Int32 through `conv.ovf.i4`; no
+implicit numeric conversion is introduced. Existing `String.Concat` provides bounded
+text assembly in the sample. No new runtime instructions or console ABI are needed.

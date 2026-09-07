@@ -1,0 +1,112 @@
+import System.Console.*
+
+func Prompt(needsDivisor: bool) -> () {
+    if needsDivisor {
+        WriteLine("Divisor:")
+    } else {
+        WriteLine("Dividend:")
+    }
+}
+
+func CalculateLine(text: string, dividend: int&, needsDivisor: bool&) -> () {
+    Int32.Parse(text) match {
+        Ok(let number) => {
+            if *needsDivisor {
+                Int32.Divide(*dividend, number) match {
+                    Ok(let quotient) => {
+                        WriteLine(String.Concat("= ", quotient.ToString()))
+                    },
+                    Error(let error) => {
+                        error match {
+                            DivisionByZero => { WriteLine("Cannot divide by zero") },
+                            Overflow => { WriteLine("Division overflow") }
+                        }
+                    }
+                }
+                *needsDivisor = false
+            } else {
+                *dividend = number
+                *needsDivisor = true
+            }
+        },
+        Error(let error) => {
+            error match {
+                InvalidFormat => { WriteLine("Invalid number; try again") },
+                Overflow => { WriteLine("Number out of range; try again") }
+            }
+        }
+    }
+}
+
+func Main() -> int {
+    WriteLine("Integer division: one signed decimal number per line; EOF exits")
+    var dividend = 0
+    var needsDivisor = false
+    var text = ""
+    var length = 0
+    var invalid = false
+    var ended = false
+    Prompt(needsDivisor)
+
+    // A bounded demonstration: at most 256 raw bytes and 32 characters per line.
+    for inputIndex in 0..<256 {
+        var ready = false
+        Console.ReadByte() match {
+            Ok(let option) => {
+                option match {
+                    Some(let raw) => {
+                        let code = int(raw)
+                        if code == 13 {
+                            continue
+                        } else if code == 10 {
+                            ready = true
+                        } else {
+                            length = length + 1
+                            if length > 32 {
+                                invalid = true
+                            } else if code >= 48 && code <= 57 {
+                                let digit = code - 48
+                                text = String.Concat(text, digit.ToString())
+                            } else if code == 45 && length == 1 {
+                                text = "-"
+                            } else if code == 43 && length == 1 {
+                                text = "+"
+                            } else {
+                                invalid = true
+                            }
+                        }
+                    },
+                    None => {
+                        ended = true
+                        ready = true
+                    }
+                }
+            },
+            Error(let error) => {
+                WriteLine(error.ToString())
+                return 1
+            }
+        }
+        if ready {
+            if !ended || length > 0 {
+                if invalid {
+                    WriteLine("Expected at most 32 ASCII decimal characters; try again")
+                } else {
+                    CalculateLine(text, &dividend, &needsDivisor)
+                }
+            }
+            text = ""
+            length = 0
+            invalid = false
+            if ended {
+                if needsDivisor {
+                    WriteLine("End of input before divisor")
+                }
+                return 0
+            }
+            Prompt(needsDivisor)
+        }
+    }
+    WriteLine("Input limit reached (256 bytes)")
+    return 2
+}
