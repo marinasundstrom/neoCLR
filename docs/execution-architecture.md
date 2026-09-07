@@ -86,7 +86,9 @@ CLI-like file with ordinary .NET execution compatibility. See [format direction]
 
 ### Representation and calling conventions
 
-Distinguish portable signatures from target layouts and call ABIs. Specify target
+Distinguish portable signatures from target layouts and call ABIs.
+[Explicit target layout](target-layout.md) now parameterizes scalar alignment and pointer
+width for closed sequential records; interpreter memory still uses the host descriptor. Specify target
 pointer width, alignment, record layout, argument passing, return values, and native
 interop boundaries. Different architectures need not share byte layouts. Compiled
 and interpreted calls on the same target need adapters or an agreed ABI if they mix.

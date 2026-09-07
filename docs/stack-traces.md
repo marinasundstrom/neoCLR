@@ -3,6 +3,8 @@
 Status: owned logical stack snapshots for interpreter execution Faults are implemented.
 The Rust API exposes Fault.stack_trace, StackTrace, StackFrame, and CodeLocation. Guest
 System.Diagnostics.StackTrace/StackFrame and debug-source resolution remain pending.
+The immediate platform milestone emphasizes simple runnable programs, representative
+primitive/String APIs, and Error/Fault behavior; richer source diagnostics follow.
 
 Faults are unrecoverable runtime and system errors. Guest applications cannot catch or
 resume them. A host receiving a Fault does not imply rollback or recovery from arbitrary

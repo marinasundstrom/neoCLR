@@ -274,6 +274,8 @@ Run `cargo run --example invoke` for the Rust embedding sample.
 [Fault stack snapshots](docs/stack-traces.md) preserve logical frames and method identities.
 `cargo run --example stack_trace` formats a snapshot after the loaded program is dropped.
 Debug-source resolution and guest StackTrace/StackFrame types remain pending.
+[Explicit target layouts](docs/target-layout.md) support storage planning independently of the host.
+`cargo run --example target_layout` compares two pointer-width/alignment choices.
 
 [Explicit module sets](docs/module-sets.md) support additional libraries, cross-module
 generic calls, and field-name aliases. Run `cargo run --example modules` for a three-module

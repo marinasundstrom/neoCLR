@@ -57,6 +57,18 @@ impl LoadedProgram {
         crate::type_identity::resolve(&self.module, ty)
     }
 
+    /// Resolve a closed type in this snapshot and calculate its explicit target layout.
+    pub fn layout_of(
+        &self,
+        ty: &Type,
+        target: crate::memory::TargetLayout,
+    ) -> Result<crate::memory::Layout, Fault> {
+        let ty = crate::scope::normalize_type(&self.module, ty)?;
+        crate::vm::check_type(&ty, &self.module)?;
+        crate::references::check_type(&self.module, &self.module, &ty)?;
+        crate::memory::layout_for(&self.module, &ty, target)
+    }
+
     /// Build a conservative closed call graph from explicit roots without executing code.
     /// The limit counts distinct definition/closed-owner instantiations, including imports.
     pub fn analyze_reachability(

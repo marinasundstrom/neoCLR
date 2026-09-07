@@ -1299,3 +1299,28 @@ Validation: all 324 integration tests pass on macOS ARM64; focused trace tests w
 repeated after a formatting refinement. Formatting, clippy with warnings denied, and
 diff checks pass. The sample prints Validate -> Process -> Main after dropping its
 loaded program. Linux and Windows remain for CI.
+
+## 2026-09-07 — Explicit target layout and runnable-program priorities
+
+Separated scalar layout inputs from host process properties with TargetLayout,
+memory::layout_for, and LoadedProgram::layout_of. Pointer size/alignment and Int64,
+Single, and Double alignment are explicit and validated. Sequential packing, minimum
+size, nested generic fields, and existing layout limits use the selected descriptor.
+Interpreter memory operations retain the host descriptor; foreign layout queries are
+planning calculations and do not change execution or native marshalling.
+
+Added six tests for pointer/native-integer widths, independent scalar alignment,
+packing and nested generics, invalid descriptors, existing type/storage checks, and
+host execution consistency. Added a sample comparing explicit 32/64-bit choices and
+documented that a data layout is not a complete native ABI or executable allocation.
+
+Updated priorities from the user's clarification: simple runnable programs without
+extensive OOP, a demonstrative primitive-backed type set, useful String APIs, and
+recoverable Error versus terminal Fault/stack-trace behavior. Arrays are promoted to
+this initial milestone, with initialization, bounds, copy/alias, and backing-storage
+contracts to settle before array IL. Rich source diagnostics and broader object-model
+features follow these fundamentals. No array implementation is claimed in this slice.
+
+Validation: all 330 integration tests pass on macOS ARM64; formatting, clippy with
+warnings denied, and diff checks pass. The sample reports Packet sizes 16/24 and offsets
+[0,4,8]/[0,8,16] for its two explicit descriptors. Linux and Windows remain for CI.

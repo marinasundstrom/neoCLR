@@ -44,13 +44,63 @@ pub struct FieldLayout {
     pub layout: Layout,
 }
 
-/// Sequential prototype layout with optional packing and native-size pointer fields.
+/// Explicit scalar layout inputs for the prototype's sequential record layout.
+/// This is a data-layout description, not a native calling convention or target triple.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct TargetLayout {
+    pub pointer_size: u8,
+    pub pointer_alignment: u8,
+    pub int64_alignment: u8,
+    pub single_alignment: u8,
+    pub double_alignment: u8,
+}
+
+impl TargetLayout {
+    pub fn host() -> Self {
+        Self {
+            pointer_size: std::mem::size_of::<usize>() as u8,
+            pointer_alignment: std::mem::align_of::<usize>() as u8,
+            int64_alignment: std::mem::align_of::<u64>() as u8,
+            single_alignment: std::mem::align_of::<f32>() as u8,
+            double_alignment: std::mem::align_of::<f64>() as u8,
+        }
+    }
+
+    pub fn validate(&self) -> Result<(), Fault> {
+        if !matches!(self.pointer_size, 4 | 8) {
+            return Err(Fault::new("target pointer size must be 4 or 8 bytes"));
+        }
+        for (alignment, size) in [
+            (self.pointer_alignment, self.pointer_size),
+            (self.int64_alignment, 8),
+            (self.single_alignment, 4),
+            (self.double_alignment, 8),
+        ] {
+            if !alignment.is_power_of_two() || alignment > size {
+                return Err(Fault::new(
+                    "target scalar alignment must be a power of two no larger than its size",
+                ));
+            }
+        }
+        Ok(())
+    }
+}
+
+/// Sequential host layout used by interpreter memory operations.
 pub fn layout(module: &Module, ty: &Type) -> Result<Layout, Fault> {
+    layout_for(module, ty, TargetLayout::host())
+}
+
+/// Calculate layout using explicit target inputs without allocating or executing code.
+/// Non-host results describe target storage; interpreter memory operations use host layout.
+pub fn layout_for(module: &Module, ty: &Type, target: TargetLayout) -> Result<Layout, Fault> {
+    target.validate()?;
     fn build(
         module: &Module,
         ty: &Type,
         path: &mut Vec<Type>,
         budget: &mut usize,
+        target: TargetLayout,
     ) -> Result<Layout, Fault> {
         if *budget == 0 {
             return Err(Fault::new("layout complexity limit exceeded"));
@@ -59,15 +109,16 @@ pub fn layout(module: &Module, ty: &Type) -> Result<Layout, Fault> {
         let (size, alignment) = match ty {
             Type::SByte | Type::Byte => (1, 1),
             Type::Int16 | Type::UInt16 | Type::Char => (2, 2),
-            Type::Single => (4, std::mem::align_of::<f32>()),
-            Type::Double => (8, std::mem::align_of::<f64>()),
+            Type::Single => (4, usize::from(target.single_alignment)),
+            Type::Double => (8, usize::from(target.double_alignment)),
             Type::Int32 | Type::UInt32 => (4, 4),
-            Type::Int64 | Type::UInt64 => (8, std::mem::align_of::<u64>()),
+            Type::Int64 | Type::UInt64 => (8, usize::from(target.int64_alignment)),
             Type::Boolean => (1, 1),
             Type::Void => (0, 1),
-            Type::IntPtr | Type::UIntPtr | Type::Ptr(_) => {
-                (std::mem::size_of::<usize>(), std::mem::align_of::<usize>())
-            }
+            Type::IntPtr | Type::UIntPtr | Type::Ptr(_) => (
+                usize::from(target.pointer_size),
+                usize::from(target.pointer_alignment),
+            ),
             Type::Named(name)
             | Type::Constructed {
                 definition: name, ..
@@ -99,7 +150,7 @@ pub fn layout(module: &Module, ty: &Type) -> Result<Layout, Fault> {
                 let mut alignment = 1usize;
                 let mut fields = vec![];
                 for field in &instantiated_fields {
-                    let layout = build(module, &field.ty, path, budget)?;
+                    let layout = build(module, &field.ty, path, budget, target)?;
                     let field_alignment = layout.alignment.min(packing);
                     alignment = alignment.max(field_alignment);
                     size = align_up(size, field_alignment)?;
@@ -135,7 +186,7 @@ pub fn layout(module: &Module, ty: &Type) -> Result<Layout, Fault> {
             fields: vec![],
         })
     }
-    build(module, ty, &mut vec![], &mut 16384)
+    build(module, ty, &mut vec![], &mut 16384, target)
 }
 
 fn align_up(size: usize, alignment: usize) -> Result<usize, Fault> {

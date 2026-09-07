@@ -11,7 +11,7 @@ requirements. Embedding and a future high-level language are additional consumer
 of the same semantic model. See [execution architecture](execution-architecture.md)
 for shared contracts, capability boundaries, unresolved choices, and staged experiments.
 [Closed call-graph analysis](reachability.md) now provides bounded traversal of explicit
-roots and closed generic calls for backend planning. Native compilation still needs
+roots and closed generic calls for backend planning. [Explicit target layout](target-layout.md) is now available; native compilation still needs
 layout closure and opcode/ABI capability checks. [Runtime-service planning](runtime-services.md)
 now reports direct service uses and compares them with a supplied service set.
 Only interpretation is implemented today; this does not make interpreter internals
@@ -38,14 +38,32 @@ language compiler should target the same metadata/IL and enable incremental libr
 migration. Native backend/code-sharing choices remain open; no hidden fallback or
 universal ownership policy is implied.
 
-## Current priority: stack traces
+## Current priority: a small runnable platform
 
-[Fault stack snapshots and runtime StackTrace/StackFrame types](stack-traces.md) are the
-current priority. Owned interpreter Fault snapshots now preserve exact method identities
-and IL positions before frames are discarded. Next come optional source mappings from
-guest artifacts and the runtime-library capture API. Faults remain
-unrecoverable runtime/system errors; this introduces no guest exception handling.
-The library API will integrate with runtime capture while preserving explicit ownership.
+The first milestone is building and running simple programs without extensive OOP.
+Prioritize the complete path from assembler through metadata/IL, runtime library,
+execution, recoverable Error results, and unrecoverable Fault diagnostics. Add core
+mechanics when these programs need them; broader OOP and backend features can wait.
+
+The immediate demonstration set should include:
+
+- HelloWorld, arithmetic, branches, free functions, and explicit pointer allocation.
+- Primitive-backed System types with a small useful method surface. System.Int32 already
+  demonstrates Parse, Divide, and ToString; extend a few representative primitives before
+  pursuing inheritance, interfaces, or reflection.
+- Invariant, zero-based, fixed-length arrays with explicit initialization and bounds
+  behavior. Define copy semantics and backing-storage lifetime before adding array IL;
+  include empty arrays and Void elements. See [arrays and pointers](arrays-and-pointers.md).
+- A usable String API on the existing UTF-8 String value/type. String literals and console
+  output already work; basic text operations need a deliberate indexing/error contract.
+- Recoverable failures through Result and terminal runtime/system Faults with preserved
+  stack traces. Error handling is a milestone of its own, not incidental plumbing.
+
+[Owned Fault snapshots](stack-traces.md) are implemented. Guest StackTrace/StackFrame
+integration remains an intended runtime-library capability; source-line resolution and
+rich formatting can follow the core programs. [Explicit target layout](target-layout.md)
+now separates storage calculations from the host. This does not require starting native
+code generation before the interpreter/library demonstration is coherent.
 
 ## Strategy review and verifier foundation
 
@@ -104,8 +122,8 @@ must preserve explicit allocation and avoid requiring null or boxing for absence
    Stack-height joins, definite local initialization, reachable returns, and maximum
    stack analysis are implemented by the explicit verifier, along with typed stack
    states and instruction operand checks. Decide when verification becomes mandatory.
-2. Extend type/generic metadata and implement arrays when their storage contracts
-   are ready; see [arrays and pointers](arrays-and-pointers.md).
+2. Arrays are promoted to the initial runnable milestone above; rectangular shapes,
+   nonzero lower bounds, covariance, and richer collections remain later work.
 3. Implement a CLI-based binary reader/writer for the supported subset, preserving
    standard table/heap/token and opcode encodings where semantics permit. Define
    versioned extensions only for required deviations; see [format direction](format-direction.md).

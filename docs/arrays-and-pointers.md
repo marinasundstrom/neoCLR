@@ -9,6 +9,22 @@ Arrays should follow the same separation between data type and storage as every
 other type. Making every array implicitly reference-allocated would reintroduce
 the distinction neoCLR intends to remove.
 
+## Initial runnable milestone
+
+Arrays are now a near-term fundamental alongside primitive-backed types, strings, and
+Error/Fault diagnostics. Start with a small program that creates an initialized array,
+reads its length, reads and updates elements, and demonstrates a bounds failure with
+a Fault trace. Empty arrays, explicit element values, and generic element types belong
+in the first contract; extensive OOP and the full collection library are not prerequisites.
+
+The ownership proposal below remains a candidate, not an accepted encoding. Before
+implementation, settle owned element storage versus a descriptor over separately allocated
+storage, copy/alias behavior, construction/allocation instructions, and return lifetime.
+Do not make allocation or copying silently imply GC or the bootstrap Ref arena. Raw
+pointer buffers already exist, but lack the array value's shape and checked-access contract.
+String APIs may later use array/buffer facilities without making the String representation
+or Unicode indexing depend on a particular array-storage policy.
+
 ## Array ownership and shape
 
 Start with invariant, zero-based, one-dimensional `Array<T>` with a runtime length
@@ -94,7 +110,6 @@ not a sustainable universal promise. Frame ownership is the semantic promise;
 backend placement and explicit shared identity are separate concerns.
 
 The initial heap allocation and pointer operations are now available. The array
-experiment above, checked spans, and ownership-policy decisions remain deferred
-follow-ups. Array tests should eventually cover empty arrays, bounds, aliasing versus
-copies, invalid lengths, and zero-sized elements; they do not block the initial
-heap/pointer slice.
+experiment above is promoted to the initial runnable milestone. Checked spans and
+broader ownership policies remain later work. Initial array tests should cover empty arrays, bounds, aliasing versus
+copies, invalid lengths, and zero-sized elements; the existing heap/pointer implementation remains independently usable.
