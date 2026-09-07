@@ -147,3 +147,32 @@ they need not match a higher-level language's source identifiers. Parameter and
 local scopes are separate, and each declaring type defines its own field scope.
 Qualified field aliases such as `Point::X` resolve during assembly to the same
 numeric operands as explicit field indices. See [identifier mappings](neoil.md#identifier-mappings-and-field-aliases).
+
+## Future exploration: nullability on declarations
+
+Explore explicitly marking locals, parameters, fields, and properties as nullable,
+with non-null as the default contract, instead of making nullability part of type
+identity. Under this proposal, two declarations could refer to the same type while
+having different permissions to contain null. This is a direction to investigate,
+not implemented syntax, metadata, or verifier behavior.
+
+This must remain separate from allocation and ownership. A nullable declaration
+would not select heap allocation, garbage collection, or reference counting. The
+library principle also remains: use Option<T> for semantic absence; reserve null
+for an intentional null-reference state.
+
+Questions to resolve before implementation:
+
+- Which values can carry null, especially raw pointers and future reference wrappers,
+  without introducing a class/struct distinction or a null state for every value?
+- How should declaration annotations be encoded, including return values, property
+  accessors, generic substitution, and nested generic arguments?
+- Should non-null contracts be enforced by the verifier, runtime checks, a frontend,
+  or a combination, and what happens at native and host boundaries?
+- How do definite initialization, copying between declarations with different
+  annotations, and narrowing after null checks preserve those contracts?
+- How should annotations participate in method compatibility and overload resolution
+  while remaining separate from type identity?
+
+These choices should be considered alongside future frontend and metadata design;
+they do not require adding nullability to the current implementation slice.

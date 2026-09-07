@@ -1410,3 +1410,13 @@ Validation: all 348 integration tests pass on macOS ARM64; formatting, clippy wi
 warnings denied, and diff checks pass. The sample verifies and prints 42, InvalidInt32,
 Expected a positive number: -1, and Execution continued, then returns Void. Linux and
 Windows remain for CI.
+
+## 2026-09-07 — Record declaration-nullability exploration
+
+Recorded the proposed future model of explicit nullable declarations rather than
+nullable type identities. Listed open questions about eligible representations,
+return/accessor contracts, generics, verification, initialization, native boundaries,
+and method compatibility. Preserved Option for semantic absence and kept allocation
+and ownership independent. No implementation or final syntax is chosen.
+
+Validation: documentation-only change; diff checks pass. Runtime tests were not rerun.

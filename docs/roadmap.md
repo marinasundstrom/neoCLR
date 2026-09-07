@@ -206,3 +206,10 @@ No importer, source compiler, bridge, binary metadata writer, or compatibility
 analyzer is implemented yet. A useful migration success criterion is a small real
 library recompiling with localized, explained changes and equivalent observable
 behavior in the supported subset.
+
+## Deferred design question: declaration nullability
+
+Explore explicit nullable annotations on locals, parameters, fields, and properties,
+separate from type identity. Resolve enforcement, generic composition, and boundary
+contracts before implementation; preserve Option<T> for semantic absence. See the
+[nullability design questions](type-system.md#future-exploration-nullability-on-declarations).
