@@ -209,3 +209,7 @@ reassembly instead of preserving proposals that no longer fit.
 
 The [implementation gate](managed-reference-implementation.md) records current code
 gaps, reference identity/retention invariants and the first acceptance workloads.
+
+The proposed [managed heap strategy](managed-heap-strategy.md) separates frame and heap
+roots behind T&, and reviews initobj plus construction into supplied storage before
+introducing a new value-construction instruction.

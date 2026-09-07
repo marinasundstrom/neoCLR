@@ -95,3 +95,11 @@ A managed collector, reference counting, explicit free, or region reset can ther
 be separate choices, provided their contracts compose. The raw VM retains pointer
 and memory operations. Higher-level languages can restrict allocator selection or
 pointer use without changing the core model.
+
+## Next managed allocation review
+
+The [managed heap strategy](managed-heap-strategy.md) compares the MSIL patterns
+for initobj, constructor calls and newobj before selecting explicit heap placement.
+Review managed initobj and constructor destinations before adding newval or making
+newobj heap-only. Current newobj still produces ordinary values; heap placement
+producing T& remains proposed direction.

@@ -109,3 +109,6 @@ CLI-style allocation/construction lowering before adding instructions; no manual
 retain/release operations are source prerequisites. Bump the format if obsolete
 encodings would otherwise be misinterpreted, and update validation, services, hosting
 and examples together.
+
+The next [managed heap strategy](managed-heap-strategy.md) develops storage provenance,
+initobj/constructor reuse, explicit heap placement and automatic lifetime handling.

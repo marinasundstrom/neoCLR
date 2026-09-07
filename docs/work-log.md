@@ -2722,3 +2722,21 @@ Validation: all 543 tests passed across 85 test targets; cargo clippy --all-targ
 links and heading targets in the changed documents resolve. Tests cover valid caller
 returns, frame-escape Faults without verification, field mutation/replacement, output
 aliasing, initialization, host/native boundaries and final host-cell release.
+
+## Managed heap strategy and MSIL construction patterns — 2026-09-07
+
+Added managed-heap-strategy.md to plan frame-versus-heap provenance behind the same
+T& feature, interior-root retention, construction/publication, live-allocation limits,
+reference-valued fields, cycles and deterministic cleanup. Explicit managed heap
+allocation and destructor dispatch remain unimplemented.
+
+Compared Microsoft's initobj, newobj, call and unbox references with the prototype.
+The proposed strategy preserves recognizable initialization and construction roles:
+managed initobj and destination-oriented constructors should be reviewed before
+adding newval or changing newobj to mean only heap allocation. Explicit heap placement
+may reuse heap.new with a T& result; the exact encoding remains open. No new opcode,
+value/reference type flag, null default or source ownership wrapper was selected.
+
+Validation: 17 local links and heading targets resolve, whitespace checks pass, and
+src/tests/examples/runtime match the preceding commit. No runtime tests were rerun
+for this documentation-only follow-up; the implementation commit passed 543 tests.
