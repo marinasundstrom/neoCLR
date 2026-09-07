@@ -1,0 +1,3 @@
+; Opaque owned metadata, not a guest address or an erased payload.
+.type System.RuntimeTypeHandle
+.end

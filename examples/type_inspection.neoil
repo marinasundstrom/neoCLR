@@ -1,0 +1,45 @@
+.module TypeInspection
+.entry Main
+
+.type Box<T>
+    .field Value T
+.end
+
+.function Main() -> Void
+    .local System.Type boxType
+    ldtoken int32
+    call System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)
+    call instance System.Type::get_Name()
+    call System.Console::WriteLine(String)
+    pop
+
+    ldc.i4 42
+    newobj Box<Int32>
+    call System.TypeOf<Box<Int32>>::Of(Box<Int32>)
+    stloc boxType
+    ldloc boxType
+    call instance System.Type::get_Name()
+    call System.Console::WriteLine(String)
+    pop
+    ldloc boxType
+    call instance System.Type::get_GenericArgumentCount()
+    call System.Console::WriteLine(Int32)
+    pop
+    ldloc boxType
+    ldc.i4 0
+    call instance System.Type::GetGenericArgument(Int32)
+    call instance System.Type::get_Name()
+    call System.Console::WriteLine(String)
+    pop
+
+    ldloc boxType
+    ldtoken Box<int>
+    call System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)
+    call instance System.Type::Equals(System.Type)
+    brtrue Same
+    fault "closed type identity mismatch"
+Same:
+    ldstr "Same type"
+    call System.Console::WriteLine(String)
+    ret
+.end

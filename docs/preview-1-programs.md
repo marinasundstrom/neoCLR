@@ -21,7 +21,7 @@ generated union representation and runtime dependencies are not adopted here.
 
 The [runnable walkthrough](preview-1-walkthrough.md) packages the current examples
 and tests their CLI source/artifact paths. It adds file integration and explicit
-pointer borrowing; guest reflection remains unfinished.
+pointer borrowing; read-only guest type inspection is included.
 
 ## The program set
 
@@ -32,12 +32,11 @@ pointer borrowing; guest reflection remains unfinished.
 | P3 | Typed data and alternatives | Constructors, private storage, properties, generic carriers, independent copies | constructors.neoil, ordinary_unions.neoil, ordinary_unions tests |
 | P4 | Explicit buffer | Array allocation, indexing/loop, aliasing, exactly one free | array_loops.neoil, arrays.neoil |
 | P5 | A deliberate Fault | Terminal failure with guest caller frames and IL locations | fault_trace.neoil, array_bounds.neoil |
-| P6 | Inspect a type | Type/value acquisition, exact identity, name, closed generic arguments | Host identity APIs only; guest support still missing |
+| P6 | Inspect a type | Type/value acquisition, exact identity, name, closed generic arguments | type_inspection.neoil, System.Type and TypeOf<T>.Of |
 
 The existing files are groundwork, not a claim that every program contract below is
 already implemented or has an exact fixture. Preview 1 must give each row a checked-in
-neoIL equivalent, expected output/exit behavior and automated coverage. P2 and P3 now use ordinary System carriers across their API/host/native paths. P6
-still lacks guest APIs, and the final acceptance fixtures and release checks remain.
+neoIL equivalent, expected output/exit behavior and automated coverage. P2 and P3 now use ordinary System carriers across their API/host/native paths. P6 now has read-only guest APIs; final release checks remain.
 These gaps prevent declaring Preview 1 complete.
 
 ## P1 — Hello and a free helper
@@ -256,21 +255,16 @@ func Main() -> Void {
 }
 ```
 
-`typeOf`, `typeOfValue`, descriptor equality/Name and GenericArguments are conceptual
-operations, **not existing functions or settled API names**. The Boolean printing is
-pseudocode too: the IL equivalent can branch and print String literals with the existing
-WriteLine(String), avoiding an unrelated overload prerequisite. Expected semantic
-results are true, the Box definition's name, and System.Int32's name; exact display
-format must be specified with the descriptor API. Comparing Box<Int32> with Box<String>
-must be false. Definition identity must also account for module identity.
+The [executable equivalent](../examples/type_inspection.neoil) uses `ldtoken` and
+System.Type.GetTypeFromHandle for a named type, and System.TypeOf<T>.Of for a value's
+declared type. It prints System.Int32, Box, 1, System.Int32 and Same type. Descriptor
+Equals uses canonical identity; Name and GetGenericArgument provide read-only metadata.
+The pseudocode's typeOf/typeOfValue and GenericArguments notation are explanatory
+projections, not extra API members. The value route does not inspect dynamic payloads.
 
-Lowering will acquire a descriptor from a closed type token or a value, then use
-ordinary read-only accessors. Opcode spelling, collection access and descriptor
-lifetime need a separate implementation contract; no fictitious runnable IL is shown.
-Generic-argument inspection need not require native Array<Type> storage or a collection
-library. A count plus indexed getter is sufficient. No member invocation, reflective
-construction/mutation, visibility bypass or copying of the .NET reflection hierarchy
-is implied by this program.
+The [descriptor contract](type-inspection.md) specifies naming and lifetime. No native
+Array<Type> storage or collection library is needed: a count and indexed getter suffice.
+No member invocation, reflective construction/mutation or visibility bypass is provided.
 
 ## Running and accepting the set
 

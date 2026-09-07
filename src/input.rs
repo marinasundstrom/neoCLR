@@ -30,6 +30,11 @@ fn resolve_with_budget(
             ));
         }
         *remaining -= 1;
+        if *ty == Type::RuntimeTypeHandle {
+            return Err(Fault::new(
+                "runtime type handles cannot be imported from the host",
+            ));
+        }
         if *ty == Type::Value {
             return Ok(Input::Erased);
         }

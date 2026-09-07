@@ -28,10 +28,14 @@ pub struct TypeDescriptor {
 pub(crate) fn describe(module: &Module, ty: &Type) -> Result<TypeDescriptor, Fault> {
     let normalized = crate::scope::normalize_type(module, ty)?;
     let identity = resolve(module, &normalized)?;
-    let name = normalized
-        .definition_name()
-        .ok_or_else(|| Fault::new("type has no metadata name"))?
-        .to_owned();
+    let name = match &normalized {
+        Type::Ptr(element) => format!("{}*", signature_name(element)?),
+        Type::Ref(element) => format!("Ref<{}>", signature_name(element)?),
+        _ => normalized
+            .definition_name()
+            .ok_or_else(|| Fault::new("type has no metadata name"))?
+            .to_owned(),
+    };
     let generic_arguments = match &normalized {
         Type::Constructed { arguments, .. } => arguments
             .iter()
@@ -47,6 +51,29 @@ pub(crate) fn describe(module: &Module, ty: &Type) -> Result<TypeDescriptor, Fau
         name,
         generic_arguments,
         declaring_type,
+    })
+}
+
+fn signature_name(ty: &Type) -> Result<String, Fault> {
+    Ok(match ty {
+        Type::Ptr(element) => format!("{}*", signature_name(element)?),
+        Type::Ref(element) => format!("Ref<{}>", signature_name(element)?),
+        Type::Constructed {
+            definition,
+            arguments,
+        } => format!(
+            "{}<{}>",
+            definition,
+            arguments
+                .iter()
+                .map(signature_name)
+                .collect::<Result<Vec<_>, _>>()?
+                .join(",")
+        ),
+        _ => ty
+            .definition_name()
+            .ok_or_else(|| Fault::new("type has no metadata name"))?
+            .to_owned(),
     })
 }
 

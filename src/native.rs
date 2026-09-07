@@ -5,6 +5,10 @@ use crate::{
 };
 
 pub(crate) enum Binding {
+    TypeName,
+    TypeEquals,
+    TypeArgumentCount,
+    TypeArgument,
     ParseInt32,
     Int32ToString,
     WriteLine,
@@ -42,6 +46,16 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             (Binding::ReadAllText, Type::Value)
         }
         ("neoCLR.Runtime.ConsoleReadByte", []) => (Binding::ConsoleReadByte, Type::Value),
+        ("neoCLR.Runtime.TypeName", [Type::RuntimeTypeHandle]) => (Binding::TypeName, Type::String),
+        ("neoCLR.Runtime.TypeEquals", [Type::RuntimeTypeHandle, Type::RuntimeTypeHandle]) => {
+            (Binding::TypeEquals, Type::Boolean)
+        }
+        ("neoCLR.Runtime.TypeArgumentCount", [Type::RuntimeTypeHandle]) => {
+            (Binding::TypeArgumentCount, Type::Int32)
+        }
+        ("neoCLR.Runtime.TypeArgument", [Type::RuntimeTypeHandle, Type::Int32]) => {
+            (Binding::TypeArgument, Type::RuntimeTypeHandle)
+        }
         _ => {
             return Err(Fault::new(format!(
                 "no runtime binding for {}({:?})",
@@ -66,6 +80,26 @@ impl Binding {
         console: Option<&dyn crate::Console>,
     ) -> Result<Value, Fault> {
         match (self, args.as_slice()) {
+            (Self::TypeName, [Value::RuntimeTypeHandle(handle)]) => {
+                Ok(Value::String(handle.name.clone()))
+            }
+            (
+                Self::TypeEquals,
+                [
+                    Value::RuntimeTypeHandle(left),
+                    Value::RuntimeTypeHandle(right),
+                ],
+            ) => Ok(Value::Boolean(left.identity == right.identity)),
+            (Self::TypeArgumentCount, [Value::RuntimeTypeHandle(handle)]) => {
+                Ok(Value::Int32(handle.generic_arguments.len() as i32))
+            }
+            (Self::TypeArgument, [Value::RuntimeTypeHandle(handle), Value::Int32(index)]) => {
+                let argument = usize::try_from(*index)
+                    .ok()
+                    .and_then(|index| handle.generic_arguments.get(index))
+                    .ok_or_else(|| Fault::new("generic argument index out of range"))?;
+                Ok(Value::RuntimeTypeHandle(Box::new(argument.clone())))
+            }
             (Self::ConsoleReadByte, []) => {
                 // Byte = data, Void = EOF; Int32 1 = Unavailable, 2 = ReadFailed.
                 let payload = match console {

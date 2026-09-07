@@ -6,7 +6,7 @@ carriers, explicit native allocation and terminal Faults. They do not require a
 high-level compiler or extensive object-oriented programming.
 
 This walkthrough is executable today. It is not a declaration that Preview 1 is
-released: [guest reflection and release validation](preview-1.md) remain open.
+released: [exact-release platform and toolchain validation](preview-1.md) remain open.
 The Raven-like pseudocode below explains intent; the linked neoIL files are the
 actual programs. No iterator framework, Stream hierarchy or implicit ownership
 facility is required by these samples.
@@ -40,6 +40,7 @@ Run these commands from the repository root:
 | Ordinary values and alternatives | `cargo run --locked -- run examples/ordinary_unions.neoil` | `success`, `7`, `failure`, `7`, `Some<Void> is present` |
 | Array loops | `cargo run --locked -- run examples/array_loops.neoil` | `Sum of squares:`, `30` |
 | File summary | `cargo run --locked -- run examples/file_summary.neoil` | `File contents:`, `Hello, neoCLR 🌍!`, `UTF-8 bytes:`, `19` |
+| Read-only type inspection | `cargo run --locked -- run examples/type_inspection.neoil` | `System.Int32`, `Box`, `1`, `System.Int32`, `Same type` |
 | Pointer-backed carrier | `cargo run --locked -- run examples/pointer_union.neoil` | `42`, `7`, `11` |
 
 Comma-separated outputs in the table are separate lines. These programs finish with
@@ -192,3 +193,11 @@ An embedding host receives a Fault for that execution; its application need not 
 No guest cleanup handler runs, although execution teardown reclaims its tracked native
 buffers. Native code and host allocation failures are outside any universal containment
 claim. See [Fault traces](stack-traces.md) and [memory semantics](heap-and-pointers.md).
+
+## Read-only type inspection
+
+[TypeInspection](../examples/type_inspection.neoil) gets a type token, describes a
+Box<Int32> value through System.TypeOf<T>.Of, reads its name and generic argument,
+and compares it with Box<int>. Identity comes from loaded metadata, not names alone.
+The helper describes declared T; it introduces no dynamic object dispatch or payload
+erasure. See [the descriptor contract](type-inspection.md) for scope and lifetime.

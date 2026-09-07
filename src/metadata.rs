@@ -23,6 +23,8 @@ pub enum Type {
     Error,
     /// One explicitly erased, complete value; no reference identity or allocation policy.
     Value,
+    /// Opaque read-only metadata descriptor, with no native address or payload storage.
+    RuntimeTypeHandle,
     Named(String),
     /// An explicit source-module scope, checked and bound during preparation.
     Scoped {
@@ -63,6 +65,7 @@ impl Type {
             "String" | "string" | "System.String" => Self::String,
             "Error" | "System.Error" => Self::Error,
             "Value" | "System.Value" => Self::Value,
+            "RuntimeTypeHandle" | "System.RuntimeTypeHandle" => Self::RuntimeTypeHandle,
             _ => Self::Named(name.into()),
         }
     }
@@ -87,6 +90,7 @@ impl Type {
             Self::String => Some("System.String"),
             Self::Error => Some("System.Error"),
             Self::Value => Some("System.Value"),
+            Self::RuntimeTypeHandle => Some("System.RuntimeTypeHandle"),
             Self::Named(name)
             | Self::Constructed {
                 definition: name, ..
@@ -116,6 +120,7 @@ impl Type {
                 | Self::String
                 | Self::Error
                 | Self::Value
+                | Self::RuntimeTypeHandle
         )
     }
 }
@@ -543,6 +548,9 @@ pub enum Instruction {
     Construct(FunctionRef),
     #[serde(rename = "value.pack")]
     PackValue(Type),
+    /// CLI-shaped type-token acquisition; method and field tokens are not supported.
+    #[serde(rename = "ldtoken")]
+    LoadTypeToken(Type),
     #[serde(rename = "value.is")]
     IsValue(Type),
     #[serde(rename = "value.unpack")]
@@ -781,6 +789,7 @@ impl Function {
                     }
                 }
                 Instruction::New(ty)
+                | Instruction::LoadTypeToken(ty)
                 | Instruction::PackValue(ty)
                 | Instruction::IsValue(ty)
                 | Instruction::UnpackValue(ty)

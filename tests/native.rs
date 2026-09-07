@@ -23,7 +23,7 @@ fn methodimpl_internalcall_round_trips_as_clr_flag() {
             .iter()
             .filter(|f| f.impl_flags == INTERNAL_CALL)
             .count(),
-        10
+        14
     );
 }
 
@@ -31,6 +31,8 @@ fn methodimpl_internalcall_round_trips_as_clr_flag() {
 fn native_registry_checks_full_signature_and_implementation_shape() {
     for declaration in [
         ".function Unknown() -> Void\n.methodimpl InternalCall",
+        ".function neoCLR.Runtime.TypeName(Int32) -> String\n.methodimpl InternalCall",
+        ".function neoCLR.Runtime.TypeName(System.RuntimeTypeHandle) -> Int32\n.methodimpl InternalCall",
         ".function neoCLR.Runtime.WriteLine(int32) -> Void\n.methodimpl InternalCall",
         ".function neoCLR.Runtime.WriteLine(string) -> Int32\n.methodimpl InternalCall",
         ".function neoCLR.Runtime.WriteLine(string) -> Void\n.methodimpl InternalCall\nldvoid\nret",

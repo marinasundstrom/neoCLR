@@ -212,6 +212,7 @@ normalization; other checks use exact type equality. See [integer storage](integ
 | `call Name(T0, …, Tn)` | `P0,…,Pn → R` | Call declared IL or InternalCall function |
 | `ret` | `R → caller` | Return exactly one value; no extra stack items |
 | `newobj Type` | `F0,…,Fn → Type` | Construct a closed record value in substituted field declaration order |
+| `ldtoken T` | `→ RuntimeTypeHandle` | Read-only closed type token; type operands only; see [type inspection](type-inspection.md) |
 | `value.pack T` | `T → System.Value` | Explicit type erasure preserving exact payload identity |
 | `value.is T` | `System.Value → Boolean` | Exact payload type test; no payload on failure |
 | `value.unpack T` | `System.Value → T` | Checked extraction; mismatch Faults; see [value storage](value-storage.md) |
@@ -245,6 +246,7 @@ visible during Preview 1 review.
 | --- | --- | --- |
 | CLI-aligned | `ldc.*`, `ldarg`, `starg`, `ldloc`, `stloc`, arithmetic, comparisons, branches, `call`, `ret`, `newobj`, field access, conversions, `sizeof`, `alignof`, indirect memory access, `cpobj`, `initobj`, `cpblk`, `initblk` | Familiar CLI concepts with neoCLR's documented typed stack and fault rules |
 | neoCLR explicit memory | `localloc`, `heap.alloc`, `heap.free`, `ptr.null`, `ptr.cast`, `ptr.add`, `ptr.fromint`, `ldflda` | Explicit allocation, address and lifetime capabilities |
+| CLI-shaped type tokens | `ldtoken` | Type-only subset; owned metadata handle, not a native pointer |
 | neoCLR value storage | `value.pack`, `value.is`, `value.unpack` | Visible erased storage; never implicit boxing |
 
 The status labels describe the current prototype, not a promise that every backend

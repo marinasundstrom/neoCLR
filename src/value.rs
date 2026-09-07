@@ -22,6 +22,8 @@ pub enum Value {
     Error(String),
     /// Interpreter storage for explicit erasure, not a guest heap reference.
     Erased(Box<Value>),
+    /// Owned metadata snapshot, not an arbitrary-value container or native pointer.
+    RuntimeTypeHandle(Box<crate::TypeDescriptor>),
     Object {
         ty: Type,
         fields: Vec<Value>,
@@ -80,6 +82,7 @@ impl Value {
             Self::String(_) => Type::String,
             Self::Error(_) => Type::Error,
             Self::Erased(_) => Type::Value,
+            Self::RuntimeTypeHandle(_) => Type::RuntimeTypeHandle,
             Self::Object { ty, .. } => ty.clone(),
             Self::Pointer(pointer) => Type::Ptr(Box::new(pointer.target.clone())),
             Self::Reference { target, .. } => Type::Ref(Box::new(target.clone())),

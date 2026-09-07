@@ -216,6 +216,7 @@ fn effect(module: &Module, op: &Op, arity: usize) -> Result<(usize, usize), Faul
         | Void
         | Arg(_)
         | Load(_)
+        | LoadTypeToken(_)
         | SizeOf(_)
         | AlignOf(_)
         | NullPointer(_)
@@ -423,6 +424,7 @@ fn typed_effect(
             }
             Result::Ok(vec![loaded(&callee.returns)])
         }
+        LoadTypeToken(_) => one(Type::RuntimeTypeHandle),
         PackValue(ty) => {
             stored(&values[0], ty)?;
             one(Type::Value)

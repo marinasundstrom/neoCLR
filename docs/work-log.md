@@ -2197,3 +2197,26 @@ case names with equal payload types, Byte/Void storage, untouched/uninitialized 
 outputs on mismatch, cleared pointer outputs, invalid output/source addresses,
 alias mutation and access after frame release. Formatting, clippy with warnings
 denied and diff checks pass on macOS ARM64.
+
+## Minimal guest read-only type inspection
+
+Added type-only ldtoken, an opaque System.RuntimeTypeHandle and ordinary System.Type
+members for canonical identity comparison, names, generic argument counts and indexed
+argument inspection. System.TypeOf<T>.Of describes a value's declared T without boxing
+or System.Value, including Byte, Void and pointer signatures. Four validated InternalCall
+helpers use owned descriptors from the existing host metadata model. TypeInspection is
+an explicit backend service; no native handle layout or JIT/AOT implementation is implied.
+
+Handles survive execution/program teardown as owned metadata snapshots. Host re-import
+is rejected, including inside records or erased values. Tokens obey existing accessibility,
+module references, generic arity and closed-type rules. No reflective invocation, private
+member bypass, dynamic object dispatch or general reflection hierarchy was introduced.
+Added a runnable sample, source/artifact walkthrough coverage, opcode documentation and
+precise identity/lifetime/declared-type limits. Guest inspection closes that feature gap;
+exact-release toolchain/platform validation remains outstanding.
+
+Validation: ran the complete 470-test suite. It exposed two outdated runtime-import
+counts and a malformed new visibility fixture; corrected those, and all affected suites
+pass on rerun. Other full-suite targets passed. The sample verifies and executes with
+expected output. Formatting, clippy with warnings denied and diff checks pass on macOS
+ARM64. A subsequent release validation must run against the final release commit.

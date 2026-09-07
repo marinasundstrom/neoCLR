@@ -94,6 +94,13 @@ fn walkthrough_sources_and_artifacts_have_the_documented_outputs_and_exits() {
                 ),
             ],
         ),
+        (
+            "type_inspection",
+            vec![(
+                b"",
+                "System.Int32\nBox\n1\nSystem.Int32\nSame type\n=> Void\n".into(),
+            )],
+        ),
         ("array_bounds", vec![]),
         ("fault_trace", vec![]),
     ];

@@ -1,0 +1,12 @@
+.function neoCLR.Runtime.TypeName(System.RuntimeTypeHandle type) -> String
+    .methodimpl InternalCall
+.end
+.function neoCLR.Runtime.TypeEquals(System.RuntimeTypeHandle left, System.RuntimeTypeHandle right) -> Boolean
+    .methodimpl InternalCall
+.end
+.function neoCLR.Runtime.TypeArgumentCount(System.RuntimeTypeHandle type) -> Int32
+    .methodimpl InternalCall
+.end
+.function neoCLR.Runtime.TypeArgument(System.RuntimeTypeHandle type, Int32 index) -> System.RuntimeTypeHandle
+    .methodimpl InternalCall
+.end

@@ -509,7 +509,8 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                         crate::memory::layout(module, ty)?;
                     }
                 }
-                Op::PackValue(ty)
+                Op::LoadTypeToken(ty)
+                | Op::PackValue(ty)
                 | Op::IsValue(ty)
                 | Op::UnpackValue(ty)
                 | Op::NullPointer(ty)
@@ -1043,6 +1044,11 @@ fn interpret_frames(
                     if let Some(target) = targets.get(index as u32 as usize) {
                         frame.pc = *target;
                     }
+                }
+                Op::LoadTypeToken(ty) => {
+                    frame.stack.push(Value::RuntimeTypeHandle(Box::new(
+                        crate::type_identity::describe(module, ty)?,
+                    )));
                 }
                 Op::PackValue(ty) => {
                     let value = frame.pop()?.erase(ty)?;

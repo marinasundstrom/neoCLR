@@ -35,7 +35,7 @@ may remain unnamed; neoCLR is sufficient as the runtime codename for the preview
 | Ordinary unions | Carrier/variant convention sufficient for Option<T> and Result<T,TError>, including Void, nested carriers, and Result<T,T> | Implemented: ordinary System carriers, native boundaries, samples and bounded erased host input |
 | No union-specific IL | Library, samples, native result construction and host inputs use ordinary types; remove special union operations and encodings | Implemented in format 4; old artifacts require reassembly |
 | Minimal library and console | Useful Int32/String/Error APIs; console input/output; EOF distinct from input failure; an interactive program | Implemented using raw byte input and immediate line output; `ReadByte` uses the ordinary nested Result/Option boundary. General ReadLine is not required |
-| Minimal reflection | Obtain a System.Type-style descriptor from a type token or value, compare identity, read its name, inspect closed generic arguments | Existing host type identities are groundwork; guest read-only type inspection is not implemented |
+| Minimal reflection | Obtain a System.Type-style descriptor from a type token or value, compare identity, read its name, inspect closed generic arguments | Implemented via type-only ldtoken, System.Type and declared-type System.TypeOf<T>.Of; no dynamic object dispatch |
 | Memory and arrays | Explicit pointers/allocation/free, record storage, small usable array/buffer example, documented lifetime and copy rules | Implemented; native-layout Array<T> descriptors are sufficient. No promise of general owned arrays or automatic cleanup |
 | Errors and diagnostics | Recoverable failures through Result; terminal Faults with owned logical stack frames shown by CLI/host | All six reviewed library Result APIs use ordinary typed errors. Source-line maps and guest StackTrace classes are not required for Preview 1 |
 | Embedding and native boundary | One runnable embedding example and one supported scalar/pointer native interop example | Implemented experimental Rust hosting and P/Invoke subset; validate the published examples and platform requirements |
@@ -75,7 +75,7 @@ and compatibility with existing .NET tooling are later work, not achieved by usi
    native/host adapters, samples and tests use ordinary types and calls. Format 4 removes
    all six special instructions and Option/Result type/value dispatch. Older artifacts
    are rejected before decoding; reassemble source.
-5. **Add minimal read-only type inspection.** Expose type identity, names and closed
+5. **Minimal read-only type inspection — implemented.** Expose type identity, names and closed
    generic arguments through a small System.Type-style API. Specify descriptor lifetime
    and identity scope. Inspection grants no invocation, construction or mutation rights.
    Use existing metadata; do not introduce a second type model or reflection-dependent
@@ -85,14 +85,14 @@ and compatibility with existing .NET tooling are later work, not achieved by usi
    Fix failures and contradictions before adding more features.
 
 The interpreter's carrier-storage decision and limits are recorded in
-[value storage](value-storage.md). Minimal guest reflection and
-release validation remain open. The
+[value storage](value-storage.md). Minimal guest reflection is [implemented](type-inspection.md);
+release validation remains open. The
 prototype is not evidence of a settled native ABI or a publication date.
 
 The [runnable walkthrough](preview-1-walkthrough.md) now tests source/artifact execution
 for console calculation, ordinary unions, array loops, file summaries, borrowed pointer
-carriers and deliberate Faults. It does not close the guest-reflection or remote
-platform-validation gates.
+carriers and deliberate Faults. Type inspection now joins the walkthrough; exact-release and remote
+platform-validation gates remain open.
 
 ## Required demonstrations
 
@@ -124,7 +124,7 @@ not justify expanding Preview 1 into streams, filesystem abstractions or network
 - [x] The ordinary constructor/carrier milestones above are implemented and tested.
 - [x] No special union instructions or Option/Result runtime categories remain; final
       samples and library code execute through ordinary metadata and IL operations.
-- [ ] Minimal guest type inspection is implemented without dynamic invocation, reflective
+- [x] Minimal guest type inspection is implemented without dynamic invocation, reflective
       construction, field mutation, or an accessibility bypass.
 - [ ] All required demonstrations run from source and, where applicable, assembled artifacts.
 - [ ] `cargo fmt --check`, `cargo clippy --locked --all-targets -- -D warnings`, and
@@ -176,7 +176,7 @@ Include read-only type inspection because it makes the platform's type model obs
 and demonstrates that primitives and records share that model. The required behavior is
 obtaining a descriptor for a statically named type and for a value, comparing canonical
 identity, reading a display/name representation, and inspecting closed generic arguments.
-Exact method names and handle encoding are implementation choices to settle in that slice.
+The initial API and opaque handle contract are documented in [type inspection](type-inspection.md).
 
 Reflection should describe neoCLR's own type and execution model. Familiar System.Type
 concepts are a starting point, not a requirement to reproduce the .NET reflection object

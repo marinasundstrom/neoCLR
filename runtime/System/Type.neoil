@@ -1,0 +1,52 @@
+.type System.Type
+    .field private Handle System.RuntimeTypeHandle
+    .method static GetTypeFromHandle(System.RuntimeTypeHandle handle) -> System.Type
+        ldarg handle
+        newobj System.Type
+        ret
+    .end
+    .property instance Name() -> String
+        .get instance System.Type::get_Name()
+    .end
+    .method instance get_Name() -> String
+        ldarg this
+        ldfld 0
+        call neoCLR.Runtime.TypeName(System.RuntimeTypeHandle)
+        ret
+    .end
+    .property instance GenericArgumentCount() -> Int32
+        .get instance System.Type::get_GenericArgumentCount()
+    .end
+    .method instance get_GenericArgumentCount() -> Int32
+        ldarg this
+        ldfld 0
+        call neoCLR.Runtime.TypeArgumentCount(System.RuntimeTypeHandle)
+        ret
+    .end
+    .method instance GetGenericArgument(Int32 index) -> System.Type
+        ldarg this
+        ldfld 0
+        ldarg index
+        call neoCLR.Runtime.TypeArgument(System.RuntimeTypeHandle,Int32)
+        call System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)
+        ret
+    .end
+    .method instance Equals(System.Type other) -> Boolean
+        ldarg this
+        ldfld 0
+        ldarg other
+        ldfld 0
+        call neoCLR.Runtime.TypeEquals(System.RuntimeTypeHandle,System.RuntimeTypeHandle)
+        ret
+    .end
+.end
+
+; Describes the declared T, including Byte/Void, without erasing the value.
+; There is no subtype or dynamic-object dispatch implied by this helper.
+.type System.TypeOf<T>
+    .method static Of(T value) -> System.Type
+        ldtoken T
+        call System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)
+        ret
+    .end
+.end

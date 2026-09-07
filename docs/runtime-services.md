@@ -29,6 +29,8 @@ Duplicate entries in the supplied service set have no additional effect.
 
 | Service | Direct uses |
 | --- | --- |
+| TypeInspection | Type-only ldtoken and validated TypeName/TypeEquals/TypeArgumentCount/TypeArgument InternalCalls |
+| ValueStorage | Explicit value.pack/value.is/value.unpack and current erased native return boundaries |
 | NativeAllocation | heap.alloc and heap.free |
 | FrameAllocation | localloc, including the frame-lifetime release contract |
 | PointerMemory | allocation/free tracking, ptr.fromint, ptr.add, ldflda, typed/indirect memory loads and stores, object/block copy and initialization |

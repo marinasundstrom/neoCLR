@@ -42,3 +42,6 @@
 .include "System/Text/Utf8SliceError.neoil"
 .include "System/IO/ConsoleReadError.neoil"
 .include "System/IO/FileReadError.neoil"
+.include "System/RuntimeTypeHandle.neoil"
+.include "System/Type.neoil"
+.include "neoCLR/Runtime/TypeInspection.neoil"

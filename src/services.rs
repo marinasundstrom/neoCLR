@@ -19,6 +19,7 @@ pub enum RuntimeService {
     FileInput,
     ConsoleInput,
     ValueStorage,
+    TypeInspection,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -45,6 +46,10 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
     }
     if function.is_internal_call() {
         let service = match crate::native::bind(function)? {
+            crate::native::Binding::TypeName
+            | crate::native::Binding::TypeEquals
+            | crate::native::Binding::TypeArgumentCount
+            | crate::native::Binding::TypeArgument => RuntimeService::TypeInspection,
             crate::native::Binding::ConsoleReadByte => RuntimeService::ConsoleInput,
             crate::native::Binding::ReadAllText => RuntimeService::FileInput,
             crate::native::Binding::ErrorFromMessage | crate::native::Binding::ErrorMessage => {
@@ -91,6 +96,7 @@ fn instruction_services(op: &Op) -> &'static [RuntimeService] {
         Op::Allocate(..) | Op::Free => &[NativeAllocation, PointerMemory],
         Op::AllocateLocal => &[FrameAllocation, PointerMemory],
         Op::PackValue(..) | Op::IsValue(..) | Op::UnpackValue(..) => &[ValueStorage],
+        Op::LoadTypeToken(..) => &[TypeInspection],
         Op::PointerFromInt(..)
         | Op::PointerAdd
         | Op::FieldAddress(..)
