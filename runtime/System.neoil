@@ -244,6 +244,10 @@
 
 ; Explicit native buffer descriptor. Copies alias Data; Free is a caller obligation.
 .type System.Array<T>
+    .property instance Item(Int32) -> T
+        .get instance System.Array<T>::Get(Int32)
+        .set instance System.Array<T>::Set(Int32,T)
+    .end
     .property instance Length() -> Int32
         .get instance System.Array<T>::get_Length()
     .end

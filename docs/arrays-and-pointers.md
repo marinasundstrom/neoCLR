@@ -14,6 +14,8 @@ the distinction neoCLR intends to remove.
 
 System.Array<T> is an ordinary generic record in the platform-written System library:
 Data is T* and Length is Int32. It describes separately allocated native storage.
+The ordinary indexed `Item(Int32) -> T` property maps to `Get` and `Set`; it adds no
+implicit bounds, allocation or ownership behavior.
 There is no new array signature category, opcode, intrinsic member dispatch, implicit
 GC, or reference counting. This subset intentionally differs from the owned-array
 proposal below and from a .NET managed array.
@@ -21,7 +23,7 @@ proposal below and from a .NET managed array.
 | Member | Contract |
 | --- | --- |
 | static Allocate(Int32 length, T initialValue) -> System.Array<T> | Explicitly allocate and initialize each element by copying the supplied value |
-| instance get_Length() -> Int32 | Read descriptor length; ordinary method, no property metadata yet |
+| instance get_Length() -> Int32 | Read descriptor length; exposed through the ordinary Length property |
 | instance Get(Int32 index) -> T | Bounds-check and return an element value |
 | instance Set(Int32 index, T value) -> Void | Bounds-check and write an element |
 | instance GetElementAddress(Int32 index) -> T* | Bounds-check and compute its raw address using checked native-integer arithmetic |
