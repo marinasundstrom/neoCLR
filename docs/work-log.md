@@ -1885,6 +1885,10 @@ and destruction are the default VM contract. Reference counting, garbage collect
 arenas and ownership analysis are optional abstractions that languages may layer on
 top and lower explicitly.
 
+Public positioning was clarified: neoCLR is managed and type-safe, but intentionally
+low-level. Typed pointers, explicit memory access and native calls are first-class
+escape hatches; language-level ergonomics remain optional layers above the VM.
+
 Recorded the native-lowering requirement: typed stack effects, explicit control
 flow and memory operations form a portable IL subset that interpreters, JITs and
 NativeAOT backends must share. Allocation, I/O, provenance checks, interrupts and

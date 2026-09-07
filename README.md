@@ -1,5 +1,11 @@
 # neoCLR
 
+neoCLR is a managed, type-safe virtual machine with an intentionally low-level
+instruction set. It provides explicit memory access, typed pointers, native calls,
+and allocation controls when a program needs them. It is a runtime platform rather
+than a high-level language: language authors may build safer or more ergonomic
+abstractions above the same capabilities.
+
 neoCLR is the codename for an experimental runtime for an unnamed, .NET-inspired
 platform. This repository contains a small standalone Rust interpreter, a neoIL
 assembler, a prototype metadata format, and executable samples. It does not need

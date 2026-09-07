@@ -12,6 +12,10 @@ reference count, garbage-collection root, or destructor. Higher-level languages 
 hide those details behind `Ref<T>`, ownership analysis, arenas, or garbage collection,
 but their generated IL must still make the selected policy explicit.
 
+This makes neoCLR managed without making it high-level. The VM validates types,
+signatures, layouts and pointer operations, while explicitly permitting programs
+and native integrations to address memory when their contract requires it.
+
 ## Current priority
 
 Focus on heap allocation and executable pointers. Defer reference counting, GC,
