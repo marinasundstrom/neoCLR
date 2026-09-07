@@ -199,7 +199,9 @@ Console output is collected and emitted by the CLI only on successful completion
 
 See [semantics](docs/semantics.md), [assembler and opcodes](docs/neoil.md),
 [arrays and pointers proposal](docs/arrays-and-pointers.md), and
-[migration and roadmap](docs/roadmap.md). Work and validation are recorded in
+[migration and roadmap](docs/roadmap.md). Candidate high-level frontends are a modified
+C# dialect or a Raven subset; existing .NET code migration follows the necessary runtime
+and OOP foundations. Work and validation are recorded in
 [the work log](docs/work-log.md).
 
 ## Development

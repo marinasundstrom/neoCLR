@@ -1324,3 +1324,13 @@ features follow these fundamentals. No array implementation is claimed in this s
 Validation: all 330 integration tests pass on macOS ARM64; formatting, clippy with
 warnings denied, and diff checks pass. The sample reports Packet sizes 16/24 and offsets
 [0,4,8]/[0,8,16] for its two explicit descriptors. Linux and Windows remain for CI.
+
+## 2026-09-07 — Candidate language frontends and migration order
+
+Recorded modified C# or a subset of Raven as candidate neoCLR compiler frontends,
+without selecting an implementation. The initial compiler targets small programs and
+the same metadata/IL as the assembler, then enables incremental runtime-library authoring.
+Extensive OOP and broad .NET compatibility are not prerequisites for that subset.
+Existing .NET source migration follows the OOP/runtime features those programs require,
+with explicit adaptations for neoCLR semantics. Updated the roadmap, architecture, and
+README. Documentation-only change; diff checks pass, with no runtime changes or tests needed.

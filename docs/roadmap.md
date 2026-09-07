@@ -65,6 +65,32 @@ rich formatting can follow the core programs. [Explicit target layout](target-la
 now separates storage calculations from the host. This does not require starting native
 code generation before the interpreter/library demonstration is coherent.
 
+## Candidate high-level compiler targets
+
+A modified C# dialect or a subset of Raven are candidate frontends for neoCLR. No
+language or compiler implementation is selected yet. The first frontend should compile
+small programs against the implemented platform subset, producing the same metadata/IL
+as the assembler. It need not wait for extensive OOP, a complete runtime library, or
+compatibility with arbitrary existing .NET programs.
+
+Start with primitive values, free/static functions, locals, control flow, calls, and
+explicit Error/Fault behavior; include strings and arrays as their core contracts become
+available. Match compiler-produced programs against equivalent handwritten IL samples.
+Unsupported language features should produce clear diagnostics. The frontend must
+respect neoCLR's real Void value, value semantics, explicit allocation, and Result/Option
+contracts rather than silently inheriting incompatible source-platform behavior.
+
+Use this frontend to implement a few runtime-library functions and types incrementally,
+keeping the assembler available as the low-level authoring and validation tool. Compiler
+self-hosting and a broad language feature set are not prerequisites.
+
+Existing .NET code migration is a later milestone, after the relevant OOP and runtime
+features exist. Familiar syntax and APIs help that future path but do not establish
+semantic or binary compatibility. Select a real source library then, identify its
+required features, and make every necessary semantic adaptation explicit. Preserve the
+migration principles below without letting broad compatibility delay the initial
+runnable platform and language subset.
+
 ## Strategy review and verifier foundation
 
 Following the strategy review, the first [verifier pass](verification.md) is implemented.

@@ -198,8 +198,10 @@ without embedding the interpreter.
 2. Specify invocation, target layout, failure, and runtime-service boundaries. Build
    a minimal embedding experiment using the interpreter, without freezing a broad ABI.
    Perform a small binary metadata/read-back experiment to test tooling assumptions.
-3. Develop the future language compiler as another producer of the same metadata/IL.
-   Migrate a few library functions/types incrementally; compiler self-hosting can wait.
+3. Develop a modified C# or Raven-subset frontend as another producer of the same
+   metadata/IL; the choice remains open. Target small programs and migrate a few runtime-
+   library functions/types incrementally. Compiler self-hosting can wait. Existing .NET
+   code migration follows later, once its required OOP and runtime features are available.
 4. Run a deliberately small native AOT experiment: one executable printing HelloWorld,
    and one exported scalar function invoked by a C host. State supported instructions,
    architectures, runtime dependencies, and generic roots. Use the same semantic tests
