@@ -5,6 +5,14 @@ and instruction representation, and executed by neoCLR. Host Rust implements the
 interpreter and unavoidable bootstrap services; it should not become the BCL's
 implementation language by accident.
 
+For new features, first try composing existing IL operations. If that fails, identify
+whether the gap is a platform fundamental or an unavoidable host operation. An IL
+wrapper alone does not make host-implemented policy a platform-written implementation.
+Keep temporary bootstrap helpers explicit and describe what is needed to replace them.
+In particular, the current whole-file text helper is a bounded demonstration, not the
+foundation of a permanent Stream API. General I/O abstractions should follow concrete
+needs and the primitives required to implement them in platform code.
+
 [System.neoil](../runtime/System.neoil) currently provides twenty-two platform-written methods and nine native declarations:
 
 - `System.IO.File` provides bounded ReadAllText; see [file input](file-input.md).

@@ -1464,3 +1464,14 @@ more robust basic library; the file experiment does not expand that scope.
 Validation: all 353 integration tests pass on macOS ARM64; formatting, clippy with
 warnings denied, and diff checks pass. The CLI sample verifies and prints 42,
 InvalidInt32, and File input handled, then returns Void. Linux and Windows remain for CI.
+
+## 2026-09-07 — Establish a fundamentals-first implementation method
+
+Recorded the user's emphasis on avoiding premature primitives and library abstractions.
+Each slice should start from a small program, identify a demonstrated gap, separate
+VM fundamentals from library policy and host operations, and validate the resulting
+contract. Clarified that IL wrappers alone do not move policy into platform code and
+that bootstrap helpers are not automatically permanent runtime services. Console I/O
+remains next, without requiring a Stream hierarchy or general I/O framework.
+
+Validation: documentation-only change; diff checks pass. No runtime behavior changed.

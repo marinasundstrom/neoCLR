@@ -51,6 +51,23 @@ prerequisite: a narrow host integration plus platform-written library code can p
 a useful end-to-end demonstration. Select implementation slices by the applications
 they enable, while keeping their contracts usable by future compilers and backends.
 
+Use the following implementation method for each slice:
+
+1. Select a small executable program and identify what the existing IL and library
+   cannot express. Prefer composing existing capabilities when they suffice.
+2. Separate a missing execution or metadata fundamental from library policy and an
+   operation that requires the host. Extend the appropriate layer only as needed.
+3. Implement library logic in platform IL, using explicit host bindings for the
+   necessary external operations. Record temporary bootstrap helpers and the missing
+   fundamentals that would let their logic move into platform code.
+4. Validate the contract with the runnable program and focused failure cases, document
+   it, and commit the bounded slice. Let demonstrated needs justify later abstractions.
+
+A Stream-style API, general I/O hierarchy, or collection of new runtime intrinsics is
+not a prerequisite for console I/O. Do not infer that every familiar library method
+needs its own permanent VM service. The goal is enough fundamentals to implement useful
+libraries, not merely a growing set of host-implemented methods behind IL wrappers.
+
 The immediate demonstration set should include:
 
 - HelloWorld, arithmetic, branches, free functions, and explicit pointer allocation.
@@ -82,6 +99,11 @@ external integrations. Define line input, EOF as ordinary absence, recoverable i
 errors, and prompt/output visibility so a small interactive application can read,
 compute, report, and continue. The file-input demonstration below is a completed
 bounded experiment, not a reason to move on to networking.
+
+First identify the minimal host input/output contract and how platform code composes
+it. Resolve EOF, ownership of returned data, and output visibility for that small
+contract; defer general streams, buffering frameworks, and async abstractions. This
+is an implementation step, not a commitment to a complete console or I/O API design.
 
 ## Demonstrations and later external capabilities
 
