@@ -1269,3 +1269,33 @@ System.Diagnostics.StackTrace/StackFrame types. Faults remain unrecoverable runt
 errors. The proposal separates current capture from Fault-time capture and records
 identity, lifetime, bounds, and backend mapping requirements. No stack-trace implementation
 is claimed in this slice.
+
+## 2026-09-07 — Owned Fault stack snapshots
+
+Added optional StackTrace snapshots to execution Faults with owned StackFrame entries
+and explicit IL instruction locations. Frames retain selected module/revision/member
+identity, closed owner, parameter signature, and method name, innermost first. Caller
+frames retain call sites while cancellation and instruction exhaustion identify the
+next instruction. Formatting includes the full captured chain after program teardown.
+
+Centralized capture around interpreter execution, including instruction failures,
+fallthrough, cancellation, and resource limits. Early execution rejection records the
+requested root at instruction zero. Loader, verifier, entry selection, and host input
+faults have no invented execution trace. Native-boundary faults show guest callers;
+foreign frames and native unwinding are not invented.
+
+Capture keeps at most 64 frames and marks truncation. Frame-vector reservation is
+fallible, but metadata cloning still uses ordinary Rust allocation; this does not promise
+diagnostics after catastrophic host OOM or native process failure. Snapshots retain no
+arguments, locals, guest allocations, or interpreter frame pointers. Rust Fault literals
+now require stack_trace; guest metadata/IL and value semantics remain unchanged.
+
+Added seven tests for nested ownership/call sites, generic binding identities,
+truncation, execution limits, fallthrough, early cancellation, absent non-execution
+traces, and native boundaries. Added IL/Rust samples and updated the diagnostic roadmap.
+Guest debug-source mappings and System.Diagnostics.StackTrace/StackFrame remain pending.
+
+Validation: all 324 integration tests pass on macOS ARM64; focused trace tests were
+repeated after a formatting refinement. Formatting, clippy with warnings denied, and
+diff checks pass. The sample prints Validate -> Process -> Main after dropping its
+loaded program. Linux and Windows remain for CI.

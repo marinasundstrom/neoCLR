@@ -152,8 +152,9 @@ of the contract. Shared tests must distinguish these categories explicitly.
 
 Debug/source mappings and runtime diagnostics should follow module/member identities,
 with backend-specific instruction/native-code locations as additional information.
-[Stack traces](stack-traces.md) are the next diagnostic priority: preserve Fault-time
-logical frames and provide runtime-backed StackTrace/StackFrame library types.
+[Fault stack snapshots](stack-traces.md) now preserve logical interpreter frames and
+closed method identities. Debug-source resolution and runtime-backed StackTrace/StackFrame
+library types remain the next diagnostic work.
 Full debugger integration is later work; retaining a route back to source should not
 be an afterthought of the high-level compiler.
 

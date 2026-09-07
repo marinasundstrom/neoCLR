@@ -38,7 +38,8 @@ Each invocation starts fresh frames, allocations, output, and instruction/frame 
 There is no synthetic guest caller frame or wrapper instruction charge. A Fault does
 not change the handle or program; subsequent invocations can proceed. Instruction
 Faults retain the actual guest function/instruction context. Argument faults identify
-the function without inventing an instruction location.
+the function without inventing an instruction location. Execution Faults also preserve
+[owned stack snapshots](stack-traces.md); input and resolution faults have no guest trace.
 
 The result is the existing Execution, with a precise stored return Value. Return types
 are not restricted to primitive types: a guest function may produce records, Result,

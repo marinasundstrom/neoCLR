@@ -1,0 +1,17 @@
+.module StackTraceDemo
+.revision demo-1
+.entry Main
+
+.function Main() -> Void
+    call Process()
+    ret
+.end
+
+.function Process() -> Void
+    call Validate()
+    ret
+.end
+
+.function Validate() -> Void
+    fault "A runtime invariant failed"
+.end

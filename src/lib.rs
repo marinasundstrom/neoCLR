@@ -13,7 +13,9 @@ mod references;
 pub use reachability::{FunctionImplementation, Reachability, ReachableCall, ReachableFunction};
 mod scope;
 mod services;
+mod stack_trace;
 pub use services::{MissingService, RuntimeService, ServiceUse};
+pub use stack_trace::{CodeLocation, StackFrame, StackTrace};
 mod type_identity;
 pub mod value;
 mod vm;
@@ -31,14 +33,27 @@ pub struct Fault {
     pub message: String,
     pub function: Option<String>,
     pub instruction: Option<usize>,
+    /// Owned execution frames; absent for loading, verification, and host input faults.
+    pub stack_trace: Option<StackTrace>,
 }
 
 impl Fault {
+    pub(crate) fn with_stack_trace(mut self, trace: StackTrace) -> Self {
+        if let Some(frame) = trace.frames.first() {
+            self.function = Some(frame.function.name.clone());
+            let CodeLocation::IlInstruction(index) = frame.location;
+            self.instruction = Some(index);
+        }
+        self.stack_trace = Some(trace);
+        self
+    }
+
     pub(crate) fn new(message: impl Into<String>) -> Self {
         Self {
             message: message.into(),
             function: None,
             instruction: None,
+            stack_trace: None,
         }
     }
 }
@@ -48,6 +63,9 @@ impl std::fmt::Display for Fault {
         write!(f, "Fault: {}", self.message)?;
         if let (Some(function), Some(instruction)) = (&self.function, self.instruction) {
             write!(f, " at {function}:{instruction}")?;
+        }
+        if let Some(trace) = &self.stack_trace {
+            write!(f, "{trace}")?;
         }
         Ok(())
     }

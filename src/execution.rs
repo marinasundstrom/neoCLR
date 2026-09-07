@@ -60,6 +60,7 @@ impl ExecutionOptions {
                 message: "execution cancelled".into(),
                 function: Some(function.into()),
                 instruction: Some(instruction),
+                stack_trace: None,
             });
         }
         Ok(())

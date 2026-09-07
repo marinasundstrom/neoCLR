@@ -38,11 +38,12 @@ language compiler should target the same metadata/IL and enable incremental libr
 migration. Native backend/code-sharing choices remain open; no hidden fallback or
 universal ownership policy is implied.
 
-## Next priority: stack traces
+## Current priority: stack traces
 
 [Fault stack snapshots and runtime StackTrace/StackFrame types](stack-traces.md) are the
-next priority. Capture logical frames before teardown, retain exact method identities,
-and resolve optional debug source locations from guest artifacts. Faults remain
+current priority. Owned interpreter Fault snapshots now preserve exact method identities
+and IL positions before frames are discarded. Next come optional source mappings from
+guest artifacts and the runtime-library capture API. Faults remain
 unrecoverable runtime/system errors; this introduces no guest exception handling.
 The library API will integrate with runtime capture while preserving explicit ownership.
 

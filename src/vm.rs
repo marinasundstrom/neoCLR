@@ -495,6 +495,7 @@ fn check_type_context(ty: &Type, module: &Module, arity: usize, depth: usize) ->
 struct Frame {
     function: std::rc::Rc<crate::metadata::Function>,
     pc: usize,
+    trace_pc: usize,
     args: Vec<Value>,
     locals: Vec<Option<Value>>,
     stack: Vec<Value>,
@@ -507,6 +508,7 @@ impl Frame {
         Self {
             function: std::rc::Rc::new(function),
             pc: 0,
+            trace_pc: 0,
             args,
             locals: vec![None; local_count],
             stack: vec![],
@@ -607,14 +609,37 @@ pub(crate) fn interpret_function(
     function: crate::metadata::Function,
     arguments: Vec<Value>,
     options: ExecutionOptions,
-    mut native_libraries: Option<crate::interop::NativeLibraries>,
+    native_libraries: Option<crate::interop::NativeLibraries>,
 ) -> Result<Execution, Fault> {
-    options.check_cancellation(&function.name, 0)?;
+    let initial_fault = |fault: Fault| {
+        fault.with_stack_trace(crate::StackTrace::capture(std::iter::once((&function, 0))))
+    };
+    options
+        .check_cancellation(&function.name, 0)
+        .map_err(initial_fault)?;
     let limits = options.limits;
     if limits.frames == 0 {
-        return Err(Fault::new("frame limit exceeded"));
+        return Err(initial_fault(Fault::new("frame limit exceeded")));
     }
     let mut frames = vec![Frame::new(function, arguments)];
+    let result = interpret_frames(module, &mut frames, options, native_libraries);
+    result.map_err(|fault: Fault| {
+        fault.with_stack_trace(crate::StackTrace::capture(
+            frames
+                .iter()
+                .rev()
+                .map(|frame| (frame.function.as_ref(), frame.trace_pc)),
+        ))
+    })
+}
+
+fn interpret_frames(
+    module: &Module,
+    frames: &mut Vec<Frame>,
+    options: ExecutionOptions,
+    mut native_libraries: Option<crate::interop::NativeLibraries>,
+) -> Result<Execution, Fault> {
+    let limits = options.limits;
     let mut heap: Vec<Value> = vec![];
     let mut memory = crate::memory::PointerHeap::default();
     let mut output = vec![];
@@ -624,11 +649,13 @@ pub(crate) fn interpret_function(
             .ok_or_else(|| Fault::new("missing frame"))?;
         let function = frame.function.clone();
         let pc = frame.pc;
+        frame.trace_pc = pc;
         options.check_cancellation(&function.name, pc)?;
         let op = function.body.get(pc).ok_or_else(|| Fault {
             message: "function fell through without ret".into(),
             function: Some(function.name.clone()),
             instruction: Some(pc),
+            stack_trace: None,
         })?;
         let access_alignment = match pc.checked_sub(1).and_then(|i| function.body.get(i)) {
             Some(Op::Unaligned(alignment)) => Some(*alignment as usize),
@@ -1185,6 +1212,9 @@ pub(crate) fn interpret_function(
         if frames.iter().any(|f| f.stack.len() > limits.stack) {
             return Err(Fault::new("evaluation stack limit exceeded"));
         }
+    }
+    if let Some(frame) = frames.last_mut() {
+        frame.trace_pc = frame.pc;
     }
     Err(Fault::new("instruction limit exceeded"))
 }

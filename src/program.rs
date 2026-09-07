@@ -253,6 +253,7 @@ impl LoadedFunction<'_> {
             message,
             function: Some(self.function.name.clone()),
             instruction: None,
+            stack_trace: None,
         };
         if receiver.is_some() != self.function.instance {
             return Err(fault(if self.function.instance {

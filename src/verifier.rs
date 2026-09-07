@@ -59,6 +59,7 @@ fn analyze_function(
         message: format!("verification: {message}"),
         function: Some(function.name.clone()),
         instruction: Some(pc),
+        stack_trace: None,
     };
     let arity = function
         .owner

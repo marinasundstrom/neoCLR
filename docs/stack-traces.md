@@ -1,13 +1,46 @@
 # Stack traces and Fault diagnostics
 
-Status: next implementation priority, recorded after the runtime-service planning slice.
-The current Fault stores one function name and instruction index. It does not yet carry
-a stack snapshot, and System.Diagnostics.StackTrace/StackFrame are not implemented.
+Status: owned logical stack snapshots for interpreter execution Faults are implemented.
+The Rust API exposes Fault.stack_trace, StackTrace, StackFrame, and CodeLocation. Guest
+System.Diagnostics.StackTrace/StackFrame and debug-source resolution remain pending.
 
 Faults are unrecoverable runtime and system errors. Guest applications cannot catch or
 resume them. A host receiving a Fault does not imply rollback or recovery from arbitrary
 native failures. Capturing a trace adds diagnostics, not guest exceptions. Recoverable
 application errors continue to use Result.
+
+## Implemented interpreter snapshot
+
+Execution Faults carry an optional owned StackTrace, innermost first. Each frame retains
+a FunctionRef with the selected module/revision/member row, name, closed owner, parameter
+signature, and CodeLocation::IlInstruction index. The snapshot survives dropping the
+loaded program and contains no arguments, locals, interpreter frame pointers, or guest
+allocation handles. Fault Display includes the frames, and the legacy function/instruction
+fields identify the innermost location.
+
+Capture is centralized around interpreter execution, including instruction faults,
+resource limits, fallthrough, and cancellation. Caller frames retain the call instruction,
+not the next instruction after the call. Instruction-budget exhaustion and cancellation
+identify the next instruction to execute. Stack-limit checks identify the active frame's
+last instruction; after a completed return this is the caller's call site. Pre-cancellation
+or a zero execution limit records the requested root at instruction zero. Loading,
+verification, root resolution, entry selection, and invalid input values do not fabricate
+guest stacks.
+
+Capture keeps up to 64 innermost frames and marks truncation explicitly. The frame vector
+uses fallible reservation; failure yields an empty truncated snapshot without replacing
+the original Fault. This bounds frame count, not metadata string bytes. Cloning identity
+strings/types still uses ordinary Rust allocation, so catastrophic host allocation failure
+or native process failure is not guaranteed to yield a trace.
+
+The same snapshot behavior applies in interpreter debug and release builds. There are no
+source files/lines yet, and no fake native frames: native-call failures retain the guest
+call site. Symbols, inlining, and native unwinding remain separate capabilities. Adding
+stack_trace changes Rust Fault struct literals; existing literals need stack_trace: None.
+This experimental API change does not alter guest metadata or IL.
+
+`cargo run --example stack_trace` formats a three-frame Fault after dropping the program.
+`cargo run -- run examples/stack_trace.neoil` demonstrates the CLI's terminal Fault output.
 
 ## Capture first, resolve and format afterward
 
@@ -48,11 +81,11 @@ ownership must be explicit. Do not expose raw interpreter frame pointers or free
 Rust frame/vector layout as a guest ABI. Indexed access provides an initial API without
 requiring reflection or the final collection API first.
 
-## Proposed slices
+## Implementation sequence
 
-1. Add owned logical frame snapshots to interpreter execution Faults, including nested
-   calls, generic identities, cancellation, and resource-limit failures. Keep loader and
-   host-input faults without invented guest stacks. Bound capture and report truncation.
+1. Implemented: owned logical frame snapshots for interpreter execution Faults, including nested
+   calls, generic identities, cancellation, and resource-limit failures. Loader and
+   host-input faults have no invented guest stacks. Capture is bounded and reports truncation.
 2. Add artifact-level debug/source mappings and resolve snapshots for debug applications.
    Keep a method/IL fallback for missing or mismatched symbols.
 3. Add contextual runtime capture and the StackTrace/StackFrame library surface, once the
@@ -62,7 +95,7 @@ requiring reflection or the final collection API first.
    No native unwinding, cross-thread capture, or arbitrary foreign-frame recovery is
    implied by the first interpreter implementation.
 
-All execution Fault paths need review, including failures outside an instruction body.
-Trace collection must not obscure the original Fault; allocation/resource exhaustion
-needs a bounded best-effort diagnostic path. Capturing arguments or local values is
+New execution Fault paths must retain capture coverage, including failures outside an
+instruction body. Trace collection must not obscure the original Fault; further
+allocation/resource-exhaustion hardening remains possible. Capturing arguments or local values is
 outside this initial contract.
