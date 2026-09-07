@@ -583,6 +583,14 @@
         ldvoid
         ret
     .end
+    .method instance .ctor(System.Result.Ok<T> value) -> Void
+        ldarg value
+        value.pack System.Result.Ok<T>
+        newobj System.Result<T,E>
+        starg this
+        ldvoid
+        ret
+    .end
     .property instance IsOk() -> Boolean
         .get instance System.Result<T,E>::get_IsOk()
     .end
@@ -598,9 +606,23 @@
         value.unpack System.Ok<T>
         ret
     .end
+    .method instance GetOkCase() -> System.Result.Ok<T>
+        ldarg this
+        ldfld 0
+        value.unpack System.Result.Ok<T>
+        ret
+    .end
     .method instance .ctor(System.Err<E> value) -> Void
         ldarg value
         value.pack System.Err<E>
+        newobj System.Result<T,E>
+        starg this
+        ldvoid
+        ret
+    .end
+    .method instance .ctor(System.Result.Error<E> value) -> Void
+        ldarg value
+        value.pack System.Result.Error<E>
         newobj System.Result<T,E>
         starg this
         ldvoid
@@ -619,6 +641,12 @@
         ldarg this
         ldfld 0
         value.unpack System.Err<E>
+        ret
+    .end
+    .method instance GetErrorCase() -> System.Result.Error<E>
+        ldarg this
+        ldfld 0
+        value.unpack System.Result.Error<E>
         ret
     .end
 .end

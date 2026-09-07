@@ -120,7 +120,7 @@ fn carrier_execution_does_not_depend_on_markers_or_bootstrap_union_opcodes() {
                 | Instruction::LoadCase(_)
         )));
     }
-    assert_eq!(count, 25);
+    assert_eq!(count, 29);
     let module = assemble(SAMPLE).unwrap();
     let loaded = LoadedProgram::with_library(&module, &library).unwrap();
     loaded.verify().unwrap();
