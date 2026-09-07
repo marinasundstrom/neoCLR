@@ -5,6 +5,13 @@ guest memory model. Rust allocation, borrowing, aliasing, or destruction rules m
 not become guest semantics accidentally. Implementations in another host language
 should be able to preserve the same explicit VM contract.
 
+The base contract is explicit memory management. Allocation location, address
+formation, storage layout, lifetime and destruction are visible capabilities or
+declared runtime services. No plain value silently acquires a heap allocation,
+reference count, garbage-collection root, or destructor. Higher-level languages may
+hide those details behind `Ref<T>`, ownership analysis, arenas, or garbage collection,
+but their generated IL must still make the selected policy explicit.
+
 ## Current priority
 
 Focus on heap allocation and executable pointers. Defer reference counting, GC,

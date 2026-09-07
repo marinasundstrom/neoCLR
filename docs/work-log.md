@@ -1880,6 +1880,11 @@ interrupt state and safepoints, while native calls declare ABI, layout, pointer 
 ownership boundaries. Managed language profiles may restrict these capabilities,
 but the low-level VM does not remove them.
 
+Reaffirmed the main memory theme: explicit allocation, addresses, layouts, lifetimes
+and destruction are the default VM contract. Reference counting, garbage collection,
+arenas and ownership analysis are optional abstractions that languages may layer on
+top and lower explicitly.
+
 Recorded the native-lowering requirement: typed stack effects, explicit control
 flow and memory operations form a portable IL subset that interpreters, JITs and
 NativeAOT backends must share. Allocation, I/O, provenance checks, interrupts and
