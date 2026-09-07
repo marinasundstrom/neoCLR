@@ -90,7 +90,7 @@ pub(crate) fn analyze(
         };
         let mut calls = Vec::new();
         for (instruction, op) in function.body.iter().enumerate() {
-            if let Instruction::Call(target) = op {
+            if let Instruction::Call(target) | Instruction::Construct(target) = op {
                 // Prepared metadata already enforces the declaring module's reference list.
                 // Do not apply the root module's direct-reference list to transitive calls.
                 let callee = crate::vm::resolve(module, target).map_err(|mut fault| {

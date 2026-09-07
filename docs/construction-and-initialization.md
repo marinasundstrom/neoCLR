@@ -1,9 +1,13 @@
 # Construction, mutation, and initialization proposal
 
-Status: proposed contracts for discussion, not implemented or approved semantics.
+Status: future contracts for discussion. The implemented
+[constructor subset](constructors.md) supports invocation and whole-value receiver
+initialization with `starg this`. The broader addressed and partial-initialization
+contracts below remain proposals.
 The [basic verifier](verification.md) is now implemented; this document
 identifies prerequisites for ordinary library types and a future high-level language.
-It does not change current newobj, stfld, receiver, pointer, or ownership behavior.
+The proposals below do not change current aggregate newobj, stfld, pointer, or
+ownership behavior.
 
 ## Separate the contracts
 

@@ -192,6 +192,7 @@ normalization; other checks use exact type equality. See [integer storage](integ
 | `call Name(T0, …, Tn)` | `P0,…,Pn → R` | Call declared IL or InternalCall function |
 | `ret` | `R → caller` | Return exactly one value; no extra stack items |
 | `newobj Type` | `F0,…,Fn → Type` | Construct a closed record value in substituted field declaration order |
+| `newobj instance Type::.ctor(T0, …, Tn)` | `P0,…,Pn → Type` | Invoke an IL constructor with a fresh receiver; see [constructor initialization](constructors.md). Normalized opcode: `newobj.ctor` |
 | `ldfld i` | `Record → T` | Copy field |
 | `stfld i` | `Record,T → Record` | Produce updated record value |
 | `sizeof T` | `→ Int32` | Byte size of supported native layout |

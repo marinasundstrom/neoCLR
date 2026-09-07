@@ -515,6 +515,8 @@ pub enum Instruction {
     Switch(Vec<usize>),
     #[serde(rename = "call")]
     Call(FunctionRef),
+    #[serde(rename = "newobj.ctor")]
+    Construct(FunctionRef),
     #[serde(rename = "ret")]
     Return,
     #[serde(rename = "newobj")]
@@ -747,7 +749,7 @@ impl Function {
         }
         for op in &mut result.body {
             match op {
-                Instruction::Call(target) => {
+                Instruction::Call(target) | Instruction::Construct(target) => {
                     if let Some(owner) = &mut target.owner {
                         *owner = map(owner)?;
                     }

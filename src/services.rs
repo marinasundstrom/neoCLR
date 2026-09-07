@@ -198,6 +198,7 @@ fn instruction_services(op: &Op) -> &'static [RuntimeService] {
         | Op::BranchLessEqualUnsigned(..)
         | Op::Switch(..)
         | Op::Call(..)
+        | Op::Construct(..)
         | Op::Return
         | Op::New(..)
         | Op::Field(..)

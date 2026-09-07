@@ -1521,6 +1521,30 @@ No union instructions or encodings were removed in this documentation slice.
 
 Validation: documentation-only changes; diff checks pass. Runtime tests were not rerun.
 
+## 2026-09-07 — Invoke record constructors with whole-value initialization
+
+Added signature-based `newobj instance Type::.ctor(...)`, normalized to `newobj.ctor`
+in prototype metadata. Constructor references use normal overload binding, generic
+substitution, accessibility, module-reference validation and reachability. Execution
+supplies a fresh receiver slot in an ordinary guest frame and returns the initialized
+owner value when the constructor returns Void. Nonempty receivers require explicit
+whole-value initialization through `starg this`; empty records start complete.
+Verifier dataflow and unverified execution reject early receiver reads and returns
+without initialization. Constructor frames participate in limits and Fault traces.
+
+Added a generic public-constructor/private-field sample and ten integration tests
+covering round trips, overloads, named/indexed slots, control-flow joins, invalid
+storage/returns, empty records, cross-module access, reachability and frame limits.
+Existing aggregate newobj and ordinary value-receiver calls retain their semantics.
+Documented this bounded subset and updated the MVP/roadmap. Field-by-field receiver
+initialization, addressed access, carrier storage, allocation/ownership policy and
+ordinary Option/Result migration remain future work.
+
+Validation: all 396 integration tests pass; formatting, Clippy with warnings denied,
+and diff checks pass. The sample assembled to JSON, passed the typed verifier, and
+ran from that artifact, printing 42 and its construction message before returning
+Void. No push or publication performed.
+
 ## 2026-09-07 — Explicit property metadata and accessor associations
 
 Added optional property records to type metadata, with name, static/instance kind,

@@ -144,6 +144,38 @@ pub(crate) fn record_fields(
         .collect()
 }
 
+pub(crate) fn resolve_constructor(
+    module: &Module,
+    target: &FunctionRef,
+) -> Result<crate::metadata::Function, Fault> {
+    let function = resolve(module, target)?;
+    let owner = target
+        .owner
+        .as_ref()
+        .ok_or_else(|| Fault::new("constructor requires an explicit owner"))?;
+    let name = match owner {
+        Type::Constructed { definition, .. } => definition.as_str(),
+        _ => owner
+            .definition_name()
+            .ok_or_else(|| Fault::new("constructor requires a record owner"))?,
+    };
+    if !target.instance
+        || function.name != format!("{name}..ctor")
+        || function.returns != Type::Void
+        || function.is_internal_call()
+        || function.pinvoke.is_some()
+        || !module
+            .types
+            .iter()
+            .any(|def| def.name == name && def.representation == Representation::Record)
+    {
+        return Err(Fault::new(
+            "newobj constructor requires an instance IL .ctor returning Void on a record type",
+        ));
+    }
+    Ok(function)
+}
+
 pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
     if module.name == "System" {
         crate::references::validate_list(module, &[module])?;
@@ -385,7 +417,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 Op::Load(i) | Op::Store(i) if *i >= function.locals.len() => {
                     return Err(Fault::new("local index outside signature"));
                 }
-                Op::Call(target) => {
+                Op::Call(target) | Op::Construct(target) => {
                     if let Some(owner) = &target.owner {
                         check(owner)?;
                     }
@@ -393,6 +425,9 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                         check(ty)?;
                     }
                     let callee = resolve(module, target)?;
+                    if matches!(op, Op::Construct(_)) {
+                        resolve_constructor(module, target)?;
+                    }
                     crate::access::check_call(module, Some(function), &callee)?;
                 }
                 Op::New(ty) => {
@@ -587,7 +622,8 @@ struct Frame {
     function: std::rc::Rc<crate::metadata::Function>,
     pc: usize,
     trace_pc: usize,
-    args: Vec<Value>,
+    args: Vec<Option<Value>>,
+    constructing: bool,
     locals: Vec<Option<Value>>,
     stack: Vec<Value>,
     allocations: Vec<crate::memory::Pointer>,
@@ -600,7 +636,8 @@ impl Frame {
             function: std::rc::Rc::new(function),
             pc: 0,
             trace_pc: 0,
-            args,
+            args: args.into_iter().map(Some).collect(),
+            constructing: false,
             locals: vec![None; local_count],
             stack: vec![],
             allocations: vec![],
@@ -786,10 +823,15 @@ fn interpret_frames(
                 Op::String(s) => frame.stack.push(Value::String(s.clone())),
                 Op::Void => frame.stack.push(Value::Void),
                 Op::Error(s) => frame.stack.push(Value::Error(s.clone())),
-                Op::Arg(i) => frame.stack.push(frame.args[*i].clone().on_stack()),
+                Op::Arg(i) => frame.stack.push(
+                    frame.args[*i]
+                        .clone()
+                        .ok_or_else(|| Fault::new("read of uninitialized constructor receiver"))?
+                        .on_stack(),
+                ),
                 Op::StoreArg(i) => {
                     let value = frame.pop()?;
-                    frame.args[*i] = value.for_storage(&function.argument_types()[*i])?;
+                    frame.args[*i] = Some(value.for_storage(&function.argument_types()[*i])?);
                 }
                 Op::Load(i) => frame.stack.push(
                     frame.locals[*i]
@@ -943,6 +985,34 @@ fn interpret_frames(
                         frame.pc = *target;
                     }
                 }
+                Op::Construct(target) => {
+                    let callee = resolve_constructor(module, target)?;
+                    crate::access::check_call(module, Some(&function), &callee)?;
+                    let owner = callee
+                        .owner
+                        .clone()
+                        .ok_or_else(|| Fault::new("missing constructor owner"))?;
+                    check_type(&owner, module)?;
+                    let args = frame.args(&callee.parameters)?;
+                    if frames.len() >= limits.frames {
+                        return Err(Fault::new("frame limit exceeded"));
+                    }
+                    let empty = module.instantiated_fields(&owner)?.is_empty();
+                    let mut child = Frame::new(callee, args);
+                    child.constructing = true;
+                    child.args.insert(
+                        0,
+                        if empty {
+                            Some(Value::Object {
+                                ty: owner,
+                                fields: vec![],
+                            })
+                        } else {
+                            None
+                        },
+                    );
+                    frames.push(child);
+                }
                 Op::Call(target) => {
                     let callee = resolve(module, target)?;
                     crate::access::check_call(module, Some(&function), &callee)?;
@@ -981,6 +1051,13 @@ fn interpret_frames(
                     if !frame.stack.is_empty() {
                         return Err(Fault::new("ret requires exactly one value"));
                     }
+                    let value = if frame.constructing {
+                        frame.args[0].take().ok_or_else(|| {
+                            Fault::new("constructor returned without initializing its receiver")
+                        })?
+                    } else {
+                        value
+                    };
                     for pointer in &frame.allocations {
                         memory.release_local(pointer)?;
                     }

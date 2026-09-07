@@ -167,12 +167,13 @@ runnable platform and language subset.
 Following the strategy review, the first [verifier pass](verification.md) is implemented.
 It checks evaluation-stack types, operands, definite local initialization, returns,
 and reachable fallthrough. It is explicit rather than mandatory. Stable member
-identity, reference contracts, and constructor initialization remain foundations
-before addressed mutation and constructor verification.
+identities and whole-value constructor verification are also implemented. Addressed
+access still requires explicit reference and lifetime contracts.
 
 The [construction proposal](construction-and-initialization.md) and
 [addressed-access proposal](addressed-access.md) remain design discussions, not
-implemented receiver/lifetime contracts. A small high-level compiler can eventually
+implemented addressed receiver/lifetime contracts; the [constructor subset](constructors.md)
+is documented separately. A small high-level compiler can eventually
 produce the same metadata/IL as the assembler, enabling incremental runtime-library
 migration without requiring compiler self-hosting.
 
@@ -200,9 +201,10 @@ The next type-system slices should supply the minimal ordinary-type contracts ne
 to model a proper union in code. This is part of the fundamentals, not a dependency
 on extensive OOP or reflection. Stage the work around a small carrier/variant example:
 
-1. Construction that establishes a valid value: distinguish existing .ctor-shaped
-   methods and field-based newobj from a defined constructor invocation and
-   initialization contract. Addressed receiver mutation may be a prerequisite.
+1. Implemented first subset: [constructor invocation](constructors.md) with whole-value
+   receiver initialization, separate from field-based newobj and ordinary calls.
+   Per-field initialization and addressed receiver mutation remain future work;
+   determine what ordinary carrier storage actually requires before expanding this.
 2. Implemented: [property metadata](properties.md) associates a declared property with
    its getter and/or setter methods, validating signatures, owner, and call kind.
    Generic and indexed properties work without new instructions or receiver semantics.

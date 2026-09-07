@@ -153,7 +153,7 @@ pub(crate) fn validate_uses(linked: &Module, source: &Module) -> Result<(), Faul
             Ok(ty.clone())
         })?;
         for instruction in &function.body {
-            if let Instruction::Call(target) = instruction {
+            if let Instruction::Call(target) | Instruction::Construct(target) = instruction {
                 check_call(linked, source, target)?;
             }
         }

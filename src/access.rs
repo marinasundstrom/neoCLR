@@ -248,7 +248,9 @@ pub(crate) fn validate_types(module: &Module) -> Result<(), Fault> {
         attributes(source, &function.custom_attributes)?;
         // A free call can expose a type through its return without spelling it in IL.
         for op in &function.body {
-            if let crate::metadata::Instruction::Call(target) = op {
+            if let crate::metadata::Instruction::Call(target)
+            | crate::metadata::Instruction::Construct(target) = op
+            {
                 check_signature(module, source, &crate::vm::resolve(module, target)?)?;
             }
         }

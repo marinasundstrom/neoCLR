@@ -439,7 +439,11 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                             }
                             Some(serde_json::json!(targets))
                         }
-                        "call" => Some(
+                        "call" | "newobj.ctor" => Some(
+                            serde_json::to_value(parse_function_ref(rest)?)
+                                .map_err(|e| Fault::new(e.to_string()))?,
+                        ),
+                        "newobj" if rest.contains('(') => Some(
                             serde_json::to_value(parse_function_ref(rest)?)
                                 .map_err(|e| Fault::new(e.to_string()))?,
                         ),
@@ -464,7 +468,12 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                             None
                         }
                     };
-                    let mut json = serde_json::json!({"op": word});
+                    let opcode = if word == "newobj" && rest.contains('(') {
+                        "newobj.ctor"
+                    } else {
+                        word
+                    };
+                    let mut json = serde_json::json!({"op": opcode});
                     if let Some(argument) = argument {
                         json["arg"] = argument;
                     }

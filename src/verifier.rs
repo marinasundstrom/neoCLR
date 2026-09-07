@@ -34,12 +34,25 @@ pub fn verify_with_library(module: &Module, library: &Module) -> Result<Verifica
 }
 
 pub(crate) fn analyze(module: &Module) -> Result<Verification, Fault> {
+    let mut constructors = std::collections::HashSet::new();
+    for function in &module.functions {
+        for op in &function.body {
+            if let Op::Construct(target) = op {
+                constructors.insert(crate::vm::resolve_constructor(module, target)?.definition);
+            }
+        }
+    }
     let mut functions = Vec::new();
     for (index, function) in module.functions.iter().enumerate() {
         if function.is_internal_call() || function.pinvoke.is_some() {
             continue;
         }
-        functions.push(analyze_function(module, index, function)?);
+        let mut report = analyze_function(module, index, function, false)?;
+        if constructors.contains(&function.definition) {
+            let construction = analyze_function(module, index, function, true)?;
+            report.maximum_stack = report.maximum_stack.max(construction.maximum_stack);
+        }
+        functions.push(report);
     }
     Ok(Verification { functions })
 }
@@ -48,12 +61,14 @@ pub(crate) fn analyze(module: &Module) -> Result<Verification, Fault> {
 struct State {
     stack: Vec<StackType>,
     initialized: Vec<bool>,
+    receiver_initialized: bool,
 }
 
 fn analyze_function(
     module: &Module,
     index: usize,
     function: &Function,
+    constructing: bool,
 ) -> Result<FunctionVerification, Fault> {
     let fault = |pc, message: &str| Fault {
         message: format!("verification: {message}"),
@@ -70,6 +85,12 @@ fn analyze_function(
     states[0] = Some(State {
         stack: vec![],
         initialized: vec![false; function.locals.len()],
+        receiver_initialized: !constructing
+            || function
+                .owner
+                .as_ref()
+                .and_then(|owner| module.type_definition(owner))
+                .is_some_and(|def| def.fields.is_empty()),
     });
     let mut queue = VecDeque::from([0]);
     let mut maximum_stack = 0;
@@ -89,6 +110,15 @@ fn analyze_function(
         }
         if matches!(op, Op::Load(slot) if !state.initialized[*slot]) {
             return Err(fault(pc, "local is not initialized on every incoming path"));
+        }
+        if constructing && matches!(op, Op::Arg(0) | Op::Return) && !state.receiver_initialized {
+            return Err(fault(
+                pc,
+                "constructor receiver is not initialized on every incoming path",
+            ));
+        }
+        if matches!(op, Op::StoreArg(0)) {
+            state.receiver_initialized = true;
         }
         if let Op::Store(slot) = op {
             state.initialized[*slot] = true;
@@ -141,6 +171,10 @@ fn analyze_function(
                     ));
                 }
                 let mut changed = false;
+                if previous.receiver_initialized && !state.receiver_initialized {
+                    previous.receiver_initialized = false;
+                    changed = true;
+                }
                 for (old, incoming) in previous.initialized.iter_mut().zip(&state.initialized) {
                     if *old && !incoming {
                         *old = false;
@@ -192,6 +226,7 @@ fn effect(module: &Module, op: &Op, arity: usize) -> Result<(usize, usize), Faul
         Dup => (1, 2),
         New(ty) => (crate::vm::record_fields(module, ty, arity)?.len(), 1),
         Call(target) => (target.parameters.len() + usize::from(target.instance), 1),
+        Construct(target) => (target.parameters.len(), 1),
         SetField(_) | PointerAdd | HeapStore | BitAnd | BitOr | BitXor | ShiftLeft | ShiftRight
         | ShiftRightUnsigned | Remainder | RemainderUnsigned | Add | Sub | Mul | AddChecked
         | SubChecked | MulChecked | Divide | AddCheckedUnsigned | SubCheckedUnsigned
@@ -403,6 +438,15 @@ fn typed_effect(
                 stored(value, &ty)?;
             }
             Result::Ok(vec![loaded(&callee.returns)])
+        }
+        Construct(target) => {
+            let callee = crate::vm::resolve_constructor(module, target)?;
+            for (value, ty) in values.iter().zip(&callee.parameters) {
+                stored(value, ty)?;
+            }
+            one(callee
+                .owner
+                .ok_or_else(|| crate::Fault::new("missing constructor owner"))?)
         }
         New(ty) => {
             for (value, field) in values

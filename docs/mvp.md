@@ -26,7 +26,7 @@ may remain unnamed; neoCLR is sufficient as the runtime codename for the preview
 | Build and tooling | Locked source build; assemble, check, verify, and run workflows; clear malformed-input diagnostics | Implemented; fresh-clone and declared toolchain/platform validation remain release gates |
 | Execution fundamentals | Primitive values, free functions, calls/overloads, indexed parameters/locals, control flow, real Void, value copying | Implemented; preserve semantics through remaining changes |
 | Metadata and modules | Explicit types/members/signatures, generic type definitions and closed use, properties/accessors, module references and member identities | Implemented; current JSON is a documented prototype representation |
-| Ordinary type contracts | Public/internal type visibility, public/internal/private members, usable constructors with defined receiver and initialization behavior | Visibility and property associations implemented; constructor invocation/initialization contract remains incomplete |
+| Ordinary type contracts | Public/internal type visibility, public/internal/private members, usable constructors with defined receiver and initialization behavior | Visibility, properties and whole-value constructor initialization implemented; carrier requirements still need proving |
 | Ordinary unions | Carrier/variant convention sufficient for Option<T> and Result<T,TError>, including Void, nested carriers, and Result<T,T> | Marker and generic foundations exist; representation, construction and typed-query contract still need implementation |
 | No union-specific IL | Library, samples, native result construction and host inputs use ordinary types; remove special union operations and encodings | Not done; current some/none/ok/err/is.case/ldcase and special Option/Result handling are bootstrap debt |
 | Minimal library and console | Useful Int32/String/Error APIs; console input/output; EOF distinct from input failure; an interactive program | Implemented using raw byte input and immediate line output; migrate existing bootstrap Result/Option uses. General ReadLine is not required |
@@ -50,8 +50,9 @@ and compatibility with existing .NET tooling are later work, not achieved by usi
 
 1. **Settle the minimum construction and carrier-storage contracts.** Review the existing
    construction/addressed-access proposals against one carrier and its variant types.
-   Decide constructor invocation, where its receiver lives, when it becomes initialized,
-   and how inactive alternatives avoid fabricated/default T values. Keep allocation
+   [Constructor invocation](constructors.md) now supplies a frame-owned receiver slot
+   initialized as a whole. Decide how carrier storage represents inactive alternatives
+   without fabricated/default T values, and whether it needs further initialization operations. Keep allocation
    separate from construction. Do not add a class/struct storage split, implicit boxing,
    mandatory heap allocation, or union-specific VM operations to shortcut the decision.
 2. **Implement the required ordinary operations.** Add only the receiver/addressed access,
@@ -77,7 +78,7 @@ and compatibility with existing .NET tooling are later work, not achieved by usi
    against the final implementation, run the release checks below, and resolve licensing.
    Fix failures and contradictions before adding more features.
 
-The constructor and carrier-storage choice is the main unresolved technical decision.
+Carrier storage and any further initialization requirements are the main unresolved technical decision.
 Do not estimate a publication date until a small end-to-end carrier prototype proves
 that choice. The decision record must explain invalid states, copying, mutation,
 alignment where relevant, and behavior at raw-pointer and trusted host boundaries.
