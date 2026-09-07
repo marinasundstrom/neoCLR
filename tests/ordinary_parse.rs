@@ -13,24 +13,28 @@ fn parse_returns_ordinary_results_for_boundaries_and_invalid_input() {
         .unwrap();
     let is_ok = program
         .resolve_function(
-            &parse_function_ref("instance System.Result<Int32,Error>::get_IsOk()").unwrap(),
+            &parse_function_ref("instance System.Result<Int32,Error>::get_IsOkCase()").unwrap(),
         )
         .unwrap();
     let ok = program
         .resolve_function(
-            &parse_function_ref("instance System.Result<Int32,Error>::GetOk()").unwrap(),
+            &parse_function_ref("instance System.Result<Int32,Error>::GetOkCase()").unwrap(),
         )
         .unwrap();
     let err = program
         .resolve_function(
-            &parse_function_ref("instance System.Result<Int32,Error>::GetErr()").unwrap(),
+            &parse_function_ref("instance System.Result<Int32,Error>::GetErrorCase()").unwrap(),
         )
         .unwrap();
     let ok_value = program
-        .resolve_function(&parse_function_ref("instance System.Ok<Int32>::get_Value()").unwrap())
+        .resolve_function(
+            &parse_function_ref("instance System.Result.Ok<Int32>::get_Value()").unwrap(),
+        )
         .unwrap();
     let err_value = program
-        .resolve_function(&parse_function_ref("instance System.Err<Error>::get_Value()").unwrap())
+        .resolve_function(
+            &parse_function_ref("instance System.Result.Error<Error>::get_Value()").unwrap(),
+        )
         .unwrap();
     for (text, expected) in [
         ("2147483647", Some(i32::MAX)),
