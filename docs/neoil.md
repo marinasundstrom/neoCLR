@@ -230,7 +230,7 @@ normalization; other checks use exact type equality. See [integer storage](integ
 | `ptr.null T` | `→ Ptr<T>` | Actual null address |
 | `ptr.cast T` | `Ptr<U> → Ptr<T>` | Reinterpret target type, preserving address |
 | `ptr.add` | `Ptr<T>,Int32 or IntPtr → Ptr<T>` | Signed byte offset; checked prototype bounds |
-| `ldflda i` | `Ptr<Record> → Ptr<T>` | Address field at zero-based index |
+| `ldflda i` | `Ptr<Record> → Ptr<T>` or `Record& → T&` | Address field at zero-based index; managed path preserves the owner lifetime |
 | `unaligned. n` | `→` | Prefix a supported memory access with alignment 1, 2, or 4 |
 | `ldobj T` | `Ptr<T> → T` | Copy initialized value from native storage |
 | `stobj T` | `Ptr<T>,T →` | Copy value into native storage |
@@ -565,20 +565,22 @@ generic contexts, and the distinction between invocation and metadata inspection
 declarations and optional property/indexer metadata. `.implements I<T>` on an
 ordinary type declares conformance. `InterfaceRef<I>` is a distinct borrowed signature.
 `interface.borrow` is a neoCLR addition; `callvirt` is a CLI-shaped interface-only
-subset. Both report InterfaceDispatch. Neither boxes nor owns a receiver.
+subset. Both report InterfaceDispatch. Neither boxes a receiver; managed I& retains its slot.
 See [interfaces](interfaces.md) for exact matching, copy and lifetime rules.
 
 ## Managed slot references (format 4)
 
-`T&` is an explicit call-scoped, non-owning slot reference. `ldloca index/name` and
+`T&` is an explicit managed slot reference, including locals and checked guest returns. `ldloca index/name` and
 `ldarga index/name` push references to local and by-value argument slots. Existing
 `ldobj T`/`stobj T` accept an exact T& and copy/read or immediately replace its value
 without native layout requirements. The pointer operand path remains separate.
 These are CLI-shaped operations with the [slot-reference restrictions](reference-slots.md).
-SlotReferences is the service for address formation; ldobj/stobj conservatively report
+Managed `ldflda` projects a record field while preserving its root lifetime. Returning
+a reference into the current frame faults; caller-backed reference returns are valid.
+SlotReferences is the service for address formation; ldflda/ldobj/stobj conservatively report
 both SlotReferences and PointerMemory until operand-sensitive service analysis exists.
 
-`interface.borrow I` also accepts a managed Concrete& and yields a call-scoped I&
+`interface.borrow I` also accepts a managed Concrete& and yields a retaining I&
 view. `callvirt` accepts that view and preserves the implementation receiver mode.
 `.method instance byref` declares a managed reference receiver; call operands keep
 the same normalized member signature. `out T&` adds output assignment metadata to

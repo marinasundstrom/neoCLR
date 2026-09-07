@@ -2694,3 +2694,31 @@ No compiler or runtime behavior changed.
 Validation: all 90 local links and heading targets in the changed design documents
 resolve; diff whitespace checks pass. src/tests/examples/runtime match HEAD exactly.
 Runtime tests were not rerun for this documentation-only change.
+
+## Checked managed reference locals, fields and returns — 2026-09-07
+
+Enabled initialized T& locals and guest reference returns through the existing ByRef
+signature. Extended ldflda to managed record fields, including nested generic values
+without native layout. References preserve a root identity and field path across
+same-type owner replacement; local reference rebinding changes only the binding.
+
+Every returning frame now checks the actual reference root. References into its
+ordinary locals or by-value argument copies fault, including field/interface views
+and references hidden behind aliases or helpers. Caller-backed references can be
+returned while their owner remains active. Physical host cell allocation does not
+make guest locals managed heap objects; no implicit promotion on return is selected.
+Recorded the high-level MakeCounter(Counter&) -> int& / &counter.Age direction and
+added examples/reference_returns.neoil with the corresponding executable IL.
+
+Reference handles retain host cells automatically. Field output obligations track
+writes to that field or an ancestor; sibling writes do not fulfill an output promise.
+Stored/returned references must be initialized. Host reference results are rejected
+before guest execution, native result signatures remain rejected, and reference-valued
+fields, erasure and nested references remain gated. Updated verification, runtime
+service classification and the design/implementation documents.
+
+Validation: all 543 tests passed across 85 test targets; cargo clippy --all-targets
+-- -D warnings, cargo fmt --check and diff whitespace checks passed. All 261 local
+links and heading targets in the changed documents resolve. Tests cover valid caller
+returns, frame-escape Faults without verification, field mutation/replacement, output
+aliasing, initialization, host/native boundaries and final host-cell release.

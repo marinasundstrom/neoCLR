@@ -414,18 +414,12 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 ));
             }
         }
-        if function
-            .locals
-            .iter()
-            .chain([&function.returns])
-            .any(crate::slots::contains)
-        {
-            return Err(Fault::new(
-                "managed references cannot be locals or return values",
-            ));
-        }
         if (function.is_internal_call() || function.pinvoke.is_some())
-            && function.parameters.iter().any(crate::slots::contains)
+            && function
+                .parameters
+                .iter()
+                .chain([&function.returns])
+                .any(crate::slots::contains)
         {
             return Err(Fault::new(
                 "managed references cannot cross native helper boundaries",
@@ -540,6 +534,11 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 }
                 Op::Load(i) | Op::Store(i) | Op::LocalAddress(i) if *i >= function.locals.len() => {
                     return Err(Fault::new("local index outside signature"));
+                }
+                Op::LocalAddress(i) if crate::slots::contains(&function.locals[*i]) => {
+                    return Err(Fault::new(
+                        "cannot take the address of a managed reference local",
+                    ));
                 }
                 Op::ArgumentAddress(i) | Op::StoreArg(i)
                     if crate::slots::contains(&function.argument_types()[*i]) =>
@@ -824,7 +823,7 @@ impl Frame {
                     && (function.out_parameters.contains(&(index - offset))
                         || function.out_when_true.contains(&(index - offset)))
                 {
-                    *reference = reference.output()?;
+                    *reference = reference.output();
                     outputs.push((
                         reference.clone(),
                         function.out_when_true.contains(&(index - offset)),
@@ -854,6 +853,25 @@ impl Frame {
             outputs,
         })
     }
+    fn check_reference_return(&self, value: &Value) -> Result<(), Fault> {
+        let reference = match value {
+            Value::SlotReference(reference) => reference,
+            Value::SlotInterface { receiver, .. } => receiver,
+            _ => return Ok(()),
+        };
+        if self
+            .args
+            .iter()
+            .chain(&self.locals)
+            .any(|cell| reference.addresses(cell))
+        {
+            return Err(Fault::new(
+                "cannot return a managed reference to the current frame",
+            ));
+        }
+        Ok(())
+    }
+
     fn pop(&mut self) -> Result<Value, Fault> {
         self.stack
             .pop()
@@ -874,6 +892,16 @@ impl Frame {
             .zip(types)
             .map(|(value, ty)| value.for_storage(ty))
             .collect()
+    }
+}
+
+// Stored and returned references must be readable. Uninitialized capabilities
+// remain confined to direct output-argument paths in this implementation slice.
+fn assigned_reference(value: &Value) -> Result<(), Fault> {
+    match value {
+        Value::SlotReference(reference) => reference.assigned(),
+        Value::SlotInterface { receiver, .. } => receiver.assigned(),
+        _ => Ok(()),
     }
 }
 
@@ -957,6 +985,11 @@ pub(crate) fn interpret_function(
     options
         .check_cancellation(&function.name, 0)
         .map_err(initial_fault)?;
+    if crate::slots::contains(&function.returns) {
+        return Err(initial_fault(Fault::new(
+            "managed references cannot cross host result boundaries",
+        )));
+    }
     let limits = options.limits;
     if limits.frames == 0 {
         return Err(initial_fault(Fault::new("frame limit exceeded")));
@@ -1058,6 +1091,7 @@ fn interpret_frames(
                     .push(frame.locals[*i].borrow().get()?.on_stack()),
                 Op::Store(i) => {
                     let value = frame.pop()?;
+                    assigned_reference(&value)?;
                     frame.locals[*i].borrow_mut().set(value)?;
                 }
                 Op::Dup => {
@@ -1376,6 +1410,8 @@ fn interpret_frames(
                 Op::Return => {
                     let value = frame.pop()?;
                     let value = value.for_storage(&function.returns)?;
+                    assigned_reference(&value)?;
+                    frame.check_reference_return(&value)?;
                     for (output, conditional) in &frame.outputs {
                         if !conditional || value == Value::Boolean(true) {
                             output.assigned()?;
@@ -1513,6 +1549,19 @@ fn interpret_frames(
                         .push(Value::Pointer(memory.offset(&pointer, offset)?));
                 }
                 Op::FieldAddress(index) => {
+                    if let Some(Value::SlotReference(reference)) = frame.stack.last() {
+                        crate::access::check_field(module, &function, reference.target(), *index)?;
+                        let fields = module.instantiated_fields(reference.target())?;
+                        let target = fields
+                            .get(*index)
+                            .ok_or_else(|| Fault::new("field index out of range"))?
+                            .ty
+                            .clone();
+                        let reference = reference.field(*index, target)?;
+                        frame.pop()?;
+                        frame.stack.push(Value::SlotReference(reference));
+                        return Ok(None);
+                    }
                     let pointer = frame.pointer()?;
                     if !matches!(pointer.target, Type::Named(_) | Type::Constructed { .. }) {
                         return Err(Fault::new("ldflda requires pointer to record"));

@@ -30,7 +30,7 @@ pub enum Value {
     },
     SlotReference(crate::SlotReference),
     Pointer(crate::memory::Pointer),
-    /// A call-scoped interface projection over a managed concrete slot.
+    /// An interface projection retaining its managed concrete slot.
     SlotInterface {
         interface: Type,
         receiver: crate::SlotReference,

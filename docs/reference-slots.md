@@ -1,7 +1,8 @@
 # Managed slot references and reference receivers
 
 Status: T& parameters, out and out(true) contracts, ldloca/ldarga, ldobj/stobj slot
-access, reference receivers and safe interface slot views are implemented.
+access, managed ldflda, reference receivers, T& locals and checked guest returns, and safe
+interface slot views are implemented.
 Existing pointer and InterfaceRef behavior is unchanged.
 
 ## Purpose
@@ -15,9 +16,9 @@ it must not depend on the native-layout subset supported by pointer memory.
 Use `T&` as the CLI-shaped spelling for a typed slot reference, with a
 separate ByRef signature node. It is not `T*`, not an interface view and not the
 bootstrap Ref<T> arena handle. Ref<T> was a proposal, not the chosen future
-managed-reference abstraction. This document specifies the implemented call-scoped
-subset; the [T& lifecycle direction](lifecycle.md) adds automatic retention and
-escape without a separate source ownership wrapper.
+managed-reference abstraction. This document specifies automatic reference handling
+and checked guest returns using the same T& feature. The broader
+[T& lifecycle direction](lifecycle.md) includes managed heap allocation and destruction.
 
 A slot reference grants access to one exact T slot. It has no null state, integer
 conversion, pointer arithmetic or unchecked cast. Copying the reference aliases
@@ -68,6 +69,9 @@ including forwarding, rather than merely attach an advisory annotation.
 | ldarg on a T& parameter | Load the passed reference, without dereferencing it |
 | ldobj T on T& | Copy the initialized value from the referenced slot |
 | stobj T on T& | Store an exact, storage-normalized T value into that slot |
+| stloc/ldloc on a T& local | Store/load a retaining alias; the target must be initialized when storing |
+| ldflda field on T& | Form a managed reference to a field of an initialized record, preserving its root lifetime |
+| ret returning T& | Return an initialized alias only when its root does not belong to the current frame |
 | starg on a T& parameter | Rebinding is rejected in the first slice; stobj updates the caller's slot |
 
 Existing ldobj/stobj pointer behavior remains an explicitly different operand path.
@@ -108,34 +112,56 @@ passes ldloca counter before the explicit arguments. Receiver mode belongs to th
 resolved method contract and does not introduce overloads distinguished only by
 receiver mode. Byref receivers require an initialized concrete value.
 
-Future field references can make individual field mutation more direct. The first
-slice needs only whole-slot access; nested field paths, arrays and native allocations
-must receive their own validity rules before they become safe-reference targets.
+Managed ldflda supports individual and nested record fields, including generic
+records and String fields. Array elements and native allocations still need their
+own validity rules before they become managed-reference targets.
 Constructors retain their existing initialization convention initially.
 
 ## Lifetime, aliasing and enforcement
 
-Start with a call-scoped subset: byrefs may be formed on the evaluation stack,
-passed as arguments/receivers and forwarded to nested calls. They cannot be returned,
-placed in locals or record fields, erased into System.Value, retained by runtime
-helpers, or imported/exported through host calls or P/Invoke. Ordinary local values
-remain addressable. Reference-valued locals and longer-lived references can be added
-once their escape contracts exist; this first restriction is not a permanent VM limit.
+Managed references may be formed on the evaluation stack, passed as arguments or
+receivers, stored in T& locals and returned to guest callers. Returning a reference
+to caller-owned storage is valid; returning a reference to the current frame's
+ordinary locals or by-value arguments is a runtime Fault. Field references and
+interface views carry the same root lifetime. Every returning frame checks the
+actual root identity, including when references passed through helpers or aliases.
 
-The interpreter represents each slot with a stable host cell. Managed references
-hold weak identity to that cell, its exact type and an optional output-write baseline.
-They neither keep the frame alive nor alias a later slot when frame storage is reused.
-Every indirect access checks that the slot is still live, the slot type matches,
-and the access is permitted. Host reference counting supports this implementation;
-it does not impose reference-counted ownership on guest values. A native backend can lower proven call-scoped references
-to ordinary addresses, while preserving these rules for paths it cannot prove safe.
-No fixed fat-pointer layout or stable native ABI is implied.
+Copying a reference preserves its target; rebinding a reference local changes only
+that binding. Same-type assignment to an addressed value preserves root identity.
+Managed ldflda adds a field path to that root, so aliases continue to see the same
+field after whole-record replacement. Field access enforces declared accessibility,
+exact types and initialization, with no native-layout requirement.
+
+The interpreter uses stable host cells with automatic retention. A reference does
+not retain a whole frame, and host heap placement does not authorize a guest-frame
+escape. No implicit promotion of an ordinary local is performed. The cell is freed
+when its frame and reference handles release it, without guest destructor dispatch.
+Native stack placement and a portable reference ABI remain future work.
+
+T& locals and returns must refer to initialized storage and satisfy any attached
+output-write obligation. Uninitialized capabilities can still be used directly for
+out calls. Taking the address of a T& local/parameter is rejected: nested references
+and indirectly storing references are not supported. Reference-valued fields,
+generic reference arguments, erasure, host transfer and native helper/P/Invoke
+signatures remain rejected. These restrictions prevent managed-reference cycles in
+this slice. A host-invoked function or entry point returning T& is rejected before
+executing its body; suitable guest calls to the same function are supported.
+
+The [reference-return sample](../examples/reference_returns.neoil) implements
+MakeCounter(Counter& counter) -> Int32& with ldarg, ldflda Counter::Age and ret.
+It uses no arena handle, new instruction or manual lifetime operation. The legacy
+heap.new/Ref arena and its heap_objects limit are unchanged; host slot cells are
+separate from that arena. Future explicit managed allocation and reference-valued
+fields need their own allocation limits and lifecycle rules.
 
 Typed verification rejects forbidden reference storage/escape and invalid operand
 shapes. Execution enforces the same safety boundaries even when optional verification
 was not requested. Initialization tracking follows the actual slot, not a copied
 reference descriptor. Out parameters also need per-invocation assignment obligations:
 stores through aliases and successful forwarding must satisfy the affected obligations.
+For an addressed field, only replacement of that field or an ancestor fulfills its
+output promise; a sibling field write does not. Forming a field address requires an
+initialized containing record, so partial record construction is not introduced.
 A normal return with an unwritten out parameter faults before returning to the caller.
 The verifier may prove those obligations where possible; runtime checks cover the rest.
 
@@ -146,7 +172,7 @@ introduced, will not imply that another alias cannot mutate the target. Threads 
 concurrent access rules remain separate work. A borrow checker is not required by
 this contract: runtime validation may enforce it, while compiler proofs may remove
 redundant checks. Languages may choose stronger borrowing rules independently.
-Stored/escaping references will still require explicit validity and retention rules.
+Reference-valued fields and further escape paths still require their own validity rules.
 
 The first safe subset has no raw-pointer-to-byref conversion. A pointer is not proof
 of a valid slot or lifetime. Explicit unsafe bridges can be designed later without
@@ -157,8 +183,9 @@ weakening ordinary slot references.
 Writes happen when stobj executes, including writes before a terminal Fault. There
 is no rollback, cleanup handler or implicit transactional result. An ordinary Error
 returned through Result is a normal return and must still fulfill every out contract.
-Replacing a value invokes no automatic destructor or release: existing explicit
-ownership rules remain the caller/library's responsibility.
+Replacing an ordinary value invokes no guest destructor. Rebinding a T& local
+releases its old reference automatically. Explicit Dispose/Close calls remain
+separate resource operations.
 
 Unconditional out is distinct from the implemented `out(true) T&` contract for
 Boolean-returning methods. Conditional outputs must be assigned on true, and provide

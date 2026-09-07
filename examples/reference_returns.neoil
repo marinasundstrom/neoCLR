@@ -1,0 +1,29 @@
+.module ReferenceReturns
+.entry Main
+
+.type Counter
+    .field Age Int32
+.end
+
+.function MakeCounter(Counter& counter) -> Int32&
+    ldarg counter
+    ldflda Counter::Age
+    ret
+.end
+
+.function Main() -> Int32
+    .local Counter counter
+    .local Int32& age
+    ldc.i4 0
+    newobj Counter
+    stloc counter
+    ldloca counter
+    call MakeCounter(Counter&)
+    stloc age
+    ldloc age
+    ldc.i4 42
+    stobj Int32
+    ldloc counter
+    ldfld Counter::Age
+    ret
+.end

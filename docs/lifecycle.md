@@ -3,8 +3,10 @@
 Status: agreed platform direction with implementation decisions still open. Values
 are the default; reference semantics are chosen explicitly; the runtime manages
 reference lifetimes. Clonable, Disposable and Closable are implemented ordinary
-interfaces. Managed heap retention, escaping stack references and automatic guest
-destruction remain future work. The current Ref arena is a prototype limitation.
+interfaces. T& locals, managed field addresses and checked guest reference returns
+are implemented. Returning a reference into the current frame faults. Explicit
+managed heap allocation, reference-valued fields and automatic guest destruction
+remain future work. The current Ref arena is a prototype limitation.
 
 Ref<T> was a proposal, not a selected public reference abstraction. The source
 direction is T&. Prefer .NET CLR instructions and semantics wherever they fit;
@@ -32,8 +34,8 @@ Heap allocation in the managed programming model produces a managed reference.
 The referenced value has the same type T that could otherwise be held directly;
 there is no class/struct bit that forces allocation policy onto the type.
 Current heap.alloc/free remain raw memory operations, while heap.new/Ref expose
-an execution-retained arena. This document does not change execution behavior;
-implementation may replace obsolete encodings in a breaking preview revision.
+an execution-retained arena. Implementation may replace obsolete encodings in a
+breaking preview revision.
 The selected high-level spelling is new T(...); its CLI-based IL lowering remains open.
 
 A byref parameter can refer to a caller's local and be passed further down the call
@@ -74,69 +76,41 @@ not implemented compiler syntax or a change to neoIL newobj.
 
 ## Storage and escape
 
-Call-scoped references to caller locals do not require heap allocation merely
-because a callee uses them. When the call returns, there is no reference handle
-cleanup for the caller to perform. This is the implemented T& subset today.
-
-Conceptually, a reference used only by a nested call can remain stack-backed:
-
-```swift
-let counter = Counter(0)
-Increment(&counter)
-```
-
-Taking a reference alone does not require heap allocation. Its required lifetime
-determines whether retained storage is necessary. Returning a reference cannot keep
-the value in the ordinary stack frame of a function that has already returned;
-that frame's storage becomes available for reuse. The runtime must arrange
-longer-lived storage, normally on the heap.
-
-The intended broader direction permits a reference to keep a value alive beyond
-its creating scope. The compiler/runtime must then arrange suitable storage, for
-example by allocating an escaping local in retained storage from the start or
-promoting it while preserving the identity seen by every existing reference.
-Escape analysis may avoid unnecessary allocation; correctness cannot depend on
-requiring programmers to choose the physical placement themselves.
-
-Selected source direction, not yet accepted by a high-level compiler:
+A reference can depend on storage in an active outer frame. Passing a caller's
+local by reference does not require managed heap allocation or manual lifetime
+handling. Returning that reference, or a reference to one of its fields, to the
+caller is valid because the caller still owns the storage:
 
 ```swift
-func MakeCounter() -> Counter& {
-    let counter = Counter(0)
-    return &counter
+func MakeCounter(counter: Counter&) -> int& {
+    return &counter.Age
 }
 ```
 
-The result refers to the same counter, whose lifetime outlasts the function.
-Use T& for reference types and &value to form a reference, including references
-returned from a function. A separate source-level ownership wrapper or heap qualifier
-is not required. The compiler/runtime determines the required retention and storage
-from the reference's use. The IL encoding and enforcement of escaping retention
-versus call-scoped access remain implementation decisions.
-Current neoIL T& returns and stored byrefs are still rejected;
-accept them only when retained storage and alias-preserving promotion exist.
+The same function must not return an address into its own frame. This includes
+its ordinary locals, by-value argument copies and fields nested inside either.
+Returning &local does not implicitly promote that local. The future high-level
+language should reject this escape; the runtime must validate the actual target
+and fault even when optional verification is skipped. A helper or reference-valued
+local cannot hide the target's owning frame. Each frame validates again on return.
 
-Promotion must preserve the same value and every existing alias; it must not
-produce a detached copy. The compiler may instead allocate the escaping value in
-managed heap storage from the start. Safe source code cannot insist that a retained
-reference point into an ordinary stack frame whose lifetime has ended.
+If a function creates an object whose reference must survive that function, the
+object needs explicit managed heap-backed storage. The selected source direction
+is new T(...), producing T&; its managed allocation lowering is still future work.
+Ordinary by-value returns transfer a value into the caller and do not impose this
+heap-allocation requirement. A new stack slot containing a reference to a heap
+object does not make that object's lifetime depend on the slot.
 
-Returning an ordinary value does not inherently require a heap allocation:
+The interpreter represents ordinary slots using allocated host cells. That physical
+implementation detail does not turn guest locals into managed heap objects or make
+their addresses eligible to escape their owner. Runtime return checks follow the
+root slot and field path. The [reference-return example](../examples/reference_returns.neoil)
+implements the caller-owned field case using ldloca, ldflda and ret.
 
-```swift
-func MakeCounter() -> Counter {
-    return Counter(0)
-}
-```
-
-That result is transferred to the caller. Choose Counter& when reference identity
-or access to the same instance is intended. Values by default and call-scoped byrefs
-can avoid allocations, but returning references may require retained heap storage;
-the syntax does not by itself promise reduced heap use.
-
-Raw pointers require a stable-address or pinning contract at native boundaries.
-Ordinary managed references should continue to work without exposing those details.
-An unrestricted native address must not be relocated underneath foreign code.
+A managed field reference continues to address the same field path when the owner
+is replaced by a value of the same type. It does not become a detached copy.
+Raw native pointers remain a separate capability and do not inherit these retention
+or relocation rules. Future pinning and interop bridges need their own contracts.
 
 ## Deterministic destruction
 
@@ -219,8 +193,9 @@ or rollback. Raw memory release remains distinct from destroying typed managed v
 2. Implement automatic lifetime retention/release for managed heap references and
    safe call-scoped access to their values. Test final-reference release through
    aliases, nested fields and returns before attaching user destructor bodies.
-3. Define stack-reference escape representation and implement retained placement or
-   promotion without changing alias identity. Preserve simple stack-backed byref calls.
+3. Build on checked T& locals, field addresses and caller-backed guest returns.
+   Introduce managed heap targets without weakening the rule against returning
+   addresses into the current frame. Allocation optimizations must preserve that rule.
 4. Add destruction metadata, initialization tracking and execution/failure rules.
    Demonstrate real resource release alongside Disposable/Closable and explicit Clone.
 5. Resolve cycles, weak references, concurrency and native pinning before broadening

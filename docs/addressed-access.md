@@ -5,12 +5,15 @@ Status: original design proposal, partly superseded by the implemented
 Use those documents for current behavior. This document preserves the rationale
 and broader proposals; its recommended first scope is not the implemented subset.
 
-Implemented: T& parameters, whole-slot ldloca/ldarga and ldobj/stobj access, explicit
-byref receivers, out/out(true) assignment contracts and managed interface views.
-Deferred: readonly permissions, reference-valued locals, managed field references,
-returned/stored references and native-address bridges. In particular, taking the
-address of an uninitialized local is permitted today; reading it requires initialization.
-The field-path and readonly rules below remain proposals.
+Implemented: T& parameters and locals, ldloca/ldarga, managed record-field ldflda,
+ldobj/stobj, checked caller-backed reference returns, explicit byref receivers,
+out/out(true) assignment contracts and managed interface views. Runtime return
+checks reject current-frame roots, including field and interface views.
+Deferred: readonly permissions, reference-valued aggregate fields, managed heap
+allocation, array-element references and native-address bridges. Taking the address
+of an uninitialized local is permitted; reading it or forming a field reference
+requires initialization. The broader rules below preserve earlier proposals; use
+[slot contracts](reference-slots.md) for implemented field-path behavior.
 
 ## Recommended boundary
 

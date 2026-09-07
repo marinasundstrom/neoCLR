@@ -3,8 +3,10 @@
 The selected [high-level allocation direction](lifecycle.md#high-level-allocation-syntax)
 uses T(...) for value construction, &value for a reference to an existing value, and
 new T(...) for explicit managed heap allocation returning T&. Reference retention
-is automatic. Escaping references require retained storage; they cannot keep an
-ended ordinary stack frame alive. High-level syntax is separate from the final IL
+is automatic. A function may return a caller-backed reference or, in the future,
+a managed heap reference. Returning an address into its own frame faults, including
+when a helper or alias obscures the origin. There is no implicit promotion of a
+local merely because its address is returned. High-level syntax is separate from the final IL
 encoding, which remains open.
 
 The sections below describe implemented raw-memory operations and earlier encoding

@@ -23,10 +23,14 @@ A call consumes its arguments and transfers them into a new frame. `ret` transfe
 one owned value to the caller. Ordinary owned values may leave a frame; copying
 embedded pointers does not extend their targets' lifetimes. Managed `T&` references
 address local and argument slots through `ldloca`/`ldarga` and may be passed or
-forwarded within calls. They cannot be returned or stored in locals or fields.
-Runtime checks enforce slot liveness, initialization and output assignment; no
-exclusive-borrow policy is implied. Move semantics and escaping references remain
-future choices. See [managed slot references](reference-slots.md).
+forwarded within calls. Initialized references can be stored in T& locals and
+returned to guest callers when their root belongs to an active outer frame.
+Managed ldflda addresses record fields with the same lifetime; returning any address
+into the current frame faults, including through aliases. Reference-valued fields,
+erasure and host transfer remain rejected. Runtime checks enforce
+initialization and output assignment; no exclusive-borrow policy is implied.
+Explicit heap allocation through T&, reference fields and guest destructors remain
+future work. See [managed slot references](reference-slots.md).
 
 `heap.new` transfers a value into an execution-owned arena and produces `Ref<T>`.
 `heap.load` copies its current contents. `heap.store` replaces its contents with a

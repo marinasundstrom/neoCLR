@@ -44,8 +44,10 @@ then support a minimal hosting experiment and an early native AOT experiment.
 with exact primitive and [validated record inputs](record-inputs.md), explicitly copied
 receivers, [validated ordinary Option/Result inputs](union-inputs.md), and fresh state.
 [Cooperative cancellation](cancellation.md) now supports stopping interpreter execution
-from the host. Guest call-scoped addressed mutation is implemented; managed references
-cannot cross host calls or outlive their frames. A small
+from the host. Guest addressed mutation and retaining T& locals/returns are
+implemented with managed field addresses and runtime checks. A returned reference
+must target storage owned by an active outer frame; current-frame escapes and host
+transfers are rejected. A small
 language compiler should target the same metadata/IL and enable incremental library
 migration. Native backend/code-sharing choices remain open; no hidden fallback or
 universal ownership policy is implied.

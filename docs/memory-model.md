@@ -12,7 +12,7 @@ Programmers do not manually retain, release or invalidate ordinary managed refer
 The compiler/runtime arranges storage and retention to satisfy the reference contract.
 Raw pointers and explicit memory operations remain low-level capabilities, including
 native interop. See the [managed lifecycle direction](lifecycle.md) for the intended
-heap-reference, stack-byref and escaping-reference distinctions and current limits.
+heap-reference, stack-byref and checked reference-return distinctions and current limits.
 
 This makes neoCLR managed without making it high-level. The VM validates types,
 signatures, layouts and pointer operations, while explicitly permitting programs
@@ -36,11 +36,11 @@ the declared copy rules. Allocation, reference access and ownership are separate
 Capabilities are expressed through declared types, interfaces, parameter/receiver
 contracts and explicit operations. Current interfaces are declared on types; this
 is not a promise of dynamic per-instance interface attachment. An interface view
-adds access to an existing contract without changing allocation or retaining an owner.
+adds access to an existing contract without changing its storage lifetime.
 Retained managed references extend T&/ByRef without turning all T values into
 references. Ref<T> remains a historical proposal and current arena encoding.
 
-A Rust-style borrow checker is not a platform requirement. In the current call-scoped
+A Rust-style borrow checker is not a platform requirement. In the current managed-reference
 subset the runtime checks reference identity, liveness, exact type, initialization
 and output assignment. Multiple writable aliases are allowed, and sequential reads
 observe preceding writes. There is no exclusive-borrow or no-alias guarantee.
@@ -58,14 +58,16 @@ case requires selecting exclusive borrowing as the only solution.
 ## Current priority
 
 The next lifecycle foundation is [managed references and destruction](lifecycle.md).
-It prioritizes automatic heap-reference retention alongside stack-backed byref calls,
-then safe escaping references and user destructor execution. The implemented preview
+It prioritizes automatic heap-reference retention alongside stack-backed byref calls
+and checked caller-backed reference returns, then user destructor execution. The implemented preview
 contracts below remain unchanged. Earlier ownership-operation proposals later in this
 document are implementation options, not requirements for manual reference management.
 
-Heap allocation and native pointers are implemented, as are call-scoped managed
-references and interface views. Stabilize their contracts and the Preview 1 programs.
-Automatic retention, escaping references and destruction are not implemented yet.
+Heap allocation and native pointers are implemented, as are retaining managed
+slot references, guest reference returns and interface views. Stabilize their contracts and the Preview 1 programs.
+Slot references, field addresses and checked caller-backed returns are implemented;
+explicit managed heap allocation,
+reference fields and guest destruction are not implemented yet.
 Their next implementation gate is described in the
 [managed-reference plan](managed-reference-implementation.md); cycle policy and
 concurrency remain open decisions.
@@ -148,7 +150,7 @@ dropped. **There is no reference counting** or per-allocation release within tha
 arena. This arena is scaffolding, not the final managed memory model.
 
 Instance methods use copied receiver values unless they declare a byref receiver.
-Byref receivers access the original initialized slot through the same call-scoped
+Byref receivers access the original initialized slot through the same retaining
 managed-reference contract as parameters. Updating a copied receiver does not
 write back to the caller. Native pointers have a separate allocation store and
 explicit access operations.

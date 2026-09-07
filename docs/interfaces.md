@@ -2,11 +2,12 @@
 
 ## Managed slot views
 
-The preferred call-scoped view is now `I&`. Start with `ldloca value` or an existing
+The preferred managed view is `I&`. Start with `ldloca value` or an existing
 Concrete& parameter, then `interface.borrow I`. The resulting view refers to the
-same initialized concrete slot and retains no owner. It can be passed and forwarded
-through active calls, but cannot escape into locals, fields, erasure, returns or native
-calls. It supports ordinary values such as String-containing records without requiring
+same initialized concrete slot and retains it automatically. It can be passed,
+stored in locals and returned to guest callers when the root belongs to an active
+outer frame. Returning a view into the current frame faults. Fields, erasure and host/native
+transfers remain unsupported. It supports ordinary values such as String-containing records without requiring
 native layout. It is used for dispatch, not for loading an abstract interface value.
 
 `callvirt` respects the declared receiver mode: ordinary instance implementations
@@ -17,7 +18,7 @@ byref receiver. See [slot reference contracts](reference-slots.md).
 
 | Spelling | Formation | Lifetime/access |
 | --- | --- | --- |
-| I& | Concrete& followed by interface.borrow I | Managed, initialized, call-scoped concrete slot; value or byref dispatch |
+| I& | Concrete& followed by interface.borrow I | Managed, initialized, retained concrete slot; value or byref dispatch |
 | InterfaceRef<I> | Concrete* followed by interface.borrow I | Existing explicit native pointer rules; value receiver dispatch only |
 
 [The List sample](../examples/interfaces.neoil) now passes List<Int32>& directly

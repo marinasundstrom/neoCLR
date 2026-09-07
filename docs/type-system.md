@@ -99,7 +99,8 @@ immutability or purity.
 `.method instance byref` explicitly changes argument zero to T&. Its caller supplies
 a managed slot reference, and the method uses ldobj/stobj to read or replace the
 original value. There is no implicit dereference or copy-back on return. Byref
-receivers require initialized storage and remain call-scoped. Constructors keep their
+receivers require initialized storage. Reference returns must not address the
+returning frame, including when they address a field inside its local or argument. Constructors keep their
 existing initialization convention. See [reference contracts](reference-slots.md).
 
 The [types sample](../examples/types.neoil) exercises record/static/instance methods,

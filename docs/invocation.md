@@ -47,6 +47,9 @@ Option, or pointers using the runtime's implemented operations. Its returned all
 and native-library retention belong to that Execution. These results are not transferable
 guest handles into a later invocation. Supported owned results can be imported
 as data with validation; pointer/Ref transfer and persistent state need separate contracts.
+Managed T& results are rejected before the invoked body executes, even though guest
+calls can now return retained references. A future host reference handle must define
+context, metadata and cleanup lifetimes first.
 
 Safe invoke disables native imports. The separate unsafe invoke_with_native method
 retains the existing native ABI/trust requirements. Foreign code may maintain its own

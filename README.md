@@ -371,7 +371,7 @@ general reflection and guest attribute discovery remain deferred.
 
 Following the strategy review, the [control-flow verifier foundation](docs/verification.md)
 is implemented as an explicit `verify` command. It checks stack types, call/field
-operands, local initialization, returns and call-scoped reference use. Runtime guards
+operands, local initialization, returns and managed reference use. Runtime guards
 enforce liveness and output assignment; broader lifetime analysis remains pending. The
 [construction, mutation, and initialization proposal](docs/construction-and-initialization.md)
 connects the next type-system decisions with verification and a future high-level
@@ -457,3 +457,6 @@ archive validation process.
 [Managed references in Raven-like pseudocode](docs/references-in-pseudocode.md)
 explains &value, T&, output parameters, reference receivers, interface views and
 union TryGet methods alongside their executable neoIL equivalents.
+
+[Checked reference returns](examples/reference_returns.neoil) demonstrates returning
+a reference to a caller-owned field and updating that field through the result.

@@ -14,15 +14,17 @@ platform operations below remain explicit.
 | Form | Meaning |
 | --- | --- |
 | Int32 | An ordinary copied value |
-| Int32& | Non-owning managed reference to an exact Int32 slot |
+| Int32& | Retaining managed reference to an exact Int32 slot |
 | Int32* | Raw native pointer with explicit memory/lifetime obligations |
 | Int32*& | Managed reference to a slot whose value is a raw Int32 pointer |
 | Settable& | Managed interface view over an implementing concrete slot |
 | Ref<T> | Historical proposal/current arena handle; not the selected future reference abstraction |
 
-The examples below cover the implemented call-scoped subset. The
-[lifecycle direction](lifecycle.md) extends the same CLR-style T&/ByRef feature with
-automatic retention for managed heap values and escaping references.
+The examples below focus on scoped calls. The same CLR-style T&/ByRef feature now
+supports reference locals, managed field addresses and checked caller-backed guest
+returns; see [slot contracts](reference-slots.md).
+The [lifecycle direction](lifecycle.md) extends this to explicit managed heap
+allocation, reference fields and guest destruction.
 
 ## Passing a reference
 
@@ -228,38 +230,20 @@ still has an explicit native lifetime; extraction after that storage expires fau
 
 ## What can cross a context boundary today?
 
-Managed references can pass and forward through active calls in the same execution.
-They cannot be returned, retained in IL locals or fields, erased, put in heap values,
-or passed through host/native invocation. The referenced ordinary local or argument
-slot may contain String or another value without a native layout. No raw pointer
-can be converted into a managed reference by this subset.
+Managed references can pass through active calls, be stored in T& locals and be
+returned to guest callers when their root belongs to an active outer frame. Managed
+ldflda forms field references with the same root lifetime. Returning an address into
+the current frame faults, including addresses of nested fields, by-value arguments
+and references forwarded through helpers. No automatic local promotion is implied.
+Reference-valued fields, erasure and host/native transfers remain unsupported.
 
-These restrictions are enforced by metadata and runtime checks, with optional
-verification providing earlier diagnostics. Interpreter references use weak slot
-identities; they cannot retain an expired frame or accidentally refer to reused frame
-storage. Native backends must preserve the observable contract, but need not copy
-the interpreter's host representation.
+Metadata and runtime checks enforce these boundaries; optional verification provides
+earlier diagnostics. Interpreter references identify a stable host cell and field
+path. Host allocation does not make an ordinary guest local a heap object: every
+return validates the actual root against the returning frame. Native backends must
+preserve this contract without copying the interpreter's host representation.
 
-Longer-lived references, readonly capabilities, references into fields/arrays,
-threads, ownership and counted references remain separate decisions. The notation
-here deliberately illustrates passing references directly rather than suggesting
-that a managed-reference IL local is already available.
-
-## Run the examples
-
-From the repository root:
-
-```sh
-cargo build --locked
-cargo run --locked -- verify examples/reference_parameters.neoil
-cargo run --locked -- run examples/reference_parameters.neoil
-cargo run --locked -- run examples/reference_receivers.neoil
-cargo run --locked -- run examples/interfaces.neoil
-cargo run --locked -- run examples/union_try_get.neoil
-cargo run --locked -- run examples/pointer_union.neoil
-```
-
-The first, second and union case samples print 42; the interface list prints 42 and 2;
-the pointer carrier prints 42, 7 and 11. Each ends with the CLI's `=> Void`. The
-[walkthrough](preview-1-walkthrough.md) documents assembly to an artifact and execution
-of that artifact; its automated tests cover these source and artifact paths.
+Explicit managed heap allocation, array-element references, readonly capabilities,
+threads and guest destruction remain separate gates. See the
+[reference-return sample](../examples/reference_returns.neoil) and
+[lifecycle direction](lifecycle.md).

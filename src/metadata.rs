@@ -39,7 +39,7 @@ pub enum Type {
         arguments: Vec<Type>,
     },
     Ref(Box<Type>),
-    /// Call-scoped typed slot reference; independent of ownership and native layout.
+    /// Retaining managed slot reference; independent of native layout.
     ByRef(Box<Type>),
     /// Explicit borrowed interface receiver, separate from the interface declaration.
     InterfaceRef(Box<Type>),

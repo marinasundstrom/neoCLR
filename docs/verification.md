@@ -77,15 +77,22 @@ type. Loading through a typed local can normalize a raw small-integer payload.
 
 ## Managed references and output contracts
 
-The call-scoped `T&` subset checks exact slot types, explicit reference receivers
-and interface views. Metadata rejects reference locals, fields, returns and native
-boundary signatures; runtime guards also reject forbidden reference values without
+The `T&` subset checks exact slot types, explicit reference receivers and interface
+views. Initialized references can be stored in locals and returned to guest callers when
+the target belongs to an active outer frame. Directly known current-frame returns
+are rejected by verification; execution checks every actual root through aliases,
+field paths and interface views.
+Metadata rejects reference-valued fields, nested references and native boundary signatures;
+runtime guards reject host results and uninitialized reference storage/returns without
 requiring this optional analysis pass. See [reference contracts](reference-slots.md).
 
 For a directly addressed local, `ldloca` preserves its origin in the abstract stack.
-`stobj` establishes initialization, while `ldobj`, interface formation and ordinary
-reference arguments require initialization. All ordinary input preconditions are
-checked before a call's output promises are applied, including when output and input
+`stobj` establishes initialization, while `ldobj`, managed `ldflda`, interface
+formation, reference local stores, returns and ordinary reference arguments require
+initialization.
+Reference locals do not preserve the verifier's original-slot provenance; runtime
+initialization and per-invocation output checks continue to apply through aliases.
+All ordinary input preconditions are checked before a call's output promises are applied, including when output and input
 arguments alias the same local.
 
 | Callee parameter | Caller-side initialization proof |
@@ -125,7 +132,7 @@ Generic constraints and more expressive joins remain separate work. Invalid meta
 is rejected regardless of reachability, but typed analysis applies only to paths
 reachable from each function's entry under the conservative branch model.
 
-Whole-value constructor initialization and call-scoped references are implemented.
+Whole-value constructor initialization and retaining managed references are implemented.
 Partial field initialization, returned/stored managed references, readonly permissions
 and broader lifetime analysis remain future work. Making verification mandatory needs
 an explicit compatibility choice; current tests can still assemble malformed execution

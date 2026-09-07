@@ -91,11 +91,21 @@ fn uninitialized_reference_arguments_fault_even_without_verification() {
     );
 }
 #[test]
-fn reference_escape_and_rebinding_are_rejected_in_metadata_or_execution() {
+fn unsupported_reference_storage_and_parameter_rebinding_are_rejected() {
     for (extra, body, returns) in [
         ("", ".local Int32 value\nldloca value", "Int32&"),
-        ("", ".local Int32& value\nldvoid", "Void"),
+        ("", ".local Int32& value\nldloca value\npop\nldvoid", "Void"),
         (".type Bad\n.field Value Int32&\n.end", "ldvoid", "Void"),
+        (
+            ".function Bad() -> Int32&\n.pinvoke \"missing\" \"bad\" cdecl\n.end",
+            "ldvoid",
+            "Void",
+        ),
+        (
+            ".function Bad() -> Int32&\n.methodimpl InternalCall\n.end",
+            "ldvoid",
+            "Void",
+        ),
         (
             ".type Box<T>\n.field Value T\n.end",
             ".local Box<Int32&> value\nldvoid",
@@ -383,5 +393,254 @@ fn conditional_output_alias_writes_satisfy_only_the_slots_actually_written() {
         } else {
             assert!(result.unwrap_err().message.contains("out parameter"));
         }
+    }
+}
+
+#[test]
+fn reference_returns_sample_preserves_the_callers_counter() {
+    let p =
+        LoadedProgram::new(&assemble(include_str!("../examples/reference_returns.neoil")).unwrap())
+            .unwrap();
+    p.verify().unwrap();
+    let result = p.run(Limits::default()).unwrap();
+    assert_eq!(result.value, Value::Int32(42));
+    assert!(result.heap.is_empty());
+    assert_eq!(result.memory.live_allocations(), 0);
+}
+
+#[test]
+fn returned_reference_keeps_the_callers_slot_and_sees_later_assignment() {
+    let extra = ".function Forward(Int32& value) -> Int32&\nldarg value\nret\n.end";
+    let p = program(extra, ".local Int32 value\n.local Int32& alias\nldc.i4 7\nstloc value\nldloca value\ncall Forward(Int32&)\ncall Forward(Int32&)\nstloc alias\nldc.i4 42\nstloc value\nldloc alias\nldobj Int32", "Int32").unwrap();
+    p.verify().unwrap();
+    assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+}
+
+#[test]
+fn current_frame_references_cannot_escape_directly_or_through_aliases() {
+    let forward = ".function Forward(String& value) -> String&\nldarg value\nret\n.end";
+    for body in [
+        ".local String value\nldstr \"local\"\nstloc value\nldloca value",
+        "ldarga value",
+        ".local String& alias\nldarga value\nstloc alias\nldloc alias",
+        "ldarga value\ncall Forward(String&)",
+    ] {
+        let extra = format!("{forward}\n.function Bad(String value) -> String&\n{body}\nret\n.end");
+        let p = program(
+            &extra,
+            "ldstr \"argument\"\ncall Bad(String)\nldobj String",
+            "String",
+        )
+        .unwrap();
+        // Origin tracking through aliases/calls is optional; execution always checks.
+        let fault = p.run(Limits::default()).unwrap_err();
+        assert!(fault.message.contains("current frame"), "{fault}");
+        assert_eq!(fault.function.as_deref(), Some("Bad"));
+        if !body.contains("alias") && !body.contains("Forward") {
+            assert!(p.verify().is_err());
+        }
+    }
+}
+
+#[test]
+fn reference_local_rebinding_and_self_assignment_preserve_other_aliases() {
+    let extra = ".function Forward(String& value) -> String&\nldarg value\nret\n.end";
+    let p = program(extra, ".local String one\n.local String two\n.local String& first\n.local String& alias\nldstr \"first\"\nstloc one\nldstr \"second\"\nstloc two\nldloca one\ncall Forward(String&)\nstloc first\nldloc first\nstloc alias\nldloc first\nstloc first\nldloca two\ncall Forward(String&)\nstloc first\nldloc alias\nldstr \"still alive\"\nstobj String\nldloc first\nldobj String", "String").unwrap();
+    p.verify().unwrap();
+    assert_eq!(
+        p.run(Limits::default()).unwrap().value,
+        Value::String("second".into())
+    );
+}
+
+#[test]
+fn uninitialized_references_cannot_be_stored_or_returned() {
+    for extra in [
+        ".function Bad() -> Int32&\n.local Int32 value\nldloca value\nret\n.end",
+        ".function Bad() -> Int32&\n.local Int32 value\n.local Int32& alias\nldloca value\nstloc alias\nldloc alias\nret\n.end",
+    ] {
+        let p = program(extra, "call Bad()\nldobj Int32", "Int32").unwrap();
+        assert!(p.verify().is_err());
+        assert!(
+            p.run(Limits::default())
+                .unwrap_err()
+                .message
+                .contains("uninitialized")
+        );
+    }
+}
+
+#[test]
+fn returning_an_out_reference_requires_assignment_during_that_call() {
+    for assign in ["", "ldarg value\nldc.i4 42\nstobj Int32"] {
+        let extra =
+            format!(".function Set(out Int32& value) -> Int32&\n{assign}\nldarg value\nret\n.end");
+        let p = program(&extra, ".local Int32 value\nldc.i4 7\nstloc value\nldloca value\ncall Set(Int32&)\nldobj Int32", "Int32").unwrap();
+        p.verify().unwrap();
+        let result = p.run(Limits::default());
+        if assign.is_empty() {
+            assert!(result.unwrap_err().message.contains("out parameter"));
+        } else {
+            assert_eq!(result.unwrap().value, Value::Int32(42));
+        }
+    }
+}
+
+#[test]
+fn host_reference_results_are_rejected_before_running_guest_code() {
+    let p = program(
+        "",
+        ".local Int32 value\nfault \"must not execute\"\nldc.i4 42\nstloc value\nldloca value",
+        "Int32&",
+    )
+    .unwrap();
+    p.verify().unwrap();
+    assert!(
+        p.run(Limits::default())
+            .unwrap_err()
+            .message
+            .contains("host result")
+    );
+    let target = neoclr::assembler::parse_function_ref("Main()").unwrap();
+    assert!(
+        p.resolve_function(&target)
+            .unwrap()
+            .invoke(vec![], Limits::default())
+            .unwrap_err()
+            .message
+            .contains("host result")
+    );
+}
+
+#[test]
+fn returned_interface_view_must_refer_to_caller_storage() {
+    let extra = r#"
+.interface Readable
+    .method instance Read() -> String
+    .end
+.end
+.type Text
+    .implements Readable
+    .field Value String
+    .method instance Read() -> String
+        ldarg this
+        ldfld Text::Value
+        ret
+    .end
+.end
+.function View(Text& text) -> Readable&
+    ldarg text
+    interface.borrow Readable
+    ret
+.end
+.function Bad() -> Readable&
+    .local Text text
+    ldstr "local"
+    newobj Text
+    stloc text
+    ldloca text
+    call View(Text&)
+    ret
+.end
+"#;
+    let p = program(extra, ".local Text text\n.local Readable& value\nldstr \"retained\"\nnewobj Text\nstloc text\nldloca text\ncall View(Text&)\nstloc value\nldloc value\ncallvirt instance Readable::Read()", "String").unwrap();
+    p.verify().unwrap();
+    assert_eq!(
+        p.run(Limits::default()).unwrap().value,
+        Value::String("retained".into())
+    );
+    let bad = program(
+        extra,
+        "call Bad()\ncallvirt instance Readable::Read()",
+        "String",
+    )
+    .unwrap();
+    assert!(
+        bad.run(Limits::default())
+            .unwrap_err()
+            .message
+            .contains("current frame")
+    );
+}
+
+#[test]
+fn nested_generic_field_alias_tracks_same_type_parent_replacement() {
+    let extra = r#"
+.type Box<T>
+    .field Value T
+.end
+.function Field(Box<Box<String>>& box) -> String&
+    ldarg box
+    ldflda Box<Box<String>>::Value
+    ldflda Box<String>::Value
+    ret
+.end
+"#;
+    let p = program(extra, ".local Box<Box<String>> box\n.local String& field\nldstr \"before\"\nnewobj Box<String>\nnewobj Box<Box<String>>\nstloc box\nldloca box\ncall Field(Box<Box<String>>&)\nstloc field\nldstr \"replacement\"\nnewobj Box<String>\nnewobj Box<Box<String>>\nstloc box\nldloc field\nldobj String", "String").unwrap();
+    p.verify().unwrap();
+    assert_eq!(
+        p.run(Limits::default()).unwrap().value,
+        Value::String("replacement".into())
+    );
+}
+
+#[test]
+fn field_references_cannot_escape_their_owning_frame() {
+    let prefix = ".type Counter\n.field Age Int32\n.end\n.function Age(Counter& counter) -> Int32&\nldarg counter\nldflda Counter::Age\nret\n.end";
+    for body in [
+        "ldarga counter\nldflda Counter::Age",
+        "ldarga counter\ncall Age(Counter&)",
+        ".local Counter local\nldarg counter\nstloc local\nldloca local\ncall Age(Counter&)",
+        ".local Int32& alias\nldarga counter\ncall Age(Counter&)\nstloc alias\nldloc alias",
+    ] {
+        let extra =
+            format!("{prefix}\n.function Bad(Counter counter) -> Int32&\n{body}\nret\n.end");
+        let p = program(
+            &extra,
+            "ldc.i4 7\nnewobj Counter\ncall Bad(Counter)\nldobj Int32",
+            "Int32",
+        )
+        .unwrap();
+        let fault = p.run(Limits::default()).unwrap_err();
+        assert!(fault.message.contains("current frame"), "{fault}");
+        assert_eq!(fault.function.as_deref(), Some("Bad"));
+    }
+}
+
+#[test]
+fn sibling_field_writes_do_not_fulfill_an_output_obligation() {
+    let extra = ".type Pair\n.field Left Int32\n.field Right Int32\n.end\n.function Assign(out Int32& left,Int32& right) -> Void\nldarg right\nldc.i4 42\nstobj Int32\nldvoid\nret\n.end";
+    for field in ["Left", "Right"] {
+        let body = format!(
+            ".local Pair pair\nldc.i4 0\nldc.i4 0\nnewobj Pair\nstloc pair\nldloca pair\nldflda Pair::Left\nldloca pair\nldflda Pair::{field}\ncall Assign(Int32&,Int32&)\npop\nldloc pair\nldfld Pair::Left"
+        );
+        let p = program(extra, &body, "Int32").unwrap();
+        p.verify().unwrap();
+        let result = p.run(Limits::default());
+        if field == "Left" {
+            assert_eq!(result.unwrap().value, Value::Int32(42));
+        } else {
+            assert!(result.unwrap_err().message.contains("out parameter"));
+        }
+    }
+}
+
+#[test]
+fn replacing_a_parent_fulfills_its_field_output_obligation() {
+    let extra = ".type Counter\n.field Age Int32\n.end\n.function Replace(out Int32& age,Counter& counter) -> Void\nldarg counter\nldc.i4 42\nnewobj Counter\nstobj Counter\nldvoid\nret\n.end";
+    let p = program(extra, ".local Counter counter\nldc.i4 7\nnewobj Counter\nstloc counter\nldloca counter\nldflda Counter::Age\nldloca counter\ncall Replace(Int32&,Counter&)\npop\nldloc counter\nldfld Counter::Age", "Int32").unwrap();
+    p.verify().unwrap();
+    assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+}
+
+#[test]
+fn managed_field_addresses_require_initialized_records_and_valid_fields() {
+    for body in [
+        ".local Counter counter\nldloca counter\nldflda Counter::Age\nldobj Int32",
+        ".local Counter counter\nldc.i4 7\nnewobj Counter\nstloc counter\nldloca counter\nldflda 9\nldobj Int32",
+    ] {
+        let p = program(".type Counter\n.field Age Int32\n.end", body, "Int32").unwrap();
+        assert!(p.verify().is_err());
+        assert!(p.run(Limits::default()).is_err());
     }
 }

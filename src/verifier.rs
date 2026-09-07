@@ -135,7 +135,11 @@ fn analyze_function(
                 }),
             ) => state.initialized[*index] = true,
             (
-                Op::LoadObject(_) | Op::BorrowInterface(_),
+                Op::LoadObject(_)
+                | Op::FieldAddress(_)
+                | Op::BorrowInterface(_)
+                | Op::Store(_)
+                | Op::Return,
                 Some(StackType::Slot {
                     local: Some(index), ..
                 }),
@@ -509,6 +513,10 @@ fn typed_effect(
             Result::Ok(vec![])
         }
         Return => {
+            require(
+                !matches!(&values[0], StackType::Slot { .. }),
+                "cannot return a managed reference to the current frame",
+            )?;
             stored(&values[0], &function.returns)?;
             Result::Ok(vec![])
         }
@@ -589,7 +597,17 @@ fn typed_effect(
             stored(&values[1], &field(exact(&values[0])?, *index)?)?;
             Result::Ok(vec![values[0].clone()])
         }
-        FieldAddress(index) => one(T::Ptr(Box::new(field(pointer(&values[0])?, *index)?))),
+        FieldAddress(index) => match exact(&values[0])? {
+            T::ByRef(owner) => {
+                let ty = T::ByRef(Box::new(field(owner, *index)?));
+                if let StackType::Slot { local, .. } = &values[0] {
+                    Ok(vec![StackType::Slot { ty, local: *local }])
+                } else {
+                    one(ty)
+                }
+            }
+            _ => one(T::Ptr(Box::new(field(pointer(&values[0])?, *index)?))),
+        },
         NullPointer(ty) => one(T::Ptr(Box::new(ty.clone()))),
         PointerCast(ty) => {
             pointer(&values[0])?;

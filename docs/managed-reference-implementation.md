@@ -1,151 +1,111 @@
 # Managed reference implementation gate
 
-Status: proposed implementation plan for the agreed [lifecycle model](lifecycle.md).
-This is a representation and invariant review, not executable reference retention,
-new IL, a selected native ABI or an additional source-level ownership system.
+Status: the first checked reference-return slice is implemented for the agreed
+[lifecycle model](lifecycle.md). T& locals, managed record-field addresses and guest
+reference returns reuse ByRef, ldloca/ldarga, ldflda, ldobj/stobj and ret. Runtime
+checks reject references into the returning frame, including field/interface views
+and aliases. Explicit managed heap allocation and destruction remain future work.
 
-Use the .NET CLR instruction set, metadata concepts and semantics as the baseline.
-Reuse existing instruction meanings where they fit, and document the concrete
-improvement when a deviation is needed. Ref<T> is a historical proposal and current
-prototype encoding, not a selected future type. Preview changes may replace or
-remove it and break artifacts/APIs; preserving the experiment is not an acceptance
-requirement. Reject incompatible artifacts explicitly rather than adding an
-unnecessary compatibility layer.
-
-Reuse CLR managed references, represented by T&/ByRef, as the explicit reference
-feature. Extend the existing metadata, verification and address/load/store paths
-rather than introduce a parallel public ownership type. Frame-backed and retained
-storage implement the same reference abstraction. Automatic retention and escapes
-beyond a defining frame require documented semantic extensions; they do not imply
-compatibility with execution on an unmodified CLR.
+Use CLR metadata and instruction semantics as the baseline. Ref<T> is a historical
+proposal and current arena encoding, not a selected future wrapper. Preview changes
+may replace it and break artifacts/APIs. Reject incompatible artifacts explicitly;
+unnecessary compatibility layers are not an acceptance requirement. New allocation
+and lifetime behavior must have explicit semantics rather than imply compatibility
+with execution on an unmodified CLR.
 
 ## Observable contract
 
-T(...) constructs a value, &value refers to the same value, and new T(...) constructs
-a managed heap value and returns T&. A reference can be passed down call frames
-without manual handling. Returning a reference requires the referenced value to
-outlive its creating frame. Source syntax does not select a retaining-wrapper type.
+T(...) constructs an ordinary value, &value refers to that value, and the selected
+future new T(...) constructs a managed heap value and returns T&. Passing references
+requires no manual retention, release, ownership annotations or invalidation.
 
-Every alias must observe the same logical storage location. Taking another reference
-or changing physical placement cannot duplicate the referent. A value copy copies
-its inline fields and its embedded reference handles; it does not recursively clone
-their targets. Clonable remains an explicit operation with a separate contract.
+A function can return a reference into caller-owned storage, including a field of
+a byref argument. It cannot return a reference into its own ordinary local or
+by-value argument storage. No implicit promotion on return is selected. The future
+high-level language should enforce this dependency direction and the runtime must
+fault on violations even without verification. A function-created referent that
+must outlive its owner needs managed heap-backed storage. Ordinary by-value returns
+transfer values to the caller without inherently requiring heap allocation.
 
-Distinguish a reference variable from its referent: assigning another reference to
-the variable changes its binding; writing through the reference changes the target.
-A reference to an existing local continues to observe same-type assignment to that
-local under the current whole-slot semantics. Promotion must preserve that behavior.
+The [reference-return example](../examples/reference_returns.neoil) implements:
+
+```swift
+func MakeCounter(counter: Counter&) -> int& {
+    return &counter.Age
+}
+```
+
+Every alias observes the same root and field path. Replacing an owner with another
+value of the same type preserves the field's logical location. Rebinding a T& local
+changes only that reference binding. Ordinary value copies do not clone reference
+targets; Clonable remains explicit.
 
 ## Current implementation gaps
 
-| Area | Current implementation | Required change |
+| Area | Current implementation | Next gate |
 | --- | --- | --- |
-| Stack slots | Slot owns an optional Value in an Rc cell; SlotReference holds Weak plus an output-write baseline | Preserve stable target identity while adding retention where references outlive their frame |
-| Managed heap prototype | Value.Reference contains an arena index and Type::Ref target | Supply retaining managed references with the selected T& semantics |
-| Execution roots | Execution.heap owns every arena value until the result is dropped | Distinguish live references from registry bookkeeping so dead allocations can be released |
-| Copies | Value derives Rust Clone; slot reads recursively copy value trees | Make reference-copy retention a specified guest contract across every copy path |
-| Metadata and verification | ByRef locals, fields, returns and erasure are rejected | Admit supported retained references only after representation, escape and initialization checks exist |
-| Hosting | Inputs accept owned values; pointer/Ref/byref transfer is rejected | Define opaque rooted results and execution-context lifetimes before persistent reference invocation |
+| Slots | Stable host cells; references identify a root and field path; every ret rejects current-frame roots | Introduce explicit managed heap targets with independent lifetime provenance |
+| Managed heap prototype | Value.Reference is an index into execution-owned storage with Type::Ref | Replace with the selected T& semantics and automatic reclamation |
+| Copies | Reference handles retain host cells; slot reads copy values; fields preserve inline semantics | Define copy/release behavior for records containing managed references |
+| Metadata and verification | T& locals, record-field addresses and caller-backed returns supported | Define reference-valued fields, broader escape analysis and safe initialization |
+| Output obligations | Root/path write history tracks field or ancestor replacement; sibling writes do not satisfy outputs | Extend to additional storage kinds without weakening per-invocation obligations |
+| Hosting | Owned inputs only; T& results rejected before guest execution | Define context-rooted handles before persistent reference invocation |
 
-See [slots.rs](../src/slots.rs), [value.rs](../src/value.rs),
-[vm.rs](../src/vm.rs) and [input.rs](../src/input.rs). Existing host Rc cells are
-implementation scaffolding: they do not prove physical stack placement or a guest
-reference-counting contract. Replacing Weak with Rc alone would leave metadata,
-copying, outputs, cycles and host cleanup obligations unresolved.
+See [slots.rs](../src/slots.rs), [value.rs](../src/value.rs), [vm.rs](../src/vm.rs)
+and [input.rs](../src/input.rs). The interpreter's use of host allocations does not
+make ordinary guest locals managed heap objects. Strong host cells alone are not
+an escape policy; explicit frame-root validation controls returned references.
+Reference-valued fields, nested references and erasure remain rejected, preventing
+slot-reference cycles in this slice. Array-element references are not implemented.
 
-## Candidate representation
+## Invariants for the next managed heap slice
 
-Use one logical managed location with a stable identity, exact closed type,
-initialization state and payload. A managed reference identifies that location;
-retention is automatic. Physical representation can differ across backends.
+1. Every reference has one initialized target of the exact type. Field paths and
+   interface views preserve the root's storage lifetime. Reused storage cannot
+   revive stale references or change the identity observed by aliases.
+2. Returning a reference into the current frame always faults. A heap root has a
+   separately established lifetime; physical host placement cannot substitute for
+   that semantic distinction. Forwarding through another function changes neither.
+3. Copying a heap reference preserves its target and retention. Discarding an alias
+   releases only its own claim. Bookkeeping registries must not retain dead objects.
+4. Reads copy T under ordinary value semantics. Replacing a value accounts for its
+   embedded references while preserving aliases to the same logical location.
+   Retain incoming state before releasing outgoing state, including self-assignment.
+5. Construction and allocation are separate internally. Uninitialized storage must
+   not escape as a readable reference. Preserve out/out(true) obligations and field
+   identity across ancestor replacement; failed stores must not satisfy outputs.
+6. Guest return transfers a valid reference before callee teardown. Host results
+   remain rejected until their context and cleanup contracts exist.
+7. Dispose/Close resource state is independent of reference liveness. Guest
+   destructor dispatch requires separate metadata, ordering and failure rules.
 
-For a first interpreter experiment, a stable retained cell is a reasonable correctness
-baseline. Direct frame storage owns its normal lifetime claim; surviving reference
-values keep the same cell alive. Heap allocations enter this model directly.
-An allocation registry must not accidentally retain every cell merely to track it.
-Limits, diagnostics and identity lookup can use separate bookkeeping.
+## Boundaries and acceptance cases
 
-Proven call-scoped references can use ordinary frame storage without allocating
-another managed heap object. Optimizing retention away is valid when the active
-frame already guarantees the referent's lifetime. Conversely, a reference stored
-or returned beyond that guarantee requires retained storage before the frame ends.
-The programmer sees the same T& contract in either case.
+Automatic reference counting is a candidate for managed heap reclamation. Cycles,
+weak references, concurrency and pinning require decisions before claiming general
+deterministic reclamation. Reference-valued fields introduce new retention graphs;
+the current acyclic slot subset does not resolve those policies.
 
-Choose conservative retained placement for known escaping values before implementing
-general late promotion. A later promotion mechanism must redirect all aliases through
-the same logical identity. Raw addresses cannot be redirected this way; native
-pinning/stable-address rules remain a separate gate.
+The heap_objects limit currently bounds the legacy arena length. A reclaiming
+managed heap must separate live-object budgets from identity bookkeeping. Repeated
+allocation/release should not exhaust a live-object budget; identity reuse must
+remain safe. Frame cells and native pointer-byte budgets remain separate.
 
-## Invariants to establish before enabling escapes
+A host reference must retain required context/metadata/code or use a checked
+context-owned handle. Releasing a Rust handle on an arbitrary thread must not
+unexpectedly execute guest destructors. Cleanup scheduling, reentrancy, cancellation
+and secondary Faults need explicit contracts. Native backends need equivalent
+provenance, roots and copy/release rules; the interpreter layout is not a portable ABI.
 
-1. Every accessible reference has a live target of the exact declared type. An
-   allocation identifier cannot be fabricated or reused to revive an old reference.
-2. Copying a reference preserves target identity and required lifetime. Discarding
-   one reference releases only its own retention; the target survives other roots.
-3. Reads copy the stored T according to its value semantics. Replacing T preserves
-   location identity, accounts for embedded references and does not invalidate
-   unrelated aliases merely because a host container was replaced.
-4. Allocation and construction are separate internally. Uninitialized storage may
-   participate in checked output initialization, but must not escape as a readable
-   value. Preserve per-invocation out/out(true) write obligations across aliases.
-5. Returning a reference installs retention in the caller/result before releasing
-   the callee's lifetime claim. It never returns an address into a dead ordinary frame.
-6. Disposal may change the target's resource state without invalidating its managed
-   references. Final reference release and explicit Dispose are distinct events.
-7. Failed stores, invalid types and failed promotion leave existing live references
-   valid or terminate with a defined Fault; no partially published target is observable.
+Current tests cover caller-root forwarding, field mutation, nested generic String
+fields, parent replacement, reference-local rebinding, output aliases, and Faults
+for direct/indirect current-frame escapes. They also cover uninitialized targets,
+invalid field indices, native result signatures and host-result rejection. Host-cell
+release is tested independently of guest readback.
 
-For replacement, retain incoming referenced state before releasing outgoing state.
-Self-assignment and overlapping aliases must not reclaim a target in the middle of
-the operation. Temporary interpreter copies must not become observable extra guest
-lifetimes when destructor timing is introduced.
-
-## Boundaries that cannot be inferred from host reference counts
-
-An acyclic reference-counted graph is a useful first test workload, but is not a
-complete cycle policy. Determine how unsupported cyclic stores are handled before
-claiming general deterministic reclamation. Weak references or supplementary cycle
-collection affect the public lifetime guarantee and need their own decision.
-
-The allocation limit must distinguish live allocation count from an identity budget.
-The current heap_objects check uses the monotonically growing arena length. Under
-reclamation, repeated allocate/release should not exhaust a live-object budget while
-identity reuse must still be safe. Native pointer-byte limits remain separate.
-
-A host-visible reference must keep its execution context and required metadata/code
-alive, or be restricted to a context-owned handle with checked lifetime. Rust Drop
-on an arbitrary host thread must not unexpectedly execute guest destructors. Guest
-cleanup scheduling, reentrancy, cancellation and secondary Faults need a deliberate
-context contract before host releases can trigger user code.
-
-Reachability/service planning must eventually include implicit destruction targets,
-and native compilation needs equivalent roots, reference-copy and release behavior.
-No interpreter-only ownership mechanism should become the portable ABI by accident.
-
-## First bounded implementation and acceptance cases
-
-First implement and test automatic retention of managed heap values, with scoped
-byref access to the same target. Then enable a returned T& using retained placement
-and verify that it survives the producer frame. Keep runtime reference handling
-automatic; no manual endloc/retain/release source operations are prerequisites.
-User destructor dispatch follows once these reference-copy/release invariants hold.
-
-Acceptance cases should cover scalar and String-containing records; new T(...)
-aliases; a local passed through multiple byref calls; returned &local; alias-visible
-mutation before and after return; copies of records containing references; field and
-local replacement including self-assignment; last-reference release; construction
-failure; repeated allocation under a live-object limit; and rejected unsupported
-native/host escape paths. Count target allocations and releases independently of
-host implementation temporaries. Later add destructor-order and failure tests.
-
-The final IL encoding remains open. Review CLI-style newobj, ldloca/ldarga and
-ldobj/stobj before proposing any additional instruction. Their current prototype
-meanings are not a reason to invent a parallel operation for an otherwise unchanged
-concept. Reference escape and automatic retained storage need an explicit semantic
-contract; do not imply ordinary CLR execution compatibility for those extensions.
-
-Breaking preview artifacts and host APIs is permitted. Replace obsolete ByRef/Ref
-representations where the selected model requires it, without assuming Ref<T> must
-survive as a wrapper or a renamed type. Bump the format when old encodings would
-otherwise be misinterpreted, require reassembly, and update validation, verification,
-runtime services, host boundaries and examples together.
+Next add explicit managed allocation producing T&, safe heap-root returns, reference
+fields and live-budget tests. Then add destructor ordering and failure tests. Review
+CLI-style allocation/construction lowering before adding instructions; no manual
+retain/release operations are source prerequisites. Bump the format if obsolete
+encodings would otherwise be misinterpreted, and update validation, services, hosting
+and examples together.
