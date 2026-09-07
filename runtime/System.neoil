@@ -45,6 +45,23 @@
 .end
 
 .type System.Error
+    .method static FromMessage(String message) -> Error
+        ldarg message
+        call neoCLR.Runtime.ErrorFromMessage(String)
+        ret
+    .end
+
+    .method instance get_Message() -> String
+        ldarg this
+        call neoCLR.Runtime.ErrorMessage(Error)
+        ret
+    .end
+
+    .method instance ToString() -> String
+        ldarg this
+        call instance System.Error::get_Message()
+        ret
+    .end
 .end
 
 .type System.SByte
@@ -292,4 +309,12 @@
         heap.free
         ret
     .end
+.end
+
+.function neoCLR.Runtime.ErrorFromMessage(String message) -> Error
+    .methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.ErrorMessage(Error value) -> String
+    .methodimpl InternalCall
 .end

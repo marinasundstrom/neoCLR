@@ -15,6 +15,7 @@ pub enum RuntimeService {
     ConsoleOutput,
     NativeInterop,
     StringOperations,
+    ErrorValues,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -41,6 +42,9 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
     }
     if function.is_internal_call() {
         let service = match crate::native::bind(function)? {
+            crate::native::Binding::ErrorFromMessage | crate::native::Binding::ErrorMessage => {
+                RuntimeService::ErrorValues
+            }
             crate::native::Binding::ParseInt32 => RuntimeService::ParseInt32,
             crate::native::Binding::Int32ToString => RuntimeService::FormatInt32,
             crate::native::Binding::WriteLine => RuntimeService::ConsoleOutput,

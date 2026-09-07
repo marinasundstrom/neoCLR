@@ -11,6 +11,8 @@ pub(crate) enum Binding {
     StringConcat,
     StringByteCount,
     StringSliceUtf8,
+    ErrorFromMessage,
+    ErrorMessage,
 }
 
 pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
@@ -34,6 +36,10 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             Binding::StringSliceUtf8,
             Type::Result(Box::new(Type::String), Box::new(Type::Error)),
         ),
+        ("neoCLR.Runtime.ErrorFromMessage", [Type::String]) => {
+            (Binding::ErrorFromMessage, Type::Error)
+        }
+        ("neoCLR.Runtime.ErrorMessage", [Type::Error]) => (Binding::ErrorMessage, Type::String),
         _ => {
             return Err(Fault::new(format!(
                 "no runtime binding for {}({:?})",
@@ -126,6 +132,18 @@ impl Binding {
                     Type::Error,
                     Case::Ok,
                 ))
+            }
+            (Self::ErrorFromMessage, [Value::String(message)])
+            | (Self::ErrorMessage, [Value::Error(message)]) => {
+                let mut text = String::new();
+                text.try_reserve_exact(message.len())
+                    .map_err(|_| Fault::new("error text allocation failed"))?;
+                text.push_str(message);
+                Ok(if matches!(self, Self::ErrorFromMessage) {
+                    Value::Error(text)
+                } else {
+                    Value::String(text)
+                })
             }
             _ => Err(Fault::new("invalid native arguments")),
         }

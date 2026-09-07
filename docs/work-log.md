@@ -1393,3 +1393,20 @@ Array, and deliberate bounds-Fault samples, expected outcomes, Windows executabl
 and output overwrite behavior. Retained the broader sample inventory and module-set
 instructions. Documentation-only change; commands match the current CLI and diff checks
 pass. No runtime tests were rerun.
+
+## 2026-09-07 — Basic Error methods and recoverable failure sample
+
+Added System.Error.FromMessage, get_Message, and ToString as platform-library IL
+methods over two declared InternalCall helpers. Runtime strings can now construct
+owned Error values and retrieve their messages. Service planning reports ErrorValues.
+No new instructions, exception handling, or automatic Error stack capture are added.
+
+Added a free-function sample that propagates parse errors, constructs a domain error,
+reports Result cases, and continues execution. Documented the API and its separation
+from terminal Faults. Five tests cover the sample, empty/Unicode/NUL messages, owned
+host round trips, input and execution Fault distinctions, and service reachability.
+
+Validation: all 348 integration tests pass on macOS ARM64; formatting, clippy with
+warnings denied, and diff checks pass. The sample verifies and prints 42, InvalidInt32,
+Expected a positive number: -1, and Execution continued, then returns Void. Linux and
+Windows remain for CI.

@@ -59,7 +59,9 @@ The immediate demonstration set should include:
   now provide concatenation, ordinal equality, emptiness, explicit UTF-8 byte count, and
   checked byte slicing with Result errors. General indexing and decoding remain separate.
 - Recoverable failures through Result and terminal runtime/system Faults with preserved
-  stack traces. Error handling is a milestone of its own, not incidental plumbing.
+  stack traces. [Initial Error methods](errors.md) now construct and expose messages;
+  a runnable sample reports parse and domain errors and continues. Error handling is
+  a milestone of its own, not incidental plumbing.
 
 [Owned Fault snapshots](stack-traces.md) are implemented. Guest StackTrace/StackFrame
 integration remains an intended runtime-library capability; source-line resolution and

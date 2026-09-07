@@ -1,0 +1,65 @@
+.module Errors
+.entry Main
+
+.function ReadPositive(String text) -> Result<Int32,Error>
+    .local Result<Int32,Error> parsed
+    .local Int32 value
+    ldarg text
+    call System.Int32::Parse(String)
+    stloc parsed
+    ldloc parsed
+    is.case Err
+    brtrue ParseFailed
+    ldloc parsed
+    ldcase Ok
+    stloc value
+    ldloc value
+    ldc.i4 0
+    bgt Success
+    ldstr "Expected a positive number: "
+    ldarg text
+    call System.String::Concat(String,String)
+    call System.Error::FromMessage(String)
+    err Int32
+    ret
+ParseFailed:
+    ldloc parsed
+    ret
+Success:
+    ldloc value
+    ok Error
+    ret
+.end
+
+.function Report(Result<Int32,Error> result) -> Void
+    ldarg result
+    dup
+    is.case Ok
+    brtrue Success
+    ldcase Err
+    call instance System.Error::ToString()
+    call System.Console::WriteLine(String)
+    ret
+Success:
+    ldcase Ok
+    call System.Console::WriteLine(Int32)
+    ret
+.end
+
+.function Main() -> Void
+    ldstr "42"
+    call ReadPositive(String)
+    call Report(Result<Int32,Error>)
+    pop
+    ldstr "oops"
+    call ReadPositive(String)
+    call Report(Result<Int32,Error>)
+    pop
+    ldstr "-1"
+    call ReadPositive(String)
+    call Report(Result<Int32,Error>)
+    pop
+    ldstr "Execution continued"
+    call System.Console::WriteLine(String)
+    ret
+.end

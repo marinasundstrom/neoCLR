@@ -34,6 +34,7 @@ Duplicate entries in the supplied service set have no additional effect.
 | ConsoleOutput | Validated neoCLR.Runtime.WriteLine InternalCall |
 | NativeInterop | P/Invoke declarations |
 | StringOperations | Validated StringConcat, StringByteCount, and StringSliceUtf8 InternalCalls |
+| ErrorValues | Validated ErrorFromMessage and ErrorMessage InternalCalls |
 
 heap.alloc/free report both NativeAllocation and PointerMemory; localloc reports both
 FrameAllocation and PointerMemory. PointerMemory names the current pointer-access and

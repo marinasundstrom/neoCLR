@@ -93,11 +93,13 @@ output-file overwrite rule applies to `System.neo.json`.
 
 ```sh
 cargo run --locked -- run examples/strings.neoil
+cargo run --locked -- run examples/errors.neoil
 cargo run --locked -- run examples/arrays.neoil
 cargo run --locked -- run examples/array_bounds.neoil
 ```
 
-The string sample demonstrates Unicode text and recoverable slice Errors. The array
+The string sample demonstrates Unicode text and recoverable slice Errors. The
+[error sample](docs/errors.md) constructs and reports Error messages, then continues. The array
 sample prints `10`, `42`, `10` and frees its buffer. The bounds sample deliberately
 terminates with a nonzero exit code and a Fault stack trace; that failure is expected.
 

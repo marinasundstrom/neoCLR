@@ -21,7 +21,7 @@ fn runtime_library_is_assembled_platform_code() {
             .iter()
             .filter(|f| !f.is_internal_call())
             .count(),
-        18
+        21
     );
     assert_eq!(
         module
@@ -29,7 +29,7 @@ fn runtime_library_is_assembled_platform_code() {
             .iter()
             .filter(|f| f.is_internal_call())
             .count(),
-        6
+        8
     );
     assert!(
         module
