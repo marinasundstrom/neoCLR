@@ -391,9 +391,9 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                             serde_json::from_str::<String>(rest)
                                 .map_err(|_| Fault::new("expected JSON-quoted string"))?
                         )),
-                        "ldarg" | "starg" | "ldloc" | "stloc" => Some(serde_json::json!(
-                            resolve_slot(&pending.function, word, rest)?
-                        )),
+                        "ldarg" | "ldarga" | "starg" | "ldloc" | "ldloca" | "stloc" => Some(
+                            serde_json::json!(resolve_slot(&pending.function, word, rest)?),
+                        ),
                         "ldfld" | "stfld" | "ldflda" => {
                             let index = if let Ok(index) = rest.parse::<usize>() {
                                 index
@@ -777,13 +777,16 @@ pub fn parse_type(text: &str) -> Result<Type, Fault> {
         let text = text.trim();
         if let Some(index) = text.strip_prefix('!') {
             // Pointer suffixes are parsed first below; !0* is not a bare index.
-            if !text.ends_with('*') {
+            if !text.ends_with('*') && !text.ends_with('&') {
                 return Ok(Type::TypeParameter(
                     index
                         .parse()
                         .map_err(|_| Fault::new("expected type parameter index !0"))?,
                 ));
             }
+        }
+        if let Some(element) = text.strip_suffix('&') {
+            return Ok(Type::ByRef(Box::new(parse(element, depth + 1)?)));
         }
         if let Some(element) = text.strip_suffix('*') {
             return Ok(Type::Ptr(Box::new(parse(element, depth + 1)?)));
@@ -990,10 +993,10 @@ fn resolve_slot(function: &Function, op: &str, operand: &str) -> Result<usize, F
     if let Ok(index) = operand.parse::<usize>() {
         return Ok(index);
     }
-    if matches!(op, "ldarg" | "starg") && function.instance && operand == "this" {
+    if matches!(op, "ldarg" | "ldarga" | "starg") && function.instance && operand == "this" {
         return Ok(0);
     }
-    let (names, offset) = if matches!(op, "ldarg" | "starg") {
+    let (names, offset) = if matches!(op, "ldarg" | "ldarga" | "starg") {
         (&function.parameter_names, usize::from(function.instance))
     } else {
         (&function.local_names, 0)
@@ -1005,7 +1008,7 @@ fn resolve_slot(function: &Function, op: &str, operand: &str) -> Result<usize, F
         .ok_or_else(|| {
             Fault::new(format!(
                 "unknown {} name {operand:?}",
-                if matches!(op, "ldarg" | "starg") {
+                if matches!(op, "ldarg" | "ldarga" | "starg") {
                     "parameter"
                 } else {
                     "local"
@@ -1132,6 +1135,7 @@ fn bind_type_parameters(ty: Type, names: &[Option<String>]) -> Type {
         },
         Type::Ref(t) => Type::Ref(Box::new(bind_type_parameters(*t, names))),
         Type::InterfaceRef(t) => Type::InterfaceRef(Box::new(bind_type_parameters(*t, names))),
+        Type::ByRef(t) => Type::ByRef(Box::new(bind_type_parameters(*t, names))),
         Type::Ptr(t) => Type::Ptr(Box::new(bind_type_parameters(*t, names))),
         other => other,
     }

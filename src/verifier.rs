@@ -127,6 +127,26 @@ fn analyze_function(
             state.initialized[*slot] = true;
         }
         let inputs = state.stack.split_off(state.stack.len() - pops);
+        match (op, inputs.first()) {
+            (
+                Op::StoreObject(_),
+                Some(StackType::Slot {
+                    local: Some(index), ..
+                }),
+            ) => state.initialized[*index] = true,
+            (
+                Op::LoadObject(_),
+                Some(StackType::Slot {
+                    local: Some(index), ..
+                }),
+            ) if !state.initialized[*index] => {
+                return Err(fault(pc, "referenced local is uninitialized"));
+            }
+            _ => (),
+        }
+        if matches!(op, Op::Call(_) | Op::Construct(_)) && inputs.iter().any(|input| matches!(input, StackType::Slot { local: Some(index), .. } if !state.initialized[*index])) {
+            return Err(fault(pc, "reference argument requires initialized local"));
+        }
         let outputs = typed_effect(module, function, op, &inputs, arity, state.stack.is_empty())
             .map_err(|e| fault(pc, &e.message))?;
         debug_assert_eq!(outputs.len(), pushes);
@@ -218,6 +238,8 @@ fn effect(module: &Module, op: &Op, arity: usize) -> Result<(usize, usize), Faul
         | String(_)
         | Void
         | Arg(_)
+        | LocalAddress(_)
+        | ArgumentAddress(_)
         | Load(_)
         | LoadTypeToken(_)
         | SizeOf(_)
@@ -321,6 +343,7 @@ fn effect(module: &Module, op: &Op, arity: usize) -> Result<(usize, usize), Faul
 // becomes Int32, for example). Keep it distinct from a raw stored !n value.
 #[derive(Debug, Clone, PartialEq, Eq)]
 enum StackType {
+    Slot { ty: Type, local: Option<usize> },
     Exact(Type),
     NormalizedParameter(u16),
 }
@@ -337,7 +360,7 @@ fn loaded(ty: &Type) -> StackType {
 }
 
 fn stored(value: &StackType, target: &Type) -> Result<(), Fault> {
-    if *value == StackType::Exact(target.clone()) || *value == loaded(target) {
+    if exact(value).is_ok_and(|ty| ty == target) || *value == loaded(target) {
         Ok(())
     } else {
         Err(Fault::new(format!(
@@ -348,10 +371,17 @@ fn stored(value: &StackType, target: &Type) -> Result<(), Fault> {
 
 fn exact(value: &StackType) -> Result<&Type, Fault> {
     match value {
-        StackType::Exact(ty) => Ok(ty),
+        StackType::Exact(ty) | StackType::Slot { ty, .. } => Ok(ty),
         _ => Err(Fault::new(
             "operation requires a concrete stack type; open parameter normalization is unresolved",
         )),
+    }
+}
+
+fn address(value: &StackType) -> Result<&Type, Fault> {
+    match exact(value)? {
+        Type::Ptr(t) | Type::ByRef(t) => Ok(t),
+        _ => Err(Fault::new("expected pointer or managed slot reference")),
     }
 }
 
@@ -407,6 +437,14 @@ fn typed_effect(
         String(_) => one(T::String),
         Error(_) => one(T::Error),
         Void => one(T::Void),
+        LocalAddress(index) => Result::Ok(vec![StackType::Slot {
+            ty: T::ByRef(Box::new(function.locals[*index].clone())),
+            local: Some(*index),
+        }]),
+        ArgumentAddress(index) => Result::Ok(vec![StackType::Slot {
+            ty: T::ByRef(Box::new(function.argument_types()[*index].clone())),
+            local: None,
+        }]),
         Arg(index) => Result::Ok(vec![loaded(&function.argument_types()[*index])]),
         Load(index) => Result::Ok(vec![loaded(&function.locals[*index])]),
         Store(index) => {
@@ -526,14 +564,14 @@ fn typed_effect(
         }
         LoadObject(ty) => {
             require(
-                pointer(&values[0])? == ty,
+                address(&values[0])? == ty,
                 "memory load pointer type mismatch",
             )?;
             Result::Ok(vec![loaded(ty)])
         }
         StoreObject(ty) => {
             require(
-                pointer(&values[0])? == ty,
+                address(&values[0])? == ty,
                 "memory store pointer type mismatch",
             )?;
             stored(&values[1], ty)?;
@@ -577,7 +615,13 @@ fn typed_effect(
             stored(&values[1], ty)?;
             Result::Ok(vec![])
         }
-        HeapNew => one(T::Ref(Box::new(exact(&values[0])?.clone()))),
+        HeapNew => {
+            require(
+                !crate::slots::contains(exact(&values[0])?),
+                "managed reference cannot escape into heap storage",
+            )?;
+            one(T::Ref(Box::new(exact(&values[0])?.clone())))
+        }
         HeapLoad | HeapStore => {
             let T::Ref(ty) = exact(&values[0])? else {
                 return Result::Err(crate::Fault::new("expected Ref value"));

@@ -1,0 +1,35 @@
+.module ReferenceParameters
+.entry Main
+
+.function Assign(Int32& destination, Int32 value) -> Void
+    ldarg destination
+    ldarg value
+    stobj Int32
+    ldvoid
+    ret
+.end
+
+.function Forward(Int32& destination) -> Void
+    ldarg destination
+    ldc.i4 42
+    call Assign(Int32&,Int32)
+    ret
+.end
+
+.function Main() -> Void
+    .local Int32 answer
+    ldc.i4 0
+    stloc answer
+    ldloca answer
+    call Forward(Int32&)
+    pop
+    ldloc answer
+    call System.Console::WriteLine(Int32)
+    ret
+.end
+
+.function ReadCopy(Int32 value) -> Int32
+    ldarga value
+    ldobj Int32
+    ret
+.end

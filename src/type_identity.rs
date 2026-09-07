@@ -11,6 +11,7 @@ pub enum TypeIdentity {
         definition: TypeDefId,
         arguments: Vec<TypeIdentity>,
     },
+    ByRef(Box<TypeIdentity>),
     Ptr(Box<TypeIdentity>),
     InterfaceRef(Box<TypeIdentity>),
     // Ref retains its explicit runtime identity during the ownership prototype.
@@ -30,6 +31,7 @@ pub(crate) fn describe(module: &Module, ty: &Type) -> Result<TypeDescriptor, Fau
     let normalized = crate::scope::normalize_type(module, ty)?;
     let identity = resolve(module, &normalized)?;
     let name = match &normalized {
+        Type::ByRef(element) => format!("{}&", signature_name(element)?),
         Type::Ptr(element) => format!("{}*", signature_name(element)?),
         Type::Ref(element) => format!("Ref<{}>", signature_name(element)?),
         Type::InterfaceRef(element) => format!("InterfaceRef<{}>", signature_name(element)?),
@@ -58,6 +60,7 @@ pub(crate) fn describe(module: &Module, ty: &Type) -> Result<TypeDescriptor, Fau
 
 fn signature_name(ty: &Type) -> Result<String, Fault> {
     Ok(match ty {
+        Type::ByRef(element) => format!("{}&", signature_name(element)?),
         Type::Ptr(element) => format!("{}*", signature_name(element)?),
         Type::Ref(element) => format!("Ref<{}>", signature_name(element)?),
         Type::InterfaceRef(element) => format!("InterfaceRef<{}>", signature_name(element)?),
@@ -105,6 +108,7 @@ pub(crate) fn resolve(module: &Module, ty: &Type) -> Result<TypeIdentity, Fault>
 fn build(module: &Module, ty: &Type) -> Result<TypeIdentity, Fault> {
     let nested = |ty: &Type| build(module, ty).map(Box::new);
     Ok(match ty {
+        Type::ByRef(t) => TypeIdentity::ByRef(nested(t)?),
         Type::Ptr(t) => TypeIdentity::Ptr(nested(t)?),
         Type::Ref(t) => TypeIdentity::Ref(nested(t)?),
         Type::InterfaceRef(t) => TypeIdentity::InterfaceRef(nested(t)?),

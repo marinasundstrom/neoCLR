@@ -1,8 +1,8 @@
 # Proposed slot references and reference receivers
 
-Status: design for the next executable slice. None of the new signatures,
-parameter contracts or instructions below is implemented yet. Existing pointer
-and InterfaceRef behavior remains unchanged until an explicit migration.
+Status: direct T& parameters, ldloca/ldarga and ldobj/stobj slot access are implemented.
+Out contracts, reference receivers and safe interface slot views below remain planned.
+Existing pointer and InterfaceRef behavior is unchanged.
 
 ## Purpose
 

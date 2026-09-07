@@ -565,3 +565,13 @@ ordinary type declares conformance. `InterfaceRef<I>` is a distinct borrowed sig
 `interface.borrow` is a neoCLR addition; `callvirt` is a CLI-shaped interface-only
 subset. Both report InterfaceDispatch. Neither boxes nor owns a receiver.
 See [interfaces](interfaces.md) for exact matching, copy and lifetime rules.
+
+## Managed slot references (format 4)
+
+`T&` is an explicit call-scoped, non-owning slot reference. `ldloca index/name` and
+`ldarga index/name` push references to local and by-value argument slots. Existing
+`ldobj T`/`stobj T` accept an exact T& and copy/read or immediately replace its value
+without native layout requirements. The pointer operand path remains separate.
+These are CLI-shaped operations with the [slot-reference restrictions](reference-slots.md).
+SlotReferences is the service for address formation; ldobj/stobj conservatively report
+both SlotReferences and PointerMemory until operand-sensitive service analysis exists.

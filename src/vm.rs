@@ -319,6 +319,9 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         }
         let mut fields = HashSet::new();
         for field in &def.fields {
+            if crate::slots::contains(&field.ty) {
+                return Err(Fault::new("managed references cannot be stored in fields"));
+            }
             if field.name.is_empty() || !fields.insert(&field.name) {
                 return Err(Fault::new("empty or duplicate field name"));
             }
@@ -411,6 +414,23 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 ));
             }
         }
+        if function
+            .locals
+            .iter()
+            .chain([&function.returns])
+            .any(crate::slots::contains)
+        {
+            return Err(Fault::new(
+                "managed references cannot be locals or return values",
+            ));
+        }
+        if (function.is_internal_call() || function.pinvoke.is_some())
+            && function.parameters.iter().any(crate::slots::contains)
+        {
+            return Err(Fault::new(
+                "managed references cannot cross native helper boundaries",
+            ));
+        }
         for ty in function
             .parameters
             .iter()
@@ -486,11 +506,20 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                         "switch target outside function or into prefixed instruction",
                     ));
                 }
-                Op::Arg(i) | Op::StoreArg(i) if *i >= function.argument_types().len() => {
+                Op::Arg(i) | Op::StoreArg(i) | Op::ArgumentAddress(i)
+                    if *i >= function.argument_types().len() =>
+                {
                     return Err(Fault::new("argument index outside signature"));
                 }
-                Op::Load(i) | Op::Store(i) if *i >= function.locals.len() => {
+                Op::Load(i) | Op::Store(i) | Op::LocalAddress(i) if *i >= function.locals.len() => {
                     return Err(Fault::new("local index outside signature"));
+                }
+                Op::ArgumentAddress(i) | Op::StoreArg(i)
+                    if crate::slots::contains(&function.argument_types()[*i]) =>
+                {
+                    return Err(Fault::new(
+                        "cannot rebind or take the address of a managed reference parameter",
+                    ));
                 }
                 Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {
                     if let Some(owner) = &target.owner {
@@ -519,8 +548,6 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 Op::SizeOf(ty)
                 | Op::AlignOf(ty)
                 | Op::Allocate(ty)
-                | Op::LoadObject(ty)
-                | Op::StoreObject(ty)
                 | Op::CopyObject(ty)
                 | Op::InitializeObject(ty) => {
                     check(ty)?;
@@ -528,9 +555,18 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                         crate::memory::layout(module, ty)?;
                     }
                 }
+                Op::LoadObject(ty) | Op::StoreObject(ty) => {
+                    check(ty)?;
+                    if crate::slots::contains(ty) {
+                        return Err(Fault::new("managed references cannot be indirectly stored"));
+                    }
+                }
                 Op::BorrowInterface(ty) => {
                     check(ty)?;
                     crate::interfaces::interface_definition(module, ty)?;
+                }
+                Op::PackValue(ty) if crate::slots::contains(ty) => {
+                    return Err(Fault::new("managed references cannot be erased"));
                 }
                 Op::LoadTypeToken(ty)
                 | Op::PackValue(ty)
@@ -693,6 +729,9 @@ fn check_type_context(ty: &Type, module: &Module, arity: usize, depth: usize) ->
                 return Err(Fault::new("generic type argument count mismatch"));
             }
             for argument in arguments {
+                if crate::slots::contains(argument) {
+                    return Err(Fault::new("managed references cannot be generic arguments"));
+                }
                 nested(argument)?;
             }
             Ok(())
@@ -702,7 +741,20 @@ fn check_type_context(ty: &Type, module: &Module, arity: usize, depth: usize) ->
             crate::interfaces::interface_definition(module, t)?;
             Ok(())
         }
-        Type::Ref(t) | Type::Ptr(t) => nested(t),
+        Type::ByRef(t) => {
+            if crate::slots::contains(t) {
+                return Err(Fault::new("nested managed references are not supported"));
+            }
+            nested(t)
+        }
+        Type::Ref(t) | Type::Ptr(t) => {
+            if crate::slots::contains(t) {
+                return Err(Fault::new(
+                    "managed references cannot be stored in pointer or owner types",
+                ));
+            }
+            nested(t)
+        }
         _ => Ok(()),
     }
 }
@@ -711,23 +763,30 @@ struct Frame {
     function: std::rc::Rc<crate::metadata::Function>,
     pc: usize,
     trace_pc: usize,
-    args: Vec<Option<Value>>,
+    args: Vec<crate::slots::Cell>,
     constructing: bool,
-    locals: Vec<Option<Value>>,
+    locals: Vec<crate::slots::Cell>,
     stack: Vec<Value>,
     allocations: Vec<crate::memory::Pointer>,
 }
 
 impl Frame {
     fn new(function: crate::metadata::Function, args: Vec<Value>) -> Self {
-        let local_count = function.locals.len();
+        let locals = function
+            .locals
+            .iter()
+            .map(|ty| crate::slots::Slot::new(ty.clone(), None))
+            .collect();
         Self {
             function: std::rc::Rc::new(function),
             pc: 0,
             trace_pc: 0,
-            args: args.into_iter().map(Some).collect(),
+            args: args
+                .into_iter()
+                .map(|v| crate::slots::Slot::new(v.ty(), Some(v)))
+                .collect(),
             constructing: false,
-            locals: vec![None; local_count],
+            locals,
             stack: vec![],
             allocations: vec![],
         }
@@ -750,7 +809,12 @@ impl Frame {
         let args = self.stack.split_off(self.stack.len() - types.len());
         args.into_iter()
             .zip(types)
-            .map(|(value, ty)| value.for_storage(ty))
+            .map(|(value, ty)| {
+                if let Value::SlotReference(r) = &value {
+                    r.read()?;
+                }
+                value.for_storage(ty)
+            })
             .collect()
     }
 }
@@ -912,25 +976,31 @@ fn interpret_frames(
                 Op::String(s) => frame.stack.push(Value::String(s.clone())),
                 Op::Void => frame.stack.push(Value::Void),
                 Op::Error(s) => frame.stack.push(Value::Error(s.clone())),
-                Op::Arg(i) => frame.stack.push(
-                    frame.args[*i]
-                        .clone()
-                        .ok_or_else(|| Fault::new("read of uninitialized constructor receiver"))?
-                        .on_stack(),
-                ),
+                Op::LocalAddress(i) => {
+                    frame
+                        .stack
+                        .push(Value::SlotReference(crate::SlotReference::new(
+                            &frame.locals[*i],
+                        )))
+                }
+                Op::ArgumentAddress(i) => {
+                    frame
+                        .stack
+                        .push(Value::SlotReference(crate::SlotReference::new(
+                            &frame.args[*i],
+                        )))
+                }
+                Op::Arg(i) => frame.stack.push(frame.args[*i].borrow().get()?.on_stack()),
                 Op::StoreArg(i) => {
                     let value = frame.pop()?;
-                    frame.args[*i] = Some(value.for_storage(&function.argument_types()[*i])?);
+                    frame.args[*i].borrow_mut().set(value)?;
                 }
-                Op::Load(i) => frame.stack.push(
-                    frame.locals[*i]
-                        .clone()
-                        .ok_or_else(|| Fault::new("read of uninitialized local"))?
-                        .on_stack(),
-                ),
+                Op::Load(i) => frame
+                    .stack
+                    .push(frame.locals[*i].borrow().get()?.on_stack()),
                 Op::Store(i) => {
                     let value = frame.pop()?;
-                    frame.locals[*i] = Some(value.for_storage(&function.locals[*i])?);
+                    frame.locals[*i].borrow_mut().set(value)?;
                 }
                 Op::Dup => {
                     let value = frame
@@ -1153,14 +1223,17 @@ fn interpret_frames(
                     child.constructing = true;
                     child.args.insert(
                         0,
-                        if empty {
-                            Some(Value::Object {
-                                ty: owner,
-                                fields: vec![],
-                            })
-                        } else {
-                            None
-                        },
+                        crate::slots::Slot::new(
+                            owner.clone(),
+                            if empty {
+                                Some(Value::Object {
+                                    ty: owner,
+                                    fields: vec![],
+                                })
+                            } else {
+                                None
+                            },
+                        ),
                     );
                     frames.push(child);
                 }
@@ -1206,7 +1279,7 @@ fn interpret_frames(
                         return Err(Fault::new("ret requires exactly one value"));
                     }
                     let value = if frame.constructing {
-                        frame.args[0].take().ok_or_else(|| {
+                        frame.args[0].borrow().get().map_err(|_| {
                             Fault::new("constructor returned without initializing its receiver")
                         })?
                     } else {
@@ -1399,6 +1472,20 @@ fn interpret_frames(
                 | Op::LoadIndirectNative
                 | Op::LoadIndirectFloat32
                 | Op::LoadIndirectFloat64 => {
+                    if let (Op::LoadObject(ty), Some(Value::SlotReference(reference))) =
+                        (op, frame.stack.last())
+                    {
+                        if reference.target() != ty {
+                            return Err(Fault::new("managed reference load type mismatch"));
+                        }
+                        if access_alignment.is_some() {
+                            return Err(Fault::new("unaligned is not valid on slot references"));
+                        }
+                        let value = reference.read()?.on_stack();
+                        frame.pop()?;
+                        frame.stack.push(value);
+                        return Ok(None);
+                    }
                     let mut pointer = frame.pointer()?;
                     let ty = if let Op::LoadObject(ty) = op {
                         if pointer.target != *ty {
@@ -1424,6 +1511,19 @@ fn interpret_frames(
                 | Op::StoreIndirectFloat32
                 | Op::StoreIndirectFloat64 => {
                     let value = frame.pop()?;
+                    if let (Op::StoreObject(ty), Some(Value::SlotReference(reference))) =
+                        (op, frame.stack.last())
+                    {
+                        if reference.target() != ty {
+                            return Err(Fault::new("managed reference store type mismatch"));
+                        }
+                        if access_alignment.is_some() {
+                            return Err(Fault::new("unaligned is not valid on slot references"));
+                        }
+                        reference.write(value)?;
+                        frame.pop()?;
+                        return Ok(None);
+                    }
                     let pointer = frame.pointer()?;
                     if let Op::StoreObject(ty) = op {
                         if pointer.target != *ty {
@@ -1448,6 +1548,11 @@ fn interpret_frames(
                     }
                     let value = frame.pop()?;
                     let target = value.ty();
+                    if crate::slots::contains(&target) {
+                        return Err(Fault::new(
+                            "managed references cannot escape into heap storage",
+                        ));
+                    }
                     let index = heap.len();
                     heap.push(value);
                     frame.stack.push(Value::Reference { index, target });

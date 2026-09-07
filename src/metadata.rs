@@ -39,6 +39,8 @@ pub enum Type {
         arguments: Vec<Type>,
     },
     Ref(Box<Type>),
+    /// Call-scoped typed slot reference; independent of ownership and native layout.
+    ByRef(Box<Type>),
     /// Explicit borrowed interface receiver, separate from the interface declaration.
     InterfaceRef(Box<Type>),
     /// Fundamental unmanaged pointer signature; no ownership policy is implied.
@@ -447,6 +449,10 @@ pub enum Instruction {
     String(String),
     #[serde(rename = "ldvoid")]
     Void,
+    #[serde(rename = "ldloca")]
+    LocalAddress(usize),
+    #[serde(rename = "ldarga")]
+    ArgumentAddress(usize),
     #[serde(rename = "ldarg")]
     Arg(usize),
     #[serde(rename = "starg")]
@@ -726,6 +732,7 @@ impl Type {
                     name: name.clone(),
                     arguments: types.iter().map(nested).collect::<Result<_, _>>()?,
                 },
+                Type::ByRef(t) => Type::ByRef(Box::new(nested(t)?)),
                 Type::Ptr(t) => Type::Ptr(Box::new(nested(t)?)),
                 Type::Ref(t) => Type::Ref(Box::new(nested(t)?)),
                 Type::InterfaceRef(t) => Type::InterfaceRef(Box::new(nested(t)?)),

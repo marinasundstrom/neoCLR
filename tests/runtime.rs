@@ -253,6 +253,7 @@ fn all_implemented_opcodes_have_a_sample() {
     let samples = [
         include_str!("../examples/hello.neoil"),
         include_str!("../examples/interfaces.neoil"),
+        include_str!("../examples/reference_parameters.neoil"),
         include_str!("../examples/type_inspection.neoil"),
         include_str!("../examples/features.neoil"),
         include_str!("../examples/fault.neoil"),
@@ -350,6 +351,8 @@ fn all_implemented_opcodes_have_a_sample() {
         "ldtoken",
         "ldvoid",
         "ldarg",
+        "ldarga",
+        "ldloca",
         "starg",
         "unaligned.",
         "beq",

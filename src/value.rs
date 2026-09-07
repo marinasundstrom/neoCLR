@@ -28,6 +28,7 @@ pub enum Value {
         ty: Type,
         fields: Vec<Value>,
     },
+    SlotReference(crate::SlotReference),
     Pointer(crate::memory::Pointer),
     InterfaceRef {
         interface: Type,
@@ -54,6 +55,9 @@ impl Value {
             }
             remaining -= 1;
             match item {
+                Self::SlotReference(_) => {
+                    return Err(crate::Fault::new("managed references cannot be erased"));
+                }
                 Self::Erased(payload) => {
                     pending.push((payload, depth + 1));
                 }
@@ -89,6 +93,7 @@ impl Value {
             Self::RuntimeTypeHandle(_) => Type::RuntimeTypeHandle,
             Self::Object { ty, .. } => ty.clone(),
             Self::InterfaceRef { interface, .. } => Type::InterfaceRef(Box::new(interface.clone())),
+            Self::SlotReference(reference) => Type::ByRef(Box::new(reference.target().clone())),
             Self::Pointer(pointer) => Type::Ptr(Box::new(pointer.target.clone())),
             Self::Reference { target, .. } => Type::Ref(Box::new(target.clone())),
         }

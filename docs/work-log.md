@@ -2297,3 +2297,17 @@ future conditional TryGet assignment. Implementation is ordered into direct refe
 out obligations, reference receivers and an explicit interface/library migration.
 All syntax in the design is marked proposed. No executable behavior changed; checked
 document links and whitespace. Runtime tests are not required for this design slice.
+
+## Direct managed slot references
+
+Implemented T& signatures, named/indexed ldloca and ldarga, exact typed ldobj/stobj
+access, and call forwarding. Weak slot identities neither retain frames nor alias
+reused storage. References can address Strings and generic value records without
+native layout. Metadata and runtime checks prohibit return/storage/erasure/native
+escape and reference-parameter rebinding. Ordinary reference calls require initialized
+storage, and aliases observe writes immediately. Slot addressing is independent of
+raw pointers, owning Ref<T>, and current pointer-based interface views.
+
+Seven focused reference tests, ten constructor regressions and six service tests pass.
+An executable reference_parameters sample covers forwarding and argument addresses.
+Out contracts and reference receivers follow in separate slices.

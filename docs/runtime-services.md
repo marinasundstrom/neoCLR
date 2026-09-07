@@ -29,6 +29,7 @@ Duplicate entries in the supplied service set have no additional effect.
 
 | Service | Direct uses |
 | --- | --- |
+| SlotReferences | ldloca/ldarga and the managed-reference operand path of ldobj/stobj |
 | InterfaceDispatch | interface.borrow and callvirt: explicit borrowed view formation, receiver access and implementation selection |
 | TypeInspection | Type-only ldtoken and validated TypeName/TypeEquals/TypeArgumentCount/TypeArgument InternalCalls |
 | ValueStorage | Explicit value.pack/value.is/value.unpack and current erased native return boundaries |
@@ -80,3 +81,6 @@ before compilation, and may choose how to satisfy each logical service.
 `cargo run --example reachability` reports HelloWorld's ConsoleOutput requirement and
 its missing-service location when supplied with an empty service set. It executes no
 HelloWorld guest code.
+
+ldobj/stobj conservatively report both PointerMemory and SlotReferences; service
+analysis does not yet distinguish their operand kinds.

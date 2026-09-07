@@ -57,6 +57,7 @@ pub(crate) fn normalize_type(context: &Module, ty: &Type) -> Result<Type, Fault>
                 definition: definition.clone(),
                 arguments: arguments.iter().map(nested).collect::<Result<_, _>>()?,
             },
+            Type::ByRef(t) => Type::ByRef(Box::new(nested(t)?)),
             Type::Ptr(t) => Type::Ptr(Box::new(nested(t)?)),
             Type::Ref(t) => Type::Ref(Box::new(nested(t)?)),
             Type::InterfaceRef(t) => Type::InterfaceRef(Box::new(nested(t)?)),
