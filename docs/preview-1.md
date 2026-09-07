@@ -40,7 +40,7 @@ may remain unnamed; neoCLR is sufficient as the runtime codename for the preview
 | Managed references and interfaces | Call-scoped typed references, output parameters, explicit receiver views and a small useful interface set | Implemented: T&, out/out(true), reference receivers, List<T> and Equatable<T>; no escaping references or automatic ownership |
 | Errors and diagnostics | Recoverable failures through Result; terminal Faults with owned logical stack frames shown by CLI/host | All six reviewed library Result APIs use ordinary typed errors. Source-line maps and guest StackTrace classes are not required for Preview 1 |
 | Embedding and native boundary | One runnable embedding example and one supported scalar/pointer native interop example | Implemented experimental Rust hosting and P/Invoke subset; validate the published examples and platform requirements |
-| Publication readiness | Accurate README/design limits, explicit license, release notes, tested supported platforms and source release instructions | MIT license added; release notes, platform validation and source release checks remain |
+| Publication readiness | Accurate README/design limits, explicit license, release notes, tested supported platforms and source release instructions | MIT license and dependency notice inventory present; release notes drafted; final provenance, candidate/platform and archive checks remain |
 
 "Implemented" does not mean release-validated on every platform. Local validation so far
 is on macOS ARM64; CI is configured for Linux, macOS, and Windows, but this plan does not
@@ -100,9 +100,10 @@ scope and acceptance tests before starting that migration.
    Cargo metadata and tested locally from a clean source snapshot. Minimum/stable CI
    jobs are configured for three operating systems. Collect their results and verify
    first-install prerequisites and clean-clone instructions for the release candidate.
-3. **Prepare the source package.** Review source provenance/dependency notices, inspect
-   the tracked release contents, and draft release notes describing capabilities,
-   intentional deviations and known limits. Choose the preview version/tag explicitly.
+3. **Finalize the source package.** Review the [dependency notices](../THIRD_PARTY_NOTICES.md)
+   and [source audit](source-release.md) against the candidate. Finish provenance review
+   and the [draft release notes](preview-1-release-notes.md), then select the version/tag
+   explicitly. Recheck archive membership after any further changes.
 4. **Validate the candidate commit.** Run formatting, strict Clippy, the full suite,
    representative embedding/native examples and source/artifact demonstrations on the
    exact candidate. Record OS, architecture and toolchain for local and CI evidence.
@@ -168,9 +169,12 @@ not justify expanding Preview 1 into streams, filesystem abstractions or network
 - [x] Add the project-owner-selected MIT license and Cargo license metadata.
 - [ ] Release notes and public documentation disclose System.Value allocation/copy costs,
       its retirement direction and the limits of the Void* storage experiment.
-- [ ] Verify source provenance and required dependency notices.
-- [ ] Choose the preview version/tag and add release notes with capabilities, known limits,
-      breaking metadata changes, build instructions, and tested platform evidence.
+- [x] Inventory locked dependency licenses and preserve notice texts with provenance/hashes,
+      including native libffi and separately licensed build/test tooling.
+- [ ] Complete maintainer provenance review and refresh dependency/source notices for the
+      exact candidate and chosen distribution shape.
+- [x] Draft release notes covering capabilities, known limits, format changes and build instructions.
+- [ ] Choose the preview version/tag and finalize release notes with exact-candidate platform evidence.
 - [ ] Confirm the source release contains the lockfile, runtime IL, fixtures, samples,
       docs and tests, with no generated local artifacts or credentials.
 

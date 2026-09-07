@@ -2499,3 +2499,31 @@ retaining stable formatting, Clippy and tests. Verified the toolchain action ref
 Updated README instructions, validation evidence and the release checklist. Remote
 CI, a first-install environment and exact-release-commit validation remain open.
 No runtime code, dependencies, lockfile or publication state changed.
+
+## Source-package audit and draft Preview 1 notes
+
+Inventoried the tracked source tree and Cargo package listing. Added draft release
+notes describing capabilities, deliberate semantic differences, temporary storage,
+minimum build prerequisites and remaining publication gates. No final version,
+release candidate, tag or remote publication was selected.
+
+Added THIRD_PARTY_NOTICES.md and a machine-readable inventory for all 20 locked
+registry dependencies, with 42 preserved license files and SHA-256 checks. Most
+texts come from the cached registry sources. The two Rust libffi crates omit their
+workspace licenses, so those texts were fetched from the exact upstream commits
+recorded in their package VCS metadata. Preserved native libffi's license and its
+separate LICENSE-BUILDTOOLS notice; did not collapse bundled tooling licenses into
+the Rust crate's dual-license expression. No dependency implementation was vendored.
+
+The original tracked inventory contained 322 files and no generated target/native
+artifacts, symlinks or matches for the checked private-key/GitHub/AWS token patterns.
+Reviewed attribution markers in source, tests and examples; the scope and limits of
+that review are recorded in source-release.md. Final maintainer provenance review
+and distribution-specific checks remain release gates.
+
+Created a local review archive from the staged Git tree: all 368 tracked files were
+present, including runtime includes, fixtures, license texts and draft documentation.
+Checked exact archive membership, dependency coverage against Cargo.lock, all notice
+hashes, changed Markdown links and staged diff whitespace. The archive is an
+unversioned local review artifact, not a release. No runtime code or dependency
+versions changed, so prior execution validation remains applicable to this slice.

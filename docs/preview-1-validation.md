@@ -76,3 +76,14 @@ implementation; later documentation and CI edits do not designate a release cand
 Local command logs in temporary directories are development aids, not durable
 release evidence. Release records should use preserved logs or immutable CI links.
 No remote push, tag creation or publication is implied by this document.
+
+## Source packaging review
+
+The follow-up packaging slice inventories all 20 locked registry dependencies and
+preserves 42 notice texts with recorded origins and hashes. See
+[third-party notices](../THIRD_PARTY_NOTICES.md) and the [source audit](source-release.md).
+A local review archive is checked for tracked-tree membership, required sources,
+fixtures and notices; it is not a published or versioned release artifact.
+
+Draft release notes are available. Final maintainer provenance review, candidate
+selection, remote-platform results and the final archive checksum remain open.

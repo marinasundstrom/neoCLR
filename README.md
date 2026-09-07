@@ -423,7 +423,12 @@ demonstrates that form.
 `cargo run -- run examples/system_companions.neoil` constructs a nested System result case.
 `cargo run -- run examples/union_extract.neoil` demonstrates discriminator-then-accessor extraction.
 
-neoCLR is licensed under the [MIT License](LICENSE).
+neoCLR is licensed under the [MIT License](LICENSE). [Third-party notices](THIRD_PARTY_NOTICES.md)
+record the locked dependency licenses, including native libffi and its build-tool notices.
+
+[Draft Preview 1 release notes](docs/preview-1-release-notes.md) describe the proposed
+source preview. [Source packaging](docs/source-release.md) records the audit and
+remaining publication checks; no release candidate or final tag has been selected.
 
 [Managed references in Raven-like pseudocode](docs/references-in-pseudocode.md)
 explains &value, T&, output parameters, reference receivers, interface views and
