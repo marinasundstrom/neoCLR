@@ -377,3 +377,4 @@ side-by-side module versions remain pending.
 companions. Run `cargo run -- run examples/nested_types.neoil` for a minimal example.
 Non-generic unions can nest cases directly; `cargo run -- run examples/non_generic_union.neoil`
 demonstrates that form.
+`cargo run -- run examples/system_companions.neoil` constructs a nested System result case.

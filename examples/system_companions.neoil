@@ -1,0 +1,9 @@
+.module SystemCompanions
+.entry Main
+
+.function Main() -> Int32
+    ldc.i4 42
+    newobj instance System.Result.Ok<Int32>::.ctor(Int32)
+    call instance System.Result.Ok<Int32>::get_Value()
+    ret
+.end

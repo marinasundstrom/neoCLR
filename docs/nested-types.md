@@ -123,6 +123,9 @@ generic case and its ordinary instance method. The bundled System library will a
 this shape in a later migration slice; compatibility top-level wrappers remain
 temporarily available.
 
+`examples/system_companions.neoil` demonstrates constructing `System.Result.Ok<Int32>`
+and reading its ordinary `Value` member through the bundled library.
+
 ## Access and ordinary union behavior
 
 This subset permits public/internal type visibility. A public nested type remains
