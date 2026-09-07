@@ -13,6 +13,7 @@ pub(crate) enum Binding {
     StringSliceUtf8,
     ErrorFromMessage,
     ErrorMessage,
+    ReadAllText,
 }
 
 pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
@@ -40,6 +41,10 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             (Binding::ErrorFromMessage, Type::Error)
         }
         ("neoCLR.Runtime.ErrorMessage", [Type::Error]) => (Binding::ErrorMessage, Type::String),
+        ("neoCLR.Runtime.ReadAllText", [Type::String, Type::Int32]) => (
+            Binding::ReadAllText,
+            Type::Result(Box::new(Type::String), Box::new(Type::Error)),
+        ),
         _ => {
             return Err(Fault::new(format!(
                 "no runtime binding for {}({:?})",
@@ -63,6 +68,9 @@ impl Binding {
         output: &mut Vec<String>,
     ) -> Result<Value, Fault> {
         match (self, args.as_slice()) {
+            (Self::ReadAllText, [Value::String(path), Value::Int32(max_bytes)]) => {
+                crate::file_io::read_all_text(path, *max_bytes)
+            }
             (Self::ParseInt32, [Value::String(text)]) => Ok(match text.parse::<i32>() {
                 Ok(n) => Value::result(Value::Int32(n), Type::Int32, Type::Error, Case::Ok),
                 Err(_) => Value::result(

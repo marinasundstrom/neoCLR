@@ -318,3 +318,16 @@
 .function neoCLR.Runtime.ErrorMessage(Error value) -> String
     .methodimpl InternalCall
 .end
+
+.type System.IO.File
+    .method static ReadAllText(String path, Int32 maxBytes) -> Result<String,Error>
+        ldarg path
+        ldarg maxBytes
+        call neoCLR.Runtime.ReadAllText(String,Int32)
+        ret
+    .end
+.end
+
+.function neoCLR.Runtime.ReadAllText(String path, Int32 maxBytes) -> Result<String,Error>
+    .methodimpl InternalCall
+.end

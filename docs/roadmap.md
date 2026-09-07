@@ -75,12 +75,21 @@ rich formatting can follow the core programs. [Explicit target layout](target-la
 now separates storage calculations from the host. This does not require starting native
 code generation before the interpreter/library demonstration is coherent.
 
-## Next demonstrations: useful external capabilities
+## Immediate next slice: console input/output
 
-A proposed next integration is bounded UTF-8 text-file reading: a small application
-reads input, parses values, reports recoverable errors, and prints a computed result.
-This exercises external data, strings, Result handling, and library composition without
-requiring a general stream hierarchy. The exact API is not selected or implemented.
+Prioritize console input alongside the existing Console.WriteLine output before more
+external integrations. Define line input, EOF as ordinary absence, recoverable input
+errors, and prompt/output visibility so a small interactive application can read,
+compute, report, and continue. The file-input demonstration below is a completed
+bounded experiment, not a reason to move on to networking.
+
+## Demonstrations and later external capabilities
+
+The first integration now provides [bounded UTF-8 text-file reading](file-input.md):
+a small application reads input, parses values, reports recoverable errors, and prints
+a computed result. System.IO.File.ReadAllText is a platform-IL wrapper over an explicit
+blocking host service. It exercises external data, strings, Result handling, and library
+composition without requiring a general stream hierarchy.
 
 Implement only the missing mechanics needed by the selected demo. Keep platform-facing
 methods in library IL and define a narrow, explicit binding to host services. Decide
@@ -89,9 +98,10 @@ cleanup before implementing the boundary. Demonstrate both successful execution 
 an ordinary failure that the application handles. Document build/run commands and
 test the service contract without depending on an external network.
 
-Socket primitives followed by an HttpClient-style library are a possible later
-demonstration. Build that in layers when useful: explicit socket operations and
-lifetimes first, then protocol/library behavior. Blocking I/O, cancellation, buffer
+Socket primitives followed by an HttpClient-style library are a distant possible
+demonstration, after the basics and a more robust base class library are in place.
+Build that in layers when useful: explicit socket operations and lifetimes first,
+then protocol/library behavior. Blocking I/O, cancellation, buffer
 transfer, and eventual async support need deliberate contracts. Networking is not
 the next mandatory feature, and runtime async or extensive OOP need not block a
 simpler useful integration.

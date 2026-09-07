@@ -5,8 +5,9 @@ and instruction representation, and executed by neoCLR. Host Rust implements the
 interpreter and unavoidable bootstrap services; it should not become the BCL's
 implementation language by accident.
 
-[System.neoil](../runtime/System.neoil) currently provides twenty-one platform-written methods and eight native declarations:
+[System.neoil](../runtime/System.neoil) currently provides twenty-two platform-written methods and nine native declarations:
 
+- `System.IO.File` provides bounded ReadAllText; see [file input](file-input.md).
 - `System.Error` provides FromMessage, get_Message, and ToString; see [Error values](errors.md).
 - `System.Array<T>` provides six IL methods for explicit allocation, length, checked
   access, element addresses, and free; see [arrays and pointers](arrays-and-pointers.md).
@@ -26,7 +27,7 @@ implementation language by accident.
 The remaining host calls are `neoCLR.Runtime.WriteLine(string) -> Void`,
 `neoCLR.Runtime.Int32ToString(int32) -> String`, and
 `neoCLR.Runtime.ParseInt32(string) -> Result<Int32,Error>`, plus StringConcat,
-StringByteCount, StringSliceUtf8, ErrorFromMessage, and ErrorMessage. Parsing and formatting
+StringByteCount, StringSliceUtf8, ErrorFromMessage, ErrorMessage, and ReadAllText. Parsing and formatting
 are temporary host implementations until character/string operations can support
 their platform versions. Console output is buffered until successful execution.
 

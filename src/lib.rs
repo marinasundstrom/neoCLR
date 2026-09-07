@@ -3,6 +3,7 @@ pub use assembler::assemble;
 mod execution;
 mod input;
 pub use execution::{CancellationToken, ExecutionOptions};
+mod file_io;
 pub mod library;
 pub mod memory;
 pub mod metadata;

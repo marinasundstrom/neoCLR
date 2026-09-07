@@ -1442,3 +1442,25 @@ Each integration should define its narrow host boundary, recoverable errors, res
 lifetime, runnable example, and validation. No integration API is selected or implemented.
 
 Validation: documentation-only change; diff checks pass. Runtime tests were not rerun.
+
+## 2026-09-07 — Bounded UTF-8 file input demonstration
+
+Added System.IO.File.ReadAllText(path, maxBytes) as ordinary platform IL over one
+explicit InternalCall, classified as FileInput for service planning. The blocking
+reader enforces the byte limit against actual reads, decodes UTF-8 strictly, preserves
+text content, closes its handle on every return path, and returns expected I/O failures
+as Error results. Allocation reservation failures remain terminal Faults.
+
+Added a sample that reads external fixtures, doubles a parsed number, handles invalid
+content, and continues. Five tests cover serialization/verification/execution, exact
+and exceeded bounds across chunks, Unicode/NUL/BOM handling, invalid UTF-8, missing
+files, argument errors, service discovery, and execution Fault context. Documented
+commands, error classifications, filesystem access, and blocking/cancellation limits.
+
+The user's priority clarification puts console input/output next, including EOF,
+recoverable errors, and visible prompts. Networking remains distant work after a
+more robust basic library; the file experiment does not expand that scope.
+
+Validation: all 353 integration tests pass on macOS ARM64; formatting, clippy with
+warnings denied, and diff checks pass. The CLI sample verifies and prints 42,
+InvalidInt32, and File input handled, then returns Void. Linux and Windows remain for CI.

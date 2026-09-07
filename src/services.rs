@@ -16,6 +16,7 @@ pub enum RuntimeService {
     NativeInterop,
     StringOperations,
     ErrorValues,
+    FileInput,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -42,6 +43,7 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
     }
     if function.is_internal_call() {
         let service = match crate::native::bind(function)? {
+            crate::native::Binding::ReadAllText => RuntimeService::FileInput,
             crate::native::Binding::ErrorFromMessage | crate::native::Binding::ErrorMessage => {
                 RuntimeService::ErrorValues
             }
