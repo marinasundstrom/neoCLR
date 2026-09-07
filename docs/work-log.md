@@ -1842,3 +1842,13 @@ lowering its carrier and non-generic companion to separate ordinary types. Added
 serialized execution, nested generic host receivers and identities, Void payloads,
 multiple levels, module linking, effective visibility and malformed ownership.
 The existing System wrapper names remain intact pending the next migration slice.
+
+## 2026-09-07 — Typed slots and explicit erased storage
+
+Clarified the `System.Value` boundary after nested-case work. Locals and fields are
+always typed slots containing complete values; `System.Value` is an explicit erased
+carrier for heterogeneous slots, with visible pack/is/unpack operations. It is not
+a universal base class or implicit boxing target. A native backend may lower a slot
+to pointer, layout metadata and size/alignment, while `Ptr<T>` remains the explicit
+unmanaged capability and does not acquire ownership. `System.Object` is reserved
+for a future common object API and is not introduced into Preview 1.

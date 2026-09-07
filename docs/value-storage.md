@@ -19,6 +19,27 @@ boxing/casting, this contract has no mandatory reference identity, null sentinel
 heap allocation, subtype conversion or shared mutable box. Distinct instruction
 spellings make those semantic differences explicit.
 
+## Slot model
+
+Every local and field has a declared slot type. A normal slot stores that type's
+complete value with the usual copy and initialization rules; it does not need a
+common base type. `System.Value` is the explicit escape hatch for a slot that must
+carry values of different, runtime-known types. Packing into it and unpacking from
+it are visible operations, so the VM never silently boxes a value merely because a
+slot is wide enough.
+
+At a lower level, a native backend may represent a slot as an address and a layout
+descriptor (`pointer + type metadata + size/alignment`). That is an implementation
+of typed storage, not a new guest type and not an ownership promise. A pointer to a
+slot remains an unmanaged `Ptr<T>` and follows the existing lifetime checks. Future
+allocators or collectors may choose where such storage lives without changing the
+metadata contract.
+
+`System.Object` is reserved for a later common object API. It should not be used as
+the backing representation for arbitrary slots, and introducing it does not make
+all values reference-compatible. This keeps the low-level machine model explicit
+while leaving higher-level languages free to provide ergonomic object semantics.
+
 Packing uses normal storage conversion: `ldc.i4 257; value.pack Byte` stores Byte(1).
 It matches Byte, not Int32. Extraction applies normal stack normalization, so unpacking
 Byte puts Int32(1) on the stack. Generic operands are substituted normally. Void is a
