@@ -1879,3 +1879,8 @@ Added the interrupt/native architecture note: execution modes share explicit
 interrupt state and safepoints, while native calls declare ABI, layout, pointer and
 ownership boundaries. Managed language profiles may restrict these capabilities,
 but the low-level VM does not remove them.
+
+Recorded the native-lowering requirement: typed stack effects, explicit control
+flow and memory operations form a portable IL subset that interpreters, JITs and
+NativeAOT backends must share. Allocation, I/O, provenance checks, interrupts and
+native interop remain explicit runtime-service boundaries.

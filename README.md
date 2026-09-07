@@ -352,6 +352,8 @@ Run `cargo run --example invoke` for the Rust embedding sample.
 `cargo run --example cancellation` stops an invocation from another host thread.
 [Interrupt and native boundaries](docs/interrupts-and-native.md) define the VM-level
 contracts available to managed and native-oriented language profiles.
+[Native lowering](docs/native-lowering.md) keeps the typed IL directly translatable
+to machine instructions, with runtime services remaining explicit boundaries.
 [Closed call-graph analysis](docs/reachability.md) follows explicit roots for backend planning.
 `cargo run --example reachability` reports HelloWorld's IL calls, runtime import, and
 [runtime-service requirements](docs/runtime-services.md).
