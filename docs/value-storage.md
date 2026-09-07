@@ -1,4 +1,4 @@
-# Explicit typed value storage
+# Temporary explicit typed value storage
 
 The interpreter supports `System.Value`: one complete value whose static payload type
 has been explicitly erased. `Value` is its short signature alias. It is a runtime-known
@@ -19,6 +19,33 @@ boxing/casting, this contract has no reference identity, null sentinel, subtype
 conversion or shared mutable box. The interpreter does allocate host heap storage
 when packing; this is an explicit cost, not an allocation-free operation. Distinct instruction
 spellings make those semantic differences explicit.
+
+## Retirement decision
+
+System.Value is a temporary interpreter facility, not a permanent platform type.
+Remove it, its short alias, value.pack/value.is/value.unpack, and their dedicated
+runtime handling once ordinary type storage and explicit references can support the
+library payloads that currently depend on them. Do not preserve the mechanism under
+a different name or make a future System.Object an implicit arbitrary-value box.
+
+The intended foundation is typed values, native storage and explicit pointers.
+Void* deliberately carries no concrete payload type or ownership policy. A library
+using it must maintain its own tag or descriptor and lifetime contract. Higher-level
+languages may enforce safe/unsafe distinctions or provide ownership abstractions;
+neoCLR should retain intentional access to the underlying low-level operations.
+
+Before removal, establish usable native representations and explicit lifetime/copy/
+release contracts for current String, error and nested carrier payloads. Migrate
+System.Option/Result, native bindings, host inputs and samples together, preserving
+case extraction and typed Error behavior. Then remove the obsolete encodings with
+an explicit artifact version break and update the opcode/service documentation.
+The borrowed pointer sample proves only the native-layout subset, not this whole
+migration. General inheritance or a full class library need not precede removal if
+the required storage and ordinary type contracts can be supplied independently.
+
+This decision does not remove the current implementation immediately or silently
+expand Preview 1 into a complete object model. The sections below document the
+existing temporary behavior, including its allocation costs.
 
 ## Slot model
 

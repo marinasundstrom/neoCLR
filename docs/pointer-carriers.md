@@ -87,3 +87,8 @@ The existing System.Value carrier has different semantics: explicit packing owns
 host value tree and copies owned payloads. It remains necessary for current general
 library payloads. Pointer-backed carriers demonstrate the lower-level option and its
 manual lifetime responsibilities, not an allocation-free implementation of that tree.
+
+System.Value is scheduled for [removal](value-storage.md#retirement-decision) once
+ordinary type storage and explicit reference/lifetime contracts cover these remaining
+payloads. This experiment is a step toward that migration, not a permanent two-track
+choice between pointer carriers and a built-in erased-value container.

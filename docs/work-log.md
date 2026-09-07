@@ -2127,3 +2127,18 @@ and stack allocation. The new cases cover source/JSON round trips, native carrie
 storage, Byte/Void payloads, wrong-case Faults before access, and use after heap free
 or frame return. The sample verifies and prints 42, 7, 11, then => Void. Formatting,
 clippy with warnings denied and diff checks pass on macOS ARM64.
+
+## Retire System.Value after ordinary storage migration
+
+Recorded the owner's decision that System.Value must not remain a permanent platform
+facility. Its type alias, three value operations and dedicated runtime handling will
+be removed after migrating their library/native/host callers to ordinary storage and
+explicit references. Documented the remaining String/error/nested-payload storage and
+lifetime contracts; the current borrowed pointer sample covers only native-layout
+payloads. A future System.Object must not silently recreate arbitrary-value boxing.
+
+Clarified the intentional boundary between typed operations and explicit pointer
+reinterpretation. Libraries or languages supply payload tags, lifetimes and optional
+safe/unsafe policies; existing interpreter checks do not prove arbitrary casts safe.
+No runtime behavior or Preview 1 feature gate changed in this documentation slice.
+Validation: reviewed the cross-links and ran git diff --check.
