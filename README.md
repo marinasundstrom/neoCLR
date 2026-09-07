@@ -47,6 +47,8 @@ record layout. `localloc` provides explicit frame-local byte storage, released o
 return. Native integers and explicit pointer/address conversions are also
 available. See [heap and pointers](docs/heap-and-pointers.md).
 Reference counting, GC, and higher-level lifetime management remain deferred.
+[System.Collections.ArrayList<T>](docs/array-list.md) provides a small growable list
+for native-layout values, with ordinary indexers, shared aliases and explicit release.
 The [pointer-backed carrier example](docs/pointer-carriers.md) demonstrates how ordinary
 values can refer to shared heap or stack storage through `Void*`, with explicit lifetimes.
 Types describe values and behavior; allocation and lifetime are separate choices,

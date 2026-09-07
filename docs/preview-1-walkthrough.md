@@ -38,6 +38,7 @@ Run these commands from the repository root:
 | Free function and console | `cargo run --locked -- run examples/hello_functions.neoil` | `Hello, world!` |
 | Interactive calculation | `cargo run --locked -- run examples/console_input.neoil` | Prompt, then `42` when you enter `21` |
 | Ordinary values and alternatives | `cargo run --locked -- run examples/ordinary_unions.neoil` | `success`, `7`, `failure`, `7`, `Some<Void> is present` |
+| Growable list | `cargo run --locked -- run examples/array_list.neoil` | `ArrayList count:`, `5`, `0`, `1`, `4`, `9`, `16` |
 | Array loops | `cargo run --locked -- run examples/array_loops.neoil` | `Sum of squares:`, `30` |
 | File summary | `cargo run --locked -- run examples/file_summary.neoil` | `File contents:`, `Hello, neoCLR 🌍!`, `UTF-8 bytes:`, `19` |
 | Read-only type inspection | `cargo run --locked -- run examples/type_inspection.neoil` | `System.Int32`, `Box`, `1`, `System.Int32`, `Same type` |
@@ -201,3 +202,11 @@ Box<Int32> value through System.TypeOf<T>.Of, reads its name and generic argumen
 and compares it with Box<int>. Identity comes from loaded metadata, not names alone.
 The helper describes declared T; it introduces no dynamic object dispatch or payload
 erasure. See [the descriptor contract](type-inspection.md) for scope and lifetime.
+
+## A growable collection without interfaces
+
+[ArrayList<T>](array-list.md) lives in System.Collections. Allocate, Add, Count, Capacity,
+an indexer and Free are implemented in platform IL. Copies share an explicit state
+pointer, so growth through one alias is visible to the others. Free once after all
+borrowers finish. The current element subset requires native layout; String and current
+System.Result payloads are not yet supported. A future List<T> interface is separate.

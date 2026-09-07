@@ -2220,3 +2220,27 @@ counts and a malformed new visibility fixture; corrected those, and all affected
 pass on rerun. Other full-suite targets passed. The sample verifies and executes with
 expected output. Formatting, clippy with warnings denied and diff checks pass on macOS
 ARM64. A subsequent release validation must run against the final release commit.
+
+## System.Collections.ArrayList<T>
+
+Added a small growable list entirely in platform IL under System.Collections, with
+Allocate(capacity), Add, Count, Capacity, indexed get/set and explicit Free. There is
+no Generic namespace. A future List<T> interface will have no I prefix; neither the
+interface nor broad collection features are prerequisites for this implementation.
+
+List descriptors contain an explicit pointer to a shared native state block. Copies
+see buffer growth, count changes and indexed mutation through every alias. Growth
+copies initialized elements to a larger buffer and releases the old one. The caller
+releases buffer/state once; there is no reference counting, destructor dispatch or
+hidden System.Value fallback. Elements require native layout, including Byte, Void,
+pointers and ordinary records; String and current erased carriers remain unsupported.
+
+Added an executable sample, CLI source/artifact walkthrough coverage, ownership and
+error documentation, and tests for repeated growth from zero/nonzero capacity, alias
+mutation, Count-based bounds, native payload copies, release of empty/nonempty lists,
+expired access and non-owning pointer elements. No runtime opcode or native helper
+was added for the collection.
+
+Validation: all 477 tests pass in the complete suite, including the prior reflection
+slice and all sample verification. Formatting, clippy with warnings denied and diff
+checks pass on macOS ARM64. Remote exact-release platform validation remains open.

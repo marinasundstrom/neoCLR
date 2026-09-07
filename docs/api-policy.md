@@ -57,3 +57,12 @@ See [runtime library](runtime-library.md) for the implemented mapping and limits
 As APIs are added, tests should cover ordinary observable .NET behavior and the
 intentional neoCLR adaptations separately. Do not promise compatibility for a
 member until its supported inputs, outputs, errors, and other effects are defined.
+
+## Collection namespace and naming
+
+Place generic collections directly in System.Collections. Generic arity already
+distinguishes type identities; a separate Generic namespace is unnecessary. The
+preview implements System.Collections.ArrayList<T> for native-layout values, with
+explicit allocation/release. A future list interface will use the name List<T>,
+without an I prefix. No interface implementation is implied by the present type.
+See [ArrayList](array-list.md) for the concrete API and current element limits.

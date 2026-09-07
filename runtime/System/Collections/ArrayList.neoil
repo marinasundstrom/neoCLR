@@ -1,0 +1,196 @@
+; Internal control block shared by copied list descriptors.
+.type internal System.Collections.ArrayListStorage<T>
+    .field Data T*
+    .field Count Int32
+    .field Capacity Int32
+.end
+
+.type System.Collections.ArrayList<T>
+    .field private State System.Collections.ArrayListStorage<T>*
+    .method static Allocate(Int32 capacity) -> System.Collections.ArrayList<T>
+        .local T* data
+        .local System.Collections.ArrayListStorage<T>* state
+        ldarg capacity
+        ldc.i4 0
+        blt Invalid
+        ldarg capacity
+        heap.alloc T
+        stloc data
+        ldc.i4 1
+        heap.alloc System.Collections.ArrayListStorage<T>
+        stloc state
+        ldloc state
+        ldloc data
+        ldc.i4 0
+        ldarg capacity
+        newobj System.Collections.ArrayListStorage<T>
+        stobj System.Collections.ArrayListStorage<T>
+        ldloc state
+        newobj System.Collections.ArrayList<T>
+        ret
+    Invalid:
+        fault "ArrayList capacity must be non-negative"
+    .end
+    .property instance Count() -> Int32
+        .get instance System.Collections.ArrayList<T>::get_Count()
+    .end
+    .method instance get_Count() -> Int32
+        ldarg this
+        ldfld 0
+        ldflda 1
+        ldobj Int32
+        ret
+    .end
+    .property instance Capacity() -> Int32
+        .get instance System.Collections.ArrayList<T>::get_Capacity()
+    .end
+    .method instance get_Capacity() -> Int32
+        ldarg this
+        ldfld 0
+        ldflda 2
+        ldobj Int32
+        ret
+    .end
+    .method private instance Address(Int32 index) -> T*
+        ldarg index
+        ldc.i4 0
+        blt Invalid
+        ldarg index
+        ldarg this
+        call instance System.Collections.ArrayList<T>::get_Count()
+        bge Invalid
+        ldarg this
+        ldfld 0
+        ldflda 0
+        ldobj T*
+        ldarg index
+        sizeof T
+        mul.ovf
+        ptr.add
+        ret
+    Invalid:
+        fault "ArrayList index out of range"
+    .end
+    .property instance Item(Int32) -> T
+        .get instance System.Collections.ArrayList<T>::get_Item(Int32)
+        .set instance System.Collections.ArrayList<T>::set_Item(Int32,T)
+    .end
+    .method instance get_Item(Int32 index) -> T
+        ldarg this
+        ldarg index
+        call instance System.Collections.ArrayList<T>::Address(Int32)
+        ldobj T
+        ret
+    .end
+    .method instance set_Item(Int32 index, T value) -> Void
+        ldarg this
+        ldarg index
+        call instance System.Collections.ArrayList<T>::Address(Int32)
+        ldarg value
+        stobj T
+        ldvoid
+        ret
+    .end
+    .method instance Add(T value) -> Void
+        .local System.Collections.ArrayListStorage<T>* state
+        .local T* oldData
+        .local T* newData
+        .local Int32 count
+        .local Int32 capacity
+        .local Int32 index
+        ldarg this
+        ldfld 0
+        stloc state
+        ldarg this
+        call instance System.Collections.ArrayList<T>::get_Count()
+        stloc count
+        ldarg this
+        call instance System.Collections.ArrayList<T>::get_Capacity()
+        stloc capacity
+        ldloc count
+        ldloc capacity
+        blt Store
+        ldloc capacity
+        brtrue Double
+        ldc.i4 4
+        stloc capacity
+        br Allocate
+    Double:
+        ldloc capacity
+        ldc.i4 2
+        mul.ovf
+        stloc capacity
+    Allocate:
+        ldloc capacity
+        heap.alloc T
+        stloc newData
+        ldloc state
+        ldflda 0
+        ldobj T*
+        stloc oldData
+        ldc.i4 0
+        stloc index
+        br Test
+    Copy:
+        ldloc newData
+        ldloc index
+        sizeof T
+        mul.ovf
+        ptr.add
+        ldloc oldData
+        ldloc index
+        sizeof T
+        mul.ovf
+        ptr.add
+        cpobj T
+        ldloc index
+        ldc.i4 1
+        add
+        stloc index
+    Test:
+        ldloc index
+        ldloc count
+        blt Copy
+        ldloc oldData
+        heap.free
+        pop
+        ldloc state
+        ldflda 0
+        ldloc newData
+        stobj T*
+        ldloc state
+        ldflda 2
+        ldloc capacity
+        stobj Int32
+    Store:
+        ldloc state
+        ldflda 0
+        ldobj T*
+        ldloc count
+        sizeof T
+        mul.ovf
+        ptr.add
+        ldarg value
+        stobj T
+        ldloc state
+        ldflda 1
+        ldloc count
+        ldc.i4 1
+        add.ovf
+        stobj Int32
+        ldvoid
+        ret
+    .end
+    .method instance Free() -> Void
+        ldarg this
+        ldfld 0
+        ldflda 0
+        ldobj T*
+        heap.free
+        pop
+        ldarg this
+        ldfld 0
+        heap.free
+        ret
+    .end
+.end

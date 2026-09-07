@@ -101,6 +101,10 @@ fn walkthrough_sources_and_artifacts_have_the_documented_outputs_and_exits() {
                 "System.Int32\nBox\n1\nSystem.Int32\nSame type\n=> Void\n".into(),
             )],
         ),
+        (
+            "array_list",
+            vec![(b"", "ArrayList count:\n5\n0\n1\n4\n9\n16\n=> Void\n".into())],
+        ),
         ("array_bounds", vec![]),
         ("fault_trace", vec![]),
     ];

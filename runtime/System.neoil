@@ -45,3 +45,4 @@
 .include "System/RuntimeTypeHandle.neoil"
 .include "System/Type.neoil"
 .include "neoCLR/Runtime/TypeInspection.neoil"
+.include "System/Collections/ArrayList.neoil"

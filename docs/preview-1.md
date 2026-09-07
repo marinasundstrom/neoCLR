@@ -36,7 +36,7 @@ may remain unnamed; neoCLR is sufficient as the runtime codename for the preview
 | No union-specific IL | Library, samples, native result construction and host inputs use ordinary types; remove special union operations and encodings | Implemented in format 4; old artifacts require reassembly |
 | Minimal library and console | Useful Int32/String/Error APIs; console input/output; EOF distinct from input failure; an interactive program | Implemented using raw byte input and immediate line output; `ReadByte` uses the ordinary nested Result/Option boundary. General ReadLine is not required |
 | Minimal reflection | Obtain a System.Type-style descriptor from a type token or value, compare identity, read its name, inspect closed generic arguments | Implemented via type-only ldtoken, System.Type and declared-type System.TypeOf<T>.Of; no dynamic object dispatch |
-| Memory and arrays | Explicit pointers/allocation/free, record storage, small usable array/buffer example, documented lifetime and copy rules | Implemented; native-layout Array<T> descriptors are sufficient. No promise of general owned arrays or automatic cleanup |
+| Memory and arrays | Explicit pointers/allocation/free, record storage, small usable array/buffer example, documented lifetime and copy rules | Implemented: native-layout Array<T> views and ArrayList<T> with explicit release. No automatic cleanup or arbitrary-payload collection promise |
 | Errors and diagnostics | Recoverable failures through Result; terminal Faults with owned logical stack frames shown by CLI/host | All six reviewed library Result APIs use ordinary typed errors. Source-line maps and guest StackTrace classes are not required for Preview 1 |
 | Embedding and native boundary | One runnable embedding example and one supported scalar/pointer native interop example | Implemented experimental Rust hosting and P/Invoke subset; validate the published examples and platform requirements |
 | Publication readiness | Accurate README/design limits, explicit license, release notes, tested supported platforms and source release instructions | MIT license added; release notes, platform validation and source release checks remain |
@@ -160,7 +160,7 @@ Preview 1 release. This plan performs neither a remote push nor a publication.
   invocation, reflective construction/mutation, broad reflection or redesigned
   access modifiers. Keep the familiar implemented access levels for now.
 - A Stream hierarchy, sockets, HttpClient, runtime async or general concurrency libraries.
-- Full Unicode indexing/decoding APIs, general collections, multidimensional/covariant arrays,
+- Full Unicode indexing/decoding APIs, broad collection APIs beyond the small native-layout ArrayList<T>, multidimensional/covariant arrays,
   and comprehensive framework parity.
 - Guest StackTrace/StackFrame APIs, source-level debugger integration and source-line mapping;
   the first release still requires terminal Fault traces through the existing host/CLI path.
