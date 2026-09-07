@@ -214,8 +214,8 @@ fn scoped_receivers_normalize_and_unsupported_stored_fields_fail_resolution() {
     for ty in [
         "Int32*",
         "Ref<Int32>",
-        "Option<Int32>",
-        "Result<Int32,Error>",
+        "Option<Int32*>",
+        "Result<Int32,Ref<Error>>",
     ] {
         assert!(
             program

@@ -19,18 +19,20 @@ receiver, parameter, and return-type accessors expose the resolved contract with
 
 ## Argument and execution contract
 
-Inputs include primitives (numeric types, Boolean, String, Error, and inhabited Void)
-and [validated owned records](record-inputs.md). Arguments must be their exact storage Values. A Byte parameter
+Inputs include primitives (numeric types, Boolean, String, Error, and inhabited Void),
+[validated owned records](record-inputs.md), and bootstrap Option/Result values.
+Arguments must be their exact storage Values. A Byte parameter
 requires Value::Byte, not Value::Int32; Single requires Value::Single, not Double.
 Guest ldarg still performs the existing evaluation-stack normalization, and stores
 and returns retain their existing conversions. This distinguishes the typed host
 boundary from the normalized evaluation stack used by IL call instructions.
 
 Arity and argument values are checked before executing any instruction. A Void
-parameter still requires one Value::Void argument. Union values, raw pointers,
-and prototype Ref values cannot be supplied as arguments or receivers, including inside records.
-Direct native/InternalCall targets are rejected during resolution; IL
-wrappers can call native declarations using the existing instruction contracts.
+parameter still requires one Value::Void argument. Raw pointers and prototype Ref
+values cannot be supplied as arguments or receivers, including inside records or
+Option/Result alternatives. See [bootstrap union inputs](union-inputs.md) for case
+and payload validation. Direct native/InternalCall targets are rejected during
+resolution; IL wrappers can call native declarations using the existing instruction contracts.
 
 Each invocation starts fresh frames, allocations, output, and instruction/frame limits.
 There is no synthetic guest caller frame or wrapper instruction charge. A Fault does
@@ -42,7 +44,7 @@ The result is the existing Execution, with a precise stored return Value. Return
 are not restricted to primitive types: a guest function may produce records, Result,
 Option, or pointers using the runtime's implemented operations. Its returned allocations
 and native-library retention belong to that Execution. These results are not transferable
-guest handles into a later invocation. Owned primitive/record results can be imported
+guest handles into a later invocation. Supported owned results can be imported
 as data with validation; pointer/Ref transfer and persistent state need separate contracts.
 
 Safe invoke disables native imports. The separate unsafe invoke_with_native method
@@ -64,7 +66,7 @@ let result = method.invoke_instance(box_value, vec![], neoclr::Limits::default()
 `receiver_type()` returns the specialized owner type for instance methods and None for
 static functions. `parameters()` excludes the receiver. Static invoke methods reject
 instance targets; invoke_instance methods reject static targets. Receiver validation
-uses the same exact primitive/owned-record schema as parameters, including scoped tags,
+uses the same exact owned-input schema as parameters, including scoped tags,
 closed generics, and shared schema limits. Faults distinguish the receiver from declared
 argument indices, which start at zero. In guest IL, `ldarg 0` / `ldarg this` still reads
 the receiver, and declared parameters follow it.

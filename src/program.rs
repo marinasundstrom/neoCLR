@@ -55,7 +55,7 @@ impl LoadedProgram {
         crate::type_identity::resolve(&self.module, ty)
     }
 
-    /// Resolve a closed IL function with owned primitive/record inputs.
+    /// Resolve a closed IL function with validated owned inputs.
     /// The returned handle borrows this immutable program and needs no entry point.
     pub fn resolve_function(
         &self,

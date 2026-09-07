@@ -1170,3 +1170,27 @@ an IL/Rust sample and updated invocation, ownership, architecture, and roadmap d
 Validation: all 292 integration tests pass on macOS ARM64; formatting, clippy with
 warnings denied, and diff checks pass. The sample preserves Int32(21) and produces an
 updated Int32(42). Linux and Windows remain for CI.
+
+## 2026-09-07 — Validated bootstrap Option and Result inputs
+
+Extended the owned invocation schema to the existing bootstrap Option/Result values,
+including nested payloads and fields in generic record receivers. Import checks the
+canonical type tag, permitted case, and exact payload storage value. None requires
+its existing Void placeholder; Some<Void> and Result<T,T> retain distinct case identities.
+Scoped record and union tags normalize recursively, and faults identify case payloads
+and nested fields before guest execution.
+
+Resolution validates every alternative, including unselected cases. Pointer/Ref
+payloads, recursive by-value schemas, and schemas exceeding shared depth/complexity
+limits fail resolution. Supported outputs can be imported again as owned data. This
+adds no IL or metadata categories and does not change the ordinary-type union direction.
+
+Added six tests covering case round trips, exact storage, malformed tags and payloads,
+nested scoped records, generic receivers, unsupported alternatives, recursion, depth,
+and branching complexity. Updated earlier rejection tests and added an IL/Rust sample
+plus invocation and architecture documentation.
+
+Validation: all 298 integration tests pass on macOS ARM64; formatting, clippy with
+warnings denied, and diff checks pass. The sample reports Succeeded and Failed from
+Result inputs and reuses an Option<String> result containing Hello, world!.
+Linux and Windows remain for CI.

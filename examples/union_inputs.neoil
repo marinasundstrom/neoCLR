@@ -1,0 +1,17 @@
+.module UnionInputs
+
+.function Describe(Result<Void,Error> value) -> String
+    ldarg value
+    is.case Ok
+    brtrue Success
+    ldstr "Failed"
+    ret
+Success:
+    ldstr "Succeeded"
+    ret
+.end
+
+.function Echo(Option<String> value) -> Option<String>
+    ldarg value
+    ret
+.end

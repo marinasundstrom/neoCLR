@@ -260,10 +260,12 @@ to prepare HelloWorld once and execute it twice with fresh guest state.
 
 [Resolved function invocation](docs/invocation.md) supports repeated calls to static and instance
 IL functions with typed primitive and [owned record arguments](docs/record-inputs.md),
-including libraries without an entry point.
+including libraries without an entry point. [Bootstrap Option/Result inputs](docs/union-inputs.md)
+are validated by type, case, and payload.
 Run `cargo run --example invoke` for the Rust embedding sample.
 `cargo run --example record_inputs` demonstrates copied record inputs and result reuse.
 `cargo run --example instance_invocation` demonstrates explicit copied generic receivers.
+`cargo run --example union_inputs` demonstrates Option/Result arguments and result reuse.
 
 [Explicit module sets](docs/module-sets.md) support additional libraries, cross-module
 generic calls, and field-name aliases. Run `cargo run --example modules` for a three-module
