@@ -10,9 +10,20 @@ fn main() -> Result<(), neoclr::Fault> {
             "{index}: {} {:?} {:?}",
             function.target.name, function.target.definition, function.implementation
         );
+        for service in &function.services {
+            println!(
+                "  service {:?} at {:?}",
+                service.service, service.instruction
+            );
+        }
         for call in &function.calls {
             println!("  instruction {} -> {}", call.instruction, call.target);
         }
     }
+    println!("Required services: {:?}", graph.required_services());
+    println!(
+        "Missing with no services: {:?}",
+        graph.missing_services(&[])
+    );
     Ok(())
 }

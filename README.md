@@ -269,7 +269,9 @@ Run `cargo run --example invoke` for the Rust embedding sample.
 [Cooperative cancellation](docs/cancellation.md) is available through ExecutionOptions.
 `cargo run --example cancellation` stops an invocation from another host thread.
 [Closed call-graph analysis](docs/reachability.md) follows explicit roots for backend planning.
-`cargo run --example reachability` reports HelloWorld's IL calls and runtime import.
+`cargo run --example reachability` reports HelloWorld's IL calls, runtime import, and
+[runtime-service requirements](docs/runtime-services.md).
+[Stack traces and debug Fault diagnostics](docs/stack-traces.md) are the next priority.
 
 [Explicit module sets](docs/module-sets.md) support additional libraries, cross-module
 generic calls, and field-name aliases. Run `cargo run --example modules` for a three-module

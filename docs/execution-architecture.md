@@ -113,7 +113,9 @@ from reachable code and declared roots. Unbounded or dynamically selected instan
 need a diagnostic or an explicitly supported capability. [Closed call-graph analysis](reachability.md)
 now follows explicit roots through bound, specialized calls with a function-count limit.
 It reports runtime/native imports and conservatively includes all syntactic calls;
-layout closure, backend capability checks, and machine-code generation remain pending.
+[Runtime-service planning](runtime-services.md) adds explicit service requirements and
+use-site diagnostics for missing services. Layout closure, opcode/ABI capability checks,
+and machine-code generation remain pending.
 Reflection and exported generic APIs must not depend on code that the build accidentally omitted.
 
 ### Runtime services, failures, and optional memory management
@@ -150,6 +152,8 @@ of the contract. Shared tests must distinguish these categories explicitly.
 
 Debug/source mappings and runtime diagnostics should follow module/member identities,
 with backend-specific instruction/native-code locations as additional information.
+[Stack traces](stack-traces.md) are the next diagnostic priority: preserve Fault-time
+logical frames and provide runtime-backed StackTrace/StackFrame library types.
 Full debugger integration is later work; retaining a route back to source should not
 be an afterthought of the high-level compiler.
 

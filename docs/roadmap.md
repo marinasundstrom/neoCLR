@@ -12,7 +12,8 @@ of the same semantic model. See [execution architecture](execution-architecture.
 for shared contracts, capability boundaries, unresolved choices, and staged experiments.
 [Closed call-graph analysis](reachability.md) now provides bounded traversal of explicit
 roots and closed generic calls for backend planning. Native compilation still needs
-layout closure, runtime-service dependencies, and capability checks.
+layout closure and opcode/ABI capability checks. [Runtime-service planning](runtime-services.md)
+now reports direct service uses and compares them with a supplied service set.
 Only interpretation is implemented today; this does not make interpreter internals
 the permanent platform ABI.
 
@@ -36,6 +37,14 @@ from the host. Addressed mutation and shared receiver lifetimes remain open. A s
 language compiler should target the same metadata/IL and enable incremental library
 migration. Native backend/code-sharing choices remain open; no hidden fallback or
 universal ownership policy is implied.
+
+## Next priority: stack traces
+
+[Fault stack snapshots and runtime StackTrace/StackFrame types](stack-traces.md) are the
+next priority. Capture logical frames before teardown, retain exact method identities,
+and resolve optional debug source locations from guest artifacts. Faults remain
+unrecoverable runtime/system errors; this introduces no guest exception handling.
+The library API will integrate with runtime capture while preserving explicit ownership.
 
 ## Strategy review and verifier foundation
 

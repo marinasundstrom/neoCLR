@@ -1244,3 +1244,28 @@ layout closure, runtime services, capabilities, and code generation.
 Validation: all 311 integration tests pass on macOS ARM64; formatting, clippy with
 warnings denied, and diff checks pass. The sample reports Main -> System.Console.WriteLine
 -> neoCLR.Runtime.WriteLine without executing HelloWorld. Linux and Windows remain for CI.
+
+## 2026-09-07 — Runtime-service requirements and stack-trace priority
+
+Extended closed call-graph nodes with direct runtime-service uses and source sites.
+The catalog distinguishes native/frame allocation, pointer memory, the bootstrap
+reference arena, validated parsing/formatting/output helpers, and native interop.
+Instruction classification is exhaustive; helper classification uses the existing
+runtime binding registry. Ordinary record construction implies no allocator service.
+
+Added distinct aggregate requirements and per-use missing-service diagnostics for an
+explicit supplied service set. These are planning results, not proof of opcode, layout,
+ABI, or native backend support. Updated the graph sample and documented conservative
+unreachable-code handling, closed generic sites, and opaque import dependencies.
+
+Added six tests for HelloWorld, allocator-free value operations, closed generic memory
+sites, frame/reference separation, validated binding classification, and unreachable
+memory/native requirements. All 317 integration tests pass on macOS ARM64; formatting,
+clippy with warnings denied, and diff checks pass. Linux and Windows remain for CI.
+
+Recorded the user's new stack-trace requirement as the next priority: owned logical
+Fault snapshots, guest-artifact debug source resolution, and ordinary runtime-backed
+System.Diagnostics.StackTrace/StackFrame types. Faults remain unrecoverable runtime/system
+errors. The proposal separates current capture from Fault-time capture and records
+identity, lifetime, bounds, and backend mapping requirements. No stack-trace implementation
+is claimed in this slice.

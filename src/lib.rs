@@ -12,6 +12,8 @@ mod reachability;
 mod references;
 pub use reachability::{FunctionImplementation, Reachability, ReachableCall, ReachableFunction};
 mod scope;
+mod services;
+pub use services::{MissingService, RuntimeService, ServiceUse};
 mod type_identity;
 pub mod value;
 mod vm;

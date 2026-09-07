@@ -26,7 +26,8 @@ root order and equivalent resolved load set produce the same ordering. Indices i
 nodes only within that report; they are not metadata rows or persistent cache keys.
 
 Each node records its canonical closed FunctionRef, including definition identity,
-return type, implementation kind, and outgoing calls with source instruction indices.
+return type, implementation kind, outgoing calls with source instruction indices, and
+[direct runtime-service uses](runtime-services.md).
 Implementation kinds distinguish IL, runtime InternalCall, and P/Invoke; native imports
 retain library, symbol, and calling-convention metadata. They are terminal graph nodes,
 not claims that foreign code or runtime helpers have no further dependencies.
@@ -56,7 +57,8 @@ Loading validates metadata first. Typed verification remains separate and opt-in
 The report does not scan fields for layout closure, evaluate control flow, discover
 attribute constructors or reflection roots, infer initialization, enumerate native
 transitive dependencies, or assign code-sharing policy. Implicit runtime services
-used by instructions (such as allocation) are not call edges. It also does not emit
+used by instructions (such as allocation) are reported separately as service uses,
+not call edges. It also does not emit
 specialized IL artifacts, machine code, or a binary metadata format.
 
 Future AOT work must combine this graph with target layout, explicit backend capability

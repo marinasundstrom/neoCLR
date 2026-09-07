@@ -1,0 +1,206 @@
+//! Logical runtime-service uses; no target ABI or ownership policy is implied.
+use crate::{
+    Fault,
+    metadata::{Function, Instruction as Op},
+};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum RuntimeService {
+    NativeAllocation,
+    FrameAllocation,
+    PointerMemory,
+    BootstrapReferences,
+    ParseInt32,
+    FormatInt32,
+    ConsoleOutput,
+    NativeInterop,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ServiceUse {
+    pub service: RuntimeService,
+    /// None identifies an import declaration; Some identifies an IL instruction.
+    pub instruction: Option<usize>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MissingService {
+    /// Index in the associated Reachability report, not a metadata token.
+    pub function: usize,
+    pub instruction: Option<usize>,
+    pub service: RuntimeService,
+}
+
+pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
+    if function.pinvoke.is_some() {
+        return Ok(vec![ServiceUse {
+            service: RuntimeService::NativeInterop,
+            instruction: None,
+        }]);
+    }
+    if function.is_internal_call() {
+        let service = match crate::native::bind(function)? {
+            crate::native::Binding::ParseInt32 => RuntimeService::ParseInt32,
+            crate::native::Binding::Int32ToString => RuntimeService::FormatInt32,
+            crate::native::Binding::WriteLine => RuntimeService::ConsoleOutput,
+        };
+        return Ok(vec![ServiceUse {
+            service,
+            instruction: None,
+        }]);
+    }
+    Ok(function
+        .body
+        .iter()
+        .enumerate()
+        .flat_map(|(instruction, op)| {
+            instruction_services(op)
+                .iter()
+                .map(move |service| ServiceUse {
+                    service: *service,
+                    instruction: Some(instruction),
+                })
+        })
+        .collect())
+}
+
+fn instruction_services(op: &Op) -> &'static [RuntimeService] {
+    use RuntimeService::*;
+    // Exhaustive so additions to IL require an explicit service classification.
+    match op {
+        Op::Allocate(..) | Op::Free => &[NativeAllocation, PointerMemory],
+        Op::AllocateLocal => &[FrameAllocation, PointerMemory],
+        Op::PointerFromInt(..)
+        | Op::PointerAdd
+        | Op::FieldAddress(..)
+        | Op::LoadObject(..)
+        | Op::StoreObject(..)
+        | Op::CopyObject(..)
+        | Op::InitializeObject(..)
+        | Op::CopyBlock
+        | Op::InitializeBlock
+        | Op::LoadIndirectInt8
+        | Op::LoadIndirectUInt8
+        | Op::LoadIndirectInt16
+        | Op::LoadIndirectUInt16
+        | Op::LoadIndirectUInt32
+        | Op::LoadIndirectInt64
+        | Op::LoadIndirectNative
+        | Op::StoreIndirectInt8
+        | Op::StoreIndirectInt16
+        | Op::StoreIndirectInt64
+        | Op::StoreIndirectNative
+        | Op::LoadIndirectFloat32
+        | Op::LoadIndirectFloat64
+        | Op::StoreIndirectFloat32
+        | Op::StoreIndirectFloat64
+        | Op::LoadIndirectInt32
+        | Op::StoreIndirectInt32 => &[PointerMemory],
+        Op::HeapNew | Op::HeapLoad | Op::HeapStore => &[BootstrapReferences],
+        Op::Unaligned(..)
+        | Op::Int(..)
+        | Op::Int64(..)
+        | Op::CheckedInt8
+        | Op::CheckedUInt8
+        | Op::CheckedInt16
+        | Op::CheckedUInt16
+        | Op::CheckedInt32
+        | Op::CheckedUInt32
+        | Op::CheckedInt64
+        | Op::CheckedUInt64
+        | Op::CheckedNativeInt
+        | Op::CheckedNativeUInt
+        | Op::CheckedInt8Unsigned
+        | Op::CheckedUInt8Unsigned
+        | Op::CheckedInt16Unsigned
+        | Op::CheckedUInt16Unsigned
+        | Op::CheckedInt32Unsigned
+        | Op::CheckedUInt32Unsigned
+        | Op::CheckedInt64Unsigned
+        | Op::CheckedUInt64Unsigned
+        | Op::CheckedNativeIntUnsigned
+        | Op::CheckedNativeUIntUnsigned
+        | Op::ConvertInt8
+        | Op::ConvertUInt8
+        | Op::ConvertInt16
+        | Op::ConvertUInt16
+        | Op::ConvertUInt32
+        | Op::ConvertInt64
+        | Op::ConvertUInt64
+        | Op::Float32 { .. }
+        | Op::Float64 { .. }
+        | Op::ConvertFloat32
+        | Op::ConvertFloat64
+        | Op::ConvertFloatUnsigned
+        | Op::CheckFinite
+        | Op::Bool(..)
+        | Op::String(..)
+        | Op::Void
+        | Op::Arg(..)
+        | Op::StoreArg(..)
+        | Op::Load(..)
+        | Op::Store(..)
+        | Op::Dup
+        | Op::Pop
+        | Op::BitAnd
+        | Op::BitOr
+        | Op::BitXor
+        | Op::BitNot
+        | Op::Negate
+        | Op::ShiftLeft
+        | Op::ShiftRight
+        | Op::ShiftRightUnsigned
+        | Op::Remainder
+        | Op::RemainderUnsigned
+        | Op::Add
+        | Op::Sub
+        | Op::Mul
+        | Op::AddChecked
+        | Op::SubChecked
+        | Op::MulChecked
+        | Op::Divide
+        | Op::AddCheckedUnsigned
+        | Op::SubCheckedUnsigned
+        | Op::MulCheckedUnsigned
+        | Op::DivideUnsigned
+        | Op::LessUnsigned
+        | Op::ConvertNativeInt
+        | Op::ConvertNativeUInt
+        | Op::ConvertInt32
+        | Op::Equal
+        | Op::Greater
+        | Op::GreaterUnsigned
+        | Op::Less
+        | Op::Branch(..)
+        | Op::BranchTrue(..)
+        | Op::BranchFalse(..)
+        | Op::BranchEqual(..)
+        | Op::BranchNotEqual(..)
+        | Op::BranchGreater(..)
+        | Op::BranchGreaterUnsigned(..)
+        | Op::BranchLess(..)
+        | Op::BranchLessUnsigned(..)
+        | Op::BranchGreaterEqual(..)
+        | Op::BranchGreaterEqualUnsigned(..)
+        | Op::BranchLessEqual(..)
+        | Op::BranchLessEqualUnsigned(..)
+        | Op::Switch(..)
+        | Op::Call(..)
+        | Op::Return
+        | Op::New(..)
+        | Op::Field(..)
+        | Op::SetField(..)
+        | Op::SizeOf(..)
+        | Op::AlignOf(..)
+        | Op::NullPointer(..)
+        | Op::PointerCast(..)
+        | Op::Some
+        | Op::None(..)
+        | Op::Ok(..)
+        | Op::Err(..)
+        | Op::IsCase(..)
+        | Op::LoadCase(..)
+        | Op::Error(..)
+        | Op::Fault(..) => &[],
+    }
+}

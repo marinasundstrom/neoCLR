@@ -22,6 +22,8 @@ pub struct ReachableFunction {
     pub implementation: FunctionImplementation,
     /// Every syntactic call in the specialized IL body, including unreachable code.
     pub calls: Vec<ReachableCall>,
+    /// Logical runtime services used directly by this body or import declaration.
+    pub services: Vec<crate::ServiceUse>,
 }
 
 #[derive(Debug, Clone)]
@@ -107,6 +109,7 @@ pub(crate) fn analyze(
                 });
             }
         }
+        let services = crate::services::uses(&function)?;
         nodes.push(ReachableFunction {
             target: FunctionRef {
                 definition: function.definition,
@@ -118,10 +121,45 @@ pub(crate) fn analyze(
             returns: function.returns,
             implementation,
             calls,
+            services,
         });
     }
     Ok(Reachability {
         roots: root_indices,
         functions: nodes,
     })
+}
+
+impl Reachability {
+    /// Distinct service requirements, in RuntimeService enum order.
+    pub fn required_services(&self) -> Vec<crate::RuntimeService> {
+        self.functions
+            .iter()
+            .flat_map(|function| function.services.iter().map(|usage| usage.service))
+            .collect::<std::collections::BTreeSet<_>>()
+            .into_iter()
+            .collect()
+    }
+
+    /// Every use absent from the supplied service set, in function/instruction order.
+    /// An empty result is not a guarantee of backend opcode, layout, or ABI support.
+    pub fn missing_services(
+        &self,
+        available: &[crate::RuntimeService],
+    ) -> Vec<crate::MissingService> {
+        self.functions
+            .iter()
+            .enumerate()
+            .flat_map(|(function, node)| {
+                node.services
+                    .iter()
+                    .filter(|usage| !available.contains(&usage.service))
+                    .map(move |usage| crate::MissingService {
+                        function,
+                        instruction: usage.instruction,
+                        service: usage.service,
+                    })
+            })
+            .collect()
+    }
 }
