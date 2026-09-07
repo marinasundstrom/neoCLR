@@ -104,3 +104,23 @@ pub(crate) fn contains(ty: &Type) -> bool {
         _ => false,
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn references_do_not_retain_storage_and_failed_stores_do_not_fulfill_outputs() {
+        let cell = Slot::new(Type::Int32, Some(Value::Int32(7)));
+        let reference = SlotReference::new(&cell);
+        let output = reference.output().unwrap();
+        assert!(output.write(Value::String("wrong".into())).is_err());
+        assert!(output.assigned().is_err());
+        assert_eq!(reference.read().unwrap(), Value::Int32(7));
+        reference.write(Value::Int32(42)).unwrap();
+        assert_eq!(output.read().unwrap(), Value::Int32(42));
+        drop(cell);
+        assert!(reference.read().is_err());
+        assert!(reference.write(Value::Int32(0)).is_err());
+        assert!(output.assigned().is_err());
+    }
+}

@@ -98,4 +98,32 @@
         value.unpack System.Result.Error<E>
         ret
     .end
+    .method instance TryGet(out(true) System.Result.Ok<T>& destination) -> Boolean
+        ldarg this
+        call instance System.Result<T,E>::get_IsOk()
+        brfalse Miss
+        ldarg destination
+        ldarg this
+        call instance System.Result<T,E>::GetOkCase()
+        stobj System.Result.Ok<T>
+        ldc.bool true
+        ret
+    Miss:
+        ldc.bool false
+        ret
+    .end
+    .method instance TryGet(out(true) System.Result.Error<E>& destination) -> Boolean
+        ldarg this
+        call instance System.Result<T,E>::get_IsErr()
+        brfalse Miss
+        ldarg destination
+        ldarg this
+        call instance System.Result<T,E>::GetErrorCase()
+        stobj System.Result.Error<E>
+        ldc.bool true
+        ret
+    Miss:
+        ldc.bool false
+        ret
+    .end
 .end

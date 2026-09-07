@@ -262,3 +262,56 @@ fn receiver_modes_cannot_be_used_for_static_methods_or_constructors_or_overload_
         assert!(program(source, "ldvoid", "Void").is_err());
     }
 }
+
+#[test]
+fn conditional_out_initializes_only_the_success_branch() {
+    let extra = ".function Try(out(true) Int32& destination,Boolean success) -> Boolean\nldarg success\nbrfalse Miss\nldarg destination\nldc.i4 42\nstobj Int32\nldc.bool true\nret\nMiss:\nldc.bool false\nret\n.end";
+    for branch in [
+        "brfalse Miss\nldloc value\nret\nMiss:\nldc.i4 -1",
+        "brtrue Hit\nldc.i4 -1\nret\nHit:\nldloc value",
+    ] {
+        for success in [true, false] {
+            let p = program(extra, &format!(".local Int32 value\nldloca value\nldc.bool {success}\ncall Try(Int32&,Boolean)\n{branch}"), "Int32").unwrap();
+            p.verify().unwrap();
+            assert_eq!(
+                p.run(Limits::default()).unwrap().value,
+                Value::Int32(if success { 42 } else { -1 })
+            );
+        }
+    }
+    let p = program(extra, ".local Int32 value\nldloca value\nldc.bool false\ncall Try(Int32&,Boolean)\npop\nldloc value", "Int32").unwrap();
+    assert!(p.verify().is_err());
+    assert!(p.run(Limits::default()).is_err());
+    let same_edge = program(extra, ".local Int32 value\nldloca value\nldc.bool false\ncall Try(Int32&,Boolean)\nbrtrue Join\nJoin:\nldloc value", "Int32").unwrap();
+    assert!(same_edge.verify().is_err());
+}
+
+#[test]
+fn conditional_out_requires_assignment_on_true_but_not_false() {
+    for success in [true, false] {
+        let extra = format!(
+            ".function Try(out(true) Int32& destination) -> Boolean\nldc.bool {success}\nret\n.end"
+        );
+        let p = program(
+            &extra,
+            ".local Int32 value\nldloca value\ncall Try(Int32&)",
+            "Boolean",
+        )
+        .unwrap();
+        p.verify().unwrap();
+        let result = p.run(Limits::default());
+        if success {
+            assert!(result.unwrap_err().message.contains("out parameter"));
+        } else {
+            assert_eq!(result.unwrap().value, Value::Boolean(false));
+        }
+    }
+    assert!(
+        program(
+            ".function Bad(out(true) Int32& value) -> Void\nldvoid\nret\n.end",
+            "ldvoid",
+            "Void"
+        )
+        .is_err()
+    );
+}

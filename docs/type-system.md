@@ -7,7 +7,7 @@ mechanics remain foundational alongside free functions.
 This implementation adds primitive type definitions, declared method ownership,
 static methods, and instance receiver snapshots. The current platform also supports
 type generics and [explicit borrowed interface dispatch](interfaces.md). Inheritance,
-class virtual dispatch and by-reference receiver writeback remain future work. [Property metadata](properties.md)
+class virtual dispatch and broader reference lifetime support remain future work. [Property metadata](properties.md)
 now explicitly associates ordinary getter/setter methods with declared signatures.
 [Accessibility](accessibility.md) enforces public/internal/private method calls and
 ordinary field access, plus public/internal top-level type visibility.
@@ -91,17 +91,16 @@ receiver is excluded from the declared parameter signature, so parameterless
 `Int32.ToString()` still consumes an Int32 receiver. Static methods retain ordinary
 zero-based argument indexing. A missing or mistyped receiver Faults.
 
-In this slice the receiver is a read-only **value snapshot**. `ldarg 0` copies that
-snapshot under existing guest value semantics. `stfld` can produce a changed copy,
-but does not update the original receiver. This is not yet .NET's by-reference
-struct receiver mechanism. No borrowed address, lifetime token, automatic heap
-allocation, Rust ownership rule, or mutable receiver is implied.
+Ordinary instance receivers are value snapshots. ldarg this copies the value, and
+stfld produces a changed value without updating the caller's original slot. Pointer
+fields continue to alias their targets; copying a receiver does not imply deep
+immutability or purity.
 
-Read-only here concerns the receiver's own data, not deep immutability or method
-purity. Embedded `Ref<T>` values retain shared identity, and their targets can still
-be modified through existing heap operations. Use `heap.load` explicitly before
-calling a method on a referenced target; it yields a snapshot. General mutable
-receivers need explicit VM address/alias semantics and are deliberately deferred.
+`.method instance byref` explicitly changes argument zero to T&. Its caller supplies
+a managed slot reference, and the method uses ldobj/stobj to read or replace the
+original value. There is no implicit dereference or copy-back on return. Byref
+receivers require initialized storage and remain call-scoped. Constructors keep their
+existing initialization convention. See [reference contracts](reference-slots.md).
 
 The [types sample](../examples/types.neoil) exercises record/static/instance methods,
 receiver indexing, overloads, primitive conversion, and free-function entry points.
@@ -117,9 +116,10 @@ Pointers carry no ownership. A first native interop subset supports scalar/point
 externally supplied memory remains unimplemented. See [native interop](native-interop.md). Value copying a record copies its fields, including pointer addresses;
 it does not copy the pointed-to storage or acquire ownership.
 
-The existing Option/Result/Ref constructors are special-cased signatures, not general
-generic definitions. A library-defined, reference-counted `Ref<T>` requires real
-generic metadata, layout, and lifetime operations. It remains deferred, not implemented. The native heap/pointer subset does not depend on this wrapper.
+Option and Result are ordinary generic library carriers. Their case extraction can
+use typed managed output references without new union instructions. Ref<T> retains
+its separate bootstrap arena meaning; counted ownership remains deferred. Neither
+native pointers nor managed slot references require a counted wrapper.
 See [memory model layers](memory-model.md) for the separation between raw VM memory
 and ownership policies.
 
@@ -127,7 +127,8 @@ and ownership policies.
 Native-sized integers use canonical System.IntPtr/System.UIntPtr type identities,
 with nint/nuint aliases. Their arithmetic and native storage are executable; see
 [native integers](native-integers.md). Basic generic record definitions, constructed references, and field substitution are
-now available; see [generic metadata](generic-metadata.md). Generic execution remains pending.
+available with closed generic owner execution; see [generic metadata](generic-metadata.md).
+Generic methods and richer constraints remain deferred.
 
 Future modeling should place more emphasis on types to express contracts. Ref<T>
 may express reference-counted ownership, while Ptr<T> expresses address access without
@@ -217,9 +218,9 @@ This is deferred design work, not implemented inheritance metadata or syntax. Or
 union carriers remain a separate convention and must not require inheritance or a
 closed hierarchy to represent their variants.
 
-See the [proposed slot-reference design](reference-slots.md) for typed reference
-parameters, out assignment and explicit reference receivers. This is planned work,
-not a change to the currently implemented pointer or receiver semantics.
+See the [managed slot-reference contracts](reference-slots.md) for implemented
+reference parameters, output assignment and explicit reference receivers, and the
+[Raven-like pseudocode guide](references-in-pseudocode.md) for their language projection.
 
 `.method instance byref` now takes an explicit T& receiver. Its ldarg this loads
 the reference; ldobj/stobj read and replace the original slot. Ordinary instance

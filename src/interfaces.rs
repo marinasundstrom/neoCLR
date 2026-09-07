@@ -81,7 +81,15 @@ fn member(module: &Module, concrete: &Type, contract: &Function) -> Result<Funct
         parameters: contract.parameters.clone(),
     };
     let implementation = crate::vm::resolve(module, &target)?;
-    if implementation.receiver_byref != contract.receiver_byref
+    if implementation
+        .out_when_true
+        .iter()
+        .collect::<std::collections::BTreeSet<_>>()
+        != contract
+            .out_when_true
+            .iter()
+            .collect::<std::collections::BTreeSet<_>>()
+        || implementation.receiver_byref != contract.receiver_byref
         || implementation
             .out_parameters
             .iter()

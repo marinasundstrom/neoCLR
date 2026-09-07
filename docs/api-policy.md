@@ -36,8 +36,8 @@ leaving room for better designs as the runtime develops.
 
 The current assembler models declaring types and static/instance methods alongside
 free functions. Primitive members belong to canonical System type definitions.
-Read-only receiver snapshots are a prototype limitation, not full .NET by-reference
-receiver mechanics. Basic visibility, assembly references and explicit borrowed
+Ordinary receivers are value snapshots; methods can explicitly declare byref
+receivers when they must access the original managed slot. Basic visibility, assembly references and explicit borrowed
 interface dispatch are implemented; class virtual dispatch remains deferred.
 
 The Divide helper is a proof-of-concept extension whose final API location remains
@@ -66,3 +66,16 @@ preview implements System.Collections.ArrayList<T> for native-layout values, wit
 explicit allocation/release. It implements List<T>, without an I prefix, through
 [explicit borrowed interface references](interfaces.md).
 See [ArrayList](array-list.md) for the concrete API and current element limits.
+
+## References in ordinary APIs
+
+Use typed managed T& parameters when an API needs access to caller storage, and
+explicit byref receivers when a method must mutate the original value. Keep raw
+pointers for APIs deliberately concerned with native memory or interop. Ordinary
+by-value inputs remain useful where copying is the intended contract; a managed
+reference does not imply counted ownership, allocation or retention.
+
+Out parameters declare assignment on every normal return. Boolean TryGet methods
+can use out(true) for assignment only on success, avoiding invented default values
+for arbitrary T. System.Option/Result case extraction now follows that contract.
+See the [Raven-like reference guide](references-in-pseudocode.md).

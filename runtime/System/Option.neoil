@@ -74,5 +74,33 @@
         value.unpack System.Option.Some<T>
         ret
     .end
+    .method instance TryGet(out(true) System.Option.Some<T>& destination) -> Boolean
+        ldarg this
+        call instance System.Option<T>::get_IsSome()
+        brfalse Miss
+        ldarg destination
+        ldarg this
+        call instance System.Option<T>::GetSomeCase()
+        stobj System.Option.Some<T>
+        ldc.bool true
+        ret
+    Miss:
+        ldc.bool false
+        ret
+    .end
+    .method instance TryGet(out(true) System.Option.None& destination) -> Boolean
+        ldarg this
+        call instance System.Option<T>::get_IsNone()
+        brfalse Miss
+        ldarg destination
+        ldarg this
+        call instance System.Option<T>::GetNoneCase()
+        stobj System.Option.None
+        ldc.bool true
+        ret
+    Miss:
+        ldc.bool false
+        ret
+    .end
 .end
 

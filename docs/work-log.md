@@ -2351,3 +2351,40 @@ interface dispatch. Eighteen interface tests and fifteen reference tests pass, c
 inline mutation, forwarding, String-containing records, uninitialized formation,
 receiver-mode conformance and rejected escapes. The ArrayList library keeps its
 existing value receivers over shared pointer state, avoiding a silent semantic change.
+
+
+## Conditional outputs, union migration and language projection
+
+Added out(true) T& metadata for Boolean-returning methods. Runtime checks require an
+assignment when the actual return is true; false grants no initialization guarantee.
+Verification propagates known output-local initialization along direct brtrue/brfalse
+success edges, preserving false-path and merged-path checks. Function graph nodes
+and interface conformance preserve conditional output contracts. No union opcode or
+default-T synthesis is introduced.
+
+Migrated the pointer carrier's copy TryGet methods to conditional managed outputs.
+Removed its pointer-returning try-get variants at the user's request; the alias
+sample reads through the carrier's checked accessor. Output locals no longer need
+native allocation. Payload pointers keep their explicit lifetime
+rules. Added platform-written TryGet overloads selected by Some/None and Ok/Error
+case-reference types to Option/Result, plus an executable case-extraction sample. Existing checked accessors
+and the bootstrap carrier representation remain available and unchanged.
+
+Documented &value, T&, explicit dereferencing, output parameters, byref receivers and
+managed interface projection in an original Raven-like pseudocode guide, alongside
+real neoIL. It distinguishes illustrative source syntax from implemented metadata and
+instructions, call-scoped safety from ownership, and conditional output from ordinary
+out. Updated older receiver/reference documentation and the preview walkthrough. The
+new examples are exercised from source and assembled artifacts.
+
+Focused validation passes 17 reference tests, 18 interface tests, 10 pointer-carrier
+tests and four new library union-output tests. A slot-identity unit test verifies
+expired access and that failed typed stores cannot fulfill output obligations.
+
+Validation also exercised the complete 516-test suite before the final overload and
+pointer-method cleanup. Two stale expectations (service inventory and host-input
+diagnostic wording) were corrected; their affected suites passed on rerun. Final
+checks cover overloaded case extraction with identical payload types, all sample
+verification, source/artifact walkthroughs and pointer lifetime failures after the
+pointer-returning methods were removed. Formatting, diff checks and strict Clippy
+pass. Historical work-log entries retain the earlier pointer API for chronology.

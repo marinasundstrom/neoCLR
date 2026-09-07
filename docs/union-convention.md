@@ -159,29 +159,14 @@ pointer liveness, alignment, initialization or correctness of a tag/pointer pair
 constructed by arbitrary low-level code. Normal access checks and caller obligations
 still apply. A null pointer does not select a union case.
 
-The pointer-backed sample now implements ordinary copying and borrowing try-get members.
-The [.NET non-boxing access pattern](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/union#non-boxing-access-pattern)
-returns Boolean and supplies a case value through an out parameter. It avoids boxing
-during extraction; it does not inherently borrow an address into the carrier.
-The sample distinguishes these contracts:
+The pointer-backed sample implements copying try-get members with managed output
+references: TryGetOk(out(true) T& destination) and TryGetError(out(true) E& destination).
+Both check the tag before reading the payload and leave the output unchanged on a
+mismatch. A matching expired or null payload faults when read. No pointer-returning
+try-get methods are provided.
 
-| Sample method shape | Matching tag | Different tag |
-| --- | --- | --- |
-| TryGetOk(T* destination) -> Boolean | Copy the payload into caller-provided storage; return true | Return false and leave destination unchanged |
-| TryGetOkPointer(T** destination) -> Boolean | Write the borrowed payload pointer; return true | Write a null pointer; return false |
-
-The sample implements both rows for Ok and Error (using E for the Error payload).
-These are not yet System.Option/Result members or a finalized compiler convention.
-Separate case names avoid signature collisions when payload types coincide. The
-copying form deliberately makes no generic default-value or out-assignment promise
-on failure. A language can enforce that the caller reads the output only after success.
-The borrowing form gives no ownership and no lifetime extension; true identifies the
-case, not validity of the returned address. A matching stale or null pointer may be
-returned without dereferencing it, and later access can Fault. Output storage itself
-must be valid whenever the method writes it.
-
-Existing T* parameters, localloc, ptr.cast and stobj can express these output-storage
-operations as ordinary IL. CLR-style managed byrefs, out metadata, address-taking of
-ordinary locals and flow-sensitive out initialization are separate features that are
-not required to experiment with explicit pointer output slots. No union-specific
-instruction is needed for a Boolean result, tag check or output store.
+The general library convention is overloaded TryGet(out Case& value), extracting an
+ordinary case value. System.Option and System.Result implement this convention with
+conditional output metadata. Distinct case types keep overloads unambiguous even
+when payload types coincide. See [reference pseudocode](references-in-pseudocode.md)
+for the source projection and ordinary call/branch/load/store IL pattern.

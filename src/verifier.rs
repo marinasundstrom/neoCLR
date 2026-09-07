@@ -144,6 +144,7 @@ fn analyze_function(
             }
             _ => (),
         }
+        let mut conditional_outputs = vec![];
         if let Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) = op {
             let callee = crate::vm::resolve(module, target).map_err(|e| fault(pc, &e.message))?;
             let offset = inputs.len().saturating_sub(callee.parameters.len());
@@ -152,12 +153,23 @@ fn analyze_function(
                     local: Some(index), ..
                 } = input
                 {
-                    if argument >= offset && callee.out_parameters.contains(&(argument - offset)) {
+                    if argument >= offset
+                        && (callee.out_parameters.contains(&(argument - offset))
+                            || callee.out_when_true.contains(&(argument - offset)))
+                    {
                         continue;
                     }
                     if !state.initialized[*index] {
                         return Err(fault(pc, "reference argument requires initialized local"));
                     }
+                }
+            }
+            for index in &callee.out_when_true {
+                if let Some(StackType::Slot {
+                    local: Some(slot), ..
+                }) = inputs.get(index + offset)
+                {
+                    conditional_outputs.push(*slot);
                 }
             }
             // Check all input preconditions before making any outputs initialized.
@@ -170,8 +182,14 @@ fn analyze_function(
                 }
             }
         }
-        let outputs = typed_effect(module, function, op, &inputs, arity, state.stack.is_empty())
-            .map_err(|e| fault(pc, &e.message))?;
+        let mut outputs =
+            typed_effect(module, function, op, &inputs, arity, state.stack.is_empty())
+                .map_err(|e| fault(pc, &e.message))?;
+        if !conditional_outputs.is_empty() {
+            conditional_outputs.sort_unstable();
+            conditional_outputs.dedup();
+            outputs = vec![StackType::ConditionalOutput(conditional_outputs)];
+        }
         debug_assert_eq!(outputs.len(), pushes);
         state.stack.extend(outputs);
         maximum_stack = maximum_stack.max(state.stack.len());
@@ -199,7 +217,17 @@ fn analyze_function(
             }
             _ => successors.push(pc + 1),
         }
-        for target in successors {
+        for (edge, target) in successors.into_iter().enumerate() {
+            let mut state = state.clone();
+            match (op, edge, inputs.first()) {
+                (Op::BranchTrue(_), 0, Some(StackType::ConditionalOutput(slots)))
+                | (Op::BranchFalse(_), 1, Some(StackType::ConditionalOutput(slots))) => {
+                    for slot in slots {
+                        state.initialized[*slot] = true;
+                    }
+                }
+                _ => (),
+            }
             if target >= function.body.len() {
                 return Err(fault(pc, "reachable fallthrough past end of function"));
             }
@@ -366,6 +394,7 @@ fn effect(module: &Module, op: &Op, arity: usize) -> Result<(usize, usize), Faul
 // becomes Int32, for example). Keep it distinct from a raw stored !n value.
 #[derive(Debug, Clone, PartialEq, Eq)]
 enum StackType {
+    ConditionalOutput(Vec<usize>),
     Slot { ty: Type, local: Option<usize> },
     Exact(Type),
     NormalizedParameter(u16),
@@ -395,6 +424,7 @@ fn stored(value: &StackType, target: &Type) -> Result<(), Fault> {
 fn exact(value: &StackType) -> Result<&Type, Fault> {
     match value {
         StackType::Exact(ty) | StackType::Slot { ty, .. } => Ok(ty),
+        StackType::ConditionalOutput(_) => Ok(&Type::Boolean),
         _ => Err(Fault::new(
             "operation requires a concrete stack type; open parameter normalization is unresolved",
         )),

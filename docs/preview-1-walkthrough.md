@@ -164,8 +164,8 @@ introducing a filesystem object model or Stream abstraction.
 
 [PointerUnion](../examples/pointer_union.neoil) contrasts a copied Int32 snapshot
 (42) with a borrowed carrier that observes mutation through an alias (7), then reads
-an error from stack storage (11). TryGetOk copies into caller-provided storage,
-TryGetOkPointer supplies a borrowed pointer, and TryGetError handles the other case.
+an error from stack storage (11). TryGetOk copies into a managed output slot,
+GetOk reads the aliased carrier after mutation, and TryGetError handles the other case.
 The carrier uses a tag plus Void*. Its caller owns
 the payload and releases heap storage exactly once. See the
 [pointer contract](pointer-carriers.md) for casts, lifetimes and native-layout limits.
@@ -219,3 +219,11 @@ used through an explicit List<Int32>&. Expected lines are `42`, `2`
 and `=> Void`. The sample keeps allocation/release on the concrete owner and
 passes only the borrowed contract to Sum. The automated walkthrough assembles
 and runs this sample from both source and an artifact.
+
+## Managed references and union outputs
+
+`reference_parameters.neoil`, `reference_receivers.neoil` and `union_try_get.neoil`
+each print `42` and `=> Void`. Run them with the same `cargo run --locked -- run`
+command used above. Their source/artifact paths are covered by the walkthrough tests.
+The [pseudocode guide](references-in-pseudocode.md) explains ampersand references,
+explicit dereferencing, reference receivers and conditional output initialization.

@@ -1,7 +1,7 @@
-# Proposed slot references and reference receivers
+# Managed slot references and reference receivers
 
-Status: direct T& parameters, out contracts, ldloca/ldarga and ldobj/stobj slot access
-reference receivers and safe interface slot views are implemented.
+Status: T& parameters, out and out(true) contracts, ldloca/ldarga, ldobj/stobj slot
+access, reference receivers and safe interface slot views are implemented.
 Existing pointer and InterfaceRef behavior is unchanged.
 
 ## Purpose
@@ -154,12 +154,14 @@ returned through Result is a normal return and must still fulfill every out cont
 Replacing a value invokes no automatic destructor or release: existing explicit
 ownership rules remain the caller/library's responsibility.
 
-Unconditional out is not yet a complete TryGet contract for arbitrary T. A method
-that initializes its output only when it returns true needs conditional assignment
-metadata and corresponding flow rules. Do not invent a dummy T or assume every type
-has a meaningful default. Defer that contract; continue using a returned Result or
-an initialized read/write slot with explicitly documented failure behavior. Existing
-pointer-based carrier TryGet patterns are not silently migrated by this proposal.
+Unconditional out is distinct from the implemented `out(true) T&` contract for
+Boolean-returning methods. Conditional outputs must be assigned on true, and provide
+no new initialization guarantee on false. The verifier recognizes direct success
+edges from brtrue/brfalse on a call result; runtime assignment obligations cover
+forwarding and aliases. It does not infer success through Boolean locals or arbitrary
+comparisons yet. The union TryGet methods use this contract without inventing defaults.
+Pointer-returning variants use unconditional out T*& and explicitly store null on false.
+See the [pseudocode and IL guide](references-in-pseudocode.md).
 
 ## Interface integration and implementation order
 

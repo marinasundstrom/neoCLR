@@ -268,6 +268,9 @@ pub struct Function {
     /// Declared parameter indices whose slots must be assigned before normal return.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub out_parameters: Vec<usize>,
+    /// Output slots assigned on Boolean true; false provides no initialization guarantee.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub out_when_true: Vec<usize>,
     pub returns: Type,
     #[serde(default)]
     pub locals: Vec<Type>,

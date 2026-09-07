@@ -55,7 +55,7 @@ fn resolve_with_budget(
             },
             _ => {
                 return Err(Fault::new(
-                    "host input requires owned primitives or records; pointer, Ref and InterfaceRef inputs are not supported",
+                    "host input requires owned primitives or records; pointer and Ref inputs are not supported, nor are InterfaceRef or managed slot reference inputs",
                 ));
             }
         };

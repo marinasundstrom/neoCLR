@@ -121,7 +121,8 @@ fn layout_and_resource_limits_apply_and_planning_uses_existing_services() {
         graph.required_services(),
         [
             RuntimeService::NativeAllocation,
-            RuntimeService::PointerMemory
+            RuntimeService::PointerMemory,
+            RuntimeService::SlotReferences
         ]
     );
     assert!(run_body("ldc.i4 0\nldstr \"\"\ncall System.Array<String>::Allocate(Int32,String)\npop\nldvoid\nret","Void", "").unwrap_err().message.contains("layout is not implemented"));

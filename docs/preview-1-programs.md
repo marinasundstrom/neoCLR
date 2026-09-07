@@ -278,3 +278,11 @@ These programs define behavioral acceptance; the release checklist still covers
 cross-platform/toolchain evidence, documentation, source license and reproducibility.
 Passing the examples alone is not publication readiness. Adding a new feature should
 identify the program and missing behavior it enables, or explicitly amend this set.
+
+## References, output parameters and interface receivers
+
+The [reference pseudocode and IL guide](references-in-pseudocode.md) extends this
+notation with &value and T&, explicit dereferencing, out assignment, byref receiver
+calls, interface projection and conditional union extraction. Its examples map to
+reference_parameters.neoil, reference_receivers.neoil, interfaces.neoil and
+union_try_get.neoil. These remain pseudocode projections, not compiler inputs.

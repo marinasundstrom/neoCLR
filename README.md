@@ -410,3 +410,7 @@ demonstrates that form.
 `cargo run -- run examples/union_extract.neoil` demonstrates discriminator-then-accessor extraction.
 
 neoCLR is licensed under the [MIT License](LICENSE).
+
+[Managed references in Raven-like pseudocode](docs/references-in-pseudocode.md)
+explains &value, T&, output parameters, reference receivers, interface views and
+union TryGet methods alongside their executable neoIL equivalents.

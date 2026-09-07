@@ -582,3 +582,8 @@ view. `callvirt` accepts that view and preserves the implementation receiver mod
 the same normalized member signature. `out T&` adds output assignment metadata to
 a declared parameter, without creating a distinct overload signature. Interface
 formation/dispatch conservatively report SlotReferences alongside InterfaceDispatch.
+
+`out(true) T&` records an output obligation conditional on a Boolean true return.
+It is parameter metadata (out_when_true indices), not an opcode or overload
+discriminator. Direct brtrue/brfalse success edges can establish local initialization
+in the verifier; runtime checks enforce each actual output obligation.

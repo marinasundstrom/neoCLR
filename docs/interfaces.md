@@ -139,8 +139,9 @@ implementations in the loaded module set. Several edges may therefore share one 
 instruction index. If an implementation has generic parameters that cannot be inferred
 from its interface, analysis faults rather than claim a complete closed graph.
 This limitation does not prevent interpreter dispatch to a known concrete receiver.
-Interface formation and dispatch report the InterfaceDispatch runtime service.
+Interface formation and dispatch conservatively report InterfaceDispatch and
+SlotReferences; the latter covers the managed operand path.
 
-See the [proposed slot-reference design](reference-slots.md) for typed reference
-parameters, out assignment and explicit reference receivers. This is planned work,
-not a change to the currently implemented pointer or receiver semantics.
+See the [managed slot-reference contracts](reference-slots.md) for implemented
+reference parameters, output assignment and explicit reference receivers, and the
+[Raven-like pseudocode guide](references-in-pseudocode.md) for their language projection.

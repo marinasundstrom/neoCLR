@@ -442,7 +442,14 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             ));
         }
         let mut out_parameters = HashSet::new();
-        for index in &function.out_parameters {
+        if !function.out_when_true.is_empty() && function.returns != Type::Boolean {
+            return Err(Fault::new("conditional output requires a Boolean return"));
+        }
+        for index in function
+            .out_parameters
+            .iter()
+            .chain(&function.out_when_true)
+        {
             if !out_parameters.insert(*index)
                 || !matches!(function.parameters.get(*index), Some(Type::ByRef(_)))
             {
@@ -793,7 +800,7 @@ struct Frame {
     locals: Vec<crate::slots::Cell>,
     stack: Vec<Value>,
     allocations: Vec<crate::memory::Pointer>,
-    outputs: Vec<crate::SlotReference>,
+    outputs: Vec<(crate::SlotReference, bool)>,
 }
 
 impl Frame {
@@ -802,7 +809,10 @@ impl Frame {
         let mut outputs = vec![];
         for (index, arg) in args.iter_mut().enumerate() {
             if let Value::SlotInterface { receiver, .. } = arg {
-                if index >= offset && function.out_parameters.contains(&(index - offset)) {
+                if index >= offset
+                    && (function.out_parameters.contains(&(index - offset))
+                        || function.out_when_true.contains(&(index - offset)))
+                {
                     return Err(Fault::new(
                         "an interface view is not an output storage slot",
                     ));
@@ -810,9 +820,15 @@ impl Frame {
                 receiver.assigned()?;
             }
             if let Value::SlotReference(reference) = arg {
-                if index >= offset && function.out_parameters.contains(&(index - offset)) {
+                if index >= offset
+                    && (function.out_parameters.contains(&(index - offset))
+                        || function.out_when_true.contains(&(index - offset)))
+                {
                     *reference = reference.output()?;
-                    outputs.push(reference.clone());
+                    outputs.push((
+                        reference.clone(),
+                        function.out_when_true.contains(&(index - offset)),
+                    ));
                 } else {
                     reference.assigned()?;
                 }
@@ -1358,11 +1374,13 @@ fn interpret_frames(
                     }
                 }
                 Op::Return => {
-                    for output in &frame.outputs {
-                        output.assigned()?;
-                    }
                     let value = frame.pop()?;
                     let value = value.for_storage(&function.returns)?;
+                    for (output, conditional) in &frame.outputs {
+                        if !conditional || value == Value::Boolean(true) {
+                            output.assigned()?;
+                        }
+                    }
                     if !frame.stack.is_empty() {
                         return Err(Fault::new("ret requires exactly one value"));
                     }

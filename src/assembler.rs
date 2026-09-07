@@ -623,22 +623,24 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         .split_once("->")
                         .ok_or_else(|| Fault::new("expected .function Name -> Type"))?;
                     let inline_parameters = name.contains('(');
-                    let (target, parameter_names, out_parameters) = if inline_parameters {
-                        parse_callable(name.trim(), true)?
-                    } else {
-                        identifier(name.trim())?;
-                        (
-                            FunctionRef {
-                                definition: None,
-                                name: name.trim().into(),
-                                parameters: vec![],
-                                owner: None,
-                                instance: false,
-                            },
-                            vec![],
-                            vec![],
-                        )
-                    };
+                    let (target, parameter_names, out_parameters, out_when_true) =
+                        if inline_parameters {
+                            parse_callable(name.trim(), true)?
+                        } else {
+                            identifier(name.trim())?;
+                            (
+                                FunctionRef {
+                                    definition: None,
+                                    name: name.trim().into(),
+                                    parameters: vec![],
+                                    owner: None,
+                                    instance: false,
+                                },
+                                vec![],
+                                vec![],
+                                vec![],
+                            )
+                        };
                     if target.owner.is_some() || target.instance {
                         return Err(Fault::new(
                             "declaration names must not contain an owner or instance prefix",
@@ -669,6 +671,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                             parameters: target.parameters,
                             parameter_names,
                             out_parameters,
+                            out_when_true,
                             receiver_byref,
                             returns: parse_type(result)?,
                             locals: vec![],
@@ -873,10 +876,10 @@ pub fn parse_type(text: &str) -> Result<Type, Fault> {
 
 /// Parse an explicit call signature, including nested constructed parameter types.
 pub fn parse_function_ref(text: &str) -> Result<FunctionRef, Fault> {
-    parse_callable(text, false).map(|(target, _, _)| target)
+    parse_callable(text, false).map(|(target, _, _, _)| target)
 }
 
-type Callable = (FunctionRef, Vec<Option<String>>, Vec<usize>);
+type Callable = (FunctionRef, Vec<Option<String>>, Vec<usize>, Vec<usize>);
 fn parse_callable(text: &str, named: bool) -> Result<Callable, Fault> {
     let (text, definition) = if !named {
         if let Some((signature, identity)) = text.rsplit_once('@') {
@@ -938,9 +941,13 @@ fn parse_callable(text: &str, named: bool) -> Result<Callable, Fault> {
     let mut types = vec![];
     let mut names = vec![];
     let mut out_parameters = vec![];
+    let mut out_when_true = vec![];
     let mut parameter = |text: &str| -> Result<(), Fault> {
         let text = if named {
-            if let Some(rest) = text.trim().strip_prefix("out ") {
+            if let Some(rest) = text.trim().strip_prefix("out(true) ") {
+                out_when_true.push(types.len());
+                rest.trim()
+            } else if let Some(rest) = text.trim().strip_prefix("out ") {
                 out_parameters.push(types.len());
                 rest.trim()
             } else {
@@ -990,6 +997,7 @@ fn parse_callable(text: &str, named: bool) -> Result<Callable, Fault> {
         },
         names,
         out_parameters,
+        out_when_true,
     ))
 }
 

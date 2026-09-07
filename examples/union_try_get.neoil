@@ -1,0 +1,18 @@
+.module UnionTryGet
+.entry Main
+
+.function Main() -> Void
+    .local System.Result.Ok<Int32> ok
+    ldc.i4 42
+    newobj instance System.Result.Ok<Int32>::.ctor(Int32)
+    newobj instance System.Result<Int32,String>::.ctor(System.Result.Ok<Int32>)
+    ldloca ok
+    call instance System.Result<Int32,String>::TryGet(System.Result.Ok<Int32>&)
+    brfalse Miss
+    ldloc ok
+    call instance System.Result.Ok<Int32>::get_Value()
+    call System.Console::WriteLine(Int32)
+    ret
+Miss:
+    fault "expected Ok"
+.end

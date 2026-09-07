@@ -57,7 +57,7 @@
         ldobj E
         ret
     .end
-    .method instance TryGetOk(T* destination) -> Boolean
+    .method instance TryGetOk(out(true) T& destination) -> Boolean
         ldarg this
         ldfld 0
         ldc.i4 0
@@ -74,26 +74,7 @@
         ldc.bool false
         ret
     .end
-    .method instance TryGetOkPointer(T** destination) -> Boolean
-        ldarg this
-        ldfld 0
-        ldc.i4 0
-        bne.un Miss
-        ldarg destination
-        ldarg this
-        ldfld 1
-        ptr.cast T
-        stobj T*
-        ldc.bool true
-        ret
-    Miss:
-        ldarg destination
-        ptr.null T
-        stobj T*
-        ldc.bool false
-        ret
-    .end
-    .method instance TryGetError(E* destination) -> Boolean
+    .method instance TryGetError(out(true) E& destination) -> Boolean
         ldarg this
         ldfld 0
         ldc.i4 1
@@ -110,33 +91,13 @@
         ldc.bool false
         ret
     .end
-    .method instance TryGetErrorPointer(E** destination) -> Boolean
-        ldarg this
-        ldfld 0
-        ldc.i4 1
-        bne.un Miss
-        ldarg destination
-        ldarg this
-        ldfld 1
-        ptr.cast E
-        stobj E*
-        ldc.bool true
-        ret
-    Miss:
-        ldarg destination
-        ptr.null E
-        stobj E*
-        ldc.bool false
-        ret
-    .end
 .end
 
 .function Main() -> Void
     .local Int32* owner
     .local PointerResult<Int32,Int32> view
     .local PointerResult<Int32,Int32> alias
-    .local Int32* snapshot
-    .local Int32** borrowed
+    .local Int32 snapshot
     .local Int32* stackError
 
     ldc.i4 1
@@ -150,39 +111,22 @@
     stloc view
     ldloc view
     stloc alias
-    ; Explicit caller-owned output slots, not managed out parameters.
-    sizeof Int32
-    localloc
-    ptr.cast Int32
-    stloc snapshot
-    sizeof Int32*
-    localloc
-    ptr.cast Int32*
-    stloc borrowed
+    ; Managed output slots; payload pointers retain explicit native lifetimes.
     ldloc view
-    ldloc snapshot
-    call instance PointerResult<Int32,Int32>::TryGetOk(Int32*)
+    ldloca snapshot
+    call instance PointerResult<Int32,Int32>::TryGetOk(Int32&)
     brtrue Copied
     fault "expected Ok copy"
 Copied:
-    ldloc alias
-    ldloc borrowed
-    call instance PointerResult<Int32,Int32>::TryGetOkPointer(Int32**)
-    brtrue Borrowed
-    fault "expected Ok pointer"
-Borrowed:
-
     ; Mutation is visible through both views, but not through the value snapshot.
     ldloc owner
     ldc.i4 7
     stobj Int32
     ldloc snapshot
-    ldobj Int32
     call System.Console::WriteLine(Int32)
     pop
-    ldloc borrowed
-    ldobj Int32*
-    ldobj Int32
+    ldloc alias
+    call instance PointerResult<Int32,Int32>::GetOk()
     call System.Console::WriteLine(Int32)
     pop
 
@@ -202,13 +146,12 @@ Borrowed:
     stobj Int32
     ldloc stackError
     call PointerResult<Int32,Int32>::FromError(Int32*)
-    ldloc snapshot
-    call instance PointerResult<Int32,Int32>::TryGetError(Int32*)
+    ldloca snapshot
+    call instance PointerResult<Int32,Int32>::TryGetError(Int32&)
     brtrue ErrorCopied
     fault "expected Error copy"
 ErrorCopied:
     ldloc snapshot
-    ldobj Int32
     call System.Console::WriteLine(Int32)
     ret
 .end
