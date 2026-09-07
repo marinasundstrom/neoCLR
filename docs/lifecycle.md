@@ -20,7 +20,8 @@ The referenced value has the same type T that could otherwise be held directly;
 there is no class/struct bit that forces allocation policy onto the type.
 Current heap.alloc/free remain raw memory operations, while heap.new/Ref expose
 an execution-retained arena. Neither existing mechanism is silently redefined by
-this proposal; a managed allocation spelling and artifact transition remain open.
+this proposal. The selected high-level spelling is new T(...); its IL lowering
+and artifact transition remain open.
 
 A byref parameter can refer to a caller's local and be passed further down the call
 chain. The programmer explicitly chooses reference access, then uses that reference
@@ -34,11 +35,48 @@ value fields retain their value semantics. Physical stack/heap location and whet
 reference access retains storage are separate concepts; a byref can also access a
 value backed by managed heap storage when that access contract is implemented.
 
+## High-level allocation syntax
+
+The selected source direction distinguishes construction, reference formation and
+explicit managed heap allocation:
+
+```swift
+let value = Counter(0)          // Counter: ordinary value construction
+let reference = &value         // Counter&: reference to the existing value
+let allocated = new Counter(0) // Counter&: new value in managed heap storage
+```
+
+| Expression | Meaning |
+| --- | --- |
+| T(...) | Construct a value; physical placement is chosen by the implementation |
+| &value | Refer to that existing value, preserving its identity and required lifetime |
+| new T(...) | Explicitly construct a new value in managed heap storage and return T& |
+
+Automatic placement is the default. A value may live in registers, stack storage
+or other suitable storage; T(...) is not a promise of a native stack allocation.
+new explicitly requests managed heap allocation, with automatic reference retention
+and cleanup rather than a raw pointer or manual free. No type declaration chooses
+class-versus-struct allocation semantics. This source syntax is selected direction,
+not implemented compiler syntax or a change to neoIL newobj.
+
 ## Storage and escape
 
 Call-scoped references to caller locals do not require heap allocation merely
 because a callee uses them. When the call returns, there is no reference handle
 cleanup for the caller to perform. This is the implemented T& subset today.
+
+Conceptually, a reference used only by a nested call can remain stack-backed:
+
+```swift
+let counter = Counter(0)
+Increment(&counter)
+```
+
+Taking a reference alone does not require heap allocation. Its required lifetime
+determines whether retained storage is necessary. Returning a reference cannot keep
+the value in the ordinary stack frame of a function that has already returned;
+that frame's storage becomes available for reuse. The runtime must arrange
+longer-lived storage, normally on the heap.
 
 The intended broader direction permits a reference to keep a value alive beyond
 its creating scope. The compiler/runtime must then arrange suitable storage, for
@@ -49,7 +87,7 @@ requiring programmers to choose the physical placement themselves.
 
 Selected source direction, not yet accepted by a high-level compiler:
 
-```text
+```swift
 func MakeCounter() -> Counter& {
     let counter = Counter(0)
     return &counter
@@ -64,6 +102,24 @@ from the reference's use. The IL encoding and enforcement of escaping retention
 versus call-scoped access remain implementation decisions.
 Current neoIL T& returns and stored byrefs are still rejected;
 accept them only when retained storage and alias-preserving promotion exist.
+
+Promotion must preserve the same value and every existing alias; it must not
+produce a detached copy. The compiler may instead allocate the escaping value in
+managed heap storage from the start. Safe source code cannot insist that a retained
+reference point into an ordinary stack frame whose lifetime has ended.
+
+Returning an ordinary value does not inherently require a heap allocation:
+
+```swift
+func MakeCounter() -> Counter {
+    return Counter(0)
+}
+```
+
+That result is transferred to the caller. Choose Counter& when reference identity
+or access to the same instance is intended. Values by default and call-scoped byrefs
+can avoid allocations, but returning references may require retained heap storage;
+the syntax does not by itself promise reduced heap use.
 
 Raw pointers require a stable-address or pinning contract at native boundaries.
 Ordinary managed references should continue to work without exposing those details.

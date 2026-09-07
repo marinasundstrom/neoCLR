@@ -1,10 +1,16 @@
 # Allocation encoding: proposals and current scope
 
-Current priority: explicit allocation and pointer operations. Ownership management,
-reference counting, GC, and allocator-policy composition are deferred. The environment
-should be able to choose allocation implementation; an explicit allocator operand at
-every allocation site is not a requirement. The earlier alternatives below remain
-recorded proposals, not settled encodings or additional work for this milestone.
+The selected [high-level allocation direction](lifecycle.md#high-level-allocation-syntax)
+uses T(...) for value construction, &value for a reference to an existing value, and
+new T(...) for explicit managed heap allocation returning T&. Reference retention
+is automatic. Escaping references require retained storage; they cannot keep an
+ended ordinary stack frame alive. High-level syntax is separate from the final IL
+encoding, which remains open.
+
+The sections below describe implemented raw-memory operations and earlier encoding
+proposals. They do not define new T(...) as returning a raw pointer. Managed heap
+retention, reference counting, GC and allocator-policy composition remain unimplemented.
+An explicit allocator operand at every high-level allocation site is not required.
 
 The first implementation now uses `heap.alloc T` (element count to `Ptr<T>`) and
 `heap.free`, with `stobj T` for copying a constructed value into storage. It uses the
@@ -18,7 +24,7 @@ these should be selected by a permanent value/reference bit on the type.
 
 - Stack storage: `localloc`, with explicit frame lifetime, byte size, and primitive
   alignment. The interpreter backs it with host buffers.
-- Heap storage: an explicit allocator call returning an unmanaged pointer (or a
+- Raw heap storage: an explicit allocator call returning an unmanaged pointer (or a
   Result carrying that pointer and a recoverable allocation error). The allocator
   is an implementation/ABI contract, not an ambient managed-object heap.
 - Construction: initialize the selected destination and execute the type's constructor.
@@ -28,9 +34,10 @@ these should be selected by a permanent value/reference bit on the type.
 
 `newobj` can be a convenient typed operation that produces an owned value in the
 current frame. This intentionally changes the usual heap-allocation assumption of
-ordinary CLR `newobj`. An explicit heap shorthand could lower to allocator plus
-construction and produce `Ptr<T>`, rather than automatically producing Ref. Its exact
-spelling and whether it is an opcode or assembler lowering remain undecided.
+ordinary CLR `newobj`. An earlier low-level heap shorthand proposal would produce
+Ptr<T> through allocation plus construction. That proposal is distinct from the
+selected high-level new T(...), which returns a managed T&. Its managed allocation,
+construction and retention lowering has not yet been encoded in neoIL.
 
 A single permanent `newobj.stack`/`newobj.heap` pair is not enough by itself: the VM
 also needs placement construction for preallocated memory, arenas, and foreign

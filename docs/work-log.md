@@ -2665,3 +2665,13 @@ storage remain compiler/runtime responsibilities; escaping references require no
 separate source ownership wrapper. Recorded the distinction between this source
 direction and the current neoIL restriction on returned/stored byrefs. No parser
 or runtime behavior changed; diff whitespace checks passed.
+
+## High-level heap allocation syntax selected — 2026-09-07
+
+Documented T(...) for ordinary value construction, &value for reference formation
+and new T(...) for explicit managed heap allocation returning T&. Clarified that
+an escaping reference cannot remain in an ordinary returned stack frame: retained
+placement or promotion is required, preserving every alias to the same value.
+Call-scoped byrefs and by-value returns do not inherently require heap allocation.
+Updated the allocation-encoding proposal to distinguish raw pointer operations
+from the selected managed source syntax. No compiler or runtime behavior changed.
