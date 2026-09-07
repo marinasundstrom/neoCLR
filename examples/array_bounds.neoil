@@ -1,0 +1,13 @@
+.module ArrayBounds
+.entry Main
+
+.function Main() -> Void
+    ldc.i4 2
+    ldc.i4 0
+    call System.Array<Int32>::Allocate(Int32,Int32)
+    ldc.i4 2
+    call instance System.Array<Int32>::Get(Int32)
+    pop
+    ldvoid
+    ret
+.end

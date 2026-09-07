@@ -1358,3 +1358,28 @@ Validation: all 336 integration tests pass on macOS ARM64; formatting, clippy wi
 warnings denied, and diff checks pass. The CLI sample prints Hello, neoCLR!, byte count
 10, the globe slice, and Invalid boundary handled, then returns Void. Linux and Windows
 remain for CI.
+
+## 2026-09-07 — Explicit Array<T> buffer library subset
+
+Added System.Array<T> as an ordinary Data:T*/Length:Int32 record with six platform-IL
+methods: Allocate(length, initialValue), get_Length, Get, Set, GetElementAddress, and
+Free. Construction explicitly allocates native storage and initializes each element.
+Access checks signed bounds and computes offsets with checked native-integer arithmetic.
+No new runtime binding, instruction, array type category, GC, or ownership policy is added.
+
+Descriptor copies alias the same allocation without acquiring ownership; element access
+uses existing value-copy/storage rules. Free releases the buffer once, not pointees or
+element resources. Empty and Void-element buffers work; supported elements require
+native layouts. String, Ref, Error, and bootstrap union element storage remains unsupported.
+Owned array values and recoverable accessors are separate future work, not silently
+assigned descriptor semantics. Documented raw descriptor invariants and execution lifetime.
+
+Added seven tests for initialized typed elements, alias mutation, record element copying,
+empty/Void arrays, bounds and negative-length Fault traces, dangling aliases/double free,
+resource limits, serialization, and service planning. Updated the library method count
+and added successful and deliberate bounds-Fault samples.
+
+Validation: all 343 integration tests pass on macOS ARM64; formatting, clippy with
+warnings denied, and diff checks pass. The main sample prints 10, 42, 10 and frees its
+allocation. The bounds sample exits with a terminal Fault showing GetElementAddress,
+Get, and Main. Linux and Windows remain for CI.

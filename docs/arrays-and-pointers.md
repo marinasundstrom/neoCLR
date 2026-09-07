@@ -1,7 +1,8 @@
 # Arrays and pointers: direction and remaining work
 
 Native `Ptr<T>`/`T*` values and a first heap/access subset are implemented; see
-[heap and pointers](heap-and-pointers.md). Array storage remains a proposal. Raw pointers are foundational VM capabilities; managed
+[heap and pointers](heap-and-pointers.md). An explicit native-buffer System.Array<T> descriptor is now implemented; owned array
+values remain a proposal. Raw pointers are foundational VM capabilities; managed
 ownership policies are separate. The current Ref arena is not reference-counted.
 See [memory layers](memory-model.md) for the updated architectural direction.
 
@@ -9,21 +10,66 @@ Arrays should follow the same separation between data type and storage as every
 other type. Making every array implicitly reference-allocated would reintroduce
 the distinction neoCLR intends to remove.
 
-## Initial runnable milestone
+## Implemented first subset: explicit buffer descriptors
 
-Arrays are now a near-term fundamental alongside primitive-backed types, strings, and
-Error/Fault diagnostics. Start with a small program that creates an initialized array,
-reads its length, reads and updates elements, and demonstrates a bounds failure with
-a Fault trace. Empty arrays, explicit element values, and generic element types belong
-in the first contract; extensive OOP and the full collection library are not prerequisites.
+System.Array<T> is an ordinary generic record in the platform-written System library:
+Data is T* and Length is Int32. It describes separately allocated native storage.
+There is no new array signature category, opcode, intrinsic member dispatch, implicit
+GC, or reference counting. This subset intentionally differs from the owned-array
+proposal below and from a .NET managed array.
 
-The ownership proposal below remains a candidate, not an accepted encoding. Before
-implementation, settle owned element storage versus a descriptor over separately allocated
-storage, copy/alias behavior, construction/allocation instructions, and return lifetime.
-Do not make allocation or copying silently imply GC or the bootstrap Ref arena. Raw
-pointer buffers already exist, but lack the array value's shape and checked-access contract.
-String APIs may later use array/buffer facilities without making the String representation
-or Unicode indexing depend on a particular array-storage policy.
+| Member | Contract |
+| --- | --- |
+| static Allocate(Int32 length, T initialValue) -> System.Array<T> | Explicitly allocate and initialize each element by copying the supplied value |
+| instance get_Length() -> Int32 | Read descriptor length; ordinary method, no property metadata yet |
+| instance Get(Int32 index) -> T | Bounds-check and return an element value |
+| instance Set(Int32 index, T value) -> Void | Bounds-check and write an element |
+| instance GetElementAddress(Int32 index) -> T* | Bounds-check and compute its raw address using checked native-integer arithmetic |
+| instance Free() -> Void | Explicitly release the backing allocation |
+
+Copying the descriptor copies its pointer and length; both copies access the same buffer.
+It does not copy elements or acquire ownership. Element Get/Set and initialization use
+existing value/storage rules: records copy, small scalar storage remains precise, and
+pointer-containing elements copy addresses without acquiring pointee ownership. Free
+must be called exactly once for an allocation. It does not run element destructors or
+free pointees. Remaining aliases cannot safely access freed storage; the interpreter's
+existing allocation diagnostics reject dangling accesses and repeated free.
+
+Length is fixed by the API after allocation, but the descriptor has ordinary metadata
+fields and no encapsulation guarantee. Handwritten IL can construct or modify descriptors;
+these methods do not prove that arbitrary Data/Length pairs describe a valid buffer.
+Raw element pointers obey the existing pointer lifetime/alignment rules. Native interop
+retains its separate unsafe boundary. This is a low-level buffer facility, not checked
+borrow provenance or a permanent array ownership model.
+
+The initial subset supports T only where native layout and typed loads/stores exist:
+numeric types, Boolean, Char, Void, pointers, and supported closed records. String, Error,
+Ref, and bootstrap union elements fail allocation layout checks, even for empty arrays.
+Nested descriptors store pointer/length values; they do not deep-copy inner buffers.
+
+Negative lengths and out-of-range indices produce terminal Faults. Access is invariant,
+zero-based, and excludes the one-past-end index. Empty arrays are valid but have no valid
+indices. Array<Void> retains its logical length and bounds with zero payload bytes;
+valid element addresses can coincide. A zero-byte allocation still has a tracked lifetime.
+Recoverable Option/Result accessors and bounds-error types can be layered on later.
+
+Allocation uses existing byte/allocation limits, and initialization consumes ordinary
+IL frames and instructions. A Fault aborts execution and releases its remaining storage
+through existing execution teardown. Returning a descriptor within guest calls preserves
+its execution-owned allocation; returning it to a host does not make it transferable
+into another invocation. Keep the Execution alive while its memory is needed. Host
+invocation continues to reject pointer-bearing input schemas.
+
+`cargo run -- run examples/arrays.neoil` prints 10, 42, 10 after updating a shared buffer,
+then explicitly frees it. `examples/array_bounds.neoil` deliberately faults on index 2
+of a two-element array and presents GetElementAddress -> Get -> Main in its stack trace.
+
+## Remaining array value design
+
+An owned, runtime-length array value is separate future work. Settle its copy/move,
+allocation, and return-lifetime contracts before adding newarr, ldelem/stelem, or a
+special signature encoding. Do not silently reuse the descriptor's pointer aliasing
+as the semantics of owned array values. The earlier candidate below remains a proposal.
 
 ## Array ownership and shape
 
@@ -109,7 +155,8 @@ lifetime or must be rejected. Physical “always native stack” placement is th
 not a sustainable universal promise. Frame ownership is the semantic promise;
 backend placement and explicit shared identity are separate concerns.
 
-The initial heap allocation and pointer operations are now available. The array
-experiment above is promoted to the initial runnable milestone. Checked spans and
-broader ownership policies remain later work. Initial array tests should cover empty arrays, bounds, aliasing versus
-copies, invalid lengths, and zero-sized elements; the existing heap/pointer implementation remains independently usable.
+The explicit buffer descriptor now serves the initial runnable milestone. The owned-array
+experiment, checked spans, and broader ownership policies remain separate later work.
+Tests cover empty arrays, bounds, descriptor aliasing versus element copies, invalid
+lengths, and zero-sized elements. The heap/pointer implementation remains independently
+usable.

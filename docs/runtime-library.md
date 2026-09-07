@@ -5,8 +5,10 @@ and instruction representation, and executed by neoCLR. Host Rust implements the
 interpreter and unavoidable bootstrap services; it should not become the BCL's
 implementation language by accident.
 
-[System.neoil](../runtime/System.neoil) currently provides twelve platform-written methods and six native declarations:
+[System.neoil](../runtime/System.neoil) currently provides eighteen platform-written methods and six native declarations:
 
+- `System.Array<T>` provides six IL methods for explicit allocation, length, checked
+  access, element addresses, and free; see [arrays and pointers](arrays-and-pointers.md).
 - `System.String` provides Concat, Equals, IsEmpty, GetUtf8ByteCount, and SliceUtf8;
   see [the text contract](text-model.md).
 - The UnionAttribute marker has an ordinary IL constructor.

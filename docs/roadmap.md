@@ -51,9 +51,10 @@ The immediate demonstration set should include:
 - Primitive-backed System types with a small useful method surface. System.Int32 already
   demonstrates Parse, Divide, and ToString; extend a few representative primitives before
   pursuing inheritance, interfaces, or reflection.
-- Invariant, zero-based, fixed-length arrays with explicit initialization and bounds
-  behavior. Define copy semantics and backing-storage lifetime before adding array IL;
-  include empty arrays and Void elements. See [arrays and pointers](arrays-and-pointers.md).
+- [System.Array<T> buffer descriptors](arrays-and-pointers.md) now provide explicit
+  allocation/free, initialization, length, and checked access in ordinary library IL.
+  Descriptor copies alias storage; owned array values and broader element types remain
+  separate work. Empty and Void-element buffers are supported.
 - A usable String API on the existing UTF-8 String value/type. [Initial String members](text-model.md)
   now provide concatenation, ordinal equality, emptiness, explicit UTF-8 byte count, and
   checked byte slicing with Result errors. General indexing and decoding remain separate.
