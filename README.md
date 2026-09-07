@@ -460,3 +460,6 @@ union TryGet methods alongside their executable neoIL equivalents.
 
 [Checked reference returns](examples/reference_returns.neoil) demonstrates returning
 a reference to a caller-owned field and updating that field through the result.
+
+[Managed value initialization](docs/managed-initialization.md) defines initobj for
+existing typed slots, outputs and constructor receivers.

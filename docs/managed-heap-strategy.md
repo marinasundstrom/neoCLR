@@ -2,7 +2,9 @@
 
 Status: proposed next implementation strategy after checked managed reference
 returns. The [slot contract](reference-slots.md) is implemented; this document does
-not change newobj, initobj, constructors or the legacy Ref arena yet.
+not change newobj or the legacy Ref arena. The first
+[managed initobj subset](managed-initialization.md) is now implemented; constructor
+destinations and managed heap allocation remain future work.
 
 ## One reference type, distinct storage lifetimes
 
@@ -44,7 +46,7 @@ modifier; the receiving local's type must not silently choose allocation behavio
 
 | Pattern | Role | NeoCLR next step |
 | --- | --- | --- |
-| Address a destination; initobj T | Default-initialize existing storage, with no constructor invocation | Extend native-only initobj to supported managed T& destinations and typed defaults |
+| Address a destination; initobj T | Default-initialize existing storage, with no constructor invocation | Managed typed defaults are implemented for scalars and recursively supported records |
 | Address a destination; arguments; call .ctor | Construct into supplied storage | Add destination-oriented construction; current ordinary calls copy their receiver |
 | Arguments; newobj .ctor | Construct a fresh result | Preserve the existing ordinary-value path while deciding explicit heap placement |
 | Explicit managed heap placement | Establish an independently managed root and return T& | Evolve an existing heap operation or define a narrow construction modifier |
@@ -135,9 +137,9 @@ reference liveness does not mean a resource is still open.
 
 ## Bounded implementation order
 
-1. Define typed default initialization and constructor destinations. Extend initobj
-   to the supported managed T& subset, with independent checks when verification is
-   skipped. Keep unsupported default states explicit.
+1. Build on the implemented managed initobj subset and define constructor
+   destinations. Keep unsupported default states explicit and enforce runtime
+   initialization checks independently of optional verification.
 2. Add managed heap root provenance, automatic retention and live-object accounting.
    Select explicit heap placement producing T&, using an existing operation where
    possible, while preserving ordinary value construction. Initially keep

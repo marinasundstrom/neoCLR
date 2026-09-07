@@ -87,7 +87,7 @@ runtime guards reject host results and uninitialized reference storage/returns w
 requiring this optional analysis pass. See [reference contracts](reference-slots.md).
 
 For a directly addressed local, `ldloca` preserves its origin in the abstract stack.
-`stobj` establishes initialization, while `ldobj`, managed `ldflda`, interface
+`stobj` and managed `initobj` establish initialization, while `ldobj`, managed `ldflda`, interface
 formation, reference local stores, returns and ordinary reference arguments require
 initialization.
 Reference locals do not preserve the verifier's original-slot provenance; runtime
@@ -143,3 +143,8 @@ terminal-Fault examples. Negative cases exercise joins, loops, assignment propag
 returns, calls, receivers, fields, numeric categories, and pointer operands. Generic
 normalization, raw bootstrap payloads, small-integer/floating storage conversions,
 source/JSON CLI inputs, and dynamic pointer failures are covered as well.
+
+The verifier recognizes initobj on a directly addressed constructor receiver as
+whole-receiver initialization. Addressing or reading receiver fields before that
+initialization remains invalid. Defaultability is described in
+[managed initialization](managed-initialization.md).

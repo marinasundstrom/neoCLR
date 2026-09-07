@@ -234,7 +234,7 @@ normalization; other checks use exact type equality. See [integer storage](integ
 | `unaligned. n` | `→` | Prefix a supported memory access with alignment 1, 2, or 4 |
 | `ldobj T` | `Ptr<T> → T` | Copy initialized value from native storage |
 | `stobj T` | `Ptr<T>,T →` | Copy value into native storage |
-| `initobj T` | `Ptr<T> →` | Zero a supported native layout without a constructor |
+| `initobj T` | `Ptr<T> →` or `T& →` | Default-initialize supported storage without invoking a constructor |
 | `cpobj T` | `Ptr<T>,Ptr<T> →` | Copy initialized value from source to destination |
 | `initblk` | `Ptr<T>,Int32,integer →` | Fill a byte range with the low byte of the value |
 | `cpblk` | `Ptr<T>,Ptr<U>,integer →` | Copy a byte range and initialization state (overlap supported) |
@@ -577,7 +577,7 @@ without native layout requirements. The pointer operand path remains separate.
 These are CLI-shaped operations with the [slot-reference restrictions](reference-slots.md).
 Managed `ldflda` projects a record field while preserving its root lifetime. Returning
 a reference into the current frame faults; caller-backed reference returns are valid.
-SlotReferences is the service for address formation; ldflda/ldobj/stobj conservatively report
+SlotReferences is the service for address formation; ldflda/ldobj/stobj/initobj conservatively report
 both SlotReferences and PointerMemory until operand-sensitive service analysis exists.
 
 `interface.borrow I` also accepts a managed Concrete& and yields a retaining I&
@@ -591,3 +591,7 @@ formation/dispatch conservatively report SlotReferences alongside InterfaceDispa
 It is parameter metadata (out_when_true indices), not an opcode or overload
 discriminator. Direct brtrue/brfalse success edges can establish local initialization
 in the verifier; runtime checks enforce each actual output obligation.
+
+Managed `initobj T` initializes supported typed defaults in an existing T& slot,
+including uninitialized locals and out destinations. See
+[managed value initialization](managed-initialization.md) for the exact subset.

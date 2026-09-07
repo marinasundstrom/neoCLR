@@ -129,7 +129,7 @@ fn analyze_function(
         let inputs = state.stack.split_off(state.stack.len() - pops);
         match (op, inputs.first()) {
             (
-                Op::StoreObject(_),
+                Op::StoreObject(_) | Op::InitializeObject(_),
                 Some(StackType::Slot {
                     local: Some(index), ..
                 }),
@@ -147,6 +147,37 @@ fn analyze_function(
                 return Err(fault(pc, "referenced local is uninitialized"));
             }
             _ => (),
+        }
+        if constructing
+            && !state.receiver_initialized
+            && matches!(
+                op,
+                Op::LoadObject(_) | Op::FieldAddress(_) | Op::BorrowInterface(_) | Op::Store(_)
+            )
+            && matches!(
+                inputs.first(),
+                Some(StackType::Slot {
+                    argument: Some(0),
+                    ..
+                })
+            )
+        {
+            return Err(fault(
+                pc,
+                "constructor receiver is not initialized on every incoming path",
+            ));
+        }
+        if constructing
+            && matches!(op, Op::StoreObject(_) | Op::InitializeObject(_))
+            && matches!(
+                inputs.first(),
+                Some(StackType::Slot {
+                    argument: Some(0),
+                    ..
+                })
+            )
+        {
+            state.receiver_initialized = true;
         }
         let mut conditional_outputs = vec![];
         if let Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) = op {
@@ -399,7 +430,11 @@ fn effect(module: &Module, op: &Op, arity: usize) -> Result<(usize, usize), Faul
 #[derive(Debug, Clone, PartialEq, Eq)]
 enum StackType {
     ConditionalOutput(Vec<usize>),
-    Slot { ty: Type, local: Option<usize> },
+    Slot {
+        ty: Type,
+        local: Option<usize>,
+        argument: Option<usize>,
+    },
     Exact(Type),
     NormalizedParameter(u16),
 }
@@ -497,10 +532,12 @@ fn typed_effect(
         LocalAddress(index) => Result::Ok(vec![StackType::Slot {
             ty: T::ByRef(Box::new(function.locals[*index].clone())),
             local: Some(*index),
+            argument: None,
         }]),
         ArgumentAddress(index) => Result::Ok(vec![StackType::Slot {
             ty: T::ByRef(Box::new(function.argument_types()[*index].clone())),
             local: None,
+            argument: Some(*index),
         }]),
         Arg(index) => Result::Ok(vec![loaded(&function.argument_types()[*index])]),
         Load(index) => Result::Ok(vec![loaded(&function.locals[*index])]),
@@ -601,7 +638,11 @@ fn typed_effect(
             T::ByRef(owner) => {
                 let ty = T::ByRef(Box::new(field(owner, *index)?));
                 if let StackType::Slot { local, .. } = &values[0] {
-                    Ok(vec![StackType::Slot { ty, local: *local }])
+                    Ok(vec![StackType::Slot {
+                        ty,
+                        local: *local,
+                        argument: None,
+                    }])
                 } else {
                     one(ty)
                 }
@@ -665,7 +706,21 @@ fn typed_effect(
             stored(&values[1], ty)?;
             Result::Ok(vec![])
         }
-        CopyObject(ty) | InitializeObject(ty) => {
+        InitializeObject(ty) => {
+            require(
+                address(&values[0])? == ty,
+                "memory operation pointer type mismatch",
+            )?;
+            if crate::vm::check_type(ty, module).is_ok() {
+                if matches!(exact(&values[0])?, T::ByRef(_)) {
+                    crate::initialization::default_value(module, ty)?;
+                } else {
+                    crate::memory::layout(module, ty)?;
+                }
+            }
+            Result::Ok(vec![])
+        }
+        CopyObject(ty) => {
             for value in values {
                 require(
                     pointer(value)? == ty,

@@ -100,14 +100,14 @@ fn instruction_services(op: &Op) -> &'static [RuntimeService] {
         Op::PackValue(..) | Op::IsValue(..) | Op::UnpackValue(..) => &[ValueStorage],
         Op::LoadTypeToken(..) => &[TypeInspection],
         Op::LocalAddress(..) | Op::ArgumentAddress(..) => &[SlotReferences],
-        Op::LoadObject(..) | Op::StoreObject(..) | Op::FieldAddress(..) => {
-            &[PointerMemory, SlotReferences]
-        }
+        Op::LoadObject(..)
+        | Op::StoreObject(..)
+        | Op::FieldAddress(..)
+        | Op::InitializeObject(..) => &[PointerMemory, SlotReferences],
         Op::BorrowInterface(..) | Op::CallVirtual(..) => &[InterfaceDispatch, SlotReferences],
         Op::PointerFromInt(..)
         | Op::PointerAdd
         | Op::CopyObject(..)
-        | Op::InitializeObject(..)
         | Op::CopyBlock
         | Op::InitializeBlock
         | Op::LoadIndirectInt8

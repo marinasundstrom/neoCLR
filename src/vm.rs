@@ -571,14 +571,16 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                     record_fields(module, ty, arity)?;
                     crate::access::check_construction(module, function, ty)?;
                 }
-                Op::SizeOf(ty)
-                | Op::AlignOf(ty)
-                | Op::Allocate(ty)
-                | Op::CopyObject(ty)
-                | Op::InitializeObject(ty) => {
+                Op::SizeOf(ty) | Op::AlignOf(ty) | Op::Allocate(ty) | Op::CopyObject(ty) => {
                     check(ty)?;
                     if check_type(ty, module).is_ok() {
                         crate::memory::layout(module, ty)?;
+                    }
+                }
+                Op::InitializeObject(ty) => {
+                    check(ty)?;
+                    if check_type(ty, module).is_ok() {
+                        crate::initialization::default_value(module, ty)?;
                     }
                 }
                 Op::LoadObject(ty) | Op::StoreObject(ty) => {
@@ -1573,6 +1575,18 @@ fn interpret_frames(
                         .push(Value::Pointer(memory.field(&pointer, &layout, *index)?));
                 }
                 Op::CopyObject(ty) | Op::InitializeObject(ty) => {
+                    if let (Op::InitializeObject(_), Some(Value::SlotReference(reference))) =
+                        (op, frame.stack.last())
+                    {
+                        if reference.target() != ty {
+                            return Err(Fault::new("memory operation pointer type mismatch"));
+                        }
+                        // Build the complete default before publishing it or fulfilling outputs.
+                        let value = crate::initialization::default_value(module, ty)?;
+                        reference.write(value)?;
+                        frame.pop()?;
+                        return Ok(None);
+                    }
                     let source = if matches!(op, Op::CopyObject(_)) {
                         Some(frame.pointer()?)
                     } else {

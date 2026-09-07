@@ -41,7 +41,11 @@ fn generic_memory_calls_report_each_instantiation_and_exact_use_location() {
     let graph = program.analyze_reachability(&roots, 3).unwrap();
     assert_eq!(
         graph.required_services(),
-        [Service::NativeAllocation, Service::PointerMemory]
+        [
+            Service::NativeAllocation,
+            Service::PointerMemory,
+            Service::SlotReferences
+        ]
     );
     let missing = graph.missing_services(&[Service::PointerMemory, Service::PointerMemory]);
     assert_eq!(
@@ -51,7 +55,8 @@ fn generic_memory_calls_report_each_instantiation_and_exact_use_location() {
             .collect::<Vec<_>>(),
         [
             (0, Some(1), Service::NativeAllocation),
-            (1, Some(1), Service::NativeAllocation)
+            (1, Some(1), Service::NativeAllocation),
+            (2, Some(1), Service::SlotReferences)
         ]
     );
     assert_eq!(graph.functions[2].services[0].instruction, Some(1));

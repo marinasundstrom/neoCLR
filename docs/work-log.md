@@ -2740,3 +2740,30 @@ value/reference type flag, null default or source ownership wrapper was selected
 Validation: 17 local links and heading targets resolve, whitespace checks pass, and
 src/tests/examples/runtime match the preceding commit. No runtime tests were rerun
 for this documentation-only follow-up; the implementation commit passed 543 tests.
+
+## Managed initobj and typed defaults — 2026-09-07
+
+Extended the existing initobj opcode to managed T& destinations without changing
+its stack effect, constructor behavior or heap allocation semantics. Supported
+defaults are exact scalar zeroes, false, inhabited Void, null raw pointers and
+recursively supported ordinary records. String, managed references, erased values
+and other unspecified default states remain rejected. Recursive/excessive shapes
+are bounded. Complete defaults are built before publishing a slot write.
+
+Initialization uses ordinary slot/field writes, preserving aliases and out/out(true)
+assignment rules. Closed unsupported types fail validation; execution checks
+specialized generic types without requiring verification. The verifier now tracks
+whole-argument addresses so ldarga this / initobj can initialize a constructor's
+receiver, while field access still requires an initialized receiver. Arbitrary
+caller-destination constructor calls remain future work.
+
+Added the value_initialization example, managed_initialization integration tests,
+and the managed-initialization contract. Updated service classification, constructor
+and verifier documentation, and the heap strategy. No newval opcode or newobj
+allocation change was introduced.
+
+Validation: all 552 tests passed across the completed suite targets. The first full
+run exposed an outdated native-only service expectation for initobj; corrected it,
+reran that target and completed every remaining target plus doc tests. Final
+cargo clippy --all-targets -- -D warnings, cargo fmt --check and diff whitespace
+checks passed. All 150 local documentation links and heading targets resolve.

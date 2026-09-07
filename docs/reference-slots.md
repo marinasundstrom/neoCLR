@@ -69,6 +69,7 @@ including forwarding, rather than merely attach an advisory annotation.
 | ldarg on a T& parameter | Load the passed reference, without dereferencing it |
 | ldobj T on T& | Copy the initialized value from the referenced slot |
 | stobj T on T& | Store an exact, storage-normalized T value into that slot |
+| initobj T on T& | Write the supported typed default without invoking a constructor |
 | stloc/ldloc on a T& local | Store/load a retaining alias; the target must be initialized when storing |
 | ldflda field on T& | Form a managed reference to a field of an initialized record, preserving its root lifetime |
 | ret returning T& | Return an initialized alias only when its root does not belong to the current frame |
@@ -225,3 +226,6 @@ Implementation slices (implemented and committed separately):
 Each slice must update the opcode/deviation reference, executable samples and runtime
 service planning. No compiler, GC, reference counting or full borrowing language is
 required to establish these contracts.
+
+[Managed initobj](managed-initialization.md) supplies typed defaults for scalar and
+record storage, including whole-slot output initialization and field resets.

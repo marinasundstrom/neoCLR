@@ -301,3 +301,7 @@ the static pointee type, not its lifetime responsibilities. See the
 [pointer-backed carrier example](pointer-carriers.md) for a tagged, borrowed view
 using existing casts, native storage and ordinary methods, including the special
 zero-sized Void semantics and the remaining native-layout limitations.
+
+The same initobj opcode also accepts managed T& destinations under the
+[typed default-initialization contract](managed-initialization.md). That path uses
+managed slot writes and does not require native layout or raw memory allocation.

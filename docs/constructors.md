@@ -28,10 +28,13 @@ signature, generic substitution and bound member identity rules.
 This first subset initializes the receiver as a whole. For a record with fields,
 the receiver slot begins uninitialized. `starg this` installs a complete value of
 the owner type. Reading the receiver before that, or returning without initializing
-it, is a verifier error and an execution Fault. The verifier requires initialization
-on every incoming path to a read or return. No fabricated defaults, nulls or unused
-field values are supplied. Zero-field records already have a complete empty receiver.
-A field of type `Void` still requires explicit initialization with `ldvoid`.
+it, is a verifier error and an execution Fault. Explicit ldarga this followed by
+initobj T can also initialize the whole receiver when T supports a typed default;
+see [managed initialization](managed-initialization.md). The verifier requires initialization
+on every incoming path to a read or return. No implicit defaults, nulls or unused
+field values are supplied; initobj is an explicit initialization operation. Zero-field records already have a complete empty receiver.
+Without initobj, aggregate construction still supplies every field explicitly,
+including `ldvoid` for a Void field.
 
 The constructor must return exactly one `Void` and leave no extra evaluation-stack
 items. At that return boundary, construction supplies the initialized receiver to

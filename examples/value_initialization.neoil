@@ -1,0 +1,31 @@
+.module ValueInitialization
+.entry Main
+
+.type Counter
+    .field Age Int32
+    .field Enabled Boolean
+    .method instance .ctor(Int32 age) -> Void
+        ldarga this
+        initobj Counter
+        ldarga this
+        ldflda Counter::Age
+        ldarg age
+        stobj Int32
+        ldvoid
+        ret
+    .end
+.end
+
+.function Main() -> Int32
+    .local Counter counter
+    ldloca counter
+    initobj Counter
+    ldloc counter
+    ldfld Counter::Age
+    call System.Console::WriteLine(Int32)
+    pop
+    ldc.i4 42
+    newobj instance Counter::.ctor(Int32)
+    ldfld Counter::Age
+    ret
+.end
