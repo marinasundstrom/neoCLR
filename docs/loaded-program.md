@@ -63,3 +63,7 @@ execution-mode fallback is introduced.
 
 Run `cargo run --example loaded_program` for an embedding example that prepares and
 verifies HelloWorld once, drops the source Module, and executes it twice.
+
+[Closed call-graph analysis](reachability.md) shares the prepared definition bindings and
+follows explicit closed roots without execution. Its bounded conservative report supports
+backend planning; it does not perform typed verification or establish AOT support.

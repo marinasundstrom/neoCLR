@@ -268,6 +268,8 @@ Run `cargo run --example invoke` for the Rust embedding sample.
 `cargo run --example union_inputs` demonstrates Option/Result arguments and result reuse.
 [Cooperative cancellation](docs/cancellation.md) is available through ExecutionOptions.
 `cargo run --example cancellation` stops an invocation from another host thread.
+[Closed call-graph analysis](docs/reachability.md) follows explicit roots for backend planning.
+`cargo run --example reachability` reports HelloWorld's IL calls and runtime import.
 
 [Explicit module sets](docs/module-sets.md) support additional libraries, cross-module
 generic calls, and field-name aliases. Run `cargo run --example modules` for a three-module

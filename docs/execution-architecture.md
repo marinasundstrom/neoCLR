@@ -110,8 +110,11 @@ remain options; the platform has not selected one.
 
 For an initial AOT experiment, explicitly identify required closed instantiations
 from reachable code and declared roots. Unbounded or dynamically selected instantiations
-need a diagnostic or an explicitly supported capability. Reflection and exported
-generic APIs must not depend on code that the build accidentally omitted.
+need a diagnostic or an explicitly supported capability. [Closed call-graph analysis](reachability.md)
+now follows explicit roots through bound, specialized calls with a function-count limit.
+It reports runtime/native imports and conservatively includes all syntactic calls;
+layout closure, backend capability checks, and machine-code generation remain pending.
+Reflection and exported generic APIs must not depend on code that the build accidentally omitted.
 
 ### Runtime services, failures, and optional memory management
 

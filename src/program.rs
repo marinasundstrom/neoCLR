@@ -57,6 +57,16 @@ impl LoadedProgram {
         crate::type_identity::resolve(&self.module, ty)
     }
 
+    /// Build a conservative closed call graph from explicit roots without executing code.
+    /// The limit counts distinct definition/closed-owner instantiations, including imports.
+    pub fn analyze_reachability(
+        &self,
+        roots: &[crate::metadata::FunctionRef],
+        max_functions: usize,
+    ) -> Result<crate::Reachability, Fault> {
+        crate::reachability::analyze(&self.module, roots, max_functions)
+    }
+
     /// Resolve a closed IL function with validated owned inputs.
     /// The returned handle borrows this immutable program and needs no entry point.
     pub fn resolve_function(

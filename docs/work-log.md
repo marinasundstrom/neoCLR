@@ -1218,3 +1218,29 @@ Validation: all 304 integration tests pass on macOS ARM64; formatting, clippy wi
 warnings denied, and diff checks pass. The sample cancels Spin at instruction zero
 and then successfully invokes Ready on the same program. Linux and Windows remain
 for CI.
+
+## 2026-09-07 — Bounded closed call-graph analysis
+
+Added LoadedProgram::analyze_reachability for explicit closed FunctionRef roots.
+The report preserves selected definition identities, specialized owners/signatures,
+return types, implementation kinds, and call-site edges. Distinct closed owners and
+bound generic overloads remain distinct; recursive calls reuse graph nodes. Root
+order and IL call order determine report-local indices, independently of supplied
+module order for equivalent load sets.
+
+Analysis follows all syntactic calls, including unreachable IL, without execution or
+native library loading. Runtime InternalCall and P/Invoke declarations are terminal
+nodes; native import metadata is retained. Root references are checked against the
+root module, while transitive calls retain the loader-validated declaring-module rules.
+A function-count bound rejects expanding generic call graphs without partial output.
+Pointer signatures and import roots do not require host input schemas.
+
+Added seven tests for HelloWorld, recursive and unreachable calls, native imports,
+generic overload identities, closed instance owners, open-root rejection, transitive
+references/revisions, deterministic order, and bounded expanding instantiations.
+Added a reporting sample and documented conservative scope and AOT work still needed:
+layout closure, runtime services, capabilities, and code generation.
+
+Validation: all 311 integration tests pass on macOS ARM64; formatting, clippy with
+warnings denied, and diff checks pass. The sample reports Main -> System.Console.WriteLine
+-> neoCLR.Runtime.WriteLine without executing HelloWorld. Linux and Windows remain for CI.

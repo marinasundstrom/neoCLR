@@ -10,6 +10,9 @@ Interpretation, JIT compilation, and native AOT are platform-wide architectural
 requirements. Embedding and a future high-level language are additional consumers
 of the same semantic model. See [execution architecture](execution-architecture.md)
 for shared contracts, capability boundaries, unresolved choices, and staged experiments.
+[Closed call-graph analysis](reachability.md) now provides bounded traversal of explicit
+roots and closed generic calls for backend planning. Native compilation still needs
+layout closure, runtime-service dependencies, and capability checks.
 Only interpretation is implemented today; this does not make interpreter internals
 the permanent platform ABI.
 
