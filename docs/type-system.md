@@ -192,3 +192,25 @@ Questions to resolve before implementation:
 
 These choices should be considered alongside future frontend and metadata design;
 they do not require adding nullability to the current implementation slice.
+
+## Future exploration: inheritance openness and closed hierarchies
+
+Make inheritance policy explicit when inheritance is introduced. Distinguish whether
+an individual type permits derivation from whether an entire hierarchy is closed to
+unlisted subtypes. These declarations should remain independent of value semantics,
+allocation, and ownership; they must not restore a class/struct memory-model distinction.
+
+A closed hierarchy could allow derivation among a known set of permitted types while
+preventing arbitrary extensions. Its permitted members and enforcement boundary need
+an explicit contract. A type that cannot be derived from is a different case from a
+base type whose hierarchy permits only declared alternatives.
+
+Before implementation, decide the default openness, where permitted subtypes are
+listed, whether closure is relative to a module or an explicit list, and how indirect
+derivation and separately compiled modules are validated. Also define how versioning
+and generic instantiations affect closure. A compiler may use a verified closed set
+for exhaustive analysis; an annotation alone must not imply such a guarantee.
+
+This is deferred design work, not implemented inheritance metadata or syntax. Ordinary
+union carriers remain a separate convention and must not require inheritance or a
+closed hierarchy to represent their variants.

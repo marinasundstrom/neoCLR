@@ -1543,3 +1543,12 @@ scoped/module-reference validation, legacy omission, and library associations.
 Validation: all 367 integration tests pass on macOS ARM64; formatting, clippy with
 warnings denied, and diff checks pass. The sample verifies and prints 42 and
 Properties describe ordinary methods, then returns Void. Linux and Windows remain for CI.
+
+## 2026-09-07 — Record explicit inheritance policy
+
+Recorded future explicit control over type derivability and hierarchy closure as
+separate contracts. Listed defaults, permitted-subtype declarations, indirect derivation,
+module boundaries, generics, and versioning as open questions. Kept the policy separate
+from allocation/value semantics and from ordinary union representation.
+
+Validation: documentation-only change; diff checks pass. No runtime behavior changed.

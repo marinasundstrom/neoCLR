@@ -301,3 +301,11 @@ contracts before implementation; compiler/tooling-only enforcement is a candidat
 Use consistent annotations without class/struct rules or an automatic Nullable<T>
 rewrite, while deciding actual null storage separately. Preserve Option<T> for semantic absence. See the
 [nullability design questions](type-system.md#future-exploration-nullability-on-declarations).
+
+## Deferred design question: inheritance openness
+
+When inheritance is introduced, explicitly model whether a type permits derivation
+and whether its hierarchy is closed to unlisted subtypes. Determine defaults, permitted
+subtypes, module/version boundaries, and validation before exposing a closed-world
+guarantee. See [inheritance policy](type-system.md#future-exploration-inheritance-openness-and-closed-hierarchies).
+This does not expand the immediate ordinary-type and union-foundation slices.
