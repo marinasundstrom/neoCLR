@@ -25,8 +25,9 @@ now shares a prepared metadata snapshot across execution and analysis, with
 retaining legacy compatibility. Invocation,
 target-layout, runtime-service, and Fault boundaries
 then support a minimal hosting experiment and an early native AOT experiment.
-[Static function invocation](invocation.md) is now available as a Rust embedding subset
-with exact primitive and [validated record inputs](record-inputs.md), using fresh state. A small
+[Static and instance invocation](invocation.md) is now available as a Rust embedding subset
+with exact primitive and [validated record inputs](record-inputs.md), explicitly copied
+receivers, and fresh state. Addressed mutation and shared receiver lifetimes remain open. A small
 language compiler should target the same metadata/IL and enable incremental library
 migration. Native backend/code-sharing choices remain open; no hidden fallback or
 universal ownership policy is implied.

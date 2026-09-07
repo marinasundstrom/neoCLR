@@ -55,17 +55,12 @@ impl LoadedProgram {
         crate::type_identity::resolve(&self.module, ty)
     }
 
-    /// Resolve a closed static IL function with owned primitive/record input parameters.
+    /// Resolve a closed IL function with owned primitive/record inputs.
     /// The returned handle borrows this immutable program and needs no entry point.
     pub fn resolve_function(
         &self,
         target: &crate::metadata::FunctionRef,
     ) -> Result<LoadedFunction<'_>, Fault> {
-        if target.instance {
-            return Err(Fault::new(
-                "host invocation does not yet support instance receivers",
-            ));
-        }
         let mut target = target.clone();
         if let Some(owner) = &mut target.owner {
             *owner = crate::scope::normalize_type(&self.module, owner)?;
@@ -82,7 +77,7 @@ impl LoadedProgram {
                 "host invocation currently requires an IL function; use an IL wrapper for native declarations",
             ));
         }
-        let inputs = crate::input::resolve(&self.module, &function.parameters)?;
+        let inputs = crate::input::resolve(&self.module, &function.argument_types())?;
         let definition = function
             .definition
             .clone()
@@ -127,7 +122,7 @@ impl LoadedProgram {
     }
 }
 
-/// A resolved static IL function belonging to one immutable program snapshot.
+/// A resolved IL function belonging to one immutable program snapshot.
 #[derive(Debug)]
 pub struct LoadedFunction<'program> {
     program: &'program LoadedProgram,
@@ -140,6 +135,16 @@ impl LoadedFunction<'_> {
     pub fn definition(&self) -> &crate::metadata::MemberId {
         &self.definition
     }
+    /// The explicit copied receiver type, or None for static functions.
+    pub fn receiver_type(&self) -> Option<&Type> {
+        if self.function.instance {
+            self.function.owner.as_ref()
+        } else {
+            None
+        }
+    }
+
+    /// Declared parameters, excluding the instance receiver.
     pub fn parameters(&self) -> &[Type] {
         &self.function.parameters
     }
@@ -149,7 +154,7 @@ impl LoadedFunction<'_> {
 
     /// Invoke with validated owned storage values and fresh guest state.
     pub fn invoke(&self, arguments: Vec<crate::Value>, limits: Limits) -> Result<Execution, Fault> {
-        let arguments = self.import_arguments(arguments)?;
+        let arguments = self.import_arguments(None, arguments)?;
         crate::vm::interpret_function(
             &self.program.module,
             self.function.clone(),
@@ -170,7 +175,7 @@ impl LoadedFunction<'_> {
         arguments: Vec<crate::Value>,
         limits: Limits,
     ) -> Result<Execution, Fault> {
-        let arguments = self.import_arguments(arguments)?;
+        let arguments = self.import_arguments(None, arguments)?;
         crate::vm::interpret_function(
             &self.program.module,
             self.function.clone(),
@@ -180,28 +185,91 @@ impl LoadedFunction<'_> {
         )
     }
 
-    fn import_arguments(&self, arguments: Vec<crate::Value>) -> Result<Vec<crate::Value>, Fault> {
+    /// Invoke an instance method with an owned receiver snapshot and fresh state.
+    /// Changes to `this` do not update a value retained by the caller.
+    pub fn invoke_instance(
+        &self,
+        receiver: crate::Value,
+        arguments: Vec<crate::Value>,
+        limits: Limits,
+    ) -> Result<Execution, Fault> {
+        let arguments = self.import_arguments(Some(receiver), arguments)?;
+        crate::vm::interpret_function(
+            &self.program.module,
+            self.function.clone(),
+            arguments,
+            limits,
+            None,
+        )
+    }
+
+    /// Invoke an instance method with an owned receiver and native imports enabled.
+    ///
+    /// # Safety
+    /// Native declarations must match their exported C ABI signatures. Native code
+    /// and library initializers/destructors must uphold pointer validity, allocation
+    /// lifetimes, and Rust's memory safety requirements. The caller must trust the code.
+    pub unsafe fn invoke_instance_with_native(
+        &self,
+        receiver: crate::Value,
+        arguments: Vec<crate::Value>,
+        limits: Limits,
+    ) -> Result<Execution, Fault> {
+        let arguments = self.import_arguments(Some(receiver), arguments)?;
+        crate::vm::interpret_function(
+            &self.program.module,
+            self.function.clone(),
+            arguments,
+            limits,
+            Some(crate::interop::NativeLibraries::default()),
+        )
+    }
+
+    fn import_arguments(
+        &self,
+        receiver: Option<crate::Value>,
+        arguments: Vec<crate::Value>,
+    ) -> Result<Vec<crate::Value>, Fault> {
         let fault = |message| Fault {
             message,
             function: Some(self.function.name.clone()),
             instruction: None,
         };
-        if arguments.len() != self.inputs.len() {
+        if receiver.is_some() != self.function.instance {
+            return Err(fault(if self.function.instance {
+                "instance invocation requires an explicit receiver".into()
+            } else {
+                "static invocation does not accept a receiver".into()
+            }));
+        }
+        if arguments.len() != self.function.parameters.len() {
             return Err(fault(format!(
                 "invocation expected {} arguments, got {}",
-                self.inputs.len(),
+                self.function.parameters.len(),
                 arguments.len()
             )));
         }
-        arguments
-            .into_iter()
-            .zip(&self.inputs)
-            .enumerate()
-            .map(|(index, (value, schema))| {
-                schema.import(&self.program.module, value).map_err(|error| {
-                    fault(format!("invocation argument {index}: {}", error.message))
-                })
-            })
-            .collect()
+        let mut schemas = self.inputs.iter();
+        let mut imported = Vec::with_capacity(self.inputs.len());
+        if let Some(receiver) = receiver {
+            let schema = schemas
+                .next()
+                .ok_or_else(|| fault("missing receiver schema".into()))?;
+            imported.push(
+                schema
+                    .import(&self.program.module, receiver)
+                    .map_err(|error| fault(format!("invocation receiver: {}", error.message)))?,
+            );
+        }
+        for (index, (value, schema)) in arguments.into_iter().zip(schemas).enumerate() {
+            imported.push(
+                schema
+                    .import(&self.program.module, value)
+                    .map_err(|error| {
+                        fault(format!("invocation argument {index}: {}", error.message))
+                    })?,
+            );
+        }
+        Ok(imported)
     }
 }

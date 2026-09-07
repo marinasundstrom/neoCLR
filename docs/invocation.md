@@ -1,6 +1,6 @@
 # Resolved function invocation
 
-LoadedProgram can resolve a static IL function without an entry point and return a
+LoadedProgram can resolve a static or instance IL function without an entry point and return a
 LoadedFunction handle borrowing that program's immutable snapshot:
 
 ```rust
@@ -15,7 +15,7 @@ generic owners and exact revision selectors. It requires closed signatures and o
 the root's direct module-reference list. The handle retains the selected specialized
 function and its definition identity; repeated invocation does not relink or reselect
 that target. Rust borrowing ties the handle to its source LoadedProgram. Identity,
-parameter, and return-type accessors expose the resolved contract without mutation.
+receiver, parameter, and return-type accessors expose the resolved contract without mutation.
 
 ## Argument and execution contract
 
@@ -28,8 +28,8 @@ boundary from the normalized evaluation stack used by IL call instructions.
 
 Arity and argument values are checked before executing any instruction. A Void
 parameter still requires one Value::Void argument. Union values, raw pointers,
-and prototype Ref values cannot be supplied as arguments, including inside records. Instance
-receivers and direct native/InternalCall targets are rejected during resolution; IL
+and prototype Ref values cannot be supplied as arguments or receivers, including inside records.
+Direct native/InternalCall targets are rejected during resolution; IL
 wrappers can call native declarations using the existing instruction contracts.
 
 Each invocation starts fresh frames, allocations, output, and instruction/frame limits.
@@ -49,6 +49,39 @@ Safe invoke disables native imports. The separate unsafe invoke_with_native meth
 retains the existing native ABI/trust requirements. Foreign code may maintain its own
 process-global state. Resolution and invocation do not automatically run the opt-in
 typed verifier; callers can verify the program before resolving or invoking.
+
+## Instance receivers
+
+Resolve an instance signature and supply its receiver separately:
+
+```rust
+let method = program.resolve_function(
+    &neoclr::assembler::parse_function_ref("instance Box<Int32>::Get()")?,
+)?;
+let result = method.invoke_instance(box_value, vec![], neoclr::Limits::default())?;
+```
+
+`receiver_type()` returns the specialized owner type for instance methods and None for
+static functions. `parameters()` excludes the receiver. Static invoke methods reject
+instance targets; invoke_instance methods reject static targets. Receiver validation
+uses the same exact primitive/owned-record schema as parameters, including scoped tags,
+closed generics, and shared schema limits. Faults distinguish the receiver from declared
+argument indices, which start at zero. In guest IL, `ldarg 0` / `ldarg this` still reads
+the receiver, and declared parameters follow it.
+
+The receiver moves into a fresh execution as an owned value. Clone it first to retain
+an independent host copy. Guest field updates and starg operate on guest values and do
+not write back to the caller; a method can return an updated record for explicit reuse.
+This does not introduce addressed receivers, shared references, automatic allocation,
+or automatic constructor invocation. A resolved `.ctor` remains an ordinary instance Void method
+called explicitly on a supplied value; no construction invariant is inferred.
+
+Safe invoke_instance disables native imports. Unsafe invoke_instance_with_native has
+the same native ABI/trust requirements as invoke_with_native. Both use the ordinary
+interpreter frame and instruction budgets with no synthetic wrapper.
+
+`cargo run --example instance_invocation` invokes Box<Int32> methods, preserving the
+original Int32(21) while returning an updated copy containing Int32(42).
 
 ## Architectural scope
 

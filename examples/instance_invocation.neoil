@@ -1,0 +1,18 @@
+.module InstanceInvocation
+
+.type Box<T>
+    .field Value T
+
+    .method instance Get() -> T
+        ldarg this
+        ldfld Box<T>::Value
+        ret
+    .end
+
+    .method instance WithValue(T value) -> Box<T>
+        ldarg this
+        ldarg value
+        stfld Box<T>::Value
+        ret
+    .end
+.end

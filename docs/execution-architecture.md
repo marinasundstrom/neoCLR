@@ -161,9 +161,9 @@ snapshot shared by interpreter execution, verification, and type identity querie
 It supports repeated entry-point execution with fresh state. This establishes a
 preparation boundary without specifying a native hosting ABI or backend interface.
 
-[Resolved function handles](invocation.md) now permit repeated static IL calls with
+[Resolved function handles](invocation.md) now permit repeated static and instance IL calls with
 exact primitive and [owned record inputs](record-inputs.md), including closed generic methods and revision-qualified
-targets. This is a Rust embedding subset with fresh execution state. Instance receivers,
+targets. This is a Rust embedding subset with fresh execution state and explicitly copied receivers. Addressed receivers,
 pointer/Ref and union inputs, persistent sessions, and a native hosting ABI remain pending.
 
 A minimal hosting milestone should load a module, resolve a function by identity and

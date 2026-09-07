@@ -258,11 +258,12 @@ Module-scoped type lookup and revision identities remain future work.
 by execution, verification, and type queries. Run `cargo run --example loaded_program`
 to prepare HelloWorld once and execute it twice with fresh guest state.
 
-[Resolved function invocation](docs/invocation.md) supports repeated calls to static
+[Resolved function invocation](docs/invocation.md) supports repeated calls to static and instance
 IL functions with typed primitive and [owned record arguments](docs/record-inputs.md),
 including libraries without an entry point.
 Run `cargo run --example invoke` for the Rust embedding sample.
 `cargo run --example record_inputs` demonstrates copied record inputs and result reuse.
+`cargo run --example instance_invocation` demonstrates explicit copied generic receivers.
 
 [Explicit module sets](docs/module-sets.md) support additional libraries, cross-module
 generic calls, and field-name aliases. Run `cargo run --example modules` for a three-module

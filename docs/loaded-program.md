@@ -32,8 +32,8 @@ with the supplied resource limits. A prior result or Fault does not change the l
 snapshot. Returned execution values and allocations belong to their own Execution;
 pointer/Ref values from one execution are not transferable handles into another.
 [Resolved function handles](invocation.md) additionally support primitive and
-[owned record arguments](record-inputs.md) to static IL functions without an entry point.
-Persistent guest state, cancellation, instance invocation, and pointer/Ref transfer remain pending.
+[owned record arguments](record-inputs.md) to static and instance IL functions without an entry point.
+Persistent guest state, cancellation, addressed receivers, and pointer/Ref transfer remain pending.
 
 Native imports remain disabled in safe `run`. The separate unsafe `run_with_native`
 method has the same C ABI and native-code trust requirements as the existing helper.

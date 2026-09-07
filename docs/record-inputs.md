@@ -1,6 +1,6 @@
 # Owned record inputs for host invocation
 
-Resolved static IL functions can now accept ordinary record Values in addition to
+Resolved IL functions can accept ordinary record Values in addition to
 primitive inputs. Parameters may contain nested records and closed generic records.
 Input fields are positional and must have their exact declared storage types:
 
@@ -27,7 +27,7 @@ loaded representation before reaching guest code. Failures identify the argument
 nested field indices without inventing a guest instruction location.
 
 The schema is bounded to depth 64 (root depth zero) and 16,384 total nodes across input
-parameters. Recursive by-value definitions are rejected, and expanding generic schemas
+parameters and the instance receiver. Recursive by-value definitions are rejected, and expanding generic schemas
 also remain subject to existing signature nesting/substitution limits. These are
 prototype import limits, not native layout constraints or a universal memory policy.
 
@@ -44,7 +44,8 @@ Pointer fields, Ref fields, and bootstrap Option/Result fields remain unsupporte
 this boundary, including when nested in a record or ignored by the function body.
 An unused generic argument is not a stored field: Empty<Ptr<Int32>> with no fields
 can be imported because it carries no pointer value. Raw pointer/Ref transfer and
-union input validation need their own contracts. Instance receivers remain deferred.
+union input validation need their own contracts. Explicit instance receivers use the
+same owned-data validation; see [invocation](invocation.md).
 
 Invocation still starts fresh guest state, uses exact primitive storage values, and
 returns the existing Execution. Native imports retain their separate unsafe contract.

@@ -1147,3 +1147,26 @@ architecture, and ownership-boundary documentation.
 Validation: all 287 integration tests pass on macOS ARM64; formatting, clippy with
 warnings denied, and diff checks pass. The record sample preserves the original sum
 Int32(42) while its updated copy produces Int32(62). Linux and Windows remain for CI.
+
+## 2026-09-07 — Explicit copied instance invocation
+
+Extended LoadedProgram resolution to instance IL methods. LoadedFunction exposes the
+closed receiver type separately from declared parameters and provides invoke_instance
+and its unsafe native-enabled counterpart. Static and instance entry points enforce
+the call kind. Receiver and argument schemas share the existing bounded, exact owned
+primitive/record validation; faults distinguish the receiver from declared arguments.
+
+Receivers enter the ordinary interpreter frame as owned values in the existing this
+slot. Updates do not write back to a retained host copy. Closed generic and primitive
+methods work without a wrapper frame, relinking, or additional guest instruction cost.
+Addressed mutation, shared receiver lifetimes, pointer/Ref and union inputs, automatic
+construction, and a stable native hosting ABI remain deferred.
+
+Added five tests covering copied generic receivers and result reuse, malformed receivers,
+argument diagnostics before execution, safe/native call-kind enforcement, primitive
+methods, exact guest budgets, scoped tags, Void, and unsupported stored fields. Added
+an IL/Rust sample and updated invocation, ownership, architecture, and roadmap docs.
+
+Validation: all 292 integration tests pass on macOS ARM64; formatting, clippy with
+warnings denied, and diff checks pass. The sample preserves Int32(21) and produces an
+updated Int32(42). Linux and Windows remain for CI.

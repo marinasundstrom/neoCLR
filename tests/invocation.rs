@@ -169,11 +169,10 @@ fn handles_respect_scopes_revisions_and_direct_references() {
 }
 
 #[test]
-fn unsupported_receivers_pointer_inputs_and_direct_native_targets_fail_at_resolution() {
+fn pointer_inputs_and_direct_native_targets_fail_at_resolution() {
     let module = assemble(".module App\n.type Point\n.method instance Get() -> Void\nldvoid\nret\n.end\n.end\n.function Record(Point value) -> Void\nldvoid\nret\n.end\n.function Pointer(Int32* value) -> Void\nldvoid\nret\n.end\n.function Native() -> Int32\n.pinvoke \"missing_invocation_fixture\" \"value\" cdecl\n.end").unwrap();
     let program = LoadedProgram::new(&module).unwrap();
     for target in [
-        "instance Point::Get()",
         "Pointer(Int32*)",
         "Native()",
         "neoCLR.Runtime.WriteLine(String)",
