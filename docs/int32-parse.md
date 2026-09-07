@@ -10,6 +10,12 @@ The decimal grammar is unchanged: an optional sign followed by ASCII digits with
 Int32 range. Whitespace, empty text, malformed digits and overflow produce Error.
 Culture-aware parsing and broader text APIs remain future work.
 
+The long-term error parameter may become a closed ordinary union such as
+`ParseError.InvalidFormat` and `ParseError.Overflow`, yielding
+`Result<Int32,ParseError>`. Those cases remain regular nested types and constructors;
+the VM needs no exception or error-specific instruction. The preview keeps the
+existing `System.Error` payload while carrier migration continues.
+
 ## Native service contract
 
 The existing InternalCall helper `neoCLR.Runtime.ParseInt32(String) -> System.Value`

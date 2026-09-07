@@ -1906,3 +1906,7 @@ interrupts and stack traces.
 Added a complete opcode status inventory to the neoIL reference, grouping
 CLI-aligned instructions, explicit neoCLR memory/value operations, and temporary
 bootstrap union operations.
+
+Recorded typed parse errors as a future ordinary union domain. `Result<T,TError>`
+can carry cases such as invalid format or overflow without exceptions; the preview
+continues to use `System.Error` until the carrier migration is complete.
