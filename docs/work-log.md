@@ -1383,3 +1383,13 @@ Validation: all 343 integration tests pass on macOS ARM64; formatting, clippy wi
 warnings denied, and diff checks pass. The main sample prints 10, 42, 10 and frees its
 allocation. The bounds sample exits with a terminal Fault showing GetElementAddress,
 Get, and Main. Linux and Windows remain for CI.
+
+## 2026-09-07 — Sample build-and-test instructions
+
+Reorganized the README around a complete sample workflow: prerequisites, automatic
+bundled System assembly, quick execution, separate build/assemble/verify/run commands,
+optional compiled System selection, and the test suite. Added representative String,
+Array, and deliberate bounds-Fault samples, expected outcomes, Windows executable naming,
+and output overwrite behavior. Retained the broader sample inventory and module-set
+instructions. Documentation-only change; commands match the current CLI and diff checks
+pass. No runtime tests were rerun.

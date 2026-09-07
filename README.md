@@ -35,13 +35,95 @@ Types describe values and behavior; allocation and lifetime are separate choices
 with no class/struct bit deciding either. The proof of concept aims to make migration
 familiar where possible, without committing every program to one memory model.
 
-## Run
+## Build and run a sample
 
-Install stable Rust with support for edition 2024 (Rust 1.85 or newer) and a native
-C toolchain for vendored libffi (compiler/make on Unix, MSVC tools on Windows), then:
+Run these commands from the repository root. Install stable Rust 1.85 or newer
+(edition 2024) and a native C toolchain for vendored libffi: compiler/make on Unix,
+or MSVC tools on Windows. No .NET installation is required.
+
+The assembler and interpreter are built together as the `neoclr` executable.
+The bundled `runtime/System.neoil` library is assembled automatically; it does not
+need a separate build for normal sample execution.
+
+### Quick start
 
 ```sh
-cargo run -- run examples/hello.neoil
+cargo run --locked -- run examples/hello.neoil
+```
+
+Cargo builds the executable if needed, then neoCLR assembles and runs the source.
+Expected output:
+
+```text
+Hello, world!
+=> Void
+```
+
+### Build, assemble, verify, and run separately
+
+```sh
+cargo build --locked
+./target/debug/neoclr assemble examples/hello.neoil hello.neo.json
+./target/debug/neoclr verify hello.neo.json
+./target/debug/neoclr run hello.neo.json
+```
+
+On Windows the executable is `target\debug\neoclr.exe`. `hello.neo.json` contains
+prototype metadata and IL, not native machine code or a .NET executable. The assembler
+refuses to overwrite an existing output: use a new filename or remove your previous
+sample artifact before assembling again.
+
+`verify` checks evaluation-stack types, definite local initialization, and return
+contracts without executing the program. `check` performs structural metadata and
+operand validation only. `run` accepts either `.neoil` source or a JSON artifact;
+it does not automatically run the opt-in typed verifier.
+
+### Build the runtime library explicitly (optional)
+
+```sh
+cargo run --locked -- assemble runtime/System.neoil System.neo.json
+cargo run --locked -- run hello.neo.json --system System.neo.json
+```
+
+The second command uses the HelloWorld artifact assembled above. These commands
+select your compiled System library instead of the bundled source. The same
+output-file overwrite rule applies to `System.neo.json`.
+
+### Test representative programs
+
+```sh
+cargo run --locked -- run examples/strings.neoil
+cargo run --locked -- run examples/arrays.neoil
+cargo run --locked -- run examples/array_bounds.neoil
+```
+
+The string sample demonstrates Unicode text and recoverable slice Errors. The array
+sample prints `10`, `42`, `10` and frees its buffer. The bounds sample deliberately
+terminates with a nonzero exit code and a Fault stack trace; that failure is expected.
+
+Run the repository test suite with:
+
+```sh
+cargo test --locked
+```
+
+### Multiple modules
+
+```sh
+cargo run --locked -- run examples/modules/app.neoil \
+  --module examples/modules/operations.neoil --module examples/modules/models.neoil
+```
+
+`assemble`, `check`, and `verify` accept the same dependency flags. Use `--system`
+to select a runtime library; see the [CLI module workflow](docs/cli-module-sets.md).
+
+### More samples
+
+The feature tour checks record copying, explicit heap identity, free functions,
+loops, arithmetic, Option<Void>, and Result<Void,Error>. The additional samples
+cover the implemented instruction set:
+
+```sh
 cargo run -- run examples/features.neoil
 cargo run -- run examples/overloads.neoil
 cargo run -- run examples/types.neoil
@@ -69,35 +151,7 @@ cargo run -- run examples/checked-conversions.neoil
 cargo run -- run examples/fault.neoil
 ```
 
-Multi-module programs can run directly from sources or artifacts:
-
-```sh
-cargo run -- run examples/modules/app.neoil \
-  --module examples/modules/operations.neoil --module examples/modules/models.neoil
-```
-
-`assemble`, `check`, and `verify` accept the same dependency flags. Use `--system`
-to select a runtime library; see the [CLI module workflow](docs/cli-module-sets.md).
-
-HelloWorld prints:
-
-```text
-Hello, world!
-=> Void
-```
-
-The feature tour checks record copying, explicit heap identity, free functions,
-loops, arithmetic, `Option<Void>`, and `Result<Void,Error>`. Together the samples
-contain every implemented opcode. The fault sample intentionally terminates with
-a nonzero exit code and an instruction location.
-
-Assemble to a standalone prototype module, then execute that module:
-
-```sh
-cargo run -- assemble examples/hello.neoil hello.neo.json
-cargo run -- check hello.neo.json
-cargo run -- run hello.neo.json
-```
+`examples/fault.neoil` deliberately produces a terminal Fault and nonzero exit code.
 
 Declarations and calls carry parameter signatures, for example
 `.function Describe(int32) -> string` and
@@ -105,11 +159,6 @@ Declarations and calls carry parameter signatures, for example
 by name and ordered parameter types; return types alone do not distinguish them.
 The overload sample demonstrates both user-defined and bootstrap library overloads.
 See [the assembly reference](docs/neoil.md) for primitive aliases and syntax.
-
-The assembler refuses to overwrite an existing output file. `check` validates
-metadata and instruction operands; it is **not** a complete static verifier.
-Evaluation-stack types, initialization, and return contracts are checked as code
-executes. `run` accepts `.neoil` source directly or serialized JSON modules.
 
 ## Native interop sample
 
