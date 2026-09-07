@@ -244,12 +244,12 @@
 
 ; Explicit native buffer descriptor. Copies alias Data; Free is a caller obligation.
 .type System.Array<T>
-    .property instance Item(Int32) -> T
-        .get instance System.Array<T>::Get(Int32)
-        .set instance System.Array<T>::Set(Int32,T)
-    .end
     .property instance Length() -> Int32
         .get instance System.Array<T>::get_Length()
+    .end
+    .property instance Item(Int32) -> T
+        .get instance System.Array<T>::get_Item(Int32)
+        .set instance System.Array<T>::set_Item(Int32,T)
     .end
 
     .field Data T*
@@ -336,6 +336,13 @@
         ret
     .end
 
+    .method instance get_Item(Int32 index) -> T
+        ldarg this
+        ldarg index
+        call instance System.Array<T>::Get(Int32)
+        ret
+    .end
+
     .method instance Set(Int32 index, T value) -> Void
         ldarg this
         ldarg index
@@ -343,6 +350,14 @@
         ldarg value
         stobj T
         ldvoid
+        ret
+    .end
+
+    .method instance set_Item(Int32 index, T value) -> Void
+        ldarg this
+        ldarg index
+        ldarg value
+        call instance System.Array<T>::Set(Int32,T)
         ret
     .end
 
