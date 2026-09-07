@@ -1863,9 +1863,3 @@ Refined the companion rule: non-generic unions may nest their variants directly;
 only generic carriers require a separate non-generic companion to keep variant
 parameters independent. Runtime wrapper migration remains deferred until the
 assembler can express this distinction without ambiguity.
-
-The assembler ambiguity was resolved: a System companion can be declared in the
-runtime library itself, while an application still cannot redefine the bundled
-System types. Added ordinary nested `System.Option` and `System.Result` companion
-cases with constructor/value accessors and a host-linked integration test. Existing
-top-level wrappers remain as compatibility definitions for this preview slice.

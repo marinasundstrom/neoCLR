@@ -119,10 +119,9 @@ or inheritance relation is introduced. Existing metadata artifacts without the
 optional ownership field remain top-level definitions.
 
 Run `cargo run -- run examples/nested_types.neoil` to print `42` using a nested
-generic case and its ordinary instance method. The bundled System library now also
-contains ordinary `System.Option` and `System.Result` companions with nested cases;
-the compatibility top-level wrappers remain temporarily available while callers
-migrate.
+generic case and its ordinary instance method. The bundled System library will adopt
+this shape in a later migration slice; compatibility top-level wrappers remain
+temporarily available.
 
 ## Access and ordinary union behavior
 
