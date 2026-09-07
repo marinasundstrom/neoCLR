@@ -16,9 +16,9 @@ needs and the primitives required to implement them in platform code.
 [System.neoil](../runtime/System.neoil) currently provides twenty-three platform-written methods and ten native declarations:
 
 - `System.IO.File` provides bounded ReadAllText; see [file input](file-input.md).
-- `System.Error` provides FromMessage, get_Message, and ToString; see [Error values](errors.md).
+- `System.Error` provides FromMessage, get_Message, and ToString, with explicit Message property metadata; see [Error values](errors.md).
 - `System.Array<T>` provides six IL methods for explicit allocation, length, checked
-  access, element addresses, and free; see [arrays and pointers](arrays-and-pointers.md).
+  access, element addresses, and free, with explicit Length property metadata; see [arrays and pointers](arrays-and-pointers.md).
 - `System.String` provides Concat, Equals, IsEmpty, GetUtf8ByteCount, and SliceUtf8;
   see [the text contract](text-model.md).
 - The UnionAttribute marker has an ordinary IL constructor.

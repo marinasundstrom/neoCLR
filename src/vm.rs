@@ -408,6 +408,75 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             }
         }
     }
+    for definition in &module.types {
+        let arity = definition.generic_parameters.len();
+        let owner = if arity == 0 {
+            Type::from_name(&definition.name)
+        } else {
+            Type::Constructed {
+                definition: definition.name.clone(),
+                arguments: (0..arity)
+                    .map(|index| Type::TypeParameter(index as u16))
+                    .collect(),
+            }
+        };
+        let mut signatures = HashSet::new();
+        for property in &definition.properties {
+            if !crate::metadata::valid_slot_name(&property.name)
+                || !signatures.insert((&property.name, property.instance, &property.parameters))
+            {
+                return Err(Fault::new("invalid or duplicate property signature"));
+            }
+            check_type_context(&property.ty, module, arity, 0)?;
+            for parameter in &property.parameters {
+                check_type_context(parameter, module, arity, 0)?;
+            }
+            if property.getter.is_none() && property.setter.is_none() {
+                return Err(Fault::new("property requires an accessor"));
+            }
+            for (target, setter) in property
+                .getter
+                .iter()
+                .map(|t| (t, false))
+                .chain(property.setter.iter().map(|t| (t, true)))
+            {
+                if target.owner.as_ref() != Some(&owner) || target.instance != property.instance {
+                    return Err(Fault::new(
+                        "property accessor owner or instance kind mismatch",
+                    ));
+                }
+                let mut parameters = property.parameters.clone();
+                if setter {
+                    parameters.push(property.ty.clone());
+                }
+                if target.parameters != parameters {
+                    return Err(Fault::new("property accessor parameter mismatch"));
+                }
+                let accessor = resolve(module, target)?;
+                if accessor.returns
+                    != if setter {
+                        Type::Void
+                    } else {
+                        property.ty.clone()
+                    }
+                {
+                    return Err(Fault::new("property accessor return type mismatch"));
+                }
+                if definition
+                    .definition
+                    .as_ref()
+                    .zip(accessor.definition.as_ref())
+                    .is_some_and(|(ty, method)| {
+                        ty.module != method.module || ty.revision != method.revision
+                    })
+                {
+                    return Err(Fault::new(
+                        "property accessor must belong to the declaring module",
+                    ));
+                }
+            }
+        }
+    }
     for attributes in module
         .types
         .iter()

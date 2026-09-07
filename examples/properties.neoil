@@ -1,0 +1,27 @@
+.module Properties
+.entry Main
+
+.type Box<T>
+    .field Stored T
+    .property instance Value() -> T
+        .get instance Box<T>::Read()
+    .end
+    .method instance Read() -> T
+        ldarg this
+        ldfld Box<T>::Stored
+        ret
+    .end
+.end
+
+.function Main() -> Void
+    ldc.i4 42
+    newobj Box<Int32>
+    call instance Box<Int32>::Read()
+    call System.Console::WriteLine(Int32)
+    pop
+    ldstr "Properties describe ordinary methods"
+    call System.Error::FromMessage(String)
+    call instance System.Error::get_Message()
+    call System.Console::WriteLine(String)
+    ret
+.end

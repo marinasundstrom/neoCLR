@@ -495,3 +495,10 @@ labels. `.ctor` declarations must be instance methods returning Void. See
 Call and attribute-constructor references may append `@ Module:index` to select a
 module-local function definition while retaining signature validation. Ordinary calls
 are bound before generic specialization. See [function identities](member-identities.md).
+
+## Property declarations
+
+A `.property static/instance Name(IndexTypes...) -> Type` block inside a type uses
+`.get` and/or `.set` full method references and its own `.end`. Access remains an
+ordinary method call. See [property metadata](properties.md) for syntax, signature
+validation, generic owners, and current mutation limitations.

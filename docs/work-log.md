@@ -1520,3 +1520,26 @@ remove special dispatch and explicitly migrate or reject old serialized artifact
 No union instructions or encodings were removed in this documentation slice.
 
 Validation: documentation-only changes; diff checks pass. Runtime tests were not rerun.
+
+## 2026-09-07 — Explicit property metadata and accessor associations
+
+Added optional property records to type metadata, with name, static/instance kind,
+index parameters, value type, and getter/setter method references. The assembler
+accepts property blocks with explicit .get/.set signatures. Preparation normalizes
+scopes and generic parameters and binds accessor identities in the prepared copy.
+Validation checks signature uniqueness, available accessors, owner/module, call kind,
+parameter and return types, and supplied method identities.
+
+Access remains ordinary method calls. No property instruction, backing storage,
+receiver mutation rule, accessibility, reflection API, or union behavior was added.
+System.Error.Message and System.Array<T>.Length now associate existing accessors.
+The sample reads a generic Box property and Error.Message. Documented syntax,
+indexed properties, serialized compatibility, and copied-receiver limitations.
+
+Six tests cover the generic executable/serialized sample, indexed pointer-backed
+getter/setter calls with overloads, malformed source and JSON, forged accessor tokens,
+scoped/module-reference validation, legacy omission, and library associations.
+
+Validation: all 367 integration tests pass on macOS ARM64; formatting, clippy with
+warnings denied, and diff checks pass. The sample verifies and prints 42 and
+Properties describe ordinary methods, then returns Void. Linux and Windows remain for CI.

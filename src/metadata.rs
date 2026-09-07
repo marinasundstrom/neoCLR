@@ -140,6 +140,8 @@ pub struct TypeDef {
     pub custom_attributes: Vec<CustomAttribute>,
     pub name: String,
     pub fields: Vec<Field>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub properties: Vec<Property>,
     #[serde(default)]
     pub representation: Representation,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -148,6 +150,42 @@ pub struct TypeDef {
     pub packing: Option<u16>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub minimum_size: Option<u32>,
+}
+
+/// An ordinary property signature and explicit method-semantics associations.
+/// Accessors execute through calls; this metadata adds no storage or dispatch.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Property {
+    pub name: String,
+    pub instance: bool,
+    pub parameters: Vec<Type>,
+    pub ty: Type,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub getter: Option<FunctionRef>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub setter: Option<FunctionRef>,
+}
+
+impl Property {
+    pub(crate) fn map_types(
+        &mut self,
+        mut map: impl FnMut(&Type) -> Result<Type, crate::Fault>,
+    ) -> Result<(), crate::Fault> {
+        self.ty = map(&self.ty)?;
+        for ty in &mut self.parameters {
+            *ty = map(ty)?;
+        }
+        for target in self.getter.iter_mut().chain(self.setter.iter_mut()) {
+            if let Some(owner) = &mut target.owner {
+                *owner = map(owner)?;
+            }
+            for ty in &mut target.parameters {
+                *ty = map(ty)?;
+            }
+        }
+        Ok(())
+    }
 }
 
 /// Representation is independent of ownership and reference identity.

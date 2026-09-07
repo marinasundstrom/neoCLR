@@ -45,8 +45,8 @@ candidate initial visibility levels; their exact scopes and enforcement remain t
 specified. These are ordinary type-system capabilities, not union-specific instructions.
 
 Current .ctor-shaped methods do not by themselves settle initialization or addressed
-receiver semantics. Current get_Message-style methods do not supply property metadata,
-and fields currently have no enforced accessibility contract. Track these gaps separately
+receiver semantics. [Property metadata](properties.md) now supplies explicit getter/setter
+associations, including Error.Message; fields still have no enforced accessibility contract. Track these gaps separately
 and validate them with a small carrier/variant example before claiming ordinary Option
 and Result are implementable. Extensive inheritance, virtual dispatch, reflection, and
 a full runtime library are not prerequisites for this milestone.

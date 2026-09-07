@@ -45,6 +45,10 @@
 .end
 
 .type System.Error
+    .property instance Message() -> String
+        .get instance System.Error::get_Message()
+    .end
+
     .method static FromMessage(String message) -> Error
         ldarg message
         call neoCLR.Runtime.ErrorFromMessage(String)
@@ -226,6 +230,10 @@
 
 ; Explicit native buffer descriptor. Copies alias Data; Free is a caller obligation.
 .type System.Array<T>
+    .property instance Length() -> Int32
+        .get instance System.Array<T>::get_Length()
+    .end
+
     .field Data T*
     .field Length Int32
 

@@ -13,8 +13,8 @@ catch a Fault or resume the failed execution.
 | instance get_Message() -> String | Return the stored message |
 | instance ToString() -> String | Return the message through the library accessor |
 
-These are ordinary methods in System.neoil. get_Message is an accessor-shaped method;
-property metadata is not implemented. FromMessage and get_Message call two validated
+These are ordinary methods in System.neoil. [Property metadata](properties.md) now
+associates the Message property explicitly with get_Message. FromMessage and get_Message call two validated
 InternalCall helpers; ToString calls get_Message through IL. Runtime-service planning
 identifies those helpers as ErrorValues. There are no new instructions or type categories.
 

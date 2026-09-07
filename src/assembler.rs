@@ -89,6 +89,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
     let mut field_fixups: Vec<FieldFixup> = vec![];
     let mut function: Option<PendingFunction> = None;
     let mut typedef: Option<TypeDef> = None;
+    let mut property: Option<crate::metadata::Property> = None;
     for (index, raw) in source.lines().enumerate() {
         let line_number = index + 1;
         // Comments occupy their own lines, keeping quoted strings unambiguous.
@@ -100,6 +101,35 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
             .split_once(char::is_whitespace)
             .map_or((line, ""), |(a, b)| (a, b.trim()));
         let result = (|| -> Result<(), Fault> {
+            if let Some(pending) = property.as_mut() {
+                if word == ".end" {
+                    if !rest.is_empty() {
+                        return Err(Fault::new("unexpected property .end operand"));
+                    }
+                    typedef
+                        .as_mut()
+                        .ok_or_else(|| Fault::new("property requires type"))?
+                        .properties
+                        .push(property.take().unwrap());
+                } else {
+                    let slot = match word {
+                        ".get" => &mut pending.getter,
+                        ".set" => &mut pending.setter,
+                        _ => return Err(Fault::new("expected .get, .set or .end in property")),
+                    };
+                    if slot.is_some() {
+                        return Err(Fault::new("duplicate property accessor"));
+                    }
+                    *slot = Some(parse_function_ref(rest)?);
+                    let def = typedef
+                        .as_ref()
+                        .ok_or_else(|| Fault::new("property requires type"))?;
+                    pending.map_types(|ty| {
+                        Ok(bind_type_parameters(ty.clone(), &def.generic_parameters))
+                    })?;
+                }
+                return Ok(());
+            }
             if word == ".end" {
                 if !rest.is_empty() {
                     return Err(Fault::new(".end has no operand"));
@@ -148,6 +178,39 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                 return Ok(());
             }
             if let (true, Some(def)) = (function.is_none() && word != ".method", typedef.as_mut()) {
+                if word == ".property" {
+                    let (kind, signature) =
+                        rest.split_once(char::is_whitespace).ok_or_else(|| {
+                            Fault::new("expected .property static/instance Name(...) -> Type")
+                        })?;
+                    if !matches!(kind, "static" | "instance") {
+                        return Err(Fault::new("expected static or instance property"));
+                    }
+                    let (name, ty) = signature
+                        .split_once("->")
+                        .ok_or_else(|| Fault::new("expected property signature and return type"))?;
+                    let target = parse_function_ref(name.trim())?;
+                    if target.owner.is_some()
+                        || target.instance
+                        || target.definition.is_some()
+                        || target.name.contains('.')
+                    {
+                        return Err(Fault::new("property name must be unqualified"));
+                    }
+                    let mut pending = crate::metadata::Property {
+                        name: target.name,
+                        instance: kind == "instance",
+                        parameters: target.parameters,
+                        ty: parse_type(ty)?,
+                        getter: None,
+                        setter: None,
+                    };
+                    pending.map_types(|ty| {
+                        Ok(bind_type_parameters(ty.clone(), &def.generic_parameters))
+                    })?;
+                    property = Some(pending);
+                    return Ok(());
+                }
                 if word == ".custom" {
                     def.custom_attributes
                         .push(crate::metadata::CustomAttribute {
@@ -177,7 +240,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                 }
                 if word != ".field" {
                     return Err(Fault::new(
-                        "expected .field, .pack, .size, .custom, .method or .end",
+                        "expected .field, .property, .pack, .size, .custom, .method or .end",
                     ));
                 }
                 let (name, ty) = rest
@@ -442,6 +505,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         name: ty.definition_name().unwrap_or(&name).into(),
                         generic_parameters,
                         fields: vec![],
+                        properties: vec![],
                         packing: None,
                         minimum_size: None,
                         representation: if ty.is_primitive() {

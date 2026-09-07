@@ -199,8 +199,9 @@ on extensive OOP or reflection. Stage the work around a small carrier/variant ex
 1. Construction that establishes a valid value: distinguish existing .ctor-shaped
    methods and field-based newobj from a defined constructor invocation and
    initialization contract. Addressed receiver mutation may be a prerequisite.
-2. Property metadata that associates a declared property with its getter and optional
-   setter methods. Accessor-shaped names alone do not express this contract.
+2. Implemented: [property metadata](properties.md) associates a declared property with
+   its getter and/or setter methods, validating signatures, owner, and call kind.
+   Generic and indexed properties work without new instructions or receiver semantics.
 3. Accessibility for types and members, beginning with the needed public/private/internal
    distinctions and explicit rules for accessors, module boundaries, and host invocation.
    Decide validation/enforcement alongside metadata rather than treating visibility as

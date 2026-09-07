@@ -73,6 +73,19 @@ pub(crate) fn link_modules(
 // Bind symbolic references while their declaring generic context is still open.
 // Specialization later substitutes signatures, but preserves the selected definition.
 pub(crate) fn bind_member_references(module: &mut Module) -> Result<(), Fault> {
+    let mut properties = Vec::new();
+    for (index, definition) in module.types.iter().enumerate() {
+        for (row, property) in definition.properties.iter().enumerate() {
+            let mut property = property.clone();
+            for accessor in property.getter.iter_mut().chain(property.setter.iter_mut()) {
+                accessor.definition = crate::vm::resolve(module, accessor)?.definition;
+            }
+            properties.push((index, row, property));
+        }
+    }
+    for (index, row, property) in properties {
+        module.types[index].properties[row] = property;
+    }
     let mut calls = Vec::new();
     for (function, definition) in module.functions.iter().enumerate() {
         for (pc, op) in definition.body.iter().enumerate() {

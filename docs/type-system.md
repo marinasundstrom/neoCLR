@@ -7,7 +7,8 @@ mechanics remain foundational alongside free functions.
 This implementation adds primitive type definitions, declared method ownership,
 static methods, and read-only instance receiver snapshots. Inheritance, interfaces,
 virtual dispatch, mutable/by-reference receivers, general generic execution,
-properties, and assembly-qualified identities remain future work.
+and assembly-qualified identities remain future work. [Property metadata](properties.md)
+now explicitly associates ordinary getter/setter methods with declared signatures.
 
 ## Primitive identity and representation
 
