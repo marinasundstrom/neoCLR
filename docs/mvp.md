@@ -164,6 +164,13 @@ obtaining a descriptor for a statically named type and for a value, comparing ca
 identity, reading a display/name representation, and inspecting closed generic arguments.
 Exact method names and handle encoding are implementation choices to settle in that slice.
 
+Reflection should describe neoCLR's own type and execution model. Familiar System.Type
+concepts are a starting point, not a requirement to reproduce the .NET reflection object
+hierarchy, historical distinctions, or behavioral conventions. Its public structure and
+behavior may intentionally evolve with the runtime. Document those choices and any
+migration implications; the preview makes no reflection compatibility or stability promise.
+This freedom does not expand the MVP beyond the small read-only subset defined here.
+
 A descriptor is metadata, not an allocation policy, universal object reference, or native
 address. Its lifetime must remain valid for every supported use, including values returned
 to an embedding host. Names alone must not define identity. Inspecting an internal type

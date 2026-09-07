@@ -1644,3 +1644,14 @@ or publication made. README and roadmap now link to the MVP plan.
 
 Validation: documentation-only plan; diff checks pass. Runtime validation remains the
 386 passing integration tests recorded for the completed type-visibility slice.
+
+## 2026-09-07 — Clarify freedom from legacy API constraints
+
+Recorded that neoCLR need not reproduce CLR/.NET legacy structures or every historical
+behavior. Familiar concepts remain useful for understanding and migration, while explicit
+structural and behavioral improvements are valid design choices. Reflection in particular
+should model neoCLR and can evolve with it; the MVP's read-only subset is not a commitment
+to the .NET reflection hierarchy or a stable compatibility surface. No scope expansion
+or runtime implementation change was made.
+
+Validation: documentation-only changes; diff checks pass. Runtime tests were not rerun.

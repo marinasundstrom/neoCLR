@@ -1,12 +1,15 @@
-# Familiar .NET APIs, explicit platform differences
+# Familiar concepts, deliberate platform contracts
 
-Keep the consumer-facing API surface as close to .NET as possible wherever neoCLR
-does not intentionally diverge. Familiarity is a goal independent of implementation:
+Use familiar .NET APIs and concepts wherever they fit neoCLR's intended model. We do
+not need to reproduce CLR/.NET legacy structures, historical restrictions, or every
+compatibility behavior. Deliberate improvements to structure and behavior are valid
+platform decisions, not merely unavoidable exceptions to a compatibility requirement.
+Familiarity is a goal independent of implementation:
 a platform-written function, native runtime call, interpreter operation, and future
 JIT implementation should expose the same documented consumer contract.
 
-Preserve established namespaces, type/member names, overload families, parameter
-order, and observable behavior unless a specific platform decision requires change.
+Prefer established namespaces, type/member names, overload families, parameter
+order, and observable behavior when their contracts remain appropriate.
 Implement a small coherent subset first instead of inventing unrelated substitutes
 for missing framework functionality. A missing implementation remains a documented
 gap, not a reason to redefine the API silently.
@@ -17,6 +20,11 @@ without the `I` convention. These need explicit API mappings. Implementation det
 alone do not justify additional consumer-visible differences.
 
 ## Current examples
+
+For each intentional departure, state the problem it solves, the resulting contract,
+and the migration impact. Keep compatible behavior where useful, but do not add a
+legacy abstraction solely because .NET exposes it. Preserve the small MVP scope while
+leaving room for better designs as the runtime develops.
 
 | API | Familiar surface | Deliberate change or current limitation |
 | --- | --- | --- |
