@@ -45,6 +45,12 @@ Prioritize the complete path from assembler through metadata/IL, runtime library
 execution, recoverable Error results, and unrecoverable Fault diagnostics. Add core
 mechanics when these programs need them; broader OOP and backend features can wait.
 
+Showing what the platform can do is a priority. Aim for small but functionality-rich
+applications, not only isolated opcode examples. A broad runtime library is not a
+prerequisite: a narrow host integration plus platform-written library code can provide
+a useful end-to-end demonstration. Select implementation slices by the applications
+they enable, while keeping their contracts usable by future compilers and backends.
+
 The immediate demonstration set should include:
 
 - HelloWorld, arithmetic, branches, free functions, and explicit pointer allocation.
@@ -68,6 +74,31 @@ integration remains an intended runtime-library capability; source-line resoluti
 rich formatting can follow the core programs. [Explicit target layout](target-layout.md)
 now separates storage calculations from the host. This does not require starting native
 code generation before the interpreter/library demonstration is coherent.
+
+## Next demonstrations: useful external capabilities
+
+A proposed next integration is bounded UTF-8 text-file reading: a small application
+reads input, parses values, reports recoverable errors, and prints a computed result.
+This exercises external data, strings, Result handling, and library composition without
+requiring a general stream hierarchy. The exact API is not selected or implemented.
+
+Implement only the missing mechanics needed by the selected demo. Keep platform-facing
+methods in library IL and define a narrow, explicit binding to host services. Decide
+the input size limit, text decoding behavior, expected I/O Error results, and resource
+cleanup before implementing the boundary. Demonstrate both successful execution and
+an ordinary failure that the application handles. Document build/run commands and
+test the service contract without depending on an external network.
+
+Socket primitives followed by an HttpClient-style library are a possible later
+demonstration. Build that in layers when useful: explicit socket operations and
+lifetimes first, then protocol/library behavior. Blocking I/O, cancellation, buffer
+transfer, and eventual async support need deliberate contracts. Networking is not
+the next mandatory feature, and runtime async or extensive OOP need not block a
+simpler useful integration.
+
+Keep nullability exploration, broad reflection/OOP, .NET migration, and a complete
+framework behind the immediate goal of demonstrable applications. Existing fault
+diagnostics and explicit memory semantics remain part of every integration's contract.
 
 ## Candidate high-level compiler targets
 

@@ -1431,3 +1431,14 @@ annotations alone cannot add a distinguishable null state to fully occupied stor
 No runtime behavior or metadata format changed.
 
 Validation: documentation-only change; diff checks pass. Runtime tests were not rerun.
+
+## 2026-09-07 — Prioritize capability-rich runnable demonstrations
+
+Reaffirmed useful small applications as the immediate priority, without requiring an
+extensive runtime library or object model. Proposed bounded UTF-8 file input and a
+parse/report application as a smaller integration candidate. Recorded Socket primitives
+and a later HttpClient-style library as possible demonstrations, not mandatory next work.
+Each integration should define its narrow host boundary, recoverable errors, resource
+lifetime, runnable example, and validation. No integration API is selected or implemented.
+
+Validation: documentation-only change; diff checks pass. Runtime tests were not rerun.
