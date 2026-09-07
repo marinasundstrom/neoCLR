@@ -53,6 +53,9 @@ They consume guest frames and instruction budget, and their metadata/IL bodies a
 serialized just like application functions. Tests replace the compiled Divide body
 and confirm execution follows the replacement, rather than a hidden intrinsic.
 
+The [Result API review](runtime-error-contracts.md) inventories current failure outcomes
+and proposed operation-specific error types. Those proposed signatures are not yet implemented.
+
 ## Build and use
 
 `runtime/System.neoil` is an ordered `.include` manifest. Class and feature sources

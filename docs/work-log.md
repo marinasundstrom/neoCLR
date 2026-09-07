@@ -1966,3 +1966,12 @@ expanded line numbers; source-map support is deferred.
 Validation: pre-split and manifest assembly produce identical serialized metadata/IL;
 all 21 source-loader, CLI, library and native-binding tests pass. Formatting, clippy
 with warnings denied, and diff checks pass on macOS ARM64.
+
+## Runtime Result API review
+
+Audited all six public Result-returning methods and their native failure branches.
+Documented proposed operation-specific error contracts in runtime-error-contracts.md,
+including Parse's missing format/overflow distinction, checked arithmetic, UTF-8 ranges,
+console EOF versus failures, and bounded file input. The review specifies canonical API
+migration, ordinary nested error cases, structured native outcomes, and acceptance tests.
+It does not implement these proposed types or silently change output Fault policy.
