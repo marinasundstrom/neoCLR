@@ -2656,3 +2656,12 @@ interfaces remain implemented. This revision changes design documentation only.
 Validation: all 59 local links and heading targets in the changed documents resolve,
 diff whitespace checks pass, and src/tests/examples/runtime match the preceding
 commit exactly. No runtime tests were rerun for this documentation-only revision.
+
+## Reference source syntax selected — 2026-09-07
+
+Selected T& and &value for reference types and reference formation, including the
+MakeCounter() -> Counter& example that returns &counter. Retention and physical
+storage remain compiler/runtime responsibilities; escaping references require no
+separate source ownership wrapper. Recorded the distinction between this source
+direction and the current neoIL restriction on returned/stored byrefs. No parser
+or runtime behavior changed; diff whitespace checks passed.

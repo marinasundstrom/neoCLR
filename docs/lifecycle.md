@@ -47,18 +47,22 @@ promoting it while preserving the identity seen by every existing reference.
 Escape analysis may avoid unnecessary allocation; correctness cannot depend on
 requiring programmers to choose the physical placement themselves.
 
-Conceptual source, not implemented syntax:
+Selected source direction, not yet accepted by a high-level compiler:
 
 ```text
-func MakeCounter() -> reference Counter {
+func MakeCounter() -> Counter& {
     let counter = Counter(0)
-    return reference counter
+    return &counter
 }
 ```
 
 The result refers to the same counter, whose lifetime outlasts the function.
-The encoding of an escaping/retaining reference versus a call-scoped T& remains an
-implementation decision. Current T& returns and stored byrefs are still rejected;
+Use T& for reference types and &value to form a reference, including references
+returned from a function. A separate source-level ownership wrapper or heap qualifier
+is not required. The compiler/runtime determines the required retention and storage
+from the reference's use. The IL encoding and enforcement of escaping retention
+versus call-scoped access remain implementation decisions.
+Current neoIL T& returns and stored byrefs are still rejected;
 accept them only when retained storage and alias-preserving promotion exist.
 
 Raw pointers require a stable-address or pinning contract at native boundaries.
