@@ -25,6 +25,10 @@ Interfaces will use ordinary names without an `I` prefix.
 
 ## Current focus
 
+The first publication target is a **runnable source preview**. The [MVP plan](docs/mvp.md)
+defines required capabilities, remaining work, demonstrations, release checks, and exclusions.
+The current checkout is not yet declared MVP-complete.
+
 The first native heap/pointer slice is implemented: explicit allocation/free,
 native addresses, pointer casts and byte offsets, indirect access, and sequential
 record layout. `localloc` provides explicit frame-local byte storage, released on
@@ -99,6 +103,7 @@ cargo run --locked -- run examples/console_input.neoil
 cargo run --locked -- run examples/properties.neoil
 cargo run --locked -- run examples/accessibility.neoil
 cargo run --locked -- run examples/field_access.neoil
+cargo run --locked -- run examples/type_visibility.neoil
 cargo run --locked -- run examples/arrays.neoil
 cargo run --locked -- run examples/array_bounds.neoil
 ```

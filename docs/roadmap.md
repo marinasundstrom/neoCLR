@@ -4,6 +4,10 @@ The platform name is undecided; neoCLR names the runtime only. The existing code
 is a small semantic testbed. It is not a commitment to Rust for every component,
 JSON for distribution, or the exact instruction extensions used here.
 
+The first publication target is defined in the [public source MVP plan](mvp.md).
+Use its required capabilities and release gates to prioritize work; the broader
+directions below are not all prerequisites for the first release.
+
 ## Architectural targets and next priorities
 
 Interpretation, JIT compilation, and native AOT are platform-wide architectural
@@ -205,7 +209,8 @@ on extensive OOP or reflection. Stage the work around a small carrier/variant ex
 3. [Method accessibility](accessibility.md) now enforces public/internal/private calls
    and public-only host member invocation, with explicit local-entry semantics. Field
    visibility now covers ordinary loads/stores/addresses and aggregate construction;
-   type visibility and construction invariants remain needed. Accessor methods
+   top-level types support public/internal visibility with checked type uses.
+   Construction invariants remain needed. Accessor methods
    follow the implemented method rules. Keep familiar .NET-style access levels for
    now; possible improvements to the access model are deferred.
 

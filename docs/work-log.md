@@ -1624,3 +1624,23 @@ metadata. The sample uses an internal helper type and prints 42.
 Validation: all 386 integration tests pass on macOS ARM64; formatting, clippy with
 warnings denied, and diff checks pass. The sample verifies and executes successfully.
 Linux and Windows remain for CI.
+
+## 2026-09-07 — Define the public source MVP
+
+The user selected a runnable source preview with assembler, interpreter, library, and
+samples as the first publication target. Added an MVP capability/gap table, implementation
+order, required offline demonstrations, release acceptance checklist, and explicit
+exclusions. Remaining feature gates center on construction/carrier storage, ordinary
+Option/Result, removal of bootstrap union operations, and minimal read-only guest type
+inspection. Binaries, a high-level compiler, networking, broad reflection, and executing
+JIT/AOT backends are outside this release target.
+
+Recommended and included type descriptors, identity/name inspection, and closed generic
+arguments as the minimal reflection scope; member enumeration, dynamic invocation and
+reflective mutation remain deferred. Publication gates include tested platform/toolchain
+evidence, clean-clone instructions, an owner-approved license, source provenance/notices,
+versioning and release notes. No license was selected, release tag created, push performed,
+or publication made. README and roadmap now link to the MVP plan.
+
+Validation: documentation-only plan; diff checks pass. Runtime validation remains the
+386 passing integration tests recorded for the completed type-visibility slice.
