@@ -53,8 +53,10 @@ The assembler currently resolves labels and produces the interpreter's typed IR,
 serialized as `.neo.json` for inspection and tests. It does **not** emit CLI binary
 metadata or CIL byte streams. Its integer branch operands are instruction indices,
 not CIL byte displacements; field operands are record indices, not metadata tokens.
-`ldc.bool`, union operations, and heap operations are experimental IR instructions,
-not allocations of new binary CIL opcodes. `newobj`, `stfld`, `ceq`, and Void-return
+`ldc.bool`, explicit value-storage operations, and heap operations are experimental
+IR instructions, not allocations of new binary CIL opcodes. Format 4 removed the
+earlier union-specific instructions; Option/Result use ordinary library methods.
+`newobj`, `stfld`, `ceq`, and Void-return
 behavior also have prototype differences documented in the semantic reference.
 
 `add`, `sub`, and `mul` preserve wrapping behavior. The `.ovf` forms preserve the

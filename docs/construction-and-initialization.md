@@ -1,11 +1,12 @@
 # Construction, mutation, and initialization proposal
 
-Status: future contracts for discussion. The implemented
+Status: implemented foundation plus future contracts for discussion. The implemented
 [constructor subset](constructors.md) supports invocation and whole-value receiver
-initialization with `starg this`. The broader addressed and partial-initialization
-contracts below remain proposals.
-The [basic verifier](verification.md) is now implemented; this document
-identifies prerequisites for ordinary library types and a future high-level language.
+initialization with `starg this`. [Managed slot references](reference-slots.md),
+byref receivers and out/out(true) contracts are also implemented. Managed field
+references, readonly access, partial initialization and placement construction
+remain proposals. The [verifier](verification.md) documents current static checks
+and runtime obligations; this document discusses their future extensions.
 The proposals below do not change current aggregate newobj, stfld, pointer, or
 ownership behavior.
 
@@ -27,8 +28,10 @@ Clone/Drop must not become the future guest copy/destruction contract.
 
 ## Addressable values and receivers first
 
-The [addressed-access proposal](addressed-access.md) develops this boundary, its first
-scoped subset, and the checks needed before implementation.
+The [addressed-access design](addressed-access.md) records the original proposal.
+The implemented whole-slot subset and its restrictions are specified in
+[reference contracts](reference-slots.md); field paths and readonly permissions
+in the broader design below remain future work.
 
 Recommend a CLI-like by-reference signature, provisionally written T&, alongside
 native T*. Its meaning is addressed access to existing storage, not counted Ref<T>
@@ -99,10 +102,12 @@ value construction, while placement construction initializes separately obtained
 storage. This restores a familiar constructor-based operation without restoring a
 class/struct allocation distinction.
 
-Current .ctor members supply constructor identity for attributes only; invoking
-newobj Type still constructs a record from its fields. Constructor invocation,
-initialization receivers, and a versioned transition from this helper remain open.
-No current module should acquire different behavior merely by loading it again.
+Current `newobj instance Type::.ctor(...)` invokes a constructor with a whole-value
+initialization receiver and returns the completed value. `newobj Type` continues
+to construct a record from its fields. These are distinct normalized operations;
+see [constructor invocation](constructors.md). Placement construction and partial
+initialization remain open. No current module should acquire different behavior
+merely by loading it again.
 
 Use ordinary factories returning Result<T,E> for expected construction failure,
 for example Parse or TryCreate. Validate inputs before acquiring resources where
@@ -140,28 +145,27 @@ The first useful tests should exercise:
 5. Returning a recoverable factory error with explicit resource cleanup.
 6. Preserving these behaviors when the caller is compiled from the future language.
 
-Option/Result remain a motivating library workload. Their carrier convention still
-needs inactive storage and safe typed extraction. In particular, a Boolean query
-that writes an output only on success is not equivalent to an unconditional out
-parameter: false must not fabricate a valid T. Conditional initialization would
-need an explicit contract and control-flow support. Do not rush it into the first
-byref implementation or assume ordinary out rules solve it.
+Option/Result now use temporary System.Value storage and ordinary typed extraction.
+Their TryGet methods use `out(true) Case&`: a successful direct Boolean branch
+establishes initialization, while false supplies no new initialization guarantee.
+Execution checks assignment on required returns; the verifier's propagation is
+conservative. See [verification](verification.md). Remaining work is payload layout
+and lifetime migration, followed by richer initialization proofs when needed;
+unconditional out is not a substitute for the conditional contract.
 
-## Proposed dependency order and open choices
+## Remaining dependency order and open choices
 
-1. Settle receiver modes, initialization rules, and the boundary between verified
-   addressed access and raw pointers. Define member/field identity requirements.
-2. Introduce a basic control-flow verifier and stable definition references, including
-   generic overload identity. Add visibility so construction invariants can be hidden.
-3. Implement scoped addressed access and mutable receivers with verifier support.
-4. Implement constructor invocation and field initialization checking, with a declared
-   compatibility path for current field-based newobj and value-update stfld.
-5. Bring up a small language compiler and migrate a few library functions/types.
-6. Use Option/Result to settle carrier storage and typed extraction; extend compiler
-   and library together rather than designing a complete source language in advance.
+1. Preserve the implemented value/byref receiver distinction, whole-value construction,
+   visibility, bound member identities and call-scoped reference checks.
+2. Specify field-path identity and invalidation, readonly permissions and partial
+   initialization before extending addressed access or placement construction.
+3. Define payload layout, copying and lifetime contracts for String, errors and
+   nested carriers before retiring System.Value. Keep extraction behavior stable.
+4. Bring up a small language compiler and migrate a few library functions/types,
+   comparing its output with handwritten IL fixtures.
 
-Decisions still requiring discussion include the exact receiver encoding, whether
-verified read-only access is a signature modifier or a distinct reference form,
-construction visibility, the Fault containment boundary, and eventual copy/move
-contracts for owning values. No opcode numbers, binary schema, ownership hooks,
-constructor migration, or final source syntax are selected by this proposal.
+Decisions still requiring discussion include whether verified read-only access is
+a signature modifier or a distinct reference form, placement initialization, the
+Fault containment boundary, and eventual copy/move contracts for owning values.
+Current receiver metadata and constructor visibility are implemented; final binary
+encoding, ownership hooks and high-level source syntax remain open.

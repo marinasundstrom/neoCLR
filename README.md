@@ -251,8 +251,10 @@ cargo run -- assemble runtime/System.neoil System.neo.json
 cargo run -- run examples/hello.neoil System.neo.json
 ```
 
-This is bootstrap linking against one System library, not yet general assembly
-reference resolution. See [runtime library design](docs/runtime-library.md).
+Explicit module sets can link additional libraries, with optional direct dependency
+lists and exact revision pins. Lookup still requires unique type names across the
+load set; automatic dependency discovery and side-by-side versions remain deferred.
+See [module sets](docs/module-sets.md) and [runtime library design](docs/runtime-library.md).
 
 ## What is implemented
 
@@ -260,8 +262,9 @@ reference resolution. See [runtime library design](docs/runtime-library.md).
 - Signature-based overload resolution and structured call references.
 - Optional parameter/local names (`string value`, `.local Point point`), preserved
   in metadata; named operands assemble to indices.
-- Canonical System primitive definitions, type-owned static methods, and read-only
-  instance receiver snapshots; see [type system](docs/type-system.md).
+- Canonical System primitive definitions, type-owned static methods, copied value
+  receivers, and explicit managed reference receivers; see [type system](docs/type-system.md)
+  and [reference contracts](docs/reference-slots.md).
 - Signed/unsigned 8-, 16-, 32-, and 64-bit integer storage, UTF-16 Char,
   integer conversions, bitwise/shift/remainder operations, and indirect loads/stores; see [integer types](docs/integer-types.md).
 - Checked `conv.ovf.*` numeric conversions with explicit source signedness and overflow Faults.
@@ -333,8 +336,10 @@ cargo clippy --locked --all-targets -- -D warnings
 cargo test --locked
 ```
 
-The CI matrix runs these checks on Linux, macOS, and Windows. Local validation
-has been performed on macOS ARM64; the other platforms still require CI execution.
+The CI matrix runs these checks on Linux, macOS, and Windows. The
+[validation record](docs/preview-1-validation.md) includes a passing six-job
+cross-platform baseline and identifies the tested snapshots. New changes still
+require their own validation; earlier CI evidence does not certify the working tree.
 
 Typed memory initialization/copying (`initobj`, `cpobj`) and byte-range operations
 (`initblk`, `cpblk`) are implemented with explicit pointer checks. See
@@ -343,10 +348,11 @@ Typed memory initialization/copying (`initobj`, `cpobj`) and byte-range operatio
 Parameter, local, and qualified field names are assembly conveniences mapped to
 canonical indices. See [identifier mappings](docs/neoil.md#identifier-mappings-and-field-aliases).
 
-The next fundamental milestone is library-defined Option and Result through minimal
-generic support and a convention for ordinary carrier types, inspired by .NET 11.
-See the [union convention](docs/unions-and-enums.md);
-reflection remains outside that milestone.
+Library-defined Option and Result are implemented through ordinary generic carrier
+types, nested cases, constructors, properties and conditional output methods.
+See the [union convention](docs/union-convention.md). Their remaining storage milestone
+is retiring temporary System.Value after payload layout, copying and lifetime
+contracts support String, errors and nested carriers; see [value storage](docs/value-storage.md).
 
 Indexed generic parameters, constructed references, field substitution, and closed
 generic record values, methods, and native layouts are implemented; see [generic types](docs/generic-metadata.md).
@@ -355,14 +361,18 @@ types. Dedicated union opcodes are not planned.
 
 [Marker custom attributes](docs/custom-attributes.md) are supported on types and
 methods/functions. The System library supplies UnionAttribute as an ordinary marker;
-union behavior and guest reflection remain pending.
+case behavior lives in ordinary library methods. Read-only type inspection is available;
+general reflection and guest attribute discovery remain deferred.
 
 Following the strategy review, the [control-flow verifier foundation](docs/verification.md)
 is implemented as an explicit `verify` command. It checks stack types, call/field
-operands, local initialization, and returns; reference-lifetime analysis remains pending. The
+operands, local initialization, returns and call-scoped reference use. Runtime guards
+enforce liveness and output assignment; broader lifetime analysis remains pending. The
 [construction, mutation, and initialization proposal](docs/construction-and-initialization.md)
 connects the next type-system decisions with verification and a future high-level
-language for the runtime library; its contracts are proposals, not implemented features.
+language for the runtime library. Whole-value constructors and reference receivers
+are implemented; partial initialization, readonly access and placement construction
+remain proposals.
 
 [Execution architecture](docs/execution-architecture.md) treats interpretation, JIT,
 and native AOT as platform-wide targets, with shared semantics and explicit capability
@@ -375,7 +385,8 @@ distinguish overloads with identical substituted signatures.
 
 [Type identities](docs/type-identities.md) preserve module-local type definition rows
 and expose resolved closed signature keys, including generic arguments and pointers.
-Module-scoped type lookup and revision identities remain future work.
+Exact revision identities and scoped origin checks are implemented. Internal scoped
+type keys, colliding type names and content provenance remain future work.
 
 [LoadedProgram](docs/loaded-program.md) prepares an immutable metadata snapshot shared
 by execution, verification, and type queries. Run `cargo run --example loaded_program`

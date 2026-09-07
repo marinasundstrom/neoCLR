@@ -20,10 +20,13 @@ recursively copies its fields. Embedded `Ref<T>` values copy their identity and
 updated record; it does not mutate some hidden receiver identity.
 
 A call consumes its arguments and transfers them into a new frame. `ret` transfers
-one owned value to the caller. Values may leave a frame because they have no
-implicit pointer back into that frame. There are no stack-address instructions or
-borrows yet. This chooses copying as the initial escape policy; move semantics and
-checked borrowing remain future choices.
+one owned value to the caller. Ordinary owned values may leave a frame; copying
+embedded pointers does not extend their targets' lifetimes. Managed `T&` references
+address local and argument slots through `ldloca`/`ldarga` and may be passed or
+forwarded within calls. They cannot be returned or stored in locals or fields.
+Runtime checks enforce slot liveness, initialization and output assignment; no
+exclusive-borrow policy is implied. Move semantics and escaping references remain
+future choices. See [managed slot references](reference-slots.md).
 
 `heap.new` transfers a value into an execution-owned arena and produces `Ref<T>`.
 `heap.load` copies its current contents. `heap.store` replaces its contents with a
@@ -83,9 +86,13 @@ returns an error for zero divisors and the minimum integer divided by -1.
 and ASCII decimal digits with no whitespace trimming or culture handling. This is
 a deliberately small contract, not .NET Parse compatibility.
 
-`ceq` requires identical types and compares data structurally; references compare
-arena identity. `clt` only supports integers. `brtrue` requires `Boolean` rather
-than applying integer/reference truthiness.
+`ceq` requires identical runtime value types and compares data structurally; arena
+references compare identity and pointers compare address and target type. It does
+not dispatch `Equatable<T>.Equals`. Numeric comparisons include integer and
+floating-point operands; see [floating point](floating-point.md) for NaN behavior.
+`brtrue` and `brfalse` accept Boolean, integer, native pointer and arena-reference
+operands; see [neoIL](neoil.md) for their truth tests. These operations do not
+implicitly convert arbitrary records or strings to Boolean.
 
 ## Metadata and library shape
 
@@ -93,8 +100,11 @@ A module has a format version, name, entry-function name, type definitions, and
 function definitions. Free functions have no owner. Static and instance methods
 have a declaring type; primitives resolve to canonical System definitions and can
 own members. `.entry Main` selects a parameterless non-instance entry. Ordinary
-instance methods currently use read-only receiver snapshots, with the receiver at
-argument zero; see [type system](type-system.md) for explicit limitations.
+instance methods use copied receiver values, with the receiver at argument zero.
+Explicit byref receivers instead access the original initialized slot. Whole-value
+constructors initialize their receiver with `starg this`; field-by-field and
+placement construction remain deferred. See [constructors](constructors.md) and
+[reference receivers](reference-slots.md).
 
 Types have named, ordered fields unless their representation is runtime-known.
 Prototype instructions index fields and locals from zero, and assembled branch

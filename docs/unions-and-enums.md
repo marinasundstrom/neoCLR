@@ -2,8 +2,8 @@
 
 Status: the [Preview 1 member convention](union-convention.md) is selected and ordinary
 System.Option/Result implement it using explicit typed value storage and ordinary
-constructors/accessors. Existing APIs and unqualified Option/Result spellings still
-use bootstrap encodings pending migration. This direction supersedes the earlier
+constructors/accessors. Library APIs, native adapters and host inputs use ordinary
+carriers; format 4 removed bootstrap union encodings. This direction supersedes the earlier
 union case-table and dedicated-opcode design; broader tooling remains future work.
 
 ## Ordinary carrier and variant types
@@ -47,11 +47,12 @@ not union-specific instructions. The selected convention states behavioral oblig
 that the VM does not prove for arbitrary implementations.
 
 The [constructor subset](constructors.md) establishes a whole receiver value;
-addressed receivers remain future work. [Property metadata](properties.md) supplies explicit getter/setter
+ordinary methods also support [byref receivers](reference-slots.md).
+[Property metadata](properties.md) supplies explicit getter/setter
 associations, including Error.Message; ordinary field operations now enforce visibility.
-The System carrier tests demonstrate the required value behavior. Host/native adapter
-migration remains separate work; constructor provenance at unsafe/trusted boundaries
-is not guaranteed. Extensive inheritance, virtual dispatch, reflection, and a full
+The System carrier tests demonstrate the required value behavior. Host/native adapters
+use ordinary carriers; constructor provenance at unsafe/trusted boundaries is not
+guaranteed. Extensive inheritance, class virtual dispatch, reflection, and a full
 runtime library are not prerequisites for this milestone.
 
 ## Intended library shapes
@@ -59,10 +60,10 @@ runtime library are not prerequisites for this milestone.
 | Carrier | Permitted variant types |
 | --- | --- |
 | System.Option<T> | None, Some<T> |
-| System.Result<T, TError> | Ok<T>, Err<TError> |
+| System.Result<T, TError> | Ok<T>, Error<TError> |
 
 These are conceptual signatures, not new assembler declarations. Some<T>, Ok<T>,
-and Err<TError> own their payload fields as ordinary generic records. None is an
+and Error<TError> own their payload fields as ordinary generic records. None is an
 ordinary zero-field type. Distinct wrappers preserve success/error identity even
 for Result<T,T>. TError need not inherit from a universal Error type. Some<Void>
 and Ok<Void> contain a real Void value; they remain distinct from None.
@@ -81,10 +82,11 @@ current model. Our eventual contract will therefore be similar, not binary ident
 No interface naming prefix is required, and no struct/class distinction determines
 storage or lifetime.
 
-A TryGetValue-like member needs an explicit output contract. Addressable locals,
-byrefs, and initialization rules must be settled before copying the .NET out pattern.
-An unsuccessful query must not expose an uninitialized or fabricated T. Do not make
-implementing Option depend recursively on already having Option-based extraction.
+TryGet members use the implemented `out(true) Case&` contract. A direct successful
+Boolean branch proves the output initialized; a miss supplies no new initialization
+guarantee. Runtime checks enforce required assignments. See
+[reference contracts](reference-slots.md) for aliasing and forwarding, and
+[verification](verification.md) for conservative proof propagation.
 Constructed carriers must preserve the selected variant and value; their queries
 must agree and must not change the active alternative. Absence is an explicit None
 value, not an implicit null or uninitialized state. A zeroed allocation is not
@@ -117,7 +119,7 @@ Fault remains for violated execution contracts.
 4. Completed: marker metadata and the ordinary constructor/property/access/storage
    foundation, with a selected [constructor/query convention](union-convention.md).
 5. Completed: fully qualified System carrier and wrapper types in platform IL, with
-   tests for None/Some, Ok/Err, Void, nesting, failed queries and independent copies.
+   tests for None/Some, Ok/Error, Void, nesting, failed queries and independent copies.
 6. Completed: library, native adapters, host inputs, samples and tests use ordinary
    constructed carriers, constructors, queries and accessors.
 7. Completed: format 4 removes the six bootstrap union instructions, special signature

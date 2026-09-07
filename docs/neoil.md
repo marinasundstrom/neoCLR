@@ -151,8 +151,9 @@ Instance calls use `call instance Owner::Member(...)`; static methods use
 `call Owner::Member(...)`. Dotted qualified-name shorthand is still accepted.
 An explicit owner is encoded separately in the call reference. Instance calls
 consume a receiver before the declared parameters; `ldarg 0` is the receiver and
-`ldarg 1` is the first declared parameter. Receivers are read-only snapshots in this
-prototype. Static and instance overloads are distinct.
+`ldarg 1` is the first declared parameter. Value receivers are copied snapshots;
+explicit byref receivers access the original initialized slot. See
+[reference receivers](reference-slots.md). Static and instance overloads are distinct.
 
 ## Instructions
 
@@ -388,10 +389,11 @@ and preserve older stack entries. These zero/null tests follow the familiar
 String, records, Error, unions, Void, and floating-point values are not conditions.
 neoCLR does not infer reference semantics for value types based on their .NET names,
 or infer truth from string length or Option/Result cases. Use ordinary discriminator methods for unions
-and explicit comparisons for floats. Managed byrefs and short-form branch aliases
-remain pending. Tables do not add implicit default branches, union destructuring,
-or a static stack verifier. Stack types and instruction budgets remain checked during
-execution. See `examples/control-flow.neoil` for pointer testing, an integer-controlled
+and explicit comparisons for floats. Managed byrefs are not accepted as branch
+conditions; short-form branch aliases remain pending. Tables do not add implicit
+default branches or union destructuring. The optional [verifier](verification.md)
+checks stack types and control-flow joins; runtime checks and instruction budgets
+also apply. See `examples/control-flow.neoil` for pointer testing, an integer-controlled
 loop, and multi-way dispatch.
 
 

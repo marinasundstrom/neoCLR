@@ -52,6 +52,26 @@ universal ownership policy is implied.
 
 ## Current priority: a small runnable platform
 
+The implemented foundation is summarized above and in the
+[library foundation](#implemented-library-foundation). Before expanding it, keep
+the following decisions explicit. These are proposed follow-up work, not additions
+to the published Preview 1 release gates.
+
+| Decision | Why it matters next | Recommended next step |
+| --- | --- | --- |
+| Payload layout and ownership | String, errors and ordinary union carriers have no native layout, so Array/ArrayList cannot hold them | Specify copy, replacement, release and active-payload rules; prove nested Result and String collection workloads before retiring System.Value |
+| Scoped type identity | Scoped source operands currently normalize to unique names; colliding names cannot coexist across modules | Carry resolved definition identities through signatures and caches before general loading or cross-build compilation caches |
+| Verification and required Faults | Verification is optional and pointer side tables include prototype diagnostics | Classify required checks, verified preconditions and optional diagnostics before an optimized backend; decide which execution profiles require verification |
+| Managed reference extensions | Whole-slot references work, but field paths, readonly permissions and escaping references need further rules | Specify aliasing, slot replacement and invalidation with executable examples before adding each capability |
+| Text APIs | UTF-8 bytes, UTF-16 code units and user-visible text elements need distinct contracts | Set indexing and decoding contracts before introducing Length/indexers; add a byte-to-text workload with explicit decoding errors |
+| Native execution and hosting | Call graphs and target layouts are available, but they do not establish ABI or complete backend support | Validate layout/opcode closure, Fault propagation, cancellation and value lifetimes in a small AOT executable/export experiment |
+| Frontend scope | A compiler can exercise library ergonomics against the existing IL | Choose a small C#-dialect or Raven subset and pair compiled programs with the existing IL fixtures |
+
+Prioritize the storage/lifetime design and a small frontend workload over broad new
+library APIs. Keep binary round-trip and AOT experiments bounded so they test the
+shared contracts before any public ABI is frozen. General OOP, networking, async,
+GC and reference counting remain later work justified by concrete programs.
+
 The first milestone is building and running simple programs without extensive OOP.
 Prioritize the complete path from assembler through metadata/IL, runtime library,
 execution, recoverable Error results, and unrecoverable Fault diagnostics. Add core

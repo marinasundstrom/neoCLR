@@ -54,8 +54,9 @@ JSON instruction `newobj.ctor` with a normal function-reference operand. Explici
 this new operation. This prototype encoding is not a CLI binary opcode assignment.
 
 Construction creates an ordinary value and implies no heap placement, reference
-counting or ownership policy. Field-by-field initialization, addressed receivers,
-construction into supplied storage, inheritance, and destruction remain future work
+counting or ownership policy. Ordinary methods support [byref receivers](reference-slots.md),
+but construction still uses the whole-value convention above. Field-by-field
+initialization, construction into supplied storage, inheritance, and destruction remain future work
 in the [construction proposal](construction-and-initialization.md). Recoverable
 construction failure can use an ordinary factory returning `Result`; constructor
 invocation itself does not introduce exception handling or special union operations.

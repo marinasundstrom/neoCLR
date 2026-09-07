@@ -2,14 +2,16 @@
 
 This slice implements type parameter references, constructed type references, generic
 record field signatures, validation, substitution, and closed generic record values.
-Static and instance IL methods on generic types are also implemented. Library-defined
-Option/Result remain pending; no reflection facility is introduced.
+Static and instance IL methods on generic types and ordinary library-defined
+System.Option/Result are implemented. Generic methods with their own type parameters
+and constraints remain deferred; read-only type inspection is documented separately
+in [type inspection](type-inspection.md).
 
 ```text
 .type Pair<Left, !1>
     .field First Left
     .field Second !1
-    .field Nested Option<Left>
+    .field Nested System.Option<Left>
 .end
 ```
 
@@ -63,7 +65,8 @@ be used in locals, parameters, return values, and free-function overload signatu
 The interpreter's Object value now stores a Type rather than a definition-name
 string. This is a Rust embedding API change. The serialized `newobj` operand retains
 the legacy name string for non-generic records; constructed operands use structural
-Constructed signatures, including indexed argument order. Legacy modules still load.
+Constructed signatures, including indexed argument order. Supported format-4 modules
+with omitted optional metadata still load; earlier format versions require reassembly.
 Older readers reject the new structured operands rather than erasing type arguments.
 
 `examples/generic-values.neoil` demonstrates construction, field aliases, independent
@@ -73,15 +76,14 @@ Native layouts and allocation now support closed generic records whose substitut
 fields have supported layouts. Method-level generics remain unsupported. A recursive
 pointer signature does not expand its pointee or acquire a lifetime/ownership policy.
 
-Option, Result, Ref, and Ptr retain their bootstrap signature encodings for now.
-They cannot be redeclared as generic definitions under those reserved short names.
-Ordinary generic record construction and members on generic types are implemented.
-Marker custom attributes are implemented. Typed access/storage support
-will then enable the [union convention](unions-and-enums.md), before migrating
-Option and Result into the System library. No union-specific type category or
-instructions are planned.
-Existing modules without the new optional metadata continue to load; old readers
-will reject the new signature variants instead of interpreting them as old types.
+System.Option and System.Result are ordinary generic definitions. Unqualified
+Option/Result names have no special runtime meaning and require ordinary definitions
+to resolve. Ref and Ptr retain distinct runtime signature forms. Generic record
+construction, members, marker attributes and explicit typed storage implement the
+[union convention](union-convention.md); there are no union-specific instructions
+or signature categories. System.Value retirement remains a separate storage and
+lifetime migration. Old readers reject unsupported signature variants rather than
+interpreting them as old types.
 
 ## Methods on generic types
 
@@ -152,4 +154,5 @@ Generic definitions now carry module-local type rows. The separate
 [type identity resolver](type-identities.md) produces closed keys from the definition
 row and ordered argument identities, including nested constructions and pointers.
 It does not expand fields or replace the interpreter's existing signature-based
-value and layout checks. Module-scoped type references remain future work.
+value and layout checks. [Scoped type operands](scoped-types.md) check module origin;
+internal scoped keys and colliding type names across modules remain future work.

@@ -1,9 +1,16 @@
-# Addressed access: proposed first contract
+# Addressed access: design history and remaining proposals
 
-Status: discussion proposal. No byref signatures, addressed receiver modes,
-or new instructions are implemented by this document. The [basic verifier](verification.md)
-is implemented separately; the reference contracts here remain proposals.
-This refines the [construction proposal](construction-and-initialization.md).
+Status: original design proposal, partly superseded by the implemented
+[managed slot-reference contract](reference-slots.md) and [verifier](verification.md).
+Use those documents for current behavior. This document preserves the rationale
+and broader proposals; its recommended first scope is not the implemented subset.
+
+Implemented: T& parameters, whole-slot ldloca/ldarga and ldobj/stobj access, explicit
+byref receivers, out/out(true) assignment contracts and managed interface views.
+Deferred: readonly permissions, reference-valued locals, managed field references,
+returned/stored references and native-address bridges. In particular, taking the
+address of an uninitialized local is permitted today; reading it requires initialization.
+The field-path and readonly rules below remain proposals.
 
 ## Recommended boundary
 
@@ -139,13 +146,13 @@ should exercise the same contracts.
 
 ## Next decisions and implementation gate
 
-The control-flow verifier includes typed stack states and definite local initialization
-as an explicit pass. Next, settle definition/member
-identity so receiver modes and generic overload targets can be encoded unambiguously.
-Then add addressed access and its checks together.
+The control-flow verifier, bound member identities and whole-slot addressed access
+are implemented. Extend them together when introducing field paths, permissions or
+longer lifetimes, with runtime enforcement for obligations the verifier cannot prove.
 
-Still open: the final signature encoding for read-only access; the precise receiver
-syntax; how initialization access differs from ordinary references; reference returns
-and containment; native-address conversion; and the compatibility plan for field stores.
+Still open: the signature encoding for read-only access; partial initialization;
+reference returns and containment; native-address conversion; and field-reference
+invalidation. Current receiver syntax and out/out(true) behavior are specified in
+[reference contracts](reference-slots.md).
 The decisions proposed here do not select an ownership system or commit the future
 language to a borrow-checking discipline.

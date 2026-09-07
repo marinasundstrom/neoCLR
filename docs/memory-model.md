@@ -151,9 +151,11 @@ identity, loads, and stores. Allocations are retained until the execution result
 dropped. **There is no reference counting** or per-allocation release within that
 arena. This arena is scaffolding, not the final managed memory model.
 
-Instance method receivers are currently read-only value snapshots. They do not
-establish a borrow model or mutable receiver semantics. Native pointers have a
-separate allocation store and explicit access operations.
+Instance methods use copied receiver values unless they declare a byref receiver.
+Byref receivers access the original initialized slot through the same call-scoped
+managed-reference contract as parameters. Updating a copied receiver does not
+write back to the caller. Native pointers have a separate allocation store and
+explicit access operations.
 
 Native allocations stay live until explicit free or execution teardown. Copies of
 pointers neither retain nor release storage. General generic metadata and lifetime-aware

@@ -28,9 +28,10 @@ The returned `TypeIdentity` supports equality and hashing:
 - Constructed types identify a definition row plus ordered, recursively resolved
   argument identities. `Box<Int32>` and `Box<String>` share a definition but have
   different closed identities; nested constructions retain every argument.
-- Pointer signatures retain their pointee identity. The bootstrap `Ref`, `Option`,
-  and `Result` signatures retain distinct structural wrapper identities until their
-  library migration. This does not introduce a general union type category.
+- Pointer, managed-reference and native interface-reference signatures retain their
+  target identity. The bootstrap `Ref` retains its separate wrapper identity.
+  Option and Result are ordinary constructed definition identities; there is no
+  special union identity category.
 
 For example, given an application that declares `Box<T>`:
 

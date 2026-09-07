@@ -2561,3 +2561,24 @@ then checks an archive of that exact tree, notice hashes and extracted build/sam
 execution before publishing. The GitHub release records that final run, commit and
 asset checksums; the validated source does not need a post-validation documentation
 edit. Earlier failure records remain historical evidence, not current release status.
+
+## Prototype review and documentation cleanup — 2026-09-07
+
+Reconciled README and the semantic, memory, construction, reference, generic and
+union design documents with the implementation. Corrected obsolete claims about
+byref receivers, conditional output assignment, constructor invocation, bootstrap
+union encodings, type revisions and conditional branch operands. Marked the older
+addressed-access design as partly superseded and linked its implemented contract.
+Preserved proposed field references, readonly access, partial initialization and
+escaping-reference rules as future work.
+
+Added a roadmap decision table covering payload layout/ownership, scoped identities,
+verification and required Faults, reference extensions, text APIs, native/hosting
+contracts and frontend scope. Recommendations prioritize storage/lifetime contracts
+and a small compiler workload; they do not change Preview 1 release gates.
+
+Validation: one uninterrupted local cargo test --locked run passed, including the
+source/artifact walkthrough and doc-test stage. Checked all 217 local Markdown
+links and heading targets in the twelve edited reference documents, and git diff
+--check passed. This cleanup changes documentation only; runtime behavior and
+artifact encodings are unchanged.
