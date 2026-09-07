@@ -2839,3 +2839,28 @@ passed. Focused tests also updated obsolete field-storage/host-return expectatio
 Final clippy --all-targets -D warnings, formatting and whitespace checks passed; 514
 local links and heading targets resolve. The CLI heap-reference sample returned 42
 and reported three allocated/reclaimed objects through --gc-stats and --gc-events.
+
+## Neo companion compiler and upcoming slices — 2026-09-07
+
+Added a small Raven-inspired Neo front end lowering to existing neoIL and format 5
+modules. The CLI accepts .neo for check, verify, assemble and run. The initial subset
+supports records, typed free functions, let/var, arithmetic, field mutation, explicit
+managed references and explicit heap construction. The counter example demonstrates
+value copying, a caller-owned reference, and a heap-backed field reference, printing
+1, 2 and 42. Compilation verifies generated IL; runtime lifetime checks remain active.
+
+Documented run/build/embedding instructions, an implemented EBNF grammar and current
+limits. Neo is a deliberately small companion compiler maintained alongside neoCLR
+for testing and explanation, not a current full-fledged compiler project. Runtime
+changes should update affected lowering, examples, tests and grammar together.
+
+Planned control flow first, then patterns and match expressions/statements for union
+results, followed by a bounded console calculator. These features are not implemented
+in this slice. Recorded scope/lifetime and exhaustiveness decisions to resolve during
+implementation. Library ports and compiler bootstrapping remain future exercises;
+Object hierarchy and pinning retain their separate runtime design boundaries.
+
+Validation: all 18 focused Neo, CLI, module CLI and GC diagnostics tests passed.
+Clippy across all targets with warnings denied, formatting and whitespace checks
+passed. All 539 local documentation file links resolve. The source counter demo
+returned 42 with one heap allocation reclaimed, including GC statistics/events output.

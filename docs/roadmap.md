@@ -1,10 +1,17 @@
 # Direction and migration
 
-Current sequence: finish the direct managed-reference/GC milestone, then select
+Current sequence: the direct managed-reference/GC foundation is implemented; select
 the next slices around a concrete end-to-end scenario. The [optional object hierarchy](object-hierarchy.md)
 is a planned subsequent area. Adapt memory
 layout and base-reference tracing during inheritance work; keep allocation mode
 independent of inheritance and value equality independent of reference access.
+The [Neo concept language](neo.md) now supplies the first source-to-runtime scenario.
+Keep this small companion compiler updated alongside neoCLR for testing and
+explanation, without making a full-fledged compiler a current goal. The
+[upcoming Neo slices](neo-roadmap.md) prioritize control flow, union-aware matching
+and a bounded console program.
+Future [library/compiler bootstrapping](neo-bootstrapping.md) is an exercise to pursue
+only as the required language and library capabilities become useful.
 
 The platform name is undecided; neoCLR names the runtime only. The existing code
 is a small semantic testbed. It is not a commitment to Rust for every component,
@@ -12,7 +19,7 @@ JSON for distribution, or the exact instruction extensions used here.
 
 The first publication target is defined in the [public source Preview 1 plan](preview-1.md).
 Its scope is grounded in six [Raven-like programs and IL mappings](preview-1-programs.md),
-with hand-authored IL acceptance fixtures until a high-level frontend exists.
+with hand-authored IL acceptance fixtures retained alongside the growing Neo subset.
 Use its required capabilities and release gates to prioritize work; the broader
 directions below are not all prerequisites for the first release.
 
@@ -52,10 +59,11 @@ receivers, [validated ordinary Option/Result inputs](union-inputs.md), and fresh
 [Cooperative cancellation](cancellation.md) now supports stopping interpreter execution
 from the host. Guest addressed mutation and retaining T& locals/returns are
 implemented with managed field addresses and runtime checks. A returned reference
-must target storage owned by an active outer frame; current-frame escapes and host
-transfers are rejected. A small
-language compiler should target the same metadata/IL and enable incremental library
-migration. Native backend/code-sharing choices remain open; no hidden fallback or
+may target storage owned by an active outer frame or the managed heap; current-frame
+escapes are rejected. Heap-backed host results can be inspected through their owning
+execution, while reference inputs across executions remain unsupported. Neo targets
+the same metadata/IL and may enable incremental library migration.
+Native backend/code-sharing choices remain open; no hidden fallback or
 universal ownership policy is implied.
 
 ## Current priority: a small runnable platform
@@ -336,7 +344,7 @@ require deliberate treatment. Ordinary `add`/`sub`/`mul` already retain wrapping
 operations terminate with Faults rather than throw. Surface required changes early
 through a compatibility report rather than promise binary execution.
 
-No importer, source compiler, bridge, binary metadata writer, or compatibility
+No .NET importer, .NET source compiler, bridge, binary metadata writer, or compatibility
 analyzer is implemented yet. A useful migration success criterion is a small real
 library recompiling with localized, explained changes and equivalent observable
 behavior in the supported subset.

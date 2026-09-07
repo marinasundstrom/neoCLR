@@ -4,7 +4,9 @@ Current memory milestone: format 5 uses direct heap-backed T&. Ref and heap.load
 are removed; heap-only references can be stored in fields/erased payloads and returned
 to the host for context-bound inspection. See [the current contract](heap-references.md).
 
-These examples explain the implemented platform contracts. They are **pseudocode,
+The executable [Neo concept language](neo.md) now implements a small subset of these
+ideas; see its guide for accepted source. The examples below still explain the broader
+platform contracts. They are **pseudocode,
 not inputs to an existing compiler or a specification of Raven**. They follow the
 project's name-before-type source notation, with familiar reference, output and
 explicit-memory notation inspired by C# and Rust. In particular, this is not Rust's

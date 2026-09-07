@@ -44,6 +44,22 @@ value lifetimes, managed heap collection and resource cleanup.
 [Explicit cleanup](docs/disposal.md) is available through System.Disposable and
 System.Closable<E>; automatic destruction remains future work.
 
+## Try Neo
+
+[Neo](docs/neo.md) is a small Raven-inspired concept language for this runtime.
+We keep this companion compiler updated alongside neoCLR to test and explain platform
+features. It is not currently intended to be a complex, full-fledged compiler; see
+the [upcoming slices](docs/neo-roadmap.md) for its bounded development plan.
+The first example exercises value copies, explicit references and managed heap storage:
+
+```sh
+cargo run -- run examples/source/counter.neo
+cargo run -- run examples/source/counter.neo --gc-stats --gc-events
+```
+
+It prints `1`, `2`, and `42`. See the [Neo guide](docs/neo.md) for source syntax,
+artifact compilation and current limits.
+
 ## Preview 1
 
 **Preview 1 (v0.1.0-preview.1)** is a runnable source preview. Read the

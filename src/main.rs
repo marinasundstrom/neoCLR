@@ -10,7 +10,7 @@ const USAGE: &str = "Usage:
   neoclr run <input> [System.neo.json] [--module <input>]... [--system <input>] [--gc-stats] [--gc-events]
   neoclr check <input> [--module <input>]... [--system <input>]
   neoclr verify <input> [--module <input>]... [--system <input>]
-Inputs ending in .neoil are sources; other module inputs are JSON artifacts.";
+Inputs: .neo is the high-level subset, .neoil is IL source, otherwise JSON artifacts.";
 
 fn read(path: &str) -> Result<String, String> {
     if path.ends_with(".neoil") {
@@ -57,13 +57,20 @@ fn execute(args: &[String]) -> Result<Vec<String>, String> {
         }
     }
 
+    if paths[0].ends_with(".neo") && (paths.len() != 1 || system_path.is_some()) {
+        return Err(
+            "high-level source currently supports only bundled System and one input file".into(),
+        );
+    }
     let texts = paths
         .iter()
         .map(|path| read(path))
         .collect::<Result<Vec<_>, _>>()?;
     let (modules, program) = if paths.len() == 1 && system_path.is_none() {
         // Preserve standalone System assembly/analysis and existing single-input behavior.
-        let module = if command == "assemble" || paths[0].ends_with(".neoil") {
+        let module = if paths[0].ends_with(".neo") {
+            neoclr::frontend::compile(&texts[0])
+        } else if command == "assemble" || paths[0].ends_with(".neoil") {
             assemble(&texts[0])
         } else {
             load(&texts[0])

@@ -4,6 +4,7 @@ mod access;
 mod console;
 mod execution;
 pub use console::{Console, StdioConsole};
+pub mod frontend;
 mod gc;
 mod initialization;
 mod input;

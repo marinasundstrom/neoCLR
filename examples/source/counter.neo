@@ -1,0 +1,30 @@
+import System.Console.*
+
+record Counter(Age: int)
+
+func Increment(counter: Counter&) -> () {
+    counter.Age = counter.Age + 1
+}
+
+func MakeCounter() -> Counter& {
+    return new Counter(40)
+}
+
+func Age(counter: Counter&) -> int& {
+    return &counter.Age
+}
+
+func Main() -> int {
+    var local = Counter(1)
+    let copy = local
+    Increment(&local)
+
+    let shared = MakeCounter()
+    let age = Age(shared)
+    *age = *age + 2
+
+    WriteLine(copy.Age)
+    WriteLine(local.Age)
+    WriteLine(shared.Age)
+    return shared.Age
+}

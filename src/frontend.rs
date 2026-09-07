@@ -1,0 +1,923 @@
+//! Neo concept-language front end for exercising NeoCLR end to end.
+//! This is a separate experimental language subset, not a Raven compiler.
+use crate::{Fault, Module};
+use std::collections::HashMap;
+
+#[derive(Clone, Debug)]
+struct Token {
+    text: String,
+    line: usize,
+    column: usize,
+}
+impl Token {
+    fn error(&self, message: impl AsRef<str>) -> Fault {
+        Fault::new(format!(
+            "source {}:{}: {}",
+            self.line,
+            self.column,
+            message.as_ref()
+        ))
+    }
+}
+
+fn lex(source: &str) -> Result<Vec<Token>, Fault> {
+    if source.len() > 1_048_576 {
+        return Err(Fault::new("source exceeds 1 MiB limit"));
+    }
+    let mut tokens = Vec::new();
+    let (mut offset, mut line, mut column) = (0, 1, 1);
+    while offset < source.len() {
+        let rest = &source[offset..];
+        let first = rest.chars().next().unwrap();
+        let start = Token {
+            text: String::new(),
+            line,
+            column,
+        };
+        if rest.starts_with("//") {
+            let length = rest.find('\n').unwrap_or(rest.len());
+            column += rest[..length].chars().count();
+            offset += length;
+            continue;
+        }
+        if first == '\n' {
+            tokens.push(Token {
+                text: "\n".into(),
+                ..start
+            });
+            offset += 1;
+            line += 1;
+            column = 1;
+            continue;
+        }
+        if first.is_whitespace() {
+            offset += first.len_utf8();
+            column += 1;
+            continue;
+        }
+        let length = if first.is_ascii_alphabetic() || first == '_' {
+            rest.bytes()
+                .take_while(|c| c.is_ascii_alphanumeric() || *c == b'_')
+                .count()
+        } else if first.is_ascii_digit() {
+            rest.bytes().take_while(u8::is_ascii_digit).count()
+        } else if first == '"' {
+            let mut escaped = false;
+            let mut end = None;
+            for (index, ch) in rest.char_indices().skip(1) {
+                if ch == '\n' || ch == '\r' {
+                    return Err(start.error("string literal must end on the same line"));
+                }
+                if !escaped && ch == '"' {
+                    end = Some(index + 1);
+                    break;
+                }
+                escaped = !escaped && ch == '\\';
+            }
+            end.ok_or_else(|| start.error("unterminated string literal"))?
+        } else if rest.starts_with("->") {
+            2
+        } else if "(){}:,.;&*+-=/".contains(first) {
+            first.len_utf8()
+        } else {
+            return Err(start.error(format!("unsupported character {first:?}")));
+        };
+        let text = &rest[..length];
+        tokens.push(Token {
+            text: text.into(),
+            ..start
+        });
+        column += text.chars().count();
+        offset += length;
+    }
+    tokens.push(Token {
+        text: String::new(),
+        line,
+        column,
+    });
+    Ok(tokens)
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+enum Ty {
+    Int,
+    String,
+    Bool,
+    Void,
+    Record(String),
+    Ref(Box<Ty>),
+}
+impl Ty {
+    fn il(&self) -> String {
+        match self {
+            Self::Int => "Int32".into(),
+            Self::String => "String".into(),
+            Self::Bool => "Boolean".into(),
+            Self::Void => "Void".into(),
+            Self::Record(name) => name.clone(),
+            Self::Ref(ty) => format!("{}&", ty.il()),
+        }
+    }
+}
+#[derive(Clone)]
+struct Field {
+    name: Token,
+    ty: Ty,
+}
+struct Record {
+    name: Token,
+    fields: Vec<Field>,
+}
+struct Function {
+    name: Token,
+    parameters: Vec<Field>,
+    returns: Ty,
+    body: Vec<Stmt>,
+}
+struct Source {
+    records: Vec<Record>,
+    functions: Vec<Function>,
+    console_import: bool,
+}
+struct Expr {
+    at: Token,
+    kind: ExprKind,
+    depth: usize,
+}
+enum ExprKind {
+    Int(i32),
+    String(String),
+    Bool(bool),
+    Name(String),
+    Field(Box<Expr>, Token),
+    Call(Box<Expr>, Vec<Expr>),
+    Unary(String, Box<Expr>),
+    Binary(String, Box<Expr>, Box<Expr>),
+}
+enum Stmt {
+    Bind {
+        name: Token,
+        mutable: bool,
+        annotation: Option<Ty>,
+        value: Expr,
+    },
+    Assign(Expr, Expr),
+    Return(Token, Option<Expr>),
+    Expression(Expr),
+}
+struct Parser {
+    tokens: Vec<Token>,
+    position: usize,
+    depth: usize,
+}
+impl Parser {
+    fn current(&self) -> &Token {
+        &self.tokens[self.position]
+    }
+    fn at(&self, text: &str) -> bool {
+        self.current().text == text
+    }
+    fn take(&mut self) -> Token {
+        let token = self.current().clone();
+        if !token.text.is_empty() {
+            self.position += 1;
+        }
+        token
+    }
+    fn eat(&mut self, text: &str) -> bool {
+        if self.at(text) {
+            self.take();
+            true
+        } else {
+            false
+        }
+    }
+    fn expect(&mut self, text: &str) -> Result<Token, Fault> {
+        if self.at(text) {
+            Ok(self.take())
+        } else {
+            Err(self.current().error(format!(
+                "expected {text:?}, found {:?}",
+                self.current().text
+            )))
+        }
+    }
+    fn newlines(&mut self) {
+        while self.eat("\n") {}
+    }
+    fn lines(&mut self) {
+        while self.eat("\n") || self.eat(";") {}
+    }
+    fn name(&mut self) -> Result<Token, Fault> {
+        let token = self.take();
+        if !crate::metadata::valid_slot_name(&token.text) {
+            return Err(token.error("expected a name"));
+        }
+        if [
+            "func", "record", "let", "var", "return", "new", "true", "false", "import",
+        ]
+        .contains(&token.text.as_str())
+        {
+            return Err(token.error("keyword cannot be used as a name"));
+        }
+        Ok(token)
+    }
+    fn ty(&mut self) -> Result<Ty, Fault> {
+        let mut ty = if self.eat("(") {
+            self.expect(")")?;
+            Ty::Void
+        } else {
+            let token = self.name()?;
+            match token.text.as_str() {
+                "int" | "Int32" => Ty::Int,
+                "string" | "String" => Ty::String,
+                "bool" | "Boolean" => Ty::Bool,
+                "Void" | "unit" => Ty::Void,
+                _ => Ty::Record(token.text),
+            }
+        };
+        if self.eat("&") {
+            ty = Ty::Ref(Box::new(ty));
+        }
+        Ok(ty)
+    }
+    fn fields(&mut self) -> Result<Vec<Field>, Fault> {
+        self.expect("(")?;
+        self.newlines();
+        let mut fields: Vec<Field> = Vec::new();
+        if !self.at(")") {
+            loop {
+                let name = self.name()?;
+                if fields.iter().any(|field| field.name.text == name.text) {
+                    return Err(name.error("duplicate parameter or field"));
+                }
+                self.expect(":")?;
+                let ty = self.ty()?;
+                if fields.len() >= 1024 {
+                    return Err(name.error("parameter/field limit exceeded"));
+                }
+                fields.push(Field { name, ty });
+                self.newlines();
+                if !self.eat(",") {
+                    break;
+                }
+                self.newlines();
+            }
+        }
+        self.expect(")")?;
+        Ok(fields)
+    }
+    fn source(&mut self) -> Result<Source, Fault> {
+        let mut source = Source {
+            records: Vec::new(),
+            functions: Vec::new(),
+            console_import: false,
+        };
+        self.lines();
+        while !self.at("") {
+            if self.eat("import") {
+                for word in ["System", ".", "Console", ".", "*"] {
+                    self.expect(word)?;
+                }
+                source.console_import = true;
+                self.end_statement()?;
+            } else if self.eat("record") {
+                let name = self.name()?;
+                let fields = self.fields()?;
+                source.records.push(Record { name, fields });
+                self.end_statement()?;
+            } else if self.eat("func") {
+                let name = self.name()?;
+                let parameters = self.fields()?;
+                self.expect("->")?;
+                let returns = self.ty()?;
+                self.newlines();
+                self.expect("{")?;
+                self.lines();
+                let mut body = Vec::new();
+                while !self.at("}") && !self.at("") {
+                    body.push(self.statement()?);
+                    self.lines();
+                }
+                self.expect("}")?;
+                source.functions.push(Function {
+                    name,
+                    parameters,
+                    returns,
+                    body,
+                });
+            } else {
+                return Err(self
+                    .current()
+                    .error("expected record, func, or import System.Console.*"));
+            }
+            if source.records.len() + source.functions.len() > 1024 {
+                return Err(self.current().error("declaration limit exceeded"));
+            }
+            self.lines();
+        }
+        Ok(source)
+    }
+    fn end_statement(&mut self) -> Result<(), Fault> {
+        if self.at("}") || self.at("") {
+            return Ok(());
+        }
+        if !self.at("\n") && !self.at(";") {
+            return Err(self.current().error("expected newline or semicolon"));
+        }
+        self.lines();
+        Ok(())
+    }
+    fn statement(&mut self) -> Result<Stmt, Fault> {
+        let statement = if self.at("let") || self.at("var") {
+            let mutable = self.take().text == "var";
+            let name = self.name()?;
+            let annotation = if self.eat(":") {
+                Some(self.ty()?)
+            } else {
+                None
+            };
+            self.expect("=")?;
+            Stmt::Bind {
+                name,
+                mutable,
+                annotation,
+                value: self.expression(0)?,
+            }
+        } else if self.at("return") {
+            let at = self.take();
+            let value = if ["\n", ";", "}", ""].contains(&self.current().text.as_str()) {
+                None
+            } else {
+                Some(self.expression(0)?)
+            };
+            Stmt::Return(at, value)
+        } else {
+            let left = self.expression(0)?;
+            if self.eat("=") {
+                Stmt::Assign(left, self.expression(0)?)
+            } else {
+                Stmt::Expression(left)
+            }
+        };
+        self.end_statement()?;
+        Ok(statement)
+    }
+    fn node(&self, at: Token, kind: ExprKind, depth: usize) -> Result<Expr, Fault> {
+        if depth > 128 {
+            return Err(at.error("expression nesting limit exceeded"));
+        }
+        Ok(Expr { at, kind, depth })
+    }
+    fn expression(&mut self, minimum: u8) -> Result<Expr, Fault> {
+        if self.depth >= 128 {
+            return Err(self.current().error("expression nesting limit exceeded"));
+        }
+        self.depth += 1;
+        let result = self.expression_inner(minimum);
+        self.depth -= 1;
+        result
+    }
+    fn expression_inner(&mut self, minimum: u8) -> Result<Expr, Fault> {
+        let at = self.take();
+        let mut left = if at.text == "-"
+            && self
+                .current()
+                .text
+                .as_bytes()
+                .first()
+                .is_some_and(u8::is_ascii_digit)
+        {
+            let literal = self.take();
+            let value: i64 = literal
+                .text
+                .parse()
+                .map_err(|_| literal.error("integer literal is outside Int32 range"))?;
+            let value = i32::try_from(-value)
+                .map_err(|_| literal.error("integer literal is outside Int32 range"))?;
+            self.node(at, ExprKind::Int(value), 1)?
+        } else if ["&", "*", "-", "new"].contains(&at.text.as_str()) {
+            let operand = self.expression(30)?;
+            let depth = operand.depth + 1;
+            self.node(
+                at.clone(),
+                ExprKind::Unary(at.text.clone(), Box::new(operand)),
+                depth,
+            )?
+        } else if at.text == "(" {
+            self.newlines();
+            let value = self.expression(0)?;
+            self.newlines();
+            self.expect(")")?;
+            value
+        } else if at.text.starts_with('"') {
+            let value: String =
+                serde_json::from_str(&at.text).map_err(|_| at.error("invalid string escape"))?;
+            self.node(at, ExprKind::String(value), 1)?
+        } else if at.text.as_bytes().first().is_some_and(u8::is_ascii_digit) {
+            let value = at
+                .text
+                .parse()
+                .map_err(|_| at.error("integer literal is outside Int32 range"))?;
+            self.node(at, ExprKind::Int(value), 1)?
+        } else if at.text == "true" || at.text == "false" {
+            let value = at.text == "true";
+            self.node(at, ExprKind::Bool(value), 1)?
+        } else if crate::metadata::valid_slot_name(&at.text) {
+            self.node(at.clone(), ExprKind::Name(at.text.clone()), 1)?
+        } else {
+            return Err(at.error("expected expression"));
+        };
+        loop {
+            if self.at(".") {
+                self.take();
+                let field = self.name()?;
+                let depth = left.depth + 1;
+                left = self.node(
+                    left.at.clone(),
+                    ExprKind::Field(Box::new(left), field),
+                    depth,
+                )?;
+            } else if self.at("(") {
+                self.take();
+                self.newlines();
+                let mut arguments = Vec::new();
+                if !self.at(")") {
+                    loop {
+                        arguments.push(self.expression(0)?);
+                        self.newlines();
+                        if !self.eat(",") {
+                            break;
+                        }
+                        self.newlines();
+                    }
+                }
+                self.expect(")")?;
+                let depth = arguments
+                    .iter()
+                    .map(|arg| arg.depth)
+                    .max()
+                    .unwrap_or(0)
+                    .max(left.depth)
+                    + 1;
+                left = self.node(
+                    left.at.clone(),
+                    ExprKind::Call(Box::new(left), arguments),
+                    depth,
+                )?;
+            } else {
+                let binding = match self.current().text.as_str() {
+                    "+" | "-" => 10,
+                    "*" | "/" => 20,
+                    _ => break,
+                };
+                if binding < minimum {
+                    break;
+                }
+                let operation = self.take();
+                let right = self.expression(binding + 1)?;
+                let depth = left.depth.max(right.depth) + 1;
+                left = self.node(
+                    operation.clone(),
+                    ExprKind::Binary(operation.text, Box::new(left), Box::new(right)),
+                    depth,
+                )?;
+            }
+        }
+        Ok(left)
+    }
+}
+
+#[derive(Clone)]
+struct Binding {
+    ty: Ty,
+    mutable: bool,
+    load: String,
+    address: String,
+}
+struct Lowerer<'a> {
+    source: &'a Source,
+    function: &'a Function,
+    bindings: HashMap<String, Binding>,
+    locals: Vec<String>,
+    body: Vec<String>,
+}
+impl Lowerer<'_> {
+    fn require(&self, actual: &Ty, expected: &Ty, at: &Token) -> Result<(), Fault> {
+        if actual != expected {
+            return Err(at.error(format!("expected {}, got {}", expected.il(), actual.il())));
+        }
+        Ok(())
+    }
+    fn binding(&self, name: &str, at: &Token) -> Result<Binding, Fault> {
+        self.bindings
+            .get(name)
+            .cloned()
+            .ok_or_else(|| at.error(format!("unknown binding {name}")))
+    }
+    fn field(&self, owner: &Ty, name: &Token) -> Result<Ty, Fault> {
+        let Ty::Record(record) = owner else {
+            return Err(name.error("field access requires a record"));
+        };
+        self.source
+            .records
+            .iter()
+            .find(|definition| &definition.name.text == record)
+            .and_then(|definition| {
+                definition
+                    .fields
+                    .iter()
+                    .find(|field| field.name.text == name.text)
+            })
+            .map(|field| field.ty.clone())
+            .ok_or_else(|| name.error(format!("unknown field {}.{}", record, name.text)))
+    }
+    fn expression(&mut self, expression: &Expr) -> Result<Ty, Fault> {
+        match &expression.kind {
+            ExprKind::Int(value) => {
+                self.body.push(format!("ldc.i4 {value}"));
+                Ok(Ty::Int)
+            }
+            ExprKind::String(value) => {
+                self.body
+                    .push(format!("ldstr {}", serde_json::to_string(value).unwrap()));
+                Ok(Ty::String)
+            }
+            ExprKind::Bool(value) => {
+                self.body.push(format!("ldc.bool {value}"));
+                Ok(Ty::Bool)
+            }
+            ExprKind::Name(name) => {
+                let binding = self.binding(name, &expression.at)?;
+                self.body.push(binding.load);
+                Ok(binding.ty)
+            }
+            ExprKind::Field(value, field) => {
+                let mut owner = self.expression(value)?;
+                if let Ty::Ref(target) = owner {
+                    self.body.push(format!("ldobj {}", target.il()));
+                    owner = *target;
+                }
+                let ty = self.field(&owner, field)?;
+                self.body
+                    .push(format!("ldfld {}::{}", owner.il(), field.text));
+                Ok(ty)
+            }
+            ExprKind::Unary(operation, value) if operation == "&" => {
+                Ok(Ty::Ref(Box::new(self.place(value)?)))
+            }
+            ExprKind::Unary(operation, value) if operation == "*" => {
+                let Ty::Ref(target) = self.expression(value)? else {
+                    return Err(expression.at.error("dereference requires T&"));
+                };
+                self.body.push(format!("ldobj {}", target.il()));
+                Ok(*target)
+            }
+            ExprKind::Unary(operation, value) if operation == "new" => {
+                let ExprKind::Call(callee, _) = &value.kind else {
+                    return Err(expression.at.error("new requires record construction"));
+                };
+                let ExprKind::Name(name) = &callee.kind else {
+                    return Err(expression.at.error("new requires record construction"));
+                };
+                if !self
+                    .source
+                    .records
+                    .iter()
+                    .any(|record| &record.name.text == name)
+                {
+                    return Err(expression.at.error("new requires record construction"));
+                }
+                let ty = self.expression(value)?;
+                self.body.push("heap.new".into());
+                Ok(Ty::Ref(Box::new(ty)))
+            }
+            ExprKind::Unary(_, value) => {
+                let ty = self.expression(value)?;
+                self.require(&ty, &Ty::Int, &expression.at)?;
+                self.body.push("neg".into());
+                Ok(Ty::Int)
+            }
+            ExprKind::Binary(operation, left, right) => {
+                let ty = self.expression(left)?;
+                self.require(&ty, &Ty::Int, &left.at)?;
+                let ty = self.expression(right)?;
+                self.require(&ty, &Ty::Int, &right.at)?;
+                self.body.push(
+                    match operation.as_str() {
+                        "+" => "add",
+                        "-" => "sub",
+                        "*" => "mul",
+                        _ => "div",
+                    }
+                    .into(),
+                );
+                Ok(Ty::Int)
+            }
+            ExprKind::Call(callee, arguments) => self.call(callee, arguments),
+        }
+    }
+    fn call(&mut self, callee: &Expr, arguments: &[Expr]) -> Result<Ty, Fault> {
+        let binding = match &callee.kind {
+            ExprKind::Name(name) => Some(name),
+            ExprKind::Field(owner, _) => {
+                if let ExprKind::Name(name) = &owner.kind {
+                    Some(name)
+                } else {
+                    None
+                }
+            }
+            _ => None,
+        };
+        if binding.is_some_and(|name| self.bindings.contains_key(name)) {
+            return Err(callee
+                .at
+                .error("calling through a binding is not supported"));
+        }
+        if matches!(&callee.kind, ExprKind::Field(owner, name) if matches!(&owner.kind, ExprKind::Name(owner) if owner == "Console") && name.text == "WriteLine")
+            || matches!(&callee.kind, ExprKind::Name(name) if name == "WriteLine" && self.source.console_import)
+        {
+            if arguments.len() != 1 {
+                return Err(callee.at.error("WriteLine requires one argument"));
+            }
+            let ty = self.expression(&arguments[0])?;
+            if !matches!(ty, Ty::Int | Ty::String) {
+                return Err(callee
+                    .at
+                    .error("WriteLine supports int and string in this subset"));
+            }
+            self.body
+                .push(format!("call System.Console::WriteLine({})", ty.il()));
+            return Ok(Ty::Void);
+        }
+        let ExprKind::Name(name) = &callee.kind else {
+            return Err(callee
+                .at
+                .error("only free functions and record constructors are supported"));
+        };
+        let (parameters, returns, opcode) = if let Some(record) = self
+            .source
+            .records
+            .iter()
+            .find(|record| &record.name.text == name)
+        {
+            (
+                record.fields.clone(),
+                Ty::Record(name.clone()),
+                format!("newobj {name}"),
+            )
+        } else if let Some(function) = self
+            .source
+            .functions
+            .iter()
+            .find(|function| &function.name.text == name)
+        {
+            (
+                function.parameters.clone(),
+                function.returns.clone(),
+                format!(
+                    "call {name}({})",
+                    function
+                        .parameters
+                        .iter()
+                        .map(|field| field.ty.il())
+                        .collect::<Vec<_>>()
+                        .join(",")
+                ),
+            )
+        } else {
+            return Err(callee
+                .at
+                .error(format!("unknown function or record {name}")));
+        };
+        if parameters.len() != arguments.len() {
+            return Err(callee.at.error("argument count mismatch"));
+        }
+        for (argument, parameter) in arguments.iter().zip(parameters) {
+            let ty = self.expression(argument)?;
+            self.require(&ty, &parameter.ty, &argument.at)?;
+        }
+        self.body.push(opcode);
+        Ok(returns)
+    }
+    // Emit a managed address of an assignable source location.
+    fn place(&mut self, expression: &Expr) -> Result<Ty, Fault> {
+        match &expression.kind {
+            ExprKind::Name(name) => {
+                let binding = self.binding(name, &expression.at)?;
+                if !binding.mutable {
+                    return Err(expression.at.error(
+                        "cannot assign or take a writable address of an immutable binding",
+                    ));
+                }
+                if matches!(binding.ty, Ty::Ref(_)) {
+                    return Err(expression
+                        .at
+                        .error("nested managed addresses are not supported"));
+                }
+                self.body.push(binding.address);
+                Ok(binding.ty)
+            }
+            ExprKind::Unary(operation, value) if operation == "*" => {
+                let Ty::Ref(target) = self.expression(value)? else {
+                    return Err(expression.at.error("dereference requires T&"));
+                };
+                Ok(*target)
+            }
+            ExprKind::Field(owner, field) => {
+                let saved = self.body.len();
+                let ty = self.expression(owner)?;
+                let target = if let Ty::Ref(target) = ty {
+                    *target
+                } else {
+                    self.body.truncate(saved);
+                    self.place(owner)?
+                };
+                let field_type = self.field(&target, field)?;
+                if matches!(field_type, Ty::Ref(_)) {
+                    return Err(field.error("nested managed addresses are not supported"));
+                }
+                self.body
+                    .push(format!("ldflda {}::{}", target.il(), field.text));
+                Ok(field_type)
+            }
+            _ => Err(expression.at.error("expected an assignable location")),
+        }
+    }
+    fn lower(mut self) -> Result<String, Fault> {
+        for (index, parameter) in self.function.parameters.iter().enumerate() {
+            self.bindings.insert(
+                parameter.name.text.clone(),
+                Binding {
+                    ty: parameter.ty.clone(),
+                    mutable: false,
+                    load: format!("ldarg {index}"),
+                    address: format!("ldarga {index}"),
+                },
+            );
+        }
+        let mut returned = false;
+        for statement in &self.function.body {
+            if returned {
+                return Err(self
+                    .function
+                    .name
+                    .error("statements after return are not supported"));
+            }
+            match statement {
+                Stmt::Bind {
+                    name,
+                    mutable,
+                    annotation,
+                    value,
+                } => {
+                    if self.bindings.contains_key(&name.text) {
+                        return Err(name.error("duplicate binding"));
+                    }
+                    let ty = self.expression(value)?;
+                    if let Some(annotation) = annotation {
+                        self.require(&ty, annotation, name)?;
+                    }
+                    let index = self.locals.len();
+                    self.locals.push(format!(".local {}", ty.il()));
+                    self.body.push(format!("stloc {index}"));
+                    self.bindings.insert(
+                        name.text.clone(),
+                        Binding {
+                            ty,
+                            mutable: *mutable,
+                            load: format!("ldloc {index}"),
+                            address: format!("ldloca {index}"),
+                        },
+                    );
+                }
+                Stmt::Assign(left, right) => {
+                    if let ExprKind::Name(name) = &left.kind {
+                        let binding = self.binding(name, &left.at)?;
+                        if !binding.mutable {
+                            return Err(left.at.error("cannot assign an immutable binding"));
+                        }
+                        let ty = self.expression(right)?;
+                        self.require(&ty, &binding.ty, &right.at)?;
+                        self.body.push(binding.load.replacen("ldloc", "stloc", 1));
+                    } else {
+                        let expected = self.place(left)?;
+                        let actual = self.expression(right)?;
+                        self.require(&actual, &expected, &right.at)?;
+                        self.body.push(format!("stobj {}", expected.il()));
+                    }
+                }
+                Stmt::Return(at, value) => {
+                    let ty = if let Some(value) = value {
+                        self.expression(value)?
+                    } else {
+                        self.body.push("ldvoid".into());
+                        Ty::Void
+                    };
+                    self.require(&ty, &self.function.returns, at)?;
+                    self.body.push("ret".into());
+                    returned = true;
+                }
+                Stmt::Expression(expression) => {
+                    self.expression(expression)?;
+                    self.body.push("pop".into());
+                }
+            }
+        }
+        if !returned {
+            if self.function.returns != Ty::Void {
+                return Err(self
+                    .function
+                    .name
+                    .error("function requires an explicit return"));
+            }
+            self.body.extend(["ldvoid".into(), "ret".into()]);
+        }
+        Ok(format!(
+            ".function {}({}) -> {}\n{}\n{}\n.end\n",
+            self.function.name.text,
+            self.function
+                .parameters
+                .iter()
+                .map(|field| field.ty.il())
+                .collect::<Vec<_>>()
+                .join(","),
+            self.function.returns.il(),
+            self.locals.join("\n"),
+            self.body.join("\n")
+        ))
+    }
+}
+
+/// Lower a Neo source program to inspectable neoIL.
+pub fn lower_to_il(source: &str) -> Result<String, Fault> {
+    let tokens = lex(source)?;
+    let source = Parser {
+        tokens,
+        position: 0,
+        depth: 0,
+    }
+    .source()?;
+    let mut names = HashMap::new();
+    for name in source
+        .records
+        .iter()
+        .map(|record| &record.name)
+        .chain(source.functions.iter().map(|function| &function.name))
+    {
+        if names.insert(name.text.clone(), ()).is_some()
+            || [
+                "int",
+                "Int32",
+                "String",
+                "string",
+                "bool",
+                "Boolean",
+                "Void",
+                "unit",
+                "Console",
+                "WriteLine",
+            ]
+            .contains(&name.text.as_str())
+        {
+            return Err(name.error("duplicate or reserved declaration name"));
+        }
+    }
+    let main = source
+        .functions
+        .iter()
+        .find(|function| function.name.text == "Main")
+        .ok_or_else(|| Fault::new("source requires func Main()"))?;
+    if !main.parameters.is_empty() {
+        return Err(main.name.error("Main must be parameterless"));
+    }
+    let mut il = String::from(".module SourceProgram\n.entry Main\n");
+    for record in &source.records {
+        il.push_str(&format!(".type {}\n", record.name.text));
+        for field in &record.fields {
+            il.push_str(&format!(".field {} {}\n", field.name.text, field.ty.il()));
+        }
+        il.push_str(".end\n");
+    }
+    for function in &source.functions {
+        il.push_str(
+            &Lowerer {
+                source: &source,
+                function,
+                bindings: HashMap::new(),
+                locals: Vec::new(),
+                body: Vec::new(),
+            }
+            .lower()?,
+        );
+    }
+    Ok(il)
+}
+
+/// Compile through the existing assembler and verifier; execution still enforces
+/// reference provenance and runtime limits independently.
+pub fn compile(source: &str) -> Result<Module, Fault> {
+    let module = crate::assemble(&lower_to_il(source)?)?;
+    crate::LoadedProgram::new(&module)?.verify()?;
+    Ok(module)
+}
