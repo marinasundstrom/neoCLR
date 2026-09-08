@@ -6,6 +6,7 @@ mod clock;
 mod console;
 pub mod debugger;
 mod execution;
+mod path;
 pub use console::{Console, StdioConsole};
 mod delegates;
 pub mod frontend;

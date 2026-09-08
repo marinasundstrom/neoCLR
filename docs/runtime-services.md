@@ -29,6 +29,7 @@ Duplicate entries in the supplied service set have no additional effect.
 
 | Service | Direct uses |
 | --- | --- |
+| PathOperations | Host-platform lexical path combination and filename extraction |
 | ProcessEnvironment | Guest arguments and host current-directory/variable reads; arguments also require ManagedArrays and erased results require ValueStorage |
 | LocalClock | Host local clock reading; its owned component array also requires ManagedArrays |
 | SlotReferences | ldloca/ldarga and the managed-reference operand path of ldflda/ldobj/stobj/initobj |

@@ -8,6 +8,8 @@ pub(crate) enum Binding {
     EnvironmentArguments,
     EnvironmentCurrentDirectory,
     EnvironmentVariable,
+    PathCombine,
+    PathGetFileName,
     LocalClock,
     Math(crate::math::Operation),
     Reflection(crate::reflection::Query),
@@ -63,6 +65,12 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         }
         ("neoCLR.Runtime.EnvironmentVariable", [Type::String]) => {
             (Binding::EnvironmentVariable, Type::Value)
+        }
+        ("neoCLR.Runtime.PathCombine", [Type::String, Type::String]) => {
+            (Binding::PathCombine, Type::String)
+        }
+        ("neoCLR.Runtime.PathGetFileName", [Type::String]) => {
+            (Binding::PathGetFileName, Type::String)
         }
         ("neoCLR.Runtime.LocalClock", []) => {
             (Binding::LocalClock, Type::Array(Box::new(Type::Int32)))
@@ -171,6 +179,12 @@ impl Binding {
                     }
                 };
                 Ok(Value::Erased(Box::new(payload)))
+            }
+            (Self::PathCombine, [Value::String(left), Value::String(right)]) => {
+                Ok(Value::String(crate::path::combine(left, right)))
+            }
+            (Self::PathGetFileName, [Value::String(path)]) => {
+                Ok(Value::String(crate::path::file_name(path)))
             }
             (Self::LocalClock, []) => crate::clock::read_local(),
             (Self::TypeName, [Value::RuntimeTypeHandle(handle)]) => {

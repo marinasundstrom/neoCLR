@@ -10,6 +10,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 #### Added
 
+- Added System.IO.Path.Combine and GetFileName with host-platform lexical behavior,
+  following .NET empty/rooted/trailing-separator contracts. Added PathOperations
+  service reporting, artifact tests and documented Windows validation limits.
+
 - Added a read-only System.Environment subset: per-execution guest arguments,
   Result-based current-directory reads and Result/Option-based variable lookup.
   CLI run/debug forward arguments after `--`, with the guest input path first.

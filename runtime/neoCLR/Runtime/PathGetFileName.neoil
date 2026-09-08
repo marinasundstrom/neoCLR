@@ -1,0 +1,3 @@
+.function neoCLR.Runtime.PathGetFileName(String path) -> String
+.methodimpl InternalCall
+.end

@@ -1,0 +1,13 @@
+.type System.IO.Path
+    .method static Combine(String left, String right) -> String
+        ldarg left
+        ldarg right
+        call neoCLR.Runtime.PathCombine(String,String)
+        ret
+    .end
+    .method static GetFileName(String path) -> String
+        ldarg path
+        call neoCLR.Runtime.PathGetFileName(String)
+        ret
+    .end
+.end

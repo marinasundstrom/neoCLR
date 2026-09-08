@@ -19,6 +19,7 @@ pub enum RuntimeService {
     MathOperations,
     LocalClock,
     ProcessEnvironment,
+    PathOperations,
     ErrorValues,
     FileInput,
     ConsoleInput,
@@ -56,6 +57,9 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             crate::native::Binding::EnvironmentArguments
             | crate::native::Binding::EnvironmentCurrentDirectory
             | crate::native::Binding::EnvironmentVariable => RuntimeService::ProcessEnvironment,
+            crate::native::Binding::PathCombine | crate::native::Binding::PathGetFileName => {
+                RuntimeService::PathOperations
+            }
             crate::native::Binding::LocalClock => RuntimeService::LocalClock,
             crate::native::Binding::Math(_) => RuntimeService::MathOperations,
             crate::native::Binding::Reflection(_)

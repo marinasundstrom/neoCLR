@@ -80,3 +80,6 @@
 .include "neoCLR/Runtime/EnvironmentArguments.neoil"
 .include "neoCLR/Runtime/EnvironmentCurrentDirectory.neoil"
 .include "neoCLR/Runtime/EnvironmentVariable.neoil"
+.include "System/IO/Path.neoil"
+.include "neoCLR/Runtime/PathCombine.neoil"
+.include "neoCLR/Runtime/PathGetFileName.neoil"
