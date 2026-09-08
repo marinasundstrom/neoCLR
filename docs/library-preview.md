@@ -195,3 +195,9 @@ next bounded exploration in this pass.
 Character classification and [fundamental Math operations](math.md) now expand the
 text/numeric foundation with Neo samples. The Math subset covers Int32 helpers and
 core Double operations; it does not imply full overload, decimal or MathF coverage.
+
+For subsequent library coverage, the [date/time plan](date-time-design.md) begins
+with separate date-only and time-of-day values, following the structure of .NET's
+DateOnly/TimeOnly. Resolve representation and invariant protection before building
+factories and parsing; durations, clocks and timezone mapping follow independently.
+This is planned API structure, not part of the implemented Math/Char milestone.

@@ -10,6 +10,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 #### Added
 
+- Planned separate Date and Time value APIs against .NET DateOnly/TimeOnly, with
+  durations and timeline instants kept distinct. Recorded projected slices and open
+  naming, precision, default/construction invariant, arithmetic and timezone choices.
+  This documents direction only; date/time APIs are not implemented yet.
+
 - Added Math.Min/Max/Sign for Int32, typed Result-based Clamp with InvalidRangeError,
   and Double Abs/Min/Max/Sqrt/Pow/Floor/Ceiling/Truncate/Round/Exp/Log/Log10/Sin/Cos/Tan.
   Preserved .NET ties-to-even rounding, NaN propagation and signed-zero ordering;

@@ -471,3 +471,13 @@ Next explore comparer-driven algorithms and managed-array adapters, followed by 
 foreach lowering once cleanup on early exit and faults has a runtime/language contract.
 Compare each with .NET ordering and enumeration behavior, including mutation policy,
 allocation costs and disposal. String collation and generic variance remain separate.
+
+## Date and time foundation (planned)
+
+Follow the [date/time API direction](date-time-design.md): start with separate
+value-default Date and Time concepts, comparing .NET DateOnly and TimeOnly, then
+explore durations, instants and explicit clock services. Naming, precision, ranges
+and construction/default invariants need validation before implementation. Offset
+and timezone mapping are later capabilities; a time of day is not an elapsed duration.
+The initial slice should provide validated construction, comparison and exact
+parse/format behavior without requiring a complete timezone or calendar framework.
