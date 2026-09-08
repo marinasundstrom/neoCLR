@@ -1,4 +1,4 @@
-//! Preliminary aggregate inheritance: complete values, no base-reference views yet.
+//! Record ancestry, field layout and managed-receiver dispatch contracts.
 use crate::{
     Fault, Module,
     metadata::{Field, Representation, Type},
@@ -90,6 +90,18 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
         if definition.base.is_none() {
             continue;
         }
+        if module.functions.iter().any(|f| {
+            f.name.ends_with("..ctor")
+                && !f.receiver_byref
+                && f.owner
+                    .as_ref()
+                    .and_then(|t| module.type_definition(t))
+                    .is_some_and(|d| std::ptr::eq(d, definition))
+        }) {
+            return Err(Fault::new(
+                "derived constructors require managed byref receivers",
+            ));
+        }
         let chain = lineage(module, &definition.open_type())?;
         fields(module, &definition.open_type())?;
         for base in chain.iter().skip(1) {
@@ -97,7 +109,7 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             if !parent.implements.is_empty()
                 || module.functions.iter().any(|f| {
                     f.instance
-                        && (f.name.ends_with("..ctor") || !f.receiver_byref)
+                        && !f.receiver_byref
                         && f.owner
                             .as_ref()
                             .and_then(|t| module.type_definition(t))
@@ -105,7 +117,7 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
                 })
             {
                 return Err(Fault::new(
-                    "base constructors, value receivers and inherited interface implementations are not supported yet",
+                    "base value receivers and inherited interface implementations are not supported yet",
                 ));
             }
         }

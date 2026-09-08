@@ -10,6 +10,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 #### Added
 
+- Managed constructor chaining using byref .ctor receivers, call/newobj and Neo
+  init declarations with explicit base initializers. One unpublished owner retains
+  inherited and own fields; verifier/runtime checks enforce initialization, base
+  completion and restricted receiver access. Added direct managed stfld writes,
+  including reference fields, GC roots and debugger inspection of construction
+  storage, examples, regression tests and a .NET comparison. Managed stfld produces
+  Void; value-form stfld remains a record update. Old root value constructors remain
+  supported; derived constructors require managed receivers. New constructor/field
+  operands need this runtime revision. Reflection hierarchy migration remains next.
+
 - Inherited managed-receiver methods, class virtual/override dispatch and abstract
   records/methods in Neo and IL. Base views select implementations using the complete
   concrete owner; readonly/output/return contracts are validated and abstract values

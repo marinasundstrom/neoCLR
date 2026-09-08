@@ -1,0 +1,22 @@
+abstract record Counter(Value: int) {
+    init(value: int) {
+        this.Value = value
+    }
+    readonly abstract func Read() -> int
+}
+
+record OffsetCounter(Offset: int): Counter {
+    init(value: int, offset: int): base(value) {
+        this.Offset = offset
+    }
+    readonly override func Read() -> int {
+        return this.Value + this.Offset
+    }
+}
+
+func Main() -> int {
+    let local = OffsetCounter(19, 1)
+    let view: readonly Counter& = &local
+    let heap: Counter& = new OffsetCounter(20, 2)
+    return view.Read() + heap.Read()
+}

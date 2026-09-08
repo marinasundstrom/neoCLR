@@ -333,3 +333,42 @@ fn snapshots_bound_large_payloads_and_do_not_follow_heap_cycles() {
     assert!(done.heap[0].1.truncated);
     worker.join().unwrap();
 }
+
+#[test]
+fn constructor_frames_show_shared_unpublished_storage() {
+    let module = frontend::compile_named(
+        include_str!("../examples/source/constructor-chaining.neo"),
+        "constructor-chaining.neo",
+    )
+    .unwrap();
+    let (debugger, worker) = launch(module, Limits::default());
+    debugger
+        .command(DebugCommand::Break(Breakpoint::Instruction {
+            function: "Counter..ctor".into(),
+            instruction: 0,
+        }))
+        .unwrap();
+    let stopped = act(&debugger, DebugCommand::Continue);
+    assert_eq!(stopped.frames[0].function, "Counter..ctor");
+    assert!(
+        stopped.frames[0].arguments[0]
+            .1
+            .value
+            .contains(".construction")
+    );
+    let storage = stopped
+        .frames
+        .iter()
+        .flat_map(|f| &f.locals)
+        .find(|(name, _)| name == "<construction storage>")
+        .unwrap();
+    assert!(
+        storage
+            .1
+            .children
+            .iter()
+            .any(|(_, value)| value.value.contains("Uninitialized"))
+    );
+    debugger.command(DebugCommand::Stop).unwrap();
+    worker.join().unwrap();
+}

@@ -149,12 +149,19 @@ pub(crate) fn resolve_constructor(
     module: &Module,
     target: &FunctionRef,
 ) -> Result<crate::metadata::Function, Fault> {
+    let function = resolve_constructor_body(module, target)?;
+    crate::inheritance::require_concrete(module, target.owner.as_ref().unwrap())?;
+    Ok(function)
+}
+pub(crate) fn resolve_constructor_body(
+    module: &Module,
+    target: &FunctionRef,
+) -> Result<crate::metadata::Function, Fault> {
     let function = resolve(module, target)?;
     let owner = target
         .owner
         .as_ref()
         .ok_or_else(|| Fault::new("constructor requires an explicit owner"))?;
-    crate::inheritance::require_concrete(module, owner)?;
     let name = match owner {
         Type::Constructed { definition, .. } => definition.as_str(),
         _ => owner
@@ -458,14 +465,12 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             ));
         }
         if function.receiver_byref
-            && (!function.instance
-                || function.name.ends_with(".ctor")
-                || function.is_internal_call()
-                || function.pinvoke.is_some())
+            && (!function.instance || function.is_internal_call() || function.pinvoke.is_some())
         {
-            return Err(Fault::new(
-                "byref receiver requires a non-constructor IL instance method",
-            ));
+            return Err(Fault::new("byref receiver requires an IL instance method"));
+        }
+        if function.receiver_readonly && function.name.ends_with("..ctor") {
+            return Err(Fault::new("constructor receiver must be writable"));
         }
         if function.receiver_readonly && !function.receiver_byref {
             return Err(Fault::new("readonly receiver requires a byref receiver"));
@@ -884,7 +889,7 @@ fn restrict_reference_arguments(
     function: &crate::metadata::Function,
     args: &mut [Value],
 ) -> Result<(), Fault> {
-    let offset = usize::from(function.instance);
+    let offset = args.len().saturating_sub(function.parameters.len());
     for (index, value) in args.iter_mut().enumerate() {
         let reference = match value {
             Value::SlotReference(reference)
@@ -917,6 +922,9 @@ struct Frame {
     trace_pc: usize,
     args: Vec<crate::slots::Cell>,
     constructing: bool,
+    construction_receiver: Option<crate::SlotReference>,
+    construction_storage: Option<crate::slots::Cell>,
+    constructor_chained: bool,
     locals: Vec<crate::slots::Cell>,
     stack: Vec<Value>,
     allocations: Vec<crate::memory::Pointer>,
@@ -927,6 +935,14 @@ impl Frame {
     fn new(function: crate::metadata::Function, mut args: Vec<Value>) -> Result<Self, Fault> {
         if function.is_abstract {
             return Err(Fault::new("cannot invoke an abstract method body"));
+        }
+        if function.receiver_byref
+            && function.name.ends_with("..ctor")
+            && args.len() != function.parameters.len()
+        {
+            return Err(Fault::new(
+                "managed constructor requires newobj or constructor chaining",
+            ));
         }
         restrict_reference_arguments(&function, &mut args)?;
         let offset = args.len().saturating_sub(function.parameters.len());
@@ -972,6 +988,9 @@ impl Frame {
                 .map(|v| crate::slots::Slot::new(v.ty(), Some(v)))
                 .collect(),
             constructing: false,
+            construction_receiver: None,
+            construction_storage: None,
+            constructor_chained: false,
             locals,
             stack: vec![],
             allocations: vec![],
@@ -988,6 +1007,7 @@ impl Frame {
             .args
             .iter()
             .chain(&self.locals)
+            .chain(self.construction_storage.iter())
             .any(|cell| reference.addresses(cell))
         {
             return Err(Fault::new(
@@ -1202,7 +1222,12 @@ fn interpret_instructions(
             let check = |frames: &[Frame], heap: &crate::ManagedHeap| -> Result<(), Fault> {
                 let mut usage = crate::arrays::Usage::default();
                 for frame in frames {
-                    for cell in frame.args.iter().chain(&frame.locals) {
+                    for cell in frame
+                        .args
+                        .iter()
+                        .chain(&frame.locals)
+                        .chain(frame.construction_storage.iter())
+                    {
                         cell.borrow().array_usage(&mut usage, &limits)?;
                     }
                     for value in &frame.stack {
@@ -1214,7 +1239,12 @@ fn interpret_instructions(
             if check(frames, heap).is_err() {
                 let mut roots = vec![];
                 for frame in frames.iter() {
-                    for cell in frame.args.iter().chain(&frame.locals) {
+                    for cell in frame
+                        .args
+                        .iter()
+                        .chain(&frame.locals)
+                        .chain(frame.construction_storage.iter())
+                    {
                         cell.borrow().trace_heap(&mut roots);
                     }
                     for value in &frame.stack {
@@ -1256,7 +1286,12 @@ fn interpret_instructions(
         {
             let mut roots = vec![];
             for frame in frames.iter() {
-                for cell in frame.args.iter().chain(&frame.locals) {
+                for cell in frame
+                    .args
+                    .iter()
+                    .chain(&frame.locals)
+                    .chain(frame.construction_storage.iter())
+                {
                     cell.borrow().trace_heap(&mut roots);
                 }
                 for value in &frame.stack {
@@ -1318,7 +1353,11 @@ fn interpret_instructions(
                 }
                 Op::Arg(i) => frame.stack.push(frame.args[*i].borrow().get()?.on_stack()),
                 Op::StoreArg(i) => {
+                    if *i == 0 && frame.construction_receiver.is_some() {
+                        return Err(Fault::new("cannot replace a constructor receiver"));
+                    }
                     let value = frame.pop()?;
+                    assigned_reference(&value)?;
                     frame.args[*i].borrow_mut().set(value)?;
                 }
                 Op::Load(i) => frame
@@ -1678,23 +1717,45 @@ fn interpret_instructions(
                     if frames.len() >= limits.frames {
                         return Err(Fault::new("frame limit exceeded"));
                     }
-                    let empty = module.instantiated_fields(&owner)?.is_empty();
+                    let byref = callee.receiver_byref;
+                    let definitions = module.instantiated_fields(&owner)?;
                     let mut child = Frame::new(callee, args)?;
-                    child.constructing = true;
-                    child.args.insert(
-                        0,
-                        crate::slots::Slot::new(
+                    if byref {
+                        let storage = crate::slots::Slot::construction(
                             owner.clone(),
-                            if empty {
-                                Some(Value::Object {
-                                    ty: owner,
-                                    fields: vec![],
-                                })
-                            } else {
-                                None
-                            },
-                        ),
-                    );
+                            definitions
+                                .iter()
+                                .map(|f| Value::Uninitialized(f.ty.clone()))
+                                .collect(),
+                        );
+                        let receiver =
+                            crate::SlotReference::new(&storage).constructor_view(module, &owner)?;
+                        child.args.insert(
+                            0,
+                            crate::slots::Slot::new(
+                                Type::ByRef(Box::new(owner)),
+                                Some(Value::SlotReference(receiver.clone())),
+                            ),
+                        );
+                        child.construction_receiver = Some(receiver);
+                        child.construction_storage = Some(storage);
+                    } else {
+                        child.constructing = true;
+                        child.args.insert(
+                            0,
+                            crate::slots::Slot::new(
+                                owner.clone(),
+                                if definitions.is_empty() {
+                                    Some(Value::Object {
+                                        ty: owner,
+                                        fields: vec![],
+                                    })
+                                } else {
+                                    None
+                                },
+                            ),
+                        );
+                    }
                     frames.push(child);
                 }
                 Op::Call(target) => {
@@ -1707,6 +1768,59 @@ fn interpret_instructions(
                         check_type(ty, module)?;
                         Ok(ty.clone())
                     })?;
+                    if callee.receiver_byref && callee.name.ends_with("..ctor") {
+                        resolve_constructor_body(module, target)?;
+                        let current = frame.construction_receiver.clone().ok_or_else(|| {
+                            Fault::new("constructor call requires an active constructor receiver")
+                        })?;
+                        let owner = callee.owner.clone().unwrap();
+                        let same = function.owner.as_ref() == Some(&owner);
+                        let direct_base =
+                            crate::inheritance::base(module, function.owner.as_ref().unwrap())?
+                                .as_ref()
+                                == Some(&owner);
+                        if (!same && !direct_base)
+                            || frame.constructor_chained
+                            || current.constructor_completed(&owner)?
+                        {
+                            return Err(Fault::new(
+                                "constructor must chain once to this type or its direct base",
+                            ));
+                        }
+                        let args = frame.args(&callee.parameters)?;
+                        let Value::SlotReference(supplied) = frame.pop()? else {
+                            return Err(Fault::new("constructor chain requires its own receiver"));
+                        };
+                        if !current.same_location(&supplied) || supplied.is_readonly() {
+                            return Err(Fault::new(
+                                "constructor chain requires its own writable receiver",
+                            ));
+                        }
+                        let receiver = current.constructor_view(module, &owner)?;
+                        frame.constructor_chained = true;
+                        if frames.len() >= limits.frames {
+                            return Err(Fault::new("frame limit exceeded"));
+                        }
+                        if frames.iter().any(|f| {
+                            f.construction_receiver
+                                .as_ref()
+                                .is_some_and(|r| r.same_location(&receiver))
+                                && f.function.definition == callee.definition
+                        }) {
+                            return Err(Fault::new("cyclic constructor delegation"));
+                        }
+                        let mut child = Frame::new(callee, args)?;
+                        child.args.insert(
+                            0,
+                            crate::slots::Slot::new(
+                                Type::ByRef(Box::new(owner.clone())),
+                                Some(Value::SlotReference(receiver.clone())),
+                            ),
+                        );
+                        child.construction_receiver = Some(receiver);
+                        frames.push(child);
+                        return Ok(None);
+                    }
                     let mut args = frame.args(&callee.argument_types())?;
                     restrict_reference_arguments(&callee, &mut args)?;
                     if callee.pinvoke.is_some() {
@@ -1752,6 +1866,16 @@ fn interpret_instructions(
                     if !frame.stack.is_empty() {
                         return Err(Fault::new("ret requires exactly one value"));
                     }
+                    let value = if let Some(receiver) = &frame.construction_receiver {
+                        receiver.complete_constructor()?;
+                        if let Some(storage) = &frame.construction_storage {
+                            storage.borrow_mut().publish()?
+                        } else {
+                            value
+                        }
+                    } else {
+                        value
+                    };
                     let value = if frame.constructing {
                         frame.args[0].borrow().get().map_err(|_| {
                             Fault::new("constructor returned without initializing its receiver")
@@ -1883,8 +2007,23 @@ fn interpret_instructions(
                 }
                 Op::SetField(i) => {
                     let value = frame.pop()?;
-                    let Value::Object { ty, mut fields } = frame.pop()? else {
-                        return Err(Fault::new("stfld requires object value"));
+                    let receiver = frame.pop()?;
+                    if let Value::SlotReference(reference) = receiver {
+                        crate::access::check_field(module, &function, reference.target(), *i)?;
+                        let fields = module.instantiated_fields(reference.target())?;
+                        let target = fields
+                            .get(*i)
+                            .ok_or_else(|| Fault::new("field index out of range"))?
+                            .ty
+                            .clone();
+                        reference.write_field(*i, target, value)?;
+                        frame.stack.push(Value::Void);
+                        return Ok(None);
+                    }
+                    let Value::Object { ty, mut fields } = receiver else {
+                        return Err(Fault::new(
+                            "stfld requires a record value or managed reference",
+                        ));
                     };
                     crate::access::check_field(module, &function, &ty, *i)?;
                     let field = fields
@@ -2265,6 +2404,12 @@ fn debug_value(
                                     .find(|(_, c)| reference.addresses(c))
                                     .map(|(i, _)| format!("frame#{frame}.local#{i}"))
                             })
+                            .or_else(|| {
+                                f.construction_storage
+                                    .as_ref()
+                                    .filter(|cell| reference.addresses(cell))
+                                    .map(|_| format!("frame#{frame}.construction"))
+                            })
                     })
                     .unwrap_or_else(|| "expired frame".into())
             };
@@ -2354,7 +2499,7 @@ fn debug_snapshot(
                 (name, slot(cell, &mut budget))
             })
             .collect();
-        let locals = frame
+        let mut locals: Vec<_> = frame
             .locals
             .iter()
             .enumerate()
@@ -2374,6 +2519,9 @@ fn debug_snapshot(
                 )
             })
             .collect();
+        if let Some(storage) = &frame.construction_storage {
+            locals.push(("<construction storage>".into(), slot(storage, &mut budget)));
+        }
         snapshot.frames.push(crate::debugger::DebugFrame {
             index,
             function: frame.function.name.clone(),

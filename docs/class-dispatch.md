@@ -60,8 +60,8 @@ by aggregate construction, constructor allocation, initobj, defaulted array elem
 native layout or owned host input. Derived aggregate construction still initializes
 all inherited fields. An abstract type without abstract methods is also non-instantiable.
 
-Base constructors and inherited value-receiver methods remain restricted pending
-constructor chaining and its publication rules. Inheriting implemented interfaces
+Managed base constructors now support [constructor chaining](constructor-chaining.md)
+and publication checks. Inherited value-receiver methods remain restricted. Inheriting implemented interfaces
 through a class base is also still restricted; existing interface inheritance works
 independently. No default interface method bodies are added in this slice.
 

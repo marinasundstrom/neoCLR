@@ -8,7 +8,8 @@ remains planned.
 Status: [inherited value layout and BaseType](inherited-layout.md) are implemented
 as preliminary groundwork. [Base references](base-views.md) are now implemented;
 [virtual dispatch and abstract classes](class-dispatch.md) are implemented.
-Constructor chaining and common Object methods remain planned. The existing interface system and Equatable<T> remain
+[Constructor chaining](constructor-chaining.md) is now implemented; common Object
+methods remain planned. The existing interface system and Equatable<T> remain
 available. Heap allocation and managed references are independent of this proposal.
 
 The runtime should support types with or without a base class. There is no mandatory

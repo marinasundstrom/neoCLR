@@ -423,3 +423,6 @@ See [readonly storage and return signatures](readonly-storage.md) for implemente
 readonly T& type positions, checked boundaries and migration. Binding immutability
 remains a language feature. [Explicit nullability](nullability.md) is a planned
 signature characteristic and special state, not implemented syntax or zeroing.
+
+See [managed constructor chaining](constructor-chaining.md) for explicit init
+declarations, base initialization and the local/heap constructor example.

@@ -52,13 +52,208 @@ pub(crate) fn analyze(module: &Module) -> Result<Verification, Fault> {
             continue;
         }
         let mut report = analyze_function(module, index, function, false)?;
-        if constructors.contains(&function.definition) {
+        if function.receiver_byref && function.name.ends_with("..ctor") {
+            analyze_constructor(module, function)?;
+        }
+        if constructors.contains(&function.definition) && !function.receiver_byref {
             let construction = analyze_function(module, index, function, true)?;
             report.maximum_stack = report.maximum_stack.max(construction.maximum_stack);
         }
         functions.push(report);
     }
     Ok(Verification { functions })
+}
+
+/// Construction capabilities cannot become ordinary managed references until return.
+/// Track the receiver and its direct field addresses separately from typed-stack analysis.
+fn analyze_constructor(module: &Module, function: &Function) -> Result<(), Fault> {
+    #[derive(Clone, PartialEq, Eq)]
+    enum Origin {
+        Other,
+        Receiver,
+        Field(usize),
+    }
+    #[derive(Clone, PartialEq, Eq)]
+    struct Construction {
+        stack: Vec<Origin>,
+        fields: Vec<bool>,
+        base_done: bool,
+        may_chain: bool,
+    }
+    let owner = function.owner.as_ref().unwrap();
+    let base = crate::inheritance::base(module, owner)?;
+    let start = base
+        .as_ref()
+        .map(|t| crate::inheritance::fields(module, t).map(|f| f.len()))
+        .transpose()?
+        .unwrap_or(0);
+    let count = crate::inheritance::fields(module, owner)?.len();
+    let arity = module
+        .type_definition(owner)
+        .unwrap()
+        .generic_parameters
+        .len();
+    let fault = |pc, message: &str| Fault {
+        message: format!("verification: {message}"),
+        function: Some(function.name.clone()),
+        instruction: Some(pc),
+        stack_trace: None,
+    };
+    let mut states = vec![None; function.body.len()];
+    states[0] = Some(Construction {
+        stack: vec![],
+        fields: vec![false; count],
+        base_done: base.is_none(),
+        may_chain: false,
+    });
+    let mut queue = VecDeque::from([0]);
+    while let Some(pc) = queue.pop_front() {
+        let mut state = states[pc].clone().unwrap();
+        let op = &function.body[pc];
+        let (pops, pushes) = effect(module, op, arity)?;
+        let inputs = state.stack.split_off(state.stack.len() - pops);
+        let mut outputs = vec![Origin::Other; pushes];
+        match op {
+            Op::Arg(0) => outputs[0] = Origin::Receiver,
+            Op::StoreArg(0) | Op::ArgumentAddress(0) => {
+                return Err(fault(
+                    pc,
+                    "cannot replace or address constructor receiver binding",
+                ));
+            }
+            Op::Dup => outputs = vec![inputs[0].clone(); 2],
+            Op::Pop => (),
+            Op::Field(index) | Op::FieldAddress(index)
+                if inputs.first() == Some(&Origin::Receiver) =>
+            {
+                if !state.base_done {
+                    return Err(fault(
+                        pc,
+                        "base constructor must complete before field access",
+                    ));
+                }
+                if matches!(op, Op::Field(_)) {
+                    if !state.fields[*index] {
+                        return Err(fault(
+                            pc,
+                            "constructor field is not initialized on every path",
+                        ));
+                    }
+                } else {
+                    if *index < start {
+                        return Err(fault(pc, "constructor can address only its own fields"));
+                    }
+                    outputs[0] = Origin::Field(*index);
+                }
+            }
+            Op::SetField(index) if inputs.first() == Some(&Origin::Receiver) => {
+                if !state.base_done || *index < start {
+                    return Err(fault(
+                        pc,
+                        "constructor must complete base before writing own fields",
+                    ));
+                }
+                if inputs[1] != Origin::Other {
+                    return Err(fault(pc, "construction capability cannot be stored"));
+                }
+                state.fields[*index] = true;
+            }
+            Op::StoreObject(_) | Op::InitializeObject(_)
+                if matches!(inputs.first(), Some(Origin::Field(_))) =>
+            {
+                if inputs.iter().skip(1).any(|v| *v != Origin::Other) {
+                    return Err(fault(pc, "construction capability cannot be stored"));
+                }
+                let Origin::Field(index) = inputs[0] else {
+                    unreachable!()
+                };
+                state.fields[index] = true;
+            }
+            Op::Call(target)
+                if target.name.ends_with("..ctor")
+                    && crate::vm::resolve(module, target)?.receiver_byref =>
+            {
+                if state.may_chain {
+                    return Err(fault(pc, "constructor may chain only once"));
+                }
+                if inputs.first() != Some(&Origin::Receiver)
+                    || inputs.iter().skip(1).any(|v| *v != Origin::Other)
+                {
+                    return Err(fault(
+                        pc,
+                        "constructor chain requires its own receiver and initialized arguments",
+                    ));
+                }
+                state.may_chain = true;
+                state.base_done = true;
+                let initialized = if target.owner.as_ref() == Some(owner) {
+                    count
+                } else {
+                    start
+                };
+                state.fields[..initialized].fill(true);
+            }
+            Op::Return if !state.base_done || state.fields.iter().any(|v| !v) => {
+                return Err(fault(
+                    pc,
+                    "constructor must initialize its base and all own fields on every return",
+                ));
+            }
+            _ if inputs.iter().any(|v| *v != Origin::Other) => {
+                return Err(fault(
+                    pc,
+                    "construction capability cannot escape or be used for ordinary access",
+                ));
+            }
+            _ => (),
+        }
+        state.stack.extend(outputs);
+        let successors = match op {
+            Op::Return | Op::Fault(_) => vec![],
+            Op::Branch(target) => vec![*target],
+            Op::BranchTrue(target)
+            | Op::BranchFalse(target)
+            | Op::BranchEqual(target)
+            | Op::BranchNotEqual(target)
+            | Op::BranchGreater(target)
+            | Op::BranchGreaterUnsigned(target)
+            | Op::BranchLess(target)
+            | Op::BranchLessUnsigned(target)
+            | Op::BranchGreaterEqual(target)
+            | Op::BranchGreaterEqualUnsigned(target)
+            | Op::BranchLessEqual(target)
+            | Op::BranchLessEqualUnsigned(target) => vec![*target, pc + 1],
+            Op::Switch(targets) => targets.iter().copied().chain([pc + 1]).collect(),
+            _ => vec![pc + 1],
+        };
+        for next in successors {
+            if next >= states.len() {
+                continue;
+            } // Ordinary verifier already checks control flow.
+            let changed = if let Some(previous) = &mut states[next] {
+                if previous.stack != state.stack {
+                    return Err(fault(
+                        next,
+                        "incompatible constructor capabilities at branch merge",
+                    ));
+                }
+                let old = previous.clone();
+                previous.base_done &= state.base_done;
+                previous.may_chain |= state.may_chain;
+                for (a, b) in previous.fields.iter_mut().zip(&state.fields) {
+                    *a &= b;
+                }
+                *previous != old
+            } else {
+                states[next] = Some(state.clone());
+                true
+            };
+            if changed {
+                queue.push_back(next);
+            }
+        }
+    }
+    Ok(())
 }
 
 #[derive(Clone)]
@@ -764,8 +959,30 @@ fn typed_effect(
         }
         Call(target) => {
             let callee = crate::vm::resolve(module, target)?;
-            for (value, ty) in values.iter().zip(callee.argument_types()) {
-                stored(value, &ty)?;
+            for (index, (value, ty)) in values.iter().zip(callee.argument_types()).enumerate() {
+                if index == 0 && callee.receiver_byref && callee.name.ends_with("..ctor") {
+                    require(
+                        function.receiver_byref && function.name.ends_with("..ctor"),
+                        "constructor chaining requires a managed constructor",
+                    )?;
+                    let T::ByRef(actual) = exact(value)? else {
+                        return Err(crate::Fault::new("constructor requires managed receiver"));
+                    };
+                    require(
+                        function.owner.as_ref() == Some(actual.as_ref()),
+                        "constructor must use its own receiver type",
+                    )?;
+                    let owner = callee.owner.as_ref().unwrap();
+                    require(
+                        function.owner.as_ref() == Some(owner)
+                            || crate::inheritance::base(module, function.owner.as_ref().unwrap())?
+                                .as_ref()
+                                == Some(owner),
+                        "constructor chain must target this type or direct base",
+                    )?;
+                } else {
+                    stored(value, &ty)?;
+                }
             }
             Result::Ok(vec![loaded(&callee.returns)])
         }
@@ -826,8 +1043,17 @@ fn typed_effect(
             Result::Ok(vec![loaded(&field(owner, *index)?)])
         }
         SetField(index) => {
-            stored(&values[1], &field(exact(&values[0])?, *index)?)?;
-            Result::Ok(vec![values[0].clone()])
+            if let T::ByRef(owner) = exact(&values[0])? {
+                require(
+                    !matches!(values[0], StackType::Readonly(_)),
+                    "cannot write through readonly reference",
+                )?;
+                stored(&values[1], &field(owner, *index)?)?;
+                one(T::Void)
+            } else {
+                stored(&values[1], &field(exact(&values[0])?, *index)?)?;
+                Result::Ok(vec![values[0].clone()])
+            }
         }
         FieldAddress(index) => match exact(&values[0])? {
             T::ByRef(owner) => {

@@ -228,7 +228,7 @@ normalization; other checks use exact type equality. See [integer storage](integ
 | `value.unpack T` | `System.Value → T` | Checked extraction; mismatch Faults; see [value storage](value-storage.md) |
 | `newobj instance Type::.ctor(T0, …, Tn)` | `P0,…,Pn → Type` | Invoke an IL constructor with a fresh receiver; see [constructor initialization](constructors.md). Normalized opcode: `newobj.ctor` |
 | `ldfld i` | `Record → T` | Copy field |
-| `stfld i` | `Record,T → Record` | Produce updated record value |
+| `stfld i` | `Record,T → Record` or `Record&,T → Void` | Update a value copy or assign an addressed field |
 | `sizeof T` | `→ Int32` | Byte size of supported native layout |
 | `alignof T` | `→ Int32` | Native layout alignment |
 | `localloc` | `integer → Ptr<Byte>` | Allocate uninitialized frame-local bytes; stack must otherwise be empty |
@@ -665,3 +665,6 @@ readonly, lifetime, whole-value restrictions and differences from CLR castclass.
 Record methods now support virtual, override and abstract declarations, and types
 support abstract records. Class callvirt dispatches through managed base views; see
 [class dispatch](class-dispatch.md) for syntax, validation and construction restrictions.
+
+See [managed constructor chaining](constructor-chaining.md) for byref .ctor receivers,
+base/this call validation, partial initialization and managed stfld writes.

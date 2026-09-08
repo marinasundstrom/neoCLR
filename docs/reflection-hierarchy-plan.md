@@ -3,13 +3,12 @@
 Planned follow-up to [class dispatch and abstract classes](class-dispatch.md),
 recorded 2026-09-08. Current reflection descriptors remain separate records.
 
-Constructor chaining is the next runtime slice and must land before migrating the
-reflection descriptors. Specify base-before-derived initialization, argument evaluation,
-exactly-once base construction and restrictions on publishing a partially initialized
-receiver. Compare CLR constructor calls and C# base/this initializers with neoCLR
-managed receiver views; preserve complete-owner identity and initialization checks.
+[Constructor chaining](constructor-chaining.md) is implemented as the prerequisite
+for migrating reflection descriptors. It provides base-before-derived field access,
+delegation, definite initialization and restrictions on publishing a partially
+initialized receiver.
 
-After constructor chaining, the library exercise should use a small shared MemberInfo base for the common
+The next library exercise should use a small shared MemberInfo base for the common
 name/declaring-type metadata of MethodInfo, FieldInfo and PropertyInfo. Evaluate
 MethodBase for method/constructor metadata only when constructor introspection needs
 it. ParameterInfo and Type do not need to be forced into that hierarchy simply for

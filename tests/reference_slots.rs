@@ -257,10 +257,9 @@ fn generic_reference_receivers_can_replace_non_native_payloads() {
 }
 
 #[test]
-fn receiver_modes_cannot_be_used_for_static_methods_or_constructors_or_overload_identity() {
+fn receiver_modes_cannot_be_used_for_static_methods_or_overload_identity() {
     for source in [
         ".type C\n.method static byref M() -> Void\nldvoid\nret\n.end\n.end",
-        ".type C\n.method instance byref .ctor() -> Void\nldvoid\nret\n.end\n.end",
         ".type C\n.method instance M() -> Void\nldvoid\nret\n.end\n.method instance byref M() -> Void\nldvoid\nret\n.end\n.end",
     ] {
         assert!(program(source, "ldvoid", "Void").is_err());

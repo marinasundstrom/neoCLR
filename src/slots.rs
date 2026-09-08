@@ -13,6 +13,7 @@ pub(crate) struct Slot {
     ty: Type,
     value: Option<Value>,
     writes: u64,
+    construction: Option<Vec<Type>>,
     replacements: HashMap<Vec<usize>, u64>,
 }
 pub(crate) type Cell = Rc<RefCell<Slot>>;
@@ -23,8 +24,24 @@ impl Slot {
             ty,
             value,
             writes: 0,
+            construction: None,
             replacements: HashMap::new(),
         }))
+    }
+    pub(crate) fn construction(ty: Type, fields: Vec<Value>) -> Cell {
+        let cell = Self::new(ty.clone(), Some(Value::Object { ty, fields }));
+        cell.borrow_mut().construction = Some(vec![]);
+        cell
+    }
+    pub(crate) fn publish(&mut self) -> Result<Value, Fault> {
+        let value = self.get()?;
+        if let Value::Object { fields, .. } = &value {
+            for field in fields {
+                field.initialized()?;
+            }
+        }
+        self.construction = None;
+        Ok(value)
     }
     pub(crate) fn reset(cell: &Cell) -> Result<(), Fault> {
         if Rc::strong_count(cell) != 1 {
@@ -96,6 +113,14 @@ pub struct SlotReference {
     path: Vec<usize>,
     after_write: Option<u64>,
     readonly: bool,
+    construction: Option<ConstructionView>,
+}
+#[derive(Debug, Clone)]
+struct ConstructionView {
+    owner: Type,
+    base: Option<Type>,
+    start: usize,
+    end: usize,
 }
 impl PartialEq for SlotReference {
     fn eq(&self, other: &Self) -> bool {
@@ -116,6 +141,7 @@ impl SlotReference {
             path: vec![],
             after_write: None,
             readonly: false,
+            construction: None,
         }
     }
     pub(crate) fn heap(cell: &Cell, identity: usize) -> Self {
@@ -178,8 +204,91 @@ impl SlotReference {
             Ok(())
         }
     }
+    pub(crate) fn constructor_view(
+        &self,
+        module: &crate::Module,
+        owner: &Type,
+    ) -> Result<Self, Fault> {
+        self.require_writable()?;
+        let cell = self.cell()?;
+        let slot = cell.borrow();
+        if !self.path.is_empty() || slot.construction.is_none() {
+            return Err(Fault::new(
+                "constructor requires unpublished construction storage",
+            ));
+        }
+        crate::inheritance::require_base(module, &slot.ty, owner)?;
+        let base = crate::inheritance::base(module, owner)?;
+        let start = base
+            .as_ref()
+            .map(|t| module.instantiated_fields(t).map(|f| f.len()))
+            .transpose()?
+            .unwrap_or(0);
+        let mut view = self.clone();
+        view.target = owner.clone();
+        view.construction = Some(ConstructionView {
+            owner: owner.clone(),
+            base,
+            start,
+            end: module.instantiated_fields(owner)?.len(),
+        });
+        Ok(view)
+    }
+    fn construction_fields(&self) -> Result<Option<ConstructionView>, Fault> {
+        let Some(view) = &self.construction else {
+            return Ok(None);
+        };
+        let cell = self.cell()?;
+        let slot = cell.borrow();
+        let completed = slot
+            .construction
+            .as_ref()
+            .ok_or_else(|| Fault::new("construction capability has expired"))?;
+        if view
+            .base
+            .as_ref()
+            .is_some_and(|base| !completed.contains(base))
+        {
+            return Err(Fault::new(
+                "base constructor must complete before field access",
+            ));
+        }
+        Ok(Some(view.clone()))
+    }
+    pub(crate) fn complete_constructor(&self) -> Result<(), Fault> {
+        let view = self
+            .construction_fields()?
+            .ok_or_else(|| Fault::new("missing construction capability"))?;
+        let cell = self.cell()?;
+        let mut slot = cell.borrow_mut();
+        let Some(Value::Object { fields, .. }) = &slot.value else {
+            return Err(Fault::new("missing construction storage"));
+        };
+        for field in &fields[..view.end] {
+            field.initialized()?;
+        }
+        let completed = slot.construction.as_mut().unwrap();
+        if !completed.contains(&view.owner) {
+            completed.push(view.owner);
+        }
+        Ok(())
+    }
+    pub(crate) fn constructor_completed(&self, owner: &Type) -> Result<bool, Fault> {
+        Ok(self
+            .cell()?
+            .borrow()
+            .construction
+            .as_ref()
+            .is_some_and(|done| done.contains(owner)))
+    }
     pub(crate) fn field(&self, index: usize, target: Type) -> Result<Self, Fault> {
-        self.assigned()?;
+        if let Some(view) = self.construction_fields()? {
+            if !self.path.is_empty() || index < view.start || index >= view.end {
+                return Err(Fault::new("constructor can address only its own fields"));
+            }
+        } else {
+            self.assigned()?;
+        }
         if matches!(&target, Type::ByRef(_) | Type::ReadOnlyByRef(_)) {
             return Err(Fault::new("nested managed references are not supported"));
         }
@@ -229,6 +338,11 @@ impl SlotReference {
         Ok(result)
     }
     pub(crate) fn output(&self) -> Result<Self, Fault> {
+        if self.construction.is_some() {
+            return Err(Fault::new(
+                "construction storage cannot be an output argument",
+            ));
+        }
         self.require_writable()?;
         self.require_complete_view()?;
         let mut result = self.clone();
@@ -238,6 +352,11 @@ impl SlotReference {
     pub(crate) fn assigned(&self) -> Result<(), Fault> {
         let cell = self.cell()?;
         let slot = cell.borrow();
+        if slot.construction.is_some() {
+            return Err(Fault::new(
+                "cannot publish or call through a receiver during construction",
+            ));
+        }
         if self.after_write.is_some_and(|baseline| {
             !slot
                 .replacements
@@ -289,18 +408,45 @@ impl SlotReference {
         view.target = target.clone();
         Ok(view)
     }
+    pub(crate) fn write_field(
+        &self,
+        index: usize,
+        target: Type,
+        value: Value,
+    ) -> Result<(), Fault> {
+        self.require_writable()?;
+        if let Some(view) = self.construction_fields()? {
+            if !self.path.is_empty() || index < view.start || index >= view.end {
+                return Err(Fault::new("constructor can write only its own fields"));
+            }
+        } else {
+            self.assigned()?;
+        }
+        let mut field = self.clone();
+        field.path.push(index);
+        field.target = target;
+        field.after_write = None;
+        field.write(value)
+    }
     pub(crate) fn read_field(&self, index: usize) -> Result<Value, Fault> {
-        self.assigned()?;
+        if let Some(view) = self.construction_fields()? {
+            if !self.path.is_empty() || index >= view.end {
+                return Err(Fault::new("constructor field read outside owner"));
+            }
+        } else {
+            self.assigned()?;
+        }
         let cell = self.cell()?;
         let slot = cell.borrow();
         let Value::Object { fields, .. } = at_path(slot.value.as_ref().unwrap(), &self.path)?
         else {
             return Err(Fault::new("field read requires a record"));
         };
-        fields
+        Ok(fields
             .get(index)
-            .cloned()
-            .ok_or_else(|| Fault::new("field index out of range"))
+            .ok_or_else(|| Fault::new("field index out of range"))?
+            .initialized()?
+            .clone())
     }
     pub(crate) fn read(&self) -> Result<Value, Fault> {
         self.assigned()?;
@@ -317,6 +463,14 @@ impl SlotReference {
     }
     pub(crate) fn write(&self, value: Value) -> Result<(), Fault> {
         self.require_writable()?;
+        if self.construction.is_some() {
+            self.construction_fields()?;
+            if self.path.len() != 1 {
+                return Err(Fault::new(
+                    "constructor must initialize individual own fields",
+                ));
+            }
+        }
         self.require_complete_view()?;
         if !self.path.is_empty() || self.allocation_id().is_some() {
             value.ensure_heap_references()?;

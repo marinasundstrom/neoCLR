@@ -3,7 +3,7 @@
 Implemented as preliminary groundwork. This adds a single explicit record base,
 inherited fields and BaseType reflection. [Managed base-reference views](base-views.md) are now implemented in a subsequent
 slice. [Inherited method dispatch, virtual overrides and abstract classes](class-dispatch.md)
-are also implemented; constructor chaining remains planned.
+are also implemented; [constructor chaining](constructor-chaining.md) is now implemented.
 Those remain the next object-model slice; this is not complete class inheritance.
 
 ## Metadata, storage and Neo
@@ -40,7 +40,7 @@ and all its fields. Managed allocation and references keep their existing meanin
 The GC scans inherited reference fields as part of the complete stored value.
 
 A type used as a base may now declare managed-reference instance methods, including
-virtual and abstract contracts. Base constructors, value-receiver methods and
+virtual and abstract contracts. Base value-receiver constructors/methods and
 inherited interface implementations remain restricted; see [class dispatch](class-dispatch.md).
 Derived types may declare their own methods and interfaces. Base types may declare
 static helpers. Native layout/interop for derived records is rejected pending an

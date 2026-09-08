@@ -29,8 +29,8 @@ a language responsibility; runtime-protected slots are not on the immediate trac
 base views and reflection. [Inherited value layout and BaseType](inherited-layout.md) establish the first
 record-base metadata/storage slice. [Base-reference views](base-views.md) preserve
 complete owners. [Inherited methods, virtual dispatch and abstract classes](class-dispatch.md)
-are now implemented. Constructor chaining comes next, before migrating reflection
-descriptors into a hierarchy; see the [reflection hierarchy/interface
+are now implemented. [Constructor chaining](constructor-chaining.md) now supplies the initialization
+prerequisite for migrating reflection descriptors into a hierarchy; see the [reflection hierarchy/interface
 consumer plan](reflection-hierarchy-plan.md). Activation ownership, external roots and cleanup need decisions before
 escaping callbacks or suspension.
 

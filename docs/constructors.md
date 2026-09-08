@@ -1,5 +1,9 @@
 # Constructor invocation
 
+Managed byref constructors, field initialization and base/this chaining are now
+implemented; see [constructor chaining](constructor-chaining.md). The whole-value
+subset below remains supported for root records.
+
 Record types can define overloaded instance IL constructors returning real `Void`:
 
 ```text
@@ -41,7 +45,8 @@ items. At that return boundary, construction supplies the initialized receiver t
 the caller instead of the constructor's `Void`. Fault traces and frame/instruction
 limits include the constructor normally. Reachability analysis follows its body.
 
-Only instance IL `.ctor` methods on record types are construction targets. Static,
+Only instance IL `.ctor` methods on concrete record types are allocation targets.
+Abstract base constructors can run through the managed chaining contract. Static,
 runtime-implemented and native-import methods are not supported construction targets.
 Accessibility applies to the constructor and its owner. A public constructor can
 initialize its own private fields; callers need not have direct field access.
@@ -58,8 +63,8 @@ this new operation. This prototype encoding is not a CLI binary opcode assignmen
 
 Construction creates an ordinary value and implies no heap placement, reference
 counting or ownership policy. Ordinary methods support [byref receivers](reference-slots.md),
-but construction still uses the whole-value convention above. Field-by-field
-initialization, construction into supplied storage, inheritance, and destruction remain future work
+and managed construction now supports field initialization and base chaining.
+Construction into externally supplied storage and destruction remain future work
 in the [construction proposal](construction-and-initialization.md). Recoverable
 construction failure can use an ordinary factory returning `Result`; constructor
 invocation itself does not introduce exception handling or special union operations.

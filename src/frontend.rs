@@ -210,6 +210,7 @@ struct Interface {
 }
 struct Function {
     name: Token,
+    base_initializer: Option<Vec<Expr>>,
     is_virtual: bool,
     is_override: bool,
     is_abstract: bool,
@@ -617,6 +618,7 @@ impl Parser {
         };
         Ok(Function {
             name,
+            base_initializer: None,
             is_virtual: false,
             is_override: false,
             is_abstract: false,
@@ -633,6 +635,50 @@ impl Parser {
         while !self.at("}") {
             if methods.len() >= 1024 {
                 return Err(self.current().error("method limit exceeded"));
+            }
+            if self.at("init") && !abstract_members {
+                let mut name = self.take();
+                name.text = ".ctor".into();
+                let parameters = self.fields(true)?;
+                let base_initializer = if self.eat(":") {
+                    self.expect("base")?;
+                    self.expect("(")?;
+                    self.newlines();
+                    let mut args = Vec::new();
+                    if !self.at(")") {
+                        loop {
+                            args.push(self.expression(0)?);
+                            self.newlines();
+                            if !self.eat(",") {
+                                break;
+                            }
+                            self.newlines();
+                        }
+                    }
+                    self.expect(")")?;
+                    Some(args)
+                } else {
+                    None
+                };
+                let body = self.block()?;
+                if methods.iter().any(|m| m.name.text == ".ctor") {
+                    return Err(
+                        name.error("Neo currently supports one explicit initializer per record")
+                    );
+                }
+                methods.push(Function {
+                    name,
+                    base_initializer,
+                    parameters,
+                    returns: Ty::Void,
+                    body,
+                    is_virtual: false,
+                    is_override: false,
+                    is_abstract: false,
+                    receiver_readonly: false,
+                });
+                self.lines();
+                continue;
             }
             let receiver_readonly = self.eat("readonly");
             let is_abstract = self.eat("abstract");
@@ -1901,11 +1947,26 @@ impl Lowerer<'_> {
             .iter()
             .find(|record| &record.name.text == name)
         {
-            (
-                record.fields.clone(),
-                Ty::Record(name.clone()),
-                format!("newobj {name}"),
-            )
+            if let Some(ctor) = record.methods.iter().find(|m| m.name.text == ".ctor") {
+                (
+                    ctor.parameters.clone(),
+                    Ty::Record(name.clone()),
+                    format!(
+                        "newobj instance {name}::.ctor({})",
+                        ctor.parameters
+                            .iter()
+                            .map(|f| f.ty.il())
+                            .collect::<Vec<_>>()
+                            .join(",")
+                    ),
+                )
+            } else {
+                (
+                    record.fields.clone(),
+                    Ty::Record(name.clone()),
+                    format!("newobj {name}"),
+                )
+            }
         } else if let Some(function) = self
             .source
             .functions
@@ -2361,6 +2422,19 @@ impl Lowerer<'_> {
                     );
                 }
                 Stmt::Assign(left, right) => {
+                    if self.function.name.text == ".ctor" {
+                        if let ExprKind::Field(owner, field) = &left.kind {
+                            if matches!(&owner.kind, ExprKind::Name(name) if name == "this") {
+                                let ty = Ty::Record(self.receiver.unwrap().text.clone());
+                                let expected = self.field(&ty, field)?;
+                                self.body.push("ldarg 0".into());
+                                self.expression_for(right, &expected)?;
+                                self.body.push(format!("stfld {}::{}", ty.il(), field.text));
+                                self.body.push("pop".into());
+                                continue;
+                            }
+                        }
+                    }
                     if let ExprKind::Index(owner, index) = &left.kind {
                         if self.indexer(owner, index, Some(right))?.is_some() {
                             self.body.push("pop".into());
@@ -2447,6 +2521,66 @@ impl Lowerer<'_> {
                     scoped: false,
                 },
             );
+        }
+        if self.function.name.text == ".ctor" {
+            let record = self
+                .source
+                .records
+                .iter()
+                .find(|r| Some(&r.name.text) == self.receiver.map(|t| &t.text))
+                .unwrap();
+            match (&record.base, &self.function.base_initializer) {
+                (Some(base), Some(arguments)) => {
+                    let parent = self
+                        .source
+                        .records
+                        .iter()
+                        .find(|r| r.name.text == base.il())
+                        .unwrap();
+                    let ctor = parent
+                        .methods
+                        .iter()
+                        .find(|m| m.name.text == ".ctor")
+                        .ok_or_else(|| {
+                            self.function
+                                .name
+                                .error("base requires an explicit init declaration")
+                        })?;
+                    if arguments.len() != ctor.parameters.len() {
+                        return Err(self
+                            .function
+                            .name
+                            .error("base initializer argument count mismatch"));
+                    }
+                    self.body.push("ldarg 0".into());
+                    for (argument, parameter) in arguments.iter().zip(&ctor.parameters) {
+                        self.parameter_argument(argument, parameter)?;
+                    }
+                    self.body.push(format!(
+                        "call instance {}::.ctor({})",
+                        base.il(),
+                        ctor.parameters
+                            .iter()
+                            .map(|f| f.ty.il())
+                            .collect::<Vec<_>>()
+                            .join(",")
+                    ));
+                    self.body.push("pop".into());
+                }
+                (Some(_), None) => {
+                    return Err(self
+                        .function
+                        .name
+                        .error("derived init requires an explicit base initializer"));
+                }
+                (None, Some(_)) => {
+                    return Err(self
+                        .function
+                        .name
+                        .error("base initializer requires a base record"));
+                }
+                (None, None) => (),
+            }
         }
         let returned = self.statements(&self.function.body)?;
         if !returned && !self.function.is_abstract {

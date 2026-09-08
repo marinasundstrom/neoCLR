@@ -17,7 +17,10 @@ program          = separators, { declaration, separators }, end_of_input ;
 declaration      = import_decl | record_decl | interface_decl | function_decl ;
 import_decl      = "import", "System", ".", "Console", ".", "*", terminator ;
 record_decl      = [ "abstract" ], "record", identifier, field_list, [ ":", type, { ",", type } ],
-                   (terminator | newlines, "{", separators, { [ "readonly" ], [ "abstract" ], [ "virtual" | "override" ], method_decl, separators }, "}") ;
+                   (terminator | newlines, "{", separators, { record_member, separators }, "}") ;
+record_member    = init_decl | [ "readonly" ], [ "abstract" ], [ "virtual" | "override" ], method_decl ;
+init_decl        = "init", parameter_list, [ ":", "base", "(", newlines, [ expression, { ",", newlines, expression } ], newlines, ")" ],
+                   newlines, "{", separators, { statement, separators }, "}" ;
 interface_decl   = "interface", identifier, [ ":", type, { ",", type } ], newlines, "{", separators,
                    { [ "readonly" ], "func", identifier, parameter_list, "->", type, terminator, separators }, "}" ;
 method_decl      = "func", identifier, parameter_list, "->", type,
@@ -256,3 +259,7 @@ Aggregate arguments include inherited fields first. See [inherited value layout]
 for current restrictions. [Base-reference conversions](base-views.md) are implemented;
 [Virtual/abstract methods](class-dispatch.md) are implemented; abstract methods
 require a terminator instead of a body.
+
+Explicit init declarations and base(...) initializers are implemented; see
+[constructor chaining](constructor-chaining.md) for the one-initializer source limit,
+field initialization rules and unchanged aggregate construction without init.
