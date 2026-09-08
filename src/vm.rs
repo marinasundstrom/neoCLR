@@ -1469,6 +1469,27 @@ fn interpret_instructions(
                 }
                 Op::BorrowInterface(interface) => {
                     let view = match frame.pop()? {
+                        Value::SlotInterface {
+                            interface: source,
+                            receiver,
+                        } => {
+                            crate::interfaces::ensure_implementation(module, &source, interface)?;
+                            receiver.assigned()?;
+                            Value::SlotInterface {
+                                interface: interface.clone(),
+                                receiver,
+                            }
+                        }
+                        Value::InterfaceRef {
+                            interface: source,
+                            receiver,
+                        } => {
+                            crate::interfaces::ensure_implementation(module, &source, interface)?;
+                            Value::InterfaceRef {
+                                interface: interface.clone(),
+                                receiver,
+                            }
+                        }
                         Value::SlotReference(receiver) => {
                             receiver.assigned()?;
                             crate::interfaces::ensure_implementation(

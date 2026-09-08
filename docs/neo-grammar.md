@@ -18,7 +18,7 @@ declaration      = import_decl | record_decl | interface_decl | function_decl ;
 import_decl      = "import", "System", ".", "Console", ".", "*", terminator ;
 record_decl      = "record", identifier, field_list, [ ":", type, { ",", type } ],
                    (terminator | newlines, "{", separators, { [ "readonly" ], function_decl, separators }, "}") ;
-interface_decl   = "interface", identifier, newlines, "{", separators,
+interface_decl   = "interface", identifier, [ ":", type, { ",", type } ], newlines, "{", separators,
                    { [ "readonly" ], "func", identifier, parameter_list, "->", type, terminator, separators }, "}" ;
 function_decl    = "func", identifier, parameter_list, "->", type, newlines,
                    "{", separators, { statement, separators }, "}" ;

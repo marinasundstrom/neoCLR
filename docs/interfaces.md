@@ -2,7 +2,8 @@
 
 The [library-focused next preview](library-preview.md) prioritizes shared type
 relationships, interface inheritance and class inheritance to support useful library
-contracts and their Neo projection. These inheritance capabilities remain planned.
+contracts and their Neo projection. [Interface inheritance](interface-inheritance.md) is now implemented; class inheritance
+remains planned.
 
 Neo now [declares interfaces and projects managed references](neo-interfaces.md)
 using ordinary names without an `I` prefix.
@@ -142,7 +143,7 @@ cargo run --locked -- run examples/interfaces.neoil
 
 ## Preview boundaries
 
-There is no interface inheritance, variance, default implementation, static interface
+There is no variance, default implementation, static interface
 member, method-generic slot, explicit slot mapping, automatic cast, owning interface
 reference, or native interface ABI. Implementations must be public IL instance methods;
 native work can be reached through an ordinary IL wrapper. Contracts cannot declare

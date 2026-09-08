@@ -711,7 +711,7 @@ fn typed_effect(
                     one(T::ByRef(Box::new(interface.clone())))
                 }
             }
-            T::Ptr(concrete) => {
+            T::Ptr(concrete) | T::InterfaceRef(concrete) => {
                 crate::interfaces::ensure_implementation(module, concrete, interface)?;
                 one(T::InterfaceRef(Box::new(interface.clone())))
             }

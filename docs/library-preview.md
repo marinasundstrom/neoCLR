@@ -41,7 +41,9 @@ and streams should guide these mechanisms before their public hierarchies expand
 
 ## Ordered slices
 
-1. **Shared type relationships and interface inheritance.** Specify and implement
+1. **Shared type relationships and interface inheritance.** The initial
+   [interface slice](interface-inheritance.md) is implemented; general class/base
+   relationships remain ahead. Specify and implement
    multiple base interfaces, generic substitution, transitive conformance and
    conversion between derived and base interface references. Preserve the complete
    owner, reference identity, readonly capability and lifetime through each view.

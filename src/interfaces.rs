@@ -46,19 +46,51 @@ fn arguments(ty: &Type) -> &[Type] {
     }
 }
 
+/// Transitive, substituted interface identities, with diamonds deduplicated.
+pub(crate) fn closure(module: &Module, ty: &Type) -> Result<Vec<Type>, Fault> {
+    fn visit(
+        module: &Module,
+        ty: &Type,
+        path: &mut Vec<String>,
+        result: &mut Vec<Type>,
+    ) -> Result<(), Fault> {
+        let definition = module
+            .type_definition(ty)
+            .ok_or_else(|| Fault::new("interface receiver requires a known implementing type"))?;
+        let name = ty
+            .definition_name()
+            .ok_or_else(|| Fault::new("invalid interface owner"))?
+            .to_string();
+        if path.contains(&name) || path.len() >= 256 {
+            return Err(Fault::new(
+                "cyclic or excessively deep interface inheritance",
+            ));
+        }
+        if definition.representation == Representation::Interface {
+            if result.contains(ty) {
+                return Ok(());
+            }
+            result.push(ty.clone());
+        }
+        path.push(name);
+        for base in &definition.implements {
+            let base = base.substitute_type_parameters(arguments(ty))?;
+            interface_definition(module, &base)?;
+            visit(module, &base, path, result)?;
+        }
+        path.pop();
+        Ok(())
+    }
+    let mut result = Vec::new();
+    visit(module, ty, &mut Vec::new(), &mut result)?;
+    Ok(result)
+}
+
 fn declared(module: &Module, concrete: &Type, interface: &Type) -> Result<(), Fault> {
     interface_definition(module, interface)?;
-    let definition = module
-        .type_definition(concrete)
-        .ok_or_else(|| Fault::new("interface receiver requires a known implementing type"))?;
-    let interfaces = definition
-        .implements
-        .iter()
-        .map(|ty| ty.substitute_type_parameters(arguments(concrete)))
-        .collect::<Result<Vec<_>, _>>()?;
-    if interfaces.iter().filter(|ty| *ty == interface).count() != 1 {
+    if !closure(module, concrete)?.contains(interface) {
         return Err(Fault::new(
-            "type must declare exactly one matching interface implementation",
+            "type must declare exactly one matching interface implementation (directly or transitively)",
         ));
     }
     Ok(())
@@ -126,17 +158,22 @@ pub(crate) fn ensure_implementation(
     interface: &Type,
 ) -> Result<(), Fault> {
     declared(module, concrete, interface)?;
-    let definition = interface_definition(module, interface)?;
-    for method in &module.functions {
-        if method
-            .owner
-            .as_ref()
-            .and_then(|ty| module.type_definition(ty))
-            .is_some_and(|d| std::ptr::eq(d, definition))
-        {
-            let contract =
-                method.map_types(|ty| ty.substitute_type_parameters(arguments(interface)))?;
-            member(module, concrete, &contract)?;
+    if interface_definition(module, concrete).is_ok() {
+        return Ok(());
+    }
+    for inherited in closure(module, interface)? {
+        let definition = interface_definition(module, &inherited)?;
+        for method in &module.functions {
+            if method
+                .owner
+                .as_ref()
+                .and_then(|ty| module.type_definition(ty))
+                .is_some_and(|d| std::ptr::eq(d, definition))
+            {
+                let contract =
+                    method.map_types(|ty| ty.substitute_type_parameters(arguments(&inherited)))?;
+                member(module, concrete, &contract)?;
+            }
         }
     }
     Ok(())
@@ -155,17 +192,53 @@ pub(crate) fn implementation(
     member(module, concrete, contract)
 }
 
+fn flags<T: Ord + Copy>(values: &[T]) -> std::collections::BTreeSet<T> {
+    values.iter().copied().collect()
+}
+
 pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
     for definition in &module.types {
         if definition.representation == Representation::Interface
             && (!definition.fields.is_empty()
-                || !definition.implements.is_empty()
                 || definition.packing.is_some()
                 || definition.minimum_size.is_some())
         {
-            return Err(Fault::new(
-                "interfaces cannot declare storage, layout or inherited interfaces in this preview",
-            ));
+            return Err(Fault::new("interfaces cannot declare storage or layout"));
+        }
+        let inherited = closure(module, &definition.open_type())?;
+        if definition.representation == Representation::Interface {
+            let mut contracts: Vec<Function> = Vec::new();
+            for interface in inherited {
+                let owner = interface_definition(module, &interface)?;
+                for method in &module.functions {
+                    if !method
+                        .owner
+                        .as_ref()
+                        .and_then(|ty| module.type_definition(ty))
+                        .is_some_and(|d| std::ptr::eq(d, owner))
+                    {
+                        continue;
+                    }
+                    let contract = method
+                        .map_types(|ty| ty.substitute_type_parameters(arguments(&interface)))?;
+                    for previous in &contracts {
+                        if previous.name.rsplit('.').next() == contract.name.rsplit('.').next()
+                            && previous.parameters == contract.parameters
+                            && (previous.returns != contract.returns
+                                || previous.receiver_byref != contract.receiver_byref
+                                || previous.receiver_readonly != contract.receiver_readonly
+                                || flags(&previous.out_parameters)
+                                    != flags(&contract.out_parameters)
+                                || flags(&previous.out_when_true) != flags(&contract.out_when_true)
+                                || flags(&previous.readonly_parameters)
+                                    != flags(&contract.readonly_parameters))
+                        {
+                            return Err(Fault::new("incompatible inherited interface contracts"));
+                        }
+                    }
+                    contracts.push(contract);
+                }
+            }
         }
         let mut seen = std::collections::HashSet::new();
         for interface in &definition.implements {
@@ -212,9 +285,11 @@ pub(crate) fn dispatch_targets(
                     && a.len() == b.len()
                     && a.iter().zip(b).all(|(a, b)| infer(a, b, bindings))
             }
-            (Type::Ptr(a), Type::Ptr(b)) | (Type::InterfaceRef(a), Type::InterfaceRef(b)) => {
-                infer(a, b, bindings)
-            }
+            (Type::Ptr(a), Type::Ptr(b))
+            | (Type::InterfaceRef(a), Type::InterfaceRef(b))
+            | (Type::ByRef(a), Type::ByRef(b))
+            | (Type::ReadOnlyByRef(a), Type::ReadOnlyByRef(b))
+            | (Type::Array(a), Type::Array(b)) => infer(a, b, bindings),
             _ => pattern == actual,
         }
     }
@@ -224,7 +299,10 @@ pub(crate) fn dispatch_targets(
         .ok_or_else(|| Fault::new("interface call requires owner"))?;
     let mut targets = vec![];
     for definition in &module.types {
-        for implemented in &definition.implements {
+        if definition.representation == Representation::Interface {
+            continue;
+        }
+        for implemented in &closure(module, &definition.open_type())? {
             let mut bindings = vec![None; definition.generic_parameters.len()];
             if !infer(implemented, interface, &mut bindings) {
                 continue;

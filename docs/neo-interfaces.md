@@ -120,7 +120,14 @@ current-frame escapes and the CLI artifact round trip.
 
 The bounded slice supports source-declared interfaces and records only. Generic
 interface declarations, adapting bundled System interfaces, properties, overloads,
-static/default interface members, interface inheritance, variance, native interface
+static/default interface members, variance, native interface
 ABI and general dynamic casts remain outside the Neo compiler subset. Existing
 runtime capabilities are described in [interfaces](interfaces.md). No new opcode
 or artifact format revision is needed.
+
+## Inherited interfaces
+
+Interfaces may declare comma-separated bases (`interface Counter: Readable`). Neo
+projects derived references to bases and resolves inherited methods without manual
+dereferencing. See [interface inheritance](interface-inheritance.md) for diamond,
+ambiguity, runtime validation and run instructions.

@@ -1,0 +1,21 @@
+interface Readable {
+    readonly func Read() -> int
+}
+interface Left: Readable { }
+interface Right: Readable { }
+interface Counter: Left, Right {
+    func Add(amount: int) -> ()
+}
+record Cell(Value: int): Counter {
+    readonly func Read() -> int { return this.Value }
+    func Add(amount: int) -> () { this.Value = this.Value + amount }
+}
+func Read(readonly value: Readable&) -> int { return value.Read() }
+func Main() -> int {
+    var local = Cell(20)
+    let localView: Counter& = &local
+    localView.Add(1)
+    let heapView: Counter& = new Cell(21)
+    let observation: readonly Readable& = heapView
+    return localView.Read() + Read(observation)
+}

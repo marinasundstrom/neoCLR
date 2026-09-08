@@ -124,7 +124,7 @@ fn metadata_requires_complete_exact_public_instance_implementation() {
         CELL.replace("Get() -> Int32", "Other() -> Int32"),
         CELL.replace(".implements Read", ".implements Cell"),
         ".interface Bad\n.field Value Int32\n.end".into(),
-        ".interface Bad\n.implements Read\n.end".into(),
+        ".interface Bad\n.implements Bad\n.end".into(),
         ".interface Bad\n.method instance Get() -> Int32\nldc.i4 0\nret\n.end\n.end".into(),
     ] {
         assert!(program(&invalid, "ldc.i4 0").is_err(), "accepted {invalid}");

@@ -10,6 +10,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 #### Added
 
+- Interface inheritance in IL and Neo: transitive generic contracts, diamond
+  deduplication, base-interface reference projections, inherited method dispatch,
+  load-time cycle/conflict checks and closed dispatch analysis. Managed views retain
+  owner identity, GC lifetime and readonly access. Type.GetInterfaces now includes
+  transitive bases; member enumeration stays declared-only. Added a runnable sample,
+  artifact/runtime tests and design/migration documentation. Class inheritance,
+  variance and default interface implementations remain planned.
+
 - Planned a library-focused next preview toward .NET BCL familiarity, separating
   runtime/library API contracts from Neo projection. Prioritized shared type
   relationships, interface inheritance and class inheritance, followed by useful

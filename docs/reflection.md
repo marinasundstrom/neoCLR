@@ -37,7 +37,7 @@ for i in 0..<fields.Length {
 | `GetFields()` / `GetFields(BindingFlags)` | `FieldInfo[]`, declared fields |
 | `GetMethods()` / `GetMethods(BindingFlags)` | `MethodInfo[]`, declared instance and static methods, including property accessors |
 | `GetProperties()` / `GetProperties(BindingFlags)` | `PropertyInfo[]`, declared properties |
-| `GetInterfaces()` | `Type[]`, directly declared implemented interfaces |
+| `GetInterfaces()` | `Type[]`, direct and transitive interfaces, deduplicated, excluding self |
 | `GetGenericArguments()` | `Type[]`, closed signature arguments, empty for nongeneric signatures |
 | `GetElementType()` | `Option<Type>`, Some for array, managed-reference or pointer target, otherwise None |
 | `IsArray`, `IsByRef`, `IsPointer`, `IsInterface` | Boolean signature/definition facts |
@@ -134,7 +134,7 @@ Parameterless queries select Public | Instance | Static (28). An explicit filter
 must select both visibility and storage mode; Default(), or Public() alone, returns
 an empty array. NonPublic includes private and internal members. A public property
 with a private accessor does not appear in a NonPublic-only query. DeclaredOnly is
-accepted; every result is already declared-only until inheritance exists. Unsupported
+accepted; method/field/property results are currently declared-only. Unsupported
 bits fault, including IgnoreCase and FlattenHierarchy. No inherited, name-filtered,
 or singular GetMethod/GetField/GetProperty lookup is provided yet.
 
@@ -167,7 +167,7 @@ ManagedArrays. Property/accessor options and GetElementType also require ValueSt
 through the current Option carrier representation. The host binding validates helper
 signatures; all public descriptor accessors and Type forwarding methods are ordinary IL.
 
-Invoke, GetValue/SetValue, reflective construction, attribute discovery, inheritance,
+Invoke, GetValue/SetValue, reflective construction, attribute discovery, class inheritance,
 module enumeration and metadata mutation remain
 future work. [Acceptance tests](../tests/reflection.rs) cover filtering, substitution,
 accessors, output contracts, module boundaries, serialization, resource limits, copied
@@ -187,3 +187,7 @@ See [readonly storage and return signatures](readonly-storage.md) for implemente
 readonly T& type positions, checked boundaries and migration. Binding immutability
 remains a language feature. [Explicit nullability](nullability.md) is a planned
 signature characteristic and special state, not implemented syntax or zeroing.
+
+[Interface inheritance](interface-inheritance.md) now supplies transitive
+GetInterfaces results. Member enumeration remains declared-only; query each base
+interface separately for its declarations.

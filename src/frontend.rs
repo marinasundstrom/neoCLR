@@ -202,6 +202,7 @@ struct Record {
 }
 struct Interface {
     name: Token,
+    bases: Vec<Ty>,
     methods: Vec<Function>,
 }
 struct Function {
@@ -217,6 +218,57 @@ struct Source {
     functions: Vec<Function>,
     console_import: bool,
 }
+impl Source {
+    fn interface_reachable(&self, from: &Ty, to: &Ty) -> bool {
+        let mut pending = vec![from.clone()];
+        let mut seen = Vec::new();
+        while let Some(ty) = pending.pop() {
+            if seen.contains(&ty) {
+                continue;
+            }
+            if &ty == to {
+                return true;
+            }
+            seen.push(ty.clone());
+            if let Some(i) = self.interfaces.iter().find(|i| i.name.text == ty.il()) {
+                pending.extend(i.bases.clone());
+            } else if let Some(r) = self.records.iter().find(|r| r.name.text == ty.il()) {
+                pending.extend(r.implements.clone());
+            }
+        }
+        false
+    }
+    fn interface_method(
+        &self,
+        target: &Ty,
+        name: &str,
+    ) -> Result<Option<(String, &Function)>, Fault> {
+        let mut pending = vec![target.clone()];
+        let mut seen = Vec::new();
+        let mut found = None;
+        while let Some(ty) = pending.pop() {
+            if seen.contains(&ty) {
+                continue;
+            }
+            seen.push(ty.clone());
+            if let Some(i) = self.interfaces.iter().find(|i| i.name.text == ty.il()) {
+                for method in &i.methods {
+                    if method.name.text == name {
+                        if found.is_some() {
+                            return Err(method.name.error(
+                                "ambiguous inherited method; project to its declaring interface",
+                            ));
+                        }
+                        found = Some((ty.il(), method));
+                    }
+                }
+                pending.extend(i.bases.clone());
+            }
+        }
+        Ok(found)
+    }
+}
+
 struct Expr {
     at: Token,
     kind: ExprKind,
@@ -517,8 +569,25 @@ impl Parser {
             } else if self.eat("interface") {
                 let name = self.name()?;
                 self.newlines();
+                let mut bases = Vec::new();
+                if self.eat(":") {
+                    loop {
+                        if bases.len() >= 1024 {
+                            return Err(name.error("interface count limit exceeded"));
+                        }
+                        bases.push(self.ty()?);
+                        if !self.eat(",") {
+                            break;
+                        }
+                    }
+                }
+                self.newlines();
                 let methods = self.methods(true)?;
-                source.interfaces.push(Interface { name, methods });
+                source.interfaces.push(Interface {
+                    name,
+                    bases,
+                    methods,
+                });
             } else if self.eat("record") {
                 let name = self.name()?;
                 let fields = self.fields(false)?;
@@ -1087,14 +1156,7 @@ impl Lowerer<'_> {
                     return Ok(expected.clone());
                 }
                 if library::implements(concrete, interface)?
-                    || self
-                        .source
-                        .interfaces
-                        .iter()
-                        .any(|i| i.name.text == interface.il())
-                        && self.source.records.iter().any(|r| {
-                            r.name.text == concrete.il() && r.implements.contains(interface)
-                        })
+                    || self.source.interface_reachable(concrete, interface)
                 {
                     self.body
                         .push(format!("interface.borrow {}", interface.il()));
@@ -1497,10 +1559,13 @@ impl Lowerer<'_> {
                     .records
                     .iter()
                     .find(|r| r.name.text == target.il());
-                let declared = contract
-                    .map(|i| &i.methods)
-                    .or_else(|| record.map(|r| &r.methods))
-                    .is_some_and(|methods| methods.iter().any(|m| m.name.text == member.text));
+                let declared = if contract.is_some() {
+                    self.source
+                        .interface_method(target, &member.text)?
+                        .is_some()
+                } else {
+                    record.is_some_and(|r| r.methods.iter().any(|m| m.name.text == member.text))
+                };
                 if member.text == "GetType"
                     && arguments.is_empty()
                     && matches!(ty, Ty::Ref(_) | Ty::ReadOnlyRef(_))
@@ -1514,19 +1579,30 @@ impl Lowerer<'_> {
                     return Ok(Ty::Record("System.Type".into()));
                 }
                 if contract.is_some() || record.is_some() {
-                    let method = contract
-                        .map(|i| &i.methods)
-                        .or_else(|| record.map(|r| &r.methods))
-                        .unwrap()
-                        .iter()
-                        .find(|m| m.name.text == member.text)
-                        .ok_or_else(|| member.error("unknown source instance method"))?;
+                    let (method_owner, method) = if contract.is_some() {
+                        self.source
+                            .interface_method(target, &member.text)?
+                            .ok_or_else(|| member.error("unknown source instance method"))?
+                    } else {
+                        (
+                            target.il(),
+                            record
+                                .unwrap()
+                                .methods
+                                .iter()
+                                .find(|m| m.name.text == member.text)
+                                .ok_or_else(|| member.error("unknown source instance method"))?,
+                        )
+                    };
+                    if contract.is_some() && method_owner != target.il() {
+                        self.body.push(format!("interface.borrow {method_owner}"));
+                    }
                     let receiver_readonly = method.receiver_readonly;
                     let parameters = method.parameters.clone();
                     let returns = method.returns.clone();
                     let signature = format!(
                         "instance {}::{}({})",
-                        target.il(),
+                        method_owner,
                         member.text,
                         parameters
                             .iter()
@@ -2358,6 +2434,14 @@ pub fn lower_to_il_named(source: &str, document: &str) -> Result<String, Fault> 
     let mut il = String::from(".module SourceProgram\n.entry Main\n");
     for interface in &source.interfaces {
         il.push_str(&format!(".interface {}\n", interface.name.text));
+        for base in &interface.bases {
+            if !source.interfaces.iter().any(|i| i.name.text == base.il()) {
+                return Err(interface
+                    .name
+                    .error("base requires a declared source interface"));
+            }
+            il.push_str(&format!(".implements {}\n", base.il()));
+        }
         for method in &interface.methods {
             il.push_str(&format!(
                 ".method instance {}byref {}({}) -> {}\n.end\n",

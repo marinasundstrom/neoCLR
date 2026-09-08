@@ -2,7 +2,8 @@
 
 The [library-focused next preview](library-preview.md) prioritizes shared type
 relationships, interface inheritance and class inheritance to support useful library
-contracts and their Neo projection. These inheritance capabilities remain planned.
+contracts and their Neo projection. [Interface inheritance](interface-inheritance.md) is now implemented; class inheritance
+remains planned.
 
 Status: agreed direction; class inheritance and these common Object methods are not
 implemented by this change. The existing interface system and Equatable<T> remain

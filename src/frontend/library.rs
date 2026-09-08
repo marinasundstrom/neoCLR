@@ -202,19 +202,10 @@ pub(super) fn implements(concrete: &Ty, interface: &Ty) -> Result<bool, Fault> {
     let module = crate::library::system()?;
     let concrete = crate::assembler::parse_type(&concrete.il())?;
     let interface = crate::assembler::parse_type(&interface.il())?;
-    let Some(definition) = module.type_definition(&concrete) else {
+    if module.type_definition(&concrete).is_none() {
         return Ok(false);
-    };
-    let arguments = match &concrete {
-        Type::Constructed { arguments, .. } => arguments.as_slice(),
-        _ => &[],
-    };
-    for implementation in &definition.implements {
-        if implementation.substitute_type_parameters(arguments)? == interface {
-            return Ok(true);
-        }
     }
-    Ok(false)
+    Ok(crate::interfaces::closure(module, &concrete)?.contains(&interface))
 }
 
 /// Resolve the declared single-index Item property, never a method naming guess.

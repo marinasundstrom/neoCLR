@@ -102,14 +102,21 @@ impl Query {
                     .map(|d| Ok(wrap_type(d.clone()))),
                 limits,
             ),
-            Self::Interfaces => array(
-                "System.Type",
-                definition
-                    .into_iter()
-                    .flat_map(|d| &d.implements)
-                    .map(|t| type_value(module, &t.substitute_type_parameters(arguments)?)),
-                limits,
-            ),
+            Self::Interfaces => {
+                let interfaces = if definition.is_some() {
+                    crate::interfaces::closure(module, &ty)?
+                } else {
+                    Vec::new()
+                };
+                array(
+                    "System.Type",
+                    interfaces
+                        .iter()
+                        .filter(|t| **t != ty)
+                        .map(|t| type_value(module, t)),
+                    limits,
+                )
+            }
             Self::Fields => {
                 validate_flags(argument)?;
                 array(
