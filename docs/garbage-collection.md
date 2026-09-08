@@ -111,3 +111,6 @@ See the [managed heap strategy](managed-heap-strategy.md).
 
 Changing an instruction's
 result from Ref<T> to T& requires a coordinated preview format transition.
+
+[Managed arrays](managed-arrays.md) now support frame-owned values and GC heap
+allocations with common checked element operations and managed element references.

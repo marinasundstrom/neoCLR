@@ -1,14 +1,8 @@
 # Arrays and pointers: direction and remaining work
 
-Native `Ptr<T>`/`T*` values and a first heap/access subset are implemented; see
-[heap and pointers](heap-and-pointers.md). An explicit native-buffer System.Array<T> descriptor is now implemented; owned array
-values remain a proposal. Raw pointers are foundational VM capabilities; managed
-ownership policies are separate. The current Ref arena is not reference-counted.
-See [memory layers](memory-model.md) for the updated architectural direction.
-
-Arrays should follow the same separation between data type and storage as every
-other type. Making every array implicitly reference-allocated would reintroduce
-the distinction neoCLR intends to remove.
+Managed owned and heap arrays are implemented separately; see [managed arrays](managed-arrays.md).
+This page describes the existing native `System.Array<T>` pointer/length buffer API.
+It retains explicit native allocation/free and frame-backed `localloc` storage.
 
 ## Implemented first subset: explicit buffer descriptors
 
@@ -19,9 +13,8 @@ primitive integer value without changing that value's underlying representation.
 Array<T> is a non-owning view over the region.
 The ordinary indexed `Item(Int32) -> T` property maps to `Get` and `Set`; it adds no
 implicit bounds, allocation or ownership behavior.
-There is no new array signature category, opcode, intrinsic member dispatch, implicit
-GC, or reference counting. This subset intentionally differs from the owned-array
-proposal below and from a .NET managed array.
+This descriptor uses ordinary generic metadata and methods. Its native buffer is not
+traced by the managed GC and has no reference counting. It is distinct from T[] managed arrays.
 
 | Member | Contract |
 | --- | --- |
@@ -72,7 +65,7 @@ borrow provenance or a permanent array ownership model.
 
 The initial subset supports T only where native layout and typed loads/stores exist:
 numeric types, Boolean, Char, Void, pointers, and supported closed records. String, Error,
-Ref, and erased carrier elements fail allocation layout checks, even for empty arrays.
+managed references, and erased carrier elements fail allocation layout checks, even for empty arrays.
 Nested descriptors store pointer/length values; they do not deep-copy inner buffers.
 
 Negative lengths and out-of-range indices produce terminal Faults. Access is invariant,
@@ -92,99 +85,9 @@ invocation continues to reject pointer-bearing input schemas.
 then explicitly frees it. `examples/array_bounds.neoil` deliberately faults on index 2
 of a two-element array and presents GetElementAddress -> Get -> Main in its stack trace.
 
-## Remaining array value design
+## Further work
 
-An owned, runtime-length array value is separate future work. Settle its copy/move,
-allocation, and return-lifetime contracts before adding newarr, ldelem/stelem, or a
-special signature encoding. Do not silently reuse the descriptor's pointer aliasing
-as the semantics of owned array values. The earlier candidate below remains a proposal.
-
-## Array ownership and shape
-
-Start with invariant, zero-based, one-dimensional `Array<T>` with a runtime length
-and fixed size after construction. Its elements belong to the owning value's
-region. `newarr T` would create a frame-owned array by default; placing it in a
-shared heap region would require an explicit operation, producing `Ref<Array<T>>`.
-A frame arena can hold runtime-sized payloads without requiring an unbounded native
-stack allocation. It should fault or return a declared allocation error at a
-resource boundary rather than silently changing observable ownership or identity.
-
-For consistency with current record semantics, assignment would copy the array's
-elements; copying elements containing `Ref<T>` would preserve those references.
-That can be expensive. Before implementing large arrays, decide whether to retain
-implicit copies, require explicit copies for variable-sized aggregates, or adopt
-moves with borrows. Do not silently make array assignment alias because it is
-cheaper. Returning an array must transfer/copy owned storage into the caller's
-region, never leave a pointer into a dead callee frame.
-
-Every element must be initialized before safe access. Allocation cannot presume
-that zero bits are a valid default for arbitrary `T`, since most types have no
-null/default inhabitant. An initial `Array.Create<T>(length, initialValue)` can
-copy an explicit value into each slot; an initializer function can come later.
-Negative lengths and byte-size multiplication overflow must be handled before
-allocation. An empty array is valid and distinct from an absent array.
-
-Bounds-checked `ldelem`/`stelem` and `ldlen` would be the natural IL-like surface.
-A violated low-level index invariant can Fault; `Get(index) -> Option<T>` provides
-a recoverable lookup API, and mutation can return `Result<Void,BoundsError>`.
-Bounds policy should be explicit rather than introducing catchable index exceptions.
-Element type is invariant: no array covariance and no delayed array-store type errors.
-
-`Array<Void>` should be legal. It still has a length, bounds, and logical elements,
-but it need not store per-element payload bytes. This must work without confusing
-zero-sized payloads with null or empty arrays. A pointer model must also define
-zero-sized-element stepping before allowing raw pointers to such arrays.
-
-An eventual `InlineArray<T,N>` can express compile-time shape/layout where needed.
-It should not force runtime-length arrays to have reference semantics. Jagged
-arrays can use nested arrays or explicit references; rectangular arrays and nonzero
-lower bounds can wait until migration requirements justify them.
-
-## Distinct access capabilities
-
-| Form | Proposed contract | Current status |
-| --- | --- | --- |
-| `T` | Owned data; copied under the prototype's rules | Implemented for scalars/records/unions |
-| `Ref<T>` | Non-null shared heap identity with checked typed access | Implemented with execution-owned arena |
-| `Borrow<T>` / `BorrowMut<T>` | Temporary checked access; cannot outlive owner | Design only; naming provisional |
-| `Span<T>` / `SpanMut<T>` | Borrow plus length, with bounds checks | Design only |
-| `Ptr<T>` | Unmanaged address type, with no implied ownership | Native heap/access subset implemented |
-
-`Ref<T>` is not an address into the native stack, and `Ptr<T>` must not be an
-unchecked alias for it. Managed references may need stable handles or relocation
-tracking if GC is introduced. Converting one to a native address would require an
-explicit pin or stable allocation, an explicit lifetime, and an unsafe boundary.
-A foreign pointer cannot become managed ownership without a declared ownership
-transfer and deallocator contract.
-
-Checked borrows would need lifetime metadata or verifiable provenance, an escape
-rule, and an aliasing contract. Rust-style exclusivity is not a default VM rule;
-checked borrowing should be an explicit facility rather than a host-language assumption. A span can view stack or heap storage; its origin
-must stay live. Returning a borrow to callee-owned storage must fail verification.
-Array element access through borrows must retain bounds and allocation provenance.
-These rules are prerequisites for address-taking instructions such as `ldelema`.
-
-Raw pointers belong to the core low-level VM, independently of whether a high-level
-language restricts them to unsafe or interop code. The design needs alignment,
-address width, bounds/provenance, null, arithmetic overflow, and deallocation
-contracts; pretending a raw address is safe does not supply those contracts.
-BCL absence should remain `Option`. A future foreign ABI may represent an actual
-null pointer directly, but it must not become the general missing-value convention.
-If a `Ptr<T>` requires a storage-bearing element, native `void*` should map to an
-opaque address type, not automatically `Ptr<Void>`: neoCLR's inhabited, zero-sized
-`Void` is a different concept.
-
-## Async interaction and next experiment
-
-A future runtime-async function must keep owned values live across suspension.
-Its logical frame may reside in persistent storage. A borrow into an ordinary
-caller stack frame cannot simply survive suspension; it needs a proven enclosing
-lifetime or must be rejected. Physical “always native stack” placement is therefore
-not a sustainable universal promise. Frame ownership is the semantic promise;
-backend placement and explicit shared identity are separate concerns.
-
-The explicit buffer descriptor now serves the initial runnable milestone. The owned-array
-experiment, checked spans, and broader ownership policies remain separate later work.
-Tests cover empty arrays, bounds, descriptor aliasing versus element copies, invalid
-lengths, and zero-sized elements. The heap/pointer implementation remains independently
-usable.
+The [managed-array contract](managed-arrays.md) supersedes the earlier owned-array
+proposal. `newarr` creates managed heap storage; `array.create` creates owned values.
+Checked slices and native pinning remain future work. Async suspension will need
+explicit lifetime rules for references into caller-owned arrays.

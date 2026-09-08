@@ -164,7 +164,7 @@ fn check_type(module: &Module, source: Scope<'_>, ty: &Type) -> Result<(), Fault
                     nested(argument)?;
                 }
             }
-            Type::ByRef(t) | Type::Ptr(t) | Type::InterfaceRef(t) => nested(t)?,
+            Type::Array(t) | Type::ByRef(t) | Type::Ptr(t) | Type::InterfaceRef(t) => nested(t)?,
             Type::Scoped { .. } => {
                 return Err(Fault::new("unresolved type scope during access checking"));
             }

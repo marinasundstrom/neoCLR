@@ -82,11 +82,39 @@ separate explicit low-level semantics and are not yet exposed by Neo. The
 [managed-access tests](../tests/neo_managed_access.rs) cover contexts, copies, forwarding,
 retargeting and lifetime checks.
 
+## Managed arrays implemented
+
+Neo now demonstrates owned array copying, managed heap arrays, indexed mutation,
+Length and element-reference forwarding. The [array contract](managed-arrays.md)
+keeps CLR newarr semantics and adds an explicit owned construction operation.
+Reference elements, slices and pinning remain scoped future decisions.
+
+## Next demonstration: declared interfaces and managed projections
+
+After the array foundation, demonstrate interfaces declared in Neo, a record that
+implements the contract, and an explicit cast/projection from its managed reference
+to `I&`. Choose source syntax in that slice and update the grammar with implementation.
+Keep it bounded to the runtime's [existing interface capabilities](interfaces.md).
+
+The source compiler needs interface member declarations, record instance methods,
+conformance declarations, explicit managed-reference projection, and dispatch through
+an interface-typed parameter. Lower projection to `interface.borrow` and interface
+calls to `callvirt`; avoid copying the receiver or introducing a boxed object.
+Preserve concrete storage identity and the receiver's existing frame or heap lifetime.
+
+The example should exercise one interface with both a frame-owned record and a heap
+record, mutation through a reference receiver, forwarding a caller-owned interface
+reference, and retaining a heap receiver through an interface reference. Test rejected
+nonconforming casts and escaping local views as well as successful dispatch. Do not
+expand this into interface inheritance, variance or a general dynamic-cast system.
+Fixed-length array annotations and braced initializers remain a separate refinement
+as described in the [array contract](managed-arrays.md).
+
 ## Later platform slices
 
 Use the completed programs to select the next runtime capability and add a small Neo
 demonstration with it. The [optional object hierarchy](object-hierarchy.md) remains
-the next planned platform area after the memory foundation: first establish base
+a later platform area after the memory foundation and interface demonstration: first establish base
 layout/views and tracing of the complete derived allocation, then dispatch and common
 library methods as needed. No mandatory Object root; value equality and hashing must
 remain independent of whether a value is accessed as T or T&. Reference identity is

@@ -316,3 +316,12 @@ Raw native pointers are different: they retain explicit low-level access and lif
 rules. Automatic managed-reference reads do not apply to pointers. Neo does not yet
 expose pointer types/dereferencing. Unary `*` is no longer a managed-reference operator;
 its future role is pointer dereferencing. Binary `*` remains multiplication.
+
+## Arrays
+
+[Managed arrays](managed-arrays.md) support owned `T[]` values and managed `T[]&`
+references. `[1, 2, 3]` and `array(length, initialValue)` create owned values;
+`new int[3]` and `new array(3, 0)` create managed heap arrays. Use `items[i]`,
+`items[i] = value`, `&items[i]` and `items.Length`. Managed element references
+read/write automatically and follow the same lifetime rules as record fields.
+Run `cargo run --locked -- run examples/source/arrays.neo --gc-stats`.

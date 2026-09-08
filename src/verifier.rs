@@ -137,6 +137,10 @@ fn analyze_function(
             (
                 Op::LoadObject(_)
                 | Op::FieldAddress(_)
+                | Op::ArrayAddress(_)
+                | Op::ArrayElement(_)
+                | Op::StoreArrayElement(_)
+                | Op::ArrayLength
                 | Op::BorrowInterface(_)
                 | Op::Store(_)
                 | Op::Return,
@@ -335,6 +339,9 @@ fn effect(module: &Module, op: &Op, arity: usize) -> Result<(usize, usize), Faul
         Pop | Store(_) | StoreArg(_) | Return | BranchTrue(_) | BranchFalse(_) | Switch(_)
         | InitializeObject(_) => (1, 0),
         Dup => (1, 2),
+        NewArray(_) | ArrayLength => (1, 1),
+        CreateArray(_) | ArrayElement(_) | ArrayAddress(_) => (2, 1),
+        StoreArrayElement(_) => (3, 0),
         New(ty) => (crate::vm::record_fields(module, ty, arity)?.len(), 1),
         Call(target) | CallVirtual(target) => {
             (target.parameters.len() + usize::from(target.instance), 1)
@@ -520,6 +527,65 @@ fn typed_effect(
             .ok_or_else(|| crate::Fault::new("field index out of range"))
     };
     match op {
+        NewArray(ty) | CreateArray(ty) => {
+            require(
+                count(exact(&values[0])?),
+                "array length requires Int32 or native integer",
+            )?;
+            if matches!(op, CreateArray(_)) {
+                stored(&values[1], ty)?;
+            }
+            let array = T::Array(Box::new(ty.clone()));
+            one(if matches!(op, NewArray(_)) {
+                T::ByRef(Box::new(array))
+            } else {
+                array
+            })
+        }
+        ArrayLength | ArrayElement(_) | StoreArrayElement(_) | ArrayAddress(_) => {
+            let owner = exact(&values[0])?;
+            let target = if let T::ByRef(t) = owner {
+                t.as_ref()
+            } else {
+                owner
+            };
+            let T::Array(element) = target else {
+                return Err(crate::Fault::new("array operation requires array"));
+            };
+            if matches!(op, ArrayLength) {
+                return one(T::UIntPtr);
+            }
+            require(
+                count(exact(&values[1])?),
+                "array index requires Int32 or native integer",
+            )?;
+            let operand = match op {
+                ArrayElement(t) | StoreArrayElement(t) | ArrayAddress(t) => t,
+                _ => unreachable!(),
+            };
+            require(element.as_ref() == operand, "array element type mismatch")?;
+            if matches!(op, ArrayElement(_)) {
+                return Ok(vec![loaded(element)]);
+            }
+            require(
+                matches!(owner, T::ByRef(_)),
+                "array mutation/address requires managed array reference",
+            )?;
+            if matches!(op, StoreArrayElement(_)) {
+                stored(&values[2], element)?;
+                return Ok(vec![]);
+            }
+            Ok(vec![match &values[0] {
+                StackType::Slot {
+                    local, argument, ..
+                } => StackType::Slot {
+                    ty: T::ByRef(element.clone()),
+                    local: *local,
+                    argument: *argument,
+                },
+                _ => E(T::ByRef(element.clone())),
+            }])
+        }
         Unaligned(_) | Branch(_) | Fault(_) | Pop => Result::Ok(vec![]),
         Int(_) | SizeOf(_) | AlignOf(_) => one(T::Int32),
         Int64(_) => one(T::Int64),

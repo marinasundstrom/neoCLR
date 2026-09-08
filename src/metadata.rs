@@ -40,6 +40,8 @@ pub enum Type {
     },
     /// Retaining managed slot reference; independent of native layout.
     ByRef(Box<Type>),
+    /// Owned fixed-length array value; allocation mode is separate.
+    Array(Box<Type>),
     /// Explicit borrowed interface receiver, separate from the interface declaration.
     InterfaceRef(Box<Type>),
     /// Fundamental unmanaged pointer signature; no ownership policy is implied.
@@ -571,6 +573,19 @@ pub enum Instruction {
     Construct(FunctionRef),
     #[serde(rename = "value.pack")]
     PackValue(Type),
+    /// Fixed-length managed heap array with supported default initialization.
+    #[serde(rename = "newarr")]
+    NewArray(Type),
+    #[serde(rename = "array.create")]
+    CreateArray(Type),
+    #[serde(rename = "ldlen")]
+    ArrayLength,
+    #[serde(rename = "ldelem")]
+    ArrayElement(Type),
+    #[serde(rename = "stelem")]
+    StoreArrayElement(Type),
+    #[serde(rename = "ldelema")]
+    ArrayAddress(Type),
     /// CLI-shaped type-token acquisition; method and field tokens are not supported.
     #[serde(rename = "ldtoken")]
     LoadTypeToken(Type),
@@ -741,6 +756,7 @@ impl Type {
                     arguments: types.iter().map(nested).collect::<Result<_, _>>()?,
                 },
                 Type::ByRef(t) => Type::ByRef(Box::new(nested(t)?)),
+                Type::Array(t) => Type::Array(Box::new(nested(t)?)),
                 Type::Ptr(t) => Type::Ptr(Box::new(nested(t)?)),
                 Type::InterfaceRef(t) => Type::InterfaceRef(Box::new(nested(t)?)),
                 other => other.clone(),
@@ -815,6 +831,11 @@ impl Function {
                     }
                 }
                 Instruction::New(ty)
+                | Instruction::NewArray(ty)
+                | Instruction::CreateArray(ty)
+                | Instruction::ArrayElement(ty)
+                | Instruction::StoreArrayElement(ty)
+                | Instruction::ArrayAddress(ty)
                 | Instruction::BorrowInterface(ty)
                 | Instruction::LoadTypeToken(ty)
                 | Instruction::PackValue(ty)

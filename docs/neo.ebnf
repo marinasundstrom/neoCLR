@@ -8,7 +8,7 @@ function_decl    = "func", identifier, field_list, "->", type, newlines,
 field_list       = "(", newlines,
                    [ field, newlines, { ",", newlines, field, newlines } ], ")" ;
 field            = identifier, ":", type ;
-type             = (qualified_name, [ "<", type, { ",", type }, ">" ] | "(", ")"), [ "&" ] ;
+type             = (qualified_name, [ "<", type, { ",", type }, ">" ] | "(", ")"), { "[", "]" }, [ "&" ] ;
 qualified_name   = identifier, { ".", identifier } ;
 
 block            = newlines, "{", separators, { statement, separators }, "}" ;
@@ -31,12 +31,14 @@ equality         = comparison, { ("==" | "!="), comparison } ;
 comparison       = additive, { ("<" | ">" | "<=" | ">="), additive } ;
 additive         = multiplicative, { ("+" | "-"), multiplicative } ;
 multiplicative   = unary, { ("*" | "/"), unary } ;
-unary            = ("&" | "-" | "!" | "new"), unary | postfix ;
-postfix          = primary, { ".", identifier | arguments } ;
+unary            = ("&" | "-" | "!" | "new"), unary
+                 | "new", type, "[", expression, "]" | postfix ;
+postfix          = primary, { ".", identifier | arguments | "[", expression, "]" } ;
 arguments        = "(", newlines,
                    [ expression, newlines,
                      { ",", newlines, expression, newlines } ], ")" ;
 primary          = integer | string | "true" | "false" | identifier
+                 | "[", newlines, expression, newlines, { ",", newlines, expression, newlines }, "]"
                  | "typeof", "(", newlines, type, newlines, ")"
                  | "(", newlines, expression, newlines, ")" ;
 

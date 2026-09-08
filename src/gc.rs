@@ -92,6 +92,16 @@ impl ManagedHeap {
     pub fn reclaimed_objects(&self) -> usize {
         self.reclaimed
     }
+    pub(crate) fn array_usage(
+        &self,
+        usage: &mut crate::arrays::Usage,
+        limits: &crate::Limits,
+    ) -> Result<(), Fault> {
+        for cell in self.objects.values() {
+            cell.borrow().array_usage(usage, limits)?;
+        }
+        Ok(())
+    }
     pub(crate) fn allocate(&mut self, value: Value) -> Result<usize, Fault> {
         value.ensure_heap_references()?;
         let identity = self.next_identity;
@@ -155,7 +165,10 @@ pub(crate) fn trace(value: &Value, references: &mut Vec<usize>) {
                     references.push(identity);
                 }
             }
-            Value::Object { fields, .. } => pending.extend(fields),
+            Value::Object { fields, .. }
+            | Value::Array {
+                elements: fields, ..
+            } => pending.extend(fields),
             Value::Erased(value) => pending.push(value),
             Value::Void
             | Value::Single(_)

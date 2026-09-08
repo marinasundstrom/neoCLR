@@ -101,3 +101,6 @@ Further details: [slot operations](reference-slots.md), [heap references](heap-r
 [native pointers](heap-and-pointers.md), and [Neo grammar](neo-grammar.md).
 Implemented behavior is covered by the [Neo access tests](../tests/neo_managed_access.rs)
 and the [counter regression](../tests/neo.rs).
+
+[Managed arrays](managed-arrays.md) now support frame-owned values and GC heap
+allocations with common checked element operations and managed element references.

@@ -31,6 +31,16 @@ impl Slot {
             crate::gc::trace(value, roots);
         }
     }
+    pub(crate) fn array_usage(
+        &self,
+        usage: &mut crate::arrays::Usage,
+        limits: &crate::Limits,
+    ) -> Result<(), Fault> {
+        if let Some(value) = &self.value {
+            crate::arrays::measure(value, usage, limits)?;
+        }
+        Ok(())
+    }
     pub(crate) fn get(&self) -> Result<Value, Fault> {
         self.value
             .clone()
@@ -38,6 +48,9 @@ impl Slot {
     }
     pub(crate) fn set(&mut self, value: Value) -> Result<(), Fault> {
         let value = value.for_storage(&self.ty)?;
+        if let Some(old) = &self.value {
+            crate::arrays::check_replacement(old, &value)?;
+        }
         self.writes = self
             .writes
             .checked_add(1)
@@ -141,6 +154,30 @@ impl SlotReference {
         }
         Ok(result)
     }
+    pub(crate) fn array_length(&self) -> Result<usize, Fault> {
+        self.assigned()?;
+        let cell = self.cell()?;
+        let slot = cell.borrow();
+        let value = at_path(
+            slot.value
+                .as_ref()
+                .ok_or_else(|| Fault::new("uninitialized array"))?,
+            &self.path,
+        )?;
+        let Value::Array { elements, .. } = value else {
+            return Err(Fault::new("array operation requires array"));
+        };
+        Ok(elements.len())
+    }
+    pub(crate) fn element(&self, index: usize, target: &Type) -> Result<Self, Fault> {
+        if self.target != Type::Array(Box::new(target.clone())) {
+            return Err(Fault::new("array element type mismatch"));
+        }
+        if index >= self.array_length()? {
+            return Err(Fault::new("array index out of range"));
+        }
+        self.field(index, target.clone())
+    }
     pub(crate) fn output(&self) -> Result<Self, Fault> {
         let mut result = self.clone();
         result.after_write = Some(self.cell()?.borrow().writes);
@@ -193,8 +230,12 @@ impl SlotReference {
             .as_mut()
             .ok_or_else(|| Fault::new("read of uninitialized slot"))?;
         for index in &self.path {
-            let Value::Object { fields, .. } = field else {
-                return Err(Fault::new("managed field reference requires record"));
+            let fields = match field {
+                Value::Object { fields, .. }
+                | Value::Array {
+                    elements: fields, ..
+                } => fields,
+                _ => return Err(Fault::new("managed path requires record or array")),
             };
             field = fields
                 .get_mut(*index)
@@ -203,6 +244,7 @@ impl SlotReference {
         if field.ty() != self.target {
             return Err(Fault::new("managed field reference type mismatch"));
         }
+        crate::arrays::check_replacement(field, &value)?;
         *field = value;
         slot.writes = next_write;
         slot.replacements
@@ -214,8 +256,12 @@ impl SlotReference {
 
 fn at_path<'a>(mut value: &'a Value, path: &[usize]) -> Result<&'a Value, Fault> {
     for index in path {
-        let Value::Object { fields, .. } = value else {
-            return Err(Fault::new("managed field reference requires record"));
+        let fields = match value {
+            Value::Object { fields, .. }
+            | Value::Array {
+                elements: fields, ..
+            } => fields,
+            _ => return Err(Fault::new("managed path requires record or array")),
         };
         value = fields
             .get(*index)
@@ -227,7 +273,7 @@ fn at_path<'a>(mut value: &'a Value, path: &[usize]) -> Result<&'a Value, Fault>
 pub(crate) fn contains(ty: &Type) -> bool {
     match ty {
         Type::ByRef(_) => true,
-        Type::Ptr(t) | Type::InterfaceRef(t) => contains(t),
+        Type::Array(t) | Type::Ptr(t) | Type::InterfaceRef(t) => contains(t),
         Type::Constructed { arguments, .. } | Type::Scoped { arguments, .. } => {
             arguments.iter().any(contains)
         }

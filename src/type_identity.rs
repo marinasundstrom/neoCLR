@@ -12,6 +12,7 @@ pub enum TypeIdentity {
         arguments: Vec<TypeIdentity>,
     },
     ByRef(Box<TypeIdentity>),
+    Array(Box<TypeIdentity>),
     Ptr(Box<TypeIdentity>),
     InterfaceRef(Box<TypeIdentity>),
 }
@@ -30,6 +31,7 @@ pub(crate) fn describe(module: &Module, ty: &Type) -> Result<TypeDescriptor, Fau
     let identity = resolve(module, &normalized)?;
     let name = match &normalized {
         Type::ByRef(element) => format!("{}&", signature_name(element)?),
+        Type::Array(element) => format!("{}[]", signature_name(element)?),
         Type::Ptr(element) => format!("{}*", signature_name(element)?),
         Type::InterfaceRef(element) => format!("InterfaceRef<{}>", signature_name(element)?),
         _ => normalized
@@ -58,6 +60,7 @@ pub(crate) fn describe(module: &Module, ty: &Type) -> Result<TypeDescriptor, Fau
 fn signature_name(ty: &Type) -> Result<String, Fault> {
     Ok(match ty {
         Type::ByRef(element) => format!("{}&", signature_name(element)?),
+        Type::Array(element) => format!("{}[]", signature_name(element)?),
         Type::Ptr(element) => format!("{}*", signature_name(element)?),
         Type::InterfaceRef(element) => format!("InterfaceRef<{}>", signature_name(element)?),
         Type::Constructed {
@@ -105,6 +108,7 @@ fn build(module: &Module, ty: &Type) -> Result<TypeIdentity, Fault> {
     let nested = |ty: &Type| build(module, ty).map(Box::new);
     Ok(match ty {
         Type::ByRef(t) => TypeIdentity::ByRef(nested(t)?),
+        Type::Array(t) => TypeIdentity::Array(nested(t)?),
         Type::Ptr(t) => TypeIdentity::Ptr(nested(t)?),
         Type::InterfaceRef(t) => TypeIdentity::InterfaceRef(nested(t)?),
         _ => {

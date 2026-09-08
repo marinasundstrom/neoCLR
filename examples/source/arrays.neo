@@ -1,0 +1,34 @@
+import System.Console.*
+
+record Counter(Age: int)
+
+func Second(values: int[]&) -> int& {
+    return &values[1]
+}
+
+func MakeValues() -> int[]& {
+    let values = new int[3]
+    values[1] = 40
+    return values
+}
+
+func Main() -> int {
+    var local = [1, 2, 3]
+    let copy = local
+    let localElement = Second(&local)
+    localElement = 9
+    WriteLine(copy[1])
+    WriteLine(local[1])
+
+    let shared = MakeValues()
+    let element = Second(shared)
+    element = element + 2
+    WriteLine(shared.Length)
+    WriteLine(shared[1])
+
+    let words = new array(2, "Neo")
+    words[1] = "CLR"
+    WriteLine(words[0])
+    WriteLine(words[1])
+    return shared[1]
+}

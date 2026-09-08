@@ -215,6 +215,12 @@ normalization; other checks use exact type equality. See [integer storage](integ
 | `interface.borrow I` | `Ptr<Concrete> → InterfaceRef<I>` | Explicit non-owning interface view; requires declared implementation and native concrete layout |
 | `ret` | `R → caller` | Return exactly one value; no extra stack items |
 | `newobj Type` | `F0,…,Fn → Type` | Construct a closed record value in substituted field declaration order |
+| `newarr T` | length → T[]& | Default-initialized managed heap array |
+| `array.create T` | length, T → T[] | Explicitly initialized owned array value |
+| `ldlen` | T[] or T[]& → UIntPtr | Array length |
+| `ldelem T` | array, index → T | Checked element copy |
+| `stelem T` | T[]&, index, T → | Checked element replacement |
+| `ldelema T` | T[]&, index → T& | Managed reference retaining array provenance |
 | `ldtoken T` | `→ RuntimeTypeHandle` | Read-only closed type token; type operands only; see [type inspection](type-inspection.md) |
 | `value.pack T` | `T → System.Value` | Explicit type erasure preserving exact payload identity |
 | `value.is T` | `System.Value → Boolean` | Exact payload type test; no payload on failure |
@@ -593,3 +599,6 @@ in the verifier; runtime checks enforce each actual output obligation.
 Managed `initobj T` initializes supported typed defaults in an existing T& slot,
 including uninitialized locals and out destinations. See
 [managed value initialization](managed-initialization.md) for the exact subset.
+
+See [managed arrays](managed-arrays.md) for T[] signatures, native-integer indices,
+initialization differences from CLR, payload limits and fixed-shape replacement.

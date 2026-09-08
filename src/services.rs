@@ -22,6 +22,7 @@ pub enum RuntimeService {
     TypeInspection,
     InterfaceDispatch,
     SlotReferences,
+    ManagedArrays,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -95,6 +96,11 @@ fn instruction_services(op: &Op) -> &'static [RuntimeService] {
     use RuntimeService::*;
     // Exhaustive so additions to IL require an explicit service classification.
     match op {
+        Op::NewArray(_) => &[ManagedArrays, ManagedHeap, SlotReferences],
+        Op::CreateArray(_) => &[ManagedArrays],
+        Op::ArrayLength | Op::ArrayElement(_) | Op::StoreArrayElement(_) | Op::ArrayAddress(_) => {
+            &[ManagedArrays, SlotReferences]
+        }
         Op::Allocate(..) | Op::Free => &[NativeAllocation, PointerMemory],
         Op::AllocateLocal => &[FrameAllocation, PointerMemory],
         Op::PackValue(..) | Op::IsValue(..) | Op::UnpackValue(..) => &[ValueStorage],

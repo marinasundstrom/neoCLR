@@ -465,7 +465,8 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         "sizeof" | "alignof" | "heap.alloc" | "ptr.null" | "ptr.cast"
                         | "ptr.fromint" | "ldobj" | "stobj" | "cpobj" | "initobj"
                         | "value.pack" | "value.is" | "value.unpack" | "ldtoken"
-                        | "interface.borrow" => Some(
+                        | "interface.borrow" | "newarr" | "array.create" | "ldelem" | "stelem"
+                        | "ldelema" => Some(
                             serde_json::to_value(parse_type(rest)?)
                                 .map_err(|e| Fault::new(e.to_string()))?,
                         ),
@@ -794,6 +795,9 @@ pub fn parse_type(text: &str) -> Result<Type, Fault> {
                         .map_err(|_| Fault::new("expected type parameter index !0"))?,
                 ));
             }
+        }
+        if let Some(element) = text.strip_suffix("[]") {
+            return Ok(Type::Array(Box::new(parse(element, depth + 1)?)));
         }
         if let Some(element) = text.strip_suffix('&') {
             return Ok(Type::ByRef(Box::new(parse(element, depth + 1)?)));
@@ -1162,6 +1166,7 @@ fn bind_type_parameters(ty: Type, names: &[Option<String>]) -> Type {
         },
         Type::InterfaceRef(t) => Type::InterfaceRef(Box::new(bind_type_parameters(*t, names))),
         Type::ByRef(t) => Type::ByRef(Box::new(bind_type_parameters(*t, names))),
+        Type::Array(t) => Type::Array(Box::new(bind_type_parameters(*t, names))),
         Type::Ptr(t) => Type::Ptr(Box::new(bind_type_parameters(*t, names))),
         other => other,
     }

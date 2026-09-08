@@ -1,3 +1,4 @@
+mod arrays;
 pub mod assembler;
 pub use assembler::assemble;
 mod access;

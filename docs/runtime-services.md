@@ -36,7 +36,8 @@ Duplicate entries in the supplied service set have no additional effect.
 | NativeAllocation | heap.alloc and heap.free |
 | FrameAllocation | localloc, including the frame-lifetime release contract |
 | PointerMemory | allocation/free tracking, ptr.fromint, ptr.add, ldflda, typed/indirect memory loads and stores, object/block copy and initialization |
-| ManagedHeap | heap.new (also requires SlotReferences) |
+| ManagedHeap | heap.new and newarr (also require SlotReferences) |
+| ManagedArrays | Array creation, length and element operations; access operations conservatively also require SlotReferences |
 | ParseInt32 | Validated neoCLR.Runtime.ParseInt32 InternalCall |
 | FormatInt32 | Validated neoCLR.Runtime.Int32ToString InternalCall |
 | ConsoleOutput | Validated neoCLR.Runtime.WriteLine InternalCall |

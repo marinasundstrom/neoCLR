@@ -11,6 +11,9 @@ pub struct Limits {
     pub stack: usize,
     /// Maximum simultaneously live managed heap objects, checked after collection.
     pub heap_objects: usize,
+    /// Logical array payload budget across active frames and managed heap.
+    pub array_elements: usize,
+    pub array_bytes: usize,
     pub pointer_bytes: usize,
     pub pointer_allocations: usize,
 }
@@ -22,6 +25,8 @@ impl Default for Limits {
             frames: 256,
             stack: 4096,
             heap_objects: 4096,
+            array_elements: 65_536,
+            array_bytes: 16 * 1024 * 1024,
             pointer_bytes: 16 * 1024 * 1024,
             pointer_allocations: 4096,
         }
@@ -565,6 +570,16 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                     }
                     crate::access::check_call(module, Some(function), &callee)?;
                 }
+                Op::NewArray(ty)
+                | Op::CreateArray(ty)
+                | Op::ArrayElement(ty)
+                | Op::StoreArrayElement(ty)
+                | Op::ArrayAddress(ty) => {
+                    check(&Type::Array(Box::new(ty.clone())))?;
+                    if matches!(op, Op::NewArray(_)) && check_type(ty, module).is_ok() {
+                        crate::initialization::default_value(module, ty)?;
+                    }
+                }
                 Op::New(ty) => {
                     record_fields(module, ty, arity)?;
                     crate::access::check_construction(module, function, ty)?;
@@ -761,6 +776,18 @@ fn check_type_context(ty: &Type, module: &Module, arity: usize, depth: usize) ->
                     return Err(Fault::new("managed references cannot be generic arguments"));
                 }
                 nested(argument)?;
+            }
+            Ok(())
+        }
+        Type::Array(t) => {
+            if crate::slots::contains(t) {
+                return Err(Fault::new(
+                    "managed-reference array elements are not supported yet",
+                ));
+            }
+            nested(t)?;
+            if crate::interfaces::interface_definition(module, t).is_ok() {
+                return Err(Fault::new("array elements require concrete values"));
             }
             Ok(())
         }
@@ -1009,7 +1036,41 @@ fn interpret_frames(
     let mut collection_threshold = limits.heap_objects.min(64);
     let mut memory = crate::memory::PointerHeap::default();
     let mut output = vec![];
+    let mut arrays_used = false;
     for _ in 0..limits.instructions {
+        if arrays_used {
+            let check = |frames: &[Frame], heap: &crate::ManagedHeap| -> Result<(), Fault> {
+                let mut usage = crate::arrays::Usage::default();
+                for frame in frames {
+                    for cell in frame.args.iter().chain(&frame.locals) {
+                        cell.borrow().array_usage(&mut usage, &limits)?;
+                    }
+                    for value in &frame.stack {
+                        crate::arrays::measure(value, &mut usage, &limits)?;
+                    }
+                }
+                heap.array_usage(&mut usage, &limits)
+            };
+            if check(frames, &heap).is_err() {
+                let mut roots = vec![];
+                for frame in frames.iter() {
+                    for cell in frame.args.iter().chain(&frame.locals) {
+                        cell.borrow().trace_heap(&mut roots);
+                    }
+                    for value in &frame.stack {
+                        crate::gc::trace(value, &mut roots);
+                    }
+                }
+                heap.collect(roots, crate::CollectionReason::AllocationPressure)?;
+                check(frames, &heap).map_err(|mut error| {
+                    if let Some(frame) = frames.last() {
+                        error.function = Some(frame.function.name.clone());
+                        error.instruction = Some(frame.trace_pc);
+                    }
+                    error
+                })?;
+            }
+        }
         let frame = frames
             .last_mut()
             .ok_or_else(|| Fault::new("missing frame"))?;
@@ -1030,7 +1091,7 @@ fn interpret_frames(
         frame.pc += 1;
         let context = function.name.clone();
         // Collect only between instructions, before allocation operands leave roots.
-        if matches!(op, Op::HeapNew) && heap.len() >= collection_threshold {
+        if matches!(op, Op::HeapNew | Op::NewArray(_)) && heap.len() >= collection_threshold {
             let mut roots = vec![];
             for frame in frames.iter() {
                 for cell in frame.args.iter().chain(&frame.locals) {
@@ -1454,6 +1515,72 @@ fn interpret_frames(
                         caller.stack.push(value.on_stack());
                     } else {
                         return Ok(Some(value));
+                    }
+                }
+                Op::NewArray(ty) | Op::CreateArray(ty) => {
+                    arrays_used = true;
+                    let initial = if matches!(op, Op::CreateArray(_)) {
+                        frame.pop()?.for_storage(ty)?
+                    } else {
+                        crate::initialization::default_value(module, ty)?
+                    };
+                    let length = crate::arrays::index(frame.pop()?).map_err(|_| {
+                        Fault::new("array length must be a non-negative Int32 or native integer")
+                    })?;
+                    let value = crate::arrays::create(ty.clone(), length, initial, &limits)?;
+                    if matches!(op, Op::NewArray(_)) {
+                        if heap.len() >= limits.heap_objects {
+                            return Err(Fault::new("heap object limit exceeded"));
+                        }
+                        let index = heap.allocate(value)?;
+                        frame.stack.push(Value::SlotReference(heap.address(index)?));
+                    } else {
+                        frame.stack.push(value);
+                    }
+                }
+                Op::ArrayLength => {
+                    let length = match frame.pop()? {
+                        Value::SlotReference(reference) => reference.array_length()?,
+                        Value::Array { elements, .. } => elements.len(),
+                        _ => return Err(Fault::new("ldlen requires array")),
+                    };
+                    frame.stack.push(Value::UIntPtr(length));
+                }
+                Op::ArrayElement(ty) | Op::ArrayAddress(ty) | Op::StoreArrayElement(ty) => {
+                    let stored = if matches!(op, Op::StoreArrayElement(_)) {
+                        Some(frame.pop()?)
+                    } else {
+                        None
+                    };
+                    let index = crate::arrays::index(frame.pop()?)?;
+                    match frame.pop()? {
+                        Value::SlotReference(reference) => {
+                            let address = reference.element(index, ty)?;
+                            if matches!(op, Op::ArrayElement(_)) {
+                                frame.stack.push(address.read()?.on_stack());
+                            } else if let Some(value) = stored {
+                                address.write(value)?;
+                            } else {
+                                frame.stack.push(Value::SlotReference(address));
+                            }
+                        }
+                        Value::Array { element, elements } if matches!(op, Op::ArrayElement(_)) => {
+                            if element != *ty {
+                                return Err(Fault::new("array element type mismatch"));
+                            }
+                            frame.stack.push(
+                                elements
+                                    .get(index)
+                                    .ok_or_else(|| Fault::new("array index out of range"))?
+                                    .clone()
+                                    .on_stack(),
+                            );
+                        }
+                        _ => {
+                            return Err(Fault::new(
+                                "array mutation/address requires managed array reference",
+                            ));
+                        }
                     }
                 }
                 Op::New(ty) => {

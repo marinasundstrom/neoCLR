@@ -24,6 +24,10 @@ pub enum Value {
     Erased(Box<Value>),
     /// Owned metadata snapshot, not an arbitrary-value container or native pointer.
     RuntimeTypeHandle(Box<crate::TypeDescriptor>),
+    Array {
+        element: Type,
+        elements: Vec<Value>,
+    },
     Object {
         ty: Type,
         fields: Vec<Value>,
@@ -60,7 +64,10 @@ impl Value {
                     }
                     reference.assigned()?;
                 }
-                Self::Object { fields, .. } => pending.extend(fields),
+                Self::Object { fields, .. }
+                | Self::Array {
+                    elements: fields, ..
+                } => pending.extend(fields),
                 Self::Erased(value) => pending.push(value),
                 _ => (),
             }
@@ -94,7 +101,10 @@ impl Value {
                 Self::Erased(payload) => {
                     pending.push((payload, depth + 1));
                 }
-                Self::Object { fields, .. } => {
+                Self::Object { fields, .. }
+                | Self::Array {
+                    elements: fields, ..
+                } => {
                     pending.extend(fields.iter().map(|field| (field, depth + 1)));
                 }
                 _ => {}
@@ -125,6 +135,7 @@ impl Value {
             Self::Erased(_) => Type::Value,
             Self::RuntimeTypeHandle(_) => Type::RuntimeTypeHandle,
             Self::Object { ty, .. } => ty.clone(),
+            Self::Array { element, .. } => Type::Array(Box::new(element.clone())),
             Self::SlotInterface { interface, .. } => Type::ByRef(Box::new(interface.clone())),
             Self::InterfaceRef { interface, .. } => Type::InterfaceRef(Box::new(interface.clone())),
             Self::SlotReference(reference) => Type::ByRef(Box::new(reference.target().clone())),

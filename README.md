@@ -490,3 +490,6 @@ a reference to a caller-owned field and updating that field through the result.
 
 [Managed value initialization](docs/managed-initialization.md) defines initobj for
 existing typed slots, outputs and constructor receivers.
+
+[Managed arrays](docs/managed-arrays.md) now support frame-owned values and GC heap
+allocations with common checked element operations and managed element references.

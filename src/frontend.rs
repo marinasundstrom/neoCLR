@@ -84,7 +84,7 @@ fn lex(source: &str) -> Result<Vec<Token>, Fault> {
             .any(|op| rest.starts_with(op))
         {
             2
-        } else if "(){}:,.;&*+-=/!<>".contains(first) {
+        } else if "(){}[]:,.;&*+-=/!<>".contains(first) {
             first.len_utf8()
         } else {
             return Err(start.error(format!("unsupported character {first:?}")));
@@ -113,6 +113,7 @@ enum Ty {
     Void,
     Record(String),
     Ref(Box<Ty>),
+    Array(Box<Ty>),
 }
 impl Ty {
     fn from_metadata(ty: &crate::metadata::Type) -> Result<Self, Fault> {
@@ -122,6 +123,7 @@ impl Ty {
             Type::Boolean => Self::Bool,
             Type::String => Self::String,
             Type::Void => Self::Void,
+            Type::Array(target) => Self::Array(Box::new(Self::from_metadata(target)?)),
             Type::ByRef(target) => Self::Ref(Box::new(Self::from_metadata(target)?)),
             Type::Constructed {
                 definition,
@@ -150,6 +152,7 @@ impl Ty {
             Self::Void => "Void".into(),
             Self::Record(name) => name.clone(),
             Self::Ref(ty) => format!("{}&", ty.il()),
+            Self::Array(ty) => format!("{}[]", ty.il()),
         }
     }
 }
@@ -189,6 +192,9 @@ enum ExprKind {
     Binary(String, Box<Expr>, Box<Expr>),
     Match(Box<Expr>, Vec<Arm>),
     TypeOf(Ty),
+    ArrayLiteral(Vec<Expr>),
+    NewArray(Ty, Box<Expr>),
+    Index(Box<Expr>, Box<Expr>),
 }
 enum Pattern {
     Wildcard(Token),
@@ -319,6 +325,21 @@ impl Parser {
                 Ty::from_metadata(&crate::metadata::Type::from_name(&name))?
             }
         };
+        let mut array_depth = 0;
+        while self.at("[")
+            && self
+                .tokens
+                .get(self.position + 1)
+                .is_some_and(|t| t.text == "]")
+        {
+            self.take();
+            self.take();
+            array_depth += 1;
+            if self.depth + array_depth > 32 {
+                return Err(self.current().error("type nesting limit exceeded"));
+            }
+            ty = Ty::Array(Box::new(ty));
+        }
         if self.eat("&") {
             ty = Ty::Ref(Box::new(ty));
         }
@@ -527,7 +548,33 @@ impl Parser {
     }
     fn expression_inner(&mut self, minimum: u8) -> Result<Expr, Fault> {
         let at = self.take();
-        let mut left = if at.text == "typeof" {
+        let mut left = if at.text == "[" {
+            self.newlines();
+            let mut elements = vec![self.expression(0)?];
+            self.newlines();
+            while self.eat(",") {
+                self.newlines();
+                elements.push(self.expression(0)?);
+                self.newlines();
+            }
+            self.expect("]")?;
+            let depth = elements.iter().map(|e| e.depth).max().unwrap_or(0) + 1;
+            self.node(at, ExprKind::ArrayLiteral(elements), depth)?
+        } else if at.text == "new" {
+            let saved = self.position;
+            let ty = self.ty()?;
+            if self.eat("[") {
+                let length = self.expression(0)?;
+                self.expect("]")?;
+                let depth = length.depth + 1;
+                self.node(at, ExprKind::NewArray(ty, Box::new(length)), depth)?
+            } else {
+                self.position = saved;
+                let operand = self.expression(30)?;
+                let depth = operand.depth + 1;
+                self.node(at, ExprKind::Unary("new".into(), Box::new(operand)), depth)?
+            }
+        } else if at.text == "typeof" {
             self.expect("(")?;
             self.newlines();
             let ty = self.ty()?;
@@ -628,6 +675,15 @@ impl Parser {
                 left = self.node(
                     left.at.clone(),
                     ExprKind::Match(Box::new(left), arms),
+                    depth,
+                )?;
+            } else if self.eat("[") {
+                let index = self.expression(0)?;
+                self.expect("]")?;
+                let depth = left.depth.max(index.depth) + 1;
+                left = self.node(
+                    left.at.clone(),
+                    ExprKind::Index(Box::new(left), Box::new(index)),
                     depth,
                 )?;
             } else if self.at(".") {
@@ -777,8 +833,54 @@ impl Lowerer<'_> {
             self.value_expression(expression)
         }
     }
+    fn array_owner(&mut self, expression: &Expr) -> Result<Ty, Fault> {
+        // Reading a local array element need not copy its whole value.
+        if let ExprKind::Name(name) = &expression.kind {
+            let binding = self.binding(name, &expression.at)?;
+            if let Ty::Array(element) = binding.ty {
+                self.body.push(binding.address);
+                return Ok(Ty::Ref(Box::new(Ty::Array(element))));
+            }
+        }
+        self.expression(expression)
+    }
+    fn array_element(ty: Ty, at: &Token) -> Result<Ty, Fault> {
+        match ty {
+            Ty::Array(element) => Ok(*element),
+            Ty::Ref(target) => Self::array_element(*target, at),
+            _ => Err(at.error("indexing requires an array")),
+        }
+    }
     fn expression(&mut self, expression: &Expr) -> Result<Ty, Fault> {
         match &expression.kind {
+            ExprKind::NewArray(element, length) => {
+                self.expression_for(length, &Ty::Int)?;
+                self.body.push(format!("newarr {}", element.il()));
+                Ok(Ty::Ref(Box::new(Ty::Array(Box::new(element.clone())))))
+            }
+            ExprKind::ArrayLiteral(elements) => {
+                self.body.push(format!("ldc.i4 {}", elements.len()));
+                let element = self.value_expression(&elements[0])?;
+                self.body.push(format!("array.create {}", element.il()));
+                let ty = Ty::Array(Box::new(element.clone()));
+                let local = self.temp(&ty);
+                self.body.push(format!("stloc {local}"));
+                for (index, value) in elements.iter().enumerate().skip(1) {
+                    self.body
+                        .extend([format!("ldloca {local}"), format!("ldc.i4 {index}")]);
+                    self.expression_for(value, &element)?;
+                    self.body.push(format!("stelem {}", element.il()));
+                }
+                self.body.push(format!("ldloc {local}"));
+                Ok(ty)
+            }
+            ExprKind::Index(owner, index) => {
+                let owner_ty = self.array_owner(owner)?;
+                let element = Self::array_element(owner_ty, &owner.at)?;
+                self.expression_for(index, &Ty::Int)?;
+                self.body.push(format!("ldelem {}", element.il()));
+                Ok(element)
+            }
             ExprKind::TypeOf(ty) => {
                 self.body.push(format!("ldtoken {}", ty.il()));
                 self.body
@@ -804,7 +906,14 @@ impl Lowerer<'_> {
                 Ok(binding.ty)
             }
             ExprKind::Field(value, field) => {
-                let mut owner = self.expression(value)?;
+                let mut owner = self.array_owner(value)?;
+                if field.text == "Length"
+                    && matches!(&owner, Ty::Array(_) | Ty::Ref(_))
+                    && Self::array_element(owner.clone(), field).is_ok()
+                {
+                    self.body.extend(["ldlen".into(), "conv.ovf.i4".into()]);
+                    return Ok(Ty::Int);
+                }
                 if let Ty::Ref(target) = owner {
                     self.body.push(format!("ldobj {}", target.il()));
                     owner = *target;
@@ -835,6 +944,7 @@ impl Lowerer<'_> {
                     .records
                     .iter()
                     .any(|record| &record.name.text == name)
+                    && name != "array"
                 {
                     return Err(expression.at.error("new requires record construction"));
                 }
@@ -936,6 +1046,17 @@ impl Lowerer<'_> {
             return Err(callee
                 .at
                 .error("calling through a binding is not supported"));
+        }
+        if matches!(&callee.kind, ExprKind::Name(name) if name == "array") {
+            if arguments.len() != 2 {
+                return Err(callee
+                    .at
+                    .error("array(length, initialValue) requires two arguments"));
+            }
+            self.expression_for(&arguments[0], &Ty::Int)?;
+            let element = self.value_expression(&arguments[1])?;
+            self.body.push(format!("array.create {}", element.il()));
+            return Ok(Ty::Array(Box::new(element)));
         }
         if matches!(&callee.kind, ExprKind::Name(name) if name == "int") {
             if arguments.len() != 1 {
@@ -1040,6 +1161,14 @@ impl Lowerer<'_> {
     // Emit a managed address of an assignable source location.
     fn place(&mut self, expression: &Expr, borrowing: bool) -> Result<Ty, Fault> {
         match &expression.kind {
+            ExprKind::Index(owner, index) => {
+                let owner_ty = self.place(owner, borrowing)?;
+                let element = Self::array_element(owner_ty, &owner.at)?;
+                self.expression_for(index, &Ty::Int)?;
+                self.body.push(format!("ldelema {}", element.il()));
+                Ok(element)
+            }
+
             ExprKind::Name(name) => {
                 let binding = self.binding(name, &expression.at)?;
                 if let Ty::Ref(target) = binding.ty {
@@ -1519,6 +1648,7 @@ pub fn lower_to_il(source: &str) -> Result<String, Fault> {
                 "Result",
                 "Byte",
                 "byte",
+                "array",
             ]
             .contains(&name.text.as_str())
         {
