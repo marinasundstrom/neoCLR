@@ -128,7 +128,64 @@ and inspects live guest frames, managed heap objects and tracked native storage.
 emits source sequence points and slot labels. Further UI/editor integration and richer
 source-level debugging should build on this execution-control and snapshot boundary.
 
-## Next slice: ordinary and output reference parameters
+## Runtime library reference contracts reviewed
+
+The [API design document](api-design.md) inventories values, managed references,
+receivers, outputs, and native storage contracts. List/ArrayList now require managed
+reference receivers, and Neo honors library receiver and property metadata. The
+native collection backing store remains a separate migration.
+
+## Next slice: reflection introspection
+
+Extend [System.Type inspection](type-inspection.md) to enumerate fields, methods,
+and properties. Keep the familiar .NET `System.Reflection` descriptor names and
+`Type.GetFields()`, `GetMethods()`, and `GetProperties()` where they fit. The official
+[GetFields](https://learn.microsoft.com/en-us/dotnet/api/system.type.getfields),
+[GetProperties](https://learn.microsoft.com/en-us/dotnet/api/system.type.getproperties),
+and [BindingFlags](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.bindingflags)
+contracts are the comparison baseline; document every supported subset or deviation.
+
+The bounded implementation should cover:
+
+- `FieldInfo`: Name, DeclaringType, FieldType, and represented visibility/storage flags.
+- `MethodInfo`: Name, DeclaringType, ReturnType, static/instance information, and
+  `GetParameters()` returning parameter names, positions, types and output contracts.
+  Keep constructor enumeration distinct from ordinary methods.
+- `PropertyInfo`: Name, DeclaringType, PropertyType, index parameters, CanRead/CanWrite,
+  and getter/setter descriptors using existing property metadata.
+- Type shape: namespace/full-name policy, generic arguments, implemented interfaces,
+  and element type plus IsArray/IsByRef/IsPointer where supported. Audit the existing
+  qualified Type.Name contract before introducing CLR-like Name/FullName behavior.
+- neoCLR-specific facts: managed-reference signatures and reference receiver mode.
+  Expose these without classifying the underlying definition as inherently a value
+  type or a reference type.
+
+Start with public member enumeration. Define a supported BindingFlags subset for
+explicit filtering; reject unsupported flags instead of silently ignoring them.
+There is no inherited-member enumeration until inheritance exists. Document order,
+overload identity, visibility, generic substitution and descriptor lifetime. Inspection
+must not invoke property getters or grant mutation/private invocation access.
+
+Return ordinary typed descriptor arrays, choosing value results by default and using
+managed heap references only where the API deliberately promises shared storage.
+Descriptors describe metadata; they must not capture guest object references or become
+hidden GC roots. Preserve module/revision/definition identity and avoid recursive
+unbounded snapshots when a type's members refer back to the type.
+
+The end-to-end Neo example should enumerate a record's fields and methods, and a
+library type's properties and method parameters, using existing arrays, loops and
+ordinary property access. Include closed generic types and managed-reference signatures.
+Keep Neo updates bounded to that scenario. Add source/artifact round-trip tests,
+visibility checks and a GC-pressure test for returned descriptor arrays.
+
+For inspection starting from an object/reference expression, explicitly distinguish
+its declared type from the concrete type behind a managed interface view. Design a
+reference-aware type lookup that does not require an Object base or boxing. Do not
+pretend the existing `TypeOf<T>.Of(T)` provides dynamic type discovery. Reflective
+GetValue/SetValue, Invoke, construction, attribute instantiation and metadata mutation
+remain subsequent work after enumeration and type discovery are sound.
+
+## Following slice: ordinary and output reference parameters
 
 Clarify and demonstrate the difference between an ordinary `Foo&` parameter and the
 proposed Neo spelling `out Foo&`, using the runtime's existing output contracts.

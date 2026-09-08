@@ -211,6 +211,10 @@ compiler limitations as runtime lifetime or type-system restrictions.
 
 ## Upcoming decisions
 
+The next implementation slice is [reflection introspection](neo-roadmap.md#next-slice-reflection-introspection):
+review Type and member-descriptor contracts using these value/reference rules. The
+following items remain queued alongside that work.
+
 1. Clarify initialized `Foo&` versus output parameters (`out Foo&` in proposed Neo
    syntax), including conditional output, read-before-assignment, aliases, and
    normal-return obligations. An output parameter initializes a Foo destination;

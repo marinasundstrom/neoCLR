@@ -100,3 +100,10 @@ cargo test --test neo_typeof --test type_inspection
 
 The [Neo guide](neo.md) and [grammar](neo-grammar.md) describe the source subset.
 This addition changes neither the runtime opcode set nor the module format.
+
+## Next implementation slice
+
+[Reflection introspection](neo-roadmap.md#next-slice-reflection-introspection) is next:
+field, method and property enumeration with familiar System.Reflection descriptor
+names, parameter/type details, and explicit managed-reference metadata. These APIs
+are planned, not implemented by the current minimal Type inspection surface.
