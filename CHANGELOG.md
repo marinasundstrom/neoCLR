@@ -13,6 +13,12 @@ The next preview's version, publication date and release validation are not yet 
 
 #### Added
 
+- **Neo output parameters:** unconditional `out name: Foo&` declarations, explicit
+  `out destination` arguments, and typed uninitialized var locals now project the
+  existing runtime contracts. Source/interface forwarding and conditional library
+  TryGet calls are demonstrated end to end. Caller initialization is checked by the
+  verifier; callee read/assignment obligations remain runtime-enforced.
+
 - **Reflection introspection:** System.Type now enumerates fields, methods and
   properties through independent FieldInfo, MethodInfo and PropertyInfo records.
   ParameterInfo exposes names, positions, types and output contracts. Queries support

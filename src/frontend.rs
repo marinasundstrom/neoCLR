@@ -160,6 +160,7 @@ impl Ty {
 struct Field {
     name: Token,
     ty: Ty,
+    output: bool,
 }
 struct Record {
     name: Token,
@@ -199,6 +200,7 @@ enum ExprKind {
     Binary(String, Box<Expr>, Box<Expr>),
     Match(Box<Expr>, Vec<Arm>),
     TypeOf(Ty),
+    Out(Box<Expr>),
     InterfaceCast(Box<Expr>, Ty),
     ArrayLiteral(Vec<Expr>),
     NewArray(Ty, Box<Expr>),
@@ -221,7 +223,7 @@ enum Stmt {
         name: Token,
         mutable: bool,
         annotation: Option<Ty>,
-        value: Expr,
+        value: Option<Expr>,
     },
     Assign(Expr, Expr),
     Return(Token, Option<Expr>),
@@ -373,12 +375,13 @@ impl Parser {
         }
         Ok(ty)
     }
-    fn fields(&mut self) -> Result<Vec<Field>, Fault> {
+    fn fields(&mut self, parameters: bool) -> Result<Vec<Field>, Fault> {
         self.expect("(")?;
         self.newlines();
         let mut fields: Vec<Field> = Vec::new();
         if !self.at(")") {
             loop {
+                let output = parameters && self.eat("out");
                 let name = self.name()?;
                 if fields.iter().any(|field| field.name.text == name.text) {
                     return Err(name.error("duplicate parameter or field"));
@@ -388,7 +391,10 @@ impl Parser {
                 if fields.len() >= 1024 {
                     return Err(name.error("parameter/field limit exceeded"));
                 }
-                fields.push(Field { name, ty });
+                if output && !matches!(ty, Ty::Ref(_)) {
+                    return Err(name.error("out parameter requires a managed reference type"));
+                }
+                fields.push(Field { name, ty, output });
                 self.newlines();
                 if !self.eat(",") {
                     break;
@@ -402,7 +408,7 @@ impl Parser {
     fn function(&mut self, abstract_member: bool) -> Result<Function, Fault> {
         self.expect("func")?;
         let name = self.name()?;
-        let parameters = self.fields()?;
+        let parameters = self.fields(true)?;
         self.expect("->")?;
         let returns = self.ty()?;
         let body = if abstract_member {
@@ -460,7 +466,7 @@ impl Parser {
                 source.interfaces.push(Interface { name, methods });
             } else if self.eat("record") {
                 let name = self.name()?;
-                let fields = self.fields()?;
+                let fields = self.fields(false)?;
                 let mut implements = Vec::new();
                 if self.eat(":") {
                     loop {
@@ -592,12 +598,21 @@ impl Parser {
             } else {
                 None
             };
-            self.expect("=")?;
+            let value = if self.eat("=") {
+                Some(self.expression(0)?)
+            } else {
+                if !mutable || annotation.is_none() {
+                    return Err(
+                        name.error("uninitialized declaration requires var and an explicit type")
+                    );
+                }
+                None
+            };
             Stmt::Bind {
                 name,
                 mutable,
                 annotation,
-                value: self.expression(0)?,
+                value,
             }
         } else if self.at("return") {
             let at = self.take();
@@ -665,6 +680,10 @@ impl Parser {
                 let depth = operand.depth + 1;
                 self.node(at, ExprKind::Unary("new".into(), Box::new(operand)), depth)?
             }
+        } else if at.text == "out" {
+            let value = self.expression(30)?;
+            let depth = value.depth + 1;
+            self.node(at, ExprKind::Out(Box::new(value)), depth)?
         } else if at.text == "typeof" {
             self.expect("(")?;
             self.newlines();
@@ -971,7 +990,39 @@ impl Lowerer<'_> {
         self.require(&actual, expected, at)?;
         Ok(actual)
     }
+    fn parameter_argument(&mut self, argument: &Expr, parameter: &Field) -> Result<(), Fault> {
+        if parameter.output {
+            let ExprKind::Out(value) = &argument.kind else {
+                return Err(argument
+                    .at
+                    .error("output parameter requires an out argument"));
+            };
+            let actual = Ty::Ref(Box::new(self.place(value, true)?));
+            self.require(&actual, &parameter.ty, &argument.at)
+        } else {
+            self.expression_for(argument, &parameter.ty).map(|_| ())
+        }
+    }
+    fn output_arguments(
+        &self,
+        arguments: &[Expr],
+        function: &crate::metadata::Function,
+    ) -> Result<(), Fault> {
+        for (index, argument) in arguments.iter().enumerate() {
+            let output =
+                function.out_parameters.contains(&index) || function.out_when_true.contains(&index);
+            if matches!(argument.kind, ExprKind::Out(_)) != output {
+                return Err(argument
+                    .at
+                    .error("out argument must match an output parameter"));
+            }
+        }
+        Ok(())
+    }
     fn library_argument(&mut self, expression: &Expr) -> Result<Ty, Fault> {
+        if let ExprKind::Out(value) = &expression.kind {
+            return self.place(value, true).map(|ty| Ty::Ref(Box::new(ty)));
+        }
         if matches!(&expression.kind, ExprKind::Unary(op, _) if op == "&") {
             self.expression(expression)
         } else {
@@ -1206,6 +1257,9 @@ impl Lowerer<'_> {
                     Ty::Bool
                 })
             }
+            ExprKind::Out(_) => Err(expression
+                .at
+                .error("out is only valid on an output argument")),
             ExprKind::Call(callee, arguments) => self.call(callee, arguments),
             ExprKind::Match(value, arms) => self
                 .match_arms(value, arms, false, None, false)
@@ -1263,7 +1317,7 @@ impl Lowerer<'_> {
                         return Err(member.error("argument count mismatch"));
                     }
                     for (argument, parameter) in arguments.iter().zip(&parameters) {
-                        self.expression_for(argument, &parameter.ty)?;
+                        self.parameter_argument(argument, parameter)?;
                     }
                     self.body.push(format!(
                         "{} {signature}",
@@ -1280,7 +1334,12 @@ impl Lowerer<'_> {
                     library::parameters(target, &member.text, arguments.len())?
                 {
                     for (argument, parameter) in arguments.iter().zip(&parameters) {
-                        self.expression_for(argument, parameter)?;
+                        if matches!(argument.kind, ExprKind::Out(_)) {
+                            let actual = self.library_argument(argument)?;
+                            self.require(&actual, parameter, &argument.at)?;
+                        } else {
+                            self.expression_for(argument, parameter)?;
+                        }
                     }
                     parameters
                 } else {
@@ -1297,6 +1356,7 @@ impl Lowerer<'_> {
                 );
                 let function =
                     library::resolve(&signature).map_err(|e| callee.at.error(e.message))?;
+                self.output_arguments(arguments, &function)?;
                 let argument_body = self.body.split_off(argument_start);
                 let interface = library::is_interface(target)?;
                 // Interface calls consume a view even when dispatch subsequently
@@ -1371,6 +1431,7 @@ impl Lowerer<'_> {
                 );
                 let function =
                     library::resolve(&signature).map_err(|e| callee.at.error(e.message))?;
+                self.output_arguments(arguments, &function)?;
                 self.body.push(format!("call {signature}"));
                 return Ty::from_metadata(&function.returns);
             }
@@ -1418,8 +1479,8 @@ impl Lowerer<'_> {
         if parameters.len() != arguments.len() {
             return Err(callee.at.error("argument count mismatch"));
         }
-        for (argument, parameter) in arguments.iter().zip(parameters) {
-            self.expression_for(argument, &parameter.ty)?;
+        for (argument, parameter) in arguments.iter().zip(&parameters) {
+            self.parameter_argument(argument, parameter)?;
         }
         self.body.push(opcode);
         Ok(returns)
@@ -1795,16 +1856,21 @@ impl Lowerer<'_> {
                     if self.bindings.contains_key(&name.text) {
                         return Err(name.error("duplicate binding"));
                     }
-                    let ty = if let Some(annotation) = annotation {
-                        self.expression_for(value, annotation)?
-                    } else {
-                        self.expression(value)?
+                    let ty = match (value, annotation) {
+                        (Some(value), Some(annotation)) => {
+                            self.expression_for(value, annotation)?
+                        }
+                        (Some(value), None) => self.expression(value)?,
+                        (None, Some(annotation)) => annotation.clone(),
+                        (None, None) => unreachable!(),
                     };
                     let index = self.locals.len();
                     self.locals
                         .push(format!(".local {} {}_{index}", ty.il(), name.text));
                     self.body.push(format!("local.reset {index}"));
-                    self.body.push(format!("stloc {index}"));
+                    if value.is_some() {
+                        self.body.push(format!("stloc {index}"));
+                    }
                     self.bindings.insert(
                         name.text.clone(),
                         Binding {
@@ -1911,7 +1977,12 @@ impl Lowerer<'_> {
             self.function
                 .parameters
                 .iter()
-                .map(|field| format!("{} {}", field.ty.il(), field.name.text))
+                .map(|field| format!(
+                    "{}{} {}",
+                    if field.output { "out " } else { "" },
+                    field.ty.il(),
+                    field.name.text
+                ))
                 .collect::<Vec<_>>()
                 .join(","),
             self.function.returns.il(),
@@ -1985,7 +2056,7 @@ pub fn lower_to_il_named(source: &str, document: &str) -> Result<String, Fault> 
                 method
                     .parameters
                     .iter()
-                    .map(|p| p.ty.il())
+                    .map(|p| format!("{}{}", if p.output { "out " } else { "" }, p.ty.il()))
                     .collect::<Vec<_>>()
                     .join(","),
                 method.returns.il()

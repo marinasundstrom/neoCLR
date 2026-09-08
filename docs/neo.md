@@ -368,3 +368,12 @@ types. This adds no generic function declarations or generic method inference. O
 comparisons remain expressions. A reference to a bundled type can implicitly convert
 to an interface declared by that closed type, without addressing or boxing a value.
 See the [complete collection example](../examples/source/collections.neo).
+
+## Output parameters and uninitialized locals
+
+`func Initialize(out value: Foo&)` declares an unconditional output contract;
+`Initialize(out destination)` forms or forwards its destination reference.
+`var destination: Foo` declares uninitialized storage. The existing verifier checks
+caller initialization; runtime guards enforce callee assignment obligations. Calls
+to library conditional outputs are supported on direct success branches. See
+[output references](neo-outputs.md) for syntax, examples and limitations.

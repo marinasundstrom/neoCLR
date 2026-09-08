@@ -59,10 +59,7 @@ pub(super) fn resolve(signature: &str) -> Result<crate::metadata::Function, Faul
         crate::library::system()?,
         &crate::assembler::parse_function_ref(signature)?,
     )?;
-    if function.visibility != Visibility::Public
-        || !function.out_parameters.is_empty()
-        || !function.out_when_true.is_empty()
-    {
+    if function.visibility != Visibility::Public {
         return Err(Fault::new("unsupported library call contract"));
     }
     Ok(function)

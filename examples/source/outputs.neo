@@ -1,0 +1,30 @@
+import System.Console.*
+
+record Counter(Age: int)
+
+func Initialize(out value: Counter&) -> () {
+    value = Counter(40)
+}
+
+func Forward(out destination: Counter&) -> () {
+    Initialize(out destination)
+}
+
+func SetAge(out age: int&) -> () {
+    age = 42
+}
+
+func Main() -> int {
+    var counter: Counter
+    Forward(out counter)
+    let age = &counter.Age
+    SetAge(out age)
+    WriteLine(counter.Age)
+
+    let element = typeof(Counter&).GetElementType()
+    var some: System.Option.Some<System.Type>
+    if element.TryGet(out some) {
+        WriteLine(some.Value.Name)
+    }
+    return counter.Age
+}

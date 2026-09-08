@@ -209,11 +209,10 @@ compiler limitations as runtime lifetime or type-system restrictions.
 owned descriptor values and arrays, preserve T& signatures and reference receiver mode,
 and do not retain guest object references. The following items remain queued.
 
-1. Clarify initialized `Foo&` versus output parameters (`out Foo&` in proposed Neo
-   syntax), including conditional output, read-before-assignment, aliases, and
-   normal-return obligations. An output parameter initializes a Foo destination;
-   it is not automatically a way to replace a caller's reference binding. See
-   [reference slots](reference-slots.md).
+1. Extend the implemented [Neo output contracts](neo-outputs.md) with stronger
+   static callee/alias analysis and a future conditional declaration syntax. Ordinary
+   and output references already preserve one destination and its provenance; an
+   output is not a way to replace a caller's reference binding.
 2. Specify readonly observation contracts before broadly converting predicates,
    equality, and large immutable receiver APIs to references.
 3. Build on the managed growable collection with explicit Clone and any future

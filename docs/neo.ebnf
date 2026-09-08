@@ -5,12 +5,15 @@ import_decl      = "import", "System", ".", "Console", ".", "*", terminator ;
 record_decl      = "record", identifier, field_list, [ ":", type, { ",", type } ],
                    (terminator | newlines, "{", separators, { function_decl, separators }, "}") ;
 interface_decl   = "interface", identifier, newlines, "{", separators,
-                   { "func", identifier, field_list, "->", type, terminator, separators }, "}" ;
-function_decl    = "func", identifier, field_list, "->", type, newlines,
+                   { "func", identifier, parameter_list, "->", type, terminator, separators }, "}" ;
+function_decl    = "func", identifier, parameter_list, "->", type, newlines,
                    "{", separators, { statement, separators }, "}" ;
 field_list       = "(", newlines,
                    [ field, newlines, { ",", newlines, field, newlines } ], ")" ;
 field            = identifier, ":", type ;
+parameter_list   = "(", newlines, [ parameter, newlines,
+                   { ",", newlines, parameter, newlines } ], ")" ;
+parameter        = [ "out" ], identifier, ":", type ;
 type             = (qualified_name, [ "<", type, { ",", type }, ">" ] | "(", ")"), { "[", "]" }, [ "&" ] ;
 qualified_name   = identifier, { ".", identifier } ;
 
@@ -19,7 +22,8 @@ statement        = (binding | return_statement | expression_statement | "break" 
                  | if_statement | "while", expression, block | "loop", block
                  | "for", identifier, "in", expression, (".." | "..<"), expression, block ;
 if_statement     = "if", expression, block, [ newlines, "else", (if_statement | block) ] ;
-binding          = ("let" | "var"), identifier, [ ":", type ], "=", expression ;
+binding          = ("let" | "var"), identifier, [ ":", type ], "=", expression
+                 | "var", identifier, ":", type ;
 return_statement = "return", [ expression ] ;
 expression_statement = expression, [ "=", expression ] ;
 
@@ -39,8 +43,9 @@ unary            = ("&" | "-" | "!" | "new"), unary
                  | "new", type, "[", expression, "]" | postfix ;
 postfix          = primary, { ".", identifier | arguments | "[", expression, "]" } ;
 arguments        = "(", newlines,
-                   [ expression, newlines,
-                     { ",", newlines, expression, newlines } ], ")" ;
+                   [ argument, newlines,
+                     { ",", newlines, argument, newlines } ], ")" ;
+argument         = [ "out" ], expression ;
 generic_member   = qualified_name, "<", type, { ",", type }, ">", ".", identifier ;
 primary          = generic_member | integer | string | "true" | "false" | "this" | identifier
                  | "[", newlines, expression, newlines, { ",", newlines, expression, newlines }, "]"
