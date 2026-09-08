@@ -62,8 +62,8 @@ member until its supported inputs, outputs, errors, and other effects are define
 
 Place generic collections directly in System.Collections. Generic arity already
 distinguishes type identities; a separate Generic namespace is unnecessary. The
-preview implements System.Collections.ArrayList<T> for native-layout values, with
-explicit allocation/release. It implements List<T>, without an I prefix, through
+preview implements System.Collections.ArrayList<T> with a managed T[]& backing
+array and GC lifetime. T can itself be a managed-reference type. It implements List<T>, without an I prefix, through
 [explicit borrowed interface references](interfaces.md).
 See [ArrayList](array-list.md) for the concrete API and current element limits.
 

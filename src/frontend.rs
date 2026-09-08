@@ -1263,10 +1263,19 @@ impl Lowerer<'_> {
                     return Ok(returns);
                 }
                 let argument_start = self.body.len();
-                let types = arguments
-                    .iter()
-                    .map(|a| self.library_argument(a))
-                    .collect::<Result<Vec<_>, _>>()?;
+                let types = if let Some(parameters) =
+                    library::parameters(target, &member.text, arguments.len())?
+                {
+                    for (argument, parameter) in arguments.iter().zip(&parameters) {
+                        self.expression_for(argument, parameter)?;
+                    }
+                    parameters
+                } else {
+                    arguments
+                        .iter()
+                        .map(|a| self.library_argument(a))
+                        .collect::<Result<Vec<_>, _>>()?
+                };
                 let signature = format!(
                     "instance {}::{}({})",
                     target.il(),
@@ -1409,6 +1418,10 @@ impl Lowerer<'_> {
                 let owner_ty = self.place(owner, borrowing)?;
                 let element = Self::array_element(owner_ty, &owner.at)?;
                 self.expression_for(index, &Ty::Int)?;
+                if let Ty::Ref(target) = &element {
+                    self.body.push(format!("ldelem {}", element.il()));
+                    return Ok(*target.clone());
+                }
                 self.body.push(format!("ldelema {}", element.il()));
                 Ok(element)
             }

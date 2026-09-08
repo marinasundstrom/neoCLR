@@ -2,6 +2,8 @@ use crate::metadata::Type;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Value {
+    /// Internal reserved array slot; guest element reads fault until initialized.
+    Uninitialized(Type),
     Void,
     Single(f32),
     Double(f64),
@@ -46,6 +48,13 @@ pub enum Value {
 }
 
 impl Value {
+    pub(crate) fn initialized(&self) -> Result<&Self, crate::Fault> {
+        if matches!(self, Self::Uninitialized(_)) {
+            Err(crate::Fault::new("read of uninitialized array element"))
+        } else {
+            Ok(self)
+        }
+    }
     /// Values embedded in fields, erased payloads or heap storage may only carry
     /// heap-backed references. A scoped reference cannot acquire a longer lifetime.
     pub(crate) fn ensure_heap_references(&self) -> Result<(), crate::Fault> {
@@ -115,6 +124,7 @@ impl Value {
 
     pub fn ty(&self) -> Type {
         match self {
+            Self::Uninitialized(ty) => ty.clone(),
             Self::Void => Type::Void,
             Self::Single(_) => Type::Single,
             Self::Double(_) => Type::Double,
@@ -160,6 +170,7 @@ impl Value {
 
     /// CLI integer storage truncates a stack integer to the destination width.
     pub(crate) fn for_storage(self, ty: &Type) -> Result<Self, crate::Fault> {
+        self.initialized()?;
         let value = match (&self, ty) {
             (Self::Double(n), Type::Single) => Self::Single(*n as f32),
             (Self::Int32(n), Type::SByte) => Self::SByte(*n as i8),

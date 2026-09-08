@@ -27,7 +27,7 @@ byref receiver. See [slot reference contracts](reference-slots.md).
 [The List sample](../examples/interfaces.neoil) now passes List<Int32>& directly
 from an ArrayList local, without native receiver-descriptor allocation. ArrayList's
 methods and the List contract now declare byref receivers. The original descriptor
-is used for calls, while its native backing storage still requires explicit Free.
+is used for calls; its managed array backing storage is traced by the GC.
 [The Counter sample](../examples/reference_receivers.neoil) demonstrates byref interface dispatch that changes an inline field.
 
 [System.Equatable<T>](equality.md) supplies typed Equals(T) dispatch for primitives,
@@ -126,10 +126,10 @@ the managed slot view described above;
 the native-pointer view does not acquire that capability implicitly.
 
 System.Collections.ArrayList<T> now implements System.Collections.List<T> with Count,
-Item get/set and Add. Allocate and Free remain concrete ownership operations, outside
-the borrowed list contract. See [the executable sample](../examples/interfaces.neoil):
+Item get/set and Add. Allocate remains a concrete factory operation, outside
+the borrowed list contract; there is no ArrayList.Free. See [the executable sample](../examples/interfaces.neoil):
 it addresses an ArrayList local, borrows a managed List view, adds values,
-passes the view to Sum and releases through the concrete owner. It prints 42 and 2.
+passes the view to Sum and lets GC reclaim the backing storage. It prints 42 and 2.
 
 ```sh
 cargo run --locked -- verify examples/interfaces.neoil

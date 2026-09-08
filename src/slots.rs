@@ -143,7 +143,7 @@ impl SlotReference {
     }
     pub(crate) fn field(&self, index: usize, target: Type) -> Result<Self, Fault> {
         self.assigned()?;
-        if contains(&target) {
+        if matches!(&target, Type::ByRef(_)) {
             return Err(Fault::new("nested managed references are not supported"));
         }
         let mut result = self.clone();
@@ -185,7 +185,11 @@ impl SlotReference {
         if index >= self.array_length()? {
             return Err(Fault::new("array index out of range"));
         }
-        self.field(index, target.clone())
+        let mut result = self.clone();
+        result.path.push(index);
+        result.target = target.clone();
+        result.after_write = None;
+        Ok(result)
     }
     pub(crate) fn output(&self) -> Result<Self, Fault> {
         let mut result = self.clone();
@@ -206,6 +210,7 @@ impl SlotReference {
         if slot.value.is_none() {
             return Err(Fault::new("read of uninitialized slot"));
         }
+        at_path(slot.value.as_ref().unwrap(), &self.path)?.initialized()?;
         Ok(())
     }
     pub(crate) fn read(&self) -> Result<Value, Fault> {

@@ -133,7 +133,9 @@ source-level debugging should build on this execution-control and snapshot bound
 The [API design document](api-design.md) inventories values, managed references,
 receivers, outputs, and native storage contracts. List/ArrayList now require managed
 reference receivers, and Neo honors library receiver and property metadata. The
-native collection backing store remains a separate migration.
+collection now holds a managed T[]& backing array, supports reference elements, and
+uses GC rather than Free. Its capacity allocation and copy rules are documented in
+[ArrayList](array-list.md).
 
 ## Next slice: reflection introspection
 

@@ -21,6 +21,39 @@ pub(super) fn is_interface(ty: &Ty) -> Result<bool, Fault> {
     }))
 }
 
+/// A unique method shape supplies argument context, including a substituted T&.
+/// Overloaded names retain the existing exact-signature selection path.
+pub(super) fn parameters(ty: &Ty, member: &str, count: usize) -> Result<Option<Vec<Ty>>, Fault> {
+    let module = crate::library::system()?;
+    let metadata = crate::assembler::parse_type(&ty.il())?;
+    let Some(definition) = module.type_definition(&metadata) else {
+        return Ok(None);
+    };
+    let mut candidates = module.functions.iter().filter(|f| {
+        f.instance
+            && f.owner.as_ref() == Some(&definition.open_type())
+            && f.name.rsplit('.').next() == Some(member)
+            && f.parameters.len() == count
+            && f.visibility == Visibility::Public
+    });
+    let Some(method) = candidates.next() else {
+        return Ok(None);
+    };
+    if candidates.next().is_some() {
+        return Ok(None);
+    }
+    let arguments = match &metadata {
+        Type::Constructed { arguments, .. } => arguments.as_slice(),
+        _ => &[],
+    };
+    method
+        .parameters
+        .iter()
+        .map(|p| Ty::from_metadata(&p.substitute_type_parameters(arguments)?))
+        .collect::<Result<Vec<_>, _>>()
+        .map(Some)
+}
+
 pub(super) fn resolve(signature: &str) -> Result<crate::metadata::Function, Fault> {
     let function = crate::vm::resolve(
         crate::library::system()?,

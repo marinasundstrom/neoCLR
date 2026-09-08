@@ -213,3 +213,70 @@ fn replacement_of_array_inside_record_preserves_shape() {
             .contains("equal lengths")
     );
 }
+
+#[test]
+fn reserved_capacity_faults_on_reads_and_accepts_typed_initialization() {
+    for access in ["ldelem Int32", "ldelema Int32\nldobj Int32"] {
+        let p = program(
+            "",
+            &format!("ldc.i4 2\narray.alloc Int32\nldc.i4 0\n{access}"),
+            "Int32",
+        );
+        p.verify().unwrap();
+        assert!(
+            p.run(Limits::default())
+                .unwrap_err()
+                .message
+                .contains("uninitialized")
+        );
+    }
+    let p = program(
+        "",
+        ".local String[]& a\nldc.i4 4\narray.alloc String\nstloc a\nldloc a\nldc.i4 2\nldstr \"Neo\"\nstelem String\nldloc a\nldc.i4 2\nldelem String",
+        "String",
+    );
+    p.verify().unwrap();
+    assert_eq!(
+        p.run(Limits::default()).unwrap().value,
+        Value::String("Neo".into())
+    );
+}
+
+#[test]
+fn reference_elements_trace_targets_and_replacement_releases_old_roots() {
+    let p = program(
+        "",
+        ".local Int32&[]& a\nldc.i4 1\narray.alloc Int32&\nstloc a\nldloc a\nldc.i4 0\nldc.i4 1\nheap.new\nstelem Int32&\nldloc a\nldc.i4 0\nldc.i4 42\nheap.new\nstelem Int32&\nldloc a",
+        "Int32&[]&",
+    );
+    p.verify().unwrap();
+    let result = p.run(Limits::default()).unwrap();
+    assert_eq!(result.heap.len(), 2);
+    assert_eq!(result.heap.reclaimed_objects(), 1);
+}
+
+#[test]
+fn reserved_arrays_obey_budgets_and_cannot_deinitialize_existing_elements() {
+    let p = program("", "ldc.i4 4\narray.alloc String\nldlen", "UIntPtr");
+    assert!(
+        p.run(Limits {
+            array_elements: 3,
+            ..Default::default()
+        })
+        .unwrap_err()
+        .message
+        .contains("budget")
+    );
+    let p = program(
+        "",
+        ".local Int32[]& a\nldc.i4 1\nnewarr Int32\nstloc a\nldloc a\nldc.i4 1\narray.alloc Int32\nldobj Int32[]\nstobj Int32[]\nldc.i4 0",
+        "Int32",
+    );
+    p.verify().unwrap();
+    assert!(
+        p.run(Limits::default())
+            .unwrap_err()
+            .message
+            .contains("cannot become uninitialized")
+    );
+}

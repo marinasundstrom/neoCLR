@@ -1,19 +1,20 @@
 use neoclr::{Limits, LoadedProgram, Value, assemble, load};
 
-fn execute(body: &str, returns: &str, extra: &str) -> Result<neoclr::Execution, neoclr::Fault> {
+fn program(body: &str, returns: &str, extra: &str) -> LoadedProgram {
     let module = assemble(&format!(
         ".module App\n.entry Main\n{extra}\n.function Main() -> {returns}\n{body}\nret\n.end"
-    ))?;
-    let program = LoadedProgram::new(&load(&serde_json::to_string(&module).unwrap())?)?;
-    program.verify()?;
-    program.run(Limits::default())
+    ))
+    .unwrap();
+    let program =
+        LoadedProgram::new(&load(&serde_json::to_string(&module).unwrap()).unwrap()).unwrap();
+    program.verify().unwrap();
+    program
 }
 
 #[test]
-fn sample_grows_through_an_alias_and_releases_both_allocations() {
+fn sample_grows_through_reference_alias_without_native_allocations() {
     let module = assemble(include_str!("../examples/array_list.neoil")).unwrap();
-    let program =
-        LoadedProgram::new(&load(&serde_json::to_string(&module).unwrap()).unwrap()).unwrap();
+    let program = LoadedProgram::new(&module).unwrap();
     program.verify().unwrap();
     let result = program.run(Limits::default()).unwrap();
     assert_eq!(
@@ -21,40 +22,42 @@ fn sample_grows_through_an_alias_and_releases_both_allocations() {
         ["ArrayList count:", "5", "0", "1", "4", "9", "16"]
     );
     assert_eq!(result.memory.live_allocations(), 0);
+    assert!(result.heap.statistics().allocated_objects >= 3);
+    assert_eq!(result.heap.len(), 0);
 }
 
 #[test]
-fn empty_zero_capacity_and_repeated_growth_preserve_items_and_capacity() {
+fn growth_copies_live_elements_and_keeps_amortized_capacity_policy() {
     for initial in [0, 1, 4] {
         let mut body = format!(
-            ".local System.Collections.ArrayList<Int32> list\nldc.i4 {initial}\ncall System.Collections.ArrayList<Int32>::Allocate(Int32)\nstloc list\nldloca list\ncall instance System.Collections.ArrayList<Int32>::get_Count()\nldc.i4 0\nbeq Empty\nfault \"not empty\"\nEmpty:\n"
+            ".local System.Collections.ArrayList<Int32> list\nldc.i4 {initial}\ncall System.Collections.ArrayList<Int32>::Allocate(Int32)\nstloc list\n"
         );
-        for index in 0..9 {
+        for i in 0..9 {
             body += &format!(
-                "ldloca list\nldc.i4 {index}\ncall instance System.Collections.ArrayList<Int32>::Add(Int32)\npop\n"
+                "ldloca list\nldc.i4 {i}\ncall instance System.Collections.ArrayList<Int32>::Add(Int32)\npop\n"
             );
         }
-        for index in 0..9 {
+        for i in 0..9 {
             body += &format!(
-                "ldloca list\nldc.i4 {index}\ncall instance System.Collections.ArrayList<Int32>::get_Item(Int32)\nldc.i4 {index}\nbeq Item{index}\nfault \"lost item\"\nItem{index}:\n"
+                "ldloca list\nldc.i4 {i}\ncall instance System.Collections.ArrayList<Int32>::get_Item(Int32)\nldc.i4 {i}\nbeq Item{i}\nfault \"lost item\"\nItem{i}:\n"
             );
         }
-        body += "ldloca list\ncall instance System.Collections.ArrayList<Int32>::get_Capacity()\nldloca list\ncall instance System.Collections.ArrayList<Int32>::Free()\npop";
-        let result = execute(&body, "Int32", "").unwrap();
+        body += "ldloca list\ncall instance System.Collections.ArrayList<Int32>::get_Capacity()";
+        let result = program(&body, "Int32", "")
+            .run(Limits {
+                heap_objects: 3,
+                ..Default::default()
+            })
+            .unwrap();
         assert_eq!(result.value, Value::Int32(16));
         assert_eq!(result.memory.live_allocations(), 0);
     }
 }
 
 #[test]
-fn aliases_share_indexed_mutation_and_count() {
-    let body = ".local System.Collections.ArrayList<Int32> list\n.local System.Collections.ArrayList<Int32> alias\nldc.i4 0\ncall System.Collections.ArrayList<Int32>::Allocate(Int32)\nstloc list\nldloc list\nstloc alias\nldloca alias\nldc.i4 1\ncall instance System.Collections.ArrayList<Int32>::Add(Int32)\npop\nldloca list\nldc.i4 0\nldc.i4 42\ncall instance System.Collections.ArrayList<Int32>::set_Item(Int32,Int32)\npop\nldloca alias\nldc.i4 0\ncall instance System.Collections.ArrayList<Int32>::get_Item(Int32)\nldloca list\ncall instance System.Collections.ArrayList<Int32>::Free()\npop";
-    assert_eq!(execute(body, "Int32", "").unwrap().value, Value::Int32(42));
-}
-
-#[test]
-fn native_payload_storage_supports_byte_void_and_records() {
+fn managed_payloads_support_strings_bytes_void_and_records() {
     for (ty, value, expected) in [
+        ("String", "ldstr \"Neo\"", Value::String("Neo".into())),
         ("Byte", "ldc.i4 257", Value::Byte(1)),
         ("Void", "ldvoid", Value::Void),
         (
@@ -75,66 +78,95 @@ fn native_payload_storage_supports_byte_void_and_records() {
             );
         }
         body += &format!(
-            "ldloca list\nldc.i4 4\ncall instance System.Collections.ArrayList<{ty}>::get_Item(Int32)\nldloca list\ncall instance System.Collections.ArrayList<{ty}>::Free()\npop"
+            "ldloca list\nldc.i4 4\ncall instance System.Collections.ArrayList<{ty}>::get_Item(Int32)"
         );
-        let result = execute(&body, ty, ".type Cell\n.field Value Int32\n.end").unwrap();
-        assert_eq!(result.value, expected);
-        assert_eq!(result.memory.live_allocations(), 0);
+        assert_eq!(
+            program(&body, ty, ".type Cell\n.field Value Int32\n.end")
+                .run(Limits::default())
+                .unwrap()
+                .value,
+            expected
+        );
     }
 }
 
 #[test]
-fn invalid_capacity_indices_expired_aliases_and_unsupported_layouts_fault() {
-    let prefix = ".local System.Collections.ArrayList<Int32> list\nldc.i4 2\ncall System.Collections.ArrayList<Int32>::Allocate(Int32)\nstloc list\n";
-    for (body, message) in [
+fn invalid_capacity_and_indices_fault_before_reading_spare_capacity() {
+    for (body, expected) in [
         (
-            "ldc.i4 -1\ncall System.Collections.ArrayList<Int32>::Allocate(Int32)\npop\nldvoid"
-                .to_string(),
+            "ldc.i4 -1\ncall System.Collections.ArrayList<Int32>::Allocate(Int32)\npop\nldc.i4 0",
             "capacity",
         ),
         (
-            format!(
-                "{prefix}ldloca list\nldc.i4 0\ncall instance System.Collections.ArrayList<Int32>::get_Item(Int32)\npop\nldvoid"
-            ),
+            ".local System.Collections.ArrayList<Int32> list\nldc.i4 8\ncall System.Collections.ArrayList<Int32>::Allocate(Int32)\nstloc list\nldloca list\nldc.i4 0\ncall instance System.Collections.ArrayList<Int32>::get_Item(Int32)",
             "index",
-        ),
-        (
-            format!(
-                "{prefix}ldloca list\nldc.i4 -1\nldc.i4 3\ncall instance System.Collections.ArrayList<Int32>::set_Item(Int32,Int32)"
-            ),
-            "index",
-        ),
-        (
-            format!(
-                "{prefix}ldloca list\ncall instance System.Collections.ArrayList<Int32>::Free()\npop\nldloca list\ncall instance System.Collections.ArrayList<Int32>::get_Count()\npop\nldvoid"
-            ),
-            "use after free",
-        ),
-        (
-            "ldc.i4 0\ncall System.Collections.ArrayList<String>::Allocate(Int32)\npop\nldvoid"
-                .into(),
-            "layout",
         ),
     ] {
-        let fault = execute(&body, "Void", "").unwrap_err();
-        assert!(fault.message.contains(message), "{fault}");
+        assert!(
+            program(body, "Int32", "")
+                .run(Limits::default())
+                .unwrap_err()
+                .message
+                .contains(expected)
+        );
     }
 }
 
 #[test]
-fn empty_lists_release_storage_and_bounds_use_count_not_capacity() {
-    let empty = ".local System.Collections.ArrayList<Int32> list\nldc.i4 8\ncall System.Collections.ArrayList<Int32>::Allocate(Int32)\nstloc list\nldloca list\ncall instance System.Collections.ArrayList<Int32>::Free()";
-    let result = execute(empty, "Void", "").unwrap();
+fn reference_elements_preserve_identity_and_gc_reachability_across_growth() {
+    let extra = ".type Foo\n.field Age Int32\n.end\n.function Make() -> System.Collections.ArrayList<Foo&>\n.local System.Collections.ArrayList<Foo&> list\nldc.i4 0\ncall System.Collections.ArrayList<Foo&>::Allocate(Int32)\nstloc list\nldloca list\nldc.i4 40\nnewobj Foo\nheap.new\ncall instance System.Collections.ArrayList<Foo&>::Add(Foo&)\npop\nldloc list\nret\n.end";
+    let body = ".local System.Collections.ArrayList<Foo&> list\n.local Foo& alias\ncall Make()\nstloc list\nldloca list\nldc.i4 0\ncall instance System.Collections.ArrayList<Foo&>::get_Item(Int32)\nstloc alias\nldloc alias\nldflda Foo::Age\nldc.i4 42\nstobj Int32\nldloca list\nldloc alias\ncall instance System.Collections.ArrayList<Foo&>::Add(Foo&)\npop\nldloca list\nldc.i4 1\ncall instance System.Collections.ArrayList<Foo&>::get_Item(Int32)\nldobj Foo\nldfld Foo::Age";
+    let result = program(body, "Int32", extra)
+        .run(Limits {
+            heap_objects: 3,
+            ..Default::default()
+        })
+        .unwrap();
+    assert_eq!(result.value, Value::Int32(42));
     assert_eq!(result.memory.live_allocations(), 0);
-    let body = ".local System.Collections.ArrayList<Int32> list\nldc.i4 8\ncall System.Collections.ArrayList<Int32>::Allocate(Int32)\nstloc list\nldloca list\nldc.i4 42\ncall instance System.Collections.ArrayList<Int32>::Add(Int32)\npop\nldloca list\nldc.i4 1\ncall instance System.Collections.ArrayList<Int32>::get_Item(Int32)";
-    let fault = execute(body, "Int32", "").unwrap_err();
-    assert!(fault.message.contains("index out of range"), "{fault}");
+    assert_eq!(result.heap.len(), 0);
 }
 
 #[test]
-fn freeing_pointer_elements_does_not_free_their_targets() {
-    let body = ".local Int32* target\n.local System.Collections.ArrayList<Int32*> list\nldc.i4 1\nheap.alloc Int32\nstloc target\nldloc target\nldc.i4 42\nstobj Int32\nldc.i4 0\ncall System.Collections.ArrayList<Int32*>::Allocate(Int32)\nstloc list\nldloca list\nldloc target\ncall instance System.Collections.ArrayList<Int32*>::Add(Int32*)\npop\nldloca list\ncall instance System.Collections.ArrayList<Int32*>::Free()\npop\nldloc target\nldobj Int32\nldloc target\nheap.free\npop";
-    let result = execute(body, "Int32", "").unwrap();
-    assert_eq!(result.value, Value::Int32(42));
-    assert_eq!(result.memory.live_allocations(), 0);
+fn frame_reference_elements_cannot_escape_into_managed_backing_storage() {
+    let body = ".local Int32 value\n.local System.Collections.ArrayList<Int32&> list\nldc.i4 42\nstloc value\nldc.i4 1\ncall System.Collections.ArrayList<Int32&>::Allocate(Int32)\nstloc list\nldloca list\nldloca value\ncall instance System.Collections.ArrayList<Int32&>::Add(Int32&)";
+    let fault = program(body, "Void", "")
+        .run(Limits::default())
+        .unwrap_err();
+    assert!(fault.message.contains("frame-backed"), "{fault}");
+}
+
+#[test]
+fn descriptor_copies_share_array_but_growth_detaches_the_copy() {
+    let body = ".local System.Collections.ArrayList<Int32> list\n.local System.Collections.ArrayList<Int32> copy\nldc.i4 1\ncall System.Collections.ArrayList<Int32>::Allocate(Int32)\nstloc list\nldloca list\nldc.i4 1\ncall instance System.Collections.ArrayList<Int32>::Add(Int32)\npop\nldloc list\nstloc copy\nldloca copy\nldc.i4 0\nldc.i4 2\ncall instance System.Collections.ArrayList<Int32>::set_Item(Int32,Int32)\npop\nldloca list\nldc.i4 0\ncall instance System.Collections.ArrayList<Int32>::get_Item(Int32)\nldc.i4 2\nbeq Shared\nfault \"copy lost shared buffer\"\nShared:\nldloca copy\nldc.i4 3\ncall instance System.Collections.ArrayList<Int32>::Add(Int32)\npop\nldloca copy\nldc.i4 0\nldc.i4 4\ncall instance System.Collections.ArrayList<Int32>::set_Item(Int32,Int32)\npop\nldloca list\ncall instance System.Collections.ArrayList<Int32>::get_Count()\nldc.i4 1\nbeq Independent\nfault \"count was shared\"\nIndependent:\nldloca list\nldc.i4 0\ncall instance System.Collections.ArrayList<Int32>::get_Item(Int32)";
+    assert_eq!(
+        program(body, "Int32", "")
+            .run(Limits::default())
+            .unwrap()
+            .value,
+        Value::Int32(2)
+    );
+}
+
+#[test]
+fn replacing_a_reference_element_does_not_retain_it_in_spare_capacity() {
+    let body = ".local System.Collections.ArrayList<Int32&> list\nldc.i4 8\ncall System.Collections.ArrayList<Int32&>::Allocate(Int32)\nstloc list\nldloca list\nldc.i4 1\nheap.new\ncall instance System.Collections.ArrayList<Int32&>::Add(Int32&)\npop\nldloca list\nldc.i4 0\nldc.i4 42\nheap.new\ncall instance System.Collections.ArrayList<Int32&>::set_Item(Int32,Int32&)\npop\nldloc list";
+    let result = program(body, "System.Collections.ArrayList<Int32&>", "")
+        .run(Limits::default())
+        .unwrap();
+    assert_eq!(result.heap.len(), 2);
+    assert_eq!(result.heap.reclaimed_objects(), 1);
+}
+
+#[test]
+fn neo_forwards_reference_elements_and_automatically_accesses_the_target() {
+    let il = neoclr::frontend::lower_to_il("record Foo(Age: int)\nfunc Append(list: System.Collections.ArrayList<Foo&>&, item: Foo&) -> int { list.Add(item); let first = list.get_Item(0); first.Age = first.Age + 2; return first.Age }\nfunc Main() -> int { return 0 }").unwrap();
+    let helpers = &il[..il.rfind(".function Main(").unwrap()];
+    let module = assemble(&format!("{helpers}\n.function Main() -> Int32\n.local System.Collections.ArrayList<Foo&> list\nldc.i4 0\ncall System.Collections.ArrayList<Foo&>::Allocate(Int32)\nstloc list\nldloca list\nldc.i4 40\nnewobj Foo\nheap.new\ncall Append(System.Collections.ArrayList<Foo&>&,Foo&)\nret\n.end")).unwrap();
+    let program = LoadedProgram::new(&module).unwrap();
+    program.verify().unwrap();
+    assert_eq!(
+        program.run(Limits::default()).unwrap().value,
+        Value::Int32(42)
+    );
 }

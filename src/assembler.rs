@@ -480,8 +480,8 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         "sizeof" | "alignof" | "heap.alloc" | "ptr.null" | "ptr.cast"
                         | "ptr.fromint" | "ldobj" | "stobj" | "cpobj" | "initobj"
                         | "value.pack" | "value.is" | "value.unpack" | "ldtoken"
-                        | "interface.borrow" | "newarr" | "array.create" | "ldelem" | "stelem"
-                        | "ldelema" => Some(
+                        | "interface.borrow" | "newarr" | "array.alloc" | "array.create"
+                        | "ldelem" | "stelem" | "ldelema" => Some(
                             serde_json::to_value(parse_type(rest)?)
                                 .map_err(|e| Fault::new(e.to_string()))?,
                         ),

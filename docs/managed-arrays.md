@@ -9,6 +9,7 @@ There is no mandatory Object or System.Array base class. The native pointer/leng
 
 | Instruction | Stack effect | Contract |
 | --- | --- | --- |
+| `array.alloc T` | length → T[]& | Reserve managed heap slots; reads fault until individually initialized |
 | `newarr T` | length → T[]& | Create a zero-based, fixed-length managed heap array with initialized elements |
 | `array.create T` | length, initial T → T[] | Create an owned array value by copying an explicit initializer |
 | `ldlen` | T[] or T[]& → UIntPtr | Native unsigned length, as in CLR IL |
@@ -41,8 +42,11 @@ apply even when static verification is skipped. Neo reads/writes those managed
 references automatically, exactly as for record fields.
 
 Ordinary array copies are independent. Embedded managed references retain their
-aliases and must be heap-backed, as in record fields. Direct `T&[]` element types
-are not supported in this slice; records containing heap references are supported.
+aliases and must be heap-backed, as in record fields. Direct `T&[]` element types and records containing heap references are supported.
+Use an explicit initializer or `array.alloc` for reference elements; non-null managed
+references still have no default value. `ldelem` copies the reference and `stelem`
+replaces it. `ldelema` on reference elements is rejected because nested managed
+references are not exposed.
 
 Array locations have fixed shape: replacing an initialized array must preserve its
 length, recursively through nested arrays and record fields. Existing element
@@ -101,7 +105,13 @@ Existing GC object statistics include heap arrays as allocations; they do not
 report array payload bytes. Host invocation does not yet accept array input schemas.
 The JSON format remains 5 with additive Array type and array opcode variants.
 
-Keep future work driven by examples: reference-element initialization/nullability,
+`array.alloc` is the bounded storage primitive used by [ArrayList](array-list.md).
+Spare slots have a type but no value or GC edges. Reads through ldelem or an element
+address fault until written. Allocation bounds and fixed-shape replacement rules
+still apply. Whole-array replacement cannot turn an initialized element back into
+an uninitialized slot, including nested array elements. This extension preserves newarr's initialized-element contract.
+
+Keep future work driven by examples: reference nullability,
 checked slice views, copying cost and possible moves, managed collections, and
 pinning/native layout. Native interop requires an explicit layout and pinning
 contract; a managed element reference is not a native pointer. Inheritance must

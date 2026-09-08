@@ -77,6 +77,11 @@ pub(crate) fn create(
 pub(crate) fn check_replacement(old: &Value, new: &Value) -> Result<(), Fault> {
     let mut pending = vec![(old, new)];
     while let Some((old, new)) = pending.pop() {
+        if matches!(new, Value::Uninitialized(_)) && !matches!(old, Value::Uninitialized(_)) {
+            return Err(Fault::new(
+                "initialized array element cannot become uninitialized",
+            ));
+        }
         match (old, new) {
             (Value::Array { elements: a, .. }, Value::Array { elements: b, .. }) => {
                 if a.len() != b.len() {

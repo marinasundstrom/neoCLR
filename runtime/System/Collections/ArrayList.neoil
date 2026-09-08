@@ -1,46 +1,30 @@
-; Internal control block shared by copied list descriptors.
-.type internal System.Collections.ArrayListStorage<T>
-    .field Data T*
-    .field Count Int32
-    .field Capacity Int32
-.end
-
+; Value descriptor. Explicit ArrayList<T>& aliases share the entire list.
+; Ordinary copies share Data until growth, and copy Count independently.
 .type System.Collections.ArrayList<T>
     .implements System.Collections.List<T>
-    .field private State System.Collections.ArrayListStorage<T>*
+    .field private Data T[]&
+    .field private Count Int32
+
     .method static Allocate(Int32 capacity) -> System.Collections.ArrayList<T>
-        .local T* data
-        .local System.Collections.ArrayListStorage<T>* state
         ldarg capacity
         ldc.i4 0
         blt Invalid
         ldarg capacity
-        heap.alloc T
-        stloc data
-        ldc.i4 1
-        heap.alloc System.Collections.ArrayListStorage<T>
-        stloc state
-        ldloc state
-        ldloc data
+        array.alloc T
         ldc.i4 0
-        ldarg capacity
-        newobj System.Collections.ArrayListStorage<T>
-        stobj System.Collections.ArrayListStorage<T>
-        ldloc state
         newobj System.Collections.ArrayList<T>
         ret
     Invalid:
         fault "ArrayList capacity must be non-negative"
     .end
+
     .property instance Count() -> Int32
         .get instance System.Collections.ArrayList<T>::get_Count()
     .end
     .method instance byref get_Count() -> Int32
         ldarg this
-        ldflda 0
-        ldobj System.Collections.ArrayListStorage<T>*
-        ldflda 1
-        ldobj Int32
+        ldobj System.Collections.ArrayList<T>
+        ldfld 1
         ret
     .end
     .property instance Capacity() -> Int32
@@ -48,13 +32,13 @@
     .end
     .method instance byref get_Capacity() -> Int32
         ldarg this
-        ldflda 0
-        ldobj System.Collections.ArrayListStorage<T>*
-        ldflda 2
-        ldobj Int32
+        ldobj System.Collections.ArrayList<T>
+        ldfld 0
+        ldlen
+        conv.ovf.i4
         ret
     .end
-    .method private instance byref Address(Int32 index) -> T*
+    .method private instance byref CheckIndex(Int32 index) -> Void
         ldarg index
         ldc.i4 0
         blt Invalid
@@ -62,15 +46,7 @@
         ldarg this
         call instance System.Collections.ArrayList<T>::get_Count()
         bge Invalid
-        ldarg this
-        ldflda 0
-        ldobj System.Collections.ArrayListStorage<T>*
-        ldflda 0
-        ldobj T*
-        ldarg index
-        sizeof T
-        mul.ovf
-        ptr.add
+        ldvoid
         ret
     Invalid:
         fault "ArrayList index out of range"
@@ -82,35 +58,45 @@
     .method instance byref get_Item(Int32 index) -> T
         ldarg this
         ldarg index
-        call instance System.Collections.ArrayList<T>::Address(Int32)
-        ldobj T
+        call instance System.Collections.ArrayList<T>::CheckIndex(Int32)
+        pop
+        ldarg this
+        ldobj System.Collections.ArrayList<T>
+        ldfld 0
+        ldarg index
+        ldelem T
         ret
     .end
     .method instance byref set_Item(Int32 index, T value) -> Void
         ldarg this
         ldarg index
-        call instance System.Collections.ArrayList<T>::Address(Int32)
+        call instance System.Collections.ArrayList<T>::CheckIndex(Int32)
+        pop
+        ldarg this
+        ldobj System.Collections.ArrayList<T>
+        ldfld 0
+        ldarg index
         ldarg value
-        stobj T
+        stelem T
         ldvoid
         ret
     .end
     .method instance byref Add(T value) -> Void
-        .local System.Collections.ArrayListStorage<T>* state
-        .local T* oldData
-        .local T* newData
+        .local T[]& data
+        .local T[]& oldData
         .local Int32 count
         .local Int32 capacity
         .local Int32 index
         ldarg this
-        ldflda 0
-        ldobj System.Collections.ArrayListStorage<T>*
-        stloc state
+        ldobj System.Collections.ArrayList<T>
+        ldfld 0
+        stloc data
         ldarg this
         call instance System.Collections.ArrayList<T>::get_Count()
         stloc count
-        ldarg this
-        call instance System.Collections.ArrayList<T>::get_Capacity()
+        ldloc data
+        ldlen
+        conv.ovf.i4
         stloc capacity
         ldloc count
         ldloc capacity
@@ -126,28 +112,21 @@
         mul.ovf
         stloc capacity
     Allocate:
-        ldloc capacity
-        heap.alloc T
-        stloc newData
-        ldloc state
-        ldflda 0
-        ldobj T*
+        ldloc data
         stloc oldData
+        ldloc capacity
+        array.alloc T
+        stloc data
         ldc.i4 0
         stloc index
         br Test
     Copy:
-        ldloc newData
+        ldloc data
         ldloc index
-        sizeof T
-        mul.ovf
-        ptr.add
         ldloc oldData
         ldloc index
-        sizeof T
-        mul.ovf
-        ptr.add
-        cpobj T
+        ldelem T
+        stelem T
         ldloc index
         ldc.i4 1
         add
@@ -156,48 +135,19 @@
         ldloc index
         ldloc count
         blt Copy
-        ldloc oldData
-        heap.free
-        pop
-        ldloc state
-        ldflda 0
-        ldloc newData
-        stobj T*
-        ldloc state
-        ldflda 2
-        ldloc capacity
-        stobj Int32
     Store:
-        ldloc state
-        ldflda 0
-        ldobj T*
+        ldloc data
         ldloc count
-        sizeof T
-        mul.ovf
-        ptr.add
         ldarg value
-        stobj T
-        ldloc state
-        ldflda 1
+        stelem T
+        ldarg this
+        ldloc data
         ldloc count
         ldc.i4 1
         add.ovf
-        stobj Int32
+        newobj System.Collections.ArrayList<T>
+        stobj System.Collections.ArrayList<T>
         ldvoid
-        ret
-    .end
-    .method instance byref Free() -> Void
-        ldarg this
-        ldflda 0
-        ldobj System.Collections.ArrayListStorage<T>*
-        ldflda 0
-        ldobj T*
-        heap.free
-        pop
-        ldarg this
-        ldflda 0
-        ldobj System.Collections.ArrayListStorage<T>*
-        heap.free
         ret
     .end
 .end

@@ -106,11 +106,6 @@ fn unsupported_reference_storage_and_parameter_rebinding_are_rejected() {
             "Void",
         ),
         (
-            ".type Box<T>\n.field Value T\n.end",
-            ".local Box<Int32&> value\nldvoid",
-            "Void",
-        ),
-        (
             "",
             ".local Int32 value\nldloca value\nvalue.pack Int32&",
             "System.Value",

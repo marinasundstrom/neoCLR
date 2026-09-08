@@ -216,6 +216,7 @@ normalization; other checks use exact type equality. See [integer storage](integ
 | `ret` | `R → caller` | Return exactly one value; no extra stack items |
 | `newobj Type` | `F0,…,Fn → Type` | Construct a closed record value in substituted field declaration order |
 | `newarr T` | length → T[]& | Default-initialized managed heap array |
+| `array.alloc T` | length → T[]& | Checked uninitialized managed capacity; reads fault until written |
 | `array.create T` | length, T → T[] | Explicitly initialized owned array value |
 | `ldlen` | T[] or T[]& → UIntPtr | Array length |
 | `ldelem T` | array, index → T | Checked element copy |

@@ -42,6 +42,7 @@ fn aliases_closed_generic_arguments_and_address_modes_preserve_identity() {
         "typeof(Option<Result<int,System.Int32ParseError>>).GetGenericArgument(0).Equals(typeof(System.Result<System.Int32,System.Int32ParseError>))",
         "!typeof(int).Equals(typeof(int&))",
         "typeof(int&).GenericArgumentCount == 0",
+        "typeof(Option<int&>).GetGenericArgument(0).Equals(typeof(int&))",
     ] {
         assert_eq!(
             execute(&format!("func Main() -> bool {{ return {expression} }}")).value,
@@ -70,7 +71,6 @@ fn typeof_takes_a_type_operand_and_respects_visibility_and_shape() {
     for source in [
         "func Main() -> System.Type { return typeof(Unknown) }",
         "func Main() -> System.Type { return typeof(Result<int>) }",
-        "func Main() -> System.Type { return typeof(Option<int&>) }",
         "func Main() -> System.Type { return typeof(int&&) }",
         "func Main() -> System.Type { var value = 42; return typeof(value) }",
         "func Make() -> int { return 42 }\nfunc Main() -> System.Type { return typeof(Make()) }",

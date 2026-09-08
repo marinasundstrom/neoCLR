@@ -75,7 +75,7 @@ to the published Preview 1 release gates.
 
 | Decision | Why it matters next | Recommended next step |
 | --- | --- | --- |
-| Payload layout and ownership | String, errors and ordinary union carriers have no native layout, so Array/ArrayList cannot hold them | Specify copy, replacement, release and active-payload rules; prove nested Result and String collection workloads before retiring System.Value |
+| Payload layout and ownership | String, errors and ordinary union carriers have no native layout, so the native Array buffer cannot hold them; managed ArrayList now can | Specify copy, replacement, release and active-payload rules; prove nested Result and String collection workloads before retiring System.Value |
 | Scoped type identity | Scoped source operands currently normalize to unique names; colliding names cannot coexist across modules | Carry resolved definition identities through signatures and caches before general loading or cross-build compilation caches |
 | Verification and required Faults | Verification is optional and pointer side tables include prototype diagnostics | Classify required checks, verified preconditions and optional diagnostics before an optimized backend; decide which execution profiles require verification |
 | Managed reference extensions | Whole-slot references work, but field paths, readonly permissions and escaping references need further rules | Specify aliasing, slot replacement and invalidation with executable examples before adding each capability |

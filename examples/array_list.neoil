@@ -54,7 +54,6 @@ PrintTest:
     ldloca values
     call instance System.Collections.ArrayList<Int32>::get_Count()
     blt Print
-    ldloca values
-    call instance System.Collections.ArrayList<Int32>::Free()
+    ldvoid
     ret
 .end

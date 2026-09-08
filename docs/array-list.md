@@ -1,114 +1,104 @@
-# ArrayList<T>: explicit growable storage
+# ArrayList<T>: managed growable storage
 
-System.Collections.ArrayList<T> is a small platform-written growable list for
-native-layout values. It uses ordinary generic types, pointer fields, member calls
-and existing heap instructions. There is no Collections.Generic namespace, reference
-type flag or special collection opcode. Its native storage is explicitly freed and
-is separate from the managed GC and [managed arrays](managed-arrays.md).
-It implements System.Collections.List<T> through an explicit borrowed interface view;
-see [interfaces](interfaces.md) for dispatch and lifetime rules. All instance methods
-now require managed-reference receivers; see [API design](api-design.md). Direct IL
-callers load an address or an existing reference, rather than a descriptor value.
+`System.Collections.ArrayList<T>` is a platform-written value descriptor containing
+private `Data: T[]&` and `Count: Int32` fields. Its backing array lives on the managed
+heap and is traced by the GC. There is no native control block, raw storage pointer,
+manual Free, or special collection opcode. It implements `System.Collections.List<T>`
+through managed-reference interface dispatch.
 
 | Member | Contract |
 | --- | --- |
-| Allocate(Int32 capacity) -> ArrayList<T> | Allocate an empty list with explicit initial capacity; zero is valid |
-| Count: Int32 | Number of initialized elements |
-| Capacity: Int32 | Number of element slots in the current buffer |
-| Add(T value) -> Void | Append a value copy; grow the buffer when full |
-| Item[Int32]: T | Checked get/set for indices from zero through Count - 1 |
-| Free() -> Void | Release the buffer and shared state exactly once |
+| Allocate(Int32 capacity) -> ArrayList<T> | Return an empty descriptor with a managed backing array; zero capacity is valid |
+| Count: Int32 | Number of initialized logical elements |
+| Capacity: Int32 | Length of the current backing array |
+| Add(T value) -> Void | Append a copy of T; grow if full |
+| Item[Int32]: T | Checked value get/set for indices below Count |
 
-Indexer metadata associates get_Item/set_Item. There is no implicit constructor,
-automatic destruction, iterator protocol, Remove, Clear, sorting or comparer API.
-This is a generic type despite the CLR's historical non-generic ArrayList spelling;
-we intentionally use System.Collections directly for generic and non-generic types.
+All instance methods use managed-reference receivers. Direct IL callers load an
+address or existing `ArrayList<T>&`; interface callers use `List<T>&`. No receiver
+boxing or implicit deep cloning is involved. The generic naming follows the
+[API policy](api-policy.md).
 
-## Representation and copying
+## Copying and sharing
 
-The list value contains one private pointer to an internal ArrayListStorage<T> record.
-That record contains Data: T*, Count: Int32 and Capacity: Int32. Allocate explicitly
-creates the data buffer and this state block. Spare capacity is uninitialized; it is
-not filled with fabricated default T values. Count starts at zero.
+An `ArrayList<T>&` aliases the entire descriptor: mutation, Count changes and growth
+are visible to all references to that descriptor. An ordinary `ArrayList<T>` copy
+copies Count independently and copies the Data reference. The copies initially share
+array elements, but growing one replaces only that descriptor's Data reference.
+They can subsequently address different arrays. This is ordinary field-copy behavior,
+not independent deep collection copying and not a shared hidden control block.
 
-Copying the list descriptor copies its state pointer. Both copies see subsequent Add,
-indexer writes, count changes and capacity growth. They are aliases, not independent
-collections and not reference-counted owners. Allocate/Free make allocation and lifetime
-explicit even though consumers call ordinary methods instead of writing heap IL.
-The caller must keep the list live for every borrower and free it only once. Free
-invalidates all aliases; the interpreter reports subsequent tracked access as a Fault.
+Use an explicit reference to share one coherent mutable list. A future explicit
+Clone operation can provide independent collection copying. This slice does not
+add implicit cloning, copy-on-write, or a collection destructor.
 
-Growth from zero capacity chooses four slots. Otherwise capacity doubles with checked
-Int32 arithmetic. Add allocates a new buffer, copies only Count initialized elements
-with cpobj T, releases the old buffer, updates shared Data/Capacity, then stores the
-new element and increments Count. The stable state block keeps copied descriptors
-current after a buffer replacement. Growth policy is a preview implementation detail.
+`ArrayList<Foo>` stores Foo values. `ArrayList<Foo&>` stores reference values:
+Add takes Foo&, get_Item returns Foo&, and set_Item replaces the stored reference.
+Access through the returned reference in Neo automatically operates on Foo. Mutating
+Foo differs from replacing the reference stored in an element. Ordinary reference
+copies retain target identity; they do not clone Foo.
 
-Element loads, stores and relocation follow ordinary native value-copy semantics.
-Pointer fields remain aliases to their targets. Free releases the list's two allocations;
-it does not follow element pointers or invoke destructors. Any buffer-interior pointers
-obtained through lower-level access become stale when growth replaces that buffer.
-No thread-safety, mutation-during-enumeration or concurrent access contract is provided.
-As with other pointer-containing records, the current hosting API does not import a
-list descriptor into a fresh invocation. Construct and use it within the guest execution;
-copying it to the host does not create a cross-execution ownership transfer.
+## Capacity, growth and GC
 
-## Bounds, errors and supported elements
+`array.alloc T` reserves checked, uninitialized managed array slots. Unused capacity
+contains no fabricated T, null reference, or copied filler value. Reading an
+uninitialized slot faults. ArrayList checks indices against Count before element
+access and initializes each slot with `stelem T` before incrementing Count.
 
-Indexer access is checked against Count, not Capacity. Negative capacity, invalid
-indices, capacity/offset overflow, allocation limits and expired storage produce
-terminal Faults under the existing array/memory contract. Add is not a recoverable
-allocation Result API. On a terminal Fault, execution teardown reclaims tracked
-allocations; there are no guest cleanup handlers. Native host failure containment
-is subject to the existing runtime limitations.
+Growth from zero chooses capacity four; otherwise capacity doubles with checked
+Int32 arithmetic. Add allocates a replacement array, copies only Count live elements
+with `ldelem`/`stelem`, stores the new item and updates the original descriptor.
+Old arrays remain alive only while reachable, including through copied descriptors.
+Capacity growth is a preview policy, not a reference invalidation promise.
 
-Supported elements include native numeric primitives, Void, typed pointers and
-records composed of native-layout fields. Byte storage conversion is preserved during
-Add and indexed writes. Void elements have zero payload size but still count as list
-elements and use the same allocation-lifetime rules. String, Error, RuntimeTypeHandle,
-System.Value and current System.Option/Result carriers have no native payload layout,
-so lists of those values are not yet supported, even with capacity zero. Pointer
-signatures to such types can be stored, without adding support for their pointee layout.
+GC traces initialized elements, including managed-reference values and references
+inside records. Replacing an element drops that stored reference; other roots may
+still retain its target. Fresh spare capacity contains no references. A copied descriptor can retain
+initialized slots beyond its own Count because it shares the array. The public API
+does not expose addresses of element slots. A Foo& returned from a reference-element
+list addresses Foo itself and remains valid across list growth while it is reachable.
 
-Managed-reference elements such as `ArrayList<Foo&>` are also not supported by this
-native backing store yet. Their intended contract is ordinary generic substitution:
-Add takes Foo& and item access returns Foo&, copying the reference rather than Foo.
-See [generic reference elements](api-design.md#generic-reference-elements) for the
-required managed-storage and automatic Neo access behavior.
+Strings, ordinary union carriers, numeric values, records, and managed references
+can be stored without native payload layouts. Raw pointer values remain raw pointers:
+the list neither roots managed targets through them nor frees their native targets.
+Stored managed references must be heap-backed under the existing aggregate storage
+rules. Add and indexed set fault on frame references even when verification is skipped.
 
-These limits match the current Array<T>/native storage foundation. Supporting more
-payloads requires the [ordinary storage migration](value-storage.md#retirement-decision),
-not a hidden erased-value fallback inside ArrayList.
+Negative capacity, invalid indices, arithmetic overflow and resource limits produce
+terminal Faults. Managed heap and array-payload limits apply, including simultaneous
+old/new buffers during growth and retained arrays from descriptor copies. No thread
+safety, enumeration-under-mutation, Remove, Clear, pinning or native layout is added.
 
-## Run the sample
+## Migration and examples
+
+This is a breaking storage/API change. Rebuild source/artifacts against the current
+System library and remove ArrayList.Free calls. Native-buffer `System.Array<T>` remains
+a separate API with explicit native allocation/free; it is not this backing store.
 
 ```sh
 cargo run --locked -- verify examples/array_list.neoil
-cargo run --locked -- run examples/array_list.neoil
-cargo test --locked --test array_list
+cargo run --locked -- run examples/array_list.neoil --gc-stats
+cargo run --locked -- run examples/interfaces.neoil
+cargo test --locked --test array_list --test library_references --test managed_arrays
 ```
 
-[ArrayListDemo](../examples/array_list.neoil) allocates with capacity one, takes a
-managed reference to the descriptor, and appends squares through that reference.
-It reads the count and items through the original descriptor and releases once. Output is `ArrayList count:`, `5`, `0`, `1`,
-`4`, `9`, `16`, and `=> Void`, each on a separate line. The walkthrough also exercises
-the source and assembled-artifact paths.
+The ArrayList example takes a managed-reference alias and appends squares through it.
+It prints `ArrayList count:`, `5`, `0`, `1`, `4`, `9`, `16`, then returns Void.
+Backing arrays are reclaimed by GC without guest cleanup.
 
-Raven-like explanatory pseudocode (not a compiler input):
+This Neo helper demonstrates the substituted reference-element signature:
 
-```text
-var values = ArrayList<Int32>.Allocate(1)
-let alias = &values
-for (var i = 0; i < 5; i = i + 1) {
-    alias.Add(checked(i * i))
+```swift
+func Append(list: System.Collections.ArrayList<Foo&>&, item: Foo&) -> int {
+    list.Add(item)
+    let first = list.get_Item(0)
+    first.Age = first.Age + 2
+    return first.Age
 }
-Console.WriteLine(values.Count)
-for (var i = 0; i < values.Count; i = i + 1) {
-    Console.WriteLine(values[i])
-}
-values.Free()
 ```
 
-The library implementation is [ordinary neoIL](../runtime/System/Collections/ArrayList.neoil).
-This demonstrates shared access through an explicit pointer field without making a
-class declaration inherently reference-allocated or adding a mandatory ownership model.
+The [tests](../tests/array_list.rs) supply its owner from an IL entry point because
+Neo does not yet spell generic static factory calls. Library indexer syntax also
+remains separate; direct accessor calls work. A unique library method signature now
+provides parameter context, so existing references reach Add without an extra `&`.
+Overloaded methods retain exact-signature selection in this compiler subset.

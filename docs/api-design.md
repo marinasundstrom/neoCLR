@@ -91,7 +91,7 @@ See [managed heap](managed-heap-strategy.md) and [native interop](native-interop
 
 `System.Collections.List<T>` and every instance method of `ArrayList<T>` now use
 managed-reference receivers. This includes Count, Capacity, Item get/set, Add, the
-private Address helper, and Free. Interface dispatch receives the original concrete
+private bounds-check helper. Interface dispatch receives the original concrete
 slot; it does not copy the descriptor to supply `this`.
 
 ```text
@@ -114,18 +114,11 @@ methods. Rebuild artifacts against the matching System library. Interface
 implementations must declare the matching byref receiver. Native `InterfaceRef<I>`
 views cannot call this managed-receiver contract.
 
-ArrayList remains a legacy native-layout collection: its copied descriptor still
-aliases a shared pointer-based control block, Allocate returns a descriptor value,
-and Free explicitly releases native allocations once. A managed receiver does not
-make that backing storage GC-managed or make descriptor copies independent. The
-[ArrayList sample](../examples/array_list.neoil) now uses an explicit managed-reference
-alias to demonstrate the intended calling pattern. Native-buffer `System.Array<T>`
-is also distinct from the runtime's owned `T[]` and managed `T[]&` arrays.
-
-The next collection storage design should use managed arrays, support reference-bearing
-and text elements, and settle value-copy behavior and element-reference stability.
-Do that as a separate migration rather than hiding a storage-model change inside a
-parameter annotation update.
+ArrayList now holds Data: T[]& and Count directly. Its backing array is managed;
+Free has been removed. Copying the descriptor copies Count and shares the array
+reference until growth replaces one descriptor's buffer. Use ArrayList<T>& to share
+the whole mutable list. See [the collection contract](array-list.md) for copying,
+checked uninitialized capacity, growth, GC and the breaking migration.
 
 ## Generic reference elements
 
@@ -136,9 +129,10 @@ The generic argument determines the stored value and the substituted API signatu
 | `ArrayList<Foo>` | `Add(Foo)` | `Foo` | Copy the Foo value according to its field copy rules |
 | `ArrayList<Foo&>` | `Add(Foo&)` | `Foo&` | Copy the managed-reference value; preserve the referenced Foo's identity |
 
-The second row is the intended contract, currently blocked by ArrayList's native
-backing storage. It requires managed-reference element storage before it can execute.
-It must not be implemented by converting the managed reference to a raw pointer.
+Both rows are implemented using managed array storage. No raw-pointer conversion
+is involved. Newly allocated spare capacity is uninitialized and contributes no GC
+roots. Copies of descriptors may retain shared initialized array slots beyond their
+own Count, as described in the collection contract.
 
 There is no need to change generic `Add(T)` to `Add(T&)` to support a list of
 references: T is already `Foo&`. Likewise `get_Item` returns T, so it returns a
@@ -155,15 +149,14 @@ rejecting references to shorter-lived frame storage when stored in heap storage.
 The same rules apply whether Foo was originally a frame-owned value or a managed
 heap allocation; the actual owner lifetime determines which stores are valid.
 
-Before shipping this instantiation, test reference copying, shared mutation,
-replacement versus referent mutation, GC retention/reclamation, and invalid frame
-escapes, with automatic Neo access and no boxing or raw-pointer conversion.
+Tests cover reference copying, shared mutation, replacement versus referent
+mutation, GC retention/reclamation, invalid frame escapes and automatic Neo access.
 
 ## Current library inventory
 
 | API family | Current contract and decision |
 | --- | --- |
-| `Collections.List<T>` / `ArrayList<T>` | Managed-reference receivers in this slice; element inputs and outputs remain values; native backing storage migration remains pending |
+| `Collections.List<T>` / `ArrayList<T>` | Managed-reference receivers and managed T[]& backing storage; value/reference elements follow T; no Free |
 | Native-buffer `Array<T>` | Explicit pointer-containing descriptor with value receivers and caller-managed Free; review together with native-buffer naming and ownership, separately from managed arrays |
 | `Disposable`, `Closable<E>`, `Clonable<T>` | Already use byref receivers; retain these contracts. Clone explicitly returns T; Close returns `Result<Void,E>` |
 | `Equatable<T>` | Currently a value receiver and T input. Preserve value equality, not reference identity. Review receiver copying for large records and whether a separate reference-input comparison contract is needed before changing implementations |
@@ -202,7 +195,8 @@ Generic static factory call syntax is not yet implemented in Neo; the integratio
 tests supply the collection owner from an IL entry point. See
 [the receiver tests](../tests/library_references.rs).
 
-For ordinary library parameters the current compiler selects exact signatures;
+For a unique library instance method, substituted parameter types supply context,
+including reference arguments. Overloaded library methods still select exact signatures;
 explicit address expressions select reference inputs, while ordinary value contexts
 read through references. Broader contextual overload selection and implicit
 conversions to bundled library interfaces remain follow-up work. Source-declared
@@ -222,8 +216,8 @@ following items remain queued alongside that work.
    [reference slots](reference-slots.md).
 2. Specify readonly observation contracts before broadly converting predicates,
    equality, and large immutable receiver APIs to references.
-3. Migrate the growable collection to managed storage and define copy/clone semantics,
-   retained references, and the lifetime of element views across growth.
+3. Build on the managed growable collection with explicit Clone and any future
+   element-slot views; preserve the documented copy and lifetime contracts.
 4. Extend Neo library argument binding as reference-taking APIs are introduced,
    with tests for evaluation order, value/reference overload selection, and no
    implicit addressing of arbitrary value arguments.

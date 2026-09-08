@@ -59,7 +59,10 @@ arguments to native imports. These are staged omissions, not claims that such
 features can never be supported. In particular, returning a reference to caller-owned
 storage should eventually be expressible with a suitable lifetime contract.
 
-Do not initially accept byref-containing generic arguments or ownership wrappers.
+The initial slice excluded byref-containing generic arguments. The managed-array
+collection slice now permits managed-reference type arguments and array elements,
+with heap-provenance checks on aggregate stores; direct nested managed references
+and native pointer storage of reference-bearing signatures remain unsupported.
 Existing generic methods whose receiver is addressed, or whose argument is a reference
 to a closed generic value, remain useful without that broader feature. Longer term,
 restrictions should follow storage/lifetime capabilities instead of recreating a

@@ -166,7 +166,7 @@ interface value. The implementation and contract must agree on receiver mode.
 Value-receiver contracts are also supported, with their existing copy semantics.
 
 [The List sample](../examples/interfaces.neoil) passes List<Int32>& to Sum while
-keeping allocation and Free on the concrete ArrayList owner. [The Counter sample](../examples/reference_receivers.neoil)
+keeping allocation on the concrete ArrayList owner and backing-store lifetime with GC. [The Counter sample](../examples/reference_receivers.neoil)
 shows inline mutation through a byref interface contract. Native-pointer
 InterfaceRef<I> remains a distinct, lower-level view; it cannot supply a managed
 byref receiver. See [both interface forms](interfaces.md).

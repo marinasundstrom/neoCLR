@@ -553,13 +553,13 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 Op::Load(i) | Op::Store(i) | Op::LocalAddress(i) if *i >= function.locals.len() => {
                     return Err(Fault::new("local index outside signature"));
                 }
-                Op::LocalAddress(i) if crate::slots::contains(&function.locals[*i]) => {
+                Op::LocalAddress(i) if matches!(&function.locals[*i], Type::ByRef(_)) => {
                     return Err(Fault::new(
                         "cannot take the address of a managed reference local",
                     ));
                 }
                 Op::ArgumentAddress(i) | Op::StoreArg(i)
-                    if crate::slots::contains(&function.argument_types()[*i]) =>
+                    if matches!(&function.argument_types()[*i], Type::ByRef(_)) =>
                 {
                     return Err(Fault::new(
                         "cannot rebind or take the address of a managed reference parameter",
@@ -585,12 +585,16 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                     }
                     crate::access::check_call(module, Some(function), &callee)?;
                 }
-                Op::NewArray(ty)
+                Op::AllocateArray(ty)
+                | Op::NewArray(ty)
                 | Op::CreateArray(ty)
                 | Op::ArrayElement(ty)
                 | Op::StoreArrayElement(ty)
                 | Op::ArrayAddress(ty) => {
                     check(&Type::Array(Box::new(ty.clone())))?;
+                    if matches!(op, Op::ArrayAddress(_)) && matches!(ty, Type::ByRef(_)) {
+                        return Err(Fault::new("nested managed references are not supported"));
+                    }
                     if matches!(op, Op::NewArray(_)) && check_type(ty, module).is_ok() {
                         crate::initialization::default_value(module, ty)?;
                     }
@@ -618,7 +622,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                             "interface views support dispatch, not value storage",
                         ));
                     }
-                    if crate::slots::contains(ty) {
+                    if matches!(ty, Type::ByRef(_)) {
                         return Err(Fault::new("managed references cannot be indirectly stored"));
                     }
                 }
@@ -787,19 +791,11 @@ fn check_type_context(ty: &Type, module: &Module, arity: usize, depth: usize) ->
                 return Err(Fault::new("generic type argument count mismatch"));
             }
             for argument in arguments {
-                if crate::slots::contains(argument) {
-                    return Err(Fault::new("managed references cannot be generic arguments"));
-                }
                 nested(argument)?;
             }
             Ok(())
         }
         Type::Array(t) => {
-            if crate::slots::contains(t) {
-                return Err(Fault::new(
-                    "managed-reference array elements are not supported yet",
-                ));
-            }
             nested(t)?;
             if crate::interfaces::interface_definition(module, t).is_ok() {
                 return Err(Fault::new("array elements require concrete values"));
@@ -812,7 +808,7 @@ fn check_type_context(ty: &Type, module: &Module, arity: usize, depth: usize) ->
             Ok(())
         }
         Type::ByRef(t) => {
-            if crate::slots::contains(t) {
+            if matches!(t.as_ref(), Type::ByRef(_)) {
                 return Err(Fault::new("nested managed references are not supported"));
             }
             nested(t)
@@ -1165,7 +1161,9 @@ fn interpret_instructions(
         frame.pc += 1;
         let context = function.name.clone();
         // Collect only between instructions, before allocation operands leave roots.
-        if matches!(op, Op::HeapNew | Op::NewArray(_)) && heap.len() >= collection_threshold {
+        if matches!(op, Op::HeapNew | Op::NewArray(_) | Op::AllocateArray(_))
+            && heap.len() >= collection_threshold
+        {
             let mut roots = vec![];
             for frame in frames.iter() {
                 for cell in frame.args.iter().chain(&frame.locals) {
@@ -1591,10 +1589,12 @@ fn interpret_instructions(
                         return Ok(Some(value));
                     }
                 }
-                Op::NewArray(ty) | Op::CreateArray(ty) => {
+                Op::AllocateArray(ty) | Op::NewArray(ty) | Op::CreateArray(ty) => {
                     arrays_used = true;
                     let initial = if matches!(op, Op::CreateArray(_)) {
                         frame.pop()?.for_storage(ty)?
+                    } else if matches!(op, Op::AllocateArray(_)) {
+                        Value::Uninitialized(ty.clone())
                     } else {
                         crate::initialization::default_value(module, ty)?
                     };
@@ -1602,7 +1602,7 @@ fn interpret_instructions(
                         Fault::new("array length must be a non-negative Int32 or native integer")
                     })?;
                     let value = crate::arrays::create(ty.clone(), length, initial, &limits)?;
-                    if matches!(op, Op::NewArray(_)) {
+                    if matches!(op, Op::NewArray(_) | Op::AllocateArray(_)) {
                         if heap.len() >= limits.heap_objects {
                             return Err(Fault::new("heap object limit exceeded"));
                         }
@@ -1629,6 +1629,11 @@ fn interpret_instructions(
                     let index = crate::arrays::index(frame.pop()?)?;
                     match frame.pop()? {
                         Value::SlotReference(reference) => {
+                            if matches!(op, Op::ArrayAddress(_)) && matches!(ty, Type::ByRef(_)) {
+                                return Err(Fault::new(
+                                    "nested managed references are not supported",
+                                ));
+                            }
                             let address = reference.element(index, ty)?;
                             if matches!(op, Op::ArrayElement(_)) {
                                 frame.stack.push(address.read()?.on_stack());
@@ -1646,6 +1651,7 @@ fn interpret_instructions(
                                 elements
                                     .get(index)
                                     .ok_or_else(|| Fault::new("array index out of range"))?
+                                    .initialized()?
                                     .clone()
                                     .on_stack(),
                             );
@@ -1939,7 +1945,7 @@ fn interpret_instructions(
                     }
                     let value = frame.pop()?;
                     let target = value.ty();
-                    if crate::slots::contains(&target) {
+                    if matches!(&target, Type::ByRef(_)) {
                         return Err(Fault::new(
                             "managed references cannot escape into heap storage",
                         ));

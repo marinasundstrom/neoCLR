@@ -586,6 +586,8 @@ pub enum Instruction {
     #[serde(rename = "value.pack")]
     PackValue(Type),
     /// Fixed-length managed heap array with supported default initialization.
+    #[serde(rename = "array.alloc")]
+    AllocateArray(Type),
     #[serde(rename = "newarr")]
     NewArray(Type),
     #[serde(rename = "array.create")]
@@ -843,6 +845,7 @@ impl Function {
                     }
                 }
                 Instruction::New(ty)
+                | Instruction::AllocateArray(ty)
                 | Instruction::NewArray(ty)
                 | Instruction::CreateArray(ty)
                 | Instruction::ArrayElement(ty)

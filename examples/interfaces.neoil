@@ -50,12 +50,11 @@ Test:
     call Sum(System.Collections.List<Int32>&)
     call System.Console::WriteLine(Int32)
     pop
-    ; The concrete owner observes growth and retains the only release obligation.
+    ; The concrete owner observes growth; GC retains and reclaims the backing array.
     ldloca owner
     call instance System.Collections.ArrayList<Int32>::get_Count()
     call System.Console::WriteLine(Int32)
     pop
-    ldloca owner
-    call instance System.Collections.ArrayList<Int32>::Free()
+    ldvoid
     ret
 .end

@@ -173,7 +173,8 @@ pub(crate) fn trace(value: &Value, references: &mut Vec<usize>) {
                 elements: fields, ..
             } => pending.extend(fields),
             Value::Erased(value) => pending.push(value),
-            Value::Void
+            Value::Uninitialized(_)
+            | Value::Void
             | Value::Single(_)
             | Value::Double(_)
             | Value::Int32(_)

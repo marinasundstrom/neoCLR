@@ -339,7 +339,7 @@ fn effect(module: &Module, op: &Op, arity: usize) -> Result<(usize, usize), Faul
         Pop | Store(_) | StoreArg(_) | Return | BranchTrue(_) | BranchFalse(_) | Switch(_)
         | InitializeObject(_) => (1, 0),
         Dup => (1, 2),
-        NewArray(_) | ArrayLength => (1, 1),
+        AllocateArray(_) | NewArray(_) | ArrayLength => (1, 1),
         CreateArray(_) | ArrayElement(_) | ArrayAddress(_) => (2, 1),
         StoreArrayElement(_) => (3, 0),
         New(ty) => (crate::vm::record_fields(module, ty, arity)?.len(), 1),
@@ -527,7 +527,7 @@ fn typed_effect(
             .ok_or_else(|| crate::Fault::new("field index out of range"))
     };
     match op {
-        NewArray(ty) | CreateArray(ty) => {
+        AllocateArray(ty) | NewArray(ty) | CreateArray(ty) => {
             require(
                 count(exact(&values[0])?),
                 "array length requires Int32 or native integer",
@@ -536,7 +536,7 @@ fn typed_effect(
                 stored(&values[1], ty)?;
             }
             let array = T::Array(Box::new(ty.clone()));
-            one(if matches!(op, NewArray(_)) {
+            one(if matches!(op, NewArray(_) | AllocateArray(_)) {
                 T::ByRef(Box::new(array))
             } else {
                 array
@@ -825,7 +825,7 @@ fn typed_effect(
         }
         HeapNew => {
             require(
-                !crate::slots::contains(exact(&values[0])?),
+                !matches!(exact(&values[0])?, T::ByRef(_)),
                 "managed reference cannot escape into heap storage",
             )?;
             one(T::ByRef(Box::new(exact(&values[0])?.clone())))
