@@ -10,6 +10,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 #### Added
 
+- Preliminary record-base metadata and inherited value layout through IL `.extends`
+  and Neo record bases. Aggregate construction/defaulting includes inherited fields,
+  generic bases substitute recursively, and field visibility retains its declaring
+  owner. Added Type.BaseType as Option<Type>, a sample and regression tests. Base
+  types with instance methods or implemented interfaces, native inherited layouts,
+  base-reference conversions and virtual dispatch remain unsupported pending the
+  next object-model slice; no implicit Object base or value slicing is introduced.
+  Rust TypeDef literals now require the base field; older JSON artifacts default it
+  to absent.
+
 - Interface inheritance in IL and Neo: transitive generic contracts, diamond
   deduplication, base-interface reference projections, inherited method dispatch,
   load-time cycle/conflict checks and closed dispatch analysis. Managed views retain

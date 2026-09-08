@@ -12,6 +12,7 @@ pub(crate) enum Query {
     Interfaces,
     GenericArguments,
     ElementType,
+    BaseType,
     Shape,
     DisplayName,
 }
@@ -28,6 +29,7 @@ impl Query {
             "neoCLR.Runtime.TypeGenericArguments" => {
                 (Self::GenericArguments, false, "System.Type[]")
             }
+            "neoCLR.Runtime.TypeBaseType" => (Self::BaseType, false, "System.Option<System.Type>"),
             "neoCLR.Runtime.TypeElementType" => {
                 (Self::ElementType, false, "System.Option<System.Type>")
             }
@@ -85,6 +87,13 @@ impl Query {
                 }
                 _ => return Err(Fault::new("unknown type name query")),
             })),
+            Self::BaseType => option(
+                "System.Type",
+                crate::inheritance::base(module, &ty)?
+                    .as_ref()
+                    .map(|base| type_value(module, base))
+                    .transpose()?,
+            ),
             Self::ElementType => option(
                 "System.Type",
                 match &ty {

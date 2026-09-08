@@ -75,7 +75,8 @@ pub(crate) fn check_field(
     index: usize,
 ) -> Result<(), Fault> {
     check_owner(module, scope(caller), owner)?;
-    let definition = record_definition(module, owner)?;
+    let (declaring_owner, index) = crate::inheritance::field_owner(module, owner, index)?;
+    let definition = record_definition(module, &declaring_owner)?;
     let field = definition
         .fields
         .get(index)
@@ -112,8 +113,7 @@ pub(crate) fn check_construction(
     owner: &Type,
 ) -> Result<(), Fault> {
     check_owner(module, scope(caller), owner)?;
-    let definition = record_definition(module, owner)?;
-    for index in 0..definition.fields.len() {
+    for index in 0..crate::inheritance::fields(module, owner)?.len() {
         check_field(module, caller, owner, index)?;
     }
     Ok(())
@@ -225,6 +225,9 @@ pub(crate) fn validate_types(module: &Module) -> Result<(), Fault> {
             .definition
             .as_ref()
             .map(|id| (id.module.as_str(), id.revision.as_deref()));
+        if let Some(base) = &definition.base {
+            check_type(module, source, base)?;
+        }
         for ty in &definition.implements {
             check_type(module, source, ty)?;
         }

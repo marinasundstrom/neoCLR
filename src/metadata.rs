@@ -165,6 +165,8 @@ pub struct TypeDef {
     pub fields: Vec<Field>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub implements: Vec<Type>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub base: Option<Type>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub properties: Vec<Property>,
     #[serde(default)]

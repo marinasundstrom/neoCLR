@@ -8,6 +8,7 @@ mod execution;
 pub use console::{Console, StdioConsole};
 pub mod frontend;
 mod gc;
+mod inheritance;
 mod initialization;
 mod input;
 mod interfaces;

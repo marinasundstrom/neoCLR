@@ -133,7 +133,7 @@ pub(crate) fn record_fields(
         } => (definition, arguments),
         _ => return Err(Fault::new("expected record type reference")),
     };
-    let def = module
+    module
         .types
         .iter()
         .find(|d| {
@@ -142,16 +142,7 @@ pub(crate) fn record_fields(
                 && d.representation == Representation::Record
         })
         .ok_or_else(|| Fault::new("expected record definition"))?;
-    def.fields
-        .iter()
-        .map(|f| {
-            Ok(crate::metadata::Field {
-                visibility: f.visibility,
-                name: f.name.clone(),
-                ty: f.ty.substitute_type_parameters(arguments)?,
-            })
-        })
-        .collect()
+    crate::inheritance::fields(module, ty)
 }
 
 pub(crate) fn resolve_constructor(
@@ -319,6 +310,9 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             {
                 return Err(Fault::new("invalid generic record layout controls"));
             }
+        }
+        if let Some(base) = &def.base {
+            check_type_context(base, module, def.generic_parameters.len(), 0)?;
         }
         for interface in &def.implements {
             check_type_context(interface, module, def.generic_parameters.len(), 0)?;
@@ -774,6 +768,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
     {
         crate::access::check_entry(module, entry)?;
     }
+    crate::inheritance::validate(module)?;
     crate::interfaces::validate(module)?;
     if !module.entry.is_empty()
         && !module.functions.iter().any(|f| {

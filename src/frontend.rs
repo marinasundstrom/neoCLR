@@ -196,6 +196,8 @@ struct Field {
 }
 struct Record {
     name: Token,
+    base: Option<Ty>,
+    inherited_fields: usize,
     fields: Vec<Field>,
     implements: Vec<Ty>,
     methods: Vec<Function>,
@@ -219,6 +221,65 @@ struct Source {
     console_import: bool,
 }
 impl Source {
+    fn prepare_inheritance(&mut self) -> Result<(), Fault> {
+        let names: Vec<_> = self.records.iter().map(|r| r.name.text.clone()).collect();
+        for record in &mut self.records {
+            for (index, ty) in record.implements.iter().enumerate() {
+                if names.contains(&ty.il()) && index != 0 {
+                    return Err(record
+                        .name
+                        .error("a single record base must precede interfaces"));
+                }
+            }
+            if record
+                .implements
+                .first()
+                .is_some_and(|ty| names.contains(&ty.il()))
+            {
+                record.base = Some(record.implements.remove(0));
+            }
+        }
+        fn collect(
+            source: &Source,
+            index: usize,
+            path: &mut Vec<usize>,
+        ) -> Result<Vec<Field>, Fault> {
+            let record = &source.records[index];
+            if path.contains(&index) || path.len() >= 64 {
+                return Err(record
+                    .name
+                    .error("cyclic or excessively deep base inheritance"));
+            }
+            path.push(index);
+            let mut fields = if let Some(base) = &record.base {
+                let parent = source
+                    .records
+                    .iter()
+                    .position(|r| r.name.text == base.il())
+                    .unwrap();
+                collect(source, parent, path)?
+            } else {
+                Vec::new()
+            };
+            for field in &record.fields {
+                if fields.iter().any(|f| f.name.text == field.name.text) {
+                    return Err(field.name.error("inherited fields cannot be hidden"));
+                }
+                fields.push(field.clone());
+            }
+            path.pop();
+            Ok(fields)
+        }
+        let fields = (0..self.records.len())
+            .map(|i| collect(self, i, &mut Vec::new()))
+            .collect::<Result<Vec<_>, _>>()?;
+        for (record, fields) in self.records.iter_mut().zip(fields) {
+            record.inherited_fields = fields.len() - record.fields.len();
+            record.fields = fields;
+        }
+        Ok(())
+    }
+
     fn interface_reachable(&self, from: &Ty, to: &Ty) -> bool {
         let mut pending = vec![from.clone()];
         let mut seen = Vec::new();
@@ -613,6 +674,8 @@ impl Parser {
                     Vec::new()
                 };
                 source.records.push(Record {
+                    base: None,
+                    inherited_fields: 0,
                     name,
                     fields,
                     implements,
@@ -630,6 +693,7 @@ impl Parser {
             }
             self.lines();
         }
+        source.prepare_inheritance()?;
         Ok(source)
     }
     fn end_statement(&mut self) -> Result<(), Fault> {
@@ -2486,7 +2550,10 @@ pub fn lower_to_il_named(source: &str, document: &str) -> Result<String, Fault> 
             }
             il.push_str(&format!(".implements {}\n", interface.il()));
         }
-        for field in &record.fields {
+        if let Some(base) = &record.base {
+            il.push_str(&format!(".extends {}\n", base.il()));
+        }
+        for field in record.fields.iter().skip(record.inherited_fields) {
             il.push_str(&format!(".field {} {}\n", field.name.text, field.ty.il()));
         }
         for function in &record.methods {

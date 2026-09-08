@@ -34,6 +34,7 @@ for i in 0..<fields.Length {
 
 | API | Result / contract |
 | --- | --- |
+| `BaseType` | `Option<Type>`, immediate substituted record base or None |
 | `GetFields()` / `GetFields(BindingFlags)` | `FieldInfo[]`, declared fields |
 | `GetMethods()` / `GetMethods(BindingFlags)` | `MethodInfo[]`, declared instance and static methods, including property accessors |
 | `GetProperties()` / `GetProperties(BindingFlags)` | `PropertyInfo[]`, declared properties |
@@ -191,3 +192,6 @@ signature characteristic and special state, not implemented syntax or zeroing.
 [Interface inheritance](interface-inheritance.md) now supplies transitive
 GetInterfaces results. Member enumeration remains declared-only; query each base
 interface separately for its declarations.
+
+See [inherited value layout](inherited-layout.md) for the preliminary record-base
+contract. Field descriptors retain their declaring-type-relative DefinitionIndex.

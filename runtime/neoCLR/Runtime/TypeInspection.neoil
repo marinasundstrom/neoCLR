@@ -35,3 +35,6 @@
 .function neoCLR.Runtime.TypeDisplayName(System.RuntimeTypeHandle type, Int32 kind) -> String
     .methodimpl InternalCall
 .end
+.function neoCLR.Runtime.TypeBaseType(System.RuntimeTypeHandle type) -> System.Option<System.Type>
+    .methodimpl InternalCall
+.end

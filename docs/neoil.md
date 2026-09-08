@@ -651,3 +651,9 @@ See [readonly storage and return signatures](readonly-storage.md) for implemente
 readonly T& type positions, checked boundaries and migration. Binding immutability
 remains a language feature. [Explicit nullability](nullability.md) is a planned
 signature characteristic and special state, not implemented syntax or zeroing.
+
+## Preliminary record bases
+
+A `.type` may declare `.extends Base` once. Inherited aggregate fields precede its
+own fields. See [inherited value layout](inherited-layout.md) for generic substitution,
+visibility, native-layout restrictions and the remaining base-reference/dispatch work.

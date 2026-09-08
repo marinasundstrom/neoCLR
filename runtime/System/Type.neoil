@@ -85,6 +85,15 @@
         call neoCLR.Runtime.TypeProperties(System.RuntimeTypeHandle,Int32)
         ret
     .end
+    .property instance BaseType() -> System.Option<System.Type>
+        .get instance System.Type::get_BaseType()
+    .end
+    .method instance get_BaseType() -> System.Option<System.Type>
+        ldarg this
+        ldfld 0
+        call neoCLR.Runtime.TypeBaseType(System.RuntimeTypeHandle)
+        ret
+    .end
     .method instance GetInterfaces() -> System.Type[]
         ldarg this
         ldfld 0

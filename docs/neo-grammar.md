@@ -248,3 +248,7 @@ See [readonly storage and return signatures](readonly-storage.md) for implemente
 readonly T& type positions, checked boundaries and migration. Binding immutability
 remains a language feature. [Explicit nullability](nullability.md) is a planned
 signature characteristic and special state, not implemented syntax or zeroing.
+
+A record may name one source record base first in its colon list, before interfaces.
+Aggregate arguments include inherited fields first. See [inherited value layout](inherited-layout.md)
+for current restrictions; base-reference conversions and virtual methods are not implemented.

@@ -52,7 +52,9 @@ and streams should guide these mechanisms before their public hierarchies expand
    be selected by traversal order. Define ambiguity and redeclaration rules before
    implementation. Exercise a small collection observation hierarchy through Neo,
    raw IL, artifacts and reflection. Default interface bodies and variance can wait.
-2. **Class inheritance and virtual behavior.** Build on the same relationships:
+2. **Class inheritance and virtual behavior.** The preliminary
+   [inherited-layout slice](inherited-layout.md) is implemented; base views and
+   virtual dispatch remain ahead. Build on the same relationships:
    optional single base class, inherited layout, construction, virtual slots,
    overrides and base references. Decide abstract/sealed rules, inherited interface
    implementations and base-value copying before exposing corresponding APIs. A

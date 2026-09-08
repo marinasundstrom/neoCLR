@@ -242,6 +242,16 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     );
                     return Ok(());
                 }
+                if word == ".extends" {
+                    if def.base.is_some() {
+                        return Err(Fault::new("duplicate base type"));
+                    }
+                    def.base = Some(bind_type_parameters(
+                        parse_type(rest)?,
+                        &def.generic_parameters,
+                    ));
+                    return Ok(());
+                }
                 if word == ".implements" {
                     def.implements.push(bind_type_parameters(
                         parse_type(rest)?,
@@ -251,7 +261,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                 }
                 if word != ".field" {
                     return Err(Fault::new(
-                        "expected .type, .interface, .implements, .field, .property, .pack, .size, .custom, .method or .end",
+                        "expected .type, .interface, .implements, .extends, .field, .property, .pack, .size, .custom, .method or .end",
                     ));
                 }
                 let (name, ty) = rest
@@ -594,6 +604,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         generic_parameters,
                         fields: vec![],
                         implements: vec![],
+                        base: None,
                         properties: vec![],
                         packing: None,
                         minimum_size: None,

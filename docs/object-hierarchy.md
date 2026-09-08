@@ -5,8 +5,9 @@ relationships, interface inheritance and class inheritance to support useful lib
 contracts and their Neo projection. [Interface inheritance](interface-inheritance.md) is now implemented; class inheritance
 remains planned.
 
-Status: agreed direction; class inheritance and these common Object methods are not
-implemented by this change. The existing interface system and Equatable<T> remain
+Status: [inherited value layout and BaseType](inherited-layout.md) are implemented
+as preliminary groundwork. Base references, virtual dispatch, constructor chaining
+and common Object methods remain planned. The existing interface system and Equatable<T> remain
 available. Heap allocation and managed references are independent of this proposal.
 
 The runtime should support types with or without a base class. There is no mandatory

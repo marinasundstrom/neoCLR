@@ -92,8 +92,8 @@ fn analyze_function(
             || function
                 .owner
                 .as_ref()
-                .and_then(|owner| module.type_definition(owner))
-                .is_some_and(|def| def.fields.is_empty()),
+                .and_then(|owner| crate::vm::record_fields(module, owner, arity).ok())
+                .is_some_and(|fields| fields.is_empty()),
     });
     let mut queue = VecDeque::from([0]);
     let mut maximum_stack = 0;

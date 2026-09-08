@@ -26,8 +26,9 @@ The [runtime groundwork review](runtime-groundwork-review.md) led to implemented
 [stored/returned readonly signatures](readonly-storage.md). Immutable bindings remain
 a language responsibility; runtime-protected slots are not on the immediate track.
 [Interface inheritance](interface-inheritance.md) now provides transitive contracts,
-base views and reflection. Class/base relationships and complete-owner projections
-for inherited field layouts remain the next object-model foundation. Activation ownership, external roots and cleanup need decisions before
+base views and reflection. [Inherited value layout and BaseType](inherited-layout.md) establish the first
+record-base metadata/storage slice. Base-reference views, construction contracts and
+virtual dispatch remain the next object-model foundation. Activation ownership, external roots and cleanup need decisions before
 escaping callbacks or suspension.
 
 ## Projected exploration order

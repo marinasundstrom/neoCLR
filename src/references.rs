@@ -142,6 +142,9 @@ pub(crate) fn validate_uses(linked: &Module, source: &Module) -> Result<(), Faul
                 check_call(linked, source, accessor)?;
             }
         }
+        if let Some(base) = &definition.base {
+            check_type(linked, source, base)?;
+        }
         for ty in &definition.implements {
             check_type(linked, source, ty)?;
         }

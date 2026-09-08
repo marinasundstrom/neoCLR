@@ -1,0 +1,15 @@
+record Position(X: int)
+record LabelledPosition(Label: string): Position
+
+func Main() -> int {
+    var local = LabelledPosition(40, "local")
+    let heap = new LabelledPosition(2, "heap")
+    local.X = local.X + heap.X
+    typeof(LabelledPosition).BaseType match {
+        Some(let baseType) => {
+            if baseType.Equals(typeof(Position)) { return local.X }
+            return 1
+        },
+        None => { return 2 }
+    }
+}

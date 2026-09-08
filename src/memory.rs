@@ -126,6 +126,11 @@ pub fn layout_for(module: &Module, ty: &Type, target: TargetLayout) -> Result<La
                 let def = module
                     .type_definition(ty)
                     .ok_or_else(|| Fault::new("unknown layout type"))?;
+                if def.base.is_some() {
+                    return Err(Fault::new(
+                        "native layout for inherited records is not supported",
+                    ));
+                }
                 if def.representation != Representation::Record {
                     return Err(Fault::new("unsupported memory representation"));
                 }
