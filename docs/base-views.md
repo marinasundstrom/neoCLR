@@ -80,11 +80,9 @@ The benefit is predictable identity, access and lifetime across frontends. Costs
 include ancestry traversal, an exposed/stored-type distinction and runtime whole-value
 checks; this work makes no performance claim.
 
-Class virtual slots, inherited methods, base constructor chaining, downcasts and
-native inherited layout remain future work. The inherited-layout restriction on base
-types with instance methods or implemented interfaces still applies. Virtual dispatch
-can now build on the separate view and stored-owner types instead of discarding
-that distinction. No general assignability or covariance rule is added to containers.
+[Inherited methods, virtual dispatch and abstract classes](class-dispatch.md) now
+build on these views. Base constructor chaining, downcasts, inherited interface
+implementations and native inherited layout remain future work. No general assignability or covariance rule is added to containers.
 
 ## Run
 

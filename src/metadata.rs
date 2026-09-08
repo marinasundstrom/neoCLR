@@ -167,6 +167,8 @@ pub struct TypeDef {
     pub implements: Vec<Type>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub base: Option<Type>,
+    #[serde(default)]
+    pub is_abstract: bool,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub properties: Vec<Property>,
     #[serde(default)]
@@ -275,6 +277,12 @@ pub struct Function {
     /// Narrow the managed instance receiver to readonly access on entry.
     #[serde(default)]
     pub receiver_readonly: bool,
+    #[serde(default)]
+    pub is_virtual: bool,
+    #[serde(default)]
+    pub is_override: bool,
+    #[serde(default)]
+    pub is_abstract: bool,
     /// Declared parameter indices whose slots must be assigned before normal return.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub out_parameters: Vec<usize>,

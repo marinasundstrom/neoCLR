@@ -1,0 +1,14 @@
+abstract record Counter(Value: int) {
+    readonly abstract func Read() -> int
+    func Add(amount: int) -> () { this.Value = this.Value + amount }
+}
+record OffsetCounter(Offset: int): Counter {
+    readonly override func Read() -> int { return this.Value + this.Offset }
+}
+func Read(readonly counter: Counter&) -> int { return counter.Read() }
+func Main() -> int {
+    var local = OffsetCounter(19, 1)
+    local.Add(1)
+    let heap: Counter& = new OffsetCounter(20, 1)
+    return Read(&local) + Read(heap)
+}

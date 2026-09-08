@@ -54,7 +54,8 @@ and streams should guide these mechanisms before their public hierarchies expand
    raw IL, artifacts and reflection. Default interface bodies and variance can wait.
 2. **Class inheritance and virtual behavior.** The preliminary
    [inherited-layout slice](inherited-layout.md) and [base views](base-views.md) are
-   implemented; virtual dispatch and base construction remain ahead. Build on the same relationships:
+   implemented. [Class dispatch/abstract classes](class-dispatch.md) are also implemented;
+   base construction remains ahead. Build on the same relationships:
    optional single base class, inherited layout, construction, virtual slots,
    overrides and base references. Decide abstract/sealed rules, inherited interface
    implementations and base-value copying before exposing corresponding APIs. A
@@ -136,3 +137,7 @@ readers/streams/files, time, environment and diagnostics, followed by callback a
 async consumers as platform support arrives. Track these as coverage gaps, not as
 features promised for this preview. Claim concrete capabilities and limits, not
 production readiness or .NET binary/source compatibility.
+
+The [reflection hierarchy and interface plan](reflection-hierarchy-plan.md) is the
+next concrete library consumer. Default interface implementations remain a separate
+planned exploration with explicit conflict and receiver contracts.

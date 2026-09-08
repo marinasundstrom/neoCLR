@@ -571,6 +571,9 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         }
                         _ => (crate::metadata::Visibility::Public, rest),
                     };
+                    let (is_abstract, rest) = rest
+                        .strip_prefix("abstract ")
+                        .map_or((false, rest), |rest| (true, rest.trim()));
                     let (mut name, generic_parameters) = parse_type_declaration(rest)?;
                     if let Some(parent) = typedef.take() {
                         if !parent.generic_parameters.is_empty() {
@@ -605,6 +608,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         fields: vec![],
                         implements: vec![],
                         base: None,
+                        is_abstract,
                         properties: vec![],
                         packing: None,
                         minimum_size: None,
@@ -645,6 +649,17 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     } else {
                         (None, false, rest)
                     };
+                    let (is_abstract, declaration) = declaration
+                        .strip_prefix("abstract ")
+                        .map_or((false, declaration), |rest| (true, rest.trim()));
+                    let (is_virtual, is_override, declaration) =
+                        if let Some(rest) = declaration.strip_prefix("virtual ") {
+                            (true, false, rest.trim())
+                        } else if let Some(rest) = declaration.strip_prefix("override ") {
+                            (true, true, rest.trim())
+                        } else {
+                            (false, false, declaration)
+                        };
                     let (receiver_readonly, declaration) =
                         match declaration.strip_prefix("readonly ") {
                             Some(rest) => (true, rest.trim()),
@@ -717,6 +732,9 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                             readonly_parameters,
                             receiver_byref,
                             receiver_readonly,
+                            is_virtual: is_virtual || is_abstract,
+                            is_override,
+                            is_abstract,
                             returns: parse_type(result)?,
                             locals: vec![],
                             local_names: vec![],

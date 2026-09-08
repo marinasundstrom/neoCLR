@@ -195,3 +195,7 @@ interface separately for its declarations.
 
 See [inherited value layout](inherited-layout.md) for the preliminary record-base
 contract. Field descriptors retain their declaring-type-relative DefinitionIndex.
+
+Type.IsAbstract and MethodInfo.IsVirtual/IsOverride/IsAbstract now expose the
+[class-dispatch flags](class-dispatch.md). Descriptor records remain independent;
+the [hierarchy/interface migration](reflection-hierarchy-plan.md) is planned.

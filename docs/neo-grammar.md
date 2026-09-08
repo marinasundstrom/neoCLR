@@ -16,10 +16,12 @@ There are no empty statements apart from separators.
 program          = separators, { declaration, separators }, end_of_input ;
 declaration      = import_decl | record_decl | interface_decl | function_decl ;
 import_decl      = "import", "System", ".", "Console", ".", "*", terminator ;
-record_decl      = "record", identifier, field_list, [ ":", type, { ",", type } ],
-                   (terminator | newlines, "{", separators, { [ "readonly" ], function_decl, separators }, "}") ;
+record_decl      = [ "abstract" ], "record", identifier, field_list, [ ":", type, { ",", type } ],
+                   (terminator | newlines, "{", separators, { [ "readonly" ], [ "abstract" ], [ "virtual" | "override" ], method_decl, separators }, "}") ;
 interface_decl   = "interface", identifier, [ ":", type, { ",", type } ], newlines, "{", separators,
                    { [ "readonly" ], "func", identifier, parameter_list, "->", type, terminator, separators }, "}" ;
+method_decl      = "func", identifier, parameter_list, "->", type,
+                   (terminator | newlines, "{", separators, { statement, separators }, "}") ;
 function_decl    = "func", identifier, parameter_list, "->", type, newlines,
                    "{", separators, { statement, separators }, "}" ;
 field_list       = "(", newlines,
@@ -252,4 +254,5 @@ signature characteristic and special state, not implemented syntax or zeroing.
 A record may name one source record base first in its colon list, before interfaces.
 Aggregate arguments include inherited fields first. See [inherited value layout](inherited-layout.md)
 for current restrictions. [Base-reference conversions](base-views.md) are implemented;
-virtual methods remain planned.
+[Virtual/abstract methods](class-dispatch.md) are implemented; abstract methods
+require a terminator instead of a body.

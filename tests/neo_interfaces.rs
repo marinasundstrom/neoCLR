@@ -78,7 +78,7 @@ fn invalid_projection_and_dispatch_contracts_are_rejected() {
     for main in [
         "func Main() -> () { var c = SimpleCounter(1); let view = c as Counter& }",
         "func Main() -> () { var c = SimpleCounter(1); let view = &c as Counter }",
-        "func Main() -> () { var c = SimpleCounter(1); let view = &c as SimpleCounter& }",
+        "func Main() -> () { var c = SimpleCounter(1); let view = &c as int& }",
         "func Main() -> () { let c = SimpleCounter(1); let view = &c as Counter& }",
         "func Main() -> () { let c = new SimpleCounter(1); let view = c as Counter&; view.Add(true) }",
         "func Main() -> () { let c = new SimpleCounter(1); let view = c as Counter&; view.Add() }",

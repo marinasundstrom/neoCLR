@@ -278,6 +278,17 @@ impl SlotReference {
         view.target = target.clone();
         Ok(view)
     }
+    /// Runtime-only receiver projection after validated virtual target selection.
+    pub(crate) fn dispatch_view(
+        &self,
+        module: &crate::Module,
+        target: &Type,
+    ) -> Result<Self, Fault> {
+        crate::inheritance::require_base(module, &self.stored_type()?, target)?;
+        let mut view = self.clone();
+        view.target = target.clone();
+        Ok(view)
+    }
     pub(crate) fn read_field(&self, index: usize) -> Result<Value, Fault> {
         self.assigned()?;
         let cell = self.cell()?;

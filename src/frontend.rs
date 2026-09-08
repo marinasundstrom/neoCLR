@@ -196,6 +196,7 @@ struct Field {
 }
 struct Record {
     name: Token,
+    is_abstract: bool,
     base: Option<Ty>,
     inherited_fields: usize,
     fields: Vec<Field>,
@@ -209,6 +210,9 @@ struct Interface {
 }
 struct Function {
     name: Token,
+    is_virtual: bool,
+    is_override: bool,
+    is_abstract: bool,
     receiver_readonly: bool,
     parameters: Vec<Field>,
     returns: Ty,
@@ -280,6 +284,18 @@ impl Source {
         Ok(())
     }
 
+    fn record_method(&self, target: &Ty, name: &str) -> Option<(String, &Function)> {
+        let mut current = Some(target.clone());
+        for _ in 0..64 {
+            let ty = current?;
+            let record = self.records.iter().find(|r| r.name.text == ty.il())?;
+            if let Some(method) = record.methods.iter().find(|m| m.name.text == name) {
+                return Some((ty.il(), method));
+            }
+            current = record.base.clone();
+        }
+        None
+    }
     fn base_reachable(&self, from: &Ty, to: &Ty) -> bool {
         let mut current = Some(from.clone());
         for _ in 0..64 {
@@ -601,6 +617,9 @@ impl Parser {
         };
         Ok(Function {
             name,
+            is_virtual: false,
+            is_override: false,
+            is_abstract: false,
             receiver_readonly: false,
             parameters,
             returns,
@@ -616,8 +635,19 @@ impl Parser {
                 return Err(self.current().error("method limit exceeded"));
             }
             let receiver_readonly = self.eat("readonly");
-            let mut method = self.function(abstract_members)?;
+            let is_abstract = self.eat("abstract");
+            let is_virtual = self.eat("virtual");
+            let is_override = !is_virtual && self.eat("override");
+            if abstract_members && (is_virtual || is_override || is_abstract) {
+                return Err(self
+                    .current()
+                    .error("interface virtual modifiers are not supported"));
+            }
+            let mut method = self.function(abstract_members || is_abstract)?;
             method.receiver_readonly = receiver_readonly;
+            method.is_virtual = is_virtual || is_override || is_abstract;
+            method.is_abstract = is_abstract;
+            method.is_override = is_override;
             if methods.iter().any(|m| m.name.text == method.name.text) {
                 return Err(method
                     .name
@@ -666,7 +696,9 @@ impl Parser {
                     bases,
                     methods,
                 });
-            } else if self.eat("record") {
+            } else if self.at("record") || self.at("abstract") {
+                let is_abstract = self.eat("abstract");
+                self.expect("record")?;
                 let name = self.name()?;
                 let fields = self.fields(false)?;
                 let mut implements = Vec::new();
@@ -691,6 +723,7 @@ impl Parser {
                     Vec::new()
                 };
                 source.records.push(Record {
+                    is_abstract,
                     base: None,
                     inherited_fields: 0,
                     name,
@@ -1653,7 +1686,7 @@ impl Lowerer<'_> {
                         .interface_method(target, &member.text)?
                         .is_some()
                 } else {
-                    record.is_some_and(|r| r.methods.iter().any(|m| m.name.text == member.text))
+                    self.source.record_method(target, &member.text).is_some()
                 };
                 if member.text == "GetType"
                     && arguments.is_empty()
@@ -1673,19 +1706,11 @@ impl Lowerer<'_> {
                             .interface_method(target, &member.text)?
                             .ok_or_else(|| member.error("unknown source instance method"))?
                     } else {
-                        (
-                            target.il(),
-                            record
-                                .unwrap()
-                                .methods
-                                .iter()
-                                .find(|m| m.name.text == member.text)
-                                .ok_or_else(|| member.error("unknown source instance method"))?,
-                        )
+                        self.source
+                            .record_method(target, &member.text)
+                            .ok_or_else(|| member.error("unknown source instance method"))?
                     };
-                    if contract.is_some() && method_owner != target.il() {
-                        self.body.push(format!("interface.borrow {method_owner}"));
-                    }
+                    let virtual_call = contract.is_some() || method.is_virtual;
                     let receiver_readonly = method.receiver_readonly;
                     let parameters = method.parameters.clone();
                     let returns = method.returns.clone();
@@ -1703,6 +1728,16 @@ impl Lowerer<'_> {
                         self.body.truncate(saved);
                         self.place_with_access(owner, true, receiver_readonly)?;
                     }
+                    if method_owner != target.il() {
+                        self.body.push(format!(
+                            "{} {method_owner}",
+                            if contract.is_some() {
+                                "interface.borrow"
+                            } else {
+                                "castclass"
+                            }
+                        ));
+                    }
                     if parameters.len() != arguments.len() {
                         return Err(member.error("argument count mismatch"));
                     }
@@ -1711,11 +1746,7 @@ impl Lowerer<'_> {
                     }
                     self.body.push(format!(
                         "{} {signature}",
-                        if contract.is_some() {
-                            "callvirt"
-                        } else {
-                            "call"
-                        }
+                        if virtual_call { "callvirt" } else { "call" }
                     ));
                     return Ok(returns);
                 }
@@ -2418,7 +2449,7 @@ impl Lowerer<'_> {
             );
         }
         let returned = self.statements(&self.function.body)?;
-        if !returned {
+        if !returned && !self.function.is_abstract {
             if self.function.returns != Ty::Void {
                 return Err(self
                     .function
@@ -2427,16 +2458,34 @@ impl Lowerer<'_> {
             }
             self.body.extend(["ldvoid".into(), "ret".into()]);
         }
+        if self.function.is_abstract {
+            self.body.clear();
+        }
         Ok(format!(
             "{} {}({}) -> {}\n{}\n{}\n.end\n",
             if self.receiver.is_some() {
-                if self.function.receiver_readonly {
-                    ".method instance readonly byref"
-                } else {
-                    ".method instance byref"
-                }
+                format!(
+                    ".method instance {}{}{}byref",
+                    if self.function.is_abstract {
+                        "abstract "
+                    } else {
+                        ""
+                    },
+                    if self.function.is_override {
+                        "override "
+                    } else if self.function.is_virtual {
+                        "virtual "
+                    } else {
+                        ""
+                    },
+                    if self.function.receiver_readonly {
+                        "readonly "
+                    } else {
+                        ""
+                    }
+                )
             } else {
-                ".function"
+                ".function".into()
             },
             self.function.name.text,
             self.function
@@ -2559,7 +2608,11 @@ pub fn lower_to_il_named(source: &str, document: &str) -> Result<String, Fault> 
         il.push_str(".end\n");
     }
     for record in &source.records {
-        il.push_str(&format!(".type {}\n", record.name.text));
+        il.push_str(&format!(
+            ".type {}{}\n",
+            if record.is_abstract { "abstract " } else { "" },
+            record.name.text
+        ));
         for interface in &record.implements {
             if !source
                 .interfaces

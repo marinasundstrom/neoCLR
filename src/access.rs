@@ -113,6 +113,7 @@ pub(crate) fn check_construction(
     owner: &Type,
 ) -> Result<(), Fault> {
     check_owner(module, scope(caller), owner)?;
+    crate::inheritance::require_concrete(module, owner)?;
     for index in 0..crate::inheritance::fields(module, owner)?.len() {
         check_field(module, caller, owner, index)?;
     }

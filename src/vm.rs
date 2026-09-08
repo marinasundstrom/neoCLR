@@ -154,6 +154,7 @@ pub(crate) fn resolve_constructor(
         .owner
         .as_ref()
         .ok_or_else(|| Fault::new("constructor requires an explicit owner"))?;
+    crate::inheritance::require_concrete(module, owner)?;
     let name = match owner {
         Type::Constructed { definition, .. } => definition.as_str(),
         _ => owner
@@ -513,6 +514,9 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             crate::interfaces::validate_contract(function)?;
             continue;
         }
+        if function.is_abstract {
+            continue;
+        }
         if function.pinvoke.is_some() {
             crate::interop::validate(function)?;
             continue;
@@ -611,11 +615,17 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                         check(ty)?;
                     }
                     let callee = resolve(module, target)?;
-                    if matches!(op, Op::CallVirtual(_))
-                        != crate::interfaces::is_contract(module, &callee)
+                    if callee.is_abstract && !matches!(op, Op::CallVirtual(_)) {
+                        return Err(Fault::new("abstract methods require virtual dispatch"));
+                    }
+                    if (crate::interfaces::is_contract(module, &callee)
+                        && !matches!(op, Op::CallVirtual(_)))
+                        || (matches!(op, Op::CallVirtual(_))
+                            && !crate::interfaces::is_contract(module, &callee)
+                            && !callee.is_virtual)
                     {
                         return Err(Fault::new(
-                            "interface declarations require callvirt; class virtual calls are not supported",
+                            "callvirt requires an interface declaration or a virtual record method",
                         ));
                     }
                     if matches!(op, Op::Construct(_)) {
@@ -915,6 +925,9 @@ struct Frame {
 
 impl Frame {
     fn new(function: crate::metadata::Function, mut args: Vec<Value>) -> Result<Self, Fault> {
+        if function.is_abstract {
+            return Err(Fault::new("cannot invoke an abstract method body"));
+        }
         restrict_reference_arguments(&function, &mut args)?;
         let offset = args.len().saturating_sub(function.parameters.len());
         let mut outputs = vec![];
@@ -1525,6 +1538,28 @@ fn interpret_instructions(
                     let contract = resolve(module, target)?;
                     crate::access::check_call(module, Some(&function), &contract)?;
                     let mut args = frame.args(&contract.argument_types()[1..])?;
+                    if !crate::interfaces::is_contract(module, &contract) {
+                        let Value::SlotReference(reference) = frame.pop()? else {
+                            return Err(Fault::new("class callvirt requires a managed reference"));
+                        };
+                        if contract.owner.as_ref() != Some(reference.target()) {
+                            return Err(Fault::new("class virtual receiver type mismatch"));
+                        }
+                        let callee = crate::inheritance::dispatch(
+                            module,
+                            &reference.stored_type()?,
+                            &contract,
+                        )?;
+                        let receiver =
+                            reference.dispatch_view(module, callee.owner.as_ref().unwrap())?;
+                        args.insert(0, Value::SlotReference(receiver));
+                        if frames.len() >= limits.frames {
+                            return Err(Fault::new("frame limit exceeded"));
+                        }
+                        frames.push(Frame::new(callee, args)?);
+                        return Ok(None);
+                    }
+
                     let (interface, concrete, storage) = match frame.pop()? {
                         Value::SlotInterface {
                             interface,

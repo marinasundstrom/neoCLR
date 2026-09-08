@@ -41,6 +41,7 @@ fn resolve_with_budget(
         if ty.is_primitive() {
             return Ok(Input::Primitive(ty.clone()));
         }
+        crate::inheritance::require_concrete(module, ty)?;
         if active.contains(ty) {
             return Err(Fault::new("recursive by-value host input schema"));
         }

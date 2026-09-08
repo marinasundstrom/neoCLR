@@ -67,6 +67,9 @@ impl Query {
                 1 => matches!(ty, Type::ByRef(_) | Type::ReadOnlyByRef(_)),
                 2 => matches!(ty, Type::Ptr(_)),
                 4 => matches!(ty, Type::ReadOnlyByRef(_)),
+                5 => definition.is_some_and(|d| {
+                    d.is_abstract || d.representation == Representation::Interface
+                }),
                 3 => definition.is_some_and(|d| d.representation == Representation::Interface),
                 _ => return Err(Fault::new("unknown type shape query")),
             })),
@@ -406,6 +409,9 @@ fn method(
                 limits,
             )?,
             Value::Boolean(f.receiver_readonly),
+            Value::Boolean(f.is_virtual || crate::interfaces::is_contract(module, f)),
+            Value::Boolean(f.is_override),
+            Value::Boolean(f.is_abstract || crate::interfaces::is_contract(module, f)),
         ],
     ))
 }

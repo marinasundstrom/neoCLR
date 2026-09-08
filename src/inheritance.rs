@@ -84,6 +84,9 @@ pub(crate) fn field_owner(
 
 pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
     for definition in &module.types {
+        if definition.is_abstract && definition.representation != Representation::Record {
+            return Err(Fault::new("abstract applies only to record definitions"));
+        }
         if definition.base.is_none() {
             continue;
         }
@@ -94,6 +97,7 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             if !parent.implements.is_empty()
                 || module.functions.iter().any(|f| {
                     f.instance
+                        && (f.name.ends_with("..ctor") || !f.receiver_byref)
                         && f.owner
                             .as_ref()
                             .and_then(|t| module.type_definition(t))
@@ -101,8 +105,34 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
                 })
             {
                 return Err(Fault::new(
-                    "base types with instance methods or interface implementations require the forthcoming base-reference dispatch model",
+                    "base constructors, value receivers and inherited interface implementations are not supported yet",
                 ));
+            }
+        }
+    }
+    validate_methods(module)?;
+    for definition in &module.types {
+        if definition.representation != Representation::Record || definition.is_abstract {
+            continue;
+        }
+        let concrete = definition.open_type();
+        for owner in lineage(module, &concrete)? {
+            let args = match &owner {
+                Type::Constructed { arguments, .. } => arguments.as_slice(),
+                _ => &[],
+            };
+            for method in &module.functions {
+                if method.is_abstract
+                    && method
+                        .owner
+                        .as_ref()
+                        .and_then(|t| module.type_definition(t))
+                        .zip(module.type_definition(&owner))
+                        .is_some_and(|(a, b)| std::ptr::eq(a, b))
+                {
+                    let contract = method.map_types(|t| t.substitute_type_parameters(args))?;
+                    dispatch(module, &concrete, &contract)?;
+                }
             }
         }
     }
@@ -117,5 +147,183 @@ pub(crate) fn require_base(module: &Module, from: &Type, to: &Type) -> Result<()
         Err(Fault::new(
             "castclass requires the same record type or an ancestor",
         ))
+    }
+}
+
+fn declared_method(
+    module: &Module,
+    owner: &Type,
+    contract: &crate::metadata::Function,
+) -> Result<Option<crate::metadata::Function>, Fault> {
+    let definition = module
+        .type_definition(owner)
+        .ok_or_else(|| Fault::new("unknown method owner"))?;
+    let arguments = match owner {
+        Type::Constructed { arguments, .. } => arguments.as_slice(),
+        _ => &[],
+    };
+    for method in &module.functions {
+        if method.instance
+            && method
+                .owner
+                .as_ref()
+                .and_then(|t| module.type_definition(t))
+                .is_some_and(|d| std::ptr::eq(d, definition))
+        {
+            let candidate = method.map_types(|ty| ty.substitute_type_parameters(arguments))?;
+            if candidate.name.rsplit('.').next() == contract.name.rsplit('.').next()
+                && candidate.parameters == contract.parameters
+            {
+                return Ok(Some(candidate));
+            }
+        }
+    }
+    Ok(None)
+}
+fn validate_methods(module: &Module) -> Result<(), Fault> {
+    fn flags(values: &[usize]) -> std::collections::BTreeSet<usize> {
+        values.iter().copied().collect()
+    }
+    for method in &module.functions {
+        if method.is_abstract
+            && (!method.is_virtual
+                || !method.body.is_empty()
+                || !method.locals.is_empty()
+                || method
+                    .owner
+                    .as_ref()
+                    .and_then(|t| module.type_definition(t))
+                    .is_none_or(|d| !d.is_abstract))
+        {
+            return Err(Fault::new(
+                "abstract methods require an abstract record and no body or locals",
+            ));
+        }
+        if (method.is_virtual || method.is_override)
+            && (!method.is_virtual
+                || !method.instance
+                || !method.receiver_byref
+                || method.visibility != crate::metadata::Visibility::Public
+                || method.name.ends_with("..ctor")
+                || method.is_internal_call()
+                || method.pinvoke.is_some()
+                || method
+                    .owner
+                    .as_ref()
+                    .and_then(|t| module.type_definition(t))
+                    .is_none_or(|d| d.representation != Representation::Record))
+        {
+            return Err(Fault::new(
+                "virtual and override require public IL record methods with managed receivers",
+            ));
+        }
+        let Some(owner) = &method.owner else {
+            continue;
+        };
+        if !method.instance
+            || module
+                .type_definition(owner)
+                .is_none_or(|d| d.representation != Representation::Record)
+        {
+            continue;
+        }
+        let mut inherited = None;
+        for base in lineage(module, owner)?.iter().skip(1) {
+            if let Some(candidate) = declared_method(module, base, method)? {
+                inherited = Some(candidate);
+                break;
+            }
+        }
+        if method.is_override {
+            let parent = inherited
+                .ok_or_else(|| Fault::new("override requires an inherited virtual method"))?;
+            if !parent.is_virtual
+                || parent.returns != method.returns
+                || parent.receiver_readonly != method.receiver_readonly
+                || parent.receiver_byref != method.receiver_byref
+                || flags(&parent.out_parameters) != flags(&method.out_parameters)
+                || flags(&parent.out_when_true) != flags(&method.out_when_true)
+                || flags(&parent.readonly_parameters) != flags(&method.readonly_parameters)
+            {
+                return Err(Fault::new(
+                    "override must preserve the exact inherited virtual contract",
+                ));
+            }
+        } else if inherited.is_some() && !method.name.ends_with("..ctor") {
+            return Err(Fault::new(
+                "inherited method hiding is unsupported; use override for virtual methods",
+            ));
+        }
+    }
+    Ok(())
+}
+
+pub(crate) fn dispatch(
+    module: &Module,
+    concrete: &Type,
+    contract: &crate::metadata::Function,
+) -> Result<crate::metadata::Function, Fault> {
+    if !contract.is_virtual {
+        return Err(Fault::new("class callvirt requires a virtual method"));
+    }
+    let owner = contract
+        .owner
+        .as_ref()
+        .ok_or_else(|| Fault::new("virtual method requires owner"))?;
+    require_base(module, concrete, owner)?;
+    for ty in lineage(module, concrete)? {
+        if let Some(candidate) = declared_method(module, &ty, contract)? {
+            if candidate.is_abstract {
+                return Err(Fault::new(
+                    "concrete type has an unimplemented abstract method",
+                ));
+            }
+            return Ok(candidate);
+        }
+        if &ty == owner {
+            break;
+        }
+    }
+    Err(Fault::new("virtual implementation not found"))
+}
+
+pub(crate) fn dispatch_targets(
+    module: &Module,
+    contract: &crate::metadata::Function,
+) -> Result<Vec<crate::metadata::Function>, Fault> {
+    let mut targets = Vec::new();
+    for definition in &module.types {
+        if definition.representation != Representation::Record || definition.is_abstract {
+            continue;
+        }
+        let owner = definition.open_type();
+        // Open generic class target inference is deliberately not advertised as closed.
+        if !definition.generic_parameters.is_empty() {
+            if lineage(module, &owner)?.iter().any(|t| {
+                t.definition_name() == contract.owner.as_ref().and_then(Type::definition_name)
+            }) {
+                return Err(Fault::new(
+                    "closed class dispatch graph cannot infer generic implementers yet",
+                ));
+            }
+            continue;
+        }
+        if require_base(module, &owner, contract.owner.as_ref().unwrap()).is_ok() {
+            let target = dispatch(module, &owner, contract)?;
+            if !targets.iter().any(|f: &crate::metadata::Function| {
+                f.definition == target.definition && f.owner == target.owner
+            }) {
+                targets.push(target);
+            }
+        }
+    }
+    Ok(targets)
+}
+
+pub(crate) fn require_concrete(module: &Module, ty: &Type) -> Result<(), Fault> {
+    if module.type_definition(ty).is_some_and(|d| d.is_abstract) {
+        Err(Fault::new("cannot instantiate an abstract record"))
+    } else {
+        Ok(())
     }
 }

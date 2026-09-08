@@ -104,7 +104,8 @@ impl LoadedProgram {
         let function = crate::vm::resolve(&self.module, &target)?;
         crate::access::check_call(&self.module, None, &function)?;
         crate::access::check_signature(&self.module, None, &function)?;
-        if function.is_internal_call()
+        if function.is_abstract
+            || function.is_internal_call()
             || function.pinvoke.is_some()
             || crate::interfaces::is_contract(&self.module, &function)
         {

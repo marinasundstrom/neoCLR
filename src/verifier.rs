@@ -44,7 +44,8 @@ pub(crate) fn analyze(module: &Module) -> Result<Verification, Fault> {
     }
     let mut functions = Vec::new();
     for (index, function) in module.functions.iter().enumerate() {
-        if function.is_internal_call()
+        if function.is_abstract
+            || function.is_internal_call()
             || function.pinvoke.is_some()
             || crate::interfaces::is_contract(module, function)
         {

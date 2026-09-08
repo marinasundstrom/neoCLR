@@ -35,6 +35,7 @@ pub(crate) fn default_value(module: &Module, ty: &Type) -> Result<Value, Fault> 
                 if path.contains(ty) {
                     return Err(Fault::new("recursive default initialization"));
                 }
+                crate::inheritance::require_concrete(module, ty)?;
                 let definitions = crate::vm::record_fields(module, ty, 0)?;
                 path.push(ty.clone());
                 let fields = definitions

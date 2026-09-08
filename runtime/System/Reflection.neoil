@@ -144,6 +144,9 @@
     .field private DefinitionIndex Int32
     .field private Parameters System.Reflection.ParameterInfo[]
     .field private IsReadOnly Boolean
+    .field private IsVirtual Boolean
+    .field private IsOverride Boolean
+    .field private IsAbstract Boolean
     .property instance Name() -> String
         .get instance System.Reflection.MethodInfo::get_Name()
     .end
@@ -229,6 +232,32 @@
         ldfld 10
         ret
     .end
+    .property instance IsVirtual() -> Boolean
+        .get instance System.Reflection.MethodInfo::get_IsVirtual()
+    .end
+    .method instance get_IsVirtual() -> Boolean
+        ldarg this
+        ldfld 11
+        ret
+    .end
+    .property instance IsOverride() -> Boolean
+        .get instance System.Reflection.MethodInfo::get_IsOverride()
+    .end
+    .method instance get_IsOverride() -> Boolean
+        ldarg this
+        ldfld 12
+        ret
+    .end
+
+    .property instance IsAbstract() -> Boolean
+        .get instance System.Reflection.MethodInfo::get_IsAbstract()
+    .end
+    .method instance get_IsAbstract() -> Boolean
+        ldarg this
+        ldfld 13
+        ret
+    .end
+
 .end
 
 .type System.Reflection.PropertyInfo

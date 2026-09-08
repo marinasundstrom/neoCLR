@@ -53,7 +53,8 @@ The current assembler models declaring types and static/instance methods alongsi
 free functions. Primitive members belong to canonical System type definitions.
 Ordinary receivers are value snapshots; methods can explicitly declare byref
 receivers when they must access the original managed slot. Basic visibility, assembly references and explicit borrowed
-interface dispatch are implemented; class virtual dispatch remains deferred.
+interface dispatch are implemented, as are managed base views, class virtual dispatch
+and abstract records. See [class contracts](class-dispatch.md) for current restrictions.
 
 The Divide helper is a proof-of-concept extension whose final API location remains
 open. Existing .NET APIs should be preferred when an appropriate equivalent exists.

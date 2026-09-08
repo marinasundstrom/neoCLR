@@ -10,6 +10,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 #### Added
 
+- Inherited managed-receiver methods, class virtual/override dispatch and abstract
+  records/methods in Neo and IL. Base views select implementations using the complete
+  concrete owner; readonly/output/return contracts are validated and abstract values
+  cannot be instantiated or imported. Added Type.IsAbstract and MethodInfo virtual,
+  override and abstract flags, examples, tests and a .NET comparison probe. Rust
+  metadata literals require the new flags; new metadata/descriptor layouts require
+  a matching runtime/System library. Generic class runtime dispatch works; closed
+  generic class target inference remains explicitly unsupported. Planned reflection
+  hierarchy migration after constructor chaining, and default interface implementations
+  as a separate library-driven slice.
+
 - Managed base-reference views through castclass and implicit/explicit Neo ancestor
   projections. Views preserve location identity, derived GetType, complete-owner GC
   lifetime and readonly access. ldfld now reads managed record references directly.

@@ -122,6 +122,16 @@
         call neoCLR.Runtime.TypeShape(System.RuntimeTypeHandle,Int32)
         ret
     .end
+    .property instance IsAbstract() -> Boolean
+        .get instance System.Type::get_IsAbstract()
+    .end
+    .method instance get_IsAbstract() -> Boolean
+        ldarg this
+        ldfld 0
+        ldc.i4 5
+        call neoCLR.Runtime.TypeShape(System.RuntimeTypeHandle,Int32)
+        ret
+    .end
     .property instance IsReadOnly() -> Boolean
         .get instance System.Type::get_IsReadOnly()
     .end

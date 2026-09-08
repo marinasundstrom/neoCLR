@@ -2,8 +2,8 @@
 
 Implemented as preliminary groundwork. This adds a single explicit record base,
 inherited fields and BaseType reflection. [Managed base-reference views](base-views.md) are now implemented in a subsequent
-slice. Inherited method dispatch, virtual overrides and constructor chaining remain
-planned.
+slice. [Inherited method dispatch, virtual overrides and abstract classes](class-dispatch.md)
+are also implemented; constructor chaining remains planned.
 Those remain the next object-model slice; this is not complete class inheritance.
 
 ## Metadata, storage and Neo
@@ -39,8 +39,9 @@ all field types support default initialization. Ordinary copying preserves Deriv
 and all its fields. Managed allocation and references keep their existing meaning.
 The GC scans inherited reference fields as part of the complete stored value.
 
-To avoid pretending that base behavior is implemented, a type used as a base may
-not yet declare instance methods (including constructors) or implement interfaces.
+A type used as a base may now declare managed-reference instance methods, including
+virtual and abstract contracts. Base constructors, value-receiver methods and
+inherited interface implementations remain restricted; see [class dispatch](class-dispatch.md).
 Derived types may declare their own methods and interfaces. Base types may declare
 static helpers. Native layout/interop for derived records is rejected pending an
 explicit inherited-layout ABI. There is no implicit value slicing. [Base-reference projection](base-views.md) now
