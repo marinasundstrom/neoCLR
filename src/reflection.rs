@@ -377,6 +377,11 @@ fn method(
     arguments: &[Type],
     limits: &Limits,
 ) -> Result<Value, Fault> {
+    if !f.generic_parameters.is_empty() {
+        return Err(Fault::new(
+            "generic method definition reflection is not yet supported",
+        ));
+    }
     let parameter_types = f
         .parameters
         .iter()

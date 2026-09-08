@@ -66,7 +66,10 @@ pub(crate) fn resolve(
         {
             continue;
         }
-        if definition.name != target.name || definition.instance != target.instance {
+        if definition.name != target.name
+            || definition.instance != target.instance
+            || definition.generic_parameters.len() != target.generic_arguments.len()
+        {
             continue;
         }
         let arity = definition
@@ -87,8 +90,9 @@ pub(crate) fn resolve(
             {
                 continue;
             }
-            let mut instantiated =
-                definition.map_types(|ty| ty.substitute_type_parameters(arguments))?;
+            let mut instantiated = definition.map_types(|ty| {
+                ty.substitute_parameters(Some(arguments), Some(&target.generic_arguments))
+            })?;
             instantiated.owner = target.owner.clone();
             instantiated
         } else {
@@ -99,8 +103,25 @@ pub(crate) fn resolve(
             {
                 continue;
             }
-            definition.clone()
+            definition.map_types(|ty| ty.substitute_method_parameters(&target.generic_arguments))?
         };
+        if !target.generic_arguments.is_empty() {
+            // Callers may still be symbolic; validate structural constraints after
+            // substitution without capturing their independent parameter namespace.
+            candidate = candidate.map_types(|ty| {
+                check_type_context(
+                    ty,
+                    module,
+                    SignatureContext {
+                        types: 65536,
+                        methods: 65536,
+                    },
+                    0,
+                )?;
+                Ok(ty.clone())
+            })?;
+        }
+        candidate.generic_arguments = target.generic_arguments.clone();
         candidate.definition = Some(identity);
         if candidate.parameters == target.parameters {
             if found.is_some() {
@@ -119,10 +140,21 @@ pub(crate) fn resolve(
     })
 }
 
+#[derive(Clone, Copy)]
+pub(crate) struct SignatureContext {
+    pub types: usize,
+    pub methods: usize,
+}
+impl From<usize> for SignatureContext {
+    fn from(types: usize) -> Self {
+        Self { types, methods: 0 }
+    }
+}
+
 pub(crate) fn record_fields(
     module: &Module,
     ty: &Type,
-    arity: usize,
+    arity: impl Into<SignatureContext>,
 ) -> Result<Vec<crate::metadata::Field>, Fault> {
     check_type_context(ty, module, arity, 0)?;
     let (name, arguments): (&str, &[Type]) = match ty {
@@ -340,7 +372,14 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         .functions
         .iter()
         .filter(|function| function.owner.is_none())
-        .map(|function| (&function.name, &function.parameters, function.instance))
+        .map(|function| {
+            (
+                &function.name,
+                &function.parameters,
+                function.instance,
+                function.generic_parameters.len(),
+            )
+        })
         .collect();
     for function in &module.functions {
         if function
@@ -362,6 +401,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             &function.owner,
             &function.name,
             function.instance,
+            function.generic_parameters.len(),
             parameters_without_access,
         )) {
             return Err(Fault::new(
@@ -374,12 +414,14 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                     &function.name,
                     &function.parameters,
                     function.instance,
+                    function.generic_parameters.len(),
                 )))
             || !signatures.insert((
                 &function.owner,
                 &function.name,
                 &function.parameters,
                 function.instance,
+                function.generic_parameters.len(),
             ))
         {
             return Err(Fault::new(
@@ -422,7 +464,34 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             .as_ref()
             .and_then(|owner| module.type_definition(owner))
             .map_or(0, |d| d.generic_parameters.len());
-        let check = |ty: &Type| check_type_context(ty, module, arity, 0);
+        let context = SignatureContext {
+            types: arity,
+            methods: function.generic_parameters.len(),
+        };
+        let check = |ty: &Type| check_type_context(ty, module, context, 0);
+        if !function.generic_parameters.is_empty() {
+            let mut names = HashSet::new();
+            if function.generic_parameters.len() > 1024
+                || function.instance
+                || function.is_virtual
+                || function.is_abstract
+                || function.is_internal_call()
+                || function.pinvoke.is_some()
+                || !function.interface_implementations.is_empty()
+            {
+                return Err(Fault::new(
+                    "generic functions currently require static or free concrete IL bodies",
+                ));
+            }
+            for name in function.generic_parameters.iter().flatten() {
+                if !crate::metadata::valid_slot_name(name)
+                    || Type::from_name(name).is_primitive()
+                    || !names.insert(name)
+                {
+                    return Err(Fault::new("invalid or duplicate method type parameter"));
+                }
+            }
+        }
         if let Some(owner) = &function.owner {
             if arity == 0 {
                 check_type(owner, module)?;
@@ -520,7 +589,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             if let Some(owner) = &target.owner {
                 check(owner)?;
             }
-            for ty in &target.parameters {
+            for ty in target.parameters.iter().chain(&target.generic_arguments) {
                 check(ty)?;
             }
             let contract = resolve(module, target)?;
@@ -632,7 +701,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                     if let Some(owner) = &target.owner {
                         check(owner)?;
                     }
-                    for ty in &target.parameters {
+                    for ty in target.parameters.iter().chain(&target.generic_arguments) {
                         check(ty)?;
                     }
                     let callee = resolve(module, target)?;
@@ -672,7 +741,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                     }
                 }
                 Op::New(ty) => {
-                    record_fields(module, ty, arity)?;
+                    record_fields(module, ty, context)?;
                     crate::access::check_construction(module, function, ty)?;
                 }
                 Op::SizeOf(ty) | Op::AlignOf(ty) | Op::Allocate(ty) | Op::CopyObject(ty) => {
@@ -797,11 +866,12 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         }
     }
     crate::access::validate_types(module)?;
-    if let Some(entry) = module
-        .functions
-        .iter()
-        .find(|f| f.name == module.entry && f.parameters.is_empty() && !f.instance)
-    {
+    if let Some(entry) = module.functions.iter().find(|f| {
+        f.name == module.entry
+            && f.generic_parameters.is_empty()
+            && f.parameters.is_empty()
+            && !f.instance
+    }) {
         crate::access::check_entry(module, entry)?;
     }
     crate::inheritance::validate(module)?;
@@ -809,6 +879,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
     if !module.entry.is_empty()
         && !module.functions.iter().any(|f| {
             f.name == module.entry
+                && f.generic_parameters.is_empty()
                 && f.parameters.is_empty()
                 && !f.is_internal_call()
                 && f.pinvoke.is_none()
@@ -828,16 +899,25 @@ pub(crate) fn check_type(ty: &Type, module: &Module) -> Result<(), Fault> {
     check_type_context(ty, module, 0, 0)
 }
 
-fn check_type_context(ty: &Type, module: &Module, arity: usize, depth: usize) -> Result<(), Fault> {
+fn check_type_context(
+    ty: &Type,
+    module: &Module,
+    arity: impl Into<SignatureContext>,
+    depth: usize,
+) -> Result<(), Fault> {
+    let arity = arity.into();
     if depth > 32 {
         return Err(Fault::new("type nesting exceeds 32"));
     }
     let nested = |ty: &Type| check_type_context(ty, module, arity, depth + 1);
     match ty {
         Type::Scoped { .. } => Err(Fault::new("unresolved scoped type signature")),
-        Type::TypeParameter(index) if *index as usize >= arity => {
+        Type::TypeParameter(index) if *index as usize >= arity.types => {
             Err(Fault::new("type parameter outside declaring context"))
         }
+        Type::MethodTypeParameter(index) if *index as usize >= arity.methods => Err(Fault::new(
+            "method type parameter outside declaring context",
+        )),
         Type::Named(name) => {
             if Type::from_name(name).is_primitive() {
                 return Err(Fault::new(
@@ -1122,7 +1202,12 @@ pub(crate) fn interpret(
     let entry = module
         .functions
         .iter()
-        .position(|f| f.name == module.entry && f.parameters.is_empty() && !f.instance)
+        .position(|f| {
+            f.name == module.entry
+                && f.generic_parameters.is_empty()
+                && f.parameters.is_empty()
+                && !f.instance
+        })
         .ok_or_else(|| Fault::new("missing entry"))?;
     crate::access::check_entry(module, &module.functions[entry])?;
     interpret_function(

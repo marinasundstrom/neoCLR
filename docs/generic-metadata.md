@@ -3,8 +3,8 @@
 This slice implements type parameter references, constructed type references, generic
 record field signatures, validation, substitution, and closed generic record values.
 Static and instance IL methods on generic types and ordinary library-defined
-System.Option/Result are implemented. Generic methods with their own type parameters
-and constraints remain deferred; read-only type inspection is documented separately
+System.Option/Result are implemented. Concrete static/free [functions with their own type parameters](function-generics.md)
+are implemented; generic instance methods and constraints remain deferred; read-only type inspection is documented separately
 in [type inspection](type-inspection.md).
 
 ```text
@@ -32,8 +32,8 @@ Closed references such as `Pair<Int32, String>` require a known generic definiti
 and exactly the declared number of arguments. Bare generic names are not closed
 references. Type parameters may appear within their declaring type's fields and methods,
 including under pointers, current builtin wrappers, and other constructed types.
-Free-function signatures and locals must be closed. Method-level generic parameters,
-constraints, and variance remain pending. Validation checks metadata as well as source, including nested arity and
+Free-function signatures and locals may use their own method-level parameters.
+Constraints and variance remain pending. Validation checks metadata as well as source, including nested arity and
 parameter context; type nesting is limited to 32 levels.
 
 The Rust embedding helper `Module::instantiated_fields` resolves the field signatures
@@ -73,7 +73,8 @@ Older readers reject the new structured operands rather than erasing type argume
 copies, and a function accepting a closed generic value. The earlier
 `examples/generic-metadata.neoil` demonstrates closed generic pointer signatures.
 Native layouts and allocation now support closed generic records whose substituted
-fields have supported layouts. Method-level generics remain unsupported. A recursive
+fields have supported layouts. Method-level parameters are supported on concrete
+static/free functions; generic instance methods remain deferred. A recursive
 pointer signature does not expand its pointee or acquire a lifetime/ownership policy.
 
 System.Option and System.Result are ordinary generic definitions. Unqualified

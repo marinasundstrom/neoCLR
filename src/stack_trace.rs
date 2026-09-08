@@ -46,6 +46,7 @@ impl StackTrace {
                     name: function.name.clone(),
                     owner: function.owner.clone(),
                     instance: function.instance,
+                    generic_arguments: function.generic_arguments.clone(),
                     parameters: function.parameters.clone(),
                 },
                 location: CodeLocation::IlInstruction(instruction),

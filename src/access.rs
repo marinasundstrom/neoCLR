@@ -173,7 +173,7 @@ fn check_type(module: &Module, source: Scope<'_>, ty: &Type) -> Result<(), Fault
             Type::Scoped { .. } => {
                 return Err(Fault::new("unresolved type scope during access checking"));
             }
-            Type::TypeParameter(_) => {}
+            Type::TypeParameter(_) | Type::MethodTypeParameter(_) => {}
             _ => {}
         }
         Ok(())

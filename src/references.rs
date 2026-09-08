@@ -102,7 +102,7 @@ pub(crate) fn check_call(
     if let Some(owner) = &target.owner {
         check_type(linked, source, owner)?;
     }
-    for parameter in &target.parameters {
+    for parameter in target.parameters.iter().chain(&target.generic_arguments) {
         check_type(linked, source, parameter)?;
     }
     Ok(())

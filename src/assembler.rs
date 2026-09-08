@@ -162,6 +162,10 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                             _ => return Err(Fault::new("invalid branch fixup")),
                         }
                     }
+                    let method_names = pending.function.generic_parameters.clone();
+                    pending.function = pending
+                        .function
+                        .map_types(|ty| Ok(bind_parameters(ty.clone(), &method_names, true)))?;
                     if let Some(def) = &typedef {
                         let owner = pending.function.owner.clone();
                         pending.function = pending.function.map_types(|ty| {
@@ -438,7 +442,11 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                                     Fault::new("expected field index or Type::Field")
                                 })?;
                                 let owner = bind_type_parameters(
-                                    parse_type(owner)?,
+                                    bind_parameters(
+                                        parse_type(owner)?,
+                                        &pending.function.generic_parameters,
+                                        true,
+                                    ),
                                     &typedef
                                         .as_ref()
                                         .map(|d| d.generic_parameters.clone())
@@ -695,6 +703,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                             FunctionRef {
                                 definition: None,
                                 name: name.trim().into(),
+                                generic_arguments: vec![],
                                 parameters: vec![],
                                 owner: None,
                                 instance: false,
@@ -747,6 +756,23 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                             is_virtual: is_virtual || is_abstract,
                             is_override,
                             interface_implementations: vec![],
+                            generic_parameters: target
+                                .generic_arguments
+                                .iter()
+                                .enumerate()
+                                .map(|(index, ty)| match ty {
+                                    Type::Named(name) if crate::metadata::valid_slot_name(name) => {
+                                        Ok(Some(name.clone()))
+                                    }
+                                    Type::MethodTypeParameter(i) if *i as usize == index => {
+                                        Ok(None)
+                                    }
+                                    _ => Err(Fault::new(
+                                        "expected method type parameter name or !!index",
+                                    )),
+                                })
+                                .collect::<Result<_, _>>()?,
+                            generic_arguments: vec![],
                             is_abstract,
                             returns: parse_type(result)?,
                             locals: vec![],
@@ -803,6 +829,10 @@ fn resolve_fields(
             .as_ref()
             .and_then(|t| context.type_definition(t))
             .map_or(0, |d| d.generic_parameters.len());
+        let arity = crate::vm::SignatureContext {
+            types: arity,
+            methods: module.functions[function].generic_parameters.len(),
+        };
         let fields = crate::vm::record_fields(&context, &owner, arity).map_err(|e| {
             Fault::new(format!(
                 "line {line}: invalid field owner {owner:?}: {}",
@@ -875,9 +905,18 @@ pub fn parse_type(text: &str) -> Result<Type, Fault> {
             }
             return parse(inner, depth + 1);
         }
+        if let Some(index) = text.strip_prefix("!!") {
+            if !text.ends_with('*') && !text.ends_with('&') && !text.ends_with("[]") {
+                return Ok(Type::MethodTypeParameter(
+                    index
+                        .parse()
+                        .map_err(|_| Fault::new("expected method parameter index !!0"))?,
+                ));
+            }
+        }
         if let Some(index) = text.strip_prefix('!') {
             // Pointer suffixes are parsed first below; !0* is not a bare index.
-            if !text.ends_with('*') && !text.ends_with('&') {
+            if !text.ends_with('*') && !text.ends_with('&') && !text.ends_with("[]") {
                 return Ok(Type::TypeParameter(
                     index
                         .parse()
@@ -968,6 +1007,21 @@ pub fn parse_function_ref(text: &str) -> Result<FunctionRef, Fault> {
     parse_callable(text, false).map(|(target, _, _, _, _)| target)
 }
 
+fn parse_method_name(text: &str) -> Result<(String, Vec<Type>), Fault> {
+    if text.contains('<') {
+        match parse_type(text)? {
+            Type::Constructed {
+                definition,
+                arguments,
+            } => Ok((definition, arguments)),
+            _ => Err(Fault::new("expected generic method name")),
+        }
+    } else {
+        identifier(text)?;
+        Ok((text.to_owned(), vec![]))
+    }
+}
+
 type Callable = (
     FunctionRef,
     Vec<Option<String>>,
@@ -1008,8 +1062,8 @@ fn parse_callable(text: &str, named: bool) -> Result<Callable, Fault> {
         Some(name) => (true, name.trim()),
         None => (false, name.trim()),
     };
-    let (owner, name) = if let Some((owner, member)) = name.split_once("::") {
-        identifier(member.trim())?;
+    let (owner, name, generic_arguments) = if let Some((owner, member)) = name.split_once("::") {
+        let (member, generic_arguments) = parse_method_name(member.trim())?;
         if member.trim().contains('.') && member.trim() != ".ctor" {
             return Err(Fault::new("expected an unqualified member name"));
         }
@@ -1025,10 +1079,10 @@ fn parse_callable(text: &str, named: bool) -> Result<Callable, Fault> {
             },
             member.trim()
         );
-        (Some(owner), full_name)
+        (Some(owner), full_name, generic_arguments)
     } else {
-        identifier(name)?;
-        (None, name.to_owned())
+        let (name, generic_arguments) = parse_method_name(name)?;
+        (None, name, generic_arguments)
     };
     let parameters = parameters
         .strip_suffix(')')
@@ -1092,6 +1146,7 @@ fn parse_callable(text: &str, named: bool) -> Result<Callable, Fault> {
             name,
             owner,
             instance,
+            generic_arguments,
             parameters: types,
         },
         names,
@@ -1234,6 +1289,9 @@ fn parse_type_declaration(text: &str) -> Result<(String, Vec<Option<String>>), F
 }
 
 fn bind_type_parameters(ty: Type, names: &[Option<String>]) -> Type {
+    bind_parameters(ty, names, false)
+}
+pub(crate) fn bind_parameters(ty: Type, names: &[Option<String>], method: bool) -> Type {
     match ty {
         Type::Scoped {
             module,
@@ -1244,13 +1302,19 @@ fn bind_type_parameters(ty: Type, names: &[Option<String>]) -> Type {
             name,
             arguments: arguments
                 .into_iter()
-                .map(|t| bind_type_parameters(t, names))
+                .map(|t| bind_parameters(t, names, method))
                 .collect(),
         },
         Type::Named(name) => names
             .iter()
             .position(|n| n.as_deref() == Some(&name))
-            .map_or(Type::Named(name), |index| Type::TypeParameter(index as u16)),
+            .map_or(Type::Named(name), |index| {
+                if method {
+                    Type::MethodTypeParameter(index as u16)
+                } else {
+                    Type::TypeParameter(index as u16)
+                }
+            }),
         Type::Constructed {
             definition,
             arguments,
@@ -1258,13 +1322,14 @@ fn bind_type_parameters(ty: Type, names: &[Option<String>]) -> Type {
             definition,
             arguments: arguments
                 .into_iter()
-                .map(|t| bind_type_parameters(t, names))
+                .map(|t| bind_parameters(t, names, method))
                 .collect(),
         },
-        Type::InterfaceRef(t) => Type::InterfaceRef(Box::new(bind_type_parameters(*t, names))),
-        Type::ByRef(t) => Type::ByRef(Box::new(bind_type_parameters(*t, names))),
-        Type::Array(t) => Type::Array(Box::new(bind_type_parameters(*t, names))),
-        Type::Ptr(t) => Type::Ptr(Box::new(bind_type_parameters(*t, names))),
+        Type::InterfaceRef(t) => Type::InterfaceRef(Box::new(bind_parameters(*t, names, method))),
+        Type::ReadOnlyByRef(t) => Type::ReadOnlyByRef(Box::new(bind_parameters(*t, names, method))),
+        Type::ByRef(t) => Type::ByRef(Box::new(bind_parameters(*t, names, method))),
+        Type::Array(t) => Type::Array(Box::new(bind_parameters(*t, names, method))),
+        Type::Ptr(t) => Type::Ptr(Box::new(bind_parameters(*t, names, method))),
         other => other,
     }
 }

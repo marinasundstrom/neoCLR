@@ -34,6 +34,8 @@ pub enum Type {
     },
     /// Indexed parameter of the declaring type (CLI VAR-like signature).
     TypeParameter(u16),
+    /// Indexed method parameter (CLI MVAR), independent of its owner.
+    MethodTypeParameter(u16),
     Constructed {
         definition: String,
         arguments: Vec<Type>,
@@ -224,7 +226,11 @@ impl Property {
             if let Some(owner) = &mut target.owner {
                 *owner = map(owner)?;
             }
-            for ty in &mut target.parameters {
+            for ty in target
+                .parameters
+                .iter_mut()
+                .chain(&mut target.generic_arguments)
+            {
                 *ty = map(ty)?;
             }
         }
@@ -286,6 +292,11 @@ pub struct Function {
     /// Explicit interface declarations implemented by this body (MethodImpl analogue).
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub interface_implementations: Vec<FunctionRef>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub generic_parameters: Vec<Option<String>>,
+    /// Instantiation carried by resolved bodies, never serialized on a definition.
+    #[serde(skip)]
+    pub generic_arguments: Vec<Type>,
     /// Declared parameter indices whose slots must be assigned before normal return.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub out_parameters: Vec<usize>,
@@ -394,6 +405,8 @@ pub struct FunctionRef {
     pub owner: Option<Type>,
     #[serde(default)]
     pub instance: bool,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub generic_arguments: Vec<Type>,
     pub parameters: Vec<Type>,
 }
 
@@ -784,16 +797,37 @@ impl Instruction {
 
 impl Type {
     pub fn substitute_type_parameters(&self, arguments: &[Type]) -> Result<Type, crate::Fault> {
-        fn substitute(ty: &Type, arguments: &[Type], depth: usize) -> Result<Type, crate::Fault> {
+        self.substitute_parameters(Some(arguments), None)
+    }
+    pub fn substitute_method_parameters(&self, arguments: &[Type]) -> Result<Type, crate::Fault> {
+        self.substitute_parameters(None, Some(arguments))
+    }
+    pub(crate) fn substitute_parameters(
+        &self,
+        types: Option<&[Type]>,
+        methods: Option<&[Type]>,
+    ) -> Result<Type, crate::Fault> {
+        fn substitute(
+            ty: &Type,
+            types: Option<&[Type]>,
+            methods: Option<&[Type]>,
+            depth: usize,
+        ) -> Result<Type, crate::Fault> {
             if depth > 32 {
                 return Err(crate::Fault::new("type substitution nesting exceeds 32"));
             }
-            let nested = |ty: &Type| substitute(ty, arguments, depth + 1);
+            let nested = |ty: &Type| substitute(ty, types, methods, depth + 1);
             Ok(match ty {
-                Type::TypeParameter(index) => arguments
+                Type::TypeParameter(index) if types.is_some() => types
+                    .unwrap()
                     .get(*index as usize)
                     .cloned()
                     .ok_or_else(|| crate::Fault::new("type parameter index outside arguments"))?,
+                Type::MethodTypeParameter(index) if methods.is_some() => methods
+                    .unwrap()
+                    .get(*index as usize)
+                    .cloned()
+                    .ok_or_else(|| crate::Fault::new("method parameter index outside arguments"))?,
                 Type::Constructed {
                     definition,
                     arguments: types,
@@ -818,7 +852,7 @@ impl Type {
                 other => other.clone(),
             })
         }
-        substitute(self, arguments, 0)
+        substitute(self, types, methods, 0)
     }
 }
 
@@ -878,7 +912,11 @@ impl Function {
             if let Some(owner) = &mut target.owner {
                 *owner = map(owner)?;
             }
-            for ty in &mut target.parameters {
+            for ty in target
+                .parameters
+                .iter_mut()
+                .chain(&mut target.generic_arguments)
+            {
                 *ty = map(ty)?;
             }
         }
@@ -890,7 +928,11 @@ impl Function {
                     if let Some(owner) = &mut target.owner {
                         *owner = map(owner)?;
                     }
-                    for ty in &mut target.parameters {
+                    for ty in target
+                        .parameters
+                        .iter_mut()
+                        .chain(&mut target.generic_arguments)
+                    {
                         *ty = map(ty)?;
                     }
                 }

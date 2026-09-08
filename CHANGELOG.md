@@ -10,6 +10,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 #### Added
 
+- Generic free functions and static IL methods with independent method parameters,
+  explicit type arguments, simultaneous owner/method substitution, verification,
+  host invocation and distinct closed call graphs. Added regression tests and a
+  pinned .NET comparison. Managed-reference arguments preserve existing lifetimes;
+  invalid substituted shapes fault. Generic instance methods, constraints and guest
+  generic-method reflection remain deferred. New metadata requires this runtime;
+  existing artifacts remain compatible, while Rust metadata literals need new fields.
+
 - Default interface bodies now execute in runtime/IL and Neo with class precedence,
   most-specific selection, diamond ambiguity checks, qualified replacements and
   reabstraction. Managed interface receivers retain original owners and readonly/output

@@ -110,7 +110,7 @@ fn analyze_constructor(module: &Module, function: &Function) -> Result<(), Fault
     while let Some(pc) = queue.pop_front() {
         let mut state = states[pc].clone().unwrap();
         let op = &function.body[pc];
-        let (pops, pushes) = effect(module, op, arity)?;
+        let (pops, pushes) = effect(module, op, arity.into())?;
         let inputs = state.stack.split_off(state.stack.len() - pops);
         let mut outputs = vec![Origin::Other; pushes];
         match op {
@@ -280,6 +280,10 @@ fn analyze_function(
         .as_ref()
         .and_then(|t| module.type_definition(t))
         .map_or(0, |d| d.generic_parameters.len());
+    let arity = crate::vm::SignatureContext {
+        types: arity,
+        methods: function.generic_parameters.len(),
+    };
     let mut states: Vec<Option<State>> = vec![None; function.body.len()];
     states[0] = Some(State {
         stack: vec![],
@@ -583,7 +587,11 @@ fn analyze_function(
 }
 
 // Exhaustive: adding an instruction requires explicitly specifying its stack effect.
-fn effect(module: &Module, op: &Op, arity: usize) -> Result<(usize, usize), Fault> {
+fn effect(
+    module: &Module,
+    op: &Op,
+    arity: crate::vm::SignatureContext,
+) -> Result<(usize, usize), Fault> {
     use Op::*;
     Result::Ok(match op {
         Unaligned(_) | Branch(_) | Fault(_) | ResetLocal(_) => (0, 0),
@@ -711,12 +719,14 @@ enum StackType {
     Exact(Type),
     Readonly(Type),
     NormalizedParameter(u16),
+    NormalizedMethodParameter(u16),
 }
 
 fn loaded(ty: &Type) -> StackType {
     use Type::*;
     match ty {
         TypeParameter(index) => StackType::NormalizedParameter(*index),
+        MethodTypeParameter(index) => StackType::NormalizedMethodParameter(*index),
         SByte | Byte | Int16 | UInt16 | Char | UInt32 => StackType::Exact(Int32),
         UInt64 => StackType::Exact(Int64),
         Single => StackType::Exact(Double),
@@ -791,7 +801,7 @@ fn typed_effect(
     function: &Function,
     op: &Op,
     values: &[StackType],
-    arity: usize,
+    arity: crate::vm::SignatureContext,
     rest_empty: bool,
 ) -> Result<Vec<StackType>, Fault> {
     use Op::*;

@@ -51,13 +51,17 @@ pub(crate) fn analyze(
     max_functions: usize,
 ) -> Result<Reachability, Fault> {
     let mut functions = Vec::<Function>::new();
-    let mut seen = HashMap::<(MemberId, Option<Type>), usize>::new();
+    let mut seen = HashMap::<(MemberId, Option<Type>, Vec<Type>), usize>::new();
     let mut intern = |function: Function, functions: &mut Vec<Function>| -> Result<usize, Fault> {
         let definition = function
             .definition
             .clone()
             .ok_or_else(|| Fault::new("missing reachable function identity"))?;
-        let key = (definition, function.owner.clone());
+        let key = (
+            definition,
+            function.owner.clone(),
+            function.generic_arguments.clone(),
+        );
         if let Some(index) = seen.get(&key) {
             return Ok(*index);
         }
@@ -76,7 +80,11 @@ pub(crate) fn analyze(
             *owner = crate::scope::normalize_type(module, owner)?;
             crate::vm::check_type(owner, module)?;
         }
-        for parameter in &mut root.parameters {
+        for parameter in root
+            .parameters
+            .iter_mut()
+            .chain(&mut root.generic_arguments)
+        {
             *parameter = crate::scope::normalize_type(module, parameter)?;
             crate::vm::check_type(parameter, module)?;
         }
@@ -140,6 +148,7 @@ pub(crate) fn analyze(
                 name: function.name,
                 owner: function.owner,
                 instance: function.instance,
+                generic_arguments: function.generic_arguments.clone(),
                 parameters: function.parameters,
             },
             returns: function.returns,

@@ -96,7 +96,11 @@ impl LoadedProgram {
             *owner = crate::scope::normalize_type(&self.module, owner)?;
             crate::vm::check_type(owner, &self.module)?;
         }
-        for parameter in &mut target.parameters {
+        for parameter in target
+            .parameters
+            .iter_mut()
+            .chain(&mut target.generic_arguments)
+        {
             *parameter = crate::scope::normalize_type(&self.module, parameter)?;
             crate::vm::check_type(parameter, &self.module)?;
         }

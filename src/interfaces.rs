@@ -192,6 +192,7 @@ fn member(
             name: format!("{}.{name}", owner.definition_name().unwrap()),
             owner: Some(owner.clone()),
             instance: true,
+            generic_arguments: vec![],
             parameters: contract.parameters.clone(),
         };
         if let Ok(function) = crate::vm::resolve(module, &target) {
