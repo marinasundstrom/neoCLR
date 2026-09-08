@@ -41,7 +41,8 @@ postfix          = primary, { ".", identifier | arguments | "[", expression, "]"
 arguments        = "(", newlines,
                    [ expression, newlines,
                      { ",", newlines, expression, newlines } ], ")" ;
-primary          = integer | string | "true" | "false" | "this" | identifier
+generic_member   = qualified_name, "<", type, { ",", type }, ">", ".", identifier ;
+primary          = generic_member | integer | string | "true" | "false" | "this" | identifier
                  | "[", newlines, expression, newlines, { ",", newlines, expression, newlines }, "]"
                  | "typeof", "(", newlines, type, newlines, ")"
                  | "(", newlines, expression, newlines, ")" ;

@@ -183,3 +183,12 @@ source-declared interfaces. Concrete managed references implicitly project to
 implemented interface references in typed argument, binding and return contexts;
 bare values are not implicitly addressed. No generic declarations are added. `interface`, `as` and `this` are reserved names. Interface names follow
 ordinary Neo naming, without an `I` prefix.
+
+## Closed generic static member calls
+
+`System.Collections.ArrayList<Counter&>.Allocate(0)` selects a static member on a
+closed generic type. Type arguments may include managed references and nested closed
+types. This adds no generic function declarations or generic method inference. Ordinary
+comparisons remain expressions. A reference to a bundled type can implicitly convert
+to an interface declared by that closed type, without addressing or boxing a value.
+See the [complete collection example](../examples/source/collections.neo).

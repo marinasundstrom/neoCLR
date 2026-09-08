@@ -55,7 +55,11 @@ The next preview's version, publication date and release validation are not yet 
   All collection instance methods use managed-reference receivers. Copying a list
   descriptor copies Count and shares its backing array until growth; an explicit
   ArrayList<T>& shares the whole mutable descriptor. See [ArrayList](docs/array-list.md).
-- **Reference-aware library calls in Neo:** library receivers use their declared
+- **Reference-aware library calls in Neo:** added closed generic static member calls
+  and implicit reference conversions for implemented bundled interfaces. A complete
+  Neo ArrayList<Counter&> example now creates its owner, shares references through List,
+  mutates a referenced object and demonstrates independent copied Count state.
+  Existing library receivers use their declared
   value/reference contract, and unique instance methods supply contextual parameter
   types, including reference arguments. Exact-signature overload selection remains
   the current subset. Added the [library API design guide](docs/api-design.md).

@@ -1,0 +1,24 @@
+import System.Console.*
+
+record Counter(Age: int)
+
+func Add(values: System.Collections.List<Counter&>&, counter: Counter&) -> () {
+    values.Add(counter)
+}
+
+func Main() -> int {
+    var values = System.Collections.ArrayList<Counter&>.Allocate(0)
+    let shared = &values
+    let view: System.Collections.List<Counter&>& = shared
+    let counter = new Counter(40)
+    Add(view, counter)
+    let first = view.get_Item(0)
+    first.Age = first.Age + 2
+    WriteLine(counter.Age)
+    WriteLine(shared.Count)
+    var copy = values
+    shared.Add(new Counter(7))
+    WriteLine(copy.Count)
+    WriteLine(shared.Count)
+    return counter.Age
+}

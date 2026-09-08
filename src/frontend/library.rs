@@ -198,3 +198,23 @@ pub(super) fn property(ty: &Ty, name: &str) -> Result<Option<(Ty, String, bool)>
         function.receiver_byref,
     )))
 }
+
+/// Declared conformance of a closed bundled type, independent of its storage.
+pub(super) fn implements(concrete: &Ty, interface: &Ty) -> Result<bool, Fault> {
+    let module = crate::library::system()?;
+    let concrete = crate::assembler::parse_type(&concrete.il())?;
+    let interface = crate::assembler::parse_type(&interface.il())?;
+    let Some(definition) = module.type_definition(&concrete) else {
+        return Ok(false);
+    };
+    let arguments = match &concrete {
+        Type::Constructed { arguments, .. } => arguments.as_slice(),
+        _ => &[],
+    };
+    for implementation in &definition.implements {
+        if implementation.substitute_type_parameters(arguments)? == interface {
+            return Ok(true);
+        }
+    }
+    Ok(false)
+}

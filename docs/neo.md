@@ -359,3 +359,12 @@ managed-reference values are forwarded; a byref receiver on a value requires an 
 mutable binding. Library interface references dispatch virtually. No explicit
 dereference is needed. See [API design](api-design.md#neo-projection) for the current
 value/reference contract inventory and remaining compiler limitations.
+
+## Closed generic static member calls
+
+`System.Collections.ArrayList<Counter&>.Allocate(0)` selects a static member on a
+closed generic type. Type arguments may include managed references and nested closed
+types. This adds no generic function declarations or generic method inference. Ordinary
+comparisons remain expressions. A reference to a bundled type can implicitly convert
+to an interface declared by that closed type, without addressing or boxing a value.
+See the [complete collection example](../examples/source/collections.neo).

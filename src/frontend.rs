@@ -716,7 +716,20 @@ impl Parser {
             let value = at.text == "true";
             self.node(at, ExprKind::Bool(value), 1)?
         } else if crate::metadata::valid_slot_name(&at.text) {
-            self.node(at.clone(), ExprKind::Name(at.text.clone()), 1)?
+            // A closed generic owner followed by a member is a static call path.
+            // Speculation must leave ordinary comparison expressions untouched.
+            let saved = self.position;
+            self.position -= 1;
+            let candidate = self.ty();
+            let owner = candidate
+                .ok()
+                .filter(|ty| ty.il().contains('<') && self.at("."));
+            if let Some(owner) = owner {
+                self.node(at.clone(), ExprKind::Name(owner.il()), 1)?
+            } else {
+                self.position = saved;
+                self.node(at.clone(), ExprKind::Name(at.text.clone()), 1)?
+            }
         } else {
             return Err(at.error("expected expression"));
         };
@@ -939,16 +952,15 @@ impl Lowerer<'_> {
     fn convert_reference(&mut self, actual: Ty, expected: &Ty, at: &Token) -> Result<Ty, Fault> {
         if actual != *expected {
             if let (Ty::Ref(concrete), Ty::Ref(interface)) = (&actual, expected) {
-                if self
-                    .source
-                    .interfaces
-                    .iter()
-                    .any(|i| i.name.text == interface.il())
-                    && self
+                if library::implements(concrete, interface)?
+                    || self
                         .source
-                        .records
+                        .interfaces
                         .iter()
-                        .any(|r| r.name.text == concrete.il() && r.implements.contains(interface))
+                        .any(|i| i.name.text == interface.il())
+                        && self.source.records.iter().any(|r| {
+                            r.name.text == concrete.il() && r.implements.contains(interface)
+                        })
                 {
                     self.body
                         .push(format!("interface.borrow {}", interface.il()));

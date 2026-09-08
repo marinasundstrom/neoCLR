@@ -97,8 +97,13 @@ func Append(list: System.Collections.ArrayList<Foo&>&, item: Foo&) -> int {
 }
 ```
 
-The [tests](../tests/array_list.rs) supply its owner from an IL entry point because
-Neo does not yet spell generic static factory calls. Library indexer syntax also
+Neo supports `System.Collections.ArrayList<Counter&>.Allocate(0)` and conversion
+of its managed reference to `System.Collections.List<Counter&>&`. Run the complete
+[Neo collection example](../examples/source/collections.neo) with
+`cargo run -- run examples/source/collections.neo`; it prints 42, 1, 1, 2 and returns 42.
+The example uses mutable value descriptors because collection receivers are writable
+managed references, including Count observation; readonly contracts remain future work.
+Library indexer syntax also
 remains separate; direct accessor calls work. A unique library method signature now
 provides parameter context, so existing references reach Add without an extra `&`.
 Overloaded methods retain exact-signature selection in this compiler subset.

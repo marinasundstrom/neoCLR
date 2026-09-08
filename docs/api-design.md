@@ -191,16 +191,16 @@ func Append(values: System.Collections.ArrayList<int>&) -> int {
 
 The same form works with `System.Collections.List<int>&`; methods and properties
 use virtual dispatch through that interface. Neo does not require `*values`.
-Generic static factory call syntax is not yet implemented in Neo; the integration
-tests supply the collection owner from an IL entry point. See
-[the receiver tests](../tests/library_references.rs).
+Generic static factory calls are available in Neo. The complete
+[collection example](../examples/source/collections.neo) creates its own owner and
+passes references through the bundled List interface.
 
 For a unique library instance method, substituted parameter types supply context,
 including reference arguments. Overloaded library methods still select exact signatures;
 explicit address expressions select reference inputs, while ordinary value contexts
-read through references. Broader contextual overload selection and implicit
-conversions to bundled library interfaces remain follow-up work. Source-declared
-interface conversions already have their own supported rules. Do not present these
+read through references. Broader contextual overload selection remains follow-up work. Implicit conversions
+from references to bundled types into their declared implemented interfaces are
+supported alongside source-declared interface conversions. Do not present these
 compiler limitations as runtime lifetime or type-system restrictions.
 
 ## Upcoming decisions
