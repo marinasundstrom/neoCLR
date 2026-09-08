@@ -83,3 +83,5 @@
 .include "System/IO/Path.neoil"
 .include "neoCLR/Runtime/PathCombine.neoil"
 .include "neoCLR/Runtime/PathGetFileName.neoil"
+.include "System/IO/FileWriteError.neoil"
+.include "neoCLR/Runtime/WriteAllText.neoil"

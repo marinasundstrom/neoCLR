@@ -1,5 +1,5 @@
-//! Blocking, bounded UTF-8 file input for the initial platform library.
-use std::io::{ErrorKind, Read};
+//! Blocking, bounded UTF-8 file input/output for the initial platform library.
+use std::io::{ErrorKind, Read, Write};
 
 use crate::{Fault, Value};
 
@@ -68,6 +68,49 @@ pub(crate) fn read_all_text(path: &str, max_bytes: i32) -> Result<Value, Fault> 
         Ok(text) => Value::Erased(Box::new(Value::String(text))),
         Err(_) => error(ReadStatus::InvalidUtf8),
     })
+}
+
+// Int32 status: 0 success, 1 invalid limit, 2 invalid path, 3 not found,
+// 4 access denied, 5 not regular, 6 write failed, 7 too large.
+pub(crate) fn write_all_text(path: &str, text: &str, max_bytes: i32) -> i32 {
+    let Ok(limit) = usize::try_from(max_bytes) else {
+        return 1;
+    };
+    if path.is_empty() || path.contains('\0') {
+        return 2;
+    }
+    if text.len() > limit {
+        return 7;
+    }
+    let status = |e: std::io::Error| match e.kind() {
+        ErrorKind::NotFound => 3,
+        ErrorKind::PermissionDenied => 4,
+        ErrorKind::InvalidInput => 2,
+        ErrorKind::IsADirectory => 5,
+        _ => 6,
+    };
+    let mut file = match std::fs::OpenOptions::new()
+        .write(true)
+        .create(true)
+        .truncate(false)
+        .open(path)
+    {
+        Ok(file) => file,
+        Err(e) => return status(e),
+    };
+    match file.metadata() {
+        Ok(metadata) if !metadata.is_file() => return 5,
+        Ok(_) => {}
+        Err(e) => return status(e),
+    }
+    match file
+        .set_len(0)
+        .and_then(|()| file.write_all(text.as_bytes()))
+        .and_then(|()| file.flush())
+    {
+        Ok(()) => 0,
+        Err(e) => status(e),
+    }
 }
 
 #[cfg(test)]

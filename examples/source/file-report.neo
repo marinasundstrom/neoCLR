@@ -1,0 +1,23 @@
+func Main() -> int {
+    let args = System.Environment.GetCommandLineArgs()
+    if args.Length != 3 {
+        System.Console.WriteLine("Usage: file-report.neo -- input-file output-directory")
+        return 1
+    }
+    System.IO.File.ReadAllText(args[1], 1048576) match {
+        Ok(let text) => {
+            let name = System.IO.Path.GetFileName(args[1])
+            let bytes = text.GetUtf8ByteCount()
+            var report = System.String.Concat("Input: ", name)
+            report = System.String.Concat(report, "\nUTF-8 bytes: ")
+            report = System.String.Concat(report, bytes.ToString())
+            report = System.String.Concat(report, "\n")
+            let destination = System.IO.Path.Combine(args[2], "summary.txt")
+            System.IO.File.WriteAllText(destination, report, 4096) match {
+                Ok(let done) => { System.Console.WriteLine(destination); return 0 },
+                Error(let error) => { System.Console.WriteLine(error.ToString()); return 3 }
+            }
+        },
+        Error(let error) => { System.Console.WriteLine(error.ToString()); return 2 }
+    }
+}

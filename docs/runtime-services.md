@@ -49,6 +49,7 @@ Duplicate entries in the supplied service set have no additional effect.
 | CharacterClassification | Pinned Unicode category lookup used by System.Char predicates |
 | MathOperations | Validated Double Math helper calls; integer Math policy remains IL |
 | ConsoleInput | Validated ConsoleReadByte InternalCall |
+| FileOutput | Bounded UTF-8 file creation/replacement through WriteAllText |
 | FileInput | Validated bounded ReadAllText InternalCall |
 | ErrorValues | Validated ErrorFromMessage and ErrorMessage InternalCalls |
 

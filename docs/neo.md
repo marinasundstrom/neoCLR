@@ -524,3 +524,6 @@ Run its Neo sample with `cargo run --locked -- run examples/source/local-clock.n
 
 The [Environment API](environment.md) exposes guest arguments, current directory and
 optional process variables; see `examples/source/environment.neo`.
+
+The [file report example](file-output.md) combines guest arguments, paths and bounded
+UTF-8 input/output with typed Results.

@@ -1,0 +1,3 @@
+.function neoCLR.Runtime.WriteAllText(String path, String text, Int32 maxBytes) -> Int32
+.methodimpl InternalCall
+.end

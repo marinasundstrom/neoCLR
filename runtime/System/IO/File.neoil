@@ -76,4 +76,73 @@
         newobj instance System.Result<String,System.IO.FileReadError>::.ctor(System.Result.Error<System.IO.FileReadError>)
         ret
     .end
+    .method static WriteAllText(String path, String text, Int32 maxBytes) -> System.Result<Void,System.IO.FileWriteError>
+        .local Int32 status
+        ldarg path
+        ldarg text
+        ldarg maxBytes
+        call neoCLR.Runtime.WriteAllText(String,String,Int32)
+        stloc status
+        ldloc status
+        brtrue Failed
+        ldvoid
+        newobj.ctor instance System.Result.Ok<Void>::.ctor(Void)
+        newobj.ctor instance System.Result<Void,System.IO.FileWriteError>::.ctor(System.Result.Ok<Void>)
+        ret
+    Failed:
+        ldloc status
+        ldc.i4 1
+        beq InvalidLimit
+        ldloc status
+        ldc.i4 2
+        beq InvalidPath
+        ldloc status
+        ldc.i4 3
+        beq NotFound
+        ldloc status
+        ldc.i4 4
+        beq AccessDenied
+        ldloc status
+        ldc.i4 5
+        beq NotRegularFile
+        ldloc status
+        ldc.i4 6
+        beq WriteFailed
+        ldloc status
+        ldc.i4 7
+        beq TooLarge
+        fault "invalid native file write status"
+    InvalidLimit:
+        newobj instance System.IO.FileWriteError.InvalidLimit::.ctor()
+        newobj instance System.IO.FileWriteError::.ctor(System.IO.FileWriteError.InvalidLimit)
+        br WrapError
+    InvalidPath:
+        newobj instance System.IO.FileWriteError.InvalidPath::.ctor()
+        newobj instance System.IO.FileWriteError::.ctor(System.IO.FileWriteError.InvalidPath)
+        br WrapError
+    NotFound:
+        newobj instance System.IO.FileWriteError.NotFound::.ctor()
+        newobj instance System.IO.FileWriteError::.ctor(System.IO.FileWriteError.NotFound)
+        br WrapError
+    AccessDenied:
+        newobj instance System.IO.FileWriteError.AccessDenied::.ctor()
+        newobj instance System.IO.FileWriteError::.ctor(System.IO.FileWriteError.AccessDenied)
+        br WrapError
+    NotRegularFile:
+        newobj instance System.IO.FileWriteError.NotRegularFile::.ctor()
+        newobj instance System.IO.FileWriteError::.ctor(System.IO.FileWriteError.NotRegularFile)
+        br WrapError
+    WriteFailed:
+        newobj instance System.IO.FileWriteError.WriteFailed::.ctor()
+        newobj instance System.IO.FileWriteError::.ctor(System.IO.FileWriteError.WriteFailed)
+        br WrapError
+    TooLarge:
+        newobj instance System.IO.FileWriteError.TooLarge::.ctor()
+        newobj instance System.IO.FileWriteError::.ctor(System.IO.FileWriteError.TooLarge)
+        br WrapError
+    WrapError:
+        newobj instance System.Result.Error<System.IO.FileWriteError>::.ctor(System.IO.FileWriteError)
+        newobj instance System.Result<Void,System.IO.FileWriteError>::.ctor(System.Result.Error<System.IO.FileWriteError>)
+        ret
+    .end
 .end

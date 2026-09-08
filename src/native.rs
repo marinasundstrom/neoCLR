@@ -31,6 +31,7 @@ pub(crate) enum Binding {
     ErrorFromMessage,
     ErrorMessage,
     ReadAllText,
+    WriteAllText,
     ConsoleReadByte,
 }
 
@@ -104,6 +105,9 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             (Binding::ErrorFromMessage, Type::Error)
         }
         ("neoCLR.Runtime.ErrorMessage", [Type::Error]) => (Binding::ErrorMessage, Type::String),
+        ("neoCLR.Runtime.WriteAllText", [Type::String, Type::String, Type::Int32]) => {
+            (Binding::WriteAllText, Type::Int32)
+        }
         ("neoCLR.Runtime.ReadAllText", [Type::String, Type::Int32]) => {
             (Binding::ReadAllText, Type::Value)
         }
@@ -219,6 +223,16 @@ impl Binding {
                 };
                 Ok(Value::Erased(Box::new(payload)))
             }
+            (
+                Self::WriteAllText,
+                [
+                    Value::String(path),
+                    Value::String(text),
+                    Value::Int32(limit),
+                ],
+            ) => Ok(Value::Int32(crate::file_io::write_all_text(
+                path, text, *limit,
+            ))),
             (Self::ReadAllText, [Value::String(path), Value::Int32(max_bytes)]) => {
                 crate::file_io::read_all_text(path, *max_bytes)
             }

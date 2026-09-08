@@ -22,6 +22,7 @@ pub enum RuntimeService {
     PathOperations,
     ErrorValues,
     FileInput,
+    FileOutput,
     ConsoleInput,
     ValueStorage,
     TypeInspection,
@@ -68,6 +69,7 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             | crate::native::Binding::TypeArgumentCount
             | crate::native::Binding::TypeArgument => RuntimeService::TypeInspection,
             crate::native::Binding::ConsoleReadByte => RuntimeService::ConsoleInput,
+            crate::native::Binding::WriteAllText => RuntimeService::FileOutput,
             crate::native::Binding::ReadAllText => RuntimeService::FileInput,
             crate::native::Binding::ErrorFromMessage | crate::native::Binding::ErrorMessage => {
                 RuntimeService::ErrorValues

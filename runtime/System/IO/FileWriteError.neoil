@@ -1,0 +1,252 @@
+.type System.IO.FileWriteError
+    .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
+    .field private Stored System.Value
+    .type InvalidLimit
+        .method instance .ctor() -> Void
+            ldvoid
+            ret
+        .end
+    .end
+    .method instance .ctor(System.IO.FileWriteError.InvalidLimit value) -> Void
+        ldarg value
+        value.pack System.IO.FileWriteError.InvalidLimit
+        newobj System.IO.FileWriteError
+        starg this
+        ldvoid
+        ret
+    .end
+    .property instance IsInvalidLimit() -> Boolean
+        .get instance System.IO.FileWriteError::get_IsInvalidLimit()
+    .end
+    .method instance get_IsInvalidLimit() -> Boolean
+        ldarg this
+        ldfld 0
+        value.is System.IO.FileWriteError.InvalidLimit
+        ret
+    .end
+    .method instance GetInvalidLimit() -> System.IO.FileWriteError.InvalidLimit
+        ldarg this
+        ldfld 0
+        value.unpack System.IO.FileWriteError.InvalidLimit
+        ret
+    .end
+    .type InvalidPath
+        .method instance .ctor() -> Void
+            ldvoid
+            ret
+        .end
+    .end
+    .method instance .ctor(System.IO.FileWriteError.InvalidPath value) -> Void
+        ldarg value
+        value.pack System.IO.FileWriteError.InvalidPath
+        newobj System.IO.FileWriteError
+        starg this
+        ldvoid
+        ret
+    .end
+    .property instance IsInvalidPath() -> Boolean
+        .get instance System.IO.FileWriteError::get_IsInvalidPath()
+    .end
+    .method instance get_IsInvalidPath() -> Boolean
+        ldarg this
+        ldfld 0
+        value.is System.IO.FileWriteError.InvalidPath
+        ret
+    .end
+    .method instance GetInvalidPath() -> System.IO.FileWriteError.InvalidPath
+        ldarg this
+        ldfld 0
+        value.unpack System.IO.FileWriteError.InvalidPath
+        ret
+    .end
+    .type NotFound
+        .method instance .ctor() -> Void
+            ldvoid
+            ret
+        .end
+    .end
+    .method instance .ctor(System.IO.FileWriteError.NotFound value) -> Void
+        ldarg value
+        value.pack System.IO.FileWriteError.NotFound
+        newobj System.IO.FileWriteError
+        starg this
+        ldvoid
+        ret
+    .end
+    .property instance IsNotFound() -> Boolean
+        .get instance System.IO.FileWriteError::get_IsNotFound()
+    .end
+    .method instance get_IsNotFound() -> Boolean
+        ldarg this
+        ldfld 0
+        value.is System.IO.FileWriteError.NotFound
+        ret
+    .end
+    .method instance GetNotFound() -> System.IO.FileWriteError.NotFound
+        ldarg this
+        ldfld 0
+        value.unpack System.IO.FileWriteError.NotFound
+        ret
+    .end
+    .type AccessDenied
+        .method instance .ctor() -> Void
+            ldvoid
+            ret
+        .end
+    .end
+    .method instance .ctor(System.IO.FileWriteError.AccessDenied value) -> Void
+        ldarg value
+        value.pack System.IO.FileWriteError.AccessDenied
+        newobj System.IO.FileWriteError
+        starg this
+        ldvoid
+        ret
+    .end
+    .property instance IsAccessDenied() -> Boolean
+        .get instance System.IO.FileWriteError::get_IsAccessDenied()
+    .end
+    .method instance get_IsAccessDenied() -> Boolean
+        ldarg this
+        ldfld 0
+        value.is System.IO.FileWriteError.AccessDenied
+        ret
+    .end
+    .method instance GetAccessDenied() -> System.IO.FileWriteError.AccessDenied
+        ldarg this
+        ldfld 0
+        value.unpack System.IO.FileWriteError.AccessDenied
+        ret
+    .end
+    .type NotRegularFile
+        .method instance .ctor() -> Void
+            ldvoid
+            ret
+        .end
+    .end
+    .method instance .ctor(System.IO.FileWriteError.NotRegularFile value) -> Void
+        ldarg value
+        value.pack System.IO.FileWriteError.NotRegularFile
+        newobj System.IO.FileWriteError
+        starg this
+        ldvoid
+        ret
+    .end
+    .property instance IsNotRegularFile() -> Boolean
+        .get instance System.IO.FileWriteError::get_IsNotRegularFile()
+    .end
+    .method instance get_IsNotRegularFile() -> Boolean
+        ldarg this
+        ldfld 0
+        value.is System.IO.FileWriteError.NotRegularFile
+        ret
+    .end
+    .method instance GetNotRegularFile() -> System.IO.FileWriteError.NotRegularFile
+        ldarg this
+        ldfld 0
+        value.unpack System.IO.FileWriteError.NotRegularFile
+        ret
+    .end
+    .type WriteFailed
+        .method instance .ctor() -> Void
+            ldvoid
+            ret
+        .end
+    .end
+    .method instance .ctor(System.IO.FileWriteError.WriteFailed value) -> Void
+        ldarg value
+        value.pack System.IO.FileWriteError.WriteFailed
+        newobj System.IO.FileWriteError
+        starg this
+        ldvoid
+        ret
+    .end
+    .property instance IsWriteFailed() -> Boolean
+        .get instance System.IO.FileWriteError::get_IsWriteFailed()
+    .end
+    .method instance get_IsWriteFailed() -> Boolean
+        ldarg this
+        ldfld 0
+        value.is System.IO.FileWriteError.WriteFailed
+        ret
+    .end
+    .method instance GetWriteFailed() -> System.IO.FileWriteError.WriteFailed
+        ldarg this
+        ldfld 0
+        value.unpack System.IO.FileWriteError.WriteFailed
+        ret
+    .end
+    .type TooLarge
+        .method instance .ctor() -> Void
+            ldvoid
+            ret
+        .end
+    .end
+    .method instance .ctor(System.IO.FileWriteError.TooLarge value) -> Void
+        ldarg value
+        value.pack System.IO.FileWriteError.TooLarge
+        newobj System.IO.FileWriteError
+        starg this
+        ldvoid
+        ret
+    .end
+    .property instance IsTooLarge() -> Boolean
+        .get instance System.IO.FileWriteError::get_IsTooLarge()
+    .end
+    .method instance get_IsTooLarge() -> Boolean
+        ldarg this
+        ldfld 0
+        value.is System.IO.FileWriteError.TooLarge
+        ret
+    .end
+    .method instance GetTooLarge() -> System.IO.FileWriteError.TooLarge
+        ldarg this
+        ldfld 0
+        value.unpack System.IO.FileWriteError.TooLarge
+        ret
+    .end
+    .method instance ToString() -> String
+        ldarg this
+        call instance System.IO.FileWriteError::get_IsInvalidLimit()
+        brtrue InvalidLimit
+        ldarg this
+        call instance System.IO.FileWriteError::get_IsInvalidPath()
+        brtrue InvalidPath
+        ldarg this
+        call instance System.IO.FileWriteError::get_IsNotFound()
+        brtrue NotFound
+        ldarg this
+        call instance System.IO.FileWriteError::get_IsAccessDenied()
+        brtrue AccessDenied
+        ldarg this
+        call instance System.IO.FileWriteError::get_IsNotRegularFile()
+        brtrue NotRegularFile
+        ldarg this
+        call instance System.IO.FileWriteError::get_IsWriteFailed()
+        brtrue WriteFailed
+        ldarg this
+        call instance System.IO.FileWriteError::get_IsTooLarge()
+        brtrue TooLarge
+        fault "invalid file write error"
+    InvalidLimit:
+        ldstr "InvalidLimit"
+        ret
+    InvalidPath:
+        ldstr "InvalidPath"
+        ret
+    NotFound:
+        ldstr "NotFound"
+        ret
+    AccessDenied:
+        ldstr "AccessDenied"
+        ret
+    NotRegularFile:
+        ldstr "NotRegularFile"
+        ret
+    WriteFailed:
+        ldstr "WriteFailed"
+        ret
+    TooLarge:
+        ldstr "TooLarge"
+        ret
+    .end
+.end

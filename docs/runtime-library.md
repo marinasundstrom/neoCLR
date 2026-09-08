@@ -177,3 +177,6 @@ The [Environment API](environment.md) exposes guest arguments, current directory
 optional process variables; see `examples/source/environment.neo`.
 
 [Lexical paths](path.md) provide System.IO.Path.Combine and GetFileName.
+
+The [file report example](file-output.md) combines guest arguments, paths and bounded
+UTF-8 input/output with typed Results.

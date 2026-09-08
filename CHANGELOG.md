@@ -10,6 +10,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 #### Added
 
+- Added bounded UTF-8 File.WriteAllText with Result<Void,FileWriteError>, explicit
+  FileOutput service reporting and preflight byte limits before opening files.
+  It creates/replaces regular files without adding a BOM; failures after opening
+  can leave partial output. Added temporary-file and artifact tests plus a Neo
+  report example combining Environment, Path, bounded I/O and Result handling.
+
 - Added System.IO.Path.Combine and GetFileName with host-platform lexical behavior,
   following .NET empty/rooted/trailing-separator contracts. Added PathOperations
   service reporting, artifact tests and documented Windows validation limits.

@@ -23,7 +23,7 @@ fn methodimpl_internalcall_round_trips_as_clr_flag() {
             .iter()
             .filter(|f| f.impl_flags == INTERNAL_CALL)
             .count(),
-        49 // Includes reflection, text, character, math, clock, environment and path helpers.
+        50 // Includes reflection, text, math, clock, environment, path and file I/O helpers.
     );
 }
 

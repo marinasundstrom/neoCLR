@@ -109,3 +109,5 @@ and path behavior is preserved; tests must not require an unavailable platform-s
 classification. The file sample explicitly translates file and parse errors into its
 application-level Error carrier. Reassemble applications and System for the changed
 public error parameter and native payload protocol.
+
+[Bounded UTF-8 output](file-output.md) now provides the corresponding WriteAllText API.

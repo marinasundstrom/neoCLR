@@ -204,6 +204,6 @@ Parsing, formatting and globalization are deferred. Arithmetic, durations and br
 clock/timezone support remain later work in the [date/time plan](date-time-design.md).
 
 The [Environment slice](environment.md) now supplies guest arguments and fallible
-process reads. A future Path/File-write slice should be driven by a small report
-program, comparing .NET Path/File contracts with typed Result failures. It is not
-yet implemented or required for this preview.
+process reads. The [file report](file-output.md) now combines .NET-like lexical Path operations
+and bounded file reads/writes with typed Results. The preview has this concrete
+command-line scenario; broader filesystem APIs remain future work.

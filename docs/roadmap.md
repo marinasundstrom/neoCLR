@@ -482,3 +482,12 @@ offset as a single snapshot. This is the preview milestone. Parsing, formatting
 and globalization are deferred. Arithmetic, durations, instants, injectable clocks
 and timezone mapping follow concrete application needs; a time of day is not an
 elapsed duration.
+
+## Command-line library milestone
+
+[Environment](environment.md), [Path](path.md) and [bounded file output](file-output.md)
+now support a small Neo report program. These follow .NET API behavior with explicit
+Option/Result failures and per-execution guest arguments. Next validate release
+scenarios and platform behavior before expanding into streams, directory traversal,
+atomic save or process control. Each expansion needs a concrete application and
+.NET contract comparison; none is implied by this bounded subset.
