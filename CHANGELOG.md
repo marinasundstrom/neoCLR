@@ -10,10 +10,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 #### Added
 
-- Planned separate Date and Time value APIs against .NET DateOnly/TimeOnly, with
-  durations and timeline instants kept distinct. Recorded projected slices and open
-  naming, precision, default/construction invariant, arithmetic and timezone choices.
-  This documents direction only; date/time APIs are not implemented yet.
+- Added separate System.Date and System.Time core values, following .NET
+  DateOnly/TimeOnly ranges, Gregorian day numbers and 100 ns ticks. Validated factories
+  return typed Results; zero defaults are the minimum date and midnight. Private
+  storage, readonly components and Equatable/Comparable use existing runtime rules.
+  Added a Neo sample, pinned .NET boundary fixtures and guest access-bypass tests.
+  Parsing, formatting, arithmetic, durations and clocks remain planned; documented
+  the trusted host-import boundary and projected slices.
 
 - Added Math.Min/Max/Sign for Int32, typed Result-based Clamp with InvalidRangeError,
   and Double Abs/Min/Max/Sqrt/Pow/Floor/Ceiling/Truncate/Round/Exp/Log/Log10/Sin/Cos/Tan.

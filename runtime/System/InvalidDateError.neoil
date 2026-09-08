@@ -1,0 +1,12 @@
+.type System.InvalidDateError
+    .method instance .ctor() -> Void
+        ldvoid
+        ret
+    .end
+
+    .method instance ToString() -> String
+        ldstr "InvalidDate"
+        ret
+    .end
+
+.end

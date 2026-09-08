@@ -562,3 +562,7 @@ Neo character literals, including Unicode IsDigit and explicit IsAsciiDigit.
 [Fundamental Math operations](docs/math.md) add integer helpers, typed Clamp and core
 Double functions. Neo supports Double literals and same-type arithmetic/comparison;
 `examples/source/math.neo` demonstrates the APIs.
+
+[Date and Time core values](docs/date-time.md) provide validated factories, readonly
+components and value comparison. Run `examples/source/date-time.neo` for leap-date,
+time-of-day and typed-error handling; parsing and formatting remain planned.

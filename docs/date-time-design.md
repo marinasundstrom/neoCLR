@@ -1,6 +1,7 @@
 # Date and time API direction
 
-Planned direction, 2026-09-08; no date/time types are implemented by this document.
+Direction recorded 2026-09-08. The [Date/Time core](date-time.md) is now implemented;
+parsing, formatting and the later capabilities below remain planned.
 Start with separate date-only and time-of-day values. Do not require a dummy date
 for a time or a dummy midnight/timezone for a date. The purpose is a coherent
 foundation, not immediate calendar, timezone and formatting completeness.
@@ -25,7 +26,7 @@ separation is absent from .NET.
 | Local date + time | Date and time without a timezone mapping | Explicit composition; later API |
 | Offset / timezone | Fixed displacement / named rule set | Separate concepts; later API |
 
-`Date` and `Time` are proposed names, not settled public contracts. Retaining
+`Date` and `Time` are now the chosen preview names in the core slice. Retaining
 DateOnly/TimeOnly would increase direct API familiarity; shorter names express the
 primary concepts without referring to a combined type. Review migration, imports
 and readability with samples before choosing. In neoCLR these are ordinary
@@ -44,7 +45,8 @@ clock needs a narrow runtime/host service with an injectable source for tests;
 reading the current time must not be implicit in value construction. Monotonic
 elapsed measurement and civil time are separate services.
 
-Before implementing Date and Time, settle:
+The core slice settles names, Gregorian ranges, 100 ns precision, zero defaults
+and validated factories. Continue evaluating the remaining questions:
 
 - Gregorian range, day numbering and time resolution. .NET's 100 ns tick precision
   is a baseline, not a decision; compare nanoseconds and integer overflow costs.

@@ -1,0 +1,327 @@
+.type System.Date
+    .implements System.Equatable<System.Date>
+    .implements System.Comparable<System.Date>
+    .field private StoredDayNumber Int32
+
+    .method static Create(Int32 year, Int32 month, Int32 day) -> System.Result<System.Date,System.InvalidDateError>
+        ldarg year
+        ldc.i4 1
+        blt Invalid
+        ldarg year
+        ldc.i4 9999
+        bgt Invalid
+        ldarg month
+        ldc.i4 1
+        blt Invalid
+        ldarg month
+        ldc.i4 12
+        bgt Invalid
+        ldarg day
+        ldc.i4 1
+        blt Invalid
+        ldarg day
+        ldarg year
+        ldarg month
+        call System.Date::DaysInMonth(Int32,Int32)
+        bgt Invalid
+        ldarg year
+        call System.Date::DaysBeforeYear(Int32)
+        ldarg year
+        ldarg month
+        call System.Date::DaysBeforeMonth(Int32,Int32)
+        add
+        ldarg day
+        ldc.i4 1
+        sub
+        add
+        newobj System.Date
+        newobj instance System.Result.Ok<System.Date>::.ctor(System.Date)
+        newobj instance System.Result<System.Date,System.InvalidDateError>::.ctor(System.Result.Ok<System.Date>)
+        ret
+        Invalid:
+        newobj instance System.InvalidDateError::.ctor()
+        newobj instance System.Result.Error<System.InvalidDateError>::.ctor(System.InvalidDateError)
+        newobj instance System.Result<System.Date,System.InvalidDateError>::.ctor(System.Result.Error<System.InvalidDateError>)
+        ret
+    .end
+
+    .method static FromDayNumber(Int32 dayNumber) -> System.Result<System.Date,System.InvalidDateError>
+        ldarg dayNumber
+        ldc.i4 0
+        blt Invalid
+        ldarg dayNumber
+        ldc.i4 3652058
+        bgt Invalid
+        ldarg dayNumber
+        newobj System.Date
+        newobj instance System.Result.Ok<System.Date>::.ctor(System.Date)
+        newobj instance System.Result<System.Date,System.InvalidDateError>::.ctor(System.Result.Ok<System.Date>)
+        ret
+        Invalid:
+        newobj instance System.InvalidDateError::.ctor()
+        newobj instance System.Result.Error<System.InvalidDateError>::.ctor(System.InvalidDateError)
+        newobj instance System.Result<System.Date,System.InvalidDateError>::.ctor(System.Result.Error<System.InvalidDateError>)
+        ret
+    .end
+
+    .method private static DaysBeforeYear(Int32 year) -> Int32
+        .local Int32 previous
+        ldarg year
+        ldc.i4 1
+        sub
+        stloc previous
+        ldloc previous
+        ldc.i4 365
+        mul
+        ldloc previous
+        ldc.i4 4
+        div
+        add
+        ldloc previous
+        ldc.i4 100
+        div
+        sub
+        ldloc previous
+        ldc.i4 400
+        div
+        add
+        ret
+    .end
+
+    .method private static DaysInMonth(Int32 year, Int32 month) -> Int32
+        ldarg month
+        ldc.i4 2
+        beq February
+        ldarg month
+        ldc.i4 4
+        beq Thirty
+        ldarg month
+        ldc.i4 6
+        beq Thirty
+        ldarg month
+        ldc.i4 9
+        beq Thirty
+        ldarg month
+        ldc.i4 11
+        beq Thirty
+        ldc.i4 31
+        ret
+        Thirty:
+        ldc.i4 30
+        ret
+        February:
+        ldarg year
+        ldc.i4 4
+        rem
+        brtrue Common
+        ldarg year
+        ldc.i4 100
+        rem
+        brtrue Leap
+        ldarg year
+        ldc.i4 400
+        rem
+        brtrue Common
+        Leap:
+        ldc.i4 29
+        ret
+        Common:
+        ldc.i4 28
+        ret
+    .end
+
+    .method private static DaysBeforeMonth(Int32 year, Int32 month) -> Int32
+        .local Int32 current
+        .local Int32 days
+        ldc.i4 1
+        stloc current
+        ldc.i4 0
+        stloc days
+        Next:
+        ldloc current
+        ldarg month
+        bge Done
+        ldloc days
+        ldarg year
+        ldloc current
+        call System.Date::DaysInMonth(Int32,Int32)
+        add
+        stloc days
+        ldloc current
+        ldc.i4 1
+        add
+        stloc current
+        br Next
+        Done:
+        ldloc days
+        ret
+    .end
+
+    .property instance DayNumber() -> Int32
+        .get instance System.Date::get_DayNumber()
+    .end
+    .method instance readonly byref get_DayNumber() -> Int32
+        ldarg this
+        ldfld 0
+        ret
+    .end
+
+    .property instance Year() -> Int32
+        .get instance System.Date::get_Year()
+    .end
+    .method instance readonly byref get_Year() -> Int32
+        .local Int32 remaining
+        .local Int32 year
+        .local Int32 cycles
+        ldarg this
+        ldfld 0
+        stloc remaining
+        ldloc remaining
+        ldc.i4 146097
+        div
+        ldc.i4 400
+        mul
+        stloc year
+        ldloc remaining
+        ldc.i4 146097
+        rem
+        stloc remaining
+        ldloc remaining
+        ldc.i4 36524
+        div
+        ldc.i4 3
+        call System.Math::Min(Int32,Int32)
+        stloc cycles
+        ldloc year
+        ldloc cycles
+        ldc.i4 100
+        mul
+        add
+        stloc year
+        ldloc remaining
+        ldloc cycles
+        ldc.i4 36524
+        mul
+        sub
+        stloc remaining
+        ldloc year
+        ldloc remaining
+        ldc.i4 1461
+        div
+        ldc.i4 4
+        mul
+        add
+        stloc year
+        ldloc remaining
+        ldc.i4 1461
+        rem
+        ldc.i4 365
+        div
+        ldc.i4 3
+        call System.Math::Min(Int32,Int32)
+        ldloc year
+        add
+        ldc.i4 1
+        add
+        ret
+    .end
+
+    .property instance DayOfYear() -> Int32
+        .get instance System.Date::get_DayOfYear()
+    .end
+    .method instance readonly byref get_DayOfYear() -> Int32
+        ldarg this
+        ldfld 0
+        ldarg this
+        call instance System.Date::get_Year()
+        call System.Date::DaysBeforeYear(Int32)
+        sub
+        ldc.i4 1
+        add
+        ret
+    .end
+
+    .property instance Month() -> Int32
+        .get instance System.Date::get_Month()
+    .end
+    .method instance readonly byref get_Month() -> Int32
+        .local Int32 year
+        .local Int32 remaining
+        .local Int32 month
+        .local Int32 length
+        ldarg this
+        call instance System.Date::get_Year()
+        stloc year
+        ldarg this
+        call instance System.Date::get_DayOfYear()
+        stloc remaining
+        ldc.i4 1
+        stloc month
+        Next:
+        ldloc year
+        ldloc month
+        call System.Date::DaysInMonth(Int32,Int32)
+        stloc length
+        ldloc remaining
+        ldloc length
+        ble Done
+        ldloc remaining
+        ldloc length
+        sub
+        stloc remaining
+        ldloc month
+        ldc.i4 1
+        add
+        stloc month
+        br Next
+        Done:
+        ldloc month
+        ret
+    .end
+
+    .property instance Day() -> Int32
+        .get instance System.Date::get_Day()
+    .end
+    .method instance readonly byref get_Day() -> Int32
+        ldarg this
+        call instance System.Date::get_DayOfYear()
+        ldarg this
+        call instance System.Date::get_Year()
+        ldarg this
+        call instance System.Date::get_Month()
+        call System.Date::DaysBeforeMonth(Int32,Int32)
+        sub
+        ret
+    .end
+
+    .method instance readonly byref Equals(System.Date other) -> Boolean
+        ldarg this
+        ldfld 0
+        ldarg other
+        ldfld 0
+        ceq
+        ret
+    .end
+
+    .method instance readonly byref CompareTo(System.Date other) -> Int32
+        ldarg this
+        ldfld 0
+        ldarg other
+        ldfld 0
+        blt Less
+        ldarg this
+        ldfld 0
+        ldarg other
+        ldfld 0
+        bgt Greater
+        ldc.i4 0
+        ret
+        Less:
+        ldc.i4 -1
+        ret
+        Greater:
+        ldc.i4 1
+        ret
+    .end
+
+.end

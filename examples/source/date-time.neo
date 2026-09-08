@@ -1,0 +1,24 @@
+func Main() -> int {
+    let baseline = default(System.Date)
+    let midnight = default(System.Time)
+    if baseline.Year != 1 || baseline.Month != 1 || baseline.Day != 1 { return -1 }
+    if midnight.Hour != 0 { return -2 }
+    System.Date.Create(2024, 2, 29) match {
+        Ok(let date) => {
+            if date.DayOfYear != 60 { return -3 }
+            System.Console.WriteLine(date.Year)
+        },
+        Error(let error) => { System.Console.WriteLine(error.ToString()); return -4 }
+    }
+    System.Time.Create(23, 59, 59, 9999999) match {
+        Ok(let time) => {
+            if time.Millisecond != 999 { return -5 }
+            System.Console.WriteLine(time.Hour)
+        },
+        Error(let error) => { System.Console.WriteLine(error.ToString()); return -6 }
+    }
+    System.Date.Create(1900, 2, 29) match {
+        Ok(let date) => { return -7 },
+        Error(let error) => { System.Console.WriteLine(error.ToString()); return 42 }
+    }
+}

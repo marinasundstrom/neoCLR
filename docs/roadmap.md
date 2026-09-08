@@ -472,12 +472,12 @@ foreach lowering once cleanup on early exit and faults has a runtime/language co
 Compare each with .NET ordering and enumeration behavior, including mutation policy,
 allocation costs and disposal. String collation and generic variance remain separate.
 
-## Date and time foundation (planned)
+## Date and time foundation
 
-Follow the [date/time API direction](date-time-design.md): start with separate
-value-default Date and Time concepts, comparing .NET DateOnly and TimeOnly, then
-explore durations, instants and explicit clock services. Naming, precision, ranges
-and construction/default invariants need validation before implementation. Offset
-and timezone mapping are later capabilities; a time of day is not an elapsed duration.
-The initial slice should provide validated construction, comparison and exact
-parse/format behavior without requiring a complete timezone or calendar framework.
+The [Date/Time core slice](date-time.md) is implemented with private storage,
+valid defaults, factory Results and readonly components/comparison, following the
+[date/time API direction](date-time-design.md) and .NET DateOnly/TimeOnly baselines.
+Continue with exact invariant parsing/formatting, then deliberate arithmetic,
+durations, instants and explicit clock services. Offset and timezone mapping remain
+later capabilities; a time of day is not an elapsed duration. A complete timezone
+or calendar framework is not required for the next parsing/formatting slice.

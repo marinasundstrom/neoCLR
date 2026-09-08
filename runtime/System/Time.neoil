@@ -1,0 +1,190 @@
+.type System.Time
+    .implements System.Equatable<System.Time>
+    .implements System.Comparable<System.Time>
+    .field private StoredTicks Int64
+
+    .method static Create(Int32 hour, Int32 minute, Int32 second) -> System.Result<System.Time,System.InvalidTimeError>
+        ldarg hour
+        ldarg minute
+        ldarg second
+        ldc.i4 0
+        call System.Time::Create(Int32,Int32,Int32,Int32)
+        ret
+    .end
+
+    .method static Create(Int32 hour, Int32 minute, Int32 second, Int32 fractionTicks) -> System.Result<System.Time,System.InvalidTimeError>
+        ldarg hour
+        ldc.i4 0
+        blt Invalid
+        ldarg hour
+        ldc.i4 23
+        bgt Invalid
+        ldarg minute
+        ldc.i4 0
+        blt Invalid
+        ldarg minute
+        ldc.i4 59
+        bgt Invalid
+        ldarg second
+        ldc.i4 0
+        blt Invalid
+        ldarg second
+        ldc.i4 59
+        bgt Invalid
+        ldarg fractionTicks
+        ldc.i4 0
+        blt Invalid
+        ldarg fractionTicks
+        ldc.i4 9999999
+        bgt Invalid
+        ldarg hour
+        ldc.i4 60
+        mul
+        ldarg minute
+        add
+        ldc.i4 60
+        mul
+        ldarg second
+        add
+        conv.i8
+        ldc.i8 10000000
+        mul
+        ldarg fractionTicks
+        conv.i8
+        add
+        newobj System.Time
+        newobj instance System.Result.Ok<System.Time>::.ctor(System.Time)
+        newobj instance System.Result<System.Time,System.InvalidTimeError>::.ctor(System.Result.Ok<System.Time>)
+        ret
+        Invalid:
+        newobj instance System.InvalidTimeError::.ctor()
+        newobj instance System.Result.Error<System.InvalidTimeError>::.ctor(System.InvalidTimeError)
+        newobj instance System.Result<System.Time,System.InvalidTimeError>::.ctor(System.Result.Error<System.InvalidTimeError>)
+        ret
+    .end
+
+    .method static FromTicks(Int64 ticks) -> System.Result<System.Time,System.InvalidTimeError>
+        ldarg ticks
+        ldc.i8 0
+        blt Invalid
+        ldarg ticks
+        ldc.i8 863999999999
+        bgt Invalid
+        ldarg ticks
+        newobj System.Time
+        newobj instance System.Result.Ok<System.Time>::.ctor(System.Time)
+        newobj instance System.Result<System.Time,System.InvalidTimeError>::.ctor(System.Result.Ok<System.Time>)
+        ret
+        Invalid:
+        newobj instance System.InvalidTimeError::.ctor()
+        newobj instance System.Result.Error<System.InvalidTimeError>::.ctor(System.InvalidTimeError)
+        newobj instance System.Result<System.Time,System.InvalidTimeError>::.ctor(System.Result.Error<System.InvalidTimeError>)
+        ret
+    .end
+
+    .property instance Ticks() -> Int64
+        .get instance System.Time::get_Ticks()
+    .end
+    .method instance readonly byref get_Ticks() -> Int64
+        ldarg this
+        ldfld 0
+        ret
+    .end
+
+    .property instance Hour() -> Int32
+        .get instance System.Time::get_Hour()
+    .end
+    .method instance readonly byref get_Hour() -> Int32
+        ldarg this
+        ldfld 0
+        ldc.i8 36000000000
+        div
+        conv.i4
+        ret
+    .end
+
+    .property instance Minute() -> Int32
+        .get instance System.Time::get_Minute()
+    .end
+    .method instance readonly byref get_Minute() -> Int32
+        ldarg this
+        ldfld 0
+        ldc.i8 600000000
+        div
+        ldc.i8 60
+        rem
+        conv.i4
+        ret
+    .end
+
+    .property instance Second() -> Int32
+        .get instance System.Time::get_Second()
+    .end
+    .method instance readonly byref get_Second() -> Int32
+        ldarg this
+        ldfld 0
+        ldc.i8 10000000
+        div
+        ldc.i8 60
+        rem
+        conv.i4
+        ret
+    .end
+
+    .property instance Millisecond() -> Int32
+        .get instance System.Time::get_Millisecond()
+    .end
+    .method instance readonly byref get_Millisecond() -> Int32
+        ldarg this
+        ldfld 0
+        ldc.i8 10000
+        div
+        ldc.i8 1000
+        rem
+        conv.i4
+        ret
+    .end
+
+    .property instance FractionTicks() -> Int32
+        .get instance System.Time::get_FractionTicks()
+    .end
+    .method instance readonly byref get_FractionTicks() -> Int32
+        ldarg this
+        ldfld 0
+        ldc.i8 10000000
+        rem
+        conv.i4
+        ret
+    .end
+
+    .method instance readonly byref Equals(System.Time other) -> Boolean
+        ldarg this
+        ldfld 0
+        ldarg other
+        ldfld 0
+        ceq
+        ret
+    .end
+
+    .method instance readonly byref CompareTo(System.Time other) -> Int32
+        ldarg this
+        ldfld 0
+        ldarg other
+        ldfld 0
+        blt Less
+        ldarg this
+        ldfld 0
+        ldarg other
+        ldfld 0
+        bgt Greater
+        ldc.i4 0
+        ret
+        Less:
+        ldc.i4 -1
+        ret
+        Greater:
+        ldc.i4 1
+        ret
+    .end
+
+.end
