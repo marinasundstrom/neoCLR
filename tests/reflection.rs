@@ -125,7 +125,7 @@ fn methods_distinguish_overloads_receivers_and_output_contracts() {
 #[test]
 fn properties_report_accessors_without_executing_them() {
     let prefix = format!(
-        "{}\nldc.i4 0\nldelem System.Reflection.PropertyInfo",
+        ".local System.Reflection.PropertyInfo descriptor\n{}\nldc.i4 0\nldelem System.Reflection.PropertyInfo\nstloc descriptor\nldloca descriptor",
         query("GetProperties", None)
     );
     for (method, argument, expected) in [
@@ -266,7 +266,7 @@ fn shape_queries_and_element_options_preserve_address_modes() {
 fn transitive_private_signature_metadata_does_not_grant_call_access() {
     let dependencies = ".module Dependencies\n.type Payload\n.end";
     let library = ".module Models\n.references (Dependencies)\n.type Model\n.field private Data [Dependencies]Payload\n.method private static Secret() -> Void\nldvoid\nret\n.end\n.end";
-    let app = ".module App\n.references (Models)\n.entry Main\n.function Main() -> String\nldtoken [Models]Model\ncall System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)\nldc.i4 36\ncall System.Reflection.BindingFlags::FromValue(Int32)\ncall instance System.Type::GetFields(System.Reflection.BindingFlags)\nldc.i4 0\nldelem System.Reflection.FieldInfo\ncall instance System.Reflection.FieldInfo::get_FieldType()\ncall instance System.Type::get_Name()\nret\n.end";
+    let app = ".module App\n.references (Models)\n.entry Main\n.function Main() -> String\n.local System.Reflection.FieldInfo descriptor\nldtoken [Models]Model\ncall System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)\nldc.i4 36\ncall System.Reflection.BindingFlags::FromValue(Int32)\ncall instance System.Type::GetFields(System.Reflection.BindingFlags)\nldc.i4 0\nldelem System.Reflection.FieldInfo\nstloc descriptor\nldloca descriptor\ncall instance System.Reflection.FieldInfo::get_FieldType()\ncall instance System.Type::get_Name()\nret\n.end";
     let module = neoclr::assembler::assemble_modules(&[app, library, dependencies]).unwrap();
     let program =
         LoadedProgram::with_modules(&module[0], neoclr::library::system().unwrap(), &module[1..])

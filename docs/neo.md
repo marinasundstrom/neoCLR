@@ -426,3 +426,6 @@ signature characteristic and special state, not implemented syntax or zeroing.
 
 See [managed constructor chaining](constructor-chaining.md) for explicit init
 declarations, base initialization and the local/heap constructor example.
+
+The [reflection hierarchy example](reflection-hierarchy.md) demonstrates inherited
+properties, readonly MemberInfo views and heterogeneous managed reference collections.

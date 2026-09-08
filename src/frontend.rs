@@ -1315,7 +1315,9 @@ impl Lowerer<'_> {
                 if concrete == interface {
                     return Ok(expected.clone());
                 }
-                if self.source.base_reachable(concrete, interface) {
+                if self.source.base_reachable(concrete, interface)
+                    || library::base_reachable(concrete, interface)?
+                {
                     self.body.push(format!("castclass {}", interface.il()));
                     return Ok(expected.clone());
                 }
@@ -1395,11 +1397,47 @@ impl Lowerer<'_> {
     ) -> Result<(), Fault> {
         if byref {
             if !matches!(ty, Ty::Ref(_) | Ty::ReadOnlyRef(_)) {
+                let saved_body = self.body.clone();
+                let saved_locals = self.locals.len();
+                let saved_labels = self.labels;
                 self.body.truncate(start);
-                self.place_with_access(expression, true, readonly)?;
+                if let Err(error) = self.place_with_access(expression, true, readonly) {
+                    if !readonly {
+                        return Err(error);
+                    }
+                    self.body = saved_body;
+                    self.locals.truncate(saved_locals);
+                    self.labels = saved_labels;
+                    let index = self.locals.len();
+                    self.locals
+                        .push(format!(".local {} receiver_{index}", ty.il()));
+                    self.body.push(format!("stloc {index}"));
+                    self.body.push(format!("ldloca {index}"));
+                }
             }
         } else if let Ty::Ref(target) | Ty::ReadOnlyRef(target) = ty {
             self.body.push(format!("ldobj {}", target.il()));
+        }
+        Ok(())
+    }
+    fn library_projection(
+        &mut self,
+        target: &Ty,
+        function: &crate::metadata::Function,
+    ) -> Result<(), Fault> {
+        let owner = Ty::from_metadata(
+            function
+                .owner
+                .as_ref()
+                .ok_or_else(|| Fault::new("member requires owner"))?,
+        )?;
+        if owner != *target {
+            if !function.receiver_byref {
+                return Err(Fault::new(
+                    "inherited library members require managed receivers",
+                ));
+            }
+            self.body.push(format!("castclass {}", owner.il()));
         }
         Ok(())
     }
@@ -1444,13 +1482,18 @@ impl Lowerer<'_> {
             function.receiver_byref || interface,
             function.receiver_readonly,
         )?;
+        self.library_projection(target, &function)?;
         self.expression_for(index, &Ty::from_metadata(&function.parameters[0])?)?;
         if let Some(value) = value {
             self.expression_for(value, &Ty::from_metadata(&function.parameters[1])?)?;
         }
         self.body.push(format!(
             "{} {signature}",
-            if interface { "callvirt" } else { "call" }
+            if interface || function.is_virtual {
+                "callvirt"
+            } else {
+                "call"
+            }
         ));
         Ok(Some(Ty::from_metadata(&function.returns)?))
     }
@@ -1598,12 +1641,24 @@ impl Lowerer<'_> {
                 } else {
                     &owner
                 };
-                if let Some((ty, getter, byref, readonly)) =
+                if let Some((ty, getter, function)) =
                     library::property(target, &field.text).map_err(|e| field.error(e.message))?
                 {
                     let interface = library::is_interface(target)?;
-                    self.library_receiver(value, &owner, saved, byref || interface, readonly)?;
-                    let opcode = if interface { "callvirt" } else { "call" };
+                    let target = target.clone();
+                    self.library_receiver(
+                        value,
+                        &owner,
+                        saved,
+                        function.receiver_byref || interface,
+                        function.receiver_readonly,
+                    )?;
+                    self.library_projection(&target, &function)?;
+                    let opcode = if interface || function.is_virtual {
+                        "callvirt"
+                    } else {
+                        "call"
+                    };
                     self.body.push(format!("{opcode} {getter}"));
                     return Ok(ty);
                 }
@@ -1823,6 +1878,7 @@ impl Lowerer<'_> {
                 );
                 let function =
                     library::resolve(&signature).map_err(|e| callee.at.error(e.message))?;
+                let signature = library::method_signature(&function)?;
                 self.output_arguments(arguments, &function)?;
                 let argument_body = self.body.split_off(argument_start);
                 let interface = library::is_interface(target)?;
@@ -1835,8 +1891,13 @@ impl Lowerer<'_> {
                     function.receiver_byref || interface,
                     function.receiver_readonly,
                 )?;
+                self.library_projection(target, &function)?;
                 self.body.extend(argument_body);
-                let opcode = if interface { "callvirt" } else { "call" };
+                let opcode = if interface || function.is_virtual {
+                    "callvirt"
+                } else {
+                    "call"
+                };
                 self.body.push(format!("{opcode} {signature}"));
                 return Ty::from_metadata(&function.returns);
             }

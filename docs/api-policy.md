@@ -95,3 +95,8 @@ Out parameters declare assignment on every normal return. Boolean TryGet methods
 can use out(true) for assignment only on success, avoiding invented default values
 for arbitrary T. System.Option/Result case extraction now follows that contract.
 See the [Raven-like reference guide](references-in-pseudocode.md).
+
+Reflection member descriptors share an abstract MemberInfo base for common metadata
+and expose readonly managed readers. This is a concrete use of shared storage and
+base views; independent capabilities should use interfaces when needed. See
+[the API and .NET comparison](reflection-hierarchy.md).

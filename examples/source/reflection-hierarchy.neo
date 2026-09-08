@@ -1,0 +1,35 @@
+import System.Console.*
+
+record Counter(Age: int) {
+    readonly func Read() -> int { return this.Age }
+}
+
+func NameOf(readonly member: System.Reflection.MemberInfo&) -> string {
+    return member.Name
+}
+
+func Main() -> int {
+    let fields = typeof(Counter).GetFields()
+    let methods = typeof(Counter).GetMethods()
+    let properties = typeof(System.Type).GetProperties()
+
+    // A common reference view of a local descriptor; no base-value copy.
+    let local = fields[0]
+    WriteLine(NameOf(&local))
+    WriteLine(local.DeclaringType.Name)
+
+    // Heap array elements supply references for a heterogeneous managed list.
+    let fieldStorage = new System.Reflection.FieldInfo[1] { fields[0] }
+    let methodStorage = new System.Reflection.MethodInfo[1] { methods[0] }
+    let propertyStorage = new System.Reflection.PropertyInfo[1] { properties[0] }
+    var members = System.Collections.ArrayList<readonly System.Reflection.MemberInfo&>.Allocate(3)
+    members.Add(&fieldStorage[0])
+    members.Add(&methodStorage[0])
+    members.Add(&propertyStorage[0])
+
+    for i in 0..<members.Count {
+        WriteLine(members[i].Name)
+        WriteLine(members[i].GetType().Name)
+    }
+    return members.Count
+}

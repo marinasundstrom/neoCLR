@@ -21,44 +21,96 @@ pub(super) fn is_interface(ty: &Ty) -> Result<bool, Fault> {
     }))
 }
 
+fn owners(module: &crate::Module, ty: &Type) -> Result<Vec<Type>, Fault> {
+    if module
+        .type_definition(ty)
+        .is_some_and(|d| d.representation == crate::metadata::Representation::Record)
+    {
+        crate::inheritance::lineage(module, ty)
+    } else {
+        Ok(vec![ty.clone()])
+    }
+}
+pub(super) fn base_reachable(from: &Ty, to: &Ty) -> Result<bool, Fault> {
+    let module = crate::library::system()?;
+    let from = crate::assembler::parse_type(&from.il())?;
+    let to = crate::assembler::parse_type(&to.il())?;
+    Ok(owners(module, &from)?.contains(&to))
+}
+pub(super) fn method_signature(function: &crate::metadata::Function) -> Result<String, Fault> {
+    Ok(format!(
+        "instance {}::{}({})",
+        Ty::from_metadata(
+            function
+                .owner
+                .as_ref()
+                .ok_or_else(|| Fault::new("instance member requires owner"))?
+        )?
+        .il(),
+        function.name.rsplit('.').next().unwrap(),
+        function
+            .parameters
+            .iter()
+            .map(|p| Ty::from_metadata(p).map(|p| p.il()))
+            .collect::<Result<Vec<_>, _>>()?
+            .join(",")
+    ))
+}
 /// A unique method shape supplies argument context, including a substituted T&.
 /// Overloaded names retain the existing exact-signature selection path.
 pub(super) fn parameters(ty: &Ty, member: &str, count: usize) -> Result<Option<Vec<Ty>>, Fault> {
     let module = crate::library::system()?;
     let metadata = crate::assembler::parse_type(&ty.il())?;
-    let Some(definition) = module.type_definition(&metadata) else {
-        return Ok(None);
-    };
-    let mut candidates = module.functions.iter().filter(|f| {
-        f.instance
-            && f.owner.as_ref() == Some(&definition.open_type())
-            && f.name.rsplit('.').next() == Some(member)
-            && f.parameters.len() == count
-            && f.visibility == Visibility::Public
-    });
-    let Some(method) = candidates.next() else {
-        return Ok(None);
-    };
-    if candidates.next().is_some() {
-        return Ok(None);
+    for owner in owners(module, &metadata)? {
+        let Some(definition) = module.type_definition(&owner) else {
+            continue;
+        };
+        let mut candidates = module.functions.iter().filter(|f| {
+            f.instance
+                && f.owner.as_ref() == Some(&definition.open_type())
+                && f.name.rsplit('.').next() == Some(member)
+                && f.parameters.len() == count
+                && f.visibility == Visibility::Public
+        });
+        let Some(method) = candidates.next() else {
+            continue;
+        };
+        if candidates.next().is_some() {
+            return Ok(None);
+        }
+        let arguments = match &owner {
+            Type::Constructed { arguments, .. } => arguments.as_slice(),
+            _ => &[],
+        };
+        return method
+            .parameters
+            .iter()
+            .map(|p| Ty::from_metadata(&p.substitute_type_parameters(arguments)?))
+            .collect::<Result<Vec<_>, _>>()
+            .map(Some);
     }
-    let arguments = match &metadata {
-        Type::Constructed { arguments, .. } => arguments.as_slice(),
-        _ => &[],
-    };
-    method
-        .parameters
-        .iter()
-        .map(|p| Ty::from_metadata(&p.substitute_type_parameters(arguments)?))
-        .collect::<Result<Vec<_>, _>>()
-        .map(Some)
+    Ok(None)
 }
 
 pub(super) fn resolve(signature: &str) -> Result<crate::metadata::Function, Fault> {
-    let function = crate::vm::resolve(
-        crate::library::system()?,
-        &crate::assembler::parse_function_ref(signature)?,
-    )?;
+    let module = crate::library::system()?;
+    let mut target = crate::assembler::parse_function_ref(signature)?;
+    let chain = if target.instance && !target.name.ends_with("..ctor") {
+        owners(module, target.owner.as_ref().unwrap())?
+    } else {
+        target.owner.iter().cloned().collect()
+    };
+    let mut result = crate::vm::resolve(module, &target);
+    for owner in chain {
+        if result.is_ok() {
+            break;
+        }
+        let member = target.name.rsplit('.').next().unwrap().to_owned();
+        target.name = format!("{}.{}", owner.definition_name().unwrap(), member);
+        target.owner = Some(owner);
+        result = crate::vm::resolve(module, &target);
+    }
+    let function = result?;
     if function.visibility != Visibility::Public {
         return Err(Fault::new("unsupported library call contract"));
     }
@@ -153,48 +205,49 @@ pub(super) fn cases(ty: &Ty) -> Result<Vec<Case>, Fault> {
 }
 
 /// Read an ordinary non-indexed property through its declared public getter.
-pub(super) fn property(ty: &Ty, name: &str) -> Result<Option<(Ty, String, bool, bool)>, Fault> {
+pub(super) fn property(
+    ty: &Ty,
+    name: &str,
+) -> Result<Option<(Ty, String, crate::metadata::Function)>, Fault> {
     let module = crate::library::system()?;
     let metadata = crate::assembler::parse_type(&ty.il())?;
-    let Some(definition) = module.type_definition(&metadata) else {
-        return Ok(None);
-    };
-    let Some(property) = definition
-        .properties
-        .iter()
-        .find(|p| p.name == name && p.instance && p.parameters.is_empty())
-    else {
-        return Ok(None);
-    };
-    let arguments = match &metadata {
-        Type::Constructed { arguments, .. } => arguments.as_slice(),
-        _ => &[],
-    };
-    let mut property = property.clone();
-    property.map_types(|ty| ty.substitute_type_parameters(arguments))?;
-    let Some(getter) = property.getter else {
-        return Err(Fault::new("property has no getter"));
-    };
-    if !getter.instance || getter.owner.as_ref() != Some(&metadata) || !getter.parameters.is_empty()
-    {
-        return Err(Fault::new("unsupported property getter contract"));
+    for owner in owners(module, &metadata)? {
+        let Some(definition) = module.type_definition(&owner) else {
+            continue;
+        };
+        let Some(property) = definition
+            .properties
+            .iter()
+            .find(|p| p.name == name && p.instance && p.parameters.is_empty())
+        else {
+            continue;
+        };
+        let arguments = match &owner {
+            Type::Constructed { arguments, .. } => arguments.as_slice(),
+            _ => &[],
+        };
+        let mut property = property.clone();
+        property.map_types(|ty| ty.substitute_type_parameters(arguments))?;
+        let getter = property
+            .getter
+            .ok_or_else(|| Fault::new("property has no getter"))?;
+        if !getter.instance
+            || getter.owner.as_ref() != Some(&owner)
+            || !getter.parameters.is_empty()
+        {
+            return Err(Fault::new("unsupported property getter contract"));
+        }
+        let function = crate::vm::resolve(module, &getter)?;
+        if function.visibility != Visibility::Public || function.returns != property.ty {
+            return Err(Fault::new("unsupported property getter contract"));
+        }
+        return Ok(Some((
+            Ty::from_metadata(&property.ty)?,
+            method_signature(&function)?,
+            function,
+        )));
     }
-    let member = getter
-        .name
-        .rsplit('.')
-        .next()
-        .ok_or_else(|| Fault::new("invalid property getter"))?;
-    let signature = format!("instance {}::{member}()", ty.il());
-    let function = resolve(&signature)?;
-    if function.returns != property.ty {
-        return Err(Fault::new("property getter type mismatch"));
-    }
-    Ok(Some((
-        Ty::from_metadata(&property.ty)?,
-        signature,
-        function.receiver_byref,
-        function.receiver_readonly,
-    )))
+    Ok(None)
 }
 
 /// Declared conformance of a closed bundled type, independent of its storage.
@@ -212,16 +265,21 @@ pub(super) fn implements(concrete: &Ty, interface: &Ty) -> Result<bool, Fault> {
 pub(super) fn indexer(ty: &Ty, setter: bool) -> Result<(String, crate::metadata::Function), Fault> {
     let module = crate::library::system()?;
     let metadata = crate::assembler::parse_type(&ty.il())?;
-    let definition = module
-        .type_definition(&metadata)
-        .ok_or_else(|| Fault::new("type has no indexer"))?;
-    let mut property = definition
-        .properties
-        .iter()
-        .find(|p| p.name == "Item" && p.instance && p.parameters.len() == 1)
-        .cloned()
+    let (owner, mut property) = owners(module, &metadata)?
+        .into_iter()
+        .find_map(|owner| {
+            module
+                .type_definition(&owner)
+                .and_then(|d| {
+                    d.properties
+                        .iter()
+                        .find(|p| p.name == "Item" && p.instance && p.parameters.len() == 1)
+                })
+                .cloned()
+                .map(|p| (owner, p))
+        })
         .ok_or_else(|| Fault::new("type has no single-index Item property"))?;
-    let arguments = match &metadata {
+    let arguments = match &owner {
         Type::Constructed { arguments, .. } => arguments.as_slice(),
         _ => &[],
     };
@@ -245,7 +303,7 @@ pub(super) fn indexer(ty: &Ty, setter: bool) -> Result<(String, crate::metadata:
         .ok_or_else(|| Fault::new("invalid indexer accessor"))?;
     let signature = format!(
         "instance {}::{member}({})",
-        ty.il(),
+        Ty::from_metadata(&owner)?.il(),
         accessor
             .parameters
             .iter()

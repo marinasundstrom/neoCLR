@@ -1,4 +1,4 @@
-; Independent metadata snapshots. No Object or MemberInfo base class.
+; Metadata snapshots. Member descriptors share a base without a mandatory Object root.
 .type System.Reflection.ParameterInfo
     .field private Name String
     .field private Position Int32
@@ -57,35 +57,86 @@
 
 .end
 
-.type System.Reflection.FieldInfo
+
+; Internal construction contract: trusted reflection factories also build this layout directly.
+.type abstract System.Reflection.MemberInfo
     .field private Name String
     .field private DeclaringType System.Type
+    .method internal instance byref .ctor(String name, System.Type declaringType) -> Void
+        ldarg this
+        ldarg name
+        stfld 0
+        pop
+        ldarg this
+        ldarg declaringType
+        stfld 1
+        pop
+        ldvoid
+        ret
+    .end
+    .property instance Name() -> String
+        .get instance System.Reflection.MemberInfo::get_Name()
+    .end
+    .method instance readonly byref get_Name() -> String
+        ldarg this
+        ldfld 0
+        ret
+    .end
+    .property instance DeclaringType() -> System.Type
+        .get instance System.Reflection.MemberInfo::get_DeclaringType()
+    .end
+    .method instance readonly byref get_DeclaringType() -> System.Type
+        ldarg this
+        ldfld 1
+        ret
+    .end
+.end
+
+.type System.Reflection.FieldInfo
+    .extends System.Reflection.MemberInfo
+    .method internal instance byref .ctor(String name, System.Type declaringType, System.Type fieldType, Boolean isPublic, Boolean isPrivate, Boolean isAssembly, Boolean isStatic, Int32 definitionIndex) -> Void
+        ldarg this
+        ldarg name
+        ldarg declaringType
+        call instance System.Reflection.MemberInfo::.ctor(String,System.Type)
+        pop
+        ldarg this
+        ldarg fieldType
+        stfld 2
+        pop
+        ldarg this
+        ldarg isPublic
+        stfld 3
+        pop
+        ldarg this
+        ldarg isPrivate
+        stfld 4
+        pop
+        ldarg this
+        ldarg isAssembly
+        stfld 5
+        pop
+        ldarg this
+        ldarg isStatic
+        stfld 6
+        pop
+        ldarg this
+        ldarg definitionIndex
+        stfld 7
+        pop
+        ldvoid
+        ret
+    .end
     .field private FieldType System.Type
     .field private IsPublic Boolean
     .field private IsPrivate Boolean
     .field private IsAssembly Boolean
     .field private IsStatic Boolean
     .field private DefinitionIndex Int32
-    .property instance Name() -> String
-        .get instance System.Reflection.FieldInfo::get_Name()
-    .end
-    .method instance get_Name() -> String
-        ldarg this
-        ldfld 0
-        ret
-    .end
-    .property instance DeclaringType() -> System.Type
-        .get instance System.Reflection.FieldInfo::get_DeclaringType()
-    .end
-    .method instance get_DeclaringType() -> System.Type
-        ldarg this
-        ldfld 1
-        ret
-    .end
     .property instance FieldType() -> System.Type
         .get instance System.Reflection.FieldInfo::get_FieldType()
     .end
-    .method instance get_FieldType() -> System.Type
+    .method instance readonly byref get_FieldType() -> System.Type
         ldarg this
         ldfld 2
         ret
@@ -93,7 +144,7 @@
     .property instance IsPublic() -> Boolean
         .get instance System.Reflection.FieldInfo::get_IsPublic()
     .end
-    .method instance get_IsPublic() -> Boolean
+    .method instance readonly byref get_IsPublic() -> Boolean
         ldarg this
         ldfld 3
         ret
@@ -101,7 +152,7 @@
     .property instance IsPrivate() -> Boolean
         .get instance System.Reflection.FieldInfo::get_IsPrivate()
     .end
-    .method instance get_IsPrivate() -> Boolean
+    .method instance readonly byref get_IsPrivate() -> Boolean
         ldarg this
         ldfld 4
         ret
@@ -109,7 +160,7 @@
     .property instance IsAssembly() -> Boolean
         .get instance System.Reflection.FieldInfo::get_IsAssembly()
     .end
-    .method instance get_IsAssembly() -> Boolean
+    .method instance readonly byref get_IsAssembly() -> Boolean
         ldarg this
         ldfld 5
         ret
@@ -117,7 +168,7 @@
     .property instance IsStatic() -> Boolean
         .get instance System.Reflection.FieldInfo::get_IsStatic()
     .end
-    .method instance get_IsStatic() -> Boolean
+    .method instance readonly byref get_IsStatic() -> Boolean
         ldarg this
         ldfld 6
         ret
@@ -125,7 +176,7 @@
     .property instance DefinitionIndex() -> Int32
         .get instance System.Reflection.FieldInfo::get_DefinitionIndex()
     .end
-    .method instance get_DefinitionIndex() -> Int32
+    .method instance readonly byref get_DefinitionIndex() -> Int32
         ldarg this
         ldfld 7
         ret
@@ -133,8 +184,64 @@
 .end
 
 .type System.Reflection.MethodInfo
-    .field private Name String
-    .field private DeclaringType System.Type
+    .extends System.Reflection.MemberInfo
+    .method internal instance byref .ctor(String name, System.Type declaringType, System.Type returnType, Boolean isStatic, Boolean isPublic, Boolean isPrivate, Boolean isAssembly, Boolean isReceiverByRef, Int32 definitionIndex, System.Reflection.ParameterInfo[] parameters, Boolean isReadOnly, Boolean isVirtual, Boolean isOverride, Boolean isAbstract) -> Void
+        ldarg this
+        ldarg name
+        ldarg declaringType
+        call instance System.Reflection.MemberInfo::.ctor(String,System.Type)
+        pop
+        ldarg this
+        ldarg returnType
+        stfld 2
+        pop
+        ldarg this
+        ldarg isStatic
+        stfld 3
+        pop
+        ldarg this
+        ldarg isPublic
+        stfld 4
+        pop
+        ldarg this
+        ldarg isPrivate
+        stfld 5
+        pop
+        ldarg this
+        ldarg isAssembly
+        stfld 6
+        pop
+        ldarg this
+        ldarg isReceiverByRef
+        stfld 7
+        pop
+        ldarg this
+        ldarg definitionIndex
+        stfld 8
+        pop
+        ldarg this
+        ldarg parameters
+        stfld 9
+        pop
+        ldarg this
+        ldarg isReadOnly
+        stfld 10
+        pop
+        ldarg this
+        ldarg isVirtual
+        stfld 11
+        pop
+        ldarg this
+        ldarg isOverride
+        stfld 12
+        pop
+        ldarg this
+        ldarg isAbstract
+        stfld 13
+        pop
+        ldvoid
+        ret
+    .end
     .field private ReturnType System.Type
     .field private IsStatic Boolean
     .field private IsPublic Boolean
@@ -147,26 +254,10 @@
     .field private IsVirtual Boolean
     .field private IsOverride Boolean
     .field private IsAbstract Boolean
-    .property instance Name() -> String
-        .get instance System.Reflection.MethodInfo::get_Name()
-    .end
-    .method instance get_Name() -> String
-        ldarg this
-        ldfld 0
-        ret
-    .end
-    .property instance DeclaringType() -> System.Type
-        .get instance System.Reflection.MethodInfo::get_DeclaringType()
-    .end
-    .method instance get_DeclaringType() -> System.Type
-        ldarg this
-        ldfld 1
-        ret
-    .end
     .property instance ReturnType() -> System.Type
         .get instance System.Reflection.MethodInfo::get_ReturnType()
     .end
-    .method instance get_ReturnType() -> System.Type
+    .method instance readonly byref get_ReturnType() -> System.Type
         ldarg this
         ldfld 2
         ret
@@ -174,7 +265,7 @@
     .property instance IsStatic() -> Boolean
         .get instance System.Reflection.MethodInfo::get_IsStatic()
     .end
-    .method instance get_IsStatic() -> Boolean
+    .method instance readonly byref get_IsStatic() -> Boolean
         ldarg this
         ldfld 3
         ret
@@ -182,7 +273,7 @@
     .property instance IsPublic() -> Boolean
         .get instance System.Reflection.MethodInfo::get_IsPublic()
     .end
-    .method instance get_IsPublic() -> Boolean
+    .method instance readonly byref get_IsPublic() -> Boolean
         ldarg this
         ldfld 4
         ret
@@ -190,7 +281,7 @@
     .property instance IsPrivate() -> Boolean
         .get instance System.Reflection.MethodInfo::get_IsPrivate()
     .end
-    .method instance get_IsPrivate() -> Boolean
+    .method instance readonly byref get_IsPrivate() -> Boolean
         ldarg this
         ldfld 5
         ret
@@ -198,7 +289,7 @@
     .property instance IsAssembly() -> Boolean
         .get instance System.Reflection.MethodInfo::get_IsAssembly()
     .end
-    .method instance get_IsAssembly() -> Boolean
+    .method instance readonly byref get_IsAssembly() -> Boolean
         ldarg this
         ldfld 6
         ret
@@ -206,7 +297,7 @@
     .property instance IsReceiverByRef() -> Boolean
         .get instance System.Reflection.MethodInfo::get_IsReceiverByRef()
     .end
-    .method instance get_IsReceiverByRef() -> Boolean
+    .method instance readonly byref get_IsReceiverByRef() -> Boolean
         ldarg this
         ldfld 7
         ret
@@ -214,12 +305,12 @@
     .property instance DefinitionIndex() -> Int32
         .get instance System.Reflection.MethodInfo::get_DefinitionIndex()
     .end
-    .method instance get_DefinitionIndex() -> Int32
+    .method instance readonly byref get_DefinitionIndex() -> Int32
         ldarg this
         ldfld 8
         ret
     .end
-    .method instance GetParameters() -> System.Reflection.ParameterInfo[]
+    .method instance readonly byref GetParameters() -> System.Reflection.ParameterInfo[]
         ldarg this
         ldfld 9
         ret
@@ -227,7 +318,7 @@
     .property instance IsReadOnly() -> Boolean
         .get instance System.Reflection.MethodInfo::get_IsReadOnly()
     .end
-    .method instance get_IsReadOnly() -> Boolean
+    .method instance readonly byref get_IsReadOnly() -> Boolean
         ldarg this
         ldfld 10
         ret
@@ -235,7 +326,7 @@
     .property instance IsVirtual() -> Boolean
         .get instance System.Reflection.MethodInfo::get_IsVirtual()
     .end
-    .method instance get_IsVirtual() -> Boolean
+    .method instance readonly byref get_IsVirtual() -> Boolean
         ldarg this
         ldfld 11
         ret
@@ -243,7 +334,7 @@
     .property instance IsOverride() -> Boolean
         .get instance System.Reflection.MethodInfo::get_IsOverride()
     .end
-    .method instance get_IsOverride() -> Boolean
+    .method instance readonly byref get_IsOverride() -> Boolean
         ldarg this
         ldfld 12
         ret
@@ -252,7 +343,7 @@
     .property instance IsAbstract() -> Boolean
         .get instance System.Reflection.MethodInfo::get_IsAbstract()
     .end
-    .method instance get_IsAbstract() -> Boolean
+    .method instance readonly byref get_IsAbstract() -> Boolean
         ldarg this
         ldfld 13
         ret
@@ -261,8 +352,48 @@
 .end
 
 .type System.Reflection.PropertyInfo
-    .field private Name String
-    .field private DeclaringType System.Type
+    .extends System.Reflection.MemberInfo
+    .method internal instance byref .ctor(String name, System.Type declaringType, System.Type propertyType, Boolean isStatic, Boolean canRead, Boolean canWrite, Int32 definitionIndex, System.Reflection.ParameterInfo[] indexParameters, System.Option<System.Reflection.MethodInfo> getter, System.Option<System.Reflection.MethodInfo> setter) -> Void
+        ldarg this
+        ldarg name
+        ldarg declaringType
+        call instance System.Reflection.MemberInfo::.ctor(String,System.Type)
+        pop
+        ldarg this
+        ldarg propertyType
+        stfld 2
+        pop
+        ldarg this
+        ldarg isStatic
+        stfld 3
+        pop
+        ldarg this
+        ldarg canRead
+        stfld 4
+        pop
+        ldarg this
+        ldarg canWrite
+        stfld 5
+        pop
+        ldarg this
+        ldarg definitionIndex
+        stfld 6
+        pop
+        ldarg this
+        ldarg indexParameters
+        stfld 7
+        pop
+        ldarg this
+        ldarg getter
+        stfld 8
+        pop
+        ldarg this
+        ldarg setter
+        stfld 9
+        pop
+        ldvoid
+        ret
+    .end
     .field private PropertyType System.Type
     .field private IsStatic Boolean
     .field private CanRead Boolean
@@ -271,26 +402,10 @@
     .field private IndexParameters System.Reflection.ParameterInfo[]
     .field private Getter System.Option<System.Reflection.MethodInfo>
     .field private Setter System.Option<System.Reflection.MethodInfo>
-    .property instance Name() -> String
-        .get instance System.Reflection.PropertyInfo::get_Name()
-    .end
-    .method instance get_Name() -> String
-        ldarg this
-        ldfld 0
-        ret
-    .end
-    .property instance DeclaringType() -> System.Type
-        .get instance System.Reflection.PropertyInfo::get_DeclaringType()
-    .end
-    .method instance get_DeclaringType() -> System.Type
-        ldarg this
-        ldfld 1
-        ret
-    .end
     .property instance PropertyType() -> System.Type
         .get instance System.Reflection.PropertyInfo::get_PropertyType()
     .end
-    .method instance get_PropertyType() -> System.Type
+    .method instance readonly byref get_PropertyType() -> System.Type
         ldarg this
         ldfld 2
         ret
@@ -298,7 +413,7 @@
     .property instance IsStatic() -> Boolean
         .get instance System.Reflection.PropertyInfo::get_IsStatic()
     .end
-    .method instance get_IsStatic() -> Boolean
+    .method instance readonly byref get_IsStatic() -> Boolean
         ldarg this
         ldfld 3
         ret
@@ -306,7 +421,7 @@
     .property instance CanRead() -> Boolean
         .get instance System.Reflection.PropertyInfo::get_CanRead()
     .end
-    .method instance get_CanRead() -> Boolean
+    .method instance readonly byref get_CanRead() -> Boolean
         ldarg this
         ldfld 4
         ret
@@ -314,7 +429,7 @@
     .property instance CanWrite() -> Boolean
         .get instance System.Reflection.PropertyInfo::get_CanWrite()
     .end
-    .method instance get_CanWrite() -> Boolean
+    .method instance readonly byref get_CanWrite() -> Boolean
         ldarg this
         ldfld 5
         ret
@@ -322,23 +437,24 @@
     .property instance DefinitionIndex() -> Int32
         .get instance System.Reflection.PropertyInfo::get_DefinitionIndex()
     .end
-    .method instance get_DefinitionIndex() -> Int32
+    .method instance readonly byref get_DefinitionIndex() -> Int32
         ldarg this
         ldfld 6
         ret
     .end
-    .method instance GetIndexParameters() -> System.Reflection.ParameterInfo[]
+    .method instance readonly byref GetIndexParameters() -> System.Reflection.ParameterInfo[]
         ldarg this
         ldfld 7
         ret
     .end
-    .method instance GetGetMethod() -> System.Option<System.Reflection.MethodInfo>
+    .method instance readonly byref GetGetMethod() -> System.Option<System.Reflection.MethodInfo>
         ldarg this
         ldc.bool false
         call instance System.Reflection.PropertyInfo::GetGetMethod(Boolean)
         ret
     .end
-    .method instance GetGetMethod(Boolean nonPublic) -> System.Option<System.Reflection.MethodInfo>
+    .method instance readonly byref GetGetMethod(Boolean nonPublic) -> System.Option<System.Reflection.MethodInfo>
+        .local System.Reflection.MethodInfo method
         ldarg nonPublic
         brtrue Return
         ldarg this
@@ -349,6 +465,8 @@
         ldfld 8
         call instance System.Option<System.Reflection.MethodInfo>::GetSomeCase()
         call instance System.Option.Some<System.Reflection.MethodInfo>::get_Value()
+        stloc method
+        ldloca method
         call instance System.Reflection.MethodInfo::get_IsPublic()
         brtrue Return
         newobj instance System.Option.None::.ctor()
@@ -359,13 +477,14 @@
         ldfld 8
         ret
     .end
-    .method instance GetSetMethod() -> System.Option<System.Reflection.MethodInfo>
+    .method instance readonly byref GetSetMethod() -> System.Option<System.Reflection.MethodInfo>
         ldarg this
         ldc.bool false
         call instance System.Reflection.PropertyInfo::GetSetMethod(Boolean)
         ret
     .end
-    .method instance GetSetMethod(Boolean nonPublic) -> System.Option<System.Reflection.MethodInfo>
+    .method instance readonly byref GetSetMethod(Boolean nonPublic) -> System.Option<System.Reflection.MethodInfo>
+        .local System.Reflection.MethodInfo method
         ldarg nonPublic
         brtrue Return
         ldarg this
@@ -376,6 +495,8 @@
         ldfld 9
         call instance System.Option<System.Reflection.MethodInfo>::GetSomeCase()
         call instance System.Option.Some<System.Reflection.MethodInfo>::get_Value()
+        stloc method
+        ldloca method
         call instance System.Reflection.MethodInfo::get_IsPublic()
         brtrue Return
         newobj instance System.Option.None::.ctor()

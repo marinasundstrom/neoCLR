@@ -1,9 +1,10 @@
 # Reflection introspection
 
-neoCLR exposes metadata queries on `System.Type`, with independent ordinary records
-in `System.Reflection`: `MethodInfo`, `FieldInfo`, `PropertyInfo`, and `ParameterInfo`.
-They require neither an Object root nor a MemberInfo/MethodBase hierarchy. This slice
-inspects declarations; it does not execute methods or read an object's field values.
+neoCLR exposes metadata queries on `System.Type`. `MethodInfo`, `FieldInfo` and
+`PropertyInfo` share an abstract `MemberInfo` base; `ParameterInfo` remains independent.
+See [descriptor hierarchy](reflection-hierarchy.md) for readonly receiver contracts,
+base views and migration. Queries inspect declarations without executing methods
+or reading an object's field values.
 
 ## Run the examples
 
@@ -197,5 +198,6 @@ See [inherited value layout](inherited-layout.md) for the preliminary record-bas
 contract. Field descriptors retain their declaring-type-relative DefinitionIndex.
 
 Type.IsAbstract and MethodInfo.IsVirtual/IsOverride/IsAbstract now expose the
-[class-dispatch flags](class-dispatch.md). Descriptor records remain independent;
-the [hierarchy/interface migration](reflection-hierarchy-plan.md) is planned.
+[class-dispatch flags](class-dispatch.md). The [descriptor hierarchy](reflection-hierarchy.md)
+is implemented; interface capabilities and default bodies remain in the
+[follow-up plan](reflection-hierarchy-plan.md).

@@ -10,6 +10,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 #### Added
 
+- Reflection member descriptors now derive from an abstract MemberInfo base with
+  shared Name/DeclaringType storage and internal chained constructors. Instance
+  readers use readonly managed receivers; Neo resolves inherited bundled class
+  members and borrows readonly temporaries without evaluating them twice. Added
+  frame/heap reference examples, constructor/snapshot parity and GC tests, .NET
+  comparison and migration guidance. Query results remain declared-only snapshots.
+  Descriptor field order is preserved; receiver contracts, member rows and declaring
+  owners change, so recompile applications against the matching System library.
+  MethodBase and default interface implementations remain planned.
+
 - Managed constructor chaining using byref .ctor receivers, call/newobj and Neo
   init declarations with explicit base initializers. One unpublished owner retains
   inherited and own fields; verifier/runtime checks enforce initialization, base

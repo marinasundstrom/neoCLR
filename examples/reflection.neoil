@@ -4,11 +4,14 @@
     .field Age Int32
 .end
 .function Main() -> Void
+    .local System.Reflection.FieldInfo descriptor
     ldtoken Counter
     call System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)
     call instance System.Type::GetFields()
     ldc.i4 0
     ldelem System.Reflection.FieldInfo
+    stloc descriptor
+    ldloca descriptor
     call instance System.Reflection.FieldInfo::get_FieldType()
     call instance System.Type::get_Name()
     call System.Console::WriteLine(String)

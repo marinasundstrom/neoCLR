@@ -1,30 +1,17 @@
 # Reflection as an inheritance and interface consumer
 
-Planned follow-up to [class dispatch and abstract classes](class-dispatch.md),
-recorded 2026-09-08. Current reflection descriptors remain separate records.
+The [MemberInfo hierarchy](reflection-hierarchy.md) is implemented as of 2026-09-08,
+following constructor chaining. It shares Name/DeclaringType storage and readonly
+readers across FieldInfo, MethodInfo and PropertyInfo, and exercises frame views,
+heap reference collections and internal base construction.
 
-[Constructor chaining](constructor-chaining.md) is implemented as the prerequisite
-for migrating reflection descriptors. It provides base-before-derived field access,
-delegation, definite initialization and restrictions on publishing a partially
-initialized receiver.
+Neo now resolves inherited bundled class properties/methods. Reflection queries
+remain explicitly declared-only. Future inherited query support must specify
+filtering, override suppression and DeclaringType versus ReflectedType before
+changing default results. MethodBase remains deferred until constructor introspection
+needs shared behavior. ParameterInfo and Type remain independent.
 
-The next library exercise should use a small shared MemberInfo base for the common
-name/declaring-type metadata of MethodInfo, FieldInfo and PropertyInfo. Evaluate
-MethodBase for method/constructor metadata only when constructor introspection needs
-it. ParameterInfo and Type do not need to be forced into that hierarchy simply for
-uniformity. Preserve optional Object ancestry and ordinary value/reference modes.
-Use interfaces for independent capabilities that need polymorphic behavior without
-shared storage; choose those interfaces from actual consumers rather than creating
-an interface for every descriptor class.
-
-Before migration, complete inherited property lookup in Neo/library projection and
-specify declared-only versus inherited reflection queries. Review descriptor receiver
-contracts: inherited behavior needs readonly managed views rather than copying a base
-value. Keep published member names and descriptor identity semantics where they fit,
-and document any construction/layout changes. Exercise both frame descriptors and
-managed collections of references to heterogeneous descriptors.
-
-Also evaluate inherited interface implementations across class bases, including how
+The next inheritance slice should implement inherited interface implementations across class bases, including how
 virtual class overrides satisfy an inherited interface contract. That currently
 restricted bridge is relevant if a common reflection base exposes a capability
 interface. Test owner identity, readonly access, dispatch and GC through both views.

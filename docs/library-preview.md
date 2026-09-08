@@ -55,7 +55,8 @@ and streams should guide these mechanisms before their public hierarchies expand
 2. **Class inheritance and virtual behavior.** The preliminary
    [inherited-layout slice](inherited-layout.md) and [base views](base-views.md) are
    implemented. [Class dispatch/abstract classes](class-dispatch.md) are also implemented;
-   [Managed constructor chaining](constructor-chaining.md) is now implemented. Build on the same relationships:
+   [Managed constructor chaining](constructor-chaining.md) and the
+   [reflection descriptor hierarchy](reflection-hierarchy.md) are now implemented. Build on the same relationships:
    optional single base class, inherited layout, construction, virtual slots,
    overrides and base references. Decide abstract/sealed rules, inherited interface
    implementations and base-value copying before exposing corresponding APIs. A
