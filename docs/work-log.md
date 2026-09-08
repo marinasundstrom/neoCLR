@@ -2971,3 +2971,23 @@ includes scalar/record copying and mutation, forwarding/retargeting, conditions/
 match results, returned references and lifetime failures. Clippy across all targets
 with warnings denied, formatting and whitespace checks passed; all 556 local
 documentation file links resolve.
+
+## Runtime/Neo reference documentation audit — 2026-09-08
+
+Added one cross-layer managed-reference guide covering T versus T&, frame ownership,
+heap reachability, interior roots, checked returns, ordinary copies, reference binding
+versus target lifetime, and Neo's automatic loads/stores. Linked it from the README,
+Neo guide and runtime contract pages. Clarified that lexical blocks do not yet own
+separate runtime lifetimes and guest destructors remain unimplemented.
+
+Corrected stale statements in the memory model, lifecycle, heap strategy, implementation
+gate and pseudocode guide that described implemented heap allocation/reference fields
+or Neo construction syntax as future work. Updated managed pseudocode to omit manual
+dereferences, while keeping native pointers separate. Host results remain context-bound;
+no independent persistent root registration or cross-execution reference inputs are
+promised. Updated remaining implementation gates rather than presenting completed
+memory work as still pending.
+
+Validation: documentation-only change; reviewed against the implemented reference
+contracts and source projection. All 572 local documentation file links resolve and
+git diff --check passes. No runtime/compiler behavior changed or tests rerun.

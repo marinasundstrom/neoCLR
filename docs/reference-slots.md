@@ -29,6 +29,10 @@ conversion, pointer arithmetic or unchecked cast. Copying the reference aliases
 the same slot; loading through it copies the stored value. Storing through it
 replaces that slot immediately. There is no implicit copy-back on method return.
 
+Neo projects these explicit IL loads/stores as automatic source access: `age = age + 2`
+reads and updates the target of an int&. The binding does not own or extend a frame's
+lifetime. See the [runtime-to-Neo reference guide](managed-reference-semantics.md).
+
 ## Parameters and explicit access
 
 Assembly syntax keeps type before the optional name:
@@ -139,8 +143,10 @@ exact types and initialization, with no native-layout requirement.
 
 The interpreter uses stable host cells with automatic retention. A reference does
 not retain a whole frame, and host heap placement does not authorize a guest-frame
-escape. No implicit promotion of an ordinary local is performed. The cell is freed
-when its frame and reference handles release it, without guest destructor dispatch.
+escape. No implicit promotion of an ordinary local is performed. Guest frame storage
+becomes invalid when its frame exits, even if a host cell remains allocated internally.
+Heap storage instead remains valid while reachable in its owning managed execution;
+GC may reclaim unreachable allocations. Neither path dispatches guest destructors.
 Native stack placement and a portable reference ABI remain future work.
 
 T& locals and returns must refer to initialized storage and satisfy any attached

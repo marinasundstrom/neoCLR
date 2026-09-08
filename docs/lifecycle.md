@@ -34,7 +34,8 @@ The referenced value has the same type T that could otherwise be held directly;
 there is no class/struct bit that forces allocation policy onto the type.
 heap.alloc/free remain raw memory operations. heap.new directly produces a GC-backed
 T&; format 5 removes Ref and heap.load/store. See [heap references](heap-references.md).
-The selected high-level spelling is new T(...); its CLI-based IL lowering remains open.
+Neo implements new T(...) as ordinary value construction followed by heap.new.
+Construction directly into a final heap destination remains a separate future feature.
 
 A byref parameter can refer to a caller's local and be passed further down the call
 chain. The programmer explicitly chooses reference access, then uses that reference
@@ -46,7 +47,7 @@ An ordinary by-value copy copies embedded managed references as references: it d
 not clone their targets. The runtime accounts for any required retention. Inline
 value fields retain their value semantics. Physical stack/heap location and whether
 reference access retains storage are separate concepts; a byref can also access a
-value backed by managed heap storage when that access contract is implemented.
+value backed by managed heap storage under the same implemented T& contract.
 
 ## Choose storage to match the intended lifetime
 
@@ -74,7 +75,7 @@ The selected source direction distinguishes construction, reference formation an
 explicit managed heap allocation:
 
 ```swift
-let value = Counter(0)          // Counter: ordinary value construction
+var value = Counter(0)          // Counter: mutable ordinary value storage
 let reference = &value         // Counter&: reference to the existing value
 let allocated = new Counter(0) // Counter&: new value in managed heap storage
 ```
@@ -89,8 +90,9 @@ Automatic placement is the default. A value may live in registers, stack storage
 or other suitable storage; T(...) is not a promise of a native stack allocation.
 new explicitly requests managed heap allocation, with automatic reference retention
 and cleanup rather than a raw pointer or manual free. No type declaration chooses
-class-versus-struct allocation semantics. This source syntax is selected direction,
-not implemented compiler syntax or a change to neoIL newobj.
+class-versus-struct allocation semantics. This source syntax is implemented by Neo;
+neoIL newobj still constructs an ordinary value. See the
+[runtime-to-Neo reference guide](managed-reference-semantics.md).
 
 ## Explicitly copy an existing value to the heap
 
@@ -125,14 +127,13 @@ func MakeCounter(counter: Counter&) -> int& {
 
 The same function must not return an address into its own frame. This includes
 its ordinary locals, by-value argument copies and fields nested inside either.
-Returning &local does not implicitly promote that local. The future high-level
-language should reject this escape; the runtime must validate the actual target
-and fault even when optional verification is skipped. A helper or reference-valued
+Returning &local does not implicitly promote that local. Neo rejects directly provable escapes; the runtime validates the actual target
+and faults even when optional verification is skipped. A helper or reference-valued
 local cannot hide the target's owning frame. Each frame validates again on return.
 
 If a function creates an object whose reference must survive that function, the
 object needs explicit managed heap-backed storage. The selected source direction
-is new T(...), producing T&; its managed allocation lowering is still future work.
+is new T(...), producing T& through the implemented newobj/heap.new sequence.
 Ordinary by-value returns transfer a value into the caller and do not impose this
 heap-allocation requirement. A new stack slot containing a reference to a heap
 object does not make that object's lifetime depend on the slot.
@@ -209,20 +210,17 @@ or rollback. Raw memory release remains distinct from destroying typed managed v
 
 ## Next implementation gates
 
-1. Specify managed allocation and reference identity/retention, keeping ordinary
-   value copies and explicit T& calls as the default contracts. Audit all paths that
-   copy, store, return or erase reference-containing values and cross host boundaries.
-2. Extend the implemented collector to unified heap-backed T& and safe call-scoped
-   access. Test reachability through aliases, nested fields and returns before
-   considering guest finalization.
-3. Build on checked T& locals, field addresses and caller-backed guest returns.
-   Introduce managed heap targets without weakening the rule against returning
-   addresses into the current frame. Allocation optimizations must preserve that rule.
-4. Add destruction metadata, initialization tracking and execution/failure rules.
-   Demonstrate real resource release alongside Disposable/Closable and explicit Clone.
-5. Build on implemented cycle collection; define weak references, concurrency and
-   native pinning before exposing those features. Unique ownership may be a later optional
-   capability; it is not the foundation users must adopt to use managed references.
+1. Preserve the implemented frame/heap provenance and GC-root contracts through
+   inheritance and base views, without weakening current-frame return checks.
+2. Define construction directly into supplied destinations before permitting
+   self-references or publication of objects during construction.
+3. Define runtime block lifetimes and earlier local cleanup before loosening Neo's
+   conservative restrictions on addresses of block-local values.
+4. Add destruction metadata, initialization tracking and execution/failure rules
+   before promising automatic guest cleanup alongside Disposable/Closable.
+5. Define weak references, concurrency, native pinning and persistent host roots
+   before exposing those capabilities. None requires users to manually manage
+   ordinary managed references.
 
 Interpretation, JIT and AOT must preserve the same observable value/reference and
 lifetime behavior. Existing Ref arena artifacts and raw pointer-based collections

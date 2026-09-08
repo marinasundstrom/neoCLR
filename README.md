@@ -37,6 +37,8 @@ and lifetime choices, a real `Void` value, functions outside types, `Option<T>` 
 `Result<T,E>` for recoverable errors, and terminal Faults instead of exceptions.
 Interfaces use ordinary names without an `I` prefix.
 [Borrowed interface references](docs/interfaces.md) make dispatch explicit without boxing or ownership.
+[Managed references in the runtime and Neo](docs/managed-reference-semantics.md) explains
+frame ownership, GC reachability and automatic source-level access.
 [Typed equality](docs/equality.md) uses System.Equatable<T> and Equals(T).
 [Explicit cloning](docs/cloning.md) uses System.Clonable<T> and Clone(), independently
 of ordinary value copies. The [lifecycle design](docs/lifecycle.md) separates

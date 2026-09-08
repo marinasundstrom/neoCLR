@@ -22,6 +22,20 @@ optimizations and production tooling are not current goals. The
 [upcoming slices](neo-roadmap.md) describe the next bounded steps; future
 [bootstrapping](neo-bootstrapping.md) does not expand today's scope.
 
+## Runtime contract and source projection
+
+Read the [managed-reference semantics guide](managed-reference-semantics.md) for the
+shared runtime/Neo model. T& chooses reference access; the target's storage determines
+its lifetime. Frame-backed references cannot outlive their owning frame. Heap-backed
+references, including interior field references, keep the owning heap allocation
+reachable independently of the allocating method. Copying a reference does not promote
+a local or extend its frame's lifetime.
+
+Neo hides managed dereferencing through ordinary reads and assignment. The runtime
+still executes explicit checked IL loads/stores. Lexical block visibility is implemented,
+but separate runtime block lifetimes and automatic guest destruction are not. Native
+pointers retain separate low-level semantics and are not yet exposed by Neo.
+
 ## Run the example
 
 From the repository root, with Rust/Cargo installed (Rust 1.85 or newer):

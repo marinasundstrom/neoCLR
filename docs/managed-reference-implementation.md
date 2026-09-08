@@ -16,15 +16,14 @@ with execution on an unmodified CLR.
 
 ## Observable contract
 
-T(...) constructs an ordinary value, &value refers to that value, and the selected
-future new T(...) constructs a managed heap value and returns T&. Passing references
+Neo T(...) constructs an ordinary value, &value refers to that value, and
+new T(...) constructs a managed heap value and returns T&. Passing references
 requires no manual retention, release, ownership annotations or invalidation.
 
 A function can return a reference into caller-owned storage, including a field of
 a byref argument. It cannot return a reference into its own ordinary local or
-by-value argument storage. No implicit promotion on return is selected. The future
-high-level language should enforce this dependency direction and the runtime must
-fault on violations even without verification. A function-created referent that
+by-value argument storage. There is no implicit promotion on return. Neo supplies
+static checks where supported; the runtime faults on violations even without verification. A function-created referent that
 must outlive its owner needs managed heap-backed storage. Ordinary by-value returns
 transfer values to the caller without inherently requiring heap allocation.
 
@@ -59,7 +58,7 @@ an escape policy; explicit frame-root validation controls returned references.
 Stored fields and erased payloads accept heap-backed references; frame-backed
 references are rejected there. Nested addresses remain unsupported. Array-element references are not implemented.
 
-## Invariants for the next managed heap slice
+## Invariants to preserve
 
 1. Every reference has one initialized target of the exact type. Field paths and
    interface views preserve the root's storage lifetime. Reused storage cannot
@@ -75,8 +74,9 @@ references are rejected there. Nested addresses remain unsupported. Array-elemen
 5. Construction and allocation are separate internally. Uninitialized storage must
    not escape as a readable reference. Preserve out/out(true) obligations and field
    identity across ancestor replacement; failed stores must not satisfy outputs.
-6. Guest return transfers a valid reference before callee teardown. Host results
-   remain rejected until their context and cleanup contracts exist.
+6. Guest return transfers a valid reference before callee teardown. Heap-backed host
+   results support inspection through their owning execution; independent host root
+   registration and reference inputs across executions remain unsupported.
 7. Dispose/Close resource state is independent of reference liveness. Guest
    destructor dispatch requires separate metadata, ordering and failure rules.
 

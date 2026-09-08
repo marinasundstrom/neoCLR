@@ -13,9 +13,10 @@ explicit-memory notation inspired by C# and Rust. In particular, this is not Rus
 exclusive borrowing model. The corresponding neoIL samples assemble and execute.
 
 `&value` forms a managed reference to a slot. `T&` describes the type of that
-reference. `*reference` explicitly reads or writes the referenced value in this
-pseudocode. A language may offer automatic borrowing or dereferencing, but the
-platform operations below remain explicit.
+reference. Managed-reference reads and writes are automatic in Neo and in the
+pseudocode below; the corresponding IL loads/stores remain explicit. Raw pointers
+retain their separate low-level access rules. See the
+[runtime-to-Neo reference guide](managed-reference-semantics.md).
 
 | Form | Meaning |
 | --- | --- |
@@ -24,19 +25,19 @@ platform operations below remain explicit.
 | Int32* | Raw native pointer with explicit memory/lifetime obligations |
 | Int32*& | Managed reference to a slot whose value is a raw Int32 pointer |
 | Settable& | Managed interface view over an implementing concrete slot |
-| Ref<T> | Historical proposal/current arena handle; not the selected future reference abstraction |
+| Ref<T> | Historical proposal removed in format 5; use T& for managed references |
 
 The examples below focus on scoped calls. The same CLR-style T&/ByRef feature now
 supports reference locals, managed field addresses and checked caller-backed guest
 returns; see [slot contracts](reference-slots.md).
-The [lifecycle direction](lifecycle.md) extends this to explicit managed heap
-allocation, reference fields and guest destruction.
+Managed heap allocation and heap-backed reference fields are also implemented;
+guest destruction remains future work under the [lifecycle direction](lifecycle.md).
 
 ## Passing a reference
 
 ```text
 func Increment(value: Int32&) -> Void {
-    *value = *value + 1
+    value = value + 1
 }
 
 var count: Int32 = 41
@@ -73,7 +74,7 @@ Languages can choose stronger restrictions.
 
 ```text
 func Assign(destination: out Int32&, value: Int32) -> Void {
-    *destination = value
+    destination = value
 }
 
 var answer: Int32
@@ -112,7 +113,7 @@ type Counter {
     Value: Int32
 
     func Set(this: Counter&, value: Int32) -> Void {
-        (*this).Value = value
+        this.Value = value
     }
 }
 
@@ -237,11 +238,13 @@ still has an explicit native lifetime; extraction after that storage expires fau
 ## What can cross a context boundary today?
 
 Managed references can pass through active calls, be stored in T& locals and be
-returned to guest callers when their root belongs to an active outer frame. Managed
+returned to guest callers when their root belongs to an active outer frame or the managed heap. Managed
 ldflda forms field references with the same root lifetime. Returning an address into
 the current frame faults, including addresses of nested fields, by-value arguments
 and references forwarded through helpers. No automatic local promotion is implied.
-Reference-valued fields, erasure and host/native transfers remain unsupported.
+Reference-valued fields and erased payloads may store heap-backed references only.
+Heap-backed host results support inspection within their owning execution; reference
+inputs across executions and native transfers remain unsupported.
 
 Metadata and runtime checks enforce these boundaries; optional verification provides
 earlier diagnostics. Interpreter references identify a stable host cell and field
@@ -249,7 +252,7 @@ path. Host allocation does not make an ordinary guest local a heap object: every
 return validates the actual root against the returning frame. Native backends must
 preserve this contract without copying the interpreter's host representation.
 
-Explicit managed heap allocation, array-element references, readonly capabilities,
+Array-element references, runtime block lifetimes, readonly capabilities,
 threads and guest destruction remain separate gates. See the
 [reference-return sample](../examples/reference_returns.neoil) and
 [lifecycle direction](lifecycle.md).

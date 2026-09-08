@@ -31,13 +31,12 @@ the declared copy rules. Allocation, reference access and ownership are separate
 | T& | Explicit managed access to a live, initialized slot when reading; output contracts can initialize it |
 | Interface& | Explicit dispatch view over an implementing value's slot |
 | T* or Void* | Low-level address access with explicit validity and lifetime obligations |
-| Future retained T& | The same CLR-style managed-reference feature, with automatic lifetime retention |
 
 Capabilities are expressed through declared types, interfaces, parameter/receiver
 contracts and explicit operations. Current interfaces are declared on types; this
 is not a promise of dynamic per-instance interface attachment. An interface view
 adds access to an existing contract without changing its storage lifetime.
-Retained managed references extend T&/ByRef without turning all T values into
+Heap-backed managed references use T&/ByRef without turning all T values into
 references. Ref<T> is a historical proposal removed in format 5.
 
 A Rust-style borrow checker is not a platform requirement. In the current managed-reference
@@ -50,27 +49,24 @@ silently inherited by every language targeting neoCLR.
 
 This separates the required behavior from how it is enforced. An interpreter may
 track slots dynamically; a future compiler may eliminate checks it can prove redundant.
-Both must preserve the reference contract. Longer-lived or stored references still
-need specified invalidation/retention rules, and cross-thread access needs concurrency
+Both must preserve the reference contract, including the heap-only stored-reference
+restriction and context-bound host results. Cross-thread access still needs concurrency
 rules. Avoiding a borrow checker does not remove those design obligations. Neither
 case requires selecting exclusive borrowing as the only solution.
 
 ## Current priority
 
-The next lifecycle foundation is [managed references and destruction](lifecycle.md).
-It prioritizes automatic heap-reference retention alongside stack-backed byref calls
-and checked caller-backed reference returns, then user destructor execution. The implemented preview
-contracts below remain unchanged. Earlier ownership-operation proposals later in this
-document are implementation options, not requirements for manual reference management.
+The managed-reference/GC foundation is implemented: frame-backed T&, direct managed
+heap allocation, tracing through interior/interface views, heap-backed reference
+fields and checked reference returns. The [Neo companion compiler](neo.md) exercises
+these contracts through runnable source programs. Guest destruction, runtime block
+lifetimes, pinning and persistent host roots remain future work. See the
+[implementation plan](managed-reference-implementation.md) for remaining gates.
 
-Heap allocation and native pointers are implemented, as are retaining managed
-slot references, guest reference returns and interface views. Stabilize their contracts and the Preview 1 programs.
-Slot references, field addresses and checked caller-backed returns are implemented;
-explicit managed heap allocation,
-reference fields and guest destruction are not implemented yet.
-Their next implementation gate is described in the
-[managed-reference plan](managed-reference-implementation.md); cycle policy and
-concurrency remain open decisions.
+The [runtime-to-Neo reference guide](managed-reference-semantics.md) explains storage
+ownership, reference access and lifetime together. Earlier ownership-operation
+proposals below are historical implementation options, not manual reference-management
+requirements.
 
 The precise native allocation contract is in [heap and pointers](heap-and-pointers.md),
 and the managed-reference contract is in [slot references](reference-slots.md).

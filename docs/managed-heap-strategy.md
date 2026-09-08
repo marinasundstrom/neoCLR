@@ -1,8 +1,8 @@
 # Managed heap strategy
 
 Status: direct [heap-backed T&](heap-references.md), checked frame references, typed
-initobj and tracing GC are implemented. Constructor destinations and source-language
-heap construction remain future work. Memory management reaches this milestone before
+initobj, tracing GC and Neo source-language heap construction are implemented.
+Construction directly into supplied destinations remains future work. Memory management reaches this milestone before
 the next [object-model slices](object-hierarchy.md).
 
 ## One reference type, distinct storage lifetimes
@@ -47,9 +47,9 @@ modifier; the receiving local's type must not silently choose allocation behavio
 | --- | --- | --- |
 | Address a destination; initobj T | Default-initialize existing storage, with no constructor invocation | Managed typed defaults are implemented for scalars and recursively supported records |
 | Address a destination; arguments; call .ctor | Construct into supplied storage | Add destination-oriented construction; current ordinary calls copy their receiver |
-| Arguments; newobj .ctor | Construct a fresh result | Preserve the existing ordinary-value path while deciding explicit heap placement |
-| Explicit managed heap placement | Establish an independently managed root and return T& | Evolve an existing heap operation or define a narrow construction modifier |
-| ldloca/ldarga; ldflda; ldobj/stobj | Form references, project fields, read and replace values | Keep the same operations for frame and future heap targets |
+| Arguments; newobj .ctor | Construct a fresh result | Implemented ordinary-value construction; Neo new T(...) follows it with heap.new |
+| Explicit managed heap placement | Establish an independently managed root and return T& | Implemented by heap.new, which consumes T and produces heap-backed T& |
+| ldloca/ldarga; ldflda; ldobj/stobj | Form references, project fields, read and replace values | Implemented with the same operations for frame and heap targets |
 
 Source T(args) constructs an ordinary value; new T(args) explicitly requests managed
 heap construction. Source keywords need not map one-to-one to IL mnemonics. Physical
