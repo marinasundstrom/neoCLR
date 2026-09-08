@@ -13,6 +13,7 @@ pub(crate) enum Binding {
     ParseInt32,
     Int32ToString,
     WriteLine,
+    CharCategory,
     StringConcat,
     StringByteCount,
     StringCompareOrdinal,
@@ -45,6 +46,7 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         ("neoCLR.Runtime.ParseInt32", [Type::String]) => (Binding::ParseInt32, Type::Value),
         ("neoCLR.Runtime.Int32ToString", [Type::Int32]) => (Binding::Int32ToString, Type::String),
         ("neoCLR.Runtime.WriteLine", [Type::String]) => (Binding::WriteLine, Type::Void),
+        ("neoCLR.Runtime.CharCategory", [Type::Char]) => (Binding::CharCategory, Type::Int32),
         ("neoCLR.Runtime.StringConcat", [Type::String, Type::String]) => {
             (Binding::StringConcat, Type::String)
         }
@@ -173,6 +175,11 @@ impl Binding {
                 }
                 Ok(Value::Void)
             }
+            (Self::CharCategory, [Value::Char(value)]) => {
+                let ranges = crate::char_categories::RANGES;
+                let index = ranges.partition_point(|(end, _)| end < value);
+                Ok(Value::Int32(i32::from(ranges[index].1)))
+            }
             (Self::StringConcat, [Value::String(left), Value::String(right)]) => {
                 let length = left
                     .len()
@@ -250,5 +257,23 @@ impl Binding {
             }
             _ => Err(Fault::new("invalid native arguments")),
         }
+    }
+}
+
+#[cfg(test)]
+mod character_tests {
+    #[test]
+    fn bmp_categories_match_pinned_dotnet_10_probe() {
+        // FNV-1a over Char.GetUnicodeCategory for all 65,536 UTF-16 units.
+        // docs/experiments/character-classification-dotnet, SDK 10.0.100.
+        let ranges = crate::char_categories::RANGES;
+        assert_eq!(ranges.last().unwrap().0, u16::MAX);
+        assert!(ranges.windows(2).all(|pair| pair[0].0 < pair[1].0));
+        let mut hash = 14_695_981_039_346_656_037u64;
+        for value in 0..=u16::MAX {
+            let index = ranges.partition_point(|(end, _)| *end < value);
+            hash = (hash ^ u64::from(ranges[index].1)).wrapping_mul(1_099_511_628_211);
+        }
+        assert_eq!(hash, 0x9FB70257D9A6A292);
     }
 }

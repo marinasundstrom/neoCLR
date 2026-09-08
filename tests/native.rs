@@ -23,7 +23,7 @@ fn methodimpl_internalcall_round_trips_as_clr_flag() {
             .iter()
             .filter(|f| f.impl_flags == INTERNAL_CALL)
             .count(),
-        27 // Includes nine metadata-only reflection helpers and four ordinal text helpers.
+        28 // Includes metadata reflection, ordinal text and character category helpers.
     );
 }
 

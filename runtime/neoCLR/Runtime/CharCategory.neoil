@@ -1,0 +1,3 @@
+.function neoCLR.Runtime.CharCategory(Char value) -> Int32
+    .methodimpl InternalCall
+.end

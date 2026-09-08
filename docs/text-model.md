@@ -101,3 +101,6 @@ readonly ContainsOrdinal, StartsWithOrdinal and EndsWithOrdinal. Ordering follow
 .NET UTF-16 code units despite UTF-8 storage; matching is exact and case-sensitive.
 These Boolean predicates expose no indexes and do not settle general indexing or
 Length. Culture, normalization and case folding remain future work.
+
+[Character classification](character-classification.md) adds familiar System.Char predicates and
+Neo character literals, including Unicode IsDigit and explicit IsAsciiDigit.

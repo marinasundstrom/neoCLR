@@ -101,7 +101,7 @@ arguments        = "(", newlines,
                      { ",", newlines, argument, newlines } ], ")" ;
 argument         = [ "out" ], expression ;
 generic_member   = qualified_name, "<", type, { ",", type }, ">", ".", identifier ;
-primary          = generic_member | integer | string | "true" | "false" | "this" | identifier
+primary          = generic_member | integer | string | character | "true" | "false" | "this" | identifier
                  | "[", newlines, expression, newlines, { ",", newlines, expression, newlines }, "]"
                  | ("typeof" | "default"), "(", newlines, type, newlines, ")"
                  | "(", newlines, expression, newlines, ")" ;
@@ -144,6 +144,9 @@ Integer tokens contain decimal digits only. Positive literals must fit Int32; a
 literal immediately prefixed by minus may represent -2147483648. No suffixes, digit
 separators or floating literals are implemented. Strings use double quotes and
 JSON-style escapes, including Unicode escapes; raw line breaks are rejected.
+Character literals use single quotes around one UTF-16 unit or an escape; see
+[character classification](character-classification.md) for the bounded escape grammar.
+Supplementary scalars need two units and cannot form a single Char literal.
 
 Whitespace other than LF is ignored outside strings. LF is a statement separator;
 CRLF works because CR is ignored. `//` comments end before LF. Semicolons also separate

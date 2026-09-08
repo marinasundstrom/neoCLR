@@ -14,6 +14,7 @@
 .include "System/Int16.neoil"
 .include "System/UInt16.neoil"
 .include "System/Char.neoil"
+.include "neoCLR/Runtime/CharCategory.neoil"
 .include "System/UInt32.neoil"
 .include "System/Int64.neoil"
 .include "System/UInt64.neoil"

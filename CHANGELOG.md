@@ -10,6 +10,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 #### Added
 
+- Added System.Char digit, letter, case, whitespace, number, punctuation, symbol,
+  control, separator, ASCII and surrogate predicates. Library IL uses one checked
+  category helper with pinned Unicode 16 data and a CharacterClassification service;
+  all BMP categories match the pinned .NET 10 probe. Neo now supports single-quoted
+  UTF-16 Char literals and bounded escapes, with source diagnostics. Added tests,
+  a sample, API/grammar documentation and reproducible licensed table generation.
+
 - Added String.CompareOrdinal with .NET-compatible UTF-16 ordering over valid UTF-8
   text, plus readonly ContainsOrdinal, StartsWithOrdinal and EndsWithOrdinal.
   Four validated StringOperations helpers support ordinary library IL; no opcode

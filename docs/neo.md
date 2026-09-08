@@ -507,3 +507,6 @@ These are eager ArrayList operations; LINQ remains future work.
 Neo borrows readonly instance receivers automatically, including string temporaries.
 Run `cargo run --locked -- run examples/source/ordinal-text.neo` for an eager file-name
 search using ArrayList, a predicate and Option matching.
+
+[Character classification](character-classification.md) adds familiar System.Char predicates and
+Neo character literals, including Unicode IsDigit and explicit IsAsciiDigit.

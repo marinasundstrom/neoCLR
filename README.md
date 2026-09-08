@@ -555,3 +555,6 @@ ArrayList predicates and Option matching:
 ```sh
 cargo run --locked -- run examples/source/ordinal-text.neo
 ```
+
+[Character classification](docs/character-classification.md) adds familiar System.Char predicates and
+Neo character literals, including Unicode IsDigit and explicit IsAsciiDigit.

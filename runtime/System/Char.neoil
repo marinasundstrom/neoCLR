@@ -18,5 +18,181 @@
         ldc.i4 1
         ret
     .end
-.end
+    .method static IsDigit(Char value) -> Boolean
+        ldarg value
+        call neoCLR.Runtime.CharCategory(Char)
+        ldc.i4 8
+        ceq
+        ret
+    .end
 
+    .method static IsNumber(Char value) -> Boolean
+        ldarg value
+        call neoCLR.Runtime.CharCategory(Char)
+        ldc.i4 8
+        sub
+        ldc.i4 2
+        cgt.un
+        ldc.bool false
+        ceq
+        ret
+    .end
+
+    .method static IsLetter(Char value) -> Boolean
+        ldarg value
+        call neoCLR.Runtime.CharCategory(Char)
+        ldc.i4 0
+        sub
+        ldc.i4 4
+        cgt.un
+        ldc.bool false
+        ceq
+        ret
+    .end
+
+    .method static IsUpper(Char value) -> Boolean
+        ldarg value
+        call neoCLR.Runtime.CharCategory(Char)
+        ldc.i4 0
+        ceq
+        ret
+    .end
+
+    .method static IsLower(Char value) -> Boolean
+        ldarg value
+        call neoCLR.Runtime.CharCategory(Char)
+        ldc.i4 1
+        ceq
+        ret
+    .end
+
+    .method static IsSeparator(Char value) -> Boolean
+        ldarg value
+        call neoCLR.Runtime.CharCategory(Char)
+        ldc.i4 11
+        sub
+        ldc.i4 2
+        cgt.un
+        ldc.bool false
+        ceq
+        ret
+    .end
+
+    .method static IsControl(Char value) -> Boolean
+        ldarg value
+        call neoCLR.Runtime.CharCategory(Char)
+        ldc.i4 14
+        ceq
+        ret
+    .end
+
+    .method static IsPunctuation(Char value) -> Boolean
+        ldarg value
+        call neoCLR.Runtime.CharCategory(Char)
+        ldc.i4 18
+        sub
+        ldc.i4 6
+        cgt.un
+        ldc.bool false
+        ceq
+        ret
+    .end
+
+    .method static IsSymbol(Char value) -> Boolean
+        ldarg value
+        call neoCLR.Runtime.CharCategory(Char)
+        ldc.i4 25
+        sub
+        ldc.i4 3
+        cgt.un
+        ldc.bool false
+        ceq
+        ret
+    .end
+
+    .method static IsSurrogate(Char value) -> Boolean
+        ldarg value
+        ldc.i4 55296
+        sub
+        ldc.i4 2047
+        cgt.un
+        ldc.bool false
+        ceq
+        ret
+    .end
+
+    .method static IsHighSurrogate(Char value) -> Boolean
+        ldarg value
+        ldc.i4 55296
+        sub
+        ldc.i4 1023
+        cgt.un
+        ldc.bool false
+        ceq
+        ret
+    .end
+
+    .method static IsLowSurrogate(Char value) -> Boolean
+        ldarg value
+        ldc.i4 56320
+        sub
+        ldc.i4 1023
+        cgt.un
+        ldc.bool false
+        ceq
+        ret
+    .end
+
+    .method static IsAscii(Char value) -> Boolean
+        ldarg value
+        ldc.i4 0
+        sub
+        ldc.i4 127
+        cgt.un
+        ldc.bool false
+        ceq
+        ret
+    .end
+
+    .method static IsAsciiDigit(Char value) -> Boolean
+        ldarg value
+        ldc.i4 48
+        sub
+        ldc.i4 9
+        cgt.un
+        ldc.bool false
+        ceq
+        ret
+    .end
+
+    .method static IsLetterOrDigit(Char value) -> Boolean
+        ldarg value
+        call System.Char::IsLetter(Char)
+        brtrue Yes
+        ldarg value
+        call System.Char::IsDigit(Char)
+        ret
+        Yes:
+        ldc.bool true
+        ret
+    .end
+
+    .method static IsWhiteSpace(Char value) -> Boolean
+        ldarg value
+        ldc.i4 9
+        sub
+        ldc.i4 4
+        cgt.un
+        brfalse Yes
+        ldarg value
+        ldc.i4 133
+        beq Yes
+        ldarg value
+        call System.Char::IsSeparator(Char)
+        ret
+        Yes:
+        ldc.bool true
+        ret
+    .end
+
+.end

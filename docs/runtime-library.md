@@ -158,3 +158,6 @@ identity contracts, limitations, and runnable Neo/IL examples.
 [Ordinal text operations](ordinal-text.md) add String.CompareOrdinal and readonly
 ContainsOrdinal, StartsWithOrdinal and EndsWithOrdinal. See the text contract for
 UTF-16 ordering over UTF-8 storage, empty patterns and current copying costs.
+
+[Character classification](character-classification.md) adds familiar System.Char predicates and
+Neo character literals, including Unicode IsDigit and explicit IsAsciiDigit.

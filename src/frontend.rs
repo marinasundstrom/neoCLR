@@ -64,20 +64,20 @@ fn lex(source: &str) -> Result<Vec<Token>, Fault> {
                 .count()
         } else if first.is_ascii_digit() {
             rest.bytes().take_while(u8::is_ascii_digit).count()
-        } else if first == '"' {
+        } else if first == '"' || first == '\'' {
             let mut escaped = false;
             let mut end = None;
             for (index, ch) in rest.char_indices().skip(1) {
                 if ch == '\n' || ch == '\r' {
-                    return Err(start.error("string literal must end on the same line"));
+                    return Err(start.error("quoted literal must end on the same line"));
                 }
-                if !escaped && ch == '"' {
+                if !escaped && ch == first {
                     end = Some(index + 1);
                     break;
                 }
                 escaped = !escaped && ch == '\\';
             }
-            end.ok_or_else(|| start.error("unterminated string literal"))?
+            end.ok_or_else(|| start.error("unterminated quoted literal"))?
         } else if rest.starts_with("..<") {
             3
         } else if ["->", "=>", "..", "==", "!=", "<=", ">=", "&&", "||"]
@@ -104,6 +104,39 @@ fn lex(source: &str) -> Result<Vec<Token>, Fault> {
         column,
     });
     Ok(tokens)
+}
+
+fn char_literal(at: &Token) -> Result<u16, Fault> {
+    let inner = &at.text[1..at.text.len() - 1];
+    let invalid =
+        || at.error("character literal requires one UTF-16 code unit or a supported escape");
+    if let Some(escape) = inner.strip_prefix('\\') {
+        return match escape {
+            "0" => Ok(0),
+            "n" => Ok(10),
+            "r" => Ok(13),
+            "t" => Ok(9),
+            "b" => Ok(8),
+            "f" => Ok(12),
+            "v" => Ok(11),
+            "\\" => Ok(92),
+            "'" => Ok(39),
+            "\"" => Ok(34),
+            _ if escape.starts_with('u')
+                && escape.len() == 5
+                && escape[1..].bytes().all(|b| b.is_ascii_hexdigit()) =>
+            {
+                u16::from_str_radix(&escape[1..], 16).map_err(|_| invalid())
+            }
+            _ => Err(invalid()),
+        };
+    }
+    let mut units = inner.encode_utf16();
+    let value = units.next().ok_or_else(invalid)?;
+    if units.next().is_some() {
+        return Err(invalid());
+    }
+    Ok(value)
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -398,6 +431,7 @@ enum ExprKind {
     Lambda(Vec<(Token, Option<Ty>)>, Box<ArmBody>),
     Int(i32),
     String(String),
+    Char(u16),
     Bool(bool),
     Name(String),
     Field(Box<Expr>, Token),
@@ -1297,6 +1331,9 @@ impl Parser {
             self.newlines();
             self.expect(")")?;
             value
+        } else if at.text.starts_with('\'') {
+            let value = char_literal(&at)?;
+            self.node(at, ExprKind::Char(value), 1)?
         } else if at.text.starts_with('"') {
             let value: String =
                 serde_json::from_str(&at.text).map_err(|_| at.error("invalid string escape"))?;
@@ -2155,6 +2192,11 @@ impl Lowerer<'_> {
             ExprKind::Int(value) => {
                 self.body.push(format!("ldc.i4 {value}"));
                 Ok(Ty::Int)
+            }
+            ExprKind::Char(value) => {
+                self.body
+                    .extend([format!("ldc.i4 {value}"), "conv.u2".into()]);
+                Ok(Ty::Record("System.Char".into()))
             }
             ExprKind::String(value) => {
                 self.body
