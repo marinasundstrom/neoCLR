@@ -84,7 +84,7 @@ statically named Box<int> token. The walkthrough acceptance test also runs its s
 and assembled artifact through the CLI.
 
 [Member enumeration](reflection.md) is implemented. Construction/invocation by
-descriptor, dynamic object GetType, custom-attribute reflection, mutable metadata
+descriptor, custom-attribute reflection, mutable metadata
 and a comprehensive Type API remain
 outside this slice. The prototype names and API may evolve independently of .NET's
 reflection hierarchy.
@@ -115,3 +115,7 @@ are planned, not implemented by the current minimal Type inspection surface.
 The planned Type member queries use independent MethodInfo, FieldInfo and PropertyInfo
 records; they do not depend on class hierarchies. FunctionInfo is reserved for possible
 module-level free-function queries, not a category of Type member.
+
+Managed references now support concrete target discovery through `ref.type` and Neo's
+GetType fallback. See [reflection introspection](reflection.md). This is distinct from
+TypeOf<T>.Of(T), which continues to describe its declared generic argument.

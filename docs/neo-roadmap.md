@@ -147,9 +147,9 @@ syntax. Public defaults, explicit BindingFlags filtering, accessor options and t
 shape queries are documented and tested. Constructors and module free functions are
 excluded from Type.GetMethods; FunctionInfo remains reserved for future module queries.
 
-Dynamic discovery from a managed reference remains a follow-up to metadata enumeration.
-It must distinguish declared interface type from the live concrete target, without
-boxing, requiring Object, or retaining the target. Reflective execution and metadata
+Managed references now support GetType discovery of their concrete live target,
+including through interface views, without boxing, requiring Object, or retaining
+the target. Reflective execution and metadata
 mutation remain separate future work.
 
 ## Ordinary and output reference parameters — completed

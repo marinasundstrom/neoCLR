@@ -19,7 +19,11 @@ The next preview's version, publication date and release validation are not yet 
   TryGet calls are demonstrated end to end. Caller initialization is checked by the
   verifier; callee read/assignment obligations remain runtime-enforced.
 
-- **Reflection introspection:** System.Type now enumerates fields, methods and
+- **Reflection introspection:** added live managed-reference GetType discovery through
+  `ref.type`, including concrete interface targets and interior field types, without
+  boxing or retaining inspected objects. Existing declared methods keep their dispatch.
+  The collection example now checks its concrete implementation through an interface.
+  System.Type now enumerates fields, methods and
   properties through independent FieldInfo, MethodInfo and PropertyInfo records.
   ParameterInfo exposes names, positions, types and output contracts. Queries support
   a documented BindingFlags subset, accessor metadata, closed generic substitution,
@@ -149,7 +153,7 @@ The next preview's version, publication date and release validation are not yet 
 - The debugger requires launch-time integration; it does not attach to arbitrary OS
   processes or provide expression evaluation, memory editing, native-frame unwinding
   or editor/DAP integration.
-- Reflection is metadata-only. Dynamic reference-aware GetType, reflective invocation,
+- Reflection is metadata-only. Reflective invocation,
   field mutation, constructor queries, class hierarchies and module-level FunctionInfo
   queries remain future work.
 - The compiler and library remain bounded prototypes. JIT/AOT execution, managed-object

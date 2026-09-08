@@ -1289,6 +1289,22 @@ impl Lowerer<'_> {
                     .records
                     .iter()
                     .find(|r| r.name.text == target.il());
+                let declared = contract
+                    .map(|i| &i.methods)
+                    .or_else(|| record.map(|r| &r.methods))
+                    .is_some_and(|methods| methods.iter().any(|m| m.name.text == member.text));
+                if member.text == "GetType"
+                    && arguments.is_empty()
+                    && matches!(ty, Ty::Ref(_))
+                    && !declared
+                    && library::parameters(target, "GetType", 0)?.is_none()
+                {
+                    self.body.push("ref.type".into());
+                    self.body.push(
+                        "call System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)".into(),
+                    );
+                    return Ok(Ty::Record("System.Type".into()));
+                }
                 if contract.is_some() || record.is_some() {
                     let method = contract
                         .map(|i| &i.methods)

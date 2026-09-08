@@ -10,6 +10,9 @@ func Main() -> int {
     var values = System.Collections.ArrayList<Counter&>.Allocate(0)
     let shared = &values
     let view: System.Collections.List<Counter&>& = shared
+    if !view.GetType().Equals(typeof(System.Collections.ArrayList<Counter&>)) {
+        return -1
+    }
     let counter = new Counter(40)
     Add(view, counter)
     let first = view.get_Item(0)

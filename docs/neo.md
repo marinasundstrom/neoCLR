@@ -377,3 +377,11 @@ See the [complete collection example](../examples/source/collections.neo).
 caller initialization; runtime guards enforce callee assignment obligations. Calls
 to library conditional outputs are supported on direct success branches. See
 [output references](neo-outputs.md) for syntax, examples and limitations.
+
+## Runtime type discovery
+
+`reference.GetType()` returns System.Type for an initialized managed reference's
+target. Interface views reveal the concrete implementation type; interior references
+reveal the referenced field/element type. Existing declared GetType methods take
+precedence. This fallback does not address ordinary values or follow raw pointers.
+It lowers to ref.type and GetTypeFromHandle; typeof remains declared-type inspection.

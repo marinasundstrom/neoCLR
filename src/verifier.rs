@@ -138,7 +138,8 @@ fn analyze_function(
                 }),
             ) => state.initialized[*index] = true,
             (
-                Op::LoadObject(_)
+                Op::ReferenceType
+                | Op::LoadObject(_)
                 | Op::FieldAddress(_)
                 | Op::ArrayAddress(_)
                 | Op::ArrayElement(_)
@@ -342,7 +343,7 @@ fn effect(module: &Module, op: &Op, arity: usize) -> Result<(usize, usize), Faul
         Pop | Store(_) | StoreArg(_) | Return | BranchTrue(_) | BranchFalse(_) | Switch(_)
         | InitializeObject(_) => (1, 0),
         Dup => (1, 2),
-        AllocateArray(_) | NewArray(_) | ArrayLength => (1, 1),
+        AllocateArray(_) | NewArray(_) | ArrayLength | ReferenceType => (1, 1),
         CreateArray(_) | ArrayElement(_) | ArrayAddress(_) => (2, 1),
         StoreArrayElement(_) => (3, 0),
         New(ty) => (crate::vm::record_fields(module, ty, arity)?.len(), 1),
@@ -667,6 +668,13 @@ fn typed_effect(
             Result::Ok(vec![loaded(&callee.returns)])
         }
         LoadTypeToken(_) => one(Type::RuntimeTypeHandle),
+        ReferenceType => {
+            require(
+                matches!(exact(&values[0])?, Type::ByRef(_)),
+                "ref.type requires a managed reference",
+            )?;
+            one(Type::RuntimeTypeHandle)
+        }
         PackValue(ty) => {
             stored(&values[0], ty)?;
             one(Type::Value)

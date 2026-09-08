@@ -1472,6 +1472,20 @@ fn interpret_instructions(
                     }
                     frames.push(Frame::new(callee, args)?);
                 }
+                Op::ReferenceType => {
+                    let reference = match frame.pop()? {
+                        Value::SlotReference(reference)
+                        | Value::SlotInterface {
+                            receiver: reference,
+                            ..
+                        } => reference,
+                        _ => return Err(Fault::new("ref.type requires a managed reference")),
+                    };
+                    reference.assigned()?;
+                    frame.stack.push(Value::RuntimeTypeHandle(Box::new(
+                        crate::type_identity::describe_loaded(module, reference.target())?,
+                    )));
+                }
                 Op::LoadTypeToken(ty) => {
                     frame.stack.push(Value::RuntimeTypeHandle(Box::new(
                         crate::type_identity::describe(module, ty)?,

@@ -605,6 +605,8 @@ pub enum Instruction {
     /// CLI-shaped type-token acquisition; method and field tokens are not supported.
     #[serde(rename = "ldtoken")]
     LoadTypeToken(Type),
+    #[serde(rename = "ref.type")]
+    ReferenceType,
     #[serde(rename = "interface.borrow")]
     BorrowInterface(Type),
     #[serde(rename = "callvirt")]

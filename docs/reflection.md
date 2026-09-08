@@ -52,12 +52,15 @@ arity and assembly-qualified formatting. `Foo&.IsByRef` describes an addressing 
 there is no inherent value/reference classification on Foo. Wrapper signatures do not
 enumerate their target's members: use GetElementType first.
 
-Use `typeof(T)` for a declared signature. `TypeOf<T>.Of(T)` also describes declared T,
-not the concrete value behind an interface view. Dynamic reference-aware GetType is a
-follow-up: it must inspect a live initialized managed reference, identify its concrete
-target behind interface views, and return an owned descriptor without retaining the
-target. It must neither box the value nor require an Object base. It is not implemented
-by this slice, and raw pointers must not be followed implicitly for discovery.
+Use `typeof(T)` for a declared signature. `TypeOf<T>.Of(T)` also describes declared T.
+For a live initialized managed reference, Neo's `reference.GetType()` intrinsic describes
+its target, including the concrete type behind an interface view. IL uses `ref.type`
+to produce a RuntimeTypeHandle, followed by GetTypeFromHandle. An interior reference
+describes its field/element type. This creates only owned metadata, without copying
+or retaining the guest target, boxing, or requiring Object. Existing declared GetType
+methods retain normal method dispatch; the intrinsic is a fallback for managed references.
+Raw pointers and ordinary values are not implicitly addressed or followed. Uninitialized
+or expired targets fault; use typeof to inspect a signature without a live value.
 
 ## Member descriptors
 
@@ -165,7 +168,7 @@ through the current Option carrier representation. The host binding validates he
 signatures; all public descriptor accessors and Type forwarding methods are ordinary IL.
 
 Invoke, GetValue/SetValue, reflective construction, attribute discovery, inheritance,
-module enumeration, dynamic reference type discovery and metadata mutation remain
+module enumeration and metadata mutation remain
 future work. [Acceptance tests](../tests/reflection.rs) cover filtering, substitution,
 accessors, output contracts, module boundaries, serialization, resource limits, copied
 arrays and GC pressure.

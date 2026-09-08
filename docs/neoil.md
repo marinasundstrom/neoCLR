@@ -623,3 +623,8 @@ output calls can initialize the renewed slot. Neo uses this extension for repeat
 declarations and temporary values, allowing their array shapes to differ between
 iterations. It does not change stloc assignment semantics, run destructors, permit
 frame escapes, or establish lexical block cleanup.
+
+`ref.type` consumes one initialized managed reference (including an interface view)
+and produces a System.RuntimeTypeHandle describing its target. It validates the target
+without copying guest payload or retaining it in the result. It requires TypeInspection
+and SlotReferences runtime services. Ordinary values and raw pointers fault.

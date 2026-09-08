@@ -124,6 +124,7 @@ fn instruction_services(op: &Op) -> &'static [RuntimeService] {
         Op::AllocateLocal => &[FrameAllocation, PointerMemory],
         Op::PackValue(..) | Op::IsValue(..) | Op::UnpackValue(..) => &[ValueStorage],
         Op::LoadTypeToken(..) => &[TypeInspection],
+        Op::ReferenceType => &[TypeInspection, SlotReferences],
         Op::LocalAddress(..) | Op::ArgumentAddress(..) => &[SlotReferences],
         Op::LoadObject(..)
         | Op::StoreObject(..)
