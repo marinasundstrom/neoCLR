@@ -394,3 +394,17 @@ It lowers to ref.type and GetTypeFromHandle; typeof remains declared-type inspec
 The preliminary `ReferenceEquals(left, right)` intrinsic compares two explicit managed
 references by location, including concrete/interface aliases and interior paths. It
 does not dereference arguments for value comparison. See [reference identity](reference-identity.md).
+
+## Library indexers
+
+Use `list[index]` to read and `list[index] = value` to write a bundled library's
+declared single-parameter `Item` indexer. Neo resolves its public getter or setter
+from property metadata and uses virtual dispatch for interface views. Samples use
+brackets rather than calling accessor methods directly.
+
+For ArrayList<Foo&>, reading preserves the stored managed reference and assignment
+replaces that reference using the setter. `list[i].Age = 42` instead updates the
+referenced object. Value-returning indexers produce copies and are not addressable;
+`&list[i]` requires a reference-returning getter. Receiver mutability and argument
+types follow the accessor contracts. Declaring indexers in Neo and multi-argument
+indexers remain outside the current subset.

@@ -10,6 +10,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 #### Changed
 
+- Neo bracket syntax now projects bundled single-index Item getters and setters,
+  including virtual interface dispatch and reference-valued elements. Collection
+  samples use brackets instead of direct accessor calls; metadata and IL retain
+  their accessor methods. Documented setter replacement and addressability rules.
+
 - Neo now accepts checked local array extents (`let a: int[3] = [1, 2, 3]`) and
   managed heap initializer braces (`new int[3] { 1, 2, 3 }`). Nonempty
   lists require exact counts and evaluate once in order; they support element types

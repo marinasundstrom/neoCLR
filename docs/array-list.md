@@ -86,12 +86,16 @@ The ArrayList example takes a managed-reference alias and appends squares throug
 It prints `ArrayList count:`, `5`, `0`, `1`, `4`, `9`, `16`, then returns Void.
 Backing arrays are reclaimed by GC without guest cleanup.
 
+Neo uses indexer syntax for reads and writes, including through List<T>& views.
+`list[i] = item` calls the setter and replaces the stored T; for Foo& this replaces
+the reference. `list[i].Age = value` mutates the referenced Foo instead.
+
 This Neo helper demonstrates the substituted reference-element signature:
 
 ```swift
 func Append(list: System.Collections.ArrayList<Foo&>&, item: Foo&) -> int {
     list.Add(item)
-    let first = list.get_Item(0)
+    let first = list[0]
     first.Age = first.Age + 2
     return first.Age
 }

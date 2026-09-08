@@ -215,3 +215,52 @@ pub(super) fn implements(concrete: &Ty, interface: &Ty) -> Result<bool, Fault> {
     }
     Ok(false)
 }
+
+/// Resolve the declared single-index Item property, never a method naming guess.
+pub(super) fn indexer(ty: &Ty, setter: bool) -> Result<(String, crate::metadata::Function), Fault> {
+    let module = crate::library::system()?;
+    let metadata = crate::assembler::parse_type(&ty.il())?;
+    let definition = module
+        .type_definition(&metadata)
+        .ok_or_else(|| Fault::new("type has no indexer"))?;
+    let mut property = definition
+        .properties
+        .iter()
+        .find(|p| p.name == "Item" && p.instance && p.parameters.len() == 1)
+        .cloned()
+        .ok_or_else(|| Fault::new("type has no single-index Item property"))?;
+    let arguments = match &metadata {
+        Type::Constructed { arguments, .. } => arguments.as_slice(),
+        _ => &[],
+    };
+    property.map_types(|ty| ty.substitute_type_parameters(arguments))?;
+    let accessor = if setter {
+        property.setter
+    } else {
+        property.getter
+    }
+    .ok_or_else(|| {
+        Fault::new(if setter {
+            "indexer has no setter"
+        } else {
+            "indexer has no getter"
+        })
+    })?;
+    let member = accessor
+        .name
+        .rsplit('.')
+        .next()
+        .ok_or_else(|| Fault::new("invalid indexer accessor"))?;
+    let signature = format!(
+        "instance {}::{member}({})",
+        ty.il(),
+        accessor
+            .parameters
+            .iter()
+            .map(|t| Ty::from_metadata(t).map(|t| t.il()))
+            .collect::<Result<Vec<_>, _>>()?
+            .join(",")
+    );
+    let function = resolve(&signature)?;
+    Ok((signature, function))
+}

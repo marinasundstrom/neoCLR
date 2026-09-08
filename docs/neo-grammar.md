@@ -230,3 +230,8 @@ default. The length is evaluated once and checked before elements run; elements 
 once each, left to right. A dynamic count mismatch faults before element evaluation.
 Newlines and a trailing comma are allowed inside braces. Earlier array construction
 forms remain accepted.
+
+Bracket expressions also project bundled instance Item properties with one index
+parameter. Reads select the getter; direct indexed assignments select the setter.
+Interface views dispatch virtually. Only reference-returning getters can supply
+managed addresses; value-returning getters yield copies. See [library indexers](neo.md#library-indexers).

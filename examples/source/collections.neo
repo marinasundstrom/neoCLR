@@ -15,7 +15,7 @@ func Main() -> int {
     }
     let counter = new Counter(40)
     Add(view, counter)
-    let first = view.get_Item(0)
+    let first = view[0]
     first.Age = first.Age + 2
     WriteLine(counter.Age)
     WriteLine(shared.Count)

@@ -1103,6 +1103,37 @@ impl Lowerer<'_> {
             format!("{valid}:"),
         ]);
     }
+    fn indexer(
+        &mut self,
+        owner: &Expr,
+        index: &Expr,
+        value: Option<&Expr>,
+    ) -> Result<Option<Ty>, Fault> {
+        let saved = self.body.len();
+        let ty = self.expression(owner)?;
+        let target = if let Ty::Ref(target) = &ty {
+            target.as_ref()
+        } else {
+            &ty
+        };
+        if matches!(target, Ty::Array(_)) {
+            self.body.truncate(saved);
+            return Ok(None);
+        }
+        let (signature, function) =
+            library::indexer(target, value.is_some()).map_err(|e| owner.at.error(e.message))?;
+        let interface = library::is_interface(target)?;
+        self.library_receiver(owner, &ty, saved, function.receiver_byref || interface)?;
+        self.expression_for(index, &Ty::from_metadata(&function.parameters[0])?)?;
+        if let Some(value) = value {
+            self.expression_for(value, &Ty::from_metadata(&function.parameters[1])?)?;
+        }
+        self.body.push(format!(
+            "{} {signature}",
+            if interface { "callvirt" } else { "call" }
+        ));
+        Ok(Some(Ty::from_metadata(&function.returns)?))
+    }
     fn array_owner(&mut self, expression: &Expr) -> Result<Ty, Fault> {
         // Reading a local array element need not copy its whole value.
         if let ExprKind::Name(name) = &expression.kind {
@@ -1194,6 +1225,9 @@ impl Lowerer<'_> {
                 Ok(ty)
             }
             ExprKind::Index(owner, index) => {
+                if let Some(ty) = self.indexer(owner, index, None)? {
+                    return Ok(ty);
+                }
                 let owner_ty = self.array_owner(owner)?;
                 let element = Self::array_element(owner_ty, &owner.at)?;
                 self.expression_for(index, &Ty::Int)?;
@@ -1612,6 +1646,14 @@ impl Lowerer<'_> {
     fn place(&mut self, expression: &Expr, borrowing: bool) -> Result<Ty, Fault> {
         match &expression.kind {
             ExprKind::Index(owner, index) => {
+                if let Some(ty) = self.indexer(owner, index, None)? {
+                    return match ty {
+                        Ty::Ref(target) => Ok(*target),
+                        _ => Err(expression
+                            .at
+                            .error("value-returning indexer is not an addressable location")),
+                    };
+                }
                 let owner_ty = self.place(owner, borrowing)?;
                 let element = Self::array_element(owner_ty, &owner.at)?;
                 self.expression_for(index, &Ty::Int)?;
@@ -2016,6 +2058,12 @@ impl Lowerer<'_> {
                     );
                 }
                 Stmt::Assign(left, right) => {
+                    if let ExprKind::Index(owner, index) = &left.kind {
+                        if self.indexer(owner, index, Some(right))?.is_some() {
+                            self.body.push("pop".into());
+                            continue;
+                        }
+                    }
                     if let ExprKind::Name(name) = &left.kind {
                         let binding = self.binding(name, &left.at)?;
                         let rebind = matches!(binding.ty, Ty::Ref(_))
