@@ -164,7 +164,8 @@ pub(crate) fn validate_uses(linked: &Module, source: &Module) -> Result<(), Faul
         for instruction in &function.body {
             if let Instruction::Call(target)
             | Instruction::CallVirtual(target)
-            | Instruction::Construct(target) = instruction
+            | Instruction::Construct(target)
+            | Instruction::BindDelegate { target, .. } = instruction
             {
                 check_call(linked, source, target)?;
             }

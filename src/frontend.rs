@@ -230,7 +230,13 @@ struct Function {
     returns: Ty,
     body: Vec<Stmt>,
 }
+struct DelegateDeclaration {
+    name: Token,
+    parameters: Vec<Field>,
+    returns: Ty,
+}
 struct Source {
+    delegates: Vec<DelegateDeclaration>,
     interfaces: Vec<Interface>,
     records: Vec<Record>,
     functions: Vec<Function>,
@@ -504,6 +510,7 @@ impl Parser {
             "typeof",
             "default",
             "class",
+            "delegate",
             "interface",
             "readonly",
             "static",
@@ -819,6 +826,7 @@ impl Parser {
     }
     fn source(&mut self) -> Result<Source, Fault> {
         let mut source = Source {
+            delegates: Vec::new(),
             interfaces: Vec::new(),
             records: Vec::new(),
             functions: Vec::new(),
@@ -832,6 +840,17 @@ impl Parser {
                 }
                 source.console_import = true;
                 self.end_statement()?;
+            } else if self.eat("delegate") {
+                let name = self.name()?;
+                let parameters = self.fields(true)?;
+                self.expect("->")?;
+                let returns = self.ty()?;
+                self.end_statement()?;
+                source.delegates.push(DelegateDeclaration {
+                    name,
+                    parameters,
+                    returns,
+                });
             } else if self.eat("interface") {
                 let name = self.name()?;
                 self.newlines();
@@ -931,7 +950,12 @@ impl Parser {
                     .current()
                     .error("expected interface, class, record, func, or import System.Console.*"));
             }
-            if source.records.len() + source.functions.len() + source.interfaces.len() > 1024 {
+            if source.records.len()
+                + source.functions.len()
+                + source.interfaces.len()
+                + source.delegates.len()
+                > 1024
+            {
                 return Err(self.current().error("declaration limit exceeded"));
             }
             self.lines();
@@ -1249,8 +1273,13 @@ impl Parser {
                         arguments.push(self.ty()?);
                     }
                     self.expect(">")?;
-                    if !self.at("(") {
-                        return Err(self.current().error("expected generic call"));
+                    if !["(", ")", ",", ";", "\n", "}", "]", ""]
+                        .iter()
+                        .any(|token| self.at(token))
+                    {
+                        return Err(self
+                            .current()
+                            .error("expected generic call or method group"));
                     }
                     Ok(arguments)
                 })();
@@ -1511,6 +1540,20 @@ impl Lowerer<'_> {
         Ok(self.read(ty))
     }
     fn expression_for(&mut self, expression: &Expr, expected: &Ty) -> Result<Ty, Fault> {
+        if self.delegate_signature(expected)?.is_some()
+            && matches!(
+                expression.kind,
+                ExprKind::Name(_) | ExprKind::Field(_, _) | ExprKind::Generic(_, _)
+            )
+        {
+            let mut probe = self.clone();
+            if let Ok(actual) = probe.value_expression(expression) {
+                *self = probe;
+                return self.convert_reference(actual, expected, &expression.at);
+            }
+            return self.bind_delegate(&expected.il(), expression);
+        }
+
         if matches!(expected, Ty::ReadOnlyRef(_)) {
             if let ExprKind::Unary(operation, value) = &expression.kind {
                 if operation == "&" {
@@ -1998,11 +2041,273 @@ impl Lowerer<'_> {
                 .map(|(ty, _)| ty),
         }
     }
+    fn delegate_signature(&self, ty: &Ty) -> Result<Option<(Vec<Field>, Ty)>, Fault> {
+        if let Some(d) = self
+            .source
+            .delegates
+            .iter()
+            .find(|d| d.name.text == ty.il())
+        {
+            return Ok(Some((d.parameters.clone(), d.returns.clone())));
+        }
+        let Some(f) = library::delegate(ty)? else {
+            return Ok(None);
+        };
+        let parameters = f
+            .parameters
+            .iter()
+            .enumerate()
+            .map(|(i, t)| {
+                Ok(Field {
+                    name: self.function.name.clone(),
+                    ty: Ty::from_metadata(t)?,
+                    output: f.out_parameters.contains(&i),
+                    readonly: f.readonly_parameters.contains(&i),
+                })
+            })
+            .collect::<Result<Vec<_>, Fault>>()?;
+        Ok(Some((parameters, Ty::from_metadata(&f.returns)?)))
+    }
+    fn invoke_delegate(&mut self, ty: &Ty, arguments: &[Expr], at: &Token) -> Result<Ty, Fault> {
+        let target = match ty {
+            Ty::Ref(t) | Ty::ReadOnlyRef(t) => {
+                self.body.push(format!("ldobj {}", t.il()));
+                t.as_ref()
+            }
+            _ => ty,
+        };
+        let (parameters, returns) = self
+            .delegate_signature(target)?
+            .ok_or_else(|| at.error("expected delegate"))?;
+        if parameters.len() != arguments.len() {
+            return Err(at.error("argument count mismatch"));
+        }
+        for (argument, parameter) in arguments.iter().zip(&parameters) {
+            self.parameter_argument(argument, parameter)?;
+        }
+        self.body.push(format!(
+            "call instance {}::Invoke({})",
+            target.il(),
+            parameters
+                .iter()
+                .map(|p| {
+                    if self
+                        .source
+                        .delegates
+                        .iter()
+                        .any(|d| d.name.text == target.il())
+                    {
+                        p.ty.parameter_il()
+                    } else {
+                        p.ty.il()
+                    }
+                })
+                .collect::<Vec<_>>()
+                .join(",")
+        ));
+        Ok(returns)
+    }
+    fn bind_delegate(&mut self, name: &str, expression: &Expr) -> Result<Ty, Fault> {
+        let (expression, arguments) = match &expression.kind {
+            ExprKind::Generic(e, types) => (e.as_ref(), types.as_slice()),
+            _ => (expression, &[][..]),
+        };
+        let qualified = Self::qualified_name(expression);
+        let bound = qualified
+            .as_ref()
+            .and_then(|p| p.split('.').next())
+            .is_some_and(|n| self.bindings.contains_key(n));
+        let static_method = if bound {
+            None
+        } else {
+            qualified.as_ref().and_then(|path| {
+                self.source
+                    .functions
+                    .iter()
+                    .find(|f| &f.name.text == path)
+                    .map(|f| (path.clone(), f))
+                    .or_else(|| {
+                        path.rsplit_once('.').and_then(|(owner, member)| {
+                            self.source
+                                .records
+                                .iter()
+                                .find(|r| r.name.text == owner)
+                                .and_then(|r| {
+                                    r.methods
+                                        .iter()
+                                        .find(|m| m.name.text == member && m.is_static)
+                                })
+                                .map(|m| (format!("{owner}::{member}"), m))
+                        })
+                    })
+            })
+        };
+        if static_method.is_none() && !bound {
+            if let Some(path) = &qualified {
+                let path = if path == "Console.WriteLine"
+                    || (path == "WriteLine" && self.source.console_import)
+                {
+                    "System.Console.WriteLine"
+                } else {
+                    path.as_str()
+                };
+                if let Some((owner, member)) = path.rsplit_once('.') {
+                    let (parameters, _) = self
+                        .delegate_signature(&Ty::Record(name.into()))?
+                        .ok_or_else(|| expression.at.error("expected delegate"))?;
+                    let generic = if arguments.is_empty() {
+                        String::new()
+                    } else {
+                        format!(
+                            "<{}>",
+                            arguments.iter().map(Ty::il).collect::<Vec<_>>().join(",")
+                        )
+                    };
+                    let signature = format!(
+                        "{owner}::{member}{generic}({})",
+                        parameters
+                            .iter()
+                            .map(|p| p.ty.parameter_il())
+                            .collect::<Vec<_>>()
+                            .join(",")
+                    );
+                    library::resolve(&signature).map_err(|e| expression.at.error(e.message))?;
+                    self.body
+                        .push(format!("delegate.bind {name} = {signature}"));
+                    return Ok(Ty::Record(name.into()));
+                }
+            }
+        }
+        let (target, method) = if let Some(found) = static_method {
+            found
+        } else {
+            let ExprKind::Field(receiver, member) = &expression.kind else {
+                return Err(expression
+                    .at
+                    .error("delegate binding requires a source method group"));
+            };
+            let ty = self.expression(receiver)?;
+            let (Ty::Ref(target) | Ty::ReadOnlyRef(target)) = &ty else {
+                return Err(expression.at.error("bound delegate requires an explicit managed receiver; values are not implicitly copied"));
+            };
+            let interface = self
+                .source
+                .interfaces
+                .iter()
+                .any(|i| i.name.text == target.il());
+            let (owner, method) = if interface {
+                self.source.interface_method(target, &member.text)?
+            } else {
+                self.source.record_method(target, &member.text)
+            }
+            .ok_or_else(|| member.error("unknown delegate target method"))?;
+            if method.is_static {
+                return Err(member.error("static method requires type qualification"));
+            }
+            if owner != target.il() {
+                self.body.push(format!(
+                    "{} {owner}",
+                    if interface {
+                        "interface.borrow"
+                    } else {
+                        "castclass"
+                    }
+                ));
+            }
+            (format!("instance {owner}::{}", member.text), method)
+        };
+        if method.generic_parameters.len() != arguments.len() {
+            return Err(expression
+                .at
+                .error("delegate binding requires explicit closed generic arguments"));
+        }
+        let names = method
+            .generic_parameters
+            .iter()
+            .cloned()
+            .map(Some)
+            .collect::<Vec<_>>();
+        let types = arguments
+            .iter()
+            .map(|t| crate::assembler::parse_type(&t.il()))
+            .collect::<Result<Vec<_>, _>>()?;
+        let parameters = method
+            .parameters
+            .iter()
+            .map(|p| {
+                let ty = crate::assembler::bind_parameters(
+                    crate::assembler::parse_type(&p.ty.parameter_il())?,
+                    &names,
+                    true,
+                );
+                Ok(Ty::from_metadata(&ty.substitute_method_parameters(&types)?)?.il())
+            })
+            .collect::<Result<Vec<_>, Fault>>()?;
+        let generic = if arguments.is_empty() {
+            String::new()
+        } else {
+            format!(
+                "<{}>",
+                arguments.iter().map(Ty::il).collect::<Vec<_>>().join(",")
+            )
+        };
+        self.body.push(format!(
+            "delegate.bind {name} = {target}{generic}({})",
+            parameters.join(",")
+        ));
+        Ok(Ty::Record(name.into()))
+    }
     fn call(&mut self, callee: &Expr, arguments: &[Expr]) -> Result<Ty, Fault> {
         let (callee, type_arguments) = match &callee.kind {
             ExprKind::Generic(callee, types) => (callee.as_ref(), types.as_slice()),
             _ => (callee, &[][..]),
         };
+        if let Some(path) = Self::qualified_name(callee) {
+            if !path
+                .split('.')
+                .next()
+                .is_some_and(|n| self.bindings.contains_key(n))
+            {
+                let name = if type_arguments.is_empty() {
+                    path
+                } else {
+                    format!(
+                        "{path}<{}>",
+                        type_arguments
+                            .iter()
+                            .map(Ty::il)
+                            .collect::<Vec<_>>()
+                            .join(",")
+                    )
+                };
+                if self
+                    .delegate_signature(&Ty::Record(name.clone()))?
+                    .is_some()
+                {
+                    if arguments.len() != 1 {
+                        return Err(callee
+                            .at
+                            .error("delegate construction requires one method group"));
+                    }
+                    return self.bind_delegate(&name, &arguments[0]);
+                }
+            }
+        }
+        // Keep the successful speculative lowering so receiver expressions execute once.
+        let mut probe = self.clone();
+        if let Ok(ty) = probe.expression(callee) {
+            let target = match &ty {
+                Ty::Ref(t) | Ty::ReadOnlyRef(t) => t.as_ref(),
+                t => t,
+            };
+            if self.delegate_signature(target)?.is_some() {
+                if !type_arguments.is_empty() {
+                    return Err(callee.at.error("delegate invocation is not generic"));
+                }
+                *self = probe;
+                return self.invoke_delegate(&ty, arguments, &callee.at);
+            }
+        }
         if let Some(path) = Self::qualified_name(callee) {
             let bound = path
                 .split('.')
@@ -2155,9 +2460,45 @@ impl Lowerer<'_> {
             }
         }
         if !type_arguments.is_empty() {
+            if let Some((owner, member)) = Self::qualified_name(callee)
+                .as_deref()
+                .and_then(|p| p.rsplit_once('.'))
+            {
+                let method =
+                    library::generic_static(owner, member, type_arguments, arguments.len())
+                        .map_err(|e| callee.at.error(e.message))?;
+                let signature = format!(
+                    "{owner}::{member}<{}>({})",
+                    type_arguments
+                        .iter()
+                        .map(Ty::il)
+                        .collect::<Vec<_>>()
+                        .join(","),
+                    method
+                        .parameters
+                        .iter()
+                        .map(|t| Ty::from_metadata(t).map(|t| t.parameter_il()))
+                        .collect::<Result<Vec<_>, _>>()?
+                        .join(",")
+                );
+                for (index, (argument, ty)) in arguments.iter().zip(&method.parameters).enumerate()
+                {
+                    self.parameter_argument(
+                        argument,
+                        &Field {
+                            name: callee.at.clone(),
+                            ty: Ty::from_metadata(ty)?,
+                            output: method.out_parameters.contains(&index),
+                            readonly: method.readonly_parameters.contains(&index),
+                        },
+                    )?;
+                }
+                self.body.push(format!("call {signature}"));
+                return Ty::from_metadata(&method.returns);
+            }
             return Err(callee
                 .at
-                .error("generic calls currently require a source free function or static method"));
+                .error("generic calls require a free function or static method"));
         }
         let path = Self::qualified_name(callee);
         let binding = path.as_ref().and_then(|p| p.split('.').next());
@@ -2171,6 +2512,12 @@ impl Lowerer<'_> {
                 } else {
                     &ty
                 };
+                if self.delegate_signature(target)?.is_some() {
+                    if member.text != "Invoke" {
+                        return Err(member.error("delegate exposes Invoke"));
+                    }
+                    return self.invoke_delegate(&ty, arguments, member);
+                }
                 let contract = self
                     .source
                     .interfaces
@@ -3177,6 +3524,7 @@ pub fn lower_to_il_named(source: &str, document: &str) -> Result<String, Fault> 
         .map(|record| &record.name)
         .chain(source.functions.iter().map(|function| &function.name))
         .chain(source.interfaces.iter().map(|interface| &interface.name))
+        .chain(source.delegates.iter().map(|delegate| &delegate.name))
     {
         if names.insert(name.text.clone(), ()).is_some()
             || [
@@ -3211,6 +3559,27 @@ pub fn lower_to_il_named(source: &str, document: &str) -> Result<String, Fault> 
         return Err(main.name.error("Main must be parameterless"));
     }
     let mut il = String::from(".module SourceProgram\n.entry Main\n");
+    for delegate in &source.delegates {
+        let parameters = delegate
+            .parameters
+            .iter()
+            .map(|p| {
+                format!(
+                    "{}{}{} {}",
+                    if p.readonly { "readonly " } else { "" },
+                    if p.output { "out " } else { "" },
+                    p.ty.il(),
+                    p.name.text
+                )
+            })
+            .collect::<Vec<_>>()
+            .join(",");
+        il.push_str(&format!(
+            ".delegate {}\n.method instance Invoke({parameters}) -> {}\n.end\n.end\n",
+            delegate.name.text,
+            delegate.returns.il()
+        ));
+    }
     for interface in &source.interfaces {
         il.push_str(&format!(".interface {}\n", interface.name.text));
         for base in &interface.bases {

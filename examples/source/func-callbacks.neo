@@ -1,0 +1,19 @@
+import System.Console.*
+
+func Print(value: int) -> () { WriteLine(value) }
+func Noop() -> () {}
+func Increment(value: int&) -> () { value = value + 1 }
+
+func Main() -> int {
+    var values: int[2] = [41, 42]
+    System.Array.ForEach<int>(&values, Print)
+    let heap = new int[1] { 43 }
+    System.Array.ForEach<int>(heap, Print)
+
+    var value = 41
+    let increment: System.Func<int&, void> = Increment
+    increment(&value)
+    let noop: System.Func<void> = Noop
+    noop.Invoke()
+    return value
+}

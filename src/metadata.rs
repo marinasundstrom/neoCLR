@@ -245,6 +245,7 @@ pub enum Representation {
     Record,
     Runtime,
     Interface,
+    Delegate,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -629,6 +630,8 @@ pub enum Instruction {
     Switch(Vec<usize>),
     #[serde(rename = "call")]
     Call(FunctionRef),
+    #[serde(rename = "delegate.bind")]
+    BindDelegate { delegate: Type, target: FunctionRef },
     #[serde(rename = "newobj.ctor")]
     Construct(FunctionRef),
     #[serde(rename = "value.pack")]
@@ -922,6 +925,19 @@ impl Function {
         }
         for op in &mut result.body {
             match op {
+                Instruction::BindDelegate { delegate, target } => {
+                    *delegate = map(delegate)?;
+                    if let Some(owner) = &mut target.owner {
+                        *owner = map(owner)?;
+                    }
+                    for ty in target
+                        .parameters
+                        .iter_mut()
+                        .chain(&mut target.generic_arguments)
+                    {
+                        *ty = map(ty)?;
+                    }
+                }
                 Instruction::Call(target)
                 | Instruction::CallVirtual(target)
                 | Instruction::Construct(target) => {

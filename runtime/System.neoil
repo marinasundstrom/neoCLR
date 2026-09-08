@@ -53,3 +53,5 @@
 .include "System/Closable.neoil"
 
 .include "System/Reflection.neoil"
+
+.include "System/Func.neoil"

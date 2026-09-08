@@ -1,154 +1,115 @@
-# Typed delegates: contract and groundwork
+# Delegate contract and CLR comparison
 
-Status: design checkpoint, 2026-09-08. Guest delegate metadata, binding and invocation
-are **not implemented**. The executable examples below use existing interfaces.
-This contract narrows the first implementation; nullable metadata remains separate.
+Status: first runtime/IL and Neo implementation, 2026-09-08. See the
+[delegate guide](delegates.md) for the implemented surface and commands. The earlier
+[interface-adapter example](../examples/source/callback-groundwork.neo) remains
+groundwork evidence, not a delegate implementation.
 
-## Comparison with .NET
+## Reuse familiar behavior
 
-The pinned [probe](experiments/delegates-dotnet/Program.cs) checks static and closed
-generic targets, shared class receivers, copied struct receivers, virtual selection,
-private method binding, reference parameter contracts, equality, multicast and GC.
-It also checks compiler rejection of an incompatible output signature and a lambda
-capturing a ref parameter. These are observations of SDK 10.0.100/net10.0, not claims
-about every possible delegate construction API or implementation strategy.
+Delegates are the platform's shared callable abstraction. Keep CLR/.NET behavior
+unless a documented simplification fits neoCLR's existing model. Functions remain
+definitions; future language lambdas build on delegates and captured environments.
 
-.NET provides nominal typed delegates and supports static and instance targets.
-Its delegate API also provides target/method inspection and invocation lists.
-See [System.Delegate](https://learn.microsoft.com/en-us/dotnet/api/system.delegate?view=net-10.0).
-C# method-group binding to a struct instance boxes a copy; our probe verifies that
-later changes to the original struct do not change the bound receiver. This is a
-language binding rule to compare with neoCLR's explicit reference model, rather
-than a reason to introduce an inherent value/reference classification of classes.
-See [C# expressions specification](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/expressions).
-Sources consulted 2026-09-08.
+The pinned [SDK 10.0.100/net10.0 probe](experiments/delegates-dotnet/Program.cs) checks
+static and closed generic targets, shared class receivers, copied struct receivers,
+virtual selection, private binding, reference contracts, equality, multicast and GC.
+It also checks rejection of Void generic arguments, an incompatible output signature
+and a lambda capturing a ref parameter. These observations do not describe every
+possible .NET delegate construction API.
 
-neoCLR should reuse typed invocation and shared managed receiver behavior. It should
-avoid an implicit receiver copy: users explicitly choose an adapter containing a
-value if a snapshot is wanted. This preserves identity and makes lifetime decisions
-visible, at the cost of restricting which receivers can initially be retained.
+Primary sources consulted 2026-09-08:
 
-## First implementation contract
+- [System.Delegate](https://learn.microsoft.com/en-us/dotnet/api/system.delegate?view=net-10.0):
+  nominal callable types, method/target information and invocation lists.
+- [C# expressions specification](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/expressions):
+  delegate creation and value receiver binding. The probe confirms a copied boxed
+  struct receiver, unlike a shared class receiver.
+- [Func<T,TResult>](https://learn.microsoft.com/en-us/dotnet/api/system.func-2?view=net-10.0):
+  familiar input/result order; neoCLR currently omits variance.
+- [Type.MakeGenericType](https://learn.microsoft.com/en-us/dotnet/api/system.type.makegenerictype?view=net-10.0):
+  .NET rejects Void and byref generic arguments. neoCLR's existing composed type
+  model allows them, so Func<T,Void> replaces Action<T>. The benefit is one callback
+  family; the cost is an explicit API migration and no direct CLR signature match.
+- [C# lambda expressions](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/lambda-expressions):
+  captured outer variables provide the behavioral baseline for future closures.
+  Compiler-generated shared environments are the chosen direction, not implemented
+  lambda support.
+- [ldvirtftn](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.ldvirtftn?view=net-10.0):
+  the CLI resolves a virtual implementation and produces a function pointer.
 
-A delegate declaration defines a nominal callable type with an Invoke signature.
-Two declarations with identical signatures are still distinct types. The delegate
-is an immutable callable value under the existing addressing model; a managed
-reference to that value is a separate choice. No mandatory Object base or intrinsic
-reference-type bit is required. This differs from CLR delegate classes and will
-require dedicated runtime representation and tooling.
+## Binding and invocation
 
-Its internal binding has two alternatives:
+A fieldless nominal delegate definition declares exactly one bodyless public instance
+Invoke member. Generic owner parameters are supported. The representation has no
+mandatory Object base, fields, inheritance, layout controls or user-supplied body.
+It is a callable value; D& separately denotes managed delegate storage.
 
-- A concrete, closed free/static IL function, with no receiver.
-- A concrete IL instance implementation plus a valid heap-backed managed receiver.
+The internal binding is a closed FunctionRef plus either no receiver or a heap-backed
+managed receiver. No-receiver is an internal alternative, not an invalid or nullable
+address. default(D), including defaults of records containing D, is rejected.
 
-The absence of a receiver in the static alternative is structural, not a nullable
-reference slot. There is no default callable: default(D) must fault/reject until an
-explicit nullable or optional wrapper is used. A zeroed callable is never valid.
-Closed generic free/static targets use existing method type arguments; open generic
-methods cannot be invoked. Native callbacks, open-instance binding and legacy
-by-value receivers are outside the first slice.
+Signature checks include returns, parameter types, readonly, out and conditional-out
+contracts. There are no implicit signature adapters. Access is checked at binding;
+invocation does not reapply the eventual consumer's access to a private target.
+Serialized IL contains symbolic binding instructions, never forged live capabilities.
+Module-reference and visibility checks apply to binding dependencies too.
 
-Binding must check the full signature, including return type, readonly, output and
-conditional output contracts. Start with exact compatibility, without variance or
-implicit adapters. A readonly receiver cannot be bound to a mutating method.
-Access is checked at binding: a legitimate creator can hand out a callback to a
-private method, without making the method publicly accessible. A guest cannot forge
-that capability through arbitrary serialized payloads. Runtime checks must cover
-unverified IL and artifacts as well as compiler-generated code.
+Virtual/class and interface bindings resolve the implementation using existing
+dispatch rules, including explicit/default interface bodies, then retain the original
+owner through its appropriate view. Constructors, native imports, runtime InternalCall
+targets and by-value instance implementations are excluded. Invocation reuses normal
+frames and their argument, output-completion and reference-validity checks.
 
-For virtual/interface targets, select the implementation through the existing
-runtime dispatch rules and retain the original managed receiver and complete owner.
-Do not turn a base view into a copied base value. Validate explicit/default interface
-implementations and overrides before accepting this binding path. Incomplete
-construction must not become publishable through a delegate.
-
-## Lifetime and storage
-
-Copying a delegate copies its binding and shares its receiver; it does not copy the
-receiver's contents. A bound heap receiver keeps the complete allocation alive,
-including when the reference points to an interior location. Invocation must retain
-existing address validity and readonly checks. Tracing must see receivers held in
-locals, fields, arrays, erased values and other delegate-containing composites.
-
-The initial stored delegate must not capture a frame-backed receiver. Current
-neoCLR composite storage rejects frame references even when the containing adapter
-is itself local. Supporting a scoped delegate therefore needs more than another GC
-root: aggregate provenance, return/escape checks and storage contracts must evolve.
-Silently copying or promoting the receiver would change the user's chosen semantics.
-
-This restriction does not prevent passing a frame value as an ordinary reference
-argument to a static callback. Existing direct interface reference views also work
-within the owner's lifetime. Scoped frame-bound delegates are a later feature, with
-positive nested-call tests and negative return, field and heap-storage tests required.
-
-## Representation and instruction choices
-
-| Approach | Benefit | Cost / decision |
-| --- | --- | --- |
-| CLI-style ldftn/ldvirtftn followed by delegate construction | Familiar instruction pattern | Conventional construction exposes pointer/target conventions that need a new safe interpretation here. |
-| Compiler-generated interface adapters | Works today with existing dispatch and GC | Boilerplate and no shared runtime delegate contract; useful comparison baseline. |
-| Checked binding operation with a typed nominal Invoke contract | Validates receiver, permissions and closed signature together; avoids raw code pointers | New runtime/IL encoding and tool support. Preferred for the first implementation; spelling is provisional. |
-
-The CLR [ldvirtftn instruction](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.ldvirtftn?view=net-10.0)
-resolves a virtual implementation and pushes its function pointer. Reusing its name
-for a different opaque binding operation would obscure that distinction. Prefer
-ordinary call-like Invoke behavior where it fits, but settle the encoding with
-verifier and artifact tests before adding it to the documented grammar. No performance
-or allocation advantage is claimed without measurements.
-
-## Runtime audit and acceptance work
-
-| Existing area | Required delegate work |
+| Instruction choice | Outcome |
 | --- | --- |
-| TypeDef / composed Type / FunctionRef | Nominal callable kind, canonical Invoke contracts and closed member identity; reject invalid metadata. |
-| Value and ensure_heap_references | Sealed binding representation, target validation, copying and default rejection. |
-| GC tracing | Traverse retained receivers from every supported storage position, with collection-pressure and release tests. |
-| VM call and virtual dispatch | Reuse argument, readonly/output, receiver and construction checks; preserve source traces and stepping. |
-| VM reference-return checks | Keep frame capture rejected initially; recursive provenance is required before relaxing this. |
-| Reachability | Binding retains executable code even before invocation; record closed generic targets and indirect invocation explicitly. |
-| Input/artifact loading | Resolve trusted metadata, never deserialize a guest-selected live address or unchecked invocation capability. |
-| Debugger and reflection | Show signature, closed member and target identity without exposing raw native addresses. |
+| CLI ldftn/ldvirtftn and pointer-shaped construction | Not adopted: a raw code-pointer convention is unnecessary for a checked managed binding. |
+| Compiler-only interface adapters | Useful existing baseline, but lacks a common runtime callable contract. |
+| delegate.bind D = Target(...) | Implemented fused operation: validate type, method and optional managed receiver together. New encoding/tool support is the cost. |
+| call / callvirt instance D::Invoke(...) | Reused ordinary call pattern; runtime transfers into the bound method. No separate invocation opcode. |
 
-Guest reflection needs care: a free function does not have a declaring Type, and
-current MethodInfo does not describe open method generic parameters. Do not invent
-an Object owner or invalid reference to fit Delegate.Method/Target. Host/debugger
-inspection can precede a separate FunctionInfo/optional target API decision.
+No allocation or performance advantage is claimed without measurements.
 
-The next slice should implement static and heap-bound delegates end to end: metadata,
-checked binding/invocation, GC, closed reachability, debugger/source mapping, and a
-small Neo declaration/binding projection with a library callback consumer. Acceptance
-must include malformed signatures, readonly/output mismatches, inaccessible binding,
-incomplete receivers, frame-target rejection, closed generic targets, virtual/interface
-selection and collection under pressure. Existing adapter tests are evidence for the
-foundation, not substitutes for these future delegate tests.
+## Lifetime, equality and tooling
 
-## Later decisions
+A delegate copy shares its receiver. Binding never implicitly boxes, copies or
+promotes an instance. Heap targets, including interior references, keep the complete
+allocation alive through GC. Tracing follows delegates inside ordinary composites.
 
-Single-target equality could compare nominal closed delegate type, exact closed
-method and receiver reference identity (including interior path). ReferenceEquals on
-D& would separately compare delegate storage locations. This is a proposed API,
-not implemented equality behavior.
+Frame-bound receivers remain rejected, even for a delegate stored locally. Supporting
+them requires aggregate provenance and escape rules, not only GC tracing. Ordinary
+reference arguments to a static callback can point into a caller frame and retain
+the existing return/escape rules. An unpublished construction receiver cannot be bound.
 
-The .NET probe establishes a multicast baseline: invocation order, last return value
-and stopping on exception. Combining/removing lists, empty-list representation,
-variance, Delegate/MulticastDelegate hierarchy and guest introspection remain later
-contracts. Lambda capture lowering belongs in Neo after runtime lifetime rules are
-ready. Pinning, native function pointers and callback trampolines remain interop work.
+Single-target equality compares the nominal closed delegate type, exact closed method
+and receiver location, independently of readonly view permissions. Equality of D&
+storage remains reference identity. There is no new guest Equals/GetHashCode API.
 
-## Run the evidence
+Reachability reports separate retained binding targets from typed indirect Invoke
+sites. Binding targets include possible virtual/interface implementations. Invoke
+alone cannot serve as a concrete graph root. Debugger snapshots show the closed target
+and its receiver; calls use normal source frames and step/next behavior.
 
-From the repository root, with the pinned .NET SDK installed:
+Host input schemas reject live delegates, including erased delegate payloads. Host
+results can contain opaque bindings for inspection, but cannot be imported as callable
+capabilities into another execution. Guest reflection can inspect the nominal Invoke
+signature through Type's existing APIs; Delegate.Method/Target needs a later design,
+particularly because free functions have no declaring Type.
 
-```sh
-python3 docs/experiments/delegates-dotnet/verify.py
-cargo test --locked --test callback_groundwork
-cargo run --locked -- run examples/source/callback-groundwork.neo
-```
+## Validation and remaining boundaries
 
-The Neo sample prints 42 three times and returns 42. It uses interface adapters to
-show a static forwarding callback, a direct frame reference and an adapter retaining
-a heap receiver. The tests round-trip the artifact and force repeated collections
-with a four-object heap limit. Negative tests reject storing a frame target and
-returning a dead frame interface view; another test makes receiver copying explicit.
-These checks passed on 2026-09-08. They establish no new opcode or artifact contract.
+Regression coverage includes artifact round trips, closed generic targets, nominal
+mismatch without verification, readonly/output contracts, private access transfer,
+constructor/frame rejection, virtual/explicit/default interface dispatch, shared
+receiver copies, GC pressure, debugger stepping, Func<Void> and ForEach over frame
+and heap arrays. The pinned .NET probe supplies the external behavioral comparison.
+
+Multicast is not implemented. Its .NET baseline is invocation order, last return
+value and stopping on exception; combining/removing lists and empty-list representation
+need a separate slice. Scoped captures, variance, native trampolines and guest delegate
+introspection also remain separate. Nullable metadata is not introduced here.
+
+New Delegate representation and delegate.bind artifacts require this runtime; existing
+artifacts remain compatible. Rust consumers exhaustively matching Representation,
+Instruction or Value need new cases. Reachability adds binding/indirect-site fields.
+Neo reserves delegate; its standalone grammar is synchronized with the current guide.

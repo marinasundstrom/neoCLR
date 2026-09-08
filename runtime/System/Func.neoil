@@ -1,0 +1,54 @@
+; One family: TResult may be Void. No separate Action family is required.
+.delegate System.Func<TResult>
+    .method instance Invoke() -> TResult
+    .end
+.end
+
+.delegate System.Func<T1,TResult>
+    .method instance Invoke(T1 arg1) -> TResult
+    .end
+.end
+
+.delegate System.Func<T1,T2,TResult>
+    .method instance Invoke(T1 arg1,T2 arg2) -> TResult
+    .end
+.end
+
+.delegate System.Func<T1,T2,T3,TResult>
+    .method instance Invoke(T1 arg1,T2 arg2,T3 arg3) -> TResult
+    .end
+.end
+
+.delegate System.Func<T1,T2,T3,T4,TResult>
+    .method instance Invoke(T1 arg1,T2 arg2,T3 arg3,T4 arg4) -> TResult
+    .end
+.end
+
+; Managed-array callback consumer, independent of the legacy native Array<T> buffer.
+.type System.Array
+    .method static ForEach<T>(readonly T[]& array, System.Func<T,Void> action) -> Void
+        .local Int32 index
+        ldc.i4 0
+        stloc index
+        br Test
+    Body:
+        ldarg action
+        ldarg array
+        ldloc index
+        ldelem T
+        call instance System.Func<T,Void>::Invoke(T)
+        pop
+        ldloc index
+        ldc.i4 1
+        add
+        stloc index
+    Test:
+        ldloc index
+        ldarg array
+        ldlen
+        conv.i4
+        blt Body
+        ldvoid
+        ret
+    .end
+.end

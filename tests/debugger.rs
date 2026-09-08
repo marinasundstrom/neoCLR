@@ -402,3 +402,55 @@ fn default_interface_breakpoint_shows_original_receiver_and_steps_into_explicit_
     debugger.command(DebugCommand::Stop).unwrap();
     worker.join().unwrap();
 }
+
+#[test]
+fn delegate_call_enters_target_and_next_preserves_caller_source() {
+    let source = "delegate Reader() -> int
+class Counter { var Value: int = 42; readonly func Read() -> int { return this.Value } }
+func Main() -> int {
+ let counter = new Counter()
+ let callback = Reader(counter.Read)
+ let result = callback()
+ return result
+}";
+    let module = frontend::compile_named(source, "delegates.neo").unwrap();
+    let main = module.functions.iter().find(|f| f.name == "Main").unwrap();
+    let pc = main
+        .body
+        .iter()
+        .position(
+            |op| matches!(op, neoclr::metadata::Instruction::Call(t) if t.name == "Reader.Invoke"),
+        )
+        .unwrap();
+    for step in [true, false] {
+        let (debugger, worker) = launch(module.clone(), Limits::default());
+        debugger
+            .command(DebugCommand::Break(Breakpoint::Instruction {
+                function: "Main".into(),
+                instruction: pc,
+            }))
+            .unwrap();
+        let stopped = act(&debugger, DebugCommand::Continue);
+        let callback = stopped.frames[0]
+            .locals
+            .iter()
+            .find(|(_, v)| v.value.contains("delegate Counter.Read"))
+            .unwrap();
+        assert!(callback.1.value.contains("delegate Counter.Read"));
+        assert!(callback.1.children[0].1.value.contains("heap#"));
+        debugger.command(DebugCommand::ClearBreakpoints).unwrap();
+        if step {
+            let entered = act(&debugger, DebugCommand::Step);
+            assert_eq!(entered.frames[0].function, "Counter.Read");
+            assert_eq!(entered.frames.len(), 2);
+            assert_eq!(entered.frames[1].source.as_ref().unwrap().line, 6);
+            act(&debugger, DebugCommand::Out);
+        } else {
+            let next = act(&debugger, DebugCommand::Next);
+            assert_eq!(next.frames.len(), 1);
+            assert_eq!(next.frames[0].source.as_ref().unwrap().line, 7);
+        }
+        assert_eq!(act(&debugger, DebugCommand::Continue).status, "completed");
+        worker.join().unwrap();
+    }
+}

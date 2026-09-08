@@ -668,3 +668,21 @@ support abstract records. Class callvirt dispatches through managed base views; 
 
 See [managed constructor chaining](constructor-chaining.md) for byref .ctor receivers,
 base/this call validation, partial initialization and managed stfld writes.
+
+
+## Managed delegates
+
+`.delegate Name<T>` declares a fieldless nominal callable with exactly one bodyless
+public `.method instance Invoke(...) -> R`. It has no base, instance fields or
+layout overrides. Generic owner parameters are substituted normally.
+
+`delegate.bind D = Target(...)` pushes D. For an instance target it first consumes
+one heap-backed managed receiver. For a static target it consumes none. Binding
+checks the exact invocation contract and access; virtual/interface selection retains
+the concrete owner. `call instance D::Invoke(...)` and `callvirt` consume D followed
+by its arguments and push R, using the ordinary call frame and output rules.
+`ldobj D` reads callable storage through D&. No default/null callable is manufactured.
+
+See [delegates](delegates.md) for examples, Func<Void>, lifetime restrictions and the
+[CLR instruction comparison](delegate-contract.md). delegate.bind is a new opcode;
+Invoke reuses call/callvirt.

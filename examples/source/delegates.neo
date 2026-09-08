@@ -1,0 +1,27 @@
+import System.Console.*
+
+delegate Transform(value: int) -> int
+
+class Counter {
+    var Value: int
+    init(value: int) { this.Value = value }
+    func Add(amount: int) -> int {
+        this.Value = this.Value + amount
+        return this.Value
+    }
+}
+func Identity<T>(value: T) -> T { return value }
+func Apply(callback: Transform, value: int) -> int {
+    return callback(value)
+}
+func MakeCallback() -> Transform {
+    let counter = new Counter(40)
+    return counter.Add
+}
+func Main() -> int {
+    let identity: Transform = Identity<int>
+    WriteLine(Apply(identity, 42))
+    let callback = MakeCallback()
+    WriteLine(callback.Invoke(1))
+    return callback(1)
+}

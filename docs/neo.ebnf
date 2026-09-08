@@ -1,17 +1,29 @@
 (* Neo concept language: implemented subset. *)
 program          = separators, { declaration, separators }, end_of_input ;
-declaration      = import_decl | record_decl | interface_decl | function_decl ;
+declaration      = delegate_decl | import_decl | class_decl | record_decl | interface_decl | function_decl ;
+delegate_decl    = "delegate", identifier, parameter_list, "->", type, terminator ;
 import_decl      = "import", "System", ".", "Console", ".", "*", terminator ;
+class_decl       = [ "abstract" ], "class", identifier, [ ":", type, { ",", type } ],
+                   newlines, "{", separators, { class_member, separators }, "}" ;
+class_member     = class_field | record_member ;
+class_field      = "var", identifier, ":", type, [ "=", expression ], terminator ;
 record_decl      = [ "abstract" ], "record", identifier, field_list, [ ":", type, { ",", type } ],
                    (terminator | newlines, "{", separators, { record_member, separators }, "}") ;
-record_member    = init_decl | [ "readonly" ], [ "abstract" ], [ "virtual" | "override" ], method_decl ;
+record_member    = init_decl | explicit_method | "static", generic_function_member | [ "readonly" ], [ "abstract" ], [ "virtual" | "override" ], method_decl ;
 init_decl        = "init", parameter_list, [ ":", "base", "(", newlines, [ expression, { ",", newlines, expression } ], newlines, ")" ],
                    newlines, "{", separators, { statement, separators }, "}" ;
 interface_decl   = "interface", identifier, [ ":", type, { ",", type } ], newlines, "{", separators,
-                   { [ "readonly" ], "func", identifier, parameter_list, "->", type, terminator, separators }, "}" ;
+                   { interface_member, separators }, "}" ;
+interface_member = [ "readonly" ], [ "abstract" ], "func", identifier,
+                   [ ".", identifier ], parameter_list, "->", type,
+                   (terminator | block) ;
 method_decl      = "func", identifier, parameter_list, "->", type,
                    (terminator | newlines, "{", separators, { statement, separators }, "}") ;
-function_decl    = "func", identifier, parameter_list, "->", type, newlines,
+explicit_method  = [ "readonly" ], "func", identifier, ".", identifier,
+                   parameter_list, "->", type, newlines, block ;
+generic_parameters = "<", identifier, { ",", identifier }, ">" ;
+generic_function_member = "func", identifier, [ generic_parameters ], parameter_list, "->", type, newlines, block ;
+function_decl    = "func", qualified_name, [ generic_parameters ], parameter_list, "->", type, newlines,
                    "{", separators, { statement, separators }, "}" ;
 field_list       = "(", newlines,
                    [ field, newlines, { ",", newlines, field, newlines } ], ")" ;
@@ -49,7 +61,7 @@ unary            = ("&" | "-" | "!" | "new"), unary
                  | "new", type, "[", expression, "]", [ array_initializer ] | postfix ;
 array_initializer = "{", newlines, [ expression, newlines,
                     { ",", newlines, expression, newlines }, [ ",", newlines ] ], "}" ;
-postfix          = primary, { ".", identifier | arguments | "[", expression, "]" } ;
+postfix          = primary, { ".", identifier | arguments | "<", type, { ",", type }, ">" | "[", expression, "]" } ;
 arguments        = "(", newlines,
                    [ argument, newlines,
                      { ",", newlines, argument, newlines } ], ")" ;
@@ -57,7 +69,7 @@ argument         = [ "out" ], expression ;
 generic_member   = qualified_name, "<", type, { ",", type }, ">", ".", identifier ;
 primary          = generic_member | integer | string | "true" | "false" | "this" | identifier
                  | "[", newlines, expression, newlines, { ",", newlines, expression, newlines }, "]"
-                 | "typeof", "(", newlines, type, newlines, ")"
+                 | ("typeof" | "default"), "(", newlines, type, newlines, ")"
                  | "(", newlines, expression, newlines, ")" ;
 
 terminator       = separator, { separator }

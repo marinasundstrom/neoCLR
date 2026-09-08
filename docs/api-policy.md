@@ -130,3 +130,10 @@ primarily by language analysis and verification. The current interpreter still c
 invalid reads and reference use; future verified backends may remove checks proven
 unnecessary. This does not introduce a universal local-slot initialization feature
 or relax managed-reference lifetime validity. Nullable metadata is a separate slice.
+
+
+Delegate APIs retain Invoke and Func's input/result ordering. Because Void is an
+ordinary generic argument, Func<T,Void> replaces Action<T>; there is no separate
+Action family. This reduces duplicate API families but requires a mapping when
+porting .NET APIs. Closures will use compiler-generated captured environments and
+delegates, following the C# model. See [the contract](delegate-contract.md).

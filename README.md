@@ -514,3 +514,15 @@ cargo run --locked -- debug examples/source/debugger.neo
 Use `source`, `bt`, `stack`, `heap`, `step`, `next` and `continue`. `watch` enables
 live inspection; `pause` freezes execution at an instruction boundary. Neo source
 locations and local labels survive compilation into JSON artifacts.
+
+
+### Managed callbacks
+
+[Delegates](docs/delegates.md) provide checked static/heap-bound callbacks with ordinary
+Invoke calls. Neo automatically wraps method groups when a delegate type is expected
+and uses function-style invocation. The Func family includes Void results, so
+Array.ForEach takes Func<T,Void> instead of a separate Action<T> delegate.
+
+```sh
+cargo run --locked -- run examples/source/func-callbacks.neo
+```

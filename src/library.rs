@@ -96,7 +96,8 @@ pub(crate) fn bind_member_references(module: &mut Module) -> Result<(), Fault> {
         for (pc, op) in definition.body.iter().enumerate() {
             if let crate::metadata::Instruction::Call(target)
             | crate::metadata::Instruction::CallVirtual(target)
-            | crate::metadata::Instruction::Construct(target) = op
+            | crate::metadata::Instruction::Construct(target)
+            | crate::metadata::Instruction::BindDelegate { target, .. } = op
             {
                 let identity = crate::vm::resolve(module, target)?.definition;
                 calls.push((function, pc, identity));
@@ -106,7 +107,8 @@ pub(crate) fn bind_member_references(module: &mut Module) -> Result<(), Fault> {
     for (function, pc, identity) in calls {
         if let crate::metadata::Instruction::Call(target)
         | crate::metadata::Instruction::CallVirtual(target)
-        | crate::metadata::Instruction::Construct(target) =
+        | crate::metadata::Instruction::Construct(target)
+        | crate::metadata::Instruction::BindDelegate { target, .. } =
             &mut module.functions[function].body[pc]
         {
             target.definition = identity;

@@ -112,6 +112,7 @@ impl LoadedProgram {
             || function.is_internal_call()
             || function.pinvoke.is_some()
             || crate::interfaces::is_contract(&self.module, &function)
+            || crate::delegates::is_contract(&self.module, &function)
         {
             return Err(Fault::new(
                 "host invocation currently requires an IL function; use an IL wrapper for native declarations",

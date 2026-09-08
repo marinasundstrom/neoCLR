@@ -196,7 +196,9 @@ fn validate_methods(module: &Module) -> Result<(), Fault> {
         values.iter().copied().collect()
     }
     for method in &module.functions {
-        if crate::interfaces::is_contract(module, method) {
+        if crate::interfaces::is_contract(module, method)
+            || crate::delegates::is_contract(module, method)
+        {
             continue;
         }
         if method.is_abstract

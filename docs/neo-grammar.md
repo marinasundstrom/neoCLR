@@ -14,7 +14,8 @@ There are no empty statements apart from separators.
 
 ```ebnf
 program          = separators, { declaration, separators }, end_of_input ;
-declaration      = import_decl | class_decl | record_decl | interface_decl | function_decl ;
+declaration      = delegate_decl | import_decl | class_decl | record_decl | interface_decl | function_decl ;
+delegate_decl    = "delegate", identifier, parameter_list, "->", type, terminator ;
 import_decl      = "import", "System", ".", "Console", ".", "*", terminator ;
 class_decl       = [ "abstract" ], "class", identifier, [ ":", type, { ",", type } ],
                    newlines, "{", separators, { class_member, separators }, "}" ;
@@ -90,7 +91,7 @@ unary            = ("&" | "-" | "!" | "new"), unary
                  | "new", type, "[", expression, "]", [ array_initializer ] | postfix ;
 array_initializer = "{", newlines, [ expression, newlines,
                     { ",", newlines, expression, newlines }, [ ",", newlines ] ], "}" ;
-postfix          = primary, { ".", identifier | arguments | "<", type, { ",", type }, ">", arguments | "[", expression, "]" } ;
+postfix          = primary, { ".", identifier | arguments | "<", type, { ",", type }, ">" | "[", expression, "]" } ;
 arguments        = "(", newlines,
                    [ argument, newlines,
                      { ",", newlines, argument, newlines } ], ")" ;
@@ -310,3 +311,13 @@ before the body, and outside constructor parameter scope. See [classes and defau
 contextual bare default literal is added. It does not run constructors. Types without
 valid defaults, including non-nullable managed references, are rejected. Nullable
 signatures and null literals remain unimplemented.
+
+
+Delegate declarations are nominal. Explicit construction accepts a source method group,
+for example `Transform(counter.Add)` or `System.Func<int, void>(Print)`.
+Generic target methods require explicit type arguments. A generic method group without
+an immediate invocation is accepted in a delegate construction argument or where an
+expected delegate type supplies context (parameters, typed bindings and returns).
+Delegate-valued expressions support `callback(args)`, including fields and returned
+callables; `value.Invoke(args)` also works through managed references. Custom source declarations are nongeneric in this slice; bundled
+generic Func and generic IL declarations are supported. Lambda syntax remains planned. See [delegates](delegates.md).

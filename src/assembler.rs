@@ -494,6 +494,14 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                             }
                             Some(serde_json::json!(targets))
                         }
+                        "delegate.bind" => {
+                            let (ty, target) = rest.split_once(" = ").ok_or_else(|| {
+                                Fault::new("expected delegate.bind Type = Target(...)")
+                            })?;
+                            Some(
+                                serde_json::json!({"delegate": parse_type(ty.trim())?, "target": parse_function_ref(target.trim())?}),
+                            )
+                        }
                         "call" | "callvirt" | "newobj.ctor" => Some(
                             serde_json::to_value(parse_function_ref(rest)?)
                                 .map_err(|e| Fault::new(e.to_string()))?,
@@ -574,7 +582,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     }
                     module.revision = Some(rest.into());
                 }
-                ".type" | ".interface" => {
+                ".type" | ".interface" | ".delegate" => {
                     let (visibility, rest) = match rest.split_once(char::is_whitespace) {
                         Some(("public", rest)) => {
                             (crate::metadata::Visibility::Public, rest.trim())
@@ -628,7 +636,9 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         properties: vec![],
                         packing: None,
                         minimum_size: None,
-                        representation: if word == ".interface" {
+                        representation: if word == ".delegate" {
+                            Representation::Delegate
+                        } else if word == ".interface" {
                             Representation::Interface
                         } else if ty.is_primitive() {
                             Representation::Runtime

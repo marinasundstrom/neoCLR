@@ -159,6 +159,7 @@ pub(crate) fn trace(value: &Value, references: &mut Vec<usize>) {
     let mut pending = vec![value];
     while let Some(value) = pending.pop() {
         match value {
+            Value::Delegate(d) => pending.extend(d.receiver.as_deref()),
             Value::SlotReference(reference)
             | Value::SlotInterface {
                 receiver: reference,

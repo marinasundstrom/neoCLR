@@ -298,6 +298,9 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         if def.name.is_empty() || !names.insert((&def.name, def.generic_parameters.len())) {
             return Err(Fault::new("empty or duplicate type name"));
         }
+        if def.representation == Representation::Delegate {
+            crate::delegates::contract(module, &def.open_type())?;
+        }
         let ty = Type::from_name(&def.name);
         if ty.definition_name() != Some(def.name.as_str()) {
             return Err(Fault::new("type definitions must use canonical names"));
@@ -327,7 +330,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         if !def.generic_parameters.is_empty()
             && (!matches!(
                 def.representation,
-                Representation::Record | Representation::Interface
+                Representation::Record | Representation::Interface | Representation::Delegate
             ) || matches!(
                 def.name.as_str(),
                 "Option" | "Result" | "Ref" | "Ptr" | "InterfaceRef"
@@ -598,6 +601,10 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         if arity > 0 && (function.pinvoke.is_some() || function.impl_flags != 0) {
             return Err(Fault::new("generic owners require IL methods"));
         }
+        if crate::delegates::is_contract(module, function) {
+            crate::delegates::contract(module, function.owner.as_ref().unwrap())?;
+            continue;
+        }
         if crate::interfaces::is_contract(module, function) {
             crate::interfaces::validate_contract(function)?;
             if crate::interfaces::is_bodyless(module, function) {
@@ -697,6 +704,16 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                         "cannot rebind or take the address of a managed reference parameter",
                     ));
                 }
+                Op::BindDelegate { delegate, target } => {
+                    check(delegate)?;
+                    if let Some(owner) = &target.owner {
+                        check(owner)?;
+                    }
+                    for ty in target.parameters.iter().chain(&target.generic_arguments) {
+                        check(ty)?;
+                    }
+                    crate::delegates::validate_binding(module, function, delegate, target)?;
+                }
                 Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {
                     if let Some(owner) = &target.owner {
                         check(owner)?;
@@ -713,10 +730,11 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                             || !callee.interface_implementations.is_empty()))
                         || (matches!(op, Op::CallVirtual(_))
                             && !crate::interfaces::is_contract(module, &callee)
-                            && !callee.is_virtual)
+                            && !callee.is_virtual
+                            && !crate::delegates::is_contract(module, &callee))
                     {
                         return Err(Fault::new(
-                            "callvirt requires an interface declaration or a virtual record method",
+                            "callvirt requires a delegate Invoke, interface declaration or virtual record method",
                         ));
                     }
                     if matches!(op, Op::Construct(_)) {
@@ -1675,6 +1693,38 @@ fn interpret_instructions(
                     };
                     frame.stack.push(view);
                 }
+                Op::Call(target) | Op::CallVirtual(target)
+                    if target.instance
+                        && match &target.owner {
+                            Some(owner) => module
+                                .type_definition(owner)
+                                .is_some_and(|d| d.representation == Representation::Delegate),
+                            None => {
+                                crate::delegates::is_contract(module, &resolve(module, target)?)
+                            }
+                        } =>
+                {
+                    let signature = resolve(module, target)?;
+                    crate::access::check_call(module, Some(&function), &signature)?;
+                    let ty = signature.owner.as_ref().unwrap();
+                    let mut args = frame.args(&signature.argument_types()[1..])?;
+                    let Value::Delegate(binding) = frame.pop()? else {
+                        return Err(Fault::new("Invoke requires a delegate value"));
+                    };
+                    if &binding.ty != ty {
+                        return Err(Fault::new("delegate nominal type mismatch"));
+                    }
+                    let callee = resolve(module, &binding.target)?;
+                    crate::delegates::compatible(&signature, &callee)?;
+                    if let Some(receiver) = binding.receiver {
+                        receiver.ensure_heap_references()?;
+                        args.insert(0, *receiver);
+                    }
+                    if frames.len() >= limits.frames {
+                        return Err(Fault::new("frame limit exceeded"));
+                    }
+                    frames.push(Frame::new(callee, args)?);
+                }
                 Op::CallVirtual(target) => {
                     let contract = resolve(module, target)?;
                     crate::access::check_call(module, Some(&function), &contract)?;
@@ -1872,6 +1922,16 @@ fn interpret_instructions(
                         );
                     }
                     frames.push(child);
+                }
+                Op::BindDelegate { delegate, target } => {
+                    let receiver = if target.instance {
+                        Some(frame.pop()?)
+                    } else {
+                        None
+                    };
+                    let value =
+                        crate::delegates::bind(module, &function, delegate, target, receiver)?;
+                    frame.stack.push(value);
                 }
                 Op::Call(target) => {
                     let callee = resolve(module, target)?;
@@ -2465,6 +2525,18 @@ fn debug_value(
         ..Default::default()
     };
     match value {
+        Value::Delegate(binding) => {
+            result.value = debug_text(&format!(
+                "delegate {}<{:?}>",
+                binding.target.name, binding.target.generic_arguments
+            ));
+            if let Some(receiver) = &binding.receiver {
+                result.children.push((
+                    "target".into(),
+                    debug_value(module, frames, receiver, depth + 1, budget),
+                ));
+            }
+        }
         Value::Object { ty, fields } => {
             result.value = format!("record ({} fields)", fields.len());
             let names = module.instantiated_fields(ty).unwrap_or_default();

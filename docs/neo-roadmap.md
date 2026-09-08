@@ -204,11 +204,10 @@ Keep the upcoming work separate:
    body-declared fields, field initializers and bounded constructor synthesis. Broader
    automatic initialization depends on runtime nullability/defaultability; reference
    slots must never receive an invalid reference as a default.
-2. Implement the [runtime delegate contract](delegate-contract.md) and a typed
-   callback consumer. Design probes and interface-adapter groundwork are in place;
-   guest delegates remain unimplemented. Start with static and heap-bound targets.
-   Delegates are the common callable abstraction; ordinary functions remain definitions.
-3. Language method-group conversions and lambdas built on delegates, after capture
+2. [Runtime delegates](delegates.md), contextual Neo method-group conversion, Func
+   (including Void results) and Array.ForEach are implemented. Ordinary functions
+   remain definitions; nullable metadata remains separate.
+3. C#-style lambdas/environments built on delegates, after capture
    modes and escaping managed lifetimes have a validated runtime contract.
 
 These are bounded explorations, not a commitment to turn Neo into a full compiler.

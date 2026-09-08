@@ -5,6 +5,8 @@ static class Probe
 {
     public static void Run()
     {
+        try { typeof(Func<>).MakeGenericType(typeof(void)); throw new Exception("expected void type argument rejection"); }
+        catch (ArgumentException) { }
         Func<int, int> identity = Identity<int>;
         Check(identity(42) == 42 && identity.Target is null, "static and closed generic target");
         var owner = new Counter { Value = 1 };

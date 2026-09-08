@@ -462,3 +462,23 @@ run constructors or field initializers and cannot create an invalid managed refe
 Nullability remains a separate runtime feature to implement. Constructor synthesis is
 Neo policy; runtime initialization, reference validity and lifetime rules remain
 mandatory across languages. See [the responsibility boundary](api-policy.md#runtime-guarantees-and-language-policy).
+
+
+## Delegates
+
+Declare `delegate Transform(value: int) -> int`, then bind a method explicitly with
+`Transform(Identity<int>)` or `Transform(counter.Add)`. Call a delegate variable
+directly or use `.Invoke(...)`. The library provides `System.Func<T..., TResult>`,
+including `System.Func<int, void>` in place of Action<int>. Generic bundled static
+calls accept explicit type arguments when name/arity selects one method.
+
+Run `cargo run --locked -- run examples/source/func-callbacks.neo` for frame/heap
+array ForEach and a reference callback. See [delegates](delegates.md) for contracts
+and limitations; lambdas are a later compiler slice.
+
+
+Expected delegate types also wrap matching method groups automatically, including
+`System.Array.ForEach<int>(&values, Print)` and
+`let callback: System.Func<int, void> = Print`. Delegate-valued fields and returned
+expressions use the same call syntax: `holder.Callback(42)`, `MakeCallback()(42)`.
+Receiver expressions are evaluated once.

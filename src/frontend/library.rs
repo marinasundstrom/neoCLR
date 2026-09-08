@@ -314,3 +314,53 @@ pub(super) fn indexer(ty: &Ty, setter: bool) -> Result<(String, crate::metadata:
     let function = resolve(&signature)?;
     Ok((signature, function))
 }
+
+pub(super) fn delegate(ty: &Ty) -> Result<Option<crate::metadata::Function>, Fault> {
+    let module = crate::library::system()?;
+    let ty = crate::assembler::parse_type(&ty.il())?;
+    if module
+        .type_definition(&ty)
+        .is_some_and(|d| d.representation == crate::metadata::Representation::Delegate)
+    {
+        crate::delegates::contract(module, &ty).map(Some)
+    } else {
+        Ok(None)
+    }
+}
+
+/// Explicit generic arguments and a unique declared arity provide argument context.
+pub(super) fn generic_static(
+    owner: &str,
+    member: &str,
+    arguments: &[Ty],
+    count: usize,
+) -> Result<crate::metadata::Function, Fault> {
+    let module = crate::library::system()?;
+    let owner = crate::assembler::parse_type(owner)?;
+    let def = module
+        .type_definition(&owner)
+        .ok_or_else(|| Fault::new("unknown static owner"))?;
+    let mut methods = module.functions.iter().filter(|f| {
+        !f.instance
+            && f.owner.as_ref() == Some(&def.open_type())
+            && f.name.rsplit('.').next() == Some(member)
+            && f.parameters.len() == count
+            && f.generic_parameters.len() == arguments.len()
+            && f.visibility == Visibility::Public
+    });
+    let method = methods
+        .next()
+        .ok_or_else(|| Fault::new("unknown generic static method"))?;
+    if methods.next().is_some() {
+        return Err(Fault::new("ambiguous generic static method"));
+    }
+    let type_arguments = match &owner {
+        Type::Constructed { arguments, .. } => arguments.as_slice(),
+        _ => &[],
+    };
+    let arguments = arguments
+        .iter()
+        .map(|t| crate::assembler::parse_type(&t.il()))
+        .collect::<Result<Vec<_>, _>>()?;
+    method.map_types(|t| t.substitute_parameters(Some(type_arguments), Some(&arguments)))
+}

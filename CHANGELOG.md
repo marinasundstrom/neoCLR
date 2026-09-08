@@ -19,14 +19,21 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Base-first initializer ordering deliberately differs from C#. Nullability remains
   planned; class/default become reserved words, with no opcode/artifact change.
 
-- Recorded delegates as the planned shared runtime callable abstraction, with
+- Added delegates as the shared runtime callable abstraction, with
   language function values/lambdas built upon them. Excluded a separate universal
   function-object runtime model. Added a typed-delegate contract/runtime audit, pinned
   .NET behavioral probes and runnable Neo interface-adapter lifetime/GC tests. The
-  proposed first implementation retains heap receivers without implicit copying;
-  scoped frame captures and multicast remain later work. Guest delegate metadata
-  and opcodes are not implemented. Aligned platform/Neo roadmaps with separate class
-  syntax/default-constructor and delegate slices, and the compiler inference role.
+  implementation now adds nominal generic IL delegates, checked delegate.bind and
+  ordinary Invoke calls, with heap receiver retention, virtual/interface binding,
+  reference/output checks, GC tracing, source debugging and separate binding edges
+  in closed call graphs. Neo adds delegate declarations, explicit source method-group
+  binding, contextual method-group conversion and function-style invocation of
+  delegate expressions. Bundled Func supports zero to four inputs, including Void
+  results instead of a separate Action family; Array.ForEach consumes Func<T,Void>.
+  Added samples, grammar synchronization and regression coverage. New delegate
+  artifacts require this runtime; Rust exhaustive enum matches need updating.
+  Scoped captures, lambdas, multicast, variance and nullable metadata remain later
+  work. Aligned platform/Neo roadmaps and the compiler inference role.
 
 - Generic free functions and static methods across runtime/IL and Neo, with independent
   method parameters, explicit type arguments, simultaneous owner/method substitution, verification,

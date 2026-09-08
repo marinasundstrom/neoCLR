@@ -4,6 +4,7 @@ use crate::metadata::Type;
 pub enum Value {
     /// Internal reserved array slot; guest element reads fault until initialized.
     Uninitialized(Type),
+    Delegate(crate::Delegate),
     Void,
     Single(f32),
     Double(f64),
@@ -61,6 +62,7 @@ impl Value {
         let mut pending = vec![self];
         while let Some(value) = pending.pop() {
             match value {
+                Self::Delegate(d) => pending.extend(d.receiver.as_deref()),
                 Self::SlotReference(reference)
                 | Self::SlotInterface {
                     receiver: reference,
@@ -125,6 +127,7 @@ impl Value {
     pub fn ty(&self) -> Type {
         match self {
             Self::Uninitialized(ty) => ty.clone(),
+            Self::Delegate(d) => d.ty.clone(),
             Self::Void => Type::Void,
             Self::Single(_) => Type::Single,
             Self::Double(_) => Type::Double,

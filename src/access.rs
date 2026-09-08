@@ -254,7 +254,8 @@ pub(crate) fn validate_types(module: &Module) -> Result<(), Fault> {
         for op in &function.body {
             if let crate::metadata::Instruction::Call(target)
             | crate::metadata::Instruction::CallVirtual(target)
-            | crate::metadata::Instruction::Construct(target) = op
+            | crate::metadata::Instruction::Construct(target)
+            | crate::metadata::Instruction::BindDelegate { target, .. } = op
             {
                 check_signature(module, source, &crate::vm::resolve(module, target)?)?;
             }

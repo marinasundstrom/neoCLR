@@ -44,7 +44,8 @@ pub(crate) fn analyze(module: &Module) -> Result<Verification, Fault> {
     }
     let mut functions = Vec::new();
     for (index, function) in module.functions.iter().enumerate() {
-        if function.is_abstract
+        if crate::delegates::is_contract(module, function)
+            || function.is_abstract
             || function.is_internal_call()
             || function.pinvoke.is_some()
             || crate::interfaces::is_bodyless(module, function)
@@ -618,6 +619,7 @@ fn effect(
         CreateArray(_) | ArrayElement(_) | ArrayAddress(_) => (2, 1),
         StoreArrayElement(_) => (3, 0),
         New(ty) => (crate::vm::record_fields(module, ty, arity)?.len(), 1),
+        BindDelegate { target, .. } => (usize::from(target.instance), 1),
         Call(target) | CallVirtual(target) => {
             (target.parameters.len() + usize::from(target.instance), 1)
         }
@@ -947,8 +949,29 @@ fn typed_effect(
                 "interface.borrow requires a typed pointer or managed slot reference",
             )),
         },
+        BindDelegate { delegate, target } => {
+            let callee = crate::delegates::validate_binding(module, function, delegate, target)?;
+            if callee.instance {
+                let owner = callee.owner.as_ref().unwrap();
+                stored(
+                    &values[0],
+                    &if callee.receiver_readonly {
+                        T::ReadOnlyByRef(Box::new(owner.clone()))
+                    } else {
+                        T::ByRef(Box::new(owner.clone()))
+                    },
+                )?;
+            }
+            one(delegate.clone())
+        }
         CallVirtual(target) => {
             let callee = crate::vm::resolve(module, target)?;
+            if crate::delegates::is_contract(module, &callee) {
+                for (value, ty) in values.iter().zip(callee.argument_types()) {
+                    stored(value, &ty)?;
+                }
+                return Ok(vec![loaded(&callee.returns)]);
+            }
             let interface = callee
                 .owner
                 .clone()

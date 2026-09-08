@@ -80,3 +80,11 @@ instead of silently omitting potential targets. See [interfaces](interfaces.md).
 
 Reachable function nodes also carry receiver_byref, out_parameters and out_when_true
 indices so backend planning preserves reference receiver and output contracts.
+
+
+Delegate binding dependencies are reported in `ReachableFunction.bindings`, separate
+from direct `calls`. `delegate_invocations` records (instruction, closed delegate
+type) for indirect Invoke sites. Backends must retain binding edges as executable
+dependencies; an Invoke site does not identify a unique target. Virtual/interface
+binding conservatively includes dispatch candidates. An Invoke declaration alone
+is not a concrete analysis root.
