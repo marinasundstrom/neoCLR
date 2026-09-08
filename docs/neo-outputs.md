@@ -74,3 +74,13 @@ Run `cargo run -- run examples/source/outputs.neo`. It prints 42 and Counter and
 returns 42, demonstrating forwarding, writing through an existing field reference,
 and conditional type metadata extraction. See [runtime slots](reference-slots.md),
 [API contracts](api-design.md), and [tests](../tests/neo_outputs.rs).
+
+## Reference passing example
+
+Run `cargo run --locked -- run examples/source/reference-passing.neo`.
+`Forward(alias)` passes an existing reference without an address operator and writes
+through to the original Counter. `selected = &other` changes only the local selection.
+`Initialize(out reference)` replaces the Counter at the original target; existing
+aliases observe that replacement. It does not change which storage reference addresses.
+See [the design guidance](type-design.md#decision-explicit-reference-creation-in-neo)
+for the explicit-reference-creation decision and assignment differences.

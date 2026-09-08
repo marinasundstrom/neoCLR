@@ -1,0 +1,41 @@
+import System.Console.*
+
+record Counter(Age: int)
+
+func Increment(counter: Counter&) -> () {
+    counter.Age = counter.Age + 1
+}
+
+func Forward(counter: Counter&) -> () {
+    Increment(counter)
+}
+
+func ChangeCopy(counter: Counter) -> int {
+    return counter.Age + 100
+}
+
+func Initialize(out counter: Counter&) -> () {
+    counter = Counter(40)
+}
+
+func Main() -> int {
+    var value = Counter(1)
+    let reference = &value
+    let alias = reference
+    Forward(alias)
+    WriteLine(value.Age)
+    WriteLine(ChangeCopy(value))
+
+    var other = Counter(10)
+    var selected = reference
+    selected = &other
+    Increment(selected)
+    WriteLine(value.Age)
+    WriteLine(other.Age)
+
+    Initialize(out reference)
+    WriteLine(alias.Age)
+    Forward(reference)
+    Forward(alias)
+    return value.Age
+}

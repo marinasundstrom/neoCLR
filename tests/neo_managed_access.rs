@@ -63,3 +63,21 @@ fn lifetime_checks_and_pointer_boundary_still_apply() {
         Value::Int32(42)
     );
 }
+
+#[test]
+fn reference_passing_sample_preserves_aliases_and_distinguishes_output_writes() {
+    let result = run(include_str!("../examples/source/reference-passing.neo"));
+    assert_eq!(result.output, ["2", "102", "2", "11", "40"]);
+    assert_eq!(result.value, Value::Int32(42));
+}
+
+#[test]
+fn creating_an_argument_reference_requires_an_address_and_outputs_do_not_fill_reference_slots() {
+    for source in [
+        "record Counter(Age: int)\nfunc Use(value: Counter&) -> () {}\nfunc Main() -> () { var value = Counter(1); Use(value) }",
+        "record Counter(Age: int)\nfunc Use(value: Counter&) -> () {}\nfunc Main() -> () { Use(Counter(1)) }",
+        "record Counter(Age: int)\nfunc Set(out value: Counter&) -> () { value = Counter(1) }\nfunc Main() -> () { var reference: Counter&; Set(out reference) }",
+    ] {
+        assert!(frontend::compile(source).is_err(), "{source}");
+    }
+}

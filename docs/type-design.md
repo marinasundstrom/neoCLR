@@ -121,17 +121,19 @@ caller unexpectedly. Benchmark allocation/copy cost before claiming an improveme
 A future high-level language may infer more access/storage choices; the runtime's
 ability to express them does not require every language to expose identical syntax.
 
-## Proposed experiment: contextual borrowing in Neo
+## Decision: explicit reference creation in Neo
 
 Separate the stored value from the passing mode. A Foo& binding stores a managed
 reference; passing its reference value shares the target without exposing the caller's
 binding for replacement. Passing the reference-holding slot itself by reference is a
-second level of indirection; `out Foo&` supplies an output-slot contract. An existing
-Foo& argument already passes without another `&`. The experiment below concerns
+second level of indirection, currently unsupported. Today `out Foo&` initializes
+the referenced Foo storage; it does not replace a Foo& binding. See
+[output references](neo-outputs.md). An existing
+Foo& argument already passes without another `&`. The alternative considered below concerns
 obtaining a reference from a Foo value, not changing how reference values are passed.
 
-Explicit managed-reference types remain a runtime contract. Removing some call-site
-`&` expressions is a separate, unimplemented language experiment: an unambiguous
+Explicit managed-reference types remain a runtime contract. We considered removing some call-site
+`&` expressions through contextual borrowing: an unambiguous
 expected Foo& could borrow an addressable Foo automatically. Inferred `let copy = value`
 would continue to copy; no implicit heap promotion or lifetime extension is proposed.
 Explicit `&value` would remain available. Ordinary pointer operations are separate.
@@ -145,3 +147,15 @@ Before adopting it, test value/reference overload ambiguity, readonly targets,
 fields/indexers versus temporaries, generic inference and retained references in the
 order workflow. Runtime escape validation must remain unchanged. No syntax change
 is implemented by recording this proposal.
+
+For the current preview, reference creation stays explicit: `Use(&value)` obtains a
+reference from a value, while `Use(reference)` forwards an existing Foo&. Implicit
+argument borrowing is not adopted. This
+keeps changes from value parameters to reference parameters visible at call sites.
+
+Run `cargo run --locked -- run examples/source/reference-passing.neo` to see alias
+passing, automatic member access, explicit local retargeting and output writes.
+It prints 2, 102, 2, 11, 40 and returns 42. The current assignment projection still
+uses `selected = &other` to retarget a mutable reference binding; an unadorned
+assignment through a reference writes its target. This is a remaining difference
+from C# class-reference assignment, not an implication of reference-valued parameters.

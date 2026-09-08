@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-08
 
+- Added a reference-passing example and regressions for alias forwarding, explicit
+  address creation/local retargeting and output writes. Corrected the new type-design
+  notes: current `out Foo&` initializes Foo storage, not a caller's Foo& binding;
+  reference-slot replacement remains unsupported. Confirmed explicit reference creation
+  instead of implicit argument borrowing and documented the existing assignment difference from C#.
+
 - Added Neo `if let` and `let … else` case bindings with single evaluation, scoped
   immutable bindings and checked failure-path exits. The order workflow now uses
   a custom PurchaseError union and guards instead of nested success matches.
