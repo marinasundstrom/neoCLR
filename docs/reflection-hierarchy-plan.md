@@ -25,24 +25,16 @@ a provisional reimplementation edge difference; see the implementation compariso
 
 ## Default interface implementations
 
-Explore this as a separate contract and implementation slice. The existing
-[C# interface specification](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/interfaces)
-provides a shipped language baseline for interface member bodies and inherited
-implementation selection. It does not decide neoCLR's reference-receiver policy.
+The [default interface contract](default-interface-implementations.md) is now recorded
+with a pinned .NET probe, negative compilation checks and a runtime groundwork audit.
+It chooses class precedence, most-specific default selection, explicit diamond failures,
+reabstraction and an interface-view receiver retaining the original owner. Default
+bodies are not yet enabled. Implement selection, validation and receiver entry together,
+then wire Neo, reflection, closed analysis and debugger coverage as specified there.
 
-Compare abstract contracts alone, shared class implementations, and default interface
-bodies. Defaults can share behavior without forcing class ancestry, but introduce
-selection rules and implementation dependencies. Specify class-versus-interface
-precedence, most-specific inherited implementations, diamond ambiguity, explicit
-replacement and reabstraction before enabling bodies. A default body must retain the
-original concrete receiver through its interface view, respect readonly/output
-contracts and avoid invented interface storage. Decide how it calls other members
-and appears in reflection, stack traces and closed dispatch analysis.
-
-Use a real reflection capability for the first demonstration if it needs shared
-behavior; otherwise choose another concrete library consumer. Default implementations
-are not implemented by the class-dispatch slice, and existing bodyless-interface
-validation remains in force.
+Use a real library capability once shared behavior is needed; do not introduce a
+reflection interface merely to demonstrate a default. The first implementation demo
+should exercise a default calling a required member on frame and heap owners.
 
 The .NET comparison starts with
 [MemberInfo](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.memberinfo?view=net-10.0)

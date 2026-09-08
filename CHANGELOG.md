@@ -10,6 +10,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 #### Added
 
+- Planned default-interface contract with class precedence, most-specific selection,
+  diamond ambiguity, reabstraction and managed interface-view receiver rules. Added a
+  runtime groundwork audit and pinned .NET positive/negative probes. This is design
+  and executable comparison work; default interface bodies remain unimplemented.
+
 - Explicit interface implementations via runtime declaration-to-body mappings, IL
   .override directives and Neo `func Interface.Member` bodies. Added inherited and
   redeclared mappings, generic analysis, qualified private reflection names, examples,

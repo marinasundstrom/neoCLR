@@ -118,4 +118,5 @@ escape and private reflection names.
 Old artifacts omit the new field and retain implicit mapping. New artifacts with
 explicit mappings require this runtime; Rust Function literals need the new vector.
 There is no new opcode or System descriptor layout. Existing public APIs are unchanged.
-Default interface implementations are the next separate contract/implementation slice.
+The [default-interface contract](default-interface-implementations.md) is recorded;
+its runtime/Neo implementation is the next slice.
