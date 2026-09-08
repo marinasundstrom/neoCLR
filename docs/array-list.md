@@ -6,7 +6,9 @@ and existing heap instructions. There is no Collections.Generic namespace, refer
 type flag or special collection opcode. Its native storage is explicitly freed and
 is separate from the managed GC and [managed arrays](managed-arrays.md).
 It implements System.Collections.List<T> through an explicit borrowed interface view;
-see [interfaces](interfaces.md) for dispatch and lifetime rules.
+see [interfaces](interfaces.md) for dispatch and lifetime rules. All instance methods
+now require managed-reference receivers; see [API design](api-design.md). Direct IL
+callers load an address or an existing reference, rather than a descriptor value.
 
 | Member | Contract |
 | --- | --- |
@@ -68,6 +70,12 @@ System.Value and current System.Option/Result carriers have no native payload la
 so lists of those values are not yet supported, even with capacity zero. Pointer
 signatures to such types can be stored, without adding support for their pointee layout.
 
+Managed-reference elements such as `ArrayList<Foo&>` are also not supported by this
+native backing store yet. Their intended contract is ordinary generic substitution:
+Add takes Foo& and item access returns Foo&, copying the reference rather than Foo.
+See [generic reference elements](api-design.md#generic-reference-elements) for the
+required managed-storage and automatic Neo access behavior.
+
 These limits match the current Array<T>/native storage foundation. Supporting more
 payloads requires the [ordinary storage migration](value-storage.md#retirement-decision),
 not a hidden erased-value fallback inside ArrayList.
@@ -80,17 +88,17 @@ cargo run --locked -- run examples/array_list.neoil
 cargo test --locked --test array_list
 ```
 
-[ArrayListDemo](../examples/array_list.neoil) allocates with capacity one, copies the
-descriptor, and appends squares through the copy. It reads the count and items through
-the original descriptor and releases once. Output is `ArrayList count:`, `5`, `0`, `1`,
+[ArrayListDemo](../examples/array_list.neoil) allocates with capacity one, takes a
+managed reference to the descriptor, and appends squares through that reference.
+It reads the count and items through the original descriptor and releases once. Output is `ArrayList count:`, `5`, `0`, `1`,
 `4`, `9`, `16`, and `=> Void`, each on a separate line. The walkthrough also exercises
 the source and assembled-artifact paths.
 
 Raven-like explanatory pseudocode (not a compiler input):
 
 ```text
-let values = ArrayList<Int32>.Allocate(1)
-let alias = values
+var values = ArrayList<Int32>.Allocate(1)
+let alias = &values
 for (var i = 0; i < 5; i = i + 1) {
     alias.Add(checked(i * i))
 }

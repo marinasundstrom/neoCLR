@@ -35,9 +35,10 @@
     .property instance Count() -> Int32
         .get instance System.Collections.ArrayList<T>::get_Count()
     .end
-    .method instance get_Count() -> Int32
+    .method instance byref get_Count() -> Int32
         ldarg this
-        ldfld 0
+        ldflda 0
+        ldobj System.Collections.ArrayListStorage<T>*
         ldflda 1
         ldobj Int32
         ret
@@ -45,14 +46,15 @@
     .property instance Capacity() -> Int32
         .get instance System.Collections.ArrayList<T>::get_Capacity()
     .end
-    .method instance get_Capacity() -> Int32
+    .method instance byref get_Capacity() -> Int32
         ldarg this
-        ldfld 0
+        ldflda 0
+        ldobj System.Collections.ArrayListStorage<T>*
         ldflda 2
         ldobj Int32
         ret
     .end
-    .method private instance Address(Int32 index) -> T*
+    .method private instance byref Address(Int32 index) -> T*
         ldarg index
         ldc.i4 0
         blt Invalid
@@ -61,7 +63,8 @@
         call instance System.Collections.ArrayList<T>::get_Count()
         bge Invalid
         ldarg this
-        ldfld 0
+        ldflda 0
+        ldobj System.Collections.ArrayListStorage<T>*
         ldflda 0
         ldobj T*
         ldarg index
@@ -76,14 +79,14 @@
         .get instance System.Collections.ArrayList<T>::get_Item(Int32)
         .set instance System.Collections.ArrayList<T>::set_Item(Int32,T)
     .end
-    .method instance get_Item(Int32 index) -> T
+    .method instance byref get_Item(Int32 index) -> T
         ldarg this
         ldarg index
         call instance System.Collections.ArrayList<T>::Address(Int32)
         ldobj T
         ret
     .end
-    .method instance set_Item(Int32 index, T value) -> Void
+    .method instance byref set_Item(Int32 index, T value) -> Void
         ldarg this
         ldarg index
         call instance System.Collections.ArrayList<T>::Address(Int32)
@@ -92,7 +95,7 @@
         ldvoid
         ret
     .end
-    .method instance Add(T value) -> Void
+    .method instance byref Add(T value) -> Void
         .local System.Collections.ArrayListStorage<T>* state
         .local T* oldData
         .local T* newData
@@ -100,7 +103,8 @@
         .local Int32 capacity
         .local Int32 index
         ldarg this
-        ldfld 0
+        ldflda 0
+        ldobj System.Collections.ArrayListStorage<T>*
         stloc state
         ldarg this
         call instance System.Collections.ArrayList<T>::get_Count()
@@ -182,15 +186,17 @@
         ldvoid
         ret
     .end
-    .method instance Free() -> Void
+    .method instance byref Free() -> Void
         ldarg this
-        ldfld 0
+        ldflda 0
+        ldobj System.Collections.ArrayListStorage<T>*
         ldflda 0
         ldobj T*
         heap.free
         pop
         ldarg this
-        ldfld 0
+        ldflda 0
+        ldobj System.Collections.ArrayListStorage<T>*
         heap.free
         ret
     .end

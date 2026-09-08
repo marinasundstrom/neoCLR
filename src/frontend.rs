@@ -966,6 +966,23 @@ impl Lowerer<'_> {
             self.value_expression(expression)
         }
     }
+    fn library_receiver(
+        &mut self,
+        expression: &Expr,
+        ty: &Ty,
+        start: usize,
+        byref: bool,
+    ) -> Result<(), Fault> {
+        if byref {
+            if !matches!(ty, Ty::Ref(_)) {
+                self.body.truncate(start);
+                self.place(expression, true)?;
+            }
+        } else if let Ty::Ref(target) = ty {
+            self.body.push(format!("ldobj {}", target.il()));
+        }
+        Ok(())
+    }
     fn array_owner(&mut self, expression: &Expr) -> Result<Ty, Fault> {
         // Reading a local array element need not copy its whole value.
         if let ExprKind::Name(name) = &expression.kind {
@@ -1064,6 +1081,7 @@ impl Lowerer<'_> {
                 Ok(binding.ty)
             }
             ExprKind::Field(value, field) => {
+                let saved = self.body.len();
                 let mut owner = self.array_owner(value)?;
                 if field.text == "Length"
                     && matches!(&owner, Ty::Array(_) | Ty::Ref(_))
@@ -1072,15 +1090,23 @@ impl Lowerer<'_> {
                     self.body.extend(["ldlen".into(), "conv.ovf.i4".into()]);
                     return Ok(Ty::Int);
                 }
+                let target = if let Ty::Ref(target) = &owner {
+                    target.as_ref()
+                } else {
+                    &owner
+                };
+                if let Some((ty, getter, byref)) =
+                    library::property(target, &field.text).map_err(|e| field.error(e.message))?
+                {
+                    let interface = library::is_interface(target)?;
+                    self.library_receiver(value, &owner, saved, byref || interface)?;
+                    let opcode = if interface { "callvirt" } else { "call" };
+                    self.body.push(format!("{opcode} {getter}"));
+                    return Ok(ty);
+                }
                 if let Ty::Ref(target) = owner {
                     self.body.push(format!("ldobj {}", target.il()));
                     owner = *target;
-                }
-                if let Some((ty, getter)) =
-                    library::property(&owner, &field.text).map_err(|e| field.error(e.message))?
-                {
-                    self.body.push(format!("call {getter}"));
-                    return Ok(ty);
                 }
                 let ty = self.field(&owner, field)?;
                 self.body
@@ -1180,7 +1206,7 @@ impl Lowerer<'_> {
         if let ExprKind::Field(owner, member) = &callee.kind {
             if bound_receiver || path.is_none() {
                 let saved = self.body.len();
-                let mut ty = self.expression(owner)?;
+                let ty = self.expression(owner)?;
                 let target = if let Ty::Ref(t) = &ty {
                     t.as_ref()
                 } else {
@@ -1236,23 +1262,27 @@ impl Lowerer<'_> {
                     ));
                     return Ok(returns);
                 }
-                if let Ty::Ref(target) = ty {
-                    self.body.push(format!("ldobj {}", target.il()));
-                    ty = *target;
-                }
+                let argument_start = self.body.len();
                 let types = arguments
                     .iter()
                     .map(|a| self.library_argument(a))
                     .collect::<Result<Vec<_>, _>>()?;
                 let signature = format!(
                     "instance {}::{}({})",
-                    ty.il(),
+                    target.il(),
                     member.text,
                     types.iter().map(Ty::il).collect::<Vec<_>>().join(",")
                 );
                 let function =
                     library::resolve(&signature).map_err(|e| callee.at.error(e.message))?;
-                self.body.push(format!("call {signature}"));
+                let argument_body = self.body.split_off(argument_start);
+                let interface = library::is_interface(target)?;
+                // Interface calls consume a view even when dispatch subsequently
+                // copies the concrete receiver for a value-receiver implementation.
+                self.library_receiver(owner, &ty, saved, function.receiver_byref || interface)?;
+                self.body.extend(argument_body);
+                let opcode = if interface { "callvirt" } else { "call" };
+                self.body.push(format!("{opcode} {signature}"));
                 return Ty::from_metadata(&function.returns);
             }
         }

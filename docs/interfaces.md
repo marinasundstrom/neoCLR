@@ -26,9 +26,9 @@ byref receiver. See [slot reference contracts](reference-slots.md).
 
 [The List sample](../examples/interfaces.neoil) now passes List<Int32>& directly
 from an ArrayList local, without native receiver-descriptor allocation. ArrayList's
-existing value-receiver methods retain their shared backing-state behavior; a safe
-view alone does not change a method's receiver mode. [The Counter sample](../examples/reference_receivers.neoil)
-demonstrates byref interface dispatch that changes an inline field.
+methods and the List contract now declare byref receivers. The original descriptor
+is used for calls, while its native backing storage still requires explicit Free.
+[The Counter sample](../examples/reference_receivers.neoil) demonstrates byref interface dispatch that changes an inline field.
 
 [System.Equatable<T>](equality.md) supplies typed Equals(T) dispatch for primitives,
 type descriptors and user-defined records through the same managed views.
@@ -119,10 +119,10 @@ is inaccessible. Returning a view of a local allocation does not extend the fram
 lifetime. Tracked pointer diagnostics are not static lifetime verification, nor a
 sandbox guarantee for arbitrary native addresses.
 
-Instance dispatch preserves the current receiver-copy semantics. Changing inline
+Native-pointer interface dispatch uses value-receiver semantics. Changing inline
 receiver fields does not write them back into pointed storage. Mutations through
-pointer fields affect their shared targets. This makes the current ArrayList state
-model usable through a borrowed List contract. By-reference `this` is available through the managed slot view described above;
+pointer fields affect their shared targets. By-reference `this` is available through
+the managed slot view described above;
 the native-pointer view does not acquire that capability implicitly.
 
 System.Collections.ArrayList<T> now implements System.Collections.List<T> with Count,

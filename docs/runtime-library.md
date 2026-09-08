@@ -1,5 +1,8 @@
 # Runtime library boundary
 
+The [API design policy and contract inventory](api-design.md) defines when System
+APIs use values, managed references, reference receivers, outputs, and native pointers.
+
 The basic runtime library is written **for neoCLR**, assembled into its metadata
 and instruction representation, and executed by neoCLR. Host Rust implements the
 interpreter and unavoidable bootstrap services; it should not become the BCL's

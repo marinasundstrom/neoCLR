@@ -285,7 +285,8 @@ cargo run -- run examples/hello.neoil System.neo.json
 Explicit module sets can link additional libraries, with optional direct dependency
 lists and exact revision pins. Lookup still requires unique type names across the
 load set; automatic dependency discovery and side-by-side versions remain deferred.
-See [module sets](docs/module-sets.md) and [runtime library design](docs/runtime-library.md).
+See [module sets](docs/module-sets.md) and [runtime library design](docs/runtime-library.md), and
+[API contracts](docs/api-design.md).
 
 ## What is implemented
 

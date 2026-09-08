@@ -13,13 +13,20 @@ pub(super) struct Case {
     pub payload: Option<(Ty, String)>,
 }
 
+pub(super) fn is_interface(ty: &Ty) -> Result<bool, Fault> {
+    let module = crate::library::system()?;
+    let metadata = crate::assembler::parse_type(&ty.il())?;
+    Ok(module.type_definition(&metadata).is_some_and(|definition| {
+        definition.representation == crate::metadata::Representation::Interface
+    }))
+}
+
 pub(super) fn resolve(signature: &str) -> Result<crate::metadata::Function, Fault> {
     let function = crate::vm::resolve(
         crate::library::system()?,
         &crate::assembler::parse_function_ref(signature)?,
     )?;
     if function.visibility != Visibility::Public
-        || function.receiver_byref
         || !function.out_parameters.is_empty()
         || !function.out_when_true.is_empty()
     {
@@ -116,7 +123,7 @@ pub(super) fn cases(ty: &Ty) -> Result<Vec<Case>, Fault> {
 }
 
 /// Read an ordinary non-indexed property through its declared public getter.
-pub(super) fn property(ty: &Ty, name: &str) -> Result<Option<(Ty, String)>, Fault> {
+pub(super) fn property(ty: &Ty, name: &str) -> Result<Option<(Ty, String, bool)>, Fault> {
     let module = crate::library::system()?;
     let metadata = crate::assembler::parse_type(&ty.il())?;
     let Some(definition) = module.type_definition(&metadata) else {
@@ -152,5 +159,9 @@ pub(super) fn property(ty: &Ty, name: &str) -> Result<Option<(Ty, String)>, Faul
     if function.returns != property.ty {
         return Err(Fault::new("property getter type mismatch"));
     }
-    Ok(Some((Ty::from_metadata(&property.ty)?, signature)))
+    Ok(Some((
+        Ty::from_metadata(&property.ty)?,
+        signature,
+        function.receiver_byref,
+    )))
 }

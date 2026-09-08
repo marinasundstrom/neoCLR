@@ -3,18 +3,18 @@
 
 .function Main() -> Void
     .local System.Collections.ArrayList<Int32> values
-    .local System.Collections.ArrayList<Int32> alias
+    .local System.Collections.ArrayList<Int32>& alias
     .local Int32 index
     ldc.i4 1
     call System.Collections.ArrayList<Int32>::Allocate(Int32)
     stloc values
-    ldloc values
+    ldloca values
     stloc alias
     ldc.i4 0
     stloc index
     br Test
 Fill:
-    ; Grow through the alias. The original descriptor sees the new buffer/count.
+    ; Grow through the alias. Both names address the same descriptor.
     ldloc alias
     ldloc index
     ldloc index
@@ -32,7 +32,7 @@ Test:
     ldstr "ArrayList count:"
     call System.Console::WriteLine(String)
     pop
-    ldloc values
+    ldloca values
     call instance System.Collections.ArrayList<Int32>::get_Count()
     call System.Console::WriteLine(Int32)
     pop
@@ -40,7 +40,7 @@ Test:
     stloc index
     br PrintTest
 Print:
-    ldloc values
+    ldloca values
     ldloc index
     call instance System.Collections.ArrayList<Int32>::get_Item(Int32)
     call System.Console::WriteLine(Int32)
@@ -51,10 +51,10 @@ Print:
     stloc index
 PrintTest:
     ldloc index
-    ldloc values
+    ldloca values
     call instance System.Collections.ArrayList<Int32>::get_Count()
     blt Print
-    ldloc values
+    ldloca values
     call instance System.Collections.ArrayList<Int32>::Free()
     ret
 .end

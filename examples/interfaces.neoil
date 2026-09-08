@@ -51,11 +51,11 @@ Test:
     call System.Console::WriteLine(Int32)
     pop
     ; The concrete owner observes growth and retains the only release obligation.
-    ldloc owner
+    ldloca owner
     call instance System.Collections.ArrayList<Int32>::get_Count()
     call System.Console::WriteLine(Int32)
     pop
-    ldloc owner
+    ldloca owner
     call instance System.Collections.ArrayList<Int32>::Free()
     ret
 .end

@@ -347,3 +347,15 @@ cargo run --locked -- debug examples/source/debugger.neo
 Use `source`, `bt`, `stack`, `heap`, `step`, `next` and `continue`. `watch` enables
 live inspection; `pause` freezes execution at an instruction boundary. Neo source
 locations and local labels survive compilation into JSON artifacts.
+
+## Library receiver contracts
+
+A managed reference is itself a value: passing `T&` copies the reference, while
+access through it automatically reads or writes the referenced storage. Copying the
+reference does not copy T or let the callee rebind the caller's reference variable.
+
+Instance calls and property getters honor bundled System receiver metadata. Existing
+managed-reference values are forwarded; a byref receiver on a value requires an addressable
+mutable binding. Library interface references dispatch virtually. No explicit
+dereference is needed. See [API design](api-design.md#neo-projection) for the current
+value/reference contract inventory and remaining compiler limitations.

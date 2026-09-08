@@ -149,7 +149,8 @@ Reset((&counter) as Settable&)
 Self is a pseudocode placeholder for the contract receiver, not a new IL type.
 Counter remains the concrete value in its original slot. The interface view exposes
 a contract and the information needed for dispatch; it does not create an interface
-object, copy the Counter, box it or keep its storage alive.
+object, copy the Counter or box it. A frame-owned Counter remains bound to its
+owner frame; a view of a managed heap Counter keeps that owner reachable.
 
 ```text
 ldloca counter
