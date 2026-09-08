@@ -78,6 +78,11 @@ pub(crate) fn closure(module: &Module, ty: &Type) -> Result<Vec<Type>, Fault> {
             interface_definition(module, &base)?;
             visit(module, &base, path, result)?;
         }
+        if definition.representation == Representation::Record {
+            if let Some(base) = crate::inheritance::base(module, ty)? {
+                visit(module, &base, path, result)?;
+            }
+        }
         path.pop();
         Ok(())
     }
@@ -97,22 +102,58 @@ fn declared(module: &Module, concrete: &Type, interface: &Type) -> Result<(), Fa
 }
 
 fn member(module: &Module, concrete: &Type, contract: &Function) -> Result<Function, Fault> {
-    let owner = concrete
-        .definition_name()
-        .ok_or_else(|| Fault::new("invalid interface implementation owner"))?;
+    // An inherited mapping is anchored at the class that declares conformance.
+    // A repeated declaration remaps from that class, including inherited members.
+    let chain = if module
+        .type_definition(concrete)
+        .is_some_and(|d| d.representation == Representation::Record)
+    {
+        crate::inheritance::lineage(module, concrete)?
+    } else {
+        vec![concrete.clone()]
+    };
+    let interface = contract
+        .owner
+        .as_ref()
+        .ok_or_else(|| Fault::new("interface contract requires owner"))?;
+    let mut anchor = None;
+    for (index, owner) in chain.iter().enumerate() {
+        let definition = module
+            .type_definition(owner)
+            .ok_or_else(|| Fault::new("unknown implementation owner"))?;
+        for declared in &definition.implements {
+            let declared = declared.substitute_type_parameters(arguments(owner))?;
+            if closure(module, &declared)?.contains(interface) {
+                anchor = Some(index);
+                break;
+            }
+        }
+        if anchor.is_some() {
+            break;
+        }
+    }
+    let anchor = anchor.ok_or_else(|| Fault::new("missing interface mapping declaration"))?;
     let name = contract
         .name
         .rsplit('.')
         .next()
         .ok_or_else(|| Fault::new("invalid interface member"))?;
-    let target = FunctionRef {
-        definition: None,
-        name: format!("{owner}.{name}"),
-        owner: Some(concrete.clone()),
-        instance: true,
-        parameters: contract.parameters.clone(),
-    };
-    let implementation = crate::vm::resolve(module, &target)?;
+    let mut selected = None;
+    for owner in &chain[anchor..] {
+        let target = FunctionRef {
+            definition: None,
+            name: format!("{}.{name}", owner.definition_name().unwrap()),
+            owner: Some(owner.clone()),
+            instance: true,
+            parameters: contract.parameters.clone(),
+        };
+        if let Ok(function) = crate::vm::resolve(module, &target) {
+            selected = Some(function);
+            break;
+        }
+    }
+    let implementation =
+        selected.ok_or_else(|| Fault::new("interface implementation member not found"))?;
     if implementation
         .out_when_true
         .iter()
@@ -172,7 +213,14 @@ pub(crate) fn ensure_implementation(
             {
                 let contract =
                     method.map_types(|ty| ty.substitute_type_parameters(arguments(&inherited)))?;
-                member(module, concrete, &contract)?;
+                let implementation = member(module, concrete, &contract)?;
+                if !module
+                    .type_definition(concrete)
+                    .is_some_and(|d| d.is_abstract)
+                    && implementation.is_virtual
+                {
+                    crate::inheritance::dispatch(module, concrete, &implementation)?;
+                }
             }
         }
     }
@@ -189,7 +237,12 @@ pub(crate) fn implementation(
     if !is_contract(module, contract) || contract.owner.as_ref() != Some(interface) {
         return Err(Fault::new("callvirt requires an interface member"));
     }
-    member(module, concrete, contract)
+    let mapped = member(module, concrete, contract)?;
+    if mapped.is_virtual {
+        crate::inheritance::dispatch(module, concrete, &mapped)
+    } else {
+        Ok(mapped)
+    }
 }
 
 fn flags<T: Ord + Copy>(values: &[T]) -> std::collections::BTreeSet<T> {
@@ -245,7 +298,11 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             if !seen.insert(interface) {
                 return Err(Fault::new("duplicate interface implementation"));
             }
-            ensure_implementation(module, &definition.open_type(), interface)?;
+        }
+        for interface in closure(module, &definition.open_type())? {
+            if interface != definition.open_type() {
+                ensure_implementation(module, &definition.open_type(), &interface)?;
+            }
         }
     }
     Ok(())
@@ -299,7 +356,7 @@ pub(crate) fn dispatch_targets(
         .ok_or_else(|| Fault::new("interface call requires owner"))?;
     let mut targets = vec![];
     for definition in &module.types {
-        if definition.representation == Representation::Interface {
+        if definition.representation == Representation::Interface || definition.is_abstract {
             continue;
         }
         for implemented in &closure(module, &definition.open_type())? {

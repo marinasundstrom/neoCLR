@@ -106,18 +106,16 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
         fields(module, &definition.open_type())?;
         for base in chain.iter().skip(1) {
             let parent = module.type_definition(base).unwrap();
-            if !parent.implements.is_empty()
-                || module.functions.iter().any(|f| {
-                    f.instance
-                        && !f.receiver_byref
-                        && f.owner
-                            .as_ref()
-                            .and_then(|t| module.type_definition(t))
-                            .is_some_and(|d| std::ptr::eq(d, parent))
-                })
-            {
+            if module.functions.iter().any(|f| {
+                f.instance
+                    && !f.receiver_byref
+                    && f.owner
+                        .as_ref()
+                        .and_then(|t| module.type_definition(t))
+                        .is_some_and(|d| std::ptr::eq(d, parent))
+            }) {
                 return Err(Fault::new(
-                    "base value receivers and inherited interface implementations are not supported yet",
+                    "inherited value receivers are not supported yet",
                 ));
             }
         }

@@ -10,6 +10,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 #### Added
 
+- Interface implementations now inherit through class bases and dispatch mapped virtual
+  members to concrete overrides, including through base views. Added generic target
+  analysis, inherited GetInterfaces results, frame/heap examples, lifetime/readonly
+  regression tests and a pinned .NET comparison. No artifact schema change; inherited
+  interface programs previously rejected are now supported. Explicit interface
+  implementations and default implementations are planned as separate follow-up slices.
+
 - Reflection member descriptors now derive from an abstract MemberInfo base with
   shared Name/DeclaringType storage and internal chained constructors. Instance
   readers use readonly managed receivers; Neo resolves inherited bundled class

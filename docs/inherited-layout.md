@@ -40,8 +40,9 @@ and all its fields. Managed allocation and references keep their existing meanin
 The GC scans inherited reference fields as part of the complete stored value.
 
 A type used as a base may now declare managed-reference instance methods, including
-virtual and abstract contracts. Base value-receiver constructors/methods and
-inherited interface implementations remain restricted; see [class dispatch](class-dispatch.md).
+virtual and abstract contracts. Base value-receiver constructors/methods remain
+restricted. Inherited interface implementations are now supported through
+[class interface dispatch](class-interface-dispatch.md).
 Derived types may declare their own methods and interfaces. Base types may declare
 static helpers. Native layout/interop for derived records is rejected pending an
 explicit inherited-layout ABI. There is no implicit value slicing. [Base-reference projection](base-views.md) now

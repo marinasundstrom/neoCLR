@@ -329,6 +329,7 @@ impl Source {
                 pending.extend(i.bases.clone());
             } else if let Some(r) = self.records.iter().find(|r| r.name.text == ty.il()) {
                 pending.extend(r.implements.clone());
+                pending.extend(r.base.iter().cloned());
             }
         }
         false

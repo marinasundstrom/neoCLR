@@ -97,3 +97,7 @@ with a readonly base view. Tests cover source/artifact dispatch, generic call-gr
 resolution, reflection, ambiguity, missing/conflicting contracts, cyclic metadata,
 GC retention/identity and readonly/current-frame escape checks. Raw IL checks ensure
 that skipping verification does not turn a readonly base projection writable.
+
+Class bases now also contribute inherited interface conformance and virtual mappings;
+see [class interface dispatch](class-interface-dispatch.md). Explicit implementations
+and default bodies remain planned separately.

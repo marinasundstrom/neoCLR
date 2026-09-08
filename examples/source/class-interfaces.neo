@@ -1,0 +1,24 @@
+interface Readable {
+    readonly func Read() -> int
+}
+interface Counter: Readable {
+    func Add(amount: int) -> ()
+}
+abstract record CounterBase(Value: int): Counter {
+    init(value: int) { this.Value = value }
+    readonly abstract func Read() -> int
+    func Add(amount: int) -> () { this.Value = this.Value + amount }
+}
+record OffsetCounter(Offset: int): CounterBase {
+    init(value: int, offset: int): base(value) { this.Offset = offset }
+    readonly override func Read() -> int { return this.Value + this.Offset }
+}
+func Read(readonly value: Readable&) -> int { return value.Read() }
+func Main() -> int {
+    var local = OffsetCounter(19, 1)
+    let localView: Counter& = &local
+    localView.Add(1)
+    let heapBase: CounterBase& = new OffsetCounter(20, 1)
+    let heapView: readonly Readable& = heapBase
+    return localView.Read() + Read(heapView)
+}

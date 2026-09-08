@@ -1603,7 +1603,7 @@ fn interpret_instructions(
                         Value::SlotInterface {
                             interface,
                             receiver,
-                        } => (interface, receiver.target().clone(), Ok(receiver)),
+                        } => (interface, receiver.stored_type()?, Ok(receiver)),
                         Value::InterfaceRef {
                             interface,
                             receiver,
@@ -1622,6 +1622,12 @@ fn interpret_instructions(
                         Ok(slot) => {
                             slot.assigned()?;
                             if callee.receiver_byref {
+                                let owner = callee.owner.as_ref().unwrap();
+                                let slot = if slot.target() != owner {
+                                    slot.dispatch_view(module, owner)?
+                                } else {
+                                    slot
+                                };
                                 Value::SlotReference(slot)
                             } else {
                                 slot.read()?

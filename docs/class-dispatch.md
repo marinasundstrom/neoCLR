@@ -61,9 +61,9 @@ native layout or owned host input. Derived aggregate construction still initiali
 all inherited fields. An abstract type without abstract methods is also non-instantiable.
 
 Managed base constructors now support [constructor chaining](constructor-chaining.md)
-and publication checks. Inherited value-receiver methods remain restricted. Inheriting implemented interfaces
-through a class base is also still restricted; existing interface inheritance works
-independently. No default interface method bodies are added in this slice.
+and publication checks. Inherited value-receiver methods remain restricted. [Inherited interface implementations](class-interface-dispatch.md) now reuse class
+virtual dispatch. Explicit interface implementations and default interface bodies
+remain planned separately.
 
 ## Inspection and analysis
 

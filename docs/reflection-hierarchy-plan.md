@@ -11,10 +11,24 @@ filtering, override suppression and DeclaringType versus ReflectedType before
 changing default results. MethodBase remains deferred until constructor introspection
 needs shared behavior. ParameterInfo and Type remain independent.
 
-The next inheritance slice should implement inherited interface implementations across class bases, including how
-virtual class overrides satisfy an inherited interface contract. That currently
-restricted bridge is relevant if a common reflection base exposes a capability
-interface. Test owner identity, readonly access, dispatch and GC through both views.
+[Inherited class interface implementations](class-interface-dispatch.md) now bridge
+class bases and virtual overrides, preserving owner identity, readonly access and GC.
+
+## Explicit interface implementations
+
+Planned before default bodies: add explicit contract-to-body mappings, allowing two
+interfaces with the same member signature to have different implementations without
+exposing those methods as ordinary class members. Compare C# explicit implementations
+(§19.6.2 of the specification below) and CLI MethodImpl metadata before choosing the
+metadata representation and Neo syntax. This needs a runtime mapping contract, not
+just qualified method names interpreted by the compiler.
+
+Specify inherited mapping/reimplementation rules, access through interface views,
+readonly/output compatibility, generic substitution, properties/indexers, reflection,
+stack traces and closed dispatch analysis. Test distinct same-signature interfaces,
+base/derived views, inaccessible direct calls and malformed mapping artifacts. Keep
+managed receiver lifetime and identity rules unchanged. Explicit mappings and default
+bodies are separate planned features; neither is currently implemented.
 
 ## Default interface implementations
 
