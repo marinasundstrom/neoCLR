@@ -26,6 +26,17 @@ impl Slot {
             replacements: HashMap::new(),
         }))
     }
+    pub(crate) fn reset(cell: &Cell) -> Result<(), Fault> {
+        if Rc::strong_count(cell) != 1 {
+            return Err(Fault::new(
+                "cannot reset local while managed references are live",
+            ));
+        }
+        let mut slot = cell.borrow_mut();
+        slot.value = None;
+        slot.replacements.clear();
+        Ok(())
+    }
     pub(crate) fn trace_heap(&self, roots: &mut Vec<usize>) {
         if let Some(value) = &self.value {
             crate::gc::trace(value, roots);

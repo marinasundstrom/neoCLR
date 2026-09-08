@@ -487,6 +487,8 @@ pub enum Instruction {
     Load(usize),
     #[serde(rename = "stloc")]
     Store(usize),
+    #[serde(rename = "local.reset")]
+    ResetLocal(usize),
     #[serde(rename = "dup")]
     Dup,
     #[serde(rename = "pop")]

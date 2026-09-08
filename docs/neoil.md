@@ -613,3 +613,13 @@ index replace the preceding point. Locations require a nonempty document and pos
 line/column. Artifact `sequence_points` must be strictly ordered and reference existing
 instructions. They add no opcodes and remain optional in format 5. See the
 [debugger guide](debugger.md) for terminal usage and Neo source mapping.
+
+## Renewing declaration storage
+
+`local.reset index` (or a local name) has stack effect 0 → 0 and makes a local
+uninitialized again. It faults if any managed alias to that local is live, including
+interior references. The verifier clears definite initialization; ordinary stores and
+output calls can initialize the renewed slot. Neo uses this extension for repeated
+declarations and temporary values, allowing their array shapes to differ between
+iterations. It does not change stloc assignment semantics, run destructors, permit
+frame escapes, or establish lexical block cleanup.

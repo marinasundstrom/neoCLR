@@ -195,6 +195,7 @@ fn instruction_services(op: &Op) -> &'static [RuntimeService] {
         | Op::Arg(..)
         | Op::StoreArg(..)
         | Op::Load(..)
+        | Op::ResetLocal(..)
         | Op::Store(..)
         | Op::Dup
         | Op::Pop

@@ -1039,6 +1039,7 @@ impl Lowerer<'_> {
                 self.body.push(format!("array.create {}", element.il()));
                 let ty = Ty::Array(Box::new(element.clone()));
                 let local = self.temp(&ty);
+                self.body.push(format!("local.reset {local}"));
                 self.body.push(format!("stloc {local}"));
                 for (index, value) in elements.iter().enumerate().skip(1) {
                     self.body
@@ -1502,6 +1503,7 @@ impl Lowerer<'_> {
         }
         let cases = library::cases(&ty).map_err(|e| value.at.error(e.message))?;
         let scrutinee = self.temp(&ty);
+        self.body.push(format!("local.reset {scrutinee}"));
         self.body.push(format!("stloc {scrutinee}"));
         let mut seen = std::collections::HashSet::new();
         let mut wildcard = false;
@@ -1550,6 +1552,7 @@ impl Lowerer<'_> {
                             format!("call {accessor}"),
                         ]);
                         let index = self.temp(payload);
+                        self.body.push(format!("local.reset {index}"));
                         self.body.push(format!("stloc {index}"));
                         self.bindings.insert(
                             name.text.clone(),
@@ -1582,6 +1585,8 @@ impl Lowerer<'_> {
                             result_type = Some(actual.clone());
                             result_local = Some(self.temp(&actual));
                         }
+                        self.body
+                            .push(format!("local.reset {}", result_local.unwrap()));
                         self.body.push(format!("stloc {}", result_local.unwrap()));
                     }
                     false
@@ -1706,6 +1711,7 @@ impl Lowerer<'_> {
                     let start_ty = self.value_expression(start)?;
                     self.require(&start_ty, &Ty::Int, &start.at)?;
                     let index = self.temp(&Ty::Int);
+                    self.body.push(format!("local.reset {index}"));
                     self.body.push(format!("stloc {index}"));
                     let limit_ty = self.value_expression(limit)?;
                     self.require(&limit_ty, &Ty::Int, &limit.at)?;
@@ -1785,6 +1791,7 @@ impl Lowerer<'_> {
                     let index = self.locals.len();
                     self.locals
                         .push(format!(".local {} {}_{index}", ty.il(), name.text));
+                    self.body.push(format!("local.reset {index}"));
                     self.body.push(format!("stloc {index}"));
                     self.bindings.insert(
                         name.text.clone(),

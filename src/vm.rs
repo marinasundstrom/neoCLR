@@ -550,7 +550,9 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 {
                     return Err(Fault::new("argument index outside signature"));
                 }
-                Op::Load(i) | Op::Store(i) | Op::LocalAddress(i) if *i >= function.locals.len() => {
+                Op::Load(i) | Op::Store(i) | Op::ResetLocal(i) | Op::LocalAddress(i)
+                    if *i >= function.locals.len() =>
+                {
                     return Err(Fault::new("local index outside signature"));
                 }
                 Op::LocalAddress(i) if matches!(&function.locals[*i], Type::ByRef(_)) => {
@@ -1234,6 +1236,7 @@ fn interpret_instructions(
                 Op::Load(i) => frame
                     .stack
                     .push(frame.locals[*i].borrow().get()?.on_stack()),
+                Op::ResetLocal(i) => crate::slots::Slot::reset(&frame.locals[*i])?,
                 Op::Store(i) => {
                     let value = frame.pop()?;
                     assigned_reference(&value)?;

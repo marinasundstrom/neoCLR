@@ -51,7 +51,9 @@ references are not exposed.
 Array locations have fixed shape: replacing an initialized array must preserve its
 length, recursively through nested arrays and record fields. Existing element
 references then remain valid and observe the replacement. This preview rule also
-applies when no element reference is currently live. Rebinding a heap array reference
+applies when no element reference is currently live. Neo declaration initialization
+uses local.reset to renew a local between iterations; that operation requires no live
+managed aliases and differs from assignment to an existing array. Rebinding a heap array reference
 to another allocation can change length; references to its former elements keep
 that former allocation alive. Arrays of array values work as nested copies with
 this shape rule; CLR-style jagged reference arrays and multidimensional arrays are

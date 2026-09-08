@@ -123,6 +123,9 @@ fn analyze_function(
         if matches!(op, Op::StoreArg(0)) {
             state.receiver_initialized = true;
         }
+        if let Op::ResetLocal(slot) = op {
+            state.initialized[*slot] = false;
+        }
         if let Op::Store(slot) = op {
             state.initialized[*slot] = true;
         }
@@ -319,7 +322,7 @@ fn analyze_function(
 fn effect(module: &Module, op: &Op, arity: usize) -> Result<(usize, usize), Fault> {
     use Op::*;
     Result::Ok(match op {
-        Unaligned(_) | Branch(_) | Fault(_) => (0, 0),
+        Unaligned(_) | Branch(_) | Fault(_) | ResetLocal(_) => (0, 0),
         Int(_)
         | Int64(_)
         | Float32 { .. }
@@ -586,7 +589,7 @@ fn typed_effect(
                 _ => E(T::ByRef(element.clone())),
             }])
         }
-        Unaligned(_) | Branch(_) | Fault(_) | Pop => Result::Ok(vec![]),
+        Unaligned(_) | Branch(_) | Fault(_) | Pop | ResetLocal(_) => Result::Ok(vec![]),
         Int(_) | SizeOf(_) | AlignOf(_) => one(T::Int32),
         Int64(_) => one(T::Int64),
         Float32 { .. } | Float64 { .. } => one(T::Double),

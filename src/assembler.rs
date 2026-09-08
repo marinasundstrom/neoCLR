@@ -406,9 +406,12 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                             serde_json::from_str::<String>(rest)
                                 .map_err(|_| Fault::new("expected JSON-quoted string"))?
                         )),
-                        "ldarg" | "ldarga" | "starg" | "ldloc" | "ldloca" | "stloc" => Some(
-                            serde_json::json!(resolve_slot(&pending.function, word, rest)?),
-                        ),
+                        "ldarg" | "ldarga" | "starg" | "ldloc" | "ldloca" | "stloc"
+                        | "local.reset" => Some(serde_json::json!(resolve_slot(
+                            &pending.function,
+                            word,
+                            rest
+                        )?)),
                         "ldfld" | "stfld" | "ldflda" => {
                             let index = if let Ok(index) = rest.parse::<usize>() {
                                 index

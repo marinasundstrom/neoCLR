@@ -143,12 +143,11 @@ array cannot mutate runtime metadata or an earlier copy. Applications may explic
 store these values in managed heap arrays, where ordinary GC rules apply. There is
 no descriptor disposal obligation or hidden target-object root.
 
-Value arrays retain their fixed shape on replacement. Neo currently reuses a
-loop-local slot across iterations, so assigning differently sized parameter arrays
-to that slot faults. The example uses a PrintMethod helper: each call gives its
-parameter array fresh frame storage. This is the existing array/frame constraint,
-not a special reflection ownership rule; general block-local storage renewal remains
-a compiler/runtime follow-up.
+Value arrays retain their fixed shape on ordinary replacement. Neo emits local.reset
+when executing declarations again, so successive loop iterations may retrieve parameter
+arrays of different lengths directly. The runtime rejects reset while managed aliases
+to the old local remain live. This renews declaration storage without changing array
+assignment or promising automatic block cleanup.
 
 The runtime enforces array element and payload budgets during result construction and
 subsequent execution, including nested parameter/accessor arrays. This uses the existing

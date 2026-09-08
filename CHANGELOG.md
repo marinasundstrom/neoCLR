@@ -42,6 +42,12 @@ The next preview's version, publication date and release validation are not yet 
 
 #### Changed
 
+- **Fresh Neo declaration storage:** repeated local declarations and compiler
+  temporaries now reset their storage before initialization, allowing differently
+  sized array and nested-record results on successive loop iterations. The new
+  `local.reset` instruction faults while aliases to the old local remain live;
+  ordinary assignment retains its existing shape and reference-preservation rules.
+
 - **ArrayList<T> now uses a managed T[]& backing array.** It grows automatically and
   no longer requires Free. Checked `array.alloc T` reserves uninitialized capacity
   without inventing default elements. Generic reference arguments and reference array
@@ -128,9 +134,8 @@ The next preview's version, publication date and release validation are not yet 
 
 - Guest destructors, finalizers, automatic scope cleanup and distinct runtime block
   lifetimes are not implemented. GC does not call Dispose or Close.
-- Arrays retain fixed shape when replaced, including nested array fields. Neo reuses
-  loop-local slots; use fresh frame storage when successive value-array results have
-  different lengths, as demonstrated by the reflection example.
+- Arrays retain fixed shape when replaced, including nested array fields. Neo renews declaration storage on each iteration; assignments to an existing
+  array location still preserve its shape.
 - The debugger requires launch-time integration; it does not attach to arbitrary OS
   processes or provide expression evaluation, memory editing, native-frame unwinding
   or editor/DAP integration.

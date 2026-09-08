@@ -4,14 +4,7 @@ record Counter(Age: int) {
     func Add(amount: int) -> () {
         this.Age = this.Age + amount
     }
-}
-
-func PrintMethod(method: System.Reflection.MethodInfo) -> () {
-    WriteLine(method.Name)
-    let parameters = method.GetParameters()
-    for i in 0..<parameters.Length {
-        WriteLine(parameters[i].ParameterType.Name)
-    }
+    func Read() -> int { return this.Age }
 }
 
 func Main() -> () {
@@ -22,7 +15,11 @@ func Main() -> () {
     }
     let methods = typeof(Counter).GetMethods()
     for i in 0..<methods.Length {
-        PrintMethod(methods[i])
+        WriteLine(methods[i].Name)
+        let parameters = methods[i].GetParameters()
+        for j in 0..<parameters.Length {
+            WriteLine(parameters[j].ParameterType.Name)
+        }
     }
     let properties = typeof(System.Type).GetProperties()
     for i in 0..<properties.Length {
