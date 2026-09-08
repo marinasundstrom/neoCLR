@@ -1,0 +1,10 @@
+record Product(Stock: int)
+func MakeRestock(product: Product&) -> System.Func<int, void> {
+    return amount => { product.Stock = product.Stock + amount }
+}
+func Main() -> int {
+    var product = Product(5)
+    let restock = MakeRestock(&product)
+    restock(4)
+    return product.Stock
+}

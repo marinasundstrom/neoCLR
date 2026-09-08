@@ -527,3 +527,10 @@ optional process variables; see `examples/source/environment.neo`.
 
 The [file report example](file-output.md) combines guest arguments, paths and bounded
 UTF-8 input/output with typed Results.
+
+## Application experience experiment
+
+The [order workflow and comparison](experiments/reference-experience/README.md)
+exercise shared inventory, receipt snapshots, interface notifications and callbacks.
+They record where explicit references help and where current library or lifetime
+rules cause friction, with commands and small follow-up exercises.

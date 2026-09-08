@@ -6,7 +6,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
-No changes yet.
+### 2026-09-08
+
+- Added an executable order-workflow experiment and a .NET 10 comparison to assess
+  explicit managed-reference ergonomics, with focused tests for receipt snapshots,
+  list-copy aliasing and callback capture lifetimes. Recorded observed friction,
+  language/library distinctions and provisional alternatives; no runtime contracts
+  changed. See [reference experience](docs/experiments/reference-experience/README.md).
 
 ## 0.1.0-preview.3 — 2026-09-08
 

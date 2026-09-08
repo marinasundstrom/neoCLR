@@ -1,0 +1,17 @@
+import System.Console.*
+
+func Main() -> int {
+    var original = System.Collections.ArrayList<int>.Allocate(2)
+    original.Add(10)
+    var copy = original
+    copy[0] = 20
+    WriteLine(original[0])
+    copy.Add(30)
+    WriteLine(original.Count)
+    WriteLine(copy.Count)
+    copy.Add(40)
+    copy[0] = 50
+    WriteLine(original[0])
+    WriteLine(copy[0])
+    return 0
+}

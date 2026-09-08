@@ -1,0 +1,65 @@
+import System.Console.*
+
+record Product(Name: string, Price: int, Stock: int)
+record Receipt(Name: string, Quantity: int, Total: int)
+// Temporary outcome record: see docs/experiments/reference-experience for the
+// Result construction friction observed while writing this application.
+record PurchaseOutcome(Accepted: bool, Receipt: Receipt, Message: string)
+
+interface Notifications {
+    func Purchased(receipt: Receipt) -> ()
+}
+record ConsoleNotifications(): Notifications {
+    func Purchased(receipt: Receipt) -> () {
+        WriteLine(System.String.Concat("Purchased: ", receipt.Name))
+        WriteLine(receipt.Total)
+    }
+}
+
+func FindProduct(products: readonly System.Collections.ArrayList<Product&>&,
+                 name: string) -> Option<Product&> {
+    return products.Find(product => product.Name.Equals(name))
+}
+
+func Purchase(product: Product&, quantity: int,
+              notifications: Notifications&) -> PurchaseOutcome {
+    if quantity <= 0 { return PurchaseOutcome(false, Receipt("", 0, 0), "Invalid quantity") }
+    if product.Stock < quantity { return PurchaseOutcome(false, Receipt("", 0, 0), "Out of stock") }
+    product.Stock = product.Stock - quantity
+    let receipt = Receipt(product.Name, quantity, product.Price * quantity)
+    notifications.Purchased(receipt)
+    return PurchaseOutcome(true, receipt, "")
+}
+
+func MakeRestock(product: Product&) -> System.Func<int, void> {
+    return amount => { product.Stock = product.Stock + amount }
+}
+
+func Main() -> int {
+    var products = System.Collections.ArrayList<Product&>.Allocate(0)
+    products.Add(new Product("Coffee", 12, 5))
+    products.Add(new Product("Tea", 8, 3))
+    var notifications = ConsoleNotifications()
+    var receipts = System.Collections.ArrayList<Receipt>.Allocate(0)
+    FindProduct(&products, "Coffee") match {
+        Some(let product) => {
+            let restock = MakeRestock(product)
+            let outcome = Purchase(product, 2, &notifications)
+            if !outcome.Accepted { WriteLine(outcome.Message); return 1 }
+            receipts.Add(outcome.Receipt)
+            product.Price = 15
+            restock(4)
+            WriteLine(product.Stock)
+            WriteLine(receipts[0].Total)
+            let rejected = Purchase(product, 99, &notifications)
+            if rejected.Accepted { return 2 }
+            WriteLine(rejected.Message)
+            if product.Stock != 7 { return 3 }
+            if receipts[0].Total != 24 { return 4 }
+        },
+        None => { return 5 }
+    }
+    if !FindProduct(&products, "Milk").IsNone { return 6 }
+    WriteLine("Orders complete")
+    return 0
+}
