@@ -9,6 +9,7 @@ license = "MIT"
 publish = false
 
 [dependencies]
+chrono = { version = "0.4.45", default-features = false, features = ["clock"] }
 libffi = "5.2.0"
 libloading = "0.8.9"
 serde = { version = "1", features = ["derive"] }

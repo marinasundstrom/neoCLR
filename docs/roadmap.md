@@ -477,7 +477,8 @@ allocation costs and disposal. String collation and generic variance remain sepa
 The [Date/Time core slice](date-time.md) is implemented with private storage,
 valid defaults, factory Results and readonly components/comparison, following the
 [date/time API direction](date-time-design.md) and .NET DateOnly/TimeOnly baselines.
-Continue with exact invariant parsing/formatting, then deliberate arithmetic,
-durations, instants and explicit clock services. Offset and timezone mapping remain
-later capabilities; a time of day is not an elapsed duration. A complete timezone
-or calendar framework is not required for the next parsing/formatting slice.
+The [local clock](local-clock.md) now reads system date/time and its captured UTC
+offset as a single snapshot. This is the preview milestone. Parsing, formatting
+and globalization are deferred. Arithmetic, durations, instants, injectable clocks
+and timezone mapping follow concrete application needs; a time of day is not an
+elapsed duration.

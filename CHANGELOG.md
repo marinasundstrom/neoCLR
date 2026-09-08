@@ -15,8 +15,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   return typed Results; zero defaults are the minimum date and midnight. Private
   storage, readonly components and Equatable/Comparable use existing runtime rules.
   Added a Neo sample, pinned .NET boundary fixtures and guest access-bypass tests.
-  Parsing, formatting, arithmetic, durations and clocks remain planned; documented
-  the trusted host-import boundary and projected slices.
+  Added Clock.GetLocalNow with a LocalDateTime snapshot containing separate Date,
+  Time and UTC-offset seconds from one host reading, a LocalClock runtime service,
+  and a Chrono clock backend. Added a runnable Neo sample and host/TZ tests.
+  Parsing, formatting and globalization are deferred; arithmetic and durations
+  remain planned. Documented the trusted host-import boundary, clock precision,
+  timezone fallback and projected slices.
 
 - Added Math.Min/Max/Sign for Int32, typed Result-based Clamp with InvalidRangeError,
   and Double Abs/Min/Max/Sqrt/Pow/Floor/Ceiling/Truncate/Round/Exp/Log/Log10/Sin/Cos/Tan.

@@ -70,3 +70,7 @@
 .include "System/Time.neoil"
 .include "System/InvalidDateError.neoil"
 .include "System/InvalidTimeError.neoil"
+
+.include "System/Clock.neoil"
+.include "System/LocalDateTime.neoil"
+.include "neoCLR/Runtime/LocalClock.neoil"

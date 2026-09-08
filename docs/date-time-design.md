@@ -1,7 +1,8 @@
 # Date and time API direction
 
 Direction recorded 2026-09-08. The [Date/Time core](date-time.md) is now implemented;
-parsing, formatting and the later capabilities below remain planned.
+the [local system clock](local-clock.md) is also implemented. Parsing, formatting
+and globalization are postponed beyond this preview scope.
 Start with separate date-only and time-of-day values. Do not require a dummy date
 for a time or a dummy midnight/timezone for a date. The purpose is a coherent
 foundation, not immediate calendar, timezone and formatting completeness.
@@ -41,7 +42,7 @@ clock transitions. Keep those outcomes explicit in any later conversion API.
 
 Calendar validation, arithmetic, comparison, parsing and formatting belong in the
 library. Neo uses ordinary calls, properties and Option/Result matching. Reading a
-clock needs a narrow runtime/host service with an injectable source for tests;
+clock uses a narrow runtime/host service; a public injectable source remains later work;
 reading the current time must not be implicit in value construction. Monotonic
 elapsed measurement and civil time are separate services.
 
@@ -49,7 +50,7 @@ The core slice settles names, Gregorian ranges, 100 ns precision, zero defaults
 and validated factories. Continue evaluating the remaining questions:
 
 - Gregorian range, day numbering and time resolution. .NET's 100 ns tick precision
-  is a baseline, not a decision; compare nanoseconds and integer overflow costs.
+  is the implemented choice; revisit nanoseconds only with evidence and migration costs.
 - Valid default representations and protection of invariants. Existing initobj,
   copying, direct IL stores and future reflection must not silently manufacture an
   invalid date. Review private fields/validated construction before claiming the
@@ -60,7 +61,7 @@ and validated factories. Continue evaluating the remaining questions:
 - Date arithmetic at month ends and leap years, overflow, and time arithmetic
   across midnight. Do not silently discard a day carry when the caller needs it;
   compare TimeOnly's wrapping and wrapped-day overloads before choosing.
-- Exact invariant parse/format grammar first. Culture-sensitive parsing, alternate
+- Parsing and formatting are deferred; decide an exact invariant grammar when resumed. Culture-sensitive parsing, alternate
   calendars, leap-second policy, timezone database distribution and DST resolution
   remain separate work with their own research and tests.
 
@@ -69,11 +70,13 @@ and validated factories. Continue evaluating the remaining questions:
 1. Decide Date/Time names, representations, defaults and construction invariants;
    add small .NET probes for boundaries and arithmetic behavior.
 2. Implement separate Date and Time values with validated factories, readonly
-   components, Equatable/Comparable, exact formatting and parsing. Demonstrate
+   components and Equatable/Comparable (implemented). Demonstrate
    birth dates and daily schedules in Neo; test IL/artifact bypasses and errors.
-3. Add signed durations and deliberate arithmetic/carry contracts.
-4. Add clock abstraction and instant/offset APIs, then local-time and timezone
-   mapping when a concrete application needs them.
+3. Read the host local date, time and offset in a single snapshot (implemented);
+   see [local clock](local-clock.md). This is the preview date/time milestone.
+4. Later, add signed durations and deliberate arithmetic/carry contracts, clock
+   injection and instant/timezone APIs when a concrete application needs them.
+   Parsing, formatting and globalization remain deferred.
 
 Value copying should be small and require no retained heap reference. Parsing
 creates text/result values under existing rules; clock and timezone resources need

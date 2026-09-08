@@ -5,6 +5,7 @@ use crate::{
 };
 
 pub(crate) enum Binding {
+    LocalClock,
     Math(crate::math::Operation),
     Reflection(crate::reflection::Query),
     TypeName,
@@ -50,6 +51,9 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         return Ok(Binding::Reflection(query));
     }
     let (binding, returns) = match (function.name.as_str(), function.parameters.as_slice()) {
+        ("neoCLR.Runtime.LocalClock", []) => {
+            (Binding::LocalClock, Type::Array(Box::new(Type::Int32)))
+        }
         ("neoCLR.Runtime.ParseInt32", [Type::String]) => (Binding::ParseInt32, Type::Value),
         ("neoCLR.Runtime.Int32ToString", [Type::Int32]) => (Binding::Int32ToString, Type::String),
         ("neoCLR.Runtime.WriteLine", [Type::String]) => (Binding::WriteLine, Type::Void),
@@ -125,6 +129,7 @@ impl Binding {
             return query.invoke(module, &args, limits);
         }
         match (self, args.as_slice()) {
+            (Self::LocalClock, []) => crate::clock::read_local(),
             (Self::TypeName, [Value::RuntimeTypeHandle(handle)]) => {
                 Ok(Value::String(handle.name.clone()))
             }

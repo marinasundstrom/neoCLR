@@ -1,0 +1,6 @@
+.type System.Clock
+    .method static GetLocalNow() -> System.LocalDateTime
+        call System.LocalDateTime::Capture()
+        ret
+    .end
+.end

@@ -1,0 +1,66 @@
+.type System.LocalDateTime
+    .field private StoredDate System.Date
+    .field private StoredTime System.Time
+    .field private StoredUtcOffsetSeconds Int32
+    .method internal static Capture() -> System.LocalDateTime
+        .local Int32[] parts
+        call neoCLR.Runtime.LocalClock()
+        stloc parts
+        ldloc parts
+        ldc.i4 0
+        ldelem Int32
+        ldloc parts
+        ldc.i4 1
+        ldelem Int32
+        ldloc parts
+        ldc.i4 2
+        ldelem Int32
+        call System.Date::Create(Int32,Int32,Int32)
+        call instance System.Result<System.Date,System.InvalidDateError>::GetOkCase()
+        call instance System.Result.Ok<System.Date>::get_Value()
+        ldloc parts
+        ldc.i4 3
+        ldelem Int32
+        ldloc parts
+        ldc.i4 4
+        ldelem Int32
+        ldloc parts
+        ldc.i4 5
+        ldelem Int32
+        ldloc parts
+        ldc.i4 6
+        ldelem Int32
+        call System.Time::Create(Int32,Int32,Int32,Int32)
+        call instance System.Result<System.Time,System.InvalidTimeError>::GetOkCase()
+        call instance System.Result.Ok<System.Time>::get_Value()
+        ldloc parts
+        ldc.i4 7
+        ldelem Int32
+        newobj System.LocalDateTime
+        ret
+    .end
+    .property instance Date() -> System.Date
+        .get instance System.LocalDateTime::get_Date()
+    .end
+    .method instance readonly byref get_Date() -> System.Date
+        ldarg this
+        ldfld 0
+        ret
+    .end
+    .property instance Time() -> System.Time
+        .get instance System.LocalDateTime::get_Time()
+    .end
+    .method instance readonly byref get_Time() -> System.Time
+        ldarg this
+        ldfld 1
+        ret
+    .end
+    .property instance UtcOffsetSeconds() -> Int32
+        .get instance System.LocalDateTime::get_UtcOffsetSeconds()
+    .end
+    .method instance readonly byref get_UtcOffsetSeconds() -> Int32
+        ldarg this
+        ldfld 2
+        ret
+    .end
+.end

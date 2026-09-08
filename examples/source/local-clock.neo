@@ -1,0 +1,16 @@
+func Main() -> int {
+    let now = System.Clock.GetLocalNow()
+    let date = now.Date
+    let time = now.Time
+    System.Console.WriteLine("Local system date: year, month, day")
+    System.Console.WriteLine(date.Year)
+    System.Console.WriteLine(date.Month)
+    System.Console.WriteLine(date.Day)
+    System.Console.WriteLine("Local system time: hour, minute, second")
+    System.Console.WriteLine(time.Hour)
+    System.Console.WriteLine(time.Minute)
+    System.Console.WriteLine(time.Second)
+    System.Console.WriteLine("UTC offset in seconds")
+    System.Console.WriteLine(now.UtcOffsetSeconds)
+    return 0
+}

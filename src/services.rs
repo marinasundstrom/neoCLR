@@ -17,6 +17,7 @@ pub enum RuntimeService {
     StringOperations,
     CharacterClassification,
     MathOperations,
+    LocalClock,
     ErrorValues,
     FileInput,
     ConsoleInput,
@@ -51,6 +52,7 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
     }
     if function.is_internal_call() {
         let service = match crate::native::bind(function)? {
+            crate::native::Binding::LocalClock => RuntimeService::LocalClock,
             crate::native::Binding::Math(_) => RuntimeService::MathOperations,
             crate::native::Binding::Reflection(_)
             | crate::native::Binding::TypeName
@@ -78,6 +80,15 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             service,
             instruction: None,
         }];
+        if matches!(
+            crate::native::bind(function)?,
+            crate::native::Binding::LocalClock
+        ) {
+            uses.push(ServiceUse {
+                service: RuntimeService::ManagedArrays,
+                instruction: None,
+            });
+        }
         if let crate::native::Binding::Reflection(query) = crate::native::bind(function)? {
             use crate::reflection::Query;
             if !matches!(

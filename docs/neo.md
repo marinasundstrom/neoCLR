@@ -518,3 +518,6 @@ Double functions. Neo supports Double literals and same-type arithmetic/comparis
 [Date and Time core values](date-time.md) provide validated factories, readonly
 components and value comparison. Run `examples/source/date-time.neo` for leap-date,
 time-of-day and typed-error handling; parsing and formatting remain planned.
+
+The [local system clock](local-clock.md) provides Date, Time and UTC offset in one reading.
+Run its Neo sample with `cargo run --locked -- run examples/source/local-clock.neo`.

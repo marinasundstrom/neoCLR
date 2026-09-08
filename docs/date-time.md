@@ -2,8 +2,9 @@
 
 Implemented 2026-09-08: separate System.Date and System.Time value-default types,
 with validated factories, readonly components and value equality/ordering. This
-first slice establishes representation and construction; parsing, formatting,
-arithmetic, durations, clocks and timezone mapping remain planned.
+core establishes representation and construction; parsing, formatting,
+arithmetic, durations and timezone mapping remain planned. The
+[local clock](local-clock.md) now provides actual system date/time.
 
 ## Representation and API
 
@@ -96,5 +97,6 @@ cases across leap years and century transitions. To regenerate the fixture:
 
 Tests cover component roundtrips, last ticks, invalid bounds, value comparison,
 source/artifact execution, zero defaults and unchecked attempts to access private
-storage. Next: exact invariant parsing/formatting, then deliberate date arithmetic
-and time carry behavior as described in the plan.
+storage. The [local clock](local-clock.md) now supplies actual system date/time.
+Parsing, formatting and globalization are deferred; arithmetic and time carry
+remain later work as described in the plan.

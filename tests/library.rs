@@ -35,7 +35,7 @@ fn runtime_library_is_assembled_platform_code() {
             .iter()
             .filter(|f| f.is_internal_call())
             .count(),
-        43 // Includes reflection, text, character category and 15 floating math helpers.
+        44 // Includes reflection, text, character, math and local clock helpers.
     );
     assert!(
         module

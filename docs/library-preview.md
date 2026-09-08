@@ -198,6 +198,7 @@ core Double operations; it does not imply full overload, decimal or MathF covera
 
 The [Date/Time core](date-time.md) implements separate date-only and time-of-day
 values, following .NET DateOnly/TimeOnly ranges and precision. Validated construction,
-zero defaults, readonly components and comparison are in place. Exact invariant
-parsing and formatting are the next date/time slice; arithmetic, durations, clocks
-and timezone mapping follow the [date/time plan](date-time-design.md).
+zero defaults, readonly components and comparison are in place. The
+[local clock](local-clock.md) supplies a single system-local date/time/offset snapshot.
+Parsing, formatting and globalization are deferred. Arithmetic, durations and broader
+clock/timezone support remain later work in the [date/time plan](date-time-design.md).
