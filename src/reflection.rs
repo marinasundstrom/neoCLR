@@ -62,8 +62,9 @@ impl Query {
         match self {
             Self::Shape => Ok(Value::Boolean(match argument {
                 0 => matches!(ty, Type::Array(_)),
-                1 => matches!(ty, Type::ByRef(_)),
+                1 => matches!(ty, Type::ByRef(_) | Type::ReadOnlyByRef(_)),
                 2 => matches!(ty, Type::Ptr(_)),
+                4 => matches!(ty, Type::ReadOnlyByRef(_)),
                 3 => definition.is_some_and(|d| d.representation == Representation::Interface),
                 _ => return Err(Fault::new("unknown type shape query")),
             })),
@@ -87,7 +88,9 @@ impl Query {
             Self::ElementType => option(
                 "System.Type",
                 match &ty {
-                    Type::Array(t) | Type::ByRef(t) | Type::Ptr(t) => Some(type_value(module, t)?),
+                    Type::Array(t) | Type::ByRef(t) | Type::ReadOnlyByRef(t) | Type::Ptr(t) => {
+                        Some(type_value(module, t)?)
+                    }
                     _ => None,
                 },
             ),
@@ -329,15 +332,19 @@ fn parameters(
     array(
         "System.Reflection.ParameterInfo",
         types.iter().enumerate().map(|(i, ty)| {
+            let qualified = match ty {
+                Type::ByRef(target) if readonly.contains(&i) => Type::ReadOnlyByRef(target.clone()),
+                _ => ty.clone(),
+            };
             Ok(record(
                 "System.Reflection.ParameterInfo",
                 vec![
                     Value::String(names.get(i).and_then(|n| n.clone()).unwrap_or_default()),
                     index_value(i)?,
-                    type_value(module, ty)?,
+                    type_value(module, &qualified)?,
                     Value::Boolean(out.contains(&i)),
                     Value::Boolean(conditional.contains(&i)),
-                    Value::Boolean(readonly.contains(&i)),
+                    Value::Boolean(readonly.contains(&i) || matches!(ty, Type::ReadOnlyByRef(_))),
                 ],
             ))
         }),
@@ -391,6 +398,7 @@ fn from_identity(module: &Module, identity: &TypeIdentity) -> Result<Type, Fault
     let nested = |id| from_identity(module, id).map(Box::new);
     Ok(match identity {
         TypeIdentity::ByRef(t) => Type::ByRef(nested(t)?),
+        TypeIdentity::ReadOnlyByRef(t) => Type::ReadOnlyByRef(nested(t)?),
         TypeIdentity::Array(t) => Type::Array(nested(t)?),
         TypeIdentity::Ptr(t) => Type::Ptr(nested(t)?),
         TypeIdentity::InterfaceRef(t) => Type::InterfaceRef(nested(t)?),

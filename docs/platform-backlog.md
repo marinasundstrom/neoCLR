@@ -22,7 +22,7 @@ it remains a concept compiler rather than a prerequisite full language implement
 
 | Area | Intended capability | Decisions before implementation |
 | --- | --- | --- |
-| Binding immutability and readonly references | Independent protected bindings and restricted managed access, enforced by runtime and projected in Neo | Slot initialization/re-entry; reference permissions and conversions; readonly receivers; owned fields versus referenced targets; verifier, reflection and dispatch enforcement |
+| Binding immutability and readonly references | Binding rules in the language; restricted reference access enforced by the runtime | Preserve permissions through signatures, storage and dispatch; keep owned fields distinct from referenced targets; no runtime immutable-slot requirement |
 | Object-oriented programming | Inheritance, base references, virtual methods and overrides, with familiar construction and member lookup | Base metadata and layout; constructor chaining; override validation; base-value copying or slicing; complete derived-object tracing and lifetime preservation through base views |
 | Nullability | Genuinely nullable slots with an explicit absent value, including nullable managed references | Representation and type identity; nullable value versus nullable reference syntax; conversions, access checks and initialization; reflection, verifier and GC rules |
 | Delegates and lambdas | Typed callable values, bound receivers and captured environments | Invocation signatures; capture by value versus reference; escaping captures and GC roots; delegate equality and possible multicast behavior; whether low-level function pointers are needed |
@@ -34,10 +34,10 @@ it remains a concept compiler rather than a prerequisite full language implement
 
 ## Contract boundaries
 
-**Mutability** belongs in runtime storage and access contracts, with language syntax
-and early diagnostics layered above. Immutable binding and readonly target access
-are independent; neither promises deep immutability. The [placement decision](mutability.md)
-details alias checks, receiver permissions and initialization/re-entry work.
+**Mutability** separates compiler-enforced binding rules from runtime-enforced
+managed-reference access. There is no immediate requirement for immutable runtime
+slots. The [placement decision](mutability.md) and [readonly storage signatures](readonly-storage.md)
+record that boundary.
 
 **Inheritance** builds on the [object hierarchy design](object-hierarchy.md). A base
 reference must preserve the complete derived allocation's identity and reachability.
@@ -46,7 +46,9 @@ type derive from Object. Value equality and hashing remain separate from referen
 identity. Class syntax in Neo follows the runtime contract rather than defining it
 in isolation.
 
-**Nullability** is a runtime representation and validation feature, not just a
+**Nullability** follows the [explicit signature direction](nullability.md): a special
+null state rather than zeroed bytes, with Option preferred for domain optionality.
+It is a runtime representation and validation feature, not just a
 compiler warning annotation. A null value must be distinct from an uninitialized
 slot and from Void. Decide its relationship to Option<T> without silently treating
 all three as interchangeable. In particular, distinguish a nullable reference from
@@ -102,7 +104,7 @@ where they fit the value/reference model.
 
 ## Suggested sequence and acceptance
 
-1. Establish binding immutability and readonly access contracts across runtime and Neo.
+1. Keep binding immutability in the language and complete shared readonly reference contracts.
 2. Establish inheritance and nullable-slot contracts. They affect layout, tracing,
    assignability, reflection and the initial base-library design.
 3. Explore enums and flags as a bounded metadata/library slice; it can move earlier

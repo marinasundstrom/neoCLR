@@ -113,6 +113,7 @@ enum Ty {
     Void,
     Record(String),
     Ref(Box<Ty>),
+    ReadOnlyRef(Box<Ty>),
     Array(Box<Ty>),
 }
 impl Ty {
@@ -125,6 +126,9 @@ impl Ty {
             Type::Void => Self::Void,
             Type::Array(target) => Self::Array(Box::new(Self::from_metadata(target)?)),
             Type::ByRef(target) => Self::Ref(Box::new(Self::from_metadata(target)?)),
+            Type::ReadOnlyByRef(target) => {
+                Self::ReadOnlyRef(Box::new(Self::from_metadata(target)?))
+            }
             Type::Constructed {
                 definition,
                 arguments,
@@ -144,6 +148,18 @@ impl Ty {
             ),
         })
     }
+    fn parameter_il(&self) -> String {
+        match self {
+            Self::ReadOnlyRef(target) => format!("{}&", target.il()),
+            _ => self.il(),
+        }
+    }
+    fn restricted(&self) -> Self {
+        match self {
+            Self::Ref(target) => Self::ReadOnlyRef(target.clone()),
+            _ => self.clone(),
+        }
+    }
     fn il(&self) -> String {
         match self {
             Self::Int => "Int32".into(),
@@ -151,7 +167,22 @@ impl Ty {
             Self::Bool => "Boolean".into(),
             Self::Void => "Void".into(),
             Self::Record(name) => name.clone(),
-            Self::Ref(ty) => format!("{}&", ty.il()),
+            Self::Ref(ty) => {
+                let name = ty.il();
+                if name.starts_with("readonly ") {
+                    format!("({name})&")
+                } else {
+                    format!("{name}&")
+                }
+            }
+            Self::ReadOnlyRef(ty) => {
+                let name = ty.il();
+                if name.starts_with("readonly ") {
+                    format!("readonly ({name})&")
+                } else {
+                    format!("readonly {name}&")
+                }
+            }
             Self::Array(ty) => format!("{}[]", ty.il()),
         }
     }
@@ -327,6 +358,14 @@ impl Parser {
         result
     }
     fn ty_inner(&mut self) -> Result<Ty, Fault> {
+        if self.eat("readonly") {
+            return match self.ty()? {
+                Ty::Ref(target) => Ok(Ty::ReadOnlyRef(target)),
+                _ => Err(self
+                    .current()
+                    .error("readonly type requires a managed reference")),
+            };
+        }
         let mut ty = if self.eat("(") {
             self.expect(")")?;
             Ty::Void
@@ -396,10 +435,10 @@ impl Parser {
                 if fields.len() >= 1024 {
                     return Err(name.error("parameter/field limit exceeded"));
                 }
-                if output && !matches!(ty, Ty::Ref(_)) {
+                if output && !matches!(ty, Ty::Ref(_) | Ty::ReadOnlyRef(_)) {
                     return Err(name.error("out parameter requires a managed reference type"));
                 }
-                if readonly && (output || !matches!(ty, Ty::Ref(_))) {
+                if readonly && (output || !matches!(ty, Ty::Ref(_) | Ty::ReadOnlyRef(_))) {
                     return Err(name.error("readonly parameter requires a managed input reference"));
                 }
                 fields.push(Field {
@@ -999,7 +1038,7 @@ impl Lowerer<'_> {
             .ok_or_else(|| name.error(format!("unknown field {}.{}", record, name.text)))
     }
     fn read(&mut self, ty: Ty) -> Ty {
-        if let Ty::Ref(target) = ty {
+        if let Ty::Ref(target) | Ty::ReadOnlyRef(target) = ty {
             self.body.push(format!("ldobj {}", target.il()));
             *target
         } else {
@@ -1016,10 +1055,18 @@ impl Lowerer<'_> {
         Ok(self.read(ty))
     }
     fn expression_for(&mut self, expression: &Expr, expected: &Ty) -> Result<Ty, Fault> {
+        if matches!(expected, Ty::ReadOnlyRef(_)) {
+            if let ExprKind::Unary(operation, value) = &expression.kind {
+                if operation == "&" {
+                    let actual = Ty::Ref(Box::new(self.place_with_access(value, true, true)?));
+                    return self.convert_reference(actual, expected, &expression.at);
+                }
+            }
+        }
         let actual = if let ExprKind::Match(value, arms) = &expression.kind {
             self.match_arms(value, arms, false, Some(expected), false)?
                 .0
-        } else if matches!(expected, Ty::Ref(_)) {
+        } else if matches!(expected, Ty::Ref(_) | Ty::ReadOnlyRef(_)) {
             self.expression(expression)?
         } else {
             self.value_expression(expression)?
@@ -1027,8 +1074,18 @@ impl Lowerer<'_> {
         self.convert_reference(actual, expected, &expression.at)
     }
     fn convert_reference(&mut self, actual: Ty, expected: &Ty, at: &Token) -> Result<Ty, Fault> {
+        if matches!(actual, Ty::ReadOnlyRef(_)) && matches!(expected, Ty::Ref(_)) {
+            return Err(at.error("readonly reference cannot satisfy writable contract"));
+        }
         if actual != *expected {
-            if let (Ty::Ref(concrete), Ty::Ref(interface)) = (&actual, expected) {
+            if let (
+                Ty::Ref(concrete) | Ty::ReadOnlyRef(concrete),
+                Ty::Ref(interface) | Ty::ReadOnlyRef(interface),
+            ) = (&actual, expected)
+            {
+                if concrete == interface {
+                    return Ok(expected.clone());
+                }
                 if library::implements(concrete, interface)?
                     || self
                         .source
@@ -1049,12 +1106,17 @@ impl Lowerer<'_> {
         Ok(actual)
     }
     fn parameter_argument(&mut self, argument: &Expr, parameter: &Field) -> Result<(), Fault> {
-        if parameter.readonly {
+        let expected = if parameter.readonly {
+            parameter.ty.restricted()
+        } else {
+            parameter.ty.clone()
+        };
+        if matches!(expected, Ty::ReadOnlyRef(_)) {
             if let ExprKind::Unary(operation, value) = &argument.kind {
                 if operation == "&" {
                     let actual = Ty::Ref(Box::new(self.place_with_access(value, true, true)?));
                     return self
-                        .convert_reference(actual, &parameter.ty, &argument.at)
+                        .convert_reference(actual, &expected, &argument.at)
                         .map(|_| ());
                 }
             }
@@ -1068,7 +1130,7 @@ impl Lowerer<'_> {
             let actual = Ty::Ref(Box::new(self.place(value, true)?));
             self.require(&actual, &parameter.ty, &argument.at)
         } else {
-            self.expression_for(argument, &parameter.ty).map(|_| ())
+            self.expression_for(argument, &expected).map(|_| ())
         }
     }
     fn output_arguments(
@@ -1106,11 +1168,11 @@ impl Lowerer<'_> {
         readonly: bool,
     ) -> Result<(), Fault> {
         if byref {
-            if !matches!(ty, Ty::Ref(_)) {
+            if !matches!(ty, Ty::Ref(_) | Ty::ReadOnlyRef(_)) {
                 self.body.truncate(start);
                 self.place_with_access(expression, true, readonly)?;
             }
-        } else if let Ty::Ref(target) = ty {
+        } else if let Ty::Ref(target) | Ty::ReadOnlyRef(target) = ty {
             self.body.push(format!("ldobj {}", target.il()));
         }
         Ok(())
@@ -1137,7 +1199,7 @@ impl Lowerer<'_> {
     ) -> Result<Option<Ty>, Fault> {
         let saved = self.body.len();
         let ty = self.expression(owner)?;
-        let target = if let Ty::Ref(target) = &ty {
+        let target = if let Ty::Ref(target) | Ty::ReadOnlyRef(target) = &ty {
             target.as_ref()
         } else {
             &ty
@@ -1180,7 +1242,7 @@ impl Lowerer<'_> {
     fn array_element(ty: Ty, at: &Token) -> Result<Ty, Fault> {
         match ty {
             Ty::Array(element) => Ok(*element),
-            Ty::Ref(target) => Self::array_element(*target, at),
+            Ty::Ref(target) | Ty::ReadOnlyRef(target) => Self::array_element(*target, at),
             _ => Err(at.error("indexing requires an array")),
         }
     }
@@ -1188,7 +1250,7 @@ impl Lowerer<'_> {
         self.sequence(&expression.at);
         match &expression.kind {
             ExprKind::InterfaceCast(value, target) => {
-                let Ty::Ref(interface) = target else {
+                let (Ty::Ref(interface) | Ty::ReadOnlyRef(interface)) = target else {
                     return Err(expression.at.error(
                         "interface projection requires an interface reference target (Contract&)",
                     ));
@@ -1204,7 +1266,7 @@ impl Lowerer<'_> {
                         .error("projection target must be a declared source interface"));
                 }
                 let actual = self.expression(value)?;
-                if !matches!(actual, Ty::Ref(_)) {
+                if !matches!(actual, Ty::Ref(_) | Ty::ReadOnlyRef(_)) {
                     return Err(value
                         .at
                         .error("interface projection requires a managed reference; use &value"));
@@ -1294,13 +1356,13 @@ impl Lowerer<'_> {
                 let saved = self.body.len();
                 let mut owner = self.array_owner(value)?;
                 if field.text == "Length"
-                    && matches!(&owner, Ty::Array(_) | Ty::Ref(_))
+                    && matches!(&owner, Ty::Array(_) | Ty::Ref(_) | Ty::ReadOnlyRef(_))
                     && Self::array_element(owner.clone(), field).is_ok()
                 {
                     self.body.extend(["ldlen".into(), "conv.ovf.i4".into()]);
                     return Ok(Ty::Int);
                 }
-                let target = if let Ty::Ref(target) = &owner {
+                let target = if let Ty::Ref(target) | Ty::ReadOnlyRef(target) = &owner {
                     target.as_ref()
                 } else {
                     &owner
@@ -1314,7 +1376,7 @@ impl Lowerer<'_> {
                     self.body.push(format!("{opcode} {getter}"));
                     return Ok(ty);
                 }
-                if let Ty::Ref(target) = owner {
+                if let Ty::Ref(target) | Ty::ReadOnlyRef(target) = owner {
                     self.body.push(format!("ldobj {}", target.il()));
                     owner = *target;
                 }
@@ -1420,7 +1482,7 @@ impl Lowerer<'_> {
             if bound_receiver || path.is_none() {
                 let saved = self.body.len();
                 let ty = self.expression(owner)?;
-                let target = if let Ty::Ref(t) = &ty {
+                let target = if let Ty::Ref(t) | Ty::ReadOnlyRef(t) = &ty {
                     t.as_ref()
                 } else {
                     &ty
@@ -1441,7 +1503,7 @@ impl Lowerer<'_> {
                     .is_some_and(|methods| methods.iter().any(|m| m.name.text == member.text));
                 if member.text == "GetType"
                     && arguments.is_empty()
-                    && matches!(ty, Ty::Ref(_))
+                    && matches!(ty, Ty::Ref(_) | Ty::ReadOnlyRef(_))
                     && !declared
                     && library::parameters(target, "GetType", 0)?.is_none()
                 {
@@ -1468,11 +1530,11 @@ impl Lowerer<'_> {
                         member.text,
                         parameters
                             .iter()
-                            .map(|p| p.ty.il())
+                            .map(|p| p.ty.parameter_il())
                             .collect::<Vec<_>>()
                             .join(",")
                     );
-                    if !matches!(ty, Ty::Ref(_)) {
+                    if !matches!(ty, Ty::Ref(_) | Ty::ReadOnlyRef(_)) {
                         self.body.truncate(saved);
                         self.place_with_access(owner, true, receiver_readonly)?;
                     }
@@ -1560,7 +1622,7 @@ impl Lowerer<'_> {
                     .error("ReferenceEquals requires two managed references"));
             }
             for argument in arguments {
-                if !matches!(self.expression(argument)?, Ty::Ref(_)) {
+                if !matches!(self.expression(argument)?, Ty::Ref(_) | Ty::ReadOnlyRef(_)) {
                     return Err(argument
                         .at
                         .error("ReferenceEquals requires explicit managed references"));
@@ -1662,7 +1724,7 @@ impl Lowerer<'_> {
                     function
                         .parameters
                         .iter()
-                        .map(|field| field.ty.il())
+                        .map(|field| field.ty.parameter_il())
                         .collect::<Vec<_>>()
                         .join(",")
                 ),
@@ -1695,7 +1757,7 @@ impl Lowerer<'_> {
             ExprKind::Index(owner, index) => {
                 if let Some(ty) = self.indexer(owner, index, None)? {
                     return match ty {
-                        Ty::Ref(target) => Ok(*target),
+                        Ty::Ref(target) | Ty::ReadOnlyRef(target) => Ok(*target),
                         _ => Err(expression
                             .at
                             .error("value-returning indexer is not an addressable location")),
@@ -1704,7 +1766,7 @@ impl Lowerer<'_> {
                 let owner_ty = self.place_with_access(owner, borrowing, readonly)?;
                 let element = Self::array_element(owner_ty, &owner.at)?;
                 self.expression_for(index, &Ty::Int)?;
-                if let Ty::Ref(target) = &element {
+                if let Ty::Ref(target) | Ty::ReadOnlyRef(target) = &element {
                     self.body.push(format!("ldelem {}", element.il()));
                     return Ok(*target.clone());
                 }
@@ -1714,7 +1776,7 @@ impl Lowerer<'_> {
 
             ExprKind::Name(name) => {
                 let binding = self.binding(name, &expression.at)?;
-                if let Ty::Ref(target) = binding.ty {
+                if let Ty::Ref(target) | Ty::ReadOnlyRef(target) = binding.ty {
                     self.body.push(binding.load);
                     return Ok(*target);
                 }
@@ -1732,13 +1794,14 @@ impl Lowerer<'_> {
             ExprKind::Field(owner, field) => {
                 let saved = self.body.len();
                 let ty = self.expression(owner)?;
-                let (target, referenced_owner) = if let Ty::Ref(target) = ty {
-                    (*target, true)
-                } else {
-                    (ty, false)
-                };
+                let (target, referenced_owner) =
+                    if let Ty::Ref(target) | Ty::ReadOnlyRef(target) = ty {
+                        (*target, true)
+                    } else {
+                        (ty, false)
+                    };
                 let field_type = self.field(&target, field)?;
-                if let Ty::Ref(referent) = field_type {
+                if let Ty::Ref(referent) | Ty::ReadOnlyRef(referent) = field_type {
                     if referenced_owner {
                         self.body.push(format!("ldobj {}", target.il()));
                     }
@@ -1756,7 +1819,7 @@ impl Lowerer<'_> {
             }
             _ => {
                 let ty = self.expression(expression)?;
-                if let Ty::Ref(target) = ty {
+                if let Ty::Ref(target) | Ty::ReadOnlyRef(target) = ty {
                     Ok(*target)
                 } else {
                     Err(expression.at.error("expected an assignable location"))
@@ -1782,7 +1845,7 @@ impl Lowerer<'_> {
         values: bool,
     ) -> Result<(Ty, bool), Fault> {
         let mut ty = self.expression(value)?;
-        if let Ty::Ref(target) = ty {
+        if let Ty::Ref(target) | Ty::ReadOnlyRef(target) = ty {
             self.body.push(format!("ldobj {}", target.il()));
             ty = *target;
         }
@@ -2113,9 +2176,9 @@ impl Lowerer<'_> {
                     }
                     if let ExprKind::Name(name) = &left.kind {
                         let binding = self.binding(name, &left.at)?;
-                        let rebind = matches!(binding.ty, Ty::Ref(_))
+                        let rebind = matches!(binding.ty, Ty::Ref(_) | Ty::ReadOnlyRef(_))
                             && matches!(&right.kind, ExprKind::Unary(op, _) if op == "&");
-                        if let Ty::Ref(target) = &binding.ty {
+                        if let Ty::Ref(target) | Ty::ReadOnlyRef(target) = &binding.ty {
                             if !rebind {
                                 self.body.push(binding.load);
                                 self.expression_for(right, target)?;
@@ -2163,7 +2226,11 @@ impl Lowerer<'_> {
             self.bindings.insert(
                 "this".into(),
                 Binding {
-                    ty: Ty::Ref(Box::new(Ty::Record(receiver.text.clone()))),
+                    ty: if self.function.receiver_readonly {
+                        Ty::ReadOnlyRef(Box::new(Ty::Record(receiver.text.clone())))
+                    } else {
+                        Ty::Ref(Box::new(Ty::Record(receiver.text.clone())))
+                    },
                     mutable: false,
                     load: "ldarg 0".into(),
                     address: "ldarga 0".into(),
@@ -2176,7 +2243,11 @@ impl Lowerer<'_> {
             self.bindings.insert(
                 parameter.name.text.clone(),
                 Binding {
-                    ty: parameter.ty.clone(),
+                    ty: if parameter.readonly {
+                        parameter.ty.restricted()
+                    } else {
+                        parameter.ty.clone()
+                    },
                     mutable: false,
                     load: format!("ldarg {index}"),
                     address: format!("ldarga {index}"),

@@ -237,5 +237,12 @@ The [readonly input-parameter slice](readonly-parameters.md) now enforces restri
 managed access at runtime, with Neo declarations and ParameterInfo.IsReadOnly.
 Readonly instance receivers now use the same enforcement and expose MethodInfo.IsReadOnly.
 ArrayList Count/Capacity/Item getters and List Count/Item contracts support readonly
-observation. General storage/return declarations remain future work; the verifier
-currently tracks only part of the permission flow.
+observation. [Readonly storage and return signatures](readonly-storage.md) are implemented;
+full alias/lifetime analysis remains outside the verifier.
+
+Characteristic placement should follow its meaning: nominal definitions describe
+members and relationships; use-site type signatures carry reference access and the
+agreed future nullability characteristic; source compilers control binding reassignment.
+Slots hold runtime state validated against their signatures. Null will be a special
+state for explicitly nullable values or references, not zero/default payloads or
+uninitialized storage. Prefer Option for domain optionality. See [nullability](nullability.md).

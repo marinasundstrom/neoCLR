@@ -1,6 +1,6 @@
-; Investigation probe: currently verifies, then intentionally faults on the write.
-; No write permission is recovered; the return/local signatures fail to expose
-; the live restriction. See docs/reference-storage-contract.md.
+; Historical gap probe, intentionally invalid: now rejected by verification and
+; faults at Observe's writable return if executed unchecked. Originally verified
+; and faulted at the later write. See docs/reference-storage-contract.md.
 .module ReferenceContractProbe
 .entry Main
 .function Observe(readonly Int32& value) -> Int32&

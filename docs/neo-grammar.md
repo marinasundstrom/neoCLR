@@ -28,7 +28,7 @@ field            = identifier, ":", type ;
 parameter_list   = "(", newlines, [ parameter, newlines,
                    { ",", newlines, parameter, newlines } ], ")" ;
 parameter        = [ "out" | "readonly" ], identifier, ":", type ;
-type             = (qualified_name, [ "<", type, { ",", type }, ">" ] | "(", ")"), { "[", "]" }, [ "&" ] ;
+type             = "readonly", type | (qualified_name, [ "<", type, { ",", type }, ">" ] | "(", ")"), { "[", "]" }, [ "&" ] ;
 qualified_name   = identifier, { ".", identifier } ;
 
 block            = newlines, "{", separators, { statement, separators }, "}" ;
@@ -243,3 +243,8 @@ for enforcement, the partial verifier projection and current limitations.
 
 Inside record/interface bodies, `readonly func` declares a readonly managed receiver.
 The modifier is not valid on free functions. See [receiver semantics](readonly-parameters.md#readonly-instance-receivers).
+
+See [readonly storage and return signatures](readonly-storage.md) for implemented
+readonly T& type positions, checked boundaries and migration. Binding immutability
+remains a language feature. [Explicit nullability](nullability.md) is a planned
+signature characteristic and special state, not implemented syntax or zeroing.

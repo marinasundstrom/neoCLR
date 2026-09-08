@@ -332,6 +332,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         }
     }
     let mut identities = HashSet::new();
+    let mut access_signatures = HashSet::new();
     let mut signatures = HashSet::new();
     let free_signatures: HashSet<_> = module
         .functions
@@ -346,6 +347,24 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             .is_some_and(|identity| !identities.insert(identity))
         {
             return Err(Fault::new("duplicate function definition identity"));
+        }
+        let parameters_without_access: Vec<_> = function
+            .parameters
+            .iter()
+            .map(|ty| match ty {
+                Type::ReadOnlyByRef(target) => Type::ByRef(target.clone()),
+                other => other.clone(),
+            })
+            .collect();
+        if !access_signatures.insert((
+            &function.owner,
+            &function.name,
+            function.instance,
+            parameters_without_access,
+        )) {
+            return Err(Fault::new(
+                "duplicate function signature differing only by reference access",
+            ));
         }
         if function.name.is_empty()
             || (function.owner.is_some()
@@ -570,13 +589,21 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 {
                     return Err(Fault::new("local index outside signature"));
                 }
-                Op::LocalAddress(i) if matches!(&function.locals[*i], Type::ByRef(_)) => {
+                Op::LocalAddress(i)
+                    if matches!(
+                        &function.locals[*i],
+                        Type::ByRef(_) | Type::ReadOnlyByRef(_)
+                    ) =>
+                {
                     return Err(Fault::new(
                         "cannot take the address of a managed reference local",
                     ));
                 }
                 Op::ArgumentAddress(i) | Op::StoreArg(i)
-                    if matches!(&function.argument_types()[*i], Type::ByRef(_)) =>
+                    if matches!(
+                        &function.argument_types()[*i],
+                        Type::ByRef(_) | Type::ReadOnlyByRef(_)
+                    ) =>
                 {
                     return Err(Fault::new(
                         "cannot rebind or take the address of a managed reference parameter",
@@ -609,7 +636,9 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 | Op::StoreArrayElement(ty)
                 | Op::ArrayAddress(ty) => {
                     check(&Type::Array(Box::new(ty.clone())))?;
-                    if matches!(op, Op::ArrayAddress(_)) && matches!(ty, Type::ByRef(_)) {
+                    if matches!(op, Op::ArrayAddress(_))
+                        && matches!(ty, Type::ByRef(_) | Type::ReadOnlyByRef(_))
+                    {
                         return Err(Fault::new("nested managed references are not supported"));
                     }
                     if matches!(op, Op::NewArray(_)) && check_type(ty, module).is_ok() {
@@ -639,7 +668,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                             "interface views support dispatch, not value storage",
                         ));
                     }
-                    if matches!(ty, Type::ByRef(_)) {
+                    if matches!(ty, Type::ByRef(_) | Type::ReadOnlyByRef(_)) {
                         return Err(Fault::new("managed references cannot be indirectly stored"));
                     }
                 }
@@ -824,8 +853,8 @@ fn check_type_context(ty: &Type, module: &Module, arity: usize, depth: usize) ->
             crate::interfaces::interface_definition(module, t)?;
             Ok(())
         }
-        Type::ByRef(t) => {
-            if matches!(t.as_ref(), Type::ByRef(_)) {
+        Type::ByRef(t) | Type::ReadOnlyByRef(t) => {
+            if matches!(t.as_ref(), Type::ByRef(_) | Type::ReadOnlyByRef(_)) {
                 return Err(Fault::new("nested managed references are not supported"));
             }
             nested(t)
@@ -857,7 +886,12 @@ fn restrict_reference_arguments(
             _ => continue,
         };
         if (index == 0 && function.receiver_readonly)
-            || (index >= offset && function.readonly_parameters.contains(&(index - offset)))
+            || (index >= offset
+                && (function.readonly_parameters.contains(&(index - offset))
+                    || matches!(
+                        function.parameters.get(index - offset),
+                        Some(Type::ReadOnlyByRef(_))
+                    )))
         {
             reference.assigned()?;
             reference.restrict_readonly();
@@ -1470,7 +1504,7 @@ fn interpret_instructions(
                 Op::CallVirtual(target) => {
                     let contract = resolve(module, target)?;
                     crate::access::check_call(module, Some(&function), &contract)?;
-                    let mut args = frame.args(&contract.parameters)?;
+                    let mut args = frame.args(&contract.argument_types()[1..])?;
                     let (interface, concrete, storage) = match frame.pop()? {
                         Value::SlotInterface {
                             interface,
@@ -1712,7 +1746,9 @@ fn interpret_instructions(
                     let index = crate::arrays::index(frame.pop()?)?;
                     match frame.pop()? {
                         Value::SlotReference(reference) => {
-                            if matches!(op, Op::ArrayAddress(_)) && matches!(ty, Type::ByRef(_)) {
+                            if matches!(op, Op::ArrayAddress(_))
+                                && matches!(ty, Type::ByRef(_) | Type::ReadOnlyByRef(_))
+                            {
                                 return Err(Fault::new(
                                     "nested managed references are not supported",
                                 ));
@@ -2028,7 +2064,7 @@ fn interpret_instructions(
                     }
                     let value = frame.pop()?;
                     let target = value.ty();
-                    if matches!(&target, Type::ByRef(_)) {
+                    if matches!(&target, Type::ByRef(_) | Type::ReadOnlyByRef(_)) {
                         return Err(Fault::new(
                             "managed references cannot escape into heap storage",
                         ));

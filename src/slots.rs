@@ -180,7 +180,7 @@ impl SlotReference {
     }
     pub(crate) fn field(&self, index: usize, target: Type) -> Result<Self, Fault> {
         self.assigned()?;
-        if matches!(&target, Type::ByRef(_)) {
+        if matches!(&target, Type::ByRef(_) | Type::ReadOnlyByRef(_)) {
             return Err(Fault::new("nested managed references are not supported"));
         }
         let mut result = self.clone();
@@ -325,7 +325,7 @@ fn at_path<'a>(mut value: &'a Value, path: &[usize]) -> Result<&'a Value, Fault>
 
 pub(crate) fn contains(ty: &Type) -> bool {
     match ty {
-        Type::ByRef(_) => true,
+        Type::ByRef(_) | Type::ReadOnlyByRef(_) => true,
         Type::Array(t) | Type::Ptr(t) | Type::InterfaceRef(t) => contains(t),
         Type::Constructed { arguments, .. } | Type::Scoped { arguments, .. } => {
             arguments.iter().any(contains)

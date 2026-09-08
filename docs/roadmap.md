@@ -12,12 +12,12 @@ source syntax or runtime internals. Improve contracts without legacy constraints
 
 ## Groundwork checkpoint
 
-Feature implementation is paused for the [runtime groundwork review](runtime-groundwork-review.md).
-It recommends completing stored/returned reference permissions and protected-slot
-initialization, then shared type relationships and complete-owner projections before
-inheritance. Activation ownership, external roots and cleanup need decisions before
-escaping callbacks or suspension. The sequence below remains a feature roadmap;
-the review supplies the prerequisites and proposed acceptance cases.
+The [runtime groundwork review](runtime-groundwork-review.md) led to implemented
+[stored/returned readonly signatures](readonly-storage.md). Immutable bindings remain
+a language responsibility; runtime-protected slots are not on the immediate track.
+Shared type relationships and complete-owner projections remain the next object-model
+foundation. Activation ownership, external roots and cleanup need decisions before
+escaping callbacks or suspension.
 
 ## Projected exploration order
 
@@ -28,9 +28,9 @@ The completed memory and Neo foundations remain the starting point.
 
 | Order | Projected tasks | Exit criterion / demonstration |
 | --- | --- | --- |
-| 1. Binding immutability and readonly access | Decide protected-slot versus reference-capability contracts, initialization/re-entry and shallow boundaries. Implement runtime enforcement, receiver permissions, verifier/reflection support and Neo projections. | All four binding/reference mutability combinations work; raw IL cannot bypass protected storage or upgrade readonly access; aliases, loops and reference-containing values follow documented rules. |
+| 1. Reference access contracts | Preserve readonly permissions in signatures, storage, calls and returns, with verifier/reflection support and Neo projection. Keep immutable bindings in the language. | Raw IL cannot upgrade readonly access; locals remain replaceable under their declared signature; aliases and reference-containing values follow documented rules. |
 | 2. Inheritance and object model | Specify base metadata, field layout, construction order, virtual slots, override validation and base-value copy rules. Implement one inheritance chain, base-reference conversion, full-owner GC tracing and reflection of inherited members. | A derived value can be used locally and on the managed heap, dispatched through a base reference, and inspected without losing derived identity or bypassing lifetime checks. |
-| 3. Nullable slots | Specify null versus uninitialized storage, nullable values versus nullable references, conversions and checked access. Add metadata, runtime storage, verifier/GC rules and a small Neo projection. | Store, copy, clear and inspect a genuinely nullable slot; absent access fails predictably, and clearing a heap reference removes its GC edge. |
+| 3. Nullable signatures and storage | Follow the [explicit null-state direction](nullability.md): non-nullable defaults, nullable values/references by signature, Option for optionality, distinct uninitialized storage, conversions and checked access. Add metadata, runtime storage, verifier/GC rules and a small Neo projection. | Store, copy, clear and inspect a genuinely nullable slot; absent access fails predictably, and clearing a heap reference removes its GC edge. |
 | 4. Enums and flags | Specify underlying integral types, enum identity, named constants, a flags designation, conversions and unknown-value rules. Add metadata, typed bitwise operations, reflection/formatting and a bounded Neo projection. | A typed options value combines and tests flags, round-trips through an artifact, and formats named and unnamed combinations according to a documented contract. |
 | 5. Generic constraints | Specify base/interface constraints plus not-null, not-void and not-reference scopes. Implement metadata/substitution validation and negative cases at loading and relevant invocation boundaries; project a bounded subset in Neo. | A small generic API accepts valid arguments and rejects invalid ones consistently from source and IL/artifacts. |
 | 6. Managed delegates and lambdas | Start with typed static and bound-instance delegates and invocation. Then specify capture modes, escaping closure ownership, equality and optional multicast semantics. Evaluate function pointers only where needed for invocation or interop. | A callback retains a managed receiver or eligible capture, runs through a typed delegate, and cannot retain a dead frame reference. |
@@ -49,10 +49,10 @@ as those programs need them, with consistent APIs rather than isolated demonstra
 
 The first [readonly input-parameter implementation](readonly-parameters.md) is complete;
 readonly receivers and the initial collection-getter review are also complete.
-Richer storage/return contracts and protected bindings remain.
-The [mutability design](mutability.md) places immutable storage and readonly access
-in runtime contracts, with syntax and early diagnostics in Neo. Explore it first so
-inheritance and capture rules preserve one shared permission model.
+[Stored/returned readonly signatures](readonly-storage.md) are also implemented.
+The [mutability decision](mutability.md) keeps binding immutability in Neo while
+reference permissions remain runtime contracts. Inheritance and capture rules must
+preserve that shared permission model.
 
 Keep these early decisions explicit:
 
@@ -149,16 +149,16 @@ to the published Preview 1 release gates.
 | Payload layout and ownership | String, errors and ordinary union carriers have no native layout, so the native Array buffer cannot hold them; managed ArrayList now can | Specify copy, replacement, release and active-payload rules; prove nested Result and String collection workloads before retiring System.Value |
 | Scoped type identity | Scoped source operands currently normalize to unique names; colliding names cannot coexist across modules | Carry resolved definition identities through signatures and caches before general loading or cross-build compilation caches |
 | Verification and required Faults | Verification is optional and pointer side tables include prototype diagnostics | Classify required checks, verified preconditions and optional diagnostics before an optimized backend; decide which execution profiles require verification |
-| Managed reference extensions | Whole-slot references work, but field paths, readonly permissions and escaping references need further rules | Specify aliasing, slot replacement and invalidation with executable examples before adding each capability |
+| Managed reference extensions | Field paths, heap/frame references and readonly signatures are implemented; richer type relationships and lifetime analysis remain | Preserve access and owner identity through future base projections, nullable signatures and captures |
 | Text APIs | UTF-8 bytes, UTF-16 code units and user-visible text elements need distinct contracts | Set indexing and decoding contracts before introducing Length/indexers; add a byte-to-text workload with explicit decoding errors |
 | Native execution and hosting | Call graphs and target layouts are available, but they do not establish ABI or complete backend support | Validate layout/opcode closure, Fault propagation, cancellation and value lifetimes in a small AOT executable/export experiment |
-| Frontend scope | A compiler can exercise library ergonomics against the existing IL | Choose a small C#-dialect or Raven subset and pair compiled programs with the existing IL fixtures |
+| Frontend scope | Neo exercises library ergonomics against the existing IL | Keep the concept compiler and executable samples updated with runtime contracts |
 
 Prioritize the storage/lifetime design and a small frontend workload over broad new
 library APIs. Keep binary round-trip and AOT experiments bounded so they test the
-shared contracts before any public ABI is frozen. General OOP, networking, async,
-[Tracing GC](garbage-collection.md) now manages the prototype heap, including cycles.
-Unified heap-backed T& and advanced collector policies remain future work.
+shared contracts before any public ABI is frozen. General OOP, networking and async
+remain future work. [Tracing GC](garbage-collection.md) manages the prototype heap,
+including cycles, with direct heap-backed T&. Advanced collector policies remain planned.
 
 The [lifecycle direction](lifecycle.md) develops the next storage foundation:
 GC-managed heap references, stack-backed byref calls and separate value cleanup rules.

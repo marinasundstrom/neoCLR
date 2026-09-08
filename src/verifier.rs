@@ -226,6 +226,10 @@ fn analyze_function(
                         callee.receiver_readonly
                     } else {
                         callee.readonly_parameters.contains(&(argument - offset))
+                            || matches!(
+                                callee.parameters.get(argument - offset),
+                                Some(Type::ReadOnlyByRef(_))
+                            )
                     })
                 {
                     return Err(fault(
@@ -322,13 +326,28 @@ fn analyze_function(
                         "incompatible stack heights at control-flow join",
                     ));
                 }
-                if previous.stack != state.stack {
-                    return Err(fault(
-                        target,
-                        "incompatible stack types at control-flow join",
-                    ));
-                }
                 let mut changed = false;
+                for (old, incoming) in previous.stack.iter_mut().zip(&state.stack) {
+                    if old == incoming {
+                        continue;
+                    }
+                    match (&*old, incoming) {
+                        (StackType::Exact(Type::ByRef(a)), StackType::Readonly(Type::ByRef(b)))
+                            if a == b =>
+                        {
+                            *old = incoming.clone();
+                            changed = true;
+                        }
+                        (StackType::Readonly(Type::ByRef(a)), StackType::Exact(Type::ByRef(b)))
+                            if a == b => {}
+                        _ => {
+                            return Err(fault(
+                                target,
+                                "incompatible stack types at control-flow join",
+                            ));
+                        }
+                    }
+                }
                 if previous.receiver_initialized && !state.receiver_initialized {
                     previous.receiver_initialized = false;
                     changed = true;
@@ -498,11 +517,22 @@ fn loaded(ty: &Type) -> StackType {
         SByte | Byte | Int16 | UInt16 | Char | UInt32 => StackType::Exact(Int32),
         UInt64 => StackType::Exact(Int64),
         Single => StackType::Exact(Double),
+        ReadOnlyByRef(target) => StackType::Readonly(ByRef(target.clone())),
         other => StackType::Exact(other.clone()),
     }
 }
 
 fn stored(value: &StackType, target: &Type) -> Result<(), Fault> {
+    if matches!(value, StackType::Readonly(_)) && matches!(target, Type::ByRef(_)) {
+        return Err(Fault::new(
+            "readonly reference cannot satisfy writable storage contract",
+        ));
+    }
+    if let Type::ReadOnlyByRef(inner) = target {
+        if exact(value).is_ok_and(|ty| ty == &Type::ByRef(inner.clone())) {
+            return Ok(());
+        }
+    }
     if exact(value).is_ok_and(|ty| ty == target) || *value == loaded(target) {
         Ok(())
     } else {
@@ -651,17 +681,7 @@ fn typed_effect(
             local: None,
             argument: Some(*index),
         }]),
-        Arg(index) => {
-            let offset = usize::from(function.instance);
-            let ty = function.argument_types()[*index].clone();
-            Ok(vec![if (*index == 0 && function.receiver_readonly)
-                || (*index >= offset && function.readonly_parameters.contains(&(*index - offset)))
-            {
-                StackType::Readonly(ty)
-            } else {
-                loaded(&ty)
-            }])
-        }
+        Arg(index) => Ok(vec![loaded(&function.argument_types()[*index])]),
         Load(index) => Result::Ok(vec![loaded(&function.locals[*index])]),
         Store(index) => {
             stored(&values[0], &function.locals[*index])?;
@@ -714,7 +734,7 @@ fn typed_effect(
                     ));
                 }
             }
-            for (value, ty) in values[1..].iter().zip(&callee.parameters) {
+            for (value, ty) in values[1..].iter().zip(&callee.argument_types()[1..]) {
                 stored(value, ty)?;
             }
             Result::Ok(vec![loaded(&callee.returns)])

@@ -146,9 +146,24 @@ impl Value {
             Self::RuntimeTypeHandle(_) => Type::RuntimeTypeHandle,
             Self::Object { ty, .. } => ty.clone(),
             Self::Array { element, .. } => Type::Array(Box::new(element.clone())),
-            Self::SlotInterface { interface, .. } => Type::ByRef(Box::new(interface.clone())),
+            Self::SlotInterface {
+                interface,
+                receiver,
+            } => {
+                if receiver.is_readonly() {
+                    Type::ReadOnlyByRef(Box::new(interface.clone()))
+                } else {
+                    Type::ByRef(Box::new(interface.clone()))
+                }
+            }
             Self::InterfaceRef { interface, .. } => Type::InterfaceRef(Box::new(interface.clone())),
-            Self::SlotReference(reference) => Type::ByRef(Box::new(reference.target().clone())),
+            Self::SlotReference(reference) => {
+                if reference.is_readonly() {
+                    Type::ReadOnlyByRef(Box::new(reference.target().clone()))
+                } else {
+                    Type::ByRef(Box::new(reference.target().clone()))
+                }
+            }
             Self::Pointer(pointer) => Type::Ptr(Box::new(pointer.target.clone())),
         }
     }
@@ -171,7 +186,7 @@ impl Value {
     /// CLI integer storage truncates a stack integer to the destination width.
     pub(crate) fn for_storage(self, ty: &Type) -> Result<Self, crate::Fault> {
         self.initialized()?;
-        let value = match (&self, ty) {
+        let mut value = match (&self, ty) {
             (Self::Double(n), Type::Single) => Self::Single(*n as f32),
             (Self::Int32(n), Type::SByte) => Self::SByte(*n as i8),
             (Self::Int32(n), Type::Byte) => Self::Byte(*n as u8),
@@ -182,6 +197,23 @@ impl Value {
             (Self::Int64(n), Type::UInt64) => Self::UInt64(*n as u64),
             _ => self,
         };
+        if let Type::ReadOnlyByRef(target) = ty {
+            if value.ty() == Type::ByRef(target.clone()) {
+                match &mut value {
+                    Self::SlotReference(reference)
+                    | Self::SlotInterface {
+                        receiver: reference,
+                        ..
+                    } => reference.restrict_readonly(),
+                    _ => (),
+                }
+            }
+        }
+        if matches!(value.ty(), Type::ReadOnlyByRef(_)) && matches!(ty, Type::ByRef(_)) {
+            return Err(crate::Fault::new(
+                "readonly reference cannot satisfy writable storage contract",
+            ));
+        }
         if value.ty() == *ty {
             Ok(value)
         } else {

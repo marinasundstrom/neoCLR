@@ -646,3 +646,8 @@ Instance methods accept `.method instance readonly byref Name(...) -> T`.
 This records receiver_readonly, restricts this at entry and requires a non-constructor
 IL byref receiver. Calls keep their ordinary signatures; interface implementations
 must match. See [receiver contracts](readonly-parameters.md#readonly-instance-receivers).
+
+See [readonly storage and return signatures](readonly-storage.md) for implemented
+readonly T& type positions, checked boundaries and migration. Binding immutability
+remains a language feature. [Explicit nullability](nullability.md) is a planned
+signature characteristic and special state, not implemented syntax or zeroing.

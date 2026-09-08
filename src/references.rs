@@ -58,9 +58,11 @@ pub(crate) fn check_type(linked: &Module, source: &Module, ty: &Type) -> Result<
         return Ok(());
     }
     match ty {
-        Type::Array(t) | Type::ByRef(t) | Type::Ptr(t) | Type::InterfaceRef(t) => {
-            check_type(linked, source, t)?
-        }
+        Type::Array(t)
+        | Type::ByRef(t)
+        | Type::ReadOnlyByRef(t)
+        | Type::Ptr(t)
+        | Type::InterfaceRef(t) => check_type(linked, source, t)?,
         Type::Constructed {
             definition,
             arguments,

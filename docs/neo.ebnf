@@ -14,7 +14,7 @@ field            = identifier, ":", type ;
 parameter_list   = "(", newlines, [ parameter, newlines,
                    { ",", newlines, parameter, newlines } ], ")" ;
 parameter        = [ "out" | "readonly" ], identifier, ":", type ;
-type             = (qualified_name, [ "<", type, { ",", type }, ">" ] | "(", ")"), { "[", "]" }, [ "&" ] ;
+type             = "readonly", type | (qualified_name, [ "<", type, { ",", type }, ">" ] | "(", ")"), { "[", "]" }, [ "&" ] ;
 qualified_name   = identifier, { ".", identifier } ;
 
 block            = newlines, "{", separators, { statement, separators }, "}" ;

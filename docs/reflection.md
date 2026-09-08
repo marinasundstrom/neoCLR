@@ -176,9 +176,14 @@ arrays and GC pressure.
 The [readonly input-parameter slice](readonly-parameters.md) now enforces restricted
 managed access at runtime, with Neo declarations and ParameterInfo.IsReadOnly.
 Readonly instance receivers are also implemented, with MethodInfo.IsReadOnly.
-General storage/return declarations remain future work; the verifier currently tracks
-only part of the permission flow.
+[Readonly storage and return signatures](readonly-storage.md) now preserve declared
+permissions. The verifier remains conservative about aliases and lifetime provenance.
 
 MethodInfo.IsReadOnly reports an enforced readonly receiver (separate from
 ParameterInfo.IsReadOnly). Reassemble external System artifacts for the expanded
 MethodInfo descriptor; static and value-receiver methods report false.
+
+See [readonly storage and return signatures](readonly-storage.md) for implemented
+readonly T& type positions, checked boundaries and migration. Binding immutability
+remains a language feature. [Explicit nullability](nullability.md) is a planned
+signature characteristic and special state, not implemented syntax or zeroing.

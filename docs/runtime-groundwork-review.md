@@ -2,7 +2,9 @@
 
 Reviewed 2026-09-08 against readonly receiver milestone `0e1b2e1`. This is a code-backed design
 assessment and proposed sequence, not implementation of the capabilities below.
-Feature expansion is paused while these foundations are considered.
+The follow-up implements readonly storage/return signatures. Binding immutability
+remains a language feature; the earlier runtime-protected-slot recommendation is
+superseded by the [mutability decision](mutability.md).
 
 ## Recommendation
 
@@ -19,40 +21,31 @@ reflection, debugger/source maps, target layout and runtime-service planning.
 
 The [reference/storage contract follow-up](reference-storage-contract.md) now gives
 a concrete permission matrix, container rules, a reproducible gap probe and acceptance
-cases for the first foundation. It remains a proposal.
+cases for the first foundation. Its core reference-signature slice is now implemented;
+the wider future-feature assessment remains a proposal.
 
 ## Findings and dependencies
 
-### 1. Storage and reference contracts are incomplete
+### 1. Reference-signature milestone completed; binding policy stays in Neo
 
-Evidence: [Function metadata](../src/metadata.rs) records readonly inputs and receivers,
-but locals and returns still carry ordinary Type signatures. [SlotReference](../src/slots.rs)
-retains its runtime permission; [the verifier](../src/verifier.rs) loses permission
-facts when references pass through ordinary locals and returned signatures.
-Slot::set has no immutable-slot contract. Neo let checks are compiler rules.
+At the reviewed milestone, readonly capabilities survived at runtime but local and
+return signatures did not expose them. The [storage/return slice](readonly-storage.md)
+now records recursive access signatures and rejects readonly-to-writable boundaries
+in the verifier and runtime. [Function.argument_types](../src/metadata.rs) derives
+qualified argument signatures from existing input/receiver declaration contracts.
 
-A readonly return can therefore look writable to its consumer and fault only when
-used. This is enforced, but not yet a complete, predictable API contract. Immutable
-storage is a different missing capability: restricting one alias cannot protect a
-slot against every other writer.
+Immutable local bindings remain a language feature. The absence of write-once slots
+in Slot::set is intentional and not a runtime deficiency. There is no immediate
+protected-slot or initialization-region implementation to undertake.
 
-Groundwork: specify a shared access/storage model covering local, parameter, field,
-array-element and return positions; initialization, out writes and loop re-entry;
-and conservative permission joins. Keep target mutability separate from rebinding.
-Choose whether qualifiers belong on use-site signatures or separate contract records
-before extending the current parallel parameter lists. Do not equate readonly with
-purity, non-aliasing, thread safety or a stable value.
+Further work should preserve the common reference contract through richer type
+relationships and retain conservative lifetime/provenance analysis. Readonly does not
+mean purity, non-aliasing, deep immutability or a stable value. The runtime still checks
+frame escapes when static analysis cannot prove them.
 
-First bounded implementation after the pause: readonly local/return contracts and
-verifier propagation, followed by protected-slot initialization. Demonstrate a readonly
-reference returned by one method, stored locally and forwarded without losing its
-declared restriction; raw IL must not upgrade it. Protected-slot tests must include
-pre-existing aliases and repeat execution of a declaration in a loop.
-
-.NET comparison: the [existing readonly investigation](readonly-parameters.md)
-distinguishes language diagnostics, CLR controlled-mutability references and neoCLR's
-runtime permission. Extending the same permission offers consistent cross-language
-enforcement, at the cost of richer signatures, checks and migration.
+The [reference/storage investigation](reference-storage-contract.md) records the
+alternatives and original gap probe; [readonly research](readonly-parameters.md)
+compares the language, metadata and runtime layers with .NET.
 
 ### 2. Type relationships need one shared contract
 
@@ -85,6 +78,10 @@ derived-only field holds another heap reference. Collection, dispatch, identity 
 reflection must all preserve the complete object correctly.
 
 ### 3. Absence and initialization need distinct representations
+
+The [nullability direction](nullability.md) now selects an explicit type-signature
+characteristic and a special null state, with Option preferred for optionality.
+The implementation remains future work.
 
 Evidence: [Type](../src/metadata.rs) has no nullable managed form. [Value](../src/value.rs)
 and slots represent uninitialized storage; Option/Result are ordinary library unions.
@@ -180,8 +177,8 @@ single-execution interpreter or readonly permissions.
 
 ## Proposed order and scope control
 
-1. Review and settle the reference/storage capability matrix; implement local/return
-   permission contracts and protected-slot initialization as separate small slices.
+1. Preserve the implemented reference/storage capability contracts and language-level
+   binding immutability when extending the runtime.
 2. Establish shared assignability, complete-owner projections and dispatch contracts;
    use them to implement one inheritance chain.
 3. Specify nullable storage and then enforce the relevant generic constraints.

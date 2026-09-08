@@ -113,6 +113,16 @@
         call neoCLR.Runtime.TypeShape(System.RuntimeTypeHandle,Int32)
         ret
     .end
+    .property instance IsReadOnly() -> Boolean
+        .get instance System.Type::get_IsReadOnly()
+    .end
+    .method instance get_IsReadOnly() -> Boolean
+        ldarg this
+        ldfld 0
+        ldc.i4 4
+        call neoCLR.Runtime.TypeShape(System.RuntimeTypeHandle,Int32)
+        ret
+    .end
     .property instance IsByRef() -> Boolean
         .get instance System.Type::get_IsByRef()
     .end

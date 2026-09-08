@@ -12,6 +12,7 @@ pub enum TypeIdentity {
         arguments: Vec<TypeIdentity>,
     },
     ByRef(Box<TypeIdentity>),
+    ReadOnlyByRef(Box<TypeIdentity>),
     Array(Box<TypeIdentity>),
     Ptr(Box<TypeIdentity>),
     InterfaceRef(Box<TypeIdentity>),
@@ -38,7 +39,8 @@ pub(crate) fn describe_loaded(module: &Module, normalized: &Type) -> Result<Type
     crate::vm::check_type(normalized, module)?;
     let identity = build(module, normalized)?;
     let name = match normalized {
-        Type::ByRef(element) => format!("{}&", signature_name(element)?),
+        Type::ByRef(element) => reference_name(element, false)?,
+        Type::ReadOnlyByRef(element) => reference_name(element, true)?,
         Type::Array(element) => format!("{}[]", signature_name(element)?),
         Type::Ptr(element) => format!("{}*", signature_name(element)?),
         Type::InterfaceRef(element) => format!("InterfaceRef<{}>", signature_name(element)?),
@@ -67,7 +69,8 @@ pub(crate) fn describe_loaded(module: &Module, normalized: &Type) -> Result<Type
 
 pub(crate) fn signature_name(ty: &Type) -> Result<String, Fault> {
     Ok(match ty {
-        Type::ByRef(element) => format!("{}&", signature_name(element)?),
+        Type::ByRef(element) => reference_name(element, false)?,
+        Type::ReadOnlyByRef(element) => reference_name(element, true)?,
         Type::Array(element) => format!("{}[]", signature_name(element)?),
         Type::Ptr(element) => format!("{}*", signature_name(element)?),
         Type::InterfaceRef(element) => format!("InterfaceRef<{}>", signature_name(element)?),
@@ -116,6 +119,7 @@ fn build(module: &Module, ty: &Type) -> Result<TypeIdentity, Fault> {
     let nested = |ty: &Type| build(module, ty).map(Box::new);
     Ok(match ty {
         Type::ByRef(t) => TypeIdentity::ByRef(nested(t)?),
+        Type::ReadOnlyByRef(t) => TypeIdentity::ReadOnlyByRef(nested(t)?),
         Type::Array(t) => TypeIdentity::Array(nested(t)?),
         Type::Ptr(t) => TypeIdentity::Ptr(nested(t)?),
         Type::InterfaceRef(t) => TypeIdentity::InterfaceRef(nested(t)?),
@@ -148,4 +152,15 @@ fn build(module: &Module, ty: &Type) -> Result<TypeIdentity, Fault> {
             }
         }
     })
+}
+
+fn reference_name(target: &Type, readonly: bool) -> Result<String, Fault> {
+    let mut name = signature_name(target)?;
+    if name.starts_with("readonly ") {
+        name = format!("({name})");
+    }
+    Ok(format!(
+        "{}{name}&",
+        if readonly { "readonly " } else { "" }
+    ))
 }

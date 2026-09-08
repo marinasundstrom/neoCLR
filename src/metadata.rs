@@ -40,6 +40,8 @@ pub enum Type {
     },
     /// Retaining managed slot reference; independent of native layout.
     ByRef(Box<Type>),
+    /// Managed reference with a declared readonly access contract.
+    ReadOnlyByRef(Box<Type>),
     /// Owned fixed-length array value; allocation mode is separate.
     Array(Box<Type>),
     /// Explicit borrowed interface receiver, separate from the interface declaration.
@@ -346,7 +348,19 @@ impl Function {
                 owner.clone()
             });
         }
-        types.extend(self.parameters.iter().cloned());
+        types.extend(self.parameters.iter().enumerate().map(|(index, ty)| {
+            if self.readonly_parameters.contains(&index) {
+                if let Type::ByRef(target) = ty {
+                    return Type::ReadOnlyByRef(target.clone());
+                }
+            }
+            ty.clone()
+        }));
+        if self.receiver_readonly {
+            if let Some(Type::ByRef(target)) = types.first() {
+                types[0] = Type::ReadOnlyByRef(target.clone());
+            }
+        }
         types
     }
 
@@ -782,6 +796,7 @@ impl Type {
                     arguments: types.iter().map(nested).collect::<Result<_, _>>()?,
                 },
                 Type::ByRef(t) => Type::ByRef(Box::new(nested(t)?)),
+                Type::ReadOnlyByRef(t) => Type::ReadOnlyByRef(Box::new(nested(t)?)),
                 Type::Array(t) => Type::Array(Box::new(nested(t)?)),
                 Type::Ptr(t) => Type::Ptr(Box::new(nested(t)?)),
                 Type::InterfaceRef(t) => Type::InterfaceRef(Box::new(nested(t)?)),

@@ -1,32 +1,31 @@
 # Stored and returned managed-reference contracts
 
-Status: design recommendation, 2026-09-08, following the
-[runtime groundwork review](runtime-groundwork-review.md). The runtime implementation
-remains at the readonly input/receiver milestone. This document settles a proposed
-semantic direction and bounds the next implementation; it does not add syntax or
-claim that the verifier already enforces these rules.
+Status updated 2026-09-08: [readonly storage/return signatures](readonly-storage.md)
+are implemented. This investigation records the design and broader acceptance goals;
+the implementation page defines current scope. Immutable bindings remain a language
+feature by explicit decision; runtime-protected slots are no longer a planned next slice.
 
 ## Observed gap
 
 The [return probe](experiments/reference-contracts/return-gap.neoil) forwards a readonly
-input through an ordinary Int32& return and local, then attempts a write. With the
-current implementation:
+input through an ordinary Int32& return and local, then attempts a write. To exercise this intentionally invalid producer against the
+current runtime:
 
 ```sh
 cargo run --locked -- verify docs/experiments/reference-contracts/return-gap.neoil
 cargo run --locked -- run docs/experiments/reference-contracts/return-gap.neoil
 ```
 
-Verification succeeds. Execution intentionally faults at Main instruction 6 with
+At milestone 0e1b2e1, verification succeeded and execution faulted at Main instruction 6 with
 "readonly managed reference cannot be used for writable access". The attempted write
 does not succeed. This demonstrates missing static contract information, not an
-upgrade of the runtime capability. The probe was run against milestone 0e1b2e1.
+upgrade of the runtime capability. The corrected runtime now rejects the writable return during verification and faults
+at Observe when the probe is executed unchecked; the fixture remains intentionally invalid.
 
-[Function metadata](../src/metadata.rs) has readonly parameter indices and a receiver
-flag. [Value::for_storage](../src/value.rs) compares ordinary storage types, while
-[verifier local loads and returns](../src/verifier.rs) do not preserve the full access
-contract. Adding another return Boolean would fix one position but leave nested
-generic arguments and reference-valued array elements unresolved.
+At that milestone, parameter indices and a receiver flag were the only declared
+access metadata. A return Boolean would have fixed one position while leaving nested
+generic arguments and reference-valued array elements unresolved. The implementation
+now uses recursive ReadOnlyByRef signatures instead.
 
 ## Recommended semantic model
 
@@ -35,7 +34,7 @@ Keep three independent facts:
 | Fact | Meaning | Where enforced |
 | --- | --- | --- |
 | Stored value signature | What value the slot contains, including permissions on any managed-reference signature nodes | Loader, storage conversion, calls, returns, verifier |
-| Slot replacement policy | Whether the stored value may be replaced after initialization | Runtime storage, independent of the alias used |
+| Source binding policy | Whether a binding may be reassigned | Language compiler; IL locals remain replaceable under their signatures |
 | Live reference permission and provenance | Which operations this access path permits, and which frame or heap owner it addresses | Runtime reference operations and lifetime checks |
 
 A writable managed reference and a readonly view can designate the same location.
@@ -74,7 +73,7 @@ Recommend a recursive signature representation with access recorded on each mana
 reference node, used consistently by parameters, returns, locals, fields, array elements
 and generic arguments. Use structured parameter/receiver contracts for direction
 (input/out/conditional output), rather than encoding initialization as reference access.
-Keep slot protection in storage declarations.
+Keep binding policy in the language; no runtime slot-protection metadata is required.
 
 This is a logical schema recommendation, not a mandated Rust enum or JSON spelling.
 Evaluate whether to extend the current Type tree or separate nominal identities from
@@ -130,36 +129,17 @@ disappear. The first implementation may retain conservative rejections for compl
 aliases; it must neither manufacture write permission nor claim complete escape proof.
 Raw IL receives runtime checks regardless of verifier precision.
 
-## Immutable storage is the following slice
+## Binding immutability stays in the language
 
-The four combinations remain distinct:
-
-| Slot | Stored reference | Replace reference value | Mutate target through it |
-| --- | --- | --- | --- |
-| Mutable | W(T) | Allowed by storage contract | Allowed |
-| Immutable | W(T) | Forbidden after initialization | Allowed |
-| Mutable | R(T) | Allowed by storage contract | Forbidden |
-| Immutable | R(T) | Forbidden after initialization | Forbidden |
-
-This table describes runtime operations. Neo assignment to a managed reference already
-accesses its target automatically; the table does not redefine assignment as rebinding.
-Any future rebinding syntax needs a deliberate language rule.
-
-Protecting an owned value must cover its owned subfields/elements, including writes
-through previously formed aliases. Loading a separately stored reference still follows
-that reference's contract. For the first protected-slot slice, prefer complete-value
-initialization followed by sealing. Constructor field-by-field initialization and
-output-based initialization need explicit authorization rules before exposing them.
-
-local.reset cannot simply reopen a sealed lifetime. Define declaration re-entry as
-fresh storage lifetime under a checked scope/region rule, preserving the prohibition
-on invalidating live references. The precise region encoding and constructor/output
-initialization protocol are still open; they are not prerequisites for readonly
-local/return signatures and should not be smuggled into that implementation.
+Neo let/var controls source rebinding. The runtime enforces the stored reference's
+access contract, but its containing local can be replaced with another compatible
+reference by IL. There is no requirement for universal write-once slots, sealing,
+initialization regions or new local.reset rules. The earlier protected-slot proposal
+is deferred unless a concrete runtime consumer justifies revisiting it.
 
 For now, out T& means a writable initialization/output contract for the addressed T,
 not replacement of the reference value held by the caller. An outer readonly reference
-cannot satisfy it. This preserves the existing output model.
+cannot satisfy it. See the [revised mutability decision](mutability.md).
 
 ## .NET comparison and alternatives
 
@@ -189,12 +169,12 @@ must declare a readonly result and consumers use compatible destinations. New me
 must be rejected by unsupported runtimes; do not silently drop qualifiers or invent
 a published format/version number here.
 
-## Bounded next implementation and acceptance
+## Acceptance goals and remaining scope
 
-Implement readonly local/return declarations, a shared signature access model and
-boundary checks; migrate current input/receiver contracts to that model. Project a
-minimal Neo spelling, tentatively readonly T& in type positions, clearly distinguished
-from readonly func. Do not update the implemented grammar until that parser exists.
+The implemented slice adds readonly local/return declarations and shared signature
+checks; prepared input/receiver contracts use that access model. Neo accepts readonly
+T& in type positions, separately from readonly func. Broader provenance analysis remains
+partial, as described in the implementation document.
 
 Cover these acceptance cases before declaring the slice complete:
 
@@ -212,5 +192,5 @@ Cover these acceptance cases before declaring the slice complete:
 
 If the recursive metadata migration exceeds a bounded slice, separate representation
 and existing-contract normalization from local/return syntax. Do not compensate with
-another permanent side table. Protected slots, initialization regions, nested references,
-general variance and new lifetime policies remain subsequent work.
+another permanent side table. Nested references, general variance and new lifetime policies remain separate work.
+Protected slots and initialization regions are not planned runtime requirements.

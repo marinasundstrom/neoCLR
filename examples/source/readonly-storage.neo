@@ -1,0 +1,25 @@
+record Counter(Age: int)
+record Holder(Value: readonly Counter&)
+
+func GetAge(readonly counter: Counter&) -> readonly int& {
+    return &counter.Age
+}
+func Observe(readonly counter: Counter&) -> readonly Counter& {
+    return counter
+}
+func Main() -> int {
+    let owned = Counter(42)
+    let localView: readonly Counter& = &owned
+    let counter = new Counter(40)
+    let age: readonly int& = GetAge(counter)
+    let view = Observe(counter)
+    let holder = Holder(view)
+    var values = System.Collections.ArrayList<readonly Counter&>.Allocate(1)
+    values.Add(view)
+    counter.Age = 42
+    if !typeof(readonly Counter&).IsReadOnly { return -1 }
+    if !ReferenceEquals(counter, holder.Value) { return -2 }
+    if values[0].Age != age { return -3 }
+    if localView.Age != age { return -4 }
+    return age
+}

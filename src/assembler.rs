@@ -818,6 +818,21 @@ pub fn parse_type(text: &str) -> Result<Type, Fault> {
             return Err(Fault::new("type nesting exceeds 32"));
         }
         let text = text.trim();
+        if let Some(element) = text.strip_suffix("[]") {
+            return Ok(Type::Array(Box::new(parse(element, depth + 1)?)));
+        }
+        if let Some(rest) = text.strip_prefix("readonly ") {
+            return match parse(rest, depth + 1)? {
+                Type::ByRef(target) => Ok(Type::ReadOnlyByRef(target)),
+                _ => Err(Fault::new("readonly type requires a managed reference")),
+            };
+        }
+        if let Some(inner) = text.strip_prefix('(').and_then(|t| t.strip_suffix(')')) {
+            if !inner.trim().starts_with("readonly ") {
+                return Err(Fault::new("type grouping requires a readonly signature"));
+            }
+            return parse(inner, depth + 1);
+        }
         if let Some(index) = text.strip_prefix('!') {
             // Pointer suffixes are parsed first below; !0* is not a bare index.
             if !text.ends_with('*') && !text.ends_with('&') {
@@ -827,9 +842,6 @@ pub fn parse_type(text: &str) -> Result<Type, Fault> {
                         .map_err(|_| Fault::new("expected type parameter index !0"))?,
                 ));
             }
-        }
-        if let Some(element) = text.strip_suffix("[]") {
-            return Ok(Type::Array(Box::new(parse(element, depth + 1)?)));
         }
         if let Some(element) = text.strip_suffix('&') {
             return Ok(Type::ByRef(Box::new(parse(element, depth + 1)?)));

@@ -20,12 +20,23 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   instance receivers now share this enforcement, including virtual interface dispatch,
   Neo readonly methods and MethodInfo.IsReadOnly. ArrayList Count/Capacity/Item
   getters and List Count/Item contracts permit readonly observation; external List
-  implementations must update their getter receiver contracts. General storage/return
-  declarations remain future work. Reassemble
+  implementations must update their getter receiver contracts. Reference storage
+  signatures now include ReadOnlyByRef in locals, returns, fields, arrays and generic
+  arguments, with readonly T& syntax in Neo and IL. Storage/call/return boundaries
+  narrow writable inputs or reject readonly-to-writable mismatches; verifier joins
+  preserve compatible readonly access. Type.IsReadOnly and qualified reflection
+  signatures expose the contract. Unqualified writable destinations/results that
+  previously carried restricted references now fail at the boundary. Reassemble
   external System artifacts for the expanded reflection descriptor layout; readonly
   metadata requires this runtime, and Neo now reserves the readonly keyword.
 
 #### Changed
+
+- Recorded explicit nullability as a planned type-signature characteristic across
+  values and managed references, non-nullable by default. Null is a special state
+  distinct from present zero/default payloads and uninitialized storage; Option
+  remains preferred for domain optionality. Documented composition, clearing/GC
+  obligations and .NET comparisons. No nullable behavior is implemented by this slice.
 
 - Established a research-backed .NET/CLR comparison workflow for every roadmap
   capability and substantive revision of existing features. Added primary-source
@@ -34,7 +45,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Added a code-backed runtime groundwork review after the readonly receiver milestone,
   covering storage/reference contracts, type relationships, nullable initialization,
   activation ownership, GC roots, cleanup and persistent state. Recorded proposed
-  dependencies and acceptance cases, and paused further feature implementation.
+  dependencies and acceptance cases, and paused feature work for that assessment
+  before resuming the readonly signature implementation.
   The reviewed foundations are proposals, not newly implemented capabilities.
   Expanded the reference/storage proposal with recursive permission signatures,
   boundary narrowing/rejection, invariant containers, verifier joins and separate
@@ -44,9 +56,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Planned runtime-enforced immutable storage and readonly reference/receiver
   capabilities, with Neo syntax and diagnostics above them. Documented their
   independence, shallow boundaries, alias checks and initialization/re-entry
-  decisions; placed this foundation first in the exploration roadmap. These
-  protected-slot contracts are not yet implemented; readonly inputs and receivers
-  are implemented as described above.
+  decisions; placed this foundation first in the exploration roadmap. The
+  earlier protected-slot proposal is superseded: immutable bindings remain a language
+  feature and are removed from the immediate runtime plan. Readonly reference
+  contracts remain runtime-enforced, without making local bindings write-once.
 
 - Recorded the planned platform backlog: inheritance, nullable slots, enums/flags, delegates and
   lambdas, generic constraints (including not-null/not-void/not-reference), runtime

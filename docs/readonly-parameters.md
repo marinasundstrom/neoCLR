@@ -1,9 +1,9 @@
 # Readonly managed inputs and instance receivers
 
 This slice implements a runtime access restriction for managed input references.
-It also implements readonly instance receivers. It does not implement immutable
-runtime slots, deep immutability, or general readonly type syntax for locals, fields
-and returns.
+It also implements readonly instance receivers. [Readonly storage/return signatures](readonly-storage.md)
+now extend this contract to other type positions. Binding immutability remains a
+language feature; no runtime-protected slots or deep immutability are implied.
 
 ## Consumer contract
 
@@ -51,19 +51,15 @@ rules are independent of permission.
 
 ## Diagnostics and limitations
 
-The verifier tracks readonly argument loads on the evaluation stack, including
-field/element address and interface projections. It rejects direct writes and known
-writable calls. It does not yet retain permission facts through arbitrary locals,
-stored payloads or returned signatures, and joins remain conservative. Consequently,
-some misuse can compile and must fault at runtime; verification is not a complete
-readonly proof. Unverified IL receives the same runtime restriction.
+The verifier tracks declared reference access on argument and local loads, call
+results, and derived field/element addresses. It rejects writes and writable boundary
+mismatches. Compatible writable/readonly reference stack joins become readonly;
+provenance-bearing joins and broader alias/escape analysis remain conservative.
+Unverified IL receives runtime checks as well.
 
-A restricted reference returned under today's T& return type stays restricted at
-runtime, even though its signature does not advertise that permission. General
-readonly return/local/field contracts are a follow-up; public APIs should not rely
-on this incomplete static projection. Existing readonly-parameter code can forward
-references to other readonly inputs. No writable instance method is automatically
-reclassified as readonly, and Neo does not insert defensive copies to call one.
+A restricted reference can no longer be returned or stored under ordinary writable T&.
+Declare readonly result/local signatures instead. No writable instance method is
+automatically reclassified as readonly, and Neo does not insert defensive copies.
 Explicit value-receiver APIs can still consume an ordinary value copy.
 
 `System.Reflection.ParameterInfo.IsReadOnly` reports this enforced input contract.
@@ -94,9 +90,8 @@ We compared three placements: compiler-only restrictions, adoption of CLR's arra
 prefix, and explicit parameter metadata plus runtime capability narrowing. The last
 fits this slice because neoCLR executes IL without requiring verification and needs
 one rule across frame/heap addresses. It adds a permission bit and runtime checks;
-there is no demonstrated performance advantage. Keeping T& identity avoids a new
-parallel type family, at the cost of incomplete static permission propagation until
-readonly storage/return contracts are designed.
+there is no demonstrated performance advantage. The storage follow-up retains addressed-object identity while qualifying reference
+signatures recursively, without a wrapper object family.
 
 Compatibility accommodations are evidence about .NET's design, not constraints on
 neoCLR. The goal is consistent APIs and behavior where appropriate, with deliberate
