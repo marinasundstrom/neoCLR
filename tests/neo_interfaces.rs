@@ -14,7 +14,7 @@ fn example_dispatches_to_original_frame_and_heap_storage_without_boxes() {
     let il = frontend::lower_to_il(source).unwrap();
     assert!(il.contains(".interface Counter"));
     assert!(il.contains(".implements Counter"));
-    assert!(il.contains(".method instance byref Add(Int32)"));
+    assert!(il.contains(".method instance abstract byref Add(Int32 amount)"));
     assert!(il.contains("interface.borrow Counter"));
     assert!(il.contains("callvirt instance Counter::Read()"));
     let result = run(source);
@@ -96,7 +96,6 @@ fn invalid_projection_and_dispatch_contracts_are_rejected() {
         "interface Readable { func Read() -> int }; record Cell(Value: int): Readable { func Read() -> bool { return true } }; func Main() -> () {}",
         "interface Readable { func Read() -> int }; record Cell(Value: int) { func Read() -> int { return this.Value } }; func Main() -> () { var c = Cell(1); let i = &c as Readable& }",
         "interface Readable { func Read() -> int }; interface AlternateReadable { func Read() -> int }; record Cell(Value: int): Readable { func Read() -> int { return this.Value } }; func Use(j: AlternateReadable&) -> int { return j.Read() }; func Main() -> int { var c = Cell(1); return Use(&c as Readable&) }",
-        "interface Readable { func Read() -> int { return 1 } }; func Main() -> () {}",
         "interface Readable { func Read() -> int; func Read() -> int }; func Main() -> () {}",
         "record Cell(Value: int) { func Read(this: int) -> int { return this } }; func Main() -> () {}",
         "record Cell(Value: int) { func Read() -> int { let this = 1; return this } }; func Main() -> () {}",

@@ -10,11 +10,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 #### Added
 
-- Generic free functions and static IL methods with independent method parameters,
-  explicit type arguments, simultaneous owner/method substitution, verification,
+- Generic free functions and static methods across runtime/IL and Neo, with independent
+  method parameters, explicit type arguments, simultaneous owner/method substitution, verification,
   host invocation and distinct closed call graphs. Added regression tests and a
-  pinned .NET comparison. Managed-reference arguments preserve existing lifetimes;
-  invalid substituted shapes fault. Generic instance methods, constraints and guest
+  pinned .NET comparison. Neo adds namespace-qualified functions, static members,
+  argument-based type inference and explicit type arguments, with a runnable example,
+  grammar and constructor-status guidance. Managed-reference arguments preserve
+  existing lifetimes; invalid substituted shapes fault. Generic instance methods, constraints and guest
   generic-method reflection remain deferred. New metadata requires this runtime;
   existing artifacts remain compatible, while Rust metadata literals need new fields.
 
@@ -23,6 +25,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   reabstraction. Managed interface receivers retain original owners and readonly/output
   checks; verification, reflection, closed graphs, debugger/source traces, samples and
   tests cover defaults. Includes the contract audit and pinned .NET comparison probes.
+  Updated older Neo regression expectations for abstract declarations and defaults.
   New body/replacement artifacts require this runtime; existing bodyless interfaces
   remain compatible. Output completion retains the existing runtime return check.
 

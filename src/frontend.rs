@@ -210,6 +210,8 @@ struct Interface {
 }
 struct Function {
     name: Token,
+    generic_parameters: Vec<String>,
+    is_static: bool,
     base_initializer: Option<Vec<Expr>>,
     explicit_interface: Option<String>,
     is_virtual: bool,
@@ -291,7 +293,11 @@ impl Source {
         for _ in 0..64 {
             let ty = current?;
             let record = self.records.iter().find(|r| r.name.text == ty.il())?;
-            if let Some(method) = record.methods.iter().find(|m| m.name.text == name) {
+            if let Some(method) = record
+                .methods
+                .iter()
+                .find(|m| m.name.text == name && !m.is_static)
+            {
                 return Some((ty.il(), method));
             }
             current = record.base.clone();
@@ -382,6 +388,7 @@ enum ExprKind {
     Binary(String, Box<Expr>, Box<Expr>),
     Match(Box<Expr>, Vec<Arm>),
     TypeOf(Ty),
+    Generic(Box<Expr>, Vec<Ty>),
     Out(Box<Expr>),
     InterfaceCast(Box<Expr>, Ty),
     ArrayLiteral(Vec<Expr>),
@@ -488,6 +495,7 @@ impl Parser {
             "typeof",
             "interface",
             "readonly",
+            "static",
             "as",
             "this",
         ]
@@ -617,6 +625,26 @@ impl Parser {
         } else {
             None
         };
+        if !allow_explicit {
+            while self.eat(".") {
+                name.text.push('.');
+                name.text.push_str(&self.name()?.text);
+            }
+        }
+        let mut generic_parameters = Vec::new();
+        if self.eat("<") {
+            loop {
+                let parameter = self.name()?;
+                if generic_parameters.contains(&parameter.text) {
+                    return Err(parameter.error("duplicate generic parameter"));
+                }
+                generic_parameters.push(parameter.text);
+                if !self.eat(",") {
+                    break;
+                }
+            }
+            self.expect(">")?;
+        }
         let parameters = self.fields(true)?;
         self.expect("->")?;
         let returns = self.ty()?;
@@ -632,6 +660,8 @@ impl Parser {
         };
         Ok(Function {
             name,
+            generic_parameters,
+            is_static: false,
             base_initializer: None,
             explicit_interface,
             is_virtual: false,
@@ -683,6 +713,8 @@ impl Parser {
                 }
                 methods.push(Function {
                     name,
+                    generic_parameters: Vec::new(),
+                    is_static: false,
                     base_initializer,
                     explicit_interface: None,
                     parameters,
@@ -696,6 +728,7 @@ impl Parser {
                 self.lines();
                 continue;
             }
+            let is_static = self.eat("static");
             let receiver_readonly = self.eat("readonly");
             let is_abstract = self.eat("abstract");
             let is_virtual = self.eat("virtual");
@@ -716,6 +749,24 @@ impl Parser {
                     .name
                     .error("explicit interface bodies cannot be virtual, override or abstract"));
             }
+            if is_static
+                && (abstract_members
+                    || receiver_readonly
+                    || is_abstract
+                    || is_virtual
+                    || is_override
+                    || method.explicit_interface.is_some())
+            {
+                return Err(method
+                    .name
+                    .error("static methods cannot have instance or interface modifiers"));
+            }
+            if !is_static && !method.generic_parameters.is_empty() {
+                return Err(method
+                    .name
+                    .error("generic methods currently require static"));
+            }
+            method.is_static = is_static;
             method.receiver_readonly = receiver_readonly;
             method.is_virtual = is_virtual || is_override || is_abstract;
             method.is_abstract = is_abstract || (abstract_members && method.is_abstract);
@@ -1105,6 +1156,31 @@ impl Parser {
             return Err(at.error("expected expression"));
         };
         loop {
+            if self.at("<") {
+                let saved = self.position;
+                let arguments = (|| -> Result<Vec<Ty>, Fault> {
+                    self.take();
+                    let mut arguments = vec![self.ty()?];
+                    while self.eat(",") {
+                        arguments.push(self.ty()?);
+                    }
+                    self.expect(">")?;
+                    if !self.at("(") {
+                        return Err(self.current().error("expected generic call"));
+                    }
+                    Ok(arguments)
+                })();
+                if let Ok(arguments) = arguments {
+                    let depth = left.depth + 1;
+                    left = self.node(
+                        left.at.clone(),
+                        ExprKind::Generic(Box::new(left), arguments),
+                        depth,
+                    )?;
+                    continue;
+                }
+                self.position = saved;
+            }
             if self.at("as") && minimum <= 7 {
                 self.take();
                 let target = self.ty()?;
@@ -1233,6 +1309,44 @@ impl Parser {
     }
 }
 
+// Bounded exact structural inference; conversions remain checked at the call.
+fn infer_parameters(
+    formal: &crate::metadata::Type,
+    actual: &crate::metadata::Type,
+    found: &mut [Option<crate::metadata::Type>],
+) -> Result<(), Fault> {
+    use crate::metadata::Type;
+    match (formal, actual) {
+        (Type::MethodTypeParameter(index), actual) => {
+            let slot = &mut found[*index as usize];
+            if slot.as_ref().is_some_and(|previous| previous != actual) {
+                return Err(Fault::new(
+                    "conflicting inferred type arguments; supply explicit type arguments",
+                ));
+            }
+            *slot = Some(actual.clone());
+        }
+        (Type::ByRef(f) | Type::ReadOnlyByRef(f), Type::ByRef(a) | Type::ReadOnlyByRef(a))
+        | (Type::Array(f), Type::Array(a)) => infer_parameters(f, a, found)?,
+        (
+            Type::Constructed {
+                definition: f,
+                arguments: fs,
+            },
+            Type::Constructed {
+                definition: a,
+                arguments: args,
+            },
+        ) if f == a && fs.len() == args.len() => {
+            for (f, a) in fs.iter().zip(args) {
+                infer_parameters(f, a, found)?;
+            }
+        }
+        _ => (),
+    }
+    Ok(())
+}
+
 #[derive(Clone)]
 struct Binding {
     ty: Ty,
@@ -1241,7 +1355,10 @@ struct Binding {
     address: String,
     scoped: bool,
 }
+#[derive(Clone)]
 struct Lowerer<'a> {
+    // Shared by speculative clones; source expression nodes outlive this lowering.
+    inferred_calls: std::rc::Rc<std::cell::RefCell<HashMap<usize, Vec<Ty>>>>,
     document: &'a str,
     receiver: Option<&'a Token>,
     source: &'a Source,
@@ -1628,6 +1745,9 @@ impl Lowerer<'_> {
                 self.body.push(format!("ldelem {}", element.il()));
                 Ok(element)
             }
+            ExprKind::Generic(_, _) => Err(expression
+                .at
+                .error("generic function arguments require an invocation")),
             ExprKind::TypeOf(ty) => {
                 self.body.push(format!("ldtoken {}", ty.il()));
                 self.body
@@ -1786,6 +1906,166 @@ impl Lowerer<'_> {
         }
     }
     fn call(&mut self, callee: &Expr, arguments: &[Expr]) -> Result<Ty, Fault> {
+        let (callee, type_arguments) = match &callee.kind {
+            ExprKind::Generic(callee, types) => (callee.as_ref(), types.as_slice()),
+            _ => (callee, &[][..]),
+        };
+        if let Some(path) = Self::qualified_name(callee) {
+            let bound = path
+                .split('.')
+                .next()
+                .is_some_and(|n| self.bindings.contains_key(n));
+            let function = if bound {
+                None
+            } else {
+                self.source
+                    .functions
+                    .iter()
+                    .find(|f| f.name.text == path)
+                    .map(|f| (path.clone(), f))
+                    .or_else(|| {
+                        path.rsplit_once('.').and_then(|(owner, member)| {
+                            self.source
+                                .records
+                                .iter()
+                                .find(|r| r.name.text == owner)
+                                .and_then(|r| {
+                                    r.methods
+                                        .iter()
+                                        .find(|m| m.name.text == member && m.is_static)
+                                })
+                                .map(|f| (format!("{owner}::{member}"), f))
+                        })
+                    })
+            };
+            if let Some((name, function)) = function {
+                let inferred;
+                let type_arguments = if type_arguments.is_empty()
+                    && !function.generic_parameters.is_empty()
+                {
+                    let key = callee as *const Expr as usize;
+                    let cached = self.inferred_calls.borrow().get(&key).cloned();
+                    inferred = if let Some(types) = cached {
+                        types
+                    } else {
+                        if arguments.len() != function.parameters.len() {
+                            return Err(callee.at.error("argument count mismatch"));
+                        }
+                        let names = function
+                            .generic_parameters
+                            .iter()
+                            .cloned()
+                            .map(Some)
+                            .collect::<Vec<_>>();
+                        let mut found = vec![None; names.len()];
+                        let mut probe = self.clone();
+                        for (argument, parameter) in arguments.iter().zip(&function.parameters) {
+                            let actual = if let ExprKind::Out(value) = &argument.kind {
+                                Ty::Ref(Box::new(probe.place(value, true)?))
+                            } else if matches!(parameter.ty, Ty::Ref(_) | Ty::ReadOnlyRef(_)) {
+                                if (parameter.readonly
+                                    || matches!(parameter.ty, Ty::ReadOnlyRef(_)))
+                                    && matches!(&argument.kind, ExprKind::Unary(op, _) if op == "&")
+                                {
+                                    let ExprKind::Unary(_, value) = &argument.kind else {
+                                        unreachable!()
+                                    };
+                                    Ty::ReadOnlyRef(Box::new(
+                                        probe.place_with_access(value, true, true)?,
+                                    ))
+                                } else {
+                                    probe.expression(argument)?
+                                }
+                            } else if matches!(&parameter.ty, Ty::Record(name) if function.generic_parameters.contains(name))
+                            {
+                                // T denotes the stored value, including a managed reference.
+                                probe.expression(argument)?
+                            } else {
+                                probe.library_argument(argument)?
+                            };
+                            let formal = crate::assembler::bind_parameters(
+                                crate::assembler::parse_type(&parameter.ty.il())?,
+                                &names,
+                                true,
+                            );
+                            infer_parameters(
+                                &formal,
+                                &crate::assembler::parse_type(&actual.il())?,
+                                &mut found,
+                            )
+                            .map_err(|e| argument.at.error(e.message))?;
+                        }
+                        let types = found.into_iter().map(|ty| {
+                            ty.ok_or_else(|| callee.at.error("cannot infer all type arguments; supply explicit type arguments"))
+                                .and_then(|ty| Ty::from_metadata(&ty))
+                        }).collect::<Result<Vec<_>, _>>()?;
+                        self.inferred_calls.borrow_mut().insert(key, types.clone());
+                        types
+                    };
+                    inferred.as_slice()
+                } else {
+                    type_arguments
+                };
+                if type_arguments.len() != function.generic_parameters.len() {
+                    return Err(callee.at.error("explicit generic argument count mismatch"));
+                }
+                let names = function
+                    .generic_parameters
+                    .iter()
+                    .cloned()
+                    .map(Some)
+                    .collect::<Vec<_>>();
+                let types = type_arguments
+                    .iter()
+                    .map(|t| crate::assembler::parse_type(&t.il()))
+                    .collect::<Result<Vec<_>, _>>()?;
+                let substitute = |ty: &Ty| -> Result<Ty, Fault> {
+                    let ty = crate::assembler::bind_parameters(
+                        crate::assembler::parse_type(&ty.il())?,
+                        &names,
+                        true,
+                    );
+                    Ty::from_metadata(&ty.substitute_method_parameters(&types)?)
+                };
+                let mut parameters = function.parameters.clone();
+                for parameter in &mut parameters {
+                    parameter.ty = substitute(&parameter.ty)?;
+                }
+                let returns = substitute(&function.returns)?;
+                if parameters.len() != arguments.len() {
+                    return Err(callee.at.error("argument count mismatch"));
+                }
+                for (argument, parameter) in arguments.iter().zip(&parameters) {
+                    self.parameter_argument(argument, parameter)?;
+                }
+                let generic = if types.is_empty() {
+                    String::new()
+                } else {
+                    format!(
+                        "<{}>",
+                        type_arguments
+                            .iter()
+                            .map(Ty::il)
+                            .collect::<Vec<_>>()
+                            .join(",")
+                    )
+                };
+                self.body.push(format!(
+                    "call {name}{generic}({})",
+                    parameters
+                        .iter()
+                        .map(|p| p.ty.parameter_il())
+                        .collect::<Vec<_>>()
+                        .join(",")
+                ));
+                return Ok(returns);
+            }
+        }
+        if !type_arguments.is_empty() {
+            return Err(callee
+                .at
+                .error("generic calls currently require a source free function or static method"));
+        }
         let path = Self::qualified_name(callee);
         let binding = path.as_ref().and_then(|p| p.split('.').next());
         let bound_receiver = binding.is_some_and(|name| self.bindings.contains_key(name));
@@ -2576,7 +2856,7 @@ impl Lowerer<'_> {
     }
     fn lower(mut self) -> Result<String, Fault> {
         self.sequence(&self.function.name);
-        if let Some(receiver) = self.receiver {
+        if let Some(receiver) = self.receiver.filter(|_| !self.function.is_static) {
             self.bindings.insert(
                 "this".into(),
                 Binding {
@@ -2593,7 +2873,7 @@ impl Lowerer<'_> {
             );
         }
         for (index, parameter) in self.function.parameters.iter().enumerate() {
-            let index = index + usize::from(self.receiver.is_some());
+            let index = index + usize::from(self.receiver.is_some() && !self.function.is_static);
             self.bindings.insert(
                 parameter.name.text.clone(),
                 Binding {
@@ -2702,7 +2982,9 @@ impl Lowerer<'_> {
         );
         Ok(format!(
             "{} {}({}) -> {}\n{}\n{}\n.end\n",
-            if self.receiver.is_some() {
+            if self.receiver.is_some() && self.function.is_static {
+                ".method static".into()
+            } else if self.receiver.is_some() {
                 format!(
                     ".method {}instance {}{}{}byref",
                     if self.function.explicit_interface.is_some() {
@@ -2731,7 +3013,15 @@ impl Lowerer<'_> {
             } else {
                 ".function".into()
             },
-            self.function.name.text,
+            if self.function.generic_parameters.is_empty() {
+                self.function.name.text.clone()
+            } else {
+                format!(
+                    "{}<{}>",
+                    self.function.name.text,
+                    self.function.generic_parameters.join(",")
+                )
+            },
             self.function
                 .parameters
                 .iter()
@@ -2824,6 +3114,7 @@ pub fn lower_to_il_named(source: &str, document: &str) -> Result<String, Fault> 
         for function in &interface.methods {
             il.push_str(
                 &Lowerer {
+                    inferred_calls: Default::default(),
                     document,
                     receiver: Some(&interface.name),
                     source: &source,
@@ -2867,6 +3158,7 @@ pub fn lower_to_il_named(source: &str, document: &str) -> Result<String, Fault> 
         for function in &record.methods {
             il.push_str(
                 &Lowerer {
+                    inferred_calls: Default::default(),
                     document,
                     receiver: Some(&record.name),
                     source: &source,
@@ -2886,6 +3178,7 @@ pub fn lower_to_il_named(source: &str, document: &str) -> Result<String, Fault> 
     for function in &source.functions {
         il.push_str(
             &Lowerer {
+                inferred_calls: Default::default(),
                 document,
                 receiver: None,
                 source: &source,

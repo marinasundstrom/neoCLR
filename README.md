@@ -180,6 +180,8 @@ cargo run --locked -- run examples/array_bounds.neoil
 ```
 
 The [accessibility sample](docs/accessibility.md) demonstrates public methods and restricted helpers.
+The [generic function sample](docs/function-generics.md#neo-projection) demonstrates explicit
+type arguments on free functions and static methods.
 The [property sample](docs/properties.md) demonstrates generic properties backed by ordinary methods.
 The [constructor sample](docs/constructors.md) initializes generic records through public constructors with private fields.
 The [ordinary carrier sample](docs/value-storage.md) uses explicit typed value storage and ordinary methods without union-specific instructions.
@@ -345,7 +347,7 @@ Its planned removal requires a complete payload-storage and lifetime migration;
 managed references and the Void* sample alone do not complete that migration.
 
 The library is a bootstrap surface, not a complete BCL. General user-defined
-generic methods, interface inheritance/class virtual dispatch, static lifetime verification, full native marshalling,
+generic instance methods, static lifetime verification, full native marshalling,
 threading, runtime async, JIT compilation, and full verification are unimplemented.
 Resource limits are guardrails, not a memory quota or a hostile-code sandbox.
 The CLI writes console output immediately and flushes each line, so prompts are visible

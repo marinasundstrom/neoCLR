@@ -18,7 +18,7 @@ declaration      = import_decl | record_decl | interface_decl | function_decl ;
 import_decl      = "import", "System", ".", "Console", ".", "*", terminator ;
 record_decl      = [ "abstract" ], "record", identifier, field_list, [ ":", type, { ",", type } ],
                    (terminator | newlines, "{", separators, { record_member, separators }, "}") ;
-record_member    = init_decl | explicit_method | [ "readonly" ], [ "abstract" ], [ "virtual" | "override" ], method_decl ;
+record_member    = init_decl | explicit_method | "static", generic_function_member | [ "readonly" ], [ "abstract" ], [ "virtual" | "override" ], method_decl ;
 init_decl        = "init", parameter_list, [ ":", "base", "(", newlines, [ expression, { ",", newlines, expression } ], newlines, ")" ],
                    newlines, "{", separators, { statement, separators }, "}" ;
 interface_decl   = "interface", identifier, [ ":", type, { ",", type } ], newlines, "{", separators,
@@ -30,7 +30,9 @@ method_decl      = "func", identifier, parameter_list, "->", type,
                    (terminator | newlines, "{", separators, { statement, separators }, "}") ;
 explicit_method  = [ "readonly" ], "func", identifier, ".", identifier,
                    parameter_list, "->", type, newlines, block ;
-function_decl    = "func", identifier, parameter_list, "->", type, newlines,
+generic_parameters = "<", identifier, { ",", identifier }, ">" ;
+generic_function_member = "func", identifier, [ generic_parameters ], parameter_list, "->", type, newlines, block ;
+function_decl    = "func", qualified_name, [ generic_parameters ], parameter_list, "->", type, newlines,
                    "{", separators, { statement, separators }, "}" ;
 field_list       = "(", newlines,
                    [ field, newlines, { ",", newlines, field, newlines } ], ")" ;
@@ -62,8 +64,8 @@ introduce nested scopes; active names cannot be shadowed, but sibling scopes may
 Types resolve to `int`/`Int32`, `string`/`String`, `bool`/`Boolean`, `unit`/`Void`/`()`,
 or a declared record, interface or bundled System type. Qualified names and closed generic
 arguments are supported; Option/Result abbreviate System.Option/System.Result. One
-`&` suffix forms a managed reference. Raw pointer syntax and generic declarations
-are unsupported. Runtime restrictions on ByRef generic arguments still apply.
+`&` suffix forms a managed reference. Raw pointer syntax and generic type declarations
+are unsupported. Free functions and static methods accept generic parameters. Runtime restrictions on ByRef generic arguments still apply.
 
 ## Expressions
 
@@ -84,7 +86,7 @@ unary            = ("&" | "-" | "!" | "new"), unary
                  | "new", type, "[", expression, "]", [ array_initializer ] | postfix ;
 array_initializer = "{", newlines, [ expression, newlines,
                     { ",", newlines, expression, newlines }, [ ",", newlines ] ], "}" ;
-postfix          = primary, { ".", identifier | arguments | "[", expression, "]" } ;
+postfix          = primary, { ".", identifier | arguments | "<", type, { ",", type }, ">", arguments | "[", expression, "]" } ;
 arguments        = "(", newlines,
                    [ argument, newlines,
                      { ",", newlines, argument, newlines } ], ")" ;
@@ -110,7 +112,7 @@ public static/ordinary instance bundled System calls, and declared record/interf
 instance methods. Library overloads are selected by exact types after reading bare
 reference arguments when the declared contract expects a value. Library receiver and
 output contracts are projected as described in [output parameters](neo-outputs.md).
-Source record/interface methods use managed reference receivers. Generic method calls remain unsupported. `int(value)` supports Byte/Int32
+Source record/interface methods use managed reference receivers. Explicit generic free/static calls are supported; generic instance methods remain unsupported. `int(value)` supports Byte/Int32
 only and lowers to checked Int32 conversion. These are static restrictions on the
 existing call grammar; no new expression production is needed.
 `new` accepts record construction, such as `new SimpleCounter(0)`, or managed array
@@ -201,14 +203,14 @@ Record instance methods have an implicit managed `this` receiver. Interface meth
 are signatures without bodies. Conformance and `as Contract&` targets must name
 source-declared interfaces. Concrete managed references implicitly project to
 implemented interface references in typed argument, binding and return contexts;
-bare values are not implicitly addressed. No generic declarations are added. `interface`, `as` and `this` are reserved names. Interface names follow
+bare values are not implicitly addressed. Interface and record generic declarations remain unsupported. `interface`, `as` and `this` are reserved names. Interface names follow
 ordinary Neo naming, without an `I` prefix.
 
 ## Closed generic static member calls
 
 `System.Collections.ArrayList<Counter&>.Allocate(0)` selects a static member on a
 closed generic type. Type arguments may include managed references and nested closed
-types. This adds no generic function declarations or generic method inference. Ordinary
+types. Generic free/static functions are specified separately below; argument inference is available for source free/static functions. Ordinary
 comparisons remain expressions. A reference to a bundled type can implicitly convert
 to an interface declared by that closed type, without addressing or boxing a value.
 See the [complete collection example](../examples/source/collections.neo).
@@ -275,3 +277,19 @@ Record explicit bodies cannot be virtual/override/abstract. Interfaces now suppo
 [default bodies and qualified replacements/reabstraction](default-interface-implementations.md).
 An abstract declaration has no body; virtual/override modifiers remain unsupported
 on interface declarations.
+
+## Generic free functions and static methods
+
+A free function may have a qualified name (`func Utility.Identity<T>`) without a
+namespace block. Static record members use `static func Identity<T>`. Both support
+argument-based type inference; `<type, ...>` is a postfix type-argument
+list immediately followed by ordinary call arguments. For example,
+`Utility.Identity<int>(42)` and `Helpers.Identity<int&>(&value)`. Speculative parsing
+leaves ordinary `<` comparisons unchanged. `static` is reserved. Static methods have
+no `this`; instance/interface generic methods and source overloads are not supported.
+See [generic functions](function-generics.md) for the runtime contract and sample.
+
+Inference is semantic, not extra grammar: an ordinary call can infer method arguments
+by matching argument types. Explicit `<type, ...>` overrides inference. Missing
+evidence or conflicting inferred types requires explicit arguments. Reference intent
+follows the [value/reference inference rules](function-generics.md#neo-projection).

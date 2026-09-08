@@ -90,3 +90,66 @@ reflection incomplete, rather than implying CLR parity.
 parameter scopes, symbolic forwarding, reference lifetime checks, host invocation,
 closed graph identity, overload arity and invalid contexts/substitutions. Existing
 owner-generic, dispatch and reachability suites remain regression coverage.
+
+## Neo projection
+
+```swift
+func Utility.Identity<T>(value: T) -> T {
+    return value
+}
+record Helpers() {
+    static func Forward<T>(value: T) -> T {
+        return Utility.Identity(value)
+    }
+}
+func TypeName<T>() -> string { return typeof(T).Name }
+func Main() -> int {
+    var value = Helpers.Forward(42)
+    let alias: int& = Utility.Identity(&value)
+    return alias
+}
+```
+
+Run the [complete sample](../examples/source/generic-functions.neo) from the repository:
+
+```sh
+cargo run --locked -- run examples/source/generic-functions.neo
+```
+
+It prints `System.Int32` and `42`, and returns 42. `static func` has no `this` receiver.
+Qualified free-function declarations/calls provide namespace names without namespace
+blocks or an import-resolution system. Generic instance methods, generic source types
+and source overload declarations remain unsupported.
+
+Neo infers omitted method type arguments from argument types. Inference structurally
+matches T, T&, arrays and constructed generic types. Repeated occurrences of a
+parameter must infer the same type. It does not search for a common base, apply
+numeric widening, infer from the return target, or solve constraints/overloads.
+Use explicit arguments to resolve an unsupported or ambiguous case; calls such as
+`TypeName<int>()` require them because there is no argument evidence.
+
+For an unconstrained T, inference uses the actual stored argument type. A managed
+reference is itself a value: `Identity(alias)` and `Identity(&value)` both infer T
+as int& when alias holds int&. Neither silently copies the referenced object.
+A value-typed context (`let copy: int = Identity(alias)`) reads the returned reference
+normally. A parameter declared T& instead requests reference access and infers T
+from the referenced target. It accepts an existing reference binding without manual
+dereferencing or another address operator. Structural value parameters such as T[]
+use ordinary automatic reference access to match their value shape. Readonly
+capabilities are checked after inference and cannot be upgraded. Output arguments
+infer from their addressed slots. No inference rule extends storage lifetimes or changes allocation.
+
+Type inference is compiler work: emitted IL always contains explicit method arguments
+and substituted call signatures. This follows C#'s separation of argument-based generic
+inference from CLR method instantiation, with a deliberately smaller exact matching
+algorithm and neoCLR's different reference/value argument policy. The compiler caches
+inferred calls during speculative analysis so nested generic calls are not repeatedly
+inferred exponentially; speculative IL is discarded and argument expressions execute
+once in source order.
+
+The runtime should expose precise contracts, while a language may omit information
+that can be recovered without changing intent. Neo demonstrates that projection;
+other languages may make different syntax choices. Explicit addressing is not a
+requirement to repeat type names or manually dereference managed references. This
+keeps Neo a small explanation and testing tool for the platform, not a commitment
+to full C# inference or a complete compiler framework.

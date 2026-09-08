@@ -1,0 +1,23 @@
+import System.Console.*
+
+func Utility.Identity<T>(value: T) -> T {
+    return value
+}
+
+record Helpers() {
+    static func Forward<T>(value: T) -> T {
+        return Utility.Identity(value)
+    }
+}
+
+func TypeName<T>() -> string {
+    return typeof(T).Name
+}
+
+func Main() -> int {
+    var value = Helpers.Forward(42)
+    let alias: int& = Utility.Identity(&value)
+    WriteLine(TypeName<int>())
+    WriteLine(alias)
+    return alias
+}

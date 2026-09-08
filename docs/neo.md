@@ -168,7 +168,7 @@ Reference-valued fields may contain heap-backed references; scoped targets in th
 fields fault at runtime. This compiler does not perform complete static lifetime
 analysis, so some invalid programs fail only during execution.
 
-Uninitialized bindings, generic declarations, overload declarations,
+Uninitialized bindings, generic type declarations, overload declarations,
 inheritance, general patterns, native pointers/interop, pinning and full Raven syntax
 are not implemented. It does not expose the entire standard library yet. These are
 candidate future slices, chosen around end-to-end scenarios rather than added as a
@@ -367,7 +367,7 @@ value/reference contract inventory and remaining compiler limitations.
 
 `System.Collections.ArrayList<Counter&>.Allocate(0)` selects a static member on a
 closed generic type. Type arguments may include managed references and nested closed
-types. This adds no generic function declarations or generic method inference. Ordinary
+types. Generic free/static declarations are described in [generic functions](function-generics.md); argument-based inference is available for source free/static functions. Ordinary
 comparisons remain expressions. A reference to a bundled type can implicitly convert
 to an interface declared by that closed type, without addressing or boxing a value.
 See the [complete collection example](../examples/source/collections.neo).
@@ -444,3 +444,21 @@ reabstract a base declaration with `func BaseInterface.Member` or
 they do not become ordinary record methods. Run
 `cargo run --locked -- run examples/source/default-interfaces.neo` for a readonly
 default calling an explicit implementation on frame and heap owners.
+
+## Generic functions and ordinary constructors
+
+Neo now supports inferred and explicit generic free functions, namespace-qualified function names
+and `static func` members. See [the contract and runnable example](function-generics.md#neo-projection).
+
+An explicit parameterless `init()` is supported. Compare [C# constructor synthesis](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/constructors) (consulted 2026-09-08), which is a language rule. Neo does not synthesize a C#-style
+parameterless constructor: without `init`, record construction consumes the declared
+positional fields. `init` replaces that aggregate call and must initialize required
+fields, with the existing explicit base chaining rules.
+
+An ordinary `class` declaration with body-declared fields is a separate planned
+source-language building block. Runtime record representation describes storage; it
+does not mean all source classes must have positional record constructors. Both
+ordinary classes and records will retain explicit value/reference addressing. Before
+synthesizing default constructors, define how field initializers and non-nullable
+reference fields satisfy initialization; an invalid zero reference is not a default
+object. See the [constructor contract](constructor-chaining.md).
