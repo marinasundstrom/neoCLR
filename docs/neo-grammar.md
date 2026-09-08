@@ -337,3 +337,7 @@ generic Func and generic IL declarations are supported. Lambdas require an expec
 Records and classes may implement bundled System interfaces as well as source-declared
 interfaces, including `System.Comparable<Score>`. The linked runtime verifies the
 method contracts. Source interface inheritance still requires source-declared bases.
+
+`Result<T,E>.Ok(payload)` and `Result<T,E>.Error(payload)` use ordinary static-call
+syntax. Importing case types, inferring their constructor type arguments and converting
+cases to carriers are planned separately; see [Result construction](result-construction.md).

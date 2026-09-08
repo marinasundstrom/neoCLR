@@ -3078,6 +3078,34 @@ impl Lowerer<'_> {
                 } else {
                     format!("System.{owner}")
                 };
+                // A unique static signature supplies argument context, just as an
+                // instance signature does. Preserve managed references and delegates.
+                if let Ok(function) = library::generic_static(&owner, member, &[], arguments.len())
+                {
+                    let parameters = function
+                        .parameters
+                        .iter()
+                        .map(Ty::from_metadata)
+                        .collect::<Result<Vec<_>, _>>()?;
+                    for (index, (argument, ty)) in arguments.iter().zip(&parameters).enumerate() {
+                        self.parameter_argument(
+                            argument,
+                            &Field {
+                                name: callee.at.clone(),
+                                ty: ty.clone(),
+                                output: function.out_parameters.contains(&index),
+                                readonly: function.readonly_parameters.contains(&index),
+                            },
+                        )?;
+                    }
+                    let signature = format!(
+                        "{owner}::{member}({})",
+                        parameters.iter().map(Ty::il).collect::<Vec<_>>().join(",")
+                    );
+                    library::resolve(&signature).map_err(|e| callee.at.error(e.message))?;
+                    self.body.push(format!("call {signature}"));
+                    return Ty::from_metadata(&function.returns);
+                }
                 let types = arguments
                     .iter()
                     .map(|a| self.library_argument(a))

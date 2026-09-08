@@ -40,6 +40,19 @@
 .type System.Result<T,E>
     .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
     .field private Stored System.Value
+
+    .method static Ok(T value) -> System.Result<T,E>
+        ldarg value
+        newobj instance System.Result.Ok<T>::.ctor(T)
+        newobj instance System.Result<T,E>::.ctor(System.Result.Ok<T>)
+        ret
+    .end
+    .method static Error(E error) -> System.Result<T,E>
+        ldarg error
+        newobj instance System.Result.Error<E>::.ctor(E)
+        newobj instance System.Result<T,E>::.ctor(System.Result.Error<E>)
+        ret
+    .end
     .method instance .ctor(System.Result.Ok<T> value) -> Void
         ldarg value
         value.pack System.Result.Ok<T>

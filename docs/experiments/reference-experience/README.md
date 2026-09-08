@@ -10,6 +10,12 @@ an independent sequence. The current list probe therefore prints the same five l
 as C#: `20, 2, 2, 50, 50`. Historical observations below are retained as the reason
 for this change; see [the updated contract](../../array-list.md).
 
+The second follow-up adds ordinary `Result<T,E>.Ok(value)` / `.Error(error)` library
+factories usable from Neo. The current workflow uses Result; the placeholder
+PurchaseOutcome and failed construction attempts below describe the initial experiment.
+The C# baseline retains its original outcome record, so it is now a behavior comparison
+rather than identical error-handling structure. See [Result construction](../../result-construction.md).
+
 ## Run it
 
 From the repository root:

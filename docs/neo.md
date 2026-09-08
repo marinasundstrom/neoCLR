@@ -534,3 +534,9 @@ The [order workflow and comparison](experiments/reference-experience/README.md)
 exercise shared inventory, receipt snapshots, interface notifications and callbacks.
 They record where explicit references help and where current library or lifetime
 rules cause friction, with commands and small follow-up exercises.
+
+## Qualified Result construction
+
+Use `Result<T,E>.Ok(value)` or `Result<T,E>.Error(error)` to construct a library
+Result. Both type arguments are explicit; the result binding can be inferred.
+See [construction and the planned case projection](result-construction.md).

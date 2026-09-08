@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-08
 
+- Added ordinary Result<T,E>.Ok/Error library factories, usable from Neo with an
+  explicitly closed owner such as Result<int,string>.Ok(42). The order workflow now
+  uses Result instead of a placeholder outcome record. Unique library static signatures
+  now supply argument context so managed-reference payloads retain identity. Typing and frame
+  storage checks remain unchanged. Documented imported case construction, generic
+  inference and declared-case carrier conversion as a separate compiler plan, with
+  standalone variant types and both existing-type and inline-case union declarations.
+
 - Changed ArrayList assignment to share count and buffer coherently across growth
   using managed backing state. Added readonly Copy() for independent sequences with
   shallow element copies. Breaking library layout/behavior change: rebuild artifacts

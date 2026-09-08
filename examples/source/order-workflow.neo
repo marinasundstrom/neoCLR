@@ -2,9 +2,6 @@ import System.Console.*
 
 record Product(Name: string, Price: int, Stock: int)
 record Receipt(Name: string, Quantity: int, Total: int)
-// Temporary outcome record: see docs/experiments/reference-experience for the
-// Result construction friction observed while writing this application.
-record PurchaseOutcome(Accepted: bool, Receipt: Receipt, Message: string)
 
 interface Notifications {
     func Purchased(receipt: Receipt) -> ()
@@ -22,13 +19,13 @@ func FindProduct(products: readonly System.Collections.ArrayList<Product&>&,
 }
 
 func Purchase(product: Product&, quantity: int,
-              notifications: Notifications&) -> PurchaseOutcome {
-    if quantity <= 0 { return PurchaseOutcome(false, Receipt("", 0, 0), "Invalid quantity") }
-    if product.Stock < quantity { return PurchaseOutcome(false, Receipt("", 0, 0), "Out of stock") }
+              notifications: Notifications&) -> Result<Receipt, string> {
+    if quantity <= 0 { return Result<Receipt,string>.Error("Invalid quantity") }
+    if product.Stock < quantity { return Result<Receipt,string>.Error("Out of stock") }
     product.Stock = product.Stock - quantity
     let receipt = Receipt(product.Name, quantity, product.Price * quantity)
     notifications.Purchased(receipt)
-    return PurchaseOutcome(true, receipt, "")
+    return Result<Receipt,string>.Ok(receipt)
 }
 
 func MakeRestock(product: Product&) -> System.Func<int, void> {
@@ -44,16 +41,18 @@ func Main() -> int {
     FindProduct(&products, "Coffee") match {
         Some(let product) => {
             let restock = MakeRestock(product)
-            let outcome = Purchase(product, 2, &notifications)
-            if !outcome.Accepted { WriteLine(outcome.Message); return 1 }
-            receipts.Add(outcome.Receipt)
+            Purchase(product, 2, &notifications) match {
+                Ok(let receipt) => { receipts.Add(receipt) },
+                Error(let error) => { WriteLine(error); return 1 }
+            }
             product.Price = 15
             restock(4)
             WriteLine(product.Stock)
             WriteLine(receipts[0].Total)
-            let rejected = Purchase(product, 99, &notifications)
-            if rejected.Accepted { return 2 }
-            WriteLine(rejected.Message)
+            Purchase(product, 99, &notifications) match {
+                Ok(let receipt) => { return 2 },
+                Error(let error) => { WriteLine(error) }
+            }
             if product.Stock != 7 { return 3 }
             if receipts[0].Total != 24 { return 4 }
         },

@@ -128,3 +128,13 @@ Fault remains for violated execution contracts.
 There are no union-specific IL instructions in the platform contract. Integer-backed
 enums remain a separate milestone. Reflection, GC, reference counting, runtime async
 and high-level pattern syntax are not prerequisites for this convention.
+
+## Upcoming Neo projection
+
+The [case construction plan](result-construction.md#planned-case-projection-ravens-model)
+uses variants as separate types: `union PaymentMethod(Card | Cash)` accepts existing
+types, while a `union Shape { case Circle(...) ... }` declaration introduces cases.
+Imports and generic constructor inference create case values independently; the carrier
+constructor signatures determine accepted variants and permit conversion into an
+expected carrier. No separate case-membership metadata is required. This is planned language
+support, not new runtime inheritance or implemented source declaration syntax.
