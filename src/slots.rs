@@ -149,6 +149,14 @@ impl SlotReference {
     pub(crate) fn debug_path(&self) -> &[usize] {
         &self.path
     }
+    pub(crate) fn same_location(&self, other: &Self) -> bool {
+        self.path == other.path
+            && match (&self.root, &other.root) {
+                (Root::Frame(a), Root::Frame(b)) => Rc::ptr_eq(a, b),
+                (Root::Heap { cell: a, .. }, Root::Heap { cell: b, .. }) => Weak::ptr_eq(a, b),
+                _ => false,
+            }
+    }
     pub(crate) fn target(&self) -> &Type {
         &self.target
     }

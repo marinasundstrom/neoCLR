@@ -13,6 +13,11 @@ The next preview's version, publication date and release validation are not yet 
 
 #### Added
 
+- **Preliminary reference identity:** Neo ReferenceEquals and IL ref.eq compare
+  initialized managed locations across frame/heap storage, concrete/interface views,
+  and interior paths. They preserve value equality behavior and reject raw pointers;
+  no Object root, boxing, native address or identity hash is introduced.
+
 - **Neo output parameters:** unconditional `out name: Foo&` declarations, explicit
   `out destination` arguments, and typed uninitialized var locals now project the
   existing runtime contracts. Source/interface forwarding and conditional library

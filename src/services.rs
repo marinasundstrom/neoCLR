@@ -125,6 +125,7 @@ fn instruction_services(op: &Op) -> &'static [RuntimeService] {
         Op::PackValue(..) | Op::IsValue(..) | Op::UnpackValue(..) => &[ValueStorage],
         Op::LoadTypeToken(..) => &[TypeInspection],
         Op::ReferenceType => &[TypeInspection, SlotReferences],
+        Op::ReferenceEqual => &[SlotReferences],
         Op::LocalAddress(..) | Op::ArgumentAddress(..) => &[SlotReferences],
         Op::LoadObject(..)
         | Op::StoreObject(..)

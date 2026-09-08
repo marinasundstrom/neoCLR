@@ -187,6 +187,18 @@ fn analyze_function(
         {
             state.receiver_initialized = true;
         }
+        if matches!(op, Op::ReferenceEqual) {
+            for input in &inputs {
+                if let StackType::Slot {
+                    local: Some(index), ..
+                } = input
+                {
+                    if !state.initialized[*index] {
+                        return Err(fault(pc, "reference equality requires initialized targets"));
+                    }
+                }
+            }
+        }
         let mut conditional_outputs = vec![];
         if let Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) = op {
             let callee = crate::vm::resolve(module, target).map_err(|e| fault(pc, &e.message))?;
@@ -352,11 +364,11 @@ fn effect(module: &Module, op: &Op, arity: usize) -> Result<(usize, usize), Faul
         }
         Construct(target) => (target.parameters.len(), 1),
         BorrowInterface(_) | PackValue(_) | IsValue(_) | UnpackValue(_) => (1, 1),
-        SetField(_) | PointerAdd | BitAnd | BitOr | BitXor | ShiftLeft | ShiftRight
-        | ShiftRightUnsigned | Remainder | RemainderUnsigned | Add | Sub | Mul | AddChecked
-        | SubChecked | MulChecked | Divide | AddCheckedUnsigned | SubCheckedUnsigned
-        | MulCheckedUnsigned | DivideUnsigned | Equal | Greater | GreaterUnsigned | Less
-        | LessUnsigned => (2, 1),
+        ReferenceEqual | SetField(_) | PointerAdd | BitAnd | BitOr | BitXor | ShiftLeft
+        | ShiftRight | ShiftRightUnsigned | Remainder | RemainderUnsigned | Add | Sub | Mul
+        | AddChecked | SubChecked | MulChecked | Divide | AddCheckedUnsigned
+        | SubCheckedUnsigned | MulCheckedUnsigned | DivideUnsigned | Equal | Greater
+        | GreaterUnsigned | Less | LessUnsigned => (2, 1),
         BranchEqual(_)
         | BranchNotEqual(_)
         | BranchGreater(_)
@@ -668,6 +680,15 @@ fn typed_effect(
             Result::Ok(vec![loaded(&callee.returns)])
         }
         LoadTypeToken(_) => one(Type::RuntimeTypeHandle),
+        ReferenceEqual => {
+            for value in values {
+                require(
+                    matches!(exact(value)?, Type::ByRef(_)),
+                    "ref.eq requires managed references",
+                )?;
+            }
+            one(Type::Boolean)
+        }
         ReferenceType => {
             require(
                 matches!(exact(&values[0])?, Type::ByRef(_)),

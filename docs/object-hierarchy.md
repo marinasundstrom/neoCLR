@@ -26,7 +26,8 @@ default record policy and the relationship to Equatable<T> need to be
 specified before adding universal method implementations.
 
 Reference identity is separate: whether two references designate the same stored
-instance or location. Any reference-identity hashing intrinsic must preserve that
+instance or location. The preliminary [ref.eq / ReferenceEquals facility](reference-identity.md)
+now compares managed locations independently of value equality. Any reference-identity hashing intrinsic must preserve that
 identity across moving GC and account for interior locations consistently. This
 intrinsic must not become Object.GetHashCode's implicit meaning. Raw native pointer
 addresses are a separate capability and cannot define managed value identity.

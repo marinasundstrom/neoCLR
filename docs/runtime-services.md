@@ -86,3 +86,6 @@ HelloWorld guest code.
 
 ldflda/ldobj/stobj/initobj conservatively report both PointerMemory and SlotReferences; service
 analysis does not yet distinguish their operand kinds.
+
+The preliminary `ref.eq` managed-location comparison uses SlotReferences; it neither
+requires an Object root nor invokes value equality. See [reference identity](reference-identity.md).

@@ -1,0 +1,18 @@
+import System.Console.*
+
+interface Counter { func Read() -> int }
+record SimpleCounter(Age: int): Counter {
+    func Read() -> int { return this.Age }
+}
+
+func Main() -> () {
+    var local = SimpleCounter(42)
+    var copy = local
+    let view: Counter& = &local
+    if ReferenceEquals(&local, view) { WriteLine("Same location through interface") }
+    if !ReferenceEquals(&local, &copy) { WriteLine("Copy has a different location") }
+    let heap = new SimpleCounter(42)
+    let age = &heap.Age
+    if ReferenceEquals(age, &heap.Age) { WriteLine("Same field location") }
+    if !ReferenceEquals(heap, age) { WriteLine("Object and field are distinct locations") }
+}

@@ -385,3 +385,9 @@ target. Interface views reveal the concrete implementation type; interior refere
 reveal the referenced field/element type. Existing declared GetType methods take
 precedence. This fallback does not address ordinary values or follow raw pointers.
 It lowers to ref.type and GetTypeFromHandle; typeof remains declared-type inspection.
+
+## Reference identity
+
+The preliminary `ReferenceEquals(left, right)` intrinsic compares two explicit managed
+references by location, including concrete/interface aliases and interior paths. It
+does not dereference arguments for value comparison. See [reference identity](reference-identity.md).

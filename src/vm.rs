@@ -1472,6 +1472,23 @@ fn interpret_instructions(
                     }
                     frames.push(Frame::new(callee, args)?);
                 }
+                Op::ReferenceEqual => {
+                    let mut reference = || -> Result<crate::SlotReference, Fault> {
+                        let reference = match frame.pop()? {
+                            Value::SlotReference(reference)
+                            | Value::SlotInterface {
+                                receiver: reference,
+                                ..
+                            } => reference,
+                            _ => return Err(Fault::new("ref.eq requires managed references")),
+                        };
+                        reference.assigned()?;
+                        Ok(reference)
+                    };
+                    let right = reference()?;
+                    let left = reference()?;
+                    frame.stack.push(Value::Boolean(left.same_location(&right)));
+                }
                 Op::ReferenceType => {
                     let reference = match frame.pop()? {
                         Value::SlotReference(reference)

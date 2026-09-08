@@ -628,3 +628,8 @@ frame escapes, or establish lexical block cleanup.
 and produces a System.RuntimeTypeHandle describing its target. It validates the target
 without copying guest payload or retaining it in the result. It requires TypeInspection
 and SlotReferences runtime services. Ordinary values and raw pointers fault.
+
+`ref.eq` consumes two live initialized managed references, possibly with different
+referent/interface types, and pushes Boolean location identity. It normalizes interface
+views to their underlying storage root/path and requires SlotReferences. Values and
+raw pointers are rejected. See [reference identity](reference-identity.md).

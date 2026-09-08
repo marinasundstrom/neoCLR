@@ -1389,6 +1389,33 @@ impl Lowerer<'_> {
                 .at
                 .error("calling through a binding is not supported"));
         }
+        if matches!(&callee.kind, ExprKind::Name(name) if name == "ReferenceEquals")
+            && !self
+                .source
+                .functions
+                .iter()
+                .any(|f| f.name.text == "ReferenceEquals")
+            && !self
+                .source
+                .records
+                .iter()
+                .any(|r| r.name.text == "ReferenceEquals")
+        {
+            if arguments.len() != 2 {
+                return Err(callee
+                    .at
+                    .error("ReferenceEquals requires two managed references"));
+            }
+            for argument in arguments {
+                if !matches!(self.expression(argument)?, Ty::Ref(_)) {
+                    return Err(argument
+                        .at
+                        .error("ReferenceEquals requires explicit managed references"));
+                }
+            }
+            self.body.push("ref.eq".into());
+            return Ok(Ty::Bool);
+        }
         if matches!(&callee.kind, ExprKind::Name(name) if name == "array") {
             if arguments.len() != 2 {
                 return Err(callee

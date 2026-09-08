@@ -607,6 +607,8 @@ pub enum Instruction {
     LoadTypeToken(Type),
     #[serde(rename = "ref.type")]
     ReferenceType,
+    #[serde(rename = "ref.eq")]
+    ReferenceEqual,
     #[serde(rename = "interface.borrow")]
     BorrowInterface(Type),
     #[serde(rename = "callvirt")]
