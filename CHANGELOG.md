@@ -6,8 +6,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+No changes yet.
+
+## 0.1.0-preview.2 — 2026-09-08
+
+Source-only prerelease. See [release notes](docs/preview-2-release-notes.md).
+
 Changes since [v0.1.0-preview.1](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.1).
-The next preview's version, publication date and release validation are not yet set.
+Publication requires the exact-commit validation linked from the GitHub release.
 
 ### 2026-09-08
 
@@ -139,7 +145,7 @@ The next preview's version, publication date and release validation are not yet 
   possible Neo library/compiler bootstrapping. These designs do not implement those
   features. See the [roadmap](docs/neo-roadmap.md) and [lifecycle design](docs/lifecycle.md).
 
-### Migration notes for the next preview
+### Migration notes for Preview 2
 
 - Reassemble format-4 artifacts, including external System libraries, against the
   current runtime. Source and library artifacts must agree on signatures.

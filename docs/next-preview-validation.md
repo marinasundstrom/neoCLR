@@ -1,6 +1,7 @@
 # Next-preview validation
 
-The candidate is still Unreleased; no version or publication date has been selected.
+The selected candidate is v0.1.0-preview.2, a source-only prerelease dated 2026-09-08.
+See [Preview 2 release notes](preview-2-release-notes.md).
 The [changelog](../CHANGELOG.md) records features and migration guidance. Published
 Preview 1 notes and evidence remain frozen.
 

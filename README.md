@@ -1,7 +1,7 @@
 # neoCLR
 
 [![CI](https://github.com/marinasundstrom/neoCLR/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/marinasundstrom/neoCLR/actions/workflows/ci.yml)
-[![Preview 1](https://img.shields.io/badge/release-v0.1.0--preview.1-blue)](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.1)
+[![Preview 2](https://img.shields.io/badge/release-v0.1.0--preview.2-blue)](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.2)
 [![MIT license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Rust 1.85+](https://img.shields.io/badge/Rust-1.85%2B-orange)](Cargo.toml)
 
@@ -75,34 +75,24 @@ separates unreleased work from published capabilities. Every commit updates it u
 The [next-preview validation guide](docs/next-preview-validation.md) documents the
 reproducible source-archive check and exact-commit release gates.
 
-## Preview 1
+## Preview 2
 
-**Preview 1 (v0.1.0-preview.1)** is a runnable source preview. Read the
-[release notes](docs/preview-1-release-notes.md) for capabilities and known limits,
-and the [scope and release checks](docs/preview-1.md) for the milestone boundaries.
-The GitHub prerelease records the tagged commit, CI evidence and source checksums.
-Start with the [runnable walkthrough](docs/preview-1-walkthrough.md): console calculation,
-array loops, file input, explicit pointers, ordinary errors and Fault traces, with
-source/artifact commands and tested expected output.
-The [program contracts and IL mappings](docs/preview-1-programs.md) define the target
-through six small Raven-like pseudocode programs. They are explanatory examples;
-Preview 1 does not require a high-level compiler.
+**Preview 2 (v0.1.0-preview.2)** is a source-only prerelease adding tracing GC,
+managed arrays and collections, the Neo companion compiler, an interactive debugger,
+and reflection introspection. See the [release notes](docs/preview-2-release-notes.md)
+for examples, migration guidance and limitations. The GitHub prerelease records the
+exact commit, platform validation and source checksums.
 
-The first native heap/pointer slice is implemented: explicit allocation/free,
-native addresses, pointer casts and byte offsets, indirect access, and sequential
-record layout. `localloc` provides explicit frame-local byte storage, released on
-return. Native integers and explicit pointer/address conversions are also
-available. See [heap and pointers](docs/heap-and-pointers.md).
-Managed heap allocations now use [tracing garbage collection](docs/garbage-collection.md).
-[Heap-backed T&](docs/heap-references.md) shares the frame-reference operations.
-Guest destruction remains future work.
-[System.Collections.ArrayList<T>](docs/array-list.md) provides a small growable list
-for native-layout values, with ordinary indexers, shared aliases and explicit release.
-The [pointer-backed carrier example](docs/pointer-carriers.md) demonstrates how ordinary
-values can refer to shared heap or stack storage through `Void*`, with explicit lifetimes.
-Types describe values and behavior; allocation and lifetime are separate choices,
-with no class/struct bit deciding either. The proof of concept aims to make migration
-familiar where possible, without committing every program to one memory model.
+Managed references can address frame-owned values or managed heap objects. Neo reads
+and writes their targets automatically; `ReferenceEquals` explicitly compares their
+locations. Returning a reference into the current frame faults. GC reclaims unreachable
+managed heap objects; native allocation/free remains explicit and separate.
+[ArrayList<T>](docs/array-list.md) now uses a managed backing array and requires no Free.
+Automatic destruction and resource cleanup remain future work.
+
+[Preview 1's frozen release notes](docs/preview-1-release-notes.md) describe the earlier
+release. Its [walkthrough](docs/preview-1-walkthrough.md) remains historical evidence;
+use the current [Neo guide](docs/neo.md) and examples for Preview 2.
 
 ## Build and run a sample
 
@@ -113,8 +103,8 @@ or MSVC tools on Windows. No .NET installation is required.
 
 Cargo records this minimum as `rust-version = "1.85"`. CI is configured to test
 1.85.0 and stable on Linux, macOS and Windows; recorded local validation is macOS
-ARM64. See [validation evidence](docs/preview-1-validation.md) for tested snapshots
-and the remaining release checks. Dependencies must be downloaded on the first
+ARM64. See the [validation guide](docs/next-preview-validation.md) and the GitHub release
+for exact-commit platform evidence. Dependencies must be downloaded on the first
 build; the commands use Cargo.lock through `--locked`.
 
 The assembler and interpreter are built together as the `neoclr` executable.
