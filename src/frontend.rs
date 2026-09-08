@@ -2009,6 +2009,14 @@ impl Lowerer<'_> {
                 return Ok(expected.clone());
             }
         }
+        if actual != *expected {
+            if let Some(construction) = library::case_conversion(&actual, expected)
+                .map_err(|error| at.error(error.message))?
+            {
+                self.body.push(construction);
+                return Ok(expected.clone());
+            }
+        }
         if matches!(actual, Ty::ReadOnlyRef(_)) && matches!(expected, Ty::Ref(_)) {
             return Err(at.error("readonly reference cannot satisfy writable contract"));
         }

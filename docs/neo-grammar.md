@@ -349,8 +349,9 @@ method contracts. Source interface inheritance still requires source-declared ba
 `Result<T,E>.Ok(payload)` and `Result<T,E>.Error(payload)` use ordinary static-call
 syntax. Explicit [library case constructors](neo-library-constructors.md), such as
 `System.Result.Ok<int>(42)` and `Result<int,string>(ok)`, reuse call syntax. Source case
-imports are supported; external imports, generic constructor inference and implicit
-external case-to-carrier conversion remain separate work.
+imports are supported. [Case-to-carrier conversion](case-to-carrier-conversion.md) uses
+an expected marked carrier and its accepting constructor. External imports and generic
+constructor inference remain separate work.
 
 Non-generic source unions support the two forms above. Cases must be distinct
 concrete declared source value types; inline cases generate nested record types.

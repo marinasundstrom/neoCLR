@@ -43,8 +43,8 @@ cargo test --locked --test neo_result_factories --test neo_match --test referenc
 `System.Result.Ok<int>(42)` now constructs an independent case value, and
 `Result<int,string>(ok)` explicitly invokes the carrier constructor accepting it.
 See [library constructor calls](neo-library-constructors.md) for normal metadata
-lookup, argument context and current limits. Generic argument inference and implicit
-external case conversion remain separate.
+lookup, argument context and current limits. Generic argument inference remains separate. [Case-to-carrier conversion](case-to-carrier-conversion.md)
+now invokes the accepting public constructor when a marked bundled carrier is expected.
 
 ## Planned case projection: Raven's model
 
@@ -88,10 +88,9 @@ Remaining compiler work builds on these declarations:
    do not confuse type imports with static-member imports.
 2. Infer generic constructor arguments from payloads, including diagnostics when
    arguments do not determine them.
-3. Discover each accepted variant from the marked union carrier's one-parameter
-   constructors and convert through the matching constructor. Diagnose missing or
-   ambiguous matches; do not make ordinary non-union constructors implicit conversions.
-   Preserve reference access modes and lifetime checks.
+3. Marked bundled carriers now accept exact case types through public one-value
+   constructors, preserving reference payloads and lifetime checks. Broader constructor
+   conversion ranking and arbitrary external assembly discovery remain separate work.
 4. Test standalone case bindings, nested carriers, overload resolution and rejection
    of invalid or ambiguous conversions using more than Result alone.
 

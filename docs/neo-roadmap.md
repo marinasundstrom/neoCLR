@@ -229,3 +229,7 @@ contracts when selecting value/reference use.
 [Explicit library constructor calls](neo-library-constructors.md) now supply the
 ordinary metadata path for standalone generic cases and explicit carrier construction.
 Generic constructor inference and external case imports can build on that path.
+
+[Implicit case-to-carrier conversion](case-to-carrier-conversion.md) now uses marked
+bundled carrier constructors with exact case types. The Raven source comparison records
+which broader inference and conversion behaviors remain deferred.

@@ -29,11 +29,10 @@ are rejected. Constructors are not inherited and no default constructor is fabri
 
 ## Boundaries and comparison
 
-This implements explicit construction, not generic constructor inference or an implicit
-external case-to-carrier conversion. `let result: Result<int,string> = ok` remains outside
-this slice; use `Result<int,string>(ok)`. `System.Result.Ok(42)` and imported `Ok(42)` still
-need future inference/import work. Source union case conversions retain their existing
-contract. Library heap-construction syntax is not added here. No arbitrary external
+Explicit construction remains available alongside [implicit case-to-carrier conversion](case-to-carrier-conversion.md):
+`let result: Result<int,string> = ok` invokes the accepting constructor when the target
+is a marked union. `System.Result.Ok(42)` and imported `Ok(42)` still need future
+inference/import work. Source union case conversions retain their existing contract. Library heap-construction syntax is not added here. No arbitrary external
 assembly loading is added: this frontend targets the bundled System metadata.
 
 Microsoft's [C# constructor guide](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/constructors)

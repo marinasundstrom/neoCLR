@@ -4,17 +4,17 @@ record Receipt(Total: int)
 
 func Main() -> int {
     let ok = System.Result.Ok<Receipt>(Receipt(42))
-    let result = Result<Receipt, string>(ok)
+    let result: Result<Receipt, string> = ok
     let Ok(receipt) = result else { return -1 }
     WriteLine(receipt.Total)
 
     let some = System.Option.Some<int>(42)
-    let option = Option<int>(some)
+    let option: Option<int> = some
     let Some(value) = option else { return -2 }
     WriteLine(value)
 
     let none = System.Option.None()
-    let missing = Option<int>(none)
+    let missing: Option<int> = none
     if let None = missing { return value }
     return -3
 }

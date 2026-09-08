@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-09
 
+- Added implicit Neo case-to-carrier conversion for marked bundled union types using
+  the unique public constructor accepting the exact case value type. Expected types
+  in annotations, returns, arguments and storage supply the carrier; ordinary unmarked
+  constructors do not enable conversion. Added Raven implementation research, an
+  updated case example and type/reference/lifetime regressions. Generic constructor
+  inference and external case imports remain separate; runtime instructions are unchanged.
+
 - Added explicit public library constructor calls in Neo, including standalone
   System.Result.Ok<T>/Error<E> and System.Option.Some<T>/None values and explicit
   overloaded carrier construction. Metadata supplies parameter context for reference,

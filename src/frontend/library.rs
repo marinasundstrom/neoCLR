@@ -435,3 +435,47 @@ pub(super) fn constructors(
         .collect::<Result<Vec<_>, _>>()
         .map(Some)
 }
+
+/// A marker opts the carrier into implicit construction; constructor parameters
+/// remain the acceptance contract. Ordinary one-argument constructors do not opt in.
+pub(super) fn case_conversion(actual: &Ty, expected: &Ty) -> Result<Option<String>, Fault> {
+    let module = crate::library::system()?;
+    let owner = crate::assembler::parse_type(&expected.il())?;
+    let Some(definition) = module.type_definition(&owner) else {
+        return Ok(None);
+    };
+    if !definition.custom_attributes.iter().any(|attribute| {
+        attribute
+            .constructor
+            .owner
+            .as_ref()
+            .and_then(Type::definition_name)
+            == Some("System.Runtime.CompilerServices.UnionAttribute")
+    }) {
+        return Ok(None);
+    }
+    // A reference to a carrier is a storage contract, never an implicit allocation.
+    if matches!(expected, Ty::Ref(_) | Ty::ReadOnlyRef(_)) {
+        return Ok(None);
+    }
+    let mut selected = None;
+    for constructor in constructors(expected, 1)?.unwrap_or_default() {
+        let parameter = Ty::from_metadata(&constructor.parameters[0])?;
+        if matches!(parameter, Ty::Ref(_) | Ty::ReadOnlyRef(_))
+            || !constructor.out_parameters.is_empty()
+            || !constructor.readonly_parameters.is_empty()
+            || parameter != *actual
+        {
+            continue;
+        }
+        if selected.is_some() {
+            return Err(Fault::new("ambiguous union case conversion"));
+        }
+        selected = Some(format!(
+            "newobj instance {}::.ctor({})",
+            expected.il(),
+            actual.il()
+        ));
+    }
+    Ok(selected)
+}
