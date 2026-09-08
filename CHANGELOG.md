@@ -6,13 +6,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
-### 2026-09-08
-
-#### Fixed
-
-- Source validation disables Git line-ending conversion when archiving, preserving
-  notice hashes across Windows and Unix. Its text I/O explicitly uses UTF-8, and
-  CI runs every platform job even if another job fails.
+No changes yet.
 
 ## 0.1.0-preview.2 — 2026-09-08
 
@@ -22,6 +16,12 @@ Changes since [v0.1.0-preview.1](https://github.com/marinasundstrom/neoCLR/relea
 Publication requires the exact-commit validation linked from the GitHub release.
 
 ### 2026-09-08
+
+#### Fixed
+
+- Source validation disables Git line-ending conversion when archiving, preserving
+  notice hashes across Windows and Unix. Its text I/O explicitly uses UTF-8, and
+  CI runs every platform job even if another job fails.
 
 #### Added
 

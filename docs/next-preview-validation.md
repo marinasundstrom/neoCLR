@@ -37,7 +37,8 @@ content; uncommitted working-tree changes are not included in its archive.
 
 The check:
 
-1. Resolves one exact commit and archives its tracked source with git archive.
+1. Resolves one exact commit and archives its tracked source with git archive,
+   disabling line-ending conversion so notice bytes agree on Windows and Unix.
 2. Rejects links/special files and unexpected archive paths; compares archive membership
    with the tracked tree and checks required source/release files.
 3. Checks the dependency notice inventory against Cargo.lock and verifies notice hashes.
