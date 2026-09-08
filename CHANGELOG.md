@@ -6,6 +6,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-09-09
+
+- Added a reference-view example covering generic forwarding, base/interface views,
+  readonly fields and collection elements, with identity/virtual-dispatch checks,
+  GC-pressure coverage and readonly-container write rejection. Documented the distinction
+  between replacing a stored readonly reference and writing through a readonly holder.
+
 ### 2026-09-08
 
 - Changed Neo reference-to-reference assignment to copy the reference into mutable

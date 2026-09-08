@@ -152,3 +152,67 @@ func Main() -> int {
 "#;
     assert_eq!(run(source).value, Value::Int32(42));
 }
+
+#[test]
+fn base_interface_readonly_and_generic_views_keep_identity_and_virtual_dispatch() {
+    let result = run(include_str!("../examples/source/reference-views.neo"));
+    assert_eq!(result.output, ["42", "42", "42"]);
+    assert_eq!(result.value, Value::Int32(42));
+}
+
+#[test]
+fn reassigned_interface_view_keeps_complete_heap_owner_alive() {
+    let source = r#"
+interface Readable { readonly func Read() -> int }
+record C(N: int): Readable { readonly func Read() -> int { return this.N } }
+func Make() -> readonly Readable& {
+    var selected: readonly Readable& = new C(1)
+    selected = new C(42)
+    return selected
+}
+func Discard() -> () { let temporary = new C(0) }
+func Main() -> int {
+    let view = Make()
+    Discard()
+    Discard()
+    Discard()
+    return view.Read()
+}
+"#;
+    let module = frontend::compile(source).unwrap();
+    let result = LoadedProgram::new(&module)
+        .unwrap()
+        .run(Limits {
+            heap_objects: 2,
+            ..Limits::default()
+        })
+        .unwrap();
+    assert_eq!(result.value, Value::Int32(42));
+    assert!(result.heap.reclaimed_objects() >= 3);
+}
+
+#[test]
+fn readonly_container_view_cannot_replace_its_reference_field() {
+    let source = r#"
+record C(N: int)
+record H(Item: C&)
+func Replace(readonly holder: H&, replacement: C&) -> () {
+    holder.Item = replacement
+}
+func Main() -> () {
+    let original = new C(1)
+    let holder = new H(original)
+    Replace(holder, new C(2))
+}
+"#;
+    match frontend::compile(source) {
+        Err(_) => (),
+        Ok(module) => {
+            let fault = LoadedProgram::new(&module)
+                .unwrap()
+                .run(Limits::default())
+                .unwrap_err();
+            assert!(fault.message.contains("readonly"), "{fault:?}");
+        }
+    }
+}

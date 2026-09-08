@@ -1,0 +1,38 @@
+import System.Console.*
+
+interface Readable { readonly func Read() -> int }
+record Counter(Value: int): Readable {
+    readonly virtual func Read() -> int { return this.Value }
+}
+record OffsetCounter(Offset: int): Counter {
+    readonly override func Read() -> int { return this.Value + this.Offset }
+}
+record Selection(Current: readonly Readable&)
+
+func Identity<T>(value: T) -> T { return value }
+
+func Main() -> int {
+    let first = new Counter(1)
+    let second = new OffsetCounter(40, 2)
+    var baseView: Counter& = first
+    baseView = Identity(second)
+    var interfaceView: readonly Readable& = first
+    interfaceView = baseView
+    let alias = interfaceView
+
+    let selection = new Selection(first)
+    selection.Current = interfaceView
+    var entries = System.Collections.ArrayList<readonly Readable&>.Allocate(1)
+    entries.Add(first)
+    entries[0] = second
+
+    if !ReferenceEquals(alias, second) { return -1 }
+    if !ReferenceEquals(selection.Current, second) { return -2 }
+    if !ReferenceEquals(entries[0], second) { return -3 }
+    if first.Value != 1 { return -4 }
+    if !baseView.GetType().Equals(typeof(OffsetCounter)) { return -5 }
+    WriteLine(alias.Read())
+    WriteLine(selection.Current.Read())
+    WriteLine(entries[0].Read())
+    return baseView.Read()
+}

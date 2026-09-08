@@ -73,3 +73,20 @@ cargo test --locked --test neo_reference_assignment --test neo_managed_access --
 Neo tests use source/artifact loading and cover identity-preserving stores, closure
 cells, exactly-once factory evaluation, immutable binding failures, output target
 writes, readonly conversion rejection and runtime rejection of heap-stored frame references.
+
+## Base, interface and readonly views
+
+Run `cargo run --locked -- run examples/source/reference-views.neo`. It prints 42
+three times and returns 42. An inferred generic result retains its concrete reference
+before assignment converts it to a base view. Assigning that view to a readonly
+interface reference retains the same concrete owner and virtual dispatch. The example
+checks identity with ReferenceEquals across aliases, a field and an ArrayList element;
+the former owner remains unchanged. This reuses the reference-copy decision above and
+Neo's existing view conversions; it adds no allocation or conversion mechanism.
+
+There are two separate readonly boundaries. A writable holder can replace a field
+whose stored reference is readonly; that qualifier limits access through the stored
+reference. A readonly view of the holder prevents replacing its field. Neither choice
+makes other writable aliases to the target readonly. Regression tests cover the latter
+write rejection and a reassigned interface reference surviving its factory frame and
+collection pressure with a two-object heap budget.
