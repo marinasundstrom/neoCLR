@@ -28,9 +28,11 @@ There is no implicit promotion when &local escapes and no manually invalidated h
 Reference-valued record fields and erased payloads may contain heap-backed references.
 The runtime rejects frame-backed references in those positions, even without optional
 verification. This conservative subset prevents a returned record, heap object or
-erased payload from hiding a scoped reference. Nested managed addresses (T&&) and
-ByRef generic arguments remain unsupported. Use ldobj on an owner and ldfld to read
-its reference-valued field; taking that field's address would create T&&.
+erased payload from hiding a scoped reference. Nested managed addresses (T&&) remain
+unsupported. ByRef generic arguments and reference array elements are supported;
+stored references must be heap-backed. See [managed arrays](managed-arrays.md) and
+[ArrayList](array-list.md). Use ldobj on an owner and ldfld to read its reference-valued
+field; taking that field's address would create T&&.
 
 Reference copies preserve identity; value copies copy inline fields and preserve
 embedded reference identities. A new heap allocation gets a fresh identity, even

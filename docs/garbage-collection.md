@@ -83,12 +83,14 @@ collection_events() and `run --gc-events`. Each event records its sequence, reas
 counts and reclamation. The history contains counts only, so it does not root objects.
 It is reported at completion, not streamed live. Root counts include duplicate edges.
 
-The next monitoring layer should provide pause durations including root scanning;
-allocation rates and byte counts
-require a defined managed storage-size model. Hosts will also need snapshots during
-long-running programs and diagnostics on Fault/cancellation. Define bounded buffering
-and observer behavior before callbacks are permitted around GC safepoints. Later
-heap graph/root inspection can explain why particular allocations remain reachable.
+The [interactive debugger](debugger.md) now exposes bounded live stack/heap snapshots
+and GC counters, including paused and terminal states, through both the CLI and an
+embedding controller. It does not change the completion-only behavior of the two
+`run` reporting flags above.
+
+Further monitoring should provide pause durations including root scanning; allocation
+rates and byte counts require a defined managed storage-size model. General observer
+callbacks around GC safepoints and heap graph/root explanations remain future work.
 
 ## Cleanup and future work
 

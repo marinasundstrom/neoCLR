@@ -67,6 +67,12 @@ combines control flow, union results and console input:
 cargo run -- run examples/source/calculator.neo
 ```
 
+## Release history
+
+This README describes the current development tree. The [changelog](CHANGELOG.md)
+separates unreleased work from published capabilities. Every commit updates it using
+[the changelog workflow](docs/changelog.md); published entries remain unchanged.
+
 ## Preview 1
 
 **Preview 1 (v0.1.0-preview.1)** is a runnable source preview. Read the

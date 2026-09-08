@@ -59,6 +59,11 @@ homepage/repository fields is not evidence that a remote URL should be invented.
 
 ## Final release checks
 
+Maintain [the changelog](../CHANGELOG.md) in every development commit using the
+[changelog workflow](changelog.md). For a release candidate, promote only the selected
+Unreleased entries to its actual version/date; keep previously published sections and
+release notes unchanged.
+
 - Refresh dependency metadata and notice hashes against the final Cargo.lock.
 - Review any source/fixture/license additions since the audited snapshot.
 - Confirm archive membership matches the selected tracked tree and preserve its hash.
