@@ -487,3 +487,12 @@ Lambdas use the same expected delegate context: `value => value + 1` or
 `() => { statements }`. Captured bindings share managed storage; managed-reference
 captures must be heap-backed. Run `cargo run --locked -- run examples/source/closures.neo`
 for an Array.ForEach lambda and an escaping counter closure.
+
+## Common interfaces
+
+[Comparable<T>, Iterable<T> and Iterator<T>](common-interfaces.md) are bundled library
+contracts. Use `while iterator.MoveNext()` with `iterator.Current`, then Dispose.
+List<T> inherits Iterable<T>; inherited library members work through managed interface
+views. Integer-range for syntax is unchanged. Run
+`cargo run --locked -- run examples/source/common-interfaces.neo` for ordering and
+iteration through readonly collection views.

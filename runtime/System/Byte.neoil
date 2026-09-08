@@ -1,3 +1,22 @@
 .type System.Byte
+    .implements System.Comparable<Byte>
+    .method instance readonly byref CompareTo(Byte other) -> Int32
+        ldarg this
+        ldobj Byte
+        ldarg other
+        blt.un Less
+        ldarg this
+        ldobj Byte
+        ldarg other
+        bgt.un Greater
+        ldc.i4 0
+        ret
+    Less:
+        ldc.i4 -1
+        ret
+    Greater:
+        ldc.i4 1
+        ret
+    .end
 .end
 

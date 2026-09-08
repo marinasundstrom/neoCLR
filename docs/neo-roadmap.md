@@ -36,7 +36,9 @@ heap objects remain available; deterministic block cleanup is not claimed.
 [Acceptance tests](../tests/neo_control_flow.rs) cover ranges, nested transfers,
 short-circuit effects, scope/lifetime diagnostics and instruction limits. Run the
 [control-flow example](../examples/source/control-flow.neo) to print and return 21.
-General iteration protocols, custom steps and broader collection syntax remain future.
+[Iterable/Iterator library protocols](common-interfaces.md) are now implemented;
+Neo currently consumes them with while. Iterable for lowering with guaranteed disposal,
+custom steps and broader collection syntax remain future.
 
 ## 2. Patterns and union-aware match — completed
 

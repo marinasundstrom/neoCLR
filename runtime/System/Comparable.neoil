@@ -1,0 +1,5 @@
+; Natural ordering: negative, zero or positive. Readonly receiver, T input by value.
+.interface System.Comparable<T>
+    .method instance readonly byref CompareTo(T other) -> Int32
+    .end
+.end

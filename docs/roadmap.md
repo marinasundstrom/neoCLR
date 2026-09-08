@@ -462,3 +462,12 @@ and whether its hierarchy is closed to unlisted subtypes. Determine defaults, pe
 subtypes, module/version boundaries, and validation before exposing a closed-world
 guarantee. See [inheritance policy](type-system.md#future-exploration-inheritance-openness-and-closed-hierarchies).
 This does not expand the immediate ordinary-type and union-foundation slices.
+
+### Common library infrastructure milestone
+
+[Comparable, Iterable and Iterator](common-interfaces.md) now provide sign-based
+ordering and typed managed traversal; ArrayList is the first Iterable consumer.
+Next explore comparer-driven algorithms and managed-array adapters, followed by Neo
+foreach lowering once cleanup on early exit and faults has a runtime/language contract.
+Compare each with .NET ordering and enumeration behavior, including mutation policy,
+allocation costs and disposal. String collation and generic variance remain separate.

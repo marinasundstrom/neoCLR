@@ -1,3 +1,39 @@
 .type System.Single
+    .implements System.Comparable<Single>
+    .method instance readonly byref CompareTo(Single other) -> Int32
+        ldarg this
+        ldobj Single
+        ldarg this
+        ldobj Single
+        ceq
+        brfalse ReceiverNaN
+        ldarg other
+        ldarg other
+        ceq
+        brfalse Greater
+        ldarg this
+        ldobj Single
+        ldarg other
+        blt Less
+        ldarg this
+        ldobj Single
+        ldarg other
+        bgt Greater
+    Equal:
+        ldc.i4 0
+        ret
+    Less:
+        ldc.i4 -1
+        ret
+    Greater:
+        ldc.i4 1
+        ret
+    ReceiverNaN:
+        ldarg other
+        ldarg other
+        ceq
+        brfalse Equal
+        br Less
+    .end
 .end
 

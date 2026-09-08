@@ -1957,7 +1957,15 @@ impl Lowerer<'_> {
                     "inherited library members require managed receivers",
                 ));
             }
-            self.body.push(format!("castclass {}", owner.il()));
+            self.body.push(format!(
+                "{} {}",
+                if library::is_interface(&owner)? {
+                    "interface.borrow"
+                } else {
+                    "castclass"
+                },
+                owner.il()
+            ));
         }
         Ok(())
     }
@@ -2533,9 +2541,10 @@ impl Lowerer<'_> {
                             .join(",")
                     )
                 };
-                if self
-                    .delegate_signature(&Ty::Record(name.clone()))?
-                    .is_some()
+                if crate::assembler::parse_type(&name).is_ok()
+                    && self
+                        .delegate_signature(&Ty::Record(name.clone()))?
+                        .is_some()
                 {
                     if arguments.len() != 1 {
                         return Err(callee
@@ -3932,10 +3941,11 @@ pub fn lower_to_il_named(source: &str, document: &str) -> Result<String, Fault> 
                 .interfaces
                 .iter()
                 .any(|i| i.name.text == interface.il())
+                && !library::is_interface(interface)?
             {
                 return Err(record
                     .name
-                    .error("conformance requires a declared source interface"));
+                    .error("conformance requires a source or bundled interface"));
             }
             il.push_str(&format!(".implements {}\n", interface.il()));
         }

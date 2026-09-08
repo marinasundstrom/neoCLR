@@ -27,6 +27,17 @@ fn owners(module: &crate::Module, ty: &Type) -> Result<Vec<Type>, Fault> {
         .is_some_and(|d| d.representation == crate::metadata::Representation::Record)
     {
         crate::inheritance::lineage(module, ty)
+    } else if module
+        .type_definition(ty)
+        .is_some_and(|d| d.representation == crate::metadata::Representation::Interface)
+    {
+        let mut result = vec![ty.clone()];
+        for base in crate::interfaces::closure(module, ty)? {
+            if !result.contains(&base) {
+                result.push(base);
+            }
+        }
+        Ok(result)
     } else {
         Ok(vec![ty.clone()])
     }
@@ -35,7 +46,14 @@ pub(super) fn base_reachable(from: &Ty, to: &Ty) -> Result<bool, Fault> {
     let module = crate::library::system()?;
     let from = crate::assembler::parse_type(&from.il())?;
     let to = crate::assembler::parse_type(&to.il())?;
-    Ok(owners(module, &from)?.contains(&to))
+    if module
+        .type_definition(&from)
+        .is_some_and(|d| d.representation == crate::metadata::Representation::Record)
+    {
+        Ok(crate::inheritance::lineage(module, &from)?.contains(&to))
+    } else {
+        Ok(from == to)
+    }
 }
 pub(super) fn method_signature(function: &crate::metadata::Function) -> Result<String, Fault> {
     Ok(format!(

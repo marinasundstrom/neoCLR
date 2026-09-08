@@ -1,3 +1,22 @@
 .type System.Int16
+    .implements System.Comparable<Int16>
+    .method instance readonly byref CompareTo(Int16 other) -> Int32
+        ldarg this
+        ldobj Int16
+        ldarg other
+        blt Less
+        ldarg this
+        ldobj Int16
+        ldarg other
+        bgt Greater
+        ldc.i4 0
+        ret
+    Less:
+        ldc.i4 -1
+        ret
+    Greater:
+        ldc.i4 1
+        ret
+    .end
 .end
 

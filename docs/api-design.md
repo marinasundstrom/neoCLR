@@ -246,3 +246,12 @@ agreed future nullability characteristic; source compilers control binding reass
 Slots hold runtime state validated against their signatures. Null will be a special
 state for explicitly nullable values or references, not zero/default payloads or
 uninitialized storage. Prefer Option for domain optionality. See [nullability](nullability.md).
+
+## Common ordering and iteration
+
+See [common interfaces](common-interfaces.md) for Comparable<T>, Iterable<T>,
+Iterator<T> and the List<T> inheritance change. CompareTo takes T by value and uses a readonly managed receiver, unlike Equatable's
+older value-receiver contract. Equatable migration remains a separate review. GetIterator and Current use readonly receivers; MoveNext and
+Dispose require writable managed receivers. Current returns T without erasing an
+explicit T&. ArrayList iterators retain their initial backing buffer and extent,
+with documented mutation visibility rather than .NET List version checking.

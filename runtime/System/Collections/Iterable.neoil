@@ -1,0 +1,4 @@
+.interface System.Collections.Iterable<T>
+    .method instance readonly byref GetIterator() -> System.Collections.Iterator<T>&
+    .end
+.end

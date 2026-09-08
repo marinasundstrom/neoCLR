@@ -1,0 +1,94 @@
+.interface System.Collections.Iterator<T>
+    .implements System.Disposable
+    .method instance byref MoveNext() -> Boolean
+    .end
+    .property instance Current() -> T
+        .get instance System.Collections.Iterator<T>::get_Current()
+    .end
+    .method instance readonly byref get_Current() -> T
+    .end
+.end
+
+; Retains the original managed buffer and extent, never the caller's descriptor.
+.type internal System.Collections.ArrayIterator<T>
+    .implements System.Collections.Iterator<T>
+    .field private Data T[]&
+    .field private Count Int32
+    .field private Position Int32
+
+    .method internal static Create(T[]& data, Int32 count) -> System.Collections.Iterator<T>&
+        ldarg count
+        ldc.i4 0
+        blt Invalid
+        ldarg count
+        ldarg data
+        ldlen
+        conv.ovf.i4
+        bgt Invalid
+        ldarg data
+        ldarg count
+        ldc.i4 -1
+        newobj System.Collections.ArrayIterator<T>
+        heap.new
+        interface.borrow System.Collections.Iterator<T>
+        ret
+    Invalid:
+        fault "Iterator extent out of range"
+    .end
+
+    .method instance byref MoveNext() -> Boolean
+        .local Int32 position
+        ldarg this
+        ldfld System.Collections.ArrayIterator<T>::Position
+        ldarg this
+        ldfld System.Collections.ArrayIterator<T>::Count
+        bge End
+        ldarg this
+        ldfld System.Collections.ArrayIterator<T>::Position
+        ldc.i4 1
+        add.ovf
+        stloc position
+        ldarg this
+        ldloc position
+        stfld System.Collections.ArrayIterator<T>::Position
+        pop
+        ldloc position
+        ldarg this
+        ldfld System.Collections.ArrayIterator<T>::Count
+        clt
+        ret
+    End:
+        ldc.bool false
+        ret
+    .end
+
+    .method instance readonly byref get_Current() -> T
+        ldarg this
+        ldfld System.Collections.ArrayIterator<T>::Position
+        ldc.i4 0
+        blt Invalid
+        ldarg this
+        ldfld System.Collections.ArrayIterator<T>::Position
+        ldarg this
+        ldfld System.Collections.ArrayIterator<T>::Count
+        bge Invalid
+        ldarg this
+        ldfld System.Collections.ArrayIterator<T>::Data
+        ldarg this
+        ldfld System.Collections.ArrayIterator<T>::Position
+        ldelem T
+        ret
+    Invalid:
+        fault "Iterator has no current element"
+    .end
+
+    .method instance byref Dispose() -> Void
+        ldarg this
+        ldarg this
+        ldfld System.Collections.ArrayIterator<T>::Count
+        stfld System.Collections.ArrayIterator<T>::Position
+        pop
+        ldvoid
+        ret
+    .end
+.end

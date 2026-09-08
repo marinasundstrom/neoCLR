@@ -10,6 +10,20 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 #### Added
 
+- Added System.Comparable<T> with a readonly managed receiver and value input,
+  plus scalar CompareTo implementations, including unsigned
+  extremes and .NET-compatible floating-point NaN ordering. Added Iterable<T> and
+  Iterator<T> with MoveNext/Current and inherited Disposable; List<T> now inherits
+  Iterable<T>, requiring GetIterator from implementers. ArrayList iterators retain
+  their initial managed buffer/extent and can outlive stack descriptors; writes to
+  retained storage remain visible, unlike .NET List mutation invalidation. Added
+  Neo conformance to bundled interfaces and inherited-library-interface projection,
+  samples, tests and API/.NET comparison
+  documentation. Fixed generic static calls being misidentified as delegate type
+  names, and updated library body checks to recognize bodyless delegate contracts.
+  No new opcode or artifact format; iterable for syntax remains planned.
+  Planned the following release-focused fundamental API pass in library-preview.
+
 - Neo ordinary class declarations with body fields, field initializers, bounded
   parameterless-constructor synthesis and implicit parameterless base chaining.
   Added default(T) over checked runtime initobj; defaults do not run constructors

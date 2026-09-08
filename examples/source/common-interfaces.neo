@@ -1,0 +1,24 @@
+import System.Console.*
+
+func Sum(values: readonly System.Collections.Iterable<int>&) -> int {
+    let iterator = values.GetIterator()
+    var total = 0
+    while iterator.MoveNext() {
+        total = total + iterator.Current
+    }
+    iterator.Dispose()
+    return total
+}
+
+func Main() -> int {
+    var values = System.Collections.ArrayList<int>.Allocate(0)
+    values.Add(20)
+    values.Add(22)
+    let list: readonly System.Collections.List<int>& = &values
+    let total = Sum(list)
+    var expected = 42
+    let comparable: System.Comparable<int>& = &expected
+    WriteLine(comparable.CompareTo(total))
+    WriteLine(total)
+    return total
+}

@@ -529,3 +529,13 @@ and nested closures; captured references must satisfy heap-lifetime checks.
 cargo run --locked -- run examples/source/func-callbacks.neo
 cargo run --locked -- run examples/source/closures.neo
 ```
+
+### Common comparison and iteration
+
+[Comparable, Iterable and Iterator](docs/common-interfaces.md) provide scalar ordering
+and managed collection traversal. ArrayList supports independent iterators through
+readonly Iterable views; Iterator exposes MoveNext, Current and Dispose.
+
+```sh
+cargo run --locked -- run examples/source/common-interfaces.neo
+```

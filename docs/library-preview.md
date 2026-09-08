@@ -142,3 +142,42 @@ production readiness or .NET binary/source compatibility.
 The [reflection hierarchy and interface plan](reflection-hierarchy-plan.md) is the
 next concrete library consumer. Default interface implementations remain a separate
 planned exploration with explicit conflict and receiver contracts.
+
+## Next pass: fundamental APIs before release
+
+After the [common-interface milestone](common-interfaces.md), focus implementation
+on the most fundamental runtime-library APIs. This is planned work, not a release
+announcement or a claim of BCL equivalence. Keep the existing Neo compiler and
+end-to-end examples current with every contract change.
+
+Explore these bounded slices in order:
+
+1. **Comparison, equality and collection algorithms.** Review the older Equatable
+   receiver against the new readonly Comparable receiver. Compare .NET's
+   IEquatable/IComparable and comparer strategy APIs with explicit T/T& contracts;
+   settle equality/hash consistency before adding hash-based containers. Add the
+   smallest useful searching/ordering consumers and managed-array iteration adapters.
+2. **Text operations.** Inventory the equivalents of String comparison, indexing,
+   length, search and construction. Resolve ordinal versus culture-sensitive policy
+   against the existing UTF-8 text contract and .NET's UTF-16 API behavior. Do not
+   quietly reinterpret byte offsets as character indexes. Add platform IL operations
+   where possible and identify any necessary bootstrap host primitives explicitly.
+3. **Collection fundamentals.** Fill the concrete gaps in familiar List operations
+   such as Clear, removal and search, guided by actual samples. Compare .NET mutation
+   invalidation with the current descriptor/buffer model before adding versioning or
+   changing iterator semantics. Preserve value elements and explicit reference elements.
+4. **Conversion, formatting and failure APIs.** Extend useful numeric/text conversions
+   and formatting with consistent Option/Result outcomes. Compare .NET Parse/TryParse
+   and formatting conventions; keep routine failure separate from invalid program
+   state. Build on existing concrete error types instead of introducing a broad
+   exception or culture framework without an end-to-end need.
+5. **Release evidence.** Run small applications combining text, collections,
+   iteration, comparison and recoverable errors. Check direct IL, artifact roundtrips,
+   GC/reference lifetimes and Neo debugger behavior. Document migration notes and
+   remaining gaps. Choose release scope from implemented, validated behavior.
+
+Each slice must record primary-source .NET comparisons and its API contracts before
+implementation, including allocation/copying costs and the responsibility split
+between runtime, library and Neo. This sequence can change when a concrete dependency
+appears. Native I/O ownership, foreach cleanup, nullable metadata and broader async
+remain independent foundations; the plan does not silently fold them into this pass.

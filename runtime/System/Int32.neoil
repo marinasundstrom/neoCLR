@@ -1,4 +1,5 @@
 .type System.Int32
+    .implements System.Comparable<Int32>
     .implements System.Equatable<Int32>
     .method static Parse(string value) -> System.Result<Int32,System.Int32ParseError>
         .local Byte failure
@@ -80,6 +81,24 @@
     .method instance ToString() -> string
         ldarg this
         call neoCLR.Runtime.Int32ToString(int32)
+        ret
+    .end
+    .method instance readonly byref CompareTo(Int32 other) -> Int32
+        ldarg this
+        ldobj Int32
+        ldarg other
+        blt Less
+        ldarg this
+        ldobj Int32
+        ldarg other
+        bgt Greater
+        ldc.i4 0
+        ret
+    Less:
+        ldc.i4 -1
+        ret
+    Greater:
+        ldc.i4 1
         ret
     .end
 .end

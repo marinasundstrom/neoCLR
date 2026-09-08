@@ -1,3 +1,22 @@
 .type System.UInt64
+    .implements System.Comparable<UInt64>
+    .method instance readonly byref CompareTo(UInt64 other) -> Int32
+        ldarg this
+        ldobj UInt64
+        ldarg other
+        blt.un Less
+        ldarg this
+        ldobj UInt64
+        ldarg other
+        bgt.un Greater
+        ldc.i4 0
+        ret
+    Less:
+        ldc.i4 -1
+        ret
+    Greater:
+        ldc.i4 1
+        ret
+    .end
 .end
 

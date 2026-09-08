@@ -22,9 +22,11 @@ fn runtime_library_is_assembled_platform_code() {
                     .owner
                     .as_ref()
                     .and_then(|ty| module.type_definition(ty))
-                    .is_some_and(
-                        |d| d.representation == neoclr::metadata::Representation::Interface
-                    ))
+                    .is_some_and(|d| matches!(
+                        d.representation,
+                        neoclr::metadata::Representation::Interface
+                            | neoclr::metadata::Representation::Delegate
+                    )))
             .all(|f| !f.body.is_empty())
     );
     assert_eq!(

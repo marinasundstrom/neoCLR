@@ -1,5 +1,6 @@
 ; Borrowed list contract: allocation and release belong to the concrete owner.
 .interface System.Collections.List<T>
+    .implements System.Collections.Iterable<T>
     .property instance Count() -> Int32
         .get instance System.Collections.List<T>::get_Count()
     .end

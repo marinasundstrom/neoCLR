@@ -325,3 +325,7 @@ expected delegate type supplies context (parameters, typed bindings and returns)
 Delegate-valued expressions support `callback(args)`, including fields and returned
 callables; `value.Invoke(args)` also works through managed references. Custom source declarations are nongeneric in this slice; bundled
 generic Func and generic IL declarations are supported. Lambdas require an expected delegate type; captures use shared managed storage. See [delegates](delegates.md).
+
+Records and classes may implement bundled System interfaces as well as source-declared
+interfaces, including `System.Comparable<Score>`. The linked runtime verifies the
+method contracts. Source interface inheritance still requires source-declared bases.

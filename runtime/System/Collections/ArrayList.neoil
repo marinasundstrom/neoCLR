@@ -18,6 +18,15 @@
         fault "ArrayList capacity must be non-negative"
     .end
 
+    .method instance readonly byref GetIterator() -> System.Collections.Iterator<T>&
+        ldarg this
+        ldfld System.Collections.ArrayList<T>::Data
+        ldarg this
+        ldfld System.Collections.ArrayList<T>::Count
+        call System.Collections.ArrayIterator<T>::Create(T[]&,Int32)
+        ret
+    .end
+
     .property instance Count() -> Int32
         .get instance System.Collections.ArrayList<T>::get_Count()
     .end

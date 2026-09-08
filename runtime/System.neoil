@@ -2,6 +2,7 @@
 .module System
 
 .include "System/Equatable.neoil"
+.include "System/Comparable.neoil"
 .include "System/Clonable.neoil"
 .include "System/Value.neoil"
 .include "System/Void.neoil"
@@ -49,6 +50,8 @@
 .include "neoCLR/Runtime/TypeInspection.neoil"
 .include "System/Collections/ArrayList.neoil"
 .include "System/Collections/List.neoil"
+.include "System/Collections/Iterable.neoil"
+.include "System/Collections/Iterator.neoil"
 .include "System/Disposable.neoil"
 .include "System/Closable.neoil"
 
