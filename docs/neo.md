@@ -322,9 +322,9 @@ its future role is pointer dereferencing. Binary `*` remains multiplication.
 
 [Managed arrays](managed-arrays.md) support owned `T[]` values and managed `T[]&`
 references. `[1, 2, 3]` and `array(length, initialValue)` create owned values;
-`new int[3] { }` creates a default-initialized managed heap array, and
-`new int[3] { 1, 2, 3 }` supplies exact elements. Earlier `new int[3]` and
-`new array(3, 0)` forms remain accepted. Local annotations such as
+`new int[3]` creates a default-initialized managed heap array, and
+`new int[3] { 1, 2, 3 }` supplies exact elements. The earlier `new array(3, 0)`
+form remains accepted. Local annotations such as
 `let items: int[3] = [1, 2, 3]` enforce the extent; signatures still use T[]. Use `items[i]`,
 `items[i] = value`, `&items[i]` and `items.Length`. Managed element references
 read/write automatically and follow the same lifetime rules as record fields.

@@ -125,7 +125,7 @@ preserve tracing and element provenance without imposing an Object root.
 let arr: int[3] = [1, 2, 3]
 var writable: int[3] = arr
 let view: int[]& = &writable
-let arr2: int[]& = new int[3] { }
+let arr2: int[]& = new int[3]
 let words: string[]& = new string[2] { "Neo", "CLR" }
 ```
 

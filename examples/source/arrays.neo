@@ -7,7 +7,7 @@ func Second(values: int[]&) -> int& {
 }
 
 func MakeValues() -> int[]& {
-    let values: int[]& = new int[3] { }
+    let values: int[]& = new int[3]
     values[1] = 40
     return values
 }

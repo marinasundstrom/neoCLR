@@ -104,8 +104,8 @@ Source record/interface methods use managed reference receivers. Generic method 
 only and lowers to checked Int32 conversion. These are static restrictions on the
 existing call grammar; no new expression production is needed.
 `new` accepts record construction, such as `new SimpleCounter(0)`, or managed array
-construction (`new int[3] { }`, `new int[3] { 1, 2, 3 }`, and the earlier
-`new int[3]` / `new array(3, 0)` forms). It does not accept arbitrary
+construction (`new int[3]`, `new int[3] { 1, 2, 3 }`, and the earlier
+`new array(3, 0)` form). It does not accept arbitrary
 factory calls or copy expressions in this slice. Assignment and
 `&` require appropriate addressable locations or existing managed references. There is
 no assignment expression or implicit numeric conversion. T& is read automatically
@@ -222,7 +222,8 @@ This is a local constraint on T[], not a distinct runtime type: signatures, fiel
 generic arguments and typeof continue to use T[]. Use `var` to take a writable
 reference to owned storage; `int[]&` can address either frame or managed heap storage.
 
-`new T[length] { }` uses the same default initialization as `new T[length]`.
+Use `new T[length]` for default initialization. Empty braces are accepted but
+omitted from samples.
 Defaults remain limited to the runtime-supported element types. A nonempty initializer
 must supply exactly length elements, including for strings and records that have no
 default. The length is evaluated once and checked before elements run; elements run
