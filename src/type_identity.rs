@@ -57,7 +57,7 @@ pub(crate) fn describe(module: &Module, ty: &Type) -> Result<TypeDescriptor, Fau
     })
 }
 
-fn signature_name(ty: &Type) -> Result<String, Fault> {
+pub(crate) fn signature_name(ty: &Type) -> Result<String, Fault> {
     Ok(match ty {
         Type::ByRef(element) => format!("{}&", signature_name(element)?),
         Type::Array(element) => format!("{}[]", signature_name(element)?),

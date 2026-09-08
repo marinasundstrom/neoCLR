@@ -602,3 +602,13 @@ including uninitialized locals and out destinations. See
 
 See [managed arrays](managed-arrays.md) for T[] signatures, native-integer indices,
 initialization differences from CLR, payload limits and fixed-shape replacement.
+
+## Source sequence points
+
+Optional `.sequence {"instruction":0,"document":"sample.neo","line":3,"column":5}`
+directives inside IL methods attach a source location to the next instruction.
+The assembler assigns the actual instruction index; repeated directives at the same
+index replace the preceding point. Locations require a nonempty document and positive
+line/column. Artifact `sequence_points` must be strictly ordered and reference existing
+instructions. They add no opcodes and remain optional in format 5. See the
+[debugger guide](debugger.md) for terminal usage and Neo source mapping.

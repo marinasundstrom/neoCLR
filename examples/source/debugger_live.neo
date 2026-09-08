@@ -1,0 +1,13 @@
+record Counter(Value: int)
+
+func Tick(counter: Counter&) -> () {
+    counter.Value = counter.Value + 1
+}
+
+func Main() -> int {
+    let shared = new Counter(0)
+    for index in 0..<1000000 {
+        Tick(shared)
+    }
+    return shared.Value
+}

@@ -1,4 +1,4 @@
-//! Owned logical guest frames. Source symbols and native unwinding are separate work.
+//! Owned logical guest frames. Source locations are optional; native unwinding remains separate.
 use crate::metadata::{Function, FunctionRef};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -9,6 +9,7 @@ pub enum CodeLocation {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct StackFrame {
+    pub source: Option<crate::metadata::SequencePoint>,
     pub function: FunctionRef,
     pub location: CodeLocation,
 }
@@ -34,6 +35,12 @@ impl StackTrace {
         }
         for (function, instruction) in frames.by_ref().take(Self::MAX_FRAMES) {
             trace.frames.push(StackFrame {
+                source: function
+                    .sequence_points
+                    .iter()
+                    .rev()
+                    .find(|p| p.instruction <= instruction)
+                    .cloned(),
                 function: FunctionRef {
                     definition: function.definition.clone(),
                     name: function.name.clone(),
@@ -72,6 +79,13 @@ impl std::fmt::Display for StackTrace {
             }
             let CodeLocation::IlInstruction(index) = frame.location;
             write!(f, " IL instruction {index}")?;
+            if let Some(source) = &frame.source {
+                write!(
+                    f,
+                    " at {}:{}:{}",
+                    source.document, source.line, source.column
+                )?;
+            }
         }
         if self.truncated {
             write!(f, "\n  ... stack trace truncated")?;

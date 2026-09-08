@@ -281,6 +281,21 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                 return Ok(());
             }
             if let Some(pending) = function.as_mut() {
+                if word == ".sequence" {
+                    let mut point: crate::metadata::SequencePoint = serde_json::from_str(rest)
+                        .map_err(|e| Fault::new(format!("invalid sequence point: {e}")))?;
+                    point.instruction = pending.function.body.len();
+                    if pending
+                        .function
+                        .sequence_points
+                        .last()
+                        .is_some_and(|p| p.instruction == point.instruction)
+                    {
+                        pending.function.sequence_points.pop();
+                    }
+                    pending.function.sequence_points.push(point);
+                    return Ok(());
+                }
                 if word == ".custom" {
                     if !pending.function.body.is_empty() || !pending.labels.is_empty() {
                         return Err(Fault::new(".custom must precede instructions and labels"));
@@ -663,6 +678,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     };
                     function = Some(PendingFunction {
                         function: Function {
+                            sequence_points: vec![],
                             visibility,
                             definition: None,
                             custom_attributes: vec![],

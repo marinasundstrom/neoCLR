@@ -246,6 +246,29 @@ pub struct PointerHeap {
 }
 
 impl PointerHeap {
+    pub(crate) fn debug_allocations(&self) -> Vec<crate::debugger::NativeAllocation> {
+        self.allocations
+            .iter()
+            .enumerate()
+            .filter_map(|(id, a)| {
+                a.as_ref().map(|a| crate::debugger::NativeAllocation {
+                    id,
+                    frame_owned: a.frame_owned,
+                    size: a.bytes.len(),
+                    bytes: a
+                        .bytes
+                        .slice()
+                        .iter()
+                        .zip(&a.initialized)
+                        .take(128)
+                        .map(|(byte, initialized)| initialized.then_some(*byte))
+                        .collect(),
+                })
+            })
+            .take(128)
+            .collect()
+    }
+
     pub fn live_bytes(&self) -> usize {
         self.live_bytes
     }

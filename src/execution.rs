@@ -32,6 +32,7 @@ impl CancellationToken {
 /// Existing calls may pass Limits directly; this is an experimental Rust API.
 #[derive(Debug, Clone, Default)]
 pub struct ExecutionOptions {
+    pub debugger: Option<crate::debugger::Debugger>,
     pub limits: Limits,
     pub cancellation: Option<CancellationToken>,
     /// None captures output and leaves input unavailable; Some performs live host I/O.
@@ -41,6 +42,7 @@ pub struct ExecutionOptions {
 impl From<Limits> for ExecutionOptions {
     fn from(limits: Limits) -> Self {
         Self {
+            debugger: None,
             limits,
             cancellation: None,
             console: None,

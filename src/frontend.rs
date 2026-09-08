@@ -228,7 +228,7 @@ enum Stmt {
     Expression(Expr),
     If(Expr, Vec<Stmt>, Vec<Stmt>),
     While(Expr, Vec<Stmt>),
-    Loop(Vec<Stmt>),
+    Loop(Token, Vec<Stmt>),
     For(Token, Expr, Expr, bool, Vec<Stmt>),
     Break(Token),
     Continue(Token),
@@ -556,7 +556,10 @@ impl Parser {
             return Ok(Stmt::While(condition, self.block()?));
         }
         if self.eat("loop") {
-            return Ok(Stmt::Loop(self.block()?));
+            return Ok(Stmt::Loop(
+                self.tokens[self.position - 1].clone(),
+                self.block()?,
+            ));
         }
         if self.eat("for") {
             let name = self.name()?;
@@ -855,6 +858,7 @@ struct Binding {
     scoped: bool,
 }
 struct Lowerer<'a> {
+    document: &'a str,
     receiver: Option<&'a Token>,
     source: &'a Source,
     function: &'a Function,
@@ -866,6 +870,15 @@ struct Lowerer<'a> {
     loops: Vec<(String, String)>,
 }
 impl Lowerer<'_> {
+    fn sequence(&mut self, at: &Token) {
+        self.body.push(format!(
+            ".sequence {}",
+            serde_json::json!({
+                "instruction": 0, "document": self.document, "line": at.line, "column": at.column
+            })
+        ));
+    }
+
     fn require(&self, actual: &Ty, expected: &Ty, at: &Token) -> Result<(), Fault> {
         if actual != expected {
             return Err(at.error(format!("expected {}, got {}", expected.il(), actual.il())));
@@ -972,6 +985,7 @@ impl Lowerer<'_> {
         }
     }
     fn expression(&mut self, expression: &Expr) -> Result<Ty, Fault> {
+        self.sequence(&expression.at);
         match &expression.kind {
             ExprKind::InterfaceCast(value, target) => {
                 let Ty::Ref(interface) = target else {
@@ -1589,6 +1603,16 @@ impl Lowerer<'_> {
                     .name
                     .error("statements after return, break or continue are not supported"));
             }
+            let at = match statement {
+                Stmt::Bind { name, .. } | Stmt::For(name, ..) => name,
+                Stmt::Assign(e, _) | Stmt::Expression(e) | Stmt::If(e, ..) | Stmt::While(e, ..) => {
+                    &e.at
+                }
+                Stmt::Return(at, _) | Stmt::Break(at) | Stmt::Continue(at) | Stmt::Loop(at, _) => {
+                    at
+                }
+            };
+            self.sequence(at);
             match statement {
                 Stmt::If(condition, yes, no) => {
                     self.condition(condition)?;
@@ -1620,7 +1644,7 @@ impl Lowerer<'_> {
                     }
                     self.body.push(format!("{end}:"));
                 }
-                Stmt::Loop(body) => {
+                Stmt::Loop(_, body) => {
                     let start = self.label();
                     let end = self.label();
                     self.body.push(format!("{start}:"));
@@ -1716,7 +1740,8 @@ impl Lowerer<'_> {
                         self.expression(value)?
                     };
                     let index = self.locals.len();
-                    self.locals.push(format!(".local {}", ty.il()));
+                    self.locals
+                        .push(format!(".local {} {}_{index}", ty.il(), name.text));
                     self.body.push(format!("stloc {index}"));
                     self.bindings.insert(
                         name.text.clone(),
@@ -1777,6 +1802,7 @@ impl Lowerer<'_> {
         Ok(returned)
     }
     fn lower(mut self) -> Result<String, Fault> {
+        self.sequence(&self.function.name);
         if let Some(receiver) = self.receiver {
             self.bindings.insert(
                 "this".into(),
@@ -1823,7 +1849,7 @@ impl Lowerer<'_> {
             self.function
                 .parameters
                 .iter()
-                .map(|field| field.ty.il())
+                .map(|field| format!("{} {}", field.ty.il(), field.name.text))
                 .collect::<Vec<_>>()
                 .join(","),
             self.function.returns.il(),
@@ -1835,6 +1861,11 @@ impl Lowerer<'_> {
 
 /// Lower a Neo source program to inspectable neoIL.
 pub fn lower_to_il(source: &str) -> Result<String, Fault> {
+    lower_to_il_named(source, "<source>")
+}
+
+/// Lower with a diagnostic source document name, retained in JSON artifacts.
+pub fn lower_to_il_named(source: &str, document: &str) -> Result<String, Fault> {
     let tokens = lex(source)?;
     let source = Parser {
         tokens,
@@ -1920,6 +1951,7 @@ pub fn lower_to_il(source: &str) -> Result<String, Fault> {
         for function in &record.methods {
             il.push_str(
                 &Lowerer {
+                    document,
                     receiver: Some(&record.name),
                     source: &source,
                     function,
@@ -1938,6 +1970,7 @@ pub fn lower_to_il(source: &str) -> Result<String, Fault> {
     for function in &source.functions {
         il.push_str(
             &Lowerer {
+                document,
                 receiver: None,
                 source: &source,
                 function,
@@ -1957,7 +1990,12 @@ pub fn lower_to_il(source: &str) -> Result<String, Fault> {
 /// Compile through the existing assembler and verifier; execution still enforces
 /// reference provenance and runtime limits independently.
 pub fn compile(source: &str) -> Result<Module, Fault> {
-    let module = crate::assemble(&lower_to_il(source)?)?;
+    compile_named(source, "<source>")
+}
+
+/// Compile with source mapping to a named document.
+pub fn compile_named(source: &str, document: &str) -> Result<Module, Fault> {
+    let module = crate::assemble(&lower_to_il_named(source, document)?)?;
     crate::LoadedProgram::new(&module)?.verify()?;
     Ok(module)
 }

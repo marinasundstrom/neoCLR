@@ -335,3 +335,15 @@ and `shared as Counter&` preserve the original location and lifetime. Concrete m
 references also project implicitly when an interface reference is expected. Instance methods
 use an implicit managed `this` receiver, with automatic reads/writes.
 Run `cargo run --locked -- run examples/source/interfaces.neo --gc-stats`.
+
+## Debug a running program
+
+Launch the [interactive terminal debugger](debugger.md):
+
+```sh
+cargo run --locked -- debug examples/source/debugger.neo
+```
+
+Use `source`, `bt`, `stack`, `heap`, `step`, `next` and `continue`. `watch` enables
+live inspection; `pause` freezes execution at an instruction boundary. Neo source
+locations and local labels survive compilation into JSON artifacts.

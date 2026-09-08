@@ -247,6 +247,8 @@ pub struct Field {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Function {
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub sequence_points: Vec<SequencePoint>,
     #[serde(default, skip_serializing_if = "Visibility::is_public")]
     pub visibility: Visibility,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -284,6 +286,16 @@ pub struct Function {
     pub pinvoke: Option<NativeImport>,
     #[serde(default)]
     pub body: Vec<Instruction>,
+}
+
+/// A one-based source location for an IL instruction boundary.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct SequencePoint {
+    pub instruction: usize,
+    pub document: String,
+    pub line: usize,
+    pub column: usize,
 }
 
 /// Initial member access levels, independent of type representation and allocation.

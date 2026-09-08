@@ -41,6 +41,12 @@ impl Slot {
         }
         Ok(())
     }
+    pub(crate) fn inspect_type(&self) -> &Type {
+        &self.ty
+    }
+    pub(crate) fn inspect(&self) -> Option<&Value> {
+        self.value.as_ref()
+    }
     pub(crate) fn get(&self) -> Result<Value, Fault> {
         self.value
             .clone()
@@ -128,6 +134,9 @@ impl SlotReference {
     }
     pub(crate) fn addresses(&self, cell: &Cell) -> bool {
         matches!(&self.root, Root::Frame(root) if Rc::ptr_eq(root, cell))
+    }
+    pub(crate) fn debug_path(&self) -> &[usize] {
+        &self.path
     }
     pub(crate) fn target(&self) -> &Type {
         &self.target

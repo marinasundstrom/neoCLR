@@ -1,3 +1,4 @@
+mod debug_terminal;
 use neoclr::{ExecutionOptions, StdioConsole, assemble, load};
 use std::{
     env, fs,
@@ -8,6 +9,7 @@ use std::{
 const USAGE: &str = "Usage:
   neoclr assemble <source.neoil> <output.neo.json> [--module <input>]... [--system <input>]
   neoclr run <input> [System.neo.json] [--module <input>]... [--system <input>] [--gc-stats] [--gc-events]
+  neoclr debug <input> [--module <input>]... [--system <input>]
   neoclr check <input> [--module <input>]... [--system <input>]
   neoclr verify <input> [--module <input>]... [--system <input>]
 Inputs: .neo is the high-level subset, .neoil is IL source, otherwise JSON artifacts.";
@@ -23,7 +25,7 @@ fn read(path: &str) -> Result<String, String> {
 
 fn execute(args: &[String]) -> Result<Vec<String>, String> {
     let command = args.first().map(String::as_str).ok_or(USAGE)?;
-    if !matches!(command, "assemble" | "run" | "check" | "verify") {
+    if !matches!(command, "assemble" | "run" | "debug" | "check" | "verify") {
         return Err(USAGE.into());
     }
     let required = if command == "assemble" { 3 } else { 2 };
@@ -69,7 +71,7 @@ fn execute(args: &[String]) -> Result<Vec<String>, String> {
     let (modules, program) = if paths.len() == 1 && system_path.is_none() {
         // Preserve standalone System assembly/analysis and existing single-input behavior.
         let module = if paths[0].ends_with(".neo") {
-            neoclr::frontend::compile(&texts[0])
+            neoclr::frontend::compile_named(&texts[0], paths[0])
         } else if command == "assemble" || paths[0].ends_with(".neoil") {
             assemble(&texts[0])
         } else {
@@ -111,6 +113,7 @@ fn execute(args: &[String]) -> Result<Vec<String>, String> {
     };
     let module = &modules[0];
     match command {
+        "debug" => debug_terminal::run(program, paths[0], &texts[0]),
         "assemble" => {
             let output = &args[2];
             let json = serde_json::to_string_pretty(module).map_err(|e| e.to_string())?;

@@ -497,3 +497,15 @@ allocations with common checked element operations and managed element reference
 [Neo interfaces](docs/neo-interfaces.md) demonstrate declared contracts, record
 implementations and managed reference projections without boxing. Run
 `cargo run --locked -- run examples/source/interfaces.neo --gc-stats`.
+
+## Debug a running program
+
+Launch the [interactive terminal debugger](docs/debugger.md):
+
+```sh
+cargo run --locked -- debug examples/source/debugger.neo
+```
+
+Use `source`, `bt`, `stack`, `heap`, `step`, `next` and `continue`. `watch` enables
+live inspection; `pause` freezes execution at an instruction boundary. Neo source
+locations and local labels survive compilation into JSON artifacts.

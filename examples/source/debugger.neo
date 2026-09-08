@@ -1,0 +1,17 @@
+record Counter(Value: int)
+
+func Add(counter: Counter&, amount: int) -> int {
+    counter.Value = counter.Value + amount
+    return counter.Value
+}
+
+func Main() -> int {
+    var local = Counter(1)
+    let shared = new Counter(10)
+    var values = [1, 2, 3]
+    for index in 0..<3 {
+        values[index] = Add(shared, index + 1)
+        Add(&local, 1)
+    }
+    return local.Value + shared.Value
+}

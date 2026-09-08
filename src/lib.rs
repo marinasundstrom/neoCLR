@@ -3,6 +3,7 @@ pub mod assembler;
 pub use assembler::assemble;
 mod access;
 mod console;
+pub mod debugger;
 mod execution;
 pub use console::{Console, StdioConsole};
 pub mod frontend;

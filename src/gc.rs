@@ -41,6 +41,9 @@ pub struct ManagedHeap {
 }
 
 impl ManagedHeap {
+    pub(crate) fn debug_cells(&self) -> impl Iterator<Item = (&usize, &crate::slots::Cell)> {
+        self.objects.iter()
+    }
     /// Most recent 64 collections, in execution order. No guest values are retained.
     pub fn collection_events(&self) -> impl ExactSizeIterator<Item = &CollectionEvent> {
         self.events.iter()

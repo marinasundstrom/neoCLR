@@ -120,3 +120,29 @@ a separate operation. Do not add inheritance syntax before those contracts are r
 an interop scenario requires them. [Library ports and compiler bootstrapping](neo-bootstrapping.md)
 are possible later exercises, not prerequisites or reasons to grow every compiler
 feature now.
+
+## Interactive inspection implemented
+
+The [terminal debugger](debugger.md) launches paused, supports stepping and breakpoints,
+and inspects live guest frames, managed heap objects and tracked native storage. Neo
+emits source sequence points and slot labels. Further UI/editor integration and richer
+source-level debugging should build on this execution-control and snapshot boundary.
+
+## Next slice: ordinary and output reference parameters
+
+Clarify and demonstrate the difference between an ordinary `Foo&` parameter and the
+proposed Neo spelling `out Foo&`, using the runtime's existing output contracts.
+`Foo&` grants access to an initialized value. An output reference permits
+uninitialized caller storage and requires the callee to assign it before a normal
+return; the caller can then rely on initialization. Both use one managed reference,
+with the same storage identity, frame/heap provenance and lifetime restrictions.
+`out` is not a second reference layer or an ownership transfer.
+
+Cover assignment tracking, reads before assignment, aliases and interior fields,
+forwarding to other output parameters, and why an unrelated field write does not
+fulfill an output obligation. Distinguish ordinary outputs from existing conditional
+outputs (`out_when_true`) before choosing which syntax Neo should expose. The
+[reference-slot contract](reference-slots.md) is the runtime baseline. Neo does not
+yet expose output parameter declarations or uninitialized local bindings; implement
+only the bounded source support needed for an end-to-end example after documenting
+these rules.

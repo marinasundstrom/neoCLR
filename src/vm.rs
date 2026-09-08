@@ -373,6 +373,21 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             function.instance,
         )?;
         crate::metadata::validate_slot_names(&function.local_names, function.locals.len(), false)?;
+        let mut previous = None;
+        for point in &function.sequence_points {
+            if point.instruction >= function.body.len()
+                || point.line == 0
+                || point.column == 0
+                || point.document.is_empty()
+                || point.document.len() > 4096
+                || point.document.chars().any(char::is_control)
+                || previous.is_some_and(|pc| pc >= point.instruction)
+            {
+                return Err(Fault::new("invalid source sequence point"));
+            }
+            previous = Some(point.instruction);
+        }
+
         if function.instance && function.owner.is_none() {
             return Err(Fault::new("instance method requires a declaring type"));
         }
@@ -1003,26 +1018,38 @@ pub(crate) fn interpret_function(
     options: ExecutionOptions,
     native_libraries: Option<crate::interop::NativeLibraries>,
 ) -> Result<Execution, Fault> {
-    let initial_fault = |fault: Fault| {
-        fault.with_stack_trace(crate::StackTrace::capture(std::iter::once((&function, 0))))
-    };
-    options
-        .check_cancellation(&function.name, 0)
-        .map_err(initial_fault)?;
-    let limits = options.limits;
-    if limits.frames == 0 {
-        return Err(initial_fault(Fault::new("frame limit exceeded")));
+    let debugger = options.debugger.clone();
+    if let Some(debugger) = &debugger {
+        debugger.begin()?;
     }
-    let mut frames = vec![Frame::new(function, arguments)?];
-    let result = interpret_frames(module, &mut frames, options, native_libraries);
-    result.map_err(|fault: Fault| {
-        fault.with_stack_trace(crate::StackTrace::capture(
-            frames
-                .iter()
-                .rev()
-                .map(|frame| (frame.function.as_ref(), frame.trace_pc)),
-        ))
-    })
+    let result = (|| {
+        let initial_fault = |fault: Fault| {
+            fault.with_stack_trace(crate::StackTrace::capture(std::iter::once((&function, 0))))
+        };
+        options
+            .check_cancellation(&function.name, 0)
+            .map_err(initial_fault)?;
+        let limits = options.limits;
+        if limits.frames == 0 {
+            return Err(initial_fault(Fault::new("frame limit exceeded")));
+        }
+        let mut frames = vec![Frame::new(function, arguments)?];
+        let result = interpret_frames(module, &mut frames, options, native_libraries);
+        result.map_err(|fault: Fault| {
+            fault.with_stack_trace(crate::StackTrace::capture(
+                frames
+                    .iter()
+                    .rev()
+                    .map(|frame| (frame.function.as_ref(), frame.trace_pc)),
+            ))
+        })
+    })();
+    if let (Some(debugger), Err(fault)) = (&debugger, &result) {
+        if debugger.snapshot().revision == 0 {
+            debugger.finish(Default::default(), Some(fault.to_string()));
+        }
+    }
+    result
 }
 
 fn interpret_frames(
@@ -1031,13 +1058,60 @@ fn interpret_frames(
     options: ExecutionOptions,
     mut native_libraries: Option<crate::interop::NativeLibraries>,
 ) -> Result<Execution, Fault> {
-    let limits = options.limits;
     let mut heap = crate::ManagedHeap::default();
-    let mut collection_threshold = limits.heap_objects.min(64);
     let mut memory = crate::memory::PointerHeap::default();
     let mut output = vec![];
+    let result = interpret_instructions(
+        module,
+        frames,
+        &options,
+        &mut native_libraries,
+        &mut heap,
+        &mut memory,
+        &mut output,
+    );
+    if let Some(debugger) = &options.debugger {
+        let mut snapshot = debug_snapshot(module, frames, &heap, &memory, &output, result.is_err());
+        if let Ok(value) = &result {
+            snapshot.result = Some(debug_value(module, frames, value, 0, &mut 2048));
+        }
+        debugger.finish(snapshot, result.as_ref().err().map(|e| e.message.clone()));
+    }
+    result.map(|value| Execution {
+        value,
+        output,
+        heap,
+        memory,
+        native_libraries,
+    })
+}
+
+#[allow(clippy::too_many_arguments)]
+fn interpret_instructions(
+    module: &Module,
+    frames: &mut Vec<Frame>,
+    options: &ExecutionOptions,
+    native_libraries: &mut Option<crate::interop::NativeLibraries>,
+    heap: &mut crate::ManagedHeap,
+    memory: &mut crate::memory::PointerHeap,
+    output: &mut Vec<String>,
+) -> Result<Value, Fault> {
+    let limits = options.limits;
+    let mut collection_threshold = limits.heap_objects.min(64);
     let mut arrays_used = false;
     for _ in 0..limits.instructions {
+        if let (Some(debugger), Some(frame)) = (&options.debugger, frames.last()) {
+            let before_host_call = matches!(frame.function.body.get(frame.pc), Some(Op::Call(target))
+                if resolve(module, target).is_ok_and(|f| f.pinvoke.is_some() || f.is_internal_call()));
+            debugger.checkpoint(
+                (&frame.function.name, frame.pc, frames.len()),
+                source_point(&frame.function, frame.pc),
+                options.cancellation.as_ref(),
+                before_host_call,
+                || debug_snapshot(module, frames, heap, memory, output, false),
+            )?;
+        }
+
         if arrays_used {
             let check = |frames: &[Frame], heap: &crate::ManagedHeap| -> Result<(), Fault> {
                 let mut usage = crate::arrays::Usage::default();
@@ -1051,7 +1125,7 @@ fn interpret_frames(
                 }
                 heap.array_usage(&mut usage, &limits)
             };
-            if check(frames, &heap).is_err() {
+            if check(frames, heap).is_err() {
                 let mut roots = vec![];
                 for frame in frames.iter() {
                     for cell in frame.args.iter().chain(&frame.locals) {
@@ -1062,7 +1136,7 @@ fn interpret_frames(
                     }
                 }
                 heap.collect(roots, crate::CollectionReason::AllocationPressure)?;
-                check(frames, &heap).map_err(|mut error| {
+                check(frames, heap).map_err(|mut error| {
                     if let Some(frame) = frames.last() {
                         error.function = Some(frame.function.name.clone());
                         error.instruction = Some(frame.trace_pc);
@@ -1469,13 +1543,13 @@ fn interpret_frames(
                         })?;
                         // SAFETY: a native library session is only supplied by run_with_native,
                         // whose caller accepts the native ABI and memory safety contract.
-                        let value = unsafe { libraries.invoke(&callee, args, &memory)? };
+                        let value = unsafe { libraries.invoke(&callee, args, memory)? };
                         expect(&value, &callee.returns)?;
                         frame.stack.push(value.on_stack());
                     } else if callee.is_internal_call() {
                         let value = crate::native::bind(&callee)?.invoke(
                             args,
-                            &mut output,
+                            output,
                             options.console.as_deref(),
                         )?;
                         expect(&value, &callee.returns)?;
@@ -1882,13 +1956,7 @@ fn interpret_frames(
                 let mut roots = vec![];
                 crate::gc::trace(&value, &mut roots);
                 heap.collect(roots, crate::CollectionReason::ExecutionCompleted)?;
-                return Ok(Execution {
-                    value,
-                    output,
-                    heap,
-                    memory,
-                    native_libraries,
-                });
+                return Ok(value);
             }
             Err(mut fault) => {
                 fault.function = Some(context);
@@ -1905,6 +1973,250 @@ fn interpret_frames(
         frame.trace_pc = frame.pc;
     }
     Err(Fault::new("instruction limit exceeded"))
+}
+
+fn source_point(
+    function: &crate::metadata::Function,
+    pc: usize,
+) -> Option<&crate::metadata::SequencePoint> {
+    function
+        .sequence_points
+        .iter()
+        .rev()
+        .find(|p| p.instruction <= pc)
+}
+fn debug_text(text: &str) -> String {
+    text.chars()
+        .take(256)
+        .flat_map(char::escape_debug)
+        .collect()
+}
+fn debug_value(
+    module: &Module,
+    frames: &[Frame],
+    value: &Value,
+    depth: usize,
+    budget: &mut usize,
+) -> crate::debugger::DebugValue {
+    use crate::debugger::DebugValue;
+    if *budget == 0 || depth >= 8 {
+        return DebugValue {
+            value: "…".into(),
+            truncated: true,
+            ..Default::default()
+        };
+    }
+    *budget -= 1;
+    let mut result = DebugValue {
+        ty: debug_text(
+            &crate::type_identity::signature_name(&value.ty())
+                .unwrap_or_else(|_| "<unknown>".into()),
+        ),
+        ..Default::default()
+    };
+    match value {
+        Value::Object { ty, fields } => {
+            result.value = format!("record ({} fields)", fields.len());
+            let names = module.instantiated_fields(ty).unwrap_or_default();
+            for (i, field) in fields.iter().take(64).enumerate() {
+                result.children.push((
+                    names
+                        .get(i)
+                        .map_or_else(|| i.to_string(), |f| debug_text(&f.name)),
+                    debug_value(module, frames, field, depth + 1, budget),
+                ));
+            }
+            result.truncated = fields.len() > 64;
+        }
+        Value::Array { elements, .. } => {
+            result.value = format!("array length={}", elements.len());
+            for (i, element) in elements.iter().take(64).enumerate() {
+                result.children.push((
+                    i.to_string(),
+                    debug_value(module, frames, element, depth + 1, budget),
+                ));
+            }
+            result.truncated = elements.len() > 64;
+        }
+        Value::Erased(payload) => {
+            result.value = "erased value".into();
+            result.children.push((
+                "payload".into(),
+                debug_value(module, frames, payload, depth + 1, budget),
+            ));
+        }
+        Value::SlotReference(reference)
+        | Value::SlotInterface {
+            receiver: reference,
+            ..
+        } => {
+            let root = if let Some(id) = reference.allocation_id() {
+                format!("heap#{id}")
+            } else {
+                frames
+                    .iter()
+                    .enumerate()
+                    .find_map(|(frame, f)| {
+                        f.args
+                            .iter()
+                            .enumerate()
+                            .find(|(_, c)| reference.addresses(c))
+                            .map(|(i, _)| format!("frame#{frame}.arg#{i}"))
+                            .or_else(|| {
+                                f.locals
+                                    .iter()
+                                    .enumerate()
+                                    .find(|(_, c)| reference.addresses(c))
+                                    .map(|(i, _)| format!("frame#{frame}.local#{i}"))
+                            })
+                    })
+                    .unwrap_or_else(|| "expired frame".into())
+            };
+            result.value = format!(
+                "&{root} path={:?}{}",
+                reference.debug_path(),
+                if matches!(value, Value::SlotInterface { .. }) {
+                    " (interface view)"
+                } else {
+                    ""
+                }
+            );
+        }
+        Value::Pointer(pointer)
+        | Value::InterfaceRef {
+            receiver: pointer, ..
+        } => {
+            result.value = if pointer.address == 0 {
+                "null native pointer".into()
+            } else {
+                format!(
+                    "native allocation={:?} offset={} (not dereferenced)",
+                    pointer.allocation, pointer.offset
+                )
+            };
+        }
+        Value::RuntimeTypeHandle(handle) => result.value = debug_text(&handle.name),
+        Value::String(text) | Value::Error(text) => {
+            result.value = debug_text(text);
+            result.truncated = text.chars().count() > 256;
+        }
+        _ => result.value = format!("{value:?}"),
+    }
+    result
+}
+fn debug_snapshot(
+    module: &Module,
+    frames: &[Frame],
+    heap: &crate::ManagedHeap,
+    memory: &crate::memory::PointerHeap,
+    output: &[String],
+    fault: bool,
+) -> crate::debugger::DebugSnapshot {
+    let mut snapshot = crate::debugger::DebugSnapshot::default();
+    let mut budget = 8192;
+    for (index, frame) in frames.iter().enumerate().rev().take(64) {
+        let pc = if fault || index + 1 != frames.len() {
+            frame.trace_pc
+        } else {
+            frame.pc
+        };
+        let slot = |cell: &crate::slots::Cell, budget: &mut usize| {
+            let slot = cell.borrow();
+            slot.inspect().map_or_else(
+                || crate::debugger::DebugValue {
+                    ty: debug_text(
+                        &crate::type_identity::signature_name(slot.inspect_type())
+                            .unwrap_or_else(|_| "<unknown>".into()),
+                    ),
+                    value: "uninitialized".into(),
+                    ..Default::default()
+                },
+                |v| debug_value(module, frames, v, 0, budget),
+            )
+        };
+        let arguments = frame
+            .args
+            .iter()
+            .enumerate()
+            .take(128)
+            .map(|(i, cell)| {
+                let name = if i == 0 && frame.function.instance {
+                    "this".into()
+                } else {
+                    frame
+                        .function
+                        .parameter_names
+                        .get(i - usize::from(frame.function.instance))
+                        .and_then(|n| n.clone())
+                        .unwrap_or_else(|| format!("arg#{i}"))
+                };
+                (name, slot(cell, &mut budget))
+            })
+            .collect();
+        let locals = frame
+            .locals
+            .iter()
+            .enumerate()
+            .take(128)
+            .map(|(i, cell)| {
+                (
+                    format!(
+                        "local#{i} {}",
+                        frame
+                            .function
+                            .local_names
+                            .get(i)
+                            .and_then(|n| n.as_deref())
+                            .unwrap_or("")
+                    ),
+                    slot(cell, &mut budget),
+                )
+            })
+            .collect();
+        snapshot.frames.push(crate::debugger::DebugFrame {
+            index,
+            function: frame.function.name.clone(),
+            instruction: pc,
+            operation: frame
+                .function
+                .body
+                .get(pc)
+                .map(|op| debug_text(&format!("{op:?}")))
+                .unwrap_or_else(|| "<end>".into()),
+            source: source_point(&frame.function, pc).cloned(),
+            arguments,
+            locals,
+            evaluation_stack: frame
+                .stack
+                .iter()
+                .take(128)
+                .map(|v| debug_value(module, frames, v, 0, &mut budget))
+                .collect(),
+        });
+        snapshot.truncated |=
+            frame.args.len() > 128 || frame.locals.len() > 128 || frame.stack.len() > 128;
+    }
+    for (id, cell) in heap.debug_cells().take(256) {
+        if let Some(value) = cell.borrow().inspect() {
+            snapshot
+                .heap
+                .push((*id, debug_value(module, frames, value, 0, &mut budget)));
+        }
+    }
+    snapshot.native = memory.debug_allocations();
+    snapshot.truncated |=
+        frames.len() > 64 || heap.len() > 256 || memory.live_allocations() > 128 || budget == 0;
+    let stats = heap.statistics();
+    snapshot.gc = serde_json::json!({ "allocated": stats.allocated_objects, "live": stats.live_objects,
+        "peak": stats.peak_objects, "collections": stats.collections, "reclaimed": stats.reclaimed_objects });
+    snapshot.output = output
+        .iter()
+        .rev()
+        .take(32)
+        .rev()
+        .map(|s| debug_text(s))
+        .collect();
+    snapshot
 }
 
 fn validate_attribute(
