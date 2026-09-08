@@ -10,6 +10,15 @@ binding immutability/readonly references, inheritance, nullable slots, enums/fla
 dynamic hooks, and a more useful fundamental library. Familiarity primarily means C#/.NET APIs and observable behavior, not matching
 source syntax or runtime internals. Improve contracts without legacy constraints.
 
+## Groundwork checkpoint
+
+Feature implementation is paused for the [runtime groundwork review](runtime-groundwork-review.md).
+It recommends completing stored/returned reference permissions and protected-slot
+initialization, then shared type relationships and complete-owner projections before
+inheritance. Activation ownership, external roots and cleanup need decisions before
+escaping callbacks or suspension. The sequence below remains a feature roadmap;
+the review supplies the prerequisites and proposed acceptance cases.
+
 ## Projected exploration order
 
 This is a proposed task sequence, not a release schedule. Each exploration should
