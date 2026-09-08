@@ -6,299 +6,115 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+No changes yet.
+
+## 0.1.0-preview.3 — 2026-09-08
+
+A source-only preview focused on runtime-library foundations and the object/callable
+features needed to exercise them in Neo. See [release notes](docs/preview-3-release-notes.md)
+for examples, compatibility guidance and exact-commit validation requirements.
+
 ### 2026-09-08
-
-#### Maintenance
-
-- Refreshed dependency notices for the clock backend and all target-specific locked
-  packages (47 packages, 94 notice files), fixing the archive notice-inventory gate.
-  Expanded release smoke checks for recent runtime/library features and dynamic
-  clock, Environment and file-report scenarios. Updated the validation guide for
-  Unreleased development; published Preview 2 notes remain unchanged.
-  Fixed a legacy boundary test to identify Math.Abs(Int32) by signature instead
-  of rejecting the newer Double overload. Recorded macOS stable/minimum-Rust
-  archive checks (26 source/artifact scenarios and native interop), the full local
-  test run and successful corrected-target rerun; cross-platform release gates
-  remain pending.
 
 #### Added
 
-- Added bounded UTF-8 File.WriteAllText with Result<Void,FileWriteError>, explicit
-  FileOutput service reporting and preflight byte limits before opening files.
-  It creates/replaces regular files without adding a BOM; failures after opening
-  can leave partial output. Added temporary-file and artifact tests plus a Neo
-  report example combining Environment, Path, bounded I/O and Result handling.
+- Runtime-enforced readonly managed parameters, receivers and storage signatures,
+  including fields, locals, arrays, returns and generic arguments. Derived references
+  preserve permissions; writable-to-readonly narrowing is allowed and permission
+  escalation faults. Neo adds readonly syntax; reflection and debugging expose the
+  qualifiers. Readonly remains shallow and does not imply immutable backing memory.
+- Class/record inheritance and inherited value layout, managed base-reference views,
+  virtual/override dispatch and abstract classes/methods. Base views retain the complete
+  owner and prevent value slicing. Type.BaseType returns Option<Type>. No mandatory
+  Object base, implicit boxing or public downcast facility is introduced.
+- Managed constructor chaining with unpublished construction storage, base completion
+  and initialized-field checks. Neo adds ordinary classes, body fields, initializers,
+  init declarations, bounded parameterless-constructor synthesis and default(T).
+  Defaults do not invoke constructors or invent invalid references. Base-first
+  initializer ordering deliberately differs from C#; positional records remain.
+- Interface inheritance, inherited class implementations, explicit declaration-to-body
+  mappings and default interface bodies, including most-specific dispatch, diamond
+  ambiguity checks and reabstraction. Neo supports qualified implementation bodies;
+  managed receiver lifetime, readonly and output contracts remain enforced.
+- Generic free functions and static methods with independent method parameters,
+  explicit type arguments, substitution, host invocation and closed call graphs.
+  Neo adds namespace functions, static members and argument-based generic inference.
+- Nominal generic delegates with checked delegate.bind, Invoke calls, heap receiver
+  retention, virtual/interface binding and GC tracing. Neo adds delegate declarations,
+  contextual method-group conversion, function-style invocation and contextual lambdas.
+  Closures use managed capture cells/environments, share captured mutable bindings,
+  and create fresh range-loop captures; unsafe frame/output/constructor captures are
+  rejected. Func supports zero through four inputs, including Void results, and
+  Array.ForEach consumes Func<T,Void> without a separate Action family.
+- Comparable<T>, readonly comparison/equality receivers, Iterable<T> and Iterator<T>
+  with Disposable, and inherited Iterable support on List<T>. ArrayList iterators
+  retain their original buffer and extent; writes remain visible, unlike .NET List's
+  mutation invalidation. Find, FindIndex and Exists use Func predicates; Find returns
+  Option<T>. Added Neo conformance to bundled interfaces and library callback examples.
+- Abstract MemberInfo as the shared base of MethodInfo, FieldInfo and PropertyInfo,
+  with readonly managed readers and internal chained constructors. Reflection adds
+  base/abstract/virtual/override/readonly facts and transitive interface introspection;
+  member queries remain declared-only metadata snapshots.
+- String.CompareOrdinal over UTF-16 code-unit ordering, plus readonly ContainsOrdinal,
+  StartsWithOrdinal and EndsWithOrdinal over valid UTF-8 storage. Added Unicode 16
+  System.Char predicates and Neo single-UTF-16-unit character literals, including
+  surrogate escapes; pinned category data is reproducible and attributed.
+- Int32 Math.Min/Max/Sign and Result-based Clamp; fundamental Double arithmetic,
+  rounding, exponential/logarithmic and trigonometric helpers. Preserved documented
+  .NET NaN/signed-zero behavior and ties-to-even rounding. Neo adds finite Double
+  literals and same-type numeric operations, without implicit widening.
+- Separate Date and Time values with validated Result factories, readonly components,
+  equality/ordering, Gregorian day numbers and 100 ns ticks. Clock.GetLocalNow captures
+  local Date, Time and UTC-offset seconds in one host reading using Chrono. Documented
+  precision, timezone fallback and the trusted host-import boundary.
+- Read-only Environment APIs for per-execution guest arguments, Result-based current
+  directory and Result/Option variable lookup. CLI run/debug forward arguments after
+  `--`, with the guest input path first. Missing and empty variables remain distinct.
+- Lexical Path.Combine/GetFileName and bounded UTF-8 File.WriteAllText returning
+  Result<Void,FileWriteError>. Output byte limits are checked before opening; writes
+  create/replace regular files without adding a BOM and are not atomic. A runnable
+  file-report example combines arguments, paths, bounded I/O and Result handling.
 
-- Added System.IO.Path.Combine and GetFileName with host-platform lexical behavior,
-  following .NET empty/rooted/trailing-separator contracts. Added PathOperations
-  service reporting, artifact tests and documented Windows validation limits.
+#### Changed and migration
 
-- Added a read-only System.Environment subset: per-execution guest arguments,
-  Result-based current-directory reads and Result/Option-based variable lookup.
-  CLI run/debug forward arguments after `--`, with the guest input path first.
-  Added ProcessEnvironment service reporting, Neo example and isolated host tests.
-  Rust ExecutionOptions gains an arguments field; exhaustive literals must adapt.
-  Native clock/argument arrays participate in runtime array-budget accounting.
+- Neo arrays accept checked local extents and optional heap initializer braces;
+  samples omit empty braces. Single-index Item properties use bracket syntax,
+  including interface dispatch and reference-valued elements.
+- Recompile applications and external System libraries together. New readonly,
+  inheritance, constructor, implementation-mapping and delegate metadata/opcodes need
+  this runtime; the JSON format remains provisional. Rust metadata literals and
+  exhaustive enum matches may need updating.
+- Equatable, scalar Equals, comparison contracts and reflection descriptor readers
+  now use readonly managed receivers. IL callers/implementers must match them; Neo
+  borrows automatically. List implementations must supply inherited GetIterator and
+  the current readonly getter contracts. Host wrappers must supply managed receivers.
+- Derived constructors use managed receivers. Managed stfld produces Void; the
+  value-form instruction remains a record update. Whole-value reads, resets, writes
+  and out through projected base views fault to prevent slicing.
+- Neo reserves class, default and readonly and generated neoCLR.Compiler names.
+  Closures incur managed heap allocations. Rust ExecutionOptions gains arguments;
+  exhaustive literals must initialize it or use defaults.
+- Runtime immutable-slot proposals were superseded: immutable bindings remain a
+  language feature. Nullable type signatures for both values and references are
+  planned, with null distinct from zero/default and uninitialized storage; they are
+  not implemented. Option remains preferred for domain optionality.
+- Kept future enums/flags, constraints, async, dynamic hooks and broader framework
+  growth on a research-backed .NET/CLR roadmap. LINQ, globalization, date/time
+  parsing/formatting, generic instance methods, multicast/variance, reflective
+  invocation and broader native/resource lifetime features remain later work.
 
-- Added separate System.Date and System.Time core values, following .NET
-  DateOnly/TimeOnly ranges, Gregorian day numbers and 100 ns ticks. Validated factories
-  return typed Results; zero defaults are the minimum date and midnight. Private
-  storage, readonly components and Equatable/Comparable use existing runtime rules.
-  Added a Neo sample, pinned .NET boundary fixtures and guest access-bypass tests.
-  Added Clock.GetLocalNow with a LocalDateTime snapshot containing separate Date,
-  Time and UTC-offset seconds from one host reading, a LocalClock runtime service,
-  and a Chrono clock backend. Added a runnable Neo sample and host/TZ tests.
-  Parsing, formatting and globalization are deferred; arithmetic and durations
-  remain planned. Documented the trusted host-import boundary, clock precision,
-  timezone fallback and projected slices.
+#### Validation and packaging
 
-- Added Math.Min/Max/Sign for Int32, typed Result-based Clamp with InvalidRangeError,
-  and Double Abs/Min/Max/Sqrt/Pow/Floor/Ceiling/Truncate/Round/Exp/Log/Log10/Sin/Cos/Tan.
-  Preserved .NET ties-to-even rounding, NaN propagation and signed-zero ordering;
-  Double operations declare MathOperations helpers. Neo now supports finite Double
-  literals and same-type arithmetic/comparison, including unordered NaN behavior.
-  Added API contracts, a Neo sample, .NET probe, artifact and boundary tests.
-
-- Added System.Char digit, letter, case, whitespace, number, punctuation, symbol,
-  control, separator, ASCII and surrogate predicates. Library IL uses one checked
-  category helper with pinned Unicode 16 data and a CharacterClassification service;
-  all BMP categories match the pinned .NET 10 probe. Neo now supports single-quoted
-  UTF-16 Char literals and bounded escapes, with source diagnostics. Added tests,
-  a sample, API/grammar documentation and reproducible licensed table generation.
-
-- Added String.CompareOrdinal with .NET-compatible UTF-16 ordering over valid UTF-8
-  text, plus readonly ContainsOrdinal, StartsWithOrdinal and EndsWithOrdinal.
-  Four validated StringOperations helpers support ordinary library IL; no opcode
-  or artifact format change. Added Unicode/empty/NUL coverage, artifact and service
-  checks, a pinned .NET comparison, API tradeoffs and an eager Neo file-name search.
-  Culture, case folding and general string indexing remain deferred.
-
-- Added eager ArrayList.Find, FindIndex and Exists using Func<T,Boolean>. Find returns
-  Option<T> so absence never manufactures an invalid/default element. Searches retain
-  the initial backing buffer and extent and dispose the managed iterator on normal
-  completion. Added a custom-equality Neo sample, callback/GC/reference tests and .NET
-  probes. Fixed union matching with source-defined payloads and closure captures of
-  constructed library values. LINQ remains explicitly deferred.
-
-- Added System.Comparable<T> with a readonly managed receiver and value input,
-  plus scalar CompareTo implementations. Equatable and the Int32/String/Type Equals
-  methods now use the same readonly managed receiver: existing IL callers and
-  implementations must migrate from value receivers; Neo borrows automatically.
-  Documented host-wrapper migration and validated readonly enforcement. Includes unsigned
-  extremes and .NET-compatible floating-point NaN ordering. Added Iterable<T> and
-  Iterator<T> with MoveNext/Current and inherited Disposable; List<T> now inherits
-  Iterable<T>, requiring GetIterator from implementers. ArrayList iterators retain
-  their initial managed buffer/extent and can outlive stack descriptors; writes to
-  retained storage remain visible, unlike .NET List mutation invalidation. Added
-  Neo conformance to bundled interfaces and inherited-library-interface projection,
-  samples, tests and API/.NET comparison
-  documentation. Fixed generic static calls being misidentified as delegate type
-  names, and updated library body checks to recognize bodyless delegate contracts.
-  No new opcode or artifact format; iterable for syntax remains planned.
-  Planned the following release-focused fundamental API pass in library-preview.
-
-- Neo ordinary class declarations with body fields, field initializers, bounded
-  parameterless-constructor synthesis and implicit parameterless base chaining.
-  Added default(T) over checked runtime initobj; defaults do not run constructors
-  or invent null/invalid managed references. Records retain positional construction.
-  Added samples, grammar, tests, a pinned .NET comparison and responsibility guidance:
-  synthesis is language policy, storage/reference validity is runtime enforcement.
-  Base-first initializer ordering deliberately differs from C#. Nullability remains
-  planned; class/default become reserved words, with no opcode/artifact change.
-
-- Added delegates as the shared runtime callable abstraction, with
-  language function values/lambdas built upon them. Excluded a separate universal
-  function-object runtime model. Added a typed-delegate contract/runtime audit, pinned
-  .NET behavioral probes and runnable Neo interface-adapter lifetime/GC tests. The
-  implementation now adds nominal generic IL delegates, checked delegate.bind and
-  ordinary Invoke calls, with heap receiver retention, virtual/interface binding,
-  reference/output checks, GC tracing, source debugging and separate binding edges
-  in closed call graphs. Neo adds delegate declarations, explicit source method-group
-  binding, contextual method-group conversion and function-style invocation of
-  delegate expressions. Bundled Func supports zero to four inputs, including Void
-  results instead of a separate Action family; Array.ForEach consumes Func<T,Void>.
-  Added samples, grammar synchronization and regression coverage. New delegate
-  artifacts require this runtime; Rust exhaustive enum matches need updating.
-  Neo now lowers contextual lambdas to existing delegates and generated managed
-  capture cells/environments, sharing mutable bindings across returned/nested closures
-  and using fresh range-loop captures. Heap-reference validation remains enforced;
-  out, uninitialized-local and constructor-this captures are rejected. Added a runnable
-  closure sample, synchronized grammar, debugger/GC/lifetime tests and .NET capture
-  probes. Generated neoCLR.Compiler names are reserved; captured storage incurs
-  additional heap allocations. Natural lambda inference, stack-only closures,
-  multicast, variance and nullable metadata remain later
-  work. Aligned platform/Neo roadmaps and the compiler inference role.
-
-- Generic free functions and static methods across runtime/IL and Neo, with independent
-  method parameters, explicit type arguments, simultaneous owner/method substitution, verification,
-  host invocation and distinct closed call graphs. Added regression tests and a
-  pinned .NET comparison. Neo adds namespace-qualified functions, static members,
-  argument-based type inference and explicit type arguments, with a runnable example,
-  grammar and constructor-status guidance. Managed-reference arguments preserve
-  existing lifetimes; invalid substituted shapes fault. Generic instance methods, constraints and guest
-  generic-method reflection remain deferred. New metadata requires this runtime;
-  existing artifacts remain compatible, while Rust metadata literals need new fields.
-
-- Default interface bodies now execute in runtime/IL and Neo with class precedence,
-  most-specific selection, diamond ambiguity checks, qualified replacements and
-  reabstraction. Managed interface receivers retain original owners and readonly/output
-  checks; verification, reflection, closed graphs, debugger/source traces, samples and
-  tests cover defaults. Includes the contract audit and pinned .NET comparison probes.
-  Updated older Neo regression expectations for abstract declarations and defaults.
-  New body/replacement artifacts require this runtime; existing bodyless interfaces
-  remain compatible. Output completion retains the existing runtime return check.
-
-- Explicit interface implementations via runtime declaration-to-body mappings, IL
-  .override directives and Neo `func Interface.Member` bodies. Added inherited and
-  redeclared mappings, generic analysis, qualified private reflection names, examples,
-  regression tests and a pinned .NET comparison. Bodies use managed receivers and
-  remain separate from class virtual slots. New mapping artifacts require this runtime;
-  IsVirtual and one inherited reimplementation edge deliberately differ from .NET,
-  documented as preview choices. Default interface bodies remain planned.
-
-- Interface implementations now inherit through class bases and dispatch mapped virtual
-  members to concrete overrides, including through base views. Added generic target
-  analysis, inherited GetInterfaces results, frame/heap examples, lifetime/readonly
-  regression tests and a pinned .NET comparison. No artifact schema change; inherited
-  interface programs previously rejected are now supported. Explicit interface
-  implementations and default implementations are planned as separate follow-up slices.
-
-- Reflection member descriptors now derive from an abstract MemberInfo base with
-  shared Name/DeclaringType storage and internal chained constructors. Instance
-  readers use readonly managed receivers; Neo resolves inherited bundled class
-  members and borrows readonly temporaries without evaluating them twice. Added
-  frame/heap reference examples, constructor/snapshot parity and GC tests, .NET
-  comparison and migration guidance. Query results remain declared-only snapshots.
-  Descriptor field order is preserved; receiver contracts, member rows and declaring
-  owners change, so recompile applications against the matching System library.
-  MethodBase and default interface implementations remain planned.
-
-- Managed constructor chaining using byref .ctor receivers, call/newobj and Neo
-  init declarations with explicit base initializers. One unpublished owner retains
-  inherited and own fields; verifier/runtime checks enforce initialization, base
-  completion and restricted receiver access. Added direct managed stfld writes,
-  including reference fields, GC roots and debugger inspection of construction
-  storage, examples, regression tests and a .NET comparison. Managed stfld produces
-  Void; value-form stfld remains a record update. Old root value constructors remain
-  supported; derived constructors require managed receivers. New constructor/field
-  operands need this runtime revision. Reflection hierarchy migration remains next.
-
-- Inherited managed-receiver methods, class virtual/override dispatch and abstract
-  records/methods in Neo and IL. Base views select implementations using the complete
-  concrete owner; readonly/output/return contracts are validated and abstract values
-  cannot be instantiated or imported. Added Type.IsAbstract and MethodInfo virtual,
-  override and abstract flags, examples, tests and a .NET comparison probe. Rust
-  metadata literals require the new flags; new metadata/descriptor layouts require
-  a matching runtime/System library. Generic class runtime dispatch works; closed
-  generic class target inference remains explicitly unsupported. Planned reflection
-  hierarchy migration after constructor chaining, and default interface implementations
-  as a separate library-driven slice.
-
-- Managed base-reference views through castclass and implicit/explicit Neo ancestor
-  projections. Views preserve location identity, derived GetType, complete-owner GC
-  lifetime and readonly access. ldfld now reads managed record references directly.
-  Whole-value reads/writes/reset/out through projected views fault to prevent slicing;
-  downcasts and native casts remain unsupported. Added source/artifact and unchecked
-  runtime tests, examples and API/IL migration documentation. Rust Instruction
-  matches must handle CastClass; new opcode artifacts require this runtime revision.
-
-- Preliminary record-base metadata and inherited value layout through IL `.extends`
-  and Neo record bases. Aggregate construction/defaulting includes inherited fields,
-  generic bases substitute recursively, and field visibility retains its declaring
-  owner. Added Type.BaseType as Option<Type>, a sample and regression tests. Base
-  types with instance methods or implemented interfaces, native inherited layouts,
-  base-reference conversions and virtual dispatch remain unsupported pending the
-  next object-model slice; no implicit Object base or value slicing is introduced.
-  Rust TypeDef literals now require the base field; older JSON artifacts default it
-  to absent.
-
-- Interface inheritance in IL and Neo: transitive generic contracts, diamond
-  deduplication, base-interface reference projections, inherited method dispatch,
-  load-time cycle/conflict checks and closed dispatch analysis. Managed views retain
-  owner identity, GC lifetime and readonly access. Type.GetInterfaces now includes
-  transitive bases; member enumeration stays declared-only. Added a runnable sample,
-  artifact/runtime tests and design/migration documentation. Class inheritance,
-  variance and default interface implementations remain planned.
-
-- Planned a library-focused next preview toward .NET BCL familiarity, separating
-  runtime/library API contracts from Neo projection. Prioritized shared type
-  relationships, interface inheritance and class inheritance, followed by useful
-  text/collection APIs and practical Option/Result examples; documented scope,
-  comparison sources and validation gates. These additions are plans, not newly
-  implemented inheritance or library APIs.
-
-- Readonly managed input parameters in Neo and IL, enforced by live reference
-  capabilities across frame/heap storage, derived addresses, copies and interface
-  views. Restricted writes and writable forwarding fault even without verification.
-  Added partial verifier diagnostics, ParameterInfo.IsReadOnly, debugger markers,
-  metadata validation, examples and a reproducible .NET 10 comparison. Documented
-  the const-reference analogy and JIT limits: readonly views may observe writes
-  through other aliases and do not imply globally immutable memory. Readonly
-  instance receivers now share this enforcement, including virtual interface dispatch,
-  Neo readonly methods and MethodInfo.IsReadOnly. ArrayList Count/Capacity/Item
-  getters and List Count/Item contracts permit readonly observation; external List
-  implementations must update their getter receiver contracts. Reference storage
-  signatures now include ReadOnlyByRef in locals, returns, fields, arrays and generic
-  arguments, with readonly T& syntax in Neo and IL. Storage/call/return boundaries
-  narrow writable inputs or reject readonly-to-writable mismatches; verifier joins
-  preserve compatible readonly access. Type.IsReadOnly and qualified reflection
-  signatures expose the contract. Unqualified writable destinations/results that
-  previously carried restricted references now fail at the boundary. Reassemble
-  external System artifacts for the expanded reflection descriptor layout; readonly
-  metadata requires this runtime, and Neo now reserves the readonly keyword.
-
-#### Changed
-
-- Recorded explicit nullability as a planned type-signature characteristic across
-  values and managed references, non-nullable by default. Null is a special state
-  distinct from present zero/default payloads and uninitialized storage; Option
-  remains preferred for domain optionality. Documented composition, clearing/GC
-  obligations and .NET comparisons. No nullable behavior is implemented by this slice.
-
-- Established a research-backed .NET/CLR comparison workflow for every roadmap
-  capability and substantive revision of existing features. Added primary-source
-  starting evidence, per-area research questions and decision/validation criteria;
-  clarified that runtime mutability placement remains a candidate to evaluate.
-  Added a code-backed runtime groundwork review after the readonly receiver milestone,
-  covering storage/reference contracts, type relationships, nullable initialization,
-  activation ownership, GC roots, cleanup and persistent state. Recorded proposed
-  dependencies and acceptance cases, and paused feature work for that assessment
-  before resuming the readonly signature implementation.
-  The reviewed foundations are proposals, not newly implemented capabilities.
-  Expanded the reference/storage proposal with recursive permission signatures,
-  boundary narrowing/rejection, invariant containers, verifier joins and separate
-  protected-slot initialization. Added a reproducible probe of the current
-  verify-then-fault return/local gap and scoped acceptance cases.
-
-- Planned runtime-enforced immutable storage and readonly reference/receiver
-  capabilities, with Neo syntax and diagnostics above them. Documented their
-  independence, shallow boundaries, alias checks and initialization/re-entry
-  decisions; placed this foundation first in the exploration roadmap. The
-  earlier protected-slot proposal is superseded: immutable bindings remain a language
-  feature and are removed from the immediate runtime plan. Readonly reference
-  contracts remain runtime-enforced, without making local bindings write-once.
-
-- Recorded the planned platform backlog: inheritance, nullable slots, enums/flags, delegates and
-  lambdas, generic constraints (including not-null/not-void/not-reference), runtime
-  async, dynamic hooks and fundamental framework growth. Documented open contracts,
-  projected roadmap tasks and exit criteria, including integral enum representation,
-  typed flag operations and reflection/formatting decisions. Familiarity targets C#/.NET APIs and
-  observable behavior rather than syntax or internals; these are plans,
-  not implemented capabilities.
-
-- Neo bracket syntax now projects bundled single-index Item getters and setters,
-  including virtual interface dispatch and reference-valued elements. Collection
-  samples use brackets instead of direct accessor calls; metadata and IL retain
-  their accessor methods. Documented setter replacement and addressability rules.
-
-- Neo now accepts checked local array extents (`let a: int[3] = [1, 2, 3]`) and
-  managed heap initializer braces (`new int[3] { 1, 2, 3 }`). Nonempty
-  lists require exact counts and evaluate once in order; they support element types
-  without defaults. Local extent annotations lower to T[] with initialization checks;
-  they do not introduce fixed-extent metadata types. Previous forms remain accepted.
-  Updated the executable array example and synchronized grammar documentation.
-  Samples omit optional empty braces for default-initialized arrays.
-
+- Expanded archive validation to 26 Neo source/artifact scenarios plus native interop,
+  including semantic checks for clock readings, guest arguments and report output.
+  CI covers Linux/macOS/Windows on stable and minimum Rust 1.85.0; publication requires
+  a successful six-job run on the exact versioned candidate.
+- Refreshed notices for all 47 locked registry packages with 94 byte-hashed license
+  texts, preserving upstream bytes across checkouts. Added Char data attribution,
+  API/.NET comparison probes, migration guides and synchronized Neo grammar/examples.
+- Fixed the legacy Math.Abs boundary assertion to select its Int32 parameter signature
+  rather than rejecting the Double overload. Recorded local validation and archived
+  evidence; published Preview 1 and Preview 2 history remains unchanged.
 
 ## 0.1.0-preview.2 — 2026-09-08
 

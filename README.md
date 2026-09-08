@@ -1,7 +1,7 @@
 # neoCLR
 
 [![CI](https://github.com/marinasundstrom/neoCLR/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/marinasundstrom/neoCLR/actions/workflows/ci.yml)
-[![Preview 2](https://img.shields.io/badge/release-v0.1.0--preview.2-blue)](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.2)
+[![Preview 3](https://img.shields.io/badge/release-v0.1.0--preview.3-blue)](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.3)
 [![MIT license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Rust 1.85+](https://img.shields.io/badge/Rust-1.85%2B-orange)](Cargo.toml)
 
@@ -75,13 +75,14 @@ separates unreleased work from published capabilities. Every commit updates it u
 The [next-preview validation guide](docs/next-preview-validation.md) documents the
 reproducible source-archive check and exact-commit release gates.
 
-## Preview 2
+## Preview 3
 
-**Preview 2 (v0.1.0-preview.2)** is a source-only prerelease adding tracing GC,
-managed arrays and collections, the Neo companion compiler, an interactive debugger,
-and reflection introspection. See the [release notes](docs/preview-2-release-notes.md)
-for examples, migration guidance and limitations. The GitHub prerelease records the
-exact commit, platform validation and source checksums.
+**Preview 3 (v0.1.0-preview.3)** is the runtime-library foundation preview: readonly
+references, inheritance and constructor chaining, interface implementations, delegates
+and closures, plus comparison/iteration, text/Math helpers, Date/Time, the local clock
+and bounded file I/O. See the [release notes](docs/preview-3-release-notes.md) for
+examples, migration guidance and limitations. Publication is gated on exact-commit
+CI; the GitHub prerelease records validation and source checksums.
 
 Managed references can address frame-owned values or managed heap objects. Neo reads
 and writes their targets automatically; `ReferenceEquals` explicitly compares their
@@ -92,7 +93,8 @@ Automatic destruction and resource cleanup remain future work.
 
 [Preview 1's frozen release notes](docs/preview-1-release-notes.md) describe the earlier
 release. Its [walkthrough](docs/preview-1-walkthrough.md) remains historical evidence;
-use the current [Neo guide](docs/neo.md) and examples for Preview 2.
+Preview 2 also retains its [frozen release notes](docs/preview-2-release-notes.md).
+Use the current [Neo guide](docs/neo.md) and examples for Preview 3.
 
 ## Build and run a sample
 

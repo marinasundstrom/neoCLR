@@ -1,9 +1,10 @@
 # Next-preview validation
 
-This guide now targets Unreleased development after v0.1.0-preview.2. No next version,
-release date or release commit is selected. [Preview 2 release notes](preview-2-release-notes.md)
-and published evidence remain historical records. The [changelog](../CHANGELOG.md)
-records implemented features and migration guidance.
+The selected source-only candidate is **v0.1.0-preview.3**, dated 2026-09-08.
+See [Preview 3 notes](preview-3-release-notes.md). Its versioned commit must pass the
+six-job CI gate before publication; the passing development run for 90b4240 does not
+certify a later candidate. Published Preview 1/2 notes and evidence remain frozen.
+The [changelog](../CHANGELOG.md) records implemented features and migration guidance.
 
 ## Validation scope
 
