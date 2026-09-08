@@ -1,5 +1,9 @@
 # Neo slice plan
 
+The [library-focused next preview](library-preview.md) prioritizes shared type
+relationships, interface inheritance and class inheritance to support useful library
+contracts and their Neo projection. These inheritance capabilities remain planned.
+
 All planned capabilities and substantive revisions to implemented behavior follow
 the [research and design comparison](design-research.md): establish the .NET/CLR
 baseline, evaluate alternatives and justify improvements with evidence. Each roadmap

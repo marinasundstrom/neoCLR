@@ -1,5 +1,9 @@
 # Optional object hierarchy and common value methods
 
+The [library-focused next preview](library-preview.md) prioritizes shared type
+relationships, interface inheritance and class inheritance to support useful library
+contracts and their Neo projection. These inheritance capabilities remain planned.
+
 Status: agreed direction; class inheritance and these common Object methods are not
 implemented by this change. The existing interface system and Equatable<T> remain
 available. Heap allocation and managed references are independent of this proposal.

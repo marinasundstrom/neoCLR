@@ -1,5 +1,9 @@
 # Explicit borrowed interface references
 
+The [library-focused next preview](library-preview.md) prioritizes shared type
+relationships, interface inheritance and class inheritance to support useful library
+contracts and their Neo projection. These inheritance capabilities remain planned.
+
 Neo now [declares interfaces and projects managed references](neo-interfaces.md)
 using ordinary names without an `I` prefix.
 

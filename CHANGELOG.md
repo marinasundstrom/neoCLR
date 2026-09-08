@@ -10,6 +10,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 #### Added
 
+- Planned a library-focused next preview toward .NET BCL familiarity, separating
+  runtime/library API contracts from Neo projection. Prioritized shared type
+  relationships, interface inheritance and class inheritance, followed by useful
+  text/collection APIs and practical Option/Result examples; documented scope,
+  comparison sources and validation gates. These additions are plans, not newly
+  implemented inheritance or library APIs.
+
 - Readonly managed input parameters in Neo and IL, enforced by live reference
   capabilities across frame/heap storage, derived addresses, copies and interface
   views. Restricted writes and writable forwarding fault even without verification.

@@ -24,12 +24,22 @@ first-class Void, explicit ownership/sharing, free functions, and interface name
 without the `I` convention. These need explicit API mappings. Implementation details
 alone do not justify additional consumer-visible differences.
 
+## Library scope and language projection
+
+The long-term target is the expected breadth and role of the .NET foundational
+library, adapted to neoCLR rather than exact API or binary compatibility. The
+[library-focused preview plan](library-preview.md) prioritizes interface/class
+inheritance where reusable library contracts require it, then useful APIs and
+end-to-end examples. Runtime/library contracts and Neo syntax are separate design
+layers: other frontends must be able to consume the same APIs. Familiarity includes
+documented behavior, not just familiar member names.
+
 ## Current examples
 
 For each intentional departure, state the problem it solves, the resulting contract,
 and the migration impact. Keep compatible behavior where useful, but do not add a
-legacy abstraction solely because .NET exposes it. Preserve the small Preview 1 scope while
-leaving room for better designs as the runtime develops.
+legacy abstraction solely because .NET exposes it. Use the current preview plan to bound implementation while
+leaving room for broader library coverage as the runtime develops.
 
 | API | Familiar surface | Deliberate change or current limitation |
 | --- | --- | --- |

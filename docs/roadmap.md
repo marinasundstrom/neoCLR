@@ -10,6 +10,16 @@ binding immutability/readonly references, inheritance, nullable slots, enums/fla
 dynamic hooks, and a more useful fundamental library. Familiarity primarily means C#/.NET APIs and observable behavior, not matching
 source syntax or runtime internals. Improve contracts without legacy constraints.
 
+## Immediate preview priority
+
+The [library-focused preview plan](library-preview.md) sets the immediate order:
+shared type relationships and interface inheritance, class inheritance and virtual
+behavior, then foundational library contracts and practical Neo programs. Simple
+text/console improvements can progress alongside that groundwork. The long-term aim
+is a library comparable in role and breadth to the .NET BCL, adapted to neoCLR; the
+next preview promises a bounded useful subset. The broader exploration order below
+is subordinate to these end-to-end needs.
+
 ## Groundwork checkpoint
 
 The [runtime groundwork review](runtime-groundwork-review.md) led to implemented
@@ -29,7 +39,7 @@ The completed memory and Neo foundations remain the starting point.
 | Order | Projected tasks | Exit criterion / demonstration |
 | --- | --- | --- |
 | 1. Reference access contracts | Preserve readonly permissions in signatures, storage, calls and returns, with verifier/reflection support and Neo projection. Keep immutable bindings in the language. | Raw IL cannot upgrade readonly access; locals remain replaceable under their declared signature; aliases and reference-containing values follow documented rules. |
-| 2. Inheritance and object model | Specify base metadata, field layout, construction order, virtual slots, override validation and base-value copy rules. Implement one inheritance chain, base-reference conversion, full-owner GC tracing and reflection of inherited members. | A derived value can be used locally and on the managed heap, dispatched through a base reference, and inspected without losing derived identity or bypassing lifetime checks. |
+| 2. Inheritance and object model | First establish transitive interface inheritance and shared type relationships; then specify base metadata, field layout, construction order, virtual slots, override validation and base-value copy rules. Implement one inheritance chain, base-reference conversion, full-owner GC tracing and reflection of inherited members. | A derived value can be used locally and on the managed heap, dispatched through a base reference, and inspected without losing derived identity or bypassing lifetime checks. |
 | 3. Nullable signatures and storage | Follow the [explicit null-state direction](nullability.md): non-nullable defaults, nullable values/references by signature, Option for optionality, distinct uninitialized storage, conversions and checked access. Add metadata, runtime storage, verifier/GC rules and a small Neo projection. | Store, copy, clear and inspect a genuinely nullable slot; absent access fails predictably, and clearing a heap reference removes its GC edge. |
 | 4. Enums and flags | Specify underlying integral types, enum identity, named constants, a flags designation, conversions and unknown-value rules. Add metadata, typed bitwise operations, reflection/formatting and a bounded Neo projection. | A typed options value combines and tests flags, round-trips through an artifact, and formats named and unnamed combinations according to a documented contract. |
 | 5. Generic constraints | Specify base/interface constraints plus not-null, not-void and not-reference scopes. Implement metadata/substitution validation and negative cases at loading and relevant invocation boundaries; project a bounded subset in Neo. | A small generic API accepts valid arguments and rejects invalid ones consistently from source and IL/artifacts. |
