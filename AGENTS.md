@@ -15,3 +15,14 @@
   `git diff --cached --check`.
 
 See [the changelog workflow](docs/changelog.md) for consolidation and release handling.
+
+## Research-backed platform design
+
+- Frame every roadmap capability and substantive improvement to existing features
+  as a comparison with .NET/CLR APIs, behavior and implementation layers.
+- Follow [design research](docs/design-research.md): use primary sources, distinguish
+  shipped behavior from proposals, compare alternatives and record tradeoffs.
+- Do not call a divergence an improvement without explaining its benefit and costs.
+  Reuse existing research for routine fixes; deepen it when contracts or assumptions change.
+- Record provisional choices and validation needs. This process is not an additional
+  approval requirement and does not override authorized work.

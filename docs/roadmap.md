@@ -1,5 +1,10 @@
 # Direction and migration
 
+All planned capabilities and substantive revisions to implemented behavior follow
+the [research and design comparison](design-research.md): establish the .NET/CLR
+baseline, evaluate alternatives and justify improvements with evidence. Each roadmap
+phase includes that research before its contract is settled.
+
 The [platform backlog](platform-backlog.md) records the next broad capabilities:
 binding immutability/readonly references, inheritance, nullable slots, enums/flags, delegates/lambdas, generic constraints, runtime async,
 dynamic hooks, and a more useful fundamental library. Familiarity primarily means C#/.NET APIs and observable behavior, not matching

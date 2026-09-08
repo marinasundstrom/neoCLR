@@ -1,5 +1,10 @@
 # Neo slice plan
 
+All planned capabilities and substantive revisions to implemented behavior follow
+the [research and design comparison](design-research.md): establish the .NET/CLR
+baseline, evaluate alternatives and justify improvements with evidence. Each roadmap
+phase includes that research before its contract is settled.
+
 The [Neo foundation](neo.md) and the completed slices below are implemented. The
 [grammar](neo-grammar.md) tracks shipped syntax, with future features called out
 separately.

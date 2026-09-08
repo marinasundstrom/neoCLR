@@ -10,6 +10,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 #### Changed
 
+- Established a research-backed .NET/CLR comparison workflow for every roadmap
+  capability and substantive revision of existing features. Added primary-source
+  starting evidence, per-area research questions and decision/validation criteria;
+  clarified that runtime mutability placement remains a candidate to evaluate.
+
 - Planned runtime-enforced immutable storage and readonly reference/receiver
   capabilities, with Neo syntax and diagnostics above them. Documented their
   independence, shallow boundaries, alias checks and initialization/re-entry

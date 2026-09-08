@@ -4,6 +4,17 @@ This is the proposed placement of the abstractions, not an implemented runtime
 guarantee. Neo currently enforces let/var rules in the compiler; managed references
 are writable. Implement the runtime contracts before advertising readonly APIs.
 
+## .NET comparison and decision status
+
+The [initial research](design-research.md#starting-evidence-and-limits) supports the
+separation of binding/storage and target mutability, which also appears in C# readonly
+behavior. Mandatory live-reference capabilities across neoCLR frontends are our
+preferred design direction, not an established conclusion about deficiencies in CLR
+runtime enforcement. Compare CLI rules, current runtime implementation, alternative
+placements and alias/receiver experiments before settling representation or claiming
+stronger guarantees or better performance. The rules below specify the candidate
+contract to evaluate.
+
 ## Two independent contracts
 
 Binding immutability controls replacement of a stored value. Readonly reference

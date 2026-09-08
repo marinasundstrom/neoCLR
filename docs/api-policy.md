@@ -1,5 +1,10 @@
 # Familiar concepts, deliberate platform contracts
 
+All planned capabilities and substantive revisions to implemented behavior follow
+the [research and design comparison](design-research.md): establish the .NET/CLR
+baseline, evaluate alternatives and justify improvements with evidence. Each roadmap
+phase includes that research before its contract is settled.
+
 Use familiar .NET APIs and concepts wherever they fit neoCLR's intended model. We do
 not need to reproduce CLR/.NET legacy structures, historical restrictions, or every
 compatibility behavior. Deliberate improvements to structure and behavior are valid

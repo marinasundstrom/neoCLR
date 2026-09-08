@@ -1,5 +1,10 @@
 # Platform backlog
 
+All planned capabilities and substantive revisions to implemented behavior follow
+the [research and design comparison](design-research.md): establish the .NET/CLR
+baseline, evaluate alternatives and justify improvements with evidence. Each roadmap
+phase includes that research before its contract is settled.
+
 These are planned capabilities, not implemented features or commitments to a release
 date. The goal is to make neoCLR useful as a platform, with familiarity primarily in
 C#/.NET APIs and observable behavior, while improving contracts where useful.
