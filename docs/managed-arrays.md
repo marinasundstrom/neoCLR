@@ -119,26 +119,27 @@ pinning/native layout. Native interop requires an explicit layout and pinning
 contract; a managed element reference is not a native pointer. Inheritance must
 preserve tracing and element provenance without imposing an Object root.
 
-## Next source refinement: fixed-length types
-
-The intended spelling distinguishes shape, addressing mode and allocation:
+## Neo local extents and heap initializers
 
 ```swift
-// Proposed next slice; not accepted by the current parser yet.
 let arr: int[3] = [1, 2, 3]
-let view: int[]& = &arr
+var writable: int[3] = arr
+let view: int[]& = &writable
 let arr2: int[]& = new int[3] { }
+let words: string[]& = new string[2] { "Neo", "CLR" }
 ```
 
-`int[3]` expresses an owned array with a statically known extent. `int[]&` expresses
-managed reference access to an array with runtime length. The reference can point
-to either storage region; `new` selects the managed heap. An immutable owned binding
-would need an explicit policy for forming a writable view; today's Neo requires
-`var` to take a managed address of owned storage.
+The local annotation checks the extent at initialization. Literal mismatches are
+compiler errors; a dynamically produced array is checked at runtime before binding.
+The annotation requires a nonnegative Int32 literal and an initializer. Ordinary
+replacement and writes through aliases preserve the runtime's fixed array shape.
+`int[3]` is currently a local extent constraint lowered to int[], not a distinct
+metadata type. Fields, signatures, generic arguments and typeof still use T[].
 
-Before implementing this spelling, define fixed-extent type identity and conversions
-from a fixed-length owner to a runtime-length array view, enforce initializer counts,
-and specify empty braces as default initialization versus explicit element lists.
-The current implementation uses owned `int[]` with runtime length and supports
-`new int[3]` without braces. Fixed-length annotations must become real checked
-contracts, not unchecked decoration.
+`int[]&` describes reference access independently of allocation; `new` chooses
+managed heap storage. Empty initializer braces request supported default values.
+Nonempty braces require exactly the specified number of elements and support types
+without defaults, such as strings and records. Length is evaluated once, then checked
+before evaluating elements once each from left to right. Trailing commas and multiline
+initializers are accepted. Existing `new int[3]`, literals and array(length, value)
+forms remain supported. Writable references to owned locals still require var.

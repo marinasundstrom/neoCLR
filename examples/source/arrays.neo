@@ -7,13 +7,13 @@ func Second(values: int[]&) -> int& {
 }
 
 func MakeValues() -> int[]& {
-    let values = new int[3]
+    let values: int[]& = new int[3] { }
     values[1] = 40
     return values
 }
 
 func Main() -> int {
-    var local = [1, 2, 3]
+    var local: int[3] = [1, 2, 3]
     let copy = local
     let localElement = Second(&local)
     localElement = 9
@@ -26,7 +26,7 @@ func Main() -> int {
     WriteLine(shared.Length)
     WriteLine(shared[1])
 
-    let words = new array(2, "Neo")
+    let words: string[]& = new string[2] { "Neo", "Neo" }
     words[1] = "CLR"
     WriteLine(words[0])
     WriteLine(words[1])

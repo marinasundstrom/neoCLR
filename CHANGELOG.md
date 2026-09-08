@@ -6,7 +6,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
-No changes yet.
+### 2026-09-08
+
+#### Changed
+
+- Neo now accepts checked local array extents (`let a: int[3] = [1, 2, 3]`) and
+  managed heap initializer braces (`new int[3] { }` or `{ 1, 2, 3 }`). Nonempty
+  lists require exact counts and evaluate once in order; they support element types
+  without defaults. Local extent annotations lower to T[] with initialization checks;
+  they do not introduce fixed-extent metadata types. Previous forms remain accepted.
+  Updated the executable array example and synchronized grammar documentation.
+
 
 ## 0.1.0-preview.2 — 2026-09-08
 

@@ -22,8 +22,9 @@ statement        = (binding | return_statement | expression_statement | "break" 
                  | if_statement | "while", expression, block | "loop", block
                  | "for", identifier, "in", expression, (".." | "..<"), expression, block ;
 if_statement     = "if", expression, block, [ newlines, "else", (if_statement | block) ] ;
-binding          = ("let" | "var"), identifier, [ ":", type ], "=", expression
+binding          = ("let" | "var"), identifier, [ ":", local_type ], "=", expression
                  | "var", identifier, ":", type ;
+local_type       = type, [ "[", integer, "]" ] ;
 return_statement = "return", [ expression ] ;
 expression_statement = expression, [ "=", expression ] ;
 
@@ -40,7 +41,9 @@ additive         = multiplicative, { ("+" | "-"), multiplicative } ;
 multiplicative   = projection, { ("*" | "/"), projection } ;
 projection       = unary, { "as", type } ;
 unary            = ("&" | "-" | "!" | "new"), unary
-                 | "new", type, "[", expression, "]" | postfix ;
+                 | "new", type, "[", expression, "]", [ array_initializer ] | postfix ;
+array_initializer = "{", newlines, [ expression, newlines,
+                    { ",", newlines, expression, newlines }, [ ",", newlines ] ], "}" ;
 postfix          = primary, { ".", identifier | arguments | "[", expression, "]" } ;
 arguments        = "(", newlines,
                    [ argument, newlines,

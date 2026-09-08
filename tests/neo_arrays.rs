@@ -76,3 +76,53 @@ fn array_example_round_trips_through_cli_artifact() {
     );
     assert!(String::from_utf8_lossy(&execution.stdout).contains("2\n9\n3\n42\nNeo\nCLR"));
 }
+
+#[test]
+fn fixed_extent_locals_check_literals_dynamic_values_and_replacement() {
+    assert_eq!(run("func Main() -> int { var a: int[3] = [1, 2, 3]; let view: int[]& = &a; view[1] = 40; let copy: int[3] = a; return copy[1] + copy[2] }").unwrap().value, Value::Int32(43));
+    for source in [
+        "func Main() -> int { let a: int[2] = [1]; return 0 }",
+        "func Main() -> int { var a: int[2]; return 0 }",
+        "func Main() -> int { let a: int[-1] = [1]; return 0 }",
+        "func Main() -> int { let a[2] = [1, 2]; return 0 }",
+    ] {
+        assert!(frontend::compile(source).is_err(), "accepted {source}");
+    }
+    for source in [
+        "func Items() -> int[] { return [1] } func Main() -> int { let a: int[2] = Items(); return 0 }",
+        "func Main() -> int { var a: int[2] = [1, 2]; a = [3]; return 0 }",
+    ] {
+        assert!(run(source).is_err(), "accepted {source}");
+    }
+}
+
+#[test]
+fn heap_initializers_evaluate_once_in_order_and_allow_nondefault_elements() {
+    let result = run(r#"
+record Counter(Age: int)
+func Next(value: int&) -> int { value = value + 1; return value }
+func Length(value: int&) -> int { value = value + 1; return 2 }
+func Main() -> int {
+    var calls = 0
+    let values = new int[Length(&calls)] {
+        Next(&calls),
+        Next(&calls),
+    }
+    let records = new Counter[1] { Counter(7) }
+    let defaults = new int[3] { }
+    return values[0] * 100 + values[1] * 10 + calls + records[0].Age + defaults[2]
+}
+"#)
+    .unwrap();
+    assert_eq!(result.value, Value::Int32(240));
+    assert!(
+        frontend::compile("func Main() -> int { let a = new int[2] { 1 }; return 0 }").is_err()
+    );
+    assert!(
+        frontend::compile("func Main() -> int { let a = new int[1] { true }; return 0 }").is_err()
+    );
+    assert!(
+        run("func Main() -> int { let n = 1; let a = new int[n] { 1, 2 }; return 0 }").is_err()
+    );
+    assert!(run("func Main() -> int { let a = new string[1] { }; return 0 }").is_err());
+}

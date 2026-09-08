@@ -19,12 +19,15 @@ import_decl      = "import", "System", ".", "Console", ".", "*", terminator ;
 record_decl      = "record", identifier, field_list, [ ":", type, { ",", type } ],
                    (terminator | newlines, "{", separators, { function_decl, separators }, "}") ;
 interface_decl   = "interface", identifier, newlines, "{", separators,
-                   { "func", identifier, field_list, "->", type, terminator, separators }, "}" ;
-function_decl    = "func", identifier, field_list, "->", type, newlines,
+                   { "func", identifier, parameter_list, "->", type, terminator, separators }, "}" ;
+function_decl    = "func", identifier, parameter_list, "->", type, newlines,
                    "{", separators, { statement, separators }, "}" ;
 field_list       = "(", newlines,
                    [ field, newlines, { ",", newlines, field, newlines } ], ")" ;
 field            = identifier, ":", type ;
+parameter_list   = "(", newlines, [ parameter, newlines,
+                   { ",", newlines, parameter, newlines } ], ")" ;
+parameter        = [ "out" ], identifier, ":", type ;
 type             = (qualified_name, [ "<", type, { ",", type }, ">" ] | "(", ")"), { "[", "]" }, [ "&" ] ;
 qualified_name   = identifier, { ".", identifier } ;
 
@@ -33,14 +36,16 @@ statement        = (binding | return_statement | expression_statement | "break" 
                  | if_statement | "while", expression, block | "loop", block
                  | "for", identifier, "in", expression, (".." | "..<"), expression, block ;
 if_statement     = "if", expression, block, [ newlines, "else", (if_statement | block) ] ;
-binding          = ("let" | "var"), identifier, [ ":", type ], "=", expression ;
+binding          = ("let" | "var"), identifier, [ ":", local_type ], "=", expression
+                 | "var", identifier, ":", type ;
+local_type       = type, [ "[", integer, "]" ] ;
 return_statement = "return", [ expression ] ;
 expression_statement = expression, [ "=", expression ] ;
 ```
 
 A program must define one parameterless `Main`. Other declarations may appear before
 or after it. There are no top-level executable statements in this slice. Fields and
-parameters share name-before-type syntax. Trailing commas, overload declarations,
+parameters share name-before-type syntax. Except for heap array initializers, trailing commas, overload declarations,
 function expression bodies and standalone blocks are unsupported. Structured statements
 introduce nested scopes; active names cannot be shadowed, but sibling scopes may reuse names.
 
@@ -66,12 +71,16 @@ additive         = multiplicative, { ("+" | "-"), multiplicative } ;
 multiplicative   = projection, { ("*" | "/"), projection } ;
 projection       = unary, { "as", type } ;
 unary            = ("&" | "-" | "!" | "new"), unary
-                 | "new", type, "[", expression, "]" | postfix ;
+                 | "new", type, "[", expression, "]", [ array_initializer ] | postfix ;
+array_initializer = "{", newlines, [ expression, newlines,
+                    { ",", newlines, expression, newlines }, [ ",", newlines ] ], "}" ;
 postfix          = primary, { ".", identifier | arguments | "[", expression, "]" } ;
 arguments        = "(", newlines,
-                   [ expression, newlines,
-                     { ",", newlines, expression, newlines } ], ")" ;
-primary          = integer | string | "true" | "false" | "this" | identifier
+                   [ argument, newlines,
+                     { ",", newlines, argument, newlines } ], ")" ;
+argument         = [ "out" ], expression ;
+generic_member   = qualified_name, "<", type, { ",", type }, ">", ".", identifier ;
+primary          = generic_member | integer | string | "true" | "false" | "this" | identifier
                  | "[", newlines, expression, newlines, { ",", newlines, expression, newlines }, "]"
                  | "typeof", "(", newlines, type, newlines, ")"
                  | "(", newlines, expression, newlines, ")" ;
@@ -89,13 +98,14 @@ The grammar permits general postfix shapes, but semantic checks restrict calls t
 free functions, positional record construction, explicit `int(byteOrInt)` conversion,
 public static/ordinary instance bundled System calls, and declared record/interface
 instance methods. Library overloads are selected by exact types after reading bare
-reference arguments; library out/byref-receiver contracts are not exposed. Library
-instance receivers are values (T& is read with ldobj). Source record/interface methods
-use managed reference receivers. Generic method calls remain unsupported. `int(value)` supports Byte/Int32
+reference arguments when the declared contract expects a value. Library receiver and
+output contracts are projected as described in [output parameters](neo-outputs.md).
+Source record/interface methods use managed reference receivers. Generic method calls remain unsupported. `int(value)` supports Byte/Int32
 only and lowers to checked Int32 conversion. These are static restrictions on the
 existing call grammar; no new expression production is needed.
 `new` accepts record construction, such as `new SimpleCounter(0)`, or managed array
-construction (`new int[3]` and `new array(3, 0)`). It does not accept arbitrary
+construction (`new int[3] { }`, `new int[3] { 1, 2, 3 }`, and the earlier
+`new int[3]` / `new array(3, 0)` forms). It does not accept arbitrary
 factory calls or copy expressions in this slice. Assignment and
 `&` require appropriate addressable locations or existing managed references. There is
 no assignment expression or implicit numeric conversion. T& is read automatically
@@ -201,3 +211,21 @@ See the [complete collection example](../examples/source/collections.neo).
 caller initialization; runtime guards enforce callee assignment obligations. Calls
 to library conditional outputs are supported on direct success branches. See
 [output references](neo-outputs.md) for syntax, examples and limitations.
+
+## Local array extents and heap initializers
+
+`let a: int[3] = [1, 2, 3]` checks a local array extent. The extent must be a
+nonnegative Int32 literal and the declaration must have an initializer. Literal
+count mismatches are compilation errors; dynamically produced arrays are checked
+at runtime before binding. Subsequent writes retain the runtime's fixed-shape rules.
+This is a local constraint on T[], not a distinct runtime type: signatures, fields,
+generic arguments and typeof continue to use T[]. Use `var` to take a writable
+reference to owned storage; `int[]&` can address either frame or managed heap storage.
+
+`new T[length] { }` uses the same default initialization as `new T[length]`.
+Defaults remain limited to the runtime-supported element types. A nonempty initializer
+must supply exactly length elements, including for strings and records that have no
+default. The length is evaluated once and checked before elements run; elements run
+once each, left to right. A dynamic count mismatch faults before element evaluation.
+Newlines and a trailing comma are allowed inside braces. Earlier array construction
+forms remain accepted.

@@ -203,7 +203,7 @@ enum ExprKind {
     Out(Box<Expr>),
     InterfaceCast(Box<Expr>, Ty),
     ArrayLiteral(Vec<Expr>),
-    NewArray(Ty, Box<Expr>),
+    NewArray(Ty, Box<Expr>, Vec<Expr>),
     Index(Box<Expr>, Box<Expr>),
 }
 enum Pattern {
@@ -223,6 +223,7 @@ enum Stmt {
         name: Token,
         mutable: bool,
         annotation: Option<Ty>,
+        extent: Option<i32>,
         value: Option<Expr>,
     },
     Assign(Expr, Expr),
@@ -590,46 +591,65 @@ impl Parser {
                 Stmt::Continue(at)
             });
         }
-        let statement = if self.at("let") || self.at("var") {
-            let mutable = self.take().text == "var";
-            let name = self.name()?;
-            let annotation = if self.eat(":") {
-                Some(self.ty()?)
-            } else {
-                None
-            };
-            let value = if self.eat("=") {
-                Some(self.expression(0)?)
-            } else {
-                if !mutable || annotation.is_none() {
-                    return Err(
-                        name.error("uninitialized declaration requires var and an explicit type")
-                    );
+        let statement =
+            if self.at("let") || self.at("var") {
+                let mutable = self.take().text == "var";
+                let name = self.name()?;
+                let annotation = if self.eat(":") {
+                    Some(self.ty()?)
+                } else {
+                    None
+                };
+                let extent = if annotation.is_some() && self.eat("[") {
+                    let at = self.take();
+                    let length = at.text.parse::<i32>().map_err(|_| {
+                        at.error("array extent must be a nonnegative Int32 literal")
+                    })?;
+                    self.expect("]")?;
+                    Some(length)
+                } else {
+                    None
+                };
+                let annotation = if extent.is_some() {
+                    Some(Ty::Array(Box::new(annotation.unwrap())))
+                } else {
+                    annotation
+                };
+                let value = if self.eat("=") {
+                    Some(self.expression(0)?)
+                } else {
+                    if !mutable || annotation.is_none() {
+                        return Err(name
+                            .error("uninitialized declaration requires var and an explicit type"));
+                    }
+                    None
+                };
+                if extent.is_some() && value.is_none() {
+                    return Err(name.error("fixed-extent local requires an initializer"));
                 }
-                None
-            };
-            Stmt::Bind {
-                name,
-                mutable,
-                annotation,
-                value,
-            }
-        } else if self.at("return") {
-            let at = self.take();
-            let value = if ["\n", ";", "}", ""].contains(&self.current().text.as_str()) {
-                None
+                Stmt::Bind {
+                    name,
+                    mutable,
+                    annotation,
+                    extent,
+                    value,
+                }
+            } else if self.at("return") {
+                let at = self.take();
+                let value = if ["\n", ";", "}", ""].contains(&self.current().text.as_str()) {
+                    None
+                } else {
+                    Some(self.expression(0)?)
+                };
+                Stmt::Return(at, value)
             } else {
-                Some(self.expression(0)?)
+                let left = self.expression(0)?;
+                if self.eat("=") {
+                    Stmt::Assign(left, self.expression(0)?)
+                } else {
+                    Stmt::Expression(left)
+                }
             };
-            Stmt::Return(at, value)
-        } else {
-            let left = self.expression(0)?;
-            if self.eat("=") {
-                Stmt::Assign(left, self.expression(0)?)
-            } else {
-                Stmt::Expression(left)
-            }
-        };
         if !matches!(&statement, Stmt::Expression(Expr { kind: ExprKind::Match(_, arms), .. })
             if arms.iter().any(|a| matches!(a.body, ArmBody::Block(_))))
         {
@@ -672,8 +692,31 @@ impl Parser {
             if self.eat("[") {
                 let length = self.expression(0)?;
                 self.expect("]")?;
-                let depth = length.depth + 1;
-                self.node(at, ExprKind::NewArray(ty, Box::new(length)), depth)?
+                let mut elements = Vec::new();
+                if self.eat("{") {
+                    self.newlines();
+                    while !self.at("}") {
+                        elements.push(self.expression(0)?);
+                        self.newlines();
+                        if !self.eat(",") {
+                            break;
+                        }
+                        self.newlines();
+                    }
+                    self.expect("}")?;
+                }
+                let depth = elements
+                    .iter()
+                    .map(|e| e.depth)
+                    .max()
+                    .unwrap_or(0)
+                    .max(length.depth)
+                    + 1;
+                self.node(
+                    at,
+                    ExprKind::NewArray(ty, Box::new(length), elements),
+                    depth,
+                )?
             } else {
                 self.position = saved;
                 let operand = self.expression(30)?;
@@ -1046,6 +1089,20 @@ impl Lowerer<'_> {
         }
         Ok(())
     }
+    fn check_array_length(&mut self, count: usize, array: bool) {
+        let valid = self.label();
+        self.body.push("dup".into());
+        if array {
+            self.body.extend(["ldlen".into(), "conv.i4".into()]);
+        }
+        self.body.extend([
+            format!("ldc.i4 {count}"),
+            "ceq".into(),
+            format!("brtrue {valid}"),
+            "fault \"array length does not match initializer or extent\"".into(),
+            format!("{valid}:"),
+        ]);
+    }
     fn array_owner(&mut self, expression: &Expr) -> Result<Ty, Fault> {
         // Reading a local array element need not copy its whole value.
         if let ExprKind::Name(name) = &expression.kind {
@@ -1091,10 +1148,33 @@ impl Lowerer<'_> {
                 }
                 self.convert_reference(actual, target, &value.at)
             }
-            ExprKind::NewArray(element, length) => {
+            ExprKind::NewArray(element, length, elements) => {
+                if !elements.is_empty()
+                    && matches!(length.kind, ExprKind::Int(count) if count as usize != elements.len())
+                {
+                    return Err(length
+                        .at
+                        .error("array initializer count does not match length"));
+                }
                 self.expression_for(length, &Ty::Int)?;
-                self.body.push(format!("newarr {}", element.il()));
-                Ok(Ty::Ref(Box::new(Ty::Array(Box::new(element.clone())))))
+                let ty = Ty::Ref(Box::new(Ty::Array(Box::new(element.clone()))));
+                if elements.is_empty() {
+                    self.body.push(format!("newarr {}", element.il()));
+                } else {
+                    self.check_array_length(elements.len(), false);
+                    self.body.push(format!("array.alloc {}", element.il()));
+                    let local = self.temp(&ty);
+                    self.body
+                        .extend([format!("local.reset {local}"), format!("stloc {local}")]);
+                    for (index, value) in elements.iter().enumerate() {
+                        self.body
+                            .extend([format!("ldloc {local}"), format!("ldc.i4 {index}")]);
+                        self.expression_for(value, element)?;
+                        self.body.push(format!("stelem {}", element.il()));
+                    }
+                    self.body.push(format!("ldloc {local}"));
+                }
+                Ok(ty)
             }
             ExprKind::ArrayLiteral(elements) => {
                 self.body.push(format!("ldc.i4 {}", elements.len()));
@@ -1894,10 +1974,17 @@ impl Lowerer<'_> {
                     name,
                     mutable,
                     annotation,
+                    extent,
                     value,
                 } => {
                     if self.bindings.contains_key(&name.text) {
                         return Err(name.error("duplicate binding"));
+                    }
+                    if matches!((extent, value),
+                        (Some(count), Some(Expr { kind: ExprKind::ArrayLiteral(elements), .. }))
+                        if *count as usize != elements.len())
+                    {
+                        return Err(name.error("array initializer count does not match extent"));
                     }
                     let ty = match (value, annotation) {
                         (Some(value), Some(annotation)) => {
@@ -1907,6 +1994,9 @@ impl Lowerer<'_> {
                         (None, Some(annotation)) => annotation.clone(),
                         (None, None) => unreachable!(),
                     };
+                    if let Some(count) = extent {
+                        self.check_array_length(*count as usize, true);
+                    }
                     let index = self.locals.len();
                     self.locals
                         .push(format!(".local {} {}_{index}", ty.il(), name.text));
