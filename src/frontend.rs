@@ -3285,6 +3285,54 @@ impl Lowerer<'_> {
         self.body.push(opcode);
         Ok(returns)
     }
+    // Probe only compiler state; emitted RHS effects still occur exactly once.
+    fn reference_expression(&self, expression: &Expr) -> bool {
+        let mut probe = self.clone();
+        matches!(
+            probe.expression(expression),
+            Ok(Ty::Ref(_) | Ty::ReadOnlyRef(_))
+        )
+    }
+    // Store the reference itself without manufacturing a nested managed reference.
+    fn assign_reference_slot(&mut self, left: &Expr, right: &Expr) -> Result<bool, Fault> {
+        if !self.reference_expression(right) {
+            return Ok(false);
+        }
+        match &left.kind {
+            ExprKind::Field(owner, field) => {
+                let mut probe = self.clone();
+                let owner_ty = probe.expression(owner)?;
+                let target = match owner_ty {
+                    Ty::Ref(target) | Ty::ReadOnlyRef(target) => *target,
+                    value => value,
+                };
+                let field_ty = self.field(&target, field)?;
+                if !matches!(field_ty, Ty::Ref(_) | Ty::ReadOnlyRef(_)) {
+                    return Ok(false);
+                }
+                self.place(owner, false)?;
+                self.expression_for(right, &field_ty)?;
+                self.body
+                    .push(format!("stfld {}::{}", target.il(), field.text));
+                self.body.push("pop".into());
+                Ok(true)
+            }
+            ExprKind::Index(owner, index) => {
+                let mut probe = self.clone();
+                let owner_ty = probe.expression(owner)?;
+                let element = Self::array_element(owner_ty, &owner.at)?;
+                if !matches!(element, Ty::Ref(_) | Ty::ReadOnlyRef(_)) {
+                    return Ok(false);
+                }
+                self.place(owner, false)?;
+                self.expression_for(index, &Ty::Int)?;
+                self.expression_for(right, &element)?;
+                self.body.push(format!("stelem {}", element.il()));
+                Ok(true)
+            }
+            _ => Ok(false),
+        }
+    }
     // Emit a managed address of an assignable source location.
     fn place(&mut self, expression: &Expr, borrowing: bool) -> Result<Ty, Fault> {
         self.place_with_access(expression, borrowing, false)
@@ -3789,8 +3837,15 @@ impl Lowerer<'_> {
                     }
                     if let ExprKind::Name(name) = &left.kind {
                         let binding = self.binding(name, &left.at)?;
-                        let rebind = matches!(binding.ty, Ty::Ref(_) | Ty::ReadOnlyRef(_))
-                            && matches!(&right.kind, ExprKind::Unary(op, _) if op == "&");
+                        // Output parameters address T storage, not a reference slot.
+                        let output = self
+                            .function
+                            .parameters
+                            .iter()
+                            .any(|parameter| parameter.name.text == *name && parameter.output);
+                        let rebind = !output
+                            && matches!(binding.ty, Ty::Ref(_) | Ty::ReadOnlyRef(_))
+                            && self.reference_expression(right);
                         if let Ty::Ref(target) | Ty::ReadOnlyRef(target) = &binding.ty {
                             if !rebind {
                                 self.body.push(binding.load);
@@ -3812,6 +3867,9 @@ impl Lowerer<'_> {
                             self.body.push(binding.load.replacen("ldloc", "stloc", 1));
                         }
                     } else {
+                        if self.assign_reference_slot(left, right)? {
+                            continue;
+                        }
                         let expected = self.place(left, false)?;
                         self.expression_for(right, &expected)?;
                         self.body.push(format!("stobj {}", expected.il()));

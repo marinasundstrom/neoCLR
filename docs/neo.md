@@ -301,13 +301,18 @@ a value, while T& requests a reference. Source function signatures determine whe
 a reference is forwarded or read. Ordinary values still require `&` to be passed as
 references; there is no automatic address-taking.
 
-Assignment to an existing T& binding writes its target, including a `let` binding or
-T& parameter. `left = right` between references copies right's value into left's target.
-Retarget a mutable reference binding explicitly with `reference = &other`; a `let`
-reference cannot be retargeted. `&reference` forwards its existing target rather than
-creating T&&. To retarget to a factory result, use `reference = &MakeCounter()` (or
-`reference = &new Counter(0)`). Assignment through reference-valued fields or returned
-references follows the same target-write rule. Field-slot rebinding is not exposed.
+Assignment of a reference to a mutable T& binding copies the reference: `left = right`
+retargets left without changing either object's contents. `left = &value` first forms
+a reference explicitly; `left = MakeCounter()` forwards a reference-returning factory.
+`let` bindings and parameters cannot be retargeted. `&reference` forwards its existing
+reference rather than creating T&&. Writable reference fields and array slots likewise
+store reference-valued right-hand sides, subject to runtime storage/lifetime checks.
+
+Assigning an actual T value through T& still writes its target, including through a
+`let` reference. To copy a referent deliberately, introduce a value: `let copy: Foo = right;
+left = copy`. Output parameters retain their initialization contract: `out Foo&`
+writes Foo storage even when the source is a Foo&. A reference-returning call exposes
+a target, not a replaceable reference binding. See [reference assignment](reference-assignment.md).
 
 For overloaded System calls, bare reference arguments are read as values; `&argument`
 selects reference access explicitly. Match arms follow an enclosing value/reference

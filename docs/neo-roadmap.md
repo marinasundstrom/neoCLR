@@ -89,7 +89,7 @@ property access boundaries and CLI execution.
 Managed references are read and written automatically in Neo. Examples use
 `age = age + 2`, with the compiler providing the underlying loads/stores. Explicit
 reference formation/forwarding remains available through `&`; mutable reference
-rebinding uses an explicitly addressed right-hand side. Raw native pointers retain
+rebinding copies a reference-valued right-hand side. Raw native pointers retain
 separate explicit low-level semantics and are not yet exposed by Neo. The
 [managed-access tests](../tests/neo_managed_access.rs) cover contexts, copies, forwarding,
 retargeting and lifetime checks.

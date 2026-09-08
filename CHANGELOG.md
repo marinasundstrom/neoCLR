@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-08
 
+- Changed Neo reference-to-reference assignment to copy the reference into mutable
+  locals, captured bindings, writable fields and array slots, consistent with binding
+  initialization and reference-valued collection setters. Breaking source change:
+  use an explicitly value-typed intermediate for the former referent-copy behavior;
+  immutable bindings now reject reference RHS reassignment. Value RHS and output
+  writes retain target semantics. Added migration guidance, .NET comparison and
+  assignment/storage/lifetime regressions; existing compiled IL is unchanged.
+
 - Added a reference-passing example and regressions for alias forwarding, explicit
   address creation/local retargeting and output writes. Corrected the new type-design
   notes: current `out Foo&` initializes Foo storage, not a caller's Foo& binding;

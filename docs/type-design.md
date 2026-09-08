@@ -155,7 +155,6 @@ keeps changes from value parameters to reference parameters visible at call site
 
 Run `cargo run --locked -- run examples/source/reference-passing.neo` to see alias
 passing, automatic member access, explicit local retargeting and output writes.
-It prints 2, 102, 2, 11, 40 and returns 42. The current assignment projection still
-uses `selected = &other` to retarget a mutable reference binding; an unadorned
-assignment through a reference writes its target. This is a remaining difference
-from C# class-reference assignment, not an implication of reference-valued parameters.
+It prints 2, 102, 2, 11, 40 and returns 42. [Reference assignment](reference-assignment.md) now copies reference-valued right-hand
+sides into mutable reference slots. Value RHS assignment still writes the target;
+output-reference initialization remains a separate contract.

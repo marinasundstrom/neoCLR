@@ -13,7 +13,7 @@ fn scalar_references_are_read_and_written_in_value_contexts() {
     let result = run(source);
     assert_eq!(result.output, ["42", "42", "42"]);
     assert_eq!(result.value, Value::Int32(84));
-    assert_eq!(run("func Main() -> int { var x = 1; let r = &x; var y = 7; let other = &y; r = other; other = 9; return x }").value, Value::Int32(7));
+    assert_eq!(run("func Main() -> int { var x = 1; let r = &x; var y = 7; let other = &y; let copy: int = other; r = copy; other = 9; return x }").value, Value::Int32(7));
 }
 
 #[test]
@@ -31,7 +31,7 @@ fn reference_parameters_forward_and_rebinding_is_explicit() {
 fn record_copies_field_references_and_reference_results_need_no_star() {
     let source = "record Counter(Age: int)\nrecord Holder(Age: int&)\nfunc Read(counter: Counter) -> int { return counter.Age }\nfunc Age(counter: Counter&) -> int& { return &counter.Age }\nfunc Main() -> int { let shared = new Counter(1); let holder = Holder(&shared.Age); holder.Age = 40; let alias = &holder.Age; alias = alias + 1; Age(shared) = 42; let copy: Counter = shared; shared = Counter(43); return Read(shared) + copy.Age }";
     assert_eq!(run(source).value, Value::Int32(85));
-    assert_eq!(run("record Counter(Age: int)\nfunc Main() -> int { let shared = new Counter(1); let holder = new Counter(40); shared = holder; holder.Age = 42; return shared.Age }").value, Value::Int32(40));
+    assert_eq!(run("record Counter(Age: int)\nfunc Main() -> int { var shared = new Counter(1); let holder = new Counter(40); shared = holder; holder.Age = 42; return shared.Age }").value, Value::Int32(42));
 }
 
 #[test]

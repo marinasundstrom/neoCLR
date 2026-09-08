@@ -76,11 +76,11 @@ Returning `&local` from the function that owns local is invalid. Returning local
 value remains valid and does not require heap allocation.
 
 Inferred bindings preserve reference types. `let` prevents rebinding but allows target
-mutation through T&. Ordinary reference-to-reference assignment copies the right
-referent into the left target. Retargeting a `var` reference binding is explicit:
-`reference = &other`. `&reference` forwards its existing reference; it is not T&&.
-See the [Neo access rules](neo.md#managed-references-are-transparent-pointers-are-explicit)
-for argument, inference and assignment details.
+mutation through T&. Reference-to-reference assignment copies the reference into a
+mutable destination. A value RHS writes the referent; an explicitly value-typed local
+can request a copy before assignment. `&value` creates a reference and `&reference`
+forwards its existing reference; it is not T&&. See [reference assignment](reference-assignment.md)
+for output contracts, storage cases and migration from the earlier target-copy rule.
 
 ## Pointers and remaining boundaries
 

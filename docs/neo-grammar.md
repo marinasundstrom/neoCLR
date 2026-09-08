@@ -214,9 +214,9 @@ The compiler resolves the declared getter and checks its public, typed value-rec
 contract. It does not expose private backing fields, property assignment or addresses
 of properties. Source record field access keeps its existing rules.
 
-Managed-reference assignment writes the target, including through immutable reference
-bindings. Only `var` reference bindings can be retargeted, using an explicitly addressed
-right-hand side (`r = &other`). `&r` forwards r's reference without constructing T&&.
+A reference RHS retargets a mutable reference binding (`r = otherReference`).
+A value RHS writes the target, including through immutable reference bindings.
+Reference creation from a value remains explicit (`r = &otherValue`). `&r` forwards r's reference without constructing T&&.
 Inferred bindings preserve references; explicitly value-typed bindings copy their
 referents. These are source access rules over existing managed references, not changes
 to native pointer semantics. See the [managed-access guide](neo.md#managed-references-are-transparent-pointers-are-explicit).
