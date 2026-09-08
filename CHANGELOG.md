@@ -36,6 +36,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   activation ownership, GC roots, cleanup and persistent state. Recorded proposed
   dependencies and acceptance cases, and paused further feature implementation.
   The reviewed foundations are proposals, not newly implemented capabilities.
+  Expanded the reference/storage proposal with recursive permission signatures,
+  boundary narrowing/rejection, invariant containers, verifier joins and separate
+  protected-slot initialization. Added a reproducible probe of the current
+  verify-then-fault return/local gap and scoped acceptance cases.
 
 - Planned runtime-enforced immutable storage and readonly reference/receiver
   capabilities, with Neo syntax and diagnostics above them. Documented their

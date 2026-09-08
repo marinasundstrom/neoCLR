@@ -11,7 +11,7 @@ The [initial research](design-research.md#starting-evidence-and-limits) supports
 separation of binding/storage and target mutability, which also appears in C# readonly
 behavior. The [parameter slice](readonly-parameters.md#net-comparison-and-decision)
 now selects explicit metadata plus live capability narrowing, backed by a bounded
-.NET comparison and alias tests. Broader receiver, storage and initialization rules
+.NET comparison and alias tests. Broader storage and initialization rules
 below remain candidates to evaluate. This is not a general claim of deficiencies in
 CLR enforcement or of improved performance.
 
@@ -80,6 +80,10 @@ Readonly access does not extend lifetimes, promote frame values, or change GC ro
 Reference identity remains the addressed location, independent of its access view.
 Native pointers stay a separate low-level interop contract; no managed mutability
 guarantee should be claimed for arbitrary native writes.
+
+See the [stored/returned reference proposal](reference-storage-contract.md) for the
+recursive signature recommendation and the boundary between this work and protected
+slot initialization.
 
 ## Implementation order
 

@@ -17,6 +17,10 @@ of a runtime. Preserve the loaded-program boundary, definition identities, manag
 slot capabilities, frame escape checks, tracing GC, typed verifier, interface dispatch,
 reflection, debugger/source maps, target layout and runtime-service planning.
 
+The [reference/storage contract follow-up](reference-storage-contract.md) now gives
+a concrete permission matrix, container rules, a reproducible gap probe and acceptance
+cases for the first foundation. It remains a proposal.
+
 ## Findings and dependencies
 
 ### 1. Storage and reference contracts are incomplete

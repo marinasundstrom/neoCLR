@@ -1,0 +1,21 @@
+; Investigation probe: currently verifies, then intentionally faults on the write.
+; No write permission is recovered; the return/local signatures fail to expose
+; the live restriction. See docs/reference-storage-contract.md.
+.module ReferenceContractProbe
+.entry Main
+.function Observe(readonly Int32& value) -> Int32&
+    ldarg value
+    ret
+.end
+.function Main() -> Int32
+    .local Int32& result
+    ldc.i4 1
+    heap.new
+    call Observe(Int32&)
+    stloc result
+    ldloc result
+    ldc.i4 9
+    stobj Int32
+    ldc.i4 0
+    ret
+.end
