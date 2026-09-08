@@ -22,7 +22,10 @@ record_member    = init_decl | explicit_method | [ "readonly" ], [ "abstract" ],
 init_decl        = "init", parameter_list, [ ":", "base", "(", newlines, [ expression, { ",", newlines, expression } ], newlines, ")" ],
                    newlines, "{", separators, { statement, separators }, "}" ;
 interface_decl   = "interface", identifier, [ ":", type, { ",", type } ], newlines, "{", separators,
-                   { [ "readonly" ], "func", identifier, parameter_list, "->", type, terminator, separators }, "}" ;
+                   { interface_member, separators }, "}" ;
+interface_member = [ "readonly" ], [ "abstract" ], "func", identifier,
+                   [ ".", identifier ], parameter_list, "->", type,
+                   (terminator | block) ;
 method_decl      = "func", identifier, parameter_list, "->", type,
                    (terminator | newlines, "{", separators, { statement, separators }, "}") ;
 explicit_method  = [ "readonly" ], "func", identifier, ".", identifier,
@@ -268,5 +271,7 @@ field initialization rules and unchanged aggregate construction without init.
 
 [Explicit interface implementations](explicit-interfaces.md) use `func Interface.Member`
 in records, optionally readonly. They do not introduce ordinary callable class members.
-Virtual/override/abstract modifiers and default interface bodies are not supported
-on these declarations.
+Record explicit bodies cannot be virtual/override/abstract. Interfaces now support
+[default bodies and qualified replacements/reabstraction](default-interface-implementations.md).
+An abstract declaration has no body; virtual/override modifiers remain unsupported
+on interface declarations.

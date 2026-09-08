@@ -111,8 +111,8 @@ Custom attribute inspection is a candidate, following the role of .NET's
 ICustomAttributeProvider while using Neo's naming convention. The
 [bridge between inherited class interface implementations and virtual overrides](class-interface-dispatch.md)
 is now implemented, as are [explicit interface mappings](explicit-interfaces.md).
-Default interface bodies remain planned with precedence, diamond ambiguity,
-reabstraction and receiver rules still to specify.
+[Default interface bodies](default-interface-implementations.md) now implement
+precedence, diamond ambiguity, reabstraction and managed receiver rules.
 
 ## Run and migration
 

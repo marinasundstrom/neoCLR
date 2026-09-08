@@ -2,7 +2,8 @@
 
 Implemented in the preview: multiple base interfaces, transitive conformance,
 generic substitution in IL, base-interface views and inherited method calls in Neo.
-Class inheritance, default interface bodies and variance remain future work.
+Class inheritance and [default interface bodies](default-interface-implementations.md)
+are now supported; variance remains future work.
 
 ```swift
 interface Readable { readonly func Read() -> int }
@@ -102,4 +103,4 @@ Class bases now also contribute inherited interface conformance and virtual mapp
 see [class interface dispatch](class-interface-dispatch.md).
 
 [Explicit interface implementations](explicit-interfaces.md) are now available;
-default interface bodies remain planned.
+[default interface bodies](default-interface-implementations.md) are now supported.

@@ -63,7 +63,8 @@ actual body. MethodInfo queries with NonPublic/Instance flags expose private bod
 Neo-generated names retain the interface qualifier, while public queries exclude them.
 There is no GetInterfaceMap API yet. Property/indexer accessors can use the same IL
 method mapping mechanism; new Neo property/indexer declaration syntax is deferred.
-Default interface bodies and interface reabstraction remain unsupported. Existing
+[Default interface bodies and reabstraction](default-interface-implementations.md)
+are now supported on interface owners. Existing
 rejection of incompatible contracts combined into one interface is unchanged.
 
 ## .NET comparison and tradeoffs
@@ -118,5 +119,5 @@ escape and private reflection names.
 Old artifacts omit the new field and retain implicit mapping. New artifacts with
 explicit mappings require this runtime; Rust Function literals need the new vector.
 There is no new opcode or System descriptor layout. Existing public APIs are unchanged.
-The [default-interface contract](default-interface-implementations.md) is recorded;
-its runtime/Neo implementation is the next slice.
+[Default interface bodies](default-interface-implementations.md) now build on these
+mappings; record explicit implementations still cannot be abstract or class-virtual.

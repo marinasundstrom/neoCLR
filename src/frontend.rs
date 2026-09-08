@@ -620,7 +620,11 @@ impl Parser {
         let parameters = self.fields(true)?;
         self.expect("->")?;
         let returns = self.ty()?;
-        let body = if abstract_member {
+        let has_body = self.tokens[self.position..]
+            .iter()
+            .find(|t| t.text != "\n")
+            .is_some_and(|t| t.text == "{");
+        let body = if abstract_member && !has_body {
             self.end_statement()?;
             Vec::new()
         } else {
@@ -632,7 +636,7 @@ impl Parser {
             explicit_interface,
             is_virtual: false,
             is_override: false,
-            is_abstract: false,
+            is_abstract: abstract_member && !has_body,
             receiver_readonly: false,
             parameters,
             returns,
@@ -696,20 +700,25 @@ impl Parser {
             let is_abstract = self.eat("abstract");
             let is_virtual = self.eat("virtual");
             let is_override = !is_virtual && self.eat("override");
-            if abstract_members && (is_virtual || is_override || is_abstract) {
+            if abstract_members && (is_virtual || is_override) {
                 return Err(self
                     .current()
                     .error("interface virtual modifiers are not supported"));
             }
-            let mut method = self.function(abstract_members || is_abstract, !abstract_members)?;
-            if method.explicit_interface.is_some() && (is_virtual || is_override || is_abstract) {
+            let mut method = self.function(abstract_members || is_abstract, true)?;
+            if is_abstract && !method.is_abstract {
+                return Err(method.name.error("abstract methods cannot have bodies"));
+            }
+            if method.explicit_interface.is_some()
+                && (is_virtual || is_override || (is_abstract && !abstract_members))
+            {
                 return Err(method
                     .name
                     .error("explicit interface bodies cannot be virtual, override or abstract"));
             }
             method.receiver_readonly = receiver_readonly;
             method.is_virtual = is_virtual || is_override || is_abstract;
-            method.is_abstract = is_abstract;
+            method.is_abstract = is_abstract || (abstract_members && method.is_abstract);
             method.is_override = is_override;
             if methods.iter().any(|m| m.name.text == method.name.text) {
                 return Err(method
@@ -2812,33 +2821,22 @@ pub fn lower_to_il_named(source: &str, document: &str) -> Result<String, Fault> 
             }
             il.push_str(&format!(".implements {}\n", base.il()));
         }
-        for method in &interface.methods {
-            il.push_str(&format!(
-                ".method instance {}byref {}({}) -> {}\n.end\n",
-                if method.receiver_readonly {
-                    "readonly "
-                } else {
-                    ""
-                },
-                method.name.text,
-                method
-                    .parameters
-                    .iter()
-                    .map(|p| format!(
-                        "{}{}",
-                        if p.output {
-                            "out "
-                        } else if p.readonly {
-                            "readonly "
-                        } else {
-                            ""
-                        },
-                        p.ty.il()
-                    ))
-                    .collect::<Vec<_>>()
-                    .join(","),
-                method.returns.il()
-            ));
+        for function in &interface.methods {
+            il.push_str(
+                &Lowerer {
+                    document,
+                    receiver: Some(&interface.name),
+                    source: &source,
+                    function,
+                    bindings: HashMap::new(),
+                    locals: Vec::new(),
+                    body: Vec::new(),
+                    labels: 0,
+                    scope: 0,
+                    loops: Vec::new(),
+                }
+                .lower()?,
+            );
         }
         il.push_str(".end\n");
     }

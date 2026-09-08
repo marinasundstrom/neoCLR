@@ -436,4 +436,11 @@ that interface; the declaration adds no ordinary record method. Run
 `cargo run --locked -- run examples/source/explicit-interfaces.neo` for two interfaces
 with the same signature and different implementations. See
 [explicit implementations](explicit-interfaces.md) for mapping, inheritance and
-.NET comparison details. Default interface bodies remain planned.
+.NET comparison details. [Default interface bodies](default-interface-implementations.md) are now supported.
+
+Interface methods can now provide bodies, and derived interfaces can replace or
+reabstract a base declaration with `func BaseInterface.Member` or
+`abstract func BaseInterface.Member`. Invoke defaults through interface references;
+they do not become ordinary record methods. Run
+`cargo run --locked -- run examples/source/default-interfaces.neo` for a readonly
+default calling an explicit implementation on frame and heap owners.

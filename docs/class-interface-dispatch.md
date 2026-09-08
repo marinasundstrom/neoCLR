@@ -82,6 +82,6 @@ results. Class member hiding remains rejected.
 ## Following slices
 
 [Explicit interface implementations](explicit-interfaces.md) are now implemented.
-Default interface implementations remain planned separately, with class-versus-interface
-precedence, diamond ambiguity and reabstraction rules still to be decided. See the
-[interface implementation plan](reflection-hierarchy-plan.md).
+[Default interface implementations](default-interface-implementations.md) now add
+fallback selection, most-specific replacements and reabstraction while preserving
+class mapping precedence. See the [library/interface plan](reflection-hierarchy-plan.md).

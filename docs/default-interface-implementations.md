@@ -1,16 +1,16 @@
 # Default interface implementation contract
 
-Contract and executable .NET comparison completed 2026-09-08. **Default bodies are
-not yet implemented in neoCLR or Neo.** This document specifies the next implementation
-slice after [explicit interface mappings](explicit-interfaces.md); examples below are
-proposed syntax, not runnable Neo samples.
+Implemented 2026-09-08 in the runtime, IL and Neo, following the pinned .NET
+comparison and [explicit interface mappings](explicit-interfaces.md). The runnable
+[default-interface sample](../examples/source/default-interfaces.neo) returns 42
+through readonly frame and heap views.
 
 The use case is shared behavior expressed entirely through a capability's members,
 without requiring a common class base or repeating forwarding methods. A default
 must work on the original frame or heap owner through a managed interface view.
 It must not allocate interface storage, copy the owner or impose Object ancestry.
 
-## Preferred contract
+## Implemented contract
 
 A public interface method may have a body. A bodyless declaration remains abstract.
 A derived interface may explicitly implement a base interface member using the same
@@ -18,7 +18,6 @@ qualified declaration syntax as records. It may explicitly reabstract that membe
 removing the inherited fallback for types implementing the derived interface.
 
 ```swift
-// Proposed, not implemented syntax.
 interface Readable {
     readonly func Read() -> int
     readonly func IsZero() -> bool { return this.Read() == 0 }
@@ -51,7 +50,9 @@ Selection for one closed declaration and one complete concrete owner proceeds as
    declaration order, traversal order or the interface spelling at the call site.
 4. A concrete type must have a valid result for every required contract. A class body
    may resolve an otherwise ambiguous default diamond. Abstract types may defer
-   implementation, but cannot make an invalid concrete descendant instantiable.
+   a reabstracted replacement, but cannot make an invalid concrete descendant
+   instantiable. The existing rule for an original bodyless contract is unchanged:
+   an abstract record must declare or inherit a matching abstract class member.
 
 Defaults must not cause ordinary class lookup to invent inherited methods. An interface
 reference is required. Inherited class conformance remains anchored: merely adding a
@@ -81,28 +82,34 @@ complete-owner GC roots. Do not prolong a frame's lifetime to make a return lega
 Raw native pointer interface views stay excluded from default execution in the first
 slice; existing pointer-backed class-body dispatch retains its current restrictions.
 
-## Groundwork found in the implementation
+## Runtime integration and metadata
 
-The audit identifies specific changes, rather than a need for a second runtime model:
+Interface membership and bodylessness are now separate checks. The verifier analyzes
+executable interface bodies; closed call graphs include selected defaults and their
+callees. Reflection reports IsAbstract only for bodyless/reabstracted members and
+preserves interface declaring owners. Debugger frames and source points name the
+executed interface body and expose its original managed receiver. Host invocation of
+interface bodies remains restricted; use a guest interface call.
 
-| Area | Current behavior | Required change |
-| --- | --- | --- |
-| interfaces.rs | `is_contract` means any interface-owned method; bodies are rejected | Separate interface membership from abstract/bodyless status; validate bodies and qualified interface overrides |
-| metadata.rs / vm.rs | `argument_types` describes Interface&; Frame already accepts SlotInterface | Enter defaults with that view instead of projecting to a record body owner |
-| interfaces.rs mapping | Missing and invalid class mappings both return faults | Represent absence separately so fallback cannot hide an invalid contract |
-| inheritance.rs | Abstract/override validation assumes record owners | Route interface reabstraction/replacement through interface rules |
-| verifier.rs | All interface-owned functions are skipped | Analyze executable interface bodies, including readonly and output flow |
-| reachability.rs / program.rs | Interface-owned functions are treated as non-executable | Include selected bodies and their callees in closed graphs; keep arbitrary host entry into interface bodies restricted |
-| reflection.rs | Every interface member reports IsAbstract | Report bodyless/reabstracted versus executable members accurately; retain interface declaring owners |
-| frontend.rs | Interface methods parse as declarations only | Parse/lower bodies and qualified replacements; type `this` as an interface view with no record fields |
+Function.interface_implementations also maps qualified replacements on interface
+owners. Those bodies are private implementation members and cannot be used directly
+as callvirt contracts; calls name the original public declaration. Record mappings
+remain concrete and nonvirtual; interface replacements may be reabstracted. All
+replacement receiver, parameter, return and output contracts must match.
 
-Reuse Function.interface_implementations for qualified interface replacements if its
-validation can distinguish record and interface owners cleanly. Do not encode the
-mapping in a body name. Preserve old bodyless artifacts: an omitted abstract flag on
-an existing empty interface declaration must not accidentally create an executable
-method. Choose a canonical abstract/body representation during implementation and test
-old serialized fixtures. This remains a validation detail, not permission to infer
-ordinary class abstractness from an empty body.
+A public interface method with instructions and a managed receiver is executable.
+A bodyless interface declaration remains abstract even when its serialized is_abstract
+flag is absent/false, preserving old artifacts. Neo emits the explicit abstract flag
+for declarations/reabstractions; an empty Void source body emits ldvoid/ret and stays
+executable. Explicit abstract methods cannot contain instructions. Bodyless members
+cannot have locals or native bindings. No new opcode, receiver representation or
+System descriptor layout is introduced.
+
+Class mapping now returns absence separately from invalid contracts. Only absence
+permits default fallback. Runtime frame entry uses the existing SlotInterface rather
+than projecting the receiver to a record body owner. Readonly checks apply on entry;
+output completion is checked at runtime return, as for existing class bodies. The
+verifier does not yet prove every output-parameter assignment path.
 
 ## .NET evidence and alternatives
 
@@ -137,31 +144,34 @@ behavior in .NET or establish neoCLR's receiver safety. Those are implementation
 required below, not conclusions from the comparison. No CoreCLR source/layout or JIT
 optimization claim is made.
 
-## Implementation acceptance and library use
+## Validation, use and remaining scope
 
-Before enabling syntax, implement and test selection plus receiver entry together.
-Cover source, raw IL and serialized artifacts: class precedence; nested defaults calling
-explicit members; identical versus competing diamonds; reabstraction; generic closed
-selection/collisions; private/inaccessible bodies; readonly violations; output assignment;
-invalid frame escape; heap collection pressure; and complete-owner identity. Run negative
-cases without prior verification. Closed graphs must include defaults and their dynamic
-callees without omitting unresolved generic targets. Debugger stacks/source locations
-must name the executed interface body. Reflection must distinguish an abstract contract
-from a default body without synthesizing class member rows.
-
-Start with a small capability demonstration whose default calls a required member.
-Then evaluate a collection convenience such as IsEmpty derived from Count, keeping
-familiar property APIs in the library. Add it only where a real collection consumer
-benefits. Reflection capability defaults should follow an actual shared behavior need;
-MemberInfo's shared storage is already served by class inheritance. GetInterfaceMap,
-additional accessor declaration syntax and broad framework expansion remain separate.
-
-Run the comparison, including expected compiler failures:
+Tests cover Neo and serialized roundtrips, readonly frame/heap dispatch, nested calls
+to explicit class implementations, class precedence, competing/resolved diamonds,
+reabstraction, inherited/redeclared conformance, generic closed targets, output checks,
+readonly failures without verification, frame escape, heap pressure and reference
+identity. Debugger tests stop in a default and step into its explicit callee; fault
+traces preserve the selected body and source line. Existing interface, explicit-mapping
+and class-dispatch regressions remain applicable.
 
 ```sh
+cargo run --locked -- run examples/source/default-interfaces.neo --gc-stats
+cargo test --locked --test default_interfaces --test debugger
 python3 docs/experiments/default-interfaces-dotnet/verify.py
 ```
 
-The script requires SDK 10.0.100, selects it using the probe directory's global.json,
-and prints the actual runtime version. Build outputs stay ignored. The comparison
-is executable evidence for this contract slice; it does not enable defaults in Neo.
+The comparison script requires SDK 10.0.100, selects it through the probe directory's
+global.json and prints the actual runtime version (10.0.0 in the recorded run). It
+checks positive behavior and three expected compiler rejections. Build outputs remain
+ignored. The class-based .NET probe does not establish Neo's frame-value safety.
+
+New artifacts with default bodies or interface replacements require this runtime.
+Recompile sources against the matching revision. Existing bodyless interfaces retain
+their behavior, and defaults do not add methods to implementing class metadata.
+
+The next library work should apply this to a real capability, such as deriving a
+collection's IsEmpty property from Count. Preserve familiar property APIs rather than
+adding method-shaped substitutes merely for the demo. GetInterfaceMap, broader Neo
+property/indexer declaration syntax, default base calls, static virtual members,
+interface state and method hiding remain separate work. Defaults add shared behavior;
+MemberInfo's shared storage remains appropriately served by class inheritance.

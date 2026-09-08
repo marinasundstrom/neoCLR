@@ -33,8 +33,8 @@ are now implemented. [Constructor chaining](constructor-chaining.md) and the
 [MemberInfo descriptor hierarchy](reflection-hierarchy.md) exercise these foundations.
 [Inherited class interface implementations and virtual override selection](class-interface-dispatch.md)
 and [explicit interface implementations](explicit-interfaces.md) are implemented.
-The [default-interface contract and comparison](default-interface-implementations.md)
-are recorded; runtime/Neo implementation is next;
+[Default interface bodies](default-interface-implementations.md) now execute in the
+runtime and Neo. Applying them to a useful library capability is next;
 see the [reflection/interface plan](reflection-hierarchy-plan.md). Activation ownership, external roots and cleanup need decisions before
 escaping callbacks or suspension.
 

@@ -1,0 +1,13 @@
+interface Readable {
+    readonly func Read() -> int
+    readonly func Twice() -> int { return this.Read() + this.Read() }
+}
+record Counter(Value: int): Readable {
+    readonly func Readable.Read() -> int { return this.Value }
+}
+func Main() -> int {
+    var local = Counter(10)
+    let localView: readonly Readable& = &local
+    let heapView: readonly Readable& = new Counter(11)
+    return localView.Twice() + heapView.Twice()
+}

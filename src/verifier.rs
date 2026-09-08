@@ -47,7 +47,7 @@ pub(crate) fn analyze(module: &Module) -> Result<Verification, Fault> {
         if function.is_abstract
             || function.is_internal_call()
             || function.pinvoke.is_some()
-            || crate::interfaces::is_contract(module, function)
+            || crate::interfaces::is_bodyless(module, function)
         {
             continue;
         }

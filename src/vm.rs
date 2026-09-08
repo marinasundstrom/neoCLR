@@ -531,7 +531,9 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         }
         if crate::interfaces::is_contract(module, function) {
             crate::interfaces::validate_contract(function)?;
-            continue;
+            if crate::interfaces::is_bodyless(module, function) {
+                continue;
+            }
         }
         if function.is_abstract {
             continue;
@@ -638,7 +640,8 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                         return Err(Fault::new("abstract methods require virtual dispatch"));
                     }
                     if (crate::interfaces::is_contract(module, &callee)
-                        && !matches!(op, Op::CallVirtual(_)))
+                        && (!matches!(op, Op::CallVirtual(_))
+                            || !callee.interface_implementations.is_empty()))
                         || (matches!(op, Op::CallVirtual(_))
                             && !crate::interfaces::is_contract(module, &callee)
                             && !callee.is_virtual)
@@ -1635,7 +1638,12 @@ fn interpret_instructions(
                     let receiver = match storage {
                         Ok(slot) => {
                             slot.assigned()?;
-                            if callee.receiver_byref {
+                            if crate::interfaces::is_contract(module, &callee) {
+                                Value::SlotInterface {
+                                    interface: callee.owner.clone().unwrap(),
+                                    receiver: slot,
+                                }
+                            } else if callee.receiver_byref {
                                 let owner = callee.owner.as_ref().unwrap();
                                 let slot = if slot.target() != owner {
                                     slot.dispatch_view(module, owner)?
@@ -1648,7 +1656,9 @@ fn interpret_instructions(
                             }
                         }
                         Err(pointer) => {
-                            if callee.receiver_byref {
+                            if callee.receiver_byref
+                                || crate::interfaces::is_contract(module, &callee)
+                            {
                                 return Err(Fault::new(
                                     "byref interface receiver requires a managed slot view",
                                 ));

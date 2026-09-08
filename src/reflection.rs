@@ -416,7 +416,7 @@ fn method(
             Value::Boolean(f.receiver_readonly),
             Value::Boolean(f.is_virtual || crate::interfaces::is_contract(module, f)),
             Value::Boolean(f.is_override),
-            Value::Boolean(f.is_abstract || crate::interfaces::is_contract(module, f)),
+            Value::Boolean(crate::interfaces::is_bodyless(module, f)),
         ],
     ))
 }

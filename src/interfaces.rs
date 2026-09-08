@@ -22,17 +22,29 @@ pub(crate) fn is_contract(module: &Module, function: &Function) -> bool {
         .is_some_and(|d| d.representation == Representation::Interface)
 }
 
+pub(crate) fn is_bodyless(module: &Module, function: &Function) -> bool {
+    function.is_abstract || (is_contract(module, function) && function.body.is_empty())
+}
+
 pub(crate) fn validate_contract(function: &Function) -> Result<(), Fault> {
+    let explicit = !function.interface_implementations.is_empty();
     if !function.instance
-        || function.visibility != Visibility::Public
+        || function.visibility
+            != if explicit {
+                Visibility::Private
+            } else {
+                Visibility::Public
+            }
         || function.name.ends_with(".ctor")
-        || !function.body.is_empty()
-        || !function.locals.is_empty()
         || function.impl_flags != 0
         || function.pinvoke.is_some()
+        || function.is_override
+        || (function.body.is_empty() && !function.locals.is_empty())
+        || (function.is_abstract && !function.body.is_empty())
+        || (!function.body.is_empty() && !function.receiver_byref)
     {
         return Err(Fault::new(
-            "interface members must be public instance declarations without bodies, locals or native bindings",
+            "invalid interface declaration, default body or explicit replacement",
         ));
     }
     Ok(())
@@ -101,7 +113,11 @@ fn declared(module: &Module, concrete: &Type, interface: &Type) -> Result<(), Fa
     Ok(())
 }
 
-fn member(module: &Module, concrete: &Type, contract: &Function) -> Result<Function, Fault> {
+fn member(
+    module: &Module,
+    concrete: &Type,
+    contract: &Function,
+) -> Result<Option<Function>, Fault> {
     // An inherited mapping is anchored at the class that declares conformance.
     // A repeated declaration remaps from that class, including inherited members.
     let chain = if module
@@ -187,14 +203,14 @@ fn member(module: &Module, concrete: &Type, contract: &Function) -> Result<Funct
             }
         }
     }
-    let implementation =
-        selected.ok_or_else(|| Fault::new("interface implementation member not found"))?;
-    check_signature(module, &implementation, contract, explicit)?;
-    Ok(implementation)
+    if let Some(implementation) = &selected {
+        check_signature(module, implementation, contract, explicit)?;
+    }
+    Ok(selected)
 }
 
 fn check_signature(
-    module: &Module,
+    _module: &Module,
     implementation: &Function,
     contract: &Function,
     explicit: bool,
@@ -234,7 +250,6 @@ fn check_signature(
         || (!explicit && implementation.visibility != Visibility::Public)
         || implementation.is_internal_call()
         || implementation.pinvoke.is_some()
-        || is_contract(module, implementation)
     {
         return Err(Fault::new(
             "interface implementation requires matching IL receiver, parameter and return contracts",
@@ -260,14 +275,16 @@ pub(crate) fn ensure_implementation(
                 .as_ref()
                 .and_then(|ty| module.type_definition(ty))
                 .is_some_and(|d| std::ptr::eq(d, definition))
+                && method.interface_implementations.is_empty()
             {
                 let contract =
                     method.map_types(|ty| ty.substitute_type_parameters(arguments(&inherited)))?;
-                let implementation = member(module, concrete, &contract)?;
+                let implementation = select(module, concrete, &contract)?;
                 if !module
                     .type_definition(concrete)
                     .is_some_and(|d| d.is_abstract)
                     && implementation.is_virtual
+                    && !is_contract(module, &implementation)
                 {
                     crate::inheritance::dispatch(module, concrete, &implementation)?;
                 }
@@ -284,15 +301,90 @@ pub(crate) fn implementation(
     contract: &Function,
 ) -> Result<Function, Fault> {
     declared(module, concrete, interface)?;
-    if !is_contract(module, contract) || contract.owner.as_ref() != Some(interface) {
+    if !is_contract(module, contract)
+        || contract.owner.as_ref() != Some(interface)
+        || !contract.interface_implementations.is_empty()
+    {
         return Err(Fault::new("callvirt requires an interface member"));
     }
-    let mapped = member(module, concrete, contract)?;
-    if mapped.is_virtual {
+    let mapped = select(module, concrete, contract)?;
+    if is_bodyless(module, &mapped) && is_contract(module, &mapped) {
+        return Err(Fault::new(
+            "interface member has no concrete implementation",
+        ));
+    }
+    if mapped.is_virtual && !is_contract(module, &mapped) {
         crate::inheritance::dispatch(module, concrete, &mapped)
     } else {
         Ok(mapped)
     }
+}
+
+fn select(module: &Module, concrete: &Type, contract: &Function) -> Result<Function, Fault> {
+    if let Some(body) = member(module, concrete, contract)? {
+        return Ok(body);
+    }
+    let mut candidates = vec![contract.clone()];
+    for interface in closure(module, concrete)? {
+        for method in &module.functions {
+            if !method
+                .owner
+                .as_ref()
+                .and_then(|t| module.type_definition(t))
+                .zip(module.type_definition(&interface))
+                .is_some_and(|(a, b)| std::ptr::eq(a, b))
+            {
+                continue;
+            }
+            let body = method.map_types(|t| t.substitute_type_parameters(arguments(&interface)))?;
+            for target in &body.interface_implementations {
+                let declaration = crate::vm::resolve(module, target)?;
+                if declaration.definition == contract.definition
+                    && declaration.owner == contract.owner
+                    && !candidates
+                        .iter()
+                        .any(|c| c.definition == body.definition && c.owner == body.owner)
+                {
+                    candidates.push(body.clone());
+                }
+            }
+        }
+    }
+    let mut remaining = Vec::new();
+    for candidate in &candidates {
+        let mut dominated = false;
+        for other in &candidates {
+            if candidate.owner != other.owner
+                && closure(module, other.owner.as_ref().unwrap())?
+                    .contains(candidate.owner.as_ref().unwrap())
+            {
+                dominated = true;
+                break;
+            }
+        }
+        if !dominated {
+            remaining.push(candidate);
+        }
+    }
+    if remaining.len() != 1 {
+        return Err(Fault::new("ambiguous default interface implementation"));
+    }
+    let selected = remaining[0];
+    if is_bodyless(module, selected)
+        && !module
+            .type_definition(concrete)
+            .is_some_and(|d| d.is_abstract)
+    {
+        return Err(Fault::new(
+            "interface implementation member not found or reabstracted",
+        ));
+    }
+    // Existing abstract records must still supply an explicit abstract class contract
+    // when no interface default or replacement participates.
+    if is_bodyless(module, selected) && candidates.len() == 1 {
+        return Err(Fault::new("interface implementation member not found"));
+    }
+    Ok(selected.clone())
 }
 
 fn flags<T: Ord + Copy>(values: &[T]) -> std::collections::BTreeSet<T> {
@@ -312,13 +404,16 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
         let definition = module
             .type_definition(owner)
             .ok_or_else(|| Fault::new("unknown explicit implementation owner"))?;
-        if definition.representation != Representation::Record
-            || !body.instance
+        let interface_owner = definition.representation == Representation::Interface;
+        if !matches!(
+            definition.representation,
+            Representation::Record | Representation::Interface
+        ) || !body.instance
             || !body.receiver_byref
             || body.visibility != Visibility::Private
-            || body.is_virtual
+            || (body.is_virtual && !interface_owner)
             || body.is_override
-            || body.is_abstract
+            || (body.is_abstract && !interface_owner)
             || body.name.ends_with(".ctor")
             || body.is_internal_call()
             || body.pinvoke.is_some()
@@ -329,7 +424,7 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
         }
         for target in &body.interface_implementations {
             let contract = crate::vm::resolve(module, target)?;
-            if !is_contract(module, &contract) {
+            if !is_contract(module, &contract) || !contract.interface_implementations.is_empty() {
                 return Err(Fault::new(
                     "explicit implementation must map an interface declaration",
                 ));
@@ -370,11 +465,12 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             for interface in inherited {
                 let owner = interface_definition(module, &interface)?;
                 for method in &module.functions {
-                    if !method
-                        .owner
-                        .as_ref()
-                        .and_then(|ty| module.type_definition(ty))
-                        .is_some_and(|d| std::ptr::eq(d, owner))
+                    if !method.interface_implementations.is_empty()
+                        || !method
+                            .owner
+                            .as_ref()
+                            .and_then(|ty| module.type_definition(ty))
+                            .is_some_and(|d| std::ptr::eq(d, owner))
                     {
                         continue;
                     }

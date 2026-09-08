@@ -25,16 +25,12 @@ a provisional reimplementation edge difference; see the implementation compariso
 
 ## Default interface implementations
 
-The [default interface contract](default-interface-implementations.md) is now recorded
-with a pinned .NET probe, negative compilation checks and a runtime groundwork audit.
-It chooses class precedence, most-specific default selection, explicit diamond failures,
-reabstraction and an interface-view receiver retaining the original owner. Default
-bodies are not yet enabled. Implement selection, validation and receiver entry together,
-then wire Neo, reflection, closed analysis and debugger coverage as specified there.
-
-Use a real library capability once shared behavior is needed; do not introduce a
-reflection interface merely to demonstrate a default. The first implementation demo
-should exercise a default calling a required member on frame and heap owners.
+[Default interface bodies](default-interface-implementations.md) are now implemented,
+including class precedence, most-specific selection, explicit diamond errors,
+reabstraction and original-owner interface receivers. Neo, reflection, closed analysis
+and debugger tests cover the feature. Apply defaults to a real runtime-library
+capability next, with familiar property APIs where appropriate. Do not introduce a
+reflection interface merely to demonstrate a default.
 
 The .NET comparison starts with
 [MemberInfo](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.memberinfo?view=net-10.0)

@@ -86,7 +86,7 @@ pub(crate) fn analyze(
     let mut nodes = Vec::new();
     while nodes.len() < functions.len() {
         let function = functions[nodes.len()].clone();
-        if function.is_abstract || crate::interfaces::is_contract(module, &function) {
+        if function.is_abstract || crate::interfaces::is_bodyless(module, &function) {
             return Err(crate::Fault::new(
                 "an abstract declaration is not an executable graph root",
             ));

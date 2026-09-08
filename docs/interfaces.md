@@ -2,8 +2,8 @@
 
 The [library-focused next preview](library-preview.md) prioritizes shared type
 relationships, interface inheritance and class inheritance to support useful library
-contracts and their Neo projection. [Interface inheritance](interface-inheritance.md) is now implemented; class inheritance
-remains planned.
+contracts and their Neo projection. [Interface inheritance](interface-inheritance.md)
+and [class inheritance/dispatch](class-dispatch.md) are now implemented.
 
 Neo now [declares interfaces and projects managed references](neo-interfaces.md)
 using ordinary names without an `I` prefix.
@@ -161,3 +161,7 @@ SlotReferences; the latter covers the managed operand path.
 See the [managed slot-reference contracts](reference-slots.md) for implemented
 reference parameters, output assignment and explicit reference receivers, and the
 [Raven-like pseudocode guide](references-in-pseudocode.md) for their language projection.
+
+[Default interface bodies](default-interface-implementations.md) now provide shared
+behavior through managed views, with class precedence and most-specific selection.
+They do not add ordinary methods to implementing classes.

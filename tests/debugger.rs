@@ -372,3 +372,33 @@ fn constructor_frames_show_shared_unpublished_storage() {
     debugger.command(DebugCommand::Stop).unwrap();
     worker.join().unwrap();
 }
+
+#[test]
+fn default_interface_breakpoint_shows_original_receiver_and_steps_into_explicit_body() {
+    let module = frontend::compile_named(
+        include_str!("../examples/source/default-interfaces.neo"),
+        "defaults.neo",
+    )
+    .unwrap();
+    let (debugger, worker) = launch(module, Limits::default());
+    debugger
+        .command(DebugCommand::Break(Breakpoint::Instruction {
+            function: "Readable.Twice".into(),
+            instruction: 0,
+        }))
+        .unwrap();
+    let stopped = act(&debugger, DebugCommand::Continue);
+    assert_eq!(stopped.frames[0].function, "Readable.Twice");
+    assert!(stopped.frames[0].source.is_some());
+    assert!(stopped.frames[0].arguments[0].1.value.contains("frame#"));
+    let mut snapshot = stopped;
+    for _ in 0..10 {
+        snapshot = act(&debugger, DebugCommand::Step);
+        if snapshot.frames[0].function == "Counter.Readable.Read" {
+            break;
+        }
+    }
+    assert_eq!(snapshot.frames[0].function, "Counter.Readable.Read");
+    debugger.command(DebugCommand::Stop).unwrap();
+    worker.join().unwrap();
+}

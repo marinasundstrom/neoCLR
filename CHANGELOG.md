@@ -10,10 +10,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 #### Added
 
-- Planned default-interface contract with class precedence, most-specific selection,
-  diamond ambiguity, reabstraction and managed interface-view receiver rules. Added a
-  runtime groundwork audit and pinned .NET positive/negative probes. This is design
-  and executable comparison work; default interface bodies remain unimplemented.
+- Default interface bodies now execute in runtime/IL and Neo with class precedence,
+  most-specific selection, diamond ambiguity checks, qualified replacements and
+  reabstraction. Managed interface receivers retain original owners and readonly/output
+  checks; verification, reflection, closed graphs, debugger/source traces, samples and
+  tests cover defaults. Includes the contract audit and pinned .NET comparison probes.
+  New body/replacement artifacts require this runtime; existing bodyless interfaces
+  remain compatible. Output completion retains the existing runtime return check.
 
 - Explicit interface implementations via runtime declaration-to-body mappings, IL
   .override directives and Neo `func Interface.Member` bodies. Added inherited and
