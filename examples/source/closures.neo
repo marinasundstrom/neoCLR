@@ -1,0 +1,20 @@
+import System.Console.*
+
+func MakeCounter(start: int) -> System.Func<int> {
+    var value = start
+    return () => {
+        value = value + 1
+        return value
+    }
+}
+
+func Main() -> int {
+    var total = 0
+    let values: int[3] = [10, 20, 10]
+    System.Array.ForEach<int>(&values, value => { total = total + value })
+    let counter = MakeCounter(total)
+    WriteLine(counter())
+    let result = counter()
+    WriteLine(result)
+    return result
+}

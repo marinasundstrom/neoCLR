@@ -32,7 +32,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   results instead of a separate Action family; Array.ForEach consumes Func<T,Void>.
   Added samples, grammar synchronization and regression coverage. New delegate
   artifacts require this runtime; Rust exhaustive enum matches need updating.
-  Scoped captures, lambdas, multicast, variance and nullable metadata remain later
+  Neo now lowers contextual lambdas to existing delegates and generated managed
+  capture cells/environments, sharing mutable bindings across returned/nested closures
+  and using fresh range-loop captures. Heap-reference validation remains enforced;
+  out, uninitialized-local and constructor-this captures are rejected. Added a runnable
+  closure sample, synchronized grammar, debugger/GC/lifetime tests and .NET capture
+  probes. Generated neoCLR.Compiler names are reserved; captured storage incurs
+  additional heap allocations. Natural lambda inference, stack-only closures,
+  multicast, variance and nullable metadata remain later
   work. Aligned platform/Neo roadmaps and the compiler inference role.
 
 - Generic free functions and static methods across runtime/IL and Neo, with independent

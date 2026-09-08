@@ -75,8 +75,12 @@ are unsupported. Free functions and static methods accept generic parameters. Ru
 ## Expressions
 
 ```ebnf
-expression       = logical_or, { "match", newlines, "{", separators,
+expression       = lambda | logical_or, { "match", newlines, "{", separators,
                    [ match_arm, { arm_separator, match_arm }, [ arm_separator ] ], "}" } ;
+lambda           = (identifier | "(", newlines, [ lambda_parameter,
+                   { ",", newlines, lambda_parameter } ], newlines, ")"),
+                   "=>", newlines, (expression | block) ;
+lambda_parameter = identifier, [ ":", type ], newlines ;
 match_arm        = pattern, "=>", newlines, (expression | block) ;
 pattern          = "_" | identifier, [ "(", ("let", identifier | "_"), ")" ] ;
 arm_separator    = ("," | newline), separators ;
@@ -320,4 +324,4 @@ an immediate invocation is accepted in a delegate construction argument or where
 expected delegate type supplies context (parameters, typed bindings and returns).
 Delegate-valued expressions support `callback(args)`, including fields and returned
 callables; `value.Invoke(args)` also works through managed references. Custom source declarations are nongeneric in this slice; bundled
-generic Func and generic IL declarations are supported. Lambda syntax remains planned. See [delegates](delegates.md).
+generic Func and generic IL declarations are supported. Lambdas require an expected delegate type; captures use shared managed storage. See [delegates](delegates.md).

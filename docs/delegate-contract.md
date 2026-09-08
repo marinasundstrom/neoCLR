@@ -9,7 +9,7 @@ groundwork evidence, not a delegate implementation.
 
 Delegates are the platform's shared callable abstraction. Keep CLR/.NET behavior
 unless a documented simplification fits neoCLR's existing model. Functions remain
-definitions; future language lambdas build on delegates and captured environments.
+definitions; Neo lambdas build on delegates and captured environments.
 
 The pinned [SDK 10.0.100/net10.0 probe](experiments/delegates-dotnet/Program.cs) checks
 static and closed generic targets, shared class receivers, copied struct receivers,
@@ -32,7 +32,7 @@ Primary sources consulted 2026-09-08:
   model allows them, so Func<T,Void> replaces Action<T>. The benefit is one callback
   family; the cost is an explicit API migration and no direct CLR signature match.
 - [C# lambda expressions](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/lambda-expressions):
-  captured outer variables provide the behavioral baseline for future closures.
+  captured outer variables provide the behavioral baseline for closures.
   Compiler-generated shared environments are the chosen direction, not implemented
   lambda support.
 - [ldvirtftn](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.ldvirtftn?view=net-10.0):
@@ -113,3 +113,47 @@ New Delegate representation and delegate.bind artifacts require this runtime; ex
 artifacts remain compatible. Rust consumers exhaustively matching Representation,
 Instruction or Value need new cases. Reachability adds binding/indirect-site fields.
 Neo reserves delegate; its standalone grammar is synchronized with the current guide.
+
+## Closure lowering
+
+Implemented in Neo on 2026-09-08. The C# expressions specification (§12.22.6)
+provides the language baseline: lambdas capture outer variables, multiple delegates
+can share a variable, and its lifetime extends beyond the declaring call. C# rejects
+capturing ref/out/in parameters. The pinned .NET probe now also checks shared mutation,
+returned captures and fresh foreach bindings. These are language behaviors, not a
+requirement for a new CLI instruction or a particular environment layout.
+
+Neo adopts shared-binding semantics with generated IL methods and managed objects,
+using the existing delegate.bind, field access, heap.new and GC contracts. Each
+captured binding gets a typed cell at initialization; environments reference those
+cells. Early lifting preserves address identity even before a lambda is evaluated.
+Only cells needed by a lambda are retained in its environment. Neo's range `for`
+introduces a fresh iteration binding, matching the foreach case in the probe.
+
+A value snapshot would be simpler but would hide subsequent outer assignments.
+A scope-wide environment can reduce allocations but complicates incremental compiler
+lowering and may retain unrelated captures. Per-binding cells are the preliminary
+choice: explicit sharing is easy to validate, at the cost of extra allocations and
+indirection. No performance improvement is claimed. A future optimization can change
+layout without changing the shared-binding contract. Stack-only environments and
+escape analysis are deferred; this implementation allocates captured storage even
+when a lambda branch is never taken.
+
+Unlike C# ref parameters, Neo's ordinary T& parameters are reference-valued inputs.
+Capturing one therefore stores that reference in a heap cell: runtime composite-store
+validation accepts heap-backed references and rejects frame-backed ones. It does not
+promote the referent. Out captures and constructor-this captures are rejected by Neo;
+the runtime independently prevents storing unpublished/frame-backed references.
+Uninitialized captured locals are also rejected in this bounded compiler rather than
+adding definite-assignment analysis or invalid default capture fields. Parameter and
+local values captured by a lambda have managed storage, a deliberate language choice
+that can extend their lifetime. Ordinary instance method-group binding retains its
+existing no-copy/no-promotion rule.
+
+No opcode, metadata capability or GC algorithm changes are needed. Generated methods
+retain source positions; the debugger currently exposes their implementation names
+and cells. Optimized capture views, debugger reconstruction, delegate equality APIs,
+multicast and nullable captures need separate validation. Runtime limits account for
+these extra objects. Regression tests cover shared addresses, generic/nested helpers,
+iteration freshness, heap/frame references, collection of closure cycles, artifact
+roundtrips and stepping through original source.

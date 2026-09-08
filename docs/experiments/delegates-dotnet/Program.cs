@@ -9,6 +9,16 @@ static class Probe
         catch (ArgumentException) { }
         Func<int, int> identity = Identity<int>;
         Check(identity(42) == 42 && identity.Target is null, "static and closed generic target");
+        int captured = 1;
+        Action<int> add = amount => captured += amount;
+        Func<int> readCapture = () => captured;
+        captured = 40;
+        add(2);
+        Check(readCapture() == 42, "closures share mutable binding storage");
+        Check(MakeClosure(42)() == 42, "returned closure retains captured parameter");
+        var readers = new List<Func<int>>();
+        foreach (int item in new[] { 0, 1, 2 }) readers.Add(() => item);
+        Check(readers[0]() == 0 && readers[1]() == 1 && readers[2]() == 2, "foreach capture is fresh per iteration");
         var owner = new Counter { Value = 1 };
         Func<int> shared = owner.Next;
         owner.Value = 40;
@@ -42,8 +52,9 @@ static class Probe
         var weak = ExerciseRetainedTarget();
         Collect();
         Check(!weak.IsAlive, "released delegate releases target root");
-        Console.WriteLine("Delegate binding, identity, receiver copy, ref contracts, multicast and GC probes passed.");
+        Console.WriteLine("Delegate binding, identity, receiver copy, ref contracts, shared/escaping captures, multicast and GC probes passed.");
     }
+    static Func<int> MakeClosure(int value) => () => value;
     static T Identity<T>(T value) => value;
     static void Set(out int value) { value = 42; }
     static int Read(in int value) => value;

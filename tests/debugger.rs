@@ -454,3 +454,51 @@ func Main() -> int {
         worker.join().unwrap();
     }
 }
+
+#[test]
+fn closure_step_uses_lambda_source_and_exposes_capture_heap() {
+    let source = "delegate Reader() -> int\nfunc Main() -> int {\n var value = 42\n let callback: Reader = () => value\n let result = callback()\n return result\n}";
+    let module = frontend::compile_named(source, "closures.neo").unwrap();
+    let main = module.functions.iter().find(|f| f.name == "Main").unwrap();
+    let pc = main
+        .body
+        .iter()
+        .position(|op| {
+            matches!(op,
+        neoclr::metadata::Instruction::Call(t) if t.name == "Reader.Invoke")
+        })
+        .unwrap();
+    for step in [true, false] {
+        let (debugger, worker) = launch(module.clone(), Limits::default());
+        debugger
+            .command(DebugCommand::Break(Breakpoint::Instruction {
+                function: "Main".into(),
+                instruction: pc,
+            }))
+            .unwrap();
+        let stopped = act(&debugger, DebugCommand::Continue);
+        assert_eq!(stopped.heap.len(), 2); // binding cell and closure environment
+        debugger.command(DebugCommand::ClearBreakpoints).unwrap();
+        if step {
+            let entered = act(&debugger, DebugCommand::Step);
+            assert!(
+                entered.frames[0]
+                    .function
+                    .starts_with("neoCLR.Compiler.Environment")
+            );
+            assert_eq!(entered.frames[0].source.as_ref().unwrap().line, 4);
+            assert_eq!(
+                entered.frames[0].source.as_ref().unwrap().document,
+                "closures.neo"
+            );
+            assert_eq!(entered.frames.len(), 2);
+            act(&debugger, DebugCommand::Out);
+        } else {
+            let next = act(&debugger, DebugCommand::Next);
+            assert_eq!(next.frames.len(), 1);
+            assert_eq!(next.frames[0].source.as_ref().unwrap().line, 6);
+        }
+        assert_eq!(act(&debugger, DebugCommand::Continue).status, "completed");
+        worker.join().unwrap();
+    }
+}

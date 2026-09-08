@@ -1,5 +1,6 @@
 //! Neo concept-language front end for exercising NeoCLR end to end.
 //! This is a separate experimental language subset, not a Raven compiler.
+mod closures;
 mod library;
 
 use crate::{Fault, Module};
@@ -386,12 +387,15 @@ impl Source {
     }
 }
 
+#[derive(Clone)]
 struct Expr {
     at: Token,
     kind: ExprKind,
     depth: usize,
 }
+#[derive(Clone)]
 enum ExprKind {
+    Lambda(Vec<(Token, Option<Ty>)>, Box<ArmBody>),
     Int(i32),
     String(String),
     Bool(bool),
@@ -410,18 +414,22 @@ enum ExprKind {
     NewArray(Ty, Box<Expr>, Vec<Expr>),
     Index(Box<Expr>, Box<Expr>),
 }
+#[derive(Clone)]
 enum Pattern {
     Wildcard(Token),
     Case(Token, Option<Option<Token>>), // None: no payload; Some(None): discarded payload.
 }
+#[derive(Clone)]
 struct Arm {
     pattern: Pattern,
     body: ArmBody,
 }
+#[derive(Clone)]
 enum ArmBody {
     Expression(Expr),
     Block(Vec<Stmt>),
 }
+#[derive(Clone)]
 enum Stmt {
     Bind {
         name: Token,
@@ -1136,6 +1144,63 @@ impl Parser {
         result
     }
     fn expression_inner(&mut self, minimum: u8) -> Result<Expr, Fault> {
+        let saved = self.position;
+        let lambda_at = self.current().clone();
+        let parameters = (|| -> Result<Vec<(Token, Option<Ty>)>, Fault> {
+            let mut parameters = Vec::new();
+            if self.eat("(") {
+                self.newlines();
+                if !self.at(")") {
+                    loop {
+                        let name = self.name()?;
+                        if parameters
+                            .iter()
+                            .any(|(t, _): &(Token, Option<Ty>)| t.text == name.text)
+                        {
+                            return Err(name.error("duplicate lambda parameter"));
+                        }
+                        let ty = if self.eat(":") {
+                            Some(self.ty()?)
+                        } else {
+                            None
+                        };
+                        parameters.push((name, ty));
+                        if parameters.len() > 1024 {
+                            return Err(lambda_at.error("lambda parameter limit exceeded"));
+                        }
+                        self.newlines();
+                        if !self.eat(",") {
+                            break;
+                        }
+                        self.newlines();
+                    }
+                }
+                self.expect(")")?;
+            } else {
+                parameters.push((self.name()?, None));
+            }
+            self.expect("=>")?;
+            Ok(parameters)
+        })();
+        if let Ok(parameters) = parameters {
+            self.newlines();
+            let body = if self.at("{") {
+                ArmBody::Block(self.block()?)
+            } else {
+                ArmBody::Expression(self.expression(0)?)
+            };
+            let depth = match &body {
+                ArmBody::Expression(e) => e.depth + 1,
+                _ => 1,
+            };
+            return self.node(
+                lambda_at,
+                ExprKind::Lambda(parameters, Box::new(body)),
+                depth,
+            );
+        }
+        self.position = saved;
+
         let at = self.take();
         let mut left = if at.text == "[" {
             self.newlines();
@@ -1462,6 +1527,8 @@ fn infer_parameters(
 
 #[derive(Clone)]
 struct Binding {
+    // IL that loads the shared heap cell; reads and addresses use its Value field.
+    cell: Option<String>,
     ty: Ty,
     mutable: bool,
     load: String,
@@ -1470,6 +1537,11 @@ struct Binding {
 }
 #[derive(Clone)]
 struct Lowerer<'a> {
+    generated: Vec<String>,
+    captures: std::collections::HashSet<closures::Key>,
+    // Synthetic instance methods use their environment owner's generic context.
+    type_parameters: Vec<String>,
+    lambda: bool,
     // Shared by speculative clones; source expression nodes outlive this lowering.
     inferred_calls: std::rc::Rc<std::cell::RefCell<HashMap<usize, Vec<Ty>>>>,
     document: &'a str,
@@ -1484,6 +1556,181 @@ struct Lowerer<'a> {
     loops: Vec<(String, String)>,
 }
 impl Lowerer<'_> {
+    fn capture_type(ty: &Ty) -> String {
+        format!("neoCLR.Compiler.Capture<{}>", ty.il())
+    }
+    fn captured_binding(binding: Binding, cell: String) -> Binding {
+        let ty = Self::capture_type(&binding.ty);
+        Binding {
+            load: format!("{cell}\nldfld {ty}::Value"),
+            address: format!("{cell}\nldflda {ty}::Value"),
+            cell: Some(cell),
+            scoped: false,
+            ..binding
+        }
+    }
+    fn lift_binding(&mut self, name: &Token, old_local: Option<usize>) -> Result<(), Fault> {
+        let binding = self.binding(&name.text, name)?;
+        if binding.cell.is_some() {
+            return Ok(());
+        }
+        let cell_ty = Self::capture_type(&binding.ty);
+        let local = self.temp(&Ty::Ref(Box::new(Ty::Record(cell_ty.clone()))));
+        self.body.push(binding.load.clone());
+        self.body.extend([
+            format!("newobj {cell_ty}"),
+            "heap.new".into(),
+            format!("stloc {local}"),
+        ]);
+        if let Some(old) = old_local {
+            self.body.push(format!("local.reset {old}"));
+        }
+        self.bindings.insert(
+            name.text.clone(),
+            Self::captured_binding(binding, format!("ldloc {local}")),
+        );
+        Ok(())
+    }
+    fn lambda_expression(
+        &mut self,
+        expression: &Expr,
+        parameters: &[(Token, Option<Ty>)],
+        body: &ArmBody,
+        expected: &Ty,
+    ) -> Result<Ty, Fault> {
+        let (mut signature, returns) = self.delegate_signature(expected)?.ok_or_else(|| {
+            expression
+                .at
+                .error("lambda requires an expected delegate type")
+        })?;
+        if signature.len() != parameters.len() {
+            return Err(expression.at.error("lambda parameter count mismatch"));
+        }
+        for (field, (name, annotation)) in signature.iter_mut().zip(parameters) {
+            if let Some(ty) = annotation {
+                let expected = if field.readonly {
+                    field.ty.restricted()
+                } else {
+                    field.ty.clone()
+                };
+                self.require(ty, &expected, name)?;
+            }
+            field.name = name.clone();
+        }
+        let free = closures::free(parameters, body);
+        let mut captures = self
+            .bindings
+            .iter()
+            .filter(|(name, _)| free.contains(*name))
+            .map(|(name, binding)| (name.clone(), binding.clone()))
+            .collect::<Vec<_>>();
+        captures.sort_by(|a, b| a.0.cmp(&b.0));
+        let suffix = format!("{}_{}", expression.at.line, expression.at.column);
+        let generic = if self.type_parameters.is_empty() {
+            String::new()
+        } else {
+            format!("<{}>", self.type_parameters.join(","))
+        };
+        let owner_name = format!("neoCLR.Compiler.Environment{suffix}");
+        let owner = format!("{owner_name}{generic}");
+        let method_name = if captures.is_empty() {
+            format!("neoCLR.Compiler.Lambda{suffix}")
+        } else {
+            "Invoke".into()
+        };
+        let function = Function {
+            name: Token {
+                text: method_name.clone(),
+                ..expression.at.clone()
+            },
+            generic_parameters: if captures.is_empty() {
+                self.type_parameters.clone()
+            } else {
+                vec![]
+            },
+            is_static: false,
+            base_initializer: None,
+            explicit_interface: None,
+            is_virtual: false,
+            is_override: false,
+            is_abstract: false,
+            receiver_readonly: false,
+            parameters: signature.clone(),
+            returns: returns.clone(),
+            body: match body {
+                ArmBody::Expression(e) => vec![Stmt::Return(e.at.clone(), Some(e.clone()))],
+                ArmBody::Block(b) => b.clone(),
+            },
+        };
+        let receiver = Token {
+            text: owner.clone(),
+            ..expression.at.clone()
+        };
+        let mut bindings = HashMap::new();
+        let mut environment = format!(".type internal {owner}\n");
+        for (i, (name, binding)) in captures.iter().enumerate() {
+            let cell = binding.cell.as_ref().ok_or_else(|| {
+                expression
+                    .at
+                    .error(format!("binding {name} cannot be captured in this context"))
+            })?;
+            let cell_ty = Self::capture_type(&binding.ty);
+            let field = format!("capture_{i}_{name}");
+            environment.push_str(&format!(".field {field} {cell_ty}&\n"));
+            self.body.push(cell.clone());
+            bindings.insert(
+                name.clone(),
+                Self::captured_binding(binding.clone(), format!("ldarg 0\nldfld {owner}::{field}")),
+            );
+        }
+        let (method, helpers) = Lowerer {
+            generated: Vec::new(),
+            captures: closures::captured(&function),
+            type_parameters: self.type_parameters.clone(),
+            lambda: true,
+            // Synthetic AST nodes die after lowering; never cache their addresses in the parent.
+            inferred_calls: Default::default(),
+            document: self.document,
+            receiver: if captures.is_empty() {
+                None
+            } else {
+                Some(&receiver)
+            },
+            source: self.source,
+            function: &function,
+            bindings,
+            locals: Vec::new(),
+            body: Vec::new(),
+            labels: 0,
+            scope: 0,
+            loops: Vec::new(),
+        }
+        .lower()?;
+        self.generated.extend(helpers);
+        let target = if captures.is_empty() {
+            self.generated
+                .push(method.replacen(".function ", ".function internal ", 1));
+            format!("{method_name}{generic}")
+        } else {
+            environment.push_str(&method);
+            environment.push_str(".end\n");
+            self.generated.push(environment);
+            self.body
+                .extend([format!("newobj {owner}"), "heap.new".into()]);
+            format!("instance {owner}::Invoke")
+        };
+        self.body.push(format!(
+            "delegate.bind {} = {target}({})",
+            expected.il(),
+            signature
+                .iter()
+                .map(|p| p.ty.parameter_il())
+                .collect::<Vec<_>>()
+                .join(",")
+        ));
+        Ok(expected.clone())
+    }
+
     fn sequence(&mut self, at: &Token) {
         self.body.push(format!(
             ".sequence {}",
@@ -1540,6 +1787,9 @@ impl Lowerer<'_> {
         Ok(self.read(ty))
     }
     fn expression_for(&mut self, expression: &Expr, expected: &Ty) -> Result<Ty, Fault> {
+        if let ExprKind::Lambda(parameters, body) = &expression.kind {
+            return self.lambda_expression(expression, parameters, body, expected);
+        }
         if self.delegate_signature(expected)?.is_some()
             && matches!(
                 expression.kind,
@@ -1872,6 +2122,9 @@ impl Lowerer<'_> {
                 self.body.push(format!("ldelem {}", element.il()));
                 Ok(element)
             }
+            ExprKind::Lambda(_, _) => Err(expression
+                .at
+                .error("lambda requires an expected delegate type")),
             ExprKind::Generic(_, _) => Err(expression
                 .at
                 .error("generic function arguments require an invocation")),
@@ -2289,7 +2542,7 @@ impl Lowerer<'_> {
                             .at
                             .error("delegate construction requires one method group"));
                     }
-                    return self.bind_delegate(&name, &arguments[0]);
+                    return self.expression_for(&arguments[0], &Ty::Record(name));
                 }
             }
         }
@@ -2966,6 +3219,7 @@ impl Lowerer<'_> {
                         self.bindings.insert(
                             name.text.clone(),
                             Binding {
+                                cell: None,
                                 ty: payload.clone(),
                                 mutable: false,
                                 load: format!("ldloc {index}"),
@@ -2973,6 +3227,9 @@ impl Lowerer<'_> {
                                 scoped: true,
                             },
                         );
+                        if self.captures.contains(&closures::key(name)) {
+                            self.lift_binding(name, Some(index))?;
+                        }
                     }
                 }
             }
@@ -3143,6 +3400,7 @@ impl Lowerer<'_> {
                     self.bindings.insert(
                         name.text.clone(),
                         Binding {
+                            cell: None,
                             ty: Ty::Int,
                             mutable: false,
                             load: format!("ldloc {index}"),
@@ -3150,6 +3408,9 @@ impl Lowerer<'_> {
                             scoped: true,
                         },
                     );
+                    if self.captures.contains(&closures::key(name)) {
+                        self.lift_binding(name, None)?;
+                    }
                     self.loops.push((end.clone(), step.clone()));
                     self.block(body)?;
                     self.loops.pop();
@@ -3220,6 +3481,7 @@ impl Lowerer<'_> {
                     self.bindings.insert(
                         name.text.clone(),
                         Binding {
+                            cell: None,
                             ty,
                             mutable: *mutable,
                             load: format!("ldloc {index}"),
@@ -3227,6 +3489,12 @@ impl Lowerer<'_> {
                             scoped: self.scope != 0,
                         },
                     );
+                    if self.captures.contains(&closures::key(name)) {
+                        if value.is_none() {
+                            return Err(name.error("captured local requires an initializer"));
+                        }
+                        self.lift_binding(name, Some(index))?;
+                    }
                 }
                 Stmt::Assign(left, right) => {
                     if self.function.name.text == ".ctor" {
@@ -3263,8 +3531,16 @@ impl Lowerer<'_> {
                         if !binding.mutable {
                             return Err(left.at.error("cannot assign an immutable binding"));
                         }
-                        self.expression_for(right, &binding.ty)?;
-                        self.body.push(binding.load.replacen("ldloc", "stloc", 1));
+                        if let Some(cell) = &binding.cell {
+                            self.body.push(cell.clone());
+                            self.expression_for(right, &binding.ty)?;
+                            self.body
+                                .push(format!("stfld {}::Value", Self::capture_type(&binding.ty)));
+                            self.body.push("pop".into());
+                        } else {
+                            self.expression_for(right, &binding.ty)?;
+                            self.body.push(binding.load.replacen("ldloc", "stloc", 1));
+                        }
                     } else {
                         let expected = self.place(left, false)?;
                         self.expression_for(right, &expected)?;
@@ -3294,12 +3570,16 @@ impl Lowerer<'_> {
         }
         Ok(returned)
     }
-    fn lower(mut self) -> Result<String, Fault> {
+    fn lower(mut self) -> Result<(String, Vec<String>), Fault> {
         self.sequence(&self.function.name);
-        if let Some(receiver) = self.receiver.filter(|_| !self.function.is_static) {
+        if let Some(receiver) = self
+            .receiver
+            .filter(|_| !self.function.is_static && !self.lambda)
+        {
             self.bindings.insert(
                 "this".into(),
                 Binding {
+                    cell: None,
                     ty: if self.function.receiver_readonly {
                         Ty::ReadOnlyRef(Box::new(Ty::Record(receiver.text.clone())))
                     } else {
@@ -3317,6 +3597,7 @@ impl Lowerer<'_> {
             self.bindings.insert(
                 parameter.name.text.clone(),
                 Binding {
+                    cell: None,
                     ty: if parameter.readonly {
                         parameter.ty.restricted()
                     } else {
@@ -3328,6 +3609,29 @@ impl Lowerer<'_> {
                     scoped: false,
                 },
             );
+            if self.captures.contains(&closures::key(&parameter.name)) {
+                if parameter.output {
+                    return Err(parameter.name.error("output parameters cannot be captured"));
+                }
+                self.lift_binding(&parameter.name, None)?;
+            }
+        }
+        if !self.lambda
+            && self.receiver.is_some()
+            && !self.function.is_static
+            && self.captures.contains(&closures::key(&self.function.name))
+        {
+            if self.function.name.text == ".ctor" {
+                return Err(self
+                    .function
+                    .name
+                    .error("constructor receiver cannot be captured"));
+            }
+            let name = Token {
+                text: "this".into(),
+                ..self.function.name.clone()
+            };
+            self.lift_binding(&name, None)?;
         }
         if self.function.name.text == ".ctor" {
             let record = self
@@ -3437,7 +3741,7 @@ impl Lowerer<'_> {
                 .unwrap_or_default(),
             self.locals.join("\n")
         );
-        Ok(format!(
+        let il = format!(
             "{} {}({}) -> {}\n{}\n{}\n.end\n",
             if self.receiver.is_some() && self.function.is_static {
                 ".method static".into()
@@ -3499,7 +3803,8 @@ impl Lowerer<'_> {
             self.function.returns.il(),
             declarations,
             self.body.join("\n")
-        ))
+        );
+        Ok((il, self.generated))
     }
 }
 
@@ -3526,7 +3831,8 @@ pub fn lower_to_il_named(source: &str, document: &str) -> Result<String, Fault> 
         .chain(source.interfaces.iter().map(|interface| &interface.name))
         .chain(source.delegates.iter().map(|delegate| &delegate.name))
     {
-        if names.insert(name.text.clone(), ()).is_some()
+        if name.text.starts_with("neoCLR.Compiler.")
+            || names.insert(name.text.clone(), ()).is_some()
             || [
                 "int",
                 "Int32",
@@ -3559,6 +3865,7 @@ pub fn lower_to_il_named(source: &str, document: &str) -> Result<String, Fault> 
         return Err(main.name.error("Main must be parameterless"));
     }
     let mut il = String::from(".module SourceProgram\n.entry Main\n");
+    let mut generated = Vec::new();
     for delegate in &source.delegates {
         let parameters = delegate
             .parameters
@@ -3591,22 +3898,26 @@ pub fn lower_to_il_named(source: &str, document: &str) -> Result<String, Fault> 
             il.push_str(&format!(".implements {}\n", base.il()));
         }
         for function in &interface.methods {
-            il.push_str(
-                &Lowerer {
-                    inferred_calls: Default::default(),
-                    document,
-                    receiver: Some(&interface.name),
-                    source: &source,
-                    function,
-                    bindings: HashMap::new(),
-                    locals: Vec::new(),
-                    body: Vec::new(),
-                    labels: 0,
-                    scope: 0,
-                    loops: Vec::new(),
-                }
-                .lower()?,
-            );
+            let (method, helpers) = Lowerer {
+                generated: Vec::new(),
+                captures: closures::captured(function),
+                type_parameters: function.generic_parameters.clone(),
+                lambda: false,
+                inferred_calls: Default::default(),
+                document,
+                receiver: Some(&interface.name),
+                source: &source,
+                function,
+                bindings: HashMap::new(),
+                locals: Vec::new(),
+                body: Vec::new(),
+                labels: 0,
+                scope: 0,
+                loops: Vec::new(),
+            }
+            .lower()?;
+            il.push_str(&method);
+            generated.extend(helpers);
         }
         il.push_str(".end\n");
     }
@@ -3635,31 +3946,14 @@ pub fn lower_to_il_named(source: &str, document: &str) -> Result<String, Fault> 
             il.push_str(&format!(".field {} {}\n", field.name.text, field.ty.il()));
         }
         for function in &record.methods {
-            il.push_str(
-                &Lowerer {
-                    inferred_calls: Default::default(),
-                    document,
-                    receiver: Some(&record.name),
-                    source: &source,
-                    function,
-                    bindings: HashMap::new(),
-                    locals: Vec::new(),
-                    body: Vec::new(),
-                    labels: 0,
-                    scope: 0,
-                    loops: Vec::new(),
-                }
-                .lower()?,
-            );
-        }
-        il.push_str(".end\n");
-    }
-    for function in &source.functions {
-        il.push_str(
-            &Lowerer {
+            let (method, helpers) = Lowerer {
+                generated: Vec::new(),
+                captures: closures::captured(function),
+                type_parameters: function.generic_parameters.clone(),
+                lambda: false,
                 inferred_calls: Default::default(),
                 document,
-                receiver: None,
+                receiver: Some(&record.name),
                 source: &source,
                 function,
                 bindings: HashMap::new(),
@@ -3669,8 +3963,42 @@ pub fn lower_to_il_named(source: &str, document: &str) -> Result<String, Fault> 
                 scope: 0,
                 loops: Vec::new(),
             }
-            .lower()?,
-        );
+            .lower()?;
+            il.push_str(&method);
+            generated.extend(helpers);
+        }
+        il.push_str(".end\n");
+    }
+    for function in &source.functions {
+        let (method, helpers) = Lowerer {
+            generated: Vec::new(),
+            captures: closures::captured(function),
+            type_parameters: function.generic_parameters.clone(),
+            lambda: false,
+            inferred_calls: Default::default(),
+            document,
+            receiver: None,
+            source: &source,
+            function,
+            bindings: HashMap::new(),
+            locals: Vec::new(),
+            body: Vec::new(),
+            labels: 0,
+            scope: 0,
+            loops: Vec::new(),
+        }
+        .lower()?;
+        il.push_str(&method);
+        generated.extend(helpers);
+    }
+    if !generated.is_empty() {
+        il.push_str(".type internal neoCLR.Compiler.Capture<T>\n.field Value T\n.end\n");
+        let mut emitted = std::collections::HashSet::new();
+        for helper in generated {
+            if emitted.insert(helper.clone()) {
+                il.push_str(&helper);
+            }
+        }
     }
     Ok(il)
 }

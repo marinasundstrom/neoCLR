@@ -522,7 +522,10 @@ locations and local labels survive compilation into JSON artifacts.
 Invoke calls. Neo automatically wraps method groups when a delegate type is expected
 and uses function-style invocation. The Func family includes Void results, so
 Array.ForEach takes Func<T,Void> instead of a separate Action<T> delegate.
+Contextual lambdas share captured bindings in managed storage, including returned
+and nested closures; captured references must satisfy heap-lifetime checks.
 
 ```sh
 cargo run --locked -- run examples/source/func-callbacks.neo
+cargo run --locked -- run examples/source/closures.neo
 ```

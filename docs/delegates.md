@@ -92,13 +92,60 @@ The first sample prints 42 and 41, then returns 42. The Func sample prints 41, 4
 43, then returns 42. See [debugger commands](debugger.md) for breakpoints, stack and
 heap inspection.
 
+## Lambdas and shared captures
+
+```swift
+func MakeCounter(start: int) -> System.Func<int> {
+    var value = start
+    return () => { value = value + 1; return value }
+}
+```
+
+An expected delegate type supplies lambda parameter and return types:
+`x => x + 1`, `(x, y) => x + y`, `(x: int) => x + 1`, and
+`() => { statements }`. Optional parameter annotations must match that contract.
+Use a typed binding, parameter, return, field, or explicit delegate construction
+such as `Transform(x => x + 1)`. A bare `let callback = x => x + 1` has no expected
+type and is rejected. This slice does not infer generic arguments from lambda bodies.
+
+Closures share captured bindings with their declaring code and with other closures.
+Changing an outer `var` is visible to the closure, and vice versa. A captured `let`
+remains immutable under Neo's existing rules. The compiler allocates captured local
+and parameter storage on the managed heap from initialization, so even addresses
+taken before delegate creation refer to that shared storage. Returned and nested
+closures retain it through GC. Range-loop iteration bindings get fresh storage on
+each iteration. Captured references still mean references: storing a frame-backed
+T& in the capture object faults; heap-backed references and heap-backed `this` work.
+The compiler rejects captured out parameters, uninitialized local declarations and
+constructor `this`. Nullable capture slots are not introduced.
+
+A noncapturing lambda becomes a static delegate target. Capturing lambdas use one
+managed cell per captured binding and a managed environment per lambda evaluation,
+with references to the required cells. This is preliminary compiler lowering, with
+extra allocation/indirection costs; it adds no runtime opcode or artifact format.
+It differs from method-group binding, which requires an already heap-backed receiver
+and never implicitly copies or promotes it. Names under `neoCLR.Compiler.` are
+reserved for generated helpers. See the [CLR comparison](delegate-contract.md#closure-lowering).
+
+Run the sample (prints 41 and 42, returns 42):
+
+```sh
+cargo run --locked -- run examples/source/closures.neo
+cargo run --locked -- check examples/source/closures.neo
+cargo run --locked -- debug examples/source/closures.neo
+```
+
+Use `step` to enter the generated lambda target, `next` to step over its invocation,
+and `out` to return to the caller. Source positions point back to the lambda's Neo
+source. `stack` and `heap` expose generated environments and Capture<T> cells;
+source-level reconstruction of captured locals is not yet implemented.
+
 ## Remaining work
 
-Lambdas and closures will build on delegates, following the C# approach of
-compiler-generated environment objects holding captured bindings. They will not
-introduce a competing callable object model. Capturing a local binding into a shared
-environment needs its own compiler/lifetime slice; it is different from silently
-copying a receiver during method-group binding.
+Natural lambda-type inference, explicit capture lists, stack-only closures and
+capture allocation optimizations remain future work. Delegate equality compares the
+generated method and environment identity, not captured values; do not depend on
+whether two separate lambda evaluations compare equal.
 
 Generic custom Neo delegate declarations, more arities, variance, multicast operations, open-instance binding, native callbacks and
 guest Delegate.Method/Target APIs remain unimplemented. Delegate-valued expressions

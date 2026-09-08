@@ -207,7 +207,9 @@ Keep the upcoming work separate:
 2. [Runtime delegates](delegates.md), contextual Neo method-group conversion, Func
    (including Void results) and Array.ForEach are implemented. Ordinary functions
    remain definitions; nullable metadata remains separate.
-3. C#-style lambdas/environments built on delegates, after capture
-   modes and escaping managed lifetimes have a validated runtime contract.
+3. Contextual lambdas and shared managed capture cells are implemented, including
+   escaping/nested closures and runtime rejection of frame-reference captures.
+   Next evaluate broader inference and capture allocation costs; nullable metadata,
+   multicast and variance remain independent decisions.
 
 These are bounded explorations, not a commitment to turn Neo into a full compiler.

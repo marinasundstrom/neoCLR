@@ -45,8 +45,12 @@ local_type       = type, [ "[", integer, "]" ] ;
 return_statement = "return", [ expression ] ;
 expression_statement = expression, [ "=", expression ] ;
 
-expression       = logical_or, { "match", newlines, "{", separators,
+expression       = lambda | logical_or, { "match", newlines, "{", separators,
                    [ match_arm, { arm_separator, match_arm }, [ arm_separator ] ], "}" } ;
+lambda           = (identifier | "(", newlines, [ lambda_parameter,
+                   { ",", newlines, lambda_parameter } ], newlines, ")"),
+                   "=>", newlines, (expression | block) ;
+lambda_parameter = identifier, [ ":", type ], newlines ;
 match_arm        = pattern, "=>", newlines, (expression | block) ;
 pattern          = "_" | identifier, [ "(", ("let", identifier | "_"), ")" ] ;
 arm_separator    = ("," | newline), separators ;

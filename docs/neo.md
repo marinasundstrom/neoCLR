@@ -474,7 +474,7 @@ calls accept explicit type arguments when name/arity selects one method.
 
 Run `cargo run --locked -- run examples/source/func-callbacks.neo` for frame/heap
 array ForEach and a reference callback. See [delegates](delegates.md) for contracts
-and limitations; lambdas are a later compiler slice.
+and limitations, including lambdas and shared captures.
 
 
 Expected delegate types also wrap matching method groups automatically, including
@@ -482,3 +482,8 @@ Expected delegate types also wrap matching method groups automatically, includin
 `let callback: System.Func<int, void> = Print`. Delegate-valued fields and returned
 expressions use the same call syntax: `holder.Callback(42)`, `MakeCallback()(42)`.
 Receiver expressions are evaluated once.
+
+Lambdas use the same expected delegate context: `value => value + 1` or
+`() => { statements }`. Captured bindings share managed storage; managed-reference
+captures must be heap-backed. Run `cargo run --locked -- run examples/source/closures.neo`
+for an Array.ForEach lambda and an escaping counter closure.
