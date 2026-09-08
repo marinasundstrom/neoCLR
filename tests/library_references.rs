@@ -23,7 +23,7 @@ fn run_source_helper(receiver: &str, heap: bool) -> neoclr::Execution {
     let module = assemble(&format!(
         "{helpers}\n.function Main() -> Int32\n.local {local_type} owner\nldc.i4 0\ncall System.Collections.ArrayList<Int32>::Allocate(Int32)\n{allocation}stloc owner\n{address}\n{view}call AddAndCount({receiver}&)\nret\n.end"
     )).unwrap();
-    // Neo does not yet spell generic static calls; the IL entry supplies the owner.
+    // The IL entry exercises both frame and heap wrapper receivers.
     let program = LoadedProgram::new(&module).unwrap();
     program.verify().unwrap();
     program.run(Limits::default()).unwrap()
@@ -41,7 +41,7 @@ fn neo_library_methods_and_properties_use_frame_and_heap_reference_receivers() {
             assert_eq!(execution.memory.live_allocations(), 0);
             assert_eq!(
                 execution.heap.statistics().allocated_objects,
-                usize::from(heap) + 2
+                usize::from(heap) + 3
             );
         }
     }

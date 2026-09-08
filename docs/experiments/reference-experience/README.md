@@ -3,7 +3,12 @@
 This first experiment asks whether explicit managed references earn their cost in
 ordinary application code. It is an executable, scripted order workflow, not a
 production application or a human usability study. No runtime or language contracts
-are changed. Findings describe Preview 3 behavior on 2026-09-08.
+are changed. The initial findings below describe Preview 3 behavior on 2026-09-08.
+
+Follow-up: ArrayList now shares complete managed state, and Copy() explicitly creates
+an independent sequence. The current list probe therefore prints the same five lines
+as C#: `20, 2, 2, 50, 50`. Historical observations below are retained as the reason
+for this change; see [the updated contract](../../array-list.md).
 
 ## Run it
 

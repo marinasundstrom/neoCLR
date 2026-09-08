@@ -60,8 +60,8 @@ allocation, with no element-array copy.
 This is an **extent and buffer capture**, not an immutable snapshot or a fail-fast
 .NET List enumerator. Later additions are outside the captured extent. Writes to the
 retained buffer are visible. Growth installs a new buffer on the list; an existing
-iterator continues over the old one. This follows ArrayList's existing descriptor-copy
-behavior. There is no concurrent-mutation/thread-safety guarantee.
+iterator continues over the old one. This iterator policy is independent of ArrayList wrapper assignment, which
+now shares the complete list state. There is no concurrent-mutation/thread-safety guarantee.
 
 ## Neo example and commands
 
@@ -115,12 +115,11 @@ step and diverge from the familiar cursor API. An Option adapter can be evaluate
 later without replacing these interfaces. No performance claim is made.
 
 The ArrayList iterator deliberately differs from .NET's modification-version checks.
-Capturing only its buffer and extent supports the existing stack/value descriptor
-without retaining a frame address or changing descriptor-copy semantics. A shared
-version/owner object would add state and affect copied descriptors; copying every
-element would cost O(n) storage and still share explicitly referenced elements. The
-current bounded choice makes retention and mutation effects explicit. Revisit it
-when collection ownership or concurrent traversal requirements change.
+Capturing only its buffer and extent avoids retaining a frame address. ArrayList now
+has shared managed state, so a version-checking iterator is technically possible;
+this slice preserves the existing traversal contract rather than silently changing
+it with assignment semantics. Copying every element would cost O(n) storage and still
+share reference elements. Revisit mutation invalidation as a separate API decision.
 
 The [SDK 10.0.100/net10.0 comparison probe](experiments/common-interfaces-dotnet/Program.cs)
 checks extreme/NaN ordering, independent cursors, exhaustion and .NET list mutation

@@ -118,7 +118,8 @@ fn reference_elements_preserve_identity_and_gc_reachability_across_growth() {
     let body = ".local System.Collections.ArrayList<Foo&> list\n.local Foo& alias\ncall Make()\nstloc list\nldloca list\nldc.i4 0\ncall instance System.Collections.ArrayList<Foo&>::get_Item(Int32)\nstloc alias\nldloc alias\nldflda Foo::Age\nldc.i4 42\nstobj Int32\nldloca list\nldloc alias\ncall instance System.Collections.ArrayList<Foo&>::Add(Foo&)\npop\nldloca list\nldc.i4 1\ncall instance System.Collections.ArrayList<Foo&>::get_Item(Int32)\nldobj Foo\nldfld Foo::Age";
     let result = program(body, "Int32", extra)
         .run(Limits {
-            heap_objects: 3,
+            // State, old/new buffers, and the referenced element.
+            heap_objects: 4,
             ..Default::default()
         })
         .unwrap();
@@ -137,14 +138,14 @@ fn frame_reference_elements_cannot_escape_into_managed_backing_storage() {
 }
 
 #[test]
-fn descriptor_copies_share_array_but_growth_detaches_the_copy() {
-    let body = ".local System.Collections.ArrayList<Int32> list\n.local System.Collections.ArrayList<Int32> copy\nldc.i4 1\ncall System.Collections.ArrayList<Int32>::Allocate(Int32)\nstloc list\nldloca list\nldc.i4 1\ncall instance System.Collections.ArrayList<Int32>::Add(Int32)\npop\nldloc list\nstloc copy\nldloca copy\nldc.i4 0\nldc.i4 2\ncall instance System.Collections.ArrayList<Int32>::set_Item(Int32,Int32)\npop\nldloca list\nldc.i4 0\ncall instance System.Collections.ArrayList<Int32>::get_Item(Int32)\nldc.i4 2\nbeq Shared\nfault \"copy lost shared buffer\"\nShared:\nldloca copy\nldc.i4 3\ncall instance System.Collections.ArrayList<Int32>::Add(Int32)\npop\nldloca copy\nldc.i4 0\nldc.i4 4\ncall instance System.Collections.ArrayList<Int32>::set_Item(Int32,Int32)\npop\nldloca list\ncall instance System.Collections.ArrayList<Int32>::get_Count()\nldc.i4 1\nbeq Independent\nfault \"count was shared\"\nIndependent:\nldloca list\nldc.i4 0\ncall instance System.Collections.ArrayList<Int32>::get_Item(Int32)";
+fn descriptor_copies_share_count_and_buffer_across_growth() {
+    let body = ".local System.Collections.ArrayList<Int32> list\n.local System.Collections.ArrayList<Int32> copy\nldc.i4 1\ncall System.Collections.ArrayList<Int32>::Allocate(Int32)\nstloc list\nldloca list\nldc.i4 1\ncall instance System.Collections.ArrayList<Int32>::Add(Int32)\npop\nldloc list\nstloc copy\nldloca copy\nldc.i4 0\nldc.i4 2\ncall instance System.Collections.ArrayList<Int32>::set_Item(Int32,Int32)\npop\nldloca list\nldc.i4 0\ncall instance System.Collections.ArrayList<Int32>::get_Item(Int32)\nldc.i4 2\nbeq Shared\nfault \"copy lost shared buffer\"\nShared:\nldloca copy\nldc.i4 3\ncall instance System.Collections.ArrayList<Int32>::Add(Int32)\npop\nldloca copy\nldc.i4 0\nldc.i4 4\ncall instance System.Collections.ArrayList<Int32>::set_Item(Int32,Int32)\npop\nldloca list\ncall instance System.Collections.ArrayList<Int32>::get_Count()\nldc.i4 2\nbeq Independent\nfault \"count was not shared\"\nIndependent:\nldloca list\nldc.i4 0\ncall instance System.Collections.ArrayList<Int32>::get_Item(Int32)";
     assert_eq!(
         program(body, "Int32", "")
             .run(Limits::default())
             .unwrap()
             .value,
-        Value::Int32(2)
+        Value::Int32(4)
     );
 }
 
@@ -154,7 +155,7 @@ fn replacing_a_reference_element_does_not_retain_it_in_spare_capacity() {
     let result = program(body, "System.Collections.ArrayList<Int32&>", "")
         .run(Limits::default())
         .unwrap();
-    assert_eq!(result.heap.len(), 2);
+    assert_eq!(result.heap.len(), 3);
     assert_eq!(result.heap.reclaimed_objects(), 1);
 }
 

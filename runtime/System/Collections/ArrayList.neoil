@@ -1,9 +1,11 @@
-; Value descriptor. Explicit ArrayList<T>& aliases share the entire list.
-; Ordinary copies share Data until growth, and copy Count independently.
+; Value wrapper with coherent shared managed state. Copy() duplicates the sequence.
+.type internal System.Collections.ArrayListState<T>
+    .field internal Data T[]&
+    .field internal Count Int32
+.end
 .type System.Collections.ArrayList<T>
     .implements System.Collections.List<T>
-    .field private Data T[]&
-    .field private Count Int32
+    .field private State System.Collections.ArrayListState<T>&
 
     .method static Allocate(Int32 capacity) -> System.Collections.ArrayList<T>
         ldarg capacity
@@ -12,6 +14,8 @@
         ldarg capacity
         array.alloc T
         ldc.i4 0
+        newobj System.Collections.ArrayListState<T>
+        heap.new
         newobj System.Collections.ArrayList<T>
         ret
     Invalid:
@@ -20,9 +24,11 @@
 
     .method instance readonly byref GetIterator() -> System.Collections.Iterator<T>&
         ldarg this
-        ldfld System.Collections.ArrayList<T>::Data
+        ldfld System.Collections.ArrayList<T>::State
+        ldfld System.Collections.ArrayListState<T>::Data
         ldarg this
-        ldfld System.Collections.ArrayList<T>::Count
+        ldfld System.Collections.ArrayList<T>::State
+        ldfld System.Collections.ArrayListState<T>::Count
         call System.Collections.ArrayIterator<T>::Create(T[]&,Int32)
         ret
     .end
@@ -32,8 +38,8 @@
     .end
     .method instance readonly byref get_Count() -> Int32
         ldarg this
-        ldobj System.Collections.ArrayList<T>
-        ldfld 1
+        ldfld System.Collections.ArrayList<T>::State
+        ldfld System.Collections.ArrayListState<T>::Count
         ret
     .end
     .property instance Capacity() -> Int32
@@ -41,8 +47,8 @@
     .end
     .method instance readonly byref get_Capacity() -> Int32
         ldarg this
-        ldobj System.Collections.ArrayList<T>
-        ldfld 0
+        ldfld System.Collections.ArrayList<T>::State
+        ldfld System.Collections.ArrayListState<T>::Data
         ldlen
         conv.ovf.i4
         ret
@@ -70,8 +76,8 @@
         call instance System.Collections.ArrayList<T>::CheckIndex(Int32)
         pop
         ldarg this
-        ldobj System.Collections.ArrayList<T>
-        ldfld 0
+        ldfld System.Collections.ArrayList<T>::State
+        ldfld System.Collections.ArrayListState<T>::Data
         ldarg index
         ldelem T
         ret
@@ -82,8 +88,8 @@
         call instance System.Collections.ArrayList<T>::CheckIndex(Int32)
         pop
         ldarg this
-        ldobj System.Collections.ArrayList<T>
-        ldfld 0
+        ldfld System.Collections.ArrayList<T>::State
+        ldfld System.Collections.ArrayListState<T>::Data
         ldarg index
         ldarg value
         stelem T
@@ -97,8 +103,8 @@
         .local Int32 capacity
         .local Int32 index
         ldarg this
-        ldobj System.Collections.ArrayList<T>
-        ldfld 0
+        ldfld System.Collections.ArrayList<T>::State
+        ldfld System.Collections.ArrayListState<T>::Data
         stloc data
         ldarg this
         call instance System.Collections.ArrayList<T>::get_Count()
@@ -150,15 +156,58 @@
         ldarg value
         stelem T
         ldarg this
+        ldfld System.Collections.ArrayList<T>::State
         ldloc data
+        stfld System.Collections.ArrayListState<T>::Data
+        pop
+        ldarg this
+        ldfld System.Collections.ArrayList<T>::State
         ldloc count
         ldc.i4 1
         add.ovf
-        newobj System.Collections.ArrayList<T>
-        stobj System.Collections.ArrayList<T>
+        stfld System.Collections.ArrayListState<T>::Count
+        pop
         ldvoid
         ret
     .end
+    ; Independent sequence, shallow element copies; spare capacity is not copied.
+    .method instance readonly byref Copy() -> System.Collections.ArrayList<T>
+        .local System.Collections.ArrayList<T> copy
+        .local T[]& data
+        .local Int32 count
+        .local Int32 index
+        ldarg this
+        ldfld System.Collections.ArrayList<T>::State
+        ldfld System.Collections.ArrayListState<T>::Data
+        stloc data
+        ldarg this
+        call instance System.Collections.ArrayList<T>::get_Count()
+        stloc count
+        ldloc count
+        call System.Collections.ArrayList<T>::Allocate(Int32)
+        stloc copy
+        ldc.i4 0
+        stloc index
+        br Test
+    CopyElement:
+        ldloca copy
+        ldloc data
+        ldloc index
+        ldelem T
+        call instance System.Collections.ArrayList<T>::Add(T)
+        pop
+        ldloc index
+        ldc.i4 1
+        add.ovf
+        stloc index
+    Test:
+        ldloc index
+        ldloc count
+        blt CopyElement
+        ldloc copy
+        ret
+    .end
+
     ; Predicate searches retain the same initial buffer/extent as GetIterator.
     .method instance readonly byref FindIndex(System.Func<T,Boolean> match) -> Int32
         .local System.Collections.Iterator<T>& iterator

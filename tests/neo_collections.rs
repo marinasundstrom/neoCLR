@@ -8,7 +8,7 @@ fn complete_collection_program_preserves_references_and_descriptor_copy_contract
         .unwrap()
         .run(Limits::default())
         .unwrap();
-    assert_eq!(result.output, ["42", "1", "1", "2"]);
+    assert_eq!(result.output, ["42", "1", "2", "2"]);
     assert_eq!(result.value, Value::Int32(42));
 }
 

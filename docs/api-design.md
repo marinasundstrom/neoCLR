@@ -114,11 +114,10 @@ methods. Rebuild artifacts against the matching System library. Interface
 implementations must declare the matching byref receiver. Native `InterfaceRef<I>`
 views cannot call this managed-receiver contract.
 
-ArrayList now holds Data: T[]& and Count directly. Its backing array is managed;
-Free has been removed. Copying the descriptor copies Count and shares the array
-reference until growth replaces one descriptor's buffer. Use ArrayList<T>& to share
-the whole mutable list. See [the collection contract](array-list.md) for copying,
-checked uninitialized capacity, growth, GC and the breaking migration.
+ArrayList holds a reference to shared managed state containing Data: T[]& and Count.
+Ordinary copies share the complete collection across growth. Copy() explicitly creates
+an independent sequence with shallow element copies. See [the collection contract](array-list.md)
+for storage costs, readonly access, checked capacity, GC and migration from Preview 3.
 
 ## Generic reference elements
 

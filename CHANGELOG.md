@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-08
 
+- Changed ArrayList assignment to share count and buffer coherently across growth
+  using managed backing state. Added readonly Copy() for independent sequences with
+  shallow element copies. Breaking library layout/behavior change: rebuild artifacts
+  and replace reliance on independent copied counts with Copy(). Each independent list
+  now allocates an additional managed state object; no runtime opcode changed.
+
 - Added an executable order-workflow experiment and a .NET 10 comparison to assess
   explicit managed-reference ergonomics, with focused tests for receipt snapshots,
   list-copy aliasing and callback capture lifetimes. Recorded observed friction,
