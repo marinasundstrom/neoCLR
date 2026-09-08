@@ -4,32 +4,40 @@ System.Equatable<T> declares an ordinary generic interface:
 
 ```text
 .interface System.Equatable<T>
-    .method instance Equals(T other) -> Boolean
+    .method instance readonly byref Equals(T other) -> Boolean
     .end
 .end
 ```
 
-Its shape follows [.NET IEquatable<T>](https://learn.microsoft.com/en-us/dotnet/api/system.iequatable-1),
-with neoCLR's interface naming convention. T specifies the type being compared;
-it need not be the implementing type. Type arguments are invariant under the
-current interface model. Implementations supply an exact public instance method.
-There is no implicit implementation based on a method name alone.
+Its shape follows [.NET IEquatable<T>.Equals](https://learn.microsoft.com/en-us/dotnet/api/system.iequatable-1.equals?view=net-10.0),
+with neoCLR's naming convention. T specifies the compared type; it need not be the
+implementing type. Arguments are invariant. Implementations declare conformance and
+provide matching receiver, parameter and return contracts.
 
-The receiver uses existing value-receiver semantics and other is a value parameter.
-Interface callers explicitly borrow the receiver slot as Equatable<T>&. Dispatch
-copies the concrete receiver into the implementation; it does not box it or transfer
-ownership. This contract does not introduce readonly references or an exclusive
-borrow rule. Implementations should compare values without observable mutation.
+The receiver is now a readonly managed reference, consistently with Comparable<T>.
+Other is passed by value; T may itself be an explicit managed reference. Dispatch
+uses the actual receiver storage without a mandatory whole-receiver copy or boxing.
+Readonly prevents writes through this receiver and its owned projections; it does
+not freeze other aliases or references held in fields. Equality implementations
+should avoid observable mutation and remain consistent while compared state is stable.
 
-## Implementations
+## Neo and IL implementations
 
-- System.Int32 compares integer values.
-- System.String compares exact text, with no case folding or Unicode normalization.
-- System.Type compares descriptor identity using its existing Equals method.
+```swift
+record Point(X: int, Y: int): System.Equatable<Point> {
+    readonly func Equals(other: Point) -> bool {
+        return this.X.Equals(other.X) && this.Y.Equals(other.Y)
+    }
+}
 
-The [sample](../examples/equatable.neoil) defines Point equality by comparing both
-coordinates, passes an Equatable<Point>& to a free function, and also compares
-primitive Int32 and String values through the same interface pattern.
+func SamePoint(left: readonly System.Equatable<Point>&, right: Point) -> bool {
+    return left.Equals(right)
+}
+```
+
+Int32 compares integer values, String compares exact text without case folding or
+Unicode normalization, and Type compares canonical descriptor identity. Their direct
+Equals methods use the same readonly managed receiver as interface dispatch.
 
 ```text
 .local Int32 number
@@ -41,39 +49,58 @@ ldc.i4 42
 callvirt instance System.Equatable<Int32>::Equals(Int32)
 ```
 
-Illustrative Raven-like source:
+The [IL sample](../examples/equatable.neoil) implements Point equality and prints
+true, false, true, true. The [Neo predicate-search sample](../examples/source/predicate-search.neo)
+uses custom equality in an ordinary ArrayList operation.
 
-```text
-func SamePoint(left: Equatable<Point>&, right: Point) -> Boolean {
-    return left.Equals(right)
-}
+## CLR comparison and migration
 
-let point = Point(2, 3)
-let equal = SamePoint((&point) as Equatable<Point>&, Point(2, 3))
-```
+Revised 2026-09-08. .NET's IEquatable<T> describes an equality method, not a universal
+readonly receiver requirement. C# [readonly struct members](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/struct#readonly-instance-members)
+are a language mechanism for declaring nonmutating receiver access. NeoCLR instead
+uses its existing runtime-checked readonly managed receiver contract uniformly for
+this interface, whether the object resides in a frame or on the heap.
 
-The source syntax is explanatory; there is no high-level compiler yet. In neoIL,
-the method signature selects Equals(Point), and the explicit interface view selects
-the concrete implementation.
+Keeping the former value receiver would preserve old IL but require copying the
+receiver and would not match ordinary readonly Neo instance methods. Keeping parallel
+old/new interface implementations would add two contracts to maintain. During preview,
+we choose one readonly receiver contract. This removes the mandatory receiver copy;
+it does not eliminate argument copies or imply a measured performance improvement.
+A separate by-reference argument/comparer strategy remains a later API decision.
 
-## Equality contract and scope
+This is a **breaking preview library change**. Update Equatable implementations to
+`instance readonly byref`; Neo uses `readonly func Equals`. Direct IL callers of
+Int32.Equals, String.Equals and Type.Equals must pass a managed receiver address
+instead of an owned value (for example ldloca rather than ldloc). Rebuild old modules;
+old value-receiver implementations fail conformance checks. Neo automatically borrows
+addressable receivers and materializes readonly temporaries where required.
 
-For same-type equality, implementations should be reflexive, symmetric and transitive,
-and return consistent results while the compared state is unchanged. The VM verifies
-method signatures and dispatch compatibility, not these mathematical properties.
-For comparisons between different types, document the intended relation explicitly.
+The host snapshot invocation API does not import managed references. A host wishing
+to call these members can invoke a guest wrapper accepting owned arguments, borrow
+its receiver argument with ldarga, then call Equals. Host tests demonstrate that
+boundary. Service planning now reports slot-reference services for direct equality.
+No opcode or artifact format changes are introduced.
 
-Implementing Equatable does not change ceq, create equality operators, or cause
-collections to discover a comparer automatically. It also does not add Object.Equals,
-hashing, ordering or a generic constraint mechanism. Future hash-based collections
-will need a compatible hash contract: values considered equal must have equal hashes.
-Those facilities can be designed separately without broadening this one-method interface.
+The pinned [.NET comparison probe](experiments/common-interfaces-dotnet/Program.cs)
+checks typed equality and ordinary List predicate searches on SDK 10.0.100/net10.0.
+Neo tests verify direct/interface equality, readonly receiver enforcement even when
+IL verification is skipped, and rejection of the previous receiver contract.
+
+## Scope
+
+For same-type equality, implementations should be reflexive, symmetric and transitive.
+The runtime checks signatures, access and dispatch, not these mathematical laws.
+Cross-type implementations must document their relation explicitly.
+
+Equatable does not change ceq, introduce equality operators or select a default
+collection comparer. [Predicate searches](predicate-search.md) use a caller-supplied
+function, which may call Equals. There is no mandatory Object.Equals fallback, hash
+contract or generic constraint added here. Hash-based containers must wait for a
+compatible equality/hash design: equal keys need equal hashes. LINQ is future work.
 
 ```sh
 cargo run --locked -- verify examples/equatable.neoil
 cargo run --locked -- run examples/equatable.neoil
-cargo test --locked --test equatable
+cargo run --locked -- run examples/source/predicate-search.neo
+cargo test --locked --test equatable --test predicate_search
 ```
-
-The sample prints true, false, true, true, then the CLI reports `=> Void`.
-The automated walkthrough also assembles and executes its serialized artifact.

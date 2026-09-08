@@ -1,5 +1,5 @@
 ; Typed equality. T is the compared value type; dispatch uses an explicit view.
 .interface System.Equatable<T>
-    .method instance Equals(T other) -> Boolean
+    .method instance readonly byref Equals(T other) -> Boolean
     .end
 .end

@@ -1560,10 +1560,11 @@ impl Lowerer<'_> {
         format!("neoCLR.Compiler.Capture<{}>", ty.il())
     }
     fn captured_binding(binding: Binding, cell: String) -> Binding {
-        let ty = Self::capture_type(&binding.ty);
+        // Compiler-owned Capture<T> has one field and no base. Numeric operands
+        // avoid resolving foreign T definitions before System is linked.
         Binding {
-            load: format!("{cell}\nldfld {ty}::Value"),
-            address: format!("{cell}\nldflda {ty}::Value"),
+            load: format!("{cell}\nldfld 0"),
+            address: format!("{cell}\nldflda 0"),
             cell: Some(cell),
             scoped: false,
             ..binding
@@ -3543,8 +3544,7 @@ impl Lowerer<'_> {
                         if let Some(cell) = &binding.cell {
                             self.body.push(cell.clone());
                             self.expression_for(right, &binding.ty)?;
-                            self.body
-                                .push(format!("stfld {}::Value", Self::capture_type(&binding.ty)));
+                            self.body.push("stfld 0".into());
                             self.body.push("pop".into());
                         } else {
                             self.expression_for(right, &binding.ty)?;

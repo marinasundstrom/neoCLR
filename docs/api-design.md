@@ -159,7 +159,7 @@ mutation, GC retention/reclamation, invalid frame escapes and automatic Neo acce
 | `Collections.List<T>` / `ArrayList<T>` | Managed-reference receivers and managed T[]& backing storage; value/reference elements follow T; no Free |
 | Native-buffer `Array<T>` | Explicit pointer-containing descriptor with value receivers and caller-managed Free; review together with native-buffer naming and ownership, separately from managed arrays |
 | `Disposable`, `Closable<E>`, `Clonable<T>` | Already use byref receivers; retain these contracts. Clone explicitly returns T; Close returns `Result<Void,E>` |
-| `Equatable<T>` | Currently a value receiver and T input. Preserve value equality, not reference identity. Review receiver copying for large records and whether a separate reference-input comparison contract is needed before changing implementations |
+| `Equatable<T>` | Readonly managed receiver and T input, aligned with Comparable. Preserve value equality, not reference identity; see [migration](equality.md). A separate reference-input comparison strategy remains future work |
 | `Option<T>` / `Result<T,E>` and case accessors | Constructors and extraction use values; keep independent extraction semantics. Review predicate receiver copying separately. Existing TryGet output contracts remain authoritative |
 | Numeric operations, Math, parsing | Scalar/value inputs and typed value results remain appropriate; parsing failure is an ordinary Result |
 | String, Error, Console, File text APIs | Current text/value inputs and results remain appropriate; host primitives and their wrappers must be changed together if reference inputs are later justified |
@@ -250,8 +250,12 @@ uninitialized storage. Prefer Option for domain optionality. See [nullability](n
 ## Common ordering and iteration
 
 See [common interfaces](common-interfaces.md) for Comparable<T>, Iterable<T>,
-Iterator<T> and the List<T> inheritance change. CompareTo takes T by value and uses a readonly managed receiver, unlike Equatable's
-older value-receiver contract. Equatable migration remains a separate review. GetIterator and Current use readonly receivers; MoveNext and
+Iterator<T> and the List<T> inheritance change. CompareTo and Equatable.Equals take T by value and use readonly managed receivers;
+see the [equality migration](equality.md). GetIterator and Current use readonly receivers; MoveNext and
 Dispose require writable managed receivers. Current returns T without erasing an
 explicit T&. ArrayList iterators retain their initial backing buffer and extent,
 with documented mutation visibility rather than .NET List version checking.
+
+[ArrayList predicate searches](predicate-search.md) are eager concrete operations.
+Find returns Option<T>, FindIndex returns an index or -1, and Exists returns Boolean.
+No LINQ surface or default comparer policy is introduced.

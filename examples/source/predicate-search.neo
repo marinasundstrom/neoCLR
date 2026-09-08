@@ -1,0 +1,20 @@
+import System.Console.*
+
+record Person(Name: string, Age: int): System.Equatable<Person> {
+    readonly func Equals(other: Person) -> bool {
+        return this.Name.Equals(other.Name) && this.Age.Equals(other.Age)
+    }
+}
+
+func Main() -> int {
+    var people = System.Collections.ArrayList<Person>.Allocate(0)
+    people.Add(Person("Ada", 36))
+    people.Add(Person("Grace", 42))
+    let expected = Person("Grace", 42)
+    WriteLine(people.FindIndex(person => person.Equals(expected)))
+    if !people.Exists(person => person.Age >= 40) { return -1 }
+    people.Find(person => person.Equals(expected)) match {
+        Some(let person) => { WriteLine(person.Name); return person.Age },
+        None => { return -1 }
+    }
+}

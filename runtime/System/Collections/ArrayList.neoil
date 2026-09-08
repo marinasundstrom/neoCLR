@@ -159,4 +159,90 @@
         ldvoid
         ret
     .end
+    ; Predicate searches retain the same initial buffer/extent as GetIterator.
+    .method instance readonly byref FindIndex(System.Func<T,Boolean> match) -> Int32
+        .local System.Collections.Iterator<T>& iterator
+        .local Int32 index
+        ldarg this
+        call instance System.Collections.ArrayList<T>::GetIterator()
+        stloc iterator
+        ldc.i4 0
+        stloc index
+    Next:
+        ldloc iterator
+        callvirt instance System.Collections.Iterator<T>::MoveNext()
+        brfalse Missing
+        ldarg match
+        ldloc iterator
+        callvirt instance System.Collections.Iterator<T>::get_Current()
+        call instance System.Func<T,Boolean>::Invoke(T)
+        brtrue Found
+        ldloc index
+        ldc.i4 1
+        add.ovf
+        stloc index
+        br Next
+    Found:
+        ldloc iterator
+        interface.borrow System.Disposable
+        callvirt instance System.Disposable::Dispose()
+        pop
+        ldloc index
+        ret
+    Missing:
+        ldloc iterator
+        interface.borrow System.Disposable
+        callvirt instance System.Disposable::Dispose()
+        pop
+        ldc.i4 -1
+        ret
+    .end
+
+    .method instance readonly byref Exists(System.Func<T,Boolean> match) -> Boolean
+        ldarg this
+        ldarg match
+        call instance System.Collections.ArrayList<T>::FindIndex(System.Func<T,Boolean>)
+        ldc.i4 0
+        clt
+        ldc.bool false
+        ceq
+        ret
+    .end
+
+    .method instance readonly byref Find(System.Func<T,Boolean> match) -> System.Option<T>
+        .local System.Collections.Iterator<T>& iterator
+        .local T value
+        ldarg this
+        call instance System.Collections.ArrayList<T>::GetIterator()
+        stloc iterator
+    Next:
+        ldloc iterator
+        callvirt instance System.Collections.Iterator<T>::MoveNext()
+        brfalse Missing
+        ldloc iterator
+        callvirt instance System.Collections.Iterator<T>::get_Current()
+        stloc value
+        ldarg match
+        ldloc value
+        call instance System.Func<T,Boolean>::Invoke(T)
+        brtrue Found
+        br Next
+    Found:
+        ldloc iterator
+        interface.borrow System.Disposable
+        callvirt instance System.Disposable::Dispose()
+        pop
+        ldloc value
+        newobj instance System.Option.Some<T>::.ctor(T)
+        newobj instance System.Option<T>::.ctor(System.Option.Some<T>)
+        ret
+    Missing:
+        ldloc iterator
+        interface.borrow System.Disposable
+        callvirt instance System.Disposable::Dispose()
+        pop
+        newobj instance System.Option.None::.ctor()
+        newobj instance System.Option<T>::.ctor(System.Option.None)
+        ret
+    .end
 .end

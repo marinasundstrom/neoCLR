@@ -192,10 +192,25 @@ pub(super) fn cases(ty: &Ty) -> Result<Vec<Case>, Fault> {
         }
         let (test, extract) = accessors
             .ok_or_else(|| Fault::new("union case lacks typed test/extraction accessors"))?;
-        module
+        let case_definition = module
             .type_definition(&case_type)
             .ok_or_else(|| Fault::new("missing union case definition"))?;
-        let fields = module.instantiated_fields(&case_type)?;
+        // Inspect the trusted carrier shape without requiring source payload types
+        // to be defined in System. The complete linked program validates them later.
+        if case_definition.base.is_some() {
+            return Err(Fault::new(
+                "inherited union case payloads are not supported",
+            ));
+        }
+        let case_arguments = match &case_type {
+            Type::Constructed { arguments, .. } => arguments.as_slice(),
+            _ => &[],
+        };
+        let fields = case_definition
+            .fields
+            .iter()
+            .map(|field| field.ty.substitute_type_parameters(case_arguments))
+            .collect::<Result<Vec<_>, _>>()?;
         let payload = if fields.is_empty() {
             None
         } else {
@@ -204,7 +219,7 @@ pub(super) fn cases(ty: &Ty) -> Result<Vec<Case>, Fault> {
             }
             let accessor = format!("instance {}::get_Value()", case.il());
             let function = resolve(&accessor)?;
-            if function.returns != fields[0].ty {
+            if function.returns != fields[0] {
                 return Err(Fault::new("union payload accessor type mismatch"));
             }
             Some((Ty::from_metadata(&function.returns)?, accessor))

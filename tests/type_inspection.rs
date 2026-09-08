@@ -47,7 +47,7 @@ fn descriptors_use_closed_identity_and_preserve_declared_small_value_types() {
         ("Void*", "Int32*", false),
     ] {
         let body = format!(
-            "ldtoken {left}\ncall System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)\nldtoken {right}\ncall System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)\ncall instance System.Type::Equals(System.Type)"
+            ".local System.Type left\nldtoken {left}\ncall System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)\nstloc left\nldloca left\nldtoken {right}\ncall System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)\ncall instance System.Type::Equals(System.Type)"
         );
         assert_eq!(execute(&body, "Boolean").unwrap(), Value::Boolean(same));
     }

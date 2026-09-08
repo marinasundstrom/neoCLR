@@ -152,8 +152,8 @@ end-to-end examples current with every contract change.
 
 Explore these bounded slices in order:
 
-1. **Comparison, equality and collection algorithms.** Review the older Equatable
-   receiver against the new readonly Comparable receiver. Compare .NET's
+1. **Comparison, equality and collection algorithms.** Equatable and Comparable now share readonly receivers, and eager ArrayList
+   predicate searches are implemented. Continue with explicit comparer strategies. Compare .NET's
    IEquatable/IComparable and comparer strategy APIs with explicit T/T& contracts;
    settle equality/hash consistency before adding hash-based containers. Add the
    smallest useful searching/ordering consumers and managed-array iteration adapters.
@@ -181,3 +181,8 @@ implementation, including allocation/copying costs and the responsibility split
 between runtime, library and Neo. This sequence can change when a concrete dependency
 appears. Native I/O ownership, foreach cleanup, nullable metadata and broader async
 remain independent foundations; the plan does not silently fold them into this pass.
+
+The equality receiver alignment and [concrete predicate-search slice](predicate-search.md)
+are implemented. Comparer strategies, hashing and further collection operations remain
+planned. LINQ, deferred query execution and query syntax are explicitly future concerns,
+not part of this fundamental API pass.

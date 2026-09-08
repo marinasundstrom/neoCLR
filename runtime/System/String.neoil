@@ -7,8 +7,9 @@
         ret
     .end
 
-    .method instance Equals(String other) -> Boolean
+    .method instance readonly byref Equals(String other) -> Boolean
         ldarg this
+        ldobj String
         ldarg other
         ceq
         ret

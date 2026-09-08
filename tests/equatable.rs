@@ -50,7 +50,7 @@ fn library_equals_agrees_between_direct_and_interface_calls() {
                 )
             } else {
                 (
-                    "ldloc value".into(),
+                    "ldloca value".into(),
                     format!("call instance {ty}::Equals({ty})"),
                 )
             };
@@ -71,7 +71,7 @@ fn generic_implementations_can_compare_a_different_type() {
     .implements System.Equatable<Int32>
     .field Tag Int32
     .field Payload T
-    .method instance Equals(Int32 other) -> Boolean
+    .method instance readonly byref Equals(Int32 other) -> Boolean
         ldarg this
         ldfld Tagged<T>::Tag
         ldarg other
@@ -89,4 +89,62 @@ fn generic_implementations_can_compare_a_different_type() {
             Value::Boolean(expected)
         );
     }
+}
+
+#[test]
+fn runtime_enforces_readonly_equality_without_verifier() {
+    let module = assemble(
+        r#"
+.module Test
+.entry Main
+.type Counter
+.implements System.Equatable<Counter>
+.field Value Int32
+.method instance readonly byref Equals(Counter other) -> Boolean
+ldarg this
+ldc.i4 99
+stfld Counter::Value
+pop
+ldc.bool true
+ret
+.end
+.end
+.function Main() -> Boolean
+.local Counter value
+ldc.i4 42
+newobj Counter
+stloc value
+ldloca value
+interface.borrow System.Equatable<Counter>
+ldloc value
+callvirt instance System.Equatable<Counter>::Equals(Counter)
+ret
+.end
+"#,
+    )
+    .unwrap();
+    let error = LoadedProgram::new(&module)
+        .unwrap()
+        .run(Limits::default())
+        .unwrap_err();
+    assert!(error.message.contains("readonly"), "{error}");
+}
+
+#[test]
+fn old_value_receiver_implementations_must_be_migrated() {
+    assert!(
+        assemble(
+            r#"
+.module Old
+.type Item
+.implements System.Equatable<Item>
+.method instance Equals(Item other) -> Boolean
+ldc.bool true
+ret
+.end
+.end
+"#
+        )
+        .is_err()
+    );
 }

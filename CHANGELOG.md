@@ -10,8 +10,18 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 #### Added
 
+- Added eager ArrayList.Find, FindIndex and Exists using Func<T,Boolean>. Find returns
+  Option<T> so absence never manufactures an invalid/default element. Searches retain
+  the initial backing buffer and extent and dispose the managed iterator on normal
+  completion. Added a custom-equality Neo sample, callback/GC/reference tests and .NET
+  probes. Fixed union matching with source-defined payloads and closure captures of
+  constructed library values. LINQ remains explicitly deferred.
+
 - Added System.Comparable<T> with a readonly managed receiver and value input,
-  plus scalar CompareTo implementations, including unsigned
+  plus scalar CompareTo implementations. Equatable and the Int32/String/Type Equals
+  methods now use the same readonly managed receiver: existing IL callers and
+  implementations must migrate from value receivers; Neo borrows automatically.
+  Documented host-wrapper migration and validated readonly enforcement. Includes unsigned
   extremes and .NET-compatible floating-point NaN ordering. Added Iterable<T> and
   Iterator<T> with MoveNext/Current and inherited Disposable; List<T> now inherits
   Iterable<T>, requiring GetIterator from implementers. ArrayList iterators retain

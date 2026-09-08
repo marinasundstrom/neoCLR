@@ -32,7 +32,7 @@
     call System.Console::WriteLine(String)
     pop
 
-    ldloc boxType
+    ldloca boxType
     ldtoken Box<int>
     call System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)
     call instance System.Type::Equals(System.Type)

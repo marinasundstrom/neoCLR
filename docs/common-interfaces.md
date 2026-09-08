@@ -12,9 +12,9 @@ negative means before, zero means equivalent in the ordering, positive means aft
 Consumers must use the sign, not assume every implementation returns -1 or 1.
 Implementations should provide a consistent, transitive ordering. Ordering equivalence
 need not be reference identity. The receiver is a readonly managed reference; the compared T uses value semantics.
-T can itself be an explicit managed reference. Unlike the older value-receiver
-Equatable<T> contract, Comparable avoids a required receiver copy and matches Neo
-readonly instance methods. Equatable remains unchanged pending a separate migration.
+T can itself be an explicit managed reference. [Equatable<T>](equality.md) now uses
+the same readonly receiver contract; both avoid a mandatory whole-receiver copy and
+match Neo readonly instance methods. See the equality guide for migration details.
 Large argument copies and comparer strategies remain separate API design decisions.
 
 Boolean, Char, all signed/unsigned fixed-width integers, native-sized integers,
@@ -26,7 +26,7 @@ compare equal. This is an ordering contract, not a change to floating-point `==`
 Neo records/classes can declare conformance to bundled interfaces, for example
 `record Score(Value: int): System.Comparable<Score>` with a matching `readonly func CompareTo(other: Score) -> int` method.
 String ordering is deferred until explicit ordinal/culture policies are designed;
-Equatable and existing String equality remain unchanged.
+String equality still compares exact text; its receiver now follows the readonly equality contract.
 
 ## Iterable and Iterator
 

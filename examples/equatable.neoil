@@ -5,7 +5,7 @@
     .implements System.Equatable<Point>
     .field X Int32
     .field Y Int32
-    .method instance Equals(Point other) -> Boolean
+    .method instance readonly byref Equals(Point other) -> Boolean
         ldarg this
         ldfld Point::X
         ldarg other

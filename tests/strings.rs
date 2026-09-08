@@ -2,7 +2,7 @@ use neoclr::{
     Limits, LoadedProgram, RuntimeService, Value, assemble, assembler::parse_function_ref,
 };
 fn program() -> LoadedProgram {
-    LoadedProgram::new(&assemble(".module App").unwrap()).unwrap()
+    LoadedProgram::new(&assemble(".module App\n.function EqualText(String left, String right) -> Boolean\nldarga left\nldarg right\ncall instance System.String::Equals(String)\nret\n.end").unwrap()).unwrap()
 }
 fn text(value: &str) -> Value {
     Value::String(value.into())
@@ -77,7 +77,7 @@ fn concat_preserves_utf8_embedded_nul_and_owned_inputs() {
 fn equality_is_ordinal_and_empty_is_not_absence() {
     let program = program();
     let equals = program
-        .resolve_function(&parse_function_ref("instance System.String::Equals(String)").unwrap())
+        .resolve_function(&parse_function_ref("EqualText(String,String)").unwrap())
         .unwrap();
     let empty = program
         .resolve_function(&parse_function_ref("instance System.String::IsEmpty()").unwrap())
@@ -90,7 +90,7 @@ fn equality_is_ordinal_and_empty_is_not_absence() {
     ] {
         assert_eq!(
             equals
-                .invoke_instance(text(left), vec![text(right)], Limits::default())
+                .invoke(vec![text(left), text(right)], Limits::default())
                 .unwrap()
                 .value,
             Value::Boolean(expected)
@@ -224,7 +224,16 @@ fn service_planning_distinguishes_il_members_from_string_runtime_helpers() {
             1,
         )
         .unwrap();
-    assert!(equals.required_services().is_empty());
+    assert!(
+        equals
+            .required_services()
+            .contains(&RuntimeService::SlotReferences)
+    );
+    assert!(
+        !equals
+            .required_services()
+            .contains(&RuntimeService::StringOperations)
+    );
     let graph = program
         .analyze_reachability(
             &[parse_function_ref("instance System.String::SliceUtf8(Int32,Int32)").unwrap()],

@@ -71,8 +71,9 @@
         ret
     .end
 
-    .method instance Equals(Int32 other) -> Boolean
+    .method instance readonly byref Equals(Int32 other) -> Boolean
         ldarg this
+        ldobj Int32
         ldarg other
         ceq
         ret

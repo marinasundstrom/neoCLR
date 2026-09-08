@@ -496,3 +496,8 @@ List<T> inherits Iterable<T>; inherited library members work through managed int
 views. Integer-range for syntax is unchanged. Run
 `cargo run --locked -- run examples/source/common-interfaces.neo` for ordering and
 iteration through readonly collection views.
+
+[Predicate search](predicate-search.md) uses ordinary calls and contextual lambdas:
+`people.Find(person => person.Equals(expected))` returns Option<T> for exhaustive
+match handling. Equatable implementations use `readonly func Equals(other: T) -> bool`.
+These are eager ArrayList operations; LINQ remains future work.

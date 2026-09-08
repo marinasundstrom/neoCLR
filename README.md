@@ -539,3 +539,11 @@ readonly Iterable views; Iterator exposes MoveNext, Current and Dispose.
 ```sh
 cargo run --locked -- run examples/source/common-interfaces.neo
 ```
+
+[Eager predicate searches](docs/predicate-search.md) add ArrayList.Find, FindIndex
+and Exists using Func<T,Boolean>. Find returns Option<T>; custom equality uses
+readonly Equatable implementations. LINQ remains future work.
+
+```sh
+cargo run --locked -- run examples/source/predicate-search.neo
+```

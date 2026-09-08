@@ -32,7 +32,7 @@
         call System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)
         ret
     .end
-    .method instance Equals(System.Type other) -> Boolean
+    .method instance readonly byref Equals(System.Type other) -> Boolean
         ldarg this
         ldfld 0
         ldarg other
