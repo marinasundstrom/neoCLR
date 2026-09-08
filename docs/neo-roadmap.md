@@ -147,6 +147,24 @@ and properties. Keep the familiar .NET `System.Reflection` descriptor names and
 and [BindingFlags](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.bindingflags)
 contracts are the comparison baseline; document every supported subset or deviation.
 
+Use independent ordinary descriptor records. Class hierarchies are not implemented,
+so do not require MemberInfo/MethodBase inheritance or an Object root to ship this API.
+Shared information can use consistent properties without a common base class.
+
+The initial Type API should expose only these member categories:
+
+| Query | Result descriptor | Scope |
+| --- | --- | --- |
+| Type.GetFields() | FieldInfo[] | Fields declared by the type |
+| Type.GetMethods() | MethodInfo[] | Instance and static methods belonging to the type |
+| Type.GetProperties() | PropertyInfo[] | Declared property metadata and accessors |
+
+FunctionInfo is appropriate only for a module-level free-function query, such as a
+future Module.GetFunctions(). It is not returned by Type.GetMethods and does not
+require a FunctionInfo/MethodInfo inheritance relationship. Keep module enumeration
+optional after the initial Type member slice; describe free-function versus static
+method ownership explicitly if that API is introduced.
+
 The bounded implementation should cover:
 
 - `FieldInfo`: Name, DeclaringType, FieldType, and represented visibility/storage flags.
@@ -178,7 +196,9 @@ The end-to-end Neo example should enumerate a record's fields and methods, and a
 library type's properties and method parameters, using existing arrays, loops and
 ordinary property access. Include closed generic types and managed-reference signatures.
 Keep Neo updates bounded to that scenario. Add source/artifact round-trip tests,
-visibility checks and a GC-pressure test for returned descriptor arrays.
+visibility checks and a GC-pressure test for returned descriptor arrays. Document
+the feature, public signatures, return/storage contracts, supported metadata,
+limitations, and runnable Neo/IL examples in a reflection guide in the same slice.
 
 For inspection starting from an object/reference expression, explicitly distinguish
 its declared type from the concrete type behind a managed interface view. Design a

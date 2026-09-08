@@ -107,3 +107,7 @@ This addition changes neither the runtime opcode set nor the module format.
 field, method and property enumeration with familiar System.Reflection descriptor
 names, parameter/type details, and explicit managed-reference metadata. These APIs
 are planned, not implemented by the current minimal Type inspection surface.
+
+The planned Type member queries use independent MethodInfo, FieldInfo and PropertyInfo
+records; they do not depend on class hierarchies. FunctionInfo is reserved for possible
+module-level free-function queries, not a category of Type member.
