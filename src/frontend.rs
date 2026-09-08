@@ -1,6 +1,7 @@
 //! Neo concept-language front end for exercising NeoCLR end to end.
 //! This is a separate experimental language subset, not a Raven compiler.
 mod closures;
+mod conditional;
 mod library;
 mod unions;
 
@@ -502,6 +503,8 @@ enum Stmt {
     Return(Token, Option<Expr>),
     Expression(Expr),
     If(Expr, Vec<Stmt>, Vec<Stmt>),
+    IfLet(Pattern, Expr, Vec<Stmt>, Vec<Stmt>),
+    LetElse(Pattern, Expr, Vec<Stmt>),
     While(Expr, Vec<Stmt>),
     Loop(Token, Vec<Stmt>),
     For(Token, Expr, Expr, bool, Vec<Stmt>),
@@ -1080,6 +1083,13 @@ impl Parser {
     }
     fn statement_inner(&mut self) -> Result<Stmt, Fault> {
         if self.eat("if") {
+            let pattern = if self.eat("let") {
+                let pattern = self.conditional_pattern()?;
+                self.expect("=")?;
+                Some(pattern)
+            } else {
+                None
+            };
             let condition = self.expression(0)?;
             let yes = self.block()?;
             let saved = self.position;
@@ -1094,7 +1104,11 @@ impl Parser {
                 self.position = saved;
                 Vec::new()
             };
-            return Ok(Stmt::If(condition, yes, no));
+            return Ok(if let Some(pattern) = pattern {
+                Stmt::IfLet(pattern, condition, yes, no)
+            } else {
+                Stmt::If(condition, yes, no)
+            });
         }
         if self.eat("while") {
             let condition = self.expression(0)?;
@@ -1128,6 +1142,20 @@ impl Parser {
             } else {
                 Stmt::Continue(at)
             });
+        }
+        if self.at("let")
+            && self
+                .tokens
+                .get(self.position + 2)
+                .is_some_and(|t| t.text == "(")
+        {
+            self.take();
+            let pattern = self.conditional_pattern()?;
+            self.expect("=")?;
+            let value = self.expression(0)?;
+            self.newlines();
+            self.expect("else")?;
+            return Ok(Stmt::LetElse(pattern, value, self.block()?));
         }
         let statement =
             if self.at("let") || self.at("var") {
@@ -1165,6 +1193,20 @@ impl Parser {
                 if extent.is_some() && value.is_none() {
                     return Err(name.error("fixed-extent local requires an initializer"));
                 }
+                let saved = self.position;
+                self.newlines();
+                if self.eat("else") {
+                    if mutable || annotation.is_some() || extent.is_some() {
+                        return Err(name.error("let-else requires an unannotated case pattern"));
+                    }
+                    let value = value.ok_or_else(|| name.error("let-else requires a value"))?;
+                    return Ok(Stmt::LetElse(
+                        Pattern::Case(name, None),
+                        value,
+                        self.block()?,
+                    ));
+                }
+                self.position = saved;
                 Stmt::Bind {
                     name,
                     mutable,
@@ -3509,15 +3551,54 @@ impl Lowerer<'_> {
             }
             let at = match statement {
                 Stmt::Bind { name, .. } | Stmt::For(name, ..) => name,
-                Stmt::Assign(e, _) | Stmt::Expression(e) | Stmt::If(e, ..) | Stmt::While(e, ..) => {
-                    &e.at
-                }
+                Stmt::Assign(e, _)
+                | Stmt::Expression(e)
+                | Stmt::If(e, ..)
+                | Stmt::While(e, ..)
+                | Stmt::IfLet(_, e, ..)
+                | Stmt::LetElse(_, e, ..) => &e.at,
                 Stmt::Return(at, _) | Stmt::Break(at) | Stmt::Continue(at) | Stmt::Loop(at, _) => {
                     at
                 }
             };
             self.sequence(at);
             match statement {
+                Stmt::IfLet(pattern, value, yes, no) => {
+                    let otherwise = self.label();
+                    let end = self.label();
+                    let saved = self.bindings.clone();
+                    self.scope += 1;
+                    self.conditional_case(pattern, value, &otherwise)?;
+                    let yes_exits = self.statements(yes)?;
+                    self.scope -= 1;
+                    self.bindings = saved;
+                    if !yes_exits {
+                        self.body.push(format!("br {end}"));
+                    }
+                    self.body.push(format!("{otherwise}:"));
+                    let no_exits = self.block(no)?;
+                    returned = yes_exits && no_exits;
+                    if !returned {
+                        self.body.push(format!("{end}:"));
+                    }
+                }
+                Stmt::LetElse(pattern, value, no) => {
+                    let missing = self.label();
+                    let success = self.label();
+                    let outer = self.bindings.clone();
+                    self.conditional_case(pattern, value, &missing)?;
+                    let bound = self.bindings.clone();
+                    self.body.push(format!("br {success}"));
+                    self.body.push(format!("{missing}:"));
+                    self.bindings = outer;
+                    if !self.block(no)? {
+                        return Err(value.at.error(
+                            "let-else failure block must exit with return, break or continue",
+                        ));
+                    }
+                    self.bindings = bound;
+                    self.body.push(format!("{success}:"));
+                }
                 Stmt::If(condition, yes, no) => {
                     self.condition(condition)?;
                     let otherwise = self.label();

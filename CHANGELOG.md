@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-08
 
+- Added Neo `if let` and `let … else` case bindings with single evaluation, scoped
+  immutable bindings and checked failure-path exits. The order workflow now uses
+  a custom PurchaseError union and guards instead of nested success matches.
+  Added grammar, usage documentation and control-flow/capture regressions; runtime
+  instructions are unchanged. Recorded contextual borrowing as a future language
+  experiment, without changing explicit reference syntax.
+
 - Added non-generic Neo union declarations from existing source types or inline
   nested record cases. Carriers generate one constructor per variant, support exact
   case-to-carrier conversion and exhaustive whole-variant matching, and retain the

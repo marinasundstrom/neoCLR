@@ -84,8 +84,8 @@ with `unknown function overload System.Result.Error([String])`. Explicit wrappin
 with `Result<Receipt,string>(System.Result.Error<string>(...))` failed with
 `generic calls require a free function or static method`. These are the two attempted
 forms, not proof that every possible construction is unavailable. The library has
-case constructors, but the frontend path was not straightforward. The working
-sample uses `PurchaseOutcome` with an Accepted flag and a placeholder receipt on
+case constructors, but the frontend path was not straightforward. The initial working
+sample used `PurchaseOutcome` with an Accepted flag and a placeholder receipt on
 failure. That workaround allows invalid state combinations and is not a recommended
 replacement for Result. Investigate ergonomic union construction independently.
 
@@ -156,3 +156,7 @@ ran with SDK 10.0.100 and printed the matching workflow plus its documented list
 results. These are local experiment results, not a new release certification or a
 full-suite run. The four tests characterize current behavior; they may need deliberate
 revision if the experiment leads to a new contract.
+
+The current workflow uses `Result<Receipt, PurchaseError>` with a custom union and
+[conditional bindings](../../conditional-patterns.md). Earlier observations above
+record the initial experiment; the placeholder outcome is no longer in the sample.

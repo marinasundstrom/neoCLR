@@ -102,6 +102,22 @@ impl Analysis {
                     }
                 }
                 Stmt::Expression(e) => self.expression(e, &scope, depth),
+                Stmt::IfLet(pattern, e, a, b) => {
+                    self.expression(e, &scope, depth);
+                    let mut nested = scope.clone();
+                    if let Pattern::Case(_, Some(Some(name))) = pattern {
+                        nested.insert(name.text.clone(), (key(name), depth));
+                    }
+                    self.block(a, &nested, depth);
+                    self.block(b, &scope, depth);
+                }
+                Stmt::LetElse(pattern, e, b) => {
+                    self.expression(e, &scope, depth);
+                    self.block(b, &scope, depth);
+                    if let Pattern::Case(_, Some(Some(name))) = pattern {
+                        scope.insert(name.text.clone(), (key(name), depth));
+                    }
+                }
                 Stmt::If(e, a, b) => {
                     self.expression(e, &scope, depth);
                     self.block(a, &scope, depth);

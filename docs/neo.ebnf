@@ -40,9 +40,12 @@ qualified_name   = identifier, { ".", identifier } ;
 
 block            = newlines, "{", separators, { statement, separators }, "}" ;
 statement        = (binding | return_statement | expression_statement | "break" | "continue"), terminator
-                 | if_statement | "while", expression, block | "loop", block
+                 | if_statement | let_else_statement | "while", expression, block | "loop", block
                  | "for", identifier, "in", expression, (".." | "..<"), expression, block ;
-if_statement     = "if", expression, block, [ newlines, "else", (if_statement | block) ] ;
+if_statement     = "if", [ "let", conditional_pattern, "=" ], expression, block,
+                   [ newlines, "else", (if_statement | block) ] ;
+let_else_statement = "let", conditional_pattern, "=", expression, newlines, "else", block ;
+conditional_pattern = identifier, [ "(", (identifier | "_"), ")" ] ;
 binding          = ("let" | "var"), identifier, [ ":", local_type ], "=", expression
                  | "var", identifier, ":", type ;
 local_type       = type, [ "[", integer, "]" ] ;

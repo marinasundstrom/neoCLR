@@ -54,9 +54,12 @@ qualified_name   = identifier, { ".", identifier } ;
 
 block            = newlines, "{", separators, { statement, separators }, "}" ;
 statement        = (binding | return_statement | expression_statement | "break" | "continue"), terminator
-                 | if_statement | "while", expression, block | "loop", block
+                 | if_statement | let_else_statement | "while", expression, block | "loop", block
                  | "for", identifier, "in", expression, (".." | "..<"), expression, block ;
-if_statement     = "if", expression, block, [ newlines, "else", (if_statement | block) ] ;
+if_statement     = "if", [ "let", conditional_pattern, "=" ], expression, block,
+                   [ newlines, "else", (if_statement | block) ] ;
+let_else_statement = "let", conditional_pattern, "=", expression, newlines, "else", block ;
+conditional_pattern = identifier, [ "(", (identifier | "_"), ")" ] ;
 binding          = ("let" | "var"), identifier, [ ":", local_type ], "=", expression
                  | "var", identifier, ":", type ;
 local_type       = type, [ "[", integer, "]" ] ;
@@ -351,3 +354,6 @@ Non-generic source unions support the two forms above. Cases must be distinct
 concrete declared source value types; inline cases generate nested record types.
 A source-union case binding captures the complete variant, unlike the existing
 bundled Option/Result payload projection. See [union declarations](neo-unions.md).
+
+See [conditional union bindings](conditional-patterns.md) for `if let` and
+`let … else`, including scope, failure-path rules and the order-workflow example.

@@ -548,3 +548,6 @@ Declare `union PaymentMethod(Card | Cash)` from existing types, or use inline
 `case` declarations to generate separate nested types. Constructor signatures
 define accepted variants. See [syntax, matching and examples](neo-unions.md), and
 [type/API design guidelines](type-design.md) for choosing values, references and storage.
+
+See [conditional union bindings](conditional-patterns.md) for `if let` and
+`let … else`, including scope, failure-path rules and the order-workflow example.

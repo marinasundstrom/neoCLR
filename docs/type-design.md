@@ -120,3 +120,28 @@ routine refactor changes behavior, and whether an allocation choice leaks into t
 caller unexpectedly. Benchmark allocation/copy cost before claiming an improvement.
 A future high-level language may infer more access/storage choices; the runtime's
 ability to express them does not require every language to expose identical syntax.
+
+## Proposed experiment: contextual borrowing in Neo
+
+Separate the stored value from the passing mode. A Foo& binding stores a managed
+reference; passing its reference value shares the target without exposing the caller's
+binding for replacement. Passing the reference-holding slot itself by reference is a
+second level of indirection; `out Foo&` supplies an output-slot contract. An existing
+Foo& argument already passes without another `&`. The experiment below concerns
+obtaining a reference from a Foo value, not changing how reference values are passed.
+
+Explicit managed-reference types remain a runtime contract. Removing some call-site
+`&` expressions is a separate, unimplemented language experiment: an unambiguous
+expected Foo& could borrow an addressable Foo automatically. Inferred `let copy = value`
+would continue to copy; no implicit heap promotion or lifetime extension is proposed.
+Explicit `&value` would remain available. Ordinary pointer operations are separate.
+
+Compare C#'s [parameter modifiers](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/method-parameters)
+(consulted 2026-09-08): ref/out normally expose the passing mode at the call site,
+whereas in can omit its modifier. Neo's managed references also express object views,
+so this is an analogy rather than a direct mapping. Contextual borrowing could reduce
+noise, but hide mutation/sharing and make overload or API changes alter copying.
+Before adopting it, test value/reference overload ambiguity, readonly targets,
+fields/indexers versus temporaries, generic inference and retained references in the
+order workflow. Runtime escape validation must remain unchanged. No syntax change
+is implemented by recording this proposal.

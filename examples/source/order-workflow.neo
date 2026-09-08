@@ -3,6 +3,11 @@ import System.Console.*
 record Product(Name: string, Price: int, Stock: int)
 record Receipt(Name: string, Quantity: int, Total: int)
 
+union PurchaseError {
+    case InvalidQuantity(quantity: int)
+    case OutOfStock(available: int, requested: int)
+}
+
 interface Notifications {
     func Purchased(receipt: Receipt) -> ()
 }
@@ -19,13 +24,13 @@ func FindProduct(products: readonly System.Collections.ArrayList<Product&>&,
 }
 
 func Purchase(product: Product&, quantity: int,
-              notifications: Notifications&) -> Result<Receipt, string> {
-    if quantity <= 0 { return Result<Receipt,string>.Error("Invalid quantity") }
-    if product.Stock < quantity { return Result<Receipt,string>.Error("Out of stock") }
+              notifications: Notifications&) -> Result<Receipt, PurchaseError> {
+    if quantity <= 0 { return Result<Receipt,PurchaseError>.Error(PurchaseError.InvalidQuantity(quantity)) }
+    if product.Stock < quantity { return Result<Receipt,PurchaseError>.Error(PurchaseError.OutOfStock(product.Stock, quantity)) }
     product.Stock = product.Stock - quantity
     let receipt = Receipt(product.Name, quantity, product.Price * quantity)
     notifications.Purchased(receipt)
-    return Result<Receipt,string>.Ok(receipt)
+    return Result<Receipt,PurchaseError>.Ok(receipt)
 }
 
 func MakeRestock(product: Product&) -> System.Func<int, void> {
@@ -38,26 +43,22 @@ func Main() -> int {
     products.Add(new Product("Tea", 8, 3))
     var notifications = ConsoleNotifications()
     var receipts = System.Collections.ArrayList<Receipt>.Allocate(0)
-    FindProduct(&products, "Coffee") match {
-        Some(let product) => {
-            let restock = MakeRestock(product)
-            Purchase(product, 2, &notifications) match {
-                Ok(let receipt) => { receipts.Add(receipt) },
-                Error(let error) => { WriteLine(error); return 1 }
-            }
-            product.Price = 15
-            restock(4)
-            WriteLine(product.Stock)
-            WriteLine(receipts[0].Total)
-            Purchase(product, 99, &notifications) match {
-                Ok(let receipt) => { return 2 },
-                Error(let error) => { WriteLine(error) }
-            }
-            if product.Stock != 7 { return 3 }
-            if receipts[0].Total != 24 { return 4 }
-        },
-        None => { return 5 }
-    }
+    let Some(product) = FindProduct(&products, "Coffee") else { return 5 }
+    let restock = MakeRestock(product)
+    let Ok(receipt) = Purchase(product, 2, &notifications) else { return 1 }
+    receipts.Add(receipt)
+    product.Price = 15
+    restock(4)
+    WriteLine(product.Stock)
+    WriteLine(receipts[0].Total)
+    if let Error(error) = Purchase(product, 99, &notifications) {
+        if let OutOfStock(details) = error {
+            WriteLine("Out of stock")
+            if details.available != 7 || details.requested != 99 { return 7 }
+        } else { return 8 }
+    } else { return 2 }
+    if product.Stock != 7 { return 3 }
+    if receipts[0].Total != 24 { return 4 }
     if !FindProduct(&products, "Milk").IsNone { return 6 }
     WriteLine("Orders complete")
     return 0

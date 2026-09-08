@@ -114,3 +114,6 @@ constructor signatures and nested identity, source/JSON verification, copy behav
 whole-case matching, reference payloads, GC pressure, invalid conversions, exhaustiveness,
 shadowing and runtime frame-escape rejection. General imported case inference remains
 on the [case-projection plan](result-construction.md#planned-case-projection-ravens-model).
+
+See [conditional union bindings](conditional-patterns.md) for `if let` and
+`let … else`, including scope, failure-path rules and the order-workflow example.
