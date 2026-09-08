@@ -10,3 +10,28 @@
 .function neoCLR.Runtime.TypeArgument(System.RuntimeTypeHandle type, Int32 index) -> System.RuntimeTypeHandle
     .methodimpl InternalCall
 .end
+
+.function neoCLR.Runtime.TypeFields(System.RuntimeTypeHandle type, Int32 flags) -> System.Reflection.FieldInfo[]
+    .methodimpl InternalCall
+.end
+.function neoCLR.Runtime.TypeMethods(System.RuntimeTypeHandle type, Int32 flags) -> System.Reflection.MethodInfo[]
+    .methodimpl InternalCall
+.end
+.function neoCLR.Runtime.TypeProperties(System.RuntimeTypeHandle type, Int32 flags) -> System.Reflection.PropertyInfo[]
+    .methodimpl InternalCall
+.end
+.function neoCLR.Runtime.TypeInterfaces(System.RuntimeTypeHandle type) -> System.Type[]
+    .methodimpl InternalCall
+.end
+.function neoCLR.Runtime.TypeGenericArguments(System.RuntimeTypeHandle type) -> System.Type[]
+    .methodimpl InternalCall
+.end
+.function neoCLR.Runtime.TypeElementType(System.RuntimeTypeHandle type) -> System.Option<System.Type>
+    .methodimpl InternalCall
+.end
+.function neoCLR.Runtime.TypeShape(System.RuntimeTypeHandle type, Int32 kind) -> Boolean
+    .methodimpl InternalCall
+.end
+.function neoCLR.Runtime.TypeDisplayName(System.RuntimeTypeHandle type, Int32 kind) -> String
+    .methodimpl InternalCall
+.end

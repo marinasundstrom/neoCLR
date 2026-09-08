@@ -31,7 +31,7 @@ Duplicate entries in the supplied service set have no additional effect.
 | --- | --- |
 | SlotReferences | ldloca/ldarga and the managed-reference operand path of ldflda/ldobj/stobj/initobj |
 | InterfaceDispatch | interface.borrow and callvirt: explicit borrowed view formation, receiver access and implementation selection |
-| TypeInspection | Type-only ldtoken and validated TypeName/TypeEquals/TypeArgumentCount/TypeArgument InternalCalls |
+| TypeInspection | Type-only ldtoken and validated type identity, shape and [reflection metadata](reflection.md) InternalCalls |
 | ValueStorage | Explicit value.pack/value.is/value.unpack and current erased native return boundaries |
 | NativeAllocation | heap.alloc and heap.free |
 | FrameAllocation | localloc, including the frame-lifetime release contract |

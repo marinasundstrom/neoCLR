@@ -137,75 +137,20 @@ collection now holds a managed T[]& backing array, supports reference elements, 
 uses GC rather than Free. Its capacity allocation and copy rules are documented in
 [ArrayList](array-list.md).
 
-## Next slice: reflection introspection
+## Reflection introspection — completed
 
-Extend [System.Type inspection](type-inspection.md) to enumerate fields, methods,
-and properties. Keep the familiar .NET `System.Reflection` descriptor names and
-`Type.GetFields()`, `GetMethods()`, and `GetProperties()` where they fit. The official
-[GetFields](https://learn.microsoft.com/en-us/dotnet/api/system.type.getfields),
-[GetProperties](https://learn.microsoft.com/en-us/dotnet/api/system.type.getproperties),
-and [BindingFlags](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.bindingflags)
-contracts are the comparison baseline; document every supported subset or deviation.
+Implemented [reflection introspection](reflection.md) through ordinary System.Type
+queries and independent MethodInfo, FieldInfo, PropertyInfo and ParameterInfo records.
+The [Neo example](../examples/source/reflection.neo) exercises field/method/property
+arrays, parameter types, and closed managed-reference generic arguments using existing
+syntax. Public defaults, explicit BindingFlags filtering, accessor options and type
+shape queries are documented and tested. Constructors and module free functions are
+excluded from Type.GetMethods; FunctionInfo remains reserved for future module queries.
 
-Use independent ordinary descriptor records. Class hierarchies are not implemented,
-so do not require MemberInfo/MethodBase inheritance or an Object root to ship this API.
-Shared information can use consistent properties without a common base class.
-
-The initial Type API should expose only these member categories:
-
-| Query | Result descriptor | Scope |
-| --- | --- | --- |
-| Type.GetFields() | FieldInfo[] | Fields declared by the type |
-| Type.GetMethods() | MethodInfo[] | Instance and static methods belonging to the type |
-| Type.GetProperties() | PropertyInfo[] | Declared property metadata and accessors |
-
-FunctionInfo is appropriate only for a module-level free-function query, such as a
-future Module.GetFunctions(). It is not returned by Type.GetMethods and does not
-require a FunctionInfo/MethodInfo inheritance relationship. Keep module enumeration
-optional after the initial Type member slice; describe free-function versus static
-method ownership explicitly if that API is introduced.
-
-The bounded implementation should cover:
-
-- `FieldInfo`: Name, DeclaringType, FieldType, and represented visibility/storage flags.
-- `MethodInfo`: Name, DeclaringType, ReturnType, static/instance information, and
-  `GetParameters()` returning parameter names, positions, types and output contracts.
-  Keep constructor enumeration distinct from ordinary methods.
-- `PropertyInfo`: Name, DeclaringType, PropertyType, index parameters, CanRead/CanWrite,
-  and getter/setter descriptors using existing property metadata.
-- Type shape: namespace/full-name policy, generic arguments, implemented interfaces,
-  and element type plus IsArray/IsByRef/IsPointer where supported. Audit the existing
-  qualified Type.Name contract before introducing CLR-like Name/FullName behavior.
-- neoCLR-specific facts: managed-reference signatures and reference receiver mode.
-  Expose these without classifying the underlying definition as inherently a value
-  type or a reference type.
-
-Start with public member enumeration. Define a supported BindingFlags subset for
-explicit filtering; reject unsupported flags instead of silently ignoring them.
-There is no inherited-member enumeration until inheritance exists. Document order,
-overload identity, visibility, generic substitution and descriptor lifetime. Inspection
-must not invoke property getters or grant mutation/private invocation access.
-
-Return ordinary typed descriptor arrays, choosing value results by default and using
-managed heap references only where the API deliberately promises shared storage.
-Descriptors describe metadata; they must not capture guest object references or become
-hidden GC roots. Preserve module/revision/definition identity and avoid recursive
-unbounded snapshots when a type's members refer back to the type.
-
-The end-to-end Neo example should enumerate a record's fields and methods, and a
-library type's properties and method parameters, using existing arrays, loops and
-ordinary property access. Include closed generic types and managed-reference signatures.
-Keep Neo updates bounded to that scenario. Add source/artifact round-trip tests,
-visibility checks and a GC-pressure test for returned descriptor arrays. Document
-the feature, public signatures, return/storage contracts, supported metadata,
-limitations, and runnable Neo/IL examples in a reflection guide in the same slice.
-
-For inspection starting from an object/reference expression, explicitly distinguish
-its declared type from the concrete type behind a managed interface view. Design a
-reference-aware type lookup that does not require an Object base or boxing. Do not
-pretend the existing `TypeOf<T>.Of(T)` provides dynamic type discovery. Reflective
-GetValue/SetValue, Invoke, construction, attribute instantiation and metadata mutation
-remain subsequent work after enumeration and type discovery are sound.
+Dynamic discovery from a managed reference remains a follow-up to metadata enumeration.
+It must distinguish declared interface type from the live concrete target, without
+boxing, requiring Object, or retaining the target. Reflective execution and metadata
+mutation remain separate future work.
 
 ## Following slice: ordinary and output reference parameters
 

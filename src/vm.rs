@@ -1545,8 +1545,14 @@ fn interpret_instructions(
                         expect(&value, &callee.returns)?;
                         frame.stack.push(value.on_stack());
                     } else if callee.is_internal_call() {
-                        let value = crate::native::bind(&callee)?.invoke(
+                        let binding = crate::native::bind(&callee)?;
+                        if matches!(binding, crate::native::Binding::Reflection(_)) {
+                            arrays_used = true;
+                        }
+                        let value = binding.invoke(
                             args,
+                            module,
+                            &limits,
                             output,
                             options.console.as_deref(),
                         )?;

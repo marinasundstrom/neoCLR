@@ -23,6 +23,7 @@ mod native;
 mod program;
 mod reachability;
 mod references;
+mod reflection;
 pub use reachability::{FunctionImplementation, Reachability, ReachableCall, ReachableFunction};
 mod scope;
 mod services;

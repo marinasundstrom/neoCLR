@@ -28,8 +28,16 @@ pub struct TypeDescriptor {
 
 pub(crate) fn describe(module: &Module, ty: &Type) -> Result<TypeDescriptor, Fault> {
     let normalized = crate::scope::normalize_type(module, ty)?;
-    let identity = resolve(module, &normalized)?;
-    let name = match &normalized {
+    resolve(module, &normalized)?;
+    describe_loaded(module, &normalized)
+}
+
+// Introspection follows already validated metadata, including transitive signatures.
+// It does not grant permission to name those types in executable instructions.
+pub(crate) fn describe_loaded(module: &Module, normalized: &Type) -> Result<TypeDescriptor, Fault> {
+    crate::vm::check_type(normalized, module)?;
+    let identity = build(module, normalized)?;
+    let name = match normalized {
         Type::ByRef(element) => format!("{}&", signature_name(element)?),
         Type::Array(element) => format!("{}[]", signature_name(element)?),
         Type::Ptr(element) => format!("{}*", signature_name(element)?),
@@ -39,15 +47,15 @@ pub(crate) fn describe(module: &Module, ty: &Type) -> Result<TypeDescriptor, Fau
             .ok_or_else(|| Fault::new("type has no metadata name"))?
             .to_owned(),
     };
-    let generic_arguments = match &normalized {
+    let generic_arguments = match normalized {
         Type::Constructed { arguments, .. } => arguments
             .iter()
-            .map(|argument| describe(module, argument))
+            .map(|argument| describe_loaded(module, argument))
             .collect::<Result<_, _>>()?,
         _ => vec![],
     };
     let declaring_type = module
-        .type_definition(&normalized)
+        .type_definition(normalized)
         .and_then(|definition| definition.declaring_type.clone());
     Ok(TypeDescriptor {
         identity,

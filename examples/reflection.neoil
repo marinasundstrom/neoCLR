@@ -1,0 +1,16 @@
+.module ReflectionExample
+.entry Main
+.type Counter
+    .field Age Int32
+.end
+.function Main() -> Void
+    ldtoken Counter
+    call System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)
+    call instance System.Type::GetFields()
+    ldc.i4 0
+    ldelem System.Reflection.FieldInfo
+    call instance System.Reflection.FieldInfo::get_FieldType()
+    call instance System.Type::get_Name()
+    call System.Console::WriteLine(String)
+    ret
+.end

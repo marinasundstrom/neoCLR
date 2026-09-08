@@ -33,7 +33,7 @@ fn runtime_library_is_assembled_platform_code() {
             .iter()
             .filter(|f| f.is_internal_call())
             .count(),
-        14
+        22 // Includes eight metadata-only reflection helpers.
     );
     assert!(
         module

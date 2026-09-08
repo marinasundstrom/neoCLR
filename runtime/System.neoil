@@ -51,3 +51,5 @@
 .include "System/Collections/List.neoil"
 .include "System/Disposable.neoil"
 .include "System/Closable.neoil"
+
+.include "System/Reflection.neoil"

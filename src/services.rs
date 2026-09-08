@@ -49,7 +49,8 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
     }
     if function.is_internal_call() {
         let service = match crate::native::bind(function)? {
-            crate::native::Binding::TypeName
+            crate::native::Binding::Reflection(_)
+            | crate::native::Binding::TypeName
             | crate::native::Binding::TypeEquals
             | crate::native::Binding::TypeArgumentCount
             | crate::native::Binding::TypeArgument => RuntimeService::TypeInspection,
@@ -69,6 +70,24 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             service,
             instruction: None,
         }];
+        if let crate::native::Binding::Reflection(query) = crate::native::bind(function)? {
+            use crate::reflection::Query;
+            if !matches!(
+                query,
+                Query::Shape | Query::DisplayName | Query::ElementType
+            ) {
+                uses.push(ServiceUse {
+                    service: RuntimeService::ManagedArrays,
+                    instruction: None,
+                });
+            }
+            if matches!(query, Query::Properties | Query::ElementType) {
+                uses.push(ServiceUse {
+                    service: RuntimeService::ValueStorage,
+                    instruction: None,
+                });
+            }
+        }
         if function.returns == crate::metadata::Type::Value {
             uses.push(ServiceUse {
                 service: RuntimeService::ValueStorage,

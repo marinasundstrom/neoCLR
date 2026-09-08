@@ -1,0 +1,395 @@
+; Independent metadata snapshots. No Object or MemberInfo base class.
+.type System.Reflection.ParameterInfo
+    .field private Name String
+    .field private Position Int32
+    .field private ParameterType System.Type
+    .field private IsOut Boolean
+    .field private IsOutWhenTrue Boolean
+    .property instance Name() -> String
+        .get instance System.Reflection.ParameterInfo::get_Name()
+    .end
+    .method instance get_Name() -> String
+        ldarg this
+        ldfld 0
+        ret
+    .end
+    .property instance Position() -> Int32
+        .get instance System.Reflection.ParameterInfo::get_Position()
+    .end
+    .method instance get_Position() -> Int32
+        ldarg this
+        ldfld 1
+        ret
+    .end
+    .property instance ParameterType() -> System.Type
+        .get instance System.Reflection.ParameterInfo::get_ParameterType()
+    .end
+    .method instance get_ParameterType() -> System.Type
+        ldarg this
+        ldfld 2
+        ret
+    .end
+    .property instance IsOut() -> Boolean
+        .get instance System.Reflection.ParameterInfo::get_IsOut()
+    .end
+    .method instance get_IsOut() -> Boolean
+        ldarg this
+        ldfld 3
+        ret
+    .end
+    .property instance IsOutWhenTrue() -> Boolean
+        .get instance System.Reflection.ParameterInfo::get_IsOutWhenTrue()
+    .end
+    .method instance get_IsOutWhenTrue() -> Boolean
+        ldarg this
+        ldfld 4
+        ret
+    .end
+.end
+
+.type System.Reflection.FieldInfo
+    .field private Name String
+    .field private DeclaringType System.Type
+    .field private FieldType System.Type
+    .field private IsPublic Boolean
+    .field private IsPrivate Boolean
+    .field private IsAssembly Boolean
+    .field private IsStatic Boolean
+    .field private DefinitionIndex Int32
+    .property instance Name() -> String
+        .get instance System.Reflection.FieldInfo::get_Name()
+    .end
+    .method instance get_Name() -> String
+        ldarg this
+        ldfld 0
+        ret
+    .end
+    .property instance DeclaringType() -> System.Type
+        .get instance System.Reflection.FieldInfo::get_DeclaringType()
+    .end
+    .method instance get_DeclaringType() -> System.Type
+        ldarg this
+        ldfld 1
+        ret
+    .end
+    .property instance FieldType() -> System.Type
+        .get instance System.Reflection.FieldInfo::get_FieldType()
+    .end
+    .method instance get_FieldType() -> System.Type
+        ldarg this
+        ldfld 2
+        ret
+    .end
+    .property instance IsPublic() -> Boolean
+        .get instance System.Reflection.FieldInfo::get_IsPublic()
+    .end
+    .method instance get_IsPublic() -> Boolean
+        ldarg this
+        ldfld 3
+        ret
+    .end
+    .property instance IsPrivate() -> Boolean
+        .get instance System.Reflection.FieldInfo::get_IsPrivate()
+    .end
+    .method instance get_IsPrivate() -> Boolean
+        ldarg this
+        ldfld 4
+        ret
+    .end
+    .property instance IsAssembly() -> Boolean
+        .get instance System.Reflection.FieldInfo::get_IsAssembly()
+    .end
+    .method instance get_IsAssembly() -> Boolean
+        ldarg this
+        ldfld 5
+        ret
+    .end
+    .property instance IsStatic() -> Boolean
+        .get instance System.Reflection.FieldInfo::get_IsStatic()
+    .end
+    .method instance get_IsStatic() -> Boolean
+        ldarg this
+        ldfld 6
+        ret
+    .end
+    .property instance DefinitionIndex() -> Int32
+        .get instance System.Reflection.FieldInfo::get_DefinitionIndex()
+    .end
+    .method instance get_DefinitionIndex() -> Int32
+        ldarg this
+        ldfld 7
+        ret
+    .end
+.end
+
+.type System.Reflection.MethodInfo
+    .field private Name String
+    .field private DeclaringType System.Type
+    .field private ReturnType System.Type
+    .field private IsStatic Boolean
+    .field private IsPublic Boolean
+    .field private IsPrivate Boolean
+    .field private IsAssembly Boolean
+    .field private IsReceiverByRef Boolean
+    .field private DefinitionIndex Int32
+    .field private Parameters System.Reflection.ParameterInfo[]
+    .property instance Name() -> String
+        .get instance System.Reflection.MethodInfo::get_Name()
+    .end
+    .method instance get_Name() -> String
+        ldarg this
+        ldfld 0
+        ret
+    .end
+    .property instance DeclaringType() -> System.Type
+        .get instance System.Reflection.MethodInfo::get_DeclaringType()
+    .end
+    .method instance get_DeclaringType() -> System.Type
+        ldarg this
+        ldfld 1
+        ret
+    .end
+    .property instance ReturnType() -> System.Type
+        .get instance System.Reflection.MethodInfo::get_ReturnType()
+    .end
+    .method instance get_ReturnType() -> System.Type
+        ldarg this
+        ldfld 2
+        ret
+    .end
+    .property instance IsStatic() -> Boolean
+        .get instance System.Reflection.MethodInfo::get_IsStatic()
+    .end
+    .method instance get_IsStatic() -> Boolean
+        ldarg this
+        ldfld 3
+        ret
+    .end
+    .property instance IsPublic() -> Boolean
+        .get instance System.Reflection.MethodInfo::get_IsPublic()
+    .end
+    .method instance get_IsPublic() -> Boolean
+        ldarg this
+        ldfld 4
+        ret
+    .end
+    .property instance IsPrivate() -> Boolean
+        .get instance System.Reflection.MethodInfo::get_IsPrivate()
+    .end
+    .method instance get_IsPrivate() -> Boolean
+        ldarg this
+        ldfld 5
+        ret
+    .end
+    .property instance IsAssembly() -> Boolean
+        .get instance System.Reflection.MethodInfo::get_IsAssembly()
+    .end
+    .method instance get_IsAssembly() -> Boolean
+        ldarg this
+        ldfld 6
+        ret
+    .end
+    .property instance IsReceiverByRef() -> Boolean
+        .get instance System.Reflection.MethodInfo::get_IsReceiverByRef()
+    .end
+    .method instance get_IsReceiverByRef() -> Boolean
+        ldarg this
+        ldfld 7
+        ret
+    .end
+    .property instance DefinitionIndex() -> Int32
+        .get instance System.Reflection.MethodInfo::get_DefinitionIndex()
+    .end
+    .method instance get_DefinitionIndex() -> Int32
+        ldarg this
+        ldfld 8
+        ret
+    .end
+    .method instance GetParameters() -> System.Reflection.ParameterInfo[]
+        ldarg this
+        ldfld 9
+        ret
+    .end
+.end
+
+.type System.Reflection.PropertyInfo
+    .field private Name String
+    .field private DeclaringType System.Type
+    .field private PropertyType System.Type
+    .field private IsStatic Boolean
+    .field private CanRead Boolean
+    .field private CanWrite Boolean
+    .field private DefinitionIndex Int32
+    .field private IndexParameters System.Reflection.ParameterInfo[]
+    .field private Getter System.Option<System.Reflection.MethodInfo>
+    .field private Setter System.Option<System.Reflection.MethodInfo>
+    .property instance Name() -> String
+        .get instance System.Reflection.PropertyInfo::get_Name()
+    .end
+    .method instance get_Name() -> String
+        ldarg this
+        ldfld 0
+        ret
+    .end
+    .property instance DeclaringType() -> System.Type
+        .get instance System.Reflection.PropertyInfo::get_DeclaringType()
+    .end
+    .method instance get_DeclaringType() -> System.Type
+        ldarg this
+        ldfld 1
+        ret
+    .end
+    .property instance PropertyType() -> System.Type
+        .get instance System.Reflection.PropertyInfo::get_PropertyType()
+    .end
+    .method instance get_PropertyType() -> System.Type
+        ldarg this
+        ldfld 2
+        ret
+    .end
+    .property instance IsStatic() -> Boolean
+        .get instance System.Reflection.PropertyInfo::get_IsStatic()
+    .end
+    .method instance get_IsStatic() -> Boolean
+        ldarg this
+        ldfld 3
+        ret
+    .end
+    .property instance CanRead() -> Boolean
+        .get instance System.Reflection.PropertyInfo::get_CanRead()
+    .end
+    .method instance get_CanRead() -> Boolean
+        ldarg this
+        ldfld 4
+        ret
+    .end
+    .property instance CanWrite() -> Boolean
+        .get instance System.Reflection.PropertyInfo::get_CanWrite()
+    .end
+    .method instance get_CanWrite() -> Boolean
+        ldarg this
+        ldfld 5
+        ret
+    .end
+    .property instance DefinitionIndex() -> Int32
+        .get instance System.Reflection.PropertyInfo::get_DefinitionIndex()
+    .end
+    .method instance get_DefinitionIndex() -> Int32
+        ldarg this
+        ldfld 6
+        ret
+    .end
+    .method instance GetIndexParameters() -> System.Reflection.ParameterInfo[]
+        ldarg this
+        ldfld 7
+        ret
+    .end
+    .method instance GetGetMethod() -> System.Option<System.Reflection.MethodInfo>
+        ldarg this
+        ldc.bool false
+        call instance System.Reflection.PropertyInfo::GetGetMethod(Boolean)
+        ret
+    .end
+    .method instance GetGetMethod(Boolean nonPublic) -> System.Option<System.Reflection.MethodInfo>
+        ldarg nonPublic
+        brtrue Return
+        ldarg this
+        ldfld 8
+        call instance System.Option<System.Reflection.MethodInfo>::get_IsSome()
+        brfalse Return
+        ldarg this
+        ldfld 8
+        call instance System.Option<System.Reflection.MethodInfo>::GetSomeCase()
+        call instance System.Option.Some<System.Reflection.MethodInfo>::get_Value()
+        call instance System.Reflection.MethodInfo::get_IsPublic()
+        brtrue Return
+        newobj instance System.Option.None::.ctor()
+        newobj instance System.Option<System.Reflection.MethodInfo>::.ctor(System.Option.None)
+        ret
+    Return:
+        ldarg this
+        ldfld 8
+        ret
+    .end
+    .method instance GetSetMethod() -> System.Option<System.Reflection.MethodInfo>
+        ldarg this
+        ldc.bool false
+        call instance System.Reflection.PropertyInfo::GetSetMethod(Boolean)
+        ret
+    .end
+    .method instance GetSetMethod(Boolean nonPublic) -> System.Option<System.Reflection.MethodInfo>
+        ldarg nonPublic
+        brtrue Return
+        ldarg this
+        ldfld 9
+        call instance System.Option<System.Reflection.MethodInfo>::get_IsSome()
+        brfalse Return
+        ldarg this
+        ldfld 9
+        call instance System.Option<System.Reflection.MethodInfo>::GetSomeCase()
+        call instance System.Option.Some<System.Reflection.MethodInfo>::get_Value()
+        call instance System.Reflection.MethodInfo::get_IsPublic()
+        brtrue Return
+        newobj instance System.Option.None::.ctor()
+        newobj instance System.Option<System.Reflection.MethodInfo>::.ctor(System.Option.None)
+        ret
+    Return:
+        ldarg this
+        ldfld 9
+        ret
+    .end
+.end
+
+; Typed flag wrapper until enum declarations are available. CLR bit values.
+.type System.Reflection.BindingFlags
+    .field private Bits Int32
+    .method static FromValue(Int32 value) -> System.Reflection.BindingFlags
+        ldarg value
+        newobj System.Reflection.BindingFlags
+        ret
+    .end
+    .method instance get_Value() -> Int32
+        ldarg this
+        ldfld 0
+        ret
+    .end
+    .method instance Or(System.Reflection.BindingFlags other) -> System.Reflection.BindingFlags
+        ldarg this
+        ldfld 0
+        ldarg other
+        ldfld 0
+        or
+        newobj System.Reflection.BindingFlags
+        ret
+    .end
+    .method static Default() -> System.Reflection.BindingFlags
+        ldc.i4 0
+        newobj System.Reflection.BindingFlags
+        ret
+    .end
+    .method static DeclaredOnly() -> System.Reflection.BindingFlags
+        ldc.i4 2
+        newobj System.Reflection.BindingFlags
+        ret
+    .end
+    .method static Instance() -> System.Reflection.BindingFlags
+        ldc.i4 4
+        newobj System.Reflection.BindingFlags
+        ret
+    .end
+    .method static Static() -> System.Reflection.BindingFlags
+        ldc.i4 8
+        newobj System.Reflection.BindingFlags
+        ret
+    .end
+    .method static Public() -> System.Reflection.BindingFlags
+        ldc.i4 16
+        newobj System.Reflection.BindingFlags
+        ret
+    .end
+    .method static NonPublic() -> System.Reflection.BindingFlags
+        ldc.i4 32
+        newobj System.Reflection.BindingFlags
+        ret
+    .end
+.end

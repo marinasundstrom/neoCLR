@@ -394,8 +394,10 @@ types. Dedicated union opcodes are not planned.
 
 [Marker custom attributes](docs/custom-attributes.md) are supported on types and
 methods/functions. The System library supplies UnionAttribute as an ordinary marker;
-case behavior lives in ordinary library methods. Read-only type inspection is available;
-general reflection and guest attribute discovery remain deferred.
+case behavior lives in ordinary library methods. [Reflection introspection](docs/reflection.md)
+now enumerates fields, methods, properties and parameter signatures. Run
+`cargo run -- run examples/source/reflection.neo` for the Neo example. Reflective
+invocation and guest attribute discovery remain deferred.
 
 Following the strategy review, the [control-flow verifier foundation](docs/verification.md)
 is implemented as an explicit `verify` command. It checks stack types, call/field

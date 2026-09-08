@@ -141,3 +141,11 @@ all existing CLI tools support it unchanged.
 Runtime helper names are implementation details, not the intended consumer API.
 Visibility/access enforcement is still pending, so the prototype does not yet
 prevent applications from naming those declared helpers directly.
+
+## Reflection introspection
+
+System.Type exposes GetFields, GetMethods and GetProperties, returning ordinary typed
+value arrays of independent System.Reflection descriptors. Parameter and accessor
+metadata preserve managed-reference signatures and receiver/output contracts. See the
+[reflection API guide](reflection.md) for filtering, type-shape queries, storage and
+identity contracts, limitations, and runnable Neo/IL examples.

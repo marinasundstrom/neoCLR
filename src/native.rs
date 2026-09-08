@@ -5,6 +5,7 @@ use crate::{
 };
 
 pub(crate) enum Binding {
+    Reflection(crate::reflection::Query),
     TypeName,
     TypeEquals,
     TypeArgumentCount,
@@ -24,6 +25,17 @@ pub(crate) enum Binding {
 pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
     if !function.is_internal_call() || function.instance || function.owner.is_some() {
         return Err(Fault::new("native binding requires InternalCall metadata"));
+    }
+    if let Some((query, integer, returns)) = crate::reflection::Query::binding(&function.name) {
+        let expected = if integer {
+            vec![Type::RuntimeTypeHandle, Type::Int32]
+        } else {
+            vec![Type::RuntimeTypeHandle]
+        };
+        if function.parameters != expected || function.returns != returns {
+            return Err(Fault::new("reflection binding signature mismatch"));
+        }
+        return Ok(Binding::Reflection(query));
     }
     let (binding, returns) = match (function.name.as_str(), function.parameters.as_slice()) {
         ("neoCLR.Runtime.ParseInt32", [Type::String]) => (Binding::ParseInt32, Type::Value),
@@ -76,9 +88,14 @@ impl Binding {
     pub(crate) fn invoke(
         &self,
         args: Vec<Value>,
+        module: &crate::Module,
+        limits: &crate::Limits,
         output: &mut Vec<String>,
         console: Option<&dyn crate::Console>,
     ) -> Result<Value, Fault> {
+        if let Self::Reflection(query) = self {
+            return query.invoke(module, &args, limits);
+        }
         match (self, args.as_slice()) {
             (Self::TypeName, [Value::RuntimeTypeHandle(handle)]) => {
                 Ok(Value::String(handle.name.clone()))

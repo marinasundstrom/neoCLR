@@ -1,0 +1,36 @@
+import System.Console.*
+
+record Counter(Age: int) {
+    func Add(amount: int) -> () {
+        this.Age = this.Age + amount
+    }
+}
+
+func PrintMethod(method: System.Reflection.MethodInfo) -> () {
+    WriteLine(method.Name)
+    let parameters = method.GetParameters()
+    for i in 0..<parameters.Length {
+        WriteLine(parameters[i].ParameterType.Name)
+    }
+}
+
+func Main() -> () {
+    let fields = typeof(Counter).GetFields()
+    for i in 0..<fields.Length {
+        WriteLine(fields[i].Name)
+        WriteLine(fields[i].FieldType.Name)
+    }
+    let methods = typeof(Counter).GetMethods()
+    for i in 0..<methods.Length {
+        PrintMethod(methods[i])
+    }
+    let properties = typeof(System.Type).GetProperties()
+    for i in 0..<properties.Length {
+        WriteLine(properties[i].Name)
+    }
+    let arguments = typeof(Option<Counter&>).GetGenericArguments()
+    WriteLine(arguments[0].Name)
+    if arguments[0].IsByRef {
+        WriteLine("Managed reference signature")
+    }
+}

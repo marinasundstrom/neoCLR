@@ -24,7 +24,8 @@ Name matches the host descriptor's existing naming contract. A Box<Int32> descri
 has Name `Box` and a separate System.Int32 argument descriptor. This is not the CLR
 Name/FullName/assembly-qualified-name formatting contract. A pointer to Box<Int32>
 is named `Box<System.Int32>*`; pointer and managed-reference signatures expose no generic
-argument list of their own. No element-type property is provided in this subset.
+argument list of their own. GetElementType now exposes these targets; see
+[reflection introspection](reflection.md).
 
 ## Identity and lifetime
 
@@ -55,10 +56,12 @@ unknown, invalid-arity or unbound types are rejected. Normal module-reference an
 accessibility rules apply to the operand. A handle grants no ability to invoke private
 methods, construct inaccessible types or mutate fields.
 
-System.Type uses four narrow InternalCall helpers for name, identity comparison and
-generic argument inspection. The existing binding registry validates their signatures.
-Reachability reports the TypeInspection runtime service for ldtoken and those imports;
-no System.Value or ValueStorage service is involved. A future JIT/AOT backend must
+System.Type uses narrow InternalCall helpers for name, identity comparison,
+generic argument inspection and [member queries](reflection.md). The existing binding
+registry validates their signatures. Reachability reports the TypeInspection runtime
+service for ldtoken and those imports. The original token/name/identity queries need
+no ValueStorage service; the newer Option-returning reflection queries use the current
+System.Value carrier. A future JIT/AOT backend must
 retain the required metadata and supply this service. The interpreter's owned snapshots
 are not a prescribed native handle layout or an implemented AOT backend.
 
@@ -80,8 +83,9 @@ The sample creates a Box<Int32> value, gets its declared type and compares it wi
 statically named Box<int> token. The walkthrough acceptance test also runs its source
 and assembled artifact through the CLI.
 
-Member enumeration, construction/invocation by descriptor, dynamic object GetType,
-custom-attribute reflection, mutable metadata and a comprehensive Type API remain
+[Member enumeration](reflection.md) is implemented. Construction/invocation by
+descriptor, dynamic object GetType, custom-attribute reflection, mutable metadata
+and a comprehensive Type API remain
 outside this slice. The prototype names and API may evolve independently of .NET's
 reflection hierarchy.
 
