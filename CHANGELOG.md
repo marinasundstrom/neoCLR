@@ -10,6 +10,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 #### Changed
 
+- Planned runtime-enforced immutable storage and readonly reference/receiver
+  capabilities, with Neo syntax and diagnostics above them. Documented their
+  independence, shallow boundaries, alias checks and initialization/re-entry
+  decisions; placed this foundation first in the exploration roadmap. These
+  contracts are not yet implemented.
+
 - Recorded the planned platform backlog: inheritance, nullable slots, enums/flags, delegates and
   lambdas, generic constraints (including not-null/not-void/not-reference), runtime
   async, dynamic hooks and fundamental framework growth. Documented open contracts,

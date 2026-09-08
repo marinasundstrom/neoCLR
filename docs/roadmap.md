@@ -1,7 +1,7 @@
 # Direction and migration
 
 The [platform backlog](platform-backlog.md) records the next broad capabilities:
-inheritance, nullable slots, enums/flags, delegates/lambdas, generic constraints, runtime async,
+binding immutability/readonly references, inheritance, nullable slots, enums/flags, delegates/lambdas, generic constraints, runtime async,
 dynamic hooks, and a more useful fundamental library. Familiarity primarily means C#/.NET APIs and observable behavior, not matching
 source syntax or runtime internals. Improve contracts without legacy constraints.
 
@@ -14,13 +14,14 @@ The completed memory and Neo foundations remain the starting point.
 
 | Order | Projected tasks | Exit criterion / demonstration |
 | --- | --- | --- |
-| 1. Inheritance and object model | Specify base metadata, field layout, construction order, virtual slots, override validation and base-value copy rules. Implement one inheritance chain, base-reference conversion, full-owner GC tracing and reflection of inherited members. | A derived value can be used locally and on the managed heap, dispatched through a base reference, and inspected without losing derived identity or bypassing lifetime checks. |
-| 2. Nullable slots | Specify null versus uninitialized storage, nullable values versus nullable references, conversions and checked access. Add metadata, runtime storage, verifier/GC rules and a small Neo projection. | Store, copy, clear and inspect a genuinely nullable slot; absent access fails predictably, and clearing a heap reference removes its GC edge. |
-| 3. Enums and flags | Specify underlying integral types, enum identity, named constants, a flags designation, conversions and unknown-value rules. Add metadata, typed bitwise operations, reflection/formatting and a bounded Neo projection. | A typed options value combines and tests flags, round-trips through an artifact, and formats named and unnamed combinations according to a documented contract. |
-| 4. Generic constraints | Specify base/interface constraints plus not-null, not-void and not-reference scopes. Implement metadata/substitution validation and negative cases at loading and relevant invocation boundaries; project a bounded subset in Neo. | A small generic API accepts valid arguments and rejects invalid ones consistently from source and IL/artifacts. |
-| 5. Managed delegates and lambdas | Start with typed static and bound-instance delegates and invocation. Then specify capture modes, escaping closure ownership, equality and optional multicast semantics. Evaluate function pointers only where needed for invocation or interop. | A callback retains a managed receiver or eligible capture, runs through a typed delegate, and cannot retain a dead frame reference. |
-| 6. Runtime suspension and async | Specify suspended activation ownership, references across suspension, resume/completion, cancellation and Fault/error propagation. Implement a minimal suspension primitive and evaluate a Task-like library/Neo projection. | One suspend/resume program preserves live roots, rejects invalid lifetimes, reports completion/cancellation, and exposes suspended state in the debugger. |
-| 7. Dynamic binding hooks | Choose a concrete dynamic-object use case. Specify operations, hook discovery, lookup/fallback, access checks and cache invalidation; then implement a bounded binder and source demonstration. | A hooked member operation has predictable success and missing-member behavior while retaining runtime type and lifetime checks. |
+| 1. Binding immutability and readonly access | Decide protected-slot versus reference-capability contracts, initialization/re-entry and shallow boundaries. Implement runtime enforcement, receiver permissions, verifier/reflection support and Neo projections. | All four binding/reference mutability combinations work; raw IL cannot bypass protected storage or upgrade readonly access; aliases, loops and reference-containing values follow documented rules. |
+| 2. Inheritance and object model | Specify base metadata, field layout, construction order, virtual slots, override validation and base-value copy rules. Implement one inheritance chain, base-reference conversion, full-owner GC tracing and reflection of inherited members. | A derived value can be used locally and on the managed heap, dispatched through a base reference, and inspected without losing derived identity or bypassing lifetime checks. |
+| 3. Nullable slots | Specify null versus uninitialized storage, nullable values versus nullable references, conversions and checked access. Add metadata, runtime storage, verifier/GC rules and a small Neo projection. | Store, copy, clear and inspect a genuinely nullable slot; absent access fails predictably, and clearing a heap reference removes its GC edge. |
+| 4. Enums and flags | Specify underlying integral types, enum identity, named constants, a flags designation, conversions and unknown-value rules. Add metadata, typed bitwise operations, reflection/formatting and a bounded Neo projection. | A typed options value combines and tests flags, round-trips through an artifact, and formats named and unnamed combinations according to a documented contract. |
+| 5. Generic constraints | Specify base/interface constraints plus not-null, not-void and not-reference scopes. Implement metadata/substitution validation and negative cases at loading and relevant invocation boundaries; project a bounded subset in Neo. | A small generic API accepts valid arguments and rejects invalid ones consistently from source and IL/artifacts. |
+| 6. Managed delegates and lambdas | Start with typed static and bound-instance delegates and invocation. Then specify capture modes, escaping closure ownership, equality and optional multicast semantics. Evaluate function pointers only where needed for invocation or interop. | A callback retains a managed receiver or eligible capture, runs through a typed delegate, and cannot retain a dead frame reference. |
+| 7. Runtime suspension and async | Specify suspended activation ownership, references across suspension, resume/completion, cancellation and Fault/error propagation. Implement a minimal suspension primitive and evaluate a Task-like library/Neo projection. | One suspend/resume program preserves live roots, rejects invalid lifetimes, reports completion/cancellation, and exposes suspended state in the debugger. |
+| 8. Dynamic binding hooks | Choose a concrete dynamic-object use case. Specify operations, hook discovery, lookup/fallback, access checks and cache invalidation; then implement a bounded binder and source demonstration. | A hooked member operation has predictable success and missing-member behavior while retaining runtime type and lifetime checks. |
 
 Enums and flags can move earlier as an independent bounded slice; they need not
 wait for an Object hierarchy.
@@ -31,6 +32,10 @@ With nullability and constraints, exercise collection and optional-value APIs. W
 delegates, add a real callback consumer; with async, choose a bounded I/O or host
 completion scenario. Add text, collections, streams/files and other framework classes
 as those programs need them, with consistent APIs rather than isolated demonstrations.
+
+The [mutability design](mutability.md) places immutable storage and readonly access
+in runtime contracts, with syntax and early diagnostics in Neo. Explore it first so
+inheritance and capture rules preserve one shared permission model.
 
 Keep these early decisions explicit:
 

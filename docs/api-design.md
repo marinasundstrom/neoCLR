@@ -227,3 +227,8 @@ A migration is complete when System metadata and IL, its callers, the verifier/r
 checks, Neo lowering where supported, examples, and documentation agree. Use executable
 examples that exercise both frame and managed heap owners, and verify that value-return
 APIs still copy while reference operations affect the intended original storage.
+
+The planned [mutability contracts](mutability.md) place readonly references and
+receiver permissions in the runtime, with Neo diagnostics above them. Use these
+contracts when implemented; current writable T& APIs do not already promise readonly
+access. Immutable bindings and deep object immutability are separate concerns.

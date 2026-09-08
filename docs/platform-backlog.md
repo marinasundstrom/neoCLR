@@ -17,6 +17,7 @@ it remains a concept compiler rather than a prerequisite full language implement
 
 | Area | Intended capability | Decisions before implementation |
 | --- | --- | --- |
+| Binding immutability and readonly references | Independent protected bindings and restricted managed access, enforced by runtime and projected in Neo | Slot initialization/re-entry; reference permissions and conversions; readonly receivers; owned fields versus referenced targets; verifier, reflection and dispatch enforcement |
 | Object-oriented programming | Inheritance, base references, virtual methods and overrides, with familiar construction and member lookup | Base metadata and layout; constructor chaining; override validation; base-value copying or slicing; complete derived-object tracing and lifetime preservation through base views |
 | Nullability | Genuinely nullable slots with an explicit absent value, including nullable managed references | Representation and type identity; nullable value versus nullable reference syntax; conversions, access checks and initialization; reflection, verifier and GC rules |
 | Delegates and lambdas | Typed callable values, bound receivers and captured environments | Invocation signatures; capture by value versus reference; escaping captures and GC roots; delegate equality and possible multicast behavior; whether low-level function pointers are needed |
@@ -27,6 +28,11 @@ it remains a concept compiler rather than a prerequisite full language implement
 | Fundamental library and framework | A coherent set of base types and useful framework APIs, implemented as scenarios require them | Which contracts belong in metadata/runtime services and which belong in library types; optional Object methods; collections, text, I/O, callable and async APIs; consistent errors, references and cleanup |
 
 ## Contract boundaries
+
+**Mutability** belongs in runtime storage and access contracts, with language syntax
+and early diagnostics layered above. Immutable binding and readonly target access
+are independent; neither promises deep immutability. The [placement decision](mutability.md)
+details alias checks, receiver permissions and initialization/re-entry work.
 
 **Inheritance** builds on the [object hierarchy design](object-hierarchy.md). A base
 reference must preserve the complete derived allocation's identity and reachability.
@@ -91,16 +97,17 @@ where they fit the value/reference model.
 
 ## Suggested sequence and acceptance
 
-1. Establish inheritance and nullable-slot contracts. They affect layout, tracing,
+1. Establish binding immutability and readonly access contracts across runtime and Neo.
+2. Establish inheritance and nullable-slot contracts. They affect layout, tracing,
    assignability, reflection and the initial base-library design.
-2. Explore enums and flags as a bounded metadata/library slice; it can move earlier
+3. Explore enums and flags as a bounded metadata/library slice; it can move earlier
    because its integral representation need not wait for inheritance or nullability.
-3. Add generic constraint metadata around those contracts. Address-mode and Void
+4. Add generic constraint metadata around those contracts. Address-mode and Void
    constraints can be explored independently, but their scope must be explicit.
-4. Add managed delegates and closure lifetimes, with a small callback scenario.
-5. Design suspension and implement one end-to-end async scenario, including GC and
+5. Add managed delegates and closure lifetimes, with a small callback scenario.
+6. Design suspension and implement one end-to-end async scenario, including GC and
    debugger inspection of suspended execution.
-6. Add dynamic hooks around a concrete use case after member lookup and dispatch
+7. Add dynamic hooks around a concrete use case after member lookup and dispatch
    rules are stable enough to extend.
 
 This is a proposed dependency order, not a fixed implementation schedule. Grow the

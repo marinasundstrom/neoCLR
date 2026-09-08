@@ -169,3 +169,7 @@ delegates/lambdas, generic constraints, runtime async, dynamic hooks and framewo
 growth. Add bounded Neo syntax and executable examples alongside each selected
 runtime slice; these plans do not expand Neo into a full compiler project. Runtime
 contracts and cross-layer lifetime checks come before convenient surface syntax.
+
+Explore [binding immutability and readonly access](mutability.md) before expanding
+inheritance and closure syntax. Neo projects runtime-enforced storage and reference
+permissions; let binding immutability must remain distinct from target mutability.
