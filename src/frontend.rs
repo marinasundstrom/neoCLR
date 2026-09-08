@@ -2,6 +2,7 @@
 //! This is a separate experimental language subset, not a Raven compiler.
 mod closures;
 mod conditional;
+mod constructors;
 mod imports;
 mod library;
 mod unions;
@@ -2939,6 +2940,9 @@ impl Lowerer<'_> {
                 ));
                 return Ok(returns);
             }
+        }
+        if let Some(ty) = self.library_constructor(callee, type_arguments, arguments)? {
+            return Ok(ty);
         }
         if !type_arguments.is_empty() {
             if let Some((owner, member)) = Self::qualified_name(callee)

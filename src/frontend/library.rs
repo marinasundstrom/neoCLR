@@ -397,3 +397,41 @@ pub(super) fn generic_static(
         .collect::<Result<Vec<_>, _>>()?;
     method.map_types(|t| t.substitute_parameters(Some(type_arguments), Some(&arguments)))
 }
+
+/// Only declared public constructors of the exact owner; never inherited constructors.
+pub(super) fn constructors(
+    ty: &Ty,
+    count: usize,
+) -> Result<Option<Vec<crate::metadata::Function>>, Fault> {
+    let module = crate::library::system()?;
+    let Ok(owner) = crate::assembler::parse_type(&ty.il()) else {
+        return Ok(None); // A qualified generic static member is not a type spelling.
+    };
+    let Some(definition) = module.type_definition(&owner) else {
+        return Ok(None);
+    };
+    if definition.visibility != Visibility::Public
+        || definition.is_abstract
+        || definition.representation != crate::metadata::Representation::Record
+    {
+        return Err(Fault::new("library type is not publicly constructible"));
+    }
+    let arguments = match &owner {
+        Type::Constructed { arguments, .. } => arguments.as_slice(),
+        _ => &[],
+    };
+    module
+        .functions
+        .iter()
+        .filter(|function| {
+            function.instance
+                && function.owner.as_ref() == Some(&definition.open_type())
+                && function.name.ends_with("..ctor")
+                && function.visibility == Visibility::Public
+                && function.parameters.len() == count
+                && function.generic_parameters.is_empty()
+        })
+        .map(|function| function.map_types(|ty| ty.substitute_type_parameters(arguments)))
+        .collect::<Result<Vec<_>, _>>()
+        .map(Some)
+}

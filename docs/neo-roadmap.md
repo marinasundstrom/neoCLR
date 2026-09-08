@@ -225,3 +225,7 @@ Next investigate generic type declarations, generic constructor inference and ex
 under [the Raven-style projection plan](result-construction.md#planned-case-projection-ravens-model).
 Use [type-design guidelines](type-design.md) to review the full field and operation
 contracts when selecting value/reference use.
+
+[Explicit library constructor calls](neo-library-constructors.md) now supply the
+ordinary metadata path for standalone generic cases and explicit carrier construction.
+Generic constructor inference and external case imports can build on that path.

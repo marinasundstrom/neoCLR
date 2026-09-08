@@ -557,3 +557,6 @@ define accepted variants. See [syntax, matching and examples](neo-unions.md), an
 
 See [conditional union bindings](conditional-patterns.md) for `if let` and
 `let … else`, including scope, failure-path rules and the order-workflow example.
+
+[Public library constructor calls](neo-library-constructors.md) support independent
+generic case values with explicit type arguments, such as `System.Result.Ok<int>(42)`.

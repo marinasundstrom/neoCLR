@@ -38,6 +38,14 @@ cargo run --locked -- run examples/source/order-workflow.neo
 cargo test --locked --test neo_result_factories --test neo_match --test reference_experience
 ```
 
+## Explicit standalone case constructors
+
+`System.Result.Ok<int>(42)` now constructs an independent case value, and
+`Result<int,string>(ok)` explicitly invokes the carrier constructor accepting it.
+See [library constructor calls](neo-library-constructors.md) for normal metadata
+lookup, argument context and current limits. Generic argument inference and implicit
+external case conversion remain separate.
+
 ## Planned case projection: Raven's model
 
 Raven imports simple case types using `import System.Result.*`. `Ok(42)` constructs
