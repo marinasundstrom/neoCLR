@@ -5,7 +5,9 @@ in this discussion: what .NET/CLR already provides, what problem remains for neo
 and which solution best serves the platform. Familiar APIs and observable behavior
 are the starting point. Different syntax or internals are permitted, but difference
 alone is not an improvement. More runtime machinery is an option to evaluate, not
-an automatic preference.
+an automatic preference. Historical .NET/CLR compatibility accommodations are
+context, not constraints: neoCLR may choose a more consistent contract across its
+runtime and frontends without reproducing those workarounds.
 
 Apply this process to new work and to changes in existing memory, arrays, collections,
 reflection, dispatch, debugger and Neo contracts. Do not treat an implemented preview
@@ -65,9 +67,10 @@ Primary sources consulted on 2026-09-08:
   therefore be evaluated as an intentional change, not described as reproducing that
   C# feature. This observation does not describe nullable value types.
 
-This is initial evidence, not a completed comparative study of the backlog. Mutability
-still needs CLI/runtime verification and alias/receiver experiments before settling
-its encoding and enforcement costs. Each later area needs its own research record.
+This is initial evidence, not a completed comparative study of the backlog. The
+[readonly input-parameter comparison](readonly-parameters.md) adds a reproducible
+.NET 10 probe and a bounded implementation decision. Broader mutability and each
+later area still need their own evidence and cost assessment.
 
 ## Research tasks attached to the roadmap
 

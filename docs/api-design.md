@@ -232,3 +232,8 @@ The planned [mutability contracts](mutability.md) place readonly references and
 receiver permissions in the runtime, with Neo diagnostics above them. Use these
 contracts when implemented; current writable T& APIs do not already promise readonly
 access. Immutable bindings and deep object immutability are separate concerns.
+
+The [readonly input-parameter slice](readonly-parameters.md) now enforces restricted
+managed access at runtime, with Neo declarations and ParameterInfo.IsReadOnly.
+Readonly receiver and general storage/return declarations remain future work; the
+verifier currently tracks only part of the permission flow.

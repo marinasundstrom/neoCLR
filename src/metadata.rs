@@ -274,6 +274,9 @@ pub struct Function {
     /// Output slots assigned on Boolean true; false provides no initialization guarantee.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub out_when_true: Vec<usize>,
+    /// Input parameters narrowed to readonly managed-reference capabilities on entry.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub readonly_parameters: Vec<usize>,
     pub returns: Type,
     #[serde(default)]
     pub locals: Vec<Type>,

@@ -1,0 +1,22 @@
+import System.Console.*
+
+record Counter(Age: int)
+
+func ReadAge(readonly counter: Counter&) -> int {
+    return counter.Age
+}
+
+func Sum(readonly values: int[]&) -> int {
+    return values[0] + values[1]
+}
+
+func Main() -> int {
+    let local = Counter(20)
+    let shared = new Counter(22)
+    WriteLine(ReadAge(&local))
+    WriteLine(ReadAge(shared))
+    shared.Age = 23
+    WriteLine(ReadAge(shared))
+    let values: int[2] = [20, 22]
+    return Sum(&values)
+}

@@ -178,3 +178,8 @@ contracts and cross-layer lifetime checks come before convenient surface syntax.
 Explore [binding immutability and readonly access](mutability.md) before expanding
 inheritance and closure syntax. Neo projects runtime-enforced storage and reference
 permissions; let binding immutability must remain distinct from target mutability.
+
+The [readonly input-parameter slice](readonly-parameters.md) now enforces restricted
+managed access at runtime, with Neo declarations and ParameterInfo.IsReadOnly.
+Readonly receiver and general storage/return declarations remain future work; the
+verifier currently tracks only part of the permission flow.

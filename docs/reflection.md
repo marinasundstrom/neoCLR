@@ -172,3 +172,8 @@ module enumeration and metadata mutation remain
 future work. [Acceptance tests](../tests/reflection.rs) cover filtering, substitution,
 accessors, output contracts, module boundaries, serialization, resource limits, copied
 arrays and GC pressure.
+
+The [readonly input-parameter slice](readonly-parameters.md) now enforces restricted
+managed access at runtime, with Neo declarations and ParameterInfo.IsReadOnly.
+Readonly receiver and general storage/return declarations remain future work; the
+verifier currently tracks only part of the permission flow.

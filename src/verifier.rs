@@ -199,11 +199,37 @@ fn analyze_function(
                 }
             }
         }
+        if matches!(inputs.first(), Some(StackType::Readonly(_)))
+            && matches!(
+                op,
+                Op::StoreObject(_)
+                    | Op::InitializeObject(_)
+                    | Op::StoreArrayElement(_)
+                    | Op::StoreIndirectInt8
+                    | Op::StoreIndirectInt16
+                    | Op::StoreIndirectInt32
+                    | Op::StoreIndirectInt64
+                    | Op::StoreIndirectNative
+                    | Op::StoreIndirectFloat32
+                    | Op::StoreIndirectFloat64
+            )
+        {
+            return Err(fault(pc, "cannot write through readonly reference"));
+        }
         let mut conditional_outputs = vec![];
         if let Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) = op {
             let callee = crate::vm::resolve(module, target).map_err(|e| fault(pc, &e.message))?;
             let offset = inputs.len().saturating_sub(callee.parameters.len());
             for (argument, input) in inputs.iter().enumerate() {
+                if matches!(input, StackType::Readonly(_))
+                    && (argument < offset
+                        || !callee.readonly_parameters.contains(&(argument - offset)))
+                {
+                    return Err(fault(
+                        pc,
+                        "readonly reference cannot satisfy writable parameter or receiver",
+                    ));
+                }
                 if let StackType::Slot {
                     local: Some(index), ..
                 } = input
@@ -458,6 +484,7 @@ enum StackType {
         argument: Option<usize>,
     },
     Exact(Type),
+    Readonly(Type),
     NormalizedParameter(u16),
 }
 
@@ -484,7 +511,7 @@ fn stored(value: &StackType, target: &Type) -> Result<(), Fault> {
 
 fn exact(value: &StackType) -> Result<&Type, Fault> {
     match value {
-        StackType::Exact(ty) | StackType::Slot { ty, .. } => Ok(ty),
+        StackType::Exact(ty) | StackType::Readonly(ty) | StackType::Slot { ty, .. } => Ok(ty),
         StackType::ConditionalOutput(_) => Ok(&Type::Boolean),
         _ => Err(Fault::new(
             "operation requires a concrete stack type; open parameter normalization is unresolved",
@@ -599,6 +626,7 @@ fn typed_effect(
                     local: *local,
                     argument: *argument,
                 },
+                StackType::Readonly(_) => StackType::Readonly(T::ByRef(element.clone())),
                 _ => E(T::ByRef(element.clone())),
             }])
         }
@@ -620,7 +648,17 @@ fn typed_effect(
             local: None,
             argument: Some(*index),
         }]),
-        Arg(index) => Result::Ok(vec![loaded(&function.argument_types()[*index])]),
+        Arg(index) => {
+            let offset = usize::from(function.instance);
+            let ty = function.argument_types()[*index].clone();
+            Ok(vec![
+                if *index >= offset && function.readonly_parameters.contains(&(*index - offset)) {
+                    StackType::Readonly(ty)
+                } else {
+                    loaded(&ty)
+                },
+            ])
+        }
         Load(index) => Result::Ok(vec![loaded(&function.locals[*index])]),
         Store(index) => {
             stored(&values[0], &function.locals[*index])?;
@@ -642,7 +680,13 @@ fn typed_effect(
         BorrowInterface(interface) => match exact(&values[0])? {
             T::ByRef(concrete) => {
                 crate::interfaces::ensure_implementation(module, concrete, interface)?;
-                one(T::ByRef(Box::new(interface.clone())))
+                if matches!(values[0], StackType::Readonly(_)) {
+                    Ok(vec![StackType::Readonly(T::ByRef(Box::new(
+                        interface.clone(),
+                    )))])
+                } else {
+                    one(T::ByRef(Box::new(interface.clone())))
+                }
             }
             T::Ptr(concrete) => {
                 crate::interfaces::ensure_implementation(module, concrete, interface)?;
@@ -734,7 +778,9 @@ fn typed_effect(
         FieldAddress(index) => match exact(&values[0])? {
             T::ByRef(owner) => {
                 let ty = T::ByRef(Box::new(field(owner, *index)?));
-                if let StackType::Slot { local, .. } = &values[0] {
+                if matches!(values[0], StackType::Readonly(_)) {
+                    Ok(vec![StackType::Readonly(ty)])
+                } else if let StackType::Slot { local, .. } = &values[0] {
                     Ok(vec![StackType::Slot {
                         ty,
                         local: *local,

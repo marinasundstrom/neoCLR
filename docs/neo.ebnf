@@ -13,7 +13,7 @@ field_list       = "(", newlines,
 field            = identifier, ":", type ;
 parameter_list   = "(", newlines, [ parameter, newlines,
                    { ",", newlines, parameter, newlines } ], ")" ;
-parameter        = [ "out" ], identifier, ":", type ;
+parameter        = [ "out" | "readonly" ], identifier, ":", type ;
 type             = (qualified_name, [ "<", type, { ",", type }, ">" ] | "(", ")"), { "[", "]" }, [ "&" ] ;
 qualified_name   = identifier, { ".", identifier } ;
 

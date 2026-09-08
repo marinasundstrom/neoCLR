@@ -408,3 +408,8 @@ referenced object. Value-returning indexers produce copies and are not addressab
 `&list[i]` requires a reference-returning getter. Receiver mutability and argument
 types follow the accessor contracts. Declaring indexers in Neo and multi-argument
 indexers remain outside the current subset.
+
+The [readonly input-parameter slice](readonly-parameters.md) now enforces restricted
+managed access at runtime, with Neo declarations and ParameterInfo.IsReadOnly.
+Readonly receiver and general storage/return declarations remain future work; the
+verifier currently tracks only part of the permission flow.

@@ -453,6 +453,18 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 "byref receiver requires a non-constructor IL instance method",
             ));
         }
+        let mut readonly_parameters = HashSet::new();
+        for index in &function.readonly_parameters {
+            if !readonly_parameters.insert(*index)
+                || !matches!(function.parameters.get(*index), Some(Type::ByRef(_)))
+                || function.out_parameters.contains(index)
+                || function.out_when_true.contains(index)
+                || function.is_internal_call()
+                || function.pinvoke.is_some()
+            {
+                return Err(Fault::new("invalid readonly parameter contract"));
+            }
+        }
         let mut out_parameters = HashSet::new();
         if !function.out_when_true.is_empty() && function.returns != Type::Boolean {
             return Err(Fault::new("conditional output requires a Boolean return"));
@@ -827,6 +839,30 @@ fn check_type_context(ty: &Type, module: &Module, arity: usize, depth: usize) ->
     }
 }
 
+fn restrict_reference_arguments(
+    function: &crate::metadata::Function,
+    args: &mut [Value],
+) -> Result<(), Fault> {
+    let offset = usize::from(function.instance);
+    for (index, value) in args.iter_mut().enumerate() {
+        let reference = match value {
+            Value::SlotReference(reference)
+            | Value::SlotInterface {
+                receiver: reference,
+                ..
+            } => reference,
+            _ => continue,
+        };
+        if index >= offset && function.readonly_parameters.contains(&(index - offset)) {
+            reference.assigned()?;
+            reference.restrict_readonly();
+        } else {
+            reference.require_writable()?;
+        }
+    }
+    Ok(())
+}
+
 struct Frame {
     function: std::rc::Rc<crate::metadata::Function>,
     pc: usize,
@@ -841,6 +877,7 @@ struct Frame {
 
 impl Frame {
     fn new(function: crate::metadata::Function, mut args: Vec<Value>) -> Result<Self, Fault> {
+        restrict_reference_arguments(&function, &mut args)?;
         let offset = args.len().saturating_sub(function.parameters.len());
         let mut outputs = vec![];
         for (index, arg) in args.iter_mut().enumerate() {
@@ -1568,7 +1605,8 @@ fn interpret_instructions(
                         check_type(ty, module)?;
                         Ok(ty.clone())
                     })?;
-                    let args = frame.args(&callee.argument_types())?;
+                    let mut args = frame.args(&callee.argument_types())?;
+                    restrict_reference_arguments(&callee, &mut args)?;
                     if callee.pinvoke.is_some() {
                         let libraries = native_libraries.as_mut().ok_or_else(|| {
                             Fault::new("native imports require trusted run_with_native execution")
@@ -2119,7 +2157,12 @@ fn debug_value(
                     .unwrap_or_else(|| "expired frame".into())
             };
             result.value = format!(
-                "&{root} path={:?}{}",
+                "{}&{root} path={:?}{}",
+                if reference.is_readonly() {
+                    "readonly "
+                } else {
+                    ""
+                },
                 reference.debug_path(),
                 if matches!(value, Value::SlotInterface { .. }) {
                     " (interface view)"

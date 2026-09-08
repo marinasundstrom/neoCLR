@@ -161,6 +161,7 @@ struct Field {
     name: Token,
     ty: Ty,
     output: bool,
+    readonly: bool,
 }
 struct Record {
     name: Token,
@@ -305,6 +306,7 @@ impl Parser {
             "match",
             "typeof",
             "interface",
+            "readonly",
             "as",
             "this",
         ]
@@ -382,6 +384,7 @@ impl Parser {
         let mut fields: Vec<Field> = Vec::new();
         if !self.at(")") {
             loop {
+                let readonly = parameters && self.eat("readonly");
                 let output = parameters && self.eat("out");
                 let name = self.name()?;
                 if fields.iter().any(|field| field.name.text == name.text) {
@@ -395,7 +398,15 @@ impl Parser {
                 if output && !matches!(ty, Ty::Ref(_)) {
                     return Err(name.error("out parameter requires a managed reference type"));
                 }
-                fields.push(Field { name, ty, output });
+                if readonly && (output || !matches!(ty, Ty::Ref(_))) {
+                    return Err(name.error("readonly parameter requires a managed input reference"));
+                }
+                fields.push(Field {
+                    name,
+                    ty,
+                    output,
+                    readonly,
+                });
                 self.newlines();
                 if !self.eat(",") {
                     break;
@@ -1034,6 +1045,16 @@ impl Lowerer<'_> {
         Ok(actual)
     }
     fn parameter_argument(&mut self, argument: &Expr, parameter: &Field) -> Result<(), Fault> {
+        if parameter.readonly {
+            if let ExprKind::Unary(operation, value) = &argument.kind {
+                if operation == "&" {
+                    let actual = Ty::Ref(Box::new(self.place_with_access(value, true, true)?));
+                    return self
+                        .convert_reference(actual, &parameter.ty, &argument.at)
+                        .map(|_| ());
+                }
+            }
+        }
         if parameter.output {
             let ExprKind::Out(value) = &argument.kind else {
                 return Err(argument
@@ -1644,6 +1665,14 @@ impl Lowerer<'_> {
     }
     // Emit a managed address of an assignable source location.
     fn place(&mut self, expression: &Expr, borrowing: bool) -> Result<Ty, Fault> {
+        self.place_with_access(expression, borrowing, false)
+    }
+    fn place_with_access(
+        &mut self,
+        expression: &Expr,
+        borrowing: bool,
+        readonly: bool,
+    ) -> Result<Ty, Fault> {
         match &expression.kind {
             ExprKind::Index(owner, index) => {
                 if let Some(ty) = self.indexer(owner, index, None)? {
@@ -1654,7 +1683,7 @@ impl Lowerer<'_> {
                             .error("value-returning indexer is not an addressable location")),
                     };
                 }
-                let owner_ty = self.place(owner, borrowing)?;
+                let owner_ty = self.place_with_access(owner, borrowing, readonly)?;
                 let element = Self::array_element(owner_ty, &owner.at)?;
                 self.expression_for(index, &Ty::Int)?;
                 if let Ty::Ref(target) = &element {
@@ -1671,7 +1700,7 @@ impl Lowerer<'_> {
                     self.body.push(binding.load);
                     return Ok(*target);
                 }
-                if !binding.mutable {
+                if !binding.mutable && !readonly {
                     return Err(expression.at.error(
                         "cannot assign or take a writable address of an immutable binding",
                     ));
@@ -1701,7 +1730,7 @@ impl Lowerer<'_> {
                 }
                 if !referenced_owner {
                     self.body.truncate(saved);
-                    self.place(owner, borrowing)?;
+                    self.place_with_access(owner, borrowing, readonly)?;
                 }
                 self.body
                     .push(format!("ldflda {}::{}", target.il(), field.text));
@@ -2160,7 +2189,13 @@ impl Lowerer<'_> {
                 .iter()
                 .map(|field| format!(
                     "{}{} {}",
-                    if field.output { "out " } else { "" },
+                    if field.output {
+                        "out "
+                    } else if field.readonly {
+                        "readonly "
+                    } else {
+                        ""
+                    },
                     field.ty.il(),
                     field.name.text
                 ))
@@ -2237,7 +2272,17 @@ pub fn lower_to_il_named(source: &str, document: &str) -> Result<String, Fault> 
                 method
                     .parameters
                     .iter()
-                    .map(|p| format!("{}{}", if p.output { "out " } else { "" }, p.ty.il()))
+                    .map(|p| format!(
+                        "{}{}",
+                        if p.output {
+                            "out "
+                        } else if p.readonly {
+                            "readonly "
+                        } else {
+                            ""
+                        },
+                        p.ty.il()
+                    ))
                     .collect::<Vec<_>>()
                     .join(","),
                 method.returns.il()

@@ -633,3 +633,11 @@ and SlotReferences runtime services. Ordinary values and raw pointers fault.
 referent/interface types, and pushes Boolean location identity. It normalizes interface
 views to their underlying storage root/path and requires SlotReferences. Values and
 raw pointers are rejected. See [reference identity](reference-identity.md).
+
+## Readonly managed input parameters
+
+Inline declarations accept `readonly T& name`, recorded as readonly_parameters
+metadata. Calls retain their ordinary T& signatures; the runtime narrows the input
+capability and prevents writable forwarding or mutation through it. This is distinct
+from the CLR readonly. array prefix and introduces no new opcode. See
+[the comparison and contract](readonly-parameters.md).

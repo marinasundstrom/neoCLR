@@ -110,3 +110,8 @@ original managed receiver. Concrete references project implicitly when an implem
 interface reference is expected, or explicitly through `as Contract&`. Neither form
 boxes the value or changes its frame/heap lifetime. Ordinary values still require
 explicit address formation before passing them as interface references.
+
+The [readonly input-parameter slice](readonly-parameters.md) now enforces restricted
+managed access at runtime, with Neo declarations and ParameterInfo.IsReadOnly.
+Readonly receiver and general storage/return declarations remain future work; the
+verifier currently tracks only part of the permission flow.

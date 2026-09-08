@@ -217,3 +217,13 @@ operations, numerical behavior, Errors, and required Faults on supported platfor
 Pair future language-generated modules with handwritten IL fixtures. The aim is one
 platform with several implementations, not an interpreter language and a separately
 specified compiled language.
+
+## Shared contracts as compilation evidence
+
+Runtime-level type, lifetime and access guarantees should provide one foundation for
+Neo, other frontends, verification and future JIT/AOT compilation. This includes the
+[readonly parameter contract](readonly-parameters.md#c-analogy-and-future-native-compilation):
+readonly access forbids writes through that view but does not establish global
+immutability, absence of writable aliases or thread safety. Optimizations must use
+proved facts and preserve runtime Fault behavior; no JIT or performance gain is
+claimed by the current interpreter slice.

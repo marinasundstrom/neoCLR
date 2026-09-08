@@ -89,6 +89,14 @@ fn member(module: &Module, concrete: &Type, contract: &Function) -> Result<Funct
             .out_when_true
             .iter()
             .collect::<std::collections::BTreeSet<_>>()
+        || implementation
+            .readonly_parameters
+            .iter()
+            .collect::<std::collections::BTreeSet<_>>()
+            != contract
+                .readonly_parameters
+                .iter()
+                .collect::<std::collections::BTreeSet<_>>()
         || implementation.receiver_byref != contract.receiver_byref
         || implementation
             .out_parameters

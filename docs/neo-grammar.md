@@ -27,7 +27,7 @@ field_list       = "(", newlines,
 field            = identifier, ":", type ;
 parameter_list   = "(", newlines, [ parameter, newlines,
                    { ",", newlines, parameter, newlines } ], ")" ;
-parameter        = [ "out" ], identifier, ":", type ;
+parameter        = [ "out" | "readonly" ], identifier, ":", type ;
 type             = (qualified_name, [ "<", type, { ",", type }, ">" ] | "(", ")"), { "[", "]" }, [ "&" ] ;
 qualified_name   = identifier, { ".", identifier } ;
 
@@ -235,3 +235,8 @@ Bracket expressions also project bundled instance Item properties with one index
 parameter. Reads select the getter; direct indexed assignments select the setter.
 Interface views dispatch virtually. Only reference-returning getters can supply
 managed addresses; value-returning getters yield copies. See [library indexers](neo.md#library-indexers).
+
+`readonly name: T&` declares a managed input-reference restriction. It excludes
+output parameters and leaves call syntax unchanged. An explicit & argument may
+address an immutable owned binding in this context. See [readonly parameters](readonly-parameters.md)
+for enforcement, the partial verifier projection and current limitations.

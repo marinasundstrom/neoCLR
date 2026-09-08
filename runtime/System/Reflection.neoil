@@ -5,6 +5,7 @@
     .field private ParameterType System.Type
     .field private IsOut Boolean
     .field private IsOutWhenTrue Boolean
+    .field private IsReadOnly Boolean
     .property instance Name() -> String
         .get instance System.Reflection.ParameterInfo::get_Name()
     .end
@@ -45,6 +46,15 @@
         ldfld 4
         ret
     .end
+    .property instance IsReadOnly() -> Boolean
+        .get instance System.Reflection.ParameterInfo::get_IsReadOnly()
+    .end
+    .method instance get_IsReadOnly() -> Boolean
+        ldarg this
+        ldfld 5
+        ret
+    .end
+
 .end
 
 .type System.Reflection.FieldInfo

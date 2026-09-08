@@ -38,6 +38,8 @@ delegates, add a real callback consumer; with async, choose a bounded I/O or hos
 completion scenario. Add text, collections, streams/files and other framework classes
 as those programs need them, with consistent APIs rather than isolated demonstrations.
 
+The first [readonly input-parameter implementation](readonly-parameters.md) is complete;
+readonly receivers, richer storage/return contracts and protected bindings remain.
 The [mutability design](mutability.md) places immutable storage and readonly access
 in runtime contracts, with syntax and early diagnostics in Neo. Explore it first so
 inheritance and capture rules preserve one shared permission model.

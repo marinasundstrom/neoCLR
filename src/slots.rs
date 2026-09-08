@@ -95,6 +95,7 @@ pub struct SlotReference {
     root: Root,
     path: Vec<usize>,
     after_write: Option<u64>,
+    readonly: bool,
 }
 impl PartialEq for SlotReference {
     fn eq(&self, other: &Self) -> bool {
@@ -114,6 +115,7 @@ impl SlotReference {
             root: Root::Frame(Rc::clone(cell)),
             path: vec![],
             after_write: None,
+            readonly: false,
         }
     }
     pub(crate) fn heap(cell: &Cell, identity: usize) -> Self {
@@ -159,6 +161,22 @@ impl SlotReference {
     }
     pub(crate) fn target(&self) -> &Type {
         &self.target
+    }
+    /// Whether this access view forbids writes to its addressed storage.
+    pub fn is_readonly(&self) -> bool {
+        self.readonly
+    }
+    pub(crate) fn restrict_readonly(&mut self) {
+        self.readonly = true;
+    }
+    pub(crate) fn require_writable(&self) -> Result<(), Fault> {
+        if self.readonly {
+            Err(Fault::new(
+                "readonly managed reference cannot be used for writable access",
+            ))
+        } else {
+            Ok(())
+        }
     }
     pub(crate) fn field(&self, index: usize, target: Type) -> Result<Self, Fault> {
         self.assigned()?;
@@ -211,6 +229,7 @@ impl SlotReference {
         Ok(result)
     }
     pub(crate) fn output(&self) -> Result<Self, Fault> {
+        self.require_writable()?;
         let mut result = self.clone();
         result.after_write = Some(self.cell()?.borrow().writes);
         Ok(result)
@@ -245,6 +264,7 @@ impl SlotReference {
         .clone())
     }
     pub(crate) fn write(&self, value: Value) -> Result<(), Fault> {
+        self.require_writable()?;
         if !self.path.is_empty() || self.allocation_id().is_some() {
             value.ensure_heap_references()?;
         }

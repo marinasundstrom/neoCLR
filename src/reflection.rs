@@ -193,7 +193,7 @@ impl Query {
                                     return Ok(None);
                                 }
                                 let parameters =
-                                    parameters(module, &p.parameters, &[], &[], &[], limits)?;
+                                    parameters(module, &p.parameters, &[], &[], &[], &[], limits)?;
                                 let get = getter
                                     .as_ref()
                                     .map(|f| method(module, &ty, f, &[], limits))
@@ -323,6 +323,7 @@ fn parameters(
     names: &[Option<String>],
     out: &[usize],
     conditional: &[usize],
+    readonly: &[usize],
     limits: &Limits,
 ) -> Result<Value, Fault> {
     array(
@@ -336,6 +337,7 @@ fn parameters(
                     type_value(module, ty)?,
                     Value::Boolean(out.contains(&i)),
                     Value::Boolean(conditional.contains(&i)),
+                    Value::Boolean(readonly.contains(&i)),
                 ],
             ))
         }),
@@ -377,6 +379,7 @@ fn method(
                 &f.parameter_names,
                 &f.out_parameters,
                 &f.out_when_true,
+                &f.readonly_parameters,
                 limits,
             )?,
         ],

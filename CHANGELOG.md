@@ -8,6 +8,19 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-08
 
+#### Added
+
+- Readonly managed input parameters in Neo and IL, enforced by live reference
+  capabilities across frame/heap storage, derived addresses, copies and interface
+  views. Restricted writes and writable forwarding fault even without verification.
+  Added partial verifier diagnostics, ParameterInfo.IsReadOnly, debugger markers,
+  metadata validation, examples and a reproducible .NET 10 comparison. Documented
+  the const-reference analogy and JIT limits: readonly views may observe writes
+  through other aliases and do not imply globally immutable memory. Readonly
+  receiver and general storage/return declarations remain future work. Reassemble
+  external System artifacts for the expanded reflection descriptor layout; readonly
+  metadata requires this runtime, and Neo now reserves the readonly keyword.
+
 #### Changed
 
 - Established a research-backed .NET/CLR comparison workflow for every roadmap
