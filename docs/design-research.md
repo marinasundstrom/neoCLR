@@ -89,3 +89,8 @@ later area still need their own evidence and cost assessment.
 These tasks are part of each [roadmap phase](roadmap.md), not a separate promise to
 implement every candidate. Keep the [API policy](api-policy.md) and feature-specific
 documents aligned with the resulting decisions.
+
+The [readonly receiver refinement](readonly-parameters.md#readonly-instance-receivers)
+reuses the input-capability evidence and compares C# readonly instance-member behavior.
+It records enforced receiver metadata, exact interface matching, collection getter
+migration and the continuing shallow-access and partial-verifier limits.

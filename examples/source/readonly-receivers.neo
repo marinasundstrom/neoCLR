@@ -1,0 +1,28 @@
+interface CounterView {
+    readonly func Read() -> int
+}
+record Counter(Age: int): CounterView {
+    readonly func Read() -> int { return this.ReadAge() }
+    readonly func ReadAge() -> int { return this.Age }
+    func Increment() -> () { this.Age = this.Age + 1 }
+}
+func ReadCounter(readonly counter: CounterView&) -> int {
+    return counter.Read()
+}
+func Sum(readonly values: System.Collections.List<int>&) -> int {
+    var total = 0
+    for i in 0..<values.Count {
+        total = total + values[i]
+    }
+    return total
+}
+func Main() -> int {
+    let local = Counter(20)
+    let shared = new Counter(21)
+    shared.Increment()
+    var storage = System.Collections.ArrayList<int>.Allocate(2)
+    let values = &storage
+    values.Add(local.Read())
+    values.Add(ReadCounter(shared))
+    return Sum(values)
+}

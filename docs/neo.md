@@ -411,5 +411,10 @@ indexers remain outside the current subset.
 
 The [readonly input-parameter slice](readonly-parameters.md) now enforces restricted
 managed access at runtime, with Neo declarations and ParameterInfo.IsReadOnly.
-Readonly receiver and general storage/return declarations remain future work; the
-verifier currently tracks only part of the permission flow.
+Readonly instance receivers are also implemented, with MethodInfo.IsReadOnly.
+General storage/return declarations remain future work; the verifier currently tracks
+only part of the permission flow.
+
+Record and interface methods may declare `readonly func Read() -> int`. Such methods
+can be called through readonly inputs and on immutable owned locals. See the
+[receiver contract and runnable example](readonly-parameters.md#readonly-instance-receivers).

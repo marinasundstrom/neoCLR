@@ -98,6 +98,7 @@ fn member(module: &Module, concrete: &Type, contract: &Function) -> Result<Funct
                 .iter()
                 .collect::<std::collections::BTreeSet<_>>()
         || implementation.receiver_byref != contract.receiver_byref
+        || implementation.receiver_readonly != contract.receiver_readonly
         || implementation
             .out_parameters
             .iter()

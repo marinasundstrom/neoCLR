@@ -3,13 +3,13 @@
     .property instance Count() -> Int32
         .get instance System.Collections.List<T>::get_Count()
     .end
-    .method instance byref get_Count() -> Int32
+    .method instance readonly byref get_Count() -> Int32
     .end
     .property instance Item(Int32) -> T
         .get instance System.Collections.List<T>::get_Item(Int32)
         .set instance System.Collections.List<T>::set_Item(Int32,T)
     .end
-    .method instance byref get_Item(Int32 index) -> T
+    .method instance readonly byref get_Item(Int32 index) -> T
     .end
     .method instance byref set_Item(Int32 index, T value) -> Void
     .end

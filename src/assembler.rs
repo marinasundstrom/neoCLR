@@ -634,6 +634,11 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     } else {
                         (None, false, rest)
                     };
+                    let (receiver_readonly, declaration) =
+                        match declaration.strip_prefix("readonly ") {
+                            Some(rest) => (true, rest.trim()),
+                            None => (false, declaration),
+                        };
                     let (receiver_byref, declaration) = match declaration.strip_prefix("byref ") {
                         Some(rest) => (true, rest.trim()),
                         None => (false, declaration),
@@ -700,6 +705,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                             out_when_true,
                             readonly_parameters,
                             receiver_byref,
+                            receiver_readonly,
                             returns: parse_type(result)?,
                             locals: vec![],
                             local_names: vec![],

@@ -382,6 +382,7 @@ fn method(
                 &f.readonly_parameters,
                 limits,
             )?,
+            Value::Boolean(f.receiver_readonly),
         ],
     ))
 }

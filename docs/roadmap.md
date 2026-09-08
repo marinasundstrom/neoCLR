@@ -39,7 +39,8 @@ completion scenario. Add text, collections, streams/files and other framework cl
 as those programs need them, with consistent APIs rather than isolated demonstrations.
 
 The first [readonly input-parameter implementation](readonly-parameters.md) is complete;
-readonly receivers, richer storage/return contracts and protected bindings remain.
+readonly receivers and the initial collection-getter review are also complete.
+Richer storage/return contracts and protected bindings remain.
 The [mutability design](mutability.md) places immutable storage and readonly access
 in runtime contracts, with syntax and early diagnostics in Neo. Explore it first so
 inheritance and capture rules preserve one shared permission model.

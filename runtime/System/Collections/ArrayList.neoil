@@ -21,7 +21,7 @@
     .property instance Count() -> Int32
         .get instance System.Collections.ArrayList<T>::get_Count()
     .end
-    .method instance byref get_Count() -> Int32
+    .method instance readonly byref get_Count() -> Int32
         ldarg this
         ldobj System.Collections.ArrayList<T>
         ldfld 1
@@ -30,7 +30,7 @@
     .property instance Capacity() -> Int32
         .get instance System.Collections.ArrayList<T>::get_Capacity()
     .end
-    .method instance byref get_Capacity() -> Int32
+    .method instance readonly byref get_Capacity() -> Int32
         ldarg this
         ldobj System.Collections.ArrayList<T>
         ldfld 0
@@ -38,7 +38,7 @@
         conv.ovf.i4
         ret
     .end
-    .method private instance byref CheckIndex(Int32 index) -> Void
+    .method private instance readonly byref CheckIndex(Int32 index) -> Void
         ldarg index
         ldc.i4 0
         blt Invalid
@@ -55,7 +55,7 @@
         .get instance System.Collections.ArrayList<T>::get_Item(Int32)
         .set instance System.Collections.ArrayList<T>::set_Item(Int32,T)
     .end
-    .method instance byref get_Item(Int32 index) -> T
+    .method instance readonly byref get_Item(Int32 index) -> T
         ldarg this
         ldarg index
         call instance System.Collections.ArrayList<T>::CheckIndex(Int32)

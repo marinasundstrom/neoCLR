@@ -641,3 +641,8 @@ metadata. Calls retain their ordinary T& signatures; the runtime narrows the inp
 capability and prevents writable forwarding or mutation through it. This is distinct
 from the CLR readonly. array prefix and introduces no new opcode. See
 [the comparison and contract](readonly-parameters.md).
+
+Instance methods accept `.method instance readonly byref Name(...) -> T`.
+This records receiver_readonly, restricts this at entry and requires a non-constructor
+IL byref receiver. Calls keep their ordinary signatures; interface implementations
+must match. See [receiver contracts](readonly-parameters.md#readonly-instance-receivers).

@@ -175,6 +175,7 @@ struct Interface {
 }
 struct Function {
     name: Token,
+    receiver_readonly: bool,
     parameters: Vec<Field>,
     returns: Ty,
     body: Vec<Stmt>,
@@ -431,6 +432,7 @@ impl Parser {
         };
         Ok(Function {
             name,
+            receiver_readonly: false,
             parameters,
             returns,
             body,
@@ -444,7 +446,9 @@ impl Parser {
             if methods.len() >= 1024 {
                 return Err(self.current().error("method limit exceeded"));
             }
-            let method = self.function(abstract_members)?;
+            let receiver_readonly = self.eat("readonly");
+            let mut method = self.function(abstract_members)?;
+            method.receiver_readonly = receiver_readonly;
             if methods.iter().any(|m| m.name.text == method.name.text) {
                 return Err(method
                     .name
@@ -1099,11 +1103,12 @@ impl Lowerer<'_> {
         ty: &Ty,
         start: usize,
         byref: bool,
+        readonly: bool,
     ) -> Result<(), Fault> {
         if byref {
             if !matches!(ty, Ty::Ref(_)) {
                 self.body.truncate(start);
-                self.place(expression, true)?;
+                self.place_with_access(expression, true, readonly)?;
             }
         } else if let Ty::Ref(target) = ty {
             self.body.push(format!("ldobj {}", target.il()));
@@ -1144,7 +1149,13 @@ impl Lowerer<'_> {
         let (signature, function) =
             library::indexer(target, value.is_some()).map_err(|e| owner.at.error(e.message))?;
         let interface = library::is_interface(target)?;
-        self.library_receiver(owner, &ty, saved, function.receiver_byref || interface)?;
+        self.library_receiver(
+            owner,
+            &ty,
+            saved,
+            function.receiver_byref || interface,
+            function.receiver_readonly,
+        )?;
         self.expression_for(index, &Ty::from_metadata(&function.parameters[0])?)?;
         if let Some(value) = value {
             self.expression_for(value, &Ty::from_metadata(&function.parameters[1])?)?;
@@ -1294,11 +1305,11 @@ impl Lowerer<'_> {
                 } else {
                     &owner
                 };
-                if let Some((ty, getter, byref)) =
+                if let Some((ty, getter, byref, readonly)) =
                     library::property(target, &field.text).map_err(|e| field.error(e.message))?
                 {
                     let interface = library::is_interface(target)?;
-                    self.library_receiver(value, &owner, saved, byref || interface)?;
+                    self.library_receiver(value, &owner, saved, byref || interface, readonly)?;
                     let opcode = if interface { "callvirt" } else { "call" };
                     self.body.push(format!("{opcode} {getter}"));
                     return Ok(ty);
@@ -1448,6 +1459,7 @@ impl Lowerer<'_> {
                         .iter()
                         .find(|m| m.name.text == member.text)
                         .ok_or_else(|| member.error("unknown source instance method"))?;
+                    let receiver_readonly = method.receiver_readonly;
                     let parameters = method.parameters.clone();
                     let returns = method.returns.clone();
                     let signature = format!(
@@ -1462,7 +1474,7 @@ impl Lowerer<'_> {
                     );
                     if !matches!(ty, Ty::Ref(_)) {
                         self.body.truncate(saved);
-                        self.place(owner, true)?;
+                        self.place_with_access(owner, true, receiver_readonly)?;
                     }
                     if parameters.len() != arguments.len() {
                         return Err(member.error("argument count mismatch"));
@@ -1512,7 +1524,13 @@ impl Lowerer<'_> {
                 let interface = library::is_interface(target)?;
                 // Interface calls consume a view even when dispatch subsequently
                 // copies the concrete receiver for a value-receiver implementation.
-                self.library_receiver(owner, &ty, saved, function.receiver_byref || interface)?;
+                self.library_receiver(
+                    owner,
+                    &ty,
+                    saved,
+                    function.receiver_byref || interface,
+                    function.receiver_readonly,
+                )?;
                 self.body.extend(argument_body);
                 let opcode = if interface { "callvirt" } else { "call" };
                 self.body.push(format!("{opcode} {signature}"));
@@ -2179,7 +2197,11 @@ impl Lowerer<'_> {
         Ok(format!(
             "{} {}({}) -> {}\n{}\n{}\n.end\n",
             if self.receiver.is_some() {
-                ".method instance byref"
+                if self.function.receiver_readonly {
+                    ".method instance readonly byref"
+                } else {
+                    ".method instance byref"
+                }
             } else {
                 ".function"
             },
@@ -2267,7 +2289,12 @@ pub fn lower_to_il_named(source: &str, document: &str) -> Result<String, Fault> 
         il.push_str(&format!(".interface {}\n", interface.name.text));
         for method in &interface.methods {
             il.push_str(&format!(
-                ".method instance byref {}({}) -> {}\n.end\n",
+                ".method instance {}byref {}({}) -> {}\n.end\n",
+                if method.receiver_readonly {
+                    "readonly "
+                } else {
+                    ""
+                },
                 method.name.text,
                 method
                     .parameters

@@ -163,3 +163,140 @@ fn readonly_view_observes_mutation_through_a_distinct_writable_alias() {
         .unwrap();
     assert_eq!(result.value, Value::Int32(42));
 }
+
+#[test]
+fn readonly_receivers_cover_source_interfaces_collections_and_artifacts() {
+    let module =
+        frontend::compile(include_str!("../examples/source/readonly-receivers.neo")).unwrap();
+    let json = serde_json::to_string(&module).unwrap();
+    assert!(json.contains("\"receiver_readonly\":true"));
+    let restored = serde_json::from_str(&json).unwrap();
+    let program = LoadedProgram::new(&restored).unwrap();
+    program.verify().unwrap();
+    assert_eq!(
+        program.run(Limits::default()).unwrap().value,
+        Value::Int32(42)
+    );
+}
+
+#[test]
+fn readonly_receiver_contracts_reject_mutation_and_interface_mismatches() {
+    for source in [
+        "record Counter(Age: int) { readonly func Bad() -> () { this.Age = 9 } }\nfunc Main() -> () { let x = new Counter(1); x.Bad() }",
+        "record Counter(Age: int) { func Write() -> () { this.Age = 9 }; readonly func Bad() -> () { this.Write() } }\nfunc Main() -> () { let x = new Counter(1); x.Bad() }",
+        "interface View { readonly func Read() -> int }\nrecord Counter(Age: int): View { func Read() -> int { return this.Age } }\nfunc Main() -> int { let x = new Counter(1); let v: View& = x; return v.Read() }",
+        "func Bad(readonly x: System.Collections.ArrayList<int>&) -> () { x.Add(1) }\nfunc Main() -> () { var x = System.Collections.ArrayList<int>.Allocate(1); Bad(&x) }",
+    ] {
+        assert!(frontend::compile(source).is_err(), "accepted {source}");
+    }
+}
+
+#[test]
+fn unchecked_readonly_receivers_cannot_write_or_forward_this() {
+    for body in [
+        "ldarg this\nldflda 0\nldc.i4 9\nstobj Int32",
+        "ldarg this\ncall instance Counter::Write()\npop",
+        "ldarg this\nstloc alias\nldloc alias\nldflda 0\nldc.i4 9\nstobj Int32",
+    ] {
+        let source = format!(
+            r#"
+.type Counter
+ .field Age Int32
+ .method instance byref Write() -> Void
+  ldarg this
+  ldflda 0
+  ldc.i4 9
+  stobj Int32
+  ldvoid
+  ret
+ .end
+ .method instance readonly byref Read() -> Void
+  .local Counter& alias
+  {body}
+  ldvoid
+  ret
+ .end
+.end
+.function Main() -> Void
+ .local Counter counter
+ ldc.i4 1
+ newobj Counter
+ stloc counter
+ ldloca counter
+ call instance Counter::Read()
+ ret
+.end
+"#
+        );
+        let error = raw(&source).unwrap_err();
+        assert!(error.message.contains("readonly"), "{}", error.message);
+    }
+}
+
+#[test]
+fn readonly_receivers_expose_reflection_and_shallow_alias_semantics() {
+    let source = r#"
+record Counter(Age: int)
+record Holder(Value: Counter&) {
+    readonly func Update() -> int {
+        this.Value.Age = 42
+        return this.Value.Age
+    }
+}
+func Main() -> int {
+    let counter = new Counter(0)
+    let holder = Holder(counter)
+    let methods = typeof(Holder).GetMethods()
+    if methods[0].IsReadOnly { return holder.Update() }
+    return 0
+}
+"#;
+    let module = frontend::compile(source).unwrap();
+    let program = LoadedProgram::new(&module).unwrap();
+    assert_eq!(
+        program.run(Limits::default()).unwrap().value,
+        Value::Int32(42)
+    );
+}
+
+#[test]
+fn invalid_readonly_receiver_metadata_is_rejected() {
+    for declaration in [
+        ".method instance readonly Read() -> Void",
+        ".method static readonly byref Read() -> Void",
+        ".method instance readonly byref .ctor() -> Void",
+    ] {
+        let source = format!(".module App\n.type Counter\n{declaration}\nldvoid\nret\n.end\n.end");
+        assert!(
+            assemble(&source)
+                .and_then(|m| LoadedProgram::new(&m))
+                .is_err()
+        );
+    }
+}
+
+#[test]
+fn readonly_collection_getters_accept_owned_bindings_and_preserve_element_references() {
+    let source = r#"
+record Counter(Age: int)
+func Read(readonly values: System.Collections.List<Counter&>&) -> int {
+    values[0].Age = 42
+    return values[0].Age
+}
+func Main() -> int {
+    var values = System.Collections.ArrayList<Counter&>.Allocate(1)
+    values.Add(new Counter(1))
+    let copy = values
+    if copy.Count != 1 || copy.Capacity != 1 { return -1 }
+    if copy[0].Age != 1 { return -2 }
+    return Read(&values)
+}
+"#;
+    let module = frontend::compile(source).unwrap();
+    let program = LoadedProgram::new(&module).unwrap();
+    program.verify().unwrap();
+    assert_eq!(
+        program.run(Limits::default()).unwrap().value,
+        Value::Int32(42)
+    );
+}

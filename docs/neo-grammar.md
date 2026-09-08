@@ -17,9 +17,9 @@ program          = separators, { declaration, separators }, end_of_input ;
 declaration      = import_decl | record_decl | interface_decl | function_decl ;
 import_decl      = "import", "System", ".", "Console", ".", "*", terminator ;
 record_decl      = "record", identifier, field_list, [ ":", type, { ",", type } ],
-                   (terminator | newlines, "{", separators, { function_decl, separators }, "}") ;
+                   (terminator | newlines, "{", separators, { [ "readonly" ], function_decl, separators }, "}") ;
 interface_decl   = "interface", identifier, newlines, "{", separators,
-                   { "func", identifier, parameter_list, "->", type, terminator, separators }, "}" ;
+                   { [ "readonly" ], "func", identifier, parameter_list, "->", type, terminator, separators }, "}" ;
 function_decl    = "func", identifier, parameter_list, "->", type, newlines,
                    "{", separators, { statement, separators }, "}" ;
 field_list       = "(", newlines,
@@ -240,3 +240,6 @@ managed addresses; value-returning getters yield copies. See [library indexers](
 output parameters and leaves call syntax unchanged. An explicit & argument may
 address an immutable owned binding in this context. See [readonly parameters](readonly-parameters.md)
 for enforcement, the partial verifier projection and current limitations.
+
+Inside record/interface bodies, `readonly func` declares a readonly managed receiver.
+The modifier is not valid on free functions. See [receiver semantics](readonly-parameters.md#readonly-instance-receivers).

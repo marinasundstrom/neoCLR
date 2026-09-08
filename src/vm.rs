@@ -453,6 +453,9 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 "byref receiver requires a non-constructor IL instance method",
             ));
         }
+        if function.receiver_readonly && !function.receiver_byref {
+            return Err(Fault::new("readonly receiver requires a byref receiver"));
+        }
         let mut readonly_parameters = HashSet::new();
         for index in &function.readonly_parameters {
             if !readonly_parameters.insert(*index)
@@ -853,7 +856,9 @@ fn restrict_reference_arguments(
             } => reference,
             _ => continue,
         };
-        if index >= offset && function.readonly_parameters.contains(&(index - offset)) {
+        if (index == 0 && function.receiver_readonly)
+            || (index >= offset && function.readonly_parameters.contains(&(index - offset)))
+        {
             reference.assigned()?;
             reference.restrict_readonly();
         } else {

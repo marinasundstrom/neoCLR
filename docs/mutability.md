@@ -1,8 +1,8 @@
 # Binding immutability and readonly managed references
 
 This describes the broader design. The first [readonly input-parameter slice](readonly-parameters.md)
-is now implemented and compared with .NET. Runtime-protected immutable slots and
-readonly receiver/storage declarations remain planned. Neo still enforces let/var
+and readonly instance receivers are implemented and compared with .NET. Runtime-protected
+immutable slots and general readonly storage/return declarations remain planned. Neo still enforces let/var
 binding rules in the compiler.
 
 ## .NET comparison and decision status

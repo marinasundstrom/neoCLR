@@ -175,5 +175,10 @@ arrays and GC pressure.
 
 The [readonly input-parameter slice](readonly-parameters.md) now enforces restricted
 managed access at runtime, with Neo declarations and ParameterInfo.IsReadOnly.
-Readonly receiver and general storage/return declarations remain future work; the
-verifier currently tracks only part of the permission flow.
+Readonly instance receivers are also implemented, with MethodInfo.IsReadOnly.
+General storage/return declarations remain future work; the verifier currently tracks
+only part of the permission flow.
+
+MethodInfo.IsReadOnly reports an enforced readonly receiver (separate from
+ParameterInfo.IsReadOnly). Reassemble external System artifacts for the expanded
+MethodInfo descriptor; static and value-receiver methods report false.

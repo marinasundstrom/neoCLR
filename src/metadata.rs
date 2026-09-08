@@ -268,6 +268,9 @@ pub struct Function {
     /// Instance argument zero addresses the caller slot rather than containing a value copy.
     #[serde(default)]
     pub receiver_byref: bool,
+    /// Narrow the managed instance receiver to readonly access on entry.
+    #[serde(default)]
+    pub receiver_readonly: bool,
     /// Declared parameter indices whose slots must be assigned before normal return.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub out_parameters: Vec<usize>,

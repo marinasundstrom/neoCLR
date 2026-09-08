@@ -1,8 +1,9 @@
-# Readonly managed input parameters
+# Readonly managed inputs and instance receivers
 
 This slice implements a runtime access restriction for managed input references.
-It does not implement immutable runtime slots, readonly receiver declarations, deep
-immutability, or general readonly type syntax for locals, fields and returns.
+It also implements readonly instance receivers. It does not implement immutable
+runtime slots, deep immutability, or general readonly type syntax for locals, fields
+and returns.
 
 ## Consumer contract
 
@@ -38,7 +39,8 @@ is unchanged. The capability follows reference copies, returns, stored heap refe
 erased payloads, interface views and derived addresses into owned fields or array
 elements. Stores and initialization through a restricted view fault. Passing it as
 a writable parameter, output parameter or writable receiver faults at the call boundary.
-Interface implementations must match the declared readonly parameter contract exactly.
+Interface implementations must match the declared readonly parameter and receiver
+contracts exactly.
 
 Readonly does not mean a stable snapshot. Other writable aliases can change the
 same value. Loading a stored reference field or reference-array element preserves
@@ -69,8 +71,9 @@ It is a neoCLR extension; it is not an alias for .NET ParameterInfo.IsIn. Debugg
 reference displays include a readonly marker, and reachability reports include the
 parameter indices. No new opcode or separate reference type was introduced.
 
-Reassemble external System artifacts for the expanded ParameterInfo layout. JSON
-format 5 remains provisional; artifacts using readonly metadata require this runtime.
+Reassemble external System artifacts for the expanded ParameterInfo and MethodInfo
+layouts. JSON format 5 remains provisional; artifacts using readonly metadata require
+this runtime.
 Neo reserves `readonly` as a keyword. Existing writable signatures retain their behavior.
 
 ## .NET comparison and decision
@@ -97,7 +100,7 @@ readonly storage/return contracts are designed.
 
 Compatibility accommodations are evidence about .NET's design, not constraints on
 neoCLR. The goal is consistent APIs and behavior where appropriate, with deliberate
-runtime improvements where justified. Later readonly receivers and richer signatures
+runtime improvements where justified. Richer readonly signatures
 must preserve the same enforcement model rather than add unrelated special cases.
 
 ### Reproducible comparison
@@ -156,3 +159,63 @@ require separate alias, effect, lifetime and memory-model evidence. A JIT may re
 a runtime permission check only when it proves the equivalent contract, preserving
 observable Fault behavior and relevant side effects. The alias-mutation regression
 test deliberately demonstrates why readonly alone is not a stable-value guarantee.
+
+## Readonly instance receivers
+
+Neo record and interface bodies accept `readonly func`:
+
+```swift
+interface CounterView {
+    readonly func Read() -> int
+}
+record Counter(Age: int): CounterView {
+    readonly func Read() -> int { return this.Age }
+}
+func ReadCounter(readonly counter: CounterView&) -> int {
+    return counter.Read()
+}
+```
+
+IL declares `.method instance readonly byref Read() -> Int32`. Metadata stores
+`receiver_readonly` alongside `receiver_byref`; ordinary call signatures do not
+change. Only non-constructor IL instance methods with managed receivers support it.
+The runtime narrows this at entry, including virtual interface dispatch, and rejects
+writes or forwarding to writable receivers even without verification. Interface
+implementations must match the contract exactly. This conservative rule avoids
+permission-dependent dispatch; accepting stronger implementation guarantees is a
+possible future refinement.
+
+Neo may address an immutable owned local to call such a method. Writable aliases
+remain writable after the call. There is no implicit defensive receiver copy.
+A readonly receiver can call another readonly receiver method. Separately stored
+reference fields retain their own permissions, so this is not a purity contract.
+
+The initial library review marks ArrayList<T>.Count, Capacity, its internal
+CheckIndex helper and Item getter readonly. List<T>.Count and Item getter carry
+matching interface contracts. Add and Item setter remain writable. Reading a T&
+element preserves its own permission; neither list elements nor backing-array
+targets become deeply immutable. External List implementations must update these
+two getter receiver contracts. MethodInfo.IsReadOnly reports the receiver restriction
+(false for value receivers and static methods); ParameterInfo.IsReadOnly continues
+to describe individual inputs. Reachability reports include receiver_readonly.
+
+C# supports readonly struct instance members as a language feature. Calling a
+non-readonly member from a readonly context can require a defensive copy, as described
+in [Microsoft's readonly reference](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/readonly)
+(checked 2026-09-08). neoCLR instead uses the existing runtime permission for this
+across record and interface calls, independent of frame/heap allocation. The benefit
+is one enforced contract across languages and unchecked IL; the costs are dispatch
+metadata, runtime checks, and an explicit API migration. Compiler-only annotations
+or automatic defensive copies would leave different enforcement or alias behavior.
+The verifier remains partial and no JIT optimization benefit is claimed.
+
+Run the end-to-end example and regression suite:
+
+```sh
+cargo run --locked -- run examples/source/readonly-receivers.neo
+cargo test --locked --test readonly_references --test array_list --test interfaces --test reflection
+```
+
+The example returns 42. Tests cover artifact round trips, interface dispatch, collection
+getters, immutable local receivers, reflection, shallow aliases, malformed contracts,
+and unchecked writes and writable forwarding through copied receiver references.

@@ -222,8 +222,11 @@ fn analyze_function(
             let offset = inputs.len().saturating_sub(callee.parameters.len());
             for (argument, input) in inputs.iter().enumerate() {
                 if matches!(input, StackType::Readonly(_))
-                    && (argument < offset
-                        || !callee.readonly_parameters.contains(&(argument - offset)))
+                    && !(if argument < offset {
+                        callee.receiver_readonly
+                    } else {
+                        callee.readonly_parameters.contains(&(argument - offset))
+                    })
                 {
                     return Err(fault(
                         pc,
@@ -651,13 +654,13 @@ fn typed_effect(
         Arg(index) => {
             let offset = usize::from(function.instance);
             let ty = function.argument_types()[*index].clone();
-            Ok(vec![
-                if *index >= offset && function.readonly_parameters.contains(&(*index - offset)) {
-                    StackType::Readonly(ty)
-                } else {
-                    loaded(&ty)
-                },
-            ])
+            Ok(vec![if (*index == 0 && function.receiver_readonly)
+                || (*index >= offset && function.readonly_parameters.contains(&(*index - offset)))
+            {
+                StackType::Readonly(ty)
+            } else {
+                loaded(&ty)
+            }])
         }
         Load(index) => Result::Ok(vec![loaded(&function.locals[*index])]),
         Store(index) => {

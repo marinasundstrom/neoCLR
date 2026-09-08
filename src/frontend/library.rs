@@ -153,7 +153,7 @@ pub(super) fn cases(ty: &Ty) -> Result<Vec<Case>, Fault> {
 }
 
 /// Read an ordinary non-indexed property through its declared public getter.
-pub(super) fn property(ty: &Ty, name: &str) -> Result<Option<(Ty, String, bool)>, Fault> {
+pub(super) fn property(ty: &Ty, name: &str) -> Result<Option<(Ty, String, bool, bool)>, Fault> {
     let module = crate::library::system()?;
     let metadata = crate::assembler::parse_type(&ty.il())?;
     let Some(definition) = module.type_definition(&metadata) else {
@@ -193,6 +193,7 @@ pub(super) fn property(ty: &Ty, name: &str) -> Result<Option<(Ty, String, bool)>
         Ty::from_metadata(&property.ty)?,
         signature,
         function.receiver_byref,
+        function.receiver_readonly,
     )))
 }
 

@@ -17,7 +17,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   metadata validation, examples and a reproducible .NET 10 comparison. Documented
   the const-reference analogy and JIT limits: readonly views may observe writes
   through other aliases and do not imply globally immutable memory. Readonly
-  receiver and general storage/return declarations remain future work. Reassemble
+  instance receivers now share this enforcement, including virtual interface dispatch,
+  Neo readonly methods and MethodInfo.IsReadOnly. ArrayList Count/Capacity/Item
+  getters and List Count/Item contracts permit readonly observation; external List
+  implementations must update their getter receiver contracts. General storage/return
+  declarations remain future work. Reassemble
   external System artifacts for the expanded reflection descriptor layout; readonly
   metadata requires this runtime, and Neo now reserves the readonly keyword.
 
@@ -32,7 +36,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   capabilities, with Neo syntax and diagnostics above them. Documented their
   independence, shallow boundaries, alias checks and initialization/re-entry
   decisions; placed this foundation first in the exploration roadmap. These
-  contracts are not yet implemented.
+  protected-slot contracts are not yet implemented; readonly inputs and receivers
+  are implemented as described above.
 
 - Recorded the planned platform backlog: inheritance, nullable slots, enums/flags, delegates and
   lambdas, generic constraints (including not-null/not-void/not-reference), runtime

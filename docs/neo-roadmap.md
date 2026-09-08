@@ -181,5 +181,6 @@ permissions; let binding immutability must remain distinct from target mutabilit
 
 The [readonly input-parameter slice](readonly-parameters.md) now enforces restricted
 managed access at runtime, with Neo declarations and ParameterInfo.IsReadOnly.
-Readonly receiver and general storage/return declarations remain future work; the
-verifier currently tracks only part of the permission flow.
+Readonly instance receivers are also implemented, with MethodInfo.IsReadOnly.
+General storage/return declarations remain future work; the verifier currently tracks
+only part of the permission flow.

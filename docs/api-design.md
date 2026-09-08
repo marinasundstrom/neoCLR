@@ -235,5 +235,7 @@ access. Immutable bindings and deep object immutability are separate concerns.
 
 The [readonly input-parameter slice](readonly-parameters.md) now enforces restricted
 managed access at runtime, with Neo declarations and ParameterInfo.IsReadOnly.
-Readonly receiver and general storage/return declarations remain future work; the
-verifier currently tracks only part of the permission flow.
+Readonly instance receivers now use the same enforcement and expose MethodInfo.IsReadOnly.
+ArrayList Count/Capacity/Item getters and List Count/Item contracts support readonly
+observation. General storage/return declarations remain future work; the verifier
+currently tracks only part of the permission flow.

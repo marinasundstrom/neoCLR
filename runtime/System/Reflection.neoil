@@ -143,6 +143,7 @@
     .field private IsReceiverByRef Boolean
     .field private DefinitionIndex Int32
     .field private Parameters System.Reflection.ParameterInfo[]
+    .field private IsReadOnly Boolean
     .property instance Name() -> String
         .get instance System.Reflection.MethodInfo::get_Name()
     .end
@@ -218,6 +219,14 @@
     .method instance GetParameters() -> System.Reflection.ParameterInfo[]
         ldarg this
         ldfld 9
+        ret
+    .end
+    .property instance IsReadOnly() -> Boolean
+        .get instance System.Reflection.MethodInfo::get_IsReadOnly()
+    .end
+    .method instance get_IsReadOnly() -> Boolean
+        ldarg this
+        ldfld 10
         ret
     .end
 .end
