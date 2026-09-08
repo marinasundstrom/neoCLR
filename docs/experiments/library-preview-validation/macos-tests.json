@@ -1,0 +1,29 @@
+{
+  "platform": "macOS 26.6.2 ARM64",
+  "rust": "1.95.0",
+  "runtime_commit": "e5220e0",
+  "runtime_unchanged_in_archive_commit": "eb4a7dd74977da4f0195fde66b38af42af4cbe0c",
+  "command": "cargo test --locked --all-targets --no-fail-fast",
+  "initial_run": {
+    "exit_code": 101,
+    "targets_completed": 147,
+    "passed": 917,
+    "failed": 1,
+    "ignored": 0,
+    "failure": "console::migrated_library_has_one_canonical_api_and_no_union_instructions_at_these_boundaries",
+    "log_sha256": "19cad31bd7762105cd61e6a2ed6b04092de10f8b05ee05fea2fe07051c92c588"
+  },
+  "correction": "Select the existing Math.Abs(Int32) API by name and parameter signature, permitting the Double overload. No runtime change.",
+  "targeted_rerun": {
+    "command": "cargo test --locked --test console",
+    "passed": 11,
+    "failed": 0,
+    "exit_code": 0
+  },
+  "additional_checks": {
+    "cargo +1.85.0 check --locked --all-targets": "passed",
+    "cargo clippy --locked --all-targets -- -D warnings": "passed",
+    "cargo fmt --check": "passed"
+  },
+  "scope": "All other initial targets passed. The corrected target passed its rerun. The entire suite was not repeated after this test-only correction; exact-candidate cross-platform CI remains a release gate."
+}

@@ -74,3 +74,9 @@ Before publication, require:
 The validator does not push, tag, upload a release or change package versions. CI runs
 require a pushed commit or pull request. Local macOS evidence is not Linux/Windows
 validation. See [source release](source-release.md) for the remaining publication process.
+
+## Current development evidence
+
+See the [library-preview validation record](experiments/library-preview-validation/README.md)
+for the exact macOS commits, toolchains and scope of the locally recorded checks.
+These records do not select a release or replace the full cross-platform CI gate.

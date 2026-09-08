@@ -15,6 +15,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Expanded release smoke checks for recent runtime/library features and dynamic
   clock, Environment and file-report scenarios. Updated the validation guide for
   Unreleased development; published Preview 2 notes remain unchanged.
+  Fixed a legacy boundary test to identify Math.Abs(Int32) by signature instead
+  of rejecting the newer Double overload. Recorded macOS stable/minimum-Rust
+  archive checks (26 source/artifact scenarios and native interop), the full local
+  test run and successful corrected-target rerun; cross-platform release gates
+  remain pending.
 
 #### Added
 

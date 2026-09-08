@@ -317,12 +317,19 @@ fn console_case_sample_handles_bytes_eof_and_read_failures() {
 #[test]
 fn migrated_library_has_one_canonical_api_and_no_union_instructions_at_these_boundaries() {
     let system = neoclr::library::system().unwrap();
-    for name in [
-        "System.Console.ReadByte",
-        "System.IO.File.ReadAllText",
-        "System.Math.Abs",
+    for (name, parameters) in [
+        ("System.Console.ReadByte", vec![]),
+        (
+            "System.IO.File.ReadAllText",
+            vec![Type::String, Type::Int32],
+        ),
+        ("System.Math.Abs", vec![Type::Int32]),
     ] {
-        let functions: Vec<_> = system.functions.iter().filter(|f| f.name == name).collect();
+        let functions: Vec<_> = system
+            .functions
+            .iter()
+            .filter(|f| f.name == name && f.parameters == parameters)
+            .collect();
         assert_eq!(functions.len(), 1);
         assert!(matches!(functions[0].returns, Type::Constructed { .. }));
 
