@@ -21,8 +21,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 - Recorded delegates as the planned shared runtime callable abstraction, with
   language function values/lambdas built upon them. Excluded a separate universal
-  function-object runtime model; capture lifetimes, representation and multicast
-  behavior remain design work. Aligned platform/Neo roadmaps with separate class
+  function-object runtime model. Added a typed-delegate contract/runtime audit, pinned
+  .NET behavioral probes and runnable Neo interface-adapter lifetime/GC tests. The
+  proposed first implementation retains heap receivers without implicit copying;
+  scoped frame captures and multicast remain later work. Guest delegate metadata
+  and opcodes are not implemented. Aligned platform/Neo roadmaps with separate class
   syntax/default-constructor and delegate slices, and the compiler inference role.
 
 - Generic free functions and static methods across runtime/IL and Neo, with independent

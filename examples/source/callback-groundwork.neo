@@ -1,0 +1,41 @@
+// Interface adapters exercise callback lifetimes. These are not delegate declarations.
+import System.Console.*
+
+interface IntCallback {
+    func Invoke(amount: int) -> int
+}
+class Counter: IntCallback {
+    var Value: int
+    init(value: int) { this.Value = value }
+    func Invoke(amount: int) -> int {
+        this.Value = this.Value + amount
+        return this.Value
+    }
+}
+func Increment(value: int) -> int { return value + 1 }
+class StaticAdapter: IntCallback {
+    func Invoke(amount: int) -> int { return Increment(amount) }
+}
+class BoundCounter: IntCallback {
+    var Target: Counter&
+    init(target: Counter&) { this.Target = target }
+    func Invoke(amount: int) -> int { return this.Target.Invoke(amount) }
+}
+func ApplyTwice(callback: IntCallback&, amount: int) -> int {
+    callback.Invoke(amount)
+    return callback.Invoke(amount)
+}
+func MakeBound() -> BoundCounter {
+    let target = new Counter(40)
+    return BoundCounter(target)
+}
+func Main() -> int {
+    var plain = StaticAdapter()
+    WriteLine(ApplyTwice(&plain, 41))
+    var local = Counter(40)
+    WriteLine(ApplyTwice(&local, 1))
+    var bound = MakeBound()
+    for index in 0..<75 { let discarded = new Counter(index) }
+    WriteLine(ApplyTwice(&bound, 1))
+    return bound.Invoke(0)
+}

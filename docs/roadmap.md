@@ -36,8 +36,9 @@ and [explicit interface implementations](explicit-interfaces.md) are implemented
 [Default interface bodies](default-interface-implementations.md) now execute in the
 runtime and Neo. [Generic free/static functions](function-generics.md) now supply
 an independent callable-definition building block. [Ordinary Neo classes and default(T)](classes-and-defaults.md)
-now project construction/default rules without adding nullable signatures. Next are
-[managed delegate design](delegates.md) and a callback consumer; runtime nullability
+now project construction/default rules without adding nullable signatures. The
+[delegate contract and executable groundwork](delegate-contract.md) are recorded.
+Next are typed delegate implementation and a callback consumer; runtime nullability
 and defaultability remain separate foundations for broader automatic initialization. Languages will build function values and lambdas on delegates;
 ordinary functions will not become a separate runtime object model.
 Applying default bodies to a useful library capability remains planned;
