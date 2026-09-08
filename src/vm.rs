@@ -444,7 +444,11 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 .name
                 .strip_prefix(&prefix)
                 .ok_or_else(|| Fault::new("method name does not match its declaring type"))?;
-            if member.is_empty() || (member.contains('.') && member != ".ctor") {
+            if member.is_empty()
+                || (member.contains('.')
+                    && member != ".ctor"
+                    && function.interface_implementations.is_empty())
+            {
                 return Err(Fault::new("invalid member name"));
             }
             if member == ".ctor" && (!function.instance || function.returns != Type::Void) {
@@ -511,6 +515,16 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             .chain([&function.returns])
         {
             check(ty)?;
+        }
+        for target in &function.interface_implementations {
+            if let Some(owner) = &target.owner {
+                check(owner)?;
+            }
+            for ty in &target.parameters {
+                check(ty)?;
+            }
+            let contract = resolve(module, target)?;
+            crate::access::check_call(module, Some(function), &contract)?;
         }
         if arity > 0 && (function.pinvoke.is_some() || function.impl_flags != 0) {
             return Err(Fault::new("generic owners require IL methods"));

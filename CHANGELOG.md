@@ -10,6 +10,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 #### Added
 
+- Explicit interface implementations via runtime declaration-to-body mappings, IL
+  .override directives and Neo `func Interface.Member` bodies. Added inherited and
+  redeclared mappings, generic analysis, qualified private reflection names, examples,
+  regression tests and a pinned .NET comparison. Bodies use managed receivers and
+  remain separate from class virtual slots. New mapping artifacts require this runtime;
+  IsVirtual and one inherited reimplementation edge deliberately differ from .NET,
+  documented as preview choices. Default interface bodies remain planned.
+
 - Interface implementations now inherit through class bases and dispatch mapped virtual
   members to concrete overrides, including through base views. Added generic target
   analysis, inherited GetInterfaces results, frame/heap examples, lifetime/readonly

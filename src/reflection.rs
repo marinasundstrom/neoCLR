@@ -385,7 +385,12 @@ fn method(
     Ok(record(
         "System.Reflection.MethodInfo",
         vec![
-            Value::String(f.name.rsplit('.').next().unwrap_or(&f.name).into()),
+            Value::String(
+                f.name
+                    .strip_prefix(&format!("{}.", owner.definition_name().unwrap_or("")))
+                    .unwrap_or(&f.name)
+                    .into(),
+            ),
             type_value(module, owner)?,
             type_value(module, &f.returns.substitute_type_parameters(arguments)?)?,
             Value::Boolean(!f.instance),

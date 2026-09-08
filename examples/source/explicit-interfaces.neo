@@ -1,0 +1,19 @@
+interface Readable {
+    readonly func Read() -> int
+}
+interface Identified {
+    readonly func Read() -> int
+}
+record Counter(Value: int): Readable, Identified {
+    readonly func Readable.Read() -> int { return this.Value }
+    readonly func Identified.Read() -> int { return 1 }
+}
+record Child(): Counter
+func Main() -> int {
+    var local = Child(20)
+    let readable: readonly Readable& = &local
+    let identified: readonly Identified& = &local
+    let heap: Counter& = new Child(20)
+    let heapReadable: readonly Readable& = heap
+    return readable.Read() + identified.Read() + heapReadable.Read() + 1
+}

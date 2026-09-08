@@ -343,6 +343,14 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         entry_point,
                         calling_convention: crate::metadata::CallingConvention::Cdecl,
                     });
+                } else if word == ".override" {
+                    if !pending.function.body.is_empty() || !pending.labels.is_empty() {
+                        return Err(Fault::new(".override must precede instructions"));
+                    }
+                    pending
+                        .function
+                        .interface_implementations
+                        .push(parse_function_ref(rest)?);
                 } else if word == ".methodimpl" {
                     if rest != "InternalCall" || pending.function.impl_flags != 0 {
                         return Err(Fault::new(
@@ -702,7 +710,11 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                             "declaration names must not contain an owner or instance prefix",
                         ));
                     }
-                    if owner.is_some() && target.name.contains('.') && target.name != ".ctor" {
+                    if owner.is_some()
+                        && target.name.contains('.')
+                        && target.name != ".ctor"
+                        && visibility != crate::metadata::Visibility::Private
+                    {
                         return Err(Fault::new(
                             "method name must be unqualified within its type",
                         ));
@@ -734,6 +746,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                             receiver_readonly,
                             is_virtual: is_virtual || is_abstract,
                             is_override,
+                            interface_implementations: vec![],
                             is_abstract,
                             returns: parse_type(result)?,
                             locals: vec![],

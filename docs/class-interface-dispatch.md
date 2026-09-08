@@ -43,7 +43,8 @@ Primary source consulted 2026-09-08: the shipped
 C# inherits interface mappings, dispatches mapped virtual methods to overrides, allows
 inherited public members to satisfy interfaces, and restarts mapping on redeclaration.
 Abstract classes can defer implementation through abstract members. C# also supports
-explicit implementations and member hiding; neoCLR does not yet implement those.
+explicit implementations and member hiding. neoCLR now supports
+[explicit mappings](explicit-interfaces.md); member hiding remains unsupported.
 
 The pinned SDK 10.0.100/net10.0 probe checks inherited mappings, overrides, reference
 identity, enumeration and mapping through inherited public members. This is evidence
@@ -80,9 +81,7 @@ results. Class member hiding remains rejected.
 
 ## Following slices
 
-Both **explicit interface implementations** and **default interface implementations**
-are planned. They are distinct: explicit mappings let a concrete type implement a
-contract separately from its public surface; defaults supply behavior in an interface.
-First specify explicit contract-to-body identity and visibility, then default-body
-selection. See the [interface implementation plan](reflection-hierarchy-plan.md).
-Neither feature is enabled by this slice.
+[Explicit interface implementations](explicit-interfaces.md) are now implemented.
+Default interface implementations remain planned separately, with class-versus-interface
+precedence, diamond ambiguity and reabstraction rules still to be decided. See the
+[interface implementation plan](reflection-hierarchy-plan.md).

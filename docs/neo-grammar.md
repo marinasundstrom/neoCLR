@@ -18,13 +18,15 @@ declaration      = import_decl | record_decl | interface_decl | function_decl ;
 import_decl      = "import", "System", ".", "Console", ".", "*", terminator ;
 record_decl      = [ "abstract" ], "record", identifier, field_list, [ ":", type, { ",", type } ],
                    (terminator | newlines, "{", separators, { record_member, separators }, "}") ;
-record_member    = init_decl | [ "readonly" ], [ "abstract" ], [ "virtual" | "override" ], method_decl ;
+record_member    = init_decl | explicit_method | [ "readonly" ], [ "abstract" ], [ "virtual" | "override" ], method_decl ;
 init_decl        = "init", parameter_list, [ ":", "base", "(", newlines, [ expression, { ",", newlines, expression } ], newlines, ")" ],
                    newlines, "{", separators, { statement, separators }, "}" ;
 interface_decl   = "interface", identifier, [ ":", type, { ",", type } ], newlines, "{", separators,
                    { [ "readonly" ], "func", identifier, parameter_list, "->", type, terminator, separators }, "}" ;
 method_decl      = "func", identifier, parameter_list, "->", type,
                    (terminator | newlines, "{", separators, { statement, separators }, "}") ;
+explicit_method  = [ "readonly" ], "func", identifier, ".", identifier,
+                   parameter_list, "->", type, newlines, block ;
 function_decl    = "func", identifier, parameter_list, "->", type, newlines,
                    "{", separators, { statement, separators }, "}" ;
 field_list       = "(", newlines,
@@ -263,3 +265,8 @@ require a terminator instead of a body.
 Explicit init declarations and base(...) initializers are implemented; see
 [constructor chaining](constructor-chaining.md) for the one-initializer source limit,
 field initialization rules and unchanged aggregate construction without init.
+
+[Explicit interface implementations](explicit-interfaces.md) use `func Interface.Member`
+in records, optionally readonly. They do not introduce ordinary callable class members.
+Virtual/override/abstract modifiers and default interface bodies are not supported
+on these declarations.

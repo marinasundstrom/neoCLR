@@ -174,6 +174,7 @@ fn declared_method(
     };
     for method in &module.functions {
         if method.instance
+            && method.interface_implementations.is_empty()
             && method
                 .owner
                 .as_ref()
@@ -231,6 +232,7 @@ fn validate_methods(module: &Module) -> Result<(), Fault> {
             continue;
         };
         if !method.instance
+            || !method.interface_implementations.is_empty()
             || module
                 .type_definition(owner)
                 .is_none_or(|d| d.representation != Representation::Record)

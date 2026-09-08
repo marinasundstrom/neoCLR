@@ -139,7 +139,38 @@ fn member(module: &Module, concrete: &Type, contract: &Function) -> Result<Funct
         .next()
         .ok_or_else(|| Fault::new("invalid interface member"))?;
     let mut selected = None;
+    let mut explicit = false;
     for owner in &chain[anchor..] {
+        for method in &module.functions {
+            if method.interface_implementations.is_empty()
+                || !method
+                    .owner
+                    .as_ref()
+                    .and_then(|t| module.type_definition(t))
+                    .zip(module.type_definition(owner))
+                    .is_some_and(|(a, b)| std::ptr::eq(a, b))
+            {
+                continue;
+            }
+            let body = method.map_types(|ty| ty.substitute_type_parameters(arguments(owner)))?;
+            for target in &body.interface_implementations {
+                let declaration = crate::vm::resolve(module, target)?;
+                if declaration.definition == contract.definition
+                    && declaration.owner == contract.owner
+                {
+                    if explicit {
+                        return Err(Fault::new(
+                            "ambiguous explicit interface mapping after substitution",
+                        ));
+                    }
+                    selected = Some(body.clone());
+                    explicit = true;
+                }
+            }
+        }
+        if explicit {
+            break;
+        }
         let target = FunctionRef {
             definition: None,
             name: format!("{}.{name}", owner.definition_name().unwrap()),
@@ -148,12 +179,31 @@ fn member(module: &Module, concrete: &Type, contract: &Function) -> Result<Funct
             parameters: contract.parameters.clone(),
         };
         if let Ok(function) = crate::vm::resolve(module, &target) {
-            selected = Some(function);
-            break;
+            if function.interface_implementations.is_empty()
+                && function.visibility == Visibility::Public
+            {
+                selected = Some(function);
+                break;
+            }
         }
     }
     let implementation =
         selected.ok_or_else(|| Fault::new("interface implementation member not found"))?;
+    check_signature(module, &implementation, contract, explicit)?;
+    Ok(implementation)
+}
+
+fn check_signature(
+    module: &Module,
+    implementation: &Function,
+    contract: &Function,
+    explicit: bool,
+) -> Result<(), Fault> {
+    if implementation.parameters != contract.parameters {
+        return Err(Fault::new(
+            "interface implementation requires exact parameter types",
+        ));
+    }
     if implementation
         .out_when_true
         .iter()
@@ -181,16 +231,16 @@ fn member(module: &Module, concrete: &Type, contract: &Function) -> Result<Funct
                 .iter()
                 .collect::<std::collections::BTreeSet<_>>()
         || implementation.returns != contract.returns
-        || implementation.visibility != Visibility::Public
+        || (!explicit && implementation.visibility != Visibility::Public)
         || implementation.is_internal_call()
         || implementation.pinvoke.is_some()
-        || is_contract(module, &implementation)
+        || is_contract(module, implementation)
     {
         return Err(Fault::new(
-            "interface implementation requires a public IL instance method with the exact return type",
+            "interface implementation requires matching IL receiver, parameter and return contracts",
         ));
     }
-    Ok(implementation)
+    Ok(())
 }
 
 pub(crate) fn ensure_implementation(
@@ -250,6 +300,62 @@ fn flags<T: Ord + Copy>(values: &[T]) -> std::collections::BTreeSet<T> {
 }
 
 pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
+    let mut mappings = std::collections::HashSet::new();
+    for body in &module.functions {
+        if body.interface_implementations.is_empty() {
+            continue;
+        }
+        let owner = body
+            .owner
+            .as_ref()
+            .ok_or_else(|| Fault::new("explicit implementation requires a record owner"))?;
+        let definition = module
+            .type_definition(owner)
+            .ok_or_else(|| Fault::new("unknown explicit implementation owner"))?;
+        if definition.representation != Representation::Record
+            || !body.instance
+            || !body.receiver_byref
+            || body.visibility != Visibility::Private
+            || body.is_virtual
+            || body.is_override
+            || body.is_abstract
+            || body.name.ends_with(".ctor")
+            || body.is_internal_call()
+            || body.pinvoke.is_some()
+        {
+            return Err(Fault::new(
+                "explicit implementations require private concrete managed IL record methods",
+            ));
+        }
+        for target in &body.interface_implementations {
+            let contract = crate::vm::resolve(module, target)?;
+            if !is_contract(module, &contract) {
+                return Err(Fault::new(
+                    "explicit implementation must map an interface declaration",
+                ));
+            }
+            let interface = contract.owner.as_ref().unwrap();
+            let mut declared_here = false;
+            for declared in &definition.implements {
+                if closure(module, declared)?.contains(interface) {
+                    declared_here = true;
+                }
+            }
+            if !declared_here {
+                return Err(Fault::new(
+                    "explicit implementation requires interface conformance declared on its owner",
+                ));
+            }
+            if !mappings.insert((
+                owner.clone(),
+                contract.definition.clone(),
+                interface.clone(),
+            )) {
+                return Err(Fault::new("duplicate explicit interface mapping"));
+            }
+            check_signature(module, body, &contract, true)?;
+        }
+    }
     for definition in &module.types {
         if definition.representation == Representation::Interface
             && (!definition.fields.is_empty()

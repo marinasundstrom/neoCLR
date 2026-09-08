@@ -16,19 +16,12 @@ class bases and virtual overrides, preserving owner identity, readonly access an
 
 ## Explicit interface implementations
 
-Planned before default bodies: add explicit contract-to-body mappings, allowing two
-interfaces with the same member signature to have different implementations without
-exposing those methods as ordinary class members. Compare C# explicit implementations
-(§19.6.2 of the specification below) and CLI MethodImpl metadata before choosing the
-metadata representation and Neo syntax. This needs a runtime mapping contract, not
-just qualified method names interpreted by the compiler.
-
-Specify inherited mapping/reimplementation rules, access through interface views,
-readonly/output compatibility, generic substitution, properties/indexers, reflection,
-stack traces and closed dispatch analysis. Test distinct same-signature interfaces,
-base/derived views, inaccessible direct calls and malformed mapping artifacts. Keep
-managed receiver lifetime and identity rules unchanged. Explicit mappings and default
-bodies are separate planned features; neither is currently implemented.
+[Explicit interface implementations](explicit-interfaces.md) are now implemented in
+runtime metadata, IL and Neo. Tests cover distinct mappings, inherited/redeclared
+conformance, class virtual independence, readonly/output contracts, generic substitution,
+reflection visibility and lifetime preservation. Property/indexer declaration syntax,
+GetInterfaceMap and import compatibility remain separate work. The .NET probe records
+a provisional reimplementation edge difference; see the implementation comparison.
 
 ## Default interface implementations
 

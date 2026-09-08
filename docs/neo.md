@@ -429,3 +429,11 @@ declarations, base initialization and the local/heap constructor example.
 
 The [reflection hierarchy example](reflection-hierarchy.md) demonstrates inherited
 properties, readonly MemberInfo views and heterogeneous managed reference collections.
+
+Explicit interface bodies use `func Interface.Member(...) -> ... { ... }` in a
+record, optionally preceded by `readonly`. Calls go through a reference typed as
+that interface; the declaration adds no ordinary record method. Run
+`cargo run --locked -- run examples/source/explicit-interfaces.neo` for two interfaces
+with the same signature and different implementations. See
+[explicit implementations](explicit-interfaces.md) for mapping, inheritance and
+.NET comparison details. Default interface bodies remain planned.

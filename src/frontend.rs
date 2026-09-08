@@ -211,6 +211,7 @@ struct Interface {
 struct Function {
     name: Token,
     base_initializer: Option<Vec<Expr>>,
+    explicit_interface: Option<String>,
     is_virtual: bool,
     is_override: bool,
     is_abstract: bool,
@@ -605,9 +606,17 @@ impl Parser {
         self.expect(")")?;
         Ok(fields)
     }
-    fn function(&mut self, abstract_member: bool) -> Result<Function, Fault> {
+    fn function(&mut self, abstract_member: bool, allow_explicit: bool) -> Result<Function, Fault> {
         self.expect("func")?;
-        let name = self.name()?;
+        let mut name = self.name()?;
+        let explicit_interface = if allow_explicit && self.eat(".") {
+            let interface = name.text.clone();
+            let member = self.name()?;
+            name.text = format!("{interface}.{}", member.text);
+            Some(interface)
+        } else {
+            None
+        };
         let parameters = self.fields(true)?;
         self.expect("->")?;
         let returns = self.ty()?;
@@ -620,6 +629,7 @@ impl Parser {
         Ok(Function {
             name,
             base_initializer: None,
+            explicit_interface,
             is_virtual: false,
             is_override: false,
             is_abstract: false,
@@ -670,6 +680,7 @@ impl Parser {
                 methods.push(Function {
                     name,
                     base_initializer,
+                    explicit_interface: None,
                     parameters,
                     returns: Ty::Void,
                     body,
@@ -690,7 +701,12 @@ impl Parser {
                     .current()
                     .error("interface virtual modifiers are not supported"));
             }
-            let mut method = self.function(abstract_members || is_abstract)?;
+            let mut method = self.function(abstract_members || is_abstract, !abstract_members)?;
+            if method.explicit_interface.is_some() && (is_virtual || is_override || is_abstract) {
+                return Err(method
+                    .name
+                    .error("explicit interface bodies cannot be virtual, override or abstract"));
+            }
             method.receiver_readonly = receiver_readonly;
             method.is_virtual = is_virtual || is_override || is_abstract;
             method.is_abstract = is_abstract;
@@ -779,7 +795,7 @@ impl Parser {
                     methods,
                 });
             } else if self.at("func") {
-                source.functions.push(self.function(false)?);
+                source.functions.push(self.function(false, false)?);
             } else {
                 return Err(self
                     .current()
@@ -2657,11 +2673,34 @@ impl Lowerer<'_> {
         if self.function.is_abstract {
             self.body.clear();
         }
+        let declarations = format!(
+            "{}{}",
+            self.function
+                .explicit_interface
+                .as_ref()
+                .map(|interface| format!(
+                    ".override instance {interface}::{}({})\n",
+                    self.function.name.text.rsplit('.').next().unwrap(),
+                    self.function
+                        .parameters
+                        .iter()
+                        .map(|p| p.ty.il())
+                        .collect::<Vec<_>>()
+                        .join(",")
+                ))
+                .unwrap_or_default(),
+            self.locals.join("\n")
+        );
         Ok(format!(
             "{} {}({}) -> {}\n{}\n{}\n.end\n",
             if self.receiver.is_some() {
                 format!(
-                    ".method instance {}{}{}byref",
+                    ".method {}instance {}{}{}byref",
+                    if self.function.explicit_interface.is_some() {
+                        "private "
+                    } else {
+                        ""
+                    },
                     if self.function.is_abstract {
                         "abstract "
                     } else {
@@ -2702,7 +2741,7 @@ impl Lowerer<'_> {
                 .collect::<Vec<_>>()
                 .join(","),
             self.function.returns.il(),
-            self.locals.join("\n"),
+            declarations,
             self.body.join("\n")
         ))
     }

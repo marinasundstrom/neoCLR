@@ -62,8 +62,8 @@ all inherited fields. An abstract type without abstract methods is also non-inst
 
 Managed base constructors now support [constructor chaining](constructor-chaining.md)
 and publication checks. Inherited value-receiver methods remain restricted. [Inherited interface implementations](class-interface-dispatch.md) now reuse class
-virtual dispatch. Explicit interface implementations and default interface bodies
-remain planned separately.
+virtual dispatch. [Explicit interface implementations](explicit-interfaces.md)
+are also available; default interface bodies remain planned.
 
 ## Inspection and analysis
 

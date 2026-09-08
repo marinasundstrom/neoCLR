@@ -158,6 +158,9 @@ pub(crate) fn validate_uses(linked: &Module, source: &Module) -> Result<(), Faul
             check_type(linked, source, ty)?;
             Ok(ty.clone())
         })?;
+        for target in &function.interface_implementations {
+            check_call(linked, source, target)?;
+        }
         for instruction in &function.body {
             if let Instruction::Call(target)
             | Instruction::CallVirtual(target)

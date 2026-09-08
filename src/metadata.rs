@@ -283,6 +283,9 @@ pub struct Function {
     pub is_override: bool,
     #[serde(default)]
     pub is_abstract: bool,
+    /// Explicit interface declarations implemented by this body (MethodImpl analogue).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub interface_implementations: Vec<FunctionRef>,
     /// Declared parameter indices whose slots must be assigned before normal return.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub out_parameters: Vec<usize>,
@@ -870,6 +873,14 @@ impl Function {
             .chain([&mut result.returns])
         {
             *ty = map(ty)?;
+        }
+        for target in &mut result.interface_implementations {
+            if let Some(owner) = &mut target.owner {
+                *owner = map(owner)?;
+            }
+            for ty in &mut target.parameters {
+                *ty = map(ty)?;
+            }
         }
         for op in &mut result.body {
             match op {

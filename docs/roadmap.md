@@ -32,8 +32,8 @@ complete owners. [Inherited methods, virtual dispatch and abstract classes](clas
 are now implemented. [Constructor chaining](constructor-chaining.md) and the
 [MemberInfo descriptor hierarchy](reflection-hierarchy.md) exercise these foundations.
 [Inherited class interface implementations and virtual override selection](class-interface-dispatch.md)
-are implemented. Explicit interface implementations, followed by default interface
-implementations, are planned next;
+and [explicit interface implementations](explicit-interfaces.md) are implemented.
+Default interface implementations are planned next;
 see the [reflection/interface plan](reflection-hierarchy-plan.md). Activation ownership, external roots and cleanup need decisions before
 escaping callbacks or suspension.
 
