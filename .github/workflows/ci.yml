@@ -13,7 +13,17 @@ jobs:
           components: rustfmt, clippy
       - run: cargo fmt --check
       - run: cargo clippy --locked --all-targets -- -D warnings
-      - run: cargo test --locked
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/validate-release.py --toolchain stable --output release-validation
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: source-validation-${{ matrix.os }}-stable
+          path: |
+            release-validation/report.json
+            release-validation/neoclr-source.tar
       - run: cargo run --locked -- run examples/features.neoil
       - run: cargo run --locked --example invoke
       - run: cargo run --locked --example build_native
@@ -28,7 +38,17 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@1.85.0
       - run: cargo build --locked --all-targets
-      - run: cargo test --locked
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/validate-release.py --toolchain 1.85.0 --output release-validation
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: source-validation-${{ matrix.os }}-minimum
+          path: |
+            release-validation/report.json
+            release-validation/neoclr-source.tar
       - run: cargo run --locked -- run examples/features.neoil
       - run: cargo run --locked --example invoke
       - run: cargo run --locked --example build_native

@@ -72,6 +72,8 @@ cargo run -- run examples/source/calculator.neo
 This README describes the current development tree. The [changelog](CHANGELOG.md)
 separates unreleased work from published capabilities. Every commit updates it using
 [the changelog workflow](docs/changelog.md); published entries remain unchanged.
+The [next-preview validation guide](docs/next-preview-validation.md) documents the
+reproducible source-archive check and exact-commit release gates.
 
 ## Preview 1
 

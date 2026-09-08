@@ -29,6 +29,14 @@ CLI and Raven design references. This review does not establish the historical o
 of every line; project maintainers should review provenance before final publication.
 The notices cover the inspected dependency versions and must be updated with Cargo.lock.
 
+## Automated candidate validation
+
+The [next-preview validation guide](next-preview-validation.md) describes the automated
+source-archive, notice, full-test and source/artifact checks. Run
+`python3 scripts/validate-release.py --toolchain stable` or select Rust 1.85.0. The
+script records the exact committed tree and checksum without tagging or publishing.
+CI applies this check across the six existing platform/toolchain jobs.
+
 ## Assemble a review archive
 
 Run from a clean, committed checkout. Use a new output path; review archives are

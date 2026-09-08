@@ -51,6 +51,11 @@ The next preview's version, publication date and release validation are not yet 
   and existing managed references can convert to implemented interface views for
   virtual dispatch. Views preserve frame or heap provenance without boxing.
   See [Neo interfaces](docs/neo-interfaces.md).
+- **Reproducible candidate validation:** added a source-archive validator that checks
+  tracked membership and dependency notices, runs all test targets on a selected Rust
+  toolchain, compares nine Neo source/artifact programs and exercises native interop.
+  The six existing CI jobs now run the archive check and retain reports/checksums.
+  Actual publication still requires successful evidence for the selected commit.
 - **Release changelog workflow:** reconstructed the published baseline and subsequent
   development history. Added a per-commit update rule, same-date consolidation and
   protection of published entries, with repository instructions for future work.
@@ -138,6 +143,8 @@ The next preview's version, publication date and release validation are not yet 
 
 - Reassemble format-4 artifacts, including external System libraries, against the
   current runtime. Source and library artifacts must agree on signatures.
+  New development instructions local.reset, ref.type and ref.eq require the current
+  runtime; format 5 is still a provisional format, not a stable compatibility promise.
 - Replace Ref<T> with T&, heap.load with ldobj T, and heap.store with stobj T.
   Remove a following pop if it consumed heap.store's old Void result: stobj produces
   no stack value. The runtime service is now ManagedHeap; heap.new also uses SlotReferences.
