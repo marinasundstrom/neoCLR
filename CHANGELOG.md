@@ -10,6 +10,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 #### Changed
 
+- Recorded the planned platform backlog: inheritance, nullable slots, delegates and
+  lambdas, generic constraints (including not-null/not-void/not-reference), runtime
+  async, dynamic hooks and fundamental framework growth. Documented open contracts,
+  projected roadmap tasks and exit criteria. Familiarity targets C#/.NET APIs and
+  observable behavior rather than syntax or internals; these are plans,
+  not implemented capabilities.
+
 - Neo bracket syntax now projects bundled single-index Item getters and setters,
   including virtual interface dispatch and reference-valued elements. Collection
   samples use brackets instead of direct accessor calls; metadata and IL retain

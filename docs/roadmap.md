@@ -1,5 +1,50 @@
 # Direction and migration
 
+The [platform backlog](platform-backlog.md) records the next broad capabilities:
+inheritance, nullable slots, delegates/lambdas, generic constraints, runtime async,
+dynamic hooks, and a more useful fundamental library. Familiarity primarily means C#/.NET APIs and observable behavior, not matching
+source syntax or runtime internals. Improve contracts without legacy constraints.
+
+## Projected exploration order
+
+This is a proposed task sequence, not a release schedule. Each exploration should
+produce a reviewed contract and a bounded implementation plan before growing syntax
+or framework surface. Reorder when an end-to-end program exposes a stronger need.
+The completed memory and Neo foundations remain the starting point.
+
+| Order | Projected tasks | Exit criterion / demonstration |
+| --- | --- | --- |
+| 1. Inheritance and object model | Specify base metadata, field layout, construction order, virtual slots, override validation and base-value copy rules. Implement one inheritance chain, base-reference conversion, full-owner GC tracing and reflection of inherited members. | A derived value can be used locally and on the managed heap, dispatched through a base reference, and inspected without losing derived identity or bypassing lifetime checks. |
+| 2. Nullable slots | Specify null versus uninitialized storage, nullable values versus nullable references, conversions and checked access. Add metadata, runtime storage, verifier/GC rules and a small Neo projection. | Store, copy, clear and inspect a genuinely nullable slot; absent access fails predictably, and clearing a heap reference removes its GC edge. |
+| 3. Generic constraints | Specify base/interface constraints plus not-null, not-void and not-reference scopes. Implement metadata/substitution validation and negative cases at loading and relevant invocation boundaries; project a bounded subset in Neo. | A small generic API accepts valid arguments and rejects invalid ones consistently from source and IL/artifacts. |
+| 4. Managed delegates and lambdas | Start with typed static and bound-instance delegates and invocation. Then specify capture modes, escaping closure ownership, equality and optional multicast semantics. Evaluate function pointers only where needed for invocation or interop. | A callback retains a managed receiver or eligible capture, runs through a typed delegate, and cannot retain a dead frame reference. |
+| 5. Runtime suspension and async | Specify suspended activation ownership, references across suspension, resume/completion, cancellation and Fault/error propagation. Implement a minimal suspension primitive and evaluate a Task-like library/Neo projection. | One suspend/resume program preserves live roots, rejects invalid lifetimes, reports completion/cancellation, and exposes suspended state in the debugger. |
+| 6. Dynamic binding hooks | Choose a concrete dynamic-object use case. Specify operations, hook discovery, lookup/fallback, access checks and cache invalidation; then implement a bounded binder and source demonstration. | A hooked member operation has predictable success and missing-member behavior while retaining runtime type and lifetime checks. |
+
+Fundamental framework work runs throughout this sequence. With inheritance, decide
+which useful base types need Object and establish Equals/GetHashCode/ToString contracts.
+With nullability and constraints, exercise collection and optional-value APIs. With
+delegates, add a real callback consumer; with async, choose a bounded I/O or host
+completion scenario. Add text, collections, streams/files and other framework classes
+as those programs need them, with consistent APIs rather than isolated demonstrations.
+
+Keep these early decisions explicit:
+
+- Explore inheritance and nullability together before freezing shared metadata or
+  assignability rules, even if their first implementations are separate slices.
+- Define constraint semantics before exposing broad generic declarations in Neo.
+- Establish closure and suspended-activation lifetimes before escaping lambdas or await.
+- Keep dynamic binding hooks distinct from ordinary virtual/interface dispatch.
+- At each slice, update runtime enforcement, applicable verifier/GC/reflection/debugger
+  support, Neo examples, API documentation and the changelog. Record unsupported cases.
+
+The runtime may own more of these mechanisms than the CLR does when that provides
+consistent behavior to every frontend. Choose that boundary deliberately; familiar
+API behavior does not prescribe the implementation. The [platform backlog](platform-backlog.md)
+contains the unresolved choices and links to the existing design documents.
+
+## Existing foundations and longer-term direction
+
 Current sequence: the direct managed-reference/GC foundation is implemented; select
 the next slices around a concrete end-to-end scenario. The [optional object hierarchy](object-hierarchy.md)
 is a planned subsequent area. Adapt memory

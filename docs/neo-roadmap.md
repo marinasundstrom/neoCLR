@@ -87,7 +87,7 @@ retargeting and lifetime checks.
 Neo now demonstrates owned array copying, managed heap arrays, indexed mutation,
 Length and element-reference forwarding. The [array contract](managed-arrays.md)
 keeps CLR newarr semantics and adds an explicit owned construction operation.
-Reference elements, slices and pinning remain scoped future decisions.
+Reference elements are implemented. Slices and pinning remain future decisions.
 
 ## Interface demonstration implemented
 
@@ -102,9 +102,10 @@ pressure. The slice uses the existing runtime interface operations and managed r
 
 Choose further source support around concrete scenarios: adapting bundled System
 contracts, receiver modes, properties or generic declarations. Interface inheritance,
-variance and general dynamic casts remain separate work. Fixed-length array
-annotations and braced initializers are also a separate refinement, described in
-the [array contract](managed-arrays.md).
+variance and general dynamic casts remain separate work. Checked local array extents
+and optional braced heap initializers are implemented, as described in
+the [array contract](managed-arrays.md). Bundled single-index Item properties now
+project through bracket syntax for getters and setters.
 
 ## Later platform slices
 
@@ -160,3 +161,11 @@ conditional library output metadata. The [output guide](neo-outputs.md) explains
 initialization, forwarding, interface dispatch, reference targets versus bindings,
 and the division between static caller checks and runtime callee obligations.
 Conditional output declarations and more complete static alias analysis remain future.
+
+## Platform backlog projection
+
+The [platform backlog](platform-backlog.md) records planned inheritance, nullability,
+delegates/lambdas, generic constraints, runtime async, dynamic hooks and framework
+growth. Add bounded Neo syntax and executable examples alongside each selected
+runtime slice; these plans do not expand Neo into a full compiler project. Runtime
+contracts and cross-layer lifetime checks come before convenient surface syntax.

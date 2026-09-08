@@ -1,0 +1,100 @@
+# Platform backlog
+
+These are planned capabilities, not implemented features or commitments to a release
+date. The goal is to make neoCLR useful as a platform, with familiarity primarily in
+C#/.NET APIs and observable behavior, while improving contracts where useful.
+This does not require C# syntax, CLR internals or identical runtime representations.
+The absence of legacy compatibility requirements gives us room to put mechanisms
+in the runtime when that makes them more consistent across languages and libraries.
+
+Preserve the existing foundations: values by default, explicit managed-reference
+access, allocation independent of type identity, checked frame lifetimes, a managed
+GC heap, and separate native pointers. An Object hierarchy remains optional for
+runtime types. Keep Neo updated with small executable demonstrations of each slice;
+it remains a concept compiler rather than a prerequisite full language implementation.
+
+## Capabilities to develop
+
+| Area | Intended capability | Decisions before implementation |
+| --- | --- | --- |
+| Object-oriented programming | Inheritance, base references, virtual methods and overrides, with familiar construction and member lookup | Base metadata and layout; constructor chaining; override validation; base-value copying or slicing; complete derived-object tracing and lifetime preservation through base views |
+| Nullability | Genuinely nullable slots with an explicit absent value, including nullable managed references | Representation and type identity; nullable value versus nullable reference syntax; conversions, access checks and initialization; reflection, verifier and GC rules |
+| Delegates and lambdas | Typed callable values, bound receivers and captured environments | Invocation signatures; capture by value versus reference; escaping captures and GC roots; delegate equality and possible multicast behavior; whether low-level function pointers are needed |
+| Generic constraints | Base/interface constraints and explicit not-null, not-void and not-reference restrictions | Metadata encoding, substitution and validation; constraint composition; address-mode restrictions versus object-graph restrictions; consistent enforcement for source, IL, reflection and host entry points |
+| Runtime async model | Suspension and resumption, potentially with task-based APIs familiar from .NET | Ownership of suspended activations; references across suspension; scheduling and completion; cancellation, ordinary errors and terminal Faults; debugger and GC integration |
+| Dynamic dispatch with hooks | Extensible runtime binding for operations whose targets are resolved dynamically | Supported operations and hook contracts; lookup and fallback order; missing-member results; access checks; caching and invalidation; interaction with typed virtual/interface dispatch |
+| Fundamental library and framework | A coherent set of base types and useful framework APIs, implemented as scenarios require them | Which contracts belong in metadata/runtime services and which belong in library types; optional Object methods; collections, text, I/O, callable and async APIs; consistent errors, references and cleanup |
+
+## Contract boundaries
+
+**Inheritance** builds on the [object hierarchy design](object-hierarchy.md). A base
+reference must preserve the complete derived allocation's identity and reachability.
+Inheritance must not introduce an implicit value/reference type split or make every
+type derive from Object. Value equality and hashing remain separate from reference
+identity. Class syntax in Neo follows the runtime contract rather than defining it
+in isolation.
+
+**Nullability** is a runtime representation and validation feature, not just a
+compiler warning annotation. A null value must be distinct from an uninitialized
+slot and from Void. Decide its relationship to Option<T> without silently treating
+all three as interchangeable. In particular, distinguish a nullable reference from
+a reference to a nullable value. Native null pointers retain their separate interop
+meaning. Not-null constraints depend on these definitions.
+
+**Delegates** should expose typed managed callables without requiring users to handle
+raw pointers. A captured reference cannot outlive its target merely because a closure
+holds it. Specify escaping captures and receiver retention before adding lambdas that
+can escape a call. Low-level function pointers are a possible supporting mechanism,
+not a settled requirement; managed callable identity and native callback lifetime/ABI
+are separate concerns.
+
+**Generic constraints** must reflect neoCLR's addressing model. The proposed
+not-reference constraint restricts reference-form type arguments; it should not
+silently mean the C# class/struct distinction. Decide whether it excludes just T&,
+also pointers, or recursively contained references. Similarly, define whether
+not-void applies only to Void itself or also to constructed types containing Void.
+These scopes and source spellings remain open. Constraints need enforceable metadata
+contracts, not compiler-only promises. See [generic metadata](generic-metadata.md).
+
+**Async** requires a lifetime decision before surface await syntax. Suspending a
+callee while it holds a reference into a caller frame must either retain an eligible
+owning activation or be rejected by a defined rule. Suspension must not implicitly
+invalidate references or silently promote existing locals. Task-based completion is
+a candidate projection, not yet the chosen runtime representation. Decide how async
+completion carries Result/error values and terminal Faults within neoCLR's existing
+error model rather than assuming a guest exception system. Suspension alone does
+not imply parallel execution or a settled threading model.
+
+**Dynamic hooks** extend runtime binding; existing virtual dispatch remains the
+mechanism for statically declared polymorphic contracts. Define which operations can
+be intercepted and how they preserve accessibility, argument types and lifetime
+checks. Explicit metadata or runtime-service contracts should identify hooks rather
+than assigning hidden behavior to an arbitrary method name.
+
+**The framework** should grow into a useful, coherent platform through real programs.
+Candidate needs include Object's conventional methods where a base is useful,
+collection contracts and implementations, text and formatting, streams/files,
+delegates, task APIs and resource cleanup. These are areas to select from, not a
+promise to reproduce the entire .NET library. Follow the [API design](api-design.md)
+and [API policy](api-policy.md), retaining familiar namespaces, names and contracts
+where they fit the value/reference model.
+
+## Suggested sequence and acceptance
+
+1. Establish inheritance and nullable-slot contracts. They affect layout, tracing,
+   assignability, reflection and the initial base-library design.
+2. Add generic constraint metadata around those contracts. Address-mode and Void
+   constraints can be explored independently, but their scope must be explicit.
+3. Add managed delegates and closure lifetimes, with a small callback scenario.
+4. Design suspension and implement one end-to-end async scenario, including GC and
+   debugger inspection of suspended execution.
+5. Add dynamic hooks around a concrete use case after member lookup and dispatch
+   rules are stable enough to extend.
+
+This is a proposed dependency order, not a fixed implementation schedule. Grow the
+framework throughout these slices as each scenario needs it. For every selected
+slice, document the contract, implement runtime enforcement and metadata support,
+add the relevant verifier/GC/reflection/debugger integration, and demonstrate it in
+Neo with source/artifact tests. Keep unsupported behavior explicit. Introducing a
+runtime primitive is appropriate when it provides a shared enforceable capability;
+ordinary library policy can remain ordinary library code.
