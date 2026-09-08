@@ -15,14 +15,14 @@ import tempfile
 def run(argv, cwd, capture=False, env=None):
     print("+ " + " ".join(map(str, argv)), flush=True)
     result = subprocess.run(list(map(str, argv)), cwd=cwd, env=env, check=True,
-                            stdout=subprocess.PIPE if capture else None, text=True)
+                            stdout=subprocess.PIPE if capture else None, text=True, encoding="utf-8")
     return result.stdout if capture else None
 
 
 def audit_notices(source):
-    manifest = json.loads((source / "third-party/manifest.json").read_text())
+    manifest = json.loads((source / "third-party/manifest.json").read_text(encoding="utf-8"))
     packages = {}
-    for block in (source / "Cargo.lock").read_text().split("[[package]]")[1:]:
+    for block in (source / "Cargo.lock").read_text(encoding="utf-8").split("[[package]]")[1:]:
         fields = dict(re.findall(r'^([a-z_]+) = "([^"\n]*)"$', block, re.MULTILINE))
         if fields.get("source", "").startswith("registry+"):
             packages[(fields["name"], fields["version"])] = fields
@@ -64,7 +64,7 @@ def main():
             raise RuntimeError("revision did not resolve to one commit")
         report["commit"] = revision
         archive = output / "neoclr-source.tar"
-        run(["git", "archive", "--format=tar", "--prefix=neoclr-source/", "--output=" + str(archive), revision], repo)
+        run(["git", "-c", "core.autocrlf=false", "-c", "core.eol=lf", "archive", "--format=tar", "--prefix=neoclr-source/", "--output=" + str(archive), revision], repo)
         report["archive_sha256"] = hashlib.sha256(archive.read_bytes()).hexdigest()
         expected = set(run(["git", "ls-tree", "-r", "--name-only", revision], repo, True).splitlines())
         with tarfile.open(archive) as tar:
@@ -118,7 +118,7 @@ def main():
         report["error"] = str(error)
         raise
     finally:
-        (output / "report.json").write_text(json.dumps(report, indent=2) + "\n")
+        (output / "report.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
         print("Evidence: " + str(output / "report.json"), flush=True)
 
 

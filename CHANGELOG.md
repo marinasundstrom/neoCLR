@@ -6,7 +6,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
-No changes yet.
+### 2026-09-08
+
+#### Fixed
+
+- Source validation disables Git line-ending conversion when archiving, preserving
+  notice hashes across Windows and Unix. Its text I/O explicitly uses UTF-8, and
+  CI runs every platform job even if another job fails.
 
 ## 0.1.0-preview.2 — 2026-09-08
 
