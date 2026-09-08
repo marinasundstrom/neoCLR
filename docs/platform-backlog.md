@@ -20,6 +20,7 @@ it remains a concept compiler rather than a prerequisite full language implement
 | Object-oriented programming | Inheritance, base references, virtual methods and overrides, with familiar construction and member lookup | Base metadata and layout; constructor chaining; override validation; base-value copying or slicing; complete derived-object tracing and lifetime preservation through base views |
 | Nullability | Genuinely nullable slots with an explicit absent value, including nullable managed references | Representation and type identity; nullable value versus nullable reference syntax; conversions, access checks and initialization; reflection, verifier and GC rules |
 | Delegates and lambdas | Typed callable values, bound receivers and captured environments | Invocation signatures; capture by value versus reference; escaping captures and GC roots; delegate equality and possible multicast behavior; whether low-level function pointers are needed |
+| Enums and flags | Named integral values and typed flag combinations with familiar .NET-like API behavior | Underlying width/signedness; distinct enum identity; explicit numeric conversions; zero, aliases and unnamed values; flag combination/testing; formatting, parsing and reflection |
 | Generic constraints | Base/interface constraints and explicit not-null, not-void and not-reference restrictions | Metadata encoding, substitution and validation; constraint composition; address-mode restrictions versus object-graph restrictions; consistent enforcement for source, IL, reflection and host entry points |
 | Runtime async model | Suspension and resumption, potentially with task-based APIs familiar from .NET | Ownership of suspended activations; references across suspension; scheduling and completion; cancellation, ordinary errors and terminal Faults; debugger and GC integration |
 | Dynamic dispatch with hooks | Extensible runtime binding for operations whose targets are resolved dynamically | Supported operations and hook contracts; lookup and fallback order; missing-member results; access checks; caching and invalidation; interaction with typed virtual/interface dispatch |
@@ -47,6 +48,15 @@ holds it. Specify escaping captures and receiver retention before adding lambdas
 can escape a call. Low-level function pointers are a possible supporting mechanism,
 not a settled requirement; managed callable identity and native callback lifetime/ABI
 are separate concerns.
+
+**Enums and flags** should provide named integral values and a flags designation,
+with typed bitwise combination, removal and testing. Decide underlying integral types,
+explicit conversions, zero/default values, duplicate names for one value, and treatment
+of unnamed values and unknown bits. Define formatting, parsing and reflection behavior
+alongside the metadata and verifier rules. Keep enums distinct from tagged unions
+such as Option/Result; flag combinations are not separate payload-bearing cases.
+A reflection-options example is a useful first consumer. An enum must not require
+Object inheritance merely to have runtime type identity. Source syntax remains open.
 
 **Generic constraints** must reflect neoCLR's addressing model. The proposed
 not-reference constraint restricts reference-form type arguments; it should not
@@ -83,12 +93,14 @@ where they fit the value/reference model.
 
 1. Establish inheritance and nullable-slot contracts. They affect layout, tracing,
    assignability, reflection and the initial base-library design.
-2. Add generic constraint metadata around those contracts. Address-mode and Void
+2. Explore enums and flags as a bounded metadata/library slice; it can move earlier
+   because its integral representation need not wait for inheritance or nullability.
+3. Add generic constraint metadata around those contracts. Address-mode and Void
    constraints can be explored independently, but their scope must be explicit.
-3. Add managed delegates and closure lifetimes, with a small callback scenario.
-4. Design suspension and implement one end-to-end async scenario, including GC and
+4. Add managed delegates and closure lifetimes, with a small callback scenario.
+5. Design suspension and implement one end-to-end async scenario, including GC and
    debugger inspection of suspended execution.
-5. Add dynamic hooks around a concrete use case after member lookup and dispatch
+6. Add dynamic hooks around a concrete use case after member lookup and dispatch
    rules are stable enough to extend.
 
 This is a proposed dependency order, not a fixed implementation schedule. Grow the

@@ -10,10 +10,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 #### Changed
 
-- Recorded the planned platform backlog: inheritance, nullable slots, delegates and
+- Recorded the planned platform backlog: inheritance, nullable slots, enums/flags, delegates and
   lambdas, generic constraints (including not-null/not-void/not-reference), runtime
   async, dynamic hooks and fundamental framework growth. Documented open contracts,
-  projected roadmap tasks and exit criteria. Familiarity targets C#/.NET APIs and
+  projected roadmap tasks and exit criteria, including integral enum representation,
+  typed flag operations and reflection/formatting decisions. Familiarity targets C#/.NET APIs and
   observable behavior rather than syntax or internals; these are plans,
   not implemented capabilities.
 

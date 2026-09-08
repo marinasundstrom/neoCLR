@@ -164,7 +164,7 @@ Conditional output declarations and more complete static alias analysis remain f
 
 ## Platform backlog projection
 
-The [platform backlog](platform-backlog.md) records planned inheritance, nullability,
+The [platform backlog](platform-backlog.md) records planned inheritance, nullability, enums/flags,
 delegates/lambdas, generic constraints, runtime async, dynamic hooks and framework
 growth. Add bounded Neo syntax and executable examples alongside each selected
 runtime slice; these plans do not expand Neo into a full compiler project. Runtime
