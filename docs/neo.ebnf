@@ -1,8 +1,11 @@
 (* Neo concept language: implemented subset. *)
 program          = separators, { declaration, separators }, end_of_input ;
-declaration      = import_decl | record_decl | function_decl ;
+declaration      = import_decl | record_decl | interface_decl | function_decl ;
 import_decl      = "import", "System", ".", "Console", ".", "*", terminator ;
-record_decl      = "record", identifier, field_list, terminator ;
+record_decl      = "record", identifier, field_list, [ ":", type, { ",", type } ],
+                   (terminator | newlines, "{", separators, { function_decl, separators }, "}") ;
+interface_decl   = "interface", identifier, newlines, "{", separators,
+                   { "func", identifier, field_list, "->", type, terminator, separators }, "}" ;
 function_decl    = "func", identifier, field_list, "->", type, newlines,
                    "{", separators, { statement, separators }, "}" ;
 field_list       = "(", newlines,
@@ -30,14 +33,15 @@ logical_and      = equality, { "&&", equality } ;
 equality         = comparison, { ("==" | "!="), comparison } ;
 comparison       = additive, { ("<" | ">" | "<=" | ">="), additive } ;
 additive         = multiplicative, { ("+" | "-"), multiplicative } ;
-multiplicative   = unary, { ("*" | "/"), unary } ;
+multiplicative   = projection, { ("*" | "/"), projection } ;
+projection       = unary, { "as", type } ;
 unary            = ("&" | "-" | "!" | "new"), unary
                  | "new", type, "[", expression, "]" | postfix ;
 postfix          = primary, { ".", identifier | arguments | "[", expression, "]" } ;
 arguments        = "(", newlines,
                    [ expression, newlines,
                      { ",", newlines, expression, newlines } ], ")" ;
-primary          = integer | string | "true" | "false" | identifier
+primary          = integer | string | "true" | "false" | "this" | identifier
                  | "[", newlines, expression, newlines, { ",", newlines, expression, newlines }, "]"
                  | "typeof", "(", newlines, type, newlines, ")"
                  | "(", newlines, expression, newlines, ")" ;

@@ -1,0 +1,40 @@
+import System.Console.*
+
+interface Counter {
+    func Add(amount: int) -> ()
+    func Read() -> int
+}
+
+record SimpleCounter(Value: int): Counter {
+    func Add(amount: int) -> () {
+        this.Value = this.Value + amount
+    }
+    func Read() -> int {
+        return this.Value
+    }
+}
+
+func Forward(counter: Counter&) -> Counter& {
+    return counter
+}
+
+func Increment(counter: Counter&) -> int {
+    counter.Add(2)
+    return counter.Read()
+}
+
+func MakeCounter() -> Counter& {
+    let owner = new SimpleCounter(40)
+    return owner
+}
+
+func Main() -> int {
+    var local = SimpleCounter(1)
+    let view: Counter& = &local as Counter&
+    WriteLine(Increment(&local))
+    WriteLine(Forward(view).Read())
+
+    let shared = MakeCounter()
+    WriteLine(Increment(shared))
+    return shared.Read()
+}

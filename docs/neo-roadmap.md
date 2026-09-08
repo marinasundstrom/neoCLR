@@ -89,26 +89,22 @@ Length and element-reference forwarding. The [array contract](managed-arrays.md)
 keeps CLR newarr semantics and adds an explicit owned construction operation.
 Reference elements, slices and pinning remain scoped future decisions.
 
-## Next demonstration: declared interfaces and managed projections
+## Interface demonstration implemented
 
-After the array foundation, demonstrate interfaces declared in Neo, a record that
-implements the contract, and an explicit cast/projection from its managed reference
-to `I&`. Choose source syntax in that slice and update the grammar with implementation.
-Keep it bounded to the runtime's [existing interface capabilities](interfaces.md).
+Neo now supports interface declarations, record conformance and instance methods,
+explicit `as Contract&` projections, implicit concrete-to-interface reference
+conversions in typed contexts, and virtual interface dispatch. Names follow the usual
+Neo convention without an `I` prefix. The [interface guide](neo-interfaces.md) and
+[source example](../examples/source/interfaces.neo) demonstrate frame and heap
+receivers, mutation, caller-view forwarding and heap retention without boxing.
+Tests cover invalid conformance, local escapes, reference parameters/results and GC
+pressure. The slice uses the existing runtime interface operations and managed receivers.
 
-The source compiler needs interface member declarations, record instance methods,
-conformance declarations, explicit managed-reference projection, and dispatch through
-an interface-typed parameter. Lower projection to `interface.borrow` and interface
-calls to `callvirt`; avoid copying the receiver or introducing a boxed object.
-Preserve concrete storage identity and the receiver's existing frame or heap lifetime.
-
-The example should exercise one interface with both a frame-owned record and a heap
-record, mutation through a reference receiver, forwarding a caller-owned interface
-reference, and retaining a heap receiver through an interface reference. Test rejected
-nonconforming casts and escaping local views as well as successful dispatch. Do not
-expand this into interface inheritance, variance or a general dynamic-cast system.
-Fixed-length array annotations and braced initializers remain a separate refinement
-as described in the [array contract](managed-arrays.md).
+Choose further source support around concrete scenarios: adapting bundled System
+contracts, receiver modes, properties or generic declarations. Interface inheritance,
+variance and general dynamic casts remain separate work. Fixed-length array
+annotations and braced initializers are also a separate refinement, described in
+the [array contract](managed-arrays.md).
 
 ## Later platform slices
 

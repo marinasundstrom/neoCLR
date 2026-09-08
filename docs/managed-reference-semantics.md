@@ -104,3 +104,9 @@ and the [counter regression](../tests/neo.rs).
 
 [Managed arrays](managed-arrays.md) now support frame-owned values and GC heap
 allocations with common checked element operations and managed element references.
+
+[Neo interface references](neo-interfaces.md) support virtual dispatch through the
+original managed receiver. Concrete references project implicitly when an implemented
+interface reference is expected, or explicitly through `as Contract&`. Neither form
+boxes the value or changes its frame/heap lifetime. Ordinary values still require
+explicit address formation before passing them as interface references.

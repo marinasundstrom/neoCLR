@@ -1,5 +1,8 @@
 # Explicit borrowed interface references
 
+Neo now [declares interfaces and projects managed references](neo-interfaces.md)
+using ordinary names without an `I` prefix.
+
 ## Managed slot views
 
 The preferred managed view is `I&`. Start with `ldloca value` or an existing

@@ -493,3 +493,7 @@ existing typed slots, outputs and constructor receivers.
 
 [Managed arrays](docs/managed-arrays.md) now support frame-owned values and GC heap
 allocations with common checked element operations and managed element references.
+
+[Neo interfaces](docs/neo-interfaces.md) demonstrate declared contracts, record
+implementations and managed reference projections without boxing. Run
+`cargo run --locked -- run examples/source/interfaces.neo --gc-stats`.

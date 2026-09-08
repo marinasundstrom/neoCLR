@@ -14,9 +14,12 @@ There are no empty statements apart from separators.
 
 ```ebnf
 program          = separators, { declaration, separators }, end_of_input ;
-declaration      = import_decl | record_decl | function_decl ;
+declaration      = import_decl | record_decl | interface_decl | function_decl ;
 import_decl      = "import", "System", ".", "Console", ".", "*", terminator ;
-record_decl      = "record", identifier, field_list, terminator ;
+record_decl      = "record", identifier, field_list, [ ":", type, { ",", type } ],
+                   (terminator | newlines, "{", separators, { function_decl, separators }, "}") ;
+interface_decl   = "interface", identifier, newlines, "{", separators,
+                   { "func", identifier, field_list, "->", type, terminator, separators }, "}" ;
 function_decl    = "func", identifier, field_list, "->", type, newlines,
                    "{", separators, { statement, separators }, "}" ;
 field_list       = "(", newlines,
@@ -42,7 +45,7 @@ function expression bodies and standalone blocks are unsupported. Structured sta
 introduce nested scopes; active names cannot be shadowed, but sibling scopes may reuse names.
 
 Types resolve to `int`/`Int32`, `string`/`String`, `bool`/`Boolean`, `unit`/`Void`/`()`,
-or a declared record or bundled System type. Qualified names and closed generic
+or a declared record, interface or bundled System type. Qualified names and closed generic
 arguments are supported; Option/Result abbreviate System.Option/System.Result. One
 `&` suffix forms a managed reference. Raw pointer syntax and generic declarations
 are unsupported. Runtime restrictions on ByRef generic arguments still apply.
@@ -60,20 +63,21 @@ logical_and      = equality, { "&&", equality } ;
 equality         = comparison, { ("==" | "!="), comparison } ;
 comparison       = additive, { ("<" | ">" | "<=" | ">="), additive } ;
 additive         = multiplicative, { ("+" | "-"), multiplicative } ;
-multiplicative   = unary, { ("*" | "/"), unary } ;
+multiplicative   = projection, { ("*" | "/"), projection } ;
+projection       = unary, { "as", type } ;
 unary            = ("&" | "-" | "!" | "new"), unary
                  | "new", type, "[", expression, "]" | postfix ;
 postfix          = primary, { ".", identifier | arguments | "[", expression, "]" } ;
 arguments        = "(", newlines,
                    [ expression, newlines,
                      { ",", newlines, expression, newlines } ], ")" ;
-primary          = integer | string | "true" | "false" | identifier
+primary          = integer | string | "true" | "false" | "this" | identifier
                  | "[", newlines, expression, newlines, { ",", newlines, expression, newlines }, "]"
                  | "typeof", "(", newlines, type, newlines, ")"
                  | "(", newlines, expression, newlines, ")" ;
 ```
 
-Member access and calls bind most tightly, then unary operations, multiplication and
+Member access and calls bind most tightly, then unary operations, interface projection with `as`, multiplication and
 division, addition and subtraction, ordering comparisons, equality, `&&`, then `||`.
 Binary operators associate to the left. Conditions require Boolean; `&&` and `||`
 short-circuit. Ordering uses Int32; equality supports Int32 and Boolean.
@@ -83,14 +87,16 @@ a managed-reference operator; pointer syntax is still outside this grammar.
 
 The grammar permits general postfix shapes, but semantic checks restrict calls to
 free functions, positional record construction, explicit `int(byteOrInt)` conversion,
-and public static/ordinary instance bundled System calls.
-Library overloads are selected by exact types after reading bare reference arguments; out/byref-receiver contracts
-are not exposed. Instance receivers are values (T& is read with ldobj). Generic method
-calls and user-declared methods remain unsupported. `int(value)` supports Byte/Int32
+public static/ordinary instance bundled System calls, and declared record/interface
+instance methods. Library overloads are selected by exact types after reading bare
+reference arguments; library out/byref-receiver contracts are not exposed. Library
+instance receivers are values (T& is read with ldobj). Source record/interface methods
+use managed reference receivers. Generic method calls remain unsupported. `int(value)` supports Byte/Int32
 only and lowers to checked Int32 conversion. These are static restrictions on the
 existing call grammar; no new expression production is needed.
-`new` requires a record-construction call, such as `new Counter(0)`. It does not
-accept arbitrary factory calls or copy expressions in this slice. Assignment and
+`new` accepts record construction, such as `new SimpleCounter(0)`, or managed array
+construction (`new int[3]` and `new array(3, 0)`). It does not accept arbitrary
+factory calls or copy expressions in this slice. Assignment and
 `&` require appropriate addressable locations or existing managed references. There is
 no assignment expression or implicit numeric conversion. T& is read automatically
 when a value is needed. Source signatures retain references for T& parameters/returns;
@@ -167,3 +173,13 @@ right-hand side (`r = &other`). `&r` forwards r's reference without constructing
 Inferred bindings preserve references; explicitly value-typed bindings copy their
 referents. These are source access rules over existing managed references, not changes
 to native pointer semantics. See the [managed-access guide](neo.md#managed-references-are-transparent-pointers-are-explicit).
+
+## Interface declarations and reference projections
+
+See [Neo interfaces](neo-interfaces.md) for the implemented semantics and example.
+Record instance methods have an implicit managed `this` receiver. Interface methods
+are signatures without bodies. Conformance and `as Contract&` targets must name
+source-declared interfaces. Concrete managed references implicitly project to
+implemented interface references in typed argument, binding and return contexts;
+bare values are not implicitly addressed. No generic declarations are added. `interface`, `as` and `this` are reserved names. Interface names follow
+ordinary Neo naming, without an `I` prefix.

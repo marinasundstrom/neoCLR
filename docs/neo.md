@@ -137,6 +137,7 @@ The [Neo grammar](neo-grammar.md) gives the implemented EBNF and lexical rules.
 
 - One parameterless `func Main()`, plus typed free functions and forward calls.
 - Records, positional construction, nested field access and mutation.
+- Source interfaces, record instance methods with managed `this`, explicit `as Contract&` projections and contextual managed reference conversions.
 - Initialized `let`/`var` bindings with optional type annotations.
 - `int`/`Int32`, `string`/`String`, `bool`/`Boolean`, `()`/`unit`/`Void`, named records and T&.
 - Int32 arithmetic with `+`, `-`, `*`, `/`, parentheses and unary minus; runtime arithmetic semantics apply.
@@ -162,12 +163,12 @@ and expression nesting.
 
 Returning a direct address into the current function is rejected by verification;
 runtime provenance checks also prevent indirect escapes. Heap-backed references can
-return and keep their entire allocation alive, including through field views.
+return and keep their entire allocation alive, including through field and interface views.
 Reference-valued fields may contain heap-backed references; scoped targets in those
 fields fault at runtime. This compiler does not perform complete static lifetime
 analysis, so some invalid programs fail only during execution.
 
-Uninitialized bindings, generic declarations, overload declarations, user-defined instance methods,
+Uninitialized bindings, generic declarations, overload declarations,
 inheritance, general patterns, native pointers/interop, pinning and full Raven syntax
 are not implemented. It does not expose the entire standard library yet. These are
 candidate future slices, chosen around end-to-end scenarios rather than added as a
@@ -325,3 +326,12 @@ references. `[1, 2, 3]` and `array(length, initialValue)` create owned values;
 `items[i] = value`, `&items[i]` and `items.Length`. Managed element references
 read/write automatically and follow the same lifetime rules as record fields.
 Run `cargo run --locked -- run examples/source/arrays.neo --gc-stats`.
+
+## Interfaces
+
+[Declare an interface and project a managed reference](neo-interfaces.md) using
+ordinary names such as `Counter`, implemented by `SimpleCounter`. `&local as Counter&`
+and `shared as Counter&` preserve the original location and lifetime. Concrete managed
+references also project implicitly when an interface reference is expected. Instance methods
+use an implicit managed `this` receiver, with automatic reads/writes.
+Run `cargo run --locked -- run examples/source/interfaces.neo --gc-stats`.

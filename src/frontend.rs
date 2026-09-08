@@ -164,6 +164,12 @@ struct Field {
 struct Record {
     name: Token,
     fields: Vec<Field>,
+    implements: Vec<Ty>,
+    methods: Vec<Function>,
+}
+struct Interface {
+    name: Token,
+    methods: Vec<Function>,
 }
 struct Function {
     name: Token,
@@ -172,6 +178,7 @@ struct Function {
     body: Vec<Stmt>,
 }
 struct Source {
+    interfaces: Vec<Interface>,
     records: Vec<Record>,
     functions: Vec<Function>,
     console_import: bool,
@@ -192,6 +199,7 @@ enum ExprKind {
     Binary(String, Box<Expr>, Box<Expr>),
     Match(Box<Expr>, Vec<Arm>),
     TypeOf(Ty),
+    InterfaceCast(Box<Expr>, Ty),
     ArrayLiteral(Vec<Expr>),
     NewArray(Ty, Box<Expr>),
     Index(Box<Expr>, Box<Expr>),
@@ -274,8 +282,28 @@ impl Parser {
             return Err(token.error("expected a name"));
         }
         if [
-            "func", "record", "let", "var", "return", "new", "true", "false", "import", "if",
-            "else", "while", "for", "in", "loop", "break", "continue", "match", "typeof",
+            "func",
+            "record",
+            "let",
+            "var",
+            "return",
+            "new",
+            "true",
+            "false",
+            "import",
+            "if",
+            "else",
+            "while",
+            "for",
+            "in",
+            "loop",
+            "break",
+            "continue",
+            "match",
+            "typeof",
+            "interface",
+            "as",
+            "this",
         ]
         .contains(&token.text.as_str())
         {
@@ -371,8 +399,48 @@ impl Parser {
         self.expect(")")?;
         Ok(fields)
     }
+    fn function(&mut self, abstract_member: bool) -> Result<Function, Fault> {
+        self.expect("func")?;
+        let name = self.name()?;
+        let parameters = self.fields()?;
+        self.expect("->")?;
+        let returns = self.ty()?;
+        let body = if abstract_member {
+            self.end_statement()?;
+            Vec::new()
+        } else {
+            self.block()?
+        };
+        Ok(Function {
+            name,
+            parameters,
+            returns,
+            body,
+        })
+    }
+    fn methods(&mut self, abstract_members: bool) -> Result<Vec<Function>, Fault> {
+        self.expect("{")?;
+        self.lines();
+        let mut methods: Vec<Function> = Vec::new();
+        while !self.at("}") {
+            if methods.len() >= 1024 {
+                return Err(self.current().error("method limit exceeded"));
+            }
+            let method = self.function(abstract_members)?;
+            if methods.iter().any(|m| m.name.text == method.name.text) {
+                return Err(method
+                    .name
+                    .error("duplicate method; source overload declarations are not supported"));
+            }
+            methods.push(method);
+            self.lines();
+        }
+        self.expect("}")?;
+        Ok(methods)
+    }
     fn source(&mut self) -> Result<Source, Fault> {
         let mut source = Source {
+            interfaces: Vec::new(),
             records: Vec::new(),
             functions: Vec::new(),
             console_import: false,
@@ -385,29 +453,49 @@ impl Parser {
                 }
                 source.console_import = true;
                 self.end_statement()?;
+            } else if self.eat("interface") {
+                let name = self.name()?;
+                self.newlines();
+                let methods = self.methods(true)?;
+                source.interfaces.push(Interface { name, methods });
             } else if self.eat("record") {
                 let name = self.name()?;
                 let fields = self.fields()?;
-                source.records.push(Record { name, fields });
-                self.end_statement()?;
-            } else if self.eat("func") {
-                let name = self.name()?;
-                let parameters = self.fields()?;
-                self.expect("->")?;
-                let returns = self.ty()?;
-                let body = self.block()?;
-                source.functions.push(Function {
+                let mut implements = Vec::new();
+                if self.eat(":") {
+                    loop {
+                        if implements.len() >= 1024 {
+                            return Err(name.error("interface count limit exceeded"));
+                        }
+                        implements.push(self.ty()?);
+                        if !self.eat(",") {
+                            break;
+                        }
+                    }
+                }
+                let saved = self.position;
+                self.newlines();
+                let methods = if self.at("{") {
+                    self.methods(false)?
+                } else {
+                    self.position = saved;
+                    self.end_statement()?;
+                    Vec::new()
+                };
+                source.records.push(Record {
                     name,
-                    parameters,
-                    returns,
-                    body,
+                    fields,
+                    implements,
+                    methods,
                 });
+            } else if self.at("func") {
+                source.functions.push(self.function(false)?);
             } else {
                 return Err(self
                     .current()
-                    .error("expected record, func, or import System.Console.*"));
+                    .error("expected interface, record, func, or import System.Console.*"));
             }
-            if source.records.len() + source.functions.len() > 1024 {
+            if source.records.len() + source.functions.len() + source.interfaces.len() > 1024 {
                 return Err(self.current().error("declaration limit exceeded"));
             }
             self.lines();
@@ -630,7 +718,16 @@ impl Parser {
             return Err(at.error("expected expression"));
         };
         loop {
-            if self.at("match") && minimum == 0 {
+            if self.at("as") && minimum <= 7 {
+                self.take();
+                let target = self.ty()?;
+                let depth = left.depth + 1;
+                left = self.node(
+                    left.at.clone(),
+                    ExprKind::InterfaceCast(Box::new(left), target),
+                    depth,
+                )?;
+            } else if self.at("match") && minimum == 0 {
                 self.take();
                 self.newlines();
                 self.expect("{")?;
@@ -758,6 +855,7 @@ struct Binding {
     scoped: bool,
 }
 struct Lowerer<'a> {
+    receiver: Option<&'a Token>,
     source: &'a Source,
     function: &'a Function,
     bindings: HashMap<String, Binding>,
@@ -823,7 +921,29 @@ impl Lowerer<'_> {
         } else {
             self.value_expression(expression)?
         };
-        self.require(&actual, expected, &expression.at)?;
+        self.convert_reference(actual, expected, &expression.at)
+    }
+    fn convert_reference(&mut self, actual: Ty, expected: &Ty, at: &Token) -> Result<Ty, Fault> {
+        if actual != *expected {
+            if let (Ty::Ref(concrete), Ty::Ref(interface)) = (&actual, expected) {
+                if self
+                    .source
+                    .interfaces
+                    .iter()
+                    .any(|i| i.name.text == interface.il())
+                    && self
+                        .source
+                        .records
+                        .iter()
+                        .any(|r| r.name.text == concrete.il() && r.implements.contains(interface))
+                {
+                    self.body
+                        .push(format!("interface.borrow {}", interface.il()));
+                    return Ok(expected.clone());
+                }
+            }
+        }
+        self.require(&actual, expected, at)?;
         Ok(actual)
     }
     fn library_argument(&mut self, expression: &Expr) -> Result<Ty, Fault> {
@@ -853,6 +973,30 @@ impl Lowerer<'_> {
     }
     fn expression(&mut self, expression: &Expr) -> Result<Ty, Fault> {
         match &expression.kind {
+            ExprKind::InterfaceCast(value, target) => {
+                let Ty::Ref(interface) = target else {
+                    return Err(expression.at.error(
+                        "interface projection requires an interface reference target (Contract&)",
+                    ));
+                };
+                if !self
+                    .source
+                    .interfaces
+                    .iter()
+                    .any(|i| i.name.text == interface.il())
+                {
+                    return Err(expression
+                        .at
+                        .error("projection target must be a declared source interface"));
+                }
+                let actual = self.expression(value)?;
+                if !matches!(actual, Ty::Ref(_)) {
+                    return Err(value
+                        .at
+                        .error("interface projection requires a managed reference; use &value"));
+                }
+                self.convert_reference(actual, target, &value.at)
+            }
             ExprKind::NewArray(element, length) => {
                 self.expression_for(length, &Ty::Int)?;
                 self.body.push(format!("newarr {}", element.il()));
@@ -1021,7 +1165,63 @@ impl Lowerer<'_> {
         let bound_receiver = binding.is_some_and(|name| self.bindings.contains_key(name));
         if let ExprKind::Field(owner, member) = &callee.kind {
             if bound_receiver || path.is_none() {
+                let saved = self.body.len();
                 let mut ty = self.expression(owner)?;
+                let target = if let Ty::Ref(t) = &ty {
+                    t.as_ref()
+                } else {
+                    &ty
+                };
+                let contract = self
+                    .source
+                    .interfaces
+                    .iter()
+                    .find(|i| i.name.text == target.il());
+                let record = self
+                    .source
+                    .records
+                    .iter()
+                    .find(|r| r.name.text == target.il());
+                if contract.is_some() || record.is_some() {
+                    let method = contract
+                        .map(|i| &i.methods)
+                        .or_else(|| record.map(|r| &r.methods))
+                        .unwrap()
+                        .iter()
+                        .find(|m| m.name.text == member.text)
+                        .ok_or_else(|| member.error("unknown source instance method"))?;
+                    let parameters = method.parameters.clone();
+                    let returns = method.returns.clone();
+                    let signature = format!(
+                        "instance {}::{}({})",
+                        target.il(),
+                        member.text,
+                        parameters
+                            .iter()
+                            .map(|p| p.ty.il())
+                            .collect::<Vec<_>>()
+                            .join(",")
+                    );
+                    if !matches!(ty, Ty::Ref(_)) {
+                        self.body.truncate(saved);
+                        self.place(owner, true)?;
+                    }
+                    if parameters.len() != arguments.len() {
+                        return Err(member.error("argument count mismatch"));
+                    }
+                    for (argument, parameter) in arguments.iter().zip(&parameters) {
+                        self.expression_for(argument, &parameter.ty)?;
+                    }
+                    self.body.push(format!(
+                        "{} {signature}",
+                        if contract.is_some() {
+                            "callvirt"
+                        } else {
+                            "call"
+                        }
+                    ));
+                    return Ok(returns);
+                }
                 if let Ty::Ref(target) = ty {
                     self.body.push(format!("ldobj {}", target.il()));
                     ty = *target;
@@ -1577,7 +1777,20 @@ impl Lowerer<'_> {
         Ok(returned)
     }
     fn lower(mut self) -> Result<String, Fault> {
+        if let Some(receiver) = self.receiver {
+            self.bindings.insert(
+                "this".into(),
+                Binding {
+                    ty: Ty::Ref(Box::new(Ty::Record(receiver.text.clone()))),
+                    mutable: false,
+                    load: "ldarg 0".into(),
+                    address: "ldarga 0".into(),
+                    scoped: false,
+                },
+            );
+        }
         for (index, parameter) in self.function.parameters.iter().enumerate() {
+            let index = index + usize::from(self.receiver.is_some());
             self.bindings.insert(
                 parameter.name.text.clone(),
                 Binding {
@@ -1600,7 +1813,12 @@ impl Lowerer<'_> {
             self.body.extend(["ldvoid".into(), "ret".into()]);
         }
         Ok(format!(
-            ".function {}({}) -> {}\n{}\n{}\n.end\n",
+            "{} {}({}) -> {}\n{}\n{}\n.end\n",
+            if self.receiver.is_some() {
+                ".method instance byref"
+            } else {
+                ".function"
+            },
             self.function.name.text,
             self.function
                 .parameters
@@ -1630,6 +1848,7 @@ pub fn lower_to_il(source: &str) -> Result<String, Fault> {
         .iter()
         .map(|record| &record.name)
         .chain(source.functions.iter().map(|function| &function.name))
+        .chain(source.interfaces.iter().map(|interface| &interface.name))
     {
         if names.insert(name.text.clone(), ()).is_some()
             || [
@@ -1664,16 +1883,62 @@ pub fn lower_to_il(source: &str) -> Result<String, Fault> {
         return Err(main.name.error("Main must be parameterless"));
     }
     let mut il = String::from(".module SourceProgram\n.entry Main\n");
+    for interface in &source.interfaces {
+        il.push_str(&format!(".interface {}\n", interface.name.text));
+        for method in &interface.methods {
+            il.push_str(&format!(
+                ".method instance byref {}({}) -> {}\n.end\n",
+                method.name.text,
+                method
+                    .parameters
+                    .iter()
+                    .map(|p| p.ty.il())
+                    .collect::<Vec<_>>()
+                    .join(","),
+                method.returns.il()
+            ));
+        }
+        il.push_str(".end\n");
+    }
     for record in &source.records {
         il.push_str(&format!(".type {}\n", record.name.text));
+        for interface in &record.implements {
+            if !source
+                .interfaces
+                .iter()
+                .any(|i| i.name.text == interface.il())
+            {
+                return Err(record
+                    .name
+                    .error("conformance requires a declared source interface"));
+            }
+            il.push_str(&format!(".implements {}\n", interface.il()));
+        }
         for field in &record.fields {
             il.push_str(&format!(".field {} {}\n", field.name.text, field.ty.il()));
+        }
+        for function in &record.methods {
+            il.push_str(
+                &Lowerer {
+                    receiver: Some(&record.name),
+                    source: &source,
+                    function,
+                    bindings: HashMap::new(),
+                    locals: Vec::new(),
+                    body: Vec::new(),
+                    labels: 0,
+                    scope: 0,
+                    loops: Vec::new(),
+                }
+                .lower()?,
+            );
         }
         il.push_str(".end\n");
     }
     for function in &source.functions {
         il.push_str(
             &Lowerer {
+                receiver: None,
                 source: &source,
                 function,
                 bindings: HashMap::new(),
