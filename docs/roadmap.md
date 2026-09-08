@@ -34,7 +34,12 @@ are now implemented. [Constructor chaining](constructor-chaining.md) and the
 [Inherited class interface implementations and virtual override selection](class-interface-dispatch.md)
 and [explicit interface implementations](explicit-interfaces.md) are implemented.
 [Default interface bodies](default-interface-implementations.md) now execute in the
-runtime and Neo. Applying them to a useful library capability is next;
+runtime and Neo. [Generic free/static functions](function-generics.md) now supply
+an independent callable-definition building block. Next separate slices are ordinary
+Neo class declarations/default-constructor policy, then [managed delegate design](delegates.md)
+and a callback consumer. Languages will build function values and lambdas on delegates;
+ordinary functions will not become a separate runtime object model.
+Applying default bodies to a useful library capability remains planned;
 see the [reflection/interface plan](reflection-hierarchy-plan.md). Activation ownership, external roots and cleanup need decisions before
 escaping callbacks or suspension.
 
@@ -52,7 +57,7 @@ The completed memory and Neo foundations remain the starting point.
 | 3. Nullable signatures and storage | Follow the [explicit null-state direction](nullability.md): non-nullable defaults, nullable values/references by signature, Option for optionality, distinct uninitialized storage, conversions and checked access. Add metadata, runtime storage, verifier/GC rules and a small Neo projection. | Store, copy, clear and inspect a genuinely nullable slot; absent access fails predictably, and clearing a heap reference removes its GC edge. |
 | 4. Enums and flags | Specify underlying integral types, enum identity, named constants, a flags designation, conversions and unknown-value rules. Add metadata, typed bitwise operations, reflection/formatting and a bounded Neo projection. | A typed options value combines and tests flags, round-trips through an artifact, and formats named and unnamed combinations according to a documented contract. |
 | 5. Generic constraints | Specify base/interface constraints plus not-null, not-void and not-reference scopes. Implement metadata/substitution validation and negative cases at loading and relevant invocation boundaries; project a bounded subset in Neo. | A small generic API accepts valid arguments and rejects invalid ones consistently from source and IL/artifacts. |
-| 6. Managed delegates and lambdas | Start with typed static and bound-instance delegates and invocation. Then specify capture modes, escaping closure ownership, equality and optional multicast semantics. Evaluate function pointers only where needed for invocation or interop. | A callback retains a managed receiver or eligible capture, runs through a typed delegate, and cannot retain a dead frame reference. |
+| 6. Managed delegates and lambdas | Follow the [delegate direction](delegates.md): a shared runtime callable abstraction, with language function values/lambdas built upon it. Start with typed static and bound-instance delegates and invocation. Then specify capture modes, escaping closure ownership, equality and optional multicast semantics. Evaluate function pointers only where needed for invocation or interop. | A callback retains a managed receiver or eligible capture, runs through a typed delegate, and cannot retain a dead frame reference. |
 | 7. Runtime suspension and async | Specify suspended activation ownership, references across suspension, resume/completion, cancellation and Fault/error propagation. Implement a minimal suspension primitive and evaluate a Task-like library/Neo projection. | One suspend/resume program preserves live roots, rejects invalid lifetimes, reports completion/cancellation, and exposes suspended state in the debugger. |
 | 8. Dynamic binding hooks | Choose a concrete dynamic-object use case. Specify operations, hook discovery, lookup/fallback, access checks and cache invalidation; then implement a bounded binder and source demonstration. | A hooked member operation has predictable success and missing-member behavior while retaining runtime type and lifetime checks. |
 

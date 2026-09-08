@@ -81,7 +81,7 @@ later area still need their own evidence and cost assessment.
 | Nullability | Compare reference annotations, nullable value representation, generic/default initialization and reflection; test the cost and usefulness of enforced nullable storage. |
 | Enums and flags | Compare underlying types, flag operations, unnamed values, conversions, formatting and reflection; justify deviations rather than redesigning familiar options APIs. |
 | Generic constraints | Compare existing metadata/runtime constraints with C#-only restrictions; define how proposed address-mode, null and Void constraints differ. |
-| Delegates and lambdas | Compare managed delegate invocation, capture lowering, lifetime/GC behavior and function-pointer facilities; determine which mechanisms neoCLR actually needs. |
+| Delegates and lambdas | Follow the [delegate direction](delegates.md): compare managed delegate invocation, capture lowering, lifetime/GC behavior and function-pointer facilities. Languages build callable values on delegates; a separate universal function-object runtime model is excluded. Validate remaining representation and multicast choices. |
 | Async | Compare current .NET async implementations and relevant proposals on pinned versions; distinguish API/task behavior from state-machine or runtime-suspension mechanisms. |
 | Dynamic hooks | Compare .NET dynamic binding and extensibility with ordinary virtual dispatch, then select a concrete problem that justifies runtime hooks. |
 | Framework and existing features | Map each affected API to its .NET behavior and assess deliberate neoCLR differences, including copying, allocation, errors and reference contracts. |

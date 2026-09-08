@@ -10,6 +10,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 #### Added
 
+- Recorded delegates as the planned shared runtime callable abstraction, with
+  language function values/lambdas built upon them. Excluded a separate universal
+  function-object runtime model; capture lifetimes, representation and multicast
+  behavior remain design work. Aligned platform/Neo roadmaps with separate class
+  syntax/default-constructor and delegate slices, and the compiler inference role.
+
 - Generic free functions and static methods across runtime/IL and Neo, with independent
   method parameters, explicit type arguments, simultaneous owner/method substitution, verification,
   host invocation and distinct closed call graphs. Added regression tests and a

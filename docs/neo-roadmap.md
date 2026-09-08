@@ -2,8 +2,8 @@
 
 The [library-focused next preview](library-preview.md) prioritizes shared type
 relationships, interface inheritance and class inheritance to support useful library
-contracts and their Neo projection. [Interface inheritance](interface-inheritance.md) is now implemented; class inheritance
-remains planned.
+contracts and their Neo projection. [Interface inheritance](interface-inheritance.md)
+and [class inheritance/virtual dispatch](class-dispatch.md) are implemented.
 
 All planned capabilities and substantive revisions to implemented behavior follow
 the [research and design comparison](design-research.md): establish the .NET/CLR
@@ -189,3 +189,24 @@ managed access at runtime, with Neo declarations and ParameterInfo.IsReadOnly.
 Readonly instance receivers are also implemented, with MethodInfo.IsReadOnly.
 [Readonly storage and return signatures](readonly-storage.md) now preserve declared
 permissions. The verifier remains conservative about aliases and lifetime provenance.
+
+## Generic functions and the next independent building blocks
+
+[Generic free functions and static methods](function-generics.md) are implemented in
+the runtime and Neo, with argument-based inference and explicit type arguments.
+Inference keeps emitted runtime contracts precise and preserves managed-reference
+bindings. Neo should avoid redundant syntax while keeping value/reference intent
+clear; other languages may project the same platform differently.
+
+Keep the upcoming work separate:
+
+1. Ordinary class source declarations, body-declared fields and default-constructor
+   policy. Existing explicit parameterless init works; constructor synthesis does not.
+   Compare C# class/record construction and initialization against neoCLR's required
+   fields and non-nullable references before choosing synthesis rules.
+2. [Runtime delegate design](delegates.md) and a typed callback consumer. Delegates
+   are the common callable abstraction; ordinary functions remain definitions.
+3. Language method-group conversions and lambdas built on delegates, after capture
+   modes and escaping managed lifetimes have a validated runtime contract.
+
+These are bounded explorations, not a commitment to turn Neo into a full compiler.
