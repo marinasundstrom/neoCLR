@@ -219,8 +219,9 @@ These are bounded explorations, not a commitment to turn Neo into a full compile
 ## Source union declarations and remaining case projection
 
 [Non-generic source unions](neo-unions.md) now generate separate cases and carrier
-constructors, with exact case conversions and exhaustive matching. Next investigate
-case imports, generic constructor inference and external constructor-metadata discovery
+constructors, with exact case conversions and exhaustive matching.
+[Source case imports](neo-case-imports.md) now support unqualified constructor/type names.
+Next investigate generic type declarations, generic constructor inference and external constructor-metadata discovery
 under [the Raven-style projection plan](result-construction.md#planned-case-projection-ravens-model).
 Use [type-design guidelines](type-design.md) to review the full field and operation
 contracts when selecting value/reference use.

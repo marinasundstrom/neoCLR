@@ -78,8 +78,8 @@ Generated helper methods appear as IL frames; source call-site mapping is retain
 Only declared non-abstract source records/classes and other source union carriers
 are accepted as case types in this slice. Self-cases, unknown types, duplicate case
 names, empty unions and direct `default(Union)` are rejected. Select a case explicitly.
-Inline variants are real nested metadata types. Generic unions/cases, imports of case
-types, generic constructor inference, primitive/interface/reference case alternatives,
+Inline variants are real nested metadata types. Generic unions/cases, external case imports,
+generic constructor inference, primitive/interface/reference case alternatives,
 qualified patterns, guards and destructuring are not implemented here. Field types
 can use the existing type system, including generic library types and managed references.
 
@@ -117,3 +117,6 @@ on the [case-projection plan](result-construction.md#planned-case-projection-rav
 
 See [conditional union bindings](conditional-patterns.md) for `if let` and
 `let … else`, including scope, failure-path rules and the order-workflow example.
+
+[Source case imports](neo-case-imports.md) allow `import Shape.*` for unqualified
+case construction and type annotations, without changing case identity or conversion.

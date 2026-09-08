@@ -62,7 +62,7 @@ existing types; the second declares case types with the carrier. A case value ca
 exist independently of any carrier. Case membership does not create inheritance or
 make every case contain a union tag. Qualified case names/imports should follow the
 existing companion-type pattern (as System.Result.Ok<T> does); inline Neo cases are public nested records and existing case types can be reused
-across carriers. Generic cases and imports remain future work.
+across carriers. [Source case imports](neo-case-imports.md) are implemented; generic cases and external imports remain future work.
 
 The union carrier's constructor signatures are authoritative: each variant has a
 constructor receiving one value of that variant type. A declaration generates these
@@ -75,8 +75,9 @@ conversion must not silently copy a referenced target or extend a frame's lifeti
 
 Remaining compiler work builds on these declarations:
 
-1. Import case types into type/constructor lookup, with ordinary ambiguity and
-   shadowing rules; do not confuse this with the current static-member imports.
+1. Source case imports now participate in type/constructor lookup with ambiguity and
+   shadowing rules. Extend discovery to external cases such as System.Result.Ok<T>;
+   do not confuse type imports with static-member imports.
 2. Infer generic constructor arguments from payloads, including diagnostics when
    arguments do not determine them.
 3. Discover each accepted variant from the marked union carrier's one-parameter

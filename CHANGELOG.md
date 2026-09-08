@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-09
 
+- Added file-wide Neo imports of declared source union cases, including constructor
+  calls and type annotations, with duplicate-import handling, ambiguity diagnostics
+  and local/declaration precedence. Updated the order workflow to import PurchaseError
+  cases and documented grammar and .NET lookup comparison. External case imports,
+  generic union declarations and generic constructor inference remain future work;
+  emitted case identities and runtime contracts are unchanged.
+
 - Added a reference-view example covering generic forwarding, base/interface views,
   readonly fields and collection elements, with identity/virtual-dispatch checks,
   GC-pressure coverage and readonly-container write rejection. Documented the distinction

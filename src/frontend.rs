@@ -2,11 +2,31 @@
 //! This is a separate experimental language subset, not a Raven compiler.
 mod closures;
 mod conditional;
+mod imports;
 mod library;
 mod unions;
 
 use crate::{Fault, Module};
 use std::collections::HashMap;
+
+const PREDEFINED_NAMES: &[&str] = &[
+    "int",
+    "Int32",
+    "String",
+    "string",
+    "bool",
+    "Boolean",
+    "Void",
+    "unit",
+    "Console",
+    "WriteLine",
+    "System",
+    "Option",
+    "Result",
+    "Byte",
+    "byte",
+    "array",
+];
 
 #[derive(Clone, Debug)]
 struct Token {
@@ -301,6 +321,8 @@ struct Source {
     records: Vec<Record>,
     functions: Vec<Function>,
     console_import: bool,
+    case_imports: Vec<Token>,
+    case_aliases: HashMap<String, Vec<String>>,
 }
 impl Source {
     fn prepare_inheritance(&mut self) -> Result<(), Fault> {
@@ -515,6 +537,8 @@ struct Parser {
     tokens: Vec<Token>,
     position: usize,
     depth: usize,
+    case_aliases: HashMap<String, Vec<String>>,
+    generic_names: Vec<String>,
 }
 impl Parser {
     fn current(&self) -> &Token {
@@ -618,10 +642,16 @@ impl Parser {
             self.expect(")")?;
             Ty::Void
         } else {
-            let mut name = self.name()?.text;
+            let at = self.name()?;
+            let mut name = at.text.clone();
             while self.eat(".") {
                 name.push('.');
                 name.push_str(&self.name()?.text);
+            }
+            if !self.generic_names.contains(&name) {
+                if let Some(qualified) = imports::lookup(&self.case_aliases, &name, &at)? {
+                    name = qualified;
+                }
             }
             let name = match name.as_str() {
                 "Option" => "System.Option",
@@ -736,6 +766,7 @@ impl Parser {
             }
             self.expect(">")?;
         }
+        let saved_generics = std::mem::replace(&mut self.generic_names, generic_parameters.clone());
         let parameters = self.fields(true)?;
         self.expect("->")?;
         let returns = self.ty()?;
@@ -749,6 +780,7 @@ impl Parser {
         } else {
             self.block()?
         };
+        self.generic_names = saved_generics;
         Ok(Function {
             name,
             generic_parameters,
@@ -897,7 +929,7 @@ impl Parser {
         self.expect("}")?;
         Ok(members)
     }
-    fn source(&mut self) -> Result<Source, Fault> {
+    fn source(&mut self, prepare: bool) -> Result<Source, Fault> {
         let mut source = Source {
             unions: Vec::new(),
             delegates: Vec::new(),
@@ -905,14 +937,24 @@ impl Parser {
             records: Vec::new(),
             functions: Vec::new(),
             console_import: false,
+            case_imports: Vec::new(),
+            case_aliases: self.case_aliases.clone(),
         };
         self.lines();
         while !self.at("") {
             if self.eat("import") {
-                for word in ["System", ".", "Console", ".", "*"] {
-                    self.expect(word)?;
+                let mut owner = self.name()?;
+                self.expect(".")?;
+                while !self.eat("*") {
+                    owner.text.push('.');
+                    owner.text.push_str(&self.name()?.text);
+                    self.expect(".")?;
                 }
-                source.console_import = true;
+                if owner.text == "System.Console" {
+                    source.console_import = true;
+                } else {
+                    source.case_imports.push(owner);
+                }
                 self.end_statement()?;
             } else if self.eat("union") {
                 unions::parse(self, &mut source)?;
@@ -1036,6 +1078,9 @@ impl Parser {
                 return Err(self.current().error("declaration limit exceeded"));
             }
             self.lines();
+        }
+        if !prepare {
+            return Ok(source);
         }
         source.prepare_inheritance()?;
         unions::validate(&source)?;
@@ -2371,24 +2416,7 @@ impl Lowerer<'_> {
                 Ok(Ty::Ref(Box::new(self.place(value, true)?)))
             }
             ExprKind::Unary(operation, value) if operation == "new" => {
-                let ExprKind::Call(callee, _) = &value.kind else {
-                    return Err(expression.at.error("new requires record construction"));
-                };
-                let ExprKind::Name(name) = &callee.kind else {
-                    return Err(expression.at.error("new requires record construction"));
-                };
-                if !self
-                    .source
-                    .records
-                    .iter()
-                    .any(|record| &record.name.text == name)
-                    && name != "array"
-                {
-                    return Err(expression.at.error("new requires record construction"));
-                }
-                let ty = self.expression(value)?;
-                self.body.push("heap.new".into());
-                Ok(Ty::Ref(Box::new(ty)))
+                self.allocate_record(expression, value)
             }
             ExprKind::Unary(operation, value) => {
                 let ty = self.value_expression(value)?;
@@ -2678,6 +2706,9 @@ impl Lowerer<'_> {
         Ok(Ty::Record(name.into()))
     }
     fn call(&mut self, callee: &Expr, arguments: &[Expr]) -> Result<Ty, Fault> {
+        if let Some(ty) = self.imported_call(callee, arguments)? {
+            return Ok(ty);
+        }
         if let Some(path) = Self::qualified_name(callee)
             .filter(|path| !self.bindings.contains_key(path.split('.').next().unwrap()))
         {
@@ -4144,12 +4175,19 @@ pub fn lower_to_il(source: &str) -> Result<String, Fault> {
 /// Lower with a diagnostic source document name, retained in JSON artifacts.
 pub fn lower_to_il_named(source: &str, document: &str) -> Result<String, Fault> {
     let tokens = lex(source)?;
-    let source = Parser {
+    let mut parser = Parser {
         tokens,
         position: 0,
         depth: 0,
-    }
-    .source()?;
+        case_aliases: HashMap::new(),
+        generic_names: Vec::new(),
+    };
+    // Collect declarations before resolving file-wide case imports, including forward types.
+    let declarations = parser.source(false)?;
+    parser.case_aliases = imports::resolve(&declarations)?;
+    drop(declarations);
+    parser.position = 0;
+    let source = parser.source(true)?;
     let mut names = HashMap::new();
     for name in source
         .records
@@ -4162,25 +4200,7 @@ pub fn lower_to_il_named(source: &str, document: &str) -> Result<String, Fault> 
     {
         if name.text.starts_with("neoCLR.Compiler.")
             || names.insert(name.text.clone(), ()).is_some()
-            || [
-                "int",
-                "Int32",
-                "String",
-                "string",
-                "bool",
-                "Boolean",
-                "Void",
-                "unit",
-                "Console",
-                "WriteLine",
-                "System",
-                "Option",
-                "Result",
-                "Byte",
-                "byte",
-                "array",
-            ]
-            .contains(&name.text.as_str())
+            || PREDEFINED_NAMES.contains(&name.text.as_str())
         {
             return Err(name.error("duplicate or reserved declaration name"));
         }

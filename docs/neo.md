@@ -148,6 +148,7 @@ The [Neo grammar](neo-grammar.md) gives the implemented EBNF and lexical rules.
 - Explicit `int(byteValue)` conversion using checked Int32 conversion.
 - `typeof(T)` returning System.Type, and read-only public System property access.
 - `Console.WriteLine` for int and string. `import System.Console.*` enables unqualified `WriteLine`.
+- [Source union case imports](neo-case-imports.md), such as `import PurchaseError.*`, for case constructors and type annotations.
 - `if`/`else`, `while`, integer-range `for`, `loop`, `break` and `continue`.
 - Int32/Double comparisons, Int32/Double/Boolean equality, and short-circuit `&&`/`||` with `!`.
 - Newline or semicolon statement separators and `//` comments.

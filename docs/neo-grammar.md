@@ -20,7 +20,7 @@ union_decl       = "union", identifier, newlines,
                    | "{", separators, union_case, { separators, union_case }, separators, "}") ;
 union_case       = "case", identifier, [ field_list ], terminator ;
 delegate_decl    = "delegate", identifier, parameter_list, "->", type, terminator ;
-import_decl      = "import", "System", ".", "Console", ".", "*", terminator ;
+import_decl      = "import", qualified_name, ".", "*", terminator ;
 class_decl       = [ "abstract" ], "class", identifier, [ ":", type, { ",", type } ],
                    newlines, "{", separators, { class_member, separators }, "}" ;
 class_member     = class_field | record_member ;

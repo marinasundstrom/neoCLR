@@ -1,3 +1,4 @@
+import PurchaseError.*
 import System.Console.*
 
 record Product(Name: string, Price: int, Stock: int)
@@ -25,8 +26,8 @@ func FindProduct(products: readonly System.Collections.ArrayList<Product&>&,
 
 func Purchase(product: Product&, quantity: int,
               notifications: Notifications&) -> Result<Receipt, PurchaseError> {
-    if quantity <= 0 { return Result<Receipt,PurchaseError>.Error(PurchaseError.InvalidQuantity(quantity)) }
-    if product.Stock < quantity { return Result<Receipt,PurchaseError>.Error(PurchaseError.OutOfStock(product.Stock, quantity)) }
+    if quantity <= 0 { return Result<Receipt,PurchaseError>.Error(InvalidQuantity(quantity)) }
+    if product.Stock < quantity { return Result<Receipt,PurchaseError>.Error(OutOfStock(product.Stock, quantity)) }
     product.Stock = product.Stock - quantity
     let receipt = Receipt(product.Name, quantity, product.Price * quantity)
     notifications.Purchased(receipt)
