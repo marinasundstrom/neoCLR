@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-09
 
+- Added initial runtime-enforced notvoid/notreference generic constraints on types and
+  methods, neoIL .constraint directives and Neo where clauses. Restrictions apply to
+  the outermost argument; symbolic forwarding is rechecked at concrete resolution.
+  Added metadata/host/source/IL regressions and design guidance. Base/interface
+  constraints and constrained-member lookup remain next; notnull awaits nullable
+  metadata. Older tools reject constrained artifacts; Neo reserves the new keywords.
+
 - Added plain generic Neo record declarations with explicit positional construction,
   substituted fields, generic function forwarding and heap construction. Emitted
   generic definitions reuse the existing runtime metadata and lifetime rules; reference

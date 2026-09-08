@@ -278,6 +278,7 @@ struct Field {
 struct Record {
     name: Token,
     generic_parameters: Vec<String>,
+    generic_constraints: Vec<crate::metadata::GenericConstraint>,
     is_class: bool,
     field_initializers: Vec<(Token, Expr)>,
     is_abstract: bool,
@@ -301,6 +302,7 @@ struct Interface {
 struct Function {
     name: Token,
     generic_parameters: Vec<String>,
+    generic_constraints: Vec<crate::metadata::GenericConstraint>,
     is_static: bool,
     base_initializer: Option<Vec<Expr>>,
     explicit_interface: Option<String>,
@@ -613,6 +615,9 @@ impl Parser {
             "case",
             "interface",
             "readonly",
+            "where",
+            "notvoid",
+            "notreference",
             "static",
             "as",
             "this",
@@ -773,6 +778,7 @@ impl Parser {
         let parameters = self.fields(true)?;
         self.expect("->")?;
         let returns = self.ty()?;
+        let generic_constraints = self.constraints(&generic_parameters)?;
         let has_body = self.tokens[self.position..]
             .iter()
             .find(|t| t.text != "\n")
@@ -787,6 +793,7 @@ impl Parser {
         Ok(Function {
             name,
             generic_parameters,
+            generic_constraints,
             is_static: false,
             base_initializer: None,
             explicit_interface,
@@ -864,6 +871,7 @@ impl Parser {
                 methods.push(Function {
                     name,
                     generic_parameters: Vec::new(),
+                    generic_constraints: Vec::new(),
                     is_static: false,
                     base_initializer,
                     explicit_interface: None,
@@ -1009,6 +1017,7 @@ impl Parser {
                 } else {
                     self.fields(false)?
                 };
+                let generic_constraints = self.constraints(&generic_parameters)?;
                 let mut implements = Vec::new();
                 if self.eat(":") {
                     loop {
@@ -1044,6 +1053,7 @@ impl Parser {
                             ..name.clone()
                         },
                         generic_parameters: Vec::new(),
+                        generic_constraints: Vec::new(),
                         is_static: false,
                         base_initializer: None,
                         explicit_interface: None,
@@ -1067,6 +1077,7 @@ impl Parser {
                 }
                 source.records.push(Record {
                     generic_parameters,
+                    generic_constraints,
                     is_class,
                     field_initializers: members.initializers,
                     is_abstract,
@@ -1829,6 +1840,7 @@ impl Lowerer<'_> {
                 text: method_name.clone(),
                 ..expression.at.clone()
             },
+            generic_constraints: Vec::new(),
             generic_parameters: if captures.is_empty() {
                 self.type_parameters.clone()
             } else {
@@ -4151,6 +4163,14 @@ impl Lowerer<'_> {
                 .unwrap_or_default(),
             self.locals.join("\n")
         );
+        let declarations = format!(
+            "{}{}",
+            crate::constraints::emit(
+                &self.function.generic_constraints,
+                &self.function.generic_parameters
+            ),
+            declarations
+        );
         let il = format!(
             "{} {}({}) -> {}\n{}\n{}\n.end\n",
             if self.receiver.is_some() && self.function.is_static {
@@ -4336,6 +4356,10 @@ pub fn lower_to_il_named(source: &str, document: &str) -> Result<String, Fault> 
             ".type {}{}\n",
             if record.is_abstract { "abstract " } else { "" },
             record.declaration_name()
+        ));
+        il.push_str(&crate::constraints::emit(
+            &record.generic_constraints,
+            &record.generic_parameters,
         ));
         for interface in &record.implements {
             if !source

@@ -1,0 +1,14 @@
+import System.Console.*
+
+record Measurement<T>(Value: T) where T: notvoid, notreference
+
+func CopyValue<T>(value: T) -> T where T: notreference {
+    return value
+}
+
+func Main() -> int {
+    let measurement = Measurement<int>(42)
+    let copy = CopyValue(measurement)
+    WriteLine(copy.Value)
+    return copy.Value
+}

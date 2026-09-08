@@ -128,7 +128,9 @@ The pass does not specialize and reanalyze every possible closed generic body.
 
 The analysis is conservative: an unconstrained generic arithmetic operation can be
 rejected even when one particular closed instantiation would execute successfully.
-Generic constraints and more expressive joins remain separate work. Invalid metadata
+The initial [generic constraints](generic-constraints.md) enforce notvoid/notreference
+at concrete substitution boundaries. Stronger symbolic constraint implication and
+more expressive joins remain separate work. Invalid metadata
 is rejected regardless of reachability, but typed analysis applies only to paths
 reachable from each function's entry under the conservative branch model.
 

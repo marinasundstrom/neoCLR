@@ -246,3 +246,7 @@ and support substituted fields, explicit positional construction, generic forwar
 value copies and managed-reference storage. Next extend generic source unions and their
 independent case types; generic record methods, classes, inheritance and constructor
 inference remain separate steps. This uses the existing CLR-like metadata foundation.
+
+[Generic constraints](generic-constraints.md) now project runtime-enforced `notvoid`
+and `notreference` for generic records/functions/static methods. Base/interface
+constraints and member lookup come next; notnull requires nullable metadata first.

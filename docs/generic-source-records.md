@@ -45,7 +45,7 @@ generic runtime; it makes no claim about matching CLR JIT code sharing or perfor
 Starting with data-only records supplies the type-substitution foundation for generic
 source union cases with limited compiler complexity. The cost is a temporarily smaller
 projection than C#: generic classes, methods on generic records, explicit initializers,
-inheritance/conformance on generic records, source generic unions, constraints and
+inheritance/conformance on generic records, source generic unions and
 source constructor inference remain separate work. Nongeneric records/classes retain
 their existing functionality. Type names remain unique within the file; overloading a
 type name by generic arity is not introduced.
@@ -65,3 +65,6 @@ The example prints 40 and 42, then returns 42. Tests cover closed metadata field
 nested records, generic forwarding, value copies, managed-reference identity, heap
 construction and interior references, readonly payloads, import shadowing, invalid
 forms and lifetime rejection. These are correctness checks, not allocation benchmarks.
+
+The initial [generic constraints](generic-constraints.md) now support runtime-enforced
+`notvoid` and `notreference` clauses on these records.

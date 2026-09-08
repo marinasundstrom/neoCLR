@@ -124,6 +124,10 @@ pub(crate) fn resolve(
         candidate.generic_arguments = target.generic_arguments.clone();
         candidate.definition = Some(identity);
         if candidate.parameters == target.parameters {
+            crate::constraints::check(&definition.generic_constraints, &target.generic_arguments)?;
+            if let Some(owner) = &target.owner {
+                crate::constraints::check_known_type(module, owner, 0)?;
+            }
             if found.is_some() {
                 return Err(Fault::new(
                     "ambiguous function overload after type substitution",
@@ -156,6 +160,7 @@ pub(crate) fn record_fields(
     ty: &Type,
     arity: impl Into<SignatureContext>,
 ) -> Result<Vec<crate::metadata::Field>, Fault> {
+    let arity = arity.into();
     check_type_context(ty, module, arity, 0)?;
     let (name, arguments): (&str, &[Type]) = match ty {
         Type::Named(name) => (name, &[]),
@@ -174,7 +179,11 @@ pub(crate) fn record_fields(
                 && d.representation == Representation::Record
         })
         .ok_or_else(|| Fault::new("expected record definition"))?;
-    crate::inheritance::fields(module, ty)
+    let fields = crate::inheritance::fields(module, ty)?;
+    for field in &fields {
+        crate::constraints::check_known_type(module, &field.ty, 0)?;
+    }
+    Ok(fields)
 }
 
 pub(crate) fn resolve_constructor(
@@ -315,6 +324,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 "runtime primitive types cannot declare record fields",
             ));
         }
+        crate::constraints::validate(&def.generic_constraints, def.generic_parameters.len())?;
         if def.generic_parameters.len() > u16::MAX as usize + 1 {
             return Err(Fault::new("too many type parameters"));
         }
@@ -472,6 +482,10 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             methods: function.generic_parameters.len(),
         };
         let check = |ty: &Type| check_type_context(ty, module, context, 0);
+        crate::constraints::validate(
+            &function.generic_constraints,
+            function.generic_parameters.len(),
+        )?;
         if !function.generic_parameters.is_empty() {
             let mut names = HashSet::new();
             if function.generic_parameters.len() > 1024
@@ -967,6 +981,10 @@ fn check_type_context(
             }
             for argument in arguments {
                 nested(argument)?;
+            }
+            crate::constraints::check(&def.generic_constraints, arguments)?;
+            for inherited in def.base.iter().chain(&def.implements) {
+                nested(&inherited.substitute_type_parameters(arguments)?)?;
             }
             Ok(())
         }

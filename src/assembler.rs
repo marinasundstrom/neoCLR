@@ -219,6 +219,11 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     property = Some(pending);
                     return Ok(());
                 }
+                if word == ".constraint" {
+                    def.generic_constraints
+                        .extend(crate::constraints::parse(rest, &def.generic_parameters)?);
+                    return Ok(());
+                }
                 if word == ".custom" {
                     def.custom_attributes
                         .push(crate::metadata::CustomAttribute {
@@ -308,6 +313,21 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         pending.function.sequence_points.pop();
                     }
                     pending.function.sequence_points.push(point);
+                    return Ok(());
+                }
+                if word == ".constraint" {
+                    if !pending.function.body.is_empty() || !pending.labels.is_empty() {
+                        return Err(Fault::new(
+                            ".constraint must precede instructions and labels",
+                        ));
+                    }
+                    pending
+                        .function
+                        .generic_constraints
+                        .extend(crate::constraints::parse(
+                            rest,
+                            &pending.function.generic_parameters,
+                        )?);
                     return Ok(());
                 }
                 if word == ".custom" {
@@ -629,6 +649,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         custom_attributes: vec![],
                         name: ty.definition_name().unwrap_or(&name).into(),
                         generic_parameters,
+                        generic_constraints: vec![],
                         fields: vec![],
                         implements: vec![],
                         base: None,
@@ -766,6 +787,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                             is_virtual: is_virtual || is_abstract,
                             is_override,
                             interface_implementations: vec![],
+                            generic_constraints: vec![],
                             generic_parameters: target
                                 .generic_arguments
                                 .iter()

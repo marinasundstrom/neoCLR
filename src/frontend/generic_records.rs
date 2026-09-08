@@ -116,3 +116,38 @@ impl Lowerer<'_> {
         Ok(Some(owner))
     }
 }
+
+impl Parser {
+    pub(super) fn constraints(
+        &mut self,
+        parameters: &[String],
+    ) -> Result<Vec<crate::metadata::GenericConstraint>, Fault> {
+        let names = parameters.iter().cloned().map(Some).collect::<Vec<_>>();
+        let mut result = Vec::new();
+        loop {
+            let saved = self.position;
+            self.newlines();
+            if !self.eat("where") {
+                self.position = saved;
+                break;
+            }
+            let parameter = self.name()?;
+            self.expect(":")?;
+            let mut text = parameter.text.clone();
+            loop {
+                text.push(' ');
+                text.push_str(&self.take().text);
+                if !self.eat(",") {
+                    break;
+                }
+            }
+            result.extend(
+                crate::constraints::parse(&text, &names)
+                    .map_err(|error| parameter.error(error.message))?,
+            );
+        }
+        crate::constraints::validate(&result, names.len())
+            .map_err(|error| self.current().error(error.message))?;
+        Ok(result)
+    }
+}

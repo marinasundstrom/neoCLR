@@ -71,13 +71,12 @@ such as Option/Result; flag combinations are not separate payload-bearing cases.
 A reflection-options example is a useful first consumer. An enum must not require
 Object inheritance merely to have runtime type identity. Source syntax remains open.
 
-**Generic constraints** must reflect neoCLR's addressing model. The proposed
-not-reference constraint restricts reference-form type arguments; it should not
-silently mean the C# class/struct distinction. Decide whether it excludes just T&,
-also pointers, or recursively contained references. Similarly, define whether
-not-void applies only to Void itself or also to constructed types containing Void.
-These scopes and source spellings remain open. Constraints need enforceable metadata
-contracts, not compiler-only promises. See [generic metadata](generic-metadata.md).
+**Generic constraints** now have an initial runtime-enforced
+[notvoid/notreference subset](generic-constraints.md). These restrict the outermost
+argument; notreference excludes managed reference forms, not native pointers or fields
+containing references. Base/interface contracts and constrained-member lookup are next;
+notnull depends on nullable metadata. Stronger symbolic implication checking and
+constructor constraints remain separate work.
 
 **Async** requires a lifetime decision before surface await syntax. Suspending a
 callee while it holds a reference into a caller frame must either retain an eligible

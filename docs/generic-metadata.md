@@ -157,3 +157,11 @@ row and ordered argument identities, including nested constructions and pointers
 It does not expand fields or replace the interpreter's existing signature-based
 value and layout checks. [Scoped type operands](scoped-types.md) check module origin;
 internal scoped keys and colliding type names across modules remain future work.
+
+## Initial argument constraints
+
+[Generic constraints](generic-constraints.md) now attach notvoid/notreference rows to
+type and method definitions. The runtime checks concrete arguments at construction,
+signature substitution and function resolution; owner and method indices remain
+independent. Neo projects the same contracts with `where` clauses. Base/interface
+constraints, symbolic implication proofs and nullable-type restrictions remain later slices.

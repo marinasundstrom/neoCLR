@@ -25,7 +25,7 @@ class_decl       = [ "abstract" ], "class", identifier, [ ":", type, { ",", type
                    newlines, "{", separators, { class_member, separators }, "}" ;
 class_member     = class_field | record_member ;
 class_field      = "var", identifier, ":", type, [ "=", expression ], terminator ;
-record_decl      = [ "abstract" ], "record", identifier, [ generic_parameters ], field_list, [ ":", type, { ",", type } ],
+record_decl      = [ "abstract" ], "record", identifier, [ generic_parameters ], field_list, { constraint_clause }, [ ":", type, { ",", type } ],
                    (terminator | newlines, "{", separators, { record_member, separators }, "}") ;
 record_member    = init_decl | explicit_method | "static", generic_function_member | [ "readonly" ], [ "abstract" ], [ "virtual" | "override" ], method_decl ;
 init_decl        = "init", parameter_list, [ ":", "base", "(", newlines, [ expression, { ",", newlines, expression } ], newlines, ")" ],
@@ -40,8 +40,10 @@ method_decl      = "func", identifier, parameter_list, "->", type,
 explicit_method  = [ "readonly" ], "func", identifier, ".", identifier,
                    parameter_list, "->", type, newlines, block ;
 generic_parameters = "<", identifier, { ",", identifier }, ">" ;
-generic_function_member = "func", identifier, [ generic_parameters ], parameter_list, "->", type, newlines, block ;
-function_decl    = "func", qualified_name, [ generic_parameters ], parameter_list, "->", type, newlines,
+constraint_clause = newlines, "where", identifier, ":", constraint, { ",", constraint } ;
+constraint       = "notvoid" | "notreference" ;
+generic_function_member = "func", identifier, [ generic_parameters ], parameter_list, "->", type, { constraint_clause }, newlines, block ;
+function_decl    = "func", qualified_name, [ generic_parameters ], parameter_list, "->", type, { constraint_clause }, newlines,
                    "{", separators, { statement, separators }, "}" ;
 field_list       = "(", newlines,
                    [ field, newlines, { ",", newlines, field, newlines } ], ")" ;
@@ -362,3 +364,7 @@ bundled Option/Result payload projection. See [union declarations](neo-unions.md
 
 See [conditional union bindings](conditional-patterns.md) for `if let` and
 `let … else`, including scope, failure-path rules and the order-workflow example.
+
+The initial [generic constraints](generic-constraints.md) use `where T: notvoid, notreference`
+on generic records, free functions and static generic methods. These clauses are
+runtime-enforced; base/interface and notnull constraints remain separate work.

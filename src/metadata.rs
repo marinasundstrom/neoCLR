@@ -151,6 +151,20 @@ pub struct Module {
     pub functions: Vec<Function>,
 }
 
+/// Runtime restrictions on the outermost form of a generic argument.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ConstraintKind {
+    NotVoid,
+    NotReference,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct GenericConstraint {
+    pub parameter: u16,
+    pub kind: ConstraintKind,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct TypeDef {
@@ -177,6 +191,8 @@ pub struct TypeDef {
     pub representation: Representation,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub generic_parameters: Vec<Option<String>>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub generic_constraints: Vec<GenericConstraint>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub packing: Option<u16>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -295,6 +311,8 @@ pub struct Function {
     pub interface_implementations: Vec<FunctionRef>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub generic_parameters: Vec<Option<String>>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub generic_constraints: Vec<GenericConstraint>,
     /// Instantiation carried by resolved bodies, never serialized on a definition.
     #[serde(skip)]
     pub generic_arguments: Vec<Type>,
