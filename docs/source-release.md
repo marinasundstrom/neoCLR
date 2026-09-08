@@ -17,8 +17,9 @@ private-key headers or the checked GitHub/AWS credential patterns. These are bou
 checks, not a guarantee that every possible secret or provenance issue is detectable.
 Fixture files deliberately include invalid/empty text for I/O tests and must remain.
 
-The dependency inventory covers all 20 registry packages in Cargo.lock, including
-build dependencies and windows-link. Preserved license texts are byte-hashed in the
+The original dependency inventory covered 20 registry packages. The current
+Unreleased inventory covers 47 locked registry packages, including Chrono and its
+target-specific dependencies. Preserved license texts are byte-hashed in the
 [notice manifest](../third-party/manifest.json). Native libffi and its separately
 licensed build/test tooling are recorded explicitly. No dependency source is copied
 into the preview archive by this notice inventory.

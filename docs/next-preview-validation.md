@@ -1,25 +1,24 @@
 # Next-preview validation
 
-The selected candidate is v0.1.0-preview.2, a source-only prerelease dated 2026-09-08.
-See [Preview 2 release notes](preview-2-release-notes.md).
-The [changelog](../CHANGELOG.md) records features and migration guidance. Published
-Preview 1 notes and evidence remain frozen.
+This guide now targets Unreleased development after v0.1.0-preview.2. No next version,
+release date or release commit is selected. [Preview 2 release notes](preview-2-release-notes.md)
+and published evidence remain historical records. The [changelog](../CHANGELOG.md)
+records implemented features and migration guidance.
 
-## Implementation scope
+## Validation scope
 
-- Repeated Neo declarations renew local storage without changing ordinary array
-  assignment or invalidating live managed aliases.
-- A complete Neo collection example creates ArrayList<Counter&>, uses a List view,
-  mutates referenced objects and demonstrates descriptor-copy behavior.
-- Neo projects ordinary and output reference contracts, typed uninitialized locals,
-  forwarding and conditional library outputs.
-- Live managed references support concrete GetType discovery through interface views.
-- Preliminary ReferenceEquals compares managed locations independently of value equality.
+The current library milestone covers readonly managed references, inheritance and
+constructor/interface dispatch, generic functions/delegates/closures, reflection,
+common interfaces and collections, ordinal text/character helpers, Math, separate
+Date/Time values, the host local clock, guest Environment arguments, lexical Path
+operations and bounded UTF-8 file I/O. These are preview subsets, not a claim of
+complete .NET class-library parity. See [library scope](library-preview.md) and
+individual API design documents for the researched .NET comparisons and limits.
 
-These are implemented. Automatic block cleanup/destruction, readonly references,
-inheritance, reflective invocation, pinning, persistent host roots and broader compiler
-features remain outside this candidate. Verification remains optional for IL/artifact
-execution and part of Neo compilation; runtime provenance/output checks remain mandatory.
+Validation should prove those existing contracts, not expand APIs simply to match a
+BCL inventory. Parsing/formatting/globalization, broader filesystem services and
+asynchronous I/O remain deferred. Verification is mandatory for Neo compilation and
+optional for direct IL/artifact execution; runtime provenance checks remain active.
 
 ## Reproducible source-archive check
 
@@ -44,8 +43,10 @@ The check:
 3. Checks the dependency notice inventory against Cargo.lock and verifies notice hashes.
 4. Runs all test targets from the extracted source on the selected Rust toolchain,
    using a fresh target directory, then builds the executable.
-5. Verifies and runs nine Neo programs as source and JSON artifacts, checking identical
-   output, then builds and runs the native interop sample from the extracted tree.
+5. Verifies and runs 23 deterministic Neo programs as source and JSON artifacts,
+   checking identical output. Separately checks Environment arguments and process
+   reads, local-clock snapshots against the host instant, and report-file contents
+   from source and artifacts. Then builds and runs the native interop sample.
 6. Writes report.json with the commit, archive SHA-256, platform, rustc version,
    notice/file counts, smoke programs, full-test status and overall result.
 

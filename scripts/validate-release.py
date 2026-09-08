@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Validate a committed source archive without tagging or publishing it (Python 3.9+)."""
 import argparse
+from datetime import datetime, timezone
 import hashlib
 import json
 import os
@@ -99,7 +100,11 @@ def main():
         run(cargo + ["build", "--locked"], source, env=env)
         executable = output / "target/debug" / ("neoclr.exe" if os.name == "nt" else "neoclr")
         for name in ["counter", "collections", "outputs", "reflection", "reference-identity",
-                     "interfaces", "arrays", "control-flow", "typeof"]:
+                     "interfaces", "arrays", "control-flow", "typeof",
+                     "ordinal-text", "character-classification", "math", "date-time",
+                     "common-interfaces", "predicate-search", "reflection-hierarchy",
+                     "constructor-chaining", "default-interfaces", "explicit-interfaces",
+                     "generic-functions", "delegates", "closures", "readonly"]:
             program = source / "examples/source" / (name + ".neo")
             artifact = output / (name + ".neo.json")
             run([executable, "verify", program], source)
@@ -109,6 +114,51 @@ def main():
             restored = run([executable, "run", artifact], source, True)
             if direct != restored:
                 raise RuntimeError("source/artifact output mismatch: " + name)
+            report["smoke_programs"].append(name)
+        # Dynamic programs need semantic checks rather than identical wall-clock output.
+        for name in ["environment", "local-clock", "file-report"]:
+            program = source / "examples/source" / (name + ".neo")
+            artifact = output / (name + ".neo.json")
+            run([executable, "assemble", program, artifact], source)
+            run([executable, "verify", program], source)
+            run([executable, "verify", artifact], source)
+            previous = None
+            for input_path in [program, artifact]:
+                guest_args = []
+                smoke_env = dict(env)
+                smoke_env["NEO_DEMO"] = "archive validation"
+                if name == "file-report":
+                    fixture = output / "report-input.txt"
+                    fixture.write_bytes("hello é\n".encode("utf-8"))
+                    destination = output / "summary.txt"
+                    if destination.exists():
+                        destination.unlink()
+                    guest_args = ["--", fixture, output]
+                elif name == "environment":
+                    guest_args = ["--", "argument with spaces", "--gc-stats"]
+                before = datetime.now(timezone.utc).timestamp()
+                result = run([executable, "run", input_path] + guest_args, source, True, smoke_env)
+                after = datetime.now(timezone.utc).timestamp()
+                lines = result.splitlines()
+                if not lines or lines[-1] != "=> Int32(0)":
+                    raise RuntimeError("guest smoke failure: " + name)
+                if name == "local-clock":
+                    if len(lines) != 11:
+                        raise RuntimeError("unexpected local-clock output")
+                    parts = [int(lines[i]) for i in [1, 2, 3, 5, 6, 7]]
+                    instant = datetime(*parts, tzinfo=timezone.utc).timestamp() - int(lines[9])
+                    if not before - 1 <= instant <= after:
+                        raise RuntimeError("local-clock snapshot differs from host instant")
+                elif name == "environment":
+                    if lines[:3] != [str(input_path), "argument with spaces", "--gc-stats"]:
+                        raise RuntimeError("guest arguments differ from supplied arguments")
+                    if lines[3:5] != [str(source), "archive validation"]:
+                        raise RuntimeError("process environment smoke mismatch")
+                    if previous is not None and previous != lines[1:]:
+                        raise RuntimeError("environment source/artifact output mismatch")
+                    previous = lines[1:]
+                elif destination.read_bytes() != b"Input: report-input.txt\nUTF-8 bytes: 9\n":
+                    raise RuntimeError("file-report output mismatch")
             report["smoke_programs"].append(name)
         run(cargo + ["run", "--locked", "--example", "build_native"], source, env=env)
         run([executable, "run", "examples/pinvoke.neoil"], source)

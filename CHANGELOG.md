@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-08
 
+#### Maintenance
+
+- Refreshed dependency notices for the clock backend and all target-specific locked
+  packages (47 packages, 94 notice files), fixing the archive notice-inventory gate.
+  Expanded release smoke checks for recent runtime/library features and dynamic
+  clock, Environment and file-report scenarios. Updated the validation guide for
+  Unreleased development; published Preview 2 notes remain unchanged.
+
 #### Added
 
 - Added bounded UTF-8 File.WriteAllText with Result<Void,FileWriteError>, explicit

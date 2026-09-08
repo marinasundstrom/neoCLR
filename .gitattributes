@@ -1,0 +1,3 @@
+# Preserve upstream notice bytes, including line endings and trailing blank lines.
+third-party/licenses/** -text -whitespace
+third-party/unicode/** -text -whitespace
