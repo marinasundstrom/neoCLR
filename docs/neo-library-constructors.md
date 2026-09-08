@@ -31,8 +31,7 @@ are rejected. Constructors are not inherited and no default constructor is fabri
 
 Explicit construction remains available alongside [implicit case-to-carrier conversion](case-to-carrier-conversion.md):
 `let result: Result<int,string> = ok` invokes the accepting constructor when the target
-is a marked union. `System.Result.Ok(42)` infers its owner arguments. Imported `Ok(42)` still needs external
-case import support. Source union case conversions retain their existing contract. Library heap-construction syntax is not added here. No arbitrary external
+is a marked union. `System.Result.Ok(42)` infers its owner arguments. `import System.Result.*` also enables the short `Ok(42)` spelling. Source union case conversions retain their existing contract. Library heap-construction syntax is not added here. No arbitrary external
 assembly loading is added: this frontend targets the bundled System metadata.
 
 Microsoft's [C# constructor guide](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/constructors)

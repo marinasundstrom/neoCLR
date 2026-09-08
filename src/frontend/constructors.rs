@@ -16,6 +16,11 @@ impl Lowerer<'_> {
         {
             return Ok(None);
         }
+        let path = if matches!(callee.kind, ExprKind::Name(_)) {
+            imports::lookup(&self.source.case_aliases, &path, &callee.at)?.unwrap_or(path)
+        } else {
+            path
+        };
         let path = match path.as_str() {
             "Result" => "System.Result".to_owned(),
             "Option" => "System.Option".to_owned(),

@@ -1,16 +1,25 @@
-//! File-wide imports of independently named source union cases.
+//! File-wide imports of independently named union cases.
 use super::*;
 
 pub(super) fn resolve(source: &Source) -> Result<HashMap<String, Vec<String>>, Fault> {
     let mut aliases: HashMap<String, Vec<String>> = HashMap::new();
     for import in &source.case_imports {
-        let union = source
+        let variants = if let Some(union) = source
             .unions
             .iter()
             .find(|union| union.name.text == import.text)
-            .ok_or_else(|| import.error("case import requires a declared source union"))?;
-        for variant in &union.variants {
-            let qualified = variant.il();
+        {
+            union.variants.iter().map(Ty::il).collect()
+        } else {
+            library::imported_cases(&import.text)
+                .map_err(|error| import.error(error.message))?
+                .ok_or_else(|| {
+                    import.error(
+                        "case import requires a declared source union or marked bundled union",
+                    )
+                })?
+        };
+        for qualified in variants {
             let name = qualified.rsplit('.').next().unwrap().to_owned();
             if qualified == name || PREDEFINED_NAMES.contains(&name.as_str()) {
                 continue;
@@ -103,6 +112,16 @@ impl Lowerer<'_> {
                 if let Some(qualified) =
                     imports::lookup(&self.source.case_aliases, name, &callee.at)?
                 {
+                    // Bundled constructors resolve the alias using the original AST node.
+                    // Inference caches must never use a temporary rewritten callee address.
+                    if !self
+                        .source
+                        .records
+                        .iter()
+                        .any(|record| record.name.text == qualified)
+                    {
+                        return Ok(None);
+                    }
                     return self
                         .call(
                             &Expr {

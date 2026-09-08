@@ -46,9 +46,10 @@ See [library constructor calls](neo-library-constructors.md) for normal metadata
 lookup, argument context and current limits. `System.Result.Ok(42)` also infers the case argument from its payload. [Case-to-carrier conversion](case-to-carrier-conversion.md)
 now invokes the accepting public constructor when a marked bundled carrier is expected.
 
-## Planned case projection: Raven's model
+## Case projection: Raven's model
 
-Raven imports simple case types using `import System.Result.*`. `Ok(42)` constructs
+Raven imports simple case types using `import System.Result.*`. Neo now supports
+this spelling for bundled marked unions as well; see [case imports](neo-case-imports.md). `Ok(42)` constructs
 Ok<int>, inferring its one parameter from the payload. An expected Result<int,string>
 can then accept that case through its constructor. The error type is supplied only
 when forming the carrier, not inferred while forming the case. This supports an
@@ -70,7 +71,8 @@ existing types; the second declares case types with the carrier. A case value ca
 exist independently of any carrier. Case membership does not create inheritance or
 make every case contain a union tag. Qualified case names/imports should follow the
 existing companion-type pattern (as System.Result.Ok<T> does); inline Neo cases are public nested records and existing case types can be reused
-across carriers. [Source case imports](neo-case-imports.md) are implemented; generic cases and external imports remain future work.
+across carriers. [Case imports](neo-case-imports.md) are implemented for source and bundled unions;
+generic source union declarations and arbitrary external assembly loading remain future work.
 
 The union carrier's constructor signatures are authoritative: each variant has a
 constructor receiving one value of that variant type. A declaration generates these
@@ -81,22 +83,16 @@ non-union types are not implicitly eligible. This follows the platform's [ordina
 and its recorded .NET comparison. Managed reference modes remain independent; such
 conversion must not silently copy a referenced target or extend a frame's lifetime.
 
-Remaining compiler work builds on these declarations:
-
-1. Source case imports now participate in type/constructor lookup with ambiguity and
-   shadowing rules. Extend discovery to external cases such as System.Result.Ok<T>;
-   do not confuse type imports with static-member imports.
-2. Infer generic constructor arguments from payloads, including diagnostics when
-   arguments do not determine them.
-3. Marked bundled carriers now accept exact case types through public one-value
-   constructors, preserving reference payloads and lifetime checks. Broader constructor
-   conversion ranking and arbitrary external assembly discovery remain separate work.
-4. Test standalone case bindings, nested carriers, overload resolution and rejection
-   of invalid or ambiguous conversions using more than Result alone.
+Implemented compiler support now covers source and bundled case imports, payload-based
+constructor inference, and conversion through a marked carrier's accepting constructor.
+Tests cover independent case bindings, nested Option/Result carriers, exact constructor
+acceptance, reference payloads, lookup ambiguity and runtime lifetime checks. Broader
+constructor conversion ranking, generic source union declarations and arbitrary external
+assembly discovery remain separate work.
 
 A Result-specific contextual shortcut would construct a carrier directly from an
 expected Result<T,E>, rather than model the independently typed case. It is not part
-of this contract. The planned work is not a new runtime union kind or a promise that
+of this contract. This projection is not a new runtime union kind or a promise that
 all constructor calls will become implicit conversions.
 
 ## .NET comparison and tradeoffs (2026-09-08)
@@ -109,12 +105,12 @@ projection; they are not claimed to reproduce F# inference or FSharp.Core binari
 
 Closed-owner factories fit the present Neo static-call support and leave the runtime
 unchanged. They cost repeated type arguments in return expressions but immediately
-remove the placeholder outcome-record workaround. General case inference and carrier
-conversion can later remove that verbosity without coupling lowering to the Result
+remove the placeholder outcome-record workaround. Generic case inference and carrier
+conversion now remove that verbosity without coupling lowering to the Result
 name. Existing union representation costs and behavior are unchanged; no speedup is
 claimed. This additive API requires rebuilding System artifacts to use the factories.
 
 Tests cover explicit owners, nested cases, Void, generic factory calls, reference
 identity, JSON loading/verification, bad payloads/arity, evaluation exactly once and
-runtime rejection of frame-backed payloads. This does not certify general union
-construction, constructor inference or implicit case-to-carrier conversion.
+runtime rejection of frame-backed payloads. Separate constructor, case-import and case-conversion suites cover the newer
+projection; the factory tests alone do not certify those features.

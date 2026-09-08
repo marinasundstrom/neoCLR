@@ -107,3 +107,107 @@ fn imports_do_not_replace_predefined_type_names() {
         Value::Int32(42)
     );
 }
+
+#[test]
+fn bundled_cases_support_inference_explicit_arguments_and_type_positions() {
+    let source = r#"
+func Wrap<T>(value: T) -> Some<T> { return Some(value) }
+import System.Result.*
+import System.Option.*
+import System.Result.*
+record Counter(Value: int)
+func Main() -> int {
+    let number: Ok<int> = Ok(42)
+    let flag: Ok<bool> = Ok(true)
+    let message: Error<string> = Error("no")
+    let result: Result<int, string> = number
+    let failure: Result<int, string> = message
+    let explicit = Ok<int>(42)
+    let counter = new Counter(40)
+    let refCase: Some<Counter&> = Wrap(counter)
+    refCase.Value.Value = 42
+    if !ReferenceEquals(refCase.Value, counter) { return -1 }
+    if !typeof(Ok<int>).Equals(typeof(System.Result.Ok<int>)) { return -2 }
+    let absent: Option<int> = None()
+    let present: Option<int> = Some(explicit.Value)
+    let Some(value) = present else { return -3 }
+    if let None = absent { if flag.Value { return value } }
+    return -4
+}
+"#;
+    assert_eq!(run(source), Value::Int32(42));
+}
+
+#[test]
+fn imported_constructor_inference_keeps_stable_expression_identity() {
+    let mut expression = "Next(&calls)".to_owned();
+    for _ in 0..24 {
+        expression = format!("Some({expression})");
+    }
+    assert_eq!(
+        run(&format!(
+            "import System.Option.*\nfunc Next(calls: int&) -> int {{ calls = calls + 1; return 42 }} func Main() -> int {{ var calls = 0; let nested = {expression}; let number: Some<int> = Some(42); let flag: Some<bool> = Some(true); return calls }}"
+        )),
+        Value::Int32(1)
+    );
+}
+
+#[test]
+fn bundled_imports_keep_shadowing_and_ambiguity_rules() {
+    assert_eq!(
+        run(
+            "import System.Result.*\nfunc Ok<T>(value: T) -> T { return value } func Main() -> int { return Ok<int>(42) }"
+        ),
+        Value::Int32(42)
+    );
+    assert_eq!(
+        run(
+            "import System.Result.*\nfunc Main() -> int { let Ok: System.Func<int,int> = value => value + 2; return Ok(40) }"
+        ),
+        Value::Int32(42)
+    );
+    assert_eq!(
+        run(
+            "import System.Result.*\nrecord Ok(Value: int)\nfunc Main() -> int { let value: Ok = Ok(42); return value.Value }"
+        ),
+        Value::Int32(42)
+    );
+    let prefix = "import System.Result.*\nimport Local.*\nunion Local { case Ok(Value: int) }\n";
+    assert_eq!(
+        run(&format!(
+            "{prefix}func Main() -> int {{ return System.Result.Ok(42).Value }}"
+        )),
+        Value::Int32(42)
+    );
+    for statement in [
+        "let value = Ok(42)",
+        "let value = Ok<int>(42)",
+        "let value: Ok<int> = System.Result.Ok(42)",
+    ] {
+        assert!(
+            frontend::compile(&format!("{prefix}func Main() -> () {{ {statement} }}"))
+                .unwrap_err()
+                .message
+                .contains("ambiguous imported case")
+        );
+    }
+}
+
+#[test]
+fn imports_do_not_expand_runtime_or_constructor_contracts() {
+    for source in [
+        "import System.String.*\nfunc Main() -> () {}",
+        "import System.Result.Ok.*\nfunc Main() -> () {}",
+        "import System.Result.*\nfunc Main() -> () { let result: Result<Void,string> = Ok(42) }",
+        "import System.Option.*\nfunc Main() -> () { let value = new Some(42) }",
+    ] {
+        assert!(frontend::compile(source).is_err(), "{source}");
+    }
+    let module = frontend::compile("import System.Option.*\nfunc Main() -> Option<int&> { var value = 42; return Some(&value) }").unwrap();
+    assert!(
+        LoadedProgram::new(&module)
+            .unwrap()
+            .run(Limits::default())
+            .is_err()
+    );
+}

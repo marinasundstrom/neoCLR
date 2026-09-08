@@ -366,8 +366,8 @@ reassembly. See [union conventions](union-convention.md).
 Neo now constructs independent bundled cases with argument-based generic inference,
 then converts them through a marked carrier's accepting constructor when context
 requires it. This compiler projection follows the documented Raven case-first model;
-the CLR-like runtime continues to execute ordinary closed constructor calls. Next add
-external case imports for short `Ok(42)` spelling; generic source union declarations
+the CLR-like runtime continues to execute ordinary closed constructor calls. Bundled case imports now provide short
+`Ok(42)` spelling through `import System.Result.*`; generic source union declarations
 remain a separate capability. See [constructor inference](neo-library-constructors.md)
 for comparison, conservative ambiguity rules and validation boundaries.
 

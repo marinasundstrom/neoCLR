@@ -133,5 +133,5 @@ and high-level pattern syntax are not prerequisites for this convention.
 
 [Non-generic declarations](neo-unions.md) now support existing source cases and
 inline nested record cases, exact constructor-based conversions and whole-variant
-matching. The [remaining case-construction plan](result-construction.md#planned-case-projection-ravens-model)
+matching. The [remaining case-construction plan](result-construction.md#case-projection-ravens-model)
 covers imported cases, generic constructor inference and broader metadata discovery.

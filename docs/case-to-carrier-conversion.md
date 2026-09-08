@@ -86,4 +86,4 @@ fields, arrays and collection setters; Option/Result and nested carriers; generi
 reference payloads; once-only evaluation; unmarked/wrong-case/wrong-type rejection;
 readonly payload retention under collection pressure, invariant generic case arguments,
 and runtime frame escape rejection. [Generic constructor inference](neo-library-constructors.md#constructor-argument-inference)
-is now available independently; external case imports remain future work.
+is now available independently, together with [bundled case imports](neo-case-imports.md).

@@ -1,4 +1,4 @@
-# Source union case imports
+# Union case imports
 
 ```swift
 import PurchaseError.*
@@ -27,6 +27,26 @@ typeof/default operands and generic arguments. Constructors can use the short na
 qualified names remain available. Match and conditional case patterns already resolve
 against their input union and do not require imports.
 
+Bundled union families use the same import form:
+
+```swift
+import System.Result.*
+import System.Option.*
+
+let ok: Ok<int> = Ok(42)
+let result: Result<int,string> = ok
+let error = Error("Unavailable")
+let failed: Result<int,string> = error
+let some = Some(42)
+let absent: Option<int> = None()
+```
+
+The import exposes independent case type definitions. Constructor inference still
+uses payload evidence, and a carrier target supplies only the subsequent conversion.
+Explicit calls such as `Ok<int>(42)` and type positions such as `Some<Foo&>` work too.
+Library cases retain their existing value-construction behavior; `new Some(42)` is
+not supported by the current library constructor projection.
+
 ## Lookup rules and limits
 
 - Duplicate imports are idempotent. Different imported cases sharing a short name
@@ -35,12 +55,15 @@ against their input union and do not require imports.
   Generic function type parameters take precedence within their signatures and bodies.
 - Local callable bindings and source functions take precedence for ordinary calls.
   Importing a case never replaces an existing binding.
-- The owner must be a declared source union. Existing top-level variants already
-  have unqualified names; importing them introduces no additional identity.
-- Only wildcard imports are supported. External union cases (including System.Result.*),
-  general namespace/type imports, aliases, generic union declarations and generic case
-  constructor inference remain separate work. System.Console.* retains its existing
-  special static-member import.
+- The owner must be a declared source union or a public marked bundled union family.
+  Source unions take precedence if both have the same name. Existing top-level variants
+  already have unqualified names; importing them introduces no additional identity.
+- Bundled imports discover public independent case definitions from public one-value-
+  parameter carrier constructors. A family name omits generic carrier arguments;
+  accepting constructors supply membership, not dotted-name prefixes alone.
+- Only wildcard case imports are supported. General namespace/type imports, aliases,
+  arbitrary external assembly loading and generic source union declarations remain
+  separate work. System.Console.* retains its existing special static-member import.
 
 The compiler collects declarations before resolving imported type spellings. Emitted
 IL/metadata contains the same qualified case identities as explicitly qualified code.
@@ -51,7 +74,8 @@ Imports do not alter accessibility, runtime storage validity or frame escape che
 Microsoft's [using directive reference](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/using-directive)
 (consulted 2026-09-09) describes using static importing accessible nested types as
 well as static members. Neo's wildcard syntax is a small language projection of
-similar name lookup, restricted here to declared union variants. It avoids repeated
+similar name lookup, restricted here to declared union variants and marked bundled
+carrier contracts. It avoids repeated
 carrier qualification in the order workflow without adding runtime machinery. Costs
 are possible short-name ambiguity and a declaration pass in the concept compiler.
 It does not claim to implement all C# import scopes or overload rules.
@@ -67,3 +91,17 @@ The workflow now imports PurchaseError cases and still prints Purchased: Coffee,
 24, 7, 24, Out of stock, Orders complete and returns 0. Tests exercise independent
 case construction, carrier conversion, type identity, generic-parameter shadowing,
 heap construction, duplicate/ambiguous imports and local/file-level name precedence.
+
+Raven's [union specification](https://github.com/marinasundstrom/raven/blob/92352e228f1a026d85de08b385e910001bbe2ebc/docs/lang/spec/unions.md)
+was inspected at commit `92352e228f1a026d85de08b385e910001bbe2ebc` for the case-first
+model and wildcard imports. Neo uses the same separation of imported case identity,
+constructor inference and carrier conversion, with narrower import scopes. This is
+compiler lookup over existing metadata, not new CLR-style storage or dispatch machinery.
+Importing every nested type as C# `using static` can would widen this slice beyond
+union use; adding a runtime case-registration table would duplicate the constructor
+contract. The bounded choice reduces qualification at the cost of possible name
+ambiguity and metadata lookup during compilation. General import policy remains open.
+
+Run `cargo run --locked -- run examples/source/case-constructors.neo` for the bundled
+case example. Regressions cover explicit/inferred generic calls, type positions,
+shadowing, ambiguity, nested inference, once-only evaluation and frame escape rejection.

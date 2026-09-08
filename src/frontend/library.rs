@@ -479,3 +479,47 @@ pub(super) fn case_conversion(actual: &Ty, expected: &Ty) -> Result<Option<Strin
     }
     Ok(selected)
 }
+
+/// Import independent case definitions from the marked carrier's public constructors.
+/// The import names a family, so generic owner arguments are intentionally not required.
+pub(super) fn imported_cases(name: &str) -> Result<Option<Vec<String>>, Fault> {
+    let module = crate::library::system()?;
+    let mut found = false;
+    let mut cases = Vec::new();
+    for definition in module.types.iter().filter(|definition| {
+        definition.name == name
+            && definition.visibility == Visibility::Public
+            && definition.custom_attributes.iter().any(|attribute| {
+                attribute
+                    .constructor
+                    .owner
+                    .as_ref()
+                    .and_then(Type::definition_name)
+                    == Some("System.Runtime.CompilerServices.UnionAttribute")
+            })
+    }) {
+        found = true;
+        for constructor in module.functions.iter().filter(|function| {
+            function.owner.as_ref() == Some(&definition.open_type())
+                && function.instance
+                && function.name.ends_with("..ctor")
+                && function.visibility == Visibility::Public
+                && function.parameters.len() == 1
+                && function.generic_parameters.is_empty()
+                && function.out_parameters.is_empty()
+                && function.readonly_parameters.is_empty()
+        }) {
+            let parameter = &constructor.parameters[0];
+            if matches!(parameter, Type::ByRef(_) | Type::ReadOnlyByRef(_)) {
+                continue;
+            }
+            let Some(case) = module.type_definition(parameter) else {
+                continue;
+            };
+            if case.visibility == Visibility::Public && !cases.contains(&case.name) {
+                cases.push(case.name.clone());
+            }
+        }
+    }
+    Ok(found.then_some(cases))
+}
