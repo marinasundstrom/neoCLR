@@ -91,7 +91,8 @@ func Main() -> int {
     p.verify().unwrap();
     assert_eq!(
         p.run(Limits {
-            heap_objects: 3,
+            // The list now retains a managed state object as well as its buffer.
+            heap_objects: 4,
             ..Limits::default()
         })
         .unwrap()

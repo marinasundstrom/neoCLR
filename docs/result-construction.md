@@ -57,12 +57,12 @@ union Shape {
 }
 ```
 
-These are proposed Neo declarations, not accepted syntax yet. The first form lists
+These non-generic Neo declarations are now implemented; see [union declarations](neo-unions.md). The first form lists
 existing types; the second declares case types with the carrier. A case value can
 exist independently of any carrier. Case membership does not create inheritance or
 make every case contain a union tag. Qualified case names/imports should follow the
-existing companion-type pattern (as System.Result.Ok<T> does); exact generated names,
-visibility and reuse across carriers still need specification.
+existing companion-type pattern (as System.Result.Ok<T> does); inline Neo cases are public nested records and existing case types can be reused
+across carriers. Generic cases and imports remain future work.
 
 The union carrier's constructor signatures are authoritative: each variant has a
 constructor receiving one value of that variant type. A declaration generates these
@@ -73,7 +73,7 @@ non-union types are not implicitly eligible. This follows the platform's [ordina
 and its recorded .NET comparison. Managed reference modes remain independent; such
 conversion must not silently copy a referenced target or extend a frame's lifetime.
 
-A future Neo compiler slice should implement the general building blocks:
+Remaining compiler work builds on these declarations:
 
 1. Import case types into type/constructor lookup, with ordinary ambiguity and
    shadowing rules; do not confuse this with the current static-member imports.

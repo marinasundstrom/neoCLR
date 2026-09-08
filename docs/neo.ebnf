@@ -1,6 +1,10 @@
 (* Neo concept language: implemented subset. *)
 program          = separators, { declaration, separators }, end_of_input ;
-declaration      = delegate_decl | import_decl | class_decl | record_decl | interface_decl | function_decl ;
+declaration      = union_decl | delegate_decl | import_decl | class_decl | record_decl | interface_decl | function_decl ;
+union_decl       = "union", identifier, newlines,
+                   ("(", newlines, type, { newlines, "|", newlines, type }, newlines, ")", terminator
+                   | "{", separators, union_case, { separators, union_case }, separators, "}") ;
+union_case       = "case", identifier, [ field_list ], terminator ;
 delegate_decl    = "delegate", identifier, parameter_list, "->", type, terminator ;
 import_decl      = "import", "System", ".", "Console", ".", "*", terminator ;
 class_decl       = [ "abstract" ], "class", identifier, [ ":", type, { ",", type } ],

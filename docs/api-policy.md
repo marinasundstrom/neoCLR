@@ -137,3 +137,10 @@ ordinary generic argument, Func<T,Void> replaces Action<T>; there is no separate
 Action family. This reduces duplicate API families but requires a mapping when
 porting .NET APIs. Closures will use compiler-generated captured environments and
 delegates, following the C# model. See [the contract](delegate-contract.md).
+
+## Compositional type and parameter contracts
+
+Follow the [type-design guide](type-design.md): evaluate a type's fields and operation
+guarantees together. An outer value can share reference-valued fields, and T& alone
+does not grant retention or ownership. Specify copying, mutation, retention, readonly
+limits and disposal independently when designing library APIs.

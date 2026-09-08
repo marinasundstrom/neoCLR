@@ -1,0 +1,43 @@
+import System.Console.*
+
+record Card(LastDigits: string)
+record Cash()
+union PaymentMethod(Card | Cash)
+
+union Shape {
+    case Circle(radius: int)
+    case Square(side: int)
+    case Rectangle(width: int, height: int)
+}
+
+func Measure(shape: Shape) -> int {
+    return shape match {
+        Circle(let circle) => circle.radius * circle.radius,
+        Square(let square) => square.side * square.side,
+        Rectangle(let rectangle) => rectangle.width * rectangle.height
+    }
+}
+
+func PaymentLabel(method: PaymentMethod) -> string {
+    return method match {
+        Card(let card) => card.LastDigits,
+        Cash => "cash"
+    }
+}
+
+func MakeShape() -> Shape {
+    return Shape.Circle(3)
+}
+
+func Main() -> int {
+    var circle = Shape.Circle(3)
+    let shape: Shape = circle
+    circle.radius = 8
+    WriteLine(PaymentLabel(Card("1234")))
+    WriteLine(PaymentLabel(PaymentMethod(Cash())))
+    WriteLine(Measure(shape))
+    WriteLine(Measure(Shape.Square(4)))
+    WriteLine(Measure(Shape.Rectangle(2, 3)))
+    if Measure(MakeShape()) != 9 { return 1 }
+    return 0
+}

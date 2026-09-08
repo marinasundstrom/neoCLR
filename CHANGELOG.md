@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-08
 
+- Added non-generic Neo union declarations from existing source types or inline
+  nested record cases. Carriers generate one constructor per variant, support exact
+  case-to-carrier conversion and exhaustive whole-variant matching, and retain the
+  existing erased-storage/GC rules. Added a sample, metadata/lifetime tests and type/API
+  design guidelines. `union` and `case` are now reserved identifiers. Generic case
+  inference and imported shorthand remain future work; no new runtime opcode is added.
+
 - Added ordinary Result<T,E>.Ok/Error library factories, usable from Neo with an
   explicitly closed owner such as Result<int,string>.Ok(42). The order workflow now
   uses Result instead of a placeholder outcome record. Unique library static signatures
@@ -21,6 +28,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   shallow element copies. Breaking library layout/behavior change: rebuild artifacts
   and replace reliance on independent copied counts with Copy(). Each independent list
   now allocates an additional managed state object; no runtime opcode changed.
+  GC-pressure tests, including reflection collections, account for that retained state.
 
 - Added an executable order-workflow experiment and a .NET 10 comparison to assess
   explicit managed-reference ergonomics, with focused tests for receipt snapshots,

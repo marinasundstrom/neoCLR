@@ -235,9 +235,10 @@ match, as demonstrated by `Console.ReadByte()` returning
 `Result<Option<byte>, System.IO.ConsoleReadError>`. Without a supplied console,
 input reports the recoverable Unavailable case. The CLI supplies process stdin/stdout.
 
-Public System methods bind by exact parameter types after automatic reference reads; `Console` and
-`Int32` abbreviate their System names. Current union coverage comes from the trusted
-bundled library's marker, constructors and typed case accessors. Runtime faults remain
+Public System methods use known parameter context where unique and otherwise exact
+signature selection; `Console` and `Int32` abbreviate their System names. Union coverage
+comes from bundled marker/constructor/accessor contracts or non-generic source union
+declarations that generate those ordinary members. Runtime faults remain
 separate from recoverable results, including malformed union representations. See the
 [grammar and matching rules](neo-grammar.md) for limits.
 
@@ -540,3 +541,10 @@ rules cause friction, with commands and small follow-up exercises.
 Use `Result<T,E>.Ok(value)` or `Result<T,E>.Error(error)` to construct a library
 Result. Both type arguments are explicit; the result binding can be inferred.
 See [construction and the planned case projection](result-construction.md).
+
+## Union declarations and type design
+
+Declare `union PaymentMethod(Card | Cash)` from existing types, or use inline
+`case` declarations to generate separate nested types. Constructor signatures
+define accepted variants. See [syntax, matching and examples](neo-unions.md), and
+[type/API design guidelines](type-design.md) for choosing values, references and storage.

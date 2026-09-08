@@ -55,7 +55,7 @@ escapes; heap-backed field references can remain valid match results.
 
 [Acceptance tests](../tests/neo_match.rs) exercise parsing, nested Option/Result input
 and EOF, type/coverage failures and lifetimes. The [match example](../examples/source/match.neo)
-prints an error message and 42. Guards, nested destructuring patterns, user-declared
+prints an error message and 42. Guards, nested destructuring patterns, generic source
 unions and subtype patterns remain future work; nested unions currently use nested
 matches. No general open-world exhaustiveness contract is claimed.
 
@@ -215,3 +215,12 @@ Keep the upcoming work separate:
    multicast and variance remain independent decisions.
 
 These are bounded explorations, not a commitment to turn Neo into a full compiler.
+
+## Source union declarations and remaining case projection
+
+[Non-generic source unions](neo-unions.md) now generate separate cases and carrier
+constructors, with exact case conversions and exhaustive matching. Next investigate
+case imports, generic constructor inference and external constructor-metadata discovery
+under [the Raven-style projection plan](result-construction.md#planned-case-projection-ravens-model).
+Use [type-design guidelines](type-design.md) to review the full field and operation
+contracts when selecting value/reference use.

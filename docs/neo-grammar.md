@@ -14,7 +14,11 @@ There are no empty statements apart from separators.
 
 ```ebnf
 program          = separators, { declaration, separators }, end_of_input ;
-declaration      = delegate_decl | import_decl | class_decl | record_decl | interface_decl | function_decl ;
+declaration      = union_decl | delegate_decl | import_decl | class_decl | record_decl | interface_decl | function_decl ;
+union_decl       = "union", identifier, newlines,
+                   ("(", newlines, type, { newlines, "|", newlines, type }, newlines, ")", terminator
+                   | "{", separators, union_case, { separators, union_case }, separators, "}") ;
+union_case       = "case", identifier, [ field_list ], terminator ;
 delegate_decl    = "delegate", identifier, parameter_list, "->", type, terminator ;
 import_decl      = "import", "System", ".", "Console", ".", "*", terminator ;
 class_decl       = [ "abstract" ], "class", identifier, [ ":", type, { ",", type } ],
@@ -185,12 +189,13 @@ return, break or continue; their expression results are discarded. Payload names
 are immutable, arm-local and cannot shadow active names. References follow the
 ordinary lifetime rules; no address to copied arm payload storage can escape.
 
-Coverage is limited to bundled System unions with the UnionAttribute marker,
+Bundled System union coverage uses the UnionAttribute marker,
 constructor-declared cases, and typed public test/extraction/payload accessors.
 The compiler validates that contract; arbitrary source records are not unions merely
 because their names resemble Option or Result. Unsupported contracts are diagnosed.
-Guards, nested destructuring patterns, user-declared unions and subtype patterns are
-future features.
+Non-generic source declarations generate the corresponding constructors and accessors;
+their case bindings capture whole variants. Guards, nested destructuring patterns,
+generic source unions and subtype patterns remain future features.
 
 ## Type operands and metadata properties
 
@@ -341,3 +346,8 @@ method contracts. Source interface inheritance still requires source-declared ba
 `Result<T,E>.Ok(payload)` and `Result<T,E>.Error(payload)` use ordinary static-call
 syntax. Importing case types, inferring their constructor type arguments and converting
 cases to carriers are planned separately; see [Result construction](result-construction.md).
+
+Non-generic source unions support the two forms above. Cases must be distinct
+concrete declared source value types; inline cases generate nested record types.
+A source-union case binding captures the complete variant, unlike the existing
+bundled Option/Result payload projection. See [union declarations](neo-unions.md).

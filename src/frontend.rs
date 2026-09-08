@@ -2,6 +2,7 @@
 //! This is a separate experimental language subset, not a Raven compiler.
 mod closures;
 mod library;
+mod unions;
 
 use crate::{Fault, Module};
 use std::collections::HashMap;
@@ -108,7 +109,7 @@ fn lex(source: &str) -> Result<Vec<Token>, Fault> {
             .any(|op| rest.starts_with(op))
         {
             2
-        } else if "(){}[]:,.;&*+-=/!<>".contains(first) {
+        } else if "(){}[]:,.;&*+-=/!<>|".contains(first) {
             first.len_utf8()
         } else {
             return Err(start.error(format!("unsupported character {first:?}")));
@@ -293,6 +294,7 @@ struct DelegateDeclaration {
     returns: Ty,
 }
 struct Source {
+    unions: Vec<unions::Union>,
     delegates: Vec<DelegateDeclaration>,
     interfaces: Vec<Interface>,
     records: Vec<Record>,
@@ -577,6 +579,8 @@ impl Parser {
             "default",
             "class",
             "delegate",
+            "union",
+            "case",
             "interface",
             "readonly",
             "static",
@@ -892,6 +896,7 @@ impl Parser {
     }
     fn source(&mut self) -> Result<Source, Fault> {
         let mut source = Source {
+            unions: Vec::new(),
             delegates: Vec::new(),
             interfaces: Vec::new(),
             records: Vec::new(),
@@ -906,6 +911,8 @@ impl Parser {
                 }
                 source.console_import = true;
                 self.end_statement()?;
+            } else if self.eat("union") {
+                unions::parse(self, &mut source)?;
             } else if self.eat("delegate") {
                 let name = self.name()?;
                 let parameters = self.fields(true)?;
@@ -1012,14 +1019,15 @@ impl Parser {
             } else if self.at("func") {
                 source.functions.push(self.function(false, false)?);
             } else {
-                return Err(self
-                    .current()
-                    .error("expected interface, class, record, func, or import System.Console.*"));
+                return Err(self.current().error(
+                    "expected union, interface, class, record, func, or import System.Console.*",
+                ));
             }
             if source.records.len()
                 + source.functions.len()
                 + source.interfaces.len()
                 + source.delegates.len()
+                + source.unions.len()
                 > 1024
             {
                 return Err(self.current().error("declaration limit exceeded"));
@@ -1027,6 +1035,7 @@ impl Parser {
             self.lines();
         }
         source.prepare_inheritance()?;
+        unions::validate(&source)?;
         for record in &mut source.records {
             if record.is_class && record.base.is_some() {
                 for method in &mut record.methods {
@@ -1897,6 +1906,21 @@ impl Lowerer<'_> {
         self.convert_reference(actual, expected, &expression.at)
     }
     fn convert_reference(&mut self, actual: Ty, expected: &Ty, at: &Token) -> Result<Ty, Fault> {
+        if let Some(union) = self
+            .source
+            .unions
+            .iter()
+            .find(|u| u.name.text == expected.il())
+        {
+            if union.variants.contains(&actual) {
+                self.body.push(format!(
+                    "newobj instance {}::.ctor({})",
+                    expected.il(),
+                    actual.il()
+                ));
+                return Ok(expected.clone());
+            }
+        }
         if matches!(actual, Ty::ReadOnlyRef(_)) && matches!(expected, Ty::Ref(_)) {
             return Err(at.error("readonly reference cannot satisfy writable contract"));
         }
@@ -2211,6 +2235,11 @@ impl Lowerer<'_> {
                 .at
                 .error("generic function arguments require an invocation")),
             ExprKind::Default(ty) => {
+                if self.source.unions.iter().any(|u| u.name.text == ty.il()) {
+                    return Err(expression
+                        .at
+                        .error("union default requires selecting a variant"));
+                }
                 let local = self.temp(ty);
                 self.body.extend([
                     format!("ldloca {local}"),
@@ -2607,6 +2636,35 @@ impl Lowerer<'_> {
         Ok(Ty::Record(name.into()))
     }
     fn call(&mut self, callee: &Expr, arguments: &[Expr]) -> Result<Ty, Fault> {
+        if let Some(path) = Self::qualified_name(callee)
+            .filter(|path| !self.bindings.contains_key(path.split('.').next().unwrap()))
+        {
+            if let Some(union) = self.source.unions.iter().find(|u| u.name.text == path) {
+                if arguments.len() != 1 {
+                    return Err(callee
+                        .at
+                        .error("union constructor requires one variant value"));
+                }
+                let actual = self.value_expression(&arguments[0])?;
+                if !union.variants.contains(&actual) {
+                    return Err(callee
+                        .at
+                        .error("no union constructor accepts this variant type"));
+                }
+                self.body
+                    .push(format!("newobj instance {path}::.ctor({})", actual.il()));
+                return Ok(Ty::Record(path));
+            }
+            if self.source.records.iter().any(|r| r.name.text == path)
+                && !matches!(&callee.kind, ExprKind::Name(name) if name == &path)
+            {
+                let named = Expr {
+                    kind: ExprKind::Name(path),
+                    ..callee.clone()
+                };
+                return self.call(&named, arguments);
+            }
+        }
         let (callee, type_arguments) = match &callee.kind {
             ExprKind::Generic(callee, types) => (callee.as_ref(), types.as_slice()),
             _ => (callee, &[][..]),
@@ -3071,7 +3129,7 @@ impl Lowerer<'_> {
             return Ok(Ty::Void);
         }
         if let Some(path) = Self::qualified_name(callee) {
-            if path.contains('.') {
+            if path.contains('.') && !self.source.records.iter().any(|r| r.name.text == path) {
                 let (owner, member) = path.rsplit_once('.').unwrap();
                 let owner = if owner.starts_with("System.") {
                     owner.to_owned()
@@ -3288,7 +3346,12 @@ impl Lowerer<'_> {
             self.body.push(format!("ldobj {}", target.il()));
             ty = *target;
         }
-        let cases = library::cases(&ty).map_err(|e| value.at.error(e.message))?;
+        let source_union = self.source.unions.iter().find(|u| u.name.text == ty.il());
+        let cases = if let Some(union) = source_union {
+            union.cases()
+        } else {
+            library::cases(&ty).map_err(|e| value.at.error(e.message))?
+        };
         let scrutinee = self.temp(&ty);
         self.body.push(format!("local.reset {scrutinee}"));
         self.body.push(format!("stloc {scrutinee}"));
@@ -3320,7 +3383,7 @@ impl Lowerer<'_> {
                     if !seen.insert(name.text.clone()) {
                         return Err(name.error("duplicate match case"));
                     }
-                    if binding.is_some() != case.payload.is_some() {
+                    if source_union.is_none() && binding.is_some() != case.payload.is_some() {
                         return Err(name.error("case payload pattern does not match its shape"));
                     }
                     self.body.extend([
@@ -3336,8 +3399,10 @@ impl Lowerer<'_> {
                         self.body.extend([
                             format!("ldloc {scrutinee}"),
                             format!("call {}", case.extract),
-                            format!("call {accessor}"),
                         ]);
+                        if !accessor.is_empty() {
+                            self.body.push(format!("call {accessor}"));
+                        }
                         let index = self.temp(payload);
                         self.body.push(format!("local.reset {index}"));
                         self.body.push(format!("stloc {index}"));
@@ -3954,6 +4019,7 @@ pub fn lower_to_il_named(source: &str, document: &str) -> Result<String, Fault> 
         .chain(source.functions.iter().map(|function| &function.name))
         .chain(source.interfaces.iter().map(|interface| &interface.name))
         .chain(source.delegates.iter().map(|delegate| &delegate.name))
+        .chain(source.unions.iter().map(|union| &union.name))
     {
         if name.text.starts_with("neoCLR.Compiler.")
             || names.insert(name.text.clone(), ()).is_some()
@@ -4045,7 +4111,17 @@ pub fn lower_to_il_named(source: &str, document: &str) -> Result<String, Fault> 
         }
         il.push_str(".end\n");
     }
+    for union in &source.unions {
+        il.push_str(&union.emit(&source));
+    }
     for record in &source.records {
+        if source
+            .unions
+            .iter()
+            .any(|u| u.inline && u.variants.contains(&Ty::Record(record.name.text.clone())))
+        {
+            continue;
+        }
         il.push_str(&format!(
             ".type {}{}\n",
             if record.is_abstract { "abstract " } else { "" },
