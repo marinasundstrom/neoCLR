@@ -100,3 +100,33 @@ Reflection member descriptors share an abstract MemberInfo base for common metad
 and expose readonly managed readers. This is a concrete use of shared storage and
 base views; independent capabilities should use interfaces when needed. See
 [the API and .NET comparison](reflection-hierarchy.md).
+
+## Runtime guarantees and language policy
+
+The runtime owns shared correctness rules: valid initialized storage, declared
+nullability, reference lifetimes, readonly access, construction completion and typed
+default semantics. No compiler, handwritten IL or artifact may bypass those rules.
+Nullability is still planned; current managed references have no null/default value.
+
+A language owns declaration syntax, binding immutability, inference, early diagnostics,
+field-initializer lowering and constructor synthesis. Another language may insert more
+initialization than Neo does, provided its resulting IL satisfies the same contracts.
+Do not introduce runtime metadata solely to enforce a Neo syntax/synthesis preference.
+
+For example, Neo's [class synthesis rule](classes-and-defaults.md) requires initializers
+for all fields when no init is declared. That is compiler policy. Requiring construction
+to finish with every field initialized is runtime enforcement. A field can be initialized
+with default(T) only if T actually has a valid runtime default. Never invent a zero
+address for a non-nullable reference merely to satisfy an initialization obligation.
+
+C# also performs constructor synthesis and inference in the compiler; .NET reference
+nullability annotations do not impose equivalent runtime non-nullability. The deliberate
+neoCLR difference is enforcing reference/null-state intent across languages, with
+representation, verification and GC costs recorded in [the nullability design](nullability.md).
+
+Field completion is the mandatory construction boundary, including conditional
+assignments and early returns. Local/temporary definite assignment can be handled
+primarily by language analysis and verification. The current interpreter still checks
+invalid reads and reference use; future verified backends may remove checks proven
+unnecessary. This does not introduce a universal local-slot initialization feature
+or relax managed-reference lifetime validity. Nullable metadata is a separate slice.

@@ -1,0 +1,20 @@
+import System.Console.*
+
+abstract class Counter {
+    var Value: int = default(int)
+    readonly abstract func Read() -> int
+}
+
+class OffsetCounter: Counter {
+    var Offset: int = 42
+    readonly override func Read() -> int { return this.Value + this.Offset }
+}
+
+func Main() -> int {
+    var local = OffsetCounter()
+    let localView: Counter& = &local
+    let heap: Counter& = new OffsetCounter()
+    WriteLine(localView.Read())
+    WriteLine(heap.Read())
+    return localView.Read()
+}

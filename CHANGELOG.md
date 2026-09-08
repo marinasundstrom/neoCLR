@@ -10,6 +10,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 #### Added
 
+- Neo ordinary class declarations with body fields, field initializers, bounded
+  parameterless-constructor synthesis and implicit parameterless base chaining.
+  Added default(T) over checked runtime initobj; defaults do not run constructors
+  or invent null/invalid managed references. Records retain positional construction.
+  Added samples, grammar, tests, a pinned .NET comparison and responsibility guidance:
+  synthesis is language policy, storage/reference validity is runtime enforcement.
+  Base-first initializer ordering deliberately differs from C#. Nullability remains
+  planned; class/default become reserved words, with no opcode/artifact change.
+
 - Recorded delegates as the planned shared runtime callable abstraction, with
   language function values/lambdas built upon them. Excluded a separate universal
   function-object runtime model; capture lifetimes, representation and multicast

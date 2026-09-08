@@ -450,15 +450,15 @@ default calling an explicit implementation on frame and heap owners.
 Neo now supports inferred and explicit generic free functions, namespace-qualified function names
 and `static func` members. See [the contract and runnable example](function-generics.md#neo-projection).
 
-An explicit parameterless `init()` is supported. Compare [C# constructor synthesis](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/constructors) (consulted 2026-09-08), which is a language rule. Neo does not synthesize a C#-style
-parameterless constructor: without `init`, record construction consumes the declared
-positional fields. `init` replaces that aggregate call and must initialize required
-fields, with the existing explicit base chaining rules.
+Ordinary [class declarations and typed defaults](classes-and-defaults.md) are now
+supported. Classes declare typed fields in their bodies and can receive a synthesized
+parameterless init when every field has an initializer. Records retain positional
+fields and aggregate construction without init. Explicit init declarations keep their
+own parameter signatures. Class and record are source forms with the same runtime
+value/reference addressing choices.
 
-An ordinary `class` declaration with body-declared fields is a separate planned
-source-language building block. Runtime record representation describes storage; it
-does not mean all source classes must have positional record constructors. Both
-ordinary classes and records will retain explicit value/reference addressing. Before
-synthesizing default constructors, define how field initializers and non-nullable
-reference fields satisfy initialization; an invalid zero reference is not a default
-object. See the [constructor contract](constructor-chaining.md).
+`default(T)` projects the runtime's existing checked initobj operation. It does not
+run constructors or field initializers and cannot create an invalid managed reference.
+Nullability remains a separate runtime feature to implement. Constructor synthesis is
+Neo policy; runtime initialization, reference validity and lifetime rules remain
+mandatory across languages. See [the responsibility boundary](api-policy.md#runtime-guarantees-and-language-policy).

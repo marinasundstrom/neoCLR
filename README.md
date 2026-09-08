@@ -180,6 +180,8 @@ cargo run --locked -- run examples/array_bounds.neoil
 ```
 
 The [accessibility sample](docs/accessibility.md) demonstrates public methods and restricted helpers.
+The [class sample](docs/classes-and-defaults.md) demonstrates body fields, constructor
+synthesis, typed defaults and frame/heap base views.
 The [generic function sample](docs/function-generics.md#neo-projection) demonstrates explicit
 type arguments on free functions and static methods.
 The [property sample](docs/properties.md) demonstrates generic properties backed by ordinary methods.

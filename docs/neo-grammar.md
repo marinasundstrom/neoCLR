@@ -14,8 +14,12 @@ There are no empty statements apart from separators.
 
 ```ebnf
 program          = separators, { declaration, separators }, end_of_input ;
-declaration      = import_decl | record_decl | interface_decl | function_decl ;
+declaration      = import_decl | class_decl | record_decl | interface_decl | function_decl ;
 import_decl      = "import", "System", ".", "Console", ".", "*", terminator ;
+class_decl       = [ "abstract" ], "class", identifier, [ ":", type, { ",", type } ],
+                   newlines, "{", separators, { class_member, separators }, "}" ;
+class_member     = class_field | record_member ;
+class_field      = "var", identifier, ":", type, [ "=", expression ], terminator ;
 record_decl      = [ "abstract" ], "record", identifier, field_list, [ ":", type, { ",", type } ],
                    (terminator | newlines, "{", separators, { record_member, separators }, "}") ;
 record_member    = init_decl | explicit_method | "static", generic_function_member | [ "readonly" ], [ "abstract" ], [ "virtual" | "override" ], method_decl ;
@@ -94,7 +98,7 @@ argument         = [ "out" ], expression ;
 generic_member   = qualified_name, "<", type, { ",", type }, ">", ".", identifier ;
 primary          = generic_member | integer | string | "true" | "false" | "this" | identifier
                  | "[", newlines, expression, newlines, { ",", newlines, expression, newlines }, "]"
-                 | "typeof", "(", newlines, type, newlines, ")"
+                 | ("typeof" | "default"), "(", newlines, type, newlines, ")"
                  | "(", newlines, expression, newlines, ")" ;
 ```
 
@@ -293,3 +297,16 @@ Inference is semantic, not extra grammar: an ordinary call can infer method argu
 by matching argument types. Explicit `<type, ...>` overrides inference. Missing
 evidence or conflicting inferred types requires explicit arguments. Reference intent
 follows the [value/reference inference rules](function-generics.md#neo-projection).
+
+## Ordinary classes and typed defaults
+
+`class` and `default` are reserved. Class bodies declare typed mutable fields;
+records retain positional declarations. A class without init receives a parameterless
+constructor only when every field has an initializer. An omitted class base initializer
+requests the base's parameterless init. Field initializers run after base completion,
+before the body, and outside constructor parameter scope. See [classes and defaults](classes-and-defaults.md).
+
+`default(T)` is an expression using the runtime's existing initobj contract. No
+contextual bare default literal is added. It does not run constructors. Types without
+valid defaults, including non-nullable managed references, are rejected. Nullable
+signatures and null literals remain unimplemented.

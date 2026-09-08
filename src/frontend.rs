@@ -196,11 +196,19 @@ struct Field {
 }
 struct Record {
     name: Token,
+    is_class: bool,
+    field_initializers: Vec<(Token, Expr)>,
     is_abstract: bool,
     base: Option<Ty>,
     inherited_fields: usize,
     fields: Vec<Field>,
     implements: Vec<Ty>,
+    methods: Vec<Function>,
+}
+#[derive(Default)]
+struct Members {
+    fields: Vec<Field>,
+    initializers: Vec<(Token, Expr)>,
     methods: Vec<Function>,
 }
 struct Interface {
@@ -388,6 +396,7 @@ enum ExprKind {
     Binary(String, Box<Expr>, Box<Expr>),
     Match(Box<Expr>, Vec<Arm>),
     TypeOf(Ty),
+    Default(Ty),
     Generic(Box<Expr>, Vec<Ty>),
     Out(Box<Expr>),
     InterfaceCast(Box<Expr>, Ty),
@@ -493,6 +502,8 @@ impl Parser {
             "continue",
             "match",
             "typeof",
+            "default",
+            "class",
             "interface",
             "readonly",
             "static",
@@ -673,11 +684,35 @@ impl Parser {
             body,
         })
     }
-    fn methods(&mut self, abstract_members: bool) -> Result<Vec<Function>, Fault> {
+    fn methods(&mut self, abstract_members: bool, class: bool) -> Result<Members, Fault> {
         self.expect("{")?;
         self.lines();
-        let mut methods: Vec<Function> = Vec::new();
+        let mut members = Members::default();
+        let methods = &mut members.methods;
         while !self.at("}") {
+            if class && self.eat("var") {
+                let name = self.name()?;
+                if members.fields.len() >= 1024
+                    || members.fields.iter().any(|f| f.name.text == name.text)
+                {
+                    return Err(name.error("duplicate field or field limit exceeded"));
+                }
+                self.expect(":")?;
+                let ty = self.ty()?;
+                if self.eat("=") {
+                    members
+                        .initializers
+                        .push((name.clone(), self.expression(0)?));
+                }
+                members.fields.push(Field {
+                    name,
+                    ty,
+                    output: false,
+                    readonly: false,
+                });
+                self.end_statement()?;
+                continue;
+            }
             if methods.len() >= 1024 {
                 return Err(self.current().error("method limit exceeded"));
             }
@@ -780,7 +815,7 @@ impl Parser {
             self.lines();
         }
         self.expect("}")?;
-        Ok(methods)
+        Ok(members)
     }
     fn source(&mut self) -> Result<Source, Fault> {
         let mut source = Source {
@@ -813,17 +848,24 @@ impl Parser {
                     }
                 }
                 self.newlines();
-                let methods = self.methods(true)?;
+                let methods = self.methods(true, false)?.methods;
                 source.interfaces.push(Interface {
                     name,
                     bases,
                     methods,
                 });
-            } else if self.at("record") || self.at("abstract") {
+            } else if self.at("record") || self.at("class") || self.at("abstract") {
                 let is_abstract = self.eat("abstract");
-                self.expect("record")?;
+                let is_class = self.eat("class");
+                if !is_class {
+                    self.expect("record")?;
+                }
                 let name = self.name()?;
-                let fields = self.fields(false)?;
+                let mut fields = if is_class {
+                    Vec::new()
+                } else {
+                    self.fields(false)?
+                };
                 let mut implements = Vec::new();
                 if self.eat(":") {
                     loop {
@@ -838,28 +880,56 @@ impl Parser {
                 }
                 let saved = self.position;
                 self.newlines();
-                let methods = if self.at("{") {
-                    self.methods(false)?
+                let mut members = if self.at("{") {
+                    self.methods(false, is_class)?
                 } else {
+                    if is_class {
+                        return Err(name.error("class requires a body"));
+                    }
                     self.position = saved;
                     self.end_statement()?;
-                    Vec::new()
+                    Members::default()
                 };
+                fields.append(&mut members.fields);
+                if is_class && !members.methods.iter().any(|m| m.name.text == ".ctor") {
+                    if fields.len() != members.initializers.len() {
+                        return Err(name.error("class requires an explicit init or an initializer for every field; use default(T) only for defaultable types"));
+                    }
+                    members.methods.push(Function {
+                        name: Token {
+                            text: ".ctor".into(),
+                            ..name.clone()
+                        },
+                        generic_parameters: Vec::new(),
+                        is_static: false,
+                        base_initializer: None,
+                        explicit_interface: None,
+                        is_virtual: false,
+                        is_override: false,
+                        is_abstract: false,
+                        receiver_readonly: false,
+                        parameters: Vec::new(),
+                        returns: Ty::Void,
+                        body: Vec::new(),
+                    });
+                }
                 source.records.push(Record {
+                    is_class,
+                    field_initializers: members.initializers,
                     is_abstract,
                     base: None,
                     inherited_fields: 0,
                     name,
                     fields,
                     implements,
-                    methods,
+                    methods: members.methods,
                 });
             } else if self.at("func") {
                 source.functions.push(self.function(false, false)?);
             } else {
                 return Err(self
                     .current()
-                    .error("expected interface, record, func, or import System.Console.*"));
+                    .error("expected interface, class, record, func, or import System.Console.*"));
             }
             if source.records.len() + source.functions.len() + source.interfaces.len() > 1024 {
                 return Err(self.current().error("declaration limit exceeded"));
@@ -867,6 +937,15 @@ impl Parser {
             self.lines();
         }
         source.prepare_inheritance()?;
+        for record in &mut source.records {
+            if record.is_class && record.base.is_some() {
+                for method in &mut record.methods {
+                    if method.name.text == ".ctor" && method.base_initializer.is_none() {
+                        method.base_initializer = Some(Vec::new());
+                    }
+                }
+            }
+        }
         Ok(source)
     }
     fn end_statement(&mut self) -> Result<(), Fault> {
@@ -1087,13 +1166,18 @@ impl Parser {
             let value = self.expression(30)?;
             let depth = value.depth + 1;
             self.node(at, ExprKind::Out(Box::new(value)), depth)?
-        } else if at.text == "typeof" {
+        } else if at.text == "typeof" || at.text == "default" {
             self.expect("(")?;
             self.newlines();
             let ty = self.ty()?;
             self.newlines();
             self.expect(")")?;
-            self.node(at, ExprKind::TypeOf(ty), 1)?
+            let kind = if at.text == "default" {
+                ExprKind::Default(ty)
+            } else {
+                ExprKind::TypeOf(ty)
+            };
+            self.node(at, kind, 1)?
         } else if at.text == "-"
             && self
                 .current()
@@ -1748,6 +1832,15 @@ impl Lowerer<'_> {
             ExprKind::Generic(_, _) => Err(expression
                 .at
                 .error("generic function arguments require an invocation")),
+            ExprKind::Default(ty) => {
+                let local = self.temp(ty);
+                self.body.extend([
+                    format!("ldloca {local}"),
+                    format!("initobj {}", ty.il()),
+                    format!("ldloc {local}"),
+                ]);
+                Ok(ty.clone())
+            }
             ExprKind::TypeOf(ty) => {
                 self.body.push(format!("ldtoken {}", ty.il()));
                 self.body
@@ -2948,6 +3041,23 @@ impl Lowerer<'_> {
                 }
                 (None, None) => (),
             }
+            // Field initializers run after base completion and outside parameter scope.
+            let parameters = self.bindings.clone();
+            self.bindings.retain(|name, _| name == "this");
+            for (name, value) in &record.field_initializers {
+                let field = record
+                    .fields
+                    .iter()
+                    .find(|f| f.name.text == name.text)
+                    .unwrap();
+                self.sequence(name);
+                self.body.push("ldarg 0".into());
+                self.expression_for(value, &field.ty)?;
+                self.body
+                    .push(format!("stfld {}::{}", record.name.text, name.text));
+                self.body.push("pop".into());
+            }
+            self.bindings = parameters;
         }
         let returned = self.statements(&self.function.body)?;
         if !returned && !self.function.is_abstract {

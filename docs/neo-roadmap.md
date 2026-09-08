@@ -200,10 +200,10 @@ clear; other languages may project the same platform differently.
 
 Keep the upcoming work separate:
 
-1. Ordinary class source declarations, body-declared fields and default-constructor
-   policy. Existing explicit parameterless init works; constructor synthesis does not.
-   Compare C# class/record construction and initialization against neoCLR's required
-   fields and non-nullable references before choosing synthesis rules.
+1. [Ordinary classes and default(T)](classes-and-defaults.md) are implemented with
+   body-declared fields, field initializers and bounded constructor synthesis. Broader
+   automatic initialization depends on runtime nullability/defaultability; reference
+   slots must never receive an invalid reference as a default.
 2. [Runtime delegate design](delegates.md) and a typed callback consumer. Delegates
    are the common callable abstraction; ordinary functions remain definitions.
 3. Language method-group conversions and lambdas built on delegates, after capture

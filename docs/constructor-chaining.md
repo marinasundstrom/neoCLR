@@ -26,8 +26,10 @@ parameters supply its call signature; field names are not implicitly assigned.
 OffsetCounter(40, 2) produces a value; new OffsetCounter(40, 2) constructs that value
 and places it on the managed heap using Neo's existing lowering.
 
-The small compiler supports one explicit initializer per record, and a derived init
-requires an explicit : base(...) whose base declares init. Arguments evaluate left
+The small compiler supports one explicit initializer per type. A derived record init
+requires an explicit : base(...) whose base declares init. [Ordinary classes](classes-and-defaults.md)
+also support field initializers and implicit parameterless base calls; records keep
+the existing explicit rule. Arguments evaluate left
 to right before entering the base constructor. There is no implicit Object
 constructor. Source overload declarations and : this(...) are deferred; IL supports
 overloaded constructors and same-type delegation now.

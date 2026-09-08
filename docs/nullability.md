@@ -98,3 +98,19 @@ Before implementation, specify clearing and alias behavior, checked access, defa
 copying, GC tracing and the reflection contract. Acceptance must include present zero
 versus null, null versus uninitialized, nested qualifier placement, removal of old GC
 edges, writable/readonly access, and failure when null enters a non-nullable signature.
+
+## Construction and defaultability boundary
+
+The reference-holding slot accepts null only when its declared type signature permits
+null. Non-nullable references must receive valid references; defaulting them to a zero
+address or other invalid reference is forbidden. An uninitialized slot is not a legal
+null/default value and cannot be read or complete a required constructor field.
+
+The current [Neo default(T) projection](classes-and-defaults.md) uses checked initobj
+without adding nullable signatures. Once nullable signatures exist, their null default
+must be an assigned null state, distinct from a present zero and uninitialized storage.
+The runtime must enforce this through generic substitution, calls/returns, fields,
+arrays and host/artifact boundaries; compiler diagnostics are additional assistance.
+Constructor synthesis and how much initialization a language inserts remain language
+policy. Future defaultability metadata/constraints should be considered alongside
+nullable defaults, rather than weakening non-nullable reference validity.
