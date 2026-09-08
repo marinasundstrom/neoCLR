@@ -501,3 +501,9 @@ iteration through readonly collection views.
 `people.Find(person => person.Equals(expected))` returns Option<T> for exhaustive
 match handling. Equatable implementations use `readonly func Equals(other: T) -> bool`.
 These are eager ArrayList operations; LINQ remains future work.
+
+[Ordinal text matching](ordinal-text.md) uses ordinary library calls such as
+`name.EndsWithOrdinal(".neo")` and `System.String.CompareOrdinal(left, right)`.
+Neo borrows readonly instance receivers automatically, including string temporaries.
+Run `cargo run --locked -- run examples/source/ordinal-text.neo` for an eager file-name
+search using ArrayList, a predicate and Option matching.

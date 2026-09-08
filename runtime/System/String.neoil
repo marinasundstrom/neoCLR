@@ -15,6 +15,37 @@
         ret
     .end
 
+    .method static CompareOrdinal(String left, String right) -> Int32
+        ldarg left
+        ldarg right
+        call neoCLR.Runtime.StringCompareOrdinal(String,String)
+        ret
+    .end
+
+    .method instance readonly byref ContainsOrdinal(String value) -> Boolean
+        ldarg this
+        ldobj String
+        ldarg value
+        call neoCLR.Runtime.StringContainsOrdinal(String,String)
+        ret
+    .end
+
+    .method instance readonly byref StartsWithOrdinal(String value) -> Boolean
+        ldarg this
+        ldobj String
+        ldarg value
+        call neoCLR.Runtime.StringStartsWithOrdinal(String,String)
+        ret
+    .end
+
+    .method instance readonly byref EndsWithOrdinal(String value) -> Boolean
+        ldarg this
+        ldobj String
+        ldarg value
+        call neoCLR.Runtime.StringEndsWithOrdinal(String,String)
+        ret
+    .end
+
     .method instance GetUtf8ByteCount() -> Int32
         ldarg this
         call neoCLR.Runtime.StringByteCount(String)

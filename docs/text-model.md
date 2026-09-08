@@ -93,3 +93,11 @@ Unknown payload types/statuses Fault. The helper no longer constructs bootstrap 
 Reassemble applications and System together. Replace ldcase/is.case after SliceUtf8 with
 ordinary Result and error-case accessors, using the specific error type in signatures.
 There is no parallel Typed method, and JSON format 4 does not imply library ABI stability.
+
+## Explicit ordinal comparison and matching
+
+[Ordinal text operations](ordinal-text.md) now provide String.CompareOrdinal and
+readonly ContainsOrdinal, StartsWithOrdinal and EndsWithOrdinal. Ordering follows
+.NET UTF-16 code units despite UTF-8 storage; matching is exact and case-sensitive.
+These Boolean predicates expose no indexes and do not settle general indexing or
+Length. Culture, normalization and case folding remain future work.

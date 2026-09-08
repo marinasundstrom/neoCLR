@@ -1,0 +1,17 @@
+func Main() -> int {
+    var files = System.Collections.ArrayList<string>.Allocate(0)
+    files.Add("notes.txt")
+    files.Add("café.neo")
+    files.Add("demo.neo")
+    let found = files.Find(name => name.EndsWithOrdinal(".neo") && name.StartsWithOrdinal("café"))
+    found match {
+        Some(let name) => {
+            System.Console.WriteLine(name)
+            if name.ContainsOrdinal("é") && System.String.CompareOrdinal(name, "demo.neo") < 0 {
+                return 42
+            }
+            return -1
+        },
+        None => { return -2 }
+    }
+}

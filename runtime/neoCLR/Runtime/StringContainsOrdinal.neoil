@@ -1,0 +1,3 @@
+.function neoCLR.Runtime.StringContainsOrdinal(String value, String other) -> Boolean
+    .methodimpl InternalCall
+.end

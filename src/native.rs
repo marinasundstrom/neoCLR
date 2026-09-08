@@ -15,6 +15,10 @@ pub(crate) enum Binding {
     WriteLine,
     StringConcat,
     StringByteCount,
+    StringCompareOrdinal,
+    StringContainsOrdinal,
+    StringStartsWithOrdinal,
+    StringEndsWithOrdinal,
     StringSliceUtf8,
     ErrorFromMessage,
     ErrorMessage,
@@ -43,6 +47,18 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         ("neoCLR.Runtime.WriteLine", [Type::String]) => (Binding::WriteLine, Type::Void),
         ("neoCLR.Runtime.StringConcat", [Type::String, Type::String]) => {
             (Binding::StringConcat, Type::String)
+        }
+        ("neoCLR.Runtime.StringCompareOrdinal", [Type::String, Type::String]) => {
+            (Binding::StringCompareOrdinal, Type::Int32)
+        }
+        ("neoCLR.Runtime.StringContainsOrdinal", [Type::String, Type::String]) => {
+            (Binding::StringContainsOrdinal, Type::Boolean)
+        }
+        ("neoCLR.Runtime.StringStartsWithOrdinal", [Type::String, Type::String]) => {
+            (Binding::StringStartsWithOrdinal, Type::Boolean)
+        }
+        ("neoCLR.Runtime.StringEndsWithOrdinal", [Type::String, Type::String]) => {
+            (Binding::StringEndsWithOrdinal, Type::Boolean)
         }
         ("neoCLR.Runtime.StringByteCount", [Type::String]) => {
             (Binding::StringByteCount, Type::Int32)
@@ -169,6 +185,24 @@ impl Binding {
                 value.push_str(left);
                 value.push_str(right);
                 Ok(Value::String(value))
+            }
+            (Self::StringCompareOrdinal, [Value::String(left), Value::String(right)]) => {
+                // .NET ordinal ordering compares UTF-16 units, not UTF-8 bytes or scalars.
+                let order = left.encode_utf16().cmp(right.encode_utf16());
+                Ok(Value::Int32(match order {
+                    std::cmp::Ordering::Less => -1,
+                    std::cmp::Ordering::Equal => 0,
+                    std::cmp::Ordering::Greater => 1,
+                }))
+            }
+            (Self::StringContainsOrdinal, [Value::String(value), Value::String(pattern)]) => {
+                Ok(Value::Boolean(value.contains(pattern.as_str())))
+            }
+            (Self::StringStartsWithOrdinal, [Value::String(value), Value::String(pattern)]) => {
+                Ok(Value::Boolean(value.starts_with(pattern.as_str())))
+            }
+            (Self::StringEndsWithOrdinal, [Value::String(value), Value::String(pattern)]) => {
+                Ok(Value::Boolean(value.ends_with(pattern.as_str())))
             }
             (Self::StringByteCount, [Value::String(value)]) => {
                 let length = i32::try_from(value.len())

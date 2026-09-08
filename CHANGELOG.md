@@ -10,6 +10,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 #### Added
 
+- Added String.CompareOrdinal with .NET-compatible UTF-16 ordering over valid UTF-8
+  text, plus readonly ContainsOrdinal, StartsWithOrdinal and EndsWithOrdinal.
+  Four validated StringOperations helpers support ordinary library IL; no opcode
+  or artifact format change. Added Unicode/empty/NUL coverage, artifact and service
+  checks, a pinned .NET comparison, API tradeoffs and an eager Neo file-name search.
+  Culture, case folding and general string indexing remain deferred.
+
 - Added eager ArrayList.Find, FindIndex and Exists using Func<T,Boolean>. Find returns
   Option<T> so absence never manufactures an invalid/default element. Searches retain
   the initial backing buffer and extent and dispose the managed iterator on normal

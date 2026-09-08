@@ -547,3 +547,11 @@ readonly Equatable implementations. LINQ remains future work.
 ```sh
 cargo run --locked -- run examples/source/predicate-search.neo
 ```
+
+[Ordinal text operations](docs/ordinal-text.md) provide explicit comparison and
+prefix/suffix/containment checks. The file-name search example combines text,
+ArrayList predicates and Option matching:
+
+```sh
+cargo run --locked -- run examples/source/ordinal-text.neo
+```

@@ -186,3 +186,8 @@ The equality receiver alignment and [concrete predicate-search slice](predicate-
 are implemented. Comparer strategies, hashing and further collection operations remain
 planned. LINQ, deferred query execution and query syntax are explicitly future concerns,
 not part of this fundamental API pass.
+
+The first [text slice](ordinal-text.md) is implemented: explicit ordinal comparison
+and prefix/suffix/containment predicates. General indexing, length, construction,
+culture and comparison strategies remain planned. Collection fundamentals are the
+next bounded exploration in this pass.

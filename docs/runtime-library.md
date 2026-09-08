@@ -154,3 +154,7 @@ value arrays of independent System.Reflection descriptors. Parameter and accesso
 metadata preserve managed-reference signatures and receiver/output contracts. See the
 [reflection API guide](reflection.md) for filtering, type-shape queries, storage and
 identity contracts, limitations, and runnable Neo/IL examples.
+
+[Ordinal text operations](ordinal-text.md) add String.CompareOrdinal and readonly
+ContainsOrdinal, StartsWithOrdinal and EndsWithOrdinal. See the text contract for
+UTF-16 ordering over UTF-8 storage, empty patterns and current copying costs.

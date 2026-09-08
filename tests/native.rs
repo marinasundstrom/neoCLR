@@ -23,13 +23,15 @@ fn methodimpl_internalcall_round_trips_as_clr_flag() {
             .iter()
             .filter(|f| f.impl_flags == INTERNAL_CALL)
             .count(),
-        22 // Includes eight metadata-only reflection helpers.
+        27 // Includes nine metadata-only reflection helpers and four ordinal text helpers.
     );
 }
 
 #[test]
 fn native_registry_checks_full_signature_and_implementation_shape() {
     for declaration in [
+        ".function neoCLR.Runtime.StringCompareOrdinal(String,String) -> Boolean\n.methodimpl InternalCall",
+        ".function neoCLR.Runtime.StringContainsOrdinal(String,Int32) -> Boolean\n.methodimpl InternalCall",
         ".function Unknown() -> Void\n.methodimpl InternalCall",
         ".function neoCLR.Runtime.TypeFields(System.RuntimeTypeHandle,Int32) -> Int32\n.methodimpl InternalCall",
         ".function neoCLR.Runtime.TypeShape(Int32,Int32) -> Boolean\n.methodimpl InternalCall",

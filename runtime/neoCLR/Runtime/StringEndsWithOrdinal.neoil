@@ -1,0 +1,3 @@
+.function neoCLR.Runtime.StringEndsWithOrdinal(String value, String other) -> Boolean
+    .methodimpl InternalCall
+.end

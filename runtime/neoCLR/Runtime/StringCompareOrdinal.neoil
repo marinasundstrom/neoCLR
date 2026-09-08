@@ -1,0 +1,3 @@
+.function neoCLR.Runtime.StringCompareOrdinal(String value, String other) -> Int32
+    .methodimpl InternalCall
+.end
