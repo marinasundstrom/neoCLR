@@ -1,0 +1,16 @@
+func Main() -> int {
+    let a = 3.0
+    let b = 4.0
+    let distance = System.Math.Sqrt(a * a + b * b)
+    if distance != 5.0 { return -1 }
+    if System.Math.Round(2.5) != 2.0 { return -2 }
+    if System.Math.Round(3.5) != 4.0 { return -3 }
+    if System.Math.Pow(2.0, 3.0) != 8.0 { return -4 }
+    System.Math.Clamp(100, 0, 42) match {
+        Ok(let value) => {
+            System.Console.WriteLine("Triangle, rounding, power and clamping checked")
+            return value
+        },
+        Error(let error) => { System.Console.WriteLine(error.ToString()); return -5 }
+    }
+}

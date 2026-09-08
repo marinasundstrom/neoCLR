@@ -63,7 +63,30 @@ fn lex(source: &str) -> Result<Vec<Token>, Fault> {
                 .take_while(|c| c.is_ascii_alphanumeric() || *c == b'_')
                 .count()
         } else if first.is_ascii_digit() {
-            rest.bytes().take_while(u8::is_ascii_digit).count()
+            let bytes = rest.as_bytes();
+            let mut length = bytes.iter().take_while(|b| b.is_ascii_digit()).count();
+            if bytes.get(length) == Some(&b'.')
+                && bytes.get(length + 1).is_some_and(u8::is_ascii_digit)
+            {
+                length += 1;
+                while bytes.get(length).is_some_and(u8::is_ascii_digit) {
+                    length += 1;
+                }
+            }
+            if matches!(bytes.get(length), Some(b'e' | b'E')) {
+                length += 1;
+                if matches!(bytes.get(length), Some(b'+' | b'-')) {
+                    length += 1;
+                }
+                let digits = length;
+                while bytes.get(length).is_some_and(u8::is_ascii_digit) {
+                    length += 1;
+                }
+                if length == digits {
+                    return Err(start.error("floating exponent requires digits"));
+                }
+            }
+            length
         } else if first == '"' || first == '\'' {
             let mut escaped = false;
             let mut end = None;
@@ -430,6 +453,7 @@ struct Expr {
 enum ExprKind {
     Lambda(Vec<(Token, Option<Ty>)>, Box<ArmBody>),
     Int(i32),
+    Double(f64),
     String(String),
     Char(u16),
     Bool(bool),
@@ -1302,6 +1326,7 @@ impl Parser {
             };
             self.node(at, kind, 1)?
         } else if at.text == "-"
+            && !self.current().text.contains(['.', 'e', 'E'])
             && self
                 .current()
                 .text
@@ -1338,6 +1363,17 @@ impl Parser {
             let value: String =
                 serde_json::from_str(&at.text).map_err(|_| at.error("invalid string escape"))?;
             self.node(at, ExprKind::String(value), 1)?
+        } else if at.text.as_bytes().first().is_some_and(u8::is_ascii_digit)
+            && at.text.contains(['.', 'e', 'E'])
+        {
+            let value: f64 = at
+                .text
+                .parse()
+                .map_err(|_| at.error("invalid Double literal"))?;
+            if !value.is_finite() {
+                return Err(at.error("Double literal must be finite"));
+            }
+            self.node(at, ExprKind::Double(value), 1)?
         } else if at.text.as_bytes().first().is_some_and(u8::is_ascii_digit) {
             let value = at
                 .text
@@ -2193,6 +2229,10 @@ impl Lowerer<'_> {
                 self.body.push(format!("ldc.i4 {value}"));
                 Ok(Ty::Int)
             }
+            ExprKind::Double(value) => {
+                self.body.push(format!("ldc.r8 {value:?}"));
+                Ok(Ty::Record("System.Double".into()))
+            }
             ExprKind::Char(value) => {
                 self.body
                     .extend([format!("ldc.i4 {value}"), "conv.u2".into()]);
@@ -2286,9 +2326,11 @@ impl Lowerer<'_> {
                     self.body.extend(["ldc.bool false".into(), "ceq".into()]);
                     Ok(Ty::Bool)
                 } else {
-                    self.require(&ty, &Ty::Int, &expression.at)?;
+                    if ty != Ty::Record("System.Double".into()) {
+                        self.require(&ty, &Ty::Int, &expression.at)?;
+                    }
                     self.body.push("neg".into());
-                    Ok(Ty::Int)
+                    Ok(ty)
                 }
             }
             ExprKind::Binary(operation, left, right) => {
@@ -2312,7 +2354,8 @@ impl Lowerer<'_> {
                     return Ok(Ty::Bool);
                 }
                 let equality = operation == "==" || operation == "!=";
-                if !equality || !matches!(ty, Ty::Int | Ty::Bool) {
+                let floating = ty == Ty::Record("System.Double".into());
+                if !floating && (!equality || !matches!(ty, Ty::Int | Ty::Bool)) {
                     self.require(&ty, &Ty::Int, &left.at)?;
                 }
                 let rhs = self.value_expression(right)?;
@@ -2323,6 +2366,8 @@ impl Lowerer<'_> {
                     "*" => "mul",
                     "/" => "div",
                     "==" | "!=" => "ceq",
+                    ">=" if floating => "clt.un",
+                    "<=" if floating => "cgt.un",
                     "<" | ">=" => "clt",
                     _ => "cgt",
                 };
@@ -2331,7 +2376,7 @@ impl Lowerer<'_> {
                     self.body.extend(["ldc.bool false".into(), "ceq".into()]);
                 }
                 Ok(if ["add", "sub", "mul", "div"].contains(&op) {
-                    Ty::Int
+                    ty
                 } else {
                     Ty::Bool
                 })

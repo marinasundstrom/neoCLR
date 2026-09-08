@@ -16,6 +16,7 @@ pub enum RuntimeService {
     NativeInterop,
     StringOperations,
     CharacterClassification,
+    MathOperations,
     ErrorValues,
     FileInput,
     ConsoleInput,
@@ -50,6 +51,7 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
     }
     if function.is_internal_call() {
         let service = match crate::native::bind(function)? {
+            crate::native::Binding::Math(_) => RuntimeService::MathOperations,
             crate::native::Binding::Reflection(_)
             | crate::native::Binding::TypeName
             | crate::native::Binding::TypeEquals

@@ -161,3 +161,7 @@ UTF-16 ordering over UTF-8 storage, empty patterns and current copying costs.
 
 [Character classification](character-classification.md) adds familiar System.Char predicates and
 Neo character literals, including Unicode IsDigit and explicit IsAsciiDigit.
+
+[Fundamental Math operations](math.md) add integer helpers, typed Clamp and core
+Double functions. Neo supports Double literals and same-type arithmetic/comparison;
+`examples/source/math.neo` demonstrates the APIs.

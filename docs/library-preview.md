@@ -191,3 +191,7 @@ The first [text slice](ordinal-text.md) is implemented: explicit ordinal compari
 and prefix/suffix/containment predicates. General indexing, length, construction,
 culture and comparison strategies remain planned. Collection fundamentals are the
 next bounded exploration in this pass.
+
+Character classification and [fundamental Math operations](math.md) now expand the
+text/numeric foundation with Neo samples. The Math subset covers Int32 helpers and
+core Double operations; it does not imply full overload, decimal or MathF coverage.

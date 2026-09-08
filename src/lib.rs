@@ -21,6 +21,7 @@ pub use slots::SlotReference;
 mod char_categories;
 mod file_io;
 pub mod library;
+mod math;
 pub mod memory;
 pub mod metadata;
 mod native;

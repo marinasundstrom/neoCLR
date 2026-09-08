@@ -26,5 +26,155 @@
         ret
     .end
 
-.end
+    .method static Min(Int32 left, Int32 right) -> Int32
+        ldarg left
+        ldarg right
+        blt Left
+        ldarg right
+        ret
+    Left:
+        ldarg left
+        ret
+    .end
 
+    .method static Max(Int32 left, Int32 right) -> Int32
+        ldarg left
+        ldarg right
+        bgt Left
+        ldarg right
+        ret
+    Left:
+        ldarg left
+        ret
+    .end
+
+    .method static Sign(Int32 value) -> Int32
+        ldarg value
+        ldc.i4 0
+        blt Negative
+        ldarg value
+        ldc.i4 0
+        bgt Positive
+        ldc.i4 0
+        ret
+    Negative:
+        ldc.i4 -1
+        ret
+    Positive:
+        ldc.i4 1
+        ret
+    .end
+
+    .method static Clamp(Int32 value, Int32 min, Int32 max) -> System.Result<Int32,System.InvalidRangeError>
+        ldarg min
+        ldarg max
+        bgt Invalid
+        ldarg value
+        ldarg min
+        call System.Math::Max(Int32,Int32)
+        ldarg max
+        call System.Math::Min(Int32,Int32)
+        newobj instance System.Result.Ok<Int32>::.ctor(Int32)
+        newobj instance System.Result<Int32,System.InvalidRangeError>::.ctor(System.Result.Ok<Int32>)
+        ret
+    Invalid:
+        newobj instance System.InvalidRangeError::.ctor()
+        newobj instance System.Result.Error<System.InvalidRangeError>::.ctor(System.InvalidRangeError)
+        newobj instance System.Result<Int32,System.InvalidRangeError>::.ctor(System.Result.Error<System.InvalidRangeError>)
+        ret
+    .end
+
+    .method static Abs(Double value) -> Double
+        ldarg value
+        call neoCLR.Runtime.MathAbs(Double)
+        ret
+    .end
+
+    .method static Sqrt(Double value) -> Double
+        ldarg value
+        call neoCLR.Runtime.MathSqrt(Double)
+        ret
+    .end
+
+    .method static Floor(Double value) -> Double
+        ldarg value
+        call neoCLR.Runtime.MathFloor(Double)
+        ret
+    .end
+
+    .method static Ceiling(Double value) -> Double
+        ldarg value
+        call neoCLR.Runtime.MathCeiling(Double)
+        ret
+    .end
+
+    .method static Truncate(Double value) -> Double
+        ldarg value
+        call neoCLR.Runtime.MathTruncate(Double)
+        ret
+    .end
+
+    .method static Round(Double value) -> Double
+        ldarg value
+        call neoCLR.Runtime.MathRound(Double)
+        ret
+    .end
+
+    .method static Exp(Double value) -> Double
+        ldarg value
+        call neoCLR.Runtime.MathExp(Double)
+        ret
+    .end
+
+    .method static Log(Double value) -> Double
+        ldarg value
+        call neoCLR.Runtime.MathLog(Double)
+        ret
+    .end
+
+    .method static Log10(Double value) -> Double
+        ldarg value
+        call neoCLR.Runtime.MathLog10(Double)
+        ret
+    .end
+
+    .method static Sin(Double value) -> Double
+        ldarg value
+        call neoCLR.Runtime.MathSin(Double)
+        ret
+    .end
+
+    .method static Cos(Double value) -> Double
+        ldarg value
+        call neoCLR.Runtime.MathCos(Double)
+        ret
+    .end
+
+    .method static Tan(Double value) -> Double
+        ldarg value
+        call neoCLR.Runtime.MathTan(Double)
+        ret
+    .end
+
+    .method static Pow(Double left, Double right) -> Double
+        ldarg left
+        ldarg right
+        call neoCLR.Runtime.MathPow(Double,Double)
+        ret
+    .end
+
+    .method static Min(Double left, Double right) -> Double
+        ldarg left
+        ldarg right
+        call neoCLR.Runtime.MathMin(Double,Double)
+        ret
+    .end
+
+    .method static Max(Double left, Double right) -> Double
+        ldarg left
+        ldarg right
+        call neoCLR.Runtime.MathMax(Double,Double)
+        ret
+    .end
+
+.end

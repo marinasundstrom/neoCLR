@@ -1,0 +1,59 @@
+.function neoCLR.Runtime.MathAbs(Double value) -> Double
+    .methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.MathSqrt(Double value) -> Double
+    .methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.MathFloor(Double value) -> Double
+    .methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.MathCeiling(Double value) -> Double
+    .methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.MathTruncate(Double value) -> Double
+    .methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.MathRound(Double value) -> Double
+    .methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.MathExp(Double value) -> Double
+    .methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.MathLog(Double value) -> Double
+    .methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.MathLog10(Double value) -> Double
+    .methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.MathSin(Double value) -> Double
+    .methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.MathCos(Double value) -> Double
+    .methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.MathTan(Double value) -> Double
+    .methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.MathPow(Double left, Double right) -> Double
+    .methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.MathMin(Double left, Double right) -> Double
+    .methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.MathMax(Double left, Double right) -> Double
+    .methodimpl InternalCall
+.end

@@ -558,3 +558,7 @@ cargo run --locked -- run examples/source/ordinal-text.neo
 
 [Character classification](docs/character-classification.md) adds familiar System.Char predicates and
 Neo character literals, including Unicode IsDigit and explicit IsAsciiDigit.
+
+[Fundamental Math operations](docs/math.md) add integer helpers, typed Clamp and core
+Double functions. Neo supports Double literals and same-type arithmetic/comparison;
+`examples/source/math.neo` demonstrates the APIs.

@@ -10,6 +10,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 #### Added
 
+- Added Math.Min/Max/Sign for Int32, typed Result-based Clamp with InvalidRangeError,
+  and Double Abs/Min/Max/Sqrt/Pow/Floor/Ceiling/Truncate/Round/Exp/Log/Log10/Sin/Cos/Tan.
+  Preserved .NET ties-to-even rounding, NaN propagation and signed-zero ordering;
+  Double operations declare MathOperations helpers. Neo now supports finite Double
+  literals and same-type arithmetic/comparison, including unordered NaN behavior.
+  Added API contracts, a Neo sample, .NET probe, artifact and boundary tests.
+
 - Added System.Char digit, letter, case, whitespace, number, punctuation, symbol,
   control, separator, ASCII and surrogate predicates. Library IL uses one checked
   category helper with pinned Unicode 16 data and a CharacterClassification service;

@@ -5,6 +5,7 @@ use crate::{
 };
 
 pub(crate) enum Binding {
+    Math(crate::math::Operation),
     Reflection(crate::reflection::Query),
     TypeName,
     TypeEquals,
@@ -30,6 +31,12 @@ pub(crate) enum Binding {
 pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
     if !function.is_internal_call() || function.instance || function.owner.is_some() {
         return Err(Fault::new("native binding requires InternalCall metadata"));
+    }
+    if let Some((operation, arity)) = crate::math::Operation::binding(&function.name) {
+        if function.parameters != vec![Type::Double; arity] || function.returns != Type::Double {
+            return Err(Fault::new("math binding signature mismatch"));
+        }
+        return Ok(Binding::Math(operation));
     }
     if let Some((query, integer, returns)) = crate::reflection::Query::binding(&function.name) {
         let expected = if integer {
@@ -111,6 +118,9 @@ impl Binding {
         output: &mut Vec<String>,
         console: Option<&dyn crate::Console>,
     ) -> Result<Value, Fault> {
+        if let Self::Math(operation) = self {
+            return operation.invoke(&args);
+        }
         if let Self::Reflection(query) = self {
             return query.invoke(module, &args, limits);
         }

@@ -68,6 +68,7 @@ impl Analysis {
                 }
             }
             ExprKind::Int(_)
+            | ExprKind::Double(_)
             | ExprKind::Char(_)
             | ExprKind::String(_)
             | ExprKind::Bool(_)

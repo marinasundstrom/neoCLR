@@ -42,7 +42,9 @@ Duplicate entries in the supplied service set have no additional effect.
 | FormatInt32 | Validated neoCLR.Runtime.Int32ToString InternalCall |
 | ConsoleOutput | Validated neoCLR.Runtime.WriteLine InternalCall |
 | NativeInterop | P/Invoke declarations |
-| StringOperations | Validated StringConcat, StringByteCount, and StringSliceUtf8 InternalCalls |
+| StringOperations | Validated concat, UTF-8 count/slice and ordinal text InternalCalls |
+| CharacterClassification | Pinned Unicode category lookup used by System.Char predicates |
+| MathOperations | Validated Double Math helper calls; integer Math policy remains IL |
 | ConsoleInput | Validated ConsoleReadByte InternalCall |
 | FileInput | Validated bounded ReadAllText InternalCall |
 | ErrorValues | Validated ErrorFromMessage and ErrorMessage InternalCalls |

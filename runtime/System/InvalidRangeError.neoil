@@ -1,0 +1,10 @@
+.type System.InvalidRangeError
+    .method instance .ctor() -> Void
+        ldvoid
+        ret
+    .end
+    .method instance ToString() -> String
+        ldstr "InvalidRange"
+        ret
+    .end
+.end

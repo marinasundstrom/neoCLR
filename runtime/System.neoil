@@ -25,6 +25,8 @@
 .include "System/Int32.neoil"
 .include "System/Console.neoil"
 .include "System/Math.neoil"
+.include "System/InvalidRangeError.neoil"
+.include "neoCLR/Runtime/Math.neoil"
 .include "neoCLR/Runtime/WriteLine.neoil"
 .include "neoCLR/Runtime/Int32ToString.neoil"
 .include "neoCLR/Runtime/ParseInt32.neoil"

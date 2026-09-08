@@ -35,7 +35,7 @@ fn runtime_library_is_assembled_platform_code() {
             .iter()
             .filter(|f| f.is_internal_call())
             .count(),
-        28 // Includes metadata reflection, ordinal text and character category helpers.
+        43 // Includes reflection, text, character category and 15 floating math helpers.
     );
     assert!(
         module

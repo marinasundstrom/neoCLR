@@ -101,7 +101,7 @@ arguments        = "(", newlines,
                      { ",", newlines, argument, newlines } ], ")" ;
 argument         = [ "out" ], expression ;
 generic_member   = qualified_name, "<", type, { ",", type }, ">", ".", identifier ;
-primary          = generic_member | integer | string | character | "true" | "false" | "this" | identifier
+primary          = generic_member | integer | floating | string | character | "true" | "false" | "this" | identifier
                  | "[", newlines, expression, newlines, { ",", newlines, expression, newlines }, "]"
                  | ("typeof" | "default"), "(", newlines, type, newlines, ")"
                  | "(", newlines, expression, newlines, ")" ;
@@ -110,9 +110,11 @@ primary          = generic_member | integer | string | character | "true" | "fal
 Member access and calls bind most tightly, then unary operations, interface projection with `as`, multiplication and
 division, addition and subtraction, ordering comparisons, equality, `&&`, then `||`.
 Binary operators associate to the left. Conditions require Boolean; `&&` and `||`
-short-circuit. Ordering uses Int32; equality supports Int32 and Boolean.
+short-circuit. Ordering supports Int32 and Double; equality also supports Boolean.
+Double ordering is false for NaN, while inequality is true.
 `&counter.Age` therefore addresses the field; `reference + 1` automatically reads a
-managed integer reference. All arithmetic in this subset uses Int32. Unary `*` is not
+managed integer reference. Arithmetic uses matching Int32 or Double operands; mixed operands require a future
+explicit conversion facility. Unary `*` is not
 a managed-reference operator; pointer syntax is still outside this grammar.
 
 The grammar permits general postfix shapes, but semantic checks restrict calls to
@@ -142,7 +144,10 @@ names. Fields, parameters and bindings must be unique in their applicable scope.
 
 Integer tokens contain decimal digits only. Positive literals must fit Int32; a
 literal immediately prefixed by minus may represent -2147483648. No suffixes, digit
-separators or floating literals are implemented. Strings use double quotes and
+separators are implemented. Double literals have a fractional part or exponent:
+`digits, [ ".", digits ], [ ("e" | "E"), [ "+" | "-" ], digits ]`, with at least
+a fraction or exponent. A decimal point requires digits on both sides; exponents
+require digits. Literals must be finite and lower to ldc.r8. Strings use double quotes and
 JSON-style escapes, including Unicode escapes; raw line breaks are rejected.
 Character literals use single quotes around one UTF-16 unit or an escape; see
 [character classification](character-classification.md) for the bounded escape grammar.

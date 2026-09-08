@@ -140,8 +140,8 @@ The [Neo grammar](neo-grammar.md) gives the implemented EBNF and lexical rules.
 - Source interfaces, record instance methods with managed `this`, explicit `as Contract&` projections and contextual managed reference conversions.
 - Initialized `let`/`var` bindings with optional type annotations.
 - `int`/`Int32`, `string`/`String`, `bool`/`Boolean`, `()`/`unit`/`Void`, named records and T&.
-- Int32 arithmetic with `+`, `-`, `*`, `/`, parentheses and unary minus; runtime arithmetic semantics apply.
-- Integer, Boolean and double-quoted string literals; strings use JSON-style escapes.
+- Int32 and Double arithmetic with `+`, `-`, `*`, `/`, parentheses and unary minus; runtime arithmetic semantics apply.
+- Integer, finite Double, Boolean, single-quoted Char and double-quoted String literals; strings use JSON-style escapes.
 - Explicit reference formation, automatic managed-reference access, heap construction and typed returns.
 - Exhaustive union match expressions/statements, case payload bindings and wildcards.
 - Closed generic type annotations and public static/ordinary instance bundled System calls.
@@ -149,7 +149,7 @@ The [Neo grammar](neo-grammar.md) gives the implemented EBNF and lexical rules.
 - `typeof(T)` returning System.Type, and read-only public System property access.
 - `Console.WriteLine` for int and string. `import System.Console.*` enables unqualified `WriteLine`.
 - `if`/`else`, `while`, integer-range `for`, `loop`, `break` and `continue`.
-- Int32 comparisons, Int32/Boolean equality, and short-circuit `&&`/`||` with `!`.
+- Int32/Double comparisons, Int32/Double/Boolean equality, and short-circuit `&&`/`||` with `!`.
 - Newline or semicolon statement separators and `//` comments.
 
 Non-Void functions need an explicit return on every fallthrough path. Both `if` arms
@@ -510,3 +510,7 @@ search using ArrayList, a predicate and Option matching.
 
 [Character classification](character-classification.md) adds familiar System.Char predicates and
 Neo character literals, including Unicode IsDigit and explicit IsAsciiDigit.
+
+[Fundamental Math operations](math.md) add integer helpers, typed Clamp and core
+Double functions. Neo supports Double literals and same-type arithmetic/comparison;
+`examples/source/math.neo` demonstrates the APIs.
