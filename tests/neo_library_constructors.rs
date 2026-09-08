@@ -63,7 +63,7 @@ fn invalid_constructors_and_unclosed_generic_cases_are_rejected() {
         "System.Result.Ok<int>(true)",
         "System.Result.Ok<int>()",
         "System.Result.Ok<int, string>(42)",
-        "System.Result.Ok(42)",
+        "System.Result.Ok()",
         "Result<int, string>(42)",
         "System.Collections.ArrayListState<int>()",
         "System.Option.Some<int>(42, 43)",
@@ -104,4 +104,57 @@ func Main() -> int {
 }
 "#;
     assert_eq!(run(source).value, Value::Int32(42));
+}
+
+#[test]
+fn inferred_cases_preserve_argument_types_before_carrier_conversion() {
+    let source = r#"
+record Counter(Value: int)
+func Wrap<T>(value: T) -> System.Option.Some<T> { return System.Option.Some(value) }
+func Nothing() -> () {}
+func Main() -> int {
+    let counter = new Counter(40)
+    let ok = System.Result.Ok(counter)
+    let result: Result<Counter&, string> = ok
+    let Ok(alias) = result else { return -1 }
+    if !ReferenceEquals(alias, counter) { return -2 }
+    let wrapped = Wrap(alias)
+    wrapped.Value.Value = 42
+    let view: readonly Counter& = counter
+    let some = System.Option.Some(view)
+    let readonlyOption: Option<readonly Counter&> = some
+    let empty: Result<Void, string> = System.Result.Ok(Nothing())
+    if let Ok(_) = empty { return wrapped.Value.Value }
+    return -3
+}
+"#;
+    assert_eq!(run(source).value, Value::Int32(42));
+}
+
+#[test]
+fn constructor_inference_is_bounded_and_evaluates_arguments_once() {
+    let mut expression = "Next(&calls)".to_owned();
+    for _ in 0..24 {
+        expression = format!("System.Option.Some({expression})");
+    }
+    let source = format!(
+        "func Next(calls: int&) -> int {{ calls = calls + 1; return 42 }} func Main() -> int {{ var calls = 0; let value = {expression}; return calls }}"
+    );
+    assert_eq!(run(&source).value, Value::Int32(1));
+}
+
+#[test]
+fn carrier_target_does_not_supply_or_override_constructor_evidence() {
+    for statement in [
+        "let result: Result<Void, string> = System.Result.Ok(42)",
+        "let result: Result<int, string> = Result(System.Result.Ok(42))",
+        "let value = System.Result.Ok<int>(true)",
+        "let value = System.Option.Some()",
+        "let value = Ok(42)",
+    ] {
+        assert!(
+            frontend::compile(&format!("func Main() -> () {{ {statement} }}")).is_err(),
+            "{statement}"
+        );
+    }
 }

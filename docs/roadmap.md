@@ -363,6 +363,14 @@ metadata foundation and marker attributes are implemented. Format 4 removed the
 old union-specific instructions and runtime categories; older artifacts require
 reassembly. See [union conventions](union-convention.md).
 
+Neo now constructs independent bundled cases with argument-based generic inference,
+then converts them through a marked carrier's accepting constructor when context
+requires it. This compiler projection follows the documented Raven case-first model;
+the CLR-like runtime continues to execute ordinary closed constructor calls. Next add
+external case imports for short `Ok(42)` spelling; generic source union declarations
+remain a separate capability. See [constructor inference](neo-library-constructors.md)
+for comparison, conservative ambiguity rules and validation boundaries.
+
 TryGet overloads extract Some/None or Ok/Error case values into caller-provided
 managed output slots. The metadata contract is out(true) Case&; successful direct
 Boolean branches establish initialization. Console/file samples demonstrate this

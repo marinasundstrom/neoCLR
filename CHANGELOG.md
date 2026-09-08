@@ -8,25 +8,33 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-09
 
+- Added argument-based generic library constructor inference in Neo, so
+  `System.Result.Ok(42)` constructs an independent `Ok<int>` before any carrier
+  conversion. Inference preserves reference payloads, requires evidence for every
+  owner parameter and never uses a carrier target to override argument types.
+  Explicit type arguments remain available; external case imports remain future work.
+  Updated the example, language guidance and Raven/.NET comparison, with regressions
+  for nested inference, once-only evaluation and incompatible carrier targets.
+  Split source-call and constructor lowering to reduce recursive compiler stack use.
+
 - Added implicit Neo case-to-carrier conversion for marked bundled union types using
   the unique public constructor accepting the exact case value type. Expected types
   in annotations, returns, arguments and storage supply the carrier; ordinary unmarked
   constructors do not enable conversion. Added Raven implementation research, an
-  updated case example and type/reference/lifetime regressions. Generic constructor
-  inference and external case imports remain separate; runtime instructions are unchanged.
+  updated case example and type/reference/lifetime regressions. External case imports
+  remain separate; runtime instructions are unchanged.
 
 - Added explicit public library constructor calls in Neo, including standalone
   System.Result.Ok<T>/Error<E> and System.Option.Some<T>/None values and explicit
   overloaded carrier construction. Metadata supplies parameter context for reference,
   readonly, delegate and Void payloads; arguments execute once. Added an example,
-  API/grammar guidance and regressions. Generic constructor inference, external case
-  imports and implicit external carrier conversion remain future work.
+  API/grammar guidance and regressions. External case imports remain future work.
 
 - Added file-wide Neo imports of declared source union cases, including constructor
   calls and type annotations, with duplicate-import handling, ambiguity diagnostics
   and local/declaration precedence. Updated the order workflow to import PurchaseError
-  cases and documented grammar and .NET lookup comparison. External case imports,
-  generic union declarations and generic constructor inference remain future work;
+  cases and documented grammar and .NET lookup comparison. External case imports
+  and generic union declarations remain future work;
   emitted case identities and runtime contracts are unchanged.
 
 - Added a reference-view example covering generic forwarding, base/interface views,

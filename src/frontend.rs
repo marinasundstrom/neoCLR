@@ -2714,90 +2714,14 @@ impl Lowerer<'_> {
         ));
         Ok(Ty::Record(name.into()))
     }
-    fn call(&mut self, callee: &Expr, arguments: &[Expr]) -> Result<Ty, Fault> {
-        if let Some(ty) = self.imported_call(callee, arguments)? {
-            return Ok(ty);
-        }
-        if let Some(path) = Self::qualified_name(callee)
-            .filter(|path| !self.bindings.contains_key(path.split('.').next().unwrap()))
-        {
-            if let Some(union) = self.source.unions.iter().find(|u| u.name.text == path) {
-                if arguments.len() != 1 {
-                    return Err(callee
-                        .at
-                        .error("union constructor requires one variant value"));
-                }
-                let actual = self.value_expression(&arguments[0])?;
-                if !union.variants.contains(&actual) {
-                    return Err(callee
-                        .at
-                        .error("no union constructor accepts this variant type"));
-                }
-                self.body
-                    .push(format!("newobj instance {path}::.ctor({})", actual.il()));
-                return Ok(Ty::Record(path));
-            }
-            if self.source.records.iter().any(|r| r.name.text == path)
-                && !matches!(&callee.kind, ExprKind::Name(name) if name == &path)
-            {
-                let named = Expr {
-                    kind: ExprKind::Name(path),
-                    ..callee.clone()
-                };
-                return self.call(&named, arguments);
-            }
-        }
-        let (callee, type_arguments) = match &callee.kind {
-            ExprKind::Generic(callee, types) => (callee.as_ref(), types.as_slice()),
-            _ => (callee, &[][..]),
-        };
-        if let Some(path) = Self::qualified_name(callee) {
-            if !path
-                .split('.')
-                .next()
-                .is_some_and(|n| self.bindings.contains_key(n))
-            {
-                let name = if type_arguments.is_empty() {
-                    path
-                } else {
-                    format!(
-                        "{path}<{}>",
-                        type_arguments
-                            .iter()
-                            .map(Ty::il)
-                            .collect::<Vec<_>>()
-                            .join(",")
-                    )
-                };
-                if crate::assembler::parse_type(&name).is_ok()
-                    && self
-                        .delegate_signature(&Ty::Record(name.clone()))?
-                        .is_some()
-                {
-                    if arguments.len() != 1 {
-                        return Err(callee
-                            .at
-                            .error("delegate construction requires one method group"));
-                    }
-                    return self.expression_for(&arguments[0], &Ty::Record(name));
-                }
-            }
-        }
-        // Keep the successful speculative lowering so receiver expressions execute once.
-        let mut probe = self.clone();
-        if let Ok(ty) = probe.expression(callee) {
-            let target = match &ty {
-                Ty::Ref(t) | Ty::ReadOnlyRef(t) => t.as_ref(),
-                t => t,
-            };
-            if self.delegate_signature(target)?.is_some() {
-                if !type_arguments.is_empty() {
-                    return Err(callee.at.error("delegate invocation is not generic"));
-                }
-                *self = probe;
-                return self.invoke_delegate(&ty, arguments, &callee.at);
-            }
-        }
+    // Keep source generic inference out of the general call frame: nested library
+    // constructors do not need to retain its speculative state on their stack.
+    fn source_function_call(
+        &mut self,
+        callee: &Expr,
+        type_arguments: &[Ty],
+        arguments: &[Expr],
+    ) -> Result<Option<Ty>, Fault> {
         if let Some(path) = Self::qualified_name(callee) {
             let bound = path
                 .split('.')
@@ -2946,12 +2870,111 @@ impl Lowerer<'_> {
                         .collect::<Vec<_>>()
                         .join(",")
                 ));
-                return Ok(returns);
+                return Ok(Some(returns));
             }
+        }
+        Ok(None)
+    }
+
+    fn call(&mut self, callee: &Expr, arguments: &[Expr]) -> Result<Ty, Fault> {
+        if let Some(ty) = self.imported_call(callee, arguments)? {
+            return Ok(ty);
+        }
+        if let Some(path) = Self::qualified_name(callee)
+            .filter(|path| !self.bindings.contains_key(path.split('.').next().unwrap()))
+        {
+            if let Some(union) = self.source.unions.iter().find(|u| u.name.text == path) {
+                if arguments.len() != 1 {
+                    return Err(callee
+                        .at
+                        .error("union constructor requires one variant value"));
+                }
+                let actual = self.value_expression(&arguments[0])?;
+                if !union.variants.contains(&actual) {
+                    return Err(callee
+                        .at
+                        .error("no union constructor accepts this variant type"));
+                }
+                self.body
+                    .push(format!("newobj instance {path}::.ctor({})", actual.il()));
+                return Ok(Ty::Record(path));
+            }
+            if self.source.records.iter().any(|r| r.name.text == path)
+                && !matches!(&callee.kind, ExprKind::Name(name) if name == &path)
+            {
+                let named = Expr {
+                    kind: ExprKind::Name(path),
+                    ..callee.clone()
+                };
+                return self.call(&named, arguments);
+            }
+        }
+        let (callee, type_arguments) = match &callee.kind {
+            ExprKind::Generic(callee, types) => (callee.as_ref(), types.as_slice()),
+            _ => (callee, &[][..]),
+        };
+        if let Some(path) = Self::qualified_name(callee) {
+            if !path
+                .split('.')
+                .next()
+                .is_some_and(|n| self.bindings.contains_key(n))
+            {
+                let name = if type_arguments.is_empty() {
+                    path
+                } else {
+                    format!(
+                        "{path}<{}>",
+                        type_arguments
+                            .iter()
+                            .map(Ty::il)
+                            .collect::<Vec<_>>()
+                            .join(",")
+                    )
+                };
+                if crate::assembler::parse_type(&name).is_ok()
+                    && self
+                        .delegate_signature(&Ty::Record(name.clone()))?
+                        .is_some()
+                {
+                    if arguments.len() != 1 {
+                        return Err(callee
+                            .at
+                            .error("delegate construction requires one method group"));
+                    }
+                    return self.expression_for(&arguments[0], &Ty::Record(name));
+                }
+            }
+        }
+        // Keep the successful speculative lowering so receiver expressions execute once.
+        let mut probe = self.clone();
+        if let Ok(ty) = probe.expression(callee) {
+            let target = match &ty {
+                Ty::Ref(t) | Ty::ReadOnlyRef(t) => t.as_ref(),
+                t => t,
+            };
+            if self.delegate_signature(target)?.is_some() {
+                if !type_arguments.is_empty() {
+                    return Err(callee.at.error("delegate invocation is not generic"));
+                }
+                *self = probe;
+                return self.invoke_delegate(&ty, arguments, &callee.at);
+            }
+        }
+        if let Some(ty) = self.source_function_call(callee, type_arguments, arguments)? {
+            return Ok(ty);
         }
         if let Some(ty) = self.library_constructor(callee, type_arguments, arguments)? {
             return Ok(ty);
         }
+        self.remaining_call(callee, type_arguments, arguments)
+    }
+
+    fn remaining_call(
+        &mut self,
+        callee: &Expr,
+        type_arguments: &[Ty],
+        arguments: &[Expr],
+    ) -> Result<Ty, Fault> {
         if !type_arguments.is_empty() {
             if let Some((owner, member)) = Self::qualified_name(callee)
                 .as_deref()

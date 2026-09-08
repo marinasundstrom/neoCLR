@@ -43,7 +43,7 @@ cargo test --locked --test neo_result_factories --test neo_match --test referenc
 `System.Result.Ok<int>(42)` now constructs an independent case value, and
 `Result<int,string>(ok)` explicitly invokes the carrier constructor accepting it.
 See [library constructor calls](neo-library-constructors.md) for normal metadata
-lookup, argument context and current limits. Generic argument inference remains separate. [Case-to-carrier conversion](case-to-carrier-conversion.md)
+lookup, argument context and current limits. `System.Result.Ok(42)` also infers the case argument from its payload. [Case-to-carrier conversion](case-to-carrier-conversion.md)
 now invokes the accepting public constructor when a marked bundled carrier is expected.
 
 ## Planned case projection: Raven's model

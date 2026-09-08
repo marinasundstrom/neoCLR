@@ -85,5 +85,5 @@ The sample prints 42 twice and returns 42. Tests cover annotations, returns, par
 fields, arrays and collection setters; Option/Result and nested carriers; generic
 reference payloads; once-only evaluation; unmarked/wrong-case/wrong-type rejection;
 readonly payload retention under collection pressure, invariant generic case arguments,
-and runtime frame escape rejection. Generic constructor inference and external case
-imports remain the next independent pieces.
+and runtime frame escape rejection. [Generic constructor inference](neo-library-constructors.md#constructor-argument-inference)
+is now available independently; external case imports remain future work.
