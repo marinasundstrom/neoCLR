@@ -3,6 +3,7 @@
 mod closures;
 mod conditional;
 mod constructors;
+mod generic_records;
 mod imports;
 mod library;
 mod unions;
@@ -276,6 +277,7 @@ struct Field {
 }
 struct Record {
     name: Token,
+    generic_parameters: Vec<String>,
     is_class: bool,
     field_initializers: Vec<(Token, Expr)>,
     is_abstract: bool,
@@ -999,6 +1001,9 @@ impl Parser {
                     self.expect("record")?;
                 }
                 let name = self.name()?;
+                let generic_parameters = self.type_parameters()?;
+                let saved_generics =
+                    std::mem::replace(&mut self.generic_names, generic_parameters.clone());
                 let mut fields = if is_class {
                     Vec::new()
                 } else {
@@ -1051,7 +1056,17 @@ impl Parser {
                         body: Vec::new(),
                     });
                 }
+                self.generic_names = saved_generics;
+                if !generic_parameters.is_empty()
+                    && (is_class
+                        || is_abstract
+                        || !implements.is_empty()
+                        || !members.methods.is_empty())
+                {
+                    return Err(name.error("generic source types currently require plain records without methods or inheritance"));
+                }
                 source.records.push(Record {
+                    generic_parameters,
                     is_class,
                     field_initializers: members.initializers,
                     is_abstract,
@@ -1928,18 +1943,16 @@ impl Lowerer<'_> {
             return Err(name.error("field access requires a record"));
         };
         self.source
-            .records
-            .iter()
-            .find(|definition| &definition.name.text == record)
-            .and_then(|definition| {
-                definition
-                    .fields
-                    .iter()
+            .record_fields(owner)?
+            .and_then(|fields| {
+                fields
+                    .into_iter()
                     .find(|field| field.name.text == name.text)
             })
-            .map(|field| field.ty.clone())
+            .map(|field| field.ty)
             .ok_or_else(|| name.error(format!("unknown field {}.{}", record, name.text)))
     }
+
     fn read(&mut self, ty: Ty) -> Ty {
         if let Ty::Ref(target) | Ty::ReadOnlyRef(target) = ty {
             self.body.push(format!("ldobj {}", target.il()));
@@ -2961,6 +2974,9 @@ impl Lowerer<'_> {
             }
         }
         if let Some(ty) = self.source_function_call(callee, type_arguments, arguments)? {
+            return Ok(ty);
+        }
+        if let Some(ty) = self.generic_record_constructor(callee, type_arguments, arguments)? {
             return Ok(ty);
         }
         if let Some(ty) = self.library_constructor(callee, type_arguments, arguments)? {
@@ -4319,7 +4335,7 @@ pub fn lower_to_il_named(source: &str, document: &str) -> Result<String, Fault> 
         il.push_str(&format!(
             ".type {}{}\n",
             if record.is_abstract { "abstract " } else { "" },
-            record.name.text
+            record.declaration_name()
         ));
         for interface in &record.implements {
             if !source

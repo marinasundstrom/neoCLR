@@ -26,6 +26,7 @@ pub(super) fn parse(parser: &mut Parser, source: &mut Source) -> Result<(), Faul
             };
             variants.push(Ty::Record(case.text.clone()));
             source.records.push(Record {
+                generic_parameters: Vec::new(),
                 name: case,
                 fields,
                 is_class: false,

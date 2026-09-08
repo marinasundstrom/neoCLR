@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-09
 
+- Added plain generic Neo record declarations with explicit positional construction,
+  substituted fields, generic function forwarding and heap construction. Emitted
+  generic definitions reuse the existing runtime metadata and lifetime rules; reference
+  payloads preserve identity. Added an example, grammar/API guidance, .NET comparison
+  and regressions. Generic record methods/classes, source unions, inheritance and
+  source constructor inference remain separate slices.
+
 - Updated the order workflow to use imported inferred Ok/Error cases and conditional
   Option/Result bindings, with explicit PurchaseError conversion for nested errors.
   Added zero-quantity scenario coverage and regressions for rejected-purchase side effects,

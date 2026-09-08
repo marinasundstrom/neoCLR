@@ -66,6 +66,21 @@ impl Lowerer<'_> {
         let ExprKind::Call(callee, _) = &value.kind else {
             return Err(expression.at.error("new requires record construction"));
         };
+        if let ExprKind::Generic(target, _) = &callee.kind {
+            let name = Self::qualified_name(target)
+                .ok_or_else(|| expression.at.error("new requires record construction"))?;
+            if !self
+                .source
+                .records
+                .iter()
+                .any(|record| record.name.text == name)
+            {
+                return Err(expression.at.error("new requires record construction"));
+            }
+            let ty = self.expression(value)?;
+            self.body.push("heap.new".into());
+            return Ok(Ty::Ref(Box::new(ty)));
+        }
         let name = Self::qualified_name(callee)
             .ok_or_else(|| expression.at.error("new requires record construction"))?;
         let resolved = imports::lookup(&self.source.case_aliases, &name, &callee.at)?

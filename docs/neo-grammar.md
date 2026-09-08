@@ -25,7 +25,7 @@ class_decl       = [ "abstract" ], "class", identifier, [ ":", type, { ",", type
                    newlines, "{", separators, { class_member, separators }, "}" ;
 class_member     = class_field | record_member ;
 class_field      = "var", identifier, ":", type, [ "=", expression ], terminator ;
-record_decl      = [ "abstract" ], "record", identifier, field_list, [ ":", type, { ",", type } ],
+record_decl      = [ "abstract" ], "record", identifier, [ generic_parameters ], field_list, [ ":", type, { ",", type } ],
                    (terminator | newlines, "{", separators, { record_member, separators }, "}") ;
 record_member    = init_decl | explicit_method | "static", generic_function_member | [ "readonly" ], [ "abstract" ], [ "virtual" | "override" ], method_decl ;
 init_decl        = "init", parameter_list, [ ":", "base", "(", newlines, [ expression, { ",", newlines, expression } ], newlines, ")" ],
@@ -76,8 +76,9 @@ introduce nested scopes; active names cannot be shadowed, but sibling scopes may
 Types resolve to `int`/`Int32`, `string`/`String`, `bool`/`Boolean`, `unit`/`Void`/`()`,
 or a declared record, interface or bundled System type. Qualified names and closed generic
 arguments are supported; Option/Result abbreviate System.Option/System.Result. One
-`&` suffix forms a managed reference. Raw pointer syntax and generic type declarations
-are unsupported. Free functions and static methods accept generic parameters. Runtime restrictions on ByRef generic arguments still apply.
+`&` suffix forms a managed reference. Plain [generic record declarations](generic-source-records.md) are supported with
+explicit constructor type arguments. Generic classes, methods on generic records,
+generic source unions and raw pointer syntax remain unsupported. Free functions and static methods accept generic parameters. Runtime restrictions on ByRef generic arguments still apply.
 
 ## Expressions
 

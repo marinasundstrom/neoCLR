@@ -240,3 +240,9 @@ now combines imported inferred cases, explicit nested domain-error conversion an
 conditional bindings. Reference identity, receipt snapshots and rejected-purchase side
 effects are covered together. Next investigate generic source type/union declarations;
 error propagation syntax and richer patterns remain later usability questions.
+
+[Plain generic source records](generic-source-records.md) now emit generic type metadata
+and support substituted fields, explicit positional construction, generic forwarding,
+value copies and managed-reference storage. Next extend generic source unions and their
+independent case types; generic record methods, classes, inheritance and constructor
+inference remain separate steps. This uses the existing CLR-like metadata foundation.

@@ -1,0 +1,27 @@
+import System.Console.*
+
+record Box<T>(Value: T)
+record Entry<K,V>(Key: K, Value: V)
+record Counter(Value: int)
+
+func Wrap<T>(value: T) -> Box<T> {
+    return Box<T>(value)
+}
+
+func Main() -> int {
+    var original = Box<int>(40)
+    var snapshot = original
+    snapshot.Value = 42
+    WriteLine(original.Value)
+    WriteLine(snapshot.Value)
+
+    let counter = new Counter(40)
+    let shared = Wrap(counter)
+    shared.Value.Value = 42
+    let entry = Entry<string, Box<Counter&>>("counter", shared)
+    if !ReferenceEquals(entry.Value.Value, counter) { return -1 }
+
+    let heap = new Box<int>(entry.Value.Value.Value)
+    let address: int& = &heap.Value
+    return address
+}

@@ -368,7 +368,9 @@ then converts them through a marked carrier's accepting constructor when context
 requires it. This compiler projection follows the documented Raven case-first model;
 the CLR-like runtime continues to execute ordinary closed constructor calls. Bundled case imports now provide short
 `Ok(42)` spelling through `import System.Result.*`; generic source union declarations
-remain a separate capability. See [constructor inference](neo-library-constructors.md)
+remain a separate capability. [Plain generic source records](generic-source-records.md)
+now provide the field-substitution and generic metadata foundation for that work.
+See [constructor inference](neo-library-constructors.md)
 for comparison, conservative ambiguity rules and validation boundaries.
 
 TryGet overloads extract Some/None or Ok/Error case values into caller-provided

@@ -169,8 +169,9 @@ Reference-valued fields may contain heap-backed references; scoped targets in th
 fields fault at runtime. This compiler does not perform complete static lifetime
 analysis, so some invalid programs fail only during execution.
 
-Uninitialized bindings, generic type declarations, overload declarations,
-inheritance, general patterns, native pointers/interop, pinning and full Raven syntax
+Plain [generic records](generic-source-records.md) now support typed fields and
+explicit construction. Generic classes/unions and members on generic records, overload
+declarations, general patterns, native pointers/interop, pinning and full Raven syntax
 are not implemented. It does not expose the entire standard library yet. These are
 candidate future slices, chosen around end-to-end scenarios rather than added as a
 complete language up front.
