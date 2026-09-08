@@ -27,8 +27,9 @@ The [runtime groundwork review](runtime-groundwork-review.md) led to implemented
 a language responsibility; runtime-protected slots are not on the immediate track.
 [Interface inheritance](interface-inheritance.md) now provides transitive contracts,
 base views and reflection. [Inherited value layout and BaseType](inherited-layout.md) establish the first
-record-base metadata/storage slice. Base-reference views, construction contracts and
-virtual dispatch remain the next object-model foundation. Activation ownership, external roots and cleanup need decisions before
+record-base metadata/storage slice. [Base-reference views](base-views.md) preserve
+complete owners; inherited behavior, construction contracts and virtual dispatch
+remain the next object-model foundation. Activation ownership, external roots and cleanup need decisions before
 escaping callbacks or suspension.
 
 ## Projected exploration order

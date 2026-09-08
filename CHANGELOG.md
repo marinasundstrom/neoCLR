@@ -10,6 +10,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 #### Added
 
+- Managed base-reference views through castclass and implicit/explicit Neo ancestor
+  projections. Views preserve location identity, derived GetType, complete-owner GC
+  lifetime and readonly access. ldfld now reads managed record references directly.
+  Whole-value reads/writes/reset/out through projected views fault to prevent slicing;
+  downcasts and native casts remain unsupported. Added source/artifact and unchecked
+  runtime tests, examples and API/IL migration documentation. Rust Instruction
+  matches must handle CastClass; new opcode artifacts require this runtime revision.
+
 - Preliminary record-base metadata and inherited value layout through IL `.extends`
   and Neo record bases. Aggregate construction/defaulting includes inherited fields,
   generic bases substitute recursively, and field visibility retains its declaring

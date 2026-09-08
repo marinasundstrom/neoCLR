@@ -6,7 +6,8 @@ contracts and their Neo projection. [Interface inheritance](interface-inheritanc
 remains planned.
 
 Status: [inherited value layout and BaseType](inherited-layout.md) are implemented
-as preliminary groundwork. Base references, virtual dispatch, constructor chaining
+as preliminary groundwork. [Base references](base-views.md) are now implemented;
+virtual dispatch, constructor chaining
 and common Object methods remain planned. The existing interface system and Equatable<T> remain
 available. Heap allocation and managed references are independent of this proposal.
 

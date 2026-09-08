@@ -139,6 +139,8 @@ fn analyze_function(
             ) => state.initialized[*index] = true,
             (
                 Op::ReferenceType
+                | Op::CastClass(_)
+                | Op::Field(_)
                 | Op::LoadObject(_)
                 | Op::FieldAddress(_)
                 | Op::ArrayAddress(_)
@@ -160,7 +162,12 @@ fn analyze_function(
             && !state.receiver_initialized
             && matches!(
                 op,
-                Op::LoadObject(_) | Op::FieldAddress(_) | Op::BorrowInterface(_) | Op::Store(_)
+                Op::LoadObject(_)
+                    | Op::Field(_)
+                    | Op::CastClass(_)
+                    | Op::FieldAddress(_)
+                    | Op::BorrowInterface(_)
+                    | Op::Store(_)
             )
             && matches!(
                 inputs.first(),
@@ -411,7 +418,7 @@ fn effect(module: &Module, op: &Op, arity: usize) -> Result<(usize, usize), Faul
             (target.parameters.len() + usize::from(target.instance), 1)
         }
         Construct(target) => (target.parameters.len(), 1),
-        BorrowInterface(_) | PackValue(_) | IsValue(_) | UnpackValue(_) => (1, 1),
+        CastClass(_) | BorrowInterface(_) | PackValue(_) | IsValue(_) | UnpackValue(_) => (1, 1),
         ReferenceEqual | SetField(_) | PointerAdd | BitAnd | BitOr | BitXor | ShiftLeft
         | ShiftRight | ShiftRightUnsigned | Remainder | RemainderUnsigned | Add | Sub | Mul
         | AddChecked | SubChecked | MulChecked | Divide | AddCheckedUnsigned
@@ -700,6 +707,21 @@ fn typed_effect(
             Result::Ok(vec![])
         }
         Dup => Result::Ok(vec![values[0].clone(), values[0].clone()]),
+        CastClass(target) => {
+            let T::ByRef(source) = exact(&values[0])? else {
+                return Err(crate::Fault::new(
+                    "castclass requires a managed record reference",
+                ));
+            };
+            crate::inheritance::require_base(module, source, target)?;
+            if matches!(values[0], StackType::Readonly(_)) {
+                Ok(vec![StackType::Readonly(T::ByRef(Box::new(
+                    target.clone(),
+                )))])
+            } else {
+                one(T::ByRef(Box::new(target.clone())))
+            }
+        }
         BorrowInterface(interface) => match exact(&values[0])? {
             T::ByRef(concrete) => {
                 crate::interfaces::ensure_implementation(module, concrete, interface)?;
@@ -793,7 +815,15 @@ fn typed_effect(
             }
             one(ty.clone())
         }
-        Field(index) => Result::Ok(vec![loaded(&field(exact(&values[0])?, *index)?)]),
+        Field(index) => {
+            let owner = exact(&values[0])?;
+            let owner = if let T::ByRef(target) = owner {
+                target.as_ref()
+            } else {
+                owner
+            };
+            Result::Ok(vec![loaded(&field(owner, *index)?)])
+        }
         SetField(index) => {
             stored(&values[1], &field(exact(&values[0])?, *index)?)?;
             Result::Ok(vec![values[0].clone()])

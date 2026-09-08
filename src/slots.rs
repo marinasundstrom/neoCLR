@@ -230,6 +230,7 @@ impl SlotReference {
     }
     pub(crate) fn output(&self) -> Result<Self, Fault> {
         self.require_writable()?;
+        self.require_complete_view()?;
         let mut result = self.clone();
         result.after_write = Some(self.cell()?.borrow().writes);
         Ok(result)
@@ -251,8 +252,48 @@ impl SlotReference {
         at_path(slot.value.as_ref().unwrap(), &self.path)?.initialized()?;
         Ok(())
     }
+    pub(crate) fn stored_type(&self) -> Result<Type, Fault> {
+        self.assigned()?;
+        let cell = self.cell()?;
+        let slot = cell.borrow();
+        Ok(at_path(slot.value.as_ref().unwrap(), &self.path)?.ty())
+    }
+    fn require_complete_view(&self) -> Result<(), Fault> {
+        // Uninitialized exact slots must remain writable, including out parameters.
+        let cell = self.cell()?;
+        let slot = cell.borrow();
+        if let Some(value) = &slot.value {
+            if at_path(value, &self.path)?.ty() != self.target {
+                return Err(Fault::new(
+                    "whole-value access through a base view would slice derived storage",
+                ));
+            }
+        }
+        Ok(())
+    }
+    pub(crate) fn base_view(&self, module: &crate::Module, target: &Type) -> Result<Self, Fault> {
+        self.assigned()?;
+        crate::inheritance::require_base(module, &self.target, target)?;
+        let mut view = self.clone();
+        view.target = target.clone();
+        Ok(view)
+    }
+    pub(crate) fn read_field(&self, index: usize) -> Result<Value, Fault> {
+        self.assigned()?;
+        let cell = self.cell()?;
+        let slot = cell.borrow();
+        let Value::Object { fields, .. } = at_path(slot.value.as_ref().unwrap(), &self.path)?
+        else {
+            return Err(Fault::new("field read requires a record"));
+        };
+        fields
+            .get(index)
+            .cloned()
+            .ok_or_else(|| Fault::new("field index out of range"))
+    }
     pub(crate) fn read(&self) -> Result<Value, Fault> {
         self.assigned()?;
+        self.require_complete_view()?;
         let cell = self.cell()?;
         let slot = cell.borrow();
         Ok(at_path(
@@ -265,6 +306,7 @@ impl SlotReference {
     }
     pub(crate) fn write(&self, value: Value) -> Result<(), Fault> {
         self.require_writable()?;
+        self.require_complete_view()?;
         if !self.path.is_empty() || self.allocation_id().is_some() {
             value.ensure_heap_references()?;
         }

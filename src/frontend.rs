@@ -280,6 +280,23 @@ impl Source {
         Ok(())
     }
 
+    fn base_reachable(&self, from: &Ty, to: &Ty) -> bool {
+        let mut current = Some(from.clone());
+        for _ in 0..64 {
+            let Some(ty) = current else {
+                return false;
+            };
+            if &ty == to {
+                return true;
+            }
+            current = self
+                .records
+                .iter()
+                .find(|r| r.name.text == ty.il())
+                .and_then(|r| r.base.clone());
+        }
+        false
+    }
     fn interface_reachable(&self, from: &Ty, to: &Ty) -> bool {
         let mut pending = vec![from.clone()];
         let mut seen = Vec::new();
@@ -1219,6 +1236,10 @@ impl Lowerer<'_> {
                 if concrete == interface {
                     return Ok(expected.clone());
                 }
+                if self.source.base_reachable(concrete, interface) {
+                    self.body.push(format!("castclass {}", interface.il()));
+                    return Ok(expected.clone());
+                }
                 if library::implements(concrete, interface)?
                     || self.source.interface_reachable(concrete, interface)
                 {
@@ -1378,7 +1399,7 @@ impl Lowerer<'_> {
             ExprKind::InterfaceCast(value, target) => {
                 let (Ty::Ref(interface) | Ty::ReadOnlyRef(interface)) = target else {
                     return Err(expression.at.error(
-                        "interface projection requires an interface reference target (Contract&)",
+                        "reference projection requires a managed reference target (Type&)",
                     ));
                 };
                 if !self
@@ -1386,16 +1407,21 @@ impl Lowerer<'_> {
                     .interfaces
                     .iter()
                     .any(|i| i.name.text == interface.il())
+                    && !self
+                        .source
+                        .records
+                        .iter()
+                        .any(|r| r.name.text == interface.il())
                 {
                     return Err(expression
                         .at
-                        .error("projection target must be a declared source interface"));
+                        .error("projection target must be a declared source interface or record"));
                 }
                 let actual = self.expression(value)?;
                 if !matches!(actual, Ty::Ref(_) | Ty::ReadOnlyRef(_)) {
                     return Err(value
                         .at
-                        .error("interface projection requires a managed reference; use &value"));
+                        .error("reference projection requires a managed reference; use &value"));
                 }
                 self.convert_reference(actual, target, &value.at)
             }
@@ -1503,7 +1529,6 @@ impl Lowerer<'_> {
                     return Ok(ty);
                 }
                 if let Ty::Ref(target) | Ty::ReadOnlyRef(target) = owner {
-                    self.body.push(format!("ldobj {}", target.il()));
                     owner = *target;
                 }
                 let ty = self.field(&owner, field)?;
@@ -1942,9 +1967,6 @@ impl Lowerer<'_> {
                     };
                 let field_type = self.field(&target, field)?;
                 if let Ty::Ref(referent) | Ty::ReadOnlyRef(referent) = field_type {
-                    if referenced_owner {
-                        self.body.push(format!("ldobj {}", target.il()));
-                    }
                     self.body
                         .push(format!("ldfld {}::{}", target.il(), field.text));
                     return Ok(*referent);

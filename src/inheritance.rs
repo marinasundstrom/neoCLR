@@ -108,3 +108,14 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
     }
     Ok(())
 }
+
+/// Only same-type or ancestor projections; no downcasts or value slicing.
+pub(crate) fn require_base(module: &Module, from: &Type, to: &Type) -> Result<(), Fault> {
+    if lineage(module, from)?.contains(to) {
+        Ok(())
+    } else {
+        Err(Fault::new(
+            "castclass requires the same record type or an ancestor",
+        ))
+    }
+}

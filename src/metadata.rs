@@ -629,6 +629,8 @@ pub enum Instruction {
     LoadTypeToken(Type),
     #[serde(rename = "ref.type")]
     ReferenceType,
+    #[serde(rename = "castclass")]
+    CastClass(Type),
     #[serde(rename = "ref.eq")]
     ReferenceEqual,
     #[serde(rename = "interface.borrow")]
@@ -880,6 +882,7 @@ impl Function {
                 | Instruction::ArrayElement(ty)
                 | Instruction::StoreArrayElement(ty)
                 | Instruction::ArrayAddress(ty)
+                | Instruction::CastClass(ty)
                 | Instruction::BorrowInterface(ty)
                 | Instruction::LoadTypeToken(ty)
                 | Instruction::PackValue(ty)

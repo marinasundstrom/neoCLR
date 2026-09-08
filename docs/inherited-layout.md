@@ -1,8 +1,9 @@
 # Inherited value layout: the first class-inheritance slice
 
 Implemented as preliminary groundwork. This adds a single explicit record base,
-inherited fields and BaseType reflection. It does not yet provide base-reference
-conversions, inherited method dispatch, virtual overrides or constructor chaining.
+inherited fields and BaseType reflection. [Managed base-reference views](base-views.md) are now implemented in a subsequent
+slice. Inherited method dispatch, virtual overrides and constructor chaining remain
+planned.
 Those remain the next object-model slice; this is not complete class inheritance.
 
 ## Metadata, storage and Neo
@@ -42,8 +43,8 @@ To avoid pretending that base behavior is implemented, a type used as a base may
 not yet declare instance methods (including constructors) or implement interfaces.
 Derived types may declare their own methods and interfaces. Base types may declare
 static helpers. Native layout/interop for derived records is rejected pending an
-explicit inherited-layout ABI. There is no implicit value slicing or reference
-upcast; a Derived value/reference does not satisfy a Base slot yet.
+explicit inherited-layout ABI. There is no implicit value slicing. [Base-reference projection](base-views.md) now
+allows Derived& to be used as Base& while preserving the complete owner.
 
 ## Library API
 
@@ -78,16 +79,16 @@ Native layout is deliberately unsettled instead of inferring a C++ or CLR ABI.
 The [comparison probe](experiments/inherited-layout-dotnet/Program.cs) targets
 net10.0 with SDK 10.0.100. Run `dotnet run` from
 `docs/experiments/inherited-layout-dotnet`. Observed output: `42`, `True`, `1`,
-`True`, covering inherited fields, substituted BaseType, declared-only field
+`True`, followed by `True`, `True` for base-view identity and dynamic type.
+The first four results cover inherited fields, substituted BaseType, declared-only field
 reflection and .NET's implicit Object root. neoCLR deliberately differs on that
 last point: a root record's BaseType is None.
 
-Before adding base references, separate the reference's view type from the complete
+The [base-view slice](base-views.md) now separates the reference's view type from the complete
 stored type. Specify field access, whole-value reads/writes, copy/slicing rules,
 reference identity/GetType, GC/pinning, constructor publication and virtual receiver
 selection together. A base view must not replace a derived allocation with a Base
-value or accidentally discard derived GC edges. This missing distinction is why
-virtual dispatch is not included in this first slice.
+value or accidentally discard derived GC edges. Virtual dispatch builds on this distinction and remains outside this layout slice.
 
 ## Run and validation
 

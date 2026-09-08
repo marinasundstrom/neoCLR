@@ -251,4 +251,5 @@ signature characteristic and special state, not implemented syntax or zeroing.
 
 A record may name one source record base first in its colon list, before interfaces.
 Aggregate arguments include inherited fields first. See [inherited value layout](inherited-layout.md)
-for current restrictions; base-reference conversions and virtual methods are not implemented.
+for current restrictions. [Base-reference conversions](base-views.md) are implemented;
+virtual methods remain planned.

@@ -657,3 +657,7 @@ signature characteristic and special state, not implemented syntax or zeroing.
 A `.type` may declare `.extends Base` once. Inherited aggregate fields precede its
 own fields. See [inherited value layout](inherited-layout.md) for generic substitution,
 visibility, native-layout restrictions and the remaining base-reference/dispatch work.
+
+`castclass Base` now projects a managed derived-record reference to an ancestor.
+`ldfld` also accepts managed record references. See [base views](base-views.md) for
+readonly, lifetime, whole-value restrictions and differences from CLR castclass.

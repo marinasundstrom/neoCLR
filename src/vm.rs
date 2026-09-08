@@ -666,6 +666,10 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                         return Err(Fault::new("managed references cannot be indirectly stored"));
                     }
                 }
+                Op::CastClass(ty) => {
+                    check(ty)?;
+                    crate::inheritance::lineage(module, ty)?;
+                }
                 Op::BorrowInterface(ty) => {
                     check(ty)?;
                     crate::interfaces::interface_definition(module, ty)?;
@@ -1581,6 +1585,14 @@ fn interpret_instructions(
                     let left = reference()?;
                     frame.stack.push(Value::Boolean(left.same_location(&right)));
                 }
+                Op::CastClass(target) => {
+                    let Value::SlotReference(reference) = frame.pop()? else {
+                        return Err(Fault::new("castclass requires a managed record reference"));
+                    };
+                    frame
+                        .stack
+                        .push(Value::SlotReference(reference.base_view(module, target)?));
+                }
                 Op::ReferenceType => {
                     let reference = match frame.pop()? {
                         Value::SlotReference(reference)
@@ -1592,7 +1604,7 @@ fn interpret_instructions(
                     };
                     reference.assigned()?;
                     frame.stack.push(Value::RuntimeTypeHandle(Box::new(
-                        crate::type_identity::describe_loaded(module, reference.target())?,
+                        crate::type_identity::describe_loaded(module, &reference.stored_type()?)?,
                     )));
                 }
                 Op::LoadTypeToken(ty) => {
@@ -1812,9 +1824,17 @@ fn interpret_instructions(
                     });
                 }
                 Op::Field(i) => {
+                    if let Some(Value::SlotReference(reference)) = frame.stack.last() {
+                        crate::access::check_field(module, &function, reference.target(), *i)?;
+                        let value = reference.read_field(*i)?.on_stack();
+                        frame.pop()?;
+                        frame.stack.push(value);
+                        return Ok(None);
+                    }
+
                     let Value::Object { ty, fields } = frame.pop()? else {
                         return Err(Fault::new(
-                            "ldfld requires object value (use ldobj for a reference)",
+                            "ldfld requires a record value or managed record reference",
                         ));
                     };
                     crate::access::check_field(module, &function, &ty, *i)?;

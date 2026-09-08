@@ -1,0 +1,12 @@
+record Position(X: int)
+record LabelledPosition(Label: string): Position
+func Read(readonly position: Position&) -> int { return position.X }
+func Make() -> Position& { return new LabelledPosition(21, "heap") }
+func Main() -> int {
+    var local = LabelledPosition(20, "local")
+    let view: Position& = &local
+    view.X = 21
+    if !ReferenceEquals(view, &local) { return 1 }
+    if !view.GetType().Equals(typeof(LabelledPosition)) { return 2 }
+    return Read(view) + Read(Make())
+}
