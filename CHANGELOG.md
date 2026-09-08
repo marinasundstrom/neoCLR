@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-09
 
+- Updated the order workflow to use imported inferred Ok/Error cases and conditional
+  Option/Result bindings, with explicit PurchaseError conversion for nested errors.
+  Added zero-quantity scenario coverage and regressions for rejected-purchase side effects,
+  exact stock exhaustion, lookup identity and receipt snapshots. Documented the
+  remaining nested-carrier annotation cost and next generic-source-type investigation;
+  runtime reference, inference and conversion contracts are unchanged.
+
 - Added wildcard imports of marked bundled union cases in Neo: `import System.Result.*`
   enables `Ok(42)`/`Error("message")`, and `import System.Option.*` enables Some/None.
   Public carrier constructors supply the imported case definitions. Short names work

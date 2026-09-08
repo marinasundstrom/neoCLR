@@ -16,6 +16,58 @@ PurchaseOutcome and failed construction attempts below describe the initial expe
 The C# baseline retains its original outcome record, so it is now a behavior comparison
 rather than identical error-handling structure. See [Result construction](../../result-construction.md).
 
+## Current usability pass (2026-09-09)
+
+The workflow now imports `PurchaseError.*`, `System.Result.*` and `System.Option.*`.
+It constructs independent cases with `Ok(receipt)` and `Error(error)`, then uses
+`let … else` and `if let` to inspect outcomes. It also checks zero-quantity rejection,
+while preserving the existing successful output. These are compiler/library usability
+changes over the existing runtime contracts, not a new reference policy.
+
+The nested error boundary remains explicit:
+
+```swift
+if product.Stock < quantity {
+    let error: PurchaseError = OutOfStock(product.Stock, quantity)
+    return Error(error)
+}
+```
+
+`OutOfStock` first converts into `PurchaseError`. The following call infers
+`Error<PurchaseError>`, which the expected `Result<Receipt,PurchaseError>` accepts.
+Without that boundary, `Error(OutOfStock(...))` infers `Error<OutOfStock>` and the
+outer carrier rejects it. The equivalent compact spelling is
+`Error<PurchaseError>(OutOfStock(...))`. Context must not silently override argument
+inference or manufacture multiple nested carriers. This is remaining annotation
+cost, not evidence that runtime reference semantics need changing.
+
+The service contracts continue to express distinct intentions:
+
+- `Product&` shares inventory, and lookup returns that same reference through Option.
+- `Receipt` is a value snapshot; later price changes cannot alter its recorded total.
+- `readonly ArrayList<Product&>&` limits access through the catalog view, while its
+  Product& elements still refer to mutable products. Readonly remains shallow.
+- `Notifications&` borrows the local implementation for synchronous dispatch.
+- The restock callback retains a heap-backed Product&. Passing a frame-backed product
+  remains a runtime error under the existing capture contract.
+
+The focused regressions now exercise zero, negative and oversized quantities; exact
+stock exhaustion; missing lookup; reference identity; receipt stability; and notification
+count. Rejected purchases must neither mutate inventory nor notify. They reuse the
+sample's service declarations so the checked implementation stays the executable example.
+
+This pass reuses the [recorded .NET comparison](#net-comparison-and-design-alternatives)
+and the [constructor/inference comparison](../../neo-library-constructors.md), plus
+[case imports](../../neo-case-imports.md). The C# baseline uses nominal reference
+Product objects and a value receipt, with an outcome record instead of Neo's unions.
+It therefore compares inventory and notification behavior, not equivalent union syntax.
+No new .NET execution, allocation benchmark or human trial is claimed for this pass.
+
+The next foundation is generic source type/union declarations: library consumers can
+now use these patterns, but Neo cannot yet declare equivalent generic abstractions.
+Automatic error propagation and richer patterns should be evaluated afterward against
+this explicit workflow. No runtime change was needed for the scenarios in this pass.
+
 ## Run it
 
 From the repository root:
@@ -47,8 +99,9 @@ an oversized order, and checks a missing product. Monetary amounts are integer
 units; there is no claim to implement currency, persistence or concurrent ordering.
 
 The equivalent C# workflow and list-assignment probe are in [dotnet](dotnet/Program.cs).
-They intentionally use the same simple outcome record, so the comparison does not
-attribute error-handling verbosity to reference semantics. Run with SDK 10.0.100:
+The C# baseline retains the original simple outcome record; current Neo uses unions.
+Compare observable behavior rather than attributing error-handling syntax differences
+to reference semantics. Run with SDK 10.0.100:
 
 ```sh
 cd docs/experiments/reference-experience/dotnet
@@ -140,8 +193,8 @@ interpret these as benchmark scores or compare timings from different participan
    you expect the snapshot to observe before deciding how to represent it.
 4. Move product creation into a helper and return a restock callback. Try direct
    value storage and heap storage; explain the observed difference.
-5. Replace the outcome record with a useful Result-returning API when construction
-   is supported, recording which difficulty came from the frontend rather than memory.
+5. Compare the typed PurchaseError binding with `Error<PurchaseError>(...)`, recording
+   whether the explicit nested carrier boundary is understandable without documentation.
 
 Before selecting the next contract, build a second scenario with different needs
 (e.g. document editing with undo). One mutable catalog does not justify universal

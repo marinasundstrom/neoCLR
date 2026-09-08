@@ -95,6 +95,23 @@ expected Result<T,E>, rather than model the independently typed case. It is not 
 of this contract. This projection is not a new runtime union kind or a promise that
 all constructor calls will become implicit conversions.
 
+## Nested domain errors in the workflow
+
+The [order workflow](../examples/source/order-workflow.neo) uses imported `Ok` and
+`Error` constructors. A domain variant needs its own carrier boundary before it
+becomes the Result error payload:
+
+```swift
+let error: PurchaseError = OutOfStock(product.Stock, quantity)
+return Error(error)
+```
+
+The shorter equivalent is `return Error<PurchaseError>(OutOfStock(...))`.
+`Error(OutOfStock(...))` instead infers `Error<OutOfStock>` and cannot convert directly
+to `Result<Receipt,PurchaseError>`. Keeping the two conversions distinct preserves
+argument inference and exact constructor acceptance. See the
+[usability pass](experiments/reference-experience/README.md#current-usability-pass-2026-09-09).
+
 ## .NET comparison and tradeoffs (2026-09-08)
 
 The related .NET API is [F# Result](https://learn.microsoft.com/en-us/dotnet/fsharp/language-reference/results)

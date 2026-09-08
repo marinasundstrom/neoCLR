@@ -1,4 +1,6 @@
 import PurchaseError.*
+import System.Result.*
+import System.Option.*
 import System.Console.*
 
 record Product(Name: string, Price: int, Stock: int)
@@ -26,12 +28,18 @@ func FindProduct(products: readonly System.Collections.ArrayList<Product&>&,
 
 func Purchase(product: Product&, quantity: int,
               notifications: Notifications&) -> Result<Receipt, PurchaseError> {
-    if quantity <= 0 { return Result<Receipt,PurchaseError>.Error(InvalidQuantity(quantity)) }
-    if product.Stock < quantity { return Result<Receipt,PurchaseError>.Error(OutOfStock(product.Stock, quantity)) }
+    if quantity <= 0 {
+        let error: PurchaseError = InvalidQuantity(quantity)
+        return Error(error)
+    }
+    if product.Stock < quantity {
+        let error: PurchaseError = OutOfStock(product.Stock, quantity)
+        return Error(error)
+    }
     product.Stock = product.Stock - quantity
     let receipt = Receipt(product.Name, quantity, product.Price * quantity)
     notifications.Purchased(receipt)
-    return Result<Receipt,PurchaseError>.Ok(receipt)
+    return Ok(receipt)
 }
 
 func MakeRestock(product: Product&) -> System.Func<int, void> {
@@ -60,7 +68,10 @@ func Main() -> int {
     } else { return 2 }
     if product.Stock != 7 { return 3 }
     if receipts[0].Total != 24 { return 4 }
-    if !FindProduct(&products, "Milk").IsNone { return 6 }
+    if let Some(_) = FindProduct(&products, "Milk") { return 6 }
+    let Error(invalid) = Purchase(product, 0, &notifications) else { return 9 }
+    let InvalidQuantity(details) = invalid else { return 10 }
+    if details.quantity != 0 || product.Stock != 7 { return 11 }
     WriteLine("Orders complete")
     return 0
 }

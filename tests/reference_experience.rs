@@ -106,3 +106,83 @@ func Main() -> int {
 "#);
     assert_eq!(result.value, Value::Int32(0));
 }
+
+// Exercise the sample's actual service declarations with focused alternative inputs.
+fn workflow_with_main(main: &str) -> String {
+    let (declarations, _) = include_str!("../examples/source/order-workflow.neo")
+        .split_once("func Main()")
+        .unwrap();
+    format!("{declarations}{main}")
+}
+
+#[test]
+fn rejected_purchases_preserve_inventory_and_do_not_notify() {
+    let result = run(&workflow_with_main(
+        r#"
+func Main() -> int {
+    let product = new Product("Coffee", 12, 5)
+    var notifications = ConsoleNotifications()
+    let Error(zero) = Purchase(product, 0, &notifications) else { return 1 }
+    let InvalidQuantity(zeroDetails) = zero else { return 2 }
+    let Error(negative) = Purchase(product, -2, &notifications) else { return 3 }
+    let InvalidQuantity(negativeDetails) = negative else { return 4 }
+    let Error(oversized) = Purchase(product, 6, &notifications) else { return 5 }
+    let OutOfStock(stockDetails) = oversized else { return 6 }
+    if zeroDetails.quantity != 0 || negativeDetails.quantity != -2 { return 7 }
+    if stockDetails.available != 5 || stockDetails.requested != 6 { return 8 }
+    if product.Stock != 5 || product.Price != 12 { return 9 }
+    return 0
+}
+"#,
+    ));
+    assert_eq!(result.value, Value::Int32(0));
+    assert!(result.output.is_empty());
+}
+
+#[test]
+fn catalog_lookup_preserves_identity_and_purchase_exhausts_exact_stock() {
+    let result = run(&workflow_with_main(
+        r#"
+func Main() -> int {
+    var products = System.Collections.ArrayList<Product&>.Allocate(0)
+    let product = new Product("Tea", 8, 3)
+    products.Add(product)
+    var notifications = ConsoleNotifications()
+    let Some(found) = FindProduct(&products, "Tea") else { return 1 }
+    if !ReferenceEquals(found, product) { return 2 }
+    if let Some(_) = FindProduct(&products, "Milk") { return 3 }
+    let Ok(receipt) = Purchase(found, 3, &notifications) else { return 4 }
+    product.Price = 99
+    if product.Stock != 0 || receipt.Total != 24 || receipt.Quantity != 3 { return 5 }
+    let Error(error) = Purchase(product, 1, &notifications) else { return 6 }
+    let OutOfStock(details) = error else { return 7 }
+    if details.available != 0 || details.requested != 1 { return 8 }
+    return 0
+}
+"#,
+    ));
+    assert_eq!(result.value, Value::Int32(0));
+    assert_eq!(result.output, ["Purchased: Tea", "24"]);
+}
+
+#[test]
+fn nested_domain_error_needs_an_explicit_carrier_boundary() {
+    let source = workflow_with_main(
+        r#"
+func Reject() -> Result<Receipt, PurchaseError> { return Error(InvalidQuantity(0)) }
+func Main() -> () {}
+"#,
+    );
+    assert!(frontend::compile(&source).is_err());
+    let source = workflow_with_main(
+        r#"
+func Reject() -> Result<Receipt, PurchaseError> { return Error<PurchaseError>(InvalidQuantity(0)) }
+func Main() -> int {
+    let Error(error) = Reject() else { return 1 }
+    let InvalidQuantity(details) = error else { return 2 }
+    return details.quantity
+}
+"#,
+    );
+    assert_eq!(run(&source).value, Value::Int32(0));
+}

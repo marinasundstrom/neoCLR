@@ -234,3 +234,9 @@ Argument-based generic constructor inference and bundled case imports now use th
 [Implicit case-to-carrier conversion](case-to-carrier-conversion.md) now uses marked
 bundled carrier constructors with exact case types. The Raven source comparison records
 which broader inference and conversion behaviors remain deferred.
+
+The [order-workflow usability pass](experiments/reference-experience/README.md#current-usability-pass-2026-09-09)
+now combines imported inferred cases, explicit nested domain-error conversion and
+conditional bindings. Reference identity, receipt snapshots and rejected-purchase side
+effects are covered together. Next investigate generic source type/union declarations;
+error propagation syntax and richer patterns remain later usability questions.
