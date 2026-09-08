@@ -1,0 +1,3 @@
+.function neoCLR.Runtime.EnvironmentArguments() -> String[]
+    .methodimpl InternalCall
+.end

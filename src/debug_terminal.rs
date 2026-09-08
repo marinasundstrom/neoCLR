@@ -162,7 +162,12 @@ fn inspect(
     result.map_err(|e| e.to_string())
 }
 
-pub fn run(program: LoadedProgram, document: &str, source: &str) -> Result<Vec<String>, String> {
+pub fn run(
+    program: LoadedProgram,
+    document: &str,
+    source: &str,
+    arguments: Vec<String>,
+) -> Result<Vec<String>, String> {
     let debugger = Debugger::new();
     let worker_debugger = debugger.clone();
     let worker = std::thread::spawn(move || {
@@ -170,6 +175,7 @@ pub fn run(program: LoadedProgram, document: &str, source: &str) -> Result<Vec<S
         let result = unsafe {
             program.run_with_native(ExecutionOptions {
                 debugger: Some(worker_debugger.clone()),
+                arguments,
                 console: Some(Arc::new(worker_debugger.clone())),
                 limits: Limits {
                     instructions: usize::MAX,

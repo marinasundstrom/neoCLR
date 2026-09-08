@@ -5,6 +5,9 @@ use crate::{
 };
 
 pub(crate) enum Binding {
+    EnvironmentArguments,
+    EnvironmentCurrentDirectory,
+    EnvironmentVariable,
     LocalClock,
     Math(crate::math::Operation),
     Reflection(crate::reflection::Query),
@@ -51,6 +54,16 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         return Ok(Binding::Reflection(query));
     }
     let (binding, returns) = match (function.name.as_str(), function.parameters.as_slice()) {
+        ("neoCLR.Runtime.EnvironmentArguments", []) => (
+            Binding::EnvironmentArguments,
+            Type::Array(Box::new(Type::String)),
+        ),
+        ("neoCLR.Runtime.EnvironmentCurrentDirectory", []) => {
+            (Binding::EnvironmentCurrentDirectory, Type::Value)
+        }
+        ("neoCLR.Runtime.EnvironmentVariable", [Type::String]) => {
+            (Binding::EnvironmentVariable, Type::Value)
+        }
         ("neoCLR.Runtime.LocalClock", []) => {
             (Binding::LocalClock, Type::Array(Box::new(Type::Int32)))
         }
@@ -120,8 +133,9 @@ impl Binding {
         module: &crate::Module,
         limits: &crate::Limits,
         output: &mut Vec<String>,
-        console: Option<&dyn crate::Console>,
+        options: &crate::ExecutionOptions,
     ) -> Result<Value, Fault> {
+        let console = options.console.as_deref();
         if let Self::Math(operation) = self {
             return operation.invoke(&args);
         }
@@ -129,6 +143,35 @@ impl Binding {
             return query.invoke(module, &args, limits);
         }
         match (self, args.as_slice()) {
+            (Self::EnvironmentArguments, []) => Ok(Value::Array {
+                element: Type::String,
+                elements: options
+                    .arguments
+                    .iter()
+                    .cloned()
+                    .map(Value::String)
+                    .collect(),
+            }),
+            (Self::EnvironmentCurrentDirectory, []) => {
+                let payload = std::env::current_dir()
+                    .ok()
+                    .and_then(|p| p.into_os_string().into_string().ok())
+                    .map(Value::String)
+                    .unwrap_or(Value::Int32(1));
+                Ok(Value::Erased(Box::new(payload)))
+            }
+            (Self::EnvironmentVariable, [Value::String(name)]) => {
+                let payload = if name.is_empty() || name.contains(['=', '\0']) {
+                    Value::Int32(1)
+                } else {
+                    match std::env::var(name) {
+                        Ok(value) => Value::String(value),
+                        Err(std::env::VarError::NotPresent) => Value::Void,
+                        Err(std::env::VarError::NotUnicode(_)) => Value::Int32(1),
+                    }
+                };
+                Ok(Value::Erased(Box::new(payload)))
+            }
             (Self::LocalClock, []) => crate::clock::read_local(),
             (Self::TypeName, [Value::RuntimeTypeHandle(handle)]) => {
                 Ok(Value::String(handle.name.clone()))

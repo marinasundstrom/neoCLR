@@ -191,3 +191,7 @@ can report that failure with `launch_failure`.
 
 See [debugger tests](../tests/debugger.rs), [source grammar](neo-grammar.md),
 [managed-reference semantics](managed-reference-semantics.md) and [GC](garbage-collection.md).
+
+Guest arguments may follow `--`: `cargo run --locked -- debug examples/source/environment.neo -- demo`.
+They are exposed through [Environment.GetCommandLineArgs](environment.md), including
+the guest input path at index zero.

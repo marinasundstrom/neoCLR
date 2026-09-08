@@ -10,6 +10,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 #### Added
 
+- Added a read-only System.Environment subset: per-execution guest arguments,
+  Result-based current-directory reads and Result/Option-based variable lookup.
+  CLI run/debug forward arguments after `--`, with the guest input path first.
+  Added ProcessEnvironment service reporting, Neo example and isolated host tests.
+  Rust ExecutionOptions gains an arguments field; exhaustive literals must adapt.
+  Native clock/argument arrays participate in runtime array-budget accounting.
+
 - Added separate System.Date and System.Time core values, following .NET
   DateOnly/TimeOnly ranges, Gregorian day numbers and 100 ns ticks. Validated factories
   return typed Results; zero defaults are the minimum date and midnight. Private

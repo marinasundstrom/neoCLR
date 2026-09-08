@@ -1,0 +1,3 @@
+.function neoCLR.Runtime.EnvironmentCurrentDirectory() -> System.Value
+    .methodimpl InternalCall
+.end

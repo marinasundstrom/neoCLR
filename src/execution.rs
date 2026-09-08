@@ -32,6 +32,8 @@ impl CancellationToken {
 /// Existing calls may pass Limits directly; this is an experimental Rust API.
 #[derive(Debug, Clone, Default)]
 pub struct ExecutionOptions {
+    /// Guest-visible arguments; CLI includes the input path first. Empty by default.
+    pub arguments: Vec<String>,
     pub debugger: Option<crate::debugger::Debugger>,
     pub limits: Limits,
     pub cancellation: Option<CancellationToken>,
@@ -42,6 +44,7 @@ pub struct ExecutionOptions {
 impl From<Limits> for ExecutionOptions {
     fn from(limits: Limits) -> Self {
         Self {
+            arguments: Vec::new(),
             debugger: None,
             limits,
             cancellation: None,

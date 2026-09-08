@@ -202,3 +202,8 @@ zero defaults, readonly components and comparison are in place. The
 [local clock](local-clock.md) supplies a single system-local date/time/offset snapshot.
 Parsing, formatting and globalization are deferred. Arithmetic, durations and broader
 clock/timezone support remain later work in the [date/time plan](date-time-design.md).
+
+The [Environment slice](environment.md) now supplies guest arguments and fallible
+process reads. A future Path/File-write slice should be driven by a small report
+program, comparing .NET Path/File contracts with typed Result failures. It is not
+yet implemented or required for this preview.

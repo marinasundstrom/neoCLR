@@ -74,3 +74,9 @@
 .include "System/Clock.neoil"
 .include "System/LocalDateTime.neoil"
 .include "neoCLR/Runtime/LocalClock.neoil"
+
+.include "System/EnvironmentError.neoil"
+.include "System/Environment.neoil"
+.include "neoCLR/Runtime/EnvironmentArguments.neoil"
+.include "neoCLR/Runtime/EnvironmentCurrentDirectory.neoil"
+.include "neoCLR/Runtime/EnvironmentVariable.neoil"

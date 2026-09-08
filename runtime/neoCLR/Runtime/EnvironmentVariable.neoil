@@ -1,0 +1,3 @@
+.function neoCLR.Runtime.EnvironmentVariable(String name) -> System.Value
+    .methodimpl InternalCall
+.end

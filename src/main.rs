@@ -8,8 +8,8 @@ use std::{
 
 const USAGE: &str = "Usage:
   neoclr assemble <source.neoil> <output.neo.json> [--module <input>]... [--system <input>]
-  neoclr run <input> [System.neo.json] [--module <input>]... [--system <input>] [--gc-stats] [--gc-events]
-  neoclr debug <input> [--module <input>]... [--system <input>]
+  neoclr run <input> [System.neo.json] [--module <input>]... [--system <input>] [--gc-stats] [--gc-events] [-- <guest-argument>...]
+  neoclr debug <input> [--module <input>]... [--system <input>] [-- <guest-argument>...]
   neoclr check <input> [--module <input>]... [--system <input>]
   neoclr verify <input> [--module <input>]... [--system <input>]
 Inputs: .neo is the high-level subset, .neoil is IL source, otherwise JSON artifacts.";
@@ -32,6 +32,7 @@ fn execute(args: &[String]) -> Result<Vec<String>, String> {
     if args.len() < required || args[1..required].iter().any(|s| s.starts_with("--")) {
         return Err(USAGE.into());
     }
+    let mut guest_arguments = vec![args[1].clone()];
     let mut paths = vec![args[1].as_str()];
     let mut system_path = None;
     let mut gc_stats = false;
@@ -39,6 +40,10 @@ fn execute(args: &[String]) -> Result<Vec<String>, String> {
     let mut options = args[required..].iter();
     while let Some(option) = options.next() {
         match option.as_str() {
+            "--" if matches!(command, "run" | "debug") => {
+                guest_arguments.extend(options.cloned());
+                break;
+            }
             "--gc-stats" if command == "run" && !gc_stats => gc_stats = true,
             "--gc-events" if command == "run" && !gc_events => gc_events = true,
             "--module" | "--system" => {
@@ -113,7 +118,7 @@ fn execute(args: &[String]) -> Result<Vec<String>, String> {
     };
     let module = &modules[0];
     match command {
-        "debug" => debug_terminal::run(program, paths[0], &texts[0]),
+        "debug" => debug_terminal::run(program, paths[0], &texts[0], guest_arguments),
         "assemble" => {
             let output = &args[2];
             let json = serde_json::to_string_pretty(module).map_err(|e| e.to_string())?;
@@ -148,6 +153,7 @@ fn execute(args: &[String]) -> Result<Vec<String>, String> {
             // SAFETY: CLI run treats the user-selected program and native imports as trusted code.
             let execution = unsafe {
                 program.run_with_native(ExecutionOptions {
+                    arguments: guest_arguments,
                     console: Some(std::sync::Arc::new(StdioConsole)),
                     ..ExecutionOptions::default()
                 })

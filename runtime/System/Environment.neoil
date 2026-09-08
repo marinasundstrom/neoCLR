@@ -1,0 +1,51 @@
+.type System.Environment
+    .method static GetCommandLineArgs() -> String[]
+        call neoCLR.Runtime.EnvironmentArguments()
+        ret
+    .end
+    .method static GetCurrentDirectory() -> System.Result<String,System.EnvironmentError>
+        call neoCLR.Runtime.EnvironmentCurrentDirectory()
+        dup
+        value.is Int32
+        brtrue Failed
+        value.unpack String
+    Success:
+        newobj.ctor instance System.Result.Ok<String>::.ctor(String)
+        newobj.ctor instance System.Result<String,System.EnvironmentError>::.ctor(System.Result.Ok<String>)
+        ret
+    Failed:
+        pop
+        newobj System.EnvironmentError
+        newobj.ctor instance System.Result.Error<System.EnvironmentError>::.ctor(System.EnvironmentError)
+        newobj.ctor instance System.Result<String,System.EnvironmentError>::.ctor(System.Result.Error<System.EnvironmentError>)
+        ret
+    .end
+    .method static GetEnvironmentVariable(String name) -> System.Result<System.Option<String>,System.EnvironmentError>
+        ldarg name
+        call neoCLR.Runtime.EnvironmentVariable(String)
+        dup
+        value.is Int32
+        brtrue Failed
+        dup
+        value.is Void
+        brtrue Missing
+        value.unpack String
+        newobj.ctor instance System.Option.Some<String>::.ctor(String)
+        newobj.ctor instance System.Option<String>::.ctor(System.Option.Some<String>)
+    Success:
+        newobj.ctor instance System.Result.Ok<System.Option<String>>::.ctor(System.Option<String>)
+        newobj.ctor instance System.Result<System.Option<String>,System.EnvironmentError>::.ctor(System.Result.Ok<System.Option<String>>)
+        ret
+    Missing:
+        pop
+        newobj.ctor instance System.Option.None::.ctor()
+        newobj.ctor instance System.Option<String>::.ctor(System.Option.None)
+        br Success
+    Failed:
+        pop
+        newobj System.EnvironmentError
+        newobj.ctor instance System.Result.Error<System.EnvironmentError>::.ctor(System.EnvironmentError)
+        newobj.ctor instance System.Result<System.Option<String>,System.EnvironmentError>::.ctor(System.Result.Error<System.EnvironmentError>)
+        ret
+    .end
+.end

@@ -2009,16 +2009,15 @@ fn interpret_instructions(
                         frame.stack.push(value.on_stack());
                     } else if callee.is_internal_call() {
                         let binding = crate::native::bind(&callee)?;
-                        if matches!(binding, crate::native::Binding::Reflection(_)) {
+                        if matches!(
+                            binding,
+                            crate::native::Binding::Reflection(_)
+                                | crate::native::Binding::LocalClock
+                                | crate::native::Binding::EnvironmentArguments
+                        ) {
                             arrays_used = true;
                         }
-                        let value = binding.invoke(
-                            args,
-                            module,
-                            &limits,
-                            output,
-                            options.console.as_deref(),
-                        )?;
+                        let value = binding.invoke(args, module, &limits, output, options)?;
                         expect(&value, &callee.returns)?;
                         frame.stack.push(value);
                     } else {

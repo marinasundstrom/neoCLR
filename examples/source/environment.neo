@@ -1,0 +1,20 @@
+func Main() -> int {
+    let args = System.Environment.GetCommandLineArgs()
+    for i in 0..<args.Length {
+        System.Console.WriteLine(args[i])
+    }
+    System.Environment.GetCurrentDirectory() match {
+        Ok(let directory) => { System.Console.WriteLine(directory) },
+        Error(let error) => { System.Console.WriteLine(error.ToString()); return 1 }
+    }
+    System.Environment.GetEnvironmentVariable("NEO_DEMO") match {
+        Ok(let value) => {
+            value match {
+                Some(let text) => { System.Console.WriteLine(text) },
+                None => { System.Console.WriteLine("NEO_DEMO is not set") }
+            }
+        },
+        Error(let error) => { System.Console.WriteLine(error.ToString()); return 2 }
+    }
+    return 0
+}

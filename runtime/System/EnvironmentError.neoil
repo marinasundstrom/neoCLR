@@ -1,0 +1,6 @@
+.type System.EnvironmentError
+    .method instance ToString() -> String
+        ldstr "EnvironmentUnavailable"
+        ret
+    .end
+.end
