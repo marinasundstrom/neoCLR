@@ -850,6 +850,26 @@ architecture assessment, not a current audit. Existing implementation documentat
 describes the value-default model. This entry records the alternative and the author's clarification. The current
 value-default model remains in place; no replacement has been selected.
 
+**Author's further reasoning:** Reference behavior is the familiar expectation for
+ordinary class use, with heap management largely transparent to application developers.
+The author sees explicit value behavior as a type-design intention that should surface
+when it matters, and finds Java's modifier-based evolution of existing wrapper classes
+potentially less intrusive than C#'s class/struct split. These observations continue
+the exploration; they do not supersede the clarification that no route has been chosen.
+
+**Assistant's qualification:** This expectation is common, not universal across modern
+languages. Value semantics concern copying and identity, not necessarily a short
+lifetime: values can live inline in long-lived heap objects. Valhalla's opt-in also
+restricts identity and mutation; it is not just a storage hint or C# mutable-struct
+behavior under another spelling. Its wrapper migration therefore needs separate
+consideration from neoCLR's ability to reference mutable values.
+
+**Evidence and action:** Added this reasoning to the existing entry, with no code or
+architecture migration. The [C# struct specification](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/structs)
+and [Java team's value-class demonstration](https://inside.java/2025/10/27/try-jep-401-value-classes/)
+support the distinctions. The Java demonstration includes Integer and LocalDate in
+preview mode; it does not establish universal deployment or allocation elimination.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

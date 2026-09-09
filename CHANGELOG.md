@@ -24,7 +24,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   of ordinary class references and opt-in value behavior, separating it from the
   assistant's metadata proposal, and linked existing evaluation documents. The author
   clarified that this is not a selected direction; the current model remains in place. No runtime
-  or language contract migration is implemented by this documentation change.
+  or language contract migration is implemented by this documentation change. Extended
+  the exploration with transparent class usage, value-design intent and Java wrapper
+  evolution, distinguishing lifetime, identity and preview status.
 
 - Added emit-il for inspecting Neo compiler output on stdout or in a new neoIL file,
   preserving original source sequence points. It validates without executing and
