@@ -3061,7 +3061,7 @@ impl Lowerer<'_> {
                 } else {
                     &ty
                 };
-                if let Some(result) = self.constrained_call(&ty, member, arguments)? {
+                if let Some(result) = self.constrained_call(&ty, owner, saved, member, arguments)? {
                     return Ok(result);
                 }
                 if self.delegate_signature(target)?.is_some() {

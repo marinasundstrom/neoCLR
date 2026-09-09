@@ -250,5 +250,6 @@ inference remain separate steps. This uses the existing CLR-like metadata founda
 [Generic constraints](generic-constraints.md) now project runtime-enforced `notvoid`
 and `notreference`, plus nominal base/interface bounds, for generic records/functions/static
 methods. Method lookup and constrained reference conversions through T& receivers
-are implemented; bare-T receivers, bound fields/properties and method-group conversions
+are implemented. Addressable bare-T receivers support method calls with notreference;
+unrestricted bare-T adaptation, bound fields/properties and method-group conversions
 remain later work. notnull requires nullable metadata first.

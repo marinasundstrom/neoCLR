@@ -14,6 +14,8 @@ impl Lowerer<'_> {
     pub(super) fn constrained_call(
         &mut self,
         receiver: &Ty,
+        expression: &Expr,
+        saved: usize,
         member: &Token,
         arguments: &[Expr],
     ) -> Result<Option<Ty>, Fault> {
@@ -29,8 +31,13 @@ impl Lowerer<'_> {
         else {
             return Ok(None);
         };
-        if !reference {
-            return Err(member.error("constrained member access currently requires a T& receiver"));
+        if !reference
+            && !self.function.generic_constraints.iter().any(|constraint| {
+                constraint.parameter as usize == index
+                    && constraint.kind == crate::metadata::ConstraintKind::NotReference
+            })
+        {
+            return Err(member.error("constrained value member access requires notreference; otherwise use a T& receiver"));
         }
         let mut found: Option<Member> = None;
         for constraint in &self.function.generic_constraints {
@@ -119,6 +126,12 @@ impl Lowerer<'_> {
         }
         if method.parameters.len() != arguments.len() {
             return Err(member.error("argument count mismatch"));
+        }
+        if !reference {
+            // Use the original value slot, as for a concrete record receiver. Do
+            // not run expression effects twice or introduce a receiver copy.
+            self.body.truncate(saved);
+            self.place_with_access(expression, true, method.readonly)?;
         }
         self.body.push(format!(
             "{} {}",

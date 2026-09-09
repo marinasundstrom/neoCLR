@@ -20,7 +20,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   base/interface views, with inherited conformance and readonly/lifetime enforcement.
   Included a view/identity example and .NET reference-versus-boxing comparison,
   distinguishing platform capabilities from high-level language usability.
-  Bare-T receiver handling and broader member lookup remain later work; notnull awaits
+  Added constrained calls on addressable T values with notreference, reusing slot
+  addresses and views with existing binding mutability, shallow copy and escape rules.
+  Included value-copy and receiver-evaluation regressions and an executable example.
+  Unrestricted bare-T receiver handling and broader member lookup remain later work; notnull awaits
   nullable metadata. Older tools reject constrained artifacts; Neo reserves the new keywords.
 
 - Added plain generic Neo record declarations with explicit positional construction,

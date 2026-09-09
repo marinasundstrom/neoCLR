@@ -10,6 +10,11 @@ class Program {
     static void Add<T>(ref T x, int n) where T : Counter => x.Add(n);
     static int Read<T>(ref T x) where T : Counter => x.Read();
     static int ReadBase<T>(T x) where T : Base => x.Read();
+    static int AdjustValue<T>(T value) where T : struct, Counter {
+        var local = value;
+        local.Add(1);
+        return local.Read();
+    }
     static Counter ToCounter<T>(T value) where T : Counter => value;
     static Base ToBase<T>(T value) where T : Base => value;
     static void Main() {
@@ -21,6 +26,7 @@ class Program {
             typeof(Program).GetMethod("Add", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)!.MakeGenericMethod(typeof(int));
             throw new Exception("constraint not enforced");
         } catch (ArgumentException) { Console.WriteLine("invalid bound rejected"); }
+        Console.WriteLine($"adjusted={AdjustValue(x)}, original={x.Read()}");
         var boxed = ToCounter(x);
         boxed.Add(1);
         Console.WriteLine($"value={x.Read()}, interface={boxed.Read()}");

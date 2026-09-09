@@ -111,7 +111,7 @@ The bound does not convert or slice the argument, borrow a value, change inferen
 or authorize mutation through readonly access. `Holder<Cell&>` retains its reference;
 `Holder<Cell>` stores a copy according to Cell's own field contracts.
 
-The first member-lookup projection supports **method invocations on T& receivers**,
+Member lookup supports **method invocations on T& receivers**,
 including readonly receivers, in generic functions and static methods. Record-bound
 methods must themselves use a byref receiver; copying a potentially derived object
 into a base value receiver is not introduced by this feature. A stack value
@@ -121,8 +121,8 @@ Neo looks up source/bundled bound methods, including inherited members, and emit
 These checked views retain the concrete object and use its explicit/default interface
 implementation or virtual override. They create no box and preserve lifetime checks.
 Ambiguous members from unrelated bounds are rejected; use a narrower helper contract.
-Unconstrained members, direct member access on bare T, bound fields/properties and
-method-group conversion and constraint-aware closure lowering remain outside this first lookup slice. Generic source-record
+Unconstrained members, calls on bare T without `notreference`, direct bound field/property
+lookup, method-group conversion and constraint-aware closure lowering remain outside this slice. Generic source-record
 methods are still a separate language feature.
 
 The verifier accepts an open parameter's projection only when its declared bound
@@ -131,6 +131,51 @@ Symbolic forwarding still has the previously described limitation: this is not a
 constraint-implication verifier. Partial frontend library probes cannot prove contracts
 involving missing application definitions; full linking validates those definitions
 and repeats concrete checks.
+
+### Value receivers with notreference
+
+```swift
+func Read<T>(value: T) -> int where T: Readable, notreference {
+    return value.Read()
+}
+func Adjust<T>(value: T) -> int where T: Counter, notreference {
+    var local = value
+    local.Add(1)
+    return local.Read()
+}
+```
+
+The runtime-enforced `notreference` restriction proves that a bare T receiver is a
+value. Neo can therefore use the existing address-of-slot instructions followed by
+the same checked view and method call, just as it does for a concrete record value.
+No new opcode, box or additional receiver copy is introduced. Passing the argument
+by value still performs its ordinary copy into the callee. Mutation of an independent
+Cell copy cannot change the caller's Cell; reference-valued fields in a copied facade
+still share their targets. `notreference` remains shallow.
+
+The receiver must be addressable: a parameter, local, field or array element. Readonly
+methods can observe immutable bindings; writable methods require a mutable/addressable
+value under Neo's existing rules. Parameters are immutable, so Adjust deliberately
+creates a `var` local before calling Add. Neo does not introduce C#-style writable
+parameter bindings, defensive receiver copies or automatic temporary materialization.
+Existing restrictions on borrowing block-local values still apply. Receiver expressions
+are evaluated once, including field/array receiver expressions with side effects.
+
+Readonly references, inherited/default/explicit dispatch and lifetime checks continue
+through the existing runtime paths. Returning an interior view into a copied value
+parameter still faults when that callee frame exits. Adding a nominal bound without
+`notreference` is insufficient: T could itself be a managed reference, and taking the
+address of its slot would manufacture an unsupported nested reference. Use an explicit
+T& API for that case until general receiver adaptation is defined. The constraint also
+rejects reference arguments at concrete runtime resolution.
+
+This reuses the CLR `constrained.` comparison below: generic member invocation and
+nominal conformance are familiar, but Neo's value proof allows lowering to existing
+slot addresses and views. Requiring `T&` for every operation was simpler but prevented
+ordinary readonly generic value APIs. Adding universal receiver adaptation now would
+broaden both runtime and language contracts unnecessarily. This is a bounded capability
+extension, not proof of better usability or performance. See
+[constrained-values.neo](../examples/source/constrained-values.neo).
 
 ### Constrained reference conversions
 
@@ -190,7 +235,7 @@ NeoCLR reuses nominal bounds and ordinary virtual dispatch. Its explicit T& rece
 already supplies a managed address, so this slice reuses checked reference-view
 instructions instead of adding a `constrained.` prefix. The benefit is preserving
 existing identity, readonly and lifetime rules with no allocation mechanism. The cost
-is a narrower source API: bare T cannot yet select value-versus-reference receiver
+is a narrower source API: unrestricted bare T cannot yet select value-versus-reference receiver
 handling after substitution. Supporting that later may justify a CLR-like prefix;
 silently borrowing, copying, or boxing is not an acceptable substitute. Receiver
 adaptation does not itself require boxing: it should select the existing value/address
@@ -205,7 +250,11 @@ The [comparison probe](experiments/generic-bounds-dotnet/Program.cs) was run on
 2026-09-09 with SDK 10.0.100, runtime .NET 10.0.0, macOS ARM64. It printed `42`,
 `42`, `invalid bound rejected`: a constrained ref receiver mutated its original struct,
 a base-constrained call reached the override, and reflection rejected an invalid
-constructed generic method. The added conversion probe prints `value=42, interface=43`
+constructed generic method. The value-call probe additionally prints
+`adjusted=43, original=42`, confirming independent mutation of the copied struct.
+Its `struct` constraint selects C# value arguments; Neo's `notreference` restricts
+addressing mode rather than introducing that nominal class/struct division.
+The conversion probe prints `value=42, interface=43`
 and `True`: C# boxes the struct on conversion to an interface while the base-class
 conversion preserves class-instance identity. Neo's explicit managed views deliberately
 preserve the original object for both stack and heap storage. It does not compare allocations or throughput. Reproduce
@@ -223,9 +272,10 @@ nullable type arguments from uninitialized storage; see the
 cargo run --locked -- run examples/source/generic-constraints.neo
 cargo run --locked -- run examples/source/generic-bounds.neo
 cargo run --locked -- run examples/source/constrained-views.neo
-cargo test --locked --test neo_constrained_views --test generic_bounds --test generic_constraints --test generic_metadata --test neo_generic_records --test neo_generics
+cargo run --locked -- run examples/source/constrained-values.neo
+cargo test --locked --test neo_constrained_values --test neo_constrained_views --test generic_bounds --test generic_constraints --test generic_metadata --test neo_generic_records --test neo_generics
 ```
 
-All three examples print 42 and return 42. Tests cover source/IL contracts, JSON validation,
+All four examples print 42 and return 42. Tests cover source/IL contracts, JSON validation,
 host resolution, symbolic forwarding, shallow reference restrictions, pointers,
 substituted base and field contracts, and malformed or unsupported constraints.
