@@ -916,6 +916,60 @@ need not, by itself, settle the language's equality or object-identity contract.
 **Action:** Recorded the distinction and checked the C# comparison. No particular
 combination of semantics or change to neoCLR's current defaults was selected.
 
+### 25. Explore runtime contracts, then return to the intended object experience
+
+Recorded 2026-09-09 at the author's request.
+
+**Author's question:** Should these characteristics be runtime functionality or
+conventions built on existing interfaces and other facilities?
+
+**Assistant's provisional answer:** Equality, hashing and record conveniences could
+use ordinary methods and compiler generation. Storage, copying and reference validity
+need shared execution contracts. Immutability or absence of identity would need runtime
+enforcement if optimizations relied on them. Suggested identifying the missing guarantee
+before adding a single category that bundles several characteristics together.
+
+**Author's alternative:** Under a possible reference-default model, neoCLR could mark
+some types as inline, implementing struct-like behavior directly without a ValueType
+base-class split. The author proposed an illustrative IL declaration:
+
+```text
+.type inline value Int32
+```
+
+The author considered primitives with object-like wrappers but no separately declared
+instance data, and explicitly left open whether the inline flag should trigger value
+semantics. This was exploratory spelling, not an implemented or selected syntax.
+
+**Assistant's response:** Distinguished an inline representation hint from a contract
+that makes assignment copy contents. Suggested that `value` and `inline` could express
+separate concerns, while noting that primitive payload representation is another matter:
+no declared fields alone does not establish an integer's runtime representation.
+Whether flags belong to a type or each use remained open. These were assistant proposals,
+not decisions attributed to the author.
+
+**Author's clarification of the priority:** Preserve object-like qualities on primitive
+types and allow user-defined types to have that behavior. The low-level representation
+need not mirror the high-level abstraction. The author compared the exploration to
+Java's effort to bridge primitive and wrapper types through runtime optimization with
+semantic consequences, without requesting adoption of Java's model. The aim is familiar
+.NET usage while improving runtime architecture and design, rather than reproducing
+its historical decisions. The experiment remains useful for learning about alternatives.
+
+**Assistant's correction and suggested evaluation:** Acknowledged moving too quickly
+toward modifiers and categories. Reframed the goal as methods, interfaces, generics and
+coherent APIs for primitive and user-defined data, with efficient representation and
+precise copying, aliasing, mutation and identity contracts. Proposed testing one small
+API with both a built-in number and a user-defined value, including generic/interface
+use. That test was suggested, not performed or selected as the next implementation task.
+
+**Action and remaining scope:** Recorded this exchange. No new metadata flag, value-class
+category, convention or default behavior was implemented. The broader model remains
+under evaluation; this entry does not override the author's earlier clarification that
+changing routes has not been decided. Prior .NET/Valhalla comparisons in entries 22–24
+provide context; the Java analogy here is attributed reasoning, not a new release or
+performance claim.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

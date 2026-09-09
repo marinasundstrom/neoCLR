@@ -30,7 +30,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   that lightweight values need not be short-lived and the preference for potentially
   inline value classes over a separate struct concept, without selecting a migration.
   Recorded the follow-up separation of storage, mutation, identity and equality using
-  C# records as a comparison.
+  C# records as a comparison. Recorded the exploration of runtime contracts versus
+  conventions, tentative inline/value metadata, and the clarified priority of
+  object-like primitive and user-defined types with familiar .NET usage. Proposed
+  syntax and evaluation work remain explicitly unselected and unimplemented.
 
 - Added emit-il for inspecting Neo compiler output on stdout or in a new neoIL file,
   preserving original source sequence points. It validates without executing and
