@@ -809,6 +809,42 @@ better usability or performance.
 **Action:** Recorded these two exchanges and checked the comparison against primary
 sources. Runtime semantics, syntax and roadmap priorities remain unchanged.
 
+### 23. Reconsider universal value defaults in favor of ordinary class references
+
+Recorded 2026-09-09 at the author's explicit request.
+
+**Author's direction:** Languages should not have to live with the platform's universal
+value-default decision. Ordinary class use should match the expectation that a variable
+holds a reference, with automatic member access. Value behavior should be an opt-in;
+explicit reference passing is more appropriate when accessing those values without
+copying. Requiring ampersands throughout ordinary application code was identified as
+the wrong experience. The author connected this reconsideration to understanding the
+.NET class/value distinction and its integration of primitive wrappers into the hierarchy.
+
+**Assistant's response:** Identified this as a revision of the original universal
+value-default premise. Distinguished passing an object reference by value from passing
+the caller's slot by reference. Suggested ordinary class references, opt-in value
+classes and separate output/rebinding contracts, while retaining managed references
+for interior access, value borrowing, readonly access and lifetime checks.
+
+**Assistant's proposal, not an author decision:** Express a type's intended usage default
+in metadata for consistency across languages. Keep that contract separate from physical
+allocation. The author has not yet selected the metadata encoding, syntax, hierarchy
+rules or migration strategy; the assistant's preference is not recorded as an approved
+implementation design.
+
+**Outcome and next action:** The author requested this timeline entry and a search for
+existing design/architecture evaluation documents. The assistant found the
+[reference-experience evaluation](experiments/reference-experience/README.md),
+[type/API design discussion](type-design.md),
+[runtime groundwork review](runtime-groundwork-review.md),
+[execution architecture](execution-architecture.md) and
+[design research process](design-research.md). The experiment is the closest existing
+assessment of reference friction; the groundwork review is an earlier milestone-specific
+architecture assessment, not a current audit. Existing implementation documentation still
+describes the value-default model. This entry records the new direction without claiming
+that runtime behavior or those contracts have already migrated.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the
