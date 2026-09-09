@@ -18,6 +18,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   ordinary union cases, output-reference corrections, equality, release scope, Windows
   CI diagnosis and verified Preview 1 publication. Preserved attribution, the distinction
   between unavailable replies and implementation evidence, and later changes of direction.
+  Recorded the subsequent discussion of reference defaults and performance-oriented
+  complexity, with .NET/Valhalla sources and an explicit distinction between runtime
+  uniformity and demonstrated usability.
 
 - Added emit-il for inspecting Neo compiler output on stdout or in a new neoIL file,
   preserving original source sequence points. It validates without executing and

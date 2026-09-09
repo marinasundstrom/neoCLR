@@ -773,6 +773,42 @@ founding account with the retained detailed exchanges and removing the separate 
 file. Kept the distinctions between historical reports, observed validation and missing
 replies. The README and workflow now lead to this single record.
 
+### 22. Ask where performance-oriented complexity should be visible
+
+Recorded 2026-09-09.
+
+**Author's observation:** Developers in many high-level environments expect an object
+variable to contain a reference, automatically followed on member access. C# makes a
+stronger distinction through structs and classes, while Java historically separates
+primitives from objects. The author sees .NET's struct, reference and readonly features
+as ways to unlock performance beyond familiar object behavior, often inside library
+implementations rather than directly in ordinary consumer code. Java's work on value
+classes approaches the problem differently.
+
+**Assistant's response:** Distinguished copying an object reference from passing the
+variable's storage by reference. Framed neoCLR's question as whether choosing value or
+reference use independently of the type is worth the added decisions. A language could
+supply defaults without removing that runtime capability; no such change was selected.
+
+**Comparison checked:** Microsoft's [performance guidance](https://learn.microsoft.com/en-us/dotnet/csharp/advanced-topics/performance/)
+explicitly connects structs, ref access and readonly access with reducing allocation
+and copying. Structs are also ordinary modeling tools, and public APIs such as Span<T>
+expose these contracts: they are not exclusively hidden implementation optimizations.
+OpenJDK's [Valhalla project overview](https://github.com/openjdk/valhalla-docs/blob/main/site/_index.md)
+and [background design notes](https://github.com/openjdk/valhalla-docs/blob/main/site/design-notes/state-of-valhalla/01-background.md)
+describe value objects without identity, enabling optimized representations. This records
+the project's design direction, not a claim that all Valhalla features have shipped.
+Removing identity is different from neoCLR's choice to reference a mutable value.
+
+**Assistant's interpretation and open question:** The useful comparison is where each
+platform places complexity and how much reaches application code. neoCLR may unify
+runtime capabilities yet expose more decisions in Neo. Library and language defaults
+need evaluation with real programs; a more uniform runtime alone does not establish
+better usability or performance.
+
+**Action:** Recorded these two exchanges and checked the comparison against primary
+sources. Runtime semantics, syntax and roadmap priorities remain unchanged.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the
