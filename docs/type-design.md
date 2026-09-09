@@ -14,6 +14,24 @@ the caller's reference slot; output/rebinding contracts are separate. Readonly r
 an access path, not the entire reachable graph. A good API specifies both its guarantees
 and what callers must not assume.
 
+## Platform capability and language usability
+
+NeoCLR's managed references can provide a base or interface view of an existing object
+in either frame or managed heap storage. The view preserves identity and dispatches
+against the concrete object; this operation does not require CLR-style boxing. That
+is a platform capability, supported by its reference, lifetime and GC contracts. See
+[the constrained-view comparison](generic-constraints.md#constrained-reference-conversions)
+for the implemented behavior and .NET probe.
+
+This capability is useful independently of how a language spells it. It is not proof
+that Neo is easier to use than C#, or that explicit references are always worth their
+annotation cost. Syntax, inference, API defaults, diagnostics and tooling largely
+shape that experience. Languages can project the same runtime guarantees differently.
+Continue evaluating realistic programs and separating compiler/library friction from
+runtime restrictions; the [order-workflow experiment](experiments/reference-experience/README.md)
+is initial evidence, not a general usability verdict. Avoid inferring performance
+advantages from the absence of boxing without measuring the relevant workload.
+
 ## Values for independent data
 
 Small, stable data such as coordinates, amounts, settings snapshots and receipts are

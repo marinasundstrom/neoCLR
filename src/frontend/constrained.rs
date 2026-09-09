@@ -151,3 +151,82 @@ impl Lowerer<'_> {
         Ok(Some(method.returns))
     }
 }
+
+impl Lowerer<'_> {
+    // An existing T& can be viewed through a declared nominal bound. This does not
+    // borrow a bare T or convert one generic container into another.
+    pub(super) fn constrained_projection(
+        &self,
+        source: &Ty,
+        target: &Ty,
+    ) -> Result<Option<&'static str>, Fault> {
+        let Some(index) = self
+            .function
+            .generic_parameters
+            .iter()
+            .position(|p| p == &source.il())
+        else {
+            return Ok(None);
+        };
+        let interface = self
+            .source
+            .interfaces
+            .iter()
+            .any(|i| i.name.text == target.il())
+            || library::is_interface(target)?;
+        let mut pending = self
+            .function
+            .generic_constraints
+            .iter()
+            .filter_map(|constraint| {
+                if constraint.parameter as usize != index {
+                    return None;
+                }
+                match &constraint.kind {
+                    crate::metadata::ConstraintKind::TypeBound(bound) => {
+                        Some(Ty::from_metadata(bound))
+                    }
+                    _ => None,
+                }
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        let mut seen = Vec::new();
+        while let Some(bound) = pending.pop() {
+            if seen.contains(&bound) {
+                continue;
+            }
+            if (interface && library::implements(&bound, target)?)
+                || (!interface && library::base_reachable(&bound, target)?)
+                || bound == *target
+            {
+                return Ok(Some(if interface {
+                    "interface.borrow"
+                } else {
+                    "castclass"
+                }));
+            }
+            if let Some(record) = self
+                .source
+                .records
+                .iter()
+                .find(|r| r.name.text == bound.il())
+            {
+                pending.extend(record.base.iter().cloned());
+                if interface {
+                    pending.extend(record.implements.clone());
+                }
+            } else if interface {
+                if let Some(contract) = self
+                    .source
+                    .interfaces
+                    .iter()
+                    .find(|i| i.name.text == bound.il())
+                {
+                    pending.extend(contract.bases.clone());
+                }
+            }
+            seen.push(bound);
+        }
+        Ok(None)
+    }
+}

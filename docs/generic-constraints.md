@@ -132,6 +132,51 @@ constraint-implication verifier. Partial frontend library probes cannot prove co
 involving missing application definitions; full linking validates those definitions
 and repeats concrete checks.
 
+### Constrained reference conversions
+
+A declared bound also permits an existing `T&` to become a base/interface view:
+
+```swift
+func Observe<T>(readonly value: T&) -> readonly Readable& where T: Counter {
+    let baseView: readonly Counter& = value
+    return value
+}
+```
+
+Here Counter must declare Readable conformance (directly or through an ancestor).
+The same conversion works for arguments, local/field assignments and returns.
+Source-type `as` projections use the same rule. Bundled generic interface targets,
+such as `System.Comparable<T>&`, work through target-typed assignments and arguments.
+Converting to an inherited view needs proof from the declared bound; the concrete
+argument happening to implement an unrelated interface does not provide that proof.
+There are no downcasts, container variance, bare-T borrowing or base-value slicing.
+Readonly input can only produce a readonly view. `out` arguments still require exact
+output storage; conformance does not make output locations interchangeable.
+
+Once projected, existing base fields and interface properties/methods are available
+through that view. The conversion retains the original object and uses the existing
+`castclass`/`interface.borrow` instructions, including verifier evidence, readonly
+capabilities and runtime lifetime validation. Returning a view into an argument's
+storage is valid while the caller keeps that storage alive; returning a view into the
+current frame still faults. A managed heap view retains its owner under the existing
+GC rules. There is no metadata or instruction change in this slice.
+
+The [C# specification, §10.2.12](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/conversions#10212-implicit-conversions-involving-type-parameters)
+(consulted 2026-09-09) provides conversions from constrained type parameters to their
+base/interface types, with reference or boxing behavior depending on the argument.
+Neo adopts the familiar use of bounds as conversion evidence, but adapts the operation
+to an already explicit managed reference. Copying or boxing would lose the stack
+object's identity; refusing all conversion would force repetitive adapters around
+ordinary APIs. Checked views reuse the runtime's existing capability and lifetime
+rules. Their cost is the continuing explicit `T&` API boundary and runtime escape
+checks; this is not a performance claim or CLR boxing compatibility.
+
+This is a platform capability, not a conclusion about language usability; see
+[the distinction in the type/API guidance](type-design.md#platform-capability-and-language-usability).
+
+See [constrained-views.neo](../examples/source/constrained-views.neo) for base-field
+updates, virtual dispatch and reference identity through generic and ordinary APIs.
+
 ### Comparison with CLR constrained calls
 
 The shipped [OpCodes.Constrained contract](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.constrained?view=net-10.0)
@@ -147,7 +192,11 @@ instructions instead of adding a `constrained.` prefix. The benefit is preservin
 existing identity, readonly and lifetime rules with no allocation mechanism. The cost
 is a narrower source API: bare T cannot yet select value-versus-reference receiver
 handling after substitution. Supporting that later may justify a CLR-like prefix;
-silently borrowing, copying, or boxing is not an acceptable substitute. There is no
+silently borrowing, copying, or boxing is not an acceptable substitute. Receiver
+adaptation does not itself require boxing: it should select the existing value/address
+representation. NeoCLR does not need to reproduce CLR boxing for base/interface
+views, since managed references already retain the concrete object in either storage
+location. Any future explicit value-erasure/container operation is a separate contract. There is no
 claim of JIT performance improvement or full CLI compatibility. Tests exercise stack,
 heap, base overrides, inherited interfaces, explicit/default implementations and
 rejection from source, metadata, host calls and verification.
@@ -156,7 +205,10 @@ The [comparison probe](experiments/generic-bounds-dotnet/Program.cs) was run on
 2026-09-09 with SDK 10.0.100, runtime .NET 10.0.0, macOS ARM64. It printed `42`,
 `42`, `invalid bound rejected`: a constrained ref receiver mutated its original struct,
 a base-constrained call reached the override, and reflection rejected an invalid
-constructed generic method. It does not compare allocations or throughput. Reproduce
+constructed generic method. The added conversion probe prints `value=42, interface=43`
+and `True`: C# boxes the struct on conversion to an interface while the base-class
+conversion preserves class-instance identity. Neo's explicit managed views deliberately
+preserve the original object for both stack and heap storage. It does not compare allocations or throughput. Reproduce
 with `cd docs/experiments/generic-bounds-dotnet` followed by `dotnet run`; the directory
 pins its SDK in global.json.
 
@@ -170,9 +222,10 @@ nullable type arguments from uninitialized storage; see the
 ```sh
 cargo run --locked -- run examples/source/generic-constraints.neo
 cargo run --locked -- run examples/source/generic-bounds.neo
-cargo test --locked --test generic_bounds --test generic_constraints --test generic_metadata --test neo_generic_records --test neo_generics
+cargo run --locked -- run examples/source/constrained-views.neo
+cargo test --locked --test neo_constrained_views --test generic_bounds --test generic_constraints --test generic_metadata --test neo_generic_records --test neo_generics
 ```
 
-Both examples print 42 and return 42. Tests cover source/IL contracts, JSON validation,
+All three examples print 42 and return 42. Tests cover source/IL contracts, JSON validation,
 host resolution, symbolic forwarding, shallow reference restrictions, pointers,
 substituted base and field contracts, and malformed or unsupported constraints.

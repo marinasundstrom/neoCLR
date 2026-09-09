@@ -2055,6 +2055,10 @@ impl Lowerer<'_> {
                 if concrete == interface {
                     return Ok(expected.clone());
                 }
+                if let Some(opcode) = self.constrained_projection(concrete, interface)? {
+                    self.body.push(format!("{opcode} {}", interface.il()));
+                    return Ok(expected.clone());
+                }
                 if self.source.base_reachable(concrete, interface)
                     || library::base_reachable(concrete, interface)?
                 {

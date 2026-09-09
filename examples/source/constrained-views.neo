@@ -1,0 +1,29 @@
+interface Readable {
+    readonly func Read() -> int
+}
+record Counter(Value: int): Readable {
+    readonly virtual func Read() -> int { return this.Value }
+}
+record OffsetCounter(Offset: int): Counter {
+    readonly override func Read() -> int { return this.Value + this.Offset }
+}
+func Increment(counter: Counter&) -> () {
+    counter.Value = counter.Value + 1
+}
+func Update<T>(counter: T&) -> readonly Readable& where T: Counter {
+    Increment(counter)
+    let view: Counter& = counter
+    view.Value = view.Value + 1
+    return counter
+}
+func Main() -> int {
+    var local = OffsetCounter(18, 1)
+    let localView = Update(&local)
+    let heap = new OffsetCounter(18, 1)
+    let heapView = Update(heap)
+    if !ReferenceEquals(localView, &local) { return -1 }
+    if !ReferenceEquals(heapView, heap) { return -2 }
+    let result = localView.Read() + heapView.Read()
+    Console.WriteLine(result)
+    return result
+}

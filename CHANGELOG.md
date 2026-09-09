@@ -16,6 +16,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   reference views and ordinary dispatch, preserving readonly access and concrete identity.
   Added metadata/host/source/IL regressions, an executable example and a reproducible
   .NET comparison probe.
+  Added constrained T& conversions for API arguments, assignments and returned
+  base/interface views, with inherited conformance and readonly/lifetime enforcement.
+  Included a view/identity example and .NET reference-versus-boxing comparison,
+  distinguishing platform capabilities from high-level language usability.
   Bare-T receiver handling and broader member lookup remain later work; notnull awaits
   nullable metadata. Older tools reject constrained artifacts; Neo reserves the new keywords.
 
