@@ -870,6 +870,27 @@ and [Java team's value-class demonstration](https://inside.java/2025/10/27/try-j
 support the distinctions. The Java demonstration includes Integer and LocalDate in
 preview mode; it does not establish universal deployment or allocation elimination.
 
+**Author's clarification about lightweight values:** The earlier lifetime observation
+was general: a value can live within a long-lived heap object, while still being
+lightweight in representation. **Assistant's response:** Acknowledged that its lifetime
+qualification had been narrower than the author's point required.
+
+**Author's preference for the explored model:** The author now understands why C# uses
+the term struct and recognizes that .NET and Java's emerging value behavior differ,
+with architecture and backward compatibility informing those designs. This was not a
+request to adopt Java's behavior. The preferred concept is a value class that can
+preferably be inlined, rather than a separate struct equivalent.
+
+**Assistant's interpretation:** Described an ordinary class with an explicit value
+contract, with copying, mutation, identity and reference access still requiring separate
+decisions. Inline storage would be enabled by the contract, not promised in every use.
+This interpretation does not establish those unresolved semantics as agreed decisions.
+
+**Action and scope:** At the author's request to record, appended these clarifications
+to the ongoing exploration. The preference concerns the shape of a possible value-class
+model; the broader decision to replace current defaults remains open. No runtime,
+metadata or language change was implemented.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

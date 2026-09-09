@@ -26,7 +26,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   clarified that this is not a selected direction; the current model remains in place. No runtime
   or language contract migration is implemented by this documentation change. Extended
   the exploration with transparent class usage, value-design intent and Java wrapper
-  evolution, distinguishing lifetime, identity and preview status.
+  evolution, distinguishing lifetime, identity and preview status. Added the clarification
+  that lightweight values need not be short-lived and the preference for potentially
+  inline value classes over a separate struct concept, without selecting a migration.
 
 - Added emit-il for inspecting Neo compiler output on stdout or in a new neoIL file,
   preserving original source sequence points. It validates without executing and
