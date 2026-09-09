@@ -28,6 +28,32 @@ impl Slot {
             replacements: HashMap::new(),
         }))
     }
+    pub(crate) fn receiver(cell: &Cell, readonly_value: bool) -> Result<Value, Fault> {
+        let mut reference = crate::SlotReference::new(cell);
+        reference.assigned()?;
+        if matches!(
+            cell.borrow().inspect_type(),
+            Type::ByRef(_) | Type::ReadOnlyByRef(_)
+        ) {
+            let value = cell.borrow().get()?.on_stack();
+            match &value {
+                Value::SlotReference(target)
+                | Value::SlotInterface {
+                    receiver: target, ..
+                } => target.assigned()?,
+                _ => {
+                    return Err(Fault::new(
+                        "managed receiver slot does not contain a managed reference",
+                    ));
+                }
+            }
+            return Ok(value);
+        }
+        if readonly_value {
+            reference.restrict_readonly();
+        }
+        Ok(Value::SlotReference(reference))
+    }
     pub(crate) fn construction(ty: Type, fields: Vec<Value>) -> Cell {
         let cell = Self::new(ty.clone(), Some(Value::Object { ty, fields }));
         cell.borrow_mut().construction = Some(vec![]);

@@ -57,7 +57,6 @@ fn wrong_bounds_and_readonly_mutation_are_rejected() {
         "func Main() -> () { var n = 42; Add(&n, 1) }",
         "func Bad<T>(readonly value: T&) -> () where T: Counter { value.Add(1) }\nfunc Main() -> () {}",
         "func Bad<T>(value: T&) -> int { return value.Read() }\nfunc Main() -> () {}",
-        "func Bad<T>(value: T) -> int where T: Readable { return value.Read() }\nfunc Main() -> () {}",
     ] {
         assert!(
             execute(&format!("{DECLARATIONS}\n{tail}")).is_err(),

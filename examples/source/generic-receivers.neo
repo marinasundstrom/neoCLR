@@ -1,0 +1,26 @@
+interface Counter {
+    readonly func Read() -> int
+    func Add(amount: int) -> ()
+}
+record Cell(Value: int): Counter {
+    readonly func Read() -> int { return this.Value }
+    func Add(amount: int) -> () { this.Value = this.Value + amount }
+}
+func Read<T>(value: T) -> int where T: Counter {
+    return value.Read()
+}
+func Adjust<T>(value: T) -> int where T: Counter {
+    var local = value
+    local.Add(1)
+    return local.Read()
+}
+func Main() -> int {
+    let value = Cell(20)
+    if Adjust(value) != 21 { return -1 }
+    if Read(value) != 20 { return -2 }
+    let shared = new Cell(21)
+    if Adjust(shared) != 22 { return -3 }
+    let result = Read(value) + Read(shared)
+    Console.WriteLine(result)
+    return result
+}

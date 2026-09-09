@@ -251,5 +251,6 @@ inference remain separate steps. This uses the existing CLR-like metadata founda
 and `notreference`, plus nominal base/interface bounds, for generic records/functions/static
 methods. Method lookup and constrained reference conversions through T& receivers
 are implemented. Addressable bare-T receivers support method calls with notreference;
-unrestricted bare-T adaptation, bound fields/properties and method-group conversions
-remain later work. notnull requires nullable metadata first.
+open bare-T parameters/locals now use [receiver adaptation](receiver-adaptation.md).
+Open field/array/captured receiver adaptation, bound fields/properties and method-group
+conversions remain later work. notnull requires nullable metadata first.

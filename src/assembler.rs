@@ -1241,6 +1241,22 @@ fn parse_compact_instruction(
     operand: &str,
     function: &Function,
 ) -> Result<Option<Instruction>, Fault> {
+    if word == "ldreceiver" {
+        let words = operand.split_whitespace().collect::<Vec<_>>();
+        if !(words.len() == 2 || words.len() == 3 && words[2] == "readonly") {
+            return Err(Fault::new("expected ldreceiver arg|local slot [readonly]"));
+        }
+        let argument = match words[0] {
+            "arg" => true,
+            "local" => false,
+            _ => return Err(Fault::new("receiver source must be arg or local")),
+        };
+        return Ok(Some(Instruction::Receiver {
+            argument,
+            index: resolve_slot(function, if argument { "ldarg" } else { "ldloc" }, words[1])?,
+            readonly_value: words.len() == 3,
+        }));
+    }
     if word == "ldc.i4.s" {
         let value = operand
             .parse::<i8>()

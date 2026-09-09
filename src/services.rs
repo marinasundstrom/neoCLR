@@ -157,7 +157,7 @@ fn instruction_services(op: &Op) -> &'static [RuntimeService] {
         Op::ReferenceType => &[TypeInspection, SlotReferences],
         Op::CastClass(_) => &[TypeInspection, SlotReferences],
         Op::ReferenceEqual => &[SlotReferences],
-        Op::LocalAddress(..) | Op::ArgumentAddress(..) => &[SlotReferences],
+        Op::LocalAddress(..) | Op::ArgumentAddress(..) | Op::Receiver { .. } => &[SlotReferences],
         Op::LoadObject(..)
         | Op::StoreObject(..)
         | Op::FieldAddress(..)

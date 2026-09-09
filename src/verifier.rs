@@ -116,7 +116,13 @@ fn analyze_constructor(module: &Module, function: &Function) -> Result<(), Fault
         let mut outputs = vec![Origin::Other; pushes];
         match op {
             Op::Arg(0) => outputs[0] = Origin::Receiver,
-            Op::StoreArg(0) | Op::ArgumentAddress(0) => {
+            Op::StoreArg(0)
+            | Op::ArgumentAddress(0)
+            | Op::Receiver {
+                argument: true,
+                index: 0,
+                ..
+            } => {
                 return Err(fault(
                     pc,
                     "cannot replace or address constructor receiver binding",
@@ -312,10 +318,23 @@ fn analyze_function(
         if matches!(op, Op::Return) && state.stack.len() != 1 {
             return Err(fault(pc, "ret requires exactly one value"));
         }
-        if matches!(op, Op::Load(slot) if !state.initialized[*slot]) {
+        if matches!(op, Op::Load(slot) | Op::Receiver { argument: false, index: slot, .. } if !state.initialized[*slot])
+        {
             return Err(fault(pc, "local is not initialized on every incoming path"));
         }
-        if constructing && matches!(op, Op::Arg(0) | Op::Return) && !state.receiver_initialized {
+        if constructing
+            && matches!(
+                op,
+                Op::Arg(0)
+                    | Op::Return
+                    | Op::Receiver {
+                        argument: true,
+                        index: 0,
+                        ..
+                    }
+            )
+            && !state.receiver_initialized
+        {
             return Err(fault(
                 pc,
                 "constructor receiver is not initialized on every incoming path",
@@ -606,6 +625,7 @@ fn effect(
         | Arg(_)
         | LocalAddress(_)
         | ArgumentAddress(_)
+        | Receiver { .. }
         | Load(_)
         | LoadTypeToken(_)
         | SizeOf(_)
@@ -886,6 +906,25 @@ fn typed_effect(
         String(_) => one(T::String),
         Error(_) => one(T::Error),
         Void => one(T::Void),
+        Receiver {
+            argument,
+            index,
+            readonly_value,
+        } => {
+            let ty = if *argument {
+                function.argument_types()[*index].clone()
+            } else {
+                function.locals[*index].clone()
+            };
+            match ty {
+                T::ByRef(_) | T::ReadOnlyByRef(_) => Ok(vec![loaded(&ty)]),
+                // Open T may be a value or reference. The view proof uses its
+                // nominal bound; concrete access capabilities are checked at runtime.
+                T::TypeParameter(_) | T::MethodTypeParameter(_) => one(T::ByRef(Box::new(ty))),
+                _ if *readonly_value => Ok(vec![StackType::Readonly(T::ByRef(Box::new(ty)))]),
+                _ => one(T::ByRef(Box::new(ty))),
+            }
+        }
         LocalAddress(index) => Result::Ok(vec![StackType::Slot {
             ty: T::ByRef(Box::new(function.locals[*index].clone())),
             local: Some(*index),

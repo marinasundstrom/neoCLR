@@ -52,11 +52,10 @@ func Main() -> int { return Helpers.Compare(42, 42) }
 }
 
 #[test]
-fn mutating_immutable_value_receivers_and_unproven_address_modes_are_rejected() {
+fn mutating_immutable_values_and_excluded_reference_arguments_are_rejected() {
     for function in [
         "func Bad<T>(value: T) -> () where T: Counter, notreference { value.Add(1) }",
         "func Bad<T>(value: T) -> () where T: Counter, notreference { let local = value; local.Add(1) }",
-        "func Bad<T>(value: T) -> int where T: Readable { return value.Read() }",
     ] {
         assert!(
             frontend::compile(&format!(

@@ -121,8 +121,9 @@ Neo looks up source/bundled bound methods, including inherited members, and emit
 These checked views retain the concrete object and use its explicit/default interface
 implementation or virtual override. They create no box and preserve lifetime checks.
 Ambiguous members from unrelated bounds are rejected; use a narrower helper contract.
-Unconstrained members, calls on bare T without `notreference`, direct bound field/property
-lookup, method-group conversion and constraint-aware closure lowering remain outside this slice. Generic source-record
+Unconstrained members, direct bound field/property lookup, method-group conversion
+and constraint-aware closure lowering remain outside this slice. Direct bare-T
+parameters/locals now use [receiver adaptation](receiver-adaptation.md). Generic source-record
 methods are still a separate language feature.
 
 The verifier accepts an open parameter's projection only when its declared bound
@@ -163,18 +164,16 @@ are evaluated once, including field/array receiver expressions with side effects
 
 Readonly references, inherited/default/explicit dispatch and lifetime checks continue
 through the existing runtime paths. Returning an interior view into a copied value
-parameter still faults when that callee frame exits. Adding a nominal bound without
-`notreference` is insufficient: T could itself be a managed reference, and taking the
-address of its slot would manufacture an unsupported nested reference. Use an explicit
-T& API for that case until general receiver adaptation is defined. The constraint also
-rejects reference arguments at concrete runtime resolution.
+parameter still faults when that callee frame exits. With an open addressing mode,
+Neo now uses [ldreceiver for direct parameters/locals](receiver-adaptation.md); the
+notreference path remains useful for statically known value receivers, including
+addressable fields and array elements. The runtime constraint still rejects reference
+arguments at concrete resolution.
 
-This reuses the CLR `constrained.` comparison below: generic member invocation and
-nominal conformance are familiar, but Neo's value proof allows lowering to existing
-slot addresses and views. Requiring `T&` for every operation was simpler but prevented
-ordinary readonly generic value APIs. Adding universal receiver adaptation now would
-broaden both runtime and language contracts unnecessarily. This is a bounded capability
-extension, not proof of better usability or performance. See
+This reuses the CLR `constrained.` comparison below. A value proof permits ordinary
+slot-address lowering, while the new adaptive path selects a value borrow or an
+existing reference. Neither requires boxing for these views. These are platform
+capabilities, not proof of better usability or performance. See
 [constrained-values.neo](../examples/source/constrained-values.neo).
 
 ### Constrained reference conversions
@@ -231,20 +230,13 @@ for generic calls and can avoid boxing. The CLI metadata specification (ECMA-335
 baseline for keeping bounds in metadata rather than solely in Neo. See
 [ECMA-335](https://ecma-international.org/wp-content/uploads/ECMA-335_6th_edition_june_2012.pdf).
 
-NeoCLR reuses nominal bounds and ordinary virtual dispatch. Its explicit T& receiver
-already supplies a managed address, so this slice reuses checked reference-view
-instructions instead of adding a `constrained.` prefix. The benefit is preserving
-existing identity, readonly and lifetime rules with no allocation mechanism. The cost
-is a narrower source API: unrestricted bare T cannot yet select value-versus-reference receiver
-handling after substitution. Supporting that later may justify a CLR-like prefix;
-silently borrowing, copying, or boxing is not an acceptable substitute. Receiver
-adaptation does not itself require boxing: it should select the existing value/address
-representation. NeoCLR does not need to reproduce CLR boxing for base/interface
-views, since managed references already retain the concrete object in either storage
-location. Any future explicit value-erasure/container operation is a separate contract. There is no
-claim of JIT performance improvement or full CLI compatibility. Tests exercise stack,
-heap, base overrides, inherited interfaces, explicit/default implementations and
-rejection from source, metadata, host calls and verification.
+NeoCLR reuses nominal bounds and ordinary virtual dispatch. Explicit T& and proven
+value receivers use existing slot addresses and checked views. Open direct receivers
+now use the [ldreceiver extension](receiver-adaptation.md), which selects a stored
+reference or value borrow without requiring nested references or boxing. Broader
+storage operands remain provisional. Receiver adaptation is distinct from a future
+explicit value-erasure/container operation, and none of these capabilities alone
+establishes a usability or JIT performance advantage.
 
 The [comparison probe](experiments/generic-bounds-dotnet/Program.cs) was run on
 2026-09-09 with SDK 10.0.100, runtime .NET 10.0.0, macOS ARM64. It printed `42`,

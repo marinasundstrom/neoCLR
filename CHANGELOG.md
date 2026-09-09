@@ -23,7 +23,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Added constrained calls on addressable T values with notreference, reusing slot
   addresses and views with existing binding mutability, shallow copy and escape rules.
   Included value-copy and receiver-evaluation regressions and an executable example.
-  Unrestricted bare-T receiver handling and broader member lookup remain later work; notnull awaits
+  Added preview ldreceiver adaptation for open generic parameter/local receivers,
+  preserving stored reference identity or borrowing value storage with a chosen readonly
+  capability. No boxing or nested managed references are introduced. Fixed inferred
+  readonly-reference call signatures; added raw IL/artifact/Neo validation and CLR comparison.
+  Broader receiver operands and member lookup remain later work; notnull awaits
   nullable metadata. Older tools reject constrained artifacts; Neo reserves the new keywords.
 
 - Added plain generic Neo record declarations with explicit positional construction,

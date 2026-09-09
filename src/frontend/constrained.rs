@@ -31,14 +31,10 @@ impl Lowerer<'_> {
         else {
             return Ok(None);
         };
-        if !reference
-            && !self.function.generic_constraints.iter().any(|constraint| {
-                constraint.parameter as usize == index
-                    && constraint.kind == crate::metadata::ConstraintKind::NotReference
-            })
-        {
-            return Err(member.error("constrained value member access requires notreference; otherwise use a T& receiver"));
-        }
+        let value_only = self.function.generic_constraints.iter().any(|constraint| {
+            constraint.parameter as usize == index
+                && constraint.kind == crate::metadata::ConstraintKind::NotReference
+        });
         let mut found: Option<Member> = None;
         for constraint in &self.function.generic_constraints {
             if constraint.parameter as usize != index {
@@ -131,7 +127,11 @@ impl Lowerer<'_> {
             // Use the original value slot, as for a concrete record receiver. Do
             // not run expression effects twice or introduce a receiver copy.
             self.body.truncate(saved);
-            self.place_with_access(expression, true, method.readonly)?;
+            if value_only {
+                self.place_with_access(expression, true, method.readonly)?;
+            } else {
+                self.adaptive_receiver(expression, member)?;
+            }
         }
         self.body.push(format!(
             "{} {}",
@@ -241,5 +241,31 @@ impl Lowerer<'_> {
             seen.push(bound);
         }
         Ok(None)
+    }
+}
+
+impl Lowerer<'_> {
+    fn adaptive_receiver(&mut self, expression: &Expr, at: &Token) -> Result<(), Fault> {
+        let ExprKind::Name(name) = &expression.kind else {
+            return Err(at.error("adaptive generic receiver requires a parameter or local; bind the expression first or use notreference"));
+        };
+        let binding = self.binding(name, at)?;
+        if binding.cell.is_some() || binding.scoped {
+            return Err(at.error(
+                "adaptive generic receiver does not yet support captured or block-local bindings",
+            ));
+        }
+        let (kind, slot) = if let Some(slot) = binding.load.strip_prefix("ldarg ") {
+            ("arg", slot)
+        } else if let Some(slot) = binding.load.strip_prefix("ldloc ") {
+            ("local", slot)
+        } else {
+            return Err(at.error("adaptive receiver requires direct slot storage"));
+        };
+        self.body.push(format!(
+            "ldreceiver {kind} {slot}{}",
+            if binding.mutable { "" } else { " readonly" }
+        ));
+        Ok(())
     }
 }

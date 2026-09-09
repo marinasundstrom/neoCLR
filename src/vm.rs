@@ -700,6 +700,24 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                         "switch target outside function or into prefixed instruction",
                     ));
                 }
+                Op::Receiver {
+                    argument: true,
+                    index: 0,
+                    ..
+                } if function.instance && function.name.ends_with("..ctor") => {
+                    return Err(Fault::new("cannot adapt a constructor receiver binding"));
+                }
+                Op::Receiver {
+                    argument, index, ..
+                } if *index
+                    >= if *argument {
+                        function.argument_types().len()
+                    } else {
+                        function.locals.len()
+                    } =>
+                {
+                    return Err(Fault::new("receiver index outside signature"));
+                }
                 Op::Arg(i) | Op::StoreArg(i) | Op::ArgumentAddress(i)
                     if *i >= function.argument_types().len() =>
                 {
@@ -1487,6 +1505,20 @@ fn interpret_instructions(
                 Op::String(s) => frame.stack.push(Value::String(s.clone())),
                 Op::Void => frame.stack.push(Value::Void),
                 Op::Error(s) => frame.stack.push(Value::Error(s.clone())),
+                Op::Receiver {
+                    argument,
+                    index,
+                    readonly_value,
+                } => {
+                    let slot = if *argument {
+                        &frame.args[*index]
+                    } else {
+                        &frame.locals[*index]
+                    };
+                    frame
+                        .stack
+                        .push(crate::slots::Slot::receiver(slot, *readonly_value)?);
+                }
                 Op::LocalAddress(i) => {
                     frame
                         .stack

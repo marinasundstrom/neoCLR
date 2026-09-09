@@ -4,12 +4,21 @@ struct Cell(int n) : Counter {
     public readonly int Read() => Value;
     public void Add(int n) => Value += n;
 }
+class SharedCell(int n) : Counter {
+    public int Read() => n;
+    public void Add(int amount) => n += amount;
+}
 abstract class Base { public abstract int Read(); }
 class Derived : Base { public override int Read() => 42; }
 class Program {
     static void Add<T>(ref T x, int n) where T : Counter => x.Add(n);
     static int Read<T>(ref T x) where T : Counter => x.Read();
     static int ReadBase<T>(T x) where T : Base => x.Read();
+    static int AdjustAny<T>(T value) where T : Counter {
+        var local = value;
+        local.Add(1);
+        return local.Read();
+    }
     static int AdjustValue<T>(T value) where T : struct, Counter {
         var local = value;
         local.Add(1);
@@ -27,6 +36,8 @@ class Program {
             throw new Exception("constraint not enforced");
         } catch (ArgumentException) { Console.WriteLine("invalid bound rejected"); }
         Console.WriteLine($"adjusted={AdjustValue(x)}, original={x.Read()}");
+        var shared = new SharedCell(42);
+        Console.WriteLine($"generic-value={AdjustAny(x)}, original={x.Read()}, generic-reference={AdjustAny(shared)}, shared={shared.Read()}");
         var boxed = ToCounter(x);
         boxed.Add(1);
         Console.WriteLine($"value={x.Read()}, interface={boxed.Read()}");

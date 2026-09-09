@@ -545,6 +545,13 @@ pub enum Instruction {
     LocalAddress(usize),
     #[serde(rename = "ldarga")]
     ArgumentAddress(usize),
+    /// Borrow a value slot or load its existing managed reference, without nesting references.
+    #[serde(rename = "ldreceiver")]
+    Receiver {
+        argument: bool,
+        index: usize,
+        readonly_value: bool,
+    },
     #[serde(rename = "ldarg")]
     Arg(usize),
     #[serde(rename = "starg")]

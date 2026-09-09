@@ -2869,6 +2869,18 @@ impl Lowerer<'_> {
                     );
                     Ty::from_metadata(&ty.substitute_method_parameters(&types)?)
                 };
+                // Canonicalize declared readonly parameter spelling before substitution;
+                // a readonly reference introduced by T remains part of the closed type.
+                let signature_parameters = function
+                    .parameters
+                    .iter()
+                    .map(|p| {
+                        let formal = Ty::from_metadata(&crate::assembler::parse_type(
+                            &p.ty.parameter_il(),
+                        )?)?;
+                        substitute(&formal).map(|ty| ty.il())
+                    })
+                    .collect::<Result<Vec<_>, Fault>>()?;
                 let mut parameters = function.parameters.clone();
                 for parameter in &mut parameters {
                     parameter.ty = substitute(&parameter.ty)?;
@@ -2894,11 +2906,7 @@ impl Lowerer<'_> {
                 };
                 self.body.push(format!(
                     "call {name}{generic}({})",
-                    parameters
-                        .iter()
-                        .map(|p| p.ty.parameter_il())
-                        .collect::<Vec<_>>()
-                        .join(",")
+                    signature_parameters.join(",")
                 ));
                 return Ok(Some(returns));
             }

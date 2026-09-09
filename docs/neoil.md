@@ -604,6 +604,16 @@ including uninitialized locals and out destinations. See
 See [managed arrays](managed-arrays.md) for T[] signatures, native-integer indices,
 initialization differences from CLR, payload limits and fixed-shape replacement.
 
+## Adaptive receiver load (format 5 extension)
+
+`ldreceiver arg|local index-or-name [readonly]` loads an existing managed reference
+or borrows its value slot after generic substitution. `readonly` restricts only the
+value borrow; stored reference permissions are preserved. It requires initialized
+storage and does not expose references to reference slots. See
+[receiver adaptation](receiver-adaptation.md) for metadata, verifier/runtime checks,
+CLR comparison and the current source projection. This is a neoCLR extension, not
+a CLR opcode or a change to ldarga/ldloca.
+
 ## Source sequence points
 
 Optional `.sequence {"instruction":0,"document":"sample.neo","line":3,"column":5}`
