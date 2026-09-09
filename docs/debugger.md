@@ -5,6 +5,16 @@ values. It shows the call stack, arguments, locals, evaluation stacks, managed h
 objects, GC statistics and tracked native allocation bytes. Neo source locations
 are retained through compilation and artifact loading.
 
+## Inspect the compiler output
+
+```sh
+cargo run --locked -- emit-il examples/source/debugger.neo
+```
+
+This displays the generated IL without executing the program. An optional output path
+saves reassemblable IL with the original source sequence points. See
+[IL inspection](il-inspection.md) for the emit/assemble/debug workflow.
+
 ## Start a session
 
 From the repository root:

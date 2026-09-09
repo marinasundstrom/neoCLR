@@ -273,11 +273,11 @@ Revisit general constants, FieldInfo literal queries, additional integer widths 
 formatting later. Constant-expression evaluation belongs to Neo. The current enum
 representation and literal metadata remain provisional.
 
-The next tooling slice adds a CLI path to inspect neoIL emitted from Neo source for
-debugging. The compiler already exposes lower_to_il_named; the CLI does not yet expose
-it. Microsoft's [Ildasm](https://learn.microsoft.com/en-us/dotnet/framework/tools/ildasm-exe-il-disassembler)
+The [emit-il command](il-inspection.md) now exposes lower_to_il_named through the CLI
+for inspecting Neo compiler output without execution. It preserves source maps and
+validates before writing a new file. Microsoft's [Ildasm](https://learn.microsoft.com/en-us/dotnet/framework/tools/ildasm-exe-il-disassembler)
 (consulted 2026-09-09) reads compiled artifacts and produces reassemblable IL text.
-Start Neo with source emission; artifact disassembly needs a separate metadata-to-text
-writer. The smaller first step exposes compiler decisions but cannot inspect arbitrary
-artifacts, so it should not be presented as a complete Ildasm equivalent. Binary instruction
+Neo currently implements source emission; artifact disassembly still needs a separate
+metadata-to-text writer. This exposes compiler decisions but cannot inspect arbitrary
+artifacts and is not a complete Ildasm equivalent. Binary instruction
 encoding remains a future format decision and is not required for readable IL inspection.

@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-09
 
+- Added emit-il for inspecting Neo compiler output on stdout or in a new neoIL file,
+  preserving original source sequence points. It validates without executing and
+  refuses file overwrites. Added CLI round-trip/error regressions and debugging
+  instructions. JSON artifact disassembly and binary encoding remain future work.
+
 - Added initial Int32-backed enum/flags metadata and Neo declarations, named constants,
   typed bitwise/equality operations, explicit integer conversion and zero/unnamed values.
   Runtime validation enforces enum layout and nominal calls; enum construction accepts

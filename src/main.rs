@@ -7,6 +7,7 @@ use std::{
 };
 
 const USAGE: &str = "Usage:
+  neoclr emit-il <source.neo> [output.neoil]
   neoclr assemble <source.neoil> <output.neo.json> [--module <input>]... [--system <input>]
   neoclr run <input> [System.neo.json] [--module <input>]... [--system <input>] [--gc-stats] [--gc-events] [-- <guest-argument>...]
   neoclr debug <input> [--module <input>]... [--system <input>] [-- <guest-argument>...]
@@ -23,8 +24,42 @@ fn read(path: &str) -> Result<String, String> {
     .map_err(|e| format!("Cannot read {path}: {e}"))
 }
 
+fn emit_il(args: &[String]) -> Result<Vec<String>, String> {
+    if !(2..=3).contains(&args.len())
+        || !args[1].ends_with(".neo")
+        || args[1..].iter().any(|arg| arg.starts_with("--"))
+    {
+        return Err(format!(
+            "emit-il requires one Neo source and an optional output path\n{USAGE}"
+        ));
+    }
+    let source = read(&args[1])?;
+    let il = neoclr::frontend::lower_to_il_named(&source, &args[1]).map_err(|e| e.to_string())?;
+    // Match ordinary Neo compilation, but retain the original textual lowering.
+    // Validate before writing; emission never runs the guest program.
+    let module = assemble(&il).map_err(|e| e.to_string())?;
+    neoclr::LoadedProgram::new(&module)
+        .and_then(|program| program.verify())
+        .map_err(|e| e.to_string())?;
+    if let Some(output) = args.get(2) {
+        let mut file = fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(output)
+            .map_err(|e| format!("Cannot create {output}: {e}"))?;
+        file.write_all(il.as_bytes()).map_err(|e| e.to_string())?;
+        Ok(vec![format!("Emitted {} -> {output}", args[1])])
+    } else {
+        // main appends one newline; stdout remains reassemblable IL only.
+        Ok(vec![il.strip_suffix('\n').unwrap_or(&il).to_owned()])
+    }
+}
+
 fn execute(args: &[String]) -> Result<Vec<String>, String> {
     let command = args.first().map(String::as_str).ok_or(USAGE)?;
+    if command == "emit-il" {
+        return emit_il(args);
+    }
     if !matches!(command, "assemble" | "run" | "debug" | "check" | "verify") {
         return Err(USAGE.into());
     }

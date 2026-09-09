@@ -127,6 +127,17 @@ Hello, world!
 => Void
 ```
 
+### Inspect the IL generated from Neo
+
+```sh
+cargo run --locked -- emit-il examples/source/enums.neo
+cargo run --locked -- emit-il examples/source/generic-receivers.neo /tmp/receivers.neoil
+```
+
+The command validates the source and emits readable, reassemblable IL without running
+it. File output refuses overwrites. See [IL inspection](docs/il-inspection.md) for
+round trips and source-mapped debugging; JSON artifact disassembly remains future work.
+
 ### Build, assemble, verify, and run separately
 
 ```sh
