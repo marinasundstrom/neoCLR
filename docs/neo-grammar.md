@@ -14,7 +14,10 @@ There are no empty statements apart from separators.
 
 ```ebnf
 program          = separators, { declaration, separators }, end_of_input ;
-declaration      = union_decl | delegate_decl | import_decl | class_decl | record_decl | interface_decl | function_decl ;
+declaration      = enum_decl | union_decl | delegate_decl | import_decl | class_decl | record_decl | interface_decl | function_decl ;
+enum_decl        = [ "flags" ], "enum", identifier, [ ":", "int" ], newlines,
+                   "{", separators, [ enum_member, { ("," | separators), enum_member }, [ "," ] ], separators, "}" ;
+enum_member      = identifier, [ "=", [ "-" ], integer ] ;
 union_decl       = "union", identifier, [ generic_parameters ], newlines,
                    ("(", newlines, type, { newlines, "|", newlines, type }, newlines, ")", terminator
                    | "{", separators, union_case, { separators, union_case }, separators, "}") ;
@@ -95,13 +98,16 @@ match_arm        = pattern, "=>", newlines, (expression | block) ;
 pattern          = "_" | identifier, [ "(", ("let", identifier | "_"), ")" ] ;
 arm_separator    = ("," | newline), separators ;
 logical_or       = logical_and, { "||", logical_and } ;
-logical_and      = equality, { "&&", equality } ;
+logical_and      = bitwise_or, { "&&", bitwise_or } ;
+bitwise_or       = bitwise_xor, { "|", bitwise_xor } ;
+bitwise_xor      = bitwise_and, { "^", bitwise_and } ;
+bitwise_and      = equality, { "&", equality } ;
 equality         = comparison, { ("==" | "!="), comparison } ;
 comparison       = additive, { ("<" | ">" | "<=" | ">="), additive } ;
 additive         = multiplicative, { ("+" | "-"), multiplicative } ;
 multiplicative   = projection, { ("*" | "/"), projection } ;
 projection       = unary, { "as", type } ;
-unary            = ("&" | "-" | "!" | "new"), unary
+unary            = ("&" | "-" | "!" | "~" | "new"), unary
                  | "new", type, "[", expression, "]", [ array_initializer ] | postfix ;
 array_initializer = "{", newlines, [ expression, newlines,
                     { ",", newlines, expression, newlines }, [ ",", newlines ] ], "}" ;
@@ -373,3 +379,8 @@ nullable metadata.
 
 Generic union parameters currently apply to the parenthesized existing-case form.
 Generic inline case declarations are rejected. See [generic source unions](generic-source-unions.md).
+
+Enum declarations, named constants and bitwise/equality operations are described in
+[enums](enums.md). The initial underlying type is Int32, and member initializers accept
+integer literals only. `flags` is contextual; `enum` is reserved. Bitwise precedence
+is OR, XOR, AND, then equality; unary `~` complements an Int32 or enum value.

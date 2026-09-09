@@ -696,3 +696,11 @@ by its arguments and push R, using the ordinary call frame and output rules.
 See [delegates](delegates.md) for examples, Func<Void>, lifetime restrictions and the
 [CLR instruction comparison](delegate-contract.md). delegate.bind is a new opcode;
 Invoke reuses call/callvirt.
+
+## Enum literal metadata (format 5 extension)
+
+A type may declare `.enum Int32 [flags]` followed by `.literal Name signed-integer`
+entries. Its single private Int32 payload is validated by the loader. Constants are
+metadata, not slots; named values do not restrict the accepted Int32 domain.
+`newobj EnumName` constructs from that integer without exposing private field access.
+See [enums](enums.md) for compatibility, helper methods and Neo projection.

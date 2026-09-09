@@ -186,6 +186,34 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                 function.is_none() && word != ".method" && word != ".type" && word != ".interface",
                 typedef.as_mut(),
             ) {
+                if word == ".enum" {
+                    if def.enum_info.is_some() || !matches!(rest, "Int32" | "Int32 flags") {
+                        return Err(Fault::new("expected one .enum Int32 [flags] directive"));
+                    }
+                    def.enum_info = Some(crate::metadata::EnumInfo {
+                        underlying: Type::Int32,
+                        flags: rest.ends_with(" flags"),
+                        members: vec![],
+                    });
+                    return Ok(());
+                }
+                if word == ".literal" {
+                    let info = def
+                        .enum_info
+                        .as_mut()
+                        .ok_or_else(|| Fault::new(".literal requires .enum"))?;
+                    let (name, value) = rest
+                        .split_once(char::is_whitespace)
+                        .ok_or_else(|| Fault::new("expected .literal Name Int32-value"))?;
+                    info.members.push(crate::metadata::EnumMember {
+                        name: name.into(),
+                        value: value
+                            .trim()
+                            .parse()
+                            .map_err(|_| Fault::new("enum literal is outside Int32"))?,
+                    });
+                    return Ok(());
+                }
                 if word == ".property" {
                     let (kind, signature) =
                         rest.split_once(char::is_whitespace).ok_or_else(|| {
@@ -646,6 +674,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     }
                     let ty = Type::from_name(&name);
                     typedef = Some(TypeDef {
+                        enum_info: None,
                         visibility,
                         definition: None,
                         declaring_type: None,

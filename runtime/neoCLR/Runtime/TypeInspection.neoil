@@ -38,3 +38,10 @@
 .function neoCLR.Runtime.TypeBaseType(System.RuntimeTypeHandle type) -> System.Option<System.Type>
     .methodimpl InternalCall
 .end
+
+.function neoCLR.Runtime.TypeEnumNames(System.RuntimeTypeHandle type) -> String[]
+    .methodimpl InternalCall
+.end
+.function neoCLR.Runtime.TypeEnumUnderlying(System.RuntimeTypeHandle type) -> System.Type
+    .methodimpl InternalCall
+.end

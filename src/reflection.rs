@@ -15,6 +15,8 @@ pub(crate) enum Query {
     BaseType,
     Shape,
     DisplayName,
+    EnumNames,
+    EnumUnderlying,
 }
 
 impl Query {
@@ -33,6 +35,8 @@ impl Query {
             "neoCLR.Runtime.TypeElementType" => {
                 (Self::ElementType, false, "System.Option<System.Type>")
             }
+            "neoCLR.Runtime.TypeEnumNames" => (Self::EnumNames, false, "String[]"),
+            "neoCLR.Runtime.TypeEnumUnderlying" => (Self::EnumUnderlying, false, "System.Type"),
             "neoCLR.Runtime.TypeShape" => (Self::Shape, true, "Boolean"),
             "neoCLR.Runtime.TypeDisplayName" => (Self::DisplayName, true, "String"),
             _ => return None,
@@ -63,6 +67,7 @@ impl Query {
         let arguments = type_arguments(&ty);
         match self {
             Self::Shape => Ok(Value::Boolean(match argument {
+                6 => definition.is_some_and(|d| d.enum_info.is_some()),
                 0 => matches!(ty, Type::Array(_)),
                 1 => matches!(ty, Type::ByRef(_) | Type::ReadOnlyByRef(_)),
                 2 => matches!(ty, Type::Ptr(_)),
@@ -90,6 +95,24 @@ impl Query {
                 }
                 _ => return Err(Fault::new("unknown type name query")),
             })),
+            Self::EnumNames | Self::EnumUnderlying => {
+                let info = definition
+                    .and_then(|d| d.enum_info.as_ref())
+                    .ok_or_else(|| Fault::new("enum reflection requires an enum type"))?;
+                if matches!(self, Self::EnumUnderlying) {
+                    return type_value(module, &info.underlying);
+                }
+                // Match .NET's unsigned underlying-value ordering; aliases retain metadata order.
+                let mut members = info.members.iter().collect::<Vec<_>>();
+                members.sort_by_key(|m| m.value as u32);
+                array(
+                    "String",
+                    members
+                        .into_iter()
+                        .map(|m| Ok(Value::String(m.name.clone()))),
+                    limits,
+                )
+            }
             Self::BaseType => option(
                 "System.Type",
                 crate::inheritance::base(module, &ty)?

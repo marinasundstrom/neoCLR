@@ -169,6 +169,8 @@ pub struct GenericConstraint {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct TypeDef {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub enum_info: Option<EnumInfo>,
     #[serde(default, skip_serializing_if = "Visibility::is_public")]
     pub visibility: Visibility,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -198,6 +200,21 @@ pub struct TypeDef {
     pub packing: Option<u16>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub minimum_size: Option<u32>,
+}
+
+/// Preview Int32-backed enum contract. Named values do not restrict the value domain.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct EnumInfo {
+    pub underlying: Type,
+    pub flags: bool,
+    pub members: Vec<EnumMember>,
+}
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct EnumMember {
+    pub name: String,
+    pub value: i32,
 }
 
 impl TypeDef {

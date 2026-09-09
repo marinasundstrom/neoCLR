@@ -114,6 +114,14 @@ pub(crate) fn check_construction(
 ) -> Result<(), Fault> {
     check_owner(module, scope(caller), owner)?;
     crate::inheritance::require_concrete(module, owner)?;
+    // A validated enum has exactly one Int32 payload and admits every bit pattern.
+    // Constructing that value is not access to an arbitrary record's private fields.
+    if module
+        .type_definition(owner)
+        .is_some_and(|def| def.enum_info.is_some())
+    {
+        return Ok(());
+    }
     for index in 0..crate::inheritance::fields(module, owner)?.len() {
         check_field(module, caller, owner, index)?;
     }

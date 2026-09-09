@@ -123,12 +123,13 @@ names guide the API. This preview supports only the following flag bits:
 | `Public()` | 16 |
 | `NonPublic()` | 32 |
 
-BindingFlags is currently a typed record, not an enum. Combine factories with the
-instance method `Or(BindingFlags)`, or use `FromValue(Int32)` and `get_Value()`.
+BindingFlags is now an [Int32-backed flags enum](enums.md). Use named constants and
+bitwise operators in Neo. Existing factory methods, `Or(BindingFlags)`,
+`FromValue(Int32)` and `get_Value()` remain available.
 For example, Neo can query private and internal instance fields with:
 
 ```swift
-let flags = System.Reflection.BindingFlags.Instance().Or(System.Reflection.BindingFlags.NonPublic())
+let flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic
 let fields = typeof(Counter).GetFields(flags)
 ```
 
@@ -201,3 +202,7 @@ Type.IsAbstract and MethodInfo.IsVirtual/IsOverride/IsAbstract now expose the
 [class-dispatch flags](class-dispatch.md). The [descriptor hierarchy](reflection-hierarchy.md)
 is implemented; interface capabilities and default bodies remain in the
 [follow-up plan](reflection-hierarchy-plan.md).
+
+Type.IsEnum, GetEnumNames() and GetEnumUnderlyingType() inspect the enum metadata.
+Names are sorted by unsigned value with stable alias order. General FieldInfo literal
+support remains future work; see [enums and constants](enums.md).

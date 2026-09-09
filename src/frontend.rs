@@ -4,6 +4,7 @@ mod closures;
 mod conditional;
 mod constrained;
 mod constructors;
+mod enums;
 mod generic_records;
 mod imports;
 mod library;
@@ -133,7 +134,7 @@ fn lex(source: &str) -> Result<Vec<Token>, Fault> {
             .any(|op| rest.starts_with(op))
         {
             2
-        } else if "(){}[]:,.;&*+-=/!<>|".contains(first) {
+        } else if "(){}[]:,.;&*+-=/!<>|^~".contains(first) {
             first.len_utf8()
         } else {
             return Err(start.error(format!("unsupported character {first:?}")));
@@ -321,6 +322,7 @@ struct DelegateDeclaration {
     returns: Ty,
 }
 struct Source {
+    enums: Vec<enums::Enum>,
     unions: Vec<unions::Union>,
     delegates: Vec<DelegateDeclaration>,
     interfaces: Vec<Interface>,
@@ -592,6 +594,7 @@ impl Parser {
         if [
             "func",
             "record",
+            "enum",
             "let",
             "var",
             "return",
@@ -943,6 +946,7 @@ impl Parser {
     }
     fn source(&mut self, prepare: bool) -> Result<Source, Fault> {
         let mut source = Source {
+            enums: Vec::new(),
             unions: Vec::new(),
             delegates: Vec::new(),
             interfaces: Vec::new(),
@@ -968,6 +972,11 @@ impl Parser {
                     source.case_imports.push(owner);
                 }
                 self.end_statement()?;
+            } else if self.eat("flags") {
+                self.expect("enum")?;
+                enums::parse(self, &mut source, true)?;
+            } else if self.eat("enum") {
+                enums::parse(self, &mut source, false)?;
             } else if self.eat("union") {
                 unions::parse(self, &mut source)?;
             } else if self.eat("delegate") {
@@ -1100,6 +1109,7 @@ impl Parser {
                 + source.functions.len()
                 + source.interfaces.len()
                 + source.delegates.len()
+                + source.enums.len()
                 + source.unions.len()
                 > 1024
             {
@@ -1466,7 +1476,7 @@ impl Parser {
             let value = i32::try_from(-value)
                 .map_err(|_| literal.error("integer literal is outside Int32 range"))?;
             self.node(at, ExprKind::Int(value), 1)?
-        } else if ["&", "-", "!", "new"].contains(&at.text.as_str()) {
+        } else if ["&", "-", "!", "~", "new"].contains(&at.text.as_str()) {
             let operand = self.expression(30)?;
             let depth = operand.depth + 1;
             self.node(
@@ -1661,8 +1671,11 @@ impl Parser {
                 let binding = match self.current().text.as_str() {
                     "||" => 1,
                     "&&" => 2,
-                    "==" | "!=" => 3,
-                    "<" | ">" | "<=" | ">=" => 4,
+                    "|" => 3,
+                    "^" => 4,
+                    "&" => 5,
+                    "==" | "!=" => 6,
+                    "<" | ">" | "<=" | ">=" => 7,
                     "+" | "-" => 10,
                     "*" | "/" => 20,
                     _ => break,
@@ -2403,6 +2416,9 @@ impl Lowerer<'_> {
                 Ok(binding.ty)
             }
             ExprKind::Field(value, field) => {
+                if let Some(ty) = self.enum_field(value, field)? {
+                    return Ok(ty);
+                }
                 let saved = self.body.len();
                 let mut owner = self.array_owner(value)?;
                 if field.text == "Length"
@@ -2417,6 +2433,14 @@ impl Lowerer<'_> {
                 } else {
                     &owner
                 };
+                if field.text == "Value" && self.enum_info(target)?.is_some() {
+                    if matches!(owner, Ty::Ref(_) | Ty::ReadOnlyRef(_)) {
+                        self.body.push(format!("ldobj {}", target.il()));
+                    }
+                    self.body
+                        .push(format!("call instance {}::get_Value()", target.il()));
+                    return Ok(Ty::Int);
+                }
                 if let Some((ty, getter, function)) =
                     library::property(target, &field.text).map_err(|e| field.error(e.message))?
                 {
@@ -2452,6 +2476,7 @@ impl Lowerer<'_> {
             ExprKind::Unary(operation, value) if operation == "new" => {
                 self.allocate_record(expression, value)
             }
+            ExprKind::Unary(operation, value) if operation == "~" => self.bit_not(value),
             ExprKind::Unary(operation, value) => {
                 let ty = self.value_expression(value)?;
                 if operation == "!" {
@@ -2486,6 +2511,12 @@ impl Lowerer<'_> {
                     self.body.push(format!("{skip}:"));
                     return Ok(Ty::Bool);
                 }
+                if let Some(result) = self.enum_binary(&ty, operation, right)? {
+                    return Ok(result);
+                }
+                if matches!(operation.as_str(), "|" | "&" | "^") {
+                    self.require(&ty, &Ty::Int, &left.at)?;
+                }
                 let equality = operation == "==" || operation == "!=";
                 let floating = ty == Ty::Record("System.Double".into());
                 if !floating && (!equality || !matches!(ty, Ty::Int | Ty::Bool)) {
@@ -2498,6 +2529,9 @@ impl Lowerer<'_> {
                     "-" => "sub",
                     "*" => "mul",
                     "/" => "div",
+                    "|" => "or",
+                    "&" => "and",
+                    "^" => "xor",
                     "==" | "!=" => "ceq",
                     ">=" if floating => "clt.un",
                     "<=" if floating => "cgt.un",
@@ -2508,11 +2542,13 @@ impl Lowerer<'_> {
                 if ["!=", "<=", ">="].contains(&operation.as_str()) {
                     self.body.extend(["ldc.bool false".into(), "ceq".into()]);
                 }
-                Ok(if ["add", "sub", "mul", "div"].contains(&op) {
-                    ty
-                } else {
-                    Ty::Bool
-                })
+                Ok(
+                    if ["add", "sub", "mul", "div", "or", "and", "xor"].contains(&op) {
+                        ty
+                    } else {
+                        Ty::Bool
+                    },
+                )
             }
             ExprKind::Out(_) => Err(expression
                 .at
@@ -2910,6 +2946,9 @@ impl Lowerer<'_> {
     }
 
     fn call(&mut self, callee: &Expr, arguments: &[Expr]) -> Result<Ty, Fault> {
+        if let Some(ty) = self.enum_call(callee, arguments)? {
+            return Ok(ty);
+        }
         if let Some(ty) = self.imported_call(callee, arguments)? {
             return Ok(ty);
         }
@@ -4266,6 +4305,7 @@ pub fn lower_to_il_named(source: &str, document: &str) -> Result<String, Fault> 
         .chain(source.interfaces.iter().map(|interface| &interface.name))
         .chain(source.delegates.iter().map(|delegate| &delegate.name))
         .chain(source.unions.iter().map(|union| &union.name))
+        .chain(source.enums.iter().map(|e| &e.name))
     {
         if name.text.starts_with("neoCLR.Compiler.")
             || names.insert(name.text.clone(), ()).is_some()
@@ -4284,6 +4324,12 @@ pub fn lower_to_il_named(source: &str, document: &str) -> Result<String, Fault> 
     }
     let mut il = String::from(".module SourceProgram\n.entry Main\n");
     let mut generated = Vec::new();
+    for enumeration in &source.enums {
+        il.push_str(&crate::enums::emit(
+            &enumeration.name.text,
+            &enumeration.info,
+        ));
+    }
     for delegate in &source.delegates {
         let parameters = delegate
             .parameters

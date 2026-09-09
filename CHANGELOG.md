@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-09
 
+- Added initial Int32-backed enum/flags metadata and Neo declarations, named constants,
+  typed bitwise/equality operations, explicit integer conversion and zero/unnamed values.
+  Runtime validation enforces enum layout and nominal calls; enum construction accepts
+  the underlying integer without granting private payload access. Added IsEnum,
+  GetEnumNames and GetEnumUnderlyingType reflection APIs. Migrated BindingFlags to enum
+  metadata while retaining its existing factories, bit values and filtering policy.
+  Added artifact/source regressions, an example and a pinned .NET comparison probe.
+  Older tools reject the new format-5 metadata and Neo reserves enum; other integer
+  widths, formatting and general const/literal-field support remain future work.
+
 - Added generic Neo union carriers composed from independent source case types, with
   substituted constructors, exact case conversions, exhaustive matching and conditional
   bindings. Cases retain their own generic parameters and existing reference/value

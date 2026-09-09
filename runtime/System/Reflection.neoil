@@ -509,8 +509,15 @@
     .end
 .end
 
-; Typed flag wrapper until enum declarations are available. CLR bit values.
+; Int32-backed flags enum. Existing factories remain compatible. CLR bit values.
 .type System.Reflection.BindingFlags
+    .enum Int32 flags
+    .literal Default 0
+    .literal DeclaredOnly 2
+    .literal Instance 4
+    .literal Static 8
+    .literal Public 16
+    .literal NonPublic 32
     .field private Bits Int32
     .method static FromValue(Int32 value) -> System.Reflection.BindingFlags
         ldarg value
@@ -559,6 +566,50 @@
     .method static NonPublic() -> System.Reflection.BindingFlags
         ldc.i4 32
         newobj System.Reflection.BindingFlags
+        ret
+    .end
+    .method instance And(System.Reflection.BindingFlags other) -> System.Reflection.BindingFlags
+        ldarg this
+        ldfld 0
+        ldarg other
+        ldfld 0
+        and
+        newobj System.Reflection.BindingFlags
+        ret
+    .end
+    .method instance Xor(System.Reflection.BindingFlags other) -> System.Reflection.BindingFlags
+        ldarg this
+        ldfld 0
+        ldarg other
+        ldfld 0
+        xor
+        newobj System.Reflection.BindingFlags
+        ret
+    .end
+    .method instance Not() -> System.Reflection.BindingFlags
+        ldarg this
+        ldfld 0
+        not
+        newobj System.Reflection.BindingFlags
+        ret
+    .end
+    .method instance Equals(System.Reflection.BindingFlags other) -> Boolean
+        ldarg this
+        ldfld 0
+        ldarg other
+        ldfld 0
+        ceq
+        ret
+    .end
+    .method instance HasFlag(System.Reflection.BindingFlags other) -> Boolean
+        ldarg this
+        ldfld 0
+        ldarg other
+        ldfld 0
+        and
+        ldarg other
+        ldfld 0
+        ceq
         ret
     .end
 .end

@@ -112,6 +112,28 @@
         call neoCLR.Runtime.TypeElementType(System.RuntimeTypeHandle)
         ret
     .end
+    .property instance IsEnum() -> Boolean
+        .get instance System.Type::get_IsEnum()
+    .end
+    .method instance get_IsEnum() -> Boolean
+        ldarg this
+        ldfld 0
+        ldc.i4 6
+        call neoCLR.Runtime.TypeShape(System.RuntimeTypeHandle,Int32)
+        ret
+    .end
+    .method instance GetEnumNames() -> String[]
+        ldarg this
+        ldfld 0
+        call neoCLR.Runtime.TypeEnumNames(System.RuntimeTypeHandle)
+        ret
+    .end
+    .method instance GetEnumUnderlyingType() -> System.Type
+        ldarg this
+        ldfld 0
+        call neoCLR.Runtime.TypeEnumUnderlying(System.RuntimeTypeHandle)
+        ret
+    .end
     .property instance IsArray() -> Boolean
         .get instance System.Type::get_IsArray()
     .end

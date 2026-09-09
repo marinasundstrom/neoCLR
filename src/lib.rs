@@ -1,6 +1,7 @@
 mod arrays;
 pub mod assembler;
 mod constraints;
+mod enums;
 pub use assembler::assemble;
 mod access;
 mod clock;

@@ -126,7 +126,7 @@ Fault remains for violated execution contracts.
    categories and Union value representation. Old artifacts are rejected; reassemble source.
 
 There are no union-specific IL instructions in the platform contract. Integer-backed
-enums remain a separate milestone. Reflection, GC, reference counting, runtime async
+enums now have an initial [Int32/flags implementation](enums.md), separate from unions. Reflection, GC, reference counting, runtime async
 and high-level pattern syntax are not prerequisites for this convention.
 
 ## Neo projection

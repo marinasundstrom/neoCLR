@@ -1,0 +1,20 @@
+import System.Console.*
+
+flags enum Access {
+    None = 0
+    Read = 1
+    Write = 2
+    Both = 3
+}
+record Item(Value: int)
+
+func Main() -> int {
+    let access = Access.Read | Access.Write
+    if access.HasFlag(Access.Read) { WriteLine("read") }
+    WriteLine(access.Value)
+    let flags = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance
+    let fields = typeof(Item).GetFields(flags)
+    WriteLine(fields.Length)
+    if typeof(Access).IsEnum { WriteLine("enum") }
+    return 0
+}

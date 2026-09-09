@@ -262,14 +262,16 @@ conversions remain later work. notnull requires nullable metadata first.
 records, preserving their separate type parameters. Next complete the inline generic
 case projection and evaluate constructor inference against the existing Raven comparison.
 
-Next platform slice: integer-backed enums with flags support, using
+Implemented the first [Int32-backed enums/flags slice](enums.md), using
 System.Reflection.BindingFlags as the first migration. Compare with the
 [.NET BindingFlags enum](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.bindingflags)
 and preserve the existing supported bits/filter behavior documented in
-[reflection](reflection.md#filtering). Specify nominal enum identity, underlying
-integer range, bitwise combinations, conversions and handling of unnamed bits;
-do not broaden reflection query behavior merely by adding enum syntax. Migrate the
-current record factories/Or projection with explicit preview compatibility notes.
+[reflection](reflection.md#filtering). The initial slice supplies nominal enum identity,
+Int32 range, typed bitwise combinations, explicit conversion and unnamed-value handling.
+Reflection query filtering is unchanged; the old factories/Or methods remain compatible.
+Revisit general constants, FieldInfo literal queries, additional integer widths and
+formatting later. Constant-expression evaluation belongs to Neo. The current enum
+representation and literal metadata remain provisional.
 
 The next tooling slice adds a CLI path to inspect neoIL emitted from Neo source for
 debugging. The compiler already exposes lower_to_il_named; the CLI does not yet expose

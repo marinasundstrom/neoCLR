@@ -253,6 +253,17 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
     if module.format != 5 {
         return Err(Fault::new("unsupported module format (expected 5)"));
     }
+    for def in &module.types {
+        crate::enums::validate(def)?;
+        if def
+            .base
+            .as_ref()
+            .and_then(|base| module.type_definition(base))
+            .is_some_and(|base| base.enum_info.is_some())
+        {
+            return Err(Fault::new("cannot inherit from an enum"));
+        }
+    }
     // Validate ownership before any traversal by access checking or execution.
     for def in &module.types {
         let mut current = def;
