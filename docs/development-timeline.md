@@ -813,7 +813,7 @@ sources. Runtime semantics, syntax and roadmap priorities remain unchanged.
 
 Recorded 2026-09-09 at the author's explicit request.
 
-**Author's direction:** Languages should not have to live with the platform's universal
+**Author's exploration:** Languages should not have to live with the platform's universal
 value-default decision. Ordinary class use should match the expectation that a variable
 holds a reference, with automatic member access. Value behavior should be an opt-in;
 explicit reference passing is more appropriate when accessing those values without
@@ -833,6 +833,11 @@ allocation. The author has not yet selected the metadata encoding, syntax, hiera
 rules or migration strategy; the assistant's preference is not recorded as an approved
 implementation design.
 
+**Author's subsequent clarification:** “I don't say we should go down this route just yet.”
+The class-reference/value-opt-in model is an alternative to investigate, not a selected
+platform direction or authorization to implement a migration. The assistant had framed
+the discussion too strongly as a change in direction and corrected this record.
+
 **Outcome and next action:** The author requested this timeline entry and a search for
 existing design/architecture evaluation documents. The assistant found the
 [reference-experience evaluation](experiments/reference-experience/README.md),
@@ -842,8 +847,8 @@ existing design/architecture evaluation documents. The assistant found the
 [design research process](design-research.md). The experiment is the closest existing
 assessment of reference friction; the groundwork review is an earlier milestone-specific
 architecture assessment, not a current audit. Existing implementation documentation still
-describes the value-default model. This entry records the new direction without claiming
-that runtime behavior or those contracts have already migrated.
+describes the value-default model. This entry records the alternative and the author's clarification. The current
+value-default model remains in place; no replacement has been selected.
 
 ## Maintaining the conversation record
 
