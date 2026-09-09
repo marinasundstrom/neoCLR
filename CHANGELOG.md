@@ -29,6 +29,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   evolution, distinguishing lifetime, identity and preview status. Added the clarification
   that lightweight values need not be short-lived and the preference for potentially
   inline value classes over a separate struct concept, without selecting a migration.
+  Recorded the follow-up separation of storage, mutation, identity and equality using
+  C# records as a comparison.
 
 - Added emit-il for inspecting Neo compiler output on stdout or in a new neoIL file,
   preserving original source sequence points. It validates without executing and

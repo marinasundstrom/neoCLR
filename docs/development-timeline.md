@@ -891,6 +891,31 @@ to the ongoing exploration. The preference concerns the shape of a possible valu
 model; the broader decision to replace current defaults remains open. No runtime,
 metadata or language change was implemented.
 
+### 24. Separate storage, mutability, identity and equality
+
+Recorded 2026-09-09.
+
+**Author's observation:** A possible value class resembles a record locked against
+modification. The author wants to distinguish the individual characteristics, especially
+storage and reference/value access, and points to C# record classes as objects that
+participate in value equality through Equals/GetHashCode while retaining reference use.
+Record structs and record classes combine these properties differently.
+
+**Assistant's response:** Distinguished equal contents from being the same object.
+A record class can preserve observable reference identity while providing generated
+value equality; assigning it still copies the reference. A record struct copies its
+value. Neither record syntax nor value equality alone guarantees deep immutability.
+Ordinary classes can opt into value equality, but do not all do so automatically.
+The [C# record reference](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/record)
+provides the comparison, including equal records with distinct reference identities.
+
+**Open design question:** Which characteristics should a possible value-class declaration
+combine, and which should remain independent? Accessing storage through a reference
+need not, by itself, settle the language's equality or object-identity contract.
+
+**Action:** Recorded the distinction and checked the C# comparison. No particular
+combination of semantics or change to neoCLR's current defaults was selected.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the
