@@ -15,7 +15,7 @@ There are no empty statements apart from separators.
 ```ebnf
 program          = separators, { declaration, separators }, end_of_input ;
 declaration      = union_decl | delegate_decl | import_decl | class_decl | record_decl | interface_decl | function_decl ;
-union_decl       = "union", identifier, newlines,
+union_decl       = "union", identifier, [ generic_parameters ], newlines,
                    ("(", newlines, type, { newlines, "|", newlines, type }, newlines, ")", terminator
                    | "{", separators, union_case, { separators, union_case }, separators, "}") ;
 union_case       = "case", identifier, [ field_list ], terminator ;
@@ -370,3 +370,6 @@ on generic records, free functions and static generic methods. These clauses are
 runtime-enforced. Nominal record/interface bounds also support calls through T&
 receivers; see the constraint guide for the bounded lookup rules. notnull awaits
 nullable metadata.
+
+Generic union parameters currently apply to the parenthesized existing-case form.
+Generic inline case declarations are rejected. See [generic source unions](generic-source-unions.md).

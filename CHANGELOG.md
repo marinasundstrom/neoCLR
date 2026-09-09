@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-09
 
+- Added generic Neo union carriers composed from independent source case types, with
+  substituted constructors, exact case conversions, exhaustive matching and conditional
+  bindings. Cases retain their own generic parameters and existing reference/value
+  contracts. Explicit constructor type arguments are required; inline generic cases
+  remain deferred. Added an example, grammar/API notes and artifact regressions.
+  Planned enums/flags with BindingFlags as the first API migration, plus CLI inspection
+  of emitted Neo IL; binary encoding remains future work.
+
 - Added initial runtime-enforced notvoid/notreference generic constraints on types and
   methods, neoIL .constraint directives and Neo where clauses. Restrictions apply to
   the outermost argument; symbolic forwarding is rechecked at concrete resolution.

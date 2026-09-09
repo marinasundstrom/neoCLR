@@ -1,6 +1,7 @@
 # Neo union declarations
 
-Neo supports non-generic unions of declared source value types. Variants remain
+Neo supports unions of declared source value types, including
+[generic carriers composed from independent cases](generic-source-unions.md). Variants remain
 separate nominal types; a union is a carrier accepting one of those types through
 its constructors. This is not inheritance or a new runtime type category.
 
@@ -79,8 +80,8 @@ Only declared non-abstract source records/classes and other source union carrier
 are accepted as case types in this slice. Self-cases, unknown types, duplicate case
 names, empty unions and direct `default(Union)` are rejected. Select a case explicitly.
 Inline variants are real nested metadata types. Bundled generic case inference and
-[case imports](neo-case-imports.md) are supported independently. Generic source
-unions/cases, primitive/interface/reference case alternatives,
+[case imports](neo-case-imports.md) are supported independently. Generic inline
+cases, primitive/interface/reference case alternatives,
 qualified patterns, guards and destructuring are not implemented here. Field types
 can use the existing type system, including generic library types and managed references.
 

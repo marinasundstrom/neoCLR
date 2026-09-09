@@ -45,14 +45,14 @@ generic runtime; it makes no claim about matching CLR JIT code sharing or perfor
 Starting with data-only records supplies the type-substitution foundation for generic
 source union cases with limited compiler complexity. The cost is a temporarily smaller
 projection than C#: generic classes, methods on generic records, explicit initializers,
-inheritance/conformance on generic records, source generic unions and
-source constructor inference remain separate work. Nongeneric records/classes retain
-their existing functionality. Type names remain unique within the file; overloading a
+inheritance/conformance on generic records and source constructor inference remain
+separate work. [Generic source carriers](generic-source-unions.md) now compose these
+records. Nongeneric records/classes retain their existing functionality. Type names remain unique within the file; overloading a
 type name by generic arity is not introduced.
 
-Next extend the source union model to generic carriers and independent cases, choosing
-which carrier parameters each case needs. Then address methods and richer generic type
-contracts; owner parameters and method parameters must remain distinct in metadata.
+Generic carriers now use independent declared cases with explicit parameter dependencies.
+Inline generic cases, methods and richer generic type contracts remain next steps;
+owner parameters and method parameters must remain distinct in metadata.
 
 ## Run and verify
 

@@ -221,8 +221,8 @@ These are bounded explorations, not a commitment to turn Neo into a full compile
 [Non-generic source unions](neo-unions.md) now generate separate cases and carrier
 constructors, with exact case conversions and exhaustive matching.
 [Case imports](neo-case-imports.md) now support unqualified constructor/type names
-for source and marked bundled unions. Next investigate generic source type declarations
-and arbitrary external assembly discovery under
+for source and marked bundled unions. Generic source records/carriers now support explicit
+construction; arbitrary external assembly discovery remains future work under
 [the Raven-style projection](result-construction.md#case-projection-ravens-model).
 Use [type-design guidelines](type-design.md) to review the full field and operation
 contracts when selecting value/reference use.
@@ -238,13 +238,14 @@ which broader inference and conversion behaviors remain deferred.
 The [order-workflow usability pass](experiments/reference-experience/README.md#current-usability-pass-2026-09-09)
 now combines imported inferred cases, explicit nested domain-error conversion and
 conditional bindings. Reference identity, receipt snapshots and rejected-purchase side
-effects are covered together. Next investigate generic source type/union declarations;
+effects are covered together. Generic source records and composed carriers are now implemented;
 error propagation syntax and richer patterns remain later usability questions.
 
 [Plain generic source records](generic-source-records.md) now emit generic type metadata
 and support substituted fields, explicit positional construction, generic forwarding,
-value copies and managed-reference storage. Next extend generic source unions and their
-independent case types; generic record methods, classes, inheritance and constructor
+value copies and managed-reference storage. Generic source carriers now compose
+independently declared cases with substituted constructors, conversions and patterns;
+generic record methods, classes, inheritance and constructor
 inference remain separate steps. This uses the existing CLR-like metadata foundation.
 
 [Generic constraints](generic-constraints.md) now project runtime-enforced `notvoid`
@@ -254,3 +255,27 @@ are implemented. Addressable bare-T receivers support method calls with notrefer
 open bare-T parameters/locals now use [receiver adaptation](receiver-adaptation.md).
 Open field/array/captured receiver adaptation, bound fields/properties and method-group
 conversions remain later work. notnull requires nullable metadata first.
+
+## Immediate union and inspection work
+
+[Generic source union carriers](generic-source-unions.md) now compose independent case
+records, preserving their separate type parameters. Next complete the inline generic
+case projection and evaluate constructor inference against the existing Raven comparison.
+
+Next platform slice: integer-backed enums with flags support, using
+System.Reflection.BindingFlags as the first migration. Compare with the
+[.NET BindingFlags enum](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.bindingflags)
+and preserve the existing supported bits/filter behavior documented in
+[reflection](reflection.md#filtering). Specify nominal enum identity, underlying
+integer range, bitwise combinations, conversions and handling of unnamed bits;
+do not broaden reflection query behavior merely by adding enum syntax. Migrate the
+current record factories/Or projection with explicit preview compatibility notes.
+
+The next tooling slice adds a CLI path to inspect neoIL emitted from Neo source for
+debugging. The compiler already exposes lower_to_il_named; the CLI does not yet expose
+it. Microsoft's [Ildasm](https://learn.microsoft.com/en-us/dotnet/framework/tools/ildasm-exe-il-disassembler)
+(consulted 2026-09-09) reads compiled artifacts and produces reassemblable IL text.
+Start Neo with source emission; artifact disassembly needs a separate metadata-to-text
+writer. The smaller first step exposes compiler decisions but cannot inspect arbitrary
+artifacts, so it should not be presented as a complete Ildasm equivalent. Binary instruction
+encoding remains a future format decision and is not required for readable IL inspection.

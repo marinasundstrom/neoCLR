@@ -1,0 +1,16 @@
+import System.Console.*
+
+record Success<T>(Value: T)
+record Failure<E>(Error: E)
+union Outcome<T,E>(Success<T> | Failure<E>)
+
+func Accept<T>(value: T) -> Outcome<T,string> {
+    return Success<T>(value)
+}
+
+func Main() -> int {
+    let result = Accept(42)
+    let Success(accepted) = result else { return -1 }
+    WriteLine(accepted.Value)
+    return accepted.Value
+}

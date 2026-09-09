@@ -2020,13 +2020,8 @@ impl Lowerer<'_> {
         self.convert_reference(actual, expected, &expression.at)
     }
     fn convert_reference(&mut self, actual: Ty, expected: &Ty, at: &Token) -> Result<Ty, Fault> {
-        if let Some(union) = self
-            .source
-            .unions
-            .iter()
-            .find(|u| u.name.text == expected.il())
-        {
-            if union.variants.contains(&actual) {
+        if let Some(union) = self.source.source_union(expected) {
+            if union.variants_for(expected)?.contains(&actual) {
                 self.body.push(format!(
                     "newobj instance {}::.ctor({})",
                     expected.il(),
@@ -2361,7 +2356,7 @@ impl Lowerer<'_> {
                 .at
                 .error("generic function arguments require an invocation")),
             ExprKind::Default(ty) => {
-                if self.source.unions.iter().any(|u| u.name.text == ty.il()) {
+                if self.source.source_union(ty).is_some() {
                     return Err(expression
                         .at
                         .error("union default requires selecting a variant"));
@@ -2921,22 +2916,6 @@ impl Lowerer<'_> {
         if let Some(path) = Self::qualified_name(callee)
             .filter(|path| !self.bindings.contains_key(path.split('.').next().unwrap()))
         {
-            if let Some(union) = self.source.unions.iter().find(|u| u.name.text == path) {
-                if arguments.len() != 1 {
-                    return Err(callee
-                        .at
-                        .error("union constructor requires one variant value"));
-                }
-                let actual = self.value_expression(&arguments[0])?;
-                if !union.variants.contains(&actual) {
-                    return Err(callee
-                        .at
-                        .error("no union constructor accepts this variant type"));
-                }
-                self.body
-                    .push(format!("newobj instance {path}::.ctor({})", actual.il()));
-                return Ok(Ty::Record(path));
-            }
             if self.source.records.iter().any(|r| r.name.text == path)
                 && !matches!(&callee.kind, ExprKind::Name(name) if name == &path)
             {
@@ -2951,6 +2930,9 @@ impl Lowerer<'_> {
             ExprKind::Generic(callee, types) => (callee.as_ref(), types.as_slice()),
             _ => (callee, &[][..]),
         };
+        if let Some(ty) = self.source_union_constructor(callee, type_arguments, arguments)? {
+            return Ok(ty);
+        }
         if let Some(path) = Self::qualified_name(callee) {
             if !path
                 .split('.')
@@ -3546,9 +3528,9 @@ impl Lowerer<'_> {
             self.body.push(format!("ldobj {}", target.il()));
             ty = *target;
         }
-        let source_union = self.source.unions.iter().find(|u| u.name.text == ty.il());
+        let source_union = self.source.source_union(&ty);
         let cases = if let Some(union) = source_union {
-            union.cases()
+            union.cases(&ty)?
         } else {
             library::cases(&ty).map_err(|e| value.at.error(e.message))?
         };

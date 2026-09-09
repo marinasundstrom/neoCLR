@@ -9,7 +9,14 @@ pub(super) fn resolve(source: &Source) -> Result<HashMap<String, Vec<String>>, F
             .iter()
             .find(|union| union.name.text == import.text)
         {
-            union.variants.iter().map(Ty::il).collect()
+            union
+                .variants
+                .iter()
+                .map(|ty| {
+                    let metadata = crate::assembler::parse_type(&ty.il()).unwrap();
+                    metadata.definition_name().unwrap_or("").to_owned()
+                })
+                .collect()
         } else {
             library::imported_cases(&import.text)
                 .map_err(|error| import.error(error.message))?

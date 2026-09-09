@@ -27,9 +27,9 @@ impl Lowerer<'_> {
         missing: &str,
     ) -> Result<(), Fault> {
         let ty = self.value_expression(value)?;
-        let source_union = self.source.unions.iter().find(|u| u.name.text == ty.il());
+        let source_union = self.source.source_union(&ty);
         let cases = if let Some(union) = source_union {
-            union.cases()
+            union.cases(&ty)?
         } else {
             library::cases(&ty).map_err(|e| value.at.error(e.message))?
         };
