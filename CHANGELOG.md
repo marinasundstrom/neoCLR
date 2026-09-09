@@ -8,6 +8,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-09
 
+- Added a development conversation record of author directions/questions, assistant
+  proposals, subsequent decisions and actions/outcomes, in one chronological document covering
+  the original shared chat from the founding brief through Preview 1. Earlier
+  continuation notes explicitly identify unavailable assistant replies; recent exchanges retain attribution and open issues.
+  Added workflow instructions to maintain it as a minutes-like record, separately from
+  the implementation changelog, without inventing dates or missing conversation. Expanded the
+  timeline with available founding exchanges on memory policy, signature/name mapping,
+  ordinary union cases, output-reference corrections, equality, release scope, Windows
+  CI diagnosis and verified Preview 1 publication. Preserved attribution, the distinction
+  between unavailable replies and implementation evidence, and later changes of direction.
+
 - Added emit-il for inspecting Neo compiler output on stdout or in a new neoIL file,
   preserving original source sequence points. It validates without executing and
   refuses file overwrites. Added CLI round-trip/error regressions and debugging

@@ -19,6 +19,10 @@ platform. This repository contains a small standalone Rust interpreter, a neoIL
 assembler, a prototype metadata format, and executable samples. It does not need
 an installed .NET runtime.
 
+Read the [development conversation record](docs/development-timeline.md) for the
+author’s directions and questions, assistant proposals, subsequent decisions and actions,
+starting with the original project conversation.
+
 The default is .NET/CLR semantics wherever neoCLR does not intentionally diverge.
 Prototype shortcuts are limitations to remove, not new platform semantics.
 Consumer APIs should preserve familiar .NET namespaces, names, overloads, and
