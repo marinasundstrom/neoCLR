@@ -921,7 +921,9 @@ fn typed_effect(
                     "castclass requires a managed record reference",
                 ));
             };
-            crate::inheritance::require_base(module, source, target)?;
+            if !crate::constraints::permits_view(module, function, source, target, false) {
+                crate::inheritance::require_base(module, source, target)?;
+            }
             if matches!(values[0], StackType::Readonly(_)) {
                 Ok(vec![StackType::Readonly(T::ByRef(Box::new(
                     target.clone(),
@@ -932,7 +934,9 @@ fn typed_effect(
         }
         BorrowInterface(interface) => match exact(&values[0])? {
             T::ByRef(concrete) => {
-                crate::interfaces::ensure_implementation(module, concrete, interface)?;
+                if !crate::constraints::permits_view(module, function, concrete, interface, true) {
+                    crate::interfaces::ensure_implementation(module, concrete, interface)?;
+                }
                 if matches!(values[0], StackType::Readonly(_)) {
                     Ok(vec![StackType::Readonly(T::ByRef(Box::new(
                         interface.clone(),
@@ -942,7 +946,9 @@ fn typed_effect(
                 }
             }
             T::Ptr(concrete) | T::InterfaceRef(concrete) => {
-                crate::interfaces::ensure_implementation(module, concrete, interface)?;
+                if !crate::constraints::permits_view(module, function, concrete, interface, true) {
+                    crate::interfaces::ensure_implementation(module, concrete, interface)?;
+                }
                 one(T::InterfaceRef(Box::new(interface.clone())))
             }
             _ => Err(crate::Fault::new(

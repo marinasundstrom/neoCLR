@@ -11,9 +11,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Added initial runtime-enforced notvoid/notreference generic constraints on types and
   methods, neoIL .constraint directives and Neo where clauses. Restrictions apply to
   the outermost argument; symbolic forwarding is rechecked at concrete resolution.
-  Added metadata/host/source/IL regressions and design guidance. Base/interface
-  constraints and constrained-member lookup remain next; notnull awaits nullable
-  metadata. Older tools reject constrained artifacts; Neo reserves the new keywords.
+  Extended this with nominal base/interface bounds, substituted/scoped bound metadata,
+  and Neo constrained method lookup through explicit T& receivers. Calls reuse checked
+  reference views and ordinary dispatch, preserving readonly access and concrete identity.
+  Added metadata/host/source/IL regressions, an executable example and a reproducible
+  .NET comparison probe.
+  Bare-T receiver handling and broader member lookup remain later work; notnull awaits
+  nullable metadata. Older tools reject constrained artifacts; Neo reserves the new keywords.
 
 - Added plain generic Neo record declarations with explicit positional construction,
   substituted fields, generic function forwarding and heap construction. Emitted

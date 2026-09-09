@@ -2,6 +2,7 @@
 //! This is a separate experimental language subset, not a Raven compiler.
 mod closures;
 mod conditional;
+mod constrained;
 mod constructors;
 mod generic_records;
 mod imports;
@@ -3056,6 +3057,9 @@ impl Lowerer<'_> {
                 } else {
                     &ty
                 };
+                if let Some(result) = self.constrained_call(&ty, member, arguments)? {
+                    return Ok(result);
+                }
                 if self.delegate_signature(target)?.is_some() {
                     if member.text != "Invoke" {
                         return Err(member.error("delegate exposes Invoke"));
@@ -4168,7 +4172,7 @@ impl Lowerer<'_> {
             crate::constraints::emit(
                 &self.function.generic_constraints,
                 &self.function.generic_parameters
-            ),
+            )?,
             declarations
         );
         let il = format!(
@@ -4360,7 +4364,7 @@ pub fn lower_to_il_named(source: &str, document: &str) -> Result<String, Fault> 
         il.push_str(&crate::constraints::emit(
             &record.generic_constraints,
             &record.generic_parameters,
-        ));
+        )?);
         for interface in &record.implements {
             if !source
                 .interfaces

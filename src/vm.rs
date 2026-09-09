@@ -124,7 +124,11 @@ pub(crate) fn resolve(
         candidate.generic_arguments = target.generic_arguments.clone();
         candidate.definition = Some(identity);
         if candidate.parameters == target.parameters {
-            crate::constraints::check(&definition.generic_constraints, &target.generic_arguments)?;
+            crate::constraints::check(
+                module,
+                &candidate.generic_constraints,
+                &target.generic_arguments,
+            )?;
             if let Some(owner) = &target.owner {
                 crate::constraints::check_known_type(module, owner, 0)?;
             }
@@ -364,6 +368,10 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 return Err(Fault::new("invalid generic record layout controls"));
             }
         }
+        crate::constraints::validate_bounds(module, &def.generic_constraints)?;
+        for bound in crate::constraints::bounds(&def.generic_constraints) {
+            check_type_context(bound, module, def.generic_parameters.len(), 0)?;
+        }
         if let Some(base) = &def.base {
             check_type_context(base, module, def.generic_parameters.len(), 0)?;
         }
@@ -486,6 +494,10 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             &function.generic_constraints,
             function.generic_parameters.len(),
         )?;
+        crate::constraints::validate_bounds(module, &function.generic_constraints)?;
+        for bound in crate::constraints::bounds(&function.generic_constraints) {
+            check(bound)?;
+        }
         if !function.generic_parameters.is_empty() {
             let mut names = HashSet::new();
             if function.generic_parameters.len() > 1024
@@ -982,7 +994,7 @@ fn check_type_context(
             for argument in arguments {
                 nested(argument)?;
             }
-            crate::constraints::check(&def.generic_constraints, arguments)?;
+            crate::constraints::check_type_arguments(module, &def.generic_constraints, arguments)?;
             for inherited in def.base.iter().chain(&def.implements) {
                 nested(&inherited.substitute_type_parameters(arguments)?)?;
             }

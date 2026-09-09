@@ -14,7 +14,8 @@ Neo supports these clauses on plain generic records, generic free functions and
 static generic methods on nongeneric records/classes. Clauses follow the record field
 list or function return type. Repeat `where` for different parameters. Explicit and
 inferred method arguments undergo the same runtime checks; source record constructors
-still require explicit arguments. No new operation on T is enabled by these clauses.
+still require explicit arguments. The two flag constraints alone enable no new operation on T.
+Nominal bounds additionally enable borrowed member calls, described below.
 
 | Constraint | Rejected argument forms | Still allowed |
 | --- | --- | --- |
@@ -48,7 +49,7 @@ ret
 The directive accepts the parameter name or its zero-based index. Method constraints
 refer to method parameters; type constraints refer to owner parameters. Method
 constraints must precede instructions and labels. JSON stores a `generic_constraints`
-list of `{parameter, kind}` rows (`NotVoid` / `NotReference`) on TypeDef and Function.
+list of `{parameter, kind}` rows (`NotVoid`, `NotReference`, or `{ "TypeBound": type }`) on TypeDef and Function.
 Unknown rules, duplicate rows and out-of-range indices are rejected.
 
 Definitions are validated during loading. Concrete constructed signatures and resolved
@@ -84,22 +85,94 @@ No JIT or allocation improvement is claimed. A compiler-only prohibition was rej
 because it would not protect IL/artifact consumers; a recursive reference-free rule
 was rejected because it would express a different object-layout contract.
 
-Base/interface constraints remain the next constraint slice: define conformance for
-value versus reference arguments, make constrained members available to Neo lookup,
-and validate substitution/dispatch together. Constructor constraints, implication
-checking between generic declarations and reflection APIs for enumerating constraints
-remain future work. `notnull` is deliberately rejected until nullable type metadata
-exists; it must distinguish nullable type arguments from uninitialized storage and
-must not become an always-successful placeholder. See the
+## Nominal bounds and borrowed member lookup
+
+```swift
+func Read<T>(readonly value: T&) -> int where T: Readable {
+    return value.Read()
+}
+func Compare<T>(readonly left: T&, right: T) -> int
+where T: System.Comparable<T> {
+    return left.CompareTo(right)
+}
+record Holder<T>(Value: T) where T: Readable
+```
+
+A bound names a record (the same type or a base) or an interface (direct or inherited
+conformance). At most one record bound is permitted per parameter; multiple distinct
+interface bounds can be combined with the flag restrictions. Constructed bounds can
+refer to owner/method parameters, for example `.constraint T System.Comparable<T>`.
+Their types participate in binding, substitution, module scope/access checks and JSON
+round trips. Type-parameter bounds such as `where T: U` are not implemented.
+
+Conformance is independent of addressing mode: `Cell`, `Cell&` and `readonly Cell&`
+all satisfy a `Readable` bound when Cell implements it. Native pointers do not.
+The bound does not convert or slice the argument, borrow a value, change inference,
+or authorize mutation through readonly access. `Holder<Cell&>` retains its reference;
+`Holder<Cell>` stores a copy according to Cell's own field contracts.
+
+The first member-lookup projection supports **method invocations on T& receivers**,
+including readonly receivers, in generic functions and static methods. Record-bound
+methods must themselves use a byref receiver; copying a potentially derived object
+into a base value receiver is not introduced by this feature. A stack value
+still needs `&value` at the call site; an existing managed reference passes directly.
+Neo looks up source/bundled bound methods, including inherited members, and emits
+`interface.borrow` or `castclass`, followed by the ordinary `callvirt`/`call`.
+These checked views retain the concrete object and use its explicit/default interface
+implementation or virtual override. They create no box and preserve lifetime checks.
+Ambiguous members from unrelated bounds are rejected; use a narrower helper contract.
+Unconstrained members, direct member access on bare T, bound fields/properties and
+method-group conversion and constraint-aware closure lowering remain outside this first lookup slice. Generic source-record
+methods are still a separate language feature.
+
+The verifier accepts an open parameter's projection only when its declared bound
+proves the view. Concrete execution rechecks conformance and the receiver capability.
+Symbolic forwarding still has the previously described limitation: this is not a full
+constraint-implication verifier. Partial frontend library probes cannot prove contracts
+involving missing application definitions; full linking validates those definitions
+and repeats concrete checks.
+
+### Comparison with CLR constrained calls
+
+The shipped [OpCodes.Constrained contract](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.constrained?view=net-10.0)
+(consulted 2026-09-09) describes how the prefix selects reference/value receiver handling
+for generic calls and can avoid boxing. The CLI metadata specification (ECMA-335, sixth edition, June 2012), Partition II
+§22.21, defines GenericParamConstraint rows referring to type bounds; this is the
+baseline for keeping bounds in metadata rather than solely in Neo. See
+[ECMA-335](https://ecma-international.org/wp-content/uploads/ECMA-335_6th_edition_june_2012.pdf).
+
+NeoCLR reuses nominal bounds and ordinary virtual dispatch. Its explicit T& receiver
+already supplies a managed address, so this slice reuses checked reference-view
+instructions instead of adding a `constrained.` prefix. The benefit is preserving
+existing identity, readonly and lifetime rules with no allocation mechanism. The cost
+is a narrower source API: bare T cannot yet select value-versus-reference receiver
+handling after substitution. Supporting that later may justify a CLR-like prefix;
+silently borrowing, copying, or boxing is not an acceptable substitute. There is no
+claim of JIT performance improvement or full CLI compatibility. Tests exercise stack,
+heap, base overrides, inherited interfaces, explicit/default implementations and
+rejection from source, metadata, host calls and verification.
+
+The [comparison probe](experiments/generic-bounds-dotnet/Program.cs) was run on
+2026-09-09 with SDK 10.0.100, runtime .NET 10.0.0, macOS ARM64. It printed `42`,
+`42`, `invalid bound rejected`: a constrained ref receiver mutated its original struct,
+a base-constrained call reached the override, and reflection rejected an invalid
+constructed generic method. It does not compare allocations or throughput. Reproduce
+with `cd docs/experiments/generic-bounds-dotnet` followed by `dotnet run`; the directory
+pins its SDK in global.json.
+
+Constructor constraints, complete implication checking and reflection enumeration
+remain future work. `notnull` awaits nullable type metadata and must distinguish
+nullable type arguments from uninitialized storage; see the
 [nullability groundwork](runtime-groundwork-review.md).
 
 ## Run and validate
 
 ```sh
 cargo run --locked -- run examples/source/generic-constraints.neo
-cargo test --locked --test generic_constraints --test generic_metadata --test neo_generic_records --test neo_generics
+cargo run --locked -- run examples/source/generic-bounds.neo
+cargo test --locked --test generic_bounds --test generic_constraints --test generic_metadata --test neo_generic_records --test neo_generics
 ```
 
-The example prints 42 and returns 42. Tests cover source/IL contracts, JSON validation,
+Both examples print 42 and return 42. Tests cover source/IL contracts, JSON validation,
 host resolution, symbolic forwarding, shallow reference restrictions, pointers,
 substituted base and field contracts, and malformed or unsupported constraints.

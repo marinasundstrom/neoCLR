@@ -84,6 +84,9 @@ fn attributes(context: &Module, attributes: &mut [CustomAttribute]) -> Result<()
 pub(crate) fn normalize_module(context: &Module, source: &Module) -> Result<Module, Fault> {
     let mut result = source.clone();
     for definition in &mut result.types {
+        crate::constraints::map_types(&mut definition.generic_constraints, |ty| {
+            normalize_type(context, ty)
+        })?;
         if let Some(base) = &mut definition.base {
             *base = normalize_type(context, base)?;
         }

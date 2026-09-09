@@ -133,6 +133,10 @@ pub(crate) fn validate_uses(linked: &Module, source: &Module) -> Result<(), Faul
         check_module(source, &entry.module)?;
     }
     for definition in &source.types {
+        for bound in crate::constraints::bounds(&definition.generic_constraints) {
+            check_type(linked, source, bound)?;
+        }
+
         for property in &definition.properties {
             property.clone().map_types(|ty| {
                 check_type(linked, source, ty)?;

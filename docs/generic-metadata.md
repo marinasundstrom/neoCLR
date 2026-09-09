@@ -4,7 +4,7 @@ This slice implements type parameter references, constructed type references, ge
 record field signatures, validation, substitution, and closed generic record values.
 Static and instance IL methods on generic types and ordinary library-defined
 System.Option/Result are implemented. Concrete static/free [functions with their own type parameters](function-generics.md)
-are implemented; generic instance methods and constraints remain deferred; read-only type inspection is documented separately
+are implemented; generic instance methods remain deferred; read-only type inspection is documented separately
 in [type inspection](type-inspection.md).
 
 ```text
@@ -160,8 +160,9 @@ internal scoped keys and colliding type names across modules remain future work.
 
 ## Initial argument constraints
 
-[Generic constraints](generic-constraints.md) now attach notvoid/notreference rows to
+[Generic constraints](generic-constraints.md) now attach notvoid/notreference and nominal type-bound rows to
 type and method definitions. The runtime checks concrete arguments at construction,
 signature substitution and function resolution; owner and method indices remain
 independent. Neo projects the same contracts with `where` clauses. Base/interface
-constraints, symbolic implication proofs and nullable-type restrictions remain later slices.
+bounds support method calls through T& in Neo. Complete symbolic implication proofs
+and nullable-type restrictions remain later slices.

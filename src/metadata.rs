@@ -151,11 +151,12 @@ pub struct Module {
     pub functions: Vec<Function>,
 }
 
-/// Runtime restrictions on the outermost form of a generic argument.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+/// Runtime generic argument restrictions and nominal conformance bounds.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ConstraintKind {
     NotVoid,
     NotReference,
+    TypeBound(Type),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -929,6 +930,7 @@ impl Function {
         {
             *ty = map(ty)?;
         }
+        crate::constraints::map_types(&mut result.generic_constraints, &mut map)?;
         for target in &mut result.interface_implementations {
             if let Some(owner) = &mut target.owner {
                 *owner = map(owner)?;

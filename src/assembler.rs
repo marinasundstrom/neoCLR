@@ -220,8 +220,11 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     return Ok(());
                 }
                 if word == ".constraint" {
-                    def.generic_constraints
-                        .extend(crate::constraints::parse(rest, &def.generic_parameters)?);
+                    let mut constraints = crate::constraints::parse(rest, &def.generic_parameters)?;
+                    crate::constraints::map_types(&mut constraints, |ty| {
+                        Ok(bind_type_parameters(ty.clone(), &def.generic_parameters))
+                    })?;
+                    def.generic_constraints.extend(constraints);
                     return Ok(());
                 }
                 if word == ".custom" {

@@ -136,7 +136,11 @@ impl Parser {
             let mut text = parameter.text.clone();
             loop {
                 text.push(' ');
-                text.push_str(&self.take().text);
+                if matches!(self.current().text.as_str(), "notvoid" | "notreference") {
+                    text.push_str(&self.take().text);
+                } else {
+                    text.push_str(&self.ty()?.il());
+                }
                 if !self.eat(",") {
                     break;
                 }

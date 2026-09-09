@@ -41,7 +41,7 @@ explicit_method  = [ "readonly" ], "func", identifier, ".", identifier,
                    parameter_list, "->", type, newlines, block ;
 generic_parameters = "<", identifier, { ",", identifier }, ">" ;
 constraint_clause = newlines, "where", identifier, ":", constraint, { ",", constraint } ;
-constraint       = "notvoid" | "notreference" ;
+constraint       = "notvoid" | "notreference" | type ;
 generic_function_member = "func", identifier, [ generic_parameters ], parameter_list, "->", type, { constraint_clause }, newlines, block ;
 function_decl    = "func", qualified_name, [ generic_parameters ], parameter_list, "->", type, { constraint_clause }, newlines,
                    "{", separators, { statement, separators }, "}" ;
@@ -367,4 +367,6 @@ See [conditional union bindings](conditional-patterns.md) for `if let` and
 
 The initial [generic constraints](generic-constraints.md) use `where T: notvoid, notreference`
 on generic records, free functions and static generic methods. These clauses are
-runtime-enforced; base/interface and notnull constraints remain separate work.
+runtime-enforced. Nominal record/interface bounds also support calls through T&
+receivers; see the constraint guide for the bounded lookup rules. notnull awaits
+nullable metadata.

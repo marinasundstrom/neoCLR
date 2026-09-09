@@ -74,7 +74,8 @@ Object inheritance merely to have runtime type identity. Source syntax remains o
 **Generic constraints** now have an initial runtime-enforced
 [notvoid/notreference subset](generic-constraints.md). These restrict the outermost
 argument; notreference excludes managed reference forms, not native pointers or fields
-containing references. Base/interface contracts and constrained-member lookup are next;
+containing references. Nominal base/interface bounds and method calls through T&
+are implemented; bare-T receiver handling and broader member lookup remain next;
 notnull depends on nullable metadata. Stronger symbolic implication checking and
 constructor constraints remain separate work.
 

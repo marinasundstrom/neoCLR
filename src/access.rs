@@ -229,6 +229,10 @@ pub(crate) fn validate_types(module: &Module) -> Result<(), Fault> {
         if let Some(base) = &definition.base {
             check_type(module, source, base)?;
         }
+
+        for bound in crate::constraints::bounds(&definition.generic_constraints) {
+            check_type(module, source, bound)?;
+        }
         for ty in &definition.implements {
             check_type(module, source, ty)?;
         }

@@ -27,7 +27,7 @@ explicit_method  = [ "readonly" ], "func", identifier, ".", identifier,
                    parameter_list, "->", type, newlines, block ;
 generic_parameters = "<", identifier, { ",", identifier }, ">" ;
 constraint_clause = newlines, "where", identifier, ":", constraint, { ",", constraint } ;
-constraint       = "notvoid" | "notreference" ;
+constraint       = "notvoid" | "notreference" | type ;
 generic_function_member = "func", identifier, [ generic_parameters ], parameter_list, "->", type, { constraint_clause }, newlines, block ;
 function_decl    = "func", qualified_name, [ generic_parameters ], parameter_list, "->", type, { constraint_clause }, newlines,
                    "{", separators, { statement, separators }, "}" ;

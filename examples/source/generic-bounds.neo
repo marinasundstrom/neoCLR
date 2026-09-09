@@ -1,0 +1,25 @@
+interface Readable {
+    readonly func Read() -> int
+}
+interface Counter: Readable {
+    func Add(amount: int) -> ()
+}
+record Cell(Value: int): Counter {
+    readonly func Read() -> int { return this.Value }
+    func Add(amount: int) -> () { this.Value = this.Value + amount }
+}
+func Add<T>(value: T&, amount: int) -> () where T: Counter {
+    value.Add(amount)
+}
+func Read<T>(readonly value: T&) -> int where T: Readable {
+    return value.Read()
+}
+func Main() -> int {
+    var local = Cell(19)
+    Add(&local, 1)
+    let heap = new Cell(20)
+    Add(heap, 2)
+    let total = Read(&local) + Read(heap)
+    Console.WriteLine(total)
+    return total
+}
