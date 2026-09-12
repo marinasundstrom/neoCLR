@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-12
 
+- Expanded the Raven POC plan to cover all existing public runtime APIs while
+  retaining explicit compiler/CLR feature limits. Added a regenerable source
+  declaration inventory and a coverage work plan; the inventory does not claim
+  complete executable support. Documented a repeatable experimental distribution
+  procedure with separately packaged Raven SDK/VSIX builds, focused integration
+  checks and provenance instead of Raven's full release cycle. Recorded the author's
+  directions and the remaining standalone bridge distribution gap; no release made.
+
 - Projected bounded UTF-8 File.ReadAllText/WriteAllText into Raven with Result error
   predicates, typed matches and success/error propagation. The importer preserves
   conditional output initialization without inventing default error cases. Added

@@ -1670,6 +1670,41 @@ requested. Installed local SDK/extension 0.1.12-neoclr.4 and verified target com
 Option output inference and the saved combined workflow. The [setup instructions](experiments/raven-target/VSCODE.md)
 identify the fresh demo and remaining preview limits. No public release was made.
 
+## 2026-09-12 — Existing runtime APIs define the Raven POC scope
+
+**Author's direction.** “We want all libraries that we implemented when experimenting
+with Neo to be available in the POC release,” clarified as “all runtime APIs.” The
+author then described Raven targeting neoCLR as a good starting point even without
+the CLR's full feature support.
+
+**Assistant response and action.** The assistant distinguished runtime-library API
+coverage from complete CLR/compiler feature parity, and proposed finishing the file
+projection, then auditing the existing runtime against Raven's declarations and
+importer. The preview acceptance criteria now require that inventory and closure of
+its API gaps. The [file projection](raven-file-api.md) subsequently passed compilation,
+import, runtime execution and rejection checks (`e2d3e94`); full library coverage is
+not yet achieved. Added a [regenerable source inventory and coverage plan](raven-runtime-api-coverage.md)
+for the remaining API work. Neo frontend changes are not part of this migration, and Raven remains an experiment
+on its separate branch.
+
+**Open work.** Make each existing public API usable through the Raven target and test
+representative behavior, while documenting language/runtime feature limitations and
+any contract adaptation. This direction expands the release gate; it does not claim
+that today's bounded importer already exposes the library.
+
+## 2026-09-12 — A separate, lightweight Raven distribution
+
+**Author's direction.** The special Raven build shipped with neoCLR should not go
+through Raven's full release cycle. Test that it works with neoCLR, package it
+separately, and document a repeatable procedure in this repository for later releases.
+
+**Assistant response and action.** The assistant agreed to pin the compiler revision,
+package SDK/VSIX assets separately, and validate the neoCLR integration. Added an
+[experimental release procedure](experiments/raven-target/RELEASING.md) covering
+focused tests, packaged-build smoke checks, provenance and repeat releases. It records
+the remaining source-bridge distribution gap explicitly. No package or public release
+has been produced as part of documenting this procedure.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

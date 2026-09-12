@@ -564,3 +564,6 @@ bounded importer even though they exist in the neoCLR runtime library.
 
 The [file API slice](../../raven-file-api.md) now covers bounded UTF-8 read/write,
 Result propagation and conditional-output validation.
+See the [existing API coverage plan](../../raven-runtime-api-coverage.md) for the
+full POC scope and the [experimental release procedure](RELEASING.md) for separate
+Raven SDK/VSIX packaging without a full Raven product release cycle.

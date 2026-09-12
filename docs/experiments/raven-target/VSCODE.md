@@ -198,3 +198,5 @@ obtain the added declarations. Automatic disposal and defer remain future work, 
 NeoCLR-specific behavior isolated from existing .NET/CLR support.
 
 Normal runs print only guest output. For runtime diagnostics, `neoclr run <input> --show-result` writes the return value to stderr.
+
+For repeatable experimental distribution, see [the release procedure](RELEASING.md).
