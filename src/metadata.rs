@@ -343,6 +343,9 @@ pub struct Function {
     /// Input parameters narrowed to readonly managed-reference capabilities on entry.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub readonly_parameters: Vec<usize>,
+    /// CLI-style absence of a return value, distinct from inhabited Void.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub no_result: bool,
     pub returns: Type,
     #[serde(default)]
     pub locals: Vec<Type>,

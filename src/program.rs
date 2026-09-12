@@ -192,6 +192,11 @@ impl LoadedFunction<'_> {
     pub fn parameters(&self) -> &[Type] {
         &self.function.parameters
     }
+    /// Whether guest calls produce an evaluation-stack value.
+    pub fn has_return_value(&self) -> bool {
+        !self.function.no_result
+    }
+
     pub fn returns(&self) -> &Type {
         &self.function.returns
     }

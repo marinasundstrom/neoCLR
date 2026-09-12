@@ -1183,6 +1183,34 @@ synthetic Cecil reference; the old incomplete fixture's real dependency remains.
 helper admission, and implement/validate the binary reader and call translation. The
 [core declaration contract](raven-core-declarations.md) records the evidence and limits.
 
+## 35. Compatibility work belongs primarily in neoCLR — recorded 2026-09-12
+
+**Author direction:** Make as few changes to Raven as possible. Generally useful metadata
+improvements can belong there, but most work should improve neoCLR's CLR compatibility.
+
+**Assistant proposal/action:** Reconsidered the earlier blanket Void adaptation and added
+an explicit no-result return convention to neoCLR for static IL methods. Calls and returns
+use the existing instructions, with verifier/runtime enforcement. Existing inhabited Void
+methods retain their behavior. No Raven changes were needed.
+
+**Author clarification:** Void should remain a real type usable as a generic argument,
+without necessarily changing ordinary IL return behavior. The author pointed to runtime
+async as a comparison and emphasized preserving the metadata/instruction interface.
+
+**Assistant response:** Kept type/storage semantics separate from the return convention,
+added generic Void regression tests, and recorded the runtime-async design comparison as
+future groundwork rather than expanding this slice into async implementation.
+
+**Further author direction:** Align with .NET value-type/reference-type semantics later.
+Avoid working around that model unless necessary to demonstrate the project's direction.
+The assistant treats this as the experiment's intended direction, not an implemented
+migration or a requirement to redesign the type model in this slice.
+
+**Outcome:** Focused runtime tests exercise empty/nested calls and the existing Console
+library boundary. Binary reading and execution of Raven artifacts remain separate work.
+The [return-convention document](no-result-methods.md) records the restricted first subset,
+host-envelope behavior and the still-needed library binding policy.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

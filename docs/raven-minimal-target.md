@@ -74,3 +74,11 @@ The [binary profile](raven-binary-profile.md) selects the CLI container experime
 records the translation direction. A closed metadata fixture and explicit-only dependency
 audit now test resolution without host fallback. The Raven target itself remains
 incomplete; compiler isolation, core declarations and executable-profile validation remain.
+
+## Revised return-boundary decision
+
+Following the author's runtime-first compatibility clarification,
+[static no-result methods](no-result-methods.md) now run directly in neoCLR. This replaces
+the provisional preference above for blanket Void insertion/disposal in imported IL.
+Inhabited Void remains available in generic/value positions; existing System methods
+still need an explicit library boundary when their convention differs.

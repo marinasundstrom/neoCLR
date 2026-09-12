@@ -155,3 +155,16 @@ and emission of the static-call corpus without .NET framework references. Its me
 and the emitted application resolve as a closed dependency set. This completes the
 bounded declaration prerequisite, not the executable runtime library. Binary reading,
 helper policy and validated call/return translation are next.
+
+## Runtime-first compatibility direction
+
+Most adaptation belongs in neoCLR. Changes to Raven should remain minimal and generally
+useful for metadata/target handling. The [no-result return convention](no-result-methods.md)
+implements the next static-call compatibility requirement directly in neoCLR, superseding
+blanket call/return rewriting. It does not yet load Raven binaries.
+
+The intended later type-model direction is alignment with .NET value-type/reference-type
+semantics. Do not accumulate adaptations merely to preserve the original experiment's
+value-default model. Deviations should be justified by the direction being demonstrated
+(for example generic Void), with costs made explicit. This direction is recorded before
+implementation; the existing allocation/type model has not been migrated by this slice.

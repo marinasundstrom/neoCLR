@@ -98,6 +98,7 @@ fn parameter(t: &Type) -> Type {
 }
 pub(crate) fn compatible(contract: &Function, target: &Function) -> Result<(), Fault> {
     if contract.parameters.len() != target.parameters.len()
+        || contract.no_result != target.no_result
         || contract.returns != target.returns
         || contract
             .parameters

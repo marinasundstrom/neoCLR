@@ -111,7 +111,7 @@ fn analyze_constructor(module: &Module, function: &Function) -> Result<(), Fault
     while let Some(pc) = queue.pop_front() {
         let mut state = states[pc].clone().unwrap();
         let op = &function.body[pc];
-        let (pops, pushes) = effect(module, op, arity.into())?;
+        let (pops, pushes) = effect(module, function, op, arity.into())?;
         let inputs = state.stack.split_off(state.stack.len() - pops);
         let mut outputs = vec![Origin::Other; pushes];
         match op {
@@ -307,7 +307,7 @@ fn analyze_function(
     while let Some(pc) = queue.pop_front() {
         let mut state = states[pc].clone().expect("queued state exists");
         let op = &function.body[pc];
-        let (pops, pushes) = effect(module, op, arity).map_err(|mut e| {
+        let (pops, pushes) = effect(module, function, op, arity).map_err(|mut e| {
             e.function = Some(function.name.clone());
             e.instruction = Some(pc);
             e
@@ -315,8 +315,15 @@ fn analyze_function(
         if state.stack.len() < pops {
             return Err(fault(pc, "evaluation stack underflow"));
         }
-        if matches!(op, Op::Return) && state.stack.len() != 1 {
-            return Err(fault(pc, "ret requires exactly one value"));
+        if matches!(op, Op::Return) && state.stack.len() != usize::from(!function.no_result) {
+            return Err(fault(
+                pc,
+                if function.no_result {
+                    "no-result ret requires an empty stack"
+                } else {
+                    "ret requires exactly one value"
+                },
+            ));
         }
         if matches!(op, Op::Load(slot) | Op::Receiver { argument: false, index: slot, .. } if !state.initialized[*slot])
         {
@@ -609,6 +616,7 @@ fn analyze_function(
 // Exhaustive: adding an instruction requires explicitly specifying its stack effect.
 fn effect(
     module: &Module,
+    function: &Function,
     op: &Op,
     arity: crate::vm::SignatureContext,
 ) -> Result<(usize, usize), Fault> {
@@ -632,7 +640,8 @@ fn effect(
         | AlignOf(_)
         | NullPointer(_)
         | Error(_) => (0, 1),
-        Pop | Store(_) | StoreArg(_) | Return | BranchTrue(_) | BranchFalse(_) | Switch(_)
+        Return => (usize::from(!function.no_result), 0),
+        Pop | Store(_) | StoreArg(_) | BranchTrue(_) | BranchFalse(_) | Switch(_)
         | InitializeObject(_) => (1, 0),
         Dup => (1, 2),
         AllocateArray(_) | NewArray(_) | ArrayLength | ReferenceType => (1, 1),
@@ -640,9 +649,10 @@ fn effect(
         StoreArrayElement(_) => (3, 0),
         New(ty) => (crate::vm::record_fields(module, ty, arity)?.len(), 1),
         BindDelegate { target, .. } => (usize::from(target.instance), 1),
-        Call(target) | CallVirtual(target) => {
-            (target.parameters.len() + usize::from(target.instance), 1)
-        }
+        Call(target) | CallVirtual(target) => (
+            target.parameters.len() + usize::from(target.instance),
+            usize::from(!crate::vm::resolve(module, target)?.no_result),
+        ),
         Construct(target) => (target.parameters.len(), 1),
         CastClass(_) | BorrowInterface(_) | PackValue(_) | IsValue(_) | UnpackValue(_) => (1, 1),
         ReferenceEqual | SetField(_) | PointerAdd | BitAnd | BitOr | BitXor | ShiftLeft
@@ -945,6 +955,7 @@ fn typed_effect(
             stored(&values[0], &function.argument_types()[*index])?;
             Result::Ok(vec![])
         }
+        Return if function.no_result => Ok(vec![]),
         Return => {
             require(
                 !matches!(&values[0], StackType::Slot { .. }),
@@ -1062,7 +1073,11 @@ fn typed_effect(
                     stored(value, &ty)?;
                 }
             }
-            Result::Ok(vec![loaded(&callee.returns)])
+            Result::Ok(if callee.no_result {
+                vec![]
+            } else {
+                vec![loaded(&callee.returns)]
+            })
         }
         LoadTypeToken(_) => one(Type::RuntimeTypeHandle),
         ReferenceEqual => {

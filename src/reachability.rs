@@ -19,6 +19,7 @@ pub struct ReachableFunction {
     /// Canonical closed signature, including the selected definition row.
     pub target: FunctionRef,
     pub returns: Type,
+    pub no_result: bool,
     pub receiver_byref: bool,
     pub receiver_readonly: bool,
     pub out_parameters: Vec<usize>,
@@ -185,6 +186,7 @@ pub(crate) fn analyze(
                 parameters: function.parameters,
             },
             returns: function.returns,
+            no_result: function.no_result,
             receiver_byref: function.receiver_byref,
             receiver_readonly: function.receiver_readonly,
             out_parameters: function.out_parameters,

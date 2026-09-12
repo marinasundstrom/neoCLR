@@ -119,3 +119,12 @@ requirements of the static-call corpus. The earlier core-declaration gap is reso
 for those inputs only. Executable System binding, helper admission, binary parsing and
 stack verification remain required. The follow-up also corrects the earlier synthetic
 mscorlib entry in the application inventory.
+
+## Runtime-first return convention (2026-09-12)
+
+The author clarified that most compatibility work should be in neoCLR, with minimal
+Raven changes of general utility. [No-result methods](no-result-methods.md) now implement
+standard static no-result call/return behavior directly in the runtime. This supersedes
+the above proposal to insert Void construction/disposal at every imported IL call/return.
+Existing inhabited-Void System calls still need an explicit binding boundary. Binary
+loading is not implemented by this return-convention slice.

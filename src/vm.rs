@@ -462,6 +462,21 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         }
     }
     for function in &module.functions {
+        if function.no_result
+            && (function.returns != Type::Void
+                || function.instance
+                || function.is_virtual
+                || function.is_override
+                || function.is_abstract
+                || function.is_internal_call()
+                || function.pinvoke.is_some()
+                || !function.generic_parameters.is_empty()
+                || !function.interface_implementations.is_empty())
+        {
+            return Err(Fault::new(
+                "no-result methods currently require static, non-generic IL bodies with Void metadata",
+            ));
+        }
         crate::metadata::validate_slot_names(
             &function.parameter_names,
             function.parameters.len(),
@@ -2101,7 +2116,11 @@ fn interpret_instructions(
                     }
                 }
                 Op::Return => {
-                    let value = frame.pop()?;
+                    let value = if function.no_result {
+                        Value::Void
+                    } else {
+                        frame.pop()?
+                    };
                     let value = value.for_storage(&function.returns)?;
                     assigned_reference(&value)?;
                     frame.check_reference_return(&value)?;
@@ -2111,7 +2130,11 @@ fn interpret_instructions(
                         }
                     }
                     if !frame.stack.is_empty() {
-                        return Err(Fault::new("ret requires exactly one value"));
+                        return Err(Fault::new(if function.no_result {
+                            "no-result ret requires an empty stack"
+                        } else {
+                            "ret requires exactly one value"
+                        }));
                     }
                     let value = if let Some(receiver) = &frame.construction_receiver {
                         receiver.complete_constructor()?;
@@ -2135,7 +2158,9 @@ fn interpret_instructions(
                     }
                     frames.pop();
                     if let Some(caller) = frames.last_mut() {
-                        caller.stack.push(value.on_stack());
+                        if !function.no_result {
+                            caller.stack.push(value.on_stack());
+                        }
                     } else {
                         return Ok(Some(value));
                     }

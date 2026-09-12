@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-12
 
+- Added explicit no-result metadata and assembly syntax for static, non-generic IL
+  methods. The existing call/ret instructions now preserve CLI-style empty results;
+  verifier/runtime reject invalid stacks and unsupported return-mode combinations.
+  Existing inhabited Void behavior remains the default. Hosting and reachability
+  expose the return mode; generic Void storage/returns remain intact. Documented the
+  separate declared-type/return-convention layers and runtime-async design comparison;
+  binary loading and broader dispatch support remain planned. Recorded intended
+  later alignment with .NET value/reference type semantics; no type-model migration
+  is included in this slice.
+
 - Added the first Raven integration map, pinned to the inspected compiler revision.
   Identified existing core-library retargeting, reflection/PE emission dependencies,
   framework discovery and semantic gaps in Void/Unit and error projections. Documented

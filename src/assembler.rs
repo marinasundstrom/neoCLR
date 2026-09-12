@@ -838,7 +838,12 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                                 .collect::<Result<_, _>>()?,
                             generic_arguments: vec![],
                             is_abstract,
-                            returns: parse_type(result)?,
+                            no_result: result.trim() == "noresult",
+                            returns: if result.trim() == "noresult" {
+                                Type::Void
+                            } else {
+                                parse_type(result)?
+                            },
                             locals: vec![],
                             local_names: vec![],
                             body: vec![],
