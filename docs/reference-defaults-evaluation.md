@@ -6,6 +6,26 @@ The criteria come from [conversation entries 23–26](development-timeline.md): 
 application programming, useful object behavior for primitive/user-defined data,
 Result/Option APIs, nullable support, and meaningful separation of language and runtime.
 
+## Evaluation priority clarified after review
+
+On 2026-09-12 the author emphasized that neoCLR is the primary product of the
+experiment. Neo is a small language for demonstrating and testing patterns by emitting
+IL and executing it. Improving both is welcome, but hiding differences in Neo is not
+sufficient evidence of a better runtime. Preserve useful CLR behavior and the foundations
+that enable its strengths; seek compatibility and avoid unnecessary divergence.
+
+The required compatibility level is not yet selected: familiar APIs, source targeting,
+metadata/IL interoperability and existing binary execution are different promises.
+Do not interpret this clarification as a claim of existing binary compatibility, or
+as approval to retain every current runtime decision behind a compiler convention.
+
+Before the proposed compiler experiment, assess the relevant runtime contracts against
+CLR: object references versus references to slots, construction/copying, initialization
+and nullable storage, and generic/interface use. For each, identify what can be retained,
+what compatibility gap should be repaired, and what deliberate difference has a concrete
+benefit. Use Neo to exercise those contracts; adjust its projection as the runtime design
+warrants. The recommendation below is a candidate technique, not a language-first priority.
+
 ## Finding and recommendation
 
 The order workflow can express its sharing and snapshot behavior using existing
@@ -21,8 +41,8 @@ continues to use explicit signatures. This is a recommended candidate, not a cho
 metadata schema. A convention is insufficient if its meaning is that direct value use
 must be forbidden or identity/immutability must be guaranteed by the runtime.
 
-The smallest next implementation experiment should be a bounded language projection of
-the workflow, with explicit cross-module import/export checks. Use it to determine the
+After that runtime-contract assessment, a bounded language projection of the workflow
+with explicit cross-module import/export checks remains a possible validation experiment. Use it to determine the
 minimal shared information required. Do not change the meaning of existing Named types,
 newobj, or artifacts just to obtain cleaner source spelling. In particular, resolve the
 reference-to-reference-slot gap before claiming general C# targeting.
@@ -253,7 +273,8 @@ migration, not binary compatibility. This evaluation does not propose exception 
 
 ## Recommended next slice and acceptance gate
 
-Build a deliberately limited, opt-in compiler experiment for Product (reference default),
+Subject to the runtime-contract assessment above, build a deliberately limited, opt-in
+compiler experiment for Product (reference default),
 Receipt (value default), Notifications and the two collection uses. Keep the current
 workflow as the control. Do not ship a new default or introduce general inline flags.
 

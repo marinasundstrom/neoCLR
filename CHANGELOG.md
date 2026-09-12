@@ -13,6 +13,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   illustrative source/lowering, .NET comparison, migration costs and a proposed
   compiler/import experiment. Validated current behavior with 22 focused tests,
   emitted IL and the pinned .NET baseline; no runtime or compiler semantics changed.
+  Clarified after review that runtime improvement and useful CLR compatibility lead
+  the evaluation; Neo demonstrates/tests the contracts. A runtime-contract assessment
+  precedes the optional compiler experiment, with compatibility scope still open.
 
 - Recorded evaluation criteria centered on familiar developer experience, possible
   type-level reference/value defaults, Result/Option APIs, Faults, nullable support

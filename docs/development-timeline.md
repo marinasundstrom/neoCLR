@@ -1033,6 +1033,27 @@ considering an enforced nominal category. No experimental compiler was needed to
 the existing lowering evidence in this slice. Illustrative alternatives were not executed.
 The author has not yet selected the recommended implementation or changed current defaults.
 
+### 28. Keep runtime improvement primary and Neo as its test frontend
+
+Recorded 2026-09-12.
+
+**Author's clarification:** Runtime behavior and Neo language behavior are separate
+levels. Both can improve, but the main focus is the runtime. Neo exists primarily to
+demonstrate and test patterns by compiling to IL and running on neoCLR. Seek some
+compatibility with the existing CLR, avoid excessive divergence, retain the good parts
+and their foundations, and improve what can usefully be improved now.
+
+**Assistant's response:** Acknowledged that improving Neo's projection is not a substitute
+for evaluating runtime contracts. The earlier compiler/import experiment remains a
+possible validation tool, not the project's primary objective. Proposed first assessing
+reference/slot distinctions, construction/copying, initialization/nullability and generic
+interface use against CLR behavior. The exact compatibility level is still open; no
+binary compatibility commitment was inferred from the author's statement.
+
+**Action:** Updated the [evaluation](reference-defaults-evaluation.md) to put that runtime
+assessment before the optional compiler experiment. Preserved the previous findings and
+recorded why the priority changed. No runtime or language implementation changed.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the
