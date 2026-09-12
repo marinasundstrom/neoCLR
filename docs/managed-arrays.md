@@ -151,7 +151,8 @@ forms remain supported. Writable references to owned locals still require var.
 Arrays now admit ordinary interface-typed elements in addition to nominal class
 references. `newarr Read` initializes each element to a typed null reference; `stelem Read` stores an explicit `castclass Read` view, and `ldelem Read` returns the same object
 identity for dispatch. An uninitialized `array.alloc` slot remains different from null.
-Element types stay invariant and storage still requires an exact static type.
+Element types stay invariant. Ordinary interface element slots now also accept
+implementing class/derived-interface references through implicit upcasts.
 
 A managed address returned by `ldelema Read` addresses the **slot containing a reference**.
 `ldobj Read` copies that reference; `stobj Read` rebinds the slot. It does not overwrite
@@ -204,8 +205,9 @@ The default is typed null, including fields in generic class constructors and in
 references in jagged arrays. Null array operations fault. A constructor can therefore
 start with a null `arrayref<T>` field and assign `newarr T` to it. Arrays can contain
 class/interface references and other array references, and GC follows those handles.
-The runtime still requires exact element types and explicit class-to-interface casts;
-array covariance, System.Array methods and String defaults remain outside this slice.
+The runtime still requires invariant element types; interface element stores accept
+implicit implementing-class upcasts.
+Array covariance, System.Array methods and String defaults remain outside this slice.
 
 This aligns allocation/alias/default behavior with the Microsoft newarr/ldelema contracts
 cited above. Changing all existing `T[]` signatures to references would instead break

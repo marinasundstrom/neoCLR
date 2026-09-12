@@ -85,7 +85,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   target declarations. Five malformed-IL imports reject without output; a typed-null
   local fixture verifies and faults at execution. Result/Option/Void compatibility checks
   still pass. Documented reproduction and target-core refresh instructions. Broader array
-  import, implicit reference conversions, String defaults and collection adaptation remain pending.
+  import, String defaults and collection adaptation remain pending. Added implicit
+  nominal-class/interface upcasts at runtime assignments, calls, returns, fields and
+  array/indirect stores, preserving identity, typed nulls and GC roots. Byrefs and whole
+  array types remain invariant; downcasts still require castclass. Eight new regressions
+  and 104 related tests pass. Raven class/interface
+  import and adapted collection execution are still pending.
 
 - Began nominal class reference semantics: `.type class` uses managed heap handles in
   ordinary class-typed storage, while managed byrefs still address slots. Assignment,

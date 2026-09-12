@@ -789,6 +789,15 @@ impl Module {
                 .is_some_and(|d| d.representation == Representation::Interface)
     }
 
+    /// Implicit ordinary-reference upcast; byrefs and array covariance are excluded.
+    pub(crate) fn reference_assignable(&self, source: &Type, target: &Type) -> bool {
+        self.is_object_reference_type(source)
+            && self
+                .type_definition(target)
+                .is_some_and(|d| d.representation == Representation::Interface)
+            && crate::interfaces::ensure_implementation(self, source, target).is_ok()
+    }
+
     pub fn type_definition(&self, ty: &Type) -> Option<&TypeDef> {
         let name = ty.definition_name()?;
         let arity = match ty {

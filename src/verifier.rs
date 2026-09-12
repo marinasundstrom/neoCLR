@@ -783,7 +783,7 @@ fn loaded(ty: &Type) -> StackType {
     }
 }
 
-fn stored(value: &StackType, target: &Type) -> Result<(), Fault> {
+fn stored(module: &Module, value: &StackType, target: &Type) -> Result<(), Fault> {
     if matches!(value, StackType::Readonly(_)) && matches!(target, Type::ByRef(_)) {
         return Err(Fault::new(
             "readonly reference cannot satisfy writable storage contract",
@@ -794,7 +794,9 @@ fn stored(value: &StackType, target: &Type) -> Result<(), Fault> {
             return Ok(());
         }
     }
-    if exact(value).is_ok_and(|ty| ty == target) || *value == loaded(target) {
+    if exact(value).is_ok_and(|ty| ty == target || module.reference_assignable(ty, target))
+        || *value == loaded(target)
+    {
         Ok(())
     } else {
         Err(Fault::new(format!(
@@ -870,7 +872,7 @@ fn typed_effect(
                 "array length requires Int32 or native integer",
             )?;
             if matches!(op, CreateArray(_)) {
-                stored(&values[1], ty)?;
+                stored(module, &values[1], ty)?;
             }
             let array = T::Array(Box::new(ty.clone()));
             one(if matches!(op, NewArray(_)) {
@@ -915,7 +917,7 @@ fn typed_effect(
                 "array mutation/address requires managed array reference",
             )?;
             if matches!(op, StoreArrayElement(_)) {
-                stored(&values[2], element)?;
+                stored(module, &values[2], element)?;
                 return Ok(vec![]);
             }
             Ok(vec![match &values[0] {
@@ -970,11 +972,11 @@ fn typed_effect(
         Arg(index) => Ok(vec![loaded(&function.argument_types()[*index])]),
         Load(index) => Result::Ok(vec![loaded(&function.locals[*index])]),
         Store(index) => {
-            stored(&values[0], &function.locals[*index])?;
+            stored(module, &values[0], &function.locals[*index])?;
             Result::Ok(vec![])
         }
         StoreArg(index) => {
-            stored(&values[0], &function.argument_types()[*index])?;
+            stored(module, &values[0], &function.argument_types()[*index])?;
             Result::Ok(vec![])
         }
         Return if function.no_result => Ok(vec![]),
@@ -983,7 +985,7 @@ fn typed_effect(
                 !matches!(&values[0], StackType::Slot { .. }),
                 "cannot return a managed reference to the current frame",
             )?;
-            stored(&values[0], &function.returns)?;
+            stored(module, &values[0], &function.returns)?;
             Result::Ok(vec![])
         }
         Dup => Result::Ok(vec![values[0].clone(), values[0].clone()]),
@@ -1039,6 +1041,7 @@ fn typed_effect(
             if callee.instance {
                 let owner = callee.owner.as_ref().unwrap();
                 stored(
+                    module,
                     &values[0],
                     &if callee.receiver_readonly {
                         T::ReadOnlyByRef(Box::new(owner.clone()))
@@ -1053,7 +1056,7 @@ fn typed_effect(
             let callee = crate::vm::resolve(module, target)?;
             if crate::delegates::is_contract(module, &callee) {
                 for (value, ty) in values.iter().zip(callee.argument_types()) {
-                    stored(value, &ty)?;
+                    stored(module, value, &ty)?;
                 }
                 return Ok(vec![loaded(&callee.returns)]);
             }
@@ -1078,7 +1081,7 @@ fn typed_effect(
                 }
             }
             for (value, ty) in values[1..].iter().zip(&callee.argument_types()[1..]) {
-                stored(value, ty)?;
+                stored(module, value, ty)?;
             }
             Result::Ok(if callee.no_result {
                 vec![]
@@ -1110,7 +1113,7 @@ fn typed_effect(
                         "constructor chain must target this type or direct base",
                     )?;
                 } else {
-                    stored(value, &ty)?;
+                    stored(module, value, &ty)?;
                 }
             }
             Result::Ok(if callee.no_result {
@@ -1138,21 +1141,21 @@ fn typed_effect(
             one(Type::RuntimeTypeHandle)
         }
         PackValue(ty) => {
-            stored(&values[0], ty)?;
+            stored(module, &values[0], ty)?;
             one(Type::Value)
         }
         IsValue(_) => {
-            stored(&values[0], &Type::Value)?;
+            stored(module, &values[0], &Type::Value)?;
             one(Type::Boolean)
         }
         UnpackValue(ty) => {
-            stored(&values[0], &Type::Value)?;
+            stored(module, &values[0], &Type::Value)?;
             Result::Ok(vec![loaded(ty)])
         }
         Construct(target) => {
             let callee = crate::vm::resolve_constructor(module, target)?;
             for (value, ty) in values.iter().zip(&callee.parameters) {
-                stored(value, ty)?;
+                stored(module, value, ty)?;
             }
             one(callee
                 .owner
@@ -1163,7 +1166,7 @@ fn typed_effect(
                 .iter()
                 .zip(crate::vm::record_fields(module, ty, arity)?)
             {
-                stored(value, &field.ty)?;
+                stored(module, value, &field.ty)?;
             }
             one(ty.clone())
         }
@@ -1178,7 +1181,7 @@ fn typed_effect(
         }
         SetField(index) => {
             if module.is_reference_type(exact(&values[0])?) {
-                stored(&values[1], &field(exact(&values[0])?, *index)?)?;
+                stored(module, &values[1], &field(exact(&values[0])?, *index)?)?;
                 return Ok(vec![]);
             }
             if let T::ByRef(owner) = exact(&values[0])? {
@@ -1186,10 +1189,10 @@ fn typed_effect(
                     !matches!(values[0], StackType::Readonly(_)),
                     "cannot write through readonly reference",
                 )?;
-                stored(&values[1], &field(owner, *index)?)?;
+                stored(module, &values[1], &field(owner, *index)?)?;
                 one(T::Void)
             } else {
-                stored(&values[1], &field(exact(&values[0])?, *index)?)?;
+                stored(module, &values[1], &field(exact(&values[0])?, *index)?)?;
                 Result::Ok(vec![values[0].clone()])
             }
         }
@@ -1264,7 +1267,7 @@ fn typed_effect(
                 address(&values[0])? == ty,
                 "memory store pointer type mismatch",
             )?;
-            stored(&values[1], ty)?;
+            stored(module, &values[1], ty)?;
             Result::Ok(vec![])
         }
         InitializeObject(ty) => {
@@ -1316,7 +1319,7 @@ fn typed_effect(
         | StoreIndirectNative | StoreIndirectFloat32 | StoreIndirectFloat64 => {
             let ty = pointer(&values[0])?;
             crate::numeric::indirect_type(op, ty)?;
-            stored(&values[1], ty)?;
+            stored(module, &values[1], ty)?;
             Result::Ok(vec![])
         }
         HeapNew => {

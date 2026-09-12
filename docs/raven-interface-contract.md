@@ -78,7 +78,7 @@ The preferred path is runtime adaptation under the existing compiler metadata su
 | --- | --- |
 | Raven compilation | Candidate class/interface declarations bind and emit with standard calls; tested without compiler changes at Raven 5b773ae3536f52ef077c8897867950249d6dde90. |
 | Nominal classes | Nominal classes now admit generic owner parameters, interface conformance and dispatch. Class inheritance, methods with their own type parameters on nominal classes and virtual/byref class receivers remain unsupported. |
-| Existing interface runtime | Legacy views remain unchanged. Ordinary interface object references now support explicit casts, typed slots/fields, GC and dispatch; interface arrays and indirect slot access are now admitted; ordinary array references are now implemented; implicit storage conversions and importer admission remain later work. |
+| Existing interface runtime | Legacy views remain unchanged. Ordinary interface object references now support explicit casts, typed slots/fields, GC and dispatch; interface arrays and indirect slot access are now admitted; ordinary array references and implicit class/interface upcasts are implemented; importer admission remains later work. |
 | Library | ArrayList<T> is still a value wrapper holding shared state; ArrayIterator<T> is an explicitly heap-allocated legacy record. Adapt actual implementations after receiver/storage support exists. |
 | Import bridge | UnionImport deliberately rejects these collection types and emits no executable. Candidate declarations are isolated from the working core surface. |
 
@@ -213,3 +213,53 @@ The bridge maps standard signatures to ArrayRef and checks array stack operands 
 writing neoIL. Its static-function profile does not yet admit nominal class fields or
 interface conversions. The candidate collection probe remains rejected; the array demo
 establishes one prerequisite rather than substituting for the real collection library.
+
+## Implicit ordinary-reference assignability (2026-09-12)
+
+The runtime and typed verifier now accept an implementing nominal class reference where
+an ordinary interface reference is declared. A derived-interface reference also converts
+to its inherited interface, with generic arguments substituted and matched invariantly.
+This applies to local/argument assignments, calls and constructor arguments, returns,
+record/class fields, array elements and indirect slot stores. A conversion preserves the
+allocation identity and changes the stored handle's static view to the declared target.
+Typed null references convert only along the same declared conformance relationship.
+
+This implements the class-to-interface and interface-to-parent subset of
+[C# implicit reference conversions, §10.2.8](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/conversions#1028-implicit-reference-conversions)
+(primary source consulted 2026-09-12), following the CLI contract cited above. The
+language defines conversion applicability; neoCLR's metadata supplies conformance and
+the verifier/runtime enforce the storage contract. The alternative of inserting
+castclass at every importer store/call would add target-specific rewriting for ordinary
+CLI assignments. Runtime normalization avoids that requirement without a new opcode or
+wrapper allocation. This is compatibility work, not a measured performance improvement;
+conformance is currently checked at conversion time without a specialized cache.
+
+```text
+.local System.Collections.List<Int32> values
+ldc.i4 2
+call System.Collections.ArrayList<Int32>::Allocate(Int32)
+stloc values
+```
+
+The fragment illustrates the intended reference assignment once the adapted library is
+admitted; it is not a runnable collection sample yet. Existing explicit casts remain
+valid. Unrelated interfaces, mismatched generic arguments and implicit downcasts are
+rejected, including during execution without typed verification. `castclass` remains
+available for checked downcasts. Byref slots stay invariant: `Cell&` cannot substitute
+for `Read&`, since the callee could otherwise replace the caller's Cell with a different
+implementation. This does not change legacy borrowed interface views or make native
+pointer storage accept object references. Arrays remain invariant as whole types even
+though an interface element slot accepts an implementing class reference.
+
+The rule is implemented at module-aware interpreter boundaries. Module-free host value/
+slot operations retain exact typing. Generic-constraint-based conversions from open
+parameters, general stack-merge common-type inference, class base conversions, array
+covariance and Raven class/interface importer admission remain separate work. The
+collection metadata probe still rejects execution; this removes its runtime assignment
+prerequisite without claiming the importer or library migration is complete.
+
+`tests/reference_assignability.rs` covers assignments/calls/returns, constructor and field
+stores, element/indirect stores, identity, nulls, inherited generic contracts, GC retention
+and rejected downcasts, unrelated types and byref widening.
+
+Validation: eight new regressions and 104 related tests pass (112 focused tests total).

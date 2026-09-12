@@ -1278,14 +1278,14 @@ impl Frame {
             _ => Err(Fault::new("expected Ptr")),
         }
     }
-    fn args(&mut self, types: &[Type]) -> Result<Vec<Value>, Fault> {
+    fn args(&mut self, module: &Module, types: &[Type]) -> Result<Vec<Value>, Fault> {
         if self.stack.len() < types.len() {
             return Err(Fault::new("not enough arguments"));
         }
         let args = self.stack.split_off(self.stack.len() - types.len());
         args.into_iter()
             .zip(types)
-            .map(|(value, ty)| value.for_storage(ty))
+            .map(|(value, ty)| value.for_storage_in(module, ty))
             .collect()
     }
 }
@@ -1635,7 +1635,10 @@ fn interpret_instructions(
                     }
                     let value = frame.pop()?;
                     assigned_reference(&value)?;
-                    frame.args[*i].borrow_mut().set(value)?;
+                    let ty = frame.args[*i].borrow().inspect_type().clone();
+                    frame.args[*i]
+                        .borrow_mut()
+                        .set(value.for_storage_in(module, &ty)?)?;
                 }
                 Op::Load(i) => frame
                     .stack
@@ -1644,7 +1647,9 @@ fn interpret_instructions(
                 Op::Store(i) => {
                     let value = frame.pop()?;
                     assigned_reference(&value)?;
-                    frame.locals[*i].borrow_mut().set(value)?;
+                    frame.locals[*i]
+                        .borrow_mut()
+                        .set(value.for_storage_in(module, &function.locals[*i])?)?;
                 }
                 Op::Dup => {
                     let value = frame
@@ -1864,7 +1869,7 @@ fn interpret_instructions(
                     let signature = resolve(module, target)?;
                     crate::access::check_call(module, Some(&function), &signature)?;
                     let ty = signature.owner.as_ref().unwrap();
-                    let mut args = frame.args(&signature.argument_types()[1..])?;
+                    let mut args = frame.args(module, &signature.argument_types()[1..])?;
                     let Value::Delegate(binding) = frame.pop()? else {
                         return Err(Fault::new("Invoke requires a delegate value"));
                     };
@@ -1885,7 +1890,7 @@ fn interpret_instructions(
                 Op::CallVirtual(target) => {
                     let contract = resolve(module, target)?;
                     crate::access::check_call(module, Some(&function), &contract)?;
-                    let mut args = frame.args(&contract.argument_types()[1..])?;
+                    let mut args = frame.args(module, &contract.argument_types()[1..])?;
                     if !crate::interfaces::is_contract(module, &contract) {
                         let Value::SlotReference(reference) = frame.pop()? else {
                             return Err(Fault::new("class callvirt requires a managed reference"));
@@ -2099,7 +2104,7 @@ fn interpret_instructions(
                         .clone()
                         .ok_or_else(|| Fault::new("missing constructor owner"))?;
                     check_type(&owner, module)?;
-                    let args = frame.args(&callee.parameters)?;
+                    let args = frame.args(module, &callee.parameters)?;
                     if frames.len() >= limits.frames {
                         return Err(Fault::new("frame limit exceeded"));
                     }
@@ -2207,7 +2212,7 @@ fn interpret_instructions(
                                 "constructor must chain once to this type or its direct base",
                             ));
                         }
-                        let args = frame.args(&callee.parameters)?;
+                        let args = frame.args(module, &callee.parameters)?;
                         let Value::SlotReference(supplied) = frame.pop()? else {
                             return Err(Fault::new("constructor chain requires its own receiver"));
                         };
@@ -2241,7 +2246,7 @@ fn interpret_instructions(
                         frames.push(child);
                         return Ok(None);
                     }
-                    let mut args = frame.args(&callee.argument_types())?;
+                    let mut args = frame.args(module, &callee.argument_types())?;
                     restrict_reference_arguments(&callee, &mut args)?;
                     if callee.pinvoke.is_some() {
                         let libraries = native_libraries.as_mut().ok_or_else(|| {
@@ -2278,7 +2283,7 @@ fn interpret_instructions(
                     } else {
                         frame.pop()?
                     };
-                    let value = value.for_storage(&function.returns)?;
+                    let value = value.for_storage_in(module, &function.returns)?;
                     assigned_reference(&value)?;
                     frame.check_reference_return(&value)?;
                     for (output, conditional) in &frame.outputs {
@@ -2331,7 +2336,7 @@ fn interpret_instructions(
                 | Op::CreateArray(ty) => {
                     arrays_used = true;
                     let initial = if matches!(op, Op::CreateArray(_)) {
-                        frame.pop()?.for_storage(ty)?
+                        frame.pop()?.for_storage_in(module, ty)?
                     } else if matches!(op, Op::AllocateArray(_)) {
                         Value::Uninitialized(ty.clone())
                     } else {
@@ -2409,7 +2414,7 @@ fn interpret_instructions(
                             if matches!(op, Op::ArrayElement(_)) {
                                 frame.stack.push(address.read()?.on_stack());
                             } else if let Some(value) = stored {
-                                address.write(value)?;
+                                address.write(value.for_storage_in(module, ty)?)?;
                             } else {
                                 frame.stack.push(Value::SlotReference(address));
                             }
@@ -2438,7 +2443,7 @@ fn interpret_instructions(
                     crate::access::check_construction(module, &function, ty)?;
                     let definitions = module.instantiated_fields(ty)?;
                     let types: Vec<_> = definitions.iter().map(|f| f.ty.clone()).collect();
-                    let fields = frame.args(&types)?;
+                    let fields = frame.args(module, &types)?;
                     for field in &fields {
                         field.ensure_heap_references()?;
                     }
@@ -2506,6 +2511,7 @@ fn interpret_instructions(
                             .ok_or_else(|| Fault::new("field index out of range"))?
                             .ty
                             .clone();
+                        let value = value.for_storage_in(module, &target)?;
                         object.reference.write_field(*i, target, value)?;
                         return Ok(None);
                     }
@@ -2517,6 +2523,7 @@ fn interpret_instructions(
                             .ok_or_else(|| Fault::new("field index out of range"))?
                             .ty
                             .clone();
+                        let value = value.for_storage_in(module, &target)?;
                         reference.write_field(*i, target, value)?;
                         frame.stack.push(Value::Void);
                         return Ok(None);
@@ -2531,7 +2538,7 @@ fn interpret_instructions(
                         .get_mut(*i)
                         .ok_or_else(|| Fault::new("field index out of range"))?;
                     value.ensure_heap_references()?;
-                    *field = value.for_storage(&field.ty())?;
+                    *field = value.for_storage_in(module, &field.ty())?;
                     frame.stack.push(Value::Object { ty, fields });
                 }
                 Op::SizeOf(ty) | Op::AlignOf(ty) => {
@@ -2747,7 +2754,7 @@ fn interpret_instructions(
                         if access_alignment.is_some() {
                             return Err(Fault::new("unaligned is not valid on slot references"));
                         }
-                        reference.write(value)?;
+                        reference.write(value.for_storage_in(module, ty)?)?;
                         frame.pop()?;
                         return Ok(None);
                     }
@@ -2761,7 +2768,7 @@ fn interpret_instructions(
                     }
                     let ty = &pointer.target;
                     let value = value
-                        .for_storage(ty)
+                        .for_storage_in(module, ty)
                         .map_err(|_| Fault::new("memory store type mismatch"))?;
                     let mut layout = crate::memory::layout(module, ty)?;
                     if let Some(alignment) = access_alignment {

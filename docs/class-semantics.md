@@ -137,3 +137,8 @@ String/interface/array classification are not implemented by this slice.
 The reference-default follow-up passed 22 focused tests across class defaults, constructors
 and reference semantics. The next acceptance result must be Raven-emitted IL calling the
 real runtime library, not merely a host-generated method fixture.
+
+Ordinary implementing-class references now implicitly convert to interface storage and
+call/return contracts, preserving identity. See [reference assignability](raven-interface-contract.md#implicit-ordinary-reference-assignability-2026-09-12)
+for the implemented boundaries and remaining importer limitations. Managed byrefs to
+slots remain invariant, and downcasts still require explicit castclass.

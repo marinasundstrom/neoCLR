@@ -223,6 +223,26 @@ impl Value {
         }
     }
 
+    /// Apply nominal reference assignability before enforcing exact slot representation.
+    pub(crate) fn for_storage_in(
+        self,
+        module: &crate::Module,
+        ty: &Type,
+    ) -> Result<Self, crate::Fault> {
+        if self.ty() != *ty && module.reference_assignable(&self.ty(), ty) {
+            match self {
+                Self::ObjectReference(mut object) => {
+                    object.reference.assigned()?;
+                    object.view = Some(ty.clone());
+                    return Ok(Self::ObjectReference(object));
+                }
+                Self::NullObjectReference(_) => return Ok(Self::NullObjectReference(ty.clone())),
+                other => return other.for_storage(ty),
+            }
+        }
+        self.for_storage(ty)
+    }
+
     /// CLI integer storage truncates a stack integer to the destination width.
     pub(crate) fn for_storage(self, ty: &Type) -> Result<Self, crate::Fault> {
         self.initialized()?;

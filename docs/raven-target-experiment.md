@@ -657,3 +657,13 @@ application functions are covered. Five negative imports and a runtime null-defa
 fixture validate rejection/state behavior. Existing Result/Option/Void probe checks
 and runtime outputs remain valid. Reference conversions and the real collection library
 remain next work; this is not full CLI array or interface-import support.
+
+## Runtime reference assignment prerequisite (2026-09-12)
+
+[Implicit ordinary-reference upcasts](raven-interface-contract.md#implicit-ordinary-reference-assignability-2026-09-12)
+now work at runtime storage, call and return boundaries, including generic interface
+parents. This matches Raven's use of ordinary CLI reference assignments without requiring
+an inserted castclass at every boundary. It preserves object identity and GC retention
+and rejects downcasts, byref widening and unrelated interfaces. The Raven importer still
+needs class/interface admission and the actual collection library adaptation; no Raven
+repository changes were made in this slice.
