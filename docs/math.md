@@ -76,3 +76,6 @@ The sample combines a triangle calculation, ties-to-even rounding, integer clamp
 and exhaustive Result matching. Tests include direct calls, serialized artifacts,
 source type errors, NaN comparisons, signed zero and typed failures. The pinned
 .NET SDK 10.0.100 probe provides executable comparison evidence.
+
+The experimental [Raven Clamp projection](raven-clamp-api.md) completes the current
+Int32 Math subset through the bounded importer; floating-point methods remain pending.

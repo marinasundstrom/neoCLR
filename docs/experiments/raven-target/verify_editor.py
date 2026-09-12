@@ -78,10 +78,10 @@ try:
             'context': {'triggerKind': 1}}, True))
         items = result if isinstance(result, list) else result['items']
         labels = sorted({item['label'] for item in items})
-        expected = ('Abs', 'Min', 'Max', 'Sign') if owner == 'Math' else (('WriteLine',) if owner else (('Collections', 'Option', 'Result', 'Console', 'Math') if collections else ('Option', 'Result', 'Console', 'Math')))
+        expected = ('Abs', 'Min', 'Max', 'Sign', 'Clamp') if owner == 'Math' else (('WriteLine',) if owner else (('Collections', 'Option', 'Result', 'Console', 'Math') if collections else ('Option', 'Result', 'Console', 'Math')))
         if any(not any(label == name or label.startswith(name+'(') for label in labels) for name in expected):
             raise AssertionError(f'{owner}: missing target completions: {labels}')
-        if any(label == name or label.startswith(name+'(') for label in labels for name in ('ReadLine', 'Clamp', 'Sin', 'Sqrt')):
+        if any(label == name or label.startswith(name+'(') for label in labels for name in ('ReadLine', 'Sin', 'Sqrt')):
             raise AssertionError(f'{owner}: unexpected host API: {labels}')
         if not owner and 'IO' in labels and not files:
             raise AssertionError('Host System.IO leaked into target namespace')

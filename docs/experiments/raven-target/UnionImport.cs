@@ -363,6 +363,14 @@ static class UnionImport
             if (file.OutArgument >= 0 || reference.Name == "FromResidual") ValidatePropagation(definition.DeclaringType);
             return new(file.Name, file.Arguments, file.Result, file.OutArgument, file.Instruction, file.OutArgument >= 0);
         }
+        if (reference.DeclaringType.FullName == "System.Math" && reference.Name == "Clamp")
+        {
+            var signature = RuntimeSignatures.Match(reference, definition, ResultBindings.Type);
+            if (reference.HasThis || !signature.Args.SequenceEqual(new[] { "Int32", "Int32", "Int32" })
+                || signature.Result != "System.Result<Int32,System.InvalidRangeError>")
+                throw new InvalidDataException("Unsupported Clamp signature.");
+            return new("System.Math::Clamp", signature.Args, signature.Result);
+        }
         var surface = TargetSurface.Bind(definition);
         if (surface is { Returns: "Int32" } && !reference.HasThis && !definition.HasThis
             && reference.FullName == definition.FullName)

@@ -21,7 +21,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
         shutil.copyfile(args.project.resolve().parent / name, root / name)
     command = [sys.executable, str(bridge / 'run_project.py'), str(root / 'Demo.rvnproj'),
                '--raven', str(args.raven.resolve()), '--runtime', str(args.runtime.resolve())]
-    cases = [('Integers', 'library-integers.rvn', '42\n1\nEqual\n-2147483648\n-1\nDifferent\n2147483647\n1\nDifferent\n0\n0\nEqual\n'),
+    cases = [('Clamp', 'library-clamp.rvn', 'Clamped\n5\nClamped\n0\nClamped\n10\nClamped\n7\nClamped\n-2147483648\nClamped\n2147483647\nInvalid range\n'),
+             ('Integers', 'library-integers.rvn', '42\n1\nEqual\n-2147483648\n-1\nDifferent\n2147483647\n1\nDifferent\n0\n0\nEqual\n'),
              ('Division', 'library-division.rvn', 'Divided\n3\nDivided\n-3\nDivided\n-3\nDivided\n0\nDivided\n-2147483648\nDivision by zero\nOverflow\n'),
              ('Parsing', 'library-parsing.rvn', 'Parsed\n42\nParsed\n-2147483648\nParsed\n2147483647\nParsed\n7\nOverflow\nOverflow\nInvalid format\nInvalid format\nInvalid format\nInvalid format\n'),
              ('Paths', 'library-paths.rvn', 'summary.txt\nreport.txt\nreport.txt\n\n\nfinal.txt\n世界.txt\nleaf.txt\n'),

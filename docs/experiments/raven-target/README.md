@@ -589,3 +589,6 @@ and overflow errors. Numeric completion checks under `--parsing` include Divide.
 
 The [Int32 instance example](../../raven-integer-api.md) covers Equals, CompareTo
 and ToString on local and parameter receivers, with numeric completion checks.
+
+The [integer Clamp example](../../raven-clamp-api.md) demonstrates inclusive bounds
+and Result propagation for invalid ranges, completing the current Int32 Math subset.

@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Exposed the existing Int32 Math.Clamp API through Raven with Result matching and
+  propagation for InvalidRangeError. Added inclusive/equal/reversed-bound and Int32
+  extreme-value examples plus completion coverage. The five current Int32 Math
+  methods are projected; floating-point Math and the error's constructor/ToString
+  remain pending. Runtime semantics and installed tools are unchanged.
+
 - Exposed Int32.Equals/CompareTo/ToString through Raven, adapting ordinary managed
   receivers to the existing readonly/snapshot runtime contracts. Added bounded
   Int32 parameter-address import for these receivers, local/parameter examples,
