@@ -44,7 +44,11 @@ demonstrates a concrete class through interfaces from Raven on neoCLR, using CLI
 metadata, assignability and dispatch. Synchronous target-specific Raven
 iteration contracts now work through the compiler API and evaluated project properties.
 The saved-project workflow selects the collection profile, and language-server checks
-verify collection completion and loop-element inference. Union
+verify collection completion and loop-element inference. The combined profile now
+demonstrates collections alongside Result/Option/Void; acceptance checks cover ordinary
+class/array aliases and value-carrier copying. Keep this a fundamental demonstration,
+not full integration. Raven remains on its separate experiment branch and its changes
+will be evaluated separately. Union
 propagation remains subsequent work.
 The [interface contract probe](raven-interface-contract.md) establishes the first
 dependency order: nominal interface-reference dispatch (first bounded runtime support

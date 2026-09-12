@@ -1,5 +1,6 @@
 {
   "Math": [
+    "Abs",
     "Max",
     "Min",
     "Sign"
@@ -26,6 +27,9 @@
     "IntPtr",
     "Math",
     "Object",
+    "Option",
+    "OverflowError",
+    "Result",
     "Runtime",
     "SByte",
     "Single",

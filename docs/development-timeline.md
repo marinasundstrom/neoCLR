@@ -1523,6 +1523,26 @@ properties, runs the adapted collection library and verifies completion and infe
 loop-binding types through the language server. Default project settings remain unchanged.
 See [target integration and cleanup boundary](raven-target-contracts.md#project-and-editor-integration-2026-09-12).
 
+## 52. Fundamental demonstration, with Raven isolated — recorded 2026-09-12
+
+**Author direction.** Full integration is not necessary. Demonstrate fundamental things
+already shown with Neo: .NET-aligned value versus reference categories and Raven adapting
+to neoCLR's runtime library and type names. Evaluate changes to Raven separately as the
+experiment advances and differences become clearer. Keep Raven on a “Separate branch,
+as today”.
+
+**Assistant proposal and action.** Proposed combining the existing collection and union
+profiles in one small program, leaving propagation and cleanup deferred. Kept Raven on
+`codex/neoclr-target-resolution`; this slice changes no Raven files. Added a product
+workflow using List/ArrayList, Option, Result and Option<Void>, and paired checks for
+class/array aliases and value-carrier copying. Recorded the bounded scope and separate
+future evaluation of Raven changes; no merge or general Raven adoption is implied.
+
+**Outcome.** The combined probe compiles, imports and executes the success, overflow
+and missing-product paths on neoCLR. The project/editor verification evidence is linked
+from the [fundamental demo](experiments/raven-target/README.md#fundamental-raven-demonstration).
+These examples establish a useful subset, not full migration or arbitrary type import.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

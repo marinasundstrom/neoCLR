@@ -14,7 +14,7 @@ static class InterfaceProbe
         if (Directory.Exists(output)) throw new IOException("Output directory must not exist.");
         Directory.CreateDirectory(output);
         var core = Path.Combine(output, CoreDeclarations.Identity + ".dll");
-        CoreDeclarations.Write(core, collectionProbe: true);
+        CoreDeclarations.Write(core, unionProbe: true, collectionProbe: true);
         var source = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "samples", "library-interfaces.rvn"));
         Compilation Create(string text) => Compilation.Create("CoreInterfaces", [SyntaxTree.ParseText(text)],
             [MetadataReference.CreateFromFile(core)], new CompilationOptions(OutputKind.ConsoleApplication,
@@ -71,6 +71,18 @@ static class InterfaceProbe
             if (!result.Success) throw new Exception(string.Join("\n", result.Diagnostics));
         }
         UnionImport.Write(loopPath, core, Path.Combine(output, "CollectionForEach.neoil"), collectionProfile: true);
+        var workflowSource = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "samples", "library-workflow.rvn"));
+        var workflowRaw = Path.Combine(output, "CollectionWorkflow.raw.dll");
+        using (var stream = File.Create(workflowRaw))
+        {
+            var result = Create(workflowSource).Emit(stream, null, new EmitOptions(AssemblyName.GetAssemblyName(core)));
+            if (!result.Success) throw new Exception(string.Join("\n", result.Diagnostics));
+        }
+        var workflowPath = Path.Combine(output, "CollectionWorkflow.dll");
+        VoidProjection.Write(workflowRaw, core, workflowPath);
+        var workflowClosure = ClosureAudit.Inspect(workflowPath, core);
+        if (workflowClosure.Length != 0) throw new Exception(string.Join("\n", workflowClosure));
+        UnionImport.Write(workflowPath, core, Path.Combine(output, "CollectionWorkflow.neoil"), collectionProfile: true);
         var rejections = CollectionImportChecks.Run(path, core, output);
         File.WriteAllText(Path.Combine(output, "interface-results.json"), JsonSerializer.Serialize(new {
             RecordedDate = "2026-09-12", Scope = "Raven collection metadata, emission and import; runtime verification is separate",

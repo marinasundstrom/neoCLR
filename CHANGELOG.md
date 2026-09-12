@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-12
 
+- Combined the Raven collection declaration profile with Result/Option/Void and added
+  a product-workflow demo using the existing adapted runtime library. Project checks
+  cover the combined workflow, standalone unions, value-carrier copying, class/array
+  aliasing and iteration. Editor checks now require both collection and union APIs.
+  Regenerate older collection demo folders for the added declarations. No runtime
+  opcode or Raven source changes; the compiler stays on its separate experiment branch.
+  Documented the author's fundamental-demo scope and separate future Raven evaluation.
+
 - Added a Raven for-loop demo using the feature-branch RuntimeIterationContract option
   to bind Iterable/Iterator/GetIterator rather than .NET enumerable names. The existing
   collection import profile executes normal completion, break and return; output is

@@ -187,7 +187,9 @@ code --new-window /tmp/raven-collections-editor/editor
 
 If using CARGO_TARGET_DIR, supply its executable path to `--runtime` instead.
 Open Main.rvn and run the generated neoCLR build/run task. Expected output is
-41, 42, 41, 41 followed by `=> Void`. The project selects Iterable/Iterator through
+`42`, `Completed`, `Price overflow`, `Skipped`, `Product not found`, `Skipped`,
+followed by `=> Void`. The sample looks up products with Option, validates a price with
+Result, and returns an Option<Void> completion marker. The project selects Iterable/Iterator through
 RavenIteration* properties; the task generates and uses the matching adapted runtime
 library for each build. On a List<int> parameter, completion should offer Add, Count,
 GetIterator and Item. Hover over the loop variable declaration to see `int`.
@@ -200,9 +202,12 @@ python3 docs/experiments/raven-target/verify_project.py /tmp/raven-collections-e
 python3 docs/experiments/raven-target/verify_editor.py /tmp/raven-collections-editor/editor --collections
 ```
 
-The first checks loops, aliasing, a saved edit and failed-build stale-output protection.
+The first checks the combined workflow, Result/Option/Void, value copying, array and
+class aliasing, loops, a saved edit and failed-build stale-output protection.
 The second checks target completion and the inferred loop binding through the actual
 language server. It changes the in-memory document and retains a local LSP transcript;
-it does not edit the saved sample. The collection declaration profile is still separate
-from the Result/Option profile. Automatic disposal and defer remain future work, with
+it does not edit the saved sample. The collection declaration profile now includes Result/Option/Void, so all of these
+examples use the same declaration assembly and adapted library. Existing non-collection
+projects retain their smaller profile; regenerate older collection demo folders to
+obtain the added declarations. Automatic disposal and defer remain future work, with
 NeoCLR-specific behavior isolated from existing .NET/CLR support.

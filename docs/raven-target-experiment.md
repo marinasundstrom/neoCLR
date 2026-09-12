@@ -39,6 +39,22 @@ Result-based error flow with terminal host faults and no guest Exception hierarc
 an accepted difference. This does not promise unchanged .NET binary execution.
 Record actual frontend obstacles before deciding which runtime differences to change.
 
+## Fundamental demonstration boundary (2026-09-12)
+
+The author clarified that full integration is not required. The next demonstration
+should cover fundamental capabilities already exercised with Neo, show the adaptation
+to .NET value/reference type categories, and show Raven resolving neoCLR's runtime
+library names and iteration contract. Neo itself remains outside this migration work.
+
+Raven work stays on the existing `codex/neoclr-target-resolution` feature branch.
+It is experimental target support, not a decision to merge it into Raven or change
+its default CLR behavior. Evaluate those compiler changes and target differences
+separately as the experiment advances.
+
+The [combined sample and acceptance checks](experiments/raven-target/README.md#fundamental-raven-demonstration)
+exercise a bounded library surface. Passing them does not establish full class import,
+complete type-category migration, general BCL compatibility or binary compatibility.
+
 ## First end-to-end milestone
 
 A Raven source program calls neoCLR's System.Console.WriteLine with a string and

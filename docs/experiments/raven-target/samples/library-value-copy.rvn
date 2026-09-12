@@ -1,0 +1,16 @@
+import System.*
+import System.Console.*
+
+func Show(value: Option<int>) {
+    if value is Option.Some<int> found {
+        WriteLine(found.Value)
+    }
+}
+
+func Main() {
+    var original = Option<int>(Option.Some<int>(42))
+    let copy = original
+    original = Option<int>(Option.Some<int>(7))
+    Show(copy)
+    Show(original)
+}

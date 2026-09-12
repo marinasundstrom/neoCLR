@@ -75,7 +75,7 @@ try:
             'context': {'triggerKind': 1}}, True))
         items = result if isinstance(result, list) else result['items']
         labels = sorted({item['label'] for item in items})
-        expected = (('Min', 'Max', 'Sign') if collections else ('Abs', 'Min', 'Max', 'Sign')) if owner == 'Math' else (('WriteLine',) if owner else (('Collections', 'Console', 'Math') if collections else ('Option', 'Result', 'Console', 'Math')))
+        expected = ('Abs', 'Min', 'Max', 'Sign') if owner == 'Math' else (('WriteLine',) if owner else (('Collections', 'Option', 'Result', 'Console', 'Math') if collections else ('Option', 'Result', 'Console', 'Math')))
         if any(not any(label == name or label.startswith(name+'(') for label in labels) for name in expected):
             raise AssertionError(f'{owner}: missing target completions: {labels}')
         if any(label == name or label.startswith(name+'(') for label in labels for name in ('ReadLine', 'Clamp', 'Sin', 'Sqrt')):

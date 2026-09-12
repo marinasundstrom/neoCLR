@@ -460,3 +460,43 @@ The collection profile can also be selected from an editable Raven project, with
 same iteration settings used by the language server and saved-project runner. This
 requires Raven `1e3f7ff07d8a9785ed54105b74d1fcda96c8795f` or a compatible descendant;
 see [collection project setup and checks](VSCODE.md#collection-project-follow-up).
+
+
+## Fundamental Raven demonstration
+
+The collection declaration profile now also exposes Result, Option and generic Void.
+`library-workflow.rvn` uses an ArrayList through List, iterates with the configured
+Iterable/Iterator protocol, handles missing products with Option and arithmetic failure
+with Result, and returns an Option<Void> completion marker. No exception handling or
+union propagation is synthesized. The existing System implementations execute; metadata
+stub bodies do not. No new Raven changes or runtime opcodes are needed for this slice.
+
+Regenerate a fresh `--interfaces` probe and follow the [collection project instructions](VSCODE.md#collection-project-follow-up).
+`verify_project.py --collections` now runs these checks against that same declaration
+assembly and adapted runtime library:
+
+| Demonstration | Evidence | Scope |
+| --- | --- | --- |
+| Class reference assignment | `library-collection-aliases.rvn`: mutating an alias changes the original list | Ordinary nominal ArrayList/List references, without explicit managed-reference syntax |
+| Array reference assignment and parameters | `library-arrays.rvn`: a called function changes the original array, output 42/2 | Int32 vectors and standard CLI array operations |
+| Value copying | `library-value-copy.rvn`: replacing an Option binding preserves its prior copy, output 42/7 | Known Option<Int32> value carrier; not arbitrary mutable struct import |
+| Library naming and iteration | `library-foreach.rvn` and `library-workflow.rvn` | Configured Iterable/Iterator/GetIterator, with List/ArrayList and indexers |
+| Result, Option and Void | Standalone samples plus combined workflow | Existing bounded union import and Void projection; no propagation |
+| Editor experience | `verify_editor.py --collections` | Collection and union names, selected Math API and inferred int loop binding |
+
+Expected workflow output is 42, Completed, Price overflow, Skipped, Product not found,
+Skipped, then `=> Void`. The successful, overflow and missing-product paths all execute.
+The six malformed-import checks and null receiver fault fixture remain in the probe.
+Recorded [project results](collection-project-results.json) and
+[language-server results](collection-editor-results.json) capture this verification.
+
+This is a fundamental demonstration, not full integration. Raven remains on its separate
+experimental branch; compiler changes and differences will be evaluated separately as
+the experiment advances. The existing .NET baseline is preserved. Full application class
+import, broader collection elements, automatic cleanup, propagation and a production
+binary loader remain outside this demonstration. Earlier research on
+[CLI class behavior](../../class-semantics.md) and
+[collection contracts](../../common-interfaces.md) supplies the comparison: familiar
+reference assignment and dispatch are retained, while library names and result-based
+APIs are deliberate target differences. Temporary profile generation/import restrictions
+are tooling costs, not new platform semantics.

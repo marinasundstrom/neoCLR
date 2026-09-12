@@ -1,4 +1,10 @@
 {
+  "Result": "42\nOverflow\n=> Void\n",
+  "Option": "42\nProduct not found\n=> Void\n",
+  "Void": "Completed without a payload\nNot completed\n=> Void\n",
+  "ValueCopy": "42\n7\n=> Void\n",
+  "Arrays": "42\n2\n=> Void\n",
+  "Workflow": "42\nCompleted\nPrice overflow\nSkipped\nProduct not found\nSkipped\n=> Void\n",
   "ForEach": "41\n42\n41\n41\n=> Void\n",
   "Aliases": "7\n42\n2\n=> Void\n",
   "SavedEdit": "7\n42\n7\n7\n=> Void\n",

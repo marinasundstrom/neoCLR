@@ -25,7 +25,10 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
              ('Option', 'library-option.rvn', '42\nProduct not found\n=> Void\n'),
              ('Void', 'library-void.rvn', 'Completed without a payload\nNot completed\n=> Void\n')]
     if args.collections:
-        cases = [('ForEach', 'library-foreach.rvn', '41\n42\n41\n41\n=> Void\n'),
+        cases += [('ValueCopy', 'library-value-copy.rvn', '42\n7\n=> Void\n'),
+                  ('Arrays', 'library-arrays.rvn', '42\n2\n=> Void\n'),
+                  ('Workflow', 'library-workflow.rvn', '42\nCompleted\nPrice overflow\nSkipped\nProduct not found\nSkipped\n=> Void\n'),
+                  ('ForEach', 'library-foreach.rvn', '41\n42\n41\n41\n=> Void\n'),
                  ('Aliases', 'library-collection-aliases.rvn', '7\n42\n2\n=> Void\n')]
     for label, sample, expected in cases:
         (root / 'Main.rvn').write_text((bridge / 'samples' / sample).read_text())

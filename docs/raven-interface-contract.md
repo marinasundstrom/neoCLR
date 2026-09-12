@@ -349,9 +349,10 @@ python3 docs/experiments/raven-target/verify_collections.py /tmp/raven-collectio
 Use the actual binary path if CARGO_TARGET_DIR overrides `target`. The verification
 script checks both successful programs and the null fixture, then records outputs and
 the selected System source hash. Import maps identify the required `raven-collections`
-profile; the host must still select it explicitly with `--system`. Existing saved-project
-VS Code tasks have not been switched to this profile. Target-aware iteration lowering,
-project-profile integration and broader library admission remain next work.
+profile; the host must still select it explicitly with `--system`. Saved-project VS Code tasks now select this profile from evaluated project iteration
+settings. The profile also includes the existing Result/Option/Void declarations, enabling
+a [combined fundamental demo](experiments/raven-target/README.md#fundamental-raven-demonstration).
+Broader library admission remains future work.
 
 
 ### Target-selected for loops

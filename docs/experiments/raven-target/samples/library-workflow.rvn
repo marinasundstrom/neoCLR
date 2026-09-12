@@ -1,0 +1,45 @@
+import System.*
+import System.Collections.*
+import System.Console.*
+
+func FindPrice(product: int) -> Option<int> {
+    if product == 7 {
+        return Option<int>(Option.Some<int>(-42))
+    }
+    if product == 8 {
+        return Option<int>(Option.Some<int>(-2147483648))
+    }
+    return Option<int>(Option.None())
+}
+
+func Process(product: int) -> Option<System.Void> {
+    let price = FindPrice(product)
+    if price is Option.Some<int> found {
+        let amount = Math.Abs(found.Value)
+        if amount is Result.Ok<int> ok {
+            WriteLine(ok.Value)
+            return Option<System.Void>(Option.Some<System.Void>(()))
+        } else if amount is Result.Error<OverflowError> error {
+            WriteLine("Price overflow")
+        }
+    } else if price is Option.None missing {
+        WriteLine("Product not found")
+    }
+    return Option<System.Void>(Option.None())
+}
+
+func Main() {
+    let products = ArrayList<int>.Allocate(0)
+    products.Add(7)
+    products.Add(8)
+    products.Add(99)
+    let queue: List<int> = products
+    for product in queue {
+        let completion = Process(product)
+        if completion is Option.Some<System.Void> done {
+            WriteLine("Completed")
+        } else if completion is Option.None absent {
+            WriteLine("Skipped")
+        }
+    }
+}
