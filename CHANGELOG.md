@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Added Raven primitive storage/stack normalization, ordinary numeric conversions,
+  concrete comparisons and all 16 existing Char classifiers. Added boundary/Unicode
+  samples and completion/signature coverage. Requires the isolated Raven integral-cast
+  fix `26907410f` (also tested on CLR output). Boolean normalization, general interface
+  dispatch and arbitrary generic payloads remain pending; runtime and installed tools
+  are unchanged.
+
 - Added bounded Raven Double literal/slot/receiver import and projected all 15
   existing Double Math methods plus Double.CompareTo. Added all-method, rounding and
   NaN examples, signature checks and Math completion coverage. All 20 current Math

@@ -33,7 +33,7 @@ assembly metadata reader or verifier.
 
 | Area | Current Raven evidence | Work to close the existing-library gap |
 | --- | --- | --- |
-| Numeric primitives, Boolean, Char, String, Value/Error and error unions | Int32/String/Boolean storage, [nine String methods](raven-string-api.md), [Int32.Parse](raven-parsing-api.md), [Int32.Divide](raven-division-api.md), [Int32 instance methods](raven-integer-api.md) and selected static calls; limited error carriers | Project remaining primitive widths, conversions, comparisons, parsing, character helpers and all public error members |
+| Numeric primitives, Boolean, Char, String, Value/Error and error unions | [Primitive storage and character APIs](raven-primitive-api.md), Int32/String/Boolean storage, [nine String methods](raven-string-api.md), [Int32.Parse](raven-parsing-api.md), [Int32.Divide](raven-division-api.md), [Int32 instance methods](raven-integer-api.md) and selected static calls; limited error carriers | Complete Boolean normalization, general interface/generic paths and all public error members |
 | Math and Console | All 20 existing Math methods ([Int32 Clamp](raven-clamp-api.md), [Double methods](raven-floating-math-api.md)) and WriteLine | Console input/error paths; broader numeric/compiler support remains separate |
 | Option, Result, Void and Propagatable | Option<Int32>, completion/error propagation, file read/write carriers and typed matching | General payload shapes, all public case/carrier members and consistent conditional-output validation |
 | File and Path | Bounded UTF-8 File calls, propagation, error predicates and [both Path methods](raven-path-api.md) | Full file-error API surfaces; reuse existing I/O contracts |

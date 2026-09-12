@@ -44,7 +44,7 @@ static class UnionImport
         {
             var collection = CollectionBindings.Type(type);
             if (collection is not null && collectionProfile) return collection;
-            return ResultBindings.Type(type) ?? Type(type, result);
+            return PrimitiveBindings.Type(type) ?? ResultBindings.Type(type) ?? Type(type, result);
         }
         var output = new StringBuilder($".module ImportedUnion\n.entry {Name(entry)}\n");
         var mappings = new List<object>();
@@ -62,7 +62,7 @@ static class UnionImport
             var args = method.Parameters.Select(p => ProfileType(p.ParameterType)).ToArray();
             var result = ProfileType(method.ReturnType, true);
             var locals = method.Body.Variables.Select(v => ProfileType(v.VariableType)).ToArray();
-            if (locals.Any(t => !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
+            if (locals.Any(t => !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
                 throw new InvalidDataException("Unsupported local default in Result profile.");
             NormalizePatternBranches(method);
             var instructions = method.Body.Instructions.ToArray();
@@ -83,11 +83,11 @@ static class UnionImport
                     throw new InvalidDataException("Conditional extraction output must be tested before use.");
                 void Push(Slot slot) { stack.Add(slot); if (stack.Count > method.Body.MaxStackSize) throw new InvalidDataException("Declared maxstack exceeded."); }
                 Slot Pop() { if (stack.Count == 0) throw new InvalidDataException("Input stack underflow."); var top = stack[^1]; stack.RemoveAt(stack.Count - 1); return top; }
-                Slot Expect(string type) { var top = Pop(); if (!CollectionBindings.Assignable(top.Type, type)) throw new InvalidDataException("Input stack type mismatch."); return top; }
+                Slot Expect(string type) { var top = Pop(); if (!CollectionBindings.Assignable(PrimitiveBindings.Stack(top.Type), PrimitiveBindings.Stack(type))) throw new InvalidDataException("Input stack type mismatch."); return top; }
                 int Local(int n) { if (n < 0 || n >= locals.Length) throw new InvalidDataException("Invalid local index."); return n; }
-                void Load(int n) { Local(n); if (!assigned[n]) throw new InvalidDataException("Read of uninitialized or unsupported default local."); Push(new(locals[n])); code.AppendLine($"ldloc local{n}"); }
+                void Load(int n) { Local(n); if (!assigned[n]) throw new InvalidDataException("Read of uninitialized or unsupported default local."); Push(new(PrimitiveBindings.Stack(locals[n]))); code.AppendLine($"ldloc local{n}"); }
                 void Store(int n) { Local(n); Expect(locals[n]); assigned[n] = true; code.AppendLine($"stloc local{n}"); }
-                void Arg(int n) { if (n < 0 || n >= args.Length) throw new InvalidDataException("Invalid parameter index."); Push(new(args[n])); code.AppendLine($"ldarg {n}"); }
+                void Arg(int n) { if (n < 0 || n >= args.Length) throw new InvalidDataException("Invalid parameter index."); Push(new(PrimitiveBindings.Stack(args[n]))); code.AppendLine($"ldarg {n}"); }
                 int Target() => instruction.Operand is Instruction target && indexes.TryGetValue(target, out var n)
                     ? n : throw new InvalidDataException("Invalid branch target.");
                 var terminates = false;
@@ -122,10 +122,6 @@ static class UnionImport
                         Expect("Int32"); Push(new(IntArray)); code.AppendLine("newarr Int32"); break;
                     case Code.Ldlen:
                         Expect(IntArray); Push(new("UIntPtr")); code.AppendLine("ldlen"); break;
-                    case Code.Conv_I4:
-                        var converted = Pop();
-                        if (converted.Type is not ("UIntPtr" or "Int32")) throw new InvalidDataException("Unsupported conv.i4 input.");
-                        Push(new("Int32")); code.AppendLine("conv.i4"); break;
                     case Code.Ldelem_I4:
                         Expect("Int32"); Expect(IntArray); Push(new("Int32")); code.AppendLine("ldelem Int32"); break;
                     case Code.Stelem_I4:
@@ -142,6 +138,21 @@ static class UnionImport
                         var value = (string)instruction.Operand;
                         if (value.Length > 65536) throw new InvalidDataException("String limit exceeded.");
                         Push(new("String")); code.AppendLine("ldstr " + JsonSerializer.Serialize(value)); break;
+                    case Code.Ldc_I8:
+                        Push(new("Int64")); code.AppendLine($"ldc.i8 {instruction.Operand}"); break;
+                    case Code.Ldc_R4:
+                        Push(new("Double")); code.AppendLine("ldc.r4 " + ((float)instruction.Operand).ToString("R", System.Globalization.CultureInfo.InvariantCulture)); break;
+                    case Code.Conv_I1: case Code.Conv_U1: case Code.Conv_I2: case Code.Conv_U2:
+                    case Code.Conv_I4: case Code.Conv_U4: case Code.Conv_I8: case Code.Conv_U8:
+                    case Code.Conv_I: case Code.Conv_U: case Code.Conv_R4: case Code.Conv_R8: case Code.Conv_R_Un:
+                        var converted = Pop();
+                        if (converted.Type is not ("Int32" or "Int64" or "IntPtr" or "UIntPtr" or "Double"))
+                            throw new InvalidDataException("Unsupported numeric conversion source.");
+                        var convertedType = instruction.OpCode.Code switch {
+                            Code.Conv_I8 or Code.Conv_U8 => "Int64", Code.Conv_I => "IntPtr", Code.Conv_U => "UIntPtr",
+                            Code.Conv_R4 or Code.Conv_R8 or Code.Conv_R_Un => "Double", _ => "Int32"
+                        };
+                        Push(new(convertedType)); code.AppendLine(instruction.OpCode.Name); break;
                     case Code.Ldc_R8:
                         Push(new("Double"));
                         code.AppendLine("ldc.r8 " + ((double)instruction.Operand).ToString("R", System.Globalization.CultureInfo.InvariantCulture)); break;
@@ -154,8 +165,8 @@ static class UnionImport
                     case Code.Ldarg: case Code.Ldarg_S: Arg(((ParameterDefinition)instruction.Operand).Index); break;
                     case Code.Ldarga: case Code.Ldarga_S:
                         var parameter = ((ParameterDefinition)instruction.Operand).Index;
-                        if (parameter < 0 || parameter >= args.Length || args[parameter] is not ("Int32" or "Double"))
-                            throw new InvalidDataException("Only Int32/Double argument addresses admitted.");
+                        if (parameter < 0 || parameter >= args.Length || !PrimitiveBindings.IsReceiver(args[parameter]))
+                            throw new InvalidDataException("Only admitted primitive argument addresses supported.");
                         Push(new(args[parameter] + "&", Argument: parameter)); code.AppendLine($"ldarga {parameter}"); break;
                     case Code.Ldloc_0: case Code.Ldloc_1: case Code.Ldloc_2: case Code.Ldloc_3: Load((int)instruction.OpCode.Code - (int)Code.Ldloc_0); break;
                     case Code.Ldloc: case Code.Ldloc_S: Load(((VariableDefinition)instruction.Operand).Index); break;
@@ -236,7 +247,7 @@ static class UnionImport
                             {
                                 if (argument.Argument >= 0)
                                 {
-                                    if (n != 0 || !reference.HasThis || reference.DeclaringType.FullName is not ("System.Int32" or "System.Double")
+                                    if (n != 0 || !reference.HasThis || !PrimitiveBindings.IsReceiver(reference.DeclaringType.Name)
                                         || reference.Name is not ("Equals" or "CompareTo" or "ToString"))
                                         throw new InvalidDataException("Argument addresses are only admitted as primitive receivers.");
                                     continue;
@@ -250,7 +261,7 @@ static class UnionImport
                                 else if (!assigned[argument.Local]) throw new InvalidDataException($"Read through uninitialized carrier address in {method.Name} at {instruction.Offset:x4}, local {argument.Local}: {reference.FullName}.");
                             }
                         }
-                        if (call.Result != "noresult") Push(new(call.Result, ConditionalOut: conditionalOut));
+                        if (call.Result != "noresult") Push(new(PrimitiveBindings.Stack(call.Result), ConditionalOut: conditionalOut));
                         code.AppendLine(call.Instruction ?? $"call {call.Name}({string.Join(',', call.Arguments)})"); break;
                     case Code.Ret:
                         if (result != "noresult") Expect(result);
@@ -288,7 +299,7 @@ static class UnionImport
                 if (changed) work.Enqueue(index);
             }
         }
-        output.Append(Adapters()).Append(ResultBindings.Adapters()).Append(StringBindings.Adapters()).AppendLine(Int32Bindings.Adapters).Append(DoubleBindings.Adapters);
+        output.Append(Adapters()).Append(ResultBindings.Adapters()).Append(StringBindings.Adapters()).AppendLine(Int32Bindings.Adapters).AppendLine(DoubleBindings.Adapters).Append(PrimitiveBindings.Adapters);
         File.WriteAllText(destination, output.ToString());
         File.WriteAllText(destination + ".map.json", JsonSerializer.Serialize(new {
             Profile = collectionProfile ? "result-option-void-files-strings-collections-v8" : "result-option-void-files-strings-arrays-v7",
@@ -360,7 +371,7 @@ static class UnionImport
             throw new InvalidDataException("Unsupported runtime signature.");
         // Reuse the declaration catalog for its bounded static Int32 APIs. Check
         // both sides before mapping a resolved CLI reference to the runtime library.
-        var file = DoubleBindings.Bind(reference, definition) ?? Int32Bindings.Bind(reference, definition) ?? PathBindings.Bind(reference, definition) ?? FileBindings.Bind(reference, definition) ?? ResultBindings.Bind(reference, definition);
+        var file = PrimitiveBindings.Bind(reference, definition) ?? DoubleBindings.Bind(reference, definition) ?? Int32Bindings.Bind(reference, definition) ?? PathBindings.Bind(reference, definition) ?? FileBindings.Bind(reference, definition) ?? ResultBindings.Bind(reference, definition);
         if (file is not null)
         {
             if (file.OutArgument >= 0 || reference.Name == "FromResidual") ValidatePropagation(definition.DeclaringType);
@@ -543,14 +554,14 @@ static class UnionImport
             return new("RuntimeVoidOptionNone", [None], VoidOption);
         throw new InvalidDataException("Unsupported constructor: " + reference.FullName + " definition=" + key);
     }
-    static string Default(string type) => type switch {
+    static string Default(string type) => PrimitiveBindings.Default(type) ?? (type switch {
         VoidOk => $"ldvoid\nnewobj {VoidOk}",
         "Void" => "ldvoid",
         Overflow => "newobj System.OverflowError",
         "Double" => "ldc.r8 0", "Boolean" => "ldc.bool false", "Int32" => "ldc.i4 0", VoidSome => $"ldvoid\nnewobj {VoidSome}", Some => $"ldc.i4 0\nnewobj {Some}", None => $"newobj {None}", Ok => $"ldc.i4 0\nnewobj {Ok}",
         Error => $"newobj System.OverflowError\nnewobj {Error}",
         _ => throw new InvalidDataException("Unsupported default.")
-    };
+    });
     static string Adapters()
     {
         var text = new StringBuilder();

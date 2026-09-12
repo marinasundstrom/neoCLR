@@ -110,6 +110,14 @@ static class SignatureProbe
         var doubleType = module.GetType("System.Double");
         var doubleCompare = doubleType.Methods.Single(m => m.Name == "CompareTo");
         Check("Double receiver mapping", DoubleBindings.Bind(Reference(doubleCompare, doubleType), doubleCompare)?.Arguments.SequenceEqual(new[] { "Double&", "Double" }) == true);
+        Check("Narrow storage has Int32 stack category", PrimitiveBindings.Stack("Byte") == "Int32" && PrimitiveBindings.Stack("Char") == "Int32");
+        Check("Unsigned and Single stack normalization", PrimitiveBindings.Stack("UInt64") == "Int64" && PrimitiveBindings.Stack("Single") == "Double");
+        var charType = module.GetType("System.Char");
+        var digit = charType.Methods.Single(m => m.Name == "IsDigit");
+        var digitCall = Reference(digit, charType);
+        Check("Char signature retains storage type", PrimitiveBindings.Bind(digitCall, digit)?.Arguments.SequenceEqual(new[] { "Char" }) == true);
+        digitCall.Parameters[0].ParameterType = module.TypeSystem.Int32;
+        Reject("Char signature is not Int32 metadata", () => PrimitiveBindings.Bind(digitCall, digit));
         var text = JsonSerializer.Serialize(checks, new JsonSerializerOptions { WriteIndented = true });
         File.WriteAllText(Path.Combine(output, "signature-checks.json"), text);
         Console.WriteLine(text);

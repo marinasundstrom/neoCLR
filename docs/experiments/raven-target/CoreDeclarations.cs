@@ -18,6 +18,7 @@ static class CoreDeclarations
         var source = Source.Replace("public struct Double { }", unionProbe ? DoubleBindings.Declarations : "public struct Double { }").Replace("public struct Int32 { }", unionProbe ? Int32Bindings.Declarations : "public struct Int32 { }").Replace("public sealed class String { }", StringBindings.Declarations(unionProbe))
             .Replace("public static class Console { public static void WriteLine(string value) { } }", declarations)
             .Replace("// Union probe attribute", unionProbe ? "public sealed class UnionAttribute : System.Attribute { }" : "");
+        if (unionProbe) source = PrimitiveBindings.Project(source);
         var compilation = CSharpCompilation.Create(Identity,
             [CSharpSyntaxTree.ParseText(source)], references: [],
             options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));

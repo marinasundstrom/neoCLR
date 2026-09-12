@@ -595,3 +595,7 @@ and Result propagation for invalid ranges, completing the current Int32 Math sub
 
 The [Double Math example](../../raven-floating-math-api.md) exercises all current
 floating-point Math methods using concrete Double values and comparison calls.
+
+The [primitive and character projection](../../raven-primitive-api.md) requires
+Raven experiment `26907410f` or later for explicit integral casts. It includes all
+current Char classifiers and bounded concrete primitive comparisons.

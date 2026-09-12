@@ -8,6 +8,7 @@ import threading
 
 project = Path(sys.argv[1]).resolve()
 collections = '--collections' in sys.argv[2:]
+primitives = '--primitives' in sys.argv[2:]
 parsing = '--parsing' in sys.argv[2:]
 files = '--files' in sys.argv[2:]
 strings = '--strings' in sys.argv[2:]
@@ -176,6 +177,17 @@ try:
         if any(not any(label == name or label.startswith(name + '(') for label in labels) for name in ('Equals', 'CompareTo', 'ToString')):
             raise AssertionError('Missing Int32 instance API: ' + str(labels))
         results['Int32Instance'] = labels
+    if primitives:
+        text = 'func Main() {\n    System.Char.\n}'
+        send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': 15}, 'contentChanges': [{'text': text}]})
+        result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
+            'position': {'line': 1, 'character': 16}, 'context': {'triggerKind': 1}}, True))
+        items = result if isinstance(result, list) else result['items']
+        labels = sorted({item['label'] for item in items})
+        expected = ('IsDigit', 'IsNumber', 'IsLetter', 'IsUpper', 'IsLower', 'IsSeparator', 'IsControl', 'IsPunctuation', 'IsSymbol', 'IsSurrogate', 'IsHighSurrogate', 'IsLowSurrogate', 'IsAscii', 'IsAsciiDigit', 'IsLetterOrDigit', 'IsWhiteSpace')
+        if any(not any(label == name or label.startswith(name + '(') for label in labels) for name in expected):
+            raise AssertionError('Missing character API: ' + str(labels))
+        results['Char'] = labels
     receive(send('shutdown', None, True))
     send('exit', None)
     print(json.dumps(results, indent=2))
