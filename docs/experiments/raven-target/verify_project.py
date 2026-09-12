@@ -21,7 +21,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
         shutil.copyfile(args.project.resolve().parent / name, root / name)
     command = [sys.executable, str(bridge / 'run_project.py'), str(root / 'Demo.rvnproj'),
                '--raven', str(args.raven.resolve()), '--runtime', str(args.runtime.resolve())]
-    cases = [('Division', 'library-division.rvn', 'Divided\n3\nDivided\n-3\nDivided\n-3\nDivided\n0\nDivided\n-2147483648\nDivision by zero\nOverflow\n'),
+    cases = [('Integers', 'library-integers.rvn', '42\n1\nEqual\n-2147483648\n-1\nDifferent\n2147483647\n1\nDifferent\n0\n0\nEqual\n'),
+             ('Division', 'library-division.rvn', 'Divided\n3\nDivided\n-3\nDivided\n-3\nDivided\n0\nDivided\n-2147483648\nDivision by zero\nOverflow\n'),
              ('Parsing', 'library-parsing.rvn', 'Parsed\n42\nParsed\n-2147483648\nParsed\n2147483647\nParsed\n7\nOverflow\nOverflow\nInvalid format\nInvalid format\nInvalid format\nInvalid format\n'),
              ('Paths', 'library-paths.rvn', 'summary.txt\nreport.txt\nreport.txt\n\n\nfinal.txt\n世界.txt\nleaf.txt\n'),
              ('StringSlices', 'library-string-slices.rvn', 'Sliced\né\nSliced\n😀\nSliced\n\nInvalid boundary\nInvalid boundary\nOut of range\nOut of range\nOut of range\nOut of range\nOut of range\nSliced\n\n'),
@@ -59,6 +60,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
     results['SavedEdit'] = saved_expected
     for label, source, diagnostic in [
         ('CompileFailure', 'func Main() { MissingCall() }', 'RAV'),
+        ('InheritedIntegerMember', 'func Main() { let value = 42\n value.GetHashCode() }', 'Unsupported'),
         ('PathArgumentMismatch', 'func Main() { System.IO.Path.Combine(42, 7) }', 'RAV'),
         ('PathUnsupportedApi', 'func Main() { System.IO.Path.GetFullPath(".") }', 'RAV'),
         ('StringArgumentMismatch', 'func Main() { System.String.Concat(42, 7) }', 'RAV'),

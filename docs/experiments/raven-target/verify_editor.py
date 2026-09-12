@@ -166,6 +166,16 @@ try:
         if any(label == 'TryParse' or label.startswith('TryParse(') for label in labels):
             raise AssertionError('Host TryParse leaked: ' + str(labels))
         results['Int32'] = labels
+    if parsing:
+        text = 'func Main() {\n    let number = 42\n    number.\n}'
+        send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': 14}, 'contentChanges': [{'text': text}]})
+        result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
+            'position': {'line': 2, 'character': 11}, 'context': {'triggerKind': 1}}, True))
+        items = result if isinstance(result, list) else result['items']
+        labels = sorted({item['label'] for item in items})
+        if any(not any(label == name or label.startswith(name + '(') for label in labels) for name in ('Equals', 'CompareTo', 'ToString')):
+            raise AssertionError('Missing Int32 instance API: ' + str(labels))
+        results['Int32Instance'] = labels
     receive(send('shutdown', None, True))
     send('exit', None)
     print(json.dumps(results, indent=2))

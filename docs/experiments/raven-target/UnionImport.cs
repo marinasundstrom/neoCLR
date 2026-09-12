@@ -19,7 +19,7 @@ static class UnionImport
     const string Carrier = "System.Result<Int32,System.OverflowError>";
     const string Ok = "System.Result.Ok<Int32>";
     const string Error = "System.Result.Error<System.OverflowError>";
-    sealed record Slot(string Type, int Local = -1, int ConditionalOut = -1);
+    sealed record Slot(string Type, int Local = -1, int ConditionalOut = -1, int Argument = -1);
     sealed record State(List<Slot> Stack, bool[] Assigned);
     sealed record Call(string Name, string[] Arguments, string Result, int OutArgument = -1, string? Instruction = null, bool ConditionalOutput = false);
 
@@ -149,6 +149,11 @@ static class UnionImport
                         Push(new("Int32")); code.AppendLine($"ldc.i4 {number}"); break;
                     case Code.Ldarg_0: case Code.Ldarg_1: case Code.Ldarg_2: case Code.Ldarg_3: Arg((int)instruction.OpCode.Code - (int)Code.Ldarg_0); break;
                     case Code.Ldarg: case Code.Ldarg_S: Arg(((ParameterDefinition)instruction.Operand).Index); break;
+                    case Code.Ldarga: case Code.Ldarga_S:
+                        var parameter = ((ParameterDefinition)instruction.Operand).Index;
+                        if (parameter < 0 || parameter >= args.Length || args[parameter] != "Int32")
+                            throw new InvalidDataException("Only Int32 argument addresses admitted.");
+                        Push(new("Int32&", Argument: parameter)); code.AppendLine($"ldarga {parameter}"); break;
                     case Code.Ldloc_0: case Code.Ldloc_1: case Code.Ldloc_2: case Code.Ldloc_3: Load((int)instruction.OpCode.Code - (int)Code.Ldloc_0); break;
                     case Code.Ldloc: case Code.Ldloc_S: Load(((VariableDefinition)instruction.Operand).Index); break;
                     case Code.Stloc_0: case Code.Stloc_1: case Code.Stloc_2: case Code.Stloc_3: Store((int)instruction.OpCode.Code - (int)Code.Stloc_0); break;
@@ -226,6 +231,13 @@ static class UnionImport
                             var argument = Expect(call.Arguments[n]);
                             if (argument.Type.EndsWith('&'))
                             {
+                                if (argument.Argument >= 0)
+                                {
+                                    if (n != 0 || !reference.HasThis || reference.DeclaringType.FullName != "System.Int32"
+                                        || reference.Name is not ("Equals" or "CompareTo" or "ToString"))
+                                        throw new InvalidDataException("Argument addresses are only admitted as Int32 receivers.");
+                                    continue;
+                                }
                                 if (argument.Local < 0) throw new InvalidDataException("Only local addresses admitted.");
                                 if (n == call.OutArgument)
                                 {
@@ -273,7 +285,7 @@ static class UnionImport
                 if (changed) work.Enqueue(index);
             }
         }
-        output.Append(Adapters()).Append(ResultBindings.Adapters()).Append(StringBindings.Adapters());
+        output.Append(Adapters()).Append(ResultBindings.Adapters()).Append(StringBindings.Adapters()).Append(Int32Bindings.Adapters);
         File.WriteAllText(destination, output.ToString());
         File.WriteAllText(destination + ".map.json", JsonSerializer.Serialize(new {
             Profile = collectionProfile ? "result-option-void-files-strings-collections-v8" : "result-option-void-files-strings-arrays-v7",

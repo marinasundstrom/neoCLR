@@ -586,3 +586,6 @@ probe/verification, a saved-project example and optional editor completion check
 
 The [integer division example](../../raven-division-api.md) covers recoverable zero
 and overflow errors. Numeric completion checks under `--parsing` include Divide.
+
+The [Int32 instance example](../../raven-integer-api.md) covers Equals, CompareTo
+and ToString on local and parameter receivers, with numeric completion checks.

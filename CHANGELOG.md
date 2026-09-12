@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Exposed Int32.Equals/CompareTo/ToString through Raven, adapting ordinary managed
+  receivers to the existing readonly/snapshot runtime contracts. Added bounded
+  Int32 parameter-address import for these receivers, local/parameter examples,
+  signature checks and completion coverage. No boxing, runtime or Raven compiler
+  changes; general byref/constrained calls and interface projection remain separate.
+
 - Projected the existing Int32.Divide Result API into Raven, including division-by-zero
   and overflow predicates, matching and propagation. Added signed/boundary examples,
   checked-signature coverage and completion. The helper remains an experimental

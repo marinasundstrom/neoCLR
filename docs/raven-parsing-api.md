@@ -51,8 +51,8 @@ host TryParse does not leak into the target surface. Use these with a fresh prep
 project as described in the [integration instructions](experiments/raven-target/README.md).
 
 This slice exposes Parse and its error predicates, not every Int32 or error-case
-member. Instance comparisons/formatting, error constructors, checked case
-accessors and error ToString remain coverage work. The metadata/error catalog now
+member. Error constructors, checked case accessors and error ToString remain coverage work.
+The [Int32 instance methods](raven-integer-api.md) are projected separately. The metadata/error catalog now
 supports this additional Int32 Result carrier while preserving existing Ok<int>
 bindings. No arbitrary generic-payload support is implied. Installed SDK/VSIX assets
 have not been refreshed.

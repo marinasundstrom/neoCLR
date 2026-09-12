@@ -96,6 +96,11 @@ static class SignatureProbe
         divisionCall = Reference(divide, integerType);
         divisionCall.Parameters[1].ParameterType = module.TypeSystem.String;
         Reject("Division argument mismatch", () => Int32Bindings.Bind(divisionCall, divide));
+        var compare = integerType.Methods.Single(m => m.Name == "CompareTo");
+        var compareCall = Reference(compare, integerType);
+        Check("Int32 managed receiver mapping", Int32Bindings.Bind(compareCall, compare)?.Arguments.SequenceEqual(new[] { "Int32&", "Int32" }) == true);
+        compareCall.HasThis = false;
+        Reject("Int32 instance receiver mismatch", () => Int32Bindings.Bind(compareCall, compare));
         var text = JsonSerializer.Serialize(checks, new JsonSerializerOptions { WriteIndented = true });
         File.WriteAllText(Path.Combine(output, "signature-checks.json"), text);
         Console.WriteLine(text);
