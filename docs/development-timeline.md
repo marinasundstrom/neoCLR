@@ -1403,6 +1403,26 @@ adaptations and runtime/import requirements remain to be assessed. No new librar
 interface implementation is claimed by this documentation change. The prior POC tag
 remains unchanged, and propagation remains deferred until the interface contract exists.
 
+## 46. Type categories, including arrays, replace the old default — recorded 2026-09-12
+
+**Author correction.** “We intend to go away from the value by default and the explicit
+references, so we align with the .NET semantics around the categories of types. And
+that also applies to arrays.” This clarifies the earlier migration direction after the
+assistant repeatedly preserved Neo's original array/value model in runtime slices.
+
+**Assistant response.** Acknowledged that .NET-style type categories are the intended
+ordinary model. The old value-by-default and explicit-reference projection is transitional,
+not a second public model to preserve. Normal class/interface/array references remain
+distinct from managed byrefs to slots. The recent arrayref/array.new split is migration
+machinery rather than the desired final user experience.
+
+**Action and outcome.** Updated the roadmap, class-semantics and managed-array documents
+to distinguish the target from current implementation. The implementation has not been
+migrated by this documentation change. Upcoming slices need to migrate Neo/library
+classifications and array spelling/lowering alongside the Raven collection work. Earlier
+positions and implementation descriptions remain available; separate stack-buffer
+facilities are not implied to be ordinary arrays.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

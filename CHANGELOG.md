@@ -90,7 +90,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   array/indirect stores, preserving identity, typed nulls and GC roots. Byrefs and whole
   array types remain invariant; downcasts still require castclass. Eight new regressions
   and 104 related tests pass. Raven class/interface
-  import and adapted collection execution are still pending.
+  import and adapted collection execution are still pending. Clarified the target
+  architecture: retire value-by-default/explicit-reference ordinary semantics in favor
+  of .NET type categories, including reference-type arrays. Documented the existing
+  Neo array split as transitional and planned its migration; no runtime behavior changes
+  are made by this clarification.
 
 - Began nominal class reference semantics: `.type class` uses managed heap handles in
   ordinary class-typed storage, while managed byrefs still address slots. Assignment,

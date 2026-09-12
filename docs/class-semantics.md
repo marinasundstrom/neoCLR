@@ -3,6 +3,17 @@
 Implemented 2026-09-12 on the Raven experiment branch. This begins the intended alignment
 with .NET value/reference type semantics; it is not the completed migration.
 
+## Target direction — clarified 2026-09-12
+
+Type categories determine ordinary storage and passing semantics, following .NET.
+Classes, interfaces and arrays use ordinary references; value-category types copy their
+values. Managed byrefs remain a distinct capability for referencing a slot, including
+ref/out scenarios. They are not how callers normally express class or array sharing.
+The former value-by-default model is being retired, not preserved as a parallel public
+model. Existing unmarked types and Neo source lowering are migration work, not evidence
+of a settled default. This does not assert that all .NET behaviors are implemented or
+reverse the separate Result/Option and generic Void directions.
+
 ## Runtime contract
 
 The experimental neoIL declaration `.type class Counter` selects reference semantics.

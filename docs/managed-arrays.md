@@ -1,5 +1,20 @@
 # Managed arrays
 
+## Target model — clarified 2026-09-12
+
+Arrays are reference types in the intended .NET-aligned type model. `T[]` should
+denote an ordinary managed array reference in the migrated runtime/language surface;
+assignment and passing share the same array. A byref to an array slot is a separate
+capability, not the normal way to hold or pass an array.
+
+The owned `T[]` and explicit `T[]&` model described below is current legacy behavior
+awaiting migration. Its preservation in recent slices was a transitional implementation
+choice, not the architectural goal. `arrayref<T>` and `array.new` must not become a
+permanent requirement for ordinary array use. Any future stack/inline buffer facility
+should be explicitly separate from normal arrays and justified independently.
+
+## Current implementation during migration
+
 Neo's original arrays use the value/reference distinction of its value model. `T[]` owns
 its elements; copying it copies the elements. `T[]&` aliases an array location.
 The separate `arrayref<T>` neoIL signature is an ordinary heap-array reference for

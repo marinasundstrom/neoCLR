@@ -10,6 +10,22 @@ binding immutability/readonly references, inheritance, nullable slots, enums/fla
 dynamic hooks, and a more useful fundamental library. Familiarity primarily means C#/.NET APIs and observable behavior, not matching
 source syntax or runtime internals. Improve contracts without legacy constraints.
 
+## Type-model migration directive (2026-09-12)
+
+Retire value-by-default and explicit references as the normal object/array model.
+Align ordinary value/reference behavior with .NET type categories in both the runtime
+and Neo's demonstration surface. Arrays are reference types; `T[]` should project an
+ordinary array reference. Managed byrefs remain for slot access/ref/out, and value-category
+types retain value semantics. The existing owned-array spelling and `array.new` lowering
+are temporary migration accommodations, not compatibility requirements to preserve.
+
+Next implementation planning must include migrating Neo/library type declarations and
+array lowering to that model, replacing the transitional `arrayref<T>` public spelling,
+and updating tests/samples that encode the old defaults. Stage breaking changes with
+clear migration notes; do not expand the legacy model merely to keep those tests intact.
+Separate explicit stack-buffer designs, if needed, from ordinary array semantics.
+Continue the Raven collection demo against these target semantics.
+
 ## Current Raven-target experiment priority
 
 The [bounded Raven POC milestone](raven-target-experiment.md#milestone-closed-raven-poc-2026-09-12)
