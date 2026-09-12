@@ -970,6 +970,43 @@ changing routes has not been decided. Prior .NET/Valhalla comparisons in entries
 provide context; the Java analogy here is attributed reasoning, not a new release or
 performance claim.
 
+### 26. Evaluate improvements by continuity of developer experience
+
+Recorded 2026-09-12.
+
+**Author's evaluation criteria:** An improved .NET should not fundamentally change how
+developers work. The author considers it probably wise to associate reference/value
+semantics with types, while leaving their representation open. The platform should
+avoid introducing manual management and should simplify inconsistencies in the familiar
+experience. Runtime APIs should probably favor Result and Option unions; expected,
+recoverable failures should prefer Result, with exceptions reserved for irrecoverable
+Faults. Keep the .NET instruction set as the basis, make the platform easy for languages
+such as Raven and C# to target, and support nullable values even if APIs prefer to avoid
+them. Nullability could later have an updated or unified model.
+
+**Author's architectural emphasis:** Distinguish language responsibilities from runtime
+responsibilities. Runtime implementation details can remain hidden from developers while
+still providing meaningful benefits. Familiar usage does not require identical internals.
+
+**Assistant's assessment:** These criteria shift the evaluation toward whether runtime
+changes preserve productive, familiar source-level behavior. The existing experiment's
+managed references and storage machinery can be assessed as implementation capabilities,
+without requiring all their distinctions to appear in everyday source syntax. Type-level
+defaults remain a proposed direction, not an implemented replacement for current semantics.
+
+**Tradeoff identified by the assistant:** Moving expected failures from exceptions to
+Result changes API and control-flow contracts. Familiar targeting should therefore be
+tested with concrete language mappings, including how existing exception-based code
+would migrate; familiar instruction spelling alone does not establish compatibility.
+Fault containment and cleanup, nullable representation, type defaults and their metadata
+encoding remain contracts to evaluate, not details settled by this discussion.
+
+**Action and scope:** Recorded the criteria and assessment. No runtime or compiler change
+was made, no syntax or metadata encoding selected, and no architecture migration started.
+Existing [reference-experience evidence](experiments/reference-experience/README.md),
+[type-design discussion](type-design.md) and [design research process](design-research.md)
+remain starting points for a subsequent evaluation rather than proof of the proposed model.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

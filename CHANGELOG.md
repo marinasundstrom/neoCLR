@@ -6,6 +6,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-09-12
+
+- Recorded evaluation criteria centered on familiar developer experience, possible
+  type-level reference/value defaults, Result/Option APIs, Faults, nullable support
+  and language/runtime boundaries. Identified migration questions without selecting
+  or implementing an architecture change.
+
 ### 2026-09-09
 
 - Added a development conversation record of author directions/questions, assistant
