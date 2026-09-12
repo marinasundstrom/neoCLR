@@ -345,7 +345,7 @@ static class UnionImport
             throw new InvalidDataException("Unsupported runtime signature.");
         // Reuse the declaration catalog for its bounded static Int32 APIs. Check
         // both sides before mapping a resolved CLI reference to the runtime library.
-        var file = FileBindings.Bind(reference, definition) ?? ResultBindings.Bind(reference, definition);
+        var file = PathBindings.Bind(reference, definition) ?? FileBindings.Bind(reference, definition) ?? ResultBindings.Bind(reference, definition);
         if (file is not null)
         {
             if (file.OutArgument >= 0 || reference.Name == "FromResidual") ValidatePropagation(definition.DeclaringType);

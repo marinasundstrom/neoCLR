@@ -121,8 +121,9 @@ try:
         results['ArrayList'] = labels
     if files:
         for version, owner, expected, forbidden in (
-            (8, 'IO', ('File', 'FileReadError', 'FileWriteError'), ('Directory', 'Stream')),
-            (9, 'IO.File', ('ReadAllText', 'WriteAllText'), ('Delete', 'ReadAllBytes', 'Open'))):
+            (8, 'IO', ('Path', 'File', 'FileReadError', 'FileWriteError'), ('Directory', 'Stream')),
+            (9, 'IO.File', ('ReadAllText', 'WriteAllText'), ('Delete', 'ReadAllBytes', 'Open')),
+            (10, 'IO.Path', ('Combine', 'GetFileName'), ('GetFullPath', 'GetExtension'))):
             access = 'System.' + owner + '.'
             text = f'import System.*\nfunc Main() {{\n    {access}\n}}'
             send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})
@@ -137,9 +138,9 @@ try:
             results[owner] = labels
     if strings:
         for version, access, prefix, expected, forbidden in (
-            (10, 'text.', '    let text = "hello"\n',
+            (11, 'text.', '    let text = "hello"\n',
              ('Equals', 'ContainsOrdinal', 'StartsWithOrdinal', 'EndsWithOrdinal', 'GetUtf8ByteCount', 'IsEmpty', 'SliceUtf8'), ('Substring', 'Contains')),
-            (11, 'System.String.', '', ('Concat', 'CompareOrdinal'), ('IsNullOrEmpty', 'Join', 'Format'))):
+            (12, 'System.String.', '', ('Concat', 'CompareOrdinal'), ('IsNullOrEmpty', 'Join', 'Format'))):
             text = 'import System.*\nfunc Main() {\n' + prefix + '    ' + access + '\n}'
             send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})
             result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},

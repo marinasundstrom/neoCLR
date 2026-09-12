@@ -1,0 +1,14 @@
+import System.IO.*
+import System.Console.*
+
+func Main() {
+    let output = Path.Combine("reports", "summary.txt")
+    WriteLine(Path.GetFileName(output))
+    WriteLine(Path.Combine("", "report.txt"))
+    WriteLine(Path.Combine("report.txt", ""))
+    WriteLine(Path.GetFileName(""))
+    WriteLine(Path.GetFileName("reports/"))
+    WriteLine(Path.GetFileName(Path.Combine("reports/..", "final.txt")))
+    WriteLine(Path.GetFileName(Path.Combine("資料", "世界.txt")))
+    WriteLine(Path.GetFileName(Path.Combine("ignored", "/leaf.txt")))
+}

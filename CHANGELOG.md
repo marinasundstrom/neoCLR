@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Projected existing Path.Combine/GetFileName through the Raven target with a shared
+  declaration/binding catalog, lexical-path sample, signature rejection checks and
+  editor completion coverage. Host path semantics remain unchanged; Windows execution
+  remains unverified. No Raven compiler or installed SDK/VSIX changes.
+
 - Recorded the author's POC framing: visible rough edges, .NET familiarity,
   deliberate differences and unfinished API choices are useful material for evaluating
   the experiment. Updated preview/API design guidance while keeping support and

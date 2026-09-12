@@ -577,3 +577,6 @@ boundary examples and `verify_editor.py --strings` completion checks.
 The `--slices` probe and `verify_slices.py` verify UTF-8 slicing, typed error
 propagation and conditional-output safety; the [String API documentation](../../raven-string-api.md)
 contains commands and the remaining error-carrier limits.
+
+The [lexical Path projection](../../raven-path-api.md) adds `Combine` and
+`GetFileName`, with a saved-project sample and completion checks under `--files`.

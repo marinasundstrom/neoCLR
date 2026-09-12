@@ -13,7 +13,7 @@ static class CoreDeclarations
         if (unionProbe)
             declarations = declarations.Replace("public static class Math {",
                 "public static class Math { public static Result<int, OverflowError> Abs(int value) => default;")
-                + UnionDeclarations.Source + FileBindings.Declarations + ResultBindings.Declarations;
+                + UnionDeclarations.Source + PathBindings.Declarations + FileBindings.Declarations + ResultBindings.Declarations;
         if (collectionProbe) declarations += CollectionDeclarations.Source;
         var source = Source.Replace("public sealed class String { }", StringBindings.Declarations(unionProbe))
             .Replace("public static class Console { public static void WriteLine(string value) { } }", declarations)

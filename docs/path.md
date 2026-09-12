@@ -32,3 +32,6 @@ System.Console.WriteLine(System.IO.Path.GetFileName(output))
 
 Run `cargo test --locked --test path` for source/artifact, empty/rooted/trailing-path,
 Unicode, lexical preservation and runtime-service checks.
+
+Both methods are now projected into the experimental Raven target; see the
+[Raven sample, checks and limitations](raven-path-api.md).

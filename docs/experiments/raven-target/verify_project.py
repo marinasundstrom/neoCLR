@@ -21,7 +21,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
         shutil.copyfile(args.project.resolve().parent / name, root / name)
     command = [sys.executable, str(bridge / 'run_project.py'), str(root / 'Demo.rvnproj'),
                '--raven', str(args.raven.resolve()), '--runtime', str(args.runtime.resolve())]
-    cases = [('StringSlices', 'library-string-slices.rvn', 'Sliced\né\nSliced\n😀\nSliced\n\nInvalid boundary\nInvalid boundary\nOut of range\nOut of range\nOut of range\nOut of range\nOut of range\nSliced\n\n'),
+    cases = [('Paths', 'library-paths.rvn', 'summary.txt\nreport.txt\nreport.txt\n\n\nfinal.txt\n世界.txt\nleaf.txt\n'),
+             ('StringSlices', 'library-string-slices.rvn', 'Sliced\né\nSliced\n😀\nSliced\n\nInvalid boundary\nInvalid boundary\nOut of range\nOut of range\nOut of range\nOut of range\nOut of range\nSliced\n\n'),
              ('Strings', 'library-strings.rvn', 'Hello, värld!\n14\nyes\nno\nyes\nno\nyes\nyes\nyes\nno\n-1\n0\n1\n'),
              ('StringBoundaries', 'library-string-boundaries.rvn', 'yes\nyes\nyes\nyes\nno\n-1\n4\n'),
              ('MatchForms', 'library-match.rvn', '42\n-1\nPresent\nAbsent\n42\nOverflow\n'),
@@ -56,6 +57,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
     results['SavedEdit'] = saved_expected
     for label, source, diagnostic in [
         ('CompileFailure', 'func Main() { MissingCall() }', 'RAV'),
+        ('PathArgumentMismatch', 'func Main() { System.IO.Path.Combine(42, 7) }', 'RAV'),
+        ('PathUnsupportedApi', 'func Main() { System.IO.Path.GetFullPath(".") }', 'RAV'),
         ('StringArgumentMismatch', 'func Main() { System.String.Concat(42, 7) }', 'RAV'),
         ('StringUnsupportedApi', 'func Main() { System.String.IsNullOrEmpty(\"\") }', 'RAV'),
         ('ImportFailure', 'func Add(value: int) -> int { return value + 1 }\nfunc Main() { Add(2) }', 'Unsupported')]:

@@ -78,6 +78,15 @@ static class SignatureProbe
         var wrongStringArgument = Reference(concat, stringType);
         wrongStringArgument.Parameters[0].ParameterType = module.TypeSystem.Int32;
         Reject("String argument mismatch", () => StringBindings.Bind(wrongStringArgument, concat, false));
+        var pathType = module.GetType("System.IO.Path");
+        var combine = pathType.Methods.Single(m => m.Name == "Combine");
+        var pathCall = Reference(combine, pathType);
+        Check("Path static mapping", PathBindings.Bind(pathCall, combine)?.Name == "System.IO.Path::Combine");
+        pathCall.Parameters[0].ParameterType = module.TypeSystem.Int32;
+        Reject("Path argument mismatch", () => PathBindings.Bind(pathCall, combine));
+        pathCall = Reference(combine, pathType);
+        pathCall.HasThis = true;
+        Reject("Path receiver mismatch", () => PathBindings.Bind(pathCall, combine));
         var text = JsonSerializer.Serialize(checks, new JsonSerializerOptions { WriteIndented = true });
         File.WriteAllText(Path.Combine(output, "signature-checks.json"), text);
         Console.WriteLine(text);
