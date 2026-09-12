@@ -411,7 +411,7 @@ platform surface.
 | Familiar runtime and own library | Raven Math/Console and Result program execute on neoCLR | Package a small cohesive sample/project |
 | Result-based errors | Abs success and overflow execute | Broaden only as the sample needs |
 | Option-based absence | Raven price lookup constructs/extracts real library Some/None values and executes | Incorporate the lookup into the cohesive demo |
-| Generic Void | Existing platform intent; ordinary no-result calls work | Prove a Raven-targeted closed generic Void case; do not equate this with no-result methods |
+| Generic Void | Raven Option<System.Void> constructs and matches both cases through a target adapter | Broaden target emission; zero-stack representation remains separate |
 | VS Code completion | Compiler completion probe uses target-only declarations | Wire the Raven project/language server to the same references and verify completions in VS Code |
 
 The next priority is the Option demo, followed by generic Void and the project/editor
@@ -452,3 +452,41 @@ newly supported. Validation now includes seven runtime programs, the Rust artifa
 regression, and three new mutation checks for unwritten carriers, mismatched out cases,
 and a mismatched constructor argument. Generic Void and actual VS Code completion
 remain outstanding. See [Option run instructions](experiments/raven-target/README.md#running-the-option-demo-2026-09-12).
+
+## Generic Void execution (2026-09-12)
+
+Raven now demonstrates `Option<System.Void>` with Some(()) and None, using the actual
+neoCLR Option library. This is a deliberately different contract from .NET:
+[Type.MakeGenericType](https://learn.microsoft.com/en-us/dotnet/api/system.type.makegenerictype)
+documents Void as an invalid generic argument (consulted 2026-09-12). The probe also
+confirms that rejection on the pinned .NET 11 SDK. Ordinary method return VOID remains
+an empty-stack result convention, independent of this generic type participation.
+
+Raven's current output uses a primitive VOID signature marker inside generic arguments.
+The provisional neoCLR-owned `VoidProjection` pass preserves that raw artifact and
+replaces generic occurrences with named VALUETYPE references to the supplied System.Void.
+It reuses existing metadata encodings, but changes their accepted semantics; this is
+not a claim that the artifact satisfies ordinary CLI generic rules. Binary signature
+checks establish the distinction, since Cecil presents both forms as MetadataType.Void.
+The declaration and application dependencies still undergo the explicit closure audit.
+
+Alternatives were to retain .NET's rejection, introduce a separate public Unit type,
+or extend Raven's target emitter immediately. Rejection would miss the author's generic
+Void goal; exposing Unit would change the intended API. The bounded post-emission adapter
+lets us test that goal without another compiler change, at the cost of a temporary
+projection stage. General metadata signatures and production compiler integration need
+further work before adopting this as a universal encoding contract.
+
+Raven's compiler-generated `()` literal loads its own empty Unit.Value field. Only that
+validated field shape is mapped to `ldvoid`; arbitrary static fields and initializers
+remain unsupported. The existing VM uses an inhabited Void marker on its evaluation
+stack, including constructor arguments. This slice therefore establishes observable
+generic behavior, not zero-stack or zero-storage optimization, ABI parity, or performance
+improvement. Debug/provenance maps identify the projected input; the raw DLL is retained
+for inspecting the compiler output before adaptation.
+
+Validation: eight programs verify and execute; three new rejection probes cover raw
+VOID generic signatures, a wrong payload, and a non-Unit field. These supplement the
+four Result and three Option rejection probes and the earlier static profile checks.
+The checked-in imports are covered by the Rust runtime regression. Actual VS Code
+project completion remains the next POC priority.

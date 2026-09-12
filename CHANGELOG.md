@@ -36,7 +36,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   supported case initialization and integer equality. A Raven price lookup now uses
   the real Option library and prints 42 and Product not found; seven runtime programs
   and three additional Option rejection probes cover the slice. Raven constructor
-  emission support remains isolated on its feature branch.
+  emission support remains isolated on its feature branch. Added the eighth runtime
+  demo: Raven Option<System.Void> constructs and matches Some(()) and None through
+  a neoCLR-owned metadata projection, without further Raven changes. Ordinary no-result
+  returns are unchanged; generic Void uses a named target type and the VM's existing
+  inhabited Void marker. Added binary signature checks, three rejection probes, saved
+  imports and run instructions. This is a bounded target adapter, not general CLI
+  generic compatibility or a zero-stack optimization.
 
 - Began nominal class reference semantics: `.type class` uses managed heap handles in
   ordinary class-typed storage, while managed byrefs still address slots. Assignment,

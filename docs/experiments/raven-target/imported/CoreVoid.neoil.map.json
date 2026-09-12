@@ -1,6 +1,6 @@
 {
   "Profile": "result-option-void-v3",
-  "ApplicationSha256": "D3A7FC367B5CB49B24695E84256076D1AC067EBFE4715B494F8128C4162C858F",
+  "ApplicationSha256": "56A386ED2A54C04908CB0BF4A44306986A7B232F024A26BEAE2CD58DFBBA5067",
   "CoreSha256": "25A4B02EC51B6DC2361D659DAC5A113FD884F4D9A603C8BC5D35C313D9ADDE96",
   "ReachableMethods": [
     100663301,
@@ -40,17 +40,17 @@
     },
     {
       "MethodToken": 100663303,
-      "Offset": 11,
+      "Offset": 10,
       "OutputLine": 13
     },
     {
       "MethodToken": 100663303,
-      "Offset": 16,
+      "Offset": 15,
       "OutputLine": 15
     },
     {
       "MethodToken": 100663303,
-      "Offset": 17,
+      "Offset": 16,
       "OutputLine": 16
     },
     {
@@ -160,27 +160,27 @@
     },
     {
       "MethodToken": 100663302,
-      "Offset": 49,
+      "Offset": 52,
       "OutputLine": 75
     },
     {
       "MethodToken": 100663302,
-      "Offset": 54,
+      "Offset": 57,
       "OutputLine": 77
     },
     {
       "MethodToken": 100663302,
-      "Offset": 59,
+      "Offset": 63,
       "OutputLine": 79
     },
     {
       "MethodToken": 100663302,
-      "Offset": 65,
-      "OutputLine": 81
+      "Offset": 64,
+      "OutputLine": 80
     },
     {
       "MethodToken": 100663302,
-      "Offset": 66,
+      "Offset": 65,
       "OutputLine": 82
     },
     {
@@ -200,12 +200,12 @@
     },
     {
       "MethodToken": 100663302,
-      "Offset": 73,
+      "Offset": 76,
       "OutputLine": 90
     },
     {
       "MethodToken": 100663302,
-      "Offset": 78,
+      "Offset": 81,
       "OutputLine": 92
     },
     {
@@ -215,48 +215,53 @@
     },
     {
       "MethodToken": 100663302,
-      "Offset": 85,
+      "Offset": 84,
       "OutputLine": 96
     },
     {
       "MethodToken": 100663302,
-      "Offset": 86,
+      "Offset": 85,
       "OutputLine": 98
     },
     {
       "MethodToken": 100663302,
-      "Offset": 87,
+      "Offset": 90,
       "OutputLine": 100
     },
     {
       "MethodToken": 100663302,
-      "Offset": 92,
+      "Offset": 91,
       "OutputLine": 102
     },
     {
       "MethodToken": 100663302,
-      "Offset": 93,
+      "Offset": 96,
       "OutputLine": 104
     },
     {
       "MethodToken": 100663302,
-      "Offset": 98,
+      "Offset": 101,
       "OutputLine": 106
     },
     {
       "MethodToken": 100663302,
-      "Offset": 103,
-      "OutputLine": 108
+      "Offset": 102,
+      "OutputLine": 107
     },
     {
       "MethodToken": 100663302,
-      "Offset": 104,
+      "Offset": 107,
       "OutputLine": 109
     },
     {
       "MethodToken": 100663302,
-      "Offset": 109,
+      "Offset": 112,
       "OutputLine": 111
+    },
+    {
+      "MethodToken": 100663302,
+      "Offset": 113,
+      "OutputLine": 112
     },
     {
       "MethodToken": 100663302,
@@ -269,94 +274,84 @@
       "OutputLine": 114
     },
     {
-      "MethodToken": 100663302,
-      "Offset": 116,
-      "OutputLine": 115
-    },
-    {
-      "MethodToken": 100663302,
-      "Offset": 117,
-      "OutputLine": 116
-    },
-    {
       "MethodToken": 100663301,
       "Offset": 0,
-      "OutputLine": 120
+      "OutputLine": 118
     },
     {
       "MethodToken": 100663301,
       "Offset": 1,
-      "OutputLine": 121
+      "OutputLine": 119
     },
     {
       "MethodToken": 100663301,
       "Offset": 2,
-      "OutputLine": 122
+      "OutputLine": 120
     },
     {
       "MethodToken": 100663301,
       "Offset": 3,
-      "OutputLine": 124
+      "OutputLine": 122
     },
     {
       "MethodToken": 100663301,
       "Offset": 4,
-      "OutputLine": 126
+      "OutputLine": 124
     },
     {
       "MethodToken": 100663301,
       "Offset": 6,
-      "OutputLine": 128
+      "OutputLine": 126
     },
     {
       "MethodToken": 100663301,
       "Offset": 11,
-      "OutputLine": 130
+      "OutputLine": 128
     },
     {
       "MethodToken": 100663301,
       "Offset": 16,
-      "OutputLine": 132
+      "OutputLine": 130
     },
     {
       "MethodToken": 100663301,
       "Offset": 17,
+      "OutputLine": 131
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 22,
       "OutputLine": 133
     },
     {
       "MethodToken": 100663301,
-      "Offset": 19,
+      "Offset": 27,
       "OutputLine": 135
     },
     {
       "MethodToken": 100663301,
-      "Offset": 24,
+      "Offset": 32,
       "OutputLine": 137
     },
     {
       "MethodToken": 100663301,
-      "Offset": 29,
+      "Offset": 33,
       "OutputLine": 139
     },
     {
       "MethodToken": 100663301,
-      "Offset": 30,
-      "OutputLine": 141
+      "Offset": 34,
+      "OutputLine": 140
     },
     {
       "MethodToken": 100663301,
-      "Offset": 31,
+      "Offset": 39,
       "OutputLine": 142
     },
     {
       "MethodToken": 100663301,
-      "Offset": 36,
+      "Offset": 44,
       "OutputLine": 144
-    },
-    {
-      "MethodToken": 100663301,
-      "Offset": 41,
-      "OutputLine": 146
     }
   ],
   "Scope": "Bounded generic Result/Option bindings; CFG stack/definite-assignment checked; observable default carriers rejected; no guest declaration bodies executed."

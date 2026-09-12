@@ -33,5 +33,10 @@
     "stdout": "42\nProduct not found\n=> Void\n",
     "stderr": "",
     "verified": true
+  },
+  "CoreVoid": {
+    "stdout": "Completed without a payload\nNot completed\n=> Void\n",
+    "stderr": "",
+    "verified": true
   }
 }

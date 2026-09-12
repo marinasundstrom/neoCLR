@@ -1,0 +1,23 @@
+import System.*
+import System.Console.*
+
+func Marker(completed: int) -> Option<System.Void> {
+    if completed == 1 {
+        return Option<System.Void>(Option.Some<System.Void>(()))
+    }
+    return Option<System.Void>(Option.None())
+}
+
+func Show(completed: int) {
+    let marker = Marker(completed)
+    if marker is Option.Some<System.Void> done {
+        WriteLine("Completed without a payload")
+    } else if marker is Option.None absent {
+        WriteLine("Not completed")
+    }
+}
+
+func Main() {
+    Show(1)
+    Show(0)
+}

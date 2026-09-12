@@ -245,7 +245,7 @@ extractors must be referenced; ordinary object type-test lowering is rejected. T
 compact checked-in outcome is `union-results.json`.
 
 `UnionImport` now produces `CoreUnion.neoil` and its source/provenance map.
-The runtime verification command above verifies and runs all seven programs, including
+The runtime verification command above verifies and runs all eight programs, including
 this Result sample. To run only the checked-in demo from the neoCLR repository root:
 
 ```bash
@@ -308,3 +308,44 @@ and lifetime checks. Its newobj bindings admit only the selected real Option con
 case local defaults remain supported, while default carrier reads are rejected. It does not add
 general object construction, application classes, or a new runtime instruction. Generic
 Void and VS Code project completion remain the next POC steps.
+
+## Running the generic Void demo (2026-09-12)
+
+`samples/library-void.rvn` returns `Option<System.Void>`: Some(()) represents completion
+without a payload; None represents no completion. Reproduce with the same probe and
+runtime verification commands above; the script now checks eight programs. Run the
+saved import from the neoCLR repository root:
+
+```sh
+cargo run -- verify docs/experiments/raven-target/imported/CoreVoid.neoil
+cargo run -- run docs/experiments/raven-target/imported/CoreVoid.neoil
+```
+
+Expected output:
+
+```text
+Completed without a payload
+Not completed
+=> Void
+```
+
+The final CLI display is separate from the generic Void value in the carrier.
+`VoidProjection` preserves Raven's emitted `CoreVoid.raw.dll` and produces
+`CoreVoid.dll`, replacing generic VOID markers with named value-type references to the
+supplied System.Void. Ordinary method return VOID signatures remain unchanged. This is
+an experimental neoCLR target adapter, not native Raven backend support or a claim of
+.NET execution compatibility. No Raven source change was needed in this slice.
+
+The importer recognizes only the compiler-generated empty Unit.Value literal with its
+validated static readonly field and no type initializer, mapping it to neoCLR's existing
+`ldvoid`. Actual Option<Void> constructors and extractors execute in the runtime library.
+The VM still represents Void with an inhabited stack marker; zero-stack/storage handling
+is future work. Arbitrary static fields, general generic Void APIs and default carrier
+reads are not admitted by this profile.
+
+`void-results.json` records emission, dependency closure and three rejection probes:
+raw generic VOID signatures, an integer substituted for the Void payload, and a field
+other than the Unit literal. The probe also checks the named token in the binary method
+signature and confirms host .NET rejects Void as a generic argument. See the
+[design comparison](../../raven-target-experiment.md#generic-void-execution-2026-09-12).
+VS Code project completion is the next POC step.

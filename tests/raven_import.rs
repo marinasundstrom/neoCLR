@@ -4,6 +4,10 @@ use neoclr::{Limits, assemble, run, verify};
 fn raven_emitted_corpus_runs_against_real_system_library() {
     for (source, expected) in [
         (
+            include_str!("../docs/experiments/raven-target/imported/CoreVoid.neoil"),
+            vec!["Completed without a payload", "Not completed"],
+        ),
+        (
             include_str!("../docs/experiments/raven-target/imported/CoreOption.neoil"),
             vec!["42", "Product not found"],
         ),

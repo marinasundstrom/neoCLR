@@ -220,6 +220,187 @@
     },
     "ApplicationClosureErrors": []
   },
+  "VoidImportRejections": {
+    "VoidRawSignature": "Unsupported Result profile type: System.Option`1<System.Void>",
+    "VoidWrongPayload": "Input stack type mismatch.",
+    "VoidNonUnitField": "Only the empty Raven Unit literal field is admitted."
+  },
+  "VoidProbe": {
+    "Emission": {
+      "References": [
+        "NeoCLR.CoreProbe, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+      ],
+      "Types": [
+        "<Module>",
+        "System.Unit",
+        "NamespaceMembers",
+        "System.Runtime.CompilerServices.NullableContextAttribute",
+        "Program"
+      ],
+      "Methods": [
+        {
+          "Signature": "System.Boolean System.Unit::Equals(System.Unit)",
+          "Instructions": [
+            "ldc.i4.1",
+            "ret"
+          ],
+          "ExceptionRegions": 0
+        },
+        {
+          "Signature": "System.Boolean System.Unit::Equals(System.Object)",
+          "Instructions": [
+            "ldarg.1",
+            "isinst System.Unit",
+            "ldnull",
+            "cgt.un",
+            "ret"
+          ],
+          "ExceptionRegions": 0
+        },
+        {
+          "Signature": "System.Int32 System.Unit::GetHashCode()",
+          "Instructions": [
+            "ldc.i4.0",
+            "ret"
+          ],
+          "ExceptionRegions": 0
+        },
+        {
+          "Signature": "System.String System.Unit::ToString()",
+          "Instructions": [
+            "ldstr ()",
+            "ret"
+          ],
+          "ExceptionRegions": 0
+        },
+        {
+          "Signature": "System.Option`1<System.Void> NamespaceMembers::Marker(System.Int32)",
+          "Instructions": [
+            "nop",
+            "nop",
+            "ldarg.0",
+            "ldc.i4.1",
+            "ceq",
+            "brtrue IL_0010: nop",
+            "br IL_0021: nop",
+            "nop",
+            "ldsfld System.Unit System.Unit::Value",
+            "newobj System.Void System.Option/Some`1<System.Void>::.ctor(!0) scope=NeoCLR.CoreProbe",
+            "newobj System.Void System.Option`1<System.Void>::.ctor(System.Option/Some`1<!0>) scope=NeoCLR.CoreProbe",
+            "ret",
+            "nop",
+            "newobj System.Void System.Option/None::.ctor() scope=NeoCLR.CoreProbe",
+            "newobj System.Void System.Option`1<System.Void>::.ctor(System.Option/None) scope=NeoCLR.CoreProbe",
+            "ret"
+          ],
+          "ExceptionRegions": 0
+        },
+        {
+          "Signature": "System.Void NamespaceMembers::Show(System.Int32)",
+          "Instructions": [
+            "nop",
+            "nop",
+            "ldarg.0",
+            "call System.Option`1<System.Void> NamespaceMembers::Marker(System.Int32) scope=CoreVoid",
+            "stloc.0",
+            "nop",
+            "ldloc.0",
+            "stloc.3",
+            "ldloca.s V_3",
+            "ldloca.s V_4",
+            "call System.Boolean System.Option`1<System.Void>::TryGetValue(System.Option/Some`1<!0>&) scope=NeoCLR.CoreProbe",
+            "brfalse IL_0023: ldc.i4.0",
+            "ldloc.s V_4",
+            "stloc.1",
+            "ldc.i4.1",
+            "br IL_0024: brtrue IL_002e",
+            "ldc.i4.0",
+            "brtrue IL_002e: nop",
+            "br IL_003f: nop",
+            "nop",
+            "ldstr Completed without a payload",
+            "call System.Void System.Console::WriteLine(System.String) scope=NeoCLR.CoreProbe",
+            "br IL_0071: nop",
+            "nop",
+            "nop",
+            "ldloc.0",
+            "stloc.s V_5",
+            "ldloca.s V_5",
+            "ldloca.s V_6",
+            "call System.Boolean System.Option`1<System.Void>::TryGetValue(System.Option/None&) scope=NeoCLR.CoreProbe",
+            "brfalse IL_005a: ldc.i4.0",
+            "ldloc.s V_6",
+            "stloc.2",
+            "ldc.i4.1",
+            "br IL_005b: brtrue IL_0065",
+            "ldc.i4.0",
+            "brtrue IL_0065: nop",
+            "br IL_0070: nop",
+            "nop",
+            "ldstr Not completed",
+            "call System.Void System.Console::WriteLine(System.String) scope=NeoCLR.CoreProbe",
+            "nop",
+            "nop",
+            "nop",
+            "ret"
+          ],
+          "ExceptionRegions": 0
+        },
+        {
+          "Signature": "System.Void NamespaceMembers::Main()",
+          "Instructions": [
+            "nop",
+            "nop",
+            "ldc.i4.1",
+            "call System.Void NamespaceMembers::Show(System.Int32) scope=CoreVoid",
+            "nop",
+            "ldc.i4.0",
+            "call System.Void NamespaceMembers::Show(System.Int32) scope=CoreVoid",
+            "nop",
+            "ret"
+          ],
+          "ExceptionRegions": 0
+        },
+        {
+          "Signature": "System.Void System.Runtime.CompilerServices.NullableContextAttribute::.ctor(System.Byte)",
+          "Instructions": [
+            "ldarg.0",
+            "call System.Void System.Attribute::.ctor() scope=NeoCLR.CoreProbe",
+            "ldarg.0",
+            "ldarg.1",
+            "stfld System.Byte System.Runtime.CompilerServices.NullableContextAttribute::Flag",
+            "ret"
+          ],
+          "ExceptionRegions": 0
+        },
+        {
+          "Signature": "System.Void Program::.ctor()",
+          "Instructions": [
+            "ldarg.0",
+            "call System.Void System.Object::.ctor() scope=NeoCLR.CoreProbe",
+            "ret"
+          ],
+          "ExceptionRegions": 0
+        }
+      ],
+      "MissingFacadeTypes": [],
+      "EntryPoint": "System.Void NamespaceMembers::Main()",
+      "TypeReferences": [
+        "System.Attribute scope=NeoCLR.CoreProbe",
+        "System.AttributeTargets scope=NeoCLR.CoreProbe",
+        "System.AttributeUsageAttribute scope=NeoCLR.CoreProbe",
+        "System.Console scope=NeoCLR.CoreProbe",
+        "System.Object scope=NeoCLR.CoreProbe",
+        "System.Option scope=NeoCLR.CoreProbe",
+        "System.Option/None scope=NeoCLR.CoreProbe",
+        "System.Option/Some`1 scope=NeoCLR.CoreProbe",
+        "System.Option`1 scope=NeoCLR.CoreProbe",
+        "System.ValueType scope=NeoCLR.CoreProbe",
+        "System.Void scope=NeoCLR.CoreProbe"
+      ]
+    },
+    "ApplicationClosureErrors": []
+  },
   "OptionImportRejections": {
     "OptionDefaultCarrier": "Read of uninitialized or unsupported default local.",
     "OptionWrongOutCase": "Input stack type mismatch.",

@@ -1,47 +1,45 @@
 .module ImportedUnion
-.entry Method_06000006
-.function Method_06000006() -> noresult
+.entry Method_06000007
+.function Method_06000007() -> noresult
 IL_0000:
 IL_0001:
 IL_0002:
-ldc.i4 -42
-IL_0004:
-call Method_06000005(Int32)
+ldc.i4 1
+IL_0003:
+call Method_06000006(Int32)
+IL_0008:
 IL_0009:
+ldc.i4 0
 IL_000a:
-ldc.i4 -2147483648
+call Method_06000006(Int32)
 IL_000f:
-call Method_06000005(Int32)
-IL_0014:
-IL_0015:
+IL_0010:
 ret
 .end
-.function Method_06000005(Int32) -> noresult
-.local System.Result<Int32,System.OverflowError> local0
-.local System.Result.Ok<Int32> local1
-.local System.Result.Error<System.OverflowError> local2
-.local System.Result<Int32,System.OverflowError> local3
-.local System.Result.Ok<Int32> local4
-.local System.Result<Int32,System.OverflowError> local5
-.local System.Result.Error<System.OverflowError> local6
-ldc.i4 0
-newobj System.Result.Ok<Int32>
+.function Method_06000006(Int32) -> noresult
+.local System.Option<Void> local0
+.local System.Option.Some<Void> local1
+.local System.Option.None local2
+.local System.Option<Void> local3
+.local System.Option.Some<Void> local4
+.local System.Option<Void> local5
+.local System.Option.None local6
+ldvoid
+newobj System.Option.Some<Void>
 stloc local1
-newobj System.OverflowError
-newobj System.Result.Error<System.OverflowError>
+newobj System.Option.None
 stloc local2
-ldc.i4 0
-newobj System.Result.Ok<Int32>
+ldvoid
+newobj System.Option.Some<Void>
 stloc local4
-newobj System.OverflowError
-newobj System.Result.Error<System.OverflowError>
+newobj System.Option.None
 stloc local6
 IL_0000:
 IL_0001:
 IL_0002:
 ldarg 0
 IL_0003:
-call System.Math::Abs(Int32)
+call Method_06000005(Int32)
 IL_0008:
 stloc local0
 IL_0009:
@@ -54,7 +52,7 @@ ldloca local3
 IL_000e:
 ldloca local4
 IL_0010:
-call RuntimeTryOk(System.Result<Int32,System.OverflowError>&,System.Result.Ok<Int32>&)
+call RuntimeTryVoidSome(System.Option<Void>&,System.Option.Some<Void>&)
 IL_0015:
 brfalse IL_0023
 IL_001a:
@@ -70,52 +68,80 @@ ldc.i4 0
 IL_0024:
 brtrue IL_002e
 IL_0029:
-br IL_0041
+br IL_003f
 IL_002e:
 IL_002f:
-ldloca local1
-IL_0031:
-call RuntimeOkValue(System.Result.Ok<Int32>&)
-IL_0036:
-call RuntimeWriteInt32(Int32)
-IL_003b:
-br IL_0073
-IL_0041:
-IL_0042:
-ldloc local0
-IL_0043:
-stloc local5
-IL_0045:
-ldloca local5
-IL_0047:
-ldloca local6
-IL_0049:
-call RuntimeTryError(System.Result<Int32,System.OverflowError>&,System.Result.Error<System.OverflowError>&)
-IL_004e:
-brfalse IL_005c
-IL_0053:
-ldloc local6
-IL_0055:
-stloc local2
-IL_0056:
-ldc.i4 1
-IL_0057:
-br IL_005d
-IL_005c:
-ldc.i4 0
-IL_005d:
-brtrue IL_0067
-IL_0062:
-br IL_0072
-IL_0067:
-IL_0068:
-ldstr "Overflow"
-IL_006d:
+ldstr "Completed without a payload"
+IL_0034:
 call RuntimeWriteString(String)
+IL_0039:
+br IL_0071
+IL_003f:
+IL_0040:
+ldloc local0
+IL_0041:
+stloc local5
+IL_0043:
+ldloca local5
+IL_0045:
+ldloca local6
+IL_0047:
+call RuntimeTryVoidNone(System.Option<Void>&,System.Option.None&)
+IL_004c:
+brfalse IL_005a
+IL_0051:
+ldloc local6
+IL_0053:
+stloc local2
+IL_0054:
+ldc.i4 1
+IL_0055:
+br IL_005b
+IL_005a:
+ldc.i4 0
+IL_005b:
+brtrue IL_0065
+IL_0060:
+br IL_0070
+IL_0065:
+IL_0066:
+ldstr "Not completed"
+IL_006b:
+call RuntimeWriteString(String)
+IL_0070:
+IL_0071:
 IL_0072:
 IL_0073:
-IL_0074:
-IL_0075:
+ret
+.end
+.function Method_06000005(Int32) -> System.Option<Void>
+IL_0000:
+IL_0001:
+IL_0002:
+ldarg 0
+IL_0003:
+ldc.i4 1
+IL_0004:
+call RuntimeEqual(Int32,Int32)
+IL_0006:
+brtrue IL_0010
+IL_000b:
+br IL_0021
+IL_0010:
+IL_0011:
+ldvoid
+IL_0016:
+call RuntimeNewVoidSome(Void)
+IL_001b:
+call RuntimeVoidOptionSome(System.Option.Some<Void>)
+IL_0020:
+ret
+IL_0021:
+IL_0022:
+call RuntimeNewNone()
+IL_0027:
+call RuntimeVoidOptionNone(System.Option.None)
+IL_002c:
 ret
 .end
 .function RuntimeTryOk(System.Result<Int32,System.OverflowError>& source,out System.Result.Ok<Int32>& destination) -> Int32

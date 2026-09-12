@@ -7,6 +7,8 @@ using Mono.Cecil.Cil;
 // Bounded Result/Option profile, not a general CLI loader. Only supplied metadata is resolved.
 static class UnionImport
 {
+    const string VoidOption = "System.Option<Void>";
+    const string VoidSome = "System.Option.Some<Void>";
     const string Option = "System.Option<Int32>";
     const string Some = "System.Option.Some<Int32>";
     const string None = "System.Option.None";
@@ -48,14 +50,14 @@ static class UnionImport
             var args = method.Parameters.Select(p => Type(p.ParameterType)).ToArray();
             var result = Type(method.ReturnType, true);
             var locals = method.Body.Variables.Select(v => Type(v.VariableType)).ToArray();
-            if (locals.Any(t => t is not ("Int32" or Carrier or Ok or Error or Option or Some or None)))
+            if (locals.Any(t => t is not ("Int32" or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome)))
                 throw new InvalidDataException("Unsupported local default in Result profile.");
             var instructions = method.Body.Instructions.ToArray();
             var indexes = instructions.Select((i, n) => (i, n)).ToDictionary(p => p.i, p => p.n);
             var states = new Dictionary<int, State>();
             var work = new Queue<int>();
             var bodies = new Dictionary<int, string>();
-            Merge(0, new([], locals.Select(t => method.Body.InitLocals && t != Carrier && t != Option).ToArray()));
+            Merge(0, new([], locals.Select(t => method.Body.InitLocals && t != Carrier && t != Option && t != VoidOption).ToArray()));
             var visits = 0;
             while (work.TryDequeue(out var index))
             {
@@ -76,6 +78,14 @@ static class UnionImport
                 switch (instruction.OpCode.Code)
                 {
                     case Code.Nop: break;
+                    case Code.Ldsfld:
+                        var field = ((FieldReference)instruction.Operand).Resolve();
+                        if (field is null || field.Module != app.MainModule || field.FullName != "System.Unit System.Unit::Value"
+                            || !field.IsStatic || !field.IsInitOnly || !field.DeclaringType.IsValueType
+                            || field.DeclaringType.Fields.Any(f => !f.IsStatic)
+                            || field.DeclaringType.Methods.Any(m => m.IsConstructor && m.IsStatic))
+                            throw new InvalidDataException("Only the empty Raven Unit literal field is admitted.");
+                        Push(new("Void")); code.AppendLine("ldvoid"); break;
                     case Code.Ldstr:
                         var value = (string)instruction.Operand;
                         if (value.Length > 65536) throw new InvalidDataException("String limit exceeded.");
@@ -154,7 +164,7 @@ static class UnionImport
             for (var n = 0; n < locals.Length; n++) output.AppendLine($".local {locals[n]} local{n}");
             if (method.Body.InitLocals)
                 for (var n = 0; n < locals.Length; n++)
-                    if (locals[n] != Carrier && locals[n] != Option) output.AppendLine(Default(locals[n]) + $"\nstloc local{n}");
+                    if (locals[n] != Carrier && locals[n] != Option && locals[n] != VoidOption) output.AppendLine(Default(locals[n]) + $"\nstloc local{n}");
             foreach (var index in bodies.Keys.Order())
             {
                 mappings.Add(new { MethodToken = method.MetadataToken.ToUInt32(), instructions[index].Offset, OutputLine = output.ToString().Count(c => c == '\n') + 1 });
@@ -177,7 +187,7 @@ static class UnionImport
         output.Append(Adapters());
         File.WriteAllText(destination, output.ToString());
         File.WriteAllText(destination + ".map.json", JsonSerializer.Serialize(new {
-            Profile = "result-option-int32-v2", ApplicationSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(application))),
+            Profile = "result-option-void-v3", ApplicationSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(application))),
             CoreSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(core))), ReachableMethods = seen.Order().ToArray(), Mappings = mappings,
             Scope = "Bounded generic Result/Option bindings; CFG stack/definite-assignment checked; observable default carriers rejected; no guest declaration bodies executed."
         }, new JsonSerializerOptions { WriteIndented = true }));
@@ -193,6 +203,8 @@ static class UnionImport
     }
     static string Type(TypeReference type, bool result = false) => type.FullName switch {
         "System.Void" when result => "noresult", "System.Int32" => "Int32", "System.String" => "String",
+        "System.Option`1<System.Void>" when type.IsValueType && HasNamedVoid(type) => VoidOption,
+        "System.Option/Some`1<System.Void>" when type.IsValueType && HasNamedVoid(type) => VoidSome,
         "System.Option`1<System.Int32>" when type.IsValueType => Option,
         "System.Option/Some`1<System.Int32>" when type.IsValueType => Some,
         "System.Option/None" when type.IsValueType => None,
@@ -201,6 +213,10 @@ static class UnionImport
         "System.Result/Error`1<System.OverflowError>" when type.IsValueType => Error,
         _ => throw new InvalidDataException("Unsupported Result profile type: " + type.FullName)
     };
+    static bool HasNamedVoid(TypeReference type) => type is GenericInstanceType generic
+        && generic.GenericArguments.Count == 1 && generic.GenericArguments[0].IsValueType
+        && generic.GenericArguments[0].FullName == "System.Void"
+        && generic.GenericArguments[0].Scope.Name == CoreDeclarations.Identity;
     static Call Bind(MethodReference reference, MethodDefinition definition)
     {
         if (!definition.IsPublic || reference.ExplicitThis || reference is GenericInstanceMethod || reference.HasGenericParameters
@@ -240,6 +256,15 @@ static class UnionImport
             && key == "T System.Option/Some`1::get_Value()" && reference.ReturnType is GenericParameter { Position: 0 }
             && reference.Parameters.Count == 0)
             return new("RuntimeSomeValue", [Some + "&"], "Int32");
+        if (reference.DeclaringType.FullName == "System.Option`1<System.Void>" && HasNamedVoid(reference.DeclaringType)
+            && reference.HasThis && reference.ReturnType.FullName == "System.Boolean" && reference.Parameters.Count == 1
+            && definition.Parameters.Count == 1 && definition.Parameters[0].IsOut)
+        {
+            if (key == "System.Boolean System.Option`1::TryGetValue(System.Option/Some`1<T>&)" && reference.Parameters[0].ParameterType.FullName == "System.Option/Some`1<!0>&")
+                return new("RuntimeTryVoidSome", [VoidOption + "&", VoidSome + "&"], "Int32", 1);
+            if (key == "System.Boolean System.Option`1::TryGetValue(System.Option/None&)" && reference.Parameters[0].ParameterType.FullName == "System.Option/None&")
+                return new("RuntimeTryVoidNone", [VoidOption + "&", None + "&"], "Int32", 1);
+        }
         throw new InvalidDataException("Unsupported runtime binding: " + reference.FullName + " definition=" + key);
     }
     static Call Construct(MethodReference reference, MethodDefinition definition)
@@ -259,17 +284,23 @@ static class UnionImport
             return new("RuntimeOptionSome", [Some], Option);
         if (owner == Option && key == "System.Void System.Option`1::.ctor(System.Option/None)" && parameters.SequenceEqual(new[] { "System.Option/None" }))
             return new("RuntimeOptionNone", [None], Option);
+        if (owner == VoidSome && key == "System.Void System.Option/Some`1::.ctor(T)" && parameters.SequenceEqual(new[] { "!0" }))
+            return new("RuntimeNewVoidSome", ["Void"], VoidSome);
+        if (owner == VoidOption && key == "System.Void System.Option`1::.ctor(System.Option/Some`1<T>)" && parameters.SequenceEqual(new[] { "System.Option/Some`1<!0>" }))
+            return new("RuntimeVoidOptionSome", [VoidSome], VoidOption);
+        if (owner == VoidOption && key == "System.Void System.Option`1::.ctor(System.Option/None)" && parameters.SequenceEqual(new[] { "System.Option/None" }))
+            return new("RuntimeVoidOptionNone", [None], VoidOption);
         throw new InvalidDataException("Unsupported constructor: " + reference.FullName + " definition=" + key);
     }
     static string Default(string type) => type switch {
-        "Int32" => "ldc.i4 0", Some => $"ldc.i4 0\nnewobj {Some}", None => $"newobj {None}", Ok => $"ldc.i4 0\nnewobj {Ok}",
+        "Int32" => "ldc.i4 0", VoidSome => $"ldvoid\nnewobj {VoidSome}", Some => $"ldc.i4 0\nnewobj {Some}", None => $"newobj {None}", Ok => $"ldc.i4 0\nnewobj {Ok}",
         Error => $"newobj System.OverflowError\nnewobj {Error}",
         _ => throw new InvalidDataException("Unsupported default.")
     };
     static string Adapters()
     {
         var text = new StringBuilder();
-        foreach (var (name, type, carrier) in new[] { ("Ok", Ok, Carrier), ("Error", Error, Carrier), ("Some", Some, Option), ("None", None, Option) })
+        foreach (var (name, type, carrier) in new[] { ("Ok", Ok, Carrier), ("Error", Error, Carrier), ("Some", Some, Option), ("None", None, Option), ("VoidSome", VoidSome, VoidOption), ("VoidNone", None, VoidOption) })
         {
             text.AppendLine($".function RuntimeTry{name}({carrier}& source,out {type}& destination) -> Int32");
             text.AppendLine($"ldarg destination\n{Default(type)}\nstobj {type}");
@@ -283,6 +314,9 @@ static class UnionImport
         text.AppendLine($".function RuntimeNewNone() -> {None}\nnewobj instance {None}::.ctor()\nret\n.end");
         foreach (var (name, type) in new[] { ("Some", Some), ("None", None) })
             text.AppendLine($".function RuntimeOption{name}({type} value) -> {Option}\nldarg value\nnewobj instance {Option}::.ctor({type})\nret\n.end");
+        text.AppendLine($".function RuntimeNewVoidSome(Void value) -> {VoidSome}\nldarg value\nnewobj instance {VoidSome}::.ctor(Void)\nret\n.end");
+        foreach (var (name, type) in new[] { ("Some", VoidSome), ("None", None) })
+            text.AppendLine($".function RuntimeVoidOption{name}({type} value) -> {VoidOption}\nldarg value\nnewobj instance {VoidOption}::.ctor({type})\nret\n.end");
         foreach (var type in new[] { "Int32", "String" })
             text.AppendLine($".function RuntimeWrite{type}({type} value) -> noresult\nldarg value\ncall System.Console::WriteLine({type})\npop\nret\n.end");
         return text.ToString();

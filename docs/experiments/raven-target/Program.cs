@@ -221,6 +221,22 @@ var optionImage = Compile("CoreOption", File.ReadAllText(Path.Combine(AppContext
 var optionClosureErrors = ClosureAudit.Inspect(Path.Combine(output, "CoreOption.dll"), unionCore);
 if (optionClosureErrors.Length != 0) throw new Exception(string.Join("\n", optionClosureErrors));
 UnionImport.Write(Path.Combine(output, "CoreOption.dll"), unionCore, Path.Combine(output, "CoreOption.neoil"));
+var voidImage = Compile("CoreVoid", File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "samples", "library-void.rvn")),
+    [MetadataReference.CreateFromFile(unionCore)], AssemblyName.GetAssemblyName(unionCore), true, CoreDeclarations.Identity, voidCore: unionCore);
+using (var voidAssembly = AssemblyDefinition.ReadAssembly(Path.Combine(output, "CoreVoid.dll")))
+{
+    var marker = voidAssembly.MainModule.GetTypes().SelectMany(t => t.Methods).Single(m => m.Name == "Marker");
+    var argument = ((GenericInstanceType)marker.ReturnType).GenericArguments.Single();
+    if (argument.FullName != "System.Void" || !argument.IsValueType
+        || argument.Scope.Name != CoreDeclarations.Identity)
+        throw new Exception($"Generic Void must be an explicit target value-type reference: {argument.MetadataType}, {argument.IsValueType}, {argument.Scope}.");
+    if (voidAssembly.EntryPoint.ReturnType.MetadataType != MetadataType.Void)
+        throw new Exception("Ordinary no-result return signature changed.");
+}
+var voidClosureErrors = ClosureAudit.Inspect(Path.Combine(output, "CoreVoid.dll"), unionCore);
+if (voidClosureErrors.Length != 0) throw new Exception(string.Join("\n", voidClosureErrors));
+UnionImport.Write(Path.Combine(output, "CoreVoid.dll"), unionCore, Path.Combine(output, "CoreVoid.neoil"));
+var voidImportRejections = VoidChecks.Run(Path.Combine(output, "CoreVoid.dll"), Path.Combine(output, "CoreVoid.raw.dll"), unionCore, output);
 var optionImportRejections = OptionImportChecks.Run(Path.Combine(output, "CoreOption.dll"), unionCore, output);
 var resultImportRejections = ResultImportChecks.Run(Path.Combine(output, "CoreUnion.dll"), unionCore, output);
 var report = new
@@ -241,6 +257,8 @@ var report = new
     Scope = "emission plus bounded static and Result imports; execute generated neoIL separately against neoCLR System",
     UnionProbe = new { Scope = "metadata binding, emission and bounded Result import; execute generated neoIL separately",
         BindingPassed = true, InvalidArgumentDiagnostics = badUnionDiagnostics, DeclarationClosureErrors = unionErrors, Emission = unionImage, ApplicationClosureErrors = unionClosureErrors },
+    VoidImportRejections = voidImportRejections,
+    VoidProbe = new { Emission = voidImage, ApplicationClosureErrors = voidClosureErrors },
     OptionImportRejections = optionImportRejections,
     OptionProbe = new { Emission = optionImage, ApplicationClosureErrors = optionClosureErrors },
     ResultImportRejections = resultImportRejections,
@@ -266,7 +284,7 @@ var report = new
 File.WriteAllText(Path.Combine(output, "report.json"), JsonSerializer.Serialize(report, new JsonSerializerOptions { WriteIndented = true }));
 Console.WriteLine($"PASS: control, target Console binding, core retargeting, missing-member diagnostic and metadata closure checks. Legacy missing-library isolation passed: {missingLibraryErrors.Length != 0}. Explicit-only isolation passed: True. Report: {output}/report.json");
 
-ImageReport Compile(string name, string text, MetadataReference[] references, AssemblyName? targetIdentity, bool isolated = false, string coreName = "System.Runtime")
+ImageReport Compile(string name, string text, MetadataReference[] references, AssemblyName? targetIdentity, bool isolated = false, string coreName = "System.Runtime", string? voidCore = null)
 {
     var compilation = Compilation.Create(name, [SyntaxTree.ParseText(text)], references,
         new CompilationOptions(OutputKind.ConsoleApplication,
@@ -277,8 +295,13 @@ ImageReport Compile(string name, string text, MetadataReference[] references, As
     var result = targetIdentity is null ? compilation.Emit(image) : compilation.Emit(image, null, new EmitOptions(targetIdentity));
     if (!result.Success) throw new Exception(string.Join("\n", result.Diagnostics));
     File.WriteAllBytes(Path.Combine(output, name + ".dll"), image.ToArray());
-    image.Position = 0;
-    using var assembly = AssemblyDefinition.ReadAssembly(image);
+    if (voidCore is not null)
+    {
+        var rawPath = Path.Combine(output, name + ".raw.dll");
+        File.WriteAllBytes(rawPath, image.ToArray());
+        VoidProjection.Write(rawPath, voidCore, Path.Combine(output, name + ".dll"));
+    }
+    using var assembly = AssemblyDefinition.ReadAssembly(Path.Combine(output, name + ".dll"));
     var declaredReferences = assembly.MainModule.AssemblyReferences.Select(r => r.FullName).ToArray();
     var methods = assembly.MainModule.GetTypes().SelectMany(t => t.Methods).Select(m => new MethodReport(
         m.FullName, m.HasBody ? m.Body.Instructions.Select(Describe).ToArray() : [],
