@@ -6,6 +6,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-09-13
+
+- Shared Raven bridge signature substitution and checking across file and collection
+  calls, including constructors. Nested type arguments now use one recursive path;
+  catalogs retain explicit API admission and Void stays distinct from no-result
+  returns. Added 18 focused signature checks and verified existing execution paths.
+  This is groundwork for broader runtime API projection, not additional API coverage;
+  no Raven compiler or installed package changes.
+
 ### 2026-09-12
 
 - Expanded the Raven POC plan to cover all existing public runtime APIs while

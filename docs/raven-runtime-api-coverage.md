@@ -45,7 +45,8 @@ assembly metadata reader or verifier.
 | Type, RuntimeTypeHandle, Reflection and BindingFlags | Existing runtime introspection library | Raven metadata/type-handle projection, descriptor hierarchy, flags and all existing public introspection members |
 | Runtime service functions | Bundled implementation calls run behind admitted APIs | Review public-versus-implementation status and verify each application-facing service path |
 
-First consolidate the bridge's type/signature mapping and metadata catalog so broader
+The [shared signature mechanics](raven-signature-projection.md) now cover file and
+collection catalogs. Continue consolidating the bridge's type mapping and metadata catalog so broader
 APIs do not require another independent whitelist for each closed Result. Then cover
 primitive/string/Console/Math families, date/time and environment/path families,
 collections/delegates/interfaces, and reflection. Continue exposing useful examples

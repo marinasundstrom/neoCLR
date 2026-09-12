@@ -17,45 +17,24 @@ static class FileBindings
     static IEnumerable<string> Cases(string error) => CommonCases.Concat(error == ReadError ? ["ReadFailed", "InvalidUtf8"] : new[] { "WriteFailed" });
     public static bool IsType(string type) => type is Read or Write or StringOk or ReadError or WriteError
         || Errors.Any(e => type == $"System.Result.Error<{e}>");
-    static bool IsCore(IMetadataScope scope) => scope.Name == CoreDeclarations.Identity || scope is ModuleDefinition module && module.Assembly.Name.Name == CoreDeclarations.Identity;
     public static string? Type(TypeReference type)
     {
-        if (!type.IsValueType || !IsCore(type.Scope)) return null;
+        if (!type.IsValueType || !RuntimeSignatures.IsCore(type.Scope)) return null;
         if (type.FullName is ReadError or WriteError) return type.FullName;
         if (type is not GenericInstanceType g) return null;
         string? Argument(TypeReference t) => t.MetadataType == MetadataType.String ? "String"
-            : t.FullName == "System.Void" && t.IsValueType && IsCore(t.Scope) ? "Void"
-            : t.FullName is ReadError or WriteError && t.IsValueType && IsCore(t.Scope) ? t.FullName : null;
+            : t.FullName == "System.Void" && t.IsValueType && RuntimeSignatures.IsCore(t.Scope) ? "Void"
+            : t.FullName is ReadError or WriteError && t.IsValueType && RuntimeSignatures.IsCore(t.Scope) ? t.FullName : null;
         var args = g.GenericArguments.Select(Argument).ToArray();
         var name = g.ElementType.FullName.Split('`')[0].Replace('/', '.') + "<" + string.Join(',', args) + ">";
         return args.All(a => a is not null) && IsType(name) ? name : null;
     }
     public sealed record Binding(string Name, string[] Arguments, string Result, int OutArgument = -1, string? Instruction = null);
-    static string Closed(TypeReference t, TypeReference owner, bool returns = false)
-    {
-        if (t is ByReferenceType b) return Closed(b.ElementType, owner) + "&";
-        if (t is GenericParameter p && p.Type == GenericParameterType.Type && owner is GenericInstanceType g)
-            return Closed(g.GenericArguments[p.Position], owner);
-        if (t is GenericInstanceType nested)
-        {
-            var copy = new GenericInstanceType(nested.ElementType);
-            foreach (var arg in nested.GenericArguments)
-                copy.GenericArguments.Add(arg is GenericParameter p2 && owner is GenericInstanceType g2 ? g2.GenericArguments[p2.Position] : arg);
-            return Type(copy) ?? (copy.FullName == "System.Result/Ok`1<System.Void>" ? VoidOk : throw new InvalidDataException("Unsupported file generic signature: " + copy.FullName));
-        }
-        return t.MetadataType switch { MetadataType.Boolean => "Boolean", MetadataType.Int32 => "Int32", MetadataType.String => "String",
-            MetadataType.Void when returns => "noresult", _ => t.FullName == "System.Void" && t.IsValueType ? "Void"
-            : Type(t) ?? throw new InvalidDataException("Unsupported file signature: " + t.FullName) };
-    }
     static (string[] Args, string Result) Signature(MethodReference reference, MethodDefinition definition)
-    {
-        var args = reference.Parameters.Select(p => Closed(p.ParameterType, reference.DeclaringType)).ToArray();
-        var result = Closed(reference.ReturnType, reference.DeclaringType, true);
-        if (definition.HasGenericParameters || !args.SequenceEqual(definition.Parameters.Select(p => Closed(p.ParameterType, reference.DeclaringType)))
-            || result != Closed(definition.ReturnType, reference.DeclaringType, true))
-            throw new InvalidDataException("File reference/definition signature mismatch.");
-        return (args, result);
-    }
+        => RuntimeSignatures.Match(reference, definition, type => Type(type)
+            ?? (type.FullName == "System.Result/Ok`1<System.Void>" && type.IsValueType && RuntimeSignatures.IsCore(type.Scope)
+                && type is GenericInstanceType g && g.GenericArguments[0].IsValueType
+                && RuntimeSignatures.IsCore(g.GenericArguments[0].Scope) ? VoidOk : null));
     public static Binding? Bind(MethodReference reference, MethodDefinition definition)
     {
         var owner = Type(reference.DeclaringType);

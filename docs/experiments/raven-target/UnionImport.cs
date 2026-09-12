@@ -162,16 +162,13 @@ static class UnionImport
                         if (constructorDefinition.Module != library.MainModule) throw new InvalidDataException("Only admitted library constructors supported.");
                         if (collectionProfile && CollectionBindings.Type(constructor.DeclaringType) == CollectionBindings.ArrayList)
                         {
-                            if (!constructorDefinition.IsConstructor || !constructorDefinition.IsPublic || !constructor.HasThis
-                                || constructor.ExplicitThis || constructor.HasGenericParameters || constructorDefinition.HasGenericParameters
-                                || constructor.ReturnType.MetadataType != MetadataType.Void
-                                || constructor.CallingConvention != MethodCallingConvention.Default
-                                || constructor.Parameters.Count > 1 || constructor.Parameters.Any(p => p.ParameterType.MetadataType != MetadataType.Int32)
-                                || !constructor.Parameters.Select(p => p.ParameterType.FullName).SequenceEqual(constructorDefinition.Parameters.Select(p => p.ParameterType.FullName)))
+                            var signature = RuntimeSignatures.Match(constructor, constructorDefinition, CollectionBindings.Type);
+                            if (!constructorDefinition.IsConstructor || !constructor.HasThis || signature.Result != "noresult"
+                                || signature.Args.Length > 1 || signature.Args.Any(p => p != "Int32"))
                                 throw new InvalidDataException("Unsupported collection constructor.");
-                            if (constructor.Parameters.Count == 1) Expect("Int32");
+                            if (signature.Args.Length == 1) Expect("Int32");
                             Push(new(CollectionBindings.ArrayList));
-                            code.AppendLine($"newobj instance {CollectionBindings.ArrayList}::.ctor({(constructor.Parameters.Count == 1 ? "Int32" : "")})");
+                            code.AppendLine($"newobj instance {CollectionBindings.ArrayList}::.ctor({string.Join(',', signature.Args)})");
                             break;
                         }
                         var construction = Construct(constructor, constructorDefinition);

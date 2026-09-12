@@ -17,10 +17,10 @@ static class CollectionBindings
     public static string? Type(TypeReference type)
     {
         if (type.IsValueType) return null;
-        if (type.FullName == Disposable && type.Scope.Name == CoreDeclarations.Identity) return Disposable;
+        if (type.FullName == Disposable && RuntimeSignatures.IsCore(type.Scope)) return Disposable;
         if (type is not GenericInstanceType g || g.GenericArguments.Count != 1
             || g.GenericArguments[0].MetadataType != MetadataType.Int32
-            || g.ElementType.Scope.Name != CoreDeclarations.Identity) return null;
+            || !RuntimeSignatures.IsCore(g.ElementType.Scope)) return null;
         return g.ElementType.FullName switch {
             "System.Collections.List`1" => List, "System.Collections.ArrayList`1" => ArrayList,
             "System.Collections.Iterable`1" => Iterable, "System.Collections.Iterator`1" => Iterator,
@@ -52,25 +52,7 @@ static class CollectionBindings
     {
         var owner = Type(reference.DeclaringType);
         if (owner is null) return null;
-        if (!definition.IsPublic || reference.ExplicitThis || reference is GenericInstanceMethod
-            || reference.HasGenericParameters || reference.CallingConvention != MethodCallingConvention.Default
-            || reference.HasThis != definition.HasThis || definition.HasGenericParameters)
-            throw new InvalidDataException("Unsupported collection signature.");
-        // Resolve both definition and reference under the same closed owner arguments.
-        string Closed(TypeReference t) => t switch {
-            GenericParameter { Type: GenericParameterType.Type, Position: 0 } when reference.DeclaringType is GenericInstanceType => "Int32",
-            _ when t.MetadataType == MetadataType.Void => "noresult",
-            _ when t.MetadataType == MetadataType.Int32 => "Int32",
-            _ when t.MetadataType == MetadataType.Boolean => "Boolean",
-            GenericInstanceType g when g.GenericArguments.Count == 1 && g.GenericArguments[0] is GenericParameter { Type: GenericParameterType.Type, Position: 0 } =>
-                g.ElementType.FullName switch { "System.Collections.Iterator`1" => Iterator, "System.Collections.ArrayList`1" => ArrayList,
-                    _ => throw new InvalidDataException("Unsupported collection generic signature.") },
-            _ => Type(t) ?? throw new InvalidDataException("Unsupported collection signature type.")
-        };
-        var parameters = reference.Parameters.Select(p => Closed(p.ParameterType)).ToArray();
-        var result = Closed(reference.ReturnType);
-        if (!parameters.SequenceEqual(definition.Parameters.Select(p => Closed(p.ParameterType))) || result != Closed(definition.ReturnType))
-            throw new InvalidDataException("Collection reference/definition signature mismatch.");
+        var (parameters, result) = RuntimeSignatures.Match(reference, definition, Type);
         var expected = (owner, definition.Name) switch {
             (List or ArrayList, "Add") => ("Int32", "noresult", true),
             (ArrayList, "get_Capacity") => ("", "Int32", true),

@@ -567,3 +567,6 @@ Result propagation and conditional-output validation.
 See the [existing API coverage plan](../../raven-runtime-api-coverage.md) for the
 full POC scope and the [experimental release procedure](RELEASING.md) for separate
 Raven SDK/VSIX packaging without a full Raven product release cycle.
+
+[Shared signature projection](../../raven-signature-projection.md) documents the
+file/collection signature checker and its `--signatures` regression probe.
