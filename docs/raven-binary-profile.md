@@ -144,3 +144,11 @@ and executable admission remain open. No new external metadata or instructions a
 The author clarified the next priority: align runtime value/reference type semantics and
 use a small Raven program as the end-to-end milestone. Further parsing work should serve
 [that scenario](raven-target-experiment.md#next-milestone-useful-raven-subset).
+
+## Executable static bridge (2026-09-12)
+
+A neoCLR-owned Cecil bridge now imports the four Raven static programs and binds Console
+to the actual System implementation. All four verify/run on neoCLR. See the
+[workflow and admission limits](experiments/raven-target/README.md#first-runtime-library-execution-milestone).
+This supplies the first library-consumption evidence while native metadata reading remains
+incomplete; it does not claim general PE execution or full validation of unreachable helpers.

@@ -1,0 +1,14 @@
+.module ImportedCoreInt32
+.entry Method_06000006
+.function Method_06000006() -> noresult
+.local Int32 local0
+ldc.i4 0
+stloc local0
+call Method_06000005()
+stloc local0
+ret
+.end
+.function Method_06000005() -> Int32
+ldc.i4 42
+ret
+.end

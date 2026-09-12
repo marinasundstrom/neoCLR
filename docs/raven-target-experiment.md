@@ -217,3 +217,35 @@ have matching stack behavior. Standard constructor/field operand decoding is ava
 The remaining immediate gaps are Object/base-constructor handling and reference defaults,
 then metadata/core binding for the Raven program. Legacy value/byref field stores and
 System no-result APIs still need alignment; the compiler must not compensate silently.
+
+## First executable library integration (2026-09-12)
+
+Raven's four static core-only programs now compile, pass a bounded neoCLR-owned import
+bridge and execute on neoCLR. The HelloWorld program calls the real System.Console;
+empty/nested calls and Int32 returns/locals also verify and run. See the
+[reproduction workflow](experiments/raven-target/README.md#first-runtime-library-execution-milestone).
+This completes the first narrow library-consumption milestone, not the class program or
+native PE loading. No Raven source changes were needed.
+
+Next library stages should expand the real reference/implementation surface around a small
+Raven program, using type-semantics work where needed. Avoid treating parsing or synthetic
+fixtures as the end goal. Retain explicit dependencies, familiar metadata/instructions and
+clear boundaries for intentional Void and Result-based library differences.
+
+## VS Code development experience
+
+Author directive and clarification, recorded 2026-09-12: the MVP is **code completion in
+Raven files/projects targeting neoCLR**, using the actual neoCLR reference/API surface.
+A full debugger experience is not required. Runtime-library and compiler-target support
+comes first so editor completion describes code that can really compile and run.
+
+The immediate editor acceptance test is opening a Raven project configured for neoCLR
+and receiving completion for the supported System APIs without host .NET API leakage.
+Determine how Raven's existing language server/project loading consumes the explicit core
+and reference settings; reuse that support wherever possible. Project configuration,
+reference discovery and completion must select the same target as command-line compilation.
+
+Build/run tasks and diagnostics can support this workflow. Source-mapped debugging is
+optional later work, not an MVP dependency. These editor capabilities are planned, not
+implemented by the import-bridge slice. The author corrected the assistant's earlier
+build/run-first staging to make completion the minimum editor outcome.

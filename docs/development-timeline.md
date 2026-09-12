@@ -1257,9 +1257,26 @@ import a bounded emitted program, and execute its Console call against the real 
 System implementation. Proposed a neoCLR-owned experiment bridge, with no further Raven
 changes, while the native reader's metadata binding remains incomplete.
 
-**Action so far:** Completed nominal class reference defaults. Bridge implementation and
-actual runtime-library execution are the subsequent work; this entry does not claim them
-completed.
+**Action so far:** Completed nominal class reference defaults. The subsequent bridge now imports the four static Raven programs and all four verify/run
+on neoCLR, with HelloWorld using the real System.Console. The [workflow and recorded
+results](experiments/raven-target/README.md#first-runtime-library-execution-milestone)
+distinguish this tooling path from direct native PE loading.
+
+## 39. VS Code as a target development environment — recorded 2026-09-12
+
+**Author directive:** Have the development experience for targeting neoCLR in VS Code.
+
+**Assistant response:** Proposed staged editing/build/run support for Raven targeting
+neoCLR, then diagnostics and source-mapped debugging. Kept host .NET debugging distinct
+from integration with neoCLR's own execution/debugger.
+
+**Author correction:** Full debugging is not the MVP. The minimum is code completion in
+Raven files/projects targeting neoCLR; focus on target support first.
+
+**Assistant response/action:** Corrected the [experiment plan](raven-target-experiment.md#vs-code-development-experience)
+to require completion against the actual target library, with compiler/project and language
+server settings agreeing. Debugging is optional later work. The command-line Raven/library
+path works; target-aware completion remains planned.
 
 ## Maintaining the conversation record
 

@@ -1,0 +1,22 @@
+{
+  "CoreOnly": {
+    "stdout": "Hello from Raven on neoCLR\n=> Void\n",
+    "stderr": "",
+    "verified": true
+  },
+  "CoreEmpty": {
+    "stdout": "=> Void\n",
+    "stderr": "",
+    "verified": true
+  },
+  "CoreNested": {
+    "stdout": "=> Void\n",
+    "stderr": "",
+    "verified": true
+  },
+  "CoreInt32": {
+    "stdout": "=> Void\n",
+    "stderr": "",
+    "verified": true
+  }
+}

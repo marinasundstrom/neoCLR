@@ -1,0 +1,13 @@
+.module ImportedCoreOnly
+.entry Method_06000005
+.function Method_06000005() -> noresult
+ldstr "Hello from Raven on neoCLR"
+call RuntimeConsoleWriteLine(String)
+ret
+.end
+.function RuntimeConsoleWriteLine(String) -> noresult
+ldarg 0
+call System.Console::WriteLine(String)
+pop
+ret
+.end

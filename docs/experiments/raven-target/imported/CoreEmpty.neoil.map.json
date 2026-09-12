@@ -1,0 +1,27 @@
+{
+  "Profile": "straight-line-static-v1",
+  "ApplicationSha256": "8695584D685C8EF7D41B4F58D53EC752711A279FF0302C2D17FC671AF0324EF1",
+  "CoreSha256": "DC5073ACB1936DEEB99140EA15B61FDC34383F068A96CD1F22C189C4D8A560E8",
+  "ReachableMethods": [
+    100663301
+  ],
+  "ConsoleBinding": false,
+  "Mappings": [
+    {
+      "MethodToken": 100663301,
+      "Offset": 0,
+      "OutputLine": 4
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 1,
+      "OutputLine": 4
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 2,
+      "OutputLine": 4
+    }
+  ],
+  "Scope": "Explicit metadata closure audited; reachable bodies checked; unreachable helper IL not admitted for execution."
+}

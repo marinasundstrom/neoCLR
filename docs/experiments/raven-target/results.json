@@ -54,7 +54,12 @@
       "Consumer: unresolved type Probe.Root [Closed, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]"
     ]
   },
-  "Scope": "emission-only; fixture is not neoCLR System and generated code was not executed",
+  "Scope": "emission plus bounded static import; execute generated neoIL separately against neoCLR System",
+  "StaticImportRejections": {
+    "ImportUnderflow": "Input stack underflow.",
+    "ImportBadReturn": "Input ret stack must be empty after its declared result.",
+    "ImportUnsupported": "Unsupported reachable instruction System.Void NamespaceMembers::Main() IL_0000: ldnull"
+  },
   "CoreDeclarationTypes": [
     ".\u003CModule\u003E",
     "System.Array",

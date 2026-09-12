@@ -6,7 +6,7 @@ using Raven.CodeAnalysis;
 using Raven.CodeAnalysis.Syntax;
 using AssemblyDefinition = Mono.Cecil.AssemblyDefinition;
 
-// Declaration-only fixture. Never execute these generated assemblies.
+// Core declaration bodies never execute. Application IL is imported separately for neoCLR.
 var output = Path.GetFullPath(args.Length == 1 ? args[0] : throw new ArgumentException("Supply a new output directory."));
 if (Directory.Exists(output)) throw new IOException("Output directory must not exist.");
 Directory.CreateDirectory(output);
@@ -47,6 +47,33 @@ foreach (var (name, program) in new[] {
     coreOnlyCases[name] = Compile(name, program, [MetadataReference.CreateFromFile(corePath)], AssemblyName.GetAssemblyName(corePath), true, CoreDeclarations.Identity);
     var closure = ClosureAudit.Inspect(Path.Combine(output, name + ".dll"), corePath);
     if (closure.Length != 0) throw new Exception(string.Join("\n", closure));
+}
+foreach (var name in new[] { "CoreOnly", "CoreEmpty", "CoreNested", "CoreInt32" })
+    StaticImport.Write(Path.Combine(output, name + ".dll"), corePath, Path.Combine(output, name + ".neoil"));
+var staticImportRejections = new Dictionary<string, string>();
+foreach (var (name, opcode, diagnostic) in new[] {
+    ("ImportUnderflow", OpCodes.Pop, "underflow"),
+    ("ImportBadReturn", OpCodes.Ldc_I4_1, "ret stack"),
+    ("ImportUnsupported", OpCodes.Ldnull, "Unsupported reachable") })
+{
+    var path = Path.Combine(output, name + ".dll");
+    var original = Path.Combine(output, "CoreEmpty.dll");
+    var bytes = File.ReadAllBytes(original);
+    using (var image = AssemblyDefinition.ReadAssembly(original))
+    using (var pe = new System.Reflection.PortableExecutable.PEReader(new MemoryStream(bytes)))
+    {
+        var rva = image.EntryPoint.RVA;
+        var section = pe.PEHeaders.SectionHeaders.Single(s => rva >= s.VirtualAddress && rva < s.VirtualAddress + s.VirtualSize);
+        var body = section.PointerToRawData + rva - section.VirtualAddress;
+        var header = (bytes[body] & 3) == 2 ? 1 : (BitConverter.ToUInt16(bytes, body) >> 12) * 4;
+        if (bytes[body + header] != 0 || opcode.Size != 1) throw new Exception("Expected leading nop and one-byte mutation.");
+        bytes[body + header] = (byte)opcode.Value;
+    }
+    File.WriteAllBytes(path, bytes);
+    try { StaticImport.Write(path, corePath, Path.Combine(output, name + ".neoil")); }
+    catch (InvalidDataException error) when (error.Message.Contains(diagnostic))
+    { staticImportRejections[name] = error.Message; continue; }
+    throw new Exception("Static importer did not reject " + name);
 }
 var coreMissingConsoleErrors = CheckCoreRejection("CoreMissingConsole", false, true);
 var coreWrongSignatureErrors = CheckCoreRejection("CoreWrongSignature", true, false);
@@ -153,7 +180,8 @@ var report = new
         ConsumerErrors = consumerErrors,
         MissingDependencyErrors = missingDependencyErrors
     },
-    Scope = "emission-only; fixture is not neoCLR System and generated code was not executed",
+    Scope = "emission plus bounded static import; execute generated neoIL separately against neoCLR System",
+    StaticImportRejections = staticImportRejections,
     CoreDeclarationTypes = coreTypes,
     CoreOnly = coreOnly,
     CoreOnlyCases = coreOnlyCases,

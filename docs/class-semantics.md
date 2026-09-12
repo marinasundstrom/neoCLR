@@ -43,9 +43,9 @@ about copying, construction, dispatch and library contracts.
 The current class subset is non-generic record-shaped objects with fields, direct instance
 methods and constructors. Inheritance, abstract classes, virtual dispatch and interface
 implementation remain unsupported for marked classes. Existing legacy value-model
-functionality in those areas remains available. Class defaults and null are not implemented:
-standalone `initobj` still rejects class creation. Constructor allocation initializes fields
-using supported managed defaults; fields requiring null references remain unsupported.
+functionality in those areas remains available. Class defaults now produce typed null references, and `initobj` resets a class slot.
+Constructor allocation initializes fields using supported managed defaults, including
+nominal class-reference fields. General `ldnull` projection remains separate work.
 Native inline layout and host value-record imports reject marked classes. `notreference`
 rejects nominal classes as well as explicit reference signatures.
 

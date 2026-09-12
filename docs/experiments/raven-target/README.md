@@ -1,9 +1,10 @@
 # Raven target emission probe
 
 This is slice 2 of the [Raven target experiment](../../raven-target-experiment.md).
-It tests the existing compiler API and inventories emitted PE metadata. Slice 3 adds
-a dependency-closure audit that resolves only explicitly supplied assemblies. It does **not**
-execute the output, implement a neoCLR target, or provide neoCLR's runtime library.
+It tests the existing compiler API and inventories emitted PE metadata. The current
+follow-up imports a bounded static subset and executes it against neoCLR's real System
+library through the separate runtime verification command below. Earlier slice notes
+retain their historical limits. This is not general Raven or direct PE execution.
 
 ## Reproduce
 
@@ -129,3 +130,71 @@ reference. The old Console fixture still has a real mscorlib dependency and stil
 
 The complete updated probe passed, including the four core-only emissions and expected
 negative diagnostics. Raven remains unchanged on `codex/neoclr-target-resolution`.
+
+## First runtime-library execution milestone
+
+Validated 2026-09-12 with the same Raven commit and SDK above, starting from neoCLR
+`f49a8c9`. No Raven changes were needed. `StaticImport` now reads the four core-only
+application DLLs using Cecil and writes corresponding `.neoil` files. The compiler binds
+against the supplied declaration assembly; the imported Console call runs against the
+actual neoCLR System.Console implementation. The core fixture's empty method never runs.
+
+After building Raven as described above, run the probe from this directory with a new
+output directory. A warm build can use `-p:BuildProjectReferences=false` to reuse the
+already-built compiler:
+
+```sh
+dotnet run --project Probe.csproj -p:RavenRoot=/absolute/path/to/Raven -p:BuildProjectReferences=false -p:WarningLevel=0 -- /tmp/raven-neoclr-execution
+```
+
+Then, from the neoCLR repository root:
+
+```sh
+cargo build --locked
+python3 docs/experiments/raven-target/verify_runtime.py target/debug/neoclr /tmp/raven-neoclr-execution
+```
+
+The script requires the completed probe report, verifies every imported module, runs each
+on neoCLR and asserts the output. `CoreOnly` prints `Hello from Raven on neoCLR`; empty,
+nested-call and Int32/local programs also succeed. The CLI additionally prints `=> Void`
+as its host result envelope. [runtime-results.json](runtime-results.json) records the run.
+The [imported fixtures](imported/CoreOnly.neoil) are regression evidence, not a substitute
+for rerunning Raven emission. Their maps record original method tokens, byte offsets,
+output lines and SHA-256 hashes of application/core inputs.
+
+### Import contract and remaining gaps
+
+The bridge belongs to neoCLR experiment tooling. It is not a Raven backend rewrite and
+is not the Rust runtime's PE reader. It reuses the standard metadata/CIL contract described
+in the [binary profile](../../raven-binary-profile.md) and the existing explicit closure
+audit. Only reachable ordinary static methods with Void/Int32/String signatures are
+admitted, using straight-line instructions: constants, arguments, Int32 locals, dup/pop,
+static calls and returns. Declared maxstack, argument/result types, initialization and
+return stacks are checked before output. Local default initialization is preserved.
+Branches, instance methods, generic signatures, initializers, exception regions, native
+methods and unknown external bindings are rejected in this profile. Inputs are bounded
+to 16 MiB, reachable methods to 128, bodies to 64 KiB and local counts to 256.
+
+All supplied metadata dependencies are audited before selecting reachable bodies.
+Unreachable Raven Unit/attribute/constructor helpers are retained in the source image
+and closure audit but are not imported for execution. This is an explicit reachable-code
+policy, not full validation of helper IL or hostile PE metadata. Cecil remains a trusted
+compiler-artifact tool here, not a hardened production admission boundary.
+
+Console binding is deliberately narrow: the supplied core's exact resolved
+`System.Console.WriteLine(String) -> void` maps to the actual runtime function. A neoCLR
+wrapper discards that existing System method's inhabited Void result, while imported
+ordinary void calls preserve their empty-stack semantics. Migrating System's signatures
+can remove the wrapper later. No core declaration body is used as a runtime implementation.
+
+The alternative was waiting for the full native metadata reader or adding a Raven writer.
+This bridge gives immediate library-integration evidence with no Raven changes, at the
+cost of a temporary .NET/Cecil tool and duplicated import logic. It is not a performance
+claim or the final deployment pipeline. Direct binary loading, broader library reference
+coverage and class-program execution remain subsequent stages.
+
+The probe also patches the original PE instruction bytes (without rewriting metadata)
+to reject underflow, surplus return values and unsupported `ldnull`. Their diagnostics
+are recorded in `report.json`. Rewriting these negatives with Cecil initially introduced
+a synthetic mscorlib reference; byte-only mutation avoids changing the test's metadata
+question. No dependency was removed to force acceptance.

@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-12
 
+- Ran Raven-emitted static programs on neoCLR against the real System.Console through
+  a bounded neoCLR-owned Cecil import bridge, with no Raven changes. Added verified
+  empty/nested-call and Int32/local cases, invalid-input rejection checks, provenance
+  maps and a reproducible runtime verification script. Direct PE loading and broader
+  library/class-program support remain unfinished. Recorded staged VS Code development
+  support as planned work, with target-aware Raven code completion as the editor MVP.
+
 - Began nominal class reference semantics: `.type class` uses managed heap handles in
   ordinary class-typed storage, while managed byrefs still address slots. Assignment,
   static calls, fields, return values and GC preserve object identity; existing value

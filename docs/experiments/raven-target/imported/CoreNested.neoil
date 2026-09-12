@@ -1,0 +1,9 @@
+.module ImportedCoreNested
+.entry Method_06000006
+.function Method_06000006() -> noresult
+call Method_06000005()
+ret
+.end
+.function Method_06000005() -> noresult
+ret
+.end

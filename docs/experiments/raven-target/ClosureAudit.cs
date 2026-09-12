@@ -44,7 +44,7 @@ static class ClosureAudit
         return errors.ToArray();
     }
 
-    sealed class SuppliedAssemblies : IAssemblyResolver
+    internal sealed class SuppliedAssemblies : IAssemblyResolver
     {
         readonly Dictionary<string, AssemblyDefinition> images = new(StringComparer.Ordinal);
         public IEnumerable<AssemblyDefinition> Images => images.Values;
