@@ -1,0 +1,154 @@
+{
+  "Profile": "straight-line-static-v1",
+  "ApplicationSha256": "01B06E008E641D66305C8C252B3DDA441B2C43D3A3566D2E3005F95571F9CA26",
+  "CoreSha256": "AD30476652951B33BB79F13BDD50A1282729F0FEE4E085B4112EC958D8CB0ED3",
+  "ReachableMethods": [
+    100663301
+  ],
+  "ConsoleBinding": true,
+  "RuntimeBindings": [
+    "System.Console::WriteLine(Int32)",
+    "System.Console::WriteLine(String)",
+    "System.Math::Max(Int32,Int32)",
+    "System.Math::Min(Int32,Int32)",
+    "System.Math::Sign(Int32)"
+  ],
+  "Mappings": [
+    {
+      "MethodToken": 100663301,
+      "Offset": 0,
+      "OutputLine": 10
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 1,
+      "OutputLine": 10
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 2,
+      "OutputLine": 10
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 4,
+      "OutputLine": 11
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 6,
+      "OutputLine": 12
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 11,
+      "OutputLine": 13
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 12,
+      "OutputLine": 14
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 13,
+      "OutputLine": 14
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 14,
+      "OutputLine": 15
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 15,
+      "OutputLine": 16
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 20,
+      "OutputLine": 17
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 21,
+      "OutputLine": 18
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 22,
+      "OutputLine": 18
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 23,
+      "OutputLine": 19
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 28,
+      "OutputLine": 20
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 29,
+      "OutputLine": 20
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 30,
+      "OutputLine": 21
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 35,
+      "OutputLine": 22
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 40,
+      "OutputLine": 23
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 41,
+      "OutputLine": 23
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 42,
+      "OutputLine": 24
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 47,
+      "OutputLine": 25
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 52,
+      "OutputLine": 26
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 53,
+      "OutputLine": 26
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 58,
+      "OutputLine": 27
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 63,
+      "OutputLine": 28
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 64,
+      "OutputLine": 28
+    }
+  ],
+  "Scope": "Explicit metadata closure audited; reachable bodies checked; unreachable helper IL not admitted for execution."
+}

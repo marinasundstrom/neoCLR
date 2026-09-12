@@ -1,0 +1,11 @@
+import System.Console.*
+import System.Math.*
+
+func Main() {
+    let lower = Min(42, 100)
+    let upper = Max(lower, 7)
+    WriteLine(upper)
+    WriteLine(Sign(upper))
+    WriteLine(Sign(0))
+    WriteLine("Library calls from Raven")
+}

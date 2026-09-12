@@ -1,0 +1,41 @@
+.module ImportedCoreLibrary
+.entry Method_06000005
+.function Method_06000005() -> noresult
+.local Int32 local0
+.local Int32 local1
+ldc.i4 0
+stloc local0
+ldc.i4 0
+stloc local1
+ldc.i4 42
+ldc.i4 100
+call System.Math::Min(Int32,Int32)
+stloc local0
+ldloc local0
+ldc.i4 7
+call System.Math::Max(Int32,Int32)
+stloc local1
+ldloc local1
+call RuntimeConsoleWriteLineInt32(Int32)
+ldloc local1
+call System.Math::Sign(Int32)
+call RuntimeConsoleWriteLineInt32(Int32)
+ldc.i4 0
+call System.Math::Sign(Int32)
+call RuntimeConsoleWriteLineInt32(Int32)
+ldstr "Library calls from Raven"
+call RuntimeConsoleWriteLineString(String)
+ret
+.end
+.function RuntimeConsoleWriteLineInt32(Int32) -> noresult
+ldarg 0
+call System.Console::WriteLine(Int32)
+pop
+ret
+.end
+.function RuntimeConsoleWriteLineString(String) -> noresult
+ldarg 0
+call System.Console::WriteLine(String)
+pop
+ret
+.end

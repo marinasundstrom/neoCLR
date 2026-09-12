@@ -25,7 +25,7 @@ static class StaticImport
         var pending = new Queue<MethodDefinition>(); pending.Enqueue(entry);
         var seen = new HashSet<uint>();
         var mappings = new List<object>();
-        var console = false;
+        var bindings = new Dictionary<string, TargetSurface.Method>();
         while (pending.TryDequeue(out var method))
         {
             if (!seen.Add(method.MetadataToken.ToUInt32())) continue;
@@ -99,9 +99,8 @@ static class StaticImport
                         if (returns != "noresult") Push(returns);
                         string name;
                         if (target.Module == app.MainModule) { pending.Enqueue(target); name = Name(target); }
-                        else if (target.Module == library.MainModule && target.DeclaringType.FullName == "System.Console"
-                            && target.Name == "WriteLine" && returns == "noresult" && args.SequenceEqual(new[] { "String" }))
-                        { console = true; name = "RuntimeConsoleWriteLine"; }
+                        else if (target.Module == library.MainModule && TargetSurface.Bind(target) is { } binding)
+                        { bindings[binding.Signature] = binding; name = binding.ImportTarget; }
                         else throw new InvalidDataException("Unsupported runtime binding: " + reference.FullName);
                         text.AppendLine($"call {name}({string.Join(',', args)})"); break;
                     case Code.Ret:
@@ -114,14 +113,18 @@ static class StaticImport
             if (!returned) throw new InvalidDataException("Method falls through.");
             text.AppendLine(".end");
         }
-        if (console)
-            text.AppendLine(".function RuntimeConsoleWriteLine(String) -> noresult\nldarg 0\ncall System.Console::WriteLine(String)\npop\nret\n.end");
+        foreach (var binding in bindings.Values.Where(b => b.Returns == "Void"))
+        {
+            text.AppendLine($".function {binding.ImportTarget}({string.Join(',', binding.Parameters)}) -> noresult");
+            for (var i = 0; i < binding.Parameters.Length; i++) text.AppendLine($"ldarg {i}");
+            text.AppendLine($"call {binding.Signature}\npop\nret\n.end");
+        }
         File.WriteAllText(destination, text.ToString());
         File.WriteAllText(destination + ".map.json", JsonSerializer.Serialize(new {
             Profile = "straight-line-static-v1",
             ApplicationSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(application))),
             CoreSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(core))),
-            ReachableMethods = seen.Order().ToArray(), ConsoleBinding = console, Mappings = mappings,
+            ReachableMethods = seen.Order().ToArray(), ConsoleBinding = bindings.Values.Any(b => b.Owner == "Console"), RuntimeBindings = bindings.Keys.Order().ToArray(), Mappings = mappings,
             Scope = "Explicit metadata closure audited; reachable bodies checked; unreachable helper IL not admitted for execution."
         }, new JsonSerializerOptions { WriteIndented = true }));
     }

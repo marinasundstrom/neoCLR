@@ -1278,6 +1278,19 @@ to require completion against the actual target library, with compiler/project a
 server settings agreeing. Debugging is optional later work. The command-line Raven/library
 path works; target-aware completion remains planned.
 
+## 40. Unions belong in the MVP — recorded 2026-09-12
+
+**Author directive:** Demonstrate union usage in the MVP as well.
+
+**Assistant proposal:** Use a Raven program consuming a real neoCLR Result/Option API,
+with pattern matching for both outcomes. Proposed Math.Abs(Int32) to show successful
+absolute value and overflow, preserving the runtime's Result-based contract.
+
+**Action/outcome:** Added this to the [MVP acceptance criteria](raven-target-experiment.md#mvp-acceptance-criteria-and-union-directive-2026-09-12).
+The current slice expands real Math/Console consumption and demonstrates completion through
+Raven's compiler API using the same target declarations. Generic union import and the
+union demonstration remain the next support work; neither is claimed complete.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

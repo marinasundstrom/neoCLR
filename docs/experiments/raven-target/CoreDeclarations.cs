@@ -10,9 +10,9 @@ static class CoreDeclarations
     public static void Write(string path, bool includeConsole = true, bool stringParameter = true)
     {
         var compilation = CSharpCompilation.Create(Identity,
-            [CSharpSyntaxTree.ParseText(includeConsole
-                ? (stringParameter ? Source : Source.Replace("WriteLine(string value)", "WriteLine(int value)"))
-                : Source.Replace("public static class Console { public static void WriteLine(string value) { } }", ""))], references: [],
+            [CSharpSyntaxTree.ParseText(Source.Replace(
+                "public static class Console { public static void WriteLine(string value) { } }",
+                TargetSurface.Declarations(includeConsole, stringParameter)))], references: [],
             options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
         using var stream = File.Create(path);
         var result = compilation.Emit(stream, options: new Microsoft.CodeAnalysis.Emit.EmitOptions(metadataOnly: true, includePrivateMembers: false));

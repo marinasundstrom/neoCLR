@@ -14,6 +14,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   maps and a reproducible runtime verification script. Direct PE loading and broader
   library/class-program support remain unfinished. Recorded staged VS Code development
   support as planned work, with target-aware Raven code completion as the editor MVP.
+  Expanded the shared declaration/binding catalog to Math.Min/Max/Sign and integer
+  Console.WriteLine, with an editable Raven sample and five verified runtime programs.
+  Raven's completion API now passes checks against those target declarations without
+  host API leakage; VS Code integration remains planned. Added a real Result/Option
+  demonstration to MVP acceptance criteria; generic union import is not yet supported.
 
 - Began nominal class reference semantics: `.type class` uses managed heap handles in
   ordinary class-typed storage, while managed byrefs still address slots. Assignment,

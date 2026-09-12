@@ -40,6 +40,7 @@ if (!coreOnlyErrors.SequenceEqual(ClosureAudit.Inspect(corePath, Path.Combine(ou
     throw new Exception("Core closure audit depends on input ordering.");
 var coreOnlyCases = new Dictionary<string, ImageReport>();
 foreach (var (name, program) in new[] {
+    ("CoreLibrary", File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "samples", "library-basics.rvn"))),
     ("CoreEmpty", "func Main() {}"),
     ("CoreNested", "func Empty() {} func Main() { Empty() }"),
     ("CoreInt32", "func Answer() -> int { return 42 } func Main() { let answer = Answer() }") })
@@ -48,7 +49,7 @@ foreach (var (name, program) in new[] {
     var closure = ClosureAudit.Inspect(Path.Combine(output, name + ".dll"), corePath);
     if (closure.Length != 0) throw new Exception(string.Join("\n", closure));
 }
-foreach (var name in new[] { "CoreOnly", "CoreEmpty", "CoreNested", "CoreInt32" })
+foreach (var name in new[] { "CoreOnly", "CoreEmpty", "CoreNested", "CoreInt32", "CoreLibrary" })
     StaticImport.Write(Path.Combine(output, name + ".dll"), corePath, Path.Combine(output, name + ".neoil"));
 var staticImportRejections = new Dictionary<string, string>();
 foreach (var (name, opcode, diagnostic) in new[] {
@@ -74,6 +75,21 @@ foreach (var (name, opcode, diagnostic) in new[] {
     catch (InvalidDataException error) when (error.Message.Contains(diagnostic))
     { staticImportRejections[name] = error.Message; continue; }
     throw new Exception("Static importer did not reject " + name);
+}
+var targetCompletions = new Dictionary<string, string[]>();
+foreach (var owner in new[] { "Math", "Console" })
+{
+    var text = $"import System\nfunc Main() {{\n    System.{owner}.\n}}";
+    var tree = SyntaxTree.ParseText(text);
+    var compilation = Compilation.Create("Completion" + owner, [tree], [MetadataReference.CreateFromFile(corePath)],
+        new CompilationOptions(OutputKind.ConsoleApplication, metadataImportOptions: new MetadataImportOptions(CoreDeclarations.Identity)));
+    var names = compilation.GetCompletions(tree, text.LastIndexOf('.') + 1)
+        .Select(item => item.Symbol?.Name ?? item.DisplayText).Distinct().Order().ToArray();
+    targetCompletions[owner] = names;
+    var expected = TargetSurface.Methods.Where(m => m.Owner == owner).Select(m => m.Name).Distinct();
+    if (expected.Any(name => !names.Contains(name)) || names.Contains("Abs") || names.Contains("Clamp") || names.Contains("ReadLine")
+        || compilation.GetTypeByMetadataName("System.IO.File") is not null)
+        throw new Exception("Completion did not respect target surface for " + owner + ": " + string.Join(",", names));
 }
 var coreMissingConsoleErrors = CheckCoreRejection("CoreMissingConsole", false, true);
 var coreWrongSignatureErrors = CheckCoreRejection("CoreWrongSignature", true, false);
@@ -182,6 +198,7 @@ var report = new
     },
     Scope = "emission plus bounded static import; execute generated neoIL separately against neoCLR System",
     StaticImportRejections = staticImportRejections,
+    TargetCompletions = targetCompletions,
     CoreDeclarationTypes = coreTypes,
     CoreOnly = coreOnly,
     CoreOnlyCases = coreOnlyCases,

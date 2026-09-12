@@ -198,3 +198,39 @@ to reject underflow, surplus return values and unsupported `ldnull`. Their diagn
 are recorded in `report.json`. Rewriting these negatives with Cecil initially introduced
 a synthetic mscorlib reference; byte-only mutation avoids changing the test's metadata
 question. No dependency was removed to force acceptance.
+
+## Shared library surface and completion probe (2026-09-12)
+
+The [target surface](TargetSurface.cs) now drives both compiler declarations and exact
+runtime bindings. It exposes five signatures: Console.WriteLine(String),
+Console.WriteLine(Int32), Math.Min(Int32,Int32), Math.Max(Int32,Int32) and Math.Sign(Int32).
+Math calls go directly to the actual System implementations. Console wrappers only adapt
+the existing inhabited Void return to the declared no-result convention.
+
+The editable [Raven sample](samples/library-basics.rvn) is compiled by the same probe and
+runs as `CoreLibrary`. Using the reproduction commands above now validates five programs.
+It prints `42`, `1`, `0`, and `Library calls from Raven`. These results come from the real
+runtime library, not the declaration stubs. The sample is copied to the probe output by
+MSBuild so the probe does not depend on its invocation working directory.
+
+The [API policy](../../api-policy.md) already distinguishes neoCLR's Result-returning
+Math.Abs(Int32) and Clamp from .NET's throwing APIs. Those signatures are intentionally
+not projected as plain Int32 methods. The [runtime library](../../runtime-library.md)
+provides the contract baseline; union support will expose the real signatures next.
+This is staged API coverage, not a change to those runtime implementations.
+
+The probe also invokes Raven's existing `Compilation.GetCompletions` with the **same
+explicit-only core reference**. Math completion returns Max, Min and Sign; Console
+returns WriteLine. Abs, Clamp, ReadLine and host System.IO.File are absent. The report
+records these results under `TargetCompletions`. This demonstrates target-aware completion
+in the compiler API, not VS Code integration.
+
+Read-only inspection of Raven revision `1d7341fa64a66b514e5e68031b6d072d8140ea3a` shows
+`WorkspaceManager.EnsureRavenCoreReference` can add a framework Raven.Core reference when
+one is missing. Project loading and that policy must be checked against the explicit target
+configuration before claiming the editor MVP. No Raven edits were made in this slice.
+
+Validation: the complete emission/import probe passed, including its existing negative
+checks and the new completion checks. All five imports verify and run through
+`verify_runtime.py`; `cargo test --test raven_import` passes against the refreshed fixtures.
+The next MVP program must consume a real Result/Option API and handle both outcomes.

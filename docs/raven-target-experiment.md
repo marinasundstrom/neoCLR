@@ -249,3 +249,29 @@ Build/run tasks and diagnostics can support this workflow. Source-mapped debuggi
 optional later work, not an MVP dependency. These editor capabilities are planned, not
 implemented by the import-bridge slice. The author corrected the assistant's earlier
 build/run-first staging to make completion the minimum editor outcome.
+
+## MVP acceptance criteria and union directive (2026-09-12)
+
+The author added union usage to the MVP. The acceptance outcomes are now:
+
+- Raven compiles a small program against the supplied neoCLR runtime-library declarations
+  and it executes on neoCLR using the actual implementations. The five static programs
+  now establish a narrow first stage, including Math and Console calls.
+- A Raven program consumes a real Result or Option API and pattern-matches both outcomes.
+  Math.Abs(Int32) is the proposed first case: ordinary success and Int32.MinValue overflow.
+  Preserve neoCLR's Result contract; do not substitute .NET's throwing signature or a fake
+  application-only result. This is not implemented yet.
+- VS Code completion offers the supported target APIs in Raven files/projects without
+  host-framework leakage. The existing compiler completion API now passes the explicit
+  target probe; language-server/project integration remains outstanding.
+
+Next support work should admit the generic union signatures/case representation and the
+control flow needed for that Result sample, binding them to actual System metadata and
+methods. Verify both outcomes and reject mismatched carrier/case types. Raven's existing
+union lowering and the runtime library's layout/API must be compared before choosing the
+import contract; this is not authorization to replace one silently with the other.
+
+The reference declarations and importer share `TargetSurface` for the current five
+signatures. This prevents editor/compiler API claims from drifting from the available
+runtime bindings while the MVP grows. It is still a bounded experimental projection,
+not the complete runtime class library or a native metadata loader.

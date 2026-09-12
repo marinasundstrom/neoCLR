@@ -11,11 +11,11 @@ report = json.loads((output / "report.json").read_text())
 if len(report.get("StaticImportRejections", {})) != 3:
     raise AssertionError("Run the complete emission/import probe, including rejection checks, first")
 results = {}
-for name in ("CoreOnly", "CoreEmpty", "CoreNested", "CoreInt32"):
+for name in ("CoreOnly", "CoreEmpty", "CoreNested", "CoreInt32", "CoreLibrary"):
     artifact = output / (name + ".neoil")
     subprocess.run([str(runtime), "verify", str(artifact)], check=True, capture_output=True, text=True)
     run = subprocess.run([str(runtime), "run", str(artifact)], check=True, capture_output=True, text=True)
-    expected = ("Hello from Raven on neoCLR\n" if name == "CoreOnly" else "") + "=> Void\n"
+    expected = {"CoreOnly": "Hello from Raven on neoCLR\n", "CoreLibrary": "42\n1\n0\nLibrary calls from Raven\n"}.get(name, "") + "=> Void\n"
     if run.stdout != expected:
         raise AssertionError(f"{name}: expected {expected!r}, received {run.stdout!r}")
     results[name] = {"stdout": run.stdout, "stderr": run.stderr, "verified": True}

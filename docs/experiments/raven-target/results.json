@@ -60,6 +60,16 @@
     "ImportBadReturn": "Input ret stack must be empty after its declared result.",
     "ImportUnsupported": "Unsupported reachable instruction System.Void NamespaceMembers::Main() IL_0000: ldnull"
   },
+  "TargetCompletions": {
+    "Math": [
+      "Max",
+      "Min",
+      "Sign"
+    ],
+    "Console": [
+      "WriteLine"
+    ]
+  },
   "CoreDeclarationTypes": [
     ".\u003CModule\u003E",
     "System.Array",
@@ -76,6 +86,7 @@
     "System.Int32",
     "System.Int64",
     "System.IntPtr",
+    "System.Math",
     "System.Object",
     "System.Runtime.CompilerServices.CompilerGeneratedAttribute",
     "System.Runtime.CompilerServices.ReferenceAssemblyAttribute",
@@ -185,6 +196,122 @@
     ]
   },
   "CoreOnlyCases": {
+    "CoreLibrary": {
+      "References": [
+        "NeoCLR.CoreProbe, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+      ],
+      "Types": [
+        "\u003CModule\u003E",
+        "System.Unit",
+        "NamespaceMembers",
+        "System.Runtime.CompilerServices.NullableContextAttribute",
+        "Program"
+      ],
+      "Methods": [
+        {
+          "Signature": "System.Boolean System.Unit::Equals(System.Unit)",
+          "Instructions": [
+            "ldc.i4.1",
+            "ret"
+          ],
+          "ExceptionRegions": 0
+        },
+        {
+          "Signature": "System.Boolean System.Unit::Equals(System.Object)",
+          "Instructions": [
+            "ldarg.1",
+            "isinst System.Unit",
+            "ldnull",
+            "cgt.un",
+            "ret"
+          ],
+          "ExceptionRegions": 0
+        },
+        {
+          "Signature": "System.Int32 System.Unit::GetHashCode()",
+          "Instructions": [
+            "ldc.i4.0",
+            "ret"
+          ],
+          "ExceptionRegions": 0
+        },
+        {
+          "Signature": "System.String System.Unit::ToString()",
+          "Instructions": [
+            "ldstr ()",
+            "ret"
+          ],
+          "ExceptionRegions": 0
+        },
+        {
+          "Signature": "System.Void NamespaceMembers::Main()",
+          "Instructions": [
+            "nop",
+            "nop",
+            "ldc.i4.s 42",
+            "ldc.i4.s 100",
+            "call System.Int32 System.Math::Min(System.Int32,System.Int32) scope=NeoCLR.CoreProbe",
+            "stloc.0",
+            "nop",
+            "ldloc.0",
+            "ldc.i4.7",
+            "call System.Int32 System.Math::Max(System.Int32,System.Int32) scope=NeoCLR.CoreProbe",
+            "stloc.1",
+            "nop",
+            "ldloc.1",
+            "call System.Void System.Console::WriteLine(System.Int32) scope=NeoCLR.CoreProbe",
+            "nop",
+            "ldloc.1",
+            "call System.Int32 System.Math::Sign(System.Int32) scope=NeoCLR.CoreProbe",
+            "call System.Void System.Console::WriteLine(System.Int32) scope=NeoCLR.CoreProbe",
+            "nop",
+            "ldc.i4.0",
+            "call System.Int32 System.Math::Sign(System.Int32) scope=NeoCLR.CoreProbe",
+            "call System.Void System.Console::WriteLine(System.Int32) scope=NeoCLR.CoreProbe",
+            "nop",
+            "ldstr Library calls from Raven",
+            "call System.Void System.Console::WriteLine(System.String) scope=NeoCLR.CoreProbe",
+            "nop",
+            "ret"
+          ],
+          "ExceptionRegions": 0
+        },
+        {
+          "Signature": "System.Void System.Runtime.CompilerServices.NullableContextAttribute::.ctor(System.Byte)",
+          "Instructions": [
+            "ldarg.0",
+            "call System.Void System.Attribute::.ctor() scope=NeoCLR.CoreProbe",
+            "ldarg.0",
+            "ldarg.1",
+            "stfld System.Byte System.Runtime.CompilerServices.NullableContextAttribute::Flag",
+            "ret"
+          ],
+          "ExceptionRegions": 0
+        },
+        {
+          "Signature": "System.Void Program::.ctor()",
+          "Instructions": [
+            "ldarg.0",
+            "call System.Void System.Object::.ctor() scope=NeoCLR.CoreProbe",
+            "ret"
+          ],
+          "ExceptionRegions": 0
+        }
+      ],
+      "MissingFacadeTypes": [],
+      "EntryPoint": "System.Void NamespaceMembers::Main()",
+      "TypeReferences": [
+        "System.Attribute scope=NeoCLR.CoreProbe",
+        "System.AttributeTargets scope=NeoCLR.CoreProbe",
+        "System.AttributeUsageAttribute scope=NeoCLR.CoreProbe",
+        "System.Console scope=NeoCLR.CoreProbe",
+        "System.Int32 scope=NeoCLR.CoreProbe",
+        "System.Math scope=NeoCLR.CoreProbe",
+        "System.Object scope=NeoCLR.CoreProbe",
+        "System.String scope=NeoCLR.CoreProbe",
+        "System.ValueType scope=NeoCLR.CoreProbe"
+      ]
+    },
     "CoreEmpty": {
       "References": [
         "NeoCLR.CoreProbe, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"

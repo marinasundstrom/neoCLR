@@ -4,6 +4,10 @@ use neoclr::{Limits, assemble, run, verify};
 fn raven_emitted_static_corpus_runs_against_real_system_library() {
     for (source, expected) in [
         (
+            include_str!("../docs/experiments/raven-target/imported/CoreLibrary.neoil"),
+            vec!["42", "1", "0", "Library calls from Raven"],
+        ),
+        (
             include_str!("../docs/experiments/raven-target/imported/CoreOnly.neoil"),
             vec!["Hello from Raven on neoCLR"],
         ),
