@@ -21,7 +21,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
         shutil.copyfile(args.project.resolve().parent / name, root / name)
     command = [sys.executable, str(bridge / 'run_project.py'), str(root / 'Demo.rvnproj'),
                '--raven', str(args.raven.resolve()), '--runtime', str(args.runtime.resolve())]
-    cases = [('Result', 'library-result.rvn', '42\nOverflow\n=> Void\n'),
+    cases = [('Math', 'library-math.rvn', '-2147483648\n2147483647\n7\n-7\n-1\n0\n1\n=> Void\n'),
+             ('Result', 'library-result.rvn', '42\nOverflow\n=> Void\n'),
              ('Option', 'library-option.rvn', '42\nProduct not found\n=> Void\n'),
              ('Void', 'library-void.rvn', 'Completed without a payload\nNot completed\n=> Void\n')]
     if args.collections:

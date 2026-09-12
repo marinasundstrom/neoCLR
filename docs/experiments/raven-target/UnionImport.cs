@@ -260,6 +260,12 @@ static class UnionImport
         if (!definition.IsPublic || reference.ExplicitThis || reference is GenericInstanceMethod || reference.HasGenericParameters
             || reference.CallingConvention != MethodCallingConvention.Default || reference.HasThis != definition.HasThis)
             throw new InvalidDataException("Unsupported runtime signature.");
+        // Reuse the declaration catalog for its bounded static Int32 APIs. Check
+        // both sides before mapping a resolved CLI reference to the runtime library.
+        var surface = TargetSurface.Bind(definition);
+        if (surface is { Returns: "Int32" } && !reference.HasThis && !definition.HasThis
+            && reference.FullName == definition.FullName)
+            return new(surface.ImportTarget, surface.Parameters, surface.Returns);
         // Exact definition signatures include generic parameter positions, not just arity/names.
         var key = definition.FullName;
         if (key == "System.Result`2<System.Int32,System.OverflowError> System.Math::Abs(System.Int32)" && reference.FullName == key && !reference.HasThis)

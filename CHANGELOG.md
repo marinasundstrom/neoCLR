@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-12
 
+- Fixed the Raven saved-project importer rejecting the advertised Int32 Math.Min,
+  Math.Max and Math.Sign APIs. It now reuses the target declaration catalog with
+  resolved-signature checks and executes the existing runtime methods. Added a sample
+  covering integer limits, equal operands and all Sign outcomes to both project profiles.
+  No runtime semantics, opcodes or Raven source changes.
+
 - Combined the Raven collection declaration profile with Result/Option/Void and added
   a product-workflow demo using the existing adapted runtime library. Project checks
   cover the combined workflow, standalone unions, value-carrier copying, class/array

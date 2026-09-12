@@ -500,3 +500,23 @@ binary loader remain outside this demonstration. Earlier research on
 reference assignment and dispatch are retained, while library names and result-based
 APIs are deliberate target differences. Temporary profile generation/import restrictions
 are tooling costs, not new platform semantics.
+
+
+### Executable integer Math surface
+
+The saved-project importer now uses the same TargetSurface catalog as compiler
+metadata for the existing static Int32 Math.Min, Math.Max and Math.Sign APIs. These
+members were visible in completion but previously rejected by this importer. Calls
+retain their standard CLI static-call shape and execute the existing System.Math
+implementations. Reference and resolved-definition signatures must agree; this does
+not admit arbitrary static methods or new overloads.
+
+`library-math.rvn` checks Min/Max at both Int32 limits, equal operands, and Sign for
+negative/zero/positive values. `verify_project.py` runs it for both the smaller union
+profile and the combined collection profile. Expected output is -2147483648,
+2147483647, 7, -7, -1, 0, 1 and `=> Void`.
+
+This reuses the [existing Math contract and .NET comparison](../../math.md): no new
+runtime behavior, opcode or Raven change is introduced. Result-based Math.Abs remains
+a separately bound target-library difference. Other Math overloads remain outside the
+bounded importer even though they exist in the neoCLR runtime library.

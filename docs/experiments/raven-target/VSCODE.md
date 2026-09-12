@@ -202,7 +202,8 @@ python3 docs/experiments/raven-target/verify_project.py /tmp/raven-collections-e
 python3 docs/experiments/raven-target/verify_editor.py /tmp/raven-collections-editor/editor --collections
 ```
 
-The first checks the combined workflow, Result/Option/Void, value copying, array and
+The first checks executable integer Math.Min/Max/Sign, the combined workflow,
+Result/Option/Void, value copying, array and
 class aliasing, loops, a saved edit and failed-build stale-output protection.
 The second checks target completion and the inferred loop binding through the actual
 language server. It changes the in-memory document and retains a local LSP transcript;

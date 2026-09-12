@@ -1,0 +1,12 @@
+import System.*
+import System.Console.*
+
+func Main() {
+    WriteLine(Math.Min(-2147483648, 2147483647))
+    WriteLine(Math.Max(-2147483648, 2147483647))
+    WriteLine(Math.Min(7, 7))
+    WriteLine(Math.Max(-7, -7))
+    WriteLine(Math.Sign(-2147483648))
+    WriteLine(Math.Sign(0))
+    WriteLine(Math.Sign(2147483647))
+}
