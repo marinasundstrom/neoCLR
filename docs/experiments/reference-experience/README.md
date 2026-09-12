@@ -16,6 +16,14 @@ PurchaseOutcome and failed construction attempts below describe the initial expe
 The C# baseline retains its original outcome record, so it is now a behavior comparison
 rather than identical error-handling structure. See [Result construction](../../result-construction.md).
 
+## Architecture evaluation follow-up (2026-09-12)
+
+The [reference-defaults evaluation](../../reference-defaults-evaluation.md) compares
+three projections of this workflow, traces their metadata/runtime implications and
+records fresh baseline validation. Alternatives remain illustrative. It recommends a
+bounded compiler/import experiment before selecting new defaults; no existing runtime
+or source contract is changed.
+
 ## Current usability pass (2026-09-09)
 
 The workflow now imports `PurchaseError.*`, `System.Result.*` and `System.Option.*`.

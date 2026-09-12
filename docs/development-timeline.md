@@ -1007,6 +1007,32 @@ Existing [reference-experience evidence](experiments/reference-experience/README
 [type-design discussion](type-design.md) and [design research process](design-research.md)
 remain starting points for a subsequent evaluation rather than proof of the proposed model.
 
+### 27. Evaluate three projections before changing implementation
+
+Recorded 2026-09-12.
+
+**Author's question and instruction:** Asked what to do next, then directed the assistant
+to continue with its proposed bounded architecture evaluation of the order workflow.
+
+**Assistant's proposal:** Compare current explicit modes, shared type-declared defaults
+and language-only defaults; inspect construction, assignment, parameters, collections,
+interfaces and Result/Option use. Produce concrete code comparisons and a recommendation
+before changing runtime behavior.
+
+**Action and findings:** Wrote the [evaluation](reference-defaults-evaluation.md), inspected
+metadata, lowering, slot and return checks, emitted the current workflow's IL, and ran
+22 focused tests plus the SDK 10.0.100 C# baseline. All passed. Existing sharing/snapshot
+behavior works; cleaner spelling can plausibly use current signatures. Reference-slot
+outputs remain a real compatibility gap, while shared declaration intent matters for
+importers defining new uses of a type. More automatic heap construction can add facade
+allocations; no performance improvement was inferred.
+
+**Assistant's recommendation, not a selected migration:** Test shared usage defaults that
+lower to explicit signatures, with a bounded opt-in compiler/import experiment before
+considering an enforced nominal category. No experimental compiler was needed to establish
+the existing lowering evidence in this slice. Illustrative alternatives were not executed.
+The author has not yet selected the recommended implementation or changed current defaults.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

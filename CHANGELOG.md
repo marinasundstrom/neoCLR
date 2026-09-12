@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-12
 
+- Added a bounded reference-defaults architecture evaluation comparing the order
+  workflow under current, shared type-default and language-only models. Includes
+  illustrative source/lowering, .NET comparison, migration costs and a proposed
+  compiler/import experiment. Validated current behavior with 22 focused tests,
+  emitted IL and the pinned .NET baseline; no runtime or compiler semantics changed.
+
 - Recorded evaluation criteria centered on familiar developer experience, possible
   type-level reference/value defaults, Result/Option APIs, Faults, nullable support
   and language/runtime boundaries. Identified migration questions without selecting

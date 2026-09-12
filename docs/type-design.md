@@ -14,6 +14,11 @@ the caller's reference slot; output/rebinding contracts are separate. Readonly r
 an access path, not the entire reachable graph. A good API specifies both its guarantees
 and what callers must not assume.
 
+The [reference-defaults evaluation](reference-defaults-evaluation.md) compares current
+explicit modes, shared type-declared defaults and language-only defaults using the order
+workflow. Its recommendations are provisional; the contracts below remain implemented
+behavior, not a declaration that a migration has been selected.
+
 ## Platform capability and language usability
 
 NeoCLR's managed references can provide a base or interface view of an existing object
