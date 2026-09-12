@@ -26,6 +26,7 @@
 .end
 
 .type System.Option<T>
+    .implements System.Propagatable<System.Option<T>,T,Void>
     .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
     .field private Stored System.Value
     .method instance .ctor(System.Option.None value) -> Void
@@ -100,6 +101,42 @@
         ret
     Miss:
         ldc.bool false
+        ret
+    .end
+    .method instance readonly byref TryGetOutput(out(true) T& destination) -> Boolean
+        ldarg this
+        ldobj System.Option<T>
+        call instance System.Option<T>::get_IsSome()
+        brfalse Miss
+        ldarg destination
+        ldarg this
+        ldobj System.Option<T>
+        call instance System.Option<T>::GetSomeCase()
+        ldfld System.Option.Some<T>::Value
+        stobj T
+        ldc.bool true
+        ret
+    Miss:
+        ldc.bool false
+        ret
+    .end
+    .method instance readonly byref TryGetResidual(out(true) Void& destination) -> Boolean
+        ldarg this
+        ldobj System.Option<T>
+        call instance System.Option<T>::get_IsNone()
+        brfalse Miss
+        ldarg destination
+        ldvoid
+        stobj Void
+        ldc.bool true
+        ret
+    Miss:
+        ldc.bool false
+        ret
+    .end
+    .method static FromResidual(Void residual) -> System.Option<T>
+        newobj System.Option.None
+        newobj instance System.Option<T>::.ctor(System.Option.None)
         ret
     .end
 .end

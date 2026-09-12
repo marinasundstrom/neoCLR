@@ -4,6 +4,7 @@
 .include "System/Equatable.neoil"
 .include "System/Comparable.neoil"
 .include "System/Clonable.neoil"
+.include "System/Propagatable.neoil"
 .include "System/Value.neoil"
 .include "System/Void.neoil"
 .include "System/Boolean.neoil"

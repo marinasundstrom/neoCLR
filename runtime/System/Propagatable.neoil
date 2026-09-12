@@ -1,0 +1,8 @@
+; Extraction half of the propagation protocol. FromResidual is a carrier static
+; factory until static abstract interface members are supported by the runtime.
+.interface System.Propagatable<TSelf,TOutput,TResidual>
+    .method instance readonly byref TryGetOutput(out(true) TOutput& output) -> Boolean
+    .end
+    .method instance readonly byref TryGetResidual(out(true) TResidual& residual) -> Boolean
+    .end
+.end

@@ -55,7 +55,8 @@ demonstrates collections alongside Result/Option/Void; acceptance checks cover o
 class/array aliases and value-carrier copying. Keep this a fundamental demonstration,
 not full integration. Raven remains on its separate experiment branch and its changes
 will be evaluated separately. Union
-propagation is the next feature slice before public distribution. Its interface belongs
+propagation is the next feature slice before public distribution. Its [runtime-library extraction interface and factories](propagation-contract.md) are
+implemented; Raven target projection/import remains pending. The interface belongs
 to the NeoCLR runtime library; Raven should resolve that target contract while retaining
 its existing .NET behavior.
 The [interface contract probe](raven-interface-contract.md) establishes the first

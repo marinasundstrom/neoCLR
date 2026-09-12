@@ -1613,6 +1613,24 @@ and basic VS Code completion through Raven integration are key. The assistant ag
 to treat their combined end-to-end demonstration as acceptance criteria rather than
 feature count or completeness of the entire platform.
 
+## 56. First propagation library building block — recorded 2026-09-12
+
+**Prior author direction.** Propagation should be part of the public preview, and its
+interface belongs to the NeoCLR runtime library. Raven remains an isolated experiment.
+
+**Assistant proposal.** Inspection found that Raven's protocol includes two extraction
+methods and a static residual factory, while neoCLR supports only instance interface
+members. Proposed a prefix-free Propagatable extraction interface and concrete carrier
+factories, explicitly documenting that this does not yet enforce a static abstract
+interface contract. This is a provisional implementation choice, not an author decision
+to permanently omit static interface support.
+
+**Action and outcome.** Added the interface and Result/Option methods, including Void
+absence and conditional initialization. Four new tests and related runtime suites pass;
+the existing Raven demo still executes. The [contract and limitations](propagation-contract.md)
+record the .NET comparison and next Raven projection/import work. No `?` support or
+Raven changes are claimed by this first slice.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

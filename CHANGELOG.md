@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-12
 
+- Added the runtime-library Propagatable<TSelf,TOutput,TResidual> extraction interface,
+  implemented by Result and Option with readonly receivers and conditional output
+  initialization. Added carrier FromResidual factories, including Option's Void residual.
+  The static factory is provisionally outside the interface because static abstract
+  interface members are not implemented. Documented that enforcement boundary and the
+  remaining Raven target work; this is not yet end-to-end `?` support. Four new runtime
+  tests cover channels, Void, reconstruction and invalid output reads.
+
 - Fixed pre-merge generic Clonable and Neo calculator regressions. Assembly field fixups
   now resolve layout with available constraints before complete linked validation;
   generic contract walks recognize repeated constructed types instead of recursively
