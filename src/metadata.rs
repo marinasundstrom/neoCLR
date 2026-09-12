@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 
-/// No value-type/reference-type bit: ByRef selects explicit managed reference access.
+/// Signature types; nominal storage semantics are declared by TypeDef.
+/// ByRef denotes a managed storage reference, not an ordinary class reference.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Type {
     Void,
@@ -169,6 +170,9 @@ pub struct GenericConstraint {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct TypeDef {
+    /// Internal nominal classification; a future CLI reader derives this from standard metadata.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub is_reference_type: bool,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub enum_info: Option<EnumInfo>,
     #[serde(default, skip_serializing_if = "Visibility::is_public")]
@@ -765,6 +769,11 @@ pub enum Instruction {
 }
 
 impl Module {
+    pub fn is_reference_type(&self, ty: &Type) -> bool {
+        self.type_definition(ty)
+            .is_some_and(|definition| definition.is_reference_type)
+    }
+
     pub fn type_definition(&self, ty: &Type) -> Option<&TypeDef> {
         let name = ty.definition_name()?;
         let arity = match ty {

@@ -35,6 +35,8 @@ pub enum Value {
         ty: Type,
         fields: Vec<Value>,
     },
+    /// Ordinary class reference. Cloning copies identity, never object contents.
+    ObjectReference(ObjectReference),
     SlotReference(crate::SlotReference),
     Pointer(crate::memory::Pointer),
     /// An interface projection retaining its managed concrete slot.
@@ -46,6 +48,20 @@ pub enum Value {
         interface: Type,
         receiver: crate::memory::Pointer,
     },
+}
+
+/// Heap-only class handle, distinct from a managed byref to a slot.
+#[derive(Debug, Clone, PartialEq)]
+pub struct ObjectReference {
+    pub(crate) reference: crate::SlotReference,
+}
+impl ObjectReference {
+    pub fn allocation_id(&self) -> usize {
+        self.reference.allocation_id().expect("heap object")
+    }
+    pub fn target(&self) -> &Type {
+        self.reference.target()
+    }
 }
 
 impl Value {
@@ -62,6 +78,7 @@ impl Value {
         let mut pending = vec![self];
         while let Some(value) = pending.pop() {
             match value {
+                Self::ObjectReference(object) => object.reference.assigned()?,
                 Self::Delegate(d) => pending.extend(d.receiver.as_deref()),
                 Self::SlotReference(reference)
                 | Self::SlotInterface {
@@ -148,6 +165,7 @@ impl Value {
             Self::Erased(_) => Type::Value,
             Self::RuntimeTypeHandle(_) => Type::RuntimeTypeHandle,
             Self::Object { ty, .. } => ty.clone(),
+            Self::ObjectReference(object) => object.target().clone(),
             Self::Array { element, .. } => Type::Array(Box::new(element.clone())),
             Self::SlotInterface {
                 interface,

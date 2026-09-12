@@ -646,6 +646,12 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         }
                         _ => (crate::metadata::Visibility::Public, rest),
                     };
+                    let (is_reference_type, rest) = if word == ".type" {
+                        rest.strip_prefix("class ")
+                            .map_or((false, rest), |rest| (true, rest.trim()))
+                    } else {
+                        (false, rest)
+                    };
                     let (is_abstract, rest) = rest
                         .strip_prefix("abstract ")
                         .map_or((false, rest), |rest| (true, rest.trim()));
@@ -674,6 +680,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     }
                     let ty = Type::from_name(&name);
                     typedef = Some(TypeDef {
+                        is_reference_type,
                         enum_info: None,
                         visibility,
                         definition: None,

@@ -14,6 +14,11 @@ pub(crate) fn default_value(module: &Module, ty: &Type) -> Result<Value, Fault> 
             ));
         }
         *remaining -= 1;
+        if module.is_reference_type(ty) {
+            return Err(Fault::new(
+                "class default/null initialization is not implemented",
+            ));
+        }
         Ok(match ty {
             Type::Void => Value::Void,
             Type::Boolean => Value::Boolean(false),

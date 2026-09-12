@@ -30,6 +30,11 @@ fn resolve_with_budget(
             ));
         }
         *remaining -= 1;
+        if module.is_reference_type(ty) {
+            return Err(Fault::new(
+                "class instances cannot be imported as host value records",
+            ));
+        }
         if *ty == Type::RuntimeTypeHandle {
             return Err(Fault::new(
                 "runtime type handles cannot be imported from the host",

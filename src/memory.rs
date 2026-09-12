@@ -106,6 +106,11 @@ pub fn layout_for(module: &Module, ty: &Type, target: TargetLayout) -> Result<La
             return Err(Fault::new("layout complexity limit exceeded"));
         }
         *budget -= 1;
+        if module.is_reference_type(ty) {
+            return Err(Fault::new(
+                "class references have no native inline layout in this slice",
+            ));
+        }
         let (size, alignment) = match ty {
             Type::SByte | Type::Byte => (1, 1),
             Type::Int16 | Type::UInt16 | Type::Char => (2, 2),

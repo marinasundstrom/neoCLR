@@ -199,3 +199,12 @@ The next implementation order is:
 Each stage must report what actually runs. The static emission fixtures and test-bound
 instruction execution are groundwork, not completion of this milestone. No new Raven
 changes are assumed; any necessary changes remain isolated on its feature branch.
+
+## Nominal reference storage foundation (2026-09-12)
+
+The [first class-semantics slice](class-semantics.md) now implements heap-only ordinary
+object handles under nominal signatures, alongside managed byrefs to slots. Runtime tests
+prove class aliasing, value copying and the distinction between parameter rebinding and
+byref replacement. This partially completes the first step above. Instance constructors,
+null/default class references, field-store CIL semantics and the Raven acceptance program
+remain next; the existing value-model library and Neo projection have not been migrated.

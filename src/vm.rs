@@ -461,6 +461,35 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             ));
         }
     }
+    for definition in &module.types {
+        if definition
+            .base
+            .as_ref()
+            .is_some_and(|base| module.is_reference_type(base))
+        {
+            return Err(Fault::new(
+                "inheritance involving class semantics is not implemented",
+            ));
+        }
+        if definition.is_reference_type
+            && (definition.representation != Representation::Record
+                || definition.base.is_some()
+                || !definition.implements.is_empty()
+                || !definition.generic_parameters.is_empty()
+                || definition.is_abstract
+                || definition.enum_info.is_some()
+                || module.functions.iter().any(|f| {
+                    f.instance
+                        && f.owner.as_ref().is_some_and(|owner| {
+                            owner.definition_name() == Some(definition.name.as_str())
+                        })
+                }))
+        {
+            return Err(Fault::new(
+                "class semantics currently require non-generic records without inheritance or instance methods",
+            ));
+        }
+    }
     for function in &module.functions {
         if function.no_result
             && (function.returns != Type::Void
@@ -1233,6 +1262,7 @@ impl Frame {
 // remain confined to direct output-argument paths in this implementation slice.
 fn assigned_reference(value: &Value) -> Result<(), Fault> {
     match value {
+        Value::ObjectReference(object) => object.reference.assigned(),
         Value::SlotReference(reference) => reference.assigned(),
         Value::SlotInterface { receiver, .. } => receiver.assigned(),
         _ => Ok(()),
@@ -1475,7 +1505,8 @@ fn interpret_instructions(
         frame.pc += 1;
         let context = function.name.clone();
         // Collect only between instructions, before allocation operands leave roots.
-        if matches!(op, Op::HeapNew | Op::NewArray(_) | Op::AllocateArray(_))
+        if (matches!(op, Op::HeapNew | Op::NewArray(_) | Op::AllocateArray(_))
+            || matches!(op, Op::New(ty) if module.is_reference_type(ty)))
             && heap.len() >= collection_threshold
         {
             let mut roots = vec![];
@@ -1898,6 +1929,7 @@ fn interpret_instructions(
                 Op::ReferenceEqual => {
                     let mut reference = || -> Result<crate::SlotReference, Fault> {
                         let reference = match frame.pop()? {
+                            Value::ObjectReference(object) => object.reference,
                             Value::SlotReference(reference)
                             | Value::SlotInterface {
                                 receiver: reference,
@@ -2249,12 +2281,30 @@ fn interpret_instructions(
                     for field in &fields {
                         field.ensure_heap_references()?;
                     }
-                    frame.stack.push(Value::Object {
+                    let value = Value::Object {
                         ty: ty.clone(),
                         fields,
+                    };
+                    frame.stack.push(if module.is_reference_type(ty) {
+                        if heap.len() >= limits.heap_objects {
+                            return Err(Fault::new("heap object limit exceeded"));
+                        }
+                        let identity = heap.allocate(value)?;
+                        Value::ObjectReference(crate::value::ObjectReference {
+                            reference: heap.address(identity)?,
+                        })
+                    } else {
+                        value
                     });
                 }
                 Op::Field(i) => {
+                    if let Some(Value::ObjectReference(object)) = frame.stack.last() {
+                        crate::access::check_field(module, &function, object.target(), *i)?;
+                        let value = object.reference.read_field(*i)?.on_stack();
+                        frame.pop()?;
+                        frame.stack.push(value);
+                        return Ok(None);
+                    }
                     if let Some(Value::SlotReference(reference)) = frame.stack.last() {
                         crate::access::check_field(module, &function, reference.target(), *i)?;
                         let value = reference.read_field(*i)?.on_stack();
@@ -2280,6 +2330,19 @@ fn interpret_instructions(
                 Op::SetField(i) => {
                     let value = frame.pop()?;
                     let receiver = frame.pop()?;
+                    if let Value::ObjectReference(object) = receiver {
+                        crate::access::check_field(module, &function, object.target(), *i)?;
+                        let fields = module.instantiated_fields(object.target())?;
+                        let target = fields
+                            .get(*i)
+                            .ok_or_else(|| Fault::new("field index out of range"))?
+                            .ty
+                            .clone();
+                        object.reference.write_field(*i, target, value)?;
+                        // Preserve the existing record-update IR result until CIL stfld lowering lands.
+                        frame.stack.push(Value::ObjectReference(object));
+                        return Ok(None);
+                    }
                     if let Value::SlotReference(reference) = receiver {
                         crate::access::check_field(module, &function, reference.target(), *i)?;
                         let fields = module.instantiated_fields(reference.target())?;
@@ -2622,6 +2685,9 @@ fn debug_value(
         ..Default::default()
     };
     match value {
+        Value::ObjectReference(object) => {
+            result.value = format!("object reference heap#{}", object.allocation_id());
+        }
         Value::Delegate(binding) => {
             result.value = debug_text(&format!(
                 "delegate {}<{:?}>",

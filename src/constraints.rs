@@ -127,10 +127,13 @@ pub(crate) fn check(
             .ok_or_else(|| Fault::new("generic constraint argument missing"))?;
         let violates = match &constraint.kind {
             ConstraintKind::NotVoid => matches!(argument, Type::Void),
-            ConstraintKind::NotReference => matches!(
-                argument,
-                Type::ByRef(_) | Type::ReadOnlyByRef(_) | Type::InterfaceRef(_)
-            ),
+            ConstraintKind::NotReference => {
+                module.is_reference_type(argument)
+                    || matches!(
+                        argument,
+                        Type::ByRef(_) | Type::ReadOnlyByRef(_) | Type::InterfaceRef(_)
+                    )
+            }
             ConstraintKind::TypeBound(bound) => {
                 // Independent of addressing mode. A bound never performs a conversion.
                 let concrete = match argument {

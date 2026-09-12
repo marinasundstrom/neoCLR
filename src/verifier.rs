@@ -1083,7 +1083,8 @@ fn typed_effect(
         ReferenceEqual => {
             for value in values {
                 require(
-                    matches!(exact(value)?, Type::ByRef(_)),
+                    matches!(exact(value)?, Type::ByRef(_))
+                        || module.is_reference_type(exact(value)?),
                     "ref.eq requires managed references",
                 )?;
             }

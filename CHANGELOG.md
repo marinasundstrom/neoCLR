@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-12
 
+- Began nominal class reference semantics: `.type class` uses managed heap handles in
+  ordinary class-typed storage, while managed byrefs still address slots. Assignment,
+  static calls, fields, return values and GC preserve object identity; existing value
+  records still copy contents. Added alias/value-copy and .NET comparison tests.
+  Marked-class instance methods, inheritance, null/default initialization and native
+  layout remain unsupported; Neo and Raven binary execution are not yet migrated.
+  Existing field-wise construction and result-producing field-store IR remain temporary
+  compatibility gaps to resolve before admitting their standard CIL forms.
+
 - Added a bounded standard CIL code-stream decoder for the static-call experiment,
   preserving byte offsets and tokens and rejecting unsupported/truncated instructions.
   Added bounded PE32 CLI container and tiny/fat method-body inspection with .NET fixture
