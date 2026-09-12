@@ -15,7 +15,7 @@ retain their historical limits. This is not general Raven or direct PE execution
 
 The current sources require Raven `22cea6fa1` or later on
 `codex/neoclr-target-resolution`. Earlier revisions recorded below describe historical
-slices. Installed `0.1.12-neoclr.3` tools predate propagation. Build the compiler and
+slices. Local `0.1.12-neoclr.4` tools include propagation; see [VS Code instructions](VSCODE.md). To reproduce from source, build the compiler and
 language server from that experiment checkout:
 
 ```sh

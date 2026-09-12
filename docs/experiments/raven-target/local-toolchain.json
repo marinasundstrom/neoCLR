@@ -1,0 +1,34 @@
+{
+  "recordedDate": "2026-09-12",
+  "distribution": "local experiment; not published",
+  "ravenRevision": "22cea6fa1c88f08fef3d88ba362038b611f41e3c",
+  "ravenBranch": "codex/neoclr-target-resolution",
+  "neoCLRRevision": "1f7c431013b3a7b2ca28efd3db0fe69ad19ed2f6",
+  "toolVersion": "0.1.12-neoclr.4",
+  "sdkPath": "/Users/robert/.raven/sdk/0.1.12-neoclr.4",
+  "extensionPath": "/Users/robert/.vscode/extensions/raven.raven-vscode-0.1.12-neoclr.4",
+  "demo": "local/2026-09-12-propagation-4/editor",
+  "artifacts": {
+    "raven-vscode.vsix": "8118e81616244ef294b37a391ffdd8603dc557f8cdaa581f8bbe2410d639d36f",
+    "raven-sdk-0.1.12-neoclr.4-osx-arm64.tar.gz": "e93223fce5b1a408898ca5b445ace395b8b6300a8ce462299bcccc451c2889ec"
+  },
+  "checks": [
+    "Installed rvnc reports 0.1.12-neoclr.4",
+    "Installed stdio server: target completion, collection loop inference, Option propagation inference, ArrayList Capacity",
+    "Saved combined workflow: compile, import, verify and run"
+  ],
+  "guestOutput": [
+    "42",
+    "Saved",
+    "Completed",
+    "Overflow",
+    "Value found",
+    "42",
+    "Absent"
+  ],
+  "limitations": [
+    "Execution still uses dedicated neoCLR project tasks and the source bridge",
+    "Bounded Int32/OverflowError propagation profile",
+    "No public release or general Raven target SDK build support"
+  ]
+}

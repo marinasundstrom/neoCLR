@@ -1666,7 +1666,9 @@ with compiler adaptation where a value is needed. The author replied: “Agree t
 Raven bridge now executes Option<int> absence propagation and Result<Void,OverflowError>
 completion/error propagation. The compiler fix prevents an unused propagated Void
 value remaining on the stack. Refreshing the local SDK/extension was explicitly
-requested; tooling validation is recorded with that installation, not inferred here.
+requested. Installed local SDK/extension 0.1.12-neoclr.4 and verified target completion,
+Option output inference and the saved combined workflow. The [setup instructions](experiments/raven-target/VSCODE.md)
+identify the fresh demo and remaining preview limits. No public release was made.
 
 ## Maintaining the conversation record
 

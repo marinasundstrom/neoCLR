@@ -13,7 +13,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   type semantics while retaining CLR no-result calls. Validate encoded Void storage
   separately from Cecil member resolution; reject CLI VOID markers in value slots.
   Added propagation workflow and editor checks. Raven's discarded-Void fix remains on
-  its isolated target branch; ordinary .NET behavior is unchanged.
+  its isolated target branch; ordinary .NET behavior is unchanged. Built and installed
+  local Raven SDK/VS Code extension 0.1.12-neoclr.4; the prepared propagation demo runs,
+  and installed-server checks verify target completion, constructors and inferred output
+  types. Updated local setup instructions; these are not published release artifacts.
 
 - Replaced ArrayList.Allocate with parameterless and initial-capacity constructors,
   including the Raven class projection. Both start empty; default capacity is zero,
