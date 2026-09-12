@@ -22,7 +22,7 @@ for name in ('CoreInterfaces', 'CollectionAliases', 'CollectionForEach', 'Collec
     if check.returncode:
         raise AssertionError(check.stdout + check.stderr)
 outputs = {}
-for name, expected in [('CoreInterfaces', '1\n42\n=> Void\n'), ('CollectionAliases', '7\n42\n2\n=> Void\n'), ('CollectionForEach', '41\n42\n41\n41\n=> Void\n'), ('CollectionWorkflow', '42\nCompleted\nPrice overflow\nSkipped\nProduct not found\nSkipped\n=> Void\n')]:
+for name, expected in [('CoreInterfaces', '1\n42\n'), ('CollectionAliases', '7\n42\n2\n'), ('CollectionForEach', '41\n42\n41\n41\n'), ('CollectionWorkflow', '42\nCompleted\nPrice overflow\nSkipped\nProduct not found\nSkipped\n')]:
     run = subprocess.run([str(runtime), 'run', str(output / (name + '.neoil')), '--system', str(system)],
                          capture_output=True, text=True, timeout=30)
     if run.returncode or run.stdout != expected:

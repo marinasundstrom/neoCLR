@@ -249,7 +249,7 @@ fn documented_cli_supports_redirected_input_and_gc_diagnostics() {
     );
     let stdout = String::from_utf8_lossy(&output.stdout);
     assert!(stdout.contains("= 42\n"));
-    assert!(stdout.ends_with("=> Int32(0)\n"));
+    assert!(!stdout.contains("=> "));
     assert!(!stdout.contains("GC"));
     assert!(String::from_utf8_lossy(&output.stderr).contains("GC"));
 }

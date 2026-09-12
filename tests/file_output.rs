@@ -131,10 +131,9 @@ fn report_runs_from_artifact_and_cli() {
         "{}",
         String::from_utf8_lossy(&output.stderr)
     );
-    assert!(
-        String::from_utf8(output.stdout)
-            .unwrap()
-            .contains("=> Int32(0)")
+    assert_eq!(
+        String::from_utf8(output.stdout).unwrap(),
+        format!("{}\n", directory.join("summary.txt").display())
     );
     std::fs::remove_dir_all(directory).unwrap();
 }

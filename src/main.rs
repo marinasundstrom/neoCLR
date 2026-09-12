@@ -9,7 +9,7 @@ use std::{
 const USAGE: &str = "Usage:
   neoclr emit-il <source.neo> [output.neoil]
   neoclr assemble <source.neoil> <output.neo.json> [--module <input>]... [--system <input>]
-  neoclr run <input> [System.neo.json] [--module <input>]... [--system <input>] [--gc-stats] [--gc-events] [-- <guest-argument>...]
+  neoclr run <input> [System.neo.json] [--module <input>]... [--system <input>] [--gc-stats] [--gc-events] [--show-result] [-- <guest-argument>...]
   neoclr debug <input> [--module <input>]... [--system <input>] [-- <guest-argument>...]
   neoclr check <input> [--module <input>]... [--system <input>]
   neoclr verify <input> [--module <input>]... [--system <input>]
@@ -72,6 +72,7 @@ fn execute(args: &[String]) -> Result<Vec<String>, String> {
     let mut system_path = None;
     let mut gc_stats = false;
     let mut gc_events = false;
+    let mut show_result = false;
     let mut options = args[required..].iter();
     while let Some(option) = options.next() {
         match option.as_str() {
@@ -79,6 +80,7 @@ fn execute(args: &[String]) -> Result<Vec<String>, String> {
                 guest_arguments.extend(options.cloned());
                 break;
             }
+            "--show-result" if command == "run" && !show_result => show_result = true,
             "--gc-stats" if command == "run" && !gc_stats => gc_stats = true,
             "--gc-events" if command == "run" && !gc_events => gc_events = true,
             "--module" | "--system" => {
@@ -222,9 +224,11 @@ fn execute(args: &[String]) -> Result<Vec<String>, String> {
                     .map_err(|error| format!("GC diagnostics output failed: {error}"))?;
                 }
             }
-            let mut lines = execution.output;
-            lines.push(format!("=> {:?}", execution.value));
-            Ok(lines)
+            if show_result {
+                writeln!(io::stderr().lock(), "=> {:?}", execution.value)
+                    .map_err(|error| format!("Result diagnostics output failed: {error}"))?;
+            }
+            Ok(execution.output)
         }
     }
 }

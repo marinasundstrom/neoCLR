@@ -21,16 +21,16 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
         shutil.copyfile(args.project.resolve().parent / name, root / name)
     command = [sys.executable, str(bridge / 'run_project.py'), str(root / 'Demo.rvnproj'),
                '--raven', str(args.raven.resolve()), '--runtime', str(args.runtime.resolve())]
-    cases = [('Math', 'library-math.rvn', '-2147483648\n2147483647\n7\n-7\n-1\n0\n1\n=> Void\n'),
-             ('Result', 'library-result.rvn', '42\nOverflow\n=> Void\n'),
-             ('Option', 'library-option.rvn', '42\nProduct not found\n=> Void\n'),
-             ('Void', 'library-void.rvn', 'Completed without a payload\nNot completed\n=> Void\n')]
+    cases = [('Math', 'library-math.rvn', '-2147483648\n2147483647\n7\n-7\n-1\n0\n1\n'),
+             ('Result', 'library-result.rvn', '42\nOverflow\n'),
+             ('Option', 'library-option.rvn', '42\nProduct not found\n'),
+             ('Void', 'library-void.rvn', 'Completed without a payload\nNot completed\n')]
     if args.collections:
-        cases += [('ValueCopy', 'library-value-copy.rvn', '42\n7\n=> Void\n'),
-                  ('Arrays', 'library-arrays.rvn', '42\n2\n=> Void\n'),
-                  ('Workflow', 'library-workflow.rvn', '42\nCompleted\nPrice overflow\nSkipped\nProduct not found\nSkipped\n=> Void\n'),
-                  ('ForEach', 'library-foreach.rvn', '41\n42\n41\n41\n=> Void\n'),
-                 ('Aliases', 'library-collection-aliases.rvn', '7\n42\n2\n=> Void\n')]
+        cases += [('ValueCopy', 'library-value-copy.rvn', '42\n7\n'),
+                  ('Arrays', 'library-arrays.rvn', '42\n2\n'),
+                  ('Workflow', 'library-workflow.rvn', '42\nCompleted\nPrice overflow\nSkipped\nProduct not found\nSkipped\n'),
+                  ('ForEach', 'library-foreach.rvn', '41\n42\n41\n41\n'),
+                 ('Aliases', 'library-collection-aliases.rvn', '7\n42\n2\n')]
     for label, sample, expected in cases:
         (root / 'Main.rvn').write_text((bridge / 'samples' / sample).read_text())
         run = subprocess.run(command, capture_output=True, text=True, timeout=90)
@@ -39,7 +39,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
         results[label] = expected
     source = ((bridge / 'samples/library-foreach.rvn').read_text().replace('values.Add(41)', 'values.Add(7)') if args.collections
               else (bridge / 'samples/library-result.rvn').read_text().replace('Show(-42)', 'Show(-7)'))
-    saved_expected = '7\n42\n7\n7\n=> Void\n' if args.collections else '7\nOverflow\n=> Void\n'
+    saved_expected = '7\n42\n7\n7\n' if args.collections else '7\nOverflow\n'
     (root / 'Main.rvn').write_text(source)
     run = subprocess.run(command, capture_output=True, text=True, timeout=90)
     if run.returncode or not run.stdout.endswith(saved_expected):

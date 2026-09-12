@@ -1577,6 +1577,19 @@ published by this exchange. Raven remains isolated on its experiment branch. See
 [local installation instructions](experiments/raven-target/VSCODE.md) for installation
 status and the existing bounded-target limitations.
 
+## 54. Normal output and the release API boundary — recorded 2026-09-12
+
+**Author direction.** Asked whether `=> Void` was test output and agreed that it should
+not appear during normal execution. Requested propagation and APIs for reading/writing
+text files for a complete release; reflection APIs would also be nice to have.
+
+**Assistant action and scope.** Removed the default runner return-value suffix and
+introduced opt-in `--show-result` diagnostics on stderr. Updated CLI/demo expectations.
+Recorded propagation and text-file APIs as required Raven-target release coverage and
+reflection as desirable. Existing Neo/runtime implementations are not evidence that
+Raven can already consume all those APIs; target admission and end-to-end checks remain
+necessary. This output slice does not implement those later library features.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

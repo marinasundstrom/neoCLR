@@ -21,7 +21,7 @@ for name in ("CoreOnly", "CoreEmpty", "CoreNested", "CoreInt32", "CoreLibrary", 
     artifact = output / (name + ".neoil")
     subprocess.run([str(runtime), "verify", str(artifact)], check=True, capture_output=True, text=True)
     run = subprocess.run([str(runtime), "run", str(artifact)], check=True, capture_output=True, text=True)
-    expected = {"CoreVoid": "Completed without a payload\nNot completed\n", "CoreOption": "42\nProduct not found\n", "CoreUnion": "42\nOverflow\n", "CoreOnly": "Hello from Raven on neoCLR\n", "CoreLibrary": "42\n1\n0\nLibrary calls from Raven\n"}.get(name, "") + "=> Void\n"
+    expected = {"CoreVoid": "Completed without a payload\nNot completed\n", "CoreOption": "42\nProduct not found\n", "CoreUnion": "42\nOverflow\n", "CoreOnly": "Hello from Raven on neoCLR\n", "CoreLibrary": "42\n1\n0\nLibrary calls from Raven\n"}.get(name, "")
     if run.stdout != expected:
         raise AssertionError(f"{name}: expected {expected!r}, received {run.stdout!r}")
     results[name] = {"stdout": run.stdout, "stderr": run.stderr, "verified": True}

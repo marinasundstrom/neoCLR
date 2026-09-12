@@ -1,5 +1,10 @@
 # Raven target emission probe
 
+Normal `neoclr run` now prints only guest output. Older recorded transcripts below
+include a historical `=> Void` runner suffix; it is no longer emitted by default.
+Use `--show-result` to inspect return values on stderr. Current verification scripts
+expect clean guest output.
+
 This is slice 2 of the [Raven target experiment](../../raven-target-experiment.md).
 It tests the existing compiler API and inventories emitted PE metadata. The current
 follow-up imports a bounded static subset and executes it against neoCLR's real System

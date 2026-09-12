@@ -15,7 +15,7 @@ for name in ('CoreArrays', 'NullDefault'):
     if check.returncode:
         raise AssertionError(check.stdout + check.stderr)
 run = subprocess.run([str(runtime), 'run', str(output / 'CoreArrays.neoil')], capture_output=True, text=True, timeout=30)
-if run.returncode or run.stdout != '42\n2\n=> Void\n':
+if run.returncode or run.stdout != '42\n2\n':
     raise AssertionError(run.stdout + run.stderr)
 null = subprocess.run([str(runtime), 'run', str(output / 'NullDefault.neoil')], capture_output=True, text=True, timeout=30)
 if null.returncode == 0 or 'null array reference' not in null.stderr:

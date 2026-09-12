@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-12
 
+- Normal CLI runs now emit only guest output; removed the automatic return-value suffix
+  such as `=> Void`. Use `run --show-result` after the input path for opt-in return-value
+  diagnostics on stderr. Scripts expecting the former stdout suffix must be updated.
+  Updated CLI and Raven demo checks, and recorded propagation/text-file APIs as release
+  requirements with reflection coverage desirable.
+
 - Prepared local Raven SDK/VS Code extension 0.1.12-neoclr.3 from the isolated Raven
   feature branch, with a fresh combined demo workspace and updated try-it instructions.
   The SDK is installed alongside the default tools; the workspace selects the new server.

@@ -23,7 +23,7 @@ code --new-window /Users/robert/Projects/neoclr/docs/experiments/raven-target/lo
 2. Open `Main.rvn`, containing the combined product workflow.
 3. Choose **Terminal → Run Task → neoCLR: Run saved project**.
 4. Expect `42`, `Completed`, `Price overflow`, `Skipped`, `Product not found`,
-   `Skipped`, then `=> Void`.
+   `Skipped`.
 5. Change `products.Add(99)` to `products.Add(7)`, save, and run the task again.
    The final missing-product path should become `42`, `Completed`.
 6. Try completion after `System.Math.` or `products.`; undo any unfinished test
@@ -171,7 +171,7 @@ code --new-window /tmp/raven-collections-editor/editor
 If using CARGO_TARGET_DIR, supply its executable path to `--runtime` instead.
 Open Main.rvn and run the generated neoCLR build/run task. Expected output is
 `42`, `Completed`, `Price overflow`, `Skipped`, `Product not found`, `Skipped`,
-followed by `=> Void`. The sample looks up products with Option, validates a price with
+with no runner return-value suffix. The sample looks up products with Option, validates a price with
 Result, and returns an Option<Void> completion marker. The project selects Iterable/Iterator through
 RavenIteration* properties; the task generates and uses the matching adapted runtime
 library for each build. On a List<int> parameter, completion should offer Add, Count,
@@ -195,3 +195,5 @@ examples use the same declaration assembly and adapted library. Existing non-col
 projects retain their smaller profile; regenerate older collection demo folders to
 obtain the added declarations. Automatic disposal and defer remain future work, with
 NeoCLR-specific behavior isolated from existing .NET/CLR support.
+
+Normal runs print only guest output. For runtime diagnostics, `neoclr run <input> --show-result` writes the return value to stderr.

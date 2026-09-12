@@ -63,7 +63,7 @@ fn cli_runs_checks_and_verifies_a_source_set() {
         invocation.extend(args);
         let output = success(&invocation);
         match command {
-            "run" => assert_eq!(output, "42\n=> Void\n"),
+            "run" => assert_eq!(output, "42\n"),
             "check" => assert!(output.contains("metadata valid")),
             _ => assert!(output.contains("typed-stack/control-flow verification passed")),
         }
@@ -113,7 +113,7 @@ fn cli_assembles_and_runs_mixed_sources_and_legacy_artifacts() {
             "--module",
             "examples/modules/models.neoil"
         ]),
-        "42\n=> Void\n"
+        "42\n"
     );
     assert_eq!(fs::read(&models).unwrap(), before);
     assert!(
@@ -142,7 +142,7 @@ fn cli_uses_selected_system_for_initial_resolution() {
     }
     let compiled_system = fixture.path("System.neo.json");
     success(&["assemble", &system, &compiled_system]);
-    assert_eq!(success(&["run", &app, &compiled_system]), "=> Int32(42)\n");
+    assert_eq!(success(&["run", &app, &compiled_system]), "");
     let compiled_app = fixture.path("app.neo.json");
     success(&[
         "assemble",
@@ -153,7 +153,7 @@ fn cli_uses_selected_system_for_initial_resolution() {
     ]);
     assert_eq!(
         success(&["run", &compiled_app, "--system", &compiled_system]),
-        "=> Int32(42)\n"
+        ""
     );
 }
 
@@ -180,7 +180,7 @@ fn cli_rejects_bad_flags_and_revision_mismatches_before_creating_output() {
             "--module",
             "examples/revisions/answers.neoil"
         ]),
-        "42\n=> Void\n"
+        "42\n"
     );
     let wrong = fixture.write(
         "answers.neoil",

@@ -273,7 +273,7 @@ fn cli_flushes_prompt_before_waiting_for_redirected_input_without_duplicate_outp
     input.write_all(b"21\n").unwrap();
     drop(input);
     assert!(child.wait().unwrap().success());
-    assert_eq!(reader.join().unwrap(), "42\n=> Void\n");
+    assert_eq!(reader.join().unwrap(), "42\n");
 }
 
 fn record(name: &str, fields: Vec<Value>) -> Value {

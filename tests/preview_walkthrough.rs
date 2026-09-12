@@ -58,61 +58,49 @@ fn walkthrough_sources_and_artifacts_have_the_documented_outputs_and_exits() {
     let prompt = "Enter an unsigned number (up to nine digits):\n";
     type Scenario = (&'static str, Vec<(&'static [u8], String)>);
     let samples: Vec<Scenario> = vec![
-        (
-            "hello_functions",
-            vec![(b"", "Hello, world!\n=> Void\n".into())],
-        ),
-        (
-            "array_loops",
-            vec![(b"", "Sum of squares:\n30\n=> Void\n".into())],
-        ),
+        ("hello_functions", vec![(b"", "Hello, world!\n".into())]),
+        ("array_loops", vec![(b"", "Sum of squares:\n30\n".into())]),
         (
             "file_summary",
             vec![(
                 b"",
-                "File contents:\nHello, neoCLR 🌍!\nUTF-8 bytes:\n19\n=> Void\n".into(),
+                "File contents:\nHello, neoCLR 🌍!\nUTF-8 bytes:\n19\n".into(),
             )],
         ),
-        (
-            "equatable",
-            vec![(b"", "true\nfalse\ntrue\ntrue\n=> Void\n".into())],
-        ),
-        ("pointer_union", vec![(b"", "42\n7\n11\n=> Void\n".into())]),
+        ("equatable", vec![(b"", "true\nfalse\ntrue\ntrue\n".into())]),
+        ("pointer_union", vec![(b"", "42\n7\n11\n".into())]),
         (
             "ordinary_unions",
             vec![(
                 b"",
-                "success\n7\nfailure\n7\nSome<Void> is present\n=> Void\n".into(),
+                "success\n7\nfailure\n7\nSome<Void> is present\n".into(),
             )],
         ),
         (
             "console_input",
             vec![
-                (b"21\n", format!("{prompt}42\n=> Void\n")),
-                (b"", format!("{prompt}End of input\n=> Void\n")),
-                (b"\n", format!("{prompt}Empty input\n=> Void\n")),
-                (b"x\n", format!("{prompt}Expected ASCII digits\n=> Void\n")),
-                (
-                    b"1234567890\n",
-                    format!("{prompt}At most nine digits\n=> Void\n"),
-                ),
+                (b"21\n", format!("{prompt}42\n")),
+                (b"", format!("{prompt}End of input\n")),
+                (b"\n", format!("{prompt}Empty input\n")),
+                (b"x\n", format!("{prompt}Expected ASCII digits\n")),
+                (b"1234567890\n", format!("{prompt}At most nine digits\n")),
             ],
         ),
         (
             "type_inspection",
             vec![(
                 b"",
-                "System.Int32\nBox\n1\nSystem.Int32\nSame type\n=> Void\n".into(),
+                "System.Int32\nBox\n1\nSystem.Int32\nSame type\n".into(),
             )],
         ),
         (
             "array_list",
-            vec![(b"", "ArrayList count:\n5\n0\n1\n4\n9\n16\n=> Void\n".into())],
+            vec![(b"", "ArrayList count:\n5\n0\n1\n4\n9\n16\n".into())],
         ),
-        ("interfaces", vec![(b"", "42\n2\n=> Void\n".into())]),
-        ("reference_parameters", vec![(b"", "42\n=> Void\n".into())]),
-        ("reference_receivers", vec![(b"", "42\n=> Void\n".into())]),
-        ("union_try_get", vec![(b"", "42\n=> Void\n".into())]),
+        ("interfaces", vec![(b"", "42\n2\n".into())]),
+        ("reference_parameters", vec![(b"", "42\n".into())]),
+        ("reference_receivers", vec![(b"", "42\n".into())]),
+        ("union_try_get", vec![(b"", "42\n".into())]),
         ("array_bounds", vec![]),
         ("fault_trace", vec![]),
     ];

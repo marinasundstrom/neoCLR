@@ -114,5 +114,5 @@ fn documented_cli_example_runs() {
         "{}",
         String::from_utf8_lossy(&output.stderr)
     );
-    assert!(String::from_utf8_lossy(&output.stdout).contains("Same type\n=> Void\n"));
+    assert!(String::from_utf8_lossy(&output.stdout).contains("Same type\n"));
 }

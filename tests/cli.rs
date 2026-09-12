@@ -25,11 +25,12 @@ fn cli_assembles_checks_and_executes_hello_world() {
     assert!(check.status.success());
     let output = Command::new(binary).arg("run").arg(&path).output().unwrap();
     assert!(output.status.success());
+    assert!(output.stderr.is_empty());
     assert_eq!(
         String::from_utf8(output.stdout)
             .unwrap()
             .replace("\r\n", "\n"),
-        "Hello, world!\n=> Void\n"
+        "Hello, world!\n"
     );
     let repeated = Command::new(binary)
         .args(["assemble", "examples/hello.neoil"])
@@ -81,7 +82,37 @@ fn cli_compiles_and_loads_platform_runtime_library() {
         String::from_utf8(output.stdout)
             .unwrap()
             .replace("\r\n", "\n"),
-        "Hello, world!\n=> Void\n"
+        "Hello, world!\n"
     );
     std::fs::remove_file(path).unwrap();
+}
+
+#[test]
+fn return_value_is_an_opt_in_stderr_diagnostic() {
+    let binary = env!("CARGO_BIN_EXE_neoclr");
+    let output = Command::new(binary)
+        .args(["run", "examples/hello.neoil", "--show-result"])
+        .output()
+        .unwrap();
+    assert!(output.status.success());
+    assert_eq!(String::from_utf8(output.stdout).unwrap(), "Hello, world!\n");
+    assert_eq!(String::from_utf8(output.stderr).unwrap(), "=> Void\n");
+    for args in [
+        vec!["check", "examples/hello.neoil", "--show-result"],
+        vec![
+            "run",
+            "examples/hello.neoil",
+            "--show-result",
+            "--show-result",
+        ],
+    ] {
+        assert!(
+            !Command::new(binary)
+                .args(args)
+                .output()
+                .unwrap()
+                .status
+                .success()
+        );
+    }
 }

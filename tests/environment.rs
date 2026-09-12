@@ -128,7 +128,7 @@ func Main() -> int {
         assert!(
             String::from_utf8(output.stdout)
                 .unwrap()
-                .contains("EnvironmentUnavailable\n=> Int32(2)")
+                .contains("EnvironmentUnavailable\n")
         );
     }
 }
