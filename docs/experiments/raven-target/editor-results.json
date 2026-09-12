@@ -1,0 +1,65 @@
+{
+  "RecordedDate": "2026-09-12",
+  "RavenRevision": "37ae9730409d52f876b6b6e47abfa950d8300064",
+  "ExtensionVersion": "0.1.12-neoclr.1",
+  "VsixSha256": "113f2c38168214d6d0e03a72bc9f2ff7df0fd6da63ab2e41e24d324ca0e1d7b2",
+  "ProtocolCompletions": {
+    "Math": [
+      "Abs",
+      "Max",
+      "Min",
+      "Sign"
+    ],
+    "Console": [
+      "WriteLine"
+    ],
+    "System": [
+      "Array",
+      "Attribute",
+      "AttributeTargets",
+      "AttributeUsageAttribute",
+      "Boolean",
+      "Byte",
+      "Char",
+      "Console",
+      "Double",
+      "Enum",
+      "Int16",
+      "Int32",
+      "Int64",
+      "IntPtr",
+      "Math",
+      "Object",
+      "Option",
+      "OverflowError",
+      "Result",
+      "Runtime",
+      "SByte",
+      "Single",
+      "String",
+      "Type",
+      "UInt16",
+      "UInt32",
+      "UInt64",
+      "UIntPtr",
+      "Unit",
+      "ValueType",
+      "Void"
+    ]
+  },
+  "VSCodeObservedMathCompletions": [
+    "Abs",
+    "Max",
+    "Min",
+    "Sign"
+  ],
+  "ClientLogEvidence": "textDocument/completion 2:16 completed; items=4; installed extension 0.1.12-neoclr.1",
+  "Validation": {
+    "ProjectLoadingTests": 37,
+    "FocusedLanguageServerTests": 3,
+    "RuntimePrograms": 8
+  },
+  "Limits": "Editor reference policy and bounded import pipeline; normal Raven Build/Run commands are not neoCLR target commands.",
+  "LocalSdkVersion": "0.1.12-neoclr.1",
+  "LocalSdkValidation": "Installed alongside existing SDK; rvnc --version reports 0.1.12-neoclr.1"
+}

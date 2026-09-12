@@ -1332,6 +1332,27 @@ Raven, and actual VS Code integration remain unfinished; compiler completion alo
 is not reported as editor completion. The [POC priorities](raven-target-experiment.md#poc-demonstration-priorities-2026-09-12)
 distinguish the author's criteria from the assistant's proposed next-step order.
 
+## 42. A locally testable VS Code integration — recorded 2026-09-12
+
+**Author direction.** During the editor slice, the author requested instructions for
+actually testing the integration in VS Code, observing that no available build yet
+supported it, and suggested a local updated SDK and VS Code extension build. The author
+then clarified the term “VS Code extension.”
+
+**Assistant response and action.** The assistant added project-level explicit metadata
+configuration in Raven on its isolated branch, prepared an editable Result demo, and
+built and installed a local VSIX containing the updated compiler library/language server.
+Headless LSP checks covered Math, Console and System names; a manual VS Code interaction
+visibly returned Abs, Max, Min and Sign. The temporary UI test edits were discarded. A separate SDK bundle was built and
+installed alongside the existing SDK, with its version command checked.
+The assistant documented the setup and the distinction between editor support and the
+separate runtime import pipeline in the [walkthrough](experiments/raven-target/VSCODE.md).
+
+**Outcome and remaining work.** Target-aware completion now works in the installed
+extension. This does not make the regular Raven Build/Run buttons neoCLR commands.
+Connecting saved project edits to compilation/import/execution remains the next slice.
+The local build is experimental and is not a published release.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

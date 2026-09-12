@@ -1,2 +1,5 @@
 /bin/
 /obj/
+
+/local/
+__pycache__/

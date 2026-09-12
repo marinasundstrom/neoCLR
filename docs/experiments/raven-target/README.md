@@ -349,3 +349,14 @@ other than the Unit literal. The probe also checks the named token in the binary
 signature and confirms host .NET rejects Void as a generic argument. See the
 [design comparison](../../raven-target-experiment.md#generic-void-execution-2026-09-12).
 VS Code project completion is the next POC step.
+
+## VS Code project completion (2026-09-12)
+
+The [VS Code walkthrough](VSCODE.md) covers the locally installed experimental extension,
+project preparation, expected suggestions, rebuilding, logs, and the separate runtime
+execution command. This editor slice requires Raven `37ae9730409d52f876b6b6e47abfa950d8300064`;
+the older emission revision at the top remains the baseline for the earlier slices.
+`prepare_editor.py` generates an isolated project using `RavenMetadataCoreAssemblyName`.
+`verify_editor.py` checks actual LSP requests against the configured server. Math
+completion was also verified in the installed VS Code extension. These checks do not
+claim the normal Build/Run buttons target neoCLR yet.

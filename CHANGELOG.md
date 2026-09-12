@@ -42,7 +42,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   returns are unchanged; generic Void uses a named target type and the VM's existing
   inhabited Void marker. Added binary signature checks, three rejection probes, saved
   imports and run instructions. This is a bounded target adapter, not general CLI
-  generic compatibility or a zero-stack optimization.
+  generic compatibility or a zero-stack optimization. Added project-backed editing
+  with an explicit metadata core, reproducible LSP completion checks, a local VSIX build
+  and installation walkthrough, plus a locally installed SDK alongside existing builds.
+  Verified target Math suggestions in VS Code itself;
+  normal Raven Build/Run buttons do not yet invoke the neoCLR import pipeline.
 
 - Began nominal class reference semantics: `.type class` uses managed heap handles in
   ordinary class-typed storage, while managed byrefs still address slots. Assignment,

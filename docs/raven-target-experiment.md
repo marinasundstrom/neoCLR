@@ -412,7 +412,7 @@ platform surface.
 | Result-based errors | Abs success and overflow execute | Broaden only as the sample needs |
 | Option-based absence | Raven price lookup constructs/extracts real library Some/None values and executes | Incorporate the lookup into the cohesive demo |
 | Generic Void | Raven Option<System.Void> constructs and matches both cases through a target adapter | Broaden target emission; zero-stack representation remains separate |
-| VS Code completion | Compiler completion probe uses target-only declarations | Wire the Raven project/language server to the same references and verify completions in VS Code |
+| VS Code completion | Installed local extension displays target Math completions; LSP checks cover Console and union names | Connect the editable project to the bounded runtime build/run pipeline |
 
 The next priority is the Option demo, followed by generic Void and the project/editor
 integration. Address runtime gaps when these scenarios expose them. The POC does not
@@ -490,3 +490,27 @@ VOID generic signatures, a wrong payload, and a non-Unit field. These supplement
 four Result and three Option rejection probes and the earlier static profile checks.
 The checked-in imports are covered by the Rust runtime regression. Actual VS Code
 project completion remains the next POC priority.
+
+## Project-backed editor execution (2026-09-12)
+
+The explicit metadata-import policy now flows from Raven project evaluation into the
+language server. A named `RavenMetadataCoreAssemblyName` disables automatic host framework
+references; the language server also refrains from adding host Raven.Core/Macros support
+references. This reuses the existing [core declaration contract](raven-core-declarations.md),
+which uses .NET MetadataLoadContext's explicit resolver mechanism. No guest metadata,
+IL, runtime opcode, or language syntax changes are introduced here.
+
+A generic project property was chosen over a neoCLR-specific language-server branch.
+The benefit is consistent references across compiler and editor without host APIs
+leaking into the demo. The cost is that target authors must supply complete, correct
+reference metadata; project configuration alone neither retargets emission nor validates
+a runtime artifact. Existing .NET projects retain their default behavior. Explicit
+package/reference items remain the caller's responsibility.
+
+Raven changes remain isolated on `codex/neoclr-target-resolution` at `37ae973040`.
+Validation covers 37 project-loading tests and three focused language-server tests.
+The installed local VSIX displays Abs/Max/Min/Sign in VS Code, and the stdio protocol
+probe checks Console and System (including Option/Result/Void, without System.IO).
+The eight runtime programs still execute with the new compiler build. Full Build/Run
+integration is separate; [instructions and limitations](experiments/raven-target/VSCODE.md)
+make that boundary explicit.
