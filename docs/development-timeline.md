@@ -1082,6 +1082,26 @@ binary-format choices and scope limits. Linked it from compatibility and format 
 No Raven/compiler or binary-loader implementation was performed in this documentation
 slice; no new reference/value default was selected.
 
+### 30. Inspect the existing Raven backend before inventing a target
+
+Recorded 2026-09-12.
+
+**Author's instruction:** Continue with the planned experiment slices, beginning with
+Raven inspection. **Assistant's action:** Located Raven, read its repository instructions
+and compiler-investigation skill, and pinned its clean checkout at d92b02812740ae052f277c23151e9cc208f7672d.
+
+**Findings:** Raven imports PE symbols with MetadataLoadContext and emits through
+PersistedAssemblyBuilder/ManagedPEBuilder plus Cecil normalization. It already has a
+target-core-library option and retargeting tests. Those hooks do not provide a full
+neoCLR target: .NET framework discovery, host core identities, Unit/void mapping and
+exception-based framework projections still need explicit target contracts.
+
+**Outcome:** Produced the [integration map](raven-backend-integration-map.md), with pinned
+source links, adaptation points and a proposed minimal Console probe. Source and test
+bodies were inspected; no Raven build/test or target execution was claimed. Raven was
+not modified. The next slice should define the minimal library/call contract and run
+an emission/reference-facade probe before selecting a binary format.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

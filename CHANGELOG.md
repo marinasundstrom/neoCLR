@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-12
 
+- Added the first Raven integration map, pinned to the inspected compiler revision.
+  Identified existing core-library retargeting, reflection/PE emission dependencies,
+  framework discovery and semantic gaps in Void/Unit and error projections. Documented
+  the next minimal-target probes; no Raven changes or binary execution are claimed.
+
 - Documented the Raven target/binary-artifact experiment on its own branch: inspect
   the existing compiler, choose an evidence-backed format/library contract, and
   compile/run HelloWorld against neoCLR's own System library. Recorded deliberate

@@ -2,7 +2,11 @@
 
 Planned 2026-09-12 on `codex/raven-neoclr-target`, starting from `64024d6`.
 This document scopes an experiment. No Raven backend, binary format or loader support
-is implemented by this slice, and Raven's backend has not yet been inspected for it.
+is implemented by the planning slice. The subsequent
+[slice 1 integration map](raven-backend-integration-map.md) now pins and inspects Raven's
+backend: it identifies existing core-library retargeting support, reflection/PE coupling,
+framework discovery and the Void/Unit and exception-projection gaps. Binary format and
+runtime-target contracts remain undecided.
 
 ## Objective and compatibility boundary
 
