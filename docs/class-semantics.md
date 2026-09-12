@@ -116,3 +116,19 @@ The constructor follow-up passed 52 focused tests. They cover default primitive 
 stack enforcement, failures, heap limits, GC during construction, unsupported chaining,
 and the Console example. Run `cargo test --test class_constructors --test class_semantics
 --test constructors --test constructor_chaining --test no_result --test cil` as one command.
+
+## Reference defaults (2026-09-12)
+
+Nominal class defaults now produce a typed null reference. This is a valid reference-slot
+state, distinct from uninitialized storage, a managed byref or a zero-valued record.
+Constructor field defaults and `initobj` on a class slot use it without allocating an
+object. Resetting a slot does not modify other aliases. Null handles are not GC roots;
+`ref.eq` compares them, and field access through null faults. This adopts ordinary CLR
+class-reference default behavior for the experiment; earlier explicit-nullability ideas
+remain historical design exploration rather than an implemented non-null class guarantee.
+Generic nullable values and nullable metadata are separate work. `ldnull` projection and
+String/interface/array classification are not implemented by this slice.
+
+The reference-default follow-up passed 22 focused tests across class defaults, constructors
+and reference semantics. The next acceptance result must be Raven-emitted IL calling the
+real runtime library, not merely a host-generated method fixture.

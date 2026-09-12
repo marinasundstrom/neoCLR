@@ -118,7 +118,7 @@ fn rebinding_parameter_does_not_rebind_caller_but_byref_does() {
 }
 
 #[test]
-fn unsupported_class_metadata_and_default_initialization_are_rejected() {
+fn unsupported_class_metadata_and_native_layout_are_rejected() {
     let baseline = module(".function Main() -> Void\nldvoid\nret\n.end");
     for representation in [
         neoclr::metadata::Representation::Interface,
@@ -134,13 +134,6 @@ fn unsupported_class_metadata_and_default_initialization_are_rejected() {
     assert!(roundtrip.is_reference_type(&neoclr::metadata::Type::Named("Counter".into())));
     let ty = neoclr::metadata::Type::Named("Counter".into());
     assert!(neoclr::memory::layout(&baseline, &ty).is_err());
-    // Reserve a slot and attempt to create a class through value default initialization.
-    let invalid = assemble(&format!(
-        ".module Invalid\n.entry Main\n{TYPES}.function Main() -> Void\n.local Counter c\nldloca c\ninitobj Counter\nldvoid\nret\n.end"
-    ));
-    if let Ok(m) = invalid {
-        assert!(run(&m, Limits::default()).is_err());
-    }
 }
 
 #[test]

@@ -1247,6 +1247,20 @@ Binary parsing is supporting work, not the primary acceptance milestone.
 The type migration and actual execution of Raven binaries remain unimplemented; Raven
 itself was unchanged by this slice.
 
+## 38. Raven must consume the runtime library — recorded 2026-09-12
+
+**Author clarification:** The goal is staged support for Raven compiling to neoCLR-compatible
+IL and consuming neoCLR's runtime class library to build simple programs.
+
+**Assistant response:** Made the end-to-end path the next acceptance test: compile Raven,
+import a bounded emitted program, and execute its Console call against the real neoCLR
+System implementation. Proposed a neoCLR-owned experiment bridge, with no further Raven
+changes, while the native reader's metadata binding remains incomplete.
+
+**Action so far:** Completed nominal class reference defaults. Bridge implementation and
+actual runtime-library execution are the subsequent work; this entry does not claim them
+completed.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

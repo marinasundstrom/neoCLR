@@ -16,7 +16,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   results supplied by newobj; class field stores now consume operands without a result
   (remove the previous trailing pop). GC retains objects throughout construction.
   Decodes standard constructor/field tokens and adds a runnable Console example.
-  Inheritance, class reference defaults/null and Raven binary execution remain unfinished;
+  Added typed null defaults for nominal class fields/slots, alias-safe initobj reset,
+  null comparison, null field-access faults and GC handling. Uninitialized slots remain
+  distinct. Inheritance and Raven binary execution remain unfinished;
   legacy value/byref field-store behavior and System API returns still need migration.
 
 - Added a bounded standard CIL code-stream decoder for the static-call experiment,

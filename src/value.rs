@@ -37,6 +37,8 @@ pub enum Value {
     },
     /// Ordinary class reference. Cloning copies identity, never object contents.
     ObjectReference(ObjectReference),
+    /// Typed null for nominal class storage; not an uninitialized slot or a byref.
+    NullObjectReference(Type),
     SlotReference(crate::SlotReference),
     Pointer(crate::memory::Pointer),
     /// An interface projection retaining its managed concrete slot.
@@ -166,6 +168,7 @@ impl Value {
             Self::RuntimeTypeHandle(_) => Type::RuntimeTypeHandle,
             Self::Object { ty, .. } => ty.clone(),
             Self::ObjectReference(object) => object.target().clone(),
+            Self::NullObjectReference(ty) => ty.clone(),
             Self::Array { element, .. } => Type::Array(Box::new(element.clone())),
             Self::SlotInterface {
                 interface,

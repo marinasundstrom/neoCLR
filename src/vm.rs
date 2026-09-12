@@ -1965,8 +1965,9 @@ fn interpret_instructions(
                     frames.push(Frame::new(callee, args)?);
                 }
                 Op::ReferenceEqual => {
-                    let mut reference = || -> Result<crate::SlotReference, Fault> {
+                    let mut reference = || -> Result<Option<crate::SlotReference>, Fault> {
                         let reference = match frame.pop()? {
+                            Value::NullObjectReference(_) => return Ok(None),
                             Value::ObjectReference(object) => object.reference,
                             Value::SlotReference(reference)
                             | Value::SlotInterface {
@@ -1976,11 +1977,15 @@ fn interpret_instructions(
                             _ => return Err(Fault::new("ref.eq requires managed references")),
                         };
                         reference.assigned()?;
-                        Ok(reference)
+                        Ok(Some(reference))
                     };
                     let right = reference()?;
                     let left = reference()?;
-                    frame.stack.push(Value::Boolean(left.same_location(&right)));
+                    frame.stack.push(Value::Boolean(match (left, right) {
+                        (None, None) => true,
+                        (Some(left), Some(right)) => left.same_location(&right),
+                        _ => false,
+                    }));
                 }
                 Op::CastClass(target) => {
                     let Value::SlotReference(reference) = frame.pop()? else {
@@ -2362,6 +2367,9 @@ fn interpret_instructions(
                     });
                 }
                 Op::Field(i) => {
+                    if matches!(frame.stack.last(), Some(Value::NullObjectReference(_))) {
+                        return Err(Fault::new("null object reference in field load"));
+                    }
                     if let Some(Value::ObjectReference(object)) = frame.stack.last() {
                         crate::access::check_field(module, &function, object.target(), *i)?;
                         let value = object.reference.read_field(*i)?.on_stack();
@@ -2394,6 +2402,9 @@ fn interpret_instructions(
                 Op::SetField(i) => {
                     let value = frame.pop()?;
                     let receiver = frame.pop()?;
+                    if matches!(receiver, Value::NullObjectReference(_)) {
+                        return Err(Fault::new("null object reference in field store"));
+                    }
                     if let Value::ObjectReference(object) = receiver {
                         crate::access::check_field(module, &function, object.target(), *i)?;
                         let fields = module.instantiated_fields(object.target())?;
@@ -2747,6 +2758,7 @@ fn debug_value(
         ..Default::default()
     };
     match value {
+        Value::NullObjectReference(_) => result.value = "null".into(),
         Value::ObjectReference(object) => {
             result.value = format!("object reference heap#{}", object.allocation_id());
         }
