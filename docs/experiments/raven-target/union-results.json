@@ -2,7 +2,7 @@
   "RecordedDate": "2026-09-12",
   "RavenRevision": "17c9f8b826bd4cfc10a739f511db087214892b56",
   "UnionProbe": {
-    "Scope": "metadata binding and emission; no union program executed",
+    "Scope": "metadata binding, emission and bounded Result import; execute generated neoIL separately",
     "BindingPassed": true,
     "InvalidArgumentDiagnostics": [
       "error RAV1503: Cannot convert from 'string' to 'int'"
@@ -165,5 +165,11 @@
       ]
     },
     "ApplicationClosureErrors": []
+  },
+  "ResultImportRejections": {
+    "ResultDefaultCarrier": "Read of uninitialized or unsupported default local.",
+    "ResultUnassignedReceiver": "Read through uninitialized carrier address.",
+    "ResultMergeType": "Incompatible branch stack merge.",
+    "ResultWrongOutCase": "Input stack type mismatch."
   }
 }

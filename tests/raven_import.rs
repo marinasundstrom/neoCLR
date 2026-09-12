@@ -1,8 +1,12 @@
 use neoclr::{Limits, assemble, run, verify};
 
 #[test]
-fn raven_emitted_static_corpus_runs_against_real_system_library() {
+fn raven_emitted_corpus_runs_against_real_system_library() {
     for (source, expected) in [
+        (
+            include_str!("../docs/experiments/raven-target/imported/CoreUnion.neoil"),
+            vec!["42", "Overflow"],
+        ),
         (
             include_str!("../docs/experiments/raven-target/imported/CoreLibrary.neoil"),
             vec!["42", "1", "0", "Library calls from Raven"],

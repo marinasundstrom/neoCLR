@@ -215,6 +215,8 @@ using (var unionAssembly = AssemblyDefinition.ReadAssembly(Path.Combine(output, 
 }
 var unionClosureErrors = ClosureAudit.Inspect(Path.Combine(output, "CoreUnion.dll"), unionCore);
 if (unionClosureErrors.Length != 0) throw new Exception(string.Join("\n", unionClosureErrors));
+ResultImport.Write(Path.Combine(output, "CoreUnion.dll"), unionCore, Path.Combine(output, "CoreUnion.neoil"));
+var resultImportRejections = ResultImportChecks.Run(Path.Combine(output, "CoreUnion.dll"), unionCore, output);
 var report = new
 {
     Closure = new
@@ -230,9 +232,10 @@ var report = new
         ConsumerErrors = consumerErrors,
         MissingDependencyErrors = missingDependencyErrors
     },
-    Scope = "emission plus bounded static import; execute generated neoIL separately against neoCLR System",
-    UnionProbe = new { Scope = "metadata binding and emission; no union program executed",
+    Scope = "emission plus bounded static and Result imports; execute generated neoIL separately against neoCLR System",
+    UnionProbe = new { Scope = "metadata binding, emission and bounded Result import; execute generated neoIL separately",
         BindingPassed = true, InvalidArgumentDiagnostics = badUnionDiagnostics, DeclarationClosureErrors = unionErrors, Emission = unionImage, ApplicationClosureErrors = unionClosureErrors },
+    ResultImportRejections = resultImportRejections,
     StaticImportRejections = staticImportRejections,
     TargetCompletions = targetCompletions,
     CoreDeclarationTypes = coreTypes,

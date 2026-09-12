@@ -235,7 +235,7 @@ checks and the new completion checks. All five imports verify and run through
 `verify_runtime.py`; `cargo test --test raven_import` passes against the refreshed fixtures.
 The next MVP program must consume a real Result/Option API and handle both outcomes.
 
-## Result emission probe (2026-09-12)
+## Running the Result demo (2026-09-12)
 
 The same reproduction command checks `samples/library-result.rvn`, using a separate
 `union-probe/NeoCLR.CoreProbe.dll`. `report.json` includes `UnionProbe`: the valid
@@ -244,9 +244,34 @@ The generated `CoreUnion.dll` passes dependency-closure checks. Both generic out
 extractors must be referenced; ordinary object type-test lowering is rejected. The
 compact checked-in outcome is `union-results.json`.
 
-**This sample cannot run on neoCLR yet.** Its declaration bodies are placeholders;
-they are not part of the executable API catalog, generated neoIL, or
-`verify_runtime.py`'s five runtime programs. The [follow-up notes](../../raven-target-experiment.md#target-metadata-emission-follow-up-2026-09-12)
-record the compiler fix, correction to the previous declaration probe, and remaining
-runtime/library work. The earlier pinned Raven revision reproduced the emission
-blocker; reproduction now requires the updated feature-branch revision above.
+`ResultImport` now produces `CoreUnion.neoil` and its source/provenance map.
+The runtime verification command above verifies and runs all six programs, including
+this Result sample. To run only the checked-in demo from the neoCLR repository root:
+
+```bash
+cargo run -- verify docs/experiments/raven-target/imported/CoreUnion.neoil
+cargo run -- run docs/experiments/raven-target/imported/CoreUnion.neoil
+```
+
+Expected output:
+
+```text
+42
+Overflow
+=> Void
+```
+
+These are results from the actual System.Math.Abs and System.Result implementations.
+The final Void line is the CLI's no-result display; it does not demonstrate generic Void.
+The emitter declarations never execute. `union-results.json` records emission and
+import rejection checks; `runtime-results.json` records execution.
+
+The Result profile admits only Int32/OverflowError and their closed cases, static app
+methods, local addresses, and the verified branch subset needed here. It rejects
+observable default Result carriers, wrong out-case types, uninitialized receivers,
+and incompatible stack merges. Its adapters translate TryGetValue to TryGet, copy the
+value receiver through its managed address, initialize the out case on both outcomes,
+and map Boolean results to CLI Int32 stack values. Console adapters consume legacy
+inhabited Void returns. Direct calls to the recognition-only `Value` property are
+not supported. See the [Result import contract](../../raven-target-experiment.md#result-execution-profile-2026-09-12)
+for the limits and remaining POC work.

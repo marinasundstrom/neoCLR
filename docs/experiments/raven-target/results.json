@@ -54,7 +54,178 @@
       "Consumer: unresolved type Probe.Root [Closed, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]"
     ]
   },
-  "Scope": "emission plus bounded static import; execute generated neoIL separately against neoCLR System",
+  "Scope": "emission plus bounded static and Result imports; execute generated neoIL separately against neoCLR System",
+  "UnionProbe": {
+    "Scope": "metadata binding, emission and bounded Result import; execute generated neoIL separately",
+    "BindingPassed": true,
+    "InvalidArgumentDiagnostics": [
+      "error RAV1503: Cannot convert from 'string' to 'int'"
+    ],
+    "DeclarationClosureErrors": [],
+    "Emission": {
+      "References": [
+        "NeoCLR.CoreProbe, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+      ],
+      "Types": [
+        "<Module>",
+        "System.Unit",
+        "NamespaceMembers",
+        "System.Runtime.CompilerServices.NullableContextAttribute",
+        "Program"
+      ],
+      "Methods": [
+        {
+          "Signature": "System.Boolean System.Unit::Equals(System.Unit)",
+          "Instructions": [
+            "ldc.i4.1",
+            "ret"
+          ],
+          "ExceptionRegions": 0
+        },
+        {
+          "Signature": "System.Boolean System.Unit::Equals(System.Object)",
+          "Instructions": [
+            "ldarg.1",
+            "isinst System.Unit",
+            "ldnull",
+            "cgt.un",
+            "ret"
+          ],
+          "ExceptionRegions": 0
+        },
+        {
+          "Signature": "System.Int32 System.Unit::GetHashCode()",
+          "Instructions": [
+            "ldc.i4.0",
+            "ret"
+          ],
+          "ExceptionRegions": 0
+        },
+        {
+          "Signature": "System.String System.Unit::ToString()",
+          "Instructions": [
+            "ldstr ()",
+            "ret"
+          ],
+          "ExceptionRegions": 0
+        },
+        {
+          "Signature": "System.Void NamespaceMembers::Show(System.Int32)",
+          "Instructions": [
+            "nop",
+            "nop",
+            "ldarg.0",
+            "call System.Result`2<System.Int32,System.OverflowError> System.Math::Abs(System.Int32) scope=NeoCLR.CoreProbe",
+            "stloc.0",
+            "nop",
+            "ldloc.0",
+            "stloc.3",
+            "ldloca.s V_3",
+            "ldloca.s V_4",
+            "call System.Boolean System.Result`2<System.Int32,System.OverflowError>::TryGetValue(System.Result/Ok`1<!0>&) scope=NeoCLR.CoreProbe",
+            "brfalse IL_0023: ldc.i4.0",
+            "ldloc.s V_4",
+            "stloc.1",
+            "ldc.i4.1",
+            "br IL_0024: brtrue IL_002e",
+            "ldc.i4.0",
+            "brtrue IL_002e: nop",
+            "br IL_0041: nop",
+            "nop",
+            "ldloca.s V_1",
+            "call !0 System.Result/Ok`1<System.Int32>::get_Value() scope=NeoCLR.CoreProbe",
+            "call System.Void System.Console::WriteLine(System.Int32) scope=NeoCLR.CoreProbe",
+            "br IL_0073: nop",
+            "nop",
+            "nop",
+            "ldloc.0",
+            "stloc.s V_5",
+            "ldloca.s V_5",
+            "ldloca.s V_6",
+            "call System.Boolean System.Result`2<System.Int32,System.OverflowError>::TryGetValue(System.Result/Error`1<!1>&) scope=NeoCLR.CoreProbe",
+            "brfalse IL_005c: ldc.i4.0",
+            "ldloc.s V_6",
+            "stloc.2",
+            "ldc.i4.1",
+            "br IL_005d: brtrue IL_0067",
+            "ldc.i4.0",
+            "brtrue IL_0067: nop",
+            "br IL_0072: nop",
+            "nop",
+            "ldstr Overflow",
+            "call System.Void System.Console::WriteLine(System.String) scope=NeoCLR.CoreProbe",
+            "nop",
+            "nop",
+            "nop",
+            "ret"
+          ],
+          "ExceptionRegions": 0
+        },
+        {
+          "Signature": "System.Void NamespaceMembers::Main()",
+          "Instructions": [
+            "nop",
+            "nop",
+            "ldc.i4.s -42",
+            "call System.Void NamespaceMembers::Show(System.Int32) scope=CoreUnion",
+            "nop",
+            "ldc.i4 -2147483648",
+            "call System.Void NamespaceMembers::Show(System.Int32) scope=CoreUnion",
+            "nop",
+            "ret"
+          ],
+          "ExceptionRegions": 0
+        },
+        {
+          "Signature": "System.Void System.Runtime.CompilerServices.NullableContextAttribute::.ctor(System.Byte)",
+          "Instructions": [
+            "ldarg.0",
+            "call System.Void System.Attribute::.ctor() scope=NeoCLR.CoreProbe",
+            "ldarg.0",
+            "ldarg.1",
+            "stfld System.Byte System.Runtime.CompilerServices.NullableContextAttribute::Flag",
+            "ret"
+          ],
+          "ExceptionRegions": 0
+        },
+        {
+          "Signature": "System.Void Program::.ctor()",
+          "Instructions": [
+            "ldarg.0",
+            "call System.Void System.Object::.ctor() scope=NeoCLR.CoreProbe",
+            "ret"
+          ],
+          "ExceptionRegions": 0
+        }
+      ],
+      "MissingFacadeTypes": [],
+      "EntryPoint": "System.Void NamespaceMembers::Main()",
+      "TypeReferences": [
+        "System.Attribute scope=NeoCLR.CoreProbe",
+        "System.AttributeTargets scope=NeoCLR.CoreProbe",
+        "System.AttributeUsageAttribute scope=NeoCLR.CoreProbe",
+        "System.Boolean scope=NeoCLR.CoreProbe",
+        "System.Console scope=NeoCLR.CoreProbe",
+        "System.Int32 scope=NeoCLR.CoreProbe",
+        "System.Math scope=NeoCLR.CoreProbe",
+        "System.Object scope=NeoCLR.CoreProbe",
+        "System.OverflowError scope=NeoCLR.CoreProbe",
+        "System.Result scope=NeoCLR.CoreProbe",
+        "System.Result/Error`1 scope=NeoCLR.CoreProbe",
+        "System.Result/Ok`1 scope=NeoCLR.CoreProbe",
+        "System.Result`2 scope=NeoCLR.CoreProbe",
+        "System.String scope=NeoCLR.CoreProbe",
+        "System.ValueType scope=NeoCLR.CoreProbe"
+      ]
+    },
+    "ApplicationClosureErrors": []
+  },
+  "ResultImportRejections": {
+    "ResultDefaultCarrier": "Read of uninitialized or unsupported default local.",
+    "ResultUnassignedReceiver": "Read through uninitialized carrier address.",
+    "ResultMergeType": "Incompatible branch stack merge.",
+    "ResultWrongOutCase": "Input stack type mismatch."
+  },
   "StaticImportRejections": {
     "ImportUnderflow": "Input stack underflow.",
     "ImportBadReturn": "Input ret stack must be empty after its declared result.",
@@ -71,7 +242,7 @@
     ]
   },
   "CoreDeclarationTypes": [
-    ".\u003CModule\u003E",
+    ".<Module>",
     "System.Array",
     "System.Attribute",
     "System.AttributeTargets",
@@ -107,7 +278,7 @@
       "NeoCLR.CoreProbe, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
     ],
     "Types": [
-      "\u003CModule\u003E",
+      "<Module>",
       "System.Unit",
       "NamespaceMembers",
       "System.Runtime.CompilerServices.NullableContextAttribute",
@@ -201,7 +372,7 @@
         "NeoCLR.CoreProbe, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
       ],
       "Types": [
-        "\u003CModule\u003E",
+        "<Module>",
         "System.Unit",
         "NamespaceMembers",
         "System.Runtime.CompilerServices.NullableContextAttribute",
@@ -317,7 +488,7 @@
         "NeoCLR.CoreProbe, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
       ],
       "Types": [
-        "\u003CModule\u003E",
+        "<Module>",
         "System.Unit",
         "NamespaceMembers",
         "System.Runtime.CompilerServices.NullableContextAttribute",
@@ -405,7 +576,7 @@
         "NeoCLR.CoreProbe, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
       ],
       "Types": [
-        "\u003CModule\u003E",
+        "<Module>",
         "System.Unit",
         "NamespaceMembers",
         "System.Runtime.CompilerServices.NullableContextAttribute",
@@ -503,7 +674,7 @@
         "NeoCLR.CoreProbe, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
       ],
       "Types": [
-        "\u003CModule\u003E",
+        "<Module>",
         "System.Unit",
         "NamespaceMembers",
         "System.Runtime.CompilerServices.NullableContextAttribute",
@@ -601,10 +772,10 @@
   },
   "CoreMissingConsoleErrors": [
     "error RAV2021: You can only import namespaces and types.",
-    "error RAV0103: \u0027WriteLine\u0027 is not in scope."
+    "error RAV0103: 'WriteLine' is not in scope."
   ],
   "CoreWrongSignatureErrors": [
-    "error RAV1503: Cannot convert from \u0027string\u0027 to \u0027int\u0027"
+    "error RAV1503: Cannot convert from 'string' to 'int'"
   ],
   "CoreOnlyClosureErrors": [],
   "FrameworkReferences": 176,
@@ -613,7 +784,7 @@
       "NeoCLR.Probe.System, Version=0.0.0.1, Culture=neutral, PublicKeyToken=null"
     ],
     "Types": [
-      "\u003CModule\u003E",
+      "<Module>",
       "System.Unit",
       "NamespaceMembers",
       "System.Runtime.CompilerServices.NullableContextAttribute",
@@ -710,7 +881,7 @@
   "ExplicitOnlyIsolationPassed": true,
   "IsolatedMissingLibraryErrors": [
     "error RAV2021: You can only import namespaces and types.",
-    "error RAV0103: \u0027WriteLine\u0027 is not in scope."
+    "error RAV0103: 'WriteLine' is not in scope."
   ],
   "Control": {
     "References": [
@@ -718,7 +889,7 @@
       "System.Runtime, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
     ],
     "Types": [
-      "\u003CModule\u003E",
+      "<Module>",
       "System.Unit",
       "NamespaceMembers",
       "System.Runtime.CompilerServices.NullableContextAttribute",
@@ -810,7 +981,7 @@
       "NeoCLR.Probe.System, Version=0.0.0.1, Culture=neutral, PublicKeyToken=null"
     ],
     "Types": [
-      "\u003CModule\u003E",
+      "<Module>",
       "System.Unit",
       "NamespaceMembers",
       "System.Runtime.CompilerServices.NullableContextAttribute",
@@ -905,7 +1076,7 @@
     ]
   },
   "MissingMemberErrors": [
-    "error RAV0103: \u0027MissingWriteLine\u0027 is not in scope."
+    "error RAV0103: 'MissingWriteLine' is not in scope."
   ],
   "MissingLibraryErrors": [],
   "MissingLibraryIsolationPassed": false,
@@ -915,7 +1086,7 @@
       "System.Runtime, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
     ],
     "Types": [
-      "\u003CModule\u003E",
+      "<Module>",
       "System.Unit",
       "NamespaceMembers",
       "System.Runtime.CompilerServices.NullableContextAttribute",

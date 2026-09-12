@@ -25,7 +25,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   runtime APIs. Follow-up now emits the sample after a feature-branch Raven fix for
   target metadata types and generic/byref member signatures. Corrected the probe's
   missing union-recognition Value property; verifies actual TryGetValue lowering instead
-  of ordinary type tests. Runtime union import/execution remains outstanding.
+  of ordinary type tests. Added a bounded Result importer with control-flow stack and
+  definite-assignment checks, case defaults, value-receiver/out-case adapters, and
+  four malformed-input rejection probes. Raven's Math.Abs sample now executes against
+  the real neoCLR System library and prints success (42) and overflow (Overflow).
+  Added it as the sixth runtime regression program, with provenance and run instructions.
+  Observable default Result carriers remain unsupported and are rejected. Recorded the
+  POC priorities: own library, Result/Option, generic Void, and Raven VS Code completion.
 
 - Began nominal class reference semantics: `.type class` uses managed heap handles in
   ordinary class-typed storage, while managed byrefs still address slots. Assignment,

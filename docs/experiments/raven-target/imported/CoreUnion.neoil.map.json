@@ -1,0 +1,282 @@
+{
+  "Profile": "result-int32-overflow-v1",
+  "ApplicationSha256": "36C02DF6410EF272BC98A58496CE0F214C3AA8D10282D07F341051FE17BB1B87",
+  "CoreSha256": "DE26091A42F67C9A48E10BC4ACA4E66170077DDB55ABCFB3837F271179C1B256",
+  "ReachableMethods": [
+    100663301,
+    100663302
+  ],
+  "Mappings": [
+    {
+      "MethodToken": 100663302,
+      "Offset": 0,
+      "OutputLine": 4
+    },
+    {
+      "MethodToken": 100663302,
+      "Offset": 1,
+      "OutputLine": 5
+    },
+    {
+      "MethodToken": 100663302,
+      "Offset": 2,
+      "OutputLine": 6
+    },
+    {
+      "MethodToken": 100663302,
+      "Offset": 4,
+      "OutputLine": 8
+    },
+    {
+      "MethodToken": 100663302,
+      "Offset": 9,
+      "OutputLine": 10
+    },
+    {
+      "MethodToken": 100663302,
+      "Offset": 10,
+      "OutputLine": 11
+    },
+    {
+      "MethodToken": 100663302,
+      "Offset": 15,
+      "OutputLine": 13
+    },
+    {
+      "MethodToken": 100663302,
+      "Offset": 20,
+      "OutputLine": 15
+    },
+    {
+      "MethodToken": 100663302,
+      "Offset": 21,
+      "OutputLine": 16
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 0,
+      "OutputLine": 39
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 1,
+      "OutputLine": 40
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 2,
+      "OutputLine": 41
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 3,
+      "OutputLine": 43
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 8,
+      "OutputLine": 45
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 9,
+      "OutputLine": 47
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 10,
+      "OutputLine": 48
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 11,
+      "OutputLine": 50
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 12,
+      "OutputLine": 52
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 14,
+      "OutputLine": 54
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 16,
+      "OutputLine": 56
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 21,
+      "OutputLine": 58
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 26,
+      "OutputLine": 60
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 28,
+      "OutputLine": 62
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 29,
+      "OutputLine": 64
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 30,
+      "OutputLine": 66
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 35,
+      "OutputLine": 68
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 36,
+      "OutputLine": 70
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 41,
+      "OutputLine": 72
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 46,
+      "OutputLine": 74
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 47,
+      "OutputLine": 75
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 49,
+      "OutputLine": 77
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 54,
+      "OutputLine": 79
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 59,
+      "OutputLine": 81
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 65,
+      "OutputLine": 83
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 66,
+      "OutputLine": 84
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 67,
+      "OutputLine": 86
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 69,
+      "OutputLine": 88
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 71,
+      "OutputLine": 90
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 73,
+      "OutputLine": 92
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 78,
+      "OutputLine": 94
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 83,
+      "OutputLine": 96
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 85,
+      "OutputLine": 98
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 86,
+      "OutputLine": 100
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 87,
+      "OutputLine": 102
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 92,
+      "OutputLine": 104
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 93,
+      "OutputLine": 106
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 98,
+      "OutputLine": 108
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 103,
+      "OutputLine": 110
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 104,
+      "OutputLine": 111
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 109,
+      "OutputLine": 113
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 114,
+      "OutputLine": 115
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 115,
+      "OutputLine": 116
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 116,
+      "OutputLine": 117
+    },
+    {
+      "MethodToken": 100663301,
+      "Offset": 117,
+      "OutputLine": 118
+    }
+  ],
+  "Scope": "Bounded generic Result bindings; CFG stack/definite-assignment checked; observable default carrier rejected; no guest declaration bodies executed."
+}

@@ -1315,6 +1315,23 @@ The [follow-up](raven-target-experiment.md#target-metadata-emission-follow-up-20
 records this correction and the remaining API-projection and importer work. No new
 author design decision is inferred from continuation.
 
+## 41. A concrete POC demonstration — recorded 2026-09-12
+
+**Author direction.** The author wants a demo of a .NET-like runtime with its own
+runtime class library, Result and Option rather than exception/null-centered flows,
+Void as a valid type parameter, and Raven targeting with basic VS Code completion.
+The author identifies this combination as sufficient to distinguish and justify the
+experience; this does not request broad compatibility or a full debugger.
+
+**Assistant response and action.** The assistant acknowledged these as the POC
+priorities. During the current Result slice, the first Raven Result sample executed
+on neoCLR against the real Math and Result implementations, printing 42 and Overflow.
+The assistant added control-flow/initialization validation, malformed-input probes,
+run instructions and the executable regression artifact. Option, generic Void from
+Raven, and actual VS Code integration remain unfinished; compiler completion alone
+is not reported as editor completion. The [POC priorities](raven-target-experiment.md#poc-demonstration-priorities-2026-09-12)
+distinguish the author's criteria from the assistant's proposed next-step order.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

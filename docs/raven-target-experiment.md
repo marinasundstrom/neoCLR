@@ -351,3 +351,70 @@ byrefs, and branches; fix the target-emission boundary instead of introducing un
 instructions. Raven tests cover metadata-only generic signatures, nested case getters,
 and out-case extraction. The five existing runtime programs remain the executable
 baseline while the union importer is developed.
+
+## Result execution profile (2026-09-12)
+
+The first Result program now executes against the actual System.Math.Abs and
+System.Result methods on neoCLR. The checked-in Raven source calls Abs(-42) and
+Abs(Int32.MinValue), matches the corresponding case, and prints `42` and `Overflow`.
+`ResultImport` is a separate bounded Cecil-to-neoIL profile. It admits the emitted
+Int32/OverflowError carrier and cases, static application functions, local addresses,
+and basic conditional/unconditional control flow. It does not load PE files directly
+in the runtime or execute the declaration assembly. Neither new opcodes nor a new
+binary metadata format were needed for this sample.
+
+The CLI comparison remains the earlier metadata/byref/branch baseline, with explicit
+library adapters where current neoCLR contracts differ:
+
+- CLI value-type instance receivers are addresses. Adapters load the existing value
+  through that address and call neoCLR's current value-receiver Result methods.
+- Raven's `TryGetValue(out Case)` maps to existing `TryGet(out(true) Case&)`. Each
+  adapter first stores the case's default value, so the output is assigned on both
+  outcomes; this is the declared target contract, not an assumption that every CLI
+  byref call writes its output. The Boolean result is converted to a CLI Int32 stack
+  value. Only the exact two extraction signatures are admitted.
+- InitLocals defaults are preserved for Int32 and the two case values. The carrier's
+  default cannot be represented by the current runtime Result layout. Rather than
+  choose a case implicitly, the importer rejects reads or receiver calls without a
+  definite preceding assignment. This narrows accepted CLI programs; it is not a
+  change to CLI default semantics or proof of general carrier layout compatibility.
+- Exact stack types (including address provenance) must agree at branch joins;
+  definite-assignment facts are intersected and rechecked to a fixed point. Branch
+  targets, maxstack, method/body/local limits and call signatures are checked. Analysis
+  has a work limit. Unreachable instructions are omitted from the executable output.
+- Console's no-result projection still consumes the legacy inhabited Void return.
+  No public throwing API or nullable result was substituted for Result.
+
+The benefit is a runnable library demo without a Raven-specific runtime instruction;
+the cost is an explicitly narrow import profile and temporary adapters. A general
+metadata loader, default-carrier policy, broader generics and remaining class semantics
+are still separate work. The union-recognition `Value` property stays declaration-only
+and cannot be called through this profile. Preserve that restriction until its real
+library contract is designed.
+
+Validation includes six verified/executed programs, a Rust regression over the imported
+Result artifact, and PE mutation probes rejecting default-carrier reads, uninitialized
+receiver addresses, incompatible branch stacks and wrong out cases. Rejected inputs
+must produce no executable artifact. Maps retain input hashes, method tokens and IL
+byte offsets. See [run instructions](experiments/raven-target/README.md#running-the-result-demo-2026-09-12).
+
+## POC demonstration priorities (2026-09-12)
+
+The author clarified the intended demonstration: a .NET-like runtime with its own
+runtime class library, Result and Option instead of exception/null-centered APIs,
+Void accepted as a generic type argument, and Raven targeting with basic VS Code
+completion. The POC should make that combination concrete before broadening the
+platform surface.
+
+| Demonstration | Current evidence | Remaining work |
+| --- | --- | --- |
+| Familiar runtime and own library | Raven Math/Console and Result program execute on neoCLR | Package a small cohesive sample/project |
+| Result-based errors | Abs success and overflow execute | Broaden only as the sample needs |
+| Option-based absence | Existing neoCLR library; not yet a Raven execution demo | Add a real Option API and Some/None flow |
+| Generic Void | Existing platform intent; ordinary no-result calls work | Prove a Raven-targeted closed generic Void case; do not equate this with no-result methods |
+| VS Code completion | Compiler completion probe uses target-only declarations | Wire the Raven project/language server to the same references and verify completions in VS Code |
+
+The next priority is the Option demo, followed by generic Void and the project/editor
+integration. Address runtime gaps when these scenarios expose them. The POC does not
+require a full debugger or broad .NET application compatibility. This ordering is the
+assistant's implementation plan in response to the author's acceptance criteria.

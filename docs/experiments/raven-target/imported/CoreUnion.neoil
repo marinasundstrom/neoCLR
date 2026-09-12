@@ -1,0 +1,170 @@
+.module ImportedResult
+.entry Method_06000006
+.function Method_06000006() -> noresult
+IL_0000:
+IL_0001:
+IL_0002:
+ldc.i4 -42
+IL_0004:
+call Method_06000005(Int32)
+IL_0009:
+IL_000a:
+ldc.i4 -2147483648
+IL_000f:
+call Method_06000005(Int32)
+IL_0014:
+IL_0015:
+ret
+.end
+.function Method_06000005(Int32) -> noresult
+.local System.Result<Int32,System.OverflowError> local0
+.local System.Result.Ok<Int32> local1
+.local System.Result.Error<System.OverflowError> local2
+.local System.Result<Int32,System.OverflowError> local3
+.local System.Result.Ok<Int32> local4
+.local System.Result<Int32,System.OverflowError> local5
+.local System.Result.Error<System.OverflowError> local6
+ldc.i4 0
+newobj System.Result.Ok<Int32>
+stloc local1
+newobj System.OverflowError
+newobj System.Result.Error<System.OverflowError>
+stloc local2
+ldc.i4 0
+newobj System.Result.Ok<Int32>
+stloc local4
+newobj System.OverflowError
+newobj System.Result.Error<System.OverflowError>
+stloc local6
+IL_0000:
+IL_0001:
+IL_0002:
+ldarg 0
+IL_0003:
+call System.Math::Abs(Int32)
+IL_0008:
+stloc local0
+IL_0009:
+IL_000a:
+ldloc local0
+IL_000b:
+stloc local3
+IL_000c:
+ldloca local3
+IL_000e:
+ldloca local4
+IL_0010:
+call RuntimeTryOk(System.Result<Int32,System.OverflowError>&,System.Result.Ok<Int32>&)
+IL_0015:
+brfalse IL_0023
+IL_001a:
+ldloc local4
+IL_001c:
+stloc local1
+IL_001d:
+ldc.i4 1
+IL_001e:
+br IL_0024
+IL_0023:
+ldc.i4 0
+IL_0024:
+brtrue IL_002e
+IL_0029:
+br IL_0041
+IL_002e:
+IL_002f:
+ldloca local1
+IL_0031:
+call RuntimeOkValue(System.Result.Ok<Int32>&)
+IL_0036:
+call RuntimeWriteInt32(Int32)
+IL_003b:
+br IL_0073
+IL_0041:
+IL_0042:
+ldloc local0
+IL_0043:
+stloc local5
+IL_0045:
+ldloca local5
+IL_0047:
+ldloca local6
+IL_0049:
+call RuntimeTryError(System.Result<Int32,System.OverflowError>&,System.Result.Error<System.OverflowError>&)
+IL_004e:
+brfalse IL_005c
+IL_0053:
+ldloc local6
+IL_0055:
+stloc local2
+IL_0056:
+ldc.i4 1
+IL_0057:
+br IL_005d
+IL_005c:
+ldc.i4 0
+IL_005d:
+brtrue IL_0067
+IL_0062:
+br IL_0072
+IL_0067:
+IL_0068:
+ldstr "Overflow"
+IL_006d:
+call RuntimeWriteString(String)
+IL_0072:
+IL_0073:
+IL_0074:
+IL_0075:
+ret
+.end
+.function RuntimeTryOk(System.Result<Int32,System.OverflowError>& source,out System.Result.Ok<Int32>& destination) -> Int32
+ldarg destination
+ldc.i4 0
+newobj System.Result.Ok<Int32>
+stobj System.Result.Ok<Int32>
+ldarg source
+ldobj System.Result<Int32,System.OverflowError>
+ldarg destination
+call instance System.Result<Int32,System.OverflowError>::TryGet(System.Result.Ok<Int32>&)
+brfalse Miss
+ldc.i4 1
+ret
+Miss:
+ldc.i4 0
+ret
+.end
+.function RuntimeTryError(System.Result<Int32,System.OverflowError>& source,out System.Result.Error<System.OverflowError>& destination) -> Int32
+ldarg destination
+newobj System.OverflowError
+newobj System.Result.Error<System.OverflowError>
+stobj System.Result.Error<System.OverflowError>
+ldarg source
+ldobj System.Result<Int32,System.OverflowError>
+ldarg destination
+call instance System.Result<Int32,System.OverflowError>::TryGet(System.Result.Error<System.OverflowError>&)
+brfalse Miss
+ldc.i4 1
+ret
+Miss:
+ldc.i4 0
+ret
+.end
+.function RuntimeOkValue(System.Result.Ok<Int32>& source) -> Int32
+ldarg source
+ldobj System.Result.Ok<Int32>
+call instance System.Result.Ok<Int32>::get_Value()
+ret
+.end
+.function RuntimeWriteInt32(Int32 value) -> noresult
+ldarg value
+call System.Console::WriteLine(Int32)
+pop
+ret
+.end
+.function RuntimeWriteString(String value) -> noresult
+ldarg value
+call System.Console::WriteLine(String)
+pop
+ret
+.end
