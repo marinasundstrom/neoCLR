@@ -248,6 +248,7 @@ fn check_signature(
                 .iter()
                 .collect::<std::collections::BTreeSet<_>>()
         || implementation.returns != contract.returns
+        || implementation.no_result != contract.no_result
         || (!explicit && implementation.visibility != Visibility::Public)
         || implementation.is_internal_call()
         || implementation.pinvoke.is_some()
@@ -481,6 +482,7 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
                         if previous.name.rsplit('.').next() == contract.name.rsplit('.').next()
                             && previous.parameters == contract.parameters
                             && (previous.returns != contract.returns
+                                || previous.no_result != contract.no_result
                                 || previous.receiver_byref != contract.receiver_byref
                                 || previous.receiver_readonly != contract.receiver_readonly
                                 || flags(&previous.out_parameters)

@@ -41,8 +41,10 @@ signature as a managed byref. The cost is migrating the existing runtime's assum
 about copying, construction, dispatch and library contracts.
 
 The current class subset is non-generic record-shaped objects with fields, direct instance
-methods and constructors. Inheritance, abstract classes, virtual dispatch and interface
-implementation remain unsupported for marked classes. Existing legacy value-model
+methods and constructors, plus public implicit interface implementations. Inheritance,
+abstract classes, class virtual dispatch and generic classes remain unsupported.
+See the [nominal interface groundwork](raven-interface-contract.md#implemented-nominal-interface-groundwork-2026-09-12)
+for object-reference interface views, no-result contracts and remaining conversion limits. Existing legacy value-model
 functionality in those areas remains available. Class defaults now produce typed null references, and `initobj` resets a class slot.
 Constructor allocation initializes fields using supported managed defaults, including
 nominal class-reference fields. General `ldnull` projection remains separate work.

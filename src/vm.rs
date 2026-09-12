@@ -474,7 +474,6 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         if definition.is_reference_type
             && (definition.representation != Representation::Record
                 || definition.base.is_some()
-                || !definition.implements.is_empty()
                 || !definition.generic_parameters.is_empty()
                 || definition.is_abstract
                 || definition.enum_info.is_some())
@@ -512,12 +511,16 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 "class constructors require instance no-result signatures",
             ));
         }
+        let nominal_interface_contract = crate::interfaces::is_contract(module, function)
+            && crate::interfaces::is_bodyless(module, function)
+            && !function.receiver_byref
+            && !function.receiver_readonly;
         if function.no_result
             && (function.returns != Type::Void
-                || (function.instance && !class_owner)
-                || function.is_virtual
+                || (function.instance && !class_owner && !nominal_interface_contract)
+                || (function.is_virtual && !nominal_interface_contract)
                 || function.is_override
-                || function.is_abstract
+                || (function.is_abstract && !nominal_interface_contract)
                 || function.is_internal_call()
                 || function.pinvoke.is_some()
                 || !function.generic_parameters.is_empty()
@@ -918,7 +921,9 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 }
                 Op::CastClass(ty) => {
                     check(ty)?;
-                    crate::inheritance::lineage(module, ty)?;
+                    if crate::interfaces::interface_definition(module, ty).is_err() {
+                        crate::inheritance::lineage(module, ty)?;
+                    }
                 }
                 Op::BorrowInterface(ty) => {
                     check(ty)?;
@@ -1908,6 +1913,43 @@ fn interpret_instructions(
                         return Ok(None);
                     }
 
+                    if matches!(frame.stack.last(), Some(Value::NullObjectReference(_))) {
+                        return Err(Fault::new("null interface receiver"));
+                    }
+                    if let Some(Value::ObjectReference(_)) = frame.stack.last() {
+                        let Value::ObjectReference(mut object) = frame.pop()? else {
+                            unreachable!()
+                        };
+                        let interface = contract.owner.as_ref().unwrap();
+                        if contract.receiver_byref {
+                            return Err(Fault::new("interface receiver type or mode mismatch"));
+                        }
+                        crate::interfaces::ensure_implementation(
+                            module,
+                            object.target(),
+                            interface,
+                        )?;
+                        object.reference.assigned()?;
+                        let callee = crate::interfaces::implementation(
+                            module,
+                            object.reference.target(),
+                            interface,
+                            &contract,
+                        )?;
+                        if callee.receiver_byref || crate::interfaces::is_contract(module, &callee)
+                        {
+                            return Err(Fault::new(
+                                "nominal interface dispatch requires a concrete class method",
+                            ));
+                        }
+                        object.view = None;
+                        args.insert(0, Value::ObjectReference(object));
+                        if frames.len() >= limits.frames {
+                            return Err(Fault::new("frame limit exceeded"));
+                        }
+                        frames.push(Frame::new(callee, args)?);
+                        return Ok(None);
+                    }
                     let (interface, concrete, storage) = match frame.pop()? {
                         Value::SlotInterface {
                             interface,
@@ -1988,12 +2030,31 @@ fn interpret_instructions(
                     }));
                 }
                 Op::CastClass(target) => {
-                    let Value::SlotReference(reference) = frame.pop()? else {
-                        return Err(Fault::new("castclass requires a managed record reference"));
+                    let value = match frame.pop()? {
+                        Value::ObjectReference(mut object) => {
+                            let concrete = object.reference.target();
+                            if crate::interfaces::interface_definition(module, target).is_ok() {
+                                crate::interfaces::ensure_implementation(module, concrete, target)?;
+                                object.view = Some(target.clone());
+                            } else if concrete == target {
+                                object.view = None;
+                            } else {
+                                return Err(Fault::new("invalid object reference cast"));
+                            }
+                            object.reference.assigned()?;
+                            Value::ObjectReference(object)
+                        }
+                        Value::NullObjectReference(_)
+                            if module.is_object_reference_type(target) =>
+                        {
+                            Value::NullObjectReference(target.clone())
+                        }
+                        Value::SlotReference(reference) => {
+                            Value::SlotReference(reference.base_view(module, target)?)
+                        }
+                        _ => return Err(Fault::new("castclass requires a managed reference")),
                     };
-                    frame
-                        .stack
-                        .push(Value::SlotReference(reference.base_view(module, target)?));
+                    frame.stack.push(value);
                 }
                 Op::ReferenceType => {
                     let reference = match frame.pop()? {
@@ -2062,6 +2123,7 @@ fn interpret_instructions(
                         })?;
                         let object = crate::value::ObjectReference {
                             reference: heap.address(identity)?,
+                            view: None,
                         };
                         child.args.insert(
                             0,
@@ -2361,6 +2423,7 @@ fn interpret_instructions(
                         let identity = heap.allocate(value)?;
                         Value::ObjectReference(crate::value::ObjectReference {
                             reference: heap.address(identity)?,
+                            view: None,
                         })
                     } else {
                         value

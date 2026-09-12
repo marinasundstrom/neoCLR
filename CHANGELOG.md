@@ -60,7 +60,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Added the candidate interface contract and isolated Raven collection metadata probe:
   inherited callvirt emission and wrong-type diagnostics pass, while runtime admission
   remains deliberately rejected. Documented nominal interface dispatch and generic-class
-  support as prerequisites to adapting the actual ArrayList/iterator library.
+  support as prerequisites to adapting the actual ArrayList/iterator library. Added
+  non-generic nominal-class interface conformance, checked castclass views, inherited
+  callvirt dispatch and identity-preserving GC-rooted interface fields/returns. Supports
+  no-result interface contracts with exact return-mode matching and typed null faults.
+  Ten new regressions and 108 related tests pass. Generic classes, implicit storage
+  conversions and collection import/adaptation remain unfinished; legacy borrowed
+  interface behavior is retained.
 
 - Began nominal class reference semantics: `.type class` uses managed heap handles in
   ordinary class-typed storage, while managed byrefs still address slots. Assignment,

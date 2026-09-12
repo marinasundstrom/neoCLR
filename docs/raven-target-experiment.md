@@ -622,3 +622,13 @@ It explicitly requires runtime admission to fail: existing nominal classes do no
 support interface conformance or generic definitions. No Raven change or fake executable
 collection wrapper was needed. The next implementation is ordinary interface references
 and dispatch for nominal classes, followed by the generic/library adaptation.
+
+## Nominal interface runtime groundwork (2026-09-12)
+
+The [interface groundwork](raven-interface-contract.md#implemented-nominal-interface-groundwork-2026-09-12)
+now supports non-generic class conformance, ordinary interface-reference casts/storage,
+receiver dispatch and GC retention. No new instruction or Raven change was needed.
+Ten new regressions and 108 related tests pass. The collection emission probe still
+correctly rejects runtime import: generic classes, storage-conversion admission and
+actual library adaptation remain ahead. This does not claim the shared-library demo
+is complete or change the deferred status of union propagation.

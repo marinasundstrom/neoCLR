@@ -14,7 +14,7 @@ pub(crate) fn default_value(module: &Module, ty: &Type) -> Result<Value, Fault> 
             ));
         }
         *remaining -= 1;
-        if module.is_reference_type(ty) {
+        if module.is_object_reference_type(ty) {
             return Ok(Value::NullObjectReference(ty.clone()));
         }
         Ok(match ty {

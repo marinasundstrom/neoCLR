@@ -982,6 +982,13 @@ fn typed_effect(
         }
         Dup => Result::Ok(vec![values[0].clone(), values[0].clone()]),
         CastClass(target) => {
+            if module.is_object_reference_type(exact(&values[0])?) {
+                require(
+                    module.is_object_reference_type(target),
+                    "castclass requires an object-reference target",
+                )?;
+                return one(target.clone());
+            }
             let T::ByRef(source) = exact(&values[0])? else {
                 return Err(crate::Fault::new(
                     "castclass requires a managed record reference",
@@ -1049,6 +1056,13 @@ fn typed_effect(
                 .clone()
                 .ok_or_else(|| crate::Fault::new("interface call requires owner"))?;
             match exact(&values[0])? {
+                actual
+                    if module.is_object_reference_type(actual)
+                        && crate::interfaces::is_contract(module, &callee)
+                        && !callee.receiver_byref =>
+                {
+                    crate::interfaces::ensure_implementation(module, actual, &interface)?;
+                }
                 T::ByRef(actual) if **actual == interface => (),
                 T::InterfaceRef(actual) if **actual == interface && !callee.receiver_byref => (),
                 _ => {
@@ -1060,7 +1074,11 @@ fn typed_effect(
             for (value, ty) in values[1..].iter().zip(&callee.argument_types()[1..]) {
                 stored(value, ty)?;
             }
-            Result::Ok(vec![loaded(&callee.returns)])
+            Result::Ok(if callee.no_result {
+                vec![]
+            } else {
+                vec![loaded(&callee.returns)]
+            })
         }
         Call(target) => {
             let callee = crate::vm::resolve(module, target)?;
@@ -1100,7 +1118,7 @@ fn typed_effect(
             for value in values {
                 require(
                     matches!(exact(value)?, Type::ByRef(_))
-                        || module.is_reference_type(exact(value)?),
+                        || module.is_object_reference_type(exact(value)?),
                     "ref.eq requires managed references",
                 )?;
             }

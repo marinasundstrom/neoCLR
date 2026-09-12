@@ -2,7 +2,8 @@
 
 Recorded 2026-09-12. This is the contract and admission-probe slice toward the
 [shared runtime library demo](raven-target-experiment.md#desired-demo-the-existing-runtime-library-through-raven-2026-09-12).
-The candidate declarations compile through Raven; runtime execution is not implemented.
+The candidate collection declarations compile through Raven; collection execution is not
+yet implemented. Nominal non-generic interface dispatch now has runtime support below.
 The existing Neo interface/collection path remains available and unchanged.
 
 ## The library surface to preserve
@@ -76,8 +77,8 @@ The preferred path is runtime adaptation under the existing compiler metadata su
 | Layer | Evidence and missing work |
 | --- | --- |
 | Raven compilation | Candidate class/interface declarations bind and emit with standard calls; tested without compiler changes at Raven 5b773ae3536f52ef077c8897867950249d6dde90. |
-| Nominal classes | `src/vm.rs` currently rejects .implements and generic parameters on types marked as reference classes, and rejects virtual/byref class receivers. |
-| Existing interface runtime | Current interface views and library receivers use the older explicit managed-reference path. Ordinary interface-typed object-reference slots need defined assignment, GC and dispatch handling. |
+| Nominal classes | Nominal classes now admit interface conformance and dispatch. Generic parameters, class inheritance and virtual/byref class receivers remain unsupported. |
+| Existing interface runtime | Legacy views remain unchanged. Ordinary interface object references now support explicit casts, typed slots/fields, GC and dispatch; implicit storage conversions and interface arrays/indirect access remain later work. |
 | Library | ArrayList<T> is still a value wrapper holding shared state; ArrayIterator<T> is an explicitly heap-allocated legacy record. Adapt actual implementations after receiver/storage support exists. |
 | Import bridge | UnionImport deliberately rejects these collection types and emits no executable. Candidate declarations are isolated from the working core surface. |
 
@@ -115,3 +116,44 @@ requires the current runtime importer to reject admission without creating execu
 observations. These declaration bodies never execute and are not installed in the
 working demo's compiler reference set. Existing Result/Option/Void tasks remain bounded
 to their prior runtime profile.
+
+## Implemented nominal interface groundwork (2026-09-12)
+
+Non-generic `.type class` declarations may implement interfaces whose abstract methods
+use ordinary `instance` receivers. Interface contracts with no-result returns are
+supported, and implementation matching now distinguishes no-result from inhabited Void.
+The existing `.method instance byref` contracts retain their legacy receiver model.
+No ArrayList declarations or implementations have been migrated by this slice.
+
+`castclass Interface` establishes an ordinary interface view of an implementing class
+object. It changes the static view carried by the existing heap handle, without copying
+the object or creating a guest wrapper. Casts back to the exact concrete class preserve
+identity; incompatible casts fault. A null object casts to a typed null interface, and
+calling through it faults. Plain interface locals, parameters, returns and fields retain
+the owning heap reference. `initobj` supplies the same typed null default as nominal
+class storage. This adopts the current class-default policy, not a new non-null contract.
+
+`callvirt` accepts an implementing nominal class, the named interface, or a derived
+interface exposing the requested parent contract. The runtime selects the concrete
+implementation by full interface signature and passes the original class reference as
+its receiver. The typed verifier checks conformance; runtime checks also enforce it
+when execution is requested without typed verification. Missing implementations and
+incompatible signatures fail metadata validation. Class virtual slots, explicit/default
+nominal implementations and generic class receivers are not enabled here.
+
+This reuses standard castclass/callvirt operations and the comparison above. One
+transitional limitation remains: typed neoIL storage/call arguments require an explicit
+castclass when changing a reference's static type. Ordinary CLI implicit assignability
+must be handled when expanding the importer or the storage rules; the Raven sample has
+not been adapted to execute by silently inserting a legacy borrowed view. Interface
+arrays and indirect ldobj/stobj access also remain outside this slice. Existing scoped
+interface views keep their previous restrictions and do not gain heap ownership.
+
+`tests/nominal_interfaces.rs` covers mutation/aliasing, inherited and concrete-receiver
+dispatch, return escape, field retention through forced GC, null and incompatible casts,
+wrong receivers, missing implementations and no-result signature mismatches. The host
+ObjectReference API exposes `target()` for the static view and `concrete_type()` for the
+allocation type; identity comparison ignores the view. Ten new tests and the existing
+class/interface/default/no-result/initialization suites pass (118 focused tests total).
+The next library prerequisites are closed generic nominal classes and the associated
+import/storage conversions, before adapting ArrayList and its iterator.

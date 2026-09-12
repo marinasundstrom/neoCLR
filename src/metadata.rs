@@ -774,6 +774,14 @@ impl Module {
             .is_some_and(|definition| definition.is_reference_type)
     }
 
+    /// Ordinary object-reference storage, including nominal interface views.
+    pub fn is_object_reference_type(&self, ty: &Type) -> bool {
+        self.is_reference_type(ty)
+            || self
+                .type_definition(ty)
+                .is_some_and(|d| d.representation == Representation::Interface)
+    }
+
     pub fn type_definition(&self, ty: &Type) -> Option<&TypeDef> {
         let name = ty.definition_name()?;
         let arity = match ty {
