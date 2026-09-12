@@ -210,7 +210,9 @@ static class UnionImport
                         else if (targetMethod.Module == library.MainModule)
                         {
                             var binding = collectionProfile ? CollectionBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt) : null;
-                            if (binding is not null) call = new("", binding.Arguments, binding.Result, Instruction: binding.Instruction);
+                            var textBinding = StringBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt);
+                            if (textBinding is not null) call = new("", textBinding.Arguments, textBinding.Result, Instruction: textBinding.Instruction);
+                            else if (binding is not null) call = new("", binding.Arguments, binding.Result, Instruction: binding.Instruction);
                             else
                             {
                                 if (instruction.OpCode.Code == Code.Callvirt) throw new InvalidDataException("Unsupported runtime callvirt.");
@@ -271,13 +273,13 @@ static class UnionImport
                 if (changed) work.Enqueue(index);
             }
         }
-        output.Append(Adapters()).Append(FileBindings.Adapters());
+        output.Append(Adapters()).Append(FileBindings.Adapters()).Append(StringBindings.Adapters());
         File.WriteAllText(destination, output.ToString());
         File.WriteAllText(destination + ".map.json", JsonSerializer.Serialize(new {
-            Profile = collectionProfile ? "result-option-void-files-collections-v6" : "result-option-void-files-arrays-v5",
+            Profile = collectionProfile ? "result-option-void-files-strings-collections-v7" : "result-option-void-files-strings-arrays-v6",
             RequiredLibraryProfile = collectionProfile ? "raven-collections" : "bundled-system", ApplicationSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(application))),
             CoreSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(core))), ReachableMethods = seen.Order().ToArray(), Mappings = mappings,
-            Scope = "Bounded Int32 vectors, optional Int32 collection references, file UTF-8 APIs and generic Result/Option bindings; CFG stack/definite-assignment checked; observable default carriers rejected; no guest declaration bodies executed."
+            Scope = "Bounded Int32 vectors, optional Int32 collection references, file UTF-8 APIs, String helpers and generic Result/Option bindings; CFG stack/definite-assignment checked; observable default carriers rejected; no guest declaration bodies executed."
         }, new JsonSerializerOptions { WriteIndented = true }));
     }
 

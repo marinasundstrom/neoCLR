@@ -80,3 +80,6 @@ cargo run --locked -- run examples/source/ordinal-text.neo
 
 The Neo example searches a list of file names using an eager predicate and matches
 its Option result. It prints `café.neo` and returns 42. LINQ remains future work.
+
+The [Raven String projection](raven-string-api.md) exposes these operations through
+ordinary member calls and documents the executable boundary samples.

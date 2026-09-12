@@ -570,3 +570,6 @@ Raven SDK/VSIX packaging without a full Raven product release cycle.
 
 [Shared signature projection](../../raven-signature-projection.md) documents the
 file/collection signature checker and its `--signatures` regression probe.
+
+[The String API slice](../../raven-string-api.md) adds eight existing helpers, Unicode
+boundary examples and `verify_editor.py --strings` completion checks.

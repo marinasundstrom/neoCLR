@@ -21,7 +21,9 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
         shutil.copyfile(args.project.resolve().parent / name, root / name)
     command = [sys.executable, str(bridge / 'run_project.py'), str(root / 'Demo.rvnproj'),
                '--raven', str(args.raven.resolve()), '--runtime', str(args.runtime.resolve())]
-    cases = [('MatchForms', 'library-match.rvn', '42\n-1\nPresent\nAbsent\n42\nOverflow\n'),
+    cases = [('Strings', 'library-strings.rvn', 'Hello, värld!\n14\nyes\nno\nyes\nno\nyes\nyes\nyes\nno\n-1\n0\n1\n'),
+             ('StringBoundaries', 'library-string-boundaries.rvn', 'yes\nyes\nyes\nyes\nno\n-1\n4\n'),
+             ('MatchForms', 'library-match.rvn', '42\n-1\nPresent\nAbsent\n42\nOverflow\n'),
              ('MatchVoid', 'library-match-void.rvn', '42\nSaved\nCompleted\nOverflow\n'),
              ('Math', 'library-math.rvn', '-2147483648\n2147483647\n7\n-7\n-1\n0\n1\n'),
              ('Result', 'library-result.rvn', '42\nOverflow\n'),
@@ -53,6 +55,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
     results['SavedEdit'] = saved_expected
     for label, source, diagnostic in [
         ('CompileFailure', 'func Main() { MissingCall() }', 'RAV'),
+        ('StringArgumentMismatch', 'func Main() { System.String.Concat(42, 7) }', 'RAV'),
+        ('StringUnsupportedApi', 'func Main() { System.String.IsNullOrEmpty(\"\") }', 'RAV'),
         ('ImportFailure', 'func Add(value: int) -> int { return value + 1 }\nfunc Main() { Add(2) }', 'Unsupported')]:
         before = set(root.rglob('App.neoil'))
         (root / 'Main.rvn').write_text(source)

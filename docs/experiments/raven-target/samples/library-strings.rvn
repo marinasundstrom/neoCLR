@@ -1,0 +1,22 @@
+import System.*
+import System.Console.*
+
+func Check(value: bool) {
+    if value { WriteLine("yes") } else { WriteLine("no") }
+}
+func Main() {
+    let text = String.Concat("Hello, ", "värld!")
+    WriteLine(text)
+    WriteLine(text.GetUtf8ByteCount())
+    Check(text.Equals("Hello, värld!"))
+    Check(text.Equals("hello, värld!"))
+    Check(text.ContainsOrdinal("värld"))
+    Check(text.ContainsOrdinal("VÄRLD"))
+    Check(text.StartsWithOrdinal("Hello"))
+    Check(text.EndsWithOrdinal("!"))
+    Check("".IsEmpty())
+    Check(text.IsEmpty())
+    WriteLine(Math.Sign(String.CompareOrdinal("alpha", "beta")))
+    WriteLine(Math.Sign(String.CompareOrdinal("same", "same")))
+    WriteLine(Math.Sign(String.CompareOrdinal("beta", "alpha")))
+}

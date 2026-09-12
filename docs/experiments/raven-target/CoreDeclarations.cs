@@ -15,7 +15,8 @@ static class CoreDeclarations
                 "public static class Math { public static Result<int, OverflowError> Abs(int value) => default;")
                 + UnionDeclarations.Source + FileBindings.Declarations;
         if (collectionProbe) declarations += CollectionDeclarations.Source;
-        var source = Source.Replace("public static class Console { public static void WriteLine(string value) { } }", declarations)
+        var source = Source.Replace("public sealed class String { }", StringBindings.Declarations)
+            .Replace("public static class Console { public static void WriteLine(string value) { } }", declarations)
             .Replace("// Union probe attribute", unionProbe ? "public sealed class UnionAttribute : System.Attribute { }" : "");
         var compilation = CSharpCompilation.Create(Identity,
             [CSharpSyntaxTree.ParseText(source)], references: [],

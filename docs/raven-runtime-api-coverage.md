@@ -33,7 +33,7 @@ assembly metadata reader or verifier.
 
 | Area | Current Raven evidence | Work to close the existing-library gap |
 | --- | --- | --- |
-| Numeric primitives, Boolean, Char, String, Value/Error and error unions | Int32/String/Boolean storage and selected static calls; limited error carriers | Project remaining primitive widths, conversions, comparisons, parsing, character/string helpers and all public error members |
+| Numeric primitives, Boolean, Char, String, Value/Error and error unions | Int32/String/Boolean storage, [eight String helpers](raven-string-api.md) and selected static calls; limited error carriers | Project remaining primitive widths, conversions, comparisons, parsing, character helpers, String.SliceUtf8 and all public error members |
 | Math and Console | Selected Int32 Math, Result-producing Abs and WriteLine | Remaining existing arithmetic helpers and Console input/error paths |
 | Option, Result, Void and Propagatable | Option<Int32>, completion/error propagation, file read/write carriers and typed matching | General payload shapes, all public case/carrier members and consistent conditional-output validation |
 | File and Path | Bounded UTF-8 File calls, propagation and error predicates | Path methods and full file-error API surfaces; reuse existing I/O contracts |

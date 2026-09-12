@@ -1,0 +1,14 @@
+import System.*
+import System.Console.*
+func Check(value: bool) {
+    if value { WriteLine("yes") } else { WriteLine("no") }
+}
+func Main() {
+    Check("".ContainsOrdinal(""))
+    Check("text".StartsWithOrdinal(""))
+    Check("text".EndsWithOrdinal(""))
+    Check(String.Concat("a", "\u0000b").ContainsOrdinal("\u0000"))
+    Check("é".Equals("é"))
+    WriteLine(Math.Sign(String.CompareOrdinal("😀", "")))
+    WriteLine("😀".GetUtf8ByteCount())
+}

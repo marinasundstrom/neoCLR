@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Exposed eight existing String helpers through Raven: concatenation, ordinal
+  comparison/search, equality, empty checks and UTF-8 byte counts. A shared member
+  catalog generates declarations and checked bindings; guest adapters supply readonly
+  receivers. Added readable and Unicode-boundary samples, invalid-call checks and
+  editor completion coverage. SliceUtf8 remains pending; no runtime semantics or
+  Raven compiler changes, and no SDK/VSIX rebuild in this slice.
+
 - Shared Raven bridge signature substitution and checking across file and collection
   calls, including constructors. Nested type arguments now use one recursive path;
   catalogs retain explicit API admission and Void stays distinct from no-result

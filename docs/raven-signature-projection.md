@@ -51,7 +51,7 @@ dotnet run --project docs/experiments/raven-target/Probe.csproj \
 
 The probe checks nested substitution without mutation, closed residuals, signature
 and receiver mismatches, bad arity/indexes, unsupported shapes, nesting limits and
-Void contexts. It writes `signature-checks.json` only after all 18 checks pass.
+Void contexts. It writes `signature-checks.json` only after all 20 checks pass (including two String-call rejection checks).
 
 The existing `--interfaces` and `--files` probes, file execution/rejection checks
 and saved-project regression suite exercise the migrated catalogs through real Raven

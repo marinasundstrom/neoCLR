@@ -9,6 +9,7 @@ import threading
 project = Path(sys.argv[1]).resolve()
 collections = '--collections' in sys.argv[2:]
 files = '--files' in sys.argv[2:]
+strings = '--strings' in sys.argv[2:]
 server = json.loads((project / '.vscode/settings.json').read_text())['raven.languageServerPath']
 messages = queue.Queue()
 log = (project / 'lsp-stderr.log').open('wb')
@@ -134,6 +135,22 @@ try:
             if any(label == name or label.startswith(name + '(') for label in labels for name in forbidden):
                 raise AssertionError('Host file API leaked: ' + str(labels))
             results[owner] = labels
+    if strings:
+        for version, access, prefix, expected, forbidden in (
+            (10, 'text.', '    let text = "hello"\n',
+             ('Equals', 'ContainsOrdinal', 'StartsWithOrdinal', 'EndsWithOrdinal', 'GetUtf8ByteCount', 'IsEmpty'), ('Substring', 'Contains')),
+            (11, 'System.String.', '', ('Concat', 'CompareOrdinal'), ('IsNullOrEmpty', 'Join', 'Format'))):
+            text = 'import System.*\nfunc Main() {\n' + prefix + '    ' + access + '\n}'
+            send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})
+            result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
+                'position': {'line': 3 if prefix else 2, 'character': len('    ' + access)}, 'context': {'triggerKind': 1}}, True))
+            items = result if isinstance(result, list) else result['items']
+            labels = sorted({item['label'] for item in items})
+            if any(not any(label == name or label.startswith(name + '(') for label in labels) for name in expected):
+                raise AssertionError('Missing target String API: ' + str(labels))
+            if any(label == name or label.startswith(name + '(') for label in labels for name in forbidden):
+                raise AssertionError('Host String API leaked: ' + str(labels))
+            results[access] = labels
     receive(send('shutdown', None, True))
     send('exit', None)
     print(json.dumps(results, indent=2))

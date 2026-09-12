@@ -72,6 +72,12 @@ static class SignatureProbe
         voidOwner.GenericArguments.Add(module.GetType(FileBindings.WriteError));
         Check("Generic Void result remains a carrier", RuntimeSignatures.Map(voidOwner, FileBindings.Type, returns: true)
             == "System.Result<Void,System.IO.FileWriteError>");
+        var stringType = module.GetType("System.String");
+        var concat = stringType.Methods.Single(m => m.Name == "Concat");
+        Reject("Static String callvirt", () => StringBindings.Bind(Reference(concat, stringType), concat, true));
+        var wrongStringArgument = Reference(concat, stringType);
+        wrongStringArgument.Parameters[0].ParameterType = module.TypeSystem.Int32;
+        Reject("String argument mismatch", () => StringBindings.Bind(wrongStringArgument, concat, false));
         var text = JsonSerializer.Serialize(checks, new JsonSerializerOptions { WriteIndented = true });
         File.WriteAllText(Path.Combine(output, "signature-checks.json"), text);
         Console.WriteLine(text);
