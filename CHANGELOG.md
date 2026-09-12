@@ -57,6 +57,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Clarified the broader desired demo: Raven should consume an adapted version of the
   existing library used by Neo, with shared implementations and matching declarations.
   Proposed existing collection/iteration contracts as the interface milestone scenario.
+  Added the candidate interface contract and isolated Raven collection metadata probe:
+  inherited callvirt emission and wrong-type diagnostics pass, while runtime admission
+  remains deliberately rejected. Documented nominal interface dispatch and generic-class
+  support as prerequisites to adapting the actual ArrayList/iterator library.
 
 - Began nominal class reference semantics: `.type class` uses managed heap handles in
   ordinary class-typed storage, while managed byrefs still address slots. Assignment,

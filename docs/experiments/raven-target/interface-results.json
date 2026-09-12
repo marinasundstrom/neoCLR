@@ -1,0 +1,45 @@
+{
+  "RecordedDate": "2026-09-12",
+  "Scope": "Candidate library interface metadata and Raven emission only; no runtime execution",
+  "ApplicationClosureErrors": [],
+  "Interfaces": [
+    {
+      "FullName": "System.Disposable",
+      "Parents": []
+    },
+    {
+      "FullName": "System.Collections.Iterable`1",
+      "Parents": []
+    },
+    {
+      "FullName": "System.Collections.Iterator`1",
+      "Parents": [
+        "System.Disposable"
+      ]
+    },
+    {
+      "FullName": "System.Collections.List`1",
+      "Parents": [
+        "System.Collections.Iterable`1<T>"
+      ]
+    }
+  ],
+  "InterfaceCalls": [
+    "System.Void System.Collections.List`1<System.Int32>::Add(!0)",
+    "System.Int32 System.Collections.List`1<System.Int32>::get_Count()",
+    "System.Collections.Iterator`1<!0> System.Collections.Iterable`1<System.Int32>::GetIterator()",
+    "System.Boolean System.Collections.Iterator`1<System.Int32>::MoveNext()",
+    "!0 System.Collections.Iterator`1<System.Int32>::get_Current()",
+    "System.Void System.Disposable::Dispose()"
+  ],
+  "NegativeDiagnostics": {
+    "WrongElement": [
+      "error RAV1503: Cannot convert from 'string' to 'int'"
+    ],
+    "WrongReceiver": [
+      "error RAV1503: Cannot convert from 'int' to 'List<int>'"
+    ]
+  },
+  "ImportRejection": "Unsupported Result profile type: System.Collections.ArrayList`1<System.Int32>",
+  "RavenRevision": "5b773ae3536f52ef077c8897867950249d6dde90"
+}

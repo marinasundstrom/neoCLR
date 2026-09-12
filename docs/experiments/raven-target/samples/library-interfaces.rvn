@@ -1,0 +1,19 @@
+import System.*
+import System.Collections.*
+import System.Console.*
+
+func Print(values: List<int>) {
+    values.Add(42)
+    WriteLine(values.Count)
+    let items: Iterable<int> = values
+    let iterator = items.GetIterator()
+    while iterator.MoveNext() {
+        WriteLine(iterator.Current)
+    }
+    iterator.Dispose()
+}
+
+func Main() {
+    let values = ArrayList<int>.Allocate(2)
+    Print(values)
+}

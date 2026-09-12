@@ -16,6 +16,9 @@ The [bounded Raven POC milestone](raven-target-experiment.md#milestone-closed-ra
 is closed at `milestone/raven-poc-2026-09-12`. Next, establish the interface contract
 against CLI metadata, assignability and dispatch behavior, then demonstrate a concrete
 class through an interface from Raven on neoCLR. Union propagation follows that contract.
+The [interface contract probe](raven-interface-contract.md) establishes the first
+dependency order: nominal interface-reference dispatch, required closed generic classes,
+then real ArrayList/iterator adaptation and Raven execution.
 The desired demo is Raven consuming an adapted version of the runtime library already
 used by Neo. Prefer an existing collection/iteration contract as the first interface
 scenario, exposing declarations and executable implementations together; the POC tag

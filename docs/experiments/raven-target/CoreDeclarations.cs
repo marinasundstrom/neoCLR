@@ -7,13 +7,14 @@ using Microsoft.CodeAnalysis.CSharp;
 static class CoreDeclarations
 {
     public const string Identity = "NeoCLR.CoreProbe";
-    public static void Write(string path, bool includeConsole = true, bool stringParameter = true, bool unionProbe = false)
+    public static void Write(string path, bool includeConsole = true, bool stringParameter = true, bool unionProbe = false, bool collectionProbe = false)
     {
         var declarations = TargetSurface.Declarations(includeConsole, stringParameter);
         if (unionProbe)
             declarations = declarations.Replace("public static class Math {",
                 "public static class Math { public static Result<int, OverflowError> Abs(int value) => default;")
                 + UnionDeclarations.Source;
+        if (collectionProbe) declarations += CollectionDeclarations.Source;
         var source = Source.Replace("public static class Console { public static void WriteLine(string value) { } }", declarations)
             .Replace("// Union probe attribute", unionProbe ? "public sealed class UnionAttribute : System.Attribute { }" : "");
         var compilation = CSharpCompilation.Create(Identity,

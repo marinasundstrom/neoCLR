@@ -6,6 +6,12 @@ using Raven.CodeAnalysis;
 using Raven.CodeAnalysis.Syntax;
 using AssemblyDefinition = Mono.Cecil.AssemblyDefinition;
 
+if (args.Length == 2 && args[0] == "--interfaces")
+{
+    InterfaceProbe.Write(args[1]);
+    return;
+}
+
 if (args.Length == 3 && args[0] == "--project")
 {
     try { ProjectBuild.Write(args[1], args[2]); }

@@ -612,3 +612,13 @@ platform implementations on neoCLR. A practical collection/iteration example can
 combine with the established Result/Option flows. This is the desired direction, not
 an assertion that the full earlier library surface is already available through Raven.
 Union propagation remains deferred until the interface contract is established.
+
+## Interface contract evidence (2026-09-12)
+
+The [interface contract](raven-interface-contract.md) now records the collection surface,
+CLI comparison, current runtime blockers and implementation sequence. A separate Raven
+probe emits the inherited collection interface calls and validates incompatible inputs.
+It explicitly requires runtime admission to fail: existing nominal classes do not yet
+support interface conformance or generic definitions. No Raven change or fake executable
+collection wrapper was needed. The next implementation is ordinary interface references
+and dispatch for nominal classes, followed by the generic/library adaptation.

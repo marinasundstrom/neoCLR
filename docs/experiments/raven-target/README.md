@@ -371,3 +371,10 @@ existing folder. See [edit/build/run instructions](VSCODE.md#edit-build-and-run-
 `verify_project.py` checks Result, Option, generic Void, a changed output and failure
 behavior. The normal Raven toolbar remains a separate pipeline. Propagation and
 interfaces are not claimed by this milestone.
+
+## Interface contract probe (2026-09-12)
+
+The separate `--interfaces` mode tests the proposed existing collection surface through
+Raven emission and requires unsupported runtime import to remain rejected. See the
+[interface contract and reproduction](../../raven-interface-contract.md). It does not
+expand the executable demo's API surface or claim collection execution yet.
