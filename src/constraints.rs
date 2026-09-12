@@ -78,6 +78,7 @@ fn symbolic(ty: &Type) -> bool {
         | Type::ReadOnlyByRef(t)
         | Type::InterfaceRef(t)
         | Type::Array(t)
+        | Type::ArrayRef(t)
         | Type::Ptr(t) => symbolic(t),
         _ => false,
     }
@@ -234,6 +235,7 @@ pub(crate) fn check_known_type(
         | Type::ReadOnlyByRef(ty)
         | Type::InterfaceRef(ty)
         | Type::Array(ty)
+        | Type::ArrayRef(ty)
         | Type::Ptr(ty) => check_known_type(module, ty, depth + 1)?,
         _ => (),
     }

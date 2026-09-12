@@ -75,8 +75,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Added ordinary interface-reference array elements and indirect interface-slot loads/
   rebinding, with typed null defaults, identity/GC retention and invariant element checks.
   Ten new regressions and 90 related tests pass.
-  The array itself still uses the legacy `T[]&` representation; CLR array-reference
-  signatures/defaults and Raven array import remain unfinished.
+  Added ordinary `arrayref<T>` storage for CLI-style arrays, including typed null field
+  defaults, generic constructor allocation, jagged arrays and GC retention. Breaking
+  neoIL change: `newarr` now returns an ordinary array reference; migrate old `T[]&`
+  allocations to `array.new` or recompile Neo sources. Neo source behavior is unchanged.
+  Runtime metadata identities distinguish both array forms; 13 new regressions and
+  127 related tests pass. Raven array import,
+  implicit reference conversions, String defaults and collection adaptation remain pending.
 
 - Began nominal class reference semantics: `.type class` uses managed heap handles in
   ordinary class-typed storage, while managed byrefs still address slots. Assignment,

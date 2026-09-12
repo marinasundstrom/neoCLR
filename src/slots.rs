@@ -559,7 +559,7 @@ fn at_path<'a>(mut value: &'a Value, path: &[usize]) -> Result<&'a Value, Fault>
 pub(crate) fn contains(ty: &Type) -> bool {
     match ty {
         Type::ByRef(_) | Type::ReadOnlyByRef(_) => true,
-        Type::Array(t) | Type::Ptr(t) | Type::InterfaceRef(t) => contains(t),
+        Type::Array(t) | Type::ArrayRef(t) | Type::Ptr(t) | Type::InterfaceRef(t) => contains(t),
         Type::Constructed { arguments, .. } | Type::Scoped { arguments, .. } => {
             arguments.iter().any(contains)
         }

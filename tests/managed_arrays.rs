@@ -11,12 +11,12 @@ fn program(extra: &str, body: &str, returns: &str) -> LoadedProgram {
 
 #[test]
 fn heap_arrays_have_default_elements_and_native_length_and_indices() {
-    let p = program("", "ldc.i4 3\nconv.u\nnewarr Int32\nldlen", "UIntPtr");
+    let p = program("", "ldc.i4 3\nconv.u\narray.new Int32\nldlen", "UIntPtr");
     p.verify().unwrap();
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::UIntPtr(3));
     let p = program(
         "",
-        "ldc.i4 3\nnewarr Int32\nldc.i4 2\nconv.i\nldelem Int32",
+        "ldc.i4 3\narray.new Int32\nldc.i4 2\nconv.i\nldelem Int32",
         "Int32",
     );
     p.verify().unwrap();
@@ -78,7 +78,7 @@ fn bounds_and_invalid_operands_fault() {
             };
             let p = program(
                 "",
-                &format!("ldc.i4 2\nnewarr Int32\nldc.i4 {index}\n{op}"),
+                &format!("ldc.i4 2\narray.new Int32\nldc.i4 {index}\n{op}"),
                 returns,
             );
             assert!(
@@ -90,8 +90,8 @@ fn bounds_and_invalid_operands_fault() {
         }
     }
     for body in [
-        "ldc.i4 1\nnewarr Int32\nldstr \"bad\"\nldelem Int32",
-        "ldc.i4 1\nnewarr Int32\nldc.i4 0\nldelem String",
+        "ldc.i4 1\narray.new Int32\nldstr \"bad\"\nldelem Int32",
+        "ldc.i4 1\narray.new Int32\nldc.i4 0\nldelem String",
     ] {
         let p = program("", body, "Int32");
         assert!(p.verify().is_err());
@@ -120,7 +120,7 @@ fn allocation_budgets_bound_copies_strings_and_lengths() {
     for body in [
         "ldc.i4 4\nldc.i4 0\narray.create Int32",
         "ldc.i4 2\nldc.i4 0\narray.create Int32\ndup\npop",
-        "ldc.i4 -1\nnewarr Int32",
+        "ldc.i4 -1\narray.new Int32",
     ] {
         let p = program("", &format!("{body}\npop\nldc.i4 0"), "Int32");
         assert!(
@@ -164,7 +164,7 @@ fn allocation_budgets_bound_copies_strings_and_lengths() {
 fn payload_pressure_collects_unreachable_arrays_before_faulting() {
     let p = program(
         "",
-        "ldc.i4 2\nnewarr Int32\npop\nldc.i4 2\nnewarr Int32\nldlen",
+        "ldc.i4 2\narray.new Int32\npop\nldc.i4 2\narray.new Int32\nldlen",
         "UIntPtr",
     );
     let result = p
@@ -192,7 +192,7 @@ fn generic_arrays_substitute_elements_and_normalize_small_scalar_loads() {
 fn direct_reference_elements_and_unsupported_default_values_are_rejected() {
     for element in ["Int32&", "String"] {
         let module = assemble(&format!(
-            ".module Bad\n.entry Main\n.function Main() -> Int32\nldc.i4 0\nnewarr {element}\npop\nldc.i4 0\nret\n.end"
+            ".module Bad\n.entry Main\n.function Main() -> Int32\nldc.i4 0\narray.new {element}\npop\nldc.i4 0\nret\n.end"
         ));
         assert!(module.is_err());
     }
@@ -269,7 +269,7 @@ fn reserved_arrays_obey_budgets_and_cannot_deinitialize_existing_elements() {
     );
     let p = program(
         "",
-        ".local Int32[]& a\nldc.i4 1\nnewarr Int32\nstloc a\nldloc a\nldc.i4 1\narray.alloc Int32\nldobj Int32[]\nstobj Int32[]\nldc.i4 0",
+        ".local Int32[]& a\nldc.i4 1\narray.new Int32\nstloc a\nldloc a\nldc.i4 1\narray.alloc Int32\nldobj Int32[]\nstobj Int32[]\nldc.i4 0",
         "Int32",
     );
     p.verify().unwrap();

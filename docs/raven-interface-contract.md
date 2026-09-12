@@ -78,7 +78,7 @@ The preferred path is runtime adaptation under the existing compiler metadata su
 | --- | --- |
 | Raven compilation | Candidate class/interface declarations bind and emit with standard calls; tested without compiler changes at Raven 5b773ae3536f52ef077c8897867950249d6dde90. |
 | Nominal classes | Nominal classes now admit generic owner parameters, interface conformance and dispatch. Class inheritance, methods with their own type parameters on nominal classes and virtual/byref class receivers remain unsupported. |
-| Existing interface runtime | Legacy views remain unchanged. Ordinary interface object references now support explicit casts, typed slots/fields, GC and dispatch; interface arrays and indirect slot access are now admitted; implicit storage conversions and ordinary array-reference representation remain later work. |
+| Existing interface runtime | Legacy views remain unchanged. Ordinary interface object references now support explicit casts, typed slots/fields, GC and dispatch; interface arrays and indirect slot access are now admitted; ordinary array references are now implemented; implicit storage conversions and importer admission remain later work. |
 | Library | ArrayList<T> is still a value wrapper holding shared state; ArrayIterator<T> is an explicitly heap-allocated legacy record. Adapt actual implementations after receiver/storage support exists. |
 | Import bridge | UnionImport deliberately rejects these collection types and emits no executable. Candidate declarations are isolated from the working core surface. |
 
@@ -195,3 +195,13 @@ frame provenance checks. The remaining array blocker is the array reference itse
 legacy `T[]&` is not the CLI ordinary `T[]` object reference. Constructor defaults and
 import admission must account for that distinction before the Raven collection demo
 can run; the existing Neo collection implementation is unchanged.
+
+## Ordinary array-reference runtime support (2026-09-12)
+
+The [ordinary array slice](managed-arrays.md#ordinary-array-references-and-migration-2026-09-12)
+now implements newarr object-reference results, array-field null defaults and generic
+constructor allocation. Internal `ArrayRef` signatures distinguish CLI arrays from
+Neo's existing owned arrays. The Neo compiler preserves its source behavior by emitting
+`array.new`; old neoIL artifacts need migration. Reference conversions/import admission,
+String defaults and actual collection adaptation remain ahead. No Raven changes or
+executable collection-import claim are made by this slice.

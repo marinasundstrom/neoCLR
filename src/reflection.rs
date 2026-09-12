@@ -68,7 +68,7 @@ impl Query {
         match self {
             Self::Shape => Ok(Value::Boolean(match argument {
                 6 => definition.is_some_and(|d| d.enum_info.is_some()),
-                0 => matches!(ty, Type::Array(_)),
+                0 => matches!(ty, Type::Array(_) | Type::ArrayRef(_)),
                 1 => matches!(ty, Type::ByRef(_) | Type::ReadOnlyByRef(_)),
                 2 => matches!(ty, Type::Ptr(_)),
                 4 => matches!(ty, Type::ReadOnlyByRef(_)),
@@ -123,9 +123,11 @@ impl Query {
             Self::ElementType => option(
                 "System.Type",
                 match &ty {
-                    Type::Array(t) | Type::ByRef(t) | Type::ReadOnlyByRef(t) | Type::Ptr(t) => {
-                        Some(type_value(module, t)?)
-                    }
+                    Type::Array(t)
+                    | Type::ArrayRef(t)
+                    | Type::ByRef(t)
+                    | Type::ReadOnlyByRef(t)
+                    | Type::Ptr(t) => Some(type_value(module, t)?),
                     _ => None,
                 },
             ),
@@ -455,6 +457,7 @@ fn from_identity(module: &Module, identity: &TypeIdentity) -> Result<Type, Fault
         TypeIdentity::ByRef(t) => Type::ByRef(nested(t)?),
         TypeIdentity::ReadOnlyByRef(t) => Type::ReadOnlyByRef(nested(t)?),
         TypeIdentity::Array(t) => Type::Array(nested(t)?),
+        TypeIdentity::ArrayRef(t) => Type::ArrayRef(nested(t)?),
         TypeIdentity::Ptr(t) => Type::Ptr(nested(t)?),
         TypeIdentity::InterfaceRef(t) => Type::InterfaceRef(nested(t)?),
         TypeIdentity::Definition {

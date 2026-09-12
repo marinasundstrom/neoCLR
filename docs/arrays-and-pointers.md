@@ -88,6 +88,7 @@ of a two-element array and presents GetElementAddress -> Get -> Main in its stac
 ## Further work
 
 The [managed-array contract](managed-arrays.md) supersedes the earlier owned-array
-proposal. `newarr` creates managed heap storage; `array.create` creates owned values.
+proposal. `newarr` creates ordinary heap-array references; `array.new` retains legacy
+byref allocation and `array.create` creates owned values.
 Checked slices and native pinning remain future work. Async suspension will need
 explicit lifetime rules for references into caller-owned arrays.

@@ -2318,7 +2318,7 @@ impl Lowerer<'_> {
                 self.expression_for(length, &Ty::Int)?;
                 let ty = Ty::Ref(Box::new(Ty::Array(Box::new(element.clone()))));
                 if elements.is_empty() {
-                    self.body.push(format!("newarr {}", element.il()));
+                    self.body.push(format!("array.new {}", element.il()));
                 } else {
                     self.check_array_length(elements.len(), false);
                     self.body.push(format!("array.alloc {}", element.il()));

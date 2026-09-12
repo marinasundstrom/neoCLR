@@ -98,7 +98,8 @@ retargeting and lifetime checks.
 
 Neo now demonstrates owned array copying, managed heap arrays, indexed mutation,
 Length and element-reference forwarding. The [array contract](managed-arrays.md)
-keeps CLR newarr semantics and adds an explicit owned construction operation.
+uses array.new for its legacy byref allocation; the CLR-targeted runtime path now
+uses newarr for ordinary references. Explicit owned construction remains separate.
 Reference elements are implemented. Slices and pinning remain future decisions.
 
 ## Interface demonstration implemented

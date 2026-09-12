@@ -47,6 +47,8 @@ pub enum Type {
     ReadOnlyByRef(Box<Type>),
     /// Owned fixed-length array value; allocation mode is separate.
     Array(Box<Type>),
+    /// Ordinary managed heap-array reference (CLI SZARRAY), distinct from an owned array.
+    ArrayRef(Box<Type>),
     /// Explicit borrowed interface receiver, separate from the interface declaration.
     InterfaceRef(Box<Type>),
     /// Fundamental unmanaged pointer signature; no ownership policy is implied.
@@ -691,6 +693,9 @@ pub enum Instruction {
     AllocateArray(Type),
     #[serde(rename = "newarr")]
     NewArray(Type),
+    /// Legacy heap allocation returning a managed byref to an owned array.
+    #[serde(rename = "array.new")]
+    NewValueArray(Type),
     #[serde(rename = "array.create")]
     CreateArray(Type),
     #[serde(rename = "ldlen")]
@@ -770,8 +775,10 @@ pub enum Instruction {
 
 impl Module {
     pub fn is_reference_type(&self, ty: &Type) -> bool {
-        self.type_definition(ty)
-            .is_some_and(|definition| definition.is_reference_type)
+        matches!(ty, Type::ArrayRef(_))
+            || self
+                .type_definition(ty)
+                .is_some_and(|definition| definition.is_reference_type)
     }
 
     /// Ordinary object-reference storage, including nominal interface views.
@@ -913,6 +920,7 @@ impl Type {
                 Type::ByRef(t) => Type::ByRef(Box::new(nested(t)?)),
                 Type::ReadOnlyByRef(t) => Type::ReadOnlyByRef(Box::new(nested(t)?)),
                 Type::Array(t) => Type::Array(Box::new(nested(t)?)),
+                Type::ArrayRef(t) => Type::ArrayRef(Box::new(nested(t)?)),
                 Type::Ptr(t) => Type::Ptr(Box::new(nested(t)?)),
                 Type::InterfaceRef(t) => Type::InterfaceRef(Box::new(nested(t)?)),
                 other => other.clone(),
@@ -1019,6 +1027,7 @@ impl Function {
                 Instruction::New(ty)
                 | Instruction::AllocateArray(ty)
                 | Instruction::NewArray(ty)
+                | Instruction::NewValueArray(ty)
                 | Instruction::CreateArray(ty)
                 | Instruction::ArrayElement(ty)
                 | Instruction::StoreArrayElement(ty)

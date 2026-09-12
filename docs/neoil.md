@@ -215,7 +215,8 @@ normalization; other checks use exact type equality. See [integer storage](integ
 | `interface.borrow I` | `Ptr<Concrete> → InterfaceRef<I>` | Explicit non-owning interface view; requires declared implementation and native concrete layout |
 | `ret` | `R → caller` | Return exactly one value; no extra stack items |
 | `newobj Type` | `F0,…,Fn → Type` | Construct a closed record value in substituted field declaration order |
-| `newarr T` | length → T[]& | Default-initialized managed heap array |
+| `newarr T` | length → `arrayref<T>` | Default-initialized ordinary heap-array reference |
+| `array.new T` | length → T[]& | Legacy heap array using managed byref storage |
 | `array.alloc T` | length → T[]& | Checked uninitialized managed capacity; reads fault until written |
 | `array.create T` | length, T → T[] | Explicitly initialized owned array value |
 | `ldlen` | T[] or T[]& → UIntPtr | Array length |
@@ -704,3 +705,7 @@ entries. Its single private Int32 payload is validated by the loader. Constants 
 metadata, not slots; named values do not restrict the accepted Int32 domain.
 `newobj EnumName` constructs from that integer without exposing private field access.
 See [enums](enums.md) for compatibility, helper methods and Neo projection.
+
+`arrayref<T>` is the explicit neoIL signature for an ordinary CLI-style array reference;
+`T[]` remains an owned array. Old `newarr` artifacts targeting `T[]&` must migrate to
+`array.new` or be recompiled. See [array migration](managed-arrays.md#ordinary-array-references-and-migration-2026-09-12).

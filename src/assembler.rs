@@ -568,8 +568,8 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         "sizeof" | "alignof" | "heap.alloc" | "ptr.null" | "ptr.cast"
                         | "ptr.fromint" | "ldobj" | "stobj" | "cpobj" | "initobj"
                         | "value.pack" | "value.is" | "value.unpack" | "ldtoken" | "castclass"
-                        | "interface.borrow" | "newarr" | "array.alloc" | "array.create"
-                        | "ldelem" | "stelem" | "ldelema" => Some(
+                        | "interface.borrow" | "newarr" | "array.new" | "array.alloc"
+                        | "array.create" | "ldelem" | "stelem" | "ldelema" => Some(
                             serde_json::to_value(parse_type(rest)?)
                                 .map_err(|e| Fault::new(e.to_string()))?,
                         ),
@@ -966,6 +966,12 @@ pub fn parse_type(text: &str) -> Result<Type, Fault> {
             return Err(Fault::new("type nesting exceeds 32"));
         }
         let text = text.trim();
+        if let Some(element) = text
+            .strip_prefix("arrayref<")
+            .and_then(|t| t.strip_suffix('>'))
+        {
+            return Ok(Type::ArrayRef(Box::new(parse(element, depth + 1)?)));
+        }
         if let Some(element) = text.strip_suffix("[]") {
             return Ok(Type::Array(Box::new(parse(element, depth + 1)?)));
         }
@@ -1421,6 +1427,7 @@ pub(crate) fn bind_parameters(ty: Type, names: &[Option<String>], method: bool) 
         Type::ReadOnlyByRef(t) => Type::ReadOnlyByRef(Box::new(bind_parameters(*t, names, method))),
         Type::ByRef(t) => Type::ByRef(Box::new(bind_parameters(*t, names, method))),
         Type::Array(t) => Type::Array(Box::new(bind_parameters(*t, names, method))),
+        Type::ArrayRef(t) => Type::ArrayRef(Box::new(bind_parameters(*t, names, method))),
         Type::Ptr(t) => Type::Ptr(Box::new(bind_parameters(*t, names, method))),
         other => other,
     }

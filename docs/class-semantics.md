@@ -48,7 +48,9 @@ See the [nominal interface groundwork](raven-interface-contract.md#implemented-n
 for object-reference interface views, no-result contracts and remaining conversion limits. Existing legacy value-model
 functionality in those areas remains available. Class defaults now produce typed null references, and `initobj` resets a class slot.
 Constructor allocation initializes fields using supported managed defaults, including
-nominal class-reference fields. General `ldnull` projection remains separate work.
+nominal class-reference fields and ordinary `arrayref<T>` fields. The latter can be
+assigned `newarr T` inside a constructor; see [array migration](managed-arrays.md#ordinary-array-references-and-migration-2026-09-12).
+General `ldnull` projection remains separate work.
 Native inline layout and host value-record imports reject marked classes. `notreference`
 rejects nominal classes as well as explicit reference signatures.
 

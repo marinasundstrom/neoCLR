@@ -14,6 +14,7 @@ pub enum TypeIdentity {
     ByRef(Box<TypeIdentity>),
     ReadOnlyByRef(Box<TypeIdentity>),
     Array(Box<TypeIdentity>),
+    ArrayRef(Box<TypeIdentity>),
     Ptr(Box<TypeIdentity>),
     InterfaceRef(Box<TypeIdentity>),
 }
@@ -42,6 +43,7 @@ pub(crate) fn describe_loaded(module: &Module, normalized: &Type) -> Result<Type
         Type::ByRef(element) => reference_name(element, false)?,
         Type::ReadOnlyByRef(element) => reference_name(element, true)?,
         Type::Array(element) => format!("{}[]", signature_name(element)?),
+        Type::ArrayRef(element) => format!("arrayref<{}>", signature_name(element)?),
         Type::Ptr(element) => format!("{}*", signature_name(element)?),
         Type::InterfaceRef(element) => format!("InterfaceRef<{}>", signature_name(element)?),
         _ => normalized
@@ -72,6 +74,7 @@ pub(crate) fn signature_name(ty: &Type) -> Result<String, Fault> {
         Type::ByRef(element) => reference_name(element, false)?,
         Type::ReadOnlyByRef(element) => reference_name(element, true)?,
         Type::Array(element) => format!("{}[]", signature_name(element)?),
+        Type::ArrayRef(element) => format!("arrayref<{}>", signature_name(element)?),
         Type::Ptr(element) => format!("{}*", signature_name(element)?),
         Type::InterfaceRef(element) => format!("InterfaceRef<{}>", signature_name(element)?),
         Type::Constructed {
@@ -121,6 +124,7 @@ fn build(module: &Module, ty: &Type) -> Result<TypeIdentity, Fault> {
         Type::ByRef(t) => TypeIdentity::ByRef(nested(t)?),
         Type::ReadOnlyByRef(t) => TypeIdentity::ReadOnlyByRef(nested(t)?),
         Type::Array(t) => TypeIdentity::Array(nested(t)?),
+        Type::ArrayRef(t) => TypeIdentity::ArrayRef(nested(t)?),
         Type::Ptr(t) => TypeIdentity::Ptr(nested(t)?),
         Type::InterfaceRef(t) => TypeIdentity::InterfaceRef(nested(t)?),
         _ => {

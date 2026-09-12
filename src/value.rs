@@ -35,9 +35,9 @@ pub enum Value {
         ty: Type,
         fields: Vec<Value>,
     },
-    /// Class or interface object reference. Cloning copies identity, never contents.
+    /// Class, interface or array object reference. Cloning copies identity, never contents.
     ObjectReference(ObjectReference),
-    /// Typed null for class/interface storage; not an uninitialized slot or a byref.
+    /// Typed null for object-reference storage; not an uninitialized slot or a byref.
     NullObjectReference(Type),
     SlotReference(crate::SlotReference),
     Pointer(crate::memory::Pointer),
@@ -52,7 +52,7 @@ pub enum Value {
     },
 }
 
-/// Heap-only class handle, distinct from a managed byref to a slot.
+/// Heap-only object handle, distinct from a managed byref to a slot.
 #[derive(Debug, Clone)]
 pub struct ObjectReference {
     pub(crate) reference: crate::SlotReference,
@@ -66,7 +66,11 @@ impl PartialEq for ObjectReference {
 impl ObjectReference {
     /// Concrete allocation type, independent of an interface view.
     pub fn concrete_type(&self) -> &Type {
-        self.reference.target()
+        if matches!(self.reference.target(), Type::Array(_)) {
+            self.target()
+        } else {
+            self.reference.target()
+        }
     }
     pub fn allocation_id(&self) -> usize {
         self.reference.allocation_id().expect("heap object")

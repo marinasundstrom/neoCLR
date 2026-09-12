@@ -174,6 +174,7 @@ fn check_type(module: &Module, source: Scope<'_>, ty: &Type) -> Result<(), Fault
                 }
             }
             Type::Array(t)
+            | Type::ArrayRef(t)
             | Type::ByRef(t)
             | Type::ReadOnlyByRef(t)
             | Type::Ptr(t)

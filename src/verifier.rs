@@ -660,7 +660,7 @@ fn effect(
         Pop | Store(_) | StoreArg(_) | BranchTrue(_) | BranchFalse(_) | Switch(_)
         | InitializeObject(_) => (1, 0),
         Dup => (1, 2),
-        AllocateArray(_) | NewArray(_) | ArrayLength | ReferenceType => (1, 1),
+        AllocateArray(_) | NewValueArray(_) | NewArray(_) | ArrayLength | ReferenceType => (1, 1),
         CreateArray(_) | ArrayElement(_) | ArrayAddress(_) => (2, 1),
         StoreArrayElement(_) => (3, 0),
         New(ty) => (crate::vm::record_fields(module, ty, arity)?.len(), 1),
@@ -864,7 +864,7 @@ fn typed_effect(
             .ok_or_else(|| crate::Fault::new("field index out of range"))
     };
     match op {
-        AllocateArray(ty) | NewArray(ty) | CreateArray(ty) => {
+        AllocateArray(ty) | NewValueArray(ty) | NewArray(ty) | CreateArray(ty) => {
             require(
                 count(exact(&values[0])?),
                 "array length requires Int32 or native integer",
@@ -873,7 +873,9 @@ fn typed_effect(
                 stored(&values[1], ty)?;
             }
             let array = T::Array(Box::new(ty.clone()));
-            one(if matches!(op, NewArray(_) | AllocateArray(_)) {
+            one(if matches!(op, NewArray(_)) {
+                T::ArrayRef(Box::new(ty.clone()))
+            } else if matches!(op, NewValueArray(_) | AllocateArray(_)) {
                 T::ByRef(Box::new(array))
             } else {
                 array
@@ -886,7 +888,11 @@ fn typed_effect(
             } else {
                 owner
             };
-            let T::Array(element) = target else {
+            require(
+                !matches!(target, T::ArrayRef(_)) || matches!(owner, T::ArrayRef(_)),
+                "array reference slot must be loaded before array access",
+            )?;
+            let (T::Array(element) | T::ArrayRef(element)) = target else {
                 return Err(crate::Fault::new("array operation requires array"));
             };
             if matches!(op, ArrayLength) {
@@ -905,7 +911,7 @@ fn typed_effect(
                 return Ok(vec![loaded(element)]);
             }
             require(
-                matches!(owner, T::ByRef(_)),
+                matches!(owner, T::ByRef(_) | T::ArrayRef(_)),
                 "array mutation/address requires managed array reference",
             )?;
             if matches!(op, StoreArrayElement(_)) {

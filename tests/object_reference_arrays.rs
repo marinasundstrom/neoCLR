@@ -26,7 +26,7 @@ fn module(body: &str) -> neoclr::Module {
 fn object_reference_elements_default_to_typed_null() {
     for element in ["Cell", "Read"] {
         let m = module(&format!(
-            ".function Main() -> {element}\nldc.i4 1\nnewarr {element}\nldc.i4 0\nldelem {element}\nret\n.end"
+            ".function Main() -> {element}\nldc.i4 1\narray.new {element}\nldc.i4 0\nldelem {element}\nret\n.end"
         ));
         verify(&m).unwrap();
         let execution = run(&m, Limits::default()).unwrap();
@@ -46,7 +46,7 @@ fn interface_array_element_retains_identity_and_dispatch() {
 .local Cell original
 .local Read[]& buffer
 ldc.i4 1
-newarr Read
+array.new Read
 stloc buffer
 ldc.i4 7
 newobj Cell
@@ -89,7 +89,7 @@ fn interface_element_slot_can_be_rebound_without_mutating_old_object() {
 .local Read& slot
 .local Read old
 ldc.i4 1
-newarr Read
+array.new Read
 stloc buffer
 ldloc buffer
 ldc.i4 0
@@ -145,7 +145,7 @@ ret
 .function Make() -> Read&
 .local Read[]& buffer
 ldc.i4 1
-newarr Read
+array.new Read
 stloc buffer
 ldloc buffer
 ldc.i4 0
@@ -178,7 +178,7 @@ ret
 fn incompatible_element_types_are_rejected_without_verification() {
     for value in ["ldc.i4 1", "ldc.i4 1\nnewobj Cell"] {
         let m = module(&format!(
-            ".function Main() -> noresult\nldc.i4 1\nnewarr Read\nldc.i4 0\n{value}\nstelem Read\nret\n.end"
+            ".function Main() -> noresult\nldc.i4 1\narray.new Read\nldc.i4 0\n{value}\nstelem Read\nret\n.end"
         ));
         assert!(verify(&m).is_err());
         assert!(run(&m, Limits::default()).is_err());
@@ -188,7 +188,7 @@ fn incompatible_element_types_are_rejected_without_verification() {
 #[test]
 fn null_element_dispatch_faults() {
     let m = module(
-        ".function Main() -> Int32\nldc.i4 1\nnewarr Read\nldc.i4 0\nldelem Read\ncallvirt instance Read::Get()\nret\n.end",
+        ".function Main() -> Int32\nldc.i4 1\narray.new Read\nldc.i4 0\nldelem Read\ncallvirt instance Read::Get()\nret\n.end",
     );
     verify(&m).unwrap();
     assert!(
@@ -232,7 +232,7 @@ fn nominal_generic_buffer_can_retain_an_interface_array() {
 .function Main() -> Int32
 .local Buffer<Read> buffer
 ldc.i4 1
-newarr Read
+array.new Read
 newobj Buffer<Read>
 stloc buffer
 ldloc buffer
@@ -262,7 +262,7 @@ fn reference_array_elements_remain_invariant() {
 .function Main() -> Read
 .local Cell[]& items
 ldc.i4 1
-newarr Cell
+array.new Cell
 stloc items
 ldloc items
 ldc.i4 0

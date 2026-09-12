@@ -876,6 +876,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                     crate::access::check_call(module, Some(function), &callee)?;
                 }
                 Op::AllocateArray(ty)
+                | Op::NewValueArray(ty)
                 | Op::NewArray(ty)
                 | Op::CreateArray(ty)
                 | Op::ArrayElement(ty)
@@ -887,7 +888,9 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                     {
                         return Err(Fault::new("nested managed references are not supported"));
                     }
-                    if matches!(op, Op::NewArray(_)) && check_type(ty, module).is_ok() {
+                    if matches!(op, Op::NewArray(_) | Op::NewValueArray(_))
+                        && check_type(ty, module).is_ok()
+                    {
                         crate::initialization::default_value(module, ty)?;
                     }
                 }
@@ -915,7 +918,9 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 }
                 Op::CastClass(ty) => {
                     check(ty)?;
-                    if crate::interfaces::interface_definition(module, ty).is_err() {
+                    if !matches!(ty, Type::ArrayRef(_))
+                        && crate::interfaces::interface_definition(module, ty).is_err()
+                    {
                         crate::inheritance::lineage(module, ty)?;
                     }
                 }
@@ -1104,7 +1109,7 @@ fn check_type_context(
             }
             Ok(())
         }
-        Type::Array(t) => nested(t),
+        Type::Array(t) | Type::ArrayRef(t) => nested(t),
         Type::InterfaceRef(t) => {
             nested(t)?;
             crate::interfaces::interface_definition(module, t)?;
@@ -1532,8 +1537,10 @@ fn interpret_instructions(
         frame.pc += 1;
         let context = function.name.clone();
         // Collect only between instructions, before allocation operands leave roots.
-        if (matches!(op, Op::HeapNew | Op::NewArray(_) | Op::AllocateArray(_))
-            || matches!(op, Op::New(ty) if module.is_reference_type(ty))
+        if (matches!(
+            op,
+            Op::HeapNew | Op::NewValueArray(_) | Op::NewArray(_) | Op::AllocateArray(_)
+        ) || matches!(op, Op::New(ty) if module.is_reference_type(ty))
             || matches!(op, Op::Construct(target) if target.owner.as_ref().is_some_and(|ty| module.is_reference_type(ty))))
             && heap.len() >= collection_threshold
         {
@@ -2020,12 +2027,14 @@ fn interpret_instructions(
                 Op::CastClass(target) => {
                     let value = match frame.pop()? {
                         Value::ObjectReference(mut object) => {
-                            let concrete = object.reference.target();
+                            let concrete = object.concrete_type();
                             if crate::interfaces::interface_definition(module, target).is_ok() {
                                 crate::interfaces::ensure_implementation(module, concrete, target)?;
                                 object.view = Some(target.clone());
                             } else if concrete == target {
-                                object.view = None;
+                                if !matches!(target, Type::ArrayRef(_)) {
+                                    object.view = None;
+                                }
                             } else {
                                 return Err(Fault::new("invalid object reference cast"));
                             }
@@ -2316,7 +2325,10 @@ fn interpret_instructions(
                         return Ok(Some(value));
                     }
                 }
-                Op::AllocateArray(ty) | Op::NewArray(ty) | Op::CreateArray(ty) => {
+                Op::AllocateArray(ty)
+                | Op::NewValueArray(ty)
+                | Op::NewArray(ty)
+                | Op::CreateArray(ty) => {
                     arrays_used = true;
                     let initial = if matches!(op, Op::CreateArray(_)) {
                         frame.pop()?.for_storage(ty)?
@@ -2329,12 +2341,23 @@ fn interpret_instructions(
                         Fault::new("array length must be a non-negative Int32 or native integer")
                     })?;
                     let value = crate::arrays::create(ty.clone(), length, initial, &limits)?;
-                    if matches!(op, Op::NewArray(_) | Op::AllocateArray(_)) {
+                    if matches!(
+                        op,
+                        Op::NewArray(_) | Op::NewValueArray(_) | Op::AllocateArray(_)
+                    ) {
                         if heap.len() >= limits.heap_objects {
                             return Err(Fault::new("heap object limit exceeded"));
                         }
                         let index = heap.allocate(value)?;
-                        frame.stack.push(Value::SlotReference(heap.address(index)?));
+                        let reference = heap.address(index)?;
+                        frame.stack.push(if matches!(op, Op::NewArray(_)) {
+                            Value::ObjectReference(crate::value::ObjectReference {
+                                reference,
+                                view: Some(Type::ArrayRef(Box::new(ty.clone()))),
+                            })
+                        } else {
+                            Value::SlotReference(reference)
+                        });
                     } else {
                         frame.stack.push(value);
                     }
@@ -2342,6 +2365,14 @@ fn interpret_instructions(
                 Op::ArrayLength => {
                     let length = match frame.pop()? {
                         Value::SlotReference(reference) => reference.array_length()?,
+                        Value::ObjectReference(object)
+                            if matches!(object.target(), Type::ArrayRef(_)) =>
+                        {
+                            object.reference.array_length()?
+                        }
+                        Value::NullObjectReference(_) => {
+                            return Err(Fault::new("null array reference"));
+                        }
                         Value::Array { elements, .. } => elements.len(),
                         _ => return Err(Fault::new("ldlen requires array")),
                     };
@@ -2354,7 +2385,18 @@ fn interpret_instructions(
                         None
                     };
                     let index = crate::arrays::index(frame.pop()?)?;
-                    match frame.pop()? {
+                    let receiver = match frame.pop()? {
+                        Value::ObjectReference(object)
+                            if matches!(object.target(), Type::ArrayRef(_)) =>
+                        {
+                            Value::SlotReference(object.reference)
+                        }
+                        Value::NullObjectReference(_) => {
+                            return Err(Fault::new("null array reference"));
+                        }
+                        value => value,
+                    };
+                    match receiver {
                         Value::SlotReference(reference) => {
                             if matches!(op, Op::ArrayAddress(_))
                                 && matches!(ty, Type::ByRef(_) | Type::ReadOnlyByRef(_))

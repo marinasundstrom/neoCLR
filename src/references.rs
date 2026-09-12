@@ -59,6 +59,7 @@ pub(crate) fn check_type(linked: &Module, source: &Module, ty: &Type) -> Result<
     }
     match ty {
         Type::Array(t)
+        | Type::ArrayRef(t)
         | Type::ByRef(t)
         | Type::ReadOnlyByRef(t)
         | Type::Ptr(t)

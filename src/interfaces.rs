@@ -551,6 +551,7 @@ pub(crate) fn dispatch_targets(
             | (Type::InterfaceRef(a), Type::InterfaceRef(b))
             | (Type::ByRef(a), Type::ByRef(b))
             | (Type::ReadOnlyByRef(a), Type::ReadOnlyByRef(b))
+            | (Type::ArrayRef(a), Type::ArrayRef(b))
             | (Type::Array(a), Type::Array(b)) => infer(a, b, bindings),
             _ => pattern == actual,
         }

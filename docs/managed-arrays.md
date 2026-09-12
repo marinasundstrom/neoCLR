@@ -1,8 +1,9 @@
 # Managed arrays
 
-Implemented arrays use the same value/reference distinction as records. `T[]` owns
+Neo's original arrays use the value/reference distinction of its value model. `T[]` owns
 its elements; copying it copies the elements. `T[]&` aliases an array location.
-There is no mandatory Object or System.Array base class. The native pointer/length
+The separate `arrayref<T>` neoIL signature is an ordinary heap-array reference for
+the CLR-compatible path (see below). There is no mandatory Object or System.Array base class. The native pointer/length
 `System.Array<T>` descriptor remains a separate [buffer API](arrays-and-pointers.md).
 
 ## Storage and CLR alignment
@@ -10,12 +11,13 @@ There is no mandatory Object or System.Array base class. The native pointer/leng
 | Instruction | Stack effect | Contract |
 | --- | --- | --- |
 | `array.alloc T` | length → T[]& | Reserve managed heap slots; reads fault until individually initialized |
-| `newarr T` | length → T[]& | Create a zero-based, fixed-length managed heap array with initialized elements |
+| `newarr T` | length → `arrayref<T>` | Create an ordinary heap-array reference with initialized elements |
+| `array.new T` | length → T[]& | Legacy heap allocation returning a byref to an owned array |
 | `array.create T` | length, initial T → T[] | Create an owned array value by copying an explicit initializer |
-| `ldlen` | T[] or T[]& → UIntPtr | Native unsigned length, as in CLR IL |
-| `ldelem T` | T[] or T[]&, index → T | Copy an element, with normal evaluation-stack scalar normalization |
-| `stelem T` | T[]&, index, T → | Replace an element after bounds/type checks |
-| `ldelema T` | T[]&, index → T& | Managed element reference retaining its owner's provenance |
+| `ldlen` | T[], T[]& or `arrayref<T>` → UIntPtr | Native unsigned length, as in CLR IL |
+| `ldelem T` | T[], T[]& or `arrayref<T>`, index → T | Copy an element, with normal evaluation-stack scalar normalization |
+| `stelem T` | T[]& or `arrayref<T>`, index, T → | Replace an element after bounds/type checks |
+| `ldelema T` | T[]& or `arrayref<T>`, index → T& | Managed element reference retaining its owner's provenance |
 
 Lengths and indices accept Int32, IntPtr or UIntPtr. Negative lengths, invalid
 indices, type mismatches and resource exhaustion produce terminal Faults. This
@@ -73,7 +75,7 @@ let empty = array(0, 0)
 ```
 
 Nonempty literals and `array(length, initialValue)` produce owned values.
-`new T[length]` lowers to `newarr`; `new array(length, initialValue)` uses explicit
+`new T[length]` lowers to `array.new`; `new array(length, initialValue)` uses explicit
 initialization followed by `heap.new`. Indexing reads a value; `&items[index]`
 forms a managed reference. Mutation of an owned local requires `var`; a managed
 reference binding can mutate its target even when declared with `let`.
@@ -168,13 +170,12 @@ existing element/slot machinery preserves that distinction inside elements witho
 adding instructions or changing metadata. A special interface-buffer wrapper would add
 an unnecessary allocation and another library contract.
 
-There remains an explicit ABI difference: neoCLR's existing `newarr` returns `T[]&`,
-whereas CLI newarr returns an ordinary array object reference. This slice does **not**
-resolve that difference, introduce covariance or make the existing owned `T[]` nullable.
+At the time of this element-storage slice, `newarr` still returned `T[]&`. The
+ordinary-array-reference slice below replaces that instruction behavior. Neither slice
+introduces covariance or makes the existing owned `T[]` nullable.
 Nominal class constructors still cannot default a legacy array-reference field; explicit
 field-based construction can retain an already allocated buffer. The Raven importer
-must continue rejecting array signatures until their ordinary-reference representation
-is implemented. This is a prerequisite for adapting collections, not the completed
+continues rejecting array signatures until its admission and translation are implemented. This is a prerequisite for adapting collections, not the completed
 collection migration. String defaults also remain unsupported.
 
 `tests/object_reference_arrays.rs` exercises nulls, dispatch/identity, slot rebinding,
@@ -182,3 +183,49 @@ GC retention through an escaped element address, generic buffer fields, invalid 
 invariant access, rejected frame-slot escape and borrowed-view misuse. Ten new tests
 and 90 related tests pass. Existing Neo array and ArrayList
 regressions validate that their value-copy and managed-reference behavior remains intact.
+
+## Ordinary array references and migration (2026-09-12)
+
+`newarr T` now returns `arrayref<T>`: an ordinary object reference with fixed-length
+array storage on the managed heap. Assignment copies the reference, and replacing an
+array binding with a different-length array does not modify the old allocation. `ldlen`,
+`ldelem`, `stelem` and `ldelema` operate on this reference. The element address still
+retains its allocation independently of subsequent binding changes.
+
+`arrayref<T>` / JSON `ArrayRef` is the interpreter's explicit signature spelling for
+CLI SZARRAY. It is not a new CLI metadata element or a wrapper class expected in Raven
+programs. Keeping it distinct from the existing owned `T[]` avoids silently changing
+Neo value-copy contracts. Both forms report IsArray and their element type through
+reflection, but have distinct metadata identities. Generic substitution, reference
+constraints and access checks recurse through the element type. No native inline layout
+is exposed for array references.
+
+The default is typed null, including fields in generic class constructors and inner
+references in jagged arrays. Null array operations fault. A constructor can therefore
+start with a null `arrayref<T>` field and assign `newarr T` to it. Arrays can contain
+class/interface references and other array references, and GC follows those handles.
+The runtime still requires exact element types and explicit class-to-interface casts;
+array covariance, System.Array methods and String defaults remain outside this slice.
+
+This aligns allocation/alias/default behavior with the Microsoft newarr/ldelema contracts
+cited above. Changing all existing `T[]` signatures to references would instead break
+Neo's owned-value behavior. Giving the CLR-targeted path a different allocation opcode
+would preserve the old spelling but unnecessarily diverge from CLI newarr. The chosen
+tradeoff is a breaking preview neoIL change and one explicitly named legacy operation.
+There is no JIT performance or binary-loader compatibility claim.
+
+**Migration:** old neoIL/JSON artifacts that used `newarr` for `T[]&` must replace that
+operation with `array.new`, or be recompiled from Neo. Neo source syntax and behavior
+are unchanged; its compiler now emits `array.new`. `array.create`, `array.alloc` and
+`heap.new` retain their existing roles. This also applies to old artifacts using
+`Instruction::NewArray`; use `NewValueArray` to request the old result type. The new
+runtime does not silently translate old artifacts. Published preview artifacts and
+release notes remain unchanged.
+
+The Raven importer has not yet been expanded to admit SZARRAY; ordinary array-reference
+storage is now available for that next step. The adapted collection demo is still pending.
+`tests/reference_arrays.rs` covers constructor fields, aliasing, typed null operations,
+jagged-array GC, managed element addresses, exact casts, metadata identity, constraints
+and rejection of accidental interchange with owned arrays/byrefs.
+
+Validation: 13 new array-reference regressions and 127 related tests pass (140 total).
