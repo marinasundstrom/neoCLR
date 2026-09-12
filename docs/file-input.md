@@ -111,3 +111,6 @@ application-level Error carrier. Reassemble applications and System for the chan
 public error parameter and native payload protocol.
 
 [Bounded UTF-8 output](file-output.md) now provides the corresponding WriteAllText API.
+
+The experimental [Raven projection](raven-file-api.md) documents admitted calls,
+propagation, conditional-output checks and remaining API gaps.

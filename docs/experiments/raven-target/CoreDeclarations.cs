@@ -13,7 +13,7 @@ static class CoreDeclarations
         if (unionProbe)
             declarations = declarations.Replace("public static class Math {",
                 "public static class Math { public static Result<int, OverflowError> Abs(int value) => default;")
-                + UnionDeclarations.Source;
+                + UnionDeclarations.Source + FileBindings.Declarations;
         if (collectionProbe) declarations += CollectionDeclarations.Source;
         var source = Source.Replace("public static class Console { public static void WriteLine(string value) { } }", declarations)
             .Replace("// Union probe attribute", unionProbe ? "public sealed class UnionAttribute : System.Attribute { }" : "");
@@ -42,7 +42,10 @@ static class CoreDeclarations
             {
                 foreach (var contract in type.Interfaces) contract.InterfaceType = Project(contract.InterfaceType);
                 foreach (var method in type.Methods)
+                {
+                    method.ReturnType = Project(method.ReturnType);
                     foreach (var parameter in method.Parameters) parameter.ParameterType = Project(parameter.ParameterType);
+                }
             }
             module.Types.Remove(unit);
             foreach (var method in module.Types.SelectMany(t => t.Methods).Where(m => m.HasBody))

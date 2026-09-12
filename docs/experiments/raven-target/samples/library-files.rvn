@@ -1,0 +1,42 @@
+import System.*
+import System.Console.*
+import System.IO.*
+
+// Creates or replaces this file in the working directory.
+func Save(path: string, text: string, limit: int) -> Result<System.Void, FileWriteError> {
+    File.WriteAllText(path, text, limit)?
+    WriteLine("Written")
+    return Result<System.Void, FileWriteError>(Result.Ok<System.Void>(()))
+}
+func Load(path: string, limit: int) -> Result<string, FileReadError> {
+    let text = File.ReadAllText(path, limit)?
+    return Result<string, FileReadError>(Result.Ok<string>(text))
+}
+func ShowWrite(result: Result<System.Void, FileWriteError>) {
+    match result {
+        Result.Ok<System.Void> done => WriteLine("Completed")
+        Result.Error<FileWriteError> error => {
+            if error.Value.IsTooLarge { WriteLine("Write too large") }
+            else { WriteLine("Write failed") }
+        }
+    }
+}
+func ShowRead(result: Result<string, FileReadError>) {
+    match result {
+        Result.Ok<string> ok => WriteLine(ok.Value)
+        Result.Error<FileReadError> error => {
+            if error.Value.IsNotFound { WriteLine("Not found") }
+            else if error.Value.IsTooLarge { WriteLine("Read too large") }
+            else if error.Value.IsInvalidUtf8 { WriteLine("Invalid UTF-8") }
+            else if error.Value.IsInvalidLimit { WriteLine("Invalid limit") }
+            else { WriteLine("Read failed") }
+        }
+    }
+}
+func Main() {
+    ShowWrite(Save("neoclr-file-demo.txt", "Hello, värld!", 64))
+    ShowRead(Load("neoclr-file-demo.txt", 64))
+    ShowWrite(Save("neoclr-file-demo.txt", "replacement", 2))
+    ShowRead(Load("neoclr-file-demo.txt", 64))
+    ShowRead(Load("neoclr-file-demo.txt", 2))
+}

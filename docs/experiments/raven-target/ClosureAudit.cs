@@ -51,11 +51,18 @@ static class ClosureAudit
         TypeReference Storage(TypeReference type)
         {
             if (type is ByReferenceType byref) return new ByReferenceType(Storage(byref.ElementType));
+            if (type is GenericInstanceType generic)
+            {
+                var normalized = new GenericInstanceType(generic.ElementType);
+                foreach (var argument in generic.GenericArguments) normalized.GenericArguments.Add(Storage(argument));
+                return normalized;
+            }
             if (type.FullName == "System.Void" && type.IsValueType)
                 return new TypeReference("System", "Void", method.Module, type.Scope, true);
             return type;
         }
         foreach (var parameter in method.Parameters) parameter.ParameterType = Storage(parameter.ParameterType);
+        if (method.ReturnType is GenericInstanceType) method.ReturnType = Storage(method.ReturnType);
         return method.Resolve();
     }
 

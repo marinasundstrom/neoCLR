@@ -19,9 +19,9 @@ static class UnionImport
     const string Carrier = "System.Result<Int32,System.OverflowError>";
     const string Ok = "System.Result.Ok<Int32>";
     const string Error = "System.Result.Error<System.OverflowError>";
-    sealed record Slot(string Type, int Local = -1);
+    sealed record Slot(string Type, int Local = -1, int ConditionalOut = -1);
     sealed record State(List<Slot> Stack, bool[] Assigned);
-    sealed record Call(string Name, string[] Arguments, string Result, int OutArgument = -1, string? Instruction = null);
+    sealed record Call(string Name, string[] Arguments, string Result, int OutArgument = -1, string? Instruction = null, bool ConditionalOutput = false);
 
     public static void Write(string application, string core, string destination, bool collectionProfile = false)
     {
@@ -44,7 +44,7 @@ static class UnionImport
         {
             var collection = CollectionBindings.Type(type);
             if (collection is not null && collectionProfile) return collection;
-            return Type(type, result);
+            return FileBindings.Type(type) ?? Type(type, result);
         }
         var output = new StringBuilder($".module ImportedUnion\n.entry {Name(entry)}\n");
         var mappings = new List<object>();
@@ -62,14 +62,15 @@ static class UnionImport
             var args = method.Parameters.Select(p => ProfileType(p.ParameterType)).ToArray();
             var result = ProfileType(method.ReturnType, true);
             var locals = method.Body.Variables.Select(v => ProfileType(v.VariableType)).ToArray();
-            if (locals.Any(t => !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
+            if (locals.Any(t => !FileBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
                 throw new InvalidDataException("Unsupported local default in Result profile.");
+            NormalizePatternBranches(method);
             var instructions = method.Body.Instructions.ToArray();
             var indexes = instructions.Select((i, n) => (i, n)).ToDictionary(p => p.i, p => p.n);
             var states = new Dictionary<int, State>();
             var work = new Queue<int>();
             var bodies = new Dictionary<int, string>();
-            Merge(0, new([], locals.Select(t => method.Body.InitLocals && t != Carrier && t != Option && t != VoidOption && t != VoidResult && t != "String").ToArray()));
+            Merge(0, new([], locals.Select(t => method.Body.InitLocals && t != Carrier && t != Option && t != VoidOption && t != VoidResult && t != "String" && !FileBindings.IsType(t)).ToArray()));
             var visits = 0;
             while (work.TryDequeue(out var index))
             {
@@ -77,6 +78,9 @@ static class UnionImport
                 var input = states[index];
                 var stack = input.Stack.ToList(); var assigned = (bool[])input.Assigned.Clone();
                 var instruction = instructions[index]; var code = new StringBuilder(); var successors = new List<int>();
+                var assignmentEdges = new Dictionary<int, bool[]>();
+                if (stack.Any(slot => slot.ConditionalOut >= 0) && instruction.OpCode.Code is not (Code.Nop or Code.Brtrue or Code.Brtrue_S or Code.Brfalse or Code.Brfalse_S))
+                    throw new InvalidDataException("Conditional extraction output must be tested before use.");
                 void Push(Slot slot) { stack.Add(slot); if (stack.Count > method.Body.MaxStackSize) throw new InvalidDataException("Declared maxstack exceeded."); }
                 Slot Pop() { if (stack.Count == 0) throw new InvalidDataException("Input stack underflow."); var top = stack[^1]; stack.RemoveAt(stack.Count - 1); return top; }
                 Slot Expect(string type) { var top = Pop(); if (!CollectionBindings.Assignable(top.Type, type)) throw new InvalidDataException("Input stack type mismatch."); return top; }
@@ -94,7 +98,7 @@ static class UnionImport
                         var initializedType = ProfileType((TypeReference)instruction.Operand);
                         var address = Expect(initializedType + "&");
                         if (address.Local < 0) throw new InvalidDataException("Only local initialization is admitted.");
-                        if (initializedType is Carrier or Option or VoidOption or VoidResult)
+                        if (initializedType is Carrier or Option or VoidOption or VoidResult || FileBindings.IsType(initializedType))
                         {
                             if (assigned[address.Local]) throw new InvalidDataException("Resetting an initialized carrier is unsupported.");
                             // A CLI carrier default is not a valid union value. Keep it unreadable
@@ -185,6 +189,11 @@ static class UnionImport
                         var condition = Pop();
                         if (condition.Type is not ("Int32" or "Boolean")) throw new InvalidDataException("Invalid branch condition.");
                         var conditional = Target(); successors.Add(conditional);
+                        if (condition.ConditionalOut >= 0 && conditional != index + 1)
+                        {
+                            var success = (bool[])assigned.Clone(); success[condition.ConditionalOut] = true;
+                            assignmentEdges[instruction.OpCode.Code is Code.Brtrue or Code.Brtrue_S ? conditional : index + 1] = success;
+                        }
                         code.AppendLine($"{(instruction.OpCode.Code is Code.Brtrue or Code.Brtrue_S ? "brtrue" : "brfalse")} IL_{instructions[conditional].Offset:x4}"); break;
                     case Code.Call:
                     case Code.Callvirt:
@@ -212,17 +221,22 @@ static class UnionImport
                             }
                         }
                         else throw new InvalidDataException("Unsupported dependency call.");
+                        var conditionalOut = -1;
                         for (var n = call.Arguments.Length - 1; n >= 0; n--)
                         {
                             var argument = Expect(call.Arguments[n]);
                             if (argument.Type.EndsWith('&'))
                             {
                                 if (argument.Local < 0) throw new InvalidDataException("Only local addresses admitted.");
-                                if (n == call.OutArgument) assigned[argument.Local] = true;
-                                else if (!assigned[argument.Local]) throw new InvalidDataException("Read through uninitialized carrier address.");
+                                if (n == call.OutArgument)
+                                {
+                                    if (call.ConditionalOutput) conditionalOut = argument.Local;
+                                    else assigned[argument.Local] = true;
+                                }
+                                else if (!assigned[argument.Local]) throw new InvalidDataException($"Read through uninitialized carrier address in {method.Name} at {instruction.Offset:x4}, local {argument.Local}: {reference.FullName}.");
                             }
                         }
-                        if (call.Result != "noresult") Push(new(call.Result));
+                        if (call.Result != "noresult") Push(new(call.Result, ConditionalOut: conditionalOut));
                         code.AppendLine(call.Instruction ?? $"call {call.Name}({string.Join(',', call.Arguments)})"); break;
                     case Code.Ret:
                         if (result != "noresult") Expect(result);
@@ -232,7 +246,7 @@ static class UnionImport
                 }
                 bodies[index] = code.ToString();
                 if (!terminates) successors.Add(index + 1);
-                foreach (var successor in successors) Merge(successor, new(stack, assigned));
+                foreach (var successor in successors) Merge(successor, new(stack, assignmentEdges.GetValueOrDefault(successor, assigned)));
             }
             // Unreachable guest instructions are omitted, not admitted as executable code.
             output.AppendLine($".function {Name(method)}({string.Join(',', args)}) -> {result}");
@@ -240,7 +254,7 @@ static class UnionImport
             if (method.Body.InitLocals)
                 for (var n = 0; n < locals.Length; n++)
                     if (locals[n] == IntArray || CollectionBindings.IsReference(locals[n])) output.AppendLine($"ldloca local{n}\ninitobj {locals[n]}");
-                    else if (locals[n] != Carrier && locals[n] != Option && locals[n] != VoidOption && locals[n] != VoidResult && locals[n] != "String") output.AppendLine(Default(locals[n]) + $"\nstloc local{n}");
+                    else if (locals[n] != Carrier && locals[n] != Option && locals[n] != VoidOption && locals[n] != VoidResult && locals[n] != "String" && !FileBindings.IsType(locals[n])) output.AppendLine(Default(locals[n]) + $"\nstloc local{n}");
             foreach (var index in bodies.Keys.Order())
             {
                 mappings.Add(new { MethodToken = method.MetadataToken.ToUInt32(), instructions[index].Offset, OutputLine = output.ToString().Count(c => c == '\n') + 1 });
@@ -260,14 +274,38 @@ static class UnionImport
                 if (changed) work.Enqueue(index);
             }
         }
-        output.Append(Adapters());
+        output.Append(Adapters()).Append(FileBindings.Adapters());
         File.WriteAllText(destination, output.ToString());
         File.WriteAllText(destination + ".map.json", JsonSerializer.Serialize(new {
-            Profile = collectionProfile ? "result-option-void-collections-v5" : "result-option-void-arrays-v4",
+            Profile = collectionProfile ? "result-option-void-files-collections-v6" : "result-option-void-files-arrays-v5",
             RequiredLibraryProfile = collectionProfile ? "raven-collections" : "bundled-system", ApplicationSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(application))),
             CoreSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(core))), ReachableMethods = seen.Order().ToArray(), Mappings = mappings,
-            Scope = "Bounded Int32 vectors, optional Int32 collection references and generic Result/Option bindings; CFG stack/definite-assignment checked; observable default carriers rejected; no guest declaration bodies executed."
+            Scope = "Bounded Int32 vectors, optional Int32 collection references, file UTF-8 APIs and generic Result/Option bindings; CFG stack/definite-assignment checked; observable default carriers rejected; no guest declaration bodies executed."
         }, new JsonSerializerOptions { WriteIndented = true }));
+    }
+
+    // Raven materializes pattern-test success as 1/0 before branching again.
+    // Thread this exact diamond so conditional-out proof reaches the matched arm.
+    // The false block and join must have no other incoming branch edges.
+    static void NormalizePatternBranches(MethodDefinition method)
+    {
+        var instructions = method.Body.Instructions;
+        foreach (var join in instructions.Where(i => i.OpCode.Code is Code.Brfalse or Code.Brfalse_S).ToArray())
+        {
+            var miss = join.Previous;
+            var jump = miss?.Previous;
+            var hit = jump?.Previous;
+            if (join.Next is null || miss?.OpCode.Code != Code.Ldc_I4_0 || hit?.OpCode.Code != Code.Ldc_I4_1
+                || jump is null || jump.OpCode.Code is not (Code.Br or Code.Br_S) || jump.Operand != join) continue;
+            var incomingMiss = instructions.Where(i => ReferenceEquals(i.Operand, miss)).ToArray();
+            if (incomingMiss.Length != 1 || incomingMiss[0].OpCode.Code is not (Code.Brfalse or Code.Brfalse_S)
+                || instructions.Count(i => ReferenceEquals(i.Operand, join)) != 1
+                || instructions.Any(i => ReferenceEquals(i.Operand, jump))
+                || instructions.Any(i => i.Operand is Instruction[] targets && targets.Any(t => t == miss || t == join || t == jump))) continue;
+            incomingMiss[0].Operand = join.Operand;
+            hit.OpCode = OpCodes.Nop;
+            jump.Operand = join.Next;
+        }
     }
 
     static string Name(MethodDefinition method) => $"Method_{method.MetadataToken.ToUInt32():x8}";
@@ -308,6 +346,12 @@ static class UnionImport
             throw new InvalidDataException("Unsupported runtime signature.");
         // Reuse the declaration catalog for its bounded static Int32 APIs. Check
         // both sides before mapping a resolved CLI reference to the runtime library.
+        var file = FileBindings.Bind(reference, definition);
+        if (file is not null)
+        {
+            if (file.OutArgument >= 0 || reference.Name == "FromResidual") ValidatePropagation(definition.DeclaringType);
+            return new(file.Name, file.Arguments, file.Result, file.OutArgument, file.Instruction, file.OutArgument >= 0);
+        }
         var surface = TargetSurface.Bind(definition);
         if (surface is { Returns: "Int32" } && !reference.HasThis && !definition.HasThis
             && reference.FullName == definition.FullName)
@@ -448,6 +492,8 @@ static class UnionImport
             || reference.HasGenericParameters || reference is GenericInstanceMethod || reference.CallingConvention != MethodCallingConvention.Default
             || reference.ReturnType.MetadataType != MetadataType.Void || reference.HasThis != definition.HasThis)
             throw new InvalidDataException("Unsupported constructor signature.");
+        var file = FileBindings.Construct(reference, definition);
+        if (file is not null) return new(file.Name, file.Arguments, file.Result);
         var key = definition.FullName;
         var owner = Type(reference.DeclaringType);
         var parameters = reference.Parameters.Select(p => p.ParameterType.FullName).ToArray();

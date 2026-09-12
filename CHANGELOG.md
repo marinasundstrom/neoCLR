@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-12
 
+- Projected bounded UTF-8 File.ReadAllText/WriteAllText into Raven with Result error
+  predicates, typed matches and success/error propagation. The importer preserves
+  conditional output initialization without inventing default error cases. Added
+  temporary-file round-trip and rejection checks, saved-project execution and editor
+  completion coverage. Extended named Void handling to generic return metadata;
+  Raven's corresponding loader fix is isolated on its experimental branch. These
+  calls require regenerated declarations and the updated compiler; installed .4
+  packages are not claimed to contain this slice.
+
 - Added an executable Raven match support matrix and readable Result/Option/Void
   samples. Six admitted fixtures verify and run; seven record compiler rejections,
   including exhaustiveness, deconstruction and arm-return limits. The bridge now

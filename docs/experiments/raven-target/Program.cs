@@ -6,6 +6,12 @@ using Raven.CodeAnalysis;
 using Raven.CodeAnalysis.Syntax;
 using AssemblyDefinition = Mono.Cecil.AssemblyDefinition;
 
+if (args.Length == 2 && args[0] == "--files")
+{
+    FileProbe.Write(args[1]);
+    return;
+}
+
 if (args.Length == 2 && args[0] == "--matches")
 {
     MatchProbe.Write(args[1]);

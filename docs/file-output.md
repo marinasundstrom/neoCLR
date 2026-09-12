@@ -64,3 +64,6 @@ Tests use temporary directories to check UTF-8/no-BOM output, embedded NULs, exa
 byte limits, preflight preservation, truncation, empty files, missing parents,
 directory/invalid-path failures, artifact execution and the CLI report. Actual
 permission and disk-failure behavior remains dependent on OS/filesystem conditions.
+
+The experimental [Raven projection](raven-file-api.md) documents admitted calls,
+propagation, conditional-output checks and remaining API gaps.

@@ -131,7 +131,7 @@ directory. Then run from the neoCLR repository root:
 
 ```sh
 python3 docs/experiments/raven-target/prepare_editor.py /absolute/probe-output /absolute/path/to/Raven --server /absolute/installed-extension/server/Raven.LanguageServer.dll
-python3 docs/experiments/raven-target/verify_editor.py /absolute/probe-output/editor
+python3 docs/experiments/raven-target/verify_editor.py /absolute/probe-output/editor --files
 code --new-window /absolute/probe-output/editor
 ```
 
@@ -183,7 +183,7 @@ Repeat the automated saved-project and stdio language-server checks:
 
 ```sh
 python3 docs/experiments/raven-target/verify_project.py /tmp/raven-collections-editor/editor/Demo.rvnproj --collections --raven /absolute/path/to/Raven --runtime "$PWD/target/debug/neoclr"
-python3 docs/experiments/raven-target/verify_editor.py /tmp/raven-collections-editor/editor --collections
+python3 docs/experiments/raven-target/verify_editor.py /tmp/raven-collections-editor/editor --collections --files
 ```
 
 The first checks executable integer Math.Min/Max/Sign, the combined workflow,

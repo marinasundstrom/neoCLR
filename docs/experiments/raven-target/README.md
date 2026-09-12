@@ -523,7 +523,7 @@ assembly and adapted runtime library:
 | Value copying | `library-value-copy.rvn`: replacing an Option binding preserves its prior copy, output 42/7 | Known Option<Int32> value carrier; not arbitrary mutable struct import |
 | Library naming and iteration | `library-foreach.rvn` and `library-workflow.rvn` | Configured Iterable/Iterator/GetIterator, with List/ArrayList and indexers |
 | Result, Option and Void | Standalone samples plus combined workflow | Existing bounded union import and Void projection; no propagation |
-| Editor experience | `verify_editor.py --collections` | Collection and union names, selected Math API and inferred int loop binding |
+| Editor experience | `verify_editor.py --collections --files` | Collection and union names, selected Math API and inferred int loop binding |
 
 Expected workflow output is 42, Completed, Price overflow, Skipped, Product not found,
 Skipped, then `=> Void`. The successful, overflow and missing-product paths all execute.
@@ -561,3 +561,6 @@ This reuses the [existing Math contract and .NET comparison](../../math.md): no 
 runtime behavior, opcode or Raven change is introduced. Result-based Math.Abs remains
 a separately bound target-library difference. Other Math overloads remain outside the
 bounded importer even though they exist in the neoCLR runtime library.
+
+The [file API slice](../../raven-file-api.md) now covers bounded UTF-8 read/write,
+Result propagation and conditional-output validation.

@@ -8,6 +8,7 @@ import threading
 
 project = Path(sys.argv[1]).resolve()
 collections = '--collections' in sys.argv[2:]
+files = '--files' in sys.argv[2:]
 server = json.loads((project / '.vscode/settings.json').read_text())['raven.languageServerPath']
 messages = queue.Queue()
 log = (project / 'lsp-stderr.log').open('wb')
@@ -80,7 +81,7 @@ try:
             raise AssertionError(f'{owner}: missing target completions: {labels}')
         if any(label == name or label.startswith(name+'(') for label in labels for name in ('ReadLine', 'Clamp', 'Sin', 'Sqrt')):
             raise AssertionError(f'{owner}: unexpected host API: {labels}')
-        if not owner and 'IO' in labels:
+        if not owner and 'IO' in labels and not files:
             raise AssertionError('Host System.IO leaked into target namespace')
         results[owner or 'System'] = labels
     if collections:
@@ -117,6 +118,22 @@ try:
         if 'Capacity' not in labels or any(label.startswith('Allocate') for label in labels):
             raise AssertionError('Unexpected ArrayList constructor surface: ' + str(labels))
         results['ArrayList'] = labels
+    if files:
+        for version, owner, expected, forbidden in (
+            (8, 'IO', ('File', 'FileReadError', 'FileWriteError'), ('Directory', 'Stream')),
+            (9, 'IO.File', ('ReadAllText', 'WriteAllText'), ('Delete', 'ReadAllBytes', 'Open'))):
+            access = 'System.' + owner + '.'
+            text = f'import System.*\nfunc Main() {{\n    {access}\n}}'
+            send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})
+            result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
+                'position': {'line': 2, 'character': len('    ' + access)}, 'context': {'triggerKind': 1}}, True))
+            items = result if isinstance(result, list) else result['items']
+            labels = sorted({item['label'] for item in items})
+            if any(not any(label == name or label.startswith(name + '(') for label in labels) for name in expected):
+                raise AssertionError('Missing target file API: ' + str(labels))
+            if any(label == name or label.startswith(name + '(') for label in labels for name in forbidden):
+                raise AssertionError('Host file API leaked: ' + str(labels))
+            results[owner] = labels
     receive(send('shutdown', None, True))
     send('exit', None)
     print(json.dumps(results, indent=2))
