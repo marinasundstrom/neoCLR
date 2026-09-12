@@ -10,6 +10,15 @@ binding immutability/readonly references, inheritance, nullable slots, enums/fla
 dynamic hooks, and a more useful fundamental library. Familiarity primarily means C#/.NET APIs and observable behavior, not matching
 source syntax or runtime internals. Improve contracts without legacy constraints.
 
+## Default compatibility policy (2026-09-12)
+
+Use .NET semantics unless a concrete improvement justifies divergence and its costs.
+Do not redesign a familiar behavior merely because the prototype currently differs.
+The accepted error-flow difference is Result for recoverable outcomes and terminal
+host-reported faults, without a guest Exception class hierarchy. See [error policy](errors.md#platform-policy-clarified-2026-09-12).
+This preserves the separate generic Void and Option directions without implying exact
+.NET binary or exception-handling compatibility.
+
 ## Type-model migration directive (2026-09-12)
 
 Retire value-by-default and explicit references as the normal object/array model.
@@ -468,9 +477,9 @@ an explicit identity/ownership representation to retain aliasing and lifetime; c
 copies silently would change programs. Imported structs can often remain owned
 values, but boxing, reflection, interface dispatch, and layout still need work.
 
-Translate void-return calls with their changed stack effects: neoCLR produces a
-real Void value. Insert an explicit discard when adapting a CIL caller that
-expects no result. Introduce `Option` for APIs whose nullable values mean absence;
+Preserve ordinary CLI no-result return stack behavior using neoCLR no-result methods.
+Keep inhabited generic Void separate; do not insert dummy values/discards into ordinary
+CLI calls. Introduce `Option` for APIs whose nullable values mean absence;
 do not rewrite null tests mechanically when null is a deliberate reference state.
 
 Exception-heavy APIs need signature and control-flow adaptation to `Result`,

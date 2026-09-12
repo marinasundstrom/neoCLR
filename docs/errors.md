@@ -5,6 +5,28 @@ the prototype's message-bearing Error value; it is distinct from a terminal runt
 system Fault. Guest code handles a Result case explicitly and can continue. It cannot
 catch a Fault or resume the failed execution.
 
+## Platform policy clarified 2026-09-12
+
+.NET semantics are the baseline unless an improvement is justified. Result-based
+recoverable error flow is an explicitly chosen library/platform divergence. Operations
+whose failure a caller is expected to handle should expose typed Result errors; they
+must not turn those ordinary outcomes into terminal faults merely to avoid designing
+their error contract.
+
+Faults represent terminal failures of the current execution. They are not guest class
+instances, do not derive from System.Exception, and are not a substitute class hierarchy
+with a different name. The current Rust `Fault` record carries a message and optional
+function, instruction and stack trace to the host; guest code cannot catch it. That host
+representation is an implementation detail, not a required guest object model. Result
+error payloads remain ordinary types or union cases without an exception base class.
+
+.NET's exception-object/catch model is therefore not a compatibility promise. Existing
+exception-centered source must be adapted, and unsupported imported exception handlers
+must be rejected rather than silently dropped or converted. Fault containment, resource
+cleanup and future async failure boundaries still need explicit contracts; this policy
+does not claim they are solved. An external host may have its own exceptions without
+making them neoCLR guest objects.
+
 ## Initial Error library API
 
 | Member | Contract |

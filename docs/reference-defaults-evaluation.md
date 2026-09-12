@@ -1,7 +1,10 @@
 # Reference and value defaults: a bounded architecture evaluation
 
 Evaluated 2026-09-12 against `c15839f6be736d40aa148e81f90e3eb27d7fd266`.
-This compares alternatives; it does not select a migration or change current semantics.
+Historical evaluation: this document originally compared alternatives without selecting
+a migration. The later [type-model directive](roadmap.md#type-model-migration-directive-2026-09-12)
+selects .NET-aligned categories, including reference-type arrays. Retain the alternatives
+below as the reasoning history, not as competing current defaults.
 The criteria come from [conversation entries 23–26](development-timeline.md): familiar
 application programming, useful object behavior for primitive/user-defined data,
 Result/Option APIs, nullable support, and meaningful separation of language and runtime.

@@ -31,9 +31,12 @@ Fault containment and cleanup rules still need precise contracts. Nullability re
 a capability the platform should support, even where library APIs prefer Option;
 this experiment does not settle its representation.
 
-The [reference-defaults evaluation](reference-defaults-evaluation.md) remains an
-investigation. This branch does not select a new class/value model, require a ValueType
-hierarchy, or authorize changing all current storage contracts as a prerequisite.
+The [reference-defaults evaluation](reference-defaults-evaluation.md) records earlier
+alternatives. The subsequent author direction selects .NET-aligned type categories,
+including arrays, and retirement of the old value-by-default projection. Migration is
+incomplete. Use .NET behavior unless a concrete improvement justifies divergence;
+Result-based error flow with terminal host faults and no guest Exception hierarchy is
+an accepted difference. This does not promise unchanged .NET binary execution.
 Record actual frontend obstacles before deciding which runtime differences to change.
 
 ## First end-to-end milestone

@@ -1,11 +1,18 @@
 # Runtime library API design
 
 This document defines the API review policy for bundled `System` and its projection
-in Neo. neoCLR is a managed runtime with value semantics by default. `T&` expresses
-a reference value addressing existing storage; it does not declare that T is a
-reference type or select an allocator. The same reference contract can address a caller's frame, an interior
-field or element, or a managed heap object. Raw pointers belong to the native interop
-and explicit native storage boundary.
+in Neo. The target is .NET semantics unless a specific divergence has a demonstrated
+benefit and documented costs. Type categories determine ordinary value/reference
+behavior, including reference-type arrays. The library and Neo are still migrating
+from the earlier value-by-default model; descriptions below of explicit `T&` API
+contracts are an implementation inventory, not a requirement to preserve that model.
+Managed byrefs remain distinct slot-access capabilities; raw pointers belong to native
+interop and explicit native storage.
+
+Expected recoverable failures use `Result<T, E>`. Terminal runtime faults are reported
+to the host with diagnostic information, not modeled as a guest Exception class
+hierarchy. Error types in Result are ordinary domain data and need no Exception base.
+See [error policy](errors.md#platform-policy-clarified-2026-09-12).
 
 This is a preview design. The inventory below distinguishes implemented contracts
 from follow-up work; it does not imply that every library method has been migrated.

@@ -94,7 +94,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   architecture: retire value-by-default/explicit-reference ordinary semantics in favor
   of .NET type categories, including reference-type arrays. Documented the existing
   Neo array split as transitional and planned its migration; no runtime behavior changes
-  are made by this clarification.
+  are made by this clarification. Recorded .NET semantics as the baseline unless a
+  concrete improvement justifies divergence; Result handles recoverable failures and
+  terminal host faults do not form a guest Exception class hierarchy. Corrected stale
+  API/migration and CLI Void policy text; current Fault representation already follows
+  the host-diagnostic model. Documentation only; cleanup/containment contracts remain open.
 
 - Began nominal class reference semantics: `.type class` uses managed heap handles in
   ordinary class-typed storage, while managed byrefs still address slots. Assignment,

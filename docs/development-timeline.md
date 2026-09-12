@@ -1423,6 +1423,27 @@ classifications and array spelling/lowering alongside the Raven collection work.
 positions and implementation descriptions remain available; separate stack-buffer
 facilities are not implied to be ordinary arrays.
 
+## 47. .NET is the baseline; faults are not exception classes — recorded 2026-09-12
+
+**Author direction.** The author said to stay with .NET semantics unless an improvement
+is found. They accepted Result-based class-library error flow, while clarifying that
+exception-like terminal failures may mean faults: “I don't however think we should model
+Exceptions as classes.” The corrected message uses exception semantics, not Result
+semantics, for that fault distinction.
+
+**Assistant response.** Proposed expected recoverable failures as Result data and
+terminal runtime faults reported at the host boundary with diagnostics. No guest
+Exception hierarchy is required. The assistant emphasized completing the type-model
+migration rather than extending the old defaults.
+
+**Action and outcome.** Inspected `src/lib.rs`: Fault is already a host-side Rust record
+with diagnostic fields, documented as uncatchable by guest code. Updated the API policy,
+error policy, roadmap and experiment documents. Corrected stale text that still called
+the selected type model an undecided investigation, and an old roadmap instruction to
+insert dummy Void values for CLI calls. This commit changes documentation only. Cleanup,
+containment and future async fault boundaries remain open; no catchable guest exception
+mechanism or runtime migration is claimed by this action.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the
