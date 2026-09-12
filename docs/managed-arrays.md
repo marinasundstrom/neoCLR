@@ -3,14 +3,15 @@
 ## Target model — clarified 2026-09-12
 
 Arrays are reference types in the intended .NET-aligned type model. `T[]` should
-denote an ordinary managed array reference in the migrated runtime/language surface;
+denote an ordinary managed array reference at the Raven/CLI boundary;
 assignment and passing share the same array. A byref to an array slot is a separate
 capability, not the normal way to hold or pass an array.
 
-The owned `T[]` and explicit `T[]&` model described below is current legacy behavior
-awaiting migration. Its preservation in recent slices was a transitional implementation
-choice, not the architectural goal. `arrayref<T>` and `array.new` must not become a
-permanent requirement for ordinary array use. Any future stack/inline buffer facility
+The owned `T[]` and explicit `T[]&` model described below remains legacy Neo behavior.
+Neo is outside the Raven-target experiment and need not be updated here. Adapt runtime
+library array storage as it enters the CLR-compatible target; do not carry that legacy
+contract into Raven. `arrayref<T>` and `array.new` are internal/legacy spellings, not
+requirements for ordinary Raven array use. Any future stack/inline buffer facility
 should be explicitly separate from normal arrays and justified independently.
 
 ## Current implementation during migration

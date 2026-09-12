@@ -1444,6 +1444,24 @@ insert dummy Void values for CLI calls. This commit changes documentation only. 
 containment and future async fault boundaries remain open; no catchable guest exception
 mechanism or runtime migration is claimed by this action.
 
+## 48. Keep Neo outside the CLR/Raven experiment — recorded 2026-09-12
+
+**Author correction.** After the assistant began changing Neo array lowering, the
+author said “leave neo out of this” and clarified: “We work with neoCLR and Raven
+as we adapt neoCLR to get those CLR semantics that are familiar to developers.
+Neo doesn't need to be updated here”. This narrows the scope of the migration in
+entries 46–47; it does not reverse the runtime type-category direction.
+
+**Assistant response and action.** Acknowledged the correction and removed the
+uncommitted Neo frontend changes and the runtime array-construction helper instructions
+introduced solely for them. Updated the roadmap and active design documents to exclude
+Neo migration from this experiment. Existing committed neoCLR ordinary array/class
+reference support and Raven array import remain intact. No Raven files were changed.
+
+**Next work.** Adapt the actual collection/iterator runtime library and admit its
+class/interface calls through the Raven bridge, with runtime and Raven acceptance tests.
+That implementation remains pending; this scope correction does not complete it.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

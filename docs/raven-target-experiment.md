@@ -670,3 +670,16 @@ an inserted castclass at every boundary. It preserves object identity and GC ret
 and rejects downcasts, byref widening and unrelated interfaces. The Raven importer still
 needs class/interface admission and the actual collection library adaptation; no Raven
 repository changes were made in this slice.
+
+## Experiment scope correction (2026-09-12)
+
+Work on neoCLR and Raven to establish familiar CLR type semantics and consume the
+adapted runtime library. Neo is not part of this exercise: its compiler, source samples
+and existing semantics need not be migrated. This supersedes plans to update Neo as a
+prerequisite. Keep Raven changes minimal and isolated on its feature branch.
+
+The next implementation slice is the actual ArrayList/iterator library adaptation
+and class/interface import admission described in the [interface contract](raven-interface-contract.md).
+Runtime tests and Raven programs should validate ordinary references, array storage,
+identity, GC retention and dispatch. This scope correction does not claim that the
+collection sample executes yet.

@@ -34,7 +34,8 @@ the compatibility baseline: independent cursors, Current valid only during a suc
 iteration, sticky exhaustion, and explicit idempotent Dispose. Keep buffer/extent
 capture semantics unless a separate API decision changes them. Classifying ArrayList
 as a nominal class is a migration from the existing value wrapper with shared state;
-its Copy behavior and Neo callers need explicit review. Do not silently switch to
+its Copy behavior needs explicit review in the Raven-facing contract. Neo callers
+and compiler migration are outside this experiment. Do not silently switch to
 .NET's fail-fast mutation policy during this migration.
 
 The old readonly byref receiver qualifiers do not automatically become CLI class

@@ -10,8 +10,8 @@ Classes, interfaces and arrays use ordinary references; value-category types cop
 values. Managed byrefs remain a distinct capability for referencing a slot, including
 ref/out scenarios. They are not how callers normally express class or array sharing.
 The former value-by-default model is being retired, not preserved as a parallel public
-model. Existing unmarked types and Neo source lowering are migration work, not evidence
-of a settled default. This does not assert that all .NET behaviors are implemented or
+model for the CLR-compatible target. Existing unmarked runtime/library types require
+classification as they enter that target. Neo source lowering is outside this experiment. This does not assert that all .NET behaviors are implemented or
 reverse the separate Result/Option and generic Void directions.
 
 ## Runtime contract
@@ -26,7 +26,7 @@ a call frame and can be returned safely without an escape conversion.
 Unmarked `.type` definitions retain existing value behavior during migration. Copying a
 value copies its fields; any class references inside it still share their target objects.
 No change is made to the existing String, array, delegate or System library projections.
-Neo's source compiler has not yet been migrated to this declaration model.
+Neo's source compiler remains unchanged and is not a migration requirement for this experiment.
 
 Internally `TypeDef.is_reference_type` records classification and `Value::ObjectReference`
 carries a heap-only handle. Its signature type is the nominal class, not `ByRef<Class>`.

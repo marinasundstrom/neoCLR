@@ -1,10 +1,10 @@
 # Runtime library API design
 
-This document defines the API review policy for bundled `System` and its projection
-in Neo. The target is .NET semantics unless a specific divergence has a demonstrated
+This document defines the API review policy for bundled `System`, including its
+existing Neo projection and the active Raven target. The target is .NET semantics unless a specific divergence has a demonstrated
 benefit and documented costs. Type categories determine ordinary value/reference
-behavior, including reference-type arrays. The library and Neo are still migrating
-from the earlier value-by-default model; descriptions below of explicit `T&` API
+behavior, including reference-type arrays. Runtime-library adaptation for Raven is
+ongoing; Neo is outside this experiment and remains unchanged. Descriptions below of explicit `T&` API
 contracts are an implementation inventory, not a requirement to preserve that model.
 Managed byrefs remain distinct slot-access capabilities; raw pointers belong to native
 interop and explicit native storage.

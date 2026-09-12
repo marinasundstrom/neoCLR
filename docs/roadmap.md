@@ -22,15 +22,16 @@ This preserves the separate generic Void and Option directions without implying 
 ## Type-model migration directive (2026-09-12)
 
 Retire value-by-default and explicit references as the normal object/array model.
-Align ordinary value/reference behavior with .NET type categories in both the runtime
-and Neo's demonstration surface. Arrays are reference types; `T[]` should project an
+Align ordinary value/reference behavior with .NET type categories in neoCLR and
+its Raven target surface. Neo is outside this experiment and does not need migration. Arrays are reference types; `T[]` should project an
 ordinary array reference. Managed byrefs remain for slot access/ref/out, and value-category
 types retain value semantics. The existing owned-array spelling and `array.new` lowering
 are temporary migration accommodations, not compatibility requirements to preserve.
 
-Next implementation planning must include migrating Neo/library type declarations and
-array lowering to that model, replacing the transitional `arrayref<T>` public spelling,
-and updating tests/samples that encode the old defaults. Stage breaking changes with
+Next implementation planning must adapt runtime-library declarations and storage for
+Raven, keeping standard CLI signatures at the compiler boundary. The internal
+`arrayref<T>` spelling must not require Raven source changes. Update runtime and Raven
+acceptance tests as these contracts are implemented; leave Neo source lowering alone. Stage breaking changes with
 clear migration notes; do not expand the legacy model merely to keep those tests intact.
 Separate explicit stack-buffer designs, if needed, from ordinary array semantics.
 Continue the Raven collection demo against these target semantics.

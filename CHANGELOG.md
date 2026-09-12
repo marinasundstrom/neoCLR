@@ -99,6 +99,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   terminal host faults do not form a guest Exception class hierarchy. Corrected stale
   API/migration and CLI Void policy text; current Fault representation already follows
   the host-diagnostic model. Documentation only; cleanup/containment contracts remain open.
+  Corrected experiment scope after author clarification: adapt neoCLR and its library
+  for Raven; leave Neo outside this exercise. Removed the uncommitted Neo migration
+  attempt and its helper instructions, and revised migration plans accordingly. Existing
+  committed runtime and Raven behavior is unchanged.
 
 - Began nominal class reference semantics: `.type class` uses managed heap handles in
   ordinary class-typed storage, while managed byrefs still address slots. Assignment,
