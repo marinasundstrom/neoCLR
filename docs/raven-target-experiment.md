@@ -129,3 +129,12 @@ The [minimal target contract](raven-minimal-target.md) and
 baseline, target Console binding and the actual PE inventory. Missing-library isolation
 fails and core declarations remain incomplete. Slice 3 must resolve those constraints
 alongside its binary-format and no-result-call decision; no target execution is claimed.
+
+## Slice 3 decision (2026-09-12)
+
+The [binary profile](raven-binary-profile.md) selects CLI PE reuse with explicit target
+admission and signature-driven translation. The emission probe now includes a resolver
+that audits only supplied metadata dependencies, with positive and negative fixtures.
+This detects the target's known dependency gaps; it does not yet fix Raven's resolver or
+provide its complete core declarations. Those prerequisites, helper handling and input
+stack verification must be completed before the planned reader can execute HelloWorld.

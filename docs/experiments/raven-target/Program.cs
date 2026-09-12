@@ -45,8 +45,66 @@ if (target.References.Any(r => r.StartsWith("System.Console,") || r.StartsWith("
     throw new Exception("Retargeted output retained a forbidden framework reference.");
 if (!control.Methods.SelectMany(m => m.Instructions).Any(i => i.Contains("::WriteLine(") && i.Contains("scope=System.Console")))
     throw new Exception("Control did not call framework Console.");
+var targetClosureErrors = ClosureAudit.Inspect(Path.Combine(output, "Target.dll"), facadePath);
+if (targetClosureErrors.Length == 0) throw new Exception("Incomplete target unexpectedly passed closure audit.");
+var hostClosureErrors = missingLibraryImage is null ? [] : ClosureAudit.Inspect(Path.Combine(output, "MissingLibrary.dll"), facadePath);
+if (missingLibraryImage is not null && hostClosureErrors.Length == 0) throw new Exception("Host fallback unexpectedly passed closure audit.");
+var closedPath = Path.Combine(output, "Closed.dll");
+CreateClosedFixture(closedPath);
+var closedErrors = ClosureAudit.Inspect(closedPath);
+if (closedErrors.Length != 0) throw new Exception(string.Join("\n", closedErrors));
+using (var wrong = AssemblyDefinition.ReadAssembly(closedPath))
+{
+    wrong.MainModule.AssemblyReferences.Add(new AssemblyNameReference("Closed", new Version(9, 0, 0, 0)));
+    wrong.Write(Path.Combine(output, "WrongIdentity.dll"));
+}
+var wrongIdentityErrors = ClosureAudit.Inspect(Path.Combine(output, "WrongIdentity.dll"));
+if (!wrongIdentityErrors.Any(e => e.Contains("Version=9.0.0.0"))) throw new Exception("Wrong identity unexpectedly passed closure audit.");
+var missingTypeErrors = MutateAndAudit("MissingType", "unresolved type Probe.Absent", image =>
+    image.MainModule.GetTypeReferences().Single().Name = "Absent");
+var missingMethodErrors = MutateAndAudit("MissingMethod", "::Absent(", image =>
+    image.MainModule.GetMemberReferences().OfType<MethodReference>().Single().Name = "Absent");
+var wrongSignatureErrors = MutateAndAudit("WrongSignature", "::Identity()", image =>
+    image.MainModule.GetMemberReferences().OfType<MethodReference>().Single().Parameters.Clear());
+var consumerPath = Path.Combine(output, "Consumer.dll");
+CreateConsumerFixture(consumerPath);
+var consumerErrors = ClosureAudit.Inspect(consumerPath, closedPath);
+if (consumerErrors.Length != 0) throw new Exception(string.Join("\n", consumerErrors));
+var missingDependencyErrors = ClosureAudit.Inspect(consumerPath);
+if (!missingDependencyErrors.Any(e => e.Contains("unresolved assembly Closed,")))
+    throw new Exception("Omitted explicit dependency was accepted.");
+var duplicateRejected = false;
+try { ClosureAudit.Inspect(closedPath, closedPath); }
+catch (InvalidDataException) { duplicateRejected = true; }
+if (!duplicateRejected) throw new Exception("Duplicate input identity was accepted.");
+
+string[] MutateAndAudit(string name, string expected, Action<AssemblyDefinition> change)
+{
+    var path = Path.Combine(output, name + ".dll");
+    using (var image = AssemblyDefinition.ReadAssembly(closedPath))
+    {
+        change(image);
+        image.Write(path);
+    }
+    var errors = ClosureAudit.Inspect(path);
+    if (!errors.Any(e => e.Contains(expected))) throw new Exception(name + " did not report its expected resolution failure.");
+    return errors;
+}
 var report = new
 {
+    Closure = new
+    {
+        TargetErrors = targetClosureErrors,
+        HostFallbackErrors = hostClosureErrors,
+        ClosedFixtureErrors = closedErrors,
+        WrongIdentityErrors = wrongIdentityErrors,
+        MissingTypeErrors = missingTypeErrors,
+        MissingMethodErrors = missingMethodErrors,
+        WrongSignatureErrors = wrongSignatureErrors,
+        DuplicateIdentityRejected = duplicateRejected,
+        ConsumerErrors = consumerErrors,
+        MissingDependencyErrors = missingDependencyErrors
+    },
     Scope = "emission-only; fixture is not neoCLR System and generated code was not executed",
     FrameworkReferences = referencePaths.Length,
     Control = control,
@@ -57,7 +115,7 @@ var report = new
     MissingLibraryImage = missingLibraryImage
 };
 File.WriteAllText(Path.Combine(output, "report.json"), JsonSerializer.Serialize(report, new JsonSerializerOptions { WriteIndented = true }));
-Console.WriteLine($"PASS: control, target Console binding, core retargeting and missing-member diagnostic. Missing-library isolation passed: {missingLibraryErrors.Length != 0}. Report: {output}/report.json");
+Console.WriteLine($"PASS: control, target Console binding, core retargeting, missing-member diagnostic and metadata closure checks. Missing-library isolation passed: {missingLibraryErrors.Length != 0}. Report: {output}/report.json");
 
 ImageReport Compile(string name, string text, MetadataReference[] references, AssemblyName? targetIdentity)
 {
@@ -101,6 +159,50 @@ static void CreateFacade(string path)
     method.Parameters.Add(new ParameterDefinition("value", Mono.Cecil.ParameterAttributes.None, module.TypeSystem.String));
     console.Methods.Add(method);
     method.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
+    assembly.Write(path);
+}
+// Self-contained metadata fixture to test the resolver, not a usable runtime library.
+static void CreateClosedFixture(string path)
+{
+    using var assembly = AssemblyDefinition.CreateAssembly(new AssemblyNameDefinition("Closed", new Version(1, 0, 0, 0)), "Closed", ModuleKind.Dll);
+    var module = assembly.MainModule;
+    var root = new TypeDefinition("Probe", "Root", Mono.Cecil.TypeAttributes.Public, null);
+    module.Types.Add(root);
+    var child = new TypeDefinition("Probe", "Child", Mono.Cecil.TypeAttributes.Public,
+        new TypeReference("Probe", "Root", module, module));
+    module.Types.Add(child);
+    var method = new MethodDefinition("Identity", Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static, root);
+    method.Parameters.Add(new ParameterDefinition(root));
+    method.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
+    method.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
+    root.Methods.Add(method);
+    var caller = new MethodDefinition("Call", Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static, root);
+    caller.Parameters.Add(new ParameterDefinition(root));
+    var reference = new MethodReference("Identity", root, child.BaseType) { HasThis = false };
+    reference.Parameters.Add(new ParameterDefinition(root));
+    caller.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
+    caller.Body.Instructions.Add(Instruction.Create(OpCodes.Call, reference));
+    caller.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
+    child.Methods.Add(caller);
+    assembly.Write(path);
+}
+static void CreateConsumerFixture(string path)
+{
+    using var assembly = AssemblyDefinition.CreateAssembly(new AssemblyNameDefinition("Consumer", new Version(1, 0, 0, 0)), "Consumer", ModuleKind.Dll);
+    var module = assembly.MainModule;
+    var dependency = new AssemblyNameReference("Closed", new Version(1, 0, 0, 0));
+    module.AssemblyReferences.Add(dependency);
+    var root = new TypeReference("Probe", "Root", module, dependency);
+    var child = new TypeDefinition("Probe", "Consumer", Mono.Cecil.TypeAttributes.Public, root);
+    module.Types.Add(child);
+    var caller = new MethodDefinition("Call", Mono.Cecil.MethodAttributes.Public | Mono.Cecil.MethodAttributes.Static, root);
+    caller.Parameters.Add(new ParameterDefinition(root));
+    var reference = new MethodReference("Identity", root, root) { HasThis = false };
+    reference.Parameters.Add(new ParameterDefinition(root));
+    caller.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_0));
+    caller.Body.Instructions.Add(Instruction.Create(OpCodes.Call, reference));
+    caller.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
+    child.Methods.Add(caller);
     assembly.Write(path);
 }
 record ImageReport(string[] References, string[] Types, MethodReport[] Methods, string[] MissingFacadeTypes, string? EntryPoint, string[] TypeReferences);

@@ -67,3 +67,10 @@ Validation must include missing assemblies/members, wrong signatures, invalid to
 unsupported exception regions and inconsistent stack behavior, as well as HelloWorld.
 The existing neoCLR source/JSON path remains the execution control. Performance, JIT
 benefits and general Raven/C# compatibility have not been measured or demonstrated.
+
+## Slice 3 follow-up
+
+The [binary profile](raven-binary-profile.md) selects the CLI container experiment and
+records the translation direction. A closed metadata fixture and explicit-only dependency
+audit now test resolution without host fallback. The Raven target itself remains
+incomplete; compiler isolation, core declarations and executable-profile validation remain.

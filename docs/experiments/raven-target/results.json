@@ -1,4 +1,59 @@
 {
+  "Closure": {
+    "TargetErrors": [
+      "NeoCLR.Probe.System: unresolved assembly mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
+      "NeoCLR.Probe.System: unresolved type System.Object [mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]",
+      "Target: unresolved member System.Void System.Attribute::.ctor()",
+      "Target: unresolved member System.Void System.AttributeUsageAttribute::.ctor(System.AttributeTargets)",
+      "Target: unresolved member System.Void System.Console::WriteLine(System.String)",
+      "Target: unresolved member System.Void System.Object::.ctor()",
+      "Target: unresolved type System.Attribute [NeoCLR.Probe.System, Version=0.0.0.1, Culture=neutral, PublicKeyToken=null]",
+      "Target: unresolved type System.AttributeTargets [NeoCLR.Probe.System, Version=0.0.0.1, Culture=neutral, PublicKeyToken=null]",
+      "Target: unresolved type System.AttributeUsageAttribute [NeoCLR.Probe.System, Version=0.0.0.1, Culture=neutral, PublicKeyToken=null]",
+      "Target: unresolved type System.Object [NeoCLR.Probe.System, Version=0.0.0.1, Culture=neutral, PublicKeyToken=null]",
+      "Target: unresolved type System.String [Target]",
+      "Target: unresolved type System.ValueType [NeoCLR.Probe.System, Version=0.0.0.1, Culture=neutral, PublicKeyToken=null]"
+    ],
+    "HostFallbackErrors": [
+      "MissingLibrary: unresolved assembly System.Console, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
+      "MissingLibrary: unresolved assembly System.Runtime, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
+      "MissingLibrary: unresolved member System.Void System.Attribute::.ctor()",
+      "MissingLibrary: unresolved member System.Void System.AttributeUsageAttribute::.ctor(System.AttributeTargets)",
+      "MissingLibrary: unresolved member System.Void System.Console::WriteLine(System.String)",
+      "MissingLibrary: unresolved member System.Void System.Object::.ctor()",
+      "MissingLibrary: unresolved type System.Attribute [System.Runtime, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a]",
+      "MissingLibrary: unresolved type System.AttributeTargets [System.Runtime, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a]",
+      "MissingLibrary: unresolved type System.AttributeUsageAttribute [System.Runtime, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a]",
+      "MissingLibrary: unresolved type System.Console [System.Console, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a]",
+      "MissingLibrary: unresolved type System.Object [System.Runtime, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a]",
+      "MissingLibrary: unresolved type System.ValueType [System.Runtime, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a]",
+      "NeoCLR.Probe.System: unresolved assembly mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
+      "NeoCLR.Probe.System: unresolved type System.Object [mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]"
+    ],
+    "ClosedFixtureErrors": [],
+    "WrongIdentityErrors": [
+      "Closed: unresolved assembly Closed, Version=9.0.0.0, Culture=neutral, PublicKeyToken=null"
+    ],
+    "MissingTypeErrors": [
+      "Closed: unresolved member Probe.Root Probe.Absent::Identity(Probe.Root)",
+      "Closed: unresolved type Probe.Absent [Closed]"
+    ],
+    "MissingMethodErrors": [
+      "Closed: unresolved assembly mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
+      "Closed: unresolved member Probe.Root Probe.Root::Absent(Probe.Root)"
+    ],
+    "WrongSignatureErrors": [
+      "Closed: unresolved assembly mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
+      "Closed: unresolved member Probe.Root Probe.Root::Identity()"
+    ],
+    "DuplicateIdentityRejected": true,
+    "ConsumerErrors": [],
+    "MissingDependencyErrors": [
+      "Consumer: unresolved assembly Closed, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+      "Consumer: unresolved member Probe.Root Probe.Root::Identity(Probe.Root)",
+      "Consumer: unresolved type Probe.Root [Closed, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]"
+    ]
+  },
   "Scope": "emission-only; fixture is not neoCLR System and generated code was not executed",
   "FrameworkReferences": 176,
   "Control": {

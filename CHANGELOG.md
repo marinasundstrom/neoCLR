@@ -15,7 +15,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   contract map: target Console binding succeeds, while omitted-library resolution
   exposes host fallback and core declarations remain incomplete. Captured metadata,
   diagnostics and call-boundary alternatives; no Raven changes or binary execution
-  are claimed.
+  are claimed. Added explicit-only metadata dependency auditing with positive and
+  negative fixtures, and selected CLI PE reuse for the bounded binary experiment.
+  Runtime loading/translation, compiler isolation and complete core declarations
+  remain planned.
 
 - Documented the Raven target/binary-artifact experiment on its own branch: inspect
   the existing compiler, choose an evidence-backed format/library contract, and

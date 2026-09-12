@@ -1124,6 +1124,26 @@ for no-result calls alongside the binary container decision. This may preserve t
 existing writer and inhabited Void model, but requires explicit validation and debugging
 mapping. The author has not selected that implementation or changed class/value defaults.
 
+## 32. Binary profile and dependency audit — recorded 2026-09-12
+
+**Author direction:** Continued the Raven target experiment after the emission probe.
+
+**Assistant response/action:** Investigated the explicit host-assembly seeding in Raven's
+metadata setup. Added an experiment resolver that only accepts supplied assemblies and
+checks metadata reference resolution, with positive and negative fixtures. Documented
+CLI PE reuse and signature-driven translation as the bounded experiment direction.
+
+**Outcome:** The audit rejects the incomplete target and host-fallback artifacts. It
+accepts self-contained metadata and an explicitly supplied dependency, and detects
+missing or mismatched identities/types/members. This is a tested tooling boundary, not
+a fix to Raven's binder or an implemented runtime loader. See the
+[binary-profile decision](raven-binary-profile.md) for evidence and limits.
+
+**Still open:** The compiler needs isolated target resolution and complete core
+declarations. Generated-helper policy, input stack validation and reader implementation
+remain before execution. The assistant's format choice is scoped to this experiment;
+the author's continuation is not recorded as explicit approval of every design detail.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

@@ -1,7 +1,8 @@
 # Raven target emission probe
 
 This is slice 2 of the [Raven target experiment](../../raven-target-experiment.md).
-It tests the existing compiler API and inventories emitted PE metadata. It does **not**
+It tests the existing compiler API and inventories emitted PE metadata. Slice 3 adds
+a dependency-closure audit that resolves only explicitly supplied assemblies. It does **not**
 execute the output, implement a neoCLR target, or provide neoCLR's runtime library.
 
 ## Reproduce
@@ -57,3 +58,25 @@ emission and the missing-member check passed; the missing-library negative expos
 isolation gap. No Raven source changes, Raven xUnit suite, or neoCLR execution are claimed.
 
 The next contract work is documented in [the minimal target map](../../raven-minimal-target.md).
+
+## Dependency-closure audit (slice 3)
+
+The same command now runs `ClosureAudit` against the emitted application and fixture.
+It rejects the incomplete target and host-fallback artifact without searching installed
+frameworks. The report's `Closure` section records these errors separately from compiler
+binding diagnostics. This does not change Raven's resolver or make the target executable.
+
+Positive fixtures cover a self-contained metadata assembly and a consumer with an
+explicit external dependency. Negative fixtures cover an omitted dependency, wrong
+assembly version, missing type, missing method, changed parameter signature and duplicate
+identity. These use ordinary `Probe.Root` types to isolate metadata lookup from core
+primitive-type recognition; they do not establish a CLI-conforming core library.
+The negative checks require the relevant diagnostic, not just any failure.
+Cecil rewriting can also introduce mscorlib references into mutated fixtures; these are
+reported rather than hidden. The positive fixtures require zero resolution errors.
+
+The audit covers AssemblyRef, TypeRef and MemberRef lookup. It is not a signature/IL
+verifier or a hardened parser for hostile inputs. All fixtures remain metadata-only.
+See [the binary-profile decision](../../raven-binary-profile.md) for its limits and the
+planned CLI container/translation boundary. The slice 3 probe starts from neoCLR commit
+`7dfaca6`, with the same pinned Raven revision and SDK as slice 2.
