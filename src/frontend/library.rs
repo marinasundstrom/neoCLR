@@ -407,6 +407,11 @@ pub(super) fn constructors(
     let Ok(owner) = crate::assembler::parse_type(&ty.il()) else {
         return Ok(None); // A qualified generic static member is not a type spelling.
     };
+    // Primitive conversion syntax is handled by the expression lowerer, not
+    // library constructor lookup (e.g. int(byteValue)).
+    if owner.is_primitive() {
+        return Ok(None);
+    }
     let Some(definition) = module.type_definition(&owner) else {
         return Ok(None);
     };

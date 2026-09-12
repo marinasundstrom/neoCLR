@@ -8,6 +8,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-12
 
+- Fixed pre-merge generic Clonable and Neo calculator regressions. Assembly field fixups
+  now resolve layout with available constraints before complete linked validation;
+  generic contract walks recognize repeated constructed types instead of recursively
+  revisiting self-referential contracts. Constraint failures remain enforced. Primitive
+  conversion syntax no longer gets intercepted by library constructor lookup. These
+  restore existing behavior; no Raven target or library contract changes. Updated stale
+  native-helper inventory assertions to include the existing enum helpers. Recorded a
+  bounded preview acceptance matrix, including error flow, text files, date/time and
+  target-aware VS Code completion. All 162 integration suites pass after the regression
+  fixes and targeted reruns; unit/doc checks and the prepared Raven demo also pass.
+
 - Normal CLI runs now emit only guest output; removed the automatic return-value suffix
   such as `=> Void`. Use `run --show-result` after the input path for opt-in return-value
   diagnostics on stderr. Scripts expecting the former stdout suffix must be updated.

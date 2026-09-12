@@ -900,21 +900,29 @@ fn resolve_fields(
     // Resolve after all declarations, including other modules in a source group.
     for (function, pc, owner, name, line) in field_fixups {
         let owner = crate::scope::normalize_type(&context, &owner)?;
-        let arity = module.functions[function]
+        // Field instructions retain only the resolved index, so validate source
+        // parameter references here before that owner spelling is erased.
+        let type_arity = module.functions[function]
             .owner
             .as_ref()
             .and_then(|t| context.type_definition(t))
             .map_or(0, |d| d.generic_parameters.len());
-        let arity = crate::vm::SignatureContext {
-            types: arity,
-            methods: module.functions[function].generic_parameters.len(),
-        };
-        let fields = crate::vm::record_fields(&context, &owner, arity).map_err(|e| {
+        let type_parameters = vec![Type::Void; type_arity];
+        let method_parameters =
+            vec![Type::Void; module.functions[function].generic_parameters.len()];
+        owner.substitute_parameters(Some(&type_parameters), Some(&method_parameters))?;
+        // Field fixups need layout, not full interface validation: standalone source
+        // has not been linked with System yet. Complete signature checks follow linking.
+        crate::constraints::check_known_type(&context, &owner, 0)?;
+        let fields = crate::inheritance::fields(&context, &owner).map_err(|e| {
             Fault::new(format!(
                 "line {line}: invalid field owner {owner:?}: {}",
                 e.message
             ))
         })?;
+        for field in &fields {
+            crate::constraints::check_known_type(&context, &field.ty, 0)?;
+        }
         let index = fields
             .iter()
             .position(|field| field.name == name)

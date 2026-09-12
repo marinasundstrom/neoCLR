@@ -1590,6 +1590,29 @@ reflection as desirable. Existing Neo/runtime implementations are not evidence t
 Raven can already consume all those APIs; target admission and end-to-end checks remain
 necessary. This output slice does not implement those later library features.
 
+## 55. Demonstrate the foundations already built — recorded 2026-09-12
+
+**Author clarification.** The goal is to demonstrate the fundamentals of the new
+platform, its differences from .NET and a strong foundation. A complete foundation is
+not required; the building blocks already present are important for showing what the
+platform is about.
+
+**Assistant response.** Kept the preview tied to the bounded demo: familiar type/IL
+behavior, the target library, Result/Option with propagation, basic file APIs and Raven
+tooling. Regression repair supports reliability of existing capabilities; it is not a
+reason to expand toward a complete platform or runtime library before the preview.
+
+**Date/time addition to the demo.** The author asked to include the date/time libraries
+as relatable evidence of the platform, even if incomplete. The assistant proposed
+exposing the existing bounded date/time and local-clock surface through Raven, with
+formatting/globalization still outside scope. This is release-demo scope, not a claim
+that Raven import already supports those APIs.
+
+**Acceptance emphasis.** The author emphasized that the fundamentals, error handling,
+and basic VS Code completion through Raven integration are key. The assistant agreed
+to treat their combined end-to-end demonstration as acceptance criteria rather than
+feature count or completeness of the entire platform.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

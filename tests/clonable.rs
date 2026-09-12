@@ -75,3 +75,16 @@ fn ordinary_value_copies_do_not_invoke_clone() {
     assert_eq!(fault.message, "Clone must be explicit");
     assert_eq!(fault.function.as_deref(), Some("Item.Clone"));
 }
+
+#[test]
+fn self_referential_contract_does_not_hide_generic_constraints() {
+    let constrained = SAMPLE.replace(
+        ".type Snapshot<T>",
+        ".type Snapshot<T>\n.constraint T notvoid",
+    );
+    let module = assemble(&constrained).unwrap();
+    LoadedProgram::new(&module).unwrap().verify().unwrap();
+    let invalid = constrained.replace("Snapshot<String>", "Snapshot<Void>");
+    let error = assemble(&invalid).unwrap_err();
+    assert!(error.message.contains("violates"), "{error:?}");
+}

@@ -36,8 +36,8 @@ neoCLR execution uses the dedicated tasks, not Raven's normal Build/Run/Debug bu
 
 The installed server passed the stdio completion/hover checks, and the saved workflow
 compiled, verified and ran successfully on 2026-09-12. The wider pre-merge runtime
-suite found a generic Clonable assembly-resolution regression; this local demo is not
-a claim that the branch is release-ready. Propagation and match syntax release coverage
+suite found generic Clonable and calculator regressions, subsequently fixed and
+validated across all integration suites; this local demo is not a claim that the branch is release-ready. Propagation and match syntax release coverage
 are still pending.
 
 ## Edit, build and run the saved project

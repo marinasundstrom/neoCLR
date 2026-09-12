@@ -53,3 +53,18 @@ between an ordinary value copy and explicit Clone dispatch.
 
 See the [lifecycle proposal](lifecycle.md) for the future destruction and resource
 ownership contracts. Those mechanisms are not implemented by Clonable.
+
+## Generic contract validation regression (2026-09-12)
+
+A declaration such as Snapshot<T> implementing Clonable<Snapshot<T>> is a finite
+self-referential contract, not infinitely nested source syntax. Generic validation
+now remembers constructed signatures visited during one walk. It still validates each
+argument/constraint and retains the depth limit for expanding signatures; inheritance
+cycle rules are unchanged. The constrained Snapshot regression also rejects Void where
+T requires notvoid.
+
+Assembly field-name resolution uses available layout and constraints before linking,
+so a standalone application can refer to its System Clonable contract. Complete type
+existence and signature validation still occur after linking. This restores the existing
+cloning contract, consistent with the generic interface pattern in the .NET comparison
+above; it adds no new interface behavior or instruction.

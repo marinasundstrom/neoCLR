@@ -212,6 +212,18 @@ pub(crate) fn check_known_type(
     ty: &Type,
     depth: usize,
 ) -> Result<(), Fault> {
+    check_known_type_seen(module, ty, depth, &mut std::collections::HashSet::new())
+}
+
+fn check_known_type_seen(
+    module: &crate::Module,
+    ty: &Type,
+    depth: usize,
+    seen: &mut std::collections::HashSet<Type>,
+) -> Result<(), Fault> {
+    if !seen.insert(ty.clone()) {
+        return Ok(());
+    }
     if depth > 32 {
         return Err(Fault::new("type nesting exceeds 32"));
     }
@@ -220,15 +232,16 @@ pub(crate) fn check_known_type(
             if let Some(definition) = module.type_definition(ty) {
                 check_type_arguments(module, &definition.generic_constraints, arguments)?;
                 for inherited in definition.base.iter().chain(&definition.implements) {
-                    check_known_type(
+                    check_known_type_seen(
                         module,
                         &inherited.substitute_type_parameters(arguments)?,
                         depth + 1,
+                        seen,
                     )?;
                 }
             }
             for argument in arguments {
-                check_known_type(module, argument, depth + 1)?;
+                check_known_type_seen(module, argument, depth + 1, seen)?;
             }
         }
         Type::ByRef(ty)
@@ -236,7 +249,7 @@ pub(crate) fn check_known_type(
         | Type::InterfaceRef(ty)
         | Type::Array(ty)
         | Type::ArrayRef(ty)
-        | Type::Ptr(ty) => check_known_type(module, ty, depth + 1)?,
+        | Type::Ptr(ty) => check_known_type_seen(module, ty, depth + 1, seen)?,
         _ => (),
     }
     Ok(())

@@ -91,3 +91,10 @@ type arguments for generic type construction. Neo extends argument inference to
 constructor owners in the compiler. The benefit is less repeated type spelling for
 independent cases; the cost is additional inference and ambiguity rules. The runtime
 still receives closed constructor signatures, with no new opcode or metadata contract.
+
+Primitive conversions such as `int(byteValue)` bypass library constructor probing.
+Although primitive types have runtime library declarations, those declarations do not
+turn conversion syntax into an instance constructor call. This preserves the existing
+conversion lowering and keeps library constructor admission limited to its declared
+constructible types. The calculator and library constructor regression suites cover
+both paths (2026-09-12).

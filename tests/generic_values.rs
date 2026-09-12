@@ -127,6 +127,7 @@ fn malformed_generic_field_owners_and_unsupported_native_fields_are_rejected() {
     for operand in [
         "Box::Value",
         "Box<!0>::Value",
+        "Box<!!0>::Value",
         "Box<Int32,String>::Value",
         "Box<Int32>::Missing",
     ] {

@@ -38,6 +38,12 @@ Continue the Raven collection demo against these target semantics.
 
 ## Current Raven-target experiment priority
 
+The [preview acceptance criteria](raven-preview-acceptance.md) focus on the fundamentals already built and their differences from
+.NET. A strong, tested subset is the goal; neither a complete runtime foundation nor
+full library/compiler integration is required. New work should support that concrete
+demonstration, with unsupported capabilities documented rather than silently implied.
+
+
 The [bounded Raven POC milestone](raven-target-experiment.md#milestone-closed-raven-poc-2026-09-12)
 is closed at `milestone/raven-poc-2026-09-12`. The bounded collection follow-up now
 demonstrates a concrete class through interfaces from Raven on neoCLR, using CLI
@@ -69,15 +75,17 @@ is a checkpoint toward that broader demonstration.
 This experiment order takes precedence over older next-slice notes about propagation;
 it does not mark the broader platform roadmap complete.
 
-Pre-merge regression checks currently identify generic Clonable assembly resolution
-and the legacy Neo calculator source-construction path as failures to resolve.
+The generic Clonable assembly-resolution and legacy Neo calculator construction
+regressions are fixed. The pre-merge sweep and targeted reruns pass all 162 integration
+suites, unit/doc checks and the prepared Raven demo.
 
 Before wider distribution, have the author try the updated local SDK/extension and
 fundamental demo. Then prepare a reproducible experimental bundle with pinned neoCLR
 and Raven revisions, target declarations/library, VS Code setup and build/run instructions.
 Merge the neoCLR experiment into main, update release-facing documentation, and include
 matching experimental Raven SDK/extension builds with the NeoCLR preview. Require propagation and Result-based text-file reading/writing through Raven before
-the public preview; reflection introspection is desirable, with its admitted surface
+the public preview; include the bounded date/time library and a current local-time example. Reflection
+introspection is desirable, with its admitted surface
 explicitly documented. Reuse/adapt the existing runtime File and reflection APIs. Verify
 Raven match expressions and statements end-to-end, recording supported and rejected
 forms in the release documentation alongside propagation coverage. Keep Raven

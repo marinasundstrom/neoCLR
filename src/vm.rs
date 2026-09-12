@@ -1065,10 +1065,29 @@ fn check_type_context(
     depth: usize,
 ) -> Result<(), Fault> {
     let arity = arity.into();
+    check_type_context_seen(
+        ty,
+        module,
+        arity,
+        depth,
+        &mut std::collections::HashSet::new(),
+    )
+}
+
+fn check_type_context_seen(
+    ty: &Type,
+    module: &Module,
+    arity: SignatureContext,
+    depth: usize,
+    seen: &mut std::collections::HashSet<Type>,
+) -> Result<(), Fault> {
     if depth > 32 {
         return Err(Fault::new("type nesting exceeds 32"));
     }
-    let nested = |ty: &Type| check_type_context(ty, module, arity, depth + 1);
+    if !seen.insert(ty.clone()) {
+        return Ok(());
+    }
+    let mut nested = |ty: &Type| check_type_context_seen(ty, module, arity, depth + 1, seen);
     match ty {
         Type::Scoped { .. } => Err(Fault::new("unresolved scoped type signature")),
         Type::TypeParameter(index) if *index as usize >= arity.types => {
