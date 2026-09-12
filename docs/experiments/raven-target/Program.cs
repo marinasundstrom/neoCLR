@@ -200,20 +200,21 @@ if (!badUnionDiagnostics.Any(d => d.Contains("RAV1503")))
     throw new Exception("Union API accepted an incorrect argument type.");
 var unionErrors = ClosureAudit.Inspect(unionCore);
 if (unionErrors.Length != 0) throw new Exception(string.Join("\n", unionErrors));
-string unionEmissionBlocker;
-using (var unionStream = new MemoryStream())
+var unionImage = Compile("CoreUnion", unionSource, [MetadataReference.CreateFromFile(unionCore)],
+    AssemblyName.GetAssemblyName(unionCore), true, CoreDeclarations.Identity);
+using (var unionAssembly = AssemblyDefinition.ReadAssembly(Path.Combine(output, "CoreUnion.dll")))
 {
-    try
-    {
-        var emitted = unionCompilation.Emit(unionStream, null, new EmitOptions(AssemblyName.GetAssemblyName(unionCore)));
-        throw new Exception("Union emission changed; replace the expected-blocker probe with emitted IL validation. Success: " + emitted.Success);
-    }
-    catch (InvalidOperationException error) when (error.GetBaseException().Message ==
-        "Unable to resolve runtime type for metadata symbol: System.Result`2")
-    {
-        unionEmissionBlocker = error.GetBaseException().Message;
-    }
+    var extraction = unionAssembly.MainModule.GetMemberReferences().OfType<MethodReference>()
+        .Where(m => m.Name == "TryGetValue").ToArray();
+    if (extraction.Length != 2 || extraction.Any(m => m.DeclaringType is not GenericInstanceType
+        || m.Parameters.Count != 1 || m.Parameters[0].ParameterType is not ByReferenceType))
+        throw new Exception("Union patterns did not reference both generic out-case extractors.");
+    var show = unionAssembly.MainModule.GetTypes().SelectMany(t => t.Methods).Single(m => m.Name == "Show");
+    if (show.Body.Instructions.Any(i => i.OpCode.Code is Code.Box or Code.Isinst or Code.Unbox_Any))
+        throw new Exception("Union patterns fell back to ordinary object type tests.");
 }
+var unionClosureErrors = ClosureAudit.Inspect(Path.Combine(output, "CoreUnion.dll"), unionCore);
+if (unionClosureErrors.Length != 0) throw new Exception(string.Join("\n", unionClosureErrors));
 var report = new
 {
     Closure = new
@@ -230,8 +231,8 @@ var report = new
         MissingDependencyErrors = missingDependencyErrors
     },
     Scope = "emission plus bounded static import; execute generated neoIL separately against neoCLR System",
-    UnionProbe = new { Scope = "metadata binding only; emission blocked; no union program executed",
-        BindingPassed = true, InvalidArgumentDiagnostics = badUnionDiagnostics, DeclarationClosureErrors = unionErrors, EmissionBlocker = unionEmissionBlocker },
+    UnionProbe = new { Scope = "metadata binding and emission; no union program executed",
+        BindingPassed = true, InvalidArgumentDiagnostics = badUnionDiagnostics, DeclarationClosureErrors = unionErrors, Emission = unionImage, ApplicationClosureErrors = unionClosureErrors },
     StaticImportRejections = staticImportRejections,
     TargetCompletions = targetCompletions,
     CoreDeclarationTypes = coreTypes,

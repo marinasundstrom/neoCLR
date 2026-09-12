@@ -9,7 +9,7 @@ retain their historical limits. This is not general Raven or direct PE execution
 ## Reproduce
 
 Current probe validated on 2026-09-12 with Raven revision
-`1d7341fa64a66b514e5e68031b6d072d8140ea3a` on `codex/neoclr-target-resolution`,
+`17c9f8b826bd4cfc10a739f511db087214892b56` on `codex/neoclr-target-resolution`,
 neoCLR starting revision `26068dc`,
 .NET SDK `11.0.100-rc.1.26425.128` and Mono.Cecil `0.11.6`.
 Use a separate Raven checkout at that revision. The local `global.json` pins the SDK;
@@ -235,17 +235,18 @@ checks and the new completion checks. All five imports verify and run through
 `verify_runtime.py`; `cargo test --test raven_import` passes against the refreshed fixtures.
 The next MVP program must consume a real Result/Option API and handle both outcomes.
 
-## Result binding probe (2026-09-12)
+## Result emission probe (2026-09-12)
 
-The same reproduction command also checks `samples/library-result.rvn`, with a
-separate `union-probe/NeoCLR.CoreProbe.dll`. `report.json` now includes `UnionProbe`:
-valid Result case patterns bind, a string passed to Math.Abs fails with RAV1503,
-and emission reproduces the pinned Raven host-type-resolution failure. An unexpected
-emission outcome fails the probe so this cannot silently remain an expected blocker.
-The compact checked-in outcome is `union-results.json`.
+The same reproduction command checks `samples/library-result.rvn`, using a separate
+`union-probe/NeoCLR.CoreProbe.dll`. `report.json` includes `UnionProbe`: the valid
+Result patterns bind and emit, while passing a string to Math.Abs fails with RAV1503.
+The generated `CoreUnion.dll` passes dependency-closure checks. Both generic out-case
+extractors must be referenced; ordinary object type-test lowering is rejected. The
+compact checked-in outcome is `union-results.json`.
 
-**This sample cannot run yet.** Its declaration bodies are placeholders; it is not
-part of the executable API catalog, generated neoIL, or `verify_runtime.py`'s five
-runtime programs. The [experiment notes](../../raven-target-experiment.md#union-metadata-probe-and-emission-blocker-2026-09-12)
-explain the metadata protocol and ordered follow-up work. No Raven changes are needed
-to reproduce this blocker at the pinned revision.
+**This sample cannot run on neoCLR yet.** Its declaration bodies are placeholders;
+they are not part of the executable API catalog, generated neoIL, or
+`verify_runtime.py`'s five runtime programs. The [follow-up notes](../../raven-target-experiment.md#target-metadata-emission-follow-up-2026-09-12)
+record the compiler fix, correction to the previous declaration probe, and remaining
+runtime/library work. The earlier pinned Raven revision reproduced the emission
+blocker; reproduction now requires the updated feature-branch revision above.

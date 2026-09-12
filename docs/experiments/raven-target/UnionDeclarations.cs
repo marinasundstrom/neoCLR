@@ -16,6 +16,8 @@ static class UnionDeclarations
         }
         [System.Runtime.CompilerServices.Union]
         public struct Result<T, E> {
+            // Required by Raven's union recognition protocol; not an admitted runtime API.
+            public object Value => default;
             public Result(Result.Ok<T> value) { }
             public Result(Result.Error<E> value) { }
             public bool TryGetValue(out Result.Ok<T> value) { value = default; return false; }

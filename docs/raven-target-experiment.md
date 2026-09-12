@@ -318,3 +318,36 @@ both cases to the real Result API and execute both outcomes. No union opcode or 
 binary metadata format has been justified. The probe does not establish that a
 metadata-only emitter change is small, nor that these two generic carrier layouts
 are binary-compatible.
+
+## Target metadata emission follow-up (2026-09-12)
+
+The Result sample now emits at the Raven revision pinned in the probe README.
+The compiler change stays on `codex/neoclr-target-resolution`. With explicit core
+retargeting enabled, named metadata types and closed metadata constructions can pass
+through persisted emission without becoming host runtime types. The existing method
+proxy path now handles members on constructed metadata owners, preserves byref
+parameters, and writes definition signatures (`!0`/`!1`) under those owners. Nested
+case references retain their value-type marker. No neoCLR-specific syntax was added
+to Raven; default emission is unchanged.
+
+**Correction to the previous probe:** UnionAttribute and constructors were not enough
+for Raven's union recognition. The preliminary declaration was missing its required
+public `object Value` property. Consequently, successful binding alone did not prove
+union pattern lowering. The declaration probe now includes that property, and checks
+require both `TryGetValue(out Case)` references and reject ordinary box/isinst/unbox
+pattern lowering. The new output passes the explicit dependency-closure audit and
+references only NeoCLR.CoreProbe. The declaration's `Value` property is not implemented
+or admitted as a neoCLR runtime API. Its projection, along with the TryGetValue/TryGet
+name difference, must be resolved before exposing this as a supported target contract.
+
+The sample has still **not executed on neoCLR**. `StaticImport` remains limited to its
+existing primitive static subset. The next slice is the runtime/library binding and
+verified generic/local/branch admission described above. Passing the metadata audit
+is not proof of IL validity or runtime behavior. In particular, .NET InitLocals and
+value-receiver/out-case storage must be preserved rather than synthesized away.
+
+This follows the prior .NET comparison: keep standard generic signatures, managed
+byrefs, and branches; fix the target-emission boundary instead of introducing union
+instructions. Raven tests cover metadata-only generic signatures, nested case getters,
+and out-case extraction. The five existing runtime programs remain the executable
+baseline while the union importer is developed.

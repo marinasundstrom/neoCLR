@@ -1302,6 +1302,19 @@ technical proposal, not an additional author decision. Raven remains unchanged i
 this slice. The [probe and next steps](raven-target-experiment.md#union-metadata-probe-and-emission-blocker-2026-09-12)
 record the evidence and distinguish the remaining compiler, library, and runtime work.
 
+### Emission follow-up — recorded 2026-09-12
+
+**Assistant action and corrected finding.** On the next continuation, the assistant
+changed Raven on its existing feature branch to preserve target metadata types during
+retargeted emission and correct generic/byref member references. The sample emits and
+passes the dependency audit. Inspection also showed that the earlier declaration
+lacked the Value property needed for Raven to recognize a union: its binding success
+alone had not established union matching. The probe now includes that recognition
+contract and checks for both case extractors. No runtime union execution is claimed.
+The [follow-up](raven-target-experiment.md#target-metadata-emission-follow-up-2026-09-12)
+records this correction and the remaining API-projection and importer work. No new
+author design decision is inferred from continuation.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

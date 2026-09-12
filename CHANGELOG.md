@@ -21,7 +21,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   demonstration to MVP acceptance criteria; generic union import is not yet supported.
   Added an isolated Result metadata/type-pattern probe and incorrect-argument rejection.
   Recorded Raven's host-type-resolution emission blocker; the union sample binds but
-  does not yet emit or execute. Kept probe-only declarations outside admitted runtime APIs.
+  did not emit or execute in that slice. Kept probe-only declarations outside admitted
+  runtime APIs. Follow-up now emits the sample after a feature-branch Raven fix for
+  target metadata types and generic/byref member signatures. Corrected the probe's
+  missing union-recognition Value property; verifies actual TryGetValue lowering instead
+  of ordinary type tests. Runtime union import/execution remains outstanding.
 
 - Began nominal class reference semantics: `.type class` uses managed heap handles in
   ordinary class-typed storage, while managed byrefs still address slots. Assignment,
