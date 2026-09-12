@@ -412,7 +412,7 @@ platform surface.
 | Result-based errors | Abs success and overflow execute | Broaden only as the sample needs |
 | Option-based absence | Raven price lookup constructs/extracts real library Some/None values and executes | Incorporate the lookup into the cohesive demo |
 | Generic Void | Raven Option<System.Void> constructs and matches both cases through a target adapter | Broaden target emission; zero-stack representation remains separate |
-| VS Code completion | Installed local extension displays target Math completions; LSP checks cover Console and union names | Connect the editable project to the bounded runtime build/run pipeline |
+| VS Code completion | Installed extension plus dedicated tasks compile and run saved project sources | Broader execution profile; ordinary Raven toolbar integration remains separate |
 
 The next priority is the Option demo, followed by generic Void and the project/editor
 integration. Address runtime gaps when these scenarios expose them. The POC does not
@@ -514,3 +514,34 @@ probe checks Console and System (including Option/Result/Void, without System.IO
 The eight runtime programs still execute with the new compiler build. Full Build/Run
 integration is separate; [instructions and limitations](experiments/raven-target/VSCODE.md)
 make that boundary explicit.
+
+## Saved project execution milestone (2026-09-12)
+
+The editor's RavenWorkspace project loader now also supplies the build compilation.
+The neoCLR-owned bridge calls Raven emission with the target core identity, applies the
+existing generic Void projection and admits the resulting IL through UnionImport. The
+Python runner verifies before running and creates an isolated output directory for every
+attempt. It never searches for an older successful artifact after a failure. Dedicated
+VS Code process tasks pass paths as argument arrays and keep unrelated tasks intact.
+
+This follows the familiar project/reference/compile/run separation while reusing the
+existing temporary target importer. It does not change guest type semantics, metadata
+encodings or instructions. The bounded importer remains a cost: only its admitted
+Result/Option/Void patterns execute, even where the editor knows additional declarations.
+The normal SDK toolbar does not yet invoke this pipeline. Exact target identity and
+closure admission remain independent of Raven's project evaluation.
+
+Project compilation exposed inferred .NET TargetFrameworkAttribute source. Raven now
+omits this generated source for explicit metadata targets, whose tooling TFM need not
+identify their runtime. This is a general opt-in targeting fix on Raven's isolated branch,
+not an attribute stub added to neoCLR solely to satisfy the compiler. Default .NET project
+behavior remains covered by the project-loading tests; target authors may supply their
+own supported assembly attributes.
+
+Validation covers the actual Result, Option and Void programs; saving a changed input
+changes output from 42 to 7. Compiler and import failures produce no new executable and
+never run stale output. All 37 Raven project-loading tests pass. The next bounded milestone
+is Raven's existing union propagation operator: successful extraction, compatible failure
+return, nested calls and rejection of incompatible carriers, with emitted artifacts and
+runtime execution checked separately. Interfaces and broader virtual dispatch follow
+later, as directed by the author. No propagation implementation is claimed in this slice.

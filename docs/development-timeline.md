@@ -1353,6 +1353,24 @@ extension. This does not make the regular Raven Build/Run buttons neoCLR command
 Connecting saved project edits to compilation/import/execution remains the next slice.
 The local build is experimental and is not a published release.
 
+## 43. Finish the development loop, then propagation — recorded 2026-09-12
+
+**Author direction.** While the assistant connected saved projects to runtime execution,
+the author requested union propagation, then suggested it could be the next milestone.
+The author subsequently directed completion of this milestone, leaving interfaces and
+related capabilities for later.
+
+**Assistant response and action.** The assistant kept the current milestone focused on
+saved-source build/run tasks and recorded propagation as next. Compilation exposed an
+inferred .NET framework attribute; a small Raven project-system fix removed that inference
+for explicit-core targets. The new bridge reuses the editor project model and existing
+runtime admission, with isolated outputs for each build.
+
+**Outcome.** Result, Option and generic Void execute from project sources. A saved edit
+changes the output, while compiler/import failures stop without running stale artifacts.
+Propagation and interfaces remain planned, not reported as implemented. The dedicated
+VS Code tasks still differ from Raven's normal toolbar pipeline.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

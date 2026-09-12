@@ -1,0 +1,58 @@
+{
+  "RecordedDate": "2026-09-12",
+  "RavenRevision": "5b773ae3536f52ef077c8897867950249d6dde90",
+  "Checks": {
+    "Result": "42\nOverflow\n=> Void\n",
+    "Option": "42\nProduct not found\n=> Void\n",
+    "Void": "Completed without a payload\nNot completed\n=> Void\n",
+    "SavedEdit": "7\nOverflow\n=> Void\n",
+    "CompileFailure": "Rejected; no executable produced or stale output run",
+    "ImportFailure": "Rejected; no executable produced or stale output run"
+  },
+  "ExtensionVersion": "0.1.12-neoclr.2",
+  "VsixSha256": "cc0981c80e31da93f98365a03fcc34cbc23c3371e65848660a8c43da4ffe0777",
+  "InstalledServerCompletions": {
+    "Math": [
+      "Abs",
+      "Max",
+      "Min",
+      "Sign"
+    ],
+    "Console": [
+      "WriteLine"
+    ],
+    "System": [
+      "Array",
+      "Attribute",
+      "AttributeTargets",
+      "AttributeUsageAttribute",
+      "Boolean",
+      "Byte",
+      "Char",
+      "Console",
+      "Double",
+      "Enum",
+      "Int16",
+      "Int32",
+      "Int64",
+      "IntPtr",
+      "Math",
+      "Object",
+      "Option",
+      "OverflowError",
+      "Result",
+      "Runtime",
+      "SByte",
+      "Single",
+      "String",
+      "Type",
+      "UInt16",
+      "UInt32",
+      "UInt64",
+      "UIntPtr",
+      "Unit",
+      "ValueType",
+      "Void"
+    ]
+  }
+}

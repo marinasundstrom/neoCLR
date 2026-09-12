@@ -1,15 +1,15 @@
 # Test Raven targeting neoCLR in VS Code
 
 This setup provides project-backed completion against neoCLR's declaration assembly.
-The Result demo executes through the separate neoCLR import probe. The normal Raven
+Dedicated neoCLR tasks now compile the saved project, import it, verify it and run it. The normal Raven
 **Build**, **Run** and **Debug** buttons do not yet implement that target pipeline.
 Do not use their success as evidence that a program ran on neoCLR.
 
 ## Already prepared on this machine
 
-A local extension build, `raven.raven-vscode@0.1.12-neoclr.1`, is installed. This is an
+A local extension build, `raven.raven-vscode@0.1.12-neoclr.2`, is installed. This is an
 experiment label, not a published release. Its bundled compiler library and language
-server include Raven commit `37ae9730409d52f876b6b6e47abfa950d8300064` from
+server include Raven commit `5b773ae3536f52ef077c8897867950249d6dde90` from
 `codex/neoclr-target-resolution`. A separate SDK bundle is installed alongside the
 existing SDK at `/Users/robert/.raven/sdk/0.1.12-neoclr.1`; its `rvnc --version` reports
 `0.1.12-neoclr.1`. The demo's settings select this SDK without changing global PATH
@@ -41,13 +41,57 @@ The local UI check on 2026-09-12 displayed all four Math methods. The client log
 extension's server. The reproducible protocol check also covers Console and System.
 See [editor-results.json](editor-results.json) for the bounded evidence.
 
+## Edit, build and run the saved project
+
+Requires Raven commit `5b773ae3536f52ef077c8897867950249d6dde90` or the corresponding
+source build. The runner uses that checkout's compiler API; the independently installed
+SDK is not the target build backend yet.
+
+1. Edit `Main.rvn`, for example changing `Show(-42)` to `Show(-7)`, and **save** it.
+2. Choose **Terminal → Run Task → neoCLR: Run saved project**.
+3. The task compiles the project's saved Compile items against its declared core, applies
+   the target Void projection, imports the bounded IL, verifies it and executes it.
+   The edited example prints `7`, `Overflow`, `=> Void`.
+4. **neoCLR: Build saved project** performs the same steps except execution.
+
+The tasks are already configured in the prepared folder. They are separate from Raven's
+standard toolbar commands. Each attempt writes a fresh `.neoclr-build/build-*/output`
+directory and reports its verified IL path. Compile, import and verifier failures stop
+execution; a failed attempt never runs an older artifact. Generated directories can be
+removed when no task is using them. Unsaved buffers are not build inputs.
+
+From a terminal, use the same runner:
+
+```sh
+python3 docs/experiments/raven-target/run_project.py /absolute/editor/Demo.rvnproj --raven /absolute/path/to/Raven --runtime /absolute/path/to/neoclr
+```
+
+Build neoCLR with `cargo build --locked` first, or point `--runtime` to an existing build.
+The runner uses the pinned SDK in the bridge folder and the existing built Raven compiler;
+rebuild Raven after changing its checkout. To add/update tasks in an existing folder:
+
+```sh
+python3 docs/experiments/raven-target/configure_tasks.py /absolute/editor/Demo.rvnproj --raven /absolute/path/to/Raven --runtime /absolute/path/to/neoclr
+```
+
+Preparation also creates these tasks; pass `--runtime` to choose the executable (default:
+neoCLR's `target/debug/neoclr`). Unrelated task entries are preserved. The current project
+profile accepts exactly the supplied core reference and no project references. It reuses
+the Result/Option/Void importer: this is not general Raven IL support. Some declarations
+visible in completion are still outside that execution profile, including Math.Min/Max/Sign.
+Unsupported instructions/APIs fail admission instead of falling back to host execution.
+Union propagation is the next milestone; interfaces and broader dispatch remain later.
+
+`verify_project.py` exercises the three union demos, a saved edit, a compiler failure,
+and an unsupported-instruction failure without overwriting the user's project.
+
 ## Rebuild and install
 
 Prerequisites: the pinned .NET SDK from `global.json`, Node/npm, the VS Code `code`
 command, and a Raven checkout with the commit above. From the Raven repository:
 
 ```sh
-RAVEN_PACKAGE_OUTPUT="$PWD/artifacts/neoclr-local" scripts/package-vscode.sh 0.1.12-neoclr.1
+RAVEN_PACKAGE_OUTPUT="$PWD/artifacts/neoclr-local" scripts/package-vscode.sh 0.1.12-neoclr.2
 code --install-extension "$PWD/artifacts/neoclr-local/raven-vscode.vsix" --force
 code --list-extensions --show-versions
 code --locate-extension raven.raven-vscode
@@ -112,7 +156,5 @@ cargo run -- run docs/experiments/raven-target/local/2026-09-12-editor/CoreUnion
 
 Expected output is `42`, `Overflow`, and the CLI result display `=> Void`.
 The import uses the real System.Math and Result library. This saved IL corresponds to
-the sample at probe generation time. Editing `editor/Main.rvn` does **not** rebuild it.
-For now, change the probe's `samples/library-result.rvn` and rerun the probe into a fresh
-output directory to test changed code within the admitted subset. Connecting arbitrary
-project edits to this importer is the next development-loop slice.
+the sample at probe generation time. Editing `editor/Main.rvn` does **not** change this older saved artifact.
+Use **neoCLR: Run saved project** above to compile and execute your current saved edits.

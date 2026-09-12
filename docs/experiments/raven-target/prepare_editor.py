@@ -3,12 +3,14 @@ import argparse
 import json
 from pathlib import Path
 import shutil
+from configure_tasks import configure
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('output', type=Path)
 parser.add_argument('raven', type=Path)
 parser.add_argument('--server', type=Path, help='Override the built server, e.g. the installed VSIX server')
 parser.add_argument('--sdk', type=Path, help='Optional local SDK for this workspace')
+parser.add_argument('--runtime', type=Path, default=Path(__file__).resolve().parents[3] / 'target/debug/neoclr', help='Built neoCLR executable for the tasks')
 args = parser.parse_args()
 output, raven = args.output.resolve(), args.raven.resolve()
 core = output / 'union-probe' / 'NeoCLR.CoreProbe.dll'
@@ -40,4 +42,5 @@ settings = {'raven.languageServerPath': str(server)}
 if args.sdk:
     settings['raven.sdkPath'] = str(args.sdk.resolve())
 (project / '.vscode/settings.json').write_text(json.dumps(settings, indent=2)+'\n')
+configure(project / 'Demo.rvnproj', raven, args.runtime.resolve())
 print(project)

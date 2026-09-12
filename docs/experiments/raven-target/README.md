@@ -360,3 +360,14 @@ the older emission revision at the top remains the baseline for the earlier slic
 `verify_editor.py` checks actual LSP requests against the configured server. Math
 completion was also verified in the installed VS Code extension. These checks do not
 claim the normal Build/Run buttons target neoCLR yet.
+
+## Saved project build/run milestone (2026-09-12)
+
+Raven `5b773ae3536f52ef077c8897867950249d6dde90` fixes generated host-TFM attributes for
+explicit metadata targets. `run_project.py` now compiles the editable project through
+RavenWorkspace, retargets emission and imports/verifies/runs the resulting saved source.
+`prepare_editor.py` creates dedicated VS Code tasks; `configure_tasks.py` updates an
+existing folder. See [edit/build/run instructions](VSCODE.md#edit-build-and-run-the-saved-project).
+`verify_project.py` checks Result, Option, generic Void, a changed output and failure
+behavior. The normal Raven toolbar remains a separate pipeline. Propagation and
+interfaces are not claimed by this milestone.

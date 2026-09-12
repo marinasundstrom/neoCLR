@@ -46,7 +46,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   with an explicit metadata core, reproducible LSP completion checks, a local VSIX build
   and installation walkthrough, plus a locally installed SDK alongside existing builds.
   Verified target Math suggestions in VS Code itself;
-  normal Raven Build/Run buttons do not yet invoke the neoCLR import pipeline.
+  normal Raven Build/Run buttons do not yet invoke the neoCLR import pipeline. Added
+  dedicated VS Code build/run tasks using saved project sources, target emission and
+  verifier-gated execution. Each build has fresh outputs; failed compilation/import
+  cannot run stale IL. Verified Result/Option/Void, changed output and rejection cases.
+  Recorded propagation as the next milestone and interfaces as later work.
 
 - Began nominal class reference semantics: `.type class` uses managed heap handles in
   ordinary class-typed storage, while managed byrefs still address slots. Assignment,

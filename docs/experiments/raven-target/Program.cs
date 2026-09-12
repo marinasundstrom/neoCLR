@@ -6,6 +6,13 @@ using Raven.CodeAnalysis;
 using Raven.CodeAnalysis.Syntax;
 using AssemblyDefinition = Mono.Cecil.AssemblyDefinition;
 
+if (args.Length == 3 && args[0] == "--project")
+{
+    try { ProjectBuild.Write(args[1], args[2]); }
+    catch (Exception error) { Console.Error.WriteLine(error.Message); Environment.ExitCode = 1; }
+    return;
+}
+
 // Core declaration bodies never execute. Application IL is imported separately for neoCLR.
 var output = Path.GetFullPath(args.Length == 1 ? args[0] : throw new ArgumentException("Supply a new output directory."));
 if (Directory.Exists(output)) throw new IOException("Output directory must not exist.");
