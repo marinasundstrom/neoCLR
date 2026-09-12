@@ -101,3 +101,13 @@ unsupported features before execution. Numerical limits, Rust reader selection, 
 encoding/version negotiation and the library closure remain implementation decisions for
 the next slice. A target profile supplied by the caller is required even for unmarked PE;
 ordinary .NET executables must never be guessed to be neoCLR artifacts.
+
+## Slice 4 implementation update
+
+Raven now has an opt-in `MetadataImportOptions` API on its integration branch. This
+selects the metadata core and excludes implicit host assemblies from the metadata
+resolver. Default .NET imports remain unchanged, and import-policy changes block
+incremental state reuse. The updated [probe](experiments/raven-target/README.md) tests
+Console binding and omission through this mode. This addresses the tested compiler
+isolation prerequisite; a complete neoCLR core reference artifact, helper handling,
+full profile validation and runtime execution remain open.

@@ -14,11 +14,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   the next minimal-target probes. Added a reproducible emission probe and minimal
   contract map: target Console binding succeeds, while omitted-library resolution
   exposes host fallback and core declarations remain incomplete. Captured metadata,
-  diagnostics and call-boundary alternatives; no Raven changes or binary execution
-  are claimed. Added explicit-only metadata dependency auditing with positive and
+  diagnostics and call-boundary alternatives; binary execution is not yet claimed.
+  Added explicit-only metadata dependency auditing with positive and
   negative fixtures, and selected CLI PE reuse for the bounded binary experiment.
-  Runtime loading/translation, compiler isolation and complete core declarations
-  remain planned.
+  Added probe coverage for Raven's opt-in explicit-only metadata import API: Console
+  binds when supplied and is unavailable when omitted, even after host-mode binding.
+  Runtime loading/translation and complete core declarations remain planned.
 
 - Documented the Raven target/binary-artifact experiment on its own branch: inspect
   the existing compiler, choose an evidence-backed format/library contract, and

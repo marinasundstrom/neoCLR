@@ -25,6 +25,16 @@ func Main() {
 """;
 var control = Compile("Control", source, referencePaths.Select(MetadataReference.CreateFromFile).ToArray(), null);
 var target = Compile("Target", source, targetReferences, AssemblyName.GetAssemblyName(facadePath));
+var isolatedTarget = Compile("IsolatedTarget", source, targetReferences, AssemblyName.GetAssemblyName(facadePath), true);
+var isolatedMissing = Compilation.Create("IsolatedMissing", [SyntaxTree.ParseText(source)],
+    referencePaths.Where(path => Path.GetFileName(path) != "System.Console.dll")
+        .Select(MetadataReference.CreateFromFile).ToArray(),
+    new CompilationOptions(OutputKind.ConsoleApplication, metadataImportOptions: new MetadataImportOptions("System.Runtime")));
+var isolatedMissingErrors = isolatedMissing.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error).Select(d => d.ToString()).ToArray();
+if (isolatedMissingErrors.Length == 0 || isolatedMissing.GetTypeByMetadataName("System.Console") is not null)
+    throw new Exception("Explicit-only metadata import leaked Console.");
+if (!isolatedTarget.Methods.SelectMany(m => m.Instructions).Any(i => i.Contains("::WriteLine(") && i.Contains("scope=NeoCLR.Probe.System")))
+    throw new Exception("Isolated target did not bind the fixture Console.");
 var bad = Compilation.Create("MissingMember", [SyntaxTree.ParseText(source.Replace("WriteLine(", "MissingWriteLine("))],
     targetReferences, new CompilationOptions(OutputKind.ConsoleApplication));
 var noLibrary = Compilation.Create("MissingLibrary", [SyntaxTree.ParseText(source)],
@@ -107,6 +117,9 @@ var report = new
     },
     Scope = "emission-only; fixture is not neoCLR System and generated code was not executed",
     FrameworkReferences = referencePaths.Length,
+    IsolatedTarget = isolatedTarget,
+    ExplicitOnlyIsolationPassed = true,
+    IsolatedMissingLibraryErrors = isolatedMissingErrors,
     Control = control,
     Target = target,
     MissingMemberErrors = errors,
@@ -115,12 +128,13 @@ var report = new
     MissingLibraryImage = missingLibraryImage
 };
 File.WriteAllText(Path.Combine(output, "report.json"), JsonSerializer.Serialize(report, new JsonSerializerOptions { WriteIndented = true }));
-Console.WriteLine($"PASS: control, target Console binding, core retargeting, missing-member diagnostic and metadata closure checks. Missing-library isolation passed: {missingLibraryErrors.Length != 0}. Report: {output}/report.json");
+Console.WriteLine($"PASS: control, target Console binding, core retargeting, missing-member diagnostic and metadata closure checks. Legacy missing-library isolation passed: {missingLibraryErrors.Length != 0}. Explicit-only isolation passed: True. Report: {output}/report.json");
 
-ImageReport Compile(string name, string text, MetadataReference[] references, AssemblyName? targetIdentity)
+ImageReport Compile(string name, string text, MetadataReference[] references, AssemblyName? targetIdentity, bool isolated = false)
 {
     var compilation = Compilation.Create(name, [SyntaxTree.ParseText(text)], references,
-        new CompilationOptions(OutputKind.ConsoleApplication));
+        new CompilationOptions(OutputKind.ConsoleApplication,
+            metadataImportOptions: isolated ? new MetadataImportOptions("System.Runtime") : null));
     var diagnostics = compilation.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
     if (diagnostics.Length != 0) throw new Exception(string.Join("\n", diagnostics.Select(d => d.ToString())));
     using var image = new MemoryStream();

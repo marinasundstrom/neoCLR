@@ -1144,6 +1144,25 @@ declarations. Generated-helper policy, input stack validation and reader impleme
 remain before execution. The assistant's format choice is scoped to this experiment;
 the author's continuation is not recorded as explicit approval of every design detail.
 
+## 33. Isolated compiler metadata import — recorded 2026-09-12
+
+**Author direction:** Continued after the binary-profile and dependency-audit slice.
+
+**Assistant action:** Implemented opt-in explicit-only metadata imports in Raven on
+`codex/neoclr-target-resolution`, selecting the metadata core independently of the
+compiler host. Preserved default .NET import behavior and blocked incremental state
+reuse across import policies. Updated the neoCLR probe to test target Console binding
+and missing-library diagnostics through the new API.
+
+**Outcome:** Raven commit `1d7341fa64a66b514e5e68031b6d072d8140ea3a` passed 15 focused
+framework/import tests and the .NET 10/11 target matrix. The updated probe binds the supplied Console fixture and rejects omitted
+Console instead of finding it on the host. The core reference artifact remains
+incomplete; this is compiler integration progress, not runtime execution. Exact
+revisions and validation are linked from the [probe instructions](experiments/raven-target/README.md).
+
+**Still open:** Complete neoCLR core declarations, generated-helper handling, profile
+verification and binary loading. No change to neoCLR's class/value defaults is implied.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

@@ -7,8 +7,9 @@ execute the output, implement a neoCLR target, or provide neoCLR's runtime libra
 
 ## Reproduce
 
-Recorded on 2026-09-12 with Raven revision
-`d92b02812740ae052f277c23151e9cc208f7672d`, neoCLR starting revision `0a60f9b`,
+Current probe validated on 2026-09-12 with Raven revision
+`1d7341fa64a66b514e5e68031b6d072d8140ea3a` on `codex/neoclr-target-resolution`,
+neoCLR starting revision `26068dc`,
 .NET SDK `11.0.100-rc.1.26425.128` and Mono.Cecil `0.11.6`.
 Use a separate Raven checkout at that revision. The local `global.json` pins the SDK;
 restore needs Raven's package feeds/dependencies and the .NET 11 reference pack.
@@ -79,4 +80,31 @@ The audit covers AssemblyRef, TypeRef and MemberRef lookup. It is not a signatur
 verifier or a hardened parser for hostile inputs. All fixtures remain metadata-only.
 See [the binary-profile decision](../../raven-binary-profile.md) for its limits and the
 planned CLI container/translation boundary. The slice 3 probe starts from neoCLR commit
-`7dfaca6`, with the same pinned Raven revision and SDK as slice 2.
+`7dfaca6`, with the same earlier Raven revision and SDK as slice 2.
+
+## Explicit-only compiler imports (slice 4)
+
+The current probe requires the Raven revision above, which adds `MetadataImportOptions`.
+Earlier slices 2–3 used `d92b02812740ae052f277c23151e9cc208f7672d`; that revision
+cannot compile the updated probe. Slice 2 began at neoCLR `0a60f9b`.
+
+The new option names `System.Runtime` as the metadata core and excludes implicit host
+assembly seeding, including the empty-reference-list host-core shortcut. With the explicit .NET reference pack plus Console fixture, target
+binding and emission succeed. Omitting Console now produces binding diagnostics and
+`GetTypeByMetadataName("System.Console")` returns null. The report retains the legacy
+mode's failing isolation result for comparison and records `ExplicitOnlyIsolationPassed`
+separately. Compiler execution still uses its normal host environment.
+
+This fixes the tested metadata-import fallback, not the entire target library. The
+probe still supplies .NET reference-pack declarations, and the retargeted artifact
+still has incomplete core definitions. The dependency audit remains necessary.
+
+Validation for this slice: 7 framework-targeting baseline tests passed; the final focused
+set of 15 framework/import tests passed, including missing core, missing Console after
+host cache warm-up, incremental policy changes, option copying and explicit-mode emission.
+The new constructor argument requires compiler API consumers to rebuild; it remains
+optional for existing source callers. No guest neoCLR execution is claimed.
+
+Raven's `scripts/test-target-framework-matrix.sh` also passed: Raven.Core and Raven.Macros
+built for .NET 10/11, and the representative .NET 10 macro and .NET 11 runtime-async
+programs executed successfully. No changes were needed to those samples.

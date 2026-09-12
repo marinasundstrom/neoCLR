@@ -138,3 +138,12 @@ that audits only supplied metadata dependencies, with positive and negative fixt
 This detects the target's known dependency gaps; it does not yet fix Raven's resolver or
 provide its complete core declarations. Those prerequisites, helper handling and input
 stack verification must be completed before the planned reader can execute HelloWorld.
+
+## Compiler isolation slice (2026-09-12)
+
+The updated [probe](experiments/raven-target/README.md) uses Raven's opt-in
+`MetadataImportOptions`. Explicit-only mode now excludes host resolver seeding and
+the empty-reference-list host-core shortcut, and prevents cross-policy incremental
+reuse. Console binds when supplied and is unavailable when omitted. This is tested
+with an explicit .NET reference pack; providing an independent neoCLR core library
+remains the next prerequisite, alongside generated-helper handling.
