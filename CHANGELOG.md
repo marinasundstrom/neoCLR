@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-12
 
+- Added CLR-compatible callvirt admission for nonvirtual nominal class instance methods,
+  including closed generic classes and no-result calls. Null receivers fault before
+  method entry; wrong types and byrefs to reference slots are rejected. This supports
+  Raven's existing emitted calls without rewriting the instruction. Four new regressions
+  and 49 related tests pass; nominal inheritance/virtual slots remain separate work.
+
 - Added an isolated Raven collection library profile generated from existing System
   algorithms: nominal ArrayList/state/iterator classes, ordinary interface receivers,
   managed array buffers and no-result mutation/disposal. Runtime tests cover aliasing,

@@ -153,3 +153,22 @@ Ordinary implementing-class references now implicitly convert to interface stora
 call/return contracts, preserving identity. See [reference assignability](raven-interface-contract.md#implicit-ordinary-reference-assignability-2026-09-12)
 for the implemented boundaries and remaining importer limitations. Managed byrefs to
 slots remain invariant, and downcasts still require explicit castclass.
+
+## Nonvirtual class calls through callvirt (2026-09-12)
+
+Raven emits callvirt for ordinary class instance calls even when a method has no
+virtual slot. neoCLR now admits that shape for nominal class receivers, including
+closed generic classes and no-result methods. It calls the resolved method after
+checking the ordinary reference is non-null. A byref to the class-reference slot is
+not the receiver and must first be loaded. Wrong closed types remain rejected.
+
+This restores the CLR behavior documented by [OpCodes.Callvirt](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.callvirt?view=net-10.0)
+(primary source consulted 2026-09-12): nonvirtual instance methods are valid targets,
+and null receivers fail before entry. neoCLR reports its terminal Fault rather than
+constructing a guest NullReferenceException. No new instruction or Raven-specific
+call rewriting is required. Class inheritance/overrides remain separately scoped;
+this does not enable nominal virtual slots. Existing interface and legacy virtual
+record dispatch paths are unchanged.
+
+Four regressions in `tests/generic_classes.rs` cover mutation/results, null checks
+before a receiver-independent body, mismatched closed types and byref-slot rejection.

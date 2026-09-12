@@ -247,3 +247,89 @@ ret
             .contains("default initialization")
     );
 }
+
+#[test]
+fn callvirt_invokes_nonvirtual_class_methods_with_noresult_mutation() {
+    let m = module(
+        r#"
+.function Main() -> Int32
+.local Cell<Int32> cell
+ldc.i4 1
+newobj Cell<Int32>
+stloc cell
+ldloc cell
+ldc.i4 42
+callvirt instance Cell<Int32>::Set(Int32)
+ldloc cell
+callvirt instance Cell<Int32>::Get()
+ret
+.end
+"#,
+    );
+    verify(&m).unwrap();
+    assert_eq!(run(&m, Limits::default()).unwrap().value, Value::Int32(42));
+}
+
+#[test]
+fn nonvirtual_class_callvirt_checks_null_before_entering_body() {
+    let m = module(
+        r#"
+.type class Empty
+.method instance Answer() -> Int32
+ldc.i4 42
+ret
+.end
+.end
+.function Main() -> Int32
+.local Empty empty
+ldloca empty
+initobj Empty
+ldloc empty
+callvirt instance Empty::Answer()
+ret
+.end
+"#,
+    );
+    verify(&m).unwrap();
+    assert!(
+        run(&m, Limits::default())
+            .unwrap_err()
+            .message
+            .contains("null class receiver")
+    );
+}
+
+#[test]
+fn nonvirtual_class_callvirt_rejects_wrong_closed_receiver() {
+    let m = module(
+        r#"
+.function Main() -> Int32
+ldc.bool false
+newobj Cell<Boolean>
+callvirt instance Cell<Int32>::Get()
+ret
+.end
+"#,
+    );
+    assert!(verify(&m).is_err());
+    assert!(run(&m, Limits::default()).is_err());
+}
+
+#[test]
+fn ordinary_class_callvirt_does_not_accept_a_byref_to_the_reference_slot() {
+    let m = module(
+        r#"
+.function Main() -> Int32
+.local Cell<Int32> cell
+ldc.i4 42
+newobj Cell<Int32>
+stloc cell
+ldloca cell
+callvirt instance Cell<Int32>::Get()
+ret
+.end
+"#,
+    );
+    assert!(verify(&m).is_err());
+    assert!(run(&m, Limits::default()).is_err());
+}

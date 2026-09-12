@@ -864,10 +864,16 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                         || (matches!(op, Op::CallVirtual(_))
                             && !crate::interfaces::is_contract(module, &callee)
                             && !callee.is_virtual
+                            && !(callee.instance
+                                && !callee.receiver_byref
+                                && callee
+                                    .owner
+                                    .as_ref()
+                                    .is_some_and(|owner| module.is_reference_type(owner)))
                             && !crate::delegates::is_contract(module, &callee))
                     {
                         return Err(Fault::new(
-                            "callvirt requires a delegate Invoke, interface declaration or virtual record method",
+                            "callvirt requires an ordinary class instance, delegate Invoke, interface declaration or virtual record method",
                         ));
                     }
                     if matches!(op, Op::Construct(_)) {
@@ -1892,6 +1898,27 @@ fn interpret_instructions(
                     crate::access::check_call(module, Some(&function), &contract)?;
                     let mut args = frame.args(module, &contract.argument_types()[1..])?;
                     if !crate::interfaces::is_contract(module, &contract) {
+                        if contract.instance
+                            && !contract.receiver_byref
+                            && contract
+                                .owner
+                                .as_ref()
+                                .is_some_and(|owner| module.is_reference_type(owner))
+                        {
+                            let receiver = frame
+                                .pop()?
+                                .for_storage_in(module, contract.owner.as_ref().unwrap())?;
+                            let Value::ObjectReference(object) = receiver else {
+                                return Err(Fault::new("null class receiver"));
+                            };
+                            object.reference.assigned()?;
+                            args.insert(0, Value::ObjectReference(object));
+                            if frames.len() >= limits.frames {
+                                return Err(Fault::new("frame limit exceeded"));
+                            }
+                            frames.push(Frame::new(contract, args)?);
+                            return Ok(None);
+                        }
                         let Value::SlotReference(reference) = frame.pop()? else {
                             return Err(Fault::new("class callvirt requires a managed reference"));
                         };
