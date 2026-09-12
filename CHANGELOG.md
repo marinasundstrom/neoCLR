@@ -32,6 +32,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Added it as the sixth runtime regression program, with provenance and run instructions.
   Observable default Result carriers remain unsupported and are rejected. Recorded the
   POC priorities: own library, Result/Option, generic Void, and Raven VS Code completion.
+  Extended the shared union import profile to Option<Int32>, case/carrier construction,
+  supported case initialization and integer equality. A Raven price lookup now uses
+  the real Option library and prints 42 and Product not found; seven runtime programs
+  and three additional Option rejection probes cover the slice. Raven constructor
+  emission support remains isolated on its feature branch.
 
 - Began nominal class reference semantics: `.type class` uses managed heap handles in
   ordinary class-typed storage, while managed byrefs still address slots. Assignment,

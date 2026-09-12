@@ -9,7 +9,7 @@ retain their historical limits. This is not general Raven or direct PE execution
 ## Reproduce
 
 Current probe validated on 2026-09-12 with Raven revision
-`17c9f8b826bd4cfc10a739f511db087214892b56` on `codex/neoclr-target-resolution`,
+`995a4c982fbf5df97b82e417c9319c2e87164461` on `codex/neoclr-target-resolution`,
 neoCLR starting revision `26068dc`,
 .NET SDK `11.0.100-rc.1.26425.128` and Mono.Cecil `0.11.6`.
 Use a separate Raven checkout at that revision. The local `global.json` pins the SDK;
@@ -244,8 +244,8 @@ The generated `CoreUnion.dll` passes dependency-closure checks. Both generic out
 extractors must be referenced; ordinary object type-test lowering is rejected. The
 compact checked-in outcome is `union-results.json`.
 
-`ResultImport` now produces `CoreUnion.neoil` and its source/provenance map.
-The runtime verification command above verifies and runs all six programs, including
+`UnionImport` now produces `CoreUnion.neoil` and its source/provenance map.
+The runtime verification command above verifies and runs all seven programs, including
 this Result sample. To run only the checked-in demo from the neoCLR repository root:
 
 ```bash
@@ -275,3 +275,36 @@ and map Boolean results to CLI Int32 stack values. Console adapters consume lega
 inhabited Void returns. Direct calls to the recognition-only `Value` property are
 not supported. See the [Result import contract](../../raven-target-experiment.md#result-execution-profile-2026-09-12)
 for the limits and remaining POC work.
+
+## Running the Option demo (2026-09-12)
+
+`samples/library-option.rvn` defines a small application lookup, `FindPrice`, returning
+`System.Option<int>`. It constructs Some(42) for product 7 and None for a missing
+product. Case/carrier constructors and extraction bind to the actual neoCLR Option
+library; FindPrice itself is application code, not a new runtime API.
+
+The reproduction command emits and imports `CoreOption.dll`. Run the checked-in
+artifact from the neoCLR repository root:
+
+```bash
+cargo run -- verify docs/experiments/raven-target/imported/CoreOption.neoil
+cargo run -- run docs/experiments/raven-target/imported/CoreOption.neoil
+```
+
+Expected output:
+
+```text
+42
+Product not found
+=> Void
+```
+
+`verify_runtime.py` now verifies seven programs. The Option probe rejects unwritten
+carrier reads, wrong out cases, and a wrong constructor case. `option-results.json`
+records emission and these checks; runtime results remain in `runtime-results.json`.
+
+The importer was renamed from ResultImport to UnionImport, with the same control-flow
+and lifetime checks. Its newobj bindings admit only the selected real Option constructors;
+case local defaults remain supported, while default carrier reads are rejected. It does not add
+general object construction, application classes, or a new runtime instruction. Generic
+Void and VS Code project completion remain the next POC steps.

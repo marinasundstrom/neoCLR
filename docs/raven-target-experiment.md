@@ -410,7 +410,7 @@ platform surface.
 | --- | --- | --- |
 | Familiar runtime and own library | Raven Math/Console and Result program execute on neoCLR | Package a small cohesive sample/project |
 | Result-based errors | Abs success and overflow execute | Broaden only as the sample needs |
-| Option-based absence | Existing neoCLR library; not yet a Raven execution demo | Add a real Option API and Some/None flow |
+| Option-based absence | Raven price lookup constructs/extracts real library Some/None values and executes | Incorporate the lookup into the cohesive demo |
 | Generic Void | Existing platform intent; ordinary no-result calls work | Prove a Raven-targeted closed generic Void case; do not equate this with no-result methods |
 | VS Code completion | Compiler completion probe uses target-only declarations | Wire the Raven project/language server to the same references and verify completions in VS Code |
 
@@ -418,3 +418,37 @@ The next priority is the Option demo, followed by generic Void and the project/e
 integration. Address runtime gaps when these scenarios expose them. The POC does not
 require a full debugger or broad .NET application compatibility. This ordering is the
 assistant's implementation plan in response to the author's acceptance criteria.
+
+## Option lookup execution (2026-09-12)
+
+The application price lookup in `samples/library-option.rvn` returns the actual
+`System.Option<Int32>` carrier. Product 7 returns Some(42); product 99 returns None.
+Both are matched and printed after Raven emission and neoCLR execution. This adds
+application-to-library construction and a returned carrier to the earlier Result
+scenario. It does not claim a new lookup API exists in the runtime library.
+
+The `.NET/CLI` baseline here is value-type construction through newobj, storage into
+locals, and managed-address receiver calls, using the same instruction family as
+the prior Result profile. No runtime opcode or metadata extension was added. The
+neoCLR-owned importer is now named `UnionImport`; selected constructor references map
+to wrappers invoking the real Option.Some<Int32>, Option.None and Option<Int32>
+constructors. Integer ceq results are projected to CLI Int32 stack values. Admitted
+case locals retain their defaults; default carrier observation remains rejected
+rather than being silently interpreted as None. This restriction is a preview profile
+limit, not a claim that CLI default values behave differently.
+
+Raven required a small feature-branch extension to its target metadata emission:
+constructor tokens now follow the existing method-proxy approach. The final artifact
+retains target constructor signatures and contains no proxy types. This avoids mixed
+host/metadata generic arguments and Reflection.Emit's failure to encode the encountered
+modified generic constructor parameter. Reference-only generic constructor regression
+tests cover both the payload and carrier shape; the probe's dependency closure and
+actual neoCLR execution provide the end-to-end check.
+
+The payoff is a self-contained absence-handling demo without null, exceptions, or a
+bespoke API added solely for the demo. Costs remain the bounded reference declarations
+and temporary binding adapters; arbitrary constructors and generic parameters are not
+newly supported. Validation now includes seven runtime programs, the Rust artifact
+regression, and three new mutation checks for unwritten carriers, mismatched out cases,
+and a mismatched constructor argument. Generic Void and actual VS Code completion
+remain outstanding. See [Option run instructions](experiments/raven-target/README.md#running-the-option-demo-2026-09-12).

@@ -1,0 +1,23 @@
+import System.*
+import System.Console.*
+
+func FindPrice(product: int) -> Option<int> {
+    if product == 7 {
+        return Option<int>(Option.Some<int>(42))
+    }
+    return Option<int>(Option.None())
+}
+
+func ShowPrice(product: int) {
+    let price = FindPrice(product)
+    if price is Option.Some<int> found {
+        WriteLine(found.Value)
+    } else if price is Option.None missing {
+        WriteLine("Product not found")
+    }
+}
+
+func Main() {
+    ShowPrice(7)
+    ShowPrice(99)
+}

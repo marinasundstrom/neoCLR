@@ -215,7 +215,13 @@ using (var unionAssembly = AssemblyDefinition.ReadAssembly(Path.Combine(output, 
 }
 var unionClosureErrors = ClosureAudit.Inspect(Path.Combine(output, "CoreUnion.dll"), unionCore);
 if (unionClosureErrors.Length != 0) throw new Exception(string.Join("\n", unionClosureErrors));
-ResultImport.Write(Path.Combine(output, "CoreUnion.dll"), unionCore, Path.Combine(output, "CoreUnion.neoil"));
+UnionImport.Write(Path.Combine(output, "CoreUnion.dll"), unionCore, Path.Combine(output, "CoreUnion.neoil"));
+var optionImage = Compile("CoreOption", File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "samples", "library-option.rvn")),
+    [MetadataReference.CreateFromFile(unionCore)], AssemblyName.GetAssemblyName(unionCore), true, CoreDeclarations.Identity);
+var optionClosureErrors = ClosureAudit.Inspect(Path.Combine(output, "CoreOption.dll"), unionCore);
+if (optionClosureErrors.Length != 0) throw new Exception(string.Join("\n", optionClosureErrors));
+UnionImport.Write(Path.Combine(output, "CoreOption.dll"), unionCore, Path.Combine(output, "CoreOption.neoil"));
+var optionImportRejections = OptionImportChecks.Run(Path.Combine(output, "CoreOption.dll"), unionCore, output);
 var resultImportRejections = ResultImportChecks.Run(Path.Combine(output, "CoreUnion.dll"), unionCore, output);
 var report = new
 {
@@ -235,6 +241,8 @@ var report = new
     Scope = "emission plus bounded static and Result imports; execute generated neoIL separately against neoCLR System",
     UnionProbe = new { Scope = "metadata binding, emission and bounded Result import; execute generated neoIL separately",
         BindingPassed = true, InvalidArgumentDiagnostics = badUnionDiagnostics, DeclarationClosureErrors = unionErrors, Emission = unionImage, ApplicationClosureErrors = unionClosureErrors },
+    OptionImportRejections = optionImportRejections,
+    OptionProbe = new { Emission = optionImage, ApplicationClosureErrors = optionClosureErrors },
     ResultImportRejections = resultImportRejections,
     StaticImportRejections = staticImportRejections,
     TargetCompletions = targetCompletions,

@@ -1,13 +1,7 @@
 {
   "RecordedDate": "2026-09-12",
   "RavenRevision": "995a4c982fbf5df97b82e417c9319c2e87164461",
-  "UnionProbe": {
-    "Scope": "metadata binding, emission and bounded Result import; execute generated neoIL separately",
-    "BindingPassed": true,
-    "InvalidArgumentDiagnostics": [
-      "error RAV1503: Cannot convert from 'string' to 'int'"
-    ],
-    "DeclarationClosureErrors": [],
+  "OptionProbe": {
     "Emission": {
       "References": [
         "NeoCLR.CoreProbe, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
@@ -56,19 +50,41 @@
           "ExceptionRegions": 0
         },
         {
-          "Signature": "System.Void NamespaceMembers::Show(System.Int32)",
+          "Signature": "System.Option`1<System.Int32> NamespaceMembers::FindPrice(System.Int32)",
           "Instructions": [
             "nop",
             "nop",
             "ldarg.0",
-            "call System.Result`2<System.Int32,System.OverflowError> System.Math::Abs(System.Int32) scope=NeoCLR.CoreProbe",
+            "ldc.i4.7",
+            "ceq",
+            "brtrue IL_0010: nop",
+            "br IL_001e: nop",
+            "nop",
+            "ldc.i4.s 42",
+            "newobj System.Void System.Option/Some`1<System.Int32>::.ctor(!0) scope=NeoCLR.CoreProbe",
+            "newobj System.Void System.Option`1<System.Int32>::.ctor(System.Option/Some`1<!0>) scope=NeoCLR.CoreProbe",
+            "ret",
+            "nop",
+            "newobj System.Void System.Option/None::.ctor() scope=NeoCLR.CoreProbe",
+            "newobj System.Void System.Option`1<System.Int32>::.ctor(System.Option/None) scope=NeoCLR.CoreProbe",
+            "ret"
+          ],
+          "ExceptionRegions": 0
+        },
+        {
+          "Signature": "System.Void NamespaceMembers::ShowPrice(System.Int32)",
+          "Instructions": [
+            "nop",
+            "nop",
+            "ldarg.0",
+            "call System.Option`1<System.Int32> NamespaceMembers::FindPrice(System.Int32) scope=CoreOption",
             "stloc.0",
             "nop",
             "ldloc.0",
             "stloc.3",
             "ldloca.s V_3",
             "ldloca.s V_4",
-            "call System.Boolean System.Result`2<System.Int32,System.OverflowError>::TryGetValue(System.Result/Ok`1<!0>&) scope=NeoCLR.CoreProbe",
+            "call System.Boolean System.Option`1<System.Int32>::TryGetValue(System.Option/Some`1<!0>&) scope=NeoCLR.CoreProbe",
             "brfalse IL_0023: ldc.i4.0",
             "ldloc.s V_4",
             "stloc.1",
@@ -79,7 +95,7 @@
             "br IL_0041: nop",
             "nop",
             "ldloca.s V_1",
-            "call !0 System.Result/Ok`1<System.Int32>::get_Value() scope=NeoCLR.CoreProbe",
+            "call !0 System.Option/Some`1<System.Int32>::get_Value() scope=NeoCLR.CoreProbe",
             "call System.Void System.Console::WriteLine(System.Int32) scope=NeoCLR.CoreProbe",
             "br IL_0073: nop",
             "nop",
@@ -88,7 +104,7 @@
             "stloc.s V_5",
             "ldloca.s V_5",
             "ldloca.s V_6",
-            "call System.Boolean System.Result`2<System.Int32,System.OverflowError>::TryGetValue(System.Result/Error`1<!1>&) scope=NeoCLR.CoreProbe",
+            "call System.Boolean System.Option`1<System.Int32>::TryGetValue(System.Option/None&) scope=NeoCLR.CoreProbe",
             "brfalse IL_005c: ldc.i4.0",
             "ldloc.s V_6",
             "stloc.2",
@@ -98,7 +114,7 @@
             "brtrue IL_0067: nop",
             "br IL_0072: nop",
             "nop",
-            "ldstr Overflow",
+            "ldstr Product not found",
             "call System.Void System.Console::WriteLine(System.String) scope=NeoCLR.CoreProbe",
             "nop",
             "nop",
@@ -112,11 +128,11 @@
           "Instructions": [
             "nop",
             "nop",
-            "ldc.i4.s -42",
-            "call System.Void NamespaceMembers::Show(System.Int32) scope=CoreUnion",
+            "ldc.i4.7",
+            "call System.Void NamespaceMembers::ShowPrice(System.Int32) scope=CoreOption",
             "nop",
-            "ldc.i4 -2147483648",
-            "call System.Void NamespaceMembers::Show(System.Int32) scope=CoreUnion",
+            "ldc.i4.s 99",
+            "call System.Void NamespaceMembers::ShowPrice(System.Int32) scope=CoreOption",
             "nop",
             "ret"
           ],
@@ -153,23 +169,20 @@
         "System.Boolean scope=NeoCLR.CoreProbe",
         "System.Console scope=NeoCLR.CoreProbe",
         "System.Int32 scope=NeoCLR.CoreProbe",
-        "System.Math scope=NeoCLR.CoreProbe",
         "System.Object scope=NeoCLR.CoreProbe",
-        "System.OverflowError scope=NeoCLR.CoreProbe",
-        "System.Result scope=NeoCLR.CoreProbe",
-        "System.Result/Error`1 scope=NeoCLR.CoreProbe",
-        "System.Result/Ok`1 scope=NeoCLR.CoreProbe",
-        "System.Result`2 scope=NeoCLR.CoreProbe",
+        "System.Option scope=NeoCLR.CoreProbe",
+        "System.Option/None scope=NeoCLR.CoreProbe",
+        "System.Option/Some`1 scope=NeoCLR.CoreProbe",
+        "System.Option`1 scope=NeoCLR.CoreProbe",
         "System.String scope=NeoCLR.CoreProbe",
         "System.ValueType scope=NeoCLR.CoreProbe"
       ]
     },
     "ApplicationClosureErrors": []
   },
-  "ResultImportRejections": {
-    "ResultDefaultCarrier": "Read of uninitialized or unsupported default local.",
-    "ResultUnassignedReceiver": "Read through uninitialized carrier address.",
-    "ResultMergeType": "Incompatible branch stack merge.",
-    "ResultWrongOutCase": "Input stack type mismatch."
+  "OptionImportRejections": {
+    "OptionDefaultCarrier": "Read of uninitialized or unsupported default local.",
+    "OptionWrongOutCase": "Input stack type mismatch.",
+    "OptionWrongConstructorCase": "Input stack type mismatch."
   }
 }

@@ -1,7 +1,7 @@
 {
-  "Profile": "result-int32-overflow-v1",
-  "ApplicationSha256": "36C02DF6410EF272BC98A58496CE0F214C3AA8D10282D07F341051FE17BB1B87",
-  "CoreSha256": "DE26091A42F67C9A48E10BC4ACA4E66170077DDB55ABCFB3837F271179C1B256",
+  "Profile": "result-option-int32-v2",
+  "ApplicationSha256": "6967A07FE63BDEDA1B59C6C4636166258ADE01BB3EFCC1293B05A951D13554BF",
+  "CoreSha256": "25A4B02EC51B6DC2361D659DAC5A113FD884F4D9A603C8BC5D35C313D9ADDE96",
   "ReachableMethods": [
     100663301,
     100663302
@@ -278,5 +278,5 @@
       "OutputLine": 118
     }
   ],
-  "Scope": "Bounded generic Result bindings; CFG stack/definite-assignment checked; observable default carrier rejected; no guest declaration bodies executed."
+  "Scope": "Bounded generic Result/Option bindings; CFG stack/definite-assignment checked; observable default carriers rejected; no guest declaration bodies executed."
 }

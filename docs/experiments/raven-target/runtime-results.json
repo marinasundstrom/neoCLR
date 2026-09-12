@@ -28,5 +28,10 @@
     "stdout": "42\nOverflow\n=> Void\n",
     "stderr": "",
     "verified": true
+  },
+  "CoreOption": {
+    "stdout": "42\nProduct not found\n=> Void\n",
+    "stderr": "",
+    "verified": true
   }
 }

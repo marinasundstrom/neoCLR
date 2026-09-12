@@ -1,8 +1,23 @@
-// Emission-only contract probe. These bodies must never execute or enter the admitted
-// runtime catalog. TryGetValue projects the current neoCLR Result.TryGet operation.
+// Metadata declarations only: these bodies never execute. The bounded importer binds
+// selected signatures to real library methods; TryGetValue projects TryGet.
 static class UnionDeclarations
 {
     public const string Source = """
+        public static class Option {
+            public struct None { public None() { } }
+            public struct Some<T> {
+                public Some(T value) { Value = value; }
+                public T Value { get; }
+            }
+        }
+        [System.Runtime.CompilerServices.Union]
+        public struct Option<T> {
+            public object Value => default;
+            public Option(Option.Some<T> value) { }
+            public Option(Option.None value) { }
+            public bool TryGetValue(out Option.Some<T> value) { value = default; return false; }
+            public bool TryGetValue(out Option.None value) { value = default; return false; }
+        }
         public struct OverflowError { }
         public static class Result {
             public struct Ok<T> {

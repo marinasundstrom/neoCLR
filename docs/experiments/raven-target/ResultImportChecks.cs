@@ -33,7 +33,7 @@ static class ResultImportChecks
             var path = Path.Combine(output, test.Name + ".dll");
             var destination = Path.Combine(output, test.Name + ".neoil");
             File.WriteAllBytes(path, bytes);
-            try { ResultImport.Write(path, core, destination); }
+            try { UnionImport.Write(path, core, destination); }
             catch (InvalidDataException error) when (error.Message.Contains(test.Diagnostic))
             {
                 if (File.Exists(destination)) throw new Exception("Rejected input produced executable output.");
