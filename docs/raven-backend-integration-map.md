@@ -151,3 +151,12 @@ Still unverified: exact HelloWorld metadata/body inventory, minimal reference-fa
 closure required by MetadataLoadContext, retargeted Console binding, default embedded
 helper set for that input, and whether PE emission can represent the selected neoCLR
 contracts without deeper changes. These are the concrete questions for slice 2.
+
+## Follow-up: tested emission probe (2026-09-12)
+
+Slice 2 now provides the [minimal contract and results](raven-minimal-target.md).
+The targeted compiler build and Console retargeting probe passed. The missing-library
+negative exposed host fallback; the output also retains a fixture mscorlib dependency.
+This supplies the HelloWorld inventory left open above, without establishing a closed
+core library, target isolation or runtime execution. Existing retargeting xUnit tests
+were not run; the standalone control/fixture probe is the executed baseline.

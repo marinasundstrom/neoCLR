@@ -121,3 +121,11 @@ and explicitly distinguish expected Result errors from terminal Faults.
 
 Success means an existing compiler demonstrably targets our runtime and library.
 It does not mean all its language features work or that migration requires no changes.
+
+## Slice 2 evidence (2026-09-12)
+
+The [minimal target contract](raven-minimal-target.md) and
+[emission probe](experiments/raven-target/README.md) now record an executable compiler
+baseline, target Console binding and the actual PE inventory. Missing-library isolation
+fails and core declarations remain incomplete. Slice 3 must resolve those constraints
+alongside its binary-format and no-result-call decision; no target execution is claimed.

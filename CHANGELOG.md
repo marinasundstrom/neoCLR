@@ -11,7 +11,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Added the first Raven integration map, pinned to the inspected compiler revision.
   Identified existing core-library retargeting, reflection/PE emission dependencies,
   framework discovery and semantic gaps in Void/Unit and error projections. Documented
-  the next minimal-target probes; no Raven changes or binary execution are claimed.
+  the next minimal-target probes. Added a reproducible emission probe and minimal
+  contract map: target Console binding succeeds, while omitted-library resolution
+  exposes host fallback and core declarations remain incomplete. Captured metadata,
+  diagnostics and call-boundary alternatives; no Raven changes or binary execution
+  are claimed.
 
 - Documented the Raven target/binary-artifact experiment on its own branch: inspect
   the existing compiler, choose an evidence-backed format/library contract, and

@@ -1102,6 +1102,28 @@ bodies were inspected; no Raven build/test or target execution was claimed. Rave
 not modified. The next slice should define the minimal library/call contract and run
 an emission/reference-facade probe before selecting a binary format.
 
+## 31. Minimal Raven target probe — recorded 2026-09-12
+
+**Author direction:** Continued the experiment after its backend investigation. The
+standing direction is to test existing compilers against neoCLR's own library and
+binary surface, with the runtime as the primary focus.
+
+**Assistant action:** Built the pinned Raven compiler and added an emission-only
+Console declaration probe plus a normal .NET control. Inspected the output references,
+helper definitions, methods and entry point; tested nonexistent members and omission
+of the Console library. Raven source was not modified.
+
+**Outcome:** Target Console binding and core-reference rewriting worked. The omitted
+library still resolved through the host environment, so the isolation negative failed.
+The declaration fixture remains incomplete and output retains mscorlib. These findings
+are recorded in the [minimal contract](raven-minimal-target.md) and reproducible report;
+no neoCLR execution or complete compiler target is claimed.
+
+**Assistant proposal, still open:** Evaluate signature-driven CLI-to-runtime translation
+for no-result calls alongside the binary container decision. This may preserve the
+existing writer and inhabited Void model, but requires explicit validation and debugging
+mapping. The author has not selected that implementation or changed class/value defaults.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

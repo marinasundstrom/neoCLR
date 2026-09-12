@@ -1,0 +1,295 @@
+{
+  "Scope": "emission-only; fixture is not neoCLR System and generated code was not executed",
+  "FrameworkReferences": 176,
+  "Control": {
+    "References": [
+      "System.Console, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
+      "System.Runtime, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
+    ],
+    "Types": [
+      "\u003CModule\u003E",
+      "System.Unit",
+      "NamespaceMembers",
+      "System.Runtime.CompilerServices.NullableContextAttribute",
+      "Program"
+    ],
+    "Methods": [
+      {
+        "Signature": "System.Boolean System.Unit::Equals(System.Unit)",
+        "Instructions": [
+          "ldc.i4.1",
+          "ret"
+        ],
+        "ExceptionRegions": 0
+      },
+      {
+        "Signature": "System.Boolean System.Unit::Equals(System.Object)",
+        "Instructions": [
+          "ldarg.1",
+          "isinst System.Unit",
+          "ldnull",
+          "cgt.un",
+          "ret"
+        ],
+        "ExceptionRegions": 0
+      },
+      {
+        "Signature": "System.Int32 System.Unit::GetHashCode()",
+        "Instructions": [
+          "ldc.i4.0",
+          "ret"
+        ],
+        "ExceptionRegions": 0
+      },
+      {
+        "Signature": "System.String System.Unit::ToString()",
+        "Instructions": [
+          "ldstr ()",
+          "ret"
+        ],
+        "ExceptionRegions": 0
+      },
+      {
+        "Signature": "System.Void NamespaceMembers::Main()",
+        "Instructions": [
+          "nop",
+          "nop",
+          "ldstr Hello from Raven on neoCLR",
+          "call System.Void System.Console::WriteLine(System.String) scope=System.Console",
+          "nop",
+          "ret"
+        ],
+        "ExceptionRegions": 0
+      },
+      {
+        "Signature": "System.Void System.Runtime.CompilerServices.NullableContextAttribute::.ctor(System.Byte)",
+        "Instructions": [
+          "ldarg.0",
+          "call System.Void System.Attribute::.ctor() scope=System.Runtime",
+          "ldarg.0",
+          "ldarg.1",
+          "stfld System.Byte System.Runtime.CompilerServices.NullableContextAttribute::Flag",
+          "ret"
+        ],
+        "ExceptionRegions": 0
+      },
+      {
+        "Signature": "System.Void Program::.ctor()",
+        "Instructions": [
+          "ldarg.0",
+          "call System.Void System.Object::.ctor() scope=System.Runtime",
+          "ret"
+        ],
+        "ExceptionRegions": 0
+      }
+    ],
+    "MissingFacadeTypes": [],
+    "EntryPoint": "System.Void NamespaceMembers::Main()",
+    "TypeReferences": [
+      "System.Attribute scope=System.Runtime",
+      "System.AttributeTargets scope=System.Runtime",
+      "System.AttributeUsageAttribute scope=System.Runtime",
+      "System.Console scope=System.Console",
+      "System.Object scope=System.Runtime",
+      "System.ValueType scope=System.Runtime"
+    ]
+  },
+  "Target": {
+    "References": [
+      "NeoCLR.Probe.System, Version=0.0.0.1, Culture=neutral, PublicKeyToken=null",
+      "mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+    ],
+    "Types": [
+      "\u003CModule\u003E",
+      "System.Unit",
+      "NamespaceMembers",
+      "System.Runtime.CompilerServices.NullableContextAttribute",
+      "Program"
+    ],
+    "Methods": [
+      {
+        "Signature": "System.Boolean System.Unit::Equals(System.Unit)",
+        "Instructions": [
+          "ldc.i4.1",
+          "ret"
+        ],
+        "ExceptionRegions": 0
+      },
+      {
+        "Signature": "System.Boolean System.Unit::Equals(System.Object)",
+        "Instructions": [
+          "ldarg.1",
+          "isinst System.Unit",
+          "ldnull",
+          "cgt.un",
+          "ret"
+        ],
+        "ExceptionRegions": 0
+      },
+      {
+        "Signature": "System.Int32 System.Unit::GetHashCode()",
+        "Instructions": [
+          "ldc.i4.0",
+          "ret"
+        ],
+        "ExceptionRegions": 0
+      },
+      {
+        "Signature": "System.String System.Unit::ToString()",
+        "Instructions": [
+          "ldstr ()",
+          "ret"
+        ],
+        "ExceptionRegions": 0
+      },
+      {
+        "Signature": "System.Void NamespaceMembers::Main()",
+        "Instructions": [
+          "nop",
+          "nop",
+          "ldstr Hello from Raven on neoCLR",
+          "call System.Void System.Console::WriteLine(System.String) scope=NeoCLR.Probe.System",
+          "nop",
+          "ret"
+        ],
+        "ExceptionRegions": 0
+      },
+      {
+        "Signature": "System.Void System.Runtime.CompilerServices.NullableContextAttribute::.ctor(System.Byte)",
+        "Instructions": [
+          "ldarg.0",
+          "call System.Void System.Attribute::.ctor() scope=NeoCLR.Probe.System",
+          "ldarg.0",
+          "ldarg.1",
+          "stfld System.Byte System.Runtime.CompilerServices.NullableContextAttribute::Flag",
+          "ret"
+        ],
+        "ExceptionRegions": 0
+      },
+      {
+        "Signature": "System.Void Program::.ctor()",
+        "Instructions": [
+          "ldarg.0",
+          "call System.Void System.Object::.ctor() scope=NeoCLR.Probe.System",
+          "ret"
+        ],
+        "ExceptionRegions": 0
+      }
+    ],
+    "MissingFacadeTypes": [
+      "System.Attribute",
+      "System.AttributeTargets",
+      "System.AttributeUsageAttribute",
+      "System.Object",
+      "System.ValueType"
+    ],
+    "EntryPoint": "System.Void NamespaceMembers::Main()",
+    "TypeReferences": [
+      "System.Attribute scope=NeoCLR.Probe.System",
+      "System.AttributeTargets scope=NeoCLR.Probe.System",
+      "System.AttributeUsageAttribute scope=NeoCLR.Probe.System",
+      "System.Console scope=NeoCLR.Probe.System",
+      "System.Object scope=NeoCLR.Probe.System",
+      "System.String scope=Target",
+      "System.ValueType scope=NeoCLR.Probe.System"
+    ]
+  },
+  "MissingMemberErrors": [
+    "error RAV0103: \u0027MissingWriteLine\u0027 is not in scope."
+  ],
+  "MissingLibraryErrors": [],
+  "MissingLibraryIsolationPassed": false,
+  "MissingLibraryImage": {
+    "References": [
+      "System.Console, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
+      "System.Runtime, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
+    ],
+    "Types": [
+      "\u003CModule\u003E",
+      "System.Unit",
+      "NamespaceMembers",
+      "System.Runtime.CompilerServices.NullableContextAttribute",
+      "Program"
+    ],
+    "Methods": [
+      {
+        "Signature": "System.Boolean System.Unit::Equals(System.Unit)",
+        "Instructions": [
+          "ldc.i4.1",
+          "ret"
+        ],
+        "ExceptionRegions": 0
+      },
+      {
+        "Signature": "System.Boolean System.Unit::Equals(System.Object)",
+        "Instructions": [
+          "ldarg.1",
+          "isinst System.Unit",
+          "ldnull",
+          "cgt.un",
+          "ret"
+        ],
+        "ExceptionRegions": 0
+      },
+      {
+        "Signature": "System.Int32 System.Unit::GetHashCode()",
+        "Instructions": [
+          "ldc.i4.0",
+          "ret"
+        ],
+        "ExceptionRegions": 0
+      },
+      {
+        "Signature": "System.String System.Unit::ToString()",
+        "Instructions": [
+          "ldstr ()",
+          "ret"
+        ],
+        "ExceptionRegions": 0
+      },
+      {
+        "Signature": "System.Void NamespaceMembers::Main()",
+        "Instructions": [
+          "nop",
+          "nop",
+          "ldstr Hello from Raven on neoCLR",
+          "call System.Void System.Console::WriteLine(System.String) scope=System.Console",
+          "nop",
+          "ret"
+        ],
+        "ExceptionRegions": 0
+      },
+      {
+        "Signature": "System.Void System.Runtime.CompilerServices.NullableContextAttribute::.ctor(System.Byte)",
+        "Instructions": [
+          "ldarg.0",
+          "call System.Void System.Attribute::.ctor() scope=System.Runtime",
+          "ldarg.0",
+          "ldarg.1",
+          "stfld System.Byte System.Runtime.CompilerServices.NullableContextAttribute::Flag",
+          "ret"
+        ],
+        "ExceptionRegions": 0
+      },
+      {
+        "Signature": "System.Void Program::.ctor()",
+        "Instructions": [
+          "ldarg.0",
+          "call System.Void System.Object::.ctor() scope=System.Runtime",
+          "ret"
+        ],
+        "ExceptionRegions": 0
+      }
+    ],
+    "MissingFacadeTypes": [],
+    "EntryPoint": "System.Void NamespaceMembers::Main()",
+    "TypeReferences": [
+      "System.Attribute scope=System.Runtime",
+      "System.AttributeTargets scope=System.Runtime",
+      "System.AttributeUsageAttribute scope=System.Runtime",
+      "System.Console scope=System.Console",
+      "System.Object scope=System.Runtime",
+      "System.ValueType scope=System.Runtime"
+    ]
+  }
+}
