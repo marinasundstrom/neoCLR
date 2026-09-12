@@ -477,23 +477,44 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 || !definition.implements.is_empty()
                 || !definition.generic_parameters.is_empty()
                 || definition.is_abstract
-                || definition.enum_info.is_some()
-                || module.functions.iter().any(|f| {
-                    f.instance
-                        && f.owner.as_ref().is_some_and(|owner| {
-                            owner.definition_name() == Some(definition.name.as_str())
-                        })
-                }))
+                || definition.enum_info.is_some())
         {
             return Err(Fault::new(
-                "class semantics currently require non-generic records without inheritance or instance methods",
+                "class semantics currently require non-generic records without inheritance",
             ));
         }
     }
     for function in &module.functions {
+        let class_owner = function
+            .owner
+            .as_ref()
+            .is_some_and(|owner| module.is_reference_type(owner));
+        if class_owner
+            && (function.receiver_byref
+                || function.receiver_readonly
+                || function.is_virtual
+                || function.is_override
+                || function.is_abstract
+                || function.is_internal_call()
+                || function.pinvoke.is_some()
+                || !function.interface_implementations.is_empty()
+                || !function.generic_parameters.is_empty())
+        {
+            return Err(Fault::new(
+                "class methods currently require ordinary non-virtual IL receivers",
+            ));
+        }
+        if class_owner
+            && function.name.ends_with("..ctor")
+            && (!function.instance || !function.no_result)
+        {
+            return Err(Fault::new(
+                "class constructors require instance no-result signatures",
+            ));
+        }
         if function.no_result
             && (function.returns != Type::Void
-                || function.instance
+                || (function.instance && !class_owner)
                 || function.is_virtual
                 || function.is_override
                 || function.is_abstract
@@ -503,7 +524,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 || !function.interface_implementations.is_empty())
         {
             return Err(Fault::new(
-                "no-result methods currently require static, non-generic IL bodies with Void metadata",
+                "no-result methods require non-generic IL bodies with Void metadata and static or class receivers",
             ));
         }
         crate::metadata::validate_slot_names(
@@ -821,6 +842,17 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                         check(ty)?;
                     }
                     let callee = resolve(module, target)?;
+                    if !matches!(op, Op::Construct(_))
+                        && callee.name.ends_with("..ctor")
+                        && callee
+                            .owner
+                            .as_ref()
+                            .is_some_and(|owner| module.is_reference_type(owner))
+                    {
+                        return Err(Fault::new(
+                            "direct class constructor calls/chaining are not implemented",
+                        ));
+                    }
                     if callee.is_abstract && !matches!(op, Op::CallVirtual(_)) {
                         return Err(Fault::new("abstract methods require virtual dispatch"));
                     }
@@ -1140,6 +1172,7 @@ struct Frame {
     trace_pc: usize,
     args: Vec<crate::slots::Cell>,
     constructing: bool,
+    construction_object: Option<crate::value::ObjectReference>,
     construction_receiver: Option<crate::SlotReference>,
     construction_storage: Option<crate::slots::Cell>,
     constructor_chained: bool,
@@ -1206,6 +1239,7 @@ impl Frame {
                 .map(|v| crate::slots::Slot::new(v.ty(), Some(v)))
                 .collect(),
             constructing: false,
+            construction_object: None,
             construction_receiver: None,
             construction_storage: None,
             constructor_chained: false,
@@ -1506,11 +1540,15 @@ fn interpret_instructions(
         let context = function.name.clone();
         // Collect only between instructions, before allocation operands leave roots.
         if (matches!(op, Op::HeapNew | Op::NewArray(_) | Op::AllocateArray(_))
-            || matches!(op, Op::New(ty) if module.is_reference_type(ty)))
+            || matches!(op, Op::New(ty) if module.is_reference_type(ty))
+            || matches!(op, Op::Construct(target) if target.owner.as_ref().is_some_and(|ty| module.is_reference_type(ty))))
             && heap.len() >= collection_threshold
         {
             let mut roots = vec![];
             for frame in frames.iter() {
+                if let Some(object) = &frame.construction_object {
+                    roots.push(object.allocation_id());
+                }
                 for cell in frame
                     .args
                     .iter()
@@ -2005,7 +2043,30 @@ fn interpret_instructions(
                     let byref = callee.receiver_byref;
                     let definitions = module.instantiated_fields(&owner)?;
                     let mut child = Frame::new(callee, args)?;
-                    if byref {
+                    if module.is_reference_type(&owner) {
+                        if heap.len() >= limits.heap_objects {
+                            return Err(Fault::new("heap object limit exceeded"));
+                        }
+                        let fields = definitions
+                            .iter()
+                            .map(|field| crate::initialization::default_value(module, &field.ty))
+                            .collect::<Result<Vec<_>, _>>()?;
+                        let identity = heap.allocate(Value::Object {
+                            ty: owner.clone(),
+                            fields,
+                        })?;
+                        let object = crate::value::ObjectReference {
+                            reference: heap.address(identity)?,
+                        };
+                        child.args.insert(
+                            0,
+                            crate::slots::Slot::new(
+                                owner,
+                                Some(Value::ObjectReference(object.clone())),
+                            ),
+                        );
+                        child.construction_object = Some(object);
+                    } else if byref {
                         let storage = crate::slots::Slot::construction(
                             owner.clone(),
                             definitions
@@ -2188,9 +2249,12 @@ fn interpret_instructions(
                     for pointer in &frame.allocations {
                         memory.release_local(pointer)?;
                     }
+                    let constructed_object = frame.construction_object.clone();
+                    let produces_value = !function.no_result || constructed_object.is_some();
+                    let value = constructed_object.map_or(value, Value::ObjectReference);
                     frames.pop();
                     if let Some(caller) = frames.last_mut() {
-                        if !function.no_result {
+                        if produces_value {
                             caller.stack.push(value.on_stack());
                         }
                     } else {
@@ -2339,8 +2403,6 @@ fn interpret_instructions(
                             .ty
                             .clone();
                         object.reference.write_field(*i, target, value)?;
-                        // Preserve the existing record-update IR result until CIL stfld lowering lands.
-                        frame.stack.push(Value::ObjectReference(object));
                         return Ok(None);
                     }
                     if let Value::SlotReference(reference) = receiver {

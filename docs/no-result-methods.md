@@ -32,9 +32,9 @@ existing `call` and `ret` instructions select their behavior from the method def
 no new instruction is introduced. A no-result `ret` requires an empty evaluation stack.
 Both the verifier and interpreter enforce the distinction. Frame cleanup still runs.
 
-The first supported subset is static/free, non-generic IL methods. Instance methods,
-constructors, virtual/interface/delegate contracts, InternalCall and P/Invoke declarations
-cannot opt in yet. Delegates with inhabited Void results cannot bind no-result targets.
+The supported subset now includes static/free and ordinary nominal-class instance IL
+methods, including class constructors. Virtual/interface/delegate contracts, generic methods,
+InternalCall and P/Invoke declarations cannot opt in yet. Delegates with inhabited Void results cannot bind no-result targets.
 These bounds are explicit validation rules, not claims that CLR no-result methods have
 those restrictions. Neo source-language projection is not implemented by this slice.
 
@@ -114,3 +114,6 @@ representation are distinct. The existing inhabited generic Void representation 
 above is current behavior, not a requirement that every Void use occupy a stack slot.
 Unifying that representation across generic calls, storage and compiler lowering remains
 separate implementation work; the no-result slice has not completed it.
+
+The [class-constructor follow-up](class-semantics.md#constructor-and-field-store-follow-up-2026-09-12)
+uses no-result constructor bodies while `newobj` independently yields the allocated object.

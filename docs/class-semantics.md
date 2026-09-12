@@ -40,23 +40,55 @@ performance improvement. A separate object handle avoids rewriting every importe
 signature as a managed byref. The cost is migrating the existing runtime's assumptions
 about copying, construction, dispatch and library contracts.
 
-The first class subset is non-generic record-shaped objects with fields and static/free
-functions. Instance methods/constructors, inheritance, abstract classes and interface
-implementation are rejected for marked classes until their receiver contracts are migrated.
-Existing legacy value-model functionality in those areas remains available. Class defaults
-and null are not implemented: `initobj`/default initialization rejects class creation rather
-than manufacturing a copied inline object or an invalid reference. Native inline layout
-and host value-record imports reject marked classes. `notreference` now rejects these
-nominal classes as well as explicit reference signatures.
+The current class subset is non-generic record-shaped objects with fields, direct instance
+methods and constructors. Inheritance, abstract classes, virtual dispatch and interface
+implementation remain unsupported for marked classes. Existing legacy value-model
+functionality in those areas remains available. Class defaults and null are not implemented:
+standalone `initobj` still rejects class creation. Constructor allocation initializes fields
+using supported managed defaults; fields requiring null references remain unsupported.
+Native inline layout and host value-record imports reject marked classes. `notreference`
+rejects nominal classes as well as explicit reference signatures.
 
-There are two deliberate temporary IR limitations. Existing field-wise `newobj Counter`
-constructs initialized fields directly; it is not yet the standard constructor-token
-operation. Existing `stfld` produces the updated receiver as an IR result and requires
-`pop` when unused. These are inherited neoIL contracts, not changed meanings assigned to
-standard CIL bytes. The CIL decoder still rejects field stores/construction. Resolve these
-runtime/IR contracts before admitting those instructions; do not hide them by claiming the
-Raven program already runs. Null and ordinary instance construction are the next necessary
-work for that program.
+## Constructor and field-store follow-up (2026-09-12)
+
+`newobj instance Counter::.ctor(Int32)` allocates the class on the managed heap, initializes
+supported fields, and calls its no-result constructor with the object as argument zero.
+The constructor's `ret` requires an empty stack. On success, **newobj**, not the constructor
+return signature, supplies the original object reference to the caller. Faults do not
+produce a constructor result. The object remains a GC root throughout construction even
+if the body rebinds its own `this` slot.
+
+Ordinary non-virtual instance methods now accept the class reference directly. They can
+return a value or use a no-result signature. Class `stfld` consumes its receiver and value
+without producing a stack result, enforced by the typed verifier and runtime. Remove the
+`pop` previously required after a class field store; this is a breaking experiment change.
+Legacy value-record/byref field-store behavior is unchanged and still needs migration
+before its standard CIL forms can execute.
+
+This follows Microsoft's [`newobj`](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.newobj?view=net-10.0)
+and [`stfld`](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.stfld?view=net-10.0)
+contracts (consulted 2026-09-12). The benefit is preserving constructor and field-store
+stack behavior directly in the runtime instead of compensating in a compiler. It requires
+separate tracking of the pending newobj result and body return convention. No new opcode
+or external metadata encoding is introduced; the internal no-result marker remains an
+implementation detail. The old field-wise `newobj Counter` spelling remains available
+for existing neoIL, alongside constructor-token operations.
+
+The CIL decoder recognizes standard `newobj`, `ldfld` and `stfld` bytes and preserves their
+MethodDef/Field/MemberRef tokens. It checks token kinds only: resolving constructor identity,
+field ownership, signatures and access still belongs to metadata binding. This is not a
+claim of executing Raven binaries. Class constructor chaining, including Object's base
+constructor, remains explicitly rejected; do not silently discard those calls on import.
+
+Run the [example](../examples/class_construction.neoil), which prints 42:
+
+```sh
+cargo run -- run examples/class_construction.neoil
+```
+
+System.Console still returns an inhabited Void internally, so the example retains `pop`
+after that library call. That boundary is separate from the class constructor/field-store
+contract and still needs library migration.
 
 ## Validation and reproduction
 
@@ -79,3 +111,8 @@ dotnet run --project Probe.csproj
 The [Raven milestone](raven-target-experiment.md#next-milestone-useful-raven-subset) still
 requires constructor/field CIL semantics, core type mapping, metadata resolution and real
 System binding. Raven was not modified in this slice.
+
+The constructor follow-up passed 52 focused tests. They cover default primitive fields, direct instance calls, empty
+stack enforcement, failures, heap limits, GC during construction, unsupported chaining,
+and the Console example. Run `cargo test --test class_constructors --test class_semantics
+--test constructors --test constructor_chaining --test no_result --test cil` as one command.

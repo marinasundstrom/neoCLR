@@ -7,7 +7,7 @@ fn module(body: &str) -> neoclr::Module {
 #[test]
 fn class_aliases_share_mutations_across_static_calls() {
     let m = module(
-        ".function Main() -> Int32\n.local Counter first\n.local Counter alias\nldc.i4 1\nnewobj Counter\nstloc first\nldloc first\nstloc alias\nldloc alias\ncall Change(Counter)\npop\nldloc first\nldfld Counter::Age\nret\n.end\n.function Change(Counter) -> Void\nldarg 0\nldc.i4 42\nstfld Counter::Age\npop\nldvoid\nret\n.end",
+        ".function Main() -> Int32\n.local Counter first\n.local Counter alias\nldc.i4 1\nnewobj Counter\nstloc first\nldloc first\nstloc alias\nldloc alias\ncall Change(Counter)\npop\nldloc first\nldfld Counter::Age\nret\n.end\n.function Change(Counter) -> Void\nldarg 0\nldc.i4 42\nstfld Counter::Age\nldvoid\nret\n.end",
     );
     verify(&m).unwrap();
     assert_eq!(run(&m, Limits::default()).unwrap().value, Value::Int32(42));

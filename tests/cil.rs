@@ -107,7 +107,7 @@ fn invalid_tokens_unsupported_code_and_limits_are_rejected() {
     for code in [
         vec![0x2a, 0x2b, 0],
         vec![0xfe, 0x14],
-        vec![0x73],
+        vec![0x6f],
         vec![0xff],
     ] {
         assert!(decode(&code).unwrap_err().message.contains("unsupported"));
@@ -166,4 +166,35 @@ fn dotnet_emitted_static_calls_decode_and_execute_in_neoclr() {
             .value,
         neoclr::Value::Int32(fixture["Result"].as_i64().unwrap() as i32)
     );
+}
+
+#[test]
+fn constructor_and_field_operands_preserve_standard_tokens() {
+    let body = decode(&[0x73, 1, 0, 0, 6, 0x7b, 2, 0, 0, 4, 0x7d, 3, 0, 0, 0x0a]).unwrap();
+    assert_eq!(
+        body.iter().map(|i| i.operation.clone()).collect::<Vec<_>>(),
+        [
+            Op::Construct(0x06000001),
+            Op::LoadField(0x04000002),
+            Op::StoreField(0x0a000003)
+        ]
+    );
+    for opcode in [0x73, 0x7b, 0x7d] {
+        for len in 1..5 {
+            assert!(
+                decode(&[opcode, 1, 0, 0, 6][..len])
+                    .unwrap_err()
+                    .message
+                    .contains("truncated")
+            );
+        }
+        assert!(
+            decode(&[opcode, 0, 0, 0, 0])
+                .unwrap_err()
+                .message
+                .contains("token")
+        );
+    }
+    assert!(decode(&[0x7d, 1, 0, 0, 6]).is_err());
+    assert!(decode(&[0x73, 1, 0, 0, 4]).is_err());
 }

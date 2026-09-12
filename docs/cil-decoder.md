@@ -17,7 +17,7 @@ This decoder follows that separation; admission of that surrounding information 
 required before execution.
 
 The supported subset is `nop`, `ldarg`, `ldloc`, `stloc` (compact, short and two-byte
-forms), `ldc.i4` (all forms), `dup`, `pop`, `call`, `ret` and `ldstr`. Short integer
+forms), `ldc.i4` (all forms), `dup`, `pop`, `call`, `ret`, `ldstr`, `newobj`, `ldfld` and `stfld`. Short integer
 operands are sign-extended; multibyte operands are little-endian. Calls admit non-nil
 MethodDef and MemberRef tokens; MethodSpec is excluded until generic input is supported.
 String operands must name a nonzero user-string heap offset. These checks establish token
@@ -27,7 +27,7 @@ the metadata layer must reject that use as a call target.
 Code size is limited to 64 KiB, bounding decoded instruction count and allocations.
 Empty streams, truncated operands and unsupported opcodes are errors. The entire stream
 is decoded, including unreachable instructions after `ret`. No prefixes, branches,
-exception instructions or object construction are admitted in this first subset.
+exception instructions are admitted in this first subset.
 Errors identify the starting byte offset of the offending instruction. Returning a
 partially decoded body or guessing operand lengths would make later validation unreliable.
 
@@ -62,3 +62,7 @@ Next: admit PE headers and metadata with explicit dependency resolution, select 
 methods without ignoring unresolved helper metadata, bind the real System library,
 validate signatures/local declarations/maxstack, and connect decoded offsets to runtime
 instruction diagnostics. The decoder alone must never be treated as input verification.
+
+The constructor follow-up admits standard constructor/field token operands. `newobj` uses
+MethodDef/MemberRef token kinds; field loads/stores use Field/MemberRef. Existence, member
+kind within MemberRef, ownership and signatures remain unresolved at decoding time.

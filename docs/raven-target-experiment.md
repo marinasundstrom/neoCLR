@@ -208,3 +208,12 @@ prove class aliasing, value copying and the distinction between parameter rebind
 byref replacement. This partially completes the first step above. Instance constructors,
 null/default class references, field-store CIL semantics and the Raven acceptance program
 remain next; the existing value-model library and Neo projection have not been migrated.
+
+## Class construction follow-up (2026-09-12)
+
+Class constructor-token operations now allocate/default supported fields, invoke a no-result
+body and yield the object after successful return. Direct instance calls and class stores
+have matching stack behavior. Standard constructor/field operand decoding is available.
+The remaining immediate gaps are Object/base-constructor handling and reference defaults,
+then metadata/core binding for the Raven program. Legacy value/byref field stores and
+System no-result APIs still need alignment; the compiler must not compensate silently.

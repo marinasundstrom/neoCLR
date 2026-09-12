@@ -12,10 +12,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   ordinary class-typed storage, while managed byrefs still address slots. Assignment,
   static calls, fields, return values and GC preserve object identity; existing value
   records still copy contents. Added alias/value-copy and .NET comparison tests.
-  Marked-class instance methods, inheritance, null/default initialization and native
-  layout remain unsupported; Neo and Raven binary execution are not yet migrated.
-  Existing field-wise construction and result-producing field-store IR remain temporary
-  compatibility gaps to resolve before admitting their standard CIL forms.
+  Added class instance constructors/direct calls with no-result bodies and constructor
+  results supplied by newobj; class field stores now consume operands without a result
+  (remove the previous trailing pop). GC retains objects throughout construction.
+  Decodes standard constructor/field tokens and adds a runnable Console example.
+  Inheritance, class reference defaults/null and Raven binary execution remain unfinished;
+  legacy value/byref field-store behavior and System API returns still need migration.
 
 - Added a bounded standard CIL code-stream decoder for the static-call experiment,
   preserving byte offsets and tokens and rejecting unsupported/truncated instructions.

@@ -56,7 +56,13 @@ pub(crate) fn analyze(module: &Module) -> Result<Verification, Fault> {
         if function.receiver_byref && function.name.ends_with("..ctor") {
             analyze_constructor(module, function)?;
         }
-        if constructors.contains(&function.definition) && !function.receiver_byref {
+        if constructors.contains(&function.definition)
+            && !function.receiver_byref
+            && !function
+                .owner
+                .as_ref()
+                .is_some_and(|owner| module.is_reference_type(owner))
+        {
             let construction = analyze_function(module, index, function, true)?;
             report.maximum_stack = report.maximum_stack.max(construction.maximum_stack);
         }
@@ -512,6 +518,16 @@ fn analyze_function(
             conditional_outputs.dedup();
             outputs = vec![StackType::ConditionalOutput(conditional_outputs)];
         }
+        let pushes = if matches!(op, Op::SetField(_))
+            && inputs
+                .first()
+                .and_then(|value| exact(value).ok())
+                .is_some_and(|ty| module.is_reference_type(ty))
+        {
+            0
+        } else {
+            pushes
+        };
         debug_assert_eq!(outputs.len(), pushes);
         state.stack.extend(outputs);
         maximum_stack = maximum_stack.max(state.stack.len());
@@ -1137,6 +1153,10 @@ fn typed_effect(
             Result::Ok(vec![loaded(&field(owner, *index)?)])
         }
         SetField(index) => {
+            if module.is_reference_type(exact(&values[0])?) {
+                stored(&values[1], &field(exact(&values[0])?, *index)?)?;
+                return Ok(vec![]);
+            }
             if let T::ByRef(owner) = exact(&values[0])? {
                 require(
                     !matches!(values[0], StackType::Readonly(_)),

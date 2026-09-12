@@ -24,6 +24,9 @@ pub enum Operation {
     Dup,
     Pop,
     Call(u32),
+    Construct(u32),
+    LoadField(u32),
+    StoreField(u32),
     Return,
     LoadString(u32),
 }
@@ -92,15 +95,32 @@ pub fn decode(code: &[u8]) -> Result<Vec<Instruction>, DecodeError> {
             0x20 => Operation::Int32(i32::from_le_bytes(read(4)?.try_into().unwrap())),
             0x25 => Operation::Dup,
             0x26 => Operation::Pop,
-            0x28 => {
+            0x28 | 0x73 => {
                 let token = u32::from_le_bytes(read(4)?.try_into().unwrap());
                 // MethodSpec is intentionally excluded with generic signatures.
                 if !matches!(token >> 24, 0x06 | 0x0a) || token & 0x00ff_ffff == 0 {
                     return Err(error(
-                        "call requires a non-nil MethodDef or MemberRef token",
+                        "call/newobj requires a non-nil MethodDef or MemberRef token",
                     ));
                 }
-                Operation::Call(token)
+                if opcode == 0x28 {
+                    Operation::Call(token)
+                } else {
+                    Operation::Construct(token)
+                }
+            }
+            0x7b | 0x7d => {
+                let token = u32::from_le_bytes(read(4)?.try_into().unwrap());
+                if !matches!(token >> 24, 0x04 | 0x0a) || token & 0x00ff_ffff == 0 {
+                    return Err(error(
+                        "field access requires a non-nil Field or MemberRef token",
+                    ));
+                }
+                if opcode == 0x7b {
+                    Operation::LoadField(token)
+                } else {
+                    Operation::StoreField(token)
+                }
             }
             0x2a => Operation::Return,
             0x72 => {
