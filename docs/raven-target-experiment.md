@@ -168,3 +168,34 @@ semantics. Do not accumulate adaptations merely to preserve the original experim
 value-default model. Deviations should be justified by the direction being demonstrated
 (for example generic Void), with costs made explicit. This direction is recorded before
 implementation; the existing allocation/type model has not been migrated by this slice.
+
+## Next milestone: useful Raven subset
+
+Author clarification, recorded 2026-09-12: the objective is enabling a minimal, useful
+subset of Raven to target neoCLR. Type semantics should align with .NET's value/reference
+classification rather than routing imported classes through the original explicit-reference
+model. Standard metadata and instructions are the first choice; an internal semantic
+change does not itself justify changing the external contract. Keep deliberate Void and
+runtime-library improvements, with adaptation straightforward for existing compilers.
+
+The PE container/body slice is complete as bounded inspection, not executable loading.
+The next implementation order is:
+
+1. Define and implement the minimal runtime type-classification contract. Class-typed
+   locals, arguments and fields carry object references; value-typed storage copies values.
+   Keep managed byrefs distinct from ordinary object references. Audit construction,
+   assignment, calls, fields and GC together rather than introducing importer-specific
+   implicit-reference rewrites. Use ordinary CLI class/value signature distinctions at
+   the external boundary. Decide the exact internal representation during this slice.
+2. Use one small Raven acceptance program to prove two aliases observe a mutation on a
+   class instance, while copying a small value preserves independence. Include construction,
+   a field, a static function call and Console output. Confirm the pinned compiler's
+   supported source syntax before fixing the fixture. Compare behavior on .NET and neoCLR.
+3. Complete only the metadata resolution, instruction coverage and real System binding
+   needed to execute that program. Require explicit dependencies and clear unsupported
+   diagnostics. Extend the corpus with a Void-returning function; test the intentional
+   generic Void extension separately from ordinary no-result calls.
+
+Each stage must report what actually runs. The static emission fixtures and test-bound
+instruction execution are groundwork, not completion of this milestone. No new Raven
+changes are assumed; any necessary changes remain isolated on its feature branch.

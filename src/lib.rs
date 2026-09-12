@@ -3,6 +3,7 @@ pub mod assembler;
 pub mod cil;
 mod constraints;
 mod enums;
+pub mod pe;
 pub use assembler::assemble;
 mod access;
 mod clock;

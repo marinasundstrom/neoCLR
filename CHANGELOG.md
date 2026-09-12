@@ -10,10 +10,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 - Added a bounded standard CIL code-stream decoder for the static-call experiment,
   preserving byte offsets and tokens and rejecting unsupported/truncated instructions.
+  Added bounded PE32 CLI container and tiny/fat method-body inspection with .NET fixture
+  comparisons; rejects truncated/overlapping ranges and unsupported header modes.
   Added a reproducible .NET-emitted byte fixture with matching neoCLR execution through
   test-only binding; PE loading and production token resolution remain planned.
   Clarified that real Void type participation need not occupy an evaluation-stack slot;
-  the existing generic representation has not yet been migrated.
+  the existing generic representation has not yet been migrated. Updated the experiment
+  order to prioritize .NET value/reference type semantics and a useful Raven scenario,
+  while retaining standard external metadata and instructions wherever possible.
 
 - Added explicit no-result metadata and assembly syntax for static, non-generic IL
   methods. The existing call/ret instructions now preserve CLI-style empty results;

@@ -135,3 +135,12 @@ The [bounded CIL decoder](cil-decoder.md) now reads the static corpus's instruct
 forms with original byte offsets and tokens. .NET-emitted method bytes are tested against
 neoCLR execution through test-only binding. PE/header/metadata admission, actual token
 resolution and production lowering remain unimplemented; this is not a binary loader.
+
+## Container/body reader and priority update (2026-09-12)
+
+The [PE reader](pe-reader.md) now bounds and inspects PE32 CLI containers and extracts
+tiny/fat method bodies for the CIL decoder. Metadata tables, signatures, token resolution
+and executable admission remain open. No new external metadata or instructions are used.
+The author clarified the next priority: align runtime value/reference type semantics and
+use a small Raven program as the end-to-end milestone. Further parsing work should serve
+[that scenario](raven-target-experiment.md#next-milestone-useful-raven-subset).

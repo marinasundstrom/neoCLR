@@ -1228,6 +1228,25 @@ Continued the independent [standard CIL decoder](cil-decoder.md) groundwork with
 offsets and token preservation. This does not implement the broader Void representation
 change or load Raven binaries.
 
+## 37. Familiar binary contracts and a useful Raven milestone — recorded 2026-09-12
+
+**Author direction:** New runtime semantics should not automatically change metadata or
+the instruction set. Preserve .NET's major behavioral expectations, retain intentional
+Void and library improvements, and make adaptation easy for existing compilers.
+
+**Further clarification:** The mission is a minimal, useful Raven subset targeting neoCLR.
+Aligning value/reference type semantics is central; the original explicit-reference model
+should not drive compatibility workarounds.
+
+**Assistant response:** Agreed to finish the bounded PE/body reader already in progress,
+then prioritize runtime type classification using a class-alias/value-copy Raven scenario.
+Binary parsing is supporting work, not the primary acceptance milestone.
+
+**Action/outcome:** Added standard PE32 container and tiny/fat method-body inspection with
+.NET-emitted fixture comparisons. Updated the [experiment order](raven-target-experiment.md#next-milestone-useful-raven-subset).
+The type migration and actual execution of Raven binaries remain unimplemented; Raven
+itself was unchanged by this slice.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the
