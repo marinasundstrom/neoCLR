@@ -352,3 +352,12 @@ the selected System source hash. Import maps identify the required `raven-collec
 profile; the host must still select it explicitly with `--system`. Existing saved-project
 VS Code tasks have not been switched to this profile. Target-aware iteration lowering,
 project-profile integration and broader library admission remain next work.
+
+
+### Target-selected for loops
+
+The follow-up compiler-API contract slice adds `CollectionForEach` to the same probe
+and verification script. It uses Raven's for syntax with the selected Iterable/Iterator
+symbols and prints `41, 42, 41, 41`. See [required Raven revision and limits](raven-target-contracts.md#first-implemented-compiler-slice-2026-09-12).
+Existing earlier explicit-call samples required no Raven changes; this new loop sample
+requires the feature-branch compiler update. Automatic disposal remains a recorded gap.

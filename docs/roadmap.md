@@ -41,8 +41,9 @@ Continue the Raven collection demo against these target semantics.
 The [bounded Raven POC milestone](raven-target-experiment.md#milestone-closed-raven-poc-2026-09-12)
 is closed at `milestone/raven-poc-2026-09-12`. The bounded collection follow-up now
 demonstrates a concrete class through interfaces from Raven on neoCLR, using CLI
-metadata, assignability and dispatch. Next configure target-specific Raven language
-contracts and integrate the collection profile into the project workflow. Union
+metadata, assignability and dispatch. Synchronous target-specific Raven
+iteration contracts now work through the compiler API. Next integrate that selection
+and the collection profile into the project workflow. Union
 propagation remains subsequent work.
 The [interface contract probe](raven-interface-contract.md) establishes the first
 dependency order: nominal interface-reference dispatch (first bounded runtime support
@@ -51,7 +52,9 @@ implemented), closed generic classes (runtime support implemented), ordinary arr
 conversions (runtime upcasts implemented), then real
 ArrayList/iterator adaptation and bounded Raven Int32 collection execution
 (now implemented through an explicit library/import profile). Configure [Raven language contracts](raven-target-contracts.md)
-per target before implicit iteration lowering; preserve the default .NET target.
+per target through the project workflow; compiler-API iteration lowering is implemented and preserves
+the default .NET target. The missing automatic iterator Dispose and finally/defer
+questions are recorded for later investigation, not implementation in this slice.
 The desired demo is Raven consuming an adapted version of the runtime library already
 used by Neo. Prefer an existing collection/iteration contract as the first interface
 scenario, exposing declarations and executable implementations together; the POC tag

@@ -18,7 +18,9 @@ static class InterfaceProbe
         var source = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "samples", "library-interfaces.rvn"));
         Compilation Create(string text) => Compilation.Create("CoreInterfaces", [SyntaxTree.ParseText(text)],
             [MetadataReference.CreateFromFile(core)], new CompilationOptions(OutputKind.ConsoleApplication,
-                metadataImportOptions: new MetadataImportOptions(CoreDeclarations.Identity)));
+                metadataImportOptions: new MetadataImportOptions(CoreDeclarations.Identity),
+                runtimeIterationContract: new RuntimeIterationContract(CoreDeclarations.Identity,
+                    "System.Collections.Iterable`1", "System.Collections.Iterator`1")));
         var compilation = Create(source);
         var path = Path.Combine(output, "CoreInterfaces.dll");
         using (var stream = File.Create(path))
@@ -61,6 +63,14 @@ static class InterfaceProbe
             if (!result.Success) throw new Exception(string.Join("\n", result.Diagnostics));
         }
         UnionImport.Write(aliasPath, core, Path.Combine(output, "CollectionAliases.neoil"), collectionProfile: true);
+        var loopSource = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "samples", "library-foreach.rvn"));
+        var loopPath = Path.Combine(output, "CollectionForEach.dll");
+        using (var stream = File.Create(loopPath))
+        {
+            var result = Create(loopSource).Emit(stream, null, new EmitOptions(AssemblyName.GetAssemblyName(core)));
+            if (!result.Success) throw new Exception(string.Join("\n", result.Diagnostics));
+        }
+        UnionImport.Write(loopPath, core, Path.Combine(output, "CollectionForEach.neoil"), collectionProfile: true);
         var rejections = CollectionImportChecks.Run(path, core, output);
         File.WriteAllText(Path.Combine(output, "interface-results.json"), JsonSerializer.Serialize(new {
             RecordedDate = "2026-09-12", Scope = "Raven collection metadata, emission and import; runtime verification is separate",

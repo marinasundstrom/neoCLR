@@ -1480,6 +1480,28 @@ adapts existing algorithms and passes runtime tests; it does not yet enable Rave
 collection import or implicit iteration. Compiler configuration, target diagnostics and
 .NET/neoCLR editor regression tests remain planned on Raven's feature branch.
 
+## 50. Target iteration lowering and the cleanup gap — recorded 2026-09-12
+
+**Author direction.** The author clarified that when Raven targets neoCLR, foreach-style
+lowering should use Iterable and that target's contract. They asked to note the missing
+Dispose call and consider fixing it. They subsequently proposed a finally-like alternative,
+possibly defer in Raven, given neoCLR's absence of recoverable exception handling.
+They concluded: “That should be noted for now”.
+
+**Assistant response.** Agreed to select actual target interfaces and method signatures
+rather than only rename emitted references. Reported that Raven's existing iterator-loop
+emitter does not automatically dispose on its default .NET path either. Proposed treating
+that as a separate cleanup issue. Distinguished a possible defer syntax from runtime
+support for cleanup, and suggested evaluating finally-only CLI regions without guest
+Exception classes. These cleanup choices are proposals, not author-approved implementations.
+
+**Action and outcome.** Implemented configurable synchronous iteration in Raven's feature
+branch (`c28657859dda6b473d182445d91e5d44469a6974`), with 41 focused tests passing.
+The neoCLR probe selects Iterable/Iterator and executes a for-loop sample covering normal
+completion, break and return. Recorded [cleanup/defer discussion](raven-target-contracts.md#recorded-cleanup-discussion-no-implementation-yet)
+for future work as requested; neither automatic disposal nor defer was implemented.
+Project configuration and VS Code integration of this option remain pending.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

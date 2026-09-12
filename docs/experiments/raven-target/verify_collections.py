@@ -14,7 +14,7 @@ output, runtime, system = args.output.resolve(), args.runtime.resolve(), args.sy
 results = json.loads((output / 'interface-results.json').read_text())
 if len(results.get('ImportRejections', {})) != 6 or len(results.get('NegativeDiagnostics', {})) != 2:
     raise AssertionError('Run the complete collection probe with rejection checks first')
-for name in ('CoreInterfaces', 'CollectionAliases', 'NullCollection'):
+for name in ('CoreInterfaces', 'CollectionAliases', 'CollectionForEach', 'NullCollection'):
     mapping = json.loads((output / (name + '.neoil.map.json')).read_text())
     assert mapping['RequiredLibraryProfile'] == 'raven-collections'
     check = subprocess.run([str(runtime), 'verify', str(output / (name + '.neoil')), '--system', str(system)],
@@ -22,7 +22,7 @@ for name in ('CoreInterfaces', 'CollectionAliases', 'NullCollection'):
     if check.returncode:
         raise AssertionError(check.stdout + check.stderr)
 outputs = {}
-for name, expected in [('CoreInterfaces', '1\n42\n=> Void\n'), ('CollectionAliases', '7\n42\n2\n=> Void\n')]:
+for name, expected in [('CoreInterfaces', '1\n42\n=> Void\n'), ('CollectionAliases', '7\n42\n2\n=> Void\n'), ('CollectionForEach', '41\n42\n41\n41\n=> Void\n')]:
     run = subprocess.run([str(runtime), 'run', str(output / (name + '.neoil')), '--system', str(system)],
                          capture_output=True, text=True, timeout=30)
     if run.returncode or run.stdout != expected:

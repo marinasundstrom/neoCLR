@@ -1,0 +1,24 @@
+import System.*
+import System.Collections.*
+import System.Console.*
+
+func First(values: List<int>) -> int {
+    for value in values {
+        return value
+    }
+    return 0
+}
+
+func Main() {
+    let values = ArrayList<int>.Allocate(0)
+    values.Add(41)
+    values.Add(42)
+    for value in values {
+        WriteLine(value)
+    }
+    for value in values {
+        WriteLine(value)
+        break
+    }
+    WriteLine(First(values))
+}

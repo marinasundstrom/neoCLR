@@ -439,3 +439,18 @@ probe now imports the matching Raven programs; use `verify_collections.py` with 
 explicit generated System profile to verify their execution.
 [Target-specific Raven contracts](../../raven-target-contracts.md) are proposed for
 future implicit iteration without changing the default .NET target.
+
+## Target-selected Raven for loops
+
+The current probe sources require Raven commit
+`c28657859dda6b473d182445d91e5d44469a6974` on `codex/neoclr-target-resolution`
+(or a descendant). Rebuild Raven.CodeAnalysis before building the probe with
+BuildProjectReferences=false. Earlier revision references above describe earlier slices.
+
+`--interfaces` now also compiles [library-foreach.rvn](samples/library-foreach.rvn),
+selecting Iterable/Iterator through RuntimeIterationContract. The existing
+`verify_collections.py` command runs it with the explicit System collection profile;
+its output is `41, 42, 41, 41`. See [contract support and limits](../../raven-target-contracts.md#first-implemented-compiler-slice-2026-09-12).
+
+This is compiler-API integration, not a new VS Code/project switch. Automatic iterator
+Dispose is a recorded Raven gap; cleanup/defer support remains future work.

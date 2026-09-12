@@ -51,7 +51,8 @@
   "ImportedProgram": "CoreInterfaces.neoil",
   "RuntimeOutputs": {
     "CoreInterfaces": "1\n42\n=> Void\n",
-    "CollectionAliases": "7\n42\n2\n=> Void\n"
+    "CollectionAliases": "7\n42\n2\n=> Void\n",
+    "CollectionForEach": "41\n42\n41\n41\n=> Void\n"
   },
   "SystemSha256": "5c0b425f7a92231fed19536fd9fc75db0e8b4b48329ade396894fb3f15552899",
   "NullDefault": "Verified; execution faults with null interface receiver"

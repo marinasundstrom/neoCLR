@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-12
 
+- Added a Raven for-loop demo using the feature-branch RuntimeIterationContract option
+  to bind Iterable/Iterator/GetIterator rather than .NET enumerable names. The existing
+  collection import profile executes normal completion, break and return; output is
+  41, 42, 41, 41. Documented the new Raven dependency and compiler-API-only scope.
+  Recorded missing automatic iterator Dispose and the proposed finally/defer mechanism
+  as future work, per author direction. No cleanup behavior or Neo source changes are
+  included. Raven's seven new and 34 existing focused tests pass.
+
 - Added CLR-compatible callvirt admission for nonvirtual nominal class instance methods,
   including closed generic classes and no-result calls. Null receivers fault before
   method entry; wrong types and byrefs to reference slots are rejected. This supports
@@ -22,7 +30,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   library remain unchanged. The profile requires defaultable element types and excludes
   predicate/delegate helpers. Documented how to generate and run it. Recorded proposed target-specific Raven language contracts
   for renamed iteration/disposal APIs while preserving the default .NET target; that
-  compiler configuration is planned, not implemented. Follow-up admits two Raven Int32
+  project configuration remains planned; compiler-API support is described above.
+  Follow-up admits two Raven Int32
   collection programs through an explicit import profile: ordinary class/interface
   calls and upcasts execute the adapted library, including iteration, growth, returned
   aliases and indexers. Six malformed/unsupported inputs reject; a null-default fixture
