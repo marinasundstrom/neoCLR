@@ -44,7 +44,7 @@ static class UnionImport
         {
             var collection = CollectionBindings.Type(type);
             if (collection is not null && collectionProfile) return collection;
-            return PrimitiveBindings.Type(type) ?? ResultBindings.Type(type) ?? Type(type, result);
+            return CalendarBindings.Type(type) ?? PrimitiveBindings.Type(type) ?? ResultBindings.Type(type) ?? Type(type, result);
         }
         var output = new StringBuilder($".module ImportedUnion\n.entry {Name(entry)}\n");
         var mappings = new List<object>();
@@ -62,7 +62,7 @@ static class UnionImport
             var args = method.Parameters.Select(p => ProfileType(p.ParameterType)).ToArray();
             var result = ProfileType(method.ReturnType, true);
             var locals = method.Body.Variables.Select(v => ProfileType(v.VariableType)).ToArray();
-            if (locals.Any(t => !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
+            if (locals.Any(t => !CalendarBindings.Types.Contains(t) && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
                 throw new InvalidDataException("Unsupported local default in Result profile.");
             NormalizePatternBranches(method);
             var instructions = method.Body.Instructions.ToArray();
@@ -107,7 +107,7 @@ static class UnionImport
                         }
                         else
                         {
-                            code.AppendLine(Default(initializedType) + "\nstobj " + initializedType);
+                            code.AppendLine(CalendarBindings.Types.Contains(initializedType) ? "initobj " + initializedType : Default(initializedType) + "\nstobj " + initializedType);
                             assigned[address.Local] = true;
                         }
                         break;
@@ -165,7 +165,7 @@ static class UnionImport
                     case Code.Ldarg: case Code.Ldarg_S: Arg(((ParameterDefinition)instruction.Operand).Index); break;
                     case Code.Ldarga: case Code.Ldarga_S:
                         var parameter = ((ParameterDefinition)instruction.Operand).Index;
-                        if (parameter < 0 || parameter >= args.Length || !PrimitiveBindings.IsReceiver(args[parameter]))
+                        if (parameter < 0 || parameter >= args.Length || !(PrimitiveBindings.IsReceiver(args[parameter]) || CalendarBindings.Types.Contains(args[parameter])))
                             throw new InvalidDataException("Only admitted primitive argument addresses supported.");
                         Push(new(args[parameter] + "&", Argument: parameter)); code.AppendLine($"ldarga {parameter}"); break;
                     case Code.Ldloc_0: case Code.Ldloc_1: case Code.Ldloc_2: case Code.Ldloc_3: Load((int)instruction.OpCode.Code - (int)Code.Ldloc_0); break;
@@ -247,8 +247,7 @@ static class UnionImport
                             {
                                 if (argument.Argument >= 0)
                                 {
-                                    if (n != 0 || !reference.HasThis || !PrimitiveBindings.IsReceiver(reference.DeclaringType.Name)
-                                        || reference.Name is not ("Equals" or "CompareTo" or "ToString"))
+                                    if (n != 0 || !reference.HasThis || !(PrimitiveBindings.IsReceiver(reference.DeclaringType.Name) || CalendarBindings.Types.Contains(reference.DeclaringType.FullName)))
                                         throw new InvalidDataException("Argument addresses are only admitted as primitive receivers.");
                                     continue;
                                 }
@@ -278,7 +277,7 @@ static class UnionImport
             for (var n = 0; n < locals.Length; n++) output.AppendLine($".local {locals[n]} local{n}");
             if (method.Body.InitLocals)
                 for (var n = 0; n < locals.Length; n++)
-                    if (locals[n] == IntArray || CollectionBindings.IsReference(locals[n])) output.AppendLine($"ldloca local{n}\ninitobj {locals[n]}");
+                    if (locals[n] == IntArray || CollectionBindings.IsReference(locals[n]) || CalendarBindings.Types.Contains(locals[n])) output.AppendLine($"ldloca local{n}\ninitobj {locals[n]}");
                     else if (locals[n] != Carrier && locals[n] != Option && locals[n] != VoidOption && locals[n] != VoidResult && locals[n] != "String" && !ResultBindings.IsType(locals[n])) output.AppendLine(Default(locals[n]) + $"\nstloc local{n}");
             foreach (var index in bodies.Keys.Order())
             {
@@ -299,7 +298,7 @@ static class UnionImport
                 if (changed) work.Enqueue(index);
             }
         }
-        output.Append(Adapters()).Append(ResultBindings.Adapters()).Append(StringBindings.Adapters()).AppendLine(Int32Bindings.Adapters).AppendLine(DoubleBindings.Adapters).Append(PrimitiveBindings.Adapters);
+        output.Append(Adapters()).Append(ResultBindings.Adapters()).Append(StringBindings.Adapters()).AppendLine(Int32Bindings.Adapters).AppendLine(DoubleBindings.Adapters).Append(PrimitiveBindings.Adapters).Append(CalendarBindings.Adapters);
         File.WriteAllText(destination, output.ToString());
         File.WriteAllText(destination + ".map.json", JsonSerializer.Serialize(new {
             Profile = collectionProfile ? "result-option-void-files-strings-collections-v8" : "result-option-void-files-strings-arrays-v7",
@@ -371,7 +370,7 @@ static class UnionImport
             throw new InvalidDataException("Unsupported runtime signature.");
         // Reuse the declaration catalog for its bounded static Int32 APIs. Check
         // both sides before mapping a resolved CLI reference to the runtime library.
-        var file = PrimitiveBindings.Bind(reference, definition) ?? DoubleBindings.Bind(reference, definition) ?? Int32Bindings.Bind(reference, definition) ?? PathBindings.Bind(reference, definition) ?? FileBindings.Bind(reference, definition) ?? ResultBindings.Bind(reference, definition);
+        var file = CalendarBindings.Bind(reference, definition) ?? PrimitiveBindings.Bind(reference, definition) ?? DoubleBindings.Bind(reference, definition) ?? Int32Bindings.Bind(reference, definition) ?? PathBindings.Bind(reference, definition) ?? FileBindings.Bind(reference, definition) ?? ResultBindings.Bind(reference, definition);
         if (file is not null)
         {
             if (file.OutArgument >= 0 || reference.Name == "FromResidual") ValidatePropagation(definition.DeclaringType);

@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Projected all 24 current public Date/Time/LocalDateTime/Clock methods/accessors
+  through Raven, including validated Result factories and value-payload propagation.
+  Added fixed calendar/tick cases, live host-clock validation, completion/signature
+  checks and usage docs. Defaults use initobj with private storage preserved; no
+  new globalization, formatting, runtime or installed-tool behavior is implied.
+
 - Added Raven primitive storage/stack normalization, ordinary numeric conversions,
   concrete comparisons and all 16 existing Char classifiers. Added boundary/Unicode
   samples and completion/signature coverage. Requires the isolated Raven integral-cast

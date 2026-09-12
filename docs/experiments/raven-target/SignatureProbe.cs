@@ -118,6 +118,15 @@ static class SignatureProbe
         Check("Char signature retains storage type", PrimitiveBindings.Bind(digitCall, digit)?.Arguments.SequenceEqual(new[] { "Char" }) == true);
         digitCall.Parameters[0].ParameterType = module.TypeSystem.Int32;
         Reject("Char signature is not Int32 metadata", () => PrimitiveBindings.Bind(digitCall, digit));
+        var dateType = module.GetType("System.Date");
+        var createDate = dateType.Methods.Single(m => m.Name == "Create");
+        Check("Date factory Result mapping", CalendarBindings.Bind(Reference(createDate, dateType), createDate)?.Result == CalendarBindings.DateResult);
+        var timeType = module.GetType("System.Time");
+        var fromTicks = timeType.Methods.Single(m => m.Name == "FromTicks");
+        var ticksCall = Reference(fromTicks, timeType);
+        Check("Time ticks stay Int64", CalendarBindings.Bind(ticksCall, fromTicks)?.Arguments.SequenceEqual(new[] { "Int64" }) == true);
+        ticksCall.Parameters[0].ParameterType = module.TypeSystem.Int32;
+        Reject("Time ticks reject Int32 signature", () => CalendarBindings.Bind(ticksCall, fromTicks));
         var text = JsonSerializer.Serialize(checks, new JsonSerializerOptions { WriteIndented = true });
         File.WriteAllText(Path.Combine(output, "signature-checks.json"), text);
         Console.WriteLine(text);

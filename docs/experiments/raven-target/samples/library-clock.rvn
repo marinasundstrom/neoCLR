@@ -1,0 +1,14 @@
+import System.*
+import System.Console.*
+func Main() {
+    let now = Clock.GetLocalNow()
+    let date = now.Date
+    let time = now.Time
+    WriteLine(date.Year)
+    WriteLine(date.Month)
+    WriteLine(date.Day)
+    WriteLine(time.Hour)
+    WriteLine(time.Minute)
+    WriteLine(time.Second)
+    WriteLine(now.UtcOffsetSeconds)
+}

@@ -37,7 +37,7 @@ assembly metadata reader or verifier.
 | Math and Console | All 20 existing Math methods ([Int32 Clamp](raven-clamp-api.md), [Double methods](raven-floating-math-api.md)) and WriteLine | Console input/error paths; broader numeric/compiler support remains separate |
 | Option, Result, Void and Propagatable | Option<Int32>, completion/error propagation, file read/write carriers and typed matching | General payload shapes, all public case/carrier members and consistent conditional-output validation |
 | File and Path | Bounded UTF-8 File calls, propagation, error predicates and [both Path methods](raven-path-api.md) | Full file-error API surfaces; reuse existing I/O contracts |
-| Date, Time, LocalDateTime and Clock | Runtime implementations exist; Raven execution not yet admitted | Metadata and call mapping, validation-error unions, system-clock example |
+| Date, Time, LocalDateTime and Clock | [All current calendar/clock methods](raven-calendar-api.md), validation Results and live-clock check | Error-value constructor/ToString projection; interface dispatch remains separate |
 | Environment | Runtime implementations exist | Arguments, current directory and variable APIs with their existing errors/options |
 | Array, ArrayList, List, Iterable, Iterator | Int32 vectors, class aliasing, selected collection members/foreach | Remaining array/collection contracts and element shapes; preserve reference categories and document cleanup limits |
 | Equatable, Comparable, Clonable, Disposable, Closable | Selected interface dispatch through collections | General existing interface contracts and representative runtime-library callers |

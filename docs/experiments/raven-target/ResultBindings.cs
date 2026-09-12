@@ -9,7 +9,7 @@ static class ResultBindings
     public const string RangeError = "System.InvalidRangeError";
     public const string DivisionError = "System.IntegerDivisionError";
     public const string ParseError = "System.Int32ParseError";
-    const string StringOk = "System.Result.Ok<String>", VoidOk = "System.Result.Ok<Void>";
+    const string VoidOk = "System.Result.Ok<Void>";
     public const string SliceError = "System.Text.Utf8SliceError";
     public const string Slice = "System.Result<String,System.Text.Utf8SliceError>";
     sealed record Carrier(string Output, string Error)
@@ -22,9 +22,12 @@ static class ResultBindings
         [SliceError] = ["OutOfRange", "InvalidBoundary"],
         [ParseError] = ["InvalidFormat", "Overflow"],
         [DivisionError] = ["DivisionByZero", "Overflow"],
-        [RangeError] = []
+        [RangeError] = [],
+        ["System.InvalidDateError"] = [],
+        ["System.InvalidTimeError"] = []
     };
-    static readonly Carrier[] Carriers = [new("String", ReadError), new("Void", WriteError), new("String", SliceError), new("Int32", ParseError), new("Int32", DivisionError), new("Int32", RangeError)];
+    static readonly Carrier[] Carriers = [new("String", ReadError), new("Void", WriteError), new("String", SliceError), new("Int32", ParseError), new("Int32", DivisionError), new("Int32", RangeError), new("System.Date", "System.InvalidDateError"), new("System.Time", "System.InvalidTimeError")];
+    static IEnumerable<(string Case, string Value)> Successes => Carriers.Select(c => c.Output).Distinct().Where(t => t is not ("Void" or "Int32")).Select(t => ($"System.Result.Ok<{t}>", t));
     static IEnumerable<string> Errors => ErrorCases.Keys;
     static IEnumerable<string> Cases(string error) => ErrorCases[error];
     public static string Declarations => string.Join(" ", Errors.Select(error => {
@@ -33,23 +36,23 @@ static class ResultBindings
         var separator = error.LastIndexOf('.');
         return separator == 6 ? declaration : "namespace " + error[7..separator] + " { " + declaration + " }";
     }));
-    public static bool IsType(string type) => type is StringOk || Carriers.Any(c => type == c.Type || type == c.Error)
+    public static bool IsType(string type) => Successes.Any(s => s.Case == type) || Carriers.Any(c => type == c.Type || type == c.Error)
         || Errors.Any(e => type == $"System.Result.Error<{e}>");
     public static string? Type(TypeReference type)
     {
         if (!type.IsValueType || !RuntimeSignatures.IsCore(type.Scope)) return null;
         if (Errors.Contains(type.FullName)) return type.FullName;
         if (type is not GenericInstanceType g) return null;
-        string? Argument(TypeReference t) => t.MetadataType == MetadataType.Int32 ? "Int32" : t.MetadataType == MetadataType.String ? "String"
+        string? Argument(TypeReference t) => CalendarBindings.Type(t) ?? (t.MetadataType == MetadataType.Int32 ? "Int32" : t.MetadataType == MetadataType.String ? "String"
             : t.FullName == "System.Void" && t.IsValueType && RuntimeSignatures.IsCore(t.Scope) ? "Void"
-            : Errors.Contains(t.FullName) && t.IsValueType && RuntimeSignatures.IsCore(t.Scope) ? t.FullName : null;
+            : Errors.Contains(t.FullName) && t.IsValueType && RuntimeSignatures.IsCore(t.Scope) ? t.FullName : null);
         var args = g.GenericArguments.Select(Argument).ToArray();
         var name = g.ElementType.FullName.Split('`')[0].Replace('/', '.') + "<" + string.Join(',', args) + ">";
         return args.All(a => a is not null) && IsType(name) ? name : null;
     }
     public sealed record Binding(string Name, string[] Arguments, string Result, int OutArgument = -1, string? Instruction = null);
     static (string[] Args, string Result) Signature(MethodReference reference, MethodDefinition definition)
-        => RuntimeSignatures.Match(reference, definition, type => Type(type)
+        => RuntimeSignatures.Match(reference, definition, type => CalendarBindings.Type(type) ?? Type(type)
             ?? (type is GenericInstanceType integerOk && integerOk.ElementType.FullName == "System.Result/Ok`1"
                 && integerOk.GenericArguments.Count == 1 && integerOk.GenericArguments[0].MetadataType == MetadataType.Int32
                 && type.IsValueType && RuntimeSignatures.IsCore(type.Scope) ? Int32Ok : null)
@@ -76,7 +79,7 @@ static class ResultBindings
                 return new("", [owner + "&", expected + "&"], "Boolean", 1,
                     name == "TryGetValue" ? $"call {Helper(owner, expected)}({owner}&,{expected}&)" : $"call instance {owner}::{name}({expected}&)");
         }
-        var value = owner == StringOk ? "String" : Errors.FirstOrDefault(e => owner == $"System.Result.Error<{e}>");
+        var value = Successes.Where(s => s.Case == owner).Select(s => s.Value).SingleOrDefault() ?? Errors.FirstOrDefault(e => owner == $"System.Result.Error<{e}>");
         if (reference.HasThis && args.Length == 0 && name == "get_Value" && result == value)
             return new(Helper(owner!, name), [owner + "&"], result);
         if (Errors.Contains(owner) && reference.HasThis && args.Length == 0 && result == "Boolean"
@@ -89,7 +92,7 @@ static class ResultBindings
         var owner = Type(reference.DeclaringType);
         if (owner is null) return null;
         var (args, result) = Signature(reference, definition);
-        var expected = owner == StringOk ? "String" : Carriers.Where(c => c.Type == owner).Select(c => $"System.Result.Ok<{c.Output}>").SingleOrDefault() ?? "";
+        var expected = Successes.Where(s => s.Case == owner).Select(s => s.Value).SingleOrDefault() ?? Carriers.Where(c => c.Type == owner).Select(c => $"System.Result.Ok<{c.Output}>").SingleOrDefault() ?? "";
         if (result == "noresult" && args.SequenceEqual(new[] { expected }))
             return new(Helper(owner, "New"), args, owner);
         throw new InvalidDataException("Unsupported Result constructor: " + reference.FullName);
@@ -98,11 +101,11 @@ static class ResultBindings
     public static string Adapters()
     {
         var text = new StringBuilder();
-        foreach (var (owner, arg) in Carriers.Select(c => (c.Type, $"System.Result.Ok<{c.Output}>" )).Prepend((StringOk, "String")))
+        foreach (var (owner, arg) in Carriers.Select(c => (c.Type, $"System.Result.Ok<{c.Output}>" )).Concat(Successes.Select(s => (s.Case, s.Value))))
             text.AppendLine($".function {Helper(owner, "New")}({arg} value) -> {owner}\nldarg value\nnewobj instance {owner}::.ctor({arg})\nret\n.end");
         foreach (var (owner, result, name) in Errors.SelectMany(e => Cases(e).Select(c => (e, "Boolean", "get_Is" + c)))
             .Concat(Errors.Select(e => ($"System.Result.Error<{e}>", e, "get_Value")))
-            .Append((StringOk, "String", "get_Value")))
+            .Concat(Successes.Select(s => (s.Case, s.Value, "get_Value"))))
             text.AppendLine($".function {Helper(owner, name)}({owner}& value) -> {result}\nldarg value\nldobj {owner}\ncall instance {owner}::{name}()\nret\n.end");
         foreach (var (owner, output, error) in Carriers.Select(c => (c.Type, c.Output, c.Error)))
             foreach (var variant in new[] { $"System.Result.Ok<{output}>", $"System.Result.Error<{error}>" })

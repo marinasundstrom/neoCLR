@@ -1,0 +1,55 @@
+import System.*
+import System.Console.*
+func ShowDate(value: Date) {
+    WriteLine(value.Year)
+    WriteLine(value.Month)
+    WriteLine(value.Day)
+    WriteLine(value.DayOfYear)
+    WriteLine(value.DayNumber)
+    WriteLine(value.CompareTo(value))
+    if value.Equals(value) { WriteLine("Same date") }
+}
+func ReadDate(result: Result<Date, InvalidDateError>) -> Result<Date, InvalidDateError> {
+    let value = result?
+    ShowDate(value)
+    return Result<Date, InvalidDateError>(Result.Ok<Date>(value))
+}
+func CheckDate(result: Result<Date, InvalidDateError>) {
+    match ReadDate(result) {
+        Result.Ok<Date> ok => WriteLine("Date accepted")
+        Result.Error<InvalidDateError> error => WriteLine("Invalid date")
+    }
+}
+func ShowTime(value: Time) {
+    WriteLine(value.Hour)
+    WriteLine(value.Minute)
+    WriteLine(value.Second)
+    WriteLine(value.Millisecond)
+    WriteLine(value.FractionTicks)
+    let ticks = value.Ticks
+    WriteLine(ticks.CompareTo(452967890123L))
+    WriteLine(value.CompareTo(value))
+    if value.Equals(value) { WriteLine("Same time") }
+}
+func ReadTime(result: Result<Time, InvalidTimeError>) -> Result<Time, InvalidTimeError> {
+    let value = result?
+    ShowTime(value)
+    return Result<Time, InvalidTimeError>(Result.Ok<Time>(value))
+}
+func CheckTime(result: Result<Time, InvalidTimeError>) {
+    match ReadTime(result) {
+        Result.Ok<Time> ok => WriteLine("Time accepted")
+        Result.Error<InvalidTimeError> error => WriteLine("Invalid time")
+    }
+}
+func Main() {
+    CheckDate(Date.Create(2024, 2, 29))
+    CheckDate(Date.FromDayNumber(0))
+    CheckDate(Date.Create(2023, 2, 29))
+    CheckDate(Date.FromDayNumber(-1))
+    CheckTime(Time.Create(12, 34, 56, 7890123))
+    CheckTime(Time.FromTicks(452967890123L))
+    CheckTime(Time.Create(0, 0, 0))
+    CheckTime(Time.Create(24, 0, 0))
+    CheckTime(Time.FromTicks(-1L))
+}
