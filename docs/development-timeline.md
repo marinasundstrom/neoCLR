@@ -1705,6 +1705,32 @@ focused tests, packaged-build smoke checks, provenance and repeat releases. It r
 the remaining source-bridge distribution gap explicitly. No package or public release
 has been produced as part of documenting this procedure.
 
+## 2026-09-13 — Visible rough edges are part of the POC
+
+**Author's observation.** People evaluating the runtime library will see rough edges:
+some APIs resemble .NET, some differ, and some are unfinished or still to be decided.
+The author explicitly described that visibility as positive: “That is a good thing.”
+
+**Assistant response.** The assistant agreed that the POC should make the distinction
+between familiar behavior, deliberate differences and provisional/missing work visible
+so people can evaluate the experiment. It proposed keeping implementation and test
+evidence clear while recording this framing.
+
+**Author's clarification.** The author hopes evaluators will give feedback on the
+APIs. neoCLR can design its own contracts while retaining familiarity and some code
+compatibility. Result-based error handling is an expected compatibility break; the
+underlying platform still follows similar principles to .NET.
+
+**Assistant response.** The assistant agreed to distinguish familiar platform
+principles from exact API compatibility, and to present provisional contracts as
+candidates for feedback rather than settled designs.
+
+**Action and outcome.** Added this framing to the [preview introduction](raven-preview-acceptance.md)
+and [API design policy](api-design.md). The runtime-library coverage plan continues
+to identify actual gaps, including error-case APIs. The current String slicing work
+has passed runtime/propagation checks; this framing does not describe unsettled APIs
+as complete or stable.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

@@ -44,7 +44,7 @@ static class UnionImport
         {
             var collection = CollectionBindings.Type(type);
             if (collection is not null && collectionProfile) return collection;
-            return FileBindings.Type(type) ?? Type(type, result);
+            return ResultBindings.Type(type) ?? Type(type, result);
         }
         var output = new StringBuilder($".module ImportedUnion\n.entry {Name(entry)}\n");
         var mappings = new List<object>();
@@ -62,7 +62,7 @@ static class UnionImport
             var args = method.Parameters.Select(p => ProfileType(p.ParameterType)).ToArray();
             var result = ProfileType(method.ReturnType, true);
             var locals = method.Body.Variables.Select(v => ProfileType(v.VariableType)).ToArray();
-            if (locals.Any(t => !FileBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
+            if (locals.Any(t => !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
                 throw new InvalidDataException("Unsupported local default in Result profile.");
             NormalizePatternBranches(method);
             var instructions = method.Body.Instructions.ToArray();
@@ -70,7 +70,7 @@ static class UnionImport
             var states = new Dictionary<int, State>();
             var work = new Queue<int>();
             var bodies = new Dictionary<int, string>();
-            Merge(0, new([], locals.Select(t => method.Body.InitLocals && t != Carrier && t != Option && t != VoidOption && t != VoidResult && t != "String" && !FileBindings.IsType(t)).ToArray()));
+            Merge(0, new([], locals.Select(t => method.Body.InitLocals && t != Carrier && t != Option && t != VoidOption && t != VoidResult && t != "String" && !ResultBindings.IsType(t)).ToArray()));
             var visits = 0;
             while (work.TryDequeue(out var index))
             {
@@ -98,7 +98,7 @@ static class UnionImport
                         var initializedType = ProfileType((TypeReference)instruction.Operand);
                         var address = Expect(initializedType + "&");
                         if (address.Local < 0) throw new InvalidDataException("Only local initialization is admitted.");
-                        if (initializedType is Carrier or Option or VoidOption or VoidResult || FileBindings.IsType(initializedType))
+                        if (initializedType is Carrier or Option or VoidOption or VoidResult || ResultBindings.IsType(initializedType))
                         {
                             if (assigned[address.Local]) throw new InvalidDataException("Resetting an initialized carrier is unsupported.");
                             // A CLI carrier default is not a valid union value. Keep it unreadable
@@ -253,7 +253,7 @@ static class UnionImport
             if (method.Body.InitLocals)
                 for (var n = 0; n < locals.Length; n++)
                     if (locals[n] == IntArray || CollectionBindings.IsReference(locals[n])) output.AppendLine($"ldloca local{n}\ninitobj {locals[n]}");
-                    else if (locals[n] != Carrier && locals[n] != Option && locals[n] != VoidOption && locals[n] != VoidResult && locals[n] != "String" && !FileBindings.IsType(locals[n])) output.AppendLine(Default(locals[n]) + $"\nstloc local{n}");
+                    else if (locals[n] != Carrier && locals[n] != Option && locals[n] != VoidOption && locals[n] != VoidResult && locals[n] != "String" && !ResultBindings.IsType(locals[n])) output.AppendLine(Default(locals[n]) + $"\nstloc local{n}");
             foreach (var index in bodies.Keys.Order())
             {
                 mappings.Add(new { MethodToken = method.MetadataToken.ToUInt32(), instructions[index].Offset, OutputLine = output.ToString().Count(c => c == '\n') + 1 });
@@ -273,10 +273,10 @@ static class UnionImport
                 if (changed) work.Enqueue(index);
             }
         }
-        output.Append(Adapters()).Append(FileBindings.Adapters()).Append(StringBindings.Adapters());
+        output.Append(Adapters()).Append(ResultBindings.Adapters()).Append(StringBindings.Adapters());
         File.WriteAllText(destination, output.ToString());
         File.WriteAllText(destination + ".map.json", JsonSerializer.Serialize(new {
-            Profile = collectionProfile ? "result-option-void-files-strings-collections-v7" : "result-option-void-files-strings-arrays-v6",
+            Profile = collectionProfile ? "result-option-void-files-strings-collections-v8" : "result-option-void-files-strings-arrays-v7",
             RequiredLibraryProfile = collectionProfile ? "raven-collections" : "bundled-system", ApplicationSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(application))),
             CoreSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(core))), ReachableMethods = seen.Order().ToArray(), Mappings = mappings,
             Scope = "Bounded Int32 vectors, optional Int32 collection references, file UTF-8 APIs, String helpers and generic Result/Option bindings; CFG stack/definite-assignment checked; observable default carriers rejected; no guest declaration bodies executed."
@@ -345,7 +345,7 @@ static class UnionImport
             throw new InvalidDataException("Unsupported runtime signature.");
         // Reuse the declaration catalog for its bounded static Int32 APIs. Check
         // both sides before mapping a resolved CLI reference to the runtime library.
-        var file = FileBindings.Bind(reference, definition);
+        var file = FileBindings.Bind(reference, definition) ?? ResultBindings.Bind(reference, definition);
         if (file is not null)
         {
             if (file.OutArgument >= 0 || reference.Name == "FromResidual") ValidatePropagation(definition.DeclaringType);
@@ -491,7 +491,7 @@ static class UnionImport
             || reference.HasGenericParameters || reference is GenericInstanceMethod || reference.CallingConvention != MethodCallingConvention.Default
             || reference.ReturnType.MetadataType != MetadataType.Void || reference.HasThis != definition.HasThis)
             throw new InvalidDataException("Unsupported constructor signature.");
-        var file = FileBindings.Construct(reference, definition);
+        var file = ResultBindings.Construct(reference, definition);
         if (file is not null) return new(file.Name, file.Arguments, file.Result);
         var key = definition.FullName;
         var owner = Type(reference.DeclaringType);

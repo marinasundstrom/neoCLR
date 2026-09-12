@@ -573,3 +573,7 @@ file/collection signature checker and its `--signatures` regression probe.
 
 [The String API slice](../../raven-string-api.md) adds eight existing helpers, Unicode
 boundary examples and `verify_editor.py --strings` completion checks.
+
+The `--slices` probe and `verify_slices.py` verify UTF-8 slicing, typed error
+propagation and conditional-output safety; the [String API documentation](../../raven-string-api.md)
+contains commands and the remaining error-carrier limits.

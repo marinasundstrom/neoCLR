@@ -1,0 +1,32 @@
+import System.*
+import System.Text.*
+import System.Console.*
+
+func Extract(text: string, start: int, count: int) -> Result<string, Utf8SliceError> {
+    let part = text.SliceUtf8(start, count)?
+    WriteLine("Sliced")
+    return Result<string, Utf8SliceError>(Result.Ok<string>(part))
+}
+func ShowSlice(result: Result<string, Utf8SliceError>) {
+    match result {
+        Result.Ok<string> ok => WriteLine(ok.Value)
+        Result.Error<Utf8SliceError> error => {
+            if error.Value.IsOutOfRange { WriteLine("Out of range") }
+            else if error.Value.IsInvalidBoundary { WriteLine("Invalid boundary") }
+        }
+    }
+}
+func Main() {
+    let text = "Aé😀Z"
+    ShowSlice(Extract(text, 1, 2))
+    ShowSlice(Extract(text, 3, 4))
+    ShowSlice(Extract(text, 8, 0))
+    ShowSlice(Extract(text, 2, 0))
+    ShowSlice(Extract(text, 3, 3))
+    ShowSlice(Extract(text, -1, 1))
+    ShowSlice(Extract(text, 7, 2))
+    ShowSlice(Extract(text, 0, 2147483647))
+    ShowSlice(Extract(text, 2, 2147483647))
+    ShowSlice(Extract(text, 0, -1))
+    ShowSlice(Extract("", 0, 0))
+}

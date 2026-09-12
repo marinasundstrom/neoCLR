@@ -38,19 +38,19 @@ static class SignatureProbe
         Check("Input signature remains unchanged", shape.FullName == before);
         var extraction = result.Methods.Single(m => m.Name == "TryGetResidual");
         var reference = Reference(extraction, owner);
-        var matched = RuntimeSignatures.Match(reference, extraction, FileBindings.Type);
+        var matched = RuntimeSignatures.Match(reference, extraction, ResultBindings.Type);
         Check("Closed residual parameter", matched.Args.SequenceEqual(new[] { FileBindings.ReadError + "&" }) && matched.Result == "Boolean");
         reference.ReturnType = module.TypeSystem.Int32;
-        Reject("Return mismatch", () => RuntimeSignatures.Match(reference, extraction, FileBindings.Type));
+        Reject("Return mismatch", () => RuntimeSignatures.Match(reference, extraction, ResultBindings.Type));
         reference = Reference(extraction, owner);
         reference.Parameters[0].ParameterType = new ByReferenceType(module.TypeSystem.String);
-        Reject("Parameter mismatch", () => RuntimeSignatures.Match(reference, extraction, FileBindings.Type));
+        Reject("Parameter mismatch", () => RuntimeSignatures.Match(reference, extraction, ResultBindings.Type));
         reference = Reference(extraction, owner);
         reference.HasThis = false;
-        Reject("Receiver mismatch", () => RuntimeSignatures.Match(reference, extraction, FileBindings.Type));
+        Reject("Receiver mismatch", () => RuntimeSignatures.Match(reference, extraction, ResultBindings.Type));
         var shortOwner = new GenericInstanceType(result);
         shortOwner.GenericArguments.Add(module.TypeSystem.String);
-        Reject("Owner arity mismatch", () => RuntimeSignatures.Match(Reference(extraction, shortOwner), extraction, FileBindings.Type));
+        Reject("Owner arity mismatch", () => RuntimeSignatures.Match(Reference(extraction, shortOwner), extraction, ResultBindings.Type));
         Reject("Out of range generic index", () => RuntimeSignatures.Close(result.GenericParameters[1], shortOwner));
         var openMethod = new MethodReference("Open", module.TypeSystem.Void, result);
         var methodParameter = new GenericParameter("M", openMethod);
@@ -70,7 +70,7 @@ static class SignatureProbe
         var voidOwner = new GenericInstanceType(result);
         voidOwner.GenericArguments.Add(namedVoid);
         voidOwner.GenericArguments.Add(module.GetType(FileBindings.WriteError));
-        Check("Generic Void result remains a carrier", RuntimeSignatures.Map(voidOwner, FileBindings.Type, returns: true)
+        Check("Generic Void result remains a carrier", RuntimeSignatures.Map(voidOwner, ResultBindings.Type, returns: true)
             == "System.Result<Void,System.IO.FileWriteError>");
         var stringType = module.GetType("System.String");
         var concat = stringType.Methods.Single(m => m.Name == "Concat");

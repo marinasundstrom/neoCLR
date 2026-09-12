@@ -12,16 +12,17 @@ static class StringBindings
         new("StartsWithOrdinal", ["String"], "Boolean", true, true),
         new("EndsWithOrdinal", ["String"], "Boolean", true, true),
         new("GetUtf8ByteCount", [], "Int32", true),
-        new("IsEmpty", [], "Boolean", true)
+        new("IsEmpty", [], "Boolean", true),
+        new("SliceUtf8", ["Int32", "Int32"], ResultBindings.Slice, true)
     ];
-    static string CSharp(string type) => type switch { "String" => "string", "Int32" => "int", "Boolean" => "bool", _ => throw new InvalidDataException(type) };
-    public static string Declarations => "public sealed class String { " + string.Join(" ", Members.Select(m =>
+    static string CSharp(string type) => type switch { "String" => "string", "Int32" => "int", "Boolean" => "bool", ResultBindings.Slice => "Result<string, Text.Utf8SliceError>", _ => throw new InvalidDataException(type) };
+    public static string Declarations(bool results) => "public sealed class String { " + string.Join(" ", Members.Where(m => results || m.Result != ResultBindings.Slice).Select(m =>
         $"public {(m.Instance ? "" : "static ")}{CSharp(m.Result)} {m.Name}({string.Join(',', m.Parameters.Select((p, i) => CSharp(p) + " value" + i))}) => default;")) + " }";
     public sealed record Binding(string[] Arguments, string Result, string Instruction);
     public static Binding? Bind(MethodReference reference, MethodDefinition definition, bool callvirt)
     {
         if (reference.DeclaringType.FullName != "System.String" || !RuntimeSignatures.IsCore(reference.DeclaringType.Scope)) return null;
-        var signature = RuntimeSignatures.Match(reference, definition, _ => null);
+        var signature = RuntimeSignatures.Match(reference, definition, ResultBindings.Type);
         var member = Members.SingleOrDefault(m => m.Name == reference.Name && m.Instance == reference.HasThis
             && m.Result == signature.Result && m.Parameters.SequenceEqual(signature.Args))
             ?? throw new InvalidDataException("Unsupported String member: " + reference.FullName);

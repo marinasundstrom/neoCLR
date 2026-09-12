@@ -104,3 +104,6 @@ Length. Culture, normalization and case folding remain future work.
 
 [Character classification](character-classification.md) adds familiar System.Char predicates and
 Neo character literals, including Unicode IsDigit and explicit IsAsciiDigit.
+
+The experimental [Raven String projection](raven-string-api.md) now includes
+SliceUtf8 with typed Result handling and propagation over its existing error contract.

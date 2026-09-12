@@ -138,7 +138,7 @@ try:
     if strings:
         for version, access, prefix, expected, forbidden in (
             (10, 'text.', '    let text = "hello"\n',
-             ('Equals', 'ContainsOrdinal', 'StartsWithOrdinal', 'EndsWithOrdinal', 'GetUtf8ByteCount', 'IsEmpty'), ('Substring', 'Contains')),
+             ('Equals', 'ContainsOrdinal', 'StartsWithOrdinal', 'EndsWithOrdinal', 'GetUtf8ByteCount', 'IsEmpty', 'SliceUtf8'), ('Substring', 'Contains')),
             (11, 'System.String.', '', ('Concat', 'CompareOrdinal'), ('IsNullOrEmpty', 'Join', 'Format'))):
             text = 'import System.*\nfunc Main() {\n' + prefix + '    ' + access + '\n}'
             send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})

@@ -17,6 +17,21 @@ See [error policy](errors.md#platform-policy-clarified-2026-09-12).
 This is a preview design. The inventory below distinguishes implemented contracts
 from follow-up work; it does not imply that every library method has been migrated.
 
+## Presenting the proof of concept
+
+API feedback is an intended outcome of the POC. Familiar platform principles and
+useful code compatibility guide the design, while neoCLR can define its own APIs.
+Result-based error handling deliberately changes calling contracts and requires
+adaptation of exception-based code. Evaluators should help test whether these
+contracts are useful and coherent; similarity to .NET does not promise identical APIs.
+
+The POC intentionally makes the library's state of development visible: familiar
+.NET APIs, deliberate differences and undecided or missing pieces coexist. These
+rough edges give evaluators useful evidence about the experiment and its direction.
+Document provisional choices and current behavior clearly, with executable examples
+and a coverage matrix. A familiar API name is not a claim of complete .NET behavior,
+and implemented preview behavior remains open to revision.
+
 ## References are values
 
 A `T&` local or parameter contains a reference value. Passing or returning it copies

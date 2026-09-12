@@ -7,6 +7,24 @@ full language-feature parity. Familiar .NET type and IL behavior is the baseline
 the visible differences are the runtime library's Result/Option error model, generic
 Void, and target library contracts consumed through Raven.
 
+## What the experiment should make visible
+
+API feedback is an intended outcome of the POC. Familiar platform principles and
+useful code compatibility guide the design, while neoCLR can define its own APIs.
+Result-based error handling deliberately changes calling contracts and requires
+adaptation of exception-based code. Evaluators should help test whether these
+contracts are useful and coherent; similarity to .NET does not promise identical APIs.
+
+Visible rough edges are part of the POC's value. An evaluator should be able to see
+which APIs follow familiar .NET behavior, which deliberately differ, and which are
+provisional, absent or under discussion. That is concrete material for evaluating
+neoCLR's direction and participating in its design.
+
+Present the library as an evolving experiment. Keep the examples useful, describe
+what they demonstrate, and link to the implemented/unsupported matrix and open API
+choices. Record test evidence for supported behavior alongside those choices; visual
+or naming familiarity alone does not imply .NET compatibility or a settled contract.
+
 ## Demonstration boundary
 
 | Area | Required evidence before public preview | Current state |

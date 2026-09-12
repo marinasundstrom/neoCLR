@@ -8,12 +8,20 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
-- Exposed eight existing String helpers through Raven: concatenation, ordinal
-  comparison/search, equality, empty checks and UTF-8 byte counts. A shared member
+- Recorded the author's POC framing: visible rough edges, .NET familiarity,
+  deliberate differences and unfinished API choices are useful material for evaluating
+  the experiment. Updated preview/API design guidance while keeping support and
+  test evidence explicit. Clarified the invitation for API feedback and the expected
+  compatibility cost of Result-based error contracts.
+
+- Exposed nine existing String methods through Raven: concatenation, ordinal
+  comparison/search, equality, empty checks, UTF-8 byte counts and slicing. A shared member
   catalog generates declarations and checked bindings; guest adapters supply readonly
   receivers. Added readable and Unicode-boundary samples, invalid-call checks and
-  editor completion coverage. SliceUtf8 remains pending; no runtime semantics or
-  Raven compiler changes, and no SDK/VSIX rebuild in this slice.
+  editor completion coverage. Slicing shares a Result/error catalog with file APIs;
+  range/boundary errors propagate and unsafe extraction is rejected. Error-carrier
+  case constructors/accessors and ToString remain pending. No runtime semantics or
+  Raven compiler changes, and no SDK/VSIX rebuild in these slices.
 
 - Shared Raven bridge signature substitution and checking across file and collection
   calls, including constructors. Nested type arguments now use one recursive path;
