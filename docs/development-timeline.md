@@ -1543,6 +1543,40 @@ and missing-product paths on neoCLR. The project/editor verification evidence is
 from the [fundamental demo](experiments/raven-target/README.md#fundamental-raven-demonstration).
 These examples establish a useful subset, not full migration or arbitrary type import.
 
+## 53. Trying the tools locally before a public bundle — recorded 2026-09-12
+
+**Author direction.** Asked to update the SDK and VS Code extension so they could try
+the experiment, and asked whether more work was needed first. Added that, when ready,
+the project should produce a build other people can try themselves.
+
+**Assistant response.** Proposed testing the current bounded demo now, using a local
+experimental SDK/extension and a prepared workspace. Proposed a later downloadable bundle
+with pinned neoCLR/Raven tools, the extension, demo and a clear build/run path. Local
+feedback should expose usability problems before distributing it more broadly.
+
+**Subsequent direction.** The author proposed merging neoCLR work into neoCLR main,
+then updating documentation and producing a public build/release. They also suggested
+publishing matching Raven tools with NeoCLR. The assistant agreed that the tools should
+be pinned experimental SDK/extension artifacts, without merging Raven's branch or
+presenting them as a general Raven release.
+
+**Propagation follow-up.** The author proposed adding propagation before the public
+preview for a complete NeoCLR union story, and specified that its interface belongs in
+the NeoCLR runtime library. The assistant proposed completing the local installation
+first, then validating Raven against that runtime-owned contract while preserving its
+.NET behavior. This is the next feature slice, not functionality in the current build.
+
+**Release verification.** The author also requested checking match expression and
+statement syntax and documenting what works and does not work for the release. The
+assistant agreed to require compilation and execution evidence, not just parsing or
+completion. The pre-merge full neoCLR suite subsequently found a generic Clonable
+assembly-resolution failure; merge readiness remains pending that regression.
+
+**Scope.** Public distribution remains a future goal, not a release announced or
+published by this exchange. Raven remains isolated on its experiment branch. See the
+[local installation instructions](experiments/raven-target/VSCODE.md) for installation
+status and the existing bounded-target limitations.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

@@ -7,51 +7,50 @@ Do not use their success as evidence that a program ran on neoCLR.
 
 ## Already prepared on this machine
 
-A local extension build, `raven.raven-vscode@0.1.12-neoclr.2`, is installed. This is an
-experiment label, not a published release. Its bundled compiler library and language
-server include Raven commit `5b773ae3536f52ef077c8897867950249d6dde90` from
-`codex/neoclr-target-resolution`. A separate SDK bundle is installed alongside the
-existing SDK at `/Users/robert/.raven/sdk/0.1.12-neoclr.1`; its `rvnc --version` reports
-`0.1.12-neoclr.1`. The demo's settings select this SDK without changing global PATH
-or the default SDK symlink.
+The current local experiment uses `raven.raven-vscode@0.1.12-neoclr.3` and the
+side-by-side SDK `/Users/robert/.raven/sdk/0.1.12-neoclr.3`, built from Raven commit
+`1e3f7ff07d8a9785ed54105b74d1fcda96c8795f` on `codex/neoclr-target-resolution`.
+These are local experiment labels, not published releases. The default SDK launcher
+remains unchanged; the new workspace selects the experimental SDK and installed server.
 
 Open the prepared folder:
 
 ```sh
-code --new-window /Users/robert/Projects/neoclr/docs/experiments/raven-target/local/2026-09-12-editor/editor
+code --new-window /Users/robert/Projects/neoclr/docs/experiments/raven-target/local/2026-09-12-fundamentals-3/editor
 ```
 
-1. If the window predates installation, run **Developer: Reload Window**.
-2. Open `Main.rvn`. It contains the Result-based Math.Abs example.
-3. Inside `Main`, temporarily add a line and type `System.Math.`. The member suggestions
-   should include **Abs, Max, Min, Sign**. Delete/retype the dot if a pasted fragment
-   does not trigger suggestions. An unfinished expression will produce diagnostics.
-4. Try `System.Console.`: **WriteLine** should appear; **ReadLine** should not.
-5. Try `System.`: **Option**, **Result** and **Void** should appear; **IO** should not.
-6. Undo those test edits to restore the runnable example.
+1. Run **Developer: Reload Window** if VS Code was open during the update.
+2. Open `Main.rvn`, containing the combined product workflow.
+3. Choose **Terminal → Run Task → neoCLR: Run saved project**.
+4. Expect `42`, `Completed`, `Price overflow`, `Skipped`, `Product not found`,
+   `Skipped`, then `=> Void`.
+5. Change `products.Add(99)` to `products.Add(7)`, save, and run the task again.
+   The final missing-product path should become `42`, `Completed`.
+6. Try completion after `System.Math.` or `products.`; undo any unfinished test
+   expressions before running. Hover over the loop variable declaration to see `int`.
 
-In **View → Output → Raven**, check the extension version and language server path.
-The folder's `.vscode/settings.json` pins the installed experimental server, avoiding
-an older SDK/server selected elsewhere. This affects this workspace only. The generated
-`Demo.rvnproj` supplies only `NeoCLR.CoreProbe.dll`; that is a metadata declaration
-artifact, not the runtime implementation. Host tools still run on .NET 11.
+The workspace settings pin the installed extension's language server. The project uses
+only the neoCLR declaration assembly, while executable calls use the adapted runtime
+library. Host tooling still requires .NET 11. The SDK is a Raven host toolchain;
+neoCLR execution uses the dedicated tasks, not Raven's normal Build/Run/Debug buttons.
 
-The local UI check on 2026-09-12 displayed all four Math methods. The client log recorded
-`textDocument/completion` at `2:16`, `items=4`; server startup identified the installed
-extension's server. The reproducible protocol check also covers Console and System.
-See [editor-results.json](editor-results.json) for the bounded evidence.
+The installed server passed the stdio completion/hover checks, and the saved workflow
+compiled, verified and ran successfully on 2026-09-12. The wider pre-merge runtime
+suite found a generic Clonable assembly-resolution regression; this local demo is not
+a claim that the branch is release-ready. Propagation and match syntax release coverage
+are still pending.
 
 ## Edit, build and run the saved project
 
-Requires Raven commit `5b773ae3536f52ef077c8897867950249d6dde90` or the corresponding
+Requires Raven commit `1e3f7ff07d8a9785ed54105b74d1fcda96c8795f` or the corresponding
 source build. The runner uses that checkout's compiler API; the independently installed
 SDK is not the target build backend yet.
 
-1. Edit `Main.rvn`, for example changing `Show(-42)` to `Show(-7)`, and **save** it.
+1. Edit `Main.rvn`, for example changing `products.Add(99)` to `products.Add(7)`, and **save** it.
 2. Choose **Terminal → Run Task → neoCLR: Run saved project**.
 3. The task compiles the project's saved Compile items against its declared core, applies
    the target Void projection, imports the bounded IL, verifies it and executes it.
-   The edited example prints `7`, `Overflow`, `=> Void`.
+   The edited workflow handles the final product successfully rather than printing Product not found.
 4. **neoCLR: Build saved project** performs the same steps except execution.
 
 The tasks are already configured in the prepared folder. They are separate from Raven's
@@ -78,10 +77,9 @@ Preparation also creates these tasks; pass `--runtime` to choose the executable 
 neoCLR's `target/debug/neoclr`). Unrelated task entries are preserved. The current project
 profile accepts exactly the supplied core reference and no project references. It reuses
 the Result/Option/Void importer: this is not general Raven IL support. Some declarations
-visible in completion are still outside that execution profile, including Math.Min/Max/Sign.
+visible in completion are still outside that execution profile, beyond the documented catalog.
 Unsupported instructions/APIs fail admission instead of falling back to host execution.
-The edit/build/run milestone is closed. The interface contract is next; union
-propagation is deferred until that contract is established.
+The edit/build/run milestone is closed. The bounded interface/iteration contract now works; union propagation remains deferred.
 
 `verify_project.py` exercises the three union demos, a saved edit, a compiler failure,
 and an unsupported-instruction failure without overwriting the user's project.
@@ -92,7 +90,7 @@ Prerequisites: the pinned .NET SDK from `global.json`, Node/npm, the VS Code `co
 command, and a Raven checkout with the commit above. From the Raven repository:
 
 ```sh
-RAVEN_PACKAGE_OUTPUT="$PWD/artifacts/neoclr-local" scripts/package-vscode.sh 0.1.12-neoclr.2
+RAVEN_PACKAGE_OUTPUT="$PWD/artifacts/neoclr-local" scripts/package-vscode.sh 0.1.12-neoclr.3
 code --install-extension "$PWD/artifacts/neoclr-local/raven-vscode.vsix" --force
 code --list-extensions --show-versions
 code --locate-extension raven.raven-vscode
@@ -106,15 +104,15 @@ published version. Other projects retain their normal reference policy.
 For a separate local SDK bundle, the repository also supports:
 
 ```sh
-RAVEN_PACKAGE_OUTPUT="$PWD/artifacts/neoclr-local" scripts/package-sdk.sh osx-arm64 0.1.12-neoclr.1
+RAVEN_PACKAGE_OUTPUT="$PWD/artifacts/neoclr-local" scripts/package-sdk.sh osx-arm64 0.1.12-neoclr.3
 ```
 
 To install that bundle alongside existing SDKs (the destination must not exist):
 
 ```sh
 mkdir -p "$HOME/.raven/sdk"
-cp -R artifacts/neoclr-local/raven-sdk-0.1.12-neoclr.1-osx-arm64 "$HOME/.raven/sdk/0.1.12-neoclr.1"
-"$HOME/.raven/sdk/0.1.12-neoclr.1/bin/rvnc" --version
+cp -R artifacts/neoclr-local/raven-sdk-0.1.12-neoclr.3-osx-arm64 "$HOME/.raven/sdk/0.1.12-neoclr.3"
+"$HOME/.raven/sdk/0.1.12-neoclr.3/bin/rvnc" --version
 ```
 
 Set the demo's `raven.sdkPath` to that directory, or pass `--sdk /absolute/sdk-directory`
@@ -147,27 +145,12 @@ It writes `lsp-transcript.json` and `lsp-stderr.log` in that folder; the server 
 writes `logs/raven-lsp.log`. This is a headless protocol test, independent of the manual
 VS Code check above. It does not change the saved sample text.
 
-## Run the runtime demonstration
-
-From the neoCLR root:
-
-```sh
-cargo run -- run docs/experiments/raven-target/local/2026-09-12-editor/CoreUnion.neoil
-```
-
-Expected output is `42`, `Overflow`, and the CLI result display `=> Void`.
-The import uses the real System.Math and Result library. This saved IL corresponds to
-the sample at probe generation time. Editing `editor/Main.rvn` does **not** change this older saved artifact.
-Use **neoCLR: Run saved project** above to compile and execute your current saved edits.
-
-
 ## Collection project follow-up
 
 This follow-up needs Raven commit `1e3f7ff07d8a9785ed54105b74d1fcda96c8795f`
-on `codex/neoclr-target-resolution` (or a compatible descendant). The previously
-installed extension/server described above predates project iteration configuration.
-Build the current server and let the generated workspace settings select it; this does
-not replace the installed extension or SDK and does not change global .NET settings.
+on `codex/neoclr-target-resolution` (or a compatible descendant). The installed experimental extension above includes project iteration configuration.
+For a source-only setup instead, build the current server and let generated workspace
+settings select it. This does not change global .NET settings.
 
 From the Raven repository:
 

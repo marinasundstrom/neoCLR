@@ -49,7 +49,9 @@ demonstrates collections alongside Result/Option/Void; acceptance checks cover o
 class/array aliases and value-carrier copying. Keep this a fundamental demonstration,
 not full integration. Raven remains on its separate experiment branch and its changes
 will be evaluated separately. Union
-propagation remains subsequent work.
+propagation is the next feature slice before public distribution. Its interface belongs
+to the NeoCLR runtime library; Raven should resolve that target contract while retaining
+its existing .NET behavior.
 The [interface contract probe](raven-interface-contract.md) establishes the first
 dependency order: nominal interface-reference dispatch (first bounded runtime support
 implemented), closed generic classes (runtime support implemented), ordinary array-reference/default storage
@@ -66,6 +68,17 @@ scenario, exposing declarations and executable implementations together; the POC
 is a checkpoint toward that broader demonstration.
 This experiment order takes precedence over older next-slice notes about propagation;
 it does not mark the broader platform roadmap complete.
+
+Before wider distribution, have the author try the updated local SDK/extension and
+fundamental demo. Then prepare a reproducible experimental bundle with pinned neoCLR
+and Raven revisions, target declarations/library, VS Code setup and build/run instructions.
+Merge the neoCLR experiment into main, update release-facing documentation, and include
+matching experimental Raven SDK/extension builds with the NeoCLR preview. Verify
+Raven match expressions and statements end-to-end, recording supported and rejected
+forms in the release documentation alongside propagation coverage. Keep Raven
+on its separate branch. Validate the bundle outside the developer checkout before
+calling it a build others can try.
+This is planned distribution work, not a published release or full SDK target integration.
 
 ## Immediate preview priority
 

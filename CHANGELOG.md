@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-12
 
+- Prepared local Raven SDK/VS Code extension 0.1.12-neoclr.3 from the isolated Raven
+  feature branch, with a fresh combined demo workspace and updated try-it instructions.
+  The SDK is installed alongside the default tools; the workspace selects the new server.
+  Recorded plans for a NeoCLR preview bundle including matching Raven tools, runtime-owned
+  propagation support and verified match syntax. Pre-merge testing found a Clonable generic
+  assembly-resolution regression; main merge and public release remain pending.
+
 - Fixed the Raven saved-project importer rejecting the advertised Int32 Math.Min,
   Math.Max and Math.Sign APIs. It now reuses the target declaration catalog with
   resolved-signature checks and executes the existing runtime methods. Added a sample
