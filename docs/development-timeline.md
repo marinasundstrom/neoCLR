@@ -1371,6 +1371,20 @@ changes the output, while compiler/import failures stop without running stale ar
 Propagation and interfaces remain planned, not reported as implemented. The dedicated
 VS Code tasks still differ from Raven's normal toolbar pipeline.
 
+## 44. Close the POC and establish interfaces first — recorded 2026-09-12
+
+**Author direction.** The author stated that union propagation can wait until the
+interface contract exists, asked what should come next, and proposed closing and tagging
+this milestone. This revises the ordering recorded in entry 43; it does not erase it.
+
+**Assistant response and action.** The assistant assessed the bounded POC as complete,
+recorded its evidence and remaining limits, and chose a local annotated experiment tag,
+`milestone/raven-poc-2026-09-12`, pinning the Raven dependency. This does not publish a
+release or push either repository. The next proposed milestone is a documented interface
+contract followed by a concrete class/interface dispatch example from Raven on neoCLR.
+Union propagation is explicitly deferred; the detailed interface scope remains to be
+validated against CLI metadata, runtime behavior and the end-to-end example.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

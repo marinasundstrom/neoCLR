@@ -545,3 +545,36 @@ is Raven's existing union propagation operator: successful extraction, compatibl
 return, nested calls and rejection of incompatible carriers, with emitted artifacts and
 runtime execution checked separately. Interfaces and broader virtual dispatch follow
 later, as directed by the author. No propagation implementation is claimed in this slice.
+
+## Milestone closed: Raven POC (2026-09-12)
+
+The bounded editor/library/execution milestone is complete. The local annotated tag
+`milestone/raven-poc-2026-09-12` records this checkpoint, with Raven dependency
+`5b773ae3536f52ef077c8897867950249d6dde90` on `codex/neoclr-target-resolution`.
+This is an experiment checkpoint, not a new preview release or a claim of general
+Raven/.NET application compatibility. Existing published preview tags remain unchanged.
+
+Acceptance evidence includes real-library Result/Option/Void execution, target-aware
+completion in the installed VS Code extension, saved-source build/run tasks, changed
+output after an edit, and rejection without stale execution. Reproduction and limitations
+are in the [walkthrough](experiments/raven-target/VSCODE.md), with
+[project checks](experiments/raven-target/project-results.json) and
+[editor checks](experiments/raven-target/editor-results.json). Binary loading still uses
+the bounded Cecil bridge; generic Void still has a target projection and an inhabited VM
+marker. Dedicated tasks are separate from Raven's ordinary toolbar pipeline.
+
+The author revised the next-step order: establish the interface contract before union
+propagation. The next milestone should agree and demonstrate one interface implemented
+by a concrete class, passed as an interface and invoked through that view from Raven.
+Research should compare CLI InterfaceImpl/MethodImpl metadata, callvirt dispatch and
+assignability with neoCLR's current implementation. Distinguish class-reference receivers
+from value receivers and constrained calls; do not assume boxing can simply be omitted.
+Specify method signature matching, generic substitution, inherited interface requirements,
+and missing-implementation/invalid-cast behavior before broadening admission. Reuse
+existing runtime capabilities where they satisfy the contract, keeping compiler changes
+small. Default/explicit implementations and broader generic/value cases should be scoped
+from that evidence rather than silently included in the first runnable case.
+
+Union propagation is deferred until that contract is established. Its later acceptance
+cases remain success extraction, compatible failure return, nested calls and incompatible
+carrier rejection; no propagation support is claimed by this checkpoint.

@@ -10,6 +10,15 @@ binding immutability/readonly references, inheritance, nullable slots, enums/fla
 dynamic hooks, and a more useful fundamental library. Familiarity primarily means C#/.NET APIs and observable behavior, not matching
 source syntax or runtime internals. Improve contracts without legacy constraints.
 
+## Current Raven-target experiment priority
+
+The [bounded Raven POC milestone](raven-target-experiment.md#milestone-closed-raven-poc-2026-09-12)
+is closed at `milestone/raven-poc-2026-09-12`. Next, establish the interface contract
+against CLI metadata, assignability and dispatch behavior, then demonstrate a concrete
+class through an interface from Raven on neoCLR. Union propagation follows that contract.
+This experiment order takes precedence over older next-slice notes about propagation;
+it does not mark the broader platform roadmap complete.
+
 ## Immediate preview priority
 
 The [library-focused preview plan](library-preview.md) sets the immediate order:

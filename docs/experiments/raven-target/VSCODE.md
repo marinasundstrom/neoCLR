@@ -80,7 +80,8 @@ profile accepts exactly the supplied core reference and no project references. I
 the Result/Option/Void importer: this is not general Raven IL support. Some declarations
 visible in completion are still outside that execution profile, including Math.Min/Max/Sign.
 Unsupported instructions/APIs fail admission instead of falling back to host execution.
-Union propagation is the next milestone; interfaces and broader dispatch remain later.
+The edit/build/run milestone is closed. The interface contract is next; union
+propagation is deferred until that contract is established.
 
 `verify_project.py` exercises the three union demos, a saved edit, a compiler failure,
 and an unsupported-instruction failure without overwriting the user's project.

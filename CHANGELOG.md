@@ -50,7 +50,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   dedicated VS Code build/run tasks using saved project sources, target emission and
   verifier-gated execution. Each build has fresh outputs; failed compilation/import
   cannot run stale IL. Verified Result/Option/Void, changed output and rejection cases.
-  Recorded propagation as the next milestone and interfaces as later work.
+  Initially recorded propagation as next; subsequent author direction puts the
+  interface contract first and defers propagation. Closed the bounded Raven POC as
+  an experiment checkpoint, with acceptance evidence, limitations and pinned Raven
+  dependency for local tag milestone/raven-poc-2026-09-12; no preview release published.
 
 - Began nominal class reference semantics: `.type class` uses managed heap handles in
   ordinary class-typed storage, while managed byrefs still address slots. Assignment,
