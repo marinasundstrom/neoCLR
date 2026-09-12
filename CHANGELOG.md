@@ -72,6 +72,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   typed defaults and nested references surviving GC/artifact round trips; 96 focused
   tests pass for this generic-class slice. Constructor field-default
   limits (including String/arrays) remain; collection import/adaptation is still pending.
+  Added ordinary interface-reference array elements and indirect interface-slot loads/
+  rebinding, with typed null defaults, identity/GC retention and invariant element checks.
+  Ten new regressions and 90 related tests pass.
+  The array itself still uses the legacy `T[]&` representation; CLR array-reference
+  signatures/defaults and Raven array import remain unfinished.
 
 - Began nominal class reference semantics: `.type class` uses managed heap handles in
   ordinary class-typed storage, while managed byrefs still address slots. Assignment,

@@ -78,7 +78,7 @@ The preferred path is runtime adaptation under the existing compiler metadata su
 | --- | --- |
 | Raven compilation | Candidate class/interface declarations bind and emit with standard calls; tested without compiler changes at Raven 5b773ae3536f52ef077c8897867950249d6dde90. |
 | Nominal classes | Nominal classes now admit generic owner parameters, interface conformance and dispatch. Class inheritance, methods with their own type parameters on nominal classes and virtual/byref class receivers remain unsupported. |
-| Existing interface runtime | Legacy views remain unchanged. Ordinary interface object references now support explicit casts, typed slots/fields, GC and dispatch; implicit storage conversions and interface arrays/indirect access remain later work. |
+| Existing interface runtime | Legacy views remain unchanged. Ordinary interface object references now support explicit casts, typed slots/fields, GC and dispatch; interface arrays and indirect slot access are now admitted; implicit storage conversions and ordinary array-reference representation remain later work. |
 | Library | ArrayList<T> is still a value wrapper holding shared state; ArrayIterator<T> is an explicitly heap-allocated legacy record. Adapt actual implementations after receiver/storage support exists. |
 | Import bridge | UnionImport deliberately rejects these collection types and emits no executable. Candidate declarations are isolated from the working core surface. |
 
@@ -185,3 +185,13 @@ constructor argument does not bypass this rule. The array/default storage contra
 implicit reference assignability/import support are therefore the next collection
 prerequisites. The candidate Raven collection probe remains compile-only and rejected
 by the importer. The existing Neo collection implementation is unchanged.
+
+## Interface elements and slot access (2026-09-12)
+
+[Object-reference array elements](managed-arrays.md#nominal-object-reference-elements-2026-09-12)
+now support typed null defaults, exact-type stores, interface dispatch and indirect
+load/rebinding through element addresses. These paths reuse existing GC retention and
+frame provenance checks. The remaining array blocker is the array reference itself:
+legacy `T[]&` is not the CLI ordinary `T[]` object reference. Constructor defaults and
+import admission must account for that distinction before the Raven collection demo
+can run; the existing Neo collection implementation is unchanged.

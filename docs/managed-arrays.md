@@ -143,3 +143,42 @@ without defaults, such as strings and records. Length is evaluated once, then ch
 before evaluating elements once each from left to right. Trailing commas and multiline
 initializers are accepted. Existing `new int[3]`, literals and array(length, value)
 forms remain supported. Writable references to owned locals still require var.
+
+## Nominal object-reference elements (2026-09-12)
+
+Arrays now admit ordinary interface-typed elements in addition to nominal class
+references. `newarr Read` initializes each element to a typed null reference; `stelem Read` stores an explicit `castclass Read` view, and `ldelem Read` returns the same object
+identity for dispatch. An uninitialized `array.alloc` slot remains different from null.
+Element types stay invariant and storage still requires an exact static type.
+
+A managed address returned by `ldelema Read` addresses the **slot containing a reference**.
+`ldobj Read` copies that reference; `stobj Read` rebinds the slot. It does not overwrite
+the old object's fields. Ordinary interface locals and fields support the same indirect
+operations. The slot's lifetime remains independently checked: a heap array element
+address retains the array and its referenced objects, while a current-frame slot cannot
+escape just because the object stored in it is on the heap. Legacy borrowed interface
+views are dispatch projections, not addresses of ordinary interface slots.
+
+This fills a storage gap in the [nominal interface contract](raven-interface-contract.md).
+Primary sources checked 2026-09-12: Microsoft's
+[Newarr contract](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.newarr?view=net-10.0)
+and [Ldelema contract](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.ldelema?view=net-10.0)
+distinguish the array object reference from a managed pointer to an element. Reusing the
+existing element/slot machinery preserves that distinction inside elements without
+adding instructions or changing metadata. A special interface-buffer wrapper would add
+an unnecessary allocation and another library contract.
+
+There remains an explicit ABI difference: neoCLR's existing `newarr` returns `T[]&`,
+whereas CLI newarr returns an ordinary array object reference. This slice does **not**
+resolve that difference, introduce covariance or make the existing owned `T[]` nullable.
+Nominal class constructors still cannot default a legacy array-reference field; explicit
+field-based construction can retain an already allocated buffer. The Raven importer
+must continue rejecting array signatures until their ordinary-reference representation
+is implemented. This is a prerequisite for adapting collections, not the completed
+collection migration. String defaults also remain unsupported.
+
+`tests/object_reference_arrays.rs` exercises nulls, dispatch/identity, slot rebinding,
+GC retention through an escaped element address, generic buffer fields, invalid stores,
+invariant access, rejected frame-slot escape and borrowed-view misuse. Ten new tests
+and 90 related tests pass. Existing Neo array and ArrayList
+regressions validate that their value-copy and managed-reference behavior remains intact.

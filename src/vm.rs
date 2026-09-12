@@ -909,11 +909,6 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 }
                 Op::LoadObject(ty) | Op::StoreObject(ty) => {
                     check(ty)?;
-                    if crate::interfaces::interface_definition(module, ty).is_ok() {
-                        return Err(Fault::new(
-                            "interface views support dispatch, not value storage",
-                        ));
-                    }
                     if matches!(ty, Type::ByRef(_) | Type::ReadOnlyByRef(_)) {
                         return Err(Fault::new("managed references cannot be indirectly stored"));
                     }
@@ -1109,13 +1104,7 @@ fn check_type_context(
             }
             Ok(())
         }
-        Type::Array(t) => {
-            nested(t)?;
-            if crate::interfaces::interface_definition(module, t).is_ok() {
-                return Err(Fault::new("array elements require concrete values"));
-            }
-            Ok(())
-        }
+        Type::Array(t) => nested(t),
         Type::InterfaceRef(t) => {
             nested(t)?;
             crate::interfaces::interface_definition(module, t)?;
