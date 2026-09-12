@@ -147,3 +147,11 @@ the empty-reference-list host-core shortcut, and prevents cross-policy increment
 reuse. Console binds when supplied and is unavailable when omitted. This is tested
 with an explicit .NET reference pack; providing an independent neoCLR core library
 remains the next prerequisite, alongside generated-helper handling.
+
+## Core declaration slice (2026-09-12)
+
+The [minimal core reference artifact](raven-core-declarations.md) now supports binding
+and emission of the static-call corpus without .NET framework references. Its metadata
+and the emitted application resolve as a closed dependency set. This completes the
+bounded declaration prerequisite, not the executable runtime library. Binary reading,
+helper policy and validated call/return translation are next.

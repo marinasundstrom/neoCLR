@@ -1,5 +1,10 @@
 # Repository workflow
 
+## Raven integration work
+
+- Keep work in the Raven repository isolated on a feature branch. Verify its branch
+  before editing; do not make experiment changes on Raven's `main` branch.
+
 ## Changelog required for every commit
 
 - Include a staged `CHANGELOG.md` update in every commit, including code, tests,

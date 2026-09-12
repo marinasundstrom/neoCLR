@@ -8,13 +8,16 @@ static class ClosureAudit
     {
         using var resolver = new SuppliedAssemblies();
         foreach (var path in paths) resolver.Add(path);
+        // Resolving a member can make Cecil's TypeSystem synthesize a core AssemblyRef.
+        // Snapshot every image's actual table first; lookup order must not change the audit.
+        var assemblyReferences = resolver.Images.ToDictionary(a => a, a => a.MainModule.AssemblyReferences.ToArray());
         var errors = new SortedSet<string>(StringComparer.Ordinal);
         foreach (var assembly in resolver.Images)
         {
             var module = assembly.MainModule;
             if (assembly.Modules.Count != 1 || module.HasExportedTypes)
                 errors.Add($"{assembly.Name.Name}: multiple modules/type forwarding unsupported");
-            foreach (var reference in module.AssemblyReferences)
+            foreach (var reference in assemblyReferences[assembly])
                 Check($"assembly {reference.FullName}", () => resolver.Resolve(reference));
             foreach (var reference in module.GetTypeReferences())
                 Check($"type {reference.FullName} [{reference.Scope}]", () => reference.Resolve());

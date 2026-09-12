@@ -12,6 +12,14 @@ if (Directory.Exists(output)) throw new IOException("Output directory must not e
 Directory.CreateDirectory(output);
 var facadePath = Path.Combine(output, "NeoCLR.Probe.System.dll");
 CreateFacade(facadePath);
+var corePath = Path.Combine(output, CoreDeclarations.Identity + ".dll");
+CoreDeclarations.Write(corePath);
+var coreTypes = CoreDeclarations.ReadDeclaredTypes(corePath);
+using (var core = AssemblyDefinition.ReadAssembly(corePath))
+    if (!core.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.ReferenceAssemblyAttribute"))
+        throw new Exception("Core declarations are not marked as a reference assembly.");
+var coreErrors = ClosureAudit.Inspect(corePath);
+if (coreErrors.Length != 0) throw new Exception(string.Join("\n", coreErrors));
 var framework = TargetFrameworkResolver.ResolveVersion("net11.0");
 var referencePaths = TargetFrameworkResolver.GetReferenceAssemblies(framework);
 var targetReferences = referencePaths
@@ -23,6 +31,36 @@ func Main() {
     WriteLine("Hello from Raven on neoCLR")
 }
 """;
+var coreOnly = Compile("CoreOnly", source, [MetadataReference.CreateFromFile(corePath)], AssemblyName.GetAssemblyName(corePath), true, CoreDeclarations.Identity);
+if (coreOnly.References.Length != 1 || !coreOnly.References[0].StartsWith(CoreDeclarations.Identity + ","))
+    throw new Exception("Core-only output leaked an assembly reference.");
+var coreOnlyErrors = ClosureAudit.Inspect(Path.Combine(output, "CoreOnly.dll"), corePath);
+if (coreOnlyErrors.Length != 0) throw new Exception(string.Join("\n", coreOnlyErrors));
+if (!coreOnlyErrors.SequenceEqual(ClosureAudit.Inspect(corePath, Path.Combine(output, "CoreOnly.dll"))))
+    throw new Exception("Core closure audit depends on input ordering.");
+var coreOnlyCases = new Dictionary<string, ImageReport>();
+foreach (var (name, program) in new[] {
+    ("CoreEmpty", "func Main() {}"),
+    ("CoreNested", "func Empty() {} func Main() { Empty() }"),
+    ("CoreInt32", "func Answer() -> int { return 42 } func Main() { let answer = Answer() }") })
+{
+    coreOnlyCases[name] = Compile(name, program, [MetadataReference.CreateFromFile(corePath)], AssemblyName.GetAssemblyName(corePath), true, CoreDeclarations.Identity);
+    var closure = ClosureAudit.Inspect(Path.Combine(output, name + ".dll"), corePath);
+    if (closure.Length != 0) throw new Exception(string.Join("\n", closure));
+}
+var coreMissingConsoleErrors = CheckCoreRejection("CoreMissingConsole", false, true);
+var coreWrongSignatureErrors = CheckCoreRejection("CoreWrongSignature", true, false);
+string[] CheckCoreRejection(string name, bool includeConsole, bool stringParameter)
+{
+    var path = Path.Combine(output, name + ".dll");
+    CoreDeclarations.Write(path, includeConsole, stringParameter);
+    var compilation = Compilation.Create(name, [SyntaxTree.ParseText(source)], [MetadataReference.CreateFromFile(path)],
+        new CompilationOptions(OutputKind.ConsoleApplication, metadataImportOptions: new MetadataImportOptions(CoreDeclarations.Identity)));
+    var diagnostics = compilation.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error).Select(d => d.ToString()).ToArray();
+    var expected = includeConsole ? "RAV1503" : "RAV0103";
+    if (!diagnostics.Any(d => d.Contains(expected))) throw new Exception(name + " did not produce its expected binding error.");
+    return diagnostics;
+}
 var control = Compile("Control", source, referencePaths.Select(MetadataReference.CreateFromFile).ToArray(), null);
 var target = Compile("Target", source, targetReferences, AssemblyName.GetAssemblyName(facadePath));
 var isolatedTarget = Compile("IsolatedTarget", source, targetReferences, AssemblyName.GetAssemblyName(facadePath), true);
@@ -116,6 +154,12 @@ var report = new
         MissingDependencyErrors = missingDependencyErrors
     },
     Scope = "emission-only; fixture is not neoCLR System and generated code was not executed",
+    CoreDeclarationTypes = coreTypes,
+    CoreOnly = coreOnly,
+    CoreOnlyCases = coreOnlyCases,
+    CoreMissingConsoleErrors = coreMissingConsoleErrors,
+    CoreWrongSignatureErrors = coreWrongSignatureErrors,
+    CoreOnlyClosureErrors = coreOnlyErrors,
     FrameworkReferences = referencePaths.Length,
     IsolatedTarget = isolatedTarget,
     ExplicitOnlyIsolationPassed = true,
@@ -130,11 +174,11 @@ var report = new
 File.WriteAllText(Path.Combine(output, "report.json"), JsonSerializer.Serialize(report, new JsonSerializerOptions { WriteIndented = true }));
 Console.WriteLine($"PASS: control, target Console binding, core retargeting, missing-member diagnostic and metadata closure checks. Legacy missing-library isolation passed: {missingLibraryErrors.Length != 0}. Explicit-only isolation passed: True. Report: {output}/report.json");
 
-ImageReport Compile(string name, string text, MetadataReference[] references, AssemblyName? targetIdentity, bool isolated = false)
+ImageReport Compile(string name, string text, MetadataReference[] references, AssemblyName? targetIdentity, bool isolated = false, string coreName = "System.Runtime")
 {
     var compilation = Compilation.Create(name, [SyntaxTree.ParseText(text)], references,
         new CompilationOptions(OutputKind.ConsoleApplication,
-            metadataImportOptions: isolated ? new MetadataImportOptions("System.Runtime") : null));
+            metadataImportOptions: isolated ? new MetadataImportOptions(coreName) : null));
     var diagnostics = compilation.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
     if (diagnostics.Length != 0) throw new Exception(string.Join("\n", diagnostics.Select(d => d.ToString())));
     using var image = new MemoryStream();
@@ -143,6 +187,7 @@ ImageReport Compile(string name, string text, MetadataReference[] references, As
     File.WriteAllBytes(Path.Combine(output, name + ".dll"), image.ToArray());
     image.Position = 0;
     using var assembly = AssemblyDefinition.ReadAssembly(image);
+    var declaredReferences = assembly.MainModule.AssemblyReferences.Select(r => r.FullName).ToArray();
     var methods = assembly.MainModule.GetTypes().SelectMany(t => t.Methods).Select(m => new MethodReport(
         m.FullName, m.HasBody ? m.Body.Instructions.Select(Describe).ToArray() : [],
         m.HasBody ? m.Body.ExceptionHandlers.Count : 0)).ToArray();
@@ -150,7 +195,7 @@ ImageReport Compile(string name, string text, MetadataReference[] references, As
     var unresolvedCoreTypes = assembly.MainModule.GetTypeReferences()
         .Where(t => t.Scope.Name == "NeoCLR.Probe.System" && t.FullName != "System.Console")
         .Select(t => t.FullName).Distinct().Order().ToArray();
-    return new ImageReport(assembly.MainModule.AssemblyReferences.Select(r => r.FullName).ToArray(),
+    return new ImageReport(declaredReferences,
         assembly.MainModule.Types.Select(t => t.FullName).ToArray(), methods, unresolvedCoreTypes,
         assembly.MainModule.EntryPoint?.FullName,
         assembly.MainModule.GetTypeReferences().Select(t => $"{t.FullName} scope={t.Scope.Name}").Order().ToArray());

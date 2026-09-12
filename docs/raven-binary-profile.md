@@ -111,3 +111,11 @@ incremental state reuse. The updated [probe](experiments/raven-target/README.md)
 Console binding and omission through this mode. This addresses the tested compiler
 isolation prerequisite; a complete neoCLR core reference artifact, helper handling,
 full profile validation and runtime execution remain open.
+
+## Core declaration follow-up
+
+The [core reference artifact](raven-core-declarations.md) now closes the metadata
+requirements of the static-call corpus. The earlier core-declaration gap is resolved
+for those inputs only. Executable System binding, helper admission, binary parsing and
+stack verification remain required. The follow-up also corrects the earlier synthetic
+mscorlib entry in the application inventory.

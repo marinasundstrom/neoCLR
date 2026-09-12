@@ -19,7 +19,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   negative fixtures, and selected CLI PE reuse for the bounded binary experiment.
   Added probe coverage for Raven's opt-in explicit-only metadata import API: Console
   binds when supplied and is unavailable when omitted, even after host-mode binding.
-  Runtime loading/translation and complete core declarations remain planned.
+  Added a minimal core reference assembly and core-only Console, empty/nested-call
+  and Int32-return emission probes, with dependency and negative binding checks.
+  Corrected application AssemblyRef inventories to exclude references synthesized
+  by Cecil during inspection. Runtime loading/translation and executable System
+  binding remain planned. Recorded the workflow requirement to keep Raven work
+  isolated on a feature branch.
 
 - Documented the Raven target/binary-artifact experiment on its own branch: inspect
   the existing compiler, choose an evidence-backed format/library contract, and

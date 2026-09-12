@@ -1163,6 +1163,26 @@ revisions and validation are linked from the [probe instructions](experiments/ra
 **Still open:** Complete neoCLR core declarations, generated-helper handling, profile
 verification and binary loading. No change to neoCLR's class/value defaults is implied.
 
+## 34. Minimal core declarations — recorded 2026-09-12
+
+**Author direction:** Continued the experiment and specified that any Raven repository
+work must remain isolated on a feature branch. The assistant confirmed Raven was already
+on `codex/neoclr-target-resolution`; this slice required no additional Raven changes.
+
+**Assistant action:** Built a small metadata-only core reference assembly and compiled
+the static-call corpus with that single reference. Added negative Console/signature
+checks and corrected Cecil inspection order so synthesized in-memory references are
+not reported as artifact dependencies.
+
+**Outcome:** The Console, empty/nested-call and Int32-return examples bind and emit with
+closed metadata dependencies. This is a reference surface for testing; neoCLR has not
+executed these binaries. Earlier application mscorlib inventory entries included a
+synthetic Cecil reference; the old incomplete fixture's real dependency remains.
+
+**Still open:** Bind the reference surface to real System implementations, decide
+helper admission, and implement/validate the binary reader and call translation. The
+[core declaration contract](raven-core-declarations.md) records the evidence and limits.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

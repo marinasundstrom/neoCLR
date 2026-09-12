@@ -46,7 +46,7 @@ The input imports `System.Console.*` and declares `Main` calling
 - **Missing-library isolation fails:** omitting both Console references still binds.
   The probe records this as `MissingLibraryIsolationPassed: false` and inventories the
   resulting image. A passing emission probe is not a passing target-isolation check.
-- The target still references `mscorlib`. Cecil's declaration fixture introduces that
+- The incomplete declaration fixture references `mscorlib`. It introduces that
   core identity; output retargeting does not close all dependencies. The fixture lacks
   Object, ValueType and attribute definitions referenced by the target. The report
   also shows a `System.String` reference scoped to the target module without a local
@@ -108,3 +108,24 @@ optional for existing source callers. No guest neoCLR execution is claimed.
 Raven's `scripts/test-target-framework-matrix.sh` also passed: Raven.Core and Raven.Macros
 built for .NET 10/11, and the representative .NET 10 macro and .NET 11 runtime-async
 programs executed successfully. No changes were needed to those samples.
+
+## Core-only reference artifact (slice 5)
+
+The same command now creates `NeoCLR.CoreProbe.dll` as a metadata-only reference assembly
+using Roslyn 4.12.0 and no input references. Raven binds/emits the `CoreOnly`, `CoreEmpty`,
+`CoreNested` and `CoreInt32` programs with only this artifact supplied. The probe checks
+zero core AssemblyRefs using the raw metadata reader, the reference-assembly marker,
+application/core dependency resolution in both input orders, and missing Console / wrong
+parameter-type diagnostics. The existing framework-based controls remain separate.
+
+See [the core declaration contract](../../raven-core-declarations.md) for the distinction
+between compiler declarations and runtime implementations. The placeholder definitions
+are not neoCLR's System implementation. This slice makes no Raven repository changes;
+it uses the same Raven commit as slice 4, from neoCLR starting revision `33a216b`.
+
+The report/audit now snapshot AssemblyRefs before Cecil type resolution can synthesize
+an in-memory mscorlib reference. Earlier application inventories included such a synthetic
+reference. The old Console fixture still has a real mscorlib dependency and still fails.
+
+The complete updated probe passed, including the four core-only emissions and expected
+negative diagnostics. Raven remains unchanged on `codex/neoclr-target-resolution`.
