@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-12
 
+- Added a bounded standard CIL code-stream decoder for the static-call experiment,
+  preserving byte offsets and tokens and rejecting unsupported/truncated instructions.
+  Added a reproducible .NET-emitted byte fixture with matching neoCLR execution through
+  test-only binding; PE loading and production token resolution remain planned.
+  Clarified that real Void type participation need not occupy an evaluation-stack slot;
+  the existing generic representation has not yet been migrated.
+
 - Added explicit no-result metadata and assembly syntax for static, non-generic IL
   methods. The existing call/ret instructions now preserve CLI-style empty results;
   verifier/runtime reject invalid stacks and unsupported return-mode combinations.

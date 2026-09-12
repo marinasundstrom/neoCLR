@@ -1211,6 +1211,23 @@ library boundary. Binary reading and execution of Raven artifacts remain separat
 The [return-convention document](no-result-methods.md) records the restricted first subset,
 host-envelope behavior and the still-needed library binding policy.
 
+## 36. Void type identity versus stack representation — recorded 2026-09-12
+
+**Author clarification:** “In the neoCLR, void will be treated as a real type and the
+compiler targeting it has to adapt to it”, followed by “Even if void doesn't really
+put anything on the stack.”
+
+**Assistant response:** Distinguished real type participation from evaluation-stack
+representation. The previous no-result slice does not make inhabited generic Void's
+current internal representation a permanent contract. Targeting compilers must understand
+neoCLR's Void semantics; binary generic encoding and uniform zero-stack handling remain
+open implementation work.
+
+**Action/outcome:** Updated the [return-convention document](no-result-methods.md).
+Continued the independent [standard CIL decoder](cil-decoder.md) groundwork with byte
+offsets and token preservation. This does not implement the broader Void representation
+change or load Raven binaries.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

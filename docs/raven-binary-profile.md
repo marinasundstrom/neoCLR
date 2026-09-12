@@ -128,3 +128,10 @@ standard static no-result call/return behavior directly in the runtime. This sup
 the above proposal to insert Void construction/disposal at every imported IL call/return.
 Existing inhabited-Void System calls still need an explicit binding boundary. Binary
 loading is not implemented by this return-convention slice.
+
+## Instruction decoder groundwork (2026-09-12)
+
+The [bounded CIL decoder](cil-decoder.md) now reads the static corpus's instruction
+forms with original byte offsets and tokens. .NET-emitted method bytes are tested against
+neoCLR execution through test-only binding. PE/header/metadata admission, actual token
+resolution and production lowering remain unimplemented; this is not a binary loader.

@@ -1,5 +1,6 @@
 mod arrays;
 pub mod assembler;
+pub mod cil;
 mod constraints;
 mod enums;
 pub use assembler::assemble;

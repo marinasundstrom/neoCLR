@@ -105,3 +105,12 @@ intended direction. The current internal return marker preserves a narrow distin
 while that migration is planned; it is not a commitment to retain the original type model
 or export a new CLI return flag. Generic Void remains an intentional extension to examine
 at that boundary, not a reason to add general compatibility workarounds.
+
+## Subsequent author clarification (2026-09-12)
+
+Void is a real neoCLR type and targeting compilers must adapt to that contract, even
+when it contributes no evaluation-stack value. Type participation and physical stack
+representation are distinct. The existing inhabited generic Void representation described
+above is current behavior, not a requirement that every Void use occupy a stack slot.
+Unifying that representation across generic calls, storage and compiler lowering remains
+separate implementation work; the no-result slice has not completed it.
