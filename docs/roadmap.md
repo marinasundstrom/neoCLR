@@ -89,9 +89,10 @@ Merge the neoCLR experiment into main, update release-facing documentation, and 
 matching experimental Raven SDK/extension builds with the NeoCLR preview. Require propagation and Result-based text-file reading/writing through Raven before
 the public preview; include the bounded date/time library and a current local-time example. Reflection
 introspection is desirable, with its admitted surface
-explicitly documented. Reuse/adapt the existing runtime File and reflection APIs. Verify
-Raven match expressions and statements end-to-end, recording supported and rejected
-forms in the release documentation alongside propagation coverage. Keep Raven
+explicitly documented. Reuse/adapt the existing runtime File and reflection APIs. The
+[bounded Raven match matrix](raven-match-matrix.md) now verifies expression and statement
+forms, recording deconstruction and arm-return limits alongside propagation coverage.
+Reconcile the documented compiler/spec discrepancies separately. Keep Raven
 on its separate branch. Validate the bundle outside the developer checkout before
 calling it a build others can try.
 This is planned distribution work, not a published release or full SDK target integration.

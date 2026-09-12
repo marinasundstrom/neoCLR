@@ -13,7 +13,7 @@ Void, and target library contracts consumed through Raven.
 | Runtime library | Calls execute neoCLR library implementations, not metadata stubs or host .NET implementations | Verified for the admitted Math, Console, union and collection APIs |
 | Errors and absence | Success, expected error and absent-value paths use Result/Option | Verified with explicit case handling |
 | Propagation | Success continues; failure returns a compatible carrier; incompatible carriers are rejected | Bounded Result<Int32,OverflowError>, Option<Int32> and Result<Void,OverflowError> execute with early returns; general payload import remains out of scope |
-| Match syntax | Match expression and statement forms compile and execute; rejected forms and diagnostics are documented | Raven-target release matrix still required; Neo support alone does not establish this |
+| Match syntax | Match expression and statement forms compile and execute; rejected forms and diagnostics are documented | [Bounded Raven matrix verified](raven-match-matrix.md): typed cases, both expression spellings and statement actions work; deconstruction/shorthand and arm-return caveats are documented |
 | Text files | Read/write text, show expected I/O errors through Result, and demonstrate round-trip data | Existing runtime APIs need bounded Raven admission and end-to-end checks |
 | Date and time | Obtain the system's current local date/time using the separate date/time library concepts | Existing runtime APIs need bounded Raven admission; full formatting/globalization is not required |
 | VS Code | Completion resolves target APIs and the saved project runs through the neoCLR task | Verified using the installed experimental extension server and prepared workspace |

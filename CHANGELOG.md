@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-12
 
+- Added an executable Raven match support matrix and readable Result/Option/Void
+  samples. Six admitted fixtures verify and run; seven record compiler rejections,
+  including exhaustiveness, deconstruction and arm-return limits. The bridge now
+  admits definitely assigned string locals for match results and rejects uninitialized
+  reads. Generalized the existing terminal-failure message beyond propagation.
+  Documented two observations that need reconciliation with Raven's language docs;
+  no Raven compiler or default .NET behavior changed.
+
 - Extended Raven propagation to Option<Int32> and Result<Void,OverflowError>, including
   early absence/error returns and completion without a payload. Recorded Void's unit
   type semantics while retaining CLR no-result calls. Validate encoded Void storage

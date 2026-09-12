@@ -38,7 +38,8 @@ The installed server passed the stdio completion/hover checks, and the saved wor
 compiled, verified and ran successfully on 2026-09-12. The wider pre-merge runtime
 suite found generic Clonable and calculator regressions, subsequently fixed and
 validated across all integration suites; this local demo is not a claim that the branch is release-ready. The installed server also verified Option propagation output inference and
-ArrayList completion. Match syntax release coverage and broader API work remain pending.
+ArrayList completion. The [match matrix](../../raven-match-matrix.md) now documents tested forms and limits;
+text-file/date-time admission and broader API work remain pending.
 
 ## Edit, build and run the saved project
 

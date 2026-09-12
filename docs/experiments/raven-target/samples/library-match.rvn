@@ -1,0 +1,29 @@
+import System.*
+import System.Console.*
+
+func Magnitude(value: int) -> int {
+    return match Math.Abs(value) {
+        Result.Ok<int> ok => ok.Value
+        Result.Error<OverflowError> error => -1
+    }
+}
+func Describe(value: Option<int>) -> string {
+    return value match {
+        Option.Some<int> present => "Present"
+        Option.None absent => "Absent"
+    }
+}
+func Show(value: int) {
+    match Math.Abs(value) {
+        Result.Ok<int> ok => { WriteLine(ok.Value) }
+        Result.Error<OverflowError> error => { WriteLine("Overflow") }
+    }
+}
+func Main() {
+    WriteLine(Magnitude(-42))
+    WriteLine(Magnitude(-2147483648))
+    WriteLine(Describe(Option<int>(Option.Some<int>(7))))
+    WriteLine(Describe(Option<int>(Option.None())))
+    Show(-42)
+    Show(-2147483648)
+}

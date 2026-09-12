@@ -41,6 +41,12 @@ Result<Void,OverflowError>. The generated editor opens the combined propagation
 workflow, with ArrayList constructors and iteration. `verify_project.py` exercises
 all three propagation forms.
 
+## Match syntax validation
+
+The [Raven match matrix](../../raven-match-matrix.md) records verified forms, diagnostics,
+and outstanding arm-return discrepancies. Run the `--matches` probe and
+`verify_matches.py` before changing the published support claims.
+
 ## Reproduce
 
 Current probe validated on 2026-09-12 with Raven revision
