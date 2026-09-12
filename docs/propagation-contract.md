@@ -77,7 +77,9 @@ existing fundamentals and stale-output rejection. `--interfaces` also checks mal
 protocol metadata and rejects throwing a non-null-sentinel value. Raven's default .NET
 propagation tests remain unchanged and pass.
 
-Option/Void residual projection, broader payloads, editor propagation verification and
-updated SDK/extension packaging remain pending. Installed `0.1.12-neoclr.3` tools do not
-include this compiler feature. Build the experimental Raven branch from source for this
-slice. Defer cleanup remains separate.
+Option<Int32> and Result<Void,OverflowError> now execute success and early residual
+return, including a discarded Void-output propagation statement. The sample workflow
+uses ordinary ArrayList constructors and iteration. The [Void decision](void-semantics.md)
+separates unit values from no-result calls. Signature validation rejects raw CLI VOID
+in storage before Cecil member resolution. General payload support remains bounded;
+this is not arbitrary union import. Defer cleanup remains separate.

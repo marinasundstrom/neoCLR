@@ -7,6 +7,8 @@ using Mono.Cecil.Cil;
 // Bounded Result/Option profile, not a general CLI loader. Only supplied metadata is resolved.
 static class UnionImport
 {
+    const string VoidResult = "System.Result<Void,System.OverflowError>";
+    const string VoidOk = "System.Result.Ok<Void>";
     const string Overflow = "System.OverflowError";
     const string IntArray = "arrayref<Int32>";
     const string VoidOption = "System.Option<Void>";
@@ -25,6 +27,7 @@ static class UnionImport
     {
         foreach (var path in new[] { application, core })
             if (new FileInfo(path).Length > 16 * 1024 * 1024) throw new InvalidDataException("Image exceeds profile limit.");
+        VoidStorageValidation.Check(application);
         var errors = ClosureAudit.Inspect(application, core);
         if (errors.Length != 0) throw new InvalidDataException(string.Join("\n", errors));
         using var resolver = new ClosureAudit.SuppliedAssemblies();
@@ -59,14 +62,14 @@ static class UnionImport
             var args = method.Parameters.Select(p => ProfileType(p.ParameterType)).ToArray();
             var result = ProfileType(method.ReturnType, true);
             var locals = method.Body.Variables.Select(v => ProfileType(v.VariableType)).ToArray();
-            if (locals.Any(t => !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow)))
+            if (locals.Any(t => !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
                 throw new InvalidDataException("Unsupported local default in Result profile.");
             var instructions = method.Body.Instructions.ToArray();
             var indexes = instructions.Select((i, n) => (i, n)).ToDictionary(p => p.i, p => p.n);
             var states = new Dictionary<int, State>();
             var work = new Queue<int>();
             var bodies = new Dictionary<int, string>();
-            Merge(0, new([], locals.Select(t => method.Body.InitLocals && t != Carrier && t != Option && t != VoidOption).ToArray()));
+            Merge(0, new([], locals.Select(t => method.Body.InitLocals && t != Carrier && t != Option && t != VoidOption && t != VoidResult).ToArray()));
             var visits = 0;
             while (work.TryDequeue(out var index))
             {
@@ -91,7 +94,7 @@ static class UnionImport
                         var initializedType = ProfileType((TypeReference)instruction.Operand);
                         var address = Expect(initializedType + "&");
                         if (address.Local < 0) throw new InvalidDataException("Only local initialization is admitted.");
-                        if (initializedType is Carrier or Option or VoidOption)
+                        if (initializedType is Carrier or Option or VoidOption or VoidResult)
                         {
                             if (assigned[address.Local]) throw new InvalidDataException("Resetting an initialized carrier is unsupported.");
                             // A CLI carrier default is not a valid union value. Keep it unreadable
@@ -186,7 +189,7 @@ static class UnionImport
                     case Code.Call:
                     case Code.Callvirt:
                         var reference = (MethodReference)instruction.Operand;
-                        var targetMethod = reference.Resolve() ?? throw new InvalidDataException("Unresolved call.");
+                        var targetMethod = ClosureAudit.ResolveMethod(reference) ?? throw new InvalidDataException("Unresolved call.");
                         Call call;
                         if (targetMethod.Module == app.MainModule)
                         {
@@ -237,7 +240,7 @@ static class UnionImport
             if (method.Body.InitLocals)
                 for (var n = 0; n < locals.Length; n++)
                     if (locals[n] == IntArray || CollectionBindings.IsReference(locals[n])) output.AppendLine($"ldloca local{n}\ninitobj {locals[n]}");
-                    else if (locals[n] != Carrier && locals[n] != Option && locals[n] != VoidOption) output.AppendLine(Default(locals[n]) + $"\nstloc local{n}");
+                    else if (locals[n] != Carrier && locals[n] != Option && locals[n] != VoidOption && locals[n] != VoidResult) output.AppendLine(Default(locals[n]) + $"\nstloc local{n}");
             foreach (var index in bodies.Keys.Order())
             {
                 mappings.Add(new { MethodToken = method.MetadataToken.ToUInt32(), instructions[index].Offset, OutputLine = output.ToString().Count(c => c == '\n') + 1 });
@@ -277,8 +280,13 @@ static class UnionImport
     }
     static string Type(TypeReference type, bool result = false) => type.FullName switch {
         "System.Int32[]" when type is ArrayType { IsVector: true } array && array.ElementType.MetadataType == MetadataType.Int32 => IntArray,
+        "System.Unit" when type.IsValueType && type.Resolve() is { } unit && !unit.Fields.Any(f => !f.IsStatic)
+            && !unit.Methods.Any(m => m.IsConstructor && m.IsStatic) => "Void",
+        "System.Void" when !result && type.IsValueType => "Void",
         "System.OverflowError" when type.IsValueType => Overflow,
         "System.Boolean" => "Boolean", "System.Void" when result => "noresult", "System.Int32" => "Int32", "System.String" => "String",
+        "System.Result`2<System.Void,System.OverflowError>" when type.IsValueType && type is GenericInstanceType g && g.GenericArguments[0].IsValueType && g.GenericArguments[0].Scope.Name == CoreDeclarations.Identity => VoidResult,
+        "System.Result/Ok`1<System.Void>" when type.IsValueType && HasNamedVoid(type) => VoidOk,
         "System.Option`1<System.Void>" when type.IsValueType && HasNamedVoid(type) => VoidOption,
         "System.Option/Some`1<System.Void>" when type.IsValueType && HasNamedVoid(type) => VoidSome,
         "System.Option`1<System.Int32>" when type.IsValueType => Option,
@@ -324,6 +332,38 @@ static class UnionImport
                 && reference.ReturnType.FullName == "System.Result`2<!0,!1>")
                 return new($"System.Result<Int32,{Overflow}>::FromResidual", [Overflow], Carrier);
         }
+        if (reference.DeclaringType.FullName == "System.Result`2<System.Void,System.OverflowError>"
+            && definition.DeclaringType.FullName == "System.Result`2")
+        {
+            if (reference.Name is "TryGetOutput" or "TryGetResidual" or "FromResidual")
+                ValidatePropagation(definition.DeclaringType);
+            if (key == "System.Boolean System.Result`2::TryGetOutput(T&)" && reference.HasThis
+                && definition.Parameters[0].IsOut && reference.ReturnType.MetadataType == MetadataType.Boolean
+                && reference.Parameters.Count == 1 && reference.Parameters[0].ParameterType.FullName == "!0&")
+                return new("RuntimeVoidResultOutput", [VoidResult + "&", "Void&"], "Int32", 1);
+            if (key == "System.Boolean System.Result`2::TryGetResidual(E&)" && reference.HasThis
+                && definition.Parameters[0].IsOut && reference.ReturnType.MetadataType == MetadataType.Boolean
+                && reference.Parameters.Count == 1 && reference.Parameters[0].ParameterType.FullName == "!1&")
+                return new("RuntimeVoidResultResidual", [VoidResult + "&", Overflow + "&"], "Int32", 1);
+            if (key == "System.Result`2<T,E> System.Result`2::FromResidual(E)" && !reference.HasThis
+                && reference.Parameters.Count == 1 && reference.Parameters[0].ParameterType.FullName == "!1"
+                && reference.ReturnType.FullName == "System.Result`2<!0,!1>")
+                return new($"System.Result<Void,{Overflow}>::FromResidual", [Overflow], VoidResult);
+        }
+        if (reference.DeclaringType.FullName == "System.Option`1<System.Int32>" && definition.DeclaringType.FullName == "System.Option`1")
+        {
+            if (reference.Name is "TryGetOutput" or "TryGetResidual" or "FromResidual") ValidatePropagation(definition.DeclaringType);
+            if (key == "System.Boolean System.Option`1::TryGetOutput(T&)" && reference.ReturnType.MetadataType == MetadataType.Boolean && reference.HasThis && definition.Parameters[0].IsOut
+                && reference.Parameters.Count == 1 && reference.Parameters[0].ParameterType.FullName == "!0&")
+                return new("RuntimeOptionOutput", [Option + "&", "Int32&"], "Int32", 1);
+            if (key == "System.Boolean System.Option`1::TryGetResidual(System.Void&)" && reference.ReturnType.MetadataType == MetadataType.Boolean && reference.HasThis && definition.Parameters[0].IsOut
+                && reference.Parameters.Count == 1 && reference.Parameters[0].ParameterType.FullName == "System.Void&")
+                return new("RuntimeOptionResidual", [Option + "&", "Void&"], "Int32", 1);
+            if (key == "System.Option`1<T> System.Option`1::FromResidual(System.Void)" && !reference.HasThis
+                && reference.Parameters.Count == 1 && reference.Parameters[0].ParameterType.FullName == "System.Void"
+                && reference.ReturnType.FullName == "System.Option`1<!0>")
+                return new("System.Option<Int32>::FromResidual", ["Void"], Option);
+        }
         if (key == "System.Result`2<System.Int32,System.OverflowError> System.Math::Abs(System.Int32)" && reference.FullName == key && !reference.HasThis)
             return new("System.Math::Abs", ["Int32"], Carrier);
         if (key == "System.Void System.Console::WriteLine(System.Int32)" && reference.FullName == key && !reference.HasThis)
@@ -338,6 +378,15 @@ static class UnionImport
                 return new("RuntimeTryOk", [Carrier + "&", Ok + "&"], "Int32", 1);
             if (key == "System.Boolean System.Result`2::TryGetValue(System.Result/Error`1<E>&)" && reference.Parameters[0].ParameterType.FullName == "System.Result/Error`1<!1>&")
                 return new("RuntimeTryError", [Carrier + "&", Error + "&"], "Int32", 1);
+        }
+        if (reference.DeclaringType.FullName == "System.Result`2<System.Void,System.OverflowError>" && reference.HasThis
+            && reference.ReturnType.FullName == "System.Boolean" && reference.Parameters.Count == 1
+            && definition.Parameters.Count == 1 && definition.Parameters[0].IsOut)
+        {
+            if (key == "System.Boolean System.Result`2::TryGetValue(System.Result/Ok`1<T>&)" && reference.Parameters[0].ParameterType.FullName == "System.Result/Ok`1<!0>&")
+                return new("RuntimeTryVoidOk", [VoidResult + "&", VoidOk + "&"], "Int32", 1);
+            if (key == "System.Boolean System.Result`2::TryGetValue(System.Result/Error`1<E>&)" && reference.Parameters[0].ParameterType.FullName == "System.Result/Error`1<!1>&")
+                return new("RuntimeTryVoidError", [VoidResult + "&", Error + "&"], "Int32", 1);
         }
         if (reference.DeclaringType.FullName == "System.Result/Ok`1<System.Int32>" && reference.HasThis
             && key == "T System.Result/Ok`1::get_Value()" && reference.ReturnType is GenericParameter { Position: 0 }
@@ -370,7 +419,7 @@ static class UnionImport
     static void ValidatePropagation(TypeDefinition carrier)
     {
         var contracts = carrier.Interfaces.Where(i => i.InterfaceType.FullName ==
-            "System.Propagatable`3<System.Result`2<T,E>,T,E>").ToArray();
+            (carrier.FullName == "System.Option`1" ? "System.Propagatable`3<System.Option`1<T>,T,System.Void>" : "System.Propagatable`3<System.Result`2<T,E>,T,E>")).ToArray();
         if (contracts.Length != 1)
             throw new InvalidDataException("Missing or incompatible propagation carrier contract.");
         var contract = contracts[0].InterfaceType.Resolve();
@@ -402,6 +451,10 @@ static class UnionImport
         var key = definition.FullName;
         var owner = Type(reference.DeclaringType);
         var parameters = reference.Parameters.Select(p => p.ParameterType.FullName).ToArray();
+        if (owner == VoidOk && key == "System.Void System.Result/Ok`1::.ctor(T)" && parameters.SequenceEqual(new[] { "!0" }))
+            return new("RuntimeNewVoidOk", ["Void"], VoidOk);
+        if (owner == VoidResult && key == "System.Void System.Result`2::.ctor(System.Result/Ok`1<T>)" && parameters.SequenceEqual(new[] { "System.Result/Ok`1<!0>" }))
+            return new("RuntimeVoidResultOk", [VoidOk], VoidResult);
         if (owner == Ok && key == "System.Void System.Result/Ok`1::.ctor(T)" && parameters.SequenceEqual(new[] { "!0" }))
             return new("RuntimeNewOk", ["Int32"], Ok);
         if (owner == Carrier && key == "System.Void System.Result`2::.ctor(System.Result/Ok`1<T>)" && parameters.SequenceEqual(new[] { "System.Result/Ok`1<!0>" }))
@@ -423,6 +476,8 @@ static class UnionImport
         throw new InvalidDataException("Unsupported constructor: " + reference.FullName + " definition=" + key);
     }
     static string Default(string type) => type switch {
+        VoidOk => $"ldvoid\nnewobj {VoidOk}",
+        "Void" => "ldvoid",
         Overflow => "newobj System.OverflowError",
         "Boolean" => "ldc.bool false", "Int32" => "ldc.i4 0", VoidSome => $"ldvoid\nnewobj {VoidSome}", Some => $"ldc.i4 0\nnewobj {Some}", None => $"newobj {None}", Ok => $"ldc.i4 0\nnewobj {Ok}",
         Error => $"newobj System.OverflowError\nnewobj {Error}",
@@ -431,6 +486,22 @@ static class UnionImport
     static string Adapters()
     {
         var text = new StringBuilder();
+        foreach (var (name, type) in new[] { ("Output", "Void"), ("Residual", Overflow) })
+        {
+            text.AppendLine($".function RuntimeVoidResult{name}({VoidResult}& source,out {type}& destination) -> Int32");
+            text.AppendLine($"ldarg destination\n{Default(type)}\nstobj {type}");
+            text.AppendLine($"ldarg source\nldarg destination\ncall instance {VoidResult}::TryGet{name}({type}&)");
+            text.AppendLine("brfalse Miss\nldc.i4 1\nret\nMiss:\nldc.i4 0\nret\n.end");
+        }
+        text.AppendLine($".function RuntimeNewVoidOk(Void value) -> {VoidOk}\nldarg value\nnewobj instance {VoidOk}::.ctor(Void)\nret\n.end");
+        text.AppendLine($".function RuntimeVoidResultOk({VoidOk} value) -> {VoidResult}\nldarg value\nnewobj instance {VoidResult}::.ctor({VoidOk})\nret\n.end");
+        foreach (var (name, type) in new[] { ("Output", "Int32"), ("Residual", "Void") })
+        {
+            text.AppendLine($".function RuntimeOption{name}({Option}& source,out {type}& destination) -> Int32");
+            text.AppendLine($"ldarg destination\n{Default(type)}\nstobj {type}");
+            text.AppendLine($"ldarg source\nldarg destination\ncall instance {Option}::TryGet{name}({type}&)");
+            text.AppendLine("brfalse Miss\nldc.i4 1\nret\nMiss:\nldc.i4 0\nret\n.end");
+        }
         foreach (var (name, type) in new[] { ("Output", "Int32"), ("Residual", Overflow) })
         {
             // CLI out is initialized on both paths; the runtime contract is true-only.
@@ -439,7 +510,7 @@ static class UnionImport
             text.AppendLine($"ldarg source\nldarg destination\ncall instance {Carrier}::TryGet{name}({type}&)");
             text.AppendLine("brfalse Miss\nldc.i4 1\nret\nMiss:\nldc.i4 0\nret\n.end");
         }
-        foreach (var (name, type, carrier) in new[] { ("Ok", Ok, Carrier), ("Error", Error, Carrier), ("Some", Some, Option), ("None", None, Option), ("VoidSome", VoidSome, VoidOption), ("VoidNone", None, VoidOption) })
+        foreach (var (name, type, carrier) in new[] { ("VoidOk", VoidOk, VoidResult), ("VoidError", Error, VoidResult), ("Ok", Ok, Carrier), ("Error", Error, Carrier), ("Some", Some, Option), ("None", None, Option), ("VoidSome", VoidSome, VoidOption), ("VoidNone", None, VoidOption) })
         {
             text.AppendLine($".function RuntimeTry{name}({carrier}& source,out {type}& destination) -> Int32");
             text.AppendLine($"ldarg destination\n{Default(type)}\nstobj {type}");

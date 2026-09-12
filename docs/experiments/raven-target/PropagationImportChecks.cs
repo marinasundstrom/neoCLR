@@ -38,6 +38,20 @@ static class PropagationImportChecks
         }
         return results;
     }
+    public static void RejectVoidParameter(string application, string core, string output)
+    {
+        using var image = AssemblyDefinition.ReadAssembly(application);
+        var original = image.MainModule.AssemblyReferences.ToHashSet();
+        var call = image.MainModule.GetTypes().SelectMany(t => t.Methods).Where(m => m.HasBody)
+            .SelectMany(m => m.Body.Instructions).Select(i => i.Operand).OfType<MethodReference>()
+            .Single(m => m.Name == "TryGetResidual");
+        call.Parameters[0].ParameterType = new ByReferenceType(image.MainModule.TypeSystem.Void);
+        var invalid = Path.Combine(output, "InvalidVoidParameter.dll");
+        WriteTarget(image, original, invalid);
+        try { UnionImport.Write(invalid, core, Path.Combine(output, "InvalidVoidParameter.neoil"), collectionProfile: true); }
+        catch (InvalidDataException error) when (error.Message.Contains("CLI VOID marker")) { return; }
+        throw new Exception("CLI VOID marker accepted as parameter storage.");
+    }
     static void WriteTarget(AssemblyDefinition image, HashSet<AssemblyNameReference> original, string path)
     {
         foreach (var method in image.MainModule.GetTypes().SelectMany(t => t.Methods).Where(m => m.HasBody))

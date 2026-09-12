@@ -16,7 +16,7 @@ Use the existing names and relationships, without an `I` naming prefix:
 | Iterable<T> | GetIterator() returning Iterator<T> |
 | Iterator<T> : Disposable | MoveNext() returning Boolean; Current returning T |
 | List<T> : Iterable<T> | Count; Item indexer; Add(T) with no result |
-| ArrayList<T> : List<T> | Allocate(capacity); the List and Iterable implementations |
+| ArrayList<T> : List<T> | ArrayList() / ArrayList(capacity), Capacity; the List and Iterable implementations |
 
 ArrayList should be an ordinary managed class in this target projection. Interface
 variables carry references to implementing objects, with the same object retained

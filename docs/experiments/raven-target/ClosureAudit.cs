@@ -24,7 +24,7 @@ static class ClosureAudit
             foreach (var reference in module.GetMemberReferences())
                 Check($"member {reference.FullName}", () => reference switch
                 {
-                    MethodReference method => (object?)method.Resolve(),
+                    MethodReference method => (object?)ResolveMethod(method),
                     FieldReference field => field.Resolve(),
                     _ => null
                 });
@@ -42,6 +42,21 @@ static class ClosureAudit
             }
         }
         return errors.ToArray();
+    }
+
+    internal static MethodDefinition? ResolveMethod(MethodReference method)
+    {
+        // Cecil can classify a named System.Void token as primitive when reading member refs.
+        // Normalize this freshly read reference before resolution, without changing return VOID.
+        TypeReference Storage(TypeReference type)
+        {
+            if (type is ByReferenceType byref) return new ByReferenceType(Storage(byref.ElementType));
+            if (type.FullName == "System.Void" && type.IsValueType)
+                return new TypeReference("System", "Void", method.Module, type.Scope, true);
+            return type;
+        }
+        foreach (var parameter in method.Parameters) parameter.ParameterType = Storage(parameter.ParameterType);
+        return method.Resolve();
     }
 
     internal sealed class SuppliedAssemblies : IAssemblyResolver

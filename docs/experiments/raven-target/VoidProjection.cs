@@ -27,14 +27,22 @@ static class VoidProjection
                         generic.GenericArguments[i] = new TypeReference("System", "Void", module, scope, true);
                     else Visit(generic.GenericArguments[i]);
                 }
-            if (type is TypeSpecification specification) Visit(specification.ElementType);
+            if (type is Mono.Cecil.TypeSpecification specification) Visit(specification.ElementType);
             Visit(type.DeclaringType);
+        }
+        TypeReference Storage(TypeReference type)
+        {
+            if (type.MetadataType == MetadataType.Void) return new TypeReference("System", "Void", module, scope, true);
+            if (type is ByReferenceType byref) return new ByReferenceType(Storage(byref.ElementType));
+            Visit(type);
+            return type;
         }
         void Method(MethodReference method)
         {
             Visit(method.DeclaringType); Visit(method.ReturnType);
-            foreach (var parameter in method.Parameters) Visit(parameter.ParameterType);
+            foreach (var parameter in method.Parameters) parameter.ParameterType = Storage(parameter.ParameterType);
         }
+        foreach (var member in module.GetMemberReferences().OfType<MethodReference>()) Method(member);
         foreach (var type in module.GetTypes())
         {
             Visit(type.BaseType);
@@ -43,7 +51,7 @@ static class VoidProjection
             {
                 Method(method);
                 if (!method.HasBody) continue;
-                foreach (var variable in method.Body.Variables) Visit(variable.VariableType);
+                foreach (var variable in method.Body.Variables) variable.VariableType = Storage(variable.VariableType);
                 foreach (var instruction in method.Body.Instructions)
                     switch (instruction.Operand)
                     {

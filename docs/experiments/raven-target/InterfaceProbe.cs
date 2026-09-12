@@ -96,6 +96,27 @@ static class InterfaceProbe
             "func Normalize(value: int) -> Option<int>"));
         if (!incompatible.GetDiagnostics().Any(d => d.Severity == DiagnosticSeverity.Error))
             throw new Exception("Incompatible propagation carrier accepted.");
+        foreach (var sample in new[] { "library-option-propagation", "library-result-void-propagation" })
+        {
+            var raw = Path.Combine(output, sample + ".raw.dll");
+            using (var stream = File.Create(raw))
+            {
+                var result = Create(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "samples", sample + ".rvn")))
+                    .Emit(stream, null, new EmitOptions(AssemblyName.GetAssemblyName(core)));
+                if (!result.Success) throw new Exception(string.Join("\n", result.Diagnostics));
+            }
+            var projected = Path.Combine(output, sample + ".dll");
+            VoidProjection.Write(raw, core, projected);
+            UnionImport.Write(projected, core, Path.Combine(output, sample + ".neoil"), collectionProfile: true);
+            if (sample == "library-option-propagation")
+            {
+                PropagationImportChecks.RejectVoidParameter(projected, core, output);
+                continue;
+            }
+            try { UnionImport.Write(raw, core, Path.Combine(output, sample + ".invalid.neoil"), collectionProfile: true); }
+            catch (InvalidDataException) { continue; }
+            throw new Exception("Raw Void marker storage was admitted: " + sample);
+        }
         var propagationRejections = PropagationImportChecks.Run(propagationPath, core, output);
         var rejections = CollectionImportChecks.Run(path, core, output);
         File.WriteAllText(Path.Combine(output, "interface-results.json"), JsonSerializer.Serialize(new {

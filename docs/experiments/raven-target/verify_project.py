@@ -24,10 +24,13 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
     cases = [('Math', 'library-math.rvn', '-2147483648\n2147483647\n7\n-7\n-1\n0\n1\n'),
              ('Result', 'library-result.rvn', '42\nOverflow\n'),
              ('Propagation', 'library-propagation.rvn', 'Continued\n42\nOverflow propagated\n'),
+             ('OptionPropagation', 'library-option-propagation.rvn', 'Value found\n42\nAbsent\n'),
+             ('VoidResultPropagation', 'library-result-void-propagation.rvn', '42\nSaved\nCompleted\nOverflow\n'),
              ('Option', 'library-option.rvn', '42\nProduct not found\n'),
              ('Void', 'library-void.rvn', 'Completed without a payload\nNot completed\n')]
     if args.collections:
-        cases += [('ValueCopy', 'library-value-copy.rvn', '42\n7\n'),
+        cases += [('PropagationWorkflow', 'library-propagation-workflow.rvn', '42\nSaved\nCompleted\nOverflow\nValue found\n42\nAbsent\n'),
+                  ('ValueCopy', 'library-value-copy.rvn', '42\n7\n'),
                   ('Arrays', 'library-arrays.rvn', '42\n2\n'),
                   ('Workflow', 'library-workflow.rvn', '42\nCompleted\nPrice overflow\nSkipped\nProduct not found\nSkipped\n'),
                   ('ForEach', 'library-foreach.rvn', '41\n42\n41\n41\n'),

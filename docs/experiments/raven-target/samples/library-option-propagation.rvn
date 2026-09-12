@@ -1,0 +1,18 @@
+import System.*
+import System.Console.*
+
+func Find(found: int) -> Option<int> {
+    if found == 1 { return Option<int>(Option.Some<int>(42)) }
+    return Option<int>(Option.None())
+}
+func Read(found: int) -> Option<int> {
+    let value = Find(found)?
+    WriteLine("Value found")
+    return Option<int>(Option.Some<int>(value))
+}
+func Show(found: int) {
+    let result = Read(found)
+    if result is Option.Some<int> present { WriteLine(present.Value) }
+    else if result is Option.None absent { WriteLine("Absent") }
+}
+func Main() { Show(1); Show(0) }

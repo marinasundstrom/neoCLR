@@ -20,9 +20,42 @@ static class CoreDeclarations
         var compilation = CSharpCompilation.Create(Identity,
             [CSharpSyntaxTree.ParseText(source)], references: [],
             options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-        using var stream = File.Create(path);
+        using var stream = new MemoryStream();
         var result = compilation.Emit(stream, options: new Microsoft.CodeAnalysis.Emit.EmitOptions(metadataOnly: true, includePrivateMembers: false));
         if (!result.Success) throw new Exception(string.Join("\n", result.Diagnostics));
+        stream.Position = 0;
+        if (unionProbe)
+        {
+            using var image = Mono.Cecil.AssemblyDefinition.ReadAssembly(stream);
+            var module = image.MainModule;
+            var unit = module.GetType("System.PropagationUnit");
+            var targetVoid = new Mono.Cecil.TypeReference("System", "Void", module, module, true);
+            Mono.Cecil.TypeReference Project(Mono.Cecil.TypeReference type)
+            {
+                if (type.FullName == unit.FullName) return targetVoid;
+                if (type is Mono.Cecil.ByReferenceType byref) return new Mono.Cecil.ByReferenceType(Project(byref.ElementType));
+                if (type is Mono.Cecil.GenericInstanceType generic)
+                    for (var i = 0; i < generic.GenericArguments.Count; i++) generic.GenericArguments[i] = Project(generic.GenericArguments[i]);
+                return type;
+            }
+            foreach (var type in module.Types)
+            {
+                foreach (var contract in type.Interfaces) contract.InterfaceType = Project(contract.InterfaceType);
+                foreach (var method in type.Methods)
+                    foreach (var parameter in method.Parameters) parameter.ParameterType = Project(parameter.ParameterType);
+            }
+            module.Types.Remove(unit);
+            foreach (var method in module.Types.SelectMany(t => t.Methods).Where(m => m.HasBody))
+            { _ = method.Body.Instructions.Count; _ = method.Body.Variables.Count; }
+            foreach (var reference in module.AssemblyReferences.ToArray())
+            {
+                if (module.GetTypeReferences().Any(t => ReferenceEquals(t.Scope, reference)))
+                    throw new InvalidDataException("Core projection introduced an external type scope.");
+                module.AssemblyReferences.Remove(reference);
+            }
+            image.Write(path);
+        }
+        else File.WriteAllBytes(path, stream.ToArray());
     }
 
     public static string[] ReadDeclaredTypes(string path)

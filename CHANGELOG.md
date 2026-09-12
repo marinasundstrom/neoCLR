@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-12
 
+- Extended Raven propagation to Option<Int32> and Result<Void,OverflowError>, including
+  early absence/error returns and completion without a payload. Recorded Void's unit
+  type semantics while retaining CLR no-result calls. Validate encoded Void storage
+  separately from Cecil member resolution; reject CLI VOID markers in value slots.
+  Added propagation workflow and editor checks. Raven's discarded-Void fix remains on
+  its isolated target branch; ordinary .NET behavior is unchanged.
+
 - Replaced ArrayList.Allocate with parameterless and initial-capacity constructors,
   including the Raven class projection. Both start empty; default capacity is zero,
   storage grows on demand and negative capacity faults. Updated callers and samples;

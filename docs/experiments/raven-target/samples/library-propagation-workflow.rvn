@@ -1,0 +1,42 @@
+import System.*
+import System.Console.*
+
+func Find(found: int) -> Option<int> {
+    if found == 1 { return Option<int>(Option.Some<int>(42)) }
+    return Option<int>(Option.None())
+}
+func Read(found: int) -> Option<int> {
+    let value = Find(found)?
+    WriteLine("Value found")
+    return Option<int>(Option.Some<int>(value))
+}
+func ShowProduct(found: int) {
+    let result = Read(found)
+    if result is Option.Some<int> present { WriteLine(present.Value) }
+    else if result is Option.None absent { WriteLine("Absent") }
+}
+
+func Complete(value: int) -> Result<System.Void, OverflowError> {
+    let amount = Math.Abs(value)?
+    WriteLine(amount)
+    return Result<System.Void, OverflowError>(Result.Ok<System.Void>(()))
+}
+func Save(value: int) -> Result<System.Void, OverflowError> {
+    Complete(value)?
+    WriteLine("Saved")
+    return Result<System.Void, OverflowError>(Result.Ok<System.Void>(()))
+}
+func ShowSave(value: int) {
+    let result = Save(value)
+    if result is Result.Ok<System.Void> done { WriteLine("Completed") }
+    else if result is Result.Error<OverflowError> error { WriteLine("Overflow") }
+}
+
+func Main() {
+    let values = System.Collections.ArrayList<int>(2)
+    values.Add(-42)
+    values.Add(-2147483648)
+    for value in values { ShowSave(value) }
+    ShowProduct(1)
+    ShowProduct(0)
+}

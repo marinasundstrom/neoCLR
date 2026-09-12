@@ -14,8 +14,12 @@ static class UnionDeclarations
                 public T Value { get; }
             }
         }
+        public struct PropagationUnit { }
         [System.Runtime.CompilerServices.Union]
-        public struct Option<T> {
+        public struct Option<T> : Propagatable<Option<T>, T, PropagationUnit> {
+            public bool TryGetOutput(out T output) { output = default; return false; }
+            public bool TryGetResidual(out PropagationUnit residual) { residual = default; return false; }
+            public static Option<T> FromResidual(PropagationUnit residual) => default;
             public object Value => default;
             public Option(Option.Some<T> value) { }
             public Option(Option.None value) { }

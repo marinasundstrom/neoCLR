@@ -13,7 +13,7 @@ retain their historical limits. This is not general Raven or direct PE execution
 
 ## Current Result propagation follow-up
 
-The current sources require Raven `1a52d9464` or later on
+The current sources require Raven `22cea6fa1` or later on
 `codex/neoclr-target-resolution`. Earlier revisions recorded below describe historical
 slices. Installed `0.1.12-neoclr.3` tools predate propagation. Build the compiler and
 language server from that experiment checkout:
@@ -36,7 +36,10 @@ is `Continued`, `42`, then `Overflow propagated` on separate lines. To run it ma
 copy that sample to the generated editor project's `Main.rvn` and run `run_project.py`
 with the same project, `--raven` and `--runtime` arguments. The second call returns early
 without printing `Continued`. See the [contract and limits](../../propagation-contract.md):
-this slice admits Result<Int32,OverflowError>; Option/Void propagation is still pending.
+this slice admits Result<Int32,OverflowError>, Option<Int32> and
+Result<Void,OverflowError>. The generated editor opens the combined propagation
+workflow, with ArrayList constructors and iteration. `verify_project.py` exercises
+all three propagation forms.
 
 ## Reproduce
 

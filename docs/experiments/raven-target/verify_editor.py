@@ -101,6 +101,22 @@ try:
         if hover is None or not any(name in json.dumps(hover) for name in ('int', 'Int32')):
             raise AssertionError('Loop element type was not inferred from the project target: ' + str(hover))
         results['LoopElementHover'] = hover
+        text = 'import System.*\nfunc Read(value: Option<int>) -> Option<int> {\n    let amount = value?\n    return Option<int>(Option.Some<int>(amount))\n}'
+        send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': 6}, 'contentChanges': [{'text': text}]})
+        hover = receive(send('textDocument/hover', {'textDocument': {'uri': uri},
+            'position': {'line': 2, 'character': 9}}, True))
+        if hover is None or not any(name in json.dumps(hover) for name in ('int', 'Int32')):
+            raise AssertionError('Option propagation output type was not inferred: ' + str(hover))
+        results['PropagationOutputHover'] = hover
+        text = 'import System.Collections.*\nfunc Main() {\n    let values = ArrayList<int>(2)\n    values.\n}'
+        send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': 7}, 'contentChanges': [{'text': text}]})
+        result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
+            'position': {'line': 3, 'character': 11}, 'context': {'triggerKind': 1}}, True))
+        items = result if isinstance(result, list) else result['items']
+        labels = sorted({item['label'] for item in items})
+        if 'Capacity' not in labels or any(label.startswith('Allocate') for label in labels):
+            raise AssertionError('Unexpected ArrayList constructor surface: ' + str(labels))
+        results['ArrayList'] = labels
     receive(send('shutdown', None, True))
     send('exit', None)
     print(json.dumps(results, indent=2))

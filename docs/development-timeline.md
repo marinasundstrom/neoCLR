@@ -1650,6 +1650,24 @@ Default construction starts empty with zero capacity; explicit capacity reserves
 The Raven projection uses ordinary class construction. Historical published examples
 retain their recorded API. Validation includes capacity, growth and negative arguments.
 
+## 58. Void as a type versus a return marker — recorded 2026-09-12
+
+**Author question and correction.** Asked whether Void should be neoCLR's unit type,
+then rejected Option<Void> as the motivating example: None already handles absence,
+whereas Result<Void, MyError> expresses completion or failure. Void can remain a
+technically valid type argument. Asked whether methods should always return a unit
+value or preserve CLR void behavior.
+
+**Assistant proposal and author decision.** Proposed unit semantics for Void in the
+type system, preserving the CLR no-result stack convention for void-returning calls,
+with compiler adaptation where a value is needed. The author replied: “Agree then.”
+
+**Action and outcome.** Documented the [chosen split](void-semantics.md). The bounded
+Raven bridge now executes Option<int> absence propagation and Result<Void,OverflowError>
+completion/error propagation. The compiler fix prevents an unused propagated Void
+value remaining on the stack. Refreshing the local SDK/extension was explicitly
+requested; tooling validation is recorded with that installation, not inferred here.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

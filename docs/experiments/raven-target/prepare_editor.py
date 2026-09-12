@@ -22,7 +22,7 @@ project = output / 'editor'
 project.mkdir(exist_ok=False)
 (project / '.vscode').mkdir()
 shutil.copyfile(core, project / core.name)
-shutil.copyfile(Path(__file__).parent / ('samples/library-workflow.rvn' if args.collections else 'samples/library-result.rvn'), project / 'Main.rvn')
+shutil.copyfile(Path(__file__).parent / ('samples/library-propagation-workflow.rvn' if args.collections else 'samples/library-result.rvn'), project / 'Main.rvn')
 (project / 'Demo.rvnproj').write_text('''<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net11.0</TargetFramework>
