@@ -41,7 +41,7 @@ static class RuntimeSignatures
         if (returns && type.MetadataType == MetadataType.Void) return "noresult";
         if (type is ByReferenceType byref) return Map(byref.ElementType, catalog) + "&";
         return catalog(type) ?? (type.MetadataType switch {
-            MetadataType.Boolean => "Boolean", MetadataType.Int32 => "Int32", MetadataType.String => "String",
+            MetadataType.Double => "Double", MetadataType.Boolean => "Boolean", MetadataType.Int32 => "Int32", MetadataType.String => "String",
             _ when type.FullName == "System.Void" && type.IsValueType && IsCore(type.Scope) => "Void",
             _ => throw new InvalidDataException("Unsupported catalog signature type: " + type.FullName)
         });

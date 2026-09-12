@@ -101,6 +101,15 @@ static class SignatureProbe
         Check("Int32 managed receiver mapping", Int32Bindings.Bind(compareCall, compare)?.Arguments.SequenceEqual(new[] { "Int32&", "Int32" }) == true);
         compareCall.HasThis = false;
         Reject("Int32 instance receiver mismatch", () => Int32Bindings.Bind(compareCall, compare));
+        var math = module.GetType("System.Math");
+        var sqrt = math.Methods.Single(m => m.Name == "Sqrt");
+        var sqrtCall = Reference(sqrt, math);
+        Check("Double Math mapping", DoubleBindings.Bind(sqrtCall, sqrt)?.Result == "Double");
+        sqrtCall.Parameters[0].ParameterType = module.TypeSystem.Int32;
+        Reject("Double Math argument mismatch", () => DoubleBindings.Bind(sqrtCall, sqrt));
+        var doubleType = module.GetType("System.Double");
+        var doubleCompare = doubleType.Methods.Single(m => m.Name == "CompareTo");
+        Check("Double receiver mapping", DoubleBindings.Bind(Reference(doubleCompare, doubleType), doubleCompare)?.Arguments.SequenceEqual(new[] { "Double&", "Double" }) == true);
         var text = JsonSerializer.Serialize(checks, new JsonSerializerOptions { WriteIndented = true });
         File.WriteAllText(Path.Combine(output, "signature-checks.json"), text);
         Console.WriteLine(text);

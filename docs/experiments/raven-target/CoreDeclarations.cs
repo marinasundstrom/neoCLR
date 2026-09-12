@@ -12,10 +12,10 @@ static class CoreDeclarations
         var declarations = TargetSurface.Declarations(includeConsole, stringParameter);
         if (unionProbe)
             declarations = declarations.Replace("public static class Math {",
-                "public static class Math { public static Result<int, OverflowError> Abs(int value) => default; public static Result<int, InvalidRangeError> Clamp(int value, int min, int max) => default;")
+                "public static class Math { " + DoubleBindings.MathDeclarations + " public static Result<int, OverflowError> Abs(int value) => default; public static Result<int, InvalidRangeError> Clamp(int value, int min, int max) => default;")
                 + UnionDeclarations.Source + PathBindings.Declarations + FileBindings.Declarations + ResultBindings.Declarations;
         if (collectionProbe) declarations += CollectionDeclarations.Source;
-        var source = Source.Replace("public struct Int32 { }", unionProbe ? Int32Bindings.Declarations : "public struct Int32 { }").Replace("public sealed class String { }", StringBindings.Declarations(unionProbe))
+        var source = Source.Replace("public struct Double { }", unionProbe ? DoubleBindings.Declarations : "public struct Double { }").Replace("public struct Int32 { }", unionProbe ? Int32Bindings.Declarations : "public struct Int32 { }").Replace("public sealed class String { }", StringBindings.Declarations(unionProbe))
             .Replace("public static class Console { public static void WriteLine(string value) { } }", declarations)
             .Replace("// Union probe attribute", unionProbe ? "public sealed class UnionAttribute : System.Attribute { }" : "");
         var compilation = CSharpCompilation.Create(Identity,

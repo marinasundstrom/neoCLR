@@ -62,7 +62,7 @@ static class UnionImport
             var args = method.Parameters.Select(p => ProfileType(p.ParameterType)).ToArray();
             var result = ProfileType(method.ReturnType, true);
             var locals = method.Body.Variables.Select(v => ProfileType(v.VariableType)).ToArray();
-            if (locals.Any(t => !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
+            if (locals.Any(t => !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
                 throw new InvalidDataException("Unsupported local default in Result profile.");
             NormalizePatternBranches(method);
             var instructions = method.Body.Instructions.ToArray();
@@ -142,6 +142,9 @@ static class UnionImport
                         var value = (string)instruction.Operand;
                         if (value.Length > 65536) throw new InvalidDataException("String limit exceeded.");
                         Push(new("String")); code.AppendLine("ldstr " + JsonSerializer.Serialize(value)); break;
+                    case Code.Ldc_R8:
+                        Push(new("Double"));
+                        code.AppendLine("ldc.r8 " + ((double)instruction.Operand).ToString("R", System.Globalization.CultureInfo.InvariantCulture)); break;
                     case Code.Ldc_I4_M1: case Code.Ldc_I4_0: case Code.Ldc_I4_1: case Code.Ldc_I4_2:
                     case Code.Ldc_I4_3: case Code.Ldc_I4_4: case Code.Ldc_I4_5: case Code.Ldc_I4_6:
                     case Code.Ldc_I4_7: case Code.Ldc_I4_8: case Code.Ldc_I4_S: case Code.Ldc_I4:
@@ -151,9 +154,9 @@ static class UnionImport
                     case Code.Ldarg: case Code.Ldarg_S: Arg(((ParameterDefinition)instruction.Operand).Index); break;
                     case Code.Ldarga: case Code.Ldarga_S:
                         var parameter = ((ParameterDefinition)instruction.Operand).Index;
-                        if (parameter < 0 || parameter >= args.Length || args[parameter] != "Int32")
-                            throw new InvalidDataException("Only Int32 argument addresses admitted.");
-                        Push(new("Int32&", Argument: parameter)); code.AppendLine($"ldarga {parameter}"); break;
+                        if (parameter < 0 || parameter >= args.Length || args[parameter] is not ("Int32" or "Double"))
+                            throw new InvalidDataException("Only Int32/Double argument addresses admitted.");
+                        Push(new(args[parameter] + "&", Argument: parameter)); code.AppendLine($"ldarga {parameter}"); break;
                     case Code.Ldloc_0: case Code.Ldloc_1: case Code.Ldloc_2: case Code.Ldloc_3: Load((int)instruction.OpCode.Code - (int)Code.Ldloc_0); break;
                     case Code.Ldloc: case Code.Ldloc_S: Load(((VariableDefinition)instruction.Operand).Index); break;
                     case Code.Stloc_0: case Code.Stloc_1: case Code.Stloc_2: case Code.Stloc_3: Store((int)instruction.OpCode.Code - (int)Code.Stloc_0); break;
@@ -233,9 +236,9 @@ static class UnionImport
                             {
                                 if (argument.Argument >= 0)
                                 {
-                                    if (n != 0 || !reference.HasThis || reference.DeclaringType.FullName != "System.Int32"
+                                    if (n != 0 || !reference.HasThis || reference.DeclaringType.FullName is not ("System.Int32" or "System.Double")
                                         || reference.Name is not ("Equals" or "CompareTo" or "ToString"))
-                                        throw new InvalidDataException("Argument addresses are only admitted as Int32 receivers.");
+                                        throw new InvalidDataException("Argument addresses are only admitted as primitive receivers.");
                                     continue;
                                 }
                                 if (argument.Local < 0) throw new InvalidDataException("Only local addresses admitted.");
@@ -285,7 +288,7 @@ static class UnionImport
                 if (changed) work.Enqueue(index);
             }
         }
-        output.Append(Adapters()).Append(ResultBindings.Adapters()).Append(StringBindings.Adapters()).Append(Int32Bindings.Adapters);
+        output.Append(Adapters()).Append(ResultBindings.Adapters()).Append(StringBindings.Adapters()).AppendLine(Int32Bindings.Adapters).Append(DoubleBindings.Adapters);
         File.WriteAllText(destination, output.ToString());
         File.WriteAllText(destination + ".map.json", JsonSerializer.Serialize(new {
             Profile = collectionProfile ? "result-option-void-files-strings-collections-v8" : "result-option-void-files-strings-arrays-v7",
@@ -333,7 +336,7 @@ static class UnionImport
             && !unit.Methods.Any(m => m.IsConstructor && m.IsStatic) => "Void",
         "System.Void" when !result && type.IsValueType => "Void",
         "System.OverflowError" when type.IsValueType => Overflow,
-        "System.Boolean" => "Boolean", "System.Void" when result => "noresult", "System.Int32" => "Int32", "System.String" => "String",
+        "System.Double" => "Double", "System.Boolean" => "Boolean", "System.Void" when result => "noresult", "System.Int32" => "Int32", "System.String" => "String",
         "System.Result`2<System.Void,System.OverflowError>" when type.IsValueType && type is GenericInstanceType g && g.GenericArguments[0].IsValueType && g.GenericArguments[0].Scope.Name == CoreDeclarations.Identity => VoidResult,
         "System.Result/Ok`1<System.Void>" when type.IsValueType && HasNamedVoid(type) => VoidOk,
         "System.Option`1<System.Void>" when type.IsValueType && HasNamedVoid(type) => VoidOption,
@@ -357,7 +360,7 @@ static class UnionImport
             throw new InvalidDataException("Unsupported runtime signature.");
         // Reuse the declaration catalog for its bounded static Int32 APIs. Check
         // both sides before mapping a resolved CLI reference to the runtime library.
-        var file = Int32Bindings.Bind(reference, definition) ?? PathBindings.Bind(reference, definition) ?? FileBindings.Bind(reference, definition) ?? ResultBindings.Bind(reference, definition);
+        var file = DoubleBindings.Bind(reference, definition) ?? Int32Bindings.Bind(reference, definition) ?? PathBindings.Bind(reference, definition) ?? FileBindings.Bind(reference, definition) ?? ResultBindings.Bind(reference, definition);
         if (file is not null)
         {
             if (file.OutArgument >= 0 || reference.Name == "FromResidual") ValidatePropagation(definition.DeclaringType);
@@ -544,7 +547,7 @@ static class UnionImport
         VoidOk => $"ldvoid\nnewobj {VoidOk}",
         "Void" => "ldvoid",
         Overflow => "newobj System.OverflowError",
-        "Boolean" => "ldc.bool false", "Int32" => "ldc.i4 0", VoidSome => $"ldvoid\nnewobj {VoidSome}", Some => $"ldc.i4 0\nnewobj {Some}", None => $"newobj {None}", Ok => $"ldc.i4 0\nnewobj {Ok}",
+        "Double" => "ldc.r8 0", "Boolean" => "ldc.bool false", "Int32" => "ldc.i4 0", VoidSome => $"ldvoid\nnewobj {VoidSome}", Some => $"ldc.i4 0\nnewobj {Some}", None => $"newobj {None}", Ok => $"ldc.i4 0\nnewobj {Ok}",
         Error => $"newobj System.OverflowError\nnewobj {Error}",
         _ => throw new InvalidDataException("Unsupported default.")
     };

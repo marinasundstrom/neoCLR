@@ -1,0 +1,28 @@
+import System.*
+import System.Console.*
+func Check(value: double, expected: double) {
+    WriteLine(value.CompareTo(expected))
+}
+func Main() {
+    Check(Math.Abs(-2.5), 2.5)
+    Check(Math.Sqrt(9.0), 3.0)
+    Check(Math.Floor(-2.5), -3.0)
+    Check(Math.Ceiling(-2.5), -2.0)
+    Check(Math.Truncate(-2.5), -2.0)
+    Check(Math.Round(2.5), 2.0)
+    Check(Math.Round(3.5), 4.0)
+    Check(Math.Exp(0.0), 1.0)
+    Check(Math.Log(1.0), 0.0)
+    Check(Math.Log10(1.0), 0.0)
+    Check(Math.Sin(0.0), 0.0)
+    Check(Math.Cos(0.0), 1.0)
+    Check(Math.Tan(0.0), 0.0)
+    Check(Math.Pow(2.0, 3.0), 8.0)
+    Check(Math.Min(-1.0, 2.0), -1.0)
+    Check(Math.Max(-1.0, 2.0), 2.0)
+    let nan = Math.Sqrt(-1.0)
+    Check(Math.Min(nan, 1.0), nan)
+    Check(Math.Max(nan, 1.0), nan)
+    Check(Math.Exp(1000.0), Math.Exp(1000.0))
+    WriteLine(nan.CompareTo(0.0))
+}

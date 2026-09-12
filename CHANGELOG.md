@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Added bounded Raven Double literal/slot/receiver import and projected all 15
+  existing Double Math methods plus Double.CompareTo. Added all-method, rounding and
+  NaN examples, signature checks and Math completion coverage. All 20 current Math
+  methods are projected; conversions, floating operator lowering and formatting are
+  not implied. No runtime, Raven compiler or installed SDK/VSIX changes.
+
 - Exposed the existing Int32 Math.Clamp API through Raven with Result matching and
   propagation for InvalidRangeError. Added inclusive/equal/reversed-bound and Int32
   extreme-value examples plus completion coverage. The five current Int32 Math

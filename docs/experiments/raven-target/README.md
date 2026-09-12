@@ -592,3 +592,6 @@ and ToString on local and parameter receivers, with numeric completion checks.
 
 The [integer Clamp example](../../raven-clamp-api.md) demonstrates inclusive bounds
 and Result propagation for invalid ranges, completing the current Int32 Math subset.
+
+The [Double Math example](../../raven-floating-math-api.md) exercises all current
+floating-point Math methods using concrete Double values and comparison calls.

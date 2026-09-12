@@ -78,4 +78,5 @@ source type errors, NaN comparisons, signed zero and typed failures. The pinned
 .NET SDK 10.0.100 probe provides executable comparison evidence.
 
 The experimental [Raven Clamp projection](raven-clamp-api.md) completes the current
-Int32 Math subset through the bounded importer; floating-point methods remain pending.
+Int32 Math subset through the bounded importer. The [Double Math slice](raven-floating-math-api.md)
+projects all 15 floating-point methods with bounded literal, slot and receiver support.

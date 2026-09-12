@@ -31,6 +31,6 @@ output and early return after propagation failure. Editor checks include Clamp
 completion.
 
 All five existing Int32 Math methods (Abs, Min, Max, Sign and Clamp) now have bounded
-Raven projections. Floating-point Math methods still require primitive/import support;
-this does not claim the entire runtime Math surface. Installed SDK/VSIX assets are
+Raven projections. The [Double Math slice](raven-floating-math-api.md) projects the remaining runtime
+Math methods with bounded primitive support. Installed SDK/VSIX assets are
 unchanged; generate fresh target declarations to try the sample.
