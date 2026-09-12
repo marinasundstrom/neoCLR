@@ -1,0 +1,21 @@
+.module CollectionsSmoke
+.entry Main
+.function Main() -> Int32
+.local System.Collections.List<Int32> list
+.local System.Collections.Iterator<Int32> iterator
+ldc.i4 0
+call System.Collections.ArrayList<Int32>::Allocate(Int32)
+stloc list
+ldloc list
+ldc.i4 42
+callvirt instance System.Collections.List<Int32>::Add(Int32)
+ldloc list
+callvirt instance System.Collections.Iterable<Int32>::GetIterator()
+stloc iterator
+ldloc iterator
+callvirt instance System.Collections.Iterator<Int32>::MoveNext()
+pop
+ldloc iterator
+callvirt instance System.Collections.Iterator<Int32>::get_Current()
+ret
+.end

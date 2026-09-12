@@ -47,7 +47,9 @@ dependency order: nominal interface-reference dispatch (first bounded runtime su
 implemented), closed generic classes (runtime support implemented), ordinary array-reference/default storage
 (runtime support implemented; bounded Raven Int32 vector import executes) and reference
 conversions (runtime upcasts implemented), then real
-ArrayList/iterator adaptation and Raven execution.
+ArrayList/iterator adaptation (isolated runtime profile implemented) and Raven execution
+(import admission remains next). Configure [Raven language contracts](raven-target-contracts.md)
+per target before implicit iteration lowering; preserve the default .NET target.
 The desired demo is Raven consuming an adapted version of the runtime library already
 used by Neo. Prefer an existing collection/iteration contract as the first interface
 scenario, exposing declarations and executable implementations together; the POC tag

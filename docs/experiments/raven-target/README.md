@@ -429,3 +429,12 @@ also includes the existing Result/Option declarations. Old local core files lack
 Length declaration. The bridge runner must come from this checkout; no new Raven SDK or
 VS Code extension build is needed for this slice. This turn verified the compiler/import/
 runtime path, not a new manual VS Code session.
+
+## Runtime collection profile
+
+The [adapted collection profile](../../raven-interface-contract.md#adapted-runtime-collection-profile-2026-09-12)
+provides generation, verification and execution instructions for the actual collection
+algorithms using nominal classes/interfaces and managed arrays. This is runtime
+groundwork; `--interfaces` remains a compile-only probe that rejects import.
+[Target-specific Raven contracts](../../raven-target-contracts.md) are proposed for
+future implicit iteration without changing the default .NET target.

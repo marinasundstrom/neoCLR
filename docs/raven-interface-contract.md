@@ -2,8 +2,8 @@
 
 Recorded 2026-09-12. This is the contract and admission-probe slice toward the
 [shared runtime library demo](raven-target-experiment.md#desired-demo-the-existing-runtime-library-through-raven-2026-09-12).
-The candidate collection declarations compile through Raven; collection execution is not
-yet implemented. Nominal interface dispatch, including closed generic classes, now has runtime support below.
+The candidate collection declarations compile through Raven. An adapted runtime library
+profile now executes in neoCLR tests; Raven collection import/execution is not yet implemented. Nominal interface dispatch, including closed generic classes, now has runtime support below.
 The existing Neo interface/collection path remains available and unchanged.
 
 ## The library surface to preserve
@@ -80,7 +80,7 @@ The preferred path is runtime adaptation under the existing compiler metadata su
 | Raven compilation | Candidate class/interface declarations bind and emit with standard calls; tested without compiler changes at Raven 5b773ae3536f52ef077c8897867950249d6dde90. |
 | Nominal classes | Nominal classes now admit generic owner parameters, interface conformance and dispatch. Class inheritance, methods with their own type parameters on nominal classes and virtual/byref class receivers remain unsupported. |
 | Existing interface runtime | Legacy views remain unchanged. Ordinary interface object references now support explicit casts, typed slots/fields, GC and dispatch; interface arrays and indirect slot access are now admitted; ordinary array references and implicit class/interface upcasts are implemented; importer admission remains later work. |
-| Library | ArrayList<T> is still a value wrapper holding shared state; ArrayIterator<T> is an explicitly heap-allocated legacy record. Adapt actual implementations after receiver/storage support exists. |
+| Library | An isolated profile adapts the existing implementations to nominal classes and ordinary managed arrays. Runtime tests pass; the default legacy library remains unchanged. String defaults and predicate/delegate contracts are outside the profile. |
 | Import bridge | UnionImport deliberately rejects these collection types and emits no executable. Candidate declarations are isolated from the working core surface. |
 
 The smallest implementation sequence is:
@@ -264,3 +264,49 @@ stores, element/indirect stores, identity, nulls, inherited generic contracts, G
 and rejected downcasts, unrelated types and byref widening.
 
 Validation: eight new regressions and 104 related tests pass (112 focused tests total).
+
+## Adapted runtime collection profile (2026-09-12)
+
+The isolated [profile generator](experiments/raven-target/collection_library.py) now
+adapts the existing ArrayList/iterator source algorithms into a selectable System
+library. ArrayList, its shared state and ArrayIterator become nominal classes;
+List/Iterable/Iterator/Disposable use ordinary reference receivers and no-result
+mutation/disposal methods. Buffers are ordinary array references created by newarr.
+The runtime's existing interface upcasts and callvirt perform real dispatch. No new
+instruction or per-method host implementation was added; declaration-stub bodies are
+not executed. The default library and Neo compiler are unchanged.
+
+Allocate, Count, Capacity, indexing, Add, Copy, GetIterator, MoveNext, Current and Dispose
+are included. Growth, shallow Copy and buffer/extent capture retain the existing
+algorithms. The extra shared-state class is retained for this first adaptation; removing
+it is a possible later simplification, not a requirement for reference semantics.
+Unlike the old reserved/uninitialized buffer, newarr requires a supported default for
+T. Int32, nominal class references and Void are tested. String defaults remain unsupported;
+this is not an unrestricted replacement for the old collection library. Predicate/delegate
+helpers are excluded until their target contracts are admitted.
+
+This follows the CLI class/array/reference baseline cited above and the existing
+[collection contract comparison](common-interfaces.md#net-baseline-alternatives-and-tradeoffs).
+The profile avoids copying and maintaining a second set of collection algorithms, but
+its source transformations are temporary experiment tooling and must be reviewed when
+the source shapes change. It is not a general retargeter or the future binary library
+format. The selected target library must accompany verification and execution; using
+the default System library would select different signatures.
+
+`tests/raven_collections.rs` verifies growth through interface aliases, independent Copy,
+returned iterators retained across GC, captured buffer/extent, disposal, invalid access,
+wrong element types, reference-element identity and generic Void. The runtime fixture
+below returns 42. Raven's collection importer still rejects the candidate program;
+import admission and target declarations are the next slice, not completed by this test.
+
+From the repository root, choose a fresh output path:
+
+```sh
+python3 docs/experiments/raven-target/collection_library.py /tmp/RavenCollections.neoil
+cargo run -- verify docs/experiments/raven-target/samples/collection-runtime.neoil --system /tmp/RavenCollections.neoil
+cargo run -- run docs/experiments/raven-target/samples/collection-runtime.neoil --system /tmp/RavenCollections.neoil
+cargo test --test raven_collections
+```
+
+Future language-level iteration must use [target-specific Raven contracts](raven-target-contracts.md),
+so .NET's names remain supported alongside neoCLR's Iterable/Iterator names.

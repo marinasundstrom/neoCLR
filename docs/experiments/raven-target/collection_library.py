@@ -1,0 +1,60 @@
+"""Generate the bounded Raven collection profile from the existing System sources.
+
+No declaration-stub bodies are used. Keep the collection algorithms shared with the
+legacy library while adapting their storage and receiver contracts for this target.
+"""
+import argparse
+from pathlib import Path
+import re
+
+ROOT = Path(__file__).resolve().parents[3]
+COLLECTIONS = {'ArrayList', 'ArrayListState', 'ArrayIterator', 'List', 'Iterable', 'Iterator'}
+
+
+def adapt(text: str, name: str) -> str:
+    if name == 'ArrayList':
+        # Predicate/delegate contracts are a later target slice.
+        marker = '    ; Predicate searches retain the same initial buffer/extent as GetIterator.'
+        if text.count(marker) != 1:
+            raise ValueError('ArrayList source boundary changed; review target adaptation')
+        text = text.split(marker)[0] + '.end\n'
+        text = text.replace('; Value wrapper with coherent shared managed state. Copy() duplicates the sequence.',
+                            '; Nominal class with shared managed state. Copy() duplicates the sequence.')
+    text = text.replace('.type internal ', '.type internal class ')
+    text = re.sub(r'^\.type (System\.Collections\.ArrayList<T>)$', r'.type class \1', text, flags=re.M)
+    text = text.replace('instance readonly byref ', 'instance ').replace('instance byref ', 'instance ')
+    text = text.replace('T[]&', 'arrayref<T>')
+    for ty in COLLECTIONS:
+        text = text.replace(f'System.Collections.{ty}<T>&', f'System.Collections.{ty}<T>')
+    # CLI newarr initializes every element. The bounded profile requires defaultable T.
+    text = text.replace('array.alloc T', 'newarr T')
+    text = text.replace('-> Void', '-> noresult')
+    text = re.sub(r'^\s*ldvoid\n', '\n', text, flags=re.M)
+    text = re.sub(r'^\s*heap.new\n', '\n', text, flags=re.M)
+    text = text.replace('interface.borrow ', 'castclass ')
+    text = text.replace('ldloca copy', 'ldloc copy')
+    # Ordinary class stfld and no-result calls leave nothing to pop.
+    text = re.sub(r'(stfld System\.Collections\.[^\n]+\n)\s*pop\n', r'\1', text)
+    text = re.sub(r'(call instance System\.Collections\.ArrayList<T>::(?:CheckIndex|Add)\([^\n]+\n)\s*pop\n', r'\1', text)
+    return text
+
+
+def build(path: Path) -> str:
+    text = path.read_text()
+    if path.stem in COLLECTIONS | {'Disposable'}:
+        text = adapt(text, path.stem)
+    lines = []
+    for line in text.splitlines(keepends=True):
+        include = re.fullmatch(r'\s*\.include "([^"]+)"\s*', line)
+        lines.append(build(path.parent / include[1]) if include else line)
+    return ''.join(lines)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('output', type=Path)
+    args = parser.parse_args()
+    # Refuse to overwrite a library that may already be in use by a saved demo.
+    source = build(ROOT / 'runtime/System.neoil')
+    with args.output.open('x') as stream:
+        stream.write('; Generated Raven collection profile; do not edit.\n' + source)

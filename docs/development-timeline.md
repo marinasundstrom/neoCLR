@@ -1462,6 +1462,24 @@ reference support and Raven array import remain intact. No Raven files were chan
 class/interface calls through the Raven bridge, with runtime and Raven acceptance tests.
 That implementation remains pending; this scope correction does not complete it.
 
+## 49. Configure Raven's library contracts by target — recorded 2026-09-12
+
+**Author direction.** The author asked for a way to specify classes and contracts whose
+names differ in neoCLR, including interfaces without the I prefix and iteration APIs.
+Raven must keep targeting .NET while also supporting the experimental neoCLR target.
+
+**Assistant response.** Proposed a target contract description for compiler-recognized
+roles, including types, members and signatures. Distinguished Iterable (source) from
+Iterator (cursor), and ordinary API name binding from compiler-driven iteration lowering.
+The assistant proposed validating actual target symbols rather than global name replacement.
+
+**Action and outcome.** Recorded the [target-contract proposal](raven-target-contracts.md)
+and inspected Raven's existing core metadata options and explicit .NET iteration names.
+No Raven changes were made. The concurrently implemented runtime collection profile
+adapts existing algorithms and passes runtime tests; it does not yet enable Raven's
+collection import or implicit iteration. Compiler configuration, target diagnostics and
+.NET/neoCLR editor regression tests remain planned on Raven's feature branch.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the
