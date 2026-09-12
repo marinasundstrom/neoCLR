@@ -234,3 +234,18 @@ Validation: the complete emission/import probe passed, including its existing ne
 checks and the new completion checks. All five imports verify and run through
 `verify_runtime.py`; `cargo test --test raven_import` passes against the refreshed fixtures.
 The next MVP program must consume a real Result/Option API and handle both outcomes.
+
+## Result binding probe (2026-09-12)
+
+The same reproduction command also checks `samples/library-result.rvn`, with a
+separate `union-probe/NeoCLR.CoreProbe.dll`. `report.json` now includes `UnionProbe`:
+valid Result case patterns bind, a string passed to Math.Abs fails with RAV1503,
+and emission reproduces the pinned Raven host-type-resolution failure. An unexpected
+emission outcome fails the probe so this cannot silently remain an expected blocker.
+The compact checked-in outcome is `union-results.json`.
+
+**This sample cannot run yet.** Its declaration bodies are placeholders; it is not
+part of the executable API catalog, generated neoIL, or `verify_runtime.py`'s five
+runtime programs. The [experiment notes](../../raven-target-experiment.md#union-metadata-probe-and-emission-blocker-2026-09-12)
+explain the metadata protocol and ordered follow-up work. No Raven changes are needed
+to reproduce this blocker at the pinned revision.

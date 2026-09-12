@@ -7,12 +7,17 @@ using Microsoft.CodeAnalysis.CSharp;
 static class CoreDeclarations
 {
     public const string Identity = "NeoCLR.CoreProbe";
-    public static void Write(string path, bool includeConsole = true, bool stringParameter = true)
+    public static void Write(string path, bool includeConsole = true, bool stringParameter = true, bool unionProbe = false)
     {
+        var declarations = TargetSurface.Declarations(includeConsole, stringParameter);
+        if (unionProbe)
+            declarations = declarations.Replace("public static class Math {",
+                "public static class Math { public static Result<int, OverflowError> Abs(int value) => default;")
+                + UnionDeclarations.Source;
+        var source = Source.Replace("public static class Console { public static void WriteLine(string value) { } }", declarations)
+            .Replace("// Union probe attribute", unionProbe ? "public sealed class UnionAttribute : System.Attribute { }" : "");
         var compilation = CSharpCompilation.Create(Identity,
-            [CSharpSyntaxTree.ParseText(Source.Replace(
-                "public static class Console { public static void WriteLine(string value) { } }",
-                TargetSurface.Declarations(includeConsole, stringParameter)))], references: [],
+            [CSharpSyntaxTree.ParseText(source)], references: [],
             options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
         using var stream = File.Create(path);
         var result = compilation.Emit(stream, options: new Microsoft.CodeAnalysis.Emit.EmitOptions(metadataOnly: true, includePrivateMembers: false));
@@ -68,6 +73,7 @@ static class CoreDeclarations
             public static class Console { public static void WriteLine(string value) { } }
         }
         namespace System.Runtime.CompilerServices {
+            // Union probe attribute
             public sealed class ReferenceAssemblyAttribute : System.Attribute { }
             public sealed class CompilerGeneratedAttribute : System.Attribute { }
             public sealed class RefSafetyRulesAttribute : System.Attribute {

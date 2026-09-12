@@ -181,6 +181,39 @@ string[] MutateAndAudit(string name, string expected, Action<AssemblyDefinition>
     if (!errors.Any(e => e.Contains(expected))) throw new Exception(name + " did not report its expected resolution failure.");
     return errors;
 }
+var unionDirectory = Path.Combine(output, "union-probe");
+Directory.CreateDirectory(unionDirectory);
+var unionCore = Path.Combine(unionDirectory, CoreDeclarations.Identity + ".dll");
+CoreDeclarations.Write(unionCore, unionProbe: true);
+CoreDeclarations.ReadDeclaredTypes(unionCore);
+var unionSource = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "samples", "library-result.rvn"));
+var unionCompilation = Compilation.Create("CoreUnion", [SyntaxTree.ParseText(unionSource)],
+    [MetadataReference.CreateFromFile(unionCore)],
+    new CompilationOptions(OutputKind.ConsoleApplication, metadataImportOptions: new MetadataImportOptions(CoreDeclarations.Identity)));
+var unionDiagnostics = unionCompilation.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
+if (unionDiagnostics.Length != 0) throw new Exception(string.Join("\n", unionDiagnostics.Select(d => d.ToString())));
+var badUnionCompilation = Compilation.Create("BadUnion", [SyntaxTree.ParseText(unionSource.Replace("Math.Abs(value)", "Math.Abs(\"wrong\")"))],
+    [MetadataReference.CreateFromFile(unionCore)],
+    new CompilationOptions(OutputKind.ConsoleApplication, metadataImportOptions: new MetadataImportOptions(CoreDeclarations.Identity)));
+var badUnionDiagnostics = badUnionCompilation.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error).Select(d => d.ToString()).ToArray();
+if (!badUnionDiagnostics.Any(d => d.Contains("RAV1503")))
+    throw new Exception("Union API accepted an incorrect argument type.");
+var unionErrors = ClosureAudit.Inspect(unionCore);
+if (unionErrors.Length != 0) throw new Exception(string.Join("\n", unionErrors));
+string unionEmissionBlocker;
+using (var unionStream = new MemoryStream())
+{
+    try
+    {
+        var emitted = unionCompilation.Emit(unionStream, null, new EmitOptions(AssemblyName.GetAssemblyName(unionCore)));
+        throw new Exception("Union emission changed; replace the expected-blocker probe with emitted IL validation. Success: " + emitted.Success);
+    }
+    catch (InvalidOperationException error) when (error.GetBaseException().Message ==
+        "Unable to resolve runtime type for metadata symbol: System.Result`2")
+    {
+        unionEmissionBlocker = error.GetBaseException().Message;
+    }
+}
 var report = new
 {
     Closure = new
@@ -197,6 +230,8 @@ var report = new
         MissingDependencyErrors = missingDependencyErrors
     },
     Scope = "emission plus bounded static import; execute generated neoIL separately against neoCLR System",
+    UnionProbe = new { Scope = "metadata binding only; emission blocked; no union program executed",
+        BindingPassed = true, InvalidArgumentDiagnostics = badUnionDiagnostics, DeclarationClosureErrors = unionErrors, EmissionBlocker = unionEmissionBlocker },
     StaticImportRejections = staticImportRejections,
     TargetCompletions = targetCompletions,
     CoreDeclarationTypes = coreTypes,

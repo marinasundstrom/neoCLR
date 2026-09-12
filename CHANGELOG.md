@@ -19,6 +19,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Raven's completion API now passes checks against those target declarations without
   host API leakage; VS Code integration remains planned. Added a real Result/Option
   demonstration to MVP acceptance criteria; generic union import is not yet supported.
+  Added an isolated Result metadata/type-pattern probe and incorrect-argument rejection.
+  Recorded Raven's host-type-resolution emission blocker; the union sample binds but
+  does not yet emit or execute. Kept probe-only declarations outside admitted runtime APIs.
 
 - Began nominal class reference semantics: `.type class` uses managed heap handles in
   ordinary class-typed storage, while managed byrefs still address slots. Assignment,

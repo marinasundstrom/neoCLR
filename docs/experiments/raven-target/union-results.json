@@ -1,0 +1,13 @@
+{
+  "RecordedDate": "2026-09-12",
+  "RavenRevision": "1d7341fa64a66b514e5e68031b6d072d8140ea3a",
+  "UnionProbe": {
+    "Scope": "metadata binding only; emission blocked; no union program executed",
+    "BindingPassed": true,
+    "InvalidArgumentDiagnostics": [
+      "error RAV1503: Cannot convert from 'string' to 'int'"
+    ],
+    "DeclarationClosureErrors": [],
+    "EmissionBlocker": "Unable to resolve runtime type for metadata symbol: System.Result`2"
+  }
+}

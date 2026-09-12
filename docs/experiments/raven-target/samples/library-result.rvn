@@ -1,0 +1,16 @@
+import System.*
+import System.Console.*
+
+func Show(value: int) {
+    let result = Math.Abs(value)
+    if result is Result.Ok<int> ok {
+        WriteLine(ok.Value)
+    } else if result is Result.Error<OverflowError> error {
+        WriteLine("Overflow")
+    }
+}
+
+func Main() {
+    Show(-42)
+    Show(-2147483648)
+}

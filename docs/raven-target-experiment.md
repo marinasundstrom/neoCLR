@@ -275,3 +275,46 @@ The reference declarations and importer share `TargetSurface` for the current fi
 signatures. This prevents editor/compiler API claims from drifting from the available
 runtime bindings while the MVP grows. It is still a bounded experimental projection,
 not the complete runtime class library or a native metadata loader.
+
+## Union metadata probe and emission blocker (2026-09-12)
+
+The checked-in `samples/library-result.rvn` probe now binds `Math.Abs(Int32)` as
+`Result<Int32, OverflowError>` and type-matches `Result.Ok<Int32>` and
+`Result.Error<OverflowError>`. It includes ordinary input and Int32.MinValue. This
+is **binding evidence only**, not an executed Result demo. An incorrect string
+argument is rejected. The separate reference assembly has no external dependencies;
+its placeholder bodies never execute. It is deliberately excluded from the admitted
+`TargetSurface` catalog and the five runtime samples.
+
+Raven revision `1d7341fa64a66b514e5e68031b6d072d8140ea3a` recognizes the
+`System.Runtime.CompilerServices.UnionAttribute` and discovers member types from
+single-argument constructors (`Symbols/PE/PEUnionSymbols.cs`). Its type-pattern
+emitter searches for `TryGetValue(out Case)` (`CodeGen/Generators/ExpressionGenerator.Patterns.cs`).
+The probe supplies that protocol over the existing Result cases. neoCLR currently
+names the equivalent operation `TryGet`; no alias or importer binding is implemented
+by this probe. Choosing an alias versus a binding adapter remains open.
+
+Emission fails before we can inventory the sample's IL: `Compilation.ResolveRuntimeType`
+and `TypeSymbolExtensionsForCodeGen.GetClrTypeInternal` try to resolve the metadata
+carrier as a host runtime type and report
+``Unable to resolve runtime type for metadata symbol: System.Result`2``.
+The probe recognizes exactly this failure and fails if the outcome changes, so later
+work must replace the blocker assertion with positive emission checks. See the
+[recorded probe outcome](experiments/raven-target/union-results.json).
+
+This is an emitter limitation, not evidence that CLI generics need a different
+encoding. The .NET baseline already separates reflection over metadata from runtime
+loading: [MetadataLoadContext](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.metadataloadcontext?view=net-11.0-pp)
+permits a designated core assembly and inspection across platforms (consulted
+2026-09-12; the linked .NET 11 documentation is prerelease). Our provisional next
+step is to preserve target metadata identity through Raven emission, on its existing
+feature branch. Investigate that shared compiler capability before adding a special
+neoCLR union lowering path. Loading fake executable host implementations would hide
+the dependency and would not validate the actual runtime library.
+
+After emission works, neoCLR still needs admission of closed generic library types,
+value receiver/out-parameter calls, and verified branch/local state merges. Then bind
+both cases to the real Result API and execute both outcomes. No union opcode or new
+binary metadata format has been justified. The probe does not establish that a
+metadata-only emitter change is small, nor that these two generic carrier layouts
+are binary-compatible.

@@ -1291,6 +1291,17 @@ The current slice expands real Math/Console consumption and demonstrates complet
 Raven's compiler API using the same target declarations. Generic union import and the
 union demonstration remain the next support work; neither is claimed complete.
 
+### Follow-up evidence — recorded 2026-09-12
+
+**Assistant investigation and action.** Following the author's continuation, added a
+Raven sample consuming Math.Abs as Result and matching its success/error case types.
+Binding against isolated declarations succeeds, but emission fails while resolving
+Result as a host runtime type. No union program has executed. The assistant proposes
+fixing target metadata emission before expanding the neoCLR importer; this is a
+technical proposal, not an additional author decision. Raven remains unchanged in
+this slice. The [probe and next steps](raven-target-experiment.md#union-metadata-probe-and-emission-blocker-2026-09-12)
+record the evidence and distinguish the remaining compiler, library, and runtime work.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the
