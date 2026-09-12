@@ -80,8 +80,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   neoIL change: `newarr` now returns an ordinary array reference; migrate old `T[]&`
   allocations to `array.new` or recompile Neo sources. Neo source behavior is unchanged.
   Runtime metadata identities distinguish both array forms; 13 new regressions and
-  127 related tests pass. Raven array import,
-  implicit reference conversions, String defaults and collection adaptation remain pending.
+  127 related tests pass. Added bounded Raven Int32 vector import and an executable
+  alias/mutation/length sample, reusing Raven's standard IL and adding Array.Length to
+  target declarations. Five malformed-IL imports reject without output; a typed-null
+  local fixture verifies and faults at execution. Result/Option/Void compatibility checks
+  still pass. Documented reproduction and target-core refresh instructions. Broader array
+  import, implicit reference conversions, String defaults and collection adaptation remain pending.
 
 - Began nominal class reference semantics: `.type class` uses managed heap handles in
   ordinary class-typed storage, while managed byrefs still address slots. Assignment,

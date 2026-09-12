@@ -641,3 +641,19 @@ interface contracts through existing substitution. No Raven or instruction-set c
 was needed. The next shared-library blockers are array/default storage and implicit
 reference conversions/import admission. This remains runtime groundwork; the Raven
 collection probe is not yet executable and union propagation stays deferred.
+
+## Raven Int32 array execution (2026-09-12)
+
+The [array probe](experiments/raven-target/README.md#executable-raven-arrays-2026-09-12)
+now compiles and imports an unmodified Raven array program using ordinary CLI SZARRAY
+signatures, newarr/ldelem.i4/stelem.i4/ldlen and conv.i4. neoCLR executes it with shared
+reference semantics and prints 42 and 2. A supplied System.Array.Length declaration
+unblocks Raven's existing intrinsic lowering; no Raven source changes were needed.
+
+This follows the [array ABI comparison](managed-arrays.md#ordinary-array-references-and-migration-2026-09-12):
+translation belongs in neoCLR's target bridge, not a Raven-specific opcode or guest
+wrapper. The cost of bounded admission remains explicit: only Int32 vectors and static
+application functions are covered. Five negative imports and a runtime null-default
+fixture validate rejection/state behavior. Existing Result/Option/Void probe checks
+and runtime outputs remain valid. Reference conversions and the real collection library
+remain next work; this is not full CLI array or interface-import support.

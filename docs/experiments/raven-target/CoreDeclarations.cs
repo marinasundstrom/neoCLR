@@ -62,7 +62,7 @@ static class CoreDeclarations
             public struct IntPtr { }
             public struct UIntPtr { }
             public sealed class String { }
-            public abstract class Array { }
+            public abstract class Array { public int Length => 0; }
             public class Type { }
             public class Attribute { }
             public enum AttributeTargets { All = 32767 }

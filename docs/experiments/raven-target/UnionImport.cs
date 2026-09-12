@@ -7,6 +7,7 @@ using Mono.Cecil.Cil;
 // Bounded Result/Option profile, not a general CLI loader. Only supplied metadata is resolved.
 static class UnionImport
 {
+    const string IntArray = "arrayref<Int32>";
     const string VoidOption = "System.Option<Void>";
     const string VoidSome = "System.Option.Some<Void>";
     const string Option = "System.Option<Int32>";
@@ -50,7 +51,7 @@ static class UnionImport
             var args = method.Parameters.Select(p => Type(p.ParameterType)).ToArray();
             var result = Type(method.ReturnType, true);
             var locals = method.Body.Variables.Select(v => Type(v.VariableType)).ToArray();
-            if (locals.Any(t => t is not ("Int32" or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome)))
+            if (locals.Any(t => t is not ("Int32" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome)))
                 throw new InvalidDataException("Unsupported local default in Result profile.");
             var instructions = method.Body.Instructions.ToArray();
             var indexes = instructions.Select((i, n) => (i, n)).ToDictionary(p => p.i, p => p.n);
@@ -78,6 +79,20 @@ static class UnionImport
                 switch (instruction.OpCode.Code)
                 {
                     case Code.Nop: break;
+                    case Code.Newarr:
+                        if (Type((TypeReference)instruction.Operand) != "Int32")
+                            throw new InvalidDataException("Only Int32 vector allocation is admitted.");
+                        Expect("Int32"); Push(new(IntArray)); code.AppendLine("newarr Int32"); break;
+                    case Code.Ldlen:
+                        Expect(IntArray); Push(new("UIntPtr")); code.AppendLine("ldlen"); break;
+                    case Code.Conv_I4:
+                        var converted = Pop();
+                        if (converted.Type is not ("UIntPtr" or "Int32")) throw new InvalidDataException("Unsupported conv.i4 input.");
+                        Push(new("Int32")); code.AppendLine("conv.i4"); break;
+                    case Code.Ldelem_I4:
+                        Expect("Int32"); Expect(IntArray); Push(new("Int32")); code.AppendLine("ldelem Int32"); break;
+                    case Code.Stelem_I4:
+                        Expect("Int32"); Expect("Int32"); Expect(IntArray); code.AppendLine("stelem Int32"); break;
                     case Code.Ldsfld:
                         var field = ((FieldReference)instruction.Operand).Resolve();
                         if (field is null || field.Module != app.MainModule || field.FullName != "System.Unit System.Unit::Value"
@@ -164,7 +179,8 @@ static class UnionImport
             for (var n = 0; n < locals.Length; n++) output.AppendLine($".local {locals[n]} local{n}");
             if (method.Body.InitLocals)
                 for (var n = 0; n < locals.Length; n++)
-                    if (locals[n] != Carrier && locals[n] != Option && locals[n] != VoidOption) output.AppendLine(Default(locals[n]) + $"\nstloc local{n}");
+                    if (locals[n] == IntArray) output.AppendLine($"ldloca local{n}\ninitobj {IntArray}");
+                    else if (locals[n] != Carrier && locals[n] != Option && locals[n] != VoidOption) output.AppendLine(Default(locals[n]) + $"\nstloc local{n}");
             foreach (var index in bodies.Keys.Order())
             {
                 mappings.Add(new { MethodToken = method.MetadataToken.ToUInt32(), instructions[index].Offset, OutputLine = output.ToString().Count(c => c == '\n') + 1 });
@@ -187,9 +203,9 @@ static class UnionImport
         output.Append(Adapters());
         File.WriteAllText(destination, output.ToString());
         File.WriteAllText(destination + ".map.json", JsonSerializer.Serialize(new {
-            Profile = "result-option-void-v3", ApplicationSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(application))),
+            Profile = "result-option-void-arrays-v4", ApplicationSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(application))),
             CoreSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(core))), ReachableMethods = seen.Order().ToArray(), Mappings = mappings,
-            Scope = "Bounded generic Result/Option bindings; CFG stack/definite-assignment checked; observable default carriers rejected; no guest declaration bodies executed."
+            Scope = "Bounded Int32 vectors and generic Result/Option bindings; CFG stack/definite-assignment checked; observable default carriers rejected; no guest declaration bodies executed."
         }, new JsonSerializerOptions { WriteIndented = true }));
     }
 
@@ -202,6 +218,7 @@ static class UnionImport
             throw new InvalidDataException("Unsupported application signature.");
     }
     static string Type(TypeReference type, bool result = false) => type.FullName switch {
+        "System.Int32[]" when type is ArrayType { IsVector: true } array && array.ElementType.MetadataType == MetadataType.Int32 => IntArray,
         "System.Void" when result => "noresult", "System.Int32" => "Int32", "System.String" => "String",
         "System.Option`1<System.Void>" when type.IsValueType && HasNamedVoid(type) => VoidOption,
         "System.Option/Some`1<System.Void>" when type.IsValueType && HasNamedVoid(type) => VoidSome,

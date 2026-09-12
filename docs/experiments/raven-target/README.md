@@ -378,3 +378,54 @@ The separate `--interfaces` mode tests the proposed existing collection surface 
 Raven emission and requires unsupported runtime import to remain rejected. See the
 [interface contract and reproduction](../../raven-interface-contract.md). It does not
 expand the executable demo's API surface or claim collection execution yet.
+
+## Executable Raven arrays (2026-09-12)
+
+The `--arrays` probe compiles [library-arrays.rvn](samples/library-arrays.rvn) with
+Raven at `5b773ae3536f52ef077c8897867950249d6dde90`, using only the supplied neoCLR
+core declarations. It imports standard `Int32[]` signatures as runtime `arrayref<Int32>`
+and emits `newarr`, element operations and `ldlen`. The sample returns an array, shares
+it between bindings, mutates it through a parameter and prints its length. No Raven
+compiler change is required. The core declares `System.Array.Length` so Raven can bind
+and lower the property to `ldlen`; that declaration body never executes.
+
+From the neoCLR repository root, use a new output directory:
+
+```sh
+cargo build --locked
+dotnet run --project docs/experiments/raven-target/Probe.csproj \
+  -p:RavenRoot=/absolute/path/to/Raven -p:BuildProjectReferences=false -p:WarningLevel=0 \
+  -- --arrays /tmp/raven-neoclr-arrays
+python3 docs/experiments/raven-target/verify_arrays.py /tmp/raven-neoclr-arrays \
+  --runtime /absolute/path/to/neoclr/target/debug/neoclr
+```
+
+If building with `CARGO_TARGET_DIR`, point `--runtime` to that directory's `debug/neoclr`.
+The verifier script checks the generated array sample and null-default fixture, runs
+them and writes `array-execution-results.json`. Expected positive output:
+
+```text
+42
+2
+=> Void
+```
+
+The probe also mutates emitted IL and requires rejection of wrong allocation element
+types, unsupported stores, wrong index stack types, multidimensional signatures and
+uninitialized-local reads. Rejected inputs must not produce executable neoIL. The
+null-default fixture instead passes verification and faults at runtime on array access.
+Recorded evidence is in [array-results.json](array-results.json).
+
+This bounded bridge now labels maps `result-option-void-arrays-v4`. It admits Int32
+vectors in locals, static-function parameters and returns; InitLocals arrays get typed
+null defaults. Array covariance, other element types, instance-field import, null literals,
+array-reference comparisons and interface/class conversions remain unsupported. Runtime
+capabilities are broader than this importer profile. The actual ArrayList/iterator
+library adaptation and union propagation are still pending.
+
+For the existing saved-project/VS Code workflow, use `samples/library-arrays.rvn` as the
+project source and refresh its `NeoCLR.CoreProbe.dll` from this probe's output. That core
+also includes the existing Result/Option declarations. Old local core files lack the
+Length declaration. The bridge runner must come from this checkout; no new Raven SDK or
+VS Code extension build is needed for this slice. This turn verified the compiler/import/
+runtime path, not a new manual VS Code session.

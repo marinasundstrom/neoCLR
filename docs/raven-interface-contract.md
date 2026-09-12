@@ -205,3 +205,11 @@ Neo's existing owned arrays. The Neo compiler preserves its source behavior by e
 `array.new`; old neoIL artifacts need migration. Reference conversions/import admission,
 String defaults and actual collection adaptation remain ahead. No Raven changes or
 executable collection-import claim are made by this slice.
+
+## Bounded Raven array import (2026-09-12)
+
+Raven Int32 vectors now compile/import/execute in the [array probe](experiments/raven-target/README.md#executable-raven-arrays-2026-09-12).
+The bridge maps standard signatures to ArrayRef and checks array stack operands before
+writing neoIL. Its static-function profile does not yet admit nominal class fields or
+interface conversions. The candidate collection probe remains rejected; the array demo
+establishes one prerequisite rather than substituting for the real collection library.

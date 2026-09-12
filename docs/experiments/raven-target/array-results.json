@@ -1,0 +1,37 @@
+{
+  "Scope": "Raven Int32 vector compile/import/verify/execute on neoCLR",
+  "NegativeRejections": {
+    "WrongElement": "Only Int32 vector allocation is admitted.",
+    "WrongStore": "Unsupported reachable instruction: stelem.ref",
+    "WrongIndex": "Input stack type mismatch.",
+    "NonVector": "Unsupported Result profile type: System.Int32[,]",
+    "UninitializedLocal": "Read of uninitialized or unsupported default local."
+  },
+  "ApplicationClosureErrors": [],
+  "Opcodes": [
+    "Nop",
+    "Ldc_I4_2",
+    "Newarr",
+    "Dup",
+    "Ldc_I4_0",
+    "Ldc_I4_1",
+    "Stelem_I4",
+    "Ret",
+    "Ldarg_0",
+    "Ldc_I4_S",
+    "Call",
+    "Stloc_0",
+    "Ldloc_0",
+    "Stloc_1",
+    "Ldloc_1",
+    "Ldelem_I4",
+    "Ldlen",
+    "Conv_I4"
+  ],
+  "ExpectedOutput": [
+    "42",
+    "2"
+  ],
+  "RuntimeOutput": "42\n2\n=> Void\n",
+  "NullDefault": "Verified; execution faults with null array reference"
+}

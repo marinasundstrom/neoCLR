@@ -19,7 +19,8 @@ class through an interface from Raven on neoCLR. Union propagation follows that 
 The [interface contract probe](raven-interface-contract.md) establishes the first
 dependency order: nominal interface-reference dispatch (first bounded runtime support
 implemented), closed generic classes (runtime support implemented), ordinary array-reference/default storage
-(runtime support implemented) and import conversions, then real
+(runtime support implemented; bounded Raven Int32 vector import executes) and reference
+conversions, then real
 ArrayList/iterator adaptation and Raven execution.
 The desired demo is Raven consuming an adapted version of the runtime library already
 used by Neo. Prefer an existing collection/iteration contract as the first interface
