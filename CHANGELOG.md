@@ -54,6 +54,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   interface contract first and defers propagation. Closed the bounded Raven POC as
   an experiment checkpoint, with acceptance evidence, limitations and pinned Raven
   dependency for local tag milestone/raven-poc-2026-09-12; no preview release published.
+  Clarified the broader desired demo: Raven should consume an adapted version of the
+  existing library used by Neo, with shared implementations and matching declarations.
+  Proposed existing collection/iteration contracts as the interface milestone scenario.
 
 - Began nominal class reference semantics: `.type class` uses managed heap handles in
   ordinary class-typed storage, while managed byrefs still address slots. Assignment,

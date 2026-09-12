@@ -8,6 +8,12 @@ and instruction representation, and executed by neoCLR. Host Rust implements the
 interpreter and unavoidable bootstrap services; it should not become the BCL's
 implementation language by accident.
 
+The Raven-target experiment should expose an adapted version of this same library,
+previously demonstrated through Neo. Its compiler reference artifact is a declaration
+view, not a separate executable BCL. The desired demo is Raven source using useful
+existing library contracts and executing their platform implementations. See the
+[shared-library demo direction](raven-target-experiment.md#desired-demo-the-existing-runtime-library-through-raven-2026-09-12).
+
 For new features, first try composing existing IL operations. If that fails, identify
 whether the gap is a platform fundamental or an unavoidable host operation. An IL
 wrapper alone does not make host-implemented policy a platform-written implementation.

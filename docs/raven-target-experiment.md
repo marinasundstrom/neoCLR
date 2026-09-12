@@ -578,3 +578,37 @@ from that evidence rather than silently included in the first runnable case.
 Union propagation is deferred until that contract is established. Its later acceptance
 cases remain success extraction, compatible failure return, nested calls and incompatible
 carrier rejection; no propagation support is claimed by this checkpoint.
+
+## Desired demo: the existing runtime library through Raven (2026-09-12)
+
+The author clarified that the intended demo eventually runs the same runtime library
+surface previously exercised through Neo, adapted as necessary for the current type
+semantics and compiler boundary. The bounded POC tag proves an integration path; it does
+not mark this broader library demonstration complete.
+
+The source of library behavior remains [System.neoil](../runtime/System.neoil) and the
+[existing runtime library contracts](runtime-library.md). The Raven core declaration
+assembly is a compiler-facing view of that implementation, not an independent replacement
+BCL or a collection of executable host stubs. Adapt the actual library contracts and
+metadata as needed, preserve intentional Result/Option and generic Void behavior, and
+keep both frontends aligned with the shared implementation where supported. Document
+necessary compatibility changes rather than preserving obsolete addressing conventions
+merely to reproduce earlier samples.
+
+The interface milestone should serve this library demonstration. A useful proposed
+first vertical slice is an existing collection and iteration contract—ArrayList with
+List/Iterable/Iterator—consumed from Raven through interfaces and executed by neoCLR.
+Before selecting its exact scope, compare the existing contracts with .NET collection
+APIs, CLI interface dispatch and the newer reference/value semantics. Identify which
+library methods already work, which require adaptation, and which loader/runtime gaps
+prevent exposure. Add compiler declarations and runtime admission together so that
+visible APIs increasingly correspond to executable library behavior. Avoid creating
+an unrelated toy interface hierarchy when an existing library contract can provide
+the same bounded evidence.
+
+Acceptance for the broader demo is saved Raven source that consumes useful existing
+library APIs, obtains completion from matching declarations, and runs their adapted
+platform implementations on neoCLR. A practical collection/iteration example can then
+combine with the established Result/Option flows. This is the desired direction, not
+an assertion that the full earlier library surface is already available through Raven.
+Union propagation remains deferred until the interface contract is established.

@@ -1385,6 +1385,24 @@ contract followed by a concrete class/interface dispatch example from Raven on n
 Union propagation is explicitly deferred; the detailed interface scope remains to be
 validated against CLI metadata, runtime behavior and the end-to-end example.
 
+## 45. The existing runtime library is the desired demo — recorded 2026-09-12
+
+**Author direction.** After closing the bounded POC, the author said the eventual goal
+is to run the same, adapted runtime library surface previously used for Neo, then
+clarified: that is the desired demo.
+
+**Assistant response.** The assistant distinguished the completed integration checkpoint
+from this broader goal. The existing neoCLR library remains the implementation foundation;
+Raven's declaration assembly is its compiler-facing view. The assistant proposed using
+an existing collection/iteration contract for the interface milestone so it advances
+that demonstration rather than only exercising a disconnected interface example.
+
+**Action and open scope.** Recorded the shared-library direction in the runtime library,
+experiment and roadmap documents. The collection slice is a proposal; its exact API
+adaptations and runtime/import requirements remain to be assessed. No new library or
+interface implementation is claimed by this documentation change. The prior POC tag
+remains unchanged, and propagation remains deferred until the interface contract exists.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the
