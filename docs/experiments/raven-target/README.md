@@ -454,3 +454,9 @@ its output is `41, 42, 41, 41`. See [contract support and limits](../../raven-ta
 
 This is compiler-API integration, not a new VS Code/project switch. Automatic iterator
 Dispose is a recorded Raven gap; cleanup/defer support remains future work.
+
+
+The collection profile can also be selected from an editable Raven project, with the
+same iteration settings used by the language server and saved-project runner. This
+requires Raven `1e3f7ff07d8a9785ed54105b74d1fcda96c8795f` or a compatible descendant;
+see [collection project setup and checks](VSCODE.md#collection-project-follow-up).

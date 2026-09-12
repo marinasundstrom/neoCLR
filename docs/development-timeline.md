@@ -1502,6 +1502,27 @@ completion, break and return. Recorded [cleanup/defer discussion](raven-target-c
 for future work as requested; neither automatic disposal nor defer was implemented.
 Project configuration and VS Code integration of this option remain pending.
 
+## 51. Scoped cleanup and the target boundary — recorded 2026-09-12
+
+**Author direction.** The author proposed deterministic destructors using Disposable,
+Closable or an iteration of those contracts, then clarified that the intended feature
+is deterministic resource cleanup, separate from deconstruction. They explicitly directed
+that possible NeoCLR-specific behavior must leave existing CLR support working the same.
+Future NeoCLR behavior may differ; that is not a direction to change the .NET target.
+
+**Assistant proposal.** Distinguish cleanup responsibility owned by a scope from an
+object's memory lifetime: multiple reference aliases must not each trigger disposal
+when leaving scope. Disposable/Closable are candidate hooks. Cleanup failure policy,
+including Result-returning close operations, remains to be designed. These are proposals,
+not implemented destruction or ownership semantics.
+
+**Action and outcome.** Recorded the boundary in both target-contract documents. Kept
+cleanup/defer out of the current slice, following the earlier direction to note it only.
+The separate project/editor integration now selects iteration through evaluated project
+properties, runs the adapted collection library and verifies completion and inferred
+loop-binding types through the language server. Default project settings remain unchanged.
+See [target integration and cleanup boundary](raven-target-contracts.md#project-and-editor-integration-2026-09-12).
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

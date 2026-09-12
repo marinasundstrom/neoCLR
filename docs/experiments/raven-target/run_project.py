@@ -1,8 +1,10 @@
 """Compile saved Raven project sources, import, verify, and optionally run on neoCLR."""
 import argparse
+import json
 from pathlib import Path
 import subprocess
 import tempfile
+from collection_library import build, ROOT
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('project', type=Path)
@@ -23,9 +25,18 @@ try:
         '-p:RavenRoot='+str(raven), '-p:BuildProjectReferences=false', '-p:WarningLevel=0',
         '--', '--project', str(project), str(output)], cwd=bridge, check=True)
     artifact = output / 'App.neoil'
-    subprocess.run([str(runtime), 'verify', str(artifact)], check=True)
+    mapping = json.loads(Path(str(artifact) + '.map.json').read_text())
+    profile = mapping.get('RequiredLibraryProfile')
+    system_arguments = []
+    if profile == 'raven-collections':
+        system = output / 'System.Collections.neoil'
+        system.write_text(build(ROOT / 'runtime/System.neoil'))
+        system_arguments = ['--system', str(system)]
+    elif profile != 'bundled-system':
+        raise SystemExit('Unsupported imported library profile: ' + str(profile))
+    subprocess.run([str(runtime), 'verify', str(artifact), *system_arguments], check=True)
     print('Verified saved project: '+str(artifact), flush=True)
     if not args.build_only:
-        subprocess.run([str(runtime), 'run', str(artifact)], check=True)
+        subprocess.run([str(runtime), 'run', str(artifact), *system_arguments], check=True)
 except subprocess.CalledProcessError as error:
     raise SystemExit(error.returncode)

@@ -1,0 +1,64 @@
+{
+  "Math": [
+    "Max",
+    "Min",
+    "Sign"
+  ],
+  "Console": [
+    "WriteLine"
+  ],
+  "System": [
+    "Array",
+    "Attribute",
+    "AttributeTargets",
+    "AttributeUsageAttribute",
+    "Boolean",
+    "Byte",
+    "Char",
+    "Collections",
+    "Console",
+    "Disposable",
+    "Double",
+    "Enum",
+    "Int16",
+    "Int32",
+    "Int64",
+    "IntPtr",
+    "Math",
+    "Object",
+    "Runtime",
+    "SByte",
+    "Single",
+    "String",
+    "Type",
+    "UInt16",
+    "UInt32",
+    "UInt64",
+    "UIntPtr",
+    "Unit",
+    "ValueType",
+    "Void"
+  ],
+  "List": [
+    "Add",
+    "Count",
+    "GetIterator",
+    "Item"
+  ],
+  "LoopElementHover": {
+    "contents": {
+      "kind": "markdown",
+      "value": "```raven\nval item: int\n```\n\nType in `function Inspect`"
+    },
+    "range": {
+      "start": {
+        "line": 2,
+        "character": 8
+      },
+      "end": {
+        "line": 2,
+        "character": 12
+      }
+    }
+  }
+}

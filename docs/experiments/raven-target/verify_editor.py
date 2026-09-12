@@ -7,6 +7,7 @@ import sys
 import threading
 
 project = Path(sys.argv[1]).resolve()
+collections = '--collections' in sys.argv[2:]
 server = json.loads((project / '.vscode/settings.json').read_text())['raven.languageServerPath']
 messages = queue.Queue()
 log = (project / 'lsp-stderr.log').open('wb')
@@ -74,7 +75,7 @@ try:
             'context': {'triggerKind': 1}}, True))
         items = result if isinstance(result, list) else result['items']
         labels = sorted({item['label'] for item in items})
-        expected = ('Abs', 'Min', 'Max', 'Sign') if owner == 'Math' else (('WriteLine',) if owner else ('Option', 'Result', 'Console', 'Math'))
+        expected = (('Min', 'Max', 'Sign') if collections else ('Abs', 'Min', 'Max', 'Sign')) if owner == 'Math' else (('WriteLine',) if owner else (('Collections', 'Console', 'Math') if collections else ('Option', 'Result', 'Console', 'Math')))
         if any(not any(label == name or label.startswith(name+'(') for label in labels) for name in expected):
             raise AssertionError(f'{owner}: missing target completions: {labels}')
         if any(label == name or label.startswith(name+'(') for label in labels for name in ('ReadLine', 'Clamp', 'Sin', 'Sqrt')):
@@ -82,6 +83,24 @@ try:
         if not owner and 'IO' in labels:
             raise AssertionError('Host System.IO leaked into target namespace')
         results[owner or 'System'] = labels
+    if collections:
+        text = 'import System.Collections.*\nfunc Inspect(values: List<int>) {\n    values.\n}'
+        send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': 4}, 'contentChanges': [{'text': text}]})
+        result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
+            'position': {'line': 2, 'character': len('    values.')}, 'context': {'triggerKind': 1}}, True))
+        items = result if isinstance(result, list) else result['items']
+        labels = sorted({item['label'] for item in items})
+        for expected in ('Add', 'Count', 'GetIterator'):
+            if not any(label == expected or label.startswith(expected + '(') for label in labels):
+                raise AssertionError('Missing collection completion: ' + str(labels))
+        results['List'] = labels
+        text = 'import System.Collections.*\nfunc Inspect(values: List<int>) {\n    for item in values {\n        System.Console.WriteLine(item)\n    }\n}'
+        send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': 5}, 'contentChanges': [{'text': text}]})
+        hover = receive(send('textDocument/hover', {'textDocument': {'uri': uri},
+            'position': {'line': 2, 'character': 9}}, True))
+        if hover is None or not any(name in json.dumps(hover) for name in ('int', 'Int32')):
+            raise AssertionError('Loop element type was not inferred from the project target: ' + str(hover))
+        results['LoopElementHover'] = hover
     receive(send('shutdown', None, True))
     send('exit', None)
     print(json.dumps(results, indent=2))

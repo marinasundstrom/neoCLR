@@ -69,8 +69,8 @@ user-authored code execution are needed to select symbols.
 
 Explicit Raven collection calls now execute against the adapted runtime library.
 The initial contract-resolution slice below adds .NET regression coverage, neoCLR
-iteration binding/emission and malformed-contract diagnostics. Next verify
-VS Code uses the same project target as command-line compilation. Test normal completion,
+iteration binding/emission and malformed-contract diagnostics. The bounded project workflow now verifies that the language server uses the same
+target contract as saved-project compilation. Test normal completion,
 early exit and explicit disposal; define fault cleanup separately before claiming full
 foreach equivalence. Async protocols, delegates, awaitables and further well-known
 library roles should be added only when the next feature requires them.
@@ -95,7 +95,7 @@ GetIterator returns Iterator<T>, MoveNext returns Boolean, and Current returns T
 The bound loop carries those resolved symbols into existing codegen. Missing, wrong or
 ambiguous contract shapes report RAVT001 without falling back to .NET iteration. Option
 copies retain the contract; changing it blocks semantic-state transfer. Arrays/ranges
-keep their existing paths. This is not yet project/CLI configuration or async/yield
+keep their existing paths. The initial compiler slice did not include project configuration (added below) or async/yield
 support, and the initial descriptor does not select disposal behavior.
 
 Seven new tests and 34 existing iteration/target metadata tests pass in Raven; net10.0
@@ -130,3 +130,32 @@ faults and which terminal faults permit unwinding. A language defer construct co
 lower to that mechanism; syntax alone would not guarantee cleanup. Registration/capture
 rules and suspension remain undecided. Keep this as recorded future work rather than
 silently implementing partial disposal during target configuration.
+
+
+## Project and editor integration (2026-09-12)
+
+Raven commit `1e3f7ff07d8a9785ed54105b74d1fcda96c8795f` adds this project support.
+Evaluated RavenIterationAssemblyName, RavenIterationIterableType and
+RavenIterationIteratorType properties now select this contract in Raven projects.
+Optional acquisition/advance/current properties configure member names. Without the
+properties, Raven keeps its existing .NET behavior; partially configured contracts do
+not silently fall back. The language server uses these same project options.
+
+The bounded neoCLR project importer accepts the supported NeoCLR.CoreProbe
+Iterable/Iterator descriptor and rejects other descriptors. The run script reads the
+imported library-profile requirement, generates the adapted collection System library,
+and passes it to both verification and execution. Each attempt has a fresh output
+directory. See [collection editor instructions](experiments/raven-target/VSCODE.md#collection-project-follow-up).
+
+Saved-project checks cover for loops, aliases, edits, compile/import failures and stale
+output prevention. Actual stdio LSP checks show List members Add/Count/GetIterator/Item
+and an inferred `int` loop binding. The existing Result/Option/Void project and completion
+checks also pass. This is language-server evidence, not a newly installed extension or
+an observed VS Code UI session.
+
+The author clarified that future deterministic resource cleanup is distinct from
+object destruction and deconstruction. Disposable/Closable may be hooks; scope ownership,
+Result-returning close failures and terminal-fault behavior remain open. In particular,
+NeoCLR-specific behavior must be opt-in and must leave Raven's .NET/CLR support unchanged.
+Any .NET cleanup correction is separate work, not a side effect of this experiment.
+No cleanup/defer behavior is implemented here.

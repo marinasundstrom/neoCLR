@@ -20,6 +20,11 @@ static class ProjectBuild
         var core = references[0].FilePath!;
         if (AssemblyName.GetAssemblyName(core).Name != CoreDeclarations.Identity)
             throw new InvalidDataException("Unexpected target core identity.");
+        var expectedIteration = new RuntimeIterationContract(CoreDeclarations.Identity,
+            "System.Collections.Iterable`1", "System.Collections.Iterator`1");
+        var iteration = project.CompilationOptions.RuntimeIterationContract;
+        if (iteration is not null && iteration != expectedIteration)
+            throw new InvalidDataException("Unsupported neoCLR project iteration contract.");
         var compilation = workspace.GetCompilation(id)!;
         using var image = new MemoryStream();
         var emitted = compilation.Emit(image, null, new EmitOptions(AssemblyName.GetAssemblyName(core)));
@@ -30,6 +35,6 @@ static class ProjectBuild
         var projected = Path.Combine(output, "App.dll");
         File.WriteAllBytes(raw, image.ToArray());
         VoidProjection.Write(raw, core, projected);
-        UnionImport.Write(projected, core, Path.Combine(output, "App.neoil"));
+        UnionImport.Write(projected, core, Path.Combine(output, "App.neoil"), collectionProfile: iteration is not null);
     }
 }

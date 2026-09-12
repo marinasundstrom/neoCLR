@@ -11,10 +11,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Added a Raven for-loop demo using the feature-branch RuntimeIterationContract option
   to bind Iterable/Iterator/GetIterator rather than .NET enumerable names. The existing
   collection import profile executes normal completion, break and return; output is
-  41, 42, 41, 41. Documented the new Raven dependency and compiler-API-only scope.
+  41, 42, 41, 41. Extended target selection to evaluated Raven project properties and the saved-project
+  runner, which generates and verifies against the required collection library profile.
+  Added a collection editor setup and actual LSP completion/loop-type checks; collection
+  and existing Result/Option/Void project tests pass, including stale-output protection.
   Recorded missing automatic iterator Dispose and the proposed finally/defer mechanism
   as future work, per author direction. No cleanup behavior or Neo source changes are
-  included. Raven's seven new and 34 existing focused tests pass.
+  included. Future NeoCLR cleanup must leave default CLR support unchanged. Raven's
+  four project configuration tests and nine related tests pass in this follow-up.
 
 - Added CLR-compatible callvirt admission for nonvirtual nominal class instance methods,
   including closed generic classes and no-result calls. Null receivers fault before
@@ -30,7 +34,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   library remain unchanged. The profile requires defaultable element types and excludes
   predicate/delegate helpers. Documented how to generate and run it. Recorded proposed target-specific Raven language contracts
   for renamed iteration/disposal APIs while preserving the default .NET target; that
-  project configuration remains planned; compiler-API support is described above.
+  project configuration is now implemented as described above.
   Follow-up admits two Raven Int32
   collection programs through an explicit import profile: ordinary class/interface
   calls and upcasts execute the adapted library, including iteration, growth, returned

@@ -1,0 +1,7 @@
+{
+  "ForEach": "41\n42\n41\n41\n=> Void\n",
+  "Aliases": "7\n42\n2\n=> Void\n",
+  "SavedEdit": "7\n42\n7\n7\n=> Void\n",
+  "CompileFailure": "Rejected; no executable produced or stale output run",
+  "ImportFailure": "Rejected; no executable produced or stale output run"
+}

@@ -159,3 +159,50 @@ Expected output is `42`, `Overflow`, and the CLI result display `=> Void`.
 The import uses the real System.Math and Result library. This saved IL corresponds to
 the sample at probe generation time. Editing `editor/Main.rvn` does **not** change this older saved artifact.
 Use **neoCLR: Run saved project** above to compile and execute your current saved edits.
+
+
+## Collection project follow-up
+
+This follow-up needs Raven commit `1e3f7ff07d8a9785ed54105b74d1fcda96c8795f`
+on `codex/neoclr-target-resolution` (or a compatible descendant). The previously
+installed extension/server described above predates project iteration configuration.
+Build the current server and let the generated workspace settings select it; this does
+not replace the installed extension or SDK and does not change global .NET settings.
+
+From the Raven repository:
+
+```sh
+dotnet build src/Raven.CodeAnalysis/Raven.CodeAnalysis.csproj -p:WarningLevel=0
+dotnet build src/Raven.LanguageServer/Raven.LanguageServer.csproj -f net11.0 -p:BuildProjectReferences=false -p:WarningLevel=0
+```
+
+From the neoCLR repository, choose a fresh output directory and substitute your Raven path:
+
+```sh
+cargo build --locked
+dotnet run --project docs/experiments/raven-target/Probe.csproj -p:RavenRoot=/absolute/path/to/Raven -p:BuildProjectReferences=false -p:WarningLevel=0 -- --interfaces /tmp/raven-collections-editor
+python3 docs/experiments/raven-target/prepare_editor.py /tmp/raven-collections-editor /absolute/path/to/Raven --collections --runtime "$PWD/target/debug/neoclr"
+code --new-window /tmp/raven-collections-editor/editor
+```
+
+If using CARGO_TARGET_DIR, supply its executable path to `--runtime` instead.
+Open Main.rvn and run the generated neoCLR build/run task. Expected output is
+41, 42, 41, 41 followed by `=> Void`. The project selects Iterable/Iterator through
+RavenIteration* properties; the task generates and uses the matching adapted runtime
+library for each build. On a List<int> parameter, completion should offer Add, Count,
+GetIterator and Item. Hover over the loop variable declaration to see `int`.
+The normal Raven build/run buttons still do not invoke this import pipeline.
+
+Repeat the automated saved-project and stdio language-server checks:
+
+```sh
+python3 docs/experiments/raven-target/verify_project.py /tmp/raven-collections-editor/editor/Demo.rvnproj --collections --raven /absolute/path/to/Raven --runtime "$PWD/target/debug/neoclr"
+python3 docs/experiments/raven-target/verify_editor.py /tmp/raven-collections-editor/editor --collections
+```
+
+The first checks loops, aliasing, a saved edit and failed-build stale-output protection.
+The second checks target completion and the inferred loop binding through the actual
+language server. It changes the in-memory document and retains a local LSP transcript;
+it does not edit the saved sample. The collection declaration profile is still separate
+from the Result/Option profile. Automatic disposal and defer remain future work, with
+NeoCLR-specific behavior isolated from existing .NET/CLR support.
