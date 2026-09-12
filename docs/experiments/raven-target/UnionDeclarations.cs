@@ -3,6 +3,10 @@
 static class UnionDeclarations
 {
     public const string Source = """
+        public interface Propagatable<TSelf, TOutput, TResidual> {
+            bool TryGetOutput(out TOutput output);
+            bool TryGetResidual(out TResidual residual);
+        }
         public static class Option {
             public struct None { public None() { } }
             public struct Some<T> {
@@ -30,7 +34,10 @@ static class UnionDeclarations
             }
         }
         [System.Runtime.CompilerServices.Union]
-        public struct Result<T, E> {
+        public struct Result<T, E> : Propagatable<Result<T, E>, T, E> {
+            public bool TryGetOutput(out T output) { output = default; return false; }
+            public bool TryGetResidual(out E residual) { residual = default; return false; }
+            public static Result<T, E> FromResidual(E residual) => default;
             // Required by Raven's union recognition protocol; not an admitted runtime API.
             public object Value => default;
             public Result(Result.Ok<T> value) { }

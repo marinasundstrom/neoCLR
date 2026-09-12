@@ -1,0 +1,22 @@
+import System.*
+import System.Console.*
+
+func Normalize(value: int) -> Result<int, OverflowError> {
+    let amount = Math.Abs(value)?
+    WriteLine("Continued")
+    return Result<int, OverflowError>(Result.Ok<int>(amount))
+}
+
+func Show(value: int) {
+    let result = Normalize(value)
+    if result is Result.Ok<int> ok {
+        WriteLine(ok.Value)
+    } else if result is Result.Error<OverflowError> error {
+        WriteLine("Overflow propagated")
+    }
+}
+
+func Main() {
+    Show(-42)
+    Show(-2147483648)
+}

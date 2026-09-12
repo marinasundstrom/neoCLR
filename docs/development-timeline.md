@@ -1631,6 +1631,14 @@ the existing Raven demo still executes. The [contract and limitations](propagati
 record the .NET comparison and next Raven projection/import work. No `?` support or
 Raven changes are claimed by this first slice.
 
+**Subsequent implementation outcome (same date).** The assistant added a target-selected
+Raven protocol and a bounded Result<Int32,OverflowError> `?` program. Execution verifies
+success continuation and early residual return. Inspection found implicit exception
+capture in the default Raven lowering; the opt-in target uses result-only lowering,
+while existing .NET propagation tests still pass. Import checks reject malformed
+contracts and unsupported thrown values. Option/Void projection and refreshed tools
+remain open; continuation was not treated as approval of a permanent protocol design.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

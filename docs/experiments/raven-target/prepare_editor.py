@@ -29,6 +29,8 @@ shutil.copyfile(Path(__file__).parent / ('samples/library-workflow.rvn' if args.
     <OutputType>Exe</OutputType>
     <RavenMetadataCoreAssemblyName>NeoCLR.CoreProbe</RavenMetadataCoreAssemblyName>
     <RavenUseHostFrameworkReferences>false</RavenUseHostFrameworkReferences>
+    <RavenPropagationAssemblyName>NeoCLR.CoreProbe</RavenPropagationAssemblyName>
+    <RavenPropagationInterfaceType>System.Propagatable`3</RavenPropagationInterfaceType>
     <ImplicitImports>disable</ImplicitImports>
     <RavenFrameworkProjections>None</RavenFrameworkProjections>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>

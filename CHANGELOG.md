@@ -13,7 +13,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   initialization. Added carrier FromResidual factories, including Option's Void residual.
   The static factory is provisionally outside the interface because static abstract
   interface members are not implemented. Documented that enforcement boundary and the
-  remaining Raven target work; this is not yet end-to-end `?` support. Four new runtime
+  bounded Raven target work. The bridge now runs `Result<int, OverflowError>` `?`
+  with success extraction and early error return using target-selected Propagatable
+  metadata, checked adapters and terminal faults for invalid carriers. Added repeatable
+  execution and malformed-contract rejection checks. Option/Void propagation and an
+  updated installed SDK remain pending. Four new runtime
   tests cover channels, Void, reconstruction and invalid output reads.
 
 - Fixed pre-merge generic Clonable and Neo calculator regressions. Assembly field fixups

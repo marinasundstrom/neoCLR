@@ -20,7 +20,8 @@ static class InterfaceProbe
             [MetadataReference.CreateFromFile(core)], new CompilationOptions(OutputKind.ConsoleApplication,
                 metadataImportOptions: new MetadataImportOptions(CoreDeclarations.Identity),
                 runtimeIterationContract: new RuntimeIterationContract(CoreDeclarations.Identity,
-                    "System.Collections.Iterable`1", "System.Collections.Iterator`1")));
+                    "System.Collections.Iterable`1", "System.Collections.Iterator`1"),
+                runtimePropagationContract: new RuntimePropagationContract(CoreDeclarations.Identity, "System.Propagatable`3")));
         var compilation = Create(source);
         var path = Path.Combine(output, "CoreInterfaces.dll");
         using (var stream = File.Create(path))
@@ -33,7 +34,7 @@ static class InterfaceProbe
         using var library = AssemblyDefinition.ReadAssembly(core);
         using var image = AssemblyDefinition.ReadAssembly(path);
         var interfaces = library.MainModule.GetTypes().Where(t => t.IsInterface).ToArray();
-        if (interfaces.Length != 4 || interfaces.SelectMany(t => t.Methods).Any(m => !m.IsAbstract || !m.IsVirtual || !m.IsNewSlot))
+        if (interfaces.Length != 5 || interfaces.SelectMany(t => t.Methods).Any(m => !m.IsAbstract || !m.IsVirtual || !m.IsNewSlot))
             throw new Exception("Expected ordinary abstract CLI interface contracts.");
         var list = library.MainModule.GetType("System.Collections.ArrayList`1");
         if (list.IsValueType || !list.Interfaces.Any(i => i.InterfaceType.FullName == "System.Collections.List`1<T>"))
@@ -83,12 +84,25 @@ static class InterfaceProbe
         var workflowClosure = ClosureAudit.Inspect(workflowPath, core);
         if (workflowClosure.Length != 0) throw new Exception(string.Join("\n", workflowClosure));
         UnionImport.Write(workflowPath, core, Path.Combine(output, "CollectionWorkflow.neoil"), collectionProfile: true);
+        var propagationSource = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "samples", "library-propagation.rvn"));
+        var propagationPath = Path.Combine(output, "Propagation.dll");
+        using (var stream = File.Create(propagationPath))
+        {
+            var result = Create(propagationSource).Emit(stream, null, new EmitOptions(AssemblyName.GetAssemblyName(core)));
+            if (!result.Success) throw new Exception(string.Join("\n", result.Diagnostics));
+        }
+        UnionImport.Write(propagationPath, core, Path.Combine(output, "Propagation.neoil"), collectionProfile: true);
+        var incompatible = Create(propagationSource.Replace("func Normalize(value: int) -> Result<int, OverflowError>",
+            "func Normalize(value: int) -> Option<int>"));
+        if (!incompatible.GetDiagnostics().Any(d => d.Severity == DiagnosticSeverity.Error))
+            throw new Exception("Incompatible propagation carrier accepted.");
+        var propagationRejections = PropagationImportChecks.Run(propagationPath, core, output);
         var rejections = CollectionImportChecks.Run(path, core, output);
         File.WriteAllText(Path.Combine(output, "interface-results.json"), JsonSerializer.Serialize(new {
             RecordedDate = "2026-09-12", Scope = "Raven collection metadata, emission and import; runtime verification is separate",
             ApplicationClosureErrors = closure,
             Interfaces = interfaces.Select(t => new { t.FullName, Parents = t.Interfaces.Select(i => i.InterfaceType.FullName).ToArray() }),
-            InterfaceCalls = calls, NegativeDiagnostics = negatives, ImportRejections = rejections, ImportedProgram = Path.GetFileName(destination)
+            InterfaceCalls = calls, NegativeDiagnostics = negatives, ImportRejections = rejections, PropagationRejections = propagationRejections, ImportedProgram = Path.GetFileName(destination)
         }, new JsonSerializerOptions { WriteIndented = true }));
         Console.WriteLine("PASS: collection contracts emit and import through ordinary interface calls.");
     }

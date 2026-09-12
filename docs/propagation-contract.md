@@ -59,8 +59,25 @@ with a different output type, artifact round-trip, and rejection of unproven out
 by both verification and execution. Existing union output, library, generic-bound,
 Clonable and adapted Raven collection checks also pass.
 
-Next expose matching declarations in the experiment profile, configure Raven's target
-protocol name while preserving its .NET default, and admit emitted calls with exact
-contract/signature checks. Verify success, early return, incompatible residual rejection,
-and Void payloads through the actual Raven program and editor workflow before marking
-propagation complete in the preview acceptance matrix. Defer cleanup remains separate.
+The Raven experiment now exposes matching Result declarations and selects the protocol
+through target project properties. `samples/library-propagation.rvn` compiles and runs
+`Result<int, OverflowError>` extraction and early return. The importer checks exact
+carrier signatures and the interface shape. Adapters initialize Int32/OverflowError
+out destinations on both paths to satisfy ordinary CLI out semantics, then call the
+runtime's conditional extraction methods. This safe bounded defaulting is not a rule
+for arbitrary payloads.
+
+Raven's selected-target lowering omits implicit exception capture. The emitted
+invalid-carrier `throw null` sentinel becomes a terminal neoCLR fault; arbitrary thrown
+values and exception regions remain rejected. Carrier `initobj` scratch locals remain
+uninitialized until a valid case is assigned, rather than fabricating a union case.
+
+`verify_project.py --collections` includes the executable propagation sample alongside
+existing fundamentals and stale-output rejection. `--interfaces` also checks malformed
+protocol metadata and rejects throwing a non-null-sentinel value. Raven's default .NET
+propagation tests remain unchanged and pass.
+
+Option/Void residual projection, broader payloads, editor propagation verification and
+updated SDK/extension packaging remain pending. Installed `0.1.12-neoclr.3` tools do not
+include this compiler feature. Build the experimental Raven branch from source for this
+slice. Defer cleanup remains separate.

@@ -23,6 +23,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
                '--raven', str(args.raven.resolve()), '--runtime', str(args.runtime.resolve())]
     cases = [('Math', 'library-math.rvn', '-2147483648\n2147483647\n7\n-7\n-1\n0\n1\n'),
              ('Result', 'library-result.rvn', '42\nOverflow\n'),
+             ('Propagation', 'library-propagation.rvn', 'Continued\n42\nOverflow propagated\n'),
              ('Option', 'library-option.rvn', '42\nProduct not found\n'),
              ('Void', 'library-void.rvn', 'Completed without a payload\nNot completed\n')]
     if args.collections:

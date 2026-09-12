@@ -7,6 +7,7 @@ using Mono.Cecil.Cil;
 // Bounded Result/Option profile, not a general CLI loader. Only supplied metadata is resolved.
 static class UnionImport
 {
+    const string Overflow = "System.OverflowError";
     const string IntArray = "arrayref<Int32>";
     const string VoidOption = "System.Option<Void>";
     const string VoidSome = "System.Option.Some<Void>";
@@ -58,7 +59,7 @@ static class UnionImport
             var args = method.Parameters.Select(p => ProfileType(p.ParameterType)).ToArray();
             var result = ProfileType(method.ReturnType, true);
             var locals = method.Body.Variables.Select(v => ProfileType(v.VariableType)).ToArray();
-            if (locals.Any(t => !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome)))
+            if (locals.Any(t => !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow)))
                 throw new InvalidDataException("Unsupported local default in Result profile.");
             var instructions = method.Body.Instructions.ToArray();
             var indexes = instructions.Select((i, n) => (i, n)).ToDictionary(p => p.i, p => p.n);
@@ -86,6 +87,28 @@ static class UnionImport
                 switch (instruction.OpCode.Code)
                 {
                     case Code.Nop: break;
+                    case Code.Initobj:
+                        var initializedType = ProfileType((TypeReference)instruction.Operand);
+                        var address = Expect(initializedType + "&");
+                        if (address.Local < 0) throw new InvalidDataException("Only local initialization is admitted.");
+                        if (initializedType is Carrier or Option or VoidOption)
+                        {
+                            if (assigned[address.Local]) throw new InvalidDataException("Resetting an initialized carrier is unsupported.");
+                            // A CLI carrier default is not a valid union value. Keep it unreadable
+                            // until an actual carrier assignment, rather than inventing a case.
+                            code.AppendLine("pop");
+                        }
+                        else
+                        {
+                            code.AppendLine(Default(initializedType) + "\nstobj " + initializedType);
+                            assigned[address.Local] = true;
+                        }
+                        break;
+                    case Code.Ldnull: Push(new("FaultNull")); break;
+                    case Code.Throw:
+                        Expect("FaultNull");
+                        code.AppendLine("fault \"Invalid propagation carrier: no output or residual\"");
+                        terminates = true; break;
                     case Code.Newarr:
                         if (Type((TypeReference)instruction.Operand) != "Int32")
                             throw new InvalidDataException("Only Int32 vector allocation is admitted.");
@@ -137,8 +160,8 @@ static class UnionImport
                     case Code.Ceq:
                         Expect("Int32"); Expect("Int32"); Push(new("Int32"));
                         code.AppendLine("call RuntimeEqual(Int32,Int32)"); break;
-                    case Code.Pop: Pop(); code.AppendLine("pop"); break;
-                    case Code.Dup: var top = Pop(); Push(top); Push(top); code.AppendLine("dup"); break;
+                    case Code.Pop: if (Pop().Type != "FaultNull") code.AppendLine("pop"); break;
+                    case Code.Dup: var top = Pop(); Push(top); Push(top); if (top.Type != "FaultNull") code.AppendLine("dup"); break;
                     case Code.Br: case Code.Br_S:
                         var branch = Target(); successors.Add(branch); code.AppendLine($"br IL_{instructions[branch].Offset:x4}"); terminates = true; break;
                     case Code.Brtrue: case Code.Brtrue_S: case Code.Brfalse: case Code.Brfalse_S:
@@ -240,6 +263,7 @@ static class UnionImport
     }
     static string Type(TypeReference type, bool result = false) => type.FullName switch {
         "System.Int32[]" when type is ArrayType { IsVector: true } array && array.ElementType.MetadataType == MetadataType.Int32 => IntArray,
+        "System.OverflowError" when type.IsValueType => Overflow,
         "System.Boolean" => "Boolean", "System.Void" when result => "noresult", "System.Int32" => "Int32", "System.String" => "String",
         "System.Option`1<System.Void>" when type.IsValueType && HasNamedVoid(type) => VoidOption,
         "System.Option/Some`1<System.Void>" when type.IsValueType && HasNamedVoid(type) => VoidSome,
@@ -268,6 +292,24 @@ static class UnionImport
             return new(surface.ImportTarget, surface.Parameters, surface.Returns);
         // Exact definition signatures include generic parameter positions, not just arity/names.
         var key = definition.FullName;
+        if (reference.DeclaringType.FullName == "System.Result`2<System.Int32,System.OverflowError>"
+            && definition.DeclaringType.FullName == "System.Result`2")
+        {
+            if (reference.Name is "TryGetOutput" or "TryGetResidual" or "FromResidual")
+                ValidatePropagation(definition.DeclaringType);
+            if (key == "System.Boolean System.Result`2::TryGetOutput(T&)" && reference.HasThis
+                && definition.Parameters[0].IsOut && reference.ReturnType.MetadataType == MetadataType.Boolean
+                && reference.Parameters.Count == 1 && reference.Parameters[0].ParameterType.FullName == "!0&")
+                return new("RuntimePropagationOutput", [Carrier + "&", "Int32&"], "Int32", 1);
+            if (key == "System.Boolean System.Result`2::TryGetResidual(E&)" && reference.HasThis
+                && definition.Parameters[0].IsOut && reference.ReturnType.MetadataType == MetadataType.Boolean
+                && reference.Parameters.Count == 1 && reference.Parameters[0].ParameterType.FullName == "!1&")
+                return new("RuntimePropagationResidual", [Carrier + "&", Overflow + "&"], "Int32", 1);
+            if (key == "System.Result`2<T,E> System.Result`2::FromResidual(E)" && !reference.HasThis
+                && reference.Parameters.Count == 1 && reference.Parameters[0].ParameterType.FullName == "!1"
+                && reference.ReturnType.FullName == "System.Result`2<!0,!1>")
+                return new($"System.Result<Int32,{Overflow}>::FromResidual", [Overflow], Carrier);
+        }
         if (key == "System.Result`2<System.Int32,System.OverflowError> System.Math::Abs(System.Int32)" && reference.FullName == key && !reference.HasThis)
             return new("System.Math::Abs", ["Int32"], Carrier);
         if (key == "System.Void System.Console::WriteLine(System.Int32)" && reference.FullName == key && !reference.HasThis)
@@ -311,6 +353,32 @@ static class UnionImport
         }
         throw new InvalidDataException("Unsupported runtime binding: " + reference.FullName + " definition=" + key);
     }
+    static void ValidatePropagation(TypeDefinition carrier)
+    {
+        var contracts = carrier.Interfaces.Where(i => i.InterfaceType.FullName ==
+            "System.Propagatable`3<System.Result`2<T,E>,T,E>").ToArray();
+        if (contracts.Length != 1)
+            throw new InvalidDataException("Missing or incompatible propagation carrier contract.");
+        var contract = contracts[0].InterfaceType.Resolve();
+        if (contract is null || contract.Module != carrier.Module || !contract.IsInterface
+            || contract.GenericParameters.Count != 3 || contract.Interfaces.Count != 0
+            || contract.GenericParameters.Any(p => p.Attributes != GenericParameterAttributes.NonVariant || p.HasConstraints)
+            || contract.Methods.Count != 2)
+            throw new InvalidDataException("Incompatible propagation interface.");
+        foreach (var (name, position) in new[] { ("TryGetOutput", 1), ("TryGetResidual", 2) })
+        {
+            var methods = contract.Methods.Where(m => m.Name == name).ToArray();
+            if (methods.Length != 1) throw new InvalidDataException("Missing propagation extraction member.");
+            var method = methods[0];
+            if (!method.IsPublic || !method.IsAbstract || !method.IsVirtual || !method.IsNewSlot || method.HasBody
+                || !method.HasThis || method.HasGenericParameters || method.ReturnType.MetadataType != MetadataType.Boolean
+                || method.Parameters.Count != 1 || !method.Parameters[0].IsOut
+                || method.Parameters[0].ParameterType is not ByReferenceType { ElementType: GenericParameter p }
+                || p.Type != GenericParameterType.Type || p.Position != position)
+                throw new InvalidDataException("Incompatible propagation extraction signature.");
+        }
+    }
+
     static Call Construct(MethodReference reference, MethodDefinition definition)
     {
         if (!definition.IsConstructor || !definition.IsPublic || !reference.HasThis || reference.ExplicitThis
@@ -320,6 +388,10 @@ static class UnionImport
         var key = definition.FullName;
         var owner = Type(reference.DeclaringType);
         var parameters = reference.Parameters.Select(p => p.ParameterType.FullName).ToArray();
+        if (owner == Ok && key == "System.Void System.Result/Ok`1::.ctor(T)" && parameters.SequenceEqual(new[] { "!0" }))
+            return new("RuntimeNewOk", ["Int32"], Ok);
+        if (owner == Carrier && key == "System.Void System.Result`2::.ctor(System.Result/Ok`1<T>)" && parameters.SequenceEqual(new[] { "System.Result/Ok`1<!0>" }))
+            return new("RuntimeResultOk", [Ok], Carrier);
         if (owner == Some && key == "System.Void System.Option/Some`1::.ctor(T)" && parameters.SequenceEqual(new[] { "!0" }))
             return new("RuntimeNewSome", ["Int32"], Some);
         if (owner == None && key == "System.Void System.Option/None::.ctor()" && parameters.Length == 0)
@@ -337,6 +409,7 @@ static class UnionImport
         throw new InvalidDataException("Unsupported constructor: " + reference.FullName + " definition=" + key);
     }
     static string Default(string type) => type switch {
+        Overflow => "newobj System.OverflowError",
         "Boolean" => "ldc.bool false", "Int32" => "ldc.i4 0", VoidSome => $"ldvoid\nnewobj {VoidSome}", Some => $"ldc.i4 0\nnewobj {Some}", None => $"newobj {None}", Ok => $"ldc.i4 0\nnewobj {Ok}",
         Error => $"newobj System.OverflowError\nnewobj {Error}",
         _ => throw new InvalidDataException("Unsupported default.")
@@ -344,6 +417,14 @@ static class UnionImport
     static string Adapters()
     {
         var text = new StringBuilder();
+        foreach (var (name, type) in new[] { ("Output", "Int32"), ("Residual", Overflow) })
+        {
+            // CLI out is initialized on both paths; the runtime contract is true-only.
+            text.AppendLine($".function RuntimePropagation{name}({Carrier}& source,out {type}& destination) -> Int32");
+            text.AppendLine($"ldarg destination\n{Default(type)}\nstobj {type}");
+            text.AppendLine($"ldarg source\nldarg destination\ncall instance {Carrier}::TryGet{name}({type}&)");
+            text.AppendLine("brfalse Miss\nldc.i4 1\nret\nMiss:\nldc.i4 0\nret\n.end");
+        }
         foreach (var (name, type, carrier) in new[] { ("Ok", Ok, Carrier), ("Error", Error, Carrier), ("Some", Some, Option), ("None", None, Option), ("VoidSome", VoidSome, VoidOption), ("VoidNone", None, VoidOption) })
         {
             text.AppendLine($".function RuntimeTry{name}({carrier}& source,out {type}& destination) -> Int32");
@@ -354,6 +435,8 @@ static class UnionImport
         text.AppendLine($".function RuntimeOkValue({Ok}& source) -> Int32\nldarg source\nldobj {Ok}\ncall instance {Ok}::get_Value()\nret\n.end");
         text.AppendLine($".function RuntimeSomeValue({Some}& source) -> Int32\nldarg source\nldobj {Some}\ncall instance {Some}::get_Value()\nret\n.end");
         text.AppendLine(".function RuntimeEqual(Int32 left,Int32 right) -> Int32\nldarg left\nldarg right\nceq\nbrfalse False\nldc.i4 1\nret\nFalse:\nldc.i4 0\nret\n.end");
+        text.AppendLine($".function RuntimeNewOk(Int32 value) -> {Ok}\nldarg value\nnewobj instance {Ok}::.ctor(Int32)\nret\n.end");
+        text.AppendLine($".function RuntimeResultOk({Ok} value) -> {Carrier}\nldarg value\nnewobj instance {Carrier}::.ctor({Ok})\nret\n.end");
         text.AppendLine($".function RuntimeNewSome(Int32 value) -> {Some}\nldarg value\nnewobj instance {Some}::.ctor(Int32)\nret\n.end");
         text.AppendLine($".function RuntimeNewNone() -> {None}\nnewobj instance {None}::.ctor()\nret\n.end");
         foreach (var (name, type) in new[] { ("Some", Some), ("None", None) })

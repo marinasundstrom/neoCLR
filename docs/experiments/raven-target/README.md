@@ -11,6 +11,33 @@ follow-up imports a bounded static subset and executes it against neoCLR's real 
 library through the separate runtime verification command below. Earlier slice notes
 retain their historical limits. This is not general Raven or direct PE execution.
 
+## Current Result propagation follow-up
+
+The current sources require Raven `1a52d9464` or later on
+`codex/neoclr-target-resolution`. Earlier revisions recorded below describe historical
+slices. Installed `0.1.12-neoclr.3` tools predate propagation. Build the compiler and
+language server from that experiment checkout:
+
+```sh
+dotnet build src/Raven.Compiler/Raven.Compiler.csproj -f net11.0 -p:WarningLevel=0
+dotnet build src/Raven.LanguageServer/Raven.LanguageServer.csproj -f net11.0 -p:WarningLevel=0
+```
+
+From the neoCLR repository, with a built runtime, use fresh output paths:
+
+```sh
+dotnet run --project docs/experiments/raven-target/Probe.csproj -p:RavenRoot=/absolute/path/to/Raven -p:BuildProjectReferences=false -p:WarningLevel=0 -- --interfaces /tmp/neoclr-propagation
+python3 docs/experiments/raven-target/prepare_editor.py /tmp/neoclr-propagation /absolute/path/to/Raven --collections --runtime /absolute/path/to/neoclr
+python3 docs/experiments/raven-target/verify_project.py /tmp/neoclr-propagation/editor/Demo.rvnproj --collections --raven /absolute/path/to/Raven --runtime /absolute/path/to/neoclr
+```
+
+This verifies the existing fundamentals plus `library-propagation.rvn`, whose output
+is `Continued`, `42`, then `Overflow propagated` on separate lines. To run it manually,
+copy that sample to the generated editor project's `Main.rvn` and run `run_project.py`
+with the same project, `--raven` and `--runtime` arguments. The second call returns early
+without printing `Continued`. See the [contract and limits](../../propagation-contract.md):
+this slice admits Result<Int32,OverflowError>; Option/Void propagation is still pending.
+
 ## Reproduce
 
 Current probe validated on 2026-09-12 with Raven revision

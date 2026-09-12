@@ -25,6 +25,9 @@ static class ProjectBuild
         var iteration = project.CompilationOptions.RuntimeIterationContract;
         if (iteration is not null && iteration != expectedIteration)
             throw new InvalidDataException("Unsupported neoCLR project iteration contract.");
+        var propagation = project.CompilationOptions.RuntimePropagationContract;
+        if (propagation is not null && propagation != new RuntimePropagationContract(CoreDeclarations.Identity, "System.Propagatable`3"))
+            throw new InvalidDataException("Unsupported neoCLR project propagation contract.");
         var compilation = workspace.GetCompilation(id)!;
         using var image = new MemoryStream();
         var emitted = compilation.Emit(image, null, new EmitOptions(AssemblyName.GetAssemblyName(core)));

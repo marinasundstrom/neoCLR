@@ -12,7 +12,7 @@ Void, and target library contracts consumed through Raven.
 | Value/reference behavior | Value-carrier copies remain independent; class and array aliases share mutations | Verified in the combined Raven project checks; arbitrary application class import remains outside the bounded profile |
 | Runtime library | Calls execute neoCLR library implementations, not metadata stubs or host .NET implementations | Verified for the admitted Math, Console, union and collection APIs |
 | Errors and absence | Success, expected error and absent-value paths use Result/Option | Verified with explicit case handling |
-| Propagation | Success continues; failure returns a compatible carrier; incompatible carriers are rejected | Runtime extraction interface and carrier factories implemented; Raven projection/import still pending |
+| Propagation | Success continues; failure returns a compatible carrier; incompatible carriers are rejected | Runtime contracts implemented; Raven Result<Int32,OverflowError> success/early return executes; Option/Void projection and refreshed tools pending |
 | Match syntax | Match expression and statement forms compile and execute; rejected forms and diagnostics are documented | Raven-target release matrix still required; Neo support alone does not establish this |
 | Text files | Read/write text, show expected I/O errors through Result, and demonstrate round-trip data | Existing runtime APIs need bounded Raven admission and end-to-end checks |
 | Date and time | Obtain the system's current local date/time using the separate date/time library concepts | Existing runtime APIs need bounded Raven admission; full formatting/globalization is not required |
