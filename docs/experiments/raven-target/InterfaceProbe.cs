@@ -52,16 +52,22 @@ static class InterfaceProbe
             negatives[name] = errors;
         }
         var destination = Path.Combine(output, "CoreInterfaces.neoil");
-        string rejection;
-        try { UnionImport.Write(path, core, destination); throw new Exception("Interface execution unexpectedly admitted."); }
-        catch (InvalidDataException error) when (error.Message.Contains("Unsupported Result profile type: System.Collections.ArrayList")) { rejection = error.Message; }
-        if (File.Exists(destination)) throw new Exception("Unimplemented interface import produced executable output.");
+        UnionImport.Write(path, core, destination, collectionProfile: true);
+        var aliasSource = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "samples", "library-collection-aliases.rvn"));
+        var aliasPath = Path.Combine(output, "CollectionAliases.dll");
+        using (var stream = File.Create(aliasPath))
+        {
+            var result = Create(aliasSource).Emit(stream, null, new EmitOptions(AssemblyName.GetAssemblyName(core)));
+            if (!result.Success) throw new Exception(string.Join("\n", result.Diagnostics));
+        }
+        UnionImport.Write(aliasPath, core, Path.Combine(output, "CollectionAliases.neoil"), collectionProfile: true);
+        var rejections = CollectionImportChecks.Run(path, core, output);
         File.WriteAllText(Path.Combine(output, "interface-results.json"), JsonSerializer.Serialize(new {
-            RecordedDate = "2026-09-12", Scope = "Candidate library interface metadata and Raven emission only; no runtime execution",
+            RecordedDate = "2026-09-12", Scope = "Raven collection metadata, emission and import; runtime verification is separate",
             ApplicationClosureErrors = closure,
             Interfaces = interfaces.Select(t => new { t.FullName, Parents = t.Interfaces.Select(i => i.InterfaceType.FullName).ToArray() }),
-            InterfaceCalls = calls, NegativeDiagnostics = negatives, ImportRejection = rejection
+            InterfaceCalls = calls, NegativeDiagnostics = negatives, ImportRejections = rejections, ImportedProgram = Path.GetFileName(destination)
         }, new JsonSerializerOptions { WriteIndented = true }));
-        Console.WriteLine("PASS: candidate collection contracts emit through ordinary interface calls; runtime admission remains unsupported.");
+        Console.WriteLine("PASS: collection contracts emit and import through ordinary interface calls.");
     }
 }

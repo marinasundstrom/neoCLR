@@ -3,7 +3,7 @@
 Recorded 2026-09-12. This is the contract and admission-probe slice toward the
 [shared runtime library demo](raven-target-experiment.md#desired-demo-the-existing-runtime-library-through-raven-2026-09-12).
 The candidate collection declarations compile through Raven. An adapted runtime library
-profile now executes in neoCLR tests; Raven collection import/execution is not yet implemented. Nominal interface dispatch, including closed generic classes, now has runtime support below.
+profile and two Raven collection samples now import, verify and execute on neoCLR. Nominal interface dispatch, including closed generic classes, now has runtime support below.
 The existing Neo interface/collection path remains available and unchanged.
 
 ## The library surface to preserve
@@ -79,9 +79,9 @@ The preferred path is runtime adaptation under the existing compiler metadata su
 | --- | --- |
 | Raven compilation | Candidate class/interface declarations bind and emit with standard calls; tested without compiler changes at Raven 5b773ae3536f52ef077c8897867950249d6dde90. |
 | Nominal classes | Nominal classes now admit generic owner parameters, interface conformance and dispatch. Class inheritance, methods with their own type parameters on nominal classes and virtual/byref class receivers remain unsupported. |
-| Existing interface runtime | Legacy views remain unchanged. Ordinary interface object references now support explicit casts, typed slots/fields, GC and dispatch; interface arrays and indirect slot access are now admitted; ordinary array references and implicit class/interface upcasts are implemented; importer admission remains later work. |
+| Existing interface runtime | Legacy views remain unchanged. Ordinary interface object references now support explicit casts, typed slots/fields, GC and dispatch; interface arrays and indirect slot access are now admitted; ordinary array references and implicit class/interface upcasts are implemented; bounded Int32 collection importer admission is now implemented. |
 | Library | An isolated profile adapts the existing implementations to nominal classes and ordinary managed arrays. Runtime tests pass; the default legacy library remains unchanged. String defaults and predicate/delegate contracts are outside the profile. |
-| Import bridge | UnionImport deliberately rejects these collection types and emits no executable. Candidate declarations are isolated from the working core surface. |
+| Import bridge | The explicit collection profile admits the bounded Int32 collection catalog, ordinary upcasts and instance callvirt. Other types/members remain rejected; saved-project tasks still use their earlier profile. |
 
 The smallest implementation sequence is:
 
@@ -91,8 +91,8 @@ The smallest implementation sequence is:
 2. Support the closed generic class/interface combinations required by ArrayList<Int32>
    and Iterator<Int32>, including inherited Disposable dispatch and signature matching.
 3. Adapt the real ArrayList/iterator implementation, expose matching declarations and
-   bindings, and execute the checked-in Raven sample. Its proposed output is 1 then 42;
-   that output has not yet been observed on neoCLR for this sample.
+   bindings, and execute the checked-in Raven sample. Its observed output is 1 then 42;
+   the separate alias/indexer sample prints 7, 42 and 2.
 4. Extend the collection case only as the demo needs. Union propagation follows the
    established interface contract; broader interface features remain explicitly scoped.
 
@@ -112,9 +112,9 @@ Build Raven first as described in the [probe instructions](experiments/raven-tar
 The probe emits a separate reference assembly and compiles
 [library-interfaces.rvn](experiments/raven-target/samples/library-interfaces.rvn), checks
 dependency closure and interface-call shapes, rejects wrong element/receiver types, and
-requires the current runtime importer to reject admission without creating executable IL.
-[interface-results.json](experiments/raven-target/interface-results.json) records the
-observations. These declaration bodies never execute and are not installed in the
+imports the supported program. Six mutated/unsupported inputs must still reject without
+creating executable IL. [collection-results.json](experiments/raven-target/collection-results.json)
+records the subsequent runtime verification and execution. These declaration bodies never execute and are not installed in the
 working demo's compiler reference set. Existing Result/Option/Void tasks remain bounded
 to their prior runtime profile.
 
@@ -296,8 +296,8 @@ the default System library would select different signatures.
 `tests/raven_collections.rs` verifies growth through interface aliases, independent Copy,
 returned iterators retained across GC, captured buffer/extent, disposal, invalid access,
 wrong element types, reference-element identity and generic Void. The runtime fixture
-below returns 42. Raven's collection importer still rejects the candidate program;
-import admission and target declarations are the next slice, not completed by this test.
+below returns 42. This runtime-profile slice originally left Raven import pending;
+the following slice now admits the bounded Raven collection programs.
 
 From the repository root, choose a fresh output path:
 
@@ -310,3 +310,45 @@ cargo test --test raven_collections
 
 Future language-level iteration must use [target-specific Raven contracts](raven-target-contracts.md),
 so .NET's names remain supported alongside neoCLR's Iterable/Iterator names.
+
+## Executable Raven collection import (2026-09-12)
+
+The explicit `--interfaces` probe now imports the two checked-in Raven programs against
+matching reference declarations and executes the adapted System collection profile.
+`library-interfaces.rvn` adds and iterates through List/Iterable/Iterator/Disposable;
+`library-collection-aliases.rvn` returns a List from a function, grows an ArrayList,
+shares it through an alias and uses indexer syntax. Actual outputs are `1, 42` and
+`7, 42, 2`. No Raven changes were required at revision
+`5b773ae3536f52ef077c8897867950249d6dde90`.
+
+`CollectionBindings` is a bounded executable import catalog, not the proposed Raven
+language-contract configuration. It validates the supplied interface relationships,
+generic arity/variance and resolved member signatures. Standard CLI class/interface
+references map to nominal runtime signatures. Ordinary class-to-interface and inherited
+interface assignments remain implicit; callvirt stays callvirt, including the
+[nonvirtual class case](class-semantics.md#nonvirtual-class-calls-through-callvirt-2026-09-12).
+The interpreter performs real method dispatch; no declaration-stub body executes.
+
+The profile admits Int32 collections, supported static application functions, local
+reference defaults, Boolean branch results and the collection members used by these
+programs. Six rejection checks cover wrong elements/receivers, direct abstract-interface
+calls, uninitialized locals, omitted profile selection and incompatible inheritance.
+A valid InitLocals null-reference fixture verifies and faults on interface invocation.
+This is not general class import, variance, arbitrary collection types or null syntax
+support. The existing default import profile does not silently admit the new catalog.
+
+Reproduce from the repository root with a fresh directory and a built Raven dependency:
+
+```sh
+cargo build --locked
+dotnet run --project docs/experiments/raven-target/Probe.csproj -p:RavenRoot=/absolute/path/to/Raven -p:BuildProjectReferences=false -p:WarningLevel=0 -- --interfaces /tmp/raven-collections
+python3 docs/experiments/raven-target/collection_library.py /tmp/raven-collections/System.Collections.neoil
+python3 docs/experiments/raven-target/verify_collections.py /tmp/raven-collections --runtime target/debug/neoclr --system /tmp/raven-collections/System.Collections.neoil
+```
+
+Use the actual binary path if CARGO_TARGET_DIR overrides `target`. The verification
+script checks both successful programs and the null fixture, then records outputs and
+the selected System source hash. Import maps identify the required `raven-collections`
+profile; the host must still select it explicitly with `--system`. Existing saved-project
+VS Code tasks have not been switched to this profile. Target-aware iteration lowering,
+project-profile integration and broader library admission remain next work.

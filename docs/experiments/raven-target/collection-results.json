@@ -1,0 +1,58 @@
+{
+  "RecordedDate": "2026-09-12",
+  "Scope": "Raven collection compile/import/verify/execute on neoCLR",
+  "ApplicationClosureErrors": [],
+  "Interfaces": [
+    {
+      "FullName": "System.Disposable",
+      "Parents": []
+    },
+    {
+      "FullName": "System.Collections.Iterable`1",
+      "Parents": []
+    },
+    {
+      "FullName": "System.Collections.Iterator`1",
+      "Parents": [
+        "System.Disposable"
+      ]
+    },
+    {
+      "FullName": "System.Collections.List`1",
+      "Parents": [
+        "System.Collections.Iterable`1<T>"
+      ]
+    }
+  ],
+  "InterfaceCalls": [
+    "System.Void System.Collections.List`1<System.Int32>::Add(!0)",
+    "System.Int32 System.Collections.List`1<System.Int32>::get_Count()",
+    "System.Collections.Iterator`1<!0> System.Collections.Iterable`1<System.Int32>::GetIterator()",
+    "System.Boolean System.Collections.Iterator`1<System.Int32>::MoveNext()",
+    "!0 System.Collections.Iterator`1<System.Int32>::get_Current()",
+    "System.Void System.Disposable::Dispose()"
+  ],
+  "NegativeDiagnostics": {
+    "WrongElement": [
+      "error RAV1503: Cannot convert from 'string' to 'int'"
+    ],
+    "WrongReceiver": [
+      "error RAV1503: Cannot convert from 'int' to 'List<int>'"
+    ]
+  },
+  "ImportRejections": {
+    "WrongElement": "Input stack type mismatch.",
+    "WrongReceiver": "Input stack type mismatch.",
+    "DirectInterfaceCall": "Unsupported collection call shape.",
+    "UninitializedLocal": "Read of uninitialized or unsupported default local.",
+    "ProfileNotSelected": "Unsupported Result profile type: System.Collections.ArrayList`1<System.Int32>",
+    "WrongInheritance": "Incompatible collection contract: System.Collections.List`1 parents="
+  },
+  "ImportedProgram": "CoreInterfaces.neoil",
+  "RuntimeOutputs": {
+    "CoreInterfaces": "1\n42\n=> Void\n",
+    "CollectionAliases": "7\n42\n2\n=> Void\n"
+  },
+  "SystemSha256": "5c0b425f7a92231fed19536fd9fc75db0e8b4b48329ade396894fb3f15552899",
+  "NullDefault": "Verified; execution faults with null interface receiver"
+}

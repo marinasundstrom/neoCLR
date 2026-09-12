@@ -18,9 +18,9 @@ static class UnionImport
     const string Error = "System.Result.Error<System.OverflowError>";
     sealed record Slot(string Type, int Local = -1);
     sealed record State(List<Slot> Stack, bool[] Assigned);
-    sealed record Call(string Name, string[] Arguments, string Result, int OutArgument = -1);
+    sealed record Call(string Name, string[] Arguments, string Result, int OutArgument = -1, string? Instruction = null);
 
-    public static void Write(string application, string core, string destination)
+    public static void Write(string application, string core, string destination, bool collectionProfile = false)
     {
         foreach (var path in new[] { application, core })
             if (new FileInfo(path).Length > 16 * 1024 * 1024) throw new InvalidDataException("Image exceeds profile limit.");
@@ -35,6 +35,13 @@ static class UnionImport
         var entry = app.EntryPoint ?? throw new InvalidDataException("Missing entry point.");
         if (entry.Parameters.Count != 0 || entry.ReturnType.MetadataType != MetadataType.Void)
             throw new InvalidDataException("Result profile requires a parameterless no-result entry.");
+        if (collectionProfile) CollectionBindings.Validate(library.MainModule);
+        string ProfileType(TypeReference type, bool result = false)
+        {
+            var collection = CollectionBindings.Type(type);
+            if (collection is not null && collectionProfile) return collection;
+            return Type(type, result);
+        }
         var output = new StringBuilder($".module ImportedUnion\n.entry {Name(entry)}\n");
         var mappings = new List<object>();
         var pending = new Queue<MethodDefinition>(); pending.Enqueue(entry);
@@ -48,10 +55,10 @@ static class UnionImport
                 || method.Body.CodeSize > 65536 || method.Body.MaxStackSize > 256 || method.Body.Variables.Count > 256 || method.Body.Instructions.Count == 0
                 || method.DeclaringType.Methods.Any(m => m.IsConstructor && m.IsStatic))
                 throw new InvalidDataException("Unsupported body: " + method.FullName);
-            var args = method.Parameters.Select(p => Type(p.ParameterType)).ToArray();
-            var result = Type(method.ReturnType, true);
-            var locals = method.Body.Variables.Select(v => Type(v.VariableType)).ToArray();
-            if (locals.Any(t => t is not ("Int32" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome)))
+            var args = method.Parameters.Select(p => ProfileType(p.ParameterType)).ToArray();
+            var result = ProfileType(method.ReturnType, true);
+            var locals = method.Body.Variables.Select(v => ProfileType(v.VariableType)).ToArray();
+            if (locals.Any(t => !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome)))
                 throw new InvalidDataException("Unsupported local default in Result profile.");
             var instructions = method.Body.Instructions.ToArray();
             var indexes = instructions.Select((i, n) => (i, n)).ToDictionary(p => p.i, p => p.n);
@@ -68,7 +75,7 @@ static class UnionImport
                 var instruction = instructions[index]; var code = new StringBuilder(); var successors = new List<int>();
                 void Push(Slot slot) { stack.Add(slot); if (stack.Count > method.Body.MaxStackSize) throw new InvalidDataException("Declared maxstack exceeded."); }
                 Slot Pop() { if (stack.Count == 0) throw new InvalidDataException("Input stack underflow."); var top = stack[^1]; stack.RemoveAt(stack.Count - 1); return top; }
-                Slot Expect(string type) { var top = Pop(); if (top.Type != type) throw new InvalidDataException("Input stack type mismatch."); return top; }
+                Slot Expect(string type) { var top = Pop(); if (!CollectionBindings.Assignable(top.Type, type)) throw new InvalidDataException("Input stack type mismatch."); return top; }
                 int Local(int n) { if (n < 0 || n >= locals.Length) throw new InvalidDataException("Invalid local index."); return n; }
                 void Load(int n) { Local(n); if (!assigned[n]) throw new InvalidDataException("Read of uninitialized or unsupported default local."); Push(new(locals[n])); code.AppendLine($"ldloc local{n}"); }
                 void Store(int n) { Local(n); Expect(locals[n]); assigned[n] = true; code.AppendLine($"stloc local{n}"); }
@@ -135,22 +142,35 @@ static class UnionImport
                     case Code.Br: case Code.Br_S:
                         var branch = Target(); successors.Add(branch); code.AppendLine($"br IL_{instructions[branch].Offset:x4}"); terminates = true; break;
                     case Code.Brtrue: case Code.Brtrue_S: case Code.Brfalse: case Code.Brfalse_S:
-                        Expect("Int32"); var conditional = Target(); successors.Add(conditional);
+                        var condition = Pop();
+                        if (condition.Type is not ("Int32" or "Boolean")) throw new InvalidDataException("Invalid branch condition.");
+                        var conditional = Target(); successors.Add(conditional);
                         code.AppendLine($"{(instruction.OpCode.Code is Code.Brtrue or Code.Brtrue_S ? "brtrue" : "brfalse")} IL_{instructions[conditional].Offset:x4}"); break;
                     case Code.Call:
+                    case Code.Callvirt:
                         var reference = (MethodReference)instruction.Operand;
                         var targetMethod = reference.Resolve() ?? throw new InvalidDataException("Unresolved call.");
                         Call call;
                         if (targetMethod.Module == app.MainModule)
                         {
+                            if (instruction.OpCode.Code == Code.Callvirt) throw new InvalidDataException("Application instance calls unsupported.");
                             CheckStatic(reference); CheckStatic(targetMethod);
                             if (!targetMethod.IsPublic && targetMethod.DeclaringType != method.DeclaringType)
                                 throw new InvalidDataException("Nonpublic cross-type call unsupported.");
                             if (reference.FullName != targetMethod.FullName) throw new InvalidDataException("Resolved signature mismatch.");
                             pending.Enqueue(targetMethod);
-                            call = new(Name(targetMethod), reference.Parameters.Select(p => Type(p.ParameterType)).ToArray(), Type(reference.ReturnType, true));
+                            call = new(Name(targetMethod), reference.Parameters.Select(p => ProfileType(p.ParameterType)).ToArray(), ProfileType(reference.ReturnType, true));
                         }
-                        else if (targetMethod.Module == library.MainModule) call = Bind(reference, targetMethod);
+                        else if (targetMethod.Module == library.MainModule)
+                        {
+                            var binding = collectionProfile ? CollectionBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt) : null;
+                            if (binding is not null) call = new("", binding.Arguments, binding.Result, Instruction: binding.Instruction);
+                            else
+                            {
+                                if (instruction.OpCode.Code == Code.Callvirt) throw new InvalidDataException("Unsupported runtime callvirt.");
+                                call = Bind(reference, targetMethod);
+                            }
+                        }
                         else throw new InvalidDataException("Unsupported dependency call.");
                         for (var n = call.Arguments.Length - 1; n >= 0; n--)
                         {
@@ -163,7 +183,7 @@ static class UnionImport
                             }
                         }
                         if (call.Result != "noresult") Push(new(call.Result));
-                        code.AppendLine($"call {call.Name}({string.Join(',', call.Arguments)})"); break;
+                        code.AppendLine(call.Instruction ?? $"call {call.Name}({string.Join(',', call.Arguments)})"); break;
                     case Code.Ret:
                         if (result != "noresult") Expect(result);
                         if (stack.Count != 0) throw new InvalidDataException("Input ret stack not empty.");
@@ -179,7 +199,7 @@ static class UnionImport
             for (var n = 0; n < locals.Length; n++) output.AppendLine($".local {locals[n]} local{n}");
             if (method.Body.InitLocals)
                 for (var n = 0; n < locals.Length; n++)
-                    if (locals[n] == IntArray) output.AppendLine($"ldloca local{n}\ninitobj {IntArray}");
+                    if (locals[n] == IntArray || CollectionBindings.IsReference(locals[n])) output.AppendLine($"ldloca local{n}\ninitobj {locals[n]}");
                     else if (locals[n] != Carrier && locals[n] != Option && locals[n] != VoidOption) output.AppendLine(Default(locals[n]) + $"\nstloc local{n}");
             foreach (var index in bodies.Keys.Order())
             {
@@ -203,9 +223,10 @@ static class UnionImport
         output.Append(Adapters());
         File.WriteAllText(destination, output.ToString());
         File.WriteAllText(destination + ".map.json", JsonSerializer.Serialize(new {
-            Profile = "result-option-void-arrays-v4", ApplicationSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(application))),
+            Profile = collectionProfile ? "result-option-void-collections-v5" : "result-option-void-arrays-v4",
+            RequiredLibraryProfile = collectionProfile ? "raven-collections" : "bundled-system", ApplicationSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(application))),
             CoreSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(core))), ReachableMethods = seen.Order().ToArray(), Mappings = mappings,
-            Scope = "Bounded Int32 vectors and generic Result/Option bindings; CFG stack/definite-assignment checked; observable default carriers rejected; no guest declaration bodies executed."
+            Scope = "Bounded Int32 vectors, optional Int32 collection references and generic Result/Option bindings; CFG stack/definite-assignment checked; observable default carriers rejected; no guest declaration bodies executed."
         }, new JsonSerializerOptions { WriteIndented = true }));
     }
 
@@ -219,7 +240,7 @@ static class UnionImport
     }
     static string Type(TypeReference type, bool result = false) => type.FullName switch {
         "System.Int32[]" when type is ArrayType { IsVector: true } array && array.ElementType.MetadataType == MetadataType.Int32 => IntArray,
-        "System.Void" when result => "noresult", "System.Int32" => "Int32", "System.String" => "String",
+        "System.Boolean" => "Boolean", "System.Void" when result => "noresult", "System.Int32" => "Int32", "System.String" => "String",
         "System.Option`1<System.Void>" when type.IsValueType && HasNamedVoid(type) => VoidOption,
         "System.Option/Some`1<System.Void>" when type.IsValueType && HasNamedVoid(type) => VoidSome,
         "System.Option`1<System.Int32>" when type.IsValueType => Option,
@@ -310,7 +331,7 @@ static class UnionImport
         throw new InvalidDataException("Unsupported constructor: " + reference.FullName + " definition=" + key);
     }
     static string Default(string type) => type switch {
-        "Int32" => "ldc.i4 0", VoidSome => $"ldvoid\nnewobj {VoidSome}", Some => $"ldc.i4 0\nnewobj {Some}", None => $"newobj {None}", Ok => $"ldc.i4 0\nnewobj {Ok}",
+        "Boolean" => "ldc.bool false", "Int32" => "ldc.i4 0", VoidSome => $"ldvoid\nnewobj {VoidSome}", Some => $"ldc.i4 0\nnewobj {Some}", None => $"newobj {None}", Ok => $"ldc.i4 0\nnewobj {Ok}",
         Error => $"newobj System.OverflowError\nnewobj {Error}",
         _ => throw new InvalidDataException("Unsupported default.")
     };

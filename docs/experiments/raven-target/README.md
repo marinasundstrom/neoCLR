@@ -374,10 +374,10 @@ interfaces are not claimed by this milestone.
 
 ## Interface contract probe (2026-09-12)
 
-The separate `--interfaces` mode tests the proposed existing collection surface through
-Raven emission and requires unsupported runtime import to remain rejected. See the
-[interface contract and reproduction](../../raven-interface-contract.md). It does not
-expand the executable demo's API surface or claim collection execution yet.
+The separate `--interfaces` mode now compiles and imports two Int32 collection programs.
+Use the adapted runtime System profile to verify and execute them; see the
+[collection execution instructions](../../raven-interface-contract.md#executable-raven-collection-import-2026-09-12).
+The default saved-project profile remains unchanged.
 
 ## Executable Raven arrays (2026-09-12)
 
@@ -434,7 +434,8 @@ runtime path, not a new manual VS Code session.
 
 The [adapted collection profile](../../raven-interface-contract.md#adapted-runtime-collection-profile-2026-09-12)
 provides generation, verification and execution instructions for the actual collection
-algorithms using nominal classes/interfaces and managed arrays. This is runtime
-groundwork; `--interfaces` remains a compile-only probe that rejects import.
+algorithms using nominal classes/interfaces and managed arrays. The `--interfaces`
+probe now imports the matching Raven programs; use `verify_collections.py` with the
+explicit generated System profile to verify their execution.
 [Target-specific Raven contracts](../../raven-target-contracts.md) are proposed for
 future implicit iteration without changing the default .NET target.

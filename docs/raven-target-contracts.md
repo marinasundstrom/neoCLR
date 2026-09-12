@@ -66,8 +66,8 @@ choices, at the cost of another compiler configuration surface and a test matrix
 Its schema and project syntax remain provisional; no arbitrary plugin callbacks or
 user-authored code execution are needed to select symbols.
 
-First finish explicit Raven collection calls against the adapted runtime library.
-Then implement contract resolution on Raven's feature branch, with .NET regression
+Explicit Raven collection calls now execute against the adapted runtime library.
+Next implement contract resolution on Raven's feature branch, with .NET regression
 coverage, neoCLR iteration binding/emission and malformed-profile diagnostics. Verify
 VS Code uses the same project target as command-line compilation. Test normal completion,
 early exit and explicit disposal; define fault cleanup separately before claiming full

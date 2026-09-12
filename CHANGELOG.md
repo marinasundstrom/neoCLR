@@ -20,10 +20,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   growth, Copy, iterator GC retention, disposal and invalid accesses (seven new tests
   and 35 related tests pass). Neo and the default
   library remain unchanged. The profile requires defaultable element types and excludes
-  predicate/delegate helpers; Raven collection import remains pending. Documented how
-  to generate and run it. Recorded proposed target-specific Raven language contracts
+  predicate/delegate helpers. Documented how to generate and run it. Recorded proposed target-specific Raven language contracts
   for renamed iteration/disposal APIs while preserving the default .NET target; that
-  compiler configuration is planned, not implemented.
+  compiler configuration is planned, not implemented. Follow-up admits two Raven Int32
+  collection programs through an explicit import profile: ordinary class/interface
+  calls and upcasts execute the adapted library, including iteration, growth, returned
+  aliases and indexers. Six malformed/unsupported inputs reject; a null-default fixture
+  verifies and faults at invocation. Added execution evidence and reproduction commands.
+  Existing array and eight-program Result/Option/Void regression probes still pass.
+  Raven and default VS Code project-profile configuration remain unchanged.
 
 - Ran Raven-emitted static programs on neoCLR against the real System.Console through
   a bounded neoCLR-owned Cecil import bridge, with no Raven changes. Added verified

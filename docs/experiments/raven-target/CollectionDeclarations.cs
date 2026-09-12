@@ -1,4 +1,4 @@
-// Candidate reference surface only. These declarations are not executable library replacements.
+// Reference surface for the bounded collection profile. These declarations are not executable library replacements.
 static class CollectionDeclarations
 {
     public const string Source = """

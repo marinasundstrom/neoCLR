@@ -1,0 +1,19 @@
+import System.*
+import System.Collections.*
+import System.Console.*
+
+func Make() -> List<int> {
+    let values = ArrayList<int>.Allocate(0)
+    values.Add(41)
+    values.Add(42)
+    return values
+}
+
+func Main() {
+    let values = Make()
+    let alias = values
+    alias[0] = 7
+    WriteLine(values[0])
+    WriteLine(values[1])
+    WriteLine(values.Count)
+}
