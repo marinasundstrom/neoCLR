@@ -23,7 +23,7 @@ fn program(body: &str, extra: &str) -> LoadedProgram {
     program.verify().unwrap();
     program
 }
-const START: &str = ".local System.Collections.ArrayList<Int32> list\nldc.i4 0\ncall System.Collections.ArrayList<Int32>::Allocate(Int32)\nstloc list\n";
+const START: &str = ".local System.Collections.ArrayList<Int32> list\nldc.i4 0\nnewobj instance System.Collections.ArrayList<Int32>::.ctor(Int32)\nstloc list\n";
 
 #[test]
 fn aliases_grow_and_dispatch_through_inherited_interfaces() {
@@ -84,7 +84,7 @@ fn returned_iterator_retains_buffer_through_gc_and_disposes_idempotently() {
 .function Make() -> System.Collections.Iterator<Int32>
 .local System.Collections.ArrayList<Int32> list
 ldc.i4 1
-call System.Collections.ArrayList<Int32>::Allocate(Int32)
+newobj instance System.Collections.ArrayList<Int32>::.ctor(Int32)
 stloc list
 ldloc list
 ldc.i4 42
@@ -140,7 +140,7 @@ fn iterator_captures_original_buffer_and_extent() {
 .local System.Collections.ArrayList<Int32> list
 .local System.Collections.Iterator<Int32> iterator
 ldc.i4 1
-call System.Collections.ArrayList<Int32>::Allocate(Int32)
+newobj instance System.Collections.ArrayList<Int32>::.ctor(Int32)
 stloc list
 ldloc list
 ldc.i4 42
@@ -176,7 +176,7 @@ End:
 fn invalid_capacity_index_and_current_fault() {
     for (body, message) in [
         (
-            "ldc.i4 -1\ncall System.Collections.ArrayList<Int32>::Allocate(Int32)\npop\nldc.i4 0"
+            "ldc.i4 -1\nnewobj instance System.Collections.ArrayList<Int32>::.ctor(Int32)\npop\nldc.i4 0"
                 .to_string(),
             "capacity must be non-negative",
         ),
@@ -221,7 +221,7 @@ ldc.i4 42
 newobj Cell
 stloc cell
 ldc.i4 1
-call System.Collections.ArrayList<Cell>::Allocate(Int32)
+newobj instance System.Collections.ArrayList<Cell>::.ctor(Int32)
 stloc list
 ldloc list
 ldloc cell
@@ -235,7 +235,7 @@ brtrue Shared
 fault "element was copied"
 Shared:
 ldc.i4 0
-call System.Collections.ArrayList<Void>::Allocate(Int32)
+newobj instance System.Collections.ArrayList<Void>::.ctor(Int32)
 ldvoid
 call instance System.Collections.ArrayList<Void>::Add(Void)
 ldc.i4 42
@@ -244,4 +244,12 @@ ldc.i4 42
         program(body, extra).run(Limits::default()).unwrap().value,
         Value::Int32(42)
     );
+}
+
+#[test]
+fn constructors_start_empty_with_requested_capacity_and_grow() {
+    for (argument, signature, capacity) in [("", "", 0), ("ldc.i4 0\n", "Int32", 0), ("ldc.i4 3\n", "Int32", 3)] {
+        let body = format!(".local System.Collections.ArrayList<Int32> list\n{argument}newobj instance System.Collections.ArrayList<Int32>::.ctor({signature})\nstloc list\nldloc list\ncall instance System.Collections.ArrayList<Int32>::get_Count()\nldc.i4 0\nbeq Empty\nfault \"count\"\nEmpty:\nldloc list\ncall instance System.Collections.ArrayList<Int32>::get_Capacity()\nldc.i4 {capacity}\nbeq Capacity\nfault \"capacity\"\nCapacity:\nldloc list\nldc.i4 42\ncall instance System.Collections.ArrayList<Int32>::Add(Int32)\nldloc list\nldc.i4 0\ncall instance System.Collections.ArrayList<Int32>::get_Item(Int32)");
+        assert_eq!(program(&body, "").run(Limits::default()).unwrap().value, Value::Int32(42));
+    }
 }

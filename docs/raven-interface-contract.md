@@ -238,7 +238,7 @@ conformance is currently checked at conversion time without a specialized cache.
 ```text
 .local System.Collections.List<Int32> values
 ldc.i4 2
-call System.Collections.ArrayList<Int32>::Allocate(Int32)
+newobj instance System.Collections.ArrayList<Int32>::.ctor(Int32)
 stloc values
 ```
 

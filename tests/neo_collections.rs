@@ -18,9 +18,9 @@ fn generic_owner_parsing_preserves_comparisons_and_rejects_bad_conversions() {
         frontend::compile("func Main() -> bool { let a = 1\nlet b = 2\nreturn a < b }").is_ok()
     );
     for source in [
-        "func Main() -> () { let a = System.Collections.ArrayList<int,string>.Allocate(0) }",
-        "func Main() -> () { var a = System.Collections.ArrayList<int>.Allocate(0)\nlet b: System.Collections.List<string>& = &a }",
-        "func Main() -> () { var a = System.Collections.ArrayList<int>.Allocate(0)\nlet b: System.Collections.List<int>& = a }",
+        "func Main() -> () { let a = System.Collections.ArrayList<int,string>(0) }",
+        "func Main() -> () { var a = System.Collections.ArrayList<int>(0)\nlet b: System.Collections.List<string>& = &a }",
+        "func Main() -> () { var a = System.Collections.ArrayList<int>(0)\nlet b: System.Collections.List<int>& = a }",
     ] {
         assert!(frontend::compile(source).is_err(), "{source}");
     }
@@ -31,7 +31,7 @@ fn indexers_dispatch_getters_and_setters_with_reference_element_contracts() {
     let source = r#"
 record Counter(Age: int)
 func Main() -> int {
-    var list = System.Collections.ArrayList<Counter&>.Allocate(0)
+    var list = System.Collections.ArrayList<Counter&>(0)
     let view: System.Collections.List<Counter&>& = &list
     let original = new Counter(10)
     list.Add(original)
@@ -63,7 +63,7 @@ func Receiver(list: System.Collections.ArrayList<int>&, calls: int&) -> System.C
     return list
 }
 func Main() -> int {
-    var list = System.Collections.ArrayList<int>.Allocate(0)
+    var list = System.Collections.ArrayList<int>(0)
     list.Add(0)
     var calls = -2
     Receiver(&list, &calls)[Next(&calls)] = Next(&calls)
@@ -77,9 +77,9 @@ func Main() -> int {
         Value::Int32(2)
     );
     for source in [
-        "func Main() -> int { var list = System.Collections.ArrayList<int>.Allocate(0); list.Add(1); list[0] = true; return 0 }",
-        "func Main() -> int { var list = System.Collections.ArrayList<int>.Allocate(0); list.Add(1); let x = &list[0]; return 0 }",
-        "func Main() -> int { let list = System.Collections.ArrayList<int>.Allocate(0); list[0] = 1; return 0 }",
+        "func Main() -> int { var list = System.Collections.ArrayList<int>(0); list.Add(1); list[0] = true; return 0 }",
+        "func Main() -> int { var list = System.Collections.ArrayList<int>(0); list.Add(1); let x = &list[0]; return 0 }",
+        "func Main() -> int { let list = System.Collections.ArrayList<int>(0); list[0] = 1; return 0 }",
     ] {
         assert!(frontend::compile(source).is_err(), "accepted {source}");
     }

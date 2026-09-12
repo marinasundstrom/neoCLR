@@ -55,7 +55,7 @@ fn integer_ordering_is_overflow_safe_and_uses_typed_interfaces() {
 fn iterator_outlives_stack_descriptor_and_survives_gc() {
     let p = neo(r#"
 func Make() -> System.Collections.Iterator<int>& {
-    var list = System.Collections.ArrayList<int>.Allocate(0)
+    var list = System.Collections.ArrayList<int>(0)
     list.Add(20)
     list.Add(22)
     return list.GetIterator()
@@ -88,7 +88,7 @@ fn each_iterator_is_independent_and_reference_elements_remain_references() {
         neo(r#"
 record Counter(Age: int)
 func Main() -> int {
-    var list = System.Collections.ArrayList<Counter&>.Allocate(0)
+    var list = System.Collections.ArrayList<Counter&>(0)
     let counter = new Counter(40)
     list.Add(counter)
     let view: System.Collections.List<Counter&>& = &list
@@ -113,7 +113,7 @@ func Main() -> int {
 fn current_faults_outside_active_iteration() {
     for actions in ["", "iterator.MoveNext()", "list.Add(1); iterator.Dispose()"] {
         let s = format!(
-            "func Main() -> int {{ var list = System.Collections.ArrayList<int>.Allocate(0); let iterator = list.GetIterator(); {actions}; return iterator.Current }}"
+            "func Main() -> int {{ var list = System.Collections.ArrayList<int>(0); let iterator = list.GetIterator(); {actions}; return iterator.Current }}"
         );
         assert!(
             neo(&s)
@@ -130,7 +130,7 @@ fn iterator_keeps_initial_extent_and_backing_buffer() {
     assert_eq!(
         neo(r#"
 func Main() -> int {
-    var list = System.Collections.ArrayList<int>.Allocate(1)
+    var list = System.Collections.ArrayList<int>(1)
     list.Add(1)
     let iterator = list.GetIterator()
     list[0] = 42
@@ -178,7 +178,7 @@ fn floating_ordering_matches_dotnet_nan_and_zero_rules() {
 
 #[test]
 fn readonly_iterator_can_read_but_cannot_advance() {
-    let source = "func Main() -> bool { var list = System.Collections.ArrayList<int>.Allocate(0); let iterator: readonly System.Collections.Iterator<int>& = list.GetIterator(); return iterator.MoveNext() }";
+    let source = "func Main() -> bool { var list = System.Collections.ArrayList<int>(0); let iterator: readonly System.Collections.Iterator<int>& = list.GetIterator(); return iterator.MoveNext() }";
     assert!(frontend::compile(source).is_err());
 }
 
@@ -189,7 +189,7 @@ record Score(Value: int): System.Comparable<Score> {
     readonly func CompareTo(other: Score) -> int { return this.Value.CompareTo(other.Value) }
 }
 func Main() -> int {
-    var list = System.Collections.ArrayList<Score>.Allocate(0)
+    var list = System.Collections.ArrayList<Score>(0)
     list.Add(Score(42))
     let iterator = list.GetIterator()
     iterator.MoveNext()

@@ -32,7 +32,7 @@ For heterogeneous collections, store managed references to heap-backed descripto
 
 ```swift
 let storage = new System.Reflection.FieldInfo[1] { fields[0] }
-var members = System.Collections.ArrayList<readonly System.Reflection.MemberInfo&>.Allocate(1)
+var members = System.Collections.ArrayList<readonly System.Reflection.MemberInfo&>(1)
 members.Add(&storage[0])
 WriteLine(members[0].Name)
 ```

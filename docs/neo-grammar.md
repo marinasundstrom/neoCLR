@@ -242,7 +242,7 @@ ordinary Neo naming, without an `I` prefix.
 
 ## Closed generic static member calls
 
-`System.Collections.ArrayList<Counter&>.Allocate(0)` selects a static member on a
+`System.Collections.ArrayList<Counter&>(0)` selects a static member on a
 closed generic type. Type arguments may include managed references and nested closed
 types. Generic free/static functions are specified separately below; argument inference is available for source free/static functions. Ordinary
 comparisons remain expressions. A reference to a bundled type can implicitly convert

@@ -20,7 +20,7 @@ func Main() -> int {
     let local = Counter(20)
     let shared = new Counter(21)
     shared.Increment()
-    var storage = System.Collections.ArrayList<int>.Allocate(2)
+    var storage = System.Collections.ArrayList<int>(2)
     let values = &storage
     values.Add(local.Read())
     values.Add(ReadCounter(shared))

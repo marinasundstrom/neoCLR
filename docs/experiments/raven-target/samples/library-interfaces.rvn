@@ -14,6 +14,6 @@ func Print(values: List<int>) {
 }
 
 func Main() {
-    let values = ArrayList<int>.Allocate(2)
+    let values = ArrayList<int>(2)
     Print(values)
 }

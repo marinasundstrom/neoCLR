@@ -33,7 +33,7 @@ Test:
 .function Main() -> Void
     .local System.Collections.ArrayList<Int32> owner
     ldc.i4 0
-    call System.Collections.ArrayList<Int32>::Allocate(Int32)
+    newobj instance System.Collections.ArrayList<Int32>::.ctor(Int32)
     stloc owner
     ldloca owner
     interface.borrow System.Collections.List<Int32>

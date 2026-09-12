@@ -373,7 +373,7 @@ value/reference contract inventory and remaining compiler limitations.
 
 ## Closed generic static member calls
 
-`System.Collections.ArrayList<Counter&>.Allocate(0)` selects a static member on a
+`System.Collections.ArrayList<Counter&>(0)` selects a static member on a
 closed generic type. Type arguments may include managed references and nested closed
 types. Generic free/static declarations are described in [generic functions](function-generics.md); argument-based inference is available for source free/static functions. Ordinary
 comparisons remain expressions. A reference to a bundled type can implicitly convert

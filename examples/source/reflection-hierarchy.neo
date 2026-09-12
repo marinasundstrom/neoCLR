@@ -22,7 +22,7 @@ func Main() -> int {
     let fieldStorage = new System.Reflection.FieldInfo[1] { fields[0] }
     let methodStorage = new System.Reflection.MethodInfo[1] { methods[0] }
     let propertyStorage = new System.Reflection.PropertyInfo[1] { properties[0] }
-    var members = System.Collections.ArrayList<readonly System.Reflection.MemberInfo&>.Allocate(3)
+    var members = System.Collections.ArrayList<readonly System.Reflection.MemberInfo&>(3)
     members.Add(&fieldStorage[0])
     members.Add(&methodStorage[0])
     members.Add(&propertyStorage[0])

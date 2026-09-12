@@ -22,7 +22,7 @@ func Main() -> int {
 
     let selection = new Selection(first)
     selection.Current = interfaceView
-    var entries = System.Collections.ArrayList<readonly Readable&>.Allocate(1)
+    var entries = System.Collections.ArrayList<readonly Readable&>(1)
     entries.Add(first)
     entries[0] = second
 

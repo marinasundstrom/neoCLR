@@ -11,7 +11,7 @@ func Sum(values: readonly System.Collections.Iterable<int>&) -> int {
 }
 
 func Main() -> int {
-    var values = System.Collections.ArrayList<int>.Allocate(0)
+    var values = System.Collections.ArrayList<int>(0)
     values.Add(20)
     values.Add(22)
     let list: readonly System.Collections.List<int>& = &values

@@ -4,7 +4,7 @@
 .local System.Collections.List<Int32> list
 .local System.Collections.Iterator<Int32> iterator
 ldc.i4 0
-call System.Collections.ArrayList<Int32>::Allocate(Int32)
+newobj instance System.Collections.ArrayList<Int32>::.ctor(Int32)
 stloc list
 ldloc list
 ldc.i4 42

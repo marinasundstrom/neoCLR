@@ -7,7 +7,14 @@
     .implements System.Collections.List<T>
     .field private State System.Collections.ArrayListState<T>&
 
-    .method static Allocate(Int32 capacity) -> System.Collections.ArrayList<T>
+    .method instance .ctor() -> Void
+        ldc.i4 0
+        newobj instance System.Collections.ArrayList<T>::.ctor(Int32)
+        starg this
+        ldvoid
+        ret
+    .end
+    .method instance .ctor(Int32 capacity) -> Void
         ldarg capacity
         ldc.i4 0
         blt Invalid
@@ -17,6 +24,8 @@
         newobj System.Collections.ArrayListState<T>
         heap.new
         newobj System.Collections.ArrayList<T>
+        starg this
+        ldvoid
         ret
     Invalid:
         fault "ArrayList capacity must be non-negative"
@@ -184,7 +193,7 @@
         call instance System.Collections.ArrayList<T>::get_Count()
         stloc count
         ldloc count
-        call System.Collections.ArrayList<T>::Allocate(Int32)
+        newobj instance System.Collections.ArrayList<T>::.ctor(Int32)
         stloc copy
         ldc.i4 0
         stloc index

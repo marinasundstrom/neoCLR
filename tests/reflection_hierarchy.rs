@@ -75,7 +75,7 @@ fn reference_collection_retains_complete_owners_after_factory_frames_end() {
 func Collect() -> System.Collections.ArrayList<readonly System.Reflection.MemberInfo&> {
     let fields = typeof(Model).GetFields()
     let storage = new System.Reflection.FieldInfo[1] { fields[0] }
-    var list = System.Collections.ArrayList<readonly System.Reflection.MemberInfo&>.Allocate(1)
+    var list = System.Collections.ArrayList<readonly System.Reflection.MemberInfo&>(1)
     list.Add(&storage[0])
     return list
 }

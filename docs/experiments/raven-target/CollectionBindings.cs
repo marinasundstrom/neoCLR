@@ -72,8 +72,8 @@ static class CollectionBindings
         if (!parameters.SequenceEqual(definition.Parameters.Select(p => Closed(p.ParameterType))) || result != Closed(definition.ReturnType))
             throw new InvalidDataException("Collection reference/definition signature mismatch.");
         var expected = (owner, definition.Name) switch {
-            (ArrayList, "Allocate") => ("Int32", ArrayList, false),
             (List or ArrayList, "Add") => ("Int32", "noresult", true),
+            (ArrayList, "get_Capacity") => ("", "Int32", true),
             (List or ArrayList, "get_Count") => ("", "Int32", true),
             (List or ArrayList, "get_Item") => ("Int32", "Int32", true),
             (List or ArrayList, "set_Item") => ("Int32,Int32", "noresult", true),

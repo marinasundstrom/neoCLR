@@ -8,7 +8,7 @@ It implements System.Collections.List<T> through managed-reference dispatch.
 
 | Member | Contract |
 | --- | --- |
-| Allocate(Int32 capacity) -> ArrayList<T> | Return an empty descriptor with a managed backing array; zero capacity is valid |
+| .ctor() / .ctor(Int32 capacity) | Start empty with zero or requested capacity; negative capacity faults |
 | Copy() -> ArrayList<T> | Independent state and buffer, shallow copies of live elements; capacity equals Count |
 | Count: Int32 | Number of initialized logical elements |
 | Capacity: Int32 | Length of the current backing array |
@@ -121,7 +121,7 @@ func Append(list: System.Collections.ArrayList<Foo&>&, item: Foo&) -> int {
 }
 ```
 
-Neo supports `System.Collections.ArrayList<Counter&>.Allocate(0)` and conversion
+Neo supports `System.Collections.ArrayList<Counter&>(0)` and conversion
 of its managed reference to `System.Collections.List<Counter&>&`. Run the complete
 [Neo collection example](../examples/source/collections.neo) with
 `cargo run -- run examples/source/collections.neo`; it prints 42, 1, 2, 2 and returns 42.
@@ -150,3 +150,14 @@ Tests cover assignment across growth, Copy independence in both directions, empt
 reference lists, shared element identity, readonly copying, frame-reference rejection
 and GC/resource limits. The collection policy remains provisional while the application
 experiments continue; retained-reference diagnostics are a separate investigation.
+
+## Constructor API (2026-09-12)
+
+Following [.NET List constructors](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1.-ctor?view=net-10.0)
+(primary source consulted 2026-09-12), capacity reserves storage and never adds elements.
+`ArrayList<T>()` starts at capacity zero and grows on demand; `ArrayList<T>(capacity)`
+reserves the requested non-negative capacity. Negative capacity remains a terminal
+argument fault, rather than a .NET exception. No opcode or compiler change is needed.
+The Raven profile uses ordinary class constructors; the bundled legacy profile retains
+its existing value storage behavior. This is API alignment, not a performance claim.
+`Allocate` has been removed without a compatibility alias; migrate calls to constructors.

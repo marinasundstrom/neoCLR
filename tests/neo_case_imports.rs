@@ -24,7 +24,7 @@ func Main() -> int {
     let heap: Circle& = new Circle(2)
     let qualified = new Shape.Circle(2)
     if qualified.radius != heap.radius { return -3 }
-    var circles = System.Collections.ArrayList<Circle>.Allocate(1)
+    var circles = System.Collections.ArrayList<Circle>(1)
     circles.Add(copy)
     if !typeof(Circle).Equals(typeof(Shape.Circle)) { return -2 }
     return Measure(circles[0]) + Identity(heap.radius)

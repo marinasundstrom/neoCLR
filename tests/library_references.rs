@@ -21,7 +21,7 @@ fn run_source_helper(receiver: &str, heap: bool) -> neoclr::Execution {
         "interface.borrow System.Collections.List<Int32>\n"
     };
     let module = assemble(&format!(
-        "{helpers}\n.function Main() -> Int32\n.local {local_type} owner\nldc.i4 0\ncall System.Collections.ArrayList<Int32>::Allocate(Int32)\n{allocation}stloc owner\n{address}\n{view}call AddAndCount({receiver}&)\nret\n.end"
+        "{helpers}\n.function Main() -> Int32\n.local {local_type} owner\nldc.i4 0\nnewobj instance System.Collections.ArrayList<Int32>::.ctor(Int32)\n{allocation}stloc owner\n{address}\n{view}call AddAndCount({receiver}&)\nret\n.end"
     )).unwrap();
     // The IL entry exercises both frame and heap wrapper receivers.
     let program = LoadedProgram::new(&module).unwrap();
@@ -51,13 +51,13 @@ fn neo_library_methods_and_properties_use_frame_and_heap_reference_receivers() {
 fn list_contract_requires_a_managed_receiver_and_retains_value_elements() {
     let system = neoclr::library::system().unwrap();
     for method in system.functions.iter().filter(|f| {
-        f.instance
+        f.instance && !f.name.ends_with("..ctor")
             && (f.name.starts_with("System.Collections.List.")
                 || f.name.starts_with("System.Collections.ArrayList."))
     }) {
         assert!(method.receiver_byref, "{}", method.name);
     }
-    let module = assemble(".module Invalid\n.entry Main\n.function Main() -> Int32\nldc.i4 0\ncall System.Collections.ArrayList<Int32>::Allocate(Int32)\ncall instance System.Collections.ArrayList<Int32>::get_Count()\nret\n.end").unwrap();
+    let module = assemble(".module Invalid\n.entry Main\n.function Main() -> Int32\nldc.i4 0\nnewobj instance System.Collections.ArrayList<Int32>::.ctor(Int32)\ncall instance System.Collections.ArrayList<Int32>::get_Count()\nret\n.end").unwrap();
     let program = LoadedProgram::new(&module).unwrap();
     assert!(program.verify().is_err());
     assert!(program.run(Limits::default()).is_err());

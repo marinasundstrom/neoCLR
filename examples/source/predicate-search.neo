@@ -7,7 +7,7 @@ record Person(Name: string, Age: int): System.Equatable<Person> {
 }
 
 func Main() -> int {
-    var people = System.Collections.ArrayList<Person>.Allocate(0)
+    var people = System.Collections.ArrayList<Person>(0)
     people.Add(Person("Ada", 36))
     people.Add(Person("Grace", 42))
     let expected = Person("Grace", 42)

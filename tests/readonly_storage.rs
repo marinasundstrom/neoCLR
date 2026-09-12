@@ -34,7 +34,7 @@ fn source_rejects_readonly_to_writable_local_return_call_and_container() {
         "let read: readonly Counter& = x; let write: Counter& = read; return 0",
         "return Escape(x).Age",
         "let read: readonly Counter& = x; Write(read); return 0",
-        "var a = System.Collections.ArrayList<readonly Counter&>.Allocate(1); a.Add(x); let b: System.Collections.ArrayList<Counter&> = a; return 0",
+        "var a = System.Collections.ArrayList<readonly Counter&>(1); a.Add(x); let b: System.Collections.ArrayList<Counter&> = a; return 0",
     ] {
         let source = format!(
             "record Counter(Age: int)

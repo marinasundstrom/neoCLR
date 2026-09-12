@@ -21,7 +21,7 @@ func Main() -> int {
     let ok = System.Result.Ok<int>(42)
     let result: Result<int, string> = ok
     let holder = Holder(ok)
-    var results = System.Collections.ArrayList<Result<int, string>>.Allocate(1)
+    var results = System.Collections.ArrayList<Result<int, string>>(1)
     results.Add(ok)
     results[0] = System.Result.Error<string>("no")
     if let Error(_) = results[0] {} else { return -2 }

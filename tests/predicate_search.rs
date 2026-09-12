@@ -19,7 +19,7 @@ fn zero_match_is_distinct_from_absence_and_search_stops_at_first_match() {
     let result = program(
         r#"
 func Main() -> int {
-    var values = System.Collections.ArrayList<int>.Allocate(0)
+    var values = System.Collections.ArrayList<int>(0)
     values.Add(0)
     values.Add(42)
     var calls = 0
@@ -44,7 +44,7 @@ fn empty_reference_list_needs_no_default_element_and_calls_no_predicate() {
         r#"
 record Item(Value: int)
 func Main() -> int {
-    let values = System.Collections.ArrayList<Item&>.Allocate(0)
+    let values = System.Collections.ArrayList<Item&>(0)
     var calls = 0
     let predicate: System.Func<Item&, bool> = item => { calls = calls + 1; return true }
     if !values.Find(predicate).IsNone { return -1 }
@@ -65,7 +65,7 @@ fn reference_results_keep_heap_identity_and_survive_collection() {
         r#"
 record Item(Value: int)
 func Find() -> Option<Item&> {
-    var values = System.Collections.ArrayList<Item&>.Allocate(0)
+    var values = System.Collections.ArrayList<Item&>(0)
     values.Add(new Item(40))
     return values.Find(item => { item.Value = item.Value + 2; return true })
 }
@@ -91,7 +91,7 @@ fn predicate_search_captures_initial_buffer_and_returns_tested_value() {
     let result = program(
         r#"
 func Main() -> int {
-    var values = System.Collections.ArrayList<int>.Allocate(1)
+    var values = System.Collections.ArrayList<int>(1)
     values.Add(42)
     let found = values.Find(value => { values[0] = 7; values.Add(99); return true })
     return found match { Some(let value) => value, None => -1 }
@@ -108,7 +108,7 @@ fn predicates_are_checked_and_faults_keep_guest_trace() {
     let error = program(
         r#"
 func Main() -> int {
-    var values = System.Collections.ArrayList<int>.Allocate(0)
+    var values = System.Collections.ArrayList<int>(0)
     values.Add(0)
     return values.FindIndex(value => 1 / value > 0)
 }
@@ -124,7 +124,7 @@ func Main() -> int {
             .iter()
             .any(|f| f.function.name.contains("FindIndex"))
     );
-    assert!(frontend::compile("func Main() -> int { let values = System.Collections.ArrayList<int>.Allocate(0); return values.FindIndex(value => value) }").is_err());
+    assert!(frontend::compile("func Main() -> int { let values = System.Collections.ArrayList<int>(0); return values.FindIndex(value => value) }").is_err());
 }
 
 #[test]

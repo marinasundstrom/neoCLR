@@ -20,6 +20,27 @@ def adapt(text: str, name: str) -> str:
         text = text.split(marker)[0] + '.end\n'
         text = text.replace('; Value wrapper with coherent shared managed state. Copy() duplicates the sequence.',
                             '; Nominal class with shared managed state. Copy() duplicates the sequence.')
+    if name == 'ArrayList':
+        # Class constructors initialize the allocated receiver, never replace its identity.
+        for signature, capacity in [('()', 'ldc.i4 0'), ('(Int32 capacity)', 'ldarg capacity')]:
+            pattern = r'    \.method instance \.ctor' + re.escape(signature) + r' -> Void.*?    \.end'
+            body = f"""    .method instance .ctor{signature} -> Void
+        {capacity}
+        ldc.i4 0
+        blt Invalid
+        ldarg this
+        {capacity}
+        array.alloc T
+        ldc.i4 0
+        newobj System.Collections.ArrayListState<T>
+        stfld System.Collections.ArrayList<T>::State
+        ret
+    Invalid:
+        fault \"ArrayList capacity must be non-negative\"
+    .end"""
+            text, count = re.subn(pattern, lambda _: body, text, flags=re.S)
+            if count != 1:
+                raise ValueError('ArrayList constructor boundary changed')
     text = text.replace('.type internal ', '.type internal class ')
     text = re.sub(r'^\.type (System\.Collections\.ArrayList<T>)$', r'.type class \1', text, flags=re.M)
     text = text.replace('instance readonly byref ', 'instance ').replace('instance byref ', 'instance ')

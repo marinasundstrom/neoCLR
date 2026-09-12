@@ -1,5 +1,5 @@
 func Main() -> int {
-    var files = System.Collections.ArrayList<string>.Allocate(0)
+    var files = System.Collections.ArrayList<string>(0)
     files.Add("notes.txt")
     files.Add("café.neo")
     files.Add("demo.neo")

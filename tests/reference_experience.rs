@@ -40,14 +40,14 @@ fn value_element_edit_requires_writeback_but_reference_element_does_not() {
     let result = run(r#"
 record Product(Stock: int)
 func Main() -> int {
-    var values = System.Collections.ArrayList<Product>.Allocate(0)
+    var values = System.Collections.ArrayList<Product>(0)
     values.Add(Product(5))
     var detached = values[0]
     detached.Stock = 3
     if values[0].Stock != 5 { return 1 }
     values[0] = detached
     if values[0].Stock != 3 { return 2 }
-    var references = System.Collections.ArrayList<Product&>.Allocate(0)
+    var references = System.Collections.ArrayList<Product&>(0)
     references.Add(new Product(5))
     let shared = references[0]
     shared.Stock = 3
@@ -80,7 +80,7 @@ fn explicit_copy_is_independent_but_reference_elements_keep_identity() {
     let result = run(r#"
 record Product(Stock: int)
 func Main() -> int {
-    var values = System.Collections.ArrayList<int>.Allocate(8)
+    var values = System.Collections.ArrayList<int>(8)
     values.Add(10)
     let readonlyValues: readonly System.Collections.ArrayList<int>& = &values
     var copy = readonlyValues.Copy()
@@ -90,14 +90,14 @@ func Main() -> int {
     if values[0] != 10 || values.Count != 1 { return 2 }
     values.Add(40)
     if copy[1] != 30 { return 3 }
-    var refs = System.Collections.ArrayList<Product&>.Allocate(0)
+    var refs = System.Collections.ArrayList<Product&>(0)
     refs.Add(new Product(5))
     var copiedRefs = refs.Copy()
     copiedRefs[0].Stock = 3
     if refs[0].Stock != 3 { return 4 }
     copiedRefs[0] = new Product(9)
     if refs[0].Stock != 3 { return 5 }
-    var empty = System.Collections.ArrayList<Product&>.Allocate(0)
+    var empty = System.Collections.ArrayList<Product&>(0)
     var copiedEmpty = empty.Copy()
     copiedEmpty.Add(new Product(1))
     if empty.Count != 0 { return 6 }
@@ -144,7 +144,7 @@ fn catalog_lookup_preserves_identity_and_purchase_exhausts_exact_stock() {
     let result = run(&workflow_with_main(
         r#"
 func Main() -> int {
-    var products = System.Collections.ArrayList<Product&>.Allocate(0)
+    var products = System.Collections.ArrayList<Product&>(0)
     let product = new Product("Tea", 8, 3)
     products.Add(product)
     var notifications = ConsoleNotifications()

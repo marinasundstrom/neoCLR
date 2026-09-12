@@ -6,7 +6,7 @@
     .local System.Collections.ArrayList<Int32>& alias
     .local Int32 index
     ldc.i4 1
-    call System.Collections.ArrayList<Int32>::Allocate(Int32)
+    newobj instance System.Collections.ArrayList<Int32>::.ctor(Int32)
     stloc values
     ldloca values
     stloc alias

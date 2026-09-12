@@ -26,7 +26,7 @@ func Main() -> int {
     let array = new Counter&[1] { first }
     array[0] = second
     array[0].Age = 13
-    var list = System.Collections.ArrayList<Counter&>.Allocate(1)
+    var list = System.Collections.ArrayList<Counter&>(1)
     list.Add(first)
     list[0] = second
     list[0].Age = 14

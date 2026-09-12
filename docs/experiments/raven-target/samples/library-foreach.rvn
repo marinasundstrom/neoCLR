@@ -10,7 +10,7 @@ func First(values: List<int>) -> int {
 }
 
 func Main() {
-    let values = ArrayList<int>.Allocate(0)
+    let values = ArrayList<int>()
     values.Add(41)
     values.Add(42)
     for value in values {

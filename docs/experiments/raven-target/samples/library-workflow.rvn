@@ -29,7 +29,7 @@ func Process(product: int) -> Option<System.Void> {
 }
 
 func Main() {
-    let products = ArrayList<int>.Allocate(0)
+    let products = ArrayList<int>()
     products.Add(7)
     products.Add(8)
     products.Add(99)

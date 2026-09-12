@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-12
 
+- Replaced ArrayList.Allocate with parameterless and initial-capacity constructors,
+  including the Raven class projection. Both start empty; default capacity is zero,
+  storage grows on demand and negative capacity faults. Updated callers and samples;
+  no compatibility alias is retained. Raven also exposes Capacity for inspection.
+
 - Added the runtime-library Propagatable<TSelf,TOutput,TResidual> extraction interface,
   implemented by Result and Option with readonly receivers and conditional output
   initialization. Added carrier FromResidual factories, including Option's Void residual.

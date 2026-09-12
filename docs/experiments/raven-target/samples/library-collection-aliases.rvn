@@ -3,7 +3,7 @@ import System.Collections.*
 import System.Console.*
 
 func Make() -> List<int> {
-    let values = ArrayList<int>.Allocate(0)
+    let values = ArrayList<int>()
     values.Add(41)
     values.Add(42)
     return values

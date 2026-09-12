@@ -15,7 +15,9 @@ static class CollectionDeclarations
                 void Add(T value);
             }
             public class ArrayList<T> : List<T> {
-                public static ArrayList<T> Allocate(int capacity) => default;
+                public ArrayList() { }
+                public ArrayList(int capacity) { }
+                public int Capacity => default;
                 public int Count => default;
                 public T this[int index] { get => default; set { } }
                 public void Add(T value) { }

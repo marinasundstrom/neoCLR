@@ -14,7 +14,7 @@ func Main() -> int {
     let age: readonly int& = GetAge(counter)
     let view = Observe(counter)
     let holder = Holder(view)
-    var values = System.Collections.ArrayList<readonly Counter&>.Allocate(1)
+    var values = System.Collections.ArrayList<readonly Counter&>(1)
     values.Add(view)
     counter.Age = 42
     if !typeof(readonly Counter&).IsReadOnly { return -1 }

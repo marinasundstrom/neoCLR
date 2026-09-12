@@ -153,6 +153,20 @@ static class UnionImport
                         var constructor = (MethodReference)instruction.Operand;
                         var constructorDefinition = constructor.Resolve() ?? throw new InvalidDataException("Unresolved constructor.");
                         if (constructorDefinition.Module != library.MainModule) throw new InvalidDataException("Only admitted library constructors supported.");
+                        if (collectionProfile && CollectionBindings.Type(constructor.DeclaringType) == CollectionBindings.ArrayList)
+                        {
+                            if (!constructorDefinition.IsConstructor || !constructorDefinition.IsPublic || !constructor.HasThis
+                                || constructor.ExplicitThis || constructor.HasGenericParameters || constructorDefinition.HasGenericParameters
+                                || constructor.ReturnType.MetadataType != MetadataType.Void
+                                || constructor.CallingConvention != MethodCallingConvention.Default
+                                || constructor.Parameters.Count > 1 || constructor.Parameters.Any(p => p.ParameterType.MetadataType != MetadataType.Int32)
+                                || !constructor.Parameters.Select(p => p.ParameterType.FullName).SequenceEqual(constructorDefinition.Parameters.Select(p => p.ParameterType.FullName)))
+                                throw new InvalidDataException("Unsupported collection constructor.");
+                            if (constructor.Parameters.Count == 1) Expect("Int32");
+                            Push(new(CollectionBindings.ArrayList));
+                            code.AppendLine($"newobj instance {CollectionBindings.ArrayList}::.ctor({(constructor.Parameters.Count == 1 ? "Int32" : "")})");
+                            break;
+                        }
                         var construction = Construct(constructor, constructorDefinition);
                         for (var n = construction.Arguments.Length - 1; n >= 0; n--) Expect(construction.Arguments[n]);
                         Push(new(construction.Result));

@@ -1639,6 +1639,17 @@ while existing .NET propagation tests still pass. Import checks reject malformed
 contracts and unsupported thrown values. Option/Void projection and refreshed tools
 remain open; continuation was not treated as approval of a permanent protocol design.
 
+## 57. Familiar ArrayList construction — recorded 2026-09-12
+
+**Author direction.** Put desired initial capacity in the constructor and provide a
+parameterless constructor, resembling .NET List. The assistant proposed retaining
+Allocate for compatibility; the author corrected this: “No need to keep compat”.
+
+**Action.** Replaced Allocate with constructors and migrated active examples/tests.
+Default construction starts empty with zero capacity; explicit capacity reserves storage.
+The Raven projection uses ordinary class construction. Historical published examples
+retain their recorded API. Validation includes capacity, growth and negative arguments.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

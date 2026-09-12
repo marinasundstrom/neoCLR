@@ -185,7 +185,7 @@ fn readonly_receiver_contracts_reject_mutation_and_interface_mismatches() {
         "record Counter(Age: int) { readonly func Bad() -> () { this.Age = 9 } }\nfunc Main() -> () { let x = new Counter(1); x.Bad() }",
         "record Counter(Age: int) { func Write() -> () { this.Age = 9 }; readonly func Bad() -> () { this.Write() } }\nfunc Main() -> () { let x = new Counter(1); x.Bad() }",
         "interface View { readonly func Read() -> int }\nrecord Counter(Age: int): View { func Read() -> int { return this.Age } }\nfunc Main() -> int { let x = new Counter(1); let v: View& = x; return v.Read() }",
-        "func Bad(readonly x: System.Collections.ArrayList<int>&) -> () { x.Add(1) }\nfunc Main() -> () { var x = System.Collections.ArrayList<int>.Allocate(1); Bad(&x) }",
+        "func Bad(readonly x: System.Collections.ArrayList<int>&) -> () { x.Add(1) }\nfunc Main() -> () { var x = System.Collections.ArrayList<int>(1); Bad(&x) }",
     ] {
         assert!(frontend::compile(source).is_err(), "accepted {source}");
     }
@@ -284,7 +284,7 @@ func Read(readonly values: System.Collections.List<Counter&>&) -> int {
     return values[0].Age
 }
 func Main() -> int {
-    var values = System.Collections.ArrayList<Counter&>.Allocate(1)
+    var values = System.Collections.ArrayList<Counter&>(1)
     values.Add(new Counter(1))
     let copy = values
     if copy.Count != 1 || copy.Capacity != 1 { return -1 }

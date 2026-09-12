@@ -47,11 +47,11 @@ func MakeRestock(product: Product&) -> System.Func<int, void> {
 }
 
 func Main() -> int {
-    var products = System.Collections.ArrayList<Product&>.Allocate(0)
+    var products = System.Collections.ArrayList<Product&>(0)
     products.Add(new Product("Coffee", 12, 5))
     products.Add(new Product("Tea", 8, 3))
     var notifications = ConsoleNotifications()
-    var receipts = System.Collections.ArrayList<Receipt>.Allocate(0)
+    var receipts = System.Collections.ArrayList<Receipt>(0)
     let Some(product) = FindProduct(&products, "Coffee") else { return 5 }
     let restock = MakeRestock(product)
     let Ok(receipt) = Purchase(product, 2, &notifications) else { return 1 }

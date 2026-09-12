@@ -1,7 +1,7 @@
 import System.Console.*
 
 func Main() -> int {
-    var original = System.Collections.ArrayList<int>.Allocate(2)
+    var original = System.Collections.ArrayList<int>(2)
     original.Add(10)
     var copy = original
     copy[0] = 20
