@@ -6,6 +6,14 @@ multiple backends, not a serialization of interpreter-only execution state. Nati
 artifacts and exports need additional target/linkage information; their schema remains
 open. Hosting consumes these contracts and does not define the execution modes.
 
+## Planned Raven integration experiment
+
+The [Raven target experiment](raven-target-experiment.md), planned 2026-09-12, tests
+an existing compiler against neoCLR's metadata, binary artifact path and own System
+library. Begin by inspecting Raven's emitter before selecting an encoding. This is
+planned source/compiler integration with deliberate migration differences, especially
+Result-based errors; it is not a promise to run unchanged .NET assemblies.
+
 ## Guiding constraint
 
 neoIL does not have to mimic CLR assembly syntax. The output should retain familiar

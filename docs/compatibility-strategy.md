@@ -23,6 +23,14 @@ artifacts may break, but the break should be visible and mechanically diagnosabl
 This keeps migration incremental: familiar code can target the stable common subset,
 while language authors can opt into lower-level or more expressive neoCLR services.
 
+## Planned Raven integration experiment
+
+The [Raven target experiment](raven-target-experiment.md), planned 2026-09-12, tests
+an existing compiler against neoCLR's metadata, binary artifact path and own System
+library. Begin by inspecting Raven's emitter before selecting an encoding. This is
+planned source/compiler integration with deliberate migration differences, especially
+Result-based errors; it is not a promise to run unchanged .NET assemblies.
+
 ## Typed operations and deliberate low-level access
 
 neoCLR retains typed signatures, values and ordinary checked operations alongside

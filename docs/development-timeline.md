@@ -1054,6 +1054,34 @@ binary compatibility commitment was inferred from the author's statement.
 assessment before the optional compiler experiment. Preserved the previous findings and
 recorded why the priority changed. No runtime or language implementation changed.
 
+### 29. Make an existing Raven compiler target the runtime and its library
+
+Recorded 2026-09-12.
+
+**Author's goal:** C# and Raven should target neoCLR with limited adaptation because
+its runtime interface remains similar to CLR. The author clarified that exact exception
+compatibility is not required: this is a new platform, and migrated code should adapt
+expected failures to Result instead of centering its design on exceptions.
+
+**Assistant's response:** Distinguished source targeting from unchanged binary execution
+and separated ABI concerns from metadata, IL, library and behavioral contracts. Identified
+cleanup/Fault boundaries and exception-centered API migration as explicit design work.
+
+**Author's proposed experiment:** Address the lack of binary metadata support and add a
+neoCLR target to the existing Raven compiler. It should compile against neoCLR's runtime
+surface and load neoCLR's own library. The author then requested documentation and a
+new branch for this experiment.
+
+**Assistant's proposed order:** Inspect Raven's backend, define the artifact/library
+contract from actual dependencies, then compile and run a Console HelloWorld before
+expanding to user-defined types and Result. Raven's backend details are not yet verified.
+
+**Action:** Created `codex/raven-neoclr-target` from `64024d6` and documented the
+[experiment](raven-target-experiment.md), including the first acceptance milestone,
+binary-format choices and scope limits. Linked it from compatibility and format guides.
+No Raven/compiler or binary-loader implementation was performed in this documentation
+slice; no new reference/value default was selected.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

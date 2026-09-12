@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-12
 
+- Documented the Raven target/binary-artifact experiment on its own branch: inspect
+  the existing compiler, choose an evidence-backed format/library contract, and
+  compile/run HelloWorld against neoCLR's own System library. Recorded deliberate
+  Result-based migration differences and acceptance criteria; no backend or binary
+  loader implementation is included yet.
+
 - Added a bounded reference-defaults architecture evaluation comparing the order
   workflow under current, shared type-default and language-only models. Includes
   illustrative source/lowering, .NET comparison, migration costs and a proposed
