@@ -632,3 +632,12 @@ Ten new regressions and 108 related tests pass. The collection emission probe st
 correctly rejects runtime import: generic classes, storage-conversion admission and
 actual library adaptation remain ahead. This does not claim the shared-library demo
 is complete or change the deferred status of union propagation.
+
+## Closed generic class runtime support (2026-09-12)
+
+The [generic class slice](raven-interface-contract.md#closed-generic-nominal-classes-2026-09-12)
+admits generic nominal class definitions and executes closed constructors, fields and
+interface contracts through existing substitution. No Raven or instruction-set change
+was needed. The next shared-library blockers are array/default storage and implicit
+reference conversions/import admission. This remains runtime groundwork; the Raven
+collection probe is not yet executable and union propagation stays deferred.

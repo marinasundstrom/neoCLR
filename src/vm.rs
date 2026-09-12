@@ -474,12 +474,11 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         if definition.is_reference_type
             && (definition.representation != Representation::Record
                 || definition.base.is_some()
-                || !definition.generic_parameters.is_empty()
                 || definition.is_abstract
                 || definition.enum_info.is_some())
         {
             return Err(Fault::new(
-                "class semantics currently require non-generic records without inheritance",
+                "class semantics currently require records without inheritance",
             ));
         }
     }

@@ -3,7 +3,7 @@
 Recorded 2026-09-12. This is the contract and admission-probe slice toward the
 [shared runtime library demo](raven-target-experiment.md#desired-demo-the-existing-runtime-library-through-raven-2026-09-12).
 The candidate collection declarations compile through Raven; collection execution is not
-yet implemented. Nominal non-generic interface dispatch now has runtime support below.
+yet implemented. Nominal interface dispatch, including closed generic classes, now has runtime support below.
 The existing Neo interface/collection path remains available and unchanged.
 
 ## The library surface to preserve
@@ -77,7 +77,7 @@ The preferred path is runtime adaptation under the existing compiler metadata su
 | Layer | Evidence and missing work |
 | --- | --- |
 | Raven compilation | Candidate class/interface declarations bind and emit with standard calls; tested without compiler changes at Raven 5b773ae3536f52ef077c8897867950249d6dde90. |
-| Nominal classes | Nominal classes now admit interface conformance and dispatch. Generic parameters, class inheritance and virtual/byref class receivers remain unsupported. |
+| Nominal classes | Nominal classes now admit generic owner parameters, interface conformance and dispatch. Class inheritance, methods with their own type parameters on nominal classes and virtual/byref class receivers remain unsupported. |
 | Existing interface runtime | Legacy views remain unchanged. Ordinary interface object references now support explicit casts, typed slots/fields, GC and dispatch; implicit storage conversions and interface arrays/indirect access remain later work. |
 | Library | ArrayList<T> is still a value wrapper holding shared state; ArrayIterator<T> is an explicitly heap-allocated legacy record. Adapt actual implementations after receiver/storage support exists. |
 | Import bridge | UnionImport deliberately rejects these collection types and emits no executable. Candidate declarations are isolated from the working core surface. |
@@ -157,3 +157,31 @@ allocation type; identity comparison ignores the view. Ten new tests and the exi
 class/interface/default/no-result/initialization suites pass (118 focused tests total).
 The next library prerequisites are closed generic nominal classes and the associated
 import/storage conversions, before adapting ArrayList and its iterator.
+
+## Closed generic nominal classes (2026-09-12)
+
+The runtime now admits `.type class Cell<T>` using the existing generic metadata and
+substitution machinery. Constructed owners such as `Cell<Int32>` retain ordinary class
+reference semantics. Constructor parameters, fields, instance methods and inherited
+interface contracts substitute the same owner arguments. Different instantiations remain
+distinct: a `Cell<Int32>` cannot call a `Cell<Boolean>` method or cast to an unimplemented
+`Read<Boolean>` interface. Existing generic constraints remain enforced.
+
+This fills an implementation gap against the .NET generic-definition/constructed-type
+model already researched in [generic source records](generic-source-records.md#net-comparison-and-boundaries).
+It extends the class/interface contract above without a new opcode, erased Object payload,
+per-instantiation source declaration or Raven compiler change. Reusing substitution keeps
+owner and method parameters separate. This makes no claim about CLR JIT code sharing or
+performance; methods with their own type parameters on nominal classes, variance and class inheritance remain outside the
+slice. `Void` remains neoCLR's deliberate supported generic argument, distinct from a
+method that returns no stack value.
+
+Tests in `tests/generic_classes.rs` cover constructor dispatch, interface mutation,
+closed-type rejection, constraints, typed null defaults, unavailable native layout, Void
+payloads and nested class references surviving return and GC after an artifact round trip.
+Constructor allocation still initializes fields before entering the body. Existing
+unsupported defaults, including String and array fields, still fault; supplying a
+constructor argument does not bypass this rule. The array/default storage contract and
+implicit reference assignability/import support are therefore the next collection
+prerequisites. The candidate Raven collection probe remains compile-only and rejected
+by the importer. The existing Neo collection implementation is unchanged.

@@ -64,9 +64,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   non-generic nominal-class interface conformance, checked castclass views, inherited
   callvirt dispatch and identity-preserving GC-rooted interface fields/returns. Supports
   no-result interface contracts with exact return-mode matching and typed null faults.
-  Ten new regressions and 108 related tests pass. Generic classes, implicit storage
+  Ten new regressions and 108 related tests pass. Implicit storage
   conversions and collection import/adaptation remain unfinished; legacy borrowed
-  interface behavior is retained.
+  interface behavior is retained. Added closed generic nominal classes
+  using existing owner substitution for constructors, fields and interface dispatch.
+  Nine additional regressions cover distinct instantiations, constraints, Void payloads,
+  typed defaults and nested references surviving GC/artifact round trips; 96 focused
+  tests pass for this generic-class slice. Constructor field-default
+  limits (including String/arrays) remain; collection import/adaptation is still pending.
 
 - Began nominal class reference semantics: `.type class` uses managed heap handles in
   ordinary class-typed storage, while managed byrefs still address slots. Assignment,

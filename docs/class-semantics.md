@@ -40,9 +40,10 @@ performance improvement. A separate object handle avoids rewriting every importe
 signature as a managed byref. The cost is migrating the existing runtime's assumptions
 about copying, construction, dispatch and library contracts.
 
-The current class subset is non-generic record-shaped objects with fields, direct instance
-methods and constructors, plus public implicit interface implementations. Inheritance,
-abstract classes, class virtual dispatch and generic classes remain unsupported.
+The current class subset is record-shaped objects, including closed generic instances,
+with fields, direct instance methods and constructors, plus public implicit interface
+implementations. Inheritance, abstract classes, class virtual dispatch and methods with
+their own type parameters on nominal classes remain unsupported.
 See the [nominal interface groundwork](raven-interface-contract.md#implemented-nominal-interface-groundwork-2026-09-12)
 for object-reference interface views, no-result contracts and remaining conversion limits. Existing legacy value-model
 functionality in those areas remains available. Class defaults now produce typed null references, and `initobj` resets a class slot.
