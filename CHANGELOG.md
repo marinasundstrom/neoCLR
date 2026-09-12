@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Projected the existing Int32.Divide Result API into Raven, including division-by-zero
+  and overflow predicates, matching and propagation. Added signed/boundary examples,
+  checked-signature coverage and completion. The helper remains an experimental
+  API extension rather than a matching .NET member; arithmetic/runtime semantics and
+  installed tools are unchanged.
+
 - Exposed Int32.Parse through Raven with its existing Result<int,Int32ParseError>
   contract, typed matches, propagation and error predicates. Extended the shared
   carrier catalog without changing existing Ok<int> handling. Added boundary and

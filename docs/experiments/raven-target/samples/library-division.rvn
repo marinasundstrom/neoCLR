@@ -1,0 +1,26 @@
+import System.*
+import System.Console.*
+
+func DivideInput(dividend: int, divisor: int) -> Result<int, IntegerDivisionError> {
+    let value = Int32.Divide(dividend, divisor)?
+    WriteLine("Divided")
+    return Result<int, IntegerDivisionError>(Result.Ok<int>(value))
+}
+func ShowDivision(result: Result<int, IntegerDivisionError>) {
+    match result {
+        Result.Ok<int> ok => WriteLine(ok.Value)
+        Result.Error<IntegerDivisionError> error => {
+            if error.Value.IsDivisionByZero { WriteLine("Division by zero") }
+            else if error.Value.IsOverflow { WriteLine("Overflow") }
+        }
+    }
+}
+func Main() {
+    ShowDivision(DivideInput(7, 2))
+    ShowDivision(DivideInput(-7, 2))
+    ShowDivision(DivideInput(7, -2))
+    ShowDivision(DivideInput(0, 2))
+    ShowDivision(DivideInput(-2147483648, 1))
+    ShowDivision(DivideInput(1, 0))
+    ShowDivision(DivideInput(-2147483648, -1))
+}

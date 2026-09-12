@@ -6,6 +6,7 @@ static class ResultBindings
 {
     public const string ReadError = "System.IO.FileReadError", WriteError = "System.IO.FileWriteError";
     const string Int32Ok = "System.Result.Ok<Int32>";
+    public const string DivisionError = "System.IntegerDivisionError";
     public const string ParseError = "System.Int32ParseError";
     const string StringOk = "System.Result.Ok<String>", VoidOk = "System.Result.Ok<Void>";
     public const string SliceError = "System.Text.Utf8SliceError";
@@ -18,9 +19,10 @@ static class ResultBindings
         [ReadError] = ["InvalidLimit", "InvalidPath", "NotFound", "AccessDenied", "NotRegularFile", "TooLarge", "ReadFailed", "InvalidUtf8"],
         [WriteError] = ["InvalidLimit", "InvalidPath", "NotFound", "AccessDenied", "NotRegularFile", "TooLarge", "WriteFailed"],
         [SliceError] = ["OutOfRange", "InvalidBoundary"],
-        [ParseError] = ["InvalidFormat", "Overflow"]
+        [ParseError] = ["InvalidFormat", "Overflow"],
+        [DivisionError] = ["DivisionByZero", "Overflow"]
     };
-    static readonly Carrier[] Carriers = [new("String", ReadError), new("Void", WriteError), new("String", SliceError), new("Int32", ParseError)];
+    static readonly Carrier[] Carriers = [new("String", ReadError), new("Void", WriteError), new("String", SliceError), new("Int32", ParseError), new("Int32", DivisionError)];
     static IEnumerable<string> Errors => ErrorCases.Keys;
     static IEnumerable<string> Cases(string error) => ErrorCases[error];
     public static string Declarations => string.Join(" ", Errors.Select(error => {

@@ -583,3 +583,6 @@ The [lexical Path projection](../../raven-path-api.md) adds `Combine` and
 
 The [Int32 parsing projection](../../raven-parsing-api.md) includes `--parsing`
 probe/verification, a saved-project example and optional editor completion checks.
+
+The [integer division example](../../raven-division-api.md) covers recoverable zero
+and overflow errors. Numeric completion checks under `--parsing` include Divide.

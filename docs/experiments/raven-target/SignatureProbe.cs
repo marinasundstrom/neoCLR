@@ -87,6 +87,15 @@ static class SignatureProbe
         pathCall = Reference(combine, pathType);
         pathCall.HasThis = true;
         Reject("Path receiver mismatch", () => PathBindings.Bind(pathCall, combine));
+        var integerType = module.GetType("System.Int32");
+        var divide = integerType.Methods.Single(m => m.Name == "Divide");
+        var divisionCall = Reference(divide, integerType);
+        Check("Division Result mapping", Int32Bindings.Bind(divisionCall, divide)?.Result == "System.Result<Int32,System.IntegerDivisionError>");
+        divisionCall.ReturnType = module.TypeSystem.Int32;
+        Reject("Division return mismatch", () => Int32Bindings.Bind(divisionCall, divide));
+        divisionCall = Reference(divide, integerType);
+        divisionCall.Parameters[1].ParameterType = module.TypeSystem.String;
+        Reject("Division argument mismatch", () => Int32Bindings.Bind(divisionCall, divide));
         var text = JsonSerializer.Serialize(checks, new JsonSerializerOptions { WriteIndented = true });
         File.WriteAllText(Path.Combine(output, "signature-checks.json"), text);
         Console.WriteLine(text);

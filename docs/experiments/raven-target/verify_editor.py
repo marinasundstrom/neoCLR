@@ -161,7 +161,7 @@ try:
             'position': {'line': 1, 'character': len('    ' + access)}, 'context': {'triggerKind': 1}}, True))
         items = result if isinstance(result, list) else result['items']
         labels = sorted({item['label'] for item in items})
-        if not any(label == 'Parse' or label.startswith('Parse(') for label in labels):
+        if any(not any(label == name or label.startswith(name + '(') for label in labels) for name in ('Parse', 'Divide')):
             raise AssertionError('Missing target Parse API: ' + str(labels))
         if any(label == 'TryParse' or label.startswith('TryParse(') for label in labels):
             raise AssertionError('Host TryParse leaked: ' + str(labels))
