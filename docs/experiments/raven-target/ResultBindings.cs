@@ -5,6 +5,8 @@ using System.Text;
 static class ResultBindings
 {
     public const string ReadError = "System.IO.FileReadError", WriteError = "System.IO.FileWriteError";
+    const string Int32Ok = "System.Result.Ok<Int32>";
+    public const string ParseError = "System.Int32ParseError";
     const string StringOk = "System.Result.Ok<String>", VoidOk = "System.Result.Ok<Void>";
     public const string SliceError = "System.Text.Utf8SliceError";
     public const string Slice = "System.Result<String,System.Text.Utf8SliceError>";
@@ -15,14 +17,18 @@ static class ResultBindings
     static readonly Dictionary<string, string[]> ErrorCases = new() {
         [ReadError] = ["InvalidLimit", "InvalidPath", "NotFound", "AccessDenied", "NotRegularFile", "TooLarge", "ReadFailed", "InvalidUtf8"],
         [WriteError] = ["InvalidLimit", "InvalidPath", "NotFound", "AccessDenied", "NotRegularFile", "TooLarge", "WriteFailed"],
-        [SliceError] = ["OutOfRange", "InvalidBoundary"]
+        [SliceError] = ["OutOfRange", "InvalidBoundary"],
+        [ParseError] = ["InvalidFormat", "Overflow"]
     };
-    static readonly Carrier[] Carriers = [new("String", ReadError), new("Void", WriteError), new("String", SliceError)];
+    static readonly Carrier[] Carriers = [new("String", ReadError), new("Void", WriteError), new("String", SliceError), new("Int32", ParseError)];
     static IEnumerable<string> Errors => ErrorCases.Keys;
     static IEnumerable<string> Cases(string error) => ErrorCases[error];
-    public static string Declarations => string.Join(" ", Errors.Select(error =>
-        "namespace " + error[7..error.LastIndexOf('.')] + " { public struct " + error.Split('.').Last() + " { "
-        + string.Join(" ", Cases(error).Select(name => "public bool Is" + name + " => false;")) + " } }"));
+    public static string Declarations => string.Join(" ", Errors.Select(error => {
+        var declaration = "public struct " + error.Split('.').Last() + " { "
+            + string.Join(" ", Cases(error).Select(name => "public bool Is" + name + " => false;")) + " }";
+        var separator = error.LastIndexOf('.');
+        return separator == 6 ? declaration : "namespace " + error[7..separator] + " { " + declaration + " }";
+    }));
     public static bool IsType(string type) => type is StringOk || Carriers.Any(c => type == c.Type || type == c.Error)
         || Errors.Any(e => type == $"System.Result.Error<{e}>");
     public static string? Type(TypeReference type)
@@ -30,7 +36,7 @@ static class ResultBindings
         if (!type.IsValueType || !RuntimeSignatures.IsCore(type.Scope)) return null;
         if (Errors.Contains(type.FullName)) return type.FullName;
         if (type is not GenericInstanceType g) return null;
-        string? Argument(TypeReference t) => t.MetadataType == MetadataType.String ? "String"
+        string? Argument(TypeReference t) => t.MetadataType == MetadataType.Int32 ? "Int32" : t.MetadataType == MetadataType.String ? "String"
             : t.FullName == "System.Void" && t.IsValueType && RuntimeSignatures.IsCore(t.Scope) ? "Void"
             : Errors.Contains(t.FullName) && t.IsValueType && RuntimeSignatures.IsCore(t.Scope) ? t.FullName : null;
         var args = g.GenericArguments.Select(Argument).ToArray();
@@ -40,6 +46,9 @@ static class ResultBindings
     public sealed record Binding(string Name, string[] Arguments, string Result, int OutArgument = -1, string? Instruction = null);
     static (string[] Args, string Result) Signature(MethodReference reference, MethodDefinition definition)
         => RuntimeSignatures.Match(reference, definition, type => Type(type)
+            ?? (type is GenericInstanceType integerOk && integerOk.ElementType.FullName == "System.Result/Ok`1"
+                && integerOk.GenericArguments.Count == 1 && integerOk.GenericArguments[0].MetadataType == MetadataType.Int32
+                && type.IsValueType && RuntimeSignatures.IsCore(type.Scope) ? Int32Ok : null)
             ?? (type.FullName == "System.Result/Ok`1<System.Void>" && type.IsValueType && RuntimeSignatures.IsCore(type.Scope)
                 && type is GenericInstanceType g && g.GenericArguments[0].IsValueType
                 && RuntimeSignatures.IsCore(g.GenericArguments[0].Scope) ? VoidOk : null));

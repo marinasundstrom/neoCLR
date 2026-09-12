@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Exposed Int32.Parse through Raven with its existing Result<int,Int32ParseError>
+  contract, typed matches, propagation and error predicates. Extended the shared
+  carrier catalog without changing existing Ok<int> handling. Added boundary and
+  unsafe-extraction checks, a saved-project sample and completion coverage. Documented
+  disabling Raven's .NET parsing projections for this target. No parser semantics,
+  Raven compiler or installed SDK/VSIX changes; other numeric/error APIs remain pending.
+
 - Projected existing Path.Combine/GetFileName through the Raven target with a shared
   declaration/binding catalog, lexical-path sample, signature rejection checks and
   editor completion coverage. Host path semantics remain unchanged; Windows execution

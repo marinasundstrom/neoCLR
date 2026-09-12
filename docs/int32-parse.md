@@ -57,3 +57,6 @@ specific error type. Their malformed-input output is now `InvalidFormat`.
 Reassemble applications and System together: the former Result<Int32,Error> return
 contract and native Error payload no longer apply. No parallel Typed API is provided.
 JSON format 4 remains unchanged; the public library contract is intentionally breaking.
+
+The experimental [Raven projection](raven-parsing-api.md) supports typed matching
+and propagation with this error carrier, with executable samples and checks.

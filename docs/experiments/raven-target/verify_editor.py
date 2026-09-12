@@ -8,6 +8,7 @@ import threading
 
 project = Path(sys.argv[1]).resolve()
 collections = '--collections' in sys.argv[2:]
+parsing = '--parsing' in sys.argv[2:]
 files = '--files' in sys.argv[2:]
 strings = '--strings' in sys.argv[2:]
 server = json.loads((project / '.vscode/settings.json').read_text())['raven.languageServerPath']
@@ -152,6 +153,19 @@ try:
             if any(label == name or label.startswith(name + '(') for label in labels for name in forbidden):
                 raise AssertionError('Host String API leaked: ' + str(labels))
             results[access] = labels
+    if parsing:
+        access = 'System.Int32.'
+        text = 'func Main() {\n    ' + access + '\n}'
+        send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': 13}, 'contentChanges': [{'text': text}]})
+        result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
+            'position': {'line': 1, 'character': len('    ' + access)}, 'context': {'triggerKind': 1}}, True))
+        items = result if isinstance(result, list) else result['items']
+        labels = sorted({item['label'] for item in items})
+        if not any(label == 'Parse' or label.startswith('Parse(') for label in labels):
+            raise AssertionError('Missing target Parse API: ' + str(labels))
+        if any(label == 'TryParse' or label.startswith('TryParse(') for label in labels):
+            raise AssertionError('Host TryParse leaked: ' + str(labels))
+        results['Int32'] = labels
     receive(send('shutdown', None, True))
     send('exit', None)
     print(json.dumps(results, indent=2))

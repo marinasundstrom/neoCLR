@@ -580,3 +580,6 @@ contains commands and the remaining error-carrier limits.
 
 The [lexical Path projection](../../raven-path-api.md) adds `Combine` and
 `GetFileName`, with a saved-project sample and completion checks under `--files`.
+
+The [Int32 parsing projection](../../raven-parsing-api.md) includes `--parsing`
+probe/verification, a saved-project example and optional editor completion checks.
