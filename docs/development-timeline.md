@@ -1813,6 +1813,26 @@ succeeded for `edae382`; the [live site](https://marinasundstrom.github.io/neoCL
 was opened and its HTML/CSS/icon bytes verified against the build. Website publication
 does not publish or tag the runtime/Raven release candidate.
 
+## 2026-09-13 — Publish the runtime/Raven preview
+
+**Author direction.** Continue with the release, following the earlier request to
+ship the runtime and neoIL samples together with Raven examples, the special Raven
+distribution and documentation.
+
+**Assistant actions.** Selected Preview 4 and prepared its versioned source commit
+`c135659`. CI exposed a stale release-script assumption about the old stdout return
+suffix; the check was corrected to request diagnostic results on stderr, retaining
+its environment/clock/file assertions. Rebuilt the runtime distribution, tested all
+ten package suites, and waited for the six exact-source CI jobs to pass. Published
+Raven's experimental branch so the compiler revision is accessible, without changing
+Raven main or making a normal Raven/Marketplace release.
+
+**Outcome.** [Preview 4](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.4)
+was published with the runtime, SDK, VSIX, source, notices, checksums and validation
+evidence. The website now links the release; the local demo uses the released build.
+The [validation record](preview-4-validation.md) distinguishes source platform checks
+from macOS arm64 binary support and preserves the POC's limitations.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

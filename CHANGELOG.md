@@ -6,6 +6,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-09-13
+
+- Published Preview 4 at c135659 with eight runtime/Raven/source/validation assets
+  after all six exact-source CI jobs and ten package suites passed. Updated the
+  website download link, current installation guide and published validation record;
+  published release notes and the Preview 4 changelog section remain frozen.
+
 ## 0.1.0-preview.4 — 2026-09-13
 
 Runtime/Raven preview: see [release notes](docs/preview-4-release-notes.md) for the

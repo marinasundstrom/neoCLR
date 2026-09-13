@@ -1,5 +1,10 @@
 # Test Raven targeting neoCLR in VS Code
 
+For the published Preview 4 assets and portable installation steps, start with the
+[release instructions](../../preview-4-release-notes.md#start-here). They include the
+runtime bundle, matching Raven SDK/VSIX and companion notices. The machine-specific
+setup below is a prepared installation of the same release.
+
 This setup provides project-backed completion against neoCLR's declaration assembly.
 Dedicated neoCLR tasks now compile the saved project, import it, verify it and run it. The normal Raven
 **Build**, **Run** and **Debug** buttons do not yet implement that target pipeline.
@@ -15,7 +20,7 @@ not published releases. The global SDK selection remains unchanged.
 Open the prepared folder:
 
 ```sh
-code --new-window "$HOME/.neoclr/experiments/runtime-raven-candidate-20260913-2/demo"
+code --new-window "$HOME/.neoclr/experiments/preview-4/demo"
 ```
 
 1. Run **Developer: Reload Window** if VS Code was open during the update.
@@ -42,7 +47,7 @@ and the [match matrix](../../raven-match-matrix.md) for the supported scope.
 Terminal equivalent for the installed bundle:
 
 ```sh
-cd "$HOME/.neoclr/experiments/runtime-raven-candidate-20260913-2"
+cd "$HOME/.neoclr/experiments/preview-4"
 python3 tools/run_project.py demo/Demo.rvnproj --bridge tools/bridge/Probe.dll --system lib/System.neoil --runtime bin/neoclr
 ```
 

@@ -1,7 +1,7 @@
 # Runtime and Raven preview
 
-This is the release guide under preparation, not a publication announcement. The
-preview has two entry points: neoCLR directly through neoIL, and the experimental
+Preview 4 is [available on GitHub](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.4). This
+release has two entry points: neoCLR directly through neoIL, and the experimental
 Raven toolchain compiling programs against neoCLR's own runtime library.
 
 The purpose is to demonstrate that the platform's Result/Option error flow, generic
@@ -95,10 +95,9 @@ history; new Raven work does not require migrating that frontend.
 
 ## Validation and release status
 
-The current local candidate combines the `.6` Raven tools with the updated runtime,
-neoIL samples and attribution. Ten outside-checkout package suites passed; the broader
-runtime test run passed after correcting stale String-default assertions. See
-[candidate evidence](experiments/raven-target/candidate-validation.json) for exact
-revisions, checksums and the corrections. This is local macOS arm64 evidence, not a
-claim of passing final cross-platform CI. Final version selection, exact-source CI
-and publication remain; follow the [release procedure](experiments/raven-target/RELEASING.md).
+Preview 4 passed all six exact-source CI jobs (Linux, macOS and Windows on stable
+Rust and Rust 1.85), plus ten package suites using the macOS arm64 bundle outside
+both development checkouts. See [release validation](preview-4-validation.md) and
+the release's manifest/checksums for the exact revisions and artifacts. Source CI
+does not imply prebuilt Raven toolchain support on other hosts. The
+[release procedure](experiments/raven-target/RELEASING.md) describes repeat builds.
