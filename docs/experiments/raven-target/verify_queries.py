@@ -24,6 +24,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-queries-') as temporary:
     command = [sys.executable, str(bridge / 'run_project.py'), str(root / 'Demo.rvnproj'),
                *runner_arguments(args), '--runtime', str(args.runtime.resolve())]
     cases = [
+        ('Custom Raven Iterable and Iterator', (bridge / 'samples/application-iterable.rvn').read_text(), '0\n1\n1\n43\n2\n2\n'),
         ('Deferred callbacks and repeated enumeration', (bridge / 'samples/library-queries.rvn').read_text(),
          '0\n0\nForty two\nForty two\n2\n1\nDisposed\n2\nForty two\nNinety nine\n5\n3\n'),
         ('Empty and exhausted', header + '''

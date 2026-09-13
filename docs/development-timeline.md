@@ -2022,3 +2022,13 @@ A custom Raven Iterable/Cursor probe failed during compiler emission and remains
 the low-level custom iterator fixture verifies acquisition and disposal directly.
 [The API contract](raven-query-api.md) records these outcomes and the retained cleanup
 gap. Raven and legacy Neo sources and archived builds were not changed in this slice.
+
+
+**Custom iterator follow-up (2026-09-13).** The assistant reduced the failure to
+serialization of generic interface MethodImpl signatures by the persisted metadata
+writer. Raven now normalizes those declarations through its existing target-method
+reference path; both ordinary CLR and target emission execute the regression test.
+A second bridge issue required closing definition-relative interface signatures
+before matching application methods. The former failing repro is now a passing
+[custom Iterable sample](experiments/raven-target/samples/application-iterable.rvn).
+This resolves the previously recorded compiler gap without new runtime behavior.

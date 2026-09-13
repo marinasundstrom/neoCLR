@@ -54,7 +54,6 @@ for name in ('run_project.py', 'runner_options.py', 'configure_tasks.py', 'verif
 shutil.copytree(ROOT / 'examples/preview', output / 'samples/neoil')
 shutil.copytree(HERE / 'samples', output / 'tools/samples')
 shutil.copytree(HERE / 'samples', output / 'docs/experiments/raven-target/samples')
-shutil.copytree(HERE / 'known-gaps', output / 'docs/experiments/raven-target/known-gaps')
 for path in (ROOT / 'docs').glob('*.md'):
     shutil.copyfile(path, output / 'docs' / path.name)
 for name in ('runtime-api-inventory.json', 'runtime-api-coverage.json', 'RELEASING.md', 'VSCODE.md', 'README.md'):

@@ -73,12 +73,13 @@ An unannotated no-result lambda may infer Raven's `System.Unit`, which is not ad
 as the target Void type. The adapter now projects Void in generic *method* arguments
 as well as generic type arguments, while preserving no-result CLI returns.
 
-A [custom Raven Source/Cursor repro](experiments/raven-target/known-gaps/query-custom-iterable.rvn)
-implementing target Iterable/Iterator exposed an emission
-failure before bridge import during this investigation. Support for arbitrary Raven
-implementations of these generic target interfaces needs a separate compiler check;
-it is not claimed by the passing ArrayList examples. The low-level lifetime fixture
-uses a custom NeoIL implementation and verifies the runtime interface contract directly.
+Custom Raven [Iterable/Iterator implementations](experiments/raven-target/samples/application-iterable.rvn)
+now pass end to end. The emission failure found during the initial slice was fixed
+in Raven's target-metadata MethodImpl normalization (`000ed511e` on the experiment
+branch). The bridge closes generic
+interface declaration signatures before comparing them with application methods.
+The sample counts acquisition and disposal through an implicitly converted receiver;
+the low-level lifetime fixture independently verifies the runtime contract.
 
 ## Run and verify from source
 

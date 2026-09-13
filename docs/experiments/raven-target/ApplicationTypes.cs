@@ -57,8 +57,8 @@ static class ApplicationTypes
             {
                 CheckMethod(method);
                 if (method.Overrides.Any(o => !method.IsPublic || o.Name != method.Name || o.DeclaringType.Resolve()?.IsInterface != true
-                    || !o.Parameters.Select(p => map(p.ParameterType, false)).SequenceEqual(method.Parameters.Select(p => map(p.ParameterType, false)))
-                    || map(o.ReturnType, true) != map(method.ReturnType, true)) || method.IsFinal && !method.IsNewSlot) throw new InvalidDataException("Explicit implementations and sealed overrides are not admitted yet.");
+                    || !o.Parameters.Select(p => map(RuntimeSignatures.Close(p.ParameterType, o.DeclaringType), false)).SequenceEqual(method.Parameters.Select(p => map(p.ParameterType, false)))
+                    || map(RuntimeSignatures.Close(o.ReturnType, o.DeclaringType), true) != map(method.ReturnType, true)) || method.IsFinal && !method.IsNewSlot) throw new InvalidDataException("Explicit implementations and sealed overrides are not admitted yet.");
                 foreach (var parameter in method.Parameters) map(parameter.ParameterType, false);
                 map(method.ReturnType, true);
                 if (type.IsInterface)

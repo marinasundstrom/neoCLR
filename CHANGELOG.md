@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Enabled custom Raven Iterable/Iterator implementations in the query pipeline:
+  close generic MethodImpl signatures before bridge validation and promote the
+  earlier compiler repro to an executable sample. The companion Raven fix normalizes
+  target interface references; ordinary CLR behavior is covered separately. Updated
+  query documentation and regression coverage; cleanup limitations still apply.
+
 - Added prototype Raven-target `System.Linq.Enumerable` extensions: deferred generic
   Where/Select and eager ToList returning ArrayList. Ordinary NeoIL classes retain
   source/callback state, cache current values and dispose upstream on exhaustion or

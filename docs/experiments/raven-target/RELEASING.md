@@ -149,4 +149,4 @@ For builds containing the prototype query API, also run `tools/verify_queries.py
 against the extracted demo project with its packaged bridge, runtime and System
 library. Add `--queries` and `--extensions` to the editor checks. These are new source
 checks, not retroactive claims about earlier archived validation reports. Document
-remaining custom Iterable compiler and cleanup boundaries from the query API doc.
+remaining query and cleanup boundaries from the query API doc.
