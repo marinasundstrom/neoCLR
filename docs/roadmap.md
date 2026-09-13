@@ -4,7 +4,9 @@ The [2026-09-13 platform direction](platform-direction.md) retains the value/ref
 type split and focuses investigation on modern UTF-8 APIs, bounded memory views and
 nullability metadata. It takes precedence over historical default-semantics proposals
 below. The [runtime API plan](runtime-api-plan.md) defines scenario-driven library
-additions; delegate/function-type alternatives remain under review. These investigations
+additions. Immediate API work prioritizes System.Array<T>, minimal collection
+interfaces and basic implementations, with usable prototypes before broader expansion;
+delegate/function-type alternatives remain under review. These investigations
 do not select new representations or remove release work.
 
 All planned capabilities and substantive revisions to implemented behavior follow

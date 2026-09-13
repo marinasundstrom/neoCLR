@@ -2204,3 +2204,13 @@ emphasized “The shape is known”. The assistant recorded the purpose as a kno
 array definition for the runtime and tools, linking element type, members, interfaces
 and invariance to existing array signatures/instructions. This refines the intended
 mapping; it does not claim that mapping has been implemented.
+
+**API priority direction:** The author placed the generic array API, collection
+interfaces and basic implementations on the immediate runtime-API priority list.
+A complete library is unnecessary, but these fundamental building blocks should at
+least have usable prototypes. The assistant updated the API plan and roadmap to put
+generic array mapping first, then minimal contracts and alignment of arrays/ArrayList,
+followed by bounded keyed collections. The text-first suggestion was superseded.
+The detailed slice boundaries are the assistant's proposed execution plan, not an
+adoption of every previously supplied collection type. No new API was implemented
+in this documentation update.

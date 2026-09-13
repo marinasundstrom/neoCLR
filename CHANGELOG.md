@@ -15,6 +15,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   fixed-size array mutation, without adopting a taxonomy. No library interface or
   runtime variance support is added; mutable arrays remain invariant. Recorded System.Array<T> as the intended
   generic array type, with metadata/reflection mapping deferred to a dedicated slice.
+  Prioritized that mapping, minimal collection contracts and basic implementation
+  prototypes in the API plan, ahead of broader text/clock expansion.
 
 - Clarified platform direction: retain CLR-like type categories and language ergonomics,
   develop library APIs by concrete need, and evaluate text/encoding, memory views,

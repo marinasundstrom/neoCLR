@@ -5,6 +5,33 @@ subsets when a real program or compiler feature needs them. The aim is familiar 
 and other .NET-language ergonomics over neoCLR's documented differences, not a complete
 BCL before the platform is useful. Follow the [platform direction](platform-direction.md).
 
+## Immediate implementation priorities (2026-09-13)
+
+The author prioritizes arrays, collection interfaces and basic implementations as
+fundamental runtime-library building blocks. Deliver a small working prototype of
+each necessary layer before expanding the wider API catalog. This supersedes the
+earlier text-first implementation suggestion; the family table below is not ordered.
+
+| Order | Bounded slice | Evidence needed before calling the slice usable |
+| --- | --- | --- |
+| 1 | Map ordinary arrays to the intended System.Array<T> definition | Existing T[] source and array IL still work; element type, invariant policy, core length/index access, member lookup and reflection agree on the generic shape; no wrapper allocation is required |
+| 2 | Review and prototype the minimal iteration/read/mutation contracts | Complete member signatures, count/index and mutation capabilities, and clear treatment of fixed-size arrays; a Raven consumer reads through an interface. Reuse Iterable/Iterator where sound; do not select the whole proposed hierarchy by name alone |
+| 3 | Adapt arrays and the existing ArrayList to that bounded contract | Ordinary indexing, iteration and growable-list operations work with class and value elements. An array does not claim unsupported Add/Remove behavior. Existing prototype queries continue to work |
+| 4 | Add small keyed-lookup and uniqueness implementations | A HashMap/HashSet-style prototype serves a concrete application; key equality/hashing, duplicate behavior, lookup absence and mutation are explicit. Prefer existing Result/Option conventions over preserving a desired variance annotation |
+| 5 | Extend text/encoding and injectable-clock APIs | Build on the collection foundation with small parsing/file and deterministic-time scenarios; expand only the operations those examples need |
+
+Generic variance is supporting work for step 2, not a prerequisite for every useful
+collection prototype. Add it only after validating declaration positions, metadata
+mapping and dispatch; initially invariant contracts remain useful. The existing
+[read-only adapter experiment](experiments/readonly-views/README.md) is evidence for
+an API shape, not completion of steps 1–3.
+
+Keep the [collection taxonomy review](collection-contracts.md) open. Linked lists,
+immutable/frozen families, a complete comparer framework and full query coverage are
+not prerequisites for this initial foundation. Do not add a concrete family without
+a distinct operation or guarantee to demonstrate. Correctness fixes and already
+recorded release/debugging requirements remain in scope alongside this ordering.
+
 ## Existing evidence and next additions
 
 The [declaration inventory](experiments/raven-target/runtime-api-inventory.json) and
@@ -17,7 +44,7 @@ or runs. The following is a planning summary, not a new completeness claim.
 | Primitive values and mathematics | Bounded numeric, Boolean, Char, parsing and Math APIs | Fill overload/behavior gaps exposed by normal Raven programs before adding unrelated utilities |
 | Errors and absence | Result, Option, Void and propagation | Consistent typed failures and useful error context across new APIs; preserve ordinary call ergonomics |
 | Text and encoding | UTF-8 storage, explicit byte counting/slicing, ordinal operations and Char predicates | Scalar iteration and validated construction; strict UTF-8/UTF-16 conversion; settle indexing before adding ambiguous Length/search-offset APIs |
-| Collections | Arrays, ArrayList, Iterable/Iterator and prototype Where/Select/ToList | Dictionary/set-style lookup when an application needs keys; first specify equality/hashing, iteration and mutation contracts |
+| Collections | Arrays, ArrayList, Iterable/Iterator and prototype Where/Select/ToList | Follow the immediate priorities above: generic array mapping, minimal contracts, existing implementation alignment, then keyed lookup/uniqueness |
 | Files and console | Bounded text-file and console operations with Result outcomes | Byte I/O and streaming only when whole-file processing is insufficient; define resource cleanup before adding long-lived readers/writers |
 | Date/time | Date, Time, LocalDateTime and local-clock acquisition | An injectable clock when tests need controlled time; duration/instant and timezone work as scenarios require, with no immediate globalization expansion |
 | Metadata and reflection | Type/member introspection and a bounded reflection surface | Fill discovery gaps needed by tools and serialization; dynamic invocation requires separate access/type/fault contracts |
@@ -31,12 +58,11 @@ clock abstraction is not implemented merely because it appears here.
 
 ## Implement by scenario
 
-Use the existing order workflow as a baseline. First extend a small text-processing
-example with Unicode scalar handling and explicit decoding failures. Add keyed lookup
-only when that example needs it. Introduce buffer views when avoiding repeated copies
-has a measured benefit. Test a clock through a deterministic date-dependent rule
-before growing the calendar API. Select one bounded slice at a time; this is not a
-mandate to implement every row now.
+Use the existing order workflow as a baseline. First exercise ordinary arrays and
+ArrayList through the selected minimal interfaces. Extend order lookup and duplicate
+checking to justify keyed collections, then add text-processing and controlled-time
+examples. Select one bounded slice at a time; this is not a mandate to implement
+every type in the family table or finish the entire collection taxonomy first.
 
 Every addition needs a consumer-facing contract, .NET comparison, supported overloads,
 error/absence behavior, a Raven sample and direct runtime checks where safety depends

@@ -76,17 +76,16 @@ not a decision to replace delegates.
 
 ## Order of work
 
-1. Maintain the Raven/runtime demonstration and its reproducible tools. Audit active
-   policy documents so historical explicit-reference defaults do not direct new work.
-2. Review text and encoding contracts with small file/parsing examples: byte versus
-   scalar operations, strict decoding, explicit conversion errors and migration costs.
-3. Prototype a bounded managed-buffer view, comparing the .NET baseline first. Use
-   text processing as a concrete consumer; keep native and async expansion separate.
-4. Complete the nullability metadata comparison before selecting an encoding or
-   enforcing new defaults. This can proceed as research alongside the earlier slices.
+The [runtime API priorities](runtime-api-plan.md#immediate-implementation-priorities-2026-09-13)
+now put System.Array<T>, minimal collection contracts and basic implementations first.
+Build a usable prototype foundation before expanding text/encoding and clock APIs.
+Continue maintaining the Raven/runtime demonstration and reproducible tools throughout.
 
-This order is a proposal for bounded work, not a release promise. Debugger integration
-and other recorded release requirements remain on the roadmap.
+Bounded memory views, nullability metadata, callable alternatives and runtime async
+remain research tracks; they need not block ordinary collection APIs. Prototype them
+when a concrete question can be answered without treating the experiment as a settled
+platform contract. Debugger integration and other recorded release requirements remain
+on the roadmap. This is an implementation order, not a release-date promise.
 
 ## Initial primary evidence
 
