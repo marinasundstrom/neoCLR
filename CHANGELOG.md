@@ -14,6 +14,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Extended experimental bundle packaging with the application and order-workflow
   validation scripts and documented how to try the new samples. Updated bundle
   capability boundaries; package validation now includes dispatch, captures and GC.
+  Built and installed local Raven SDK/extension 0.1.12-neoclr.7 with a separate demo
+  and VS Code environment. All twelve package suites and installed-server checks pass;
+  recorded artifact hashes and usage instructions. No new release was published.
 
 - Extended runtime delegate binding to nominal heap receivers and the Raven source
   bridge to instance/virtual/interface method groups and shared or escaping lambda

@@ -1,5 +1,9 @@
 # Test Raven targeting neoCLR in VS Code
 
+For the newer local application build (`0.1.12-neoclr.7`), use the
+[dedicated installation walkthrough](../../raven-application-local-build.md).
+The Preview 4 setup below remains a separate installation.
+
 For the published Preview 4 assets and portable installation steps, start with the
 [release instructions](../../preview-4-release-notes.md#start-here). They include the
 runtime bundle, matching Raven SDK/VSIX and companion notices. The machine-specific

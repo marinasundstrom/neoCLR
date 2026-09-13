@@ -47,6 +47,10 @@ are implemented for the existing Func family. Keep runtime work primary and Rave
 fixes isolated on its experimental branch;
 separate general compiler bugs from target contract mappings and generic-Void semantics.
 
+The [local application toolchain](raven-application-local-build.md) is built and
+installed with Raven SDK/extension 0.1.12-neoclr.7; twelve package suites pass.
+This is local evidence, not a new published release or cross-platform gate.
+
 A future release must include Raven-to-neoCLR debugging support. Build on the existing
 terminal debugger; investigate Portable PDB/source mapping, breakpoints, step-in/over/out,
 and inspection of locals, call stacks and managed objects. Scope VS Code integration

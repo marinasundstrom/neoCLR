@@ -1,0 +1,224 @@
+{
+  "date": "2026-09-13",
+  "status": "installed local build; not published",
+  "neoCLRRevision": "e4263cddd33ead630208d438cc53cdaa03f09501",
+  "runtimeBuildRevision": "ff1d76507b94a19e80aaace1d5933a825ef81026",
+  "runtimeBuildNote": "Later bundled source commits only change packaging and documentation; runtime code is unchanged.",
+  "ravenRevision": "3142f2f1314ed5445a863be4808d0093fd37e3ad",
+  "ravenBranch": "codex/neoclr-target-resolution",
+  "sdkVersion": "0.1.12-neoclr.7",
+  "dotnetSdk": "11.0.100-rc.1.26425.128",
+  "platform": "osx-arm64",
+  "bundle": "/Users/robert/.neoclr/experiments/application-poc-20260913",
+  "sdk": "/Users/robert/.raven/sdk/0.1.12-neoclr.7",
+  "vscodeUserData": "/Users/robert/.neoclr/vscode/application-poc-20260913",
+  "vscodeExtensions": "/Users/robert/.neoclr/vscode/application-poc-20260913/extensions",
+  "artifactDirectory": "/Users/robert/.neoclr/builds/application-toolchain-2026-09-13",
+  "assets": {
+    "neoclr-application-poc-20260913-osx-arm64.tar.gz": {
+      "sha256": "48fb5a279921db102624cea0099d5716ac916fc0e6a9478e8914e8fa5df57d96",
+      "bytes": 23089230
+    },
+    "raven-sdk-0.1.12-neoclr.7-osx-arm64.tar.gz": {
+      "sha256": "cfe056123951adde908f9bc97e59ffc305517b602612189e05f8e49fc216bbb7",
+      "bytes": 30936413
+    },
+    "raven-vscode-0.1.12-neoclr.7.vsix": {
+      "sha256": "1f507e2cf3a0ac0aee3ae90571668e57d22a637ded63edd549a0c1150dfd9255",
+      "bytes": 10246742
+    }
+  },
+  "payloadFilesVerified": 667,
+  "archivePayloadHashesVerified": true,
+  "packageSuites": {
+    "application": {
+      "exitCode": 0,
+      "command": [
+        "python3",
+        "tools/verify_application.py",
+        "demo/Demo.rvnproj",
+        "--bridge",
+        "tools/bridge/Probe.dll",
+        "--system",
+        "lib/System.neoil",
+        "--runtime",
+        "bin/neoclr"
+      ]
+    },
+    "orders": {
+      "exitCode": 0,
+      "command": [
+        "python3",
+        "tools/verify_orders.py",
+        "demo/Demo.rvnproj",
+        "--bridge",
+        "tools/bridge/Probe.dll",
+        "--system",
+        "lib/System.neoil",
+        "--runtime",
+        "bin/neoclr"
+      ]
+    },
+    "project": {
+      "exitCode": 0,
+      "command": [
+        "python3",
+        "tools/verify_project.py",
+        "demo/Demo.rvnproj",
+        "--bridge",
+        "tools/bridge/Probe.dll",
+        "--system",
+        "lib/System.neoil",
+        "--runtime",
+        "bin/neoclr",
+        "--collections"
+      ]
+    },
+    "file_project": {
+      "exitCode": 0,
+      "command": [
+        "python3",
+        "tools/verify_file_project.py",
+        "demo/Demo.rvnproj",
+        "--bridge",
+        "tools/bridge/Probe.dll",
+        "--system",
+        "lib/System.neoil",
+        "--runtime",
+        "bin/neoclr"
+      ]
+    },
+    "process": {
+      "exitCode": 0,
+      "command": [
+        "python3",
+        "tools/verify_process.py",
+        "demo/Demo.rvnproj",
+        "--bridge",
+        "tools/bridge/Probe.dll",
+        "--system",
+        "lib/System.neoil",
+        "--runtime",
+        "bin/neoclr"
+      ]
+    },
+    "clock": {
+      "exitCode": 0,
+      "command": [
+        "python3",
+        "tools/verify_clock.py",
+        "demo/Demo.rvnproj",
+        "--bridge",
+        "tools/bridge/Probe.dll",
+        "--system",
+        "lib/System.neoil",
+        "--runtime",
+        "bin/neoclr"
+      ]
+    },
+    "error_values": {
+      "exitCode": 0,
+      "command": [
+        "python3",
+        "tools/verify_error_values.py",
+        "demo/Demo.rvnproj",
+        "--bridge",
+        "tools/bridge/Probe.dll",
+        "--system",
+        "lib/System.neoil",
+        "--runtime",
+        "bin/neoclr"
+      ]
+    },
+    "unions": {
+      "exitCode": 0,
+      "command": [
+        "python3",
+        "tools/verify_unions.py",
+        "demo/Demo.rvnproj",
+        "--bridge",
+        "tools/bridge/Probe.dll",
+        "--system",
+        "lib/System.neoil",
+        "--runtime",
+        "bin/neoclr"
+      ]
+    },
+    "delegates": {
+      "exitCode": 0,
+      "command": [
+        "python3",
+        "tools/verify_delegates.py",
+        "demo/Demo.rvnproj",
+        "--bridge",
+        "tools/bridge/Probe.dll",
+        "--system",
+        "lib/System.neoil",
+        "--runtime",
+        "bin/neoclr"
+      ]
+    },
+    "native_buffer": {
+      "exitCode": 0,
+      "command": [
+        "python3",
+        "tools/verify_native_buffer.py",
+        "demo/Demo.rvnproj",
+        "--bridge",
+        "tools/bridge/Probe.dll",
+        "--system",
+        "lib/System.neoil",
+        "--runtime",
+        "bin/neoclr"
+      ]
+    },
+    "neoil": {
+      "exitCode": 0,
+      "command": [
+        "python3",
+        "tools/verify_neoil.py",
+        "--samples",
+        "samples/neoil",
+        "--system",
+        "lib/System.neoil",
+        "--runtime",
+        "bin/neoclr"
+      ]
+    },
+    "editor": {
+      "exitCode": 0,
+      "command": [
+        "python3",
+        "tools/verify_editor.py",
+        "demo",
+        "--collections",
+        "--booleans",
+        "--reflection",
+        "--process",
+        "--unions",
+        "--errors",
+        "--calendar",
+        "--primitives",
+        "--parsing",
+        "--files",
+        "--strings"
+      ]
+    }
+  },
+  "installedExtension": "raven.raven-vscode@0.1.12-neoclr.7",
+  "installedExtensionServerChecks": "completion and hover protocol checks passed; no claim of manual visual verification",
+  "installedOrderWorkflowOutput": [
+    "Saved",
+    "Order report exceeds limit",
+    "Order not found",
+    "Saved",
+    "Queued",
+    "Order: Coffee"
+  ],
+  "installedDemoChange": "Main.rvn replaced with packaged application-orders.rvn after payload validation; packaged archive remains unchanged",
+  "limitations": [
+    "Local macOS arm64 evidence, not a new cross-platform release gate",
+    "Dedicated neoCLR tasks; standard Raven Run/Debug buttons do not target this pipeline",
+    "Raven source debugging and clock injection remain future work"
+  ]
+}
