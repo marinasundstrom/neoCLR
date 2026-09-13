@@ -11,7 +11,7 @@ static class UnionDeclarations
             public struct None { public None() { } }
             public struct Some<T> {
                 public Some(T value) { Value = value; }
-                public T Value { get; }
+                public T Value { get; set; }
             }
         }
         public struct PropagationUnit { }
@@ -35,11 +35,11 @@ static class UnionDeclarations
         public static class Result {
             public struct Ok<T> {
                 public Ok(T value) { Value = value; }
-                public T Value { get; }
+                public T Value { get; set; }
             }
             public struct Error<E> {
                 public Error(E value) { Value = value; }
-                public E Value { get; }
+                public E Value { get; set; }
             }
         }
         [System.Runtime.CompilerServices.Union]

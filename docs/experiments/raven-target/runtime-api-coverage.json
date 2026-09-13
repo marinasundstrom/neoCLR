@@ -1,0 +1,1069 @@
+{
+  "purpose": "Explicit source-by-source API audit. Samples and signature checks are evidence, not a claim of arbitrary generic/compiler support.",
+  "declarationCount": 614,
+  "sources": [
+    {
+      "file": "runtime/System/Equatable.neoil",
+      "declarations": 2,
+      "disposition": "interfaces",
+      "samples": [
+        "library-value-interfaces.rvn",
+        "library-interfaces.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/Comparable.neoil",
+      "declarations": 2,
+      "disposition": "interfaces",
+      "samples": [
+        "library-value-interfaces.rvn",
+        "library-interfaces.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/Clonable.neoil",
+      "declarations": 2,
+      "disposition": "unimplemented-contracts",
+      "samples": []
+    },
+    {
+      "file": "runtime/System/Propagatable.neoil",
+      "declarations": 3,
+      "disposition": "unions",
+      "samples": [
+        "library-case-payloads.rvn",
+        "library-unions.rvn",
+        "library-result-void-propagation.rvn",
+        "library-reference-payloads.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/Value.neoil",
+      "declarations": 1,
+      "disposition": "signature-markers",
+      "samples": [
+        "library-void.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/Void.neoil",
+      "declarations": 1,
+      "disposition": "signature-markers",
+      "samples": [
+        "library-void.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/Boolean.neoil",
+      "declarations": 2,
+      "disposition": "primitives",
+      "samples": [
+        "library-primitives.rvn",
+        "library-integers.rvn",
+        "library-booleans.rvn",
+        "library-strings.rvn",
+        "library-parsing.rvn",
+        "library-division.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/String.neoil",
+      "declarations": 10,
+      "disposition": "primitives",
+      "samples": [
+        "library-primitives.rvn",
+        "library-integers.rvn",
+        "library-booleans.rvn",
+        "library-strings.rvn",
+        "library-parsing.rvn",
+        "library-division.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/Error.neoil",
+      "declarations": 5,
+      "disposition": "errors",
+      "samples": [
+        "library-errors.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/SByte.neoil",
+      "declarations": 2,
+      "disposition": "primitives",
+      "samples": [
+        "library-primitives.rvn",
+        "library-integers.rvn",
+        "library-booleans.rvn",
+        "library-strings.rvn",
+        "library-parsing.rvn",
+        "library-division.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/Byte.neoil",
+      "declarations": 2,
+      "disposition": "primitives",
+      "samples": [
+        "library-primitives.rvn",
+        "library-integers.rvn",
+        "library-booleans.rvn",
+        "library-strings.rvn",
+        "library-parsing.rvn",
+        "library-division.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/Int16.neoil",
+      "declarations": 2,
+      "disposition": "primitives",
+      "samples": [
+        "library-primitives.rvn",
+        "library-integers.rvn",
+        "library-booleans.rvn",
+        "library-strings.rvn",
+        "library-parsing.rvn",
+        "library-division.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/UInt16.neoil",
+      "declarations": 2,
+      "disposition": "primitives",
+      "samples": [
+        "library-primitives.rvn",
+        "library-integers.rvn",
+        "library-booleans.rvn",
+        "library-strings.rvn",
+        "library-parsing.rvn",
+        "library-division.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/Char.neoil",
+      "declarations": 18,
+      "disposition": "primitives",
+      "samples": [
+        "library-primitives.rvn",
+        "library-integers.rvn",
+        "library-booleans.rvn",
+        "library-strings.rvn",
+        "library-parsing.rvn",
+        "library-division.rvn"
+      ]
+    },
+    {
+      "file": "runtime/neoCLR/Runtime/CharCategory.neoil",
+      "declarations": 1,
+      "disposition": "implementation-service",
+      "callers": [
+        {
+          "service": "neoCLR.Runtime.CharCategory",
+          "file": "runtime/System/Char.neoil",
+          "line": 23
+        },
+        {
+          "service": "neoCLR.Runtime.CharCategory",
+          "file": "runtime/System/Char.neoil",
+          "line": 31
+        },
+        {
+          "service": "neoCLR.Runtime.CharCategory",
+          "file": "runtime/System/Char.neoil",
+          "line": 43
+        },
+        {
+          "service": "neoCLR.Runtime.CharCategory",
+          "file": "runtime/System/Char.neoil",
+          "line": 55
+        },
+        {
+          "service": "neoCLR.Runtime.CharCategory",
+          "file": "runtime/System/Char.neoil",
+          "line": 63
+        },
+        {
+          "service": "neoCLR.Runtime.CharCategory",
+          "file": "runtime/System/Char.neoil",
+          "line": 71
+        },
+        {
+          "service": "neoCLR.Runtime.CharCategory",
+          "file": "runtime/System/Char.neoil",
+          "line": 83
+        },
+        {
+          "service": "neoCLR.Runtime.CharCategory",
+          "file": "runtime/System/Char.neoil",
+          "line": 91
+        },
+        {
+          "service": "neoCLR.Runtime.CharCategory",
+          "file": "runtime/System/Char.neoil",
+          "line": 103
+        }
+      ]
+    },
+    {
+      "file": "runtime/System/UInt32.neoil",
+      "declarations": 2,
+      "disposition": "primitives",
+      "samples": [
+        "library-primitives.rvn",
+        "library-integers.rvn",
+        "library-booleans.rvn",
+        "library-strings.rvn",
+        "library-parsing.rvn",
+        "library-division.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/Int64.neoil",
+      "declarations": 2,
+      "disposition": "primitives",
+      "samples": [
+        "library-primitives.rvn",
+        "library-integers.rvn",
+        "library-booleans.rvn",
+        "library-strings.rvn",
+        "library-parsing.rvn",
+        "library-division.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/UInt64.neoil",
+      "declarations": 2,
+      "disposition": "primitives",
+      "samples": [
+        "library-primitives.rvn",
+        "library-integers.rvn",
+        "library-booleans.rvn",
+        "library-strings.rvn",
+        "library-parsing.rvn",
+        "library-division.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/Single.neoil",
+      "declarations": 2,
+      "disposition": "primitives",
+      "samples": [
+        "library-primitives.rvn",
+        "library-integers.rvn",
+        "library-booleans.rvn",
+        "library-strings.rvn",
+        "library-parsing.rvn",
+        "library-division.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/Double.neoil",
+      "declarations": 2,
+      "disposition": "primitives",
+      "samples": [
+        "library-primitives.rvn",
+        "library-integers.rvn",
+        "library-booleans.rvn",
+        "library-strings.rvn",
+        "library-parsing.rvn",
+        "library-division.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/IntPtr.neoil",
+      "declarations": 2,
+      "disposition": "primitives",
+      "samples": [
+        "library-primitives.rvn",
+        "library-integers.rvn",
+        "library-booleans.rvn",
+        "library-strings.rvn",
+        "library-parsing.rvn",
+        "library-division.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/UIntPtr.neoil",
+      "declarations": 2,
+      "disposition": "primitives",
+      "samples": [
+        "library-primitives.rvn",
+        "library-integers.rvn",
+        "library-booleans.rvn",
+        "library-strings.rvn",
+        "library-parsing.rvn",
+        "library-division.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/Int32.neoil",
+      "declarations": 6,
+      "disposition": "primitives",
+      "samples": [
+        "library-primitives.rvn",
+        "library-integers.rvn",
+        "library-booleans.rvn",
+        "library-strings.rvn",
+        "library-parsing.rvn",
+        "library-division.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/Console.neoil",
+      "declarations": 4,
+      "disposition": "process",
+      "samples": [
+        "library-environment.rvn",
+        "library-console.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/Math.neoil",
+      "declarations": 21,
+      "disposition": "math",
+      "samples": [
+        "library-floating-math.rvn",
+        "library-math.rvn",
+        "library-clamp.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/InvalidRangeError.neoil",
+      "declarations": 3,
+      "disposition": "errors",
+      "samples": [
+        "library-errors.rvn"
+      ]
+    },
+    {
+      "file": "runtime/neoCLR/Runtime/Math.neoil",
+      "declarations": 15,
+      "disposition": "implementation-service",
+      "callers": [
+        {
+          "service": "neoCLR.Runtime.MathAbs",
+          "file": "runtime/System/Math.neoil",
+          "line": 89
+        },
+        {
+          "service": "neoCLR.Runtime.MathSqrt",
+          "file": "runtime/System/Math.neoil",
+          "line": 95
+        },
+        {
+          "service": "neoCLR.Runtime.MathFloor",
+          "file": "runtime/System/Math.neoil",
+          "line": 101
+        },
+        {
+          "service": "neoCLR.Runtime.MathCeiling",
+          "file": "runtime/System/Math.neoil",
+          "line": 107
+        },
+        {
+          "service": "neoCLR.Runtime.MathTruncate",
+          "file": "runtime/System/Math.neoil",
+          "line": 113
+        },
+        {
+          "service": "neoCLR.Runtime.MathRound",
+          "file": "runtime/System/Math.neoil",
+          "line": 119
+        },
+        {
+          "service": "neoCLR.Runtime.MathExp",
+          "file": "runtime/System/Math.neoil",
+          "line": 125
+        },
+        {
+          "service": "neoCLR.Runtime.MathLog",
+          "file": "runtime/System/Math.neoil",
+          "line": 131
+        },
+        {
+          "service": "neoCLR.Runtime.MathLog10",
+          "file": "runtime/System/Math.neoil",
+          "line": 137
+        },
+        {
+          "service": "neoCLR.Runtime.MathSin",
+          "file": "runtime/System/Math.neoil",
+          "line": 143
+        },
+        {
+          "service": "neoCLR.Runtime.MathCos",
+          "file": "runtime/System/Math.neoil",
+          "line": 149
+        },
+        {
+          "service": "neoCLR.Runtime.MathTan",
+          "file": "runtime/System/Math.neoil",
+          "line": 155
+        },
+        {
+          "service": "neoCLR.Runtime.MathPow",
+          "file": "runtime/System/Math.neoil",
+          "line": 162
+        },
+        {
+          "service": "neoCLR.Runtime.MathMin",
+          "file": "runtime/System/Math.neoil",
+          "line": 169
+        },
+        {
+          "service": "neoCLR.Runtime.MathMax",
+          "file": "runtime/System/Math.neoil",
+          "line": 176
+        }
+      ]
+    },
+    {
+      "file": "runtime/neoCLR/Runtime/WriteLine.neoil",
+      "declarations": 1,
+      "disposition": "implementation-service",
+      "callers": [
+        {
+          "service": "neoCLR.Runtime.WriteLine",
+          "file": "runtime/System/Console.neoil",
+          "line": 51
+        }
+      ]
+    },
+    {
+      "file": "runtime/neoCLR/Runtime/Int32ToString.neoil",
+      "declarations": 1,
+      "disposition": "implementation-service",
+      "callers": [
+        {
+          "service": "neoCLR.Runtime.Int32ToString",
+          "file": "runtime/System/Int32.neoil",
+          "line": 84
+        }
+      ]
+    },
+    {
+      "file": "runtime/neoCLR/Runtime/ParseInt32.neoil",
+      "declarations": 1,
+      "disposition": "implementation-service",
+      "callers": [
+        {
+          "service": "neoCLR.Runtime.ParseInt32",
+          "file": "runtime/System/Int32.neoil",
+          "line": 7
+        }
+      ]
+    },
+    {
+      "file": "runtime/System/Runtime/CompilerServices/UnionAttribute.neoil",
+      "declarations": 2,
+      "disposition": "signature-markers",
+      "samples": [
+        "library-void.rvn"
+      ]
+    },
+    {
+      "file": "runtime/neoCLR/Runtime/StringConcat.neoil",
+      "declarations": 1,
+      "disposition": "implementation-service",
+      "callers": [
+        {
+          "service": "neoCLR.Runtime.StringConcat",
+          "file": "runtime/System/String.neoil",
+          "line": 6
+        }
+      ]
+    },
+    {
+      "file": "runtime/neoCLR/Runtime/StringByteCount.neoil",
+      "declarations": 1,
+      "disposition": "implementation-service",
+      "callers": [
+        {
+          "service": "neoCLR.Runtime.StringByteCount",
+          "file": "runtime/System/String.neoil",
+          "line": 51
+        }
+      ]
+    },
+    {
+      "file": "runtime/neoCLR/Runtime/StringCompareOrdinal.neoil",
+      "declarations": 1,
+      "disposition": "implementation-service",
+      "callers": [
+        {
+          "service": "neoCLR.Runtime.StringCompareOrdinal",
+          "file": "runtime/System/String.neoil",
+          "line": 21
+        }
+      ]
+    },
+    {
+      "file": "runtime/neoCLR/Runtime/StringContainsOrdinal.neoil",
+      "declarations": 1,
+      "disposition": "implementation-service",
+      "callers": [
+        {
+          "service": "neoCLR.Runtime.StringContainsOrdinal",
+          "file": "runtime/System/String.neoil",
+          "line": 29
+        }
+      ]
+    },
+    {
+      "file": "runtime/neoCLR/Runtime/StringStartsWithOrdinal.neoil",
+      "declarations": 1,
+      "disposition": "implementation-service",
+      "callers": [
+        {
+          "service": "neoCLR.Runtime.StringStartsWithOrdinal",
+          "file": "runtime/System/String.neoil",
+          "line": 37
+        }
+      ]
+    },
+    {
+      "file": "runtime/neoCLR/Runtime/StringEndsWithOrdinal.neoil",
+      "declarations": 1,
+      "disposition": "implementation-service",
+      "callers": [
+        {
+          "service": "neoCLR.Runtime.StringEndsWithOrdinal",
+          "file": "runtime/System/String.neoil",
+          "line": 45
+        }
+      ]
+    },
+    {
+      "file": "runtime/neoCLR/Runtime/StringSliceUtf8.neoil",
+      "declarations": 1,
+      "disposition": "implementation-service",
+      "callers": [
+        {
+          "service": "neoCLR.Runtime.StringSliceUtf8",
+          "file": "runtime/System/String.neoil",
+          "line": 67
+        }
+      ]
+    },
+    {
+      "file": "runtime/System/Array.neoil",
+      "declarations": 14,
+      "disposition": "collections",
+      "samples": [
+        "library-native-buffer.rvn",
+        "library-array-shapes.rvn",
+        "library-reference-payloads.rvn",
+        "library-generic-collections.rvn"
+      ]
+    },
+    {
+      "file": "runtime/neoCLR/Runtime/ErrorFromMessage.neoil",
+      "declarations": 1,
+      "disposition": "implementation-service",
+      "callers": [
+        {
+          "service": "neoCLR.Runtime.ErrorFromMessage",
+          "file": "runtime/System/Error.neoil",
+          "line": 8
+        }
+      ]
+    },
+    {
+      "file": "runtime/neoCLR/Runtime/ErrorMessage.neoil",
+      "declarations": 1,
+      "disposition": "implementation-service",
+      "callers": [
+        {
+          "service": "neoCLR.Runtime.ErrorMessage",
+          "file": "runtime/System/Error.neoil",
+          "line": 14
+        }
+      ]
+    },
+    {
+      "file": "runtime/System/IO/File.neoil",
+      "declarations": 3,
+      "disposition": "files",
+      "samples": [
+        "library-files.rvn",
+        "library-paths.rvn"
+      ]
+    },
+    {
+      "file": "runtime/neoCLR/Runtime/ReadAllText.neoil",
+      "declarations": 1,
+      "disposition": "implementation-service",
+      "callers": [
+        {
+          "service": "neoCLR.Runtime.ReadAllText",
+          "file": "runtime/System/IO/File.neoil",
+          "line": 6
+        }
+      ]
+    },
+    {
+      "file": "runtime/neoCLR/Runtime/ConsoleReadByte.neoil",
+      "declarations": 1,
+      "disposition": "implementation-service",
+      "callers": [
+        {
+          "service": "neoCLR.Runtime.ConsoleReadByte",
+          "file": "runtime/System/Console.neoil",
+          "line": 5
+        }
+      ]
+    },
+    {
+      "file": "runtime/System/Option.neoil",
+      "declarations": 22,
+      "disposition": "unions",
+      "samples": [
+        "library-case-payloads.rvn",
+        "library-unions.rvn",
+        "library-result-void-propagation.rvn",
+        "library-reference-payloads.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/Result.neoil",
+      "declarations": 29,
+      "disposition": "unions",
+      "samples": [
+        "library-case-payloads.rvn",
+        "library-unions.rvn",
+        "library-result-void-propagation.rvn",
+        "library-reference-payloads.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/Int32ParseError.neoil",
+      "declarations": 14,
+      "disposition": "errors",
+      "samples": [
+        "library-errors.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/OverflowError.neoil",
+      "declarations": 3,
+      "disposition": "errors",
+      "samples": [
+        "library-errors.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/IntegerDivisionError.neoil",
+      "declarations": 14,
+      "disposition": "errors",
+      "samples": [
+        "library-errors.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/Text/Utf8SliceError.neoil",
+      "declarations": 14,
+      "disposition": "errors",
+      "samples": [
+        "library-errors.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/IO/ConsoleReadError.neoil",
+      "declarations": 14,
+      "disposition": "errors",
+      "samples": [
+        "library-errors.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/IO/FileReadError.neoil",
+      "declarations": 50,
+      "disposition": "errors",
+      "samples": [
+        "library-errors.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/RuntimeTypeHandle.neoil",
+      "declarations": 1,
+      "disposition": "reflection",
+      "samples": [
+        "library-reflection.rvn",
+        "library-flags.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/Type.neoil",
+      "declarations": 41,
+      "disposition": "reflection",
+      "samples": [
+        "library-reflection.rvn",
+        "library-flags.rvn"
+      ]
+    },
+    {
+      "file": "runtime/neoCLR/Runtime/TypeInspection.neoil",
+      "declarations": 15,
+      "disposition": "implementation-service",
+      "callers": [
+        {
+          "service": "neoCLR.Runtime.TypeName",
+          "file": "runtime/System/Type.neoil",
+          "line": 15
+        },
+        {
+          "service": "neoCLR.Runtime.TypeEquals",
+          "file": "runtime/System/Type.neoil",
+          "line": 40
+        },
+        {
+          "service": "neoCLR.Runtime.TypeArgumentCount",
+          "file": "runtime/System/Type.neoil",
+          "line": 24
+        },
+        {
+          "service": "neoCLR.Runtime.TypeArgument",
+          "file": "runtime/System/Type.neoil",
+          "line": 31
+        },
+        {
+          "service": "neoCLR.Runtime.TypeFields",
+          "file": "runtime/System/Type.neoil",
+          "line": 55
+        },
+        {
+          "service": "neoCLR.Runtime.TypeMethods",
+          "file": "runtime/System/Type.neoil",
+          "line": 70
+        },
+        {
+          "service": "neoCLR.Runtime.TypeProperties",
+          "file": "runtime/System/Type.neoil",
+          "line": 85
+        },
+        {
+          "service": "neoCLR.Runtime.TypeInterfaces",
+          "file": "runtime/System/Type.neoil",
+          "line": 100
+        },
+        {
+          "service": "neoCLR.Runtime.TypeGenericArguments",
+          "file": "runtime/System/Type.neoil",
+          "line": 106
+        },
+        {
+          "service": "neoCLR.Runtime.TypeElementType",
+          "file": "runtime/System/Type.neoil",
+          "line": 112
+        },
+        {
+          "service": "neoCLR.Runtime.TypeShape",
+          "file": "runtime/System/Type.neoil",
+          "line": 122
+        },
+        {
+          "service": "neoCLR.Runtime.TypeShape",
+          "file": "runtime/System/Type.neoil",
+          "line": 144
+        },
+        {
+          "service": "neoCLR.Runtime.TypeShape",
+          "file": "runtime/System/Type.neoil",
+          "line": 154
+        },
+        {
+          "service": "neoCLR.Runtime.TypeShape",
+          "file": "runtime/System/Type.neoil",
+          "line": 164
+        },
+        {
+          "service": "neoCLR.Runtime.TypeShape",
+          "file": "runtime/System/Type.neoil",
+          "line": 174
+        },
+        {
+          "service": "neoCLR.Runtime.TypeShape",
+          "file": "runtime/System/Type.neoil",
+          "line": 184
+        },
+        {
+          "service": "neoCLR.Runtime.TypeShape",
+          "file": "runtime/System/Type.neoil",
+          "line": 194
+        },
+        {
+          "service": "neoCLR.Runtime.TypeDisplayName",
+          "file": "runtime/System/Type.neoil",
+          "line": 204
+        },
+        {
+          "service": "neoCLR.Runtime.TypeDisplayName",
+          "file": "runtime/System/Type.neoil",
+          "line": 214
+        },
+        {
+          "service": "neoCLR.Runtime.TypeBaseType",
+          "file": "runtime/System/Type.neoil",
+          "line": 94
+        },
+        {
+          "service": "neoCLR.Runtime.TypeEnumNames",
+          "file": "runtime/System/Type.neoil",
+          "line": 128
+        },
+        {
+          "service": "neoCLR.Runtime.TypeEnumUnderlying",
+          "file": "runtime/System/Type.neoil",
+          "line": 134
+        }
+      ]
+    },
+    {
+      "file": "runtime/System/Collections/ArrayList.neoil",
+      "declarations": 16,
+      "disposition": "collections",
+      "samples": [
+        "library-native-buffer.rvn",
+        "library-array-shapes.rvn",
+        "library-reference-payloads.rvn",
+        "library-generic-collections.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/Collections/List.neoil",
+      "declarations": 7,
+      "disposition": "collections",
+      "samples": [
+        "library-native-buffer.rvn",
+        "library-array-shapes.rvn",
+        "library-reference-payloads.rvn",
+        "library-generic-collections.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/Collections/Iterable.neoil",
+      "declarations": 2,
+      "disposition": "collections",
+      "samples": [
+        "library-native-buffer.rvn",
+        "library-array-shapes.rvn",
+        "library-reference-payloads.rvn",
+        "library-generic-collections.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/Collections/Iterator.neoil",
+      "declarations": 4,
+      "disposition": "collections",
+      "samples": [
+        "library-native-buffer.rvn",
+        "library-array-shapes.rvn",
+        "library-reference-payloads.rvn",
+        "library-generic-collections.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/Disposable.neoil",
+      "declarations": 2,
+      "disposition": "interfaces",
+      "samples": [
+        "library-value-interfaces.rvn",
+        "library-interfaces.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/Closable.neoil",
+      "declarations": 2,
+      "disposition": "unimplemented-contracts",
+      "samples": []
+    },
+    {
+      "file": "runtime/System/Reflection.neoil",
+      "declarations": 93,
+      "disposition": "reflection",
+      "samples": [
+        "library-reflection.rvn",
+        "library-flags.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/Func.neoil",
+      "declarations": 12,
+      "disposition": "delegates",
+      "samples": [
+        "library-delegates.rvn",
+        "library-array-callbacks.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/Date.neoil",
+      "declarations": 15,
+      "disposition": "calendar",
+      "samples": [
+        "library-calendar.rvn",
+        "library-clock.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/Time.neoil",
+      "declarations": 18,
+      "disposition": "calendar",
+      "samples": [
+        "library-calendar.rvn",
+        "library-clock.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/InvalidDateError.neoil",
+      "declarations": 3,
+      "disposition": "errors",
+      "samples": [
+        "library-errors.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/InvalidTimeError.neoil",
+      "declarations": 3,
+      "disposition": "errors",
+      "samples": [
+        "library-errors.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/Clock.neoil",
+      "declarations": 2,
+      "disposition": "calendar",
+      "samples": [
+        "library-calendar.rvn",
+        "library-clock.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/LocalDateTime.neoil",
+      "declarations": 7,
+      "disposition": "calendar",
+      "samples": [
+        "library-calendar.rvn",
+        "library-clock.rvn"
+      ]
+    },
+    {
+      "file": "runtime/neoCLR/Runtime/LocalClock.neoil",
+      "declarations": 1,
+      "disposition": "implementation-service",
+      "callers": [
+        {
+          "service": "neoCLR.Runtime.LocalClock",
+          "file": "runtime/System/LocalDateTime.neoil",
+          "line": 7
+        }
+      ]
+    },
+    {
+      "file": "runtime/System/EnvironmentError.neoil",
+      "declarations": 2,
+      "disposition": "errors",
+      "samples": [
+        "library-errors.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/Environment.neoil",
+      "declarations": 4,
+      "disposition": "process",
+      "samples": [
+        "library-environment.rvn",
+        "library-console.rvn"
+      ]
+    },
+    {
+      "file": "runtime/neoCLR/Runtime/EnvironmentArguments.neoil",
+      "declarations": 1,
+      "disposition": "implementation-service",
+      "callers": [
+        {
+          "service": "neoCLR.Runtime.EnvironmentArguments",
+          "file": "runtime/System/Environment.neoil",
+          "line": 3
+        }
+      ]
+    },
+    {
+      "file": "runtime/neoCLR/Runtime/EnvironmentCurrentDirectory.neoil",
+      "declarations": 1,
+      "disposition": "implementation-service",
+      "callers": [
+        {
+          "service": "neoCLR.Runtime.EnvironmentCurrentDirectory",
+          "file": "runtime/System/Environment.neoil",
+          "line": 7
+        }
+      ]
+    },
+    {
+      "file": "runtime/neoCLR/Runtime/EnvironmentVariable.neoil",
+      "declarations": 1,
+      "disposition": "implementation-service",
+      "callers": [
+        {
+          "service": "neoCLR.Runtime.EnvironmentVariable",
+          "file": "runtime/System/Environment.neoil",
+          "line": 25
+        }
+      ]
+    },
+    {
+      "file": "runtime/System/IO/Path.neoil",
+      "declarations": 3,
+      "disposition": "files",
+      "samples": [
+        "library-files.rvn",
+        "library-paths.rvn"
+      ]
+    },
+    {
+      "file": "runtime/neoCLR/Runtime/PathCombine.neoil",
+      "declarations": 1,
+      "disposition": "implementation-service",
+      "callers": [
+        {
+          "service": "neoCLR.Runtime.PathCombine",
+          "file": "runtime/System/IO/Path.neoil",
+          "line": 5
+        }
+      ]
+    },
+    {
+      "file": "runtime/neoCLR/Runtime/PathGetFileName.neoil",
+      "declarations": 1,
+      "disposition": "implementation-service",
+      "callers": [
+        {
+          "service": "neoCLR.Runtime.PathGetFileName",
+          "file": "runtime/System/IO/Path.neoil",
+          "line": 10
+        }
+      ]
+    },
+    {
+      "file": "runtime/System/IO/FileWriteError.neoil",
+      "declarations": 44,
+      "disposition": "errors",
+      "samples": [
+        "library-errors.rvn"
+      ]
+    },
+    {
+      "file": "runtime/neoCLR/Runtime/WriteAllText.neoil",
+      "declarations": 1,
+      "disposition": "implementation-service",
+      "callers": [
+        {
+          "service": "neoCLR.Runtime.WriteAllText",
+          "file": "runtime/System/IO/File.neoil",
+          "line": 84
+        }
+      ]
+    }
+  ]
+}

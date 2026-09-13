@@ -381,7 +381,7 @@ static class UnionImport
                                 else if (binding is not null) call = new("", binding.Arguments, binding.Result, Instruction: binding.Instruction);
                                 else
                                 {
-                                    if (instruction.OpCode.Code == Code.Callvirt) throw new InvalidDataException("Unsupported runtime callvirt.");
+                                    if (instruction.OpCode.Code == Code.Callvirt) throw new InvalidDataException("Unsupported runtime callvirt: " + reference.FullName);
                                     call = Bind(reference, targetMethod);
                                 }
                             }

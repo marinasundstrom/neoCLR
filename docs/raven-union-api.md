@@ -37,3 +37,12 @@ no runtime opcode or exception behavior changes are introduced.
 Execution coverage is in [the union sample](experiments/raven-target/samples/library-unions.rvn)
 and the saved-project checks. Installed SDK/extension packages must be refreshed
 before their metadata includes this surface.
+
+## Writable case payloads
+
+The target projects the original public case Value field/property pair as a read/write
+Value property. Assigning `case.Value` mutates that case value's storage; a carrier
+previously constructed from it retains its copy. This preserves the existing runtime
+API rather than silently making payloads immutable during metadata projection.
+The [case-payload sample](experiments/raven-target/samples/library-case-payloads.rvn)
+covers Ok, Error and Some updates and carrier-copy independence.

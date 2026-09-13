@@ -35,9 +35,9 @@ or naming familiarity alone does not imply .NET compatibility or a settled contr
 | Propagation | Success continues; failure returns a compatible carrier; incompatible carriers are rejected | Bounded Result<Int32,OverflowError>, Option<Int32> and Result<Void,OverflowError> execute with early returns; file carriers also work, and other existing payload shapes remain to be projected |
 | Match syntax | Match expression and statement forms compile and execute; rejected forms and diagnostics are documented | [Bounded Raven matrix verified](raven-match-matrix.md): typed cases, both expression spellings and statement actions work; deconstruction/shorthand and arm-return caveats are documented |
 | Text files | Read/write text, show expected I/O errors through Result, and demonstrate round-trip data | [Bounded read/write projection verified](raven-file-api.md), including propagation, typed matches and temporary-file checks; [error-type APIs are projected](raven-error-api.md) |
-| Date and time | Obtain the system's current local date/time using the separate date/time library concepts | Existing runtime APIs need bounded Raven admission; full formatting/globalization is not required |
+| Date and time | Obtain the system's current local date/time using the separate date/time library concepts | [Existing calendar/clock APIs are projected](raven-calendar-api.md); full formatting/globalization is not required |
 | VS Code | Completion resolves target APIs and the saved project runs through the neoCLR task | Verified using the installed experimental extension server and prepared workspace |
-| Reflection | List useful type/member information from the target runtime | Required as part of existing API coverage; Raven admission pending |
+| Reflection | List useful type/member information from the target runtime | [Public introspection APIs are projected](raven-reflection-api.md), including class descriptors and flags |
 
 Normal execution prints only guest output. Return-value and GC inspection are opt-in
 runtime diagnostics. Terminal runtime faults remain distinct from recoverable Result

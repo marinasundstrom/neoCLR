@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Completed the source-by-source existing API audit, including runtime-service
+  callers, signature markers and explicit importer limits. Preserved writable union
+  case payloads through Value setters and verified case-copy independence; requires
+  the Raven value-property receiver fix. Package validation remains a separate step.
+
 - Generalized Raven collection/union payload mapping to existing references, nested
   collections, interfaces, unions and delegates, with a nesting bound. Expanded
   managed-array access and ForEach to admitted defaultable elements, checking opcode

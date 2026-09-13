@@ -1,77 +1,86 @@
 # Existing runtime API coverage for the Raven POC
 
-The release scope is the existing runtime library developed with Neo, accessible
-through Raven. It is not the entire .NET class library or full CLR/compiler feature
-parity. Keep Neo outside this migration. The latest direction is recorded in the
-[conversation timeline](development-timeline.md#2026-09-12--existing-runtime-apis-define-the-raven-poc-scope).
+The existing runtime-library member surface developed with Neo is now projected for
+the Raven proof of concept. The source demonstrations and signature checks pass.
+This is the existing library, not the .NET class library or unrestricted CLI import.
+Neo remains outside this migration. Package validation is recorded separately.
 
-## Source inventory
+## Audited surface
 
-[The generated inventory](experiments/raven-target/runtime-api-inventory.json) scans
-the System manifest and includes: 614 visible declaration candidates in 81 source
-files at the time of this audit. This includes types, properties and their accessor
-methods, fields, enum literals and service functions; it is **not** a count of 614
-independent APIs or working Raven calls. Private declarations and their contents are
-excluded. Runtime service functions remain explicitly marked for review rather than
-silently disappearing from the checklist.
-
-Regenerate after runtime changes and review the diff:
+The [source inventory](experiments/raven-target/runtime-api-inventory.json) contains
+614 visible declaration candidates from 81 files, including the manifest. Accessors,
+fields and properties can describe the same source operation; these are not 614
+independent APIs. The [coverage record](experiments/raven-target/runtime-api-coverage.json)
+assigns every declaring source a disposition and evidence. Its checker fails if a
+new source is unaccounted for or a runtime service loses its reviewed library caller.
 
 ```sh
-python3 docs/experiments/raven-target/inventory_runtime_api.py
 python3 docs/experiments/raven-target/inventory_runtime_api.py --check
+python3 docs/experiments/raven-target/audit_runtime_api.py --check
 ```
 
-For every application API/overload, record target metadata visibility, imported call
-support, type/category adaptation, execution evidence and editor evidence where
-relevant. Closed generic demonstrations do not prove arbitrary generic support.
-Decide explicitly which service helpers are implementation details, and show coverage
-through their public library callers. The source scanner is a checklist, not an
-assembly metadata reader or verifier.
+| Area | Implemented projection and evidence |
+| --- | --- |
+| Primitives, Boolean, Char, String | Existing conversion/comparison/character/string methods, storage and numeric API boundaries; [primitives](raven-primitive-api.md), [Boolean](raven-boolean-api.md), [String](raven-string-api.md), [parsing](raven-parsing-api.md) |
+| Math and Console | All existing Math methods, WriteLine overloads and ReadByte; [Math](raven-floating-math-api.md), [process APIs](raven-process-api.md) |
+| Option, Result, Void, Propagatable | Case/carrier constructors, predicates, extraction, residual/output flow, factories and completion; [unions](raven-union-api.md), including existing reference payloads |
+| Errors, File, Path | Existing error case/predicate/message APIs, bounded UTF-8 reading/writing, propagation and both Path methods; [errors](raven-error-api.md), [files](raven-file-api.md), [paths](raven-path-api.md) |
+| Date, Time, LocalDateTime, Clock | Existing factories, validation, components, equality/ordering and local system clock; [calendar](raven-calendar-api.md) |
+| Environment | All three APIs, copied argument arrays, current directory and variable Results/Options; [process](raven-process-api.md) |
+| Managed arrays and collections | Constructors, capacity/count, indexers, Add/Copy, foreach/iteration, predicates and ForEach; [collections](raven-generic-collections.md), [array shapes](raven-array-shapes.md) |
+| Native Array<T> | Allocate/View, Data/Length, indexer, Get/Set/GetElementAddress and Free for admitted primitive layouts; [native buffers](raven-native-buffer-api.md) |
+| Fundamental interfaces | Comparable/Equatable value and class implementations, collection contracts and Disposable; [interfaces](raven-fundamental-interfaces.md). Clonable/Closable declarations and calls are available, but have no concrete implementations in the existing library |
+| Func | All five existing arities, static application targets, invocation, callbacks and stored delegates; [delegates](raven-delegate-api.md) |
+| Type, TypeHandle and reflection | Type tokens/queries, descriptor hierarchy, all public getters, query arrays/options and BindingFlags; [reflection](raven-reflection-api.md) |
+| Signature markers | Void remains valid in generic signatures. Value is an opaque erasure identity with no public methods. RuntimeTypeHandle is produced by tokens. UnionAttribute is compiler metadata, not a union execution API |
+| neoCLR.Runtime functions | Reviewed implementation services reached through the public library callers listed in the coverage record; not a second application API |
 
-## Current audit and projected slices
+The saved-project suite includes the executable API examples and rejection cases.
+Focused scripts additionally check live clock/process behavior, file bytes, wrong-case
+and invalid-default faults, callback faults and native buffer lifetime. Editor checks
+exercise target completion. A source coverage record does not substitute for running
+these checks; it provides a reviewable checklist when the library changes.
 
-| Area | Current Raven evidence | Work to close the existing-library gap |
-| --- | --- | --- |
-| Numeric primitives, Boolean, Char, String, Value/Error and error unions | [Primitive storage and character APIs](raven-primitive-api.md), Int32/String/Boolean storage, [nine String methods](raven-string-api.md), [Int32.Parse](raven-parsing-api.md), [Int32.Divide](raven-division-api.md), [Int32 instance methods](raven-integer-api.md) and selected static calls; limited error carriers | [Canonical Boolean API boundaries](raven-boolean-api.md) are projected; general interface/generic paths remain; [error-value APIs](raven-error-api.md) are projected |
-| Math and Console | All 20 existing Math methods ([Int32 Clamp](raven-clamp-api.md), [Double methods](raven-floating-math-api.md)) and [Console input/output](raven-process-api.md) | Broader numeric/compiler support remains separate |
-| Option, Result, Void and Propagatable | [Generic value-payload bindings](raven-union-api.md), case/carrier APIs, completion/error propagation and typed matching | Existing reference payloads are admitted; arbitrary application definitions remain an importer limitation |
-| File and Path | Bounded UTF-8 File calls, propagation, error predicates and [both Path methods](raven-path-api.md) | File-error APIs are projected; retain existing I/O contracts |
-| Date, Time, LocalDateTime and Clock | [All current calendar/clock methods](raven-calendar-api.md), validation Results and live-clock check | Error-value APIs are projected; interface dispatch remains separate |
-| Environment | [All three existing process APIs](raven-process-api.md), argument arrays, current directory and variable Results/Options | Retain live host semantics; environment mutation is not an existing API |
-| Array, ArrayList, List, Iterable, Iterator | [Closed collection elements and Copy](raven-generic-collections.md), Int32/String vectors, class aliasing and foreach | [Predicate APIs](raven-delegate-api.md) are projected; [native Array<T> buffers](raven-native-buffer-api.md) are projected; existing union/reference/delegate payloads are admitted; preserve reference categories and document cleanup limits |
-| Equatable, Comparable, Clonable, Disposable, Closable | [Fundamental interface projection](raven-fundamental-interfaces.md), boxed value implementations, String/Type and collections | Clonable/Closable have no current library implementers; application implementations need broader type import |
-| Func delegate families | [All five arities and static targets](raven-delegate-api.md), completion and collection predicates | [Array.ForEach](raven-delegate-api.md#array-callbacks) is projected; instance targets and broader generic signatures; new closure/lambda features are not implied |
-| Type, RuntimeTypeHandle, Reflection and BindingFlags | [Type handles, class descriptors and public introspection APIs](raven-reflection-api.md), saved-source execution and completion | [BindingFlags enum metadata/operators](raven-reflection-api.md#bindingflags-enum-metadata) are projected; general interface paths and package validation |
-| Runtime service functions | Bundled implementation calls run behind admitted APIs | Review public-versus-implementation status and verify each application-facing service path |
+## Projection decisions and remaining boundaries
 
-The [shared signature mechanics](raven-signature-projection.md) now cover file and
-collection catalogs. Continue consolidating the bridge's type mapping and metadata catalog so broader
-APIs do not require another independent whitelist for each closed Result. Then cover
-primitive/string/Console/Math families, date/time and environment/path families,
-collections/delegates/interfaces, and reflection. Continue exposing useful examples
-as each group passes. File read/write is the current completed executable slice;
-this table is a plan, not a declaration that the remaining groups are implemented.
+- Types and arrays use the target's CLR-like value/reference categories. Reflection
+  snapshots and ArrayList are ordinary classes. Value-to-interface conversion boxes
+  a copy; direct value calls do not require boxing.
+- BindingFlags uses CLI enum literals/casts/operators instead of the old wrapper
+  factories and combinators. The [migration mapping](raven-reflection-api.md#bindingflags-enum-metadata)
+  explains each replacement.
+- Duplicate field/property spellings for union payloads project as read/write Value
+  properties, preserving the original case-field mutation behavior. Native
+  descriptors retain writable Data/Length fields; Length also serves the legacy
+  getter's read behavior. This is a preview API change, not binary compatibility.
+- Reserved ArrayList capacity supports non-defaultable carriers. Ordinary newarr
+  still requires valid defaults. Generic mapping is bounded and preserves invariant
+  arguments; arbitrary application classes, rectangular arrays and covariance are
+  not part of this importer.
+- Delegate APIs currently admit static targets. General instance/capturing targets,
+  application-defined interface implementations, virtual application hierarchies,
+  general pointer arithmetic/layouts, unboxing and constrained calls need further
+  compiler/importer work. Raw native pointer reads/writes currently admit Int32;
+  other supported primitive buffers use Get/Set/indexers.
+- Inherited Object methods visible from declaration metadata are not executable
+  library APIs unless separately admitted. Reflection remains introspection-only.
+  Cleanup on terminal faults and nullability metadata remain separate designs.
 
-## Comparison and tradeoffs
+These are explicit POC boundaries. In particular, Clonable/Closable metadata alone
+must not be presented as a demonstrated custom implementation. The API review is
+complete for this bounded projection; full CLR feature compatibility is not.
 
-.NET compilers normally consume the class library's metadata directly. The current
-experiment uses manually authored declaration metadata plus a bounded importer. It
-proves the runtime calls are real, but duplicating every signature and closed generic
-shape is a maintenance cost and a risk of contract drift. Moving toward a shared
-runtime-derived catalog and general signature handling is the next groundwork to
-evaluate; generated metadata must still preserve CLR type categories, visibility,
-inheritance, generic constraints and neoCLR's named Void semantics.
+## Comparison and maintenance
 
-Reuse the existing research in [runtime API design](api-design.md),
-[file input](file-input.md), [file output](file-output.md), and
-[the target-contract comparison](raven-target-contracts.md) as the contracts are
-projected. Research substantive divergences separately; a different interface name
-or metadata representation is not by itself an improvement. Keep Result/Option
-behavior and runtime faults distinct, and record any migration cost rather than
-hiding it in a compiler workaround.
+.NET compilers normally consume their class library metadata directly. This
+experiment still uses declaration metadata and a bounded importer, with real runtime
+library algorithms behind the calls. The duplicated metadata has a maintenance cost;
+keep the signature checks, source audit and executable examples current. The eventual
+runtime-derived binary catalog remains important groundwork.
 
-The [preview criteria](raven-preview-acceptance.md) and
-[experimental release procedure](experiments/raven-target/RELEASING.md) govern
-completion and packaging. A lightweight Raven distribution process still requires
-honest API coverage and successful package-level demonstrations.
+Reuse [API design](api-design.md), [target contracts](raven-target-contracts.md), and
+[design research](design-research.md) for subsequent changes. Review both the benefit
+and the migration cost before calling a divergence an improvement. Result/Option
+handling and terminal runtime faults remain distinct. Use the
+[preview criteria](raven-preview-acceptance.md) and
+[experimental release procedure](experiments/raven-target/RELEASING.md) for distribution.

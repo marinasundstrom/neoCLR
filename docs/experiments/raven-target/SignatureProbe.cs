@@ -78,6 +78,9 @@ static class SignatureProbe
         forEachCall.GenericArguments[0] = new PointerType(module.TypeSystem.Int32);
         Reject("Array.ForEach unsupported element", () => ArrayCallbackBindings.Bind(forEachCall, forEach));
         var ok = module.GetType("System.Result").NestedTypes.Single(t => t.Name == "Ok`1");
+        var writableCase = new GenericInstanceType(ok); writableCase.GenericArguments.Add(module.TypeSystem.Int32);
+        var setter = ok.Methods.Single(m => m.Name == "set_Value");
+        Check("Case payload setter preserves value receiver", GenericUnionBindings.Bind(Reference(setter, writableCase), setter)?.Result == "noresult");
         var nested = new GenericInstanceType(ok);
         nested.GenericArguments.Add(new ArrayType(result.GenericParameters[0]));
         var shape = new ByReferenceType(nested);

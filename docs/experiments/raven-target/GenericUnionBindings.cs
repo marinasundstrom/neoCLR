@@ -61,7 +61,8 @@ static class GenericUnionBindings
             var body = new StringBuilder($".function {name}({string.Join(',', declaration)}) -> {result}\n");
             if (instance) { body.AppendLine("ldarg arg0"); if (!byref) body.AppendLine("ldobj " + shape.Name); }
             for (var i = instance ? 1 : 0; i < inputs.Length; i++) body.AppendLine("ldarg arg" + i);
-            body.AppendLine((construct ? "newobj instance " : instance ? "call instance " : "call ") + shape.Name + "::" + method + "(" + string.Join(',', args) + ")");
+            if (method == "set_Value") body.AppendLine("stfld " + shape.Name + "::Value\npop");
+            else body.AppendLine((construct ? "newobj instance " : instance ? "call instance " : "call ") + shape.Name + "::" + method + "(" + string.Join(',', args) + ")");
             body.AppendLine("ret\n.end");
             helper = (name, body.ToString()); Helpers.Add(key, helper);
         }
@@ -90,6 +91,8 @@ static class GenericUnionBindings
         if (definition.IsVirtual && !definition.IsFinal) throw new InvalidDataException("Unexpected union virtual method.");
         if (shape.Kind is "Result.Ok" or "Result.Error" or "Option.Some")
         {
+            if (reference.HasThis && name == "set_Value" && args.SequenceEqual(new[] { shape.Args[0] }) && result == "noresult")
+                return Helper(shape, name, args, result, true, true);
             if (reference.HasThis && name == "get_Value" && args.Length == 0 && result == shape.Args[0])
                 return Helper(shape, name, args, result, true, false);
         }

@@ -1,0 +1,15 @@
+import System.*
+import System.Console.*
+func Main() {
+    var ok = Result.Ok<int>(42)
+    let carrier = Result<int, Error>(ok)
+    ok.Value = 7
+    WriteLine(ok.Value)
+    WriteLine(carrier.GetOkCase().Value)
+    var some = Option.Some<string>("Before")
+    some.Value = "After"
+    WriteLine(some.Value)
+    var error = Result.Error<string>("Original error")
+    error.Value = "Updated error"
+    WriteLine(error.Value)
+}
