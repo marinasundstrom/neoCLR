@@ -28,6 +28,13 @@ static class SignatureProbe
             catch (InvalidDataException) { checks.Add(name); return; }
             throw new Exception("Malformed signature accepted: " + name);
         }
+        NativeArrayBindings.Validate(module);
+        var native = module.GetType("System.Array`1");
+        var nativeOwner = new GenericInstanceType(native); nativeOwner.GenericArguments.Add(module.TypeSystem.Int32);
+        var allocate = native.Methods.Single(m => m.Name == "Allocate");
+        Check("Native buffer allocation signature", NativeArrayBindings.Bind(Reference(allocate, nativeOwner), allocate)?.Result == "System.Array<Int32>");
+        var dataField = new FieldReference("Data", new PointerType(module.TypeSystem.Double), nativeOwner);
+        Reject("Native pointer field mismatch", () => NativeArrayBindings.Field(dataField));
         EnumBindings.Validate(module);
         var flagsField = module.GetType(EnumBindings.Flags).Fields.Single(f => f.Name == "value__");
         flagsField.FieldType = module.TypeSystem.Int64;

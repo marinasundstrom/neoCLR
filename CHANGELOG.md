@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Exposed unsafe native Array<T> buffers through Raven for primitive elements,
+  including allocation/views, fields, indexers, addresses and explicit release.
+  Added saved-source success, bounds/lifetime faults, metadata checks and completion.
+  Int32 pointer reads/writes are admitted; general native layouts remain bounded.
+
 - Replaced provisional BindingFlags wrapper metadata with a standard Int32-backed
   CLI enum, literals and FlagsAttribute. Raven uses casts and bitwise operators
   instead of the wrapper factories/combinators; typed adapters retain runtime

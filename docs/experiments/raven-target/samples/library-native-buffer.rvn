@@ -1,0 +1,28 @@
+import System.*
+import System.Console.*
+unsafe func Main() {
+    var values = Array<int>.Allocate(3, 7)
+    WriteLine(values.Length)
+    WriteLine(values[0])
+    values[1] = 42
+    WriteLine(values.Get(1))
+    values.Set(2, 99)
+    let pointer = values.GetElementAddress(2)
+    WriteLine(*pointer)
+    *pointer = 100
+    WriteLine(values[2])
+    values.Length = 2
+    let view = Array<int>.View(values.Data, values.Length)
+    WriteLine(view.Length)
+    WriteLine(view[1])
+    values.Free()
+    let empty = Array<int>.Allocate(0, 0)
+    WriteLine(empty.Length)
+    empty.Free()
+    let wide = Array<long>.Allocate(1, 42L)
+    WriteLine(wide[0].CompareTo(42L))
+    wide.Free()
+    let bits = Array<bool>.Allocate(1, true)
+    if bits[0] { WriteLine("Native Boolean") }
+    bits.Free()
+}
