@@ -137,13 +137,17 @@ def main():
                 elif name == "environment":
                     guest_args = ["--", "argument with spaces", "--gc-stats"]
                 before = datetime.now(timezone.utc).timestamp()
-                result = run([executable, "run", input_path] + guest_args, source, True, smoke_env)
+                command = [str(executable), "run", str(input_path), "--show-result"] + list(map(str, guest_args))
+                result = subprocess.run(command, cwd=source, env=smoke_env,
+                                        capture_output=True, text=True, encoding="utf-8", check=True)
                 after = datetime.now(timezone.utc).timestamp()
-                lines = result.splitlines()
-                if not lines or lines[-1] != "=> Int32(0)":
-                    raise RuntimeError("guest smoke failure: " + name)
+                lines = result.stdout.splitlines()
+                if result.stderr.strip() != "=> Int32(0)":
+                    raise RuntimeError("guest smoke failure: " + name + ": " + result.stderr)
+                if not lines:
+                    raise RuntimeError("missing guest output: " + name)
                 if name == "local-clock":
-                    if len(lines) != 11:
+                    if len(lines) != 10:
                         raise RuntimeError("unexpected local-clock output")
                     parts = [int(lines[i]) for i in [1, 2, 3, 5, 6, 7]]
                     instant = datetime(*parts, tzinfo=timezone.utc).timestamp() - int(lines[9])

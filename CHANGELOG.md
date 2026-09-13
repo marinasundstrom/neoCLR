@@ -6,7 +6,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+## 0.1.0-preview.4 — 2026-09-13
+
+Runtime/Raven preview: see [release notes](docs/preview-4-release-notes.md) for the
+prebuilt macOS arm64 distribution, matching Raven tools, migration and limitations.
+
 ### 2026-09-13
+
+- Updated release smoke validation for the guest-only stdout contract: request
+  --show-result explicitly and verify successful completion on stderr. Retained
+  environment, clock and file content assertions without the retired output suffix.
 
 - Added a responsive project website explaining neoCLR, Raven integration, runtime
   APIs and preview limits, with excerpts built from executable samples. Added a

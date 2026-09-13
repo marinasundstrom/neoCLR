@@ -1,10 +1,10 @@
 # Next-preview validation
 
-The selected source-only candidate is **v0.1.0-preview.3**, dated 2026-09-08.
-See [Preview 3 notes](preview-3-release-notes.md). Its versioned commit must pass the
-six-job CI gate before publication; the passing development run for 90b4240 does not
-certify a later candidate. Published Preview 1/2 notes and evidence remain frozen.
-The [changelog](../CHANGELOG.md) records implemented features and migration guidance.
+The selected candidate is **v0.1.0-preview.4**, dated 2026-09-13. See
+[Preview 4 notes](preview-4-release-notes.md). Its versioned commit must pass the
+six-job source CI gate before publication. Separate package validation covers the
+macOS arm64 runtime/Raven bundle and matching experimental SDK/VSIX; it does not
+claim their availability on other hosts. Published Preview 1–3 notes remain frozen.
 
 ## Validation scope
 

@@ -1,7 +1,7 @@
 # neoCLR
 
 [![CI](https://github.com/marinasundstrom/neoCLR/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/marinasundstrom/neoCLR/actions/workflows/ci.yml)
-[![Preview 3](https://img.shields.io/badge/release-v0.1.0--preview.3-blue)](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.3)
+[![Preview 4](https://img.shields.io/badge/release-v0.1.0--preview.4-blue)](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.4)
 [![MIT license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Rust 1.85+](https://img.shields.io/badge/Rust-1.85%2B-orange)](Cargo.toml)
 
@@ -53,8 +53,8 @@ explicit **neoCLR: Build saved project** / **neoCLR: Run saved project** tasks.
 The normal Raven toolbar build/run/debug commands do not implement this target.
 See [runtime API coverage](docs/raven-runtime-api-coverage.md) for supported contracts
 and importer limits, and [the packaging procedure](docs/experiments/raven-target/RELEASING.md)
-for producing a matching experimental toolchain. This local build is not a new
-published release; the release badge still points to Preview 3.
+for producing a matching experimental toolchain. Preview 4 packages these entry points together; see the
+[release notes](docs/preview-4-release-notes.md) for assets, prerequisites and limits.
 
 ## Earlier Neo language experiment
 
@@ -80,7 +80,16 @@ separates unreleased work from published capabilities. Every commit updates it u
 The [next-preview validation guide](docs/next-preview-validation.md) documents the
 reproducible source-archive check and exact-commit release gates.
 
-## Preview 3
+## Preview 4
+
+**Preview 4 (v0.1.0-preview.4)** presents the runtime and its System library through
+neoIL and Raven. It includes a macOS arm64 runtime bundle, experimental Raven SDK/VSIX,
+examples, source, attribution and validation evidence. Start with the
+[release notes](docs/preview-4-release-notes.md). Publication is gated on the exact
+source revision passing CI; the GitHub prerelease is the asset source of truth.
+
+## Earlier previews
+
 
 **Preview 3 (v0.1.0-preview.3)** is the runtime-library foundation preview: readonly
 references, inheritance and constructor chaining, interface implementations, delegates
