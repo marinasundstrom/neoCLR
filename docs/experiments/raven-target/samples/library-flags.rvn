@@ -1,0 +1,18 @@
+import System.*
+import System.Console.*
+import System.Reflection.*
+func Read(flags: BindingFlags) { WriteLine((int)flags) }
+func Main() {
+    let flags: BindingFlags = .Public | .Instance | .Static
+    Read(flags)
+    Read(flags & BindingFlags.Static)
+    Read(flags ^ BindingFlags.Static)
+    Read((BindingFlags)~(int)flags)
+    let zero = (BindingFlags)0
+    Read(zero)
+    if flags == (BindingFlags)28 { WriteLine("Same flags") }
+    if (flags & BindingFlags.Public) == BindingFlags.Public { WriteLine("Public included") }
+    WriteLine(typeof(int).GetMethods(flags).Length)
+    let nonPublic = BindingFlags.NonPublic | BindingFlags.Instance
+    WriteLine(typeof(Date).GetFields(nonPublic)[0].Name)
+}

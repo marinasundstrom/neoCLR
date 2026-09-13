@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Replaced provisional BindingFlags wrapper metadata with a standard Int32-backed
+  CLI enum, literals and FlagsAttribute. Raven uses casts and bitwise operators
+  instead of the wrapper factories/combinators; typed adapters retain runtime
+  nominal storage. Added flags samples, metadata rejection and completion checks.
+
 - Exposed Raven type tokens, reflection queries, descriptor properties and managed
   snapshot arrays, including base-class views and Option<Type/MethodInfo> results.
   Added full public-getter/query samples, signature checks and editor completion.

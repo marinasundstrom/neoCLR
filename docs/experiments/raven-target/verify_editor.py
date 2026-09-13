@@ -263,7 +263,8 @@ try:
         for version, expression, expected in (
             (28, 'info.', ('Name', 'FullName', 'GetFields', 'GetMethods', 'GetProperties', 'GetElementType', 'GetGenericArguments')),
             (29, 'method.', ('Name', 'DeclaringType', 'ReturnType', 'GetParameters', 'IsPublic')),
-            (30, 'property.', ('Name', 'CanRead', 'GetGetMethod', 'GetIndexParameters'))):
+            (30, 'property.', ('Name', 'CanRead', 'GetGetMethod', 'GetIndexParameters')),
+            (31, 'System.Reflection.BindingFlags.', ('Public', 'NonPublic', 'Instance', 'Static', 'DeclaredOnly'))):
             text = 'import System.*\nfunc Main() {\n    let info = typeof(int)\n    let method = info.GetMethods()[0]\n    let property = typeof(Date).GetProperties()[0]\n    ' + expression + '\n}'
             send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})
             result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},

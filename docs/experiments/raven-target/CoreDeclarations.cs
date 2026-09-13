@@ -105,6 +105,7 @@ static class CoreDeclarations
             public abstract class Array { public int Length => 0; }
             public class Type { }
             public class Attribute { }
+            public sealed class FlagsAttribute : Attribute { }
             public enum AttributeTargets { All = 32767 }
             public sealed class AttributeUsageAttribute : Attribute {
                 public AttributeUsageAttribute(AttributeTargets targets) { }

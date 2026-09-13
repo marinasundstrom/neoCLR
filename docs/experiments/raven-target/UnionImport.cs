@@ -53,14 +53,14 @@ static class UnionImport
         var coercions = new Dictionary<string, (string Name, string Body)>();
         Call Coerce(Call call, string[] actual)
         {
-            if (!actual.Where((t, i) => BooleanBindings.Converts(t, call.Arguments[i])).Any()) return call;
+            if (!actual.Where((t, i) => Converts(t, call.Arguments[i])).Any()) return call;
             var key = (call.Instruction ?? call.Name) + string.Join(',', call.Arguments) + string.Join(',', actual) + call.Result + call.OutArgument;
             if (!coercions.TryGetValue(key, out var helper))
             {
                 var name = "RuntimeCliCall" + coercions.Count;
                 var parameters = actual.Select((t, i) => (i == call.OutArgument ? (call.ConditionalOutput ? "out(true) " : "out ") : "") + t + " arg" + i);
                 var body = new StringBuilder($".function {name}({string.Join(',', parameters)}) -> {call.Result}\n");
-                for (var i = 0; i < actual.Length; i++) body.AppendLine("ldarg arg" + i).Append(BooleanBindings.Convert(actual[i], call.Arguments[i]));
+                for (var i = 0; i < actual.Length; i++) body.AppendLine("ldarg arg" + i).Append(ConvertStack(actual[i], call.Arguments[i]));
                 body.AppendLine(call.Instruction ?? $"call {call.Name}({string.Join(',', call.Arguments)})").AppendLine("ret\n.end");
                 helper = (name, body.ToString()); coercions.Add(key, helper);
             }
@@ -110,12 +110,12 @@ static class UnionImport
                 void Load(int n) { Local(n); if (!assigned[n]) throw new InvalidDataException("Read of uninitialized or unsupported default local."); Push(new(PrimitiveBindings.Stack(locals[n]))); code.AppendLine($"ldloc local{n}"); }
                 Slot ConvertTop(string type)
                 {
-                    if (stack.Count == 0 || !BooleanBindings.Converts(stack[^1].Type, type)) return Expect(type);
-                    var value = Pop(); code.Append(BooleanBindings.Convert(value.Type, type)); return value;
+                    if (stack.Count == 0 || !Converts(stack[^1].Type, type)) return Expect(type);
+                    var value = Pop(); code.Append(ConvertStack(value.Type, type)); return value;
                 }
                 Slot Argument(string type)
                 {
-                    return stack.Count > 0 && BooleanBindings.Converts(stack[^1].Type, type) ? Pop() : Expect(type);
+                    return stack.Count > 0 && Converts(stack[^1].Type, type) ? Pop() : Expect(type);
                 }
                 void Store(int n) { Local(n); ConvertTop(locals[n]); assigned[n] = true; code.AppendLine($"stloc local{n}"); }
                 void Arg(int n) { if (n < 0 || n >= args.Length) throw new InvalidDataException("Invalid parameter index."); Push(new(PrimitiveBindings.Stack(args[n]))); code.AppendLine($"ldarg {n}"); }
@@ -197,6 +197,7 @@ static class UnionImport
                     case Code.Conv_I4: case Code.Conv_U4: case Code.Conv_I8: case Code.Conv_U8:
                     case Code.Conv_I: case Code.Conv_U: case Code.Conv_R4: case Code.Conv_R8: case Code.Conv_R_Un:
                         var converted = Pop();
+                        if (converted.Type == EnumBindings.Flags) { code.Append(EnumBindings.Convert(converted.Type, "Int32")); converted = new("Int32"); }
                         if (converted.Type is not ("Int32" or "Int64" or "IntPtr" or "UIntPtr" or "Double"))
                             throw new InvalidDataException("Unsupported numeric conversion source.");
                         var convertedType = instruction.OpCode.Code switch {
@@ -280,6 +281,12 @@ static class UnionImport
                         construction = Coerce(construction, constructedArguments);
                         Push(new(construction.Result));
                         code.AppendLine($"call {construction.Name}({string.Join(',', construction.Arguments)})"); break;
+                    case Code.Or: case Code.And: case Code.Xor:
+                        var bitsRight = Argument("Int32"); var bitsLeft = Argument("Int32");
+                        var bits = Coerce(new("RuntimeBits" + instruction.OpCode.Code, ["Int32", "Int32"], "Int32"), [bitsLeft.Type, bitsRight.Type]);
+                        Push(new("Int32")); code.AppendLine($"call {bits.Name}({string.Join(',', bits.Arguments)})"); break;
+                    case Code.Not:
+                        ConvertTop("Int32"); Push(new("Int32")); code.AppendLine("not"); break;
                     case Code.Ceq:
                         var right = Argument("Int32"); var left = Argument("Int32"); Push(new("Int32"));
                         var equality = Coerce(new("RuntimeEqual", ["Int32", "Int32"], "Int32"), [left.Type, right.Type]);
@@ -397,7 +404,7 @@ static class UnionImport
                 if (changed) work.Enqueue(index);
             }
         }
-        output.Append(Adapters()).Append(ResultBindings.Adapters()).Append(StringBindings.Adapters()).AppendLine(Int32Bindings.Adapters).AppendLine(DoubleBindings.Adapters).Append(PrimitiveBindings.Adapters).Append(CalendarBindings.Adapters).Append(ErrorBindings.Adapters()).Append(GenericUnionBindings.Adapters).AppendLine(ProcessBindings.Adapters).AppendLine(BooleanBindings.Adapters).AppendLine(ReflectionBindings.Adapters);
+        output.Append(Adapters()).Append(ResultBindings.Adapters()).Append(StringBindings.Adapters()).AppendLine(Int32Bindings.Adapters).AppendLine(DoubleBindings.Adapters).Append(PrimitiveBindings.Adapters).Append(CalendarBindings.Adapters).Append(ErrorBindings.Adapters()).Append(GenericUnionBindings.Adapters).AppendLine(ProcessBindings.Adapters).AppendLine(BooleanBindings.Adapters).AppendLine(ReflectionBindings.Adapters).AppendLine(EnumBindings.Adapters);
         foreach (var helper in coercions.Values) output.Append(helper.Body);
         foreach (var body in delegateAdapters.Values) output.Append(body);
         File.WriteAllText(destination, output.ToString());
@@ -461,6 +468,8 @@ static class UnionImport
         "System.Result/Error`1<System.OverflowError>" when type.IsValueType => Error,
         _ => throw new InvalidDataException("Unsupported Result profile type: " + type.FullName)
     };
+    static bool Converts(string source, string target) => BooleanBindings.Converts(source, target) || EnumBindings.Converts(source, target);
+    static string ConvertStack(string source, string target) => BooleanBindings.Convert(source, target) + EnumBindings.Convert(source, target);
     static bool NeedsInitialization(string type) => type == "System.RuntimeTypeHandle" || DelegateBindings.IsType(type) || (GenericUnionBindings.IsType(type)
         ? GenericUnionBindings.RequiresInitialization(type) : ResultBindings.RequiresInitialization(type));
     static bool HasNamedVoid(TypeReference type) => type is GenericInstanceType generic

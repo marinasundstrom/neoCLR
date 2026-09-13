@@ -28,6 +28,11 @@ static class SignatureProbe
             catch (InvalidDataException) { checks.Add(name); return; }
             throw new Exception("Malformed signature accepted: " + name);
         }
+        EnumBindings.Validate(module);
+        var flagsField = module.GetType(EnumBindings.Flags).Fields.Single(f => f.Name == "value__");
+        flagsField.FieldType = module.TypeSystem.Int64;
+        Reject("BindingFlags underlying type mismatch", () => EnumBindings.Validate(module));
+        flagsField.FieldType = module.TypeSystem.Int32;
         ReflectionBindings.Validate(module);
         var fieldsMethod = module.GetType("System.Type").Methods.Single(m => m.Name == "GetFields" && m.Parameters.Count == 0);
         Check("Reflection returns managed descriptor vector", ReflectionBindings.Bind(fieldsMethod, fieldsMethod)?.Result == "arrayref<System.Reflection.FieldInfo>");

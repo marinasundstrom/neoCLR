@@ -69,20 +69,6 @@ static class ReflectionBindings
         ("System.Reflection.PropertyInfo", "GetGetMethod", ["Boolean"], "System.Option<System.Reflection.MethodInfo>", false),
         ("System.Reflection.PropertyInfo", "GetSetMethod", [], "System.Option<System.Reflection.MethodInfo>", false),
         ("System.Reflection.PropertyInfo", "GetSetMethod", ["Boolean"], "System.Option<System.Reflection.MethodInfo>", false),
-        ("System.Reflection.BindingFlags", "FromValue", ["Int32"], "System.Reflection.BindingFlags", true),
-        ("System.Reflection.BindingFlags", "get_Value", [], "Int32", false),
-        ("System.Reflection.BindingFlags", "Or", ["System.Reflection.BindingFlags"], "System.Reflection.BindingFlags", false),
-        ("System.Reflection.BindingFlags", "Default", [], "System.Reflection.BindingFlags", true),
-        ("System.Reflection.BindingFlags", "DeclaredOnly", [], "System.Reflection.BindingFlags", true),
-        ("System.Reflection.BindingFlags", "Instance", [], "System.Reflection.BindingFlags", true),
-        ("System.Reflection.BindingFlags", "Static", [], "System.Reflection.BindingFlags", true),
-        ("System.Reflection.BindingFlags", "Public", [], "System.Reflection.BindingFlags", true),
-        ("System.Reflection.BindingFlags", "NonPublic", [], "System.Reflection.BindingFlags", true),
-        ("System.Reflection.BindingFlags", "And", ["System.Reflection.BindingFlags"], "System.Reflection.BindingFlags", false),
-        ("System.Reflection.BindingFlags", "Xor", ["System.Reflection.BindingFlags"], "System.Reflection.BindingFlags", false),
-        ("System.Reflection.BindingFlags", "Not", [], "System.Reflection.BindingFlags", false),
-        ("System.Reflection.BindingFlags", "Equals", ["System.Reflection.BindingFlags"], "Boolean", false),
-        ("System.Reflection.BindingFlags", "HasFlag", ["System.Reflection.BindingFlags"], "Boolean", false),
     ];
     public const string Declarations = """
         public struct RuntimeTypeHandle { }
@@ -93,7 +79,7 @@ static class ReflectionBindings
         namespace Reflection { public class FieldInfo : System.Reflection.MemberInfo { internal FieldInfo() { } public System.Type FieldType => default; public bool IsPublic => default; public bool IsPrivate => default; public bool IsAssembly => default; public bool IsStatic => default; public int DefinitionIndex => default; } }
         namespace Reflection { public class MethodInfo : System.Reflection.MemberInfo { internal MethodInfo() { } public System.Type ReturnType => default; public bool IsStatic => default; public bool IsPublic => default; public bool IsPrivate => default; public bool IsAssembly => default; public bool IsReceiverByRef => default; public int DefinitionIndex => default; public bool IsReadOnly => default; public bool IsVirtual => default; public bool IsOverride => default; public bool IsAbstract => default; public System.Reflection.ParameterInfo[] GetParameters() => default; } }
         namespace Reflection { public class PropertyInfo : System.Reflection.MemberInfo { internal PropertyInfo() { } public System.Type PropertyType => default; public bool IsStatic => default; public bool CanRead => default; public bool CanWrite => default; public int DefinitionIndex => default; public System.Reflection.ParameterInfo[] GetIndexParameters() => default; public System.Option<System.Reflection.MethodInfo> GetGetMethod() => default; public System.Option<System.Reflection.MethodInfo> GetGetMethod(bool arg0) => default; public System.Option<System.Reflection.MethodInfo> GetSetMethod() => default; public System.Option<System.Reflection.MethodInfo> GetSetMethod(bool arg0) => default; } }
-        namespace Reflection { public struct BindingFlags { public int Value => default; public static System.Reflection.BindingFlags FromValue(int arg0) => default; public System.Reflection.BindingFlags Or(System.Reflection.BindingFlags arg0) => default; public static System.Reflection.BindingFlags Default() => default; public static System.Reflection.BindingFlags DeclaredOnly() => default; public static System.Reflection.BindingFlags Instance() => default; public static System.Reflection.BindingFlags Static() => default; public static System.Reflection.BindingFlags Public() => default; public static System.Reflection.BindingFlags NonPublic() => default; public System.Reflection.BindingFlags And(System.Reflection.BindingFlags arg0) => default; public System.Reflection.BindingFlags Xor(System.Reflection.BindingFlags arg0) => default; public System.Reflection.BindingFlags Not() => default; public bool Equals(System.Reflection.BindingFlags arg0) => default; public bool HasFlag(System.Reflection.BindingFlags arg0) => default; } }
+        namespace Reflection { [Flags] public enum BindingFlags { Default = 0, DeclaredOnly = 2, Instance = 4, Static = 8, Public = 16, NonPublic = 32 } }
         """;
     static readonly Dictionary<string, string> Helpers = new();
     public static void Reset() => Helpers.Clear();
@@ -111,6 +97,7 @@ static class ReflectionBindings
     }
     public static void Validate(ModuleDefinition module)
     {
+        EnumBindings.Validate(module);
         foreach (var name in Classes)
         {
             var type = module.GetType(name) ?? throw new InvalidDataException("Missing reflection type: " + name);
@@ -141,7 +128,7 @@ static class ReflectionBindings
         if (!Members.Any(m => m.Owner == owner && m.Name == reference.Name && m.Static == !reference.HasThis
             && m.Args.Select(Project).SequenceEqual(args) && Project(m.Result) == result))
             throw new InvalidDataException("Unsupported reflection signature: " + reference.FullName);
-        var inputs = reference.HasThis ? new[] { owner + (owner == "System.Reflection.BindingFlags" ? "&" : "") }.Concat(args).ToArray() : args;
+        var inputs = reference.HasThis ? new[] { owner }.Concat(args).ToArray() : args;
         var key = reference.FullName;
         var name = "RuntimeReflection" + Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(Encoding.UTF8.GetBytes(key)))[..16];
         if (!Helpers.ContainsKey(key))
@@ -153,7 +140,6 @@ static class ReflectionBindings
             for (var i = 0; i < inputs.Length; i++)
             {
                 body.AppendLine("ldarg arg" + i);
-                if (i == 0 && reference.HasThis && owner == "System.Reflection.BindingFlags") body.AppendLine("ldobj " + owner);
             }
             body.AppendLine($"call {(reference.HasThis ? "instance " : "")}{owner}::{reference.Name}({string.Join(',', args)})");
             if (vector) body.AppendLine($"stloc source\nldloc source\nldlen\nconv.i4\nnewarr {element}\nstloc destination\nldc.i4 0\nstloc index\nbr Test\nCopy:\nldloc destination\nldloc index\nldloc source\nldloc index\nldelem {element}\nstelem {element}\nldloc index\nldc.i4 1\nadd\nstloc index\nTest:\nldloc index\nldloc source\nldlen\nconv.i4\nblt Copy\nldloc destination");
