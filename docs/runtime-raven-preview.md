@@ -95,9 +95,10 @@ history; new Raven work does not require migrating that frontend.
 
 ## Validation and release status
 
-The local `.6` toolchain passed nine outside-checkout integration suites and installed
-server checks; [its record](experiments/raven-target/local-toolchain.json) identifies
-those exact artifacts. Those earlier artifacts do not contain the newer neoIL samples
-or packaging corrections. A fresh candidate must include and run these walkthroughs,
-carry final attribution, and record its own checksums before publication. Follow the
-[experimental release procedure](experiments/raven-target/RELEASING.md).
+The current local candidate combines the `.6` Raven tools with the updated runtime,
+neoIL samples and attribution. Ten outside-checkout package suites passed; the broader
+runtime test run passed after correcting stale String-default assertions. See
+[candidate evidence](experiments/raven-target/candidate-validation.json) for exact
+revisions, checksums and the corrections. This is local macOS arm64 evidence, not a
+claim of passing final cross-platform CI. Final version selection, exact-source CI
+and publication remain; follow the [release procedure](experiments/raven-target/RELEASING.md).

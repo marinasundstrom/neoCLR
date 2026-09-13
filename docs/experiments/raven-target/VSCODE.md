@@ -15,7 +15,7 @@ not published releases. The global SDK selection remains unchanged.
 Open the prepared folder:
 
 ```sh
-code --new-window "$HOME/.neoclr/experiments/runtime-api-poc-20260913/demo"
+code --new-window "$HOME/.neoclr/experiments/runtime-raven-candidate-20260913-2/demo"
 ```
 
 1. Run **Developer: Reload Window** if VS Code was open during the update.
@@ -31,17 +31,18 @@ The published compiler bridge and runtime library are included: neither developm
 checkout is required. Host tooling requires .NET 11 and Python 3.9 or later.
 The [bundle instructions](bundle/README.md) explain setup after extraction or moving it.
 
-All nine package validation suites passed outside both checkouts on 2026-09-13.
+All ten package validation suites passed outside both checkouts on 2026-09-13.
 The installed extension's server also passed completion/hover protocol checks, and
 the installed demo compiled, verified and ran. This verifies the server protocol;
 it does not claim a manual visual inspection of every VS Code feature.
-See [build provenance](local-toolchain.json), [API coverage](../../raven-runtime-api-coverage.md)
+The current runtime candidate also includes direct neoIL samples under `../samples/neoil`.
+See [candidate evidence](candidate-validation.json), [build provenance](local-toolchain.json), [API coverage](../../raven-runtime-api-coverage.md)
 and the [match matrix](../../raven-match-matrix.md) for the supported scope.
 
 Terminal equivalent for the installed bundle:
 
 ```sh
-cd "$HOME/.neoclr/experiments/runtime-api-poc-20260913"
+cd "$HOME/.neoclr/experiments/runtime-raven-candidate-20260913-2"
 python3 tools/run_project.py demo/Demo.rvnproj --bridge tools/bridge/Probe.dll --system lib/System.neoil --runtime bin/neoclr
 ```
 

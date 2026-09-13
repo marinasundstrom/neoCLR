@@ -1,0 +1,201 @@
+{
+  "date": "2026-09-13",
+  "status": "local candidate validated; not published",
+  "runtimeBuildRevision": "74f6d886222f81da4cdf9e88f53b7ff094cc45f7",
+  "sourceArchiveRevision": "6dfb95acc366078c7f7ae9897dbd5315680225fc",
+  "ravenRevision": "9b269f9d0d71c4302c9008ff6bf6d0c6b1d21c9c",
+  "ravenBranch": "codex/neoclr-target-resolution",
+  "sdkVersion": "0.1.12-neoclr.6",
+  "dotnetSdk": "11.0.100-rc.1.26425.128",
+  "platform": "osx-arm64",
+  "payloadFilesVerified": 645,
+  "packageSuites": {
+    "file_project": {
+      "exitCode": 0,
+      "command": [
+        "python3",
+        "/tmp/neoclr-runtime-raven-candidate-2/tools/verify_file_project.py",
+        "/tmp/neoclr-runtime-raven-candidate-2/demo/Demo.rvnproj",
+        "--bridge",
+        "/tmp/neoclr-runtime-raven-candidate-2/tools/bridge/Probe.dll",
+        "--system",
+        "/tmp/neoclr-runtime-raven-candidate-2/lib/System.neoil",
+        "--runtime",
+        "/tmp/neoclr-runtime-raven-candidate-2/bin/neoclr"
+      ]
+    },
+    "process": {
+      "exitCode": 0,
+      "command": [
+        "python3",
+        "/tmp/neoclr-runtime-raven-candidate-2/tools/verify_process.py",
+        "/tmp/neoclr-runtime-raven-candidate-2/demo/Demo.rvnproj",
+        "--bridge",
+        "/tmp/neoclr-runtime-raven-candidate-2/tools/bridge/Probe.dll",
+        "--system",
+        "/tmp/neoclr-runtime-raven-candidate-2/lib/System.neoil",
+        "--runtime",
+        "/tmp/neoclr-runtime-raven-candidate-2/bin/neoclr"
+      ]
+    },
+    "clock": {
+      "exitCode": 0,
+      "command": [
+        "python3",
+        "/tmp/neoclr-runtime-raven-candidate-2/tools/verify_clock.py",
+        "/tmp/neoclr-runtime-raven-candidate-2/demo/Demo.rvnproj",
+        "--bridge",
+        "/tmp/neoclr-runtime-raven-candidate-2/tools/bridge/Probe.dll",
+        "--system",
+        "/tmp/neoclr-runtime-raven-candidate-2/lib/System.neoil",
+        "--runtime",
+        "/tmp/neoclr-runtime-raven-candidate-2/bin/neoclr"
+      ]
+    },
+    "error_values": {
+      "exitCode": 0,
+      "command": [
+        "python3",
+        "/tmp/neoclr-runtime-raven-candidate-2/tools/verify_error_values.py",
+        "/tmp/neoclr-runtime-raven-candidate-2/demo/Demo.rvnproj",
+        "--bridge",
+        "/tmp/neoclr-runtime-raven-candidate-2/tools/bridge/Probe.dll",
+        "--system",
+        "/tmp/neoclr-runtime-raven-candidate-2/lib/System.neoil",
+        "--runtime",
+        "/tmp/neoclr-runtime-raven-candidate-2/bin/neoclr"
+      ]
+    },
+    "unions": {
+      "exitCode": 0,
+      "command": [
+        "python3",
+        "/tmp/neoclr-runtime-raven-candidate-2/tools/verify_unions.py",
+        "/tmp/neoclr-runtime-raven-candidate-2/demo/Demo.rvnproj",
+        "--bridge",
+        "/tmp/neoclr-runtime-raven-candidate-2/tools/bridge/Probe.dll",
+        "--system",
+        "/tmp/neoclr-runtime-raven-candidate-2/lib/System.neoil",
+        "--runtime",
+        "/tmp/neoclr-runtime-raven-candidate-2/bin/neoclr"
+      ]
+    },
+    "delegates": {
+      "exitCode": 0,
+      "command": [
+        "python3",
+        "/tmp/neoclr-runtime-raven-candidate-2/tools/verify_delegates.py",
+        "/tmp/neoclr-runtime-raven-candidate-2/demo/Demo.rvnproj",
+        "--bridge",
+        "/tmp/neoclr-runtime-raven-candidate-2/tools/bridge/Probe.dll",
+        "--system",
+        "/tmp/neoclr-runtime-raven-candidate-2/lib/System.neoil",
+        "--runtime",
+        "/tmp/neoclr-runtime-raven-candidate-2/bin/neoclr"
+      ]
+    },
+    "editor": {
+      "exitCode": 0,
+      "command": [
+        "python3",
+        "/tmp/neoclr-runtime-raven-candidate-2/tools/verify_editor.py",
+        "/tmp/neoclr-runtime-raven-candidate-2/demo",
+        "--collections",
+        "--files",
+        "--strings",
+        "--parsing",
+        "--primitives",
+        "--calendar",
+        "--errors",
+        "--unions",
+        "--process",
+        "--booleans",
+        "--reflection"
+      ]
+    },
+    "neoil": {
+      "exitCode": 0,
+      "command": [
+        "python3",
+        "/tmp/neoclr-runtime-raven-candidate-2/tools/verify_neoil.py",
+        "--samples",
+        "/tmp/neoclr-runtime-raven-candidate-2/samples/neoil",
+        "--system",
+        "/tmp/neoclr-runtime-raven-candidate-2/lib/System.neoil",
+        "--runtime",
+        "/tmp/neoclr-runtime-raven-candidate-2/bin/neoclr"
+      ]
+    },
+    "native_buffer": {
+      "exitCode": 0,
+      "command": [
+        "python3",
+        "/tmp/neoclr-runtime-raven-candidate-2/tools/verify_native_buffer.py",
+        "/tmp/neoclr-runtime-raven-candidate-2/demo/Demo.rvnproj",
+        "--bridge",
+        "/tmp/neoclr-runtime-raven-candidate-2/tools/bridge/Probe.dll",
+        "--system",
+        "/tmp/neoclr-runtime-raven-candidate-2/lib/System.neoil",
+        "--runtime",
+        "/tmp/neoclr-runtime-raven-candidate-2/bin/neoclr"
+      ]
+    },
+    "project": {
+      "exitCode": 0,
+      "command": [
+        "python3",
+        "/tmp/neoclr-runtime-raven-candidate-2/tools/verify_project.py",
+        "/tmp/neoclr-runtime-raven-candidate-2/demo/Demo.rvnproj",
+        "--bridge",
+        "/tmp/neoclr-runtime-raven-candidate-2/tools/bridge/Probe.dll",
+        "--system",
+        "/tmp/neoclr-runtime-raven-candidate-2/lib/System.neoil",
+        "--runtime",
+        "/tmp/neoclr-runtime-raven-candidate-2/bin/neoclr",
+        "--collections"
+      ]
+    }
+  },
+  "runtimeTests": {
+    "executablesRun": 170,
+    "distinctTargetNames": 169,
+    "initialFailures": [
+      "neo_arrays",
+      "neo_defaults"
+    ],
+    "correction": "Stale assertions rejecting String defaults updated to existing typed-null behavior; runtime and Neo compiler unchanged. Both corrected targets passed (11 tests). All other test executables passed.",
+    "format": "passed",
+    "clippyAllTargets": "passed",
+    "doctests": "passed (0 tests)"
+  },
+  "attribution": {
+    "nugetPackages": 26,
+    "npmPackages": 5,
+    "rustPackages": 47,
+    "rustNoticeFiles": 94,
+    "vsixJavaScriptSha256": "eaef391185bcce10201d8f42ab5345e72249e82343544b79f3d378f8f9b7a90f"
+  },
+  "installedDemo": "/Users/robert/.neoclr/experiments/runtime-raven-candidate-20260913-2/demo",
+  "guestOutput": [
+    "42",
+    "Saved",
+    "Completed",
+    "Overflow",
+    "Value found",
+    "42",
+    "Absent"
+  ],
+  "remainingReleaseGates": [
+    "Choose final published version and prepare final release notes/changelog",
+    "Exact final source candidate CI across claimed platforms/toolchains",
+    "Publish runtime, Raven SDK/VSIX, source, attribution and validation assets together"
+  ],
+  "artifacts": {
+    "neoclr-runtime-raven-osx-arm64.tar.gz": "5f43005d53a463f4d3c7044c1b4caadf9272b0750455d57b5ed2be1e979bca60",
+    "neoclr-source.tar": "65ce7cf3806b8dbd049100440a6a75b4411c7a0a93d83c04b10b82afd16c7d3d",
+    "raven-toolchain-notices.tar.gz": "4411b9c32abe8f7aa5ae5578b2274192c743d866e1e3f071d7d91eb94ad5e6dc",
+    "validation-evidence.tar.gz": "1fb01c863811dbd7dbcaa4263a22d9ac0c4b8fb6edf3a110d471f687596b331e",
+    "raven-sdk-0.1.12-neoclr.6-osx-arm64.tar.gz": "093d75ac73b0b286f5ed0b1f538ce4820516a5c5e2bbb17106e8b666a0f559b1",
+    "raven-vscode.vsix": "f9dd076ec0c826fd1e4118009536f37248a8b174d29026e44eab40a9db82fce6"
+  }
+}

@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Built and locally validated the runtime/Raven candidate with direct neoIL samples,
+  source archive, toolchain notices and matching .6 Raven SDK/VSIX. Ten extracted
+  package suites pass; all runtime test executables pass after the recorded stale-test
+  corrections, with strict Clippy/format checks. Recorded revisions, asset hashes and
+  remaining final-version/CI/publication gates; refreshed the prepared local demo.
+
 - Simplified the existing virtual-call admission condition and empty verifier match
   arms for strict Clippy validation while preserving the supported receiver modes.
   Updated stale initialization tests and String API prose to the implemented typed-null
