@@ -51,7 +51,7 @@ if (args.Length == 2 && args[0] == "--interfaces")
 if (args.Length == 3 && args[0] == "--project")
 {
     try { ProjectBuild.Write(args[1], args[2]); }
-    catch (Exception error) { Console.Error.WriteLine(error.Message); Environment.ExitCode = 1; }
+    catch (Exception error) { Console.Error.WriteLine(Environment.GetEnvironmentVariable("NEOCLR_IMPORT_TRACE") == "1" ? error.ToString() : error.Message); Environment.ExitCode = 1; }
     return;
 }
 

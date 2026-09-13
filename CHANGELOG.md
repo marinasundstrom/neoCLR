@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- The Raven source bridge now imports ordinary application classes/value types,
+  fields, constructors and instance accessors/methods, including ArrayList storage.
+  Added class-alias/value-copy, saved-source, mapping and rejection checks. Recorded
+  Raven targeting findings and the future generic-Void async requirement; the source
+  bridge requires the updated experimental Raven branch, not the published Preview 4 SDK.
+
 - Recorded the implementation-language discussion, distinguishing Rust build
   dependencies and implementation memory safety from neoCLR's guest GC; language
   migration remains an open question, with no runtime changes.

@@ -39,6 +39,7 @@ static class UnionImport
         var library = resolver.Images.Single(a => a.Name.FullName == System.Reflection.AssemblyName.GetAssemblyName(core).FullName);
         if (app.MainModule.Types.Any(t => t.Name == "<Module>" && t.Methods.Any(m => m.IsConstructor && m.IsStatic)))
             throw new InvalidDataException("Module initializers unsupported.");
+        ApplicationTypes.Reset(app.MainModule);
         var entry = app.EntryPoint ?? throw new InvalidDataException("Missing entry point.");
         if (entry.Parameters.Count != 0 || entry.ReturnType.MetadataType != MetadataType.Void)
             throw new InvalidDataException("Result profile requires a parameterless no-result entry.");
@@ -47,7 +48,7 @@ static class UnionImport
         {
             var collection = CollectionBindings.Type(type);
             if (collection is not null && collectionProfile) return collection;
-            return InterfaceBindings.Type(type) ?? NativeArrayBindings.Type(type) ?? ReflectionBindings.Type(type) ?? DelegateBindings.Type(type) ?? ProcessBindings.ArrayType(type) ?? GenericUnionBindings.Type(type) ?? CalendarBindings.Type(type) ?? PrimitiveBindings.Type(type) ?? ResultBindings.Type(type) ?? Type(type, result);
+            return ApplicationTypes.Type(type) ?? InterfaceBindings.Type(type) ?? NativeArrayBindings.Type(type) ?? ReflectionBindings.Type(type) ?? DelegateBindings.Type(type) ?? ProcessBindings.ArrayType(type) ?? GenericUnionBindings.Type(type) ?? CalendarBindings.Type(type) ?? PrimitiveBindings.Type(type) ?? ResultBindings.Type(type) ?? Type(type, result);
         }
         var output = new StringBuilder($".module ImportedUnion\n.entry {Name(entry)}\n");
         var coercions = new Dictionary<string, (string Name, string Body)>();
@@ -67,22 +68,25 @@ static class UnionImport
             return call with { Name = helper.Name, Arguments = actual, Instruction = null };
         }
         var delegateAdapters = new Dictionary<string, string>();
-        var mappings = new List<object>();
+        var mappings = new List<(uint MethodToken, int Offset)>();
         var pending = new Queue<MethodDefinition>(); pending.Enqueue(entry);
         var seen = new HashSet<uint>();
+        var instanceBodies = new Dictionary<MethodDefinition, string>();
         while (pending.TryDequeue(out var method))
         {
             if (!seen.Add(method.MetadataToken.ToUInt32())) continue;
             if (seen.Count > 128) throw new InvalidDataException("Method limit exceeded.");
-            CheckStatic(method);
+            ApplicationTypes.CheckMethod(method);
             if (!method.HasBody || method.IsPInvokeImpl || method.IsInternalCall || method.Body.HasExceptionHandlers
                 || method.Body.CodeSize > 65536 || method.Body.MaxStackSize > 256 || method.Body.Variables.Count > 256 || method.Body.Instructions.Count == 0
                 || method.DeclaringType.Methods.Any(m => m.IsConstructor && m.IsStatic))
                 throw new InvalidDataException("Unsupported body: " + method.FullName);
-            var args = method.Parameters.Select(p => ProfileType(p.ParameterType)).ToArray();
+            var args = (method.HasThis ? new[] { ApplicationTypes.Receiver(method) } : Array.Empty<string>()).Concat(method.Parameters.Select(p => ProfileType(p.ParameterType))).ToArray();
+            var valueConstructor = method.IsConstructor && method.DeclaringType.IsValueType;
+            var emitInstance = method.HasThis && !valueConstructor;
             var result = ProfileType(method.ReturnType, true);
             var locals = method.Body.Variables.Select(v => ProfileType(v.VariableType)).ToArray();
-            if (locals.Any(t => !ManagedArrayBindings.IsType(t) && t != "System.Object" && !InterfaceBindings.IsInterface(t) && !NativeArrayBindings.IsType(t) && !NativeArrayBindings.IsPointer(t) && !ReflectionBindings.IsType(t) && t != "arrayref<String>" && !DelegateBindings.IsType(t) && !GenericUnionBindings.IsType(t) && !CalendarBindings.Types.Contains(t) && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
+            if (locals.Any(t => !ApplicationTypes.IsType(t) && !ManagedArrayBindings.IsType(t) && t != "System.Object" && !InterfaceBindings.IsInterface(t) && !NativeArrayBindings.IsType(t) && !NativeArrayBindings.IsPointer(t) && !ReflectionBindings.IsType(t) && t != "arrayref<String>" && !DelegateBindings.IsType(t) && !GenericUnionBindings.IsType(t) && !CalendarBindings.Types.Contains(t) && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
                 throw new InvalidDataException("Unsupported local default in Result profile.");
             NormalizePatternBranches(method);
             var instructions = method.Body.Instructions.ToArray();
@@ -118,7 +122,7 @@ static class UnionImport
                     return stack.Count > 0 && Converts(stack[^1].Type, type) ? Pop() : Expect(type);
                 }
                 void Store(int n) { Local(n); ConvertTop(locals[n]); assigned[n] = true; code.AppendLine($"stloc local{n}"); }
-                void Arg(int n) { if (n < 0 || n >= args.Length) throw new InvalidDataException("Invalid parameter index."); Push(new(PrimitiveBindings.Stack(args[n]))); code.AppendLine($"ldarg {n}"); }
+                void Arg(int n) { if (n < 0 || n >= args.Length) throw new InvalidDataException("Invalid parameter index."); Push(new(PrimitiveBindings.Stack(args[n]), Argument: args[n].EndsWith('&') ? n : -1)); code.AppendLine($"ldarg {n}"); }
                 int Target() => instruction.Operand is Instruction target && indexes.TryGetValue(target, out var n)
                     ? n : throw new InvalidDataException("Invalid branch target.");
                 var terminates = false;
@@ -138,7 +142,7 @@ static class UnionImport
                         }
                         else
                         {
-                            code.AppendLine((ManagedArrayBindings.IsReference(initializedType) || CalendarBindings.Types.Contains(initializedType) || GenericUnionBindings.IsType(initializedType)) ? "initobj " + initializedType : Default(initializedType) + "\nstobj " + initializedType);
+                            code.AppendLine((ApplicationTypes.IsType(initializedType) || ManagedArrayBindings.IsReference(initializedType) || CalendarBindings.Types.Contains(initializedType) || GenericUnionBindings.IsType(initializedType)) ? "initobj " + initializedType : Default(initializedType) + "\nstobj " + initializedType);
                             assigned[address.Local] = true;
                         }
                         break;
@@ -204,6 +208,13 @@ static class UnionImport
                     case Code.Ldfld:
                         if (!collectionProfile) throw new InvalidDataException("Native fields require target profile.");
                         var readField = (FieldReference)instruction.Operand;
+                        var appRead = ApplicationTypes.Field(readField, method, ProfileType);
+                        if (appRead is not null)
+                        {
+                            var receiver = Pop().Type;
+                            if (receiver != appRead.Owner && receiver != appRead.Owner + "&") throw new InvalidDataException("Invalid application field receiver.");
+                            Push(new(PrimitiveBindings.Stack(appRead.Type))); code.AppendLine($"ldfld {appRead.Owner}::{appRead.Name}"); break;
+                        }
                         var readShape = NativeArrayBindings.Field(readField);
                         var fieldReceiver = Pop();
                         if (fieldReceiver.Type != readShape.Owner && fieldReceiver.Type != readShape.Owner + "&") throw new InvalidDataException("Invalid native buffer field receiver.");
@@ -211,6 +222,14 @@ static class UnionImport
                     case Code.Stfld:
                         if (!collectionProfile) throw new InvalidDataException("Native fields require target profile.");
                         var writeField = (FieldReference)instruction.Operand;
+                        var appWrite = ApplicationTypes.Field(writeField, method, ProfileType);
+                        if (appWrite is not null)
+                        {
+                            ConvertTop(appWrite.Type); Expect(appWrite.Owner + (appWrite.ValueOwner ? "&" : ""));
+                            code.AppendLine($"stfld {appWrite.Owner}::{appWrite.Name}");
+                            if (appWrite.ValueOwner) code.AppendLine("pop");
+                            break;
+                        }
                         var writeShape = NativeArrayBindings.Field(writeField);
                         ConvertTop(writeShape.Type); Expect(writeShape.Owner + "&");
                         code.AppendLine($"stfld {writeShape.Owner}::{writeField.Name}\npop"); break;
@@ -255,10 +274,10 @@ static class UnionImport
                         var number = instruction.Operand is null ? (int)instruction.OpCode.Code - (int)Code.Ldc_I4_0 : Convert.ToInt32(instruction.Operand);
                         Push(new("Int32")); code.AppendLine($"ldc.i4 {number}"); break;
                     case Code.Ldarg_0: case Code.Ldarg_1: case Code.Ldarg_2: case Code.Ldarg_3: Arg((int)instruction.OpCode.Code - (int)Code.Ldarg_0); break;
-                    case Code.Ldarg: case Code.Ldarg_S: Arg(((ParameterDefinition)instruction.Operand).Index); break;
+                    case Code.Ldarg: case Code.Ldarg_S: Arg(((ParameterDefinition)instruction.Operand).Index + (method.HasThis ? 1 : 0)); break;
                     case Code.Ldarga: case Code.Ldarga_S:
-                        var parameter = ((ParameterDefinition)instruction.Operand).Index;
-                        if (parameter < 0 || parameter >= args.Length || !(NativeArrayBindings.IsType(args[parameter]) || args[parameter] == "System.Reflection.BindingFlags" || PrimitiveBindings.IsReceiver(args[parameter]) || CalendarBindings.Types.Contains(args[parameter]) || ErrorBindings.IsType(args[parameter]) || GenericUnionBindings.IsType(args[parameter])))
+                        var parameter = ((ParameterDefinition)instruction.Operand).Index + (method.HasThis ? 1 : 0);
+                        if (parameter < 0 || parameter >= args.Length || !(ApplicationTypes.IsType(args[parameter]) || NativeArrayBindings.IsType(args[parameter]) || args[parameter] == "System.Reflection.BindingFlags" || PrimitiveBindings.IsReceiver(args[parameter]) || CalendarBindings.Types.Contains(args[parameter]) || ErrorBindings.IsType(args[parameter]) || GenericUnionBindings.IsType(args[parameter])))
                             throw new InvalidDataException("Only admitted primitive argument addresses supported.");
                         Push(new(args[parameter] + "&", Argument: parameter)); code.AppendLine($"ldarga {parameter}"); break;
                     case Code.Ldloc_0: case Code.Ldloc_1: case Code.Ldloc_2: case Code.Ldloc_3: Load((int)instruction.OpCode.Code - (int)Code.Ldloc_0); break;
@@ -280,6 +299,26 @@ static class UnionImport
                     case Code.Newobj:
                         var constructor = (MethodReference)instruction.Operand;
                         var constructorDefinition = constructor.Resolve() ?? throw new InvalidDataException("Unresolved constructor.");
+                        if (constructorDefinition.Module == app.MainModule)
+                        {
+                            ApplicationTypes.CheckMethod(constructor);
+                            if (!constructorDefinition.IsPublic && constructorDefinition.DeclaringType != method.DeclaringType) throw new InvalidDataException("Nonpublic application constructor unsupported.");
+                            if (!constructorDefinition.IsConstructor || constructorDefinition.IsStatic || constructor.FullName != constructorDefinition.FullName) throw new InvalidDataException("Invalid application constructor.");
+                            var ctorArgs = constructor.Parameters.Select(p => ProfileType(p.ParameterType)).ToArray();
+                            for (var n = ctorArgs.Length - 1; n >= 0; n--) ConvertTop(ctorArgs[n]);
+                            var owner = ProfileType(constructor.DeclaringType);
+                            pending.Enqueue(constructorDefinition); Push(new(owner));
+                            if (constructorDefinition.DeclaringType.IsValueType)
+                            {
+                                var factory = "Create" + Name(constructorDefinition);
+                                var body = new StringBuilder($".function {factory}({string.Join(',', ctorArgs)}) -> {owner}\n.local {owner} value\nldloca value\ninitobj {owner}\nldloca value\n");
+                                for (var n = 0; n < ctorArgs.Length; n++) body.AppendLine($"ldarg {n}");
+                                body.AppendLine($"call {Name(constructorDefinition)}({string.Join(',', new[] { owner + "&" }.Concat(ctorArgs))})\nldloc value\nret\n.end");
+                                delegateAdapters[factory] = body.ToString();
+                                code.AppendLine($"call {factory}({string.Join(',', ctorArgs)})");
+                            }
+                            else code.AppendLine($"newobj instance {owner}::.ctor({string.Join(',', ctorArgs)})"); break;
+                        }
                         if (constructorDefinition.Module != library.MainModule) throw new InvalidDataException("Only admitted library constructors supported.");
                         if (DelegateBindings.Type(constructor.DeclaringType) is { } delegateType)
                         {
@@ -335,7 +374,7 @@ static class UnionImport
                     case Code.Pop: if (Pop().Type != "FaultNull") code.AppendLine("pop"); break;
                     case Code.Dup: var top = Pop(); Push(top); Push(top); if (top.Type != "FaultNull") code.AppendLine("dup"); break;
                     case Code.Br: case Code.Br_S:
-                        var branch = Target(); successors.Add(branch); code.AppendLine($"br IL_{instructions[branch].Offset:x4}"); terminates = true; break;
+                        var branch = Target(); successors.Add(branch); code.AppendLine($"br M{method.MetadataToken.ToUInt32():x8}_IL_{instructions[branch].Offset:x4}"); terminates = true; break;
                     case Code.Brtrue: case Code.Brtrue_S: case Code.Brfalse: case Code.Brfalse_S:
                         var condition = Pop();
                         if (condition.Type is not ("Int32" or "Boolean")) throw new InvalidDataException("Invalid branch condition.");
@@ -345,7 +384,7 @@ static class UnionImport
                             var success = (bool[])assigned.Clone(); success[condition.ConditionalOut] = true;
                             assignmentEdges[instruction.OpCode.Code is Code.Brtrue or Code.Brtrue_S ? conditional : index + 1] = success;
                         }
-                        code.AppendLine($"{(instruction.OpCode.Code is Code.Brtrue or Code.Brtrue_S ? "brtrue" : "brfalse")} IL_{instructions[conditional].Offset:x4}"); break;
+                        code.AppendLine($"{(instruction.OpCode.Code is Code.Brtrue or Code.Brtrue_S ? "brtrue" : "brfalse")} M{method.MetadataToken.ToUInt32():x8}_IL_{instructions[conditional].Offset:x4}"); break;
                     case Code.Call:
                     case Code.Callvirt:
                         var reference = (MethodReference)instruction.Operand;
@@ -353,16 +392,21 @@ static class UnionImport
                         Call call;
                         if (targetMethod.Module == app.MainModule)
                         {
-                            if (instruction.OpCode.Code == Code.Callvirt) throw new InvalidDataException("Application instance calls unsupported.");
-                            CheckStatic(reference); CheckStatic(targetMethod);
+                            ApplicationTypes.CheckMethod(reference); ApplicationTypes.CheckMethod(targetMethod);
+                            if (reference.HasThis != targetMethod.HasThis || instruction.OpCode.Code == Code.Callvirt && targetMethod.IsStatic) throw new InvalidDataException("Invalid application call receiver.");
                             if (!targetMethod.IsPublic && targetMethod.DeclaringType != method.DeclaringType)
                                 throw new InvalidDataException("Nonpublic cross-type call unsupported.");
                             if (reference.FullName != targetMethod.FullName) throw new InvalidDataException("Resolved signature mismatch.");
                             pending.Enqueue(targetMethod);
-                            call = new(Name(targetMethod), reference.Parameters.Select(p => ProfileType(p.ParameterType)).ToArray(), ProfileType(reference.ReturnType, true));
+                            var parameters = reference.Parameters.Select(p => ProfileType(p.ParameterType)).ToArray();
+                            call = targetMethod.HasThis && !(targetMethod.IsConstructor && targetMethod.DeclaringType.IsValueType)
+                                ? new("", new[] { ApplicationTypes.Receiver(targetMethod) }.Concat(parameters).ToArray(), ProfileType(reference.ReturnType, true), Instruction: $"{(instruction.OpCode.Code == Code.Callvirt ? "callvirt" : "call")} instance {ProfileType(reference.DeclaringType)}::{ApplicationTypes.MethodName(targetMethod)}({string.Join(',', parameters)})" + (targetMethod.DeclaringType.IsValueType && targetMethod.ReturnType.MetadataType == MetadataType.Void ? "\npop" : ""))
+                                : new(Name(targetMethod), targetMethod.HasThis ? new[] { ApplicationTypes.Receiver(targetMethod) }.Concat(parameters).ToArray() : parameters, ProfileType(reference.ReturnType, true));
                         }
                         else if (targetMethod.Module == library.MainModule)
                         {
+                            if (targetMethod.IsConstructor && targetMethod.DeclaringType.FullName is "System.Object" or "System.ValueType" && targetMethod.Parameters.Count == 0 && method.IsConstructor && method.DeclaringType.BaseType?.FullName == targetMethod.DeclaringType.FullName && instruction.OpCode.Code == Code.Call)
+                            { Expect(ApplicationTypes.Receiver(method)); code.AppendLine("pop"); break; }
                             var interfaceCall = collectionProfile ? InterfaceBindings.Bind(reference, targetMethod) : null;
                             var nativeCall = collectionProfile ? NativeArrayBindings.Bind(reference, targetMethod) : null;
                             var reflectionCall = collectionProfile ? ReflectionBindings.Bind(reference, targetMethod) : null;
@@ -397,7 +441,7 @@ static class UnionImport
                             {
                                 if (argument.Argument >= 0)
                                 {
-                                    if (n != 0 || !reference.HasThis || !(PrimitiveBindings.IsReceiver(reference.DeclaringType.Name) || CalendarBindings.Types.Contains(reference.DeclaringType.FullName) || ErrorBindings.IsType(reference.DeclaringType.FullName.Replace('/', '.')) || GenericUnionBindings.IsType(GenericUnionBindings.Type(reference.DeclaringType) ?? "")))
+                                    if (n != 0 || !reference.HasThis || !(ApplicationTypes.Type(reference.DeclaringType) is not null || PrimitiveBindings.IsReceiver(reference.DeclaringType.Name) || CalendarBindings.Types.Contains(reference.DeclaringType.FullName) || ErrorBindings.IsType(reference.DeclaringType.FullName.Replace('/', '.')) || GenericUnionBindings.IsType(GenericUnionBindings.Type(reference.DeclaringType) ?? "")))
                                         throw new InvalidDataException("Argument addresses are only admitted as primitive receivers.");
                                     continue;
                                 }
@@ -416,6 +460,7 @@ static class UnionImport
                     case Code.Ret:
                         if (result != "noresult") ConvertTop(result);
                         if (stack.Count != 0) throw new InvalidDataException($"Input ret stack not empty in {method.FullName}, expected {result}, remaining {string.Join(',', stack.Select(s => s.Type))}.");
+                        if (emitInstance && method.DeclaringType.IsValueType && result == "noresult") code.AppendLine("ldvoid");
                         code.AppendLine("ret"); terminates = true; break;
                     default: throw new InvalidDataException("Unsupported reachable instruction: " + instruction.OpCode);
                 }
@@ -423,19 +468,21 @@ static class UnionImport
                 if (!terminates) successors.Add(index + 1);
                 foreach (var successor in successors) Merge(successor, new(stack, assignmentEdges.GetValueOrDefault(successor, assigned)));
             }
+            var methodStart = output.Length;
             // Unreachable guest instructions are omitted, not admitted as executable code.
-            output.AppendLine($".function {Name(method)}({string.Join(',', args)}) -> {result}");
+            output.AppendLine(emitInstance ? $".method instance {(method.DeclaringType.IsValueType ? "byref " : "")}{ApplicationTypes.MethodName(method)}({string.Join(',', args.Skip(1))}) -> {(method.DeclaringType.IsValueType && result == "noresult" ? "Void" : result)}" : $".function {Name(method)}({string.Join(',', args)}) -> {result}");
             for (var n = 0; n < locals.Length; n++) output.AppendLine($".local {locals[n]} local{n}");
             if (method.Body.InitLocals)
                 for (var n = 0; n < locals.Length; n++)
-                    if (ReflectionBindings.IsType(locals[n]) && locals[n] != "System.RuntimeTypeHandle" || ManagedArrayBindings.IsType(locals[n]) || CollectionBindings.IsReference(locals[n]) || CalendarBindings.Types.Contains(locals[n]) || GenericUnionBindings.IsType(locals[n]) && !GenericUnionBindings.RequiresInitialization(locals[n])) output.AppendLine($"ldloca local{n}\ninitobj {locals[n]}");
+                    if (ApplicationTypes.IsType(locals[n]) || ReflectionBindings.IsType(locals[n]) && locals[n] != "System.RuntimeTypeHandle" || ManagedArrayBindings.IsType(locals[n]) || CollectionBindings.IsReference(locals[n]) || CalendarBindings.Types.Contains(locals[n]) || GenericUnionBindings.IsType(locals[n]) && !GenericUnionBindings.RequiresInitialization(locals[n])) output.AppendLine($"ldloca local{n}\ninitobj {locals[n]}");
                     else if (locals[n] != Carrier && locals[n] != Option && locals[n] != VoidOption && locals[n] != VoidResult && locals[n] != "String" && !NeedsInitialization(locals[n])) output.AppendLine(Default(locals[n]) + $"\nstloc local{n}");
             foreach (var index in bodies.Keys.Order())
             {
-                mappings.Add(new { MethodToken = method.MetadataToken.ToUInt32(), instructions[index].Offset, OutputLine = output.ToString().Count(c => c == '\n') + 1 });
-                output.AppendLine($"IL_{instructions[index].Offset:x4}:").Append(bodies[index]);
+                mappings.Add((method.MetadataToken.ToUInt32(), instructions[index].Offset));
+                output.AppendLine($"M{method.MetadataToken.ToUInt32():x8}_IL_{instructions[index].Offset:x4}:").Append(bodies[index]);
             }
             output.AppendLine(".end");
+            if (emitInstance) { instanceBodies[method] = output.ToString(methodStart, output.Length - methodStart); output.Length = methodStart; }
 
             void Merge(int index, State next)
             {
@@ -449,15 +496,20 @@ static class UnionImport
                 if (changed) work.Enqueue(index);
             }
         }
+        output.Append(ApplicationTypes.Declarations(ProfileType, instanceBodies));
         output.Append(Adapters()).Append(ResultBindings.Adapters()).Append(StringBindings.Adapters()).AppendLine(Int32Bindings.Adapters).AppendLine(DoubleBindings.Adapters).Append(PrimitiveBindings.Adapters).Append(CalendarBindings.Adapters).Append(ErrorBindings.Adapters()).Append(GenericUnionBindings.Adapters).AppendLine(ProcessBindings.Adapters).AppendLine(BooleanBindings.Adapters).AppendLine(ReflectionBindings.Adapters).AppendLine(EnumBindings.Adapters).AppendLine(NativeArrayBindings.Adapters);
         foreach (var helper in coercions.Values) output.Append(helper.Body);
         foreach (var body in delegateAdapters.Values) output.Append(body);
-        File.WriteAllText(destination, output.ToString());
+        var generated = output.ToString();
+        var labelLines = generated.Split('\n').Select((line, index) => (line, index))
+            .Where(p => System.Text.RegularExpressions.Regex.IsMatch(p.line, @"^M[0-9a-f]{8}_IL_[0-9a-f]{4}:$"))
+            .ToDictionary(p => p.line, p => p.index + 1);
+        File.WriteAllText(destination, generated);
         File.WriteAllText(destination + ".map.json", JsonSerializer.Serialize(new {
             Profile = collectionProfile ? "result-option-void-files-strings-collections-v8" : "result-option-void-files-strings-arrays-v7",
             RequiredLibraryProfile = collectionProfile ? "raven-collections" : "bundled-system", ApplicationSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(application))),
-            CoreSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(core))), ReachableMethods = seen.Order().ToArray(), Mappings = mappings,
-            Scope = "Bounded Int32/String vectors, optional closed collection references, file UTF-8 APIs, String helpers and generic Result/Option bindings; CFG stack/definite-assignment checked; observable default carriers rejected; no guest declaration bodies executed."
+            CoreSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(core))), ReachableMethods = seen.Order().ToArray(), Mappings = mappings.Select(m => new { m.MethodToken, m.Offset, OutputLine = labelLines[$"M{m.MethodToken:x8}_IL_{m.Offset:x4}:"] }),
+            Scope = "Bounded application class/value fields, constructors and instance methods; Int32/String vectors, optional closed collection references, file UTF-8 APIs, String helpers and generic Result/Option bindings; CFG stack/definite-assignment checked; observable default carriers rejected; no guest declaration bodies executed."
         }, new JsonSerializerOptions { WriteIndented = true }));
     }
 

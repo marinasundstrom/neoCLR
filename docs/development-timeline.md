@@ -1886,3 +1886,26 @@ The changelog records changes to the project; this document records the conversa
 that direct it. An implementation result is not a substitute for the preceding question,
 nor evidence of author approval beyond what was actually said. Only conversation actually available to the
 maintainer can be recorded—this is not an automatic capture of conversations elsewhere.
+
+
+## 2026-09-13 — Application programs and Raven targeting findings
+
+**Author direction.** After Preview 4, the author asked what should follow and
+approved three proposed slices: application-defined types, interface dispatch, and
+an order-workflow application using the runtime library. The author then emphasized
+that integration exposes Raven bugs and should help stabilize the compiler for other
+frameworks, citing the existing nanoFramework adaptation as prior experience. The
+primary purpose remains making neoCLR work with Raven.
+
+**Assistant response and action.** The assistant distinguished compiler correctness
+from configurable target contracts (Iterable/Iterator) and deliberate neoCLR differences
+(generic Void, Result). The first application class/value sample now executes through
+the bridge, including ArrayList storage. Raven metadata emission exposed a mixed
+MetadataLoadContext/TypeBuilder generic signature failure and an incorrect external
+self-assembly reference; fixes and focused tests remain on the experimental branch.
+See [application types and findings](raven-application-types.md).
+
+**Author clarification.** Generic Void also matters for a future Task<Void> and
+async/await story. The assistant recorded that as a design requirement, without
+claiming async implementation or choosing a task contract. Interface and workflow
+slices remain in progress at this entry; the published Preview 4 artifacts are unchanged.

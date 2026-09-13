@@ -1,0 +1,35 @@
+import System.*
+import System.Collections.*
+import System.Console.*
+
+class Counter {
+    var Age: int
+    init(age: int) { Age = age }
+    func Set(age: int) { Age = age }
+    func Get() -> int { return Age }
+}
+struct Point {
+    var X: int
+    init(x: int) { X = x }
+    func Set(x: int) { X = x }
+}
+func Change(counter: Counter) { counter.Set(42) }
+func Main() {
+    let counter = Counter(7)
+    let alias = counter
+    Change(alias)
+    WriteLine(counter.Get())
+    let values = ArrayList<Counter>()
+    values.Add(counter)
+    values[0].Set(99)
+    WriteLine(alias.Age)
+    var first = Point(7)
+    var second = first
+    second.Set(42)
+    WriteLine(first.X)
+    WriteLine(second.X)
+    let copies = ArrayList<Point>()
+    copies.Add(first)
+    first.Set(99)
+    WriteLine(copies[0].X)
+}
