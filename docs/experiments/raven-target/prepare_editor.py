@@ -28,6 +28,7 @@ shutil.copyfile(Path(__file__).parent / ('samples/library-propagation-workflow.r
     <TargetFramework>net11.0</TargetFramework>
     <OutputType>Exe</OutputType>
     <RavenMetadataCoreAssemblyName>NeoCLR.CoreProbe</RavenMetadataCoreAssemblyName>
+    <RavenTargetCoreAssemblyName>NeoCLR.CoreProbe</RavenTargetCoreAssemblyName>
     <RavenUseHostFrameworkReferences>false</RavenUseHostFrameworkReferences>
     <RavenPropagationAssemblyName>NeoCLR.CoreProbe</RavenPropagationAssemblyName>
     <RavenPropagationInterfaceType>System.Propagatable`3</RavenPropagationInterfaceType>

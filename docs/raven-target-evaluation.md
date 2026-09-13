@@ -10,7 +10,35 @@ with consistent target support. Raven should compile for both .NET and neoCLR th
 its normal compiler and project model. Retaining a loader/importer is compatible with
 that goal; relying on it to repair language semantics is not.
 
-## Current evidence
+## Follow-through checkpoint — 2026-09-14
+
+General compiler fixes were extracted onto Raven `codex/compiler-fixes-integration`,
+based on refreshed upstream `d92b02812740ae052f277c23151e9cc208f7672d`. Commits
+`c4febb094` and `961041ae4` cover numeric/pointer behavior and binding/dispatch;
+`a689ceab3` records validation. New regression tests failed before the fixes
+(12 numeric/pointer failures and nine binding/dispatch failures), then the focused
+suites passed (122 and 32 tests). The broader compiler/support/editor baseline passed
+5,489 tests. These commits are pushed for review, not merged into Raven main.
+
+A separate Raven branch, `codex/neoclr-target-contracts`, adds project-owned emission
+core selection. It also prevents the service and driver from reintroducing host
+references or host-derived defaults into explicit metadata targets. Seventy targeted
+configuration/metadata tests and a separate compiler-driver regression passed, as did
+the .NET 10/11 target matrix. NanoFramework was not tested in this checkpoint.
+
+neoCLR now accepts an independently compiled assembly through `--import`; the normal
+Raven compiler can produce it without runner-supplied EmitOptions. Five end-to-end
+checks cover ordinary output, string filtering, propagation and invalid target inputs.
+All 63 saved-project checks also pass. See [the compilation workflow](raven-target-compilation.md)
+for commands and the required source-tool/project update.
+
+This completes the first reviewed general-fix batches and the emission-core portion
+of target selection below. A versioned target-pack description remains open. Importer
+identities, generic library bodies, namespace-function projection and removal of the
+Void adapter remain prerequisites to evaluate before resuming library migration.
+Installed tools and demos are unchanged.
+
+## Initial assessment evidence
 
 Raven branch `codex/neoclr-target-resolution` at `854cd4d3d8c2fa4ed2f82e834c65cfef4371ebe3`
 contains 37 commits beyond local `main` / merge base

@@ -12,8 +12,9 @@ static class ProjectBuild
         var workspace = RavenWorkspace.Create(targetFramework: "net11.0");
         var id = workspace.OpenProject(projectPath);
         var project = workspace.CurrentSolution.GetProject(id)!;
-        if (project.CompilationOptions?.MetadataImportOptions?.CoreAssemblyName != CoreDeclarations.Identity)
-            throw new InvalidDataException("Project must explicitly target NeoCLR.CoreProbe.");
+        if (project.CompilationOptions?.MetadataImportOptions?.CoreAssemblyName != CoreDeclarations.Identity
+            || project.CompilationOptions.TargetCoreAssemblyName != CoreDeclarations.Identity)
+            throw new InvalidDataException("Project must select NeoCLR.CoreProbe for metadata and emission.");
         var references = project.MetadataReferences.OfType<PortableExecutableReference>().ToArray();
         if (references.Length != 1 || project.ProjectReferences.Any())
             throw new InvalidDataException("This profile admits only the supplied neoCLR core reference.");
@@ -32,14 +33,9 @@ static class ProjectBuild
             throw new InvalidDataException("Unsupported neoCLR project propagation contract.");
         var compilation = workspace.GetCompilation(id)!;
         using var image = new MemoryStream();
-        var emitted = compilation.Emit(image, null, new EmitOptions(AssemblyName.GetAssemblyName(core)));
+        var emitted = compilation.Emit(image);
         if (!emitted.Success)
             throw new InvalidDataException(string.Join("\n", emitted.Diagnostics));
-        Directory.CreateDirectory(output);
-        var raw = Path.Combine(output, "App.raw.dll");
-        var projected = Path.Combine(output, "App.dll");
-        File.WriteAllBytes(raw, image.ToArray());
-        VoidProjection.Write(raw, core, projected);
-        UnionImport.Write(projected, core, Path.Combine(output, "App.neoil"), collectionProfile: iteration is not null);
+        ApplicationImport.Write(image.ToArray(), core, output, collectionProfile: iteration is not null);
     }
 }

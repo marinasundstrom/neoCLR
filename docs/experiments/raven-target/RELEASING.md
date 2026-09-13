@@ -235,3 +235,16 @@ callback-order, disposal, fault and allocation checks. `verify_editor.py --queri
 checks predicate signature help as well as extension discovery. Preserve the
 [documented forward Last scan](../../raven-query-api.md#predicate-terminal-overloads-2026-09-13)
 and normal-outcome cleanup limits in release notes.
+
+### Source target-contract checkpoint (2026-09-14)
+
+The next bundle's project must select `RavenTargetCoreAssemblyName` as well as the
+metadata core. Use the matching Raven target-contract branch; old .12 tools are not
+updated by source changes. Rebuild compiler, bridge and editor tools together when
+preparing a new SDK. The normal compiler path and remaining adapters are described in
+[normal target compilation](../../raven-target-compilation.md).
+
+Run `verify_compiler_target.py` with the rebuilt rvnc, packaged bridge/System/runtime
+and a generated project, in addition to existing saved-project checks. It separately
+compiles and imports PE artifacts and tests rejection without host fallback. Packaging
+now carries the verifier; this checkpoint does not publish or install a new bundle.

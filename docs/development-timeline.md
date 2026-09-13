@@ -2561,3 +2561,19 @@ generic application bodies; the migration is not yet implemented by this checkpo
   review; integration requires dependency review and tests on proposed branches.
   Namespace-function identity projection and removing the metadata-only exception
   placeholder remain explicit follow-up work. Installed demo files were preserved.
+
+- **Follow-through after the author's “Continue through those issues”:** Extracted
+  general Raven fixes into two reviewed batches on `codex/compiler-fixes-integration`,
+  with before/after regressions and a passing 5,489-test baseline. Pushed the review
+  branch; Raven main was not merged. Kept target-contract changes on a separate
+  experimental branch.
+- **Assistant's implementation and finding:** Made emission-core selection a project
+  compiler option and separated compilation from neoCLR artifact import. Testing the
+  ordinary driver exposed host-reference injection and host-derived defaults; these
+  were corrected for explicitly configured metadata targets. The .NET 10/11 matrix,
+  targeted compiler tests, five independent compile/import checks and 63 saved-project
+  checks passed. [The workflow](raven-target-compilation.md) records how to reproduce it.
+- **Remaining direction:** This is an incremental target-support improvement, not a
+  completed target pack or general library importer. Migration stays paused while
+  stable identities, generic bodies and temporary adapters are addressed. No installed
+  SDK, extension or user demo was changed by this follow-through.

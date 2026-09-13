@@ -3,6 +3,7 @@
     <TargetFramework>net11.0</TargetFramework>
     <OutputType>Exe</OutputType>
     <RavenMetadataCoreAssemblyName>NeoCLR.CoreProbe</RavenMetadataCoreAssemblyName>
+    <RavenTargetCoreAssemblyName>NeoCLR.CoreProbe</RavenTargetCoreAssemblyName>
     <RavenUseHostFrameworkReferences>false</RavenUseHostFrameworkReferences>
     <RavenAllowArrayCovariance>false</RavenAllowArrayCovariance>
     <RavenPropagationAssemblyName>NeoCLR.CoreProbe</RavenPropagationAssemblyName>

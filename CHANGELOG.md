@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-14
 
+- Added ordinary Raven compiler emission followed by independent artifact import.
+  Projects now select matching metadata/emission cores; regenerate editor projects
+  and use the matching Raven target-contract branch and bridge. Added five direct
+  compiler/import checks; all 63 saved-project checks pass. Documented host-reference
+  isolation fixes, the passing .NET 10/11 matrix and remaining importer boundaries.
+  Extracted general Raven fixes onto a separate review branch (5,489 baseline tests
+  passed); Raven main and installed SDK/extension artifacts remain unchanged.
+
 - Paused the Raven runtime-library migration at the author's direction, preserving
   the scalar pilot locally. Recorded the Raven branch assessment, compiler-fix review
   batches and a plan for coherent target configuration and metadata-driven importing.
