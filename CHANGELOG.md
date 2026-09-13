@@ -6,6 +6,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-09-13
+
+- Published Preview 5 at c76ee57 with eight verified assets after all six exact-source
+  CI jobs and thirteen package suites passed. Recorded publication evidence, match
+  checks and artifact provenance; published release notes remain unchanged.
+
 ## 0.1.0-preview.5 — 2026-09-13
 
 Application and query preview: see [release notes](docs/preview-5-release-notes.md).

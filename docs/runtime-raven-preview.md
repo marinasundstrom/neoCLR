@@ -95,7 +95,7 @@ history; new Raven work does not require migrating that frontend.
 
 ## Validation and release status
 
-The Preview 5 release carries exact-source CI evidence and package validation logs,
+The Preview 5 release carries [exact-source CI evidence and package validation logs](preview-5-validation.md),
 including application classes, order persistence and deferred queries. Use its
 manifest/checksums for exact revisions and artifacts. Source CI does not imply
 prebuilt Raven toolchain support on other hosts. The
