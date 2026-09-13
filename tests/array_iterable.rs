@@ -90,6 +90,10 @@ ret
 fn array_interface_is_invariant_and_null_dispatch_faults() {
     for (body, message) in [
         (
+            "ldc.i4 0\nnewarr Int32\ncastclass System.Collections.Iterable<Int32>\ncastclass arrayref<String>\npop\nldc.i4 0\nret",
+            "identical element types",
+        ),
+        (
             "ldc.i4 0\nnewarr Int32\ncastclass System.Collections.Iterable<String>\npop\nldc.i4 0\nret",
             "matching interface",
         ),

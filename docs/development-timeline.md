@@ -2080,3 +2080,25 @@ boundaries and NaN. The .NET execution test also passes. A wider Raven test run 
 an independent mixed `ulong`/`long` binding failure, reproduced with unchanged compiler
 code; it remains open. These are next-build fixes, not a new published release or a
 claim that the entire platform is stable. See the [comparison contract](raven-primitive-api.md#numeric-comparisons-after-preview-5).
+
+## 2026-09-13 — Mutable array invariance and read-only views
+
+**Author:** Asked to resolve array co-/contravariance in neoCLR. The assistant initially
+proposed CLR-style array covariance with checked writes. The author corrected that
+proposal: a typed mutable array, including Foo[], should not become an array of a
+supertype such as Object[]. The author then identified a possible exception for a
+read-only array or a read-only interface, while leaving its mechanism open.
+
+**Author's reasoning:** Described array covariance as a historically useful feature
+from before generics, but unsuitable for the intended modern type system. This is the
+author's evaluation, not a newly established history of the CLR design.
+
+**Assistant response and action:** Accepted invariant mutable arrays as the direction.
+Distinguished a read-only element interface from an immutable binding or readonly
+reference to the array slot. Added early cast rejection and regression coverage on
+top of existing exact array storage rules. Documented both the compatibility cost
+and the future read-only projection in the [array variance contract](array-variance.md).
+
+**Open:** Covariant read-only projection API, generic variance metadata and target-aware
+Raven editor diagnostics. No new read-only array feature or generic variance behavior
+was implemented in this slice.

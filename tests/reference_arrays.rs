@@ -181,7 +181,7 @@ fn exact_array_cast_preserves_identity_and_wrong_element_cast_faults() {
     let m = module(
         ".function Main() -> arrayref<Boolean>\nldc.i4 1\nnewarr Int32\ncastclass arrayref<Boolean>\nret\n.end",
     );
-    verify(&m).unwrap();
+    assert!(verify(&m).is_err());
     assert!(run(&m, Limits::default()).is_err());
 }
 
@@ -399,5 +399,46 @@ fn ordinary_array_operations_enforce_bounds_types_and_budgets() {
         },
     ] {
         assert!(run(&m, limits).is_err());
+    }
+}
+
+#[test]
+fn mutable_arrays_are_invariant_even_for_reference_elements_and_typed_nulls() {
+    let types = ".type class Base\n.end\n.type class Foo\n.extends Base\n.end\n";
+    for (source, target) in [
+        ("Foo", "Base"),
+        ("Base", "Foo"),
+        ("Int32", "Base"),
+        ("arrayref<Foo>", "arrayref<Base>"),
+    ] {
+        for null in [false, true] {
+            let create = if null {
+                format!(
+                    ".local arrayref<{source}> data\nldloca data\ninitobj arrayref<{source}>\nldloc data"
+                )
+            } else {
+                format!("ldc.i4 0\nnewarr {source}")
+            };
+            let m = module(&format!(
+                "{types}\n.function Main() -> arrayref<{target}>\n{create}\ncastclass arrayref<{target}>\nret\n.end"
+            ));
+            assert!(
+                verify(&m)
+                    .unwrap_err()
+                    .to_string()
+                    .contains("identical element types")
+            );
+            assert!(
+                run(&m, Limits::default())
+                    .unwrap_err()
+                    .to_string()
+                    .contains("identical element types")
+            );
+        }
+        let m = module(&format!(
+            "{types}\n.function Main() -> arrayref<{target}>\nldc.i4 0\nnewarr {source}\nret\n.end"
+        ));
+        assert!(verify(&m).is_err());
+        assert!(run(&m, Limits::default()).is_err());
     }
 }

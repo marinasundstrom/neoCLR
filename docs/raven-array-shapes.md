@@ -14,8 +14,8 @@ for high-bit Byte/UInt16/Char values; it also corrects ordinary .NET execution.
 
 This follows CLI newarr, ldelem/stelem and ldelema behavior within the admitted type
 catalog. Boolean storage remains the interpreter's canonical Boolean representation;
-loads normalize to CLI integers before branch joins. Array covariance and rectangular
-arrays remain outside this importer. Ordinary arrays still require valid defaults;
+loads normalize to CLI integers before branch joins. Mutable arrays are deliberately
+[invariant](array-variance.md); rectangular arrays remain outside this importer. Ordinary arrays still require valid defaults;
 ArrayList uses its separate reserved-capacity mechanism for non-defaultable unions.
 No arbitrary application types or general pointer element arrays are claimed here.
 

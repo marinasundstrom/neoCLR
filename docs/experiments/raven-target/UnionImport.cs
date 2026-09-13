@@ -109,7 +109,16 @@ static class UnionImport
                     throw new InvalidDataException("Conditional extraction output must be tested before use.");
                 void Push(Slot slot) { stack.Add(slot); if (stack.Count > method.Body.MaxStackSize) throw new InvalidDataException("Declared maxstack exceeded."); }
                 Slot Pop() { if (stack.Count == 0) throw new InvalidDataException($"Input stack underflow in {method.FullName} at {instruction.Offset:x4}."); var top = stack[^1]; stack.RemoveAt(stack.Count - 1); return top; }
-                Slot Expect(string type) { var top = Pop(); if (!(CollectionBindings.Assignable(PrimitiveBindings.Stack(top.Type), PrimitiveBindings.Stack(type)) || ReflectionBindings.Assignable(top.Type, type) || ApplicationTypes.Assignable(top.Type, type))) throw new InvalidDataException("Input stack type mismatch."); return top; }
+                Slot Expect(string type)
+                {
+                    var top = Pop();
+                    if (ManagedArrayBindings.IsType(top.Type) && ManagedArrayBindings.IsType(type) && top.Type != type)
+                        throw new InvalidDataException("Mutable array conversions require identical element types.");
+                    if (!(CollectionBindings.Assignable(PrimitiveBindings.Stack(top.Type), PrimitiveBindings.Stack(type))
+                        || ReflectionBindings.Assignable(top.Type, type) || ApplicationTypes.Assignable(top.Type, type)))
+                        throw new InvalidDataException("Input stack type mismatch.");
+                    return top;
+                }
                 int Local(int n) { if (n < 0 || n >= locals.Length) throw new InvalidDataException("Invalid local index."); return n; }
                 void Load(int n) { Local(n); if (!assigned[n]) throw new InvalidDataException($"Read of uninitialized or unsupported default local {n} in {method.FullName} at instruction {index}."); Push(new(PrimitiveBindings.Stack(locals[n]))); code.AppendLine($"ldloc local{n}"); }
                 Slot ConvertTop(string type)
@@ -165,6 +174,9 @@ static class UnionImport
                         var castSource = Pop().Type;
                         if (!ManagedArrayBindings.IsReference(castSource) || !ManagedArrayBindings.IsReference(castTarget))
                             throw new InvalidDataException("Unsupported reference cast.");
+                        if (ManagedArrayBindings.IsType(castSource) && ManagedArrayBindings.IsType(castTarget)
+                            && castSource != castTarget)
+                            throw new InvalidDataException("Mutable array casts require identical element types.");
                         Push(new(castTarget)); code.AppendLine("castclass " + castTarget); break;
                     case Code.Ldnull: Push(new("FaultNull")); break;
                     case Code.Throw:

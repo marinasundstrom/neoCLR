@@ -48,7 +48,8 @@ runtime/library must be refreshed; published Preview 5 and installed `.8` tools 
 unchanged. This is a next-release capability requiring Raven `ec88c4474` on
 `codex/neoclr-target-resolution` and the corresponding neoCLR development build.
 
-The implemented contract is invariant and limited to vectors: no array covariance,
+The implemented contract is invariant and limited to vectors. Mutable-array covariance
+is intentionally excluded by the [array variance contract](array-variance.md); no
 rectangular-array interface projection or general IList/ICollection contract is added.
 The sequence is not itself an Iterator; independent iterator objects own position.
 Binding the runtime-provided acquisition member directly as a delegate is not part

@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Made mutable-array invariance an explicit runtime contract: verifier, interpreter
+  and Raven importer reject differing array element-type casts, including typed-null
+  casts; exact interface-to-array casts retain allocation checks. Added inheritance,
+  value-element, jagged-array and interface-view regressions. Documented the deliberate
+  CLR covariance difference and a future read-only projection; read-only variance is
+  not implemented. Raven editor semantics remain CLR-like until target-aware diagnostics.
+
 - Admitted existing numeric division, remainder and shift instructions in the Raven
   importer with operand validation. The companion Raven fix preserves unsigned
   division/remainder/right-shift semantics instead of treating high-bit values as

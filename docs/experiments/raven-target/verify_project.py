@@ -89,6 +89,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
         ('PathUnsupportedApi', 'func Main() { System.IO.Path.GetFullPath(".") }', 'RAV'),
         ('StringArgumentMismatch', 'func Main() { System.String.Concat(42, 7) }', 'RAV'),
         ('StringUnsupportedApi', 'func Main() { System.String.IsNullOrEmpty(\"\") }', 'RAV'),
+        ('ArrayImplicitCovariance', 'import System.*\nimport System.Reflection.*\nfunc Main() { let members: MemberInfo[] = typeof(int).GetMethods() }', 'identical element types'),
+        ('ArrayExplicitCovariance', 'import System.*\nimport System.Reflection.*\nfunc Main() { let members = (MemberInfo[])typeof(int).GetMethods() }', 'identical element types'),
         ('ImportFailure', 'func Negate(value: int) -> int { return -value }\nfunc Main() { Negate(2) }', 'Unsupported')]:
         before = set(root.rglob('App.neoil'))
         (root / 'Main.rvn').write_text(source)

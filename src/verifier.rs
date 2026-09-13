@@ -997,6 +997,7 @@ fn typed_effect(
             one(Type::Named("System.Object".into()))
         }
         CastClass(target) => {
+            crate::arrays::check_cast(exact(&values[0])?, target)?;
             if module.is_object_reference_type(exact(&values[0])?) {
                 require(
                     module.is_object_reference_type(target),

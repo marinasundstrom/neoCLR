@@ -106,3 +106,13 @@ pub(crate) fn index(value: Value) -> Result<usize, Fault> {
         _ => Err(Fault::new("array index requires Int32 or native integer")),
     }
 }
+
+/// Mutable array views preserve their exact element type, including typed nulls.
+pub(crate) fn check_cast(source: &Type, target: &Type) -> Result<(), Fault> {
+    if matches!((source, target), (Type::ArrayRef(_), Type::ArrayRef(_))) && source != target {
+        return Err(Fault::new(
+            "mutable array casts require identical element types",
+        ));
+    }
+    Ok(())
+}

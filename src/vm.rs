@@ -2120,7 +2120,9 @@ fn interpret_instructions(
                     }));
                 }
                 Op::CastClass(target) => {
-                    let value = match frame.pop()? {
+                    let source = frame.pop()?;
+                    crate::arrays::check_cast(&source.ty(), target)?;
+                    let value = match source {
                         Value::ObjectReference(mut object) => {
                             if !module.is_object_reference_type(target) {
                                 return Err(Fault::new(
@@ -2128,6 +2130,7 @@ fn interpret_instructions(
                                 ));
                             }
                             let concrete = &object.concrete_type();
+                            crate::arrays::check_cast(concrete, target)?;
                             if crate::interfaces::interface_definition(module, target).is_ok() {
                                 crate::interfaces::ensure_implementation(module, concrete, target)?;
                                 object.view = Some(target.clone());
