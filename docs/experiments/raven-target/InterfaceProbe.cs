@@ -20,7 +20,7 @@ static class InterfaceProbe
             [MetadataReference.CreateFromFile(core)], new CompilationOptions(OutputKind.ConsoleApplication,
                 metadataImportOptions: new MetadataImportOptions(CoreDeclarations.Identity),
                 runtimeIterationContract: new RuntimeIterationContract(CoreDeclarations.Identity,
-                    "System.Collections.Iterable`1", "System.Collections.Iterator`1"),
+                    "System.Collections.Iterable`1", "System.Collections.Iterator`1", ArraysImplementIterable: true),
                 runtimePropagationContract: new RuntimePropagationContract(CoreDeclarations.Identity, "System.Propagatable`3")));
         var compilation = Create(source);
         var path = Path.Combine(output, "CoreInterfaces.dll");

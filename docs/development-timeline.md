@@ -2032,3 +2032,31 @@ A second bridge issue required closing definition-relative interface signatures
 before matching application methods. The former failing repro is now a passing
 [custom Iterable sample](experiments/raven-target/samples/application-iterable.rvn).
 This resolves the previously recorded compiler gap without new runtime behavior.
+
+
+## 2026-09-13 — array queries need an array contract
+
+The author reported a reflection-array `for` loop rejected by the importer (`bge`)
+and then `GetMethods().ToList()` missing from editor lookup. They directed that the
+fixes belong in the next release. The assistant first fixed branch admission and
+proposed array-specific query overloads backed by a sequence adapter.
+
+The author clarified the intended .NET-like Iterable/Iterator pattern, correcting
+an initial reference to ArrayList with: “ArrayList already does that. I mean Array”.
+They added: “Anyway, we should make sure that the same pattern exists in neoCLR.”
+
+The assistant changed the implementation to a runtime array-to-Iterable view with
+independent library iterators and opt-in Raven target-symbol support, removing the
+query-only overload approach. The development query tests cover arrays in interface
+locals, parameters and returns, independent positions, mutation visibility and GC;
+the runtime tests check reference identity and invalid/null dispatch. See the
+[array/query contract](raven-query-api.md). Preview 5 remains frozen; this work is for
+a subsequent release, not a claim that the reported programs work in its artifacts.
+
+
+The author then reiterated the compatibility goal: Raven should need only minimal
+changes, such as selecting different target interfaces, while the runtime supplies
+the behavior required by ordinary emitted IL. The assistant agreed to keep contract
+selection target-neutral and to investigate missing runtime support before adding
+NeoCLR-specific compiler lowering. The array implementation follows that split:
+Raven projects the configured interface; neoCLR owns reference identity and dispatch.

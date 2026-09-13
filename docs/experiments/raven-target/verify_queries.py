@@ -24,6 +24,55 @@ with tempfile.TemporaryDirectory(prefix='neoclr-queries-') as temporary:
     command = [sys.executable, str(bridge / 'run_project.py'), str(root / 'Demo.rvnproj'),
                *runner_arguments(args), '--runtime', str(args.runtime.resolve())]
     cases = [
+        ('Array queries and reflection materialization', (bridge / 'samples/library-array-queries.rvn').read_text(),
+         'Parse\nDivide\nEquals\nToString\nCompareTo\n0\n17\n13\n3\n17\n52\n6\n0\n0\n43\n'),
+        ('Array Iterable parameters, returns and independent iterators', header + '''
+func Pass(values: int[]) -> Iterable<int> {
+    return values
+}
+func First(values: Iterable<int>) -> int {
+    let iterator = values.GetIterator()
+    iterator.MoveNext()
+    let result = iterator.Current
+    iterator.Dispose()
+    return result
+}
+func Main() {
+    let values: int[] = [7, 42]
+    let sequence: Iterable<int> = values
+    WriteLine(First(values))
+    WriteLine(First(Pass(values)))
+    let first = sequence.GetIterator()
+    let second = sequence.GetIterator()
+    first.MoveNext()
+    first.MoveNext()
+    second.MoveNext()
+    WriteLine(first.Current)
+    WriteLine(second.Current)
+    values[0] = 99
+    WriteLine(second.Current)
+    first.Dispose()
+    second.Dispose()
+    WriteLine(sequence.ToList()[0])
+}
+''', '7\n7\n42\n7\n99\n99\n'),
+        ('Array query retained across GC', header + '''
+func Make() -> Iterable<int> {
+    let values: int[] = [7, 42]
+    return values.Select((value: int) -> int => value + 1)
+}
+func Main() {
+    let query = Make()
+    var remaining = 1000
+    while remaining != 0 {
+        ArrayList<int>()
+        remaining = remaining - 1
+    }
+    let result = query.ToList()
+    WriteLine(result[0])
+    WriteLine(result[1])
+}
+''', '8\n43\n'),
         ('Custom Raven Iterable and Iterator', (bridge / 'samples/application-iterable.rvn').read_text(), '0\n1\n1\n43\n2\n2\n'),
         ('Deferred callbacks and repeated enumeration', (bridge / 'samples/library-queries.rvn').read_text(),
          '0\n0\nForty two\nForty two\n2\n1\nDisposed\n2\nForty two\nNinety nine\n5\n3\n'),

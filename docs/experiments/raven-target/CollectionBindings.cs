@@ -16,6 +16,7 @@ static class CollectionBindings
     public static bool Assignable(string source, string target)
     {
         if (source == target) return true;
+        if (ManagedArrayBindings.IsType(source) && target == $"System.Collections.Iterable<{source[9..^1]}>") return true;
         if (!Shapes.TryGetValue(source, out var from))
         {
             // The Int32 constants are also used by standalone signature checks.

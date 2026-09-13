@@ -200,7 +200,7 @@ fn reference_array_is_not_an_owned_array_or_native_payload() {
     let Value::ObjectReference(reference) = result.value else {
         panic!("object reference required")
     };
-    assert_eq!(reference.concrete_type(), reference.target());
+    assert_eq!(reference.concrete_type(), reference.target().clone());
     assert!(neoclr::memory::layout(&m, reference.target()).is_err());
 }
 

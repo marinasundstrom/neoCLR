@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Added runtime vector views as Iterable<T>, preserving array identity with separate
+  iterators and no sequence wrapper. Raven opts into the target interface through
+  project configuration; ordinary query extensions now accept arrays, including
+  reflection results. Added runtime, GC, conversion, query and completion checks.
+  This fixes Preview 5's array-query limitation for the next release. Projection is
+  invariant and vector-only; existing tools/artifacts remain unchanged. The Rust
+  ObjectReference::concrete_type accessor now returns an owned Type so array concrete
+  identity can be recovered independently of its interface view.
+
 - Fixed Raven vector `for` loops, including reflection method arrays, by admitting
   the existing CLI `bge`/short branch in the importer with operand and control-flow
   validation. Added empty/singleton/multiple-element regression coverage. This fixes

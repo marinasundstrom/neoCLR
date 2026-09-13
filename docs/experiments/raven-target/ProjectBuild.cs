@@ -23,7 +23,7 @@ static class ProjectBuild
         var expectedIteration = new RuntimeIterationContract(CoreDeclarations.Identity,
             "System.Collections.Iterable`1", "System.Collections.Iterator`1");
         var iteration = project.CompilationOptions.RuntimeIterationContract;
-        if (iteration is not null && iteration != expectedIteration)
+        if (iteration is not null && (iteration with { ArraysImplementIterable = false }) != expectedIteration)
             throw new InvalidDataException("Unsupported neoCLR project iteration contract.");
         var propagation = project.CompilationOptions.RuntimePropagationContract;
         if (propagation is not null && propagation != new RuntimePropagationContract(CoreDeclarations.Identity, "System.Propagatable`3"))

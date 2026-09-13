@@ -7,6 +7,7 @@
     <RavenPropagationAssemblyName>NeoCLR.CoreProbe</RavenPropagationAssemblyName>
     <RavenPropagationInterfaceType>System.Propagatable`3</RavenPropagationInterfaceType>
     <RavenIterationAssemblyName>NeoCLR.CoreProbe</RavenIterationAssemblyName>
+    <RavenIterationArraysImplementIterable>true</RavenIterationArraysImplementIterable>
     <RavenIterationIterableType>System.Collections.Iterable`1</RavenIterationIterableType>
     <RavenIterationIteratorType>System.Collections.Iterator`1</RavenIterationIteratorType>
     <ImplicitImports>disable</ImplicitImports>

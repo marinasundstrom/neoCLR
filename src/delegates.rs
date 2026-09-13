@@ -169,12 +169,12 @@ pub(crate) fn bind(
             if crate::interfaces::is_contract(module, &callee) {
                 callee = crate::interfaces::implementation(
                     module,
-                    object.concrete_type(),
+                    &object.concrete_type(),
                     owner,
                     &callee,
                 )?;
             } else if callee.is_virtual {
-                callee = crate::inheritance::dispatch(module, object.concrete_type(), &callee)?;
+                callee = crate::inheritance::dispatch(module, &object.concrete_type(), &callee)?;
             }
             if callee.receiver_byref
                 || callee.is_abstract

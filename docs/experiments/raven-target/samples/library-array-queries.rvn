@@ -1,0 +1,33 @@
+import System.*
+import System.Linq.*
+import System.Console.*
+
+func Main() {
+    for member in typeof(int).GetMethods().ToList() {
+        WriteLine(member.Name)
+    }
+
+    let values: int[] = [1, 2, 3]
+    var calls = 0
+    let selected = values.Where((value: int) -> bool => {
+        calls = calls + 1
+        return value != 2
+    }).Select((value: int) -> int => value + 10)
+    WriteLine(calls)
+    values[0] = 7
+    let snapshot = selected.ToList()
+    for value in snapshot {
+        WriteLine(value)
+    }
+    WriteLine(calls)
+    values[0] = 42
+    WriteLine(snapshot[0])
+    WriteLine(selected.ToList()[0])
+    WriteLine(calls)
+
+    let empty: int[] = []
+    WriteLine(empty.ToList().Count)
+    WriteLine(empty.Where((value: int) -> bool => true).ToList().Count)
+    let singleton: int[] = [42]
+    WriteLine(singleton.Select((value: int) -> int => value + 1).ToList()[0])
+}

@@ -1,7 +1,7 @@
 # Prototype query API for Raven
 
 The Raven-target runtime library now exposes `System.Linq.Enumerable` extension
-methods over `System.Collections.Iterable<T>`:
+methods over `System.Collections.Iterable<T>` and, after Preview 5, vector arrays:
 
 | Method | Result | Evaluation |
 | --- | --- | --- |
@@ -14,6 +14,46 @@ Import `System.Linq.*` to use member syntax. See the readable
 type arguments from the receiver and callback; no explicit reference operators
 are needed. These are generic library methods with validated bridge bindings,
 not support for arbitrary generic application method bodies.
+
+## Array receivers after Preview 5
+
+Managed vectors implement `System.Collections.Iterable<T>` in the runtime. An array
+can be assigned to that interface, passed to an Iterable parameter or returned as an
+Iterable value. The conversion retains the original array reference; it does not box,
+copy elements or allocate a sequence wrapper. Casting the view back to its exact
+vector type preserves identity. Each `GetIterator()` returns independent position
+state retaining the original buffer. Changes to unvisited elements remain visible.
+`ToList()` copies elements into independent storage while preserving object references.
+
+Consequently, `typeof(int).GetMethods().ToList()`, `Where` and `Select` use the same
+Iterable extension methods as lists. No array-specific query overloads are needed.
+See the [array query sample](experiments/raven-target/samples/library-array-queries.rvn).
+
+This follows [.NET's vector enumeration pattern](https://learn.microsoft.com/en-us/dotnet/api/system.array?view=net-10.0)
+(consulted 2026-09-13): runtime interface support and a separate library iterator.
+The interpreter validates the exact Iterable/Iterator contract and dispatches array
+acquisition through the internal `ArrayEnumerable.GetIterator<T>` library factory.
+Existing array instructions and ArrayIterator implement traversal; no new opcode is
+needed. The call graph includes the factory as a possible interface target. This is
+more general than the initially considered query overloads and avoids their sequence
+wrapper allocation, at the cost of runtime dispatch and compiler-symbol support.
+No overall performance advantage over .NET is claimed.
+
+Raven enables this target capability with
+`<RavenIterationArraysImplementIterable>true</RavenIterationArraysImplementIterable>`.
+The compiler then exposes the configured Iterable interface on vector symbols for
+conversion, generic inference and completion. Ordinary .NET targeting stays unchanged.
+Updated bundle/source project templates set this property. Both the compiler and
+runtime/library must be refreshed; published Preview 5 and installed `.8` tools are
+unchanged. This is a next-release capability requiring Raven `ec88c4474` on
+`codex/neoclr-target-resolution` and the corresponding neoCLR development build.
+
+The implemented contract is invariant and limited to vectors: no array covariance,
+rectangular-array interface projection or general IList/ICollection contract is added.
+The sequence is not itself an Iterator; independent iterator objects own position.
+Binding the runtime-provided acquisition member directly as a delegate is not part
+of this slice; call it normally or through a lambda. Existing terminal-fault and
+early-exit cleanup limitations remain.
 
 ## Execution and ownership
 
@@ -58,7 +98,7 @@ storage, so it was not selected.
 
 This is a bounded API, not complete LINQ compatibility. There are no indexed overloads,
 query-expression syntax guarantees, ordering/grouping, SelectMany, providers,
-expression trees, async queries or implicit array-to-Iterable projection. Source
+expression trees or async queries. Source
 mutation during an active enumeration follows the existing source iterator contract;
 ArrayList currently retains a buffer and extent, without .NET List's mutation-version
 exception. Underlying iterator acquisition happens in `GetIterator()`. Null arguments
@@ -113,3 +153,11 @@ acquisition/disposal, including repeated Dispose. A corresponding C# pipeline on
 .NET 11 preview (SDK 11.0.100-rc.1.26425.128) produced the same output as the main Raven
 sample for timing, caching and repeated enumeration; this does not establish full
 framework equivalence.
+
+
+The array contract slice passed the full runtime test suite, Clippy, 35 focused Raven
+regressions, 51 saved-project checks, 17 query checks and target editor completion.
+A small .NET 11 SDK comparison of array-to-IEnumerable conversion, independent
+iterators and mutation visibility produced the same `7, 7, 42, 7, 99, 99` sequence
+as the neoCLR interface test. These are development results, not updates to the
+published Preview 5 validation record.

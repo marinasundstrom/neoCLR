@@ -156,7 +156,8 @@ static class UnionImport
                     case Code.Castclass:
                         var castTarget = ProfileType((TypeReference)instruction.Operand);
                         var castSource = Pop().Type;
-                        if (!(ApplicationTypes.IsReference(castSource) || ReflectionBindings.IsReference(castSource) || InterfaceBindings.IsInterface(castSource) || castSource == "System.Object" || castSource == "String") || !(ApplicationTypes.IsReference(castTarget) || ReflectionBindings.IsReference(castTarget) || InterfaceBindings.IsInterface(castTarget) || castTarget == "String")) throw new InvalidDataException("Unsupported reference cast.");
+                        if (!ManagedArrayBindings.IsReference(castSource) || !ManagedArrayBindings.IsReference(castTarget))
+                            throw new InvalidDataException("Unsupported reference cast.");
                         Push(new(castTarget)); code.AppendLine("castclass " + castTarget); break;
                     case Code.Ldnull: Push(new("FaultNull")); break;
                     case Code.Throw:

@@ -98,6 +98,17 @@ pub(crate) fn closure(module: &Module, ty: &Type) -> Result<Vec<Type>, Fault> {
         path.pop();
         Ok(())
     }
+    if let Type::ArrayRef(element) = ty {
+        let interface = Type::Constructed {
+            definition: "System.Collections.Iterable".into(),
+            arguments: vec![(**element).clone()],
+        };
+        return if interface_definition(module, &interface).is_ok() {
+            closure(module, &interface)
+        } else {
+            Ok(vec![])
+        };
+    }
     let mut result = Vec::new();
     visit(module, ty, &mut Vec::new(), &mut result)?;
     Ok(result)
@@ -330,7 +341,55 @@ pub(crate) fn implementation(
     }
 }
 
+fn array_implementation(
+    module: &Module,
+    element: &Type,
+    contract: &Function,
+) -> Result<Function, Fault> {
+    let iterable = Type::Constructed {
+        definition: "System.Collections.Iterable".into(),
+        arguments: vec![element.clone()],
+    };
+    let iterator = Type::Constructed {
+        definition: "System.Collections.Iterator".into(),
+        arguments: vec![element.clone()],
+    };
+    if contract.owner.as_ref() != Some(&iterable)
+        || contract.name != "System.Collections.Iterable.GetIterator"
+        || !contract.instance
+        || contract.receiver_byref
+        || !contract.parameters.is_empty()
+        || contract.returns != iterator
+        || !contract.generic_parameters.is_empty()
+    {
+        return Err(Fault::new("unsupported array iteration contract"));
+    }
+    let array = Type::ArrayRef(Box::new(element.clone()));
+    let body = crate::vm::resolve(
+        module,
+        &FunctionRef {
+            definition: None,
+            name: "System.Collections.ArrayEnumerable.GetIterator".into(),
+            owner: Some(Type::Named("System.Collections.ArrayEnumerable".into())),
+            instance: false,
+            generic_arguments: vec![element.clone()],
+            parameters: vec![array.clone()],
+        },
+    )?;
+    if body.instance
+        || body.parameters != vec![array]
+        || body.returns != iterator
+        || is_bodyless(module, &body)
+    {
+        return Err(Fault::new("invalid array iteration implementation"));
+    }
+    Ok(body)
+}
+
 fn select(module: &Module, concrete: &Type, contract: &Function) -> Result<Function, Fault> {
+    if let Type::ArrayRef(element) = concrete {
+        return array_implementation(module, element, contract);
+    }
     if let Some(body) = member(module, concrete, contract)? {
         return Ok(body);
     }
@@ -569,6 +628,20 @@ pub(crate) fn dispatch_targets(
         .as_ref()
         .ok_or_else(|| Fault::new("interface call requires owner"))?;
     let mut targets = vec![];
+    if let Type::Constructed {
+        definition,
+        arguments,
+    } = interface
+    {
+        if definition == "System.Collections.Iterable"
+            && arguments.len() == 1
+            && module
+                .type_definition(&Type::Named("System.Collections.ArrayEnumerable".into()))
+                .is_some()
+        {
+            targets.push(array_implementation(module, &arguments[0], contract)?);
+        }
+    }
     for definition in &module.types {
         if definition.representation == Representation::Interface || definition.is_abstract {
             continue;

@@ -1954,7 +1954,7 @@ fn interpret_instructions(
                             let contract = if contract.is_virtual {
                                 crate::inheritance::dispatch(
                                     module,
-                                    object.concrete_type(),
+                                    &object.concrete_type(),
                                     &contract,
                                 )?
                             } else {
@@ -2008,7 +2008,7 @@ fn interpret_instructions(
                         object.reference.assigned()?;
                         let callee = crate::interfaces::implementation(
                             module,
-                            object.reference.target(),
+                            &object.concrete_type(),
                             interface,
                             &contract,
                         )?;
@@ -2027,7 +2027,11 @@ fn interpret_instructions(
                             }
                             args.insert(0, Value::SlotReference(receiver));
                         } else {
-                            object.view = callee.owner.clone();
+                            object.view = if callee.instance {
+                                callee.owner.clone()
+                            } else {
+                                Some(object.concrete_type())
+                            };
                             args.insert(0, Value::ObjectReference(object));
                         }
                         if frames.len() >= limits.frames {
@@ -2123,7 +2127,7 @@ fn interpret_instructions(
                                     "castclass requires an object-reference target",
                                 ));
                             }
-                            let concrete = object.concrete_type();
+                            let concrete = &object.concrete_type();
                             if crate::interfaces::interface_definition(module, target).is_ok() {
                                 crate::interfaces::ensure_implementation(module, concrete, target)?;
                                 object.view = Some(target.clone());
@@ -2132,9 +2136,8 @@ fn interpret_instructions(
                                     frame.stack.push(object.reference.read()?);
                                     return Ok(None);
                                 }
-                                if !matches!(target, Type::ArrayRef(_)) {
-                                    object.view = None;
-                                }
+                                object.view =
+                                    matches!(target, Type::ArrayRef(_)).then(|| target.clone());
                             } else if module.is_reference_type(target)
                                 && crate::inheritance::require_base(module, concrete, target)
                                     .is_ok()

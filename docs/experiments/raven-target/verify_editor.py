@@ -332,7 +332,9 @@ try:
         results['Extension receiver'] = labels
     if queries:
         for version, declaration in ((42, 'let values = ArrayList<int>()'),
-                                     (43, 'let values = ArrayList<int>().Where((value: int) -> bool => true)')):
+                                     (43, 'let values = ArrayList<int>().Where((value: int) -> bool => true)'),
+                                     (44, 'let values: int[] = [1, 2]'),
+                                     (45, 'let values = typeof(int).GetMethods()')):
             text = ('import System.Collections.*\nimport System.Linq.*\n'
                     'func Main() {\n    ' + declaration + '\n    values.\n}')
             send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})

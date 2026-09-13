@@ -65,11 +65,10 @@ impl PartialEq for ObjectReference {
 }
 impl ObjectReference {
     /// Concrete allocation type, independent of an interface view.
-    pub fn concrete_type(&self) -> &Type {
-        if matches!(self.reference.target(), Type::Array(_)) {
-            self.target()
-        } else {
-            self.reference.target()
+    pub fn concrete_type(&self) -> Type {
+        match self.reference.target() {
+            Type::Array(element) => Type::ArrayRef(element.clone()),
+            ty => ty.clone(),
         }
     }
     pub fn allocation_id(&self) -> usize {
