@@ -40,8 +40,8 @@ failure is an error payload. The sample uses branches and carrier APIs; Raven's
 propagation syntax performs the corresponding control-flow lowering.
 
 neoIL is the prototype's textual instruction format. It is not a claim that every
-spelling is standard MSIL: `.type class`, plain value declarations, `noresult`, and
-`ldvoid` expose prototype conventions. Ordinary void-returning CLI signatures still
+spelling is standard MSIL: `.type class`, plain value declarations and `ldvoid` expose prototype conventions. Lowercase
+`void` denotes ordinary no-result returns; `System.Void` names the unit type. Ordinary void-returning CLI signatures still
 have no stack result. The importer translates the admitted CLI subset into this
 runtime representation; the interpreter does not directly execute arbitrary .NET PE
 files. See [format direction](format-direction.md) and [Void mapping](void-semantics.md).

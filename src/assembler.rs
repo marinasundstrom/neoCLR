@@ -569,10 +569,12 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         | "ptr.fromint" | "ldobj" | "stobj" | "cpobj" | "initobj" | "box"
                         | "value.pack" | "value.is" | "value.unpack" | "ldtoken" | "castclass"
                         | "interface.borrow" | "newarr" | "array.new" | "array.alloc"
-                        | "array.reserve" | "array.create" | "ldelem" | "stelem" | "ldelema" => Some(
-                            serde_json::to_value(parse_type(rest)?)
-                                .map_err(|e| Fault::new(e.to_string()))?,
-                        ),
+                        | "array.reserve" | "array.create" | "ldelem" | "stelem" | "ldelema" => {
+                            Some(
+                                serde_json::to_value(parse_type(rest)?)
+                                    .map_err(|e| Fault::new(e.to_string()))?,
+                            )
+                        }
                         _ => {
                             if !rest.is_empty() {
                                 return Err(Fault::new("unexpected instruction operand"));
@@ -845,8 +847,8 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                                 .collect::<Result<_, _>>()?,
                             generic_arguments: vec![],
                             is_abstract,
-                            no_result: result.trim() == "noresult",
-                            returns: if result.trim() == "noresult" {
+                            no_result: matches!(result.trim(), "void" | "noresult"),
+                            returns: if matches!(result.trim(), "void" | "noresult") {
                                 Type::Void
                             } else {
                                 parse_type(result)?

@@ -1781,6 +1781,21 @@ does not retroactively change the existing .6 archive. A fresh candidate, its co
 asset attribution and package validation, and publication remain release work. No
 claim of general Raven/CLR binary compatibility accompanies these demonstrations.
 
+## 2026-09-13 — Keep ordinary void-return spelling familiar
+
+**Author question.** “Why does neoil use ‘noresult’?” The author asked whether `void`
+was expected. **Assistant response.** The assistant explained that `noresult` exposed
+the prototype distinction between an empty return stack and the first-class Void unit
+value, and proposed retaining that distinction internally instead of requiring a new
+public return keyword.
+
+**Action.** Added lowercase `void` in neoIL return position for the existing no-result
+calling convention and updated the new preview samples. `System.Void` explicitly
+names the unit type; uppercase `Void` and `noresult` retain legacy behavior. Tests
+cover stack preservation, rejection of a stray unit return and generic unit storage.
+The binary CLI boundary still uses its existing VOID marker; no new opcode or binary
+signature encoding is introduced. See [Void semantics](void-semantics.md).
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

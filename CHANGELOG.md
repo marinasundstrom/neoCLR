@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Accepted ordinary lowercase void returns in neoIL using the existing empty-stack
+  calling convention, and updated preview samples. System.Void remains a unit type
+  in generic/value contexts; legacy uppercase Void and noresult behavior is retained.
+  Added return-stack and generic-unit regressions; binary CLI encoding is unchanged.
+
 - Added a runtime/Raven release walkthrough and direct neoIL demonstrations for
   class aliasing/value copies and Result<Void, Error>, verified against the adapted
   library. Bundles now include these samples and their repeatable output check.

@@ -248,8 +248,17 @@ ldc.i4 42
 
 #[test]
 fn constructors_start_empty_with_requested_capacity_and_grow() {
-    for (argument, signature, capacity) in [("", "", 0), ("ldc.i4 0\n", "Int32", 0), ("ldc.i4 3\n", "Int32", 3)] {
-        let body = format!(".local System.Collections.ArrayList<Int32> list\n{argument}newobj instance System.Collections.ArrayList<Int32>::.ctor({signature})\nstloc list\nldloc list\ncall instance System.Collections.ArrayList<Int32>::get_Count()\nldc.i4 0\nbeq Empty\nfault \"count\"\nEmpty:\nldloc list\ncall instance System.Collections.ArrayList<Int32>::get_Capacity()\nldc.i4 {capacity}\nbeq Capacity\nfault \"capacity\"\nCapacity:\nldloc list\nldc.i4 42\ncall instance System.Collections.ArrayList<Int32>::Add(Int32)\nldloc list\nldc.i4 0\ncall instance System.Collections.ArrayList<Int32>::get_Item(Int32)");
-        assert_eq!(program(&body, "").run(Limits::default()).unwrap().value, Value::Int32(42));
+    for (argument, signature, capacity) in [
+        ("", "", 0),
+        ("ldc.i4 0\n", "Int32", 0),
+        ("ldc.i4 3\n", "Int32", 3),
+    ] {
+        let body = format!(
+            ".local System.Collections.ArrayList<Int32> list\n{argument}newobj instance System.Collections.ArrayList<Int32>::.ctor({signature})\nstloc list\nldloc list\ncall instance System.Collections.ArrayList<Int32>::get_Count()\nldc.i4 0\nbeq Empty\nfault \"count\"\nEmpty:\nldloc list\ncall instance System.Collections.ArrayList<Int32>::get_Capacity()\nldc.i4 {capacity}\nbeq Capacity\nfault \"capacity\"\nCapacity:\nldloc list\nldc.i4 42\ncall instance System.Collections.ArrayList<Int32>::Add(Int32)\nldloc list\nldc.i4 0\ncall instance System.Collections.ArrayList<Int32>::get_Item(Int32)"
+        );
+        assert_eq!(
+            program(&body, "").run(Limits::default()).unwrap().value,
+            Value::Int32(42)
+        );
     }
 }

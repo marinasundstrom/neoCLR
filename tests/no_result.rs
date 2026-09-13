@@ -108,3 +108,38 @@ fn generic_no_result_body_rejects_a_return_value() {
     assert!(verify(&m).unwrap_err().message.contains("empty stack"));
     assert!(run(&m, Limits::default()).is_err());
 }
+
+#[test]
+fn cli_void_return_spelling_preserves_stack_and_named_unit_returns() {
+    let m = module(
+        ".function Main() -> Int32\nldc.i4 42\ncall Empty()\ncall Unit()\npop\nret\n.end\n.function Empty() -> void\nret\n.end\n.function Unit() -> System.Void\nldvoid\nret\n.end",
+    );
+    verify(&m).unwrap();
+    assert_eq!(run(&m, Limits::default()).unwrap().value, Value::Int32(42));
+    assert!(
+        m.functions
+            .iter()
+            .find(|f| f.name == "Empty")
+            .unwrap()
+            .no_result
+    );
+    assert!(
+        !m.functions
+            .iter()
+            .find(|f| f.name == "Unit")
+            .unwrap()
+            .no_result
+    );
+}
+
+#[test]
+fn cli_void_return_rejects_unit_on_stack_but_accepts_unit_generic_storage() {
+    let bad = module(".function Main() -> void\nldvoid\nret\n.end");
+    assert!(verify(&bad).is_err());
+    assert!(run(&bad, Limits::default()).is_err());
+    let good = module(
+        ".type Box<T>\n.field Value T\n.end\n.function Main() -> void\n.local Box<System.Void> box\nldvoid\nnewobj Box<System.Void>\nstloc box\nret\n.end",
+    );
+    verify(&good).unwrap();
+    run(&good, Limits::default()).unwrap();
+}

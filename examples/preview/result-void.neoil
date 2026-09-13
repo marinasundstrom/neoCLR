@@ -1,7 +1,7 @@
 .module ResultVoid
 .entry Main
 
-; Void is a generic unit payload. A noresult call has no evaluation-stack result.
+; Void is a generic unit payload. An ordinary void call has no evaluation-stack result.
 .function Complete() -> System.Result<Void,Error>
     ldvoid
     newobj instance System.Result.Ok<Void>::.ctor(Void)
@@ -15,7 +15,7 @@
     newobj instance System.Result<Void,Error>::.ctor(System.Result.Error<Error>)
     ret
 .end
-.function Main() -> noresult
+.function Main() -> void
     call Complete()
     call instance System.Result<Void,Error>::get_IsOkCase()
     brfalse Unexpected

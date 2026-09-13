@@ -27,7 +27,15 @@ IL stack convention. The chosen split preserves generic value semantics and the
 familiar call convention, at the cost of an explicit compiler/metadata distinction.
 It is not binary compatibility with arbitrary .NET assemblies.
 
-The prototype distinguishes runtime `Void` from `noresult`. `ldvoid` represents a
+In neoIL return position, lowercase `void` selects the ordinary CLI no-result
+calling convention. `System.Void` explicitly names the inhabited unit type, including
+in generic arguments. The older `noresult` spelling remains an internal/legacy alias;
+existing uppercase `Void` return declarations retain their unit-return behavior.
+This case-sensitive distinction avoids changing legacy library stack contracts while
+restoring familiar spelling for ordinary methods. `void` in a generic argument still
+names the unit type; the no-result convention applies only in return position.
+
+The prototype retains a return-mode flag internally. `ldvoid` represents a
 logical value in the interpreter; this is not a promise that a future native backend
 must allocate bytes for it. The Raven bridge encodes value storage with a named
 System.Void value-type token, and no-result returns with CLI VOID. Raw VOID markers

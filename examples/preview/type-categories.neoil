@@ -4,7 +4,7 @@
 ; Classes share identity; a plain value declaration copies its fields.
 .type class Counter
 .field Count Int32
-.method instance .ctor(Int32 count) -> noresult
+.method instance .ctor(Int32 count) -> void
     ldarg this
     ldarg count
     stfld Counter::Count
@@ -15,7 +15,7 @@
 .field X Int32
 .end
 
-.function Main() -> noresult
+.function Main() -> void
     .local Counter original
     .local Counter alias
     .local Point point

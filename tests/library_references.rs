@@ -51,7 +51,8 @@ fn neo_library_methods_and_properties_use_frame_and_heap_reference_receivers() {
 fn list_contract_requires_a_managed_receiver_and_retains_value_elements() {
     let system = neoclr::library::system().unwrap();
     for method in system.functions.iter().filter(|f| {
-        f.instance && !f.name.ends_with("..ctor")
+        f.instance
+            && !f.name.ends_with("..ctor")
             && (f.name.starts_with("System.Collections.List.")
                 || f.name.starts_with("System.Collections.ArrayList."))
     }) {
