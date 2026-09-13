@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Admitted existing numeric division, remainder and shift instructions in the Raven
+  importer with operand validation. The companion Raven fix preserves unsigned
+  division/remainder/right-shift semantics instead of treating high-bit values as
+  negative. Added signed/unsigned/floating execution and division-fault regression
+  checks. Requires refreshed experimental tools; runtime semantics and published
+  artifacts are unchanged.
+
 - Extended companion Raven fixed-width implicit numeric conversions and corrected
   unsigned-to-floating emission using existing CLI instructions. Added a saved-project
   sample checking signed, unsigned, floating and Char widening at boundaries.

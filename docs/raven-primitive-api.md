@@ -122,3 +122,31 @@ Validation with Raven experiment `809aef0fe`: all 105 focused compiler tests pas
 (including the 144-pair classification matrix), plus 52 saved-project checks and
 28 target query checks. These results use the source-built experimental compiler,
 not the previously installed SDK or extension.
+
+### Division, remainder and shifts
+
+The bridge now admits `div`, `div.un`, `rem`, `rem.un`, `shl`, `shr`, and `shr.un`.
+Division/remainder require matching Int32, Int64 or floating stack operands; unsigned
+forms exclude floating operands. Shifts accept Int32/Int64 values and Int32 counts.
+Native-integer forms remain outside this importer slice.
+
+The [numeric operator sample](experiments/raven-target/samples/library-numeric-operators.rvn)
+checks high-bit UInt32/UInt64 division, remainder and zero-filling right shift,
+plus signed arithmetic/right shift and floating division/remainder. The companion
+Raven correction selects unsigned opcodes from the converted operand type. Earlier
+Raven output encoded signed operations even for unsigned operands, which also failed
+on the ordinary .NET runtime. This fixes the compiler rather than reinterpreting
+incorrect IL inside neoCLR.
+
+The existing [integer](integer-types.md) and [floating](floating-point.md) rules
+remain authoritative, based on ECMA-335. Integer divide-by-zero and signed division
+overflow terminate with neoCLR faults; there is no new catchable exception flow.
+The existing signed-minimum remainder boundary remains documented in the integer
+contract. Library Result-based arithmetic APIs remain available for recoverable
+errors. No instruction-set change or runtime implementation change is needed.
+
+Validation with Raven experiment `e51da7a48`: 34 focused Raven tests, 55 saved-project
+checks and 28 query checks passed. The saved-project suite verifies divide-by-zero
+and signed division overflow fault during execution after successful verification.
+Its unsupported-import regression now uses variable negation, which remains outside
+the importer; division is no longer an unsupported example.

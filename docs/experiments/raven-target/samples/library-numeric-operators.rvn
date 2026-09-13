@@ -1,0 +1,34 @@
+import System.*
+import System.Console.*
+
+func Check32(value: uint, divisor: uint, count: int) {
+    WriteLine((value / divisor).CompareTo((uint)2147483647))
+    WriteLine((value % divisor).CompareTo((uint)1))
+    WriteLine((value >> count).CompareTo((uint)2147483647))
+    WriteLine(((uint)1 << count).CompareTo((uint)2))
+}
+
+func Check64(value: ulong, divisor: ulong, count: int) {
+    WriteLine((value / divisor).CompareTo((ulong)9223372036854775807L))
+    WriteLine((value % divisor).CompareTo((ulong)1L))
+    WriteLine((value >> count).CompareTo((ulong)9223372036854775807L))
+    WriteLine(((ulong)1L << count).CompareTo((ulong)2L))
+}
+
+func CheckSigned(value: long, divisor: long, count: int) {
+    WriteLine((value / divisor).CompareTo(-3L))
+    WriteLine((value % divisor).CompareTo(-1L))
+    WriteLine((value >> count).CompareTo(-4L))
+}
+
+func CheckFloating(value: double, divisor: double) {
+    WriteLine((value / divisor).CompareTo(-3.5))
+    WriteLine((value % divisor).CompareTo(-1.0))
+}
+
+func Main() {
+    Check32((uint)-1, (uint)2, 1)
+    Check64((ulong)-1L, (ulong)2L, 1)
+    CheckSigned(-7L, 2L, 1)
+    CheckFloating(-7.0, 2.0)
+}

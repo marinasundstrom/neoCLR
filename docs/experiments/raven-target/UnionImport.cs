@@ -413,6 +413,17 @@ static class UnionImport
                         var numericRight = Pop(); var numericLeft = Pop();
                         if (numericLeft.Type != numericRight.Type || numericLeft.Type is not ("Int32" or "Int64" or "Double")) throw new InvalidDataException("Unsupported arithmetic operands.");
                         Push(new(numericLeft.Type)); code.AppendLine(instruction.OpCode.Name); break;
+                    case Code.Div: case Code.Div_Un: case Code.Rem: case Code.Rem_Un:
+                        var divisor = Pop(); var dividend = Pop();
+                        if (dividend.Type != divisor.Type || dividend.Type is not ("Int32" or "Int64" or "Double")
+                            || dividend.Type == "Double" && instruction.OpCode.Code is (Code.Div_Un or Code.Rem_Un))
+                            throw new InvalidDataException("Unsupported division/remainder operands.");
+                        Push(new(dividend.Type)); code.AppendLine(instruction.OpCode.Name); break;
+                    case Code.Shl: case Code.Shr: case Code.Shr_Un:
+                        var shiftCount = Pop(); var shifted = Pop();
+                        if (shiftCount.Type != "Int32" || shifted.Type is not ("Int32" or "Int64"))
+                            throw new InvalidDataException("Unsupported shift operands.");
+                        Push(new(shifted.Type)); code.AppendLine(instruction.OpCode.Name); break;
                     case Code.Or: case Code.And: case Code.Xor:
                         var bitsRight = Argument("Int32"); var bitsLeft = Argument("Int32");
                         var bits = Coerce(new("RuntimeBits" + instruction.OpCode.Code, ["Int32", "Int32"], "Int32"), [bitsLeft.Type, bitsRight.Type]);

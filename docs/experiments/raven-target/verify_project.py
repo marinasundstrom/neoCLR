@@ -28,6 +28,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
              ('ErrorValues', 'library-errors.rvn', (bridge / 'samples/library-errors.expected.txt').read_text()),
              ('Calendar', 'library-calendar.rvn', '2024\n2\n29\n60\n738944\n0\nSame date\nDate accepted\n1\n1\n1\n1\n0\n0\nSame date\nDate accepted\nInvalid date\nInvalid date\n' + '12\n34\n56\n789\n7890123\n0\n0\nSame time\nTime accepted\n' * 2 + '0\n0\n0\n0\n0\n-1\n0\nSame time\nTime accepted\nInvalid time\nInvalid time\n'),
              ('Primitives', 'library-primitives.rvn', '-1\n1\n-1\n1\n1\n1\n0\n0\n0\n-1\n-1\nDigit\nNumber\nLetter\nUpper\nLower\nSeparator\nControl\nPunctuation\nSymbol\nSurrogate\nHigh\nLow\nASCII\nASCII digit\nLetter or digit\nWhitespace\n'),
+             ('NumericOperators', 'library-numeric-operators.rvn', '0\n' * 13),
              ('NumericWidening', 'library-numeric-widening.rvn', '0\n0\n0\n0\n'),
              ('FloatingMath', 'library-floating-math.rvn', '0\n' * 19 + '-1\n'),
              ('Clamp', 'library-clamp.rvn', 'Clamped\n5\nClamped\n0\nClamped\n10\nClamped\n7\nClamped\n-2147483648\nClamped\n2147483647\nInvalid range\n'),
@@ -88,11 +89,28 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
         ('PathUnsupportedApi', 'func Main() { System.IO.Path.GetFullPath(".") }', 'RAV'),
         ('StringArgumentMismatch', 'func Main() { System.String.Concat(42, 7) }', 'RAV'),
         ('StringUnsupportedApi', 'func Main() { System.String.IsNullOrEmpty(\"\") }', 'RAV'),
-        ('ImportFailure', 'func Divide(value: int) -> int { return value / 2 }\nfunc Main() { Divide(2) }', 'Unsupported')]:
+        ('ImportFailure', 'func Negate(value: int) -> int { return -value }\nfunc Main() { Negate(2) }', 'Unsupported')]:
         before = set(root.rglob('App.neoil'))
         (root / 'Main.rvn').write_text(source)
         run = subprocess.run(command, capture_output=True, text=True, timeout=90)
         if run.returncode == 0 or diagnostic not in run.stderr or set(root.rglob('App.neoil')) != before:
             raise AssertionError(run.stdout + run.stderr)
         results[label] = 'Rejected; no executable produced or stale output run'
+    for label, type_name, left, right, diagnostic in (
+            ('DivisionByZero', 'uint', '(uint)42', '(uint)0', 'division by zero'),
+            ('DivisionOverflow', 'long', '-9223372036854775808L', '-1L', 'overflow')):
+        (root / 'Main.rvn').write_text(f'''
+import System.Console.*
+func Divide(left: {type_name}, right: {type_name}) -> {type_name} {{
+    return left / right
+}}
+func Main() {{
+    Divide({left}, {right})
+    WriteLine("Must not continue")
+}}
+''')
+        run = subprocess.run(command, capture_output=True, text=True, timeout=90)
+        assert run.returncode != 0 and diagnostic in run.stderr, run.stdout + run.stderr
+        assert 'Verified saved project:' in run.stdout and 'Must not continue' not in run.stdout
+        results[label] = 'Verified, then faulted during execution'
 print(json.dumps(results, indent=2))
