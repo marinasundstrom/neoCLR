@@ -1,0 +1,51 @@
+import System.*
+import System.Console.*
+import System.Collections.*
+import System.Linq.*
+
+func AsVector(values: Array<int>) -> int[] {
+    return values
+}
+
+func AsGeneric(values: int[]) -> Array<int> {
+    return values
+}
+
+func Sum(values: Iterable<int>) -> int {
+    var total = 0
+    for value in values {
+        total += value
+    }
+    return total
+}
+
+func Main() {
+    let values: Array<int> = [7, 8]
+    let alias: int[] = AsVector(values)
+    alias[0] = 42
+    let same: Array<int> = AsGeneric(alias)
+    WriteLine(same[0])
+    WriteLine(same.Length)
+    for value in same {
+        WriteLine(value)
+    }
+    WriteLine(Sum(same))
+
+    let iterator = same.GetIterator()
+    if iterator.MoveNext() {
+        WriteLine(iterator.Current)
+    }
+    iterator.Dispose()
+
+    let copy = same.Where((value: int) -> bool => value > 10).ToList()
+    WriteLine(copy.Count)
+    WriteLine(copy[0])
+    WriteLine(typeof(Array<int>).GenericArgumentCount)
+    WriteLine(typeof(Array<int>).GetGenericArguments()[0].Name)
+    WriteLine(typeof(Array<int>).GetInterfaces().Length)
+
+    let nested: Array<Array<int>> = [[1, 2]]
+    let vectors: int[][] = nested
+    vectors[0][1] = 9
+    WriteLine(nested[0][1])
+}

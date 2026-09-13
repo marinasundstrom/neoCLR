@@ -52,6 +52,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
              ('Void', 'library-void.rvn', 'Completed without a payload\nNot completed\n')]
     if args.collections:
         cases += [('Interfaces', 'library-interfaces.rvn', '1\n42\n'),
+                  ('UnifiedArray', 'library-array-unified.rvn', '42\n2\n42\n8\n50\n42\n1\n42\n1\nSystem.Int32\n1\n9\n'),
                   ('ArrayShapes', 'library-array-shapes.rvn', '0\n0\nBoolean elements\nSystem.Int32\nSystem.String\n0\n255\n65535\n65535\n42\n'),
                   ('ReferencePayloads', 'library-reference-payloads.rvn', 'Copied Type reference\nSystem.Int32\nSystem.String\n3\n2\n0\n3\n3\n42\nStored error\n7\n42\nSystem.Int32\n'),
                   ('ValueInterfaces', 'library-value-interfaces.rvn', '0\n1\nEqual integer\nEqual string\nEqual type\n0\nEqual date\n0\n0\n'),

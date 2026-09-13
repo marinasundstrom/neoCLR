@@ -2292,3 +2292,23 @@ refreshed by this source slice.
 58 saved-project cases and 28 query checks, including array extensions. The interface
 probe checks the reference declaration. These are source-level integration checks;
 a packaged SDK/editor refresh remains separate.
+
+
+### 2026-09-13 — Unifying the array spellings and refreshing the tools
+
+**Author direction:** Accepted the proposed consecutive slices: make Array<T> and
+T[] interchangeable in Raven, verify the full array experience, then refresh the
+local SDK and VS Code extension.
+
+**Assistant action:** Implemented target-specific canonicalization in source type
+binding and imported signatures. Both spellings use ordinary CLI vector signatures;
+interface member calls use normal interface dispatch. The new sample demonstrates
+alias mutation, nested arrays, indexed loops, Iterable parameters, GetIterator,
+query extensions and reflection. Compiler regressions cover opt-in behavior and
+invariant arrays. Allocation remains an array expression rather than a new generic
+class constructor. Broader collection taxonomy and arbitrary class-member projection
+remain separate. Local packaging/installation is the following slice.
+
+**Source validation:** The new sample passed on neoCLR; the saved-project suite
+passed 59 cases, and the new SDK server passed 52 completion/hover/diagnostic checks.
+Raven's compiler slice is committed as `6072dcf4b` on its experiment branch.

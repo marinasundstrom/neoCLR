@@ -22,6 +22,7 @@ patterns = '--patterns' in sys.argv[2:]
 extensions = '--extensions' in sys.argv[2:]
 queries = '--queries' in sys.argv[2:]
 array_invariance = '--array-invariance' in sys.argv[2:]
+array_shape = '--array-shape' in sys.argv[2:]
 server = json.loads((project / '.vscode/settings.json').read_text())['raven.languageServerPath']
 messages = queue.Queue()
 log = (project / 'lsp-stderr.log').open('wb')
@@ -377,6 +378,26 @@ try:
                     break
                 if time.monotonic() >= deadline:
                     raise TimeoutError('Array invariance diagnostics timed out')
+    if array_shape:
+        text = ('import System.*\nimport System.Linq.*\n'
+                'func Inspect(values: Array<int>) {\n    values.\n}')
+        send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': 49},
+            'contentChanges': [{'text': text}]})
+        result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
+            'position': {'line': 3, 'character': len('    values.')},
+            'context': {'triggerKind': 2, 'triggerCharacter': '.'}}, True))
+        items = result if isinstance(result, list) else result['items']
+        labels = sorted({item['label'] for item in items})
+        assert {'Length', 'GetIterator', 'Where', 'ToList'}.issubset(labels), labels
+        results['Generic array members'] = labels
+        text = ('import System.*\nfunc Inspect(values: Array<int>) -> int {\n'
+                '    let vector: int[] = values\n    return vector[0]\n}')
+        send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': 50},
+            'contentChanges': [{'text': text}]})
+        hover = receive(send('textDocument/hover', {'textDocument': {'uri': uri},
+            'position': {'line': 2, 'character': 9}}, True))
+        assert hover is not None and any(t in json.dumps(hover) for t in ('int[]', 'Int32[]')), hover
+        results['Generic array alias hover'] = hover
     receive(send('shutdown', None, True))
     send('exit', None)
     print(json.dumps(results, indent=2))

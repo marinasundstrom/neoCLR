@@ -38,8 +38,11 @@ existing static ForEach compiler declarations. Raven still imports ordinary arra
 signatures. The reference assembly now declares a generic System.Array<T> interface
 shape implementing Iterable<T>. `RavenIterationArrayShapeType` selects it; Raven
 reads its interface metadata instead of hardcoding Iterable on vector symbols.
-This is interface projection, not a source alias between explicit System.Array<T>
-and T[]. Class-member projection remains separate. The reference declaration and
+The selected generic shape and T[] now resolve to the same array in Raven source
+annotations and imported signatures. Assignment in either direction, nested arrays,
+indexing and typeof use normal vector semantics. The compiler emits ordinary CLI
+array signatures. Array base members and interface members such as GetIterator are
+available directly; arbitrary members on the metadata class are not projected. The reference declaration and
 runtime implementation must stay aligned; the interface probe checks the shape.
 
 ## Try the direct IL examples
@@ -109,3 +112,19 @@ The follow-up metadata projection slice passes 25 focused Raven compiler/project
 tests, 58 saved-project cases and 28 query checks using the generic shape setting.
 The interface probe validates the reference declaration and the runtime API inventory
 check passes. No SDK or VS Code extension was installed by this follow-up.
+
+
+## Unified Raven example
+
+`library-array-unified.rvn` demonstrates `let values: Array<int> = [7, 8]`, passing
+that array through `int[]` parameters and back, mutating a shared alias, indexed
+iteration, explicit iterator acquisition, query extensions and reflection. Nested
+`Array<Array<int>>` is likewise interchangeable with `int[][]`. Array allocation
+uses normal Raven array expressions; this does not add an `Array<T>(length)` constructor.
+The interface declaration supplies the contract, not a second object or boxing step.
+
+The compiler slice passes 22 focused array/iteration tests, including emitted vector
+signatures and opt-in/invariance checks. The saved-project suite includes the new
+sample; `verify_editor.py --array-shape` checks member/extension completion and alias
+hover using the project configuration. The source integration passes 59 saved-project cases and 52 editor checks with the
+new SDK server. Packaged bundle validation is recorded separately.

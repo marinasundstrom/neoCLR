@@ -156,3 +156,10 @@ For builds containing target-aware array diagnostics, keep
 and add `--array-invariance` to the editor check. It verifies implicit/explicit
 array conversion diagnostics and correction after an edit. Older SDKs ignore this
 new property; do not report source-built checks as validation of an older bundle.
+
+
+For builds containing generic array unification, also pass `--array-shape` to the
+editor checks. This verifies Array<int> member/query completion and int[] alias
+hover. Keep the unified-array sample in the saved-project suite, and select
+`RavenIterationArrayShapeType` in new demo projects. Both compiler spellings emit
+ordinary CLI arrays; no separate generic-array allocation format is required.
