@@ -40,7 +40,8 @@ Continue the Raven collection demo against these target semantics.
 
 Preview 4 is published with runtime, source, Raven SDK/VSIX and validation artifacts.
 The active follow-up is [application-defined Raven types](raven-application-types.md):
-class/value storage, interfaces and inheritance, then an order-workflow application.
+class/value storage, interfaces and inheritance are implemented, together with the
+[order-workflow application](raven-order-workflow.md).
 Delegate targets and non-capturing/capturing lambdas are included in the follow-up
 scope. Keep runtime work primary and Raven fixes isolated on its experimental branch;
 separate general compiler bugs from target contract mappings and generic-Void semantics.

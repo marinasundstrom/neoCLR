@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Added a Raven order-workflow application with domain classes, an application
+  interface, ArrayList storage, Option lookup and Result<Void, FileWriteError>
+  propagation. Isolated checks verify persistence and unchanged order/report state
+  after rejected writes; documented source-toolchain setup and current limitations.
+
 - The Raven source bridge now imports ordinary application classes/value types,
   fields, constructors and instance accessors/methods, including ArrayList storage.
   Extended this to application class interfaces, abstract/virtual inheritance and

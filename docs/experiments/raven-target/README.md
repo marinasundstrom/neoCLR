@@ -1,5 +1,10 @@
 # Raven targeting neoCLR
 
+Post-Preview-4 source work: [application classes/interfaces](../../raven-application-types.md)
+and the [order-workflow demo](../../raven-order-workflow.md) now exercise user-defined
+objects against the runtime library. These require the updated experimental Raven
+branch; published Preview 4 binaries remain unchanged.
+
 Start with the [runtime and Raven release walkthrough](../../runtime-raven-preview.md)
 and [current VS Code setup](VSCODE.md). The existing runtime API pass is complete for
 the bounded POC, with coverage and limits [recorded here](../../raven-runtime-api-coverage.md).
