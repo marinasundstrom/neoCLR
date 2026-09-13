@@ -2,8 +2,8 @@
 
 Recorded 2026-09-13. The [first generic-array slice](generic-managed-arrays.md) now implements the managed shape and its explicit Iterable<T> declaration in the Raven profile. The author wants to review collection/enumerable APIs before
 accumulating readonly, immutable and frozen contracts. The following proposals are
-inputs, not selected library declarations. Keep the implemented List<T> and ArrayList<T>
-contracts unchanged during this review; mutable arrays remain invariant.
+inputs, not selected library declarations. The capability prototype below supersedes the earlier instruction to keep List<T>
+unchanged during review. Mutable arrays remain invariant.
 
 ## Proposals supplied by the author
 
@@ -191,3 +191,77 @@ proposal to preserve native operations under a temporary descriptor name. The
 current List<T> is not added because its Add operation requires growth. See the
 [implementation and remaining limits](generic-managed-arrays.md). Earlier planning
 statements above describe the state before that slice.
+
+
+## 2026-09-13 capability prototype
+
+The author approved continuing from generic arrays into a bounded collection review
+and prototype, then observed that advertising supported capabilities is preferable
+to a mutable default whose Add operation later fails. This section selects a small
+experimental hierarchy; it does not adopt all the earlier candidate families.
+
+| Interface | Parent | Declared operations |
+| --- | --- | --- |
+| Iterable<T> | — | GetIterator |
+| Collection<T> | Iterable<T> | Count |
+| Sequence<T> | Collection<T> | Item getter |
+| MutableSequence<T> | Sequence<T> | Item getter/setter |
+| List<T> | MutableSequence<T> | Existing Add operation |
+
+Array<T> will declare MutableSequence<T>; ArrayList<T> will retain List<T> and inherit
+all the read/replacement contracts. List is still a minimal growth contract, not a
+completed .NET IList equivalent: Remove, Insert, Clear and membership APIs remain
+future work. The names, especially Sequence versus List, remain provisional.
+All parameters stay invariant until the runtime has validated generic variance.
+
+Count is the current number of accessible positions, not capacity. Indices are
+zero-based and must be less than Count; invalid positions retain the existing fault
+behavior. Reads return T, not a writable element address. For reference elements,
+the returned reference can still identify a mutable object. Sequence promises indexed
+access but no general complexity bound; iteration order matches index order. No
+concurrent mutation or thread-safety guarantee is added. Existing iterator behavior
+is unchanged; iterate without structural mutation in this prototype.
+
+A read interface restricts operations through that reference. Other aliases can
+change the storage, and an explicit cast back may succeed when the concrete object
+supports mutation. This is neither an immutable snapshot nor a security boundary.
+A separate adapter remains useful when hiding the concrete object is required.
+
+### Comparison and tradeoffs
+
+Primary sources reviewed on 2026-09-13:
+
+- [.NET 10 Array](https://learn.microsoft.com/en-us/dotnet/api/system.array?view=net-10.0)
+  exposes generic collection interfaces on vectors despite fixed length. Reusing that
+  contract would retain unsupported growth operations on arrays. The prototype instead
+  expresses replacement separately from growth in ordinary interface metadata.
+- [.NET 10 ReadOnlyCollection<T>](https://learn.microsoft.com/en-us/dotnet/api/system.collections.objectmodel.readonlycollection-1?view=net-10.0)
+  is a live wrapper and also implements mutable interfaces whose mutation methods reject
+  calls. neoCLR's read interfaces omit those members. A wrapper can still serve a
+  different purpose, so this does not imply eliminating all read-only adapters.
+- [dotnet/runtime #31001](https://github.com/dotnet/runtime/issues/31001) proposes
+  making mutable interfaces inherit their read-only counterparts. It remains a
+  proposal rather than evidence that .NET ships this hierarchy. neoCLR can experiment
+  with that inheritance without preserving an earlier public interface graph.
+
+The existing [comparison program](experiments/readonly-views/dotnet/Comparison.csproj)
+was rerun with .NET SDK 11.0.100-rc.1.26425.128. Its alias and cast-back observations
+remain applicable. Prior Java-view and independent .NET collection research stays in
+[the earlier comparison](experiments/readonly-views/README.md#comparison-and-evidence).
+
+Alternatives are retaining the .NET mutable contracts with runtime rejection, adding
+only a read adapter, or splitting the contracts. The split lets parameters state what
+they need and avoids allocating a wrapper just to obtain a smaller interface. Its costs
+are more interface names, a changed metadata member-owner graph and compiler/runtime
+coverage for inherited properties. No performance improvement is claimed.
+
+Placement: declarations and implementation conformance belong in runtime-library
+metadata; dispatch uses existing CLR-like calls. Raven should consume inheritance
+normally. No new opcode, variance rule, ownership model, immutable/frozen family,
+Map or Set API is needed. The legacy Neo library stays outside this profile migration.
+
+Validation will cover array/list substitution, count, reads, replacement, growth,
+live aliases, extension methods, source rejection of unavailable operations, low-level
+forged member calls, invalid array conformance and invariant element types. Runtime
+metadata must not let an array promise Add without an implementation. Compiler work
+is limited to any ordinary interface-inheritance bugs the experiment exposes.

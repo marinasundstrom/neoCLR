@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Planned a bounded collection capability prototype separating counted iteration,
+  indexed reads, element replacement and the existing List growth operation. Recorded
+  .NET API comparisons, provisional names, alias guarantees and validation criteria;
+  immutable/frozen families and generic variance remain separate.
+
 - Built and installed experimental Raven SDK/VSIX 0.1.12-neoclr.11 with the generic
   array integration in an isolated local demo/profile. All seven packaged suites
   passed, including 59 saved-project cases, 28 query checks and 52 editor checks;

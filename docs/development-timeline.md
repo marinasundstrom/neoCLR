@@ -2319,3 +2319,22 @@ installed VSIX server and exact configured Run task also passed. Preserved 1,074
 existing Raven source files. [Local instructions](raven-generic-arrays-local-build.md)
 and the linked manifest record artifact hashes and evidence. This completes the
 authorized local refresh without publishing a release or replacing prior demos.
+
+
+### 2026-09-13 — Collection contracts advertise supported operations
+
+**Author direction and question:** Asked to continue the collection review/prototype,
+then asked what the assistant would do. The assistant proposed Iterable, Collection,
+Sequence, MutableSequence and the existing growable List as a minimal capability chain,
+with invariant type parameters and provisional naming.
+
+**Author response:** Observed that this is preferable to a mutable default followed
+by a view that rejects Add. The assistant clarified that arrays should expose element
+replacement without claiming growth; read interfaces restrict access but do not make
+shared storage immutable or prevent mutation through other aliases.
+
+**Action underway:** Recorded the [capability prototype](collection-contracts.md#2026-09-13-capability-prototype)
+and compared it with .NET's array/read-wrapper contracts and the proposed read/mutable
+interface inheritance change. Implementation exposed a Raven inherited-indexer lookup
+bug, which is being addressed on the experiment branch rather than worked around in
+samples. No implementation completion or tool refresh is claimed by this planning entry.
