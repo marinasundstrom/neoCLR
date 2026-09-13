@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Admit no-result static generic IL methods while retaining the distinction between
+  generic Void payloads and absent call results. Added execution and invalid-return
+  regressions; generic instance-class methods remain outside this subset.
+
 - Projected the five Func arities for static Raven callbacks, including named
   Func<Void> completion, and exposed ArrayList.FindIndex/Exists/Find. Preserve
   generic Void return context and the adapted no-result Dispose calls. Added
@@ -33,7 +37,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Added typed-null String defaults for managed locals, constructed fields and array
   elements, aligning string-array initialization with CLR expectations. This
   replaces the previous default-initialization fault; intrinsic string receiver
-  representation and native pointer rules are unchanged.
+  representation and native pointer rules are unchanged. Updated generic constructor
+  coverage to verify String initialization after the newly supported typed-null default.
 
 - Generalized Raven Option/Result bindings for admitted primitive, string, calendar,
   error and nested union payloads. Exposed factories, predicates, checked case

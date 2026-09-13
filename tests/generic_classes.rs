@@ -228,23 +228,21 @@ ret
 }
 
 #[test]
-fn constructor_keeps_existing_unsupported_default_fault() {
+fn constructor_initializes_string_field_after_typed_null_default() {
     let m = module(
         r#"
-.function Main() -> Cell<String>
+.function Main() -> String
 ldstr "value"
 newobj instance Cell<String>::.ctor(String)
+call instance Cell<String>::Get()
 ret
 .end
 "#,
     );
-    // String defaults are not admitted by the current nominal class constructor path.
-    // A supplied constructor argument must not silently bypass that field policy.
-    assert!(
-        run(&m, Limits::default())
-            .unwrap_err()
-            .message
-            .contains("default initialization")
+    verify(&m).unwrap();
+    assert_eq!(
+        run(&m, Limits::default()).unwrap().value,
+        Value::String("value".into())
     );
 }
 

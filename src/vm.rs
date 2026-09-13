@@ -522,11 +522,10 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 || (function.is_abstract && !nominal_interface_contract)
                 || function.is_internal_call()
                 || function.pinvoke.is_some()
-                || !function.generic_parameters.is_empty()
                 || !function.interface_implementations.is_empty())
         {
             return Err(Fault::new(
-                "no-result methods require non-generic IL bodies with Void metadata and static or class receivers",
+                "no-result methods require IL bodies with Void metadata and static or class receivers",
             ));
         }
         crate::metadata::validate_slot_names(

@@ -90,3 +90,21 @@ fn inhabited_void_delegate_cannot_bind_a_no_result_target() {
     assert!(verify(&m).is_err());
     assert!(run(&m, Limits::default()).is_err());
 }
+
+#[test]
+fn generic_no_result_calls_preserve_caller_values_and_void_payloads() {
+    let m = module(
+        ".function Main() -> Int32\nldc.i4 42\nldvoid\ncall Ignore<Void>(Void)\nldc.i4 7\ncall Ignore<Int32>(Int32)\nret\n.end\n.function Ignore<T>(T value) -> noresult\nldarg value\npop\nret\n.end",
+    );
+    verify(&m).unwrap();
+    assert_eq!(run(&m, Limits::default()).unwrap().value, Value::Int32(42));
+}
+
+#[test]
+fn generic_no_result_body_rejects_a_return_value() {
+    let m = module(
+        ".function Main() -> noresult\nldc.i4 7\ncall Bad<Int32>(Int32)\nret\n.end\n.function Bad<T>(T value) -> noresult\nldarg value\nret\n.end",
+    );
+    assert!(verify(&m).unwrap_err().message.contains("empty stack"));
+    assert!(run(&m, Limits::default()).is_err());
+}

@@ -33,8 +33,9 @@ no new instruction is introduced. A no-result `ret` requires an empty evaluation
 Both the verifier and interpreter enforce the distinction. Frame cleanup still runs.
 
 The supported subset now includes static/free and ordinary nominal-class instance IL
-methods, including class constructors. Virtual/interface/delegate contracts, generic methods,
-InternalCall and P/Invoke declarations cannot opt in yet. Delegates with inhabited Void results cannot bind no-result targets.
+methods, including class constructors, and static/free generic IL methods. Bodyless
+nominal interface contracts also support no-result signatures. Generic class methods,
+virtual class/delegate contracts, InternalCall and P/Invoke declarations cannot opt in yet. Delegates with inhabited Void results cannot bind no-result targets.
 These bounds are explicit validation rules, not claims that CLR no-result methods have
 those restrictions. Neo source-language projection is not implemented by this slice.
 
@@ -117,3 +118,13 @@ separate implementation work; the no-result slice has not completed it.
 
 The [class-constructor follow-up](class-semantics.md#constructor-and-field-store-follow-up-2026-09-12)
 uses no-result constructor bodies while `newobj` independently yields the allocated object.
+
+## Generic static calls (2026-09-13)
+
+Static generic methods may declare a no-result return independently of their type
+parameters. Specialization retains the return convention: `Ignore<Void>(Void)`
+consumes its unit argument without producing a caller-stack result, whereas
+`Identity<Void>(Void) -> T` still produces a unit. This removes an implementation
+restriction and reuses the CLI call/return distinction described above. No new
+opcode or CLI metadata flag is needed. Tests cover caller-stack preservation,
+multiple specializations and rejection of a value left at a no-result return.
