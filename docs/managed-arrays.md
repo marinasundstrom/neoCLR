@@ -193,7 +193,8 @@ introduces covariance or makes the existing owned `T[]` nullable.
 Nominal class constructors still cannot default a legacy array-reference field; explicit
 field-based construction can retain an already allocated buffer. The Raven importer
 continues rejecting array signatures until its admission and translation are implemented. This is a prerequisite for adapting collections, not the completed
-collection migration. String defaults also remain unsupported.
+collection migration. String defaults were unsupported in this slice; see the later
+[String default-storage update](string-default-storage.md).
 
 `tests/object_reference_arrays.rs` exercises nulls, dispatch/identity, slot rebinding,
 GC retention through an escaped element address, generic buffer fields, invalid stores,
@@ -223,7 +224,9 @@ start with a null `arrayref<T>` field and assign `newarr T` to it. Arrays can co
 class/interface references and other array references, and GC follows those handles.
 The runtime still requires invariant element types; interface element stores accept
 implicit implementing-class upcasts.
-Array covariance, System.Array methods and String defaults remain outside this slice.
+Array covariance, System.Array methods and String defaults were outside this slice.
+The later [String default-storage update](string-default-storage.md) enables null
+initialization for string-array elements.
 
 This aligns allocation/alias/default behavior with the Microsoft newarr/ldelema contracts
 cited above. Changing all existing `T[]` signatures to references would instead break

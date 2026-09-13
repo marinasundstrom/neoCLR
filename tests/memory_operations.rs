@@ -95,7 +95,8 @@ fn block_copy_preserves_full_pointer_tracking() {
 
 #[test]
 fn unsupported_native_layouts_cannot_be_zero_initialized() {
-    assert!(assemble(".module Test\n.function Zero(String* p) -> Void\nldarg p\ninitobj String\nldvoid\nret\n.end").is_err());
+    let module = assemble(".module Test\n.function Zero(String* p) -> Void\nldarg p\ninitobj String\nldvoid\nret\n.end").unwrap();
+    assert!(neoclr::verify(&module).is_err());
 }
 
 #[test]

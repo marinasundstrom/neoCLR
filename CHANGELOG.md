@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Added typed-null String defaults for managed locals, constructed fields and array
+  elements, aligning string-array initialization with CLR expectations. This
+  replaces the previous default-initialization fault; intrinsic string receiver
+  representation and native pointer rules are unchanged.
+
 - Generalized Raven Option/Result bindings for admitted primitive, string, calendar,
   error and nested union payloads. Exposed factories, predicates, checked case
   access and extraction/propagation members, retaining guarded-output validation.

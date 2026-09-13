@@ -190,7 +190,7 @@ fn generic_arrays_substitute_elements_and_normalize_small_scalar_loads() {
 
 #[test]
 fn direct_reference_elements_and_unsupported_default_values_are_rejected() {
-    for element in ["Int32&", "String"] {
+    for element in ["Int32&", "Int32[]"] {
         let module = assemble(&format!(
             ".module Bad\n.entry Main\n.function Main() -> Int32\nldc.i4 0\narray.new {element}\npop\nldc.i4 0\nret\n.end"
         ));

@@ -781,9 +781,11 @@ impl Module {
                 .is_some_and(|definition| definition.is_reference_type)
     }
 
-    /// Ordinary object-reference storage, including nominal interface views.
+    /// Reference storage defaults, including intrinsic String and nominal interface views.
+    /// String retains its intrinsic payload and receiver ABI rather than a record layout.
     pub fn is_object_reference_type(&self, ty: &Type) -> bool {
-        self.is_reference_type(ty)
+        matches!(ty, Type::String)
+            || self.is_reference_type(ty)
             || self
                 .type_definition(ty)
                 .is_some_and(|d| d.representation == Representation::Interface)
