@@ -1,6 +1,5 @@
 using Mono.Cecil;
 using System.Text;
-using System.Text.RegularExpressions;
 
 // Per-import application metadata. No host type loading or per-application API catalog.
 static class ApplicationTypes
@@ -10,6 +9,10 @@ static class ApplicationTypes
     static readonly HashSet<string> Expanded = new();
     static readonly Dictionary<string, Dictionary<string, string>> Adapters = new();
     public static void Reset(ModuleDefinition module) { Module = module; Types.Clear(); Expanded.Clear(); Adapters.Clear(); }
+    public static object[] IdentityMap() => Types.Select(p => (object)new {
+        MetadataName = p.Value.FullName, RuntimeName = p.Key,
+        Fields = p.Value.Fields.Select(f => new { MetadataName = f.Name, RuntimeName = MetadataIdentity.MemberName(f.Name) }).ToArray()
+    }).ToArray();
     public static bool IsType(string name) => Types.ContainsKey(name);
     public static bool IsReference(string name) => Types.TryGetValue(name, out var type) && !type.IsValueType;
     public static string? Type(TypeReference reference)
@@ -24,7 +27,7 @@ static class ApplicationTypes
             || type.Fields.Any(f => f.IsStatic || f.HasMarshalInfo || f.IsInitOnly)
             || type.Methods.Any(m => m.IsConstructor && m.IsStatic))
             throw new InvalidDataException("Unsupported application type: " + type.FullName);
-        var name = $"Application.Type_{type.MetadataToken.ToUInt32():x8}";
+        var name = MetadataIdentity.TypeName(type);
         Types[name] = type;
         if (Types.Count > 128) throw new InvalidDataException("Application type limit exceeded.");
         return name;
@@ -75,8 +78,7 @@ static class ApplicationTypes
     public static string MethodName(MethodDefinition method)
     {
         if (method.IsConstructor) return ".ctor";
-        if (!Regex.IsMatch(method.Name, @"^[A-Za-z_][A-Za-z0-9_]*$")) return $"Generated_{method.MetadataToken.ToUInt32():x8}";
-        return method.Name;
+        return MetadataIdentity.MemberName(method.Name);
     }
     public static void CheckMethod(MethodReference method)
     {
@@ -95,7 +97,7 @@ static class ApplicationTypes
         var owner = Type(field.DeclaringType)!;
         if (field.IsStatic || reference.FullName != field.FullName || (!field.IsPublic && caller.DeclaringType != field.DeclaringType))
             throw new InvalidDataException("Unsupported application field access.");
-        return new(owner, map(field.FieldType, false), $"Field_{field.MetadataToken.ToUInt32():x8}", field.DeclaringType.IsValueType);
+        return new(owner, map(field.FieldType, false), MetadataIdentity.MemberName(field.Name), field.DeclaringType.IsValueType);
     }
     public static void AddAdapter(string owner, string name, string body)
     {
@@ -115,7 +117,7 @@ static class ApplicationTypes
             foreach (var method in type.Methods.Where(m => m.IsAbstract))
                 output.AppendLine($".method instance {(type.IsInterface ? "" : "abstract ")}{MethodName(method)}({string.Join(',', method.Parameters.Select(p => map(p.ParameterType, false)))}) -> {map(method.ReturnType, true)}\n.end");
             foreach (var field in type.Fields)
-                output.AppendLine($".field Field_{field.MetadataToken.ToUInt32():x8} {map(field.FieldType, false)}");
+                output.AppendLine($".field {MetadataIdentity.MemberName(field.Name)} {map(field.FieldType, false)}");
             foreach (var body in bodies.Where(p => p.Key.DeclaringType == type)) output.Append(body.Value);
             if (Adapters.TryGetValue(name, out var adapters)) foreach (var body in adapters.Values) output.Append(body);
             output.AppendLine(".end");

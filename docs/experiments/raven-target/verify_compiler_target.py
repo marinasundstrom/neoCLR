@@ -55,6 +55,12 @@ func Main() {
                                    str(case / 'compiled/Demo.dll'), str(case / 'NeoCLR.CoreProbe.dll'),
                                    str(case / 'imported')], text=True, capture_output=True)
         assert imported.returncode == 0, name + ': ' + imported.stdout + imported.stderr
+        mapping = json.loads((case / 'imported/App.neoil.map.json').read_text())
+        assert mapping['IdentityEncoding'] == 'assembly-signature-v1'
+        assert mapping['AssemblyIdentity'].startswith('Demo,')
+        assert mapping['MethodIdentities'] and all(m['MetadataName'] and m['RuntimeName'] for m in mapping['MethodIdentities'])
+        il = (case / 'imported/App.neoil').read_text()
+        assert all(t['RuntimeName'] in il for t in mapping['TypeIdentities'])
         # Import audits the PE dependency closure against the supplied core. Leaked
         # host references therefore fail here rather than being silently replaced.
         command = [str(args.runtime.resolve()), 'verify', str(case / 'imported/App.neoil'),

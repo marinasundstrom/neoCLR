@@ -610,6 +610,12 @@ static class UnionImport
             .ToDictionary(p => p.line, p => p.index + 1);
         File.WriteAllText(destination, generated);
         File.WriteAllText(destination + ".map.json", JsonSerializer.Serialize(new {
+            IdentityEncoding = "assembly-signature-v1",
+            AssemblyIdentity = app.Name.FullName, TypeIdentities = ApplicationTypes.IdentityMap(),
+            MethodIdentities = app.MainModule.GetTypes().SelectMany(t => t.Methods).Where(m => seen.Contains(m.MetadataToken.ToUInt32()))
+                .Select(m => new { MethodToken = m.MetadataToken.ToUInt32(), MetadataName = m.FullName,
+                    RuntimeName = m.HasThis && !(m.IsConstructor && m.DeclaringType.IsValueType)
+                        ? MetadataIdentity.TypeName(m.DeclaringType) + "::" + ApplicationTypes.MethodName(m) : Name(m) }),
             Profile = collectionProfile ? "result-option-void-application-types-v9" : "result-option-void-files-strings-arrays-v7",
             RequiredLibraryProfile = collectionProfile ? "raven-collections" : "bundled-system", ApplicationSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(application))),
             CoreSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(core))), ReachableMethods = seen.Order().ToArray(), Mappings = mappings.Select(m => new { m.MethodToken, m.Offset, OutputLine = labelLines[$"M{m.MethodToken:x8}_IL_{m.Offset:x4}:"] }),
@@ -643,7 +649,7 @@ static class UnionImport
         }
     }
 
-    static string Name(MethodDefinition method) => $"Method_{method.MetadataToken.ToUInt32():x8}";
+    static string Name(MethodDefinition method) => MetadataIdentity.FunctionName(method);
     static void CheckStatic(MethodReference method)
     {
         if (method.HasThis || method.ExplicitThis || method.HasGenericParameters || method is GenericInstanceMethod

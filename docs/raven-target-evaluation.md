@@ -38,6 +38,11 @@ identities, generic library bodies, namespace-function projection and removal of
 Void adapter remain prerequisites to evaluate before resuming library migration.
 Installed tools and demos are unchanged.
 
+Application type/field/function naming now follows
+[assembly/signature identities](raven-import-identities.md), with original names in
+source-map sidecars. This removes public application row-token naming; separate
+library loading and general signature/dispatch importing remain open.
+
 ## Initial assessment evidence
 
 Raven branch `codex/neoclr-target-resolution` at `854cd4d3d8c2fa4ed2f82e834c65cfef4371ebe3`

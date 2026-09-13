@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-14
 
+- Replaced application type/field/function row-token names in the Raven importer
+  with assembly/signature-based identities and collision-safe member escaping.
+  Added readable metadata-to-runtime mappings to source-map sidecars and regression
+  checks for declaration insertion, assembly scope, overloads and closed signatures.
+  Rebuild generated application IL/maps together. This does not enable separate
+  library loading; runtime-library migration and installed tools remain unchanged.
+
 - Added ordinary Raven compiler emission followed by independent artifact import.
   Projects now select matching metadata/emission cores; regenerate editor projects
   and use the matching Raven target-contract branch and bridge. Added five direct

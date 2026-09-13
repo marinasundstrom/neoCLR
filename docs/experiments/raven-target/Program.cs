@@ -6,6 +6,12 @@ using Raven.CodeAnalysis;
 using Raven.CodeAnalysis.Syntax;
 using AssemblyDefinition = Mono.Cecil.AssemblyDefinition;
 
+if (args.Length == 1 && args[0] == "--identity-checks")
+{
+    MetadataIdentityChecks.Run();
+    return;
+}
+
 if (args.Length == 2 && args[0] == "--parsing")
 {
     ParseProbe.Write(args[1]);

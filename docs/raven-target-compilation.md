@@ -91,7 +91,7 @@ the new configuration. Raven's normal .NET 10/11 target matrix passes; this does
 claim NanoFramework validation.
 
 The importer remains bounded and C#/Cecil-based. Named Void value-storage projection,
-per-API runtime adapters, application-token identities and generic library-body gaps
+per-API runtime adapters and generic library-body gaps
 remain. The new command separates compilation from importing; it is not the runtime's
 native PE loader or a general Raven library compiler. These are the next subjects of
 [the target assessment](raven-target-evaluation.md), before resuming library authoring.
@@ -102,3 +102,6 @@ loading described in [the binary profile](raven-binary-profile.md) and
 The benefit is consistent compiler/editor target behavior and independently testable
 artifacts. The cost is maintaining explicit configuration and a temporary importer
 until native loading and general metadata resolution are ready.
+
+Application symbols now use [assembly/signature identities](raven-import-identities.md);
+private generated helpers and source locations retain module-local token information.
