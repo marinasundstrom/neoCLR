@@ -1069,7 +1069,8 @@ fn typed_effect(
                     if callee.instance
                         && !callee.receiver_byref
                         && module.is_reference_type(&interface)
-                        && actual == &interface =>
+                        && (actual == &interface
+                            || module.reference_assignable(actual, &interface)) =>
                 {
                     ()
                 }

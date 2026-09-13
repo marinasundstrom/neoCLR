@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Added ordinary class ancestry, implicit base-reference conversions and checked
+  downcasts, preserving allocation identity and inherited fields. Allow abstract
+  class declarations without abstract members; reject mixed storage categories.
+  Class constructor chaining and virtual dispatch remain separate groundwork.
+
 - Projected Array.ForEach for managed Int32/String arrays and static Func<T,Void>
   callbacks. Resolve closed method-generic signatures against target metadata,
   retaining the existing callback algorithm and ordinary no-result API boundary.

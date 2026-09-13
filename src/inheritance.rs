@@ -109,6 +109,7 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             if module.functions.iter().any(|f| {
                 f.instance
                     && !f.receiver_byref
+                    && !parent.is_reference_type
                     && f.owner
                         .as_ref()
                         .and_then(|t| module.type_definition(t))

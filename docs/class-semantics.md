@@ -53,8 +53,9 @@ about copying, construction, dispatch and library contracts.
 
 The current class subset is record-shaped objects, including closed generic instances,
 with fields, direct instance methods and constructors, plus public implicit interface
-implementations. Inheritance, abstract classes, class virtual dispatch and methods with
-their own type parameters on nominal classes remain unsupported.
+implementations. Ordinary class ancestry and abstract classes without abstract members
+are now supported as described below. Class virtual dispatch and methods with their
+own type parameters on nominal classes remain unsupported.
 See the [nominal interface groundwork](raven-interface-contract.md#implemented-nominal-interface-groundwork-2026-09-12)
 for object-reference interface views, no-result contracts and remaining conversion limits. Existing legacy value-model
 functionality in those areas remains available. Class defaults now produce typed null references, and `initobj` resets a class slot.
@@ -172,3 +173,25 @@ record dispatch paths are unchanged.
 
 Four regressions in `tests/generic_classes.rs` cover mutation/results, null checks
 before a receiver-independent body, mismatched closed types and byref-slot rejection.
+
+## Ordinary class ancestry (2026-09-13)
+
+Class references now upcast implicitly to a base-class slot, parameter or return.
+The reference view preserves the concrete allocation and shares mutation; there is
+no record slicing or value copy. `castclass` checks the concrete allocation for
+explicit downcasts, and inherited nonvirtual methods accept derived receivers.
+Typed null upcasts remain null and managed byrefs to reference slots remain invariant.
+Closed generic ancestors use their substituted field layouts and exact arguments.
+
+This extends the existing CLR reference-category comparison above without changing
+opcodes. Abstract class declarations (`.type class abstract Base`) reject allocation.
+Value-category and class-category inheritance cannot be mixed in this preview.
+Inherited fields retain the existing no-hiding restriction. Class constructor chaining,
+virtual overrides and abstract methods are still separate work; this slice supports
+field-wise allocation and ordinary inherited methods. It is groundwork for the
+reflection descriptor hierarchy, not a completed Raven reflection projection.
+
+Seven focused regressions cover shared mutation, inherited calls, identity-preserving
+casts, null conversion, invalid downcasts, invariant byrefs, closed generic ancestry,
+abstract allocation and mixed-category rejection. Existing class/interface/assignability
+suites also pass. No full CLR inheritance conformance is claimed.

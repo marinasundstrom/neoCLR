@@ -465,21 +465,17 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         if definition
             .base
             .as_ref()
-            .is_some_and(|base| module.is_reference_type(base))
+            .is_some_and(|base| module.is_reference_type(base) != definition.is_reference_type)
         {
             return Err(Fault::new(
-                "inheritance involving class semantics is not implemented",
+                "base and derived types must have the same storage category",
             ));
         }
         if definition.is_reference_type
             && (definition.representation != Representation::Record
-                || definition.base.is_some()
-                || definition.is_abstract
                 || definition.enum_info.is_some())
         {
-            return Err(Fault::new(
-                "class semantics currently require records without inheritance",
-            ));
+            return Err(Fault::new("class semantics require record definitions"));
         }
     }
     for function in &module.functions {
@@ -2085,6 +2081,11 @@ fn interpret_instructions(
                                 if !matches!(target, Type::ArrayRef(_)) {
                                     object.view = None;
                                 }
+                            } else if module.is_reference_type(target)
+                                && crate::inheritance::require_base(module, concrete, target)
+                                    .is_ok()
+                            {
+                                object.view = Some(target.clone());
                             } else {
                                 return Err(Fault::new("invalid object reference cast"));
                             }
