@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Added a responsive project website explaining neoCLR, Raven integration, runtime
+  APIs and preview limits, with excerpts built from executable samples. Added a
+  separate GitHub Pages workflow: pull requests build/check; main and manual runs
+  publish through a restricted deployment job. Documented local preview and hosting.
+
 - Built and locally validated the runtime/Raven candidate with direct neoIL samples,
   source archive, toolchain notices and matching .6 Raven SDK/VSIX. Ten extracted
   package suites pass; all runtime test executables pass after the recorded stale-test

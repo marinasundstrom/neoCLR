@@ -1796,6 +1796,19 @@ cover stack preservation, rejection of a stray unit return and generic unit stor
 The binary CLI boundary still uses its existing VOID marker; no new opcode or binary
 signature encoding is introduced. See [Void semantics](void-semantics.md).
 
+## 2026-09-13 — A small website for the project
+
+**Author direction.** Create a small website presenting the project clearly, host it
+with GitHub Pages, and trigger build/publication in a separate GitHub Action.
+
+**Assistant action.** Built a static landing page centered on the current runtime and
+Raven integration, with code excerpts sourced from executable samples, library scope,
+preview boundaries and links to documentation. Earlier Neo work is linked as history.
+The page distinguishes published previews from the locally validated Raven candidate.
+Desktop/mobile layout and navigation were inspected in a browser. A separate Pages
+workflow builds on relevant changes and deploys only from main; pull requests do not
+receive deployment permissions. Hosting outcome is recorded after the workflow runs.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the
