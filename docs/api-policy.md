@@ -20,7 +20,7 @@ for missing framework functionality. A missing implementation remains a document
 gap, not a reason to redefine the API silently.
 
 Intentional changes include Result-based recoverable errors, Option-based absence,
-first-class Void, explicit ownership/sharing, free functions, and interface names
+first-class Void, invariant mutable arrays, free functions, and interface names
 without the `I` convention. These need explicit API mappings. Implementation details
 alone do not justify additional consumer-visible differences.
 
@@ -30,7 +30,8 @@ The long-term target is the expected breadth and role of the .NET foundational
 library, adapted to neoCLR rather than exact API or binary compatibility. The
 [library-focused preview plan](library-preview.md) prioritizes interface/class
 inheritance where reusable library contracts require it, then useful APIs and
-end-to-end examples. Runtime/library contracts and Neo syntax are separate design
+end-to-end examples. The [current API plan](runtime-api-plan.md) sequences additions by concrete need.
+Runtime/library contracts and Raven syntax are separate design
 layers: other frontends must be able to consume the same APIs. Familiarity includes
 documented behavior, not just familiar member names.
 
@@ -51,10 +52,10 @@ leaving room for broader library coverage as the runtime develops.
 
 The current assembler models declaring types and static/instance methods alongside
 free functions. Primitive members belong to canonical System type definitions.
-Ordinary receivers are value snapshots; methods can explicitly declare byref
-receivers when they must access the original managed slot. Basic visibility, assembly references and explicit borrowed
-interface dispatch are implemented, as are managed base views, class virtual dispatch
-and abstract records. See [class contracts](class-dispatch.md) for current restrictions.
+Ordinary class/value receiver behavior follows the selected CLR-like type categories;
+explicit byrefs address storage. See the [Raven application contracts](raven-application-types.md)
+for the current imported surface and restrictions. Earlier Neo/address-mode examples
+are historical and do not define current frontend requirements.
 
 The Divide helper is a proof-of-concept extension whose final API location remains
 open. Existing .NET APIs should be preferred when an appropriate equivalent exists.

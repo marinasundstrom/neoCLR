@@ -1,6 +1,8 @@
 # Explicit nullability as a type-signature characteristic
 
-Direction agreed 2026-09-08; not implemented. Null is a special runtime state.
+Historical direction agreed 2026-09-08; the uniform qualifier model is not implemented.
+The [2026-09-13 review](#review-reopened-2026-09-13) reopens its encoding and enforcement
+under the current CLR-like type categories. Null is a special runtime state.
 It does not mean that the payload is numerically zero or that its bytes are zeroed.
 
 ## Type contract and slot state
@@ -114,3 +116,39 @@ arrays and host/artifact boundaries; compiler diagnostics are additional assista
 Constructor synthesis and how much initialization a language inserts remain language
 policy. Future defaultability metadata/constraints should be considered alongside
 nullable defaults, rather than weakening non-nullable reference validity.
+
+## Review reopened (2026-09-13)
+
+The author asked whether a different metadata encoding could improve nullability,
+while explicitly leaving open whether a better solution exists. The 2026-09-08 design
+above remains a historical candidate, not a selected encoding for the current
+.NET-aligned type categories. Its address-mode examples must not reintroduce the old
+value-by-default model. Existing null handling is not implementation of that proposed
+uniform qualifier system.
+
+Preserve the conceptual distinction between null, uninitialized storage and a present
+zero/default payload. Review three alternatives before enforcing new defaults:
+
+| Alternative | Potential benefit | Cost or unresolved issue |
+| --- | --- | --- |
+| CLR-shaped nullable values and reference annotations | Small compiler/tooling adaptation | Reference annotations alone do not enforce non-null storage at runtime |
+| Existing metadata containers with a neoCLR-enforced annotation contract | May preserve encoding familiarity while enforcing selected boundaries | Must specify mandatory recognition, nested placement and behavior of unaware producers/consumers; ordinary optional attributes alone are not a safety guarantee |
+| A compositional nullable signature qualifier | Could state one cross-language contract for values and references | Changes signature identity, substitution, loader/verifier rules and tooling; may need a versioned metadata extension |
+
+Do not choose a metadata byte encoding before choosing semantics. Decide whether
+nullability participates in type identity, assignability and override matching; how
+oblivious imported metadata behaves; and whether defaults produce null or require
+initialization. Non-null class fields and arrays need a construction/publication
+contract, not just a new signature bit. Test mutation through aliases after a null
+check, generic substitution, reflection writes, direct IL and cross-module calls.
+Flow-sensitive source diagnostics remain useful even with runtime enforcement.
+
+Option stays the preferred domain-absence API. Neither Option nor metadata eliminates
+the need to support intentional null and foreign boundaries. A uniform surface need
+not require an identical physical representation for nullable values and references.
+
+Primary baseline refreshed 2026-09-13: [C# nullable reference types](https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/null-safety/nullable-reference-types)
+use annotations and flow analysis without a distinct runtime reference type;
+[nullable value types](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/nullable-value-types)
+use Nullable<T>. This layering provides compatibility and useful diagnostics. Whether
+neoCLR can simplify it without shifting excessive complexity to compilers remains open.

@@ -155,3 +155,28 @@ selects static overloads. Bound bundled instance methods remain an IL-only path.
 Defaults and null delegates are unsupported. Nullable metadata remains a separate
 slice. Single-target IL equality compares closed delegate type, closed method and
 receiver location; the guest Equals/GetHashCode API is not added here.
+
+## Function-type review reopened (2026-09-13)
+
+The author asked whether delegates could instead be modeled as function types, without
+selecting that direction. Keep the implemented [Raven callback/closure path](raven-delegates-lambdas.md)
+as the baseline during investigation. The earlier Neo/address-mode description above
+is historical and does not change the current ordinary type-category direction.
+
+Compare a language function type lowered to existing delegates, a structural callable
+signature backed by managed runtime values, and retaining nominal delegates as the
+public contract. Language syntax alone need not require a new runtime type. Structural
+function types could reduce named delegate boilerplate, but would introduce decisions
+about type identity, overloads, generic variance, metadata and cross-language conversion.
+A low-level function pointer does not by itself provide a GC-retained closure environment.
+
+Require ordinary method-group conversion, lambda inference, invocation syntax, bound
+instance/virtual methods and escaping captures to remain ergonomic. Compare equality,
+nullability, ref/out parameters and no-payload Void results. Decide multicast/events
+separately rather than assuming every function value needs an invocation list. Check
+capture lifetime, reflection, debugger presentation and existing compiler emission before
+selecting an alternative. No delegate replacement or new callable opcode is approved.
+
+Primary baseline consulted 2026-09-13: [C# delegates](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/delegates/)
+already provide typed callbacks, method binding and lambda conversion. A new model
+must improve a concrete use beyond renaming this existing capability.

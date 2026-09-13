@@ -1,5 +1,12 @@
 # Direction and migration
 
+The [2026-09-13 platform direction](platform-direction.md) retains the value/reference
+type split and focuses investigation on modern UTF-8 APIs, bounded memory views and
+nullability metadata. It takes precedence over historical default-semantics proposals
+below. The [runtime API plan](runtime-api-plan.md) defines scenario-driven library
+additions; delegate/function-type alternatives remain under review. These investigations
+do not select new representations or remove release work.
+
 All planned capabilities and substantive revisions to implemented behavior follow
 the [research and design comparison](design-research.md): establish the .NET/CLR
 baseline, evaluate alternatives and justify improvements with evidence. Each roadmap

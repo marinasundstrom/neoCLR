@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Clarified platform direction: retain CLR-like type categories and language ergonomics,
+  develop library APIs by concrete need, and evaluate text/encoding, memory views,
+  nullability metadata, callable types, runtime async and injectable clocks. Updated
+  stale default-semantics policy summaries and recorded the development conversation.
+  These are design reviews and plans, not newly implemented runtime capabilities.
+
 - Built and installed experimental Raven SDK/VSIX 0.1.12-neoclr.9 with the recent
   array, numeric and invariance fixes, then refreshed to .10 with target-aware
   array conversion diagnostics. Both isolated builds passed all six packaged suites

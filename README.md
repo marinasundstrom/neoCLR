@@ -26,6 +26,8 @@ Read the [development conversation record](docs/development-timeline.md) for the
 author’s directions and questions, assistant proposals, subsequent decisions and actions,
 starting with the original project conversation.
 
+The [platform direction](docs/platform-direction.md) keeps useful CLR foundations and
+evaluates focused differences in text, memory views and nullability.
 The default is .NET/CLR semantics wherever neoCLR does not intentionally diverge.
 Prototype shortcuts are limitations to remove, not new platform semantics.
 Consumer APIs should preserve familiar .NET namespaces, names, overloads, and

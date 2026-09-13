@@ -9,11 +9,11 @@ accessors, CLI-like stack effects, and ordinary constructor/call patterns. A lan
 or migration tool should be able to map these concepts without inventing a second
 semantic model.
 
-Change a concept when the old rule is a fundamental limitation, such as mandatory
-value/reference categories, implicit ownership, exception-only failure, or a closed
-high-level memory model. The replacement must have an explicit contract and a clear
-mapping to familiar metadata where possible. `Result<T,TError>`, typed pointers,
-array views, companion cases, and explicit allocation are examples.
+The [current platform direction](platform-direction.md) retains .NET's useful value
+and reference type categories. Change a contract only when a concrete scenario and
+comparison justify its costs. Result/Option APIs, generic Void and invariant mutable
+arrays are deliberate differences. Modern UTF-8 text APIs, bounded memory views and
+nullability metadata are areas for evaluation, not reasons to replace the type model.
 
 Every deliberate deviation belongs in the IL and metadata references, with its stack
 effect, type rules, fault behavior, and version status documented. Temporary

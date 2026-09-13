@@ -107,3 +107,34 @@ Neo character literals, including Unicode IsDigit and explicit IsAsciiDigit.
 
 The experimental [Raven String projection](raven-string-api.md) now includes
 SliceUtf8 with typed Result handling and propagation over its existing error contract.
+
+## Modern text and encoding review (2026-09-13)
+
+The author reaffirmed UTF-8 text and requested modern String, character and encoding
+APIs while preserving useful .NET ergonomics. This is a review of the public contract,
+not a change to Char's UTF-16 meaning, CompareOrdinal's ordering or existing slicing.
+
+The proposed first slice is validated Unicode scalar construction and iteration,
+followed by explicit byte-to-text decoding and text-to-byte encoding with Result
+errors. Names and signatures remain to be designed. Compare a narrow UTF-8/UTF-16 API
+with a general Encoding abstraction; do not build a codec framework before a consumer
+needs it. Prefer strict validation by default, explicit lossy replacement, and clear
+consumed/written counts for eventual streaming or destination-buffer APIs. Define BOM
+handling, embedded NUL, incomplete input and unpaired UTF-16 surrogate behavior.
+
+Separate byte offsets, scalar iteration and grapheme-oriented editing. A scalar is
+not necessarily a user-perceived character. Defer general culture/normalization and
+grapheme APIs until required; do not claim they follow automatically from UTF-8.
+Use owned copies first where necessary; zero-copy text views depend on the memory-view
+lifetime contract. Measure transcoding and allocation costs rather than promising that
+UTF-8 improves every workload.
+
+Validation should cover ASCII, supplementary scalars, combining sequences, embedded
+NUL, malformed/truncated UTF-8 and unpaired UTF-16 surrogates, plus a Raven file-reading
+example. Keep migration offsets explicit; no silent reinterpretation of .NET indexes.
+
+Primary comparison refreshed 2026-09-13: [.NET's encoding guide](https://learn.microsoft.com/en-us/dotnet/standard/base-types/character-encoding-introduction)
+already distinguishes Char, Rune and text elements; those are useful precedents.
+[UTF8Encoding](https://learn.microsoft.com/en-us/dotnet/api/system.text.utf8encoding.-ctor?view=net-10.0)
+provides configurable invalid-input handling. Our proposed difference is a focused
+UTF-8-first surface with Result-based failures, not invention of Unicode-aware APIs.

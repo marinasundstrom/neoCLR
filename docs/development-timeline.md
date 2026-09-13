@@ -2102,3 +2102,38 @@ and the future read-only projection in the [array variance contract](array-varia
 **Open:** Covariant read-only projection API, generic variance metadata and target-aware
 Raven editor diagnostics. No new read-only array feature or generic variance behavior
 was implemented in this slice.
+
+## 2026-09-13 — Preserve CLR ergonomics while selecting improvements
+
+**Author's direction:** Define what neoCLR can improve when starting without legacy
+constraints, while preserving useful .NET foundations. The value/reference type split
+still serves the project and should not be the current redesign focus. Spans and
+managed references may warrant more consistent runtime support.
+
+**Author's additions:** Reaffirmed UTF-8 strings and requested modern string, character
+and encoding APIs. Asked to revisit nullability and its metadata, while acknowledging
+that another solution might not be better. Requested an API scope that can be implemented
+incrementally as consumers need it. Emphasized preserving C# and other languages'
+ergonomics on the platform.
+
+**Further questions:** Asked whether delegates might become function types, without
+choosing that change. Wants runtime support for async/await; its model remains open,
+and tasks still seem relevant. Identified the implemented array-covariance change as
+something to observe for type-system consistency without losing ergonomics. Reaffirmed
+building date/time toward instantiable, mockable environmental APIs.
+
+**Assistant proposals:** Keep familiar type categories and compiler boundaries.
+Separate public API shape from runtime representation: language function types need
+not replace delegates, and tasks need not dictate suspension internals. Compare .NET's
+existing span, Unicode, nullability, delegate, Task and TimeProvider contracts before
+claiming an improvement. Develop APIs by concrete scenarios; distinguish representation,
+metadata enforcement, compiler diagnostics and library policy. Treat all unselected
+representations as research questions.
+
+**Actions and outcome:** Added the [platform direction](platform-direction.md) and
+[runtime API plan](runtime-api-plan.md); updated active policy summaries that still
+prescribed value-by-default. Extended the text, nullability, delegate and date/time
+research notes and linked the roadmap. This slice changes documentation only. No new
+Span, Rune/codec, nullable signature, callable representation, Task or injectable-clock
+implementation is claimed. Proposed slice ordering remains an assistant recommendation;
+no reply selecting those detailed designs is available in this exchange.

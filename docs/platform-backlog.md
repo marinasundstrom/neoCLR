@@ -12,11 +12,12 @@ This does not require C# syntax, CLR internals or identical runtime representati
 The absence of legacy compatibility requirements gives us room to put mechanisms
 in the runtime when that makes them more consistent across languages and libraries.
 
-Preserve the existing foundations: values by default, explicit managed-reference
-access, allocation independent of type identity, checked frame lifetimes, a managed
-GC heap, and separate native pointers. An Object hierarchy remains optional for
-runtime types. Keep Neo updated with small executable demonstrations of each slice;
-it remains a concept compiler rather than a prerequisite full language implementation.
+Follow the [current platform direction](platform-direction.md): retain .NET-aligned
+value/reference categories, a managed GC heap, explicit byrefs for storage access,
+and separate native pointers. Historical value-by-default/explicit-reference policies
+are not current defaults. Raven is the active frontend experiment; Neo stays historical.
+The tables below include earlier capability planning and are not an implementation
+status inventory. New slices must reconcile them with the current direction.
 
 ## Capabilities to develop
 
@@ -34,7 +35,7 @@ it remains a concept compiler rather than a prerequisite full language implement
 
 ## Modern API review
 
-For upcoming library work, follow the [modern library direction](api-design.md#modern-library-direction-2026-09-13).
+For upcoming library work, follow the [modern library direction](platform-direction.md#async-and-time-preserve-the-application-model).
 Evaluate a mockable clock before expanding date/time acquisition APIs; compare modern
 .NET TimeProvider, a narrower clock, and existing static helpers. Preserve separate
 value data and environmental dependencies. This is future design work, not implemented
@@ -49,21 +50,22 @@ record that boundary.
 
 **Inheritance** builds on the [object hierarchy design](object-hierarchy.md). A base
 reference must preserve the complete derived allocation's identity and reachability.
-Inheritance must not introduce an implicit value/reference type split or make every
-type derive from Object. Value equality and hashing remain separate from reference
-identity. Class syntax in Neo follows the runtime contract rather than defining it
-in isolation.
+Preserve the selected CLR-like type categories; do not reopen their split through
+inheritance work. Value equality and hashing remain separate from reference
+identity. Raven projects the runtime contract rather than defining it in isolation.
 
 **Nullability** follows the [explicit signature direction](nullability.md): a special
 null state rather than zeroed bytes, with Option preferred for domain optionality.
-It is a runtime representation and validation feature, not just a
-compiler warning annotation. A null value must be distinct from an uninitialized
+The [reopened metadata review](nullability.md#review-reopened-2026-09-13) compares
+runtime enforcement with CLR-shaped annotations; no encoding is selected. A null
+value must be distinct from an uninitialized
 slot and from Void. Decide its relationship to Option<T> without silently treating
 all three as interchangeable. In particular, distinguish a nullable reference from
 a reference to a nullable value. Native null pointers retain their separate interop
 meaning. Not-null constraints depend on these definitions.
 
-**Delegates** should expose typed managed callables without requiring users to handle
+**Delegates** are under [function-type review](delegates.md#function-type-review-reopened-2026-09-13)
+and should expose typed managed callables without requiring users to handle
 raw pointers. A captured reference cannot outlive its target merely because a closure
 holds it. Specify escaping captures and receiver retention before adding lambdas that
 can escape a call. Low-level function pointers are a possible supporting mechanism,

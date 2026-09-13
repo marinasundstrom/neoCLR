@@ -82,3 +82,21 @@ Value copying should be small and require no retained heap reference. Parsing
 creates text/result values under existing rules; clock and timezone resources need
 separate ownership and determinism analysis. No JIT, allocation or performance
 improvement is asserted without measurements.
+
+## Injectable clock follow-up (2026-09-13)
+
+The author reaffirmed the existing date/time foundation and wants its environmental
+API to be instantiable and mockable. Preserve Date/Time as values. Review a small
+clock interface with system and fixed/test implementations, versus a broader provider
+that also supplies monotonic timestamps and timers. Names and construction contracts
+remain open; the current static clock is not already injectable.
+
+A date-dependent order-workflow test should accept a clock and produce the same result
+without reading real wall time. Distinguish wall-clock acquisition, timezone conversion
+and elapsed-time measurement. Add timers only when async consumers need them, rather
+than requiring the entire provider surface for basic date/time tests.
+
+[.NET TimeProvider](https://learn.microsoft.com/en-us/dotnet/standard/datetime/timeprovider-overview),
+consulted 2026-09-13, is the modern comparison baseline. Evaluate the narrower API's
+simplicity against future adapter and compatibility costs. This records direction;
+it does not implement a clock abstraction or expand globalization scope.
