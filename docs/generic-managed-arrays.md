@@ -35,8 +35,12 @@ Compared with .NET, the deliberate differences are the generic runtime array sha
 and invariant mutable arrays. Familiar allocation, aliasing, default reference
 slots and ordinary array IL remain. The profile keeps nongeneric System.Array for
 existing static ForEach compiler declarations. Raven still imports ordinary array
-signatures; explicit System.Array<T> source-level projection in its reference
-assembly is not implemented by this slice.
+signatures. The reference assembly now declares a generic System.Array<T> interface
+shape implementing Iterable<T>. `RavenIterationArrayShapeType` selects it; Raven
+reads its interface metadata instead of hardcoding Iterable on vector symbols.
+This is interface projection, not a source alias between explicit System.Array<T>
+and T[]. Class-member projection remains separate. The reference declaration and
+runtime implementation must stay aligned; the interface probe checks the shape.
 
 ## Try the direct IL examples
 
@@ -99,3 +103,9 @@ Native release/removal checks and both direct IL examples passed. Raven's focuse
 metadata suite passed six tests; its independent fix is commit `3df1b54b0` on
 `codex/neoclr-target-resolution`. This is source validation, not a packaged SDK or
 VS Code extension release gate.
+
+
+The follow-up metadata projection slice passes 25 focused Raven compiler/project
+tests, 58 saved-project cases and 28 query checks using the generic shape setting.
+The interface probe validates the reference declaration and the runtime API inventory
+check passes. No SDK or VS Code extension was installed by this follow-up.

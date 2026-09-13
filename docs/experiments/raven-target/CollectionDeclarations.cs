@@ -2,6 +2,11 @@
 static class CollectionDeclarations
 {
     public const string Source = """
+        // Interface metadata for CLI vectors; allocation still uses newarr.
+        public sealed class Array<T> : Collections.Iterable<T> {
+            private Array() { }
+            public Collections.Iterator<T> GetIterator() => default;
+        }
         public interface Disposable { void Dispose(); }
         namespace Collections {
             public interface Iterable<T> { Iterator<T> GetIterator(); }

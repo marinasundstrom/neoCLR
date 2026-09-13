@@ -2270,3 +2270,25 @@ corrected a spoken project-name transcription to neoCLR. The assistant agreed
 about a shared generic definition for members/interfaces/reflection, while noting
 that ordinary CLI array signatures already encode their element type. This is a
 regularization of the array contract, not a claim that CLR arrays were untyped.
+
+
+### 2026-09-13 — Reading array contracts from target metadata
+
+**Author direction:** Continued the Array<T> work after emphasizing that arrays
+must participate in Iterable and extension methods while direct loops remain indexed.
+
+**Assistant proposal and action:** Replaced the experiment's Boolean array-interface
+projection with an optional generic shape mapping in Raven. The core reference now
+declares System.Array<T> implementing Iterable<T>; Raven substitutes the element type
+and reads the declared interface closure. The runtime support came from the preceding
+slice. This keeps future interface additions primarily in target metadata rather than
+adding a compiler rule for each contract. The normal .NET target remains unchanged.
+
+**Boundary:** This does not adopt a broader collection hierarchy or make explicit
+System.Array<T> source annotations interchangeable with T[]. Installed tools are not
+refreshed by this source slice.
+
+**Validation outcome:** The metadata projection passes 25 focused Raven tests,
+58 saved-project cases and 28 query checks, including array extensions. The interface
+probe checks the reference declaration. These are source-level integration checks;
+a packaged SDK/editor refresh remains separate.
