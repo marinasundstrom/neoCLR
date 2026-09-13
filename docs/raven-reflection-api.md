@@ -1,8 +1,7 @@
 # Reflection migration for the Raven target
 
 The existing Type and Reflection APIs are being projected onto ordinary managed
-classes. This document tracks that work; Raven source-level exposure is not yet
-complete.
+classes. This document tracks the implemented projection and its remaining boundaries.
 
 ## Snapshot storage
 
@@ -31,5 +30,37 @@ This reuses the [runtime reflection design](reflection.md) and
 [tests/raven_reflection.rs](../tests/raven_reflection.rs) exercise inherited access,
 returned base views, nested GC roots and allocation limits. Existing reflection,
 reflection hierarchy and adapted collection tests pass. Raven metadata, source samples,
-completion and package validation remain to be implemented before claiming this API
-available in the POC.
+completion are covered by the subsequent source projection below; package validation
+remains required before shipping this API in the POC.
+
+## Raven API projection
+
+The current source compiler can now use `typeof(T)`, `TypeOf<T>.Of(value)` for
+admitted closed types, all existing Type query methods, and the public getters on
+MemberInfo, FieldInfo, MethodInfo, PropertyInfo and ParameterInfo. Class assignment
+and base casts preserve identity. Descriptor arrays are projected as managed arrays;
+the adapter copies the owned snapshot vector while retaining descriptor references.
+Option<Type> and Option<MethodInfo> queries support typed case matching.
+
+[The executable sample](experiments/raven-target/samples/library-reflection.rvn)
+covers names, shapes, generic arguments, enum metadata, fields, method parameters,
+properties, accessor Options, base views and filtering. The existing BindingFlags
+factories and combinators are exposed as a provisional value wrapper, including its
+Value property. This does **not** yet project enum-literal/operator syntax or claim
+that its reference metadata is a CLI enum; that metadata migration is still required.
+The runtime query itself sees the original enum definition. Name retains neoCLR's
+existing qualified-name behavior. DefinitionIndex describes the current metadata
+snapshot and is not a stable cross-build identifier.
+
+Run the saved sample through `run_project.py` with the collection profile prepared
+as described in the [experiment instructions](experiments/raven-target/README.md).
+`verify_project.py --collections` includes it. `verify_editor.py --reflection`
+checks completion for Type, MethodInfo and PropertyInfo, including inherited members.
+The editor can also show inherited Object APIs that remain outside the executable
+importer; their appearance alone is not a claim of support.
+
+The importer rejects incompatible descriptor hierarchy and member signatures. The
+runtime remains introspection-only: MethodInfo.Invoke, field/property mutation,
+arbitrary application classes, new dynamic invocation facilities and universal generic
+shapes are not introduced here. General Equatable/interface projection and the enum
+metadata boundary remain separate work before completing the existing-API audit.

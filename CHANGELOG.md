@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Exposed Raven type tokens, reflection queries, descriptor properties and managed
+  snapshot arrays, including base-class views and Option<Type/MethodInfo> results.
+  Added full public-getter/query samples, signature checks and editor completion.
+  BindingFlags currently projects its factory/combinator API as a value wrapper;
+  true enum metadata/operator syntax remains a following slice.
+
 - Migrated reflection snapshot storage in the Raven runtime profile to ordinary
   Type/descriptor classes and the MemberInfo hierarchy. Trusted query factories
   allocate nested snapshots under heap limits and retain them through GC. Source

@@ -42,7 +42,7 @@ assembly metadata reader or verifier.
 | Array, ArrayList, List, Iterable, Iterator | [Closed collection elements and Copy](raven-generic-collections.md), Int32/String vectors, class aliasing and foreach | [Predicate APIs](raven-delegate-api.md) are projected; native Array<T> and remaining element shapes; preserve reference categories and document cleanup limits |
 | Equatable, Comparable, Clonable, Disposable, Closable | Selected interface dispatch through collections | General existing interface contracts and representative runtime-library callers |
 | Func delegate families | [All five arities and static targets](raven-delegate-api.md), completion and collection predicates | [Array.ForEach](raven-delegate-api.md#array-callbacks) is projected; instance targets and broader generic signatures; new closure/lambda features are not implied |
-| Type, RuntimeTypeHandle, Reflection and BindingFlags | Existing runtime introspection library | Raven metadata/type-handle projection, descriptor hierarchy, flags and all existing public introspection members |
+| Type, RuntimeTypeHandle, Reflection and BindingFlags | [Type handles, class descriptors and public introspection APIs](raven-reflection-api.md), saved-source execution and completion | BindingFlags enum metadata/operator projection, general interface paths and package validation |
 | Runtime service functions | Bundled implementation calls run behind admitted APIs | Review public-versus-implementation status and verify each application-facing service path |
 
 The [shared signature mechanics](raven-signature-projection.md) now cover file and

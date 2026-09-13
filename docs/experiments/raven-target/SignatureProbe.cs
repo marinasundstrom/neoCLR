@@ -28,6 +28,17 @@ static class SignatureProbe
             catch (InvalidDataException) { checks.Add(name); return; }
             throw new Exception("Malformed signature accepted: " + name);
         }
+        ReflectionBindings.Validate(module);
+        var fieldsMethod = module.GetType("System.Type").Methods.Single(m => m.Name == "GetFields" && m.Parameters.Count == 0);
+        Check("Reflection returns managed descriptor vector", ReflectionBindings.Bind(fieldsMethod, fieldsMethod)?.Result == "arrayref<System.Reflection.FieldInfo>");
+        var fieldsReference = Reference(fieldsMethod, fieldsMethod.DeclaringType);
+        fieldsReference.ReturnType = module.TypeSystem.Int32;
+        Reject("Reflection return mismatch", () => ReflectionBindings.Bind(fieldsReference, fieldsMethod));
+        var descriptorType = module.GetType("System.Reflection.FieldInfo");
+        var descriptorBase = descriptorType.BaseType;
+        descriptorType.BaseType = module.TypeSystem.Object;
+        Reject("Reflection hierarchy mismatch", () => ReflectionBindings.Validate(module));
+        descriptorType.BaseType = descriptorBase;
         var forEach = module.GetType("System.Array").Methods.Single(m => m.Name == "ForEach");
         var forEachCall = new GenericInstanceMethod(forEach);
         forEachCall.GenericArguments.Add(module.TypeSystem.Int32);

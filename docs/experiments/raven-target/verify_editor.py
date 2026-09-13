@@ -9,6 +9,7 @@ import threading
 project = Path(sys.argv[1]).resolve()
 collections = '--collections' in sys.argv[2:]
 booleans = '--booleans' in sys.argv[2:]
+reflection = '--reflection' in sys.argv[2:]
 process_apis = '--process' in sys.argv[2:]
 unions = '--unions' in sys.argv[2:]
 errors = '--errors' in sys.argv[2:]
@@ -258,6 +259,20 @@ try:
         if not any(label == 'CompareTo' or label.startswith('CompareTo(') for label in labels):
             raise AssertionError('Missing Boolean CompareTo: ' + str(labels))
         results['Boolean'] = labels
+    if reflection:
+        for version, expression, expected in (
+            (28, 'info.', ('Name', 'FullName', 'GetFields', 'GetMethods', 'GetProperties', 'GetElementType', 'GetGenericArguments')),
+            (29, 'method.', ('Name', 'DeclaringType', 'ReturnType', 'GetParameters', 'IsPublic')),
+            (30, 'property.', ('Name', 'CanRead', 'GetGetMethod', 'GetIndexParameters'))):
+            text = 'import System.*\nfunc Main() {\n    let info = typeof(int)\n    let method = info.GetMethods()[0]\n    let property = typeof(Date).GetProperties()[0]\n    ' + expression + '\n}'
+            send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})
+            result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
+                'position': {'line': 5, 'character': len('    ' + expression)}, 'context': {'triggerKind': 1}}, True))
+            items = result if isinstance(result, list) else result['items']
+            labels = sorted({item['label'] for item in items})
+            if any(not any(label == name or label.startswith(name + '(') for label in labels) for name in expected):
+                raise AssertionError('Missing reflection API: ' + str(labels))
+            results[expression] = labels
     receive(send('shutdown', None, True))
     send('exit', None)
     print(json.dumps(results, indent=2))
