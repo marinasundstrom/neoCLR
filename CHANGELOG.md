@@ -6,6 +6,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+## 0.1.0-preview.5 — 2026-09-13
+
+Application and query preview: see [release notes](docs/preview-5-release-notes.md).
+Includes the experimental Raven 0.1.12-neoclr.8 SDK and VSIX.
+
 ### 2026-09-13
 
 - Extended the order workflow with a deferred pending-order query and materialized

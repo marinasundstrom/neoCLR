@@ -1,6 +1,6 @@
 # Runtime and Raven preview
 
-Preview 4 is [available on GitHub](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.4). This
+Preview 5 is [available on GitHub](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.5). This
 release has two entry points: neoCLR directly through neoIL, and the experimental
 Raven toolchain compiling programs against neoCLR's own runtime library.
 
@@ -95,9 +95,8 @@ history; new Raven work does not require migrating that frontend.
 
 ## Validation and release status
 
-Preview 4 passed all six exact-source CI jobs (Linux, macOS and Windows on stable
-Rust and Rust 1.85), plus ten package suites using the macOS arm64 bundle outside
-both development checkouts. See [release validation](preview-4-validation.md) and
-the release's manifest/checksums for the exact revisions and artifacts. Source CI
-does not imply prebuilt Raven toolchain support on other hosts. The
+The Preview 5 release carries exact-source CI evidence and package validation logs,
+including application classes, order persistence and deferred queries. Use its
+manifest/checksums for exact revisions and artifacts. Source CI does not imply
+prebuilt Raven toolchain support on other hosts. The
 [release procedure](experiments/raven-target/RELEASING.md) describes repeat builds.
