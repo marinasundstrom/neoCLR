@@ -50,7 +50,7 @@ arbitrary function-pointer operations are not claimed.
 ## Array callbacks
 
 `Array.ForEach<T>(T[], Func<T,Void>)` now uses the existing runtime algorithm with
-ordinary managed Int32 and String arrays. Raven accepts both inferred and explicit
+ordinary managed admitted defaultable managed arrays. Raven accepts both inferred and explicit
 method type arguments and wraps matching static functions. The callback runs once
 per element in index order; a fault terminates execution. The adapted generic
 method returns no result, while its Func<T,Void> call still consumes the runtime

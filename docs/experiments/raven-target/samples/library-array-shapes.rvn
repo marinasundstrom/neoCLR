@@ -1,0 +1,24 @@
+import System.*
+import System.Console.*
+func Show(value: long) { WriteLine(value.CompareTo(42L)) }
+func ShowType(value: Type) { WriteLine(value.Name) }
+func Main() {
+    let numbers: long[] = [42L, 0L]
+    numbers[1] = 42L
+    Array.ForEach(numbers, Show)
+    let bits: bool[] = [true, false]
+    bits[1] = true
+    if bits[0] && bits[1] { WriteLine("Boolean elements") }
+    let types: Type[] = [typeof(int), typeof(string)]
+    Array.ForEach(types, ShowType)
+    let comparisons: Comparable<int>[] = [42]
+    WriteLine(comparisons[0].CompareTo(42))
+    let bytes: byte[] = [(byte)255]
+    WriteLine((int)bytes[0])
+    let shorts: ushort[] = [(ushort)65535]
+    WriteLine((int)shorts[0])
+    let chars: char[] = [(char)65535]
+    WriteLine((int)chars[0])
+    let nested: int[][] = [[42]]
+    WriteLine(nested[0][0])
+}

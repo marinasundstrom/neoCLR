@@ -40,6 +40,7 @@ static class CollectionBindings
         if (kind is null) return null;
         var element = GenericUnionBindings.Type(g.GenericArguments[0]);
         if (element is null || !(element is "Int32" or "Double" or "Boolean" or "String" or "Void"
+            || GenericUnionBindings.IsType(element) || ErrorBindings.IsType(element) || DelegateBindings.IsType(element) || NativeArrayBindings.IsType(element) || ReflectionBindings.IsReference(element) || IsReference(element) || InterfaceBindings.IsInterface(element) || element.StartsWith("arrayref<", StringComparison.Ordinal)
             || PrimitiveBindings.Types.Contains(element) || CalendarBindings.Types.Contains(element) || ErrorBindings.IsEmpty(element))) return null;
         var owner = $"System.Collections.{kind}<{element}>";
         Shapes[owner] = (kind, element);

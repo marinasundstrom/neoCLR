@@ -87,6 +87,7 @@ static class CoreDeclarations
             public abstract class ValueType { }
             public abstract class Enum : ValueType { }
             public struct Void { }
+            public struct Value { }
             public struct Boolean { }
             public struct Char { }
             public struct SByte { }

@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Generalized Raven collection/union payload mapping to existing references, nested
+  collections, interfaces, unions and delegates, with a nesting bound. Expanded
+  managed-array access and ForEach to admitted defaultable elements, checking opcode
+  widths/signedness and preserving canonical Boolean joins. Added executable shapes
+  and exposed the opaque System.Value metadata identity.
+
 - Added internal-library array.reserve allocation with ordinary managed-array
   identity and checked unreadable slots. Adapted ArrayList capacity now supports
   elements without defaults without inventing union cases; ordinary newarr retains

@@ -1,7 +1,7 @@
 # Closed collection APIs from Raven
 
 The collection target profile now closes ArrayList, List, Iterable and Iterator
-signatures over admitted primitive, String, calendar and empty-error payloads.
+signatures over admitted primitive, String, calendar, error, union, delegate, native-descriptor and managed-reference payloads.
 This extends the original Int32-only catalog. Metadata retains exact generic
 arguments; interface conversions are invariant and preserve object identity.
 
@@ -24,13 +24,15 @@ exercises string-list growth/aliasing, long-list copying and Date iteration. It 
 part of the saved-project suite. The existing foreach cleanup limitation and
 fault-path cleanup work remain documented in [the iteration contract](raven-target-contracts.md).
 
-The backing array uses ordinary managed array storage. Consequently the current
-bridge admits only payloads with runtime defaults: this slice does not claim
-arbitrary application classes, nested collection payloads or union carriers that
-have no valid default. The later [delegate projection](raven-delegate-api.md) adds Find, FindIndex and
+The backing array uses [reserved managed capacity](reserved-array-capacity.md), so
+unused capacity does not require a valid default T. Nested collections, reflection
+classes, interface references and Result/Option carriers are admitted. The
+[reference-payload sample](experiments/raven-target/samples/library-reference-payloads.rvn)
+checks nested aliases, independent sequence copies, stored union cases and delegates.
+Arbitrary application classes still need broader application-type import. The later [delegate projection](raven-delegate-api.md) adds Find, FindIndex and
 Exists with static callbacks.
 
-This reuses the [ArrayList design](array-list.md) and .NET comparison. The runtime
-contract and instruction set are unchanged. The bridge still duplicates a bounded
+This reuses the [ArrayList design](array-list.md) and .NET comparison. Public collection contracts retain their behavior; the adapted capacity allocator
+uses the internal reservation operation described above. The bridge still duplicates a bounded
 metadata surface; closed execution examples do not demonstrate general CLR generic
 loading. Installed SDK/extension packages require a separate refresh.

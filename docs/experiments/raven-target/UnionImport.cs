@@ -82,7 +82,7 @@ static class UnionImport
             var args = method.Parameters.Select(p => ProfileType(p.ParameterType)).ToArray();
             var result = ProfileType(method.ReturnType, true);
             var locals = method.Body.Variables.Select(v => ProfileType(v.VariableType)).ToArray();
-            if (locals.Any(t => t != "System.Object" && !InterfaceBindings.IsInterface(t) && !NativeArrayBindings.IsType(t) && !NativeArrayBindings.IsPointer(t) && !ReflectionBindings.IsType(t) && t != "arrayref<String>" && !DelegateBindings.IsType(t) && !GenericUnionBindings.IsType(t) && !CalendarBindings.Types.Contains(t) && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
+            if (locals.Any(t => !ManagedArrayBindings.IsType(t) && t != "System.Object" && !InterfaceBindings.IsInterface(t) && !NativeArrayBindings.IsType(t) && !NativeArrayBindings.IsPointer(t) && !ReflectionBindings.IsType(t) && t != "arrayref<String>" && !DelegateBindings.IsType(t) && !GenericUnionBindings.IsType(t) && !CalendarBindings.Types.Contains(t) && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
                 throw new InvalidDataException("Unsupported local default in Result profile.");
             NormalizePatternBranches(method);
             var instructions = method.Body.Instructions.ToArray();
@@ -138,7 +138,7 @@ static class UnionImport
                         }
                         else
                         {
-                            code.AppendLine((CalendarBindings.Types.Contains(initializedType) || GenericUnionBindings.IsType(initializedType)) ? "initobj " + initializedType : Default(initializedType) + "\nstobj " + initializedType);
+                            code.AppendLine((ManagedArrayBindings.IsReference(initializedType) || CalendarBindings.Types.Contains(initializedType) || GenericUnionBindings.IsType(initializedType)) ? "initobj " + initializedType : Default(initializedType) + "\nstobj " + initializedType);
                             assigned[address.Local] = true;
                         }
                         break;
@@ -161,24 +161,45 @@ static class UnionImport
                         terminates = true; break;
                     case Code.Newarr:
                         var element = ProfileType((TypeReference)instruction.Operand);
-                        if (element is not ("Int32" or "String") && !ReflectionBindings.IsReference(element)) throw new InvalidDataException("Unsupported vector allocation element.");
+                        if (!ManagedArrayBindings.Defaultable(element)) throw new InvalidDataException("Unsupported vector allocation element.");
                         Expect("Int32"); Push(new("arrayref<" + element + ">")); code.AppendLine("newarr " + element); break;
                     case Code.Ldlen:
                         var lengthArray = Pop().Type;
-                        if (lengthArray is not (IntArray or "arrayref<String>") && !ReflectionBindings.IsArray(lengthArray)) throw new InvalidDataException("Unsupported vector length receiver.");
+                        if (!ManagedArrayBindings.IsType(lengthArray)) throw new InvalidDataException("Unsupported vector length receiver.");
                         Push(new("UIntPtr")); code.AppendLine("ldlen"); break;
-                    case Code.Ldelem_I4:
-                        Expect("Int32"); Expect(IntArray); Push(new("Int32")); code.AppendLine("ldelem Int32"); break;
-                    case Code.Stelem_I4:
-                        Expect("Int32"); Expect("Int32"); Expect(IntArray); code.AppendLine("stelem Int32"); break;
+                    case Code.Ldelema:
+                        var addressElement = ProfileType((TypeReference)instruction.Operand);
+                        Expect("Int32"); Expect("arrayref<" + addressElement + ">");
+                        Push(new(addressElement + "&")); code.AppendLine("ldelema " + addressElement); break;
+                    case Code.Ldelem_I1: case Code.Ldelem_U1: case Code.Ldelem_I2: case Code.Ldelem_U2:
+                    case Code.Ldelem_I4: case Code.Ldelem_U4: case Code.Ldelem_I8: case Code.Ldelem_I:
+                    case Code.Ldelem_R4: case Code.Ldelem_R8: case Code.Ldelem_Any:
+                        Expect("Int32"); var loadedArray = Pop().Type;
+                        if (!ManagedArrayBindings.IsType(loadedArray)) throw new InvalidDataException("Unsupported array load.");
+                        var loadedElement = loadedArray[9..^1];
+                        ManagedArrayBindings.CheckElement(instruction.OpCode.Code, loadedElement,
+                            instruction.Operand is TypeReference loadToken ? ProfileType(loadToken) : null);
+                        Push(new(loadedElement == "Boolean" ? "Int32" : PrimitiveBindings.Stack(loadedElement))); code.AppendLine("ldelem " + loadedElement);
+                        if (loadedElement == "Boolean") code.Append(BooleanBindings.Convert("Boolean", "Int32"));
+                        break;
+                    case Code.Stelem_I1: case Code.Stelem_I2: case Code.Stelem_I4: case Code.Stelem_I8:
+                    case Code.Stelem_I: case Code.Stelem_R4: case Code.Stelem_R8: case Code.Stelem_Any:
+                        if (stack.Count < 3 || !ManagedArrayBindings.IsType(stack[^3].Type)) throw new InvalidDataException("Unsupported array store.");
+                        var storedElement = stack[^3].Type[9..^1];
+                        ManagedArrayBindings.CheckElement(instruction.OpCode.Code, storedElement,
+                            instruction.Operand is TypeReference storeToken ? ProfileType(storeToken) : null);
+                        ConvertTop(storedElement); Expect("Int32"); Expect("arrayref<" + storedElement + ">");
+                        code.AppendLine("stelem " + storedElement); break;
                     case Code.Ldelem_Ref:
                         Expect("Int32"); var referenceArray = Pop().Type;
-                        if (referenceArray != "arrayref<String>" && !ReflectionBindings.IsArray(referenceArray)) throw new InvalidDataException("Unsupported reference vector.");
+                        if (!ManagedArrayBindings.IsType(referenceArray) || !ManagedArrayBindings.IsReference(referenceArray[9..^1])) throw new InvalidDataException("Unsupported reference vector.");
                         var referenceElement = referenceArray[9..^1];
                         Push(new(referenceElement)); code.AppendLine("ldelem " + referenceElement); break;
                     case Code.Stelem_Ref:
-                        var storedReference = Pop().Type; Expect("Int32"); var storedArray = Pop().Type;
-                        if (storedArray != "arrayref<String>" && !ReflectionBindings.IsArray(storedArray) || !ReflectionBindings.Assignable(storedReference, storedArray[9..^1])) throw new InvalidDataException("Unsupported reference vector store.");
+                        if (stack.Count < 3 || !ManagedArrayBindings.IsType(stack[^3].Type)) throw new InvalidDataException("Unsupported reference vector store.");
+                        var storedArray = stack[^3].Type;
+                        if (!ManagedArrayBindings.IsReference(storedArray[9..^1])) throw new InvalidDataException("Unsupported reference vector store.");
+                        ConvertTop(storedArray[9..^1]); Expect("Int32"); Expect(storedArray);
                         code.AppendLine("stelem " + storedArray[9..^1]); break;
                     case Code.Ldfld:
                         if (!collectionProfile) throw new InvalidDataException("Native fields require target profile.");
@@ -407,7 +428,7 @@ static class UnionImport
             for (var n = 0; n < locals.Length; n++) output.AppendLine($".local {locals[n]} local{n}");
             if (method.Body.InitLocals)
                 for (var n = 0; n < locals.Length; n++)
-                    if (ReflectionBindings.IsType(locals[n]) && locals[n] != "System.RuntimeTypeHandle" || locals[n] is IntArray or "arrayref<String>" || CollectionBindings.IsReference(locals[n]) || CalendarBindings.Types.Contains(locals[n]) || GenericUnionBindings.IsType(locals[n]) && !GenericUnionBindings.RequiresInitialization(locals[n])) output.AppendLine($"ldloca local{n}\ninitobj {locals[n]}");
+                    if (ReflectionBindings.IsType(locals[n]) && locals[n] != "System.RuntimeTypeHandle" || ManagedArrayBindings.IsType(locals[n]) || CollectionBindings.IsReference(locals[n]) || CalendarBindings.Types.Contains(locals[n]) || GenericUnionBindings.IsType(locals[n]) && !GenericUnionBindings.RequiresInitialization(locals[n])) output.AppendLine($"ldloca local{n}\ninitobj {locals[n]}");
                     else if (locals[n] != Carrier && locals[n] != Option && locals[n] != VoidOption && locals[n] != VoidResult && locals[n] != "String" && !NeedsInitialization(locals[n])) output.AppendLine(Default(locals[n]) + $"\nstloc local{n}");
             foreach (var index in bodies.Keys.Order())
             {

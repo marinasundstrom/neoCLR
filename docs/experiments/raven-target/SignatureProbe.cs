@@ -28,6 +28,10 @@ static class SignatureProbe
             catch (InvalidDataException) { checks.Add(name); return; }
             throw new Exception("Malformed signature accepted: " + name);
         }
+        Check("Opaque Value metadata identity", GenericUnionBindings.Type(module.GetType("System.Value")) == "Value");
+        Check("Unsigned byte array load", ManagedArrayBindings.Type(new ArrayType(module.TypeSystem.Byte)) == "arrayref<Byte>");
+        Reject("Array signedness mismatch", () => ManagedArrayBindings.CheckElement(Mono.Cecil.Cil.Code.Ldelem_I1, "Byte", null));
+        Reject("Array token mismatch", () => ManagedArrayBindings.CheckElement(Mono.Cecil.Cil.Code.Stelem_Any, "Int32", "Double"));
         InterfaceBindings.Validate(module);
         foreach (var contractName in new[]{"Equatable", "Comparable", "Clonable", "Closable"}) {
             var contract = module.GetType("System." + contractName + "`1");
@@ -71,7 +75,7 @@ static class SignatureProbe
         forEachCall.GenericArguments.Add(module.TypeSystem.String);
         Reject("Array.ForEach method arity", () => ArrayCallbackBindings.Bind(forEachCall, forEach));
         forEachCall.GenericArguments.RemoveAt(1);
-        forEachCall.GenericArguments[0] = module.TypeSystem.Double;
+        forEachCall.GenericArguments[0] = new PointerType(module.TypeSystem.Int32);
         Reject("Array.ForEach unsupported element", () => ArrayCallbackBindings.Bind(forEachCall, forEach));
         var ok = module.GetType("System.Result").NestedTypes.Single(t => t.Name == "Ok`1");
         var nested = new GenericInstanceType(ok);
