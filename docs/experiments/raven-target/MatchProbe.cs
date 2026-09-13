@@ -14,6 +14,10 @@ static class MatchProbe
         CoreDeclarations.Write(core, unionProbe: true);
         var cases = new Dictionary<string, string> {
             ["Forms"] = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "samples/library-match.rvn")),
+            ["CaseImports"] = "import System.Result.*\nfunc Pick(value: int) -> int { return match Math.Abs(value) { Ok(let amount) => amount; Error(_) => -1 } } func Main() { WriteLine(Pick(-42)); WriteLine(Pick(-2147483648)) }",
+            ["OptionPositional"] = "func Pick(value: Option<int>) -> int { return match value { .Some(let amount) => amount; .None => -1 } } func Main() { WriteLine(Pick(Option<int>(Option.Some<int>(42)))); WriteLine(Pick(Option<int>(Option.None()))) }",
+            ["PositionalSingleEvaluation"] = "func Observe() -> Result<int, OverflowError> { WriteLine(7); return Math.Abs(-42) } func Main() { WriteLine(match Observe() { .Ok(let amount) => amount; .Error(_) => -1 }) }",
+            ["PositionalWrongArity"] = "func Main() { match Math.Abs(-42) { .Ok(let a, let b) => WriteLine(a); .Error(_) => WriteLine(-1) } }",
             ["Positional"] = "func Pick(value: int) -> int { return match Math.Abs(value) { .Ok(let amount) => amount; .Error(_) => -1 } } func Main() { WriteLine(Pick(-42)); WriteLine(Pick(-2147483648)) }",
             ["StatementReturn"] = "func Pick(value: int) -> int { match Math.Abs(value) { Result.Ok<int> ok => { return ok.Value }; Result.Error<OverflowError> error => { return -1 } } } func Main() { WriteLine(Pick(-42)); WriteLine(Pick(-2147483648)) }",
             ["Guard"] = "func Pick(value: int) -> int { return match Math.Abs(value) { Result.Ok<int> ok when ok.Value == 42 => 1; Result.Ok<int> ok => 2; Result.Error<OverflowError> error => 3 } } func Main() { WriteLine(Pick(-42)); WriteLine(Pick(-7)); WriteLine(Pick(-2147483648)) }",
@@ -38,10 +42,16 @@ static class MatchProbe
             if (compilation.GetDiagnostics().Any(d => d.Severity == DiagnosticSeverity.Error))
             { results[name] = new { Stage = "compile-rejected", Diagnostics = diagnostics }; continue; }
             var raw = Path.Combine(output, name + ".raw.dll");
-            using (var stream = File.Create(raw))
+            try
             {
+                using var stream = File.Create(raw);
                 var emitted = compilation.Emit(stream, null, new EmitOptions(AssemblyName.GetAssemblyName(core)));
-                if (!emitted.Success) throw new Exception(string.Join("\n", emitted.Diagnostics));
+                if (!emitted.Success) throw new InvalidOperationException(string.Join("\n", emitted.Diagnostics));
+            }
+            catch (Exception error) when (error is InvalidOperationException or NotSupportedException)
+            {
+                results[name] = new { Stage = "emit-failed", Diagnostics = diagnostics, Error = error.ToString() };
+                continue;
             }
             var projected = Path.Combine(output, name + ".dll");
             VoidProjection.Write(raw, core, projected);
@@ -52,9 +62,9 @@ static class MatchProbe
             }
             catch (InvalidDataException error) { results[name] = new { Stage = "import-rejected", Diagnostics = diagnostics, Error = error.Message }; }
         }
-        CheckUninitializedString(Path.Combine(output, "Forms.dll"), core, output);
         File.WriteAllText(Path.Combine(output, "match-results.json"), JsonSerializer.Serialize(results, new JsonSerializerOptions { WriteIndented = true }));
         Console.WriteLine(JsonSerializer.Serialize(results, new JsonSerializerOptions { WriteIndented = true }));
+        CheckUninitializedString(Path.Combine(output, "Forms.dll"), core, output);
     }
     static void CheckUninitializedString(string application, string core, string output)
     {

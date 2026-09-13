@@ -1,5 +1,9 @@
 # Try the application toolchain locally
 
+For the newer source-backed destructuring demo, see [the pattern walkthrough](raven-match-matrix.md#local-pattern-demo).
+It uses a separate folder and an updated language server; the .7 package described
+below remains unchanged and contains the earlier typed-case samples.
+
 The 2026-09-13 application build uses experimental Raven SDK/extension
 `0.1.12-neoclr.7`. This is a local macOS arm64 build, not a new published preview.
 It includes application classes/value types, interfaces, abstract/virtual dispatch,

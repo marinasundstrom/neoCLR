@@ -18,6 +18,7 @@ primitives = '--primitives' in sys.argv[2:]
 parsing = '--parsing' in sys.argv[2:]
 files = '--files' in sys.argv[2:]
 strings = '--strings' in sys.argv[2:]
+patterns = '--patterns' in sys.argv[2:]
 server = json.loads((project / '.vscode/settings.json').read_text())['raven.languageServerPath']
 messages = queue.Queue()
 log = (project / 'lsp-stderr.log').open('wb')
@@ -297,6 +298,24 @@ try:
             assert 'Parse' in labels and 'Divide' in labels, labels
             assert 'CompareTo' not in labels, labels
             results['Int32 in ' + declaration] = labels
+    if patterns:
+        for version, case_head in ((39, 'Ok(let text)'), (40, '.Ok(let text)')):
+            text = ('import System.*\nimport System.Result.*\n'
+                    'func Inspect(value: Result<string, OverflowError>) {\n'
+                    '    match value {\n        ' + case_head + ' => {\n'
+                    '            text.\n        }\n        .Error(_) => {}\n    }\n}')
+            send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})
+            result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
+                'position': {'line': 5, 'character': len('            text.')},
+                'context': {'triggerKind': 2, 'triggerCharacter': '.'}}, True))
+            items = result if isinstance(result, list) else result['items']
+            labels = sorted({item['label'] for item in items})
+            assert {'GetUtf8ByteCount', 'IsEmpty', 'ContainsOrdinal'}.issubset(labels), (case_head, labels)
+            results[case_head] = labels
+            hover = receive(send('textDocument/hover', {'textDocument': {'uri': uri},
+                'position': {'line': 5, 'character': 14}}, True))
+            assert hover is not None and any(name in json.dumps(hover) for name in ('string', 'String')), hover
+            results[case_head + ' payload hover'] = hover
     receive(send('shutdown', None, True))
     send('exit', None)
     print(json.dumps(results, indent=2))

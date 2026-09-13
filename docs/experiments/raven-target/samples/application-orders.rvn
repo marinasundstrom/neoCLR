@@ -2,6 +2,8 @@ import System.*
 import System.Collections.*
 import System.IO.*
 import System.Console.*
+import System.Result.*
+import System.Option.*
 
 class Order {
     var Id: int
@@ -45,12 +47,11 @@ class FileOrderStore : OrderStore {
 
 func Process(store: OrderStore, id: int, limit: int) {
     let found = store.Find(id)
-    if found is Option.Some<Order> present {
-        let order = present.Value
+    if found is Some(let order) {
         match store.Save(order, limit) {
-            Result.Ok<System.Void> done => WriteLine(order.Status)
-            Result.Error<FileWriteError> failure => {
-                if failure.Value.IsTooLarge {
+            .Ok => WriteLine(order.Status)
+            .Error(let failure) => {
+                if failure.IsTooLarge {
                     WriteLine("Order report exceeds limit")
                 }
                 else {
@@ -75,7 +76,7 @@ func Main() {
     WriteLine(first.Status)
     WriteLine(second.Status)
     match File.ReadAllText("neoclr-orders.txt", 64) {
-        Result.Ok<string> text => WriteLine(text.Value)
-        Result.Error<FileReadError> error => WriteLine("Order report could not be read")
+        Ok(let text) => WriteLine(text)
+        Error(let error) => WriteLine("Order report could not be read")
     }
 }

@@ -1,5 +1,8 @@
 # Test Raven targeting neoCLR in VS Code
 
+The latest source-backed [pattern demo](../../raven-match-matrix.md#local-pattern-demo)
+uses refreshed metadata and an updated language server in a separate folder.
+
 For the newer local application build (`0.1.12-neoclr.7`), use the
 [dedicated installation walkthrough](../../raven-application-local-build.md).
 The Preview 4 setup below remains a separate installation.

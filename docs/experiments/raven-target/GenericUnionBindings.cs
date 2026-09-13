@@ -91,6 +91,19 @@ static class GenericUnionBindings
         if (definition.IsVirtual && !definition.IsFinal) throw new InvalidDataException("Unexpected union virtual method.");
         if (shape.Kind is "Result.Ok" or "Result.Error" or "Option.Some")
         {
+            if (reference.HasThis && name == "Deconstruct" && result == "noresult"
+                && args.SequenceEqual(new[] { shape.Args[0] + "&" }) && definition.Parameters[0].IsOut)
+            {
+                var key = owner + ":Deconstruct";
+                if (!Helpers.TryGetValue(key, out var helper))
+                {
+                    var helperName = "RuntimeUnion" + Helpers.Count;
+                    var body = $".function {helperName}({owner}& receiver,out {shape.Args[0]}& value) -> void\nldarg value\nldarg receiver\nldobj {owner}\ncall instance {owner}::get_Value()\nstobj {shape.Args[0]}\nret\n.end\n";
+                    helper = (helperName, body);
+                    Helpers.Add(key, helper);
+                }
+                return new(helper.Name, [owner + "&", shape.Args[0] + "&"], "noresult", 1);
+            }
             if (reference.HasThis && name == "set_Value" && args.SequenceEqual(new[] { shape.Args[0] }) && result == "noresult")
                 return Helper(shape, name, args, result, true, true);
             if (reference.HasThis && name == "get_Value" && args.Length == 0 && result == shape.Args[0])

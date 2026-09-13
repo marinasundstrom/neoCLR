@@ -10,6 +10,11 @@ parser.add_argument('--runtime', required=True, type=Path)
 args = parser.parse_args()
 results = json.loads((args.probe / 'match-results.json').read_text())
 accepted = {
+    'Positional': '42\n-1\n',
+    'NominalDeconstruction': '42\n',
+    'CaseImports': '42\n-1\n',
+    'OptionPositional': '42\n-1\n',
+    'PositionalSingleEvaluation': '7\n42\n',
     'Forms': '42\n-1\nPresent\nAbsent\n42\nOverflow\n',
     'Guard': '1\n2\n3\n',
     'StatementTail': '42\n-1\n',
@@ -17,7 +22,7 @@ accepted = {
     'VoidOutput': '42\nSaved\nCompleted\nOverflow\n',
     'ExpressionBlockReturn': '42\n',
 }
-rejected = {'Positional': 'RAV2104', 'NominalDeconstruction': 'RAV1610',
+rejected = {'PositionalWrongArity': 'RAV1610',
             'StatementReturn': 'RAV1503', 'MissingExpression': 'RAV2100',
             'MissingStatement': 'RAV2100', 'UnreachableArm': 'RAV2101', 'WrongCase': 'RAV2102'}
 if set(results) != set(accepted) | set(rejected):

@@ -1,0 +1,24 @@
+import System.*
+import System.Console.*
+import System.Result.*
+
+func Magnitude(value: int) -> int {
+    return match Math.Abs(value) {
+        Ok(let amount) => amount
+        Error(_) => -1
+    }
+}
+
+func Number(value: Option<int>) -> int {
+    return match value {
+        .Some(let number) => number
+        .None => -1
+    }
+}
+
+func Main() {
+    WriteLine(Magnitude(-42))
+    WriteLine(Magnitude(-2147483648))
+    WriteLine(Number(Option<int>(Option.Some<int>(7))))
+    WriteLine(Number(Option<int>(Option.None())))
+}

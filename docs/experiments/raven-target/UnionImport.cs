@@ -111,7 +111,7 @@ static class UnionImport
                 Slot Pop() { if (stack.Count == 0) throw new InvalidDataException($"Input stack underflow in {method.FullName} at {instruction.Offset:x4}."); var top = stack[^1]; stack.RemoveAt(stack.Count - 1); return top; }
                 Slot Expect(string type) { var top = Pop(); if (!(CollectionBindings.Assignable(PrimitiveBindings.Stack(top.Type), PrimitiveBindings.Stack(type)) || ReflectionBindings.Assignable(top.Type, type) || ApplicationTypes.Assignable(top.Type, type))) throw new InvalidDataException("Input stack type mismatch."); return top; }
                 int Local(int n) { if (n < 0 || n >= locals.Length) throw new InvalidDataException("Invalid local index."); return n; }
-                void Load(int n) { Local(n); if (!assigned[n]) throw new InvalidDataException("Read of uninitialized or unsupported default local."); Push(new(PrimitiveBindings.Stack(locals[n]))); code.AppendLine($"ldloc local{n}"); }
+                void Load(int n) { Local(n); if (!assigned[n]) throw new InvalidDataException($"Read of uninitialized or unsupported default local {n} in {method.FullName} at instruction {index}."); Push(new(PrimitiveBindings.Stack(locals[n]))); code.AppendLine($"ldloc local{n}"); }
                 Slot ConvertTop(string type)
                 {
                     if (stack.Count == 0 || !Converts(stack[^1].Type, type)) return Expect(type);
@@ -573,12 +573,13 @@ static class UnionImport
             if (join.Next is null || miss?.OpCode.Code != Code.Ldc_I4_0 || hit?.OpCode.Code != Code.Ldc_I4_1
                 || jump is null || jump.OpCode.Code is not (Code.Br or Code.Br_S) || jump.Operand != join) continue;
             var incomingMiss = instructions.Where(i => ReferenceEquals(i.Operand, miss)).ToArray();
-            if (incomingMiss.Length != 1 || incomingMiss[0].OpCode.Code is not (Code.Brfalse or Code.Brfalse_S)
+            if (incomingMiss.Length == 0 || incomingMiss.Any(i => i.OpCode.Code is not (Code.Brfalse or Code.Brfalse_S))
                 || instructions.Count(i => ReferenceEquals(i.Operand, join)) != 1
                 || instructions.Any(i => ReferenceEquals(i.Operand, jump))
                 || instructions.Any(i => i.Operand is Instruction[] targets && targets.Any(t => t == miss || t == join || t == jump))) continue;
             var branchesOnSuccess = join.OpCode.Code is Code.Brtrue or Code.Brtrue_S;
-            incomingMiss[0].Operand = branchesOnSuccess ? join.Next : join.Operand;
+            foreach (var incoming in incomingMiss)
+                incoming.Operand = branchesOnSuccess ? join.Next : join.Operand;
             hit.OpCode = OpCodes.Nop;
             jump.Operand = branchesOnSuccess ? join.Operand : join.Next;
         }
@@ -629,8 +630,8 @@ static class UnionImport
         var file = BooleanBindings.Bind(reference, definition) ?? ProcessBindings.Bind(reference, definition) ?? GenericUnionBindings.Bind(reference, definition) ?? ErrorBindings.Bind(reference, definition) ?? CalendarBindings.Bind(reference, definition) ?? PrimitiveBindings.Bind(reference, definition) ?? DoubleBindings.Bind(reference, definition) ?? Int32Bindings.Bind(reference, definition) ?? PathBindings.Bind(reference, definition) ?? FileBindings.Bind(reference, definition) ?? ResultBindings.Bind(reference, definition);
         if (file is not null)
         {
-            if (file.OutArgument >= 0 || reference.Name == "FromResidual") ValidatePropagation(definition.DeclaringType);
-            return new(file.Name, file.Arguments, file.Result, file.OutArgument, file.Instruction, file.OutArgument >= 0);
+            if (file.OutArgument >= 0 && file.Result == "Boolean" || reference.Name == "FromResidual") ValidatePropagation(definition.DeclaringType);
+            return new(file.Name, file.Arguments, file.Result, file.OutArgument, file.Instruction, file.OutArgument >= 0 && file.Result == "Boolean");
         }
         if (reference.DeclaringType.FullName == "System.Math" && reference.Name == "Clamp")
         {

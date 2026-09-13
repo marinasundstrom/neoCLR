@@ -4,7 +4,7 @@ using Mono.Cecil;
 // APIs: each catalog still selects its types, members and receiver conventions.
 static class RuntimeSignatures
 {
-    public static bool IsCore(IMetadataScope scope) => scope.Name == CoreDeclarations.Identity
+    public static bool IsCore(IMetadataScope? scope) => scope?.Name == CoreDeclarations.Identity
         || scope is ModuleDefinition module && module.Assembly.Name.Name == CoreDeclarations.Identity;
 
     public static TypeReference Close(TypeReference type, TypeReference owner, int depth = 0, GenericInstanceMethod? method = null, bool pointers = false)

@@ -1978,3 +1978,21 @@ requested prototype LINQ for the next release. The assistant proposed validating
 extension methods after patterns and starting with Where/Select on Iterable/Iterator.
 The roadmap/backlog record that proposal and unresolved laziness/cleanup semantics;
 no LINQ implementation is claimed here.
+
+
+**Pattern slice outcome (2026-09-13).** The source experiment now uses the existing
+member-union and Deconstruct contracts, rather than adding Raven named-case attributes
+to the target library. The initial attribute approach was discarded after exposing
+incompatible case lookup behavior. The assistant corrected generic case inference,
+value deconstruction emission, primitive CLI signatures and scope retention in Raven;
+these corrections are committed as `04c953d67` on its experimental branch. The neoCLR bridge provides
+payload deconstruction adapters and preserves definite assignment across nested
+pattern branches. The order workflow now demonstrates the author's imported-case
+syntax, including String and application-object payloads. The executable
+[pattern matrix](raven-match-matrix.md) records the tested boundary; LINQ and extension
+method validation remain upcoming work. Existing archived builds are unchanged.
+
+The assistant also prepared a separate local source-backed pattern demo with an
+updated language server. The previous edited demo was preserved. Validation passed
+299 Raven tests, 50 saved-project checks, the match matrix, workflow state checks and
+payload completion/hover checks; this did not publish or replace the archived SDK.

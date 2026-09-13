@@ -8,10 +8,19 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
-- Planned preliminary Raven destructuring patterns and a prototype LINQ layer for
-  the next release, with extension-method validation, a proposed Where/Select
-  scope and explicit evaluation/iterator-cleanup decisions. Recorded the author
-  discussion; these entries describe planned work, not delivered query APIs.
+- Added Raven union payload destructuring through the existing extraction and
+  payload APIs: imported `Ok(let text)` / `Error(let error)`, target-typed cases,
+  and explicit generic case patterns. Updated the order workflow and added a
+  readable pattern sample and executable compatibility checks. The bridge tracks
+  unconditional deconstruction outputs and nested pattern assignment; the source
+  experiment requires Raven 04c953d67 and refreshed declaration metadata, not
+  archived .7 tools. Prepared a separate source-backed local demo and verified
+  payload completion/hover with its updated language server.
+
+- Planned a prototype LINQ layer for the next release, following extension-method
+  validation, with a proposed Where/Select scope and explicit evaluation and
+  iterator-cleanup decisions. Recorded the author discussion; query APIs remain
+  planned work.
 
 - Added target completion checks inside constructors and installed a patched Raven
   language server after reproducing missing Int32 static members in constructor

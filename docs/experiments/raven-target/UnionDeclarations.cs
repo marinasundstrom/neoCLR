@@ -12,6 +12,7 @@ static class UnionDeclarations
             public struct Some<T> {
                 public Some(T value) { Value = value; }
                 public T Value { get; set; }
+                public void Deconstruct(out T value) { value = Value; }
             }
         }
         public struct PropagationUnit { }
@@ -36,10 +37,12 @@ static class UnionDeclarations
             public struct Ok<T> {
                 public Ok(T value) { Value = value; }
                 public T Value { get; set; }
+                public void Deconstruct(out T value) { value = Value; }
             }
             public struct Error<E> {
                 public Error(E value) { Value = value; }
                 public E Value { get; set; }
+                public void Deconstruct(out E value) { value = Value; }
             }
         }
         [System.Runtime.CompilerServices.Union]

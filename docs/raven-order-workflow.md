@@ -21,6 +21,12 @@ absence handling instead of exceptions/null. It is not a .NET binary-compatibili
 transactional storage or production repository claim. The report is one text file,
 not a serialization format or database; globalization and async are not involved.
 
+The updated source sample imports `System.Result.*` and `System.Option.*`, and uses
+`Some(let order)`, `.Error(let failure)` and `Ok(let text)`. It requires the pattern
+slice of the experimental compiler/bridge and refreshed declaration metadata;
+archived .7 tools still use the earlier typed-case sample. See the
+[pattern matrix](raven-match-matrix.md) for supported forms.
+
 ## Run with the source toolchain
 
 Use the experimental Raven branch with commits `cbd87efa8` and `62105de24`, or a
