@@ -713,6 +713,9 @@ pub enum Instruction {
     ReferenceType,
     #[serde(rename = "castclass")]
     CastClass(Type),
+    /// Copy a value into a managed object allocation (CLI box).
+    #[serde(rename = "box")]
+    BoxValue(Type),
     #[serde(rename = "ref.eq")]
     ReferenceEqual,
     #[serde(rename = "interface.borrow")]
@@ -1046,6 +1049,7 @@ impl Function {
                 | Instruction::ArrayElement(ty)
                 | Instruction::StoreArrayElement(ty)
                 | Instruction::ArrayAddress(ty)
+                | Instruction::BoxValue(ty)
                 | Instruction::CastClass(ty)
                 | Instruction::BorrowInterface(ty)
                 | Instruction::LoadTypeToken(ty)

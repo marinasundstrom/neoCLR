@@ -211,11 +211,18 @@ fn member(
 }
 
 fn check_signature(
-    _module: &Module,
+    module: &Module,
     implementation: &Function,
     contract: &Function,
     explicit: bool,
 ) -> Result<(), Fault> {
+    // Nominal interfaces receive an object; value methods receive its boxed payload.
+    let boxed_receiver = !contract.receiver_byref
+        && implementation.receiver_byref
+        && implementation
+            .owner
+            .as_ref()
+            .is_some_and(|owner| !module.is_reference_type(owner));
     if implementation.parameters != contract.parameters {
         return Err(Fault::new(
             "interface implementation requires exact parameter types",
@@ -237,8 +244,9 @@ fn check_signature(
                 .readonly_parameters
                 .iter()
                 .collect::<std::collections::BTreeSet<_>>()
-        || implementation.receiver_byref != contract.receiver_byref
-        || implementation.receiver_readonly != contract.receiver_readonly
+        || (!boxed_receiver
+            && (implementation.receiver_byref != contract.receiver_byref
+                || implementation.receiver_readonly != contract.receiver_readonly))
         || implementation
             .out_parameters
             .iter()

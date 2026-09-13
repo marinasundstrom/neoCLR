@@ -566,7 +566,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                                 .map_err(|e| Fault::new(e.to_string()))?,
                         ),
                         "sizeof" | "alignof" | "heap.alloc" | "ptr.null" | "ptr.cast"
-                        | "ptr.fromint" | "ldobj" | "stobj" | "cpobj" | "initobj"
+                        | "ptr.fromint" | "ldobj" | "stobj" | "cpobj" | "initobj" | "box"
                         | "value.pack" | "value.is" | "value.unpack" | "ldtoken" | "castclass"
                         | "interface.borrow" | "newarr" | "array.new" | "array.alloc"
                         | "array.create" | "ldelem" | "stelem" | "ldelema" => Some(

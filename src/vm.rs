@@ -917,9 +917,20 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                         return Err(Fault::new("managed references cannot be indirectly stored"));
                     }
                 }
+                Op::BoxValue(ty) => {
+                    check(ty)?;
+                    if matches!(ty, Type::ByRef(_) | Type::ReadOnlyByRef(_) | Type::Ptr(_))
+                        || module.is_object_reference_type(ty)
+                    {
+                        return Err(Fault::new("box requires a non-reference value type"));
+                    }
+                    if !module.is_reference_type(&Type::Named("System.Object".into())) {
+                        return Err(Fault::new("box requires a System.Object class declaration"));
+                    }
+                }
                 Op::CastClass(ty) => {
                     check(ty)?;
-                    if !matches!(ty, Type::ArrayRef(_))
+                    if !matches!(ty, Type::ArrayRef(_) | Type::String)
                         && crate::interfaces::interface_definition(module, ty).is_err()
                     {
                         crate::inheritance::lineage(module, ty)?;
@@ -1559,7 +1570,11 @@ fn interpret_instructions(
         // Collect only between instructions, before allocation operands leave roots.
         if (matches!(
             op,
-            Op::HeapNew | Op::NewValueArray(_) | Op::NewArray(_) | Op::AllocateArray(_)
+            Op::BoxValue(_)
+                | Op::HeapNew
+                | Op::NewValueArray(_)
+                | Op::NewArray(_)
+                | Op::AllocateArray(_)
         ) || matches!(op, Op::New(ty) if module.is_reference_type(ty))
             || matches!(op, Op::Construct(target) if target.owner.as_ref().is_some_and(|ty| module.is_reference_type(ty))))
             && heap.len() >= collection_threshold
@@ -1977,14 +1992,24 @@ fn interpret_instructions(
                             interface,
                             &contract,
                         )?;
-                        if callee.receiver_byref || crate::interfaces::is_contract(module, &callee)
-                        {
+                        if crate::interfaces::is_contract(module, &callee) {
                             return Err(Fault::new(
                                 "nominal interface dispatch requires a concrete class method",
                             ));
                         }
-                        object.view = None;
-                        args.insert(0, Value::ObjectReference(object));
+                        if callee.receiver_byref {
+                            if module.is_reference_type(object.reference.target()) {
+                                return Err(Fault::new("boxed dispatch requires a value payload"));
+                            }
+                            let mut receiver = object.reference;
+                            if callee.receiver_readonly {
+                                receiver.restrict_readonly();
+                            }
+                            args.insert(0, Value::SlotReference(receiver));
+                        } else {
+                            object.view = None;
+                            args.insert(0, Value::ObjectReference(object));
+                        }
                         if frames.len() >= limits.frames {
                             return Err(Fault::new("frame limit exceeded"));
                         }
@@ -2073,11 +2098,20 @@ fn interpret_instructions(
                 Op::CastClass(target) => {
                     let value = match frame.pop()? {
                         Value::ObjectReference(mut object) => {
+                            if !module.is_object_reference_type(target) {
+                                return Err(Fault::new(
+                                    "castclass requires an object-reference target",
+                                ));
+                            }
                             let concrete = object.concrete_type();
                             if crate::interfaces::interface_definition(module, target).is_ok() {
                                 crate::interfaces::ensure_implementation(module, concrete, target)?;
                                 object.view = Some(target.clone());
                             } else if concrete == target {
+                                if target == &Type::String {
+                                    frame.stack.push(object.reference.read()?);
+                                    return Ok(None);
+                                }
                                 if !matches!(target, Type::ArrayRef(_)) {
                                     object.view = None;
                                 }
@@ -2091,6 +2125,23 @@ fn interpret_instructions(
                             }
                             object.reference.assigned()?;
                             Value::ObjectReference(object)
+                        }
+                        value @ Value::String(_)
+                            if crate::interfaces::interface_definition(module, target).is_ok() =>
+                        {
+                            crate::interfaces::ensure_implementation(
+                                module,
+                                &Type::String,
+                                target,
+                            )?;
+                            if heap.len() >= limits.heap_objects {
+                                return Err(Fault::new("heap object limit exceeded"));
+                            }
+                            let index = heap.allocate(value)?;
+                            Value::ObjectReference(crate::value::ObjectReference {
+                                reference: heap.address(index)?,
+                                view: Some(target.clone()),
+                            })
                         }
                         Value::NullObjectReference(_)
                             if module.is_object_reference_type(target) =>
@@ -2826,6 +2877,19 @@ fn interpret_instructions(
                         layout.alignment = layout.alignment.min(alignment);
                     }
                     memory.write(&pointer, &layout, &value)?;
+                }
+                Op::BoxValue(ty) => {
+                    if heap.len() >= limits.heap_objects {
+                        return Err(Fault::new("heap object limit exceeded"));
+                    }
+                    let value = frame.pop()?.for_storage_in(module, ty)?;
+                    let index = heap.allocate(value)?;
+                    frame
+                        .stack
+                        .push(Value::ObjectReference(crate::value::ObjectReference {
+                            reference: heap.address(index)?,
+                            view: Some(Type::Named("System.Object".into())),
+                        }));
                 }
                 Op::HeapNew => {
                     if heap.len() >= limits.heap_objects {

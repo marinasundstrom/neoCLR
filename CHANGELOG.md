@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Added bounded CLR-style box allocation and nominal interface dispatch into value
+  payloads, preserving value-copy independence, alias identity and managed lifetime.
+  Intrinsic String interface views use managed handles. Added GC, escape and invalid
+  operation tests; generic reference/nullable boxing and unboxing remain separate.
+
 - Exposed unsafe native Array<T> buffers through Raven for primitive elements,
   including allocation/views, fields, indexers, addresses and explicit release.
   Added saved-source success, bounds/lifetime faults, metadata checks and completion.

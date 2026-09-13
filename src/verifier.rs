@@ -670,7 +670,8 @@ fn effect(
             usize::from(!crate::vm::resolve(module, target)?.no_result),
         ),
         Construct(target) => (target.parameters.len(), 1),
-        CastClass(_) | BorrowInterface(_) | PackValue(_) | IsValue(_) | UnpackValue(_) => (1, 1),
+        BoxValue(_) | CastClass(_) | BorrowInterface(_) | PackValue(_) | IsValue(_)
+        | UnpackValue(_) => (1, 1),
         ReferenceEqual | SetField(_) | PointerAdd | BitAnd | BitOr | BitXor | ShiftLeft
         | ShiftRight | ShiftRightUnsigned | Remainder | RemainderUnsigned | Add | Sub | Mul
         | AddChecked | SubChecked | MulChecked | Divide | AddCheckedUnsigned
@@ -989,6 +990,10 @@ fn typed_effect(
             Result::Ok(vec![])
         }
         Dup => Result::Ok(vec![values[0].clone(), values[0].clone()]),
+        BoxValue(target) => {
+            stored(module, &values[0], target)?;
+            one(Type::Named("System.Object".into()))
+        }
         CastClass(target) => {
             if module.is_object_reference_type(exact(&values[0])?) {
                 require(
