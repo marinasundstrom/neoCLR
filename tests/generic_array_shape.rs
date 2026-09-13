@@ -32,7 +32,10 @@ ret
 fn library() -> neoclr::Module {
     assemble(&format!(
         ".module System\n{ITERATION}\n{}",
-        include_str!("../runtime/raven/Array.neoil")
+        concat!(
+            include_str!("../runtime/raven/CollectionContracts.neoil"),
+            include_str!("../runtime/raven/Array.neoil")
+        )
     ))
     .unwrap()
 }
@@ -122,7 +125,10 @@ fn reflection_library() -> neoclr::Module {
         .replace("System.Collections.Iterator", "Historical.Iterator");
     assemble(&format!(
         "{source}\n{ITERATION}\n{}",
-        include_str!("../runtime/raven/Array.neoil")
+        concat!(
+            include_str!("../runtime/raven/CollectionContracts.neoil"),
+            include_str!("../runtime/raven/Array.neoil")
+        )
     ))
     .unwrap()
 }
@@ -140,8 +146,8 @@ fn generic_identity_and_reflection_describe_the_existing_array() {
     assert_eq!(a.generic_arguments.len(), 1);
     assert_eq!(a.generic_arguments[0].name, "System.Int32");
     for (method, result, count) in [
-        ("GetProperties", "System.Reflection.PropertyInfo[]", 2),
-        ("GetMethods", "System.Reflection.MethodInfo[]", 3),
+        ("GetProperties", "System.Reflection.PropertyInfo[]", 3),
+        ("GetMethods", "System.Reflection.MethodInfo[]", 4),
         ("GetGenericArguments", "System.Type[]", 1),
     ] {
         let app = assemble(&format!(".module App\n.entry Main\n.function Main() -> {result}\nldtoken arrayref<Int32>\ncall System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)\ncall instance System.Type::{method}()\nret\n.end")).unwrap();
@@ -194,4 +200,77 @@ ret
         .find(|t| t.name == "System.Array")
         .unwrap();
     assert_eq!(definition.implements.len(), 1);
+}
+
+#[test]
+fn array_capabilities_dispatch_without_wrappers_and_reject_missing_operations() {
+    let library = library();
+    let source = r#".module App
+.entry Main
+.function Main() -> Int32
+.local arrayref<Int32> data
+ldc.i4 1
+newarr Int32
+stloc data
+ldloc data
+castclass System.Collections.MutableSequence<Int32>
+ldc.i4 0
+ldc.i4 42
+callvirt instance System.Collections.MutableSequence<Int32>::set_Item(Int32,Int32)
+ldloc data
+castclass System.Collections.Collection<Int32>
+callvirt instance System.Collections.Collection<Int32>::get_Count()
+ldc.i4 1
+ceq
+brfalse Bad
+ldloc data
+castclass System.Collections.Sequence<Int32>
+ldc.i4 0
+callvirt instance System.Collections.Sequence<Int32>::get_Item(Int32)
+ret
+Bad:
+ldc.i4 -1
+ret
+.end"#;
+    let parse = |text: &str| {
+        neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(text)], &library)
+            .map(|mut modules| modules.remove(0))
+    };
+    let app = parse(source).unwrap();
+    verify_with_library(&app, &library).unwrap();
+    let result = run_with_library(&app, &library, Limits::default()).unwrap();
+    assert_eq!(result.value, Value::Int32(42));
+    assert_eq!(result.heap.statistics().allocated_objects, 1);
+    let missing_setter = source.replace(
+        "System.Collections.MutableSequence<Int32>",
+        "System.Collections.Sequence<Int32>",
+    );
+    match parse(&missing_setter) {
+        Err(_) => {}
+        Ok(app) => {
+            assert!(verify_with_library(&app, &library).is_err());
+            assert!(run_with_library(&app, &library, Limits::default()).is_err());
+        }
+    }
+    let wrong_element = source.replace(
+        "castclass System.Collections.Sequence<Int32>",
+        "castclass System.Collections.Sequence<String>",
+    );
+    if let Ok(app) = parse(&wrong_element) {
+        assert!(run_with_library(&app, &library, Limits::default()).is_err());
+    }
+}
+
+#[test]
+fn array_metadata_cannot_promise_unimplemented_growth() {
+    let source = format!(
+        ".module System\n{ITERATION}\n{}\n{}\n{}",
+        include_str!("../runtime/raven/CollectionContracts.neoil"),
+        include_str!("../runtime/raven/List.neoil"),
+        include_str!("../runtime/raven/Array.neoil").replace(
+            ".implements System.Collections.MutableSequence<T>",
+            ".implements System.Collections.List<T>"
+        )
+    );
+    assert!(assemble(&source).is_err());
 }

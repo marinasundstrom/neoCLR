@@ -90,3 +90,29 @@ necessary contract; a host-backed prototype helper is not automatically a perman
 instruction. Compiler work should primarily provide syntax, inference, flow analysis
 and target-contract mapping. Safety rules promised across languages must also survive
 handwritten IL and metadata, not depend solely on Raven diagnostics.
+
+
+### Next collection slice: Map and dictionary implementation (2026-09-13)
+
+After the sequence capability prototype, the author selected Map<K,V> and a default
+implementation corresponding to .NET Dictionary<TKey,TValue>. Compare its equality,
+hashing, comparer selection, null-key rules, duplicate insertion and iteration
+contracts before prototyping HashMap<K,V>. Prefer Option for absence and evaluate
+Result for rejected insertion/update, retaining familiar ordinary indexer/method
+usage where those result semantics fit. Separate read/mutation capabilities, keep
+variance provisional and validate reference/value keys and values. This is the next
+planned slice, not an implemented API.
+
+
+### Following slice: LINQ terminal outcomes (2026-09-13)
+
+The author asked to evaluate Option/Result returns for First and other terminal
+operators and explicitly requested separate slices. Finish collection capabilities,
+then Map/dictionary work, then terminal operators; do not combine these API decisions
+in one implementation commit. Compare each operation with .NET's First/FirstOrDefault,
+Single/SingleOrDefault, Last and aggregation behavior before choosing contracts.
+First returning Option<T> is a candidate for absence without a default-value sentinel.
+Single requires a decision about zero versus multiple elements; Result may express
+cardinality errors. Decide empty-input and error behavior per operator rather than
+wrapping every terminal or converting runtime faults into ordinary Result errors.
+No terminal operator contract is selected or implemented by this planning note.

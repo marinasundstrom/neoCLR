@@ -16,15 +16,15 @@ static class CollectionBindings
     public static bool Assignable(string source, string target)
     {
         if (source == target) return true;
-        if (ManagedArrayBindings.IsType(source) && target == $"System.Collections.Iterable<{source[9..^1]}>") return true;
+        if (ManagedArrayBindings.IsType(source))
+            return new[] { "Iterable", "Collection", "Sequence", "MutableSequence" }
+                .Any(kind => target == $"System.Collections.{kind}<{source[9..^1]}>");
         if (!Shapes.TryGetValue(source, out var from))
-        {
-            // The Int32 constants are also used by standalone signature checks.
             from = source switch { ArrayList => ("ArrayList", "Int32"), List => ("List", "Int32"), Iterator => ("Iterator", "Int32"), _ => default };
-        }
-        return from.Kind == "Iterator" && target == Disposable
-            || from.Kind == "ArrayList" && target == $"System.Collections.List<{from.Element}>"
-            || from.Kind is "ArrayList" or "List" && target == $"System.Collections.Iterable<{from.Element}>";
+        if (from.Kind == "Iterator") return target == Disposable;
+        var hierarchy = new[] { "ArrayList", "List", "MutableSequence", "Sequence", "Collection", "Iterable" };
+        var index = Array.IndexOf(hierarchy, from.Kind);
+        return index >= 0 && hierarchy.Skip(index + 1).Any(kind => target == $"System.Collections.{kind}<{from.Element}>");
     }
 
     public static string? Type(TypeReference type)
@@ -34,6 +34,8 @@ static class CollectionBindings
         if (type is not GenericInstanceType g || g.GenericArguments.Count != 1
             || !RuntimeSignatures.IsCore(g.ElementType.Scope)) return null;
         var kind = g.ElementType.FullName switch {
+            "System.Collections.Collection`1" => "Collection", "System.Collections.Sequence`1" => "Sequence",
+            "System.Collections.MutableSequence`1" => "MutableSequence",
             "System.Collections.List`1" => "List", "System.Collections.ArrayList`1" => "ArrayList",
             "System.Collections.Iterable`1" => "Iterable", "System.Collections.Iterator`1" => "Iterator",
             _ => null
@@ -53,8 +55,11 @@ static class CollectionBindings
         foreach (var (name, parent) in new[] {
             ("System.Disposable", ""), ("System.Collections.Iterable`1", ""),
             ("System.Collections.Iterator`1", "System.Disposable"),
-            ("System.Collections.List`1", "System.Collections.Iterable`1<T>"),
-            ("System.Collections.ArrayList`1", "System.Collections.List`1<T>|System.Collections.Iterable`1<T>") })
+            ("System.Collections.Collection`1", "System.Collections.Iterable`1<T>"),
+            ("System.Collections.Sequence`1", "System.Collections.Collection`1<T>|System.Collections.Iterable`1<T>"),
+            ("System.Collections.MutableSequence`1", "System.Collections.Sequence`1<T>|System.Collections.Collection`1<T>|System.Collections.Iterable`1<T>"),
+            ("System.Collections.List`1", "System.Collections.MutableSequence`1<T>|System.Collections.Sequence`1<T>|System.Collections.Collection`1<T>|System.Collections.Iterable`1<T>"),
+            ("System.Collections.ArrayList`1", "System.Collections.List`1<T>|System.Collections.MutableSequence`1<T>|System.Collections.Sequence`1<T>|System.Collections.Collection`1<T>|System.Collections.Iterable`1<T>") })
         {
             var type = module.GetType(name) ?? throw new InvalidDataException("Missing collection contract: " + name);
             if (type.IsInterface && type.Methods.Any(m => !m.IsPublic || !m.IsAbstract || !m.IsVirtual || !m.IsNewSlot || !m.HasThis || m.HasBody))
@@ -77,9 +82,9 @@ static class CollectionBindings
         var expected = (kind, definition.Name) switch {
             ("List" or "ArrayList", "Add") => (element, "noresult", true),
             ("ArrayList", "get_Capacity") => ("", "Int32", true),
-            ("List" or "ArrayList", "get_Count") => ("", "Int32", true),
-            ("List" or "ArrayList", "get_Item") => ("Int32", element, true),
-            ("List" or "ArrayList", "set_Item") => ("Int32," + element, "noresult", true),
+            ("Collection" or "ArrayList", "get_Count") => ("", "Int32", true),
+            ("Sequence" or "MutableSequence" or "ArrayList", "get_Item") => ("Int32", element, true),
+            ("MutableSequence" or "ArrayList", "set_Item") => ("Int32," + element, "noresult", true),
             ("ArrayList", "FindIndex") => ($"System.Func<{element},Boolean>", "Int32", true),
             ("ArrayList", "Exists") => ($"System.Func<{element},Boolean>", "Boolean", true),
             ("ArrayList", "Find") => ($"System.Func<{element},Boolean>", $"System.Option<{element}>", true),

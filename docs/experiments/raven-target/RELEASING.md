@@ -163,3 +163,11 @@ editor checks. This verifies Array<int> member/query completion and int[] alias
 hover. Keep the unified-array sample in the saved-project suite, and select
 `RavenIterationArrayShapeType` in new demo projects. Both compiler spellings emit
 ordinary CLI arrays; no separate generic-array allocation format is required.
+
+
+For the collection capability prototype, run `verify_collection_capabilities.py`
+with the same project/bridge/library/runtime arguments as the other saved-source
+checks and add `--collection-capabilities` to the editor checks. Rebuild declarations
+and the bridge together: inherited Count/indexer ownership changed, and older SDKs
+need the inherited-indexer compiler correction. Do not treat the existing .11
+installation as containing these later source changes.

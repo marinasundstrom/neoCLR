@@ -1,0 +1,6 @@
+; Growth is a separate capability from replacing existing elements.
+.interface System.Collections.List<T>
+    .implements System.Collections.MutableSequence<T>
+    .method instance Add(T value) -> void
+    .end
+.end

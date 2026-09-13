@@ -34,12 +34,12 @@ static class InterfaceProbe
         using var library = AssemblyDefinition.ReadAssembly(core);
         using var image = AssemblyDefinition.ReadAssembly(path);
         var interfaces = library.MainModule.GetTypes().Where(t => t.IsInterface).ToArray();
-        if (interfaces.Length != 9 || interfaces.SelectMany(t => t.Methods).Any(m => !m.IsAbstract || !m.IsVirtual || !m.IsNewSlot))
+        if (interfaces.Length != 12 || interfaces.SelectMany(t => t.Methods).Any(m => !m.IsAbstract || !m.IsVirtual || !m.IsNewSlot))
             throw new Exception("Expected ordinary abstract CLI interface contracts.");
         var arrayShape = library.MainModule.GetType("System.Array`1");
         if (arrayShape is null || arrayShape.IsValueType || arrayShape.GenericParameters.Count != 1 ||
-            !arrayShape.Interfaces.Any(i => i.InterfaceType.FullName == "System.Collections.Iterable`1<T>"))
-            throw new Exception("Expected a generic managed array class declaring Iterable<T>.");
+            !arrayShape.Interfaces.Any(i => i.InterfaceType.FullName == "System.Collections.MutableSequence`1<T>"))
+            throw new Exception("Expected a generic managed array class declaring MutableSequence<T>.");
         var list = library.MainModule.GetType("System.Collections.ArrayList`1");
         if (list.IsValueType || !list.Interfaces.Any(i => i.InterfaceType.FullName == "System.Collections.List`1<T>"))
             throw new Exception("Expected a class implementing the existing List contract.");

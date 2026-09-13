@@ -835,13 +835,15 @@
     {
       "file": "runtime/System/Collections/List.neoil",
       "declarations": 7,
-      "disposition": "collections",
+      "disposition": "replaced-in-raven-profile",
+      "replacementFiles": [
+        "runtime/raven/CollectionContracts.neoil",
+        "runtime/raven/List.neoil"
+      ],
       "samples": [
-        "library-managed-array-metadata.rvn",
-        "library-array-shapes.rvn",
-        "library-reference-payloads.rvn",
-        "library-generic-collections.rvn"
-      ]
+        "library-collection-capabilities.rvn"
+      ],
+      "note": "Count, read indexing and replacement are inherited; List retains Add. All contracts remain invariant."
     },
     {
       "file": "runtime/System/Collections/Iterable.neoil",

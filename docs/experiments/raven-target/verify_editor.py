@@ -23,6 +23,7 @@ extensions = '--extensions' in sys.argv[2:]
 queries = '--queries' in sys.argv[2:]
 array_invariance = '--array-invariance' in sys.argv[2:]
 array_shape = '--array-shape' in sys.argv[2:]
+collection_capabilities = '--collection-capabilities' in sys.argv[2:]
 server = json.loads((project / '.vscode/settings.json').read_text())['raven.languageServerPath']
 messages = queue.Queue()
 log = (project / 'lsp-stderr.log').open('wb')
@@ -398,6 +399,23 @@ try:
             'position': {'line': 2, 'character': 9}}, True))
         assert hover is not None and any(t in json.dumps(hover) for t in ('int[]', 'Int32[]')), hover
         results['Generic array alias hover'] = hover
+    if collection_capabilities:
+        for version, shape, can_add in ((51, 'Sequence<int>', False),
+                                        (52, 'MutableSequence<int>', False),
+                                        (53, 'List<int>', True),
+                                        (54, 'Array<int>', False)):
+            text = ('import System.*\nimport System.Collections.*\nimport System.Linq.*\n'
+                    'func Inspect(values: ' + shape + ') {\n    values.\n}')
+            send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version},
+                'contentChanges': [{'text': text}]})
+            result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
+                'position': {'line': 4, 'character': len('    values.')},
+                'context': {'triggerKind': 2, 'triggerCharacter': '.'}}, True))
+            items = result if isinstance(result, list) else result['items']
+            labels = sorted({item['label'] for item in items})
+            assert {'Count', 'GetIterator', 'ToList'}.issubset(labels), labels
+            assert ('Add' in labels) == can_add, labels
+            results['Collection capabilities ' + shape] = labels
     receive(send('shutdown', None, True))
     send('exit', None)
     print(json.dumps(results, indent=2))

@@ -70,6 +70,8 @@ def build(path: Path) -> str:
         text = re.sub(r'    \.method internal instance byref \.ctor[^\n]*\n.*?    \.end\n', '', text, flags=re.S)
         text = text.replace('instance readonly byref ', 'instance ').replace('instance byref ', 'instance ')
         text = text.replace('ldloca method', 'ldloc method')
+    if path.stem == 'List':
+        return (ROOT / 'runtime/raven/CollectionContracts.neoil').read_text() + (ROOT / 'runtime/raven/List.neoil').read_text()
     if path.stem == 'Array':
         return (ROOT / 'runtime/raven/Array.neoil').read_text() + (ROOT / 'runtime/raven/NativeMemory.neoil').read_text()
     if path.stem == 'Func':

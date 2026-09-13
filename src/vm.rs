@@ -325,11 +325,6 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             && (!def.fields.is_empty()
                 || def.base.is_some()
                 || def.is_abstract
-                || def.implements
-                    != vec![Type::Constructed {
-                        definition: "System.Collections.Iterable".into(),
-                        arguments: vec![Type::TypeParameter(0)],
-                    }]
                 || !def.generic_constraints.is_empty()
                 || def
                     .definition

@@ -2338,3 +2338,28 @@ and compared it with .NET's array/read-wrapper contracts and the proposed read/m
 interface inheritance change. Implementation exposed a Raven inherited-indexer lookup
 bug, which is being addressed on the experiment branch rather than worked around in
 samples. No implementation completion or tool refresh is claimed by this planning entry.
+
+
+**Subsequent direction:** The author asked to focus next on Map and a default
+implementation corresponding to .NET Dictionary. The assistant queued Map<K,V>
+plus a dictionary-style implementation, proposed evaluating HashMap as the concrete
+name, and identified equality/hashing, comparer ownership, duplicate-key behavior,
+Option/Result lookup and read/mutation separation as decisions for that slice.
+
+
+**Capability outcome:** Implemented the experimental hierarchy in the Raven profile
+and used normal array member dispatch for Count/indexers. ArrayList inherits the
+same read/replacement contracts through List. The generic array shape no longer
+hardcodes a single interface, but still forbids incompatible record storage; ordinary
+conformance validation rejects unimplemented operations. Validation passed 39 runtime
+tests, 22 Raven tests, 60 saved projects, 28 query checks, six capability rejections
+and 56 editor checks. The installed .11 tools remain unchanged; Map is the next
+planned slice.
+
+
+**Separate follow-up:** The author asked to consider Option or Result for LINQ
+terminal methods such as First and explicitly said to keep the work in separate
+slices. The assistant recorded collection capabilities, Map/dictionary work and
+terminal-operator outcome design as separate steps. First returning Option is a
+proposal; Single cardinality semantics and other operator outcomes remain to decide.
+No terminal operators were added to the current capability implementation.

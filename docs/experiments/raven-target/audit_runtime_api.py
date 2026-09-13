@@ -54,6 +54,12 @@ for file in source['sourceFiles']:
                      'samples': ['library-managed-array-metadata.rvn', 'library-native-buffer.rvn'],
                      'note': 'The native descriptor API is removed; direct IL covers typed NativeMemory access. Raven native casts remain limited.'})
         continue
+    if file == 'runtime/System/Collections/List.neoil':
+        rows.append({'file': file, 'declarations': len(entries), 'disposition': 'replaced-in-raven-profile',
+                     'replacementFiles': ['runtime/raven/CollectionContracts.neoil', 'runtime/raven/List.neoil'],
+                     'samples': ['library-collection-capabilities.rvn'],
+                     'note': 'Count, read indexing and replacement are inherited; List retains Add. All contracts remain invariant.'})
+        continue
     group, samples = lookup[Path(file).stem]
     for sample in samples:
         if not (HERE / 'samples' / sample).is_file():

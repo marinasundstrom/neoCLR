@@ -385,7 +385,9 @@ fn array_implementation(
 }
 
 fn select(module: &Module, concrete: &Type, contract: &Function) -> Result<Function, Fault> {
-    if let Type::ArrayRef(element) = concrete {
+    if let Type::ArrayRef(element) = concrete
+        && contract.name == "System.Collections.Iterable.GetIterator"
+    {
         return array_implementation(module, element, contract);
     }
     if let Some(body) = member(module, concrete, contract)? {

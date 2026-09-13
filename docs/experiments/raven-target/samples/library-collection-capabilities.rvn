@@ -1,0 +1,38 @@
+import System.*
+import System.Console.*
+import System.Collections.*
+import System.Linq.*
+
+func Read(values: Sequence<int>) {
+    WriteLine(values.Count)
+    WriteLine(values[0])
+    WriteLine(values.ToList().Count)
+}
+
+func Replace(values: MutableSequence<int>, value: int) {
+    values[0] = value
+}
+
+func Append(values: List<int>) {
+    values.Add(11)
+}
+
+func Main() {
+    let array: Array<int> = [1, 2]
+    let list = ArrayList<int>()
+    list.Add(3)
+    list.Add(4)
+
+    Replace(array, 42)
+    Replace(list, 7)
+    Read(array)
+    Read(list)
+
+    let view: Sequence<int> = array
+    array[0] = 9
+    WriteLine(view[0])
+    WriteLine(array.Count)
+    Append(list)
+    WriteLine(list.Count)
+    WriteLine(list[2])
+}

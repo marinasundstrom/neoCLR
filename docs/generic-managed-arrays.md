@@ -13,21 +13,22 @@ Allocation still uses newarr; newobj cannot create an unrelated record with the
 array name. The definition cannot add fields, a base class or element constraints
 that the intrinsic storage would silently ignore.
 
-The definition explicitly implements System.Collections.Iterable<T>. Interface
+The definition explicitly implements System.Collections.MutableSequence<T>, inheriting
+Sequence<T>, Collection<T> and Iterable<T>. Interface
 reflection and conformance use that declaration; the runtime supplies the existing
 array iterator implementation. Direct loops over a statically known Raven array
 continue to use indexed access. Passing that array to an Iterable<T> parameter or
 an extension method targeting Iterable<T> uses the interface contract instead.
 This enables shared query extensions such as ToList without changing array-loop
-lowering or introducing array-only extension overloads. Length and the Item getter/setter are ordinary
+lowering or introducing array-only extension overloads. Length, Count and the Item getter/setter are ordinary
 library members implemented with existing array instructions. Reflection lists
 those properties/methods, substitutes their element signatures, and reports T from
 GetGenericArguments. Existing diagnostic array spelling and TypeIdentity::ArrayRef
 remain; a generic class is not a second identity for the same object.
 
 Mutable arrays remain invariant, including casts through interface views. The
-current List<T> includes Add, so arrays do not implement it. Choosing a counted or
-indexed read contract remains part of the [collection review](collection-contracts.md).
+current List<T> includes Add, so arrays do not implement it. The provisional counted/read/replacement contracts are described in the
+[collection review](collection-contracts.md#2026-09-13-capability-prototype).
 No general interface variance, read-only array, immutable/frozen collection family,
 Span or Memory contract is introduced here.
 
@@ -36,7 +37,7 @@ and invariant mutable arrays. Familiar allocation, aliasing, default reference
 slots and ordinary array IL remain. The profile keeps nongeneric System.Array for
 existing static ForEach compiler declarations. Raven still imports ordinary array
 signatures. The reference assembly now declares a generic System.Array<T> interface
-shape implementing Iterable<T>. `RavenIterationArrayShapeType` selects it; Raven
+shape implementing MutableSequence<T>. `RavenIterationArrayShapeType` selects it; Raven
 reads its interface metadata instead of hardcoding Iterable on vector symbols.
 The selected generic shape and T[] now resolve to the same array in Raven source
 annotations and imported signatures. Assignment in either direction, nested arrays,

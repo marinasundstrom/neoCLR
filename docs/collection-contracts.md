@@ -265,3 +265,39 @@ live aliases, extension methods, source rejection of unavailable operations, low
 forged member calls, invalid array conformance and invariant element types. Runtime
 metadata must not let an array promise Add without an implementation. Compiler work
 is limited to any ordinary interface-inheritance bugs the experiment exposes.
+
+
+### Prototype implementation and next slice
+
+Implemented in the Raven runtime profile: the three new capability interfaces,
+List inheriting MutableSequence, and Array declaring MutableSequence. Count on an
+array equals Length. Ordinary interface conformance checks and method dispatch now
+handle the array's library-defined members; only iterator acquisition needs its
+existing intrinsic mapping. No extra view allocation is required by the conversions.
+
+The generated reference assembly and bridge catalog use the same inheritance graph.
+Raven required a general inherited-indexer lookup correction; it does not need new
+collection-specific language rules. ArrayList keeps its existing implementation and
+acquires the read/replacement contracts transitively. This changes metadata member
+owners: callers must regenerate target declarations and recompile against the new
+profile. Installed .11 tools are unchanged by this source slice.
+
+The sample is `library-collection-capabilities.rvn`; negative source checks are in
+`verify_collection_capabilities.py`, and editor checks use `--collection-capabilities`.
+Low-level tests cover direct interface dispatch, unchanged array allocation count,
+forged setters, wrong element types and unimplemented growth declarations.
+
+**Next, as directed by the author:** Map<K,V> and a dictionary-style implementation.
+Use .NET Dictionary<TKey,TValue> as the behavioral baseline. Evaluate HashMap as the
+concrete name, explicit read/mutation capabilities, key comparer ownership, equality
+and hashing requirements, lookup via Option, duplicate-key Result behavior and
+iteration order. No Map, hasher, comparer or dictionary implementation is included in
+this slice. Decide these contracts before selecting a hash-table algorithm; do not
+assume covariant V through an invariant Option<V> or nullable-key compatibility.
+
+
+Source validation: 39 focused runtime tests, 22 Raven indexer/iteration tests,
+60 saved-project cases, 28 query checks, six unavailable-capability cases and
+56 editor completion/hover/diagnostic checks passed. All-target Clippy and the
+runtime API inventory check passed. The editor checks used the source-built server;
+no SDK, VSIX or installed demonstration was replaced.

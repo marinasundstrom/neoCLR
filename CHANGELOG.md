@@ -8,10 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
-- Planned a bounded collection capability prototype separating counted iteration,
-  indexed reads, element replacement and the existing List growth operation. Recorded
-  .NET API comparisons, provisional names, alias guarantees and validation criteria;
-  immutable/frozen families and generic variance remain separate.
+- Implemented a bounded Raven-profile collection capability prototype: Collection
+  for count/iteration, Sequence for indexed reads, MutableSequence for replacement,
+  and List adding growth through Add. Arrays and ArrayList share those contracts
+  through ordinary inherited-interface dispatch without wrapper allocations. Added
+  array Count, samples, negative/metadata tests and editor checks. Callers must
+  regenerate declarations and recompile; installed .11 tools are unchanged. Recorded
+  .NET comparisons and provisional names; immutable/frozen families and variance
+  remain separate. Planned Map/dictionary work next and LINQ terminal Option/Result
+  contracts afterward, as separate slices.
 
 - Built and installed experimental Raven SDK/VSIX 0.1.12-neoclr.11 with the generic
   array integration in an isolated local demo/profile. All seven packaged suites
