@@ -1,0 +1,50 @@
+import System.*
+import System.Collections.*
+import System.Console.*
+
+extension NumberOperations for int {
+    func Next() -> int {
+        return self + 1
+    }
+}
+
+extension ListOperations for ArrayList<int> {
+    func AppendNext(value: int) {
+        self.Add(value.Next())
+    }
+}
+
+extension SequenceOperations for Iterable<int> {
+    func Visit(action: Func<int, System.Void>) {
+        let iterator = self.GetIterator()
+        while iterator.MoveNext() {
+            action(iterator.Current)
+        }
+        iterator.Dispose()
+    }
+}
+
+func Main() {
+    let original = 41
+    WriteLine(original.Next().Next())
+    WriteLine(original)
+
+    let values = ArrayList<int>()
+    let alias = values
+    values.AppendNext(6)
+    alias.AppendNext(41)
+    WriteLine(values.Count)
+
+    var visits = 0
+    values.Visit((value: int) => {
+        visits = visits + 1
+        WriteLine(value)
+    })
+    WriteLine(visits)
+
+    let empty = ArrayList<int>()
+    empty.Visit((value: int) => {
+        visits = visits + 1
+    })
+    WriteLine(visits)
+}

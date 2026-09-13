@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Enabled nongeneric Raven application extension methods by completing their
+  generated marker metadata dependencies. Added readable value/reference/interface
+  receiver and callback examples, execution and completion checks, and explicit
+  rejection coverage for generic application extensions and executable marker
+  construction. No new runtime opcode or Raven compiler change; archived toolchains
+  remain unchanged. Documented the generic bridge boundary before the LINQ slice.
+
 - Added Raven union payload destructuring through the existing extraction and
   payload APIs: imported `Ok(let text)` / `Error(let error)`, target-typed cases,
   and explicit generic case patterns. Updated the order workflow and added a

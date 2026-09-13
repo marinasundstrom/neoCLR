@@ -1996,3 +1996,15 @@ The assistant also prepared a separate local source-backed pattern demo with an
 updated language server. The previous edited demo was preserved. Validation passed
 299 Raven tests, 50 saved-project checks, the match matrix, workflow state checks and
 payload completion/hover checks; this did not publish or replace the archived SDK.
+
+**Extension slice outcome (2026-09-13).** Following the author's request to explore
+extension methods before prototype LINQ, the assistant reproduced missing generated
+marker metadata in the target declaration image. Supplying those metadata-only
+dependencies lets nongeneric Raven extensions execute through existing static calls;
+no compiler change or new opcode was needed. The sample exercises integer receivers,
+shared ArrayList references, Iterable receivers and captured callbacks. Completion
+also exposes the extension. Generic application extensions remain rejected by the
+bridge. The assistant retained deferred Where/Select as the intended next contract
+and identified generic query bindings and iterator representation as prerequisites,
+not completed query support. See [the implemented boundary](raven-extension-methods.md).
+Archived packages and the author's edited demo were left unchanged.

@@ -106,6 +106,9 @@ static class CoreDeclarations
             public abstract class Array { public int Length => 0; }
             public class Type { }
             public class Attribute { }
+            // Metadata-only dependency of Raven's extension marker stub. Throwing
+            // or constructing it in executable code remains unsupported.
+            public class NotImplementedException { }
             public sealed class FlagsAttribute : Attribute { }
             public enum AttributeTargets { All = 32767 }
             public sealed class AttributeUsageAttribute : Attribute {
@@ -119,6 +122,7 @@ static class CoreDeclarations
             // Union probe attribute
             public sealed class ReferenceAssemblyAttribute : System.Attribute { }
             public sealed class CompilerGeneratedAttribute : System.Attribute { }
+            public sealed class ExtensionAttribute : System.Attribute { }
             public sealed class RefSafetyRulesAttribute : System.Attribute {
                 public RefSafetyRulesAttribute(int version) { }
             }

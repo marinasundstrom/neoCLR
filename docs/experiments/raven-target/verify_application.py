@@ -24,6 +24,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-application-check-') as temporar
                *runner_arguments(args), '--runtime', str(args.runtime.resolve())]
     source = (bridge / 'samples/application-types.rvn').read_text()
     for label, text, expected in [
+        ('Extension receivers and callbacks', (bridge / 'samples/application-extensions.rvn').read_text(), '43\n41\n2\n7\n42\n2\n2\n'),
         ('Delegates and shared captures', (bridge / 'samples/application-delegates.rvn').read_text(), '8\n42\n99\n12\n15\n42\n42\n123\n123\n1\n-2147483648\n'),
         ('Application interfaces', (bridge / 'samples/application-interfaces.rvn').read_text(), '42\n99\n'),
         ('Abstract inheritance and overrides', (bridge / 'samples/application-inheritance.rvn').read_text(), '7\n42\n'),
@@ -52,6 +53,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-application-check-') as temporar
     for label, text in [
         ('Type initializer', source.replace('class Counter {', 'class Counter { static init { WriteLine("Unexpected") }')),
         ('Readonly field', source.replace('class Counter {', 'class Counter { readonly field Id: int = 1')),
+        ('Generic extension boundary', 'extension IdentityOperations<T> for T { func Identity() -> T { return self } }\nfunc Main() { System.Console.WriteLine(42.Identity()) }'),
     ]:
         (root / 'Main.rvn').write_text(text)
         run = subprocess.run(command, capture_output=True, text=True, timeout=120)
@@ -75,4 +77,11 @@ func Main() {
     assert run.returncode != 0 and 'null delegate receiver' in run.stderr, run.stdout + run.stderr
     assert 'Must not reach invocation' not in run.stdout
     results['Null interface method group'] = 'faulted at binding'
+    # Extension marker metadata is present for closure auditing, not an executable
+    # exception API. A reachable constructor must still fail before execution.
+    (root / 'Main.rvn').write_text('func Main() { System.NotImplementedException() }')
+    run = subprocess.run(command, capture_output=True, text=True, timeout=120)
+    assert run.returncode != 0 and 'Unsupported Result profile type: System.NotImplementedException' in run.stderr, run.stdout + run.stderr
+    assert 'Verified saved project:' not in run.stdout
+    results['Metadata-only marker dependency'] = 'rejected before execution'
 print(json.dumps(results, indent=2))

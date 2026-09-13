@@ -19,6 +19,7 @@ parsing = '--parsing' in sys.argv[2:]
 files = '--files' in sys.argv[2:]
 strings = '--strings' in sys.argv[2:]
 patterns = '--patterns' in sys.argv[2:]
+extensions = '--extensions' in sys.argv[2:]
 server = json.loads((project / '.vscode/settings.json').read_text())['raven.languageServerPath']
 messages = queue.Queue()
 log = (project / 'lsp-stderr.log').open('wb')
@@ -316,6 +317,18 @@ try:
                 'position': {'line': 5, 'character': 14}}, True))
             assert hover is not None and any(name in json.dumps(hover) for name in ('string', 'String')), hover
             results[case_head + ' payload hover'] = hover
+    if extensions:
+        text = ('extension NumberOperations for int {\n'
+                '    func Next() -> int { return self + 1 }\n}\n'
+                'func Main() {\n    let value = 41\n    value.\n}')
+        send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': 41}, 'contentChanges': [{'text': text}]})
+        result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
+            'position': {'line': 5, 'character': len('    value.')},
+            'context': {'triggerKind': 2, 'triggerCharacter': '.'}}, True))
+        items = result if isinstance(result, list) else result['items']
+        labels = sorted({item['label'] for item in items})
+        assert any(label == 'Next' or label.startswith('Next(') for label in labels), labels
+        results['Extension receiver'] = labels
     receive(send('shutdown', None, True))
     send('exit', None)
     print(json.dumps(results, indent=2))

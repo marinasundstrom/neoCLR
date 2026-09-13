@@ -157,3 +157,9 @@ callback evaluation order, empty inputs, early exit, Result/Option outcomes and 
 before finalizing the prototype. Existing automatic iterator-disposal/fault-cleanup gaps
 must be explicit. IQueryable, expression trees, provider translation and async queries
 remain outside the proposed initial slice. No new opcode is assumed necessary.
+
+Extension follow-up (2026-09-13): nongeneric application receivers and callbacks
+now execute through ordinary calls, with member completion verified. Generic
+application signatures remain an explicit bridge boundary. See [evidence and the
+query prerequisites](raven-extension-methods.md); no query operators are implemented
+by this extension slice.
