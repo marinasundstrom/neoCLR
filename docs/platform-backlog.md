@@ -132,3 +132,28 @@ add the relevant verifier/GC/reflection/debugger integration, and demonstrate it
 Neo with source/artifact tests. Keep unsupported behavior explicit. Introducing a
 runtime primitive is appropriate when it provides a shared enforceable capability;
 ordinary library policy can remain ordinary library code.
+
+## Raven patterns and prototype LINQ (2026-09-13)
+
+The author requested preliminary destructuring patterns for the public demonstration,
+including `import System.Result.*`, `Ok(let text)` and target-member-binding `.Ok`.
+These are language/metadata/library contracts; prefer ordinary emitted calls and
+branches rather than special runtime pattern instructions. The author also pointed
+out that extension methods can become available once the target supports their
+underlying constructs, and requested prototype LINQ for the next release.
+
+Proposed order: finish union contracts and readable match samples; validate extension
+method lookup/emission; then select a bounded query API. The assistant proposed Where
+and Select over Iterable/Iterator and Func callbacks, with materialization as needed.
+These operators and exact signatures are proposals, not implemented or settled scope.
+
+Compare .NET's [Enumerable API](https://learn.microsoft.com/en-us/dotnet/api/system.linq.enumerable?view=net-10.0)
+(primary source consulted 2026-09-13): it builds queries over IEnumerable with delegates
+and supports deferred execution. Preserve familiar behavior where applicable, replacing
+only the target's iteration names/contracts. A lazy pipeline avoids an intermediate
+collection but adds iterator state, dispatch and captured lifetimes; eager materialization
+is simpler but changes when work happens and uses storage. Decide repeat enumeration,
+callback evaluation order, empty inputs, early exit, Result/Option outcomes and cleanup
+before finalizing the prototype. Existing automatic iterator-disposal/fault-cleanup gaps
+must be explicit. IQueryable, expression trees, provider translation and async queries
+remain outside the proposed initial slice. No new opcode is assumed necessary.

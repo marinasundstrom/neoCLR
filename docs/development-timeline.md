@@ -1956,3 +1956,25 @@ with an injected system or controlled test clock. Compared the idea with the shi
 alternatives, placement and future validation in [clock design](local-clock.md#future-clock-contract-review-2026-09-13)
 and a backlog entry. No clock redesign was implemented; the current toolchain refresh
 continues. Exact contracts and namespace-function projection remain open.
+
+
+### 2026-09-13 — Pattern ergonomics, extension methods and prototype LINQ
+
+**Author direction.** During the Int32 completion investigation, the author asked for
+readable union patterns using case imports and target-member binding. The example
+matched File.ReadAllText with `Ok(let text)` and `Error(let error)`, and the author
+clarified: “That means supporting destructuring.” Preliminary pattern support was
+identified as important for promoting neoCLR.
+
+**Assistant proposal and action.** Prioritized the existing constructor-completion
+bug first, then investigated target union metadata, payload deconstruction and generic
+case emission. The completion fix was committed on Raven at 55c0f7ef5 and selected in
+the local demo. Pattern work remains in progress at this entry; do not infer delivered
+support from the proposed syntax alone.
+
+**Further direction.** The author observed that Raven features such as extension
+methods can work through existing runtime constructs and library contracts, then
+requested prototype LINQ for the next release. The assistant proposed validating
+extension methods after patterns and starting with Where/Select on Iterable/Iterator.
+The roadmap/backlog record that proposal and unresolved laziness/cleanup semantics;
+no LINQ implementation is claimed here.

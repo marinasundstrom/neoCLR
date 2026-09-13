@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Planned preliminary Raven destructuring patterns and a prototype LINQ layer for
+  the next release, with extension-method validation, a proposed Where/Select
+  scope and explicit evaluation/iterator-cleanup decisions. Recorded the author
+  discussion; these entries describe planned work, not delivered query APIs.
+
 - Added target completion checks inside constructors and installed a patched Raven
   language server after reproducing missing Int32 static members in constructor
   bodies. The general compiler fix is isolated on Raven at 55c0f7ef5; archived tools

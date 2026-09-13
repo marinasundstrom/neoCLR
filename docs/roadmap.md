@@ -58,6 +58,11 @@ explicitly. Compared with CLR tooling, prefer compiler-provided standard debug m
 and a runtime debug protocol over reconstructing source from generated IL. This is a
 release requirement and investigation plan, not a claim of delivered Raven debugging.
 
+The next release should include preliminary destructuring patterns and a prototype
+LINQ layer. First validate imported union case names and target-typed `.Ok`/`.Error`
+patterns against the order workflow, then extension-method targeting and a small
+Iterable/Iterator query surface. See [the scoped plan](platform-backlog.md#raven-patterns-and-prototype-linq-2026-09-13).
+
 Generic Void also constrains a future Task<Void>/async-await design: decide awaiter
 contracts, no-payload completion and suspension without importing assumptions that Void
 cannot be a generic argument. Async is not part of these application slices.
