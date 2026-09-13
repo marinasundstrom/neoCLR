@@ -97,3 +97,64 @@ It checks output, report content, state after a rejected write, missing-parent
 read/write errors, deferred pending membership and an empty all-saved summary. Tests
 use temporary working directories and reject stale executable fallback. Raven source
 debugging remains separate future work.
+
+## Collection integration scenario (2026-09-13 source slice)
+
+The separate [collection workflow](experiments/raven-target/samples/application-order-collections.rvn)
+combines the newer library APIs with an application-defined Order class. It does
+not replace the file/report scenario above. It requires current core metadata and
+System library; the installed .11 bundle does not contain the collection additions.
+
+The example registers three orders through MutableMap<int, Order> and ArrayList<Order>.
+TryAdd rejects a duplicate before the list is changed. Find returns Option<Order>;
+PendingOrder propagates absence with `?` and also returns None for a shipped order.
+No default Order or null placeholder is needed. HashMap's equality and hash callbacks
+are explicit in this prototype; a default comparer is still future work.
+
+FindAll eagerly captures the pending entries in new list storage. Updating an order
+through the map is visible through both lists: the entries retain ordinary class
+identity. The filtered list keeps its original membership; it does not automatically
+remove an order whose Pending flag changes. A fresh query observes the current state.
+This distinction is intentional and is visible in the sample's output.
+
+OnlyPending accepts Iterable<Order>, composes Where and Single, and propagates the
+Result. Initially two pending orders yield Multiple, then one yields order 303,
+then none yield Empty. An Order[] also supports Where/Select/ToList through the array's
+Iterable contract. FindIndex demonstrates Some(0), distinguishing the first position
+from absence. Imported Some/None and Ok/Error patterns destructure application-class
+payloads without managed-reference syntax or manual casts.
+
+This scenario reuses the [.NET collection comparison](collection-contracts.md),
+[Map contract](map-contracts.md), [filtering review](arraylist-filtering.md) and
+[LINQ terminal review](raven-query-api.md). Shared class identity and shallow collection
+copies preserve familiar CLR behavior; explicit absence/cardinality results are
+neoCLR library policy. The sample adds no instruction, metadata convention, runtime
+intrinsic or Raven compiler change. Registration is not a transaction: a terminal
+allocation fault is not rolled back, and concurrent access is outside the prototype.
+
+### Run and inspect
+
+Prepare a fresh source project using the [source integration guide](experiments/raven-target/README.md)
+and `prepare_editor.py --collections`, regenerating core metadata with the current
+`--interfaces` probe. Do not reuse a .11 declaration DLL for this sample. In the
+following commands, replace the project, Raven and runtime paths with that fresh
+project and its matching built tools; run from the neoCLR checkout:
+
+```sh
+cp docs/experiments/raven-target/samples/application-order-collections.rvn /path/to/fresh/editor/Main.rvn
+python3 docs/experiments/raven-target/run_project.py /path/to/fresh/editor/Demo.rvnproj \
+  --raven /path/to/Raven --runtime /path/to/neoclr
+```
+
+Open that editor folder in VS Code and use **neoCLR: Run saved project**. The normal
+Raven toolbar is not the neoCLR execution path. Completion should expose Order's
+members when destructuring the map lookup or accessing a filtered list element.
+The [expected output](experiments/raven-target/samples/application-order-collections.expected.txt)
+includes duplicate rejection, absence, Multiple/Empty results, order 303 and index 0.
+
+`verify_application.py` runs the scenario with GC pressure and with deliberately
+colliding hashes, checking unchanged output and requiring a collection to occur in
+the GC variant. `verify_editor.py --maps` checks member discovery on the application
+payload through both map lookup and FindAll. The package builder already includes
+the sample directory and verification scripts, so a future fresh bundle will carry
+this scenario; this source slice does not itself build, install or publish a release.

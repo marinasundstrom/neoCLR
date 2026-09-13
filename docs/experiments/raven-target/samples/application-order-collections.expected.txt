@@ -1,0 +1,13 @@
+Duplicate order rejected
+3
+3
+Unknown order
+Order already shipped
+Multiple
+2
+Filtered orders share identity
+2
+303
+303
+0
+Empty

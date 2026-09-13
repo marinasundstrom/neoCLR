@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Added a combined Raven order-collection scenario using application-defined class
+  payloads, HashMap duplicate checks, ArrayList filtering, array/interface LINQ and
+  Option/Result propagation. Added application checks under GC pressure and hash
+  collisions, plus completion checks for inferred Order payloads. Documented shallow
+  filtered membership versus shared object state and how to run with fresh matching
+  core metadata/System. No runtime/compiler change or installed-tool refresh.
+
 - Added direct-storage Raven-profile ArrayList filtering: Find/FindLast return
   Option<T>, FindIndex/FindLastIndex return Option<Int32>, Exists/TrueForAll answer
   Boolean questions, and FindAll returns an independent shallow list. Breaking:

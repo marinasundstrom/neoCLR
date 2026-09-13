@@ -1,0 +1,105 @@
+import System.*
+import System.Collections.*
+import System.Linq.*
+import System.Option.*
+import System.Result.*
+import System.Console.*
+
+class Order {
+    var Number: int
+    var Pending: bool
+
+    init(number: int, pending: bool) {
+        Number = number
+        Pending = pending
+    }
+}
+
+func SameNumber(left: int, right: int) -> bool {
+    return left == right
+}
+
+func HashNumber(number: int) -> int {
+    return number
+}
+
+func Register(index: MutableMap<int, Order>, orders: ArrayList<Order>, order: Order) -> bool {
+    if !index.TryAdd(order.Number, order) {
+        return false
+    }
+    orders.Add(order)
+    return true
+}
+
+func PendingOrder(index: Map<int, Order>, number: int) -> Option<Order> {
+    let order = index.Find(number)?
+    if !order.Pending {
+        return Option<Order>(None())
+    }
+    return Option<Order>(Some<Order>(order))
+}
+
+func OnlyPending(orders: Iterable<Order>) -> Result<Order, SingleError> {
+    let order = orders.Where((order: Order) -> bool => order.Pending).Single()?
+    return .Ok(order)
+}
+
+func PrintPending(orders: Iterable<Order>) {
+    match OnlyPending(orders) {
+        Ok(let order) => WriteLine(order.Number)
+        Error(let error) => WriteLine(error.ToString())
+    }
+}
+
+func Main() {
+    let index = HashMap<int, Order>(SameNumber, HashNumber)
+    let orders = ArrayList<Order>()
+    let batch: Order[] = [Order(101, true), Order(202, false), Order(303, true)]
+    for order in batch {
+        Register(index, orders, order)
+    }
+    if !Register(index, orders, Order(101, false)) {
+        WriteLine("Duplicate order rejected")
+    }
+    WriteLine(index.Count)
+    WriteLine(orders.Count)
+
+    match PendingOrder(index, 999) {
+        Some(let order) => WriteLine(order.Number)
+        None => WriteLine("Unknown order")
+    }
+    match PendingOrder(index, 202) {
+        Some(let order) => WriteLine(order.Number)
+        None => WriteLine("Order already shipped")
+    }
+    PrintPending(orders)
+
+    // Concrete filtering creates separate list storage, retaining order identities.
+    let pending = orders.FindAll((order: Order) -> bool => order.Pending)
+    WriteLine(pending.Count)
+    match index.Find(101) {
+        Some(let order) => order.Pending = false
+        None => WriteLine("Missing registered order")
+    }
+    if !pending[0].Pending {
+        WriteLine("Filtered orders share identity")
+    }
+    WriteLine(pending.Count)
+    PrintPending(orders)
+
+    // Interface queries compose; array iteration uses the same Iterable contract.
+    let numbers = batch.Where((order: Order) -> bool => order.Pending)
+        .Select((order: Order) -> int => order.Number).ToList()
+    for number in numbers {
+        WriteLine(number)
+    }
+    match orders.FindIndex((order: Order) -> bool => order.Number == 101) {
+        Some(let position) => WriteLine(position)
+        None => WriteLine("No matching position")
+    }
+    match index.Find(303) {
+        Some(let order) => order.Pending = false
+        None => WriteLine("Missing registered order")
+    }
+    PrintPending(orders)
+}

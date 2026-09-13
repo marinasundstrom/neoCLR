@@ -213,3 +213,14 @@ with the same target configuration used for the full library checks. Run
 and retain `--test predicate_search` for the historical Neo profile regression.
 The .NET comparison is `dotnet run --project docs/experiments/list-filters/dotnet`.
 These source changes do not refresh the installed .11 SDK or VSIX.
+
+## Combined collection application checks
+
+The [order collection scenario](../../raven-order-workflow.md#collection-integration-scenario-2026-09-13-source-slice)
+uses application-defined class payloads through HashMap, ArrayList filtering and
+array/interface queries with Option/Result propagation. Run `verify_application.py`
+against the actual candidate: it includes GC-pressure and hash-collision variants.
+The full editor invocation with `--maps` also checks member discovery on application
+payloads after lookup and filtering. The sample and expected output are included
+by the existing sample-directory packaging step. Keep this source capability distinct
+from already published or installed builds lacking the newer library metadata.

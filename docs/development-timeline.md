@@ -2476,3 +2476,30 @@ satisfy exhaustiveness checking; importing Option cases and destructuring Some
 fixed the sample without a compiler change. The .NET comparison ran targeting
 net10.0. No new SDK/extension was installed and no release was published in this
 slice. Historical Neo behavior remains separate and unchanged.
+
+## 2026-09-13 — Testing the collection slices together
+
+**Context and proposal.** After the ArrayList filtering commit, the author directed
+continuation. The assistant selected an integration slice: combine the new Map,
+filtering and LINQ terminal APIs in an order application before expanding the API.
+This follows the author's earlier request to evaluate the platform through realistic
+programs and allocation-aware concrete collection use; the particular scenario is
+an assistant proposal, not a newly specified author requirement.
+
+**Action.** Added an Order class, duplicate-preserving registration, Option lookup
+and propagation, direct FindAll filtering, array/interface query composition and
+Result-based Single handling. The sample demonstrates that filtered membership is
+fixed at creation while class instances remain shared with the map and source list.
+No runtime or Raven compiler change was required. The documented current limits
+include explicit hash/equality callbacks, no transactional registration and no
+concurrency guarantee.
+
+**Outcome and evidence.** The [collection workflow](raven-order-workflow.md#collection-integration-scenario-2026-09-13-source-slice)
+runs unchanged under colliding hashes and with additional garbage-collection pressure.
+Validation passed 15 application checks and 61 editor checks, including inferred
+Order members through map lookup and filtered-list access. The assistant initially
+wrote a None construction without the required constructor invocation; correcting
+the sample to None() resolved the import failure. This does not establish improved
+compiler diagnostics for that invalid expression. The source sample and release
+procedure are ready for inclusion by the existing bundle builder; no package,
+installation or publication occurred in this slice.

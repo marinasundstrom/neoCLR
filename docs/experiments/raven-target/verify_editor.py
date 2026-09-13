@@ -433,6 +433,23 @@ try:
             assert {'Count', 'Keys', 'Find', 'ContainsKey'}.issubset(labels), labels
             assert ('TryAdd' in labels) == mutable and ('Set' in labels) == mutable, labels
             results['Map capabilities ' + shape] = labels
+        for version, label, body in (
+            (58, 'Order map payload', 'match index.Find(101) {\nSome(let order) => order.\nNone => ()\n}'),
+            (59, 'Order filtered element', 'let order = values.FindAll((order: Order) -> bool => true)[0]\norder.')):
+            text = ('import System.*\nimport System.Collections.*\nimport System.Option.*\n'
+                    'class Order { var Number: int }\n'
+                    'func Inspect(index: Map<int, Order>, values: ArrayList<Order>) {\n' + body + '\n}')
+            lines = text.splitlines()
+            line = next(i for i, value in enumerate(lines) if value.endswith('order.'))
+            send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version},
+                'contentChanges': [{'text': text}]})
+            result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
+                'position': {'line': line, 'character': len(lines[line])},
+                'context': {'triggerKind': 2, 'triggerCharacter': '.'}}, True))
+            items = result if isinstance(result, list) else result['items']
+            labels = sorted({item['label'] for item in items})
+            assert 'Number' in labels, labels
+            results[label] = labels
     receive(send('shutdown', None, True))
     send('exit', None)
     print(json.dumps(results, indent=2))

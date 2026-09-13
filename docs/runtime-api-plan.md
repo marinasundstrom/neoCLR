@@ -8,7 +8,8 @@ BCL before the platform is useful. Follow the [platform direction](platform-dire
 The first [generic managed-array prototype](generic-managed-arrays.md) now runs in
 the Raven profile, including declared Iterable<T>, indexed array loops and shared
 extension-method use. NativeMemory replaces the old native descriptor without an
-alias. Next refine the minimal counted/indexed collection contracts; full compiler
+alias. The minimal counted/indexed collection prototype and its Map/filter/query
+integration are now exercised by the [order workflow](raven-order-workflow.md#collection-integration-scenario-2026-09-13-source-slice); full compiler
 projection of the generic array name and native conversion support remain bounded
 follow-ups, not prerequisites for ordinary T[] use.
 
@@ -114,7 +115,7 @@ Result<T,SingleError> with Empty and Multiple cases, in the Raven profile.
 Filtering composes through Where; the [query API](raven-query-api.md) records the
 .NET comparison, normal-outcome disposal and terminal-fault limits. Aggregation,
 predicate overloads and specialized paths remain open. This implementation is
-separate from Map and the upcoming ArrayList work.
+separate from Map and the subsequently completed ArrayList filtering work.
 
 
 ### ArrayList filtering prototype (2026-09-13)
