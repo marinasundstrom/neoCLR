@@ -21,7 +21,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
         shutil.copyfile(args.project.resolve().parent / name, root / name)
     command = [sys.executable, str(bridge / 'run_project.py'), str(root / 'Demo.rvnproj'),
                '--raven', str(args.raven.resolve()), '--runtime', str(args.runtime.resolve())]
-    cases = [('ErrorValues', 'library-errors.rvn', (bridge / 'samples/library-errors.expected.txt').read_text()),
+    cases = [('GenericUnions', 'library-unions.rvn', 'Ok\n0\nError\nFailure\n0\nFailure\nFound\nNone\n0\n'),
+             ('ErrorValues', 'library-errors.rvn', (bridge / 'samples/library-errors.expected.txt').read_text()),
              ('Calendar', 'library-calendar.rvn', '2024\n2\n29\n60\n738944\n0\nSame date\nDate accepted\n1\n1\n1\n1\n0\n0\nSame date\nDate accepted\nInvalid date\nInvalid date\n' + '12\n34\n56\n789\n7890123\n0\n0\nSame time\nTime accepted\n' * 2 + '0\n0\n0\n0\n0\n-1\n0\nSame time\nTime accepted\nInvalid time\nInvalid time\n'),
              ('Primitives', 'library-primitives.rvn', '-1\n1\n-1\n1\n1\n1\n0\n0\n0\n-1\n-1\nDigit\nNumber\nLetter\nUpper\nLower\nSeparator\nControl\nPunctuation\nSymbol\nSurrogate\nHigh\nLow\nASCII\nASCII digit\nLetter or digit\nWhitespace\n'),
              ('FloatingMath', 'library-floating-math.rvn', '0\n' * 19 + '-1\n'),

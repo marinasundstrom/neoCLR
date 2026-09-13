@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Generalized Raven Option/Result bindings for admitted primitive, string, calendar,
+  error and nested union payloads. Exposed factories, predicates, checked case
+  access and extraction/propagation members, retaining guarded-output validation.
+  Handle both Raven pattern branch forms; added nested execution, rejection and
+  completion checks. Arbitrary application/reference payloads remain unsupported.
+
 - Projected existing error-value constructors, predicates, checked accessors and
   ToString APIs, including all 23 nested error cases and System.Error message APIs.
   Added complete case round-trips, wrong-case/default rejection checks and completion.

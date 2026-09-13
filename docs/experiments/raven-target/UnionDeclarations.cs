@@ -17,6 +17,12 @@ static class UnionDeclarations
         public struct PropagationUnit { }
         [System.Runtime.CompilerServices.Union]
         public struct Option<T> : Propagatable<Option<T>, T, PropagationUnit> {
+            public bool IsSome => false;
+            public bool IsNone => false;
+            public Option.Some<T> GetSomeCase() => default;
+            public Option.None GetNoneCase() => default;
+            public bool TryGet(out Option.Some<T> value) { value = default; return false; }
+            public bool TryGet(out Option.None value) { value = default; return false; }
             public bool TryGetOutput(out T output) { output = default; return false; }
             public bool TryGetResidual(out PropagationUnit residual) { residual = default; return false; }
             public static Option<T> FromResidual(PropagationUnit residual) => default;
@@ -38,6 +44,16 @@ static class UnionDeclarations
         }
         [System.Runtime.CompilerServices.Union]
         public struct Result<T, E> : Propagatable<Result<T, E>, T, E> {
+            public static Result<T, E> Ok(T value) => default;
+            public static Result<T, E> Error(E error) => default;
+            public bool IsOk => false;
+            public bool IsOkCase => false;
+            public bool IsErr => false;
+            public bool IsErrorCase => false;
+            public Result.Ok<T> GetOkCase() => default;
+            public Result.Error<E> GetErrorCase() => default;
+            public bool TryGet(out Result.Ok<T> value) { value = default; return false; }
+            public bool TryGet(out Result.Error<E> value) { value = default; return false; }
             public bool TryGetOutput(out T output) { output = default; return false; }
             public bool TryGetResidual(out E residual) { residual = default; return false; }
             public static Result<T, E> FromResidual(E residual) => default;

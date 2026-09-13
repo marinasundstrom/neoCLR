@@ -8,6 +8,7 @@ import threading
 
 project = Path(sys.argv[1]).resolve()
 collections = '--collections' in sys.argv[2:]
+unions = '--unions' in sys.argv[2:]
 errors = '--errors' in sys.argv[2:]
 calendar = '--calendar' in sys.argv[2:]
 primitives = '--primitives' in sys.argv[2:]
@@ -218,6 +219,19 @@ try:
             labels = sorted({item['label'] for item in items})
             if any(not any(label == name or label.startswith(name + '(') for label in labels) for name in expected):
                 raise AssertionError('Missing error API: ' + str(labels))
+            results[expression] = labels
+    if unions:
+        for version, expression, expected in (
+            (23, 'result.', ('IsOk', 'IsErr', 'GetOkCase', 'GetErrorCase', 'TryGet', 'TryGetOutput', 'TryGetResidual')),
+            (24, 'option.', ('IsSome', 'IsNone', 'GetSomeCase', 'GetNoneCase', 'TryGet'))):
+            text = 'import System.*\nfunc Main() {\n    let result = Result<long, Error>.Ok(42L)\n    let option = Option<string>(Option.None())\n    ' + expression + '\n}'
+            send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})
+            result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
+                'position': {'line': 4, 'character': len('    ' + expression)}, 'context': {'triggerKind': 1}}, True))
+            items = result if isinstance(result, list) else result['items']
+            labels = sorted({item['label'] for item in items})
+            if any(not any(label == name or label.startswith(name + '(') for label in labels) for name in expected):
+                raise AssertionError('Missing union API: ' + str(labels))
             results[expression] = labels
     receive(send('shutdown', None, True))
     send('exit', None)
