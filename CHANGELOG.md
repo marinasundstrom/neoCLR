@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Extended experimental bundle packaging with the application and order-workflow
+  validation scripts and documented how to try the new samples. Updated bundle
+  capability boundaries; package validation now includes dispatch, captures and GC.
+
 - Extended runtime delegate binding to nominal heap receivers and the Raven source
   bridge to instance/virtual/interface method groups and shared or escaping lambda
   captures through Func, including Func<Void>. Added binding-time null checks,

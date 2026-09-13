@@ -103,7 +103,11 @@ the new artifact paths. Record actual paths and versions in the build manifest.
 
 The stdio server checks, saved-project checks, match matrix and file probes in this
 folder are repeatable development evidence. Run them with the packaged server and
-compiler/bridge where the distribution supports it; source-checkout checks alone do
+compiler/bridge where the distribution supports it. Include `verify_application.py`
+and `verify_orders.py` from the bundle: these verify application type semantics,
+interface/virtual dispatch, escaping/shared captures, GC and order persistence using
+the packaged bridge/runtime. Their temporary projects preserve the installed demo.
+Source-checkout checks alone do
 not establish that the packages work.
 
 ## Publish and repeat

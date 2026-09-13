@@ -33,6 +33,11 @@ Raven entry points. Continue with Raven and VS Code:
    `library-value-interfaces.rvn`, or `library-reference-payloads.rvn`. The file sample
    creates `neoclr-file-demo.txt` in the working directory. Native buffers require an
    unsafe context and explicit Free; ordinary objects/arrays use GC.
+6. Try `application-types.rvn`, `application-interfaces.rvn`,
+   `application-inheritance.rvn`, and `application-delegates.rvn` for application
+   classes, value copies, dispatch and shared or escaping lambda captures.
+   `application-orders.rvn` combines these library contracts in a small order workflow;
+   it creates or replaces `neoclr-orders.txt` in the working directory.
 
 Terminal equivalent, from this folder:
 
@@ -52,6 +57,16 @@ Run the repeatable Raven sample suite:
 python3 tools/verify_project.py demo/Demo.rvnproj --collections --bridge tools/bridge/Probe.dll --system lib/System.neoil --runtime bin/neoclr
 ```
 
+Check application semantics and the order workflow in temporary directories:
+
+```sh
+python3 tools/verify_application.py demo/Demo.rvnproj --bridge tools/bridge/Probe.dll --system lib/System.neoil --runtime bin/neoclr
+python3 tools/verify_orders.py demo/Demo.rvnproj --bridge tools/bridge/Probe.dll --system lib/System.neoil --runtime bin/neoclr
+```
+
+These checks include value copies versus class aliases, interface/virtual dispatch,
+callbacks surviving GC, saved-source rebuilding, file round trips and rejected writes.
+
 Run `configure.py` again after moving the extracted folder, because VS Code settings
 contain its resolved paths. The SDK selection is workspace-local; no global default
 is changed. The supplied language server is pinned to the bundle's compiler source.
@@ -59,8 +74,10 @@ is changed. The supplied language server is pinned to the bundle's compiler sour
 See **docs/raven-runtime-api-coverage.md** for the existing API surface, deliberate
 projection differences and unsupported compiler patterns. Recoverable failures use
 Result/Option; terminal faults are not catchable exception objects. The importer is
-bounded: arbitrary application types, general closures/virtual dispatch, rectangular
-arrays, nullable metadata and fault-unwind cleanup are not claimed. Reflection is
+bounded: generic application definitions, custom delegate declarations, value-receiver
+method groups, explicit/default interfaces, rectangular arrays, nullable metadata and
+fault-unwind cleanup are not claimed. See [application types](docs/raven-application-types.md)
+and [delegate boundaries](docs/raven-delegates-lambdas.md). Reflection is
 introspection-only. Rough API edges are part of this experiment and are open to feedback.
 
 **manifest.json** records exact source revisions, prerequisites and file hashes.
