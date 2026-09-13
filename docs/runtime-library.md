@@ -241,3 +241,9 @@ implementations once a port is verified. Finish with a clean-checkout bootstrap 
 an extracted-bundle consumer test. Broad generic importing and the reference-assembly
 build strategy are groundwork to implement, not completed capabilities. No library
 method has been ported to Raven in the predicate-overload checkpoint itself.
+
+### Migration paused for target evaluation (2026-09-14)
+
+The author subsequently directed a pause before authoring System classes. Evaluate
+Raven compiler fixes and coherent .NET/neoCLR targeting first. The scalar pilot remains
+locally preserved, not adopted; see the [assessment and resumption criteria](raven-target-evaluation.md).

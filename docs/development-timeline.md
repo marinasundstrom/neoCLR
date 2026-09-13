@@ -2537,3 +2537,27 @@ that the older .12 binaries contain it. The [library direction](runtime-library.
 records stable library identity, bootstrap metadata and generic-body importing as
 migration groundwork. The current bridge admits known generic API calls but rejects
 generic application bodies; the migration is not yet implemented by this checkpoint.
+
+## 2026-09-14 — Pause library migration and evaluate Raven target support
+
+- **Author:** Asked whether the Raven bridge should be evaluated before authoring
+  System classes in Raven, then directed a pause. Prioritize reviewing Raven changes
+  and integrating suitable bug fixes, followed by consistent target mapping rather
+  than an attached bridge that compensates for compiler behavior.
+- **Author:** Clarified that stable importing is crucial, but Raven itself should
+  handle .NET and neoCLR targets. Earlier comments distinguished namespace functions
+  from their CLI container and rejected NotImplementedException as a neoCLR API.
+- **Assistant:** Proposed separating general compiler fixes, reusable target
+  configuration and temporary neoCLR adapters. Retain shared CIL emission where it
+  fits; the importer should validate and resolve the emitted contract.
+- **Actions:** Paused and locally stashed the scalar Math migration, inventoried the
+  37 Raven experiment commits and inspected metadata, iteration, propagation and
+  application-import boundaries. Recorded [the assessment](raven-target-evaluation.md)
+  with review batches, target-layer responsibilities and migration exit criteria.
+- **Finding:** Reproduced the author's string-filter screenshot in a disposable
+  project. Adding missing String equality operator metadata made the query run
+  without Raven changes; collection-interface conversion was not the failing step.
+- **Outcome/open work:** Migration is paused. No Raven fixes have been merged by this
+  review; integration requires dependency review and tests on proposed branches.
+  Namespace-function identity projection and removing the metadata-only exception
+  placeholder remain explicit follow-up work. Installed demo files were preserved.

@@ -142,3 +142,11 @@ method with compiler/importer gaps resolved. Raven becomes the ordinary library
 source language; neoIL remains available for low-level implementation and testing.
 This implementation track takes precedence over adding unrelated API families.
 Preserve existing contracts and migrate verified bodies incrementally.
+
+### Revised priority: evaluate target support first (2026-09-14)
+
+The author paused the Raven library migration. The scalar pilot is preserved locally;
+it is not an adopted System implementation. Prioritize [Raven compiler stabilization
+and consistent target support](raven-target-evaluation.md): review general fixes for
+integration, unify target configuration, then establish metadata-driven importer and
+library-body capabilities. This supersedes the immediate migration track above.

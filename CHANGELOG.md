@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-14
 
+- Paused the Raven runtime-library migration at the author's direction, preserving
+  the scalar pilot locally. Recorded the Raven branch assessment, compiler-fix review
+  batches and a plan for coherent target configuration and metadata-driven importing.
+  Updated the roadmap and conversation record; no Raven branch was merged and broad
+  library-authoring support remains unimplemented.
+
 - Fixed Raven string equality/inequality by declaring the missing target String
   operators and binding them to existing value equality. Interface query predicates
   now compile without changing Raven or CLI reference comparison semantics. Added
