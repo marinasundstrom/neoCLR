@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Recorded the implementation-language discussion, distinguishing Rust build
+  dependencies and implementation memory safety from neoCLR's guest GC; language
+  migration remains an open question, with no runtime changes.
+
 - Published Preview 4 at c135659 with eight runtime/Raven/source/validation assets
   after all six exact-source CI jobs and ten package suites passed. Updated the
   website download link, current installation guide and published validation record;

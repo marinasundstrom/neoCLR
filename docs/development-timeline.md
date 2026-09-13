@@ -1833,6 +1833,38 @@ evidence. The website now links the release; the local demo uses the released bu
 The [validation record](preview-4-validation.md) distinguishes source platform checks
 from macOS arm64 binary support and preserves the POC's limitations.
 
+## 2026-09-13 — Rust dependency and alternative implementation languages
+
+**Author questions.** Asked whether C++ or another implementation language would
+be better for neoCLR and remove its Rust dependency, then specifically asked what
+would be lost without Rust's memory-management model.
+
+**Assistant assessment.** Distinguished the implementation's memory safety from
+the guest heap and GC: changing language does not inherently change neoCLR's
+managed type or memory contracts. Rust ownership checks protect implementation
+lifetimes; C++ RAII and smart pointers provide resource management but do not supply
+the same general borrow checking. C++ is a viable runtime implementation choice,
+as CoreCLR's native VM illustrates, with more responsibility for lifetime correctness.
+Rust does not prove guest GC rooting or unsafe/FFI code correct. A rewrite has no
+demonstrated performance benefit here. Provisionally favor keeping Rust unless a
+concrete tooling, integration or maintenance need justifies migration; this is an
+assistant recommendation, not an author decision.
+
+**Evidence and action.** Inspected Cargo.toml, the execution architecture and native
+memory/interop call sites. `otool -L target/release/neoclr` listed only macOS
+libSystem, demonstrating no separate dynamically linked Rust library for that local
+binary, not all distribution targets. Build-time Rust remains required. Consulted
+the [Rust ownership documentation](https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html),
+[unsafe documentation](https://doc.rust-lang.org/book/ch20-01-unsafe-rust.html),
+[linkage reference](https://doc.rust-lang.org/reference/linkage.html), and
+[CoreCLR VM build sources](https://github.com/dotnet/runtime/blob/main/src/coreclr/vm/CMakeLists.txt)
+on 2026-09-13. These are general comparisons against live documentation/main,
+not a pinned implementation study or benchmark. The existing
+[architecture](execution-architecture.md) already separates semantics from Rust
+representations and leaves a native hosting ABI pending. Only this discussion and
+its changelog entry were recorded; no implementation migration was performed.
+The desired degree of build-tool independence and any migration decision remain open.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the
