@@ -1,5 +1,6 @@
 import System.*
 import System.Collections.*
+import System.Linq.*
 import System.IO.*
 import System.Console.*
 import System.Result.*
@@ -19,6 +20,7 @@ class Order {
 interface OrderStore {
     func Add(order: Order)
     func Find(id: int) -> Option<Order>
+    func Pending() -> Iterable<Order>
     func Save(order: Order, limit: int) -> Result<System.Void, FileWriteError>
 }
 
@@ -29,6 +31,9 @@ class FileOrderStore : OrderStore {
     }
     func Add(order: Order) {
         orders.Add(order)
+    }
+    func Pending() -> Iterable<Order> {
+        return orders.Where((order: Order) -> bool => order.Status.Equals("Queued"))
     }
     func Find(id: int) -> Option<Order> {
         for order in orders {
@@ -70,6 +75,7 @@ func Main() {
     let second = Order(8, "Tea")
     store.Add(first)
     store.Add(second)
+    let pending = store.Pending()
     Process(store, 7, 64)
     Process(store, 8, 2)
     Process(store, 99, 64)
@@ -78,5 +84,10 @@ func Main() {
     match File.ReadAllText("neoclr-orders.txt", 64) {
         Ok(let text) => WriteLine(text)
         Error(let error) => WriteLine("Order report could not be read")
+    }
+    let pendingNames = pending.Select((order: Order) -> string => order.Name).ToList()
+    WriteLine("Pending orders")
+    for name in pendingNames {
+        WriteLine(name)
     }
 }

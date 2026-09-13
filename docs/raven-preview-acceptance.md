@@ -29,14 +29,15 @@ or naming familiarity alone does not imply .NET compatibility or a settled contr
 
 | Area | Required evidence before public preview | Current state |
 | --- | --- | --- |
-| Value/reference behavior | Value-carrier copies remain independent; class and array aliases share mutations | Verified in the combined Raven project checks; arbitrary application class import remains outside the bounded profile |
-| Runtime library | Calls execute neoCLR library implementations, not metadata stubs or host .NET implementations | Partial: the admitted Math, Console, union and collection APIs work; audit and close all existing public API gaps before release |
+| Value/reference behavior | Value-carrier copies remain independent; class and array aliases share mutations | Verified in saved-project and application checks, including bounded application classes, value copies, inheritance and interfaces; [import limits](raven-application-types.md) remain explicit |
+| Runtime library | Calls execute neoCLR library implementations, not metadata stubs or host .NET implementations | The [existing library audit](raven-runtime-api-coverage.md) is complete for the bounded projection; declarations without concrete implementations are identified there |
 | Errors and absence | Success, expected error and absent-value paths use Result/Option | Verified with explicit case handling |
-| Propagation | Success continues; failure returns a compatible carrier; incompatible carriers are rejected | Bounded Result<Int32,OverflowError>, Option<Int32> and Result<Void,OverflowError> execute with early returns; file carriers also work, and other existing payload shapes remain to be projected |
-| Match syntax | Match expression and statement forms compile and execute; rejected forms and diagnostics are documented | [Bounded Raven matrix verified](raven-match-matrix.md): typed cases, both expression spellings and statement actions work; deconstruction/shorthand and arm-return caveats are documented |
+| Propagation | Success continues; failure returns a compatible carrier; incompatible carriers are rejected | Existing Result/Option payload projections, file errors and Result<Void,E> execute with early returns; [carrier and signature limits](raven-union-api.md) remain explicit |
+| Match syntax | Match expression and statement forms compile and execute; rejected forms and diagnostics are documented | [Bounded Raven matrix verified](raven-match-matrix.md): typed/imported cases, target-typed destructuring, both expression spellings and statement actions work; the statement-arm return caveat remains documented |
 | Text files | Read/write text, show expected I/O errors through Result, and demonstrate round-trip data | [Bounded read/write projection verified](raven-file-api.md), including propagation, typed matches and temporary-file checks; [error-type APIs are projected](raven-error-api.md) |
 | Date and time | Obtain the system's current local date/time using the separate date/time library concepts | [Existing calendar/clock APIs are projected](raven-calendar-api.md); full formatting/globalization is not required |
-| VS Code | Completion resolves target APIs and the saved project runs through the neoCLR task | Verified using the installed experimental extension server and prepared workspace |
+| VS Code | Completion resolves target APIs and the saved project runs through the neoCLR task | Verified with the isolated [local .8 SDK/extension](raven-query-local-build.md), target completion/hover and packaged tasks |
+| Queries and callbacks | Deferred filtering/projection, materialization and generic target interfaces work together | [Where/Select/ToList](raven-query-api.md), captured callbacks and custom Raven iterators pass; [the order workflow](raven-order-workflow.md) combines queries with Result/Option and file I/O |
 | Reflection | List useful type/member information from the target runtime | [Public introspection APIs are projected](raven-reflection-api.md), including class descriptors and flags |
 
 Normal execution prints only guest output. Return-value and GC inspection are opt-in
@@ -58,9 +59,12 @@ forms explicitly rather than declaring a type covered because one method works.
 Language and runtime feature limits may remain documented, but must not silently hide
 an existing public API. Record necessary type-category/contract adaptations and their
 .NET comparison. Refresh and test the packaged tools after the coverage work; the
-current installed SDK/extension is 0.1.12-neoclr.6. The existing API audit and nine
-outside-checkout package suites are complete; see [coverage](raven-runtime-api-coverage.md)
-and [build provenance](experiments/raven-target/local-toolchain.json).
+latest local SDK/extension is 0.1.12-neoclr.8. Its six packaged suites include 50
+saved-project checks, 14 query checks, application/workflow checks, direct NeoIL and
+editor coverage; see [current build provenance](experiments/raven-target/query-toolchain.json).
+The earlier .6 audit and nine-suite package record remains historical evidence for
+that build. The updated order-summary sample runs on .8 but was added after packaging;
+its new source checks do not retroactively change the archive validation record.
 
 ## Distribution boundary
 

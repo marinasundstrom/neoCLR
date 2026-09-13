@@ -23,13 +23,18 @@ with tempfile.TemporaryDirectory(prefix='neoclr-order-workflow-') as temporary:
     source = (bridge / 'samples/application-orders.rvn').read_text()
     (root / 'Main.rvn').write_text(source)
     run = subprocess.run(command, cwd=root, capture_output=True, text=True, timeout=120)
-    expected = 'Saved\nOrder report exceeds limit\nOrder not found\nSaved\nQueued\nOrder: Coffee\n'
+    expected = 'Saved\nOrder report exceeds limit\nOrder not found\nSaved\nQueued\nOrder: Coffee\nPending orders\nTea\n'
     assert run.returncode == 0 and run.stdout.endswith(expected), run.stdout + run.stderr
     assert (root / 'neoclr-orders.txt').read_text() == 'Order: Coffee'
     (root / 'Main.rvn').write_text(source.replace('neoclr-orders.txt', 'missing-parent/report.txt'))
     run = subprocess.run(command, cwd=root, capture_output=True, text=True, timeout=120)
-    expected = 'Order report could not be written\nOrder report exceeds limit\nOrder not found\nQueued\nQueued\nOrder report could not be read\n'
+    expected = 'Order report could not be written\nOrder report exceeds limit\nOrder not found\nQueued\nQueued\nOrder report could not be read\nPending orders\nCoffee\nTea\n'
     assert run.returncode == 0 and run.stdout.endswith(expected), run.stdout + run.stderr
     assert (root / 'neoclr-orders.txt').read_text() == 'Order: Coffee'
     assert not (root / 'missing-parent').exists()
-print(json.dumps({'workflow': 'passed', 'persisted_report': 'passed', 'failed_write_preserves_state': 'passed', 'missing_parent_errors': 'passed'}, indent=2))
+    (root / 'Main.rvn').write_text(source.replace('Process(store, 8, 2)', 'Process(store, 8, 64)'))
+    run = subprocess.run(command, cwd=root, capture_output=True, text=True, timeout=120)
+    expected = 'Saved\nSaved\nOrder not found\nSaved\nSaved\nOrder: Tea\nPending orders\n'
+    assert run.returncode == 0 and run.stdout.endswith(expected), run.stdout + run.stderr
+    assert (root / 'neoclr-orders.txt').read_text() == 'Order: Tea'
+print(json.dumps({'workflow': 'passed', 'persisted_report': 'passed', 'failed_write_preserves_state': 'passed', 'missing_parent_errors': 'passed', 'deferred_pending_summary': 'passed', 'all_saved_summary_is_empty': 'passed'}, indent=2))

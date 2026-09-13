@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Extended the order workflow with a deferred pending-order query and materialized
+  name summary, exercising queries, interfaces, Result/Option patterns and file I/O
+  together on the installed .8 tools. Added failed-write and all-saved summary checks,
+  prepared a separate local demo, and corrected stale preview-readiness descriptions.
+  This sample update does not change the archived .8 build or its recorded results.
+
 - Built and installed local Raven SDK/VS Code extension 0.1.12-neoclr.8 with the
   pattern, query and custom-iterator fixes. Prepared an isolated query demo and
   recorded six passing packaged suites and artifact hashes. Preserved existing

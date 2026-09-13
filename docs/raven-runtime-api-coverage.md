@@ -41,6 +41,14 @@ and invalid-default faults, callback faults and native buffer lifetime. Editor c
 exercise target completion. A source coverage record does not substitute for running
 these checks; it provides a reviewable checklist when the library changes.
 
+## Subsequent Raven-target APIs
+
+The original inventory above follows `runtime/System.neoil`; its 614 candidates do
+not include later target-specific files. The generic Where/Select/ToList surface in
+`runtime/raven/Linq.neoil` has separate [query contract and executable coverage](raven-query-api.md),
+including custom Raven Iterable implementations. This distinction keeps the existing
+library migration audit separate from subsequent API additions.
+
 ## Projection decisions and remaining boundaries
 
 - Types and arrays use the target's CLR-like value/reference categories. Reflection
