@@ -54,6 +54,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
                   ('ValueInterfaces', 'library-value-interfaces.rvn', '0\n1\nEqual integer\nEqual string\nEqual type\n0\nEqual date\n0\n0\n'),
                   ('NativeBuffer', 'library-native-buffer.rvn', '3\n7\n42\n99\n100\n2\n42\n0\n0\nNative Boolean\n'),
                   ('Flags', 'library-flags.rvn', '28\n8\n20\n-29\n0\nSame flags\nPublic included\n5\nStoredDayNumber\n'),
+                  ('ArrayForEach', 'library-array-foreach.rvn', 'Parse\nDivide\nEquals\nToString\nCompareTo\n42\n1\n2\n3\n'),
                   ('Reflection', 'library-reflection.rvn', (bridge / 'samples/library-reflection.expected.txt').read_text()),
                   ('ArrayCallbacks', 'library-array-callbacks.rvn', '7\n42\nFirst\nSecond\n'),
                   ('Delegates', 'library-delegates.rvn', '42\n' * 5 + 'Done\n1\nExists\n42\n-1\nNone\n'),

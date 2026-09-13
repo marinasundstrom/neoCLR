@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Fixed Raven vector `for` loops, including reflection method arrays, by admitting
+  the existing CLI `bge`/short branch in the importer with operand and control-flow
+  validation. Added empty/singleton/multiple-element regression coverage. This fixes
+  a Preview 5 importer gap for the next release; published artifacts are unchanged.
+
 - Published Preview 5 at c76ee57 with eight verified assets after all six exact-source
   CI jobs and thirteen package suites passed. Recorded publication evidence, match
   checks and artifact provenance; published release notes remain unchanged.

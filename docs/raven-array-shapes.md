@@ -18,3 +18,16 @@ loads normalize to CLI integers before branch joins. Array covariance and rectan
 arrays remain outside this importer. Ordinary arrays still require valid defaults;
 ArrayList uses its separate reserved-capacity mechanism for non-defaultable unions.
 No arbitrary application types or general pointer element arrays are claimed here.
+
+## Direct array iteration after Preview 5
+
+Raven lowers a `for` loop over a vector to indexed loads and an ordinary CLI `bge`
+exit branch. The bridge now admits `bge` and its short form for matching Int32,
+Int64 or Double operands, preserving the runtime's existing comparison semantics
+and control-flow validation. Preview 5 rejected this instruction even though direct
+indexing worked. No runtime opcode or Raven compiler change is needed.
+
+The [array iteration sample](experiments/raven-target/samples/library-array-foreach.rvn)
+covers reflected method arrays and empty, singleton and multiple-element integer
+vectors. This is development support for the next release; published Preview 5
+and existing installed bundles remain unchanged.

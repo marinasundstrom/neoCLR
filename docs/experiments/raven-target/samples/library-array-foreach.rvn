@@ -1,0 +1,23 @@
+import System.*
+import System.Console.*
+
+func Main() {
+    for member in typeof(int).GetMethods() {
+        WriteLine(member.Name)
+    }
+
+    let empty: int[] = []
+    for value in empty {
+        WriteLine("Unexpected empty-array element")
+    }
+
+    let singleton: int[] = [42]
+    for value in singleton {
+        WriteLine(value)
+    }
+
+    let values: int[] = [1, 2, 3]
+    for value in values {
+        WriteLine(value)
+    }
+}

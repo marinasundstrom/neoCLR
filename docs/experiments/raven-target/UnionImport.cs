@@ -419,6 +419,13 @@ static class UnionImport
                     case Code.Dup: var top = Pop(); Push(top); Push(top); if (top.Type != "FaultNull") code.AppendLine("dup"); break;
                     case Code.Br: case Code.Br_S:
                         var branch = Target(); successors.Add(branch); code.AppendLine($"br M{method.MetadataToken.ToUInt32():x8}_IL_{instructions[branch].Offset:x4}"); terminates = true; break;
+                    case Code.Bge: case Code.Bge_S:
+                        var comparisonRight = Pop(); var comparisonLeft = Pop();
+                        if (comparisonLeft.Type != comparisonRight.Type || comparisonLeft.Type is not ("Int32" or "Int64" or "Double"))
+                            throw new InvalidDataException("Unsupported ordered branch operands.");
+                        var comparisonTarget = Target(); successors.Add(comparisonTarget);
+                        code.AppendLine($"bge M{method.MetadataToken.ToUInt32():x8}_IL_{instructions[comparisonTarget].Offset:x4}");
+                        break;
                     case Code.Brtrue: case Code.Brtrue_S: case Code.Brfalse: case Code.Brfalse_S:
                         var condition = Pop();
                         if (condition.Type is not ("Int32" or "Boolean")) throw new InvalidDataException("Invalid branch condition.");
