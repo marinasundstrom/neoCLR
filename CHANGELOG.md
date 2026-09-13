@@ -17,10 +17,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   ObjectReference::concrete_type accessor now returns an owned Type so array concrete
   identity can be recovered independently of its interface view.
 
-- Fixed Raven vector `for` loops, including reflection method arrays, by admitting
-  the existing CLI `bge`/short branch in the importer with operand and control-flow
-  validation. Added empty/singleton/multiple-element regression coverage. This fixes
-  a Preview 5 importer gap for the next release; published artifacts are unchanged.
+- Fixed Raven vector `for` loops and ordinary numeric comparisons/query predicates
+  by admitting the existing CLI numeric comparison and conditional branch families
+  in the importer, including short and unsigned/unordered forms. Operand and
+  control-flow validation remain enforced; Boolean results use the existing CLI
+  adapter. Added array-loop and signed/unsigned/floating boundary regressions. This
+  fixes Preview 5 importer gaps for the next release. A companion fix on Raven's
+  experiment branch corrects unsigned and NaN comparison emission for both targets;
+  refreshed tools are required. Published artifacts remain unchanged.
 
 - Published Preview 5 at c76ee57 with eight verified assets after all six exact-source
   CI jobs and thirteen package suites passed. Recorded publication evidence, match

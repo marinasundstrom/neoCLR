@@ -2060,3 +2060,23 @@ the behavior required by ordinary emitted IL. The assistant agreed to keep contr
 selection target-neutral and to investigate missing runtime support before adding
 NeoCLR-specific compiler lowering. The array implementation follows that split:
 Raven projects the configured interface; neoCLR owns reference identity and dispatch.
+
+
+## 2026-09-13 — Stabilizing ordinary Raven programs
+
+**Author:** “Let's stabilize neoCLR.” The preceding direction was to keep Raven
+changes minimal and let neoCLR implement the contracts ordinary CLR features need.
+
+**Assistant proposal and action:** Focus on correctness rather than new features.
+A basic array query with `value > 1` reproduced an importer rejection of `cgt`,
+although the runtime already implemented it. Admitted the existing numeric comparison
+and branch families with operand/control-flow validation. Boundary tests then exposed
+Raven's signed emission for unsigned comparisons and unordered floating comparison
+errors; corrected those in the existing Raven experiment branch, without adding a
+neoCLR-specific compiler workaround.
+
+**Outcome and limits:** The updated query regression suite passes, including integer
+boundaries and NaN. The .NET execution test also passes. A wider Raven test run found
+an independent mixed `ulong`/`long` binding failure, reproduced with unchanged compiler
+code; it remains open. These are next-build fixes, not a new published release or a
+claim that the entire platform is stable. See the [comparison contract](raven-primitive-api.md#numeric-comparisons-after-preview-5).

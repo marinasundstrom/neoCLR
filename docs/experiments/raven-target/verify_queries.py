@@ -159,6 +159,43 @@ func Main() {
     WriteLine(units.Count)
 }
 ''', '42\n1\nBoolean\n0\n42\n1\n'))
+    # Exercise both expression results and conditional branches with the same
+    # nonconstant operands. Python supplies the expected IEEE/integer ordering.
+    operators = ('==', '!=', '<', '>', '<=', '>=')
+    numeric_cases = (
+        ('int', '-2147483648', -2147483648, '2147483647', 2147483647),
+        ('long', '-9223372036854775808L', -9223372036854775808, '9223372036854775807L', 9223372036854775807),
+        ('uint', '(uint)-1', 4294967295, '(uint)1', 1),
+        ('ulong', '(ulong)-1L', 18446744073709551615, '(ulong)1L', 1),
+        ('double', 'Math.Sqrt(-1.0)', float('nan'), '1.0', 1.0),
+        ('double', '-0.0', -0.0, '0.0', 0.0),
+        ('double', 'Math.Exp(1000.0)', float('inf'), '1.0', 1.0),
+    )
+    for index, (type_name, a_source, a, b_source, b) in enumerate(numeric_cases):
+        checks = []
+        expected = []
+        for left_source, left, right_source, right in (
+                ('a', a, 'b', b), ('b', b, 'a', a), ('a', a, 'a', a)):
+            for op in operators:
+                expression = f'{left_source} {op} {right_source}'
+                checks.append(f'    Show({expression})')
+                checks.append(f'    if {expression} {{\n        WriteLine(1)\n    }} else {{\n        WriteLine(0)\n    }}')
+                answer = {'==': left == right, '!=': left != right,
+                          '<': left < right, '>': left > right,
+                          '<=': left <= right, '>=': left >= right}[op]
+                expected.extend(['1' if answer else '0'] * 2)
+        source = header + 'func Show(value: bool) {\n    if value {\n        WriteLine(1)\n    } else {\n        WriteLine(0)\n    }\n}\n'
+        source += f'func Check(a: {type_name}, b: {type_name}) {{\n' + '\n'.join(checks) + '\n}\n'
+        source += f'func Main() {{\n    Check({a_source}, {b_source})\n}}\n'
+        cases.append((f'Numeric comparison boundary {index}: {type_name}', source, '\n'.join(expected) + '\n'))
+    cases.append(('Ordered query predicate', header + '''
+func Main() {
+    let values: int[] = [1, 2, 3]
+    for value in values.Where((value: int) -> bool => value > 1) {
+        WriteLine(value)
+    }
+}
+''', '2\n3\n'))
     for label, source, expected in cases:
         (root / 'Main.rvn').write_text(source)
         run = subprocess.run(command, capture_output=True, text=True, timeout=120)

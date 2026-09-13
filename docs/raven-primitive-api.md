@@ -44,3 +44,40 @@ and use **neoCLR: Run saved project**. The saved-project suite includes it;
 checks distinguish Char metadata from Int32 even though both use Int32 stack values.
 General Comparable interface dispatch and arbitrary generic primitive payloads
 remain separate coverage work.
+
+## Numeric comparisons after Preview 5
+
+The importer now admits `ceq`, `cgt`, `cgt.un`, `clt`, `clt.un` and numeric
+`beq`, `bne.un`, `bgt`, `blt`, `bge`, `ble` branches, including unsigned/unordered
+and short branch forms. Operands must share a supported numeric stack category;
+this does not add reference ordering or mixed-category implicit conversions.
+Both successors still pass the existing control-flow and stack verification.
+
+This closes a CLI importer gap rather than changing Raven or the instruction set.
+It reuses the runtime's [integer rules](integer-types.md) and
+[floating comparison rules](floating-point.md), based on ECMA-335: opcode
+signedness determines integer ordering, unordered floating comparisons preserve
+NaN behavior, and signed zero compares equal. The bridge converts neoCLR's Boolean
+comparison result to the CLI's canonical Int32 result using its existing Boolean
+adapter. This preserves current runtime behavior at the cost of an adapter call.
+
+`verify_queries.py` checks all six source comparison operators in expression and
+conditional contexts, with signed boundaries, unsigned high bits, NaN, infinity,
+and signed zero. It also runs an ordinary `Where(value => value > 1)` regression.
+These checks cover Raven's emitted forms, not every possible hand-authored CLI
+program. Native nonzero comparisons remain outside the validated Raven surface.
+Published Preview 5 tools do not contain this fix; it is for the next build.
+
+Raven experiment commit `09cf60417` selects unsigned comparison opcodes for
+unsigned operands and unordered comparisons when inverting floating `<`/`>` to
+implement `>=`/`<=`. Baseline Raven sorted high-bit unsigned values as negative;
+its inclusive floating comparisons could accept NaN. The correction is target-neutral
+and is tested by executing emitted assemblies on .NET as well as through neoCLR.
+It requires rebuilding the experimental compiler; changing the bridge alone cannot
+repair incorrect signedness already encoded in IL.
+
+Validation on 2026-09-13: 25 query checks (252 individual numeric expectations),
+51 saved-project checks, and five focused Raven code-generation tests passed.
+The wider Raven overlap run passed 24 tests and failed the existing
+`TryLookup_UlongMixedWithSignedIntegral_IsRejected` binding test; that failure was
+reproduced against unchanged compiler code and remains separate work.

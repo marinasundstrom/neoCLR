@@ -123,6 +123,13 @@ static class UnionImport
                 }
                 void Store(int n) { Local(n); ConvertTop(locals[n]); assigned[n] = true; code.AppendLine($"stloc local{n}"); }
                 void Arg(int n) { if (n < 0 || n >= args.Length) throw new InvalidDataException("Invalid parameter index."); Push(new(PrimitiveBindings.Stack(args[n]), Argument: args[n].EndsWith('&') ? n : -1)); code.AppendLine($"ldarg {n}"); }
+                bool NumericOperands()
+                {
+                    if (stack.Count < 2) return false;
+                    var left = PrimitiveBindings.Stack(stack[^2].Type);
+                    var right = PrimitiveBindings.Stack(stack[^1].Type);
+                    return left == right && left is "Int32" or "Int64" or "Double" or "IntPtr" or "UIntPtr";
+                }
                 int Target() => instruction.Operand is Instruction target && indexes.TryGetValue(target, out var n)
                     ? n : throw new InvalidDataException("Invalid branch target.");
                 var terminates = false;
@@ -412,7 +419,18 @@ static class UnionImport
                         Push(new("Int32")); code.AppendLine($"call {bits.Name}({string.Join(',', bits.Arguments)})"); break;
                     case Code.Not:
                         ConvertTop("Int32"); Push(new("Int32")); code.AppendLine("not"); break;
+                    case Code.Cgt: case Code.Cgt_Un: case Code.Clt: case Code.Clt_Un:
+                        if (!NumericOperands()) throw new InvalidDataException("Unsupported comparison operands.");
+                        Pop(); Pop(); Push(new("Int32"));
+                        code.AppendLine(instruction.OpCode.Name).Append(BooleanBindings.Convert("Boolean", "Int32"));
+                        break;
                     case Code.Ceq:
+                        if (NumericOperands())
+                        {
+                            Pop(); Pop(); Push(new("Int32"));
+                            code.AppendLine("ceq").Append(BooleanBindings.Convert("Boolean", "Int32"));
+                            break;
+                        }
                         var right = Argument("Int32"); var left = Argument("Int32"); Push(new("Int32"));
                         var equality = Coerce(new("RuntimeEqual", ["Int32", "Int32"], "Int32"), [left.Type, right.Type]);
                         code.AppendLine($"call {equality.Name}({string.Join(',', equality.Arguments)})"); break;
@@ -420,12 +438,17 @@ static class UnionImport
                     case Code.Dup: var top = Pop(); Push(top); Push(top); if (top.Type != "FaultNull") code.AppendLine("dup"); break;
                     case Code.Br: case Code.Br_S:
                         var branch = Target(); successors.Add(branch); code.AppendLine($"br M{method.MetadataToken.ToUInt32():x8}_IL_{instructions[branch].Offset:x4}"); terminates = true; break;
-                    case Code.Bge: case Code.Bge_S:
-                        var comparisonRight = Pop(); var comparisonLeft = Pop();
-                        if (comparisonLeft.Type != comparisonRight.Type || comparisonLeft.Type is not ("Int32" or "Int64" or "Double"))
-                            throw new InvalidDataException("Unsupported ordered branch operands.");
+                    case Code.Beq: case Code.Beq_S: case Code.Bne_Un: case Code.Bne_Un_S:
+                    case Code.Bgt: case Code.Bgt_S: case Code.Bgt_Un: case Code.Bgt_Un_S:
+                    case Code.Blt: case Code.Blt_S: case Code.Blt_Un: case Code.Blt_Un_S:
+                    case Code.Bge: case Code.Bge_S: case Code.Bge_Un: case Code.Bge_Un_S:
+                    case Code.Ble: case Code.Ble_S: case Code.Ble_Un: case Code.Ble_Un_S:
+                        if (!NumericOperands()) throw new InvalidDataException("Unsupported comparison branch operands.");
+                        Pop(); Pop();
                         var comparisonTarget = Target(); successors.Add(comparisonTarget);
-                        code.AppendLine($"bge M{method.MetadataToken.ToUInt32():x8}_IL_{instructions[comparisonTarget].Offset:x4}");
+                        var comparisonOpcode = instruction.OpCode.Name;
+                        if (comparisonOpcode.EndsWith(".s", StringComparison.Ordinal)) comparisonOpcode = comparisonOpcode[..^2];
+                        code.AppendLine($"{comparisonOpcode} M{method.MetadataToken.ToUInt32():x8}_IL_{instructions[comparisonTarget].Offset:x4}");
                         break;
                     case Code.Brtrue: case Code.Brtrue_S: case Code.Brfalse: case Code.Brfalse_S:
                         var condition = Pop();
