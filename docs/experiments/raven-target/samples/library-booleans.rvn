@@ -1,0 +1,26 @@
+import System.*
+import System.Console.*
+import System.Collections.*
+
+func Equal(value: int) -> bool { return value == 42 }
+func Show(first: bool, middle: int, last: bool) {
+    WriteLine(first.CompareTo(last))
+    WriteLine(middle)
+}
+func Main() {
+    let yes = true
+    let no = false
+    WriteLine(yes.CompareTo(no))
+    WriteLine(no.CompareTo(yes))
+    WriteLine(yes.CompareTo(true))
+    Show(true, 42, false)
+    if !no { WriteLine("Not false") }
+    if Equal(42) { WriteLine("Equal") }
+    if yes == no { WriteLine("Wrong") } else { WriteLine("Different") }
+    let option = Option<bool>(Option.Some<bool>(true))
+    if option is Option.Some<bool> some { WriteLine(some.Value.CompareTo(true)) }
+    let values = ArrayList<bool>()
+    values.Add(true)
+    values.Add(false)
+    for value in values { WriteLine(value.CompareTo(false)) }
+}

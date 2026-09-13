@@ -16,7 +16,8 @@ still pass dependency and signature validation.
 The importer admits ldc.i8, ldc.r4 and the existing ordinary conv.i1/u1/i2/u2/i4/u4/
 i8/u8/i/u/r4/r8/r.un instructions. It does not add checked conversions or a general
 numeric operator compiler. Boolean still uses the runtime's distinct stack value;
-this slice does not solve Boolean literal normalization or project Boolean.CompareTo.
+the later [Boolean boundary slice](raven-boolean-api.md) projects canonical Raven
+literals and Boolean.CompareTo without changing that runtime representation.
 
 ## Samples and compiler dependency
 

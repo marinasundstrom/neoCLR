@@ -8,6 +8,7 @@ import threading
 
 project = Path(sys.argv[1]).resolve()
 collections = '--collections' in sys.argv[2:]
+booleans = '--booleans' in sys.argv[2:]
 process_apis = '--process' in sys.argv[2:]
 unions = '--unions' in sys.argv[2:]
 errors = '--errors' in sys.argv[2:]
@@ -247,6 +248,16 @@ try:
             if any(not any(label == name or label.startswith(name + '(') for label in labels) for name in expected):
                 raise AssertionError('Missing process API: ' + str(labels))
             results[expression] = labels
+    if booleans:
+        text = 'func Main() {\n    let value = true\n    value.\n}'
+        send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': 27}, 'contentChanges': [{'text': text}]})
+        result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
+            'position': {'line': 2, 'character': 10}, 'context': {'triggerKind': 1}}, True))
+        items = result if isinstance(result, list) else result['items']
+        labels = sorted({item['label'] for item in items})
+        if not any(label == 'CompareTo' or label.startswith('CompareTo(') for label in labels):
+            raise AssertionError('Missing Boolean CompareTo: ' + str(labels))
+        results['Boolean'] = labels
     receive(send('shutdown', None, True))
     send('exit', None)
     print(json.dumps(results, indent=2))

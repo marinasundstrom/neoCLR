@@ -16,7 +16,7 @@ static class PrimitiveBindings
                 + (type == "Char" ? string.Join(" ", CharacterMethods.Select(n => $"public static bool {n}(char value) => false;")) : "") + " }");
         return source;
     }
-    public static bool IsReceiver(string type) => Types.Contains(type) || type is "Int32" or "Double";
+    public static bool IsReceiver(string type) => Types.Contains(type) || type is "Int32" or "Double" or "Boolean";
     public static string? Type(TypeReference type) => type.IsValueType
         && type.MetadataType is MetadataType.SByte or MetadataType.Byte or MetadataType.Int16 or MetadataType.UInt16
             or MetadataType.Char or MetadataType.UInt32 or MetadataType.Int64 or MetadataType.UInt64

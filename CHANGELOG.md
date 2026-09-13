@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Projected Boolean.CompareTo and Raven canonical Boolean literals/equality across
+  locals, parameters, returns and generic API calls. Typed adapters preserve argument
+  order and output contracts while retaining the runtime Boolean representation.
+  Added saved-source coverage; arbitrary CLI Boolean bit patterns remain unsupported.
+
 - Extended Raven collection bindings beyond Int32 to admitted primitive, String,
   calendar and empty-error elements, and exposed ArrayList.Copy. Added growth,
   aliasing, independent-copy, iteration, completion and invariant-signature checks.

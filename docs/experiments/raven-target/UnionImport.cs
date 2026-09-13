@@ -49,6 +49,22 @@ static class UnionImport
             return ProcessBindings.ArrayType(type) ?? GenericUnionBindings.Type(type) ?? CalendarBindings.Type(type) ?? PrimitiveBindings.Type(type) ?? ResultBindings.Type(type) ?? Type(type, result);
         }
         var output = new StringBuilder($".module ImportedUnion\n.entry {Name(entry)}\n");
+        var coercions = new Dictionary<string, (string Name, string Body)>();
+        Call Coerce(Call call, string[] actual)
+        {
+            if (!actual.Where((t, i) => BooleanBindings.Converts(t, call.Arguments[i])).Any()) return call;
+            var key = (call.Instruction ?? call.Name) + string.Join(',', call.Arguments) + string.Join(',', actual) + call.Result + call.OutArgument;
+            if (!coercions.TryGetValue(key, out var helper))
+            {
+                var name = "RuntimeCliCall" + coercions.Count;
+                var parameters = actual.Select((t, i) => (i == call.OutArgument ? (call.ConditionalOutput ? "out(true) " : "out ") : "") + t + " arg" + i);
+                var body = new StringBuilder($".function {name}({string.Join(',', parameters)}) -> {call.Result}\n");
+                for (var i = 0; i < actual.Length; i++) body.AppendLine("ldarg arg" + i).Append(BooleanBindings.Convert(actual[i], call.Arguments[i]));
+                body.AppendLine(call.Instruction ?? $"call {call.Name}({string.Join(',', call.Arguments)})").AppendLine("ret\n.end");
+                helper = (name, body.ToString()); coercions.Add(key, helper);
+            }
+            return call with { Name = helper.Name, Arguments = actual, Instruction = null };
+        }
         var mappings = new List<object>();
         var pending = new Queue<MethodDefinition>(); pending.Enqueue(entry);
         var seen = new HashSet<uint>();
@@ -88,7 +104,16 @@ static class UnionImport
                 Slot Expect(string type) { var top = Pop(); if (!CollectionBindings.Assignable(PrimitiveBindings.Stack(top.Type), PrimitiveBindings.Stack(type))) throw new InvalidDataException("Input stack type mismatch."); return top; }
                 int Local(int n) { if (n < 0 || n >= locals.Length) throw new InvalidDataException("Invalid local index."); return n; }
                 void Load(int n) { Local(n); if (!assigned[n]) throw new InvalidDataException("Read of uninitialized or unsupported default local."); Push(new(PrimitiveBindings.Stack(locals[n]))); code.AppendLine($"ldloc local{n}"); }
-                void Store(int n) { Local(n); Expect(locals[n]); assigned[n] = true; code.AppendLine($"stloc local{n}"); }
+                Slot ConvertTop(string type)
+                {
+                    if (stack.Count == 0 || !BooleanBindings.Converts(stack[^1].Type, type)) return Expect(type);
+                    var value = Pop(); code.Append(BooleanBindings.Convert(value.Type, type)); return value;
+                }
+                Slot Argument(string type)
+                {
+                    return stack.Count > 0 && BooleanBindings.Converts(stack[^1].Type, type) ? Pop() : Expect(type);
+                }
+                void Store(int n) { Local(n); ConvertTop(locals[n]); assigned[n] = true; code.AppendLine($"stloc local{n}"); }
                 void Arg(int n) { if (n < 0 || n >= args.Length) throw new InvalidDataException("Invalid parameter index."); Push(new(PrimitiveBindings.Stack(args[n]))); code.AppendLine($"ldarg {n}"); }
                 int Target() => instruction.Operand is Instruction target && indexes.TryGetValue(target, out var n)
                     ? n : throw new InvalidDataException("Invalid branch target.");
@@ -199,12 +224,15 @@ static class UnionImport
                             break;
                         }
                         var construction = Construct(constructor, constructorDefinition);
-                        for (var n = construction.Arguments.Length - 1; n >= 0; n--) Expect(construction.Arguments[n]);
+                        var constructedArguments = new string[construction.Arguments.Length];
+                        for (var n = construction.Arguments.Length - 1; n >= 0; n--) constructedArguments[n] = Argument(construction.Arguments[n]).Type;
+                        construction = Coerce(construction, constructedArguments);
                         Push(new(construction.Result));
                         code.AppendLine($"call {construction.Name}({string.Join(',', construction.Arguments)})"); break;
                     case Code.Ceq:
-                        Expect("Int32"); Expect("Int32"); Push(new("Int32"));
-                        code.AppendLine("call RuntimeEqual(Int32,Int32)"); break;
+                        var right = Argument("Int32"); var left = Argument("Int32"); Push(new("Int32"));
+                        var equality = Coerce(new("RuntimeEqual", ["Int32", "Int32"], "Int32"), [left.Type, right.Type]);
+                        code.AppendLine($"call {equality.Name}({string.Join(',', equality.Arguments)})"); break;
                     case Code.Pop: if (Pop().Type != "FaultNull") code.AppendLine("pop"); break;
                     case Code.Dup: var top = Pop(); Push(top); Push(top); if (top.Type != "FaultNull") code.AppendLine("dup"); break;
                     case Code.Br: case Code.Br_S:
@@ -248,9 +276,11 @@ static class UnionImport
                         }
                         else throw new InvalidDataException("Unsupported dependency call.");
                         var conditionalOut = -1;
+                        var actualArguments = new string[call.Arguments.Length];
                         for (var n = call.Arguments.Length - 1; n >= 0; n--)
                         {
-                            var argument = Expect(call.Arguments[n]);
+                            var argument = Argument(call.Arguments[n]);
+                            actualArguments[n] = argument.Type;
                             if (argument.Type.EndsWith('&'))
                             {
                                 if (argument.Argument >= 0)
@@ -269,9 +299,10 @@ static class UnionImport
                             }
                         }
                         if (call.Result != "noresult") Push(new(PrimitiveBindings.Stack(call.Result), ConditionalOut: conditionalOut));
+                        call = Coerce(call, actualArguments);
                         code.AppendLine(call.Instruction ?? $"call {call.Name}({string.Join(',', call.Arguments)})"); break;
                     case Code.Ret:
-                        if (result != "noresult") Expect(result);
+                        if (result != "noresult") ConvertTop(result);
                         if (stack.Count != 0) throw new InvalidDataException("Input ret stack not empty.");
                         code.AppendLine("ret"); terminates = true; break;
                     default: throw new InvalidDataException("Unsupported reachable instruction: " + instruction.OpCode);
@@ -306,7 +337,8 @@ static class UnionImport
                 if (changed) work.Enqueue(index);
             }
         }
-        output.Append(Adapters()).Append(ResultBindings.Adapters()).Append(StringBindings.Adapters()).AppendLine(Int32Bindings.Adapters).AppendLine(DoubleBindings.Adapters).Append(PrimitiveBindings.Adapters).Append(CalendarBindings.Adapters).Append(ErrorBindings.Adapters()).Append(GenericUnionBindings.Adapters).AppendLine(ProcessBindings.Adapters);
+        output.Append(Adapters()).Append(ResultBindings.Adapters()).Append(StringBindings.Adapters()).AppendLine(Int32Bindings.Adapters).AppendLine(DoubleBindings.Adapters).Append(PrimitiveBindings.Adapters).Append(CalendarBindings.Adapters).Append(ErrorBindings.Adapters()).Append(GenericUnionBindings.Adapters).AppendLine(ProcessBindings.Adapters).AppendLine(BooleanBindings.Adapters);
+        foreach (var helper in coercions.Values) output.Append(helper.Body);
         File.WriteAllText(destination, output.ToString());
         File.WriteAllText(destination + ".map.json", JsonSerializer.Serialize(new {
             Profile = collectionProfile ? "result-option-void-files-strings-collections-v8" : "result-option-void-files-strings-arrays-v7",
@@ -381,7 +413,7 @@ static class UnionImport
             throw new InvalidDataException("Unsupported runtime signature.");
         // Reuse the declaration catalog for its bounded static Int32 APIs. Check
         // both sides before mapping a resolved CLI reference to the runtime library.
-        var file = ProcessBindings.Bind(reference, definition) ?? GenericUnionBindings.Bind(reference, definition) ?? ErrorBindings.Bind(reference, definition) ?? CalendarBindings.Bind(reference, definition) ?? PrimitiveBindings.Bind(reference, definition) ?? DoubleBindings.Bind(reference, definition) ?? Int32Bindings.Bind(reference, definition) ?? PathBindings.Bind(reference, definition) ?? FileBindings.Bind(reference, definition) ?? ResultBindings.Bind(reference, definition);
+        var file = BooleanBindings.Bind(reference, definition) ?? ProcessBindings.Bind(reference, definition) ?? GenericUnionBindings.Bind(reference, definition) ?? ErrorBindings.Bind(reference, definition) ?? CalendarBindings.Bind(reference, definition) ?? PrimitiveBindings.Bind(reference, definition) ?? DoubleBindings.Bind(reference, definition) ?? Int32Bindings.Bind(reference, definition) ?? PathBindings.Bind(reference, definition) ?? FileBindings.Bind(reference, definition) ?? ResultBindings.Bind(reference, definition);
         if (file is not null)
         {
             if (file.OutArgument >= 0 || reference.Name == "FromResidual") ValidatePropagation(definition.DeclaringType);

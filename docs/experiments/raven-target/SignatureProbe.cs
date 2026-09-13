@@ -156,6 +156,12 @@ static class SignatureProbe
         var addString = Reference(arrayListDefinition.Methods.Single(m => m.Name == "Add"), stringList);
         Check("Collection Add closes String element", CollectionBindings.Bind(addString, arrayListDefinition.Methods.Single(m => m.Name == "Add"), true)?.Arguments.Last() == "String");
         Check("Collection generic arguments are invariant", !CollectionBindings.Assignable("System.Collections.ArrayList<String>", CollectionBindings.List));
+        var boolean = module.GetType("System.Boolean");
+        var booleanCompare = boolean.Methods.Single(m => m.Name == "CompareTo");
+        var booleanCall = Reference(booleanCompare, boolean);
+        Check("Boolean metadata stays exact", BooleanBindings.Bind(booleanCall, booleanCompare)?.Arguments.SequenceEqual(new[] { "Boolean&", "Boolean" }) == true);
+        booleanCall.Parameters[0].ParameterType = module.TypeSystem.Int32;
+        Reject("Boolean is not Int32 in metadata", () => BooleanBindings.Bind(booleanCall, booleanCompare));
         var text = JsonSerializer.Serialize(checks, new JsonSerializerOptions { WriteIndented = true });
         File.WriteAllText(Path.Combine(output, "signature-checks.json"), text);
         Console.WriteLine(text);
