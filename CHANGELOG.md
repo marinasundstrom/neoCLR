@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Projected Equatable, Comparable, Clonable and Closable contracts into Raven metadata
+  and calls. Restored Type equality conformance and value/interface implementations;
+  added boxed primitive/calendar, String and class-reference samples and checks.
+  Clonable/Closable have no existing concrete library implementations to demonstrate.
+
 - Added bounded CLR-style box allocation and nominal interface dispatch into value
   payloads, preserving value-copy independence, alias identity and managed lifetime.
   Intrinsic String interface views use managed handles. Added GC, escape and invalid

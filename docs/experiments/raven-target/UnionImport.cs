@@ -42,12 +42,12 @@ static class UnionImport
         var entry = app.EntryPoint ?? throw new InvalidDataException("Missing entry point.");
         if (entry.Parameters.Count != 0 || entry.ReturnType.MetadataType != MetadataType.Void)
             throw new InvalidDataException("Result profile requires a parameterless no-result entry.");
-        if (collectionProfile) { CollectionBindings.Validate(library.MainModule); ReflectionBindings.Validate(library.MainModule); NativeArrayBindings.Validate(library.MainModule); }
+        if (collectionProfile) { InterfaceBindings.Validate(library.MainModule); CollectionBindings.Validate(library.MainModule); ReflectionBindings.Validate(library.MainModule); NativeArrayBindings.Validate(library.MainModule); }
         string ProfileType(TypeReference type, bool result = false)
         {
             var collection = CollectionBindings.Type(type);
             if (collection is not null && collectionProfile) return collection;
-            return NativeArrayBindings.Type(type) ?? ReflectionBindings.Type(type) ?? DelegateBindings.Type(type) ?? ProcessBindings.ArrayType(type) ?? GenericUnionBindings.Type(type) ?? CalendarBindings.Type(type) ?? PrimitiveBindings.Type(type) ?? ResultBindings.Type(type) ?? Type(type, result);
+            return InterfaceBindings.Type(type) ?? NativeArrayBindings.Type(type) ?? ReflectionBindings.Type(type) ?? DelegateBindings.Type(type) ?? ProcessBindings.ArrayType(type) ?? GenericUnionBindings.Type(type) ?? CalendarBindings.Type(type) ?? PrimitiveBindings.Type(type) ?? ResultBindings.Type(type) ?? Type(type, result);
         }
         var output = new StringBuilder($".module ImportedUnion\n.entry {Name(entry)}\n");
         var coercions = new Dictionary<string, (string Name, string Body)>();
@@ -82,7 +82,7 @@ static class UnionImport
             var args = method.Parameters.Select(p => ProfileType(p.ParameterType)).ToArray();
             var result = ProfileType(method.ReturnType, true);
             var locals = method.Body.Variables.Select(v => ProfileType(v.VariableType)).ToArray();
-            if (locals.Any(t => !NativeArrayBindings.IsType(t) && !NativeArrayBindings.IsPointer(t) && !ReflectionBindings.IsType(t) && t != "arrayref<String>" && !DelegateBindings.IsType(t) && !GenericUnionBindings.IsType(t) && !CalendarBindings.Types.Contains(t) && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
+            if (locals.Any(t => t != "System.Object" && !InterfaceBindings.IsInterface(t) && !NativeArrayBindings.IsType(t) && !NativeArrayBindings.IsPointer(t) && !ReflectionBindings.IsType(t) && t != "arrayref<String>" && !DelegateBindings.IsType(t) && !GenericUnionBindings.IsType(t) && !CalendarBindings.Types.Contains(t) && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
                 throw new InvalidDataException("Unsupported local default in Result profile.");
             NormalizePatternBranches(method);
             var instructions = method.Body.Instructions.ToArray();
@@ -146,10 +146,13 @@ static class UnionImport
                         if (!collectionProfile || instruction.Operand is not TypeReference tokenType) throw new InvalidDataException("Only admitted type tokens supported.");
                         var token = ProfileType(tokenType is TypeSpecification ? tokenType : tokenType.Resolve() ?? tokenType);
                         Push(new("System.RuntimeTypeHandle")); code.AppendLine("ldtoken " + token); break;
+                    case Code.Box:
+                        var boxedType = ProfileType((TypeReference)instruction.Operand);
+                        ConvertTop(boxedType); Push(new("System.Object")); code.AppendLine("box " + boxedType); break;
                     case Code.Castclass:
                         var castTarget = ProfileType((TypeReference)instruction.Operand);
                         var castSource = Pop().Type;
-                        if (!ReflectionBindings.IsReference(castSource) || !ReflectionBindings.IsReference(castTarget)) throw new InvalidDataException("Unsupported reference cast.");
+                        if (!(ReflectionBindings.IsReference(castSource) || InterfaceBindings.IsInterface(castSource) || castSource == "System.Object" || castSource == "String") || !(ReflectionBindings.IsReference(castTarget) || InterfaceBindings.IsInterface(castTarget) || castTarget == "String")) throw new InvalidDataException("Unsupported reference cast.");
                         Push(new(castTarget)); code.AppendLine("castclass " + castTarget); break;
                     case Code.Ldnull: Push(new("FaultNull")); break;
                     case Code.Throw:
@@ -339,11 +342,13 @@ static class UnionImport
                         }
                         else if (targetMethod.Module == library.MainModule)
                         {
+                            var interfaceCall = collectionProfile ? InterfaceBindings.Bind(reference, targetMethod) : null;
                             var nativeCall = collectionProfile ? NativeArrayBindings.Bind(reference, targetMethod) : null;
                             var reflectionCall = collectionProfile ? ReflectionBindings.Bind(reference, targetMethod) : null;
                             var arrayCallback = collectionProfile ? ArrayCallbackBindings.Bind(reference, targetMethod) : null;
                             var delegateCall = DelegateBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt);
-                            if (nativeCall is not null) call = new(nativeCall.Name, nativeCall.Arguments, nativeCall.Result);
+                            if (interfaceCall is not null) call = new(interfaceCall.Name, interfaceCall.Arguments, interfaceCall.Result, Instruction: interfaceCall.Instruction);
+                            else if (nativeCall is not null) call = new(nativeCall.Name, nativeCall.Arguments, nativeCall.Result);
                             else if (reflectionCall is not null) call = new(reflectionCall.Name, reflectionCall.Arguments, reflectionCall.Result);
                             else if (arrayCallback is not null) call = new(arrayCallback.Name, arrayCallback.Arguments, arrayCallback.Result, Instruction: arrayCallback.Instruction);
                             else if (delegateCall is not null) call = new(delegateCall.Name, delegateCall.Arguments, delegateCall.Result, Instruction: delegateCall.Instruction);
@@ -487,9 +492,9 @@ static class UnionImport
         "System.Result/Error`1<System.OverflowError>" when type.IsValueType => Error,
         _ => throw new InvalidDataException("Unsupported Result profile type: " + type.FullName)
     };
-    static bool Converts(string source, string target) => BooleanBindings.Converts(source, target) || EnumBindings.Converts(source, target);
-    static string ConvertStack(string source, string target) => BooleanBindings.Convert(source, target) + EnumBindings.Convert(source, target);
-    static bool NeedsInitialization(string type) => NativeArrayBindings.IsType(type) || NativeArrayBindings.IsPointer(type) || type == "System.RuntimeTypeHandle" || DelegateBindings.IsType(type) || (GenericUnionBindings.IsType(type)
+    static bool Converts(string source, string target) => InterfaceBindings.Converts(source, target) || BooleanBindings.Converts(source, target) || EnumBindings.Converts(source, target);
+    static string ConvertStack(string source, string target) => InterfaceBindings.Convert(source, target) + BooleanBindings.Convert(source, target) + EnumBindings.Convert(source, target);
+    static bool NeedsInitialization(string type) => type == "System.Object" || InterfaceBindings.IsInterface(type) || NativeArrayBindings.IsType(type) || NativeArrayBindings.IsPointer(type) || type == "System.RuntimeTypeHandle" || DelegateBindings.IsType(type) || (GenericUnionBindings.IsType(type)
         ? GenericUnionBindings.RequiresInitialization(type) : ResultBindings.RequiresInitialization(type));
     static bool HasNamedVoid(TypeReference type) => type is GenericInstanceType generic
         && generic.GenericArguments.Count == 1 && generic.GenericArguments[0].IsValueType

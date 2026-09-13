@@ -14,13 +14,13 @@ static class CoreDeclarations
             declarations = declarations.Replace("public static class Console {", "public static class Console { " + ProcessBindings.ConsoleDeclaration).Replace("public static class Math {",
                 "public static class Math { " + DoubleBindings.MathDeclarations + " public static Result<int, OverflowError> Abs(int value) => default; public static Result<int, InvalidRangeError> Clamp(int value, int min, int max) => default;")
                 + UnionDeclarations.Source + DelegateBindings.Declarations + ProcessBindings.Declarations + CalendarBindings.Declarations + PathBindings.Declarations + FileBindings.Declarations + ResultBindings.Declarations;
-        if (collectionProbe) declarations += CollectionDeclarations.Source + ReflectionBindings.Declarations + NativeArrayBindings.Declaration;
+        if (collectionProbe) declarations += CollectionDeclarations.Source + ReflectionBindings.Declarations + NativeArrayBindings.Declaration + InterfaceBindings.Declarations;
         var source = Source.Replace("public struct Double { }", unionProbe ? DoubleBindings.Declarations : "public struct Double { }").Replace("public struct Int32 { }", unionProbe ? Int32Bindings.Declarations : "public struct Int32 { }").Replace("public sealed class String { }", StringBindings.Declarations(unionProbe))
             .Replace("public static class Console { public static void WriteLine(string value) { } }", declarations)
             .Replace("// Union probe attribute", unionProbe ? "public sealed class UnionAttribute : System.Attribute { }" : "");
         if (unionProbe) source = PrimitiveBindings.Project(source).Replace("public struct Boolean { }", BooleanBindings.Declaration)
             .Replace("public abstract class Array {", "public abstract class Array { public static void ForEach<T>(T[] values, Func<T, PropagationUnit> action) { }");
-        if (collectionProbe) source = source.Replace("public class Type { }", "");
+        if (collectionProbe) source = InterfaceBindings.Project(source.Replace("public class Type { }", ""));
         var compilation = CSharpCompilation.Create(Identity,
             [CSharpSyntaxTree.ParseText(source)], references: [],
             options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, allowUnsafe: true));

@@ -21,7 +21,7 @@ static class DoubleBindings
         }
         if (reference.DeclaringType.FullName != "System.Double") return null;
         var signature = RuntimeSignatures.Match(reference, definition, _ => null);
-        if (reference.HasThis && reference.DeclaringType.IsValueType && !definition.IsVirtual && reference.Name == "CompareTo"
+        if (reference.HasThis && reference.DeclaringType.IsValueType && (!definition.IsVirtual || definition.IsFinal) && reference.Name == "CompareTo"
             && signature.Result == "Int32" && signature.Args.SequenceEqual(new[] { "Double" }))
             return new("RuntimeDoubleCompareTo", ["Double&", "Double"], "Int32");
         throw new InvalidDataException("Unsupported Double member.");

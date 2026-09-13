@@ -11,7 +11,7 @@ static class BooleanBindings
     {
         if (reference.DeclaringType.FullName != "System.Boolean") return null;
         var (args, result) = RuntimeSignatures.Match(reference, definition, _ => null);
-        if (RuntimeSignatures.IsCore(reference.DeclaringType.Scope) && reference.HasThis && !definition.IsVirtual
+        if (RuntimeSignatures.IsCore(reference.DeclaringType.Scope) && reference.HasThis && (!definition.IsVirtual || definition.IsFinal)
             && reference.Name == "CompareTo" && result == "Int32" && args.SequenceEqual(new[] { "Boolean" }))
             return new("System.Boolean::CompareTo", ["Boolean&", "Boolean"], result, Instruction: "call instance System.Boolean::CompareTo(Boolean)");
         throw new InvalidDataException("Unsupported Boolean member.");

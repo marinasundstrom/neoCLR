@@ -1,0 +1,32 @@
+import System.*
+import System.Console.*
+func Ordered(value: Comparable<int>) -> int { return value.CompareTo(42) }
+func Main() {
+    var value = 42
+    let comparable: Comparable<int> = value
+    value = 100
+    WriteLine(comparable.CompareTo(42))
+    WriteLine(Ordered(43))
+    let equatable: Equatable<int> = 42
+    if equatable.Equals(42) { WriteLine("Equal integer") }
+    let text: Equatable<string> = "hello"
+    if text.Equals("hello") { WriteLine("Equal string") }
+    let kind = typeof(int)
+    let types: Equatable<Type> = kind
+    if types.Equals(typeof(int)) { WriteLine("Equal type") }
+    match Date.Create(2026, 9, 13) {
+        Result.Ok<Date> ok => CheckDate(ok.Value)
+        Result.Error<InvalidDateError> error => WriteLine("Invalid date")
+    }
+    let wide: Comparable<long> = 42L
+    WriteLine(wide.CompareTo(42L))
+    let boolean: Comparable<bool> = true
+    WriteLine(boolean.CompareTo(true))
+}
+
+func CheckDate(date: Date) {
+    let dates: Comparable<Date> = date
+    WriteLine(dates.CompareTo(date))
+    let equalDates: Equatable<Date> = date
+    if equalDates.Equals(date) { WriteLine("Equal date") }
+}

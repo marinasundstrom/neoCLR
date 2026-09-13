@@ -60,6 +60,8 @@ def build(path: Path) -> str:
     text = path.read_text()
     if path.stem in COLLECTIONS | {'Disposable'}:
         text = adapt(text, path.stem)
+    if path.stem in {'Equatable', 'Comparable', 'Clonable', 'Closable'}:
+        text = text.replace('instance readonly byref ', 'instance ').replace('instance byref ', 'instance ')
     if path.stem in {'Type', 'Reflection'}:
         # Immutable reflection snapshots use ordinary class identity in the target.
         text = re.sub(r'^\.type (abstract )?(System\.(?:Type|Reflection\.(?:MemberInfo|FieldInfo|MethodInfo|PropertyInfo|ParameterInfo)))$',
@@ -67,7 +69,6 @@ def build(path: Path) -> str:
         # These private construction helpers are replaced by trusted snapshot factories.
         text = re.sub(r'    \.method internal instance byref \.ctor[^\n]*\n.*?    \.end\n', '', text, flags=re.S)
         text = text.replace('instance readonly byref ', 'instance ').replace('instance byref ', 'instance ')
-        text = text.replace('    .implements System.Equatable<System.Type>\n', '')
         text = text.replace('ldloca method', 'ldloc method')
     if path.stem == 'Func':
         text = text.replace('readonly T[]& array', 'arrayref<T> array').replace('-> Void', '-> noresult')
@@ -76,7 +77,10 @@ def build(path: Path) -> str:
     for line in text.splitlines(keepends=True):
         include = re.fullmatch(r'\s*\.include "([^"]+)"\s*', line)
         lines.append(build(path.parent / include[1]) if include else line)
-    return ''.join(lines)
+    result = ''.join(lines)
+    if path.name == 'System.neoil':
+        result += '\n.type class System.Object\n.end\n'
+    return result
 
 
 if __name__ == '__main__':

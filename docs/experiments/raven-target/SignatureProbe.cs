@@ -28,6 +28,19 @@ static class SignatureProbe
             catch (InvalidDataException) { checks.Add(name); return; }
             throw new Exception("Malformed signature accepted: " + name);
         }
+        InterfaceBindings.Validate(module);
+        foreach (var contractName in new[]{"Equatable", "Comparable", "Clonable", "Closable"}) {
+            var contract = module.GetType("System." + contractName + "`1");
+            var closed = new GenericInstanceType(contract); closed.GenericArguments.Add(module.TypeSystem.Int32);
+            var member = contract.Methods.Single();
+            Check(contractName + " closed interface signature", InterfaceBindings.Bind(Reference(member, closed), member) is not null);
+            var mismatch = Reference(member, closed); mismatch.ReturnType = module.TypeSystem.String;
+            Reject(contractName + " mismatched result", () => InterfaceBindings.Bind(mismatch, member));
+        }
+        var comparableParameter = module.GetType("System.Comparable`1").GenericParameters[0];
+        comparableParameter.Attributes = GenericParameterAttributes.Covariant;
+        Reject("Comparable invariance", () => InterfaceBindings.Validate(module));
+        comparableParameter.Attributes = GenericParameterAttributes.NonVariant;
         NativeArrayBindings.Validate(module);
         var native = module.GetType("System.Array`1");
         var nativeOwner = new GenericInstanceType(native); nativeOwner.GenericArguments.Add(module.TypeSystem.Int32);

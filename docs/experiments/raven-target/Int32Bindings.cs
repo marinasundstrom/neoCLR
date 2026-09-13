@@ -9,7 +9,7 @@ static class Int32Bindings
         if (reference.DeclaringType.FullName != "System.Int32") return null;
         var (args, result) = RuntimeSignatures.Match(reference, definition, ResultBindings.Type);
         if (RuntimeSignatures.IsCore(reference.DeclaringType.Scope) && reference.HasThis
-            && reference.DeclaringType.IsValueType && !definition.IsVirtual
+            && reference.DeclaringType.IsValueType && (!definition.IsVirtual || definition.IsFinal)
             && ((reference.Name == "Equals" && result == "Boolean" && args.SequenceEqual(new[] { "Int32" }))
                 || (reference.Name == "CompareTo" && result == "Int32" && args.SequenceEqual(new[] { "Int32" }))
                 || (reference.Name == "ToString" && result == "String" && args.Length == 0)))

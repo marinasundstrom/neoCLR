@@ -44,7 +44,7 @@ static class CalendarBindings
         var signature = RuntimeSignatures.Match(reference, definition, t => Type(t) ?? ResultBindings.Type(t));
         var member = Members.SingleOrDefault(m => "System." + m.Owner == reference.DeclaringType.FullName && m.Name == reference.Name
             && m.Instance == reference.HasThis && m.Args.SequenceEqual(signature.Args) && m.Result == signature.Result);
-        if (member is null || definition.IsVirtual) throw new InvalidDataException("Unsupported calendar member: " + reference.FullName);
+        if (member is null || (definition.IsVirtual && !definition.IsFinal)) throw new InvalidDataException("Unsupported calendar member: " + reference.FullName);
         return new(member.Instance ? "Runtime" + member.Owner + member.Name : "System." + member.Owner + "::" + member.Name,
             member.Instance ? new[] { "System." + member.Owner + "&" }.Concat(member.Args).ToArray() : member.Args, member.Result);
     }

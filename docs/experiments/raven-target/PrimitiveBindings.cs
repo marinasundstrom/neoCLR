@@ -27,7 +27,7 @@ static class PrimitiveBindings
         var owner = Type(reference.DeclaringType);
         if (owner is null) return null;
         var (args, result) = RuntimeSignatures.Match(reference, definition, Type);
-        if (reference.HasThis && !definition.IsVirtual && reference.Name == "CompareTo"
+        if (reference.HasThis && (!definition.IsVirtual || definition.IsFinal) && reference.Name == "CompareTo"
             && result == "Int32" && args.SequenceEqual(new[] { owner }))
             return new("Runtime" + owner + "CompareTo", [owner + "&", owner], result);
         if (!reference.HasThis && owner == "Char" && CharacterMethods.Contains(reference.Name)

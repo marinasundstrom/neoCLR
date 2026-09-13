@@ -275,6 +275,16 @@ try:
             if any(not any(label == name or label.startswith(name + '(') for label in labels) for name in expected):
                 raise AssertionError('Missing reflection API: ' + str(labels))
             results[expression] = labels
+    if collections:
+        for version, contract, expected in ((33, 'Comparable<int>', 'CompareTo'), (34, 'Equatable<Type>', 'Equals'), (35, 'Clonable<int>', 'Clone'), (36, 'Closable<OverflowError>', 'Close')):
+            text = 'import System.*\nfunc Check(value: ' + contract + ') {\n    value.\n}'
+            send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})
+            result = receive(send('textDocument/completion', {'textDocument': {'uri': uri}, 'position': {'line': 2, 'character': 10}, 'context': {'triggerKind': 1}}, True))
+            items = result if isinstance(result, list) else result['items']
+            labels = sorted({item['label'] for item in items})
+            if not any(label == expected or label.startswith(expected + '(') for label in labels):
+                raise AssertionError('Missing interface member: ' + str(labels))
+            results[contract] = labels
     receive(send('shutdown', None, True))
     send('exit', None)
     print(json.dumps(results, indent=2))

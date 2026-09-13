@@ -26,7 +26,7 @@ static class StringBindings
         var member = Members.SingleOrDefault(m => m.Name == reference.Name && m.Instance == reference.HasThis
             && m.Result == signature.Result && m.Parameters.SequenceEqual(signature.Args))
             ?? throw new InvalidDataException("Unsupported String member: " + reference.FullName);
-        if (definition.IsVirtual || reference.DeclaringType.IsValueType || callvirt && !reference.HasThis)
+        if ((definition.IsVirtual && !definition.IsFinal) || reference.DeclaringType.IsValueType || callvirt && !reference.HasThis)
             throw new InvalidDataException("Unsupported String receiver contract.");
         var args = member.Instance ? new[] { "String" }.Concat(member.Parameters).ToArray() : member.Parameters;
         return new(args, member.Result, member.Instance
