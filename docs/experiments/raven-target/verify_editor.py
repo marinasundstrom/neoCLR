@@ -24,6 +24,7 @@ queries = '--queries' in sys.argv[2:]
 array_invariance = '--array-invariance' in sys.argv[2:]
 array_shape = '--array-shape' in sys.argv[2:]
 collection_capabilities = '--collection-capabilities' in sys.argv[2:]
+maps = '--maps' in sys.argv[2:]
 server = json.loads((project / '.vscode/settings.json').read_text())['raven.languageServerPath']
 messages = queue.Queue()
 log = (project / 'lsp-stderr.log').open('wb')
@@ -416,6 +417,22 @@ try:
             assert {'Count', 'GetIterator', 'ToList'}.issubset(labels), labels
             assert ('Add' in labels) == can_add, labels
             results['Collection capabilities ' + shape] = labels
+    if maps:
+        for version, shape, mutable in ((55, 'Map<int, string>', False),
+                                        (56, 'MutableMap<int, string>', True),
+                                        (57, 'HashMap<int, string>', True)):
+            text = ('import System.*\nimport System.Collections.*\n'
+                    'func Inspect(values: ' + shape + ') {\n    values.\n}')
+            send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version},
+                'contentChanges': [{'text': text}]})
+            result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
+                'position': {'line': 3, 'character': len('    values.')},
+                'context': {'triggerKind': 2, 'triggerCharacter': '.'}}, True))
+            items = result if isinstance(result, list) else result['items']
+            labels = sorted({item['label'] for item in items})
+            assert {'Count', 'Keys', 'Find', 'ContainsKey'}.issubset(labels), labels
+            assert ('TryAdd' in labels) == mutable and ('Set' in labels) == mutable, labels
+            results['Map capabilities ' + shape] = labels
     receive(send('shutdown', None, True))
     send('exit', None)
     print(json.dumps(results, indent=2))

@@ -9,13 +9,13 @@ static class CollectionBindings
     public const string Iterator = "System.Collections.Iterator<Int32>";
     public const string Disposable = "System.Disposable";
     static readonly Dictionary<string, (string Kind, string Element)> Shapes = new();
-    public static void Reset() => Shapes.Clear();
-    public static bool IsReference(string type) => type == Disposable || Shapes.ContainsKey(type)
+    public static void Reset() { Shapes.Clear(); MapBindings.Reset(); }
+    public static bool IsReference(string type) => type == Disposable || Shapes.ContainsKey(type) || MapBindings.IsType(type)
         || type is List or ArrayList or Iterable or Iterator;
     public static bool IsArrayList(string? type) => type is not null && type.StartsWith("System.Collections.ArrayList<", StringComparison.Ordinal);
     public static bool Assignable(string source, string target)
     {
-        if (source == target) return true;
+        if (source == target || MapBindings.Assignable(source, target)) return true;
         if (ManagedArrayBindings.IsType(source))
             return new[] { "Iterable", "Collection", "Sequence", "MutableSequence" }
                 .Any(kind => target == $"System.Collections.{kind}<{source[9..^1]}>");
@@ -29,6 +29,7 @@ static class CollectionBindings
 
     public static string? Type(TypeReference type)
     {
+        if (MapBindings.Type(type) is { } map) return map;
         if (type.IsValueType) return null;
         if (type.FullName == Disposable && RuntimeSignatures.IsCore(type.Scope)) return Disposable;
         if (type is not GenericInstanceType g || g.GenericArguments.Count != 1
@@ -52,6 +53,7 @@ static class CollectionBindings
 
     public static void Validate(ModuleDefinition module)
     {
+        MapBindings.Validate(module);
         foreach (var (name, parent) in new[] {
             ("System.Disposable", ""), ("System.Collections.Iterable`1", ""),
             ("System.Collections.Iterator`1", "System.Disposable"),
@@ -75,6 +77,7 @@ static class CollectionBindings
     public sealed record Binding(string[] Arguments, string Result, string Instruction);
     public static Binding? Bind(MethodReference reference, MethodDefinition definition, bool callvirt)
     {
+        if (MapBindings.Bind(reference, definition, callvirt) is { } map) return map;
         var owner = Type(reference.DeclaringType);
         if (owner is null) return null;
         var (parameters, result) = RuntimeSignatures.Match(reference, definition, t => ApplicationTypes.Type(t) ?? Type(t) ?? DelegateBindings.Type(t) ?? GenericUnionBindings.Type(t));

@@ -86,6 +86,7 @@ def build(path: Path) -> str:
         result += '\n.type class System.Object\n.end\n'
         result += (ROOT / 'runtime/raven/Linq.neoil').read_text()
         result += (ROOT / 'runtime/raven/ArrayEnumerable.neoil').read_text()
+        result += (ROOT / 'runtime/raven/Map.neoil').read_text()
     return result
 
 

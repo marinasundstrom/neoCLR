@@ -21,6 +21,10 @@ with tempfile.TemporaryDirectory(prefix='neoclr-capabilities-') as temporary:
     command = [sys.executable, str(Path(__file__).with_name('run_project.py')), str(root / 'Demo.rvnproj'),
                *runner_arguments(args), '--runtime', str(args.runtime.resolve())]
     for name, source in {
+        'read map cannot set': 'func Change(values: Map<int, string>) { values.Set(1, "changed") }',
+        'read map cannot insert': 'func Change(values: Map<int, string>) { values.TryAdd(1, "changed") }',
+        'map keys remain invariant': 'func Widen(values: Map<string, int>) -> Map<Object, int> { return values }',
+        'map values remain invariant': 'func Widen(values: Map<int, string>) -> Map<int, Object> { return values }',
         'read indexer cannot replace': 'func Change(values: Sequence<int>) { values[0] = 42 }',
         'read sequence cannot grow': 'func Change(values: Sequence<int>) { values.Add(42) }',
         'replacement does not imply growth': 'func Change(values: MutableSequence<int>) { values.Add(42) }',

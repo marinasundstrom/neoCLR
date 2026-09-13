@@ -398,6 +398,13 @@ static class UnionImport
                             code.AppendLine($"delegate.bind {delegateType} = {targetName}({string.Join(',', targetArguments)})");
                             Push(new(delegateType)); break;
                         }
+                        if (collectionProfile && MapBindings.Construct(constructor, constructorDefinition) is { } mapConstruction)
+                        {
+                            for (var n = mapConstruction.Arguments.Length - 1; n >= 0; n--) Argument(mapConstruction.Arguments[n]);
+                            Push(new(mapConstruction.Result));
+                            code.AppendLine(mapConstruction.Instruction);
+                            break;
+                        }
                         if (collectionProfile && CollectionBindings.IsArrayList(CollectionBindings.Type(constructor.DeclaringType)))
                         {
                             var signature = RuntimeSignatures.Match(constructor, constructorDefinition, CollectionBindings.Type);

@@ -67,6 +67,19 @@ for file in source['sourceFiles']:
     rows.append({'file': file, 'declarations': len(entries), 'disposition': group, 'samples': samples})
 result = {'purpose': 'Explicit source-by-source API audit. Samples and signature checks are evidence, not a claim of arbitrary generic/compiler support.',
           'declarationCount': sum(r['declarations'] for r in rows), 'sources': rows}
+result['targetProfileAdditions'] = [{
+    'file': 'runtime/raven/Map.neoil',
+    'disposition': 'experimental-map-contracts-and-implementation',
+    'samples': ['library-maps.rvn'],
+    'tests': ['tests/raven_collections.rs', 'docs/experiments/raven-target/verify_collection_capabilities.py'],
+    'note': 'Explicit equality/hash callbacks; no default comparer, removal or pair iteration. See docs/map-contracts.md.'
+}]
+for addition in result['targetProfileAdditions']:
+    assert (ROOT / addition['file']).is_file()
+    for sample in addition['samples']:
+        assert (HERE / 'samples' / sample).is_file()
+    for test in addition['tests']:
+        assert (ROOT / test).is_file()
 text = json.dumps(result, indent=2) + '\n'
 path = HERE / 'runtime-api-coverage.json'
 if args.check:

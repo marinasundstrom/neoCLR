@@ -34,7 +34,7 @@ static class InterfaceProbe
         using var library = AssemblyDefinition.ReadAssembly(core);
         using var image = AssemblyDefinition.ReadAssembly(path);
         var interfaces = library.MainModule.GetTypes().Where(t => t.IsInterface).ToArray();
-        if (interfaces.Length != 12 || interfaces.SelectMany(t => t.Methods).Any(m => !m.IsAbstract || !m.IsVirtual || !m.IsNewSlot))
+        if (interfaces.Length != 14 || interfaces.SelectMany(t => t.Methods).Any(m => !m.IsAbstract || !m.IsVirtual || !m.IsNewSlot))
             throw new Exception("Expected ordinary abstract CLI interface contracts.");
         var arrayShape = library.MainModule.GetType("System.Array`1");
         if (arrayShape is null || arrayShape.IsValueType || arrayShape.GenericParameters.Count != 1 ||

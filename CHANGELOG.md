@@ -8,6 +8,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Added an experimental Raven-profile Map/MutableMap/HashMap slice with Option
+  lookup, duplicate-preserving TryAdd, Set, count and independent key snapshots.
+  Managed storage, collision chains and growth use existing IL; equality/hash
+  callbacks are explicit constructor arguments, with no default comparer or uniform
+  null-key policy yet. Added Raven samples, signature/editor/capability checks and
+  direct IL tests for GC retention, collisions, snapshots and reentrancy faults.
+  Corrected an older collection test to use the inherited indexer owner and the
+  target library when assembling. Regenerate core metadata and System together;
+  the installed .11 tools are unchanged. Documented .NET/Rust/LanguageExt comparisons
+  and remaining Map work. LINQ terminal changes remain separate.
+
 - Implemented a bounded Raven-profile collection capability prototype: Collection
   for count/iteration, Sequence for indexed reads, MutableSequence for replacement,
   and List adding growth through Add. Arrays and ArrayList share those contracts
@@ -15,8 +26,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   array Count, samples, negative/metadata tests and editor checks. Callers must
   regenerate declarations and recompile; installed .11 tools are unchanged. Recorded
   .NET comparisons and provisional names; immutable/frozen families and variance
-  remain separate. Planned Map/dictionary work next and LINQ terminal Option/Result
-  contracts afterward, as separate slices.
+  remain separate. Map/dictionary work and LINQ terminal Option/Result contracts
+  follow as separate slices.
 
 - Built and installed experimental Raven SDK/VSIX 0.1.12-neoclr.11 with the generic
   array integration in an isolated local demo/profile. All seven packaged suites

@@ -2363,3 +2363,38 @@ slices. The assistant recorded collection capabilities, Map/dictionary work and
 terminal-operator outcome design as separate steps. First returning Option is a
 proposal; Single cardinality semantics and other operator outcomes remain to decide.
 No terminal operators were added to the current capability implementation.
+
+### 2026-09-13 — A first Map implementation, with comparer policy still open
+
+**Author direction.** After separating collection read/replacement/growth capabilities,
+the author asked to focus on a Map interface and a default implementation corresponding
+to .NET Dictionary. The author also raised Option/Result outcomes for LINQ terminals
+and explicitly said, “Keep this as separate slices.” The subsequent “Continue” starts
+the Map work; it does not settle every proposed collection name or comparer policy.
+
+**Assistant proposal.** Implement invariant Map<K,V>, MutableMap<K,V> and HashMap<K,V>
+using existing managed storage and IL. Because the current library has typed equality
+but no general hash-code/default-comparer contract, start with explicit equality and
+hash callbacks. Use Option for lookup, Boolean TryAdd for duplicate rejection, Set
+for insert/replace, and a snapshot of keys. The assistant identified the convenience
+cost of mandatory callbacks and left default comparers, null-key policy, removal and
+pair enumeration open. These are assistant-selected prototype boundaries, not a
+reported author endorsement of the final API.
+
+**Action and outcome.** Added the [IL implementation](../runtime/raven/Map.neoil),
+metadata/importer adapters, a [Raven order-lookup sample](experiments/raven-target/samples/library-maps.rvn)
+and [contract/research notes](map-contracts.md). The table stores collision chains in
+managed arrays/ArrayLists and grows using saved hashes. The sample demonstrates
+Option destructuring, reference keys and shared reference values. No Raven compiler
+or runtime opcode change was needed. Direct IL checks cover collection pressure,
+reference retention, collisions, snapshots, invalid interface operations and callback
+reentrancy. The existing test fixture was also corrected to use the migrated indexer
+owner and the target library when assembling.
+
+Validation reported by the assistant: 13 collection/runtime tests, 61 saved-project
+cases, 81 signature checks, 10 capability rejection cases and 59 editor checks passed.
+The .NET comparison confirms the shared duplicate/replacement behavior and illustrates
+its live key view and null-key rejection. neoCLR's key snapshot and current
+callback-defined key domain are documented differences, not asserted improvements.
+The installed .11 SDK/extension was not changed. LINQ terminal implementation remains
+a separate slice, and this bounded Map is not described as a complete Dictionary API.

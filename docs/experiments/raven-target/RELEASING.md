@@ -171,3 +171,20 @@ checks and add `--collection-capabilities` to the editor checks. Rebuild declara
 and the bridge together: inherited Count/indexer ownership changed, and older SDKs
 need the inherited-indexer compiler correction. Do not treat the existing .11
 installation as containing these later source changes.
+
+
+## Map prototype source checks
+
+The Map slice adds `runtime/raven/Map.neoil`, generated core Map/MutableMap/HashMap
+signatures and `samples/library-maps.rvn`. Rebuild the bridge, emit fresh core
+metadata with `--interfaces`, and regenerate System with `collection_library.py`.
+Do not combine this new core metadata with a stale target System library. The
+installed .11 bundle remains unchanged; package a fresh build to distribute Maps.
+
+`verify_project.py --collections` includes the Map sample. Run
+`verify_collection_capabilities.py` for the read/mutation and invariant-generic
+negative cases, the `--signatures` probe for metadata validation, and append `--maps`
+to the full `verify_editor.py` invocation for completion through Map, MutableMap
+and HashMap. Run `cargo test --test raven_collections` for direct IL/GC tests.
+The [Map contract](../../map-contracts.md) lists current comparer and iteration
+limits that must accompany a build. These checks do not imply a full Dictionary API.

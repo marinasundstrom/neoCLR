@@ -301,3 +301,13 @@ Source validation: 39 focused runtime tests, 22 Raven indexer/iteration tests,
 56 editor completion/hover/diagnostic checks passed. All-target Clippy and the
 runtime API inventory check passed. The editor checks used the source-built server;
 no SDK, VSIX or installed demonstration was replaced.
+
+
+## First Map implementation (2026-09-13)
+
+The subsequent [Map slice](map-contracts.md) implements Map<K,V>, MutableMap<K,V>
+and HashMap<K,V> with Option-returning Find, TryAdd, Set, Count and snapshot Keys.
+It requires explicit equality/hash callbacks and does not yet supply a default
+comparer, removal or pair enumeration. The two generic arguments remain invariant.
+This extends the prototype; it does not settle the whole proposed collection tree.
+LINQ terminal outcomes remain a separate slice.

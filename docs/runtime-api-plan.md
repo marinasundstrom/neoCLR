@@ -92,16 +92,19 @@ and target-contract mapping. Safety rules promised across languages must also su
 handwritten IL and metadata, not depend solely on Raven diagnostics.
 
 
-### Next collection slice: Map and dictionary implementation (2026-09-13)
+### First Map prototype and remaining work (2026-09-13)
 
-After the sequence capability prototype, the author selected Map<K,V> and a default
-implementation corresponding to .NET Dictionary<TKey,TValue>. Compare its equality,
-hashing, comparer selection, null-key rules, duplicate insertion and iteration
-contracts before prototyping HashMap<K,V>. Prefer Option for absence and evaluate
-Result for rejected insertion/update, retaining familiar ordinary indexer/method
-usage where those result semantics fit. Separate read/mutation capabilities, keep
-variance provisional and validate reference/value keys and values. This is the next
-planned slice, not an implemented API.
+The author selected Map<K,V> and a default implementation corresponding to .NET
+Dictionary<TKey,TValue>. The first [Map prototype](map-contracts.md) now implements
+invariant Map/MutableMap and HashMap in the Raven profile: Option lookup, Boolean
+TryAdd, Set, count and snapshot keys. Hashing/equality callbacks are required; no
+universal default comparer policy has been chosen. Storage and algorithms use
+existing managed library mechanisms. Raven needs no compiler change for this slice.
+
+Follow-up Map work must evaluate a paired comparer and defaults, uniform null-key
+policy, removal and pair iteration before calling this a general Dictionary
+replacement. The prototype deliberately exposes these gaps. Keep those decisions
+separate from the following LINQ terminal outcome slice.
 
 
 ### Following slice: LINQ terminal outcomes (2026-09-13)

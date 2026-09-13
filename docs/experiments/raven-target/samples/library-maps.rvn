@@ -1,0 +1,75 @@
+import System.*
+import System.Collections.*
+import System.Option.*
+import System.Console.*
+
+func Same(left: int, right: int) -> bool {
+    return left == right
+}
+
+// Deliberate collisions exercise the prototype's collision handling.
+func Hash(key: int) -> int {
+    return -1
+}
+
+func PrintOrder(orders: Map<int, string>, number: int) {
+    match orders.Find(number) {
+        Some(let status) => WriteLine(status)
+        None => WriteLine("Unknown order")
+    }
+}
+
+func SameType(left: Type, right: Type) -> bool {
+    return left.Equals(right)
+}
+
+func TypeHash(key: Type) -> int {
+    return 0
+}
+
+func Main() {
+    let orders = HashMap<int, string>(Same, Hash)
+    let writer: MutableMap<int, string> = orders
+    let reader: Map<int, string> = orders
+    if writer.TryAdd(42, "Pending") {
+        WriteLine("Added")
+    }
+    if !writer.TryAdd(42, "Duplicate") {
+        WriteLine("Duplicate rejected")
+    }
+    PrintOrder(reader, 42)
+    PrintOrder(reader, 99)
+    let originalKeys = reader.Keys
+    writer.Set(42, "Shipped")
+    writer.Set(99, "Received")
+    PrintOrder(reader, 42)
+    WriteLine(originalKeys.Count)
+    WriteLine(reader.Count)
+    if reader.ContainsKey(99) {
+        WriteLine("Found")
+    }
+    for key in reader.Keys {
+        WriteLine(key)
+    }
+    for key in 0..20 {
+        writer.Set(key, "Stored")
+    }
+    PrintOrder(reader, 0)
+    PrintOrder(reader, 19)
+    PrintOrder(reader, 42)
+    WriteLine(reader.Count)
+
+    // Reference keys use the supplied equivalence; reference values retain aliases.
+    let types = HashMap<Type, ArrayList<int>>(SameType, TypeHash)
+    let values = ArrayList<int>()
+    values.Add(7)
+    types.Set(typeof(int), values)
+    values.Add(8)
+    match types.Find(typeof(int)) {
+        Some(let found) => WriteLine(found.Count)
+        None => WriteLine("Missing type")
+    }
+    let nested = ArrayList<Map<Type, ArrayList<int>>>()
+    nested.Add(types)
+    WriteLine(nested[0].Keys.Count)
+}

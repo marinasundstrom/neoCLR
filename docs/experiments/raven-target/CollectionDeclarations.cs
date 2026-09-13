@@ -11,6 +11,25 @@ static class CollectionDeclarations
         }
         public interface Disposable { void Dispose(); }
         namespace Collections {
+            public interface Map<K, V> {
+                int Count { get; }
+                Sequence<K> Keys { get; }
+                Option<V> Find(K key);
+                bool ContainsKey(K key);
+            }
+            public interface MutableMap<K, V> : Map<K, V> {
+                bool TryAdd(K key, V value);
+                void Set(K key, V value);
+            }
+            public sealed class HashMap<K, V> : MutableMap<K, V> {
+                public HashMap(Func<K, K, bool> equal, Func<K, int> hash) { }
+                public int Count => default;
+                public Sequence<K> Keys => default;
+                public Option<V> Find(K key) => default;
+                public bool ContainsKey(K key) => default;
+                public bool TryAdd(K key, V value) => default;
+                public void Set(K key, V value) { }
+            }
             public interface Iterable<T> { Iterator<T> GetIterator(); }
             public interface Iterator<T> : Disposable {
                 bool MoveNext();
