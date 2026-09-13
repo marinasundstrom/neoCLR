@@ -58,7 +58,9 @@ forms explicitly rather than declaring a type covered because one method works.
 Language and runtime feature limits may remain documented, but must not silently hide
 an existing public API. Record necessary type-category/contract adaptations and their
 .NET comparison. Refresh and test the packaged tools after the coverage work; the
-current installed SDK is an intermediate development build.
+current installed SDK/extension is 0.1.12-neoclr.6. The existing API audit and nine
+outside-checkout package suites are complete; see [coverage](raven-runtime-api-coverage.md)
+and [build provenance](experiments/raven-target/local-toolchain.json).
 
 ## Distribution boundary
 
@@ -71,8 +73,9 @@ runtime library, demo sources and build/run instructions.
 Validate the bundle outside the developer checkout before publishing it. The
 [experimental release procedure](experiments/raven-target/RELEASING.md) uses separate
 Raven packaging and focused neoCLR checks rather than Raven's full release cycle.
-The local task runner depends on a built Raven checkout and is not yet that
-self-contained public bundle. This plan does not announce a release version or promise unchanged
+The packaged task runner now uses a published compiler bridge and supplied library
+without either development checkout. The macOS arm64 bundle has been validated locally;
+publication remains a separate step. This plan does not announce a release version or promise unchanged
 .NET binary compatibility. Keep published release notes frozen and record the final
 supported/unsupported matrix with the new preview.
 

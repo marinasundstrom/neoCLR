@@ -1731,6 +1731,34 @@ to identify actual gaps, including error-case APIs. The current String slicing w
 has passed runtime/propagation checks; this framing does not describe unsettled APIs
 as complete or stable.
 
+## 2026-09-13 — Complete the existing runtime API pass before stopping
+
+**Author direction.** “I mean don't stop work until Runtime API is done.” This
+clarified the completion boundary: the APIs already developed for neoCLR must be
+usable in the Raven proof of concept, following the earlier direction to leave the
+Neo frontend out and keep Raven changes on its experimental branch.
+
+**Assistant actions and outcome.** Completed the consecutive API projection and
+validation slices, including reflection, native buffers, interfaces, arrays and
+nested collection/union payloads. The assistant used CLR-style boxing for copied
+value-interface views, documenting its allocation and identity costs; direct value
+operations remain available. Internal reserved array capacity tracks unreadable
+slots instead of inventing default union cases. These implementation choices are
+assistant decisions, not additional author quotations or inferred approvals.
+
+Raven regressions uncovered by the integration included generic metadata fields
+and pointers, unsigned array reads, member resolution and value-property setters.
+Fixes and focused tests remain on `codex/neoclr-target-resolution`. The
+[source-by-source API audit](raven-runtime-api-coverage.md) records the projection
+and remaining importer limits. Nine validation suites passed using the packaged
+bridge outside both development checkouts. SDK/VSIX `0.1.12-neoclr.6` were installed
+locally; the installed server passed protocol checks and the saved demo ran.
+[Build provenance](experiments/raven-target/local-toolchain.json) records exact
+source revisions, hashes and scope; [VS Code instructions](experiments/raven-target/VSCODE.md)
+provide the runnable entry point. No public release was made. Full compiler parity,
+general application-type admission and fault-unwind cleanup remain outside this
+completed existing-library pass.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

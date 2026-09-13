@@ -7,43 +7,49 @@ Do not use their success as evidence that a program ran on neoCLR.
 
 ## Already prepared on this machine
 
-The current local experiment uses `raven.raven-vscode@0.1.12-neoclr.4` and the
-side-by-side SDK `/Users/robert/.raven/sdk/0.1.12-neoclr.4`, built from Raven commit
-`22cea6fa1` on `codex/neoclr-target-resolution`.
-These are local experiment labels, not published releases. The default SDK launcher
-remains unchanged; the new workspace selects the experimental SDK and installed server.
+The current local experiment uses `raven.raven-vscode@0.1.12-neoclr.6` and the
+side-by-side SDK `$HOME/.raven/sdk/0.1.12-neoclr.6`, built from Raven commit
+`9b269f9d0` on `codex/neoclr-target-resolution`. These are local experiment labels,
+not published releases. The global SDK selection remains unchanged.
 
 Open the prepared folder:
 
 ```sh
-code --new-window /Users/robert/Projects/neoclr/docs/experiments/raven-target/local/2026-09-12-propagation-4/editor
+code --new-window "$HOME/.neoclr/experiments/runtime-api-poc-20260913/demo"
 ```
 
 1. Run **Developer: Reload Window** if VS Code was open during the update.
-2. Open `Main.rvn`, containing the combined propagation workflow.
+2. Open `Main.rvn`, containing the combined Result/Option/Void propagation workflow.
 3. Choose **Terminal → Run Task → neoCLR: Run saved project**.
 4. Expect `42`, `Saved`, `Completed`, `Overflow`, `Value found`, `42`, `Absent`.
-5. Change `values.Add(-42)` to `values.Add(-7)`, save, and run again. The first line
-   should become `7`.
-6. Try completion after `System.Math.` or `values.`; undo unfinished expressions
-   before running. ArrayList exposes `Capacity` and uses constructors, not Allocate.
-   Hover over `amount` in `Complete` or `value` in `Read` to see inferred `int`.
+5. Try completion after `System.Date.` or `System.Type.`; undo unfinished expressions
+   before running. Copy another sample from `../tools/samples` over `Main.rvn` to
+   explore files, calendar APIs, reflection, collections or value interfaces.
 
-The workspace settings pin the installed extension's language server. The project uses
-only the neoCLR declaration assembly, while executable calls use the adapted runtime
-library. Host tooling still requires .NET 11. The SDK is a Raven host toolchain;
-neoCLR execution uses the dedicated tasks, not Raven's normal Build/Run/Debug buttons.
+The workspace pins the supplied matching language server and experimental SDK.
+The published compiler bridge and runtime library are included: neither development
+checkout is required. Host tooling requires .NET 11 and Python 3.9 or later.
+The [bundle instructions](bundle/README.md) explain setup after extraction or moving it.
 
-The installed server passed the stdio completion/hover checks, and the saved workflow
-compiled, verified and ran successfully on 2026-09-12. The wider pre-merge runtime
-suite found generic Clonable and calculator regressions, subsequently fixed and
-validated across all integration suites; this local demo is not a claim that the branch is release-ready. The installed server also verified Option propagation output inference and
-ArrayList completion. The [match matrix](../../raven-match-matrix.md) now documents tested forms and limits;
-text-file/date-time admission and broader API work remain pending.
+All nine package validation suites passed outside both checkouts on 2026-09-13.
+The installed extension's server also passed completion/hover protocol checks, and
+the installed demo compiled, verified and ran. This verifies the server protocol;
+it does not claim a manual visual inspection of every VS Code feature.
+See [build provenance](local-toolchain.json), [API coverage](../../raven-runtime-api-coverage.md)
+and the [match matrix](../../raven-match-matrix.md) for the supported scope.
+
+Terminal equivalent for the installed bundle:
+
+```sh
+cd "$HOME/.neoclr/experiments/runtime-api-poc-20260913"
+python3 tools/run_project.py demo/Demo.rvnproj --bridge tools/bridge/Probe.dll --system lib/System.neoil --runtime bin/neoclr
+```
+
+The sections below describe the alternative source-checkout workflow for contributors.
 
 ## Edit, build and run the saved project
 
-Requires Raven commit `22cea6fa1` or the corresponding
+Requires Raven commit `9b269f9d0` or the corresponding
 source build. The runner uses that checkout's compiler API; the independently installed
 SDK is not the target build backend yet.
 
@@ -91,7 +97,7 @@ Prerequisites: the pinned .NET SDK from `global.json`, Node/npm, the VS Code `co
 command, and a Raven checkout with the commit above. From the Raven repository:
 
 ```sh
-RAVEN_PACKAGE_OUTPUT="$PWD/artifacts/neoclr-local" scripts/package-vscode.sh 0.1.12-neoclr.4
+RAVEN_PACKAGE_OUTPUT="$PWD/artifacts/neoclr-local" scripts/package-vscode.sh 0.1.12-neoclr.6
 code --install-extension "$PWD/artifacts/neoclr-local/raven-vscode.vsix" --force
 code --list-extensions --show-versions
 code --locate-extension raven.raven-vscode
@@ -105,15 +111,15 @@ published version. Other projects retain their normal reference policy.
 For a separate local SDK bundle, the repository also supports:
 
 ```sh
-RAVEN_PACKAGE_OUTPUT="$PWD/artifacts/neoclr-local" scripts/package-sdk.sh osx-arm64 0.1.12-neoclr.4
+RAVEN_PACKAGE_OUTPUT="$PWD/artifacts/neoclr-local" scripts/package-sdk.sh osx-arm64 0.1.12-neoclr.6
 ```
 
 To install that bundle alongside existing SDKs (the destination must not exist):
 
 ```sh
 mkdir -p "$HOME/.raven/sdk"
-cp -R artifacts/neoclr-local/raven-sdk-0.1.12-neoclr.4-osx-arm64 "$HOME/.raven/sdk/0.1.12-neoclr.4"
-"$HOME/.raven/sdk/0.1.12-neoclr.4/bin/rvnc" --version
+cp -R artifacts/neoclr-local/raven-sdk-0.1.12-neoclr.6-osx-arm64 "$HOME/.raven/sdk/0.1.12-neoclr.6"
+"$HOME/.raven/sdk/0.1.12-neoclr.6/bin/rvnc" --version
 ```
 
 Set the demo's `raven.sdkPath` to that directory, or pass `--sdk /absolute/sdk-directory`
@@ -148,7 +154,7 @@ VS Code check above. It does not change the saved sample text.
 
 ## Collection project follow-up
 
-This follow-up needs Raven commit `22cea6fa1`
+This follow-up needs Raven commit `9b269f9d0`
 on `codex/neoclr-target-resolution` (or a compatible descendant). The installed experimental extension above includes project iteration configuration.
 For a source-only setup instead, build the current server and let generated workspace
 settings select it. This does not change global .NET settings.

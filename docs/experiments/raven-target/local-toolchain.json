@@ -1,22 +1,44 @@
 {
-  "recordedDate": "2026-09-12",
+  "recordedDate": "2026-09-13",
   "distribution": "local experiment; not published",
-  "ravenRevision": "22cea6fa1c88f08fef3d88ba362038b611f41e3c",
+  "ravenRevision": "9b269f9d0d71c4302c9008ff6bf6d0c6b1d21c9c",
   "ravenBranch": "codex/neoclr-target-resolution",
-  "neoCLRRevision": "1f7c431013b3a7b2ca28efd3db0fe69ad19ed2f6",
-  "toolVersion": "0.1.12-neoclr.4",
-  "sdkPath": "/Users/robert/.raven/sdk/0.1.12-neoclr.4",
-  "extensionPath": "/Users/robert/.vscode/extensions/raven.raven-vscode-0.1.12-neoclr.4",
-  "demo": "local/2026-09-12-propagation-4/editor",
+  "neoCLRRevision": "cefe3dfeb87fb0faee399b9fa9cad02b6fc41276",
+  "toolVersion": "0.1.12-neoclr.6",
+  "dotnetSdk": "11.0.100-rc.1.26425.128",
+  "sdkPath": "/Users/robert/.raven/sdk/0.1.12-neoclr.6",
+  "extensionPath": "/Users/robert/.vscode/extensions/raven.raven-vscode-0.1.12-neoclr.6",
+  "demo": "/Users/robert/.neoclr/experiments/runtime-api-poc-20260913/demo",
+  "artifactDirectory": "local/2026-09-13-runtime-api-6",
   "artifacts": {
-    "raven-vscode.vsix": "8118e81616244ef294b37a391ffdd8603dc557f8cdaa581f8bbe2410d639d36f",
-    "raven-sdk-0.1.12-neoclr.4-osx-arm64.tar.gz": "e93223fce5b1a408898ca5b445ace395b8b6300a8ce462299bcccc451c2889ec"
+    "neoclr-raven-runtime-api-osx-arm64.tar.gz": "1dc632e081aaf66c5fc2bd6d1c1f5f36c44886d39dc7050f9391f02429541f82",
+    "raven-vscode.vsix": "f9dd076ec0c826fd1e4118009536f37248a8b174d29026e44eab40a9db82fce6",
+    "raven-sdk-0.1.12-neoclr.6-osx-arm64.tar.gz": "093d75ac73b0b286f5ed0b1f538ce4820516a5c5e2bbb17106e8b666a0f559b1"
   },
-  "checks": [
-    "Installed rvnc reports 0.1.12-neoclr.4",
-    "Installed stdio server: target completion, collection loop inference, Option propagation inference, ArrayList Capacity",
-    "Saved combined workflow: compile, import, verify and run"
-  ],
+  "validation": {
+    "date": "2026-09-13",
+    "neoCLRRevision": "cefe3dfeb87fb0faee399b9fa9cad02b6fc41276",
+    "ravenRevision": "9b269f9d0d71c4302c9008ff6bf6d0c6b1d21c9c",
+    "platform": "osx-arm64",
+    "method": "Copied bundle outside both checkouts; verified all 490 original payload hashes; configured and ran published bridge against supplied runtime library.",
+    "suites": {
+      "process": 0,
+      "file_project": 0,
+      "clock": 0,
+      "error_values": 0,
+      "unions": 0,
+      "delegates": 0,
+      "editor": 0,
+      "native_buffer": 0,
+      "project": 0
+    },
+    "installedChecks": [
+      "SDK --version: 0.1.12-neoclr.6",
+      "VSIX 0.1.12-neoclr.6 installed; its actual server passed completion/hover protocol checks",
+      "Installed home demo compiled, imported, verified and executed"
+    ],
+    "scope": "Existing runtime API preview; bounded importer. Not full Raven/CLR parity or a public release."
+  },
   "guestOutput": [
     "42",
     "Saved",
@@ -27,8 +49,8 @@
     "Absent"
   ],
   "limitations": [
-    "Execution still uses dedicated neoCLR project tasks and the source bridge",
-    "Bounded Int32/OverflowError propagation profile",
-    "No public release or general Raven target SDK build support"
+    "Dedicated neoCLR tasks, not Raven normal build/run/debug buttons",
+    "Bounded importer; see runtime API coverage document",
+    "No public release; full Raven release gate not claimed"
   ]
 }
