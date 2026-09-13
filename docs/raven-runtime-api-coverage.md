@@ -55,10 +55,11 @@ these checks; it provides a reviewable checklist when the library changes.
   getter's read behavior. This is a preview API change, not binary compatibility.
 - Reserved ArrayList capacity supports non-defaultable carriers. Ordinary newarr
   still requires valid defaults. Generic mapping is bounded and preserves invariant
-  arguments; arbitrary application classes, rectangular arrays and covariance are
-  not part of this importer.
+  arguments. The post-Preview-4 source bridge also supports bounded application
+  classes/value types and class interfaces; see [application types](raven-application-types.md).
+  Generic application definitions, rectangular arrays and covariance remain outside it.
 - Delegate APIs currently admit static targets. General instance/capturing targets,
-  application-defined interface implementations, virtual application hierarchies,
+  explicit/default interface implementations, generic application hierarchies,
   general pointer arithmetic/layouts, unboxing and constrained calls need further
   compiler/importer work. Raw native pointer reads/writes currently admit Int32;
   other supported primitive buffers use Get/Set/indexers.

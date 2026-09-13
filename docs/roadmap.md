@@ -38,13 +38,23 @@ Continue the Raven collection demo against these target semantics.
 
 ## Runtime API milestone status (2026-09-13)
 
-The existing-library Raven projection pass and nine outside-checkout package suites
-are complete. See the [coverage audit](raven-runtime-api-coverage.md) and
-[local toolchain record](experiments/raven-target/local-toolchain.json). The next
-consecutive work is public distribution preparation: current-direction documentation,
-asset attribution and provenance, final candidate checks, then publication. Broader
-compiler/runtime features remain separate. Earlier slice descriptions below record
-the dependency order and must not be interpreted as a list of still-missing APIs.
+Preview 4 is published with runtime, source, Raven SDK/VSIX and validation artifacts.
+The active follow-up is [application-defined Raven types](raven-application-types.md):
+class/value storage, interfaces and inheritance, then an order-workflow application.
+Delegate targets and non-capturing/capturing lambdas are included in the follow-up
+scope. Keep runtime work primary and Raven fixes isolated on its experimental branch;
+separate general compiler bugs from target contract mappings and generic-Void semantics.
+
+A future release must include Raven-to-neoCLR debugging support. Build on the existing
+terminal debugger; investigate Portable PDB/source mapping, breakpoints, step-in/over/out,
+and inspection of locals, call stacks and managed objects. Scope VS Code integration
+explicitly. Compared with CLR tooling, prefer compiler-provided standard debug metadata
+and a runtime debug protocol over reconstructing source from generated IL. This is a
+release requirement and investigation plan, not a claim of delivered Raven debugging.
+
+Generic Void also constrains a future Task<Void>/async-await design: decide awaiter
+contracts, no-payload completion and suspension without importing assumptions that Void
+cannot be a generic argument. Async is not part of these application slices.
 
 ## Current Raven-target experiment priority
 

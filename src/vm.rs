@@ -486,17 +486,12 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         if class_owner
             && (function.receiver_byref
                 || function.receiver_readonly
-                || function.is_virtual
-                || function.is_override
-                || function.is_abstract
                 || function.is_internal_call()
                 || function.pinvoke.is_some()
                 || !function.interface_implementations.is_empty()
                 || !function.generic_parameters.is_empty())
         {
-            return Err(Fault::new(
-                "class methods currently require ordinary non-virtual IL receivers",
-            ));
+            return Err(Fault::new("class methods require ordinary IL receivers"));
         }
         if class_owner
             && function.name.ends_with("..ctor")
@@ -513,9 +508,9 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         if function.no_result
             && (function.returns != Type::Void
                 || (function.instance && !class_owner && !nominal_interface_contract)
-                || (function.is_virtual && !nominal_interface_contract)
-                || function.is_override
-                || (function.is_abstract && !nominal_interface_contract)
+                || (function.is_virtual && !nominal_interface_contract && !class_owner)
+                || (function.is_override && !class_owner)
+                || (function.is_abstract && !nominal_interface_contract && !class_owner)
                 || function.is_internal_call()
                 || function.pinvoke.is_some()
                 || !function.interface_implementations.is_empty())
@@ -846,9 +841,20 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                             .as_ref()
                             .is_some_and(|owner| module.is_reference_type(owner))
                     {
-                        return Err(Fault::new(
-                            "direct class constructor calls/chaining are not implemented",
-                        ));
+                        let caller_owner = function.owner.as_ref();
+                        if !matches!(op, Op::Call(_))
+                            || !function.instance
+                            || !function.name.ends_with("..ctor")
+                            || caller_owner.is_none()
+                            || !(caller_owner == callee.owner.as_ref()
+                                || crate::inheritance::base(module, caller_owner.unwrap())?
+                                    .as_ref()
+                                    == callee.owner.as_ref())
+                        {
+                            return Err(Fault::new(
+                                "class constructor calls require this or direct-base chaining",
+                            ));
+                        }
                     }
                     if callee.is_abstract && !matches!(op, Op::CallVirtual(_)) {
                         return Err(Fault::new("abstract methods require virtual dispatch"));
@@ -1941,10 +1947,20 @@ fn interpret_instructions(
                             let receiver = frame
                                 .pop()?
                                 .for_storage_in(module, contract.owner.as_ref().unwrap())?;
-                            let Value::ObjectReference(object) = receiver else {
+                            let Value::ObjectReference(mut object) = receiver else {
                                 return Err(Fault::new("null class receiver"));
                             };
                             object.reference.assigned()?;
+                            let contract = if contract.is_virtual {
+                                crate::inheritance::dispatch(
+                                    module,
+                                    object.concrete_type(),
+                                    &contract,
+                                )?
+                            } else {
+                                contract
+                            };
+                            object.view = contract.owner.clone();
                             args.insert(0, Value::ObjectReference(object));
                             if frames.len() >= limits.frames {
                                 return Err(Fault::new("frame limit exceeded"));
@@ -2011,7 +2027,7 @@ fn interpret_instructions(
                             }
                             args.insert(0, Value::SlotReference(receiver));
                         } else {
-                            object.view = None;
+                            object.view = callee.owner.clone();
                             args.insert(0, Value::ObjectReference(object));
                         }
                         if frames.len() >= limits.frames {
@@ -2348,6 +2364,46 @@ fn interpret_instructions(
                         return Ok(None);
                     }
                     let mut args = frame.args(module, &callee.argument_types())?;
+                    if callee.instance
+                        && callee.name.ends_with("..ctor")
+                        && callee
+                            .owner
+                            .as_ref()
+                            .is_some_and(|owner| module.is_reference_type(owner))
+                    {
+                        let own = frame
+                            .args
+                            .first()
+                            .ok_or_else(|| Fault::new("missing constructor receiver"))?
+                            .borrow()
+                            .get()?
+                            .clone();
+                        if frame.constructor_chained
+                            || !matches!((&own, args.first()),
+                            (Value::ObjectReference(a), Some(Value::ObjectReference(b))) if a == b)
+                        {
+                            return Err(Fault::new(
+                                "class constructor must chain once using its own receiver",
+                            ));
+                        }
+                        frame.constructor_chained = true;
+                        restrict_reference_arguments(&callee, &mut args)?;
+                        if frames.iter().any(|f| {
+                            f.function.definition == callee.definition
+                                && f.args.first().is_some_and(|slot| {
+                                    slot.borrow()
+                                        .get()
+                                        .is_ok_and(|value| Some(&value) == args.first())
+                                })
+                        }) {
+                            return Err(Fault::new("cyclic constructor delegation"));
+                        }
+                        if frames.len() >= limits.frames {
+                            return Err(Fault::new("frame limit exceeded"));
+                        }
+                        frames.push(Frame::new(callee, args)?);
+                        return Ok(None);
+                    }
                     restrict_reference_arguments(&callee, &mut args)?;
                     if callee.pinvoke.is_some() {
                         let libraries = native_libraries.as_mut().ok_or_else(|| {
@@ -2384,6 +2440,20 @@ fn interpret_instructions(
                     }
                 }
                 Op::Return => {
+                    if function.instance
+                        && function.name.ends_with("..ctor")
+                        && function
+                            .owner
+                            .as_ref()
+                            .is_some_and(|owner| module.is_reference_type(owner))
+                        && crate::inheritance::base(module, function.owner.as_ref().unwrap())?
+                            .is_some()
+                        && !frame.constructor_chained
+                    {
+                        return Err(Fault::new(
+                            "class constructor must complete this or base chaining",
+                        ));
+                    }
                     let value = if function.no_result {
                         Value::Void
                     } else {

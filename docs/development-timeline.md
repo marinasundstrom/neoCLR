@@ -1909,3 +1909,14 @@ See [application types and findings](raven-application-types.md).
 async/await story. The assistant recorded that as a design requirement, without
 claiming async implementation or choosing a task contract. Interface and workflow
 slices remain in progress at this entry; the published Preview 4 artifacts are unchanged.
+
+
+**Further direction in the same exchange.** The author added delegates and lambdas
+to the support goals, and required debugging support for a future release. The
+assistant placed delegate/lambda work after the class/interface foundation and
+recorded a future Raven debugging milestone in the [roadmap](roadmap.md). The
+interface/inheritance sample now executes, revealing another Raven compiler bug:
+implicit interface implementation overrode declared abstract/virtual method flags.
+The fix remains on the experimental branch. These findings reinforce the author's
+distinction between compiler stabilization, target-specific contract mappings and
+intentional runtime changes; they do not turn this into a general Raven release.

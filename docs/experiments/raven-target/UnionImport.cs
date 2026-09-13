@@ -80,7 +80,7 @@ static class UnionImport
             if (!method.HasBody || method.IsPInvokeImpl || method.IsInternalCall || method.Body.HasExceptionHandlers
                 || method.Body.CodeSize > 65536 || method.Body.MaxStackSize > 256 || method.Body.Variables.Count > 256 || method.Body.Instructions.Count == 0
                 || method.DeclaringType.Methods.Any(m => m.IsConstructor && m.IsStatic))
-                throw new InvalidDataException("Unsupported body: " + method.FullName);
+                throw new InvalidDataException("Unsupported body: " + method.FullName + " (" + method.Attributes + ")");
             var args = (method.HasThis ? new[] { ApplicationTypes.Receiver(method) } : Array.Empty<string>()).Concat(method.Parameters.Select(p => ProfileType(p.ParameterType))).ToArray();
             var valueConstructor = method.IsConstructor && method.DeclaringType.IsValueType;
             var emitInstance = method.HasThis && !valueConstructor;
@@ -109,7 +109,7 @@ static class UnionImport
                     throw new InvalidDataException("Conditional extraction output must be tested before use.");
                 void Push(Slot slot) { stack.Add(slot); if (stack.Count > method.Body.MaxStackSize) throw new InvalidDataException("Declared maxstack exceeded."); }
                 Slot Pop() { if (stack.Count == 0) throw new InvalidDataException($"Input stack underflow in {method.FullName} at {instruction.Offset:x4}."); var top = stack[^1]; stack.RemoveAt(stack.Count - 1); return top; }
-                Slot Expect(string type) { var top = Pop(); if (!(CollectionBindings.Assignable(PrimitiveBindings.Stack(top.Type), PrimitiveBindings.Stack(type)) || ReflectionBindings.Assignable(top.Type, type))) throw new InvalidDataException("Input stack type mismatch."); return top; }
+                Slot Expect(string type) { var top = Pop(); if (!(CollectionBindings.Assignable(PrimitiveBindings.Stack(top.Type), PrimitiveBindings.Stack(type)) || ReflectionBindings.Assignable(top.Type, type) || ApplicationTypes.Assignable(top.Type, type))) throw new InvalidDataException("Input stack type mismatch."); return top; }
                 int Local(int n) { if (n < 0 || n >= locals.Length) throw new InvalidDataException("Invalid local index."); return n; }
                 void Load(int n) { Local(n); if (!assigned[n]) throw new InvalidDataException("Read of uninitialized or unsupported default local."); Push(new(PrimitiveBindings.Stack(locals[n]))); code.AppendLine($"ldloc local{n}"); }
                 Slot ConvertTop(string type)
@@ -156,7 +156,7 @@ static class UnionImport
                     case Code.Castclass:
                         var castTarget = ProfileType((TypeReference)instruction.Operand);
                         var castSource = Pop().Type;
-                        if (!(ReflectionBindings.IsReference(castSource) || InterfaceBindings.IsInterface(castSource) || castSource == "System.Object" || castSource == "String") || !(ReflectionBindings.IsReference(castTarget) || InterfaceBindings.IsInterface(castTarget) || castTarget == "String")) throw new InvalidDataException("Unsupported reference cast.");
+                        if (!(ApplicationTypes.IsReference(castSource) || ReflectionBindings.IsReference(castSource) || InterfaceBindings.IsInterface(castSource) || castSource == "System.Object" || castSource == "String") || !(ApplicationTypes.IsReference(castTarget) || ReflectionBindings.IsReference(castTarget) || InterfaceBindings.IsInterface(castTarget) || castTarget == "String")) throw new InvalidDataException("Unsupported reference cast.");
                         Push(new(castTarget)); code.AppendLine("castclass " + castTarget); break;
                     case Code.Ldnull: Push(new("FaultNull")); break;
                     case Code.Throw:
@@ -212,7 +212,7 @@ static class UnionImport
                         if (appRead is not null)
                         {
                             var receiver = Pop().Type;
-                            if (receiver != appRead.Owner && receiver != appRead.Owner + "&") throw new InvalidDataException("Invalid application field receiver.");
+                            if (!ApplicationTypes.Assignable(receiver, appRead.Owner) && receiver != appRead.Owner + "&") throw new InvalidDataException("Invalid application field receiver.");
                             Push(new(PrimitiveBindings.Stack(appRead.Type))); code.AppendLine($"ldfld {appRead.Owner}::{appRead.Name}"); break;
                         }
                         var readShape = NativeArrayBindings.Field(readField);
@@ -397,7 +397,7 @@ static class UnionImport
                             if (!targetMethod.IsPublic && targetMethod.DeclaringType != method.DeclaringType)
                                 throw new InvalidDataException("Nonpublic cross-type call unsupported.");
                             if (reference.FullName != targetMethod.FullName) throw new InvalidDataException("Resolved signature mismatch.");
-                            pending.Enqueue(targetMethod);
+                            if (!targetMethod.IsAbstract) pending.Enqueue(targetMethod);
                             var parameters = reference.Parameters.Select(p => ProfileType(p.ParameterType)).ToArray();
                             call = targetMethod.HasThis && !(targetMethod.IsConstructor && targetMethod.DeclaringType.IsValueType)
                                 ? new("", new[] { ApplicationTypes.Receiver(targetMethod) }.Concat(parameters).ToArray(), ProfileType(reference.ReturnType, true), Instruction: $"{(instruction.OpCode.Code == Code.Callvirt ? "callvirt" : "call")} instance {ProfileType(reference.DeclaringType)}::{ApplicationTypes.MethodName(targetMethod)}({string.Join(',', parameters)})" + (targetMethod.DeclaringType.IsValueType && targetMethod.ReturnType.MetadataType == MetadataType.Void ? "\npop" : ""))
@@ -470,7 +470,7 @@ static class UnionImport
             }
             var methodStart = output.Length;
             // Unreachable guest instructions are omitted, not admitted as executable code.
-            output.AppendLine(emitInstance ? $".method instance {(method.DeclaringType.IsValueType ? "byref " : "")}{ApplicationTypes.MethodName(method)}({string.Join(',', args.Skip(1))}) -> {(method.DeclaringType.IsValueType && result == "noresult" ? "Void" : result)}" : $".function {Name(method)}({string.Join(',', args)}) -> {result}");
+            output.AppendLine(emitInstance ? $".method instance {(method.DeclaringType.IsValueType ? "byref " : "")}{ApplicationTypes.Modifiers(method)}{ApplicationTypes.MethodName(method)}({string.Join(',', args.Skip(1))}) -> {(method.DeclaringType.IsValueType && result == "noresult" ? "Void" : result)}" : $".function {Name(method)}({string.Join(',', args)}) -> {result}");
             for (var n = 0; n < locals.Length; n++) output.AppendLine($".local {locals[n]} local{n}");
             if (method.Body.InitLocals)
                 for (var n = 0; n < locals.Length; n++)
@@ -483,6 +483,8 @@ static class UnionImport
             }
             output.AppendLine(".end");
             if (emitInstance) { instanceBodies[method] = output.ToString(methodStart, output.Length - methodStart); output.Length = methodStart; }
+
+            ApplicationTypes.Expand(ProfileType, pending);
 
             void Merge(int index, State next)
             {
@@ -506,7 +508,7 @@ static class UnionImport
             .ToDictionary(p => p.line, p => p.index + 1);
         File.WriteAllText(destination, generated);
         File.WriteAllText(destination + ".map.json", JsonSerializer.Serialize(new {
-            Profile = collectionProfile ? "result-option-void-files-strings-collections-v8" : "result-option-void-files-strings-arrays-v7",
+            Profile = collectionProfile ? "result-option-void-application-types-v9" : "result-option-void-files-strings-arrays-v7",
             RequiredLibraryProfile = collectionProfile ? "raven-collections" : "bundled-system", ApplicationSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(application))),
             CoreSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(core))), ReachableMethods = seen.Order().ToArray(), Mappings = mappings.Select(m => new { m.MethodToken, m.Offset, OutputLine = labelLines[$"M{m.MethodToken:x8}_IL_{m.Offset:x4}:"] }),
             Scope = "Bounded application class/value fields, constructors and instance methods; Int32/String vectors, optional closed collection references, file UTF-8 APIs, String helpers and generic Result/Option bindings; CFG stack/definite-assignment checked; observable default carriers rejected; no guest declaration bodies executed."

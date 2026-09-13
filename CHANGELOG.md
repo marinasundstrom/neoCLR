@@ -10,6 +10,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 - The Raven source bridge now imports ordinary application classes/value types,
   fields, constructors and instance accessors/methods, including ArrayList storage.
+  Extended this to application class interfaces, abstract/virtual inheritance and
+  nominal constructor chaining; runtime checks preserve concrete dispatch and reject
+  invalid chaining. Added runtime and Raven examples/checks for the contracts.
   Added class-alias/value-copy, saved-source, mapping and rejection checks. Recorded
   Raven targeting findings and the future generic-Void async requirement; the source
   bridge requires the updated experimental Raven branch, not the published Preview 4 SDK.

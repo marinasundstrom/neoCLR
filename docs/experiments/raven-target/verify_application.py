@@ -23,6 +23,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-application-check-') as temporar
                *runner_arguments(args), '--runtime', str(args.runtime.resolve())]
     source = (bridge / 'samples/application-types.rvn').read_text()
     for label, text, expected in [
+        ('Application interfaces', (bridge / 'samples/application-interfaces.rvn').read_text(), '42\n99\n'),
+        ('Abstract inheritance and overrides', (bridge / 'samples/application-inheritance.rvn').read_text(), '7\n42\n'),
         ('Class identity and value copies', source, '42\n99\n7\n42\n7\n'),
         ('Saved source rebuild', source.replace('counter.Set(42)', 'counter.Set(21)'), '21\n99\n7\n42\n7\n'),
     ]:

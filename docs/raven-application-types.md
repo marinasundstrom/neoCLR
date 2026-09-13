@@ -47,7 +47,7 @@ convention internally; the input CLI still has a no-stack-result void return.
 
 Unsupported metadata fails explicitly: generic application definitions, static
 initialization/storage, enums, custom/explicit layout, nested definitions, readonly
-fields, inheritance and interfaces are outside this first slice. Reachable bodies
+fields were outside the first slice. Inheritance/interface support is described below. Reachable bodies
 retain the existing bounded opcode and exception-handler restrictions. This is not a
 general-purpose PE loader or a full metadata verifier. No performance claim is made.
 
@@ -78,3 +78,43 @@ its experimental feature branch; ordinary .NET support must retain its behavior.
 `Task<Void>` and its no-payload completion require a future async design, including
 language return handling, emitted signatures, awaiter contracts and runtime suspension.
 This records a requirement, not an async implementation or a chosen task API.
+
+## Interface and inheritance slice (2026-09-13)
+
+The source bridge now also admits application interfaces with public abstract
+instance contracts, class implementations, interface inheritance, and ordinary
+non-generic class inheritance with virtual/abstract methods and overrides. Same-name
+public MethodImpl records emitted by Raven for implicit implementations are validated
+against their contract; renamed explicit implementations and default interface bodies
+remain outside this slice. Value-type interface implementations are not yet admitted.
+
+The runtime now dispatches nominal class `callvirt` through the concrete allocation,
+including an interface implemented by a base class. Direct `call` preserves its exact
+selected method. Override validation preserves the no-result convention as well as
+parameter and return types. Class constructor calls can chain to this type or the
+direct base, preserving the same allocation. Runtime checks reject a different
+receiver, repeated chaining, cyclic delegation, and a derived constructor returning
+without chaining. Class fields retain their existing allocation-default rules.
+
+This extends the earlier [inheritance research](class-dispatch.md) and follows CLI
+virtual dispatch and constructor-call patterns. It does not introduce value slicing,
+a new virtual-call opcode, or an exception hierarchy. The bridge eagerly admits
+instance bodies of the used application types so dispatch targets cannot remain
+unvalidated merely because source calls mention only an interface. The existing
+body/type limits still apply. Application names remain token-derived in runtime
+introspection; emitting the full application reflection surface is later work.
+
+Raven also incorrectly forced final/new-slot flags for declared abstract or virtual
+methods that implicitly implement an interface. The experimental compiler correction (`62105de24`)
+preserves declaration intent; tests exercise ordinary and target metadata emission.
+This is a compiler bug fix, distinct from configurable Iterable/Iterator contracts
+and the intentional generic-Void difference.
+
+The interface sample prints `42`, `99`; the inheritance sample prints `7`, `42`.
+Both are included in `verify_application.py`. Runtime tests in
+`tests/nominal_inheritance.rs` cover dispatch, no-result overrides and rejected
+constructor behavior, including execution without opting into typed verification.
+
+Validation: the six application checks pass, as do the focused runtime inheritance/
+dispatch suites and strict Clippy. Ten focused Raven tests pass, including dispatch
+flags through ordinary and experimental metadata emission.

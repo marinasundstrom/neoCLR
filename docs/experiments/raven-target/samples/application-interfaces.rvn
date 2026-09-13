@@ -1,0 +1,24 @@
+import System.*
+import System.Collections.*
+import System.Console.*
+
+interface CounterView {
+    func Get() -> int
+    func Set(value: int)
+}
+class Counter : CounterView {
+    var Age: int
+    init(age: int) { Age = age }
+    func Get() -> int { return Age }
+    func Set(value: int) { Age = value }
+}
+func Make() -> CounterView { return Counter(7) }
+func Main() {
+    let view = Make()
+    view.Set(42)
+    WriteLine(view.Get())
+    let values = ArrayList<CounterView>()
+    values.Add(view)
+    values[0].Set(99)
+    WriteLine(view.Get())
+}

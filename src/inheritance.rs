@@ -90,14 +90,16 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
         if definition.base.is_none() {
             continue;
         }
-        if module.functions.iter().any(|f| {
-            f.name.ends_with("..ctor")
-                && !f.receiver_byref
-                && f.owner
-                    .as_ref()
-                    .and_then(|t| module.type_definition(t))
-                    .is_some_and(|d| std::ptr::eq(d, definition))
-        }) {
+        if !definition.is_reference_type
+            && module.functions.iter().any(|f| {
+                f.name.ends_with("..ctor")
+                    && !f.receiver_byref
+                    && f.owner
+                        .as_ref()
+                        .and_then(|t| module.type_definition(t))
+                        .is_some_and(|d| std::ptr::eq(d, definition))
+            })
+        {
             return Err(Fault::new(
                 "derived constructors require managed byref receivers",
             ));
@@ -219,7 +221,11 @@ fn validate_methods(module: &Module) -> Result<(), Fault> {
         if (method.is_virtual || method.is_override)
             && (!method.is_virtual
                 || !method.instance
-                || !method.receiver_byref
+                || (!method.receiver_byref
+                    && !method
+                        .owner
+                        .as_ref()
+                        .is_some_and(|owner| module.is_reference_type(owner)))
                 || method.visibility != crate::metadata::Visibility::Public
                 || method.name.ends_with("..ctor")
                 || method.is_internal_call()
@@ -257,6 +263,7 @@ fn validate_methods(module: &Module) -> Result<(), Fault> {
                 .ok_or_else(|| Fault::new("override requires an inherited virtual method"))?;
             if !parent.is_virtual
                 || parent.returns != method.returns
+                || parent.no_result != method.no_result
                 || parent.receiver_readonly != method.receiver_readonly
                 || parent.receiver_byref != method.receiver_byref
                 || flags(&parent.out_parameters) != flags(&method.out_parameters)
