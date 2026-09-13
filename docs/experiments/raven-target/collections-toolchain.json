@@ -1,0 +1,199 @@
+{
+  "neoCLRRevision": "6fd3729611d478913a6a254e8e2c8663146e43c6",
+  "ravenRevision": "854cd4d3d8c2fa4ed2f82e834c65cfef4371ebe3",
+  "ravenBranch": "codex/neoclr-target-resolution",
+  "sdkVersion": "0.1.12-neoclr.12",
+  "dotnetSdk": "11.0.100-rc.1.26425.128",
+  "platform": "osx-arm64",
+  "createdUtc": "2026-09-13T21:22:44.065764+00:00",
+  "distribution": "Validated local experiment; not published",
+  "artifacts": {
+    "raven-sdk-0.1.12-neoclr.12-osx-arm64.tar.gz": {
+      "path": "/Users/robert/.neoclr/builds/collections-toolchain-20260913/raven-sdk-0.1.12-neoclr.12-osx-arm64.tar.gz",
+      "sha256": "d0a71bc7a57ef62aaf9f9001eaf0105155e3a8c83cd6023210e93f09933f8cc7",
+      "bytes": 30950794
+    },
+    "raven-vscode.vsix": {
+      "path": "/Users/robert/.neoclr/builds/collections-toolchain-20260913/raven-vscode.vsix",
+      "sha256": "02ffda2fae8956cef75cf48699de1ac2e88db6b467744fecbcace8c26e180af4",
+      "bytes": 10252845
+    },
+    "neoclr-collections-poc-20260913-osx-arm64.tar.gz": {
+      "path": "/Users/robert/.neoclr/builds/collections-toolchain-20260913/neoclr-collections-poc-20260913-osx-arm64.tar.gz",
+      "sha256": "76f94b5feb1805a5cf257efbf28cfec125861446075af6008c862e185919285a",
+      "bytes": 23019987
+    },
+    "bundle/manifest.json": {
+      "path": "/Users/robert/.neoclr/builds/collections-toolchain-20260913/bundle/manifest.json",
+      "sha256": "8146988219068747c9ecfe62949bc1dde23852d39854f11294d40316e62c13b9",
+      "bytes": 87635
+    }
+  },
+  "validation": {
+    "payloadHashesVerified": {
+      "files": 733,
+      "archiveVerified": true,
+      "sdkArchiveFiles": 439
+    },
+    "suites": {
+      "project": {
+        "command": [
+          "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/tools/verify_project.py",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/demo/Demo.rvnproj",
+          "--bridge",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/tools/bridge/Probe.dll",
+          "--system",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/lib/System.neoil",
+          "--runtime",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/bin/neoclr",
+          "--collections"
+        ],
+        "exitCode": 0,
+        "seconds": 120.07,
+        "checks": 63
+      },
+      "queries": {
+        "command": [
+          "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/tools/verify_queries.py",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/demo/Demo.rvnproj",
+          "--bridge",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/tools/bridge/Probe.dll",
+          "--system",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/lib/System.neoil",
+          "--runtime",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/bin/neoclr"
+        ],
+        "exitCode": 0,
+        "seconds": 57.15,
+        "checks": 29
+      },
+      "application": {
+        "command": [
+          "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/tools/verify_application.py",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/demo/Demo.rvnproj",
+          "--bridge",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/tools/bridge/Probe.dll",
+          "--system",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/lib/System.neoil",
+          "--runtime",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/bin/neoclr"
+        ],
+        "exitCode": 0,
+        "seconds": 28.02,
+        "checks": 15
+      },
+      "orders": {
+        "command": [
+          "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/tools/verify_orders.py",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/demo/Demo.rvnproj",
+          "--bridge",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/tools/bridge/Probe.dll",
+          "--system",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/lib/System.neoil",
+          "--runtime",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/bin/neoclr"
+        ],
+        "exitCode": 0,
+        "seconds": 7.15,
+        "checks": 6
+      },
+      "native_buffer": {
+        "command": [
+          "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/tools/verify_native_buffer.py",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/demo/Demo.rvnproj",
+          "--bridge",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/tools/bridge/Probe.dll",
+          "--system",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/lib/System.neoil",
+          "--runtime",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/bin/neoclr"
+        ],
+        "exitCode": 0,
+        "seconds": 2.7
+      },
+      "collection_capabilities": {
+        "command": [
+          "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/tools/verify_collection_capabilities.py",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/demo/Demo.rvnproj",
+          "--bridge",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/tools/bridge/Probe.dll",
+          "--system",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/lib/System.neoil",
+          "--runtime",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/bin/neoclr"
+        ],
+        "exitCode": 0,
+        "seconds": 11.13,
+        "checks": 10
+      },
+      "neoil": {
+        "command": [
+          "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/tools/verify_neoil.py",
+          "--samples",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/samples/neoil",
+          "--system",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/lib/System.neoil",
+          "--runtime",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/bin/neoclr"
+        ],
+        "exitCode": 0,
+        "seconds": 0.93
+      },
+      "editor": {
+        "command": [
+          "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/tools/verify_editor.py",
+          "/Users/robert/.neoclr/builds/collections-toolchain-20260913/validation-bundle/demo",
+          "--collections",
+          "--booleans",
+          "--reflection",
+          "--process",
+          "--unions",
+          "--errors",
+          "--calendar",
+          "--primitives",
+          "--parsing",
+          "--files",
+          "--strings",
+          "--patterns",
+          "--extensions",
+          "--queries",
+          "--array-invariance",
+          "--array-shape",
+          "--collection-capabilities",
+          "--maps"
+        ],
+        "exitCode": 0,
+        "seconds": 7.64,
+        "checks": 61
+      }
+    },
+    "sdkDependencyNotices": "26 NuGet dependencies covered; all 31 package notice sets verified",
+    "bundleAndVsixDependencyNotices": "23 NuGet dependencies covered; all 31 package notice sets verified"
+  },
+  "installation": {
+    "sdk": "/Users/robert/.raven/sdk/0.1.12-neoclr.12",
+    "bundle": "/Users/robert/.neoclr/experiments/collections-20260913",
+    "profile": "/Users/robert/.neoclr/vscode/collections-20260913",
+    "server": "/Users/robert/.neoclr/vscode/collections-20260913/extensions/raven.raven-vscode-0.1.12-neoclr.12/server/Raven.LanguageServer.dll",
+    "compilerVersion": "0.1.12-neoclr.12",
+    "extension": "raven.raven-vscode@0.1.12-neoclr.12",
+    "existingSourceFilesPreserved": 1255,
+    "defaultRavenLaunchersPreserved": true,
+    "pristinePayloadHashesVerifiedBeforeConfiguration": 733,
+    "installedVsixEditorChecks": 61,
+    "configuredTask": "passed; order collection expected output matched",
+    "customizations": [
+      "demo/Main.rvn selects application-order-collections.rvn",
+      "configure.py creates location-specific tasks/settings",
+      "workspace SDK and VSIX server paths select the isolated .12 installation"
+    ]
+  }
+}

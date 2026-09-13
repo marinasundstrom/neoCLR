@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Built and locally installed the side-by-side Raven SDK/VSIX .12 and matching
+  neoCLR collection bundle from neoCLR 6fd3729 and Raven 854cd4d3d. The isolated
+  VS Code profile opens the combined order-collection demo. Eight extracted-bundle
+  suites, 61 installed-editor checks and the configured Run task passed. Recorded
+  payload/artifact hashes, dependency-notice checks, build evidence and instructions;
+  existing demos and normal Raven launchers were preserved. No public release.
+
 - Added a combined Raven order-collection scenario using application-defined class
   payloads, HashMap duplicate checks, ArrayList filtering, array/interface LINQ and
   Option/Result propagation. Added application checks under GC pressure and hash

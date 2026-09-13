@@ -1,5 +1,7 @@
 # Runtime library boundary
 
+Try the latest local collection APIs with the [Raven .12 installation](raven-collections-local-build.md).
+
 The [API design policy and contract inventory](api-design.md) defines when System
 APIs use values, managed references, reference receivers, outputs, and native pointers.
 

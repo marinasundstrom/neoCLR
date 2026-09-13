@@ -1,6 +1,8 @@
 # Order workflow on neoCLR
 
-The newest prepared local environment is [the .9 stabilization build](raven-stabilization-local-build.md), which opens this workflow by default.
+The newest prepared local environment is [the .12 collection build](raven-collections-local-build.md),
+which opens the collection scenario described below. The file/report workflow remains
+available as application-orders.rvn in its sample directory.
 
 This post-Preview-4 sample moves beyond calls to a predefined library catalog. Raven
 compiles application classes and an interface into ordinary CLI metadata; neoCLR

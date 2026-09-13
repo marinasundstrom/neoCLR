@@ -1,6 +1,6 @@
 # Test Raven targeting neoCLR in VS Code
 
-For the latest local .10 build, use [the stabilization demo](../../raven-stabilization-local-build.md).
+For the latest local .12 build, use [the collection demo](../../raven-collections-local-build.md).
 Earlier installation records below remain specific to their stated builds.
 
 The latest source-backed [pattern demo](../../raven-match-matrix.md#local-pattern-demo)

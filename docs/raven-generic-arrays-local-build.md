@@ -1,5 +1,8 @@
 # Try the generic-array Raven/neoCLR build
 
+For the newer .12 tools, use [the collection installation](raven-collections-local-build.md).
+The .11 record below remains specific to that earlier build.
+
 The locally installed SDK and VS Code extension are **0.1.12-neoclr.11**. This is
 an experimental local build, not a published neoCLR or Raven release. It includes
 generic managed arrays, invariant mutable-array diagnostics, the separated native
