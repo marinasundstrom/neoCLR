@@ -9,11 +9,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 ### 2026-09-13
 
 - Built and installed experimental Raven SDK/VSIX 0.1.12-neoclr.9 with the recent
-  array, numeric and invariance fixes in an isolated local environment. All six
-  packaged suites and the installed order-workflow task passed; 701 payload hashes
-  were verified. Preserved existing demos/default SDK, recorded provenance and added
-  local instructions. This is not a published release; editor array-conversion
-  diagnostics in this installed build still follow CLR rules.
+  array, numeric and invariance fixes, then refreshed to .10 with target-aware
+  array conversion diagnostics. Both isolated builds passed all six packaged suites
+  and the installed order-workflow task; 701 payload hashes were verified for .9
+  and 702 for .10. Verified .10 editor diagnostic recovery, recorded provenance and
+  updated the local walkthrough. Existing demos, the default SDK and published
+  releases are unchanged. The .9 installation retains its earlier editor behavior.
 
 - Made mutable-array invariance an explicit runtime contract: verifier, interpreter
   and Raven importer reject differing array element-type casts, including typed-null
@@ -23,7 +24,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   not implemented. New Raven target projects now disable covariance through the companion
   compiler's target-neutral option. Added editor diagnostic/recovery checks and saved-project
   coverage so invalid array conversions fail during binding. Default .NET behavior is
-  unchanged; installed .9 tools still require a future refresh.
+  unchanged; the refreshed local .10 tools include this policy, while .9 remains unchanged.
 
 - Admitted existing numeric division, remainder and shift instructions in the Raven
   importer with operand validation. The companion Raven fix preserves unsigned

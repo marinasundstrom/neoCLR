@@ -79,3 +79,8 @@ cast (`RAV1503`) errors, then an error-free update for `MethodInfo[]`. Syntax-on
 notifications can temporarily carry earlier errors while semantic analysis runs;
 the probe waits for the expected analysis result. These are source-build results,
 not validation of installed SDK `0.1.12-neoclr.9`.
+
+The refreshed local SDK/extension `0.1.12-neoclr.10` includes this policy and has now
+passed the same checks from its packaged layout. See the
+[installation and diagnostic walkthrough](raven-stabilization-local-build.md) and
+[build evidence](experiments/raven-target/array-diagnostics-toolchain.json).
