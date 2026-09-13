@@ -16,32 +16,17 @@ static class ResultBindings
     {
         public string Type => $"System.Result<{Output},{Error}>";
     }
-    static readonly Dictionary<string, string[]> ErrorCases = new() {
-        [ReadError] = ["InvalidLimit", "InvalidPath", "NotFound", "AccessDenied", "NotRegularFile", "TooLarge", "ReadFailed", "InvalidUtf8"],
-        [WriteError] = ["InvalidLimit", "InvalidPath", "NotFound", "AccessDenied", "NotRegularFile", "TooLarge", "WriteFailed"],
-        [SliceError] = ["OutOfRange", "InvalidBoundary"],
-        [ParseError] = ["InvalidFormat", "Overflow"],
-        [DivisionError] = ["DivisionByZero", "Overflow"],
-        [RangeError] = [],
-        ["System.InvalidDateError"] = [],
-        ["System.InvalidTimeError"] = []
-    };
     static readonly Carrier[] Carriers = [new("String", ReadError), new("Void", WriteError), new("String", SliceError), new("Int32", ParseError), new("Int32", DivisionError), new("Int32", RangeError), new("System.Date", "System.InvalidDateError"), new("System.Time", "System.InvalidTimeError")];
     static IEnumerable<(string Case, string Value)> Successes => Carriers.Select(c => c.Output).Distinct().Where(t => t is not ("Void" or "Int32")).Select(t => ($"System.Result.Ok<{t}>", t));
-    static IEnumerable<string> Errors => ErrorCases.Keys;
-    static IEnumerable<string> Cases(string error) => ErrorCases[error];
-    public static string Declarations => string.Join(" ", Errors.Select(error => {
-        var declaration = "public struct " + error.Split('.').Last() + " { "
-            + string.Join(" ", Cases(error).Select(name => "public bool Is" + name + " => false;")) + " }";
-        var separator = error.LastIndexOf('.');
-        return separator == 6 ? declaration : "namespace " + error[7..separator] + " { " + declaration + " }";
-    }));
-    public static bool IsType(string type) => Successes.Any(s => s.Case == type) || Carriers.Any(c => type == c.Type || type == c.Error)
+    static IEnumerable<string> Errors => ErrorBindings.Errors;
+    public static string Declarations => ErrorBindings.Declarations;
+    public static bool RequiresInitialization(string type) => IsType(type) && !ErrorBindings.IsEmpty(type);
+    public static bool IsType(string type) => ErrorBindings.IsType(type) || Successes.Any(s => s.Case == type) || Carriers.Any(c => type == c.Type || type == c.Error)
         || Errors.Any(e => type == $"System.Result.Error<{e}>");
     public static string? Type(TypeReference type)
     {
         if (!type.IsValueType || !RuntimeSignatures.IsCore(type.Scope)) return null;
-        if (Errors.Contains(type.FullName)) return type.FullName;
+        if (ErrorBindings.Type(type) is { } errorType) return errorType;
         if (type is not GenericInstanceType g) return null;
         string? Argument(TypeReference t) => CalendarBindings.Type(t) ?? (t.MetadataType == MetadataType.Int32 ? "Int32" : t.MetadataType == MetadataType.String ? "String"
             : t.FullName == "System.Void" && t.IsValueType && RuntimeSignatures.IsCore(t.Scope) ? "Void"
@@ -82,9 +67,6 @@ static class ResultBindings
         var value = Successes.Where(s => s.Case == owner).Select(s => s.Value).SingleOrDefault() ?? Errors.FirstOrDefault(e => owner == $"System.Result.Error<{e}>");
         if (reference.HasThis && args.Length == 0 && name == "get_Value" && result == value)
             return new(Helper(owner!, name), [owner + "&"], result);
-        if (Errors.Contains(owner) && reference.HasThis && args.Length == 0 && result == "Boolean"
-            && Cases(owner).Any(c => name == "get_Is" + c))
-            return new(Helper(owner, name), [owner + "&"], result);
         throw new InvalidDataException("Unsupported Result member: " + reference.FullName);
     }
     public static Binding? Construct(MethodReference reference, MethodDefinition definition)
@@ -103,8 +85,7 @@ static class ResultBindings
         var text = new StringBuilder();
         foreach (var (owner, arg) in Carriers.Select(c => (c.Type, $"System.Result.Ok<{c.Output}>" )).Concat(Successes.Select(s => (s.Case, s.Value))))
             text.AppendLine($".function {Helper(owner, "New")}({arg} value) -> {owner}\nldarg value\nnewobj instance {owner}::.ctor({arg})\nret\n.end");
-        foreach (var (owner, result, name) in Errors.SelectMany(e => Cases(e).Select(c => (e, "Boolean", "get_Is" + c)))
-            .Concat(Errors.Select(e => ($"System.Result.Error<{e}>", e, "get_Value")))
+        foreach (var (owner, result, name) in Errors.Select(e => ($"System.Result.Error<{e}>", e, "get_Value"))
             .Concat(Successes.Select(s => (s.Case, s.Value, "get_Value"))))
             text.AppendLine($".function {Helper(owner, name)}({owner}& value) -> {result}\nldarg value\nldobj {owner}\ncall instance {owner}::{name}()\nret\n.end");
         foreach (var (owner, output, error) in Carriers.Select(c => (c.Type, c.Output, c.Error)))

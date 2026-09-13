@@ -26,7 +26,6 @@ static class UnionDeclarations
             public bool TryGetValue(out Option.Some<T> value) { value = default; return false; }
             public bool TryGetValue(out Option.None value) { value = default; return false; }
         }
-        public struct OverflowError { }
         public static class Result {
             public struct Ok<T> {
                 public Ok(T value) { Value = value; }

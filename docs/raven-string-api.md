@@ -27,8 +27,8 @@ and InvalidBoundary. Empty ranges are accepted only at code-point boundaries,
 including the end of the string. Range validation precedes boundary validation.
 
 All nine currently declared String methods are now projected. The error carrier
-exposes IsOutOfRange and IsInvalidBoundary; its case constructors, checked case
-accessors and ToString remain pending. Broader inherited/interface API coverage
+exposes IsOutOfRange and IsInvalidBoundary; [case constructors, checked accessors
+and ToString](raven-error-api.md) are also projected. Broader inherited/interface API coverage
 is still tracked separately. Inherited metadata such as Object.ToString can appear in
 completion but is not admitted by this catalog. Unqualified Contains, Substring,
 Join, Format and IsNullOrEmpty are not imported from the host .NET library.

@@ -15,8 +15,8 @@ func ClampInput(value: int, min: int, max: int) -> Result<int, InvalidRangeError
 
 `InvalidRangeError` is the existing ordinary error value, not a union with invented
 subcases. Match `Result.Ok<int>` or `Result.Error<InvalidRangeError>` to distinguish
-success and failure. This slice exposes the carrier for matching/propagation; the
-error's public constructor and ToString remain projection work.
+success and failure. The [error-value projection](raven-error-api.md) also exposes its public constructor
+and ToString.
 
 The [Math contract and .NET research](math.md) apply unchanged. The inclusive bounds
 are familiar, but neoCLR returns an error Result where .NET Clamp throws for reversed

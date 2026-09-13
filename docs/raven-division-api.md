@@ -27,8 +27,8 @@ arithmetic failures explicitly; migrating conventional division code requires ch
 this helper and handling its result. The compiler does not automatically rewrite `/`
 into this API, and this slice does not add operator lowering.
 
-Only the error predicates and the Result paths described here are projected. Public
-error-case constructors, checked accessors and ToString remain coverage work.
+The [error-value projection](raven-error-api.md) additionally exposes case constructors,
+checked accessors and ToString.
 
 ## Trying it
 

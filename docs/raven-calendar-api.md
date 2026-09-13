@@ -13,8 +13,7 @@ LocalDateTime and Clock:
 Date/Time factories return `Result<Date,InvalidDateError>` or
 `Result<Time,InvalidTimeError>`. Typed matches and `?` propagation work with these
 value payloads. Clock returns the existing LocalDateTime snapshot directly; the
-internal Capture method is not exposed. The error values' constructor/ToString
-methods are separate remaining projection work.
+internal Capture method is not exposed. The [error-value APIs](raven-error-api.md) also expose constructors and ToString.
 
 The existing [date/time design](date-time.md) defines the contracts and their .NET
 comparison. This projection preserves the separate calendar-date, time-of-day and

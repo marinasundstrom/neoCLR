@@ -8,6 +8,7 @@ import threading
 
 project = Path(sys.argv[1]).resolve()
 collections = '--collections' in sys.argv[2:]
+errors = '--errors' in sys.argv[2:]
 calendar = '--calendar' in sys.argv[2:]
 primitives = '--primitives' in sys.argv[2:]
 parsing = '--parsing' in sys.argv[2:]
@@ -203,6 +204,20 @@ try:
             labels = sorted({item['label'] for item in items})
             if any(not any(label == name or label.startswith(name + '(') for label in labels) for name in expected):
                 raise AssertionError('Missing calendar API: ' + str(labels))
+            results[expression] = labels
+    if errors:
+        for version, expression, expected in (
+            (20, 'System.IO.FileReadError.', ('NotFound', 'AccessDenied')),
+            (21, 'error.', ('IsNotFound', 'GetNotFound', 'ToString')),
+            (22, 'System.Error.', ('FromMessage',))):
+            text = 'func Main() {\n    let error = System.IO.FileReadError(System.IO.FileReadError.NotFound())\n    ' + expression + '\n}'
+            send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})
+            result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
+                'position': {'line': 2, 'character': len('    ' + expression)}, 'context': {'triggerKind': 1}}, True))
+            items = result if isinstance(result, list) else result['items']
+            labels = sorted({item['label'] for item in items})
+            if any(not any(label == name or label.startswith(name + '(') for label in labels) for name in expected):
+                raise AssertionError('Missing error API: ' + str(labels))
             results[expression] = labels
     receive(send('shutdown', None, True))
     send('exit', None)

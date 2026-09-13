@@ -603,3 +603,6 @@ current Char classifiers and bounded concrete primitive comparisons.
 The [calendar and local-clock projection](../../raven-calendar-api.md) includes
 fixed validation examples, `--calendar` completion checks and `verify_clock.py`
 for validating a live snapshot against the host clock.
+
+The [error-value API projection](../../raven-error-api.md) includes constructors,
+checked extraction, descriptions, message errors and `--errors` completion checks.

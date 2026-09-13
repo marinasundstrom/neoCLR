@@ -1,0 +1,109 @@
+import System.*
+import System.Console.*
+func Main() {
+    let error0 = IO.FileReadError(IO.FileReadError.InvalidLimit())
+    WriteLine(error0.ToString())
+    let restored1 = IO.FileReadError(error0.GetInvalidLimit())
+    if restored1.IsInvalidLimit { WriteLine("Confirmed") }
+    let error1 = IO.FileReadError(IO.FileReadError.InvalidPath())
+    WriteLine(error1.ToString())
+    let restored2 = IO.FileReadError(error1.GetInvalidPath())
+    if restored2.IsInvalidPath { WriteLine("Confirmed") }
+    let error2 = IO.FileReadError(IO.FileReadError.NotFound())
+    WriteLine(error2.ToString())
+    let restored3 = IO.FileReadError(error2.GetNotFound())
+    if restored3.IsNotFound { WriteLine("Confirmed") }
+    let error3 = IO.FileReadError(IO.FileReadError.AccessDenied())
+    WriteLine(error3.ToString())
+    let restored4 = IO.FileReadError(error3.GetAccessDenied())
+    if restored4.IsAccessDenied { WriteLine("Confirmed") }
+    let error4 = IO.FileReadError(IO.FileReadError.NotRegularFile())
+    WriteLine(error4.ToString())
+    let restored5 = IO.FileReadError(error4.GetNotRegularFile())
+    if restored5.IsNotRegularFile { WriteLine("Confirmed") }
+    let error5 = IO.FileReadError(IO.FileReadError.TooLarge())
+    WriteLine(error5.ToString())
+    let restored6 = IO.FileReadError(error5.GetTooLarge())
+    if restored6.IsTooLarge { WriteLine("Confirmed") }
+    let error6 = IO.FileReadError(IO.FileReadError.ReadFailed())
+    WriteLine(error6.ToString())
+    let restored7 = IO.FileReadError(error6.GetReadFailed())
+    if restored7.IsReadFailed { WriteLine("Confirmed") }
+    let error7 = IO.FileReadError(IO.FileReadError.InvalidUtf8())
+    WriteLine(error7.ToString())
+    let restored8 = IO.FileReadError(error7.GetInvalidUtf8())
+    if restored8.IsInvalidUtf8 { WriteLine("Confirmed") }
+    let error8 = IO.FileWriteError(IO.FileWriteError.InvalidLimit())
+    WriteLine(error8.ToString())
+    let restored9 = IO.FileWriteError(error8.GetInvalidLimit())
+    if restored9.IsInvalidLimit { WriteLine("Confirmed") }
+    let error9 = IO.FileWriteError(IO.FileWriteError.InvalidPath())
+    WriteLine(error9.ToString())
+    let restored10 = IO.FileWriteError(error9.GetInvalidPath())
+    if restored10.IsInvalidPath { WriteLine("Confirmed") }
+    let error10 = IO.FileWriteError(IO.FileWriteError.NotFound())
+    WriteLine(error10.ToString())
+    let restored11 = IO.FileWriteError(error10.GetNotFound())
+    if restored11.IsNotFound { WriteLine("Confirmed") }
+    let error11 = IO.FileWriteError(IO.FileWriteError.AccessDenied())
+    WriteLine(error11.ToString())
+    let restored12 = IO.FileWriteError(error11.GetAccessDenied())
+    if restored12.IsAccessDenied { WriteLine("Confirmed") }
+    let error12 = IO.FileWriteError(IO.FileWriteError.NotRegularFile())
+    WriteLine(error12.ToString())
+    let restored13 = IO.FileWriteError(error12.GetNotRegularFile())
+    if restored13.IsNotRegularFile { WriteLine("Confirmed") }
+    let error13 = IO.FileWriteError(IO.FileWriteError.TooLarge())
+    WriteLine(error13.ToString())
+    let restored14 = IO.FileWriteError(error13.GetTooLarge())
+    if restored14.IsTooLarge { WriteLine("Confirmed") }
+    let error14 = IO.FileWriteError(IO.FileWriteError.WriteFailed())
+    WriteLine(error14.ToString())
+    let restored15 = IO.FileWriteError(error14.GetWriteFailed())
+    if restored15.IsWriteFailed { WriteLine("Confirmed") }
+    let error15 = IO.ConsoleReadError(IO.ConsoleReadError.Unavailable())
+    WriteLine(error15.ToString())
+    let restored16 = IO.ConsoleReadError(error15.GetUnavailable())
+    if restored16.IsUnavailable { WriteLine("Confirmed") }
+    let error16 = IO.ConsoleReadError(IO.ConsoleReadError.ReadFailed())
+    WriteLine(error16.ToString())
+    let restored17 = IO.ConsoleReadError(error16.GetReadFailed())
+    if restored17.IsReadFailed { WriteLine("Confirmed") }
+    let error17 = Text.Utf8SliceError(Text.Utf8SliceError.OutOfRange())
+    WriteLine(error17.ToString())
+    let restored18 = Text.Utf8SliceError(error17.GetOutOfRange())
+    if restored18.IsOutOfRange { WriteLine("Confirmed") }
+    let error18 = Text.Utf8SliceError(Text.Utf8SliceError.InvalidBoundary())
+    WriteLine(error18.ToString())
+    let restored19 = Text.Utf8SliceError(error18.GetInvalidBoundary())
+    if restored19.IsInvalidBoundary { WriteLine("Confirmed") }
+    let error19 = Int32ParseError(Int32ParseError.InvalidFormat())
+    WriteLine(error19.ToString())
+    let restored20 = Int32ParseError(error19.GetInvalidFormat())
+    if restored20.IsInvalidFormat { WriteLine("Confirmed") }
+    let error20 = Int32ParseError(Int32ParseError.Overflow())
+    WriteLine(error20.ToString())
+    let restored21 = Int32ParseError(error20.GetOverflow())
+    if restored21.IsOverflow { WriteLine("Confirmed") }
+    let error21 = IntegerDivisionError(IntegerDivisionError.DivisionByZero())
+    WriteLine(error21.ToString())
+    let restored22 = IntegerDivisionError(error21.GetDivisionByZero())
+    if restored22.IsDivisionByZero { WriteLine("Confirmed") }
+    let error22 = IntegerDivisionError(IntegerDivisionError.Overflow())
+    WriteLine(error22.ToString())
+    let restored23 = IntegerDivisionError(error22.GetOverflow())
+    if restored23.IsOverflow { WriteLine("Confirmed") }
+    let invalidrangeerror = InvalidRangeError()
+    WriteLine(invalidrangeerror.ToString())
+    let invaliddateerror = InvalidDateError()
+    WriteLine(invaliddateerror.ToString())
+    let invalidtimeerror = InvalidTimeError()
+    WriteLine(invalidtimeerror.ToString())
+    let overflowerror = OverflowError()
+    WriteLine(overflowerror.ToString())
+    let unavailable = default(EnvironmentError)
+    WriteLine(unavailable.ToString())
+    let message = Error.FromMessage("A domain error")
+    WriteLine(message.Message)
+    WriteLine(message.ToString())
+}

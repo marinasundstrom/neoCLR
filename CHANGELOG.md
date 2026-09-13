@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Projected existing error-value constructors, predicates, checked accessors and
+  ToString APIs, including all 23 nested error cases and System.Error message APIs.
+  Added complete case round-trips, wrong-case/default rejection checks and completion.
+  Empty values have valid defaults; carriers/messages require initialization. Existing
+  description differences are preserved; no Exception hierarchy or runtime change.
+
 - Projected all 24 current public Date/Time/LocalDateTime/Clock methods/accessors
   through Raven, including validated Result factories and value-payload propagation.
   Added fixed calendar/tick cases, live host-clock validation, completion/signature

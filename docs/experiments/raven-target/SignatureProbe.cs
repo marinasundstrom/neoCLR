@@ -127,6 +127,15 @@ static class SignatureProbe
         Check("Time ticks stay Int64", CalendarBindings.Bind(ticksCall, fromTicks)?.Arguments.SequenceEqual(new[] { "Int64" }) == true);
         ticksCall.Parameters[0].ParameterType = module.TypeSystem.Int32;
         Reject("Time ticks reject Int32 signature", () => CalendarBindings.Bind(ticksCall, fromTicks));
+        var readError = module.GetType("System.IO.FileReadError");
+        var notFound = readError.NestedTypes.Single(t => t.Name == "NotFound");
+        var notFoundConstructor = notFound.Methods.Single(m => m.IsConstructor);
+        Check("Error case constructor mapping", ErrorBindings.Construct(Reference(notFoundConstructor, notFound), notFoundConstructor)?.Result == "System.IO.FileReadError.NotFound");
+        Check("Only empty errors have defaults", ErrorBindings.IsEmpty("System.InvalidDateError") && !ErrorBindings.IsEmpty("System.Int32ParseError"));
+        var checkedGetter = readError.Methods.Single(m => m.Name == "GetNotFound");
+        var getterReference = Reference(checkedGetter, readError);
+        getterReference.ReturnType = module.TypeSystem.Int32;
+        Reject("Error getter signature mismatch", () => ErrorBindings.Bind(getterReference, checkedGetter));
         var text = JsonSerializer.Serialize(checks, new JsonSerializerOptions { WriteIndented = true });
         File.WriteAllText(Path.Combine(output, "signature-checks.json"), text);
         Console.WriteLine(text);
