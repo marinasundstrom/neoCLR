@@ -2214,3 +2214,25 @@ followed by bounded keyed collections. The text-first suggestion was superseded.
 The detailed slice boundaries are the assistant's proposed execution plan, not an
 adoption of every previously supplied collection type. No new API was implemented
 in this documentation update.
+
+## 2026-09-13 — Normalize array and native-memory roles with .NET
+
+**Author:** Asked to continue with Array<T>. On learning that the current generic
+System.Array is a native descriptor rather than the managed array object, observed
+that this question has changed since returning to .NET-style type semantics and
+said, “We should normalize with .NET”.
+
+**Assistant finding and response:** Audited the native descriptor, managed ArrayRef
+representation, reflection and Raven bridge. Initially proposed moving the native
+API to an explicit interop name, then clarified that renaming alone would leave
+the descriptor's mixed ownership and borrowing responsibilities intact. Proposed
+the .NET separation of managed arrays, explicit native allocation/release, borrowed
+memory views and distinct ownership when needed. Recorded the comparison and
+migration order in [collection contracts](collection-contracts.md#managed-arrays-versus-native-buffers).
+
+**Outcome and open work:** The ownership direction is recorded; the Array<T> mapping
+and native API migration are not yet implemented. The prior generic-array identity
+and invariance decisions are retained, rather than interpreting the latest direction
+as an unspoken reversal. Exact native replacement APIs, safe borrowed views and
+their lifetime enforcement remain implementation/design work. No new standard
+NativeBuffer type was adopted.

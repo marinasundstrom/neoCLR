@@ -17,6 +17,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   generic array type, with metadata/reflection mapping deferred to a dedicated slice.
   Prioritized that mapping, minimal collection contracts and basic implementation
   prototypes in the API plan, ahead of broader text/clock expansion.
+  Audited the existing native System.Array<T> naming conflict and recorded .NET-aligned
+  separation of managed arrays, native allocation and borrowed views; native API
+  migration and the generic managed-array mapping remain unimplemented.
 
 - Clarified platform direction: retain CLR-like type categories and language ergonomics,
   develop library APIs by concrete need, and evaluate text/encoding, memory views,

@@ -82,6 +82,45 @@ variant interface/delegate rules do not automatically apply to arrays.
 Maintain mutable-array invariance and fixed size. Replacement of existing elements
 must not imply Add/Remove. No generic Array API migration is implemented in this slice.
 
+### Managed arrays versus native buffers
+
+The implementation audit found a naming collision: the existing
+`runtime/System/Array.neoil` declares System.Array<T> as a copyable native descriptor
+with public Data/Length fields, Allocate, View and Free. Ordinary managed arrays
+instead use the runtime's ArrayRef signature and GC-owned array payload. The native
+descriptor is not the generic managed-array shape selected above.
+
+After this finding, the author directed us to normalize with .NET. Apply that
+direction to ownership and storage roles:
+
+| Role | Direction |
+| --- | --- |
+| Ordinary T[] / intended System.Array<T> | Fixed-length managed reference object. Assignment shares identity; the GC owns storage. No explicit Free or raw-pointer ownership on the array API |
+| Native allocation | Explicit unsafe interop allocation and release, following System.Runtime.InteropServices.NativeMemory's separation from arrays |
+| Borrowed contiguous view | A future Span<T>/ReadOnlySpan<T>-like contract over existing storage, with validated lifetime and access permissions. A view does not own or free its backing storage |
+| Longer-lived native owner | Separate ownership contract if a scenario requires one; not a copyable pointer descriptor whose aliases all appear to own the allocation |
+
+This follows .NET's [NativeMemory API](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.interopservices.nativememory?view=net-10.0)
+and [owner/consumer and memory-view guidance](https://learn.microsoft.com/en-us/dotnet/standard/memory-and-spans/memory-t-usage-guidelines).
+Those are existing .NET contracts, not proposals for merging native buffers into
+arrays. Merely changing the current descriptor's name would preserve its mixed
+Allocate/View/Free responsibilities. Do not promote that shape as a new standard
+NativeArray or NativeBuffer API without resolving ownership first.
+
+The selected generic managed-array identity and invariant mutable-array rule remain
+intentional differences from .NET; this ownership clarification does not rescind
+them. A managed array's eventual native address exposure would require an explicit
+pin/lease or copy with a defined lifetime, not an implicit conversion to a native
+owner. Stack-backed storage likewise belongs to the view/lifetime investigation,
+not a second allocation mode of the ordinary managed array type.
+
+Implementation order: resolve migration of the old native descriptor out of the
+System.Array<T> name; connect managed array signatures to the generic definition;
+then implement borrowed views only with the required runtime lifetime checks. Keep
+existing native operations available through an explicitly low-level path during
+migration. Exact replacement APIs and migration edits remain to implement. No new
+Span, native owner, pinning API or automatic resource cleanup is claimed here.
+
 ## Review the operations before the variance annotations
 
 | Candidate | Question to resolve |
