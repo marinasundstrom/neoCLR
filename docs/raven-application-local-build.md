@@ -53,6 +53,22 @@ python3 tools/run_project.py demo/Demo.rvnproj \
   --bridge tools/bridge/Probe.dll --system lib/System.neoil --runtime bin/neoclr
 ```
 
+## Constructor-completion hotfix
+
+The prepared project now selects the patched language server at
+`$HOME/.neoclr/builds/constructor-completion-hotfix/Raven.LanguageServer.dll`, built
+from Raven `55c0f7ef5` on the experiment branch. Run **Developer: Reload Window**
+if the open window still uses its previous server. Unsaved source edits are not
+replaced by the installation.
+
+The compiler now establishes constructor scopes for on-demand semantic queries;
+`System.Int32.` offers Parse and Divide there, as it does in ordinary methods.
+119 focused compiler tests and four target LSP contexts passed. The user's actual
+client log recorded a completed request with zero items at `14:23`; the server startup
+log confirmed the .7 server. The isolated replay reproduced both the empty constructor
+result and the passing method result before the fix. This hotfix changes the installed
+language-server selection, not the archived .7 SDK/VSIX or published Preview 4 assets.
+
 ## Build provenance and scope
 
 [Application build evidence](experiments/raven-target/application-toolchain.json)

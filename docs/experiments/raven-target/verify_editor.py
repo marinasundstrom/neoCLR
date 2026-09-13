@@ -285,6 +285,18 @@ try:
             if not any(label == expected or label.startswith(expected + '(') for label in labels):
                 raise AssertionError('Missing interface member: ' + str(labels))
             results[contract] = labels
+    if parsing:
+        for version, declaration in ((37, 'init()'), (38, 'init(value: int)')):
+            text = 'class Example {\n    ' + declaration + ' {\n        System.Int32.\n    }\n}'
+            send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})
+            result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
+                'position': {'line': 2, 'character': len('        System.Int32.')},
+                'context': {'triggerKind': 2, 'triggerCharacter': '.'}}, True))
+            items = result if isinstance(result, list) else result['items']
+            labels = sorted({item['label'] for item in items})
+            assert 'Parse' in labels and 'Divide' in labels, labels
+            assert 'CompareTo' not in labels, labels
+            results['Int32 in ' + declaration] = labels
     receive(send('shutdown', None, True))
     send('exit', None)
     print(json.dumps(results, indent=2))

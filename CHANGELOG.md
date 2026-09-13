@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Added target completion checks inside constructors and installed a patched Raven
+  language server after reproducing missing Int32 static members in constructor
+  bodies. The general compiler fix is isolated on Raven at 55c0f7ef5; archived tools
+  remain unchanged.
+
 - Recorded the future modern-library API direction and mockable-clock investigation,
   comparing .NET TimeProvider with narrower library contracts. No clock behavior changed.
 
