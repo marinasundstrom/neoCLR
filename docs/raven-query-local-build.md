@@ -1,5 +1,7 @@
 # Try the query-enabled Raven build locally
 
+For the newer .9 build, use [the stabilization installation](raven-stabilization-local-build.md). The .8 record below is historical.
+
 The local SDK and VS Code extension are `0.1.12-neoclr.8`. This build includes union
 patterns, extension methods, deferred Where/Select, ToList and custom Raven
 Iterable/Iterator implementations. It is a local experiment, not a published release.

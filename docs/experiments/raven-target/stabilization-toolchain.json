@@ -1,0 +1,143 @@
+{
+  "version": "0.1.12-neoclr.9",
+  "status": "validated local installation; not published",
+  "neoCLRRevision": "dc2c1a6a3f1033637883599b8063664b7ce02931",
+  "ravenRevision": "e51da7a48815858e44db21405a654867d0c9dc97",
+  "ravenBranch": "codex/neoclr-target-resolution",
+  "dotnetSdk": "11.0.100-rc.1.26425.128",
+  "platform": "osx-arm64",
+  "artifacts": {
+    "raven-sdk-0.1.12-neoclr.9-osx-arm64.tar.gz": {
+      "path": "/Users/robert/.neoclr/builds/stabilization-toolchain-20260913/raven-sdk-0.1.12-neoclr.9-osx-arm64.tar.gz",
+      "sha256": "f984026b68549b4116f5e7c80f4ccbff80820df10b41b6485a24a45164d8a080",
+      "bytes": 30946265
+    },
+    "raven-vscode.vsix": {
+      "path": "/Users/robert/.neoclr/builds/stabilization-toolchain-20260913/raven-vscode.vsix",
+      "sha256": "1bd6e59aeb82596411e8eb9454b10ca2a849d0c78e2bae7def75c7c2025adff7",
+      "bytes": 10250934
+    },
+    "neoclr-stabilization-poc-20260913-osx-arm64.tar.gz": {
+      "path": "/Users/robert/.neoclr/builds/stabilization-toolchain-20260913/neoclr-stabilization-poc-20260913-osx-arm64.tar.gz",
+      "sha256": "0e8ec6bf06b4e297a98fb1663f05c8532b7dac3366015730d03ddbeb1e32c343",
+      "bytes": 23136816
+    },
+    "manifest.json": {
+      "path": "/Users/robert/.neoclr/builds/stabilization-toolchain-20260913/bundle/manifest.json",
+      "sha256": "820a3634d52d95f8cd02631e528f6bc9bdbc84904bf105de9ebdc44166b99f55",
+      "bytes": 83701
+    }
+  },
+  "validation": {
+    "payloadHashesVerified": 701,
+    "suites": {
+      "project": {
+        "exitCode": 0,
+        "seconds": 88.21,
+        "command": [
+          "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+          "/Users/robert/.neoclr/builds/stabilization-toolchain-20260913/validation-bundle/tools/verify_project.py",
+          "/Users/robert/.neoclr/builds/stabilization-toolchain-20260913/validation-bundle/demo/Demo.rvnproj",
+          "--bridge",
+          "/Users/robert/.neoclr/builds/stabilization-toolchain-20260913/validation-bundle/tools/bridge/Probe.dll",
+          "--system",
+          "/Users/robert/.neoclr/builds/stabilization-toolchain-20260913/validation-bundle/lib/System.neoil",
+          "--runtime",
+          "/Users/robert/.neoclr/builds/stabilization-toolchain-20260913/validation-bundle/bin/neoclr",
+          "--collections"
+        ]
+      },
+      "queries": {
+        "exitCode": 0,
+        "seconds": 45.21,
+        "command": [
+          "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+          "/Users/robert/.neoclr/builds/stabilization-toolchain-20260913/validation-bundle/tools/verify_queries.py",
+          "/Users/robert/.neoclr/builds/stabilization-toolchain-20260913/validation-bundle/demo/Demo.rvnproj",
+          "--bridge",
+          "/Users/robert/.neoclr/builds/stabilization-toolchain-20260913/validation-bundle/tools/bridge/Probe.dll",
+          "--system",
+          "/Users/robert/.neoclr/builds/stabilization-toolchain-20260913/validation-bundle/lib/System.neoil",
+          "--runtime",
+          "/Users/robert/.neoclr/builds/stabilization-toolchain-20260913/validation-bundle/bin/neoclr"
+        ]
+      },
+      "application": {
+        "exitCode": 0,
+        "seconds": 18.54,
+        "command": [
+          "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+          "/Users/robert/.neoclr/builds/stabilization-toolchain-20260913/validation-bundle/tools/verify_application.py",
+          "/Users/robert/.neoclr/builds/stabilization-toolchain-20260913/validation-bundle/demo/Demo.rvnproj",
+          "--bridge",
+          "/Users/robert/.neoclr/builds/stabilization-toolchain-20260913/validation-bundle/tools/bridge/Probe.dll",
+          "--system",
+          "/Users/robert/.neoclr/builds/stabilization-toolchain-20260913/validation-bundle/lib/System.neoil",
+          "--runtime",
+          "/Users/robert/.neoclr/builds/stabilization-toolchain-20260913/validation-bundle/bin/neoclr"
+        ]
+      },
+      "orders": {
+        "exitCode": 0,
+        "seconds": 6.35,
+        "command": [
+          "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+          "/Users/robert/.neoclr/builds/stabilization-toolchain-20260913/validation-bundle/tools/verify_orders.py",
+          "/Users/robert/.neoclr/builds/stabilization-toolchain-20260913/validation-bundle/demo/Demo.rvnproj",
+          "--bridge",
+          "/Users/robert/.neoclr/builds/stabilization-toolchain-20260913/validation-bundle/tools/bridge/Probe.dll",
+          "--system",
+          "/Users/robert/.neoclr/builds/stabilization-toolchain-20260913/validation-bundle/lib/System.neoil",
+          "--runtime",
+          "/Users/robert/.neoclr/builds/stabilization-toolchain-20260913/validation-bundle/bin/neoclr"
+        ]
+      },
+      "neoil": {
+        "exitCode": 0,
+        "seconds": 0.68,
+        "command": [
+          "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+          "/Users/robert/.neoclr/builds/stabilization-toolchain-20260913/validation-bundle/tools/verify_neoil.py",
+          "--samples",
+          "/Users/robert/.neoclr/builds/stabilization-toolchain-20260913/validation-bundle/samples/neoil",
+          "--system",
+          "/Users/robert/.neoclr/builds/stabilization-toolchain-20260913/validation-bundle/lib/System.neoil",
+          "--runtime",
+          "/Users/robert/.neoclr/builds/stabilization-toolchain-20260913/validation-bundle/bin/neoclr"
+        ]
+      },
+      "editor": {
+        "exitCode": 0,
+        "seconds": 2.17,
+        "command": [
+          "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+          "/Users/robert/.neoclr/builds/stabilization-toolchain-20260913/validation-bundle/tools/verify_editor.py",
+          "/Users/robert/.neoclr/builds/stabilization-toolchain-20260913/validation-bundle/demo",
+          "--collections",
+          "--booleans",
+          "--reflection",
+          "--process",
+          "--unions",
+          "--errors",
+          "--calendar",
+          "--primitives",
+          "--parsing",
+          "--files",
+          "--strings",
+          "--patterns",
+          "--extensions",
+          "--queries"
+        ]
+      }
+    }
+  },
+  "installation": {
+    "sdk": "/Users/robert/.raven/sdk/0.1.12-neoclr.9",
+    "bundle": "/Users/robert/.neoclr/experiments/stabilization-20260913",
+    "profile": "/Users/robert/.neoclr/vscode/stabilization-20260913",
+    "compilerVersion": "0.1.12-neoclr.9",
+    "extensions": "raven.raven-vscode@0.1.12-neoclr.9",
+    "task": "passed",
+    "existingSources": "unchanged"
+  }
+}

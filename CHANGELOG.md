@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Built and installed experimental Raven SDK/VSIX 0.1.12-neoclr.9 with the recent
+  array, numeric and invariance fixes in an isolated local environment. All six
+  packaged suites and the installed order-workflow task passed; 701 payload hashes
+  were verified. Preserved existing demos/default SDK, recorded provenance and added
+  local instructions. This is not a published release; editor array-conversion
+  diagnostics still follow CLR rules.
+
 - Made mutable-array invariance an explicit runtime contract: verifier, interpreter
   and Raven importer reject differing array element-type casts, including typed-null
   casts; exact interface-to-array casts retain allocation checks. Added inheritance,

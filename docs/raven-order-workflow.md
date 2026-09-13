@@ -1,5 +1,7 @@
 # Order workflow on neoCLR
 
+The newest prepared local environment is [the .9 stabilization build](raven-stabilization-local-build.md), which opens this workflow by default.
+
 This post-Preview-4 sample moves beyond calls to a predefined library catalog. Raven
 compiles application classes and an interface into ordinary CLI metadata; neoCLR
 imports and executes them against its own runtime library.

@@ -1,6 +1,6 @@
 # Test Raven targeting neoCLR in VS Code
 
-For the latest local .8 query/pattern build, use [the isolated query demo](../../raven-query-local-build.md).
+For the latest local .9 build, use [the stabilization demo](../../raven-stabilization-local-build.md).
 Earlier installation records below remain specific to their stated builds.
 
 The latest source-backed [pattern demo](../../raven-match-matrix.md#local-pattern-demo)
