@@ -2314,6 +2314,11 @@ fn interpret_instructions(
                             arrays_used = true;
                         }
                         let value = binding.invoke(args, module, &limits, output, options)?;
+                        let value = if matches!(binding, crate::native::Binding::Reflection(_)) {
+                            crate::reflection::materialize(module, heap, &limits, value)?
+                        } else {
+                            value
+                        };
                         expect(&value, &callee.returns)?;
                         frame.stack.push(value);
                     } else {

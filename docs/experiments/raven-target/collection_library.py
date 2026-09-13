@@ -60,6 +60,15 @@ def build(path: Path) -> str:
     text = path.read_text()
     if path.stem in COLLECTIONS | {'Disposable'}:
         text = adapt(text, path.stem)
+    if path.stem in {'Type', 'Reflection'}:
+        # Immutable reflection snapshots use ordinary class identity in the target.
+        text = re.sub(r'^\.type (abstract )?(System\.(?:Type|Reflection\.(?:MemberInfo|FieldInfo|MethodInfo|PropertyInfo|ParameterInfo)))$',
+                      lambda m: '.type class ' + (m[1] or '') + m[2], text, flags=re.M)
+        # These private construction helpers are replaced by trusted snapshot factories.
+        text = re.sub(r'    \.method internal instance byref \.ctor[^\n]*\n.*?    \.end\n', '', text, flags=re.S)
+        text = text.replace('instance readonly byref ', 'instance ').replace('instance byref ', 'instance ')
+        text = text.replace('    .implements System.Equatable<System.Type>\n', '')
+        text = text.replace('ldloca method', 'ldloc method')
     if path.stem == 'Func':
         text = text.replace('readonly T[]& array', 'arrayref<T> array').replace('-> Void', '-> noresult')
         text = re.sub(r'^\s*ldvoid\n', '\n', text, flags=re.M)

@@ -477,3 +477,64 @@ fn from_identity(module: &Module, identity: &TypeIdentity) -> Result<Type, Fault
         }
     })
 }
+
+/// Project trusted metadata snapshots into the library's declared storage categories.
+/// This is deliberately confined to reflection results, never arbitrary host inputs.
+pub(crate) fn materialize(
+    module: &Module,
+    heap: &mut crate::ManagedHeap,
+    limits: &Limits,
+    value: Value,
+) -> Result<Value, Fault> {
+    fn build(
+        module: &Module,
+        heap: &mut crate::ManagedHeap,
+        limits: &Limits,
+        value: Value,
+        depth: usize,
+    ) -> Result<Value, Fault> {
+        if depth > 64 {
+            return Err(Fault::new("reflection snapshot nesting limit exceeded"));
+        }
+        match value {
+            Value::Object { ty, fields } => {
+                let fields = fields
+                    .into_iter()
+                    .map(|v| build(module, heap, limits, v, depth + 1))
+                    .collect::<Result<Vec<_>, _>>()?;
+                let value = Value::Object {
+                    ty: ty.clone(),
+                    fields,
+                };
+                if module.is_reference_type(&ty) {
+                    if heap.len() >= limits.heap_objects {
+                        return Err(Fault::new("heap object limit exceeded"));
+                    }
+                    let index = heap.allocate(value)?;
+                    Ok(Value::ObjectReference(crate::value::ObjectReference {
+                        reference: heap.address(index)?,
+                        view: None,
+                    }))
+                } else {
+                    Ok(value)
+                }
+            }
+            Value::Array { element, elements } => Ok(Value::Array {
+                element,
+                elements: elements
+                    .into_iter()
+                    .map(|v| build(module, heap, limits, v, depth + 1))
+                    .collect::<Result<Vec<_>, _>>()?,
+            }),
+            Value::Erased(value) => Ok(Value::Erased(Box::new(build(
+                module,
+                heap,
+                limits,
+                *value,
+                depth + 1,
+            )?))),
+            value => Ok(value),
+        }
+    }
+    build(module, heap, limits, value, 0)
+}

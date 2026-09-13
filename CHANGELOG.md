@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Migrated reflection snapshot storage in the Raven runtime profile to ordinary
+  Type/descriptor classes and the MemberInfo hierarchy. Trusted query factories
+  allocate nested snapshots under heap limits and retain them through GC. Source
+  metadata/import projection remains separate; added runtime regression coverage.
+
 - Added ordinary class ancestry, implicit base-reference conversions and checked
   downcasts, preserving allocation identity and inherited fields. Allow abstract
   class declarations without abstract members; reject mixed storage categories.
