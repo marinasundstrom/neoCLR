@@ -102,7 +102,12 @@ fn initobj_fulfills_outputs_without_reading_uninitialized_destinations() {
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(0));
     // The open method verifies, but unsupported defaults must still fault when
     // its body is specialized and executed without running the verifier.
-    let bad = program(extra, ".local String value\nldloca value\ncall Defaults<String>::Reset(String&)\npop\nldloc value", "String").unwrap();
+    let bad = program(
+        extra,
+        ".local Error value\nldloca value\ncall Defaults<Error>::Reset(Error&)\npop\nldloc value",
+        "Error",
+    )
+    .unwrap();
     assert!(
         bad.run(Limits::default())
             .unwrap_err()
@@ -132,7 +137,6 @@ fn field_initialization_respects_output_paths() {
 #[test]
 fn invalid_defaults_and_mismatched_destinations_are_rejected() {
     for ty in [
-        "String",
         "Error",
         "System.Value",
         "RuntimeTypeHandle",
@@ -164,7 +168,7 @@ fn invalid_defaults_and_mismatched_destinations_are_rejected() {
     );
     assert!(
         program(
-            ".type Bad\n.field Text String\n.end",
+            ".type Bad\n.field Payload System.Value\n.end",
             ".local Bad value\nldloca value\ninitobj Bad\nldvoid",
             "Void"
         )

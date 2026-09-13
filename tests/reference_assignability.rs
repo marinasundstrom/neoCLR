@@ -171,9 +171,7 @@ fn unrelated_or_wrong_generic_reference_cannot_be_implicitly_stored() {
         assert!(run(&m, Limits::default()).is_err());
         // The non-null unrelated class is rejected by the same conversion rule.
         if ty == "Other" {
-            let m = module(&format!(
-                ".function Main() -> Read<Int32>\nldc.i4 1\nnewobj Other\nret\n.end"
-            ));
+            let m = module(".function Main() -> Read<Int32>\nldc.i4 1\nnewobj Other\nret\n.end");
             assert!(verify(&m).is_err());
             assert!(run(&m, Limits::default()).is_err());
         }

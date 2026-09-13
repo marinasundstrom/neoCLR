@@ -1077,10 +1077,7 @@ fn typed_effect(
                         && !callee.receiver_byref
                         && module.is_reference_type(&interface)
                         && (actual == &interface
-                            || module.reference_assignable(actual, &interface)) =>
-                {
-                    ()
-                }
+                            || module.reference_assignable(actual, &interface)) => {}
                 actual
                     if module.is_object_reference_type(actual)
                         && crate::interfaces::is_contract(module, &callee)
@@ -1089,10 +1086,7 @@ fn typed_effect(
                     crate::interfaces::ensure_implementation(module, actual, &interface)?;
                 }
                 T::ByRef(actual)
-                    if **actual == interface && !module.is_reference_type(&interface) =>
-                {
-                    ()
-                }
+                    if **actual == interface && !module.is_reference_type(&interface) => {}
                 T::InterfaceRef(actual) if **actual == interface && !callee.receiver_byref => (),
                 _ => {
                     return Err(crate::Fault::new(

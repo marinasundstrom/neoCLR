@@ -36,8 +36,9 @@ Join, Format and IsNullOrEmpty are not imported from the host .NET library.
 ## Semantics and implementation layers
 
 This slice reuses [the existing ordinal contract and .NET comparison](ordinal-text.md)
-and [the String model](text-model.md). Text is immutable, valid Unicode and currently
-non-null. Searches are case-sensitive without normalization or culture processing;
+and [the String model](text-model.md). Non-null text is immutable and valid Unicode. Managed String slots have a
+[typed null default](string-default-storage.md), distinct from empty text; operations
+requiring text fault on null. Searches are case-sensitive without normalization or culture processing;
 empty patterns match. CompareOrdinal retains UTF-16 code-unit ordering, while
 GetUtf8ByteCount explicitly measures storage bytes. These are the existing library
 choices, not new runtime behavior or a claim of general .NET String compatibility.

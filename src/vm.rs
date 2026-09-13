@@ -853,19 +853,21 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                     if callee.is_abstract && !matches!(op, Op::CallVirtual(_)) {
                         return Err(Fault::new("abstract methods require virtual dispatch"));
                     }
-                    if (crate::interfaces::is_contract(module, &callee)
+                    let interface_call = crate::interfaces::is_contract(module, &callee);
+                    let ordinary_class_instance = callee.instance
+                        && !callee.receiver_byref
+                        && callee
+                            .owner
+                            .as_ref()
+                            .is_some_and(|owner| module.is_reference_type(owner));
+                    let supports_virtual_call = interface_call
+                        || callee.is_virtual
+                        || ordinary_class_instance
+                        || crate::delegates::is_contract(module, &callee);
+                    if (interface_call
                         && (!matches!(op, Op::CallVirtual(_))
                             || !callee.interface_implementations.is_empty()))
-                        || (matches!(op, Op::CallVirtual(_))
-                            && !crate::interfaces::is_contract(module, &callee)
-                            && !callee.is_virtual
-                            && !(callee.instance
-                                && !callee.receiver_byref
-                                && callee
-                                    .owner
-                                    .as_ref()
-                                    .is_some_and(|owner| module.is_reference_type(owner)))
-                            && !crate::delegates::is_contract(module, &callee))
+                        || (matches!(op, Op::CallVirtual(_)) && !supports_virtual_call)
                     {
                         return Err(Fault::new(
                             "callvirt requires an ordinary class instance, delegate Invoke, interface declaration or virtual record method",
