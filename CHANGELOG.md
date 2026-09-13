@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Projected Array.ForEach for managed Int32/String arrays and static Func<T,Void>
+  callbacks. Resolve closed method-generic signatures against target metadata,
+  retaining the existing callback algorithm and ordinary no-result API boundary.
+
 - Admit no-result static generic IL methods while retaining the distinction between
   generic Void payloads and absent call results. Added execution and invalid-return
   regressions; generic instance-class methods remain outside this subset.

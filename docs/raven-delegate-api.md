@@ -45,5 +45,21 @@ This reuses the [delegate contract and .NET comparison](delegate-contract.md).
 The familiar constructor/Invoke metadata is projected onto the existing runtime
 binding model, without adding opcodes. Static targets demonstrate this API slice;
 capturing lambdas, bound application-instance callbacks, multicast behavior and
-arbitrary function-pointer operations are not claimed. System.Array.ForEach and
-general generic-method import remain subsequent work.
+arbitrary function-pointer operations are not claimed.
+
+## Array callbacks
+
+`Array.ForEach<T>(T[], Func<T,Void>)` now uses the existing runtime algorithm with
+ordinary managed Int32 and String arrays. Raven accepts both inferred and explicit
+method type arguments and wraps matching static functions. The callback runs once
+per element in index order; a fault terminates execution. The adapted generic
+method returns no result, while its Func<T,Void> call still consumes the runtime
+unit result. No Action family or new opcode is introduced.
+
+[The array sample](experiments/raven-target/samples/library-array-callbacks.rvn)
+exercises both element shapes and an empty array with no callback invocations.
+Raven experiment commit `de872fa34` emits empty arrays without a host Array.Empty
+dependency (ordinary CLR compilation retains its existing optimization).
+Raven experiment commit `11e9964f2` preserves target
+MethodSpec signatures for closed imported generic methods; the importer still
+admits individual supported API contracts rather than arbitrary generic methods.

@@ -28,6 +28,15 @@ static class SignatureProbe
             catch (InvalidDataException) { checks.Add(name); return; }
             throw new Exception("Malformed signature accepted: " + name);
         }
+        var forEach = module.GetType("System.Array").Methods.Single(m => m.Name == "ForEach");
+        var forEachCall = new GenericInstanceMethod(forEach);
+        forEachCall.GenericArguments.Add(module.TypeSystem.Int32);
+        Check("Closed Array.ForEach MethodSpec", ArrayCallbackBindings.Bind(forEachCall, forEach)?.Name == "System.Array::ForEach<Int32>");
+        forEachCall.GenericArguments.Add(module.TypeSystem.String);
+        Reject("Array.ForEach method arity", () => ArrayCallbackBindings.Bind(forEachCall, forEach));
+        forEachCall.GenericArguments.RemoveAt(1);
+        forEachCall.GenericArguments[0] = module.TypeSystem.Double;
+        Reject("Array.ForEach unsupported element", () => ArrayCallbackBindings.Bind(forEachCall, forEach));
         var ok = module.GetType("System.Result").NestedTypes.Single(t => t.Name == "Ok`1");
         var nested = new GenericInstanceType(ok);
         nested.GenericArguments.Add(new ArrayType(result.GenericParameters[0]));

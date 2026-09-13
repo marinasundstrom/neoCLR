@@ -60,6 +60,9 @@ def build(path: Path) -> str:
     text = path.read_text()
     if path.stem in COLLECTIONS | {'Disposable'}:
         text = adapt(text, path.stem)
+    if path.stem == 'Func':
+        text = text.replace('readonly T[]& array', 'arrayref<T> array').replace('-> Void', '-> noresult')
+        text = re.sub(r'^\s*ldvoid\n', '\n', text, flags=re.M)
     lines = []
     for line in text.splitlines(keepends=True):
         include = re.fullmatch(r'\s*\.include "([^"]+)"\s*', line)

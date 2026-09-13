@@ -1,0 +1,12 @@
+import System.*
+import System.Console.*
+func ShowInt(value: int) { WriteLine(value) }
+func ShowString(value: string) { WriteLine(value) }
+func Main() {
+    let numbers = [7, 42]
+    Array.ForEach(numbers, ShowInt)
+    let words = ["First", "Second"]
+    Array.ForEach<string>(words, ShowString)
+    let empty: int[] = []
+    Array.ForEach(empty, ShowInt)
+}

@@ -300,8 +300,10 @@ static class UnionImport
                         }
                         else if (targetMethod.Module == library.MainModule)
                         {
+                            var arrayCallback = collectionProfile ? ArrayCallbackBindings.Bind(reference, targetMethod) : null;
                             var delegateCall = DelegateBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt);
-                            if (delegateCall is not null) call = new(delegateCall.Name, delegateCall.Arguments, delegateCall.Result, Instruction: delegateCall.Instruction);
+                            if (arrayCallback is not null) call = new(arrayCallback.Name, arrayCallback.Arguments, arrayCallback.Result, Instruction: arrayCallback.Instruction);
+                            else if (delegateCall is not null) call = new(delegateCall.Name, delegateCall.Arguments, delegateCall.Result, Instruction: delegateCall.Instruction);
                             else
                             {
                                 var binding = collectionProfile ? CollectionBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt) : null;
