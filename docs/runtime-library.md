@@ -188,3 +188,56 @@ optional process variables; see `examples/source/environment.neo`.
 
 The [file report example](file-output.md) combines guest arguments, paths and bounded
 UTF-8 input/output with typed Results.
+
+## Raven as the library source language (2026-09-13)
+
+The author now directs ordinary runtime class-library development toward Raven,
+while retaining neoIL as an important platform facility. Begin the migration while
+the library is still relatively small, rather than increasing the amount of later
+translation. Take a source milestone checkpoint before starting the transition.
+This is a change of implementation language, not a decision to alter public API
+contracts, value/reference categories, the instruction set or the runtime's role.
+
+Raven should author ordinary algorithms, collections, query operators and error-flow
+helpers. Keep neoIL where low-level control, bootstrap definitions or direct runtime
+conformance tests justify it. Host code still supplies unavoidable platform services.
+Generated neoIL can remain an executable/debuggable intermediate; the source language
+and executable representation are separate layers.
+
+This follows the managed-library pattern visible in .NET's
+[C# LINQ implementation](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Linq/src/System/Linq/Last.cs),
+using a high-level language for ordinary algorithms without moving their policy into
+the runtime engine. Raven adds a useful integration test of neoCLR's compiler-facing
+surface. Benefits are readability, maintainability and earlier discovery of target
+gaps; costs include compiler/bootstrap dependencies and the risk of introducing
+translation regressions. Retaining hand-written neoIL avoids that bootstrap cost
+but becomes more expensive to maintain as algorithms and APIs grow.
+
+### First migration groundwork
+
+The current bridge is a bounded application importer, not a general library compiler.
+[ApplicationTypes.cs](experiments/raven-target/ApplicationTypes.cs) rejects generic
+application type/method bodies and assigns application-specific type identities;
+[QueryBindings.cs](experiments/raven-target/QueryBindings.cs) admits calls to known
+generic library methods, whose executable bodies still come from neoIL. Therefore
+successful Raven calls to a generic API are not evidence that its implementation
+can already be authored and imported from Raven.
+
+Start by establishing the repeatable build path for a small scalar library helper,
+then a generic collection or query method. Preserve stable System type/member
+identities and test imported bodies with existing direct IL and Raven scenarios.
+The necessary sequence is: bootstrap reference metadata, compile Raven library
+sources against that surface, import the implementation, then compile and run a
+consumer against the matching library contract. Determine how to derive or verify
+the reference surface from the authoritative sources so declarations do not drift
+from implementations. Do not create a circular dependency on a library that cannot
+yet be built. Keep Raven changes on its experimental feature branch.
+
+For each port, compare results, fault/cleanup boundaries, callback order, allocation
+behavior and retained references under GC before replacing its hand-written body.
+Do not change the API merely to make the port easier. Keep the remaining neoIL
+bodies executable while migrating incrementally; remove duplicate authoritative
+implementations once a port is verified. Finish with a clean-checkout bootstrap and
+an extracted-bundle consumer test. Broad generic importing and the reference-assembly
+build strategy are groundwork to implement, not completed capabilities. No library
+method has been ported to Raven in the predicate-overload checkpoint itself.

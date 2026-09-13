@@ -221,17 +221,24 @@ static class SignatureProbe
             Reject(name + " rejects an old or forged result", () => CollectionBindings.Bind(searchReference, search, true));
         }
         var enumerable = module.GetType("System.Linq.Enumerable");
-        foreach (var name in new[] { "First", "Last", "Single" }) {
-            var terminal = enumerable.Methods.Single(m => m.Name == name);
+        foreach (var name in new[] { "First", "Last", "Single" })
+        foreach (var count in new[] { 1, 2 }) {
+            var terminal = enumerable.Methods.Single(m => m.Name == name && m.Parameters.Count == count);
             var terminalReference = Reference(terminal, enumerable);
             terminalReference.CallingConvention = MethodCallingConvention.Generic;
             var call = new GenericInstanceMethod(terminalReference);
             call.GenericArguments.Add(module.TypeSystem.String);
             var expected = name == "Single" ? "System.Result<String,System.Linq.SingleError>" : "System.Option<String>";
-            Check(name + " closes terminal outcome", QueryBindings.Bind(call, terminal, false)?.Result == expected);
-            Reject(name + " rejects virtual call", () => QueryBindings.Bind(call, terminal, true));
+            Check(name + " arity " + count + " closes terminal outcome", QueryBindings.Bind(call, terminal, false)?.Result == expected);
+            Reject(name + " arity " + count + " rejects virtual call", () => QueryBindings.Bind(call, terminal, true));
+            if (count == 2) {
+                var predicateType = call.Parameters[1].ParameterType;
+                call.Parameters[1].ParameterType = module.TypeSystem.Int32;
+                Reject(name + " rejects non-predicate argument", () => QueryBindings.Bind(call, terminal, false));
+                call.Parameters[1].ParameterType = predicateType;
+            }
             call.ReturnType = module.TypeSystem.String;
-            Reject(name + " rejects payload-only result", () => QueryBindings.Bind(call, terminal, false));
+            Reject(name + " arity " + count + " rejects payload-only result", () => QueryBindings.Bind(call, terminal, false));
         }
         MapBindings.Validate(module);
         var mapDefinition = module.GetType("System.Collections.Map`2");

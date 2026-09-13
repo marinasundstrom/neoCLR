@@ -20,12 +20,12 @@ func PrintSingle(value: Result<int, SingleError>) {
 }
 
 func OnlyPositive(values: Iterable<int>) -> Result<int, SingleError> {
-    let value = values.Where((number: int) -> bool => number > 0).Single()?
+    let value = values.Single((number: int) -> bool => number > 0)?
     return .Ok(value)
 }
 
 func FirstPositive(values: Iterable<int>) -> Option<int> {
-    let value = values.Where((number: int) -> bool => number > 0).First()?
+    let value = values.First((number: int) -> bool => number > 0)?
     return Option<int>(Option.Some<int>(value))
 }
 
@@ -47,7 +47,7 @@ func Main() {
     PrintOptional(FirstPositive([0]))
 
     let types: Type[] = [typeof(int), typeof(string)]
-    match types.Last() {
+    match types.Last((kind: Type) -> bool => true) {
         Some(let kind) => WriteLine(kind.Name)
         None => WriteLine("No type")
     }
@@ -63,4 +63,12 @@ func Main() {
         Some(let result) => PrintSingle(result)
         None => WriteLine("No result")
     }
+    // Predicate overloads distinguish missing matches from present zero values.
+    PrintOptional(empty.First((value: int) -> bool => true))
+    PrintOptional(many.First((value: int) -> bool => value > 100))
+    PrintOptional(many.First((value: int) -> bool => value == 0))
+    PrintOptional(many.Last((value: int) -> bool => value == 0))
+    PrintSingle(many.Single((value: int) -> bool => value > 100))
+    PrintSingle(many.Single((value: int) -> bool => value >= 0))
+    PrintSingle(many.Single((value: int) -> bool => value == 42))
 }

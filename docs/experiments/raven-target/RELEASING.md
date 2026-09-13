@@ -224,3 +224,14 @@ The full editor invocation with `--maps` also checks member discovery on applica
 payloads after lookup and filtering. The sample and expected output are included
 by the existing sample-directory packaging step. Keep this source capability distinct
 from already published or installed builds lacking the newer library metadata.
+
+## Predicate terminal overload source checks
+
+First, Last and Single now also accept Func<T, Boolean>. Refresh core metadata and
+System together; .12 binaries predate these overloads. The project/query suites use
+the updated terminal sample; application checks use Single(predicate) with an Order
+payload. Run the signature probe and `cargo test --test query_terminals` for outcome,
+callback-order, disposal, fault and allocation checks. `verify_editor.py --queries`
+checks predicate signature help as well as extension discovery. Preserve the
+[documented forward Last scan](../../raven-query-api.md#predicate-terminal-overloads-2026-09-13)
+and normal-outcome cleanup limits in release notes.

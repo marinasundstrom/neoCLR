@@ -40,7 +40,7 @@ func PendingOrder(index: Map<int, Order>, number: int) -> Option<Order> {
 }
 
 func OnlyPending(orders: Iterable<Order>) -> Result<Order, SingleError> {
-    let order = orders.Where((order: Order) -> bool => order.Pending).Single()?
+    let order = orders.Single((order: Order) -> bool => order.Pending)?
     return .Ok(order)
 }
 

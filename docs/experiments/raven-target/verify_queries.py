@@ -25,7 +25,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-queries-') as temporary:
                *runner_arguments(args), '--runtime', str(args.runtime.resolve())]
     cases = [
         ('Option and Result terminals', (bridge / 'samples/library-query-terminals.rvn').read_text(),
-         'Absent\nAbsent\n0\n42\nAbsent\nEmpty\n0\nMultiple\n42\nMultiple\n42\nAbsent\nSystem.String\nNo result\n42\n'),
+         'Absent\nAbsent\n0\n42\nAbsent\nEmpty\n0\nMultiple\n42\nMultiple\n42\nAbsent\nSystem.String\nNo result\n42\nAbsent\nAbsent\n0\n0\nEmpty\nMultiple\n42\n'),
         ('Array queries and reflection materialization', (bridge / 'samples/library-array-queries.rvn').read_text(),
          'Parse\nDivide\nEquals\nToString\nCompareTo\n0\n17\n13\n3\n17\n52\n6\n0\n0\n43\n'),
         ('Array Iterable parameters, returns and independent iterators', header + '''

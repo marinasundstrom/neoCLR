@@ -79,6 +79,55 @@ Fail:
 fault "dispose failure"
 .end
 .end
+.type class Predicate
+.field Mode Int32
+.field Calls Int32
+.field Trace Int32
+.method instance Check(Int32 value) -> Boolean
+ldarg this
+ldarg this
+ldfld Predicate::Calls
+ldc.i4 1
+add
+stfld Predicate::Calls
+ldarg this
+ldarg this
+ldfld Predicate::Trace
+ldc.i4 10
+mul
+ldarg value
+add
+stfld Predicate::Trace
+ldarg this
+ldfld Predicate::Mode
+ldc.i4 3
+beq Fail
+ldarg this
+ldfld Predicate::Mode
+ldc.i4 2
+beq Missing
+ldarg this
+ldfld Predicate::Mode
+ldc.i4 1
+beq Zero
+ldarg value
+ldc.i4 2
+rem
+ldc.i4 1
+ceq
+ret
+Zero:
+ldarg value
+ldc.i4 0
+ceq
+ret
+Missing:
+ldc.bool false
+ret
+Fail:
+fault "predicate failure"
+.end
+.end
 "#;
 fn program(body: &str) -> LoadedProgram {
     let source =
@@ -213,4 +262,101 @@ ret
         allocations[0], allocations[1]
     );
     assert!(allocations[0] < allocations[1]);
+}
+
+fn predicate_start(count: i32, mode: i32, fail_move: i32, fail_dispose: bool) -> String {
+    ".local Predicate callback\n".to_string()
+        + &start(count, fail_move, fail_dispose)
+        + &format!(
+            "ldc.i4 {mode}\nldc.i4 0\nldc.i4 0\nnewobj Predicate\nstloc callback\nldloc probe\nldloc callback\ndelegate.bind System.Func<Int32,Boolean> = instance Predicate::Check(Int32)\n"
+        )
+}
+fn predicate_call(operator: &str, via_where: bool) -> String {
+    if via_where {
+        format!(
+            "call System.Linq.Enumerable::Where<Int32>(System.Collections.Iterable<Int32>,System.Func<Int32,Boolean>)\ncall System.Linq.Enumerable::{operator}<Int32>(System.Collections.Iterable<Int32>)\n"
+        )
+    } else {
+        format!(
+            "call System.Linq.Enumerable::{operator}<Int32>(System.Collections.Iterable<Int32>,System.Func<Int32,Boolean>)\n"
+        )
+    }
+}
+
+#[test]
+fn predicate_terminals_preserve_matching_order_outcomes_and_cleanup_without_query_wrappers() {
+    for (operator, count, mode, moves, reads, trace, outcome, expected) in [
+        ("First", 6, 0, 2, 2, 1, "Some", 1),
+        ("Last", 6, 0, 7, 6, 12345, "Some", 5),
+        ("Single", 6, 0, 4, 4, 123, "Multiple", 0),
+        ("Single", 6, 1, 7, 6, 12345, "Ok", 0),
+        ("Last", 6, 1, 7, 6, 12345, "Some", 0),
+        ("First", 6, 2, 7, 6, 12345, "None", 0),
+        ("Last", 6, 2, 7, 6, 12345, "None", 0),
+        ("Single", 6, 2, 7, 6, 12345, "Empty", 0),
+        ("First", 0, 0, 1, 0, 0, "None", 0),
+        ("Last", 0, 0, 1, 0, 0, "None", 0),
+        ("Single", 0, 0, 1, 0, 0, "Empty", 0),
+    ] {
+        let mut allocations = Vec::new();
+        for via_where in [false, true] {
+            let mut body = predicate_start(count, mode, -1, false);
+            body += &predicate_call(operator, via_where);
+            let result: String = match outcome {
+                "Some" => "call instance System.Option<Int32>::GetSomeCase()\ncall instance System.Option.Some<Int32>::get_Value()".into(),
+                "None" => "call instance System.Option<Int32>::get_IsNone()".into(),
+                "Ok" => "call instance System.Result<Int32,System.Linq.SingleError>::GetOkCase()\ncall instance System.Result.Ok<Int32>::get_Value()".into(),
+                case => format!("call instance System.Result<Int32,System.Linq.SingleError>::GetErrorCase()\ncall instance System.Result.Error<System.Linq.SingleError>::get_Value()\ncall instance System.Linq.SingleError::get_Is{case}()"),
+            };
+            if matches!(outcome, "Some" | "Ok") {
+                body += &check(&result, expected, "Outcome");
+            } else {
+                body += &(result + "\nbrtrue Outcome\nfault \"wrong union case\"\nOutcome:\n");
+            }
+            for (field, expected) in [("Moves", moves), ("Reads", reads), ("Disposals", 1)] {
+                body += &check(
+                    &format!("ldloc probe\nldfld Probe::{field}"),
+                    expected,
+                    field,
+                );
+            }
+            for (field, expected) in [("Calls", reads), ("Trace", trace)] {
+                body += &check(
+                    &format!("ldloc callback\nldfld Predicate::{field}"),
+                    expected,
+                    field,
+                );
+            }
+            body += "ldc.i4 42";
+            let result = program(&body).run(Limits::default()).unwrap();
+            assert_eq!(result.value, Value::Int32(42));
+            allocations.push(result.heap.statistics().allocated_objects);
+        }
+        assert!(
+            allocations[0] < allocations[1],
+            "{operator}: {allocations:?}"
+        );
+    }
+}
+
+#[test]
+fn predicate_terminals_preserve_fault_boundaries() {
+    for operator in ["First", "Last", "Single"] {
+        for (mode, fail_move, fail_dispose, message) in [
+            (3, -1, true, "predicate failure"),
+            (0, 1, true, "iterator failure"),
+            (0, -1, true, "dispose failure"),
+        ] {
+            let body = predicate_start(3, mode, fail_move, fail_dispose)
+                + &predicate_call(operator, false)
+                + "pop\nldc.i4 0";
+            assert!(
+                program(&body)
+                    .run(Limits::default())
+                    .unwrap_err()
+                    .message
+                    .contains(message)
+            );
+        }
+    }
 }

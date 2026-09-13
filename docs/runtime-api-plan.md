@@ -113,8 +113,8 @@ separate from the following LINQ terminal outcome slice.
 Implemented First/Last returning Option<T>, and Single returning
 Result<T,SingleError> with Empty and Multiple cases, in the Raven profile.
 Filtering composes through Where; the [query API](raven-query-api.md) records the
-.NET comparison, normal-outcome disposal and terminal-fault limits. Aggregation,
-predicate overloads and specialized paths remain open. This implementation is
+.NET comparison, normal-outcome disposal and terminal-fault limits. Predicate overloads were added
+in a subsequent slice; aggregation and specialized paths remain open. This implementation is
 separate from Map and the subsequently completed ArrayList filtering work.
 
 
@@ -132,3 +132,13 @@ concrete collection types to avoid query-object allocations; use LINQ through
 interfaces and for composition. Specializing LINQ is explicitly allowed. Measure
 allocations and describe runtime speed separately. Scalar ArrayList searches now
 scan captured storage directly, without an iterator or query object.
+
+### Next implementation track: Raven-authored runtime library (2026-09-13)
+
+The author directs migration now, before further library growth makes translation
+larger. After a tagged checkpoint, prioritize the [Raven library build path](runtime-library.md#raven-as-the-library-source-language-2026-09-13):
+stable library identities and bootstrap metadata, a small scalar port, then a generic
+method with compiler/importer gaps resolved. Raven becomes the ordinary library
+source language; neoIL remains available for low-level implementation and testing.
+This implementation track takes precedence over adding unrelated API families.
+Preserve existing contracts and migrate verified bodies incrementally.

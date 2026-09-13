@@ -9,8 +9,11 @@ static class QueryBindings
                 public static Collections.Iterable<T> Where<T>(this Collections.Iterable<T> source, Func<T, bool> predicate) => default;
                 public static Collections.Iterable<U> Select<T,U>(this Collections.Iterable<T> source, Func<T,U> selector) => default;
                 public static Option<T> First<T>(this Collections.Iterable<T> source) => default;
+                public static Option<T> First<T>(this Collections.Iterable<T> source, Func<T, bool> predicate) => default;
                 public static Option<T> Last<T>(this Collections.Iterable<T> source) => default;
+                public static Option<T> Last<T>(this Collections.Iterable<T> source, Func<T, bool> predicate) => default;
                 public static Result<T, SingleError> Single<T>(this Collections.Iterable<T> source) => default;
+                public static Result<T, SingleError> Single<T>(this Collections.Iterable<T> source, Func<T, bool> predicate) => default;
                 public static Collections.ArrayList<T> ToList<T>(this Collections.Iterable<T> source) => default;
             }
         }
@@ -28,11 +31,13 @@ static class QueryBindings
         if (types.Length != arity || types.Any(t => t is null))
             throw new InvalidDataException("Unsupported query type arguments.");
         var source = $"System.Collections.Iterable<{types[0]}>";
+        var terminalArguments = definition.Parameters.Count == 2
+            ? new[] { source, $"System.Func<{types[0]},Boolean>" } : new[] { source };
         var (expected, returns) = reference.Name switch {
             "Where" => (new[] { source, $"System.Func<{types[0]},Boolean>" }, source),
             "Select" => (new[] { source, $"System.Func<{types[0]},{types[1]}>" }, $"System.Collections.Iterable<{types[1]}>"),
-            "First" or "Last" => (new[] { source }, $"System.Option<{types[0]}>"),
-            "Single" => (new[] { source }, $"System.Result<{types[0]},System.Linq.SingleError>"),
+            "First" or "Last" => (terminalArguments, $"System.Option<{types[0]}>"),
+            "Single" => (terminalArguments, $"System.Result<{types[0]},System.Linq.SingleError>"),
             "ToList" => (new[] { source }, $"System.Collections.ArrayList<{types[0]}>"),
             _ => throw new InvalidDataException("Unsupported query operator.")
         };

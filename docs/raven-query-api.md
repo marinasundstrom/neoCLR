@@ -11,6 +11,9 @@ methods over `System.Collections.Iterable<T>` and, after Preview 5, vector array
 | `First<T>(Iterable<T>)` | `Option<T>` | Reads at most the first element |
 | `Last<T>(Iterable<T>)` | `Option<T>` | Consumes the sequence, retaining the last element |
 | `Single<T>(Iterable<T>)` | `Result<T, SingleError>` | Requires exactly one element; stops on a second element |
+| `First<T>(Iterable<T>, Func<T, bool>)` | `Option<T>` | Stops at the first matching element |
+| `Last<T>(Iterable<T>, Func<T, bool>)` | `Option<T>` | Forward scan retaining the last match |
+| `Single<T>(Iterable<T>, Func<T, bool>)` | `Result<T, SingleError>` | Counts matches; stops on the second match |
 
 Import `System.Linq.*` to use member syntax. See the readable
 [query sample](experiments/raven-target/samples/library-queries.rvn). Raven infers
@@ -169,16 +172,17 @@ published Preview 5 validation record.
 
 ## Terminal outcomes (2026-09-13)
 
-The Raven profile adds source-only overloads of First, Last and Single. First/Last
+The initial Raven terminal slice added overloads taking only the source. First/Last
 return None for no element and Some for a present value, including a present zero.
 Single returns Ok for exactly one element, Error(SingleError.Empty) for none, and
 Error(SingleError.Multiple) for more than one. SingleError is a value union with
 IsEmpty/IsMultiple, checked GetEmpty/GetMultiple and ToString; it is not an exception
 class. There is no requirement to default-initialize T to express absence.
 
-Use `values.Where(predicate).First()` (or Last/Single) for filtered selection in
-this slice. Predicate overloads, OrDefault aliases, count/aggregation operators,
-ordering and specialized collection paths remain outside this implementation.
+Use either `values.Where(predicate).First()` or the subsequently added
+`values.First(predicate)` (likewise Last/Single) for filtered selection.
+OrDefault aliases, count/aggregation operators, ordering and specialized collection
+paths remain outside this implementation.
 An empty filtered sequence is handled identically to an empty source. The
 [terminal sample](experiments/raven-target/samples/library-query-terminals.rvn)
 shows arrays, lists, reference and Result payloads, case destructuring, Option
@@ -186,7 +190,8 @@ propagation and Single's Result propagation. It uses the currently supported
 explicit Option carrier constructor when returning a Some value.
 
 The terminal acquires an iterator once and disposes it on each normal outcome,
-including an early First result or Single cardinality error. First reads Current
+including an early First result or Single cardinality error. For the source-only
+overloads, First reads Current
 once after one successful MoveNext; Single reads the first Current and calls
 MoveNext again without reading a second Current. Last reads Current on each success
 until exhaustion. It does not terminate on an infinite sequence. Null receivers,
@@ -274,3 +279,66 @@ Terminal-slice source validation on 2026-09-13 passed 62 saved-project cases,
 (terminal, collection and reflection suites), plus Clippy, formatting and the API
 audit. The .NET comparison ran with SDK 11.0.100-rc.1.26425.128 targeting net10.0.
 These are source-build results; no new SDK/VSIX package was installed or released.
+
+
+## Predicate terminal overloads (2026-09-13)
+
+The author requested First and related overloads accepting a predicate. All three
+accept Func<T, Boolean> and retain the existing union outcomes. No match, even in a
+nonempty source, returns None for First/Last or Error(SingleError.Empty) for Single.
+Single reports Multiple for two matches, regardless of how many nonmatching elements
+occur between them. A matching zero or reference value remains a present payload.
+
+```raven
+let first = orders.First((order: Order) -> bool => order.Pending)
+let last = orders.Last((order: Order) -> bool => order.Pending)
+let only = orders.Single((order: Order) -> bool => order.Pending)
+```
+
+Each method acquires one iterator and reads Current once per visited element before
+calling the predicate. First stops at the first true result; Single stops at the
+second true result; Last evaluates the source forward through exhaustion. Single
+must exhaust a finite source to establish that one match is unique. All normal
+outcomes dispose the iterator once. Callback/iterator faults remain terminal and do
+not promise unwinding cleanup. Dispose faults do not become union errors. Empty
+sources do not invoke the predicate; null predicates fault only if invoked.
+
+The implementation scans directly through the iterator instead of allocating a
+Where sequence and its filtering iterator. Direct IL tests compare callback order,
+reads, cardinality and disposal against Where(predicate) followed by each terminal,
+and measure fewer managed allocations for the direct overload in those cases.
+This is not an elapsed-time performance claim, and does not eliminate the source's
+own iterator or callback allocations. Initial-match search and subsequent scanning
+use separate control-flow paths so the verifier can establish that the saved T
+payload is initialized; no default T or new verifier rule is required.
+
+This extends the earlier terminal design review, including its other-platform and
+alternative .NET Option/Maybe comparisons. Primary .NET 10 sources consulted
+2026-09-13: [First(predicate)](https://learn.microsoft.com/en-us/dotnet/api/system.linq.enumerable.first?view=net-10.0)
+and [Single(predicate)](https://learn.microsoft.com/en-us/dotnet/api/system.linq.enumerable.single?view=net-10.0)
+provide familiar predicate signatures but use exceptions for missing/non-unique
+matches. neoCLR keeps its existing explicit outcome policy. The pinned
+[Last implementation](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Linq/src/System/Linq/Last.cs)
+can search IList backwards. Our forward-only prototype instead preserves the
+existing query callback order across sources, at the cost of evaluating more
+predicates for a last match. ArrayList.FindLast remains a distinct reverse scan.
+The .NET comparison records one predicate invocation for a three-element List's
+last positive value, versus three through a forward iterator. This is evidence
+against claiming identical callback timing or universal speed equivalence with .NET.
+
+Adopting those specializations can be evaluated later, with their observable
+callback/fault differences explicit. Implementing the overloads as Where composition
+would reduce library loops but retain wrapper allocations; new runtime intrinsics
+are unnecessary. Existing metadata/IL represents the overloads, and Raven requires
+no compiler changes. The sample's OnlyPositive and the order workflow's OnlyPending
+now demonstrate predicate overloads with Result propagation.
+
+Regenerate core metadata and System together and rebuild callers to use the new
+overloads. Existing one-argument calls remain supported. Installed .12 artifacts
+are unchanged and do not contain these source additions. Run the project/query/
+application suites, signature probe, query-terminal runtime tests and editor checks;
+signature help now verifies all three predicate overloads.
+
+Source validation passed 63 saved-project cases, 29 query checks, 15 application
+checks, 116 signature checks, 64 editor checks and five query-terminal runtime
+tests, plus Clippy and formatting. The .NET comparison targets net10.0.

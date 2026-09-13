@@ -119,7 +119,7 @@ identity. The filtered list keeps its original membership; it does not automatic
 remove an order whose Pending flag changes. A fresh query observes the current state.
 This distinction is intentional and is visible in the sample's output.
 
-OnlyPending accepts Iterable<Order>, composes Where and Single, and propagates the
+OnlyPending accepts Iterable<Order>, calls Single with a predicate, and propagates the
 Result. Initially two pending orders yield Multiple, then one yields order 303,
 then none yield Empty. An Order[] also supports Where/Select/ToList through the array's
 Iterable contract. FindIndex demonstrates Some(0), distinguishing the first position
@@ -160,3 +160,8 @@ the GC variant. `verify_editor.py --maps` checks member discovery on the applica
 payload through both map lookup and FindAll. The package builder already includes
 the sample directory and verification scripts, so a future fresh bundle will carry
 this scenario; this source slice does not itself build, install or publish a release.
+
+The later predicate-overload source slice simplifies OnlyPending to
+`orders.Single(predicate)?`. The installed .12 sample retains its equivalent
+Where(predicate).Single() spelling; do not copy this newer source into .12 without
+refreshing its matching core metadata and System library.

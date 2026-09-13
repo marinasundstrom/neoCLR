@@ -450,6 +450,16 @@ try:
             labels = sorted({item['label'] for item in items})
             assert 'Number' in labels, labels
             results[label] = labels
+    if queries:
+        for version, operator in ((60, 'First'), (61, 'Last'), (62, 'Single')):
+            text = ('import System.Collections.*\nimport System.Linq.*\n'
+                    'func Main() {\n    let values = ArrayList<int>()\n    values.' + operator + '(')
+            send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version},
+                'contentChanges': [{'text': text}]})
+            result = receive(send('textDocument/signatureHelp', {'textDocument': {'uri': uri},
+                'position': {'line': 4, 'character': len(text.splitlines()[4])}}, True))
+            assert result and any('predicate' in json.dumps(signature) for signature in result['signatures']), result
+            results['Predicate overload ' + operator] = result
     receive(send('shutdown', None, True))
     send('exit', None)
     print(json.dumps(results, indent=2))

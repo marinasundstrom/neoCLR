@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Added Raven-profile First/Last/Single predicate overloads with existing Option/
+  Result outcomes, forward callback order and normal-outcome iterator disposal.
+  Direct iteration avoids Where wrapper allocations; no runtime/compiler change.
+  Added callback/cardinality/fault/allocation tests, metadata rejection and editor
+  signature-help checks, updated samples and .NET comparisons. Regenerate core
+  metadata and System together; existing source-only overloads remain supported.
+  Installed .12 tools are unchanged. Recorded the decision to migrate ordinary
+  library authoring to Raven after a source checkpoint, retaining neoIL for low-level
+  code/tests and documenting bootstrap and generic-import groundwork.
+
 - Built and locally installed the side-by-side Raven SDK/VSIX .12 and matching
   neoCLR collection bundle from neoCLR 6fd3729 and Raven 854cd4d3d. The isolated
   VS Code profile opens the combined order-collection demo. Eight extracted-bundle

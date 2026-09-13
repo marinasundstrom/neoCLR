@@ -2503,3 +2503,37 @@ the sample to None() resolved the import failure. This does not establish improv
 compiler diagnostics for that invalid expression. The source sample and release
 procedure are ready for inclusion by the existing bundle builder; no package,
 installation or publication occurred in this slice.
+
+## 2026-09-13 — Predicate terminals and the next library-authoring direction
+
+**Author's request and action.** The author asked for First and related overloads
+that accept a function predicate. The assistant added First/Last/Single overloads,
+retaining Option/Result outcomes, normal-outcome iterator disposal and terminal
+fault boundaries. Direct loops avoid a Where wrapper. Verification required control
+flow that establishes a first match before reading the saved generic value; the
+implementation was corrected to express that without a default T or verifier change.
+
+**Validation outcome.** The source changes passed 63 saved-project cases, 29 query
+checks, 15 application checks, 116 signature checks and 64 editor checks, including
+predicate signature help. Five runtime tests cover both overload families, matching
+order, cardinality, cleanup, faults and allocation comparisons. Clippy passed.
+The .NET comparison shows that its List Last(predicate) can traverse backwards,
+whereas this prototype keeps forward query order. Installed .12 tools remain the
+previous validated build, without these latest source additions.
+
+**Author's proposal and decision.** While this work was underway, the author proposed
+writing the runtime class library in Raven, with neoIL still preferred where useful,
+to help develop neoCLR itself. The assistant supported a high-level implementation
+path and proposed checking bootstrap and generic-import gaps first. The author then
+clarified that neoIL remains important but that, now a high-level language targets
+neoCLR, the class library should use it. The author requested a release or at least
+a tag before proceeding, and emphasized that migration should start now because
+library growth would make the translation larger and harder.
+
+**Assistant's response and next action.** Use Raven as the default authoring language
+for ordinary library code; retain neoIL for justified low-level, bootstrap and test
+uses. Finish the predicate slice and take a source milestone tag rather than claim
+that the older .12 binaries contain it. The [library direction](runtime-library.md#raven-as-the-library-source-language-2026-09-13)
+records stable library identity, bootstrap metadata and generic-body importing as
+migration groundwork. The current bridge admits known generic API calls but rejects
+generic application bodies; the migration is not yet implemented by this checkpoint.
