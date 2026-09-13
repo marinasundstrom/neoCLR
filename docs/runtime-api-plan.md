@@ -107,15 +107,32 @@ replacement. The prototype deliberately exposes these gaps. Keep those decisions
 separate from the following LINQ terminal outcome slice.
 
 
-### Following slice: LINQ terminal outcomes (2026-09-13)
+### First LINQ terminal slice (2026-09-13)
 
-The author asked to evaluate Option/Result returns for First and other terminal
-operators and explicitly requested separate slices. Finish collection capabilities,
-then Map/dictionary work, then terminal operators; do not combine these API decisions
-in one implementation commit. Compare each operation with .NET's First/FirstOrDefault,
-Single/SingleOrDefault, Last and aggregation behavior before choosing contracts.
-First returning Option<T> is a candidate for absence without a default-value sentinel.
-Single requires a decision about zero versus multiple elements; Result may express
-cardinality errors. Decide empty-input and error behavior per operator rather than
-wrapping every terminal or converting runtime faults into ordinary Result errors.
-No terminal operator contract is selected or implemented by this planning note.
+Implemented First/Last returning Option<T>, and Single returning
+Result<T,SingleError> with Empty and Multiple cases, in the Raven profile.
+Filtering composes through Where; the [query API](raven-query-api.md) records the
+.NET comparison, normal-outcome disposal and terminal-fault limits. Aggregation,
+predicate overloads and specialized paths remain open. This implementation is
+separate from Map and the upcoming ArrayList work.
+
+
+### Upcoming separate slice: ArrayList filtering (2026-09-13)
+
+The author requested built-in ArrayList filtering functions and appropriate Option
+and Result outcomes, after the LINQ terminal slice. Review the existing Find,
+FindIndex and Exists APIs before adding overlapping operations. Compare with .NET
+List<T>.Find/FindLast, FindIndex/FindLastIndex, FindAll, Exists and TrueForAll;
+choose the smallest useful set and resolve whether index absence remains a sentinel
+or becomes Option<Int32>. Existing Find already returns Option<T>. Filtering with
+no matches normally produces an empty collection; a Boolean predicate question
+already has a complete answer. Use Result only for a meaningful recoverable error,
+not to absorb callback/runtime faults. Contracts and implementation are still planned,
+and this work must have its own implementation commit.
+
+The author clarified the usage guideline: prefer suitable built-in operations for
+concrete collection types to avoid query-object allocations; use LINQ through
+interfaces and for composition. Specializing LINQ is explicitly allowed. Measure
+allocations and describe runtime speed separately. The current ArrayList.Find
+already avoids query wrappers but still uses an iterator; direct-storage filtering
+is part of the implementation review, not a completed optimization.

@@ -1,0 +1,76 @@
+; Cardinality failure from Enumerable.Single; not a runtime fault.
+.type System.Linq.SingleError
+    .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
+    .field private Stored System.Value
+    .type Empty
+        .method instance .ctor() -> Void
+            ldvoid
+            ret
+        .end
+    .end
+    .method instance .ctor(System.Linq.SingleError.Empty value) -> Void
+        ldarg value
+        value.pack System.Linq.SingleError.Empty
+        newobj System.Linq.SingleError
+        starg this
+        ldvoid
+        ret
+    .end
+    .property instance IsEmpty() -> Boolean
+        .get instance System.Linq.SingleError::get_IsEmpty()
+    .end
+    .method instance get_IsEmpty() -> Boolean
+        ldarg this
+        ldfld 0
+        value.is System.Linq.SingleError.Empty
+        ret
+    .end
+    .method instance GetEmpty() -> System.Linq.SingleError.Empty
+        ldarg this
+        ldfld 0
+        value.unpack System.Linq.SingleError.Empty
+        ret
+    .end
+    .type Multiple
+        .method instance .ctor() -> Void
+            ldvoid
+            ret
+        .end
+    .end
+    .method instance .ctor(System.Linq.SingleError.Multiple value) -> Void
+        ldarg value
+        value.pack System.Linq.SingleError.Multiple
+        newobj System.Linq.SingleError
+        starg this
+        ldvoid
+        ret
+    .end
+    .property instance IsMultiple() -> Boolean
+        .get instance System.Linq.SingleError::get_IsMultiple()
+    .end
+    .method instance get_IsMultiple() -> Boolean
+        ldarg this
+        ldfld 0
+        value.is System.Linq.SingleError.Multiple
+        ret
+    .end
+    .method instance GetMultiple() -> System.Linq.SingleError.Multiple
+        ldarg this
+        ldfld 0
+        value.unpack System.Linq.SingleError.Multiple
+        ret
+    .end
+    .method instance ToString() -> String
+        ldarg this
+        call instance System.Linq.SingleError::get_IsEmpty()
+        brfalse Multiple
+        ldstr "Empty"
+        ret
+    Multiple:
+        ldarg this
+        call instance System.Linq.SingleError::GetMultiple()
+        pop
+        ldstr "Multiple"
+        ret
+    .end
+.end

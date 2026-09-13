@@ -74,6 +74,13 @@ result['targetProfileAdditions'] = [{
     'tests': ['tests/raven_collections.rs', 'docs/experiments/raven-target/verify_collection_capabilities.py'],
     'note': 'Explicit equality/hash callbacks; no default comparer, removal or pair iteration. See docs/map-contracts.md.'
 }]
+result['targetProfileAdditions'] += [{
+    'file': file,
+    'disposition': 'query-library-and-terminal-outcomes',
+    'samples': ['library-query-terminals.rvn'],
+    'tests': ['tests/query_terminals.rs', 'docs/experiments/raven-target/verify_queries.py'],
+    'note': 'First/Last return Option; Single returns Result with Empty/Multiple. Normal-outcome cleanup only. See docs/raven-query-api.md.'
+} for file in ('runtime/raven/Linq.neoil', 'runtime/raven/SingleError.neoil')]
 for addition in result['targetProfileAdditions']:
     assert (ROOT / addition['file']).is_file()
     for sample in addition['samples']:

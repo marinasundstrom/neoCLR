@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Added Raven-profile LINQ terminals: First and Last return Option<T>; Single
+  returns Result<T,SingleError> with Empty and Multiple cases. Existing IL and
+  metadata support the APIs without compiler changes. Normal outcomes dispose
+  iterators, including early exits; iterator/callback/disposal faults stay terminal.
+  Added propagation/pattern samples, metadata/editor checks, direct IL tests and
+  .NET comparisons. Core metadata and System must be regenerated together; installed
+  .11 tools are unchanged. Recorded the preference for concrete collection helpers
+  to avoid query allocations while retaining LINQ composition and specialization.
+  Planned ArrayList filtering and outcome review as a separate upcoming slice.
+
 - Added an experimental Raven-profile Map/MutableMap/HashMap slice with Option
   lookup, duplicate-preserving TryAdd, Set, count and independent key snapshots.
   Managed storage, collision chains and growth use existing IL; equality/hash

@@ -8,6 +8,9 @@ methods over `System.Collections.Iterable<T>` and, after Preview 5, vector array
 | `Where<T>(Iterable<T>, Func<T, bool>)` | `Iterable<T>` | Predicate runs while advancing an iterator |
 | `Select<T, U>(Iterable<T>, Func<T, U>)` | `Iterable<U>` | Selector runs once per produced element |
 | `ToList<T>(Iterable<T>)` | `ArrayList<T>` | Consumes the sequence immediately into a new list |
+| `First<T>(Iterable<T>)` | `Option<T>` | Reads at most the first element |
+| `Last<T>(Iterable<T>)` | `Option<T>` | Consumes the sequence, retaining the last element |
+| `Single<T>(Iterable<T>)` | `Result<T, SingleError>` | Requires exactly one element; stops on a second element |
 
 Import `System.Linq.*` to use member syntax. See the readable
 [query sample](experiments/raven-target/samples/library-queries.rvn). Raven infers
@@ -162,3 +165,114 @@ A small .NET 11 SDK comparison of array-to-IEnumerable conversion, independent
 iterators and mutation visibility produced the same `7, 7, 42, 7, 99, 99` sequence
 as the neoCLR interface test. These are development results, not updates to the
 published Preview 5 validation record.
+
+
+## Terminal outcomes (2026-09-13)
+
+The Raven profile adds source-only overloads of First, Last and Single. First/Last
+return None for no element and Some for a present value, including a present zero.
+Single returns Ok for exactly one element, Error(SingleError.Empty) for none, and
+Error(SingleError.Multiple) for more than one. SingleError is a value union with
+IsEmpty/IsMultiple, checked GetEmpty/GetMultiple and ToString; it is not an exception
+class. There is no requirement to default-initialize T to express absence.
+
+Use `values.Where(predicate).First()` (or Last/Single) for filtered selection in
+this slice. Predicate overloads, OrDefault aliases, count/aggregation operators,
+ordering and specialized collection paths remain outside this implementation.
+An empty filtered sequence is handled identically to an empty source. The
+[terminal sample](experiments/raven-target/samples/library-query-terminals.rvn)
+shows arrays, lists, reference and Result payloads, case destructuring, Option
+propagation and Single's Result propagation. It uses the currently supported
+explicit Option carrier constructor when returning a Some value.
+
+The terminal acquires an iterator once and disposes it on each normal outcome,
+including an early First result or Single cardinality error. First reads Current
+once after one successful MoveNext; Single reads the first Current and calls
+MoveNext again without reading a second Current. Last reads Current on each success
+until exhaustion. It does not terminate on an infinite sequence. Null receivers,
+invalid iterator state, callback faults and Dispose faults remain runtime faults.
+There is still no promise to run cleanup during fault unwinding. A caller owns
+normal iteration cleanup only when directly obtaining an iterator itself.
+
+Implementation uses ordinary interface calls, generics and existing union
+constructors in [Linq.neoil](../runtime/raven/Linq.neoil), plus
+[SingleError.neoil](../runtime/raven/SingleError.neoil). The importer validates
+closed generic outcome signatures. No Raven compiler, opcode or metadata-format
+change is needed. Regenerate the metadata core and System profile together;
+the installed .11 build is unchanged.
+
+### Comparison and provisional choices
+
+Sources reviewed 2026-09-13, with .NET 10 as the API baseline:
+
+- [.NET First](https://learn.microsoft.com/en-us/dotnet/api/system.linq.enumerable.first?view=net-10.0)
+  and [Last](https://learn.microsoft.com/en-us/dotnet/api/system.linq.enumerable.last?view=net-10.0)
+  throw on empty input. Their OrDefault alternatives can conflate absence with a
+  legitimate default value. neoCLR keeps familiar method names but returns Option.
+  This changes source contracts and adds case handling; it does not imply binary
+  compatibility or a performance improvement.
+- [.NET Single](https://learn.microsoft.com/en-us/dotnet/api/system.linq.enumerable.single?view=net-10.0)
+  requires exactly one item. [SingleOrDefault](https://learn.microsoft.com/en-us/dotnet/api/system.linq.enumerable.singleordefault?view=net-10.0)
+  still rejects multiple items. We retain the exactly-one requirement but represent
+  the two cardinality failures explicitly. Result<Option<T>, MultipleError> would
+  fit an at-most-one operation but weaken what the name Single asks for. Returning
+  only Option would erase the difference between no match and ambiguous matches.
+- [Rust Iterator](https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.next)
+  uses Option for end-of-iteration. The transferable lesson is explicit absence,
+  not Rust's ownership model or its iterator API. neoCLR retains MoveNext/Current
+  for familiar interface-based iteration and puts Option on these public terminals.
+- [CSharpFunctionalExtensions](https://github.com/vkhorikov/CSharpFunctionalExtensions#tryfirst-and-trylast)
+  describes the ambiguity of FirstOrDefault/LastOrDefault and supplies Maybe-based
+  TryFirst/TryLast. This is .NET ecosystem experience supporting an absence carrier,
+  not a claim that .NET's existing methods should have been changed incompatibly.
+
+All outcomes remain ordinary library contracts. Future aggregation should be
+considered individually: a well-defined identity, empty-input absence, arithmetic
+failure and a runtime fault are different cases. This slice does not wrap every
+terminal in Result or establish a general aggregation policy.
+
+The [comparison program](experiments/query-terminals/dotnet/Program.cs) targets
+net10.0 and illustrates both default-value ambiguity and .NET cardinality exceptions:
+
+```sh
+dotnet run --project docs/experiments/query-terminals/dotnet/Comparison.csproj
+cargo test --test query_terminals -- --nocapture
+```
+
+`verify_project.py --collections` and `verify_queries.py` run the Raven sample;
+`verify_editor.py --queries` checks discovery on concrete lists, filtered sequences,
+arrays and reflection arrays. The signature probe rejects payload-only return
+metadata and virtual invocation of these static extensions. Direct IL tests check
+all cardinalities, short-circuiting, disposal, fault boundaries and allocations.
+
+## Concrete collection operations versus LINQ
+
+The author's guideline is to prefer an appropriate built-in operation when the
+concrete collection is available. Use LINQ for interface-based querying and useful
+pipeline composition. The reason is avoiding unnecessary query objects and
+allocations by working directly with the collection's storage, not an assertion
+that the concrete API is always faster. LINQ specialization remains a valid
+optimization; this guideline does not forbid it.
+
+For the current prototype, an equivalent one-element lookup in
+`tests/query_terminals.rs` records five managed allocations for ArrayList.Find and
+nine for Where(...).First(), including identical list setup. These are interpreter
+heap-object counts, not host allocations, allocated bytes or elapsed-time results.
+The existing Find still creates an ArrayIterator: it avoids query wrappers but
+is not yet a direct-storage scan. The upcoming ArrayList filtering slice should
+review that implementation and preserve these semantics while reducing overhead.
+Re-measure when implementations change; these counts are not a permanent API promise.
+
+[.NET CA1826](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca1826)
+prefers direct properties/indexers in applicable cases; it is not a rule covering
+all filters. [.NET 10 First source](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Linq/src/System/Linq/First.cs)
+already specializes for known iterator/list forms. Accordingly, avoid treating
+interface syntax as proof of allocation or treating every LINQ chain as equally
+expensive. Any neoCLR specialization must preserve the selected outcome, callback
+and cleanup contracts, or explicitly document a contract change.
+
+Terminal-slice source validation on 2026-09-13 passed 62 saved-project cases,
+29 query checks, 90 signature checks, 59 editor checks and 18 focused runtime tests
+(terminal, collection and reflection suites), plus Clippy, formatting and the API
+audit. The .NET comparison ran with SDK 11.0.100-rc.1.26425.128 targeting net10.0.
+These are source-build results; no new SDK/VSIX package was installed or released.

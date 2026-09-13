@@ -1,0 +1,66 @@
+import System.*
+import System.Collections.*
+import System.Linq.*
+import System.Option.*
+import System.Result.*
+import System.Console.*
+
+func PrintOptional(value: Option<int>) {
+    match value {
+        Some(let found) => WriteLine(found)
+        None => WriteLine("Absent")
+    }
+}
+
+func PrintSingle(value: Result<int, SingleError>) {
+    match value {
+        Ok(let found) => WriteLine(found)
+        Error(let error) => WriteLine(error.ToString())
+    }
+}
+
+func OnlyPositive(values: Iterable<int>) -> Result<int, SingleError> {
+    let value = values.Where((number: int) -> bool => number > 0).Single()?
+    return .Ok(value)
+}
+
+func FirstPositive(values: Iterable<int>) -> Option<int> {
+    let value = values.Where((number: int) -> bool => number > 0).First()?
+    return Option<int>(Option.Some<int>(value))
+}
+
+func Main() {
+    let empty = ArrayList<int>()
+    let one: int[] = [0]
+    let many: int[] = [0, 7, 42]
+    PrintOptional(empty.First())
+    PrintOptional(empty.Last())
+    PrintOptional(one.First())
+    PrintOptional(many.Last())
+    PrintOptional(many.Where((value: int) -> bool => value > 100).First())
+    PrintSingle(empty.Single())
+    PrintSingle(one.Single())
+    PrintSingle(many.Single())
+    PrintSingle(OnlyPositive([0, 42]))
+    PrintSingle(OnlyPositive([0, 7, 42]))
+    PrintOptional(FirstPositive([0, 42]))
+    PrintOptional(FirstPositive([0]))
+
+    let types: Type[] = [typeof(int), typeof(string)]
+    match types.Last() {
+        Some(let kind) => WriteLine(kind.Name)
+        None => WriteLine("No type")
+    }
+
+    // A carrier cannot be initialized by manufacturing a default payload.
+    let outcomes = ArrayList<Result<int, SingleError>>()
+    match outcomes.Last() {
+        Some(let result) => PrintSingle(result)
+        None => WriteLine("No result")
+    }
+    outcomes.Add(Result<int, SingleError>.Ok(42))
+    match outcomes.First() {
+        Some(let result) => PrintSingle(result)
+        None => WriteLine("No result")
+    }
+}

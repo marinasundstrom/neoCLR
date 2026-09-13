@@ -2398,3 +2398,47 @@ its live key view and null-key rejection. neoCLR's key snapshot and current
 callback-defined key domain are documented differences, not asserted improvements.
 The installed .11 SDK/extension was not changed. LINQ terminal implementation remains
 a separate slice, and this bounded Map is not described as a complete Dictionary API.
+
+### 2026-09-13 — LINQ terminal outcomes and concrete collection guidance
+
+**Context and assistant proposal.** Following the author's request to keep Map and
+LINQ terminal outcomes in separate slices, the assistant proposed First/Last returning
+Option<T>, and Single returning Result<T,SingleError> with Empty and Multiple cases.
+Filtered selection would compose through Where; all normal outcomes would dispose
+the acquired iterator. Runtime faults would remain faults, without implying fault
+unwinding or introducing exception classes. These concrete contracts are an
+assistant-selected prototype interpretation of the author's Option/Result direction.
+
+**Author's next slice.** During implementation, the author asked for built-in filter
+functions on ArrayList with appropriate Option/Result usage in an upcoming slice.
+The assistant recorded a review of existing Find, FindIndex and Exists alongside
+additional useful operations. The plan distinguishes absence, empty filtered results,
+Boolean questions and actual recoverable errors rather than wrapping every return.
+No ArrayList API or implementation was changed in this terminal slice.
+
+**Guideline and correction.** The author said to prefer suitable built-in functions
+when the concrete collection is available and use LINQ when querying through an
+interface. The assistant initially qualified a blanket speed claim. The author
+clarified: “It's not that they are faster necessarily,” explaining fewer allocations
+from direct data-structure access instead of a chain of objects. The author then
+explicitly allowed LINQ specialization and reiterated the general preference for
+built-in operations. The recorded guideline now reflects allocation efficiency,
+permits specialization, and does not claim universal faster execution.
+
+**Action and evidence.** Added the terminal library methods, SingleError value union,
+metadata adapters and a [Raven sample](experiments/raven-target/samples/library-query-terminals.rvn)
+covering pattern matching and propagation. Direct IL tests check cardinality,
+short-circuiting, disposal and fault boundaries. A measured equivalent lookup used
+five managed allocations for ArrayList.Find versus nine for Where(...).First(),
+including common setup. The assistant identified that the existing Find still creates
+an ArrayIterator: direct-storage scanning is upcoming work, not a completed change.
+Those counts measure this interpreter implementation, not host bytes or elapsed speed.
+See the [query API](raven-query-api.md) and [upcoming API plan](runtime-api-plan.md).
+The installed SDK/extension remains unchanged; no Raven compiler or opcode change
+was needed for the terminal implementation.
+
+**Validation outcome.** The assistant subsequently verified 62 saved-project cases,
+29 query checks, 90 signature checks, 59 editor checks and 18 focused runtime tests,
+plus Clippy, formatting and the API audit. A .NET 10 target comparison confirms the
+existing default-sentinel ambiguity and exception-based cardinality behavior. The
+ArrayList work remains planned separately; LINQ specialization remains permitted.

@@ -188,3 +188,15 @@ to the full `verify_editor.py` invocation for completion through Map, MutableMap
 and HashMap. Run `cargo test --test raven_collections` for direct IL/GC tests.
 The [Map contract](../../map-contracts.md) lists current comparer and iteration
 limits that must accompany a build. These checks do not imply a full Dictionary API.
+
+
+## Query terminal source checks
+
+The terminal slice adds First/Last Option results and Single's Result/SingleError
+contract. Rebuild the metadata core and System library together using the same
+fresh-source procedure as the Map slice. `verify_project.py --collections` and
+`verify_queries.py` include `library-query-terminals.rvn`; `verify_editor.py --queries`
+now expects all three new operators. Run `cargo test --test query_terminals` and
+`--signatures` as well. Publish the [query contract](../../raven-query-api.md), including
+its normal-completion cleanup boundary and absence of fault-unwinding guarantees.
+Do not claim that the current installed .11 tools already contain these additions.

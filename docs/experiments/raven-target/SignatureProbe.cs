@@ -208,6 +208,19 @@ static class SignatureProbe
         var addString = Reference(arrayListDefinition.Methods.Single(m => m.Name == "Add"), stringList);
         Check("Collection Add closes String element", CollectionBindings.Bind(addString, arrayListDefinition.Methods.Single(m => m.Name == "Add"), true)?.Arguments.Last() == "String");
         Check("Collection generic arguments are invariant", !CollectionBindings.Assignable("System.Collections.ArrayList<String>", CollectionBindings.List));
+        var enumerable = module.GetType("System.Linq.Enumerable");
+        foreach (var name in new[] { "First", "Last", "Single" }) {
+            var terminal = enumerable.Methods.Single(m => m.Name == name);
+            var terminalReference = Reference(terminal, enumerable);
+            terminalReference.CallingConvention = MethodCallingConvention.Generic;
+            var call = new GenericInstanceMethod(terminalReference);
+            call.GenericArguments.Add(module.TypeSystem.String);
+            var expected = name == "Single" ? "System.Result<String,System.Linq.SingleError>" : "System.Option<String>";
+            Check(name + " closes terminal outcome", QueryBindings.Bind(call, terminal, false)?.Result == expected);
+            Reject(name + " rejects virtual call", () => QueryBindings.Bind(call, terminal, true));
+            call.ReturnType = module.TypeSystem.String;
+            Reject(name + " rejects payload-only result", () => QueryBindings.Bind(call, terminal, false));
+        }
         MapBindings.Validate(module);
         var mapDefinition = module.GetType("System.Collections.Map`2");
         var closedMap = new GenericInstanceType(mapDefinition);

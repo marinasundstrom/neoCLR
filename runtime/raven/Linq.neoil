@@ -1,5 +1,99 @@
 ; Raven-target query library: ordinary classes, generics, interfaces and delegates.
 .type System.Linq.Enumerable
+    .method static First<T>(System.Collections.Iterable<T> source) -> System.Option<T>
+        .local System.Collections.Iterator<T> iterator
+        .local T value
+        ldarg source
+        callvirt instance System.Collections.Iterable<T>::GetIterator()
+        stloc iterator
+        ldloc iterator
+        callvirt instance System.Collections.Iterator<T>::MoveNext()
+        brfalse Empty
+        ldloc iterator
+        callvirt instance System.Collections.Iterator<T>::get_Current()
+        stloc value
+        ldloc iterator
+        callvirt instance System.Disposable::Dispose()
+        ldloc value
+        newobj instance System.Option.Some<T>::.ctor(T)
+        newobj instance System.Option<T>::.ctor(System.Option.Some<T>)
+        ret
+    Empty:
+        ldloc iterator
+        callvirt instance System.Disposable::Dispose()
+        newobj instance System.Option.None::.ctor()
+        newobj instance System.Option<T>::.ctor(System.Option.None)
+        ret
+    .end
+
+    .method static Last<T>(System.Collections.Iterable<T> source) -> System.Option<T>
+        .local System.Collections.Iterator<T> iterator
+        .local T value
+        ldarg source
+        callvirt instance System.Collections.Iterable<T>::GetIterator()
+        stloc iterator
+        ldloc iterator
+        callvirt instance System.Collections.Iterator<T>::MoveNext()
+        brfalse Empty
+    Next:
+        ldloc iterator
+        callvirt instance System.Collections.Iterator<T>::get_Current()
+        stloc value
+        ldloc iterator
+        callvirt instance System.Collections.Iterator<T>::MoveNext()
+        brtrue Next
+        ldloc iterator
+        callvirt instance System.Disposable::Dispose()
+        ldloc value
+        newobj instance System.Option.Some<T>::.ctor(T)
+        newobj instance System.Option<T>::.ctor(System.Option.Some<T>)
+        ret
+    Empty:
+        ldloc iterator
+        callvirt instance System.Disposable::Dispose()
+        newobj instance System.Option.None::.ctor()
+        newobj instance System.Option<T>::.ctor(System.Option.None)
+        ret
+    .end
+
+    .method static Single<T>(System.Collections.Iterable<T> source) -> System.Result<T,System.Linq.SingleError>
+        .local System.Collections.Iterator<T> iterator
+        .local T value
+        ldarg source
+        callvirt instance System.Collections.Iterable<T>::GetIterator()
+        stloc iterator
+        ldloc iterator
+        callvirt instance System.Collections.Iterator<T>::MoveNext()
+        brfalse Empty
+        ldloc iterator
+        callvirt instance System.Collections.Iterator<T>::get_Current()
+        stloc value
+        ldloc iterator
+        callvirt instance System.Collections.Iterator<T>::MoveNext()
+        brtrue Multiple
+        ldloc iterator
+        callvirt instance System.Disposable::Dispose()
+        ldloc value
+        newobj instance System.Result.Ok<T>::.ctor(T)
+        newobj instance System.Result<T,System.Linq.SingleError>::.ctor(System.Result.Ok<T>)
+        ret
+    Empty:
+        ldloc iterator
+        callvirt instance System.Disposable::Dispose()
+        newobj instance System.Linq.SingleError.Empty::.ctor()
+        newobj instance System.Linq.SingleError::.ctor(System.Linq.SingleError.Empty)
+        newobj instance System.Result.Error<System.Linq.SingleError>::.ctor(System.Linq.SingleError)
+        newobj instance System.Result<T,System.Linq.SingleError>::.ctor(System.Result.Error<System.Linq.SingleError>)
+        ret
+    Multiple:
+        ldloc iterator
+        callvirt instance System.Disposable::Dispose()
+        newobj instance System.Linq.SingleError.Multiple::.ctor()
+        newobj instance System.Linq.SingleError::.ctor(System.Linq.SingleError.Multiple)
+        newobj instance System.Result.Error<System.Linq.SingleError>::.ctor(System.Linq.SingleError)
+        newobj instance System.Result<T,System.Linq.SingleError>::.ctor(System.Result.Error<System.Linq.SingleError>)
+        ret
+    .end
     .method static Where<T>(System.Collections.Iterable<T> source, System.Func<T,Boolean> predicate) -> System.Collections.Iterable<T>
         ldarg source
         ldarg predicate

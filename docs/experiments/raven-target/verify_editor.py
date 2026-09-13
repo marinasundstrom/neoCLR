@@ -347,7 +347,7 @@ try:
                 'context': {'triggerKind': 2, 'triggerCharacter': '.'}}, True))
             items = result if isinstance(result, list) else result['items']
             labels = sorted({item['label'] for item in items})
-            assert {'Where', 'Select', 'ToList'}.issubset(labels), labels
+            assert {'Where', 'Select', 'ToList', 'First', 'Last', 'Single'}.issubset(labels), labels
             results['Query extensions ' + str(version)] = labels
     if array_invariance:
         import time
