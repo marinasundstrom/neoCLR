@@ -47,11 +47,25 @@ metadata declarations, bridge, demo projects and instructions. Package these as
 neoCLR assets rather than inserting them into an ordinary Raven release. The bridge
 must use the same compiler build used for validation.
 
-**Current distribution gap:** the development runner compiles its source bridge
-against a Raven checkout. A public bundle must either package a runnable bridge
-with its dependencies or explicitly include and test the required source/tooling
-setup. It must not ship local checkout paths as if it were standalone. The installed
-SDK and VSIX alone do not close this gap.
+## Build the checkout-independent bundle
+
+After committing the source changes and building the separate SDK, use a fresh output
+directory. The packaging command requires clean neoCLR and Raven checkouts:
+
+```sh
+python3 docs/experiments/raven-target/package_bundle.py --raven /path/to/Raven --sdk /path/to/raven-sdk-VERSION-osx-arm64 --runtime /path/to/neoclr --output /fresh/path/to/bundle --version runtime-api-poc-BUILD
+```
+
+The script publishes the compiler bridge with its dependencies, generates matching
+declaration metadata, flattens the target runtime library, copies the language server,
+samples and validation scripts, and records revision/version/file-hash provenance.
+It currently supports the tested macOS arm64 host. It does not publish or install.
+The resulting README explains extraction, configuration and the dedicated project tasks.
+
+`run_project.py`, the saved-program suite and focused checks accept either `--raven`
+for source development or `--bridge /path/to/Probe.dll --system /path/to/System.neoil`
+for a published build. Each build attempt owns fresh output, and failed compilation
+cannot execute stale output. The supplied library is copied alongside that output.
 
 ## Validate the actual packaged build
 

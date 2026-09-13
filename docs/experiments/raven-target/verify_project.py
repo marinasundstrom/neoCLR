@@ -1,5 +1,6 @@
 """Check saved-source execution and rejection without stale-artifact fallback."""
 import argparse
+from runner_options import add_toolchain_arguments, runner_arguments
 import json
 from pathlib import Path
 import shutil
@@ -10,7 +11,7 @@ import tempfile
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('project', type=Path)
 parser.add_argument('--collections', action='store_true')
-parser.add_argument('--raven', required=True, type=Path)
+add_toolchain_arguments(parser)
 parser.add_argument('--runtime', required=True, type=Path)
 args = parser.parse_args()
 bridge = Path(__file__).resolve().parent
@@ -20,8 +21,10 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
     for name in ('Demo.rvnproj', 'NeoCLR.CoreProbe.dll'):
         shutil.copyfile(args.project.resolve().parent / name, root / name)
     command = [sys.executable, str(bridge / 'run_project.py'), str(root / 'Demo.rvnproj'),
-               '--raven', str(args.raven.resolve()), '--runtime', str(args.runtime.resolve())]
-    cases = [('GenericUnions', 'library-unions.rvn', 'Ok\n0\nError\nFailure\n0\nFailure\nFound\nNone\n0\n'),
+               *runner_arguments(args), '--runtime', str(args.runtime.resolve())]
+    cases = [('Basics', 'library-basics.rvn', '42\n1\n0\nLibrary calls from Raven\n'),
+             ('CasePayloads', 'library-case-payloads.rvn', '7\n42\nAfter\nUpdated error\n'),
+             ('GenericUnions', 'library-unions.rvn', 'Ok\n0\nError\nFailure\n0\nFailure\nFound\nNone\n0\n'),
              ('ErrorValues', 'library-errors.rvn', (bridge / 'samples/library-errors.expected.txt').read_text()),
              ('Calendar', 'library-calendar.rvn', '2024\n2\n29\n60\n738944\n0\nSame date\nDate accepted\n1\n1\n1\n1\n0\n0\nSame date\nDate accepted\nInvalid date\nInvalid date\n' + '12\n34\n56\n789\n7890123\n0\n0\nSame time\nTime accepted\n' * 2 + '0\n0\n0\n0\n0\n-1\n0\nSame time\nTime accepted\nInvalid time\nInvalid time\n'),
              ('Primitives', 'library-primitives.rvn', '-1\n1\n-1\n1\n1\n1\n0\n0\n0\n-1\n-1\nDigit\nNumber\nLetter\nUpper\nLower\nSeparator\nControl\nPunctuation\nSymbol\nSurrogate\nHigh\nLow\nASCII\nASCII digit\nLetter or digit\nWhitespace\n'),
@@ -44,7 +47,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
              ('Option', 'library-option.rvn', '42\nProduct not found\n'),
              ('Void', 'library-void.rvn', 'Completed without a payload\nNot completed\n')]
     if args.collections:
-        cases += [('ArrayShapes', 'library-array-shapes.rvn', '0\n0\nBoolean elements\nSystem.Int32\nSystem.String\n0\n255\n65535\n65535\n42\n'),
+        cases += [('Interfaces', 'library-interfaces.rvn', '1\n42\n'),
+                  ('ArrayShapes', 'library-array-shapes.rvn', '0\n0\nBoolean elements\nSystem.Int32\nSystem.String\n0\n255\n65535\n65535\n42\n'),
                   ('ReferencePayloads', 'library-reference-payloads.rvn', 'Copied Type reference\nSystem.Int32\nSystem.String\n3\n2\n0\n3\n3\n42\nStored error\n7\n42\nSystem.Int32\n'),
                   ('ValueInterfaces', 'library-value-interfaces.rvn', '0\n1\nEqual integer\nEqual string\nEqual type\n0\nEqual date\n0\n0\n'),
                   ('NativeBuffer', 'library-native-buffer.rvn', '3\n7\n42\n99\n100\n2\n42\n0\n0\nNative Boolean\n'),
@@ -64,7 +68,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
         (root / 'Main.rvn').write_text((bridge / 'samples' / sample).read_text())
         run = subprocess.run(command, capture_output=True, text=True, timeout=90)
         if run.returncode or not run.stdout.endswith(expected):
-            raise AssertionError(run.stdout + run.stderr)
+            raise AssertionError(label + ': ' + run.stdout + run.stderr)
         results[label] = expected
     source = ((bridge / 'samples/library-foreach.rvn').read_text().replace('values.Add(41)', 'values.Add(7)') if args.collections
               else (bridge / 'samples/library-result.rvn').read_text().replace('Show(-42)', 'Show(-7)'))

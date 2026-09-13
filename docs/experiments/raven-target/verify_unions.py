@@ -1,5 +1,6 @@
 """Check generic union case faults and invalid payload/carrier defaults."""
 import argparse
+from runner_options import add_toolchain_arguments, runner_arguments
 from pathlib import Path
 import shutil
 import subprocess
@@ -8,7 +9,7 @@ import tempfile
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('project', type=Path)
-parser.add_argument('--raven', type=Path, required=True)
+add_toolchain_arguments(parser)
 parser.add_argument('--runtime', type=Path, required=True)
 args = parser.parse_args()
 bridge = Path(__file__).resolve().parent
@@ -17,7 +18,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-union-values-') as temporary:
     for name in ('Demo.rvnproj', 'NeoCLR.CoreProbe.dll'):
         shutil.copyfile(args.project.resolve().parent / name, root / name)
     command = [sys.executable, str(bridge / 'run_project.py'), str(root / 'Demo.rvnproj'),
-               '--raven', str(args.raven.resolve()), '--runtime', str(args.runtime.resolve())]
+               *runner_arguments(args), '--runtime', str(args.runtime.resolve())]
     (root / 'Main.rvn').write_text('''import System.*
 func Main() {
     let result = Result<long, Error>.Ok(42L)

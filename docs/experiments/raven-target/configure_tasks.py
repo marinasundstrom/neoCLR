@@ -5,7 +5,7 @@ from pathlib import Path
 import sys
 
 
-def configure(project, raven, runtime):
+def configure(project, raven, runtime, bridge=None, system=None):
     directory = project.parent / '.vscode'
     directory.mkdir(exist_ok=True)
     path = directory / 'tasks.json'
@@ -14,7 +14,10 @@ def configure(project, raven, runtime):
     retained = [task for task in data.get('tasks', []) if task.get('label') not in labels]
     for index, label in enumerate(labels):
         args = [str(Path(__file__).resolve().with_name('run_project.py')), str(project),
-                '--raven', str(raven), '--runtime', str(runtime)]
+                '--runtime', str(runtime)]
+        args += ['--bridge', str(bridge)] if bridge else ['--raven', str(raven)]
+        if system:
+            args += ['--system', str(system)]
         if index == 0:
             args.append('--build-only')
         retained.append({'label': label, 'type': 'process', 'command': sys.executable,

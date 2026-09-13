@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Added published-bridge execution and a checkout-independent experimental bundle
+  builder with pinned metadata/library/server, samples, setup and file-hash provenance.
+  Shared validation scripts accept either source or published toolchains. Verified
+  runner smoke behavior; package-level validation is recorded after building assets.
+
 - Completed the source-by-source existing API audit, including runtime-service
   callers, signature markers and explicit importer limits. Preserved writable union
   case payloads through Value setters and verified case-copy independence; requires

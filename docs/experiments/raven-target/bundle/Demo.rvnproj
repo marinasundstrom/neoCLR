@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <RavenMetadataCoreAssemblyName>NeoCLR.CoreProbe</RavenMetadataCoreAssemblyName>
+    <RavenUseHostFrameworkReferences>false</RavenUseHostFrameworkReferences>
+    <RavenPropagationAssemblyName>NeoCLR.CoreProbe</RavenPropagationAssemblyName>
+    <RavenPropagationInterfaceType>System.Propagatable`3</RavenPropagationInterfaceType>
+    <RavenIterationAssemblyName>NeoCLR.CoreProbe</RavenIterationAssemblyName>
+    <RavenIterationIterableType>System.Collections.Iterable`1</RavenIterationIterableType>
+    <RavenIterationIteratorType>System.Collections.Iterator`1</RavenIterationIteratorType>
+    <ImplicitImports>disable</ImplicitImports>
+    <RavenFrameworkProjections>None</RavenFrameworkProjections>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Main.rvn" />
+    <Reference Include="NeoCLR.CoreProbe"><HintPath>NeoCLR.CoreProbe.dll</HintPath></Reference>
+  </ItemGroup>
+</Project>

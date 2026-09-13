@@ -1,5 +1,6 @@
 """Run process APIs against controlled host arguments, environment and byte input."""
 import argparse
+from runner_options import add_toolchain_arguments, runner_arguments
 import os
 from pathlib import Path
 import shutil
@@ -9,7 +10,7 @@ import tempfile
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('project', type=Path)
-parser.add_argument('--raven', type=Path, required=True)
+add_toolchain_arguments(parser)
 parser.add_argument('--runtime', type=Path, required=True)
 args = parser.parse_args()
 bridge = Path(__file__).resolve().parent
@@ -18,7 +19,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-process-') as temporary:
     for name in ('Demo.rvnproj', 'NeoCLR.CoreProbe.dll'):
         shutil.copyfile(args.project.resolve().parent / name, root / name)
     build = [sys.executable, str(bridge / 'run_project.py'), str(root / 'Demo.rvnproj'),
-             '--raven', str(args.raven.resolve()), '--runtime', str(args.runtime.resolve()), '--build-only']
+             *runner_arguments(args), '--runtime', str(args.runtime.resolve()), '--build-only']
     for name in ('environment', 'console'):
         before = set(root.rglob('App.neoil'))
         (root / 'Main.rvn').write_text((bridge / f'samples/library-{name}.rvn').read_text())
