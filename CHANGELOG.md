@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Built and installed local Raven SDK/VS Code extension 0.1.12-neoclr.8 with the
+  pattern, query and custom-iterator fixes. Prepared an isolated query demo and
+  recorded six passing packaged suites and artifact hashes. Preserved existing
+  demos and the default SDK; this build is not published.
+
 - Enabled custom Raven Iterable/Iterator implementations in the query pipeline:
   close generic MethodImpl signatures before bridge validation and promote the
   earlier compiler repro to an executable sample. The companion Raven fix normalizes

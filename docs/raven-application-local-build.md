@@ -1,5 +1,8 @@
 # Try the application toolchain locally
 
+For the latest local .8 query/pattern build, use [the isolated query demo](raven-query-local-build.md).
+Earlier installation records below remain specific to their stated builds.
+
 For the newer source-backed destructuring demo, see [the pattern walkthrough](raven-match-matrix.md#local-pattern-demo).
 It uses a separate folder and an updated language server; the .7 package described
 below remains unchanged and contains the earlier typed-case samples.

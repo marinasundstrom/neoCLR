@@ -83,6 +83,9 @@ the low-level lifetime fixture independently verifies the runtime contract.
 
 ## Run and verify from source
 
+A validated [local .8 installation](raven-query-local-build.md) is also available on
+the author’s machine, including the custom iterator compiler fix.
+
 Use a disposable project and fresh declaration metadata; archived .7 tools do not
 include these APIs. Follow the [source setup](experiments/raven-target/README.md),
 build the bridge and generate metadata with `--interfaces OUTPUT`, then use

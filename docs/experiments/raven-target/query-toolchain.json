@@ -1,0 +1,71 @@
+{
+  "date": "2026-09-13",
+  "status": "local build installed and validated; not published",
+  "sdkVersion": "0.1.12-neoclr.8",
+  "extensionVersion": "0.1.12-neoclr.8",
+  "neoCLRRevision": "3ff57a36404b9928269269ca697372e5e4c17b2e",
+  "ravenRevision": "000ed511e4b1e124dce34ba4208ac0cda9ce1245",
+  "ravenBranch": "codex/neoclr-target-resolution",
+  "dotnetSdk": "11.0.100-rc.1.26425.128",
+  "installedRoot": "/Users/robert/.neoclr/experiments/queries-20260913",
+  "sdkPath": "/Users/robert/.raven/sdk/0.1.12-neoclr.8",
+  "vscodeUserData": "/Users/robert/.neoclr/vscode/queries-20260913",
+  "vscodeExtensions": "/Users/robert/.neoclr/vscode/queries-20260913/extensions",
+  "bundlePayloadHashesVerified": 685,
+  "checks": {
+    "queries": {
+      "exit_code": 0,
+      "seconds": 24.31
+    },
+    "application": {
+      "exit_code": 0,
+      "seconds": 18.19
+    },
+    "orders": {
+      "exit_code": 0,
+      "seconds": 4.16
+    },
+    "project": {
+      "exit_code": 0,
+      "seconds": 89.34
+    },
+    "neoil": {
+      "exit_code": 0,
+      "seconds": 0.62
+    },
+    "editor": {
+      "exit_code": 0,
+      "seconds": 2.06
+    }
+  },
+  "regressions": {
+    "Raven": 29,
+    "savedProjects": 50,
+    "queryCases": 14,
+    "applicationCases": 12
+  },
+  "artifacts": {
+    "raven-sdk-0.1.12-neoclr.8-osx-arm64.tar.gz": {
+      "path": "/Users/robert/.neoclr/builds/query-toolchain-20260913/raven-sdk-0.1.12-neoclr.8-osx-arm64.tar.gz",
+      "sha256": "99989040ea2b9d569910225c1e505f555ecee10cb0a23d63db448afe81b9a58c"
+    },
+    "raven-vscode.vsix": {
+      "path": "/Users/robert/.neoclr/builds/query-toolchain-20260913/raven-vscode.vsix",
+      "sha256": "1410591b17bf1d654c8e8e2c9ce61c476546114a8864c912dd4c507b8a7e2f58"
+    },
+    "neoclr-queries-poc-20260913-osx-arm64.tar.gz": {
+      "path": "/Users/robert/.neoclr/builds/query-toolchain-20260913/neoclr-queries-poc-20260913-osx-arm64.tar.gz",
+      "sha256": "a179f3dc2d41933ababc5852ad903d7f904f500148fa4af8321aea697c9dbc13"
+    },
+    "bundle/manifest.json": {
+      "path": "/Users/robert/.neoclr/builds/query-toolchain-20260913/bundle/manifest.json",
+      "sha256": "27f1a6387611dd2290814cc52765ed1ad0206bfd1344ae3f2a66fab90ac8e9ce"
+    }
+  },
+  "validationLogs": "/Users/robert/.neoclr/builds/query-toolchain-20260913/validation",
+  "installationNotes": [
+    "No default SDK selection changed.",
+    "New demo uses library-queries.rvn; prior edited demos preserved.",
+    "Project settings and tasks configured after copying the pristine bundle."
+  ]
+}
