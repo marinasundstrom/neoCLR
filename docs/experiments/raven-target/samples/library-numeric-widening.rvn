@@ -1,0 +1,29 @@
+import System.*
+import System.Console.*
+
+func WidenSigned(value: short) -> long {
+    let local: int = value
+    return local
+}
+
+func WidenUnsigned(value: uint) -> long {
+    let local: long = value
+    return local
+}
+
+func WidenFloating(value: ulong) -> double {
+    let local: double = value
+    return local
+}
+
+func WidenCharacter(value: char) -> uint {
+    let local: uint = value
+    return local
+}
+
+func Main() {
+    WriteLine(WidenSigned((short)-32768).CompareTo(-32768L))
+    WriteLine(WidenUnsigned((uint)-1).CompareTo(4294967295L))
+    WriteLine(WidenFloating((ulong)-1L).CompareTo(18446744073709551616.0))
+    WriteLine(WidenCharacter((char)65535).CompareTo((uint)65535))
+}

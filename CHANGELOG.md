@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Extended companion Raven fixed-width implicit numeric conversions and corrected
+  unsigned-to-floating emission using existing CLI instructions. Added a saved-project
+  sample checking signed, unsigned, floating and Char widening at boundaries.
+  Requires the updated experimental compiler; the runtime and published tools remain
+  unchanged. Native-sized conversion rules and Decimal target APIs are not added.
+
 - Stabilized mixed numeric operator binding in the companion Raven experiment:
   binary operator candidates now require implicit conversions, fixing the previously
   recorded `ulong`/signed lookup failure. Added target regression checks for valid

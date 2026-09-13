@@ -99,3 +99,26 @@ to `int` remain follow-up work. The ordinary Raven operator test group passes al
 
 All 28 target query checks passed with that compiler, including the new mixed-numeric
 acceptance/rejection checks. Previously published tools remain unchanged.
+
+### Fixed-width implicit widening follow-up
+
+Raven's fixed-width implicit conversion table now follows the
+[C# numeric conversion table](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/conversions#1023-implicit-numeric-conversions),
+including the previously missing `short` to `int` conversion. These are compiler
+rules: no metadata or runtime instruction changes are needed. Integer-to-floating
+conversions can lose precision. UInt32/UInt64 floating conversions now emit the
+existing `conv.r.un` before the destination-width conversion so high-bit values
+retain their unsigned magnitude; the old emitter could turn them negative.
+
+The [widening sample](experiments/raven-target/samples/library-numeric-widening.rvn)
+checks signed minimum, unsigned maximum and Char values across locals and returns.
+The ordinary .NET test also exercises calls, float and Decimal results. This does
+not add Decimal to the neoCLR target library, native-sized conversion rules, or
+complete every explicit numeric conversion. Newly applicable implicit conversions
+can affect overload selection. Existing installed tools require a rebuild to pick
+up the compiler changes.
+
+Validation with Raven experiment `809aef0fe`: all 105 focused compiler tests passed
+(including the 144-pair classification matrix), plus 52 saved-project checks and
+28 target query checks. These results use the source-built experimental compiler,
+not the previously installed SDK or extension.

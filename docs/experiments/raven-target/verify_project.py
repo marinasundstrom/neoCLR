@@ -28,6 +28,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
              ('ErrorValues', 'library-errors.rvn', (bridge / 'samples/library-errors.expected.txt').read_text()),
              ('Calendar', 'library-calendar.rvn', '2024\n2\n29\n60\n738944\n0\nSame date\nDate accepted\n1\n1\n1\n1\n0\n0\nSame date\nDate accepted\nInvalid date\nInvalid date\n' + '12\n34\n56\n789\n7890123\n0\n0\nSame time\nTime accepted\n' * 2 + '0\n0\n0\n0\n0\n-1\n0\nSame time\nTime accepted\nInvalid time\nInvalid time\n'),
              ('Primitives', 'library-primitives.rvn', '-1\n1\n-1\n1\n1\n1\n0\n0\n0\n-1\n-1\nDigit\nNumber\nLetter\nUpper\nLower\nSeparator\nControl\nPunctuation\nSymbol\nSurrogate\nHigh\nLow\nASCII\nASCII digit\nLetter or digit\nWhitespace\n'),
+             ('NumericWidening', 'library-numeric-widening.rvn', '0\n0\n0\n0\n'),
              ('FloatingMath', 'library-floating-math.rvn', '0\n' * 19 + '-1\n'),
              ('Clamp', 'library-clamp.rvn', 'Clamped\n5\nClamped\n0\nClamped\n10\nClamped\n7\nClamped\n-2147483648\nClamped\n2147483647\nInvalid range\n'),
              ('Integers', 'library-integers.rvn', '42\n1\nEqual\n-2147483648\n-1\nDifferent\n2147483647\n1\nDifferent\n0\n0\nEqual\n'),
