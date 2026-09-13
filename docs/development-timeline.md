@@ -2312,3 +2312,10 @@ remain separate. Local packaging/installation is the following slice.
 **Source validation:** The new sample passed on neoCLR; the saved-project suite
 passed 59 cases, and the new SDK server passed 52 completion/hover/diagnostic checks.
 Raven's compiler slice is committed as `6072dcf4b` on its experiment branch.
+
+**Local tool outcome:** Built and installed SDK/VSIX `0.1.12-neoclr.11` in a new
+isolated profile with the unified-array demo. Seven packaged suites passed; the
+installed VSIX server and exact configured Run task also passed. Preserved 1,074
+existing Raven source files. [Local instructions](raven-generic-arrays-local-build.md)
+and the linked manifest record artifact hashes and evidence. This completes the
+authorized local refresh without publishing a release or replacing prior demos.

@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Built and installed experimental Raven SDK/VSIX 0.1.12-neoclr.11 with the generic
+  array integration in an isolated local demo/profile. All seven packaged suites
+  passed, including 59 saved-project cases, 28 query checks and 52 editor checks;
+  the installed VSIX and configured Run task passed. Verified archive/payload hashes,
+  preserved existing source files and recorded provenance and launch instructions.
+  This is a local build, not a published release.
+
 - Added the generic managed System.Array<T> shape to the Raven runtime profile,
   sharing identity/storage with ordinary array signatures and explicitly declaring
   Iterable<T>. Added Length/Item members and closed generic/member reflection.

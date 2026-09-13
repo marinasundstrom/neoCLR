@@ -1,5 +1,7 @@
 # Try the stabilized Raven/neoCLR build
 
+For the newer .11 SDK/extension, use [the generic-array installation](raven-generic-arrays-local-build.md). The .10 record below remains historical.
+
 The local experimental SDK and VS Code extension are `0.1.12-neoclr.10`. They include
 array iteration and query support, corrected numeric operations and conversions,
 and neoCLR's invariant mutable-array contract, including target-aware editor
