@@ -11,7 +11,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Simplified the existing virtual-call admission condition and empty verifier match
   arms for strict Clippy validation while preserving the supported receiver modes.
   Updated stale initialization tests and String API prose to the implemented typed-null
-  String default; non-defaultable Error/Value rejection remains covered.
+  String default; non-defaultable Error/Value rejection remains covered. Updated
+  legacy Neo test expectations for that shared runtime behavior without changing the
+  Neo frontend.
 
 - Preserved version-specific notices for 26 NuGet and five bundled JavaScript
   dependencies in the experimental Raven tools, with source/hash provenance and

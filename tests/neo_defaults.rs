@@ -16,17 +16,18 @@ fn generic_defaults_use_the_runtime_contract() {
     let source =
         "func Zero<T>() -> T { return default(T) }\nfunc Main() -> int { return Zero<int>() }";
     assert_eq!(run(source).unwrap(), Value::Int32(0));
-    assert!(
+    assert_eq!(
         run(&source.replace(
             "-> int { return Zero<int>()",
             "-> string { return Zero<string>()"
         ))
-        .is_err()
+        .unwrap(),
+        Value::NullObjectReference(neoclr::metadata::Type::String)
     );
 }
 #[test]
-fn missing_defaults_do_not_invent_null_empty_strings_or_empty_arrays() {
-    for ty in ["int&", "string", "int[]"] {
+fn missing_defaults_do_not_invent_borrowed_references_or_empty_value_arrays() {
+    for ty in ["int&", "int[]"] {
         assert!(
             run(&format!(
                 "func Main() -> () {{ let value = default({ty}) }}"

@@ -22,7 +22,6 @@ fn invalid_types_mutability_bounds_and_escapes_are_rejected() {
     for source in [
         "func Main() -> int { let a = [1]; a[0] = 2; return 0 }",
         "func Main() -> int { var a = [1, true]; return 0 }",
-        "func Main() -> int { let a = new string[2]; return 0 }",
         "func Main() -> int& { var a = [1]; return &a[0] }",
         "func Main() -> int { let a = new int[1]; return a[1] }",
         "func Main() -> int { var a = [1]; if true { var b = [2]; let c = &b[0] }; return 0 }",
@@ -124,5 +123,9 @@ func Main() -> int {
     assert!(
         run("func Main() -> int { let n = 1; let a = new int[n] { 1, 2 }; return 0 }").is_err()
     );
-    assert!(run("func Main() -> int { let a = new string[1] { }; return 0 }").is_err());
+    let null = run("func Main() -> string { let a = new string[1]; return a[0] }").unwrap();
+    assert_eq!(
+        null.value,
+        Value::NullObjectReference(neoclr::metadata::Type::String)
+    );
 }
