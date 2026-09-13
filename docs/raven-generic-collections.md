@@ -27,8 +27,8 @@ fault-path cleanup work remain documented in [the iteration contract](raven-targ
 The backing array uses ordinary managed array storage. Consequently the current
 bridge admits only payloads with runtime defaults: this slice does not claim
 arbitrary application classes, nested collection payloads or union carriers that
-have no valid default. Predicate methods Find, FindIndex and Exists require the
-next delegate projection; they are not covered by this slice.
+have no valid default. The later [delegate projection](raven-delegate-api.md) adds Find, FindIndex and
+Exists with static callbacks.
 
 This reuses the [ArrayList design](array-list.md) and .NET comparison. The runtime
 contract and instruction set are unchanged. The bridge still duplicates a bounded

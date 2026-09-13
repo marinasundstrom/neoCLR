@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Projected the five Func arities for static Raven callbacks, including named
+  Func<Void> completion, and exposed ArrayList.FindIndex/Exists/Find. Preserve
+  generic Void return context and the adapted no-result Dispose calls. Added
+  executable callbacks and predicates; capturing/instance callbacks remain outside
+  this importer slice. Requires the corresponding Raven experiment compiler fixes.
+
 - Projected Boolean.CompareTo and Raven canonical Boolean literals/equality across
   locals, parameters, returns and generic API calls. Typed adapters preserve argument
   order and output contracts while retaining the runtime Boolean representation.

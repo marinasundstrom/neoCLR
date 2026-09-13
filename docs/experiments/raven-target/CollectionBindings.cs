@@ -70,7 +70,7 @@ static class CollectionBindings
     {
         var owner = Type(reference.DeclaringType);
         if (owner is null) return null;
-        var (parameters, result) = RuntimeSignatures.Match(reference, definition, t => Type(t) ?? GenericUnionBindings.Type(t));
+        var (parameters, result) = RuntimeSignatures.Match(reference, definition, t => Type(t) ?? DelegateBindings.Type(t) ?? GenericUnionBindings.Type(t));
         var (kind, element) = owner == Disposable ? ("Disposable", "") : Shapes[owner];
         var expected = (kind, definition.Name) switch {
             ("List" or "ArrayList", "Add") => (element, "noresult", true),
@@ -78,6 +78,9 @@ static class CollectionBindings
             ("List" or "ArrayList", "get_Count") => ("", "Int32", true),
             ("List" or "ArrayList", "get_Item") => ("Int32", element, true),
             ("List" or "ArrayList", "set_Item") => ("Int32," + element, "noresult", true),
+            ("ArrayList", "FindIndex") => ($"System.Func<{element},Boolean>", "Int32", true),
+            ("ArrayList", "Exists") => ($"System.Func<{element},Boolean>", "Boolean", true),
+            ("ArrayList", "Find") => ($"System.Func<{element},Boolean>", $"System.Option<{element}>", true),
             ("ArrayList", "Copy") => ("", owner, true),
             ("Iterable" or "ArrayList", "GetIterator") => ("", $"System.Collections.Iterator<{element}>", true),
             ("Iterator", "MoveNext") => ("", "Boolean", true),

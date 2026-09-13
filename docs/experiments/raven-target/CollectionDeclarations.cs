@@ -17,6 +17,9 @@ static class CollectionDeclarations
             public class ArrayList<T> : List<T> {
                 public ArrayList() { }
                 public ArrayList(int capacity) { }
+                public int FindIndex(Func<T, bool> match) => default;
+                public bool Exists(Func<T, bool> match) => default;
+                public Option<T> Find(Func<T, bool> match) => default;
                 public ArrayList<T> Copy() => default;
                 public int Capacity => default;
                 public int Count => default;

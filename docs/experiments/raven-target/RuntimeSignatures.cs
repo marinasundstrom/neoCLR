@@ -57,7 +57,7 @@ static class RuntimeSignatures
             || reference.DeclaringType.GetElementType().FullName != definition.DeclaringType.FullName
             || (reference.DeclaringType is GenericInstanceType owner ? owner.GenericArguments.Count : 0) != definition.DeclaringType.GenericParameters.Count)
             throw new InvalidDataException("Unsupported runtime member signature.");
-        string Resolve(TypeReference t, bool returns = false) => Map(Close(t, reference.DeclaringType), catalog, returns);
+        string Resolve(TypeReference t, bool returns = false) => Map(Close(t, reference.DeclaringType), catalog, returns && t.MetadataType == MetadataType.Void);
         var args = reference.Parameters.Select(p => Resolve(p.ParameterType)).ToArray();
         var result = Resolve(reference.ReturnType, true);
         if (!args.SequenceEqual(definition.Parameters.Select(p => Resolve(p.ParameterType)))

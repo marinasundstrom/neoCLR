@@ -19,7 +19,7 @@ static class UnionImport
     const string Carrier = "System.Result<Int32,System.OverflowError>";
     const string Ok = "System.Result.Ok<Int32>";
     const string Error = "System.Result.Error<System.OverflowError>";
-    sealed record Slot(string Type, int Local = -1, int ConditionalOut = -1, int Argument = -1);
+    sealed record Slot(string Type, int Local = -1, int ConditionalOut = -1, int Argument = -1, MethodDefinition? Function = null);
     sealed record State(List<Slot> Stack, bool[] Assigned);
     sealed record Call(string Name, string[] Arguments, string Result, int OutArgument = -1, string? Instruction = null, bool ConditionalOutput = false);
 
@@ -27,6 +27,7 @@ static class UnionImport
     {
         GenericUnionBindings.Reset();
         CollectionBindings.Reset();
+        DelegateBindings.Reset();
         foreach (var path in new[] { application, core })
             if (new FileInfo(path).Length > 16 * 1024 * 1024) throw new InvalidDataException("Image exceeds profile limit.");
         VoidStorageValidation.Check(application);
@@ -46,7 +47,7 @@ static class UnionImport
         {
             var collection = CollectionBindings.Type(type);
             if (collection is not null && collectionProfile) return collection;
-            return ProcessBindings.ArrayType(type) ?? GenericUnionBindings.Type(type) ?? CalendarBindings.Type(type) ?? PrimitiveBindings.Type(type) ?? ResultBindings.Type(type) ?? Type(type, result);
+            return DelegateBindings.Type(type) ?? ProcessBindings.ArrayType(type) ?? GenericUnionBindings.Type(type) ?? CalendarBindings.Type(type) ?? PrimitiveBindings.Type(type) ?? ResultBindings.Type(type) ?? Type(type, result);
         }
         var output = new StringBuilder($".module ImportedUnion\n.entry {Name(entry)}\n");
         var coercions = new Dictionary<string, (string Name, string Body)>();
@@ -65,6 +66,7 @@ static class UnionImport
             }
             return call with { Name = helper.Name, Arguments = actual, Instruction = null };
         }
+        var delegateAdapters = new Dictionary<string, string>();
         var mappings = new List<object>();
         var pending = new Queue<MethodDefinition>(); pending.Enqueue(entry);
         var seen = new HashSet<uint>();
@@ -80,7 +82,7 @@ static class UnionImport
             var args = method.Parameters.Select(p => ProfileType(p.ParameterType)).ToArray();
             var result = ProfileType(method.ReturnType, true);
             var locals = method.Body.Variables.Select(v => ProfileType(v.VariableType)).ToArray();
-            if (locals.Any(t => t != "arrayref<String>" && !GenericUnionBindings.IsType(t) && !CalendarBindings.Types.Contains(t) && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
+            if (locals.Any(t => t != "arrayref<String>" && !DelegateBindings.IsType(t) && !GenericUnionBindings.IsType(t) && !CalendarBindings.Types.Contains(t) && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
                 throw new InvalidDataException("Unsupported local default in Result profile.");
             NormalizePatternBranches(method);
             var instructions = method.Body.Instructions.ToArray();
@@ -97,10 +99,12 @@ static class UnionImport
                 var stack = input.Stack.ToList(); var assigned = (bool[])input.Assigned.Clone();
                 var instruction = instructions[index]; var code = new StringBuilder(); var successors = new List<int>();
                 var assignmentEdges = new Dictionary<int, bool[]>();
+                if (stack.Any(slot => slot.Function is not null) && instruction.OpCode.Code is not (Code.Newobj or Code.Nop))
+                    throw new InvalidDataException("Function address must be consumed by an admitted delegate constructor.");
                 if (stack.Any(slot => slot.ConditionalOut >= 0) && instruction.OpCode.Code is not (Code.Nop or Code.Brtrue or Code.Brtrue_S or Code.Brfalse or Code.Brfalse_S))
                     throw new InvalidDataException("Conditional extraction output must be tested before use.");
                 void Push(Slot slot) { stack.Add(slot); if (stack.Count > method.Body.MaxStackSize) throw new InvalidDataException("Declared maxstack exceeded."); }
-                Slot Pop() { if (stack.Count == 0) throw new InvalidDataException("Input stack underflow."); var top = stack[^1]; stack.RemoveAt(stack.Count - 1); return top; }
+                Slot Pop() { if (stack.Count == 0) throw new InvalidDataException($"Input stack underflow in {method.FullName} at {instruction.Offset:x4}."); var top = stack[^1]; stack.RemoveAt(stack.Count - 1); return top; }
                 Slot Expect(string type) { var top = Pop(); if (!CollectionBindings.Assignable(PrimitiveBindings.Stack(top.Type), PrimitiveBindings.Stack(type))) throw new InvalidDataException("Input stack type mismatch."); return top; }
                 int Local(int n) { if (n < 0 || n >= locals.Length) throw new InvalidDataException("Invalid local index."); return n; }
                 void Load(int n) { Local(n); if (!assigned[n]) throw new InvalidDataException("Read of uninitialized or unsupported default local."); Push(new(PrimitiveBindings.Stack(locals[n]))); code.AppendLine($"ldloc local{n}"); }
@@ -207,10 +211,42 @@ static class UnionImport
                     case Code.Ldloca: case Code.Ldloca_S:
                         var local = Local(((VariableDefinition)instruction.Operand).Index);
                         Push(new(locals[local] + "&", local)); code.AppendLine($"ldloca local{local}"); break;
+                    case Code.Ldftn:
+                        var functionReference = (MethodReference)instruction.Operand;
+                        CheckStatic(functionReference);
+                        var functionTarget = ClosureAudit.ResolveMethod(functionReference) ?? throw new InvalidDataException("Unresolved delegate target.");
+                        if (functionTarget.Module != app.MainModule || !functionTarget.IsStatic || !functionTarget.HasBody || functionReference.FullName != functionTarget.FullName)
+                            throw new InvalidDataException("Only static application delegate targets are admitted.");
+                        if (!functionTarget.IsPublic && functionTarget.DeclaringType != method.DeclaringType)
+                            throw new InvalidDataException("Nonpublic cross-type delegate target unsupported.");
+                        Push(new("FunctionAddress", Function: functionTarget)); break;
                     case Code.Newobj:
                         var constructor = (MethodReference)instruction.Operand;
                         var constructorDefinition = constructor.Resolve() ?? throw new InvalidDataException("Unresolved constructor.");
                         if (constructorDefinition.Module != library.MainModule) throw new InvalidDataException("Only admitted library constructors supported.");
+                        if (DelegateBindings.Type(constructor.DeclaringType) is { } delegateType)
+                        {
+                            DelegateBindings.Constructor(constructor, constructorDefinition);
+                            var function = Pop().Function ?? throw new InvalidDataException("Delegate requires a static function address.");
+                            Expect("FaultNull");
+                            var signature = DelegateBindings.Signature(delegateType);
+                            var targetArguments = function.Parameters.Select(p => ProfileType(p.ParameterType)).ToArray();
+                            var targetResult = ProfileType(function.ReturnType, true);
+                            if (!targetArguments.SequenceEqual(signature[..^1]) || (targetResult != signature[^1] && !(targetResult == "noresult" && signature[^1] == "Void")))
+                                throw new InvalidDataException("Delegate target signature mismatch.");
+                            pending.Enqueue(function);
+                            var targetName = Name(function);
+                            if (targetResult == "noresult")
+                            {
+                                var adapterName = "RuntimeDelegate" + targetName;
+                                var body = new StringBuilder($".function {adapterName}({string.Join(',', targetArguments.Select((t, i) => t + " arg" + i))}) -> Void\n");
+                                for (var i = 0; i < targetArguments.Length; i++) body.AppendLine("ldarg arg" + i);
+                                body.AppendLine($"call {targetName}({string.Join(',', targetArguments)})").AppendLine("ldvoid\nret\n.end");
+                                delegateAdapters[adapterName] = body.ToString(); targetName = adapterName;
+                            }
+                            code.AppendLine($"delegate.bind {delegateType} = {targetName}({string.Join(',', targetArguments)})");
+                            Push(new(delegateType)); break;
+                        }
                         if (collectionProfile && CollectionBindings.IsArrayList(CollectionBindings.Type(constructor.DeclaringType)))
                         {
                             var signature = RuntimeSignatures.Match(constructor, constructorDefinition, CollectionBindings.Type);
@@ -264,14 +300,19 @@ static class UnionImport
                         }
                         else if (targetMethod.Module == library.MainModule)
                         {
-                            var binding = collectionProfile ? CollectionBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt) : null;
-                            var textBinding = StringBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt);
-                            if (textBinding is not null) call = new("", textBinding.Arguments, textBinding.Result, Instruction: textBinding.Instruction);
-                            else if (binding is not null) call = new("", binding.Arguments, binding.Result, Instruction: binding.Instruction);
+                            var delegateCall = DelegateBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt);
+                            if (delegateCall is not null) call = new(delegateCall.Name, delegateCall.Arguments, delegateCall.Result, Instruction: delegateCall.Instruction);
                             else
                             {
-                                if (instruction.OpCode.Code == Code.Callvirt) throw new InvalidDataException("Unsupported runtime callvirt.");
-                                call = Bind(reference, targetMethod);
+                                var binding = collectionProfile ? CollectionBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt) : null;
+                                var textBinding = StringBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt);
+                                if (textBinding is not null) call = new("", textBinding.Arguments, textBinding.Result, Instruction: textBinding.Instruction);
+                                else if (binding is not null) call = new("", binding.Arguments, binding.Result, Instruction: binding.Instruction);
+                                else
+                                {
+                                    if (instruction.OpCode.Code == Code.Callvirt) throw new InvalidDataException("Unsupported runtime callvirt.");
+                                    call = Bind(reference, targetMethod);
+                                }
                             }
                         }
                         else throw new InvalidDataException("Unsupported dependency call.");
@@ -303,7 +344,7 @@ static class UnionImport
                         code.AppendLine(call.Instruction ?? $"call {call.Name}({string.Join(',', call.Arguments)})"); break;
                     case Code.Ret:
                         if (result != "noresult") ConvertTop(result);
-                        if (stack.Count != 0) throw new InvalidDataException("Input ret stack not empty.");
+                        if (stack.Count != 0) throw new InvalidDataException($"Input ret stack not empty in {method.FullName}, expected {result}, remaining {string.Join(',', stack.Select(s => s.Type))}.");
                         code.AppendLine("ret"); terminates = true; break;
                     default: throw new InvalidDataException("Unsupported reachable instruction: " + instruction.OpCode);
                 }
@@ -339,6 +380,7 @@ static class UnionImport
         }
         output.Append(Adapters()).Append(ResultBindings.Adapters()).Append(StringBindings.Adapters()).AppendLine(Int32Bindings.Adapters).AppendLine(DoubleBindings.Adapters).Append(PrimitiveBindings.Adapters).Append(CalendarBindings.Adapters).Append(ErrorBindings.Adapters()).Append(GenericUnionBindings.Adapters).AppendLine(ProcessBindings.Adapters).AppendLine(BooleanBindings.Adapters);
         foreach (var helper in coercions.Values) output.Append(helper.Body);
+        foreach (var body in delegateAdapters.Values) output.Append(body);
         File.WriteAllText(destination, output.ToString());
         File.WriteAllText(destination + ".map.json", JsonSerializer.Serialize(new {
             Profile = collectionProfile ? "result-option-void-files-strings-collections-v8" : "result-option-void-files-strings-arrays-v7",
@@ -400,8 +442,8 @@ static class UnionImport
         "System.Result/Error`1<System.OverflowError>" when type.IsValueType => Error,
         _ => throw new InvalidDataException("Unsupported Result profile type: " + type.FullName)
     };
-    static bool NeedsInitialization(string type) => GenericUnionBindings.IsType(type)
-        ? GenericUnionBindings.RequiresInitialization(type) : ResultBindings.RequiresInitialization(type);
+    static bool NeedsInitialization(string type) => DelegateBindings.IsType(type) || (GenericUnionBindings.IsType(type)
+        ? GenericUnionBindings.RequiresInitialization(type) : ResultBindings.RequiresInitialization(type));
     static bool HasNamedVoid(TypeReference type) => type is GenericInstanceType generic
         && generic.GenericArguments.Count == 1 && generic.GenericArguments[0].IsValueType
         && generic.GenericArguments[0].FullName == "System.Void"

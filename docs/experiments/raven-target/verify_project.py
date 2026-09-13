@@ -44,7 +44,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
              ('Option', 'library-option.rvn', '42\nProduct not found\n'),
              ('Void', 'library-void.rvn', 'Completed without a payload\nNot completed\n')]
     if args.collections:
-        cases += [('Booleans', 'library-booleans.rvn', '1\n-1\n0\n1\n42\nNot false\nEqual\nDifferent\n0\n1\n0\n'),
+        cases += [('Delegates', 'library-delegates.rvn', '42\n' * 5 + 'Done\n1\nExists\n42\n-1\nNone\n'),
+                  ('Booleans', 'library-booleans.rvn', '1\n-1\n0\n1\n42\nNot false\nEqual\nDifferent\n0\n1\n0\n'),
                   ('GenericCollections', 'library-generic-collections.rvn', 'Changed\nSecond\n0\n0\n1\n2\n1\n'),
                   ('PropagationWorkflow', 'library-propagation-workflow.rvn', '42\nSaved\nCompleted\nOverflow\nValue found\n42\nAbsent\n'),
                   ('ValueCopy', 'library-value-copy.rvn', '42\n7\n'),

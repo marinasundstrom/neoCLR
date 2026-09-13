@@ -13,11 +13,6 @@ COLLECTIONS = {'ArrayList', 'ArrayListState', 'ArrayIterator', 'List', 'Iterable
 
 def adapt(text: str, name: str) -> str:
     if name == 'ArrayList':
-        # Predicate/delegate contracts are a later target slice.
-        marker = '    ; Predicate searches retain the same initial buffer/extent as GetIterator.'
-        if text.count(marker) != 1:
-            raise ValueError('ArrayList source boundary changed; review target adaptation')
-        text = text.split(marker)[0] + '.end\n'
         text = text.replace('; Value wrapper with coherent shared managed state. Copy() duplicates the sequence.',
                             '; Nominal class with shared managed state. Copy() duplicates the sequence.')
     if name == 'ArrayList':
@@ -57,6 +52,7 @@ def adapt(text: str, name: str) -> str:
     # Ordinary class stfld and no-result calls leave nothing to pop.
     text = re.sub(r'(stfld System\.Collections\.[^\n]+\n)\s*pop\n', r'\1', text)
     text = re.sub(r'(call instance System\.Collections\.ArrayList<T>::(?:CheckIndex|Add)\([^\n]+\n)\s*pop\n', r'\1', text)
+    text = re.sub(r'(callvirt instance System\.Disposable::Dispose\(\)\n)\s*pop\n', r'\1', text)
     return text
 
 

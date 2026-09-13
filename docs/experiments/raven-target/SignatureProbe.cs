@@ -162,6 +162,14 @@ static class SignatureProbe
         Check("Boolean metadata stays exact", BooleanBindings.Bind(booleanCall, booleanCompare)?.Arguments.SequenceEqual(new[] { "Boolean&", "Boolean" }) == true);
         booleanCall.Parameters[0].ParameterType = module.TypeSystem.Int32;
         Reject("Boolean is not Int32 in metadata", () => BooleanBindings.Bind(booleanCall, booleanCompare));
+        var func = module.GetType("System.Func`1");
+        var voidFunc = new GenericInstanceType(func);
+        voidFunc.GenericArguments.Add(new TypeReference("System", "Void", module, module, true));
+        var invoke = func.Methods.Single(m => m.Name == "Invoke");
+        var voidInvoke = Reference(invoke, voidFunc);
+        Check("Generic Void return stays a value signature", RuntimeSignatures.Match(voidInvoke, invoke, GenericUnionBindings.Type).Result == "Void");
+        Check("Completion delegate call discards interpreter unit", DelegateBindings.Bind(voidInvoke, invoke, true)?.Result == "noresult");
+        Reject("Delegate requires virtual invocation", () => DelegateBindings.Bind(voidInvoke, invoke, false));
         var text = JsonSerializer.Serialize(checks, new JsonSerializerOptions { WriteIndented = true });
         File.WriteAllText(Path.Combine(output, "signature-checks.json"), text);
         Console.WriteLine(text);

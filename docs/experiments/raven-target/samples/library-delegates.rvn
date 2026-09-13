@@ -1,0 +1,37 @@
+import System.*
+import System.Console.*
+import System.Collections.*
+
+func IsAnswer(value: int) -> bool { return value == 42 }
+func Missing(value: int) -> bool { return false }
+func Number() -> int { return 42 }
+func Identity(value: int) -> int { return value }
+func First(a: int, b: int) -> int { return a }
+func Middle(a: int, b: int, c: int) -> int { return b }
+func Last(a: int, b: int, c: int, d: int) -> int { return d }
+func Done() { WriteLine("Done") }
+func Main() {
+    let zero: Func<int> = Number
+    let one: Func<int, int> = Identity
+    let two: Func<int, int, int> = First
+    let three: Func<int, int, int, int> = Middle
+    let four: Func<int, int, int, int, int> = Last
+    WriteLine(zero())
+    WriteLine(one(42))
+    WriteLine(two(42, 7))
+    WriteLine(three(7, 42, 9))
+    WriteLine(four(1, 2, 3, 42))
+    let done: Func<Void> = Done
+    done()
+    let values = ArrayList<int>()
+    values.Add(7)
+    values.Add(42)
+    WriteLine(values.FindIndex(IsAnswer))
+    if values.Exists(IsAnswer) { WriteLine("Exists") }
+    let found = values.Find(IsAnswer)
+    if found is Option.Some<int> some { WriteLine(some.Value) }
+    WriteLine(values.FindIndex(Missing))
+    if values.Exists(Missing) { WriteLine("Wrong") }
+    let absent = values.Find(Missing)
+    if absent.IsNone { WriteLine("None") }
+}
