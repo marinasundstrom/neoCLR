@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Stabilized mixed numeric operator binding in the companion Raven experiment:
+  binary operator candidates now require implicit conversions, fixing the previously
+  recorded `ulong`/signed lookup failure. Added target regression checks for valid
+  mixed comparison promotion and compile-time rejection. No runtime instruction or
+  metadata changes are needed; rebuilding the experimental compiler picks up the fix.
+
 - Added runtime vector views as Iterable<T>, preserving array identity with separate
   iterators and no sequence wrapper. Raven opts into the target interface through
   project configuration; ordinary query extensions now accept arrays, including

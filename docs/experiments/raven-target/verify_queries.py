@@ -188,6 +188,19 @@ func Main() {
         source += f'func Check(a: {type_name}, b: {type_name}) {{\n' + '\n'.join(checks) + '\n}\n'
         source += f'func Main() {{\n    Check({a_source}, {b_source})\n}}\n'
         cases.append((f'Numeric comparison boundary {index}: {type_name}', source, '\n'.join(expected) + '\n'))
+    cases.append(('Mixed numeric comparison promotion', header + '''
+func Greater(left: uint, right: int) -> bool {
+    return left > right
+}
+func Main() {
+    if Greater((uint)-1, 1) {
+        WriteLine(1)
+    }
+    if Greater((uint)0, -1) {
+        WriteLine(2)
+    }
+}
+''', '1\n2\n'))
     cases.append(('Ordered query predicate', header + '''
 func Main() {
     let values: int[] = [1, 2, 3]
@@ -257,4 +270,17 @@ func Main() {
         assert run.returncode != 0 and 'RAV' in run.stderr, run.stdout + run.stderr
         assert 'Verified saved project:' not in run.stdout
         results[label] = 'rejected before execution'
+    for expression in ('left + right', 'left < right'):
+        (root / 'Main.rvn').write_text(header + f'''
+func Check(left: ulong, right: long) {{
+    let invalid = {expression}
+}}
+func Main() {{
+    Check((ulong)1L, 1L)
+}}
+''')
+        run = subprocess.run(command, capture_output=True, text=True, timeout=120)
+        assert run.returncode != 0 and 'RAV0024' in run.stderr, run.stdout + run.stderr
+        assert 'Verified saved project:' not in run.stdout
+        results[f'Mixed signed/unsigned rejected: {expression}'] = 'rejected before execution'
 print(json.dumps(results, indent=2))

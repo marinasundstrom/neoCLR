@@ -81,3 +81,21 @@ Validation on 2026-09-13: 25 query checks (252 individual numeric expectations),
 The wider Raven overlap run passed 24 tests and failed the existing
 `TryLookup_UlongMixedWithSignedIntegral_IsRejected` binding test; that failure was
 reproduced against unchanged compiler code and remains separate work.
+
+### Mixed numeric operator follow-up
+
+The previously recorded `ulong`/signed lookup failure is now corrected in the Raven
+experiment (`bc0ec8046`). User-defined binary operator candidates require implicit operand
+conversions, following [C# operator applicability](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/expressions#1245-binary-operator-overload-resolution).
+Previously, a rejected built-in combination could fall through to .NET numeric
+metadata and be admitted through an explicit conversion. Fixing applicability in
+Raven avoids a target-specific runtime workaround and preserves explicit casts.
+
+Target regression checks reject mixed `ulong`/`long` addition and comparison before
+execution, while `uint`/`int` comparison still promotes to `long`. This does not
+expand the implicit conversion table; missing widening conversions such as `short`
+to `int` remain follow-up work. The ordinary Raven operator test group passes all
+61 checks, including both operand orders and user-defined operator applicability.
+
+All 28 target query checks passed with that compiler, including the new mixed-numeric
+acceptance/rejection checks. Previously published tools remain unchanged.
