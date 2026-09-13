@@ -660,7 +660,8 @@ fn effect(
         Pop | Store(_) | StoreArg(_) | BranchTrue(_) | BranchFalse(_) | Switch(_)
         | InitializeObject(_) => (1, 0),
         Dup => (1, 2),
-        AllocateArray(_) | NewValueArray(_) | NewArray(_) | ArrayLength | ReferenceType => (1, 1),
+        ReserveArray(_) | AllocateArray(_) | NewValueArray(_) | NewArray(_) | ArrayLength
+        | ReferenceType => (1, 1),
         CreateArray(_) | ArrayElement(_) | ArrayAddress(_) => (2, 1),
         StoreArrayElement(_) => (3, 0),
         New(ty) => (crate::vm::record_fields(module, ty, arity)?.len(), 1),
@@ -867,7 +868,8 @@ fn typed_effect(
             .ok_or_else(|| crate::Fault::new("field index out of range"))
     };
     match op {
-        AllocateArray(ty) | NewValueArray(ty) | NewArray(ty) | CreateArray(ty) => {
+        ReserveArray(ty) | AllocateArray(ty) | NewValueArray(ty) | NewArray(ty)
+        | CreateArray(ty) => {
             require(
                 count(exact(&values[0])?),
                 "array length requires Int32 or native integer",
@@ -876,7 +878,7 @@ fn typed_effect(
                 stored(module, &values[1], ty)?;
             }
             let array = T::Array(Box::new(ty.clone()));
-            one(if matches!(op, NewArray(_)) {
+            one(if matches!(op, NewArray(_) | ReserveArray(_)) {
                 T::ArrayRef(Box::new(ty.clone()))
             } else if matches!(op, NewValueArray(_) | AllocateArray(_)) {
                 T::ByRef(Box::new(array))

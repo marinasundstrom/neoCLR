@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Added internal-library array.reserve allocation with ordinary managed-array
+  identity and checked unreadable slots. Adapted ArrayList capacity now supports
+  elements without defaults without inventing union cases; ordinary newarr retains
+  default initialization. Added publication and direct/indirect-read regressions.
+
 - Projected Equatable, Comparable, Clonable and Closable contracts into Raven metadata
   and calls. Restored Type equality conformance and value/interface implementations;
   added boxed primitive/calendar, String and class-reference samples and checks.

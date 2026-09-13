@@ -691,6 +691,9 @@ pub enum Instruction {
     /// Fixed-length managed heap array with supported default initialization.
     #[serde(rename = "array.alloc")]
     AllocateArray(Type),
+    /// Internal capacity allocation with checked unreadable slots and ordinary array identity.
+    #[serde(rename = "array.reserve")]
+    ReserveArray(Type),
     #[serde(rename = "newarr")]
     NewArray(Type),
     /// Legacy heap allocation returning a managed byref to an owned array.
@@ -1042,6 +1045,7 @@ impl Function {
                     }
                 }
                 Instruction::New(ty)
+                | Instruction::ReserveArray(ty)
                 | Instruction::AllocateArray(ty)
                 | Instruction::NewArray(ty)
                 | Instruction::NewValueArray(ty)

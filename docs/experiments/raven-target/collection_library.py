@@ -42,8 +42,8 @@ def adapt(text: str, name: str) -> str:
     text = text.replace('T[]&', 'arrayref<T>')
     for ty in COLLECTIONS:
         text = text.replace(f'System.Collections.{ty}<T>&', f'System.Collections.{ty}<T>')
-    # CLI newarr initializes every element. The bounded profile requires defaultable T.
-    text = text.replace('array.alloc T', 'newarr T')
+    # Capacity is not a sequence of readable values. Reserve checked slots until Add writes them.
+    text = text.replace('array.alloc T', 'array.reserve T')
     text = text.replace('-> Void', '-> noresult')
     text = re.sub(r'^\s*ldvoid\n', '\n', text, flags=re.M)
     text = re.sub(r'^\s*heap.new\n', '\n', text, flags=re.M)

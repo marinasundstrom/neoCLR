@@ -876,7 +876,8 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                     }
                     crate::access::check_call(module, Some(function), &callee)?;
                 }
-                Op::AllocateArray(ty)
+                Op::ReserveArray(ty)
+                | Op::AllocateArray(ty)
                 | Op::NewValueArray(ty)
                 | Op::NewArray(ty)
                 | Op::CreateArray(ty)
@@ -1575,6 +1576,7 @@ fn interpret_instructions(
                 | Op::NewValueArray(_)
                 | Op::NewArray(_)
                 | Op::AllocateArray(_)
+                | Op::ReserveArray(_)
         ) || matches!(op, Op::New(ty) if module.is_reference_type(ty))
             || matches!(op, Op::Construct(target) if target.owner.as_ref().is_some_and(|ty| module.is_reference_type(ty))))
             && heap.len() >= collection_threshold
@@ -2432,14 +2434,15 @@ fn interpret_instructions(
                         return Ok(Some(value));
                     }
                 }
-                Op::AllocateArray(ty)
+                Op::ReserveArray(ty)
+                | Op::AllocateArray(ty)
                 | Op::NewValueArray(ty)
                 | Op::NewArray(ty)
                 | Op::CreateArray(ty) => {
                     arrays_used = true;
                     let initial = if matches!(op, Op::CreateArray(_)) {
                         frame.pop()?.for_storage_in(module, ty)?
-                    } else if matches!(op, Op::AllocateArray(_)) {
+                    } else if matches!(op, Op::AllocateArray(_) | Op::ReserveArray(_)) {
                         Value::Uninitialized(ty.clone())
                     } else {
                         crate::initialization::default_value(module, ty)?
@@ -2450,21 +2453,26 @@ fn interpret_instructions(
                     let value = crate::arrays::create(ty.clone(), length, initial, &limits)?;
                     if matches!(
                         op,
-                        Op::NewArray(_) | Op::NewValueArray(_) | Op::AllocateArray(_)
+                        Op::NewArray(_)
+                            | Op::NewValueArray(_)
+                            | Op::AllocateArray(_)
+                            | Op::ReserveArray(_)
                     ) {
                         if heap.len() >= limits.heap_objects {
                             return Err(Fault::new("heap object limit exceeded"));
                         }
                         let index = heap.allocate(value)?;
                         let reference = heap.address(index)?;
-                        frame.stack.push(if matches!(op, Op::NewArray(_)) {
-                            Value::ObjectReference(crate::value::ObjectReference {
-                                reference,
-                                view: Some(Type::ArrayRef(Box::new(ty.clone()))),
-                            })
-                        } else {
-                            Value::SlotReference(reference)
-                        });
+                        frame
+                            .stack
+                            .push(if matches!(op, Op::NewArray(_) | Op::ReserveArray(_)) {
+                                Value::ObjectReference(crate::value::ObjectReference {
+                                    reference,
+                                    view: Some(Type::ArrayRef(Box::new(ty.clone()))),
+                                })
+                            } else {
+                                Value::SlotReference(reference)
+                            });
                     } else {
                         frame.stack.push(value);
                     }
