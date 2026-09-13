@@ -148,6 +148,14 @@ static class SignatureProbe
         var readByte = console.Methods.Single(m => m.Name == "ReadByte");
         Check("Console retains Byte payload", ProcessBindings.Bind(Reference(readByte, console), readByte)?.Result == "System.Result<System.Option<Byte>,System.IO.ConsoleReadError>");
         Check("Process vectors exclude multidimensional arrays", ProcessBindings.ArrayType(new ArrayType(module.TypeSystem.String, 2)) is null);
+        var arrayListDefinition = module.GetType("System.Collections.ArrayList`1");
+        var stringList = new GenericInstanceType(arrayListDefinition);
+        stringList.GenericArguments.Add(module.TypeSystem.String);
+        var copy = arrayListDefinition.Methods.Single(m => m.Name == "Copy");
+        Check("Collection Copy preserves closed owner", CollectionBindings.Bind(Reference(copy, stringList), copy, true)?.Result == "System.Collections.ArrayList<String>");
+        var addString = Reference(arrayListDefinition.Methods.Single(m => m.Name == "Add"), stringList);
+        Check("Collection Add closes String element", CollectionBindings.Bind(addString, arrayListDefinition.Methods.Single(m => m.Name == "Add"), true)?.Arguments.Last() == "String");
+        Check("Collection generic arguments are invariant", !CollectionBindings.Assignable("System.Collections.ArrayList<String>", CollectionBindings.List));
         var text = JsonSerializer.Serialize(checks, new JsonSerializerOptions { WriteIndented = true });
         File.WriteAllText(Path.Combine(output, "signature-checks.json"), text);
         Console.WriteLine(text);

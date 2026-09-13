@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Extended Raven collection bindings beyond Int32 to admitted primitive, String,
+  calendar and empty-error elements, and exposed ArrayList.Copy. Added growth,
+  aliasing, independent-copy, iteration, completion and invariant-signature checks.
+  Elements without runtime defaults and predicate/delegate APIs remain separate.
+
 - Projected Console.ReadByte and all three existing Environment APIs through Raven,
   including nested Result/Option propagation and managed string argument arrays.
   Added controlled environment/argument/byte-input tests, signature rejection and

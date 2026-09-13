@@ -1,0 +1,28 @@
+import System.*
+import System.Collections.*
+import System.Console.*
+
+func Make() -> List<string> {
+    let values = ArrayList<string>(1)
+    values.Add("First")
+    values.Add("Second")
+    return values
+}
+func Main() {
+    let values = Make()
+    let alias = values
+    alias[0] = "Changed"
+    for value in values { WriteLine(value) }
+    let source = ArrayList<long>()
+    source.Add(42L)
+    let copy = source.Copy()
+    copy[0] = 7L
+    WriteLine(source[0].CompareTo(42L))
+    WriteLine(copy[0].CompareTo(7L))
+    copy.Add(9L)
+    WriteLine(source.Count)
+    WriteLine(copy.Count)
+    let dates = ArrayList<Date>()
+    dates.Add(default(Date))
+    for date in dates { WriteLine(date.Year) }
+}

@@ -39,7 +39,7 @@ assembly metadata reader or verifier.
 | File and Path | Bounded UTF-8 File calls, propagation, error predicates and [both Path methods](raven-path-api.md) | File-error APIs are projected; retain existing I/O contracts |
 | Date, Time, LocalDateTime and Clock | [All current calendar/clock methods](raven-calendar-api.md), validation Results and live-clock check | Error-value APIs are projected; interface dispatch remains separate |
 | Environment | [All three existing process APIs](raven-process-api.md), argument arrays, current directory and variable Results/Options | Retain live host semantics; environment mutation is not an existing API |
-| Array, ArrayList, List, Iterable, Iterator | Int32 vectors, class aliasing, selected collection members/foreach | Remaining array/collection contracts and element shapes; preserve reference categories and document cleanup limits |
+| Array, ArrayList, List, Iterable, Iterator | [Closed collection elements and Copy](raven-generic-collections.md), Int32/String vectors, class aliasing and foreach | Predicate/delegate APIs, native Array<T> and remaining element shapes; preserve reference categories and document cleanup limits |
 | Equatable, Comparable, Clonable, Disposable, Closable | Selected interface dispatch through collections | General existing interface contracts and representative runtime-library callers |
 | Func delegate families | Runtime declarations and invocation support exist | Raven target metadata and existing delegate API invocation; new closure/lambda features are not implied |
 | Type, RuntimeTypeHandle, Reflection and BindingFlags | Existing runtime introspection library | Raven metadata/type-handle projection, descriptor hierarchy, flags and all existing public introspection members |

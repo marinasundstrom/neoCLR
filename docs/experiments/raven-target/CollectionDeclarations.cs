@@ -17,6 +17,7 @@ static class CollectionDeclarations
             public class ArrayList<T> : List<T> {
                 public ArrayList() { }
                 public ArrayList(int capacity) { }
+                public ArrayList<T> Copy() => default;
                 public int Capacity => default;
                 public int Count => default;
                 public T this[int index] { get => default; set { } }

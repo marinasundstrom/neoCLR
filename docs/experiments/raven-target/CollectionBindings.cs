@@ -8,24 +8,42 @@ static class CollectionBindings
     public const string Iterable = "System.Collections.Iterable<Int32>";
     public const string Iterator = "System.Collections.Iterator<Int32>";
     public const string Disposable = "System.Disposable";
-    public static bool IsReference(string type) => type is List or ArrayList or Iterable or Iterator or Disposable;
-    public static bool Assignable(string source, string target) => source == target
-        || source == ArrayList && target is List or Iterable
-        || source == List && target == Iterable
-        || source == Iterator && target == Disposable;
+    static readonly Dictionary<string, (string Kind, string Element)> Shapes = new();
+    public static void Reset() => Shapes.Clear();
+    public static bool IsReference(string type) => type == Disposable || Shapes.ContainsKey(type)
+        || type is List or ArrayList or Iterable or Iterator;
+    public static bool IsArrayList(string? type) => type is not null && type.StartsWith("System.Collections.ArrayList<", StringComparison.Ordinal);
+    public static bool Assignable(string source, string target)
+    {
+        if (source == target) return true;
+        if (!Shapes.TryGetValue(source, out var from))
+        {
+            // The Int32 constants are also used by standalone signature checks.
+            from = source switch { ArrayList => ("ArrayList", "Int32"), List => ("List", "Int32"), Iterator => ("Iterator", "Int32"), _ => default };
+        }
+        return from.Kind == "Iterator" && target == Disposable
+            || from.Kind == "ArrayList" && target == $"System.Collections.List<{from.Element}>"
+            || from.Kind is "ArrayList" or "List" && target == $"System.Collections.Iterable<{from.Element}>";
+    }
 
     public static string? Type(TypeReference type)
     {
         if (type.IsValueType) return null;
         if (type.FullName == Disposable && RuntimeSignatures.IsCore(type.Scope)) return Disposable;
         if (type is not GenericInstanceType g || g.GenericArguments.Count != 1
-            || g.GenericArguments[0].MetadataType != MetadataType.Int32
             || !RuntimeSignatures.IsCore(g.ElementType.Scope)) return null;
-        return g.ElementType.FullName switch {
-            "System.Collections.List`1" => List, "System.Collections.ArrayList`1" => ArrayList,
-            "System.Collections.Iterable`1" => Iterable, "System.Collections.Iterator`1" => Iterator,
+        var kind = g.ElementType.FullName switch {
+            "System.Collections.List`1" => "List", "System.Collections.ArrayList`1" => "ArrayList",
+            "System.Collections.Iterable`1" => "Iterable", "System.Collections.Iterator`1" => "Iterator",
             _ => null
         };
+        if (kind is null) return null;
+        var element = GenericUnionBindings.Type(g.GenericArguments[0]);
+        if (element is null || !(element is "Int32" or "Double" or "Boolean" or "String" or "Void"
+            || PrimitiveBindings.Types.Contains(element) || CalendarBindings.Types.Contains(element) || ErrorBindings.IsEmpty(element))) return null;
+        var owner = $"System.Collections.{kind}<{element}>";
+        Shapes[owner] = (kind, element);
+        return owner;
     }
 
     public static void Validate(ModuleDefinition module)
@@ -52,17 +70,19 @@ static class CollectionBindings
     {
         var owner = Type(reference.DeclaringType);
         if (owner is null) return null;
-        var (parameters, result) = RuntimeSignatures.Match(reference, definition, Type);
-        var expected = (owner, definition.Name) switch {
-            (List or ArrayList, "Add") => ("Int32", "noresult", true),
-            (ArrayList, "get_Capacity") => ("", "Int32", true),
-            (List or ArrayList, "get_Count") => ("", "Int32", true),
-            (List or ArrayList, "get_Item") => ("Int32", "Int32", true),
-            (List or ArrayList, "set_Item") => ("Int32,Int32", "noresult", true),
-            (Iterable or ArrayList, "GetIterator") => ("", Iterator, true),
-            (Iterator, "MoveNext") => ("", "Boolean", true),
-            (Iterator, "get_Current") => ("", "Int32", true),
-            (Disposable, "Dispose") => ("", "noresult", true),
+        var (parameters, result) = RuntimeSignatures.Match(reference, definition, t => Type(t) ?? GenericUnionBindings.Type(t));
+        var (kind, element) = owner == Disposable ? ("Disposable", "") : Shapes[owner];
+        var expected = (kind, definition.Name) switch {
+            ("List" or "ArrayList", "Add") => (element, "noresult", true),
+            ("ArrayList", "get_Capacity") => ("", "Int32", true),
+            ("List" or "ArrayList", "get_Count") => ("", "Int32", true),
+            ("List" or "ArrayList", "get_Item") => ("Int32", element, true),
+            ("List" or "ArrayList", "set_Item") => ("Int32," + element, "noresult", true),
+            ("ArrayList", "Copy") => ("", owner, true),
+            ("Iterable" or "ArrayList", "GetIterator") => ("", $"System.Collections.Iterator<{element}>", true),
+            ("Iterator", "MoveNext") => ("", "Boolean", true),
+            ("Iterator", "get_Current") => ("", element, true),
+            ("Disposable", "Dispose") => ("", "noresult", true),
             _ => throw new InvalidDataException("Unsupported collection member: " + definition.FullName)
         };
         if (string.Join(',', parameters) != expected.Item1 || result != expected.Item2

@@ -122,7 +122,7 @@ try:
             'position': {'line': 3, 'character': 11}, 'context': {'triggerKind': 1}}, True))
         items = result if isinstance(result, list) else result['items']
         labels = sorted({item['label'] for item in items})
-        if 'Capacity' not in labels or any(label.startswith('Allocate') for label in labels):
+        if 'Capacity' not in labels or 'Copy' not in labels or any(label.startswith('Allocate') for label in labels):
             raise AssertionError('Unexpected ArrayList constructor surface: ' + str(labels))
         results['ArrayList'] = labels
     if files:

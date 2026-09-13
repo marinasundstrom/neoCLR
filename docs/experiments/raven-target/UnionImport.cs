@@ -26,6 +26,7 @@ static class UnionImport
     public static void Write(string application, string core, string destination, bool collectionProfile = false)
     {
         GenericUnionBindings.Reset();
+        CollectionBindings.Reset();
         foreach (var path in new[] { application, core })
             if (new FileInfo(path).Length > 16 * 1024 * 1024) throw new InvalidDataException("Image exceeds profile limit.");
         VoidStorageValidation.Check(application);
@@ -185,15 +186,16 @@ static class UnionImport
                         var constructor = (MethodReference)instruction.Operand;
                         var constructorDefinition = constructor.Resolve() ?? throw new InvalidDataException("Unresolved constructor.");
                         if (constructorDefinition.Module != library.MainModule) throw new InvalidDataException("Only admitted library constructors supported.");
-                        if (collectionProfile && CollectionBindings.Type(constructor.DeclaringType) == CollectionBindings.ArrayList)
+                        if (collectionProfile && CollectionBindings.IsArrayList(CollectionBindings.Type(constructor.DeclaringType)))
                         {
                             var signature = RuntimeSignatures.Match(constructor, constructorDefinition, CollectionBindings.Type);
                             if (!constructorDefinition.IsConstructor || !constructor.HasThis || signature.Result != "noresult"
                                 || signature.Args.Length > 1 || signature.Args.Any(p => p != "Int32"))
                                 throw new InvalidDataException("Unsupported collection constructor.");
                             if (signature.Args.Length == 1) Expect("Int32");
-                            Push(new(CollectionBindings.ArrayList));
-                            code.AppendLine($"newobj instance {CollectionBindings.ArrayList}::.ctor({string.Join(',', signature.Args)})");
+                            var collectionOwner = CollectionBindings.Type(constructor.DeclaringType)!;
+                            Push(new(collectionOwner));
+                            code.AppendLine($"newobj instance {collectionOwner}::.ctor({string.Join(',', signature.Args)})");
                             break;
                         }
                         var construction = Construct(constructor, constructorDefinition);
@@ -310,7 +312,7 @@ static class UnionImport
             Profile = collectionProfile ? "result-option-void-files-strings-collections-v8" : "result-option-void-files-strings-arrays-v7",
             RequiredLibraryProfile = collectionProfile ? "raven-collections" : "bundled-system", ApplicationSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(application))),
             CoreSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(core))), ReachableMethods = seen.Order().ToArray(), Mappings = mappings,
-            Scope = "Bounded Int32 vectors, optional Int32 collection references, file UTF-8 APIs, String helpers and generic Result/Option bindings; CFG stack/definite-assignment checked; observable default carriers rejected; no guest declaration bodies executed."
+            Scope = "Bounded Int32/String vectors, optional closed collection references, file UTF-8 APIs, String helpers and generic Result/Option bindings; CFG stack/definite-assignment checked; observable default carriers rejected; no guest declaration bodies executed."
         }, new JsonSerializerOptions { WriteIndented = true }));
     }
 
