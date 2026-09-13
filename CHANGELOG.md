@@ -6,6 +6,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-09-14
+
+- Fixed Raven string equality/inequality by declaring the missing target String
+  operators and binding them to existing value equality. Interface query predicates
+  now compile without changing Raven or CLI reference comparison semantics. Added
+  constructed-string, captured-predicate and metadata regression coverage; importer
+  stack errors now identify the method, IL offset and expected/actual types.
+  Rebuild the bridge and reference metadata together; installed .12 tools are unchanged.
+
 ### 2026-09-13
 
 - Added Raven-profile First/Last/Single predicate overloads with existing Option/

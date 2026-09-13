@@ -6,6 +6,8 @@ static class StringBindings
     sealed record Member(string Name, string[] Parameters, string Result, bool Instance = false, bool ByRefReceiver = false);
     static readonly Member[] Members = [
         new("Concat", ["String", "String"], "String"),
+        new("op_Equality", ["String", "String"], "Boolean"),
+        new("op_Inequality", ["String", "String"], "Boolean"),
         new("CompareOrdinal", ["String", "String"], "Int32"),
         new("Equals", ["String"], "Boolean", true, true),
         new("ContainsOrdinal", ["String"], "Boolean", true, true),
@@ -17,7 +19,9 @@ static class StringBindings
     ];
     static string CSharp(string type) => type switch { "String" => "string", "Int32" => "int", "Boolean" => "bool", ResultBindings.Slice => "Result<string, Text.Utf8SliceError>", _ => throw new InvalidDataException(type) };
     public static string Declarations(bool results) => "public sealed class String { " + string.Join(" ", Members.Where(m => results || m.Result != ResultBindings.Slice).Select(m =>
-        $"public {(m.Instance ? "" : "static ")}{CSharp(m.Result)} {m.Name}({string.Join(',', m.Parameters.Select((p, i) => CSharp(p) + " value" + i))}) => default;")) + " }";
+        m.Name is "op_Equality" or "op_Inequality"
+            ? $"public static bool operator {(m.Name == "op_Equality" ? "==" : "!=")}(string left, string right) => default;"
+            : $"public {(m.Instance ? "" : "static ")}{CSharp(m.Result)} {m.Name}({string.Join(',', m.Parameters.Select((p, i) => CSharp(p) + " value" + i))}) => default;")) + " }";
     public sealed record Binding(string[] Arguments, string Result, string Instruction);
     public static Binding? Bind(MethodReference reference, MethodDefinition definition, bool callvirt)
     {
@@ -29,6 +33,9 @@ static class StringBindings
         if ((definition.IsVirtual && !definition.IsFinal) || reference.DeclaringType.IsValueType || callvirt && !reference.HasThis)
             throw new InvalidDataException("Unsupported String receiver contract.");
         var args = member.Instance ? new[] { "String" }.Concat(member.Parameters).ToArray() : member.Parameters;
+        if (member.Name is "op_Equality" or "op_Inequality")
+            return new(args, "Boolean", "call RuntimeStringEquals(String,String)"
+                + (member.Name == "op_Inequality" ? "\nldc.bool false\nceq" : ""));
         return new(args, member.Result, member.Instance
             ? $"call RuntimeString{member.Name}({string.Join(',', args)})"
             : $"call System.String::{member.Name}({string.Join(',', args)})");

@@ -28,6 +28,13 @@ static class SignatureProbe
             catch (InvalidDataException) { checks.Add(name); return; }
             throw new Exception("Malformed signature accepted: " + name);
         }
+        foreach (var name in new[] { "op_Equality", "op_Inequality" })
+        {
+            var method = module.GetType("System.String").Methods.Single(m => m.Name == name);
+            var binding = StringBindings.Bind(method, method, false);
+            Check("String operator " + name, method.IsPublic && method.IsStatic && method.IsSpecialName
+                && binding is { Result: "Boolean" } && binding.Arguments.SequenceEqual(new[] { "String", "String" }));
+        }
         Check("Opaque Value metadata identity", GenericUnionBindings.Type(module.GetType("System.Value")) == "Value");
         Check("Unsigned byte array load", ManagedArrayBindings.Type(new ArrayType(module.TypeSystem.Byte)) == "arrayref<Byte>");
         Reject("Array signedness mismatch", () => ManagedArrayBindings.CheckElement(Mono.Cecil.Cil.Code.Ldelem_I1, "Byte", null));

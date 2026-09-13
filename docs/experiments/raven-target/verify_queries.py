@@ -24,6 +24,33 @@ with tempfile.TemporaryDirectory(prefix='neoclr-queries-') as temporary:
     command = [sys.executable, str(bridge / 'run_project.py'), str(root / 'Demo.rvnproj'),
                *runner_arguments(args), '--runtime', str(args.runtime.resolve())]
     cases = [
+        ('String equality in interface query predicates', header + """
+func Main() {
+    let orders: List<string> = ArrayList<string>()
+    orders.Add("test")
+    orders.Add("2")
+    let items = orders.Where(x => x == "2")
+    for item in items {
+        WriteLine(item)
+    }
+    let expected = System.String.Concat("te", "st")
+    for item in orders.Where(x => x == expected) {
+        WriteLine(item)
+    }
+    for item in orders.Where(x => x != expected) {
+        WriteLine(item)
+    }
+    if expected == "test" {
+        WriteLine("equal")
+    }
+    if expected != "test" {
+        WriteLine("wrong")
+    }
+    if "é" == System.String.Concat("", "é") {
+        WriteLine("utf8")
+    }
+}
+""", '2\ntest\n2\nequal\nutf8\n'),
         ('Option and Result terminals', (bridge / 'samples/library-query-terminals.rvn').read_text(),
          'Absent\nAbsent\n0\n42\nAbsent\nEmpty\n0\nMultiple\n42\nMultiple\n42\nAbsent\nSystem.String\nNo result\n42\nAbsent\nAbsent\n0\n0\nEmpty\nMultiple\n42\n'),
         ('Array queries and reflection materialization', (bridge / 'samples/library-array-queries.rvn').read_text(),

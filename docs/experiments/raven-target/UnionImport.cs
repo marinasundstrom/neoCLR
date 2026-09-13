@@ -116,7 +116,7 @@ static class UnionImport
                         throw new InvalidDataException("Mutable array conversions require identical element types.");
                     if (!(CollectionBindings.Assignable(PrimitiveBindings.Stack(top.Type), PrimitiveBindings.Stack(type))
                         || ReflectionBindings.Assignable(top.Type, type) || ApplicationTypes.Assignable(top.Type, type)))
-                        throw new InvalidDataException("Input stack type mismatch.");
+                        throw new InvalidDataException($"Input stack type mismatch in {method.FullName} at IL_{instruction.Offset:x4}: expected {type}, found {top.Type}.");
                     return top;
                 }
                 int Local(int n) { if (n < 0 || n >= locals.Length) throw new InvalidDataException("Invalid local index."); return n; }
