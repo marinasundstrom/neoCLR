@@ -1,0 +1,295 @@
+; Members inserted into the Raven-profile ArrayList<T> class.
+; Capture the initial buffer and count, retaining existing predicate-search timing.
+
+    .method instance Find(System.Func<T,Boolean> match) -> System.Option<T>
+        .local arrayref<T> data
+        .local Int32 count
+        .local Int32 index
+        .local T value
+        ldarg this
+        ldfld System.Collections.ArrayList<T>::State
+        ldfld System.Collections.ArrayListState<T>::Data
+        stloc data
+        ldarg this
+        call instance System.Collections.ArrayList<T>::get_Count()
+        stloc count
+        ldc.i4 0
+        stloc index
+        br Test
+    Read:
+        ldloc data
+        ldloc index
+        ldelem T
+        stloc value
+        ldarg match
+        ldloc value
+        call instance System.Func<T,Boolean>::Invoke(T)
+        brtrue Found
+        ldloc index
+        ldc.i4 1
+        add.ovf
+        stloc index
+    Test:
+        ldloc index
+        ldloc count
+        blt Read
+        newobj instance System.Option.None::.ctor()
+        newobj instance System.Option<T>::.ctor(System.Option.None)
+        ret
+    Found:
+        ldloc value
+        newobj instance System.Option.Some<T>::.ctor(T)
+        newobj instance System.Option<T>::.ctor(System.Option.Some<T>)
+        ret
+    .end
+
+    .method instance FindLast(System.Func<T,Boolean> match) -> System.Option<T>
+        .local arrayref<T> data
+        .local Int32 count
+        .local Int32 index
+        .local T value
+        ldarg this
+        ldfld System.Collections.ArrayList<T>::State
+        ldfld System.Collections.ArrayListState<T>::Data
+        stloc data
+        ldarg this
+        call instance System.Collections.ArrayList<T>::get_Count()
+        stloc count
+        ldloc count
+        ldc.i4 1
+        sub
+        stloc index
+        br Test
+    Read:
+        ldloc data
+        ldloc index
+        ldelem T
+        stloc value
+        ldarg match
+        ldloc value
+        call instance System.Func<T,Boolean>::Invoke(T)
+        brtrue Found
+        ldloc index
+        ldc.i4 1
+        sub
+        stloc index
+    Test:
+        ldloc index
+        ldc.i4 0
+        bge Read
+        newobj instance System.Option.None::.ctor()
+        newobj instance System.Option<T>::.ctor(System.Option.None)
+        ret
+    Found:
+        ldloc value
+        newobj instance System.Option.Some<T>::.ctor(T)
+        newobj instance System.Option<T>::.ctor(System.Option.Some<T>)
+        ret
+    .end
+
+    .method instance FindIndex(System.Func<T,Boolean> match) -> System.Option<Int32>
+        .local arrayref<T> data
+        .local Int32 count
+        .local Int32 index
+        .local T value
+        ldarg this
+        ldfld System.Collections.ArrayList<T>::State
+        ldfld System.Collections.ArrayListState<T>::Data
+        stloc data
+        ldarg this
+        call instance System.Collections.ArrayList<T>::get_Count()
+        stloc count
+        ldc.i4 0
+        stloc index
+        br Test
+    Read:
+        ldloc data
+        ldloc index
+        ldelem T
+        stloc value
+        ldarg match
+        ldloc value
+        call instance System.Func<T,Boolean>::Invoke(T)
+        brtrue Found
+        ldloc index
+        ldc.i4 1
+        add.ovf
+        stloc index
+    Test:
+        ldloc index
+        ldloc count
+        blt Read
+        newobj instance System.Option.None::.ctor()
+        newobj instance System.Option<Int32>::.ctor(System.Option.None)
+        ret
+    Found:
+        ldloc index
+        newobj instance System.Option.Some<Int32>::.ctor(Int32)
+        newobj instance System.Option<Int32>::.ctor(System.Option.Some<Int32>)
+        ret
+    .end
+
+    .method instance FindLastIndex(System.Func<T,Boolean> match) -> System.Option<Int32>
+        .local arrayref<T> data
+        .local Int32 count
+        .local Int32 index
+        .local T value
+        ldarg this
+        ldfld System.Collections.ArrayList<T>::State
+        ldfld System.Collections.ArrayListState<T>::Data
+        stloc data
+        ldarg this
+        call instance System.Collections.ArrayList<T>::get_Count()
+        stloc count
+        ldloc count
+        ldc.i4 1
+        sub
+        stloc index
+        br Test
+    Read:
+        ldloc data
+        ldloc index
+        ldelem T
+        stloc value
+        ldarg match
+        ldloc value
+        call instance System.Func<T,Boolean>::Invoke(T)
+        brtrue Found
+        ldloc index
+        ldc.i4 1
+        sub
+        stloc index
+    Test:
+        ldloc index
+        ldc.i4 0
+        bge Read
+        newobj instance System.Option.None::.ctor()
+        newobj instance System.Option<Int32>::.ctor(System.Option.None)
+        ret
+    Found:
+        ldloc index
+        newobj instance System.Option.Some<Int32>::.ctor(Int32)
+        newobj instance System.Option<Int32>::.ctor(System.Option.Some<Int32>)
+        ret
+    .end
+
+    .method instance Exists(System.Func<T,Boolean> match) -> Boolean
+        .local arrayref<T> data
+        .local Int32 count
+        .local Int32 index
+        .local T value
+        ldarg this
+        ldfld System.Collections.ArrayList<T>::State
+        ldfld System.Collections.ArrayListState<T>::Data
+        stloc data
+        ldarg this
+        call instance System.Collections.ArrayList<T>::get_Count()
+        stloc count
+        ldc.i4 0
+        stloc index
+        br Test
+    Read:
+        ldloc data
+        ldloc index
+        ldelem T
+        stloc value
+        ldarg match
+        ldloc value
+        call instance System.Func<T,Boolean>::Invoke(T)
+        brtrue Found
+        ldloc index
+        ldc.i4 1
+        add.ovf
+        stloc index
+    Test:
+        ldloc index
+        ldloc count
+        blt Read
+        ldc.bool false
+        ret
+    Found:
+        ldc.bool true
+        ret
+    .end
+
+    .method instance TrueForAll(System.Func<T,Boolean> match) -> Boolean
+        .local arrayref<T> data
+        .local Int32 count
+        .local Int32 index
+        .local T value
+        ldarg this
+        ldfld System.Collections.ArrayList<T>::State
+        ldfld System.Collections.ArrayListState<T>::Data
+        stloc data
+        ldarg this
+        call instance System.Collections.ArrayList<T>::get_Count()
+        stloc count
+        ldc.i4 0
+        stloc index
+        br Test
+    Read:
+        ldloc data
+        ldloc index
+        ldelem T
+        stloc value
+        ldarg match
+        ldloc value
+        call instance System.Func<T,Boolean>::Invoke(T)
+        brfalse Found
+        ldloc index
+        ldc.i4 1
+        add.ovf
+        stloc index
+    Test:
+        ldloc index
+        ldloc count
+        blt Read
+        ldc.bool true
+        ret
+    Found:
+        ldc.bool false
+        ret
+    .end
+
+    .method instance FindAll(System.Func<T,Boolean> match) -> System.Collections.ArrayList<T>
+        .local arrayref<T> data
+        .local Int32 count
+        .local Int32 index
+        .local T value
+        .local System.Collections.ArrayList<T> result
+        ldarg this
+        ldfld System.Collections.ArrayList<T>::State
+        ldfld System.Collections.ArrayListState<T>::Data
+        stloc data
+        ldarg this
+        call instance System.Collections.ArrayList<T>::get_Count()
+        stloc count
+        newobj instance System.Collections.ArrayList<T>::.ctor()
+        stloc result
+        ldc.i4 0
+        stloc index
+        br Test
+    Read:
+        ldloc data
+        ldloc index
+        ldelem T
+        stloc value
+        ldarg match
+        ldloc value
+        call instance System.Func<T,Boolean>::Invoke(T)
+        brfalse Next
+        ldloc result
+        ldloc value
+        call instance System.Collections.ArrayList<T>::Add(T)
+    Next:
+        ldloc index
+        ldc.i4 1
+        add.ovf
+        stloc index
+    Test:
+        ldloc index
+        ldloc count
+        blt Read
+        ldloc result
+        ret
+    .end

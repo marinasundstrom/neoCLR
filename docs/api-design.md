@@ -290,6 +290,8 @@ Dispose require writable managed receivers. Current returns T without erasing an
 explicit T&. ArrayList iterators retain their initial backing buffer and extent,
 with documented mutation visibility rather than .NET List version checking.
 
-[ArrayList predicate searches](predicate-search.md) are eager concrete operations.
-Find returns Option<T>, FindIndex returns an index or -1, and Exists returns Boolean.
-No LINQ surface or default comparer policy is introduced.
+The historical [ArrayList predicate searches](predicate-search.md) used Option<T>
+for Find, an index/-1 for FindIndex, and Boolean for Exists. The Raven profile now
+uses [direct filtering](arraylist-filtering.md), including Option<Int32> index
+results and FindLast/FindLastIndex/FindAll/TrueForAll. [LINQ](raven-query-api.md)
+is a separate library surface. These predicates do not require default comparers.

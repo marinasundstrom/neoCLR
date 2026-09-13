@@ -1,0 +1,78 @@
+import System.*
+import System.Collections.*
+import System.Option.*
+import System.Console.*
+
+func Show(value: Option<int>) {
+    match value {
+        Some(let found) => WriteLine(found)
+        None => WriteLine("Absent")
+    }
+}
+
+func IsSeven(value: int) -> bool {
+    return value == 7
+}
+
+func Positive(value: int) -> bool {
+    return value > 0
+}
+
+func Main() {
+    let values = ArrayList<int>()
+    values.Add(0)
+    values.Add(7)
+    values.Add(42)
+    values.Add(7)
+    Show(values.Find(IsSeven))
+    Show(values.FindLast(Positive))
+    Show(values.FindIndex(IsSeven))
+    Show(values.FindLastIndex(IsSeven))
+    Show(values.FindIndex((value: int) -> bool => value < 0))
+    if values.Exists(IsSeven) {
+        WriteLine("Exists")
+    }
+    if !values.TrueForAll(Positive) {
+        WriteLine("Not all positive")
+    }
+    let selected = values.FindAll(Positive)
+    WriteLine(selected.Count)
+    for value in selected {
+        WriteLine(value)
+    }
+    selected[0] = 99
+    WriteLine(values[1])
+    let empty = ArrayList<int>()
+    Show(empty.Find(Positive))
+    Show(empty.FindLast(Positive))
+    Show(empty.FindLastIndex(Positive))
+    WriteLine(empty.FindAll(Positive).Count)
+    if empty.TrueForAll(Positive) {
+        WriteLine("All empty elements satisfy the predicate")
+    }
+
+    let rows = ArrayList<ArrayList<int>>()
+    rows.Add(values)
+    let copied = rows.FindAll((row: ArrayList<int>) -> bool => row.Count > 0)
+    copied[0].Add(123)
+    WriteLine(values.Count)
+
+    // Return the value seen by the predicate even if it replaces that slot.
+    let changed = ArrayList<int>(1)
+    changed.Add(7)
+    Show(changed.Find((value: int) -> bool => {
+        changed[0] = 99
+        changed.Add(42)
+        return true
+    }))
+    WriteLine(changed[0])
+
+    let growing = ArrayList<int>(1)
+    growing.Add(7)
+    let original = growing.FindAll((value: int) -> bool => {
+        growing.Add(42)
+        return true
+    })
+    WriteLine(original.Count)
+    WriteLine(growing.Count)
+}

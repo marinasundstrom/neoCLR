@@ -208,6 +208,18 @@ static class SignatureProbe
         var addString = Reference(arrayListDefinition.Methods.Single(m => m.Name == "Add"), stringList);
         Check("Collection Add closes String element", CollectionBindings.Bind(addString, arrayListDefinition.Methods.Single(m => m.Name == "Add"), true)?.Arguments.Last() == "String");
         Check("Collection generic arguments are invariant", !CollectionBindings.Assignable("System.Collections.ArrayList<String>", CollectionBindings.List));
+        foreach (var name in new[] { "Find", "FindLast", "FindIndex", "FindLastIndex", "FindAll", "Exists", "TrueForAll" }) {
+            var search = arrayListDefinition.Methods.Single(m => m.Name == name);
+            var searchReference = Reference(search, stringList);
+            var expected = name switch {
+                "Find" or "FindLast" => "System.Option<String>",
+                "FindIndex" or "FindLastIndex" => "System.Option<Int32>",
+                "FindAll" => "System.Collections.ArrayList<String>", _ => "Boolean"
+            };
+            Check(name + " preserves filter outcome", CollectionBindings.Bind(searchReference, search, true)?.Result == expected);
+            searchReference.ReturnType = module.TypeSystem.Int32;
+            Reject(name + " rejects an old or forged result", () => CollectionBindings.Bind(searchReference, search, true));
+        }
         var enumerable = module.GetType("System.Linq.Enumerable");
         foreach (var name in new[] { "First", "Last", "Single" }) {
             var terminal = enumerable.Methods.Single(m => m.Name == name);

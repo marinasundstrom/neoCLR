@@ -117,22 +117,17 @@ predicate overloads and specialized paths remain open. This implementation is
 separate from Map and the upcoming ArrayList work.
 
 
-### Upcoming separate slice: ArrayList filtering (2026-09-13)
+### ArrayList filtering prototype (2026-09-13)
 
-The author requested built-in ArrayList filtering functions and appropriate Option
-and Result outcomes, after the LINQ terminal slice. Review the existing Find,
-FindIndex and Exists APIs before adding overlapping operations. Compare with .NET
-List<T>.Find/FindLast, FindIndex/FindLastIndex, FindAll, Exists and TrueForAll;
-choose the smallest useful set and resolve whether index absence remains a sentinel
-or becomes Option<Int32>. Existing Find already returns Option<T>. Filtering with
-no matches normally produces an empty collection; a Boolean predicate question
-already has a complete answer. Use Result only for a meaningful recoverable error,
-not to absorb callback/runtime faults. Contracts and implementation are still planned,
-and this work must have its own implementation commit.
+Implemented separately after LINQ terminals: direct-storage Find/FindLast and
+FindIndex/FindLastIndex return Option; Exists and TrueForAll return Boolean;
+FindAll returns an independent shallow list. See the [contract and migration](arraylist-filtering.md).
+FindIndex changes from -1 absence to Option<Int32>. No Result is needed for these
+complete outcomes; callback faults remain runtime faults. Range overloads,
+RemoveAll and fallible predicates need a concrete scenario before expansion.
 
 The author clarified the usage guideline: prefer suitable built-in operations for
 concrete collection types to avoid query-object allocations; use LINQ through
 interfaces and for composition. Specializing LINQ is explicitly allowed. Measure
-allocations and describe runtime speed separately. The current ArrayList.Find
-already avoids query wrappers but still uses an iterator; direct-storage filtering
-is part of the implementation review, not a completed optimization.
+allocations and describe runtime speed separately. Scalar ArrayList searches now
+scan captured storage directly, without an iterator or query object.

@@ -54,6 +54,12 @@ for file in source['sourceFiles']:
                      'samples': ['library-managed-array-metadata.rvn', 'library-native-buffer.rvn'],
                      'note': 'The native descriptor API is removed; direct IL covers typed NativeMemory access. Raven native casts remain limited.'})
         continue
+    if file == 'runtime/System/Collections/ArrayList.neoil':
+        rows.append({'file': file, 'declarations': len(entries), 'disposition': 'adapted-in-raven-profile',
+                     'replacementFiles': ['runtime/raven/ArrayListSearch.neoil'],
+                     'samples': ['library-list-filters.rvn', 'library-delegates.rvn', 'library-maps.rvn'],
+                     'note': 'Other members retain class/storage adaptation. Searches use direct scans; FindIndex now returns Option<Int32>. Historical Neo profile unchanged.'})
+        continue
     if file == 'runtime/System/Collections/List.neoil':
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'replaced-in-raven-profile',
                      'replacementFiles': ['runtime/raven/CollectionContracts.neoil', 'runtime/raven/List.neoil'],

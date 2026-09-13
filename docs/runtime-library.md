@@ -24,7 +24,7 @@ needs and the primitives required to implement them in platform code.
 
 [System.neoil](../runtime/System.neoil) provides platform-written methods and explicit native declarations:
 
-- [Eager ArrayList.Find, FindIndex and Exists](predicate-search.md) use Func<T,Boolean>
+- [Eager ArrayList filtering and searches](arraylist-filtering.md) use Func<T,Boolean>
   and ordinary iterator/Option IL. Find returns Option<T> without invalid defaults.
 - [Comparable, Iterable and Iterator](common-interfaces.md) provide scalar ordering
   and managed ArrayList traversal, implemented entirely in platform IL. List<T>

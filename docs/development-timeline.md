@@ -2442,3 +2442,37 @@ was needed for the terminal implementation.
 plus Clippy, formatting and the API audit. A .NET 10 target comparison confirms the
 existing default-sentinel ambiguity and exception-based cardinality behavior. The
 ArrayList work remains planned separately; LINQ specialization remains permitted.
+
+## 2026-09-13 — Concrete ArrayList filtering after the LINQ terminals
+
+**Author's direction.** The author requested built-in ArrayList filtering as a
+separate upcoming slice, with Option and Result used appropriately, then directed
+continuation. The preceding discussion clarified the motivation: avoid unnecessary
+query-chain allocations when a suitable concrete operation exists, while retaining
+LINQ composition and possible specialization. It was not a universal speed claim.
+
+**Assistant's selected contract.** Implement the familiar predicate method family:
+Find/FindLast return Option<T>, FindIndex/FindLastIndex return Option<Int32>,
+Exists/TrueForAll return Boolean, and FindAll returns a new shallow list. Changing
+FindIndex from -1 absence to Option is the assistant's concrete interpretation of
+the requested outcome review, not a separately quoted author decision. Empty
+filtered lists and Boolean questions need no Result wrapper; callback faults remain
+runtime faults. Range/removal and fallible-predicate overloads remain open.
+
+**Action and evidence.** Added direct IL scans over the initial backing buffer and
+extent, retaining the existing search policy under callback mutation. Updated Raven
+metadata, samples, completion expectations and migration documentation. The
+[filtering contract](arraylist-filtering.md) compares .NET's method family and index
+sentinel with the selected Option contract. Scalar searches no longer create an
+iterator. The equivalent Find lookup now measures four managed allocations versus
+nine for Where(...).First(), including setup, compared with the earlier five versus
+nine observation. This measures interpreter heap objects, not speed or host memory.
+
+**Validation outcome.** Four direct filtering tests passed, including callbacks that
+grow the source during GC. Source validation passed 63 saved-project cases, 12
+application cases, 104 signature checks and 59 editor checks, plus Clippy and
+formatting. A Raven sample initially used a qualified None pattern that did not
+satisfy exhaustiveness checking; importing Option cases and destructuring Some
+fixed the sample without a compiler change. The .NET comparison ran targeting
+net10.0. No new SDK/extension was installed and no release was published in this
+slice. Historical Neo behavior remains separate and unchanged.

@@ -50,7 +50,11 @@ static class CollectionDeclarations
             public class ArrayList<T> : List<T> {
                 public ArrayList() { }
                 public ArrayList(int capacity) { }
-                public int FindIndex(Func<T, bool> match) => default;
+                public Option<int> FindIndex(Func<T, bool> match) => default;
+                public Option<int> FindLastIndex(Func<T, bool> match) => default;
+                public Option<T> FindLast(Func<T, bool> match) => default;
+                public ArrayList<T> FindAll(Func<T, bool> match) => default;
+                public bool TrueForAll(Func<T, bool> match) => default;
                 public bool Exists(Func<T, bool> match) => default;
                 public Option<T> Find(Func<T, bool> match) => default;
                 public ArrayList<T> Copy() => default;

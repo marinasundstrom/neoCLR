@@ -1,5 +1,12 @@
 # Eager ArrayList predicate searches
 
+This page records the historical Neo profile implemented on 2026-09-08. The current
+Raven profile uses [direct ArrayList filtering](arraylist-filtering.md), including
+Option index results and additional methods. The older Neo implementation below
+is retained independently; its -1 sentinel and iterator allocation do not describe
+the new Raven profile. [LINQ support](raven-query-api.md) has also been added since
+this original design.
+
 Implemented 2026-09-08 as ordinary platform IL on System.Collections.ArrayList<T>.
 These are concrete collection methods, analogous to .NET List<T> members. LINQ,
 deferred queries and query pipelines remain future work.

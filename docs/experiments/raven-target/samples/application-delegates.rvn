@@ -1,4 +1,5 @@
 import System.*
+import System.Option.*
 import System.Collections.*
 import System.Console.*
 
@@ -67,7 +68,10 @@ func Main() {
     let values = ArrayList<int>()
     values.Add(7)
     values.Add(42)
-    WriteLine(values.FindIndex((value: int) -> bool => value == 42))
+    match values.FindIndex((value: int) -> bool => value == 42) {
+        Some(let index) => WriteLine(index)
+        None => WriteLine("No index")
+    }
     let increment: Func<int, int> = (value: int) -> int => value + 1
     WriteLine(increment(2147483647))
 }

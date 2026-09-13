@@ -53,6 +53,11 @@ def adapt(text: str, name: str) -> str:
     text = re.sub(r'(stfld System\.Collections\.[^\n]+\n)\s*pop\n', r'\1', text)
     text = re.sub(r'(call instance System\.Collections\.ArrayList<T>::(?:CheckIndex|Add)\([^\n]+\n)\s*pop\n', r'\1', text)
     text = re.sub(r'(callvirt instance System\.Disposable::Dispose\(\)\n)\s*pop\n', r'\1', text)
+    if name == 'ArrayList':
+        marker = '    ; Predicate searches retain the same initial buffer/extent as GetIterator.'
+        if text.count(marker) != 1 or not text.endswith('.end\n'):
+            raise ValueError('ArrayList search boundary changed')
+        text = text[:text.index(marker)] + (ROOT / 'runtime/raven/ArrayListSearch.neoil').read_text() + '.end\n'
     return text
 
 

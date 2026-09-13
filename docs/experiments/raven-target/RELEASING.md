@@ -200,3 +200,16 @@ now expects all three new operators. Run `cargo test --test query_terminals` and
 `--signatures` as well. Publish the [query contract](../../raven-query-api.md), including
 its normal-completion cleanup boundary and absence of fault-unwinding guarantees.
 Do not claim that the current installed .11 tools already contain these additions.
+
+## ArrayList filtering source checks
+
+Regenerate core metadata and System together. FindIndex now returns Option<Int32>
+instead of Int32/-1; recompile callers and migrate their absence handling. The
+[filtering contract](../../arraylist-filtering.md) documents all seven operations,
+callback behavior and limits. Run `verify_project.py --collections`,
+`verify_application.py`, the `--signatures` probe and `verify_editor.py --collections`
+with the same target configuration used for the full library checks. Run
+`cargo test --test list_filters --test query_terminals --test raven_collections`
+and retain `--test predicate_search` for the historical Neo profile regression.
+The .NET comparison is `dotnet run --project docs/experiments/list-filters/dotnet`.
+These source changes do not refresh the installed .11 SDK or VSIX.

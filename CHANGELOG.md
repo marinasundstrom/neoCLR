@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Added direct-storage Raven-profile ArrayList filtering: Find/FindLast return
+  Option<T>, FindIndex/FindLastIndex return Option<Int32>, Exists/TrueForAll answer
+  Boolean questions, and FindAll returns an independent shallow list. Breaking:
+  FindIndex no longer returns Int32/-1; regenerate core metadata and System together
+  and recompile callers. Scalar scans avoid managed iterator/query allocations and
+  retain the initial buffer/extent across callbacks and GC. Added IL, Raven,
+  metadata/editor checks, .NET comparison and API/migration documentation. Historical
+  Neo and the installed .11 SDK/extension remain unchanged.
+
 - Added Raven-profile LINQ terminals: First and Last return Option<T>; Single
   returns Result<T,SingleError> with Empty and Multiple cases. Existing IL and
   metadata support the APIs without compiler changes. Normal outcomes dispose

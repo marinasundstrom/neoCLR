@@ -824,13 +824,16 @@
     {
       "file": "runtime/System/Collections/ArrayList.neoil",
       "declarations": 16,
-      "disposition": "collections",
+      "disposition": "adapted-in-raven-profile",
+      "replacementFiles": [
+        "runtime/raven/ArrayListSearch.neoil"
+      ],
       "samples": [
-        "library-managed-array-metadata.rvn",
-        "library-array-shapes.rvn",
-        "library-reference-payloads.rvn",
-        "library-generic-collections.rvn"
-      ]
+        "library-list-filters.rvn",
+        "library-delegates.rvn",
+        "library-maps.rvn"
+      ],
+      "note": "Other members retain class/storage adaptation. Searches use direct scans; FindIndex now returns Option<Int32>. Historical Neo profile unchanged."
     },
     {
       "file": "runtime/System/Collections/List.neoil",

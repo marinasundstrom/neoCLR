@@ -52,6 +52,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
              ('Void', 'library-void.rvn', 'Completed without a payload\nNot completed\n')]
     if args.collections:
         cases += [('Interfaces', 'library-interfaces.rvn', '1\n42\n'),
+                  ('ListFilters', 'library-list-filters.rvn', '7\n7\n1\n3\nAbsent\nExists\nNot all positive\n3\n7\n42\n7\n7\nAbsent\nAbsent\nAbsent\n0\nAll empty elements satisfy the predicate\n5\n7\n99\n1\n2\n'),
                   ('QueryTerminals', 'library-query-terminals.rvn', 'Absent\nAbsent\n0\n42\nAbsent\nEmpty\n0\nMultiple\n42\nMultiple\n42\nAbsent\nSystem.String\nNo result\n42\n'),
                   ('Maps', 'library-maps.rvn', 'Added\nDuplicate rejected\nPending\nUnknown order\nShipped\n1\n2\nFound\n42\n99\nStored\nStored\nShipped\n23\n2\n1\n'),
                   ('CollectionCapabilities', 'library-collection-capabilities.rvn', '2\n42\n2\n2\n7\n2\n9\n2\n3\n11\n'),
@@ -65,7 +66,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
                   ('ManagedArrayMetadata', 'library-managed-array-metadata.rvn', '42\n2\n1\nSystem.Int32\n0\nLength\nCount\nItem\n4\n42\n8\n50\n2\n'),
                   ('Reflection', 'library-reflection.rvn', (bridge / 'samples/library-reflection.expected.txt').read_text()),
                   ('ArrayCallbacks', 'library-array-callbacks.rvn', '7\n42\nFirst\nSecond\n'),
-                  ('Delegates', 'library-delegates.rvn', '42\n' * 5 + 'Done\n1\nExists\n42\n-1\nNone\n'),
+                  ('Delegates', 'library-delegates.rvn', '42\n' * 5 + 'Done\n1\nExists\n42\nNo index\nNone\n'),
                   ('Booleans', 'library-booleans.rvn', '1\n-1\n0\n1\n42\nNot false\nEqual\nDifferent\n0\n1\n0\n'),
                   ('GenericCollections', 'library-generic-collections.rvn', 'Changed\nSecond\n0\n0\n1\n2\n1\n'),
                   ('PropagationWorkflow', 'library-propagation-workflow.rvn', '42\nSaved\nCompleted\nOverflow\nValue found\n42\nAbsent\n'),

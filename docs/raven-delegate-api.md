@@ -13,11 +13,11 @@ values.Add(42)
 let found = values.Find(IsAnswer)
 ```
 
-ArrayList.FindIndex, Exists and Find now use the shared runtime implementations.
-Find returns Option<T>; no-match is None and FindIndex returns -1. The adapted
-collection library preserves its normal-path iterator disposal using no-result
-Dispose calls. A callback fault remains terminal; this slice does not introduce
-fault-path finally/defer cleanup.
+The Raven profile's [ArrayList filtering methods](arraylist-filtering.md) now scan
+storage directly. Find/FindLast return Option<T>; FindIndex/FindLastIndex return
+Option<int>, replacing the earlier -1 sentinel. Exists and TrueForAll return Boolean;
+FindAll returns an independent list. No iterator is acquired by these methods.
+A callback fault remains terminal; no fault-path finally/defer cleanup is introduced.
 
 For completion callbacks use the target's named `Func<Void>`:
 

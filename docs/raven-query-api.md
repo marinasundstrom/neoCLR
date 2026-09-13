@@ -254,13 +254,11 @@ allocations by working directly with the collection's storage, not an assertion
 that the concrete API is always faster. LINQ specialization remains a valid
 optimization; this guideline does not forbid it.
 
-For the current prototype, an equivalent one-element lookup in
-`tests/query_terminals.rs` records five managed allocations for ArrayList.Find and
-nine for Where(...).First(), including identical list setup. These are interpreter
+The initial terminal-slice measurement in `tests/query_terminals.rs` was five
+managed allocations for ArrayList.Find and nine for Where(...).First(), including
+identical list setup. The subsequent [ArrayList filtering slice](arraylist-filtering.md)
+removed Find's iterator and now measures four versus nine. These are interpreter
 heap-object counts, not host allocations, allocated bytes or elapsed-time results.
-The existing Find still creates an ArrayIterator: it avoids query wrappers but
-is not yet a direct-storage scan. The upcoming ArrayList filtering slice should
-review that implementation and preserve these semantics while reducing overhead.
 Re-measure when implementations change; these counts are not a permanent API promise.
 
 [.NET CA1826](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca1826)
