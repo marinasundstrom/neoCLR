@@ -150,3 +150,9 @@ against the extracted demo project with its packaged bridge, runtime and System
 library. Add `--queries` and `--extensions` to the editor checks. These are new source
 checks, not retroactive claims about earlier archived validation reports. Document
 remaining query and cleanup boundaries from the query API doc.
+
+For builds containing target-aware array diagnostics, keep
+`<RavenAllowArrayCovariance>false</RavenAllowArrayCovariance>` in the demo project
+and add `--array-invariance` to the editor check. It verifies implicit/explicit
+array conversion diagnostics and correction after an edit. Older SDKs ignore this
+new property; do not report source-built checks as validation of an older bundle.

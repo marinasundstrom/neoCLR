@@ -21,6 +21,7 @@ strings = '--strings' in sys.argv[2:]
 patterns = '--patterns' in sys.argv[2:]
 extensions = '--extensions' in sys.argv[2:]
 queries = '--queries' in sys.argv[2:]
+array_invariance = '--array-invariance' in sys.argv[2:]
 server = json.loads((project / '.vscode/settings.json').read_text())['raven.languageServerPath']
 messages = queue.Queue()
 log = (project / 'lsp-stderr.log').open('wb')
@@ -345,6 +346,37 @@ try:
             labels = sorted({item['label'] for item in items})
             assert {'Where', 'Select', 'ToList'}.issubset(labels), labels
             results['Query extensions ' + str(version)] = labels
+    if array_invariance:
+        import time
+        for version, expression, expected_code in (
+                (46, 'let members: MemberInfo[] = typeof(int).GetMethods()', 'RAV1504'),
+                (47, 'let members = (MemberInfo[])typeof(int).GetMethods()', 'RAV1503'),
+                (48, 'let members: MethodInfo[] = typeof(int).GetMethods()', None)):
+            text = 'import System.*\nimport System.Reflection.*\nfunc Main() {\n    ' + expression + '\n}\n'
+            send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version},
+                'contentChanges': [{'text': text}]})
+            deadline = time.monotonic() + 90
+            while True:
+                item = messages.get(timeout=max(0.01, deadline - time.monotonic()))
+                if isinstance(item, Exception):
+                    raise item
+                transcript.append(item)
+                params = item.get('params', {})
+                if item.get('method') == 'textDocument/publishDiagnostics' and params.get('uri') == uri and params.get('version') == version:
+                    errors = [d for d in params['diagnostics'] if d.get('severity') == 1]
+                    # Syntax-only updates may clear or carry earlier diagnostics while
+                    # semantic analysis runs. Wait for this edit's expected outcome.
+                    if expected_code is None:
+                        if errors:
+                            continue
+                    elif not any(d.get('code') == expected_code and
+                                 'MemberInfo' in d['message'] and 'MethodInfo' in d['message']
+                                 for d in errors):
+                        continue
+                    results['Array invariance diagnostics ' + str(version)] = params['diagnostics']
+                    break
+                if time.monotonic() >= deadline:
+                    raise TimeoutError('Array invariance diagnostics timed out')
     receive(send('shutdown', None, True))
     send('exit', None)
     print(json.dumps(results, indent=2))

@@ -46,6 +46,7 @@ if args.collections:
     project_file.write_text(project_file.read_text().replace('<ImplicitImports>',
         '<RavenIterationAssemblyName>NeoCLR.CoreProbe</RavenIterationAssemblyName>\n'
         '    <RavenIterationArraysImplementIterable>true</RavenIterationArraysImplementIterable>\n'
+        '    <RavenAllowArrayCovariance>false</RavenAllowArrayCovariance>\n'
         '    <RavenIterationIterableType>System.Collections.Iterable`1</RavenIterationIterableType>\n'
         '    <RavenIterationIteratorType>System.Collections.Iterator`1</RavenIterationIteratorType>\n'
         '    <ImplicitImports>'))

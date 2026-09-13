@@ -13,14 +13,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   packaged suites and the installed order-workflow task passed; 701 payload hashes
   were verified. Preserved existing demos/default SDK, recorded provenance and added
   local instructions. This is not a published release; editor array-conversion
-  diagnostics still follow CLR rules.
+  diagnostics in this installed build still follow CLR rules.
 
 - Made mutable-array invariance an explicit runtime contract: verifier, interpreter
   and Raven importer reject differing array element-type casts, including typed-null
   casts; exact interface-to-array casts retain allocation checks. Added inheritance,
   value-element, jagged-array and interface-view regressions. Documented the deliberate
   CLR covariance difference and a future read-only projection; read-only variance is
-  not implemented. Raven editor semantics remain CLR-like until target-aware diagnostics.
+  not implemented. New Raven target projects now disable covariance through the companion
+  compiler's target-neutral option. Added editor diagnostic/recovery checks and saved-project
+  coverage so invalid array conversions fail during binding. Default .NET behavior is
+  unchanged; installed .9 tools still require a future refresh.
 
 - Admitted existing numeric division, remainder and shift instructions in the Raven
   importer with operand validation. The companion Raven fix preserves unsigned

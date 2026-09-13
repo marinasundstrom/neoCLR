@@ -16,6 +16,7 @@ parser.add_argument('--runtime', required=True, type=Path)
 args = parser.parse_args()
 bridge = Path(__file__).resolve().parent
 results = {}
+array_invariance = '<RavenAllowArrayCovariance>false</RavenAllowArrayCovariance>' in args.project.read_text()
 with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
     root = Path(temporary)
     for name in ('Demo.rvnproj', 'NeoCLR.CoreProbe.dll'):
@@ -89,8 +90,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
         ('PathUnsupportedApi', 'func Main() { System.IO.Path.GetFullPath(".") }', 'RAV'),
         ('StringArgumentMismatch', 'func Main() { System.String.Concat(42, 7) }', 'RAV'),
         ('StringUnsupportedApi', 'func Main() { System.String.IsNullOrEmpty(\"\") }', 'RAV'),
-        ('ArrayImplicitCovariance', 'import System.*\nimport System.Reflection.*\nfunc Main() { let members: MemberInfo[] = typeof(int).GetMethods() }', 'identical element types'),
-        ('ArrayExplicitCovariance', 'import System.*\nimport System.Reflection.*\nfunc Main() { let members = (MemberInfo[])typeof(int).GetMethods() }', 'identical element types'),
+        ('ArrayImplicitCovariance', 'import System.*\nimport System.Reflection.*\nfunc Main() { let members: MemberInfo[] = typeof(int).GetMethods() }', 'RAV1504' if array_invariance else 'identical element types'),
+        ('ArrayExplicitCovariance', 'import System.*\nimport System.Reflection.*\nfunc Main() { let members = (MemberInfo[])typeof(int).GetMethods() }', 'RAV1503' if array_invariance else 'identical element types'),
         ('ImportFailure', 'func Negate(value: int) -> int { return -value }\nfunc Main() { Negate(2) }', 'Unsupported')]:
         before = set(root.rglob('App.neoil'))
         (root / 'Main.rvn').write_text(source)

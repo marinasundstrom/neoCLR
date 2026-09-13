@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <RavenMetadataCoreAssemblyName>NeoCLR.CoreProbe</RavenMetadataCoreAssemblyName>
     <RavenUseHostFrameworkReferences>false</RavenUseHostFrameworkReferences>
+    <RavenAllowArrayCovariance>false</RavenAllowArrayCovariance>
     <RavenPropagationAssemblyName>NeoCLR.CoreProbe</RavenPropagationAssemblyName>
     <RavenPropagationInterfaceType>System.Propagatable`3</RavenPropagationInterfaceType>
     <RavenIterationAssemblyName>NeoCLR.CoreProbe</RavenIterationAssemblyName>

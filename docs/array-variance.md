@@ -28,10 +28,12 @@ when casting an interface view back to an array. Ordinary assignment, parameter 
 return validation continue to require the same array type. The Raven importer rejects
 both implicit and explicit array widening with an element-type diagnostic.
 
-Raven's ordinary CLR compiler semantics remain unchanged. Consequently, its language
-service can still accept CLR-covariant source that the neoCLR target importer rejects.
-Target-aware editor diagnostics are a follow-up, not part of this runtime contract.
-No new opcode, array type flag or read-only array syntax is introduced here.
+Raven's ordinary CLR compiler semantics remain unchanged by default. New neoCLR
+project templates select `<RavenAllowArrayCovariance>false</RavenAllowArrayCovariance>`.
+With the updated experimental compiler, normal binding rejects differing array element
+types during assignments, calls, returns and casts; the editor uses the same policy.
+Existing .9 tools predate that option and continue to defer this rejection to import.
+No new opcode, runtime array type flag or read-only array syntax is introduced here.
 
 ## Read-only projections: direction, not implemented variance
 
@@ -60,3 +62,20 @@ value-element arrays, both conversion directions, jagged arrays, typed nulls,
 interface round-trips and interface-mediated attempts to change the element type.
 The Raven project tests reject both implicit and explicit MethodInfo[] to MemberInfo[]
 conversions before producing an executable.
+
+## Target-aware diagnostics follow-up
+
+Source-built Raven now exposes a target-neutral array covariance option, independent
+of iteration interface names. New prepared and bundled neoCLR projects disable it.
+The language service publishes errors for both implicit and explicit reflection-array
+widening, and clears them after correction to the exact element type. Legacy projects
+without the setting retain compiler defaults; the neoCLR importer/runtime still enforce
+invariance. Older installed SDK/extension builds are not modified by this source slice.
+
+Validated against Raven experiment commit `f2a4af608`: 60 focused compiler/project
+configuration tests, 57 saved-project checks, and the full current editor probe with
+`--array-invariance`. The editor probe requires separate assignment (`RAV1504`) and
+cast (`RAV1503`) errors, then an error-free update for `MethodInfo[]`. Syntax-only
+notifications can temporarily carry earlier errors while semantic analysis runs;
+the probe waits for the expected analysis result. These are source-build results,
+not validation of installed SDK `0.1.12-neoclr.9`.
