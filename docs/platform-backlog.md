@@ -145,7 +145,8 @@ underlying constructs, and requested prototype LINQ for the next release.
 Proposed order: finish union contracts and readable match samples; validate extension
 method lookup/emission; then select a bounded query API. The assistant proposed Where
 and Select over Iterable/Iterator and Func callbacks, with materialization as needed.
-These operators and exact signatures are proposals, not implemented or settled scope.
+These were initial proposals; the implemented follow-up and current boundaries are
+recorded below.
 
 Compare .NET's [Enumerable API](https://learn.microsoft.com/en-us/dotnet/api/system.linq.enumerable?view=net-10.0)
 (primary source consulted 2026-09-13): it builds queries over IEnumerable with delegates
@@ -163,3 +164,9 @@ now execute through ordinary calls, with member completion verified. Generic
 application signatures remain an explicit bridge boundary. See [evidence and the
 query prerequisites](raven-extension-methods.md); no query operators are implemented
 by this extension slice.
+
+Query follow-up (2026-09-13): the source Raven-target library now implements deferred
+Where/Select and eager ToList through ordinary generic NeoIL classes. The bridge
+admits their exact closed signatures; arbitrary generic application methods remain
+out of scope. [The API contract](raven-query-api.md) records evidence, memory and
+cleanup costs, Void projection and remaining custom-interface emission investigation.

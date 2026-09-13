@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Added prototype Raven-target `System.Linq.Enumerable` extensions: deferred generic
+  Where/Select and eager ToList returning ArrayList. Ordinary NeoIL classes retain
+  source/callback state, cache current values and dispose upstream on exhaustion or
+  explicit disposal. Added execution, GC, lifetime, negative and completion checks;
+  documented cleanup, mutation and compiler boundaries. Corrected Void projection
+  for generic method arguments. No query opcode, Raven compiler change, legacy Neo
+  update or archived toolchain replacement.
+
 - Enabled nongeneric Raven application extension methods by completing their
   generated marker metadata dependencies. Added readable value/reference/interface
   receiver and callback examples, execution and completion checks, and explicit
@@ -23,11 +31,6 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   experiment requires Raven 04c953d67 and refreshed declaration metadata, not
   archived .7 tools. Prepared a separate source-backed local demo and verified
   payload completion/hover with its updated language server.
-
-- Planned a prototype LINQ layer for the next release, following extension-method
-  validation, with a proposed Where/Select scope and explicit evaluation and
-  iterator-cleanup decisions. Recorded the author discussion; query APIs remain
-  planned work.
 
 - Added target completion checks inside constructors and installed a patched Raven
   language server after reproducing missing Int32 static members in constructor

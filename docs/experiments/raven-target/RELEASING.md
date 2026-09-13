@@ -143,3 +143,10 @@ package notices and refresh the inventory if the esbuild inputs change. Distribu
 as a companion attribution archive for the separate SDK and VSIX. The runtime bundle
 contains the same texts. Do not describe the separate upstream assets as containing
 notices that are supplied only in the companion archive.
+
+
+For builds containing the prototype query API, also run `tools/verify_queries.py`
+against the extracted demo project with its packaged bridge, runtime and System
+library. Add `--queries` and `--extensions` to the editor checks. These are new source
+checks, not retroactive claims about earlier archived validation reports. Document
+remaining custom Iterable compiler and cleanup boundaries from the query API doc.

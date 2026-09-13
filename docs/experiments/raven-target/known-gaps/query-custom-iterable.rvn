@@ -1,0 +1,51 @@
+// Pending Raven target-metadata emission investigation. Not a passing release sample.
+import System.*
+import System.Collections.*
+import System.Linq.*
+import System.Console.*
+
+class Source : Iterable<int> {
+    var Acquired: int
+    var Disposed: int
+
+    func GetIterator() -> Iterator<int> {
+        Acquired = Acquired + 1
+        return Cursor(self)
+    }
+}
+
+class Cursor : Iterator<int> {
+    var Owner: Source
+    var Position: int
+
+    init(owner: Source) {
+        Owner = owner
+    }
+
+    func MoveNext() -> bool {
+        Position = Position + 1
+        return Position == 1
+    }
+
+    val Current: int { get => 42 }
+
+    func Dispose() {
+        Owner.Disposed = Owner.Disposed + 1
+    }
+}
+
+func Main() {
+    let source = Source()
+    let sequence: Iterable<int> = source
+    let query = sequence.Where((value: int) -> bool => true)
+        .Select((value: int) -> int => value + 1)
+    WriteLine(source.Acquired)
+    let iterator = query.GetIterator()
+    WriteLine(source.Acquired)
+    iterator.Dispose()
+    iterator.Dispose()
+    WriteLine(source.Disposed)
+    WriteLine(query.ToList()[0])
+    WriteLine(source.Acquired)
+    WriteLine(source.Disposed)
+}

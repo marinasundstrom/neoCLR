@@ -31,7 +31,7 @@ assemblies, extension properties, constrained receivers and static extensions ne
 separate end-to-end coverage. This is a bridge limit, not evidence that the neoCLR
 runtime lacks generics or that Raven cannot compile generic extensions.
 
-## Toward the query slice
+## Query follow-up
 
 The intended starting contract remains deferred `Where` and `Select`, followed by
 explicit materialization. [.NET Where](https://learn.microsoft.com/en-us/dotnet/api/system.linq.enumerable.where?view=net-10.0)
@@ -39,13 +39,10 @@ explicit materialization. [.NET Where](https://learn.microsoft.com/en-us/dotnet/
 change callback timing and allocate an intermediate collection, so it is not a
 substitute for that contract.
 
-Next resolve generic query method and iterator representation in the bridge. A
-library implementation with validated closed generic bindings is an alternative
-to importing arbitrary generic application bodies. Prefer a reusable runtime
-library surface; avoid a per-sample or integer-only query implementation. Validate
-repeated enumeration, callback ordering, empty input, captured state and explicit
-disposal before advertising the operators. Automatic early-exit and fault cleanup
-remain a separate [iteration-contract gap](raven-target-contracts.md).
+The [prototype query API](raven-query-api.md) now implements these operators in the
+Raven-target runtime library with validated closed generic bindings. It uses ordinary
+runtime iterators without importing arbitrary generic application bodies. Its API
+document records validation, costs and the remaining cleanup/compiler boundaries.
 
 ## Running and verification
 

@@ -617,3 +617,12 @@ for validating a live snapshot against the host clock.
 
 The [error-value API projection](../../raven-error-api.md) includes constructors,
 checked extraction, descriptions, message errors and `--errors` completion checks.
+
+
+## Prototype queries (source experiment)
+
+The current collection profile adds `import System.Linq.*` with deferred `Where` and
+`Select` and eager `ToList`. See [the query contract](../../raven-query-api.md),
+`samples/library-queries.rvn`, and `verify_queries.py`. Use fresh declaration metadata
+and the matching generated library; archived .7 packages do not contain this API.
+`verify_editor.py --queries` checks completion on lists and query results.

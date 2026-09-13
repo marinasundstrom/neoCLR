@@ -39,6 +39,9 @@ static class VoidProjection
         }
         void Method(MethodReference method)
         {
+            if (method is GenericInstanceMethod generic)
+                for (var i = 0; i < generic.GenericArguments.Count; i++)
+                    generic.GenericArguments[i] = Storage(generic.GenericArguments[i]);
             Visit(method.DeclaringType); Visit(method.ReturnType);
             foreach (var parameter in method.Parameters) parameter.ParameterType = Storage(parameter.ParameterType);
         }

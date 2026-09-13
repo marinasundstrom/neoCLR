@@ -1,0 +1,48 @@
+import System.*
+import System.Collections.*
+import System.Linq.*
+import System.Console.*
+
+func Main() {
+    let numbers = ArrayList<int>()
+    numbers.Add(7)
+    numbers.Add(42)
+    numbers.Add(99)
+
+    var tested = 0
+    var selected = 0
+    let query = numbers.Where((value: int) -> bool => {
+        tested = tested + 1
+        return value != 7
+    }).Select((value: int) -> string => {
+        selected = selected + 1
+        return if value == 42 {
+            "Forty two"
+        } else {
+            "Ninety nine"
+        }
+    })
+    WriteLine(tested)
+    WriteLine(selected)
+
+    let iterator = query.GetIterator()
+    if iterator.MoveNext() {
+        WriteLine(iterator.Current)
+        WriteLine(iterator.Current)
+    }
+    WriteLine(tested)
+    WriteLine(selected)
+    iterator.Dispose()
+    iterator.Dispose()
+    if !iterator.MoveNext() {
+        WriteLine("Disposed")
+    }
+
+    let snapshot = query.ToList()
+    WriteLine(snapshot.Count)
+    for value in snapshot {
+        WriteLine(value)
+    }
+    WriteLine(tested)
+    WriteLine(selected)
+}

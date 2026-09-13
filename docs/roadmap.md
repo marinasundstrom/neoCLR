@@ -61,8 +61,9 @@ release requirement and investigation plan, not a claim of delivered Raven debug
 The source experiment now demonstrates imported union cases and target-typed
 `.Ok`/`.Error` destructuring in the order workflow. The next release should include
 this preliminary pattern support and a prototype LINQ layer. Nongeneric application
-[extension methods are validated](raven-extension-methods.md). Next resolve the generic
-query binding/iterator representation, then add a small deferred Iterable/Iterator query surface. See [the scoped plan](platform-backlog.md#raven-patterns-and-prototype-linq-2026-09-13).
+[extension methods are validated](raven-extension-methods.md). [Prototype Where/Select/ToList](raven-query-api.md) now run through generic library
+bindings and ordinary iterators. Next investigate custom Raven Iterable implementations
+and refresh the local toolchain after that compatibility check. See [the scoped plan](platform-backlog.md#raven-patterns-and-prototype-linq-2026-09-13).
 
 Generic Void also constrains a future Task<Void>/async-await design: decide awaiter
 contracts, no-payload completion and suspension without importing assumptions that Void

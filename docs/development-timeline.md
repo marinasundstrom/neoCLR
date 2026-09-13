@@ -2008,3 +2008,17 @@ bridge. The assistant retained deferred Where/Select as the intended next contra
 and identified generic query bindings and iterator representation as prerequisites,
 not completed query support. See [the implemented boundary](raven-extension-methods.md).
 Archived packages and the author's edited demo were left unchanged.
+
+
+**Query slice outcome (2026-09-13).** Continuing the author's prototype LINQ direction,
+the assistant chose generic runtime-library operators with exact bridge bindings,
+rather than expanding generic application-body importing. Where/Select remain deferred;
+ToList performs explicit materialization. Their implementation uses ordinary classes,
+interfaces and delegates, without new opcodes. Tests exercise callback timing, caching,
+repeat enumeration, value/reference payloads and GC-held captures. The Void exercise
+found a missing method-argument projection in the bridge and that was corrected;
+explicit Func<T, System.Void> works while unconstrained Unit inference remains separate.
+A custom Raven Iterable/Cursor probe failed during compiler emission and remains open;
+the low-level custom iterator fixture verifies acquisition and disposal directly.
+[The API contract](raven-query-api.md) records these outcomes and the retained cleanup
+gap. Raven and legacy Neo sources and archived builds were not changed in this slice.

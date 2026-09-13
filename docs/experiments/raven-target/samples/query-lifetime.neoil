@@ -1,0 +1,127 @@
+; Run with the generated Raven-target System library.
+.module QueryLifetime
+.entry Main
+.type class Tracker
+    .field Acquired Int32
+    .field Released Int32
+.end
+.type class Source
+    .implements System.Collections.Iterable<Int32>
+    .field State Tracker
+    .method instance GetIterator() -> System.Collections.Iterator<Int32>
+        ldarg this
+        ldfld Source::State
+        dup
+        ldfld Tracker::Acquired
+        ldc.i4 1
+        add
+        stfld Tracker::Acquired
+        ldarg this
+        ldfld Source::State
+        ldc.bool false
+        newobj Cursor
+        castclass System.Collections.Iterator<Int32>
+        ret
+    .end
+.end
+.type class Cursor
+    .implements System.Collections.Iterator<Int32>
+    .field State Tracker
+    .field Started Boolean
+    .method instance MoveNext() -> Boolean
+        ldarg this
+        ldfld Cursor::Started
+        brtrue End
+        ldarg this
+        ldc.bool true
+        stfld Cursor::Started
+        ldc.bool true
+        ret
+    End:
+        ldc.bool false
+        ret
+    .end
+    .method instance get_Current() -> Int32
+        ldc.i4 42
+        ret
+    .end
+    .method instance Dispose() -> noresult
+        ldarg this
+        ldfld Cursor::State
+        dup
+        ldfld Tracker::Released
+        ldc.i4 1
+        add
+        stfld Tracker::Released
+        ret
+    .end
+.end
+.function Keep(Int32 value) -> Boolean
+    ldc.bool true
+    ret
+.end
+.function Increment(Int32 value) -> Int32
+    ldarg value
+    ldc.i4 1
+    add
+    ret
+.end
+.function Assert(Int32 actual, Int32 expected) -> noresult
+    ldarg actual
+    ldarg expected
+    beq Good
+    fault "query lifetime assertion failed"
+Good:
+    ret
+.end
+.function Main() -> noresult
+    .local Tracker state
+    .local System.Collections.Iterable<Int32> query
+    .local System.Collections.Iterator<Int32> iterator
+    ldc.i4 0
+    ldc.i4 0
+    newobj Tracker
+    stloc state
+    ldloc state
+    newobj Source
+    castclass System.Collections.Iterable<Int32>
+    delegate.bind System.Func<Int32,Boolean> = Keep(Int32)
+    call System.Linq.Enumerable::Where<Int32>(System.Collections.Iterable<Int32>,System.Func<Int32,Boolean>)
+    delegate.bind System.Func<Int32,Int32> = Increment(Int32)
+    call System.Linq.Enumerable::Select<Int32,Int32>(System.Collections.Iterable<Int32>,System.Func<Int32,Int32>)
+    stloc query
+    ldloc state
+    ldfld Tracker::Acquired
+    ldc.i4 0
+    call Assert(Int32,Int32)
+    ldloc query
+    callvirt instance System.Collections.Iterable<Int32>::GetIterator()
+    stloc iterator
+    ldloc state
+    ldfld Tracker::Acquired
+    ldc.i4 1
+    call Assert(Int32,Int32)
+    ldloc iterator
+    callvirt instance System.Disposable::Dispose()
+    ldloc iterator
+    callvirt instance System.Disposable::Dispose()
+    ldloc state
+    ldfld Tracker::Released
+    ldc.i4 1
+    call Assert(Int32,Int32)
+    ldloc query
+    call System.Linq.Enumerable::ToList<Int32>(System.Collections.Iterable<Int32>)
+    ldc.i4 0
+    callvirt instance System.Collections.ArrayList<Int32>::get_Item(Int32)
+    ldc.i4 43
+    call Assert(Int32,Int32)
+    ldloc state
+    ldfld Tracker::Acquired
+    ldc.i4 2
+    call Assert(Int32,Int32)
+    ldloc state
+    ldfld Tracker::Released
+    ldc.i4 2
+    call Assert(Int32,Int32)
+    ret
+.end

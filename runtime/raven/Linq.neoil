@@ -1,0 +1,264 @@
+; Raven-target query library: ordinary classes, generics, interfaces and delegates.
+.type System.Linq.Enumerable
+    .method static Where<T>(System.Collections.Iterable<T> source, System.Func<T,Boolean> predicate) -> System.Collections.Iterable<T>
+        ldarg source
+        ldarg predicate
+        call System.Linq.WhereSequence<T>::Create(System.Collections.Iterable<T>,System.Func<T,Boolean>)
+        ret
+    .end
+    .method static Select<T,U>(System.Collections.Iterable<T> source, System.Func<T,U> selector) -> System.Collections.Iterable<U>
+        ldarg source
+        ldarg selector
+        call System.Linq.SelectSequence<T,U>::Create(System.Collections.Iterable<T>,System.Func<T,U>)
+        ret
+    .end
+    .method static ToList<T>(System.Collections.Iterable<T> source) -> System.Collections.ArrayList<T>
+        .local System.Collections.Iterator<T> iterator
+        .local System.Collections.ArrayList<T> result
+        newobj instance System.Collections.ArrayList<T>::.ctor()
+        stloc result
+        ldarg source
+        callvirt instance System.Collections.Iterable<T>::GetIterator()
+        stloc iterator
+    Next:
+        ldloc iterator
+        callvirt instance System.Collections.Iterator<T>::MoveNext()
+        brfalse End
+        ldloc result
+        ldloc iterator
+        callvirt instance System.Collections.Iterator<T>::get_Current()
+        callvirt instance System.Collections.ArrayList<T>::Add(T)
+        br Next
+    End:
+        ldloc iterator
+        callvirt instance System.Disposable::Dispose()
+        ldloc result
+        ret
+    .end
+.end
+
+.type internal class System.Linq.WhereSequence<T>
+    .implements System.Collections.Iterable<T>
+    .field private Source System.Collections.Iterable<T>
+    .field private Callback System.Func<T,Boolean>
+    .method internal static Create(System.Collections.Iterable<T> source, System.Func<T,Boolean> callback) -> System.Collections.Iterable<T>
+        ldarg source
+        ldarg callback
+        newobj System.Linq.WhereSequence<T>
+        castclass System.Collections.Iterable<T>
+        ret
+    .end
+    .method instance GetIterator() -> System.Collections.Iterator<T>
+        ldarg this
+        ldfld System.Linq.WhereSequence<T>::Source
+        callvirt instance System.Collections.Iterable<T>::GetIterator()
+        ldarg this
+        ldfld System.Linq.WhereSequence<T>::Callback
+        call System.Linq.WhereIterator<T>::Create(System.Collections.Iterator<T>,System.Func<T,Boolean>)
+        ret
+    .end
+.end
+
+.type internal class System.Linq.WhereIterator<T>
+    .implements System.Collections.Iterator<T>
+    .field private Source System.Collections.Iterator<T>
+    .field private Callback System.Func<T,Boolean>
+    ; A checked slot permits any T without manufacturing a default value.
+    .field private Cached arrayref<T>
+    .field private Active Boolean
+    .field private Finished Boolean
+    .method internal static Create(System.Collections.Iterator<T> source, System.Func<T,Boolean> callback) -> System.Collections.Iterator<T>
+        ldarg source
+        ldarg callback
+        ldc.i4 1
+        array.reserve T
+        ldc.bool false
+        ldc.bool false
+        newobj System.Linq.WhereIterator<T>
+        castclass System.Collections.Iterator<T>
+        ret
+    .end
+    .method instance MoveNext() -> Boolean
+        .local T value
+        ldarg this
+        ldfld System.Linq.WhereIterator<T>::Finished
+        brtrue End
+        ldarg this
+        ldc.bool false
+        stfld System.Linq.WhereIterator<T>::Active
+    Next:
+        ldarg this
+        ldfld System.Linq.WhereIterator<T>::Source
+        callvirt instance System.Collections.Iterator<T>::MoveNext()
+        brfalse Finish
+        ldarg this
+        ldfld System.Linq.WhereIterator<T>::Source
+        callvirt instance System.Collections.Iterator<T>::get_Current()
+        stloc value
+        ldarg this
+        ldfld System.Linq.WhereIterator<T>::Callback
+        ldloc value
+        callvirt instance System.Func<T,Boolean>::Invoke(T)
+        brfalse Next
+        ldarg this
+        ldfld System.Linq.WhereIterator<T>::Cached
+        ldc.i4 0
+        ldloc value
+        stelem T
+        ldarg this
+        ldc.bool true
+        stfld System.Linq.WhereIterator<T>::Active
+        ldc.bool true
+        ret
+    Finish:
+        ldarg this
+        call instance System.Linq.WhereIterator<T>::Dispose()
+    End:
+        ldc.bool false
+        ret
+    .end
+    .method instance get_Current() -> T
+        ldarg this
+        ldfld System.Linq.WhereIterator<T>::Active
+        brfalse Invalid
+        ldarg this
+        ldfld System.Linq.WhereIterator<T>::Cached
+        ldc.i4 0
+        ldelem T
+        ret
+    Invalid:
+        fault "Query iterator has no current element"
+    .end
+    .method instance Dispose() -> noresult
+        ldarg this
+        ldfld System.Linq.WhereIterator<T>::Finished
+        brtrue End
+        ldarg this
+        ldc.bool true
+        stfld System.Linq.WhereIterator<T>::Finished
+        ldarg this
+        ldc.bool false
+        stfld System.Linq.WhereIterator<T>::Active
+        ldarg this
+        ldc.i4 0
+        array.reserve T
+        stfld System.Linq.WhereIterator<T>::Cached
+        ldarg this
+        ldfld System.Linq.WhereIterator<T>::Source
+        callvirt instance System.Disposable::Dispose()
+    End:
+        ret
+    .end
+.end
+
+.type internal class System.Linq.SelectSequence<T,U>
+    .implements System.Collections.Iterable<U>
+    .field private Source System.Collections.Iterable<T>
+    .field private Callback System.Func<T,U>
+    .method internal static Create(System.Collections.Iterable<T> source, System.Func<T,U> callback) -> System.Collections.Iterable<U>
+        ldarg source
+        ldarg callback
+        newobj System.Linq.SelectSequence<T,U>
+        castclass System.Collections.Iterable<U>
+        ret
+    .end
+    .method instance GetIterator() -> System.Collections.Iterator<U>
+        ldarg this
+        ldfld System.Linq.SelectSequence<T,U>::Source
+        callvirt instance System.Collections.Iterable<T>::GetIterator()
+        ldarg this
+        ldfld System.Linq.SelectSequence<T,U>::Callback
+        call System.Linq.SelectIterator<T,U>::Create(System.Collections.Iterator<T>,System.Func<T,U>)
+        ret
+    .end
+.end
+
+.type internal class System.Linq.SelectIterator<T,U>
+    .implements System.Collections.Iterator<U>
+    .field private Source System.Collections.Iterator<T>
+    .field private Callback System.Func<T,U>
+    ; A checked slot permits any T without manufacturing a default value.
+    .field private Cached arrayref<U>
+    .field private Active Boolean
+    .field private Finished Boolean
+    .method internal static Create(System.Collections.Iterator<T> source, System.Func<T,U> callback) -> System.Collections.Iterator<U>
+        ldarg source
+        ldarg callback
+        ldc.i4 1
+        array.reserve U
+        ldc.bool false
+        ldc.bool false
+        newobj System.Linq.SelectIterator<T,U>
+        castclass System.Collections.Iterator<U>
+        ret
+    .end
+    .method instance MoveNext() -> Boolean
+        .local T value
+        ldarg this
+        ldfld System.Linq.SelectIterator<T,U>::Finished
+        brtrue End
+        ldarg this
+        ldc.bool false
+        stfld System.Linq.SelectIterator<T,U>::Active
+    Next:
+        ldarg this
+        ldfld System.Linq.SelectIterator<T,U>::Source
+        callvirt instance System.Collections.Iterator<T>::MoveNext()
+        brfalse Finish
+        ldarg this
+        ldfld System.Linq.SelectIterator<T,U>::Source
+        callvirt instance System.Collections.Iterator<T>::get_Current()
+        stloc value
+        ldarg this
+        ldfld System.Linq.SelectIterator<T,U>::Cached
+        ldc.i4 0
+        ldarg this
+        ldfld System.Linq.SelectIterator<T,U>::Callback
+        ldloc value
+        callvirt instance System.Func<T,U>::Invoke(T)
+        stelem U
+        ldarg this
+        ldc.bool true
+        stfld System.Linq.SelectIterator<T,U>::Active
+        ldc.bool true
+        ret
+    Finish:
+        ldarg this
+        call instance System.Linq.SelectIterator<T,U>::Dispose()
+    End:
+        ldc.bool false
+        ret
+    .end
+    .method instance get_Current() -> U
+        ldarg this
+        ldfld System.Linq.SelectIterator<T,U>::Active
+        brfalse Invalid
+        ldarg this
+        ldfld System.Linq.SelectIterator<T,U>::Cached
+        ldc.i4 0
+        ldelem U
+        ret
+    Invalid:
+        fault "Query iterator has no current element"
+    .end
+    .method instance Dispose() -> noresult
+        ldarg this
+        ldfld System.Linq.SelectIterator<T,U>::Finished
+        brtrue End
+        ldarg this
+        ldc.bool true
+        stfld System.Linq.SelectIterator<T,U>::Finished
+        ldarg this
+        ldc.bool false
+        stfld System.Linq.SelectIterator<T,U>::Active
+        ldarg this
+        ldc.i4 0
+        array.reserve U
+        stfld System.Linq.SelectIterator<T,U>::Cached
+        ldarg this
+        ldfld System.Linq.SelectIterator<T,U>::Source
+        callvirt instance System.Disposable::Dispose()
+    End:
+        ret
+    .end
+.end

@@ -454,11 +454,13 @@ static class UnionImport
                             var interfaceCall = collectionProfile ? InterfaceBindings.Bind(reference, targetMethod) : null;
                             var nativeCall = collectionProfile ? NativeArrayBindings.Bind(reference, targetMethod) : null;
                             var reflectionCall = collectionProfile ? ReflectionBindings.Bind(reference, targetMethod) : null;
+                            var queryCall = collectionProfile ? QueryBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt) : null;
                             var arrayCallback = collectionProfile ? ArrayCallbackBindings.Bind(reference, targetMethod) : null;
                             var delegateCall = DelegateBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt);
                             if (interfaceCall is not null) call = new(interfaceCall.Name, interfaceCall.Arguments, interfaceCall.Result, Instruction: interfaceCall.Instruction);
                             else if (nativeCall is not null) call = new(nativeCall.Name, nativeCall.Arguments, nativeCall.Result);
                             else if (reflectionCall is not null) call = new(reflectionCall.Name, reflectionCall.Arguments, reflectionCall.Result);
+                            else if (queryCall is not null) call = new(queryCall.Name, queryCall.Arguments, queryCall.Result);
                             else if (arrayCallback is not null) call = new(arrayCallback.Name, arrayCallback.Arguments, arrayCallback.Result, Instruction: arrayCallback.Instruction);
                             else if (delegateCall is not null) call = new(delegateCall.Name, delegateCall.Arguments, delegateCall.Result, Instruction: delegateCall.Instruction);
                             else

@@ -80,6 +80,7 @@ def build(path: Path) -> str:
     result = ''.join(lines)
     if path.name == 'System.neoil':
         result += '\n.type class System.Object\n.end\n'
+        result += (ROOT / 'runtime/raven/Linq.neoil').read_text()
     return result
 
 

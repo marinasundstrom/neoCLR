@@ -20,6 +20,7 @@ files = '--files' in sys.argv[2:]
 strings = '--strings' in sys.argv[2:]
 patterns = '--patterns' in sys.argv[2:]
 extensions = '--extensions' in sys.argv[2:]
+queries = '--queries' in sys.argv[2:]
 server = json.loads((project / '.vscode/settings.json').read_text())['raven.languageServerPath']
 messages = queue.Queue()
 log = (project / 'lsp-stderr.log').open('wb')
@@ -329,6 +330,19 @@ try:
         labels = sorted({item['label'] for item in items})
         assert any(label == 'Next' or label.startswith('Next(') for label in labels), labels
         results['Extension receiver'] = labels
+    if queries:
+        for version, declaration in ((42, 'let values = ArrayList<int>()'),
+                                     (43, 'let values = ArrayList<int>().Where((value: int) -> bool => true)')):
+            text = ('import System.Collections.*\nimport System.Linq.*\n'
+                    'func Main() {\n    ' + declaration + '\n    values.\n}')
+            send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})
+            result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
+                'position': {'line': 4, 'character': len('    values.')},
+                'context': {'triggerKind': 2, 'triggerCharacter': '.'}}, True))
+            items = result if isinstance(result, list) else result['items']
+            labels = sorted({item['label'] for item in items})
+            assert {'Where', 'Select', 'ToList'}.issubset(labels), labels
+            results['Query extensions ' + str(version)] = labels
     receive(send('shutdown', None, True))
     send('exit', None)
     print(json.dumps(results, indent=2))
