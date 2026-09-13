@@ -136,6 +136,18 @@ static class SignatureProbe
         var getterReference = Reference(checkedGetter, readError);
         getterReference.ReturnType = module.TypeSystem.Int32;
         Reject("Error getter signature mismatch", () => ErrorBindings.Bind(getterReference, checkedGetter));
+        var environment = module.GetType("System.Environment");
+        var arguments = environment.Methods.Single(m => m.Name == "GetCommandLineArgs");
+        Check("Environment returns a managed string vector", ProcessBindings.Bind(Reference(arguments, environment), arguments)?.Result == "arrayref<String>");
+        var variable = environment.Methods.Single(m => m.Name == "GetEnvironmentVariable");
+        var variableCall = Reference(variable, environment);
+        Check("Environment closes nested Result/Option", ProcessBindings.Bind(variableCall, variable)?.Result == "System.Result<System.Option<String>,System.EnvironmentError>");
+        variableCall.Parameters[0].ParameterType = module.TypeSystem.Int32;
+        Reject("Environment name signature mismatch", () => ProcessBindings.Bind(variableCall, variable));
+        var console = module.GetType("System.Console");
+        var readByte = console.Methods.Single(m => m.Name == "ReadByte");
+        Check("Console retains Byte payload", ProcessBindings.Bind(Reference(readByte, console), readByte)?.Result == "System.Result<System.Option<Byte>,System.IO.ConsoleReadError>");
+        Check("Process vectors exclude multidimensional arrays", ProcessBindings.ArrayType(new ArrayType(module.TypeSystem.String, 2)) is null);
         var text = JsonSerializer.Serialize(checks, new JsonSerializerOptions { WriteIndented = true });
         File.WriteAllText(Path.Combine(output, "signature-checks.json"), text);
         Console.WriteLine(text);

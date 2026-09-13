@@ -34,11 +34,11 @@ assembly metadata reader or verifier.
 | Area | Current Raven evidence | Work to close the existing-library gap |
 | --- | --- | --- |
 | Numeric primitives, Boolean, Char, String, Value/Error and error unions | [Primitive storage and character APIs](raven-primitive-api.md), Int32/String/Boolean storage, [nine String methods](raven-string-api.md), [Int32.Parse](raven-parsing-api.md), [Int32.Divide](raven-division-api.md), [Int32 instance methods](raven-integer-api.md) and selected static calls; limited error carriers | Complete Boolean normalization and general interface/generic paths; [error-value APIs](raven-error-api.md) are projected |
-| Math and Console | All 20 existing Math methods ([Int32 Clamp](raven-clamp-api.md), [Double methods](raven-floating-math-api.md)) and WriteLine | Console input/error paths; broader numeric/compiler support remains separate |
+| Math and Console | All 20 existing Math methods ([Int32 Clamp](raven-clamp-api.md), [Double methods](raven-floating-math-api.md)) and [Console input/output](raven-process-api.md) | Broader numeric/compiler support remains separate |
 | Option, Result, Void and Propagatable | [Generic value-payload bindings](raven-union-api.md), case/carrier APIs, completion/error propagation and typed matching | Reference/application payload shapes and general generic paths |
 | File and Path | Bounded UTF-8 File calls, propagation, error predicates and [both Path methods](raven-path-api.md) | File-error APIs are projected; retain existing I/O contracts |
 | Date, Time, LocalDateTime and Clock | [All current calendar/clock methods](raven-calendar-api.md), validation Results and live-clock check | Error-value APIs are projected; interface dispatch remains separate |
-| Environment | Runtime implementations exist | Arguments, current directory and variable APIs with their existing errors/options |
+| Environment | [All three existing process APIs](raven-process-api.md), argument arrays, current directory and variable Results/Options | Retain live host semantics; environment mutation is not an existing API |
 | Array, ArrayList, List, Iterable, Iterator | Int32 vectors, class aliasing, selected collection members/foreach | Remaining array/collection contracts and element shapes; preserve reference categories and document cleanup limits |
 | Equatable, Comparable, Clonable, Disposable, Closable | Selected interface dispatch through collections | General existing interface contracts and representative runtime-library callers |
 | Func delegate families | Runtime declarations and invocation support exist | Raven target metadata and existing delegate API invocation; new closure/lambda features are not implied |

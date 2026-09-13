@@ -8,6 +8,7 @@ import threading
 
 project = Path(sys.argv[1]).resolve()
 collections = '--collections' in sys.argv[2:]
+process_apis = '--process' in sys.argv[2:]
 unions = '--unions' in sys.argv[2:]
 errors = '--errors' in sys.argv[2:]
 calendar = '--calendar' in sys.argv[2:]
@@ -232,6 +233,19 @@ try:
             labels = sorted({item['label'] for item in items})
             if any(not any(label == name or label.startswith(name + '(') for label in labels) for name in expected):
                 raise AssertionError('Missing union API: ' + str(labels))
+            results[expression] = labels
+    if process_apis:
+        for version, expression, expected in (
+            (25, 'System.Environment.', ('GetCommandLineArgs', 'GetCurrentDirectory', 'GetEnvironmentVariable')),
+            (26, 'System.Console.', ('WriteLine', 'ReadByte'))):
+            text = 'func Main() {\n    ' + expression + '\n}'
+            send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})
+            result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
+                'position': {'line': 1, 'character': len('    ' + expression)}, 'context': {'triggerKind': 1}}, True))
+            items = result if isinstance(result, list) else result['items']
+            labels = sorted({item['label'] for item in items})
+            if any(not any(label == name or label.startswith(name + '(') for label in labels) for name in expected):
+                raise AssertionError('Missing process API: ' + str(labels))
             results[expression] = labels
     receive(send('shutdown', None, True))
     send('exit', None)

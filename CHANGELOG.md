@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Projected Console.ReadByte and all three existing Environment APIs through Raven,
+  including nested Result/Option propagation and managed string argument arrays.
+  Added controlled environment/argument/byte-input tests, signature rejection and
+  completion checks. Argument snapshots currently copy through an adapter; installed
+  SDK/extension packages have not been refreshed.
+
 - Added typed-null String defaults for managed locals, constructed fields and array
   elements, aligning string-array initialization with CLR expectations. This
   replaces the previous default-initialization fault; intrinsic string receiver

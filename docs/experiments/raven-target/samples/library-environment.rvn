@@ -1,0 +1,32 @@
+import System.*
+import System.Console.*
+
+func Read(name: string) -> Result<Option<string>, EnvironmentError> {
+    let value = Environment.GetEnvironmentVariable(name)?
+    return Result<Option<string>, EnvironmentError>.Ok(value)
+}
+func Show(name: string) {
+    let result = Read(name)
+    if result is Result.Ok<Option<string>> ok {
+        if ok.Value is Option.Some<string> some { WriteLine(some.Value) }
+        else { WriteLine("Missing") }
+    } else if result is Result.Error<EnvironmentError> error {
+        WriteLine(error.Value.ToString())
+    }
+}
+func Main() {
+    let arguments = Environment.GetCommandLineArgs()
+    WriteLine(arguments.Length)
+    WriteLine(arguments[1])
+    let alias = arguments
+    alias[1] = "Changed"
+    WriteLine(arguments[1])
+    let fresh = Environment.GetCommandLineArgs()
+    WriteLine(fresh[1])
+    let directory = Environment.GetCurrentDirectory()
+    if directory is Result.Ok<string> ok { WriteLine(ok.Value) }
+    Show("NEOCLR_API_PRESENT")
+    Show("NEOCLR_API_EMPTY")
+    Show("NEOCLR_API_MISSING")
+    Show("invalid=name")
+}

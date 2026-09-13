@@ -45,7 +45,7 @@ static class UnionImport
         {
             var collection = CollectionBindings.Type(type);
             if (collection is not null && collectionProfile) return collection;
-            return GenericUnionBindings.Type(type) ?? CalendarBindings.Type(type) ?? PrimitiveBindings.Type(type) ?? ResultBindings.Type(type) ?? Type(type, result);
+            return ProcessBindings.ArrayType(type) ?? GenericUnionBindings.Type(type) ?? CalendarBindings.Type(type) ?? PrimitiveBindings.Type(type) ?? ResultBindings.Type(type) ?? Type(type, result);
         }
         var output = new StringBuilder($".module ImportedUnion\n.entry {Name(entry)}\n");
         var mappings = new List<object>();
@@ -63,7 +63,7 @@ static class UnionImport
             var args = method.Parameters.Select(p => ProfileType(p.ParameterType)).ToArray();
             var result = ProfileType(method.ReturnType, true);
             var locals = method.Body.Variables.Select(v => ProfileType(v.VariableType)).ToArray();
-            if (locals.Any(t => !GenericUnionBindings.IsType(t) && !CalendarBindings.Types.Contains(t) && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
+            if (locals.Any(t => t != "arrayref<String>" && !GenericUnionBindings.IsType(t) && !CalendarBindings.Types.Contains(t) && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
                 throw new InvalidDataException("Unsupported local default in Result profile.");
             NormalizePatternBranches(method);
             var instructions = method.Body.Instructions.ToArray();
@@ -118,15 +118,20 @@ static class UnionImport
                         code.AppendLine("fault \"Guest program reached a terminal failure\"");
                         terminates = true; break;
                     case Code.Newarr:
-                        if (Type((TypeReference)instruction.Operand) != "Int32")
-                            throw new InvalidDataException("Only Int32 vector allocation is admitted.");
-                        Expect("Int32"); Push(new(IntArray)); code.AppendLine("newarr Int32"); break;
+                        var element = ProfileType((TypeReference)instruction.Operand);
+                        if (element is not ("Int32" or "String")) throw new InvalidDataException("Unsupported vector allocation element.");
+                        Expect("Int32"); Push(new("arrayref<" + element + ">")); code.AppendLine("newarr " + element); break;
                     case Code.Ldlen:
-                        Expect(IntArray); Push(new("UIntPtr")); code.AppendLine("ldlen"); break;
+                        if (Pop().Type is not (IntArray or "arrayref<String>")) throw new InvalidDataException("Unsupported vector length receiver.");
+                        Push(new("UIntPtr")); code.AppendLine("ldlen"); break;
                     case Code.Ldelem_I4:
                         Expect("Int32"); Expect(IntArray); Push(new("Int32")); code.AppendLine("ldelem Int32"); break;
                     case Code.Stelem_I4:
                         Expect("Int32"); Expect("Int32"); Expect(IntArray); code.AppendLine("stelem Int32"); break;
+                    case Code.Ldelem_Ref:
+                        Expect("Int32"); Expect("arrayref<String>"); Push(new("String")); code.AppendLine("ldelem String"); break;
+                    case Code.Stelem_Ref:
+                        Expect("String"); Expect("Int32"); Expect("arrayref<String>"); code.AppendLine("stelem String"); break;
                     case Code.Ldsfld:
                         var field = ((FieldReference)instruction.Operand).Resolve();
                         if (field is null || field.Module != app.MainModule || field.FullName != "System.Unit System.Unit::Value"
@@ -278,7 +283,7 @@ static class UnionImport
             for (var n = 0; n < locals.Length; n++) output.AppendLine($".local {locals[n]} local{n}");
             if (method.Body.InitLocals)
                 for (var n = 0; n < locals.Length; n++)
-                    if (locals[n] == IntArray || CollectionBindings.IsReference(locals[n]) || CalendarBindings.Types.Contains(locals[n]) || GenericUnionBindings.IsType(locals[n]) && !GenericUnionBindings.RequiresInitialization(locals[n])) output.AppendLine($"ldloca local{n}\ninitobj {locals[n]}");
+                    if (locals[n] is IntArray or "arrayref<String>" || CollectionBindings.IsReference(locals[n]) || CalendarBindings.Types.Contains(locals[n]) || GenericUnionBindings.IsType(locals[n]) && !GenericUnionBindings.RequiresInitialization(locals[n])) output.AppendLine($"ldloca local{n}\ninitobj {locals[n]}");
                     else if (locals[n] != Carrier && locals[n] != Option && locals[n] != VoidOption && locals[n] != VoidResult && locals[n] != "String" && !NeedsInitialization(locals[n])) output.AppendLine(Default(locals[n]) + $"\nstloc local{n}");
             foreach (var index in bodies.Keys.Order())
             {
@@ -299,7 +304,7 @@ static class UnionImport
                 if (changed) work.Enqueue(index);
             }
         }
-        output.Append(Adapters()).Append(ResultBindings.Adapters()).Append(StringBindings.Adapters()).AppendLine(Int32Bindings.Adapters).AppendLine(DoubleBindings.Adapters).Append(PrimitiveBindings.Adapters).Append(CalendarBindings.Adapters).Append(ErrorBindings.Adapters()).Append(GenericUnionBindings.Adapters);
+        output.Append(Adapters()).Append(ResultBindings.Adapters()).Append(StringBindings.Adapters()).AppendLine(Int32Bindings.Adapters).AppendLine(DoubleBindings.Adapters).Append(PrimitiveBindings.Adapters).Append(CalendarBindings.Adapters).Append(ErrorBindings.Adapters()).Append(GenericUnionBindings.Adapters).AppendLine(ProcessBindings.Adapters);
         File.WriteAllText(destination, output.ToString());
         File.WriteAllText(destination + ".map.json", JsonSerializer.Serialize(new {
             Profile = collectionProfile ? "result-option-void-files-strings-collections-v8" : "result-option-void-files-strings-arrays-v7",
@@ -374,7 +379,7 @@ static class UnionImport
             throw new InvalidDataException("Unsupported runtime signature.");
         // Reuse the declaration catalog for its bounded static Int32 APIs. Check
         // both sides before mapping a resolved CLI reference to the runtime library.
-        var file = GenericUnionBindings.Bind(reference, definition) ?? ErrorBindings.Bind(reference, definition) ?? CalendarBindings.Bind(reference, definition) ?? PrimitiveBindings.Bind(reference, definition) ?? DoubleBindings.Bind(reference, definition) ?? Int32Bindings.Bind(reference, definition) ?? PathBindings.Bind(reference, definition) ?? FileBindings.Bind(reference, definition) ?? ResultBindings.Bind(reference, definition);
+        var file = ProcessBindings.Bind(reference, definition) ?? GenericUnionBindings.Bind(reference, definition) ?? ErrorBindings.Bind(reference, definition) ?? CalendarBindings.Bind(reference, definition) ?? PrimitiveBindings.Bind(reference, definition) ?? DoubleBindings.Bind(reference, definition) ?? Int32Bindings.Bind(reference, definition) ?? PathBindings.Bind(reference, definition) ?? FileBindings.Bind(reference, definition) ?? ResultBindings.Bind(reference, definition);
         if (file is not null)
         {
             if (file.OutArgument >= 0 || reference.Name == "FromResidual") ValidatePropagation(definition.DeclaringType);
