@@ -12,6 +12,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   APIs and preview limits, with excerpts built from executable samples. Added a
   separate GitHub Pages workflow: pull requests build/check; main and manual runs
   publish through a restricted deployment job. Documented local preview and hosting.
+  Enabled Pages and verified the successful deployment and live asset contents at
+  https://marinasundstrom.github.io/neoCLR/.
 
 - Built and locally validated the runtime/Raven candidate with direct neoIL samples,
   source archive, toolchain notices and matching .6 Raven SDK/VSIX. Ten extracted

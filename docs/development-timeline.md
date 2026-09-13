@@ -1807,7 +1807,11 @@ preview boundaries and links to documentation. Earlier Neo work is linked as his
 The page distinguishes published previews from the locally validated Raven candidate.
 Desktop/mobile layout and navigation were inspected in a browser. A separate Pages
 workflow builds on relevant changes and deploys only from main; pull requests do not
-receive deployment permissions. Hosting outcome is recorded after the workflow runs.
+receive deployment permissions. GitHub Pages was enabled with GitHub Actions as the publishing source. The
+[build and deployment run](https://github.com/marinasundstrom/neoCLR/actions/runs/34745892835)
+succeeded for `edae382`; the [live site](https://marinasundstrom.github.io/neoCLR/)
+was opened and its HTML/CSS/icon bytes verified against the build. Website publication
+does not publish or tag the runtime/Raven release candidate.
 
 ## Maintaining the conversation record
 
