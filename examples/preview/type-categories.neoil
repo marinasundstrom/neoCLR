@@ -1,0 +1,54 @@
+.module TypeCategories
+.entry Main
+
+; Classes share identity; a plain value declaration copies its fields.
+.type class Counter
+.field Count Int32
+.method instance .ctor(Int32 count) -> noresult
+    ldarg this
+    ldarg count
+    stfld Counter::Count
+    ret
+.end
+.end
+.type Point
+.field X Int32
+.end
+
+.function Main() -> noresult
+    .local Counter original
+    .local Counter alias
+    .local Point point
+    .local Point copy
+    ldc.i4 1
+    newobj instance Counter::.ctor(Int32)
+    stloc original
+    ldloc original
+    stloc alias
+    ldloc alias
+    ldc.i4 42
+    stfld Counter::Count
+    ldloc original
+    ldfld Counter::Count
+    call System.Console::WriteLine(Int32)
+    pop
+
+    ldc.i4 7
+    newobj Point
+    stloc point
+    ldloc point
+    stloc copy
+    ldloca copy
+    ldc.i4 9
+    stfld Point::X
+    pop
+    ldloc point
+    ldfld Point::X
+    call System.Console::WriteLine(Int32)
+    pop
+    ldloc copy
+    ldfld Point::X
+    call System.Console::WriteLine(Int32)
+    pop
+    ret
+.end

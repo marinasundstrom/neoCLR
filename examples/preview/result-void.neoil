@@ -1,0 +1,34 @@
+.module ResultVoid
+.entry Main
+
+; Void is a generic unit payload. A noresult call has no evaluation-stack result.
+.function Complete() -> System.Result<Void,Error>
+    ldvoid
+    newobj instance System.Result.Ok<Void>::.ctor(Void)
+    newobj instance System.Result<Void,Error>::.ctor(System.Result.Ok<Void>)
+    ret
+.end
+.function Reject() -> System.Result<Void,Error>
+    ldstr "Not saved"
+    call System.Error::FromMessage(String)
+    newobj instance System.Result.Error<Error>::.ctor(Error)
+    newobj instance System.Result<Void,Error>::.ctor(System.Result.Error<Error>)
+    ret
+.end
+.function Main() -> noresult
+    call Complete()
+    call instance System.Result<Void,Error>::get_IsOkCase()
+    brfalse Unexpected
+    ldstr "Completed"
+    call System.Console::WriteLine(String)
+    pop
+    call Reject()
+    call instance System.Result<Void,Error>::GetErrorCase()
+    call instance System.Result.Error<Error>::get_Value()
+    call instance System.Error::ToString()
+    call System.Console::WriteLine(String)
+    pop
+    ret
+Unexpected:
+    fault "Expected successful completion"
+.end

@@ -36,11 +36,14 @@ output is a temporary internal format, not that final binary representation. See
 [format direction](docs/format-direction.md) and
 [assembler expressiveness](docs/assembler-design.md).
 
-## Try the Raven runtime API experiment
+## Try the runtime and Raven experiment
 
 The current proof of concept demonstrates collections and iteration, Result/Option
 propagation, text and numeric helpers, files, date/time, reflection introspection,
 delegates, interfaces and native buffers. Its provisional APIs are open to feedback.
+
+Start with the [runtime and Raven walkthrough](docs/runtime-raven-preview.md), covering
+direct neoIL execution and Raven against the same library.
 
 Follow the [VS Code setup](docs/experiments/raven-target/VSCODE.md) for the locally
 validated macOS arm64 SDK/extension and portable demo. It provides completion and

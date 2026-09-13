@@ -1,5 +1,9 @@
 # Neo slice plan
 
+> Historical concept-language experiment. The current release focus is neoCLR with
+> Raven; this frontend is outside that migration. Start with the
+> [runtime and Raven walkthrough](runtime-raven-preview.md) for the current direction.
+
 The [library-focused next preview](library-preview.md) prioritizes shared type
 relationships, interface inheritance and class inheritance to support useful library
 contracts and their Neo projection. [Interface inheritance](interface-inheritance.md)

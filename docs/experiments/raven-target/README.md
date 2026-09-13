@@ -1,4 +1,10 @@
-# Raven target emission probe
+# Raven targeting neoCLR
+
+Start with the [runtime and Raven release walkthrough](../../runtime-raven-preview.md)
+and [current VS Code setup](VSCODE.md). The existing runtime API pass is complete for
+the bounded POC, with coverage and limits [recorded here](../../raven-runtime-api-coverage.md).
+The source-probe sections below retain the history of earlier integration slices;
+their old tool versions and admission limits do not describe the latest bundle.
 
 Normal `neoclr run` now prints only guest output. Older recorded transcripts below
 include a historical `=> Void` runner suffix; it is no longer emitted by default.

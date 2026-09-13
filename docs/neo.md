@@ -1,5 +1,9 @@
 # Neo concept language
 
+> Historical concept-language experiment. The current release focus is neoCLR with
+> Raven; this frontend is outside that migration. Start with the
+> [runtime and Raven walkthrough](runtime-raven-preview.md) for the current direction.
+
 Neo is a small high-level concept language for exercising NeoCLR end to end. Its
 syntax is inspired by Raven: `func`, `record`, `let`/`var`, name-before-type
 annotations, braces, and `()` for an empty result. Neo compiles to ordinary neoIL and

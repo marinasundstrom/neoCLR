@@ -8,6 +8,17 @@ and VS Code VSIX are distributed separately. This is not a normal Raven release.
 Prerequisites: .NET 11 SDK/runtime (the manifest records the tested preview), Python
 3.9 or later, and VS Code with the matching experimental Raven extension for editing.
 
+You can first try the runtime directly, without the Raven tools:
+
+```sh
+./bin/neoclr run samples/neoil/type-categories.neoil --system lib/System.neoil
+./bin/neoclr run samples/neoil/result-void.neoil --system lib/System.neoil
+```
+
+Expect `42`, `7`, `9` from the first, and `Completed`, `Not saved` from the second.
+The [release walkthrough](docs/runtime-raven-preview.md) explains both runtime and
+Raven entry points. Continue with Raven and VS Code:
+
 1. Extract this folder. Install the matching `raven-vscode.vsix` using VS Code's
    **Extensions: Install from VSIX** command, or `code --install-extension PATH`.
 2. Run `python3 configure.py` from this folder. If you separately installed the SDK,
@@ -29,7 +40,13 @@ Terminal equivalent, from this folder:
 python3 tools/run_project.py demo/Demo.rvnproj --bridge tools/bridge/Probe.dll --system lib/System.neoil --runtime bin/neoclr
 ```
 
-Run the repeatable sample suite:
+Verify both runtime-level neoIL samples:
+
+```sh
+python3 tools/verify_neoil.py --samples samples/neoil --system lib/System.neoil --runtime bin/neoclr
+```
+
+Run the repeatable Raven sample suite:
 
 ```sh
 python3 tools/verify_project.py demo/Demo.rvnproj --collections --bridge tools/bridge/Probe.dll --system lib/System.neoil --runtime bin/neoclr

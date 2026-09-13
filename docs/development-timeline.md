@@ -1759,6 +1759,28 @@ provide the runnable entry point. No public release was made. Full compiler pari
 general application-type admission and fault-unwind cleanup remain outside this
 completed existing-library pass.
 
+## 2026-09-13 — Present the runtime and Raven as the release
+
+**Author direction.** The author specified a runtime preview with neoIL samples,
+Raven samples and the special Raven distribution that can target neoCLR, accompanied
+by release documentation. The old Neo language material should be separated from the
+main experiment. The purpose is to show “that we're actually using a real CLR language
+and adapting it for our new CLR-like runtime” and demonstrate the platform changes
+working in Raven.
+
+**Assistant response and action.** Organized the release guide around two entry
+points: direct runtime execution using neoIL, and Raven compiled against the adapted
+runtime library. Added executable neoIL examples for class aliasing/value copying
+and Result<Void, Error>, with a repeatable verifier/output check and bundle inclusion.
+Marked the Neo guide and plan as historical, retaining their implementation and prior
+published notes. The primary README now links the runtime/Raven walkthrough.
+
+**Outcome and remaining work.** Both new neoIL samples verified and ran against the
+validated local adapted library. The source packaging recipe now includes them; this
+does not retroactively change the existing .6 archive. A fresh candidate, its complete
+asset attribution and package validation, and publication remain release work. No
+claim of general Raven/CLR binary compatibility accompanies these demonstrations.
+
 ## Maintaining the conversation record
 
 Append significant exchanges with the date on which they are recorded. Capture the

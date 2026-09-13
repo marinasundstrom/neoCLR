@@ -47,9 +47,10 @@ shutil.copy2(runtime, output / 'bin/neoclr')
 (output / 'lib/System.neoil').write_text(build(ROOT / 'runtime/System.neoil'))
 shutil.copytree(sdk / 'tools/language-server', output / 'tools/server')
 for name in ('run_project.py', 'runner_options.py', 'configure_tasks.py', 'verify_project.py',
-             'verify_editor.py', 'verify_file_project.py', 'verify_process.py', 'verify_clock.py', 'verify_error_values.py',
+             'verify_editor.py', 'verify_neoil.py', 'verify_file_project.py', 'verify_process.py', 'verify_clock.py', 'verify_error_values.py',
              'verify_unions.py', 'verify_delegates.py', 'verify_native_buffer.py'):
     shutil.copyfile(HERE / name, output / 'tools' / name)
+shutil.copytree(ROOT / 'examples/preview', output / 'samples/neoil')
 shutil.copytree(HERE / 'samples', output / 'tools/samples')
 shutil.copytree(HERE / 'samples', output / 'docs/experiments/raven-target/samples')
 for path in (ROOT / 'docs').glob('*.md'):

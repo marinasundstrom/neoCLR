@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Added a runtime/Raven release walkthrough and direct neoIL demonstrations for
+  class aliasing/value copies and Result<Void, Error>, verified against the adapted
+  library. Bundles now include these samples and their repeatable output check.
+  Marked old Neo language guides as historical and recorded the two-part release
+  direction; existing local archives remain unchanged pending a fresh candidate.
+
 - Updated the repository introduction and roadmap to present the current Raven/CLR
   type-category direction and completed runtime API milestone, separating the legacy
   Neo experiment. Future portable bundles now include both repositories' license and

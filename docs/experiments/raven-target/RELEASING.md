@@ -7,6 +7,13 @@ not merge or tag Raven main just to ship this bundle.
 
 ## Scope and evidence
 
+The [release walkthrough](../../runtime-raven-preview.md) defines two primary paths:
+the runtime with `samples/neoil`, and Raven programs with the matching experimental
+SDK/VSIX. Keep old Neo language material historical and outside the main demonstration.
+Run `tools/verify_neoil.py --samples samples/neoil --system lib/System.neoil --runtime bin/neoclr`
+from the extracted bundle in addition to the Raven checks below. A complete release
+must carry both paths and their documentation, not just compiler integration assets.
+
 Use [the neoCLR preview acceptance criteria](../../raven-preview-acceptance.md) for
 what the demonstration must expose. All existing public runtime APIs are in scope;
 full CLR/compiler feature parity is not. Maintain the supported/unsupported matrix
