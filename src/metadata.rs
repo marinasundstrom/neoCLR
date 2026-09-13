@@ -82,8 +82,17 @@ impl Type {
         }
     }
 
+    pub(crate) fn generic_arguments(&self) -> &[Type] {
+        match self {
+            Self::Constructed { arguments, .. } => arguments,
+            Self::ArrayRef(element) => std::slice::from_ref(element.as_ref()),
+            _ => &[],
+        }
+    }
+
     pub fn definition_name(&self) -> Option<&str> {
         match self {
+            Self::ArrayRef(_) => Some("System.Array"),
             Self::Void => Some("System.Void"),
             Self::Single => Some("System.Single"),
             Self::Double => Some("System.Double"),
@@ -225,7 +234,12 @@ pub struct EnumMember {
 
 impl TypeDef {
     pub(crate) fn open_type(&self) -> Type {
-        if self.generic_parameters.is_empty() {
+        if self.is_reference_type
+            && self.name == "System.Array"
+            && self.generic_parameters.len() == 1
+        {
+            Type::ArrayRef(Box::new(Type::TypeParameter(0)))
+        } else if self.generic_parameters.is_empty() {
             Type::from_name(&self.name)
         } else {
             Type::Constructed {
@@ -813,11 +827,14 @@ impl Module {
         let name = ty.definition_name()?;
         let arity = match ty {
             Type::Constructed { arguments, .. } => arguments.len(),
+            Type::ArrayRef(_) => 1,
             _ => 0,
         };
-        self.types
-            .iter()
-            .find(|def| def.name == name && def.generic_parameters.len() == arity)
+        self.types.iter().find(|def| {
+            def.name == name
+                && def.generic_parameters.len() == arity
+                && (!matches!(ty, Type::ArrayRef(_)) || def.is_reference_type)
+        })
     }
 
     /// Enumerate ordinary nested definitions owned by a type definition.

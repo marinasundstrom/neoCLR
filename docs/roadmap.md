@@ -315,7 +315,7 @@ to the published Preview 1 release gates.
 
 | Decision | Why it matters next | Recommended next step |
 | --- | --- | --- |
-| Payload layout and ownership | String, errors and ordinary union carriers have no native layout, so the native Array buffer cannot hold them; managed ArrayList now can | Specify copy, replacement, release and active-payload rules; prove nested Result and String collection workloads before retiring System.Value |
+| Payload layout and ownership | String, errors and ordinary union carriers have no native layout; managed arrays and ArrayList hold these payloads. The Raven profile removes the old native Array descriptor in favor of explicit NativeMemory | Specify copy, replacement, release and active-payload rules; prove nested Result and String collection workloads before retiring System.Value |
 | Scoped type identity | Scoped source operands currently normalize to unique names; colliding names cannot coexist across modules | Carry resolved definition identities through signatures and caches before general loading or cross-build compilation caches |
 | Verification and required Faults | Verification is optional and pointer side tables include prototype diagnostics | Classify required checks, verified preconditions and optional diagnostics before an optimized backend; decide which execution profiles require verification |
 | Managed reference extensions | Field paths, heap/frame references and readonly signatures are implemented; richer type relationships and lifetime analysis remain | Preserve access and owner identity through future base projections, nullable signatures and captures |

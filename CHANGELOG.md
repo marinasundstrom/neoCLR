@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Added the generic managed System.Array<T> shape to the Raven runtime profile,
+  sharing identity/storage with ordinary array signatures and explicitly declaring
+  Iterable<T>. Added Length/Item members and closed generic/member reflection.
+  Mutable arrays remain invariant; no wrapper allocation or growable List contract
+  is added. Removed the profile's native array descriptor without a compatibility
+  alias; added bounded NativeMemory.Alloc/Free APIs and direct IL examples. Updated
+  samples and documented remaining Raven native-cast gaps and historical Neo scope.
+
 - Added a bounded read-only view experiment in Raven and direct IL, with .NET/API
   comparisons and checks for live aliases, shared element identity, GC retention,
   access restrictions, bounds and null behavior. Recorded generic-variance prerequisites

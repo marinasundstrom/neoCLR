@@ -18,17 +18,14 @@ with tempfile.TemporaryDirectory(prefix='neoclr-native-check-') as temporary:
         shutil.copyfile(args.project.resolve().parent / name, root / name)
     command = [sys.executable, str(bridge / 'run_project.py'), str(root / 'Demo.rvnproj'), *runner_arguments(args), '--runtime', str(args.runtime.resolve())]
     for name, body in [
-        ('negative length', 'let values = Array<int>.Allocate(-1, 0)'),
-        ('bounds', 'let values = Array<int>.Allocate(1, 0)\nConsole.WriteLine(values[1])'),
-        ('after free', 'let values = Array<int>.Allocate(1, 0)\nlet pointer = values.GetElementAddress(0)\nvalues.Free()\nConsole.WriteLine(*pointer)'),
-        ('double free', 'let values = Array<int>.Allocate(1, 0)\nvalues.Free()\nvalues.Free()')]:
-        (root / 'Main.rvn').write_text('import System.*\nunsafe func Main() {\n' + body + '\n}')
+        ('double free', 'let pointer = NativeMemory.Alloc(default(nuint))\nNativeMemory.Free(pointer)\nNativeMemory.Free(pointer)')]:
+        (root / 'Main.rvn').write_text('import System.*\nimport System.Runtime.InteropServices.*\nunsafe func Main() {\n' + body + '\n}')
         result = subprocess.run(command, capture_output=True, text=True, timeout=90)
         if result.returncode == 0 or 'Fault:' not in result.stderr:
             raise AssertionError(name + ': ' + result.stdout + result.stderr)
     before = set(root.rglob('App.neoil'))
-    (root / 'Main.rvn').write_text('import System.*\nunsafe func Main() { let values = Array<string>.Allocate(1, "managed") }')
+    (root / 'Main.rvn').write_text('import System.*\nimport System.Runtime.InteropServices.*\nunsafe func Main() { let values = Array<string>.Allocate(1, "managed") }')
     result = subprocess.run(command, capture_output=True, text=True, timeout=90)
     if result.returncode == 0 or set(root.rglob('App.neoil')) != before:
-        raise AssertionError('Managed native element admitted: ' + result.stdout + result.stderr)
-print('Native length/bounds/lifetime faults and unsupported managed layout rejection passed')
+        raise AssertionError('Removed native array API admitted: ' + result.stdout + result.stderr)
+print('Native release fault and removed array descriptor API rejection passed')

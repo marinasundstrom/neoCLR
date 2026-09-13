@@ -1,6 +1,6 @@
 # Collection contracts: candidates for review
 
-Recorded 2026-09-13. The author wants to review collection/enumerable APIs before
+Recorded 2026-09-13. The [first generic-array slice](generic-managed-arrays.md) now implements the managed shape and its explicit Iterable<T> declaration in the Raven profile. The author wants to review collection/enumerable APIs before
 accumulating readonly, immutable and frozen contracts. The following proposals are
 inputs, not selected library declarations. Keep the implemented List<T> and ArrayList<T>
 contracts unchanged during this review; mutable arrays remain invariant.
@@ -180,3 +180,14 @@ and indexing-cost contracts. Then choose the minimal read/iteration contracts to
 support with standard variance metadata. System.Array<T> is the selected array direction; the surrounding hierarchy and its
 implementation remain open. No renamed List contract, implicit variance conversion or
 immutable/frozen implementation is adopted in this document.
+
+## Implementation follow-up
+
+The author confirmed that compatibility with prior iterations is unnecessary and
+asked whether Array<T> should implement interfaces. The active Raven profile now
+removes the native descriptor entirely, introduces a bounded NativeMemory API and
+declares Iterable<T> on the managed Array<T> definition. This supersedes the earlier
+proposal to preserve native operations under a temporary descriptor name. The
+current List<T> is not added because its Add operation requires growth. See the
+[implementation and remaining limits](generic-managed-arrays.md). Earlier planning
+statements above describe the state before that slice.

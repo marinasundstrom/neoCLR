@@ -1,0 +1,36 @@
+import System.*
+import System.Console.*
+import System.Collections.*
+import System.Linq.*
+
+func Sum(values: Iterable<int>) -> int {
+    var total = 0
+    for value in values {
+        total += value
+    }
+    return total
+}
+
+func Main() {
+    let values: int[] = [7, 8]
+    let alias = values
+    alias[0] = 42
+    WriteLine(values[0])
+    WriteLine(values.Length)
+
+    let shape = typeof(int[])
+    WriteLine(shape.GenericArgumentCount)
+    WriteLine(shape.GetGenericArguments()[0].Name)
+    WriteLine(shape.GetFields().Length)
+    for property in shape.GetProperties() {
+        WriteLine(property.Name)
+    }
+    WriteLine(shape.GetInterfaces().Length)
+
+    for value in values {
+        WriteLine(value)
+    }
+    WriteLine(Sum(values))
+    let copy = values.ToList()
+    WriteLine(copy.Count)
+}

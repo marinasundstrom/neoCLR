@@ -5,6 +5,13 @@ subsets when a real program or compiler feature needs them. The aim is familiar 
 and other .NET-language ergonomics over neoCLR's documented differences, not a complete
 BCL before the platform is useful. Follow the [platform direction](platform-direction.md).
 
+The first [generic managed-array prototype](generic-managed-arrays.md) now runs in
+the Raven profile, including declared Iterable<T>, indexed array loops and shared
+extension-method use. NativeMemory replaces the old native descriptor without an
+alias. Next refine the minimal counted/indexed collection contracts; full compiler
+projection of the generic array name and native conversion support remain bounded
+follow-ups, not prerequisites for ordinary T[] use.
+
 ## Immediate implementation priorities (2026-09-13)
 
 The author prioritizes arrays, collection interfaces and basic implementations as

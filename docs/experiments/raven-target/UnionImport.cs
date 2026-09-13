@@ -26,7 +26,7 @@ static class UnionImport
     public static void Write(string application, string core, string destination, bool collectionProfile = false)
     {
         GenericUnionBindings.Reset();
-        CollectionBindings.Reset(); ReflectionBindings.Reset(); NativeArrayBindings.Reset();
+        CollectionBindings.Reset(); ReflectionBindings.Reset();
         DelegateBindings.Reset();
         foreach (var path in new[] { application, core })
             if (new FileInfo(path).Length > 16 * 1024 * 1024) throw new InvalidDataException("Image exceeds profile limit.");
@@ -43,12 +43,12 @@ static class UnionImport
         var entry = app.EntryPoint ?? throw new InvalidDataException("Missing entry point.");
         if (entry.Parameters.Count != 0 || entry.ReturnType.MetadataType != MetadataType.Void)
             throw new InvalidDataException("Result profile requires a parameterless no-result entry.");
-        if (collectionProfile) { InterfaceBindings.Validate(library.MainModule); CollectionBindings.Validate(library.MainModule); ReflectionBindings.Validate(library.MainModule); NativeArrayBindings.Validate(library.MainModule); }
+        if (collectionProfile) { InterfaceBindings.Validate(library.MainModule); CollectionBindings.Validate(library.MainModule); ReflectionBindings.Validate(library.MainModule); NativeMemoryBindings.Validate(library.MainModule); }
         string ProfileType(TypeReference type, bool result = false)
         {
             var collection = CollectionBindings.Type(type);
             if (collection is not null && collectionProfile) return collection;
-            return ApplicationTypes.Type(type) ?? InterfaceBindings.Type(type) ?? NativeArrayBindings.Type(type) ?? ReflectionBindings.Type(type) ?? DelegateBindings.Type(type) ?? ProcessBindings.ArrayType(type) ?? GenericUnionBindings.Type(type) ?? CalendarBindings.Type(type) ?? PrimitiveBindings.Type(type) ?? ResultBindings.Type(type) ?? Type(type, result);
+            return ApplicationTypes.Type(type) ?? InterfaceBindings.Type(type) ?? NativeMemoryBindings.Type(type) ?? ReflectionBindings.Type(type) ?? DelegateBindings.Type(type) ?? ProcessBindings.ArrayType(type) ?? GenericUnionBindings.Type(type) ?? CalendarBindings.Type(type) ?? PrimitiveBindings.Type(type) ?? ResultBindings.Type(type) ?? Type(type, result);
         }
         var output = new StringBuilder($".module ImportedUnion\n.entry {Name(entry)}\n");
         var coercions = new Dictionary<string, (string Name, string Body)>();
@@ -86,7 +86,7 @@ static class UnionImport
             var emitInstance = method.HasThis && !valueConstructor;
             var result = ProfileType(method.ReturnType, true);
             var locals = method.Body.Variables.Select(v => ProfileType(v.VariableType)).ToArray();
-            if (locals.Any(t => !ApplicationTypes.IsType(t) && !ManagedArrayBindings.IsType(t) && t != "System.Object" && !InterfaceBindings.IsInterface(t) && !NativeArrayBindings.IsType(t) && !NativeArrayBindings.IsPointer(t) && !ReflectionBindings.IsType(t) && t != "arrayref<String>" && !DelegateBindings.IsType(t) && !GenericUnionBindings.IsType(t) && !CalendarBindings.Types.Contains(t) && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
+            if (locals.Any(t => !ApplicationTypes.IsType(t) && !ManagedArrayBindings.IsType(t) && t != "System.Object" && !InterfaceBindings.IsInterface(t) && !NativeMemoryBindings.IsPointer(t) && !ReflectionBindings.IsType(t) && t != "arrayref<String>" && !DelegateBindings.IsType(t) && !GenericUnionBindings.IsType(t) && !CalendarBindings.Types.Contains(t) && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
                 throw new InvalidDataException("Unsupported local default in Result profile.");
             NormalizePatternBranches(method);
             var instructions = method.Body.Instructions.ToArray();
@@ -235,10 +235,7 @@ static class UnionImport
                             if (!ApplicationTypes.Assignable(receiver, appRead.Owner) && receiver != appRead.Owner + "&") throw new InvalidDataException("Invalid application field receiver.");
                             Push(new(PrimitiveBindings.Stack(appRead.Type))); code.AppendLine($"ldfld {appRead.Owner}::{appRead.Name}"); break;
                         }
-                        var readShape = NativeArrayBindings.Field(readField);
-                        var fieldReceiver = Pop();
-                        if (fieldReceiver.Type != readShape.Owner && fieldReceiver.Type != readShape.Owner + "&") throw new InvalidDataException("Invalid native buffer field receiver.");
-                        Push(new(PrimitiveBindings.Stack(readShape.Type))); code.AppendLine($"ldfld {readShape.Owner}::{readField.Name}"); break;
+                        throw new InvalidDataException("Unsupported runtime field read.");
                     case Code.Stfld:
                         if (!collectionProfile) throw new InvalidDataException("Native fields require target profile.");
                         var writeField = (FieldReference)instruction.Operand;
@@ -250,9 +247,7 @@ static class UnionImport
                             if (appWrite.ValueOwner) code.AppendLine("pop");
                             break;
                         }
-                        var writeShape = NativeArrayBindings.Field(writeField);
-                        ConvertTop(writeShape.Type); Expect(writeShape.Owner + "&");
-                        code.AppendLine($"stfld {writeShape.Owner}::{writeField.Name}\npop"); break;
+                        throw new InvalidDataException("Unsupported runtime field write.");
                     case Code.Ldind_I4:
                         Expect("Int32*"); Push(new("Int32")); code.AppendLine("ldobj Int32"); break;
                     case Code.Stind_I4:
@@ -297,7 +292,7 @@ static class UnionImport
                     case Code.Ldarg: case Code.Ldarg_S: Arg(((ParameterDefinition)instruction.Operand).Index + (method.HasThis ? 1 : 0)); break;
                     case Code.Ldarga: case Code.Ldarga_S:
                         var parameter = ((ParameterDefinition)instruction.Operand).Index + (method.HasThis ? 1 : 0);
-                        if (parameter < 0 || parameter >= args.Length || !(ApplicationTypes.IsType(args[parameter]) || NativeArrayBindings.IsType(args[parameter]) || args[parameter] == "System.Reflection.BindingFlags" || PrimitiveBindings.IsReceiver(args[parameter]) || CalendarBindings.Types.Contains(args[parameter]) || ErrorBindings.IsType(args[parameter]) || GenericUnionBindings.IsType(args[parameter])))
+                        if (parameter < 0 || parameter >= args.Length || !(ApplicationTypes.IsType(args[parameter]) || args[parameter] == "System.Reflection.BindingFlags" || PrimitiveBindings.IsReceiver(args[parameter]) || CalendarBindings.Types.Contains(args[parameter]) || ErrorBindings.IsType(args[parameter]) || GenericUnionBindings.IsType(args[parameter])))
                             throw new InvalidDataException("Only admitted primitive argument addresses supported.");
                         Push(new(args[parameter] + "&", Argument: parameter)); code.AppendLine($"ldarga {parameter}"); break;
                     case Code.Ldloc_0: case Code.Ldloc_1: case Code.Ldloc_2: case Code.Ldloc_3: Load((int)instruction.OpCode.Code - (int)Code.Ldloc_0); break;
@@ -506,7 +501,7 @@ static class UnionImport
                             if (targetMethod.IsConstructor && targetMethod.DeclaringType.FullName is "System.Object" or "System.ValueType" && targetMethod.Parameters.Count == 0 && method.IsConstructor && method.DeclaringType.BaseType?.FullName == targetMethod.DeclaringType.FullName && instruction.OpCode.Code == Code.Call)
                             { Expect(ApplicationTypes.Receiver(method)); code.AppendLine("pop"); break; }
                             var interfaceCall = collectionProfile ? InterfaceBindings.Bind(reference, targetMethod) : null;
-                            var nativeCall = collectionProfile ? NativeArrayBindings.Bind(reference, targetMethod) : null;
+                            var nativeCall = collectionProfile ? NativeMemoryBindings.Bind(reference, targetMethod) : null;
                             var reflectionCall = collectionProfile ? ReflectionBindings.Bind(reference, targetMethod) : null;
                             var queryCall = collectionProfile ? QueryBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt) : null;
                             var arrayCallback = collectionProfile ? ArrayCallbackBindings.Bind(reference, targetMethod) : null;
@@ -599,7 +594,7 @@ static class UnionImport
             }
         }
         output.Append(ApplicationTypes.Declarations(ProfileType, instanceBodies));
-        output.Append(Adapters()).Append(ResultBindings.Adapters()).Append(StringBindings.Adapters()).AppendLine(Int32Bindings.Adapters).AppendLine(DoubleBindings.Adapters).Append(PrimitiveBindings.Adapters).Append(CalendarBindings.Adapters).Append(ErrorBindings.Adapters()).Append(GenericUnionBindings.Adapters).AppendLine(ProcessBindings.Adapters).AppendLine(BooleanBindings.Adapters).AppendLine(ReflectionBindings.Adapters).AppendLine(EnumBindings.Adapters).AppendLine(NativeArrayBindings.Adapters);
+        output.Append(Adapters()).Append(ResultBindings.Adapters()).Append(StringBindings.Adapters()).AppendLine(Int32Bindings.Adapters).AppendLine(DoubleBindings.Adapters).Append(PrimitiveBindings.Adapters).Append(CalendarBindings.Adapters).Append(ErrorBindings.Adapters()).Append(GenericUnionBindings.Adapters).AppendLine(ProcessBindings.Adapters).AppendLine(BooleanBindings.Adapters).AppendLine(ReflectionBindings.Adapters).AppendLine(EnumBindings.Adapters);
         foreach (var helper in coercions.Values) output.Append(helper.Body);
         foreach (var body in delegateAdapters.Values) output.Append(body);
         var generated = output.ToString();
@@ -670,7 +665,7 @@ static class UnionImport
     };
     static bool Converts(string source, string target) => InterfaceBindings.Converts(source, target) || BooleanBindings.Converts(source, target) || EnumBindings.Converts(source, target);
     static string ConvertStack(string source, string target) => InterfaceBindings.Convert(source, target) + BooleanBindings.Convert(source, target) + EnumBindings.Convert(source, target);
-    static bool NeedsInitialization(string type) => type == "System.Object" || InterfaceBindings.IsInterface(type) || NativeArrayBindings.IsType(type) || NativeArrayBindings.IsPointer(type) || type == "System.RuntimeTypeHandle" || DelegateBindings.IsType(type) || (GenericUnionBindings.IsType(type)
+    static bool NeedsInitialization(string type) => type == "System.Object" || InterfaceBindings.IsInterface(type) || NativeMemoryBindings.IsPointer(type) || type == "System.RuntimeTypeHandle" || DelegateBindings.IsType(type) || (GenericUnionBindings.IsType(type)
         ? GenericUnionBindings.RequiresInitialization(type) : ResultBindings.RequiresInitialization(type));
     static bool HasNamedVoid(TypeReference type) => type is GenericInstanceType generic
         && generic.GenericArguments.Count == 1 && generic.GenericArguments[0].IsValueType

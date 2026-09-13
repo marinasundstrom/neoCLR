@@ -548,13 +548,16 @@
     {
       "file": "runtime/System/Array.neoil",
       "declarations": 14,
-      "disposition": "collections",
+      "disposition": "replaced-in-raven-profile",
+      "replacementFiles": [
+        "runtime/raven/Array.neoil",
+        "runtime/raven/NativeMemory.neoil"
+      ],
       "samples": [
-        "library-native-buffer.rvn",
-        "library-array-shapes.rvn",
-        "library-reference-payloads.rvn",
-        "library-generic-collections.rvn"
-      ]
+        "library-managed-array-metadata.rvn",
+        "library-native-buffer.rvn"
+      ],
+      "note": "The native descriptor API is removed; direct IL covers typed NativeMemory access. Raven native casts remain limited."
     },
     {
       "file": "runtime/neoCLR/Runtime/ErrorFromMessage.neoil",
@@ -823,7 +826,7 @@
       "declarations": 16,
       "disposition": "collections",
       "samples": [
-        "library-native-buffer.rvn",
+        "library-managed-array-metadata.rvn",
         "library-array-shapes.rvn",
         "library-reference-payloads.rvn",
         "library-generic-collections.rvn"
@@ -834,7 +837,7 @@
       "declarations": 7,
       "disposition": "collections",
       "samples": [
-        "library-native-buffer.rvn",
+        "library-managed-array-metadata.rvn",
         "library-array-shapes.rvn",
         "library-reference-payloads.rvn",
         "library-generic-collections.rvn"
@@ -845,7 +848,7 @@
       "declarations": 2,
       "disposition": "collections",
       "samples": [
-        "library-native-buffer.rvn",
+        "library-managed-array-metadata.rvn",
         "library-array-shapes.rvn",
         "library-reference-payloads.rvn",
         "library-generic-collections.rvn"
@@ -856,7 +859,7 @@
       "declarations": 4,
       "disposition": "collections",
       "samples": [
-        "library-native-buffer.rvn",
+        "library-managed-array-metadata.rvn",
         "library-array-shapes.rvn",
         "library-reference-payloads.rvn",
         "library-generic-collections.rvn"

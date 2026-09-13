@@ -2236,3 +2236,37 @@ and invariance decisions are retained, rather than interpreting the latest direc
 as an unspoken reversal. Exact native replacement APIs, safe borrowed views and
 their lifetime enforcement remain implementation/design work. No new standard
 NativeBuffer type was adopted.
+
+## 2026-09-13 — Implement the array shape without a native compatibility alias
+
+**Author:** Asked to continue, then clarified that compatibility with old neoCLR
+iterations is unnecessary. Asked whether Array<T> should implement interfaces.
+Explained that direct array loops should remain indexed, while interface support
+allows arrays to be passed as iterables and used with extension methods.
+
+**Assistant response and actions:** Implemented a generic managed array shape over
+the existing array identity in the Raven profile. Initially staged a temporary
+LegacyNativeArray rename; after the author's correction, removed that path and
+replaced the native descriptor API with a bounded NativeMemory allocation/free
+API. No legacy alias was committed. Added an explicit Iterable<T> declaration,
+kept the current growable List contract off fixed-size arrays, and added a sample
+covering indexed loops, an Iterable parameter and the ToList extension.
+
+**Compiler finding:** Native method emission exposed a missing pointer case in
+Raven's metadata-reference rewriter. Fixed it with a metadata regression on the
+existing Raven experiment branch. Native-sized numeric and explicit pointer
+conversions remain separate compiler gaps. The target adapter also accounts for
+Raven's empty Unit pointer locals when importing native void-pointer calls.
+
+**Outcome:** See [generic managed arrays](generic-managed-arrays.md) for implemented
+behavior, migration and validation. The source profile changes do not refresh the
+installed SDK/extension. The broader collection hierarchy, read interfaces, Span
+and native owner contracts remain open. Historical Neo work remains outside this
+Raven-profile migration, as previously directed.
+
+**Consistency observation:** The author described the generic array signature as
+a more consistent solution for neoCLR while retaining .NET familiarity, then
+corrected a spoken project-name transcription to neoCLR. The assistant agreed
+about a shared generic definition for members/interfaces/reflection, while noting
+that ordinary CLI array signatures already encode their element type. This is a
+regularization of the array contract, not a claim that CLR arrays were untyped.

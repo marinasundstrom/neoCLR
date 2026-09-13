@@ -51,11 +51,7 @@ pub(crate) fn validate_contract(function: &Function) -> Result<(), Fault> {
 }
 
 fn arguments(ty: &Type) -> &[Type] {
-    if let Type::Constructed { arguments, .. } = ty {
-        arguments
-    } else {
-        &[]
-    }
+    ty.generic_arguments()
 }
 
 /// Transitive, substituted interface identities, with diamonds deduplicated.
@@ -98,7 +94,9 @@ pub(crate) fn closure(module: &Module, ty: &Type) -> Result<Vec<Type>, Fault> {
         path.pop();
         Ok(())
     }
-    if let Type::ArrayRef(element) = ty {
+    if let Type::ArrayRef(element) = ty
+        && module.type_definition(ty).is_none()
+    {
         let interface = Type::Constructed {
             definition: "System.Collections.Iterable".into(),
             arguments: vec![(**element).clone()],

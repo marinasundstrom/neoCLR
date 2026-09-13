@@ -1,0 +1,22 @@
+; Explicit native allocation. Array storage and GC ownership are independent.
+.type System.Runtime.InteropServices.NativeMemory
+    .method static Alloc(UIntPtr byteCount) -> Void*
+        ldarg byteCount
+        heap.alloc Byte
+        ptr.cast Void
+        ret
+    .end
+    .method static Alloc(UIntPtr elementCount, UIntPtr elementSize) -> Void*
+        ldarg elementCount
+        ldarg elementSize
+        mul.ovf.un
+        call System.Runtime.InteropServices.NativeMemory::Alloc(UIntPtr)
+        ret
+    .end
+    .method static Free(Void* pointer) -> void
+        ldarg pointer
+        heap.free
+        pop
+        ret
+    .end
+.end

@@ -19,7 +19,7 @@ groups = {
     'unions': ('Option Result Propagatable', ['library-case-payloads.rvn', 'library-unions.rvn', 'library-result-void-propagation.rvn', 'library-reference-payloads.rvn']),
     'interfaces': ('Equatable Comparable Disposable', ['library-value-interfaces.rvn', 'library-interfaces.rvn']),
     'unimplemented-contracts': ('Clonable Closable', []),
-    'collections': ('Array ArrayList List Iterable Iterator', ['library-native-buffer.rvn', 'library-array-shapes.rvn', 'library-reference-payloads.rvn', 'library-generic-collections.rvn']),
+    'collections': ('Array ArrayList List Iterable Iterator', ['library-managed-array-metadata.rvn', 'library-array-shapes.rvn', 'library-reference-payloads.rvn', 'library-generic-collections.rvn']),
     'delegates': ('Func', ['library-delegates.rvn', 'library-array-callbacks.rvn']),
     'calendar': ('Date Time LocalDateTime Clock', ['library-calendar.rvn', 'library-clock.rvn']),
     'process': ('Environment Console', ['library-environment.rvn', 'library-console.rvn']),
@@ -47,6 +47,12 @@ for file in source['sourceFiles']:
             if not any(c['service'] == name for c in callers):
                 raise ValueError('Service without a reviewed library caller: ' + name)
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'implementation-service', 'callers': callers})
+        continue
+    if file == 'runtime/System/Array.neoil':
+        rows.append({'file': file, 'declarations': len(entries), 'disposition': 'replaced-in-raven-profile',
+                     'replacementFiles': ['runtime/raven/Array.neoil', 'runtime/raven/NativeMemory.neoil'],
+                     'samples': ['library-managed-array-metadata.rvn', 'library-native-buffer.rvn'],
+                     'note': 'The native descriptor API is removed; direct IL covers typed NativeMemory access. Raven native casts remain limited.'})
         continue
     group, samples = lookup[Path(file).stem]
     for sample in samples:

@@ -1,0 +1,31 @@
+; Managed array shape. The loader maps this class to the existing arrayref<T> identity.
+; Fixed length; element replacement does not imply growable collection operations.
+.type class System.Array<T>
+    .implements System.Collections.Iterable<T>
+    .property instance Length() -> Int32
+        .get instance System.Array<T>::get_Length()
+    .end
+    .property instance Item(Int32) -> T
+        .get instance System.Array<T>::get_Item(Int32)
+        .set instance System.Array<T>::set_Item(Int32,T)
+    .end
+    .method instance get_Length() -> Int32
+        ldarg this
+        ldlen
+        conv.i4
+        ret
+    .end
+    .method instance get_Item(Int32 index) -> T
+        ldarg this
+        ldarg index
+        ldelem T
+        ret
+    .end
+    .method instance set_Item(Int32 index, T value) -> void
+        ldarg this
+        ldarg index
+        ldarg value
+        stelem T
+        ret
+    .end
+.end

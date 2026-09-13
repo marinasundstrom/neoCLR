@@ -78,14 +78,11 @@ pub(crate) fn resolve(
             .and_then(|o| module.type_definition(o))
             .map_or(0, |d| d.generic_parameters.len());
         let mut candidate = if arity > 0 {
-            let Some(Type::Constructed {
-                definition: owner,
-                arguments,
-            }) = &target.owner
-            else {
+            let Some(owner) = &target.owner else {
                 continue;
             };
-            if definition.owner.as_ref().and_then(Type::definition_name) != Some(owner.as_str())
+            let arguments = owner.generic_arguments();
+            if definition.owner.as_ref().and_then(Type::definition_name) != owner.definition_name()
                 || arguments.len() != arity
             {
                 continue;
@@ -321,6 +318,27 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         }
         if def.name.is_empty() || !names.insert((&def.name, def.generic_parameters.len())) {
             return Err(Fault::new("empty or duplicate type name"));
+        }
+        if def.is_reference_type
+            && def.name == "System.Array"
+            && def.generic_parameters.len() == 1
+            && (!def.fields.is_empty()
+                || def.base.is_some()
+                || def.is_abstract
+                || def.implements
+                    != vec![Type::Constructed {
+                        definition: "System.Collections.Iterable".into(),
+                        arguments: vec![Type::TypeParameter(0)],
+                    }]
+                || !def.generic_constraints.is_empty()
+                || def
+                    .definition
+                    .as_ref()
+                    .is_some_and(|id| id.module != "System"))
+        {
+            return Err(Fault::new(
+                "managed System.Array<T> requires the intrinsic System array shape",
+            ));
         }
         if def.representation == Representation::Delegate {
             crate::delegates::contract(module, &def.open_type())?;
@@ -962,16 +980,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
     }
     for definition in &module.types {
         let arity = definition.generic_parameters.len();
-        let owner = if arity == 0 {
-            Type::from_name(&definition.name)
-        } else {
-            Type::Constructed {
-                definition: definition.name.clone(),
-                arguments: (0..arity)
-                    .map(|index| Type::TypeParameter(index as u16))
-                    .collect(),
-            }
-        };
+        let owner = definition.open_type();
         let mut signatures = HashSet::new();
         for property in &definition.properties {
             if !crate::metadata::valid_slot_name(&property.name)

@@ -296,10 +296,7 @@ fn validate_flags(flags: i32) -> Result<(), Fault> {
     }
 }
 fn type_arguments(ty: &Type) -> &[Type] {
-    match ty {
-        Type::Constructed { arguments, .. } => arguments,
-        _ => &[],
-    }
+    ty.generic_arguments()
 }
 fn index_value(index: usize) -> Result<Value, Fault> {
     Ok(Value::Int32(

@@ -52,6 +52,9 @@ pub(crate) fn describe_loaded(module: &Module, normalized: &Type) -> Result<Type
             .to_owned(),
     };
     let generic_arguments = match normalized {
+        Type::ArrayRef(element) if module.type_definition(normalized).is_some() => {
+            vec![describe_loaded(module, element)?]
+        }
         Type::Constructed { arguments, .. } => arguments
             .iter()
             .map(|argument| describe_loaded(module, argument))

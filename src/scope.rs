@@ -10,7 +10,7 @@ pub(crate) fn normalize_type(context: &Module, ty: &Type) -> Result<Type, Fault>
             return Err(Fault::new("type nesting exceeds 32"));
         }
         let nested = |ty: &Type| bind(context, ty, depth + 1);
-        Ok(match ty {
+        let normalized = match ty {
             Type::Scoped {
                 module,
                 name,
@@ -64,9 +64,29 @@ pub(crate) fn normalize_type(context: &Module, ty: &Type) -> Result<Type, Fault>
             Type::Ptr(t) => Type::Ptr(Box::new(nested(t)?)),
             Type::InterfaceRef(t) => Type::InterfaceRef(Box::new(nested(t)?)),
             other => other.clone(),
-        })
+        };
+        canonical_array(context, normalized)
     }
     bind(context, ty, 0)
+}
+
+// Keep CLI array signatures and the generic library name on one storage identity.
+fn canonical_array(context: &Module, ty: Type) -> Result<Type, Fault> {
+    if let Type::Constructed {
+        definition,
+        arguments,
+    } = &ty
+    {
+        if definition == "System.Array"
+            && arguments.len() == 1
+            && context
+                .type_definition(&ty)
+                .is_some_and(|d| d.is_reference_type)
+        {
+            return Ok(Type::ArrayRef(Box::new(arguments[0].clone())));
+        }
+    }
+    Ok(ty)
 }
 
 fn attributes(context: &Module, attributes: &mut [CustomAttribute]) -> Result<(), Fault> {

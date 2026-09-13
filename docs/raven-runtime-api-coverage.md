@@ -28,7 +28,7 @@ python3 docs/experiments/raven-target/audit_runtime_api.py --check
 | Date, Time, LocalDateTime, Clock | Existing factories, validation, components, equality/ordering and local system clock; [calendar](raven-calendar-api.md) |
 | Environment | All three APIs, copied argument arrays, current directory and variable Results/Options; [process](raven-process-api.md) |
 | Managed arrays and collections | Constructors, capacity/count, indexers, Add/Copy, foreach/iteration, predicates and ForEach; [collections](raven-generic-collections.md), [array shapes](raven-array-shapes.md) |
-| Native Array<T> | Allocate/View, Data/Length, indexer, Get/Set/GetElementAddress and Free for admitted primitive layouts; [native buffers](raven-native-buffer-api.md) |
+| Managed Array<T> / native memory | Generic managed array identity, Length/Item and declared Iterable<T>; separate NativeMemory.Alloc/Free. The old native descriptor is removed. Raven native calls have conversion limits; typed access is covered in direct IL. See [array and native API contracts](generic-managed-arrays.md) |
 | Fundamental interfaces | Comparable/Equatable value and class implementations, collection contracts and Disposable; [interfaces](raven-fundamental-interfaces.md). Clonable/Closable declarations and calls are available, but have no concrete implementations in the existing library |
 | Func | All five existing arities, static application targets, invocation, callbacks and stored delegates; [delegates](raven-delegate-api.md) |
 | Type, TypeHandle and reflection | Type tokens/queries, descriptor hierarchy, all public getters, query arrays/options and BindingFlags; [reflection](raven-reflection-api.md) |
