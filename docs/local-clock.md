@@ -65,3 +65,32 @@ The sample prints labeled numeric date/time components and the UTC offset, witho
 adding formatting APIs. Tests check a real host reading against its UTC interval,
 Neo artifact execution, isolated Unix TZ configurations, and deterministic conversion
 across midnight with sub-tick truncation in runtime unit tests.
+
+## Future clock contract review (2026-09-13)
+
+The author proposed centering the date/time API on a clock implementation that can
+be mocked. The assistant proposed explicit clock injection, with production and
+controlled test implementations. Names, interface versus abstract class, and public
+signatures remain open; `Clock.GetLocalNow()` is still the implemented entry point.
+
+Modern .NET already provides `TimeProvider` (in .NET 8+) for wall-clock reads,
+elapsed-time measurement and timers, with a system implementation and controllable
+`FakeTimeProvider` for tests. This is a shipped baseline to learn from, not a missing
+.NET capability. Source consulted 2026-09-13:
+[Microsoft TimeProvider overview](https://learn.microsoft.com/en-us/dotnet/standard/datetime/timeprovider-overview).
+
+Compare three alternatives before implementation: retain a static convenience API;
+adopt a broad TimeProvider-like provider; or start with a narrow injectable clock.
+The latter makes time-dependent behavior testable with less initial surface, but adds
+an explicit dependency and leaves composition with timers/async unresolved. Avoid a
+mutable global clock override: independent tests should control time independently.
+Keep calendar date/time values separate from wall-clock access and monotonic elapsed
+time. Decide UTC/local/offset semantics and whether local-zone conversion belongs in
+the clock or another library service. No globalization or timer implementation is
+requested by this note.
+
+Provisional placement: use ordinary library contracts and existing dispatch, retaining
+only host time acquisition in runtime services; no new opcode is justified yet.
+Validate an order deadline with a fixed clock and manual advancement, isolated parallel
+tests, boundary dates, and system-clock snapshot coherence. Assess migration from the
+static helper and how Raven/C# callers consume the chosen contract before settling it.

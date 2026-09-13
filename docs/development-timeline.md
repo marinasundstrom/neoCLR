@@ -1939,3 +1939,20 @@ its tests include actual invocation and binding-time null failure. The neoCLR br
 uses the existing Func family and documents its adapters and limits in
 [delegate/lambda support](raven-delegates-lambdas.md). No async or debugger implementation
 is implied by this result, and published Preview 4 tools are unchanged.
+
+
+### 2026-09-13 — Modern library APIs and a replaceable clock
+
+**Author direction.** While the application toolchain was being packaged, the author
+asked that future runtime-library design feel modern, including base types and
+namespace-level functions, without carrying legacy APIs forward merely for familiarity.
+Date/time might instead center on a clock implementation that can be mocked.
+
+**Assistant response.** Proposed separating date/time values from time acquisition,
+with an injected system or controlled test clock. Compared the idea with the shipped
+.NET TimeProvider/FakeTimeProvider baseline, rather than claiming .NET lacks it.
+
+**Action and outcome.** Recorded the policy in [API design](api-design.md), with
+alternatives, placement and future validation in [clock design](local-clock.md#future-clock-contract-review-2026-09-13)
+and a backlog entry. No clock redesign was implemented; the current toolchain refresh
+continues. Exact contracts and namespace-function projection remain open.

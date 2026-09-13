@@ -32,6 +32,14 @@ it remains a concept compiler rather than a prerequisite full language implement
 | Dynamic dispatch with hooks | Extensible runtime binding for operations whose targets are resolved dynamically | Supported operations and hook contracts; lookup and fallback order; missing-member results; access checks; caching and invalidation; interaction with typed virtual/interface dispatch |
 | Fundamental library and framework | A coherent set of base types and useful framework APIs, implemented as scenarios require them | Which contracts belong in metadata/runtime services and which belong in library types; optional Object methods; collections, text, I/O, callable and async APIs; consistent errors, references and cleanup |
 
+## Modern API review
+
+For upcoming library work, follow the [modern library direction](api-design.md#modern-library-direction-2026-09-13).
+Evaluate a mockable clock before expanding date/time acquisition APIs; compare modern
+.NET TimeProvider, a narrower clock, and existing static helpers. Preserve separate
+value data and environmental dependencies. This is future design work, not implemented
+clock injection or an additional gate for the current toolchain refresh.
+
 ## Contract boundaries
 
 **Mutability** separates compiler-enforced binding rules from runtime-enforced

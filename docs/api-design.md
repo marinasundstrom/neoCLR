@@ -32,6 +32,19 @@ Document provisional choices and current behavior clearly, with executable examp
 and a coverage matrix. A familiar API name is not a claim of complete .NET behavior,
 and implemented preview behavior remains open to revision.
 
+## Modern library direction (2026-09-13)
+
+The author wants modern APIs, including base types and namespace-level functions,
+rather than inheriting historical library shapes solely for familiarity. Compare
+current .NET designs as well as older APIs. Choose instance members, static helpers
+or namespace functions by the contract they express, discoverability and target-language
+projection; namespace syntax alone is not a reason to change CLI metadata.
+
+Date/time is a future review example: separate date/time data from acquiring the
+current time, and investigate a replaceable clock usable in deterministic tests.
+This is a library-design direction, not a change to the implemented preview contract.
+See [clock alternatives and validation](local-clock.md#future-clock-contract-review-2026-09-13).
+
 ## References are values
 
 A `T&` local or parameter contains a reference value. Passing or returning it copies

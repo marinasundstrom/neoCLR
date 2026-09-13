@@ -8,6 +8,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Recorded the future modern-library API direction and mockable-clock investigation,
+  comparing .NET TimeProvider with narrower library contracts. No clock behavior changed.
+
 - Extended experimental bundle packaging with the application and order-workflow
   validation scripts and documented how to try the new samples. Updated bundle
   capability boundaries; package validation now includes dispatch, captures and GC.
