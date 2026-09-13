@@ -122,3 +122,20 @@ is chosen when publishing; this procedure does not announce one.
 For the next experimental release, repeat revision selection, focused validation,
 separate packaging and package-level smoke tests. Reuse the procedure and extend the
 coverage evidence as the bridge grows; a full Raven release remains independent.
+
+## Experimental tool dependency notices
+
+The [tool notice inventory](../../../third-party/raven-tools/README.md) supplements
+both projects' upstream notices. Check the actual SDK and runtime bundle:
+
+```sh
+python3 docs/experiments/raven-target/verify_tool_notices.py --tools /path/to/artifacts
+```
+
+For the VSIX, also compare its production JavaScript dependency graph when rebuilding
+Raven; the .deps.json check only covers .NET packages. Preserve the five reviewed npm
+package notices and refresh the inventory if the esbuild inputs change. Distribute
+`third-party/raven-tools` together with Raven's LICENSE and THIRD-PARTY-NOTICES.txt
+as a companion attribution archive for the separate SDK and VSIX. The runtime bundle
+contains the same texts. Do not describe the separate upstream assets as containing
+notices that are supplied only in the companion archive.

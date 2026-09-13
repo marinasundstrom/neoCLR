@@ -69,5 +69,5 @@ building this folder alone does not establish release readiness.
 
 The bundle carries neoCLR's **LICENSE**, **THIRD_PARTY_NOTICES.md** and preserved
 **third-party/** texts, plus Raven's upstream notices under **licenses/Raven/**.
-These preserve the repositories' attribution; they do not claim a complete audit of
-all dependencies in the separately packaged SDK and VSIX.
+The version-specific tool dependency inventory is in **third-party/raven-tools/**.
+It supplements the upstream notices and accompanies the separate SDK/VSIX assets.

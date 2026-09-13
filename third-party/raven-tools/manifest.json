@@ -1,0 +1,519 @@
+{
+  "scope": "NuGet packages enumerated by the .6 SDK, server and bridge dependency manifests; npm packages included by the production extension bundle. .NET framework assemblies are external prerequisites.",
+  "packages": [
+    {
+      "package": "Markdig/0.44.0",
+      "kind": "nuget",
+      "license": "BSD-2-Clause",
+      "licenseType": "expression",
+      "nuspecSha256": "80da8a50f03c2199d1b47abbc9b98137ab2750565f781db15c76096ed6e6be03",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/markdig/0.44.0/license.txt",
+          "source": "https://raw.githubusercontent.com/xoofx/markdig/cd7b9ca0ef66cb582232cbceaefbfe4195cf575b/license.txt",
+          "sha256": "ae543293657b6782e3d4a76257dc4157210ce88a352ef8392065d3f04dcd88d1"
+        }
+      ]
+    },
+    {
+      "package": "MediatR/8.1.0",
+      "kind": "nuget",
+      "license": "Apache-2.0",
+      "licenseType": "expression",
+      "nuspecSha256": "e4d3a10b27b18b5bc4572e8567ea4580358f76e8e0e652a90d2b34de2d12d986",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/mediatr/8.1.0/LICENSE",
+          "source": "https://raw.githubusercontent.com/jbogard/MediatR/3204dc790812336494c00894deb11e45d0f2f19e/LICENSE",
+          "sha256": "cb5e8e7e5f4a3988e1063c142c60dc2df75605f4c46515e776e3aca6df976e14"
+        }
+      ]
+    },
+    {
+      "package": "Microsoft.Bcl.AsyncInterfaces/7.0.0",
+      "kind": "nuget",
+      "license": "MIT",
+      "licenseType": "expression",
+      "nuspecSha256": "7d3ccf415c07c1fa6e5ce21216500e016941217e238092ace86349fdd096e378",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/microsoft.bcl.asyncinterfaces/7.0.0/THIRD-PARTY-NOTICES.TXT",
+          "source": "nuget:Microsoft.Bcl.AsyncInterfaces/7.0.0/THIRD-PARTY-NOTICES.TXT",
+          "sha256": "e5263d73f2fcb1ee8fa2d4e5439cc0052d02f8a4910816977b8834359e3fe689"
+        },
+        {
+          "path": "third-party/raven-tools/microsoft.bcl.asyncinterfaces/7.0.0/LICENSE.TXT",
+          "source": "nuget:Microsoft.Bcl.AsyncInterfaces/7.0.0/LICENSE.TXT",
+          "sha256": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+        }
+      ]
+    },
+    {
+      "package": "Microsoft.Build.Locator/1.9.1",
+      "kind": "nuget",
+      "license": "MIT",
+      "licenseType": "expression",
+      "nuspecSha256": "fd18f907b434828888e40ae225a39ed391d0705ab3b005f852f8731214d67474",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/microsoft.build.locator/1.9.1/LICENSE",
+          "source": "https://raw.githubusercontent.com/microsoft/MSBuildLocator/0bbf4988996176904ecc0dabb73165919fac605f/LICENSE",
+          "sha256": "990b71168a54194e2c0414bedfc3702b62cd0ae57a06240d874eb95ea8a81f69"
+        }
+      ]
+    },
+    {
+      "package": "Microsoft.CodeAnalysis.CSharp/4.12.0",
+      "kind": "nuget",
+      "license": "MIT",
+      "licenseType": "expression",
+      "nuspecSha256": "3a83e10b198148f9eab68740411b32e76603ed9d1509181bf32e3d39ffeb3d7f",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/microsoft.codeanalysis.csharp/4.12.0/ThirdPartyNotices.rtf",
+          "source": "nuget:Microsoft.CodeAnalysis.CSharp/4.12.0/ThirdPartyNotices.rtf",
+          "sha256": "ef4678850e7e3aaf9297f07e5c4060d477854e545ccf8e2ef8452d65a7b2efaf"
+        },
+        {
+          "path": "third-party/raven-tools/microsoft.codeanalysis.csharp/4.12.0/License.txt",
+          "source": "https://raw.githubusercontent.com/dotnet/roslyn/dfa7fc6bdea31a858a402168384192b633c811fa/License.txt",
+          "sha256": "ae48df11a335dc1a615f4f938b69cba73bcf4485c4f97af49b38efb0f216353b"
+        }
+      ]
+    },
+    {
+      "package": "Microsoft.CodeAnalysis.Common/4.12.0",
+      "kind": "nuget",
+      "license": "MIT",
+      "licenseType": "expression",
+      "nuspecSha256": "7e02b687b7db7488c06c05be0270c21a4101b14e03d04c668cefa4e3cbcc96ef",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/microsoft.codeanalysis.common/4.12.0/ThirdPartyNotices.rtf",
+          "source": "nuget:Microsoft.CodeAnalysis.Common/4.12.0/ThirdPartyNotices.rtf",
+          "sha256": "ef4678850e7e3aaf9297f07e5c4060d477854e545ccf8e2ef8452d65a7b2efaf"
+        },
+        {
+          "path": "third-party/raven-tools/microsoft.codeanalysis.common/4.12.0/License.txt",
+          "source": "https://raw.githubusercontent.com/dotnet/roslyn/dfa7fc6bdea31a858a402168384192b633c811fa/License.txt",
+          "sha256": "ae48df11a335dc1a615f4f938b69cba73bcf4485c4f97af49b38efb0f216353b"
+        }
+      ]
+    },
+    {
+      "package": "Microsoft.Extensions.Configuration.Binder/9.0.0",
+      "kind": "nuget",
+      "license": "MIT",
+      "licenseType": "expression",
+      "nuspecSha256": "85e9c3963962646d7ceaa39eae0ed434978d37a9df5d7a5a3ba19f33e32ddc70",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/microsoft.extensions.configuration.binder/9.0.0/THIRD-PARTY-NOTICES.TXT",
+          "source": "nuget:Microsoft.Extensions.Configuration.Binder/9.0.0/THIRD-PARTY-NOTICES.TXT",
+          "sha256": "40686c6447a7d5b5d3693068e4571b5f483d7ed335aeee773ef662440de4c5d5"
+        },
+        {
+          "path": "third-party/raven-tools/microsoft.extensions.configuration.binder/9.0.0/LICENSE.TXT",
+          "source": "nuget:Microsoft.Extensions.Configuration.Binder/9.0.0/LICENSE.TXT",
+          "sha256": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+        }
+      ]
+    },
+    {
+      "package": "Microsoft.Extensions.Configuration/9.0.0",
+      "kind": "nuget",
+      "license": "MIT",
+      "licenseType": "expression",
+      "nuspecSha256": "48656b0b0004dade4132e7c19a47a4d9bc011bb09e90c994a1491d3b389afab8",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/microsoft.extensions.configuration/9.0.0/THIRD-PARTY-NOTICES.TXT",
+          "source": "nuget:Microsoft.Extensions.Configuration/9.0.0/THIRD-PARTY-NOTICES.TXT",
+          "sha256": "40686c6447a7d5b5d3693068e4571b5f483d7ed335aeee773ef662440de4c5d5"
+        },
+        {
+          "path": "third-party/raven-tools/microsoft.extensions.configuration/9.0.0/LICENSE.TXT",
+          "source": "nuget:Microsoft.Extensions.Configuration/9.0.0/LICENSE.TXT",
+          "sha256": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+        }
+      ]
+    },
+    {
+      "package": "Microsoft.Extensions.DependencyInjection/9.0.0",
+      "kind": "nuget",
+      "license": "MIT",
+      "licenseType": "expression",
+      "nuspecSha256": "53634709a58159c8387a7bd77f1849d5d6f7d6a913c28e087e5dbd83a6687bb0",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/microsoft.extensions.dependencyinjection/9.0.0/THIRD-PARTY-NOTICES.TXT",
+          "source": "nuget:Microsoft.Extensions.DependencyInjection/9.0.0/THIRD-PARTY-NOTICES.TXT",
+          "sha256": "40686c6447a7d5b5d3693068e4571b5f483d7ed335aeee773ef662440de4c5d5"
+        },
+        {
+          "path": "third-party/raven-tools/microsoft.extensions.dependencyinjection/9.0.0/LICENSE.TXT",
+          "source": "nuget:Microsoft.Extensions.DependencyInjection/9.0.0/LICENSE.TXT",
+          "sha256": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+        }
+      ]
+    },
+    {
+      "package": "Microsoft.Extensions.Logging.Configuration/9.0.0",
+      "kind": "nuget",
+      "license": "MIT",
+      "licenseType": "expression",
+      "nuspecSha256": "7d023edd365397263d06a654a568ea6df9a3034903cf8ecd3e378a31d4a65dfe",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/microsoft.extensions.logging.configuration/9.0.0/THIRD-PARTY-NOTICES.TXT",
+          "source": "nuget:Microsoft.Extensions.Logging.Configuration/9.0.0/THIRD-PARTY-NOTICES.TXT",
+          "sha256": "40686c6447a7d5b5d3693068e4571b5f483d7ed335aeee773ef662440de4c5d5"
+        },
+        {
+          "path": "third-party/raven-tools/microsoft.extensions.logging.configuration/9.0.0/LICENSE.TXT",
+          "source": "nuget:Microsoft.Extensions.Logging.Configuration/9.0.0/LICENSE.TXT",
+          "sha256": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+        }
+      ]
+    },
+    {
+      "package": "Microsoft.Extensions.Logging.Console/9.0.0",
+      "kind": "nuget",
+      "license": "MIT",
+      "licenseType": "expression",
+      "nuspecSha256": "6414bcc724f8163cbecd14134a9695dc2223f9c78537bc6acdf4e7f9d3908105",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/microsoft.extensions.logging.console/9.0.0/THIRD-PARTY-NOTICES.TXT",
+          "source": "nuget:Microsoft.Extensions.Logging.Console/9.0.0/THIRD-PARTY-NOTICES.TXT",
+          "sha256": "40686c6447a7d5b5d3693068e4571b5f483d7ed335aeee773ef662440de4c5d5"
+        },
+        {
+          "path": "third-party/raven-tools/microsoft.extensions.logging.console/9.0.0/LICENSE.TXT",
+          "source": "nuget:Microsoft.Extensions.Logging.Console/9.0.0/LICENSE.TXT",
+          "sha256": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+        }
+      ]
+    },
+    {
+      "package": "Microsoft.Extensions.Logging/9.0.0",
+      "kind": "nuget",
+      "license": "MIT",
+      "licenseType": "expression",
+      "nuspecSha256": "2fe42588885a138c915a7f227a1b68edc232bbed83139c899fde40dc9db6597d",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/microsoft.extensions.logging/9.0.0/THIRD-PARTY-NOTICES.TXT",
+          "source": "nuget:Microsoft.Extensions.Logging/9.0.0/THIRD-PARTY-NOTICES.TXT",
+          "sha256": "40686c6447a7d5b5d3693068e4571b5f483d7ed335aeee773ef662440de4c5d5"
+        },
+        {
+          "path": "third-party/raven-tools/microsoft.extensions.logging/9.0.0/LICENSE.TXT",
+          "source": "nuget:Microsoft.Extensions.Logging/9.0.0/LICENSE.TXT",
+          "sha256": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+        }
+      ]
+    },
+    {
+      "package": "Microsoft.Extensions.Options.ConfigurationExtensions/9.0.0",
+      "kind": "nuget",
+      "license": "MIT",
+      "licenseType": "expression",
+      "nuspecSha256": "e0d4efcce675fd1bbe23faefa8405a7702edaf9ab3292b0b159eabf50a5f7eb2",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/microsoft.extensions.options.configurationextensions/9.0.0/THIRD-PARTY-NOTICES.TXT",
+          "source": "nuget:Microsoft.Extensions.Options.ConfigurationExtensions/9.0.0/THIRD-PARTY-NOTICES.TXT",
+          "sha256": "40686c6447a7d5b5d3693068e4571b5f483d7ed335aeee773ef662440de4c5d5"
+        },
+        {
+          "path": "third-party/raven-tools/microsoft.extensions.options.configurationextensions/9.0.0/LICENSE.TXT",
+          "source": "nuget:Microsoft.Extensions.Options.ConfigurationExtensions/9.0.0/LICENSE.TXT",
+          "sha256": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+        }
+      ]
+    },
+    {
+      "package": "Microsoft.NET.HostModel/3.1.16",
+      "kind": "nuget",
+      "license": "LICENSE.TXT",
+      "licenseType": "file",
+      "nuspecSha256": "59cc86e3eb8b4b047a1eea35901647dfe5825518d15f340286503be72c51ee26",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/microsoft.net.hostmodel/3.1.16/THIRD-PARTY-NOTICES.TXT",
+          "source": "nuget:Microsoft.NET.HostModel/3.1.16/THIRD-PARTY-NOTICES.TXT",
+          "sha256": "2e3b2cb5cb57ff44310801dd46e51dab1d35d9cfe196a9709ee8cb9c6f8e4d4a"
+        },
+        {
+          "path": "third-party/raven-tools/microsoft.net.hostmodel/3.1.16/LICENSE.TXT",
+          "source": "nuget:Microsoft.NET.HostModel/3.1.16/LICENSE.TXT",
+          "sha256": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+        }
+      ]
+    },
+    {
+      "package": "Microsoft.VisualStudio.Threading/17.6.40",
+      "kind": "nuget",
+      "license": "MIT",
+      "licenseType": "expression",
+      "nuspecSha256": "bcf65b10a25ab27e739cb7a384a039269793f31e83e2f181b5c7b568411c1a0f",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/microsoft.visualstudio.threading/17.6.40/NOTICE",
+          "source": "nuget:Microsoft.VisualStudio.Threading/17.6.40/NOTICE",
+          "sha256": "31073ffab0b9fb1b16393b84b15d9c60a4fb316d824ff8eda657a19cde997024"
+        },
+        {
+          "path": "third-party/raven-tools/microsoft.visualstudio.threading/17.6.40/LICENSE",
+          "source": "https://raw.githubusercontent.com/microsoft/vs-threading/cc3d33cdc22ea4eabd804623a60e750357abf541/LICENSE",
+          "sha256": "492ad816c18066132e6153dbecb698d97ee54f916b24908f3346b6118bd8c4eb"
+        }
+      ]
+    },
+    {
+      "package": "Microsoft.VisualStudio.Validation/17.6.11",
+      "kind": "nuget",
+      "license": "MIT",
+      "licenseType": "expression",
+      "nuspecSha256": "e82bc0219367f058a8a80f59c904a4cdb5c42ee30cfa5989b5a3dff9323b3952",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/microsoft.visualstudio.validation/17.6.11/NOTICE",
+          "source": "nuget:Microsoft.VisualStudio.Validation/17.6.11/NOTICE",
+          "sha256": "e8609f52d354054ef9c19991a78a080a8879a7ca59f3f026f435d2070310bad7"
+        },
+        {
+          "path": "third-party/raven-tools/microsoft.visualstudio.validation/17.6.11/LICENSE",
+          "source": "https://raw.githubusercontent.com/microsoft/vs-validation/5beab7009eb51f995e3b77cdb942bc648d581734/LICENSE",
+          "sha256": "141df76637e66c7778cbeba736fa0d05baba044431e26bc46764ff2e5caea193"
+        }
+      ]
+    },
+    {
+      "package": "Mono.Cecil/0.11.6",
+      "kind": "nuget",
+      "license": "MIT",
+      "licenseType": "expression",
+      "nuspecSha256": "52fa41faa56134d176e8816347f040c01837d8c4458d43fef0166c27559d4bd9",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/mono.cecil/0.11.6/LICENSE.txt",
+          "source": "https://raw.githubusercontent.com/jbevain/cecil/0.11.6/LICENSE.txt",
+          "sha256": "13d58ecbed676511c0c4c4009bff107025e50007ff5e7901dc562700ec62509e"
+        }
+      ]
+    },
+    {
+      "package": "Nerdbank.Streams/2.10.69",
+      "kind": "nuget",
+      "license": "MIT",
+      "licenseType": "expression",
+      "nuspecSha256": "f3d7bfe8085f9f3bfda3fcfa58886c26045619cd8e12de8cf24f6ec90891f320",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/nerdbank.streams/2.10.69/NOTICE",
+          "source": "nuget:Nerdbank.Streams/2.10.69/NOTICE",
+          "sha256": "d38c134290c8d0294168f605224ee0f2b5c141d9f166468f1d90e791dc9ad660"
+        },
+        {
+          "path": "third-party/raven-tools/nerdbank.streams/2.10.69/LICENSE",
+          "source": "https://raw.githubusercontent.com/AArnott/Nerdbank.Streams/e0dbd2163a53982f16e10dcb45dc7e9d18d3dc4d/LICENSE",
+          "sha256": "99f8056e31a2b2f39706be53611bd486b9de3f962c8f73847482a72887403cdd"
+        }
+      ]
+    },
+    {
+      "package": "Newtonsoft.Json/13.0.3",
+      "kind": "nuget",
+      "license": "MIT",
+      "licenseType": "expression",
+      "nuspecSha256": "64aeffca22289eeb3bd32cbe72722ac878d2eadcee9f8885f17daa2e8357c518",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/newtonsoft.json/13.0.3/LICENSE.md",
+          "source": "nuget:Newtonsoft.Json/13.0.3/LICENSE.md",
+          "sha256": "b98a397897ff55f76cddc380041507a95a896b2946e0188703bf0496793d6516"
+        }
+      ]
+    },
+    {
+      "package": "OmniSharp.Extensions.JsonRpc/0.19.9",
+      "kind": "nuget",
+      "license": "LICENSE",
+      "licenseType": "file",
+      "nuspecSha256": "ad77efcf55129e4b25018b555460463e8c137c88dfee531b9cdb67b9750da458",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/omnisharp.extensions.jsonrpc/0.19.9/LICENSE",
+          "source": "nuget:OmniSharp.Extensions.JsonRpc/0.19.9/LICENSE",
+          "sha256": "e715b9186819f20d0bc8feae10cfea8a65126350b46ca5824ea84405e5a3ef5e"
+        }
+      ]
+    },
+    {
+      "package": "OmniSharp.Extensions.LanguageProtocol/0.19.9",
+      "kind": "nuget",
+      "license": "LICENSE",
+      "licenseType": "file",
+      "nuspecSha256": "b3b0d622325e9c7e6176cde6e93571dc8b0b6cda3ea1cd5f96ad2ea68e9067f4",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/omnisharp.extensions.languageprotocol/0.19.9/LICENSE",
+          "source": "nuget:OmniSharp.Extensions.LanguageProtocol/0.19.9/LICENSE",
+          "sha256": "e715b9186819f20d0bc8feae10cfea8a65126350b46ca5824ea84405e5a3ef5e"
+        }
+      ]
+    },
+    {
+      "package": "OmniSharp.Extensions.LanguageServer.Shared/0.19.9",
+      "kind": "nuget",
+      "license": "LICENSE",
+      "licenseType": "file",
+      "nuspecSha256": "dec2ddcb9b25b94a95dd36b8f8c89b6c9055ea1be16b5b07d6be311d9479709f",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/omnisharp.extensions.languageserver.shared/0.19.9/LICENSE",
+          "source": "nuget:OmniSharp.Extensions.LanguageServer.Shared/0.19.9/LICENSE",
+          "sha256": "e715b9186819f20d0bc8feae10cfea8a65126350b46ca5824ea84405e5a3ef5e"
+        }
+      ]
+    },
+    {
+      "package": "OmniSharp.Extensions.LanguageServer/0.19.9",
+      "kind": "nuget",
+      "license": "LICENSE",
+      "licenseType": "file",
+      "nuspecSha256": "6f8ecd24ff30bfe6b2a6dc940ffb4582e9607d5a4de6096082453a8c729da42b",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/omnisharp.extensions.languageserver/0.19.9/LICENSE",
+          "source": "nuget:OmniSharp.Extensions.LanguageServer/0.19.9/LICENSE",
+          "sha256": "e715b9186819f20d0bc8feae10cfea8a65126350b46ca5824ea84405e5a3ef5e"
+        }
+      ]
+    },
+    {
+      "package": "Spectre.Console/0.54.0",
+      "kind": "nuget",
+      "license": "MIT",
+      "licenseType": "expression",
+      "nuspecSha256": "6c35cd24c071bdb1edce61c999160bf10cdfe10a2dc7b6b54d368d43a5e532d6",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/spectre.console/0.54.0/LICENSE.md",
+          "source": "https://raw.githubusercontent.com/spectreconsole/spectre.console/e097281ca8a50268b1022453fe6efd9112123a28/LICENSE.md",
+          "sha256": "3b7331fb6deae7edd8e09f16173b9c61de0358c86cccd69de894ed3643d0ca91"
+        }
+      ]
+    },
+    {
+      "package": "System.Reactive/6.0.0",
+      "kind": "nuget",
+      "license": "MIT",
+      "licenseType": "expression",
+      "nuspecSha256": "d972e06f45bf5a7dc931257f146460a844f50ce0eb69469c241bf66896be8d72",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/system.reactive/6.0.0/LICENSE",
+          "source": "https://raw.githubusercontent.com/dotnet/reactive/e29c7a50db88513a87651c366088da8b7f40b1f0/LICENSE",
+          "sha256": "cfc21f5e8bd655ae997eec916138b707b1d290b83272c02a95c9f821b8c87310"
+        }
+      ]
+    },
+    {
+      "package": "System.Reflection.MetadataLoadContext/9.0.0",
+      "kind": "nuget",
+      "license": "MIT",
+      "licenseType": "expression",
+      "nuspecSha256": "8208a139d4f090ec25fd857d8de4fd5d766a9d7e7110ebd73b8d4160b9e7eaa5",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/system.reflection.metadataloadcontext/9.0.0/THIRD-PARTY-NOTICES.TXT",
+          "source": "nuget:System.Reflection.MetadataLoadContext/9.0.0/THIRD-PARTY-NOTICES.TXT",
+          "sha256": "40686c6447a7d5b5d3693068e4571b5f483d7ed335aeee773ef662440de4c5d5"
+        },
+        {
+          "path": "third-party/raven-tools/system.reflection.metadataloadcontext/9.0.0/LICENSE.TXT",
+          "source": "nuget:System.Reflection.MetadataLoadContext/9.0.0/LICENSE.TXT",
+          "sha256": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+        }
+      ]
+    },
+    {
+      "package": "balanced-match/1.0.2",
+      "kind": "npm",
+      "license": "MIT",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/npm/balanced-match/1.0.2/LICENSE.md",
+          "source": "npm:balanced-match@1.0.2/LICENSE.md",
+          "sha256": "a1bd5deadb6a06dd74efa852c1b8b23f63b67f2214fbe9c8bd591da51da69268"
+        }
+      ]
+    },
+    {
+      "package": "vscode-jsonrpc/8.2.0",
+      "kind": "npm",
+      "license": "MIT",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/npm/vscode-jsonrpc/8.2.0/thirdpartynotices.txt",
+          "source": "npm:vscode-jsonrpc@8.2.0/thirdpartynotices.txt",
+          "sha256": "a89123562fe364dc8e969e85614eb6c1f8452afe131d6e42bd1314bb2d092b04"
+        },
+        {
+          "path": "third-party/raven-tools/npm/vscode-jsonrpc/8.2.0/License.txt",
+          "source": "npm:vscode-jsonrpc@8.2.0/License.txt",
+          "sha256": "ec9ee83580841e8eb687aca9867f221503809ba6426c7f876ede17d91b9fcfd0"
+        }
+      ]
+    },
+    {
+      "package": "vscode-languageclient/9.0.1",
+      "kind": "npm",
+      "license": "MIT",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/npm/vscode-languageclient/9.0.1/License.txt",
+          "source": "npm:vscode-languageclient@9.0.1/License.txt",
+          "sha256": "ec9ee83580841e8eb687aca9867f221503809ba6426c7f876ede17d91b9fcfd0"
+        }
+      ]
+    },
+    {
+      "package": "vscode-languageserver-protocol/3.17.5",
+      "kind": "npm",
+      "license": "MIT",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/npm/vscode-languageserver-protocol/3.17.5/thirdpartynotices.txt",
+          "source": "npm:vscode-languageserver-protocol@3.17.5/thirdpartynotices.txt",
+          "sha256": "9265d27cf75775aa5ae19c5ba01846fb70ecd5121f8c39c81bef7e03f007072c"
+        },
+        {
+          "path": "third-party/raven-tools/npm/vscode-languageserver-protocol/3.17.5/License.txt",
+          "source": "npm:vscode-languageserver-protocol@3.17.5/License.txt",
+          "sha256": "ec9ee83580841e8eb687aca9867f221503809ba6426c7f876ede17d91b9fcfd0"
+        }
+      ]
+    },
+    {
+      "package": "vscode-languageserver-types/3.17.5",
+      "kind": "npm",
+      "license": "MIT",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/npm/vscode-languageserver-types/3.17.5/thirdpartynotices.txt",
+          "source": "npm:vscode-languageserver-types@3.17.5/thirdpartynotices.txt",
+          "sha256": "a89123562fe364dc8e969e85614eb6c1f8452afe131d6e42bd1314bb2d092b04"
+        },
+        {
+          "path": "third-party/raven-tools/npm/vscode-languageserver-types/3.17.5/License.txt",
+          "source": "npm:vscode-languageserver-types@3.17.5/License.txt",
+          "sha256": "ec9ee83580841e8eb687aca9867f221503809ba6426c7f876ede17d91b9fcfd0"
+        }
+      ]
+    }
+  ]
+}

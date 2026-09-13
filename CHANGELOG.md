@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Preserved version-specific notices for 26 NuGet and five bundled JavaScript
+  dependencies in the experimental Raven tools, with source/hash provenance and
+  a dependency-manifest coverage checker. Future runtime bundles carry these texts;
+  separate SDK/VSIX assets require the companion attribution archive.
+
 - Accepted ordinary lowercase void returns in neoIL using the existing empty-stack
   calling convention, and updated preview samples. System.Void remains a unit type
   in generic/value contexts; legacy uppercase Void and noresult behavior is retained.
