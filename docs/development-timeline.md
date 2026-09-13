@@ -2153,3 +2153,54 @@ need input and grounding, while some ideas can be prototyped immediately. The as
 updated the research policy to scale evidence to consequences, keep prototypes
 provisional and include retaining current behavior as an explicit alternative. This
 is a decision-quality requirement, not a new permission or external-feedback gate.
+
+
+## 2026-09-13 — A bounded view before a collection hierarchy
+
+**Author:** Asked to continue the proposed read-only view/variance investigation,
+then cautioned that .NET's accumulated collection interfaces should be reviewed later.
+Questioned the need for readonly, immutable and frozen contracts. Suggested Iterable,
+counted Collection, indexed/ordered Sequence, Map and Set with separate Mutable*
+contracts as an illustration, explicitly not a selected design.
+
+**Assistant response and action:** Kept the prototype application-local. Audited the
+existing interfaces and found variance metadata/dispatch prerequisites and a legacy
+Iterable byref-return mismatch with the Raven projection. Added an explicit Dog-array
+adapter returning Animal through a getter-only interface, a C# comparison and direct
+IL checks. Reviewed .NET variance and collection discussions, Java backed views and
+alternative immutable .NET collections as different contracts.
+
+**Outcome and limits:** The prototype demonstrates live aliases, shared element
+identity, private backing storage and GC retention without copying the array. It
+allocates an adapter and does not implement implicit covariance. No new standard
+collection interface, general variance or readonly/immutable/frozen type was selected.
+See the [experiment and validation](experiments/readonly-views/README.md). The future
+collection hierarchy and variance representation remain open.
+
+**Subsequent supplied proposal:** The author shared a ChatGPT hierarchy with covariant
+Iterable/Collection/List/Set, Map<K,out V>, invariant Mutable* extensions, and concrete
+Array/ArrayList/HashSet/HashMap plus Immutable* and Frozen* families; an earlier list
+also included LinkedList. Recorded both proposals in the
+[collection-contract review](collection-contracts.md). The assistant identified Set
+membership inputs, Map's Option/byref lookup results, fixed-size array mutation and
+linked-list indexing costs as questions to resolve before selecting that hierarchy.
+No author decision adopting these particular interfaces is inferred.
+
+**Explicit array decision:** The author then stated, “System.Array should be generic
+in NeoCLR. System.Array<T>”. Recorded this as the selected generic array direction,
+while keeping the rest of the hierarchy provisional. The assistant proposed preserving
+ordinary T[] syntax and CLI array signatures/instructions, with no wrapper allocation,
+and identified type identity, metadata, reflection, member lookup and fixed-size mutation
+as mapping work still to perform. This slice does not implement the generic Array API.
+
+**Variance follow-up:** The author observed that generic System.Array allows variance
+to be declared on the type. The assistant clarified the proposed rule as invariant T
+for mutable arrays, with covariance potentially on read interfaces. A generic declaration
+still needs to agree with runtime array signatures, casts and element access; it does
+not itself make mutable covariance safe or complete the missing generic-variance work.
+
+**Shape clarification:** The author confirmed unchanged language treatment and
+emphasized “The shape is known”. The assistant recorded the purpose as a known generic
+array definition for the runtime and tools, linking element type, members, interfaces
+and invariance to existing array signatures/instructions. This refines the intended
+mapping; it does not claim that mapping has been implemented.

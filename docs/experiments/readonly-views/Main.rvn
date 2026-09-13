@@ -1,0 +1,59 @@
+import System.*
+import System.Console.*
+
+open class Animal {
+    var Age: int
+    init(age: int) {
+        Age = age
+    }
+}
+
+class Dog : Animal {
+    init(age: int) : base(age) { }
+}
+
+// Closed prototype contract, not a new standard-library interface.
+interface AnimalView {
+    val Count: int { get; }
+    val self[index: int]: Animal { get; }
+}
+
+class DogArrayView : AnimalView {
+    private field data: Dog[]
+    init(source: Dog[]) {
+        data = source
+    }
+    val Count: int {
+        get { return data.Length }
+    }
+    val self[index: int]: Animal {
+        get { return data[index] }
+    }
+}
+
+func ReadFirst(view: AnimalView) {
+    WriteLine(view.Count)
+    WriteLine(view[0].Age)
+}
+
+func MakeView() -> AnimalView {
+    let local: Dog[] = [Dog(11)]
+    return DogArrayView(local)
+}
+
+func Main() {
+    let dogs: Dog[] = [Dog(7)]
+    let view: AnimalView = DogArrayView(dogs)
+    ReadFirst(view)
+
+    // Replacing an element through the original array is visible through the view.
+    dogs[0] = Dog(42)
+    ReadFirst(view)
+
+    // Read-only elements do not make the referenced Animal immutable.
+    view[0].Age = 99
+    WriteLine(dogs[0].Age)
+
+    // The view retains its heap-backed array after the creating function returns.
+    ReadFirst(MakeView())
+}

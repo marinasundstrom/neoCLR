@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Added a bounded read-only view experiment in Raven and direct IL, with .NET/API
+  comparisons and checks for live aliases, shared element identity, GC retention,
+  access restrictions, bounds and null behavior. Recorded generic-variance prerequisites
+  and reviewed the supplied collection hierarchies, including Set/Map variance and
+  fixed-size array mutation, without adopting a taxonomy. No library interface or
+  runtime variance support is added; mutable arrays remain invariant. Recorded System.Array<T> as the intended
+  generic array type, with metadata/reflection mapping deferred to a dedicated slice.
+
 - Clarified platform direction: retain CLR-like type categories and language ergonomics,
   develop library APIs by concrete need, and evaluate text/encoding, memory views,
   nullability metadata, callable types, runtime async and injectable clocks. Updated

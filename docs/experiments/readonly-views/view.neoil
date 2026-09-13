@@ -1,0 +1,80 @@
+.module ReadOnlyViewPrototype
+.entry Main
+
+.type class Animal
+.end
+.type class Dog
+.extends Animal
+.end
+.interface AnimalView
+.method instance get_Count() -> Int32
+.end
+.method instance get_Item(Int32 index) -> Animal
+.end
+.end
+.type class DogArrayView
+.implements AnimalView
+.field private Data arrayref<Dog>
+.method instance .ctor(arrayref<Dog> data) -> void
+ldarg this
+ldarg data
+stfld DogArrayView::Data
+ret
+.end
+.method instance get_Count() -> Int32
+ldarg this
+ldfld DogArrayView::Data
+ldlen
+conv.ovf.i4
+ret
+.end
+.method instance get_Item(Int32 index) -> Animal
+ldarg this
+ldfld DogArrayView::Data
+ldarg index
+ldelem Dog
+ret
+.end
+.end
+
+.function Make() -> AnimalView
+.local arrayref<Dog> data
+ldc.i4 1
+newarr Dog
+stloc data
+ldloc data
+ldc.i4 0
+newobj Dog
+stelem Dog
+ldloc data
+newobj instance DogArrayView::.ctor(arrayref<Dog>)
+ret
+.end
+
+.function Main() -> Boolean
+.local arrayref<Dog> data
+.local AnimalView view
+.local Dog replacement
+ldc.i4 1
+newarr Dog
+stloc data
+ldloc data
+ldc.i4 0
+newobj Dog
+stelem Dog
+ldloc data
+newobj instance DogArrayView::.ctor(arrayref<Dog>)
+stloc view
+newobj Dog
+stloc replacement
+ldloc data
+ldc.i4 0
+ldloc replacement
+stelem Dog
+ldloc view
+ldc.i4 0
+callvirt instance AnimalView::get_Item(Int32)
+ldloc replacement
+ref.eq
+ret
+.end

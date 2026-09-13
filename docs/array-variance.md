@@ -84,3 +84,13 @@ The refreshed local SDK/extension `0.1.12-neoclr.10` includes this policy and ha
 passed the same checks from its packaged layout. See the
 [installation and diagnostic walkthrough](raven-stabilization-local-build.md) and
 [build evidence](experiments/raven-target/array-diagnostics-toolchain.json).
+
+## Bounded read-only view experiment (2026-09-13)
+
+The [application-local prototype](experiments/readonly-views/README.md) demonstrates
+base-object reads without copying an array, alias visibility and checked managed
+access using the existing runtime. It does not implement implicit generic variance
+or choose a library collection hierarchy. The audit identifies variance metadata,
+constructed-interface dispatch and Iterable's legacy byref return as prerequisites.
+Collection/enumerable naming and readonly/immutable/frozen contracts remain a separate
+review; the author's suggested capability split is recorded as a candidate only.

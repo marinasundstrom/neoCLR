@@ -79,6 +79,17 @@ Generic Void also constrains a future Task<Void>/async-await design: decide awai
 contracts, no-payload completion and suspension without importing assumptions that Void
 cannot be a generic argument. Async is not part of these application slices.
 
+## Read-only collection experiment (2026-09-13)
+
+The [bounded view prototype](experiments/readonly-views/README.md) tests aliasing,
+base-element reads and managed-access checks without new runtime machinery. Generic
+variance remains unimplemented. Review variance metadata and dispatch next, separately
+from the eventual collection vocabulary. The [supplied collection hierarchies](collection-contracts.md), including
+Iterable/Collection/List or Sequence, Map/Set and Mutable*, are not adopted; evaluate complete member contracts before
+adding readonly, immutable or frozen collection APIs. System.Array<T> is now the
+author-selected generic array direction; plan its identity/metadata/reflection mapping
+separately while preserving ordinary array syntax, instructions and invariance.
+
 ## Current Raven-target experiment priority
 
 The [preview acceptance criteria](raven-preview-acceptance.md) focus on the fundamentals already built and their differences from
