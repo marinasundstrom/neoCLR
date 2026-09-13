@@ -2137,3 +2137,19 @@ research notes and linked the roadmap. This slice changes documentation only. No
 Span, Rune/codec, nullable signature, callable representation, Task or injectable-clock
 implementation is claimed. Proposed slice ordering remains an assistant recommendation;
 no reply selecting those detailed designs is available in this exchange.
+
+**Follow-up on research scope:** The author requested reviews of other platforms,
+comments on .NET runtime APIs, and independent projects that seek to improve the
+.NET experience. The assistant proposed retaining .NET as the compatibility baseline
+while examining concrete feedback, alternative designs and counterevidence. Updated
+[design research](design-research.md#broader-api-review-scope-2026-09-13) to require
+relevant comparisons for substantive API design, with attributed opinions, source
+status and transfer costs. Added Noda Time, Rust text documentation and .NET API-review
+process links as initial entry points. No full comparative review or adoption of
+those projects is claimed; this establishes the workflow for subsequent API slices.
+
+**Author's qualification:** Not everything warrants change. Larger platform decisions
+need input and grounding, while some ideas can be prototyped immediately. The assistant
+updated the research policy to scale evidence to consequences, keep prototypes
+provisional and include retaining current behavior as an explicit alternative. This
+is a decision-quality requirement, not a new permission or external-feedback gate.

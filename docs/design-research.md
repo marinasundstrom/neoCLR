@@ -10,7 +10,7 @@ context, not constraints: neoCLR may choose a more consistent contract across it
 runtime and frontends without reproducing those workarounds.
 
 Apply this process to new work and to changes in existing memory, arrays, collections,
-reflection, dispatch, debugger and Neo contracts. Do not treat an implemented preview
+reflection, dispatch, debugger and frontend contracts. Do not treat an implemented preview
 choice as settled merely because it exists. Keep published history frozen; describe
 reassessment and migration in current design documents and Unreleased entries.
 
@@ -29,8 +29,9 @@ why the fix restores that contract rather than repeat the research.
    Mark proposals as proposals; do not confuse them with shipped behavior.
 3. **Alternatives.** Compare adopting the .NET behavior, adapting it to neoCLR's
    value/reference model, and adding a new mechanism where justified. Evaluate
-   language, metadata, runtime and library placement independently. Other languages
-   can supply evidence, but do not substitute analogy for a .NET comparison.
+   language, metadata, runtime and library placement independently. Include relevant
+   other platforms, .NET API feedback and alternative .NET ecosystem projects using
+   the review scope below; keep the .NET baseline explicit.
 4. **Benefits and costs.** Consider correctness, enforceability across frontends,
    usability, implementation complexity, allocation/copying cost, GC/lifetime effects,
    interop, reflection, debugging and eventual JIT/AOT support. Benchmark performance
@@ -43,10 +44,79 @@ why the fix restores that contract rather than repeat the research.
    use small .NET comparison programs on a recorded toolchain. Check runtime-source
    claims against a pinned revision when relevant.
 
-Before implementation, resolve the questions that affect the slice's contract.
-Research depth should follow uncertainty and consequences; this is not an extra
-permission gate. Continue authorized work once the comparison supports the choice.
-Reopen the decision when tests, measurements or better evidence contradict it.
+## Scale the decision to its consequences
+
+Not everything is worth changing. Keeping the existing behavior is an explicit
+alternative, including when evidence of a better design is weak.
+
+Small, reversible prototypes may begin immediately to answer a bounded question.
+State the hypothesis, comparison and success/failure criteria; label the implementation
+experimental and avoid presenting its API as a settled platform contract. Experiments
+are a way to obtain input, not a shortcut around evaluating the result.
+
+Before adopting a larger decision affecting type identity, metadata, lifetime safety,
+GC, cross-language behavior or widely used APIs, document the problem, existing
+behavior, outside experience, alternatives and compatibility costs. Use a reduced
+prototype or comparison program where it can answer the uncertainty. Identify remaining
+unknowns and whether they are acceptable; do not silently turn an experiment into policy.
+
+Before production implementation of a selected contract, resolve its essential safety
+and interoperability questions. Research depth follows consequences and uncertainty,
+not a fixed document size or an approval ritual. This does not add a permission gate
+or require external feedback to arrive before any useful work can proceed. Reopen
+choices when tests, measurements or better evidence contradict them.
+
+## Broader API review scope (2026-09-13)
+
+The author directs API reviews to consider other platforms, discussion of .NET APIs,
+and independent projects that offer different approaches within the .NET ecosystem.
+The purpose is to learn from demonstrated designs and user experience, not restrict
+research to official .NET documentation or assume a replacement library is better.
+
+For a new API family or substantive redesign, gather four kinds of evidence:
+
+1. **Current .NET contract and rationale.** Read documentation, implementation and
+   relevant API-review decisions. Check whether the criticized behavior still applies
+   to the current baseline rather than only .NET Framework or an older release.
+2. **Experience and criticism.** Inspect relevant issues, discussions, review comments
+   and first-hand experience reports. Capture the concrete scenario, competing views,
+   maintainer response and current resolution. Cite the specific comment when relying
+   on it. Attribute opinions; popularity, an open issue or a rejected proposal does
+   not establish a defect or the best solution.
+3. **Other platforms.** Compare at least one relevant design using its own primary
+   documentation and examples. Separate language conveniences from runtime guarantees
+   and library policy. Account for ownership, GC, Unicode and concurrency assumptions
+   that may not transfer to a managed CLI-like platform.
+4. **Alternative .NET projects.** Where relevant, inspect a project that addresses
+   the same problem: its rationale, public contract, tests, limitations and migration
+   story. Identify whether it solves the issue entirely as a library, needs language
+   support or exposes an actual runtime limitation. A library solution is evidence
+   against adding unnecessary runtime machinery.
+
+Select sources by the problem, not by a fixed list of fashionable platforms. If no
+useful comparison or independent project is found, record that gap instead of inventing
+an analogue. Routine fixes can reuse an existing review; this is not an exhaustive
+survey requirement for every overload or maintenance commit.
+
+Record a compact comparison in the feature document: source/version/date, status
+(shipped, proposal, rejected, superseded or opinion), concrete benefit, cost, portability
+to neoCLR and an example/test needed to validate the claim. Include counterevidence
+and reasons to keep .NET behavior. Verify performance claims with comparable workloads;
+repository marketing and anecdotes are hypotheses until checked.
+
+Initial entry points checked 2026-09-13, not completed evaluations:
+
+- [.NET API review process](https://github.com/dotnet/runtime/blob/main/docs/project/api-review-process.md)
+  provides context for proposals and design discussions. Read the relevant issue's
+  history and final outcome before treating a review comment as platform policy.
+- [Noda Time 3.2 design philosophy](https://nodatime.org/3.2.x/userguide/design)
+  is a useful date/time comparison: explicit domain distinctions, injectable clocks
+  and documented tradeoffs. Compare it with modern .NET TimeProvider and our bounded
+  date/time needs; this is not a decision to copy Noda Time's whole API.
+- [Rust's str documentation](https://doc.rust-lang.org/std/str/)
+  is an entry point for valid UTF-8 and decoding contracts. Inspect its concrete
+  operations for the text review; do not import Rust's ownership model merely to
+  borrow an API idea.
 
 ## Starting evidence and limits
 
@@ -77,11 +147,11 @@ later area still need their own evidence and cost assessment.
 | Area | Comparison to complete before settling the contract |
 | --- | --- |
 | Immutable bindings and readonly access | Compare C# readonly/ref rules, CLI storage/address restrictions and current runtime enforcement. Evaluate compiler-only, verifier-backed and mandatory runtime capabilities, including aliasing and defensive-copy behavior. |
-| Inheritance | Compare base layout, construction, virtual slots and casts; identify adaptations required by value-default types and optional Object ancestry. |
+| Inheritance | Compare base layout, construction, virtual slots and casts; retain the selected CLR-like type categories and assess any remaining object-hierarchy differences. |
 | Nullability | Compare reference annotations, nullable value representation, generic/default initialization and reflection; test the cost and usefulness of enforced nullable storage. |
 | Enums and flags | Compare underlying types, flag operations, unnamed values, conversions, formatting and reflection; justify deviations rather than redesigning familiar options APIs. |
 | Generic constraints | Compare existing metadata/runtime constraints with C#-only restrictions; define how proposed address-mode, null and Void constraints differ. |
-| Delegates and lambdas | Follow the [delegate direction](delegates.md): compare managed delegate invocation, capture lowering, lifetime/GC behavior and function-pointer facilities. Languages build callable values on delegates; a separate universal function-object runtime model is excluded. The first implementation uses checked binding and ordinary Invoke, with Func<Void> replacing Action. Validate later closure and multicast choices. |
+| Delegates and lambdas | Follow the [delegate direction](delegates.md): compare managed delegate invocation, capture lowering, lifetime/GC behavior and function-pointer facilities. Existing callables use delegates; the reopened function-type review compares alternatives without selecting a replacement. The first implementation uses checked binding and ordinary Invoke, with Func<Void> replacing Action. Validate later closure and multicast choices. |
 | Async | Compare current .NET async implementations and relevant proposals on pinned versions; distinguish API/task behavior from state-machine or runtime-suspension mechanisms. |
 | Dynamic hooks | Compare .NET dynamic binding and extensibility with ordinary virtual dispatch, then select a concrete problem that justifies runtime hooks. |
 | Framework and existing features | Map each affected API to its .NET behavior and assess deliberate neoCLR differences, including copying, allocation, errors and reference contracts. |

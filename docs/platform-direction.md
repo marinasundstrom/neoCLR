@@ -3,8 +3,12 @@
 Direction clarified 2026-09-13. neoCLR is an independent managed runtime, with Raven
 as the current frontend experiment. Preserve useful .NET behavior and investigate
 specific improvements without requiring developers to relearn ordinary programming.
+Reviews include other platforms, .NET API discussions and alternative .NET libraries,
+following the [broader research scope](design-research.md#broader-api-review-scope-2026-09-13).
 Starting without legacy constraints creates options; it does not establish that a
-replacement is simpler, safer or faster.
+replacement is simpler, safer or faster. Small reversible prototypes can gather
+evidence immediately; major platform contracts require grounded comparisons before
+adoption. Keeping current behavior is always an alternative.
 
 ## Foundations to retain
 

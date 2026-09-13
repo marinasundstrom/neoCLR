@@ -12,6 +12,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   develop library APIs by concrete need, and evaluate text/encoding, memory views,
   nullability metadata, callable types, runtime async and injectable clocks. Updated
   stale default-semantics policy summaries and recorded the development conversation.
+  Broadened substantive API reviews to other platforms, .NET feedback and independent
+  .NET libraries, with source status, counterevidence and transfer costs recorded.
+  Distinguished immediate reversible prototypes from evidence-backed adoption of
+  major platform contracts; retaining existing behavior remains an explicit option.
   These are design reviews and plans, not newly implemented runtime capabilities.
 
 - Built and installed experimental Raven SDK/VSIX 0.1.12-neoclr.9 with the recent

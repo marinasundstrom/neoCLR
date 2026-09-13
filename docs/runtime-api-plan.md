@@ -40,7 +40,9 @@ mandate to implement every row now.
 
 Every addition needs a consumer-facing contract, .NET comparison, supported overloads,
 error/absence behavior, a Raven sample and direct runtime checks where safety depends
-on enforcement. Include editor discovery, packaged execution and the coverage audit.
+on enforcement. Include editor discovery, packaged execution and the coverage audit. For substantive
+API design, review relevant other platforms, .NET feedback and alternative libraries
+under the [broader research scope](design-research.md#broader-api-review-scope-2026-09-13).
 Do not require manual dereferencing, ownership bookkeeping or special allocations for
 ordinary class/array usage. Method calls, properties, indexers, loops, generics and
 callbacks should preserve the familiar experience wherever the contract permits.
