@@ -5,6 +5,12 @@
 - Keep work in the Raven repository isolated on a feature branch. Verify its branch
   before editing; do not make experiment changes on Raven's `main` branch.
 
+## Sample readability
+
+- Prefer readable samples over compact formatting. Expand block expressions and
+  statements across lines when that makes their contents easier to follow; there is
+  no requirement to fit a complete block on one line.
+
 ## Changelog required for every commit
 
 - Include a staged `CHANGELOG.md` update in every commit, including code, tests,

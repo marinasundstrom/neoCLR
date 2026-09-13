@@ -134,7 +134,11 @@ pub(crate) fn validate_binding(
         || is_contract(module, &callee)
         || (callee.instance
             && !callee.receiver_byref
-            && !crate::interfaces::is_contract(module, &callee))
+            && !crate::interfaces::is_contract(module, &callee)
+            && !callee
+                .owner
+                .as_ref()
+                .is_some_and(|owner| module.is_reference_type(owner)))
         || (callee.is_abstract
             && !callee.is_virtual
             && !crate::interfaces::is_contract(module, &callee))
@@ -156,6 +160,38 @@ pub(crate) fn bind(
     let mut callee = validate_binding(module, caller, ty, target)?;
     let receiver = if callee.instance {
         let value = receiver.ok_or_else(|| Fault::new("delegate target requires receiver"))?;
+        if let Value::ObjectReference(mut object) = value {
+            let owner = callee.owner.as_ref().unwrap();
+            if object.target() != owner && !module.reference_assignable(object.target(), owner) {
+                return Err(Fault::new("delegate receiver type mismatch"));
+            }
+            object.reference.assigned()?;
+            if crate::interfaces::is_contract(module, &callee) {
+                callee = crate::interfaces::implementation(
+                    module,
+                    object.concrete_type(),
+                    owner,
+                    &callee,
+                )?;
+            } else if callee.is_virtual {
+                callee = crate::inheritance::dispatch(module, object.concrete_type(), &callee)?;
+            }
+            if callee.receiver_byref
+                || callee.is_abstract
+                || crate::interfaces::is_contract(module, &callee)
+            {
+                return Err(Fault::new(
+                    "nominal delegate requires a concrete class implementation",
+                ));
+            }
+            compatible(&contract(module, ty)?, &callee)?;
+            object.view = callee.owner.clone();
+            return Ok(finish(
+                ty,
+                callee,
+                Some(Box::new(Value::ObjectReference(object))),
+            ));
+        }
         let (view, slot) = match value {
             Value::SlotReference(slot) => (slot.target().clone(), slot),
             Value::SlotInterface {
@@ -214,6 +250,10 @@ pub(crate) fn bind(
         }
         None
     };
+    Ok(finish(ty, callee, receiver))
+}
+
+fn finish(ty: &Type, callee: Function, receiver: Option<Box<Value>>) -> Value {
     let target = FunctionRef {
         definition: callee.definition,
         name: callee.name,
@@ -222,9 +262,9 @@ pub(crate) fn bind(
         parameters: callee.parameters,
         generic_arguments: callee.generic_arguments,
     };
-    Ok(Value::Delegate(Delegate {
+    Value::Delegate(Delegate {
         ty: ty.clone(),
         target,
         receiver,
-    }))
+    })
 }

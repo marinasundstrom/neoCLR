@@ -1,0 +1,73 @@
+import System.*
+import System.Collections.*
+import System.Console.*
+
+interface Reader {
+    func Read() -> int
+}
+
+abstract class Base : Reader {
+    abstract func Read() -> int
+}
+
+class Derived : Base {
+    override func Read() -> int {
+        return 123
+    }
+}
+
+class Counter {
+    var Age: int
+    init(age: int) {
+        Age = age
+    }
+    func Add(delta: int) -> int {
+        Age = Age + delta
+        return Age
+    }
+    func Set(value: int) {
+        Age = value
+    }
+}
+
+func MakeCounter(start: int) -> Func<int, int> {
+    var current = start
+    return (step: int) -> int => {
+        current = current + step
+        return current
+    }
+}
+
+func Main() {
+    let counter = Counter(7)
+    let add: Func<int, int> = counter.Add
+    WriteLine(add(1))
+    let set: Func<int, System.Void> = counter.Set
+    set(42)
+    WriteLine(counter.Age)
+    let identity: Func<int, int> = (value: int) -> int => value
+    WriteLine(identity(99))
+    let next = MakeCounter(10)
+    WriteLine(next(2))
+    WriteLine(next(3))
+    var shared = 7
+    let read: Func<int> = () -> int => shared
+    let write: Func<int, System.Void> = (value: int) => {
+        shared = value
+    }
+    write(42)
+    WriteLine(read())
+    WriteLine(shared)
+    let reader: Reader = Derived()
+    let readInterface: Func<int> = reader.Read
+    WriteLine(readInterface())
+    let parent: Base = Derived()
+    let readVirtual: Func<int> = parent.Read
+    WriteLine(readVirtual())
+    let values = ArrayList<int>()
+    values.Add(7)
+    values.Add(42)
+    WriteLine(values.FindIndex((value: int) -> bool => value == 42))
+    let increment: Func<int, int> = (value: int) -> int => value + 1
+    WriteLine(increment(2147483647))
+}

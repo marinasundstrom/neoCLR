@@ -4,16 +4,31 @@ import System.Console.*
 
 class Counter {
     var Age: int
-    init(age: int) { Age = age }
-    func Set(age: int) { Age = age }
-    func Get() -> int { return Age }
+    init(age: int) {
+        Age = age
+    }
+    func Set(age: int) {
+        Age = age
+    }
+    func Get() -> int {
+        return Age
+    }
 }
+
 struct Point {
     var X: int
-    init(x: int) { X = x }
-    func Set(x: int) { X = x }
+    init(x: int) {
+        X = x
+    }
+    func Set(x: int) {
+        X = x
+    }
 }
-func Change(counter: Counter) { counter.Set(42) }
+
+func Change(counter: Counter) {
+    counter.Set(42)
+}
+
 func Main() {
     let counter = Counter(7)
     let alias = counter

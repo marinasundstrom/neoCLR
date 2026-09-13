@@ -6,13 +6,24 @@ interface CounterView {
     func Get() -> int
     func Set(value: int)
 }
+
 class Counter : CounterView {
     var Age: int
-    init(age: int) { Age = age }
-    func Get() -> int { return Age }
-    func Set(value: int) { Age = value }
+    init(age: int) {
+        Age = age
+    }
+    func Get() -> int {
+        return Age
+    }
+    func Set(value: int) {
+        Age = value
+    }
 }
-func Make() -> CounterView { return Counter(7) }
+
+func Make() -> CounterView {
+    return Counter(7)
+}
+
 func Main() {
     let view = Make()
     view.Set(42)

@@ -1050,7 +1050,9 @@ fn typed_effect(
                 stored(
                     module,
                     &values[0],
-                    &if callee.receiver_readonly {
+                    &if !callee.receiver_byref && module.is_object_reference_type(owner) {
+                        owner.clone()
+                    } else if callee.receiver_readonly {
                         T::ReadOnlyByRef(Box::new(owner.clone()))
                     } else {
                         T::ByRef(Box::new(owner.clone()))

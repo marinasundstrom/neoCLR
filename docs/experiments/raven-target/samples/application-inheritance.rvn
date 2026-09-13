@@ -1,17 +1,31 @@
 import System.*
 import System.Console.*
-interface Reader { func Read() -> int }
+
+interface Reader {
+    func Read() -> int
+}
+
 abstract class Base : Reader {
     var Age: int
-    init(age: int) { Age = age }
+    init(age: int) {
+        Age = age
+    }
     abstract func Read() -> int
-    virtual func Set(age: int) { Age = age }
+    virtual func Set(age: int) {
+        Age = age
+    }
 }
+
 class Derived : Base {
     init(age: int) : base(age) { }
-    override func Read() -> int { return Age }
-    override func Set(age: int) { base.Set(age) }
+    override func Read() -> int {
+        return Age
+    }
+    override func Set(age: int) {
+        base.Set(age)
+    }
 }
+
 func Main() {
     let item = Derived(7)
     let parent: Base = item

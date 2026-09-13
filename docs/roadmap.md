@@ -42,8 +42,9 @@ Preview 4 is published with runtime, source, Raven SDK/VSIX and validation artif
 The active follow-up is [application-defined Raven types](raven-application-types.md):
 class/value storage, interfaces and inheritance are implemented, together with the
 [order-workflow application](raven-order-workflow.md).
-Delegate targets and non-capturing/capturing lambdas are included in the follow-up
-scope. Keep runtime work primary and Raven fixes isolated on its experimental branch;
+[Delegate targets and non-capturing/capturing lambdas](raven-delegates-lambdas.md)
+are implemented for the existing Func family. Keep runtime work primary and Raven
+fixes isolated on its experimental branch;
 separate general compiler bugs from target contract mappings and generic-Void semantics.
 
 A future release must include Raven-to-neoCLR debugging support. Build on the existing

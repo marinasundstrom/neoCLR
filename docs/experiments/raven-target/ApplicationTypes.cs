@@ -8,7 +8,8 @@ static class ApplicationTypes
     static ModuleDefinition? Module;
     static readonly Dictionary<string, TypeDefinition> Types = new();
     static readonly HashSet<string> Expanded = new();
-    public static void Reset(ModuleDefinition module) { Module = module; Types.Clear(); Expanded.Clear(); }
+    static readonly Dictionary<string, Dictionary<string, string>> Adapters = new();
+    public static void Reset(ModuleDefinition module) { Module = module; Types.Clear(); Expanded.Clear(); Adapters.Clear(); }
     public static bool IsType(string name) => Types.ContainsKey(name);
     public static bool IsReference(string name) => Types.TryGetValue(name, out var type) && !type.IsValueType;
     public static string? Type(TypeReference reference)
@@ -18,7 +19,7 @@ static class ApplicationTypes
         var type = reference.Resolve();
         if (type is null || type.Module != Module || type.FullName == "System.Unit" || type.Name == "<Module>") return null;
         if (type.HasGenericParameters || type.IsEnum
-            || type.IsExplicitLayout || type.IsNested || type.IsValueType && type.HasInterfaces
+            || type.IsExplicitLayout || (type.DeclaringType?.HasGenericParameters ?? false) || type.IsValueType && type.HasInterfaces
             || (!type.IsInterface && type.BaseType?.FullName is not ("System.Object" or "System.ValueType") && type.BaseType?.Resolve()?.Module != Module)
             || type.Fields.Any(f => f.IsStatic || f.HasMarshalInfo || f.IsInitOnly)
             || type.Methods.Any(m => m.IsConstructor && m.IsStatic))
@@ -74,7 +75,7 @@ static class ApplicationTypes
     public static string MethodName(MethodDefinition method)
     {
         if (method.IsConstructor) return ".ctor";
-        if (!Regex.IsMatch(method.Name, @"^[A-Za-z_][A-Za-z0-9_]*$")) throw new InvalidDataException("Unsupported application member name.");
+        if (!Regex.IsMatch(method.Name, @"^[A-Za-z_][A-Za-z0-9_]*$")) return $"Generated_{method.MetadataToken.ToUInt32():x8}";
         return method.Name;
     }
     public static void CheckMethod(MethodReference method)
@@ -96,6 +97,11 @@ static class ApplicationTypes
             throw new InvalidDataException("Unsupported application field access.");
         return new(owner, map(field.FieldType, false), $"Field_{field.MetadataToken.ToUInt32():x8}", field.DeclaringType.IsValueType);
     }
+    public static void AddAdapter(string owner, string name, string body)
+    {
+        if (!Adapters.TryGetValue(owner, out var methods)) Adapters[owner] = methods = new();
+        methods[name] = body;
+    }
     public static string Declarations(Func<TypeReference, bool, string> map, Dictionary<MethodDefinition, string> bodies)
     {
         var output = new StringBuilder();
@@ -111,6 +117,7 @@ static class ApplicationTypes
             foreach (var field in type.Fields)
                 output.AppendLine($".field Field_{field.MetadataToken.ToUInt32():x8} {map(field.FieldType, false)}");
             foreach (var body in bodies.Where(p => p.Key.DeclaringType == type)) output.Append(body.Value);
+            if (Adapters.TryGetValue(name, out var adapters)) foreach (var body in adapters.Values) output.Append(body);
             output.AppendLine(".end");
         }
         return output.ToString();

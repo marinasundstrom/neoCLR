@@ -1928,3 +1928,14 @@ executes with OrderStore dispatch, ArrayList<Order>, Option<Order>, Result<Void,
 FileWriteError> propagation and file I/O. Isolated checks confirm that failed writes
 preserve both queued order state and the previous report. Delegate/lambda work remains
 in progress; debugging remains a future release requirement.
+
+
+**Delegate/lambda outcome.** The requested follow-up now executes instance method
+groups and Raven-generated closure objects, including mutable shared captures and a
+callback returned from its creating function. A further compiler issue was found:
+interface/abstract method groups used ldftn, while explicit base groups could use
+virtual binding. The experimental Raven correction preserves ordinary CLR behavior;
+its tests include actual invocation and binding-time null failure. The neoCLR bridge
+uses the existing Func family and documents its adapters and limits in
+[delegate/lambda support](raven-delegates-lambdas.md). No async or debugger implementation
+is implied by this result, and published Preview 4 tools are unchanged.

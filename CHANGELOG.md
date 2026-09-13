@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Extended runtime delegate binding to nominal heap receivers and the Raven source
+  bridge to instance/virtual/interface method groups and shared or escaping lambda
+  captures through Func, including Func<Void>. Added binding-time null checks,
+  closure GC tests and ordinary CLI add/sub/mul admission; documented adapter costs
+  and remaining boundaries. Raven's experimental method-group emission now preserves
+  virtual/interface dispatch and explicit base selection. Expanded application sample
+  blocks for readability and recorded that preference in the repository workflow.
+
 - Added a Raven order-workflow application with domain classes, an application
   interface, ArrayList storage, Option lookup and Result<Void, FileWriteError>
   propagation. Isolated checks verify persistence and unchanged order/report state

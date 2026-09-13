@@ -1,6 +1,7 @@
 """Exercise application metadata through saved Raven source and the neoCLR verifier."""
 import argparse
 import json
+import re
 from pathlib import Path
 import shutil
 import subprocess
@@ -23,17 +24,27 @@ with tempfile.TemporaryDirectory(prefix='neoclr-application-check-') as temporar
                *runner_arguments(args), '--runtime', str(args.runtime.resolve())]
     source = (bridge / 'samples/application-types.rvn').read_text()
     for label, text, expected in [
+        ('Delegates and shared captures', (bridge / 'samples/application-delegates.rvn').read_text(), '8\n42\n99\n12\n15\n42\n42\n123\n123\n1\n-2147483648\n'),
         ('Application interfaces', (bridge / 'samples/application-interfaces.rvn').read_text(), '42\n99\n'),
         ('Abstract inheritance and overrides', (bridge / 'samples/application-inheritance.rvn').read_text(), '7\n42\n'),
         ('Class identity and value copies', source, '42\n99\n7\n42\n7\n'),
         ('Saved source rebuild', source.replace('counter.Set(42)', 'counter.Set(21)'), '21\n99\n7\n42\n7\n'),
     ]:
+        if label == 'Delegates and shared captures':
+            text = text.replace('func Main() {', 'func AllocateNoise() { var remaining = 100; while remaining != 0 { Counter(remaining); remaining = remaining - 1 } }\nfunc Main() {')
+            text = text.replace('let next = MakeCounter(10)', 'let next = MakeCounter(10)\n    AllocateNoise()')
         (root / 'Main.rvn').write_text(text)
         run = subprocess.run(command, capture_output=True, text=True, timeout=120)
         if run.returncode or not run.stdout.endswith(expected):
             raise AssertionError(label + ': ' + run.stdout + run.stderr)
         results[label] = 'passed'
         artifact = max((root / '.neoclr-build').glob('*/output/App.neoil'), key=lambda p: p.stat().st_mtime_ns)
+        if label == 'Delegates and shared captures':
+            collected = subprocess.run([str(args.runtime.resolve()), 'run', str(artifact), '--system',
+                str(artifact.parent / 'System.Collections.neoil'), '--gc-stats'], capture_output=True, text=True, timeout=120)
+            assert collected.returncode == 0 and collected.stdout == expected, collected.stdout + collected.stderr
+            assert int(re.search(r'collections=(\d+)', collected.stderr).group(1)) > 0, collected.stderr
+            results['Escaping closure across GC'] = 'passed'
         lines = artifact.read_text().splitlines()
         mapping = json.loads(Path(str(artifact) + '.map.json').read_text())
         for entry in mapping['Mappings']:
@@ -49,4 +60,19 @@ with tempfile.TemporaryDirectory(prefix='neoclr-application-check-') as temporar
         if 'Unsupported application' not in run.stderr:
             raise AssertionError(label + ': expected importer rejection: ' + run.stderr)
         results[label] = 'rejected before execution'
+    (root / 'Main.rvn').write_text("""
+import System.*
+import System.Console.*
+interface Reader { func Read() -> int }
+class Holder { var Reader: Reader }
+func Main() {
+    let holder = Holder()
+    let callback: Func<int> = holder.Reader.Read
+    WriteLine("Must not reach invocation")
+}
+""")
+    run = subprocess.run(command, capture_output=True, text=True, timeout=120)
+    assert run.returncode != 0 and 'null delegate receiver' in run.stderr, run.stdout + run.stderr
+    assert 'Must not reach invocation' not in run.stdout
+    results['Null interface method group'] = 'faulted at binding'
 print(json.dumps(results, indent=2))

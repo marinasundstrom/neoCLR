@@ -13,18 +13,26 @@ class Order {
         Status = "Queued"
     }
 }
+
 interface OrderStore {
     func Add(order: Order)
     func Find(id: int) -> Option<Order>
     func Save(order: Order, limit: int) -> Result<System.Void, FileWriteError>
 }
+
 class FileOrderStore : OrderStore {
     var orders: ArrayList<Order>
-    init() { orders = ArrayList<Order>() }
-    func Add(order: Order) { orders.Add(order) }
+    init() {
+        orders = ArrayList<Order>()
+    }
+    func Add(order: Order) {
+        orders.Add(order)
+    }
     func Find(id: int) -> Option<Order> {
         for order in orders {
-            if order.Id == id { return Option<Order>(Option.Some<Order>(order)) }
+            if order.Id == id {
+                return Option<Order>(Option.Some<Order>(order))
+            }
         }
         return Option<Order>(Option.None())
     }
@@ -34,6 +42,7 @@ class FileOrderStore : OrderStore {
         return Result<System.Void, FileWriteError>(Result.Ok<System.Void>(()))
     }
 }
+
 func Process(store: OrderStore, id: int, limit: int) {
     let found = store.Find(id)
     if found is Option.Some<Order> present {
@@ -41,12 +50,19 @@ func Process(store: OrderStore, id: int, limit: int) {
         match store.Save(order, limit) {
             Result.Ok<System.Void> done => WriteLine(order.Status)
             Result.Error<FileWriteError> failure => {
-                if failure.Value.IsTooLarge { WriteLine("Order report exceeds limit") }
-                else { WriteLine("Order report could not be written") }
+                if failure.Value.IsTooLarge {
+                    WriteLine("Order report exceeds limit")
+                }
+                else {
+                    WriteLine("Order report could not be written")
+                }
             }
         }
-    } else { WriteLine("Order not found") }
+    } else {
+        WriteLine("Order not found")
+    }
 }
+
 func Main() {
     let store: OrderStore = FileOrderStore()
     let first = Order(7, "Coffee")

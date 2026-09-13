@@ -1,6 +1,6 @@
 using Mono.Cecil;
 
-// Existing nominal Func family. This slice admits static application targets.
+// Existing nominal Func family; target admission and closure lowering live in UnionImport.
 static class DelegateBindings
 {
     static readonly Dictionary<string, string[]> Shapes = new();

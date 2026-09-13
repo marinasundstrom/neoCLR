@@ -118,3 +118,12 @@ constructor behavior, including execution without opting into typed verification
 Validation: the six application checks pass, as do the focused runtime inheritance/
 dispatch suites and strict Clippy. Ten focused Raven tests pass, including dispatch
 flags through ordinary and experimental metadata emission.
+
+
+## Delegate/lambda follow-up
+
+[Delegate and lambda support](raven-delegates-lambdas.md) now includes application
+class targets, interface/virtual method groups, non-capturing lambdas and shared mutable
+captures, including escaping callbacks. Non-generic nested definitions are admitted
+with token-derived names for closure lowering; full nested reflection is still outside
+the projection. See that document for the Func-only boundary, adapter costs and tests.

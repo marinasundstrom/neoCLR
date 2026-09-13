@@ -85,7 +85,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
         ('PathUnsupportedApi', 'func Main() { System.IO.Path.GetFullPath(".") }', 'RAV'),
         ('StringArgumentMismatch', 'func Main() { System.String.Concat(42, 7) }', 'RAV'),
         ('StringUnsupportedApi', 'func Main() { System.String.IsNullOrEmpty(\"\") }', 'RAV'),
-        ('ImportFailure', 'func Add(value: int) -> int { return value + 1 }\nfunc Main() { Add(2) }', 'Unsupported')]:
+        ('ImportFailure', 'func Divide(value: int) -> int { return value / 2 }\nfunc Main() { Divide(2) }', 'Unsupported')]:
         before = set(root.rglob('App.neoil'))
         (root / 'Main.rvn').write_text(source)
         run = subprocess.run(command, capture_output=True, text=True, timeout=90)

@@ -19,7 +19,7 @@ static class UnionImport
     const string Carrier = "System.Result<Int32,System.OverflowError>";
     const string Ok = "System.Result.Ok<Int32>";
     const string Error = "System.Result.Error<System.OverflowError>";
-    sealed record Slot(string Type, int Local = -1, int ConditionalOut = -1, int Argument = -1, MethodDefinition? Function = null);
+    sealed record Slot(string Type, int Local = -1, int ConditionalOut = -1, int Argument = -1, MethodDefinition? Function = null, bool VirtualFunction = false);
     sealed record State(List<Slot> Stack, bool[] Assigned);
     sealed record Call(string Name, string[] Arguments, string Result, int OutArgument = -1, string? Instruction = null, bool ConditionalOutput = false);
 
@@ -288,14 +288,27 @@ static class UnionImport
                         var local = Local(((VariableDefinition)instruction.Operand).Index);
                         Push(new(locals[local] + "&", local)); code.AppendLine($"ldloca local{local}"); break;
                     case Code.Ldftn:
+                    case Code.Ldvirtftn:
                         var functionReference = (MethodReference)instruction.Operand;
-                        CheckStatic(functionReference);
+                        ApplicationTypes.CheckMethod(functionReference);
                         var functionTarget = ClosureAudit.ResolveMethod(functionReference) ?? throw new InvalidDataException("Unresolved delegate target.");
-                        if (functionTarget.Module != app.MainModule || !functionTarget.IsStatic || !functionTarget.HasBody || functionReference.FullName != functionTarget.FullName)
-                            throw new InvalidDataException("Only static application delegate targets are admitted.");
+                        var virtualFunction = instruction.OpCode.Code == Code.Ldvirtftn;
+                        if (functionTarget.Module != app.MainModule || functionReference.FullName != functionTarget.FullName
+                            || functionTarget.IsConstructor || (!functionTarget.HasBody && !virtualFunction)
+                            || functionTarget.DeclaringType.IsValueType && functionTarget.HasThis)
+                            throw new InvalidDataException("Only static or class application delegate targets are admitted: " + functionReference.FullName + "; " + instruction.OpCode);
                         if (!functionTarget.IsPublic && functionTarget.DeclaringType != method.DeclaringType)
                             throw new InvalidDataException("Nonpublic cross-type delegate target unsupported.");
-                        Push(new("FunctionAddress", Function: functionTarget)); break;
+                        if (virtualFunction)
+                        {
+                            if (!functionTarget.HasThis) throw new InvalidDataException("Virtual function address requires receiver.");
+                            var receiverType = ApplicationTypes.Receiver(functionTarget);
+                            Expect(receiverType);
+                            var checkName = "CheckDelegateReceiver_" + functionTarget.DeclaringType.MetadataToken.ToUInt32().ToString("x8");
+                            delegateAdapters[checkName] = $".function {checkName}({receiverType}) -> void\n.local {receiverType} empty\nldloca empty\ninitobj {receiverType}\nldarg 0\nldloc empty\nref.eq\nbrfalse Valid\nfault \"null delegate receiver\"\nValid:\nret\n.end\n";
+                            code.AppendLine($"call {checkName}({receiverType})");
+                        }
+                        Push(new("FunctionAddress", Function: functionTarget, VirtualFunction: virtualFunction)); break;
                     case Code.Newobj:
                         var constructor = (MethodReference)instruction.Operand;
                         var constructorDefinition = constructor.Resolve() ?? throw new InvalidDataException("Unresolved constructor.");
@@ -323,14 +336,41 @@ static class UnionImport
                         if (DelegateBindings.Type(constructor.DeclaringType) is { } delegateType)
                         {
                             DelegateBindings.Constructor(constructor, constructorDefinition);
-                            var function = Pop().Function ?? throw new InvalidDataException("Delegate requires a static function address.");
-                            Expect("FaultNull");
+                            var addressSlot = Pop();
+                            var function = addressSlot.Function ?? throw new InvalidDataException("Delegate requires an admitted function address.");
+                            if (function.HasThis) Expect(ApplicationTypes.Receiver(function));
+                            else Expect("FaultNull");
                             var signature = DelegateBindings.Signature(delegateType);
                             var targetArguments = function.Parameters.Select(p => ProfileType(p.ParameterType)).ToArray();
                             var targetResult = ProfileType(function.ReturnType, true);
                             if (!targetArguments.SequenceEqual(signature[..^1]) || (targetResult != signature[^1] && !(targetResult == "noresult" && signature[^1] == "Void")))
                                 throw new InvalidDataException("Delegate target signature mismatch.");
-                            pending.Enqueue(function);
+                            if (!function.IsAbstract) pending.Enqueue(function);
+                            if (function.HasThis)
+                            {
+                                var owner = ProfileType(function.DeclaringType);
+                                var adapterName = "DelegateTarget_" + function.MetadataToken.ToUInt32().ToString("x8") + (addressSlot.VirtualFunction ? "Virtual" : "Direct");
+                                var callInstruction = addressSlot.VirtualFunction ? "callvirt" : "call";
+                                var body = new StringBuilder($".method instance {adapterName}({string.Join(',', targetArguments)}) -> {signature[^1]}\nldarg 0\n");
+                                var adapterOwner = owner;
+                                if (function.DeclaringType.IsInterface)
+                                {
+                                    adapterOwner = "Application." + adapterName;
+                                    body.AppendLine($"ldfld {adapterOwner}::Target");
+                                }
+                                for (var n = 0; n < targetArguments.Length; n++) body.AppendLine($"ldarg {n + 1}");
+                                body.AppendLine($"{callInstruction} instance {owner}::{ApplicationTypes.MethodName(function)}({string.Join(',', targetArguments)})");
+                                if (targetResult == "noresult") body.AppendLine("ldvoid");
+                                body.AppendLine("ret\n.end");
+                                if (function.DeclaringType.IsInterface)
+                                {
+                                    delegateAdapters[adapterOwner] = $".type class {adapterOwner}\n.field Target {owner}\n" + body + ".end\n";
+                                    code.AppendLine("newobj " + adapterOwner);
+                                }
+                                else ApplicationTypes.AddAdapter(owner, adapterName, body.ToString());
+                                code.AppendLine($"delegate.bind {delegateType} = instance {adapterOwner}::{adapterName}({string.Join(',', targetArguments)})");
+                                Push(new(delegateType)); break;
+                            }
                             var targetName = Name(function);
                             if (targetResult == "noresult")
                             {
@@ -361,6 +401,10 @@ static class UnionImport
                         construction = Coerce(construction, constructedArguments);
                         Push(new(construction.Result));
                         code.AppendLine($"call {construction.Name}({string.Join(',', construction.Arguments)})"); break;
+                    case Code.Add: case Code.Sub: case Code.Mul:
+                        var numericRight = Pop(); var numericLeft = Pop();
+                        if (numericLeft.Type != numericRight.Type || numericLeft.Type is not ("Int32" or "Int64" or "Double")) throw new InvalidDataException("Unsupported arithmetic operands.");
+                        Push(new(numericLeft.Type)); code.AppendLine(instruction.OpCode.Name); break;
                     case Code.Or: case Code.And: case Code.Xor:
                         var bitsRight = Argument("Int32"); var bitsLeft = Argument("Int32");
                         var bits = Coerce(new("RuntimeBits" + instruction.OpCode.Code, ["Int32", "Int32"], "Int32"), [bitsLeft.Type, bitsRight.Type]);
