@@ -60,6 +60,14 @@ for name in ('README.md', 'configure.py'):
     shutil.copyfile(HERE / 'bundle' / name, output / name)
 shutil.copyfile(HERE / 'bundle/Demo.rvnproj', output / 'demo/Demo.rvnproj')
 shutil.copyfile(HERE / 'samples/library-propagation-workflow.rvn', output / 'demo/Main.rvn')
+# Preserve upstream attribution alongside every distributed implementation.
+for name in ('LICENSE', 'THIRD_PARTY_NOTICES.md'):
+    shutil.copyfile(ROOT / name, output / name)
+shutil.copytree(ROOT / 'third-party', output / 'third-party')
+(output / 'licenses/Raven').mkdir(parents=True)
+for name in ('LICENSE', 'THIRD-PARTY-NOTICES.txt'):
+    shutil.copyfile(raven / name, output / 'licenses/Raven' / name)
+
 # Probe construction artifacts are not part of the runnable distribution.
 shutil.rmtree(probe_output)
 manifest = {'version': args.version, 'createdUtc': datetime.now(timezone.utc).isoformat(),

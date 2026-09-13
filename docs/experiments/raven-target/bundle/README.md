@@ -49,3 +49,8 @@ introspection-only. Rough API edges are part of this experiment and are open to 
 **manifest.json** records exact source revisions, prerequisites and file hashes.
 A separate validation record is added after testing the actual extracted package;
 building this folder alone does not establish release readiness.
+
+The bundle carries neoCLR's **LICENSE**, **THIRD_PARTY_NOTICES.md** and preserved
+**third-party/** texts, plus Raven's upstream notices under **licenses/Raven/**.
+These preserve the repositories' attribution; they do not claim a complete audit of
+all dependencies in the separately packaged SDK and VSIX.

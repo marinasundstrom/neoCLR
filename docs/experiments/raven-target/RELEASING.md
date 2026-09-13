@@ -15,7 +15,7 @@ and list outstanding defects plainly. Packaging is not evidence of API support.
 Before packaging, record the exact clean neoCLR and Raven commit IDs, Raven branch,
 build tool versions, target OS/architecture, and an explicit experimental package
 version. Choose a fresh version for each build; do not overwrite a previously
-published artifact. The installed `0.1.12-neoclr.4` is a historical local build, not
+published artifact. The installed `0.1.12-neoclr.6` is a validated local build, not
 a prescribed next release version.
 
 Run focused compiler regression tests for changed Raven code and neoCLR tests for
@@ -61,6 +61,13 @@ declaration metadata, flattens the target runtime library, copies the language s
 samples and validation scripts, and records revision/version/file-hash provenance.
 It currently supports the tested macOS arm64 host. It does not publish or install.
 The resulting README explains extraction, configuration and the dedicated project tasks.
+The builder also copies neoCLR's LICENSE, notice inventory and preserved license
+texts, and Raven's LICENSE/THIRD-PARTY-NOTICES.txt; the file manifest covers them.
+Before publishing binary assets, review the actual bridge, server, SDK and VSIX
+dependency inventories against their notices. Carrying upstream source notices alone
+does not establish complete attribution for every bundled dependency. The validated
+local .6 artifacts predate this packaging correction and must not be presented as
+containing it; prepare a fresh candidate rather than overwriting those artifacts.
 
 `run_project.py`, the saved-program suite and focused checks accept either `--raven`
 for source development or `--bridge /path/to/Probe.dll --system /path/to/System.neoil`

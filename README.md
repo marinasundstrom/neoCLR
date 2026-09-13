@@ -5,19 +5,20 @@
 [![MIT license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Rust 1.85+](https://img.shields.io/badge/Rust-1.85%2B-orange)](Cargo.toml)
 
-**An experimental, .NET-inspired virtual machine with values by default and explicit control over memory and references.**
+**An experimental, .NET-inspired runtime with its own library and a Raven language integration.**
 
-neoCLR is a managed, type-safe virtual machine with garbage-collected heap storage
-and explicit value versus reference semantics. Its intentionally low-level instruction
-set also provides explicit memory access, typed pointers, native calls,
-and allocation controls when a program needs them. It is a runtime platform rather
-than a high-level language: language authors may build safer or more ergonomic
-abstractions above the same capabilities.
+neoCLR is a managed, type-safe virtual machine with garbage-collected heap storage.
+The current Raven target follows familiar CLR value/reference type categories:
+classes and arrays have reference semantics, while values are copied. Managed byrefs
+remain available for explicit slot access. Low-level typed pointers and native
+allocation provide a separate interop path.
 
-neoCLR is the codename for an experimental runtime for an unnamed, .NET-inspired
-platform. This repository contains a small standalone Rust interpreter, a neoIL
-assembler, a prototype metadata format, and executable samples. It does not need
-an installed .NET runtime.
+The experiment combines CLI metadata and a bounded CIL importer with a standalone
+Rust interpreter and an adapted runtime library. Recoverable errors use `Result`,
+absence uses `Option`, and `Void` can be a generic unit type while ordinary void calls
+retain the CLI no-result convention. Terminal runtime faults have no guest exception
+class hierarchy. This is an experimental subset, not a drop-in .NET replacement.
+The interpreter itself does not require .NET; the Raven compiler and editor tools do.
 
 Read the [development conversation record](docs/development-timeline.md) for the
 author’s directions and questions, assistant proposals, subsequent decisions and actions,
@@ -35,41 +36,36 @@ output is a temporary internal format, not that final binary representation. See
 [format direction](docs/format-direction.md) and
 [assembler expressiveness](docs/assembler-design.md).
 
-The goal is familiar runtime and library structure with deliberately different
-semantics: one model for data types, value semantics by default, explicit storage
-and lifetime choices, a real `Void` value, functions outside types, `Option<T>` for absence,
-`Result<T,E>` for recoverable errors, and terminal Faults instead of exceptions.
-Interfaces use ordinary names without an `I` prefix.
-[Borrowed interface references](docs/interfaces.md) make dispatch explicit without boxing or ownership.
-[Managed references in the runtime and Neo](docs/managed-reference-semantics.md) explains
-frame ownership, GC reachability and automatic source-level access.
-[Typed equality](docs/equality.md) uses System.Equatable<T> and Equals(T).
-[Explicit cloning](docs/cloning.md) uses System.Clonable<T> and Clone(), independently
-of ordinary value copies. The [lifecycle design](docs/lifecycle.md) separates
-value lifetimes, managed heap collection and resource cleanup.
-[Explicit cleanup](docs/disposal.md) is available through System.Disposable and
-System.Closable<E>; automatic destruction remains future work.
+## Try the Raven runtime API experiment
 
-## Try Neo
+The current proof of concept demonstrates collections and iteration, Result/Option
+propagation, text and numeric helpers, files, date/time, reflection introspection,
+delegates, interfaces and native buffers. Its provisional APIs are open to feedback.
 
-[Neo](docs/neo.md) is a small Raven-inspired concept language for this runtime.
-We keep this companion compiler updated alongside neoCLR to test and explain platform
-features. It is not currently intended to be a complex, full-fledged compiler; see
-the [upcoming slices](docs/neo-roadmap.md) for its bounded development plan.
-The first example exercises value copies, explicit references and managed heap storage:
+Follow the [VS Code setup](docs/experiments/raven-target/VSCODE.md) for the locally
+validated macOS arm64 SDK/extension and portable demo. It provides completion and
+explicit **neoCLR: Build saved project** / **neoCLR: Run saved project** tasks.
+The normal Raven toolbar build/run/debug commands do not implement this target.
+See [runtime API coverage](docs/raven-runtime-api-coverage.md) for supported contracts
+and importer limits, and [the packaging procedure](docs/experiments/raven-target/RELEASING.md)
+for producing a matching experimental toolchain. This local build is not a new
+published release; the release badge still points to Preview 3.
+
+## Earlier Neo language experiment
+
+[Neo](docs/neo.md) remains in the repository as the earlier concept language and
+runtime test surface. Its value-by-default model and explicit reference syntax are
+historical experimental behavior, not the current Raven target's default semantics.
+Neo is outside the current migration work.
 
 ```sh
 cargo run -- run examples/source/counter.neo
-cargo run -- run examples/source/counter.neo --gc-stats --gc-events
-```
-
-It prints `1`, `2`, and `42`. See the [Neo guide](docs/neo.md) for source syntax,
-artifact compilation and current limits. The [bounded calculator](docs/neo-calculator.md)
-combines control flow, union results and console input:
-
-```sh
 cargo run -- run examples/source/calculator.neo
 ```
+
+The [type-model migration](docs/roadmap.md#type-model-migration-directive-2026-09-12)
+explains the direction change. Legacy Neo and neoIL examples remain useful evidence
+of the earlier model; they should not be read as Raven syntax or its type contract.
 
 ## Release history
 

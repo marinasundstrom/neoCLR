@@ -36,6 +36,16 @@ clear migration notes; do not expand the legacy model merely to keep those tests
 Separate explicit stack-buffer designs, if needed, from ordinary array semantics.
 Continue the Raven collection demo against these target semantics.
 
+## Runtime API milestone status (2026-09-13)
+
+The existing-library Raven projection pass and nine outside-checkout package suites
+are complete. See the [coverage audit](raven-runtime-api-coverage.md) and
+[local toolchain record](experiments/raven-target/local-toolchain.json). The next
+consecutive work is public distribution preparation: current-direction documentation,
+asset attribution and provenance, final candidate checks, then publication. Broader
+compiler/runtime features remain separate. Earlier slice descriptions below record
+the dependency order and must not be interpreted as a list of still-missing APIs.
+
 ## Current Raven-target experiment priority
 
 The [preview acceptance criteria](raven-preview-acceptance.md) focus on the fundamentals already built and their differences from

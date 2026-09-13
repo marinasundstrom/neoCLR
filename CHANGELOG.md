@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-13
 
+- Updated the repository introduction and roadmap to present the current Raven/CLR
+  type-category direction and completed runtime API milestone, separating the legacy
+  Neo experiment. Future portable bundles now include both repositories' license and
+  notice files; existing .6 assets are unchanged. Binary dependency attribution review
+  remains a publication check.
+
 - Added published-bridge execution and a checkout-independent experimental bundle
   builder with pinned metadata/library/server, samples, setup and file-hash provenance.
   Shared validation scripts accept either source or published toolchains. All nine
