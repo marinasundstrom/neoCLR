@@ -47,7 +47,7 @@ shutil.copy2(runtime, output / 'bin/neoclr')
 (output / 'lib/System.neoil').write_text(build(ROOT / 'runtime/System.neoil'))
 shutil.copytree(sdk / 'tools/language-server', output / 'tools/server')
 for name in ('run_project.py', 'runner_options.py', 'configure_tasks.py', 'verify_project.py',
-             'verify_editor.py', 'verify_neoil.py', 'verify_file_project.py', 'verify_process.py', 'verify_clock.py', 'verify_error_values.py',
+             'verify_editor.py', 'verify_array_api.py', 'verify_neoil.py', 'verify_file_project.py', 'verify_process.py', 'verify_clock.py', 'verify_error_values.py',
              'verify_unions.py', 'verify_matches.py', 'verify_delegates.py', 'verify_native_buffer.py',
              'verify_application.py', 'verify_orders.py', 'verify_queries.py', 'verify_collection_capabilities.py', 'verify_compiler_target.py', 'verify_library_import.py'):
     shutil.copyfile(HERE / name, output / 'tools' / name)

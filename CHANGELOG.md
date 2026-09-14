@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-14
 
+- Completed the independent Raven empty-array factory review (`f70ba5026` on main):
+  use target metadata capabilities instead of assuming the host factory exists.
+  All 93 focused checks pass, including .NET 10/.NET 11 reference-pack cases.
+  Include the generic-array API execution verifier in future runtime bundles.
+
 - Recorded the proposed separation of Raven target profiles, symbol projections and
   emission backends, plus a staged evaluation plan. Preserved possible Raven compiler
   bootstrapping and neoCLR architecture/AOT/microcontroller work as long-term questions,

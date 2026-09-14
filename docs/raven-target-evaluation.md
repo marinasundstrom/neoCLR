@@ -625,3 +625,18 @@ beyond Reflection.Emit. Recorded the proposal and a staged evaluation in
 direction, not a wholesale refactor during stabilization. Possible Raven compiler
 bootstrapping and future neoCLR architecture/AOT/microcontroller targets are recorded
 there as long-term considerations, with no committed delivery scope.
+
+## Empty-array capability review (2026-09-14)
+
+General Raven main commit `f70ba5026` replaces the host-reflected Array.Empty factory
+with lookup against supplied target metadata. An available public unconstrained
+`System.Array.Empty<T>() -> T[]` is retained; otherwise `[]` emits allocation of a
+zero-length array. This removes the experimental blanket allocation rule for target
+metadata without adding a neoCLR name check. Explicit `Array<T>.Empty` remains the
+separate library/property contract described above.
+
+The baseline reproduced references to a missing factory in both emission modes.
+All 93 focused collection-expression checks now pass, including metadata inspection
+and execution using .NET 10/.NET 11 reference packs with and without the factory.
+This is not a claim of execution on .NET Framework or NanoFramework. Synchronization
+into the experimental branch and packaged-tool validation are the next actions.
