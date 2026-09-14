@@ -2941,3 +2941,10 @@ neoCLR as `ff617c4` and its compiler projection in experimental Raven as `882326
 The general void-invocation fix was independently integrated on Raven main as
 `8dbd96fb6`. The array implementation remains an incremental metadata-driven projection;
 a full target-profile abstraction and specialized array-symbol design remain open.
+
+
+**Author's clarification:** “I mean we might support microcontroller architectures as
+a target.” Named the broader theme “targetability and portability.” The assistant
+updated the architecture proposal and roadmap accordingly: architecture targeting and
+implementation portability are the direction; a smaller runtime profile is only one
+possible future consideration, not the meaning of the request.

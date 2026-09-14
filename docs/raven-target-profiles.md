@@ -88,17 +88,20 @@ part of the experiment. Do not treat modern .NET test success as validation on e
 NanoFramework or neoCLR; each claimed target needs its own appropriate checks.
 
 
-## Longer-term possibilities — also recorded 2026-09-14
+## Targetability and portability — long-term direction, 2026-09-14
 
-The author also asked to preserve these possibilities as inputs to future design,
-explicitly recognizing that they are far away and depend on sustained project effort:
+The author named the overarching theme **targetability and portability**, clarifying
+that microcontroller architectures are potential targets. This is broader than reducing
+the class library: it concerns which architectures the toolchain can target and how
+compiler/runtime implementations can move across environments. Preserve these inputs
+to future design, recognizing that they are far away and depend on sustained effort:
 
 - Raven might be bootstrapped, with the compiler itself rewritten in Raven. This is
   separate from writing neoCLR's System library in Raven, and from the older Neo
   concept-language bootstrap idea. No rewrite is underway or scheduled here.
 - If neoCLR attracts sustained development, evaluate additional architectures and
   deployment environments, including AOT/Native AOT approaches and possibly
-  microcontrollers. No architecture, hardware family or deployment mode is selected.
+  microcontroller architectures as compilation/deployment targets. No architecture, hardware family or deployment mode is selected.
 
 **Assistant's proposed distinction:** Treat runtime portability, ahead-of-time
 compilation of application code, and a resource-constrained runtime/class-library

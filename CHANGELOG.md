@@ -12,7 +12,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   emission backends, plus a staged evaluation plan. Preserved possible Raven compiler
   bootstrapping and neoCLR architecture/AOT/microcontroller work as long-term questions,
   not implemented features or preview commitments. Linked the roadmap and conversation
-  record to the architectural proposal.
+  record to the architectural proposal. Clarified the overarching theme as targetability
+  and portability, with microcontroller architectures as potential targets.
 
 - Implemented `Array<T>.Empty` and instance `ForEach(Func<T, Void>)` in the Raven
   runtime profile, reference surface and importer. Empty currently allocates a
