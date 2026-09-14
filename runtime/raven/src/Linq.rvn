@@ -1,0 +1,106 @@
+namespace System.Linq
+
+import System.Collections.*
+import System.Option.*
+import System.Result.*
+
+public static class Operators {
+    static func ToList<T>(source: Iterable<T>) -> ArrayList<T> {
+        let result = ArrayList<T>()
+        for item in source {
+            result.Add(item)
+        }
+        return result
+    }
+
+    static func First<T>(source: Iterable<T>) -> System.Option<T> {
+        let iterator = source.GetIterator()
+        if iterator.MoveNext() {
+            let value = iterator.Current
+            iterator.Dispose()
+            return Some(value)
+        }
+        iterator.Dispose()
+        return None
+    }
+
+    static func Last<T>(source: Iterable<T>) -> System.Option<T> {
+        let iterator = source.GetIterator()
+        if !iterator.MoveNext() {
+            iterator.Dispose()
+            return None
+        }
+        var value = iterator.Current
+        while iterator.MoveNext() {
+            value = iterator.Current
+        }
+        iterator.Dispose()
+        return Some(value)
+    }
+
+    static func Single<T>(source: Iterable<T>) -> System.Result<T, SingleError> {
+        let iterator = source.GetIterator()
+        if !iterator.MoveNext() {
+            iterator.Dispose()
+            return Error(SingleError(SingleError.Empty()))
+        }
+        let value = iterator.Current
+        let multiple = iterator.MoveNext()
+        iterator.Dispose()
+        if multiple {
+            return Error(SingleError(SingleError.Multiple()))
+        }
+        return Ok(value)
+    }
+
+    static func First<T>(source: Iterable<T>, predicate: System.Func<T, bool>) -> System.Option<T> {
+        let iterator = source.GetIterator()
+        while iterator.MoveNext() {
+            let value = iterator.Current
+            if predicate(value) {
+                iterator.Dispose()
+                return Some(value)
+            }
+        }
+        iterator.Dispose()
+        return None
+    }
+
+    static func Last<T>(source: Iterable<T>, predicate: System.Func<T, bool>) -> System.Option<T> {
+        let iterator = source.GetIterator()
+        while iterator.MoveNext() {
+            var value = iterator.Current
+            if predicate(value) {
+                while iterator.MoveNext() {
+                    let current = iterator.Current
+                    if predicate(current) {
+                        value = current
+                    }
+                }
+                iterator.Dispose()
+                return Some(value)
+            }
+        }
+        iterator.Dispose()
+        return None
+    }
+
+    static func Single<T>(source: Iterable<T>, predicate: System.Func<T, bool>) -> System.Result<T, SingleError> {
+        let iterator = source.GetIterator()
+        while iterator.MoveNext() {
+            let value = iterator.Current
+            if predicate(value) {
+                while iterator.MoveNext() {
+                    if predicate(iterator.Current) {
+                        iterator.Dispose()
+                        return Error(SingleError(SingleError.Multiple()))
+                    }
+                }
+                iterator.Dispose()
+                return Ok(value)
+            }
+        }
+        iterator.Dispose()
+        return Error(SingleError(SingleError.Empty()))
+    }
+}

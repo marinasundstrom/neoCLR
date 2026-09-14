@@ -7,7 +7,8 @@ static class GenericUnionBindings
     sealed record Shape(string Kind, string[] Args, string Name);
     static readonly Dictionary<string, Shape> Shapes = new();
     static readonly Dictionary<string, (string Name, string Body)> Helpers = new();
-    public static void Reset() { Shapes.Clear(); Helpers.Clear(); }
+    public static Func<GenericParameter, string>? ParameterMap { get; set; }
+    public static void Reset() { Shapes.Clear(); Helpers.Clear(); ParameterMap = null; }
     static string Register(string kind, params string[] args)
     {
         var name = "System." + kind + (args.Length == 0 ? "" : "<" + string.Join(',', args) + ">");
@@ -24,6 +25,7 @@ static class GenericUnionBindings
     }
     static string? Map(TypeReference type, int depth)
     {
+        if (type is GenericParameter parameter) return ParameterMap?.Invoke(parameter);
         if (depth > 24) throw new InvalidDataException("Union payload nesting limit exceeded.");
         if (type is GenericInstanceType g && RuntimeSignatures.IsCore(type.Scope) && type.IsValueType)
         {
@@ -72,7 +74,7 @@ static class GenericUnionBindings
     {
         var owner = Type(reference.DeclaringType);
         if (owner is null || !Shapes.TryGetValue(owner, out var shape)) return null;
-        var (args, result) = RuntimeSignatures.Match(reference, definition, Type);
+        var (args, result) = RuntimeSignatures.Match(reference, definition, Type, allowOpenMethodParameters: ParameterMap is not null);
         var allowed = shape.Kind switch {
             "Result" => new[] { Register("Result.Ok", shape.Args[0]), Register("Result.Error", shape.Args[1]) },
             "Option" => new[] { Register("Option.Some", shape.Args[0]), Register("Option.None") },
@@ -86,7 +88,7 @@ static class GenericUnionBindings
     {
         var owner = Type(reference.DeclaringType);
         if (owner is null || !Shapes.TryGetValue(owner, out var shape)) return null;
-        var (args, result) = RuntimeSignatures.Match(reference, definition, Type);
+        var (args, result) = RuntimeSignatures.Match(reference, definition, Type, allowOpenMethodParameters: ParameterMap is not null);
         var name = reference.Name;
         if (definition.IsVirtual && !definition.IsFinal) throw new InvalidDataException("Unexpected union virtual method.");
         if (shape.Kind is "Result.Ok" or "Result.Error" or "Option.Some")

@@ -27,7 +27,9 @@ static class CollectionBindings
         return index >= 0 && hierarchy.Skip(index + 1).Any(kind => target == $"System.Collections.{kind}<{from.Element}>");
     }
 
-    public static string? Type(TypeReference type)
+    public static string? Type(TypeReference type) => Type(type, null);
+
+    public static string? Type(TypeReference type, Func<TypeReference, string?>? parameterMap)
     {
         if (MapBindings.Type(type) is { } map) return map;
         if (type.IsValueType) return null;
@@ -42,8 +44,8 @@ static class CollectionBindings
             _ => null
         };
         if (kind is null) return null;
-        var element = GenericUnionBindings.Type(g.GenericArguments[0]);
-        if (element is null || !(element is "Int32" or "Double" or "Boolean" or "String" or "Void"
+        var element = parameterMap?.Invoke(g.GenericArguments[0]) ?? GenericUnionBindings.Type(g.GenericArguments[0]);
+        if (element is null || !(parameterMap is not null && g.GenericArguments[0] is GenericParameter || element is "Int32" or "Double" or "Boolean" or "String" or "Void"
             || ApplicationTypes.IsType(element) || GenericUnionBindings.IsType(element) || ErrorBindings.IsType(element) || DelegateBindings.IsType(element) || ReflectionBindings.IsReference(element) || IsReference(element) || InterfaceBindings.IsInterface(element) || element.StartsWith("arrayref<", StringComparison.Ordinal)
             || PrimitiveBindings.Types.Contains(element) || CalendarBindings.Types.Contains(element) || ErrorBindings.IsEmpty(element))) return null;
         var owner = $"System.Collections.{kind}<{element}>";
@@ -75,12 +77,12 @@ static class CollectionBindings
     }
 
     public sealed record Binding(string[] Arguments, string Result, string Instruction);
-    public static Binding? Bind(MethodReference reference, MethodDefinition definition, bool callvirt)
+    public static Binding? Bind(MethodReference reference, MethodDefinition definition, bool callvirt, Func<TypeReference, string?>? parameterMap = null)
     {
         if (MapBindings.Bind(reference, definition, callvirt) is { } map) return map;
-        var owner = Type(reference.DeclaringType);
+        var owner = Type(reference.DeclaringType, parameterMap);
         if (owner is null) return null;
-        var (parameters, result) = RuntimeSignatures.Match(reference, definition, t => ApplicationTypes.Type(t) ?? Type(t) ?? DelegateBindings.Type(t) ?? GenericUnionBindings.Type(t));
+        var (parameters, result) = RuntimeSignatures.Match(reference, definition, t => parameterMap?.Invoke(t) ?? ApplicationTypes.Type(t) ?? Type(t) ?? DelegateBindings.Type(t) ?? GenericUnionBindings.Type(t), allowOpenMethodParameters: parameterMap is not null);
         var (kind, element) = owner == Disposable ? ("Disposable", "") : Shapes[owner];
         var expected = (kind, definition.Name) switch {
             ("List" or "ArrayList", "Add") => (element, "noresult", true),

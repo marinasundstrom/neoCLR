@@ -9,10 +9,12 @@ static class LibraryImplementation
     {
         if (!Regex.IsMatch(owner, @"^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)+$"))
             throw new InvalidDataException("Invalid library owner.");
-        var type = source.Types.SingleOrDefault(t => t.Namespace == owner && NamespaceFunctions.IsContainer(t))
+        var type = source.Types.SingleOrDefault(t => t.Namespace == owner && NamespaceFunctions.IsContainer(t)) ?? source.GetType(owner)
             ?? throw new InvalidDataException("Missing namespace implementation: " + owner);
-        var contract = core.Types.SingleOrDefault(t => t.Namespace == owner && NamespaceFunctions.IsContainer(t))
+        var contract = core.Types.SingleOrDefault(t => t.Namespace == owner && NamespaceFunctions.IsContainer(t)) ?? core.GetType(owner)
             ?? throw new InvalidDataException("Missing namespace reference contract: " + owner);
+        if (!contract.IsPublic || !contract.IsAbstract || !contract.IsSealed || contract.HasGenericParameters)
+            throw new InvalidDataException("Unsupported library reference owner.");
         if (!type.IsPublic || !type.IsAbstract || !type.IsSealed || type.HasGenericParameters || type.HasFields || type.HasInterfaces)
             throw new InvalidDataException("Library fragment requires a public nongeneric namespace container without fields.");
         var methods = type.Methods.ToArray();
@@ -39,30 +41,70 @@ static class LibraryImplementation
         if (!method.HasGenericParameters) { ApplicationTypes.CheckMethod(method); return; }
         if (!method.IsStatic || method.ExplicitThis || method.DeclaringType.HasGenericParameters
             || method.CallingConvention != MethodCallingConvention.Generic
-            || method.GenericParameters.Any(p => p.HasConstraints || p.Attributes != GenericParameterAttributes.NonVariant)
-            || method.Parameters.Select(p => p.ParameterType).Append(method.ReturnType)
-                .Any(t => t.ContainsGenericParameter && t is not GenericParameter))
+            || method.GenericParameters.Any(p => p.HasConstraints || p.Attributes != GenericParameterAttributes.NonVariant))
             throw new InvalidDataException("Unsupported generic library signature: " + method.FullName);
     }
 
     public static string GenericName(MethodDefinition method) => method.Name + (method.HasGenericParameters
         ? "<" + string.Join(',', method.GenericParameters.Select(p => "T" + p.Position)) + ">" : "");
 
-    static bool SameType(TypeReference left, TypeReference right) => left is GenericParameter lp
-        ? right is GenericParameter rp && lp.Type == rp.Type && lp.Position == rp.Position
-        : left.FullName == right.FullName
-        && left.MetadataType == right.MetadataType && left.IsValueType == right.IsValueType
-        && (left.MetadataType is not (MetadataType.Class or MetadataType.ValueType or MetadataType.GenericInstance)
-            || left.Resolve()?.Module.Assembly.Name.FullName == right.Resolve()?.Module.Assembly.Name.FullName)
-        && (left is not GenericInstanceType l || right is GenericInstanceType r
-            && l.GenericArguments.Zip(r.GenericArguments).All(p => SameType(p.First, p.Second)));
+    static bool SameType(TypeReference left, TypeReference right)
+    {
+        if (left is GenericParameter lp)
+            return right is GenericParameter rp && lp.Type == rp.Type && lp.Position == rp.Position;
+        if (left is GenericInstanceType l)
+            return right is GenericInstanceType r && l.IsValueType == r.IsValueType
+                && SameType(l.ElementType, r.ElementType)
+                && l.GenericArguments.Count == r.GenericArguments.Count
+                && l.GenericArguments.Zip(r.GenericArguments).All(p => SameType(p.First, p.Second));
+        return left.FullName == right.FullName && left.MetadataType == right.MetadataType && left.IsValueType == right.IsValueType
+            && (left.MetadataType is not (MetadataType.Class or MetadataType.ValueType)
+                || left.Resolve()?.Module.Assembly.Name.FullName == right.Resolve()?.Module.Assembly.Name.FullName);
+    }
+
+    public static TypeReference Close(TypeReference type, GenericInstanceMethod method, int depth = 0)
+    {
+        if (depth > 32) throw new InvalidDataException("Library signature nesting limit exceeded.");
+        if (type is GenericParameter p && p.Type == GenericParameterType.Method)
+            return method.GenericArguments[p.Position];
+        if (type is GenericInstanceType generic)
+        {
+            var closed = new GenericInstanceType(generic.ElementType);
+            foreach (var argument in generic.GenericArguments) closed.GenericArguments.Add(Close(argument, method, depth + 1));
+            return closed;
+        }
+        if (type.ContainsGenericParameter) throw new InvalidDataException("Unsupported constructed library signature.");
+        return type;
+    }
 
     public static string QualifyHelpers(string text, string owner)
     {
-        var helpers = Regex.Matches(text, @"(?m)^\.function ([^\(]+)\(").Select(m => m.Groups[1].Value).ToArray();
+        var helpers = Regex.Matches(text, @"(?m)^\.function ([^\(]+)\(").Select(m => m.Groups[1].Value)
+            .Where(h => !h.StartsWith(owner + ".", StringComparison.Ordinal)).ToArray();
+        // Adapters generated from open signatures must themselves declare the free
+        // method parameters. Propagate through helper calls before qualifying names.
+        var bodies = Regex.Matches(text, @"(?ms)^\.function ([^\(]+)\(.*?^\.end\r?$")
+            .Where(m => helpers.Contains(m.Groups[1].Value))
+            .ToDictionary(m => m.Groups[1].Value, m => m.Value);
+        var parameters = helpers.ToDictionary(h => h, h => Regex.Matches(Regex.Replace(bodies[h], "\"(?:\\\\.|[^\"\\\\])*\"", ""), @"\bT[0-9]+\b")
+            .Select(m => m.Value).ToHashSet());
+        bool changed;
+        do
+        {
+            changed = false;
+            foreach (var helper in helpers)
+                foreach (Match call in Regex.Matches(bodies[helper], @"(?m)^(?:call|ldftn) ([^\(]+)\("))
+                    if (parameters.TryGetValue(call.Groups[1].Value, out var dependency))
+                        foreach (var parameter in dependency)
+                            changed |= parameters[helper].Add(parameter);
+        } while (changed);
         foreach (var helper in helpers.Where(h => !h.StartsWith(owner + ".", StringComparison.Ordinal)))
+        {
+            var generic = parameters[helper].Count == 0 ? "" : "<" + string.Join(',',
+                parameters[helper].OrderBy(p => int.Parse(p[1..]))) + ">";
             text = Regex.Replace(text, @"(?m)^(\.function |call |ldftn )" + Regex.Escape(helper) + @"(?=\()",
-                m => m.Groups[1].Value + "neoCLR.Library." + owner + "." + helper);
+                m => m.Groups[1].Value + "neoCLR.Library." + owner + "." + helper + generic);
+        }
         return text;
     }
 

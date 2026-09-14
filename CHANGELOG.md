@@ -8,6 +8,21 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-14
 
+- Port seven query terminal overloads to the shared Raven System project: ToList,
+  First, Last and Single, including predicate overloads. Import constructed generic
+  collection/delegate/Option/Result signatures with scoped parameters and generic
+  adapters. Preserve outcomes, cleanup and fault boundaries; five runtime terminal
+  tests and 30 query integration cases pass, alongside generic/Math/Void checks.
+  Refresh the signature probe for Math namespace metadata; all 121 contract checks pass.
+  Build and flatten both Math and query snapshots for standalone use. Rename the
+  extension-method container to System.Linq.Operators; rebuild consumers and core
+  metadata together. Extension syntax is unchanged. Instance types/deferred iterator
+  implementations remain neoIL pending shared implementation/reference identity.
+  Extract general imported-signature, member-proxy, sibling-type lookup and empty
+  union-case construction fixes to Raven main; retain target policy in its experimental
+  branch and document both sides. Raven main CI passes 311 compiler, 73 core and
+  249 language-server checks (three existing skips).
+
 - Resolve generic unit-return invocation behavior through an independent Raven main
   fix (327335699; experimental cherry-pick ef352917e). Preserve the actual generic
   return value when consumed and pop it when discarded; ordinary no-result calls

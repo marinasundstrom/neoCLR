@@ -1,7 +1,7 @@
 # Authoring the foundational library in Raven
 
 `runtime/raven/System.rvnproj` is the shared authoring project for ordinary
-foundational runtime APIs. Its first source is `src/Math.rvn`; additional namespaces
+foundational runtime APIs. Its sources include `src/Math.rvn` and `src/Linq.rvn`; additional namespaces
 and types should join this project as their importing requirements are validated.
 Do not create an assembly per utility namespace. This is an incremental source
 migration, not yet a self-hosting build of the complete core reference assembly.
@@ -10,8 +10,8 @@ The bootstrap currently has three distinct artifacts:
 
 - `NeoCLR.CoreProbe.dll`: compiler-facing reference metadata for the supported System
   surface. Its placeholder bodies must never execute.
-- `NeoCLR.System.dll`: compiled Raven implementation input, currently the five scalar
-  Math functions. It is imported into neoIL, not loaded dynamically by the runtime.
+- `NeoCLR.System.dll`: compiled Raven implementation input, currently five scalar
+  Math functions and seven collection/query terminal overloads. It is imported into neoIL, not loaded dynamically by the runtime.
 - `runtime/System.neoil` and its includes: the executable foundational library,
   combining generated Raven bodies with remaining handwritten bodies and intrinsics.
 
@@ -37,7 +37,7 @@ No new metadata format or instruction is introduced.
 The generated bootstrap fragments retain the existing internal `System.Math` method
 owner so direct IL, library dependencies and the archived Neo frontend keep working.
 Raven sees the namespace contract; that internal owner is not the public Raven API.
-This transitional mapping is explicit and limited to the existing Math catalog.
+This transitional namespace mapping is explicit and limited to the existing Math catalog.
 It is not a new requirement for languages to declare static utility classes.
 
 ## Build and verify
@@ -95,17 +95,17 @@ unqualified-return diagnostic issue was fixed independently; see the
 
 ## Current limits and next gate
 
-This importer accepts public namespace functions matching existing reference
-signatures, including the bounded generic body gate below. It rejects stateful
-containers, unexported helpers, new application-type identities, constrained or nested
-generic signatures, byref/out exports and no-result exports. Support for these is future work, not implied by compiling the pilot.
+This importer accepts public namespace functions and static API methods matching existing
+reference signatures, including the bounded generic body gate below. It rejects stateful
+containers, unexported helpers, new application-type identities, constrained
+generic signatures and unsupported constructed shapes, byref/out exports and no-result exports. Support for these is future work, not implied by compiling the pilot.
 Generated Result adapters are scoped to the library implementation to avoid clashes
 with consumer adapters. Reference declarations remain separately maintained and
 checked against exports; complete generation of reference metadata from Raven source
 is not implemented yet.
 
-Before migrating collections, extend the bounded generic gate to constructed generic
-signatures and required constraints. Before migrating foundational type definitions, establish
+The collection terminal migration now admits constructed Iterable/Iterator/ArrayList,
+Func and Option/Result method signatures. Before migrating foundational type definitions, establish
 how implementation and reference assemblies share their identities without circular
 bootstrap dependencies. Keep native services and neoIL conformance programs where
 those representations serve the platform.
@@ -159,3 +159,38 @@ contract, stores one result and discards another. Existing importer handling pre
 nominal Void correctly; no new importer or runtime instruction was needed. The runtime
 verifier and execution validate the stack behavior. This extends the earlier generic
 storage and Result<Void, E> coverage to generic unit-returning invocations.
+
+## Collection terminal migration — 2026-09-14
+
+`src/Linq.rvn` implements `System.Linq.Operators.ToList<T>`, `First<T>`, `Last<T>`
+and `Single<T>`, including the three predicate overloads. `Operators` replaces the
+previous Enumerable owner; extension-call syntax and `import System.Linq.*` are
+unchanged. Existing consumer assemblies must be rebuilt against the new reference
+metadata. Public declarations remain separately maintained and verified.
+
+Constructed generic signatures are compared structurally against the core, preserving
+parameter positions and nominal identities. Open parameter mapping is scoped to the
+active implementation method; ordinary application admission remains bounded. Adapter
+functions declare their free method parameters, including dependencies on other
+adapters. This follows CLI generic signatures and uses existing neoCLR generic
+instructions rather than adding opcodes or specializing a body for each consumer.
+
+Both namespaces build in one shared project. The builder validates every fragment
+before replacing snapshots, and the collection-profile builder expands the generated
+includes for standalone distribution. The reference metadata retains extension-method
+attributes while the authored bodies are ordinary static methods.
+
+Validation covers 30 query integration cases, 121 signature-contract checks and five runtime terminal tests
+(including callback/disposal faults and allocation comparisons), generic Iterable
+iteration with an independently declared contract, three rejected generic contracts,
+69 Math outcomes/six rejected Math contracts, and Void result propagation. Snapshot
+regeneration is reproducible with the recorded compiler. This is source validation;
+it does not refresh the installed SDK or publish a release.
+
+The remaining migration boundary is **type implementation identity**, not more static
+terminal algorithms: ArrayList/Map state, constructors, interface implementations,
+and deferred Where/Select iterator classes require importing instance bodies against
+shared reference identities and their fields. Those bodies remain executable neoIL.
+Native services and scalar intrinsics still belong to the runtime; copying their
+wrappers into Raven would not migrate their implementation. Constrained generic
+exports and whole-core bootstrap/reference generation remain separate gates.

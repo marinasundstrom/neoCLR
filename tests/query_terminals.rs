@@ -164,7 +164,7 @@ fn terminals_report_cardinality_and_dispose_at_the_expected_boundary() {
     ] {
         let mut body = start(count, -1, false);
         body += &format!(
-            "ldloc probe\ncall System.Linq.Enumerable::{operator}<Int32>(System.Collections.Iterable<Int32>)\n"
+            "ldloc probe\ncall System.Linq.Operators::{operator}<Int32>(System.Collections.Iterable<Int32>)\n"
         );
         let result = match outcome {
             "Some" => "call instance System.Option<Int32>::GetSomeCase()\ncall instance System.Option.Some<Int32>::get_Value()".into(),
@@ -202,7 +202,7 @@ fn iterator_and_disposal_faults_are_not_turned_into_union_outcomes() {
         ] {
             let body = start(1, fail_move, fail_dispose)
                 + &format!(
-                    "ldloc probe\ncall System.Linq.Enumerable::{operator}<Int32>(System.Collections.Iterable<Int32>)\npop\nldc.i4 0"
+                    "ldloc probe\ncall System.Linq.Operators::{operator}<Int32>(System.Collections.Iterable<Int32>)\npop\nldc.i4 0"
                 );
             let fault = program(&body).run(Limits::default()).unwrap_err();
             assert!(fault.message.contains(message), "{fault:?}");
@@ -215,7 +215,7 @@ fn concrete_find_avoids_query_chain_allocations_for_the_same_result() {
     let mut allocations = Vec::new();
     for query in [false, true] {
         let operation = if query {
-            "call System.Linq.Enumerable::Where<Int32>(System.Collections.Iterable<Int32>,System.Func<Int32,Boolean>)\ncall System.Linq.Enumerable::First<Int32>(System.Collections.Iterable<Int32>)"
+            "call System.Linq.Operators::Where<Int32>(System.Collections.Iterable<Int32>,System.Func<Int32,Boolean>)\ncall System.Linq.Operators::First<Int32>(System.Collections.Iterable<Int32>)"
         } else {
             "call instance System.Collections.ArrayList<Int32>::Find(System.Func<Int32,Boolean>)"
         };
@@ -274,11 +274,11 @@ fn predicate_start(count: i32, mode: i32, fail_move: i32, fail_dispose: bool) ->
 fn predicate_call(operator: &str, via_where: bool) -> String {
     if via_where {
         format!(
-            "call System.Linq.Enumerable::Where<Int32>(System.Collections.Iterable<Int32>,System.Func<Int32,Boolean>)\ncall System.Linq.Enumerable::{operator}<Int32>(System.Collections.Iterable<Int32>)\n"
+            "call System.Linq.Operators::Where<Int32>(System.Collections.Iterable<Int32>,System.Func<Int32,Boolean>)\ncall System.Linq.Operators::{operator}<Int32>(System.Collections.Iterable<Int32>)\n"
         )
     } else {
         format!(
-            "call System.Linq.Enumerable::{operator}<Int32>(System.Collections.Iterable<Int32>,System.Func<Int32,Boolean>)\n"
+            "call System.Linq.Operators::{operator}<Int32>(System.Collections.Iterable<Int32>,System.Func<Int32,Boolean>)\n"
         )
     }
 }

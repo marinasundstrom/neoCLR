@@ -37,6 +37,20 @@ static class GenericLibraryChecks
             method.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_1));
             method.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
         }
+        var count = new MethodDefinition("CountItems", MethodAttributes.Public | MethodAttributes.Static, Primitive("Int32"));
+        owner.Methods.Add(count);
+        var item = new GenericParameter("Item", count);
+        count.GenericParameters.Add(item);
+        count.CallingConvention = MethodCallingConvention.Generic;
+        var iterable = new GenericInstanceType(module.GetType("System.Collections.Iterable`1"));
+        iterable.GenericArguments.Add(item);
+        count.Parameters.Add(new ParameterDefinition("source", ParameterAttributes.None, iterable));
+        count.Body.Instructions.Add(Instruction.Create(OpCodes.Ldc_I4_0));
+        count.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
+        var useCollection = new MethodDefinition("UseCollection", MethodAttributes.Public | MethodAttributes.Static, Primitive("Int32"));
+        owner.Methods.Add(useCollection);
+        useCollection.Body.Instructions.Add(Instruction.Create(OpCodes.Ldc_I4_0));
+        useCollection.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
         var useUnit = new MethodDefinition("UseUnit", MethodAttributes.Public | MethodAttributes.Static, Primitive("Int32"));
         owner.Methods.Add(useUnit);
         useUnit.Body.Instructions.Add(Instruction.Create(OpCodes.Ldc_I4_0));

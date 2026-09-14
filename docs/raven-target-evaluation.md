@@ -753,3 +753,43 @@ discard, generic-type method and no-result wrapper cases. The neoCLR generic lib
 probe now verifies and executes consumed and discarded Void results. Its existing
 nominal-Void importer handling needs no change. This resolves the candidate above;
 constructed generic signatures and constraints remain separate library migration gates.
+
+
+### Constructed library bodies — 2026-09-14
+
+The collection migration exposed general CLI metadata defects, reproduced against
+independently compiled C# contracts before integration into Raven main:
+
+| General behavior | Raven main | Experimental cherry-pick | Evidence |
+| --- | --- | --- | --- |
+| Source generic parameters in imported constructed signatures | `0027c5480` | `ec8f098d9` | Box<T> signature emission and execution; 16 focused checks |
+| Caller generic context in imported member proxies | `7ef0ac43a` | `a14b0c621` | Box<T>.GetValue through a generic caller; 16 focused checks |
+| Bare empty member-union case construction | `10fe5c55f` | `100eef2ff` | Independent C# carrier execution; 20 focused checks |
+| Referenced sibling types in a source namespace | `5215f00fb` | `c6e155444` | Constructor use without a redundant same-namespace import; 20 focused checks |
+
+These changes introduce no neoCLR names or target-specific policies into Raven main.
+The importer now accepts scoped constructed collection/delegate/union signatures and
+emits generic adapters for open bodies. The actual library migration covers seven
+terminal overloads under System.Linq.Operators, following the author's naming change.
+Raven source and separate reference declarations retain their existing Option/Result,
+iterator and extension-method contracts. See [library authoring](raven-system-library.md).
+
+The namespace-member owner remains a standard marked CLI container; static extension
+APIs retain a static owner. No custom metadata format or new opcode was required.
+Instance implementation/reference identity, constrained exports and full core reference
+generation remain distinct migration gates. This work does not merge the experimental
+Raven target wholesale or refresh installed tooling.
+
+The terminal source also exposed bare empty member-case construction: `return None`
+emitted a carrier constructor without producing the case argument. The independent
+C# `Choice.Empty` regression reproduced invalid .NET IL. The correction constructs
+the admitted case before carrier lowering; explicitly typed local initializers use
+the same constructor rule with accessibility checks. No Raven-specific case attribute
+is required on an ordinary CLI member-union case. The shared source now uses bare
+None and no redundant import for its same-namespace SingleError type.
+
+Final Raven main CI validation passes 311 compiler, 73 core-library and 249
+language-server checks, with three existing language-server skips. neoCLR passes
+30 query integration cases, five runtime terminal tests, 121 signature checks, the
+generic body/rejection probe, 69 Math outcomes/six invalid contracts and Void
+propagation. Clean library regeneration reproduces the checked-in bodies.

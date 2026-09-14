@@ -5,7 +5,7 @@ static class QueryBindings
 {
     public const string Declarations = """
         namespace Linq {
-            public static class Enumerable {
+            public static class Operators {
                 public static Collections.Iterable<T> Where<T>(this Collections.Iterable<T> source, Func<T, bool> predicate) => default;
                 public static Collections.Iterable<U> Select<T,U>(this Collections.Iterable<T> source, Func<T,U> selector) => default;
                 public static Option<T> First<T>(this Collections.Iterable<T> source) => default;
@@ -21,7 +21,7 @@ static class QueryBindings
 
     public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition, bool callvirt)
     {
-        if (reference.DeclaringType.FullName != "System.Linq.Enumerable") return null;
+        if (reference.DeclaringType.FullName != "System.Linq.Operators") return null;
         if (!RuntimeSignatures.IsCore(reference.DeclaringType.Scope) || reference.HasThis || callvirt
             || reference is not GenericInstanceMethod method
             || definition.GenericParameters.Any(p => p.HasConstraints || p.Attributes != GenericParameterAttributes.NonVariant))
@@ -45,6 +45,6 @@ static class QueryBindings
             t => CollectionBindings.Type(t) ?? DelegateBindings.Type(t) ?? GenericUnionBindings.Type(t));
         if (!args.SequenceEqual(expected) || result != returns)
             throw new InvalidDataException("Unsupported query contract.");
-        return new($"System.Linq.Enumerable::{reference.Name}<{string.Join(',', types)}>", args, result);
+        return new($"System.Linq.Operators::{reference.Name}<{string.Join(',', types)}>", args, result);
     }
 }

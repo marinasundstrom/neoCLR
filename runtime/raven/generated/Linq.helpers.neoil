@@ -1,0 +1,85 @@
+; Generated from runtime/raven/src/Linq.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Linq.Operators.RuntimeEqual(Int32 left,Int32 right) -> Int32
+ldarg left
+ldarg right
+ceq
+brfalse False
+ldc.i4 1
+ret
+False:
+ldc.i4 0
+ret
+.end
+.function neoCLR.Library.System.Linq.Operators.RuntimeErrorSystemLinqSingleErrorNewSystemLinqSingleErrorEmpty(System.Linq.SingleError.Empty value) -> System.Linq.SingleError
+ldarg value
+newobj instance System.Linq.SingleError::.ctor(System.Linq.SingleError.Empty)
+ret
+.end
+.function neoCLR.Library.System.Linq.Operators.RuntimeErrorSystemLinqSingleErrorNewSystemLinqSingleErrorMultiple(System.Linq.SingleError.Multiple value) -> System.Linq.SingleError
+ldarg value
+newobj instance System.Linq.SingleError::.ctor(System.Linq.SingleError.Multiple)
+ret
+.end
+.function neoCLR.Library.System.Linq.Operators.RuntimeErrorSystemLinqSingleErrorEmptyNew() -> System.Linq.SingleError.Empty
+newobj instance System.Linq.SingleError.Empty::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Linq.Operators.RuntimeErrorSystemLinqSingleErrorMultipleNew() -> System.Linq.SingleError.Multiple
+newobj instance System.Linq.SingleError.Multiple::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Linq.Operators.RuntimeUnion0() -> System.Option.None
+newobj instance System.Option.None::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Linq.Operators.RuntimeUnion1<T0>(System.Option.None arg0) -> System.Option<T0>
+ldarg arg0
+newobj instance System.Option<T0>::.ctor(System.Option.None)
+ret
+.end
+.function neoCLR.Library.System.Linq.Operators.RuntimeUnion2<T0>(T0 arg0) -> System.Option.Some<T0>
+ldarg arg0
+newobj instance System.Option.Some<T0>::.ctor(T0)
+ret
+.end
+.function neoCLR.Library.System.Linq.Operators.RuntimeUnion3<T0>(System.Option.Some<T0> arg0) -> System.Option<T0>
+ldarg arg0
+newobj instance System.Option<T0>::.ctor(System.Option.Some<T0>)
+ret
+.end
+.function neoCLR.Library.System.Linq.Operators.RuntimeUnion4(System.Linq.SingleError arg0) -> System.Result.Error<System.Linq.SingleError>
+ldarg arg0
+newobj instance System.Result.Error<System.Linq.SingleError>::.ctor(System.Linq.SingleError)
+ret
+.end
+.function neoCLR.Library.System.Linq.Operators.RuntimeUnion5<T0>(System.Result.Error<System.Linq.SingleError> arg0) -> System.Result<T0,System.Linq.SingleError>
+ldarg arg0
+newobj instance System.Result<T0,System.Linq.SingleError>::.ctor(System.Result.Error<System.Linq.SingleError>)
+ret
+.end
+.function neoCLR.Library.System.Linq.Operators.RuntimeUnion6<T0>(T0 arg0) -> System.Result.Ok<T0>
+ldarg arg0
+newobj instance System.Result.Ok<T0>::.ctor(T0)
+ret
+.end
+.function neoCLR.Library.System.Linq.Operators.RuntimeUnion7<T0>(System.Result.Ok<T0> arg0) -> System.Result<T0,System.Linq.SingleError>
+ldarg arg0
+newobj instance System.Result<T0,System.Linq.SingleError>::.ctor(System.Result.Ok<T0>)
+ret
+.end
+.function neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end
+.function neoCLR.Library.System.Linq.Operators.RuntimeCliCall0(Boolean arg0,Int32 arg1) -> Int32
+ldarg arg0
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
+ldarg arg1
+call neoCLR.Library.System.Linq.Operators.RuntimeEqual(Int32,Int32)
+ret
+.end

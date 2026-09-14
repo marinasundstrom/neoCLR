@@ -91,8 +91,9 @@ result['targetProfileAdditions'] += [{
     'disposition': 'query-library-and-terminal-outcomes',
     'samples': ['library-query-terminals.rvn'],
     'tests': ['tests/query_terminals.rs', 'docs/experiments/raven-target/verify_queries.py'],
-    'note': 'First/Last return Option; Single returns Result with Empty/Multiple. Normal-outcome cleanup only. See docs/raven-query-api.md.'
-} for file in ('runtime/raven/Linq.neoil', 'runtime/raven/SingleError.neoil')]
+    'note': 'Operators terminals are authored in Raven with generated bootstrap bodies; First/Last return Option and Single returns Result with Empty/Multiple. Deferred iterator classes remain neoIL. Normal-outcome cleanup only. See docs/raven-query-api.md.'
+} for file in ('runtime/raven/Linq.neoil', 'runtime/raven/SingleError.neoil', 'runtime/raven/src/Linq.rvn',
+                 'runtime/raven/generated/Linq.methods.neoil', 'runtime/raven/generated/Linq.helpers.neoil')]
 for addition in result['targetProfileAdditions']:
     assert (ROOT / addition['file']).is_file()
     for sample in addition['samples']:

@@ -3286,3 +3286,34 @@ The neoCLR probe emits no System.Unit and executes six expected output lines,
 including both propagation paths. All 69 Math consumer results and six rejected
 contracts pass; regenerated Math bodies remain identical. These are local commits;
 no new tools installation or publication was performed.
+
+
+## 2026-09-14 — Larger library migration slices and an Operators container
+
+**Author direction:** Asked for larger slices and to continue porting feasible runtime
+library code, fixing Raven/compiler or neoCLR runtime problems encountered along the
+way. The previous rule remains: general Raven fixes go to main independently;
+neoCLR-specific target policies stay experimental.
+
+**Assistant action:** Extended the bounded importer from direct generic parameters to
+constructed collection, delegate and union signatures. Ported ToList, First, Last and
+Single with predicate overloads into the shared Raven System project. Preserved
+Option/Result outcomes and iterator cleanup, then checked the generated bodies with
+existing query/runtime tests. General imported-signature, generic-member emission and
+same-namespace type-lookup defects were reproduced with ordinary C# reference
+contracts and corrected independently in Raven. Bare empty member-union returns also
+exposed missing case construction; the independent .NET regression and correction
+cover return expressions and explicitly typed local initializers.
+
+**Author refinement:** “We should probably not call that type Enumerable but Operators
+perhaps.” **Assistant response and action:** Adopted `System.Linq.Operators` for the
+extension-method container, updating reference metadata, direct IL calls and docs;
+receiver syntax remains `items.First()`/`items.ToList()`. Consumers need rebuilding.
+
+**Outcome and remaining work:** The seven terminal overloads execute from Raven-generated
+bootstrap bodies. Instance type definitions and deferred iterator classes still require
+shared implementation/reference identity support before they can migrate faithfully.
+The [authoring document](raven-system-library.md) records this boundary and validation;
+compiler fixes and commit references are tracked in the
+[integration evaluation](raven-target-evaluation.md). No release or local tools refresh
+is implied by this source migration.

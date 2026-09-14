@@ -38,7 +38,7 @@ static class DelegateBindings
     {
         var owner = Type(reference.DeclaringType);
         if (owner is null) return null;
-        var (args, result) = RuntimeSignatures.Match(reference, definition, t => Type(t) ?? CollectionBindings.Type(t) ?? GenericUnionBindings.Type(t));
+        var (args, result) = RuntimeSignatures.Match(reference, definition, t => Type(t) ?? CollectionBindings.Type(t) ?? GenericUnionBindings.Type(t), allowOpenMethodParameters: GenericUnionBindings.ParameterMap is not null);
         var signature = Shapes[owner];
         if (!reference.HasThis || !callvirt || reference.Name != "Invoke" || !args.SequenceEqual(signature[..^1]) || result != signature[^1])
             throw new InvalidDataException($"Unsupported delegate invocation: {reference.FullName}; callvirt={callvirt}, actual={string.Join(',', args)} -> {result}, expected={string.Join(',', signature)}.");

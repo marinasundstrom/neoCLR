@@ -1,0 +1,25 @@
+{
+  "format": "raven-library-bootstrap-v1",
+  "owner": "System.Linq.Operators",
+  "inputs": {
+    "runtime/raven/src/Math.rvn": "05fbc020828379134fbead7aefb8e19955cefc3b875991dc937e2e303c716e18",
+    "runtime/raven/src/Linq.rvn": "6a274234eb9f10eeaf84ca4066ea9ad2f82f889824f89e7b93ed7ce7323a8202",
+    "runtime/raven/System.rvnproj": "05a1ed402b8fd7006c7753592dcd904a384c20e0ca40a0c9facd0276ba1f3600",
+    "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
+  },
+  "outputs": {
+    "Linq.methods.neoil": "948e4eb57502ea7bc6d1b2af8443a52e680168f14d84a21f0808132323cb4a10",
+    "Linq.helpers.neoil": "faf33be8ef3cf052b72bddb448700599e6dba52af6b914c4a33504e7b972a7ee"
+  },
+  "compilerSha256": "3df6ae2bdb1aa730243cbe88be787367d5b1a8e86ded32025a5d4ff711cb300b",
+  "coreSha256": "bacbafa34c4f264b428df6bff160b5972d86f35e148028d713f06a111dfad121",
+  "exports": [
+    "ToList<T0>(System.Collections.Iterable<T0> source) -> System.Collections.ArrayList<T0>",
+    "First<T0>(System.Collections.Iterable<T0> source) -> System.Option<T0>",
+    "Last<T0>(System.Collections.Iterable<T0> source) -> System.Option<T0>",
+    "Single<T0>(System.Collections.Iterable<T0> source) -> System.Result<T0,System.Linq.SingleError>",
+    "First<T0>(System.Collections.Iterable<T0> source,System.Func<T0,Boolean> predicate) -> System.Option<T0>",
+    "Last<T0>(System.Collections.Iterable<T0> source,System.Func<T0,Boolean> predicate) -> System.Option<T0>",
+    "Single<T0>(System.Collections.Iterable<T0> source,System.Func<T0,Boolean> predicate) -> System.Result<T0,System.Linq.SingleError>"
+  ]
+}

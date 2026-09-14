@@ -7,14 +7,15 @@ static class RuntimeSignatures
     public static bool IsCore(IMetadataScope? scope) => scope?.Name == CoreDeclarations.Identity
         || scope is ModuleDefinition module && module.Assembly.Name.Name == CoreDeclarations.Identity;
 
-    public static TypeReference Close(TypeReference type, TypeReference owner, int depth = 0, GenericInstanceMethod? method = null, bool pointers = false)
+    public static TypeReference Close(TypeReference type, TypeReference owner, int depth = 0, GenericInstanceMethod? method = null, bool pointers = false, bool allowOpenMethodParameters = false)
     {
         if (depth > 32) throw new InvalidDataException("Signature nesting limit exceeded.");
-        TypeReference Nested(TypeReference t) => Close(t, owner, depth + 1, method, pointers);
+        TypeReference Nested(TypeReference t) => Close(t, owner, depth + 1, method, pointers, allowOpenMethodParameters);
         if (type is GenericParameter parameter)
         {
             if (parameter.Type == GenericParameterType.Method)
             {
+                if (method is null && allowOpenMethodParameters) return parameter;
                 if (method is null || parameter.Position < 0 || parameter.Position >= method.GenericArguments.Count)
                     throw new InvalidDataException("Unsupported open method signature parameter.");
                 return Nested(method.GenericArguments[parameter.Position]);
@@ -55,7 +56,7 @@ static class RuntimeSignatures
     }
 
     public static (string[] Args, string Result) Match(MethodReference reference, MethodDefinition definition,
-        Func<TypeReference, string?> catalog, bool pointers = false)
+        Func<TypeReference, string?> catalog, bool pointers = false, bool allowOpenMethodParameters = false)
     {
         var method = reference as GenericInstanceMethod;
         var convention = method is null ? MethodCallingConvention.Default : MethodCallingConvention.Generic;
@@ -66,7 +67,7 @@ static class RuntimeSignatures
             || reference.DeclaringType.GetElementType().FullName != definition.DeclaringType.FullName
             || (reference.DeclaringType is GenericInstanceType owner ? owner.GenericArguments.Count : 0) != definition.DeclaringType.GenericParameters.Count)
             throw new InvalidDataException("Unsupported runtime member signature.");
-        string Resolve(TypeReference t, bool returns = false) => Map(Close(t, reference.DeclaringType, method: method, pointers: pointers), catalog, returns && t.MetadataType == MetadataType.Void);
+        string Resolve(TypeReference t, bool returns = false) => Map(Close(t, reference.DeclaringType, method: method, pointers: pointers, allowOpenMethodParameters: allowOpenMethodParameters), catalog, returns && t.MetadataType == MetadataType.Void);
         var args = reference.Parameters.Select(p => Resolve(p.ParameterType)).ToArray();
         var result = Resolve(reference.ReturnType, true);
         if (!args.SequenceEqual(definition.Parameters.Select(p => Resolve(p.ParameterType)))

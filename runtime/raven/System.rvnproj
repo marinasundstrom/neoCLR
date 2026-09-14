@@ -7,5 +7,6 @@
   <Import Project="../../build/NeoCLR.Raven.props" />
   <ItemGroup>
     <Compile Include="src/Math.rvn" />
+    <Compile Include="src/Linq.rvn" />
   </ItemGroup>
 </Project>

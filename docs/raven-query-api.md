@@ -1,6 +1,6 @@
 # Prototype query API for Raven
 
-The Raven-target runtime library now exposes `System.Linq.Enumerable` extension
+The Raven-target runtime library now exposes `System.Linq.Operators` extension
 methods over `System.Collections.Iterable<T>` and, after Preview 5, vector arrays:
 
 | Method | Result | Evaluation |
@@ -342,3 +342,18 @@ signature help now verifies all three predicate overloads.
 Source validation passed 63 saved-project cases, 29 query checks, 15 application
 checks, 116 signature checks, 64 editor checks and five query-terminal runtime
 tests, plus Clippy and formatting. The .NET comparison targets net10.0.
+
+## Raven-authored terminal implementations
+
+`ToList`, `First`, `Last` and `Single` (including predicate overloads) are now authored
+in `runtime/raven/src/Linq.rvn`. `System.Linq.Operators` holds the extension methods;
+`import System.Linq.*` and receiver calls remain unchanged. This replaces the earlier
+`Enumerable` owner without an alias: rebuild consumers and reference metadata together.
+The name describes an operation container rather than a sequence contract. Compared
+with .NET's Enumerable class, this is a naming difference, not a new query protocol.
+
+Generated bootstrap bodies retain the existing Option/Result outcomes and Dispose
+boundaries. Iterator/predicate faults still terminate execution rather than becoming
+error outcomes; this migration does not introduce exception unwinding. Deferred
+Where/Select iterator classes remain in neoIL pending shared implementation/reference
+identity support. See [library authoring](raven-system-library.md).

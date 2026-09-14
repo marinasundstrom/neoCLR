@@ -86,9 +86,9 @@ Good:
     newobj Source
     castclass System.Collections.Iterable<Int32>
     delegate.bind System.Func<Int32,Boolean> = Keep(Int32)
-    call System.Linq.Enumerable::Where<Int32>(System.Collections.Iterable<Int32>,System.Func<Int32,Boolean>)
+    call System.Linq.Operators::Where<Int32>(System.Collections.Iterable<Int32>,System.Func<Int32,Boolean>)
     delegate.bind System.Func<Int32,Int32> = Increment(Int32)
-    call System.Linq.Enumerable::Select<Int32,Int32>(System.Collections.Iterable<Int32>,System.Func<Int32,Int32>)
+    call System.Linq.Operators::Select<Int32,Int32>(System.Collections.Iterable<Int32>,System.Func<Int32,Int32>)
     stloc query
     ldloc state
     ldfld Tracker::Acquired
@@ -110,7 +110,7 @@ Good:
     ldc.i4 1
     call Assert(Int32,Int32)
     ldloc query
-    call System.Linq.Enumerable::ToList<Int32>(System.Collections.Iterable<Int32>)
+    call System.Linq.Operators::ToList<Int32>(System.Collections.Iterable<Int32>)
     ldc.i4 0
     callvirt instance System.Collections.ArrayList<Int32>::get_Item(Int32)
     ldc.i4 43

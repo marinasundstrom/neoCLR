@@ -170,7 +170,7 @@ static class SignatureProbe
         Check("Int32 managed receiver mapping", Int32Bindings.Bind(compareCall, compare)?.Arguments.SequenceEqual(new[] { "Int32&", "Int32" }) == true);
         compareCall.HasThis = false;
         Reject("Int32 instance receiver mismatch", () => Int32Bindings.Bind(compareCall, compare));
-        var math = module.GetType("System.Math");
+        var math = module.Types.Single(t => t.Namespace == "System.Math" && NamespaceFunctions.IsContainer(t));
         var sqrt = math.Methods.Single(m => m.Name == "Sqrt");
         var sqrtCall = Reference(sqrt, math);
         Check("Double Math mapping", DoubleBindings.Bind(sqrtCall, sqrt)?.Result == "Double");
@@ -237,7 +237,7 @@ static class SignatureProbe
             searchReference.ReturnType = module.TypeSystem.Int32;
             Reject(name + " rejects an old or forged result", () => CollectionBindings.Bind(searchReference, search, true));
         }
-        var enumerable = module.GetType("System.Linq.Enumerable");
+        var enumerable = module.GetType("System.Linq.Operators");
         foreach (var name in new[] { "First", "Last", "Single" })
         foreach (var count in new[] { 1, 2 }) {
             var terminal = enumerable.Methods.Single(m => m.Name == name && m.Parameters.Count == count);

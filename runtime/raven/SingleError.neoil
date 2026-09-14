@@ -1,4 +1,4 @@
-; Cardinality failure from Enumerable.Single; not a runtime fault.
+; Cardinality failure from Operators.Single; not a runtime fault.
 .type System.Linq.SingleError
     .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
     .field private Stored System.Value

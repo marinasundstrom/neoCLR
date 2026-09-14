@@ -1132,7 +1132,7 @@
         "tests/query_terminals.rs",
         "docs/experiments/raven-target/verify_queries.py"
       ],
-      "note": "First/Last return Option; Single returns Result with Empty/Multiple. Normal-outcome cleanup only. See docs/raven-query-api.md."
+      "note": "Operators terminals are authored in Raven with generated bootstrap bodies; First/Last return Option and Single returns Result with Empty/Multiple. Deferred iterator classes remain neoIL. Normal-outcome cleanup only. See docs/raven-query-api.md."
     },
     {
       "file": "runtime/raven/SingleError.neoil",
@@ -1144,7 +1144,43 @@
         "tests/query_terminals.rs",
         "docs/experiments/raven-target/verify_queries.py"
       ],
-      "note": "First/Last return Option; Single returns Result with Empty/Multiple. Normal-outcome cleanup only. See docs/raven-query-api.md."
+      "note": "Operators terminals are authored in Raven with generated bootstrap bodies; First/Last return Option and Single returns Result with Empty/Multiple. Deferred iterator classes remain neoIL. Normal-outcome cleanup only. See docs/raven-query-api.md."
+    },
+    {
+      "file": "runtime/raven/src/Linq.rvn",
+      "disposition": "query-library-and-terminal-outcomes",
+      "samples": [
+        "library-query-terminals.rvn"
+      ],
+      "tests": [
+        "tests/query_terminals.rs",
+        "docs/experiments/raven-target/verify_queries.py"
+      ],
+      "note": "Operators terminals are authored in Raven with generated bootstrap bodies; First/Last return Option and Single returns Result with Empty/Multiple. Deferred iterator classes remain neoIL. Normal-outcome cleanup only. See docs/raven-query-api.md."
+    },
+    {
+      "file": "runtime/raven/generated/Linq.methods.neoil",
+      "disposition": "query-library-and-terminal-outcomes",
+      "samples": [
+        "library-query-terminals.rvn"
+      ],
+      "tests": [
+        "tests/query_terminals.rs",
+        "docs/experiments/raven-target/verify_queries.py"
+      ],
+      "note": "Operators terminals are authored in Raven with generated bootstrap bodies; First/Last return Option and Single returns Result with Empty/Multiple. Deferred iterator classes remain neoIL. Normal-outcome cleanup only. See docs/raven-query-api.md."
+    },
+    {
+      "file": "runtime/raven/generated/Linq.helpers.neoil",
+      "disposition": "query-library-and-terminal-outcomes",
+      "samples": [
+        "library-query-terminals.rvn"
+      ],
+      "tests": [
+        "tests/query_terminals.rs",
+        "docs/experiments/raven-target/verify_queries.py"
+      ],
+      "note": "Operators terminals are authored in Raven with generated bootstrap bodies; First/Last return Option and Single returns Result with Empty/Multiple. Deferred iterator classes remain neoIL. Normal-outcome cleanup only. See docs/raven-query-api.md."
     }
   ]
 }

@@ -66,10 +66,11 @@ static class UnionImport
                     throw new InvalidDataException("Foreign generic parameter in library body.");
                 return "T" + parameter.Position;
             }
-            var collection = CollectionBindings.Type(type);
+            var collection = CollectionBindings.Type(type, libraryOwner is null ? null : t => ProfileType(t));
             if (collection is not null && collectionProfile) return collection;
             return ApplicationTypes.Type(type) ?? InterfaceBindings.Type(type) ?? NativeMemoryBindings.Type(type) ?? ReflectionBindings.Type(type) ?? DelegateBindings.Type(type) ?? ProcessBindings.ArrayType(type) ?? GenericUnionBindings.Type(type) ?? CalendarBindings.Type(type) ?? PrimitiveBindings.Type(type) ?? ResultBindings.Type(type) ?? Type(type, result);
         }
+        if (libraryOwner is not null) GenericUnionBindings.ParameterMap = parameter => ProfileType(parameter);
         var output = new StringBuilder(entry is not null ? $".module ImportedUnion\n.entry {Name(entry)}\n" : "");
         var coercions = new Dictionary<string, (string Name, string Body)>();
         Call Coerce(Call call, string[] actual)
@@ -451,14 +452,14 @@ static class UnionImport
                             code.AppendLine(mapConstruction.Instruction);
                             break;
                         }
-                        if (collectionProfile && CollectionBindings.IsArrayList(CollectionBindings.Type(constructor.DeclaringType)))
+                        if (collectionProfile && CollectionBindings.IsArrayList(CollectionBindings.Type(constructor.DeclaringType, libraryOwner is null ? null : t => ProfileType(t))))
                         {
-                            var signature = RuntimeSignatures.Match(constructor, constructorDefinition, CollectionBindings.Type);
+                            var signature = RuntimeSignatures.Match(constructor, constructorDefinition, t => CollectionBindings.Type(t, libraryOwner is null ? null : p => ProfileType(p)), allowOpenMethodParameters: libraryOwner is not null);
                             if (!constructorDefinition.IsConstructor || !constructor.HasThis || signature.Result != "noresult"
                                 || signature.Args.Length > 1 || signature.Args.Any(p => p != "Int32"))
                                 throw new InvalidDataException("Unsupported collection constructor.");
                             if (signature.Args.Length == 1) Expect("Int32");
-                            var collectionOwner = CollectionBindings.Type(constructor.DeclaringType)!;
+                            var collectionOwner = CollectionBindings.Type(constructor.DeclaringType, libraryOwner is null ? null : t => ProfileType(t))!;
                             Push(new(collectionOwner));
                             code.AppendLine($"newobj instance {collectionOwner}::.ctor({string.Join(',', signature.Args)})");
                             break;
@@ -547,11 +548,8 @@ static class UnionImport
                                     || generic.ElementMethod.FullName != targetMethod.FullName
                                     || generic.GenericArguments.Count != targetMethod.GenericParameters.Count)
                                     throw new InvalidDataException("Invalid generic library call.");
-                                // This first gate admits direct method parameters; nested generic shapes
-                                // require recursive substitution before they can be enabled.
-                                string Closed(TypeReference type, bool result = false) => type is GenericParameter p
-                                    && p.Type == GenericParameterType.Method
-                                    ? ProfileType(generic.GenericArguments[p.Position], result) : ProfileType(type, result);
+                                string Closed(TypeReference type, bool result = false)
+                                    => ProfileType(LibraryImplementation.Close(type, generic), result);
                                 var closedArguments = targetMethod.Parameters.Select(p => Closed(p.ParameterType)).ToArray();
                                 call = new(libraryOwner + "." + targetMethod.Name + "<" + string.Join(',', generic.GenericArguments.Select(t => ProfileType(t))) + ">",
                                     closedArguments, Closed(targetMethod.ReturnType, true));
@@ -589,7 +587,7 @@ static class UnionImport
                             else if (delegateCall is not null) call = new(delegateCall.Name, delegateCall.Arguments, delegateCall.Result, Instruction: delegateCall.Instruction);
                             else
                             {
-                                var binding = collectionProfile ? CollectionBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt) : null;
+                                var binding = collectionProfile ? CollectionBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt, libraryOwner is null ? null : t => ProfileType(t)) : null;
                                 var textBinding = StringBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt);
                                 if (textBinding is not null) call = new("", textBinding.Arguments, textBinding.Result, Instruction: textBinding.Instruction);
                                 else if (binding is not null) call = new("", binding.Arguments, binding.Result, Instruction: binding.Instruction);
