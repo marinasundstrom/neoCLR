@@ -2783,3 +2783,35 @@ browser checks covered desktop and 390px mobile, including example navigation an
 absence of page-wide horizontal overflow. The assistant is committing the website
 changes with the changelog and using the existing GitHub Pages workflow. Deployment
 completion must be verified from that run rather than inferred from a successful push.
+
+
+**Further author direction:** Organize the message around familiar value/reference
+semantics and metadata/assemblies; Void as a real generic argument and its implications
+for Func APIs; Option, Result, modernized collections and date/time; evolving APIs and
+feedback; and Raven as the first adaptable compiler target with .NET-hosted tooling
+and a VS Code extension. Describe the next work as moving the class library from
+neoIL to Raven and implementing missing library features.
+
+**Assistant action:** Revised the website around that outline and added excerpts
+from the existing Void callback and calendar samples. Distinguished .NET-hosted Raven
+tooling from neoCLR execution, and a migration direction from unchanged-binary
+compatibility. Listed library migration and API expansion as planned work; this website
+request does not itself resume the paused library implementation or override its
+compiler-stabilization prerequisites. Reused the Void, delegate, calendar, format and
+runtime API design records. Continued the authorized main/Pages publication workflow.
+
+**Runtime additions requested by the author:** Mention the interpreter, garbage
+collection and initial debugger support. Present a possible future JIT and garbage
+collector improvements as areas under consideration.
+
+**Assistant action:** Added current runtime capabilities with links to execution,
+GC and debugger documentation, distinguishing the terminal debugger from future
+Raven source debugging in VS Code. Added separate JIT and collector research cards;
+no JIT selection, implementation or performance improvement is claimed.
+
+**Positioning clarification:** The author wants neoCLR marketed as a software
+platform improving on .NET and evolving through feedback, rather than centering the
+compiler integration alone. The assistant revised the hero and platform/library
+introductions to connect type system, execution engine, class library and tools,
+with Raven as the demonstration language. The invitation asks visitors to help shape
+the platform; implemented differences and future investigations remain distinct.

@@ -43,3 +43,14 @@
 
 /* Keep complete source visible, including long generic signatures on phones. */
 pre{white-space:pre-wrap;overflow-wrap:anywhere}
+
+.next-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:48px;margin-top:40px}
+.next-grid h3{font-size:23px;letter-spacing:-.5px;margin-bottom:18px}
+.next-grid p{font-size:15px;color:var(--muted);line-height:1.8}
+.next-grid a{display:inline-block;font-size:13px;font-weight:600;margin-top:20px}
+#example-void{grid-column:1/-1}
+.principles .text-link{display:inline-block;margin-top:18px;font-size:12px}
+.library-list .text-link{margin-top:16px}
+@media(max-width:720px){.next-grid{grid-template-columns:1fr;gap:32px}}
+
+.runtime-heading{margin-top:56px;max-width:680px}.runtime-heading h3{font-size:28px;letter-spacing:-.7px}.runtime-heading p{margin-top:16px;color:var(--muted)}.runtime-capabilities{margin-top:28px}

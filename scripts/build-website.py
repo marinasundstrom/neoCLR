@@ -4,6 +4,7 @@ from html import escape
 from html.parser import HTMLParser
 from pathlib import Path
 import shutil
+from textwrap import dedent
 
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / 'website'
@@ -14,7 +15,7 @@ def excerpt(path, start, end, include_end=True):
     text = (ROOT / path).read_text(encoding='utf-8')
     first = text.index(start)
     last = text.index(end, first) + (len(end) if include_end else 0)
-    return escape(text[first:last].rstrip())
+    return escape(dedent(text[first:last]).rstrip())
 
 
 class PageCheck(HTMLParser):
@@ -51,6 +52,8 @@ def main():
     page = (SOURCE / 'index.html').read_text(encoding='utf-8')
     raven = 'docs/experiments/raven-target/samples/'
     samples = {
+        'FUNC_SAMPLE': (raven + 'application-delegates.rvn', '    var shared = 7', '    WriteLine(shared)', True),
+        'DATE_SAMPLE': (raven + 'library-calendar.rvn', '    CheckDate(Date.Create(2024', '    CheckDate(Date.FromDayNumber(-1))', True),
         'RAVEN_SAMPLE': (raven + 'library-propagation.rvn', 'func Normalize', '\n}', True),
         'IL_SAMPLE': ('examples/preview/result-void.neoil', '.function Complete', '.end', True),
         'OPTION_SAMPLE': (raven + 'library-query-terminals.rvn', 'func FirstPositive', '\n}', True),
