@@ -73,6 +73,12 @@ if (args.Length == 2 && args[0] == "--unit-contract-check")
     return;
 }
 
+if (args.Length == 2 && args[0] == "--generic-library-core")
+{
+    GenericLibraryChecks.WriteCore(args[1]);
+    return;
+}
+
 if (args.Length == 2 && args[0] == "--reference-core")
 {
     CoreDeclarations.Write(args[1], unionProbe: true, collectionProbe: true);

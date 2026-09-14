@@ -19,21 +19,38 @@ static class LibraryImplementation
         if (methods.Length == 0) throw new InvalidDataException("Empty library implementation.");
         foreach (var method in methods)
         {
-            ApplicationTypes.CheckMethod(method);
+            CheckMethod(method);
             if (!method.IsPublic || !method.IsStatic || method.IsConstructor || !method.HasBody
                 || !Regex.IsMatch(method.Name, @"^[A-Za-z_][A-Za-z0-9_]*$")
                 || method.Parameters.Any(p => p.IsOut || p.ParameterType.IsByReference)
                 || method.ReturnType.MetadataType == MetadataType.Void)
                 throw new InvalidDataException("Unsupported library export: " + method.FullName);
-            var matches = contract.Methods.Where(m => m.IsPublic && m.IsStatic && m.Name == method.Name && m.Parameters.Count == method.Parameters.Count
+            var matches = contract.Methods.Where(m => m.IsPublic && m.IsStatic && m.Name == method.Name && m.Parameters.Count == method.Parameters.Count && m.GenericParameters.Count == method.GenericParameters.Count
                 && SameType(m.ReturnType, method.ReturnType)
                 && m.Parameters.Zip(method.Parameters).All(p => p.First.Name == p.Second.Name && SameType(p.First.ParameterType, p.Second.ParameterType))).ToArray();
+            if (matches.Length == 1) CheckMethod(matches[0]);
             if (matches.Length != 1) throw new InvalidDataException("Library export does not match reference contract: " + method.FullName);
         }
         return methods;
     }
 
-    static bool SameType(TypeReference left, TypeReference right) => left.FullName == right.FullName
+    public static void CheckMethod(MethodDefinition method)
+    {
+        if (!method.HasGenericParameters) { ApplicationTypes.CheckMethod(method); return; }
+        if (!method.IsStatic || method.ExplicitThis || method.DeclaringType.HasGenericParameters
+            || method.CallingConvention != MethodCallingConvention.Generic
+            || method.GenericParameters.Any(p => p.HasConstraints || p.Attributes != GenericParameterAttributes.NonVariant)
+            || method.Parameters.Select(p => p.ParameterType).Append(method.ReturnType)
+                .Any(t => t.ContainsGenericParameter && t is not GenericParameter))
+            throw new InvalidDataException("Unsupported generic library signature: " + method.FullName);
+    }
+
+    public static string GenericName(MethodDefinition method) => method.Name + (method.HasGenericParameters
+        ? "<" + string.Join(',', method.GenericParameters.Select(p => "T" + p.Position)) + ">" : "");
+
+    static bool SameType(TypeReference left, TypeReference right) => left is GenericParameter lp
+        ? right is GenericParameter rp && lp.Type == rp.Type && lp.Position == rp.Position
+        : left.FullName == right.FullName
         && left.MetadataType == right.MetadataType && left.IsValueType == right.IsValueType
         && (left.MetadataType is not (MetadataType.Class or MetadataType.ValueType or MetadataType.GenericInstance)
             || left.Resolve()?.Module.Assembly.Name.FullName == right.Resolve()?.Module.Assembly.Name.FullName)

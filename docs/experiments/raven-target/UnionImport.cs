@@ -52,13 +52,20 @@ static class UnionImport
         var exports = libraryOwner is null ? [] : LibraryImplementation.Roots(app.MainModule, library.MainModule, libraryOwner);
         var entry = libraryOwner is null ? app.EntryPoint ?? throw new InvalidDataException("Missing entry point.") : null;
         string Name(MethodDefinition method) => libraryOwner is null ? MetadataIdentity.FunctionName(method)
-            : exports.Contains(method) ? libraryOwner + "." + method.Name
+            : exports.Contains(method) ? libraryOwner + "." + LibraryImplementation.GenericName(method)
             : throw new InvalidDataException("Unexported implementation dependency: " + method.FullName);
         if (entry is not null && (entry.Parameters.Count != 0 || entry.ReturnType.MetadataType != MetadataType.Void))
             throw new InvalidDataException("Result profile requires a parameterless no-result entry.");
         if (collectionProfile) { InterfaceBindings.Validate(library.MainModule); CollectionBindings.Validate(library.MainModule); ReflectionBindings.Validate(library.MainModule); NativeMemoryBindings.Validate(library.MainModule); }
+        MethodDefinition? activeLibraryMethod = null;
         string ProfileType(TypeReference type, bool result = false)
         {
+            if (libraryOwner is not null && type is GenericParameter parameter)
+            {
+                if (parameter.Type != GenericParameterType.Method || parameter.Owner != activeLibraryMethod)
+                    throw new InvalidDataException("Foreign generic parameter in library body.");
+                return "T" + parameter.Position;
+            }
             var collection = CollectionBindings.Type(type);
             if (collection is not null && collectionProfile) return collection;
             return ApplicationTypes.Type(type) ?? InterfaceBindings.Type(type) ?? NativeMemoryBindings.Type(type) ?? ReflectionBindings.Type(type) ?? DelegateBindings.Type(type) ?? ProcessBindings.ArrayType(type) ?? GenericUnionBindings.Type(type) ?? CalendarBindings.Type(type) ?? PrimitiveBindings.Type(type) ?? ResultBindings.Type(type) ?? Type(type, result);
@@ -91,7 +98,9 @@ static class UnionImport
             var methodId = seen.Count;
             if (seen.Count > 128) throw new InvalidDataException("Method limit exceeded.");
             if (libraryOwner is not null && !exports.Contains(method)) throw new InvalidDataException("Unexported library body.");
-            ApplicationTypes.CheckMethod(method);
+            activeLibraryMethod = libraryOwner is null ? null : method;
+            if (libraryOwner is null) ApplicationTypes.CheckMethod(method);
+            else LibraryImplementation.CheckMethod(method);
             foreach (var parameter in method.Parameters) ApplicationTypes.CheckAccess(parameter.ParameterType, method.Module);
             ApplicationTypes.CheckAccess(method.ReturnType, method.Module);
             if (method.HasBody)
@@ -123,7 +132,7 @@ static class UnionImport
             var emitInstance = method.HasThis && !valueConstructor;
             var result = ProfileType(method.ReturnType, true);
             var locals = method.Body.Variables.Select(v => ProfileType(v.VariableType)).ToArray();
-            if (locals.Any(t => !ApplicationTypes.IsType(t) && !ManagedArrayBindings.IsType(t) && t != "System.Object" && !InterfaceBindings.IsInterface(t) && !NativeMemoryBindings.IsPointer(t) && !ReflectionBindings.IsType(t) && t != "arrayref<String>" && !DelegateBindings.IsType(t) && !GenericUnionBindings.IsType(t) && !CalendarBindings.Types.Contains(t) && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
+            if (locals.Any(t => !(libraryOwner is not null && method.GenericParameters.Any(p => t == "T" + p.Position)) && !ApplicationTypes.IsType(t) && !ManagedArrayBindings.IsType(t) && t != "System.Object" && !InterfaceBindings.IsInterface(t) && !NativeMemoryBindings.IsPointer(t) && !ReflectionBindings.IsType(t) && t != "arrayref<String>" && !DelegateBindings.IsType(t) && !GenericUnionBindings.IsType(t) && !CalendarBindings.Types.Contains(t) && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
                 throw new InvalidDataException("Unsupported local default in Result profile.");
             NormalizePatternBranches(method);
             var instructions = method.Body.Instructions.ToArray();
@@ -131,7 +140,7 @@ static class UnionImport
             var states = new Dictionary<int, State>();
             var work = new Queue<int>();
             var bodies = new Dictionary<int, string>();
-            Merge(0, new([], locals.Select(t => method.Body.InitLocals && t != Carrier && t != Option && t != VoidOption && t != VoidResult && t != "String" && !NeedsInitialization(t)).ToArray()));
+            Merge(0, new([], locals.Select(t => !method.GenericParameters.Any(p => t == "T" + p.Position) && method.Body.InitLocals && t != Carrier && t != Option && t != VoidOption && t != VoidResult && t != "String" && !NeedsInitialization(t)).ToArray()));
             var visits = 0;
             while (work.TryDequeue(out var index))
             {
@@ -529,16 +538,38 @@ static class UnionImport
                         Call call;
                         if (targetMethod.Module == app.MainModule || guestLibraries.Contains(targetMethod.Module))
                         {
-                            ApplicationTypes.CheckMethod(reference); ApplicationTypes.CheckMethod(targetMethod);
-                            if (reference.HasThis != targetMethod.HasThis || instruction.OpCode.Code == Code.Callvirt && targetMethod.IsStatic) throw new InvalidDataException("Invalid application call receiver.");
-                            if (!targetMethod.IsPublic && targetMethod.DeclaringType != method.DeclaringType)
-                                throw new InvalidDataException("Nonpublic cross-type call unsupported.");
-                            if (reference.FullName != targetMethod.FullName) throw new InvalidDataException("Resolved signature mismatch.");
-                            if (!targetMethod.IsAbstract) pending.Enqueue(targetMethod);
-                            var parameters = reference.Parameters.Select(p => ProfileType(p.ParameterType)).ToArray();
-                            call = targetMethod.HasThis && !(targetMethod.IsConstructor && targetMethod.DeclaringType.IsValueType)
-                                ? new("", new[] { ApplicationTypes.Receiver(targetMethod) }.Concat(parameters).ToArray(), ProfileType(reference.ReturnType, true), Instruction: $"{(instruction.OpCode.Code == Code.Callvirt ? "callvirt" : "call")} instance {ProfileType(reference.DeclaringType)}::{ApplicationTypes.MethodName(targetMethod)}({string.Join(',', parameters)})" + (targetMethod.DeclaringType.IsValueType && targetMethod.ReturnType.MetadataType == MetadataType.Void ? "\npop" : ""))
-                                : new(Name(targetMethod), targetMethod.HasThis ? new[] { ApplicationTypes.Receiver(targetMethod) }.Concat(parameters).ToArray() : parameters, ProfileType(reference.ReturnType, true));
+                            if (libraryOwner is not null && reference is GenericInstanceMethod generic)
+                            {
+                                LibraryImplementation.CheckMethod(targetMethod);
+                                if (instruction.OpCode.Code != Code.Call || generic.HasThis || generic.ExplicitThis
+                                    || generic.CallingConvention != MethodCallingConvention.Generic
+                                    || !exports.Contains(targetMethod) || !targetMethod.IsStatic
+                                    || generic.ElementMethod.FullName != targetMethod.FullName
+                                    || generic.GenericArguments.Count != targetMethod.GenericParameters.Count)
+                                    throw new InvalidDataException("Invalid generic library call.");
+                                // This first gate admits direct method parameters; nested generic shapes
+                                // require recursive substitution before they can be enabled.
+                                string Closed(TypeReference type, bool result = false) => type is GenericParameter p
+                                    && p.Type == GenericParameterType.Method
+                                    ? ProfileType(generic.GenericArguments[p.Position], result) : ProfileType(type, result);
+                                var closedArguments = targetMethod.Parameters.Select(p => Closed(p.ParameterType)).ToArray();
+                                call = new(libraryOwner + "." + targetMethod.Name + "<" + string.Join(',', generic.GenericArguments.Select(t => ProfileType(t))) + ">",
+                                    closedArguments, Closed(targetMethod.ReturnType, true));
+                                pending.Enqueue(targetMethod);
+                            }
+                            else
+                            {
+                                ApplicationTypes.CheckMethod(reference); ApplicationTypes.CheckMethod(targetMethod);
+                                if (reference.HasThis != targetMethod.HasThis || instruction.OpCode.Code == Code.Callvirt && targetMethod.IsStatic) throw new InvalidDataException("Invalid application call receiver.");
+                                if (!targetMethod.IsPublic && targetMethod.DeclaringType != method.DeclaringType)
+                                    throw new InvalidDataException("Nonpublic cross-type call unsupported.");
+                                if (reference.FullName != targetMethod.FullName) throw new InvalidDataException("Resolved signature mismatch.");
+                                if (!targetMethod.IsAbstract) pending.Enqueue(targetMethod);
+                                var parameters = reference.Parameters.Select(p => ProfileType(p.ParameterType)).ToArray();
+                                call = targetMethod.HasThis && !(targetMethod.IsConstructor && targetMethod.DeclaringType.IsValueType)
+                                    ? new("", new[] { ApplicationTypes.Receiver(targetMethod) }.Concat(parameters).ToArray(), ProfileType(reference.ReturnType, true), Instruction: $"{(instruction.OpCode.Code == Code.Callvirt ? "callvirt" : "call")} instance {ProfileType(reference.DeclaringType)}::{ApplicationTypes.MethodName(targetMethod)}({string.Join(',', parameters)})" + (targetMethod.DeclaringType.IsValueType && targetMethod.ReturnType.MetadataType == MetadataType.Void ? "\npop" : ""))
+                                    : new(Name(targetMethod), targetMethod.HasThis ? new[] { ApplicationTypes.Receiver(targetMethod) }.Concat(parameters).ToArray() : parameters, ProfileType(reference.ReturnType, true));
+                            }
                         }
                         else if (targetMethod.Module == library.MainModule)
                         {
@@ -614,7 +645,7 @@ static class UnionImport
             if (method.Body.InitLocals)
                 for (var n = 0; n < locals.Length; n++)
                     if (ApplicationTypes.IsType(locals[n]) || ReflectionBindings.IsType(locals[n]) && locals[n] != "System.RuntimeTypeHandle" || ManagedArrayBindings.IsType(locals[n]) || CollectionBindings.IsReference(locals[n]) || CalendarBindings.Types.Contains(locals[n]) || GenericUnionBindings.IsType(locals[n]) && !GenericUnionBindings.RequiresInitialization(locals[n])) output.AppendLine($"ldloca local{n}\ninitobj {locals[n]}");
-                    else if (locals[n] != Carrier && locals[n] != Option && locals[n] != VoidOption && locals[n] != VoidResult && locals[n] != "String" && !NeedsInitialization(locals[n])) output.AppendLine(Default(locals[n]) + $"\nstloc local{n}");
+                    else if (!method.GenericParameters.Any(p => locals[n] == "T" + p.Position) && locals[n] != Carrier && locals[n] != Option && locals[n] != VoidOption && locals[n] != VoidResult && locals[n] != "String" && !NeedsInitialization(locals[n])) output.AppendLine(Default(locals[n]) + $"\nstloc local{n}");
             foreach (var index in bodies.Keys.Order())
             {
                 mappings.Add((method, methodId, instructions[index].Offset));

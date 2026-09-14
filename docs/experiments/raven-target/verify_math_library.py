@@ -98,7 +98,7 @@ func Main() {
         ('WrongResult', 'public func Min(left: int, right: int) -> bool { return true }', 'does not match reference contract'),
         ('WrongParameters', 'public func Min(value: int) -> int { return value }', 'does not match reference contract'),
         ('WrongNames', 'public func Min(a: int, b: int) -> int { return a }', 'does not match reference contract'),
-        ('Generic', 'public func Min<T>(left: T, right: T) -> T { return left }', 'Unsupported application signature'),
+        ('Generic', 'public func Min<T>(left: T, right: T) -> T { return left }', 'does not match reference contract'),
         ('Unmarked', 'public static class NamespaceMembers { public static func Min(left: int, right: int) -> int { return left } }', 'Missing namespace implementation'),
     ]:
         image = compile(name, 'import System.*\nnamespace System.Math\n' + code, library=True)

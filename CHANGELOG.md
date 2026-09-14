@@ -8,6 +8,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-14
 
+- Admit bounded unconstrained generic namespace implementation bodies against an
+  existing reference contract. Check generic arity/parameter positions, preserve open
+  bodies and validate same-fragment calls using existing runtime generic functions.
+  Add a test-only Int32/String probe and reject mismatched export contracts. Generic
+  classes, constructed signatures and constraints remain later migration gates.
+  Fix a general Raven generic-method projection crash independently on main
+  (5f93eef6a; experimental cherry-pick 64a5497ec), with 12 focused .NET checks passing.
+  Document the separate unresolved generic unit-return invocation issue in both repos.
+  The generic probe, all 69 Math results/six rejected contracts, Void propagation
+  and clean Math regeneration pass. No public System API or SDK package changes.
+
 - Select System.Void through Raven's unit Runtime Contract in the neoCLR project
   properties. Document one platform unit type, no-result calls versus explicit value
   contexts, and the compiler/target integration boundary. Add metadata and runtime

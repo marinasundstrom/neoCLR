@@ -75,7 +75,7 @@ do not require Raven. Regenerate and review the manifest alongside source edits.
 The consumer test covers qualified and wildcard-imported calls, a consumer-defined
 type in the same namespace, boundary values, Result payloads/errors, a remaining
 Double overload and a flattened executable library without source includes. Invalid
-export names, parameter names/signatures, generic bodies and unmarked containers must be rejected
+export names, parameter names/signatures, generic arity and unmarked containers must be rejected
 without executable output. Existing Rust Math tests cover the direct runtime and
 archived Neo callers.
 
@@ -90,21 +90,63 @@ not compensate with target-specific binding rules.
 The source imports `System.Result.*` and constructs `Ok`/`Error` directly. It uses
 specific error-type imports to avoid a collision with the separate `System.Error`
 type, and fully qualifies `System.Result<...>` in return annotations. The observed
-unqualified-return issue is tracked in the [target evaluation](raven-target-evaluation.md#deferred-return-annotation-resolution-candidate--2026-09-14).
+unqualified-return diagnostic issue was fixed independently; see the
+[resolution follow-up](raven-target-evaluation.md#resolution-follow-up--2026-09-14).
 
 ## Current limits and next gate
 
-This importer accepts a bounded set of nongeneric public namespace functions matching
-existing reference signatures. It rejects stateful containers, unexported helpers,
-new application-type identities, generic bodies, byref/out exports and no-result
-exports. Support for these is future work, not implied by compiling the pilot.
+This importer accepts public namespace functions matching existing reference
+signatures, including the bounded generic body gate below. It rejects stateful
+containers, unexported helpers, new application-type identities, constrained or nested
+generic signatures, byref/out exports and no-result exports. Support for these is future work, not implied by compiling the pilot.
 Generated Result adapters are scoped to the library implementation to avoid clashes
 with consumer adapters. Reference declarations remain separately maintained and
 checked against exports; complete generation of reference metadata from Raven source
 is not implemented yet.
 
-Before migrating collections, prove importing an ordinary generic method body and
-its closed instantiations. Before migrating foundational type definitions, establish
+Before migrating collections, extend the bounded generic gate to constructed generic
+signatures and required constraints. Before migrating foundational type definitions, establish
 how implementation and reference assemblies share their identities without circular
 bootstrap dependencies. Keep native services and neoIL conformance programs where
 those representations serve the platform.
+
+## Generic implementation gate — 2026-09-14
+
+The importer now preserves unconstrained generic namespace method definitions and
+calls within the same implementation fragment. Parameters and returns may use a
+method type parameter directly. Generic arity and parameter positions are checked
+against the separate reference contract; parameter names and existing nominal type
+identity checks remain enforced. Generic parameter *names* need not match. Output
+uses positional names (`T0`, etc.) and the runtime’s existing generic function syntax.
+
+This follows ordinary CLI generic method definitions/specifications and reuses the
+runtime machinery described in the [generic constraint comparison](generic-constraints.md#comparison-with-clr-constrained-calls).
+There is no new metadata format or opcode. Preserving an open body avoids introducing
+a separate importer-specific monomorphization scheme. The cost is explicit validation
+and substitution at calls; full CLI generic support is not established by this gate.
+
+The test-only `Probe.Generic` namespace supplies a separate metadata contract. Raven
+compiles `Choose<T>` plus Int32/String wrappers; the imported open body executes both
+branches for each representation. The test deliberately uses a different type parameter
+name in the reference declaration. Mismatched parameter names and arity are rejected
+without executable output. A direct neoIL driver isolates implementation import and
+execution; this is not yet general consumer binding to arbitrary generic core APIs.
+
+```sh
+python3 docs/experiments/raven-target/verify_generic_library.py \
+  --compiler /absolute/path/to/rvnc.dll \
+  --bridge docs/experiments/raven-target/bin/Release/net11.0/Probe.dll \
+  --runtime target/release/neoclr
+```
+
+No public System API is added by this probe. Generic classes, constrained bodies,
+composite signatures such as `Iterable<T>`, generic unit-return calls and broader
+cross-fragment dependencies remain subsequent gates. Generic locals must be assigned
+before use; this slice does not project implicit generic defaults.
+
+The probe exposed a general Raven RuntimeUnitContract emission defect in generic
+method specifications. The independent fix is `5f93eef6a` on Raven main and
+`64a5497ec` in the experiment, with 12 focused .NET tests passing. A separate
+`Echo<()>(value)` reduction still produces invalid IL on ordinary .NET and remains
+tracked in Raven’s Runtime Contract documentation. Generic unit storage and
+Result<Void, E> propagation do not prove that different invocation shape.

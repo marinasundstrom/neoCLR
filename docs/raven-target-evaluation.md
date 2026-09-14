@@ -718,3 +718,23 @@ Unit, target-owned Void and executable Result<Void, E> propagation. Existing Mat
 regeneration remains identical and all 69 consumer results/six invalid contracts pass.
 No .NET Framework or NanoFramework runtime execution is claimed by these tests.
 Generic implementation importing remains the next separate migration gate.
+
+### Generic call emission follow-up — 2026-09-14
+
+The next library importer gate exposed a RuntimeUnitContract bug: generic method
+specifications delegate their signature to an element method, so assigning their
+declaring type directly throws during emission. The general fix (`5f93eef6a` on Raven
+main, `64a5497ec` in the experiment) rewrites the element signature and type arguments
+separately. Twelve focused ordinary .NET checks pass; no neoCLR-specific policy was
+merged into main. Both repositories document this compiler change.
+
+**Deferred general candidate:** `Echo<()>(value)`, with `Echo<T>(value: T) -> T`,
+produced invalid .NET IL under the default Unit representation when its result was
+passed to `List<()>.Add`. This is a separate generic invocation/result issue, not
+covered by the passing generic storage or ordinary void-call tests. Investigate it
+independently before expanding the generic unit-result migration surface.
+
+The [generic library probe](raven-system-library.md#generic-implementation-gate--2026-09-14)
+now executes one open body instantiated with Int32 and String. This completes the
+ordinary generic body gate; constructed generic signatures, constraints and shared
+implementation/reference type identities remain unproven.
