@@ -2948,3 +2948,31 @@ a target.” Named the broader theme “targetability and portability.” The as
 updated the architecture proposal and roadmap accordingly: architecture targeting and
 implementation portability are the direction; a smaller runtime profile is only one
 possible future consideration, not the meaning of the request.
+
+
+## MSBuild support for Raven projects — recorded 2026-09-14
+
+**Author's direction:** “We should have some proper MSBuild support targeting neoCLR
+eventually so that we can use the Raven project files.” Explained that this is useful
+for compiling projects.
+
+**Assistant's response:** Proposed treating this as a future targetability milestone:
+reuse Raven project compilation and supply neoCLR reference/build assets, with MSBuild
+orchestrating compilation and the temporary import/verification stage. Suggested
+single-project support first, followed by incremental builds, project references and
+consistent editor resolution. Package/SDK names and a framework moniker remain open.
+
+**Action and outcome:** Added the proposed scope, alternatives and validation criteria
+to the [target-profile design](raven-target-profiles.md#msbuild-project-support--future-milestone-2026-09-14)
+and roadmap. This records future work; no MSBuild integration was implemented in this
+exchange, and the existing local .14 installation is unchanged.
+
+**Author's clarification:** “I don't think we should have it all” — MSBuild is a useful
+initial build system to support. Added: “It won't be a .NET SDK integration, but the
+experience using the project files will be similar.”
+
+**Assistant's response and action:** Narrowed the recorded initial scope to a small
+MSBuild path for `.rvnproj` compilation using neoCLR references and build targets,
+independent of Microsoft.NET.Sdk. Kept incremental builds, project references and
+asset restore as optional later slices rather than requirements for initial support.
+The familiar project-file experience is the goal; no SDK integration was selected.

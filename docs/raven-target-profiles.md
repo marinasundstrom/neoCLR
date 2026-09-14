@@ -120,3 +120,58 @@ tradeoffs before choosing a constrained profile or AOT design.
 
 These are open directions, not accepted release requirements. Preserve today's useful
 .NET-like semantics and CLI boundary while documenting any later limits explicitly.
+
+## MSBuild project support — future milestone, 2026-09-14
+
+**Author's direction:** Provide proper MSBuild support for targeting neoCLR so Raven
+project files can be used to compile projects. This belongs to targetability, beyond
+merely evaluating project properties in the compiler or invoking a Python runner.
+
+**Current boundary:** The [normal compiler path](raven-target-compilation.md) accepts
+`.rvnproj` inputs and produces target PE metadata/IL; separate import and runtime
+verification follow. The [.14 local tools](local-tools-20260914.md) validate this path.
+They do not yet provide a complete neoCLR MSBuild SDK or establish `dotnet build`
+and project-reference support for neoCLR applications.
+
+**Assistant's proposed approach:** Reuse Raven's project/compiler integration, with
+versioned neoCLR build assets supplying the target reference pack and contracts.
+MSBuild should orchestrate reference resolution, Raven compilation, the current
+import/verification stage and output layout. Keep importer execution behind its own
+target so a later native loader can replace it without changing project semantics.
+Design-time evaluation should supply the same references/contracts to completion
+without executing the program or requiring runtime import to discover symbols.
+
+This follows the existing .NET/MSBuild separation: project SDKs supply imported
+props/targets, and target Inputs/Outputs enable incremental work. Sources: Microsoft's
+[project SDK documentation](https://learn.microsoft.com/en-us/visualstudio/msbuild/how-to-use-project-sdk)
+and [incremental-build documentation](https://learn.microsoft.com/en-us/visualstudio/msbuild/how-to-build-incrementally),
+reviewed 2026-09-14. This is missing toolchain integration, not a proposed runtime or
+IL divergence from .NET.
+
+The author clarified that the initial goal is a useful MSBuild build system, not the
+entire .NET build experience and not integration with `Microsoft.NET.Sdk`. Use familiar
+Raven project files with a small set of neoCLR `.props`/`.targets` build assets. No
+custom project SDK, NuGet target-framework integration or framework moniker is required
+for this first slice. The host .NET installation needed to run Raven/MSBuild is separate
+from the runtime/library targeted by the guest program.
+
+Using MSBuild directly reuses project evaluation, task orchestration and diagnostics
+without inheriting .NET deployment and runtime assumptions. The cost is defining and
+maintaining the few build targets needed by neoCLR. A standalone build script remains
+a useful fallback, but should not be the only way to compile Raven project files.
+
+**Initial proposed acceptance:** Build one `.rvnproj` through MSBuild using the selected
+neoCLR references, invoke Raven and the current import/verification stage as appropriate,
+and produce documented outputs with useful diagnostics. Build does not execute the guest
+program. A failed compile/import must fail the build; editor and build configuration must
+agree on the target references. Validate this from the installed toolchain, including
+rejection of unavailable host APIs. This does not require a new emission backend.
+
+**Optional later slices, driven by need:** Incremental inputs/outputs and Clean/Rebuild;
+project-reference build order and compatibility checks once library importing is ready;
+versioned distribution/restore of build assets. These are separate follow-ups, not a
+promise of full MSBuild/.NET SDK feature parity or prerequisites for the initial slice.
+
+This is future work after the stabilization checkpoint, not a new requirement for the
+already validated local build. Reusable Raven fixes remain candidates for main after
+independent testing; neoCLR-specific build assets and tests remain experimental.

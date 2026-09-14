@@ -26,7 +26,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   bootstrapping and neoCLR architecture/AOT/microcontroller work as long-term questions,
   not implemented features or preview commitments. Linked the roadmap and conversation
   record to the architectural proposal. Clarified the overarching theme as targetability
-  and portability, with microcontroller architectures as potential targets.
+  and portability, with microcontroller architectures as potential targets. Added
+  a future minimal MSBuild build path for Raven projects targeting neoCLR, independent
+  of .NET SDK integration. Broader build features are optional later slices; this
+  records a plan, not implemented build support.
 
 - Implemented `Array<T>.Empty` and instance `ForEach(Func<T, Void>)` in the Raven
   runtime profile, reference surface and importer. Empty currently allocates a

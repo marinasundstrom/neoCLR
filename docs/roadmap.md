@@ -107,6 +107,13 @@ They require separate investigations into compiler self-hosting, runtime portabi
 application compilation and resource-constrained profiles. No platform, backend or
 reduction of today's semantics is selected by these notes.
 
+Proper [MSBuild support for Raven projects targeting neoCLR](raven-target-profiles.md#msbuild-project-support--future-milestone-2026-09-14)
+is a future targetability milestone. Initially, provide a small MSBuild build path
+using familiar `.rvnproj` files, neoCLR references and the existing compiler/importer.
+This is not .NET SDK integration. Incrementality, project references and asset restore
+are optional follow-ups as needed, not prerequisites for the first useful build.
+The current project-reading compiler and runner do not constitute this integration.
+
 ## Current Raven-target experiment priority
 
 The [preview acceptance criteria](raven-preview-acceptance.md) focus on the fundamentals already built and their differences from
