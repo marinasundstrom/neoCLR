@@ -8,6 +8,21 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-14
 
+- Recorded the selected task-based async direction with intended runtime-owned
+  suspension, Task<Void> for no-payload completion, and optional transitional Raven
+  state-machine lowering. Clarified that System APIs target modern language consumers
+  with tasks as the normal async pattern; public runtime APIs may use callbacks where
+  they better express the contract, and application code remains free to use them.
+  Added a source-backed assessment of transitional compiler-generated async and its
+  remaining library, lowering and execution-ownership gaps. Selected Result-bearing
+  task completion for recoverable async errors. Selected ordinary async API names
+  identified by Task return types, without mandatory Async suffixes; explicitly named
+  blocking/sync alternatives remain exceptional. Documented .NET naming migration
+  costs and provisional comparisons for markers, cancellation and operation ownership.
+  Updated planning and conversation records; concrete task contracts and async
+  implementation remain future work, without a requirement to preserve historical
+  .NET compatibility.
+
 - Prepared Preview 7 candidate with the combined MSBuild/library workflow and
   Type.IsValueType. Refreshed the API declaration and coverage inventories to
   include the property and getter (616 declaration candidates). Publication remains

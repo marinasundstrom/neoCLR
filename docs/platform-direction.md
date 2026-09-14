@@ -102,19 +102,63 @@ and library responsibilities separately.
 
 ## Async and time: preserve the application model
 
-The author wants runtime support for async/await, with the representation still open;
-Task-based APIs remain relevant. Treat the result of an asynchronous operation and
-the mechanism for suspending a frame as separate contracts. A Task<T>-shaped public
-API could coexist with runtime-owned suspension, or with a compatible compiler
-lowering. Compare both before considering a different public completion abstraction.
+The author's 2026-09-14 direction selects task-based abstractions for async/await,
+with runtime-owned suspension and resumption as the intended execution model.
+Historical .NET compatibility is not a requirement: evaluate modern .NET async
+contracts without inheriting every legacy accommodation. Task represents the asynchronous operation; the runtime supplies suspension logic.
+Task<T> carries a result, and Task<Void> (Task<void> in the author's wording) represents
+completion without a result payload, consistent with neoCLR's generic Void model.
+The remaining task API and runtime representation remain to be designed. Treat an
+operation's completion handle and the mechanism that suspends its execution as
+separate contracts.
+
+System library APIs should normally expose this task-based operation model for
+asynchronous execution. Some public runtime APIs are better expressed as callbacks;
+choose according to the contract rather than imposing tasks universally. Application
+authors also remain free to use callbacks, and internal callback mechanisms do not
+require a matching public completion API. See the
+[consumer API policy](api-policy.md#design-for-modern-language-consumers).
+
+Compiler-generated async state machines are an optional transitional path, using
+Raven's existing emission support as reported by the author; this discussion does
+not validate that path for neoCLR. They are not a required permanent compiler/runtime
+contract. Runtime support still needs to preserve resumable execution state, whether
+as retained activations, continuations or another internal representation.
+
+Compared with .NET's task-based API and compiler lowering, retaining tasks preserves
+a familiar application model while runtime-owned suspension can centralize lifetime,
+GC and debugger integration across frontends. It also adds runtime, verifier and
+future JIT/AOT responsibilities. Compiler lowering remains useful for an early probe;
+a different public completion abstraction is no longer the default design candidate.
+No performance advantage is established merely by removing compatibility constraints.
+
+The [.NET runtime-async design](https://github.com/dotnet/runtime/blob/main/docs/design/specs/runtime-async.md),
+consulted 2026-09-14, provides a comparison separating Task/ValueTask return contracts
+from runtime suspension. The document labels its ECMA-335 changes as draft proposals;
+this is not evidence of standardized CLI behavior or support in a particular release.
+Pin a runtime revision and validate its supported behavior before adopting concrete
+metadata or lowering rules. Wider platform and alternative .NET comparisons remain
+research work under the [design process](design-research.md).
+
+The [async API design discussion](async-api-design.md) compares synchronous pairs,
+async markers, naming, activation, cancellation and ownership. The author selects
+ordinary names for async operations, identified by the Task return type, with
+explicitly named blocking/sync alternatives where needed. Other behavior
+recommendations remain proposals.
 
 A first design probe should complete synchronously and suspend/resume once. Specify
 GC roots and retained frames, cancellation, cleanup, scheduling, repeated awaiting,
-debugger stacks, and references crossing suspension. Evaluate Task<Void> and
-Task<Result<T,E>> as candidates; distinguish a recoverable Error result, cancellation
-and a terminal runtime fault. Do not assume .NET task exception aggregation fits the
+debugger stacks, and references crossing suspension. Specify Task<Void> no-payload
+completion. The author selects Result-based recoverable error propagation inside
+Task: Task<Result<T,E>>, as explicitly clarified by the author. Awaiting completes the asynchronous step and yields
+the Result; an Err is an ordinary completed task value, not a task exception.
+Result inspection/propagation handles that error. This records the semantic choice,
+not an implemented async API or new await syntax. A fallible
+no-payload operation correspondingly has Task<Result<Void,E>> as its candidate shape.
+Cancellation representation remains open and terminal runtime Faults remain distinct. Do not assume .NET task exception aggregation fits the
 neoCLR fault model. Async does not itself require a new thread or task-per-thread model.
-No async representation, opcode or implementation is selected by this discussion.
+The task-based direction is selected; no concrete async representation, opcode or
+implementation is selected or introduced by this discussion.
 
 For time, extend the existing Date/Time values with an independently supplied clock
 that application code can instantiate/substitute in tests. The

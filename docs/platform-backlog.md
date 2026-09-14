@@ -29,7 +29,7 @@ status inventory. New slices must reconcile them with the current direction.
 | Delegates and lambdas | [Delegates as the shared runtime callable abstraction](delegates.md); language function values and lambdas build on them, with bound receivers and captured environments | Typed single-target delegates and Func<Void> are implemented; C#-style closure environments; escaping captures and GC roots; delegate equality and possible multicast behavior; whether low-level function pointers are needed |
 | Enums and flags | Named integral values and typed flag combinations with familiar .NET-like API behavior | Underlying width/signedness; distinct enum identity; explicit numeric conversions; zero, aliases and unnamed values; flag combination/testing; formatting, parsing and reflection |
 | Generic constraints | Base/interface constraints and explicit not-null, not-void and not-reference restrictions | Metadata encoding, substitution and validation; constraint composition; address-mode restrictions versus object-graph restrictions; consistent enforcement for source, IL, reflection and host entry points |
-| Runtime async model | Suspension and resumption, potentially with task-based APIs familiar from .NET | Ownership of suspended activations; references across suspension; scheduling and completion; cancellation, ordinary errors and terminal Faults; debugger and GC integration |
+| Runtime async model | Task-based abstractions with runtime-owned suspension and resumption | Ownership of suspended activations; references across suspension; scheduling and completion; cancellation, ordinary errors and terminal Faults; debugger and GC integration |
 | Dynamic dispatch with hooks | Extensible runtime binding for operations whose targets are resolved dynamically | Supported operations and hook contracts; lookup and fallback order; missing-member results; access checks; caching and invalidation; interaction with typed virtual/interface dispatch |
 | Fundamental library and framework | A coherent set of base types and useful framework APIs, implemented as scenarios require them | Which contracts belong in metadata/runtime services and which belong in library types; optional Object methods; collections, text, I/O, callable and async APIs; consistent errors, references and cleanup |
 
@@ -93,9 +93,12 @@ constructor constraints remain separate work.
 callee while it holds a reference into a caller frame must either retain an eligible
 owning activation or be rejected by a defined rule. Suspension must not implicitly
 invalidate references or silently promote existing locals. Task-based completion is
-a candidate projection, not yet the chosen runtime representation. Decide how async
-completion carries Result/error values and terminal Faults within neoCLR's existing
-error model rather than assuming a guest exception system. Suspension alone does
+the selected application direction, with runtime-owned suspension intended and Raven
+state-machine lowering available as a possible transition. The concrete task API and
+runtime representation remain open; see the [direction](platform-direction.md#async-and-time-preserve-the-application-model).
+Recoverable completion uses Task<Result<T,E>>. Specify cancellation and terminal
+Fault behavior within neoCLR's existing error model rather than assuming a guest
+exception system. Suspension alone does
 not imply parallel execution or a settled threading model.
 
 **Dynamic hooks** extend runtime binding; existing virtual dispatch remains the

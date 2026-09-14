@@ -1,0 +1,96 @@
+# Asynchronous API design questions
+
+Decisions and provisional recommendations, 2026-09-14. The author asked whether
+APIs need synchronous and asynchronous forms, whether methods need an async marker,
+and which .NET conventions or behaviors neoCLR should retain or change. The Task/Result direction and ordinary async naming policy are selected. Other
+recommendations below remain assistant proposals, not author approval or implemented
+contracts.
+
+## Starting contract
+
+Task<T> represents an operation and Task<Result<T,E>> carries recoverable outcomes.
+Task<Void> represents no-payload completion; Task<Result<Void,E>> covers the fallible
+case. Runtime-owned suspension is intended, with compiler state machines a possible
+transition. Some APIs are better expressed as callbacks. Await yields Result and
+Result propagation remains a separate operation.
+
+## Selected naming and provisional behavior choices
+
+| Question | Recommendation and tradeoff |
+| --- | --- |
+| Both sync and async? | Keep in-memory computations synchronous. Prefer tasks for operations that may wait on external activity. Add both forms only for concrete consumer needs and supported implementations. Avoid automatically wrapping blocking code in worker tasks or blocking on async code. This reduces redundant APIs but requires explicit offloading or blocking adapters where needed. |
+| Must every task-returning method be marked async? | No separate public modifier is necessary to distinguish a returned Task. A method may forward an existing task or create a completed task. Whether a frontend requires async on a body containing await is a language decision. Runtime suspension may still require explicit metadata and verification. |
+| Infer async from await? | Worth evaluating as frontend syntax, but retain the declared Task return contract. Inference must distinguish returning an existing Task from returning the awaited result and must preserve diagnostics. Do not infer a new public return type silently from a body edit. |
+| Implicitly suspend ordinary calls? | Defer. Removing explicit await is a larger effect/continuation design affecting callers, locks, reentrancy, references and foreign calls. Runtime support alone does not settle those contracts. Explicit await keeps suspension points visible. |
+| Async suffix? | Selected by the author: ordinary names for asynchronous operations, identified by their Task return type; no required Async suffix. Add explicitly named Blocking/Sync alternatives only when justified, using the term that accurately describes their behavior. Keep ordinary in-memory computations synchronous without extra naming. This reduces naming overhead but costs .NET familiarity and requires type/tooling information at unawaited call sites. Never distinguish pairs solely by return type. |
+| When does work start? | Prefer activated operations on call and permit already-completed tasks, following TAP. Await waits; it does not restart the operation. Lazy work is a different useful contract that should be explicit. Eager work requires ownership even if its task is ignored. |
+| How does completion resume consumers? | Propose queueing registered continuations for pending tasks to avoid arbitrary consumer execution inside completion. Already-completed awaits may continue inline, so await is not a guaranteed yield. Queueing costs scheduling overhead; specify executor/thread affinity and test reentrancy before adopting. Avoid assuming a hidden synchronization-context policy. |
+| Allocation choices? | Start with one Task family and reusable completion semantics; measure before adding ValueTask-like public restrictions. Internal completed-value optimizations remain possible. Multiple awaits require explicit result copying/sharing rules under neoCLR's value model. |
+
+The author's rationale is that .NET added async equivalents to an existing synchronous
+surface. TAP's documented coexistence guidance supports the compatibility concern;
+it does not establish that this was Microsoft's sole historical motivation. The
+assistant initially proposed retaining Async, then reconsidered when the author
+clarified the question, and the author selected ordinary names. See the
+[API policy](api-policy.md#async-naming-decision-2026-09-14) for the resulting contract.
+No existing APIs are renamed by this documentation change.
+
+## Contracts to resolve before an API ships
+
+1. **Cancellation and deadlines:** Decide whether cancellation is a case of E, a
+   standard outcome wrapper or a task state. The selected await-yields-Result model
+   must not accidentally gain an untyped exception channel. Distinguish cancelling
+   a wait from cancelling shared work, and a timeout from rollback of side effects.
+2. **Lifetime and abandoned work:** Decide who owns an operation that nobody awaits,
+   how child operations are joined or cancelled, and how shutdown releases resources.
+   Task scopes are a candidate; detached work should be explicit. Dropping a handle
+   must have a documented meaning rather than silently implying cancellation.
+3. **Buffers and references:** Define retention and mutation rights until completion.
+   GC reachability alone does not make a caller-frame reference valid or prevent
+   concurrent buffer mutation. Prefer returned values over delayed out writes;
+   specify cleanup before signalling completion when buffers can be reused afterward.
+4. **Errors and side effects:** Expected failures found immediately should use the
+   same Result channel as delayed failures. Document partial reads/writes, retry
+   safety and terminal Fault scope. Do not translate runtime Faults into ordinary E.
+5. **Composition:** Task<Result<T,E>> completion and business success are different.
+   Define whether combinators collect Results or propagate the first Err, what
+   happens to sibling operations, ordering and whether cleanup is awaited. A task
+   combinator cannot assume that generic T is a Result or that Err is a task fault.
+6. **One result versus a sequence:** Task gives one completion. Streaming values
+   need a separately designed iterator/channel or callback contract, including
+   backpressure, cancellation and cleanup; progress callbacks may accompany a task.
+7. **Target and host capabilities:** Define scheduler ownership and blocking limits
+   for event-loop, desktop and embedded hosts. Async does not imply threads. A host
+   with only blocking I/O needs an honest adapter/capability policy, not a false
+   promise that a task-returning call promptly releases its executor.
+
+## Primary comparisons and remaining research
+
+Consulted 2026-09-14:
+
+- [.NET TAP](https://learn.microsoft.com/en-us/dotnet/standard/asynchronous-programming-patterns/task-based-asynchronous-pattern-tap):
+  documented library convention for task-returning names, activated tasks, possible
+  synchronous completion and cancellation. Its exception channel differs from the
+  selected Result model. Retaining task familiarity does not require every legacy API.
+- [.NET sync-over-async guidance](https://learn.microsoft.com/en-us/dotnet/standard/asynchronous-programming-patterns/synchronous-wrappers-for-asynchronous-methods)
+  and [async-over-sync guidance](https://learn.microsoft.com/en-us/dotnet/standard/asynchronous-programming-patterns/async-wrappers-for-synchronous-methods):
+  documented advice against manufacturing wrapper pairs. This is support for keeping
+  modern .NET guidance, not evidence that neoCLR invented the distinction.
+- [Rust function reference](https://doc.rust-lang.org/reference/items/functions.html):
+  async bodies produce futures whose execution is driven by polling. This is an
+  alternative to TAP activation; adopting it would change when side effects occur
+  and how callers schedule work. Rust ownership assumptions do not transfer unchanged.
+- [Microsoft.VisualStudio.Threading VSTHRD200](https://microsoft.github.io/vs-threading/analyzers/VSTHRD200.html):
+  an ecosystem library/analyzer's concrete policy enforces Async naming for awaitable
+  methods. It demonstrates tooling value, not proof that suffixes are universally best.
+
+This is initial comparison, not a completed survey of independent .NET libraries,
+structured-concurrency designs or maintainer API-review discussions. Before settling
+cancellation, scopes and scheduling, deepen those comparisons and pin implementation
+revisions for source-dependent claims. No performance improvement has been measured.
+
+Validation should pair an in-memory operation with a genuinely pending I/O/host probe;
+exercise immediate and delayed Ok/Err, cancellation races, multiple awaiters, discarded
+handles, nested completions, GC while pending, invalid references, early disposal,
+combinator sibling cleanup and a host that cannot block. Compare both compiler and
+runtime suspension paths against the same observable API contract when available.

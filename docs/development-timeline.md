@@ -3047,3 +3047,117 @@ passes 22 scenarios; the library project's editor scenario passes 69 checks befo
 building. Added separate Build/Run tasks and a readable two-project example. No Raven
 compiler changes were needed. Packaged release validation and publication remain
 pending; these source-check outcomes are not a release claim.
+
+
+### 2026-09-14 — Task-based async with runtime support
+
+**Author's direction:** Said that neoCLR need not retain all backward compatibility
+and can choose the latest async model: “we should stick with task-based, the
+task-based abstractions.” Intended execution support belongs in the runtime.
+Compiler-generated async state machines are not necessarily required, but may be
+used transitionally because Raven already supports emitting them (author-reported
+capability, not validated for neoCLR in this exchange).
+
+**Assistant's response:** Distinguished the selected public task abstraction from
+runtime suspension and resumption. Clarified that removing compiler-generated state
+machines does not remove the need to preserve execution state. Proposed treating
+Raven lowering as an optional transition and retaining modern .NET as a comparison,
+without assuming that newer machinery is inherently faster or copying legacy contracts.
+
+**Action and outcome:** Updated the [platform direction](platform-direction.md#async-and-time-preserve-the-application-model),
+backlog, roadmap and Raven application notes to reflect this decision. Consulted the
+.NET TAP documentation and runtime-async draft; no runtime or compiler implementation
+was changed. Earlier entries describing the model as open remain historical positions.
+
+**Open:** Concrete task types, no-payload completion, Result/error and cancellation
+semantics, scheduling, references across suspension, GC roots, cleanup, debugger
+integration and metadata. A pinned implementation comparison and a bounded execution
+probe remain needed; this exchange does not choose opcodes or promise a release.
+
+
+**Author's clarification:** The runtime will eventually contain suspension logic,
+while Task still represents the operation. Explicitly identified Task<void> as possible in neoCLR, using its ability to accept
+Void as a generic argument.
+
+**Assistant's response and action:** Recorded Task as the operation representation
+and Task<Void> as completion without a result payload in the platform direction.
+This sharpens the intended contract; task members, suspension machinery and error
+semantics still require design and implementation.
+
+
+**Author's library-design clarification:** Application projects may still use
+callbacks. The runtime class library and System namespaces should be designed for
+modern consumers and modern programming languages.
+
+**Assistant's response and action:** Recorded this distinction in the
+[API policy](api-policy.md#design-for-modern-language-consumers) and linked it from
+the async direction. Applied task-based completion to public asynchronous operations;
+explained that callbacks can still serve roles such as predicates, event handlers
+and internal adapters. These examples are the assistant's interpretation of the
+principle, not additional author-selected API contracts. No APIs were implemented
+or removed; detailed contracts and adaptation needs remain open.
+
+
+**Author's correction:** Clarified that some runtime APIs may themselves be better
+expressed as callbacks. Tasks are the normal way to represent asynchronous execution,
+not an exclusive requirement for all runtime APIs.
+
+**Assistant's response and action:** Updated the API policy and platform direction
+to state this explicitly, including public runtime APIs. The earlier callback
+examples were illustrative, not an exhaustive set of exceptions. No implementation
+changed.
+
+
+**Author's feasibility question:** Asked whether neoCLR already has everything needed
+for compiler-generated async/await, given Raven's existing state-machine emission,
+and whether it could be made to work before runtime suspension.
+
+**Assistant's assessment and action:** Inspected the local Raven lowering and neoCLR
+contracts and recorded a [source-backed feasibility assessment](async-state-machine-assessment.md).
+The approach appears feasible without suspended VM frames, but current task/builders,
+error lowering, heap state identity and continuation/execution ownership need work.
+Proposed a guest queue and an initially incomplete await as a bounded probe. No async
+implementation or execution test was performed; no Raven source was modified.
+
+
+**Author's error-model clarification:** Directed that errors should continue to
+propagate through Result, giving Task<Result<T>> as the asynchronous shape.
+
+**Assistant's response and action:** Updated the async direction, API policy and
+feasibility assessment: Task carries completion and Result carries success or a
+recoverable error. Await yields Result; an Err completes the task as a value rather
+than entering a task-exception channel. Recorded the current explicit-error spelling
+Task<Result<T,E>> without claiming a one-parameter Result alias is implemented.
+Cancellation and terminal Fault handling remain separate open contracts. No code
+was changed or async execution validated.
+
+
+**Author's API-design questions:** Asked whether asynchronous APIs should also have
+synchronous versions, whether methods need an async marker, and whether neoCLR
+should use different conventions or behavior from .NET.
+
+**Assistant's proposals and action:** Recorded an [API design discussion](async-api-design.md)
+comparing .NET guidance, Rust activation and .NET ecosystem naming policy. Proposed
+purposeful sync/async surfaces, explicit Task/await contracts, familiar names as a
+starting point and further decisions on cancellation, ownership and scheduling.
+Distinguished optional frontend async syntax from implicit suspension and required
+runtime metadata. These recommendations have not been adopted by the author or
+implemented; broader comparison and executable validation remain open.
+
+
+**Author's naming clarification and decision:** Clarified that the question concerned
+Async method-name suffixes. After the assistant recommended ordinary async names,
+the author agreed: make async the ordinary operation, identified by return type,
+with blocking/sync alternatives as the exception. Stated that existing synchronous
+APIs were a major reason for Microsoft's .NET naming convention. Requested that the
+decision be documented and committed. The author also explicitly corrected the error
+shape to Task<Result<T,E>> earlier in this exchange.
+
+**Assistant's revised proposal and action:** Initially proposed retaining Async in
+the broader review, then recommended omitting the mandatory suffix after the naming
+clarification. Updated the API policy, async comparison and platform direction to
+record the selected convention and distinguish it from still-open behavior proposals.
+Recorded the historical explanation as the author's rationale, supported by TAP's
+coexistence guidance rather than claiming a complete history of Microsoft's decision.
+Prepared this documentation and the preceding async discussion for commit; no runtime
+or compiler implementation or existing API names changed.

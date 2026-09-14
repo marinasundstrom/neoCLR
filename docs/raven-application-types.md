@@ -77,7 +77,9 @@ Making neoCLR work with Raven remains the primary objective. All Raven edits sta
 its experimental feature branch; ordinary .NET support must retain its behavior.
 `Task<Void>` and its no-payload completion require a future async design, including
 language return handling, emitted signatures, awaiter contracts and runtime suspension.
-This records a requirement, not an async implementation or a chosen task API.
+The [2026-09-14 direction](platform-direction.md#async-and-time-preserve-the-application-model)
+selects task-based abstractions and intended runtime support; the concrete task API
+and implementation remain future work.
 
 ## Interface and inheritance slice (2026-09-13)
 

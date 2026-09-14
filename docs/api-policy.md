@@ -35,6 +35,61 @@ Runtime/library contracts and Raven syntax are separate design
 layers: other frontends must be able to consume the same APIs. Familiarity includes
 documented behavior, not just familiar member names.
 
+## Design for modern language consumers
+
+The author's 2026-09-14 direction distinguishes application freedom from standard
+library design. Applications may use callbacks and other supported programming
+patterns. Public runtime class-library APIs in System namespaces should present
+coherent contracts for modern programming languages, consumable across frontends.
+Evaluate the consumer's use, composition and result handling before choosing the
+implementation mechanism or reproducing historical API families.
+
+For ordinary asynchronous operations, default to the selected task-based direction: Task<T>
+represents the operation and Task<Void> represents completion without a payload;
+the runtime eventually supplies suspension and resumption. Fallible asynchronous
+operations carry Result inside Task (Task<Result<T,E>> under the current explicit
+error-type contract). Await yields the Result; recoverable errors remain values
+handled through Result, without a separate task-exception channel. Cancellation and
+terminal Fault handling require their own contracts. Do not add parallel
+callback-completion or legacy async API families solely for .NET compatibility.
+Some public runtime APIs are better expressed through callbacks; choose callbacks
+when they best express the specific contract. This includes, but is not limited to,
+predicates and event handlers. Task-based completion is the normal async pattern,
+not a blanket requirement for every runtime API or a prohibition on delegates.
+Internal callbacks and host adapters need not determine the public async surface.
+
+This follows the existing [.NET TAP comparison](platform-direction.md#async-and-time-preserve-the-application-model)
+and [design research process](design-research.md). A focused task-based surface
+reduces overlapping completion contracts for consumers; the cost is adaptation when
+porting callback-based code or integrating callback-based hosts. Exact task members,
+adapters and suspension contracts remain future design work. Broader API choices
+must justify their own benefits and costs; modern language support alone does not
+establish that a new API is better.
+
+## Async naming decision (2026-09-14)
+
+Use ordinary operation names for asynchronous System APIs. The Task return type
+communicates asynchronous completion; an Async suffix is unnecessary. For operations
+that may wait, async is the ordinary surface and an explicitly synchronous or blocking
+alternative is the exception, added only for a concrete need.
+
+For example, a proposed Read(...) -> Task<Result<Bytes,ReadError>> may coexist with
+ReadBlocking(...) -> Result<Bytes,ReadError> when a blocking implementation is useful.
+Use Blocking when the call actually waits; Sync may identify a synchronous alternative
+where that is the more accurate contract. This does not require suffixing ordinary
+in-memory computations or making every library method return Task. Do not distinguish
+paired methods solely by return type. The language async keyword and runtime method
+metadata are separate questions unaffected by this naming choice.
+
+.NET TAP uses Async names and preserves existing synchronous APIs when adding task
+counterparts. neoCLR need not carry that compatibility burden. The author identifies
+the existing synchronous surface as a major historical reason for .NET's convention;
+the documented coexistence guidance supports that rationale without establishing
+Microsoft's complete historical motivation. See the [comparison](async-api-design.md).
+The benefit is a consistent ordinary name for the preferred operation; the cost is
+less .NET naming familiarity and dependence on signatures/tooling to identify a task
+return at an unawaited call site. Porting .NET code may require renaming calls.
+
 ## Current examples
 
 For each intentional departure, state the problem it solves, the resulting contract,
