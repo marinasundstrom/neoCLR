@@ -14,7 +14,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   queue for remaining general metadata-emission candidates. Raven main now contains
   the reviewed numeric, binding/dispatch and namespace fixes at 8fa59a967; 47 focused
   tests and the 5,490-test broader baseline passed. Synced main into the experiment
-  at 5d1022ced with 50 focused checks passing. No neoCLR runtime behavior change.
+  at 5d1022ced with 50 focused checks passing. Subsequently integrated the general
+  pointer metadata-emission fix into Raven main at 521711bec: retargeted void-pointer
+  signatures now emit successfully, with 53 focused checks passing. The experimental
+  branch already has the implementation; migration remains paused. No neoCLR runtime
+  behavior change.
 
 - Extended explicit Raven library imports to nongeneric class/value types,
   constructors, fields/accessors, inheritance, interface/virtual calls and static/class

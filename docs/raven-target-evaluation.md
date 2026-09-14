@@ -10,6 +10,20 @@ with consistent target support. Raven should compile for both .NET and neoCLR th
 its normal compiler and project model. Retaining a loader/importer is compatible with
 that goal; relying on it to repair language semantics is not.
 
+## Pointer emission follow-through — 2026-09-14
+
+Raven main now includes `521711bec`, independently extracted from experiment commit
+`3df1b54b0`. Native pointer signatures are preserved when reconstructing method
+references for target-core emission. The original default-options test already
+passed on main; adding its existing EmitOptions retargeting path reproduced an
+unsupported `Unit*` failure. After the fix, all 53 focused metadata/pointer tests
+passed. No neoCLR target policy or experimental import option was added to main.
+
+The experiment already contains this implementation and remains on
+`codex/neoclr-namespace-metadata` at `5d1022ced`; it has not yet been synchronized
+with this new main commit. The remaining generic metadata-emission candidates below
+still require independent review. Runtime-library migration remains paused.
+
 ## Main integration — 2026-09-14
 
 The author directed that general Raven improvements must be integrated into Raven
@@ -102,7 +116,7 @@ on Raven feature branches and retain the experimental branch until replacements 
 | --- | --- | --- |
 | General semantic correctness | `bc0ec8046` implicit operator applicability; `09cf60417`, `809aef0fe`, `e51da7a48`, `26907410f`, `406962312` numeric conversions/comparisons; `c1431bea1` pointer substitution | Check .NET runtime outcomes and diagnostics, signedness and boundary cases; suitable first integration candidates independent of neoCLR naming. |
 | Binding, dispatch and editor correctness | `854cd4d3d` inherited indexers; `55c0f7ef5` constructor queries; `3142f2f13`, `62105de24` delegate/virtual flags; `9b269f9d0`, `6ab473fbc`, `a843844e4` receivers/enum context | Preserve ordinary .NET behavior, semantic APIs and completion. Test before proposing merges. |
-| General cross-target metadata emission | `17c9f8b82`, `995a4c982`, `11e9964f2`, `4af98e7c1`, `5f274c063`, `cbd87efa8`, `000ed511e`, `3df1b54b0` | Preserve declaring identities, closed generic signatures and receiver modes without loading target assemblies into the host. Review token-proxy normalization as an emitter implementation, not a permanent target-specific API. |
+| General cross-target metadata emission | `17c9f8b82`, `995a4c982`, `11e9964f2`, `4af98e7c1`, `5f274c063`, `cbd87efa8`, `000ed511e` (pointer fix `3df1b54b0` subsequently integrated; see above) | Preserve declaring identities, closed generic signatures and receiver modes without loading target assemblies into the host. Review token-proxy normalization as an emitter implementation, not a permanent target-specific API. |
 | Reusable target configuration | `1d7341fa6`, `37ae97304`, `5b773ae35`; `c28657859`, `1e3f7ff07`; `1a52d9464` | Explicit references and core identity, iteration and propagation contracts must use the same configuration in CLI, projects, editor and emission. Defaults must continue to target .NET. |
 | Deliberate neoCLR differences | `0fad44881`, `22cea6fa1`, `8e0f6cb7d`; `f2a4af608`, `ec88c4474`, `e127e1c49`, `6072dcf4b` | Keep inhabited Void versus no-result returns, invariant mutable arrays and generic array shape explicit and opt-in. Do not integrate by silently changing CLR defaults. |
 | Mixed changes requiring closer separation | `04c953d67` imported union patterns and target signatures; `de872fa34` array factory dependency | Separate general metadata/pattern correctness from runtime assumptions; exercise .NET plus an explicit alternative target. |
