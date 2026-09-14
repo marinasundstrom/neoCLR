@@ -1,6 +1,6 @@
 {
   "purpose": "Explicit source-by-source API audit. Samples and signature checks are evidence, not a claim of arbitrary generic/compiler support.",
-  "declarationCount": 614,
+  "declarationCount": 616,
   "sources": [
     {
       "file": "runtime/System/Equatable.neoil",
@@ -697,7 +697,7 @@
     },
     {
       "file": "runtime/System/Type.neoil",
-      "declarations": 41,
+      "declarations": 43,
       "disposition": "reflection",
       "samples": [
         "library-reflection.rvn",
@@ -767,7 +767,7 @@
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/System/Type.neoil",
-          "line": 144
+          "line": 132
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
@@ -795,7 +795,7 @@
           "line": 194
         },
         {
-          "service": "neoCLR.Runtime.TypeDisplayName",
+          "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/System/Type.neoil",
           "line": 204
         },
@@ -805,6 +805,11 @@
           "line": 214
         },
         {
+          "service": "neoCLR.Runtime.TypeDisplayName",
+          "file": "runtime/System/Type.neoil",
+          "line": 224
+        },
+        {
           "service": "neoCLR.Runtime.TypeBaseType",
           "file": "runtime/System/Type.neoil",
           "line": 94
@@ -812,12 +817,12 @@
         {
           "service": "neoCLR.Runtime.TypeEnumNames",
           "file": "runtime/System/Type.neoil",
-          "line": 128
+          "line": 138
         },
         {
           "service": "neoCLR.Runtime.TypeEnumUnderlying",
           "file": "runtime/System/Type.neoil",
-          "line": 134
+          "line": 144
         }
       ]
     },

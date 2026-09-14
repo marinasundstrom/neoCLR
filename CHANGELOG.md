@@ -9,7 +9,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 ### 2026-09-14
 
 - Prepared Preview 7 candidate with the combined MSBuild/library workflow and
-  Type.IsValueType. Publication remains subject to packaged validation and CI.
+  Type.IsValueType. Refreshed the API declaration and coverage inventories to
+  include the property and getter (616 declaration candidates). Publication remains
+  subject to packaged validation and CI.
 
 ## 0.1.0-preview.7 — 2026-09-14
 
