@@ -1,7 +1,10 @@
 # Stabilization for the next demonstrable preview
 
-Recorded 2026-09-14. This is the active work order, not a release certification or a
-new version assignment. Earlier preview validation records remain historical.
+Recorded 2026-09-14. This was the pre-Preview-6 work order. Preview 6 is now
+[published with validation evidence](preview-6-release-notes.md). The remaining
+independent compiler reviews continue under the [integration assessment](raven-target-evaluation.md);
+publication did not establish that every general fix had been extracted into Raven main.
+The sequence below records the earlier plan, not an active release gate.
 
 1. Finish reviewing the remaining general Raven metadata fixes: mixed application/
    metadata generic constructions and interface implementation references, then

@@ -26,7 +26,42 @@ or metadata mappings; do not anticipate those unresolved semantics in these fixe
 NeoCLR-specific code, mappings and tests remain excluded from Raven main for now.
 A possible alternative emission backend is future evaluation, outside this scope.
 
-The immediate release work order is [release stabilization](release-stabilization.md).
+[Preview 6 is published](preview-6-release-notes.md). The earlier
+[release work order](release-stabilization.md) is historical; remaining general
+compiler reviews continue before the generic-library authoring probe and migration.
+
+## Application generic metadata follow-through — 2026-09-14
+
+Raven main includes `b5ce4023b`, independently reviewed from the `cbd87efa8`
+candidate. Four ordinary CLI regressions initially failed: target-core emission
+mixed metadata definitions with source TypeBuilders, while default .NET emission
+could not resolve fields on those unfinished generic constructions. The review
+corrected both paths rather than retaining only the target-core workaround.
+
+The target path uses signature-only generic construction where reflection contexts
+cannot be combined. Source type references stay module-local; unlike the original
+candidate, the scope check also requires a source assembly, so a matching name alone
+does not identify an external metadata assembly as the current module. Default
+emission maps generic fields from their definition through Reflection.Emit.
+
+The tests compile against a reference-only library and execute its separate real
+implementation. They cover classes, structs, arrays and nested generic arguments,
+checking member identities, absence of self assembly references, calls and preserved
+reference identity. The prior 17-test metadata/attribute baseline passed; after the
+fix, all 28 combined metadata/attribute tests plus 14 other generic regressions
+passed. The .NET 10/.NET 11 build/run matrix passed. These results do not certify
+.NET Framework or NanoFramework execution or constitute a full Raven release gate.
+
+The main-based temporary branch was removed after fast-forward integration and push.
+The neoCLR experimental branch remains separate and unchanged in this slice; its
+existing candidate implementation is not evidence that these new main changes have
+been synchronized or validated there yet. No samples or published release artifacts
+were modified.
+
+Next: independently review interface implementation references (`000ed511e`), then
+classify the mixed union-pattern (`04c953d67`) and array-factory (`de872fa34`) changes.
+Synchronize the reviewed main fixes into the experiment before the separate generic
+library capability probe. Runtime-library migration remains paused.
 
 ## Delegate metadata follow-through — 2026-09-14
 
@@ -39,9 +74,9 @@ matrix; after the stability audit and correction, all 55 combined metadata,
 attribute, delegate and generic-call checks passed. Both temporary branches were
 removed. Main fixes remain separate from the active neoCLR experiment.
 
-Next independent reviews are mixed application/metadata generic constructions
-(`cbd87efa8`) and interface implementation references (`000ed511e`). The broader
-audit below is not represented as a full release gate on this later commit.
+At that checkpoint the next reviews were mixed application/metadata generics and
+interface implementation references. The application-generic review is now complete
+as recorded above. The broader audit below retains its original commit scope.
 
 ## Raven main stability correction — 2026-09-14
 

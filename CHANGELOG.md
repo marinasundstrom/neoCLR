@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-14
 
+- Completed the independent application-generic metadata review: integrated Raven
+  `b5ce4023b` into main after 42 focused checks and the .NET 10/.NET 11 build/run
+  matrix passed. The review also fixed ordinary .NET generic field resolution.
+  Recorded validation scope, the unchanged experimental branch and remaining
+  interface/union-pattern/array-factory reviews. Marked the pre-Preview-6 release
+  work order historical; library migration remains paused.
+
 - Updated the website download link after publishing Preview 6 at `5c52b4b`, with
   experimental Raven `0.1.12-neoclr.13` from `246d697bf`. All six source CI jobs,
   15 extracted-package suites, both language-server checks and isolated VSIX
