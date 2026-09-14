@@ -10,6 +10,8 @@ parser.add_argument('--samples', required=True, type=Path)
 args = parser.parse_args()
 expected = {
     'type-categories.neoil': '42\n7\n9\n',
+    'generic_managed_array.neoil': '42\n',
+    'native_memory.neoil': '42\n',
     'result-void.neoil': 'Completed\nNot saved\n',
 }
 for name, output in expected.items():

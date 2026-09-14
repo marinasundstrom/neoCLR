@@ -94,18 +94,18 @@ pub(crate) fn closure(module: &Module, ty: &Type) -> Result<Vec<Type>, Fault> {
         path.pop();
         Ok(())
     }
-    if let Type::ArrayRef(element) = ty
-        && module.type_definition(ty).is_none()
-    {
-        let interface = Type::Constructed {
-            definition: "System.Collections.Iterable".into(),
-            arguments: vec![(**element).clone()],
-        };
-        return if interface_definition(module, &interface).is_ok() {
-            closure(module, &interface)
-        } else {
-            Ok(vec![])
-        };
+    if let Type::ArrayRef(element) = ty {
+        if module.type_definition(ty).is_none() {
+            let interface = Type::Constructed {
+                definition: "System.Collections.Iterable".into(),
+                arguments: vec![(**element).clone()],
+            };
+            return if interface_definition(module, &interface).is_ok() {
+                closure(module, &interface)
+            } else {
+                Ok(vec![])
+            };
+        }
     }
     let mut result = Vec::new();
     visit(module, ty, &mut Vec::new(), &mut result)?;
@@ -385,10 +385,10 @@ fn array_implementation(
 }
 
 fn select(module: &Module, concrete: &Type, contract: &Function) -> Result<Function, Fault> {
-    if let Type::ArrayRef(element) = concrete
-        && contract.name == "System.Collections.Iterable.GetIterator"
-    {
-        return array_implementation(module, element, contract);
+    if let Type::ArrayRef(element) = concrete {
+        if contract.name == "System.Collections.Iterable.GetIterator" {
+            return array_implementation(module, element, contract);
+        }
     }
     if let Some(body) = member(module, concrete, contract)? {
         return Ok(body);

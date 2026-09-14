@@ -14,6 +14,11 @@ validation are required before publication; release assets carry the evidence.
 
 ### 2026-09-14
 
+- Fixed array-interface dispatch compilation on the declared Rust 1.85 minimum.
+  Moved managed-array and native-memory IL samples into the current preview sample
+  set so they use its System library, separate from historical Neo library tests.
+  Both are now verified and executed by the packaged direct-IL smoke check.
+
 - Recorded the clarified CLI-compatible target-model direction and release-first
   stabilization plan: no neoCLR-specific code, mappings or tests enter Raven main
   yet; semantic-model nullability and alternative backends remain future questions.

@@ -53,11 +53,11 @@ overwrite an existing library):
 
 ```sh
 python3 docs/experiments/raven-target/collection_library.py /tmp/managed-array-System.neoil
-cargo run -- run examples/generic_managed_array.neoil --system /tmp/managed-array-System.neoil
-cargo run -- run examples/native_memory.neoil --system /tmp/managed-array-System.neoil
+cargo run -- run examples/preview/generic_managed_array.neoil --system /tmp/managed-array-System.neoil
+cargo run -- run examples/preview/native_memory.neoil --system /tmp/managed-array-System.neoil
 ```
 
-Both entry points return 42. The first creates one managed array and accesses it
+Both entry points print 42. The first creates one managed array and accesses it
 through the generic API; the second writes/reads native storage and frees it.
 
 The saved Raven sample `library-managed-array-metadata.rvn` demonstrates ordinary

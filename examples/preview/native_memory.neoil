@@ -1,6 +1,6 @@
 .module NativeMemoryDemo
 .entry Main
-.function Main() -> Int32
+.function Main() -> void
     .local Void* allocation
     ldc.i4 4
     conv.u
@@ -15,5 +15,7 @@
     ldobj Int32
     ldloc allocation
     call System.Runtime.InteropServices.NativeMemory::Free(Void*)
+    call System.Console::WriteLine(Int32)
+    pop
     ret
 .end

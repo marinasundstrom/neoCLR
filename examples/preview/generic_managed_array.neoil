@@ -1,6 +1,6 @@
 .module GenericManagedArray
 .entry Main
-.function Main() -> Int32
+.function Main() -> void
     .local System.Array<Int32> values
     ldc.i4 2
     newarr Int32
@@ -12,5 +12,7 @@
     ldloc values
     ldc.i4 0
     call instance System.Array<Int32>::get_Item(Int32)
+    call System.Console::WriteLine(Int32)
+    pop
     ret
 .end
