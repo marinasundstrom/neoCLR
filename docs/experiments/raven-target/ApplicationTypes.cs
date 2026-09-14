@@ -8,7 +8,10 @@ static class ApplicationTypes
     static readonly Dictionary<string, TypeDefinition> Types = new();
     static readonly HashSet<string> Expanded = new();
     static readonly Dictionary<string, Dictionary<string, string>> Adapters = new();
-    public static void Reset(params ModuleDefinition[] modules) { Modules.Clear(); Modules.UnionWith(modules); Types.Clear(); Expanded.Clear(); Adapters.Clear(); }
+    static readonly Dictionary<TypeDefinition, string> LibraryNames = new();
+    public static void BindLibrary(TypeDefinition type, string name) => LibraryNames.Add(type, name);
+    public static bool OnlyLibraryTypes => Types.Values.All(LibraryNames.ContainsKey);
+    public static void Reset(params ModuleDefinition[] modules) { LibraryNames.Clear(); Modules.Clear(); Modules.UnionWith(modules); Types.Clear(); Expanded.Clear(); Adapters.Clear(); }
     public static object[] IdentityMap() => Types.Select(p => (object)new {
         AssemblyIdentity = p.Value.Module.Assembly.Name.FullName, MetadataName = p.Value.FullName, RuntimeName = p.Key,
         Fields = p.Value.Fields.Select(f => new { MetadataName = f.Name, RuntimeName = MetadataIdentity.MemberName(f.Name) }).ToArray()
@@ -41,7 +44,7 @@ static class ApplicationTypes
             || type.Fields.Any(f => f.IsStatic || f.HasMarshalInfo || f.IsInitOnly)
             || type.Methods.Any(m => m.IsConstructor && m.IsStatic))
             throw new InvalidDataException("Unsupported application type: " + type.FullName);
-        var name = MetadataIdentity.TypeName(type);
+        var name = LibraryNames.GetValueOrDefault(type) ?? MetadataIdentity.TypeName(type);
         Types[name] = type;
         if (Types.Count > 128) throw new InvalidDataException("Application type limit exceeded.");
         return name;
@@ -131,7 +134,15 @@ static class ApplicationTypes
             foreach (var method in type.Methods.Where(m => m.IsAbstract))
                 output.AppendLine($".method instance {(type.IsInterface ? "" : "abstract ")}{MethodName(method)}({string.Join(',', method.Parameters.Select(p => map(p.ParameterType, false)))}) -> {map(method.ReturnType, true)}\n.end");
             foreach (var field in type.Fields)
-                output.AppendLine($".field {MetadataIdentity.MemberName(field.Name)} {map(field.FieldType, false)}");
+                output.AppendLine($".field {(LibraryNames.ContainsKey(type) && field.IsPrivate ? "private " : "")}{MetadataIdentity.MemberName(field.Name)} {map(field.FieldType, false)}");
+            if (LibraryNames.ContainsKey(type))
+                foreach (var property in type.Properties)
+                {
+                    output.AppendLine($".property instance {MetadataIdentity.MemberName(property.Name)}({string.Join(',', property.Parameters.Select(p => map(p.ParameterType, false)))}) -> {map(property.PropertyType, false)}");
+                    if (property.GetMethod is { } getter) output.AppendLine($".get instance {name}::{MethodName(getter)}({string.Join(',', getter.Parameters.Select(p => map(p.ParameterType, false)))})");
+                    if (property.SetMethod is { } setter) output.AppendLine($".set instance {name}::{MethodName(setter)}({string.Join(',', setter.Parameters.Select(p => map(p.ParameterType, false)))})");
+                    output.AppendLine(".end");
+                }
             foreach (var body in bodies.Where(p => p.Key.DeclaringType == type)) output.Append(body.Value);
             if (Adapters.TryGetValue(name, out var adapters)) foreach (var body in adapters.Values) output.Append(body);
             output.AppendLine(".end");

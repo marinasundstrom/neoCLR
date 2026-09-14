@@ -13,6 +13,8 @@ static class LibraryImplementation
             ?? throw new InvalidDataException("Missing namespace implementation: " + owner);
         var contract = core.Types.SingleOrDefault(t => t.Namespace == owner && NamespaceFunctions.IsContainer(t)) ?? core.GetType(owner)
             ?? throw new InvalidDataException("Missing namespace reference contract: " + owner);
+        if (!(type.IsAbstract && type.IsSealed))
+            return InstanceRoots(type, contract, owner);
         if (!contract.IsPublic || !contract.IsAbstract || !contract.IsSealed || contract.HasGenericParameters)
             throw new InvalidDataException("Unsupported library reference owner.");
         if (!type.IsPublic || !type.IsAbstract || !type.IsSealed || type.HasGenericParameters || type.HasFields || type.HasInterfaces)
@@ -33,6 +35,48 @@ static class LibraryImplementation
             if (matches.Length == 1) CheckMethod(matches[0]);
             if (matches.Length != 1) throw new InvalidDataException("Library export does not match reference contract: " + method.FullName);
         }
+        return methods;
+    }
+
+    static MethodDefinition[] InstanceRoots(TypeDefinition type, TypeDefinition contract, string owner)
+    {
+        // A single explicitly selected reference/implementation pair. Never alias arbitrary
+        // guest types by namespace/name, and never execute reference-assembly stub bodies.
+        foreach (var candidate in new[] { type, contract })
+            if (!candidate.IsPublic || candidate.IsValueType || candidate.IsInterface || candidate.IsAbstract
+                || candidate.HasGenericParameters || candidate.HasInterfaces || candidate.HasNestedTypes || candidate.HasEvents
+                || candidate.BaseType?.FullName != "System.Object" || candidate.IsExplicitLayout)
+                throw new InvalidDataException("Unsupported instance library owner.");
+        if (type.IsSealed != contract.IsSealed) throw new InvalidDataException("Instance library sealing does not match reference contract.");
+        bool MatchType(TypeReference left, TypeReference right) =>
+            (left.FullName == contract.FullName && right.FullName == type.FullName
+                && left.Resolve() == contract && right.Resolve() == type) || SameType(left, right);
+        bool MatchMethod(MethodDefinition left, MethodDefinition right) =>
+            left.Name == right.Name && !left.HasGenericParameters && !left.ExplicitThis
+            && left.CallingConvention == MethodCallingConvention.Default && left.IsStatic == right.IsStatic && left.IsConstructor == right.IsConstructor
+            && left.IsVirtual == right.IsVirtual && left.IsFinal == right.IsFinal && left.IsNewSlot == right.IsNewSlot
+            && MatchType(left.ReturnType, right.ReturnType) && left.Parameters.Count == right.Parameters.Count
+            && left.Parameters.Zip(right.Parameters).All(p => p.First.Name == p.Second.Name && p.First.IsOut == p.Second.IsOut
+                && MatchType(p.First.ParameterType, p.Second.ParameterType));
+        if (type.Fields.Any(f => !f.IsPrivate || f.IsStatic || f.IsInitOnly || f.HasMarshalInfo)
+            || contract.Fields.Any(f => !f.IsPrivate))
+            throw new InvalidDataException("Instance library requires private mutable implementation fields.");
+        var methods = type.Methods.ToArray();
+        if (methods.Length == 0 || methods.Any(m => !m.IsPublic || !m.HasThis || !m.HasBody || m.HasGenericParameters
+            || m.ExplicitThis || m.CallingConvention != MethodCallingConvention.Default
+            || m.Parameters.Any(p => p.IsOut || p.ParameterType.IsByReference)))
+            throw new InvalidDataException("Unsupported instance library export.");
+        var expected = contract.Methods.Where(m => m.IsPublic).ToArray();
+        if (expected.Length != methods.Length || methods.Any(m => expected.Count(e => MatchMethod(e, m)) != 1))
+            throw new InvalidDataException("Instance library export does not match reference contract.");
+        if (type.Properties.Count != contract.Properties.Count || type.Properties.Any(p =>
+            contract.Properties.Count(c => c.Name == p.Name && MatchType(c.PropertyType, p.PropertyType)
+                && c.Parameters.Count == p.Parameters.Count
+                && c.Parameters.Zip(p.Parameters).All(a => MatchType(a.First.ParameterType, a.Second.ParameterType))
+                && c.GetMethod?.Name == p.GetMethod?.Name && c.SetMethod?.Name == p.SetMethod?.Name) != 1))
+            throw new InvalidDataException("Instance library property does not match reference contract.");
+        ApplicationTypes.BindLibrary(type, owner);
+        foreach (var method in methods) CheckMethod(method);
         return methods;
     }
 

@@ -638,7 +638,7 @@ static class UnionImport
             }
             var methodStart = output.Length;
             // Unreachable guest instructions are omitted, not admitted as executable code.
-            output.AppendLine(libraryOwner is not null ? $".function {Name(method)}({string.Join(',', args.Select((t, i) => t + " " + method.Parameters[i].Name))}) -> {result}" : emitInstance ? $".method instance {(method.DeclaringType.IsValueType ? "byref " : "")}{ApplicationTypes.Modifiers(method)}{ApplicationTypes.MethodName(method)}({string.Join(',', args.Skip(1))}) -> {(method.DeclaringType.IsValueType && result == "noresult" ? "Void" : result)}" : $".function {Name(method)}({string.Join(',', args)}) -> {result}");
+            output.AppendLine(libraryOwner is not null && !emitInstance ? $".function {Name(method)}({string.Join(',', args.Select((t, i) => t + " " + method.Parameters[i].Name))}) -> {result}" : emitInstance ? $".method instance {(method.DeclaringType.IsValueType ? "byref " : "")}{ApplicationTypes.Modifiers(method)}{ApplicationTypes.MethodName(method)}({string.Join(',', args.Skip(1))}) -> {(method.DeclaringType.IsValueType && result == "noresult" ? "Void" : result)}" : $".function {Name(method)}({string.Join(',', args)}) -> {result}");
             for (var n = 0; n < locals.Length; n++) output.AppendLine($".local {locals[n]} local{n}");
             if (method.Body.InitLocals)
                 for (var n = 0; n < locals.Length; n++)
@@ -668,7 +668,7 @@ static class UnionImport
         }
         if (libraryOwner is not null)
         {
-            if (ApplicationTypes.IdentityMap().Length != 0) throw new InvalidDataException("Library fragments cannot introduce application type identities.");
+            if (!ApplicationTypes.OnlyLibraryTypes) throw new InvalidDataException("Library fragments cannot introduce application type identities.");
         }
         output.Append(ApplicationTypes.Declarations(ProfileType, instanceBodies));
         output.Append(Adapters()).Append(ResultBindings.Adapters()).Append(StringBindings.Adapters()).AppendLine(Int32Bindings.Adapters).AppendLine(DoubleBindings.Adapters).Append(PrimitiveBindings.Adapters).Append(CalendarBindings.Adapters).Append(ErrorBindings.Adapters()).Append(GenericUnionBindings.Adapters).AppendLine(ProcessBindings.Adapters).AppendLine(BooleanBindings.Adapters).AppendLine(ReflectionBindings.Adapters).AppendLine(EnumBindings.Adapters);
@@ -685,8 +685,8 @@ static class UnionImport
             MethodIdentities = seen
                 .Select(m => new { AssemblyIdentity = m.Module.Assembly.Name.FullName, MethodToken = m.MetadataToken.ToUInt32(), MetadataName = m.FullName,
                     RuntimeName = m.HasThis && !(m.IsConstructor && m.DeclaringType.IsValueType)
-                        ? MetadataIdentity.TypeName(m.DeclaringType) + "::" + ApplicationTypes.MethodName(m) : Name(m) }),
-            Profile = libraryOwner is not null ? "namespace-library-fragment-v1" : collectionProfile ? "result-option-void-instance-libraries-v11" : "result-option-void-files-strings-arrays-v7",
+                        ? ApplicationTypes.Type(m.DeclaringType) + "::" + ApplicationTypes.MethodName(m) : Name(m) }),
+            Profile = libraryOwner is not null ? (exports.Any(m => m.HasThis) ? "instance-library-fragment-v1" : "namespace-library-fragment-v1") : collectionProfile ? "result-option-void-instance-libraries-v11" : "result-option-void-files-strings-arrays-v7",
             RequiredLibraryProfile = collectionProfile ? "raven-collections" : "bundled-system", ApplicationSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(application))),
             CoreSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(core))), DependencyImages = dependencies.Select(path => new { AssemblyIdentity = System.Reflection.AssemblyName.GetAssemblyName(path).FullName,
                 Sha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(path))) }),

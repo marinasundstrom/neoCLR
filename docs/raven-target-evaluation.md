@@ -793,3 +793,17 @@ language-server checks, with three existing language-server skips. neoCLR passes
 30 query integration cases, five runtime terminal tests, 121 signature checks, the
 generic body/rejection probe, 69 Math outcomes/six invalid contracts and Void
 propagation. Clean library regeneration reproduces the checked-in bodies.
+
+## Instance library bootstrap gate — 2026-09-15
+
+The neoCLR importer now validates a selected nongeneric class implementation against
+its separate reference contract and assigns only that definition the runtime owner
+identity. Constructor, private-state, self-signature and property execution is covered
+by an independent Raven fixture. Existing assembly-qualified guest identities remain
+intact, including the same-name/different-assembly regression. See the
+[gate, validation and remaining boundaries](raven-system-library.md#instance-implementation-identity-gate--2026-09-15).
+
+This required no Raven changes. Runtime Contract configuration and compiler emission
+remain unchanged; all work is in neoCLR's experimental import layer. Generic instance
+classes and their interface contracts are still required before further collection
+implementation ports. No installed SDK, extension or release was refreshed.

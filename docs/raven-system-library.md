@@ -194,3 +194,51 @@ shared reference identities and their fields. Those bodies remain executable neo
 Native services and scalar intrinsics still belong to the runtime; copying their
 wrappers into Raven would not migrate their implementation. Constrained generic
 exports and whole-core bootstrap/reference generation remain separate gates.
+
+## Instance implementation identity gate — 2026-09-15
+
+`--library-implementation` also accepts a single public, nongeneric reference class
+with an independently declared core contract. It checks class category and sealing,
+constructors, instance methods (including self-typed arguments/returns), dispatch
+flags, parameter names and types, and property/accessor shape. Public members must
+match exactly. Private mutable fields belong to the implementation and need not
+appear in the reference declaration. Their runtime visibility remains private.
+
+Only the explicitly selected implementation definition receives the public runtime
+owner name. Ordinary application types retain assembly-qualified identities, and
+additional implementation types remain rejected. Imported constructors, methods and
+properties live inside that runtime type; source maps report the same identity and
+use the `instance-library-fragment-v1` profile. Reference declaration bodies are
+never imported as implementations.
+
+This extends the existing [reference/implementation comparison](raven-target-evaluation.md#comparison-and-tradeoffs).
+The bootstrap still has two distinct CLI assembly identities. An explicit checked
+pair is a provisional bridge to the runtime identity, not general CLI assembly
+unification. It avoids per-member forwarding wrappers and preserves class-reference
+behavior. The cost is maintaining and validating the reference surface separately;
+eventual core assembly generation still needs a design. No metadata format, opcode,
+Raven semantic rule or Runtime Contract setting changes here.
+
+The independent `Probe.Counter` fixture has unusable reference stubs and no reference
+fields. Its Raven implementation executes construction, property access, mutation,
+self-return and a self-typed parameter. A direct neoIL consumer observes shared
+reference updates (`42`, then `99`). Five mismatched contracts are rejected before
+runtime IL is written. The existing 13 cross-library checks still cover distinct
+assemblies with identically named types, access control, constructors, inheritance,
+interfaces and delegates. Generic static-library checks and clean Math/query snapshot
+regeneration also pass.
+
+```sh
+python3 docs/experiments/raven-target/verify_instance_library.py \
+  --compiler /absolute/path/to/rvnc.dll \
+  --bridge docs/experiments/raven-target/bin/Release/net11.0/Probe.dll \
+  --runtime target/release/neoclr
+```
+
+This is groundwork, not another System API port or general consumer admission for
+arbitrary new core classes. The gate currently excludes generic classes/methods,
+interfaces, inheritance beyond Object, value classes, static members, nested types,
+events and additional implementation dependencies. The next migration gate is open
+generic instance state plus interface dispatch, followed by the deferred query
+classes and ArrayList/Map. Native-backed scalar and reflection layouts must retain
+their trusted construction contracts when migrated.

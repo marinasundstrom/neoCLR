@@ -6,6 +6,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-09-15
+
+- Add a bounded Raven instance-library import gate: validate one nongeneric class
+  against its separate reference contract, retain its public runtime identity, and
+  import constructors, private fields, methods and properties. Preserve ordinary
+  guest assembly identities. An independent Raven execution probe and five invalid
+  contracts pass, alongside 13 cross-library checks, generic-library checks and
+  clean Math/query snapshot regeneration. Generic instance classes, interfaces and
+  further System API ports remain subsequent work; Raven itself is unchanged.
+
 ### 2026-09-14
 
 - Port seven query terminal overloads to the shared Raven System project: ToList,
