@@ -14,6 +14,48 @@ The author clarified on 2026-09-14 that the remaining stabilization fixes are to
 precede the next release. Runtime-library migration from neoIL to Raven is deferred
 until after that release, rather than being a release prerequisite.
 
+The intended endpoint is a reusable Raven target model with a small set of explicit
+framework-contract mappings, such as Iterable versus IEnumerable. Review each special
+case as a general compiler defect, configurable framework contract or genuine runtime
+difference. Reusable mechanisms belong on main; experimental neoCLR configuration and
+unresolved semantics remain separate. This is a direction, not a claim that the current
+integration already meets that endpoint. For now, neoCLR is expected to share the
+CLI structure closely. Future differences such as runtime nullability may require
+semantic-model changes (types, conversions, flow and diagnostics), not merely name
+or metadata mappings; do not anticipate those unresolved semantics in these fixes.
+NeoCLR-specific code, mappings and tests remain excluded from Raven main for now.
+A possible alternative emission backend is future evaluation, outside this scope.
+
+The immediate release work order is [release stabilization](release-stabilization.md).
+
+## Delegate metadata follow-through — 2026-09-14
+
+Raven main includes `35a9df494`, independently extracted from `5f274c063`, on top
+of the attribute-regression correction. The normal-reference delegate fixture
+failed before its fix; it contains no neoCLR names or import options. Delegate
+normalization now retains its metadata constructor token instead of mixing
+reflection contexts. The initial candidate passed 26 focused checks and the target
+matrix; after the stability audit and correction, all 55 combined metadata,
+attribute, delegate and generic-call checks passed. Both temporary branches were
+removed. Main fixes remain separate from the active neoCLR experiment.
+
+Next independent reviews are mixed application/metadata generic constructions
+(`cbd87efa8`) and interface implementation references (`000ed511e`). The broader
+audit below is not represented as a full release gate on this later commit.
+
+## Raven main stability correction — 2026-09-14
+
+The author's stability request prompted a broader audit of main `ea6f3383b`:
+5,493 baseline tests and 173/172 standalone builds/runs passed, but the project
+corpus exposed four NanoFramework attribute-emission failures. Corrected the
+runtime/metadata type boundary for custom-attribute serialization in Raven main
+`5a67d5d4c`. Both new regressions failed before correction; 39 focused checks,
+four NanoFramework rebuilds and the .NET 10/.NET 11 matrix passed afterwards.
+All 38 eligible project executables passed. The separate MacCatalyst host build
+requires Xcode 26.6 rather than the installed 26.2; the full build gate remains
+non-green until that prerequisite is satisfied. No sample or exclusion was changed.
+This audit caught a regression the earlier focused integration checks missed.
+
 ## Generic field metadata follow-through — 2026-09-14
 
 Raven main includes `ea6f3383b`, independently extracted from `4af98e7c1`.

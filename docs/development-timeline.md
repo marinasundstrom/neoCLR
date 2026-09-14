@@ -2643,3 +2643,73 @@ actual target validation must be reported separately when performed.
 **Implementation outcome:** Integrated the generic-field fix into Raven main at
 `ea6f3383b`; 22 focused checks and the modern .NET build/run matrix passed. The
 completed feature branch was removed, preserving the active neoCLR experiment.
+
+## A configurable target model, not scattered special cases — 2026-09-14
+
+**Author direction:** Integrating neoCLR as a Raven target should require very little
+special-case compiler handling. The author cited selecting `Iterable<T>` instead of
+`IEnumerable<T>` as an example of a manageable framework-contract mapping.
+
+**Assistant proposal:** Put reusable target configuration, compiler correctness and
+metadata handling on Raven main. Keep neoCLR's experimental configuration and
+unresolved semantic differences on its experimental branch. Classify each mismatch
+as a compiler bug, a configurable framework contract or a genuine runtime difference.
+
+**Action/outcome:** Continued independent metadata-emission fixes and recorded this
+as the review criterion. This is not a claim that all existing neoCLR special cases
+have been removed or that a finalized target-configuration API has been integrated.
+
+**Subsequent author clarification:** Nothing specific to neoCLR should enter Raven
+main yet, including tests; those can be considered when the integration is ready.
+General fixes can enter now when useful across CLI-metadata-compatible frameworks,
+even when their library API surfaces differ. The author raised a possible future
+emission/backend rethink, explicitly as an open question beyond this work.
+
+**Assistant response:** Keep current integration evidence independent of neoCLR,
+record the narrower boundary in repository instructions, and treat backend changes
+as future evaluation rather than part of stabilization. Current imported regression
+fixtures use ordinary .NET references and no neoCLR-specific options or names.
+
+**Further author clarification:** NeoCLR should currently remain sufficiently close
+to the .NET Framework and other CLI derivatives that few special differences are
+needed. More significant differences may arise later, with runtime nullability as
+an example. The author clarified that such differences could affect Raven's
+**semantic model**, not merely metadata mapping.
+
+**Assistant response:** Distinguish configurable API names from differences in type
+identity, conversions, flow analysis, diagnostics and emitted metadata. Continue
+compatibility fixes against the shared CLI model now; keep runtime nullability and
+its semantic-model consequences as a separate, unresolved design question.
+
+**Immediate author priority:** Stabilize and commence a release so there is a stable
+new preview to demonstrate. The assistant proposed finishing the remaining
+compatibility fixes, validating demos and packaged tools, and preparing the release;
+library migration and new runtime semantics remain outside that release work.
+This records the intended sequence, not a completed release gate.
+
+## Raven main stability audit — 2026-09-14
+
+**Author concern:** Raven main should remain stable and integrated changes should not
+break its samples; the work should demonstrably improve the compiler.
+
+**Assistant action:** Set aside the pending delegate fix and audited exact main
+`ea6f3383b`. The baseline passed 5,493 tests and the standalone corpus built/ran
+173/172 samples successfully. The project build exposed four NanoFramework failures
+in custom-attribute emission plus a separate MacCatalyst/Xcode prerequisite failure.
+The earlier narrow checks had missed that compiler regression.
+
+**Correction/outcome:** Added primitive and enum attribute regressions, both failing
+before correction, and separated runtime-type attribute serialization from target
+metadata signature resolution. Integrated the correction into Raven main at
+`5a67d5d4c`: 39 focused tests, all four NanoFramework builds and the modern .NET
+build/run matrix passed. All 38 eligible project executables also passed; the 13
+build-only and 20 non-executable classifications stayed explicit. No sample source
+or exclusion was changed. MacCatalyst still needs Xcode 26.6; this host has 26.2,
+so the entire project-build gate is not claimed green. NanoFramework build success
+is not hardware execution. The pending delegate fix was then restored for combined
+validation. See Raven's `docs/compiler/main-stability-audit.md` for the audit scope.
+
+**Follow-through:** The restored general delegate fix passed 55 combined focused
+checks and was integrated into Raven main at `35a9df494`. Temporary audit/integration
+branches were removed. Broader baseline and sample results retain their original
+commit scope; release validation remains outstanding.

@@ -8,6 +8,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-14
 
+- Recorded the clarified CLI-compatible target-model direction and release-first
+  stabilization plan: no neoCLR-specific code, mappings or tests enter Raven main
+  yet; semantic-model nullability and alternative backends remain future questions.
+  A broader Raven audit found an attribute-emission regression missed by focused
+  checks. Corrected it on Raven main at 5a67d5d4c; 39 focused checks, four NanoFramework
+  builds and the modern .NET matrix passed. The audit also passed 5,493 baseline
+  tests, 173/172 standalone builds/runs and 38 eligible project runs. MacCatalyst
+  remains blocked by its Xcode prerequisite; no full green release gate is claimed.
+  Integrated the general delegate metadata fix at Raven 35a9df494 after 55 combined
+  checks passed, and removed temporary branches. Added the current release work order.
+
 - Removed completed Raven integration branches and superseded experiment branches
   locally/remotely after checking their history is retained in main or the active
   experiment. Removed the merged local neoCLR experiment branch as well. Active

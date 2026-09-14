@@ -8,6 +8,9 @@
   belong on Raven `main` even when discovered through neoCLR: extract
   and test them independently, then integrate them. Keep neoCLR-specific policies
   and target experiments on their feature branch; never merge that branch wholesale.
+- Do not integrate neoCLR-specific code, configuration or tests into Raven main yet.
+  General fixes must stand independently on CLI metadata contracts. Reconsidering
+  emission architecture or another backend is future evaluation, not this stabilization scope.
 - Review mixed changes by behavior and dependencies. A general metadata/emission fix
   is not permanently experimental just because neoCLR exposed it. Record deferred
   general candidates explicitly until they can be validated independently.
