@@ -1,0 +1,13 @@
+{
+  "neoCLRRevision": "0f8aa0b94d18dcca130c18531a31a71c70269240",
+  "ravenRevision": "ee7b2e5af5412ff7af72658fe6de289e7d41ab6b",
+  "sdkVersion": "0.1.12-neoclr.14",
+  "dotnetSdk": "11.0.100-rc.1.26425.128",
+  "platform": "osx-arm64",
+  "bundle": "/Users/robert/.neoclr/experiments/msbuild-20260914",
+  "msbuildScenarios": 15,
+  "languageServerChecks": 68,
+  "verifiedManifestFiles": 758,
+  "demoOutput": "42\nSaved\nCompleted\nOverflow\nValue found\n42\nAbsent\n",
+  "publication": "Local installation; not a published release"
+}

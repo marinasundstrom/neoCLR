@@ -13,8 +13,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   the installed compiler, importer and verifier, without Microsoft.NET.Sdk or Raven
   changes. Build does not execute the program and invalidates prior runnable output
   on failure. Added a packaged demo, VS Code build-task configuration and regression
-  checks (15 scenarios passed with installed .14 tools); incremental builds, restore
-  and project references remain out of scope.
+  checks. Installed a fresh local MSBuild demo with the existing .14 tools: 15 build
+  scenarios, 68 language-server checks and the propagation demo pass; all 758 manifest
+  files verified. Incremental builds, restore and project references remain out of scope.
 
 - Synchronized reviewed Raven main fixes into the experimental branch (`ee7b2e5af`)
   and installed SDK/VSIX `0.1.12-neoclr.14` with a fresh matching runtime bundle.

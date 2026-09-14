@@ -2995,3 +2995,11 @@ should come from the same project evaluation for build and editor. Raven already
 reads `.rvnproj` files for language services; the standalone imports centralize that
 configuration. Proposed checking completion against the actual new MSBuild project,
 rather than assuming successful compilation proves editor behavior.
+
+
+**Verified outcome:** The installed standalone MSBuild project passed all 68 editor
+checks against its configured language server, confirming shared project/reference
+context without a .NET SDK import. The fresh local bundle also passed 15 build
+scenarios; its propagation demo built and ran separately. Instructions and exact
+revisions are in the [MSBuild guide](raven-msbuild.md). This is a local installation,
+not a new public release.

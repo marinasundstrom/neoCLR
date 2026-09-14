@@ -5,6 +5,29 @@ standalone MSBuild props/targets. It does not import `Microsoft.NET.Sdk`, declar
 .NET target framework, or require a new Raven compiler build. It uses the installed
 experimental .14 compiler and the matching runtime bundle.
 
+## Installed local example
+
+A fresh local bundle is available at
+`/Users/robert/.neoclr/experiments/msbuild-20260914`. Open its MSBuild project in VS Code:
+
+```sh
+code /Users/robert/.neoclr/experiments/msbuild-20260914/msbuild-demo
+```
+
+Use **Tasks: Run Build Task** to compile it. The matching `.14` SDK and language server
+are already selected. Or build from a terminal:
+
+```sh
+dotnet msbuild /Users/robert/.neoclr/experiments/msbuild-20260914/msbuild-demo/Demo.rvnproj \
+  -p:RavenSdkRoot=/Users/robert/.raven/sdk/0.1.12-neoclr.14
+```
+
+The packaged assets passed 15 build scenarios and 68 language-server checks on this
+standalone project. The demo was also built and executed separately with its expected
+Result/Option/Void output. All 758 manifest files were verified. See the
+[local validation record](experiments/raven-target/msbuild-toolchain-20260914.json).
+This is a local installation; published previews and prior demo directories are unchanged.
+
 ## Build a bundled project
 
 New bundles contain `build/NeoCLR.Raven.props`, `build/NeoCLR.Raven.targets` and

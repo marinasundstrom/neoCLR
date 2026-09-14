@@ -1,5 +1,7 @@
 # Test Raven targeting neoCLR in VS Code
 
+Standalone MSBuild project: [local setup and build task](../../raven-msbuild.md#installed-local-example).
+
 Latest local installation: [2026-09-14 SDK/extension .14](../../local-tools-20260914.md).
 Use that record for current paths and validation; earlier checkpoints below are historical.
 
