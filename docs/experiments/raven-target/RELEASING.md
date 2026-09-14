@@ -137,7 +137,7 @@ python3 docs/experiments/raven-target/verify_tool_notices.py --tools /path/to/ar
 ```
 
 For the VSIX, also compare its production JavaScript dependency graph when rebuilding
-Raven; the .deps.json check only covers .NET packages. Preserve the five reviewed npm
+Raven; the .deps.json check only covers .NET packages. Preserve the eight reviewed npm
 package notices and refresh the inventory if the esbuild inputs change. Distribute
 `third-party/raven-tools` together with Raven's LICENSE and THIRD-PARTY-NOTICES.txt
 as a companion attribution archive for the separate SDK and VSIX. The runtime bundle

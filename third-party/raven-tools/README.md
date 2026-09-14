@@ -4,9 +4,9 @@ These notices accompany the Raven compiler bridge, SDK and language server and t
 VS Code extension JavaScript shipped with neoCLR. They supplement Raven's own MIT
 license and upstream THIRD-PARTY-NOTICES.txt; they do not replace those files.
 
-The inventory was collected from the actual `.6` SDK/server/bridge `.deps.json`
+The inventory was collected from the actual `.13` SDK/server/bridge `.deps.json`
 files, and from esbuild's production extension input graph, using Raven revision
-9b269f9d0d71c4302c9008ff6bf6d0c6b1d21c9c. It contains 26 NuGet and five npm packages.
+246d697bf6c69ff8cc56ca4859879edd7c081e7d. It contains 26 NuGet and eight npm packages.
 Framework-provided .NET assemblies are external prerequisites, not bundled here.
 
 `manifest.json` records declared licenses, package versions, preserved text hashes

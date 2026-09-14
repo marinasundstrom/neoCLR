@@ -14,6 +14,9 @@ validation are required before publication; release assets carry the evidence.
 
 ### 2026-09-14
 
+- Refreshed the experimental Raven .13 extension notice inventory from its actual
+  production inputs, adding preserved minimatch, brace-expansion and semver licenses.
+
 - Fixed array-interface dispatch compilation on the declared Rust 1.85 minimum.
   Moved managed-array and native-memory IL samples into the current preview sample
   set so they use its System library, separate from historical Neo library tests.

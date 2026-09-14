@@ -1,5 +1,5 @@
 {
-  "scope": "NuGet packages enumerated by the .6 SDK, server and bridge dependency manifests; npm packages included by the production extension bundle. .NET framework assemblies are external prerequisites.",
+  "scope": "NuGet packages enumerated by the .13 SDK, server and bridge dependency manifests; npm packages included by the .13 production extension bundle. .NET framework assemblies are external prerequisites.",
   "packages": [
     {
       "package": "Markdig/0.44.0",
@@ -512,6 +512,42 @@
           "path": "third-party/raven-tools/npm/vscode-languageserver-types/3.17.5/License.txt",
           "source": "npm:vscode-languageserver-types@3.17.5/License.txt",
           "sha256": "ec9ee83580841e8eb687aca9867f221503809ba6426c7f876ede17d91b9fcfd0"
+        }
+      ]
+    },
+    {
+      "package": "minimatch/5.1.9",
+      "kind": "npm",
+      "license": "ISC",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/npm/minimatch/5.1.9/LICENSE",
+          "source": "npm:minimatch@5.1.9/LICENSE",
+          "sha256": "d11323827fa4edeaafc437cc5b91b6971b335f0127efeeb42bf5122fe8657e8f"
+        }
+      ]
+    },
+    {
+      "package": "brace-expansion/2.1.4",
+      "kind": "npm",
+      "license": "MIT",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/npm/brace-expansion/2.1.4/LICENSE",
+          "source": "npm:brace-expansion@2.1.4/LICENSE",
+          "sha256": "68f12f6e2c33688699249c01d8f9623c534da20aa71989c57b061b7bc1676d14"
+        }
+      ]
+    },
+    {
+      "package": "semver/7.7.3",
+      "kind": "npm",
+      "license": "ISC",
+      "notices": [
+        {
+          "path": "third-party/raven-tools/npm/semver/7.7.3/LICENSE",
+          "source": "npm:semver@7.7.3/LICENSE",
+          "sha256": "4ec3d4c66cd87f5c8d8ad911b10f99bf27cb00cdfcff82621956e379186b016b"
         }
       ]
     }
