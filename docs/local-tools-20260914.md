@@ -73,3 +73,23 @@ Follow the [experimental release procedure](experiments/raven-target/RELEASING.m
 for a later public build. This local validation does not replace a new preview's
 release gate or claim complete CLR compatibility. Runtime-library migration remains
 paused while the target/importer stabilization work is evaluated.
+
+
+## Published Preview 7 installation
+
+Installed the published Preview 7 runtime bundle at
+`/Users/robert/.neoclr/experiments/preview7-20260914`, retaining the existing Raven
+SDK/VSIX `0.1.12-neoclr.14` and normal SDK selection. All 765 runtime manifest entries
+matched; the installed MSBuild demo built and produced the expected propagation output.
+Existing experiment folders and edited demos were preserved.
+
+Open the primary project:
+
+```sh
+code /Users/robert/.neoclr/experiments/preview7-20260914/msbuild-demo
+```
+
+Use **neoCLR: Build with MSBuild** or **neoCLR: Run (MSBuild)** from Tasks.
+The separate-library example is in `project-reference-demo/App`. The matching metadata
+includes `Type.IsValueType`. See the [published release](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.7)
+for portable installation instructions and validation evidence.

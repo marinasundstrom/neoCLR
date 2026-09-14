@@ -1,6 +1,6 @@
 # Runtime and Raven preview
 
-This guide describes the Preview 7 candidate. For the published Preview 6 workflow,
+This guide describes published Preview 7. For the earlier Preview 6 workflow,
 see its [release notes](preview-6-release-notes.md). The new preview has two entry points: neoCLR directly through neoIL, and the experimental
 Raven toolchain compiling programs against neoCLR's own runtime library.
 
@@ -102,7 +102,7 @@ history; new Raven work does not require migrating that frontend.
 
 ## Validation and release status
 
-The Preview 6 release carries [exact-source CI evidence and package validation logs](preview-6-validation.md),
+The Preview 7 release carries [exact-source CI evidence and package validation logs](preview-7-validation.md),
 including application classes, order persistence and deferred queries. Use its
 manifest/checksums for exact revisions and artifacts. Source CI does not imply
 prebuilt Raven toolchain support on other hosts. The

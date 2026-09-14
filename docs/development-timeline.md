@@ -3161,3 +3161,10 @@ Recorded the historical explanation as the author's rationale, supported by TAP'
 coexistence guidance rather than claiming a complete history of Microsoft's decision.
 Prepared this documentation and the preceding async discussion for commit; no runtime
 or compiler implementation or existing API names changed.
+
+**Release outcome (2026-09-14):** Published Preview 7 from `5da27a7` after six
+stable/minimum-Rust Linux/macOS/Windows CI jobs and all 18 packaged validation suites
+passed. The package includes MSBuild Build/Run tasks, the one-library demo and
+Type.IsValueType; the SDK/VSIX remain the reviewed experimental Raven .14 build.
+The core-contract and introspection/reflection reviews remain plans. Evidence and
+checksums accompany the [release](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.7).
