@@ -42,10 +42,37 @@ System.Void value-type token, and no-result returns with CLI VOID. Raw VOID mark
 are rejected in value storage. Cecil's named-Void member-reference classification
 requires normalization for resolution; encoded signatures are validated separately.
 
-Raven uses an internal Unit representation in some expression contexts. The bridge
-admits its empty value representation. An unused target Void propagation statement
-must not leave a value on the evaluation stack. Neither this rule nor the target
-contract changes Raven's default .NET lowering.
+## Raven Runtime Contract — 2026-09-14
+
+The author clarified that neoCLR has **Void, not a second Unit platform type**.
+Raven's target profile selects `RuntimeUnitContract("NeoCLR.CoreProbe", "System.Void")`.
+The shared project properties in `build/NeoCLR.Raven.props` select
+`RavenUnitAssemblyName` and `RavenUnitType`, alongside the iteration and propagation
+contracts. Raven's normal .NET default continues to use System.Unit.
+
+The language expression `()` represents the selected unit value. A no-result call in
+statement position still leaves no value; a call used as an argument or stored value
+materializes Void afterwards. `Ok(())` can supply the payload of `Result<Void, E>`.
+Raven's Reflection.Emit stage may use a temporary Unit structure internally, but target
+emission removes it and emits references to the core's System.Void. That structure is
+not a neoCLR type or public API. Unit-specific implementation members are not projected
+onto Void. This is not a complete migration of every unit-related compiler feature.
+
+A source-built experimental Raven compiler is required; older SDKs do not interpret
+the unit contract properties. Verify both final metadata and execution:
+
+```sh
+python3 docs/experiments/raven-target/verify_unit_contract.py \
+  --compiler /absolute/path/to/rvnc.dll \
+  --bridge docs/experiments/raven-target/bin/Release/net11.0/Probe.dll \
+  --runtime target/release/neoclr
+```
+
+The probe rejects emitted Unit definitions/references, checks core-owned Void
+references and ordinary no-result signatures, then executes literal/call value
+arguments and both success/error paths of Result<Void, E> propagation. The generic
+Runtime Contract mechanism is validated separately on .NET using System.ValueTuple;
+that does not establish Void-generic execution on the .NET CLR.
 
 The current executable examples are `Option<int>` and `Result<Void, OverflowError>`.
 Broader generic payloads, reflection exposure and native ABI details still need

@@ -90,7 +90,7 @@ def main():
             return
         GENERATED.mkdir(exist_ok=True)
         data = {'format': 'raven-library-bootstrap-v1', 'owner': 'System.Math',
-                'inputs': {str(p.relative_to(ROOT)): digest(p) for p in [SOURCE, PROJECT]},
+                'inputs': {str(p.relative_to(ROOT)): digest(p) for p in [SOURCE, PROJECT, ROOT / 'build/NeoCLR.Raven.props']},
                 'outputs': {name: hashlib.sha256(text.encode()).hexdigest() for name, text in outputs.items()},
                 'compilerSha256': digest(args.compiler), 'coreSha256': digest(core),
                 'exports': re.findall(r'(?m)^\.method static (.+)', outputs['Math.methods.neoil'])}

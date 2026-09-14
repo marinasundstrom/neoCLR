@@ -8,6 +8,20 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-14
 
+- Select System.Void through Raven's unit Runtime Contract in the neoCLR project
+  properties. Document one platform unit type, no-result calls versus explicit value
+  contexts, and the compiler/target integration boundary. Add metadata and runtime
+  checks for Void arguments and Result<Void, E> propagation. Track the shared project
+  properties in Math bootstrap snapshot inputs and regenerate with the new contract.
+  General function return
+  diagnostics were fixed on Raven main (0c66fbaa7), separately copied to the experiment
+  (e20534894); invalid unqualified annotations no longer silently emit Object returns.
+  Reusable Runtime Contracts are independently integrated into Raven main through
+  2d17199a1; experimental unit projection is fc4592663. Require documentation of
+  compiler-affecting changes in both repositories. The combined Raven contract suite
+  passes 87 checks and its bounded CI passes; 13 experimental unit checks, the Void
+  propagation probe and existing Math validation pass. No SDK refresh is included.
+
 - Selected namespace functions for the Math migration and documented a general
   preference for namespaces over utility classes used only to group operations.
   Retained Raven's existing CLI container/TopLevelAttribute contract for now;

@@ -11,6 +11,8 @@
     <NeoCLRImporterPath>$(NeoCLRRoot)/tools/bridge/Probe.dll</NeoCLRImporterPath>
     <RavenMetadataCoreAssemblyName>NeoCLR.CoreProbe</RavenMetadataCoreAssemblyName>
     <RavenTargetCoreAssemblyName>NeoCLR.CoreProbe</RavenTargetCoreAssemblyName>
+    <RavenUnitAssemblyName>NeoCLR.CoreProbe</RavenUnitAssemblyName>
+    <RavenUnitType>System.Void</RavenUnitType>
     <RavenUseHostFrameworkReferences>false</RavenUseHostFrameworkReferences>
     <RavenAllowArrayCovariance>false</RavenAllowArrayCovariance>
     <RavenPropagationAssemblyName>NeoCLR.CoreProbe</RavenPropagationAssemblyName>

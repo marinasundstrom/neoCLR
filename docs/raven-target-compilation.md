@@ -17,6 +17,8 @@ Generated editor projects and the next bundle template now include:
 ```xml
 <RavenMetadataCoreAssemblyName>NeoCLR.CoreProbe</RavenMetadataCoreAssemblyName>
 <RavenTargetCoreAssemblyName>NeoCLR.CoreProbe</RavenTargetCoreAssemblyName>
+<RavenUnitAssemblyName>NeoCLR.CoreProbe</RavenUnitAssemblyName>
+<RavenUnitType>System.Void</RavenUnitType>
 ```
 
 Keep the existing explicit reference to `NeoCLR.CoreProbe.dll`, iteration and
@@ -113,3 +115,23 @@ For independently compiled dependencies, see the bounded
 A later [minimal MSBuild slice](raven-msbuild.md) now orchestrates this compiler/importer
 path using standalone `.rvnproj` imports. It supports one application and the supplied
 core reference; it is not Microsoft.NET.Sdk integration or general library compilation.
+
+## Runtime Contracts and documentation
+
+Raven documents the reusable compiler mechanisms in
+`docs/compiler/runtime-contracts.md` in its repository. The neoCLR project profile
+selects those contracts; it also retains experimental policies such as nominal Void
+generic arguments, generic arrays and result-based error flow. General compiler
+mechanisms are integrated independently into Raven main. The neoCLR profile and
+its specific tests remain on the experimental Raven branch.
+
+The [Void contract](void-semantics.md#raven-runtime-contract--2026-09-14) distinguishes
+no-result calls from value contexts and provides an end-to-end validation command.
+Older installed SDKs do not implement the new unit properties; use a source-built
+experimental compiler until the next tools refresh.
+
+For every compiler-affecting integration change, update Raven’s compiler documentation
+and changelog as well as neoCLR’s integration documentation and changelog. Record
+configuration, semantic and emission consequences, limitations and validation evidence.
+Keep the [evaluation record](raven-target-evaluation.md) current so that general fixes
+and experimental policies can be reviewed separately.

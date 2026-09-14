@@ -66,6 +66,13 @@ if (args.Length == 2 && args[0] == "--interfaces")
     return;
 }
 
+if (args.Length == 2 && args[0] == "--unit-contract-check")
+{
+    try { UnitContractChecks.Verify(args[1]); }
+    catch (Exception error) { Console.Error.WriteLine(error.Message); Environment.ExitCode = 1; }
+    return;
+}
+
 if (args.Length == 2 && args[0] == "--reference-core")
 {
     CoreDeclarations.Write(args[1], unionProbe: true, collectionProbe: true);

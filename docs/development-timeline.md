@@ -3241,3 +3241,48 @@ carrier annotation remains explicit after the signature guard caught an unresolv
 return-annotation issue; recorded that as a deferred general Raven candidate, not a
 completed compiler fix. This slice establishes the first migration path, not proof
 that every remaining API can already be translated without integration work.
+
+### 2026-09-14 — Runtime Contracts and one unit value type per target
+
+**Author's direction:** Asked for Raven targeting neoCLR to use Void wherever its
+.NET target uses Unit, while keeping ordinary void calls free of a stack result.
+Clarified that Unit is not another neoCLR platform type. Compared this selection
+with Iterable/IEnumerable selection, endorsed the name “Runtime Contract”, and
+explicitly directed integrating reusable target support into Raven. Also asked for
+compiler changes and the neoCLR integration to be documented in both projects.
+
+**Assistant's response and work:** Separated the unit value representation from the
+no-result call convention and added an opt-in unit contract to compilation/project
+options. The selected target type represents `()` in value contexts; intermediate
+emitter Unit machinery is removed from target output. Built an end-to-end probe for
+Void values, calls and Result<Void, E> propagation. Independently extracted metadata,
+iteration, propagation and core-selection mechanisms onto a main-based Raven branch,
+retaining default .NET exception behavior and excluding the experimental generic-array
+and no-exception policies. General unit-contract tests use System.ValueTuple on .NET.
+
+**Related compiler correction:** The earlier unresolved-return candidate was reduced
+to an ordinary .NET diagnostic defect and fixed on Raven main as `0c66fbaa7`, with
+`e20534894` in the experiment. Missing imports now prevent emission. Case imports and
+carrier-type imports remain distinct. Generic Unit storage testing also exposed an
+invalid generic void emission in the default target; the correction preserves a real
+unit value type in generic arguments.
+
+**Scope:** Runtime Contracts describe compiler-facing requirements; a target profile
+selects their values and supplies references. They do not implicitly select exception,
+array variance or cleanup policies. Generic implementation importing was deferred in
+this turn to prioritize the author's unit-contract direction. No SDK installation or
+release is implied by these source changes; final validation/integration is recorded
+with the implementation commits and changelog.
+
+**Completed outcome:** Raven main now includes the reusable metadata, iteration,
+propagation, core-selection and unit contracts through `2d17199a1`; the temporary
+integration branch was fast-forwarded and removed. The experimental branch adopts
+unit projection as `fc4592663`, retaining its separate target policies. Raven's
+compiler documentation and both repositories' workflow instructions now require
+compiler-affecting changes to be recorded on both sides. The combined contract/project
+suite passes 87 tests; Raven's CI gate passes 311 compiler, 73 core and 249 language-server
+checks with three existing skips. The experimental unit suite passes 13 checks.
+The neoCLR probe emits no System.Unit and executes six expected output lines,
+including both propagation paths. All 69 Math consumer results and six rejected
+contracts pass; regenerated Math bodies remain identical. These are local commits;
+no new tools installation or publication was performed.

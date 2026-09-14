@@ -55,6 +55,17 @@ The precise cause and scope are not yet established. Separately, importing both
 the case name; the pilot uses specific error imports rather than introducing a
 neoCLR-specific lookup precedence rule.
 
+### Resolution follow-up — 2026-09-14
+
+The reduction reproduced on ordinary .NET metadata. The defect was missing diagnostic
+reporting for an unresolved function return annotation after earlier signature binding;
+invalid programs could be emitted with Object returns. Revalidating return annotations
+on the diagnostic path fixes this, as already done for parameters. Raven main includes
+`0c66fbaa7`; the experiment carries `e20534894`. All 294 focused namespace/import/function
+checks passed. Qualified carrier names or appropriate namespace imports are still
+required: importing cases is not the same as importing all carrier arities. The Math
+source's qualified annotation is valid source style rather than an emitter workaround.
+
 ## Qualified union type-pattern follow-through — 2026-09-14
 
 Raven main includes `b0681f32b`. Bare qualified variant names now bind as type tests,
@@ -679,3 +690,31 @@ removed after fast-forward integration; the experimental branch remains separate
 The [local SDK/extension build](local-tools-20260914.md) records the installed .14
 packages, matching runtime bundle, completion checks and execution results. This
 completes the local refresh; it does not publish a new preview or resume migration.
+
+## Runtime Contract integration — 2026-09-14
+
+The reusable mechanisms were independently extracted and integrated into Raven main:
+
+| Mechanism | Raven main commit |
+| --- | --- |
+| Explicit metadata imports | `7b1913e20` |
+| Iteration contract | `8394a4a4b` |
+| Propagation contract and project selection | `814a00d61` |
+| Emission core selection | `3b2bc4549` |
+| Unit contract, documentation and project isolation completion | `2d17199a1` |
+
+Raven documents these in `docs/compiler/runtime-contracts.md`, with linked metadata,
+iteration and propagation details. The main integration preserves ordinary .NET
+exception capture, array variance and array representation. Configuring interface
+names does not select a different exception policy. The experimental branch adopts
+the unit work as `fc4592663`; neoCLR's Void selection remains in its project profile
+and its metadata/execution checks remain separate.
+
+Validation: 87 combined contract/project checks pass. Raven's bounded CI passes
+311 compiler, 73 core and 249 language-server checks (three existing skips).
+The experimental unit suite passes 13 checks. The
+[Void probe](void-semantics.md#raven-runtime-contract--2026-09-14) verifies no emitted
+Unit, target-owned Void and executable Result<Void, E> propagation. Existing Math
+regeneration remains identical and all 69 consumer results/six invalid contracts pass.
+No .NET Framework or NanoFramework runtime execution is claimed by these tests.
+Generic implementation importing remains the next separate migration gate.

@@ -11,6 +11,9 @@
 - Do not integrate neoCLR-specific code, configuration or tests into Raven main yet.
   General fixes must stand independently on CLI metadata contracts. Reconsidering
   emission architecture or another backend is future evaluation, not this stabilization scope.
+- Document compiler-affecting integration changes in both Raven's compiler docs and
+  neoCLR's integration docs, with changelog updates in both repositories. Include
+  Runtime Contract configuration, semantic/emission effects, limitations and validation.
 - Review mixed changes by behavior and dependencies. A general metadata/emission fix
   is not permanently experimental just because neoCLR exposed it. Record deferred
   general candidates explicitly until they can be validated independently.
