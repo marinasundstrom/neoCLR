@@ -3003,3 +3003,20 @@ context without a .NET SDK import. The fresh local bundle also passed 15 build
 scenarios; its propagation demo built and ran separately. Instructions and exact
 revisions are in the [MSBuild guide](raven-msbuild.md). This is a local installation,
 not a new public release.
+
+
+### 2026-09-14 — Plan reflection around needs before expanding descriptors
+
+**Author's direction:** Requested `Type.IsValueType` and restrained additions to the
+existing model. Then asked for a roadmap review of reflection versus introspection,
+using .NET's `Type`/`TypeInfo` split as a concern: identify the needs before choosing
+how to implement the functionality.
+
+**Assistant's response:** Proposed examining metadata inspection, runtime execution
+capabilities, portability and AOT separately, without preselecting separate public
+classes. Kept the bounded `IsValueType` addition in the active preview scope.
+
+**Action and outcome:** Added a [roadmap investigation](reflection-model-review.md)
+with a .NET baseline, alternatives and validation criteria. This records planned
+architecture work; it does not claim a new reflection implementation or a completed
+preview release.

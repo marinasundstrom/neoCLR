@@ -19,6 +19,23 @@ binding immutability/readonly references, inheritance, nullable slots, enums/fla
 dynamic hooks, and a more useful fundamental library. Familiarity primarily means C#/.NET APIs and observable behavior, not matching
 source syntax or runtime internals. Improve contracts without legacy constraints.
 
+## Introspection and reflection model review (2026-09-14)
+
+Before substantially expanding the reflection API, identify the scenarios and review
+[the introspection/reflection contract](reflection-model-review.md). Separate metadata
+inspection from invocation, construction and mutation as capabilities to evaluate;
+this does not yet select separate public types or interfaces. Assess runtime type
+identity, offline metadata, inherited-member discovery, metadata retention and AOT
+constraints. Avoid introducing a second overlapping `TypeInfo` API merely to mirror
+.NET history. Retain familiar APIs where they serve a concrete need, including the
+requested bounded `Type.IsValueType` addition.
+
+The review must compare .NET's `Type`/`TypeInfo` rationale and current APIs with a
+single descriptor and optional capability-based alternatives. Require examples and
+an explicit decision on missing metadata versus unsupported execution before choosing
+an architecture. This is planned design work, not a preview requirement to implement
+full reflection or dynamic invocation.
+
 ## Default compatibility policy (2026-09-12)
 
 Use .NET semantics unless a concrete improvement justifies divergence and its costs.

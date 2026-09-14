@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-14
 
+- Planned a needs-driven introspection/reflection review: compare the .NET
+  Type/TypeInfo model, metadata inspection, execution capabilities and AOT retention
+  before expanding descriptor APIs. No replacement hierarchy is selected.
+
 - Added a minimal standalone MSBuild build path for Raven `.rvnproj` applications
   targeting neoCLR. Props/targets select the supplied reference contracts and run
   the installed compiler, importer and verifier, without Microsoft.NET.Sdk or Raven
