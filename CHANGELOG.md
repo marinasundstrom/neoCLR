@@ -10,7 +10,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 - Planned a needs-driven introspection/reflection review: compare the .NET
   Type/TypeInfo model, metadata inspection, execution capabilities and AOT retention
-  before expanding descriptor APIs. No replacement hierarchy is selected.
+  before expanding descriptor APIs. No replacement hierarchy is selected. Extended
+  API planning to distinguish a proposed common platform core, optional capabilities
+  and host-specific services, with availability and conformance questions left open.
 
 - Added a minimal standalone MSBuild build path for Raven `.rvnproj` applications
   targeting neoCLR. Props/targets select the supplied reference contracts and run

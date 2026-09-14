@@ -19,6 +19,16 @@ binding immutability/readonly references, inheritance, nullable slots, enums/fla
 dynamic hooks, and a more useful fundamental library. Familiarity primarily means C#/.NET APIs and observable behavior, not matching
 source syntax or runtime internals. Improve contracts without legacy constraints.
 
+## Core contract and target capability planning (2026-09-14)
+
+Use [API planning](runtime-api-plan.md#common-platform-contract-and-target-capabilities-2026-09-14)
+to identify a common neoCLR platform contract, optional capabilities and host-specific
+services. Determine availability, dependencies and conformance criteria before
+choosing target profiles or capability metadata. The current preview API inventory
+is not itself a standard; architecture portability and API availability are separate
+questions. Apply this classification to the reflection review below and subsequent
+library design.
+
 ## Introspection and reflection model review (2026-09-14)
 
 Before substantially expanding the reflection API, identify the scenarios and review

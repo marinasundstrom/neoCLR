@@ -13,6 +13,39 @@ integration are now exercised by the [order workflow](raven-order-workflow.md#co
 projection of the generic array name and native conversion support remain bounded
 follow-ups, not prerequisites for ordinary T[] use.
 
+## Common platform contract and target capabilities (2026-09-14)
+
+API planning should identify the core of neoCLR as a platform, not only a catalog
+of useful classes. The author proposes using this work to determine the common
+standard and which features or APIs may differ between targets. This is a design
+objective; the current preview surface is not yet a normative platform standard.
+
+For each API family, classify the proposed requirements and validate the boundary:
+
+| Proposed category | Contract to establish |
+| --- | --- |
+| Common core | Required type semantics, metadata/IL contracts and minimum library APIs; identical observable guarantees across conforming targets |
+| Optional capability | A coherent feature that a target can omit, with explicit dependencies, availability and compiler/runtime diagnostics |
+| Host-specific service | A shared abstraction where useful, with documented host-dependent behavior, resources and implementations |
+
+Possible subjects include basic type inspection versus dynamic invocation, file
+access, clocks and native interop. These are candidates for classification, not a
+settled decision about which APIs are mandatory. Different CPU architectures need
+not imply different public APIs; constrained deployments may require different
+capability sets. Keep those dimensions separate.
+
+Compare the .NET distinction between a common API contract, target frameworks and
+platform-specific APIs before selecting a neoCLR profile mechanism. Evaluate
+reference surfaces, build-time capability validation and runtime discovery; do not
+assume that a stub which fails at runtime is sufficient. Specify missing metadata,
+unsupported capabilities and ordinary recoverable failures distinctly. Include
+conformance tests for core guarantees and tests for both available and absent
+capabilities. No new profile metadata or discovery API is implemented by this plan.
+
+The [reflection-model review](reflection-model-review.md) is an initial case study.
+Keep runtime implementation strategy separate from public API guarantees and
+preserve familiar language ergonomics wherever possible.
+
 ## Immediate implementation priorities (2026-09-13)
 
 The author prioritizes arrays, collection interfaces and basic implementations as

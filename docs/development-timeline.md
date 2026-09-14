@@ -3020,3 +3020,13 @@ classes. Kept the bounded `IsValueType` addition in the active preview scope.
 with a .NET baseline, alternatives and validation criteria. This records planned
 architecture work; it does not claim a new reflection implementation or a completed
 preview release.
+
+
+**Author's follow-up:** API planning can identify the core of the platform, its
+standard contract, and features or APIs that differ by target.
+
+**Assistant's response and action:** Added a common-core, optional-capability and
+host-service classification to the runtime API plan and roadmap. Required availability
+and conformance questions to be resolved before choosing profiles or capability
+metadata. The classification is a planning framework, not a finalized standard or
+an implemented target-capability system.

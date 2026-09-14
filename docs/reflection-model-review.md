@@ -43,6 +43,10 @@ when a concrete design is proposed.
   future JIT/AOT and constrained targets. Portability should not require every target
   to support dynamic code generation or all reflection operations.
 
+The review also serves the [common platform contract plan](runtime-api-plan.md#common-platform-contract-and-target-capabilities-2026-09-14):
+identify which inspection guarantees belong to the core and which execution or
+metadata capabilities may vary by target. These boundaries remain open.
+
 ## Exit criteria and scope
 
 Use a type browser, a debugger and a small serializer as distinct requirements.
