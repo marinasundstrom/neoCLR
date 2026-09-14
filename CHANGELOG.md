@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-14
 
+- Recorded Raven main's metadata core-library identity fix (`11e5c57ec`): imported
+  structs retain their category using the supplied core assembly's full identity.
+  All 33 focused checks, the full baseline (5,515 reported passes), and the .NET
+  10/.NET 11 build/run matrix passed. Marked the general core-library prerequisite
+  resolved while retaining the separate union-emission/array-factory reviews and
+  the paused runtime-library migration. Experimental tools remain unsynchronized.
+
 - Independently integrated imported member-union shorthand binding into Raven main
   as `b60e3635f`; 219 focused checks and the .NET 10/.NET 11 build/run matrix passed.
   Recorded the remaining target-core struct/signature failures exposed by execution

@@ -30,6 +30,39 @@ A possible alternative emission backend is future evaluation, outside this scope
 [release work order](release-stabilization.md) is historical; remaining general
 compiler reviews continue before the generic-library authoring probe and migration.
 
+## Metadata core-library identity follow-through — 2026-09-14
+
+Raven main includes `11e5c57ec`. The reduced .NET 10/.NET 11 regression confirmed
+that Raven's imported symbol recognized a struct while its metadata reflection type
+reported a class. This reproduced independently of unions and neoCLR configuration.
+
+Metadata setup now selects the supplied assembly that directly defines the root
+`System.Object`, before adding host fallback paths. It uses the full assembly identity,
+including version: selecting only the name could pick another framework version from
+fallback paths populated by earlier compilations. A facade that only forwards Object
+is not selected. If no supplied reference defines the root type, the host fallback
+remains. No new target configuration or neoCLR-specific policy was added to main.
+
+Eight new cases cover imported generic classes and structs with .NET 10/.NET 11
+references under ordinary and target-core emission. They check exact core identity,
+agreement between symbol and reflection classification, emitted return/parameter/local
+types, referenced assembly scope, and execution against the separate library
+implementation. The 25-check prior focused baseline passed; after the fix, all 33
+focused checks, the full Raven baseline (5,515 reported passes) and the .NET 10/.NET 11
+build/run matrix passed. This is broader compatibility evidence, not proof of .NET
+Framework/NanoFramework execution or completion of the full Raven release gate.
+
+The main-based branch was fast-forwarded, pushed and removed. The experimental branch
+remains separate and has not been synchronized in this slice. Published Preview 6
+artifacts and the installed experimental SDK/extension were not changed.
+
+The core-library prerequisite identified below is resolved for the tested general
+path. Next, re-evaluate the remaining pattern-local, method-signature and normalization-
+order changes from `04c953d67` against this corrected baseline; do not assume every
+old workaround is still necessary. The array-factory review (`de872fa34`) follows.
+The independent boxing optimization remains deferred. Synchronization and the generic-
+library capability probe still precede migration of the runtime library to Raven.
+
 ## Imported member-union binding review — 2026-09-14
 
 Raven main includes `b60e3635f`, independently extracted from the binding portion of
@@ -73,7 +106,7 @@ Do not work around the disagreement by rewriting union IL or importing the entir
 experimental configuration. Any reusable selection/configuration mechanism must be
 validated as general CLI support before integration into main.
 
-Next, in order:
+At this checkpoint, the work order was (the first item is now completed above):
 
 1. Resolve and test metadata core-library identity alignment on Raven main's general
    target path, retaining ordinary .NET behavior and attribute-emission coverage.
