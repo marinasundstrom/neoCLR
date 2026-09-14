@@ -3047,3 +3047,11 @@ passes 22 scenarios; the library project's editor scenario passes 69 checks befo
 building. Added separate Build/Run tasks and a readable two-project example. No Raven
 compiler changes were needed. Packaged release validation and publication remain
 pending; these source-check outcomes are not a release claim.
+
+
+**Release outcome (2026-09-14):** Published Preview 7 from `5da27a7` after six
+stable/minimum-Rust Linux/macOS/Windows CI jobs and all 18 packaged validation suites
+passed. The package includes MSBuild Build/Run tasks, the one-library demo and
+Type.IsValueType; the SDK/VSIX remain the reviewed experimental Raven .14 build.
+The core-contract and introspection/reflection reviews remain plans. Evidence and
+checksums accompany the [release](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.7).

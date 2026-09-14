@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-14
 
+- Published Preview 7 from 5da27a7 after all six source CI jobs and all 18 packaged
+  validation suites passed. Updated the website and current walkthrough to point
+  to the release. Recorded the validation outcome and installed a fresh local runtime
+  bundle with the existing .14 SDK/VSIX. Candidate-preparation notes below describe their pre-publication
+  state; published release content remains unchanged.
+
 - Prepared Preview 7 candidate with the combined MSBuild/library workflow and
   Type.IsValueType. Refreshed the API declaration and coverage inventories to
   include the property and getter (616 declaration candidates). Publication remains

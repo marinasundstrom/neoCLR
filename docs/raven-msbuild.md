@@ -1,6 +1,6 @@
 # Minimal MSBuild support for neoCLR
 
-Preview 7 candidate, 2026-09-14. A Raven `.rvnproj` can now build an application through
+Available in Preview 7, 2026-09-14. A Raven `.rvnproj` can now build an application through
 standalone MSBuild props/targets. It does not import `Microsoft.NET.Sdk`, declare a
 .NET target framework, or require a new Raven compiler build. It uses the installed
 experimental .14 compiler and the matching runtime bundle.
