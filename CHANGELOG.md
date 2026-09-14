@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-14
 
+- Recorded Raven main's qualified union type-pattern fix (`b0681f32b`), including
+  closed variant member types and target-core locals. All 272 focused checks and the
+  .NET 10/.NET 11 build/run matrix passed. Kept array-factory review, experimental
+  synchronization and installed-tool refresh pending; library migration stays paused.
+
 - Recorded the proposed `Array<T>.Empty` property and its distinction from .NET
   `Array.Empty<T>()`. Kept the API and experimental compiler mapping explicitly
   pending, separate from general Raven array-factory capability handling.

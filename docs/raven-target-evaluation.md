@@ -30,6 +30,27 @@ A possible alternative emission backend is future evaluation, outside this scope
 [release work order](release-stabilization.md) is historical; remaining general
 compiler reviews continue before the generic-library authoring probe and migration.
 
+## Qualified union type-pattern follow-through — 2026-09-14
+
+Raven main includes `b0681f32b`. Bare qualified variant names now bind as type tests,
+including `choice is Choice.Ok<int>` and `result is Outcome.Error<string>`. Imported
+Raven case types preserve explicit generic arguments and validate arity/constraints.
+Constructed union member lists project case parameters from the closed carrier rather
+than leaving an open variant type; the error variant exposed this separately from
+success-case coverage. Target-core declaration-pattern locals use semantic types.
+
+All 272 focused pattern, union, completion and metadata checks passed, as did the
+.NET 10/.NET 11 build/run matrix. Tests execute both active and inactive variants for
+ordinary CLI member unions and Raven-produced unions. No neoCLR-specific mapping or
+policy was integrated; this is general compiler correctness, not a platform divergence.
+These results do not establish execution on .NET Framework or NanoFramework.
+
+This resolves the bare type-pattern failures recorded in the preceding emission
+review. The independent boxing optimization remains deferred. Array-factory capability
+handling is next, incorporating the proposed generic-array API below. Experimental
+branch synchronization, the library capability probe and installed-tool refresh remain
+pending; runtime-library migration stays paused until after the next release.
+
 ## Indexer member access and completion — 2026-09-14
 
 Raven main includes `ac4901f6b`. The author showed completion treating
@@ -57,8 +78,8 @@ recorded startup and normal shutdown, with no request-level failure. These logs
 establish successful request transport, not correctness of the answer. Compiler
 regressions reproduce and validate the semantic fix independently of the editor.
 
-Next reviews remain the separate bare type-pattern failures and array-factory work
-listed below. Keep neoCLR target policy experimental and library migration paused.
+The separate bare type-pattern follow-through is recorded below; array-factory work
+remains the next review. Keep neoCLR target policy experimental and library migration paused.
 
 ## Imported union emission follow-through — 2026-09-14
 
