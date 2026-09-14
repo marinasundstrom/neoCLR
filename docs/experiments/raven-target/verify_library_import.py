@@ -1,6 +1,7 @@
 """Compile independent Raven libraries and a consumer, then audit/import/execute."""
 import argparse
 import json
+import re
 from pathlib import Path
 import shutil
 import subprocess
@@ -71,7 +72,7 @@ func Main() {
 }
 ''', [arithmetic, facade])
 
-    def import_case(name, libraries, success=True, diagnostic=None):
+    def import_case(name, libraries, success=True, diagnostic=None, expected="42\n6\n", gc=False):
         output = root / name
         result = run(['dotnet', args.bridge.resolve(), '--import', consumer, core, output, *libraries])
         if not success:
@@ -82,9 +83,11 @@ func Main() {
             return
         require(result, name)
         require(run([args.runtime.resolve(), 'verify', output / 'App.neoil', '--system', args.system.resolve()]), name)
-        executed = run([args.runtime.resolve(), 'run', output / 'App.neoil', '--system', args.system.resolve()])
+        executed = run([args.runtime.resolve(), 'run', output / 'App.neoil', '--system', args.system.resolve(), *(['--gc-stats'] if gc else [])])
         require(executed, name)
-        assert executed.stdout == '42\n6\n', executed.stdout
+        assert executed.stdout == expected, executed.stdout
+        if gc:
+            assert int(re.search(r'collections=(\d+)', executed.stderr).group(1)) > 0, executed.stderr
         mapping = json.loads((output / 'App.neoil.map.json').read_text())
         identities = mapping['MethodIdentities']
         assert len({m['AssemblyIdentity'] for m in identities}) == 3
@@ -103,6 +106,83 @@ func Main() {
     changed = compile('ChangedSignature', arithmetic_source.replace('Sum(value: int)', 'Sum(value: int, unused: int)').replace('Sum(value - 1)', 'Sum(value - 1, 0)'), library=True, identity='ArithmeticLibrary')
     import_case('changed-signature', [changed, facade], False, 'unresolved')
     unsupported = compile('UnsupportedBody', arithmetic_source.replace('return value + Sum(value - 1)', 'return Counter().Read()') + '\npublic class Counter { public func Read() -> int { return 42 } }\n', library=True, identity='ArithmeticLibrary')
-    import_case('library-instance-body', [unsupported, facade], False)
+    import_case('library-instance-body', [unsupported, facade], expected='48\n42\n')
+
+    base_source = '''public interface Reader {
+    func Read() -> int
+}
+public abstract class CounterBase : Reader {
+    public var Age: int
+    public init(age: int) { Age = age }
+    public abstract func Read() -> int
+    public virtual func Set(age: int) { Age = age }
+}
+public struct Point {
+    public var X: int
+    public init(x: int) { X = x }
+    public func Set(x: int) { X = x }
+}
+'''
+    base = compile('BaseLibrary', base_source, library=True)
+    derived = compile('DerivedLibrary', '''public class Counter : CounterBase {
+    public init(age: int) : base(age) { }
+    public override func Read() -> int { return Age }
+    public override func Set(age: int) { base.Set(age) }
+}
+''', [base], library=True)
+    consumer = compile('InstanceConsumer', '''import System.*
+import System.Collections.*
+import System.Console.*
+func Main() {
+    let counter = Counter(7)
+    let parent: CounterBase = counter
+    let reader: Reader = parent
+    WriteLine(reader.Read())
+    parent.Set(42)
+    WriteLine(counter.Age)
+    let read: Func<int> = reader.Read
+    WriteLine(read())
+    var point = Point(7)
+    var copy = point
+    copy.Set(99)
+    WriteLine(point.X)
+    WriteLine(copy.X)
+    let values = ArrayList<CounterBase>()
+    values.Add(counter)
+    values[0].Set(21)
+    var remaining = 100
+    while remaining != 0 {
+        Counter(remaining)
+        remaining = remaining - 1
+    }
+    WriteLine(read())
+}
+''', [base, derived])
+    instance_expected = '7\n42\n42\n7\n99\n21\n'
+    import_case('library-inheritance-interface-values-delegate', [base, derived], expected=instance_expected, gc=True)
+    import_case('library-types-reversed-inputs', [derived, base], expected=instance_expected)
+    hidden = compile('HiddenBase', base_source.replace('public abstract class CounterBase', 'internal abstract class CounterBase'), library=True, identity='BaseLibrary')
+    import_case('hidden-library-type', [hidden, derived], False, 'Nonpublic imported type')
+    private_ctor = compile('PrivateConstructor', base_source.replace('public init(age:', 'private init(age:'), library=True, identity='BaseLibrary')
+    import_case('private-library-base-constructor', [private_ctor, derived], False, 'Nonpublic cross-type call')
+
+    generic = compile('GenericBody', base_source.replace('public func Set(x: int)', 'public func Identity<T>(value: T) -> T { return value }\n    public func Set(x: int)'), library=True, identity='BaseLibrary')
+    import_case('generic-library-body-boundary', [generic, derived], False, 'Unsupported application signature')
+    collision_source = '''namespace Shared {
+    public class Item { public func Read() -> int { return NUMBER } }
+}
+namespace API {
+    public func Read() -> int { return Shared.Item().Read() }
+}
+'''
+    left = compile('LeftLibrary', collision_source.replace('NUMBER', '42').replace('API', 'Left'), library=True)
+    right = compile('RightLibrary', collision_source.replace('NUMBER', '99').replace('API', 'Right'), library=True)
+    consumer = compile('CollisionConsumer', '''import System.Console.*
+func Main() {
+    WriteLine(Left.Read())
+    WriteLine(Right.Read())
+}
+''', [left, right])
+    import_case('same-type-name-different-assemblies', [left, right], expected='42\n99\n')
 
 print(json.dumps(results, indent=2))

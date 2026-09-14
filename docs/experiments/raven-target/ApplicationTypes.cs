@@ -4,26 +4,40 @@ using System.Text;
 // Per-import application metadata. No host type loading or per-application API catalog.
 static class ApplicationTypes
 {
-    static ModuleDefinition? Module;
+    static readonly HashSet<ModuleDefinition> Modules = new();
     static readonly Dictionary<string, TypeDefinition> Types = new();
     static readonly HashSet<string> Expanded = new();
     static readonly Dictionary<string, Dictionary<string, string>> Adapters = new();
-    public static void Reset(ModuleDefinition module) { Module = module; Types.Clear(); Expanded.Clear(); Adapters.Clear(); }
+    public static void Reset(params ModuleDefinition[] modules) { Modules.Clear(); Modules.UnionWith(modules); Types.Clear(); Expanded.Clear(); Adapters.Clear(); }
     public static object[] IdentityMap() => Types.Select(p => (object)new {
-        MetadataName = p.Value.FullName, RuntimeName = p.Key,
+        AssemblyIdentity = p.Value.Module.Assembly.Name.FullName, MetadataName = p.Value.FullName, RuntimeName = p.Key,
         Fields = p.Value.Fields.Select(f => new { MetadataName = f.Name, RuntimeName = MetadataIdentity.MemberName(f.Name) }).ToArray()
     }).ToArray();
+    public static bool IsModule(ModuleDefinition? module) => module is not null && Modules.Contains(module);
+    public static void CheckAccess(TypeReference reference, ModuleDefinition caller)
+    {
+        if (reference is GenericInstanceType generic)
+            foreach (var argument in generic.GenericArguments) CheckAccess(argument, caller);
+        if (reference is TypeSpecification specification) { CheckAccess(specification.ElementType, caller); return; }
+        if (reference is GenericParameter) return;
+        if (reference.Scope is AssemblyNameReference assembly && !Modules.Any(m => m.Assembly.Name.FullName == assembly.FullName)) return;
+        var type = reference.Resolve();
+        if (type is null || !IsModule(type.Module) || type.Module == caller) return;
+        for (var owner = type; owner is not null; owner = owner.DeclaringType)
+            if (!(owner.IsPublic || owner.IsNestedPublic))
+                throw new InvalidDataException("Nonpublic imported type access unsupported: " + type.FullName);
+    }
     public static bool IsType(string name) => Types.ContainsKey(name);
     public static bool IsReference(string name) => Types.TryGetValue(name, out var type) && !type.IsValueType;
     public static string? Type(TypeReference reference)
     {
         if (reference is ByReferenceType byref) return Type(byref.ElementType) is { } element ? element + "&" : null;
-        if (reference is TypeSpecification || reference.Scope is AssemblyNameReference assembly && assembly.FullName != Module?.Assembly.Name.FullName) return null;
+        if (reference is TypeSpecification || reference.Scope is AssemblyNameReference assembly && !Modules.Any(m => m.Assembly.Name.FullName == assembly.FullName)) return null;
         var type = reference.Resolve();
-        if (type is null || type.Module != Module || type.FullName == "System.Unit" || type.Name == "<Module>") return null;
+        if (type is null || !Modules.Contains(type.Module) || type.FullName == "System.Unit" || type.Name == "<Module>") return null;
         if (type.HasGenericParameters || type.IsEnum
             || type.IsExplicitLayout || (type.DeclaringType?.HasGenericParameters ?? false) || type.IsValueType && type.HasInterfaces
-            || (!type.IsInterface && type.BaseType?.FullName is not ("System.Object" or "System.ValueType") && type.BaseType?.Resolve()?.Module != Module)
+            || (!type.IsInterface && type.BaseType?.FullName is not ("System.Object" or "System.ValueType") && !IsModule(type.BaseType?.Resolve()?.Module))
             || type.Fields.Any(f => f.IsStatic || f.HasMarshalInfo || f.IsInitOnly)
             || type.Methods.Any(m => m.IsConstructor && m.IsStatic))
             throw new InvalidDataException("Unsupported application type: " + type.FullName);
@@ -41,10 +55,10 @@ static class ApplicationTypes
         bool Visit(TypeDefinition current)
         {
             if (!visited.Add(current)) return false;
-            if (current.BaseType is { } parent && parent.Resolve()?.Module == Module
+            if (current.BaseType is { } parent && IsModule(parent.Resolve()?.Module)
                 && (Type(parent) == to || Visit(parent.Resolve()))) return true;
             return current.Interfaces.Any(i => GenericUnionBindings.Type(i.InterfaceType) == to ||
-                i.InterfaceType.Resolve()?.Module == Module && Visit(i.InterfaceType.Resolve()));
+                IsModule(i.InterfaceType.Resolve()?.Module) && Visit(i.InterfaceType.Resolve()));
         }
         return Visit(type);
     }
@@ -53,8 +67,8 @@ static class ApplicationTypes
         while (Types.Any(t => !Expanded.Contains(t.Key)))
         {
             var (name, type) = Types.First(t => !Expanded.Contains(t.Key)); Expanded.Add(name);
-            if (type.BaseType?.Resolve()?.Module == Module) map(type.BaseType, false);
-            foreach (var contract in type.Interfaces) map(contract.InterfaceType, false);
+            if (IsModule(type.BaseType?.Resolve()?.Module)) { CheckAccess(type.BaseType!, type.Module); map(type.BaseType!, false); }
+            foreach (var contract in type.Interfaces) { CheckAccess(contract.InterfaceType, type.Module); map(contract.InterfaceType, false); }
             foreach (var field in type.Fields) map(field.FieldType, false);
             foreach (var method in type.Methods.Where(m => !m.IsStatic))
             {
@@ -93,7 +107,7 @@ static class ApplicationTypes
     public static FieldShape? Field(FieldReference reference, MethodDefinition caller, Func<TypeReference, bool, string> map)
     {
         var field = reference.Resolve();
-        if (field is null || field.Module != Module) return null;
+        if (field is null || !Modules.Contains(field.Module)) return null;
         var owner = Type(field.DeclaringType)!;
         if (field.IsStatic || reference.FullName != field.FullName || (!field.IsPublic && caller.DeclaringType != field.DeclaringType))
             throw new InvalidDataException("Unsupported application field access.");
@@ -112,7 +126,7 @@ static class ApplicationTypes
         {
             var (name, type) = Types.First(t => !emitted.Contains(t.Key)); emitted.Add(name);
             output.AppendLine(type.IsInterface ? $".interface {name}" : $".type {(type.IsValueType ? "" : "class ")}{(type.IsAbstract ? "abstract " : "")}{name}");
-            if (type.BaseType?.Resolve()?.Module == Module) output.AppendLine(".extends " + map(type.BaseType, false));
+            if (IsModule(type.BaseType?.Resolve()?.Module)) output.AppendLine(".extends " + map(type.BaseType, false));
             foreach (var contract in type.Interfaces) output.AppendLine(".implements " + map(contract.InterfaceType, false));
             foreach (var method in type.Methods.Where(m => m.IsAbstract))
                 output.AppendLine($".method instance {(type.IsInterface ? "" : "abstract ")}{MethodName(method)}({string.Join(',', method.Parameters.Select(p => map(p.ParameterType, false)))}) -> {map(method.ReturnType, true)}\n.end");

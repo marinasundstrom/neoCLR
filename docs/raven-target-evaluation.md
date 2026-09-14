@@ -46,7 +46,9 @@ general signature/dispatch importing remain open. A subsequent
 nongeneric static bodies and intra-library namespace-function calls through their
 existing CLI metadata. Direct consumer wildcard discovery initially reported RAV0103; the subsequent
 namespace-metadata slice supplies the missing TopLevelAttribute and fixes Raven
-metadata-first marker lookup and imported-member completion. Generic bodies and library-owned instance types remain open.
+metadata-first marker lookup and imported-member completion. Library-owned nongeneric instance types are now covered by the same workflow,
+including cross-assembly inheritance/interface calls and delegates. Generic bodies
+remain open.
 
 ## Initial assessment evidence
 

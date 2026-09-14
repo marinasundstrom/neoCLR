@@ -42,7 +42,7 @@ static class UnionImport
         var guestLibraries = resolver.Images.Where(a => a != app && a != library).Select(a => a.MainModule).ToHashSet();
         if (guestLibraries.Append(app.MainModule).Any(module => module.Types.Any(t => t.Name == "<Module>" && t.Methods.Any(m => m.IsConstructor && m.IsStatic))))
             throw new InvalidDataException("Module initializers unsupported.");
-        ApplicationTypes.Reset(app.MainModule);
+        ApplicationTypes.Reset(guestLibraries.Append(app.MainModule).ToArray());
         var entry = app.EntryPoint ?? throw new InvalidDataException("Missing entry point.");
         if (entry.Parameters.Count != 0 || entry.ReturnType.MetadataType != MetadataType.Void)
             throw new InvalidDataException("Result profile requires a parameterless no-result entry.");
@@ -81,10 +81,32 @@ static class UnionImport
             var methodId = seen.Count;
             if (seen.Count > 128) throw new InvalidDataException("Method limit exceeded.");
             ApplicationTypes.CheckMethod(method);
+            foreach (var parameter in method.Parameters) ApplicationTypes.CheckAccess(parameter.ParameterType, method.Module);
+            ApplicationTypes.CheckAccess(method.ReturnType, method.Module);
+            if (method.HasBody)
+                foreach (var variable in method.Body.Variables) ApplicationTypes.CheckAccess(variable.VariableType, method.Module);
             if (!method.HasBody || method.IsPInvokeImpl || method.IsInternalCall || method.Body.HasExceptionHandlers
                 || method.Body.CodeSize > 65536 || method.Body.MaxStackSize > 256 || method.Body.Variables.Count > 256 || method.Body.Instructions.Count == 0
                 || method.DeclaringType.Methods.Any(m => m.IsConstructor && m.IsStatic))
                 throw new InvalidDataException("Unsupported body: " + method.FullName + " (" + method.Attributes + ")");
+            foreach (var instruction in method.Body.Instructions)
+            {
+                switch (instruction.Operand)
+                {
+                    case MethodReference called:
+                        if (called is GenericInstanceMethod genericCall)
+                            foreach (var argument in genericCall.GenericArguments) ApplicationTypes.CheckAccess(argument, method.Module);
+                        ApplicationTypes.CheckAccess(called.DeclaringType, method.Module);
+                        ApplicationTypes.CheckAccess(called.ReturnType, method.Module);
+                        foreach (var parameter in called.Parameters) ApplicationTypes.CheckAccess(parameter.ParameterType, method.Module);
+                        break;
+                    case FieldReference fieldReference:
+                        ApplicationTypes.CheckAccess(fieldReference.DeclaringType, method.Module);
+                        ApplicationTypes.CheckAccess(fieldReference.FieldType, method.Module);
+                        break;
+                    case TypeReference referencedType: ApplicationTypes.CheckAccess(referencedType, method.Module); break;
+                }
+            }
             var args = (method.HasThis ? new[] { ApplicationTypes.Receiver(method) } : Array.Empty<string>()).Concat(method.Parameters.Select(p => ProfileType(p.ParameterType))).ToArray();
             var valueConstructor = method.IsConstructor && method.DeclaringType.IsValueType;
             var emitInstance = method.HasThis && !valueConstructor;
@@ -312,7 +334,7 @@ static class UnionImport
                         ApplicationTypes.CheckMethod(functionReference);
                         var functionTarget = ClosureAudit.ResolveMethod(functionReference) ?? throw new InvalidDataException("Unresolved delegate target.");
                         var virtualFunction = instruction.OpCode.Code == Code.Ldvirtftn;
-                        if (functionTarget.Module != app.MainModule || functionReference.FullName != functionTarget.FullName
+                        if (!ApplicationTypes.IsModule(functionTarget.Module) || functionReference.FullName != functionTarget.FullName
                             || functionTarget.IsConstructor || (!functionTarget.HasBody && !virtualFunction)
                             || functionTarget.DeclaringType.IsValueType && functionTarget.HasThis)
                             throw new InvalidDataException("Only static or class application delegate targets are admitted: " + functionReference.FullName + "; " + instruction.OpCode);
@@ -323,7 +345,7 @@ static class UnionImport
                             if (!functionTarget.HasThis) throw new InvalidDataException("Virtual function address requires receiver.");
                             var receiverType = ApplicationTypes.Receiver(functionTarget);
                             Expect(receiverType);
-                            var checkName = "CheckDelegateReceiver_" + functionTarget.DeclaringType.MetadataToken.ToUInt32().ToString("x8");
+                            var checkName = "CheckDelegateReceiver_" + MetadataIdentity.TypeName(functionTarget.DeclaringType).Replace('.', '_');
                             delegateAdapters[checkName] = $".function {checkName}({receiverType}) -> void\n.local {receiverType} empty\nldloca empty\ninitobj {receiverType}\nldarg 0\nldloc empty\nref.eq\nbrfalse Valid\nfault \"null delegate receiver\"\nValid:\nret\n.end\n";
                             code.AppendLine($"call {checkName}({receiverType})");
                         }
@@ -331,7 +353,7 @@ static class UnionImport
                     case Code.Newobj:
                         var constructor = (MethodReference)instruction.Operand;
                         var constructorDefinition = constructor.Resolve() ?? throw new InvalidDataException("Unresolved constructor.");
-                        if (constructorDefinition.Module == app.MainModule)
+                        if (ApplicationTypes.IsModule(constructorDefinition.Module))
                         {
                             ApplicationTypes.CheckMethod(constructor);
                             if (!constructorDefinition.IsPublic && constructorDefinition.DeclaringType != method.DeclaringType) throw new InvalidDataException("Nonpublic application constructor unsupported.");
@@ -368,7 +390,7 @@ static class UnionImport
                             if (function.HasThis)
                             {
                                 var owner = ProfileType(function.DeclaringType);
-                                var adapterName = "DelegateTarget_" + function.MetadataToken.ToUInt32().ToString("x8") + (addressSlot.VirtualFunction ? "Virtual" : "Direct");
+                                var adapterName = "DelegateTarget_" + MetadataIdentity.FunctionName(function) + (addressSlot.VirtualFunction ? "Virtual" : "Direct");
                                 var callInstruction = addressSlot.VirtualFunction ? "callvirt" : "call";
                                 var body = new StringBuilder($".method instance {adapterName}({string.Join(',', targetArguments)}) -> {signature[^1]}\nldarg 0\n");
                                 var adapterOwner = owner;
@@ -496,17 +518,6 @@ static class UnionImport
                         Call call;
                         if (targetMethod.Module == app.MainModule || guestLibraries.Contains(targetMethod.Module))
                         {
-                            if (guestLibraries.Contains(targetMethod.Module))
-                            {
-                                if (!targetMethod.IsStatic || targetMethod.IsConstructor)
-                                    throw new InvalidDataException("Library profile admits only nongeneric static methods.");
-                                if (targetMethod.Module != method.Module)
-                                {
-                                    for (var owner = targetMethod.DeclaringType; owner is not null; owner = owner.DeclaringType)
-                                        if (!(owner.IsPublic || owner.IsNestedPublic))
-                                            throw new InvalidDataException("Nonpublic library type access unsupported.");
-                                }
-                            }
                             ApplicationTypes.CheckMethod(reference); ApplicationTypes.CheckMethod(targetMethod);
                             if (reference.HasThis != targetMethod.HasThis || instruction.OpCode.Code == Code.Callvirt && targetMethod.IsStatic) throw new InvalidDataException("Invalid application call receiver.");
                             if (!targetMethod.IsPublic && targetMethod.DeclaringType != method.DeclaringType)
@@ -631,14 +642,14 @@ static class UnionImport
                 .Select(m => new { AssemblyIdentity = m.Module.Assembly.Name.FullName, MethodToken = m.MetadataToken.ToUInt32(), MetadataName = m.FullName,
                     RuntimeName = m.HasThis && !(m.IsConstructor && m.DeclaringType.IsValueType)
                         ? MetadataIdentity.TypeName(m.DeclaringType) + "::" + ApplicationTypes.MethodName(m) : Name(m) }),
-            Profile = collectionProfile ? "result-option-void-static-libraries-v10" : "result-option-void-files-strings-arrays-v7",
+            Profile = collectionProfile ? "result-option-void-instance-libraries-v11" : "result-option-void-files-strings-arrays-v7",
             RequiredLibraryProfile = collectionProfile ? "raven-collections" : "bundled-system", ApplicationSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(application))),
             CoreSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(core))), DependencyImages = dependencies.Select(path => new { AssemblyIdentity = System.Reflection.AssemblyName.GetAssemblyName(path).FullName,
                 Sha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(path))) }),
             ReachableMethods = seen.Select(m => new { AssemblyIdentity = m.Module.Assembly.Name.FullName, MethodToken = m.MetadataToken.ToUInt32() }),
             Mappings = mappings.Select(m => new { AssemblyIdentity = m.Method.Module.Assembly.Name.FullName, MethodToken = m.Method.MetadataToken.ToUInt32(), m.Offset,
                 OutputLabel = $"M{m.MethodId:x8}_IL_{m.Offset:x4}:", OutputLine = labelLines[$"M{m.MethodId:x8}_IL_{m.Offset:x4}:"] }),
-            Scope = "Bounded application class/value fields, constructors and instance methods; Int32/String vectors, optional closed collection references, file UTF-8 APIs, String helpers and generic Result/Option bindings; CFG stack/definite-assignment checked; observable default carriers rejected; explicit nongeneric static library bodies admitted; no reference-core declaration bodies executed."
+            Scope = "Bounded application class/value fields, constructors and instance methods; Int32/String vectors, optional closed collection references, file UTF-8 APIs, String helpers and generic Result/Option bindings; CFG stack/definite-assignment checked; observable default carriers rejected; explicit nongeneric library types and bodies admitted; no reference-core declaration bodies executed."
         }, new JsonSerializerOptions { WriteIndented = true }));
     }
 

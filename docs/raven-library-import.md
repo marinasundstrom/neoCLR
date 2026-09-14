@@ -1,8 +1,8 @@
-# Separate Raven libraries: static-method checkpoint
+# Separate Raven libraries
 
 Source experiment, 2026-09-14. Ordinary Raven compilation can now produce a library
-DLL and a separate consumer DLL whose reachable nongeneric static library methods
-are imported into one neoCLR program. The System-library migration remains paused.
+DLL and a separate consumer DLL whose nongeneric library types and supported method
+bodies are imported into one neoCLR program. The System-library migration remains paused.
 
 ## Build and import
 
@@ -44,6 +44,9 @@ Use a fresh output directory for each attempt.
 
 - Nongeneric static methods, including calls between libraries, recursion and normal
   calls to supported core-library APIs.
+- Constructors, class/value fields, properties through accessors, abstract bases,
+  inheritance, virtual/interface dispatch and static/class method-group delegates
+  use the same bounded rules as application-owned types.
 - Cross-assembly calls require public methods and publicly visible enclosing types.
   Existing same-type private calls remain possible. This is not a complete CLI
   accessibility implementation (`internal`, friend assemblies and protected access
@@ -57,8 +60,8 @@ Use a fresh output directory for each attempt.
 - Existing supported scalar/closed signatures and instruction rules apply. Static
   initializers, exception handlers and unsupported instructions continue to fail.
 
-Library-owned instance types, constructors, generic method/type bodies and library
-method-group/delegate targets remain outside this slice. Passing existing core generic
+Generic method/type bodies, explicit/default interface implementations, value-type
+interface implementations and value-type instance delegate targets remain unsupported. Passing existing core generic
 values is not evidence of generic-body importing. Reference-only libraries with no
 executable method body are not implementations; reachable missing bodies are rejected.
 
@@ -85,10 +88,10 @@ Keeping Raven's ordinary metadata references and emission avoids a compiler-side
 per-library catalog. Explicit closure resolution remains more restrictive than .NET
 loading: no probing, unification, forwarding or runtime loading is claimed.
 
-Admitting only static bodies is a provisional capability slice, not the desired final
-library model. It gives separate-compilation evidence without simultaneously changing
-instance type ownership, generics and dispatch. A full general importer is the next
-step; adding individual API translation entries would not establish that capability.
+The initial static-only slice established separate-compilation evidence. The current
+instance-type slice reuses existing runtime layouts and dispatch; it does not add
+per-library API translations. Generic bodies are the next capability to investigate.
+The importer remains bounded and is not yet a general CLI loader.
 The cost is a bounded import/link stage and projected intermediate DLLs.
 
 Run the source regression suite with a generated target project:
@@ -104,7 +107,7 @@ It independently compiles two libraries and a consumer. The positive program com
 a direct imported namespace-function call and recursive static calls, checks reused method tokens
 across assemblies, executes with reversed input order, and checks source-map labels.
 Negative cases cover missing/duplicate dependencies, an implementation with a private
-method, a changed signature and unsupported library instance construction. Existing
+method and a changed signature. The later instance checks below cover the expanded boundary. Existing
 application and normal compiler/import suites cover the retained single-program path.
 
 Checkpoint results: seven library checks, 15 application checks and five normal
@@ -134,3 +137,35 @@ resume the System-library migration or expand the generic/instance-body boundary
 Namespace follow-up validation: 47 focused Raven tests, 54 imports-and-namespaces
 tests, eight target namespace checks, seven separate-library checks and five normal
 compiler/import checks passed. The test sets overlap; these are separate suite totals.
+
+## Library-owned instance types
+
+The importer now resolves application and library types from the explicit assembly
+set. Assembly-qualified type identity distinguishes equal namespace/type names in
+different libraries. Delegate helper identities also include their assembly/signature
+scope. `TypeIdentities` in the source-map sidecar now includes `AssemblyIdentity`.
+
+Cross-assembly type visibility is checked on method signatures, locals, instruction
+operands and inherited contracts. Field/method/constructor access retains the existing
+public-or-same-declaring-type rule; this does not add general protected/internal access.
+Checks operate on metadata before execution, including when an implementation DLL has
+been replaced after compiling the consumer. Core reference metadata remains distinct
+from executable guest libraries.
+
+This follows the CLI separation of assembly ownership from type layout and dispatch,
+using the existing [identity comparison](raven-import-identities.md#problem-and-baseline).
+There is no new runtime opcode or Raven compiler change in this slice. The benefit is
+reuse of normal separately compiled class/value APIs. The cost is validating visibility
+and traversing definitions across the supplied assembly set; eager import of all
+instance methods of an admitted type can still reject unused unsupported bodies.
+
+Validation covers a library abstract base/interface and a derived class in a second
+library, constructor chaining, inherited property access, virtual/interface calls,
+method-group delegates surviving GC, struct copies and collection references. Another
+case imports two libraries that independently define `Shared.Item` and verifies their
+different behavior. Reversed input order passes. Replaced implementations with a
+hidden base type or private base constructor fail, and generic bodies remain rejected.
+
+Current results: 13 library checks, 15 application checks and five normal
+compiler/import checks passed. Rebuild generated IL/maps with this source bridge;
+installed tools and the paused System-library migration are unchanged.

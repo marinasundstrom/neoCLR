@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-14
 
+- Extended explicit Raven library imports to nongeneric class/value types,
+  constructors, fields/accessors, inheritance, interface/virtual calls and static/class
+  method-group delegates. Added cross-assembly type visibility checks and qualified
+  delegate helper identities. Regressions cover GC, value copies, duplicate type names
+  across assemblies and rejected hidden types/private constructors/generic bodies.
+  Source maps now qualify type records by assembly. Rebuild generated IL/maps; no Raven
+  or runtime opcode change, installed-tool refresh or System-library migration.
+
 - Fixed direct wildcard imports of namespace functions from Raven libraries by
   adding the target TopLevelAttribute metadata declaration and correcting Raven's
   marker lookup and imported-member completion on an isolated feature branch.
