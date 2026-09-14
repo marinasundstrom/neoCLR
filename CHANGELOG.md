@@ -6,6 +6,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-09-14
+
+- Updated the website download link after publishing Preview 6 at `5c52b4b`, with
+  experimental Raven `0.1.12-neoclr.13` from `246d697bf`. All six source CI jobs,
+  15 extracted-package suites, both language-server checks and isolated VSIX
+  installation passed. Verified all eight uploaded asset digests. Recorded the
+  release conversation and completed outcome; published release sections stay frozen.
+
 ## 0.1.0-preview.6 — 2026-09-14
 
 Stabilization and collection APIs, with a freshly synchronized experimental Raven

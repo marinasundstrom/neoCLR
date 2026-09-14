@@ -2713,3 +2713,28 @@ validation. See Raven's `docs/compiler/main-stability-audit.md` for the audit sc
 checks and was integrated into Raven main at `35a9df494`. Temporary audit/integration
 branches were removed. Broader baseline and sample results retain their original
 commit scope; release validation remains outstanding.
+
+## Publishing the stabilized preview — 2026-09-14
+
+**Author direction:** “Then its perhaps time for a new preview release of neoCLR”.
+This followed the requirement to keep Raven main stable, integrate general compiler
+fixes there, and retain neoCLR-specific integration on the experimental branch.
+
+**Assistant action:** Synchronized the experimental Raven branch with the reviewed
+main fixes, built a fresh SDK/VSIX and prepared Preview 6. Release validation found
+Rust syntax newer than the declared minimum, preview samples being checked against
+the historical library, and additional extension dependency notices. Corrected those
+issues and reran validation against the selected source and packaged artifacts.
+
+**Outcome:** Published [Preview 6](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.6)
+from neoCLR `5c52b4bce2da2ef31f279d0f5f3fa924b82baf61`, with experimental Raven
+`0.1.12-neoclr.13` from `246d697bf6c69ff8cc56ca4859879edd7c081e7d` on
+`codex/neoclr-namespace-metadata`. All six Linux/macOS/Windows stable/minimum-Rust
+source CI jobs passed, along with 15 extracted-package suites, the match/signature
+checks, both packaged language servers and isolated VSIX installation. All eight
+uploaded asset digests were verified. The release includes source, the macOS arm64
+runtime bundle, separate Raven SDK/VSIX, notices and validation evidence.
+
+**Still separate:** This is the neoCLR experiment, not a full Raven release gate.
+The earlier main audit's MacCatalyst/Xcode limitation remains documented. Runtime
+library migration to Raven and broader semantic changes remain deferred.
