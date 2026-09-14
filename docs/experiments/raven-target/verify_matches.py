@@ -7,6 +7,7 @@ import subprocess
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('probe', type=Path)
 parser.add_argument('--runtime', required=True, type=Path)
+parser.add_argument('--system', type=Path, help='Matching preview runtime library')
 args = parser.parse_args()
 results = json.loads((args.probe / 'match-results.json').read_text())
 accepted = {
@@ -32,7 +33,8 @@ for name, expected in accepted.items():
         raise AssertionError((name, results[name]))
     artifact = args.probe / (name + '.neoil')
     for command in ('verify', 'run'):
-        run = subprocess.run([str(args.runtime.resolve()), command, str(artifact.resolve())],
+        options = ['--system', str(args.system.resolve())] if args.system else []
+        run = subprocess.run([str(args.runtime.resolve()), command, str(artifact.resolve()), *options],
                              capture_output=True, text=True, timeout=45)
         if run.returncode or (command == 'run' and run.stdout != expected):
             raise AssertionError((name, command, run.stdout, run.stderr))

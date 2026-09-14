@@ -18,6 +18,8 @@ validation are required before publication; release assets carry the evidence.
   Moved managed-array and native-memory IL samples into the current preview sample
   set so they use its System library, separate from historical Neo library tests.
   Both are now verified and executed by the packaged direct-IL smoke check.
+  The packaged match-matrix verifier also accepts the matching System library
+  explicitly, avoiding accidental fallback to the historical bootstrap library.
 
 - Recorded the clarified CLI-compatible target-model direction and release-first
   stabilization plan: no neoCLR-specific code, mappings or tests enter Raven main
