@@ -2606,3 +2606,21 @@ generic application bodies; the migration is not yet implemented by this checkpo
   namespace test. Compiler source was unchanged by this merge; 50 focused tests passed.
   The experimental branch now contains main as an ancestor. This merge direction does
   not bring experimental policy onto main.
+
+## Release stabilization before library migration — 2026-09-14
+
+**Author direction:** “Our goal is to fix these things before we make the next
+release. After that we can worry about migrating code from neoil to Raven.”
+This follows the directive to integrate general compiler fixes into Raven main
+while retaining experimental neoCLR target behavior on a separate branch.
+
+**Assistant response and action:** Continued independent review of closed-generic
+metadata emission, using ordinary .NET reference assemblies and Raven's existing
+EmitOptions contract. The adapted regression reproduces an emission failure on
+main. The fix was subsequently integrated into Raven main at `031b9aaaa`: 18 focused
+checks and the .NET 10/.NET 11 build/run matrix passed. Remaining fixes and release
+validation are still pending; this entry does not report a release.
+
+**Outcome/direction:** Stabilizing the compiler/importer integration is a prerequisite
+for the next release. Authoring the runtime library in Raven is deferred until after
+that release; the current neoIL library remains the implementation during this work.

@@ -10,6 +10,24 @@ with consistent target support. Raven should compile for both .NET and neoCLR th
 its normal compiler and project model. Retaining a loader/importer is compatible with
 that goal; relying on it to repair language semantics is not.
 
+The author clarified on 2026-09-14 that the remaining stabilization fixes are to
+precede the next release. Runtime-library migration from neoIL to Raven is deferred
+until after that release, rather than being a release prerequisite.
+
+## Closed-generic metadata follow-through — 2026-09-14
+
+Raven main includes `031b9aaaa`, independently extracted from `17c9f8b82`.
+Reference-only generic types remain in metadata during target-core emission;
+member definitions retain their generic parameter signatures and by-reference
+parameter shapes. The ordinary-reference regression failed before the fix and
+passed afterwards, without experimental metadata-import options. All 18 focused
+checks and the repository .NET 10/.NET 11 build/run matrix passed.
+
+The experimental Raven branch already contains the implementation; it remains
+separate and has not been synchronized with the latest two main commits. Constructor
+emission (`995a4c982`) is the next independent review. This is a stabilization
+checkpoint, not completion of the remaining fixes or the release gate.
+
 ## Pointer emission follow-through — 2026-09-14
 
 Raven main now includes `521711bec`, independently extracted from experiment commit

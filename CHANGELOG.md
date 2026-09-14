@@ -18,7 +18,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   pointer metadata-emission fix into Raven main at 521711bec: retargeted void-pointer
   signatures now emit successfully, with 53 focused checks passing. The experimental
   branch already has the implementation; migration remains paused. No neoCLR runtime
-  behavior change.
+  behavior change. Subsequently integrated closed-generic reference metadata emission
+  into Raven main at 031b9aaaa; 18 focused checks and the repository .NET 10/.NET 11
+  build/run matrix passed. Recorded the author's release ordering: complete the
+  stabilization fixes before the next release, then revisit neoIL-to-Raven migration.
 
 - Extended explicit Raven library imports to nongeneric class/value types,
   constructors, fields/accessors, inheritance, interface/virtual calls and static/class
