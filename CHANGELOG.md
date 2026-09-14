@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-14
 
+- Added bounded separate Raven library importing for nongeneric static methods,
+  including intra-library namespace functions through existing CLI metadata. Dependencies
+  are explicit and closure-audited; cross-assembly private calls and unsupported
+  library instance bodies are rejected. Method queues now distinguish assemblies
+  with reused tokens; source maps carry assembly identities and explicit output labels.
+  Breaking generated-map schema: rebuild IL/maps and use the updated tools. Library
+  migration stays paused; generic bodies and library-owned instance types remain open.
+  Seven library, 15 application and five compiler/import checks pass. Recorded a Raven
+  gap in direct wildcard discovery of namespace functions from separate DLL metadata.
+
 - Replaced application type/field/function row-token names in the Raven importer
   with assembly/signature-based identities and collision-safe member escaping.
   Added readable metadata-to-runtime mappings to source-map sidecars and regression

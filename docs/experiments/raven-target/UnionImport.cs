@@ -23,21 +23,24 @@ static class UnionImport
     sealed record State(List<Slot> Stack, bool[] Assigned);
     sealed record Call(string Name, string[] Arguments, string Result, int OutArgument = -1, string? Instruction = null, bool ConditionalOutput = false);
 
-    public static void Write(string application, string core, string destination, bool collectionProfile = false)
+    public static void Write(string application, string core, string destination, bool collectionProfile = false, params string[] dependencies)
     {
+        if (dependencies.Length > 8) throw new InvalidDataException("Library input limit exceeded.");
         GenericUnionBindings.Reset();
         CollectionBindings.Reset(); ReflectionBindings.Reset();
         DelegateBindings.Reset();
-        foreach (var path in new[] { application, core })
+        var inputs = new[] { application, core }.Concat(dependencies).ToArray();
+        foreach (var path in inputs)
             if (new FileInfo(path).Length > 16 * 1024 * 1024) throw new InvalidDataException("Image exceeds profile limit.");
-        VoidStorageValidation.Check(application);
-        var errors = ClosureAudit.Inspect(application, core);
+        foreach (var path in new[] { application }.Concat(dependencies)) VoidStorageValidation.Check(path);
+        var errors = ClosureAudit.Inspect(inputs);
         if (errors.Length != 0) throw new InvalidDataException(string.Join("\n", errors));
         using var resolver = new ClosureAudit.SuppliedAssemblies();
-        resolver.Add(application); resolver.Add(core);
+        foreach (var path in inputs) resolver.Add(path);
         var app = resolver.Images.Single(a => a.Name.FullName == System.Reflection.AssemblyName.GetAssemblyName(application).FullName);
         var library = resolver.Images.Single(a => a.Name.FullName == System.Reflection.AssemblyName.GetAssemblyName(core).FullName);
-        if (app.MainModule.Types.Any(t => t.Name == "<Module>" && t.Methods.Any(m => m.IsConstructor && m.IsStatic)))
+        var guestLibraries = resolver.Images.Where(a => a != app && a != library).Select(a => a.MainModule).ToHashSet();
+        if (guestLibraries.Append(app.MainModule).Any(module => module.Types.Any(t => t.Name == "<Module>" && t.Methods.Any(m => m.IsConstructor && m.IsStatic))))
             throw new InvalidDataException("Module initializers unsupported.");
         ApplicationTypes.Reset(app.MainModule);
         var entry = app.EntryPoint ?? throw new InvalidDataException("Missing entry point.");
@@ -68,13 +71,14 @@ static class UnionImport
             return call with { Name = helper.Name, Arguments = actual, Instruction = null };
         }
         var delegateAdapters = new Dictionary<string, string>();
-        var mappings = new List<(uint MethodToken, int Offset)>();
+        var mappings = new List<(MethodDefinition Method, int MethodId, int Offset)>();
         var pending = new Queue<MethodDefinition>(); pending.Enqueue(entry);
-        var seen = new HashSet<uint>();
+        var seen = new HashSet<MethodDefinition>();
         var instanceBodies = new Dictionary<MethodDefinition, string>();
         while (pending.TryDequeue(out var method))
         {
-            if (!seen.Add(method.MetadataToken.ToUInt32())) continue;
+            if (!seen.Add(method)) continue;
+            var methodId = seen.Count;
             if (seen.Count > 128) throw new InvalidDataException("Method limit exceeded.");
             ApplicationTypes.CheckMethod(method);
             if (!method.HasBody || method.IsPInvokeImpl || method.IsInternalCall || method.Body.HasExceptionHandlers
@@ -254,7 +258,7 @@ static class UnionImport
                         Expect("Int32"); Expect("Int32*"); code.AppendLine("stobj Int32"); break;
                     case Code.Ldsfld:
                         var field = ((FieldReference)instruction.Operand).Resolve();
-                        if (field is null || field.Module != app.MainModule || field.FullName != "System.Unit System.Unit::Value"
+                        if (field is null || field.Module != method.Module || field.FullName != "System.Unit System.Unit::Value"
                             || !field.IsStatic || !field.IsInitOnly || !field.DeclaringType.IsValueType
                             || field.DeclaringType.Fields.Any(f => !f.IsStatic)
                             || field.DeclaringType.Methods.Any(m => m.IsConstructor && m.IsStatic))
@@ -462,7 +466,7 @@ static class UnionImport
                     case Code.Pop: if (Pop().Type != "FaultNull") code.AppendLine("pop"); break;
                     case Code.Dup: var top = Pop(); Push(top); Push(top); if (top.Type != "FaultNull") code.AppendLine("dup"); break;
                     case Code.Br: case Code.Br_S:
-                        var branch = Target(); successors.Add(branch); code.AppendLine($"br M{method.MetadataToken.ToUInt32():x8}_IL_{instructions[branch].Offset:x4}"); terminates = true; break;
+                        var branch = Target(); successors.Add(branch); code.AppendLine($"br M{methodId:x8}_IL_{instructions[branch].Offset:x4}"); terminates = true; break;
                     case Code.Beq: case Code.Beq_S: case Code.Bne_Un: case Code.Bne_Un_S:
                     case Code.Bgt: case Code.Bgt_S: case Code.Bgt_Un: case Code.Bgt_Un_S:
                     case Code.Blt: case Code.Blt_S: case Code.Blt_Un: case Code.Blt_Un_S:
@@ -473,7 +477,7 @@ static class UnionImport
                         var comparisonTarget = Target(); successors.Add(comparisonTarget);
                         var comparisonOpcode = instruction.OpCode.Name;
                         if (comparisonOpcode.EndsWith(".s", StringComparison.Ordinal)) comparisonOpcode = comparisonOpcode[..^2];
-                        code.AppendLine($"{comparisonOpcode} M{method.MetadataToken.ToUInt32():x8}_IL_{instructions[comparisonTarget].Offset:x4}");
+                        code.AppendLine($"{comparisonOpcode} M{methodId:x8}_IL_{instructions[comparisonTarget].Offset:x4}");
                         break;
                     case Code.Brtrue: case Code.Brtrue_S: case Code.Brfalse: case Code.Brfalse_S:
                         var condition = Pop();
@@ -484,14 +488,25 @@ static class UnionImport
                             var success = (bool[])assigned.Clone(); success[condition.ConditionalOut] = true;
                             assignmentEdges[instruction.OpCode.Code is Code.Brtrue or Code.Brtrue_S ? conditional : index + 1] = success;
                         }
-                        code.AppendLine($"{(instruction.OpCode.Code is Code.Brtrue or Code.Brtrue_S ? "brtrue" : "brfalse")} M{method.MetadataToken.ToUInt32():x8}_IL_{instructions[conditional].Offset:x4}"); break;
+                        code.AppendLine($"{(instruction.OpCode.Code is Code.Brtrue or Code.Brtrue_S ? "brtrue" : "brfalse")} M{methodId:x8}_IL_{instructions[conditional].Offset:x4}"); break;
                     case Code.Call:
                     case Code.Callvirt:
                         var reference = (MethodReference)instruction.Operand;
                         var targetMethod = ClosureAudit.ResolveMethod(reference) ?? throw new InvalidDataException("Unresolved call.");
                         Call call;
-                        if (targetMethod.Module == app.MainModule)
+                        if (targetMethod.Module == app.MainModule || guestLibraries.Contains(targetMethod.Module))
                         {
+                            if (guestLibraries.Contains(targetMethod.Module))
+                            {
+                                if (!targetMethod.IsStatic || targetMethod.IsConstructor)
+                                    throw new InvalidDataException("Library profile admits only nongeneric static methods.");
+                                if (targetMethod.Module != method.Module)
+                                {
+                                    for (var owner = targetMethod.DeclaringType; owner is not null; owner = owner.DeclaringType)
+                                        if (!(owner.IsPublic || owner.IsNestedPublic))
+                                            throw new InvalidDataException("Nonpublic library type access unsupported.");
+                                }
+                            }
                             ApplicationTypes.CheckMethod(reference); ApplicationTypes.CheckMethod(targetMethod);
                             if (reference.HasThis != targetMethod.HasThis || instruction.OpCode.Code == Code.Callvirt && targetMethod.IsStatic) throw new InvalidDataException("Invalid application call receiver.");
                             if (!targetMethod.IsPublic && targetMethod.DeclaringType != method.DeclaringType)
@@ -580,8 +595,8 @@ static class UnionImport
                     else if (locals[n] != Carrier && locals[n] != Option && locals[n] != VoidOption && locals[n] != VoidResult && locals[n] != "String" && !NeedsInitialization(locals[n])) output.AppendLine(Default(locals[n]) + $"\nstloc local{n}");
             foreach (var index in bodies.Keys.Order())
             {
-                mappings.Add((method.MetadataToken.ToUInt32(), instructions[index].Offset));
-                output.AppendLine($"M{method.MetadataToken.ToUInt32():x8}_IL_{instructions[index].Offset:x4}:").Append(bodies[index]);
+                mappings.Add((method, methodId, instructions[index].Offset));
+                output.AppendLine($"M{methodId:x8}_IL_{instructions[index].Offset:x4}:").Append(bodies[index]);
             }
             output.AppendLine(".end");
             if (emitInstance) { instanceBodies[method] = output.ToString(methodStart, output.Length - methodStart); output.Length = methodStart; }
@@ -612,14 +627,18 @@ static class UnionImport
         File.WriteAllText(destination + ".map.json", JsonSerializer.Serialize(new {
             IdentityEncoding = "assembly-signature-v1",
             AssemblyIdentity = app.Name.FullName, TypeIdentities = ApplicationTypes.IdentityMap(),
-            MethodIdentities = app.MainModule.GetTypes().SelectMany(t => t.Methods).Where(m => seen.Contains(m.MetadataToken.ToUInt32()))
-                .Select(m => new { MethodToken = m.MetadataToken.ToUInt32(), MetadataName = m.FullName,
+            MethodIdentities = seen
+                .Select(m => new { AssemblyIdentity = m.Module.Assembly.Name.FullName, MethodToken = m.MetadataToken.ToUInt32(), MetadataName = m.FullName,
                     RuntimeName = m.HasThis && !(m.IsConstructor && m.DeclaringType.IsValueType)
                         ? MetadataIdentity.TypeName(m.DeclaringType) + "::" + ApplicationTypes.MethodName(m) : Name(m) }),
-            Profile = collectionProfile ? "result-option-void-application-types-v9" : "result-option-void-files-strings-arrays-v7",
+            Profile = collectionProfile ? "result-option-void-static-libraries-v10" : "result-option-void-files-strings-arrays-v7",
             RequiredLibraryProfile = collectionProfile ? "raven-collections" : "bundled-system", ApplicationSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(application))),
-            CoreSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(core))), ReachableMethods = seen.Order().ToArray(), Mappings = mappings.Select(m => new { m.MethodToken, m.Offset, OutputLine = labelLines[$"M{m.MethodToken:x8}_IL_{m.Offset:x4}:"] }),
-            Scope = "Bounded application class/value fields, constructors and instance methods; Int32/String vectors, optional closed collection references, file UTF-8 APIs, String helpers and generic Result/Option bindings; CFG stack/definite-assignment checked; observable default carriers rejected; no guest declaration bodies executed."
+            CoreSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(core))), DependencyImages = dependencies.Select(path => new { AssemblyIdentity = System.Reflection.AssemblyName.GetAssemblyName(path).FullName,
+                Sha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(path))) }),
+            ReachableMethods = seen.Select(m => new { AssemblyIdentity = m.Module.Assembly.Name.FullName, MethodToken = m.MetadataToken.ToUInt32() }),
+            Mappings = mappings.Select(m => new { AssemblyIdentity = m.Method.Module.Assembly.Name.FullName, MethodToken = m.Method.MetadataToken.ToUInt32(), m.Offset,
+                OutputLabel = $"M{m.MethodId:x8}_IL_{m.Offset:x4}:", OutputLine = labelLines[$"M{m.MethodId:x8}_IL_{m.Offset:x4}:"] }),
+            Scope = "Bounded application class/value fields, constructors and instance methods; Int32/String vectors, optional closed collection references, file UTF-8 APIs, String helpers and generic Result/Option bindings; CFG stack/definite-assignment checked; observable default carriers rejected; explicit nongeneric static library bodies admitted; no reference-core declaration bodies executed."
         }, new JsonSerializerOptions { WriteIndented = true }));
     }
 

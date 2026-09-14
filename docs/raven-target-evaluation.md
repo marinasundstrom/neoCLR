@@ -41,7 +41,11 @@ Installed tools and demos are unchanged.
 Application type/field/function naming now follows
 [assembly/signature identities](raven-import-identities.md), with original names in
 source-map sidecars. This removes public application row-token naming; separate
-library loading and general signature/dispatch importing remain open.
+general signature/dispatch importing remain open. A subsequent
+[static-library checkpoint](raven-library-import.md) admits explicitly supplied
+nongeneric static bodies and intra-library namespace-function calls through their
+existing CLI metadata. Direct consumer wildcard discovery of library namespace
+functions currently reports RAV0103 and needs Raven-side investigation. Generic bodies and library-owned instance types remain open.
 
 ## Initial assessment evidence
 

@@ -56,7 +56,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-application-check-') as temporar
         lines = artifact.read_text().splitlines()
         mapping = json.loads(Path(str(artifact) + '.map.json').read_text())
         for entry in mapping['Mappings']:
-            assert lines[entry['OutputLine'] - 1] == f"M{entry['MethodToken']:08x}_IL_{entry['Offset']:04x}:"
+            assert lines[entry['OutputLine'] - 1] == entry['OutputLabel']
     for label, text in [
         ('Type initializer', source.replace('class Counter {', 'class Counter { static init { WriteLine("Unexpected") }')),
         ('Readonly field', source.replace('class Counter {', 'class Counter { readonly field Id: int = 1')),

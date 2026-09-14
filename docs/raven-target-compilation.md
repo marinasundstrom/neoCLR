@@ -105,3 +105,6 @@ until native loading and general metadata resolution are ready.
 
 Application symbols now use [assembly/signature identities](raven-import-identities.md);
 private generated helpers and source locations retain module-local token information.
+
+For independently compiled dependencies, see the bounded
+[static library import workflow](raven-library-import.md).

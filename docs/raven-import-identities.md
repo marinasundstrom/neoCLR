@@ -78,3 +78,7 @@ that generic declaration bodies can be imported.
 
 Validation at this checkpoint: 12 metadata identity checks, 15 application checks
 and five normal compiler/import checks passed, including sidecar identity assertions.
+
+Subsequent checkpoint: [static library importing](raven-library-import.md) now uses
+these symbol identities across explicitly supplied assemblies. It replaces token-only
+work queues and source-map labels with assembly-qualified records and import-local IDs.
