@@ -46,6 +46,16 @@ array signatures. Array base members and interface members such as GetIterator a
 available directly; arbitrary members on the metadata class are not projected. The reference declaration and
 runtime implementation must stay aligned; the interface probe checks the shape.
 
+## Planned API follow-through — 2026-09-14
+
+Use the generic array shape for the proposed `Array<T>.Empty` static getter-only
+property and instance `ForEach(action)` method, retaining `Func<T, Void>` callbacks.
+The receiver supplies the array and element type for ForEach. This is a source API
+change from the current static helper; runtime members, reference metadata and Raven
+member lookup must be updated and tested together. The existing implementation
+above remains current until that slice lands. See the
+[target assessment](raven-target-evaluation.md#generic-array-api-direction-2026-09-14).
+
 ## Try the direct IL examples
 
 From the repository root, choose an unused output path (the generator refuses to

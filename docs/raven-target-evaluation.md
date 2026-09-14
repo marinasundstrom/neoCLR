@@ -577,7 +577,7 @@ was also removed. Active worktrees, the experiment and unrelated branches remain
 These are ref deletions; the retained branches preserve all of this history.
 
 
-### Generic array empty-value API direction (2026-09-14)
+### Generic array API direction (2026-09-14)
 
 The author proposes `System.Array<T>.Empty`, probably a static property: the closed
 array type supplies the element type. This differs from .NET's
@@ -591,3 +591,13 @@ and validated. Keep the general Raven array-factory review independent: an empty
 collection expression must not assume a factory absent from the target metadata;
 a zero-length array allocation is a possible fallback. Do not add a hardcoded
 neoCLR property lookup to Raven main.
+
+
+The author also directed the array review toward an instance `Array<T>.ForEach`.
+The proposed call is `items.ForEach(action)`, with the receiver providing the array
+and T, and the existing `Func<T, Void>` callback contract retained. Compared with
+the static `Array.ForEach<T>(array, action)` shape, this removes redundant array and
+method-type arguments and places iteration on the same generic API as other array
+members. It changes the source API and requires the runtime library, reference
+metadata and Raven array-member projection to agree. It is planned, not implemented;
+keep any target-specific projection changes on Raven's experimental branch.

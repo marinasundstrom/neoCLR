@@ -13,9 +13,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   .NET 10/.NET 11 build/run matrix passed. Kept array-factory review, experimental
   synchronization and installed-tool refresh pending; library migration stays paused.
 
-- Recorded the proposed `Array<T>.Empty` property and its distinction from .NET
-  `Array.Empty<T>()`. Kept the API and experimental compiler mapping explicitly
-  pending, separate from general Raven array-factory capability handling.
+- Recorded the proposed `Array<T>.Empty` property and instance `ForEach(action)`
+  method, compared with the static .NET helper APIs. Kept API changes and experimental
+  compiler mapping explicitly pending, separate from general Raven array-factory
+  capability handling. Linked the generic-array documentation to the planned slice.
 
 - Recorded the author's indexer-completion report and Raven main fix `ac4901f6b`:
   indexers require `[index]` access; their metadata names no longer behave as ordinary

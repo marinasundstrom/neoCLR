@@ -2889,3 +2889,10 @@ array when a target lacks that factory.
 The property and its compiler mapping are proposals, not implemented in this entry.
 Any neoCLR-specific mapping remains on Raven's experimental branch; general
 metadata-capability handling belongs on Raven main after independent validation.
+
+
+**Follow-up direction:** The author pointed out that ForEach no longer needs to be
+static with `Array<T>`. The assistant proposed an instance `ForEach(action)` method,
+with the receiver supplying both the array and its element type, retaining the
+existing `Func<T, Void>` callback contract. This is recorded for the array API slice;
+the static implementation has not yet been replaced.
