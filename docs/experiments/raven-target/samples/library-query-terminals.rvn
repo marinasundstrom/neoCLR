@@ -26,7 +26,7 @@ func OnlyPositive(values: Iterable<int>) -> Result<int, SingleError> {
 
 func FirstPositive(values: Iterable<int>) -> Option<int> {
     let value = values.First((number: int) -> bool => number > 0)?
-    return Option<int>(Option.Some<int>(value))
+    return Some(value)
 }
 
 func Main() {

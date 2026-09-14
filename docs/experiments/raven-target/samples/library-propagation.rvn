@@ -4,7 +4,7 @@ import System.Console.*
 func Normalize(value: int) -> Result<int, OverflowError> {
     let amount = Math.Abs(value)?
     WriteLine("Continued")
-    return Result<int, OverflowError>(Result.Ok<int>(amount))
+    return Result<int, OverflowError>.Ok(amount)
 }
 
 func Show(value: int) {

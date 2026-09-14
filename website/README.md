@@ -1,11 +1,14 @@
 # Project website
 
 A small static site presenting the current runtime/Raven experiment, its influences, implemented features and open research questions. Plain HTML/CSS,
-no JavaScript runtime, remote fonts, analytics or package installation. The Python
-build inserts escaped excerpts from the executable Raven and neoIL examples, checks
+no browser JavaScript, remote fonts or analytics. Node.js 22 and two pinned
+build-time tokenizer dependencies provide Raven syntax highlighting. The Python
+build inserts escaped, highlighted excerpts from the executable Raven and neoIL examples, checks
 local assets and anchors, and writes only the public site to `target/website`.
 
 ```sh
+npm ci --prefix website --ignore-scripts
+npm test --prefix website
 python3 scripts/build-website.py
 python3 -m http.server 8765 --directory target/website
 ```
@@ -25,9 +28,9 @@ To enable once, use Settings → Pages → Build and deployment → Source → G
 or `gh api --method POST repos/marinasundstrom/neoCLR/pages -f build_type=workflow`.
 The site is independent of publishing a runtime release or a Raven Marketplace extension.
 
-The homepage embeds eight excerpts: Result propagation, generic Void in neoIL,
+The homepage embeds nine excerpts: Result propagation, generic Void in neoIL,
 optional query results, collection capabilities, UTF-8 slicing, query cardinality,
-Func callbacks with a Void result and calendar validation. The narrative covers
+Func callbacks with a Void result, calendar validation and imported union patterns. The narrative covers
 familiar semantics/metadata, the type system, the class library, Raven migration
 and tooling, and the planned Raven-authored library and missing API work.
 Edit the executable samples rather than duplicating code in HTML. The Pages workflow
@@ -38,3 +41,15 @@ open research and avoid unsupported performance or compatibility claims.
 The invitation welcomes discussion in the general sense, including questions,
 criticism and use cases. GitHub Issues is an available contact route; the page does
 not require the GitHub Discussions feature.
+
+Highlighting follows MyServiceBus's TextMate/Oniguruma integration, adapted to static
+HTML generation in `highlight.mjs`. The vendored Raven grammar comes from
+`src/Raven.VSCode/syntaxes/raven.tmLanguage.json` at Raven revision
+`246d697bf6c69ff8cc56ca4859879edd7c081e7d`; its MIT license is preserved in
+`syntaxes/Raven-LICENSE`. Update the grammar deliberately and run the tokenizer test.
+Only HTML/CSS and the logo are published; packages and WebAssembly stay build-time.
+NeoIL remains readable plain code; Raven tokens receive syntax colors.
+
+The primary order is Familiar, Runtime, Type system, Runtime class library, Migration,
+Tooling, and What's next. Library examples carry their own topic labels; extra union
+forms and deeper research are optional disclosures to keep the overview concise.

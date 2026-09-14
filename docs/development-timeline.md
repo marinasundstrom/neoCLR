@@ -2815,3 +2815,37 @@ compiler integration alone. The assistant revised the hero and platform/library
 introductions to connect type system, execution engine, class library and tools,
 with Raven as the demonstration language. The invitation asks visitors to help shape
 the platform; implemented differences and future investigations remain distinct.
+
+
+**Further structure and audience direction:** The author requested a concise overview
+organized as Familiar, Runtime, Type system, Runtime class library (Option, Result,
+unions, modernized APIs, collections, date/time and LINQ), Migration, Tooling and next
+implementation work. It should be relatable to .NET developers but stand on its own,
+explaining features, familiar behavior and differences rather than abstract sales
+copy. UTF-8 remains prominent. APIs are evolving and feedback is welcome.
+
+**Examples and highlighting:** The author requested Raven union sugar and a note
+about its multiple construction forms, plus syntax highlighting following the adjacent
+Raven repository or MyServiceBus's website. The supplied MyServiceBus path did not
+exist; the assistant found `/Users/robert/Projects/MyServiceBus` and inspected its
+TextMate/Oniguruma integration. Reused Raven's grammar with its MIT license and
+adapted tokenization to build-time HTML spans rather than shipping Monaco or a
+browser tokenizer. Added a test for token scopes, multiline comments, escaping and
+exact source-text preservation. Source examples now use qualified Result factories
+and imported Some construction; detailed union patterns and research are optional.
+
+**Validation scope:** The Result propagation and UTF-8 samples compiled, verified
+and ran using the locally available stabilization toolchain. A focused imported
+Some construction program also compiled and ran with result 42. The full current
+query sample could not run on that older package because its metadata predates the
+query-terminal APIs; no full query-suite pass is claimed. The original `.Some` trial
+failed and was replaced with the validated imported `Some(value)` form. No Raven or
+MyServiceBus source was edited. Continue the already authorized main/Pages workflow.
+
+**Invitation clarified:** The author reiterated that visitors should be invited to
+join the discussion and give feedback, specifically about the runtime and APIs.
+The closing section now names that focus directly.
+
+**Website checks:** HTML nesting, anchors and repository links passed. Desktop and
+390px mobile review confirmed the six-card library grid, highlighted code and union
+disclosure behavior without horizontal page overflow.

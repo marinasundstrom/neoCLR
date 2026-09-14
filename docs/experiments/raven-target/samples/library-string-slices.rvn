@@ -5,7 +5,7 @@ import System.Console.*
 func Extract(text: string, start: int, count: int) -> Result<string, Utf8SliceError> {
     let part = text.SliceUtf8(start, count)?
     WriteLine("Sliced")
-    return Result<string, Utf8SliceError>(Result.Ok<string>(part))
+    return Result<string, Utf8SliceError>.Ok(part)
 }
 func ShowSlice(result: Result<string, Utf8SliceError>) {
     match result {

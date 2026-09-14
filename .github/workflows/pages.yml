@@ -33,6 +33,15 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+      - name: Install website tokenizer
+        run: npm ci --prefix website --ignore-scripts
+      - name: Check Raven highlighting
+        run: npm test --prefix website
       - name: Build and check project site
         run: python scripts/build-website.py
       - name: Upload site

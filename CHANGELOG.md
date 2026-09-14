@@ -9,7 +9,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 ### 2026-09-14
 
 - Expanded the website with project influences, six implemented feature summaries
-  and eight excerpts sourced from executable Raven/neoIL samples. Added comparisons
+  and nine excerpts sourced from executable Raven/neoIL samples. Added comparisons
   and tradeoffs, corrected stale importer limitations, and separated open research
   from preview capabilities. Led with Raven code, retained neoIL as a supporting
   example, and invited general feedback and discussion. The Pages workflow now
@@ -22,7 +22,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   collector improvements as future investigations, separate from Raven VS Code
   source-debugging support. Positioned neoCLR as an independent managed software
   platform inspired by .NET, evolving through community feedback, with Raven
-  demonstrating the platform rather than defining its scope.
+  demonstrating the platform rather than defining its scope. Reorganized the page
+  around .NET-familiar platform layers and colocated library examples, retaining
+  prominent UTF-8 coverage. Used qualified Result factories and imported Some
+  construction, with additional union forms behind an optional disclosure. Added
+  build-time Raven TextMate highlighting using pinned tokenizer dependencies;
+  published pages need no browser JavaScript. Token escaping/state tests and
+  focused shorthand execution checks passed.
 
 - Completed the independent interface implementation metadata review: integrated
   Raven `f8f7568a1` into main after 54 focused checks and the .NET 10/.NET 11
