@@ -73,6 +73,12 @@ if (args.Length == 2 && args[0] == "--unit-contract-check")
     return;
 }
 
+if (args.Length == 2 && args[0] == "--generic-instance-library-core")
+{
+    InstanceLibraryChecks.WriteCore(args[1], generic: true);
+    return;
+}
+
 if (args.Length == 2 && args[0] == "--instance-library-core")
 {
     InstanceLibraryChecks.WriteCore(args[1]);

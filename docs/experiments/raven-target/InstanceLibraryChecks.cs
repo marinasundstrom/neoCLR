@@ -4,12 +4,12 @@ using Mono.Cecil.Cil;
 // Independent reference contract: no implementation fields, no executable stubs.
 static class InstanceLibraryChecks
 {
-    public static void WriteCore(string path)
+    public static void WriteCore(string path, bool generic = false)
     {
         CoreDeclarations.Write(path, unionProbe: true, collectionProbe: true);
         using var core = AssemblyDefinition.ReadAssembly(path, new ReaderParameters { InMemory = true });
         var module = core.MainModule;
-        var type = new TypeDefinition("Probe", "Counter", TypeAttributes.Public | TypeAttributes.Sealed, module.GetType("System.Object"));
+        var type = new TypeDefinition("Probe", generic ? "Cell`1" : "Counter", TypeAttributes.Public | TypeAttributes.Sealed, module.GetType("System.Object"));
         module.Types.Add(type);
         TypeReference Primitive(string name) => module.Types.SelectMany(t => t.Methods)
             .SelectMany(m => m.Parameters.Select(p => p.ParameterType).Append(m.ReturnType))
@@ -25,12 +25,30 @@ static class InstanceLibraryChecks
             method.Body.Instructions.Add(Instruction.Create(OpCodes.Throw));
             return method;
         }
-        var number = Primitive("Int32");
+        TypeReference number = Primitive("Int32");
+        TypeReference self = type;
+        if (generic)
+        {
+            var parameter = new GenericParameter("Item", type);
+            type.GenericParameters.Add(parameter);
+            number = parameter;
+            var constructed = new GenericInstanceType(type);
+            constructed.GenericArguments.Add(parameter);
+            self = constructed;
+            var iterable = new GenericInstanceType(module.GetType("System.Collections.Iterable`1"));
+            iterable.GenericArguments.Add(parameter);
+            type.Interfaces.Add(new InterfaceImplementation(iterable));
+            Method("AsIterable", iterable);
+            Method("Copy", self);
+            var iterator = new GenericInstanceType(module.GetType("System.Collections.Iterator`1"));
+            iterator.GenericArguments.Add(parameter);
+            Method("GetIterator", iterator).Attributes |= MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot;
+        }
         var noResult = Primitive("Void");
         Method(".ctor", noResult, ("value", number)).Attributes |= MethodAttributes.SpecialName | MethodAttributes.RTSpecialName;
-        Method("Add", noResult, ("amount", number));
-        Method("CopyFrom", noResult, ("other", type));
-        Method("Self", type);
+        Method(generic ? "Set" : "Add", noResult, (generic ? "value" : "amount", number));
+        Method("CopyFrom", noResult, ("other", self));
+        Method("Self", self);
         var getter = Method("get_Value", number);
         getter.Attributes |= MethodAttributes.SpecialName;
         type.Properties.Add(new PropertyDefinition("Value", PropertyAttributes.None, number) { GetMethod = getter });

@@ -10,8 +10,14 @@ static class ApplicationTypes
     static readonly Dictionary<string, Dictionary<string, string>> Adapters = new();
     static readonly Dictionary<TypeDefinition, string> LibraryNames = new();
     public static void BindLibrary(TypeDefinition type, string name) => LibraryNames.Add(type, name);
+    public static Func<TypeReference, string>? LibraryMap;
+    static readonly Dictionary<string, TypeReference> LibraryReferenceTypes = new();
+    static readonly Dictionary<string, TypeDefinition> LibraryReferences = new();
+    public static bool IsLibrary(TypeReference type) => LibraryNames.ContainsKey(type.Resolve());
+    public static bool IsLibraryParameter(GenericParameter parameter) => parameter.Type == GenericParameterType.Type
+        && parameter.Owner is TypeDefinition owner && LibraryNames.ContainsKey(owner);
     public static bool OnlyLibraryTypes => Types.Values.All(LibraryNames.ContainsKey);
-    public static void Reset(params ModuleDefinition[] modules) { LibraryNames.Clear(); Modules.Clear(); Modules.UnionWith(modules); Types.Clear(); Expanded.Clear(); Adapters.Clear(); }
+    public static void Reset(params ModuleDefinition[] modules) { LibraryMap = null; LibraryReferenceTypes.Clear(); LibraryReferences.Clear(); LibraryNames.Clear(); Modules.Clear(); Modules.UnionWith(modules); Types.Clear(); Expanded.Clear(); Adapters.Clear(); }
     public static object[] IdentityMap() => Types.Select(p => (object)new {
         AssemblyIdentity = p.Value.Module.Assembly.Name.FullName, MetadataName = p.Value.FullName, RuntimeName = p.Key,
         Fields = p.Value.Fields.Select(f => new { MetadataName = f.Name, RuntimeName = MetadataIdentity.MemberName(f.Name) }).ToArray()
@@ -30,21 +36,33 @@ static class ApplicationTypes
             if (!(owner.IsPublic || owner.IsNestedPublic))
                 throw new InvalidDataException("Nonpublic imported type access unsupported: " + type.FullName);
     }
-    public static bool IsType(string name) => Types.ContainsKey(name);
-    public static bool IsReference(string name) => Types.TryGetValue(name, out var type) && !type.IsValueType;
+    public static bool IsType(string name) => Types.ContainsKey(name) || LibraryReferences.ContainsKey(name);
+    public static bool IsReference(string name) => (Types.TryGetValue(name, out var type) || LibraryReferences.TryGetValue(name, out type)) && !type.IsValueType;
     public static string? Type(TypeReference reference)
     {
         if (reference is ByReferenceType byref) return Type(byref.ElementType) is { } element ? element + "&" : null;
+        if (reference is GenericInstanceType instance && LibraryNames.TryGetValue(instance.ElementType.Resolve(), out var libraryName))
+        {
+            var definition = instance.ElementType.Resolve();
+            if (instance.GenericArguments.Count != definition.GenericParameters.Count) throw new InvalidDataException("Invalid library type arity.");
+            _ = Type(definition);
+            var constructed = libraryName + "<" + string.Join(',', instance.GenericArguments.Select(t => LibraryMap!(t))) + ">";
+            LibraryReferences[constructed] = definition;
+            LibraryReferenceTypes[constructed] = instance;
+            return constructed;
+        }
         if (reference is TypeSpecification || reference.Scope is AssemblyNameReference assembly && !Modules.Any(m => m.Assembly.Name.FullName == assembly.FullName)) return null;
         var type = reference.Resolve();
         if (type is null || !Modules.Contains(type.Module) || type.FullName == "System.Unit" || type.Name == "<Module>") return null;
-        if (type.HasGenericParameters || type.IsEnum
+        if (type.HasGenericParameters && !LibraryNames.ContainsKey(type) || type.IsEnum
             || type.IsExplicitLayout || (type.DeclaringType?.HasGenericParameters ?? false) || type.IsValueType && type.HasInterfaces
             || (!type.IsInterface && type.BaseType?.FullName is not ("System.Object" or "System.ValueType") && !IsModule(type.BaseType?.Resolve()?.Module))
             || type.Fields.Any(f => f.IsStatic || f.HasMarshalInfo || f.IsInitOnly)
             || type.Methods.Any(m => m.IsConstructor && m.IsStatic))
             throw new InvalidDataException("Unsupported application type: " + type.FullName);
-        var name = LibraryNames.GetValueOrDefault(type) ?? MetadataIdentity.TypeName(type);
+        var name = LibraryNames.TryGetValue(type, out var libraryOwner)
+            ? libraryOwner + (type.HasGenericParameters ? "<" + string.Join(',', type.GenericParameters.Select(p => "T" + p.Position)) + ">" : "")
+            : MetadataIdentity.TypeName(type);
         Types[name] = type;
         if (Types.Count > 128) throw new InvalidDataException("Application type limit exceeded.");
         return name;
@@ -53,7 +71,16 @@ static class ApplicationTypes
     public static bool Assignable(string from, string to)
     {
         if (from == to) return true;
-        if (!Types.TryGetValue(from, out var type) || type.IsValueType) return false;
+        if (!(Types.TryGetValue(from, out var type) || LibraryReferences.TryGetValue(from, out type)) || type.IsValueType) return false;
+        if (LibraryNames.ContainsKey(type))
+        {
+            var owner = LibraryReferenceTypes.GetValueOrDefault(from) ?? type;
+            return type.Interfaces.Any(i =>
+            {
+                var shape = LibraryMap!(Close(i.InterfaceType, owner));
+                return shape == to || CollectionBindings.Assignable(shape, to);
+            });
+        }
         var visited = new HashSet<TypeDefinition>();
         bool Visit(TypeDefinition current)
         {
@@ -77,8 +104,8 @@ static class ApplicationTypes
             {
                 CheckMethod(method);
                 if (method.Overrides.Any(o => !method.IsPublic || o.Name != method.Name || o.DeclaringType.Resolve()?.IsInterface != true
-                    || !o.Parameters.Select(p => map(RuntimeSignatures.Close(p.ParameterType, o.DeclaringType), false)).SequenceEqual(method.Parameters.Select(p => map(p.ParameterType, false)))
-                    || map(RuntimeSignatures.Close(o.ReturnType, o.DeclaringType), true) != map(method.ReturnType, true)) || method.IsFinal && !method.IsNewSlot) throw new InvalidDataException("Explicit implementations and sealed overrides are not admitted yet.");
+                    || !o.Parameters.Select(p => map(RuntimeSignatures.Close(p.ParameterType, o.DeclaringType, allowOpenMethodParameters: LibraryNames.ContainsKey(type)), false)).SequenceEqual(method.Parameters.Select(p => map(p.ParameterType, false)))
+                    || map(RuntimeSignatures.Close(o.ReturnType, o.DeclaringType, allowOpenMethodParameters: LibraryNames.ContainsKey(type)), true) != map(method.ReturnType, true)) || method.IsFinal && !method.IsNewSlot) throw new InvalidDataException("Explicit implementations and sealed overrides are not admitted yet.");
                 foreach (var parameter in method.Parameters) map(parameter.ParameterType, false);
                 map(method.ReturnType, true);
                 if (type.IsInterface)
@@ -100,21 +127,50 @@ static class ApplicationTypes
     public static void CheckMethod(MethodReference method)
     {
         if (method.ExplicitThis || method.HasGenericParameters || method is GenericInstanceMethod
-            || method.DeclaringType.HasGenericParameters || method.DeclaringType is GenericInstanceType
+            || (method.DeclaringType.HasGenericParameters || method.DeclaringType is GenericInstanceType) && !IsLibrary(method.DeclaringType)
             || method.CallingConvention != MethodCallingConvention.Default)
             throw new InvalidDataException("Unsupported application signature: " + method.FullName);
         if (method.HasThis && Type(method.DeclaringType) is null) throw new InvalidDataException("Unsupported application receiver.");
     }
-    public static string Receiver(MethodDefinition method) => Type(method.DeclaringType)! + (method.DeclaringType.IsValueType ? "&" : "");
+    public static string Receiver(MethodReference method) => Type(method.DeclaringType)! + (method.DeclaringType.IsValueType ? "&" : "");
     public sealed record FieldShape(string Owner, string Type, string Name, bool ValueOwner);
     public static FieldShape? Field(FieldReference reference, MethodDefinition caller, Func<TypeReference, bool, string> map)
     {
         var field = reference.Resolve();
         if (field is null || !Modules.Contains(field.Module)) return null;
-        var owner = Type(field.DeclaringType)!;
-        if (field.IsStatic || reference.FullName != field.FullName || (!field.IsPublic && caller.DeclaringType != field.DeclaringType))
+        var owner = Type(reference.DeclaringType)!;
+        if (field.IsStatic || (!IsLibrary(field.DeclaringType) && reference.FullName != field.FullName) || (!field.IsPublic && caller.DeclaringType != field.DeclaringType))
             throw new InvalidDataException("Unsupported application field access.");
-        return new(owner, map(field.FieldType, false), MetadataIdentity.MemberName(field.Name), field.DeclaringType.IsValueType);
+        if (IsLibrary(field.DeclaringType) && !LibraryImplementation.SameType(
+            Close(reference.FieldType, reference.DeclaringType), Close(field.FieldType, reference.DeclaringType)))
+            throw new InvalidDataException("Invalid constructed library field signature.");
+        return new(owner, map(Close(field.FieldType, reference.DeclaringType), false), MetadataIdentity.MemberName(field.Name), field.DeclaringType.IsValueType);
+    }
+    public static bool Matches(MethodReference reference, MethodDefinition definition)
+    {
+        if (!IsLibrary(definition.DeclaringType)) return reference.FullName == definition.FullName;
+        var owner = reference.DeclaringType;
+        return owner.Resolve() == definition.DeclaringType && reference.Name == definition.Name
+            && reference.HasThis == definition.HasThis && reference.ExplicitThis == definition.ExplicitThis
+            && reference.CallingConvention == definition.CallingConvention
+            && reference.Parameters.Count == definition.Parameters.Count
+            && LibraryImplementation.SameType(Close(reference.ReturnType, owner), Close(definition.ReturnType, owner))
+            && reference.Parameters.Zip(definition.Parameters).All(p =>
+                LibraryImplementation.SameType(Close(p.First.ParameterType, owner), Close(p.Second.ParameterType, owner)));
+    }
+    public static TypeReference Close(TypeReference type, TypeReference owner, int depth = 0)
+    {
+        if (depth > 32) throw new InvalidDataException("Library signature nesting limit exceeded.");
+        if (owner is not GenericInstanceType instance || !IsLibrary(owner)) return type;
+        if (type is GenericParameter p && p.Type == GenericParameterType.Type
+            && p.Owner == instance.ElementType.Resolve()) return instance.GenericArguments[p.Position];
+        if (type is GenericInstanceType generic)
+        {
+            var result = new GenericInstanceType(generic.ElementType);
+            foreach (var argument in generic.GenericArguments) result.GenericArguments.Add(Close(argument, owner, depth + 1));
+            return result;
+        }
+        return type;
     }
     public static void AddAdapter(string owner, string name, string body)
     {

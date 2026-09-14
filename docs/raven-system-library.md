@@ -285,3 +285,57 @@ Validation also passes the 30 current-profile query cases, 19 focused runtime te
 (character classification, integer behavior, arithmetic outcomes and query terminals),
 Math/generic/instance authoring probes, clean snapshot regeneration and API audit.
 These are source checks; installed tools and release artifacts are not refreshed.
+
+## Generic instance implementation gate — 2026-09-15
+
+The checked class-import path now admits unconstrained, invariant generic class
+parameters and matching supported interface declarations. Public constructor,
+method and property signatures are checked structurally against the selected core
+reference type, including generic arity, parameter positions and self-typed returns.
+Constructed field and method references are checked after substituting their owner
+arguments. Ordinary application generic-class admission remains unchanged.
+
+One open runtime definition is emitted with positional type parameters; constructed
+references use the same owner with their actual arguments. Constructors, private
+fields, generic locals, instance calls and returns retain those parameters. Interface
+assignment and dispatch use the instantiated declaration. This reuses CLI generic
+signatures and neoCLR's existing generic class instructions, rather than specializing
+one implementation per payload. The [generic-signature comparison](generic-constraints.md#comparison-with-clr-constrained-calls)
+remains the research baseline. Constraint-bearing classes, additional implementation
+types and broader inheritance are still outside this gate.
+
+The independent `Probe.Cell<T>` declaration has no executable reference bodies or
+implementation fields. Its Raven implementation initializes and replaces private
+storage, reads a generic local, returns itself, copies from another instance, creates
+a new instance in Copy, and projects itself as Iterable<T>. GetIterator uses the
+existing ArrayList to expose one stored element. The direct neoIL consumer checks
+Int32, String and Void payloads, mutation through an alias, independent copied storage,
+interface dispatch and iterator exhaustion/disposal. Generic arity and interface
+mismatches are rejected before runtime IL is written.
+
+```sh
+python3 docs/experiments/raven-target/verify_generic_instance_library.py \
+  --compiler /absolute/path/to/rvnc.dll \
+  --bridge docs/experiments/raven-target/bin/Release/net11.0/Probe.dll \
+  --runtime target/release/neoclr
+```
+
+This exposed a general Raven binding bug in `Cell<T>(value)` inside Cell<T>. Explicit
+own type parameters were mistaken for omitted arguments. The independent compiler
+fix is `796cb3e34` on Raven main, cherry-picked as `ddaf1fa94` in the experimental
+branch. Four ordinary .NET execution cases cover qualified/unqualified calls with
+and without explicit metadata-core configuration; all 17 focused generic tests pass.
+Raven's spec and compiler documentation record the correction. No new Runtime
+Contract setting or neoCLR policy was added to the compiler.
+
+This gate is a prerequisite, not another shipped System API port. The deferred
+Where/Select and collection bodies still need a faithful authoring surface for their
+checked generic array storage and fault operations, plus private implementation
+dependencies. Their existing neoIL implementations remain authoritative meanwhile.
+
+The general fix passed Raven's integration gate before merging to main: 311 compiler,
+73 core and 249 language-server checks (three existing skips). The temporary general
+feature branch was removed after fast-forward integration. Existing nongeneric and
+static-generic library probes, 203 scalar checks and 13 cross-library checks pass.
+Regeneration changes only recorded compiler hashes; shipped library bodies remain
+identical. No SDK installation or publication is part of this slice.

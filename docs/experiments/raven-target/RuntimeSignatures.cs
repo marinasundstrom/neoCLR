@@ -23,7 +23,11 @@ static class RuntimeSignatures
             if (parameter.Type != GenericParameterType.Type || owner is not GenericInstanceType generic
                 || parameter.Position < 0 || parameter.Position >= generic.GenericArguments.Count)
                 throw new InvalidDataException("Unsupported open signature parameter.");
-            return Nested(generic.GenericArguments[parameter.Position]);
+            var replacement = generic.GenericArguments[parameter.Position];
+            // Substitution is simultaneous: a caller's open parameter is not another
+            // parameter of the callee owner to substitute recursively.
+            if (allowOpenMethodParameters && replacement is GenericParameter) return replacement;
+            return Nested(replacement);
         }
         if (type is GenericInstanceType instance)
         {

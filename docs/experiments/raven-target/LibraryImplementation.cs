@@ -9,9 +9,9 @@ static class LibraryImplementation
     {
         if (!Regex.IsMatch(owner, @"^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)+$"))
             throw new InvalidDataException("Invalid library owner.");
-        var type = source.Types.SingleOrDefault(t => t.Namespace == owner && NamespaceFunctions.IsContainer(t)) ?? source.GetType(owner)
+        var type = source.Types.SingleOrDefault(t => t.Namespace == owner && NamespaceFunctions.IsContainer(t)) ?? source.Types.SingleOrDefault(t => t.FullName.Split('`')[0] == owner)
             ?? throw new InvalidDataException("Missing namespace implementation: " + owner);
-        var contract = core.Types.SingleOrDefault(t => t.Namespace == owner && NamespaceFunctions.IsContainer(t)) ?? core.GetType(owner)
+        var contract = core.Types.SingleOrDefault(t => t.Namespace == owner && NamespaceFunctions.IsContainer(t)) ?? core.Types.SingleOrDefault(t => t.FullName.Split('`')[0] == owner)
             ?? throw new InvalidDataException("Missing namespace reference contract: " + owner);
         if (!(type.IsAbstract && type.IsSealed))
             return InstanceRoots(type, contract, owner);
@@ -44,13 +44,24 @@ static class LibraryImplementation
         // guest types by namespace/name, and never execute reference-assembly stub bodies.
         foreach (var candidate in new[] { type, contract })
             if (!candidate.IsPublic || candidate.IsValueType || candidate.IsInterface || candidate.IsAbstract
-                || candidate.HasGenericParameters || candidate.HasInterfaces || candidate.HasNestedTypes || candidate.HasEvents
+                || candidate.GenericParameters.Any(p => p.HasConstraints || p.Attributes != GenericParameterAttributes.NonVariant) || candidate.HasNestedTypes || candidate.HasEvents
                 || candidate.BaseType?.FullName != "System.Object" || candidate.IsExplicitLayout)
                 throw new InvalidDataException("Unsupported instance library owner.");
+        if (type.GenericParameters.Count != contract.GenericParameters.Count)
+            throw new InvalidDataException("Instance library generic arity does not match reference contract.");
         if (type.IsSealed != contract.IsSealed) throw new InvalidDataException("Instance library sealing does not match reference contract.");
-        bool MatchType(TypeReference left, TypeReference right) =>
-            (left.FullName == contract.FullName && right.FullName == type.FullName
+        bool MatchType(TypeReference left, TypeReference right)
+        {
+            if (left is GenericInstanceType l)
+                return right is GenericInstanceType r && MatchType(l.ElementType, r.ElementType)
+                    && l.GenericArguments.Count == r.GenericArguments.Count
+                    && l.GenericArguments.Zip(r.GenericArguments).All(p => MatchType(p.First, p.Second));
+            return (left.FullName == contract.FullName && right.FullName == type.FullName
                 && left.Resolve() == contract && right.Resolve() == type) || SameType(left, right);
+        }
+        if (type.Interfaces.Count != contract.Interfaces.Count || type.Interfaces.Any(i =>
+            contract.Interfaces.Count(c => MatchType(c.InterfaceType, i.InterfaceType)) != 1))
+            throw new InvalidDataException("Instance library interfaces do not match reference contract.");
         bool MatchMethod(MethodDefinition left, MethodDefinition right) =>
             left.Name == right.Name && !left.HasGenericParameters && !left.ExplicitThis
             && left.CallingConvention == MethodCallingConvention.Default && left.IsStatic == right.IsStatic && left.IsConstructor == right.IsConstructor
@@ -92,7 +103,7 @@ static class LibraryImplementation
     public static string GenericName(MethodDefinition method) => method.Name + (method.HasGenericParameters
         ? "<" + string.Join(',', method.GenericParameters.Select(p => "T" + p.Position)) + ">" : "");
 
-    static bool SameType(TypeReference left, TypeReference right)
+    public static bool SameType(TypeReference left, TypeReference right)
     {
         if (left is GenericParameter lp)
             return right is GenericParameter rp && lp.Type == rp.Type && lp.Position == rp.Position;

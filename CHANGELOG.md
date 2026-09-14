@@ -8,6 +8,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-15
 
+- Extend matched Raven library class imports to unconstrained generic parameters,
+  constructed fields/methods, generic locals and supported interface declarations.
+  An independent Cell<T> probe validates Int32/String/Void payloads, construction,
+  mutation, copies and Iterable dispatch; arity/interface mismatches are rejected.
+  Fix explicit generic self-construction independently in Raven and cherry-pick it
+  into the experiment, with four new .NET execution cases and 17 focused tests.
+  Raven main integration passes 311 compiler, 73 core and 249 language-server checks
+  (three existing skips); existing neoCLR authoring/cross-library regressions pass.
+  This is migration groundwork; checked generic storage, fault operations and private
+  implementation dependencies remain before the deferred collection bodies can port.
+
 - Port Int32.Divide and seven Char predicates to the shared Raven runtime project,
   preserving Result errors, UTF-16 code-unit/Unicode behavior and existing public
   static APIs. Native parsing/category services remain in the runtime. Admit checked

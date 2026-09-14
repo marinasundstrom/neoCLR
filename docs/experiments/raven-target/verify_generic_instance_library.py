@@ -1,0 +1,130 @@
+"""Execute a generic Raven class against an independent reference declaration."""
+import argparse
+from pathlib import Path
+import subprocess
+import tempfile
+from xml.sax.saxutils import escape
+from build_runtime_library import ROOT
+from collection_library import build
+
+parser = argparse.ArgumentParser(description=__doc__)
+for name in ('compiler', 'bridge', 'runtime'):
+    parser.add_argument('--' + name, required=True, type=Path)
+args = parser.parse_args()
+compiler, bridge, runtime = (getattr(args, n).resolve() for n in ('compiler', 'bridge', 'runtime'))
+
+
+def run(command, success=True):
+    result = subprocess.run([str(x) for x in command], capture_output=True, text=True, timeout=120)
+    assert (result.returncode == 0) == success, result.stdout + result.stderr
+    return result.stdout + result.stderr
+
+
+with tempfile.TemporaryDirectory(prefix='neoclr-generic-instance-') as temporary:
+    root = Path(temporary)
+    (root / 'demo').mkdir()
+    core = root / 'demo/NeoCLR.CoreProbe.dll'
+    run(['dotnet', bridge, '--generic-instance-library-core', core])
+    source = '''namespace Probe
+import System.Collections.*
+public class Cell<T> : Iterable<T> {
+    private field stored: T
+    public init(value: T) {
+        stored = value
+    }
+    public func Set(value: T) {
+        stored = value
+    }
+    public func CopyFrom(other: Cell<T>) {
+        Set(other.Value)
+    }
+    public func Self() -> Cell<T> {
+        return self
+    }
+    public val Value: T {
+        get {
+            let value: T = stored
+            return value
+        }
+    }
+    public func AsIterable() -> Iterable<T> {
+        return self
+    }
+    public func Copy() -> Cell<T> {
+        return Cell<T>(stored)
+    }
+    public func GetIterator() -> Iterator<T> {
+        let values = ArrayList<T>()
+        values.Add(stored)
+        return values.GetIterator()
+    }
+}
+'''
+
+    def compile(name, text):
+        folder = root / name
+        folder.mkdir()
+        (folder / 'Main.rvn').write_text(text)
+        project = folder / 'Library.rvnproj'
+        project.write_text(f'''<Project><PropertyGroup><OutputType>Library</OutputType>
+<AssemblyName>{name}</AssemblyName><NeoCLRRoot>{escape(str(root))}</NeoCLRRoot></PropertyGroup>
+<Import Project="{escape(str(ROOT / 'build/NeoCLR.Raven.props'))}" />
+<ItemGroup><Compile Include="Main.rvn" /></ItemGroup></Project>''')
+        run(['dotnet', compiler, project, '--no-project-restore', '-o', folder / 'compiled'])
+        return folder / 'compiled' / (name + '.dll')
+
+    image = compile('GenericInstance', source)
+    imported = root / 'imported'
+    run(['dotnet', bridge, '--library-implementation', image, core, 'Probe.Cell', imported])
+    body = (imported / 'Implementation.neoil').read_text()
+    driver = '.module GenericInstance\n.entry Main\n' + body + '\n.function Main() -> void\n'
+    for value_type in ('Int32', 'String', 'Void'):
+        driver += f'.local Probe.Cell<{value_type}> cell{value_type}\n.local System.Collections.Iterator<{value_type}> iterator{value_type}\n'
+    for value_type, first, second in [('Int32', 'ldc.i4 7', 'ldc.i4 42'),
+                                       ('String', 'ldstr "first"', 'ldstr "second"'),
+                                       ('Void', 'ldvoid', 'ldvoid')]:
+        owner = f'Probe.Cell<{value_type}>'
+        iterator = f'System.Collections.Iterator<{value_type}>'
+        driver += f'''{first}
+newobj instance {owner}::.ctor({value_type})
+stloc cell{value_type}
+ldloc cell{value_type}
+call instance {owner}::Self()
+{second}
+call instance {owner}::Set({value_type})
+ldloc cell{value_type}
+{second}
+newobj instance {owner}::.ctor({value_type})
+call instance {owner}::CopyFrom({owner})
+ldloc cell{value_type}
+call instance {owner}::Copy()
+{first}
+call instance {owner}::Set({value_type})
+ldloc cell{value_type}
+call instance {owner}::AsIterable()
+callvirt instance System.Collections.Iterable<{value_type}>::GetIterator()
+stloc iterator{value_type}
+ldloc iterator{value_type}
+callvirt instance {iterator}::MoveNext()
+brfalse Failed
+ldloc iterator{value_type}
+callvirt instance {iterator}::get_Current()
+'''
+        driver += 'pop\nldstr "void"\n' if value_type == 'Void' else ''
+        driver += f'call System.Console::WriteLine({"String" if value_type == "Void" else value_type})\npop\n'
+        driver += f'ldloc iterator{value_type}\ncallvirt instance {iterator}::MoveNext()\nbrtrue Failed\nldloc iterator{value_type}\ncallvirt instance System.Disposable::Dispose()\n'
+    driver += 'ret\nFailed:\nfault "Unexpected iterator cardinality"\n.end\n'
+    application = root / 'App.neoil'
+    application.write_text(driver)
+    system = root / 'System.neoil'
+    system.write_text(build(ROOT / 'runtime/System.neoil'))
+    run([runtime, 'verify', application, '--system', system])
+    assert run([runtime, 'run', application, '--system', system]).splitlines() == ['42', 'second', 'void']
+    for name, invalid in [('Arity', source.replace('Cell<T>', 'Cell<T,U>')),
+                          ('MissingInterface', source.replace(' : Iterable<T>', '').replace('public func AsIterable() -> Iterable<T> {\n        return self', 'public func AsIterable() -> Iterable<T> {\n        return ArrayList<T>()'))]:
+        bad = compile(name, invalid)
+        output = root / name / 'imported'
+        diagnostic = run(['dotnet', bridge, '--library-implementation', bad, core, 'Probe.Cell', output], False)
+        assert 'match reference contract' in diagnostic, diagnostic
+        assert not (output / 'Implementation.neoil').exists()
+    print('Generic instance fields, constructors, self signatures, Iterable dispatch and Int32/String/Void payloads passed; arity/interface mismatches rejected')

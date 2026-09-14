@@ -824,3 +824,25 @@ Conditional extraction results retain direct branch proof. This is a neoCLR impo
 correction; Raven already emits the expected CLI behavior, so neither Raven branch
 requires changes. A separate consumer covers fields, locals, calls, scalar outcomes
 and union extraction. Runtime Contract configuration is unchanged.
+
+## Generic class authoring and self-construction — 2026-09-15
+
+The importer now keeps generic class parameters through matched reference/implementation
+identities, private state, instance calls and supported interface declarations. The
+independent Cell<T> probe executes Int32/String/Void payloads and rejects mismatched
+arity/interfaces. See [authoring scope and remaining boundaries](raven-system-library.md#generic-instance-implementation-gate--2026-09-15).
+
+A separate general Raven defect treated explicit own type arguments in `Box<T>(value)`
+as missing constructor arguments. The fix `796cb3e34` was developed independently on
+`codex/generic-self-construction`, with four .NET execution regressions and 17 focused
+generic/signature checks. The experiment receives only its cherry-pick `ddaf1fa94`.
+The constructor binder preserves inference for omitted arguments and validates
+constraints for explicit ones; emission remains ordinary CLI metadata/IL. Runtime
+Contract configuration is unchanged. Both Raven compiler/spec docs and changelog are
+updated. No neoCLR-specific code or tests accompany the general compiler fix.
+
+After the independent CI gate passed (311 compiler, 73 core, 249 language-server
+checks; three existing skips), Raven main was fast-forwarded to `796cb3e34` and the
+temporary feature branch removed. The experimental branch remains separate at
+`ddaf1fa94`. Existing neoCLR authoring and cross-library regressions pass; regenerated
+System bodies are unchanged. Installed tools and release artifacts are not refreshed.

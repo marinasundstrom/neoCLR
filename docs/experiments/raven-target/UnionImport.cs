@@ -62,7 +62,7 @@ static class UnionImport
         {
             if (libraryOwner is not null && type is GenericParameter parameter)
             {
-                if (parameter.Type != GenericParameterType.Method || parameter.Owner != activeLibraryMethod)
+                if (!ApplicationTypes.IsLibraryParameter(parameter) && (parameter.Type != GenericParameterType.Method || parameter.Owner != activeLibraryMethod))
                     throw new InvalidDataException("Foreign generic parameter in library body.");
                 return "T" + parameter.Position;
             }
@@ -70,7 +70,11 @@ static class UnionImport
             if (collection is not null && collectionProfile) return collection;
             return ApplicationTypes.Type(type) ?? InterfaceBindings.Type(type) ?? NativeMemoryBindings.Type(type) ?? ReflectionBindings.Type(type) ?? DelegateBindings.Type(type) ?? ProcessBindings.ArrayType(type) ?? GenericUnionBindings.Type(type) ?? CalendarBindings.Type(type) ?? PrimitiveBindings.Type(type) ?? ResultBindings.Type(type) ?? Type(type, result);
         }
-        if (libraryOwner is not null) GenericUnionBindings.ParameterMap = parameter => ProfileType(parameter);
+        if (libraryOwner is not null)
+        {
+            GenericUnionBindings.ParameterMap = parameter => ProfileType(parameter);
+            ApplicationTypes.LibraryMap = type => ProfileType(type);
+        }
         var output = new StringBuilder(entry is not null ? $".module ImportedUnion\n.entry {Name(entry)}\n" : "");
         var coercions = new Dictionary<string, (string Name, string Body)>();
         Call Coerce(Call call, string[] actual)
@@ -133,7 +137,7 @@ static class UnionImport
             var emitInstance = method.HasThis && !valueConstructor;
             var result = ProfileType(method.ReturnType, true);
             var locals = method.Body.Variables.Select(v => ProfileType(v.VariableType)).ToArray();
-            if (locals.Any(t => !(libraryOwner is not null && method.GenericParameters.Any(p => t == "T" + p.Position)) && !ApplicationTypes.IsType(t) && !ManagedArrayBindings.IsType(t) && t != "System.Object" && !InterfaceBindings.IsInterface(t) && !NativeMemoryBindings.IsPointer(t) && !ReflectionBindings.IsType(t) && t != "arrayref<String>" && !DelegateBindings.IsType(t) && !GenericUnionBindings.IsType(t) && !CalendarBindings.Types.Contains(t) && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
+            if (locals.Any(t => !(libraryOwner is not null && method.GenericParameters.Concat(method.DeclaringType.GenericParameters).Any(p => t == "T" + p.Position)) && !ApplicationTypes.IsType(t) && !ManagedArrayBindings.IsType(t) && t != "System.Object" && !InterfaceBindings.IsInterface(t) && !NativeMemoryBindings.IsPointer(t) && !ReflectionBindings.IsType(t) && t != "arrayref<String>" && !DelegateBindings.IsType(t) && !GenericUnionBindings.IsType(t) && !CalendarBindings.Types.Contains(t) && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
                 throw new InvalidDataException("Unsupported local default in Result profile.");
             NormalizePatternBranches(method);
             var instructions = method.Body.Instructions.ToArray();
@@ -141,7 +145,7 @@ static class UnionImport
             var states = new Dictionary<int, State>();
             var work = new Queue<int>();
             var bodies = new Dictionary<int, string>();
-            Merge(0, new([], locals.Select(t => !method.GenericParameters.Any(p => t == "T" + p.Position) && method.Body.InitLocals && t != Carrier && t != Option && t != VoidOption && t != VoidResult && t != "String" && !NeedsInitialization(t)).ToArray()));
+            Merge(0, new([], locals.Select(t => !method.GenericParameters.Concat(method.DeclaringType.GenericParameters).Any(p => t == "T" + p.Position) && method.Body.InitLocals && t != Carrier && t != Option && t != VoidOption && t != VoidResult && t != "String" && !NeedsInitialization(t)).ToArray()));
             var visits = 0;
             while (work.TryDequeue(out var index))
             {
@@ -394,8 +398,8 @@ static class UnionImport
                         {
                             ApplicationTypes.CheckMethod(constructor);
                             if (!constructorDefinition.IsPublic && constructorDefinition.DeclaringType != method.DeclaringType) throw new InvalidDataException("Nonpublic application constructor unsupported.");
-                            if (!constructorDefinition.IsConstructor || constructorDefinition.IsStatic || constructor.FullName != constructorDefinition.FullName) throw new InvalidDataException("Invalid application constructor.");
-                            var ctorArgs = constructor.Parameters.Select(p => ProfileType(p.ParameterType)).ToArray();
+                            if (!constructorDefinition.IsConstructor || constructorDefinition.IsStatic || !ApplicationTypes.Matches(constructor, constructorDefinition)) throw new InvalidDataException("Invalid application constructor.");
+                            var ctorArgs = constructor.Parameters.Select(p => ProfileType(ApplicationTypes.Close(p.ParameterType, constructor.DeclaringType))).ToArray();
                             for (var n = ctorArgs.Length - 1; n >= 0; n--) ConvertTop(ctorArgs[n]);
                             var owner = ProfileType(constructor.DeclaringType);
                             pending.Enqueue(constructorDefinition); Push(new(owner));
@@ -577,12 +581,12 @@ static class UnionImport
                                 if (reference.HasThis != targetMethod.HasThis || instruction.OpCode.Code == Code.Callvirt && targetMethod.IsStatic) throw new InvalidDataException("Invalid application call receiver.");
                                 if (!targetMethod.IsPublic && targetMethod.DeclaringType != method.DeclaringType)
                                     throw new InvalidDataException("Nonpublic cross-type call unsupported.");
-                                if (reference.FullName != targetMethod.FullName) throw new InvalidDataException("Resolved signature mismatch.");
+                                if (!ApplicationTypes.Matches(reference, targetMethod)) throw new InvalidDataException("Resolved signature mismatch.");
                                 if (!targetMethod.IsAbstract) pending.Enqueue(targetMethod);
-                                var parameters = reference.Parameters.Select(p => ProfileType(p.ParameterType)).ToArray();
+                                var parameters = reference.Parameters.Select(p => ProfileType(ApplicationTypes.Close(p.ParameterType, reference.DeclaringType))).ToArray();
                                 call = targetMethod.HasThis && !(targetMethod.IsConstructor && targetMethod.DeclaringType.IsValueType)
-                                    ? new("", new[] { ApplicationTypes.Receiver(targetMethod) }.Concat(parameters).ToArray(), ProfileType(reference.ReturnType, true), Instruction: $"{(instruction.OpCode.Code == Code.Callvirt ? "callvirt" : "call")} instance {ProfileType(reference.DeclaringType)}::{ApplicationTypes.MethodName(targetMethod)}({string.Join(',', parameters)})" + (targetMethod.DeclaringType.IsValueType && targetMethod.ReturnType.MetadataType == MetadataType.Void ? "\npop" : ""))
-                                    : new(Name(targetMethod), targetMethod.HasThis ? new[] { ApplicationTypes.Receiver(targetMethod) }.Concat(parameters).ToArray() : parameters, ProfileType(reference.ReturnType, true));
+                                    ? new("", new[] { ApplicationTypes.Receiver(reference) }.Concat(parameters).ToArray(), ProfileType(ApplicationTypes.Close(reference.ReturnType, reference.DeclaringType), true), Instruction: $"{(instruction.OpCode.Code == Code.Callvirt ? "callvirt" : "call")} instance {ProfileType(reference.DeclaringType)}::{ApplicationTypes.MethodName(targetMethod)}({string.Join(',', parameters)})" + (targetMethod.DeclaringType.IsValueType && targetMethod.ReturnType.MetadataType == MetadataType.Void ? "\npop" : ""))
+                                    : new(Name(targetMethod), targetMethod.HasThis ? new[] { ApplicationTypes.Receiver(reference) }.Concat(parameters).ToArray() : parameters, ProfileType(ApplicationTypes.Close(reference.ReturnType, reference.DeclaringType), true));
                             }
                         }
                         else if (targetMethod.Module == library.MainModule)
@@ -663,7 +667,7 @@ static class UnionImport
             if (method.Body.InitLocals)
                 for (var n = 0; n < locals.Length; n++)
                     if (ApplicationTypes.IsType(locals[n]) || ReflectionBindings.IsType(locals[n]) && locals[n] != "System.RuntimeTypeHandle" || ManagedArrayBindings.IsType(locals[n]) || CollectionBindings.IsReference(locals[n]) || CalendarBindings.Types.Contains(locals[n]) || GenericUnionBindings.IsType(locals[n]) && !GenericUnionBindings.RequiresInitialization(locals[n])) output.AppendLine($"ldloca local{n}\ninitobj {locals[n]}");
-                    else if (!method.GenericParameters.Any(p => locals[n] == "T" + p.Position) && locals[n] != Carrier && locals[n] != Option && locals[n] != VoidOption && locals[n] != VoidResult && locals[n] != "String" && !NeedsInitialization(locals[n])) output.AppendLine(Default(locals[n]) + $"\nstloc local{n}");
+                    else if (!method.GenericParameters.Concat(method.DeclaringType.GenericParameters).Any(p => locals[n] == "T" + p.Position) && locals[n] != Carrier && locals[n] != Option && locals[n] != VoidOption && locals[n] != VoidResult && locals[n] != "String" && !NeedsInitialization(locals[n])) output.AppendLine(Default(locals[n]) + $"\nstloc local{n}");
             foreach (var index in bodies.Keys.Order())
             {
                 mappings.Add((method, methodId, instructions[index].Offset));
