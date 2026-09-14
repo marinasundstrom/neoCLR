@@ -1,7 +1,8 @@
 # Project website
 
 A small static site presenting the current runtime/Raven experiment, its influences, implemented features and open research questions. Plain HTML/CSS,
-no browser JavaScript, remote fonts or analytics. Node.js 22 and two pinned
+no browser JavaScript required for content or highlighting, and no remote fonts.
+Google Analytics loads the Google tag for measurement ID `G-SVXYRRCEEK`. Node.js 22 and two pinned
 build-time tokenizer dependencies provide Raven syntax highlighting. The Python
 build inserts escaped, highlighted excerpts from the executable Raven and neoIL examples, checks
 local assets and anchors, and writes only the public site to `target/website`.

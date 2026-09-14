@@ -27,8 +27,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   prominent UTF-8 coverage. Used qualified Result factories and imported Some
   construction, with additional union forms behind an optional disclosure. Added
   build-time Raven TextMate highlighting using pinned tokenizer dependencies;
-  published pages need no browser JavaScript. Token escaping/state tests and
-  focused shorthand execution checks passed.
+  syntax highlighting needs no browser JavaScript. Token escaping/state tests and
+  focused shorthand execution checks passed. Added the requested Google Analytics
+  tag (`G-SVXYRRCEEK`) to the page head and documented the analytics script.
 
 - Completed the independent interface implementation metadata review: integrated
   Raven `f8f7568a1` into main after 54 focused checks and the .NET 10/.NET 11
