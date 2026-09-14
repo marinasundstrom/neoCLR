@@ -1,0 +1,11 @@
+<Project DefaultTargets="Build">
+  <PropertyGroup>
+    <NeoCLRRoot>$(MSBuildThisFileDirectory)../..</NeoCLRRoot>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+  <Import Project="$(NeoCLRRoot)/build/NeoCLR.Raven.props" />
+  <ItemGroup>
+    <Compile Include="Library.rvn" />
+  </ItemGroup>
+  <Import Project="$(NeoCLRRoot)/build/NeoCLR.Raven.targets" />
+</Project>

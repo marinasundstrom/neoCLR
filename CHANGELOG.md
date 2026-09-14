@@ -8,6 +8,20 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-14
 
+- Prepared Preview 7 candidate with the combined MSBuild/library workflow and
+  Type.IsValueType. Publication remains subject to packaged validation and CI.
+
+## 0.1.0-preview.7 — 2026-09-14
+
+Release candidate; publication awaits packaged validation and all required CI checks.
+
+### 2026-09-14
+
+- Added read-only Type.IsValueType classification from runtime type categories,
+  including the Raven reference/import surface and reflection sample. Managed arrays,
+  classes, strings, interfaces, pointers and byrefs are distinguished from values;
+  allocation location does not determine the result.
+
 - Planned a needs-driven introspection/reflection review: compare the .NET
   Type/TypeInfo model, metadata inspection, execution capabilities and AOT retention
   before expanding descriptor APIs. No replacement hierarchy is selected. Extended
@@ -21,7 +35,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   on failure. Added a packaged demo, VS Code build-task configuration and regression
   checks. Installed a fresh local MSBuild demo with the existing .14 tools: 15 build
   scenarios, 68 language-server checks and the propagation demo pass; all 758 manifest
-  files verified. Incremental builds, restore and project references remain out of scope.
+  files verified. Expanded the candidate to one application-to-library ProjectReference,
+  with core-pack compatibility checks, changed-library rebuilds, failure invalidation
+  and pre-build library completion. Added the two-project demo and made MSBuild the
+  primary documented Build/Run workflow. Incremental builds, restore and deeper
+  dependency graphs remain out of scope.
 
 - Synchronized reviewed Raven main fixes into the experimental branch (`ee7b2e5af`)
   and installed SDK/VSIX `0.1.12-neoclr.14` with a fresh matching runtime bundle.

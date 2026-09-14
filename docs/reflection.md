@@ -206,3 +206,19 @@ is implemented; interface capabilities and default bodies remain in the
 Type.IsEnum, GetEnumNames() and GetEnumUnderlyingType() inspect the enum metadata.
 Names are sorted by unsigned value with stable alias order. General FieldInfo literal
 support remains future work; see [enums and constants](enums.md).
+
+
+## Type category inspection (2026-09-14)
+
+`Type.IsValueType` is a read-only Boolean describing the type category, independent
+of where an instance is stored. Primitive numeric types, Boolean, Void, enums and
+nominal value definitions return true. Classes, String, interfaces and managed
+arrays return false; pointers and managed byref signatures also return false rather
+than reporting the category of their element. Legacy owned array values remain
+values; Raven's ordinary `T[]` is a managed array and returns false.
+
+This follows the [.NET IsValueType contract](https://learn.microsoft.com/en-us/dotnet/api/system.type.isvaluetype?view=net-10.0)
+for the supported corresponding categories (consulted 2026-09-14), while using
+neoCLR's declared representation rather than requiring a System.ValueType hierarchy.
+It does not inspect boxed contents or imply that value types live only on the stack.
+Broader API expansion is subject to the [reflection model review](reflection-model-review.md).

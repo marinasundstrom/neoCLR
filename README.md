@@ -49,9 +49,10 @@ delegates, interfaces and native buffers. Its provisional APIs are open to feedb
 Start with the [runtime and Raven walkthrough](docs/runtime-raven-preview.md), covering
 direct neoIL execution and Raven against the same library.
 
-Follow the [VS Code setup](docs/experiments/raven-target/VSCODE.md) for the locally
-validated macOS arm64 SDK/extension and portable demo. It provides completion and
-explicit **neoCLR: Build saved project** / **neoCLR: Run saved project** tasks.
+The current [MSBuild workflow](docs/raven-msbuild.md) uses familiar Raven project
+files with standalone neoCLR build assets. It provides completion and explicit
+**neoCLR: Build with MSBuild** / **neoCLR: Run (MSBuild)** tasks, including a bounded
+application-plus-library example. This is the next preview workflow.
 The normal Raven toolbar build/run/debug commands do not implement this target.
 See [runtime API coverage](docs/raven-runtime-api-coverage.md) for supported contracts
 and importer limits, and [the packaging procedure](docs/experiments/raven-target/RELEASING.md)

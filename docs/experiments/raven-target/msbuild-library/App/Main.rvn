@@ -1,0 +1,7 @@
+import System.Console.*
+import Demo.Library.*
+
+func Main() {
+    WriteLine(LibraryMath.Double(21))
+    WriteLine(Greeting())
+}

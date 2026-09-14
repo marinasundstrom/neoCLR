@@ -1,24 +1,42 @@
 <Project>
   <PropertyGroup>
     <NeoCLRBuildDirectory>$(MSBuildProjectDirectory)/bin/neoclr/$(Configuration)</NeoCLRBuildDirectory>
+    <TargetPath>$(NeoCLRBuildDirectory)/$(AssemblyName).dll</TargetPath>
   </PropertyGroup>
   <Target Name="Build" DependsOnTargets="NeoCLRPublish" Condition="'$(DesignTimeBuild)' != 'true'" />
   <Target Name="NeoCLRPrepare">
-    <Delete Files="$(NeoCLRBuildDirectory)/App.neoil;$(NeoCLRBuildDirectory)/App.neoil.map.json;$(NeoCLRBuildDirectory)/System.neoil" />
+    <Delete Files="$(NeoCLRBuildDirectory)/App.neoil;$(NeoCLRBuildDirectory)/App.neoil.map.json;$(NeoCLRBuildDirectory)/System.neoil;$(TargetPath)" />
   </Target>
   <Target Name="NeoCLRValidate" DependsOnTargets="NeoCLRPrepare">
     <Error Condition="'$(RavenSdkRoot)' == '' or !Exists('$(RavenSdkRoot)/tools/rvnc/rvnc.dll')"
            Code="NEOBUILD001" Text="Set RavenSdkRoot to the matching installed experimental Raven SDK." />
     <Error Condition="!Exists('$(NeoCLRReferencePath)') or !Exists('$(NeoCLRSystemPath)') or !Exists('$(NeoCLRRuntimePath)') or !Exists('$(NeoCLRImporterPath)')"
            Code="NEOBUILD002" Text="NeoCLRRoot must select a matching runtime bundle with reference metadata, System library and importer." />
-    <Error Condition="'@(ProjectReference)' != '' or '@(PackageReference)' != ''"
-           Code="NEOBUILD003" Text="This initial build supports a single application and the supplied core reference. Project/package references are not yet supported." />
+    <Error Condition="'@(PackageReference)' != '' or '@(ProjectReference->Count())' &gt; '1' or ('$(OutputType)' == 'Library' and '@(ProjectReference)' != '')"
+           Code="NEOBUILD003" Text="This build supports an application with at most one library project. Package references and library-to-library references are not supported." />
+    <Error Condition="'@(ProjectReference)' != '' and !Exists('%(ProjectReference.FullPath)')" Code="NEOBUILD005" Text="Referenced project does not exist: %(ProjectReference.FullPath)" />
+    <Error Condition="'$(OutputType)' != 'Exe' and '$(OutputType)' != 'Library'" Code="NEOBUILD006" Text="OutputType must be Exe or Library." />
+    <GetFileHash Files="$(NeoCLRReferencePath)">
+      <Output TaskParameter="Hash" PropertyName="_NeoCLRCoreHash" />
+    </GetFileHash>
+    <Error Condition="'$(NeoCLRExpectedCoreHash)' != '' and '$(NeoCLRExpectedCoreHash)' != '$(_NeoCLRCoreHash)'"
+           Code="NEOBUILD007" Text="Referenced library selects a different neoCLR reference pack." />
     <Error Condition="'@(Reference->Count())' != '1' or '%(Reference.Identity)' != 'NeoCLR.CoreProbe'"
            Code="NEOBUILD003" Text="Only the supplied neoCLR core Reference is supported in this initial build." />
     <Error Condition="'@(Compile)' == ''" Code="NEOBUILD004" Text="Include Raven source files with Compile items." />
     <Error Condition="!Exists('%(Compile.FullPath)')" Code="NEOBUILD004" Text="Source file does not exist: %(Compile.FullPath)" />
   </Target>
-  <Target Name="NeoCLRCompile" DependsOnTargets="NeoCLRValidate">
+  <Target Name="NeoCLRCheckLibrary">
+    <Error Condition="'$(OutputType)' != 'Library'" Code="NEOBUILD006" Text="ProjectReference must point to a Library project." />
+  </Target>
+  <Target Name="NeoCLRLibrary" DependsOnTargets="NeoCLRCheckLibrary;Build" Returns="$(TargetPath)" />
+  <Target Name="NeoCLRReferences" DependsOnTargets="NeoCLRValidate">
+    <MSBuild Projects="@(ProjectReference)" Targets="NeoCLRLibrary" BuildInParallel="false"
+             Properties="RavenSdkRoot=$(RavenSdkRoot);Configuration=$(Configuration);NeoCLRExpectedCoreHash=$(_NeoCLRCoreHash)">
+      <Output TaskParameter="TargetOutputs" ItemName="_NeoCLRLibrary" />
+    </MSBuild>
+  </Target>
+  <Target Name="NeoCLRCompile" DependsOnTargets="NeoCLRReferences">
     <PropertyGroup>
       <!-- The importer requires a fresh directory; each build owns its intermediate files. -->
       <_NeoCLRAttempt>$(MSBuildProjectDirectory)/obj/neoclr/$(Configuration)/$([System.Guid]::NewGuid())</_NeoCLRAttempt>
@@ -26,16 +44,18 @@
     <MakeDir Directories="$(_NeoCLRAttempt)/compiled" />
     <Exec Command="dotnet &quot;$(RavenSdkRoot)/tools/rvnc/rvnc.dll&quot; &quot;$(MSBuildProjectFullPath)&quot; --no-project-restore --configuration &quot;$(Configuration)&quot; -o &quot;$(_NeoCLRAttempt)/compiled&quot;" />
   </Target>
-  <Target Name="NeoCLRImport" DependsOnTargets="NeoCLRCompile">
-    <Exec Command="dotnet &quot;$(NeoCLRImporterPath)&quot; --import &quot;$(_NeoCLRAttempt)/compiled/$(AssemblyName).dll&quot; &quot;$(NeoCLRReferencePath)&quot; &quot;$(_NeoCLRAttempt)/imported&quot;" />
+  <Target Name="NeoCLRImport" DependsOnTargets="NeoCLRCompile" Condition="'$(OutputType)' == 'Exe'">
+    <Exec Command="dotnet &quot;$(NeoCLRImporterPath)&quot; --import &quot;$(_NeoCLRAttempt)/compiled/$(AssemblyName).dll&quot; &quot;$(NeoCLRReferencePath)&quot; &quot;$(_NeoCLRAttempt)/imported&quot; @(_NeoCLRLibrary->'&quot;%(FullPath)&quot;', ' ')" />
   </Target>
-  <Target Name="NeoCLRVerify" DependsOnTargets="NeoCLRImport">
+  <Target Name="NeoCLRVerify" DependsOnTargets="NeoCLRImport" Condition="'$(OutputType)' == 'Exe'">
     <Exec Command="&quot;$(NeoCLRRuntimePath)&quot; verify &quot;$(_NeoCLRAttempt)/imported/App.neoil&quot; --system &quot;$(NeoCLRSystemPath)&quot;" />
   </Target>
-  <Target Name="NeoCLRPublish" DependsOnTargets="NeoCLRVerify">
+  <Target Name="NeoCLRPublish" DependsOnTargets="NeoCLRCompile;NeoCLRImport;NeoCLRVerify">
     <MakeDir Directories="$(NeoCLRBuildDirectory)" />
-    <Copy SourceFiles="$(_NeoCLRAttempt)/imported/App.neoil;$(_NeoCLRAttempt)/imported/App.neoil.map.json" DestinationFolder="$(NeoCLRBuildDirectory)" />
-    <Copy SourceFiles="$(NeoCLRSystemPath)" DestinationFiles="$(NeoCLRBuildDirectory)/System.neoil" />
-    <Message Importance="High" Text="neoCLR build verified: $(NeoCLRBuildDirectory)/App.neoil" />
+    <Copy SourceFiles="$(_NeoCLRAttempt)/imported/App.neoil;$(_NeoCLRAttempt)/imported/App.neoil.map.json" DestinationFolder="$(NeoCLRBuildDirectory)" Condition="'$(OutputType)' == 'Exe'" />
+    <Copy SourceFiles="$(NeoCLRSystemPath)" DestinationFiles="$(NeoCLRBuildDirectory)/System.neoil" Condition="'$(OutputType)' == 'Exe'" />
+    <Copy SourceFiles="$(_NeoCLRAttempt)/compiled/$(AssemblyName).dll" DestinationFiles="$(TargetPath)" />
+    <Message Importance="High" Text="neoCLR build verified: $(NeoCLRBuildDirectory)/App.neoil" Condition="'$(OutputType)' == 'Exe'" />
+    <Message Importance="High" Text="neoCLR library compiled: $(TargetPath) (runtime admission occurs when importing its consumer)" Condition="'$(OutputType)' == 'Library'" />
   </Target>
 </Project>

@@ -3030,3 +3030,20 @@ host-service classification to the runtime API plan and roadmap. Required availa
 and conformance questions to be resolved before choosing profiles or capability
 metadata. The classification is a planning framework, not a finalized standard or
 an implemented target-capability system.
+
+
+### 2026-09-14 — Combine the MSBuild workflow and library demonstration
+
+**Author's direction:** Asked to continue with the three proposed slices, then said
+“Or together.” The assistant proposed a combined preview: make standalone MSBuild
+the primary workflow, add a bounded application-plus-library scenario, then validate
+and publish the complete package. The author subsequently requested IsValueType and
+future reflection/core-contract planning.
+
+**Implementation so far:** Added one-level ProjectReference orchestration using
+Raven's existing project evaluation, with exact reference-pack compatibility checks,
+changed-library rebuilds and failed-output invalidation. The source MSBuild suite
+passes 22 scenarios; the library project's editor scenario passes 69 checks before
+building. Added separate Build/Run tasks and a readable two-project example. No Raven
+compiler changes were needed. Packaged release validation and publication remain
+pending; these source-check outcomes are not a release claim.

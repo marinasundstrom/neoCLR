@@ -1,13 +1,24 @@
 import System.*
 import System.Console.*
 import System.Reflection.*
-func Show(value: bool) { if value { WriteLine("true") } else { WriteLine("false") } }
+func Show(value: bool) {
+    if value {
+        WriteLine("true")
+    } else {
+        WriteLine("false")
+    }
+}
 func Main() {
     let info = typeof(int)
     WriteLine(info.Name)
     WriteLine(info.FullName)
     WriteLine(info.Namespace)
     Show(info.Equals(TypeOf<int>.Of(42)))
+    Show(info.IsValueType)
+    Show(typeof(string).IsValueType)
+    Show(typeof(Type).IsValueType)
+    Show(typeof(int[]).IsValueType)
+    Show(typeof(BindingFlags).IsValueType)
     Show(info.IsArray)
     Show(info.IsByRef)
     Show(info.IsPointer)

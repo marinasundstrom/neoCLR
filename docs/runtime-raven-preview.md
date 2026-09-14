@@ -1,7 +1,7 @@
 # Runtime and Raven preview
 
-Preview 6 is [available on GitHub](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.6). This
-release has two entry points: neoCLR directly through neoIL, and the experimental
+This guide describes the Preview 7 candidate. For the published Preview 6 workflow,
+see its [release notes](preview-6-release-notes.md). The new preview has two entry points: neoCLR directly through neoIL, and the experimental
 Raven toolchain compiling programs against neoCLR's own runtime library.
 
 The purpose is to demonstrate that the platform's Result/Option error flow, generic
@@ -20,7 +20,7 @@ its experimental branch; its normal .NET target is a separate product path.
 
 The current tested binary host is macOS arm64. The Raven tooling requires the .NET
 11 preview recorded in the manifest; direct execution by the Rust runtime does not.
-The saved Raven project tasks additionally require Python 3.9 or later. Do not infer
+Bundle configuration and validation scripts additionally require Python 3.9 or later. Do not infer
 other binary platforms from neoCLR's source-build portability.
 
 ## Start with the runtime
@@ -48,12 +48,19 @@ files. See [format direction](format-direction.md) and [Void mapping](void-seman
 
 ## Continue with Raven
 
-Follow the bundle README to install the matching VSIX, run `configure.py`, and open
-**demo** in VS Code. The initial `Main.rvn` demonstrates collection iteration and
-Result/Option/Void propagation. Select **neoCLR: Run saved project** from Tasks.
-The ordinary Raven toolbar build/run/debug buttons do not implement this pipeline.
+Install the matching Raven SDK and VSIX, run
+`python3 configure.py --sdk /absolute/path/to/raven-sdk`, and open **msbuild-demo**
+in VS Code. Use **Tasks: Run Build Task** to compile, or **neoCLR: Run (MSBuild)** to
+build and then run. The initial `Main.rvn` demonstrates Result/Option/Void propagation.
+These standalone MSBuild assets do not import Microsoft.NET.Sdk. The normal Raven
+run/debug toolbar is not this target's pipeline.
 
-Replace `demo/Main.rvn` with a sample from `tools/samples`, save, and rerun:
+Open **project-reference-demo/App** for a separate-library example: the application
+calls a library class and namespace function through a normal `ProjectReference`.
+It prints `42` and `Library call`. See [MSBuild instructions](raven-msbuild.md) for
+commands, output layout, and the bounded one-library contract.
+
+Replace `msbuild-demo/Main.rvn` with a sample from `tools/samples`, save, and rerun:
 
 | Sample | What it demonstrates |
 | --- | --- |

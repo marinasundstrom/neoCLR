@@ -63,6 +63,7 @@ for name in ('README.md', 'configure.py'):
 shutil.copyfile(HERE / 'bundle/Demo.rvnproj', output / 'demo/Demo.rvnproj')
 shutil.copyfile(HERE / 'samples/library-propagation-workflow.rvn', output / 'demo/Main.rvn')
 shutil.copytree(ROOT / 'build', output / 'build')
+shutil.copytree(HERE / 'msbuild-library', output / 'project-reference-demo')
 shutil.copyfile(HERE / 'msbuild/Demo.rvnproj', output / 'msbuild-demo/Demo.rvnproj')
 shutil.copyfile(HERE / 'samples/library-propagation-workflow.rvn', output / 'msbuild-demo/Main.rvn')
 # Preserve upstream attribution alongside every distributed implementation.

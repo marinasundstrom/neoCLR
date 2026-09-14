@@ -68,6 +68,39 @@ impl Query {
         match self {
             Self::Shape => Ok(Value::Boolean(match argument {
                 6 => definition.is_some_and(|d| d.enum_info.is_some()),
+                7 => match &ty {
+                    Type::Void
+                    | Type::Single
+                    | Type::Double
+                    | Type::Int32
+                    | Type::SByte
+                    | Type::Byte
+                    | Type::Int16
+                    | Type::UInt16
+                    | Type::Char
+                    | Type::UInt32
+                    | Type::Int64
+                    | Type::UInt64
+                    | Type::IntPtr
+                    | Type::UIntPtr
+                    | Type::Boolean
+                    | Type::Error
+                    | Type::Value
+                    | Type::RuntimeTypeHandle
+                    | Type::Array(_) => true,
+                    Type::Named(_) | Type::Constructed { .. } | Type::Scoped { .. } => definition
+                        .is_some_and(|d| {
+                            !d.is_reference_type && d.representation != Representation::Interface
+                        }),
+                    Type::String
+                    | Type::ByRef(_)
+                    | Type::ReadOnlyByRef(_)
+                    | Type::ArrayRef(_)
+                    | Type::InterfaceRef(_)
+                    | Type::Ptr(_)
+                    | Type::TypeParameter(_)
+                    | Type::MethodTypeParameter(_) => false,
+                },
                 0 => matches!(ty, Type::Array(_) | Type::ArrayRef(_)),
                 1 => matches!(ty, Type::ByRef(_) | Type::ReadOnlyByRef(_)),
                 2 => matches!(ty, Type::Ptr(_)),

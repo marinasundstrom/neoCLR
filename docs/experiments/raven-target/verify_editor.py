@@ -25,6 +25,7 @@ array_invariance = '--array-invariance' in sys.argv[2:]
 array_shape = '--array-shape' in sys.argv[2:]
 collection_capabilities = '--collection-capabilities' in sys.argv[2:]
 maps = '--maps' in sys.argv[2:]
+project_references = '--project-references' in sys.argv[2:]
 server = json.loads((project / '.vscode/settings.json').read_text())['raven.languageServerPath']
 messages = queue.Queue()
 log = (project / 'lsp-stderr.log').open('wb')
@@ -268,7 +269,7 @@ try:
         results['Boolean'] = labels
     if reflection:
         for version, expression, expected in (
-            (28, 'info.', ('Name', 'FullName', 'GetFields', 'GetMethods', 'GetProperties', 'GetElementType', 'GetGenericArguments')),
+            (28, 'info.', ('Name', 'FullName', 'IsValueType', 'GetFields', 'GetMethods', 'GetProperties', 'GetElementType', 'GetGenericArguments')),
             (29, 'method.', ('Name', 'DeclaringType', 'ReturnType', 'GetParameters', 'IsPublic')),
             (30, 'property.', ('Name', 'CanRead', 'GetGetMethod', 'GetIndexParameters')),
             (31, 'System.Reflection.BindingFlags.', ('Public', 'NonPublic', 'Instance', 'Static', 'DeclaredOnly')),
@@ -477,6 +478,17 @@ try:
             labels = {item['label'] for item in items}
             assert required.issubset(labels) and not forbidden.intersection(labels), (access, labels)
             results['Array API completion ' + access] = sorted(labels)
+    if project_references:
+        text = 'import Demo.Library.*\nfunc Main() {\n    LibraryMath.\n}'
+        send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': 70},
+            'contentChanges': [{'text': text}]})
+        result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
+            'position': {'line': 2, 'character': len('    LibraryMath.')},
+            'context': {'triggerKind': 2, 'triggerCharacter': '.'}}, True))
+        items = result if isinstance(result, list) else result['items']
+        labels = sorted({item['label'] for item in items})
+        assert 'Double' in labels, labels
+        results['Referenced project members'] = labels
     receive(send('shutdown', None, True))
     send('exit', None)
     print(json.dumps(results, indent=2))

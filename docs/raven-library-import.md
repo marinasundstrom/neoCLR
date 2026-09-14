@@ -169,3 +169,13 @@ hidden base type or private base constructor fail, and generic bodies remain rej
 Current results: 13 library checks, 15 application checks and five normal
 compiler/import checks passed. Rebuild generated IL/maps with this source bridge;
 installed tools and the paused System-library migration are unchanged.
+
+
+## MSBuild application/library workflow
+
+The [standalone MSBuild build](raven-msbuild.md#a-referenced-library) now automates a
+bounded version of this procedure. The application can name one library `.rvnproj`
+with `ProjectReference`; MSBuild builds it first, Raven consumes its declared DLL,
+and the importer receives the explicit dependency. The shipped two-project demo
+includes a class call and a namespace function. Multi-level project graphs and
+package restore remain outside this slice; the importer limits above still apply.

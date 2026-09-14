@@ -92,3 +92,48 @@ ret
             .contains("heap object limit")
     );
 }
+
+#[test]
+fn value_type_classification_uses_type_category_not_addressing_mode() {
+    for (name, expected) in [
+        ("Int32", true),
+        ("Boolean", true),
+        ("Void", true),
+        ("String", false),
+        ("System.Type", false),
+        ("System.Reflection.BindingFlags", true),
+        ("Item", false),
+        ("Point", true),
+        ("System.Collections.Iterable<Int32>", false),
+        ("arrayref<Int32>", false),
+        ("Int32&", false),
+        ("Int32*", false),
+        ("System.Option<Int32>", true),
+    ] {
+        let app = assemble(&format!(
+            r#"
+.module Categories
+.entry Main
+.type class Item
+.end
+.type Point
+.field X Int32
+.end
+.function Main() -> Boolean
+ldtoken {name}
+call System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)
+call instance System.Type::get_IsValueType()
+ret
+.end
+"#
+        ))
+        .unwrap();
+        let program = LoadedProgram::with_library(&app, library()).unwrap();
+        program.verify().unwrap();
+        assert_eq!(
+            program.run(Limits::default()).unwrap().value,
+            Value::Boolean(expected),
+            "{name}"
+        );
+    }
+}

@@ -112,6 +112,16 @@
         call neoCLR.Runtime.TypeElementType(System.RuntimeTypeHandle)
         ret
     .end
+    .property instance IsValueType() -> Boolean
+        .get instance System.Type::get_IsValueType()
+    .end
+    .method instance get_IsValueType() -> Boolean
+        ldarg this
+        ldfld 0
+        ldc.i4 7
+        call neoCLR.Runtime.TypeShape(System.RuntimeTypeHandle,Int32)
+        ret
+    .end
     .property instance IsEnum() -> Boolean
         .get instance System.Type::get_IsEnum()
     .end

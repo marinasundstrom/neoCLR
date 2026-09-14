@@ -4,7 +4,7 @@
     <NeoCLRRoot Condition="'$(NeoCLRRoot)' == ''">$(MSBuildThisFileDirectory)..</NeoCLRRoot>
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     <AssemblyName Condition="'$(AssemblyName)' == ''">$(MSBuildProjectName)</AssemblyName>
-    <OutputType>Exe</OutputType>
+    <OutputType Condition="'$(OutputType)' == ''">Exe</OutputType>
     <NeoCLRReferencePath>$(NeoCLRRoot)/demo/NeoCLR.CoreProbe.dll</NeoCLRReferencePath>
     <NeoCLRSystemPath>$(NeoCLRRoot)/lib/System.neoil</NeoCLRSystemPath>
     <NeoCLRRuntimePath>$(NeoCLRRoot)/bin/neoclr</NeoCLRRuntimePath>

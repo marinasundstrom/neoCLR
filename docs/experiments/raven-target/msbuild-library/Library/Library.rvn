@@ -1,0 +1,11 @@
+namespace Demo.Library
+
+public class LibraryMath {
+    static func Double(value: int) -> int {
+        return value * 2
+    }
+}
+
+public func Greeting() -> string {
+    return "Library call"
+}

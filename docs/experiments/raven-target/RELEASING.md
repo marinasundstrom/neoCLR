@@ -81,6 +81,21 @@ for source development or `--bridge /path/to/Probe.dll --system /path/to/System.
 for a published build. Each build attempt owns fresh output, and failed compilation
 cannot execute stale output. The supplied library is copied alongside that output.
 
+## Primary MSBuild workflow checks
+
+The primary Raven entry point is `msbuild-demo/Demo.rvnproj`, configured with the
+matching SDK. Build with standalone MSBuild and run the verified artifact separately.
+Also build and run `project-reference-demo/App/Demo.rvnproj`; its expected output is
+`42` followed by `Library call`. This exercises one library dependency, including a
+namespace function, without changing Raven or using Microsoft.NET.Sdk.
+
+Run `tools/verify_msbuild.py --bundle /extracted/bundle --sdk /extracted/sdk` and record
+its result. Run the full editor suite against the primary project and against the
+library application's folder with `--project-references`, before the first library
+build. The latter checks source-project resolution without a prebuilt DLL. Include
+changed-library rebuilds, incompatible reference packs, dependency compiler failures
+and stale-output rejection. Do not claim multi-level dependency or restore support.
+
 ## Validate the actual packaged build
 
 Extract/install into an isolated directory or VS Code profile; preserve the user's

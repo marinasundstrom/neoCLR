@@ -21,14 +21,16 @@ Raven entry points. Continue with Raven and VS Code:
 
 1. Extract this folder. Install the matching `raven-vscode.vsix` using VS Code's
    **Extensions: Install from VSIX** command, or `code --install-extension PATH`.
-2. Run `python3 configure.py` from this folder. If you separately installed the SDK,
-   use `python3 configure.py --sdk /absolute/path/to/raven-sdk`.
-3. Open the **demo** folder in VS Code. `Main.rvn` demonstrates Result/Option/Void
+2. Extract the matching Raven SDK and run
+   `python3 configure.py --sdk /absolute/path/to/raven-sdk` from this folder.
+3. Open the **msbuild-demo** folder in VS Code. `Main.rvn` demonstrates Result/Option/Void
    propagation. Completion should resolve neoCLR types; for example type
    `System.Date.` or `System.Type.` inside a function.
-4. Use **Tasks: Run Task → neoCLR: Run saved project**. Build/run use the published
-   bridge and supplied runtime library, not ordinary `dotnet run` on the project.
-5. Copy another file from **tools/samples** over **demo/Main.rvn**, save, and rerun.
+4. Use **Tasks: Run Task → neoCLR: Run (MSBuild)**. It first runs the default
+   MSBuild build task, then executes the verified program. **Tasks: Run Build Task**
+   compiles without running. No Microsoft.NET.Sdk import or guest .NET target framework
+   is used. The compiler and importer remain separate stages.
+5. Copy another file from **tools/samples** over **msbuild-demo/Main.rvn**, save, and rerun.
    Start with `library-files.rvn`, `library-calendar.rvn`, `library-reflection.rvn`,
    `library-value-interfaces.rvn`, or `library-reference-payloads.rvn`. The file sample
    creates `neoclr-file-demo.txt` in the working directory. Native buffers require an
@@ -42,8 +44,19 @@ Raven entry points. Continue with Raven and VS Code:
 Terminal equivalent, from this folder:
 
 ```sh
-python3 tools/run_project.py demo/Demo.rvnproj --bridge tools/bridge/Probe.dll --system lib/System.neoil --runtime bin/neoclr
+dotnet msbuild msbuild-demo/Demo.rvnproj -p:RavenSdkRoot=/absolute/path/to/raven-sdk
+./bin/neoclr run msbuild-demo/bin/neoclr/Debug/App.neoil --system msbuild-demo/bin/neoclr/Debug/System.neoil
 ```
+
+For an application referencing a library, open **project-reference-demo/App** and
+use the same tasks. Its `ProjectReference` builds `Library/Library.rvnproj` before
+compiling the application. The program prints `42` and `Library call`. The language
+server resolves the library's public members from the project graph before building.
+The current build supports one directly referenced library, not a general project graph.
+
+The older **demo** folder and `tools/run_project.py` remain an advanced compiler/import
+runner and a fixture for the compatibility suites below. They are not the primary
+build workflow. See [MSBuild scope](docs/raven-msbuild.md).
 
 Verify both runtime-level neoIL samples:
 
@@ -90,16 +103,9 @@ The version-specific tool dependency inventory is in **third-party/raven-tools/*
 It supplements the upstream notices and accompanies the separate SDK/VSIX assets.
 
 
-## Build Raven projects with MSBuild
-
-This bundle also contains a minimal `msbuild-demo` project and standalone build
-assets. No Microsoft.NET.Sdk import is used. After installing the matching Raven SDK:
+Validate the primary build workflow and project-reference support:
 
 ```sh
-dotnet msbuild msbuild-demo/Demo.rvnproj -p:RavenSdkRoot=/absolute/path/to/raven-sdk
-./bin/neoclr run msbuild-demo/bin/neoclr/Debug/App.neoil --system msbuild-demo/bin/neoclr/Debug/System.neoil
+python3 tools/verify_msbuild.py --bundle "$PWD" --sdk /absolute/path/to/raven-sdk
+python3 tools/verify_editor.py project-reference-demo/App --files --project-references
 ```
-
-Build compiles, imports and verifies; running is separate. See the
-[MSBuild instructions and current limits](docs/raven-msbuild.md). Configuration with
-`configure.py --sdk ...` adds a VS Code build task in `msbuild-demo`.

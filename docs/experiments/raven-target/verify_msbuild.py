@@ -96,8 +96,47 @@ with tempfile.TemporaryDirectory(prefix='neoCLR MSBuild ') as directory:
           extra=('-p:RavenSdkRoot=' + str(root / 'missing SDK'),))
     project.write_text(project_text.replace('<Compile Include="Main.rvn" />',
         '<Compile Include="Main.rvn" /><ProjectReference Include="Other.rvnproj" />'))
-    build('Unsupported project references', expected=False, error='NEOBUILD003')
+    build('Missing project reference', expected=False, error='NEOBUILD005')
     project.write_text(project_text)
+    # A dependency is built before the compiler evaluates its metadata reference.
+    library = root / 'library with spaces'
+    library.mkdir()
+    library_project = library / 'MathLibrary.rvnproj'
+    library_text = project_text.replace('build/NeoCLR.', '../build/NeoCLR.').replace(
+        '<ItemGroup>', '<PropertyGroup><OutputType>Library</OutputType></PropertyGroup><ItemGroup>')
+    library_project.write_text(library_text)
+    library_source = library / 'Main.rvn'
+    library_source.write_text('public class Arithmetic { public static func Double(value: int) -> int { return value * 2 } }')
+    consumer_text = project_text.replace('<Compile Include="Main.rvn" />',
+        '<Compile Include="Main.rvn" /><ProjectReference Include="library with spaces/MathLibrary.rvnproj" />')
+    project.write_text(consumer_text)
+    source.write_text('import System.Console.*\nfunc Main() { WriteLine(Arithmetic.Double(21)) }')
+    artifact = build('Project reference build order and dispatch')
+    run(artifact, '42\n')
+    library_source.write_text('public class Arithmetic { public static func Double(value: int) -> int { return value * 3 } }')
+    artifact = build('Rebuild changed library')
+    run(artifact, '63\n')
+    artifact = build('Release project reference', configuration='Release')
+    run(artifact, '63\n')
+    library_source.write_text('public class Arithmetic { public static func Double(value: int) -> int { return missing } }')
+    build('Dependency compile failure invalidates application', expected=False, error='RAV')
+    library_source.write_text('public class Arithmetic { public static func Double(value: int) -> int { return value * 2 } }')
+    library_project.write_text(library_text.replace('<OutputType>Library</OutputType>', '<OutputType>Exe</OutputType>'))
+    build('Executable dependency rejected', expected=False, error='NEOBUILD006')
+    library_project.write_text(library_text)
+    alternate = root / 'different pack'
+    (alternate / 'demo').mkdir(parents=True)
+    for directory in ('bin', 'lib', 'tools'):
+        (alternate / directory).symlink_to(bundle / directory, target_is_directory=True)
+    (alternate / 'demo/NeoCLR.CoreProbe.dll').write_bytes((bundle / 'demo/NeoCLR.CoreProbe.dll').read_bytes() + b'\0')
+    library_project.write_text(library_text.replace(escape(str(bundle)), escape(str(alternate))))
+    build('Reference pack mismatch in dependency', expected=False, error='NEOBUILD007')
+    library_project.write_text(library_text.replace('<Compile Include="Main.rvn" />',
+        '<Compile Include="Main.rvn" /><ProjectReference Include="../Demo.rvnproj" />'))
+    build('Cyclic library graph rejected by bounded contract', expected=False, error='NEOBUILD003')
+    library_project.write_text(library_text)
+    project.write_text(project_text)
+    source.write_text(success)
     source.unlink()
     build('Missing source', expected=False, error='NEOBUILD004')
     source.write_text(success)

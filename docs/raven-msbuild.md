@@ -1,6 +1,6 @@
 # Minimal MSBuild support for neoCLR
 
-Source slice, 2026-09-14. A Raven `.rvnproj` can now build an application through
+Preview 7 candidate, 2026-09-14. A Raven `.rvnproj` can now build an application through
 standalone MSBuild props/targets. It does not import `Microsoft.NET.Sdk`, declare a
 .NET target framework, or require a new Raven compiler build. It uses the installed
 experimental .14 compiler and the matching runtime bundle.
@@ -82,23 +82,47 @@ and is forwarded to Raven's project evaluation. Set other target/semantic proper
 in the project or its imports. This slice does not forward arbitrary command-line
 MSBuild global properties into Raven's separate evaluation process.
 
+## A referenced library
+
+Open `project-reference-demo/App` for the two-project example. The library sets
+`OutputType` to `Library`; the application includes:
+
+```xml
+<ProjectReference Include="../Library/Library.rvnproj" />
+```
+
+MSBuild builds the library first and supplies its normal `TargetPath` DLL to Raven's
+existing project-reference resolver. The importer receives that same DLL explicitly
+alongside the consumer. Source-based language-server project references work before
+the first build. No new Raven compiler policy or runtime opcode is required.
+
+The application and library must use the exact same core reference bytes. The build
+checks their SHA-256 hashes before compiling the dependency. This is intentionally
+stricter than assembly identity compatibility: independently regenerated reference
+packs may be rejected even if they are equivalent. Use the same versioned bundle.
+
+A library build emits a DLL; executable runtime admission happens when importing its
+consumer. Generic bodies and other importer limitations remain unchanged. One direct
+library reference is supported. Libraries cannot reference further projects, and
+cycles, executable dependencies, package references and extra assembly references
+are rejected. This small graph is the tested starting point, not full solution support.
+
 ## Outputs and limits
 
 Build performs validation, Raven compilation, import, runtime verification and copying
 of verified output. Each attempt keeps its PE and imported artifacts under
 `obj/neoclr/<Configuration>/<attempt-id>`. The successful runnable files are
-`bin/neoclr/<Configuration>/App.neoil`, its `.map.json`, and `System.neoil`.
-At the start of a normal build, these three prior output files are invalidated.
+`bin/neoclr/<Configuration>/App.neoil`, its `.map.json`, and `System.neoil`. The
+compiled application/library DLL is copied to its declared `TargetPath` in that directory.
+At the start of a normal build, these prior output files are invalidated.
 Compiler/importer/verification failures stop the build before replacement output is
 published. The initial targets always rebuild; they do not implement incremental
 builds, Clean, Rebuild, Restore, Publish or Run targets. Old intermediate attempts
 remain available for inspection and can be removed when no build is using them.
 
-Only a single application with the bundle's supplied core reference is supported.
-Project references, package references and additional assembly references produce a
-build error. The current importer still determines the supported Raven/CLI subset;
-using MSBuild does not expand runtime or library support. Concurrent builds of the
-same project/configuration are not supported in this first slice.
+The current importer still determines the supported Raven/CLI subset; using MSBuild
+does not expand runtime or library support. Concurrent builds of the same
+project/configuration are not supported in this first implementation.
 
 The design follows ordinary [MSBuild project imports and build phases](https://learn.microsoft.com/en-us/visualstudio/msbuild/build-process-overview).
 Compared with the .NET project SDK, this preserves familiar project evaluation and
@@ -117,5 +141,6 @@ python3 tools/verify_msbuild.py --bundle "$PWD" --sdk /absolute/path/to/raven-sd
 For development, the verifier also accepts `--assets /path/to/neoCLR/build`.
 It checks SDK-free evaluation, design-time behavior, Debug/Release compilation,
 Result/Option/Void, generic arrays, paths containing spaces, changed source, diagnostics,
-unsupported inputs, stale-output invalidation and recovery. Successful artifacts are
+unsupported inputs, stale-output invalidation and recovery, including dependency
+changes/failures, Release configuration and mismatched reference packs. Successful artifacts are
 executed separately to check behavior. This is not a full MSBuild or .NET SDK release gate.
