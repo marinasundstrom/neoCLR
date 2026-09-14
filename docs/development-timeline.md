@@ -2873,3 +2873,19 @@ as `43f288b05`, with 291 focused checks and the .NET 10/.NET 11 matrix passing.
 been synchronized or rebuilt in these slices. The source fixes do not yet change
 the author's installed editor. See the [target evaluation](raven-target-evaluation.md)
 for validation scope and remaining stabilization reviews.
+
+
+## Empty arrays on the generic array type — recorded 2026-09-14
+
+**Author's direction:** Pointed out that neoCLR has `Array<T>` and proposed
+`Array<T>.Empty`, with Empty probably exposed as a property.
+
+**Assistant's response:** Agreed that the closed array type already supplies the
+element type. Distinguished this proposed neoCLR API from .NET's
+`System.Array.Empty<T>()` method, and from Raven's general ability to emit an empty
+array when a target lacks that factory.
+
+**Action and status:** Added this distinction to the ongoing array-factory review.
+The property and its compiler mapping are proposals, not implemented in this entry.
+Any neoCLR-specific mapping remains on Raven's experimental branch; general
+metadata-capability handling belongs on Raven main after independent validation.

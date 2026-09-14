@@ -554,3 +554,19 @@ ancestors of the active `codex/neoclr-namespace-metadata` experiment. The neoCLR
 local branch `codex/raven-neoclr-target` was already merged into neoCLR main and
 was also removed. Active worktrees, the experiment and unrelated branches remain.
 These are ref deletions; the retained branches preserve all of this history.
+
+
+### Generic array empty-value API direction (2026-09-14)
+
+The author proposes `System.Array<T>.Empty`, probably a static property: the closed
+array type supplies the element type. This differs from .NET's
+[`System.Array.Empty<T>()`](https://learn.microsoft.com/en-us/dotnet/api/system.array.empty)
+factory on its non-generic Array base class. It fits neoCLR's existing generic array
+shape without adding a method type argument. The cost is another API shape that
+compiler target mapping must recognize if it wants to use the shared empty array.
+
+The property, caching policy and experimental Raven mapping remain to be implemented
+and validated. Keep the general Raven array-factory review independent: an empty
+collection expression must not assume a factory absent from the target metadata;
+a zero-length array allocation is a possible fallback. Do not add a hardcoded
+neoCLR property lookup to Raven main.

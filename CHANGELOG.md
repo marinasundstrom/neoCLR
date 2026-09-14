@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-14
 
+- Recorded the proposed `Array<T>.Empty` property and its distinction from .NET
+  `Array.Empty<T>()`. Kept the API and experimental compiler mapping explicitly
+  pending, separate from general Raven array-factory capability handling.
+
 - Recorded the author's indexer-completion report and Raven main fix `ac4901f6b`:
   indexers require `[index]` access; their metadata names no longer behave as ordinary
   properties in lookup, hover or completion. All 440 focused checks passed. Kept
