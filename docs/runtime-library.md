@@ -215,6 +215,14 @@ but becomes more expensive to maintain as algorithms and APIs grow.
 
 ### First migration groundwork
 
+**2026-09-14 refinement:** The author selected namespace functions for the Math
+pilot rather than a public static utility class. Follow the
+[namespace API guideline](api-policy.md#namespaces-for-utility-functions-2026-09-14)
+and Raven's existing CLI namespace-function contract for now. This is an intentional
+API-design change alongside the source-language migration; it must not be described
+as only changing implementation bodies. Completion/import behavior and qualified
+calls must be checked against the new reference surface before adoption.
+
 The current bridge is a bounded application importer, not a general library compiler.
 [ApplicationTypes.cs](experiments/raven-target/ApplicationTypes.cs) rejects generic
 application type/method bodies and assigns application-specific type identities;

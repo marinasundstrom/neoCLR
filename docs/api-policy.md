@@ -24,6 +24,39 @@ first-class Void, invariant mutable arrays, free functions, and interface names
 without the `I` convention. These need explicit API mappings. Implementation details
 alone do not justify additional consumer-visible differences.
 
+## Namespaces for utility functions (2026-09-14)
+
+Prefer namespace functions when an API only groups operations and does not need a
+type contract. The author selected `System.Math` as the first example: a namespace
+can contain functions, constants where the language supports them, and related
+types. Do not introduce a public utility class solely to act as a namespace.
+Keep classes when instances, state, polymorphism, or another actual type contract
+justify them. This is a guideline, not a blanket conversion of existing APIs.
+
+Separate the source API from its binary representation. For now use Raven's existing
+.NET namespace-function contract: static methods in a compiler-generated CLI type,
+identified by the target core's `System.Runtime.CompilerServices.TopLevelAttribute`.
+The generated container is an emission detail, not the intended source-level API.
+Do not require new metadata tables or infer namespace membership from a container
+name. The existing [namespace-member probe](experiments/raven-target/NamespaceMemberProbe.cs)
+checks referenced function imports, overloads, completion, accessibility and rejection
+of unmarked lookalike containers. neoIL free functions and CLI method containers
+remain distinct representations; importing must preserve their documented mapping.
+
+Compared with exposing a .NET-style static utility class, this gives the namespace
+room for related types and avoids making a type part of the API merely to group
+functions. It does not imply a performance benefit. The cost is a different source
+contract for languages without namespace functions, plus deliberate handling of
+generated containers in metadata, reflection and tooling. Such languages may need
+to call the emitted static methods. Preserve normal CLI metadata for now rather
+than introducing another binary format to hide that difference.
+
+The Math migration must validate both qualified calls and `import System.Math.*`,
+including a related type in that namespace. A namespace and the old public
+`System.Math` type cannot simply be presented as interchangeable source contracts.
+Record the API migration separately from replacing method bodies with Raven code;
+this guideline alone does not claim that the migration has been implemented.
+
 ## Library scope and language projection
 
 The long-term target is the expected breadth and role of the .NET foundational

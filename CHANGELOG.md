@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-14
 
+- Selected namespace functions for the Math migration and documented a general
+  preference for namespaces over utility classes used only to group operations.
+  Retained Raven's existing CLI container/TopLevelAttribute contract for now;
+  recorded cross-language and reflection costs and the required migration checks.
+  This records direction; the Math implementation migration remains in progress.
+
 - Reconciled the published Preview 7 documentation with the subsequent async/API
   direction notes, preserving both histories before resuming library migration.
 

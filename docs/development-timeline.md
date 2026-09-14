@@ -3168,3 +3168,28 @@ passed. The package includes MSBuild Build/Run tasks, the one-library demo and
 Type.IsValueType; the SDK/VSIX remain the reviewed experimental Raven .14 build.
 The core-contract and introspection/reflection reviews remain plans. Evidence and
 checksums accompany the [release](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.7).
+
+
+### 2026-09-14 — Namespaces rather than utility classes
+
+**Author's direction:** Asked to resume library migration, then clarified that
+System.Math should be a namespace containing functions. Directed that, at least
+for now, this should follow Raven's existing .NET metadata contract. Explained that
+utility classes usually substitute for namespaces of functions, and that neoCLR
+need not copy that public structure. A real namespace should also accommodate
+related types and other declarations, not only functions and constants.
+
+**Assistant's response and action:** Agreed to separate the public namespace API
+from its CLI representation. Recorded the [API guideline](api-policy.md#namespaces-for-utility-functions-2026-09-14)
+and updated the Math migration plan. Inspected the existing namespace-member probe
+and reran it successfully (eight checks): target-owned TopLevelAttribute metadata,
+separate consumer imports and overloads, completion, accessibility and rejection of
+unmarked lookalike containers. No new binary metadata format or Raven compiler
+changes were introduced for this decision.
+
+**Outcome and remaining work:** The guideline is recorded. The earlier uncommitted
+static-class Math pilot needs to be adapted; the namespace Math reference surface,
+qualified calls, coexistence with related types, and implementation import still
+need validation together. The probe result establishes the existing namespace
+contract, not completion of the Math migration. Cross-language consumption and
+reflection of generated containers remain explicit design costs.
