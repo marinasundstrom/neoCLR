@@ -2577,3 +2577,32 @@ generic application bodies; the migration is not yet implemented by this checkpo
   completed target pack or general library importer. Migration stays paused while
   stable identities, generic bodies and temporary adapters are addressed. No installed
   SDK, extension or user demo was changed by this follow-through.
+
+
+## 2026-09-14 — Integrate general Raven fixes into main
+
+- **Author's directive:** “Keep the tracks separate”: experimental neoCLR support
+  belongs on its own Raven branch, while general fixes should be integrated into
+  Raven main. The author reinforced that anything benefiting Raven generally belongs
+  on main.
+- **Assistant's response:** Extract fixes by behavior and dependencies, validate with
+  ordinary .NET inputs, and advance main without merging the experiment wholesale.
+  A fix is not permanently experimental merely because neoCLR exposed it.
+- **Action:** Reused the isolated main-based numeric/binding integration branch and
+  extracted the namespace metadata/completion fixes. Reworked the namespace regression
+  to use default compilation options and normal framework references. It reproduced
+  the completion failure without neoCLR settings, then passed after the fix.
+- **Workflow:** Recorded the separation in AGENTS.md. Further general cross-target
+  emission candidates remain explicitly queued for dependency review; intentional
+  Void/array/protocol differences remain on the experimental track. The System-library
+  migration stays paused during this integration work.
+- **Outcome:** The 47 focused namespace tests and full 5,490-test baseline passed
+  without failures/skips. Fast-forwarded and pushed Raven main to `8fa59a967`, containing
+  the reviewed general numeric, binding/dispatch and namespace fixes. Experimental
+  target policies were not merged into main. The remaining emission candidates stay
+  queued for independent review. No installed SDK or extension was refreshed.
+- **Track synchronization:** Merged Raven main into `codex/neoclr-namespace-metadata`
+  at `5d1022ced`, preserving the experiment's Void regression and main's independent
+  namespace test. Compiler source was unchanged by this merge; 50 focused tests passed.
+  The experimental branch now contains main as an ancestor. This merge direction does
+  not bring experimental policy onto main.

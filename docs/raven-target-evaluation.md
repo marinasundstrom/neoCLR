@@ -10,6 +10,23 @@ with consistent target support. Raven should compile for both .NET and neoCLR th
 its normal compiler and project model. Retaining a loader/importer is compatible with
 that goal; relying on it to repair language semantics is not.
 
+## Main integration — 2026-09-14
+
+The author directed that general Raven improvements must be integrated into Raven
+main while experimental neoCLR support remains on a separate branch. Raven main is
+now `8fa59a967`: the numeric/pointer and binding/dispatch batches plus general
+namespace-metadata/completion fixes. The namespace regression uses normal framework
+references and default compilation options. Forty-seven focused namespace tests and
+the 5,490-test broader baseline passed with no failures or skips.
+
+Main was fast-forwarded from the reviewed integration branch, not merged from the
+neoCLR experiment. The experiment was synchronized from main at `5d1022ced`; 50 focused
+regressions passed and compiler source was unchanged by the merge. Main is now an
+ancestor of the experimental branch. Remaining general metadata-emission candidates below are
+queued for independent dependency review; they are not permanently categorized as
+experimental. Target-specific array/Void/protocol policies have not entered main.
+The earlier checkpoints below record the review state before integration.
+
 ## Follow-through checkpoint — 2026-09-14
 
 General compiler fixes were extracted onto Raven `codex/compiler-fixes-integration`,

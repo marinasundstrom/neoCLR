@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-14
 
+- Recorded the directive to integrate general Raven fixes into Raven main while
+  keeping neoCLR experiments on separate feature branches. Updated repository
+  instructions and the development conversation record; retained the explicit review
+  queue for remaining general metadata-emission candidates. Raven main now contains
+  the reviewed numeric, binding/dispatch and namespace fixes at 8fa59a967; 47 focused
+  tests and the 5,490-test broader baseline passed. Synced main into the experiment
+  at 5d1022ced with 50 focused checks passing. No neoCLR runtime behavior change.
+
 - Extended explicit Raven library imports to nongeneric class/value types,
   constructors, fields/accessors, inheritance, interface/virtual calls and static/class
   method-group delegates. Added cross-assembly type visibility checks and qualified

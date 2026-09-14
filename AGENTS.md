@@ -4,6 +4,12 @@
 
 - Keep work in the Raven repository isolated on a feature branch. Verify its branch
   before editing; do not make experiment changes on Raven's `main` branch.
+- General fixes discovered through the experiment belong on Raven `main`: extract
+  and test them independently, then integrate them. Keep neoCLR-specific policies
+  and target experiments on their feature branch; never merge that branch wholesale.
+- Review mixed changes by behavior and dependencies. A general metadata/emission fix
+  is not permanently experimental just because neoCLR exposed it. Record deferred
+  general candidates explicitly until they can be validated independently.
 
 ## Sample readability
 
