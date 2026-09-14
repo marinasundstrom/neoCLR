@@ -30,6 +30,42 @@ A possible alternative emission backend is future evaluation, outside this scope
 [release work order](release-stabilization.md) is historical; remaining general
 compiler reviews continue before the generic-library authoring probe and migration.
 
+## Interface implementation metadata follow-through — 2026-09-14
+
+Raven main includes `f8f7568a1`, independently reviewed from `000ed511e`.
+The ordinary CLI regression compiled against a reference-only library and ran with
+its separate implementation. Default .NET emission passed initially; target-core
+emission failed while writing an imported generic interface declaration. Replacing
+that declaration exposed a second failure during .NET execution: primitive generic
+arguments had been encoded as value-type tokens rather than CLI primitive elements.
+
+The fix normalizes imported `MethodImpl` declarations through the existing semantic
+reference mechanism, replaces temporary declarations before writing, tracks new
+member references during scope normalization, and preserves primitive element codes.
+Both implicit and explicit implementations are covered, including generic interface
+returns, property getters, closed owners, definition-relative generic parameters,
+assembly scopes and actual interface dispatch. No neoCLR names, target policies or
+experimental import options are used by these regressions.
+
+This review independently extracted the general member-reference tracking helper and
+primitive type-reference encoding from the mixed `04c953d67` candidate as dependencies.
+Its pattern changes, imported method-signature corrections (including Unit handling)
+and normalization-order change remain to be classified and tested separately; the
+mixed candidate has not been integrated wholesale.
+
+All 15 prior focused metadata checks passed before the new regression. After the
+fix, all 54 combined interface/metadata/generic/attribute checks and the .NET 10/.NET 11
+build/run matrix passed. This is focused compatibility evidence, not a full Raven
+release gate or proof of .NET Framework/NanoFramework execution. The main-based
+branch was fast-forwarded, pushed and removed. The neoCLR experiment remains at
+`246d697bf`; these reviewed main changes have not yet been synchronized there.
+Published Preview 6 artifacts remain unchanged.
+
+Next: review the remaining mixed union-pattern/target-signature (`04c953d67`) and
+array-factory (`de872fa34`) changes. Then synchronize reviewed main fixes into the
+experiment and run the separate generic-library capability probe. Runtime-library
+migration remains paused.
+
 ## Application generic metadata follow-through — 2026-09-14
 
 Raven main includes `b5ce4023b`, independently reviewed from the `cbd87efa8`
@@ -58,10 +94,9 @@ existing candidate implementation is not evidence that these new main changes ha
 been synchronized or validated there yet. No samples or published release artifacts
 were modified.
 
-Next: independently review interface implementation references (`000ed511e`), then
-classify the mixed union-pattern (`04c953d67`) and array-factory (`de872fa34`) changes.
-Synchronize the reviewed main fixes into the experiment before the separate generic
-library capability probe. Runtime-library migration remains paused.
+At this checkpoint, interface implementation references (`000ed511e`) were next;
+that review is now complete as recorded above. Remaining mixed reviews and the
+generic-library capability probe still precede runtime-library migration.
 
 ## Delegate metadata follow-through — 2026-09-14
 

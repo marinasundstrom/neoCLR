@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-14
 
+- Completed the independent interface implementation metadata review: integrated
+  Raven `f8f7568a1` into main after 54 focused checks and the .NET 10/.NET 11
+  build/run matrix passed. Recorded the primitive-signature failure caught by .NET
+  execution, independently extracted dependencies from the mixed candidate, and
+  remaining union-pattern/array-factory reviews. The experimental branch remains
+  separate and unsynchronized; runtime-library migration stays paused.
+
 - Completed the independent application-generic metadata review: integrated Raven
   `b5ce4023b` into main after 42 focused checks and the .NET 10/.NET 11 build/run
   matrix passed. The review also fixed ordinary .NET generic field resolution.
