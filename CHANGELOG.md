@@ -6,6 +6,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+## 0.1.0-preview.6 — 2026-09-14
+
+Stabilization and collection APIs, with a freshly synchronized experimental Raven
+SDK/VSIX. See [release notes](docs/preview-6-release-notes.md). Source and package
+validation are required before publication; release assets carry the evidence.
+
 ### 2026-09-14
 
 - Recorded the clarified CLI-compatible target-model direction and release-first

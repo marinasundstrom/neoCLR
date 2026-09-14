@@ -1,6 +1,6 @@
 # Runtime and Raven preview
 
-Preview 5 is [available on GitHub](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.5). This
+Preview 6 is [available on GitHub](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.6). This
 release has two entry points: neoCLR directly through neoIL, and the experimental
 Raven toolchain compiling programs against neoCLR's own runtime library.
 
@@ -95,7 +95,7 @@ history; new Raven work does not require migrating that frontend.
 
 ## Validation and release status
 
-The Preview 5 release carries [exact-source CI evidence and package validation logs](preview-5-validation.md),
+The Preview 6 release carries [exact-source CI evidence and package validation logs](preview-6-validation.md),
 including application classes, order persistence and deferred queries. Use its
 manifest/checksums for exact revisions and artifacts. Source CI does not imply
 prebuilt Raven toolchain support on other hosts. The

@@ -1,7 +1,7 @@
 # neoCLR
 
 [![CI](https://github.com/marinasundstrom/neoCLR/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/marinasundstrom/neoCLR/actions/workflows/ci.yml)
-[![Preview 5](https://img.shields.io/badge/release-v0.1.0--preview.5-blue)](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.5)
+[![Preview 6](https://img.shields.io/badge/release-v0.1.0--preview.6-blue)](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.6)
 [![MIT license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Rust 1.85+](https://img.shields.io/badge/Rust-1.85%2B-orange)](Cargo.toml)
 
@@ -55,8 +55,8 @@ explicit **neoCLR: Build saved project** / **neoCLR: Run saved project** tasks.
 The normal Raven toolbar build/run/debug commands do not implement this target.
 See [runtime API coverage](docs/raven-runtime-api-coverage.md) for supported contracts
 and importer limits, and [the packaging procedure](docs/experiments/raven-target/RELEASING.md)
-for producing a matching experimental toolchain. Preview 5 packages these entry points together; see the
-[release notes](docs/preview-5-release-notes.md) for assets, prerequisites and limits.
+for producing a matching experimental toolchain. Preview 6 packages these entry points together; see the
+[release notes](docs/preview-6-release-notes.md) for assets, prerequisites and limits.
 
 ## Earlier Neo language experiment
 
@@ -82,12 +82,12 @@ separates unreleased work from published capabilities. Every commit updates it u
 The [next-preview validation guide](docs/next-preview-validation.md) documents the
 reproducible source-archive check and exact-commit release gates.
 
-## Preview 5
+## Preview 6
 
-**Preview 5 (v0.1.0-preview.5)** presents the runtime and its System library through
+**Preview 6 (v0.1.0-preview.6)** presents the runtime and its System library through
 neoIL and Raven. It includes a macOS arm64 runtime bundle, experimental Raven SDK/VSIX,
 examples, source, attribution and validation evidence. Start with the
-[release notes](docs/preview-5-release-notes.md). Publication is gated on the exact
+[release notes](docs/preview-6-release-notes.md). Publication is gated on the exact
 source revision passing CI; the GitHub prerelease is the asset source of truth.
 
 ## Earlier previews
