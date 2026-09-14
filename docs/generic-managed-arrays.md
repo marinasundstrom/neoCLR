@@ -34,8 +34,8 @@ Span or Memory contract is introduced here.
 
 Compared with .NET, the deliberate differences are the generic runtime array shape
 and invariant mutable arrays. Familiar allocation, aliasing, default reference
-slots and ordinary array IL remain. The profile keeps nongeneric System.Array for
-existing static ForEach compiler declarations. Raven still imports ordinary array
+slots and ordinary array IL remain. The reference surface retains nongeneric
+System.Array as the CLI array base; callable array helpers now live on Array<T>. Raven still imports ordinary array
 signatures. The reference assembly now declares a generic System.Array<T> interface
 shape implementing MutableSequence<T>. `RavenIterationArrayShapeType` selects it; Raven
 reads its interface metadata instead of hardcoding Iterable on vector symbols.
@@ -43,18 +43,62 @@ The selected generic shape and T[] now resolve to the same array in Raven source
 annotations and imported signatures. Assignment in either direction, nested arrays,
 indexing and typeof use normal vector semantics. The compiler emits ordinary CLI
 array signatures. Array base members and interface members such as GetIterator are
-available directly; arbitrary members on the metadata class are not projected. The reference declaration and
+available directly. Public methods and properties on the configured generic shape
+are projected as well, retaining their metadata owner for calls. The reference declaration and
 runtime implementation must stay aligned; the interface probe checks the shape.
 
-## Planned API follow-through — 2026-09-14
+## Generic array APIs — 2026-09-14
 
-Use the generic array shape for the proposed `Array<T>.Empty` static getter-only
-property and instance `ForEach(action)` method, retaining `Func<T, Void>` callbacks.
-The receiver supplies the array and element type for ForEach. This is a source API
-change from the current static helper; runtime members, reference metadata and Raven
-member lookup must be updated and tested together. The existing implementation
-above remains current until that slice lands. See the
-[target assessment](raven-target-evaluation.md#generic-array-api-direction-2026-09-14).
+The Raven profile implements a static getter-only `Array<T>.Empty` property and an
+instance `ForEach(action)` method accepting `Func<T, Void>`. The receiver supplies
+both the array and its element type. ForEach visits elements in increasing index
+order; it copies value elements and passes reference elements as references. Callback
+faults stop traversal through ordinary runtime fault behavior. An empty array invokes
+no callbacks.
+
+```raven
+let empty = Array<int>.Empty
+let values = [1, 2, 3]
+values.ForEach(value => WriteLine(value))
+```
+
+Empty currently creates a zero-length array using `newarr`; shared identity/caching
+is not promised. No new opcode, wrapper object or array covariance is introduced.
+The existing bounded element catalog still applies. The old static
+`Array.ForEach(values, action)` API is removed from this profile; legacy Neo sources
+are separate and unchanged. This differs from .NET's static helper API while keeping
+familiar callbacks and array storage. The generic shape avoids repeating the array
+as an explicit helper argument; it requires target-aware member projection in Raven.
+
+Raven resolves configured shape members from metadata, preserving interface dispatch
+for interface members and giving projected members precedence over inherited names.
+The constructor signature for `Func<T, Void>` retains a nominal type reference for
+Void; ordinary no-result returns stay CLI void. The experiment also includes Raven
+main's independent void-call stack fix, found by testing expression-bodied callbacks.
+
+Four Raven samples cover method groups, lambdas, primitive/reference/nested empty
+arrays, direct loops and reflection. The signature probe rejects wrong receivers,
+return types, pointer elements and array variance. The runtime reflection tests now
+include Empty and ForEach. Installed SDKs and extensions are not refreshed by this
+source slice.
+
+To exercise the source integration, use experimental Raven `8823261b6` or later
+on `codex/neoclr-namespace-metadata`:
+
+```sh
+dotnet build docs/experiments/raven-target/Probe.csproj \
+  -p:RavenRoot=/absolute/path/to/Raven -m:1 /property:WarningLevel=0
+dotnet docs/experiments/raven-target/bin/Debug/net11.0/Probe.dll \
+  --array-api /tmp/neoclr-array-api
+python3 docs/experiments/raven-target/collection_library.py /tmp/neoclr-array-System.neoil
+cargo build --bin neoclr
+python3 docs/experiments/raven-target/verify_array_api.py /tmp/neoclr-array-api \
+  --runtime target/debug/neoclr --system /tmp/neoclr-array-System.neoil
+```
+
+Use fresh temporary paths for generated artifacts. See the
+[target assessment](raven-target-evaluation.md#generic-array-api-direction-2026-09-14)
+for the separate empty collection-expression emission review.
 
 ## Try the direct IL examples
 

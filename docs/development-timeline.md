@@ -2896,3 +2896,14 @@ static with `Array<T>`. The assistant proposed an instance `ForEach(action)` met
 with the receiver supplying both the array and its element type, retaining the
 existing `Func<T, Void>` callback contract. This is recorded for the array API slice;
 the static implementation has not yet been replaced.
+
+
+**Implementation follow-through:** Added the static Empty getter and instance ForEach
+to the Raven runtime profile, compiler reference declarations and importer catalog.
+Raven's experimental array projection now exposes configured shape members. Empty
+uses a zero-length allocation for now; no shared-identity guarantee is made. Four
+Raven samples compiled, imported, verified and executed, and 121 signature checks
+passed. Expression-bodied callbacks exposed a general void-call stack defect;
+`8dbd96fb6` was independently reproduced/tested and integrated into Raven main, then
+cherry-picked as `5c32d1d06` into the experiment. Nominal generic Void emission remains
+experimental. Installed tools have not yet been refreshed.

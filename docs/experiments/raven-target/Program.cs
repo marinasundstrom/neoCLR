@@ -48,6 +48,12 @@ if (args.Length == 2 && args[0] == "--matches")
     return;
 }
 
+if (args.Length == 2 && args[0] == "--array-api")
+{
+    ArrayApiProbe.Write(args[1]);
+    return;
+}
+
 if (args.Length == 2 && args[0] == "--arrays")
 {
     ArrayProbe.Write(args[1]);

@@ -586,8 +586,8 @@ factory on its non-generic Array base class. It fits neoCLR's existing generic a
 shape without adding a method type argument. The cost is another API shape that
 compiler target mapping must recognize if it wants to use the shared empty array.
 
-The property, caching policy and experimental Raven mapping remain to be implemented
-and validated. Keep the general Raven array-factory review independent: an empty
+At this proposal checkpoint, the property, caching policy and experimental Raven
+mapping remained to be implemented and validated. Keep the general Raven array-factory review independent: an empty
 collection expression must not assume a factory absent from the target metadata;
 a zero-length array allocation is a possible fallback. Do not add a hardcoded
 neoCLR property lookup to Raven main.
@@ -599,5 +599,18 @@ and T, and the existing `Func<T, Void>` callback contract retained. Compared wit
 the static `Array.ForEach<T>(array, action)` shape, this removes redundant array and
 method-type arguments and places iteration on the same generic API as other array
 members. It changes the source API and requires the runtime library, reference
-metadata and Raven array-member projection to agree. It is planned, not implemented;
-keep any target-specific projection changes on Raven's experimental branch.
+metadata and Raven array-member projection to agree. The implementation follow-through is recorded below; keep target-specific projection
+changes on Raven's experimental branch.
+
+
+**Implemented follow-through:** The Raven profile now implements both members; see
+[generic array APIs](generic-managed-arrays.md#generic-array-apis-2026-09-14) for
+semantics, migration and source validation commands. Empty currently allocates a fresh
+zero-length vector. The general empty collection-expression factory review remains
+separate. The array projection and nominal generic Void correction are committed as Raven
+`8823261b6` and stay experimental.
+The general absent-call-result fix was independently integrated on Raven main as
+`8dbd96fb6`, then cherry-picked into the experiment as `5c32d1d06`; its ordinary and
+target-metadata .NET regressions pass, alongside 39 focused runtime checks.
+Four array samples execute on neoCLR and 121 signature checks pass. Installed-tool
+refresh and synchronization of the other reviewed Raven main fixes remain pending.

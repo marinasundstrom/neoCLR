@@ -8,15 +8,21 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-14
 
+- Implemented `Array<T>.Empty` and instance `ForEach(Func<T, Void>)` in the Raven
+  runtime profile, reference surface and importer. Empty currently allocates a
+  zero-length array without a shared-identity guarantee. Removed the profile's static
+  ForEach helper; use `values.ForEach(action)`. Updated samples, reflection coverage
+  and source validation instructions. Four Raven samples, 121 signature checks and 32 runtime/collection regressions
+  pass; installed tools still require refresh. Kept configured array-member projection
+  and nominal generic Void emission on Raven's experimental branch.
+- Independently fixed void-call stack-result tracking on Raven main (`8dbd96fb6`),
+  then cherry-picked it into the experiment (`5c32d1d06`). Both ordinary and target-
+  metadata .NET reproductions now run; 39 focused runtime and 21 initial checks pass.
+
 - Recorded Raven main's qualified union type-pattern fix (`b0681f32b`), including
   closed variant member types and target-core locals. All 272 focused checks and the
   .NET 10/.NET 11 build/run matrix passed. Kept array-factory review, experimental
   synchronization and installed-tool refresh pending; library migration stays paused.
-
-- Recorded the proposed `Array<T>.Empty` property and instance `ForEach(action)`
-  method, compared with the static .NET helper APIs. Kept API changes and experimental
-  compiler mapping explicitly pending, separate from general Raven array-factory
-  capability handling. Linked the generic-array documentation to the planned slice.
 
 - Recorded the author's indexer-completion report and Raven main fix `ac4901f6b`:
   indexers require `[index]` access; their metadata names no longer behave as ordinary

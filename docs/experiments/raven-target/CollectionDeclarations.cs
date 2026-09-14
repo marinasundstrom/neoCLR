@@ -5,6 +5,8 @@ static class CollectionDeclarations
         // Interface metadata for CLI vectors; allocation still uses newarr.
         public sealed class Array<T> : Collections.MutableSequence<T> {
             private Array() { }
+            public static T[] Empty => default;
+            public void ForEach(Func<T, PropagationUnit> action) { }
             public int Count => default;
             public T this[int index] { get => default; set { } }
             public Collections.Iterator<T> GetIterator() => default;

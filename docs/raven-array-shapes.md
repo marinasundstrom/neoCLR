@@ -3,8 +3,10 @@
 The importer accepts vectors of existing defaultable primitive/calendar/error values
 and ordinary reference shapes, including reflection classes, interfaces and nested
 arrays. Array creation, length, typed loads/stores and element addresses share that
-mapping. Array.ForEach uses the same element catalog and the existing Func<T,Void>
-callback algorithm. Reference arrays preserve identities; value elements are copied.
+mapping. Instance `Array<T>.ForEach` uses the same element catalog and the existing Func<T,Void>
+callback algorithm; the receiver supplies the array and element type.
+`Array<T>.Empty` is a getter-only static property creating an empty vector; see
+[generic array APIs](generic-managed-arrays.md#generic-array-apis-2026-09-14). Reference arrays preserve identities; value elements are copied.
 
 [The array sample](experiments/raven-target/samples/library-array-shapes.rvn) exercises
 long callbacks, Boolean stores and short-circuit reads, Type callbacks, boxed interface

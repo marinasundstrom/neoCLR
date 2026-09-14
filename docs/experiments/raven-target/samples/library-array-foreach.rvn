@@ -6,18 +6,14 @@ func Main() {
         WriteLine(member.Name)
     }
 
-    let empty: int[] = []
+    let empty: int[] = Array<int>.Empty
     for value in empty {
         WriteLine("Unexpected empty-array element")
     }
 
     let singleton: int[] = [42]
-    for value in singleton {
-        WriteLine(value)
-    }
+    singleton.ForEach(value => WriteLine(value))
 
     let values: int[] = [1, 2, 3]
-    for value in values {
-        WriteLine(value)
-    }
+    values.ForEach(value => WriteLine(value))
 }

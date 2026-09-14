@@ -80,7 +80,9 @@ def build(path: Path) -> str:
     if path.stem == 'Array':
         return (ROOT / 'runtime/raven/Array.neoil').read_text() + (ROOT / 'runtime/raven/NativeMemory.neoil').read_text()
     if path.stem == 'Func':
-        text = text.replace('readonly T[]& array', 'arrayref<T> array').replace('-> Void', '-> noresult')
+        # The Raven profile declares instance ForEach on the managed Array<T> shape.
+        text = text[:text.index('; Managed-array callback consumer')]
+        text = text.replace('-> Void', '-> noresult')
         text = re.sub(r'^\s*ldvoid\n', '\n', text, flags=re.M)
     lines = []
     for line in text.splitlines(keepends=True):

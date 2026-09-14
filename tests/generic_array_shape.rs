@@ -1,5 +1,8 @@
 use neoclr::{Limits, Value, assemble, run_with_library, verify_with_library};
 
+const CALLBACK: &str =
+    ".delegate System.Func<T,R>\n.method instance Invoke(T value) -> R\n.end\n.end";
+
 const ITERATION: &str = r#"
 .interface System.Collections.Iterable<T>
 .method instance GetIterator() -> System.Collections.Iterator<T>
@@ -31,7 +34,7 @@ ret
 
 fn library() -> neoclr::Module {
     assemble(&format!(
-        ".module System\n{ITERATION}\n{}",
+        ".module System\n{CALLBACK}\n{ITERATION}\n{}",
         concat!(
             include_str!("../runtime/raven/CollectionContracts.neoil"),
             include_str!("../runtime/raven/Array.neoil")
@@ -146,8 +149,8 @@ fn generic_identity_and_reflection_describe_the_existing_array() {
     assert_eq!(a.generic_arguments.len(), 1);
     assert_eq!(a.generic_arguments[0].name, "System.Int32");
     for (method, result, count) in [
-        ("GetProperties", "System.Reflection.PropertyInfo[]", 3),
-        ("GetMethods", "System.Reflection.MethodInfo[]", 4),
+        ("GetProperties", "System.Reflection.PropertyInfo[]", 4),
+        ("GetMethods", "System.Reflection.MethodInfo[]", 6),
         ("GetGenericArguments", "System.Type[]", 1),
     ] {
         let app = assemble(&format!(".module App\n.entry Main\n.function Main() -> {result}\nldtoken arrayref<Int32>\ncall System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)\ncall instance System.Type::{method}()\nret\n.end")).unwrap();
@@ -273,4 +276,61 @@ fn array_metadata_cannot_promise_unimplemented_growth() {
         )
     );
     assert!(assemble(&source).is_err());
+}
+
+#[test]
+fn empty_array_and_instance_foreach_use_existing_storage() {
+    let library = library();
+    let source = r#".module App
+.entry Main
+.function Check(Int32 value) -> Void
+ldarg value
+ldc.i4 42
+ceq
+brtrue Good
+fault "Unexpected callback value"
+Good:
+ldvoid
+ret
+.end
+.function Main() -> Int32
+.local arrayref<Int32> data
+call System.Array<Int32>::get_Empty()
+dup
+call instance System.Array<Int32>::get_Length()
+brtrue Bad
+delegate.bind System.Func<Int32,Void> = Check(Int32)
+call instance System.Array<Int32>::ForEach(System.Func<Int32,Void>)
+ldc.i4 1
+newarr Int32
+stloc data
+ldloc data
+ldc.i4 0
+ldc.i4 42
+stelem Int32
+ldloc data
+delegate.bind System.Func<Int32,Void> = Check(Int32)
+callvirt instance System.Array<Int32>::ForEach(System.Func<Int32,Void>)
+ldloc data
+ldc.i4 0
+ldelem Int32
+ret
+Bad:
+pop
+ldc.i4 -1
+ret
+.end"#;
+    let app = neoclr::assembler::read_modules(
+        &[neoclr::assembler::ModuleInput::Source(source)],
+        &library,
+    )
+    .unwrap()
+    .remove(0);
+    verify_with_library(&app, &library).unwrap();
+    assert_eq!(
+        run_with_library(&app, &library, Limits::default())
+            .unwrap()
+            .value,
+        Value::Int32(42)
+    );
 }
