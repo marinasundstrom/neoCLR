@@ -11,7 +11,7 @@ static class DoubleBindings
     public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition)
     {
         if (!RuntimeSignatures.IsCore(reference.DeclaringType.Scope)) return null;
-        if (reference.DeclaringType.FullName == "System.Math" && reference.ReturnType.MetadataType == MetadataType.Double)
+        if (NamespaceFunctions.Owner(reference.DeclaringType) == "System.Math" && reference.ReturnType.MetadataType == MetadataType.Double)
         {
             var (args, result) = RuntimeSignatures.Match(reference, definition, _ => null);
             if (!reference.HasThis && result == "Double" && args.All(a => a == "Double")

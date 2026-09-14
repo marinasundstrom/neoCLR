@@ -3,6 +3,10 @@
 This bounded slice extends the ordinary System.Math library. It does not introduce
 new opcodes or a complete numeric framework.
 
+Raven exposes `System.Math` as a namespace, supporting qualified calls and
+`import System.Math.*`. See the [System library authoring workflow](raven-system-library.md)
+for the CLI container contract, bootstrap representation and build instructions.
+
 ## Surface and behavior
 
 - Int32 Min and Max return an operand; Sign returns -1, 0 or 1 without subtracting
@@ -21,7 +25,8 @@ new opcodes or a complete numeric framework.
   infinity where applicable, with no fabricated Result error or terminal fault.
 
 Inputs are values, with no retained reference, mutation or heap ownership. Integer
-policy and Result construction live in IL. Fifteen signature-validated bootstrap
+policy and Result construction are authored in Raven in the shared System project
+and execute through checked-in generated neoIL. Fifteen signature-validated bootstrap
 helpers implement Double operations using host floating facilities and explicit
 NaN/zero selection for Min/Max. These declare the MathOperations runtime service;
 integer methods do not. Host code exhaustively matching RuntimeService must account

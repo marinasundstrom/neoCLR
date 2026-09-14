@@ -20,12 +20,13 @@ containers = {'.type', '.interface', '.delegate'}
 blocks = containers | {'.method', '.property', '.function'}
 leaves = {'.field', '.literal', '.enum'}
 
-def visit(path, active=()):
+def visit(path, active=(), context=()):
     path = path.resolve()
     if path in active:
         raise ValueError('Include cycle: ' + str(path))
     files.append(str(path.relative_to(ROOT)))
-    stack = []
+    stack = list(context)
+    initial_depth = len(stack)
     for line, text in enumerate(path.read_text().splitlines(), 1):
         text = text.split(';', 1)[0].strip()
         if not text:
@@ -34,7 +35,7 @@ def visit(path, active=()):
             match = re.fullmatch(r'\.include "([^"]+)"', text)
             if not match:
                 raise ValueError((path, line, 'Unsupported include syntax'))
-            visit(path.parent / match[1], (*active, path))
+            visit(path.parent / match[1], (*active, path), tuple(stack))
             continue
         keyword = text.split()[0]
         if keyword == '.end':
@@ -52,7 +53,7 @@ def visit(path, active=()):
                 })
             if keyword in blocks:
                 stack.append((keyword, text, hidden))
-    if stack:
+    if len(stack) != initial_depth:
         raise ValueError((path, 'Unclosed declaration block'))
 
 visit(ROOT / 'runtime/System.neoil')

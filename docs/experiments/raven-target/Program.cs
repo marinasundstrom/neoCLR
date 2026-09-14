@@ -66,6 +66,19 @@ if (args.Length == 2 && args[0] == "--interfaces")
     return;
 }
 
+if (args.Length == 2 && args[0] == "--reference-core")
+{
+    CoreDeclarations.Write(args[1], unionProbe: true, collectionProbe: true);
+    return;
+}
+
+if (args.Length == 5 && args[0] == "--library-implementation")
+{
+    try { LibraryImplementation.Write(args[1], args[2], args[3], args[4]); }
+    catch (Exception error) { Console.Error.WriteLine(error.Message); Environment.ExitCode = 1; }
+    return;
+}
+
 if (args.Length >= 4 && args[0] == "--import")
 {
     try { ApplicationImport.Write(args[1], args[2], args[3], args.Skip(4).ToArray()); }

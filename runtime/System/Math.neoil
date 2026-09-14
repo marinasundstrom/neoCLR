@@ -1,88 +1,5 @@
 .type System.Math
-    .method static Abs(int32 value) -> System.Result<Int32,System.OverflowError>
-        ldarg value
-        ldc.i4 -2147483648
-        ceq
-        brtrue Overflow
-        ldarg value
-        ldc.i4 0
-        clt
-        brtrue Negative
-        ldarg value
-        newobj instance System.Result.Ok<Int32>::.ctor(Int32)
-        newobj instance System.Result<Int32,System.OverflowError>::.ctor(System.Result.Ok<Int32>)
-        ret
-        Negative:
-        ldc.i4 0
-        ldarg value
-        sub
-        newobj instance System.Result.Ok<Int32>::.ctor(Int32)
-        newobj instance System.Result<Int32,System.OverflowError>::.ctor(System.Result.Ok<Int32>)
-        ret
-        Overflow:
-        newobj instance System.OverflowError::.ctor()
-        newobj instance System.Result.Error<System.OverflowError>::.ctor(System.OverflowError)
-        newobj instance System.Result<Int32,System.OverflowError>::.ctor(System.Result.Error<System.OverflowError>)
-        ret
-    .end
-
-    .method static Min(Int32 left, Int32 right) -> Int32
-        ldarg left
-        ldarg right
-        blt Left
-        ldarg right
-        ret
-    Left:
-        ldarg left
-        ret
-    .end
-
-    .method static Max(Int32 left, Int32 right) -> Int32
-        ldarg left
-        ldarg right
-        bgt Left
-        ldarg right
-        ret
-    Left:
-        ldarg left
-        ret
-    .end
-
-    .method static Sign(Int32 value) -> Int32
-        ldarg value
-        ldc.i4 0
-        blt Negative
-        ldarg value
-        ldc.i4 0
-        bgt Positive
-        ldc.i4 0
-        ret
-    Negative:
-        ldc.i4 -1
-        ret
-    Positive:
-        ldc.i4 1
-        ret
-    .end
-
-    .method static Clamp(Int32 value, Int32 min, Int32 max) -> System.Result<Int32,System.InvalidRangeError>
-        ldarg min
-        ldarg max
-        bgt Invalid
-        ldarg value
-        ldarg min
-        call System.Math::Max(Int32,Int32)
-        ldarg max
-        call System.Math::Min(Int32,Int32)
-        newobj instance System.Result.Ok<Int32>::.ctor(Int32)
-        newobj instance System.Result<Int32,System.InvalidRangeError>::.ctor(System.Result.Ok<Int32>)
-        ret
-    Invalid:
-        newobj instance System.InvalidRangeError::.ctor()
-        newobj instance System.Result.Error<System.InvalidRangeError>::.ctor(System.InvalidRangeError)
-        newobj instance System.Result<Int32,System.InvalidRangeError>::.ctor(System.Result.Error<System.InvalidRangeError>)
-        ret
-    .end
+    .include "../raven/generated/Math.methods.neoil"
 
     .method static Abs(Double value) -> Double
         ldarg value
@@ -178,3 +95,5 @@
     .end
 
 .end
+
+.include "../raven/generated/Math.helpers.neoil"

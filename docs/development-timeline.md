@@ -3193,3 +3193,51 @@ qualified calls, coexistence with related types, and implementation import still
 need validation together. The probe result establishes the existing namespace
 contract, not completion of the Math migration. Cross-language consumption and
 reflection of generated containers remain explicit design costs.
+
+
+### 2026-09-14 — Shared System project and namespace lookup correction
+
+**Author's follow-up:** Directed continuation of the namespace-function pilot, then
+asked for a shared project for foundational runtime APIs, comparing it with the
+historical mscorlib grouping. Subsequently explicitly asked to fix the Raven
+resolution issue too. The assembly's historical name was context for the grouping
+question, not a selected neoCLR assembly identity.
+
+**Assistant's implementation:** Consolidated the pilot into
+[System.rvnproj](../runtime/raven/System.rvnproj), with Math as its first source.
+The source exposes namespace functions through Raven's existing CLI container and
+TopLevelAttribute contract. Added fresh bootstrap reference generation, ordinary
+Raven project compilation, signature-checked importing and checked-in executable
+fragments. Retained the existing internal Math method owner for direct IL and the
+archived Neo frontend, while exposing a namespace in Raven. Generated bodies replace
+the five handwritten scalar implementations; native Double services remain.
+
+**Problem found and compiler action:** A consumer adding a type to System.Math could
+use wildcard-imported functions but could not call them with qualified names.
+Reduced this to ordinary .NET reference metadata: source-only namespace lookup
+omitted referenced functions and constants. A focused regression failed before the
+fix; all 284 namespace/import tests passed after qualified lookup used the merged
+namespace. Integrated only that general correction into Raven main as `3ec32c96e`,
+then cherry-picked it onto the experiment as `008cb3245`. Removed the temporary,
+fully merged correction branch. No neoCLR policy was added to Raven main.
+
+**Validation and remaining scope:** The separate Raven consumer checks 69 outcomes,
+including named arguments, wildcard/qualified calls, a related namespace type,
+Int32 boundary values, Result payloads/errors and a Double function. Six invalid
+library contracts are rejected without executable output. Fresh regeneration matches
+the checked-in bodies, and existing direct runtime Math tests pass. The
+[authoring document](raven-system-library.md) distinguishes the bootstrap reference,
+implementation input and executable library. General generic-body importing and
+migration of core type definitions remain later gates. The installed .14 SDK is
+unchanged and predates the compiler correction; no new release is claimed here.
+
+**Author's source-style and workflow follow-up:** Suggested importing
+`System.Result.*` and `System.Option.*` to use `Ok`, `Error`, `Some` and `None`
+directly, then expressed the hope of porting the API to Raven slice by slice without
+interruptions. The assistant identified a repeatable build/validation path as the
+objective, with generic bodies and shared type identities still requiring proof.
+Updated Math and its consumer matches to imported Result cases. The qualified
+carrier annotation remains explicit after the signature guard caught an unresolved
+return-annotation issue; recorded that as a deferred general Raven candidate, not a
+completed compiler fix. This slice establishes the first migration path, not proof
+that every remaining API can already be translated without integration work.

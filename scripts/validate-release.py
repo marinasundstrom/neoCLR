@@ -9,6 +9,7 @@ from pathlib import Path
 import platform
 import re
 import subprocess
+import sys
 import tarfile
 import tempfile
 
@@ -90,6 +91,8 @@ def main():
             if not (source / name).is_file():
                 raise RuntimeError("required source member missing: " + name)
         report["registry_packages"], report["notice_files"] = audit_notices(source)
+        run([sys.executable, "docs/experiments/raven-target/build_runtime_library.py", "--check-snapshot"], source)
+        report["raven_library_snapshot"] = True
         env = dict(os.environ)
         env["CARGO_TARGET_DIR"] = str(output / "target")
         report["rustc"] = run(["rustc", "+" + args.toolchain, "-Vv"], source, True, env).strip()

@@ -1,0 +1,11 @@
+<Project>
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <AssemblyName>NeoCLR.System</AssemblyName>
+    <NeoCLRRoot>$(NeoCLRBootstrapRoot)</NeoCLRRoot>
+  </PropertyGroup>
+  <Import Project="../../build/NeoCLR.Raven.props" />
+  <ItemGroup>
+    <Compile Include="src/Math.rvn" />
+  </ItemGroup>
+</Project>

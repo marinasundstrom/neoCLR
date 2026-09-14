@@ -1,0 +1,53 @@
+; Generated from runtime/raven/src/Math.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Math.RuntimeErrorSystemInvalidRangeErrorNew() -> System.InvalidRangeError
+newobj instance System.InvalidRangeError::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Math.RuntimeErrorSystemOverflowErrorNew() -> System.OverflowError
+newobj instance System.OverflowError::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Math.RuntimeUnion0(System.OverflowError arg0) -> System.Result.Error<System.OverflowError>
+ldarg arg0
+newobj instance System.Result.Error<System.OverflowError>::.ctor(System.OverflowError)
+ret
+.end
+.function neoCLR.Library.System.Math.RuntimeUnion1(System.Result.Error<System.OverflowError> arg0) -> System.Result<Int32,System.OverflowError>
+ldarg arg0
+newobj instance System.Result<Int32,System.OverflowError>::.ctor(System.Result.Error<System.OverflowError>)
+ret
+.end
+.function neoCLR.Library.System.Math.RuntimeUnion2(Int32 arg0) -> System.Result.Ok<Int32>
+ldarg arg0
+newobj instance System.Result.Ok<Int32>::.ctor(Int32)
+ret
+.end
+.function neoCLR.Library.System.Math.RuntimeUnion3(System.Result.Ok<Int32> arg0) -> System.Result<Int32,System.OverflowError>
+ldarg arg0
+newobj instance System.Result<Int32,System.OverflowError>::.ctor(System.Result.Ok<Int32>)
+ret
+.end
+.function neoCLR.Library.System.Math.RuntimeUnion4(System.InvalidRangeError arg0) -> System.Result.Error<System.InvalidRangeError>
+ldarg arg0
+newobj instance System.Result.Error<System.InvalidRangeError>::.ctor(System.InvalidRangeError)
+ret
+.end
+.function neoCLR.Library.System.Math.RuntimeUnion5(System.Result.Error<System.InvalidRangeError> arg0) -> System.Result<Int32,System.InvalidRangeError>
+ldarg arg0
+newobj instance System.Result<Int32,System.InvalidRangeError>::.ctor(System.Result.Error<System.InvalidRangeError>)
+ret
+.end
+.function neoCLR.Library.System.Math.RuntimeUnion6(System.Result.Ok<Int32> arg0) -> System.Result<Int32,System.InvalidRangeError>
+ldarg arg0
+newobj instance System.Result<Int32,System.InvalidRangeError>::.ctor(System.Result.Ok<Int32>)
+ret
+.end
+.function neoCLR.Library.System.Math.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end

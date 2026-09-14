@@ -1,5 +1,12 @@
 # Raven target support before library migration
 
+**Current follow-up (2026-09-14, after Preview 7):** The
+[shared System project](raven-system-library.md) resumes migration with five scalar
+Math functions. The earlier pause/checkpoints below remain historical context. A
+general qualified namespace lookup fix was independently integrated into Raven main
+as `3ec32c96e` and cherry-picked into the experiment as `008cb3245`; no neoCLR
+policy was merged into main. Generic implementation importing remains a separate gate.
+
 Recorded 2026-09-14. This assessment supersedes the immediate migration priority in
 [the runtime API plan](runtime-api-plan.md). It is a source review and focused test
 checkpoint, not approval to merge the entire Raven experiment branch.
@@ -29,6 +36,24 @@ A possible alternative emission backend is future evaluation, outside this scope
 [Preview 6 is published](preview-6-release-notes.md). The earlier
 [release work order](release-stabilization.md) is historical; remaining general
 compiler reviews continue before the generic-library authoring probe and migration.
+
+## Deferred return-annotation resolution candidate — 2026-09-14
+
+While changing the Math source to imported `Ok`/`Error` cases, the experimental
+compiler accepted an unqualified `Result<int, OverflowError>` return annotation
+inside `namespace System.Math`, with specific error imports and
+`import System.Result.*`, but emitted `System.Object` as its return type. The
+implementation importer rejected that signature against the reference contract.
+Adding `import System.Result` did not resolve the observed case; explicitly writing
+`System.Result<int, OverflowError>` did, and regeneration/consumer checks passed.
+
+This is an unresolved general compiler candidate, not a selected target policy.
+Reduce it against ordinary CLI union metadata, check name resolution and missing-type
+diagnostics, and integrate any general correction independently on Raven main.
+The precise cause and scope are not yet established. Separately, importing both
+`System.*` and `System.Result.*` introduces the existing `System.Error` name alongside
+the case name; the pilot uses specific error imports rather than introducing a
+neoCLR-specific lookup precedence rule.
 
 ## Qualified union type-pattern follow-through — 2026-09-14
 

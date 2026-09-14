@@ -1,6 +1,6 @@
 {
   "purpose": "Explicit source-by-source API audit. Samples and signature checks are evidence, not a claim of arbitrary generic/compiler support.",
-  "declarationCount": 616,
+  "declarationCount": 626,
   "sources": [
     {
       "file": "runtime/System/Equatable.neoil",
@@ -319,13 +319,43 @@
     },
     {
       "file": "runtime/System/Math.neoil",
-      "declarations": 21,
+      "declarations": 16,
       "disposition": "math",
       "samples": [
         "library-floating-math.rvn",
         "library-math.rvn",
         "library-clamp.rvn"
       ]
+    },
+    {
+      "file": "runtime/raven/generated/Math.methods.neoil",
+      "declarations": 5,
+      "disposition": "raven-authored-math-bootstrap",
+      "samples": [
+        "library-math.rvn",
+        "library-clamp.rvn"
+      ],
+      "tests": [
+        "docs/experiments/raven-target/verify_math_library.py",
+        "tests/math_helpers.rs",
+        "tests/math_typed.rs"
+      ],
+      "note": "Generated scalar bodies and implementation adapters; source authority is runtime/raven/src/Math.rvn."
+    },
+    {
+      "file": "runtime/raven/generated/Math.helpers.neoil",
+      "declarations": 10,
+      "disposition": "raven-authored-math-bootstrap",
+      "samples": [
+        "library-math.rvn",
+        "library-clamp.rvn"
+      ],
+      "tests": [
+        "docs/experiments/raven-target/verify_math_library.py",
+        "tests/math_helpers.rs",
+        "tests/math_typed.rs"
+      ],
+      "note": "Generated scalar bodies and implementation adapters; source authority is runtime/raven/src/Math.rvn."
     },
     {
       "file": "runtime/System/InvalidRangeError.neoil",
@@ -343,77 +373,77 @@
         {
           "service": "neoCLR.Runtime.MathAbs",
           "file": "runtime/System/Math.neoil",
-          "line": 89
+          "line": 6
         },
         {
           "service": "neoCLR.Runtime.MathSqrt",
           "file": "runtime/System/Math.neoil",
-          "line": 95
+          "line": 12
         },
         {
           "service": "neoCLR.Runtime.MathFloor",
           "file": "runtime/System/Math.neoil",
-          "line": 101
+          "line": 18
         },
         {
           "service": "neoCLR.Runtime.MathCeiling",
           "file": "runtime/System/Math.neoil",
-          "line": 107
+          "line": 24
         },
         {
           "service": "neoCLR.Runtime.MathTruncate",
           "file": "runtime/System/Math.neoil",
-          "line": 113
+          "line": 30
         },
         {
           "service": "neoCLR.Runtime.MathRound",
           "file": "runtime/System/Math.neoil",
-          "line": 119
+          "line": 36
         },
         {
           "service": "neoCLR.Runtime.MathExp",
           "file": "runtime/System/Math.neoil",
-          "line": 125
+          "line": 42
         },
         {
           "service": "neoCLR.Runtime.MathLog",
           "file": "runtime/System/Math.neoil",
-          "line": 131
+          "line": 48
         },
         {
           "service": "neoCLR.Runtime.MathLog10",
           "file": "runtime/System/Math.neoil",
-          "line": 137
+          "line": 54
         },
         {
           "service": "neoCLR.Runtime.MathSin",
           "file": "runtime/System/Math.neoil",
-          "line": 143
+          "line": 60
         },
         {
           "service": "neoCLR.Runtime.MathCos",
           "file": "runtime/System/Math.neoil",
-          "line": 149
+          "line": 66
         },
         {
           "service": "neoCLR.Runtime.MathTan",
           "file": "runtime/System/Math.neoil",
-          "line": 155
+          "line": 72
         },
         {
           "service": "neoCLR.Runtime.MathPow",
           "file": "runtime/System/Math.neoil",
-          "line": 162
+          "line": 79
         },
         {
           "service": "neoCLR.Runtime.MathMin",
           "file": "runtime/System/Math.neoil",
-          "line": 169
+          "line": 86
         },
         {
           "service": "neoCLR.Runtime.MathMax",
           "file": "runtime/System/Math.neoil",
-          "line": 176
+          "line": 93
         }
       ]
     },

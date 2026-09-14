@@ -24,6 +24,12 @@ static class UnionImport
     sealed record Call(string Name, string[] Arguments, string Result, int OutArgument = -1, string? Instruction = null, bool ConditionalOutput = false);
 
     public static void Write(string application, string core, string destination, bool collectionProfile = false, params string[] dependencies)
+        => WriteImplementation(application, core, destination, collectionProfile, dependencies, null);
+
+    public static void WriteLibrary(string application, string core, string destination, string owner)
+        => WriteImplementation(application, core, destination, true, [], owner);
+
+    static void WriteImplementation(string application, string core, string destination, bool collectionProfile, string[] dependencies, string? libraryOwner)
     {
         if (dependencies.Length > 8) throw new InvalidDataException("Library input limit exceeded.");
         GenericUnionBindings.Reset();
@@ -43,8 +49,12 @@ static class UnionImport
         if (guestLibraries.Append(app.MainModule).Any(module => module.Types.Any(t => t.Name == "<Module>" && t.Methods.Any(m => m.IsConstructor && m.IsStatic))))
             throw new InvalidDataException("Module initializers unsupported.");
         ApplicationTypes.Reset(guestLibraries.Append(app.MainModule).ToArray());
-        var entry = app.EntryPoint ?? throw new InvalidDataException("Missing entry point.");
-        if (entry.Parameters.Count != 0 || entry.ReturnType.MetadataType != MetadataType.Void)
+        var exports = libraryOwner is null ? [] : LibraryImplementation.Roots(app.MainModule, library.MainModule, libraryOwner);
+        var entry = libraryOwner is null ? app.EntryPoint ?? throw new InvalidDataException("Missing entry point.") : null;
+        string Name(MethodDefinition method) => libraryOwner is null ? MetadataIdentity.FunctionName(method)
+            : exports.Contains(method) ? libraryOwner + "." + method.Name
+            : throw new InvalidDataException("Unexported implementation dependency: " + method.FullName);
+        if (entry is not null && (entry.Parameters.Count != 0 || entry.ReturnType.MetadataType != MetadataType.Void))
             throw new InvalidDataException("Result profile requires a parameterless no-result entry.");
         if (collectionProfile) { InterfaceBindings.Validate(library.MainModule); CollectionBindings.Validate(library.MainModule); ReflectionBindings.Validate(library.MainModule); NativeMemoryBindings.Validate(library.MainModule); }
         string ProfileType(TypeReference type, bool result = false)
@@ -53,7 +63,7 @@ static class UnionImport
             if (collection is not null && collectionProfile) return collection;
             return ApplicationTypes.Type(type) ?? InterfaceBindings.Type(type) ?? NativeMemoryBindings.Type(type) ?? ReflectionBindings.Type(type) ?? DelegateBindings.Type(type) ?? ProcessBindings.ArrayType(type) ?? GenericUnionBindings.Type(type) ?? CalendarBindings.Type(type) ?? PrimitiveBindings.Type(type) ?? ResultBindings.Type(type) ?? Type(type, result);
         }
-        var output = new StringBuilder($".module ImportedUnion\n.entry {Name(entry)}\n");
+        var output = new StringBuilder(entry is not null ? $".module ImportedUnion\n.entry {Name(entry)}\n" : "");
         var coercions = new Dictionary<string, (string Name, string Body)>();
         Call Coerce(Call call, string[] actual)
         {
@@ -72,7 +82,7 @@ static class UnionImport
         }
         var delegateAdapters = new Dictionary<string, string>();
         var mappings = new List<(MethodDefinition Method, int MethodId, int Offset)>();
-        var pending = new Queue<MethodDefinition>(); pending.Enqueue(entry);
+        var pending = new Queue<MethodDefinition>(entry is not null ? [entry] : exports);
         var seen = new HashSet<MethodDefinition>();
         var instanceBodies = new Dictionary<MethodDefinition, string>();
         while (pending.TryDequeue(out var method))
@@ -80,6 +90,7 @@ static class UnionImport
             if (!seen.Add(method)) continue;
             var methodId = seen.Count;
             if (seen.Count > 128) throw new InvalidDataException("Method limit exceeded.");
+            if (libraryOwner is not null && !exports.Contains(method)) throw new InvalidDataException("Unexported library body.");
             ApplicationTypes.CheckMethod(method);
             foreach (var parameter in method.Parameters) ApplicationTypes.CheckAccess(parameter.ParameterType, method.Module);
             ApplicationTypes.CheckAccess(method.ReturnType, method.Module);
@@ -598,7 +609,7 @@ static class UnionImport
             }
             var methodStart = output.Length;
             // Unreachable guest instructions are omitted, not admitted as executable code.
-            output.AppendLine(emitInstance ? $".method instance {(method.DeclaringType.IsValueType ? "byref " : "")}{ApplicationTypes.Modifiers(method)}{ApplicationTypes.MethodName(method)}({string.Join(',', args.Skip(1))}) -> {(method.DeclaringType.IsValueType && result == "noresult" ? "Void" : result)}" : $".function {Name(method)}({string.Join(',', args)}) -> {result}");
+            output.AppendLine(libraryOwner is not null ? $".function {Name(method)}({string.Join(',', args.Select((t, i) => t + " " + method.Parameters[i].Name))}) -> {result}" : emitInstance ? $".method instance {(method.DeclaringType.IsValueType ? "byref " : "")}{ApplicationTypes.Modifiers(method)}{ApplicationTypes.MethodName(method)}({string.Join(',', args.Skip(1))}) -> {(method.DeclaringType.IsValueType && result == "noresult" ? "Void" : result)}" : $".function {Name(method)}({string.Join(',', args)}) -> {result}");
             for (var n = 0; n < locals.Length; n++) output.AppendLine($".local {locals[n]} local{n}");
             if (method.Body.InitLocals)
                 for (var n = 0; n < locals.Length; n++)
@@ -626,11 +637,15 @@ static class UnionImport
                 if (changed) work.Enqueue(index);
             }
         }
+        if (libraryOwner is not null)
+        {
+            if (ApplicationTypes.IdentityMap().Length != 0) throw new InvalidDataException("Library fragments cannot introduce application type identities.");
+        }
         output.Append(ApplicationTypes.Declarations(ProfileType, instanceBodies));
         output.Append(Adapters()).Append(ResultBindings.Adapters()).Append(StringBindings.Adapters()).AppendLine(Int32Bindings.Adapters).AppendLine(DoubleBindings.Adapters).Append(PrimitiveBindings.Adapters).Append(CalendarBindings.Adapters).Append(ErrorBindings.Adapters()).Append(GenericUnionBindings.Adapters).AppendLine(ProcessBindings.Adapters).AppendLine(BooleanBindings.Adapters).AppendLine(ReflectionBindings.Adapters).AppendLine(EnumBindings.Adapters);
         foreach (var helper in coercions.Values) output.Append(helper.Body);
         foreach (var body in delegateAdapters.Values) output.Append(body);
-        var generated = output.ToString();
+        var generated = libraryOwner is null ? output.ToString() : LibraryImplementation.QualifyHelpers(output.ToString(), libraryOwner);
         var labelLines = generated.Split('\n').Select((line, index) => (line, index))
             .Where(p => System.Text.RegularExpressions.Regex.IsMatch(p.line, @"^M[0-9a-f]{8}_IL_[0-9a-f]{4}:$"))
             .ToDictionary(p => p.line, p => p.index + 1);
@@ -642,7 +657,7 @@ static class UnionImport
                 .Select(m => new { AssemblyIdentity = m.Module.Assembly.Name.FullName, MethodToken = m.MetadataToken.ToUInt32(), MetadataName = m.FullName,
                     RuntimeName = m.HasThis && !(m.IsConstructor && m.DeclaringType.IsValueType)
                         ? MetadataIdentity.TypeName(m.DeclaringType) + "::" + ApplicationTypes.MethodName(m) : Name(m) }),
-            Profile = collectionProfile ? "result-option-void-instance-libraries-v11" : "result-option-void-files-strings-arrays-v7",
+            Profile = libraryOwner is not null ? "namespace-library-fragment-v1" : collectionProfile ? "result-option-void-instance-libraries-v11" : "result-option-void-files-strings-arrays-v7",
             RequiredLibraryProfile = collectionProfile ? "raven-collections" : "bundled-system", ApplicationSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(application))),
             CoreSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(core))), DependencyImages = dependencies.Select(path => new { AssemblyIdentity = System.Reflection.AssemblyName.GetAssemblyName(path).FullName,
                 Sha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(path))) }),
@@ -679,7 +694,6 @@ static class UnionImport
         }
     }
 
-    static string Name(MethodDefinition method) => MetadataIdentity.FunctionName(method);
     static void CheckStatic(MethodReference method)
     {
         if (method.HasThis || method.ExplicitThis || method.HasGenericParameters || method is GenericInstanceMethod
@@ -727,7 +741,7 @@ static class UnionImport
             if (file.OutArgument >= 0 && file.Result == "Boolean" || reference.Name == "FromResidual") ValidatePropagation(definition.DeclaringType);
             return new(file.Name, file.Arguments, file.Result, file.OutArgument, file.Instruction, file.OutArgument >= 0 && file.Result == "Boolean");
         }
-        if (reference.DeclaringType.FullName == "System.Math" && reference.Name == "Clamp")
+        if (NamespaceFunctions.Owner(reference.DeclaringType) == "System.Math" && reference.Name == "Clamp")
         {
             var signature = RuntimeSignatures.Match(reference, definition, ResultBindings.Type);
             if (reference.HasThis || !signature.Args.SequenceEqual(new[] { "Int32", "Int32", "Int32" })
@@ -791,7 +805,8 @@ static class UnionImport
                 && reference.ReturnType.FullName == "System.Option`1<!0>")
                 return new("System.Option<Int32>::FromResidual", ["Void"], Option);
         }
-        if (key == "System.Result`2<System.Int32,System.OverflowError> System.Math::Abs(System.Int32)" && reference.FullName == key && !reference.HasThis)
+        if (NamespaceFunctions.Owner(definition.DeclaringType) == "System.Math" && definition.Name == "Abs"
+            && key == $"System.Result`2<System.Int32,System.OverflowError> {definition.DeclaringType.FullName}::Abs(System.Int32)" && reference.FullName == key && !reference.HasThis)
             return new("System.Math::Abs", ["Int32"], Carrier);
         if (key == "System.Void System.Console::WriteLine(System.Int32)" && reference.FullName == key && !reference.HasThis)
             return new("RuntimeWriteInt32", ["Int32"], "noresult");

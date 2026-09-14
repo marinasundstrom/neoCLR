@@ -12,7 +12,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   preference for namespaces over utility classes used only to group operations.
   Retained Raven's existing CLI container/TopLevelAttribute contract for now;
   recorded cross-language and reflection costs and the required migration checks.
-  This records direction; the Math implementation migration remains in progress.
+  Added the shared Raven System.rvnproj with its first migrated Int32 Math bodies
+  (Abs, Min, Max, Sign and Clamp), a reference-checked importer, generated bootstrap
+  snapshots and source-release freshness validation. Typed Result outcomes and the
+  existing internal runtime method owner are preserved; Raven consumers see the
+  namespace API. Documented builds, bootstrap identities and the remaining generic
+  implementation gate. Qualified lookup with local namespace declarations exposed
+  a general Raven bug, fixed independently on Raven main (3ec32c96e) and copied to
+  the experimental branch (008cb3245). The installed .14 SDK predates that fix.
+  Math uses imported Ok/Error cases; recorded the remaining unqualified carrier
+  return-annotation issue for independent Raven investigation.
 
 - Reconciled the published Preview 7 documentation with the subsequent async/API
   direction notes, preserving both histories before resuming library migration.

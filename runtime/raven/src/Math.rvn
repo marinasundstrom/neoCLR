@@ -1,0 +1,46 @@
+namespace System.Math
+
+import System.OverflowError
+import System.InvalidRangeError
+import System.Result.*
+
+public func Abs(value: int) -> System.Result<int, OverflowError> {
+    if value == -2147483648 {
+        return Error(OverflowError())
+    }
+    if value < 0 {
+        return Ok(0 - value)
+    }
+    return Ok(value)
+}
+
+public func Min(left: int, right: int) -> int {
+    if left < right {
+        return left
+    }
+    return right
+}
+
+public func Max(left: int, right: int) -> int {
+    if left > right {
+        return left
+    }
+    return right
+}
+
+public func Sign(value: int) -> int {
+    if value < 0 {
+        return -1
+    }
+    if value > 0 {
+        return 1
+    }
+    return 0
+}
+
+public func Clamp(value: int, min: int, max: int) -> System.Result<int, InvalidRangeError> {
+    if min > max {
+        return Error(InvalidRangeError())
+    }
+    return Ok(Min(Max(value, min), max))
+}

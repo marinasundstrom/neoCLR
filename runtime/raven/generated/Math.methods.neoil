@@ -1,0 +1,197 @@
+; Generated from runtime/raven/src/Math.rvn. Regenerate with build_runtime_library.py.
+.method static Abs(Int32 value) -> System.Result<Int32,System.OverflowError>
+M00000001_IL_0000:
+M00000001_IL_0001:
+M00000001_IL_0002:
+ldarg 0
+M00000001_IL_0003:
+ldc.i4 -2147483648
+M00000001_IL_0008:
+ceq
+call neoCLR.Library.System.Math.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_000a:
+brtrue M00000001_IL_0014
+M00000001_IL_000f:
+br M00000001_IL_0024
+M00000001_IL_0014:
+call neoCLR.Library.System.Math.RuntimeErrorSystemOverflowErrorNew()
+M00000001_IL_0019:
+call neoCLR.Library.System.Math.RuntimeUnion0(System.OverflowError)
+M00000001_IL_001e:
+call neoCLR.Library.System.Math.RuntimeUnion1(System.Result.Error<System.OverflowError>)
+M00000001_IL_0023:
+ret
+M00000001_IL_0024:
+M00000001_IL_0025:
+M00000001_IL_0026:
+ldarg 0
+M00000001_IL_0027:
+ldc.i4 0
+M00000001_IL_0028:
+clt
+call neoCLR.Library.System.Math.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_002a:
+brtrue M00000001_IL_0034
+M00000001_IL_002f:
+br M00000001_IL_0043
+M00000001_IL_0034:
+M00000001_IL_0035:
+ldc.i4 0
+M00000001_IL_0036:
+ldarg 0
+M00000001_IL_0037:
+sub
+M00000001_IL_0038:
+call neoCLR.Library.System.Math.RuntimeUnion2(Int32)
+M00000001_IL_003d:
+call neoCLR.Library.System.Math.RuntimeUnion3(System.Result.Ok<Int32>)
+M00000001_IL_0042:
+ret
+M00000001_IL_0043:
+M00000001_IL_0044:
+M00000001_IL_0045:
+ldarg 0
+M00000001_IL_0046:
+call neoCLR.Library.System.Math.RuntimeUnion2(Int32)
+M00000001_IL_004b:
+call neoCLR.Library.System.Math.RuntimeUnion3(System.Result.Ok<Int32>)
+M00000001_IL_0050:
+ret
+.end
+.method static Min(Int32 left,Int32 right) -> Int32
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldarg 0
+M00000002_IL_0003:
+ldarg 1
+M00000002_IL_0004:
+clt
+call neoCLR.Library.System.Math.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_0006:
+brtrue M00000002_IL_0010
+M00000002_IL_000b:
+br M00000002_IL_0013
+M00000002_IL_0010:
+M00000002_IL_0011:
+ldarg 0
+M00000002_IL_0012:
+ret
+M00000002_IL_0013:
+M00000002_IL_0014:
+M00000002_IL_0015:
+ldarg 1
+M00000002_IL_0016:
+ret
+.end
+.method static Max(Int32 left,Int32 right) -> Int32
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+ldarg 1
+M00000003_IL_0004:
+cgt
+call neoCLR.Library.System.Math.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_0006:
+brtrue M00000003_IL_0010
+M00000003_IL_000b:
+br M00000003_IL_0013
+M00000003_IL_0010:
+M00000003_IL_0011:
+ldarg 0
+M00000003_IL_0012:
+ret
+M00000003_IL_0013:
+M00000003_IL_0014:
+M00000003_IL_0015:
+ldarg 1
+M00000003_IL_0016:
+ret
+.end
+.method static Sign(Int32 value) -> Int32
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+ldc.i4 0
+M00000004_IL_0004:
+clt
+call neoCLR.Library.System.Math.RuntimeBooleanToInt32(Boolean)
+M00000004_IL_0006:
+brtrue M00000004_IL_0010
+M00000004_IL_000b:
+br M00000004_IL_0013
+M00000004_IL_0010:
+M00000004_IL_0011:
+ldc.i4 -1
+M00000004_IL_0012:
+ret
+M00000004_IL_0013:
+M00000004_IL_0014:
+M00000004_IL_0015:
+ldarg 0
+M00000004_IL_0016:
+ldc.i4 0
+M00000004_IL_0017:
+cgt
+call neoCLR.Library.System.Math.RuntimeBooleanToInt32(Boolean)
+M00000004_IL_0019:
+brtrue M00000004_IL_0023
+M00000004_IL_001e:
+br M00000004_IL_0026
+M00000004_IL_0023:
+M00000004_IL_0024:
+ldc.i4 1
+M00000004_IL_0025:
+ret
+M00000004_IL_0026:
+M00000004_IL_0027:
+M00000004_IL_0028:
+ldc.i4 0
+M00000004_IL_0029:
+ret
+.end
+.method static Clamp(Int32 value,Int32 min,Int32 max) -> System.Result<Int32,System.InvalidRangeError>
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 1
+M00000005_IL_0003:
+ldarg 2
+M00000005_IL_0004:
+cgt
+call neoCLR.Library.System.Math.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_0006:
+brtrue M00000005_IL_0010
+M00000005_IL_000b:
+br M00000005_IL_0020
+M00000005_IL_0010:
+call neoCLR.Library.System.Math.RuntimeErrorSystemInvalidRangeErrorNew()
+M00000005_IL_0015:
+call neoCLR.Library.System.Math.RuntimeUnion4(System.InvalidRangeError)
+M00000005_IL_001a:
+call neoCLR.Library.System.Math.RuntimeUnion5(System.Result.Error<System.InvalidRangeError>)
+M00000005_IL_001f:
+ret
+M00000005_IL_0020:
+M00000005_IL_0021:
+M00000005_IL_0022:
+ldarg 0
+M00000005_IL_0023:
+ldarg 1
+M00000005_IL_0024:
+call System.Math.Max(Int32,Int32)
+M00000005_IL_0029:
+ldarg 2
+M00000005_IL_002a:
+call System.Math.Min(Int32,Int32)
+M00000005_IL_002f:
+call neoCLR.Library.System.Math.RuntimeUnion2(Int32)
+M00000005_IL_0034:
+call neoCLR.Library.System.Math.RuntimeUnion6(System.Result.Ok<Int32>)
+M00000005_IL_0039:
+ret
+.end

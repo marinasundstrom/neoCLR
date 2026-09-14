@@ -31,6 +31,7 @@ static class CoreDeclarations
         {
             using var image = Mono.Cecil.AssemblyDefinition.ReadAssembly(stream);
             var module = image.MainModule;
+            NamespaceFunctions.ProjectMath(module);
             var unit = module.GetType("System.PropagationUnit");
             var targetVoid = new Mono.Cecil.TypeReference("System", "Void", module, module, true);
             Mono.Cecil.TypeReference Project(Mono.Cecil.TypeReference type)

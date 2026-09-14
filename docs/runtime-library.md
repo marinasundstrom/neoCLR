@@ -213,6 +213,13 @@ gaps; costs include compiler/bootstrap dependencies and the risk of introducing
 translation regressions. Retaining hand-written neoIL avoids that bootstrap cost
 but becomes more expensive to maintain as algorithms and APIs grow.
 
+### Shared Raven project and first migration slice
+
+The current [System project and Math bootstrap](raven-system-library.md) resumes
+ordinary library authoring after Preview 7. Foundational Raven sources share
+`runtime/raven/System.rvnproj`; Math is its first source, not its own assembly.
+The stages and limitations below remain the gates for expanding that migration.
+
 ### First migration groundwork
 
 **2026-09-14 refinement:** The author selected namespace functions for the Math
@@ -250,8 +257,10 @@ an extracted-bundle consumer test. Broad generic importing and the reference-ass
 build strategy are groundwork to implement, not completed capabilities. No library
 method has been ported to Raven in the predicate-overload checkpoint itself.
 
-### Migration paused for target evaluation (2026-09-14)
+### Historical pause for target evaluation (2026-09-14)
 
-The author subsequently directed a pause before authoring System classes. Evaluate
-Raven compiler fixes and coherent .NET/neoCLR targeting first. The scalar pilot remains
-locally preserved, not adopted; see the [assessment and resumption criteria](raven-target-evaluation.md).
+Before Preview 7, the author directed a pause before authoring System classes, to
+evaluate Raven compiler fixes and coherent .NET/neoCLR targeting first. That earlier
+scalar pilot was preserved locally and not adopted. The shared-project slice above
+resumes work with a new namespace-function pilot after the release; see the
+[assessment and resumption criteria](raven-target-evaluation.md).

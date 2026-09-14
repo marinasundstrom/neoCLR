@@ -66,6 +66,12 @@ for file in source['sourceFiles']:
                      'samples': ['library-collection-capabilities.rvn'],
                      'note': 'Count, read indexing and replacement are inherited; List retains Add. All contracts remain invariant.'})
         continue
+    if file.startswith('runtime/raven/generated/Math.'):
+        rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-math-bootstrap',
+                     'samples': ['library-math.rvn', 'library-clamp.rvn'],
+                     'tests': ['docs/experiments/raven-target/verify_math_library.py', 'tests/math_helpers.rs', 'tests/math_typed.rs'],
+                     'note': 'Generated scalar bodies and implementation adapters; source authority is runtime/raven/src/Math.rvn.'})
+        continue
     group, samples = lookup[Path(file).stem]
     for sample in samples:
         if not (HERE / 'samples' / sample).is_file():

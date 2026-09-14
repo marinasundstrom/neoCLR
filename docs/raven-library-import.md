@@ -2,7 +2,9 @@
 
 Source experiment, 2026-09-14. Ordinary Raven compilation can now produce a library
 DLL and a separate consumer DLL whose nongeneric library types and supported method
-bodies are imported into one neoCLR program. The System-library migration remains paused.
+bodies are imported into one neoCLR program. After Preview 7, the bounded
+[shared System project and Math migration](raven-system-library.md) resumes ordinary
+library authoring; the broader generic-body boundary still applies.
 
 ## Build and import
 
