@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-14
 
+- Removed completed Raven integration branches and superseded experiment branches
+  locally/remotely after checking their history is retained in main or the active
+  experiment. Removed the merged local neoCLR experiment branch as well. Active
+  worktrees and unrelated branches were preserved. Integrated the independently
+  reviewed reference-only constructor metadata fix into Raven main at f6b4748e6;
+  26 focused checks and the repository .NET 10/.NET 11 build/run matrix passed.
+  Removed its temporary branch after integration as well.
+
 - Recorded the directive to integrate general Raven fixes into Raven main while
   keeping neoCLR experiments on separate feature branches. Updated repository
   instructions and the development conversation record; retained the explicit review

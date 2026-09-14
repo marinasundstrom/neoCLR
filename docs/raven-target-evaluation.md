@@ -14,6 +14,19 @@ The author clarified on 2026-09-14 that the remaining stabilization fixes are to
 precede the next release. Runtime-library migration from neoIL to Raven is deferred
 until after that release, rather than being a release prerequisite.
 
+## Constructor metadata follow-through — 2026-09-14
+
+Raven main includes `f6b4748e6`, independently extracted from `995a4c982`.
+Constructing reference-only nested generic cases and carriers no longer mixes
+compiler-host types with MetadataLoadContext types. Temporary constructor tokens
+are replaced with the original target signatures and removed from the final PE.
+The adapted normal-reference test failed before the fix; all 26 focused checks
+and the repository .NET 10/.NET 11 build/run matrix passed afterwards.
+The temporary integration branch was removed after integration. The active
+experiment already contains the implementation and remains separate. Closed
+generic method metadata (`11e9964f2`) is the next independent review; the runtime
+library migration remains deferred until after release stabilization.
+
 ## Closed-generic metadata follow-through — 2026-09-14
 
 Raven main includes `031b9aaaa`, independently extracted from `17c9f8b82`.
@@ -238,3 +251,15 @@ metadata-driven importer is the preferred direction: more initial validation wor
 less dependence on a growing list of special cases. Full .NET compatibility is not
 promised; Result/Option error flow, Void value positions and array invariance remain
 intentional differences to validate separately.
+
+## Branch housekeeping — 2026-09-14
+
+At the author's request, removed completed Raven integration branches
+`codex/compiler-fixes-integration`, `codex/general-pointer-emission` and
+`codex/general-generic-metadata` locally and remotely after checking main ancestry.
+Removed superseded `codex/neoclr-target-contracts` and
+`codex/neoclr-target-resolution` locally and remotely after checking that both are
+ancestors of the active `codex/neoclr-namespace-metadata` experiment. The neoCLR
+local branch `codex/raven-neoclr-target` was already merged into neoCLR main and
+was also removed. Active worktrees, the experiment and unrelated branches remain.
+These are ref deletions; the retained branches preserve all of this history.
