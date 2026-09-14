@@ -30,6 +30,65 @@ A possible alternative emission backend is future evaluation, outside this scope
 [release work order](release-stabilization.md) is historical; remaining general
 compiler reviews continue before the generic-library authoring probe and migration.
 
+## Imported member-union binding review — 2026-09-14
+
+Raven main includes `b60e3635f`, independently extracted from the binding portion of
+`04c953d67`. Imported member unions now support `.Case(...)` by unique variant name
+and infer closed generic variant arguments for an in-scope `Case(...)` pattern.
+The leading-dot form needs no case import; the bare generic type name still does.
+Qualified variant patterns continue to work. This uses the ordinary CLI union
+constructor/extraction/deconstruction contract, with no neoCLR import configuration.
+
+The independent probe initially failed six of seven cases: four shorthand binding
+cases failed in both emission modes, while target-core qualified and imported Raven
+union cases failed during emission or execution. With the binding correction, all
+three member-pattern spellings executed correctly through the default .NET path.
+The integrated fixture additionally verifies the import requirement, the leading-dot
+form without imports, inactive cases, and repeated matching through a mutating
+value-type deconstructor. The carrier retains its value across those matches.
+
+The 14-test metadata/pattern baseline and the separate 210-test pattern/union baseline
+passed. All 219 final focused checks and the .NET 10/.NET 11 build/run matrix passed.
+This is focused validation of the binding fix, not a full Raven release gate or proof
+of .NET Framework/NanoFramework execution. The main-based branch was fast-forwarded,
+pushed and removed. No experimental target settings or tests were integrated.
+
+### Target-core prerequisite exposed by the review
+
+Temporary application of the candidate's pattern-local metadata fixes let assemblies
+write, but all four target-core probes still failed on .NET. Inspection showed
+imported struct carriers and variants emitted with `CLASS` instead of `VALUETYPE`
+in parameters and locals. Method references also exposed incorrectly encoded
+primitive/void signatures. This was reproduced with standard .NET reference assemblies
+and without the experimental metadata import options; it is broader than union
+shorthand binding. The temporary emission edits were reverted before integration.
+
+Source review points to core-library identity alignment as the first prerequisite:
+`Compilation.Setup` creates its metadata context around the host core library, while
+the supplied target reference set defines core types in its own reference assembly.
+Selecting an emission target identity does not itself align that metadata context.
+A reduced imported-struct regression should confirm the correction independently,
+including primitive signatures, actual value-type classification and .NET execution.
+Do not work around the disagreement by rewriting union IL or importing the entire
+experimental configuration. Any reusable selection/configuration mechanism must be
+validated as general CLI support before integration into main.
+
+Next, in order:
+
+1. Resolve and test metadata core-library identity alignment on Raven main's general
+   target path, retaining ordinary .NET behavior and attribute-emission coverage.
+2. Revisit the remaining pattern-local, imported method-signature and normalization-
+   order changes from `04c953d67` against that corrected baseline.
+3. Review `de872fa34` for its general array-factory behavior. Keep the independent
+   boxing-avoidance optimization from `04c953d67` deferred until separately justified
+   and validated; it was not required for the proven binding fix.
+4. Synchronize reviewed main fixes into the experimental branch and run the generic-
+   library capability probe. Runtime-library migration remains paused.
+
+Published Preview 6 artifacts remain unchanged. The experimental branch was not
+synchronized by this binding slice; its existing implementation is not evidence of
+independent validation of these general fixes.
+
 ## Interface implementation metadata follow-through — 2026-09-14
 
 Raven main includes `f8f7568a1`, independently reviewed from `000ed511e`.
@@ -61,10 +120,9 @@ branch was fast-forwarded, pushed and removed. The neoCLR experiment remains at
 `246d697bf`; these reviewed main changes have not yet been synchronized there.
 Published Preview 6 artifacts remain unchanged.
 
-Next: review the remaining mixed union-pattern/target-signature (`04c953d67`) and
-array-factory (`de872fa34`) changes. Then synchronize reviewed main fixes into the
-experiment and run the separate generic-library capability probe. Runtime-library
-migration remains paused.
+At this checkpoint, the mixed union-pattern/target-signature (`04c953d67`) and
+array-factory (`de872fa34`) reviews were next. The binding review and newly identified
+target-core prerequisite are recorded above; runtime-library migration remains paused.
 
 ## Application generic metadata follow-through — 2026-09-14
 

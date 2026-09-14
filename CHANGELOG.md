@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-14
 
+- Independently integrated imported member-union shorthand binding into Raven main
+  as `b60e3635f`; 219 focused checks and the .NET 10/.NET 11 build/run matrix passed.
+  Recorded the remaining target-core struct/signature failures exposed by execution
+  and assembly inspection, and prioritized general metadata core-library identity
+  alignment before further emission changes. Kept the boxing optimization and array-
+  factory review separate; library migration and experimental synchronization remain
+  pending.
+
 - Expanded the website with project influences, six implemented feature summaries
   and nine excerpts sourced from executable Raven/neoIL samples. Added comparisons
   and tradeoffs, corrected stale importer limitations, and separated open research
