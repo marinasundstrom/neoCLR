@@ -1,0 +1,14 @@
+namespace System.Int32
+
+import System.IntegerDivisionError
+import System.Result.*
+
+public func Divide(dividend: int, divisor: int) -> System.Result<int, IntegerDivisionError> {
+    if divisor == 0 {
+        return Error(IntegerDivisionError(IntegerDivisionError.DivisionByZero()))
+    }
+    if dividend == -2147483648 && divisor == -1 {
+        return Error(IntegerDivisionError(IntegerDivisionError.Overflow()))
+    }
+    return Ok(dividend / divisor)
+}

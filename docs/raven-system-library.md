@@ -1,7 +1,7 @@
 # Authoring the foundational library in Raven
 
 `runtime/raven/System.rvnproj` is the shared authoring project for ordinary
-foundational runtime APIs. Its sources include `src/Math.rvn` and `src/Linq.rvn`; additional namespaces
+foundational runtime APIs. Its sources include `src/Math.rvn`, `src/Linq.rvn`, `src/Int32.rvn` and `src/Char.rvn`; additional namespaces
 and types should join this project as their importing requirements are validated.
 Do not create an assembly per utility namespace. This is an incremental source
 migration, not yet a self-hosting build of the complete core reference assembly.
@@ -11,7 +11,7 @@ The bootstrap currently has three distinct artifacts:
 - `NeoCLR.CoreProbe.dll`: compiler-facing reference metadata for the supported System
   surface. Its placeholder bodies must never execute.
 - `NeoCLR.System.dll`: compiled Raven implementation input, currently five scalar
-  Math functions and seven collection/query terminal overloads. It is imported into neoIL, not loaded dynamically by the runtime.
+  Math functions, seven collection/query terminal overloads, Int32.Divide and seven character predicates. It is imported into neoIL, not loaded dynamically by the runtime.
 - `runtime/System.neoil` and its includes: the executable foundational library,
   combining generated Raven bodies with remaining handwritten bodies and intrinsics.
 
@@ -242,3 +242,46 @@ events and additional implementation dependencies. The next migration gate is op
 generic instance state plus interface dispatch, followed by the deferred query
 classes and ArrayList/Map. Native-backed scalar and reflection layouts must retain
 their trusted construction contracts when migrated.
+
+
+## Scalar algorithm migration — 2026-09-15
+
+The shared Raven project now supplies `Int32.Divide` and seven Char predicates:
+IsSurrogate, IsHighSurrogate, IsLowSurrogate, IsAscii, IsAsciiDigit, IsLetterOrDigit
+and IsWhiteSpace. Divide preserves Result errors for zero divisors and signed overflow.
+Char preserves UTF-16 code-unit behavior, including surrogate classification, ASCII
+bounds and existing Unicode classification. Parsing and Unicode category lookup remain
+native services. This is an implementation-language migration, not a new numeric or
+text contract; existing [character research](character-classification.md) remains the
+baseline.
+
+The two sources use marked namespace containers as implementation fragments. Their
+methods match the existing static members on the core Int32/Char reference types;
+public metadata still exposes `Int32.Divide` and `Char.IsAscii`, etc. They do not
+redeclare primitive types or turn their public APIs into namespace functions. Static
+fragments can now target a public nongeneric class/value owner with matching static
+methods, rather than requiring the reference owner itself to be a static class.
+This keeps primitive layout and instance operations in the existing runtime while
+moving the algorithms. Source and reference signatures remain checked independently.
+
+The port exposed Boolean stack joins in short-circuit expressions: CLI Boolean loads
+and ordinary call results need the Int32 evaluation-stack representation already used
+for comparison results. The importer now normalizes arguments, locals, fields and
+ordinary call results, converting back at typed boundaries. Conditional-out calls
+remain directly connected to their branch so the runtime verifier retains assignment
+proof for extracted union payloads. No Raven compiler change or opcode was required.
+The explicit conversion helpers can add interpreter instructions; this slice does
+not claim a performance improvement.
+
+`verify_scalar_library.py` compiles a separate Raven consumer and checks 203 outcomes:
+division successes/failures, character boundaries and Unicode examples, and Boolean
+short-circuit expressions using fields, locals and calls. Run it with the same
+`--compiler`, `--bridge` and `--runtime` arguments as the other authoring checks.
+Checked-in fragments are included by the base runtime as well as the Raven profile;
+API inventory and coverage list their generated origins. Generic instance collection
+state and deferred iterators remain the next authoring boundary.
+
+Validation also passes the 30 current-profile query cases, 19 focused runtime tests
+(character classification, integer behavior, arithmetic outcomes and query terminals),
+Math/generic/instance authoring probes, clean snapshot regeneration and API audit.
+These are source checks; installed tools and release artifacts are not refreshed.

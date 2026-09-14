@@ -66,6 +66,12 @@ for file in source['sourceFiles']:
                      'samples': ['library-collection-capabilities.rvn'],
                      'note': 'Count, read indexing and replacement are inherited; List retains Add. All contracts remain invariant.'})
         continue
+    if file.startswith(('runtime/raven/generated/Int32.', 'runtime/raven/generated/Char.')):
+        rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-scalar-bootstrap',
+                     'samples': ['library-primitives.rvn', 'library-division.rvn'],
+                     'tests': ['tests/character_classification.rs', 'docs/experiments/raven-target/verify_scalar_library.py'],
+                     'note': 'Raven implements Divide and seven Char predicates; parsing and Unicode category services stay native.'})
+        continue
     if file.startswith('runtime/raven/generated/Math.'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-math-bootstrap',
                      'samples': ['library-math.rvn', 'library-clamp.rvn'],

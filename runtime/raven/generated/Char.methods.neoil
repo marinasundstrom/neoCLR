@@ -1,0 +1,312 @@
+; Generated from runtime/raven/src/Char.rvn. Regenerate with build_runtime_library.py.
+.method static IsSurrogate(Char value) -> Boolean
+.local Int32 local0
+ldc.i4 0
+stloc local0
+M00000001_IL_0000:
+M00000001_IL_0001:
+M00000001_IL_0002:
+ldarg 0
+M00000001_IL_0003:
+conv.i4
+M00000001_IL_0004:
+stloc local0
+M00000001_IL_0005:
+M00000001_IL_0006:
+ldloc local0
+M00000001_IL_0007:
+ldc.i4 55296
+M00000001_IL_000c:
+clt
+call neoCLR.Library.System.Char.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_000e:
+ldc.i4 0
+M00000001_IL_000f:
+ceq
+call neoCLR.Library.System.Char.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_0011:
+brfalse M00000001_IL_0026
+M00000001_IL_0016:
+ldloc local0
+M00000001_IL_0017:
+ldc.i4 57343
+M00000001_IL_001c:
+cgt
+call neoCLR.Library.System.Char.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_001e:
+ldc.i4 0
+M00000001_IL_001f:
+ceq
+call neoCLR.Library.System.Char.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_0021:
+br M00000001_IL_0027
+M00000001_IL_0026:
+ldc.i4 0
+M00000001_IL_0027:
+call neoCLR.Library.System.Char.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method static IsHighSurrogate(Char value) -> Boolean
+.local Int32 local0
+ldc.i4 0
+stloc local0
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldarg 0
+M00000002_IL_0003:
+conv.i4
+M00000002_IL_0004:
+stloc local0
+M00000002_IL_0005:
+M00000002_IL_0006:
+ldloc local0
+M00000002_IL_0007:
+ldc.i4 55296
+M00000002_IL_000c:
+clt
+call neoCLR.Library.System.Char.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_000e:
+ldc.i4 0
+M00000002_IL_000f:
+ceq
+call neoCLR.Library.System.Char.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_0011:
+brfalse M00000002_IL_0026
+M00000002_IL_0016:
+ldloc local0
+M00000002_IL_0017:
+ldc.i4 56319
+M00000002_IL_001c:
+cgt
+call neoCLR.Library.System.Char.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_001e:
+ldc.i4 0
+M00000002_IL_001f:
+ceq
+call neoCLR.Library.System.Char.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_0021:
+br M00000002_IL_0027
+M00000002_IL_0026:
+ldc.i4 0
+M00000002_IL_0027:
+call neoCLR.Library.System.Char.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method static IsLowSurrogate(Char value) -> Boolean
+.local Int32 local0
+ldc.i4 0
+stloc local0
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+conv.i4
+M00000003_IL_0004:
+stloc local0
+M00000003_IL_0005:
+M00000003_IL_0006:
+ldloc local0
+M00000003_IL_0007:
+ldc.i4 56320
+M00000003_IL_000c:
+clt
+call neoCLR.Library.System.Char.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_000e:
+ldc.i4 0
+M00000003_IL_000f:
+ceq
+call neoCLR.Library.System.Char.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_0011:
+brfalse M00000003_IL_0026
+M00000003_IL_0016:
+ldloc local0
+M00000003_IL_0017:
+ldc.i4 57343
+M00000003_IL_001c:
+cgt
+call neoCLR.Library.System.Char.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_001e:
+ldc.i4 0
+M00000003_IL_001f:
+ceq
+call neoCLR.Library.System.Char.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_0021:
+br M00000003_IL_0027
+M00000003_IL_0026:
+ldc.i4 0
+M00000003_IL_0027:
+call neoCLR.Library.System.Char.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method static IsAscii(Char value) -> Boolean
+.local Int32 local0
+ldc.i4 0
+stloc local0
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+conv.i4
+M00000004_IL_0004:
+stloc local0
+M00000004_IL_0005:
+M00000004_IL_0006:
+ldloc local0
+M00000004_IL_0007:
+ldc.i4 127
+M00000004_IL_0009:
+cgt
+call neoCLR.Library.System.Char.RuntimeBooleanToInt32(Boolean)
+M00000004_IL_000b:
+ldc.i4 0
+M00000004_IL_000c:
+ceq
+call neoCLR.Library.System.Char.RuntimeBooleanToInt32(Boolean)
+M00000004_IL_000e:
+call neoCLR.Library.System.Char.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method static IsAsciiDigit(Char value) -> Boolean
+.local Int32 local0
+ldc.i4 0
+stloc local0
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+conv.i4
+M00000005_IL_0004:
+stloc local0
+M00000005_IL_0005:
+M00000005_IL_0006:
+ldloc local0
+M00000005_IL_0007:
+ldc.i4 48
+M00000005_IL_0009:
+clt
+call neoCLR.Library.System.Char.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_000b:
+ldc.i4 0
+M00000005_IL_000c:
+ceq
+call neoCLR.Library.System.Char.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_000e:
+brfalse M00000005_IL_0020
+M00000005_IL_0013:
+ldloc local0
+M00000005_IL_0014:
+ldc.i4 57
+M00000005_IL_0016:
+cgt
+call neoCLR.Library.System.Char.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_0018:
+ldc.i4 0
+M00000005_IL_0019:
+ceq
+call neoCLR.Library.System.Char.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_001b:
+br M00000005_IL_0021
+M00000005_IL_0020:
+ldc.i4 0
+M00000005_IL_0021:
+call neoCLR.Library.System.Char.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method static IsLetterOrDigit(Char value) -> Boolean
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+call System.Char::IsLetter(Char)
+call neoCLR.Library.System.Char.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_0008:
+brtrue M00000006_IL_0018
+M00000006_IL_000d:
+ldarg 0
+M00000006_IL_000e:
+call System.Char::IsDigit(Char)
+call neoCLR.Library.System.Char.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_0013:
+br M00000006_IL_0019
+M00000006_IL_0018:
+ldc.i4 1
+M00000006_IL_0019:
+call neoCLR.Library.System.Char.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method static IsWhiteSpace(Char value) -> Boolean
+.local Int32 local0
+ldc.i4 0
+stloc local0
+M00000007_IL_0000:
+M00000007_IL_0001:
+M00000007_IL_0002:
+ldarg 0
+M00000007_IL_0003:
+conv.i4
+M00000007_IL_0004:
+stloc local0
+M00000007_IL_0005:
+M00000007_IL_0006:
+ldloc local0
+M00000007_IL_0007:
+ldc.i4 9
+M00000007_IL_0009:
+clt
+call neoCLR.Library.System.Char.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_000b:
+ldc.i4 0
+M00000007_IL_000c:
+ceq
+call neoCLR.Library.System.Char.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_000e:
+brfalse M00000007_IL_0020
+M00000007_IL_0013:
+ldloc local0
+M00000007_IL_0014:
+ldc.i4 13
+M00000007_IL_0016:
+cgt
+call neoCLR.Library.System.Char.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0018:
+ldc.i4 0
+M00000007_IL_0019:
+ceq
+call neoCLR.Library.System.Char.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_001b:
+br M00000007_IL_0021
+M00000007_IL_0020:
+ldc.i4 0
+M00000007_IL_0021:
+brtrue M00000007_IL_0033
+M00000007_IL_0026:
+ldloc local0
+M00000007_IL_0027:
+ldc.i4 133
+M00000007_IL_002c:
+ceq
+call neoCLR.Library.System.Char.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_002e:
+br M00000007_IL_0034
+M00000007_IL_0033:
+ldc.i4 1
+M00000007_IL_0034:
+brtrue M00000007_IL_0044
+M00000007_IL_0039:
+ldarg 0
+M00000007_IL_003a:
+call System.Char::IsSeparator(Char)
+call neoCLR.Library.System.Char.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_003f:
+br M00000007_IL_0045
+M00000007_IL_0044:
+ldc.i4 1
+M00000007_IL_0045:
+call neoCLR.Library.System.Char.RuntimeBooleanFromInt32(Int32)
+ret
+.end

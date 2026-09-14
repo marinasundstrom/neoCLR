@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-15
 
+- Port Int32.Divide and seven Char predicates to the shared Raven runtime project,
+  preserving Result errors, UTF-16 code-unit/Unicode behavior and existing public
+  static APIs. Native parsing/category services remain in the runtime. Admit checked
+  static implementation fragments on nominal core owners; refresh bootstrap snapshots
+  and API coverage. Correct CLI Boolean joins for argument/local/field loads and
+  ordinary call results while preserving conditional-out assignment proof. A separate
+  Raven consumer passes 203 scalar and short-circuit outcomes; 30 query cases and
+  19 focused runtime tests also pass. Raven compiler and
+  Runtime Contract settings are unchanged; generic collection instance ports remain.
+
 - Record Clock/SystemClock and List<T>.Create proposals, their .NET/Noda Time
   comparisons and open design choices. Confirm the current mutable List contract;
   no new clock abstraction, default accessor or collection factory is implemented.

@@ -807,3 +807,20 @@ This required no Raven changes. Runtime Contract configuration and compiler emis
 remain unchanged; all work is in neoCLR's experimental import layer. Generic instance
 classes and their interface contracts are still required before further collection
 implementation ports. No installed SDK, extension or release was refreshed.
+
+## Scalar library bodies and Boolean stack joins — 2026-09-15
+
+The shared implementation project now ports Int32.Divide and seven Char predicates
+without changing their public reference owners. Static implementation fragments may
+match static members on nominal core types; source containers do not replace those
+types' layouts or instance semantics. All signatures remain checked against core
+metadata. [Authoring details](raven-system-library.md#scalar-algorithm-migration--2026-09-15)
+record generated sources, native boundaries and validation.
+
+Short-circuit Boolean expressions exposed an importer representation mismatch. Loads
+and ordinary call results now use the CLI integer evaluation-stack form, consistent
+with comparison results; typed stores, returns and calls convert to runtime Boolean.
+Conditional extraction results retain direct branch proof. This is a neoCLR importer
+correction; Raven already emits the expected CLI behavior, so neither Raven branch
+requires changes. A separate consumer covers fields, locals, calls, scalar outcomes
+and union extraction. Runtime Contract configuration is unchanged.

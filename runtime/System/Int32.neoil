@@ -35,41 +35,7 @@
         ret
     .end
 
-    .method static Divide(int32 dividend, int32 divisor) -> System.Result<Int32,System.IntegerDivisionError>
-        ldarg divisor
-        ldc.i4 0
-        ceq
-        brtrue DivisionByZero
-        ldarg dividend
-        ldc.i4 -2147483648
-        ceq
-        brtrue CheckOverflow
-        br Divide
-        CheckOverflow:
-        ldarg divisor
-        ldc.i4 -1
-        ceq
-        brtrue Overflow
-        Divide:
-        ldarg dividend
-        ldarg divisor
-        div
-        newobj instance System.Result.Ok<Int32>::.ctor(Int32)
-        newobj instance System.Result<Int32,System.IntegerDivisionError>::.ctor(System.Result.Ok<Int32>)
-        ret
-        DivisionByZero:
-        newobj instance System.IntegerDivisionError.DivisionByZero::.ctor()
-        newobj instance System.IntegerDivisionError::.ctor(System.IntegerDivisionError.DivisionByZero)
-        newobj instance System.Result.Error<System.IntegerDivisionError>::.ctor(System.IntegerDivisionError)
-        newobj instance System.Result<Int32,System.IntegerDivisionError>::.ctor(System.Result.Error<System.IntegerDivisionError>)
-        ret
-        Overflow:
-        newobj instance System.IntegerDivisionError.Overflow::.ctor()
-        newobj instance System.IntegerDivisionError::.ctor(System.IntegerDivisionError.Overflow)
-        newobj instance System.Result.Error<System.IntegerDivisionError>::.ctor(System.IntegerDivisionError)
-        newobj instance System.Result<Int32,System.IntegerDivisionError>::.ctor(System.Result.Error<System.IntegerDivisionError>)
-        ret
-    .end
+    .include "../raven/generated/Int32.methods.neoil"
 
     .method instance readonly byref Equals(Int32 other) -> Boolean
         ldarg this
@@ -104,3 +70,5 @@
     .end
 .end
 
+
+.include "../raven/generated/Int32.helpers.neoil"

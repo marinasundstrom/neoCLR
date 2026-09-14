@@ -1,6 +1,6 @@
 {
   "purpose": "Explicit source-by-source API audit. Samples and signature checks are evidence, not a claim of arbitrary generic/compiler support.",
-  "declarationCount": 626,
+  "declarationCount": 637,
   "sources": [
     {
       "file": "runtime/System/Equatable.neoil",
@@ -141,7 +141,7 @@
     },
     {
       "file": "runtime/System/Char.neoil",
-      "declarations": 18,
+      "declarations": 11,
       "disposition": "primitives",
       "samples": [
         "library-primitives.rvn",
@@ -151,6 +151,34 @@
         "library-parsing.rvn",
         "library-division.rvn"
       ]
+    },
+    {
+      "file": "runtime/raven/generated/Char.methods.neoil",
+      "declarations": 7,
+      "disposition": "raven-authored-scalar-bootstrap",
+      "samples": [
+        "library-primitives.rvn",
+        "library-division.rvn"
+      ],
+      "tests": [
+        "tests/character_classification.rs",
+        "docs/experiments/raven-target/verify_scalar_library.py"
+      ],
+      "note": "Raven implements Divide and seven Char predicates; parsing and Unicode category services stay native."
+    },
+    {
+      "file": "runtime/raven/generated/Char.helpers.neoil",
+      "declarations": 2,
+      "disposition": "raven-authored-scalar-bootstrap",
+      "samples": [
+        "library-primitives.rvn",
+        "library-division.rvn"
+      ],
+      "tests": [
+        "tests/character_classification.rs",
+        "docs/experiments/raven-target/verify_scalar_library.py"
+      ],
+      "note": "Raven implements Divide and seven Char predicates; parsing and Unicode category services stay native."
     },
     {
       "file": "runtime/neoCLR/Runtime/CharCategory.neoil",
@@ -297,7 +325,7 @@
     },
     {
       "file": "runtime/System/Int32.neoil",
-      "declarations": 6,
+      "declarations": 5,
       "disposition": "primitives",
       "samples": [
         "library-primitives.rvn",
@@ -307,6 +335,34 @@
         "library-parsing.rvn",
         "library-division.rvn"
       ]
+    },
+    {
+      "file": "runtime/raven/generated/Int32.methods.neoil",
+      "declarations": 1,
+      "disposition": "raven-authored-scalar-bootstrap",
+      "samples": [
+        "library-primitives.rvn",
+        "library-division.rvn"
+      ],
+      "tests": [
+        "tests/character_classification.rs",
+        "docs/experiments/raven-target/verify_scalar_library.py"
+      ],
+      "note": "Raven implements Divide and seven Char predicates; parsing and Unicode category services stay native."
+    },
+    {
+      "file": "runtime/raven/generated/Int32.helpers.neoil",
+      "declarations": 9,
+      "disposition": "raven-authored-scalar-bootstrap",
+      "samples": [
+        "library-primitives.rvn",
+        "library-division.rvn"
+      ],
+      "tests": [
+        "tests/character_classification.rs",
+        "docs/experiments/raven-target/verify_scalar_library.py"
+      ],
+      "note": "Raven implements Divide and seven Char predicates; parsing and Unicode category services stay native."
     },
     {
       "file": "runtime/System/Console.neoil",
@@ -467,7 +523,7 @@
         {
           "service": "neoCLR.Runtime.Int32ToString",
           "file": "runtime/System/Int32.neoil",
-          "line": 84
+          "line": 50
         }
       ]
     },

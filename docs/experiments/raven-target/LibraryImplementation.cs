@@ -15,7 +15,7 @@ static class LibraryImplementation
             ?? throw new InvalidDataException("Missing namespace reference contract: " + owner);
         if (!(type.IsAbstract && type.IsSealed))
             return InstanceRoots(type, contract, owner);
-        if (!contract.IsPublic || !contract.IsAbstract || !contract.IsSealed || contract.HasGenericParameters)
+        if (!contract.IsPublic || contract.HasGenericParameters || contract.IsInterface)
             throw new InvalidDataException("Unsupported library reference owner.");
         if (!type.IsPublic || !type.IsAbstract || !type.IsSealed || type.HasGenericParameters || type.HasFields || type.HasInterfaces)
             throw new InvalidDataException("Library fragment requires a public nongeneric namespace container without fields.");

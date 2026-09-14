@@ -1,15 +1,4 @@
 ; Generated from runtime/raven/src/Linq.rvn. Regenerate with build_runtime_library.py.
-.function neoCLR.Library.System.Linq.Operators.RuntimeEqual(Int32 left,Int32 right) -> Int32
-ldarg left
-ldarg right
-ceq
-brfalse False
-ldc.i4 1
-ret
-False:
-ldc.i4 0
-ret
-.end
 .function neoCLR.Library.System.Linq.Operators.RuntimeErrorSystemLinqSingleErrorNewSystemLinqSingleErrorEmpty(System.Linq.SingleError.Empty value) -> System.Linq.SingleError
 ldarg value
 newobj instance System.Linq.SingleError::.ctor(System.Linq.SingleError.Empty)
@@ -67,6 +56,21 @@ ldarg arg0
 newobj instance System.Result<T0,System.Linq.SingleError>::.ctor(System.Result.Ok<T0>)
 ret
 .end
+.function neoCLR.Library.System.Linq.Operators.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
 .function neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean value) -> Int32
     ldarg value
     brfalse False
@@ -75,11 +79,4 @@ ret
 False:
     ldc.i4 0
     ret
-.end
-.function neoCLR.Library.System.Linq.Operators.RuntimeCliCall0(Boolean arg0,Int32 arg1) -> Int32
-ldarg arg0
-call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
-ldarg arg1
-call neoCLR.Library.System.Linq.Operators.RuntimeEqual(Int32,Int32)
-ret
 .end

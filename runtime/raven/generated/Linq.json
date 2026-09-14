@@ -4,12 +4,14 @@
   "inputs": {
     "runtime/raven/src/Math.rvn": "05fbc020828379134fbead7aefb8e19955cefc3b875991dc937e2e303c716e18",
     "runtime/raven/src/Linq.rvn": "6a274234eb9f10eeaf84ca4066ea9ad2f82f889824f89e7b93ed7ce7323a8202",
-    "runtime/raven/System.rvnproj": "05a1ed402b8fd7006c7753592dcd904a384c20e0ca40a0c9facd0276ba1f3600",
+    "runtime/raven/src/Int32.rvn": "ba7ccc0493dc897f628c11dd135cc00c086cc573f88f59d37661b18cb447bac0",
+    "runtime/raven/src/Char.rvn": "5656f1ee320f33e132cc835b4aa11c5d2e5656e18b89647157bddd92ff9efa41",
+    "runtime/raven/System.rvnproj": "2ea2813223b2f94880b45574a584650046cb510155af70ba6b885fef6b141b95",
     "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
   },
   "outputs": {
-    "Linq.methods.neoil": "948e4eb57502ea7bc6d1b2af8443a52e680168f14d84a21f0808132323cb4a10",
-    "Linq.helpers.neoil": "faf33be8ef3cf052b72bddb448700599e6dba52af6b914c4a33504e7b972a7ee"
+    "Linq.methods.neoil": "1db462b3f64aae03a91b952c0112593e6ff7d73c54802628b23f819035ad6c5a",
+    "Linq.helpers.neoil": "229dd139e19d3899842c22632529461a5f5ebb901c677fbf7946d3d571307b3a"
   },
   "compilerSha256": "3df6ae2bdb1aa730243cbe88be787367d5b1a8e86ded32025a5d4ff711cb300b",
   "coreSha256": "bacbafa34c4f264b428df6bff160b5972d86f35e148028d713f06a111dfad121",

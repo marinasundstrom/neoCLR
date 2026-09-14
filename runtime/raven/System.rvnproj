@@ -8,5 +8,7 @@
   <ItemGroup>
     <Compile Include="src/Math.rvn" />
     <Compile Include="src/Linq.rvn" />
+    <Compile Include="src/Int32.rvn" />
+    <Compile Include="src/Char.rvn" />
   </ItemGroup>
 </Project>

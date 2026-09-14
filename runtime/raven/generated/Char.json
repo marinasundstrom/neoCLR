@@ -1,6 +1,6 @@
 {
   "format": "raven-library-bootstrap-v1",
-  "owner": "System.Math",
+  "owner": "System.Char",
   "inputs": {
     "runtime/raven/src/Math.rvn": "05fbc020828379134fbead7aefb8e19955cefc3b875991dc937e2e303c716e18",
     "runtime/raven/src/Linq.rvn": "6a274234eb9f10eeaf84ca4066ea9ad2f82f889824f89e7b93ed7ce7323a8202",
@@ -10,16 +10,18 @@
     "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
   },
   "outputs": {
-    "Math.methods.neoil": "e281fd42728e7e93ee2155e59ef299771842b2e203dd54144af2a583134f75ed",
-    "Math.helpers.neoil": "9770c4d4ed1c8ba5872061efbd504c7dc7bb808536019db0af18ab38a89249eb"
+    "Char.methods.neoil": "10033466e71d63c803c392288025e9e9d08c5ecaea5ba6750c1a3a761291017f",
+    "Char.helpers.neoil": "f284bedb60e5dedc600195902b22dbf89f5cf0b30d45465d9f1b6d5990afabbb"
   },
   "compilerSha256": "3df6ae2bdb1aa730243cbe88be787367d5b1a8e86ded32025a5d4ff711cb300b",
   "coreSha256": "bacbafa34c4f264b428df6bff160b5972d86f35e148028d713f06a111dfad121",
   "exports": [
-    "Abs(Int32 value) -> System.Result<Int32,System.OverflowError>",
-    "Min(Int32 left,Int32 right) -> Int32",
-    "Max(Int32 left,Int32 right) -> Int32",
-    "Sign(Int32 value) -> Int32",
-    "Clamp(Int32 value,Int32 min,Int32 max) -> System.Result<Int32,System.InvalidRangeError>"
+    "IsSurrogate(Char value) -> Boolean",
+    "IsHighSurrogate(Char value) -> Boolean",
+    "IsLowSurrogate(Char value) -> Boolean",
+    "IsAscii(Char value) -> Boolean",
+    "IsAsciiDigit(Char value) -> Boolean",
+    "IsLetterOrDigit(Char value) -> Boolean",
+    "IsWhiteSpace(Char value) -> Boolean"
   ]
 }

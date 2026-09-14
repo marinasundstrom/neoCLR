@@ -1,0 +1,48 @@
+; Generated from runtime/raven/src/Int32.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Int32.RuntimeErrorSystemIntegerDivisionErrorNewSystemIntegerDivisionErrorDivisionByZero(System.IntegerDivisionError.DivisionByZero value) -> System.IntegerDivisionError
+ldarg value
+newobj instance System.IntegerDivisionError::.ctor(System.IntegerDivisionError.DivisionByZero)
+ret
+.end
+.function neoCLR.Library.System.Int32.RuntimeErrorSystemIntegerDivisionErrorNewSystemIntegerDivisionErrorOverflow(System.IntegerDivisionError.Overflow value) -> System.IntegerDivisionError
+ldarg value
+newobj instance System.IntegerDivisionError::.ctor(System.IntegerDivisionError.Overflow)
+ret
+.end
+.function neoCLR.Library.System.Int32.RuntimeErrorSystemIntegerDivisionErrorDivisionByZeroNew() -> System.IntegerDivisionError.DivisionByZero
+newobj instance System.IntegerDivisionError.DivisionByZero::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Int32.RuntimeErrorSystemIntegerDivisionErrorOverflowNew() -> System.IntegerDivisionError.Overflow
+newobj instance System.IntegerDivisionError.Overflow::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Int32.RuntimeUnion0(System.IntegerDivisionError arg0) -> System.Result.Error<System.IntegerDivisionError>
+ldarg arg0
+newobj instance System.Result.Error<System.IntegerDivisionError>::.ctor(System.IntegerDivisionError)
+ret
+.end
+.function neoCLR.Library.System.Int32.RuntimeUnion1(System.Result.Error<System.IntegerDivisionError> arg0) -> System.Result<Int32,System.IntegerDivisionError>
+ldarg arg0
+newobj instance System.Result<Int32,System.IntegerDivisionError>::.ctor(System.Result.Error<System.IntegerDivisionError>)
+ret
+.end
+.function neoCLR.Library.System.Int32.RuntimeUnion2(Int32 arg0) -> System.Result.Ok<Int32>
+ldarg arg0
+newobj instance System.Result.Ok<Int32>::.ctor(Int32)
+ret
+.end
+.function neoCLR.Library.System.Int32.RuntimeUnion3(System.Result.Ok<Int32> arg0) -> System.Result<Int32,System.IntegerDivisionError>
+ldarg arg0
+newobj instance System.Result<Int32,System.IntegerDivisionError>::.ctor(System.Result.Ok<Int32>)
+ret
+.end
+.function neoCLR.Library.System.Int32.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end

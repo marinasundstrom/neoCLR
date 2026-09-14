@@ -167,7 +167,14 @@ static class UnionImport
                     return top;
                 }
                 int Local(int n) { if (n < 0 || n >= locals.Length) throw new InvalidDataException("Invalid local index."); return n; }
-                void Load(int n) { Local(n); if (!assigned[n]) throw new InvalidDataException($"Read of uninitialized or unsupported default local {n} in {method.FullName} at instruction {index}."); Push(new(PrimitiveBindings.Stack(locals[n]))); code.AppendLine($"ldloc local{n}"); }
+                void Load(int n)
+                {
+                    Local(n);
+                    if (!assigned[n]) throw new InvalidDataException($"Read of uninitialized or unsupported default local {n} in {method.FullName} at instruction {index}.");
+                    Push(new(locals[n] == "Boolean" ? "Int32" : PrimitiveBindings.Stack(locals[n])));
+                    code.AppendLine($"ldloc local{n}");
+                    if (locals[n] == "Boolean") code.Append(BooleanBindings.Convert("Boolean", "Int32"));
+                }
                 Slot ConvertTop(string type)
                 {
                     if (stack.Count == 0 || !Converts(stack[^1].Type, type)) return Expect(type);
@@ -178,7 +185,13 @@ static class UnionImport
                     return stack.Count > 0 && Converts(stack[^1].Type, type) ? Pop() : Expect(type);
                 }
                 void Store(int n) { Local(n); ConvertTop(locals[n]); assigned[n] = true; code.AppendLine($"stloc local{n}"); }
-                void Arg(int n) { if (n < 0 || n >= args.Length) throw new InvalidDataException("Invalid parameter index."); Push(new(PrimitiveBindings.Stack(args[n]), Argument: args[n].EndsWith('&') ? n : -1)); code.AppendLine($"ldarg {n}"); }
+                void Arg(int n)
+                {
+                    if (n < 0 || n >= args.Length) throw new InvalidDataException("Invalid parameter index.");
+                    Push(new(args[n] == "Boolean" ? "Int32" : PrimitiveBindings.Stack(args[n]), Argument: args[n].EndsWith('&') ? n : -1));
+                    code.AppendLine($"ldarg {n}");
+                    if (args[n] == "Boolean") code.Append(BooleanBindings.Convert("Boolean", "Int32"));
+                }
                 bool NumericOperands()
                 {
                     if (stack.Count < 2) return false;
@@ -280,7 +293,10 @@ static class UnionImport
                         {
                             var receiver = Pop().Type;
                             if (!ApplicationTypes.Assignable(receiver, appRead.Owner) && receiver != appRead.Owner + "&") throw new InvalidDataException("Invalid application field receiver.");
-                            Push(new(PrimitiveBindings.Stack(appRead.Type))); code.AppendLine($"ldfld {appRead.Owner}::{appRead.Name}"); break;
+                            Push(new(appRead.Type == "Boolean" ? "Int32" : PrimitiveBindings.Stack(appRead.Type)));
+                            code.AppendLine($"ldfld {appRead.Owner}::{appRead.Name}");
+                            if (appRead.Type == "Boolean") code.Append(BooleanBindings.Convert("Boolean", "Int32"));
+                            break;
                         }
                         throw new InvalidDataException("Unsupported runtime field read.");
                     case Code.Stfld:
@@ -622,9 +638,13 @@ static class UnionImport
                                 else if (!assigned[argument.Local]) throw new InvalidDataException($"Read through uninitialized carrier address in {method.Name} at {instruction.Offset:x4}, local {argument.Local}: {reference.FullName}.");
                             }
                         }
-                        if (call.Result != "noresult") Push(new(PrimitiveBindings.Stack(call.Result), ConditionalOut: conditionalOut));
+                        if (call.Result != "noresult") Push(new(call.Result == "Boolean" && conditionalOut < 0 ? "Int32" : PrimitiveBindings.Stack(call.Result), ConditionalOut: conditionalOut));
                         call = Coerce(call, actualArguments);
-                        code.AppendLine(call.Instruction ?? $"call {call.Name}({string.Join(',', call.Arguments)})"); break;
+                        code.AppendLine(call.Instruction ?? $"call {call.Name}({string.Join(',', call.Arguments)})");
+                        // Conditional-out results must reach their branch directly so the runtime
+                        // verifier retains the relationship between success and assignment.
+                        if (call.Result == "Boolean" && conditionalOut < 0) code.Append(BooleanBindings.Convert("Boolean", "Int32"));
+                        break;
                     case Code.Ret:
                         if (result != "noresult") ConvertTop(result);
                         if (stack.Count != 0) throw new InvalidDataException($"Input ret stack not empty in {method.FullName}, expected {result}, remaining {string.Join(',', stack.Select(s => s.Type))}.");

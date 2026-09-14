@@ -1,0 +1,76 @@
+; Generated from runtime/raven/src/Int32.rvn. Regenerate with build_runtime_library.py.
+.method static Divide(Int32 dividend,Int32 divisor) -> System.Result<Int32,System.IntegerDivisionError>
+M00000001_IL_0000:
+M00000001_IL_0001:
+M00000001_IL_0002:
+ldarg 1
+M00000001_IL_0003:
+ldc.i4 0
+M00000001_IL_0004:
+ceq
+call neoCLR.Library.System.Int32.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_0006:
+brtrue M00000001_IL_0010
+M00000001_IL_000b:
+br M00000001_IL_0025
+M00000001_IL_0010:
+call neoCLR.Library.System.Int32.RuntimeErrorSystemIntegerDivisionErrorDivisionByZeroNew()
+M00000001_IL_0015:
+call neoCLR.Library.System.Int32.RuntimeErrorSystemIntegerDivisionErrorNewSystemIntegerDivisionErrorDivisionByZero(System.IntegerDivisionError.DivisionByZero)
+M00000001_IL_001a:
+call neoCLR.Library.System.Int32.RuntimeUnion0(System.IntegerDivisionError)
+M00000001_IL_001f:
+call neoCLR.Library.System.Int32.RuntimeUnion1(System.Result.Error<System.IntegerDivisionError>)
+M00000001_IL_0024:
+ret
+M00000001_IL_0025:
+M00000001_IL_0026:
+M00000001_IL_0027:
+ldarg 0
+M00000001_IL_0028:
+ldc.i4 -2147483648
+M00000001_IL_002d:
+ceq
+call neoCLR.Library.System.Int32.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_002f:
+brfalse M00000001_IL_003d
+M00000001_IL_0034:
+ldarg 1
+M00000001_IL_0035:
+ldc.i4 -1
+M00000001_IL_0036:
+ceq
+call neoCLR.Library.System.Int32.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_0038:
+br M00000001_IL_003e
+M00000001_IL_003d:
+ldc.i4 0
+M00000001_IL_003e:
+brtrue M00000001_IL_0048
+M00000001_IL_0043:
+br M00000001_IL_005d
+M00000001_IL_0048:
+call neoCLR.Library.System.Int32.RuntimeErrorSystemIntegerDivisionErrorOverflowNew()
+M00000001_IL_004d:
+call neoCLR.Library.System.Int32.RuntimeErrorSystemIntegerDivisionErrorNewSystemIntegerDivisionErrorOverflow(System.IntegerDivisionError.Overflow)
+M00000001_IL_0052:
+call neoCLR.Library.System.Int32.RuntimeUnion0(System.IntegerDivisionError)
+M00000001_IL_0057:
+call neoCLR.Library.System.Int32.RuntimeUnion1(System.Result.Error<System.IntegerDivisionError>)
+M00000001_IL_005c:
+ret
+M00000001_IL_005d:
+M00000001_IL_005e:
+M00000001_IL_005f:
+ldarg 0
+M00000001_IL_0060:
+ldarg 1
+M00000001_IL_0061:
+div
+M00000001_IL_0062:
+call neoCLR.Library.System.Int32.RuntimeUnion2(Int32)
+M00000001_IL_0067:
+call neoCLR.Library.System.Int32.RuntimeUnion3(System.Result.Ok<Int32>)
+M00000001_IL_006c:
+ret
+.end
