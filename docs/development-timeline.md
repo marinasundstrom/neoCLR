@@ -2849,3 +2849,27 @@ The closing section now names that focus directly.
 **Website checks:** HTML nesting, anchors and repository links passed. Desktop and
 390px mobile review confirmed the six-card library grid, highlighted code and union
 disclosure behavior without horizontal page overflow.
+
+
+## Indexer ergonomics in Raven — recorded 2026-09-14
+
+**Author's report and direction:** Supplied a VS Code screenshot showing
+`typeof(int).GetProperties().Item.` offering `PropertyInfo` members and said,
+“This should be aligned with the experience in C#.”
+
+**Assistant's response:** Explained that Item is an indexer metadata name and that
+element-member completion belongs after indexed access, such as
+`GetProperties()[0].`. Proposed treating this as a general Raven fix, separate from
+the imported-union emission work already in progress.
+
+**Action and outcome:** Reproduced the behavior using ordinary .NET collection
+classes/interfaces and a Raven-declared indexer. Fixed named lookup, symbol
+referenceability and semantic-model fallback, with positive coverage for indexed
+access and ordinary properties named Item. Integrated `ac4901f6b` into Raven main;
+440 focused checks passed. The preceding union-emission fix was separately integrated
+as `43f288b05`, with 291 focused checks and the .NET 10/.NET 11 matrix passing.
+
+**Still open:** The experimental Raven branch and installed SDK/extension have not
+been synchronized or rebuilt in these slices. The source fixes do not yet change
+the author's installed editor. See the [target evaluation](raven-target-evaluation.md)
+for validation scope and remaining stabilization reviews.

@@ -30,6 +30,36 @@ A possible alternative emission backend is future evaluation, outside this scope
 [release work order](release-stabilization.md) is historical; remaining general
 compiler reviews continue before the generic-library authoring probe and migration.
 
+## Indexer member access and completion — 2026-09-14
+
+Raven main includes `ac4901f6b`. The author showed completion treating
+`typeof(int).GetProperties().Item.` as if the indexer were an ordinary property and
+requested the C# experience. The general reproduction used .NET `List<string>`,
+`IList<string>`, `IReadOnlyList<string>` and a Raven-declared indexer, without neoCLR
+configuration. The initial focused run had 16 failures and 16 passes.
+
+Indexer symbols now report `CanBeReferencedByName = false`. Named lookup excludes
+them; semantic-model fallback follows the same rule. Consequently `.Item` is invalid
+for an indexer, dot completion omits indexers, and `[index].` provides element members.
+Ordinary properties named Item remain valid, and metadata enumeration retains the
+indexer symbol. This aligns with [C# indexer access](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/indexers/using-indexers)
+without changing CLI property/accessor metadata or neoCLR's runtime contract.
+
+All 440 completion/indexer/property/semantic-model checks passed, including cold and
+already-bound queries, valid indexed access and imported interface indexer execution.
+The main-based branch was integrated, pushed and removed. Installed experimental
+tools have not been refreshed; synchronization and packaging are still needed to
+expose this fix in the author's existing VS Code installation.
+
+The inspected client log recorded completion at `54:37` on the sample at
+2026-09-14T15:16:37.821Z, completing in 71 ms with 13 items. The matching server log
+recorded startup and normal shutdown, with no request-level failure. These logs
+establish successful request transport, not correctness of the answer. Compiler
+regressions reproduce and validate the semantic fix independently of the editor.
+
+Next reviews remain the separate bare type-pattern failures and array-factory work
+listed below. Keep neoCLR target policy experimental and library migration paused.
+
 ## Imported union emission follow-through — 2026-09-14
 
 Raven main includes `43f288b05`. Independent ordinary-CLI regressions confirmed the

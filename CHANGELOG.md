@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-14
 
+- Recorded the author's indexer-completion report and Raven main fix `ac4901f6b`:
+  indexers require `[index]` access; their metadata names no longer behave as ordinary
+  properties in lookup, hover or completion. All 440 focused checks passed. Kept
+  installed-tool refresh explicitly pending and documented the general CLI/C# basis.
+
 - Recorded Raven main's imported-union emission fix (`43f288b05`): closed pattern
   locals, valid primitive method signatures, retained assembly scopes and correct
   metadata containers for Raven union-case accessors. All 291 focused checks and the
