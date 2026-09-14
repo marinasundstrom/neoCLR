@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-14
 
+- Synchronized reviewed Raven main fixes into the experimental branch (`ee7b2e5af`)
+  and installed SDK/VSIX `0.1.12-neoclr.14` with a fresh matching runtime bundle.
+  Recorded installation instructions, revisions, hashes and packaged validation:
+  63 saved-project, 15 application, 30 query, 5 compiler, 121 signature checks;
+  68 editor checks each against bundled and installed servers; four array and four
+  neoIL programs. All 751 manifest files verified. This is a local candidate only.
+
 - Completed the independent Raven empty-array factory review (`f70ba5026` on main):
   use target metadata capabilities instead of assuming the host factory exists.
   All 93 focused checks pass, including .NET 10/.NET 11 reference-pack cases.

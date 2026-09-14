@@ -640,3 +640,17 @@ All 93 focused collection-expression checks now pass, including metadata inspect
 and execution using .NET 10/.NET 11 reference packs with and without the factory.
 This is not a claim of execution on .NET Framework or NanoFramework. Synchronization
 into the experimental branch and packaged-tool validation are the next actions.
+
+## Synchronized local tools (2026-09-14)
+
+The experiment now includes reviewed main fixes through `f70ba5026` at merge commit
+`ee7b2e5af`. Resolution kept explicit target-core selection and host-fallback policy,
+nominal generic Void, and configured array members. Removed duplicate implementations
+introduced by overlapping older fixes; isolated test-library identities and revised
+an obsolete assertion that prohibited an available target Array.Empty factory.
+All 120 focused synchronization checks pass. The main-based review branch was
+removed after fast-forward integration; the experimental branch remains separate.
+
+The [local SDK/extension build](local-tools-20260914.md) records the installed .14
+packages, matching runtime bundle, completion checks and execution results. This
+completes the local refresh; it does not publish a new preview or resume migration.

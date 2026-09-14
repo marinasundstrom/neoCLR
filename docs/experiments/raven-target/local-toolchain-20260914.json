@@ -1,0 +1,28 @@
+{
+  "neoCLRRevision": "a71e642829e4cbf00f3670fd8360644c810335e7",
+  "ravenRevision": "ee7b2e5af5412ff7af72658fe6de289e7d41ab6b",
+  "ravenBranch": "codex/neoclr-namespace-metadata",
+  "sdkVersion": "0.1.12-neoclr.14",
+  "dotnetSdk": "11.0.100-rc.1.26425.128",
+  "platform": "osx-arm64",
+  "bundle": "/Users/robert/.neoclr/experiments/arrays-20260914",
+  "sdk": "/Users/robert/.raven/sdk/0.1.12-neoclr.14",
+  "extension": "/Users/robert/.vscode/extensions/raven.raven-vscode-0.1.12-neoclr.14",
+  "publication": "local installation only",
+  "manifestFilesVerified": 751,
+  "checks": {
+    "project": 63,
+    "application": 15,
+    "queries": 30,
+    "compiler": 5,
+    "editor": 68,
+    "installed-editor": 68,
+    "signatures": 121
+  },
+  "neoILPrograms": 4,
+  "arrayPrograms": 4,
+  "artifacts": {
+    "raven-sdk-0.1.12-neoclr.14-osx-arm64.tar.gz": "13d29bf4661dbbe8155fa35d2ac5a0bc93badd92c5d6cc45d8b8e2e948bc5eae",
+    "raven-vscode.vsix": "f7b3b04e2f346dbb865291172088bd5b8eee6ff4ceef6a7955ed8be9dcb68825"
+  }
+}

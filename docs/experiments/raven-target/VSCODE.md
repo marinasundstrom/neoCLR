@@ -1,5 +1,8 @@
 # Test Raven targeting neoCLR in VS Code
 
+Latest local installation: [2026-09-14 SDK/extension .14](../../local-tools-20260914.md).
+Use that record for current paths and validation; earlier checkpoints below are historical.
+
 For the latest local .12 build, use [the collection demo](../../raven-collections-local-build.md).
 Earlier installation records below remain specific to their stated builds.
 
