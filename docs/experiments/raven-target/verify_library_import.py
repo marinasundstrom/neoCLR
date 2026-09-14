@@ -66,7 +66,7 @@ public class Facade {
     consumer = compile('Consumer', '''import System.Console.*
 import Workflows.*
 func Main() {
-    WriteLine(Facade.Forward())
+    WriteLine(Answer())
     WriteLine(Arithmetic.Sum(3))
 }
 ''', [arithmetic, facade])

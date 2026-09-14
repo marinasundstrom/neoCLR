@@ -121,6 +121,8 @@ static class CoreDeclarations
         namespace System.Runtime.CompilerServices {
             // Union probe attribute
             public sealed class ReferenceAssemblyAttribute : System.Attribute { }
+            // Raven namespace-member metadata marker; not an executable runtime API.
+            public sealed class TopLevelAttribute : System.Attribute { }
             public sealed class CompilerGeneratedAttribute : System.Attribute { }
             public sealed class ExtensionAttribute : System.Attribute { }
             public sealed class RefSafetyRulesAttribute : System.Attribute {

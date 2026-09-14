@@ -48,12 +48,12 @@ Use a fresh output directory for each attempt.
   Existing same-type private calls remain possible. This is not a complete CLI
   accessibility implementation (`internal`, friend assemblies and protected access
   are not added).
-- A library's own calls to Raven namespace functions use their existing emitted CLI
-  container. Identity comes from metadata; no guessed container name or new
-  namespace-function ABI is used. Direct cross-assembly wildcard import is not yet
-  working in this probe: `import Workflows.*` followed by `Answer()` produced RAV0103
-  in the consumer. A public static facade calling Answer inside the library works.
-  This is a Raven metadata-discovery follow-up, not an importer workaround.
+- Raven namespace functions use their existing emitted CLI container and target-owned
+  `TopLevelAttribute` marker. Direct cross-assembly wildcard imports now work with the
+  refreshed core and Raven `codex/neoclr-namespace-metadata` compiler. No guessed
+  container name or new namespace-function ABI is used. The earlier RAV0103 probe
+  exposed both a missing core marker and Raven's host-only marker lookup; these are
+  fixed in source. Existing installed tools still require an update.
 - Existing supported scalar/closed signatures and instruction rules apply. Static
   initializers, exception handlers and unsupported instructions continue to fail.
 
@@ -101,11 +101,36 @@ python3 docs/experiments/raven-target/verify_library_import.py /path/to/Demo.rvn
 ```
 
 It independently compiles two libraries and a consumer. The positive program combines
-an internal namespace-function call through a public static facade and recursive calls, checks reused method tokens
+a direct imported namespace-function call and recursive static calls, checks reused method tokens
 across assemblies, executes with reversed input order, and checks source-map labels.
 Negative cases cover missing/duplicate dependencies, an implementation with a private
 method, a changed signature and unsupported library instance construction. Existing
 application and normal compiler/import suites cover the retained single-program path.
 
 Checkpoint results: seven library checks, 15 application checks and five normal
-compiler/import checks passed. Raven source and installed tools were not changed.
+compiler/import checks passed. This records the initial static-library checkpoint;
+the namespace follow-up below changes Raven source. Installed tools remain unchanged.
+
+## Namespace metadata follow-up
+
+The namespace marker is a compiler metadata declaration, not an executable neoCLR
+attribute API. Regenerate the core, rebuild libraries and consumers, and use the
+matching new Raven compiler and bridge. Adding the marker alone was insufficient:
+Raven now resolves it from supplied metadata, and completion accepts imported members
+without source declarations. The namespace probe covers marker scope, closure audit,
+overloads, completion, inaccessible functions, disabled imports and unmarked lookalikes:
+
+```sh
+dotnet docs/experiments/raven-target/bin/Debug/net11.0/Probe.dll \
+  --namespace-members /path/to/new-namespace-probe
+```
+
+This follows Raven's existing CLI custom-attribute contract rather than inventing a
+neoCLR-specific naming rule. The cost is requiring a truthful marker declaration in
+the reference pack and matching compiler tools. Missing-marker diagnostics remain a
+Raven follow-up; the emitter currently omits an unavailable marker. This does not
+resume the System-library migration or expand the generic/instance-body boundary.
+
+Namespace follow-up validation: 47 focused Raven tests, 54 imports-and-namespaces
+tests, eight target namespace checks, seven separate-library checks and five normal
+compiler/import checks passed. The test sets overlap; these are separate suite totals.

@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-14
 
+- Fixed direct wildcard imports of namespace functions from Raven libraries by
+  adding the target TopLevelAttribute metadata declaration and correcting Raven's
+  marker lookup and imported-member completion on an isolated feature branch.
+  Added a target namespace probe and switched the library regression to direct calls.
+  Regenerate core metadata and rebuild libraries/consumers with matching Raven tools;
+  installed SDK/extension artifacts remain unchanged. Library migration stays paused.
+
 - Added bounded separate Raven library importing for nongeneric static methods,
   including intra-library namespace functions through existing CLI metadata. Dependencies
   are explicit and closure-audited; cross-assembly private calls and unsupported

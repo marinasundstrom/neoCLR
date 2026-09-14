@@ -44,8 +44,9 @@ source-map sidecars. This removes public application row-token naming; separate
 general signature/dispatch importing remain open. A subsequent
 [static-library checkpoint](raven-library-import.md) admits explicitly supplied
 nongeneric static bodies and intra-library namespace-function calls through their
-existing CLI metadata. Direct consumer wildcard discovery of library namespace
-functions currently reports RAV0103 and needs Raven-side investigation. Generic bodies and library-owned instance types remain open.
+existing CLI metadata. Direct consumer wildcard discovery initially reported RAV0103; the subsequent
+namespace-metadata slice supplies the missing TopLevelAttribute and fixes Raven
+metadata-first marker lookup and imported-member completion. Generic bodies and library-owned instance types remain open.
 
 ## Initial assessment evidence
 
