@@ -14,6 +14,20 @@ The author clarified on 2026-09-14 that the remaining stabilization fixes are to
 precede the next release. Runtime-library migration from neoIL to Raven is deferred
 until after that release, rather than being a release prerequisite.
 
+## Generic method metadata follow-through — 2026-09-14
+
+Raven main includes `e14d23d32`, independently extracted from `11e9964f2`.
+Closed generic method calls preserve MethodSpec arguments, definition signatures
+and target assembly scopes. The normal-reference regression failed before the fix
+with a MetadataLoadContext mismatch; all 27 focused checks and the repository
+.NET 10/.NET 11 build/run matrix passed afterwards. No experimental metadata-import
+option was used. The completed integration branch was removed; the active Raven
+experiment already contains the implementation and remains separate.
+
+Closed generic field metadata (`4af98e7c1`) is the next independent review.
+Remaining stabilization work still precedes release, and runtime-library migration
+remains deferred until afterwards.
+
 ## Constructor metadata follow-through — 2026-09-14
 
 Raven main includes `f6b4748e6`, independently extracted from `995a4c982`.

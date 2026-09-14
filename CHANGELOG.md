@@ -14,7 +14,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   worktrees and unrelated branches were preserved. Integrated the independently
   reviewed reference-only constructor metadata fix into Raven main at f6b4748e6;
   26 focused checks and the repository .NET 10/.NET 11 build/run matrix passed.
-  Removed its temporary branch after integration as well.
+  Removed its temporary branch after integration as well. Subsequently integrated
+  closed generic method metadata into Raven main at e14d23d32: 27 focused checks and
+  the same target matrix passed. Its completed branch was removed too.
 
 - Recorded the directive to integrate general Raven fixes into Raven main while
   keeping neoCLR experiments on separate feature branches. Updated repository
