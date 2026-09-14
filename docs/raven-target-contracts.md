@@ -6,6 +6,11 @@ project configuration, disposal and the broader design remain future work.
 The ordinary .NET target must retain its existing behavior; neoCLR is an explicit
 experimental target. Neo is outside this exercise.
 
+The later [target-profile and backend direction](raven-target-profiles.md) separates
+framework contracts, symbol projections and emission mechanisms. It also records
+possible future Raven bootstrapping and neoCLR architecture/AOT/microcontroller work;
+these are long-term investigations, not current implementation claims.
+
 ## Boundary and comparison
 
 A compiler needs to recognize a few library protocols when lowering language features.

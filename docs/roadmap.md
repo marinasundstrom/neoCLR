@@ -92,6 +92,20 @@ adding readonly, immutable or frozen collection APIs. System.Array<T> is now the
 author-selected generic array direction; plan its identity/metadata/reflection mapping
 separately while preserving ordinary array syntax, instructions and invariance.
 
+## Target profiles and long-term portability direction
+
+The [profile/symbol/backend proposal](raven-target-profiles.md) separates framework
+contracts from compiler representation and emission mechanisms. Keep this as a staged
+architecture review after current stabilization, preserving the CLI boundary where it
+fits. General fixes still integrate independently into Raven main; experimental
+neoCLR profiles remain isolated.
+
+Possible Raven compiler bootstrapping, more neoCLR architectures, AOT deployment and
+microcontrollers are long-term inputs to that review, not scheduled deliverables.
+They require separate investigations into compiler self-hosting, runtime portability,
+application compilation and resource-constrained profiles. No platform, backend or
+reduction of today's semantics is selected by these notes.
+
 ## Current Raven-target experiment priority
 
 The [preview acceptance criteria](raven-preview-acceptance.md) focus on the fundamentals already built and their differences from

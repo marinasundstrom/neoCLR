@@ -8,12 +8,18 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-14
 
+- Recorded the proposed separation of Raven target profiles, symbol projections and
+  emission backends, plus a staged evaluation plan. Preserved possible Raven compiler
+  bootstrapping and neoCLR architecture/AOT/microcontroller work as long-term questions,
+  not implemented features or preview commitments. Linked the roadmap and conversation
+  record to the architectural proposal.
+
 - Implemented `Array<T>.Empty` and instance `ForEach(Func<T, Void>)` in the Raven
   runtime profile, reference surface and importer. Empty currently allocates a
   zero-length array without a shared-identity guarantee. Removed the profile's static
   ForEach helper; use `values.ForEach(action)`. Updated samples, reflection coverage
-  and source validation instructions. Four Raven samples, 121 signature checks and 32 runtime/collection regressions
-  pass; installed tools still require refresh. Kept configured array-member projection
+  and source validation instructions. Four Raven samples, 121 signature checks and
+  32 runtime/collection regressions pass; installed tools still require refresh. Kept configured array-member projection
   and nominal generic Void emission on Raven's experimental branch.
 - Independently fixed void-call stack-result tracking on Raven main (`8dbd96fb6`),
   then cherry-picked it into the experiment (`5c32d1d06`). Both ordinary and target-

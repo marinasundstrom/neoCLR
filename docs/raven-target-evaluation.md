@@ -614,3 +614,14 @@ The general absent-call-result fix was independently integrated on Raven main as
 target-metadata .NET regressions pass, alongside 39 focused runtime checks.
 Four array samples execute on neoCLR and 121 signature checks pass. Installed-tool
 refresh and synchronization of the other reviewed Raven main fixes remain pending.
+
+
+## Target profiles and future implementation boundaries — 2026-09-14
+
+The author proposed .NET and neoCLR Target Profiles, alternative symbol implementations
+where useful, configured language contracts, and eventual emission-backend separation
+beyond Reflection.Emit. Recorded the proposal and a staged evaluation in
+[target profiles, symbols and backends](raven-target-profiles.md). This is architectural
+direction, not a wholesale refactor during stabilization. Possible Raven compiler
+bootstrapping and future neoCLR architecture/AOT/microcontroller targets are recorded
+there as long-term considerations, with no committed delivery scope.

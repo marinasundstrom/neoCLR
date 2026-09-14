@@ -2907,3 +2907,37 @@ passed. Expression-bodied callbacks exposed a general void-call stack defect;
 `8dbd96fb6` was independently reproduced/tested and integrated into Raven main, then
 cherry-picked as `5c32d1d06` into the experiment. Nominal generic Void emission remains
 experimental. Installed tools have not yet been refreshed.
+
+
+## Target profiles, symbol implementations and future reach — recorded 2026-09-14
+
+**Author's direction:** Suggested avoiding accumulated framework-specific exceptions
+in Raven's semantic model and code generation, using separate symbol implementations
+where helpful and configurable contracts such as Iterable versus IEnumerable. Proposed
+.NET and neoCLR Target Profiles encompassing .NET versions, NanoFramework and neoCLR,
+and eventually refactoring emission to support backends beyond Reflection.Emit.
+
+**Assistant's response:** Proposed separating a framework profile from an emission
+backend: several profiles could share one backend. Suggested dedicated/composed symbol
+representations where behavior really differs, while keeping common CLI symbols and
+language rules shared. The generic array shape is a candidate for evaluating that
+boundary. Proposed preserving the current stabilization scope rather than starting a
+backend rewrite inside the array slice.
+
+**Author's additional future directions:** Asked to record that Raven might eventually
+be bootstrapped, with its compiler written in Raven. If neoCLR becomes a project with
+sustained investment, consider different architectures, Native AOT and potentially
+microcontrollers. Explicitly described these as far-future considerations.
+
+**Assistant's response and action:** Recorded the
+[profile/symbol/backend proposal](raven-target-profiles.md), linked it from the contract
+assessment and roadmap, and separated compiler bootstrapping, runtime portability,
+ahead-of-time application compilation and constrained runtime profiles. These are
+possible directions, not promises or selected implementations. No bootstrapping, new
+backend, architecture port or microcontroller implementation was started.
+
+**Concrete outcome of the ongoing slice:** The generic array API is committed in
+neoCLR as `ff617c4` and its compiler projection in experimental Raven as `8823261b6`.
+The general void-invocation fix was independently integrated on Raven main as
+`8dbd96fb6`. The array implementation remains an incremental metadata-driven projection;
+a full target-profile abstraction and specialized array-symbol design remain open.
