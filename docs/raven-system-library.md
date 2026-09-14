@@ -140,13 +140,22 @@ python3 docs/experiments/raven-target/verify_generic_library.py \
 ```
 
 No public System API is added by this probe. Generic classes, constrained bodies,
-composite signatures such as `Iterable<T>`, generic unit-return calls and broader
-cross-fragment dependencies remain subsequent gates. Generic locals must be assigned
+composite signatures such as `Iterable<T>`, and broader cross-fragment dependencies remain subsequent gates. Generic locals must be assigned
 before use; this slice does not project implicit generic defaults.
 
 The probe exposed a general Raven RuntimeUnitContract emission defect in generic
 method specifications. The independent fix is `5f93eef6a` on Raven main and
-`64a5497ec` in the experiment, with 12 focused .NET tests passing. A separate
-`Echo<()>(value)` reduction still produces invalid IL on ordinary .NET and remains
-tracked in Raven’s Runtime Contract documentation. Generic unit storage and
-Result<Void, E> propagation do not prove that different invocation shape.
+`64a5497ec` in the experiment, with 12 focused .NET tests passing.
+The subsequent generic unit-return defect is
+fixed on Raven main as `327335699` and in the experiment as `ef352917e`: a call
+whose original return type is a type parameter already returns a value when that
+parameter is unit. It must not synthesize a second value, and must pop the real
+value when discarded. Twenty-two focused .NET checks pass across default, explicit-core
+and ValueTuple-contract emission, including methods on generic types and no-result
+wrappers. Raven’s compiler documentation records the same distinction.
+
+The generic library probe also instantiates `Choose<()>(...)` using neoCLR’s Void
+contract, stores one result and discards another. Existing importer handling preserves
+nominal Void correctly; no new importer or runtime instruction was needed. The runtime
+verifier and execution validate the stack behavior. This extends the earlier generic
+storage and Result<Void, E> coverage to generic unit-returning invocations.

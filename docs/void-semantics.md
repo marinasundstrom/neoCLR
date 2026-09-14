@@ -77,3 +77,13 @@ that does not establish Void-generic execution on the .NET CLR.
 The current executable examples are `Option<int>` and `Result<Void, OverflowError>`.
 Broader generic payloads, reflection exposure and native ABI details still need
 validation as those features enter the target profile.
+
+## Generic call results — 2026-09-14
+
+A generic method returning `T` returns a value when instantiated with Void. This is
+different from a method declared with a CLI no-result return signature: its call
+already supplies the result. Raven preserves that value in expression contexts and
+pops it when discarded, without synthesizing another unit value. The generic library
+probe in [Raven authoring](raven-system-library.md#generic-implementation-gate--2026-09-14)
+checks both contexts with the selected Void contract. This reuses existing metadata,
+importer handling and runtime generic functions.

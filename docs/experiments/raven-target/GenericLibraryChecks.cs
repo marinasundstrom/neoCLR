@@ -37,6 +37,10 @@ static class GenericLibraryChecks
             method.Body.Instructions.Add(Instruction.Create(OpCodes.Ldarg_1));
             method.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
         }
+        var useUnit = new MethodDefinition("UseUnit", MethodAttributes.Public | MethodAttributes.Static, Primitive("Int32"));
+        owner.Methods.Add(useUnit);
+        useUnit.Body.Instructions.Add(Instruction.Create(OpCodes.Ldc_I4_0));
+        useUnit.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
         foreach (var method in module.Types.SelectMany(t => t.Methods).Where(m => m.HasBody))
         { _ = method.Body.Instructions.Count; _ = method.Body.Variables.Count; }
         foreach (var reference in module.AssemblyReferences.ToArray())

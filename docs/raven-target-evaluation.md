@@ -738,3 +738,18 @@ The [generic library probe](raven-system-library.md#generic-implementation-gate-
 now executes one open body instantiated with Int32 and String. This completes the
 ordinary generic body gate; constructed generic signatures, constraints and shared
 implementation/reference type identities remain unproven.
+
+### Generic unit-result resolution — 2026-09-14
+
+The deferred `Echo<()>(value)` defect reproduced under ordinary .NET emission,
+explicit System.Runtime emission and the ValueTuple unit contract. Raven synthesized
+unit after a call that already returned a generic value, and failed to pop the actual
+result in statement position. The fix distinguishes the original generic return
+signature from an ordinary no-result signature. It is independently integrated on
+Raven main as `327335699`, and cherry-picked to the experiment as `ef352917e`.
+
+Twenty-two focused unit/void/assignment checks pass, including assignment, argument,
+discard, generic-type method and no-result wrapper cases. The neoCLR generic library
+probe now verifies and executes consumed and discarded Void results. Its existing
+nominal-Void importer handling needs no change. This resolves the candidate above;
+constructed generic signatures and constraints remain separate library migration gates.

@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-14
 
+- Resolve generic unit-return invocation behavior through an independent Raven main
+  fix (327335699; experimental cherry-pick ef352917e). Preserve the actual generic
+  return value when consumed and pop it when discarded; ordinary no-result calls
+  retain their existing behavior. All 22 focused .NET checks pass. Extend the generic
+  library probe to consumed/discarded Void results; existing importer/runtime handling
+  passes without changes. Update compiler/integration documentation and close the
+  previously recorded unit-result candidate. Existing Void propagation and all
+  69 Math results/six rejected contracts continue to pass.
+
 - Admit bounded unconstrained generic namespace implementation bodies against an
   existing reference contract. Check generic arity/parameter positions, preserve open
   bodies and validate same-fragment calls using existing runtime generic functions.

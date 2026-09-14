@@ -38,6 +38,12 @@ public func ChooseInt(first: bool, left: int, right: int) -> int {
     return Choose<int>(first, left, right)
 }
 
+public func UseUnit() -> int {
+    let selected = Choose<()>(false, (), ())
+    Choose<()>(true, selected, ())
+    return 42
+}
+
 public func ChooseText(first: bool, left: string, right: string) -> string {
     return Choose<string>(first, left, right)
 }
@@ -62,18 +68,18 @@ public func ChooseText(first: bool, left: string, right: string) -> string {
     for first in (True, False):
         driver += f'ldc.bool {str(first).lower()}\nldc.i4 11\nldc.i4 22\ncall Probe.Generic.ChooseInt(Boolean,Int32,Int32)\ncall System.Console::WriteLine(Int32)\npop\n'
         driver += f'ldc.bool {str(first).lower()}\nldstr "left"\nldstr "right"\ncall Probe.Generic.ChooseText(Boolean,String,String)\ncall System.Console::WriteLine(String)\npop\n'
-    driver += 'ret\n.end\n'
+    driver += 'call Probe.Generic.UseUnit()\ncall System.Console::WriteLine(Int32)\npop\nret\n.end\n'
     application = root / 'App.neoil'
     application.write_text(driver)
     system = root / 'System.neoil'
     system.write_text(build(ROOT / 'runtime/System.neoil'))
     run([runtime, 'verify', application, '--system', system])
-    assert run([runtime, 'run', application, '--system', system]).splitlines() == ['11', 'left', '22', 'right']
+    assert run([runtime, 'run', application, '--system', system]).splitlines() == ['11', 'left', '22', 'right', '42']
     for name, invalid in [('WrongName', source.replace('left: T', 'value: T').replace('        left', '        value')),
-                          ('WrongPosition', source.replace('Choose<T>', 'Choose<T, U>').replace('Choose<int>(', 'Choose<int, int>(').replace('Choose<string>(', 'Choose<string, string>('))]:
+                          ('WrongPosition', source.replace('Choose<T>', 'Choose<T, U>').replace('Choose<int>(', 'Choose<int, int>(').replace('Choose<string>(', 'Choose<string, string>(').replace('Choose<()>(', 'Choose<(), ()>('))]:
         bad = compile(name, invalid)
         output = root / name / 'imported'
         diagnostic = run(['dotnet', bridge, '--library-implementation', bad, core, 'Probe.Generic', output], False)
         assert 'does not match reference contract' in diagnostic, diagnostic
         assert not (output / 'Implementation.neoil').exists()
-    print('Generic namespace body: Int32/String, both branches, and two invalid contracts passed')
+    print('Generic namespace body: Int32/String/Void, consumed/discarded unit results, and two invalid contracts passed')
