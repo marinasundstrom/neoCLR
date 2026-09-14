@@ -30,6 +30,35 @@ A possible alternative emission backend is future evaluation, outside this scope
 [release work order](release-stabilization.md) is historical; remaining general
 compiler reviews continue before the generic-library authoring probe and migration.
 
+## Imported union emission follow-through — 2026-09-14
+
+Raven main includes `43f288b05`. Independent ordinary-CLI regressions confirmed the
+remaining member-union method-signature and pattern-local problems from `04c953d67`.
+Target-core emission now derives closed carrier and variant locals from semantic
+symbols rather than temporary call proxies. Constructed generic method references
+retain definition `!n` parameters, encode concrete primitive signatures correctly,
+and preserve by-reference/modifier wrappers. Actual metadata void returns are kept
+separate from unit-valued returns.
+
+Scope normalization now runs after proxy replacement: earlier removal of apparently
+unused scopes produced invalid TypeRef tokens. A further independent Raven-library
+execution test found that case accessors used the logical carrier instead of the
+case's actual metadata container (`Outcome` versus `Outcome<T,E>`); this is corrected.
+All 291 focused metadata/pattern/by-reference checks and the .NET 10/.NET 11 build/run
+matrix passed. The main-based branch was integrated, pushed and removed.
+
+This does not integrate all of `04c953d67`. Bare type-pattern probes exposed separate
+failures: `choice is Choice.Ok<int>` produced invalid code under ordinary and target-
+core emission, while `result is Outcome.Ok<int>` was rejected with RAV2102 in both
+modes. These probes were separated from destructuring coverage; the declaration-pattern
+local hunk and independent boxing optimization remain deferred pending their own
+binding/emission review. The array-factory review (`de872fa34`) also remains open.
+
+The author's subsequent indexer-completion report takes the next focused slice.
+Experimental Raven remains at `246d697bf`, unsynchronized; installed tools and Preview 6
+artifacts are unchanged. Runtime-library migration remains paused. These tests prove
+modern .NET execution, not execution on .NET Framework or NanoFramework.
+
 ## Metadata core-library identity follow-through — 2026-09-14
 
 Raven main includes `11e5c57ec`. The reduced .NET 10/.NET 11 regression confirmed

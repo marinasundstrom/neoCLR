@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-14
 
+- Recorded Raven main's imported-union emission fix (`43f288b05`): closed pattern
+  locals, valid primitive method signatures, retained assembly scopes and correct
+  metadata containers for Raven union-case accessors. All 291 focused checks and the
+  .NET 10/.NET 11 matrix passed. Kept bare type-pattern failures, boxing optimization
+  and array-factory review explicit; experimental tools remain unsynchronized and
+  runtime-library migration remains paused.
+
 - Recorded Raven main's metadata core-library identity fix (`11e5c57ec`): imported
   structs retain their category using the supplied core assembly's full identity.
   All 33 focused checks, the full baseline (5,515 reported passes), and the .NET
