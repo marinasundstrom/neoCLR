@@ -2738,3 +2738,48 @@ runtime bundle, separate Raven SDK/VSIX, notices and validation evidence.
 **Still separate:** This is the neoCLR experiment, not a full Raven release gate.
 The earlier main audit's MacCatalyst/Xcode limitation remains documented. Runtime
 library migration to Raven and broader semantic changes remain deferred.
+
+
+## Website: features, influences and open discussion — 2026-09-14
+
+**Author direction:** Improve the website to better market neoCLR and its implemented
+improvements, list the project's influences and features, and demonstrate them with
+samples. The author then requested areas being explored for improvement and a general
+invitation for feedback and discussion.
+
+**Assistant proposal:** Organize the page around the CLR foundation, design reference
+points, current feature contracts and source-backed examples. Distinguish implemented
+preview behavior from research and explain benefits alongside .NET compatibility costs.
+
+**Action:** Expanded [the homepage](../website/index.html) with feature summaries and
+six generated excerpts covering Result, Option, generic Void, collection capabilities,
+UTF-8 slicing and query cardinality. Added research questions on nullability, memory
+views, callables, async, text, collections and injectable clocks. Corrected outdated
+application-type/capture limitations against the current API coverage record. Linked
+general feedback to GitHub Issues after the repository API reported Discussions disabled;
+no repository settings were changed. Noda Time is described as a research reference,
+not an adopted API; Rust Result is a design precedent, not an imported ownership model.
+
+**Evidence and status:** Reused [platform direction](platform-direction.md),
+[API coverage](raven-runtime-api-coverage.md), [collection contracts](collection-contracts.md),
+[query contracts](raven-query-api.md), [text model](text-model.md), and
+[array variance](array-variance.md). Checked the linked Rust Result, .NET array/Unicode,
+and Noda Time primary references on 2026-09-14. The website build checks embedded
+excerpts and local links. These are website edits, not new runtime capabilities or a
+new release; deployment is separate from the local changes.
+
+**Author clarification:** The focus is demonstrating the platform's style through
+Raven code, with some neoIL as a supporting view. “Discussion” means an invitation
+to exchange ideas, not a request to use GitHub Discussions.
+
+**Assistant adjustment:** Put a source-backed Raven example in the hero, moved
+features and examples before the influences section, and placed the neoIL example
+after the five Raven examples. Kept the invitation broad, with GitHub Issues as an
+available contact route rather than defining discussion as a GitHub feature.
+
+**Publication direction and validation:** The author requested committing this work
+on main and publishing the site. The local build and repository-link checks passed;
+browser checks covered desktop and 390px mobile, including example navigation and
+absence of page-wide horizontal overflow. The assistant is committing the website
+changes with the changelog and using the existing GitHub Pages workflow. Deployment
+completion must be verified from that run rather than inferred from a successful push.

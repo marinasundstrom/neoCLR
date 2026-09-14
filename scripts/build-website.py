@@ -10,11 +10,11 @@ SOURCE = ROOT / 'website'
 OUTPUT = ROOT / 'target/website'
 
 
-def excerpt(path, start, end):
+def excerpt(path, start, end, include_end=True):
     text = (ROOT / path).read_text(encoding='utf-8')
     first = text.index(start)
-    last = text.index(end, first) + len(end)
-    return escape(text[first:last])
+    last = text.index(end, first) + (len(end) if include_end else 0)
+    return escape(text[first:last].rstrip())
 
 
 class PageCheck(HTMLParser):
@@ -49,11 +49,17 @@ def main():
     for name in ('style.css', 'mark.svg'):
         shutil.copyfile(SOURCE / name, OUTPUT / name)
     page = (SOURCE / 'index.html').read_text(encoding='utf-8')
-    page = page.replace('{{RAVEN_SAMPLE}}', excerpt(
-        'docs/experiments/raven-target/samples/library-propagation.rvn',
-        'func Normalize', '\n}'))
-    page = page.replace('{{IL_SAMPLE}}', excerpt(
-        'examples/preview/result-void.neoil', '.function Complete', '.end'))
+    raven = 'docs/experiments/raven-target/samples/'
+    samples = {
+        'RAVEN_SAMPLE': (raven + 'library-propagation.rvn', 'func Normalize', '\n}', True),
+        'IL_SAMPLE': ('examples/preview/result-void.neoil', '.function Complete', '.end', True),
+        'OPTION_SAMPLE': (raven + 'library-query-terminals.rvn', 'func FirstPositive', '\n}', True),
+        'COLLECTION_SAMPLE': (raven + 'library-collection-capabilities.rvn', 'func Read', '\nfunc Main', False),
+        'TEXT_SAMPLE': (raven + 'library-string-slices.rvn', 'func Extract', '\n}', True),
+        'QUERY_SAMPLE': (raven + 'library-query-terminals.rvn', 'func OnlyPositive', '\n}', True),
+    }
+    for token, source in samples.items():
+        page = page.replace('{{' + token + '}}', excerpt(*source))
     if '{{' in page:
         raise ValueError('Unexpanded website placeholder')
     (OUTPUT / 'index.html').write_text(page, encoding='utf-8')

@@ -7,14 +7,14 @@ on:
       - 'website/**'
       - 'scripts/build-website.py'
       - 'examples/preview/result-void.neoil'
-      - 'docs/experiments/raven-target/samples/library-propagation.rvn'
+      - 'docs/experiments/raven-target/samples/*.rvn'
       - '.github/workflows/pages.yml'
   pull_request:
     paths:
       - 'website/**'
       - 'scripts/build-website.py'
       - 'examples/preview/result-void.neoil'
-      - 'docs/experiments/raven-target/samples/library-propagation.rvn'
+      - 'docs/experiments/raven-target/samples/*.rvn'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 
