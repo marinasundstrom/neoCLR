@@ -14,6 +14,21 @@ The author clarified on 2026-09-14 that the remaining stabilization fixes are to
 precede the next release. Runtime-library migration from neoIL to Raven is deferred
 until after that release, rather than being a release prerequisite.
 
+## Generic field metadata follow-through — 2026-09-14
+
+Raven main includes `ea6f3383b`, independently extracted from `4af98e7c1`.
+Closed generic fields retain their declaring type and generic definition signature
+without mixing host types with target metadata. The ordinary-reference regression
+failed before the fix. Extended coverage verifies instance reads, static reads and
+writes, and removal of temporary proxies. All 22 focused checks and the repository
+.NET 10/.NET 11 build/run matrix passed. No .NET Framework or NanoFramework execution
+is claimed; the author's direction explicitly includes fixes useful to those targets
+on main. Both repositories now record that policy in their instructions.
+
+The temporary branch was removed after integration. The neoCLR experiment remains
+separate and already contains the implementation. Generic delegate-constructor
+metadata (`5f274c063`) is the next independent review.
+
 ## Generic method metadata follow-through — 2026-09-14
 
 Raven main includes `e14d23d32`, independently extracted from `11e9964f2`.

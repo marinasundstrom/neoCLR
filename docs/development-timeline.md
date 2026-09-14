@@ -2624,3 +2624,22 @@ validation are still pending; this entry does not report a release.
 **Outcome/direction:** Stabilizing the compiler/importer integration is a prerequisite
 for the next release. Authoring the runtime library in Raven is deferred until after
 that release; the current neoIL library remains the implementation during this work.
+
+## General Raven fixes across frameworks — 2026-09-14
+
+**Author clarification:** “Everything that's benefiting Raven, even when targeting
+the .NET Framework or the Nano Framework, should be on main. The experimental
+integration with neoCLR will stay in its experimental branch.”
+
+**Assistant response/action:** Confirmed that target-independent compiler and
+metadata fixes belong on Raven main, updated repository instructions, and continued
+independent review of generic-field emission. The boundary is general utility versus
+neoCLR-specific policy, not whether a defect was discovered through this experiment.
+
+**Validation boundary:** A .NET 10/.NET 11 matrix result is not evidence of executing
+on .NET Framework or NanoFramework. Those targets remain relevant to design/review;
+actual target validation must be reported separately when performed.
+
+**Implementation outcome:** Integrated the generic-field fix into Raven main at
+`ea6f3383b`; 22 focused checks and the modern .NET build/run matrix passed. The
+completed feature branch was removed, preserving the active neoCLR experiment.

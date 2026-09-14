@@ -16,7 +16,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   26 focused checks and the repository .NET 10/.NET 11 build/run matrix passed.
   Removed its temporary branch after integration as well. Subsequently integrated
   closed generic method metadata into Raven main at e14d23d32: 27 focused checks and
-  the same target matrix passed. Its completed branch was removed too.
+  the same target matrix passed. Its completed branch was removed too. Integrated
+  closed generic field metadata at ea6f3383b with 22 focused checks and the matrix
+  passing. Recorded the author's clarification in both repositories: general Raven
+  fixes, including those benefiting .NET Framework and NanoFramework, belong on main;
+  neoCLR-specific integration stays experimental. These tests do not claim execution
+  on .NET Framework or NanoFramework.
 
 - Recorded the directive to integrate general Raven fixes into Raven main while
   keeping neoCLR experiments on separate feature branches. Updated repository
