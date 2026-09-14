@@ -175,3 +175,9 @@ promise of full MSBuild/.NET SDK feature parity or prerequisites for the initial
 This is future work after the stabilization checkpoint, not a new requirement for the
 already validated local build. Reusable Raven fixes remain candidates for main after
 independent testing; neoCLR-specific build assets and tests remain experimental.
+
+
+**Implementation checkpoint:** The [minimal standalone MSBuild slice](raven-msbuild.md)
+now supplies props/targets and a single-application project template. It reuses the
+installed .14 Raven compiler; all implementation is in neoCLR's build/distribution
+assets. Later build-system capabilities listed above remain separate work.

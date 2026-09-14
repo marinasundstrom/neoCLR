@@ -1,0 +1,30 @@
+<Project>
+  <!-- These are standalone MSBuild assets; they do not import Microsoft.NET.Sdk. -->
+  <PropertyGroup>
+    <NeoCLRRoot Condition="'$(NeoCLRRoot)' == ''">$(MSBuildThisFileDirectory)..</NeoCLRRoot>
+    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+    <AssemblyName Condition="'$(AssemblyName)' == ''">$(MSBuildProjectName)</AssemblyName>
+    <OutputType>Exe</OutputType>
+    <NeoCLRReferencePath>$(NeoCLRRoot)/demo/NeoCLR.CoreProbe.dll</NeoCLRReferencePath>
+    <NeoCLRSystemPath>$(NeoCLRRoot)/lib/System.neoil</NeoCLRSystemPath>
+    <NeoCLRRuntimePath>$(NeoCLRRoot)/bin/neoclr</NeoCLRRuntimePath>
+    <NeoCLRImporterPath>$(NeoCLRRoot)/tools/bridge/Probe.dll</NeoCLRImporterPath>
+    <RavenMetadataCoreAssemblyName>NeoCLR.CoreProbe</RavenMetadataCoreAssemblyName>
+    <RavenTargetCoreAssemblyName>NeoCLR.CoreProbe</RavenTargetCoreAssemblyName>
+    <RavenUseHostFrameworkReferences>false</RavenUseHostFrameworkReferences>
+    <RavenAllowArrayCovariance>false</RavenAllowArrayCovariance>
+    <RavenPropagationAssemblyName>NeoCLR.CoreProbe</RavenPropagationAssemblyName>
+    <RavenPropagationInterfaceType>System.Propagatable`3</RavenPropagationInterfaceType>
+    <RavenIterationAssemblyName>NeoCLR.CoreProbe</RavenIterationAssemblyName>
+    <RavenIterationArrayShapeType>System.Array`1</RavenIterationArrayShapeType>
+    <RavenIterationIterableType>System.Collections.Iterable`1</RavenIterationIterableType>
+    <RavenIterationIteratorType>System.Collections.Iterator`1</RavenIterationIteratorType>
+    <ImplicitImports>disable</ImplicitImports>
+    <RavenFrameworkProjections>None</RavenFrameworkProjections>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="NeoCLR.CoreProbe">
+      <HintPath>$(NeoCLRReferencePath)</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

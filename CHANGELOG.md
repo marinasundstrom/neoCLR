@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-14
 
+- Added a minimal standalone MSBuild build path for Raven `.rvnproj` applications
+  targeting neoCLR. Props/targets select the supplied reference contracts and run
+  the installed compiler, importer and verifier, without Microsoft.NET.Sdk or Raven
+  changes. Build does not execute the program and invalidates prior runnable output
+  on failure. Added a packaged demo, VS Code build-task configuration and regression
+  checks (15 scenarios passed with installed .14 tools); incremental builds, restore
+  and project references remain out of scope.
+
 - Synchronized reviewed Raven main fixes into the experimental branch (`ee7b2e5af`)
   and installed SDK/VSIX `0.1.12-neoclr.14` with a fresh matching runtime bundle.
   Recorded installation instructions, revisions, hashes and packaged validation:

@@ -112,7 +112,8 @@ is a future targetability milestone. Initially, provide a small MSBuild build pa
 using familiar `.rvnproj` files, neoCLR references and the existing compiler/importer.
 This is not .NET SDK integration. Incrementality, project references and asset restore
 are optional follow-ups as needed, not prerequisites for the first useful build.
-The current project-reading compiler and runner do not constitute this integration.
+The [first standalone MSBuild build path](raven-msbuild.md) is now implemented for
+a single application; the broader follow-ups remain unimplemented.
 
 ## Current Raven-target experiment priority
 

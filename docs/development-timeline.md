@@ -2976,3 +2976,22 @@ MSBuild path for `.rvnproj` compilation using neoCLR references and build target
 independent of Microsoft.NET.Sdk. Kept incremental builds, project references and
 asset restore as optional later slices rather than requirements for initial support.
 The familiar project-file experience is the goal; no SDK integration was selected.
+
+
+**Implementation follow-through:** After the author asked to continue, the assistant
+implemented standalone MSBuild props/targets and a `.rvnproj` template in neoCLR.
+The existing installed Raven compiler compiles the project, followed by independent
+import/verification; Build does not run the program. No Raven edits or .NET SDK
+integration were needed. Added distribution/editor build-task configuration and
+[documented the bounded build path](raven-msbuild.md), with larger build-system
+features explicitly deferred.
+
+
+**Author's observation:** A project targeting neoCLR should also improve the language
+server experience by giving it context.
+
+**Assistant's response:** Agreed that source items, references and target contracts
+should come from the same project evaluation for build and editor. Raven already
+reads `.rvnproj` files for language services; the standalone imports centralize that
+configuration. Proposed checking completion against the actual new MSBuild project,
+rather than assuming successful compilation proves editor behavior.

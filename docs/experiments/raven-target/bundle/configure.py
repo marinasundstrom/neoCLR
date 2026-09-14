@@ -17,3 +17,16 @@ if args.sdk:
     settings['raven.sdkPath'] = str(args.sdk.resolve())
 (project.parent / '.vscode/settings.json').write_text(json.dumps(settings, indent=2) + '\n')
 print('Open this folder in VS Code:', project.parent)
+
+msbuild = root / 'msbuild-demo'
+if msbuild.is_dir():
+    (msbuild / '.vscode').mkdir(exist_ok=True)
+    (msbuild / '.vscode/settings.json').write_text(json.dumps(settings, indent=2) + '\n')
+    if args.sdk:
+        tasks = {'version': '2.0.0', 'tasks': [{
+            'label': 'neoCLR: Build with MSBuild', 'type': 'process', 'command': 'dotnet',
+            'args': ['msbuild', str(msbuild / 'Demo.rvnproj'),
+                     '-p:RavenSdkRoot=' + str(args.sdk.resolve()), '-v:minimal'],
+            'group': {'kind': 'build', 'isDefault': True}, 'problemMatcher': '$msCompile'}]}
+        (msbuild / '.vscode/tasks.json').write_text(json.dumps(tasks, indent=2) + '\n')
+    print('MSBuild project:', msbuild / 'Demo.rvnproj')

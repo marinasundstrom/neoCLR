@@ -108,3 +108,8 @@ private generated helpers and source locations retain module-local token informa
 
 For independently compiled dependencies, see the bounded
 [separate library import workflow](raven-library-import.md).
+
+
+A later [minimal MSBuild slice](raven-msbuild.md) now orchestrates this compiler/importer
+path using standalone `.rvnproj` imports. It supports one application and the supplied
+core reference; it is not Microsoft.NET.Sdk integration or general library compilation.

@@ -88,3 +88,18 @@ The bundle carries neoCLR's **LICENSE**, **THIRD_PARTY_NOTICES.md** and preserve
 **third-party/** texts, plus Raven's upstream notices under **licenses/Raven/**.
 The version-specific tool dependency inventory is in **third-party/raven-tools/**.
 It supplements the upstream notices and accompanies the separate SDK/VSIX assets.
+
+
+## Build Raven projects with MSBuild
+
+This bundle also contains a minimal `msbuild-demo` project and standalone build
+assets. No Microsoft.NET.Sdk import is used. After installing the matching Raven SDK:
+
+```sh
+dotnet msbuild msbuild-demo/Demo.rvnproj -p:RavenSdkRoot=/absolute/path/to/raven-sdk
+./bin/neoclr run msbuild-demo/bin/neoclr/Debug/App.neoil --system msbuild-demo/bin/neoclr/Debug/System.neoil
+```
+
+Build compiles, imports and verifies; running is separate. See the
+[MSBuild instructions and current limits](docs/raven-msbuild.md). Configuration with
+`configure.py --sdk ...` adds a VS Code build task in `msbuild-demo`.
