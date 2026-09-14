@@ -311,3 +311,28 @@ It requires explicit equality/hash callbacks and does not yet supply a default
 comparer, removal or pair enumeration. The two generic arguments remain invariant.
 This extends the prototype; it does not settle the whole proposed collection tree.
 LINQ terminal outcomes remain a separate slice.
+
+## Interface-owned factory proposal — 2026-09-15
+
+The author proposed `List<T>.Create()` returning an ArrayList through `List<T>`:
+“I just want a list conforming to the list interface.” This is a proposed convenience,
+not an implemented factory. In the current Raven profile, List remains mutable:
+it extends MutableSequence (indexed replacement), adds Add, and inherits reading
+and Count. Sequence is the separate read-access contract. This proposal does not
+rename or change those contracts.
+
+The assistant considers this useful if the factory promises a fresh empty mutable
+list and guarantees the List contract. ArrayList can be the initial implementation;
+callers needing its concrete operations should still construct it explicitly. The
+tradeoff is a dependency from the contract's factory to a concrete implementation,
+and reduced visibility of implementation-specific allocation/performance choices.
+Keep the default deterministic rather than globally configurable.
+
+Compared with .NET's familiar `new List<T>()` concrete construction, this moves
+implementation selection into a library factory while preserving ordinary reference
+and mutation behavior. Evaluate it alongside a separate factory namespace before
+settling the API. This would be an ordinary static factory with a body, not a static
+abstract member every implementation must supply, and does not require new runtime
+allocation semantics. Raven binding, reference metadata and importer support for that
+placement must be tested before promising the syntax. No factory was implemented in
+this discussion.

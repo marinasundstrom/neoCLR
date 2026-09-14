@@ -684,7 +684,9 @@ The [local clock](local-clock.md) now reads system date/time and its captured UT
 offset as a single snapshot. This is the preview milestone. Parsing, formatting
 and globalization are deferred. Arithmetic, durations, instants, injectable clocks
 and timezone mapping follow concrete application needs; a time of day is not an
-elapsed duration.
+elapsed duration. The [Clock/SystemClock proposal](date-time-design.md#clock-contract-and-default-implementation-proposal--2026-09-15)
+now records a narrow injectable contract as a candidate, with default selection at
+application setup; exact methods and factory/accessor placement remain open.
 
 ## Command-line library milestone
 

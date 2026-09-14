@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-15
 
+- Record Clock/SystemClock and List<T>.Create proposals, their .NET/Noda Time
+  comparisons and open design choices. Confirm the current mutable List contract;
+  no new clock abstraction, default accessor or collection factory is implemented.
+
 - Add a bounded Raven instance-library import gate: validate one nongeneric class
   against its separate reference contract, retain its public runtime identity, and
   import constructors, private fields, methods and properties. Preserve ordinary

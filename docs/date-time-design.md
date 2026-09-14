@@ -100,3 +100,26 @@ than requiring the entire provider surface for basic date/time tests.
 consulted 2026-09-13, is the modern comparison baseline. Evaluate the narrower API's
 simplicity against future adapter and compatibility costs. This records direction;
 it does not implement a clock abstraction or expand globalization scope.
+
+### Clock contract and default implementation proposal — 2026-09-15
+
+The author proposed `Clock` as an interface and `SystemClock` as its implementation,
+so application code can accept an abstract time provider and tests can inject a
+controlled clock. The author also considered `Clock.Instance`, explicitly questioned
+its design, and did not select it for implementation.
+
+The assistant recommends placing a possible `Instance` convenience on `SystemClock`
+and selecting it at application setup, while time-dependent functions accept `Clock`.
+A static default accessor does not itself prevent dependency injection; the problem
+is application logic repeatedly selecting the system clock instead of using its
+supplied dependency. Do not introduce a mutable global replacement mechanism.
+
+This resembles Noda Time's narrow IClock/SystemClock approach. Its
+[IClock guidance](https://nodatime.org/2.4.x/api/NodaTime.IClock.html) recommends passing
+an instance to time-dependent code. Modern .NET provides the broader
+[TimeProvider abstraction and System default](https://learn.microsoft.com/en-us/dotnet/standard/datetime/timeprovider-overview),
+including timestamps and timers. Both sources were consulted 2026-09-15. A narrow
+Clock reduces the initial API and test-double burden; its cost is later composition
+with elapsed time and timer APIs. UTC/instant versus local snapshot semantics remain
+open and must be resolved before choosing methods. This is a library design proposal;
+`Clock.GetLocalNow()` remains the implemented static API.

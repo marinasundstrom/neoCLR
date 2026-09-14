@@ -3317,3 +3317,31 @@ The [authoring document](raven-system-library.md) records this boundary and vali
 compiler fixes and commit references are tracked in the
 [integration evaluation](raven-target-evaluation.md). No release or local tools refresh
 is implied by this source migration.
+
+## 2026-09-15 — Injectable clocks and factories on collection interfaces
+
+**Author proposal:** Suggested a `Clock` interface with a `SystemClock` implementation
+for dependency injection and mocking. Considered `Clock.Instance`, but explicitly
+said this might be bad design and emphasized the abstract time-provider purpose.
+Separately proposed `List<string>.Create()` to request an ArrayList through its List
+contract, observing that List is currently mutable.
+
+**Assistant response:** Recommended selecting SystemClock at application setup and
+passing Clock to time-dependent code. A possible SystemClock.Instance convenience
+would keep that choice visible; a static default does not inherently rule out
+injection. Considered the collection factory a reasonable convenience for fresh
+mutable storage, with concrete construction retained when implementation-specific
+behavior matters. Highlighted the dependency from a factory on the interface to its
+default implementation and the need to validate static interface-member binding.
+
+**Actions and outcome:** Checked the implemented List/MutableSequence/Sequence
+hierarchy, confirming List supports Add and indexed replacement. Recorded the
+[clock proposal and comparisons](date-time-design.md#clock-contract-and-default-implementation-proposal--2026-09-15)
+and [collection factory tradeoffs](collection-contracts.md#interface-owned-factory-proposal--2026-09-15).
+Neither factory/default accessor nor a new Clock interface was implemented. These
+remain proposals; clock method shape and final factory placement are open.
+
+**Ongoing migration:** Completed the separate nongeneric instance import gate in
+`d073ee0`, with constructor/private-state/property execution and contract rejection
+checks. This does not yet port generic collection implementations or establish
+static members on interface implementations.
