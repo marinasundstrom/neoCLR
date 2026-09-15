@@ -630,3 +630,17 @@ integer overflow and reversed clamp bounds.
 
 Math completion validation: five runtime tests, 69 consumer results, six rejected
 contracts and bootstrap-service guest rejection pass; clean regeneration matches.
+
+
+### Path wrappers — 2026-09-15
+
+`src/Path.rvn` implements Combine and GetFileName, retaining their existing public
+parameter names and lexical semantics. The checked bootstrap catalog now includes
+PathCombine and PathGetFileName; the host still performs platform-specific path
+handling. Generated methods retain the existing System.IO.Path owner for both Raven
+and direct IL consumers. There is no normalization, filesystem access or new API
+contract hidden in this source migration. Existing path tests exercise empty paths,
+rooted paths, Unicode, embedded NULs, separators and runtime-service declarations.
+
+Path validation: the runtime path regression and clean bootstrap regeneration pass.
+The final saved-project batch also covers Raven Path consumers.

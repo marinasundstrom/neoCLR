@@ -9,7 +9,10 @@ static class RuntimeServiceBindings
     static readonly string[] BinaryMath = ["Pow", "Min", "Max"];
     static readonly (string Name, string[] Args, string Result)[] Members =
         UnaryMath.Select(n => ("Math" + n, new[] { "Double" }, "Double"))
-        .Concat(BinaryMath.Select(n => ("Math" + n, new[] { "Double", "Double" }, "Double"))).ToArray();
+        .Concat(BinaryMath.Select(n => ("Math" + n, new[] { "Double", "Double" }, "Double"))).Concat(new (string Name, string[] Args, string Result)[] {
+            ("PathCombine", ["String", "String"], "String"),
+            ("PathGetFileName", ["String"], "String")
+        }).ToArray();
     static string CSharp(string type) => type switch {
         "Double" => "double", "String" => "string", "Int32" => "int",
         _ => throw new InvalidDataException("Unsupported runtime service declaration.")

@@ -1152,12 +1152,21 @@
     },
     {
       "file": "runtime/System/IO/Path.neoil",
-      "declarations": 3,
+      "declarations": 1,
       "disposition": "files",
       "samples": [
         "library-files.rvn",
         "library-paths.rvn"
       ]
+    },
+    {
+      "file": "runtime/raven/generated/Path.methods.neoil",
+      "declarations": 2,
+      "disposition": "raven-authored-path-bootstrap",
+      "tests": [
+        "tests/path.rs"
+      ],
+      "note": "Raven wrappers preserve the existing lexical host services and parameter names."
     },
     {
       "file": "runtime/neoCLR/Runtime/PathCombine.neoil",
@@ -1166,8 +1175,8 @@
       "callers": [
         {
           "service": "neoCLR.Runtime.PathCombine",
-          "file": "runtime/System/IO/Path.neoil",
-          "line": 5
+          "file": "runtime/raven/generated/Path.methods.neoil",
+          "line": 10
         }
       ]
     },
@@ -1178,8 +1187,8 @@
       "callers": [
         {
           "service": "neoCLR.Runtime.PathGetFileName",
-          "file": "runtime/System/IO/Path.neoil",
-          "line": 10
+          "file": "runtime/raven/generated/Path.methods.neoil",
+          "line": 20
         }
       ]
     },

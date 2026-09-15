@@ -84,6 +84,11 @@ for file in source['sourceFiles']:
                      'tests': ['tests/character_classification.rs', 'docs/experiments/raven-target/verify_scalar_library.py'],
                      'note': 'Raven implements Divide and seven Char predicates; parsing and Unicode category services stay native.'})
         continue
+    if file.startswith('runtime/raven/generated/Path.'):
+        rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-path-bootstrap',
+                     'tests': ['tests/path.rs'],
+                     'note': 'Raven wrappers preserve the existing lexical host services and parameter names.'})
+        continue
     if file.startswith('runtime/raven/generated/Math.'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-math-bootstrap',
                      'samples': ['library-math.rvn', 'library-clamp.rvn'],

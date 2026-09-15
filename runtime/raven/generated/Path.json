@@ -1,6 +1,6 @@
 {
   "format": "raven-library-bootstrap-v1",
-  "owner": "System.Time",
+  "owner": "System.IO.Path",
   "inputs": {
     "runtime/raven/src/Math.rvn": "7c6b80a8c549c2b1c91735bb7a325ab75472d112e81ae913d77b916ea5e22de0",
     "runtime/raven/src/Linq.rvn": "58a60fe5ecd4f68560baf6c16bc8342992c9d32752c6b0b40140d0300251e605",
@@ -15,22 +15,13 @@
     "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
   },
   "outputs": {
-    "Time.methods.neoil": "2ea6d111452cc5f6c3d494ba9318abfbce8d98cf468bcdc9bdf44af5403a5b10",
-    "Time.helpers.neoil": "859db7691a71fbfbb774d7f16a60903faec7c0ef1b3d565bdc0e4a63c36be7f5"
+    "Path.methods.neoil": "e61845c5223448929f44f350de4ecc414b3966e89d12066da15135c155324a34",
+    "Path.helpers.neoil": "b9f7c8e624ebca9842699c49df18cc25be29fefb21b428c8997c22c2c6d68ff6"
   },
   "compilerSha256": "744ad87d9a6ec3d8b5691e72d0cd077b154af51615387b5f6bb171daa89fb370",
   "coreSha256": "ca5d02b92371b955f196e59e9a4d6085e133807e724a770ef0d7834f6997d0ae",
   "exports": [
-    "Create(Int32,Int32,Int32) -> System.Result<System.Time,System.InvalidTimeError>",
-    "Create(Int32,Int32,Int32,Int32) -> System.Result<System.Time,System.InvalidTimeError>",
-    "FromTicks(Int64) -> System.Result<System.Time,System.InvalidTimeError>",
-    "readonly byref get_Ticks() -> Int64",
-    "readonly byref get_Hour() -> Int32",
-    "readonly byref get_Minute() -> Int32",
-    "readonly byref get_Second() -> Int32",
-    "readonly byref get_Millisecond() -> Int32",
-    "readonly byref get_FractionTicks() -> Int32",
-    "readonly byref Equals(System.Time) -> Boolean",
-    "readonly byref CompareTo(System.Time) -> Int32"
+    "Combine(String value0,String value1) -> String",
+    "GetFileName(String value0) -> String"
   ]
 }

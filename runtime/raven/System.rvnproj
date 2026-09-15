@@ -10,6 +10,7 @@
     <Compile Include="src/Linq.rvn" />
     <Compile Include="src/Int32.rvn" />
     <Compile Include="src/Char.rvn" />
+    <Compile Include="src/Path.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'ArrayList'">
     <Compile Include="src/ArrayList.rvn" />

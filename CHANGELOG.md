@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-15
 
+- Port Path.Combine and Path.GetFileName to Raven using the checked bootstrap host
+  service catalog. Preserve lexical/native platform behavior, public parameter names
+  and direct IL callers; no new path API or compiler special case.
+
 - Complete the Math port with all 15 Double operations authored in Raven and the
   same native numeric services underneath. Add a bootstrap-only, signature-checked
   service catalog; guest imports cannot use it. Preserve numeric behavior and the

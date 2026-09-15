@@ -1,0 +1,23 @@
+; Generated from runtime/raven/src/Path.rvn. Regenerate with build_runtime_library.py.
+.method static Combine(String value0,String value1) -> String
+M00000001_IL_0000:
+M00000001_IL_0001:
+M00000001_IL_0002:
+ldarg 0
+M00000001_IL_0003:
+ldarg 1
+M00000001_IL_0004:
+call neoCLR.Runtime.PathCombine(String,String)
+M00000001_IL_0009:
+ret
+.end
+.method static GetFileName(String value0) -> String
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldarg 0
+M00000002_IL_0003:
+call neoCLR.Runtime.PathGetFileName(String)
+M00000002_IL_0008:
+ret
+.end
