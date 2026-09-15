@@ -88,7 +88,7 @@ for file in source['sourceFiles']:
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-math-bootstrap',
                      'samples': ['library-math.rvn', 'library-clamp.rvn'],
                      'tests': ['docs/experiments/raven-target/verify_math_library.py', 'tests/math_helpers.rs', 'tests/math_typed.rs'],
-                     'note': 'Generated scalar bodies and implementation adapters; source authority is runtime/raven/src/Math.rvn.'})
+                     'note': 'All twenty Math functions are Raven-authored; Double operations retain native services behind checked bootstrap-only bindings. Source authority is runtime/raven/src/Math.rvn.'})
         continue
     group, samples = lookup[Path(file).stem]
     for sample in samples:

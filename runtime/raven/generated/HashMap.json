@@ -2,7 +2,7 @@
   "format": "raven-library-bootstrap-v1",
   "owner": "System.Collections.HashMap",
   "inputs": {
-    "runtime/raven/src/Math.rvn": "05fbc020828379134fbead7aefb8e19955cefc3b875991dc937e2e303c716e18",
+    "runtime/raven/src/Math.rvn": "7c6b80a8c549c2b1c91735bb7a325ab75472d112e81ae913d77b916ea5e22de0",
     "runtime/raven/src/Linq.rvn": "58a60fe5ecd4f68560baf6c16bc8342992c9d32752c6b0b40140d0300251e605",
     "runtime/raven/src/Int32.rvn": "ba7ccc0493dc897f628c11dd135cc00c086cc573f88f59d37661b18cb447bac0",
     "runtime/raven/src/Char.rvn": "5656f1ee320f33e132cc835b4aa11c5d2e5656e18b89647157bddd92ff9efa41",
@@ -18,7 +18,7 @@
     "HashMap.helpers.neoil": "954ea38278d35aa28995dac310e1164ff9d49cacfedcccd035057e74e2ea6407"
   },
   "compilerSha256": "744ad87d9a6ec3d8b5691e72d0cd077b154af51615387b5f6bb171daa89fb370",
-  "coreSha256": "8989c17caa60512fd553706d49c177d1d3eb052fe1910a4a459519030c8e6d0f",
+  "coreSha256": "d543fda59b2c10ffcecf9b9a15fb75cc8e10017795a9e6bdd667a51e9342d8dc",
   "exports": [
     ".ctor(System.Func<T0,T0,Boolean>,System.Func<T0,Int32>) -> noresult",
     "get_Count() -> Int32",

@@ -105,6 +105,13 @@ func Main() {
         output = root / (name + '-import')
         run(['dotnet', bridge, '--library-implementation', image, core, 'System.Math', output], False, diagnostic)
         assert not (output / 'Implementation.neoil').exists()
-    print(json.dumps({'consumerResults': len(expected), 'rejectedContracts': 6,
+    # Even possession of bootstrap metadata does not grant guest import access
+    # to authoring-only services; public Math calls remain the supported surface.
+    run(['dotnet', bridge, '--reference-library-core', core])
+    guest = compile('ServiceGuest', 'import System.Runtime.CompilerServices.*\nfunc Main() { RuntimeServices.MathSqrt(4.0) }')
+    denied = root / 'service-guest-import'
+    run(['dotnet', bridge, '--import', guest, core, denied], False)
+    assert not (denied / 'App.neoil').exists()
+    print(json.dumps({'bootstrapServiceGuestRejected': True, 'consumerResults' : len(expected), 'rejectedContracts': 6,
                       'qualifiedCalls': True, 'wildcardImports': True, 'relatedNamespaceType': True,
                       'resultPayloadsAndErrors': True, 'extractedSystemWithoutSourceIncludes': True}, indent=2))

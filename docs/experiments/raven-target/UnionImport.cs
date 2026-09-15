@@ -606,6 +606,7 @@ static class UnionImport
                         {
                             if (targetMethod.IsConstructor && targetMethod.DeclaringType.FullName is "System.Object" or "System.ValueType" && targetMethod.Parameters.Count == 0 && method.IsConstructor && method.DeclaringType.BaseType?.FullName == targetMethod.DeclaringType.FullName && instruction.OpCode.Code == Code.Call)
                             { Expect(ApplicationTypes.Receiver(method)); code.AppendLine("pop"); break; }
+                            var runtimeService = libraryOwner is null ? null : RuntimeServiceBindings.Bind(reference, targetMethod);
                             var checkedStorage = libraryOwner is null ? null : CheckedStorageBindings.Bind(reference, targetMethod, t => ProfileType(t));
                             var interfaceCall = collectionProfile ? InterfaceBindings.Bind(reference, targetMethod) : null;
                             var nativeCall = collectionProfile ? NativeMemoryBindings.Bind(reference, targetMethod) : null;
@@ -613,7 +614,8 @@ static class UnionImport
                             var queryCall = collectionProfile ? QueryBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt) : null;
                             var arrayCallback = collectionProfile ? ArrayCallbackBindings.Bind(reference, targetMethod) : null;
                             var delegateCall = DelegateBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt);
-                            if (checkedStorage is not null) call = new(checkedStorage.Name, checkedStorage.Arguments, checkedStorage.Result, Instruction: checkedStorage.Instruction);
+                            if (runtimeService is not null) call = new(runtimeService.Name, runtimeService.Arguments, runtimeService.Result);
+                            else if (checkedStorage is not null) call = new(checkedStorage.Name, checkedStorage.Arguments, checkedStorage.Result, Instruction: checkedStorage.Instruction);
                             else if (interfaceCall is not null) call = new(interfaceCall.Name, interfaceCall.Arguments, interfaceCall.Result, Instruction: interfaceCall.Instruction);
                             else if (nativeCall is not null) call = new(nativeCall.Name, nativeCall.Arguments, nativeCall.Result);
                             else if (reflectionCall is not null) call = new(reflectionCall.Name, reflectionCall.Arguments, reflectionCall.Result);

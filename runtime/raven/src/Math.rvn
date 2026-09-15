@@ -1,5 +1,7 @@
 namespace System.Math
 
+import System.Runtime.CompilerServices.RuntimeServices
+
 import System.OverflowError
 import System.InvalidRangeError
 import System.Result.*
@@ -43,4 +45,64 @@ public func Clamp(value: int, min: int, max: int) -> System.Result<int, InvalidR
         return Error(InvalidRangeError())
     }
     return Ok(Min(Max(value, min), max))
+}
+
+public func Abs(value: double) -> double {
+    return RuntimeServices.MathAbs(value)
+}
+
+public func Sqrt(value: double) -> double {
+    return RuntimeServices.MathSqrt(value)
+}
+
+public func Floor(value: double) -> double {
+    return RuntimeServices.MathFloor(value)
+}
+
+public func Ceiling(value: double) -> double {
+    return RuntimeServices.MathCeiling(value)
+}
+
+public func Truncate(value: double) -> double {
+    return RuntimeServices.MathTruncate(value)
+}
+
+public func Round(value: double) -> double {
+    return RuntimeServices.MathRound(value)
+}
+
+public func Exp(value: double) -> double {
+    return RuntimeServices.MathExp(value)
+}
+
+public func Log(value: double) -> double {
+    return RuntimeServices.MathLog(value)
+}
+
+public func Log10(value: double) -> double {
+    return RuntimeServices.MathLog10(value)
+}
+
+public func Sin(value: double) -> double {
+    return RuntimeServices.MathSin(value)
+}
+
+public func Cos(value: double) -> double {
+    return RuntimeServices.MathCos(value)
+}
+
+public func Tan(value: double) -> double {
+    return RuntimeServices.MathTan(value)
+}
+
+public func Pow(left: double, right: double) -> double {
+    return RuntimeServices.MathPow(left, right)
+}
+
+public func Min(left: double, right: double) -> double {
+    return RuntimeServices.MathMin(left, right)
+}
+
+public func Max(left: double, right: double) -> double {
+    return RuntimeServices.MathMax(left, right)
 }

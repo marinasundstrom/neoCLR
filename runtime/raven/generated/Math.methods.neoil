@@ -195,3 +195,159 @@ call neoCLR.Library.System.Math.RuntimeUnion6(System.Result.Ok<Int32>)
 M00000005_IL_0039:
 ret
 .end
+.method static Abs(Double value) -> Double
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+call neoCLR.Runtime.MathAbs(Double)
+M00000006_IL_0008:
+ret
+.end
+.method static Sqrt(Double value) -> Double
+M00000007_IL_0000:
+M00000007_IL_0001:
+M00000007_IL_0002:
+ldarg 0
+M00000007_IL_0003:
+call neoCLR.Runtime.MathSqrt(Double)
+M00000007_IL_0008:
+ret
+.end
+.method static Floor(Double value) -> Double
+M00000008_IL_0000:
+M00000008_IL_0001:
+M00000008_IL_0002:
+ldarg 0
+M00000008_IL_0003:
+call neoCLR.Runtime.MathFloor(Double)
+M00000008_IL_0008:
+ret
+.end
+.method static Ceiling(Double value) -> Double
+M00000009_IL_0000:
+M00000009_IL_0001:
+M00000009_IL_0002:
+ldarg 0
+M00000009_IL_0003:
+call neoCLR.Runtime.MathCeiling(Double)
+M00000009_IL_0008:
+ret
+.end
+.method static Truncate(Double value) -> Double
+M0000000a_IL_0000:
+M0000000a_IL_0001:
+M0000000a_IL_0002:
+ldarg 0
+M0000000a_IL_0003:
+call neoCLR.Runtime.MathTruncate(Double)
+M0000000a_IL_0008:
+ret
+.end
+.method static Round(Double value) -> Double
+M0000000b_IL_0000:
+M0000000b_IL_0001:
+M0000000b_IL_0002:
+ldarg 0
+M0000000b_IL_0003:
+call neoCLR.Runtime.MathRound(Double)
+M0000000b_IL_0008:
+ret
+.end
+.method static Exp(Double value) -> Double
+M0000000c_IL_0000:
+M0000000c_IL_0001:
+M0000000c_IL_0002:
+ldarg 0
+M0000000c_IL_0003:
+call neoCLR.Runtime.MathExp(Double)
+M0000000c_IL_0008:
+ret
+.end
+.method static Log(Double value) -> Double
+M0000000d_IL_0000:
+M0000000d_IL_0001:
+M0000000d_IL_0002:
+ldarg 0
+M0000000d_IL_0003:
+call neoCLR.Runtime.MathLog(Double)
+M0000000d_IL_0008:
+ret
+.end
+.method static Log10(Double value) -> Double
+M0000000e_IL_0000:
+M0000000e_IL_0001:
+M0000000e_IL_0002:
+ldarg 0
+M0000000e_IL_0003:
+call neoCLR.Runtime.MathLog10(Double)
+M0000000e_IL_0008:
+ret
+.end
+.method static Sin(Double value) -> Double
+M0000000f_IL_0000:
+M0000000f_IL_0001:
+M0000000f_IL_0002:
+ldarg 0
+M0000000f_IL_0003:
+call neoCLR.Runtime.MathSin(Double)
+M0000000f_IL_0008:
+ret
+.end
+.method static Cos(Double value) -> Double
+M00000010_IL_0000:
+M00000010_IL_0001:
+M00000010_IL_0002:
+ldarg 0
+M00000010_IL_0003:
+call neoCLR.Runtime.MathCos(Double)
+M00000010_IL_0008:
+ret
+.end
+.method static Tan(Double value) -> Double
+M00000011_IL_0000:
+M00000011_IL_0001:
+M00000011_IL_0002:
+ldarg 0
+M00000011_IL_0003:
+call neoCLR.Runtime.MathTan(Double)
+M00000011_IL_0008:
+ret
+.end
+.method static Pow(Double left,Double right) -> Double
+M00000012_IL_0000:
+M00000012_IL_0001:
+M00000012_IL_0002:
+ldarg 0
+M00000012_IL_0003:
+ldarg 1
+M00000012_IL_0004:
+call neoCLR.Runtime.MathPow(Double,Double)
+M00000012_IL_0009:
+ret
+.end
+.method static Min(Double left,Double right) -> Double
+M00000013_IL_0000:
+M00000013_IL_0001:
+M00000013_IL_0002:
+ldarg 0
+M00000013_IL_0003:
+ldarg 1
+M00000013_IL_0004:
+call neoCLR.Runtime.MathMin(Double,Double)
+M00000013_IL_0009:
+ret
+.end
+.method static Max(Double left,Double right) -> Double
+M00000014_IL_0000:
+M00000014_IL_0001:
+M00000014_IL_0002:
+ldarg 0
+M00000014_IL_0003:
+ldarg 1
+M00000014_IL_0004:
+call neoCLR.Runtime.MathMax(Double,Double)
+M00000014_IL_0009:
+ret
+.end

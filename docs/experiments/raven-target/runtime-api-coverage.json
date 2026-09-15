@@ -397,7 +397,7 @@
     },
     {
       "file": "runtime/System/Math.neoil",
-      "declarations": 16,
+      "declarations": 1,
       "disposition": "math",
       "samples": [
         "library-floating-math.rvn",
@@ -407,7 +407,7 @@
     },
     {
       "file": "runtime/raven/generated/Math.methods.neoil",
-      "declarations": 5,
+      "declarations": 20,
       "disposition": "raven-authored-math-bootstrap",
       "samples": [
         "library-math.rvn",
@@ -418,7 +418,7 @@
         "tests/math_helpers.rs",
         "tests/math_typed.rs"
       ],
-      "note": "Generated scalar bodies and implementation adapters; source authority is runtime/raven/src/Math.rvn."
+      "note": "All twenty Math functions are Raven-authored; Double operations retain native services behind checked bootstrap-only bindings. Source authority is runtime/raven/src/Math.rvn."
     },
     {
       "file": "runtime/raven/generated/Math.helpers.neoil",
@@ -433,7 +433,7 @@
         "tests/math_helpers.rs",
         "tests/math_typed.rs"
       ],
-      "note": "Generated scalar bodies and implementation adapters; source authority is runtime/raven/src/Math.rvn."
+      "note": "All twenty Math functions are Raven-authored; Double operations retain native services behind checked bootstrap-only bindings. Source authority is runtime/raven/src/Math.rvn."
     },
     {
       "file": "runtime/System/InvalidRangeError.neoil",
@@ -450,78 +450,78 @@
       "callers": [
         {
           "service": "neoCLR.Runtime.MathAbs",
-          "file": "runtime/System/Math.neoil",
-          "line": 6
+          "file": "runtime/raven/generated/Math.methods.neoil",
+          "line": 204
         },
         {
           "service": "neoCLR.Runtime.MathSqrt",
-          "file": "runtime/System/Math.neoil",
-          "line": 12
+          "file": "runtime/raven/generated/Math.methods.neoil",
+          "line": 214
         },
         {
           "service": "neoCLR.Runtime.MathFloor",
-          "file": "runtime/System/Math.neoil",
-          "line": 18
+          "file": "runtime/raven/generated/Math.methods.neoil",
+          "line": 224
         },
         {
           "service": "neoCLR.Runtime.MathCeiling",
-          "file": "runtime/System/Math.neoil",
-          "line": 24
+          "file": "runtime/raven/generated/Math.methods.neoil",
+          "line": 234
         },
         {
           "service": "neoCLR.Runtime.MathTruncate",
-          "file": "runtime/System/Math.neoil",
-          "line": 30
+          "file": "runtime/raven/generated/Math.methods.neoil",
+          "line": 244
         },
         {
           "service": "neoCLR.Runtime.MathRound",
-          "file": "runtime/System/Math.neoil",
-          "line": 36
+          "file": "runtime/raven/generated/Math.methods.neoil",
+          "line": 254
         },
         {
           "service": "neoCLR.Runtime.MathExp",
-          "file": "runtime/System/Math.neoil",
-          "line": 42
+          "file": "runtime/raven/generated/Math.methods.neoil",
+          "line": 264
         },
         {
           "service": "neoCLR.Runtime.MathLog",
-          "file": "runtime/System/Math.neoil",
-          "line": 48
+          "file": "runtime/raven/generated/Math.methods.neoil",
+          "line": 274
         },
         {
           "service": "neoCLR.Runtime.MathLog10",
-          "file": "runtime/System/Math.neoil",
-          "line": 54
+          "file": "runtime/raven/generated/Math.methods.neoil",
+          "line": 284
         },
         {
           "service": "neoCLR.Runtime.MathSin",
-          "file": "runtime/System/Math.neoil",
-          "line": 60
+          "file": "runtime/raven/generated/Math.methods.neoil",
+          "line": 294
         },
         {
           "service": "neoCLR.Runtime.MathCos",
-          "file": "runtime/System/Math.neoil",
-          "line": 66
+          "file": "runtime/raven/generated/Math.methods.neoil",
+          "line": 304
         },
         {
           "service": "neoCLR.Runtime.MathTan",
-          "file": "runtime/System/Math.neoil",
-          "line": 72
+          "file": "runtime/raven/generated/Math.methods.neoil",
+          "line": 314
         },
         {
           "service": "neoCLR.Runtime.MathPow",
-          "file": "runtime/System/Math.neoil",
-          "line": 79
+          "file": "runtime/raven/generated/Math.methods.neoil",
+          "line": 326
         },
         {
           "service": "neoCLR.Runtime.MathMin",
-          "file": "runtime/System/Math.neoil",
-          "line": 86
+          "file": "runtime/raven/generated/Math.methods.neoil",
+          "line": 338
         },
         {
           "service": "neoCLR.Runtime.MathMax",
-          "file": "runtime/System/Math.neoil",
-          "line": 93
+          "file": "runtime/raven/generated/Math.methods.neoil",
+          "line": 350
         }
       ]
     },

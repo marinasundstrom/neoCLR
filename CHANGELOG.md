@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-15
 
+- Complete the Math port with all 15 Double operations authored in Raven and the
+  same native numeric services underneath. Add a bootstrap-only, signature-checked
+  service catalog; guest imports cannot use it. Preserve numeric behavior and the
+  public namespace contract without Raven compiler changes.
+
 - Port Date to Raven, preserving Gregorian validation, day-number limits, component
   properties, comparison and Result errors. Reuse the checked Time value-import
   support without compiler/runtime changes. Keep API redesign separate from the port.

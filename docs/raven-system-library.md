@@ -11,7 +11,7 @@ The bootstrap currently has three distinct artifacts:
 - `NeoCLR.CoreProbe.dll`: compiler-facing reference metadata for the supported System
   surface. A bootstrap variant includes CheckedStorage for authoring; consumers use
   the normal reference surface. Placeholder bodies must never execute.
-- `NeoCLR.System.dll`: compiled Raven implementation input, currently five scalar
+- `NeoCLR.System.dll`: compiled Raven implementation input, currently twenty
   Math functions, nine query overloads and their private deferred iterator classes,
   Int32.Divide and seven character predicates, plus separately compiled ArrayList, HashMap, Time and Date slices.
   These implementation inputs are imported into neoIL, not loaded dynamically by the runtime.
@@ -29,7 +29,7 @@ platform-specific libraries remain decisions to make as the migration progresses
 `System.Math` is a namespace in the Raven reference surface. The source declares
 public functions `Abs`, `Min`, `Max`, `Sign` and `Clamp` for Int32. Abs and Clamp
 preserve their existing typed Result outcomes, including minimum-Int32 overflow and
-invalid bounds. Double operations still use the existing native-service bodies.
+invalid bounds. Double operations are also Raven-authored wrappers over the same native services.
 
 Raven's usual CLI contract represents namespace functions as static methods on a
 container marked with the target's TopLevelAttribute. The importer recognizes that
@@ -607,3 +607,26 @@ API redesign remains deferred.
 
 Date validation: all 10 calendar tests and 63 saved-project checks pass, as do clean
 bootstrap regeneration and API inventory/coverage checks.
+
+
+### Typed host-service authoring and complete Math port — 2026-09-15
+
+All 15 Double Math wrappers now live in `src/Math.rvn` alongside the five Int32
+functions. Numerical algorithms stay in the existing native services, preserving
+rounding, NaN, infinity and signed-zero behavior. No public API changed.
+
+The bootstrap reference includes `System.Runtime.CompilerServices.RuntimeServices`,
+with a fixed catalog of typed host-service signatures. The library importer checks
+core identity, static/public nongeneric shape and exact argument/result types before
+emitting the existing service call. Normal consumer metadata omits this type; guest
+import rejects these calls even when given bootstrap metadata. This is comparable to
+the managed/native intrinsic boundary already used by the runtime, not a general
+native-call mechanism or a new Runtime Contract configuration. No Raven compiler or
+runtime opcode change is required.
+
+The Math consumer/contract probe now also verifies guest rejection of bootstrap
+services. Existing numeric tests cover finite domains, NaN, infinity, signed zero,
+integer overflow and reversed clamp bounds.
+
+Math completion validation: five runtime tests, 69 consumer results, six rejected
+contracts and bootstrap-service guest rejection pass; clean regeneration matches.
