@@ -179,3 +179,78 @@ the alternatives against current .NET `Char`/`Rune`/encoding contracts and the C
 metadata representation, then validate literals, indexing/iteration, malformed input,
 unpaired UTF-16 surrogates, ASCII narrowing, generic constraints, reflection and
 interop. Existing String slicing and ordinal comparison must not silently change.
+
+## Consolidated String proposal: semantic text and representation views
+
+The author refined the preceding proposal into a more complete String direction. The
+goal is to retain familiar .NET ergonomics—`String`, `Char`, PascalCase and ordinary
+text operations—while making Unicode semantics explicit instead of exposing UTF-16
+storage accidentally. This section is the preferred proposal for further review; it
+does not change the current implementation.
+
+`String` is immutable Unicode text and, semantically, a sequence of Unicode scalar
+values (`String = sequence of Char`). Well-formed UTF-8 is its canonical storage
+representation, but storage does not become part of ordinary String operations. String
+has no `Encoding` property and is not parameterized as `String<Encoding>`.
+
+`Char` is one Unicode scalar value. Surrogates cannot be valid Char values, so a
+supplementary scalar such as `😀` is one Char even though its UTF-8 and UTF-16 encoded
+forms use multiple code units. Unicode determines the meaning of Char; the selected
+encoding determines only its representation. Character classification belongs on Char
+(`IsLetter`, `IsDigit`, `Category` and related properties), while casing,
+normalization and other potentially context- or culture-sensitive transformations
+belong on String. A scalar is still distinct from a user-perceived grapheme; grapheme
+segmentation remains a separate API concern.
+
+When representation matters, use explicit encoded-string types rather than adding
+storage details to String:
+
+| Abstraction | Meaningful elements | Typical operations |
+| --- | --- | --- |
+| `String` | `Char` / Unicode scalar | Text semantics and ordinary search/editing |
+| `Utf8String` | UTF-8 `Byte` units | Byte length, byte access, bytes and UTF-8 slicing |
+| `Utf16String` | UTF-16 `UInt16` units | UTF-16 code-unit access and interop |
+| `AsciiString` | `AsciiChar` | Protocol/token operations with an ASCII invariant |
+
+`Utf8String` may be a zero-copy view over canonical String storage if the eventual
+memory-view lifetime contract permits it; that is an optimization hypothesis, not an
+ABI promise. `Length` means the number of elements in the current abstraction: String
+counts Char values, while Utf8String counts UTF-8 code units. `AsciiChar` and
+`AsciiString` carry stronger range invariants. In particular, ASCII `IsDigit` means
+exactly `'0'..'9'`, whereas Char `IsDigit` follows Unicode classification. Explicit
+constructors such as `AsciiString.From(text) -> Result<AsciiString, AsciiError>` are
+required for narrowing; lossless widening can be provided where the invariant is
+known.
+
+`Encoding` describes transformation rules, not a property of text or a replacement
+for encoded-string types. It can expose UTF-8, UTF-16, UTF-32, ASCII, Latin-1 and
+other codecs through operations such as `Encoding.Utf8.Encode(text)` and
+`Encoding.Utf16.Decode(bytes)`. UTF-8 is both the canonical/default String storage
+and one member of the general encoding abstraction. Ordinary text APIs should accept
+and return String; encoded types and Bytes belong at explicit representation and I/O
+boundaries.
+
+The error model follows the rest of neoCLR: successful searches return Boolean, absent
+positions use `Option<Int>`, expected decoding, encoding and parsing failures use
+typed `Result`, and `Fault` is reserved for failures where normal execution cannot
+reasonably continue. This removes sentinel indexes, `TryParse` pairs and exceptions
+from normal recoverable cases without making every text operation fallible.
+
+The resulting separation is:
+
+```text
+TEXT:       String ──elements──> Char ──Unicode properties──> classification
+STORAGE:    String ──canonical──> UTF-8 ──view──> Utf8String / Bytes
+            UTF-16 ──view──> Utf16String / UInt16
+            ASCII ──subset──> AsciiString / AsciiChar
+ENCODING:   String <── Encode / Decode ──> Bytes
+```
+
+This proposal is deliberately different from the current UTF-16 code-unit Char
+contract and from the existing UTF-8 byte-offset slicing API. Before implementation,
+define migration for Char literals, predicates, ordering, indexing and metadata;
+decide whether representation views are owned values or lifetime-bounded views; and
+validate malformed/truncated input, unpaired UTF-16 surrogates, embedded NUL, ASCII
+narrowing, generic constraints, reflection, native interop and allocation behavior.
+Do not silently reinterpret existing String offsets or claim that the Raven-shaped
+examples in this proposal are currently valid Raven source.

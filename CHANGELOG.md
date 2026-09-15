@@ -14,6 +14,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   notation only. Preserve the current UTF-16 code-unit Char contract until migration,
   metadata, interop and validation questions are resolved; no implementation changes.
 
+- Refine the String proposal into a consolidated Unicode/text model: immutable String
+  as scalar Char values, canonical UTF-8 storage, explicit encoded-string views for
+  UTF-8/UTF-16/ASCII, separate Encoding transformations, and Option/Result/Fault
+  handling. Keep the current UTF-16 Char and String-slicing implementations unchanged;
+  the proposal's Raven-shaped examples, view lifetime, metadata and migration rules
+  remain provisional.
+
 - Update the date/time design proposal as NeoCLR Time API v1: layer Instant, Duration,
   civil values, offsets, timezones, calendars and Period; retain a narrow injectable
   Clock; and model DST gaps/overlaps and parsing/lookup failures explicitly with

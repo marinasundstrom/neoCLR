@@ -3414,3 +3414,17 @@ the .NET-compatible alternative, migration costs and validation needs. No compil
 runtime, metadata or String API behavior was changed. The choice between the existing
 Char/Rune split, a scalar-oriented String with a compatibility Char view, and the
 minimal scalar model remains open.
+
+## 2026-09-15 — Consolidated String and encoding proposal
+
+**Author clarification:** The intended follow-up was to ensure that the String proposal
+captures the supplied detailed model: immutable Unicode String as a sequence of scalar
+Char values, canonical UTF-8 storage, explicit `Utf8String`/`Utf16String`/`AsciiString`
+representation types, a separate `Encoding` transformation abstraction, and the
+existing Option/Result/Fault conventions. The examples are illustrative and are not
+asserted to compile as Raven.
+
+**Assistant action and outcome:** Expanded the [text-model proposal](text-model.md#consolidated-string-proposal-semantic-text-and-representation-views)
+to make that model the preferred direction for further review. The current UTF-16
+code-unit Char behavior, existing String slicing contract and runtime implementation
+were not changed; migration, view lifetime, metadata and interop validation remain open.
