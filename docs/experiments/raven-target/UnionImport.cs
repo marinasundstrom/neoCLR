@@ -302,7 +302,11 @@ static class UnionImport
                             var receiver = Pop().Type;
                             if (!ApplicationTypes.Assignable(receiver, appRead.Owner) && receiver != appRead.Owner + "&") throw new InvalidDataException("Invalid application field receiver.");
                             Push(new(appRead.Type == "Boolean" ? "Int32" : PrimitiveBindings.Stack(appRead.Type)));
-                            code.AppendLine($"ldfld {appRead.Owner}::{appRead.Name}");
+                            if (PrimitiveLibrary.IsMatched(readField.DeclaringType.Resolve()))
+                            {
+                                if (receiver.EndsWith('&')) code.AppendLine("ldobj " + appRead.Type);
+                            }
+                            else code.AppendLine($"ldfld {appRead.Owner}::{appRead.Name}");
                             if (appRead.Type == "Boolean") code.Append(BooleanBindings.Convert("Boolean", "Int32"));
                             break;
                         }
@@ -310,6 +314,8 @@ static class UnionImport
                     case Code.Stfld:
                         if (!collectionProfile) throw new InvalidDataException("Native fields require target profile.");
                         var writeField = (FieldReference)instruction.Operand;
+                        if (PrimitiveLibrary.IsMatched(writeField.DeclaringType.Resolve()))
+                            throw new InvalidDataException("Primitive library backing storage is readonly.");
                         var appWrite = ApplicationTypes.Field(writeField, method, ProfileType);
                         if (appWrite is not null)
                         {

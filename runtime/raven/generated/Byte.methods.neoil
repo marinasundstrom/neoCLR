@@ -1,0 +1,60 @@
+; Generated from runtime/raven/src/System/Byte.rvn. Regenerate with build_runtime_library.py.
+.type System.Byte
+.implements System.Comparable<Byte>
+.method instance readonly byref CompareTo(Byte) -> Int32
+M00000001_IL_0000:
+M00000001_IL_0001:
+M00000001_IL_0002:
+ldarg 0
+M00000001_IL_0003:
+ldobj Byte
+M00000001_IL_0008:
+conv.i4
+M00000001_IL_0009:
+ldarg 1
+M00000001_IL_000a:
+conv.i4
+M00000001_IL_000b:
+clt
+call neoCLR.Library.System.Byte.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_000d:
+brtrue M00000001_IL_0017
+M00000001_IL_0012:
+br M00000001_IL_001a
+M00000001_IL_0017:
+M00000001_IL_0018:
+ldc.i4 -1
+M00000001_IL_0019:
+ret
+M00000001_IL_001a:
+M00000001_IL_001b:
+M00000001_IL_001c:
+ldarg 0
+M00000001_IL_001d:
+ldobj Byte
+M00000001_IL_0022:
+conv.i4
+M00000001_IL_0023:
+ldarg 1
+M00000001_IL_0024:
+conv.i4
+M00000001_IL_0025:
+cgt
+call neoCLR.Library.System.Byte.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_0027:
+brtrue M00000001_IL_0031
+M00000001_IL_002c:
+br M00000001_IL_0034
+M00000001_IL_0031:
+M00000001_IL_0032:
+ldc.i4 1
+M00000001_IL_0033:
+ret
+M00000001_IL_0034:
+M00000001_IL_0035:
+M00000001_IL_0036:
+ldc.i4 0
+M00000001_IL_0037:
+ret
+.end
+.end

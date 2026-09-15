@@ -675,3 +675,36 @@ File-write validation: all 63 saved-project checks pass, including file operatio
 and Void propagation. The status regression covers success, every typed failure and
 an unknown-status fault without relying on host permissions. Signature checks and
 clean regeneration pass.
+
+
+### Primitive struct family — 2026-09-15
+
+Boolean, SByte, Byte, Int16, UInt16, UInt32, Int64, UInt64, Single and Double are now
+Raven structs under `src/System`. Existing CompareTo contracts are preserved, including
+unsigned ordering, NaN sorting before non-NaN values and equality of signed zeros.
+
+A checked primitive authoring rule represents intrinsic storage using one private
+`m_value` field of the exact primitive kind. This follows the CoreLib approach visible
+in [.NET Int32](https://github.com/dotnet/runtime/blob/main/src/libraries/System.Private.CoreLib/src/System/Int32.cs):
+the field describes the primitive itself rather than a nested object. Bootstrap-only
+metadata supplies that shape. For matched owners, field reads become existing ldobj
+loads and the runtime declaration has no extra field. Writes are rejected. The
+compiler's exact empty, base-calling default constructor is checked and omitted;
+constructors with behavior or other signatures are rejected. The field initialization
+warning is suppressed locally because the runtime supplies this storage. Ordinary
+guest structs do not receive this projection. This adds no opcode or boxing behavior.
+
+The cost is an explicit, bounded primitive authoring rule in the importer, alongside
+separately maintained bootstrap metadata. It is not a general inline-type facility.
+Native IntPtr/UIntPtr comparisons and casts are currently unavailable through the
+neoCLR reference surface, so their existing IL remains. A small nint comparison
+compiles with the same Raven build targeting .NET 11; no general compiler fix is
+claimed or made. Int32 and Char remain separate migration work at this point.
+
+`verify_primitive_library.py` checks storage/constructor admission and readonly
+rejection. Runtime common-interface tests exercise signed, unsigned, floating and
+interface-dispatched comparisons. Build snapshots remain deterministic.
+
+Primitive-family validation: 25 runtime/interface/generic-bound tests, primitive
+admission rejection cases and clean regeneration pass. Debug identity maps omit the
+backing field because it is not a runtime field.

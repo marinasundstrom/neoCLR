@@ -1,6 +1,6 @@
 {
   "purpose": "Explicit source-by-source API audit. Samples and signature checks are evidence, not a claim of arbitrary generic/compiler support.",
-  "declarationCount": 658,
+  "declarationCount": 668,
   "sources": [
     {
       "file": "runtime/System/Equatable.neoil",
@@ -54,17 +54,32 @@
       ]
     },
     {
-      "file": "runtime/System/Boolean.neoil",
+      "file": "runtime/raven/generated/Boolean.methods.neoil",
       "declarations": 2,
-      "disposition": "primitives",
+      "disposition": "raven-authored-primitive-struct",
       "samples": [
         "library-primitives.rvn",
-        "library-integers.rvn",
-        "library-booleans.rvn",
-        "library-strings.rvn",
-        "library-parsing.rvn",
-        "library-division.rvn"
-      ]
+        "library-booleans.rvn"
+      ],
+      "tests": [
+        "tests/common_interfaces.rs",
+        "docs/experiments/raven-target/verify_primitive_library.py"
+      ],
+      "note": "Matched private backing storage becomes intrinsic loads; no nested runtime field or new primitive constructor."
+    },
+    {
+      "file": "runtime/raven/generated/Boolean.helpers.neoil",
+      "declarations": 1,
+      "disposition": "raven-authored-primitive-struct",
+      "samples": [
+        "library-primitives.rvn",
+        "library-booleans.rvn"
+      ],
+      "tests": [
+        "tests/common_interfaces.rs",
+        "docs/experiments/raven-target/verify_primitive_library.py"
+      ],
+      "note": "Matched private backing storage becomes intrinsic loads; no nested runtime field or new primitive constructor."
     },
     {
       "file": "runtime/System/String.neoil",
@@ -88,56 +103,116 @@
       ]
     },
     {
-      "file": "runtime/System/SByte.neoil",
+      "file": "runtime/raven/generated/SByte.methods.neoil",
       "declarations": 2,
-      "disposition": "primitives",
+      "disposition": "raven-authored-primitive-struct",
       "samples": [
         "library-primitives.rvn",
-        "library-integers.rvn",
-        "library-booleans.rvn",
-        "library-strings.rvn",
-        "library-parsing.rvn",
-        "library-division.rvn"
-      ]
+        "library-booleans.rvn"
+      ],
+      "tests": [
+        "tests/common_interfaces.rs",
+        "docs/experiments/raven-target/verify_primitive_library.py"
+      ],
+      "note": "Matched private backing storage becomes intrinsic loads; no nested runtime field or new primitive constructor."
     },
     {
-      "file": "runtime/System/Byte.neoil",
-      "declarations": 2,
-      "disposition": "primitives",
+      "file": "runtime/raven/generated/SByte.helpers.neoil",
+      "declarations": 1,
+      "disposition": "raven-authored-primitive-struct",
       "samples": [
         "library-primitives.rvn",
-        "library-integers.rvn",
-        "library-booleans.rvn",
-        "library-strings.rvn",
-        "library-parsing.rvn",
-        "library-division.rvn"
-      ]
+        "library-booleans.rvn"
+      ],
+      "tests": [
+        "tests/common_interfaces.rs",
+        "docs/experiments/raven-target/verify_primitive_library.py"
+      ],
+      "note": "Matched private backing storage becomes intrinsic loads; no nested runtime field or new primitive constructor."
     },
     {
-      "file": "runtime/System/Int16.neoil",
+      "file": "runtime/raven/generated/Byte.methods.neoil",
       "declarations": 2,
-      "disposition": "primitives",
+      "disposition": "raven-authored-primitive-struct",
       "samples": [
         "library-primitives.rvn",
-        "library-integers.rvn",
-        "library-booleans.rvn",
-        "library-strings.rvn",
-        "library-parsing.rvn",
-        "library-division.rvn"
-      ]
+        "library-booleans.rvn"
+      ],
+      "tests": [
+        "tests/common_interfaces.rs",
+        "docs/experiments/raven-target/verify_primitive_library.py"
+      ],
+      "note": "Matched private backing storage becomes intrinsic loads; no nested runtime field or new primitive constructor."
     },
     {
-      "file": "runtime/System/UInt16.neoil",
-      "declarations": 2,
-      "disposition": "primitives",
+      "file": "runtime/raven/generated/Byte.helpers.neoil",
+      "declarations": 1,
+      "disposition": "raven-authored-primitive-struct",
       "samples": [
         "library-primitives.rvn",
-        "library-integers.rvn",
-        "library-booleans.rvn",
-        "library-strings.rvn",
-        "library-parsing.rvn",
-        "library-division.rvn"
-      ]
+        "library-booleans.rvn"
+      ],
+      "tests": [
+        "tests/common_interfaces.rs",
+        "docs/experiments/raven-target/verify_primitive_library.py"
+      ],
+      "note": "Matched private backing storage becomes intrinsic loads; no nested runtime field or new primitive constructor."
+    },
+    {
+      "file": "runtime/raven/generated/Int16.methods.neoil",
+      "declarations": 2,
+      "disposition": "raven-authored-primitive-struct",
+      "samples": [
+        "library-primitives.rvn",
+        "library-booleans.rvn"
+      ],
+      "tests": [
+        "tests/common_interfaces.rs",
+        "docs/experiments/raven-target/verify_primitive_library.py"
+      ],
+      "note": "Matched private backing storage becomes intrinsic loads; no nested runtime field or new primitive constructor."
+    },
+    {
+      "file": "runtime/raven/generated/Int16.helpers.neoil",
+      "declarations": 1,
+      "disposition": "raven-authored-primitive-struct",
+      "samples": [
+        "library-primitives.rvn",
+        "library-booleans.rvn"
+      ],
+      "tests": [
+        "tests/common_interfaces.rs",
+        "docs/experiments/raven-target/verify_primitive_library.py"
+      ],
+      "note": "Matched private backing storage becomes intrinsic loads; no nested runtime field or new primitive constructor."
+    },
+    {
+      "file": "runtime/raven/generated/UInt16.methods.neoil",
+      "declarations": 2,
+      "disposition": "raven-authored-primitive-struct",
+      "samples": [
+        "library-primitives.rvn",
+        "library-booleans.rvn"
+      ],
+      "tests": [
+        "tests/common_interfaces.rs",
+        "docs/experiments/raven-target/verify_primitive_library.py"
+      ],
+      "note": "Matched private backing storage becomes intrinsic loads; no nested runtime field or new primitive constructor."
+    },
+    {
+      "file": "runtime/raven/generated/UInt16.helpers.neoil",
+      "declarations": 1,
+      "disposition": "raven-authored-primitive-struct",
+      "samples": [
+        "library-primitives.rvn",
+        "library-booleans.rvn"
+      ],
+      "tests": [
+        "tests/common_interfaces.rs",
+        "docs/experiments/raven-target/verify_primitive_library.py"
+      ],
+      "note": "Matched private backing storage becomes intrinsic loads; no nested runtime field or new primitive constructor."
     },
     {
       "file": "runtime/System/Char.neoil",
@@ -233,69 +308,144 @@
       ]
     },
     {
-      "file": "runtime/System/UInt32.neoil",
+      "file": "runtime/raven/generated/UInt32.methods.neoil",
       "declarations": 2,
-      "disposition": "primitives",
+      "disposition": "raven-authored-primitive-struct",
       "samples": [
         "library-primitives.rvn",
-        "library-integers.rvn",
-        "library-booleans.rvn",
-        "library-strings.rvn",
-        "library-parsing.rvn",
-        "library-division.rvn"
-      ]
+        "library-booleans.rvn"
+      ],
+      "tests": [
+        "tests/common_interfaces.rs",
+        "docs/experiments/raven-target/verify_primitive_library.py"
+      ],
+      "note": "Matched private backing storage becomes intrinsic loads; no nested runtime field or new primitive constructor."
     },
     {
-      "file": "runtime/System/Int64.neoil",
-      "declarations": 2,
-      "disposition": "primitives",
+      "file": "runtime/raven/generated/UInt32.helpers.neoil",
+      "declarations": 1,
+      "disposition": "raven-authored-primitive-struct",
       "samples": [
         "library-primitives.rvn",
-        "library-integers.rvn",
-        "library-booleans.rvn",
-        "library-strings.rvn",
-        "library-parsing.rvn",
-        "library-division.rvn"
-      ]
+        "library-booleans.rvn"
+      ],
+      "tests": [
+        "tests/common_interfaces.rs",
+        "docs/experiments/raven-target/verify_primitive_library.py"
+      ],
+      "note": "Matched private backing storage becomes intrinsic loads; no nested runtime field or new primitive constructor."
     },
     {
-      "file": "runtime/System/UInt64.neoil",
+      "file": "runtime/raven/generated/Int64.methods.neoil",
       "declarations": 2,
-      "disposition": "primitives",
+      "disposition": "raven-authored-primitive-struct",
       "samples": [
         "library-primitives.rvn",
-        "library-integers.rvn",
-        "library-booleans.rvn",
-        "library-strings.rvn",
-        "library-parsing.rvn",
-        "library-division.rvn"
-      ]
+        "library-booleans.rvn"
+      ],
+      "tests": [
+        "tests/common_interfaces.rs",
+        "docs/experiments/raven-target/verify_primitive_library.py"
+      ],
+      "note": "Matched private backing storage becomes intrinsic loads; no nested runtime field or new primitive constructor."
     },
     {
-      "file": "runtime/System/Single.neoil",
-      "declarations": 2,
-      "disposition": "primitives",
+      "file": "runtime/raven/generated/Int64.helpers.neoil",
+      "declarations": 1,
+      "disposition": "raven-authored-primitive-struct",
       "samples": [
         "library-primitives.rvn",
-        "library-integers.rvn",
-        "library-booleans.rvn",
-        "library-strings.rvn",
-        "library-parsing.rvn",
-        "library-division.rvn"
-      ]
+        "library-booleans.rvn"
+      ],
+      "tests": [
+        "tests/common_interfaces.rs",
+        "docs/experiments/raven-target/verify_primitive_library.py"
+      ],
+      "note": "Matched private backing storage becomes intrinsic loads; no nested runtime field or new primitive constructor."
     },
     {
-      "file": "runtime/System/Double.neoil",
+      "file": "runtime/raven/generated/UInt64.methods.neoil",
       "declarations": 2,
-      "disposition": "primitives",
+      "disposition": "raven-authored-primitive-struct",
       "samples": [
         "library-primitives.rvn",
-        "library-integers.rvn",
-        "library-booleans.rvn",
-        "library-strings.rvn",
-        "library-parsing.rvn",
-        "library-division.rvn"
-      ]
+        "library-booleans.rvn"
+      ],
+      "tests": [
+        "tests/common_interfaces.rs",
+        "docs/experiments/raven-target/verify_primitive_library.py"
+      ],
+      "note": "Matched private backing storage becomes intrinsic loads; no nested runtime field or new primitive constructor."
+    },
+    {
+      "file": "runtime/raven/generated/UInt64.helpers.neoil",
+      "declarations": 1,
+      "disposition": "raven-authored-primitive-struct",
+      "samples": [
+        "library-primitives.rvn",
+        "library-booleans.rvn"
+      ],
+      "tests": [
+        "tests/common_interfaces.rs",
+        "docs/experiments/raven-target/verify_primitive_library.py"
+      ],
+      "note": "Matched private backing storage becomes intrinsic loads; no nested runtime field or new primitive constructor."
+    },
+    {
+      "file": "runtime/raven/generated/Single.methods.neoil",
+      "declarations": 2,
+      "disposition": "raven-authored-primitive-struct",
+      "samples": [
+        "library-primitives.rvn",
+        "library-booleans.rvn"
+      ],
+      "tests": [
+        "tests/common_interfaces.rs",
+        "docs/experiments/raven-target/verify_primitive_library.py"
+      ],
+      "note": "Matched private backing storage becomes intrinsic loads; no nested runtime field or new primitive constructor."
+    },
+    {
+      "file": "runtime/raven/generated/Single.helpers.neoil",
+      "declarations": 1,
+      "disposition": "raven-authored-primitive-struct",
+      "samples": [
+        "library-primitives.rvn",
+        "library-booleans.rvn"
+      ],
+      "tests": [
+        "tests/common_interfaces.rs",
+        "docs/experiments/raven-target/verify_primitive_library.py"
+      ],
+      "note": "Matched private backing storage becomes intrinsic loads; no nested runtime field or new primitive constructor."
+    },
+    {
+      "file": "runtime/raven/generated/Double.methods.neoil",
+      "declarations": 2,
+      "disposition": "raven-authored-primitive-struct",
+      "samples": [
+        "library-primitives.rvn",
+        "library-booleans.rvn"
+      ],
+      "tests": [
+        "tests/common_interfaces.rs",
+        "docs/experiments/raven-target/verify_primitive_library.py"
+      ],
+      "note": "Matched private backing storage becomes intrinsic loads; no nested runtime field or new primitive constructor."
+    },
+    {
+      "file": "runtime/raven/generated/Double.helpers.neoil",
+      "declarations": 1,
+      "disposition": "raven-authored-primitive-struct",
+      "samples": [
+        "library-primitives.rvn",
+        "library-booleans.rvn"
+      ],
+      "tests": [
+        "tests/common_interfaces.rs",
+        "docs/experiments/raven-target/verify_primitive_library.py"
+      ],
+      "note": "Matched private backing storage becomes intrinsic loads; no nested runtime field or new primitive constructor."
     },
     {
       "file": "runtime/System/IntPtr.neoil",

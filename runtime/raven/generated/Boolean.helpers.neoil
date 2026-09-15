@@ -1,0 +1,10 @@
+; Generated from runtime/raven/src/System/Boolean.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Boolean.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end

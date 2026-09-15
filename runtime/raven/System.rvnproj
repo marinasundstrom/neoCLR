@@ -25,4 +25,34 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Date'">
     <Compile Include="src/System/Date.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Int64'">
+    <Compile Include="src/System/Int64.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'SByte'">
+    <Compile Include="src/System/SByte.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Byte'">
+    <Compile Include="src/System/Byte.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Int16'">
+    <Compile Include="src/System/Int16.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'UInt16'">
+    <Compile Include="src/System/UInt16.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'UInt32'">
+    <Compile Include="src/System/UInt32.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'UInt64'">
+    <Compile Include="src/System/UInt64.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Single'">
+    <Compile Include="src/System/Single.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Double'">
+    <Compile Include="src/System/Double.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Boolean'">
+    <Compile Include="src/System/Boolean.rvn" />
+  </ItemGroup>
 </Project>

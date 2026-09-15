@@ -1,0 +1,17 @@
+namespace System
+
+public struct Boolean : Comparable<bool> {
+    // The runtime supplies intrinsic primitive storage.
+    #pragma warning disable-next-line RAV9032
+    private field m_value: bool
+
+    func CompareTo(other: bool) -> int {
+        if m_value == other {
+            return 0
+        }
+        if m_value {
+            return 1
+        }
+        return -1
+    }
+}

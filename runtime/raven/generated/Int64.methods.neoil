@@ -1,0 +1,52 @@
+; Generated from runtime/raven/src/System/Int64.rvn. Regenerate with build_runtime_library.py.
+.type System.Int64
+.implements System.Comparable<Int64>
+.method instance readonly byref CompareTo(Int64) -> Int32
+M00000001_IL_0000:
+M00000001_IL_0001:
+M00000001_IL_0002:
+ldarg 0
+M00000001_IL_0003:
+ldobj Int64
+M00000001_IL_0008:
+ldarg 1
+M00000001_IL_0009:
+clt
+call neoCLR.Library.System.Int64.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_000b:
+brtrue M00000001_IL_0015
+M00000001_IL_0010:
+br M00000001_IL_0018
+M00000001_IL_0015:
+M00000001_IL_0016:
+ldc.i4 -1
+M00000001_IL_0017:
+ret
+M00000001_IL_0018:
+M00000001_IL_0019:
+M00000001_IL_001a:
+ldarg 0
+M00000001_IL_001b:
+ldobj Int64
+M00000001_IL_0020:
+ldarg 1
+M00000001_IL_0021:
+cgt
+call neoCLR.Library.System.Int64.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_0023:
+brtrue M00000001_IL_002d
+M00000001_IL_0028:
+br M00000001_IL_0030
+M00000001_IL_002d:
+M00000001_IL_002e:
+ldc.i4 1
+M00000001_IL_002f:
+ret
+M00000001_IL_0030:
+M00000001_IL_0031:
+M00000001_IL_0032:
+ldc.i4 0
+M00000001_IL_0033:
+ret
+.end
+.end

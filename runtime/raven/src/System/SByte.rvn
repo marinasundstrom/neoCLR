@@ -1,0 +1,17 @@
+namespace System
+
+public struct SByte : Comparable<sbyte> {
+    // The runtime supplies intrinsic primitive storage.
+    #pragma warning disable-next-line RAV9032
+    private field m_value: sbyte
+
+    func CompareTo(other: sbyte) -> int {
+        if m_value < other {
+            return -1
+        }
+        if m_value > other {
+            return 1
+        }
+        return 0
+    }
+}

@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-15
 
+- Port Boolean, SByte, Byte, Int16, UInt16, UInt32, Int64, UInt64, Single and Double
+  structs to Raven. Preserve comparison/NaN ordering and intrinsic storage; checked
+  primitive backing fields lower to value loads and verified empty constructors are
+  omitted. Reject extra storage, writes and effectful constructors. IntPtr/UIntPtr
+  remain IL pending native-integer operator/conversion reference contracts.
+
 - Port File.WriteAllText outcome handling to Raven, preserving all seven typed errors,
   Void success and the terminal fault for unknown native status. Keep native writes
   and ReadAllText in their existing implementation layers. Match the two target Void

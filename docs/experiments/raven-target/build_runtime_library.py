@@ -9,8 +9,50 @@ import subprocess
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
-SLICES = {"Math": "System.Math", "Linq": "System.Linq.Operators", "Int32": "System.Int32", "Char": "System.Char", "ArrayList": "System.Collections.ArrayList", "HashMap": "System.Collections.HashMap", "Time": "System.Time", "Date": "System.Date", "Path": "System.IO.Path", "File": "System.IO.File"}
-SOURCES = {'Math': 'runtime/raven/src/System/Math/Functions.rvn', 'Int32': 'runtime/raven/src/System/Int32/Functions.rvn', 'Char': 'runtime/raven/src/System/Char/Functions.rvn', 'Linq': 'runtime/raven/src/System/Linq/Operators.rvn', 'ArrayList': 'runtime/raven/src/System/Collections/ArrayList.rvn', 'HashMap': 'runtime/raven/src/System/Collections/HashMap.rvn', 'Time': 'runtime/raven/src/System/Time.rvn', 'Date': 'runtime/raven/src/System/Date.rvn', 'Path': 'runtime/raven/src/System/IO/Path/Functions.rvn', 'File': 'runtime/raven/src/System/IO/File/Functions.rvn'}
+SLICES = {
+    'Math': 'System.Math',
+    'Linq': 'System.Linq.Operators',
+    'Int32': 'System.Int32',
+    'Char': 'System.Char',
+    'ArrayList': 'System.Collections.ArrayList',
+    'HashMap': 'System.Collections.HashMap',
+    'Time': 'System.Time',
+    'Date': 'System.Date',
+    'Path': 'System.IO.Path',
+    'File': 'System.IO.File',
+    'Int64': 'System.Int64',
+    'SByte': 'System.SByte',
+    'Byte': 'System.Byte',
+    'Int16': 'System.Int16',
+    'UInt16': 'System.UInt16',
+    'UInt32': 'System.UInt32',
+    'UInt64': 'System.UInt64',
+    'Single': 'System.Single',
+    'Double': 'System.Double',
+    'Boolean': 'System.Boolean',
+}
+SOURCES = {
+    'Math': 'runtime/raven/src/System/Math/Functions.rvn',
+    'Int32': 'runtime/raven/src/System/Int32/Functions.rvn',
+    'Char': 'runtime/raven/src/System/Char/Functions.rvn',
+    'Linq': 'runtime/raven/src/System/Linq/Operators.rvn',
+    'ArrayList': 'runtime/raven/src/System/Collections/ArrayList.rvn',
+    'HashMap': 'runtime/raven/src/System/Collections/HashMap.rvn',
+    'Time': 'runtime/raven/src/System/Time.rvn',
+    'Date': 'runtime/raven/src/System/Date.rvn',
+    'Path': 'runtime/raven/src/System/IO/Path/Functions.rvn',
+    'File': 'runtime/raven/src/System/IO/File/Functions.rvn',
+    'Int64': 'runtime/raven/src/System/Int64.rvn',
+    'SByte': 'runtime/raven/src/System/SByte.rvn',
+    'Byte': 'runtime/raven/src/System/Byte.rvn',
+    'Int16': 'runtime/raven/src/System/Int16.rvn',
+    'UInt16': 'runtime/raven/src/System/UInt16.rvn',
+    'UInt32': 'runtime/raven/src/System/UInt32.rvn',
+    'UInt64': 'runtime/raven/src/System/UInt64.rvn',
+    'Single': 'runtime/raven/src/System/Single.rvn',
+    'Double': 'runtime/raven/src/System/Double.rvn',
+    'Boolean': 'runtime/raven/src/System/Boolean.rvn',
+}
 PROJECT = ROOT / 'runtime/raven/System.rvnproj'
 GENERATED = ROOT / 'runtime/raven/generated'
 
@@ -104,7 +146,7 @@ def main():
         generated = {}
         for name, owner in SLICES.items():
             compiled = root / 'compiled'
-            if name in ('ArrayList', 'HashMap', 'Time', 'Date'):
+            if name not in ('Math', 'Linq', 'Int32', 'Char', 'Path', 'File'):
                 compiled = root / ('compiled-' + name)
                 subprocess.run(['dotnet', str(args.compiler.resolve()), str(PROJECT), '--no-project-restore',
                                 '-o', str(compiled)], env={**os.environ, 'NeoCLRBootstrapRoot': str(root),

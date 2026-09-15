@@ -78,6 +78,13 @@ for file in source['sourceFiles']:
                      'samples': ['library-collection-capabilities.rvn'],
                      'note': 'Count, read indexing and replacement are inherited; List retains Add. All contracts remain invariant.'})
         continue
+    if file.startswith('runtime/raven/generated/') and Path(file).name.split('.')[0] in (
+            'Boolean', 'SByte', 'Byte', 'Int16', 'UInt16', 'UInt32', 'Int64', 'UInt64', 'Single', 'Double'):
+        rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-primitive-struct',
+                     'samples': ['library-primitives.rvn', 'library-booleans.rvn'],
+                     'tests': ['tests/common_interfaces.rs', 'docs/experiments/raven-target/verify_primitive_library.py'],
+                     'note': 'Matched private backing storage becomes intrinsic loads; no nested runtime field or new primitive constructor.'})
+        continue
     if file.startswith(('runtime/raven/generated/Int32.', 'runtime/raven/generated/Char.')):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-scalar-bootstrap',
                      'samples': ['library-primitives.rvn', 'library-division.rvn'],

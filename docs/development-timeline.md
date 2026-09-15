@@ -3477,3 +3477,15 @@ System.Char functions should probably belong to a ported System.Char struct.
 **Assistant response.** Agreed to preserve that as a later structural change. Current
 folders follow current declarations; the ongoing port does not redesign the public
 Char type or make the function namespace permanent.
+
+
+### 2026-09-15 — Port the fundamental structs as a family
+
+**User direction.** The author requested as many fundamental types as possible,
+noting that several have few or no members and should share the already ported logic.
+
+**Assistant action.** Established a checked intrinsic-storage rule with Int64 and
+extended it to ten numeric/Boolean structs. Kept existing APIs and comparison
+behavior. Native-sized integer types retain IL while their operator/conversion
+reference contracts are incomplete; the corresponding comparison compiles against
+.NET with the same Raven compiler. No Raven compiler changes are included.

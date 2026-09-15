@@ -52,7 +52,8 @@ static class LibraryImplementation
                 throw new InvalidDataException("Unsupported instance library owner.");
         if (type.IsValueType != contract.IsValueType)
             throw new InvalidDataException("Library value/reference representation does not match reference contract.");
-        if (type.IsValueType)
+        if (PrimitiveLibrary.IsPrimitive(type)) PrimitiveLibrary.Validate(type, contract);
+        else if (type.IsValueType)
         {
             // Unlike reference classes, a value's instance layout is an ABI contract.
             // Start with scalar, nongeneric sequential records; do not infer layout.
@@ -74,8 +75,8 @@ static class LibraryImplementation
                 return right is GenericInstanceType r && MatchType(l.ElementType, r.ElementType)
                     && l.GenericArguments.Count == r.GenericArguments.Count
                     && l.GenericArguments.Zip(r.GenericArguments).All(p => MatchType(p.First, p.Second));
-            return (left.FullName == contract.FullName && right.FullName == type.FullName
-                && left.Resolve() == contract && right.Resolve() == type) || SameType(left, right);
+            return SameType(left, right) || (left.FullName == contract.FullName && right.FullName == type.FullName
+                && left.Resolve() == contract && right.Resolve() == type);
         }
         if (type.Interfaces.Count != contract.Interfaces.Count || type.Interfaces.Any(i =>
             contract.Interfaces.Count(c => MatchType(c.InterfaceType, i.InterfaceType)) != 1))
@@ -90,7 +91,7 @@ static class LibraryImplementation
         if (type.Fields.Any(f => !f.IsPrivate || f.IsStatic || f.IsInitOnly || f.HasMarshalInfo)
             || contract.Fields.Any(f => !f.IsPrivate))
             throw new InvalidDataException("Instance library requires private mutable implementation fields.");
-        var methods = type.Methods.ToArray();
+        var methods = type.Methods.Where(m => !PrimitiveLibrary.IsPrimitive(type) || !PrimitiveLibrary.IsDefaultConstructor(m)).ToArray();
         if (methods.Length == 0 || methods.Any(m => !(m.IsPublic || m.IsPrivate && (!m.IsConstructor || type.IsValueType) && !m.IsVirtual) || (!m.HasThis && !type.IsValueType) || !m.HasBody || m.HasGenericParameters
             || m.ExplicitThis || m.IsConstructor && m.IsStatic || m.CallingConvention != MethodCallingConvention.Default
             || m.Parameters.Any(p => p.IsOut || p.ParameterType.IsByReference)))
