@@ -1,0 +1,68 @@
+; Explicit metadata lookup façade. Type remains the cheap identity/shape view.
+.type System.Reflection.TypeInfo
+    .field public Target System.Type
+    .method internal instance byref .ctor(System.Type target) -> Void
+        ldarg this
+        ldarg target
+        stfld 0
+        pop
+        ldvoid
+        ret
+    .end
+    .method instance get_Target() -> System.Type
+        ldarg this
+        ldfld 0
+        ret
+    .end
+    .method instance GetFields() -> System.Reflection.FieldInfo[]
+        ldarg this
+        ldfld 0
+        call instance System.Type::get_Handle()
+        ldc.i4 28
+        call neoCLR.Runtime.TypeFields(System.RuntimeTypeHandle,Int32)
+        ret
+    .end
+    .method instance GetFields(System.Reflection.BindingFlags flags) -> System.Reflection.FieldInfo[]
+        ldarg this
+        ldfld 0
+        call instance System.Type::get_Handle()
+        ldarg flags
+        call instance System.Reflection.BindingFlags::get_Value()
+        call neoCLR.Runtime.TypeFields(System.RuntimeTypeHandle,Int32)
+        ret
+    .end
+    .method instance GetMethods() -> System.Reflection.MethodInfo[]
+        ldarg this
+        ldfld 0
+        call instance System.Type::get_Handle()
+        ldc.i4 28
+        call neoCLR.Runtime.TypeMethods(System.RuntimeTypeHandle,Int32)
+        ret
+    .end
+    .method instance GetMethods(System.Reflection.BindingFlags flags) -> System.Reflection.MethodInfo[]
+        ldarg this
+        ldfld 0
+        call instance System.Type::get_Handle()
+        ldarg flags
+        call instance System.Reflection.BindingFlags::get_Value()
+        call neoCLR.Runtime.TypeMethods(System.RuntimeTypeHandle,Int32)
+        ret
+    .end
+    .method instance GetProperties() -> System.Reflection.PropertyInfo[]
+        ldarg this
+        ldfld 0
+        call instance System.Type::get_Handle()
+        ldc.i4 28
+        call neoCLR.Runtime.TypeProperties(System.RuntimeTypeHandle,Int32)
+        ret
+    .end
+    .method instance GetProperties(System.Reflection.BindingFlags flags) -> System.Reflection.PropertyInfo[]
+        ldarg this
+        ldfld 0
+        call instance System.Type::get_Handle()
+        ldarg flags
+        call instance System.Reflection.BindingFlags::get_Value()
+        call neoCLR.Runtime.TypeProperties(System.RuntimeTypeHandle,Int32)
+        ret
+    .end
+.end

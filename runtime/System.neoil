@@ -66,6 +66,7 @@
 .include "System/Closable.neoil"
 
 .include "System/Reflection.neoil"
+.include "System/TypeInfo.neoil"
 
 .include "System/Func.neoil"
 

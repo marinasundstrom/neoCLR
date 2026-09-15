@@ -11,13 +11,13 @@ filtering, override suppression and DeclaringType versus ReflectedType before
 changing default results. MethodBase remains deferred until constructor introspection
 needs shared behavior. ParameterInfo and Type remain independent. The current
 direction is to keep Type as the inexpensive identity/shape descriptor and move
-member discovery behind a separate TypeInfo API. A future `type.Info` (or equivalent)
-can make that potentially costly runtime lookup explicit.
+member discovery behind a separate TypeInfo API. `Type.Info` now makes that
+potentially costly runtime lookup explicit.
 
 TypeInfo and its FieldInfo, MethodInfo and PropertyInfo descendants are planned as a
 closed algebraic class hierarchy. This reflection model does not require every
 runtime type to derive from Object. Constructor and descriptor allocation contracts
-must be defined before porting these APIs to Raven.
+must be defined before porting the remaining descriptor implementations to Raven.
 
 [Inherited class interface implementations](class-interface-dispatch.md) now bridge
 class bases and virtual overrides, preserving owner identity, readonly access and GC.

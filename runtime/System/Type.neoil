@@ -40,51 +40,6 @@
         call neoCLR.Runtime.TypeEquals(System.RuntimeTypeHandle,System.RuntimeTypeHandle)
         ret
     .end
-    .method instance GetFields() -> System.Reflection.FieldInfo[]
-        ldarg this
-        ldc.i4 28
-        call System.Reflection.BindingFlags::FromValue(Int32)
-        call instance System.Type::GetFields(System.Reflection.BindingFlags)
-        ret
-    .end
-    .method instance GetFields(System.Reflection.BindingFlags flags) -> System.Reflection.FieldInfo[]
-        ldarg this
-        ldfld 0
-        ldarg flags
-        call instance System.Reflection.BindingFlags::get_Value()
-        call neoCLR.Runtime.TypeFields(System.RuntimeTypeHandle,Int32)
-        ret
-    .end
-    .method instance GetMethods() -> System.Reflection.MethodInfo[]
-        ldarg this
-        ldc.i4 28
-        call System.Reflection.BindingFlags::FromValue(Int32)
-        call instance System.Type::GetMethods(System.Reflection.BindingFlags)
-        ret
-    .end
-    .method instance GetMethods(System.Reflection.BindingFlags flags) -> System.Reflection.MethodInfo[]
-        ldarg this
-        ldfld 0
-        ldarg flags
-        call instance System.Reflection.BindingFlags::get_Value()
-        call neoCLR.Runtime.TypeMethods(System.RuntimeTypeHandle,Int32)
-        ret
-    .end
-    .method instance GetProperties() -> System.Reflection.PropertyInfo[]
-        ldarg this
-        ldc.i4 28
-        call System.Reflection.BindingFlags::FromValue(Int32)
-        call instance System.Type::GetProperties(System.Reflection.BindingFlags)
-        ret
-    .end
-    .method instance GetProperties(System.Reflection.BindingFlags flags) -> System.Reflection.PropertyInfo[]
-        ldarg this
-        ldfld 0
-        ldarg flags
-        call instance System.Reflection.BindingFlags::get_Value()
-        call neoCLR.Runtime.TypeProperties(System.RuntimeTypeHandle,Int32)
-        ret
-    .end
     .property instance BaseType() -> System.Option<System.Type>
         .get instance System.Type::get_BaseType()
     .end
@@ -202,6 +157,58 @@
         ldfld 0
         ldc.i4 3
         call neoCLR.Runtime.TypeShape(System.RuntimeTypeHandle,Int32)
+        ret
+    .end
+    .property instance Info() -> System.Reflection.TypeInfo
+        .get instance System.Type::get_Info()
+    .end
+    .method instance get_Info() -> System.Reflection.TypeInfo
+        ldarg this
+        newobj System.Reflection.TypeInfo
+        ret
+    .end
+    .method internal instance get_Handle() -> System.RuntimeTypeHandle
+        ldarg this
+        ldfld 0
+        ret
+    .end
+    .method instance GetFields() -> System.Reflection.FieldInfo[]
+        ldarg this
+        call instance System.Type::get_Info()
+        call instance System.Reflection.TypeInfo::GetFields()
+        ret
+    .end
+    .method instance GetFields(System.Reflection.BindingFlags flags) -> System.Reflection.FieldInfo[]
+        ldarg this
+        call instance System.Type::get_Info()
+        ldarg flags
+        call instance System.Reflection.TypeInfo::GetFields(System.Reflection.BindingFlags)
+        ret
+    .end
+    .method instance GetMethods() -> System.Reflection.MethodInfo[]
+        ldarg this
+        call instance System.Type::get_Info()
+        call instance System.Reflection.TypeInfo::GetMethods()
+        ret
+    .end
+    .method instance GetMethods(System.Reflection.BindingFlags flags) -> System.Reflection.MethodInfo[]
+        ldarg this
+        call instance System.Type::get_Info()
+        ldarg flags
+        call instance System.Reflection.TypeInfo::GetMethods(System.Reflection.BindingFlags)
+        ret
+    .end
+    .method instance GetProperties() -> System.Reflection.PropertyInfo[]
+        ldarg this
+        call instance System.Type::get_Info()
+        call instance System.Reflection.TypeInfo::GetProperties()
+        ret
+    .end
+    .method instance GetProperties(System.Reflection.BindingFlags flags) -> System.Reflection.PropertyInfo[]
+        ldarg this
+        call instance System.Type::get_Info()
+        ldarg flags
+        call instance System.Reflection.TypeInfo::GetProperties(System.Reflection.BindingFlags)
         ret
     .end
     .property instance FullName() -> String

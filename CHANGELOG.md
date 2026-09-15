@@ -8,10 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-15
 
-- Record the Type/Reflection boundary for the next API iteration: Type remains a
-  cheap identity and shape descriptor, while TypeInfo will own potentially costly
-  member lookup through a closed descriptor hierarchy. Existing member queries stay
-  available during the transition.
+- Introduce `System.TypeInfo` as the explicit member-lookup view returned by
+  `Type.Info`. Type remains the identity and shape descriptor; field, method and
+  property enumeration moves behind TypeInfo while the descriptor contracts remain
+  unchanged.
+
+- Add `System.Reflection.TypeInfo` and `Type.Info` as the first Type/Reflection
+  separation slice. TypeInfo owns explicit member lookup while existing Type query
+  methods remain forwarding compatibility shims during the transition.
 
 - Move the memberless Value and RuntimeTypeHandle declarations to Raven. Check
   declaration-only imports against reference shape and reject added members,

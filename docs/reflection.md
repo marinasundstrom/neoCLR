@@ -1,6 +1,7 @@
 # Reflection introspection
 
-neoCLR exposes metadata queries on `System.Type`. `MethodInfo`, `FieldInfo` and
+neoCLR exposes type identity and shape on `System.Type`; member metadata is obtained
+through its `Info` property as `System.TypeInfo`. `MethodInfo`, `FieldInfo` and
 `PropertyInfo` share an abstract `MemberInfo` base; `ParameterInfo` remains independent.
 See [descriptor hierarchy](reflection-hierarchy.md) for readonly receiver contracts,
 base views and migration. Queries inspect declarations without executing methods
@@ -36,9 +37,10 @@ for i in 0..<fields.Length {
 | API | Result / contract |
 | --- | --- |
 | `BaseType` | `Option<Type>`, immediate substituted record base or None |
-| `GetFields()` / `GetFields(BindingFlags)` | `FieldInfo[]`, declared fields |
-| `GetMethods()` / `GetMethods(BindingFlags)` | `MethodInfo[]`, declared instance and static methods, including property accessors |
-| `GetProperties()` / `GetProperties(BindingFlags)` | `PropertyInfo[]`, declared properties |
+| `Type.Info` | `System.Reflection.TypeInfo`, explicit metadata lookup view |
+| `TypeInfo.GetFields()` / `GetFields(BindingFlags)` | `FieldInfo[]`, declared fields |
+| `TypeInfo.GetMethods()` / `GetMethods(BindingFlags)` | `MethodInfo[]`, declared instance and static methods, including property accessors |
+| `TypeInfo.GetProperties()` / `GetProperties(BindingFlags)` | `PropertyInfo[]`, declared properties |
 | `GetInterfaces()` | `Type[]`, direct and transitive interfaces, deduplicated, excluding self |
 | `GetGenericArguments()` | `Type[]`, closed signature arguments, empty for nongeneric signatures |
 | `GetElementType()` | `Option<Type>`, Some for array, managed-reference or pointer target, otherwise None |
