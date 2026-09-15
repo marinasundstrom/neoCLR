@@ -1,6 +1,6 @@
 {
   "format": "raven-library-bootstrap-v1",
-  "owner": "System.RuntimeTypeHandle",
+  "owner": "System.Duration",
   "inputs": {
     "runtime/raven/src/System/Duration.rvn": "321a44237e5990cf6ec7d1432a279145f84d2ecaa32675f5b95636801b0f8e44",
     "runtime/raven/src/System/Instant.rvn": "87c951b8e837eea48b5c306de89056e4ec19ed562cf6834475b27f54f70230dc",
@@ -31,10 +31,15 @@
     "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
   },
   "outputs": {
-    "RuntimeTypeHandle.methods.neoil": "fbc32fb37c52441219461378a9467d698f470476859405fb9bf4cda573ebf67d",
-    "RuntimeTypeHandle.helpers.neoil": "58e422f6207fc4ac4e28dea8c50b30b01910e4de042d3406dbcb0d51960412ba"
+    "Duration.methods.neoil": "83daac04bb4b273e140d2428ae65352d8844daefb5d486782e91179753529f35",
+    "Duration.helpers.neoil": "13827c20f3f972315bc5eee052aee842930a785108130b6fe58e02d993d18c1d"
   },
   "compilerSha256": "744ad87d9a6ec3d8b5691e72d0cd077b154af51615387b5f6bb171daa89fb370",
   "coreSha256": "8514d154953a26bfa7b3f8ad6828c954f171a948cc64b8222951ea51cb66dc25",
-  "exports": []
+  "exports": [
+    "FromTicks(Int64) -> System.Duration",
+    "readonly byref get_Ticks() -> Int64",
+    "readonly byref Equals(System.Duration) -> Boolean",
+    "readonly byref CompareTo(System.Duration) -> Int32"
+  ]
 }

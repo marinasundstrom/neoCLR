@@ -1,0 +1,7 @@
+.function neoCLR.Runtime.UnixTimeTicks() -> Int64
+    .methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.UnixTimeToLocal(Int64 ticks) -> Int32[]
+    .methodimpl InternalCall
+.end

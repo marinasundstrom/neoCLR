@@ -1,0 +1,35 @@
+namespace System
+
+import System.Runtime.CompilerServices.*
+
+public struct Instant : Comparable<Instant>, Equatable<Instant> {
+    private field StoredTicks: long
+
+    private init(ticks: long) {
+        StoredTicks = ticks
+    }
+
+    static func FromUnixTimeTicks(ticks: long) -> Instant {
+        return Instant(ticks)
+    }
+
+    func ToLocalDateTime() -> LocalDateTime {
+        return RuntimeServices.LocalDateTime(StoredTicks)
+    }
+
+    val UnixTimeTicks: long { get => StoredTicks }
+
+    func Equals(other: Instant) -> bool {
+        return StoredTicks == other.StoredTicks
+    }
+
+    func CompareTo(other: Instant) -> int {
+        if StoredTicks < other.StoredTicks {
+            return -1
+        }
+        if StoredTicks > other.StoredTicks {
+            return 1
+        }
+        return 0
+    }
+}

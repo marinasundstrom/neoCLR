@@ -1,0 +1,39 @@
+import System.*
+import System.Console.*
+
+class FixedClock : Clock {
+    val Now: Instant {
+        get => Instant.FromUnixTimeTicks(ticks: -1L)
+    }
+}
+
+func Read(clock: Clock) -> Instant {
+    return clock.Now
+}
+
+func ShowCurrentTime() {
+    let clock: Clock = SystemClock()
+    let instant = clock.Now
+    let local = instant.ToLocalDateTime()
+    WriteLine(local.Date.Year)
+    WriteLine(local.Time.Hour)
+}
+
+func Main() {
+    let fixedClock: Clock = FixedClock()
+    let instant = Read(fixedClock)
+    WriteLine(instant.UnixTimeTicks.CompareTo(-1L))
+    WriteLine(instant.CompareTo(Instant.FromUnixTimeTicks(ticks: 0L)))
+    let duration = Duration.FromTicks(ticks: -10L)
+    WriteLine(duration.Ticks.CompareTo(-10L))
+    WriteLine(duration.CompareTo(Duration.FromTicks(ticks: 0L)))
+    if duration.Equals(other: Duration.FromTicks(ticks: -10L)) {
+        WriteLine("Same duration")
+    }
+    let clock: Clock = SystemClock()
+    let now = Read(clock)
+    let local = now.ToLocalDateTime()
+    if local.Date.Year >= 2026 {
+        WriteLine("System clock")
+    }
+}

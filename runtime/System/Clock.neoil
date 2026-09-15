@@ -1,6 +1,7 @@
-.type System.Clock
-    .method static GetLocalNow() -> System.LocalDateTime
-        call System.LocalDateTime::Capture()
-        ret
+.interface System.Clock
+    .property instance Now() -> System.Instant
+        .get instance System.Clock::get_Now()
+    .end
+    .method instance get_Now() -> System.Instant
     .end
 .end

@@ -29,7 +29,10 @@ fn readonly_time_body_cannot_mutate_its_receiver() {
     let library = calendar_library().replace(
         ".method instance readonly byref get_Ticks() -> Int64\n",
         ".method instance readonly byref get_Ticks() -> Int64\nldarg 0\nldc.i8 0\nstfld System.Time::StoredTicks\npop\n");
-    let p = with_library(".module Probe\n.function Read(System.Time& value) -> Int64\nldarg value\ncall instance System.Time::get_Ticks()\nret\n.end", &library);
+    let p = with_library(
+        ".module Probe\n.function Read(System.Time& value) -> Int64\nldarg value\ncall instance System.Time::get_Ticks()\nret\n.end",
+        &library,
+    );
     let error = p.verify().unwrap_err().to_string();
     assert!(error.contains("readonly"), "{error}");
 }

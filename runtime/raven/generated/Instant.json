@@ -1,6 +1,6 @@
 {
   "format": "raven-library-bootstrap-v1",
-  "owner": "System.RuntimeTypeHandle",
+  "owner": "System.Instant",
   "inputs": {
     "runtime/raven/src/System/Duration.rvn": "321a44237e5990cf6ec7d1432a279145f84d2ecaa32675f5b95636801b0f8e44",
     "runtime/raven/src/System/Instant.rvn": "87c951b8e837eea48b5c306de89056e4ec19ed562cf6834475b27f54f70230dc",
@@ -31,10 +31,16 @@
     "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
   },
   "outputs": {
-    "RuntimeTypeHandle.methods.neoil": "fbc32fb37c52441219461378a9467d698f470476859405fb9bf4cda573ebf67d",
-    "RuntimeTypeHandle.helpers.neoil": "58e422f6207fc4ac4e28dea8c50b30b01910e4de042d3406dbcb0d51960412ba"
+    "Instant.methods.neoil": "d189090c09a353f26ea1deeff0daacd45da499d8afcc7c8c239fc7dd58255a1a",
+    "Instant.helpers.neoil": "82e735f375c46fc3be9434ca727846589333bafbdc0c7e3d24d7d498caf27fdd"
   },
   "compilerSha256": "744ad87d9a6ec3d8b5691e72d0cd077b154af51615387b5f6bb171daa89fb370",
   "coreSha256": "8514d154953a26bfa7b3f8ad6828c954f171a948cc64b8222951ea51cb66dc25",
-  "exports": []
+  "exports": [
+    "FromUnixTimeTicks(Int64) -> System.Instant",
+    "readonly byref ToLocalDateTime() -> System.LocalDateTime",
+    "readonly byref get_UnixTimeTicks() -> Int64",
+    "readonly byref Equals(System.Instant) -> Boolean",
+    "readonly byref CompareTo(System.Instant) -> Int32"
+  ]
 }

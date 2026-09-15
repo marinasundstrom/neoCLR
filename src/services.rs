@@ -18,6 +18,7 @@ pub enum RuntimeService {
     CharacterClassification,
     MathOperations,
     LocalClock,
+    WallClock,
     ProcessEnvironment,
     PathOperations,
     ErrorValues,
@@ -62,7 +63,8 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             crate::native::Binding::PathCombine | crate::native::Binding::PathGetFileName => {
                 RuntimeService::PathOperations
             }
-            crate::native::Binding::LocalClock => RuntimeService::LocalClock,
+            crate::native::Binding::UnixTimeToLocal => RuntimeService::LocalClock,
+            crate::native::Binding::UnixTimeTicks => RuntimeService::WallClock,
             crate::native::Binding::Math(_) => RuntimeService::MathOperations,
             crate::native::Binding::Reflection(_)
             | crate::native::Binding::TypeName
@@ -93,7 +95,7 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
         }];
         if matches!(
             crate::native::bind(function)?,
-            crate::native::Binding::LocalClock | crate::native::Binding::EnvironmentArguments
+            crate::native::Binding::UnixTimeToLocal | crate::native::Binding::EnvironmentArguments
         ) {
             uses.push(ServiceUse {
                 service: RuntimeService::ManagedArrays,

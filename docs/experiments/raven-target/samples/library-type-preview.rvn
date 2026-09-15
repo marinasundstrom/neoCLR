@@ -1,0 +1,15 @@
+import System.*
+import System.Console.*
+
+func Main() {
+    let type = typeof(int)
+    WriteLine(type.Name)
+    if type.IsValueType {
+        WriteLine("Value type")
+    }
+
+    let metadata = type.Info
+    for method in metadata.GetMethods() {
+        WriteLine(method.Name)
+    }
+}

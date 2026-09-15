@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-15
 
+- Add the initial Clock.Now/Instant API with SystemClock, Raven-authored Instant
+  and Duration values, and system-zone Instant.ToLocalDateTime conversion. Values
+  use signed 100 ns ticks; Instant uses the Unix epoch. LocalDateTime now contains
+  only Date and Time. Remove Clock.GetLocalNow and UtcOffsetSeconds; examples use
+  Raven and clock injection. Configurable zones/calendars and duration arithmetic
+  remain future work. Runtime tests replace the archived Neo clock smoke example.
+
 - Replace placeholder parameter names in Raven-authored Date, Time and Type APIs
   and their reference metadata with descriptive names. Named calls must use the
   new labels (for example `year`, `ticks`, `other` and `index`); positional calls

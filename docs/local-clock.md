@@ -1,5 +1,9 @@
 # Local system clock
 
+> Historical API, superseded 2026-09-15 by [Clock.Now and Instant](instant-clock.md).
+> `Clock.GetLocalNow` and `LocalDateTime.UtcOffsetSeconds` are no longer current APIs.
+> The description below records the earlier implementation. New samples use Raven.
+
 Implemented 2026-09-08. `System.Clock.GetLocalNow()` reads the host clock and returns
 an owned `System.LocalDateTime` snapshot with readonly properties:
 

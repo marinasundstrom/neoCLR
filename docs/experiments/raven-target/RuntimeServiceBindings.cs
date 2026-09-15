@@ -10,6 +10,7 @@ static class RuntimeServiceBindings
     static readonly (string Name, string[] Args, string Result)[] Members =
         UnaryMath.Select(n => ("Math" + n, new[] { "Double" }, "Double"))
         .Concat(BinaryMath.Select(n => ("Math" + n, new[] { "Double", "Double" }, "Double"))).Concat(new (string Name, string[] Args, string Result)[] {
+            ("LocalDateTime", ["Int64"], "System.LocalDateTime"),
             ("PathCombine", ["String", "String"], "String"),
             ("PathGetFileName", ["String"], "String"),
             ("WriteAllText", ["String", "String", "Int32"], "Int32"),
@@ -30,7 +31,7 @@ static class RuntimeServiceBindings
         }).ToArray();
     static string CSharp(string type) => type switch {
         "Double" => "double", "String" => "string", "Int32" => "int", "Char" => "char",
-        "Boolean" => "bool",
+        "Boolean" => "bool", "Int64" => "long",
         _ when type.StartsWith("System.") => type,
         _ when type.StartsWith("arrayref<") => CSharp(type[9..^1]) + "[]",
         _ => throw new InvalidDataException("Unsupported runtime service declaration.")
@@ -49,6 +50,8 @@ static class RuntimeServiceBindings
             t => ReflectionBindings.Type(t) ?? ProcessBindings.ArrayType(t) ?? GenericUnionBindings.Type(t));
         if (!Members.Any(m => m.Name == reference.Name && m.Args.SequenceEqual(args) && m.Result == result))
             throw new InvalidDataException("Unsupported runtime service signature: " + reference.FullName);
+        if (reference.Name == "LocalDateTime")
+            return new("System.LocalDateTime::FromUnixTimeTicks", args, result);
         if (reference.Name == "TypeInfo")
             return new("System.Reflection.TypeInfo::FromHandle", args, result);
         if (result.StartsWith("arrayref<"))

@@ -64,9 +64,11 @@ def main():
     page = (SOURCE / 'index.html').read_text(encoding='utf-8')
     raven = 'docs/experiments/raven-target/samples/'
     samples = {
+        'CLOCK_SAMPLE': (raven + 'library-instants.rvn', 'func ShowCurrentTime', '\n}', True),
+        'INTROSPECTION_SAMPLE': (raven + 'library-type-preview.rvn', 'func Main', '\n}', True),
         'UNION_SAMPLE': (raven + 'library-query-terminals.rvn', 'func PrintOptional', '\nfunc OnlyPositive', False),
         'FUNC_SAMPLE': (raven + 'application-delegates.rvn', '    var shared = 7', '    WriteLine(shared)', True),
-        'DATE_SAMPLE': (raven + 'library-calendar.rvn', '    CheckDate(Date.Create(2024', '    CheckDate(Date.FromDayNumber(-1))', True),
+        'DATE_SAMPLE': (raven + 'library-calendar.rvn', '    CheckDate(Date.Create(day: 29', '    CheckDate(Date.FromDayNumber(-1))', True),
         'RAVEN_SAMPLE': (raven + 'library-propagation.rvn', 'func Normalize', '\n}', True),
         'IL_SAMPLE': ('examples/preview/result-void.neoil', '.function Complete', '.end', True),
         'OPTION_SAMPLE': (raven + 'library-query-terminals.rvn', 'func FirstPositive', '\n}', True),

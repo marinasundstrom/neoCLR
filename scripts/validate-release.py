@@ -119,7 +119,9 @@ def main():
                 raise RuntimeError("source/artifact output mismatch: " + name)
             report["smoke_programs"].append(name)
         # Dynamic programs need semantic checks rather than identical wall-clock output.
-        for name in ["environment", "local-clock", "file-report"]:
+        # Clock coverage now lives in Rust runtime tests and Raven library-instants;
+        # the historical Neo clock sample predates the Clock interface.
+        for name in ["environment", "file-report"]:
             program = source / "examples/source" / (name + ".neo")
             artifact = output / (name + ".neo.json")
             run([executable, "assemble", program, artifact], source)
@@ -139,24 +141,15 @@ def main():
                     guest_args = ["--", fixture, output]
                 elif name == "environment":
                     guest_args = ["--", "argument with spaces", "--gc-stats"]
-                before = datetime.now(timezone.utc).timestamp()
                 command = [str(executable), "run", str(input_path), "--show-result"] + list(map(str, guest_args))
                 result = subprocess.run(command, cwd=source, env=smoke_env,
                                         capture_output=True, text=True, encoding="utf-8", check=True)
-                after = datetime.now(timezone.utc).timestamp()
                 lines = result.stdout.splitlines()
                 if result.stderr.strip() != "=> Int32(0)":
                     raise RuntimeError("guest smoke failure: " + name + ": " + result.stderr)
                 if not lines:
                     raise RuntimeError("missing guest output: " + name)
-                if name == "local-clock":
-                    if len(lines) != 10:
-                        raise RuntimeError("unexpected local-clock output")
-                    parts = [int(lines[i]) for i in [1, 2, 3, 5, 6, 7]]
-                    instant = datetime(*parts, tzinfo=timezone.utc).timestamp() - int(lines[9])
-                    if not before - 1 <= instant <= after:
-                        raise RuntimeError("local-clock snapshot differs from host instant")
-                elif name == "environment":
+                if name == "environment":
                     if lines[:3] != [str(input_path), "argument with spaces", "--gc-stats"]:
                         raise RuntimeError("guest arguments differ from supplied arguments")
                     if lines[3:5] != [str(source), "archive validation"]:

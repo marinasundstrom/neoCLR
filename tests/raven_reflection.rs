@@ -14,10 +14,15 @@ fn library() -> &'static Module {
 #[test]
 fn handle_fields_must_be_assigned_by_class_constructors() {
     for body in ["", "ldarg this\nldfld Holder::Handle\npop\n"] {
-        let text = format!(".module Probe\n.entry Main\n.type class Holder\n.field private Handle System.RuntimeTypeHandle\n.method instance .ctor() -> noresult\n{body}ret\n.end\n.end\n.function Main() -> Holder\nnewobj instance Holder::.ctor()\nret\n.end");
+        let text = format!(
+            ".module Probe\n.entry Main\n.type class Holder\n.field private Handle System.RuntimeTypeHandle\n.method instance .ctor() -> noresult\n{body}ret\n.end\n.end\n.function Main() -> Holder\nnewobj instance Holder::.ctor()\nret\n.end"
+        );
         let app = assemble(&text).unwrap();
         let program = LoadedProgram::with_library(&app, library()).unwrap();
-        let error = program.run(Limits::default()).err().expect("uninitialized handle must fault");
+        let error = program
+            .run(Limits::default())
+            .err()
+            .expect("uninitialized handle must fault");
         assert!(error.to_string().contains("uninitialized"), "{error}");
     }
 }

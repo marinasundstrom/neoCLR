@@ -10,6 +10,8 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    'Duration': 'System.Duration',
+    'Instant': 'System.Instant',
     'Type': 'System.Type',
     'RuntimeTypeHandle': "System.RuntimeTypeHandle",
     'Value': "System.Value",
@@ -35,6 +37,8 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    'Duration': 'runtime/raven/src/System/Duration.rvn',
+    'Instant': 'runtime/raven/src/System/Instant.rvn',
     'Type': 'runtime/raven/src/System/Type.rvn',
     'RuntimeTypeHandle': "runtime/raven/src/System/RuntimeTypeHandle.rvn",
     'Value': "runtime/raven/src/System/Value.rvn",

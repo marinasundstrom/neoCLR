@@ -9,10 +9,11 @@ static class InterfaceBindings
         public interface Closable<E> { Result<PropagationUnit,E> Close(); }
         """;
     static readonly HashSet<string> Contracts = new() { "System.Equatable", "System.Comparable", "System.Clonable", "System.Closable" };
-    public static bool IsInterface(string type) => Contracts.Any(c => type.StartsWith(c + "<", StringComparison.Ordinal));
+    public static bool IsInterface(string type) => type == "System.Clock" || Contracts.Any(c => type.StartsWith(c + "<", StringComparison.Ordinal));
     public static string? Type(TypeReference type, Func<TypeReference, string>? parameterMap = null)
     {
         if (!RuntimeSignatures.IsCore(type.Scope)) return null;
+        if (type.FullName == "System.Clock" && !type.IsValueType) return "System.Clock";
         if (type.FullName == "System.Object") return "System.Object";
         if (type is not GenericInstanceType g || g.IsValueType || g.GenericArguments.Count != 1) return null;
         var name = g.ElementType.FullName.Split('`')[0];
@@ -21,10 +22,11 @@ static class InterfaceBindings
         return element is null ? null : name + "<" + element + ">";
     }
     public static bool Converts(string source, string target) => IsInterface(target)
-        && (source == "System.Object" || source == "String" || ReflectionBindings.IsReference(source));
+        && (source == "System.Object" || source == "String" || ReflectionBindings.IsReference(source) || CalendarBindings.IsReference(source));
     public static string Convert(string source, string target) => Converts(source,target) ? "castclass " + target + "\n" : "";
     public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition)
     {
+        if (reference.DeclaringType.FullName == "System.Clock") return CalendarBindings.Bind(reference, definition);
         var owner = Type(reference.DeclaringType);
         if (owner is null || !IsInterface(owner)) return null;
         var (args, result) = RuntimeSignatures.Match(reference, definition, t => Type(t) ?? ReflectionBindings.Type(t) ?? GenericUnionBindings.Type(t));
@@ -58,7 +60,7 @@ static class InterfaceBindings
     {
         foreach (var name in new[]{"SByte","Byte","Int16","UInt16","Char","Int32","UInt32","Int64","UInt64","IntPtr","UIntPtr","Single","Double","Boolean"})
             source = source.Replace("public struct " + name + " {", "public struct " + name + " : Comparable<" + name + ">" + (name == "Int32" ? ", Equatable<Int32>" : "") + " {");
-        foreach (var name in new[]{"Date","Time"})
+        foreach (var name in new[]{"Date","Time","Instant","Duration"})
             source = source.Replace("public struct " + name + " {", "public struct " + name + " : Comparable<" + name + ">, Equatable<" + name + "> {");
         source = source.Replace("public sealed class String {", "public sealed class String : Equatable<String> {");
         source = source.Replace("public class Type {", "public class Type : Equatable<Type> {");

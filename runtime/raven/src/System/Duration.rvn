@@ -1,0 +1,29 @@
+namespace System
+
+public struct Duration : Comparable<Duration>, Equatable<Duration> {
+    private field StoredTicks: long
+
+    private init(ticks: long) {
+        StoredTicks = ticks
+    }
+
+    static func FromTicks(ticks: long) -> Duration {
+        return Duration(ticks)
+    }
+
+    val Ticks: long { get => StoredTicks }
+
+    func Equals(other: Duration) -> bool {
+        return StoredTicks == other.StoredTicks
+    }
+
+    func CompareTo(other: Duration) -> int {
+        if StoredTicks < other.StoredTicks {
+            return -1
+        }
+        if StoredTicks > other.StoredTicks {
+            return 1
+        }
+        return 0
+    }
+}

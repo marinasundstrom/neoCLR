@@ -1,7 +1,8 @@
 import System.*
 import System.Console.*
 func Main() {
-    let now = Clock.GetLocalNow()
+    let clock: Clock = SystemClock()
+    let now = clock.Now.ToLocalDateTime()
     let date = now.Date
     let time = now.Time
     WriteLine(date.Year)
@@ -10,5 +11,4 @@ func Main() {
     WriteLine(time.Hour)
     WriteLine(time.Minute)
     WriteLine(time.Second)
-    WriteLine(now.UtcOffsetSeconds)
 }

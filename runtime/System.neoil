@@ -75,9 +75,12 @@
 .include "System/InvalidDateError.neoil"
 .include "System/InvalidTimeError.neoil"
 
+.include "raven/Instant.neoil"
+.include "raven/Duration.neoil"
 .include "System/Clock.neoil"
+.include "System/SystemClock.neoil"
+.include "neoCLR/Runtime/UnixTimeTicks.neoil"
 .include "System/LocalDateTime.neoil"
-.include "neoCLR/Runtime/LocalClock.neoil"
 
 .include "System/EnvironmentError.neoil"
 .include "System/Environment.neoil"

@@ -770,3 +770,12 @@ Remaining primitive work: Int32 still combines Raven Divide with its existing IL
 parsing, formatting, equality and comparison members; IntPtr/UIntPtr need the missing
 native-integer operator/conversion surface; Void needs the core-authoring boundary
 above. These are explicit follow-ups rather than claimed completed ports.
+
+## Initial time values and clock
+
+`System/Instant.rvn` and `System/Duration.rvn` join the shared authoring project.
+Their value layouts, factory names and parameters are checked against the experimental
+reference assembly just like Date and Time. Clock.Now and SystemClock use ordinary
+CLI interface/class metadata. No Raven compiler changes are required. The bootstrap
+LocalDateTime service maps supplied Unix ticks to the existing runtime construction
+boundary; it does not select arbitrary host code. See [the contract and validation](instant-clock.md).

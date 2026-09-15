@@ -1,0 +1,2 @@
+.include "generated/Duration.methods.neoil"
+.include "generated/Duration.helpers.neoil"

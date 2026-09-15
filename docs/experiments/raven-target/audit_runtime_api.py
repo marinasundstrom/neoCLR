@@ -21,7 +21,7 @@ groups = {
     'unimplemented-contracts': ('Clonable Closable', []),
     'collections': ('Array ArrayList List Iterable Iterator', ['library-managed-array-metadata.rvn', 'library-array-shapes.rvn', 'library-reference-payloads.rvn', 'library-generic-collections.rvn']),
     'delegates': ('Func', ['library-delegates.rvn', 'library-array-callbacks.rvn']),
-    'calendar': ('Date Time LocalDateTime Clock', ['library-calendar.rvn', 'library-clock.rvn']),
+    'calendar': ('Date Time LocalDateTime Clock SystemClock', ['library-calendar.rvn', 'library-clock.rvn']),
     'process': ('Environment Console', ['library-environment.rvn', 'library-console.rvn']),
     'files': ('File Path', ['library-files.rvn', 'library-paths.rvn']),
     'math': ('Math', ['library-floating-math.rvn', 'library-math.rvn', 'library-clamp.rvn']),
@@ -95,6 +95,11 @@ for file in source['sourceFiles']:
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-char-struct',
                      'tests': ['tests/character_classification.rs', 'docs/experiments/raven-target/verify_scalar_library.py'],
                      'note': 'System/Char.rvn owns comparison and all sixteen predicates; UTF-16 units and native Unicode category behavior are unchanged.'})
+        continue
+    if file.startswith(('runtime/raven/generated/Instant.', 'runtime/raven/generated/Duration.')):
+        rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-time-values',
+                     'samples': ['library-instants.rvn'], 'tests': ['tests/instant_clock.rs'],
+                     'note': 'Signed 100 ns tick values; Instant uses Unix epoch, Duration has no epoch. System-zone conversion is a bounded demo API.'})
         continue
     if file.startswith('runtime/raven/generated/Int32.'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-scalar-bootstrap',

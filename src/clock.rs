@@ -2,8 +2,28 @@
 use crate::{Fault, Value, metadata::Type};
 use chrono::{DateTime, Datelike, Local, Offset, TimeZone, Timelike};
 
-pub(crate) fn read_local() -> Result<Value, Fault> {
-    components(Local::now())
+pub(crate) fn read_instant() -> Result<Value, Fault> {
+    instant_ticks(chrono::Utc::now()).map(Value::Int64)
+}
+
+// Floor to 100 ns: timestamps before the Unix epoch retain their signed position.
+fn instant_ticks(now: DateTime<chrono::Utc>) -> Result<i64, Fault> {
+    if now.timestamp_subsec_nanos() >= 1_000_000_000 {
+        return Err(Fault::new("leap-second clock reading is unsupported"));
+    }
+    now.timestamp()
+        .checked_mul(10_000_000)
+        .and_then(|ticks| ticks.checked_add(i64::from(now.timestamp_subsec_nanos() / 100)))
+        .ok_or_else(|| Fault::new("system time is outside the supported Instant range"))
+}
+
+pub(crate) fn local_at(ticks: i64) -> Result<Value, Fault> {
+    let instant = DateTime::from_timestamp(
+        ticks.div_euclid(10_000_000),
+        (ticks.rem_euclid(10_000_000) * 100) as u32,
+    )
+    .ok_or_else(|| Fault::new("instant is outside the supported calendar range"))?;
+    components(instant.with_timezone(&Local))
 }
 
 fn components<T: TimeZone>(now: DateTime<T>) -> Result<Value, Fault> {
@@ -32,6 +52,23 @@ fn components<T: TimeZone>(now: DateTime<T>) -> Result<Value, Fault> {
 mod tests {
     use super::*;
     use chrono::{FixedOffset, Utc};
+    #[test]
+    fn ticks_preserve_epoch_negative_instants_and_precision() {
+        for (seconds, nanos, expected) in [
+            (0, 0, 0),
+            (0, 199, 1),
+            (-1, 999_999_999, -1),
+            (-1, 0, -10_000_000),
+        ] {
+            assert_eq!(
+                instant_ticks(DateTime::from_timestamp(seconds, nanos).unwrap()).unwrap(),
+                expected
+            );
+        }
+        assert!(local_at(i64::MAX).is_err());
+        assert!(local_at(i64::MIN).is_err());
+    }
+
     #[test]
     fn one_instant_keeps_date_time_and_offset_consistent_across_midnight() {
         let utc = Utc

@@ -10,7 +10,8 @@ pub(crate) enum Binding {
     EnvironmentVariable,
     PathCombine,
     PathGetFileName,
-    LocalClock,
+    UnixTimeTicks,
+    UnixTimeToLocal,
     Math(crate::math::Operation),
     Reflection(crate::reflection::Query),
     TypeName,
@@ -74,9 +75,10 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         ("neoCLR.Runtime.PathGetFileName", [Type::String]) => {
             (Binding::PathGetFileName, Type::String)
         }
-        ("neoCLR.Runtime.LocalClock", []) => {
-            (Binding::LocalClock, Type::Array(Box::new(Type::Int32)))
+        ("neoCLR.Runtime.UnixTimeToLocal", [Type::Int64]) => {
+            (Binding::UnixTimeToLocal, Type::Array(Box::new(Type::Int32)))
         }
+        ("neoCLR.Runtime.UnixTimeTicks", []) => (Binding::UnixTimeTicks, Type::Int64),
         ("neoCLR.Runtime.ParseInt32", [Type::String]) => (Binding::ParseInt32, Type::Value),
         ("neoCLR.Runtime.Int32ToString", [Type::Int32]) => (Binding::Int32ToString, Type::String),
         ("neoCLR.Runtime.Fault", [Type::String]) => (Binding::Fault, Type::Void),
@@ -192,7 +194,8 @@ impl Binding {
             (Self::PathGetFileName, [Value::String(path)]) => {
                 Ok(Value::String(crate::path::file_name(path)))
             }
-            (Self::LocalClock, []) => crate::clock::read_local(),
+            (Self::UnixTimeToLocal, [Value::Int64(ticks)]) => crate::clock::local_at(*ticks),
+            (Self::UnixTimeTicks, []) => crate::clock::read_instant(),
             (Self::TypeName, [Value::RuntimeTypeHandle(handle)]) => {
                 Ok(Value::String(handle.name.clone()))
             }

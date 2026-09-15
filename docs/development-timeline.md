@@ -3520,3 +3520,28 @@ extended it to ten numeric/Boolean structs. Kept existing APIs and comparison
 behavior. Native-sized integer types retain IL while their operator/conversion
 reference contracts are incomplete; the corresponding comparison compiles against
 .NET with the same Raven compiler. No Raven compiler changes are included.
+
+## 2026-09-15 — Minimal clock layer and public API preview
+
+**Author direction.** Introduce Clock.Now returning Instant, a SystemClock backed by
+system time, and Duration. Keep the initial layer small. The author then asked for
+system-local rendering into LocalDateTime for the demo, and a website preview of
+both this API and the Type/introspection versus TypeInfo/reflection boundary.
+The author corrected the assistant's attempt to update an archived `.neo` sample:
+current examples must use Raven.
+
+**Proposal and refinement.** The author supplied the broader Time API v1 proposal
+(Instant/Duration, civil time, separate offsets, zones, calendars and Period) and
+asked that the implementation comply with its minimal subset. The assistant chose
+signed 100 ns ticks, a narrow injectable clock and a provisional system-zone
+conversion. To match the proposed civil-time boundary, LocalDateTime now contains
+only Date and Time; the old static Clock.GetLocalNow and offset property are removed.
+FixedClock is demonstrated as an application-defined test double, not a new library
+class. The broader proposal remains future work.
+
+**Actions.** Instant and Duration are authored in Raven; system-clock and local
+conversion services use typed runtime calls. Raven examples demonstrate clock
+substitution. Website excerpts come from executable Raven samples and distinguish
+current development APIs from the published preview. See [the minimal contract](instant-clock.md)
+and [the broader proposal](date-time-design.md). No Raven compiler or .NET target
+changes are part of this slice.

@@ -1,0 +1,136 @@
+; Generated from runtime/raven/src/System/Instant.rvn. Regenerate with build_runtime_library.py.
+.type System.Instant
+.implements System.Comparable<System.Instant>
+.implements System.Equatable<System.Instant>
+.field private StoredTicks Int64
+.property instance UnixTimeTicks() -> Int64
+.get instance System.Instant::get_UnixTimeTicks()
+.end
+.method private instance byref .ctor(Int64) -> Void
+.local Int64 local0
+ldc.i8 0
+stloc local0
+M00000001_IL_0000:
+M00000001_IL_0001:
+ldarg 0
+M00000001_IL_0002:
+pop
+M00000001_IL_0007:
+M00000001_IL_0008:
+ldarg 1
+M00000001_IL_0009:
+stloc local0
+M00000001_IL_000a:
+ldarg 0
+M00000001_IL_000b:
+ldloc local0
+M00000001_IL_000c:
+stfld System.Instant::StoredTicks
+pop
+M00000001_IL_0011:
+ldvoid
+ret
+.end
+.method static FromUnixTimeTicks(Int64) -> System.Instant
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldarg 0
+M00000002_IL_0003:
+newobj instance System.Instant::.ctor(Int64)
+M00000002_IL_0008:
+ret
+.end
+.method instance readonly byref ToLocalDateTime() -> System.LocalDateTime
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+ldfld System.Instant::StoredTicks
+M00000003_IL_0008:
+call System.LocalDateTime::FromUnixTimeTicks(Int64)
+M00000003_IL_000d:
+ret
+.end
+.method instance readonly byref get_UnixTimeTicks() -> Int64
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+ldfld System.Instant::StoredTicks
+M00000004_IL_0008:
+ret
+.end
+.method instance readonly byref Equals(System.Instant) -> Boolean
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+ldfld System.Instant::StoredTicks
+M00000005_IL_0008:
+ldarga 1
+M00000005_IL_000a:
+ldfld System.Instant::StoredTicks
+M00000005_IL_000f:
+ceq
+call neoCLR.Library.System.Instant.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_0011:
+call neoCLR.Library.System.Instant.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance readonly byref CompareTo(System.Instant) -> Int32
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+ldfld System.Instant::StoredTicks
+M00000006_IL_0008:
+ldarga 1
+M00000006_IL_000a:
+ldfld System.Instant::StoredTicks
+M00000006_IL_000f:
+clt
+call neoCLR.Library.System.Instant.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_0011:
+brtrue M00000006_IL_001b
+M00000006_IL_0016:
+br M00000006_IL_001e
+M00000006_IL_001b:
+M00000006_IL_001c:
+ldc.i4 -1
+M00000006_IL_001d:
+ret
+M00000006_IL_001e:
+M00000006_IL_001f:
+M00000006_IL_0020:
+ldarg 0
+M00000006_IL_0021:
+ldfld System.Instant::StoredTicks
+M00000006_IL_0026:
+ldarga 1
+M00000006_IL_0028:
+ldfld System.Instant::StoredTicks
+M00000006_IL_002d:
+cgt
+call neoCLR.Library.System.Instant.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_002f:
+brtrue M00000006_IL_0039
+M00000006_IL_0034:
+br M00000006_IL_003c
+M00000006_IL_0039:
+M00000006_IL_003a:
+ldc.i4 1
+M00000006_IL_003b:
+ret
+M00000006_IL_003c:
+M00000006_IL_003d:
+M00000006_IL_003e:
+ldc.i4 0
+M00000006_IL_003f:
+ret
+.end
+.end

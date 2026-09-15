@@ -206,12 +206,12 @@ try:
         for version, expression, expected in (
             (16, 'System.Date.', ('Create', 'FromDayNumber')),
             (17, 'System.Time.', ('Create', 'FromTicks')),
-            (18, 'System.Clock.', ('GetLocalNow',)),
-            (19, 'now.', ('Date', 'Time', 'UtcOffsetSeconds'))):
-            text = 'func Main() {\n    let now = System.Clock.GetLocalNow()\n    ' + expression + '\n}'
+            (18, 'clock.', ('Now',)),
+            (19, 'now.', ('Date', 'Time'))):
+            text = 'func Main() {\n    let clock: System.Clock = System.SystemClock()\n    let now = clock.Now.ToLocalDateTime()\n    ' + expression + '\n}'
             send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})
             result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
-                'position': {'line': 2, 'character': len('    ' + expression)}, 'context': {'triggerKind': 1}}, True))
+                'position': {'line': 3, 'character': len('    ' + expression)}, 'context': {'triggerKind': 1}}, True))
             items = result if isinstance(result, list) else result['items']
             labels = sorted({item['label'] for item in items})
             if any(not any(label == name or label.startswith(name + '(') for label in labels) for name in expected):

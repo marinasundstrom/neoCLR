@@ -2439,7 +2439,7 @@ fn interpret_instructions(
                         if matches!(
                             binding,
                             crate::native::Binding::Reflection(_)
-                                | crate::native::Binding::LocalClock
+                                | crate::native::Binding::UnixTimeToLocal
                                 | crate::native::Binding::EnvironmentArguments
                         ) {
                             arrays_used = true;

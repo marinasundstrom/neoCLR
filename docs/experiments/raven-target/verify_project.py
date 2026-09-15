@@ -22,7 +22,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
         shutil.copyfile(args.project.resolve().parent / name, root / name)
     command = [sys.executable, str(bridge / 'run_project.py'), str(root / 'Demo.rvnproj'),
                *runner_arguments(args), '--runtime', str(args.runtime.resolve())]
-    cases = [('Basics', 'library-basics.rvn', '42\n1\n0\nLibrary calls from Raven\n'),
+    cases = [('Instants', 'library-instants.rvn', '0\n-1\n0\n-1\nSame duration\nSystem clock\n'),
+             ('Basics', 'library-basics.rvn', '42\n1\n0\nLibrary calls from Raven\n'),
              ('CasePayloads', 'library-case-payloads.rvn', '7\n42\nAfter\nUpdated error\n'),
              ('GenericUnions', 'library-unions.rvn', 'Ok\n0\nError\nFailure\n0\nFailure\nFound\nNone\n0\n'),
              ('ErrorValues', 'library-errors.rvn', (bridge / 'samples/library-errors.expected.txt').read_text()),

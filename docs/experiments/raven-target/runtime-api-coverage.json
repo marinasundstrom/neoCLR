@@ -1,6 +1,6 @@
 {
   "purpose": "Explicit source-by-source API audit. Samples and signature checks are evidence, not a claim of arbitrary generic/compiler support.",
-  "declarationCount": 683,
+  "declarationCount": 704,
   "sources": [
     {
       "file": "runtime/System/Equatable.neoil",
@@ -1268,33 +1268,95 @@
       ]
     },
     {
-      "file": "runtime/System/Clock.neoil",
+      "file": "runtime/raven/generated/Instant.methods.neoil",
+      "declarations": 7,
+      "disposition": "raven-authored-time-values",
+      "samples": [
+        "library-instants.rvn"
+      ],
+      "tests": [
+        "tests/instant_clock.rs"
+      ],
+      "note": "Signed 100 ns tick values; Instant uses Unix epoch, Duration has no epoch. System-zone conversion is a bounded demo API."
+    },
+    {
+      "file": "runtime/raven/generated/Instant.helpers.neoil",
       "declarations": 2,
+      "disposition": "raven-authored-time-values",
+      "samples": [
+        "library-instants.rvn"
+      ],
+      "tests": [
+        "tests/instant_clock.rs"
+      ],
+      "note": "Signed 100 ns tick values; Instant uses Unix epoch, Duration has no epoch. System-zone conversion is a bounded demo API."
+    },
+    {
+      "file": "runtime/raven/generated/Duration.methods.neoil",
+      "declarations": 6,
+      "disposition": "raven-authored-time-values",
+      "samples": [
+        "library-instants.rvn"
+      ],
+      "tests": [
+        "tests/instant_clock.rs"
+      ],
+      "note": "Signed 100 ns tick values; Instant uses Unix epoch, Duration has no epoch. System-zone conversion is a bounded demo API."
+    },
+    {
+      "file": "runtime/raven/generated/Duration.helpers.neoil",
+      "declarations": 2,
+      "disposition": "raven-authored-time-values",
+      "samples": [
+        "library-instants.rvn"
+      ],
+      "tests": [
+        "tests/instant_clock.rs"
+      ],
+      "note": "Signed 100 ns tick values; Instant uses Unix epoch, Duration has no epoch. System-zone conversion is a bounded demo API."
+    },
+    {
+      "file": "runtime/System/Clock.neoil",
+      "declarations": 3,
       "disposition": "calendar",
       "samples": [
         "library-calendar.rvn",
         "library-clock.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/SystemClock.neoil",
+      "declarations": 4,
+      "disposition": "calendar",
+      "samples": [
+        "library-calendar.rvn",
+        "library-clock.rvn"
+      ]
+    },
+    {
+      "file": "runtime/neoCLR/Runtime/UnixTimeTicks.neoil",
+      "declarations": 2,
+      "disposition": "implementation-service",
+      "callers": [
+        {
+          "service": "neoCLR.Runtime.UnixTimeTicks",
+          "file": "runtime/System/SystemClock.neoil",
+          "line": 10
+        },
+        {
+          "service": "neoCLR.Runtime.UnixTimeToLocal",
+          "file": "runtime/System/LocalDateTime.neoil",
+          "line": 6
+        }
       ]
     },
     {
       "file": "runtime/System/LocalDateTime.neoil",
-      "declarations": 7,
+      "declarations": 5,
       "disposition": "calendar",
       "samples": [
         "library-calendar.rvn",
         "library-clock.rvn"
-      ]
-    },
-    {
-      "file": "runtime/neoCLR/Runtime/LocalClock.neoil",
-      "declarations": 1,
-      "disposition": "implementation-service",
-      "callers": [
-        {
-          "service": "neoCLR.Runtime.LocalClock",
-          "file": "runtime/System/LocalDateTime.neoil",
-          "line": 7
-        }
       ]
     },
     {

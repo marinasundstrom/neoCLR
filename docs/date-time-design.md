@@ -195,3 +195,12 @@ calendar boundaries, DST gaps/overlaps, offset conversions and .NET interop. Com
 the layered model with .NET `DateOnly`/`TimeOnly`/`DateTime`/`DateTimeOffset`, Noda
 Time's `Instant`/`LocalDateTime`/`ZonedDateTime`, and the current neoCLR Date/Time
 contracts before treating the architecture as locked.
+
+## Minimal implementation — 2026-09-15
+
+The first implemented subset is documented in [Instant and Clock](instant-clock.md):
+Clock.Now, SystemClock, Raven-authored Instant and Duration, and system-local
+Instant.ToLocalDateTime. LocalDateTime now contains Date and Time only. The author
+explicitly requested keeping this change minimal and using Raven, not the archived
+Neo language. All remaining Time API v1 types above are planned, not implemented.
+The broader model remains design direction, not a frozen set of signatures.

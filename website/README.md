@@ -29,9 +29,9 @@ To enable once, use Settings → Pages → Build and deployment → Source → G
 or `gh api --method POST repos/marinasundstrom/neoCLR/pages -f build_type=workflow`.
 The site is independent of publishing a runtime release or a Raven Marketplace extension.
 
-The homepage embeds nine excerpts: Result propagation, generic Void in neoIL,
+The homepage embeds eleven excerpts: Result propagation, generic Void in neoIL,
 optional query results, collection capabilities, UTF-8 slicing, query cardinality,
-Func callbacks with a Void result, calendar validation and imported union patterns. The narrative covers
+Func callbacks with a Void result, calendar validation, imported union patterns, the initial Clock API and the Type/TypeInfo split. The latter two are explicitly marked as development APIs, separate from the published download. The narrative covers
 familiar semantics/metadata, the type system, the class library, Raven migration
 and tooling, and the planned Raven-authored library and missing API work.
 Edit the executable samples rather than duplicating code in HTML. The Pages workflow
