@@ -8,7 +8,8 @@
     "runtime/raven/src/Char.rvn": "5656f1ee320f33e132cc835b4aa11c5d2e5656e18b89647157bddd92ff9efa41",
     "runtime/raven/src/ArrayList.rvn": "9541be94fae19daa0503733ec9888baf4c177e4d9717f73f91979e3aa79acb42",
     "runtime/raven/src/HashMap.rvn": "510246a97d44a89074dfd35e2448d35f7e1104f4cbd75c7a53e99fae58bedbd4",
-    "runtime/raven/System.rvnproj": "3752d8f90d72375566e7fed4fcea8c83dbe66adfc46db78026e2b79c2b6a59ef",
+    "runtime/raven/src/Time.rvn": "98b667bf4320d7552dcc18a2391757b513f31774753f5543629d0311e726f1d0",
+    "runtime/raven/System.rvnproj": "4f81f905f5a592d2a5279bc025eb20cb2cb6e3c7c46e85bb9cc54dfa4a7d7aef",
     "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
   },
   "outputs": {
@@ -16,7 +17,7 @@
     "HashMap.helpers.neoil": "954ea38278d35aa28995dac310e1164ff9d49cacfedcccd035057e74e2ea6407"
   },
   "compilerSha256": "744ad87d9a6ec3d8b5691e72d0cd077b154af51615387b5f6bb171daa89fb370",
-  "coreSha256": "a47fd3bb9f288752a2c333cbfe438d9eb20bd9346a463b68febcf701ec4bfe22",
+  "coreSha256": "8989c17caa60512fd553706d49c177d1d3eb052fe1910a4a459519030c8e6d0f",
   "exports": [
     ".ctor(System.Func<T0,T0,Boolean>,System.Func<T0,Int32>) -> noresult",
     "get_Count() -> Int32",

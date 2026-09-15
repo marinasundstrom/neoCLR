@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-15
 
+- Port Time to Raven with its existing Result factories, tick boundaries, properties
+  and comparison contracts preserved. Extend matched value-library imports with
+  interfaces, owned static factories, private constructors and verified readonly
+  receivers; project matching calendar layout metadata. Share calendar regression
+  cases across bundled and Raven profiles and test readonly/private access rejection.
+  Date migration and API redesign remain separate work; no Raven compiler change.
+
 - Record a new provisional Unicode-centred text-model proposal: canonical UTF-8 String
   storage, explicit UTF-8/UTF-16 representation views, constrained ASCII subset types
   and codec-based handling of other encodings. Mark the Raven-shaped examples as design

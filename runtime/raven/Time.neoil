@@ -1,0 +1,3 @@
+; Raven-authored value implementation for the current runtime profile.
+.include "generated/Time.methods.neoil"
+.include "generated/Time.helpers.neoil"

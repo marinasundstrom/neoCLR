@@ -5,8 +5,11 @@ using System.Text.RegularExpressions;
 // substitution of guest/application types: every exported signature must match the core.
 static class LibraryImplementation
 {
+    static readonly HashSet<MethodDefinition> ReadonlyReceivers = new();
+    public static bool IsReadonlyReceiver(MethodDefinition method) => ReadonlyReceivers.Contains(method);
     public static MethodDefinition[] Roots(ModuleDefinition source, ModuleDefinition core, string owner)
     {
+        ReadonlyReceivers.Clear();
         if (!Regex.IsMatch(owner, @"^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)+$"))
             throw new InvalidDataException("Invalid library owner.");
         var type = source.Types.SingleOrDefault(t => t.Namespace == owner && NamespaceFunctions.IsContainer(t)) ?? source.Types.SingleOrDefault(t => t.FullName.Split('`')[0] == owner)
@@ -53,14 +56,14 @@ static class LibraryImplementation
         {
             // Unlike reference classes, a value's instance layout is an ABI contract.
             // Start with scalar, nongeneric sequential records; do not infer layout.
-            if (type.HasGenericParameters || type.HasInterfaces || contract.HasInterfaces
+            if (type.HasGenericParameters
                 || !type.IsSequentialLayout || !contract.IsSequentialLayout
                 || type.PackingSize != contract.PackingSize || type.ClassSize != contract.ClassSize
                 || type.Fields.Count != contract.Fields.Count
                 || type.Fields.Zip(contract.Fields).Any(p => p.First.Name != p.Second.Name
                     || !SameType(p.First.FieldType, p.Second.FieldType)
                     || p.First.FieldType.MetadataType is not (MetadataType.Int32 or MetadataType.Int64 or MetadataType.Boolean)))
-                throw new InvalidDataException("Unsupported or mismatched value library layout.");
+                throw new InvalidDataException($"Unsupported or mismatched value library layout: source sequential={type.IsSequentialLayout}, pack={type.PackingSize}, size={type.ClassSize}, fields={string.Join(',', type.Fields.Select(f => f.Name + ":" + f.FieldType.FullName))}; reference sequential={contract.IsSequentialLayout}, pack={contract.PackingSize}, size={contract.ClassSize}, fields={string.Join(',', contract.Fields.Select(f => f.Name + ":" + f.FieldType.FullName))}.");
         }
         if (type.GenericParameters.Count != contract.GenericParameters.Count)
             throw new InvalidDataException("Instance library generic arity does not match reference contract.");
@@ -88,8 +91,8 @@ static class LibraryImplementation
             || contract.Fields.Any(f => !f.IsPrivate))
             throw new InvalidDataException("Instance library requires private mutable implementation fields.");
         var methods = type.Methods.ToArray();
-        if (methods.Length == 0 || methods.Any(m => !(m.IsPublic || m.IsPrivate && !m.IsConstructor && !m.IsVirtual) || !m.HasThis || !m.HasBody || m.HasGenericParameters
-            || m.ExplicitThis || m.CallingConvention != MethodCallingConvention.Default
+        if (methods.Length == 0 || methods.Any(m => !(m.IsPublic || m.IsPrivate && (!m.IsConstructor || type.IsValueType) && !m.IsVirtual) || (!m.HasThis && !type.IsValueType) || !m.HasBody || m.HasGenericParameters
+            || m.ExplicitThis || m.IsConstructor && m.IsStatic || m.CallingConvention != MethodCallingConvention.Default
             || m.Parameters.Any(p => p.IsOut || p.ParameterType.IsByReference)))
             throw new InvalidDataException("Unsupported instance library export.");
         // Private implementation helpers are not exports, but remain roots so even
@@ -104,6 +107,10 @@ static class LibraryImplementation
                 && c.Parameters.Zip(p.Parameters).All(a => MatchType(a.First.ParameterType, a.Second.ParameterType))
                 && c.GetMethod?.Name == p.GetMethod?.Name && c.SetMethod?.Name == p.SetMethod?.Name) != 1))
             throw new InvalidDataException("Instance library property does not match reference contract.");
+        foreach (var method in exports.Where(m => m.HasThis && !m.IsConstructor && type.IsValueType))
+            if (expected.Single(e => MatchMethod(e, method)).CustomAttributes.Any(a =>
+                a.AttributeType.FullName == "System.Runtime.CompilerServices.IsReadOnlyAttribute"))
+                ReadonlyReceivers.Add(method);
         ApplicationTypes.BindLibrary(type, owner);
         foreach (var method in methods) CheckMethod(method);
         return methods;

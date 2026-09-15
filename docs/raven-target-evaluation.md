@@ -880,3 +880,27 @@ execution was not tested.
 CheckedStorage and private implementation-type admission remain in the neoCLR
 library importer. They add no Runtime Contract option or Raven compiler special case.
 See [the library authoring limits and validation](raven-system-library.md).
+
+
+### Deferred general parser candidate — 2026-09-15
+
+While porting Time, a compound comparison condition failed parsing. The minimal
+candidate below also produces RAV1001/RAV3600 with the experimental Raven compiler
+using its ordinary `--framework net11.0` target, without a neoCLR Runtime Contract:
+
+```raven
+func Check(hour: int) -> bool {
+    if (hour < 0) || (hour > 23) {
+        return false
+    }
+    return true
+}
+func Main() { Check(4) }
+```
+
+Time uses separate guard blocks to preserve behavior. No compiler fix was made.
+This is a deferred general Raven candidate, not a neoCLR policy: independently
+reproduce on Raven main, add parser/binding coverage and validate the fix on .NET
+before integration. The main-checkout binary was unavailable during this check;
+the observation establishes .NET-target reproduction on the experimental build,
+not a tested main-branch regression or NanoFramework result.

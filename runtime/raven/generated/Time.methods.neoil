@@ -1,0 +1,543 @@
+; Generated from runtime/raven/src/Time.rvn. Regenerate with build_runtime_library.py.
+.type System.Time
+.implements System.Comparable<System.Time>
+.implements System.Equatable<System.Time>
+.field private StoredTicks Int64
+.property instance Ticks() -> Int64
+.get instance System.Time::get_Ticks()
+.end
+.property instance Hour() -> Int32
+.get instance System.Time::get_Hour()
+.end
+.property instance Minute() -> Int32
+.get instance System.Time::get_Minute()
+.end
+.property instance Second() -> Int32
+.get instance System.Time::get_Second()
+.end
+.property instance Millisecond() -> Int32
+.get instance System.Time::get_Millisecond()
+.end
+.property instance FractionTicks() -> Int32
+.get instance System.Time::get_FractionTicks()
+.end
+.method private instance byref .ctor(Int64) -> Void
+.local Int64 local0
+ldc.i8 0
+stloc local0
+M00000001_IL_0000:
+M00000001_IL_0001:
+ldarg 0
+M00000001_IL_0002:
+pop
+M00000001_IL_0007:
+M00000001_IL_0008:
+ldarg 1
+M00000001_IL_0009:
+stloc local0
+M00000001_IL_000a:
+ldarg 0
+M00000001_IL_000b:
+ldloc local0
+M00000001_IL_000c:
+stfld System.Time::StoredTicks
+pop
+M00000001_IL_0011:
+ldvoid
+ret
+.end
+.method static Create(Int32,Int32,Int32) -> System.Result<System.Time,System.InvalidTimeError>
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldarg 0
+M00000002_IL_0003:
+ldarg 1
+M00000002_IL_0004:
+ldarg 2
+M00000002_IL_0005:
+ldc.i4 0
+M00000002_IL_0006:
+call System.Time::Create(Int32,Int32,Int32,Int32)
+M00000002_IL_000b:
+ret
+.end
+.method static Create(Int32,Int32,Int32,Int32) -> System.Result<System.Time,System.InvalidTimeError>
+.local Int32 local0
+.local Int32 local1
+.local Int32 local2
+.local Int32 local3
+.local Int64 local4
+ldc.i4 0
+stloc local0
+ldc.i4 0
+stloc local1
+ldc.i4 0
+stloc local2
+ldc.i4 0
+stloc local3
+ldc.i8 0
+stloc local4
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+stloc local0
+M00000003_IL_0004:
+M00000003_IL_0005:
+ldarg 1
+M00000003_IL_0006:
+stloc local1
+M00000003_IL_0007:
+M00000003_IL_0008:
+ldarg 2
+M00000003_IL_0009:
+stloc local2
+M00000003_IL_000a:
+M00000003_IL_000b:
+ldarg 3
+M00000003_IL_000c:
+stloc local3
+M00000003_IL_000d:
+M00000003_IL_000e:
+ldloc local0
+M00000003_IL_000f:
+ldc.i4 0
+M00000003_IL_0010:
+clt
+call neoCLR.Library.System.Time.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_0012:
+brtrue M00000003_IL_001c
+M00000003_IL_0017:
+br M00000003_IL_002c
+M00000003_IL_001c:
+call neoCLR.Library.System.Time.RuntimeErrorSystemInvalidTimeErrorNew()
+M00000003_IL_0021:
+call neoCLR.Library.System.Time.RuntimeUnion0(System.InvalidTimeError)
+M00000003_IL_0026:
+call neoCLR.Library.System.Time.RuntimeUnion1(System.Result.Error<System.InvalidTimeError>)
+M00000003_IL_002b:
+ret
+M00000003_IL_002c:
+M00000003_IL_002d:
+M00000003_IL_002e:
+ldloc local0
+M00000003_IL_002f:
+ldc.i4 23
+M00000003_IL_0031:
+cgt
+call neoCLR.Library.System.Time.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_0033:
+brtrue M00000003_IL_003d
+M00000003_IL_0038:
+br M00000003_IL_004d
+M00000003_IL_003d:
+call neoCLR.Library.System.Time.RuntimeErrorSystemInvalidTimeErrorNew()
+M00000003_IL_0042:
+call neoCLR.Library.System.Time.RuntimeUnion0(System.InvalidTimeError)
+M00000003_IL_0047:
+call neoCLR.Library.System.Time.RuntimeUnion1(System.Result.Error<System.InvalidTimeError>)
+M00000003_IL_004c:
+ret
+M00000003_IL_004d:
+M00000003_IL_004e:
+M00000003_IL_004f:
+ldloc local1
+M00000003_IL_0050:
+ldc.i4 0
+M00000003_IL_0051:
+clt
+call neoCLR.Library.System.Time.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_0053:
+brtrue M00000003_IL_005d
+M00000003_IL_0058:
+br M00000003_IL_006d
+M00000003_IL_005d:
+call neoCLR.Library.System.Time.RuntimeErrorSystemInvalidTimeErrorNew()
+M00000003_IL_0062:
+call neoCLR.Library.System.Time.RuntimeUnion0(System.InvalidTimeError)
+M00000003_IL_0067:
+call neoCLR.Library.System.Time.RuntimeUnion1(System.Result.Error<System.InvalidTimeError>)
+M00000003_IL_006c:
+ret
+M00000003_IL_006d:
+M00000003_IL_006e:
+M00000003_IL_006f:
+ldloc local1
+M00000003_IL_0070:
+ldc.i4 59
+M00000003_IL_0072:
+cgt
+call neoCLR.Library.System.Time.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_0074:
+brtrue M00000003_IL_007e
+M00000003_IL_0079:
+br M00000003_IL_008e
+M00000003_IL_007e:
+call neoCLR.Library.System.Time.RuntimeErrorSystemInvalidTimeErrorNew()
+M00000003_IL_0083:
+call neoCLR.Library.System.Time.RuntimeUnion0(System.InvalidTimeError)
+M00000003_IL_0088:
+call neoCLR.Library.System.Time.RuntimeUnion1(System.Result.Error<System.InvalidTimeError>)
+M00000003_IL_008d:
+ret
+M00000003_IL_008e:
+M00000003_IL_008f:
+M00000003_IL_0090:
+ldloc local2
+M00000003_IL_0091:
+ldc.i4 0
+M00000003_IL_0092:
+clt
+call neoCLR.Library.System.Time.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_0094:
+brtrue M00000003_IL_009e
+M00000003_IL_0099:
+br M00000003_IL_00ae
+M00000003_IL_009e:
+call neoCLR.Library.System.Time.RuntimeErrorSystemInvalidTimeErrorNew()
+M00000003_IL_00a3:
+call neoCLR.Library.System.Time.RuntimeUnion0(System.InvalidTimeError)
+M00000003_IL_00a8:
+call neoCLR.Library.System.Time.RuntimeUnion1(System.Result.Error<System.InvalidTimeError>)
+M00000003_IL_00ad:
+ret
+M00000003_IL_00ae:
+M00000003_IL_00af:
+M00000003_IL_00b0:
+ldloc local2
+M00000003_IL_00b1:
+ldc.i4 59
+M00000003_IL_00b3:
+cgt
+call neoCLR.Library.System.Time.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_00b5:
+brtrue M00000003_IL_00bf
+M00000003_IL_00ba:
+br M00000003_IL_00cf
+M00000003_IL_00bf:
+call neoCLR.Library.System.Time.RuntimeErrorSystemInvalidTimeErrorNew()
+M00000003_IL_00c4:
+call neoCLR.Library.System.Time.RuntimeUnion0(System.InvalidTimeError)
+M00000003_IL_00c9:
+call neoCLR.Library.System.Time.RuntimeUnion1(System.Result.Error<System.InvalidTimeError>)
+M00000003_IL_00ce:
+ret
+M00000003_IL_00cf:
+M00000003_IL_00d0:
+M00000003_IL_00d1:
+ldloc local3
+M00000003_IL_00d2:
+ldc.i4 0
+M00000003_IL_00d3:
+clt
+call neoCLR.Library.System.Time.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_00d5:
+brtrue M00000003_IL_00df
+M00000003_IL_00da:
+br M00000003_IL_00ef
+M00000003_IL_00df:
+call neoCLR.Library.System.Time.RuntimeErrorSystemInvalidTimeErrorNew()
+M00000003_IL_00e4:
+call neoCLR.Library.System.Time.RuntimeUnion0(System.InvalidTimeError)
+M00000003_IL_00e9:
+call neoCLR.Library.System.Time.RuntimeUnion1(System.Result.Error<System.InvalidTimeError>)
+M00000003_IL_00ee:
+ret
+M00000003_IL_00ef:
+M00000003_IL_00f0:
+M00000003_IL_00f1:
+ldloc local3
+M00000003_IL_00f2:
+ldc.i4 9999999
+M00000003_IL_00f7:
+cgt
+call neoCLR.Library.System.Time.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_00f9:
+brtrue M00000003_IL_0103
+M00000003_IL_00fe:
+br M00000003_IL_0113
+M00000003_IL_0103:
+call neoCLR.Library.System.Time.RuntimeErrorSystemInvalidTimeErrorNew()
+M00000003_IL_0108:
+call neoCLR.Library.System.Time.RuntimeUnion0(System.InvalidTimeError)
+M00000003_IL_010d:
+call neoCLR.Library.System.Time.RuntimeUnion1(System.Result.Error<System.InvalidTimeError>)
+M00000003_IL_0112:
+ret
+M00000003_IL_0113:
+M00000003_IL_0114:
+M00000003_IL_0115:
+ldloc local0
+M00000003_IL_0116:
+ldc.i4 60
+M00000003_IL_0118:
+mul
+M00000003_IL_0119:
+ldloc local1
+M00000003_IL_011a:
+add
+M00000003_IL_011b:
+ldc.i4 60
+M00000003_IL_011d:
+mul
+M00000003_IL_011e:
+ldloc local2
+M00000003_IL_011f:
+add
+M00000003_IL_0120:
+conv.i8
+M00000003_IL_0121:
+stloc local4
+M00000003_IL_0123:
+M00000003_IL_0124:
+ldloc local4
+M00000003_IL_0126:
+ldc.i8 10000000
+M00000003_IL_012f:
+mul
+M00000003_IL_0130:
+ldloc local3
+M00000003_IL_0131:
+conv.i8
+M00000003_IL_0132:
+add
+M00000003_IL_0133:
+newobj instance System.Time::.ctor(Int64)
+M00000003_IL_0138:
+call neoCLR.Library.System.Time.RuntimeUnion2(System.Time)
+M00000003_IL_013d:
+call neoCLR.Library.System.Time.RuntimeUnion3(System.Result.Ok<System.Time>)
+M00000003_IL_0142:
+ret
+.end
+.method static FromTicks(Int64) -> System.Result<System.Time,System.InvalidTimeError>
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+ldc.i8 0
+M00000004_IL_000c:
+clt
+call neoCLR.Library.System.Time.RuntimeBooleanToInt32(Boolean)
+M00000004_IL_000e:
+brtrue M00000004_IL_0018
+M00000004_IL_0013:
+br M00000004_IL_0028
+M00000004_IL_0018:
+call neoCLR.Library.System.Time.RuntimeErrorSystemInvalidTimeErrorNew()
+M00000004_IL_001d:
+call neoCLR.Library.System.Time.RuntimeUnion0(System.InvalidTimeError)
+M00000004_IL_0022:
+call neoCLR.Library.System.Time.RuntimeUnion1(System.Result.Error<System.InvalidTimeError>)
+M00000004_IL_0027:
+ret
+M00000004_IL_0028:
+M00000004_IL_0029:
+M00000004_IL_002a:
+ldarg 0
+M00000004_IL_002b:
+ldc.i8 863999999999
+M00000004_IL_0034:
+cgt
+call neoCLR.Library.System.Time.RuntimeBooleanToInt32(Boolean)
+M00000004_IL_0036:
+brtrue M00000004_IL_0040
+M00000004_IL_003b:
+br M00000004_IL_0050
+M00000004_IL_0040:
+call neoCLR.Library.System.Time.RuntimeErrorSystemInvalidTimeErrorNew()
+M00000004_IL_0045:
+call neoCLR.Library.System.Time.RuntimeUnion0(System.InvalidTimeError)
+M00000004_IL_004a:
+call neoCLR.Library.System.Time.RuntimeUnion1(System.Result.Error<System.InvalidTimeError>)
+M00000004_IL_004f:
+ret
+M00000004_IL_0050:
+M00000004_IL_0051:
+M00000004_IL_0052:
+ldarg 0
+M00000004_IL_0053:
+newobj instance System.Time::.ctor(Int64)
+M00000004_IL_0058:
+call neoCLR.Library.System.Time.RuntimeUnion2(System.Time)
+M00000004_IL_005d:
+call neoCLR.Library.System.Time.RuntimeUnion3(System.Result.Ok<System.Time>)
+M00000004_IL_0062:
+ret
+.end
+.method instance readonly byref get_Ticks() -> Int64
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+ldfld System.Time::StoredTicks
+M00000005_IL_0008:
+ret
+.end
+.method instance readonly byref get_Hour() -> Int32
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+ldfld System.Time::StoredTicks
+M00000006_IL_0008:
+ldc.i8 36000000000
+M00000006_IL_0011:
+div
+M00000006_IL_0012:
+conv.i4
+M00000006_IL_0013:
+ret
+.end
+.method instance readonly byref get_Minute() -> Int32
+M00000007_IL_0000:
+M00000007_IL_0001:
+M00000007_IL_0002:
+ldarg 0
+M00000007_IL_0003:
+ldfld System.Time::StoredTicks
+M00000007_IL_0008:
+ldc.i8 600000000
+M00000007_IL_0011:
+div
+M00000007_IL_0012:
+ldc.i8 60
+M00000007_IL_001b:
+rem
+M00000007_IL_001c:
+conv.i4
+M00000007_IL_001d:
+ret
+.end
+.method instance readonly byref get_Second() -> Int32
+M00000008_IL_0000:
+M00000008_IL_0001:
+M00000008_IL_0002:
+ldarg 0
+M00000008_IL_0003:
+ldfld System.Time::StoredTicks
+M00000008_IL_0008:
+ldc.i8 10000000
+M00000008_IL_0011:
+div
+M00000008_IL_0012:
+ldc.i8 60
+M00000008_IL_001b:
+rem
+M00000008_IL_001c:
+conv.i4
+M00000008_IL_001d:
+ret
+.end
+.method instance readonly byref get_Millisecond() -> Int32
+M00000009_IL_0000:
+M00000009_IL_0001:
+M00000009_IL_0002:
+ldarg 0
+M00000009_IL_0003:
+ldfld System.Time::StoredTicks
+M00000009_IL_0008:
+ldc.i8 10000
+M00000009_IL_0011:
+div
+M00000009_IL_0012:
+ldc.i8 1000
+M00000009_IL_001b:
+rem
+M00000009_IL_001c:
+conv.i4
+M00000009_IL_001d:
+ret
+.end
+.method instance readonly byref get_FractionTicks() -> Int32
+M0000000a_IL_0000:
+M0000000a_IL_0001:
+M0000000a_IL_0002:
+ldarg 0
+M0000000a_IL_0003:
+ldfld System.Time::StoredTicks
+M0000000a_IL_0008:
+ldc.i8 10000000
+M0000000a_IL_0011:
+rem
+M0000000a_IL_0012:
+conv.i4
+M0000000a_IL_0013:
+ret
+.end
+.method instance readonly byref Equals(System.Time) -> Boolean
+M0000000b_IL_0000:
+M0000000b_IL_0001:
+M0000000b_IL_0002:
+ldarg 0
+M0000000b_IL_0003:
+ldfld System.Time::StoredTicks
+M0000000b_IL_0008:
+ldarga 1
+M0000000b_IL_000a:
+ldfld System.Time::StoredTicks
+M0000000b_IL_000f:
+ceq
+call neoCLR.Library.System.Time.RuntimeBooleanToInt32(Boolean)
+M0000000b_IL_0011:
+call neoCLR.Library.System.Time.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance readonly byref CompareTo(System.Time) -> Int32
+M0000000c_IL_0000:
+M0000000c_IL_0001:
+M0000000c_IL_0002:
+ldarg 0
+M0000000c_IL_0003:
+ldfld System.Time::StoredTicks
+M0000000c_IL_0008:
+ldarga 1
+M0000000c_IL_000a:
+ldfld System.Time::StoredTicks
+M0000000c_IL_000f:
+clt
+call neoCLR.Library.System.Time.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_0011:
+brtrue M0000000c_IL_001b
+M0000000c_IL_0016:
+br M0000000c_IL_001e
+M0000000c_IL_001b:
+M0000000c_IL_001c:
+ldc.i4 -1
+M0000000c_IL_001d:
+ret
+M0000000c_IL_001e:
+M0000000c_IL_001f:
+M0000000c_IL_0020:
+ldarg 0
+M0000000c_IL_0021:
+ldfld System.Time::StoredTicks
+M0000000c_IL_0026:
+ldarga 1
+M0000000c_IL_0028:
+ldfld System.Time::StoredTicks
+M0000000c_IL_002d:
+cgt
+call neoCLR.Library.System.Time.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_002f:
+brtrue M0000000c_IL_0039
+M0000000c_IL_0034:
+br M0000000c_IL_003c
+M0000000c_IL_0039:
+M0000000c_IL_003a:
+ldc.i4 1
+M0000000c_IL_003b:
+ret
+M0000000c_IL_003c:
+M0000000c_IL_003d:
+M0000000c_IL_003e:
+ldc.i4 0
+M0000000c_IL_003f:
+ret
+.end
+.end

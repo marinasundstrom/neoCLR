@@ -65,6 +65,13 @@ for file in source['sourceFiles']:
                      'samples': ['library-list-filters.rvn', 'library-delegates.rvn', 'library-maps.rvn'],
                      'note': 'The complete class and private iterator are Raven-authored. Direct checked array storage replaces the legacy state wrapper; searches preserve captured buffer/extent and Option outcomes. Historical Neo profile unchanged.'})
         continue
+    if file == 'runtime/System/Time.neoil':
+        rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-value-bootstrap',
+                     'replacementFiles': ['runtime/raven/Time.neoil', 'runtime/raven/src/Time.rvn'],
+                     'samples': ['library-calendar.rvn', 'library-clock.rvn'],
+                     'tests': ['tests/raven_calendar.rs'],
+                     'note': 'Existing factories, tick boundaries, comparison and readonly access preserved. Historical Neo profile unchanged.'})
+        continue
     if file == 'runtime/System/Collections/List.neoil':
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'replaced-in-raven-profile',
                      'replacementFiles': ['runtime/raven/CollectionContracts.neoil', 'runtime/raven/List.neoil'],

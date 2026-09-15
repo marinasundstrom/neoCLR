@@ -30,6 +30,8 @@ def adapt(text: str, name: str) -> str:
 
 
 def build(path: Path) -> str:
+    if path == ROOT / 'runtime/System/Time.neoil':
+        return build(ROOT / 'runtime/raven/Time.neoil')
     if path == ROOT / 'runtime/System/Collections/ArrayList.neoil':
         return build(ROOT / 'runtime/raven/ArrayList.neoil')
     text = path.read_text()

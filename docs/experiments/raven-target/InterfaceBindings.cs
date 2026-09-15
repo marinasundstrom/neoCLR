@@ -10,14 +10,14 @@ static class InterfaceBindings
         """;
     static readonly HashSet<string> Contracts = new() { "System.Equatable", "System.Comparable", "System.Clonable", "System.Closable" };
     public static bool IsInterface(string type) => Contracts.Any(c => type.StartsWith(c + "<", StringComparison.Ordinal));
-    public static string? Type(TypeReference type)
+    public static string? Type(TypeReference type, Func<TypeReference, string>? parameterMap = null)
     {
         if (!RuntimeSignatures.IsCore(type.Scope)) return null;
         if (type.FullName == "System.Object") return "System.Object";
         if (type is not GenericInstanceType g || g.IsValueType || g.GenericArguments.Count != 1) return null;
         var name = g.ElementType.FullName.Split('`')[0];
         if (!Contracts.Contains(name)) return null;
-        var element = ReflectionBindings.Type(g.GenericArguments[0]) ?? GenericUnionBindings.Type(g.GenericArguments[0]);
+        var element = parameterMap?.Invoke(g.GenericArguments[0]) ?? ReflectionBindings.Type(g.GenericArguments[0]) ?? GenericUnionBindings.Type(g.GenericArguments[0]);
         return element is null ? null : name + "<" + element + ">";
     }
     public static bool Converts(string source, string target) => IsInterface(target)

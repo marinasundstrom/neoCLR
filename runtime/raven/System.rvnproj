@@ -17,4 +17,7 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'HashMap'">
     <Compile Include="src/HashMap.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Time'">
+    <Compile Include="src/Time.rvn" />
+  </ItemGroup>
 </Project>

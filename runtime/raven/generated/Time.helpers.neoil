@@ -1,0 +1,49 @@
+; Generated from runtime/raven/src/Time.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Time.RuntimeErrorSystemInvalidTimeErrorNew() -> System.InvalidTimeError
+newobj instance System.InvalidTimeError::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Time.RuntimeUnion0(System.InvalidTimeError arg0) -> System.Result.Error<System.InvalidTimeError>
+ldarg arg0
+newobj instance System.Result.Error<System.InvalidTimeError>::.ctor(System.InvalidTimeError)
+ret
+.end
+.function neoCLR.Library.System.Time.RuntimeUnion1(System.Result.Error<System.InvalidTimeError> arg0) -> System.Result<System.Time,System.InvalidTimeError>
+ldarg arg0
+newobj instance System.Result<System.Time,System.InvalidTimeError>::.ctor(System.Result.Error<System.InvalidTimeError>)
+ret
+.end
+.function neoCLR.Library.System.Time.RuntimeUnion2(System.Time arg0) -> System.Result.Ok<System.Time>
+ldarg arg0
+newobj instance System.Result.Ok<System.Time>::.ctor(System.Time)
+ret
+.end
+.function neoCLR.Library.System.Time.RuntimeUnion3(System.Result.Ok<System.Time> arg0) -> System.Result<System.Time,System.InvalidTimeError>
+ldarg arg0
+newobj instance System.Result<System.Time,System.InvalidTimeError>::.ctor(System.Result.Ok<System.Time>)
+ret
+.end
+.function neoCLR.Library.System.Time.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
+.function neoCLR.Library.System.Time.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end

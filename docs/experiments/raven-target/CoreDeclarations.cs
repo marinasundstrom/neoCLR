@@ -32,6 +32,7 @@ static class CoreDeclarations
         {
             using var image = Mono.Cecil.AssemblyDefinition.ReadAssembly(stream);
             var module = image.MainModule;
+            CalendarBindings.ProjectLayout(module);
             NamespaceFunctions.ProjectMath(module);
             NamespaceFunctions.ProjectFault(module);
             var unit = module.GetType("System.PropagationUnit");

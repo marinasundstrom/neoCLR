@@ -71,7 +71,7 @@ static class UnionImport
                 return "arrayref<" + ProfileType(array.ElementType) + ">";
             var collection = CollectionBindings.Type(type, libraryOwner is null ? null : t => ProfileType(t));
             if (collection is not null && collectionProfile) return collection;
-            return ApplicationTypes.Type(type) ?? InterfaceBindings.Type(type) ?? NativeMemoryBindings.Type(type) ?? ReflectionBindings.Type(type) ?? DelegateBindings.Type(type) ?? ProcessBindings.ArrayType(type) ?? GenericUnionBindings.Type(type) ?? CalendarBindings.Type(type) ?? PrimitiveBindings.Type(type) ?? ResultBindings.Type(type) ?? Type(type, result);
+            return ApplicationTypes.Type(type) ?? InterfaceBindings.Type(type, libraryOwner is null ? null : t => ProfileType(t)) ?? NativeMemoryBindings.Type(type) ?? ReflectionBindings.Type(type) ?? DelegateBindings.Type(type) ?? ProcessBindings.ArrayType(type) ?? GenericUnionBindings.Type(type) ?? CalendarBindings.Type(type) ?? PrimitiveBindings.Type(type) ?? ResultBindings.Type(type) ?? Type(type, result);
         }
         if (libraryOwner is not null)
         {
@@ -138,6 +138,7 @@ static class UnionImport
             var args = (method.HasThis ? new[] { ApplicationTypes.Receiver(method) } : Array.Empty<string>()).Concat(method.Parameters.Select(p => ProfileType(p.ParameterType))).ToArray();
             var valueConstructor = libraryOwner is null && method.IsConstructor && method.DeclaringType.IsValueType;
             var emitInstance = method.HasThis && !valueConstructor;
+            var emitOwnedStatic = libraryOwner is not null && method.IsStatic && method.DeclaringType.IsValueType;
             var result = ProfileType(method.ReturnType, true);
             var locals = method.Body.Variables.Select(v => ProfileType(v.VariableType)).ToArray();
             if (locals.Any(t => !(libraryOwner is not null && method.GenericParameters.Concat(method.DeclaringType.GenericParameters).Any(p => t == "T" + p.Position)) && !ApplicationTypes.IsType(t) && !ManagedArrayBindings.IsType(t) && t != "System.Object" && !InterfaceBindings.IsInterface(t) && !NativeMemoryBindings.IsPointer(t) && !ReflectionBindings.IsType(t) && t != "arrayref<String>" && !DelegateBindings.IsType(t) && !GenericUnionBindings.IsType(t) && !CalendarBindings.Types.Contains(t) && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
@@ -598,7 +599,7 @@ static class UnionImport
                                 var parameters = reference.Parameters.Select(p => ProfileType(ApplicationTypes.Close(p.ParameterType, reference.DeclaringType))).ToArray();
                                 call = targetMethod.HasThis && (libraryOwner is not null || !(targetMethod.IsConstructor && targetMethod.DeclaringType.IsValueType))
                                     ? new("", new[] { ApplicationTypes.Receiver(reference) }.Concat(parameters).ToArray(), ProfileType(ApplicationTypes.Close(reference.ReturnType, reference.DeclaringType), true), Instruction: $"{(instruction.OpCode.Code == Code.Callvirt ? "callvirt" : "call")} instance {ProfileType(reference.DeclaringType)}::{ApplicationTypes.MethodName(targetMethod)}({string.Join(',', parameters)})" + (targetMethod.DeclaringType.IsValueType && targetMethod.ReturnType.MetadataType == MetadataType.Void ? "\npop" : ""))
-                                    : new(Name(targetMethod), targetMethod.HasThis ? new[] { ApplicationTypes.Receiver(reference) }.Concat(parameters).ToArray() : parameters, ProfileType(ApplicationTypes.Close(reference.ReturnType, reference.DeclaringType), true));
+                                    : new(libraryOwner is not null && targetMethod.IsStatic && targetMethod.DeclaringType.IsValueType ? ProfileType(reference.DeclaringType) + "::" + targetMethod.Name : Name(targetMethod), targetMethod.HasThis ? new[] { ApplicationTypes.Receiver(reference) }.Concat(parameters).ToArray() : parameters, ProfileType(ApplicationTypes.Close(reference.ReturnType, reference.DeclaringType), true));
                             }
                         }
                         else if (targetMethod.Module == library.MainModule)
@@ -676,7 +677,7 @@ static class UnionImport
             }
             var methodStart = output.Length;
             // Unreachable guest instructions are omitted, not admitted as executable code.
-            output.AppendLine(libraryOwner is not null && !emitInstance ? $".function {Name(method)}({string.Join(',', args.Select((t, i) => t + " " + method.Parameters[i].Name))}) -> {result}" : emitInstance ? $".method {(libraryOwner is not null && method.IsPrivate ? "private " : "")}instance {(method.DeclaringType.IsValueType ? "byref " : "")}{ApplicationTypes.Modifiers(method)}{ApplicationTypes.MethodName(method)}({string.Join(',', args.Skip(1))}) -> {(method.DeclaringType.IsValueType && result == "noresult" ? "Void" : result)}" : $".function {Name(method)}({string.Join(',', args)}) -> {result}");
+            output.AppendLine(libraryOwner is not null && !emitInstance && !emitOwnedStatic ? $".function {Name(method)}({string.Join(',', args.Select((t, i) => t + " " + method.Parameters[i].Name))}) -> {result}" : emitOwnedStatic ? $".method {(method.IsPrivate ? "private " : "")}static {method.Name}({string.Join(',', args)}) -> {result}" : emitInstance ? $".method {(libraryOwner is not null && method.IsPrivate ? "private " : "")}instance {(LibraryImplementation.IsReadonlyReceiver(method) ? "readonly " : "")}{(method.DeclaringType.IsValueType ? "byref " : "")}{ApplicationTypes.Modifiers(method)}{ApplicationTypes.MethodName(method)}({string.Join(',', args.Skip(1))}) -> {(method.DeclaringType.IsValueType && result == "noresult" ? "Void" : result)}" : $".function {Name(method)}({string.Join(',', args)}) -> {result}");
             for (var n = 0; n < locals.Length; n++) output.AppendLine($".local {locals[n]} local{n}");
             if (method.Body.InitLocals)
                 for (var n = 0; n < locals.Length; n++)
@@ -688,7 +689,7 @@ static class UnionImport
                 output.AppendLine($"M{methodId:x8}_IL_{instructions[index].Offset:x4}:").Append(bodies[index]);
             }
             output.AppendLine(".end");
-            if (emitInstance) { instanceBodies[method] = output.ToString(methodStart, output.Length - methodStart); output.Length = methodStart; }
+            if (emitInstance || emitOwnedStatic) { instanceBodies[method] = output.ToString(methodStart, output.Length - methodStart); output.Length = methodStart; }
 
             ApplicationTypes.Expand(ProfileType, pending);
 
@@ -722,7 +723,7 @@ static class UnionImport
             AssemblyIdentity = app.Name.FullName, TypeIdentities = ApplicationTypes.IdentityMap(),
             MethodIdentities = seen
                 .Select(m => new { AssemblyIdentity = m.Module.Assembly.Name.FullName, MethodToken = m.MetadataToken.ToUInt32(), MetadataName = m.FullName,
-                    RuntimeName = m.HasThis && (libraryOwner is not null || !(m.IsConstructor && m.DeclaringType.IsValueType))
+                    RuntimeName = (libraryOwner is not null && m.DeclaringType.IsValueType) || m.HasThis && (libraryOwner is not null || !(m.IsConstructor && m.DeclaringType.IsValueType))
                         ? ApplicationTypes.Type(m.DeclaringType) + "::" + ApplicationTypes.MethodName(m) : Name(m) }),
             Profile = libraryOwner is not null ? (exports.Any(m => m.HasThis) ? "instance-library-fragment-v1" : "namespace-library-fragment-v1") : collectionProfile ? "result-option-void-instance-libraries-v11" : "result-option-void-files-strings-arrays-v7",
             RequiredLibraryProfile = collectionProfile ? "raven-collections" : "bundled-system", ApplicationSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(application))),

@@ -37,6 +37,29 @@ static class CalendarBindings
         $"public {(group.Key == "Clock" ? "static class" : "struct")} {group.Key} {{ " + string.Join(" ", group.Select(m =>
             m.Name.StartsWith("get_") ? $"public {CSharp(m.Result)} {m.Name[4..]} => default;"
             : $"public {(m.Instance ? "" : "static ")}{CSharp(m.Result)} {m.Name}({string.Join(',', m.Args.Select((a, i) => CSharp(a) + " arg" + i))}) => default;")) + " }"));
+    public static void ProjectLayout(ModuleDefinition module)
+    {
+        var attribute = new TypeDefinition("System.Runtime.CompilerServices", "IsReadOnlyAttribute",
+            TypeAttributes.Public | TypeAttributes.Sealed, module.GetType("System.Attribute"));
+        module.Types.Add(attribute);
+        var constructor = new MethodDefinition(".ctor", MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName,
+            module.Types.SelectMany(t => t.Methods).Select(m => m.ReturnType)
+                .First(t => t.MetadataType == MetadataType.Void));
+        attribute.Methods.Add(constructor);
+        constructor.Body.Instructions.Add(Mono.Cecil.Cil.Instruction.Create(Mono.Cecil.Cil.OpCodes.Ret));
+        foreach (var (name, field, scalar) in new[] { ("Date", "StoredDayNumber", "Int32"), ("Time", "StoredTicks", "Int64") })
+        {
+            var type = module.GetType("System." + name);
+            type.PackingSize = -1;
+            type.ClassSize = -1;
+            type.Fields.Add(new FieldDefinition(field, FieldAttributes.Private,
+                module.Types.SelectMany(t => t.Methods)
+                    .SelectMany(m => m.Parameters.Select(p => p.ParameterType).Append(m.ReturnType))
+                    .First(t => t.FullName == "System." + scalar)));
+            foreach (var method in type.Methods.Where(m => m.HasThis && !m.IsConstructor))
+                method.CustomAttributes.Add(new CustomAttribute(constructor));
+        }
+    }
     public static string? Type(TypeReference type) => type.IsValueType && RuntimeSignatures.IsCore(type.Scope) && Types.Contains(type.FullName) ? type.FullName : null;
     public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition)
     {

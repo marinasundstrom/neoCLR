@@ -3428,3 +3428,21 @@ asserted to compile as Raven.
 to make that model the preferred direction for further review. The current UTF-16
 code-unit Char behavior, existing String slicing contract and runtime implementation
 were not changed; migration, view lifetime, metadata and interop validation remain open.
+
+
+### 2026-09-15 — Finish the port before revisiting API design
+
+**User direction.** The author asked to “Finish the ongoing work” and clarified:
+“We won't delve to much into the design of the API. We have design proposals, but
+that is the focus after the port.”
+
+**Assistant response and action.** The assistant scoped completion to the ongoing
+Time port, preserving its existing public behavior and deferring Date and API
+redesign. The implementation moves Time into Raven and extends the checked library
+importer for its existing interfaces, static factories and readonly receivers.
+A parser issue reproduced with Raven's .NET target is recorded as a deferred general
+compiler candidate; no Raven compiler changes are included in this slice.
+
+**Outcome.** Source and regression coverage are recorded in
+[the library migration notes](raven-system-library.md#time-value-implementation--2026-09-15).
+Design proposals remain proposals and will be considered separately after the port.

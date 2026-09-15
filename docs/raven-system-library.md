@@ -555,3 +555,39 @@ Date and Time have **not** been ported by this gate. Next, establish matching re
 layout metadata for their stored day number/ticks, retain their Equatable/Comparable
 contracts and readonly receivers, and admit checked static Result factories with
 private construction. Their current executable IL and public behavior remain in use.
+
+
+### Time value implementation — 2026-09-15
+
+The Raven profile now uses `runtime/raven/src/Time.rvn`, compiled into checked-in
+Time fragments. Existing Create/FromTicks Result factories, parameter names, tick
+bounds, component properties, equality and comparison remain unchanged. The original
+Neo profile still uses its existing IL implementation. Date has not been ported.
+API redesign is deferred until after the port; the design proposals are not migration
+requirements.
+
+The matched value gate now accepts exact interface contracts and static methods on
+value owners. Static factories retain method ownership, and private constructors
+retain access protection. Reference calendar metadata now declares the actual private
+Int32/Int64 fields, using CLI primitive encodings rather than nominal wrapper tokens.
+This preserves the existing logical layout instead of relying on empty reference
+structs. It adds no native-layout guarantee.
+
+For public value methods, the importer projects the checked reference contract's
+IsReadOnlyAttribute into the existing readonly receiver contract. The runtime verifier
+rejects writes through that receiver; source bodies are not trusted to enforce it.
+Interface type arguments can refer to the matched implementation owner. This extends
+the preceding bounded gate without admitting arbitrary guest value interfaces,
+generic value layouts, reference fields or static constructors. No Runtime Contract
+configuration, Raven compiler change or runtime opcode was needed.
+
+Shared calendar cases exercise valid and invalid factories, fraction/day boundaries
+and comparison in both profiles. Raven-specific negative tests reject receiver writes
+and external calls to the private constructor. The saved-project suite also exercises
+calendar and clock consumers. Int32 and Int64 admission probes continue to cover
+layout/category mismatches and independent value copies.
+
+Validation for this slice: all 63 saved-project checks and all 10 calendar tests
+across the two profiles pass. Both scalar value-admission modes and the generic
+private-method probe pass. Clean snapshot regeneration, API inventory and coverage
+checks pass. No SDK installation or release packaging was performed.
