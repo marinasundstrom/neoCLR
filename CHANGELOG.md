@@ -8,6 +8,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-15
 
+- Clarify the closed reflection model: TypeInfo is a separate type-metadata view;
+  MemberInfo remains the base for FieldInfo, MethodInfo and PropertyInfo.
+
 - Introduce `System.TypeInfo` as the explicit member-lookup view returned by
   `Type.Info`. Type remains the identity and shape descriptor; field, method and
   property enumeration moves behind TypeInfo while the descriptor contracts remain

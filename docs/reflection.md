@@ -1,8 +1,9 @@
 # Reflection introspection
 
 neoCLR exposes type identity and shape on `System.Type`; member metadata is obtained
-through its `Info` property as `System.TypeInfo`. `MethodInfo`, `FieldInfo` and
-`PropertyInfo` share an abstract `MemberInfo` base; `ParameterInfo` remains independent.
+through its `Info` property as `System.Reflection.TypeInfo`. `MethodInfo`, `FieldInfo`
+and `PropertyInfo` share an abstract `MemberInfo` base; TypeInfo is separate from
+that member hierarchy, and `ParameterInfo` remains independent.
 See [descriptor hierarchy](reflection-hierarchy.md) for readonly receiver contracts,
 base views and migration. Queries inspect declarations without executing methods
 or reading an object's field values.

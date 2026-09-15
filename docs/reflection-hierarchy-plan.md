@@ -14,8 +14,9 @@ direction is to keep Type as the inexpensive identity/shape descriptor and move
 member discovery behind a separate TypeInfo API. `Type.Info` now makes that
 potentially costly runtime lookup explicit.
 
-TypeInfo and its FieldInfo, MethodInfo and PropertyInfo descendants are planned as a
-closed algebraic class hierarchy. This reflection model does not require every
+TypeInfo is a separate type-metadata hierarchy. MemberInfo remains the base of the
+member hierarchy, with FieldInfo, MethodInfo and PropertyInfo as its closed concrete
+descendants; they are not descendants of TypeInfo. Neither hierarchy requires every
 runtime type to derive from Object. Constructor and descriptor allocation contracts
 must be defined before porting the remaining descriptor implementations to Raven.
 
