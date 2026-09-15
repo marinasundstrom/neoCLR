@@ -1,7 +1,7 @@
 # Authoring the foundational library in Raven
 
 `runtime/raven/System.rvnproj` is the shared authoring project for ordinary
-foundational runtime APIs. Its sources include `src/System/Math/Functions.rvn`, `src/System/Linq/Operators.rvn`, `src/System/Int32/Functions.rvn`, `src/System/Char/Functions.rvn`, `src/System/Collections/ArrayList.rvn`, `src/System/Collections/HashMap.rvn`, `src/System/Time.rvn` and `src/System/Date.rvn`; additional namespaces
+foundational runtime APIs. Its sources include `src/System/Math/Functions.rvn`, `src/System/Linq/Operators.rvn`, `src/System/Int32/Functions.rvn`, `src/System/Char.rvn`, `src/System/Collections/ArrayList.rvn`, `src/System/Collections/HashMap.rvn`, `src/System/Time.rvn` and `src/System/Date.rvn`; additional namespaces
 and types should join this project as their importing requirements are validated.
 Each declared namespace has its own folder below `src`: for example, `System/Date.rvn`,
 `System/Collections/ArrayList.rvn` and `System/Math/Functions.rvn`. Namespace functions
@@ -708,3 +708,20 @@ interface-dispatched comparisons. Build snapshots remain deterministic.
 Primitive-family validation: 25 runtime/interface/generic-bound tests, primitive
 admission rejection cases and clean regeneration pass. Debug identity maps omit the
 backing field because it is not a runtime field.
+
+
+### Char ownership and complete predicate port — 2026-09-15
+
+`src/System/Char.rvn` now declares the Char struct, its CompareTo member and all
+sixteen static predicates. The earlier function-namespace source has been removed.
+All existing public signatures remain matched against the reference type, with the
+same checked intrinsic-storage rule as the numeric family. The existing CharCategory
+native service supplies Unicode categories through the bootstrap catalog; category
+ranges and simple code-unit predicates are Raven code.
+
+The current UTF-16 code-unit model is preserved, including isolated surrogate values.
+The Unicode/text-model proposal does not change behavior in this port. The requested
+move of Char functions onto the struct is now implemented, rather than just planned.
+
+Char validation: four character regressions, 203 independently compiled scalar/Boolean
+outcomes and clean snapshot regeneration pass.

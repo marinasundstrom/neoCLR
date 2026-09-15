@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-15
 
+- Complete the Char struct port in System/Char.rvn, including CompareTo and all
+  sixteen predicates. Move the previously standalone functions onto the type;
+  retain existing UTF-16 code-unit and Unicode-category behavior through the native
+  category service. The proposed text redesign is not part of this migration.
+
 - Port Boolean, SByte, Byte, Int16, UInt16, UInt32, Int64, UInt64, Single and Double
   structs to Raven. Preserve comparison/NaN ordering and intrinsic storage; checked
   primitive backing fields lower to value loads and verified empty constructors are

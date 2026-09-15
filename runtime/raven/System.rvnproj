@@ -9,7 +9,6 @@
     <Compile Include="src/System/Math/Functions.rvn" />
     <Compile Include="src/System/Linq/Operators.rvn" />
     <Compile Include="src/System/Int32/Functions.rvn" />
-    <Compile Include="src/System/Char/Functions.rvn" />
     <Compile Include="src/System/IO/Path/Functions.rvn" />
     <Compile Include="src/System/IO/File/Functions.rvn" />
   </ItemGroup>
@@ -54,5 +53,8 @@
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Boolean'">
     <Compile Include="src/System/Boolean.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Char'">
+    <Compile Include="src/System/Char.rvn" />
   </ItemGroup>
 </Project>

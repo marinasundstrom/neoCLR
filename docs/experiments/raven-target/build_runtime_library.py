@@ -34,7 +34,7 @@ SLICES = {
 SOURCES = {
     'Math': 'runtime/raven/src/System/Math/Functions.rvn',
     'Int32': 'runtime/raven/src/System/Int32/Functions.rvn',
-    'Char': 'runtime/raven/src/System/Char/Functions.rvn',
+    'Char': 'runtime/raven/src/System/Char.rvn',
     'Linq': 'runtime/raven/src/System/Linq/Operators.rvn',
     'ArrayList': 'runtime/raven/src/System/Collections/ArrayList.rvn',
     'HashMap': 'runtime/raven/src/System/Collections/HashMap.rvn',
@@ -146,7 +146,7 @@ def main():
         generated = {}
         for name, owner in SLICES.items():
             compiled = root / 'compiled'
-            if name not in ('Math', 'Linq', 'Int32', 'Char', 'Path', 'File'):
+            if name not in ('Math', 'Linq', 'Int32', 'Path', 'File'):
                 compiled = root / ('compiled-' + name)
                 subprocess.run(['dotnet', str(args.compiler.resolve()), str(PROJECT), '--no-project-restore',
                                 '-o', str(compiled)], env={**os.environ, 'NeoCLRBootstrapRoot': str(root),

@@ -16,6 +16,7 @@ static class PrimitiveLibrary
         ["System.Single"] = MetadataType.Single,
         ["System.Double"] = MetadataType.Double,
         ["System.Boolean"] = MetadataType.Boolean,
+        ["System.Char"] = MetadataType.Char,
     };
     public static bool IsPrimitive(TypeDefinition? type) => type is not null && Kinds.ContainsKey(type.FullName);
     public static bool IsMatched(TypeDefinition? type) => IsPrimitive(type) && ApplicationTypes.IsLibrary(type!);

@@ -85,11 +85,16 @@ for file in source['sourceFiles']:
                      'tests': ['tests/common_interfaces.rs', 'docs/experiments/raven-target/verify_primitive_library.py'],
                      'note': 'Matched private backing storage becomes intrinsic loads; no nested runtime field or new primitive constructor.'})
         continue
-    if file.startswith(('runtime/raven/generated/Int32.', 'runtime/raven/generated/Char.')):
+    if file.startswith('runtime/raven/generated/Char.'):
+        rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-char-struct',
+                     'tests': ['tests/character_classification.rs', 'docs/experiments/raven-target/verify_scalar_library.py'],
+                     'note': 'System/Char.rvn owns comparison and all sixteen predicates; UTF-16 units and native Unicode category behavior are unchanged.'})
+        continue
+    if file.startswith('runtime/raven/generated/Int32.'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-scalar-bootstrap',
                      'samples': ['library-primitives.rvn', 'library-division.rvn'],
                      'tests': ['tests/character_classification.rs', 'docs/experiments/raven-target/verify_scalar_library.py'],
-                     'note': 'Raven implements Divide and seven Char predicates; parsing and Unicode category services stay native.'})
+                     'note': 'Raven implements Divide; parsing remains in its existing native/IL layer.'})
         continue
     if file.startswith('runtime/raven/generated/File.'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-file-write-bootstrap',

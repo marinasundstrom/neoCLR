@@ -5,7 +5,7 @@
     "runtime/raven/src/System/Math/Functions.rvn": "7c6b80a8c549c2b1c91735bb7a325ab75472d112e81ae913d77b916ea5e22de0",
     "runtime/raven/src/System/Linq/Operators.rvn": "58a60fe5ecd4f68560baf6c16bc8342992c9d32752c6b0b40140d0300251e605",
     "runtime/raven/src/System/Int32/Functions.rvn": "ba7ccc0493dc897f628c11dd135cc00c086cc573f88f59d37661b18cb447bac0",
-    "runtime/raven/src/System/Char/Functions.rvn": "5656f1ee320f33e132cc835b4aa11c5d2e5656e18b89647157bddd92ff9efa41",
+    "runtime/raven/src/System/Char.rvn": "6ef4617518e031038c79a5703ba1718a28c8ecbbb0e157e6570598ed8c5540af",
     "runtime/raven/src/System/Collections/ArrayList.rvn": "9541be94fae19daa0503733ec9888baf4c177e4d9717f73f91979e3aa79acb42",
     "runtime/raven/src/System/Collections/HashMap.rvn": "510246a97d44a89074dfd35e2448d35f7e1104f4cbd75c7a53e99fae58bedbd4",
     "runtime/raven/src/System/Time.rvn": "98b667bf4320d7552dcc18a2391757b513f31774753f5543629d0311e726f1d0",
@@ -22,7 +22,7 @@
     "runtime/raven/src/System/Single.rvn": "488efaf36e56f147c7158a5b0637f3bc4e56e84bb3f514af6c64a023dcd8598e",
     "runtime/raven/src/System/Double.rvn": "cd3ad24e4a21b7616a2937da71891618284913e26ea180ce203276f18b631f33",
     "runtime/raven/src/System/Boolean.rvn": "1f0010fe0d346fbc7f3ba29c88b2c1cf80faebf42a4c2de2f0cd6cff15335022",
-    "runtime/raven/System.rvnproj": "463b6300a56a1653acbbd8c3a4aa424205b4ca2d76c81ef23e877b79722e8799",
+    "runtime/raven/System.rvnproj": "393914710bcc78bb3de1a4f9d59a11d80164162f0a0021680e998ccf2662388c",
     "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
   },
   "outputs": {
@@ -30,7 +30,7 @@
     "Double.helpers.neoil": "fc757ce3ac77e1458903b63fda5060f3bf7eb0dd3b053d66bd39d311b8c2aaad"
   },
   "compilerSha256": "744ad87d9a6ec3d8b5691e72d0cd077b154af51615387b5f6bb171daa89fb370",
-  "coreSha256": "886cb93b57f12404af372cbce6acb3960d281cd3c5a3a6c893867f454d8ba910",
+  "coreSha256": "24b22fdeced47de9e673c11f368686664be849beeb9d32ea02f13d8af9588e78",
   "exports": [
     "readonly byref CompareTo(Double) -> Int32"
   ]

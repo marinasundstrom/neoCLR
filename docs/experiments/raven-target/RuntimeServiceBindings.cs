@@ -12,10 +12,11 @@ static class RuntimeServiceBindings
         .Concat(BinaryMath.Select(n => ("Math" + n, new[] { "Double", "Double" }, "Double"))).Concat(new (string Name, string[] Args, string Result)[] {
             ("PathCombine", ["String", "String"], "String"),
             ("PathGetFileName", ["String"], "String"),
-            ("WriteAllText", ["String", "String", "Int32"], "Int32")
+            ("WriteAllText", ["String", "String", "Int32"], "Int32"),
+            ("CharCategory", ["Char"], "Int32")
         }).ToArray();
     static string CSharp(string type) => type switch {
-        "Double" => "double", "String" => "string", "Int32" => "int",
+        "Double" => "double", "String" => "string", "Int32" => "int", "Char" => "char",
         _ => throw new InvalidDataException("Unsupported runtime service declaration.")
     };
     public static string Declarations => "namespace Runtime.CompilerServices { public static class RuntimeServices { "

@@ -1,4 +1,4 @@
-; Generated from runtime/raven/src/System/Char/Functions.rvn. Regenerate with build_runtime_library.py.
+; Generated from runtime/raven/src/System/Char.rvn. Regenerate with build_runtime_library.py.
 .function neoCLR.Library.System.Char.RuntimeBooleanFromInt32(Int32 value) -> Boolean
     ldarg value
     ldc.i4 0
