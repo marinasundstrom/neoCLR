@@ -5,6 +5,14 @@ import System.Option.*
 import System.Result.*
 
 public static class Operators {
+    static func Where<T>(source: Iterable<T>, predicate: System.Func<T, bool>) -> Iterable<T> {
+        return WhereSequence<T>(source, predicate)
+    }
+
+    static func Select<T, U>(source: Iterable<T>, selector: System.Func<T, U>) -> Iterable<U> {
+        return SelectSequence<T, U>(source, selector)
+    }
+
     static func ToList<T>(source: Iterable<T>) -> ArrayList<T> {
         let result = ArrayList<T>()
         for item in source {
@@ -102,5 +110,136 @@ public static class Operators {
         }
         iterator.Dispose()
         return Error(SingleError(SingleError.Empty()))
+    }
+}
+
+
+internal class WhereSequence<T> : Iterable<T> {
+    private field source: Iterable<T>
+    private field callback: System.Func<T, bool>
+
+    init(input: Iterable<T>, action: System.Func<T, bool>) {
+        source = input
+        callback = action
+    }
+
+    func GetIterator() -> Iterator<T> {
+        return WhereIterator<T>(source.GetIterator(), callback)
+    }
+}
+
+internal class WhereIterator<T> : Iterator<T> {
+    private field source: Iterator<T>
+    private field callback: System.Func<T, bool>
+    private field cached: T[]
+    private field active: bool
+    private field finished: bool
+
+    init(input: Iterator<T>, action: System.Func<T, bool>) {
+        source = input
+        callback = action
+        cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(1)
+        active = false
+        finished = false
+    }
+
+    func MoveNext() -> bool {
+        if finished {
+            return false
+        }
+        active = false
+        while source.MoveNext() {
+            let value = source.Current
+            if callback(value) {
+                cached[0] = value
+                active = true
+                return true
+            }
+        }
+        Dispose()
+        return false
+    }
+
+    val Current: T {
+        get {
+            if !active {
+                System.Fault("Query iterator has no current element")
+            }
+            return cached[0]
+        }
+    }
+
+    func Dispose() {
+        if finished {
+            return
+        }
+        finished = true
+        active = false
+        cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(0)
+        source.Dispose()
+    }
+}
+
+
+internal class SelectSequence<T, U> : Iterable<U> {
+    private field source: Iterable<T>
+    private field callback: System.Func<T, U>
+
+    init(input: Iterable<T>, action: System.Func<T, U>) {
+        source = input
+        callback = action
+    }
+
+    func GetIterator() -> Iterator<U> {
+        return SelectIterator<T, U>(source.GetIterator(), callback)
+    }
+}
+
+internal class SelectIterator<T, U> : Iterator<U> {
+    private field source: Iterator<T>
+    private field callback: System.Func<T, U>
+    private field cached: U[]
+    private field active: bool
+    private field finished: bool
+
+    init(input: Iterator<T>, action: System.Func<T, U>) {
+        source = input
+        callback = action
+        cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<U>(1)
+        active = false
+        finished = false
+    }
+
+    func MoveNext() -> bool {
+        if finished {
+            return false
+        }
+        active = false
+        if source.MoveNext() {
+            cached[0] = callback(source.Current)
+            active = true
+            return true
+        }
+        Dispose()
+        return false
+    }
+
+    val Current: U {
+        get {
+            if !active {
+                System.Fault("Query iterator has no current element")
+            }
+            return cached[0]
+        }
+    }
+
+    func Dispose() {
+        if finished {
+            return
+        }
+        finished = true
+        active = false
+        cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<U>(0)
+        source.Dispose()
     }
 }

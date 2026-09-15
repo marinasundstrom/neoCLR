@@ -3,7 +3,7 @@
   "owner": "System.Char",
   "inputs": {
     "runtime/raven/src/Math.rvn": "05fbc020828379134fbead7aefb8e19955cefc3b875991dc937e2e303c716e18",
-    "runtime/raven/src/Linq.rvn": "6a274234eb9f10eeaf84ca4066ea9ad2f82f889824f89e7b93ed7ce7323a8202",
+    "runtime/raven/src/Linq.rvn": "58a60fe5ecd4f68560baf6c16bc8342992c9d32752c6b0b40140d0300251e605",
     "runtime/raven/src/Int32.rvn": "ba7ccc0493dc897f628c11dd135cc00c086cc573f88f59d37661b18cb447bac0",
     "runtime/raven/src/Char.rvn": "5656f1ee320f33e132cc835b4aa11c5d2e5656e18b89647157bddd92ff9efa41",
     "runtime/raven/System.rvnproj": "2ea2813223b2f94880b45574a584650046cb510155af70ba6b885fef6b141b95",
@@ -13,8 +13,8 @@
     "Char.methods.neoil": "10033466e71d63c803c392288025e9e9d08c5ecaea5ba6750c1a3a761291017f",
     "Char.helpers.neoil": "f284bedb60e5dedc600195902b22dbf89f5cf0b30d45465d9f1b6d5990afabbb"
   },
-  "compilerSha256": "6ff80a37db8b5c730dac6d409d4583392cdc11564e1daff18852c6517cab21c2",
-  "coreSha256": "bacbafa34c4f264b428df6bff160b5972d86f35e148028d713f06a111dfad121",
+  "compilerSha256": "744ad87d9a6ec3d8b5691e72d0cd077b154af51615387b5f6bb171daa89fb370",
+  "coreSha256": "a47fd3bb9f288752a2c333cbfe438d9eb20bd9346a463b68febcf701ec4bfe22",
   "exports": [
     "IsSurrogate(Char value) -> Boolean",
     "IsHighSurrogate(Char value) -> Boolean",

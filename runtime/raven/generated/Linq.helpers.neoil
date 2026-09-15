@@ -80,3 +80,579 @@ False:
     ldc.i4 0
     ret
 .end
+.type internal class neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E576865726553657175656E63656031<T0>
+.implements System.Collections.Iterable<T0>
+.field private source System.Collections.Iterable<T0>
+.field private callback System.Func<T0,Boolean>
+.method instance .ctor(System.Collections.Iterable<T0>,System.Func<T0,Boolean>) -> noresult
+M0000000a_IL_0000:
+M0000000a_IL_0001:
+ldarg 0
+M0000000a_IL_0002:
+pop
+M0000000a_IL_0007:
+M0000000a_IL_0008:
+ldarg 0
+M0000000a_IL_0009:
+ldarg 1
+M0000000a_IL_000a:
+stfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E576865726553657175656E63656031<T0>::source
+M0000000a_IL_000f:
+M0000000a_IL_0010:
+ldarg 0
+M0000000a_IL_0011:
+ldarg 2
+M0000000a_IL_0012:
+stfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E576865726553657175656E63656031<T0>::callback
+M0000000a_IL_0017:
+ret
+.end
+.method instance GetIterator() -> System.Collections.Iterator<T0>
+M0000000b_IL_0000:
+M0000000b_IL_0001:
+M0000000b_IL_0002:
+ldarg 0
+M0000000b_IL_0003:
+ldfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E576865726553657175656E63656031<T0>::source
+M0000000b_IL_0008:
+callvirt instance System.Collections.Iterable<T0>::GetIterator()
+M0000000b_IL_000d:
+ldarg 0
+M0000000b_IL_000e:
+ldfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E576865726553657175656E63656031<T0>::callback
+M0000000b_IL_0013:
+newobj instance neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E57686572654974657261746F726031<T0>::.ctor(System.Collections.Iterator<T0>,System.Func<T0,Boolean>)
+M0000000b_IL_0018:
+ret
+.end
+.end
+.type internal class neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C65637453657175656E63656032<T0,T1>
+.implements System.Collections.Iterable<T1>
+.field private source System.Collections.Iterable<T0>
+.field private callback System.Func<T0,T1>
+.method instance .ctor(System.Collections.Iterable<T0>,System.Func<T0,T1>) -> noresult
+M0000000c_IL_0000:
+M0000000c_IL_0001:
+ldarg 0
+M0000000c_IL_0002:
+pop
+M0000000c_IL_0007:
+M0000000c_IL_0008:
+ldarg 0
+M0000000c_IL_0009:
+ldarg 1
+M0000000c_IL_000a:
+stfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C65637453657175656E63656032<T0,T1>::source
+M0000000c_IL_000f:
+M0000000c_IL_0010:
+ldarg 0
+M0000000c_IL_0011:
+ldarg 2
+M0000000c_IL_0012:
+stfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C65637453657175656E63656032<T0,T1>::callback
+M0000000c_IL_0017:
+ret
+.end
+.method instance GetIterator() -> System.Collections.Iterator<T1>
+M0000000d_IL_0000:
+M0000000d_IL_0001:
+M0000000d_IL_0002:
+ldarg 0
+M0000000d_IL_0003:
+ldfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C65637453657175656E63656032<T0,T1>::source
+M0000000d_IL_0008:
+callvirt instance System.Collections.Iterable<T0>::GetIterator()
+M0000000d_IL_000d:
+ldarg 0
+M0000000d_IL_000e:
+ldfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C65637453657175656E63656032<T0,T1>::callback
+M0000000d_IL_0013:
+newobj instance neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C6563744974657261746F726032<T0,T1>::.ctor(System.Collections.Iterator<T0>,System.Func<T0,T1>)
+M0000000d_IL_0018:
+ret
+.end
+.end
+.type internal class neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E57686572654974657261746F726031<T0>
+.implements System.Collections.Iterator<T0>
+.implements System.Disposable
+.field private source System.Collections.Iterator<T0>
+.field private callback System.Func<T0,Boolean>
+.field private cached arrayref<T0>
+.field private active Boolean
+.field private finished Boolean
+.property instance Current() -> T0
+.get instance neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E57686572654974657261746F726031<T0>::get_Current()
+.end
+.method instance .ctor(System.Collections.Iterator<T0>,System.Func<T0,Boolean>) -> noresult
+M0000000e_IL_0000:
+M0000000e_IL_0001:
+ldarg 0
+M0000000e_IL_0002:
+pop
+M0000000e_IL_0007:
+M0000000e_IL_0008:
+ldarg 0
+M0000000e_IL_0009:
+ldarg 1
+M0000000e_IL_000a:
+stfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E57686572654974657261746F726031<T0>::source
+M0000000e_IL_000f:
+M0000000e_IL_0010:
+ldarg 0
+M0000000e_IL_0011:
+ldarg 2
+M0000000e_IL_0012:
+stfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E57686572654974657261746F726031<T0>::callback
+M0000000e_IL_0017:
+M0000000e_IL_0018:
+ldarg 0
+M0000000e_IL_0019:
+ldc.i4 1
+M0000000e_IL_001a:
+array.reserve T0
+M0000000e_IL_001f:
+stfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E57686572654974657261746F726031<T0>::cached
+M0000000e_IL_0024:
+M0000000e_IL_0025:
+ldarg 0
+M0000000e_IL_0026:
+ldc.i4 0
+M0000000e_IL_0027:
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanFromInt32(Int32)
+stfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E57686572654974657261746F726031<T0>::active
+M0000000e_IL_002c:
+M0000000e_IL_002d:
+ldarg 0
+M0000000e_IL_002e:
+ldc.i4 0
+M0000000e_IL_002f:
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanFromInt32(Int32)
+stfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E57686572654974657261746F726031<T0>::finished
+M0000000e_IL_0034:
+ret
+.end
+.method instance MoveNext() -> Boolean
+.local T0 local0
+M0000000f_IL_0000:
+M0000000f_IL_0001:
+M0000000f_IL_0002:
+ldarg 0
+M0000000f_IL_0003:
+ldfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E57686572654974657261746F726031<T0>::finished
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
+M0000000f_IL_0008:
+brtrue M0000000f_IL_0012
+M0000000f_IL_000d:
+br M0000000f_IL_0015
+M0000000f_IL_0012:
+M0000000f_IL_0013:
+ldc.i4 0
+M0000000f_IL_0014:
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanFromInt32(Int32)
+ret
+M0000000f_IL_0015:
+M0000000f_IL_0016:
+M0000000f_IL_0017:
+ldarg 0
+M0000000f_IL_0018:
+ldc.i4 0
+M0000000f_IL_0019:
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanFromInt32(Int32)
+stfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E57686572654974657261746F726031<T0>::active
+M0000000f_IL_001e:
+M0000000f_IL_001f:
+M0000000f_IL_0020:
+ldarg 0
+M0000000f_IL_0021:
+ldfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E57686572654974657261746F726031<T0>::source
+M0000000f_IL_0026:
+callvirt instance System.Collections.Iterator<T0>::MoveNext()
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
+M0000000f_IL_002b:
+brtrue M0000000f_IL_0035
+M0000000f_IL_0030:
+br M0000000f_IL_0078
+M0000000f_IL_0035:
+M0000000f_IL_0036:
+ldarg 0
+M0000000f_IL_0037:
+ldfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E57686572654974657261746F726031<T0>::source
+M0000000f_IL_003c:
+callvirt instance System.Collections.Iterator<T0>::get_Current()
+M0000000f_IL_0041:
+stloc local0
+M0000000f_IL_0042:
+M0000000f_IL_0043:
+ldarg 0
+M0000000f_IL_0044:
+ldfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E57686572654974657261746F726031<T0>::callback
+M0000000f_IL_0049:
+ldloc local0
+M0000000f_IL_004a:
+callvirt instance System.Func<T0,Boolean>::Invoke(T0)
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
+M0000000f_IL_004f:
+brtrue M0000000f_IL_0059
+M0000000f_IL_0054:
+br M0000000f_IL_0072
+M0000000f_IL_0059:
+M0000000f_IL_005a:
+ldarg 0
+M0000000f_IL_005b:
+ldfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E57686572654974657261746F726031<T0>::cached
+M0000000f_IL_0060:
+ldc.i4 0
+M0000000f_IL_0061:
+ldloc local0
+M0000000f_IL_0062:
+stelem T0
+M0000000f_IL_0067:
+M0000000f_IL_0068:
+ldarg 0
+M0000000f_IL_0069:
+ldc.i4 1
+M0000000f_IL_006a:
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanFromInt32(Int32)
+stfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E57686572654974657261746F726031<T0>::active
+M0000000f_IL_006f:
+M0000000f_IL_0070:
+ldc.i4 1
+M0000000f_IL_0071:
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanFromInt32(Int32)
+ret
+M0000000f_IL_0072:
+M0000000f_IL_0073:
+br M0000000f_IL_001f
+M0000000f_IL_0078:
+M0000000f_IL_0079:
+ldarg 0
+M0000000f_IL_007a:
+callvirt instance neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E57686572654974657261746F726031<T0>::Dispose()
+M0000000f_IL_007f:
+M0000000f_IL_0080:
+ldc.i4 0
+M0000000f_IL_0081:
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance get_Current() -> T0
+M00000010_IL_0000:
+M00000010_IL_0001:
+M00000010_IL_0002:
+ldarg 0
+M00000010_IL_0003:
+ldfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E57686572654974657261746F726031<T0>::active
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
+M00000010_IL_0008:
+ldc.i4 0
+M00000010_IL_0009:
+ceq
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
+M00000010_IL_000b:
+brtrue M00000010_IL_0015
+M00000010_IL_0010:
+br M00000010_IL_0020
+M00000010_IL_0015:
+M00000010_IL_0016:
+ldstr "Query iterator has no current element"
+M00000010_IL_001b:
+call System.Fault(String)
+M00000010_IL_0020:
+M00000010_IL_0021:
+M00000010_IL_0022:
+ldarg 0
+M00000010_IL_0023:
+ldfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E57686572654974657261746F726031<T0>::cached
+M00000010_IL_0028:
+ldc.i4 0
+M00000010_IL_0029:
+ldelem T0
+M00000010_IL_002e:
+ret
+.end
+.method instance Dispose() -> noresult
+M00000011_IL_0000:
+M00000011_IL_0001:
+M00000011_IL_0002:
+ldarg 0
+M00000011_IL_0003:
+ldfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E57686572654974657261746F726031<T0>::finished
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
+M00000011_IL_0008:
+brtrue M00000011_IL_0012
+M00000011_IL_000d:
+br M00000011_IL_0014
+M00000011_IL_0012:
+M00000011_IL_0013:
+ret
+M00000011_IL_0014:
+M00000011_IL_0015:
+M00000011_IL_0016:
+ldarg 0
+M00000011_IL_0017:
+ldc.i4 1
+M00000011_IL_0018:
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanFromInt32(Int32)
+stfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E57686572654974657261746F726031<T0>::finished
+M00000011_IL_001d:
+M00000011_IL_001e:
+ldarg 0
+M00000011_IL_001f:
+ldc.i4 0
+M00000011_IL_0020:
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanFromInt32(Int32)
+stfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E57686572654974657261746F726031<T0>::active
+M00000011_IL_0025:
+M00000011_IL_0026:
+ldarg 0
+M00000011_IL_0027:
+ldc.i4 0
+M00000011_IL_0028:
+array.reserve T0
+M00000011_IL_002d:
+stfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E57686572654974657261746F726031<T0>::cached
+M00000011_IL_0032:
+M00000011_IL_0033:
+ldarg 0
+M00000011_IL_0034:
+ldfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E57686572654974657261746F726031<T0>::source
+M00000011_IL_0039:
+callvirt instance System.Disposable::Dispose()
+M00000011_IL_003e:
+M00000011_IL_003f:
+ret
+.end
+.end
+.type internal class neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C6563744974657261746F726032<T0,T1>
+.implements System.Collections.Iterator<T1>
+.implements System.Disposable
+.field private source System.Collections.Iterator<T0>
+.field private callback System.Func<T0,T1>
+.field private cached arrayref<T1>
+.field private active Boolean
+.field private finished Boolean
+.property instance Current() -> T1
+.get instance neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C6563744974657261746F726032<T0,T1>::get_Current()
+.end
+.method instance .ctor(System.Collections.Iterator<T0>,System.Func<T0,T1>) -> noresult
+M00000012_IL_0000:
+M00000012_IL_0001:
+ldarg 0
+M00000012_IL_0002:
+pop
+M00000012_IL_0007:
+M00000012_IL_0008:
+ldarg 0
+M00000012_IL_0009:
+ldarg 1
+M00000012_IL_000a:
+stfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C6563744974657261746F726032<T0,T1>::source
+M00000012_IL_000f:
+M00000012_IL_0010:
+ldarg 0
+M00000012_IL_0011:
+ldarg 2
+M00000012_IL_0012:
+stfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C6563744974657261746F726032<T0,T1>::callback
+M00000012_IL_0017:
+M00000012_IL_0018:
+ldarg 0
+M00000012_IL_0019:
+ldc.i4 1
+M00000012_IL_001a:
+array.reserve T1
+M00000012_IL_001f:
+stfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C6563744974657261746F726032<T0,T1>::cached
+M00000012_IL_0024:
+M00000012_IL_0025:
+ldarg 0
+M00000012_IL_0026:
+ldc.i4 0
+M00000012_IL_0027:
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanFromInt32(Int32)
+stfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C6563744974657261746F726032<T0,T1>::active
+M00000012_IL_002c:
+M00000012_IL_002d:
+ldarg 0
+M00000012_IL_002e:
+ldc.i4 0
+M00000012_IL_002f:
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanFromInt32(Int32)
+stfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C6563744974657261746F726032<T0,T1>::finished
+M00000012_IL_0034:
+ret
+.end
+.method instance MoveNext() -> Boolean
+M00000013_IL_0000:
+M00000013_IL_0001:
+M00000013_IL_0002:
+ldarg 0
+M00000013_IL_0003:
+ldfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C6563744974657261746F726032<T0,T1>::finished
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
+M00000013_IL_0008:
+brtrue M00000013_IL_0012
+M00000013_IL_000d:
+br M00000013_IL_0015
+M00000013_IL_0012:
+M00000013_IL_0013:
+ldc.i4 0
+M00000013_IL_0014:
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanFromInt32(Int32)
+ret
+M00000013_IL_0015:
+M00000013_IL_0016:
+M00000013_IL_0017:
+ldarg 0
+M00000013_IL_0018:
+ldc.i4 0
+M00000013_IL_0019:
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanFromInt32(Int32)
+stfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C6563744974657261746F726032<T0,T1>::active
+M00000013_IL_001e:
+M00000013_IL_001f:
+ldarg 0
+M00000013_IL_0020:
+ldfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C6563744974657261746F726032<T0,T1>::source
+M00000013_IL_0025:
+callvirt instance System.Collections.Iterator<T0>::MoveNext()
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
+M00000013_IL_002a:
+brtrue M00000013_IL_0034
+M00000013_IL_002f:
+br M00000013_IL_0062
+M00000013_IL_0034:
+M00000013_IL_0035:
+ldarg 0
+M00000013_IL_0036:
+ldfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C6563744974657261746F726032<T0,T1>::cached
+M00000013_IL_003b:
+ldc.i4 0
+M00000013_IL_003c:
+ldarg 0
+M00000013_IL_003d:
+ldfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C6563744974657261746F726032<T0,T1>::callback
+M00000013_IL_0042:
+ldarg 0
+M00000013_IL_0043:
+ldfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C6563744974657261746F726032<T0,T1>::source
+M00000013_IL_0048:
+callvirt instance System.Collections.Iterator<T0>::get_Current()
+M00000013_IL_004d:
+callvirt instance System.Func<T0,T1>::Invoke(T0)
+M00000013_IL_0052:
+stelem T1
+M00000013_IL_0057:
+M00000013_IL_0058:
+ldarg 0
+M00000013_IL_0059:
+ldc.i4 1
+M00000013_IL_005a:
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanFromInt32(Int32)
+stfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C6563744974657261746F726032<T0,T1>::active
+M00000013_IL_005f:
+M00000013_IL_0060:
+ldc.i4 1
+M00000013_IL_0061:
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanFromInt32(Int32)
+ret
+M00000013_IL_0062:
+M00000013_IL_0063:
+ldarg 0
+M00000013_IL_0064:
+callvirt instance neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C6563744974657261746F726032<T0,T1>::Dispose()
+M00000013_IL_0069:
+M00000013_IL_006a:
+ldc.i4 0
+M00000013_IL_006b:
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance get_Current() -> T1
+M00000014_IL_0000:
+M00000014_IL_0001:
+M00000014_IL_0002:
+ldarg 0
+M00000014_IL_0003:
+ldfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C6563744974657261746F726032<T0,T1>::active
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
+M00000014_IL_0008:
+ldc.i4 0
+M00000014_IL_0009:
+ceq
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
+M00000014_IL_000b:
+brtrue M00000014_IL_0015
+M00000014_IL_0010:
+br M00000014_IL_0020
+M00000014_IL_0015:
+M00000014_IL_0016:
+ldstr "Query iterator has no current element"
+M00000014_IL_001b:
+call System.Fault(String)
+M00000014_IL_0020:
+M00000014_IL_0021:
+M00000014_IL_0022:
+ldarg 0
+M00000014_IL_0023:
+ldfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C6563744974657261746F726032<T0,T1>::cached
+M00000014_IL_0028:
+ldc.i4 0
+M00000014_IL_0029:
+ldelem T1
+M00000014_IL_002e:
+ret
+.end
+.method instance Dispose() -> noresult
+M00000015_IL_0000:
+M00000015_IL_0001:
+M00000015_IL_0002:
+ldarg 0
+M00000015_IL_0003:
+ldfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C6563744974657261746F726032<T0,T1>::finished
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
+M00000015_IL_0008:
+brtrue M00000015_IL_0012
+M00000015_IL_000d:
+br M00000015_IL_0014
+M00000015_IL_0012:
+M00000015_IL_0013:
+ret
+M00000015_IL_0014:
+M00000015_IL_0015:
+M00000015_IL_0016:
+ldarg 0
+M00000015_IL_0017:
+ldc.i4 1
+M00000015_IL_0018:
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanFromInt32(Int32)
+stfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C6563744974657261746F726032<T0,T1>::finished
+M00000015_IL_001d:
+M00000015_IL_001e:
+ldarg 0
+M00000015_IL_001f:
+ldc.i4 0
+M00000015_IL_0020:
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanFromInt32(Int32)
+stfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C6563744974657261746F726032<T0,T1>::active
+M00000015_IL_0025:
+M00000015_IL_0026:
+ldarg 0
+M00000015_IL_0027:
+ldc.i4 0
+M00000015_IL_0028:
+array.reserve T1
+M00000015_IL_002d:
+stfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C6563744974657261746F726032<T0,T1>::cached
+M00000015_IL_0032:
+M00000015_IL_0033:
+ldarg 0
+M00000015_IL_0034:
+ldfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C6563744974657261746F726032<T0,T1>::source
+M00000015_IL_0039:
+callvirt instance System.Disposable::Dispose()
+M00000015_IL_003e:
+M00000015_IL_003f:
+ret
+.end
+.end

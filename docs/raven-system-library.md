@@ -9,9 +9,11 @@ migration, not yet a self-hosting build of the complete core reference assembly.
 The bootstrap currently has three distinct artifacts:
 
 - `NeoCLR.CoreProbe.dll`: compiler-facing reference metadata for the supported System
-  surface. Its placeholder bodies must never execute.
+  surface. A bootstrap variant includes CheckedStorage for authoring; consumers use
+  the normal reference surface. Placeholder bodies must never execute.
 - `NeoCLR.System.dll`: compiled Raven implementation input, currently five scalar
-  Math functions, seven collection/query terminal overloads, Int32.Divide and seven character predicates. It is imported into neoIL, not loaded dynamically by the runtime.
+  Math functions, nine query overloads and their private deferred iterator classes,
+  Int32.Divide and seven character predicates. It is imported into neoIL, not loaded dynamically by the runtime.
 - `runtime/System.neoil` and its includes: the executable foundational library,
   combining generated Raven bodies with remaining handwritten bodies and intrinsics.
 
@@ -385,3 +387,30 @@ for loads, stores, literals and iteration. Their experimental cherry-picks are
 Each main integration passed 311 compiler, 73 core and 249 language-server checks
 (three existing skips). The new execution tests use default and explicit System.Runtime
 metadata options; no .NET Framework or NanoFramework execution is claimed.
+
+
+### Deferred query migration completed — 2026-09-15
+
+Where/Select sequences and iterators now join the seven terminal overloads in
+`src/Linq.rvn`. The build uses the bootstrap reference variant and retains reachable
+internal classes alongside generated adapter functions. `runtime/raven/Linq.neoil`
+only includes generated bodies; it no longer contains handwritten query algorithms.
+Public methods, Option/Result outcomes, callback timing, iterator caching, Dispose
+order and repeated-iteration semantics are unchanged. Current uses an ordinary guard
+calling System.Fault before reading its cache; no compiler non-returning-call analysis
+or artificial fallback value was needed.
+
+The port exposed a runtime class-construction gap for delegate fields. That was fixed
+separately: delegate fields can be assigned during construction, early reads fault and
+the constructor must initialize them before returning. Null/default delegates remain
+unsupported under the existing preview contract.
+
+Validation: 30 Raven query cases, 25 delegate tests, five query terminal/cleanup tests,
+three reserved-array tests, 203 scalar outcomes, generic/nongeneric instance probes,
+the static-generic probe and 13 cross-library cases pass. Regeneration matches the
+checked-in snapshot; scalar implementation bodies are unchanged. SDK installation and
+release packaging were not performed as part of this migration.
+
+The next collection candidates are ArrayList and its iterator, using this same
+bootstrap storage and private-helper support. Their larger mutation/search contracts
+still need independent parity checks; they are not ported by this slice.

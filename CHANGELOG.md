@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-15
 
+- Port Where/Select sequences and iterators to Raven, completing all nine current
+  query overloads in the shared runtime project. Remove handwritten deferred query
+  bodies; preserve callback timing, cached Current, disposal and terminal faults.
+  Retain generated internal classes in reproducible bootstrap fragments. Thirty Raven
+  query cases, 33 delegate/query/reservation runtime tests, 203 scalar outcomes and
+  13 cross-library cases pass, alongside authoring probes and clean regeneration.
+
 - Add bootstrap-only checked generic array storage and scoped internal helper classes
   to matched Raven library imports. Keep consumer metadata and ordinary application
   admission unchanged. Validate Int32/String/Void storage and private helper dispatch,
@@ -26,7 +33,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   guest execution through the existing Fault outcome; embedding hosts are not aborted.
   No cleanup guarantee or compiler non-returning-call analysis is introduced. Add
   runtime and Raven consumer checks and document the FailFast comparison. Deferred
-  query migration still requires checked storage and private helper dependencies.
+  query migration uses the checked-storage and private-helper slices recorded above.
 
 - Extend matched Raven library class imports to unconstrained generic parameters,
   constructed fields/methods, generic locals and supported interface declarations.
@@ -36,8 +43,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   into the experiment, with four new .NET execution cases and 17 focused tests.
   Raven main integration passes 311 compiler, 73 core and 249 language-server checks
   (three existing skips); existing neoCLR authoring/cross-library regressions pass.
-  This is migration groundwork; checked generic storage, fault operations and private
-  implementation dependencies remain before the deferred collection bodies can port.
+  Subsequent same-day slices add checked storage, fault operations and private
+  implementation dependencies, then port the deferred query bodies.
 
 - Port Int32.Divide and seven Char predicates to the shared Raven runtime project,
   preserving Result errors, UTF-16 code-unit/Unicode behavior and existing public

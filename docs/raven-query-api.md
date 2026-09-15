@@ -343,9 +343,9 @@ Source validation passed 63 saved-project cases, 29 query checks, 15 application
 checks, 116 signature checks, 64 editor checks and five query-terminal runtime
 tests, plus Clippy and formatting. The .NET comparison targets net10.0.
 
-## Raven-authored terminal implementations
+## Raven-authored query implementations
 
-`ToList`, `First`, `Last` and `Single` (including predicate overloads) are now authored
+`Where`, `Select`, `ToList`, `First`, `Last` and `Single` (including predicate overloads) are authored
 in `runtime/raven/src/Linq.rvn`. `System.Linq.Operators` holds the extension methods;
 `import System.Linq.*` and receiver calls remain unchanged. This replaces the earlier
 `Enumerable` owner without an alias: rebuild consumers and reference metadata together.
@@ -355,5 +355,16 @@ with .NET's Enumerable class, this is a naming difference, not a new query proto
 Generated bootstrap bodies retain the existing Option/Result outcomes and Dispose
 boundaries. Iterator/predicate faults still terminate execution rather than becoming
 error outcomes; this migration does not introduce exception unwinding. Deferred
-Where/Select iterator classes remain in neoIL pending shared implementation/reference
-identity support. See [library authoring](raven-system-library.md).
+Where/Select sequences and iterators are also authored in Raven. Their private helper
+classes are emitted with internal, owner-scoped identities. Cached elements use checked
+generic storage; no default element is manufactured. `Current` guards access with
+`System.Fault("Query iterator has no current element")`, then reads the initialized
+cache. This ordinary guard pattern does not require a compiler-specific non-returning
+call rule. Dispose replaces the cache with a zero-length reservation before disposing
+the source, preserving the previous retention and terminal-fault boundaries.
+
+The generated neoIL remains an executable bootstrap artifact; handwritten deferred
+bodies have been removed. This is a source-language migration, not a change to public
+query signatures, callback timing, repeat iteration or collection contracts. The 30
+Raven query cases and five runtime terminal/cleanup/allocation tests pass. See
+[library authoring](raven-system-library.md).

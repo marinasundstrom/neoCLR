@@ -18,10 +18,25 @@ def digest(path):
 
 def fragments(text, name="Math", owner="System.Math"):
     lines = text.splitlines(keepends=True)
-    methods, helpers = [], {}
+    methods, helpers, types = [], {}, []
     while lines:
         if not lines[0].strip():
             lines.pop(0)
+            continue
+        if lines[0].startswith('.type internal class '):
+            depth = 0
+            for index, line in enumerate(lines):
+                token = line.strip().split(' ', 1)[0]
+                if token in ('.type', '.method', '.property'):
+                    depth += 1
+                elif token == '.end':
+                    depth -= 1
+                    if depth == 0:
+                        break
+            else:
+                raise ValueError('Unclosed private implementation type')
+            types.append(''.join(lines[:index + 1]))
+            lines = lines[index + 1:]
             continue
         match = re.match(r'\.function ([^(]+)\(', lines[0])
         assert match, lines[0]
@@ -37,7 +52,7 @@ def fragments(text, name="Math", owner="System.Math"):
         lines = lines[end + 1:]
     # Retain only transitively called adapters; no application entry-point shim.
     used = set()
-    pending = re.findall(r'(?m)^(?:call|ldftn) ([^(]+)\(', ''.join(methods))
+    pending = re.findall(r'(?m)^(?:call|ldftn) ([^(]+)\(', ''.join(methods + types))
     while pending:
         helper = pending.pop()
         if helper in used or helper not in helpers:
@@ -46,7 +61,7 @@ def fragments(text, name="Math", owner="System.Math"):
         pending.extend(re.findall(r'(?m)^(?:call|ldftn) ([^(]+)\(', helpers[helper]))
     banner = f'; Generated from runtime/raven/src/{name}.rvn. Regenerate with build_runtime_library.py.\n'
     return {name + '.methods.neoil': banner + ''.join(methods),
-            name + '.helpers.neoil': banner + ''.join(body for name, body in helpers.items() if name in used)}
+            name + '.helpers.neoil': banner + ''.join(body for name, body in helpers.items() if name in used) + ''.join(types)}
 
 def check_snapshot():
     for name in SLICES:
@@ -76,7 +91,7 @@ def main():
         (root / 'demo').mkdir()
         core = root / 'demo/NeoCLR.CoreProbe.dll'
         bridge = ['dotnet', str(args.bridge.resolve())]
-        subprocess.run([*bridge, '--reference-core', str(core)], check=True)
+        subprocess.run([*bridge, '--reference-library-core', str(core)], check=True)
         subprocess.run(['dotnet', str(args.compiler.resolve()), str(PROJECT), '--no-project-restore',
                         '-o', str(root / 'compiled')], env={**os.environ, 'NeoCLRBootstrapRoot': str(root)}, check=True)
         if args.check:
