@@ -1,0 +1,212 @@
+namespace System.Collections
+
+import System.Option.*
+
+public open class ArrayList<T> : List<T> {
+    private field data: T[]
+    private field count: int
+
+    init() {
+        data = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(0)
+        count = 0
+    }
+
+    init(capacity: int) {
+        if capacity < 0 {
+            System.Fault("ArrayList capacity must be non-negative")
+        }
+        data = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(capacity)
+        count = 0
+    }
+
+    val Count: int { get => count }
+    val Capacity: int { get => data.Length }
+
+    var self[index: int]: T {
+        get {
+            if index < 0 || index >= count {
+                System.Fault("ArrayList index out of range")
+            }
+            return data[index]
+        }
+        set {
+            if index < 0 || index >= count {
+                System.Fault("ArrayList index out of range")
+            }
+            data[index] = value
+        }
+    }
+
+    func Add(value: T) {
+        var buffer = data
+        let extent = count
+        var capacity = buffer.Length
+        if extent == capacity {
+            if capacity == 0 {
+                capacity = 4
+            } else {
+                if capacity > 1073741823 {
+                    System.Fault("ArrayList capacity overflow")
+                }
+                capacity = capacity * 2
+            }
+            let previous = buffer
+            buffer = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(capacity)
+            var index = 0
+            while index < extent {
+                buffer[index] = previous[index]
+                index = index + 1
+            }
+        }
+        buffer[extent] = value
+        data = buffer
+        count = extent + 1
+    }
+
+    func Copy() -> ArrayList<T> {
+        let buffer = data
+        let extent = count
+        let copy = ArrayList<T>(extent)
+        var index = 0
+        while index < extent {
+            copy.Add(buffer[index])
+            index = index + 1
+        }
+        return copy
+    }
+
+    func GetIterator() -> Iterator<T> {
+        return ArrayListIterator<T>(data, count)
+    }
+
+    func Find(@match: System.Func<T, bool>) -> System.Option<T> {
+        let buffer = data
+        let extent = count
+        var index = 0
+        while index < extent {
+            let value = buffer[index]
+            if @match(value) {
+                return Some(value)
+            }
+            index = index + 1
+        }
+        return None
+    }
+
+    func FindLast(@match: System.Func<T, bool>) -> System.Option<T> {
+        let buffer = data
+        let extent = count
+        var index = extent - 1
+        while index >= 0 {
+            let value = buffer[index]
+            if @match(value) {
+                return Some(value)
+            }
+            index = index - 1
+        }
+        return None
+    }
+
+    func FindIndex(@match: System.Func<T, bool>) -> System.Option<int> {
+        let buffer = data
+        let extent = count
+        var index = 0
+        while index < extent {
+            let value = buffer[index]
+            if @match(value) {
+                return Some(index)
+            }
+            index = index + 1
+        }
+        return None
+    }
+
+    func FindLastIndex(@match: System.Func<T, bool>) -> System.Option<int> {
+        let buffer = data
+        let extent = count
+        var index = extent - 1
+        while index >= 0 {
+            let value = buffer[index]
+            if @match(value) {
+                return Some(index)
+            }
+            index = index - 1
+        }
+        return None
+    }
+
+    func Exists(@match: System.Func<T, bool>) -> bool {
+        let buffer = data
+        let extent = count
+        var index = 0
+        while index < extent {
+            if @match(buffer[index]) {
+                return true
+            }
+            index = index + 1
+        }
+        return false
+    }
+
+    func TrueForAll(@match: System.Func<T, bool>) -> bool {
+        let buffer = data
+        let extent = count
+        var index = 0
+        while index < extent {
+            if !@match(buffer[index]) {
+                return false
+            }
+            index = index + 1
+        }
+        return true
+    }
+
+    func FindAll(@match: System.Func<T, bool>) -> ArrayList<T> {
+        let buffer = data
+        let extent = count
+        let result = ArrayList<T>()
+        var index = 0
+        while index < extent {
+            let value = buffer[index]
+            if @match(value) {
+                result.Add(value)
+            }
+            index = index + 1
+        }
+        return result
+    }
+}
+
+// Capture the original buffer and extent, including later edits within that buffer.
+internal class ArrayListIterator<T> : Iterator<T> {
+    private field data: T[]
+    private field count: int
+    private field position: int
+
+    init(buffer: T[], extent: int) {
+        data = buffer
+        count = extent
+        position = -1
+    }
+
+    func MoveNext() -> bool {
+        if position >= count {
+            return false
+        }
+        position = position + 1
+        return position < count
+    }
+
+    val Current: T {
+        get {
+            if position < 0 || position >= count {
+                System.Fault("Iterator has no current element")
+            }
+            return data[position]
+        }
+    }
+
+    func Dispose() {
+        position = count
+    }
+}

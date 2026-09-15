@@ -16,7 +16,6 @@ parser.add_argument('--runtime', required=True, type=Path)
 args = parser.parse_args()
 bridge = Path(__file__).resolve().parent
 results = {}
-array_invariance = '<RavenAllowArrayCovariance>false</RavenAllowArrayCovariance>' in args.project.read_text()
 with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
     root = Path(temporary)
     for name in ('Demo.rvnproj', 'NeoCLR.CoreProbe.dll'):
@@ -96,13 +95,16 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
         ('PathUnsupportedApi', 'func Main() { System.IO.Path.GetFullPath(".") }', 'RAV'),
         ('StringArgumentMismatch', 'func Main() { System.String.Concat(42, 7) }', 'RAV'),
         ('StringUnsupportedApi', 'func Main() { System.String.IsNullOrEmpty(\"\") }', 'RAV'),
-        ('ArrayImplicitCovariance', 'import System.*\nimport System.Reflection.*\nfunc Main() { let members: MemberInfo[] = typeof(int).GetMethods() }', 'RAV1504' if array_invariance else 'identical element types'),
-        ('ArrayExplicitCovariance', 'import System.*\nimport System.Reflection.*\nfunc Main() { let members = (MemberInfo[])typeof(int).GetMethods() }', 'RAV1503' if array_invariance else 'identical element types'),
+        ('ArrayImplicitCovariance', 'import System.*\nimport System.Reflection.*\nfunc Main() { let members: MemberInfo[] = typeof(int).GetMethods() }', ('RAV1504', 'identical element types')),
+        ('ArrayExplicitCovariance', 'import System.*\nimport System.Reflection.*\nfunc Main() { let members = (MemberInfo[])typeof(int).GetMethods() }', ('RAV1503', 'identical element types')),
         ('ImportFailure', 'func Negate(value: int) -> int { return -value }\nfunc Main() { Negate(2) }', 'Unsupported')]:
         before = set(root.rglob('App.neoil'))
         (root / 'Main.rvn').write_text(source)
         run = subprocess.run(command, capture_output=True, text=True, timeout=90)
-        if run.returncode == 0 or diagnostic not in run.stderr or set(root.rglob('App.neoil')) != before:
+        # Imported MSBuild props can configure compiler invariance without an inline
+        # property. Both compiler rejection and the legacy importer guard are valid.
+        diagnostics = (diagnostic,) if isinstance(diagnostic, str) else diagnostic
+        if run.returncode == 0 or not any(d in run.stderr for d in diagnostics) or set(root.rglob('App.neoil')) != before:
             raise AssertionError(run.stdout + run.stderr)
         results[label] = 'Rejected; no executable produced or stale output run'
     for label, type_name, left, right, diagnostic in (

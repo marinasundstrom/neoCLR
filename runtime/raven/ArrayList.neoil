@@ -1,0 +1,3 @@
+; Raven-authored class and its private iterator; checked bootstrap snapshots.
+.include "generated/ArrayList.methods.neoil"
+.include "generated/ArrayList.helpers.neoil"

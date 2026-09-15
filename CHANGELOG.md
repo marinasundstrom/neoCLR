@@ -8,6 +8,19 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-15
 
+- Port the complete ArrayList class and its private iterator to Raven, including
+  constructors, indexing, growth, shallow copies and all seven predicate searches.
+  Replace the legacy shared-state wrapper with direct checked array storage while
+  preserving aliasing, captured-buffer iteration and Option outcomes. Remove the
+  handwritten search fragment and constructor-rewriting adapter. Build the class as
+  a checked slice of the shared project; preserve the reference/implementation gate.
+  Capacity overflow now has an explicit list diagnostic. Update the reflection sample's
+  build-local definition index and document the temporary bootstrap split. Recognize
+  compiler array-invariance diagnostics when test projects inherit their configuration
+  through MSBuild imports, while still requiring rejection without stale execution.
+  Validation: 18 runtime tests, 30 query cases, eight mutation cases and 63 saved-project
+  checks pass; bootstrap regeneration and API inventory/coverage checks pass.
+
 - Port Where/Select sequences and iterators to Raven, completing all nine current
   query overloads in the shared runtime project. Remove handwritten deferred query
   bodies; preserve callback timing, cached Current, disposal and terminal faults.

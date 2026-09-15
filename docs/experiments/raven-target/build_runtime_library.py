@@ -9,7 +9,7 @@ import subprocess
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
-SLICES = {"Math": "System.Math", "Linq": "System.Linq.Operators", "Int32": "System.Int32", "Char": "System.Char"}
+SLICES = {"Math": "System.Math", "Linq": "System.Linq.Operators", "Int32": "System.Int32", "Char": "System.Char", "ArrayList": "System.Collections.ArrayList"}
 PROJECT = ROOT / 'runtime/raven/System.rvnproj'
 GENERATED = ROOT / 'runtime/raven/generated'
 
@@ -23,7 +23,7 @@ def fragments(text, name="Math", owner="System.Math"):
         if not lines[0].strip():
             lines.pop(0)
             continue
-        if lines[0].startswith('.type internal class '):
+        if lines[0].startswith(('.type internal class ', '.type class ')):
             depth = 0
             for index, line in enumerate(lines):
                 token = line.strip().split(' ', 1)[0]
@@ -35,7 +35,11 @@ def fragments(text, name="Math", owner="System.Math"):
                         break
             else:
                 raise ValueError('Unclosed private implementation type')
-            types.append(''.join(lines[:index + 1]))
+            body = ''.join(lines[:index + 1])
+            if lines[0].startswith('.type class ' + owner + '<'):
+                methods.append(body)
+            else:
+                types.append(body)
             lines = lines[index + 1:]
             continue
         match = re.match(r'\.function ([^(]+)\(', lines[0])
@@ -93,13 +97,19 @@ def main():
         bridge = ['dotnet', str(args.bridge.resolve())]
         subprocess.run([*bridge, '--reference-library-core', str(core)], check=True)
         subprocess.run(['dotnet', str(args.compiler.resolve()), str(PROJECT), '--no-project-restore',
-                        '-o', str(root / 'compiled')], env={**os.environ, 'NeoCLRBootstrapRoot': str(root)}, check=True)
+                        '-o', str(root / 'compiled')], env={**os.environ, 'NeoCLRBootstrapRoot': str(root), 'NeoCLRLibrarySlice': ''}, check=True)
         if args.check:
             check_snapshot()
         generated = {}
         for name, owner in SLICES.items():
+            compiled = root / 'compiled'
+            if name == 'ArrayList':
+                compiled = root / ('compiled-' + name)
+                subprocess.run(['dotnet', str(args.compiler.resolve()), str(PROJECT), '--no-project-restore',
+                                '-o', str(compiled)], env={**os.environ, 'NeoCLRBootstrapRoot': str(root),
+                                'NeoCLRLibrarySlice': name}, check=True)
             imported = root / ('imported-' + name)
-            subprocess.run([*bridge, '--library-implementation', str(root / 'compiled/NeoCLR.System.dll'),
+            subprocess.run([*bridge, '--library-implementation', str(compiled / 'NeoCLR.System.dll'),
                             str(core), owner, str(imported)], check=True)
             outputs = fragments((imported / 'Implementation.neoil').read_text(), name, owner)
             if args.check:
@@ -113,7 +123,7 @@ def main():
                     'inputs': {str(p.relative_to(ROOT)): digest(p) for p in inputs},
                     'outputs': {output: hashlib.sha256(text.encode()).hexdigest() for output, text in outputs.items()},
                     'compilerSha256': digest(args.compiler), 'coreSha256': digest(core),
-                    'exports': re.findall(r'(?m)^\.method static (.+)', outputs[name + '.methods.neoil'])}
+                    'exports': re.findall(r'(?m)^\.method (?:static |instance )(.+)', outputs[name + '.methods.neoil'])}
             generated.update(outputs)
             generated[name + '.json'] = json.dumps(data, indent=2) + '\n'
         # Do not publish a partial snapshot when a later implementation fails admission.

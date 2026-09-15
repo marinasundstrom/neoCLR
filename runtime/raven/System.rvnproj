@@ -5,10 +5,13 @@
     <NeoCLRRoot>$(NeoCLRBootstrapRoot)</NeoCLRRoot>
   </PropertyGroup>
   <Import Project="../../build/NeoCLR.Raven.props" />
-  <ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' != 'ArrayList'">
     <Compile Include="src/Math.rvn" />
     <Compile Include="src/Linq.rvn" />
     <Compile Include="src/Int32.rvn" />
     <Compile Include="src/Char.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'ArrayList'">
+    <Compile Include="src/ArrayList.rvn" />
   </ItemGroup>
 </Project>

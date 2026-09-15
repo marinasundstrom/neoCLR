@@ -60,10 +60,10 @@ for file in source['sourceFiles']:
                      'note': 'The native descriptor API is removed; direct IL covers typed NativeMemory access. Raven native casts remain limited.'})
         continue
     if file == 'runtime/System/Collections/ArrayList.neoil':
-        rows.append({'file': file, 'declarations': len(entries), 'disposition': 'adapted-in-raven-profile',
-                     'replacementFiles': ['runtime/raven/ArrayListSearch.neoil'],
+        rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-class-bootstrap',
+                     'replacementFiles': ['runtime/raven/ArrayList.neoil', 'runtime/raven/src/ArrayList.rvn'],
                      'samples': ['library-list-filters.rvn', 'library-delegates.rvn', 'library-maps.rvn'],
-                     'note': 'Other members retain class/storage adaptation. Searches use direct scans; FindIndex now returns Option<Int32>. Historical Neo profile unchanged.'})
+                     'note': 'The complete class and private iterator are Raven-authored. Direct checked array storage replaces the legacy state wrapper; searches preserve captured buffer/extent and Option outcomes. Historical Neo profile unchanged.'})
         continue
     if file == 'runtime/System/Collections/List.neoil':
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'replaced-in-raven-profile',

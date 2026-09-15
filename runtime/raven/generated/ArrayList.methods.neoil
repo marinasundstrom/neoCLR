@@ -1,0 +1,1164 @@
+; Generated from runtime/raven/src/ArrayList.rvn. Regenerate with build_runtime_library.py.
+.type class System.Collections.ArrayList<T0>
+.implements System.Collections.List<T0>
+.implements System.Collections.MutableSequence<T0>
+.implements System.Collections.Sequence<T0>
+.implements System.Collections.Collection<T0>
+.implements System.Collections.Iterable<T0>
+.field private data arrayref<T0>
+.field private count Int32
+.property instance Count() -> Int32
+.get instance System.Collections.ArrayList<T0>::get_Count()
+.end
+.property instance Capacity() -> Int32
+.get instance System.Collections.ArrayList<T0>::get_Capacity()
+.end
+.property instance Item(Int32) -> T0
+.get instance System.Collections.ArrayList<T0>::get_Item(Int32)
+.set instance System.Collections.ArrayList<T0>::set_Item(Int32,T0)
+.end
+.method instance .ctor() -> noresult
+M00000001_IL_0000:
+M00000001_IL_0001:
+ldarg 0
+M00000001_IL_0002:
+pop
+M00000001_IL_0007:
+M00000001_IL_0008:
+ldarg 0
+M00000001_IL_0009:
+ldc.i4 0
+M00000001_IL_000a:
+array.reserve T0
+M00000001_IL_000f:
+stfld System.Collections.ArrayList<T0>::data
+M00000001_IL_0014:
+M00000001_IL_0015:
+ldarg 0
+M00000001_IL_0016:
+ldc.i4 0
+M00000001_IL_0017:
+stfld System.Collections.ArrayList<T0>::count
+M00000001_IL_001c:
+ret
+.end
+.method instance .ctor(Int32) -> noresult
+M00000002_IL_0000:
+M00000002_IL_0001:
+ldarg 0
+M00000002_IL_0002:
+pop
+M00000002_IL_0007:
+M00000002_IL_0008:
+ldarg 1
+M00000002_IL_0009:
+ldc.i4 0
+M00000002_IL_000a:
+clt
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_000c:
+brtrue M00000002_IL_0016
+M00000002_IL_0011:
+br M00000002_IL_0021
+M00000002_IL_0016:
+M00000002_IL_0017:
+ldstr "ArrayList capacity must be non-negative"
+M00000002_IL_001c:
+call System.Fault(String)
+M00000002_IL_0021:
+M00000002_IL_0022:
+M00000002_IL_0023:
+ldarg 0
+M00000002_IL_0024:
+ldarg 1
+M00000002_IL_0025:
+array.reserve T0
+M00000002_IL_002a:
+stfld System.Collections.ArrayList<T0>::data
+M00000002_IL_002f:
+M00000002_IL_0030:
+ldarg 0
+M00000002_IL_0031:
+ldc.i4 0
+M00000002_IL_0032:
+stfld System.Collections.ArrayList<T0>::count
+M00000002_IL_0037:
+ret
+.end
+.method instance get_Count() -> Int32
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+ldfld System.Collections.ArrayList<T0>::count
+M00000003_IL_0008:
+ret
+.end
+.method instance get_Capacity() -> Int32
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+ldfld System.Collections.ArrayList<T0>::data
+M00000004_IL_0008:
+ldlen
+M00000004_IL_0009:
+conv.i4
+M00000004_IL_000a:
+ret
+.end
+.method instance get_Item(Int32) -> T0
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 1
+M00000005_IL_0003:
+ldc.i4 0
+M00000005_IL_0004:
+clt
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_0006:
+brtrue M00000005_IL_001c
+M00000005_IL_000b:
+ldarg 1
+M00000005_IL_000c:
+ldarg 0
+M00000005_IL_000d:
+ldfld System.Collections.ArrayList<T0>::count
+M00000005_IL_0012:
+clt
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_0014:
+ldc.i4 0
+M00000005_IL_0015:
+ceq
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_0017:
+br M00000005_IL_001d
+M00000005_IL_001c:
+ldc.i4 1
+M00000005_IL_001d:
+brfalse M00000005_IL_002c
+M00000005_IL_0022:
+ldstr "ArrayList index out of range"
+M00000005_IL_0027:
+call System.Fault(String)
+M00000005_IL_002c:
+M00000005_IL_002d:
+M00000005_IL_002e:
+ldarg 0
+M00000005_IL_002f:
+ldfld System.Collections.ArrayList<T0>::data
+M00000005_IL_0034:
+ldarg 1
+M00000005_IL_0035:
+ldelem T0
+M00000005_IL_003a:
+ret
+.end
+.method instance set_Item(Int32,T0) -> noresult
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 1
+M00000006_IL_0003:
+ldc.i4 0
+M00000006_IL_0004:
+clt
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_0006:
+brtrue M00000006_IL_001c
+M00000006_IL_000b:
+ldarg 1
+M00000006_IL_000c:
+ldarg 0
+M00000006_IL_000d:
+ldfld System.Collections.ArrayList<T0>::count
+M00000006_IL_0012:
+clt
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_0014:
+ldc.i4 0
+M00000006_IL_0015:
+ceq
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_0017:
+br M00000006_IL_001d
+M00000006_IL_001c:
+ldc.i4 1
+M00000006_IL_001d:
+brfalse M00000006_IL_002c
+M00000006_IL_0022:
+ldstr "ArrayList index out of range"
+M00000006_IL_0027:
+call System.Fault(String)
+M00000006_IL_002c:
+M00000006_IL_002d:
+M00000006_IL_002e:
+ldarg 0
+M00000006_IL_002f:
+ldfld System.Collections.ArrayList<T0>::data
+M00000006_IL_0034:
+ldarg 1
+M00000006_IL_0035:
+ldarg 2
+M00000006_IL_0036:
+stelem T0
+M00000006_IL_003b:
+M00000006_IL_003c:
+ret
+.end
+.method instance Add(T0) -> noresult
+.local arrayref<T0> local0
+.local Int32 local1
+.local Int32 local2
+.local arrayref<T0> local3
+.local Int32 local4
+ldloca local0
+initobj arrayref<T0>
+ldc.i4 0
+stloc local1
+ldc.i4 0
+stloc local2
+ldloca local3
+initobj arrayref<T0>
+ldc.i4 0
+stloc local4
+M00000007_IL_0000:
+M00000007_IL_0001:
+M00000007_IL_0002:
+ldarg 0
+M00000007_IL_0003:
+ldfld System.Collections.ArrayList<T0>::data
+M00000007_IL_0008:
+stloc local0
+M00000007_IL_0009:
+M00000007_IL_000a:
+ldarg 0
+M00000007_IL_000b:
+ldfld System.Collections.ArrayList<T0>::count
+M00000007_IL_0010:
+stloc local1
+M00000007_IL_0011:
+M00000007_IL_0012:
+ldloc local0
+M00000007_IL_0013:
+ldlen
+M00000007_IL_0014:
+conv.i4
+M00000007_IL_0015:
+stloc local2
+M00000007_IL_0016:
+M00000007_IL_0017:
+ldloc local1
+M00000007_IL_0018:
+ldloc local2
+M00000007_IL_0019:
+ceq
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_001b:
+brtrue M00000007_IL_0025
+M00000007_IL_0020:
+br M00000007_IL_00a0
+M00000007_IL_0025:
+M00000007_IL_0026:
+ldloc local2
+M00000007_IL_0027:
+ldc.i4 0
+M00000007_IL_0028:
+ceq
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_002a:
+brtrue M00000007_IL_0034
+M00000007_IL_002f:
+br M00000007_IL_003d
+M00000007_IL_0034:
+M00000007_IL_0035:
+ldc.i4 4
+M00000007_IL_0036:
+stloc local2
+M00000007_IL_0037:
+br M00000007_IL_0061
+M00000007_IL_003d:
+M00000007_IL_003e:
+M00000007_IL_003f:
+ldloc local2
+M00000007_IL_0040:
+ldc.i4 1073741823
+M00000007_IL_0045:
+cgt
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0047:
+brtrue M00000007_IL_0051
+M00000007_IL_004c:
+br M00000007_IL_005b
+M00000007_IL_0051:
+ldstr "ArrayList capacity overflow"
+M00000007_IL_0056:
+call System.Fault(String)
+M00000007_IL_005b:
+M00000007_IL_005c:
+M00000007_IL_005d:
+ldloc local2
+M00000007_IL_005e:
+ldc.i4 2
+M00000007_IL_005f:
+mul
+M00000007_IL_0060:
+stloc local2
+M00000007_IL_0061:
+M00000007_IL_0062:
+M00000007_IL_0063:
+ldloc local0
+M00000007_IL_0064:
+stloc local3
+M00000007_IL_0065:
+M00000007_IL_0066:
+ldloc local2
+M00000007_IL_0067:
+array.reserve T0
+M00000007_IL_006c:
+stloc local0
+M00000007_IL_006d:
+M00000007_IL_006e:
+ldc.i4 0
+M00000007_IL_006f:
+stloc local4
+M00000007_IL_0071:
+M00000007_IL_0072:
+M00000007_IL_0073:
+ldloc local4
+M00000007_IL_0075:
+ldloc local1
+M00000007_IL_0076:
+clt
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0078:
+brtrue M00000007_IL_0082
+M00000007_IL_007d:
+br M00000007_IL_009f
+M00000007_IL_0082:
+M00000007_IL_0083:
+ldloc local0
+M00000007_IL_0084:
+ldloc local4
+M00000007_IL_0086:
+ldloc local3
+M00000007_IL_0087:
+ldloc local4
+M00000007_IL_0089:
+ldelem T0
+M00000007_IL_008e:
+stelem T0
+M00000007_IL_0093:
+M00000007_IL_0094:
+ldloc local4
+M00000007_IL_0096:
+ldc.i4 1
+M00000007_IL_0097:
+add
+M00000007_IL_0098:
+stloc local4
+M00000007_IL_009a:
+br M00000007_IL_0072
+M00000007_IL_009f:
+M00000007_IL_00a0:
+M00000007_IL_00a1:
+M00000007_IL_00a2:
+ldloc local0
+M00000007_IL_00a3:
+ldloc local1
+M00000007_IL_00a4:
+ldarg 1
+M00000007_IL_00a5:
+stelem T0
+M00000007_IL_00aa:
+M00000007_IL_00ab:
+ldarg 0
+M00000007_IL_00ac:
+ldloc local0
+M00000007_IL_00ad:
+stfld System.Collections.ArrayList<T0>::data
+M00000007_IL_00b2:
+M00000007_IL_00b3:
+ldarg 0
+M00000007_IL_00b4:
+ldloc local1
+M00000007_IL_00b5:
+ldc.i4 1
+M00000007_IL_00b6:
+add
+M00000007_IL_00b7:
+stfld System.Collections.ArrayList<T0>::count
+M00000007_IL_00bc:
+M00000007_IL_00bd:
+ret
+.end
+.method instance Copy() -> System.Collections.ArrayList<T0>
+.local arrayref<T0> local0
+.local Int32 local1
+.local System.Collections.ArrayList<T0> local2
+.local Int32 local3
+ldloca local0
+initobj arrayref<T0>
+ldc.i4 0
+stloc local1
+ldloca local2
+initobj System.Collections.ArrayList<T0>
+ldc.i4 0
+stloc local3
+M00000008_IL_0000:
+M00000008_IL_0001:
+M00000008_IL_0002:
+ldarg 0
+M00000008_IL_0003:
+ldfld System.Collections.ArrayList<T0>::data
+M00000008_IL_0008:
+stloc local0
+M00000008_IL_0009:
+M00000008_IL_000a:
+ldarg 0
+M00000008_IL_000b:
+ldfld System.Collections.ArrayList<T0>::count
+M00000008_IL_0010:
+stloc local1
+M00000008_IL_0011:
+M00000008_IL_0012:
+ldloc local1
+M00000008_IL_0013:
+newobj instance System.Collections.ArrayList<T0>::.ctor(Int32)
+M00000008_IL_0018:
+stloc local2
+M00000008_IL_0019:
+M00000008_IL_001a:
+ldc.i4 0
+M00000008_IL_001b:
+stloc local3
+M00000008_IL_001c:
+M00000008_IL_001d:
+M00000008_IL_001e:
+ldloc local3
+M00000008_IL_001f:
+ldloc local1
+M00000008_IL_0020:
+clt
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0022:
+brtrue M00000008_IL_002c
+M00000008_IL_0027:
+br M00000008_IL_0044
+M00000008_IL_002c:
+M00000008_IL_002d:
+ldloc local2
+M00000008_IL_002e:
+ldloc local0
+M00000008_IL_002f:
+ldloc local3
+M00000008_IL_0030:
+ldelem T0
+M00000008_IL_0035:
+callvirt instance System.Collections.ArrayList<T0>::Add(T0)
+M00000008_IL_003a:
+M00000008_IL_003b:
+ldloc local3
+M00000008_IL_003c:
+ldc.i4 1
+M00000008_IL_003d:
+add
+M00000008_IL_003e:
+stloc local3
+M00000008_IL_003f:
+br M00000008_IL_001d
+M00000008_IL_0044:
+M00000008_IL_0045:
+M00000008_IL_0046:
+ldloc local2
+M00000008_IL_0047:
+ret
+.end
+.method instance GetIterator() -> System.Collections.Iterator<T0>
+M00000009_IL_0000:
+M00000009_IL_0001:
+M00000009_IL_0002:
+ldarg 0
+M00000009_IL_0003:
+ldfld System.Collections.ArrayList<T0>::data
+M00000009_IL_0008:
+ldarg 0
+M00000009_IL_0009:
+ldfld System.Collections.ArrayList<T0>::count
+M00000009_IL_000e:
+newobj instance neoCLR.Library.System.Collections.ArrayList.Type_53797374656D2E436F6C6C656374696F6E732E41727261794C6973744974657261746F726031<T0>::.ctor(arrayref<T0>,Int32)
+M00000009_IL_0013:
+ret
+.end
+.method instance Find(System.Func<T0,Boolean>) -> System.Option<T0>
+.local arrayref<T0> local0
+.local Int32 local1
+.local Int32 local2
+.local T0 local3
+ldloca local0
+initobj arrayref<T0>
+ldc.i4 0
+stloc local1
+ldc.i4 0
+stloc local2
+M0000000a_IL_0000:
+M0000000a_IL_0001:
+M0000000a_IL_0002:
+ldarg 0
+M0000000a_IL_0003:
+ldfld System.Collections.ArrayList<T0>::data
+M0000000a_IL_0008:
+stloc local0
+M0000000a_IL_0009:
+M0000000a_IL_000a:
+ldarg 0
+M0000000a_IL_000b:
+ldfld System.Collections.ArrayList<T0>::count
+M0000000a_IL_0010:
+stloc local1
+M0000000a_IL_0011:
+M0000000a_IL_0012:
+ldc.i4 0
+M0000000a_IL_0013:
+stloc local2
+M0000000a_IL_0014:
+M0000000a_IL_0015:
+M0000000a_IL_0016:
+ldloc local2
+M0000000a_IL_0017:
+ldloc local1
+M0000000a_IL_0018:
+clt
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_001a:
+brtrue M0000000a_IL_0024
+M0000000a_IL_001f:
+br M0000000a_IL_0057
+M0000000a_IL_0024:
+M0000000a_IL_0025:
+ldloc local0
+M0000000a_IL_0026:
+ldloc local2
+M0000000a_IL_0027:
+ldelem T0
+M0000000a_IL_002c:
+stloc local3
+M0000000a_IL_002d:
+M0000000a_IL_002e:
+ldarg 1
+M0000000a_IL_002f:
+ldloc local3
+M0000000a_IL_0030:
+callvirt instance System.Func<T0,Boolean>::Invoke(T0)
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0035:
+brtrue M0000000a_IL_003f
+M0000000a_IL_003a:
+br M0000000a_IL_004c
+M0000000a_IL_003f:
+M0000000a_IL_0040:
+ldloc local3
+M0000000a_IL_0041:
+call neoCLR.Library.System.Collections.ArrayList.RuntimeUnion2<T0>(T0)
+M0000000a_IL_0046:
+call neoCLR.Library.System.Collections.ArrayList.RuntimeUnion3<T0>(System.Option.Some<T0>)
+M0000000a_IL_004b:
+ret
+M0000000a_IL_004c:
+M0000000a_IL_004d:
+M0000000a_IL_004e:
+ldloc local2
+M0000000a_IL_004f:
+ldc.i4 1
+M0000000a_IL_0050:
+add
+M0000000a_IL_0051:
+stloc local2
+M0000000a_IL_0052:
+br M0000000a_IL_0015
+M0000000a_IL_0057:
+M0000000a_IL_0058:
+call neoCLR.Library.System.Collections.ArrayList.RuntimeUnion0()
+M0000000a_IL_005d:
+call neoCLR.Library.System.Collections.ArrayList.RuntimeUnion1<T0>(System.Option.None)
+M0000000a_IL_0062:
+ret
+.end
+.method instance FindLast(System.Func<T0,Boolean>) -> System.Option<T0>
+.local arrayref<T0> local0
+.local Int32 local1
+.local Int32 local2
+.local T0 local3
+ldloca local0
+initobj arrayref<T0>
+ldc.i4 0
+stloc local1
+ldc.i4 0
+stloc local2
+M0000000b_IL_0000:
+M0000000b_IL_0001:
+M0000000b_IL_0002:
+ldarg 0
+M0000000b_IL_0003:
+ldfld System.Collections.ArrayList<T0>::data
+M0000000b_IL_0008:
+stloc local0
+M0000000b_IL_0009:
+M0000000b_IL_000a:
+ldarg 0
+M0000000b_IL_000b:
+ldfld System.Collections.ArrayList<T0>::count
+M0000000b_IL_0010:
+stloc local1
+M0000000b_IL_0011:
+M0000000b_IL_0012:
+ldloc local1
+M0000000b_IL_0013:
+ldc.i4 1
+M0000000b_IL_0014:
+sub
+M0000000b_IL_0015:
+stloc local2
+M0000000b_IL_0016:
+M0000000b_IL_0017:
+M0000000b_IL_0018:
+ldloc local2
+M0000000b_IL_0019:
+ldc.i4 0
+M0000000b_IL_001a:
+clt
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
+M0000000b_IL_001c:
+ldc.i4 0
+M0000000b_IL_001d:
+ceq
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
+M0000000b_IL_001f:
+brtrue M0000000b_IL_0029
+M0000000b_IL_0024:
+br M0000000b_IL_005c
+M0000000b_IL_0029:
+M0000000b_IL_002a:
+ldloc local0
+M0000000b_IL_002b:
+ldloc local2
+M0000000b_IL_002c:
+ldelem T0
+M0000000b_IL_0031:
+stloc local3
+M0000000b_IL_0032:
+M0000000b_IL_0033:
+ldarg 1
+M0000000b_IL_0034:
+ldloc local3
+M0000000b_IL_0035:
+callvirt instance System.Func<T0,Boolean>::Invoke(T0)
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
+M0000000b_IL_003a:
+brtrue M0000000b_IL_0044
+M0000000b_IL_003f:
+br M0000000b_IL_0051
+M0000000b_IL_0044:
+M0000000b_IL_0045:
+ldloc local3
+M0000000b_IL_0046:
+call neoCLR.Library.System.Collections.ArrayList.RuntimeUnion2<T0>(T0)
+M0000000b_IL_004b:
+call neoCLR.Library.System.Collections.ArrayList.RuntimeUnion3<T0>(System.Option.Some<T0>)
+M0000000b_IL_0050:
+ret
+M0000000b_IL_0051:
+M0000000b_IL_0052:
+M0000000b_IL_0053:
+ldloc local2
+M0000000b_IL_0054:
+ldc.i4 1
+M0000000b_IL_0055:
+sub
+M0000000b_IL_0056:
+stloc local2
+M0000000b_IL_0057:
+br M0000000b_IL_0017
+M0000000b_IL_005c:
+M0000000b_IL_005d:
+call neoCLR.Library.System.Collections.ArrayList.RuntimeUnion0()
+M0000000b_IL_0062:
+call neoCLR.Library.System.Collections.ArrayList.RuntimeUnion1<T0>(System.Option.None)
+M0000000b_IL_0067:
+ret
+.end
+.method instance FindIndex(System.Func<T0,Boolean>) -> System.Option<Int32>
+.local arrayref<T0> local0
+.local Int32 local1
+.local Int32 local2
+.local T0 local3
+ldloca local0
+initobj arrayref<T0>
+ldc.i4 0
+stloc local1
+ldc.i4 0
+stloc local2
+M0000000c_IL_0000:
+M0000000c_IL_0001:
+M0000000c_IL_0002:
+ldarg 0
+M0000000c_IL_0003:
+ldfld System.Collections.ArrayList<T0>::data
+M0000000c_IL_0008:
+stloc local0
+M0000000c_IL_0009:
+M0000000c_IL_000a:
+ldarg 0
+M0000000c_IL_000b:
+ldfld System.Collections.ArrayList<T0>::count
+M0000000c_IL_0010:
+stloc local1
+M0000000c_IL_0011:
+M0000000c_IL_0012:
+ldc.i4 0
+M0000000c_IL_0013:
+stloc local2
+M0000000c_IL_0014:
+M0000000c_IL_0015:
+M0000000c_IL_0016:
+ldloc local2
+M0000000c_IL_0017:
+ldloc local1
+M0000000c_IL_0018:
+clt
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_001a:
+brtrue M0000000c_IL_0024
+M0000000c_IL_001f:
+br M0000000c_IL_0057
+M0000000c_IL_0024:
+M0000000c_IL_0025:
+ldloc local0
+M0000000c_IL_0026:
+ldloc local2
+M0000000c_IL_0027:
+ldelem T0
+M0000000c_IL_002c:
+stloc local3
+M0000000c_IL_002d:
+M0000000c_IL_002e:
+ldarg 1
+M0000000c_IL_002f:
+ldloc local3
+M0000000c_IL_0030:
+callvirt instance System.Func<T0,Boolean>::Invoke(T0)
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_0035:
+brtrue M0000000c_IL_003f
+M0000000c_IL_003a:
+br M0000000c_IL_004c
+M0000000c_IL_003f:
+M0000000c_IL_0040:
+ldloc local2
+M0000000c_IL_0041:
+call neoCLR.Library.System.Collections.ArrayList.RuntimeUnion5(Int32)
+M0000000c_IL_0046:
+call neoCLR.Library.System.Collections.ArrayList.RuntimeUnion6(System.Option.Some<Int32>)
+M0000000c_IL_004b:
+ret
+M0000000c_IL_004c:
+M0000000c_IL_004d:
+M0000000c_IL_004e:
+ldloc local2
+M0000000c_IL_004f:
+ldc.i4 1
+M0000000c_IL_0050:
+add
+M0000000c_IL_0051:
+stloc local2
+M0000000c_IL_0052:
+br M0000000c_IL_0015
+M0000000c_IL_0057:
+M0000000c_IL_0058:
+call neoCLR.Library.System.Collections.ArrayList.RuntimeUnion0()
+M0000000c_IL_005d:
+call neoCLR.Library.System.Collections.ArrayList.RuntimeUnion4(System.Option.None)
+M0000000c_IL_0062:
+ret
+.end
+.method instance FindLastIndex(System.Func<T0,Boolean>) -> System.Option<Int32>
+.local arrayref<T0> local0
+.local Int32 local1
+.local Int32 local2
+.local T0 local3
+ldloca local0
+initobj arrayref<T0>
+ldc.i4 0
+stloc local1
+ldc.i4 0
+stloc local2
+M0000000d_IL_0000:
+M0000000d_IL_0001:
+M0000000d_IL_0002:
+ldarg 0
+M0000000d_IL_0003:
+ldfld System.Collections.ArrayList<T0>::data
+M0000000d_IL_0008:
+stloc local0
+M0000000d_IL_0009:
+M0000000d_IL_000a:
+ldarg 0
+M0000000d_IL_000b:
+ldfld System.Collections.ArrayList<T0>::count
+M0000000d_IL_0010:
+stloc local1
+M0000000d_IL_0011:
+M0000000d_IL_0012:
+ldloc local1
+M0000000d_IL_0013:
+ldc.i4 1
+M0000000d_IL_0014:
+sub
+M0000000d_IL_0015:
+stloc local2
+M0000000d_IL_0016:
+M0000000d_IL_0017:
+M0000000d_IL_0018:
+ldloc local2
+M0000000d_IL_0019:
+ldc.i4 0
+M0000000d_IL_001a:
+clt
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_001c:
+ldc.i4 0
+M0000000d_IL_001d:
+ceq
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_001f:
+brtrue M0000000d_IL_0029
+M0000000d_IL_0024:
+br M0000000d_IL_005c
+M0000000d_IL_0029:
+M0000000d_IL_002a:
+ldloc local0
+M0000000d_IL_002b:
+ldloc local2
+M0000000d_IL_002c:
+ldelem T0
+M0000000d_IL_0031:
+stloc local3
+M0000000d_IL_0032:
+M0000000d_IL_0033:
+ldarg 1
+M0000000d_IL_0034:
+ldloc local3
+M0000000d_IL_0035:
+callvirt instance System.Func<T0,Boolean>::Invoke(T0)
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_003a:
+brtrue M0000000d_IL_0044
+M0000000d_IL_003f:
+br M0000000d_IL_0051
+M0000000d_IL_0044:
+M0000000d_IL_0045:
+ldloc local2
+M0000000d_IL_0046:
+call neoCLR.Library.System.Collections.ArrayList.RuntimeUnion5(Int32)
+M0000000d_IL_004b:
+call neoCLR.Library.System.Collections.ArrayList.RuntimeUnion6(System.Option.Some<Int32>)
+M0000000d_IL_0050:
+ret
+M0000000d_IL_0051:
+M0000000d_IL_0052:
+M0000000d_IL_0053:
+ldloc local2
+M0000000d_IL_0054:
+ldc.i4 1
+M0000000d_IL_0055:
+sub
+M0000000d_IL_0056:
+stloc local2
+M0000000d_IL_0057:
+br M0000000d_IL_0017
+M0000000d_IL_005c:
+M0000000d_IL_005d:
+call neoCLR.Library.System.Collections.ArrayList.RuntimeUnion0()
+M0000000d_IL_0062:
+call neoCLR.Library.System.Collections.ArrayList.RuntimeUnion4(System.Option.None)
+M0000000d_IL_0067:
+ret
+.end
+.method instance Exists(System.Func<T0,Boolean>) -> Boolean
+.local arrayref<T0> local0
+.local Int32 local1
+.local Int32 local2
+ldloca local0
+initobj arrayref<T0>
+ldc.i4 0
+stloc local1
+ldc.i4 0
+stloc local2
+M0000000e_IL_0000:
+M0000000e_IL_0001:
+M0000000e_IL_0002:
+ldarg 0
+M0000000e_IL_0003:
+ldfld System.Collections.ArrayList<T0>::data
+M0000000e_IL_0008:
+stloc local0
+M0000000e_IL_0009:
+M0000000e_IL_000a:
+ldarg 0
+M0000000e_IL_000b:
+ldfld System.Collections.ArrayList<T0>::count
+M0000000e_IL_0010:
+stloc local1
+M0000000e_IL_0011:
+M0000000e_IL_0012:
+ldc.i4 0
+M0000000e_IL_0013:
+stloc local2
+M0000000e_IL_0014:
+M0000000e_IL_0015:
+M0000000e_IL_0016:
+ldloc local2
+M0000000e_IL_0017:
+ldloc local1
+M0000000e_IL_0018:
+clt
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_001a:
+brtrue M0000000e_IL_0024
+M0000000e_IL_001f:
+br M0000000e_IL_004a
+M0000000e_IL_0024:
+M0000000e_IL_0025:
+ldarg 1
+M0000000e_IL_0026:
+ldloc local0
+M0000000e_IL_0027:
+ldloc local2
+M0000000e_IL_0028:
+ldelem T0
+M0000000e_IL_002d:
+callvirt instance System.Func<T0,Boolean>::Invoke(T0)
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_0032:
+brtrue M0000000e_IL_003c
+M0000000e_IL_0037:
+br M0000000e_IL_003f
+M0000000e_IL_003c:
+M0000000e_IL_003d:
+ldc.i4 1
+M0000000e_IL_003e:
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanFromInt32(Int32)
+ret
+M0000000e_IL_003f:
+M0000000e_IL_0040:
+M0000000e_IL_0041:
+ldloc local2
+M0000000e_IL_0042:
+ldc.i4 1
+M0000000e_IL_0043:
+add
+M0000000e_IL_0044:
+stloc local2
+M0000000e_IL_0045:
+br M0000000e_IL_0015
+M0000000e_IL_004a:
+M0000000e_IL_004b:
+M0000000e_IL_004c:
+ldc.i4 0
+M0000000e_IL_004d:
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance TrueForAll(System.Func<T0,Boolean>) -> Boolean
+.local arrayref<T0> local0
+.local Int32 local1
+.local Int32 local2
+ldloca local0
+initobj arrayref<T0>
+ldc.i4 0
+stloc local1
+ldc.i4 0
+stloc local2
+M0000000f_IL_0000:
+M0000000f_IL_0001:
+M0000000f_IL_0002:
+ldarg 0
+M0000000f_IL_0003:
+ldfld System.Collections.ArrayList<T0>::data
+M0000000f_IL_0008:
+stloc local0
+M0000000f_IL_0009:
+M0000000f_IL_000a:
+ldarg 0
+M0000000f_IL_000b:
+ldfld System.Collections.ArrayList<T0>::count
+M0000000f_IL_0010:
+stloc local1
+M0000000f_IL_0011:
+M0000000f_IL_0012:
+ldc.i4 0
+M0000000f_IL_0013:
+stloc local2
+M0000000f_IL_0014:
+M0000000f_IL_0015:
+M0000000f_IL_0016:
+ldloc local2
+M0000000f_IL_0017:
+ldloc local1
+M0000000f_IL_0018:
+clt
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
+M0000000f_IL_001a:
+brtrue M0000000f_IL_0024
+M0000000f_IL_001f:
+br M0000000f_IL_004d
+M0000000f_IL_0024:
+M0000000f_IL_0025:
+ldarg 1
+M0000000f_IL_0026:
+ldloc local0
+M0000000f_IL_0027:
+ldloc local2
+M0000000f_IL_0028:
+ldelem T0
+M0000000f_IL_002d:
+callvirt instance System.Func<T0,Boolean>::Invoke(T0)
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
+M0000000f_IL_0032:
+ldc.i4 0
+M0000000f_IL_0033:
+ceq
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
+M0000000f_IL_0035:
+brtrue M0000000f_IL_003f
+M0000000f_IL_003a:
+br M0000000f_IL_0042
+M0000000f_IL_003f:
+M0000000f_IL_0040:
+ldc.i4 0
+M0000000f_IL_0041:
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanFromInt32(Int32)
+ret
+M0000000f_IL_0042:
+M0000000f_IL_0043:
+M0000000f_IL_0044:
+ldloc local2
+M0000000f_IL_0045:
+ldc.i4 1
+M0000000f_IL_0046:
+add
+M0000000f_IL_0047:
+stloc local2
+M0000000f_IL_0048:
+br M0000000f_IL_0015
+M0000000f_IL_004d:
+M0000000f_IL_004e:
+M0000000f_IL_004f:
+ldc.i4 1
+M0000000f_IL_0050:
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance FindAll(System.Func<T0,Boolean>) -> System.Collections.ArrayList<T0>
+.local arrayref<T0> local0
+.local Int32 local1
+.local System.Collections.ArrayList<T0> local2
+.local Int32 local3
+.local T0 local4
+ldloca local0
+initobj arrayref<T0>
+ldc.i4 0
+stloc local1
+ldloca local2
+initobj System.Collections.ArrayList<T0>
+ldc.i4 0
+stloc local3
+M00000010_IL_0000:
+M00000010_IL_0001:
+M00000010_IL_0002:
+ldarg 0
+M00000010_IL_0003:
+ldfld System.Collections.ArrayList<T0>::data
+M00000010_IL_0008:
+stloc local0
+M00000010_IL_0009:
+M00000010_IL_000a:
+ldarg 0
+M00000010_IL_000b:
+ldfld System.Collections.ArrayList<T0>::count
+M00000010_IL_0010:
+stloc local1
+M00000010_IL_0011:
+newobj instance System.Collections.ArrayList<T0>::.ctor()
+M00000010_IL_0016:
+stloc local2
+M00000010_IL_0017:
+M00000010_IL_0018:
+ldc.i4 0
+M00000010_IL_0019:
+stloc local3
+M00000010_IL_001a:
+M00000010_IL_001b:
+M00000010_IL_001c:
+ldloc local3
+M00000010_IL_001d:
+ldloc local1
+M00000010_IL_001e:
+clt
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
+M00000010_IL_0020:
+brtrue M00000010_IL_002a
+M00000010_IL_0025:
+br M00000010_IL_005b
+M00000010_IL_002a:
+M00000010_IL_002b:
+ldloc local0
+M00000010_IL_002c:
+ldloc local3
+M00000010_IL_002d:
+ldelem T0
+M00000010_IL_0032:
+stloc local4
+M00000010_IL_0034:
+M00000010_IL_0035:
+ldarg 1
+M00000010_IL_0036:
+ldloc local4
+M00000010_IL_0038:
+callvirt instance System.Func<T0,Boolean>::Invoke(T0)
+call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
+M00000010_IL_003d:
+brtrue M00000010_IL_0047
+M00000010_IL_0042:
+br M00000010_IL_0050
+M00000010_IL_0047:
+M00000010_IL_0048:
+ldloc local2
+M00000010_IL_0049:
+ldloc local4
+M00000010_IL_004b:
+callvirt instance System.Collections.ArrayList<T0>::Add(T0)
+M00000010_IL_0050:
+M00000010_IL_0051:
+M00000010_IL_0052:
+ldloc local3
+M00000010_IL_0053:
+ldc.i4 1
+M00000010_IL_0054:
+add
+M00000010_IL_0055:
+stloc local3
+M00000010_IL_0056:
+br M00000010_IL_001b
+M00000010_IL_005b:
+M00000010_IL_005c:
+M00000010_IL_005d:
+ldloc local2
+M00000010_IL_005e:
+ret
+.end
+.end

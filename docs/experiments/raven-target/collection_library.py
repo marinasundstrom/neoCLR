@@ -1,43 +1,18 @@
 """Generate the bounded Raven collection profile from the existing System sources.
 
-No declaration-stub bodies are used. Keep the collection algorithms shared with the
-legacy library while adapting their storage and receiver contracts for this target.
+No declaration-stub bodies are used. Raven-authored implementations replace migrated
+types; remaining IL definitions adapt storage and receiver contracts for this target.
 """
 import argparse
 from pathlib import Path
 import re
 
 ROOT = Path(__file__).resolve().parents[3]
-COLLECTIONS = {'ArrayList', 'ArrayListState', 'ArrayIterator', 'List', 'Iterable', 'Iterator'}
+COLLECTIONS = {'ArrayIterator', 'List', 'Iterable', 'Iterator'}
 
 
 def adapt(text: str, name: str) -> str:
-    if name == 'ArrayList':
-        text = text.replace('; Value wrapper with coherent shared managed state. Copy() duplicates the sequence.',
-                            '; Nominal class with shared managed state. Copy() duplicates the sequence.')
-    if name == 'ArrayList':
-        # Class constructors initialize the allocated receiver, never replace its identity.
-        for signature, capacity in [('()', 'ldc.i4 0'), ('(Int32 capacity)', 'ldarg capacity')]:
-            pattern = r'    \.method instance \.ctor' + re.escape(signature) + r' -> Void.*?    \.end'
-            body = f"""    .method instance .ctor{signature} -> Void
-        {capacity}
-        ldc.i4 0
-        blt Invalid
-        ldarg this
-        {capacity}
-        array.alloc T
-        ldc.i4 0
-        newobj System.Collections.ArrayListState<T>
-        stfld System.Collections.ArrayList<T>::State
-        ret
-    Invalid:
-        fault \"ArrayList capacity must be non-negative\"
-    .end"""
-            text, count = re.subn(pattern, lambda _: body, text, flags=re.S)
-            if count != 1:
-                raise ValueError('ArrayList constructor boundary changed')
     text = text.replace('.type internal ', '.type internal class ')
-    text = re.sub(r'^\.type (System\.Collections\.ArrayList<T>)$', r'.type class \1', text, flags=re.M)
     text = text.replace('instance readonly byref ', 'instance ').replace('instance byref ', 'instance ')
     text = text.replace('T[]&', 'arrayref<T>')
     for ty in COLLECTIONS:
@@ -48,20 +23,15 @@ def adapt(text: str, name: str) -> str:
     text = re.sub(r'^\s*ldvoid\n', '\n', text, flags=re.M)
     text = re.sub(r'^\s*heap.new\n', '\n', text, flags=re.M)
     text = text.replace('interface.borrow ', 'castclass ')
-    text = text.replace('ldloca copy', 'ldloc copy')
     # Ordinary class stfld and no-result calls leave nothing to pop.
     text = re.sub(r'(stfld System\.Collections\.[^\n]+\n)\s*pop\n', r'\1', text)
-    text = re.sub(r'(call instance System\.Collections\.ArrayList<T>::(?:CheckIndex|Add)\([^\n]+\n)\s*pop\n', r'\1', text)
     text = re.sub(r'(callvirt instance System\.Disposable::Dispose\(\)\n)\s*pop\n', r'\1', text)
-    if name == 'ArrayList':
-        marker = '    ; Predicate searches retain the same initial buffer/extent as GetIterator.'
-        if text.count(marker) != 1 or not text.endswith('.end\n'):
-            raise ValueError('ArrayList search boundary changed')
-        text = text[:text.index(marker)] + (ROOT / 'runtime/raven/ArrayListSearch.neoil').read_text() + '.end\n'
     return text
 
 
 def build(path: Path) -> str:
+    if path == ROOT / 'runtime/System/Collections/ArrayList.neoil':
+        return build(ROOT / 'runtime/raven/ArrayList.neoil')
     text = path.read_text()
     if path.stem in COLLECTIONS | {'Disposable'}:
         text = adapt(text, path.stem)

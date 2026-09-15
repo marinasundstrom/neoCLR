@@ -1,7 +1,7 @@
 # Authoring the foundational library in Raven
 
 `runtime/raven/System.rvnproj` is the shared authoring project for ordinary
-foundational runtime APIs. Its sources include `src/Math.rvn`, `src/Linq.rvn`, `src/Int32.rvn` and `src/Char.rvn`; additional namespaces
+foundational runtime APIs. Its sources include `src/Math.rvn`, `src/Linq.rvn`, `src/Int32.rvn`, `src/Char.rvn` and `src/ArrayList.rvn`; additional namespaces
 and types should join this project as their importing requirements are validated.
 Do not create an assembly per utility namespace. This is an incremental source
 migration, not yet a self-hosting build of the complete core reference assembly.
@@ -13,7 +13,8 @@ The bootstrap currently has three distinct artifacts:
   the normal reference surface. Placeholder bodies must never execute.
 - `NeoCLR.System.dll`: compiled Raven implementation input, currently five scalar
   Math functions, nine query overloads and their private deferred iterator classes,
-  Int32.Divide and seven character predicates. It is imported into neoIL, not loaded dynamically by the runtime.
+  Int32.Divide and seven character predicates, plus a separately compiled ArrayList slice.
+  These implementation inputs are imported into neoIL, not loaded dynamically by the runtime.
 - `runtime/System.neoil` and its includes: the executable foundational library,
   combining generated Raven bodies with remaining handwritten bodies and intrinsics.
 
@@ -411,6 +412,56 @@ the static-generic probe and 13 cross-library cases pass. Regeneration matches t
 checked-in snapshot; scalar implementation bodies are unchanged. SDK installation and
 release packaging were not performed as part of this migration.
 
-The next collection candidates are ArrayList and its iterator, using this same
-bootstrap storage and private-helper support. Their larger mutation/search contracts
-still need independent parity checks; they are not ported by this slice.
+ArrayList and its private iterator subsequently passed this gate; see the migration below.
+
+
+### ArrayList migration — 2026-09-15
+
+`src/ArrayList.rvn` now implements both constructors, Count/Capacity, the indexer,
+Add, Copy, GetIterator and all seven predicate-search operations. Its internal
+ArrayListIterator implements Iterator and inherited Disposable. The Raven profile
+includes generated class bodies instead of rewriting the historical ArrayList IL;
+the separate handwritten search fragment has been removed. Array-backed enumeration
+outside ArrayList still uses its existing IL helper.
+
+The ordinary class owns its checked array and count directly. The old intermediate
+ArrayListState object served the original value-wrapper model and is no longer needed
+for class aliasing. Assignments still share the list; Copy creates independent storage
+with shallow element copies. Growth doubles capacity (zero grows to four). An explicit
+integer bound faults before capacity multiplication can wrap; its diagnostic is now
+`ArrayList capacity overflow`. Capacity slots remain unreadable until initialized.
+
+Iterators and each search capture the buffer and count at entry. Appended items are
+excluded, later writes within that buffer remain observable, and a reallocation does
+not retarget an ongoing scan. Find/FindAll retain the value seen by the callback even
+when the callback replaces its slot. Dispose is idempotent. These are the existing
+preview contracts, not a new .NET List version-check policy; changing mutation during
+iteration needs a separate API decision. Option results and public parameter names
+are preserved (`@match` escapes Raven's keyword while emitting the name `match`).
+
+The shared project has a temporary `NeoCLRLibrarySlice=ArrayList` authoring mode.
+`build_runtime_library.py` compiles that class separately against the bootstrap
+reference assembly, while other sources consume its reference declaration. This
+avoids source/reference identity collisions without allowing arbitrary same-name
+application types into library imports. Both compilations use the same project,
+Runtime Contract and compiler. Outputs are published together only after every slice
+passes admission. Default project compilation still builds the namespace/static
+slices; the script builds the complete set. This is not yet a single self-hosted core
+assembly or automatic reference-metadata generation.
+
+Validation: 18 runtime collection/query tests, 30 Raven query cases and 63 saved-project
+checks pass,
+plus `verify_arraylist_library.py` for all seven scans under callback growth and
+in-place mutation. The reflection sample's definition-index snapshot changes because
+private implementation metadata changed; definition indices are local to a loaded
+library, not stable cross-build identifiers. No Raven compiler change was needed.
+
+```sh
+python3 docs/experiments/raven-target/verify_arraylist_library.py /path/to/demo/Demo.rvnproj \
+  --bridge /path/to/Probe.dll --runtime /path/to/neoclr --system /path/to/System.neoil
+```
+
+HashMap remains handwritten IL. Its hashing/equality callbacks and reentrancy checks
+need the same parity review before migration. Value-shaped APIs such as Date/Time
+also need a matched value-type authoring gate; the current class gate must not silently
+turn those into reference types.
