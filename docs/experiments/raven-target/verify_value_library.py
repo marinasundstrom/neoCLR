@@ -1,4 +1,4 @@
-"""Validate a Raven class implementation against a separate CLI reference contract."""
+"""Validate a Raven value implementation against a separate CLI reference contract."""
 import argparse
 import json
 from pathlib import Path
@@ -11,6 +11,7 @@ from collection_library import build
 parser = argparse.ArgumentParser(description=__doc__)
 for name in ('compiler', 'bridge', 'runtime'):
     parser.add_argument('--' + name, required=True, type=Path)
+parser.add_argument("--wide", action="store_true")
 args = parser.parse_args()
 compiler, bridge, runtime = (getattr(args, n).resolve() for n in ('compiler', 'bridge', 'runtime'))
 
@@ -25,10 +26,10 @@ with tempfile.TemporaryDirectory(prefix='neoclr-instance-library-') as temporary
     root = Path(temporary)
     (root / 'demo').mkdir()
     core = root / 'demo/NeoCLR.CoreProbe.dll'
-    run(['dotnet', bridge, '--instance-library-core', core])
+    run(['dotnet', bridge, '--wide-value-instance-library-core' if args.wide else '--value-instance-library-core', core])
     source = '''namespace Probe
-public class Counter {
-    private var stored: int
+public struct Counter {
+    private field stored: int
     public init(value: int) {
         stored = value
     }
@@ -41,11 +42,17 @@ public class Counter {
     public func Self() -> Counter {
         return self
     }
+    public func Copy() -> Counter {
+        return Counter(stored)
+    }
     public val Value: int {
         get { return stored }
     }
 }
 '''
+
+    if args.wide:
+        source = source.replace(': int', ': long')
 
     def compile(name, text):
         folder = root / name
@@ -65,52 +72,75 @@ public class Counter {
     body = (imported / 'Implementation.neoil').read_text()
     mapping = json.loads((imported / 'Implementation.neoil.map.json').read_text())
     assert [t['RuntimeName'] for t in mapping['TypeIdentities']] == ['Probe.Counter']
-    assert '.property instance Value() -> Int32' in body
+    assert '.property instance Value() -> ' + ('Int64' if args.wide else 'Int32') in body
     application = root / 'App.neoil'
-    application.write_text('''.module InstanceLibrary
+    application.write_text('''.module ValueLibrary
 .entry Main
 ''' + body + '''
 .function Main() -> void
 .local Probe.Counter original
-.local Probe.Counter alias
+.local Probe.Counter copy
 ldc.i4 7
 newobj instance Probe.Counter::.ctor(Int32)
 stloc original
-ldloc original
+ldloca original
 call instance Probe.Counter::Self()
-stloc alias
-ldloc alias
+stloc copy
+ldloca copy
+call instance Probe.Counter::Copy()
+stloc copy
+ldloca copy
 ldc.i4 35
 call instance Probe.Counter::Add(Int32)
-ldloc original
+pop
+ldloca original
 call instance Probe.Counter::get_Value()
 call System.Console::WriteLine(Int32)
 pop
-ldloc original
-ldc.i4 99
-newobj instance Probe.Counter::.ctor(Int32)
+ldloca copy
+call instance Probe.Counter::get_Value()
+call System.Console::WriteLine(Int32)
+pop
+ldloca original
+ldloc copy
 call instance Probe.Counter::CopyFrom(Probe.Counter)
-ldloc alias
+pop
+ldloca original
 call instance Probe.Counter::get_Value()
 call System.Console::WriteLine(Int32)
 pop
 ret
 .end
 ''')
+    if args.wide:
+        prefix, driver = application.read_text().split('.function Main()', 1)
+        driver = driver.replace('Int32', 'Int64').replace('ldc.i4', 'ldc.i8')
+        driver = driver.replace('ldc.i8 7\n', 'ldc.i8 4294967303\n')
+        for index, (expected, printed) in enumerate([(4294967303, 7), (4294967338, 42), (4294967338, 42)]):
+            driver = driver.replace('call System.Console::WriteLine(Int64)',
+                f'ldc.i8 {expected}\nceq\nbrtrue Wide{index}\nfault "Wide value mismatch"\nWide{index}:\nldc.i4 {printed}\ncall System.Console::WriteLine(Int32)', 1)
+        application.write_text(prefix + '.function Main()' + driver)
+    assert any(m['RuntimeName'] == 'Probe.Counter::.ctor' for m in mapping['MethodIdentities'])
     system = root / 'System.neoil'
     system.write_text(build(ROOT / 'runtime/System.neoil'))
     run([runtime, 'verify', application, '--system', system])
-    assert run([runtime, 'run', application, '--system', system]).splitlines() == ['42', '99']
+    assert run([runtime, 'run', application, '--system', system]).splitlines() == ['7', '42', '42']
+    original = application.read_text()
+    prefix, driver = original.split('.function Main()', 1)
+    application.write_text(prefix + '.function Main()' + driver.replace(
+        'call instance Probe.Counter::get_Value()', 'ldfld Probe.Counter::stored'))
+    denied = run([runtime, 'verify', application, '--system', system], False)
+    assert 'field access denied' in denied, denied
+    application.write_text(original)
     for name, invalid, diagnostic in [
         ('WrongName', source.replace('amount', 'increment'), 'does not match reference contract'),
-        ('MissingMember', source.replace('    public func Self() -> Counter {\n        return self\n    }\n', ''), 'does not match reference contract'),
-        ('PublicState', source.replace('private var stored', 'public var stored'), 'does not match reference contract'),
-        ('ExtraMember', source.replace('    private var stored', '    public func Extra() -> int { return 1 }\n    private var stored'), 'does not match reference contract'),
-        ('WrongCategory', source.replace('public class Counter', 'public struct Counter'), 'value/reference representation'),
+        ('WrongFieldName', source.replace('stored', 'renamed'), 'value library layout'),
+        ('ExtraField', source.replace('private field stored', 'private field extra: int\n    private field stored'), 'value library layout'),
+        ('WrongCategory', source.replace('public struct Counter', 'public class Counter'), 'value/reference representation'),
     ]:
         bad = compile(name, invalid)
         output = root / name / 'imported'
         message = run(['dotnet', bridge, '--library-implementation', bad, core, 'Probe.Counter', output], False)
         assert diagnostic in message, name + ": " + message
         assert not (output / 'Implementation.neoil').exists()
-    print('Instance library: constructor, private state, shared identity, self signatures, property, mutation and five rejected contracts passed')
+    print('Value library: construction, independent copies, byref mutation, self signatures and layout/category rejection passed')

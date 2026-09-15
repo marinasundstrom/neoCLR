@@ -4,12 +4,12 @@ using Mono.Cecil.Cil;
 // Independent reference contract: no implementation fields, no executable stubs.
 static class InstanceLibraryChecks
 {
-    public static void WriteCore(string path, bool generic = false)
+    public static void WriteCore(string path, bool generic = false, bool value = false, bool wide = false)
     {
         CoreDeclarations.Write(path, unionProbe: true, collectionProbe: true, libraryBootstrap: generic);
         using var core = AssemblyDefinition.ReadAssembly(path, new ReaderParameters { InMemory = true });
         var module = core.MainModule;
-        var type = new TypeDefinition("Probe", generic ? "Cell`1" : "Counter", TypeAttributes.Public | TypeAttributes.Sealed, module.GetType("System.Object"));
+        var type = new TypeDefinition("Probe", generic ? "Cell`1" : "Counter", TypeAttributes.Public | TypeAttributes.Sealed | (value ? TypeAttributes.SequentialLayout : 0), module.GetType(value ? "System.ValueType" : "System.Object"));
         module.Types.Add(type);
         TypeReference Primitive(string name) => module.Types.SelectMany(t => t.Methods)
             .SelectMany(m => m.Parameters.Select(p => p.ParameterType).Append(m.ReturnType))
@@ -25,7 +25,8 @@ static class InstanceLibraryChecks
             method.Body.Instructions.Add(Instruction.Create(OpCodes.Throw));
             return method;
         }
-        TypeReference number = Primitive("Int32");
+        TypeReference number = Primitive(wide ? "Int64" : "Int32");
+        if (value) type.Fields.Add(new FieldDefinition("stored", FieldAttributes.Private, number));
         TypeReference self = type;
         if (generic)
         {
@@ -49,6 +50,7 @@ static class InstanceLibraryChecks
         Method(generic ? "Set" : "Add", noResult, (generic ? "value" : "amount", number));
         Method("CopyFrom", noResult, ("other", self));
         Method("Self", self);
+        if (value) Method("Copy", self);
         var getter = Method("get_Value", number);
         getter.Attributes |= MethodAttributes.SpecialName;
         type.Properties.Add(new PropertyDefinition("Value", PropertyAttributes.None, number) { GetMethod = getter });

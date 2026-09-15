@@ -79,6 +79,12 @@ if (args.Length == 2 && args[0] == "--generic-instance-library-core")
     return;
 }
 
+if (args.Length == 2 && args[0] is "--value-instance-library-core" or "--wide-value-instance-library-core")
+{
+    InstanceLibraryChecks.WriteCore(args[1], value: true, wide: args[0].StartsWith("--wide-"));
+    return;
+}
+
 if (args.Length == 2 && args[0] == "--instance-library-core")
 {
     InstanceLibraryChecks.WriteCore(args[1]);

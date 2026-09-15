@@ -136,7 +136,7 @@ static class UnionImport
                 }
             }
             var args = (method.HasThis ? new[] { ApplicationTypes.Receiver(method) } : Array.Empty<string>()).Concat(method.Parameters.Select(p => ProfileType(p.ParameterType))).ToArray();
-            var valueConstructor = method.IsConstructor && method.DeclaringType.IsValueType;
+            var valueConstructor = libraryOwner is null && method.IsConstructor && method.DeclaringType.IsValueType;
             var emitInstance = method.HasThis && !valueConstructor;
             var result = ProfileType(method.ReturnType, true);
             var locals = method.Body.Variables.Select(v => ProfileType(v.VariableType)).ToArray();
@@ -318,6 +318,15 @@ static class UnionImport
                             break;
                         }
                         throw new InvalidDataException("Unsupported runtime field write.");
+                    case Code.Ldobj:
+                        var copiedToken = (TypeReference)instruction.Operand;
+                        if (libraryOwner is null || !copiedToken.IsValueType || copiedToken.Resolve()?.IsValueType != true || !ApplicationTypes.IsLibrary(copiedToken))
+                            throw new InvalidDataException("Only matched library value loads are admitted.");
+                        var copiedType = ProfileType(copiedToken);
+                        var copiedAddress = Expect(copiedType + "&");
+                        if (copiedAddress.Local >= 0 && !assigned[copiedAddress.Local])
+                            throw new InvalidDataException("Read through uninitialized value address.");
+                        Push(new(copiedType)); code.AppendLine("ldobj " + copiedType); break;
                     case Code.Ldind_I4:
                         Expect("Int32*"); Push(new("Int32")); code.AppendLine("ldobj Int32"); break;
                     case Code.Stind_I4:
@@ -406,7 +415,7 @@ static class UnionImport
                             for (var n = ctorArgs.Length - 1; n >= 0; n--) ConvertTop(ctorArgs[n]);
                             var owner = ProfileType(constructor.DeclaringType);
                             pending.Enqueue(constructorDefinition); Push(new(owner));
-                            if (constructorDefinition.DeclaringType.IsValueType)
+                            if (libraryOwner is null && constructorDefinition.DeclaringType.IsValueType)
                             {
                                 var factory = "Create" + Name(constructorDefinition);
                                 var body = new StringBuilder($".function {factory}({string.Join(',', ctorArgs)}) -> {owner}\n.local {owner} value\nldloca value\ninitobj {owner}\nldloca value\n");
@@ -587,7 +596,7 @@ static class UnionImport
                                 if (!ApplicationTypes.Matches(reference, targetMethod)) throw new InvalidDataException("Resolved signature mismatch.");
                                 if (!targetMethod.IsAbstract) pending.Enqueue(targetMethod);
                                 var parameters = reference.Parameters.Select(p => ProfileType(ApplicationTypes.Close(p.ParameterType, reference.DeclaringType))).ToArray();
-                                call = targetMethod.HasThis && !(targetMethod.IsConstructor && targetMethod.DeclaringType.IsValueType)
+                                call = targetMethod.HasThis && (libraryOwner is not null || !(targetMethod.IsConstructor && targetMethod.DeclaringType.IsValueType))
                                     ? new("", new[] { ApplicationTypes.Receiver(reference) }.Concat(parameters).ToArray(), ProfileType(ApplicationTypes.Close(reference.ReturnType, reference.DeclaringType), true), Instruction: $"{(instruction.OpCode.Code == Code.Callvirt ? "callvirt" : "call")} instance {ProfileType(reference.DeclaringType)}::{ApplicationTypes.MethodName(targetMethod)}({string.Join(',', parameters)})" + (targetMethod.DeclaringType.IsValueType && targetMethod.ReturnType.MetadataType == MetadataType.Void ? "\npop" : ""))
                                     : new(Name(targetMethod), targetMethod.HasThis ? new[] { ApplicationTypes.Receiver(reference) }.Concat(parameters).ToArray() : parameters, ProfileType(ApplicationTypes.Close(reference.ReturnType, reference.DeclaringType), true));
                             }
@@ -713,7 +722,7 @@ static class UnionImport
             AssemblyIdentity = app.Name.FullName, TypeIdentities = ApplicationTypes.IdentityMap(),
             MethodIdentities = seen
                 .Select(m => new { AssemblyIdentity = m.Module.Assembly.Name.FullName, MethodToken = m.MetadataToken.ToUInt32(), MetadataName = m.FullName,
-                    RuntimeName = m.HasThis && !(m.IsConstructor && m.DeclaringType.IsValueType)
+                    RuntimeName = m.HasThis && (libraryOwner is not null || !(m.IsConstructor && m.DeclaringType.IsValueType))
                         ? ApplicationTypes.Type(m.DeclaringType) + "::" + ApplicationTypes.MethodName(m) : Name(m) }),
             Profile = libraryOwner is not null ? (exports.Any(m => m.HasThis) ? "instance-library-fragment-v1" : "namespace-library-fragment-v1") : collectionProfile ? "result-option-void-instance-libraries-v11" : "result-option-void-files-strings-arrays-v7",
             RequiredLibraryProfile = collectionProfile ? "raven-collections" : "bundled-system", ApplicationSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(application))),

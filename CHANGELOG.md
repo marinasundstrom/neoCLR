@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-15
 
+- Add the first matched Raven value-library gate: sequential nongeneric scalar records
+  must match reference field layout, representation and public instance contracts.
+  Preserve instance ownership for value constructors and constructor debug identities;
+  admit checked managed-reference `ldobj` copies without widening guest imports.
+  Independent Int32/Int64 probes cover construction, copying, receiver mutation and
+  private-field/layout/category rejection. Existing class/generic probes and bootstrap
+  regeneration pass. Date/Time migration, value interfaces and static factories remain
+  subsequent work; no Raven compiler or runtime instruction-set change is included.
+
 - Port HashMap algorithms to Raven while retaining Map/MutableMap contracts in IL.
   Preserve explicit callbacks, chained hashing, growth, Option lookup, duplicate
   handling, shallow key snapshots and reentrancy faults. Store callbacks directly;

@@ -508,3 +508,50 @@ pass. Generic private-method visibility, private-storage admission and nongeneri
 instance-contract probes pass, including malformed-contract/access rejections. Clean
 bootstrap regeneration and API inventory/coverage checks pass. No SDK installation
 or release packaging was performed by these source migrations.
+
+
+### First matched value-type gate — 2026-09-15
+
+The library importer now admits a deliberately bounded value representation in
+addition to classes: public, nongeneric sequential structs with private mutable
+Int32/Int64/Boolean fields, no interfaces and the same public instance API as their
+reference contract. Both sides must agree on the value/reference category, field
+names, order and types, packing and declared size. This checks the logical layout
+contract; it is not a new native-memory layout or interop guarantee. Explicit layout,
+reference-containing fields, generic values, interfaces, static factories and readonly
+fields/receiver contracts are not admitted by this first gate.
+
+An independent `Probe.Counter` reference fixture supplies actual private field
+metadata; its placeholder method bodies remain unusable. Raven source is compiled
+separately and checked against it. Value constructors retain instance ownership in
+the emitted IL, including private-field access and debugger method identities.
+Construction from another value method uses the existing `newobj instance` path.
+`ldobj` can copy an admitted library value from its exact managed-reference type;
+reads through uninitialized local addresses are rejected. Ordinary guest admission
+is unchanged. No new runtime opcode or Raven compiler change was necessary.
+
+This follows the CLI model: value instance methods receive managed-reference
+receivers, and `ldobj` copies a value onto the evaluation stack. See
+[ECMA-335, Partition I §8.9.7 and Partition II §10.5.1](https://ecma-international.org/wp-content/uploads/ECMA-335_6th_edition_june_2012.pdf)
+and [the Microsoft ldobj documentation](https://learn.microsoft.com/lb-lu/dotnet/api/system.reflection.emit.opcodes.ldobj?view=net-7.0).
+Keeping constructors as methods preserves ownership checks; making their fields public
+or assigning arbitrary namespace functions owner privileges would weaken those checks.
+The cost of the bounded gate is that it cannot yet admit the complete calendar types.
+
+`verify_value_library.py` exercises constructor invocation from IL and from Raven,
+self copies, copying into independent locals, mutation through managed receivers,
+private-field protection and layout/category/API mismatch rejection. Its `--wide`
+mode validates 64-bit values beyond Int32 range without relying on a missing console
+overload. Both modes pass, as do the existing class and generic-private-helper probes.
+Regenerating all current runtime fragments produces identical output.
+
+```sh
+python3 docs/experiments/raven-target/verify_value_library.py \
+  --compiler /path/to/rvnc.dll --bridge /path/to/Probe.dll --runtime /path/to/neoclr
+# Repeat with --wide for the 64-bit storage probe.
+```
+
+Date and Time have **not** been ported by this gate. Next, establish matching reference
+layout metadata for their stored day number/ticks, retain their Equatable/Comparable
+contracts and readonly receivers, and admit checked static Result factories with
+private construction. Their current executable IL and public behavior remain in use.

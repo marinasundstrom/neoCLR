@@ -43,10 +43,25 @@ static class LibraryImplementation
         // A single explicitly selected reference/implementation pair. Never alias arbitrary
         // guest types by namespace/name, and never execute reference-assembly stub bodies.
         foreach (var candidate in new[] { type, contract })
-            if (!candidate.IsPublic || candidate.IsValueType || candidate.IsInterface || candidate.IsAbstract
+            if (!candidate.IsPublic || candidate.IsInterface || candidate.IsAbstract
                 || candidate.GenericParameters.Any(p => p.HasConstraints || p.Attributes != GenericParameterAttributes.NonVariant) || candidate.HasNestedTypes || candidate.HasEvents
-                || candidate.BaseType?.FullName != "System.Object" || candidate.IsExplicitLayout)
+                || candidate.BaseType?.FullName != (candidate.IsValueType ? "System.ValueType" : "System.Object") || candidate.IsExplicitLayout)
                 throw new InvalidDataException("Unsupported instance library owner.");
+        if (type.IsValueType != contract.IsValueType)
+            throw new InvalidDataException("Library value/reference representation does not match reference contract.");
+        if (type.IsValueType)
+        {
+            // Unlike reference classes, a value's instance layout is an ABI contract.
+            // Start with scalar, nongeneric sequential records; do not infer layout.
+            if (type.HasGenericParameters || type.HasInterfaces || contract.HasInterfaces
+                || !type.IsSequentialLayout || !contract.IsSequentialLayout
+                || type.PackingSize != contract.PackingSize || type.ClassSize != contract.ClassSize
+                || type.Fields.Count != contract.Fields.Count
+                || type.Fields.Zip(contract.Fields).Any(p => p.First.Name != p.Second.Name
+                    || !SameType(p.First.FieldType, p.Second.FieldType)
+                    || p.First.FieldType.MetadataType is not (MetadataType.Int32 or MetadataType.Int64 or MetadataType.Boolean)))
+                throw new InvalidDataException("Unsupported or mismatched value library layout.");
+        }
         if (type.GenericParameters.Count != contract.GenericParameters.Count)
             throw new InvalidDataException("Instance library generic arity does not match reference contract.");
         if (type.IsSealed != contract.IsSealed) throw new InvalidDataException("Instance library sealing does not match reference contract.");
