@@ -370,3 +370,62 @@ func Identity<T>(value: T) -> T { return value }
 func Main() -> int { var value = 42; let read: System.Func<readonly int&, int> = Read; let identity: System.Func<readonly int&, readonly int&> = Identity<readonly int&>; return read(identity(&value)) }");
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }
+
+fn class_with_delegate_constructor(body: &str) -> neoclr::Module {
+    module(
+        "delegate.bind Transform = Identity(Int32)\nnewobj instance Holder::.ctor(Transform)\nldc.i4 42\ncall instance Holder::Apply(Int32)",
+        &format!(
+            r#"
+.type class Holder
+.field private callback Transform
+.method instance .ctor(Transform value) -> void
+{body}
+ret
+.end
+.method instance Apply(Int32 value) -> Int32
+ldarg this
+ldfld Holder::callback
+ldarg value
+callvirt instance Transform::Invoke(Int32)
+ret
+.end
+.end
+.function Identity(Int32 value) -> Int32
+ldarg value
+ret
+.end
+"#
+        ),
+    )
+}
+
+#[test]
+fn class_constructor_can_initialize_a_delegate_field() {
+    let m = class_with_delegate_constructor("ldarg this\nldarg value\nstfld Holder::callback");
+    verify(&m).unwrap();
+    assert_eq!(run(&m, Limits::default()).unwrap().value, Value::Int32(42));
+}
+
+#[test]
+fn class_constructor_must_initialize_a_delegate_field_before_return() {
+    let m = class_with_delegate_constructor("");
+    assert!(
+        run(&m, Limits::default())
+            .unwrap_err()
+            .message
+            .contains("uninitialized field")
+    );
+}
+
+#[test]
+fn class_constructor_cannot_read_a_delegate_field_before_assignment() {
+    let m = class_with_delegate_constructor(
+        "ldarg this\nldfld Holder::callback\npop\nldarg this\nldarg value\nstfld Holder::callback",
+    );
+    assert!(
+        run(&m, Limits::default())
+            .unwrap_err()
+            .message
+            .contains("uninitialized")
+    );
+}

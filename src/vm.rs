@@ -2244,7 +2244,15 @@ fn interpret_instructions(
                         }
                         let fields = definitions
                             .iter()
-                            .map(|field| crate::initialization::default_value(module, &field.ty))
+                            .map(|field| {
+                                if module.type_definition(&field.ty).is_some_and(|definition| {
+                                    definition.representation == Representation::Delegate
+                                }) {
+                                    Ok(Value::Uninitialized(field.ty.clone()))
+                                } else {
+                                    crate::initialization::default_value(module, &field.ty)
+                                }
+                            })
                             .collect::<Result<Vec<_>, _>>()?;
                         let identity = heap.allocate(Value::Object {
                             ty: owner.clone(),
@@ -2505,6 +2513,18 @@ fn interpret_instructions(
                         memory.release_local(pointer)?;
                     }
                     let constructed_object = frame.construction_object.clone();
+                    if let Some(object) = &constructed_object {
+                        if let Value::Object { fields, .. } = object.reference.read()? {
+                            if fields
+                                .iter()
+                                .any(|field| matches!(field, Value::Uninitialized(_)))
+                            {
+                                return Err(Fault::new(
+                                    "constructor returned with an uninitialized field",
+                                ));
+                            }
+                        }
+                    }
                     let produces_value = !function.no_result || constructed_object.is_some();
                     let value = constructed_object.map_or(value, Value::ObjectReference);
                     frames.pop();

@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-15
 
+- Permit class constructors to initialize delegate fields. Reserve those fields as
+  typed uninitialized storage instead of trying to manufacture a default delegate;
+  reject early reads and constructor return with an uninitialized field. Other
+  defaults are unchanged. All 25 delegate tests pass, including three new construction
+  cases. This does not introduce null/default delegates.
+
 - Add System.Fault(message) as a namespace function exposed to Raven through its
   existing CLI container contract. Preserve computed UTF-8 diagnostics and terminate
   guest execution through the existing Fault outcome; embedding hosts are not aborted.

@@ -180,3 +180,21 @@ selecting an alternative. No delegate replacement or new callable opcode is appr
 Primary baseline consulted 2026-09-13: [C# delegates](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/delegates/)
 already provide typed callbacks, method binding and lambda conversion. A new model
 must improve a concrete use beyond renaming this existing capability.
+
+
+## Delegate fields during class construction — 2026-09-15
+
+A class constructor can assign a delegate field before returning. Allocation reserves
+that field as a typed uninitialized slot because this preview has no default/null
+delegate value. Reading it before assignment faults, and the outer constructor cannot
+return with an uninitialized field. Other fields retain their existing defaults.
+Normal delegate defaults remain unsupported; this does not make an invalid callback
+callable or introduce nullable delegates.
+
+This repairs a construction gap rather than changing the [delegate contract](delegate-contract.md):
+previously allocation tried to construct a default delegate as a record and faulted
+before the constructor ran. Compared with .NET's null reference field default, the
+preview retains its existing checked delegate-capability rule, adding a constructor
+completion check. Nullable delegates remain a separate decision. The runtime tests
+cover assignment/invocation, missing assignment and an early read; all 25 delegate
+checks pass, including rejection of ordinary delegate default initialization.
