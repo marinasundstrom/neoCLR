@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-15
 
+- Replace placeholder parameter names in Raven-authored Date, Time and Type APIs
+  and their reference metadata with descriptive names. Named calls must use the
+  new labels (for example `year`, `ticks`, `other` and `index`); positional calls
+  are unchanged. Exercise named arguments in calendar and reflection samples.
+
 - Port System.Type to Raven for the Raven runtime profile. Type keeps identity and
   basic shape; metadata enumeration, base/interface lookup and enum metadata are
   exposed through System.Reflection.TypeInfo using the same opaque handle. Migrate

@@ -9,15 +9,11 @@ public struct Time : Comparable<Time>, Equatable<Time> {
         StoredTicks = ticks
     }
 
-    static func Create(arg0: int, arg1: int, arg2: int) -> Result<Time, InvalidTimeError> {
-        return Create(arg0, arg1, arg2, 0)
+    static func Create(hour: int, minute: int, second: int) -> Result<Time, InvalidTimeError> {
+        return Create(hour, minute, second, 0)
     }
 
-    static func Create(arg0: int, arg1: int, arg2: int, arg3: int) -> Result<Time, InvalidTimeError> {
-        let hour = arg0
-        let minute = arg1
-        let second = arg2
-        let fractionTicks = arg3
+    static func Create(hour: int, minute: int, second: int, fractionTicks: int) -> Result<Time, InvalidTimeError> {
         if hour < 0 {
             return Error(InvalidTimeError())
         }
@@ -46,14 +42,14 @@ public struct Time : Comparable<Time>, Equatable<Time> {
         return Ok(Time(seconds * 10000000L + fractionTicks))
     }
 
-    static func FromTicks(arg0: long) -> Result<Time, InvalidTimeError> {
-        if arg0 < 0L {
+    static func FromTicks(ticks: long) -> Result<Time, InvalidTimeError> {
+        if ticks < 0L {
             return Error(InvalidTimeError())
         }
-        if arg0 > 863999999999L {
+        if ticks > 863999999999L {
             return Error(InvalidTimeError())
         }
-        return Ok(Time(arg0))
+        return Ok(Time(ticks))
     }
 
     val Ticks: long { get => StoredTicks }
@@ -63,15 +59,15 @@ public struct Time : Comparable<Time>, Equatable<Time> {
     val Millisecond: int { get => (int)(StoredTicks / 10000L % 1000L) }
     val FractionTicks: int { get => (int)(StoredTicks % 10000000L) }
 
-    func Equals(arg0: Time) -> bool {
-        return StoredTicks == arg0.StoredTicks
+    func Equals(other: Time) -> bool {
+        return StoredTicks == other.StoredTicks
     }
 
-    func CompareTo(arg0: Time) -> int {
-        if StoredTicks < arg0.StoredTicks {
+    func CompareTo(other: Time) -> int {
+        if StoredTicks < other.StoredTicks {
             return -1
         }
-        if StoredTicks > arg0.StoredTicks {
+        if StoredTicks > other.StoredTicks {
             return 1
         }
         return 0

@@ -33,10 +33,19 @@ static class CalendarBindings
         new("Clock", "GetLocalNow", [], "System.LocalDateTime")
     ];
     static string CSharp(string t) => t switch { "Int32" => "int", "Int64" => "long", "Boolean" => "bool", _ => t };
+    static string ParameterName(Member member, int index) => member.Name switch
+    {
+        "Create" when member.Owner == "Date" => new[] { "year", "month", "day" }[index],
+        "Create" when member.Owner == "Time" => new[] { "hour", "minute", "second", "fractionTicks" }[index],
+        "FromDayNumber" => "dayNumber",
+        "FromTicks" => "ticks",
+        "Equals" or "CompareTo" => "other",
+        _ => throw new InvalidDataException("Missing calendar parameter name: " + member.Name)
+    };
     public static string Declarations => string.Join("\n", Members.GroupBy(m => m.Owner).Select(group =>
         $"public {(group.Key == "Clock" ? "static class" : "struct")} {group.Key} {{ " + string.Join(" ", group.Select(m =>
             m.Name.StartsWith("get_") ? $"public {CSharp(m.Result)} {m.Name[4..]} => default;"
-            : $"public {(m.Instance ? "" : "static ")}{CSharp(m.Result)} {m.Name}({string.Join(',', m.Args.Select((a, i) => CSharp(a) + " arg" + i))}) => default;")) + " }"));
+            : $"public {(m.Instance ? "" : "static ")}{CSharp(m.Result)} {m.Name}({string.Join(',', m.Args.Select((a, i) => CSharp(a) + " " + ParameterName(m, i)))}) => default;")) + " }"));
     public static void ProjectLayout(ModuleDefinition module)
     {
         var attribute = new TypeDefinition("System.Runtime.CompilerServices", "IsReadOnlyAttribute",

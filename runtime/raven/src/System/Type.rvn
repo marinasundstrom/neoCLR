@@ -10,8 +10,8 @@ public open class Type : Equatable<Type> {
         Handle = handle
     }
 
-    static func GetTypeFromHandle(arg0: RuntimeTypeHandle) -> Type {
-        return Type(arg0)
+    static func GetTypeFromHandle(handle: RuntimeTypeHandle) -> Type {
+        return Type(handle)
     }
 
     val Name: string { get => RuntimeServices.TypeName(Handle) }
@@ -19,12 +19,12 @@ public open class Type : Equatable<Type> {
     val Namespace: string { get => RuntimeServices.TypeDisplayName(Handle, 1) }
     val GenericArgumentCount: int { get => RuntimeServices.TypeArgumentCount(Handle) }
 
-    func GetGenericArgument(arg0: int) -> Type {
-        return GetTypeFromHandle(RuntimeServices.TypeArgument(Handle, arg0))
+    func GetGenericArgument(index: int) -> Type {
+        return GetTypeFromHandle(RuntimeServices.TypeArgument(Handle, index))
     }
 
-    func Equals(arg0: Type) -> bool {
-        return RuntimeServices.TypeEquals(Handle, arg0.Handle)
+    func Equals(other: Type) -> bool {
+        return RuntimeServices.TypeEquals(Handle, other.Handle)
     }
 
     val IsArray: bool { get => RuntimeServices.TypeShape(Handle, 0) }

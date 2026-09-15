@@ -32,7 +32,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-declaration-library-') as tempor
         ('Storage', source.replace('private field Handle: RuntimeTypeHandle', 'private field Handle: RuntimeTypeHandle\n    private field Extra: int = 0'), 'Type library layout'),
         ('Constructor', source.replace('private init', 'public init'), 'does not match reference contract'),
         ('Missing', source.replace('val Name:', 'private val Name:'), 'does not match reference contract'),
-        ('Argument', source.replace('GetTypeFromHandle(arg0:', 'GetTypeFromHandle(handle:').replace('return Type(arg0)', 'return Type(handle)'), 'does not match reference contract'),
+        ('Argument', source.replace('GetTypeFromHandle(handle:', 'GetTypeFromHandle(wrongName:').replace('return Type(handle)', 'return Type(wrongName)'), 'does not match reference contract'),
     ]:
         folder = root / name
         folder.mkdir()

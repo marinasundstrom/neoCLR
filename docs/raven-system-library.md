@@ -16,9 +16,14 @@ visibility and the runtime-created Type layout remain validated. Reflection nati
 services are available only while importing a library implementation; reference
 stub bodies are never executed. TypeInfo and member descriptors remain in NeoIL.
 
-Next slice: replace placeholder parameter names (`arg0`, `arg1`, and similar) with
-descriptive names across Raven-authored APIs and their reference metadata together.
-Parameter names are part of the checked authoring contract and named-call experience.
+Raven-authored public APIs use descriptive parameter names. Date exposes `year`,
+`month`, `day`, `dayNumber` and `other`; Time exposes `hour`, `minute`, `second`,
+`fractionTicks`, `ticks` and `other`; Type exposes `handle`, `index` and `other`.
+These names also appear in reference metadata, enabling named arguments and useful
+editor parameter hints. Calls using previous `arg0`/`arg1` labels must be updated;
+positional calls keep their behavior. Generated internal adapters and generic delegate
+argument positions may retain numbered names because they have no domain-specific
+meaning. This changes the experimental library contract, not Raven compiler behavior.
 
 The bootstrap currently has three distinct artifacts:
 

@@ -6,8 +6,8 @@ func ShowDate(value: Date) {
     WriteLine(value.Day)
     WriteLine(value.DayOfYear)
     WriteLine(value.DayNumber)
-    WriteLine(value.CompareTo(value))
-    if value.Equals(value) { WriteLine("Same date") }
+    WriteLine(value.CompareTo(other: value))
+    if value.Equals(other: value) { WriteLine("Same date") }
 }
 func ReadDate(result: Result<Date, InvalidDateError>) -> Result<Date, InvalidDateError> {
     let value = result?
@@ -28,8 +28,8 @@ func ShowTime(value: Time) {
     WriteLine(value.FractionTicks)
     let ticks = value.Ticks
     WriteLine(ticks.CompareTo(452967890123L))
-    WriteLine(value.CompareTo(value))
-    if value.Equals(value) { WriteLine("Same time") }
+    WriteLine(value.CompareTo(other: value))
+    if value.Equals(other: value) { WriteLine("Same time") }
 }
 func ReadTime(result: Result<Time, InvalidTimeError>) -> Result<Time, InvalidTimeError> {
     let value = result?
@@ -43,13 +43,13 @@ func CheckTime(result: Result<Time, InvalidTimeError>) {
     }
 }
 func Main() {
-    CheckDate(Date.Create(2024, 2, 29))
-    CheckDate(Date.FromDayNumber(0))
+    CheckDate(Date.Create(day: 29, year: 2024, month: 2))
+    CheckDate(Date.FromDayNumber(dayNumber: 0))
     CheckDate(Date.Create(2023, 2, 29))
     CheckDate(Date.FromDayNumber(-1))
-    CheckTime(Time.Create(12, 34, 56, 7890123))
-    CheckTime(Time.FromTicks(452967890123L))
-    CheckTime(Time.Create(0, 0, 0))
+    CheckTime(Time.Create(hour: 12, minute: 34, second: 56, fractionTicks: 7890123))
+    CheckTime(Time.FromTicks(ticks: 452967890123L))
+    CheckTime(Time.Create(hour: 0, minute: 0, second: 0))
     CheckTime(Time.Create(24, 0, 0))
     CheckTime(Time.FromTicks(-1L))
 }

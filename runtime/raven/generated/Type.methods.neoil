@@ -307,7 +307,7 @@ call neoCLR.Runtime.TypeElementType(System.RuntimeTypeHandle)
 M00000013_IL_000d:
 ret
 .end
-.method static GetTypeFromHandle(System.RuntimeTypeHandle arg0) -> System.Type
+.method static GetTypeFromHandle(System.RuntimeTypeHandle handle) -> System.Type
 M00000002_IL_0000:
 M00000002_IL_0001:
 M00000002_IL_0002:
