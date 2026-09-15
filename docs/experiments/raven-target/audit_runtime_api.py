@@ -92,10 +92,10 @@ result = {'purpose': 'Explicit source-by-source API audit. Samples and signature
           'declarationCount': sum(r['declarations'] for r in rows), 'sources': rows}
 result['targetProfileAdditions'] = [{
     'file': 'runtime/raven/Map.neoil',
-    'disposition': 'experimental-map-contracts-and-implementation',
+    'disposition': 'experimental-map-contracts-with-raven-implementation',
     'samples': ['library-maps.rvn'],
     'tests': ['tests/raven_collections.rs', 'docs/experiments/raven-target/verify_collection_capabilities.py'],
-    'note': 'Explicit equality/hash callbacks; no default comparer, removal or pair iteration. See docs/map-contracts.md.'
+    'note': 'HashMap algorithms are authored in runtime/raven/src/HashMap.rvn; interfaces stay in IL. Private helpers retain visibility and all bodies are checked. Explicit equality/hash callbacks; no default comparer, removal or pair iteration. See docs/map-contracts.md.'
 }]
 result['targetProfileAdditions'] += [{
     'file': file,

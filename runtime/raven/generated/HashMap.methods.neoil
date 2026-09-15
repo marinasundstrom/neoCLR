@@ -1,0 +1,887 @@
+; Generated from runtime/raven/src/HashMap.rvn. Regenerate with build_runtime_library.py.
+.type class System.Collections.HashMap<T0,T1>
+.implements System.Collections.MutableMap<T0,T1>
+.implements System.Collections.Map<T0,T1>
+.field private equal System.Func<T0,T0,Boolean>
+.field private hash System.Func<T0,Int32>
+.field private buckets arrayref<Int32>
+.field private keys System.Collections.ArrayList<T0>
+.field private values System.Collections.ArrayList<T1>
+.field private hashes System.Collections.ArrayList<Int32>
+.field private next System.Collections.ArrayList<Int32>
+.field private busy Boolean
+.property instance Count() -> Int32
+.get instance System.Collections.HashMap<T0,T1>::get_Count()
+.end
+.property instance Keys() -> System.Collections.Sequence<T0>
+.get instance System.Collections.HashMap<T0,T1>::get_Keys()
+.end
+.method instance .ctor(System.Func<T0,T0,Boolean>,System.Func<T0,Int32>) -> noresult
+M00000001_IL_0000:
+M00000001_IL_0001:
+ldarg 0
+M00000001_IL_0002:
+pop
+M00000001_IL_0007:
+M00000001_IL_0008:
+ldarg 0
+M00000001_IL_0009:
+ldarg 1
+M00000001_IL_000a:
+stfld System.Collections.HashMap<T0,T1>::equal
+M00000001_IL_000f:
+M00000001_IL_0010:
+ldarg 0
+M00000001_IL_0011:
+ldarg 2
+M00000001_IL_0012:
+stfld System.Collections.HashMap<T0,T1>::hash
+M00000001_IL_0017:
+M00000001_IL_0018:
+ldarg 0
+M00000001_IL_0019:
+ldc.i4 4
+M00000001_IL_001a:
+newarr Int32
+M00000001_IL_001f:
+dup
+M00000001_IL_0020:
+ldc.i4 0
+M00000001_IL_0021:
+ldc.i4 0
+M00000001_IL_0022:
+stelem Int32
+M00000001_IL_0023:
+dup
+M00000001_IL_0024:
+ldc.i4 1
+M00000001_IL_0025:
+ldc.i4 0
+M00000001_IL_0026:
+stelem Int32
+M00000001_IL_0027:
+dup
+M00000001_IL_0028:
+ldc.i4 2
+M00000001_IL_0029:
+ldc.i4 0
+M00000001_IL_002a:
+stelem Int32
+M00000001_IL_002b:
+dup
+M00000001_IL_002c:
+ldc.i4 3
+M00000001_IL_002d:
+ldc.i4 0
+M00000001_IL_002e:
+stelem Int32
+M00000001_IL_002f:
+stfld System.Collections.HashMap<T0,T1>::buckets
+M00000001_IL_0034:
+ldarg 0
+M00000001_IL_0035:
+newobj instance System.Collections.ArrayList<T0>::.ctor()
+M00000001_IL_003a:
+stfld System.Collections.HashMap<T0,T1>::keys
+M00000001_IL_003f:
+ldarg 0
+M00000001_IL_0040:
+newobj instance System.Collections.ArrayList<T1>::.ctor()
+M00000001_IL_0045:
+stfld System.Collections.HashMap<T0,T1>::values
+M00000001_IL_004a:
+ldarg 0
+M00000001_IL_004b:
+newobj instance System.Collections.ArrayList<Int32>::.ctor()
+M00000001_IL_0050:
+stfld System.Collections.HashMap<T0,T1>::hashes
+M00000001_IL_0055:
+ldarg 0
+M00000001_IL_0056:
+newobj instance System.Collections.ArrayList<Int32>::.ctor()
+M00000001_IL_005b:
+stfld System.Collections.HashMap<T0,T1>::next
+M00000001_IL_0060:
+M00000001_IL_0061:
+ldarg 0
+M00000001_IL_0062:
+ldc.i4 0
+M00000001_IL_0063:
+call neoCLR.Library.System.Collections.HashMap.RuntimeBooleanFromInt32(Int32)
+stfld System.Collections.HashMap<T0,T1>::busy
+M00000001_IL_0068:
+ret
+.end
+.method instance get_Count() -> Int32
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldarg 0
+M00000002_IL_0003:
+ldfld System.Collections.HashMap<T0,T1>::keys
+M00000002_IL_0008:
+callvirt instance System.Collections.ArrayList<T0>::get_Count()
+M00000002_IL_000d:
+ret
+.end
+.method instance get_Keys() -> System.Collections.Sequence<T0>
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+ldfld System.Collections.HashMap<T0,T1>::keys
+M00000003_IL_0008:
+callvirt instance System.Collections.ArrayList<T0>::Copy()
+M00000003_IL_000d:
+ret
+.end
+.method private instance Enter() -> noresult
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+ldfld System.Collections.HashMap<T0,T1>::busy
+call neoCLR.Library.System.Collections.HashMap.RuntimeBooleanToInt32(Boolean)
+M00000004_IL_0008:
+brtrue M00000004_IL_0012
+M00000004_IL_000d:
+br M00000004_IL_001d
+M00000004_IL_0012:
+M00000004_IL_0013:
+ldstr "HashMap callbacks must not reenter the map"
+M00000004_IL_0018:
+call System.Fault(String)
+M00000004_IL_001d:
+M00000004_IL_001e:
+M00000004_IL_001f:
+ldarg 0
+M00000004_IL_0020:
+ldc.i4 1
+M00000004_IL_0021:
+call neoCLR.Library.System.Collections.HashMap.RuntimeBooleanFromInt32(Int32)
+stfld System.Collections.HashMap<T0,T1>::busy
+M00000004_IL_0026:
+M00000004_IL_0027:
+ret
+.end
+.method private instance Leave() -> noresult
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+ldc.i4 0
+M00000005_IL_0004:
+call neoCLR.Library.System.Collections.HashMap.RuntimeBooleanFromInt32(Int32)
+stfld System.Collections.HashMap<T0,T1>::busy
+M00000005_IL_0009:
+M00000005_IL_000a:
+ret
+.end
+.method private instance HashKey(T0) -> Int32
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+ldfld System.Collections.HashMap<T0,T1>::hash
+M00000006_IL_0008:
+ldarg 1
+M00000006_IL_0009:
+callvirt instance System.Func<T0,Int32>::Invoke(T0)
+M00000006_IL_000e:
+ldc.i4 2147483647
+M00000006_IL_0013:
+call neoCLR.Library.System.Collections.HashMap.RuntimeBitsAnd(Int32,Int32)
+M00000006_IL_0014:
+ret
+.end
+.method private instance Locate(T0,Int32) -> Int32
+.local Int32 local0
+.local Int32 local1
+ldc.i4 0
+stloc local0
+ldc.i4 0
+stloc local1
+M00000007_IL_0000:
+M00000007_IL_0001:
+M00000007_IL_0002:
+ldarg 0
+M00000007_IL_0003:
+ldfld System.Collections.HashMap<T0,T1>::buckets
+M00000007_IL_0008:
+ldarg 2
+M00000007_IL_0009:
+ldarg 0
+M00000007_IL_000a:
+ldfld System.Collections.HashMap<T0,T1>::buckets
+M00000007_IL_000f:
+ldlen
+M00000007_IL_0010:
+conv.i4
+M00000007_IL_0011:
+rem
+M00000007_IL_0012:
+ldelem Int32
+M00000007_IL_0013:
+stloc local0
+M00000007_IL_0014:
+M00000007_IL_0015:
+M00000007_IL_0016:
+ldloc local0
+M00000007_IL_0017:
+ldc.i4 0
+M00000007_IL_0018:
+ceq
+call neoCLR.Library.System.Collections.HashMap.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_001a:
+ldc.i4 0
+M00000007_IL_001b:
+ceq
+call neoCLR.Library.System.Collections.HashMap.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_001d:
+brtrue M00000007_IL_0027
+M00000007_IL_0022:
+br M00000007_IL_0080
+M00000007_IL_0027:
+M00000007_IL_0028:
+ldloc local0
+M00000007_IL_0029:
+ldc.i4 1
+M00000007_IL_002a:
+sub
+M00000007_IL_002b:
+stloc local1
+M00000007_IL_002c:
+M00000007_IL_002d:
+ldarg 0
+M00000007_IL_002e:
+ldfld System.Collections.HashMap<T0,T1>::hashes
+M00000007_IL_0033:
+ldloc local1
+M00000007_IL_0034:
+callvirt instance System.Collections.ArrayList<Int32>::get_Item(Int32)
+M00000007_IL_0039:
+ldarg 2
+M00000007_IL_003a:
+ceq
+call neoCLR.Library.System.Collections.HashMap.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_003c:
+brfalse M00000007_IL_005e
+M00000007_IL_0041:
+ldarg 0
+M00000007_IL_0042:
+ldfld System.Collections.HashMap<T0,T1>::equal
+M00000007_IL_0047:
+ldarg 0
+M00000007_IL_0048:
+ldfld System.Collections.HashMap<T0,T1>::keys
+M00000007_IL_004d:
+ldloc local1
+M00000007_IL_004e:
+callvirt instance System.Collections.ArrayList<T0>::get_Item(Int32)
+M00000007_IL_0053:
+ldarg 1
+M00000007_IL_0054:
+callvirt instance System.Func<T0,T0,Boolean>::Invoke(T0,T0)
+call neoCLR.Library.System.Collections.HashMap.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0059:
+br M00000007_IL_005f
+M00000007_IL_005e:
+ldc.i4 0
+M00000007_IL_005f:
+brtrue M00000007_IL_0069
+M00000007_IL_0064:
+br M00000007_IL_006c
+M00000007_IL_0069:
+M00000007_IL_006a:
+ldloc local1
+M00000007_IL_006b:
+ret
+M00000007_IL_006c:
+M00000007_IL_006d:
+M00000007_IL_006e:
+ldarg 0
+M00000007_IL_006f:
+ldfld System.Collections.HashMap<T0,T1>::next
+M00000007_IL_0074:
+ldloc local1
+M00000007_IL_0075:
+callvirt instance System.Collections.ArrayList<Int32>::get_Item(Int32)
+M00000007_IL_007a:
+stloc local0
+M00000007_IL_007b:
+br M00000007_IL_0015
+M00000007_IL_0080:
+M00000007_IL_0081:
+M00000007_IL_0082:
+ldc.i4 -1
+M00000007_IL_0083:
+ret
+.end
+.method instance Find(T0) -> System.Option<T1>
+.local Int32 local0
+ldc.i4 0
+stloc local0
+M00000008_IL_0000:
+M00000008_IL_0001:
+ldarg 0
+M00000008_IL_0002:
+callvirt instance System.Collections.HashMap<T0,T1>::Enter()
+M00000008_IL_0007:
+M00000008_IL_0008:
+ldarg 0
+M00000008_IL_0009:
+ldarg 1
+M00000008_IL_000a:
+ldarg 0
+M00000008_IL_000b:
+ldarg 1
+M00000008_IL_000c:
+callvirt instance System.Collections.HashMap<T0,T1>::HashKey(T0)
+M00000008_IL_0011:
+callvirt instance System.Collections.HashMap<T0,T1>::Locate(T0,Int32)
+M00000008_IL_0016:
+stloc local0
+M00000008_IL_0017:
+ldarg 0
+M00000008_IL_0018:
+callvirt instance System.Collections.HashMap<T0,T1>::Leave()
+M00000008_IL_001d:
+M00000008_IL_001e:
+ldloc local0
+M00000008_IL_001f:
+ldc.i4 0
+M00000008_IL_0020:
+clt
+call neoCLR.Library.System.Collections.HashMap.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0022:
+brtrue M00000008_IL_002c
+M00000008_IL_0027:
+br M00000008_IL_0037
+M00000008_IL_002c:
+call neoCLR.Library.System.Collections.HashMap.RuntimeUnion0()
+M00000008_IL_0031:
+call neoCLR.Library.System.Collections.HashMap.RuntimeUnion1<T1>(System.Option.None)
+M00000008_IL_0036:
+ret
+M00000008_IL_0037:
+M00000008_IL_0038:
+M00000008_IL_0039:
+ldarg 0
+M00000008_IL_003a:
+ldfld System.Collections.HashMap<T0,T1>::values
+M00000008_IL_003f:
+ldloc local0
+M00000008_IL_0040:
+callvirt instance System.Collections.ArrayList<T1>::get_Item(Int32)
+M00000008_IL_0045:
+call neoCLR.Library.System.Collections.HashMap.RuntimeUnion2<T1>(T1)
+M00000008_IL_004a:
+call neoCLR.Library.System.Collections.HashMap.RuntimeUnion3<T1>(System.Option.Some<T1>)
+M00000008_IL_004f:
+ret
+.end
+.method instance ContainsKey(T0) -> Boolean
+.local Boolean local0
+ldc.bool false
+stloc local0
+M00000009_IL_0000:
+M00000009_IL_0001:
+ldarg 0
+M00000009_IL_0002:
+callvirt instance System.Collections.HashMap<T0,T1>::Enter()
+M00000009_IL_0007:
+M00000009_IL_0008:
+ldarg 0
+M00000009_IL_0009:
+ldarg 1
+M00000009_IL_000a:
+ldarg 0
+M00000009_IL_000b:
+ldarg 1
+M00000009_IL_000c:
+callvirt instance System.Collections.HashMap<T0,T1>::HashKey(T0)
+M00000009_IL_0011:
+callvirt instance System.Collections.HashMap<T0,T1>::Locate(T0,Int32)
+M00000009_IL_0016:
+ldc.i4 0
+M00000009_IL_0017:
+clt
+call neoCLR.Library.System.Collections.HashMap.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_0019:
+ldc.i4 0
+M00000009_IL_001a:
+ceq
+call neoCLR.Library.System.Collections.HashMap.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_001c:
+call neoCLR.Library.System.Collections.HashMap.RuntimeBooleanFromInt32(Int32)
+stloc local0
+M00000009_IL_001d:
+ldarg 0
+M00000009_IL_001e:
+callvirt instance System.Collections.HashMap<T0,T1>::Leave()
+M00000009_IL_0023:
+M00000009_IL_0024:
+ldloc local0
+call neoCLR.Library.System.Collections.HashMap.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_0025:
+call neoCLR.Library.System.Collections.HashMap.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method private instance Grow() -> noresult
+.local Int32 local0
+.local arrayref<Int32> local1
+.local Int32 local2
+.local Int32 local3
+.local Int32 local4
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj arrayref<Int32>
+ldc.i4 0
+stloc local2
+ldc.i4 0
+stloc local3
+ldc.i4 0
+stloc local4
+M0000000a_IL_0000:
+M0000000a_IL_0001:
+M0000000a_IL_0002:
+ldarg 0
+M0000000a_IL_0003:
+ldfld System.Collections.HashMap<T0,T1>::buckets
+M0000000a_IL_0008:
+ldlen
+M0000000a_IL_0009:
+conv.i4
+M0000000a_IL_000a:
+stloc local0
+M0000000a_IL_000b:
+M0000000a_IL_000c:
+ldarg 0
+M0000000a_IL_000d:
+ldfld System.Collections.HashMap<T0,T1>::keys
+M0000000a_IL_0012:
+callvirt instance System.Collections.ArrayList<T0>::get_Count()
+M0000000a_IL_0017:
+ldloc local0
+M0000000a_IL_0018:
+clt
+call neoCLR.Library.System.Collections.HashMap.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_001a:
+brtrue M0000000a_IL_0024
+M0000000a_IL_001f:
+br M0000000a_IL_0026
+M0000000a_IL_0024:
+M0000000a_IL_0025:
+ret
+M0000000a_IL_0026:
+M0000000a_IL_0027:
+M0000000a_IL_0028:
+ldloc local0
+M0000000a_IL_0029:
+ldc.i4 1073741823
+M0000000a_IL_002e:
+cgt
+call neoCLR.Library.System.Collections.HashMap.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0030:
+brtrue M0000000a_IL_003a
+M0000000a_IL_0035:
+br M0000000a_IL_0045
+M0000000a_IL_003a:
+M0000000a_IL_003b:
+ldstr "HashMap capacity overflow"
+M0000000a_IL_0040:
+call System.Fault(String)
+M0000000a_IL_0045:
+M0000000a_IL_0046:
+M0000000a_IL_0047:
+ldloc local0
+M0000000a_IL_0048:
+ldc.i4 2
+M0000000a_IL_0049:
+mul
+M0000000a_IL_004a:
+stloc local0
+M0000000a_IL_004b:
+M0000000a_IL_004c:
+ldloc local0
+M0000000a_IL_004d:
+array.reserve Int32
+M0000000a_IL_0052:
+stloc local1
+M0000000a_IL_0053:
+M0000000a_IL_0054:
+ldc.i4 0
+M0000000a_IL_0055:
+stloc local2
+M0000000a_IL_0056:
+M0000000a_IL_0057:
+M0000000a_IL_0058:
+ldloc local2
+M0000000a_IL_0059:
+ldloc local0
+M0000000a_IL_005a:
+clt
+call neoCLR.Library.System.Collections.HashMap.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_005c:
+brtrue M0000000a_IL_0066
+M0000000a_IL_0061:
+br M0000000a_IL_0075
+M0000000a_IL_0066:
+M0000000a_IL_0067:
+ldloc local1
+M0000000a_IL_0068:
+ldloc local2
+M0000000a_IL_0069:
+ldc.i4 0
+M0000000a_IL_006a:
+stelem Int32
+M0000000a_IL_006b:
+M0000000a_IL_006c:
+ldloc local2
+M0000000a_IL_006d:
+ldc.i4 1
+M0000000a_IL_006e:
+add
+M0000000a_IL_006f:
+stloc local2
+M0000000a_IL_0070:
+br M0000000a_IL_0057
+M0000000a_IL_0075:
+M0000000a_IL_0076:
+M0000000a_IL_0077:
+ldc.i4 0
+M0000000a_IL_0078:
+stloc local3
+M0000000a_IL_0079:
+M0000000a_IL_007a:
+M0000000a_IL_007b:
+ldloc local3
+M0000000a_IL_007c:
+ldarg 0
+M0000000a_IL_007d:
+ldfld System.Collections.HashMap<T0,T1>::keys
+M0000000a_IL_0082:
+callvirt instance System.Collections.ArrayList<T0>::get_Count()
+M0000000a_IL_0087:
+clt
+call neoCLR.Library.System.Collections.HashMap.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0089:
+brtrue M0000000a_IL_0093
+M0000000a_IL_008e:
+br M0000000a_IL_00c7
+M0000000a_IL_0093:
+M0000000a_IL_0094:
+ldarg 0
+M0000000a_IL_0095:
+ldfld System.Collections.HashMap<T0,T1>::hashes
+M0000000a_IL_009a:
+ldloc local3
+M0000000a_IL_009b:
+callvirt instance System.Collections.ArrayList<Int32>::get_Item(Int32)
+M0000000a_IL_00a0:
+ldloc local0
+M0000000a_IL_00a1:
+rem
+M0000000a_IL_00a2:
+stloc local4
+M0000000a_IL_00a4:
+M0000000a_IL_00a5:
+ldarg 0
+M0000000a_IL_00a6:
+ldfld System.Collections.HashMap<T0,T1>::next
+M0000000a_IL_00ab:
+ldloc local3
+M0000000a_IL_00ac:
+ldloc local1
+M0000000a_IL_00ad:
+ldloc local4
+M0000000a_IL_00af:
+ldelem Int32
+M0000000a_IL_00b0:
+callvirt instance System.Collections.ArrayList<Int32>::set_Item(Int32,Int32)
+M0000000a_IL_00b5:
+M0000000a_IL_00b6:
+ldloc local1
+M0000000a_IL_00b7:
+ldloc local4
+M0000000a_IL_00b9:
+ldloc local3
+M0000000a_IL_00ba:
+ldc.i4 1
+M0000000a_IL_00bb:
+add
+M0000000a_IL_00bc:
+stelem Int32
+M0000000a_IL_00bd:
+M0000000a_IL_00be:
+ldloc local3
+M0000000a_IL_00bf:
+ldc.i4 1
+M0000000a_IL_00c0:
+add
+M0000000a_IL_00c1:
+stloc local3
+M0000000a_IL_00c2:
+br M0000000a_IL_007a
+M0000000a_IL_00c7:
+M0000000a_IL_00c8:
+M0000000a_IL_00c9:
+ldarg 0
+M0000000a_IL_00ca:
+ldloc local1
+M0000000a_IL_00cb:
+stfld System.Collections.HashMap<T0,T1>::buckets
+M0000000a_IL_00d0:
+M0000000a_IL_00d1:
+ret
+.end
+.method private instance Append(T0,T1,Int32) -> noresult
+.local Int32 local0
+ldc.i4 0
+stloc local0
+M0000000b_IL_0000:
+M0000000b_IL_0001:
+ldarg 0
+M0000000b_IL_0002:
+callvirt instance System.Collections.HashMap<T0,T1>::Grow()
+M0000000b_IL_0007:
+M0000000b_IL_0008:
+ldarg 3
+M0000000b_IL_0009:
+ldarg 0
+M0000000b_IL_000a:
+ldfld System.Collections.HashMap<T0,T1>::buckets
+M0000000b_IL_000f:
+ldlen
+M0000000b_IL_0010:
+conv.i4
+M0000000b_IL_0011:
+rem
+M0000000b_IL_0012:
+stloc local0
+M0000000b_IL_0013:
+M0000000b_IL_0014:
+ldarg 0
+M0000000b_IL_0015:
+ldfld System.Collections.HashMap<T0,T1>::keys
+M0000000b_IL_001a:
+ldarg 1
+M0000000b_IL_001b:
+callvirt instance System.Collections.ArrayList<T0>::Add(T0)
+M0000000b_IL_0020:
+M0000000b_IL_0021:
+ldarg 0
+M0000000b_IL_0022:
+ldfld System.Collections.HashMap<T0,T1>::values
+M0000000b_IL_0027:
+ldarg 2
+M0000000b_IL_0028:
+callvirt instance System.Collections.ArrayList<T1>::Add(T1)
+M0000000b_IL_002d:
+M0000000b_IL_002e:
+ldarg 0
+M0000000b_IL_002f:
+ldfld System.Collections.HashMap<T0,T1>::hashes
+M0000000b_IL_0034:
+ldarg 3
+M0000000b_IL_0035:
+callvirt instance System.Collections.ArrayList<Int32>::Add(Int32)
+M0000000b_IL_003a:
+M0000000b_IL_003b:
+ldarg 0
+M0000000b_IL_003c:
+ldfld System.Collections.HashMap<T0,T1>::next
+M0000000b_IL_0041:
+ldarg 0
+M0000000b_IL_0042:
+ldfld System.Collections.HashMap<T0,T1>::buckets
+M0000000b_IL_0047:
+ldloc local0
+M0000000b_IL_0048:
+ldelem Int32
+M0000000b_IL_0049:
+callvirt instance System.Collections.ArrayList<Int32>::Add(Int32)
+M0000000b_IL_004e:
+M0000000b_IL_004f:
+ldarg 0
+M0000000b_IL_0050:
+ldfld System.Collections.HashMap<T0,T1>::buckets
+M0000000b_IL_0055:
+ldloc local0
+M0000000b_IL_0056:
+ldarg 0
+M0000000b_IL_0057:
+ldfld System.Collections.HashMap<T0,T1>::keys
+M0000000b_IL_005c:
+callvirt instance System.Collections.ArrayList<T0>::get_Count()
+M0000000b_IL_0061:
+stelem Int32
+M0000000b_IL_0062:
+M0000000b_IL_0063:
+ret
+.end
+.method instance TryAdd(T0,T1) -> Boolean
+.local Int32 local0
+.local Int32 local1
+ldc.i4 0
+stloc local0
+ldc.i4 0
+stloc local1
+M0000000c_IL_0000:
+M0000000c_IL_0001:
+ldarg 0
+M0000000c_IL_0002:
+callvirt instance System.Collections.HashMap<T0,T1>::Enter()
+M0000000c_IL_0007:
+M0000000c_IL_0008:
+ldarg 0
+M0000000c_IL_0009:
+ldarg 1
+M0000000c_IL_000a:
+callvirt instance System.Collections.HashMap<T0,T1>::HashKey(T0)
+M0000000c_IL_000f:
+stloc local0
+M0000000c_IL_0010:
+M0000000c_IL_0011:
+ldarg 0
+M0000000c_IL_0012:
+ldarg 1
+M0000000c_IL_0013:
+ldloc local0
+M0000000c_IL_0014:
+callvirt instance System.Collections.HashMap<T0,T1>::Locate(T0,Int32)
+M0000000c_IL_0019:
+stloc local1
+M0000000c_IL_001a:
+M0000000c_IL_001b:
+ldloc local1
+M0000000c_IL_001c:
+ldc.i4 0
+M0000000c_IL_001d:
+clt
+call neoCLR.Library.System.Collections.HashMap.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_001f:
+ldc.i4 0
+M0000000c_IL_0020:
+ceq
+call neoCLR.Library.System.Collections.HashMap.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_0022:
+brtrue M0000000c_IL_002c
+M0000000c_IL_0027:
+br M0000000c_IL_0035
+M0000000c_IL_002c:
+M0000000c_IL_002d:
+ldarg 0
+M0000000c_IL_002e:
+callvirt instance System.Collections.HashMap<T0,T1>::Leave()
+M0000000c_IL_0033:
+ldc.i4 0
+M0000000c_IL_0034:
+call neoCLR.Library.System.Collections.HashMap.RuntimeBooleanFromInt32(Int32)
+ret
+M0000000c_IL_0035:
+M0000000c_IL_0036:
+M0000000c_IL_0037:
+ldarg 0
+M0000000c_IL_0038:
+ldarg 1
+M0000000c_IL_0039:
+ldarg 2
+M0000000c_IL_003a:
+ldloc local0
+M0000000c_IL_003b:
+callvirt instance System.Collections.HashMap<T0,T1>::Append(T0,T1,Int32)
+M0000000c_IL_0040:
+ldarg 0
+M0000000c_IL_0041:
+callvirt instance System.Collections.HashMap<T0,T1>::Leave()
+M0000000c_IL_0046:
+M0000000c_IL_0047:
+ldc.i4 1
+M0000000c_IL_0048:
+call neoCLR.Library.System.Collections.HashMap.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance Set(T0,T1) -> noresult
+.local Int32 local0
+.local Int32 local1
+ldc.i4 0
+stloc local0
+ldc.i4 0
+stloc local1
+M0000000d_IL_0000:
+M0000000d_IL_0001:
+ldarg 0
+M0000000d_IL_0002:
+callvirt instance System.Collections.HashMap<T0,T1>::Enter()
+M0000000d_IL_0007:
+M0000000d_IL_0008:
+ldarg 0
+M0000000d_IL_0009:
+ldarg 1
+M0000000d_IL_000a:
+callvirt instance System.Collections.HashMap<T0,T1>::HashKey(T0)
+M0000000d_IL_000f:
+stloc local0
+M0000000d_IL_0010:
+M0000000d_IL_0011:
+ldarg 0
+M0000000d_IL_0012:
+ldarg 1
+M0000000d_IL_0013:
+ldloc local0
+M0000000d_IL_0014:
+callvirt instance System.Collections.HashMap<T0,T1>::Locate(T0,Int32)
+M0000000d_IL_0019:
+stloc local1
+M0000000d_IL_001a:
+M0000000d_IL_001b:
+ldloc local1
+M0000000d_IL_001c:
+ldc.i4 0
+M0000000d_IL_001d:
+clt
+call neoCLR.Library.System.Collections.HashMap.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_001f:
+brtrue M0000000d_IL_0029
+M0000000d_IL_0024:
+br M0000000d_IL_0039
+M0000000d_IL_0029:
+M0000000d_IL_002a:
+ldarg 0
+M0000000d_IL_002b:
+ldarg 1
+M0000000d_IL_002c:
+ldarg 2
+M0000000d_IL_002d:
+ldloc local0
+M0000000d_IL_002e:
+callvirt instance System.Collections.HashMap<T0,T1>::Append(T0,T1,Int32)
+M0000000d_IL_0033:
+br M0000000d_IL_0047
+M0000000d_IL_0039:
+M0000000d_IL_003a:
+ldarg 0
+M0000000d_IL_003b:
+ldfld System.Collections.HashMap<T0,T1>::values
+M0000000d_IL_0040:
+ldloc local1
+M0000000d_IL_0041:
+ldarg 2
+M0000000d_IL_0042:
+callvirt instance System.Collections.ArrayList<T1>::set_Item(Int32,T1)
+M0000000d_IL_0047:
+M0000000d_IL_0048:
+ldarg 0
+M0000000d_IL_0049:
+callvirt instance System.Collections.HashMap<T0,T1>::Leave()
+M0000000d_IL_004e:
+M0000000d_IL_004f:
+ret
+.end
+.end

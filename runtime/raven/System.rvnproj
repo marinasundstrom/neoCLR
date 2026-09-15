@@ -5,7 +5,7 @@
     <NeoCLRRoot>$(NeoCLRBootstrapRoot)</NeoCLRRoot>
   </PropertyGroup>
   <Import Project="../../build/NeoCLR.Raven.props" />
-  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' != 'ArrayList'">
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == ''">
     <Compile Include="src/Math.rvn" />
     <Compile Include="src/Linq.rvn" />
     <Compile Include="src/Int32.rvn" />
@@ -13,5 +13,8 @@
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'ArrayList'">
     <Compile Include="src/ArrayList.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'HashMap'">
+    <Compile Include="src/HashMap.rvn" />
   </ItemGroup>
 </Project>

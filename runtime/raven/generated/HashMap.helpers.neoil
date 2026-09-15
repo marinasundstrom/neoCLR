@@ -1,0 +1,50 @@
+; Generated from runtime/raven/src/HashMap.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Collections.HashMap.RuntimeUnion0() -> System.Option.None
+newobj instance System.Option.None::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Collections.HashMap.RuntimeUnion1<T1>(System.Option.None arg0) -> System.Option<T1>
+ldarg arg0
+newobj instance System.Option<T1>::.ctor(System.Option.None)
+ret
+.end
+.function neoCLR.Library.System.Collections.HashMap.RuntimeUnion2<T1>(T1 arg0) -> System.Option.Some<T1>
+ldarg arg0
+newobj instance System.Option.Some<T1>::.ctor(T1)
+ret
+.end
+.function neoCLR.Library.System.Collections.HashMap.RuntimeUnion3<T1>(System.Option.Some<T1> arg0) -> System.Option<T1>
+ldarg arg0
+newobj instance System.Option<T1>::.ctor(System.Option.Some<T1>)
+ret
+.end
+.function neoCLR.Library.System.Collections.HashMap.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
+.function neoCLR.Library.System.Collections.HashMap.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end
+.function neoCLR.Library.System.Collections.HashMap.RuntimeBitsAnd(Int32 left,Int32 right) -> Int32
+ldarg left
+ldarg right
+and
+ret
+.end

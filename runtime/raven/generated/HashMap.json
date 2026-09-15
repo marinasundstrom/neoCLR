@@ -1,6 +1,6 @@
 {
   "format": "raven-library-bootstrap-v1",
-  "owner": "System.Collections.ArrayList",
+  "owner": "System.Collections.HashMap",
   "inputs": {
     "runtime/raven/src/Math.rvn": "05fbc020828379134fbead7aefb8e19955cefc3b875991dc937e2e303c716e18",
     "runtime/raven/src/Linq.rvn": "58a60fe5ecd4f68560baf6c16bc8342992c9d32752c6b0b40140d0300251e605",
@@ -12,27 +12,18 @@
     "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
   },
   "outputs": {
-    "ArrayList.methods.neoil": "eecc75f961713e650b4f69e398315aaa6866c1f1b108d3d466336d6b7deb24bd",
-    "ArrayList.helpers.neoil": "b768d94c54ee50bbb99dcb43d246292c2101b39e71ebb8325b9e8693841d5cb5"
+    "HashMap.methods.neoil": "ab74c7e95ac543cf447e159a8c4b98cd5311d44eecef824d26d7dcb51742b258",
+    "HashMap.helpers.neoil": "954ea38278d35aa28995dac310e1164ff9d49cacfedcccd035057e74e2ea6407"
   },
   "compilerSha256": "744ad87d9a6ec3d8b5691e72d0cd077b154af51615387b5f6bb171daa89fb370",
   "coreSha256": "a47fd3bb9f288752a2c333cbfe438d9eb20bd9346a463b68febcf701ec4bfe22",
   "exports": [
-    ".ctor() -> noresult",
-    ".ctor(Int32) -> noresult",
+    ".ctor(System.Func<T0,T0,Boolean>,System.Func<T0,Int32>) -> noresult",
     "get_Count() -> Int32",
-    "get_Capacity() -> Int32",
-    "get_Item(Int32) -> T0",
-    "set_Item(Int32,T0) -> noresult",
-    "Add(T0) -> noresult",
-    "Copy() -> System.Collections.ArrayList<T0>",
-    "GetIterator() -> System.Collections.Iterator<T0>",
-    "Find(System.Func<T0,Boolean>) -> System.Option<T0>",
-    "FindLast(System.Func<T0,Boolean>) -> System.Option<T0>",
-    "FindIndex(System.Func<T0,Boolean>) -> System.Option<Int32>",
-    "FindLastIndex(System.Func<T0,Boolean>) -> System.Option<Int32>",
-    "Exists(System.Func<T0,Boolean>) -> Boolean",
-    "TrueForAll(System.Func<T0,Boolean>) -> Boolean",
-    "FindAll(System.Func<T0,Boolean>) -> System.Collections.ArrayList<T0>"
+    "get_Keys() -> System.Collections.Sequence<T0>",
+    "Find(T0) -> System.Option<T1>",
+    "ContainsKey(T0) -> Boolean",
+    "TryAdd(T0,T1) -> Boolean",
+    "Set(T0,T1) -> noresult"
   ]
 }

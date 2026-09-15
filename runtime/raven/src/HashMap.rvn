@@ -1,0 +1,132 @@
+namespace System.Collections
+
+import System.Option.*
+
+public class HashMap<K, V> : MutableMap<K, V> {
+    private field equal: System.Func<K, K, bool>
+    private field hash: System.Func<K, int>
+    private field buckets: int[]
+    private field keys: ArrayList<K>
+    private field values: ArrayList<V>
+    private field hashes: ArrayList<int>
+    private field next: ArrayList<int>
+    private field busy: bool
+
+    init(equal: System.Func<K, K, bool>, hash: System.Func<K, int>) {
+        self.equal = equal
+        self.hash = hash
+        buckets = [0, 0, 0, 0]
+        keys = ArrayList<K>()
+        values = ArrayList<V>()
+        hashes = ArrayList<int>()
+        next = ArrayList<int>()
+        busy = false
+    }
+
+    val Count: int { get => keys.Count }
+    val Keys: Sequence<K> { get => keys.Copy() }
+
+    private func Enter() {
+        if busy {
+            System.Fault("HashMap callbacks must not reenter the map")
+        }
+        busy = true
+    }
+
+    private func Leave() {
+        busy = false
+    }
+
+    private func HashKey(key: K) -> int {
+        return hash(key) & 2147483647
+    }
+
+    private func Locate(key: K, hash: int) -> int {
+        var node = buckets[hash % buckets.Length]
+        while node != 0 {
+            let index = node - 1
+            if hashes[index] == hash && equal(keys[index], key) {
+                return index
+            }
+            node = next[index]
+        }
+        return -1
+    }
+
+    func Find(key: K) -> System.Option<V> {
+        Enter()
+        let index = Locate(key, HashKey(key))
+        Leave()
+        if index < 0 {
+            return None
+        }
+        return Some(values[index])
+    }
+
+    func ContainsKey(key: K) -> bool {
+        Enter()
+        let found = Locate(key, HashKey(key)) >= 0
+        Leave()
+        return found
+    }
+
+    private func Grow() {
+        var size = buckets.Length
+        if keys.Count < size {
+            return
+        }
+        if size > 1073741823 {
+            System.Fault("HashMap capacity overflow")
+        }
+        size = size * 2
+        let expanded = System.Runtime.CompilerServices.CheckedStorage.Reserve<int>(size)
+        var slot = 0
+        while slot < size {
+            expanded[slot] = 0
+            slot = slot + 1
+        }
+        var index = 0
+        while index < keys.Count {
+            let bucket = hashes[index] % size
+            next[index] = expanded[bucket]
+            expanded[bucket] = index + 1
+            index = index + 1
+        }
+        buckets = expanded
+    }
+
+    private func Append(key: K, value: V, hash: int) {
+        Grow()
+        let bucket = hash % buckets.Length
+        keys.Add(key)
+        values.Add(value)
+        hashes.Add(hash)
+        next.Add(buckets[bucket])
+        buckets[bucket] = keys.Count
+    }
+
+    func TryAdd(key: K, value: V) -> bool {
+        Enter()
+        let code = HashKey(key)
+        let index = Locate(key, code)
+        if index >= 0 {
+            Leave()
+            return false
+        }
+        Append(key, value, code)
+        Leave()
+        return true
+    }
+
+    func Set(key: K, value: V) {
+        Enter()
+        let code = HashKey(key)
+        let index = Locate(key, code)
+        if index < 0 {
+            Append(key, value, code)
+        } else {
+            values[index] = value
+        }
+        Leave()
+    }
+}

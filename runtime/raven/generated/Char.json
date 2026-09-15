@@ -7,7 +7,8 @@
     "runtime/raven/src/Int32.rvn": "ba7ccc0493dc897f628c11dd135cc00c086cc573f88f59d37661b18cb447bac0",
     "runtime/raven/src/Char.rvn": "5656f1ee320f33e132cc835b4aa11c5d2e5656e18b89647157bddd92ff9efa41",
     "runtime/raven/src/ArrayList.rvn": "9541be94fae19daa0503733ec9888baf4c177e4d9717f73f91979e3aa79acb42",
-    "runtime/raven/System.rvnproj": "af1a51f04e2ef005b4e8ec91ddadc85e317b890f03e9f7b417f217ca6662d46b",
+    "runtime/raven/src/HashMap.rvn": "510246a97d44a89074dfd35e2448d35f7e1104f4cbd75c7a53e99fae58bedbd4",
+    "runtime/raven/System.rvnproj": "3752d8f90d72375566e7fed4fcea8c83dbe66adfc46db78026e2b79c2b6a59ef",
     "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
   },
   "outputs": {

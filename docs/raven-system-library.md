@@ -1,7 +1,7 @@
 # Authoring the foundational library in Raven
 
 `runtime/raven/System.rvnproj` is the shared authoring project for ordinary
-foundational runtime APIs. Its sources include `src/Math.rvn`, `src/Linq.rvn`, `src/Int32.rvn`, `src/Char.rvn` and `src/ArrayList.rvn`; additional namespaces
+foundational runtime APIs. Its sources include `src/Math.rvn`, `src/Linq.rvn`, `src/Int32.rvn`, `src/Char.rvn`, `src/ArrayList.rvn` and `src/HashMap.rvn`; additional namespaces
 and types should join this project as their importing requirements are validated.
 Do not create an assembly per utility namespace. This is an incremental source
 migration, not yet a self-hosting build of the complete core reference assembly.
@@ -13,7 +13,7 @@ The bootstrap currently has three distinct artifacts:
   the normal reference surface. Placeholder bodies must never execute.
 - `NeoCLR.System.dll`: compiled Raven implementation input, currently five scalar
   Math functions, nine query overloads and their private deferred iterator classes,
-  Int32.Divide and seven character predicates, plus a separately compiled ArrayList slice.
+  Int32.Divide and seven character predicates, plus separately compiled ArrayList and HashMap slices.
   These implementation inputs are imported into neoIL, not loaded dynamically by the runtime.
 - `runtime/System.neoil` and its includes: the executable foundational library,
   combining generated Raven bodies with remaining handwritten bodies and intrinsics.
@@ -96,16 +96,17 @@ type, and fully qualifies `System.Result<...>` in return annotations. The observ
 unqualified-return diagnostic issue was fixed independently; see the
 [resolution follow-up](raven-target-evaluation.md#resolution-follow-up--2026-09-14).
 
-## Current limits and next gate
+## Initial namespace gate
 
-This importer accepts public namespace functions and static API methods matching existing
+The initial namespace/static gate accepts public namespace functions and static API methods matching existing
 reference signatures, including the bounded generic body gate below. It rejects stateful
 containers, unexported helpers, new application-type identities, constrained
 generic signatures and unsupported constructed shapes, byref/out exports and no-result exports. Support for these is future work, not implied by compiling the pilot.
 Generated Result adapters are scoped to the library implementation to avoid clashes
 with consumer adapters. Reference declarations remain separately maintained and
 checked against exports; complete generation of reference metadata from Raven source
-is not implemented yet.
+is not implemented yet. The matched class, private helper and collection gates
+below describe subsequent additions.
 
 The collection terminal migration now admits constructed Iterable/Iterator/ArrayList,
 Func and Option/Result method signatures. Before migrating foundational type definitions, establish
@@ -461,7 +462,49 @@ python3 docs/experiments/raven-target/verify_arraylist_library.py /path/to/demo/
   --bridge /path/to/Probe.dll --runtime /path/to/neoclr --system /path/to/System.neoil
 ```
 
-HashMap remains handwritten IL. Its hashing/equality callbacks and reentrancy checks
-need the same parity review before migration. Value-shaped APIs such as Date/Time
+HashMap subsequently passed the same parity review; see below. Value-shaped APIs such as Date/Time
 also need a matched value-type authoring gate; the current class gate must not silently
 turn those into reference types.
+
+
+### HashMap and private instance helpers — 2026-09-15
+
+`src/HashMap.rvn` implements the existing MutableMap contract: construction with
+explicit equality/hash callbacks, Count, key snapshots, Find, ContainsKey, TryAdd and
+Set. `Map.neoil` now retains only interface declarations and includes generated class
+bodies. Runtime Contract configuration and Raven compiler behavior are unchanged.
+The shared build compiles this class with `NeoCLRLibrarySlice=HashMap` against the
+reference surface, then imports it alongside the other independently checked slices.
+
+Matched public classes may now contain private, nonvirtual, nongeneric instance
+helpers with bodies. Public constructors/methods/properties still match the reference
+contract exactly. Protected/internal helpers, private constructors, static helpers,
+byref/out signatures and generic helper methods remain outside this gate. All admitted
+bodies, including unused private helpers, are checked. Emission retains `private`
+visibility in IL; the existing same-owner call rule prevents cross-type access. This
+uses ordinary CLI private methods rather than adding target-specific Raven symbols
+or relaxing guest admission.
+
+Hashing still clears the sign bit, uses chained buckets and doubles bucket capacity
+when full. Rehashing uses stored hashes, without calling user callbacks again. Set
+preserves an existing key instance. Keys returns independent shallow-copy storage.
+Reentrant mutation/lookup from a callback faults; Count/Keys remain readable as before.
+Callback faults remain terminal and do not imply rollback or finally-like cleanup.
+These are the existing experimental map contracts, not a claim of complete .NET
+Dictionary compatibility. The class stores callbacks directly, removing the former
+MapCallbacks allocation. Expanded buckets are initialized explicitly before use;
+capacity multiplication has an explicit `HashMap capacity overflow` guard.
+
+The generic instance probe's `--private-methods` mode exercises private helpers with
+Int32/String/Void, rejects an extra public helper and verifies that external direct IL
+cannot call a private helper. Existing runtime tests cover collision chains, growth,
+duplicate/missing outcomes, key identity, snapshots, GC retention and reentrancy.
+Regeneration and the Raven project suite check the integrated library. Neither Raven
+repository is changed by this importer/library slice.
+
+
+HashMap validation: 18 runtime collection/query tests and all 63 saved-project checks
+pass. Generic private-method visibility, private-storage admission and nongeneric
+instance-contract probes pass, including malformed-contract/access rejections. Clean
+bootstrap regeneration and API inventory/coverage checks pass. No SDK installation
+or release packaging was performed by these source migrations.

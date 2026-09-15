@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-15
 
+- Port HashMap algorithms to Raven while retaining Map/MutableMap contracts in IL.
+  Preserve explicit callbacks, chained hashing, growth, Option lookup, duplicate
+  handling, shallow key snapshots and reentrancy faults. Store callbacks directly;
+  diagnose capacity overflow before multiplication. Admit private nonvirtual instance
+  helpers in matched library classes, preserving private visibility and validating
+  every body without relaxing the public reference contract or guest imports.
+  No Raven compiler or Runtime Contract change is required. All 18 collection/query
+  runtime tests and 63 saved-project checks pass, together with private-method,
+  private-storage and instance-contract probes and clean bootstrap regeneration.
+
 - Port the complete ArrayList class and its private iterator to Raven, including
   constructors, indexing, growth, shallow copies and all seven predicate searches.
   Replace the legacy shared-state wrapper with direct checked array storage while

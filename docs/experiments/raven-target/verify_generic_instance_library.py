@@ -12,6 +12,7 @@ for name in ('compiler', 'bridge', 'runtime'):
     parser.add_argument('--' + name, required=True, type=Path)
 parser.add_argument("--checked-storage", action="store_true")
 parser.add_argument("--private-storage", action="store_true")
+parser.add_argument("--private-methods", action="store_true")
 args = parser.parse_args()
 compiler, bridge, runtime = (getattr(args, n).resolve() for n in ('compiler', 'bridge', 'runtime'))
 
@@ -63,6 +64,16 @@ public class Cell<T> : Iterable<T> {
 }
 '''
 
+    if args.private_methods:
+        source = source.replace('public func Set(value: T) {\n        stored = value',
+                                'public func Set(value: T) {\n        Store(value)')
+        source = source.replace('let value: T = stored', 'let value: T = Read()')
+        source = source.rstrip()[:-1] + '''
+    private func Store(value: T) { stored = value }
+    private func Read() -> T { return stored }
+}
+'''
+
     if args.private_storage:
         source = source.replace('private field stored: T', 'private field stored: Storage<T>')
         source = source.replace('stored = value', 'stored.Set(value)')
@@ -105,6 +116,14 @@ public class Cell<T> : Iterable<T> {
     imported = root / 'imported'
     run(['dotnet', bridge, '--library-implementation', image, core, 'Probe.Cell', imported])
     body = (imported / 'Implementation.neoil').read_text()
+    if args.private_methods:
+        assert '.method private instance Store(' in body
+        assert '.method private instance Read(' in body
+        bad = compile('PublicHelper', source.replace('private func Store', 'public func Store'))
+        diagnostic = run(['dotnet', bridge, '--library-implementation', bad, core,
+                          'Probe.Cell', root / 'public-helper-import'], False)
+        assert 'does not match reference contract' in diagnostic, diagnostic
+
     driver = '.module GenericInstance\n.entry Main\n' + body + '\n.function Main() -> void\n'
     for value_type in ('Int32', 'String', 'Void'):
         driver += f'.local Probe.Cell<{value_type}> cell{value_type}\n.local System.Collections.Iterator<{value_type}> iterator{value_type}\n'
@@ -148,6 +167,11 @@ callvirt instance {iterator}::get_Current()
     system.write_text(build(ROOT / 'runtime/System.neoil'))
     run([runtime, 'verify', application, '--system', system])
     assert run([runtime, 'run', application, '--system', system]).splitlines() == ['42', 'second', 'void']
+    if args.private_methods:
+        application.write_text(driver.replace('::Set(', '::Store('))
+        diagnostic = run([runtime, 'verify', application, '--system', system], False)
+        assert 'private' in diagnostic.lower() or 'accessible' in diagnostic.lower(), diagnostic
+        application.write_text(driver)
     for name, invalid in [('Arity', source.replace('Cell<T>', 'Cell<T,U>')),
                           ('MissingInterface', source.replace(' : Iterable<T>', '').replace('public func AsIterable() -> Iterable<T> {\n        return self', 'public func AsIterable() -> Iterable<T> {\n        return ArrayList<T>()'))]:
         bad = compile(name, invalid)

@@ -139,3 +139,13 @@ The .NET comparison ran on SDK 11.0.100-rc.1.26425.128 targeting net10.0 and pri
 `Null key rejected`. The count of two on its previously obtained Keys demonstrates
 the live-view difference. Source-built tools were used; this is not installed-bundle
 or packaged-release validation.
+
+
+## Raven implementation — 2026-09-15
+
+The HashMap implementation now lives in `runtime/raven/src/HashMap.rvn`; the map
+interface declarations remain in `runtime/raven/Map.neoil`. Generated bootstrap IL
+preserves the algorithms and contracts described here. Private implementation helpers
+remain private. The class owns equality/hash delegates directly and uses the
+Raven-authored ArrayList for entry storage. No default comparer, removal or pair
+iteration is added by this migration. See [the authoring gate](raven-system-library.md#hashmap-and-private-instance-helpers--2026-09-15).

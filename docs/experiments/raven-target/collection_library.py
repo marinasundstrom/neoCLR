@@ -64,7 +64,7 @@ def build(path: Path) -> str:
         result += (ROOT / 'runtime/raven/SingleError.neoil').read_text()
         result += build(ROOT / 'runtime/raven/Linq.neoil')
         result += (ROOT / 'runtime/raven/ArrayEnumerable.neoil').read_text()
-        result += (ROOT / 'runtime/raven/Map.neoil').read_text()
+        result += build(ROOT / 'runtime/raven/Map.neoil')
     return result
 
 

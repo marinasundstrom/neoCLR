@@ -73,12 +73,15 @@ static class LibraryImplementation
             || contract.Fields.Any(f => !f.IsPrivate))
             throw new InvalidDataException("Instance library requires private mutable implementation fields.");
         var methods = type.Methods.ToArray();
-        if (methods.Length == 0 || methods.Any(m => !m.IsPublic || !m.HasThis || !m.HasBody || m.HasGenericParameters
+        if (methods.Length == 0 || methods.Any(m => !(m.IsPublic || m.IsPrivate && !m.IsConstructor && !m.IsVirtual) || !m.HasThis || !m.HasBody || m.HasGenericParameters
             || m.ExplicitThis || m.CallingConvention != MethodCallingConvention.Default
             || m.Parameters.Any(p => p.IsOut || p.ParameterType.IsByReference)))
             throw new InvalidDataException("Unsupported instance library export.");
+        // Private implementation helpers are not exports, but remain roots so even
+        // unused bodies are checked and emitted with their original visibility.
         var expected = contract.Methods.Where(m => m.IsPublic).ToArray();
-        if (expected.Length != methods.Length || methods.Any(m => expected.Count(e => MatchMethod(e, m)) != 1))
+        var exports = methods.Where(m => m.IsPublic).ToArray();
+        if (expected.Length != exports.Length || exports.Any(m => expected.Count(e => MatchMethod(e, m)) != 1))
             throw new InvalidDataException("Instance library export does not match reference contract.");
         if (type.Properties.Count != contract.Properties.Count || type.Properties.Any(p =>
             contract.Properties.Count(c => c.Name == p.Name && MatchType(c.PropertyType, p.PropertyType)
