@@ -27,6 +27,23 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
 
 ### Ongoing Type/Reflection separation — 2026-09-15
 
+**Subsequent corrections and scope.** The author placed TypeInfo in System.Reflection,
+kept MemberInfo as the member hierarchy's base, and noted that TypeInfo can also be
+a member for nested types. Closed hierarchies remain a desired direction, not an
+implemented property of this port. The author then explicitly prioritized porting
+Type alone while retaining reflection implementations in NeoIL. Type must retain
+only basic identity/shape information. The author clarified that TypeInfo can use
+the same descriptor while exposing the full metadata model. Finally, descriptive
+parameter names across the Raven-authored APIs were requested as the next slice.
+
+**Current action.** Implemented the Raven Type source and checked import path,
+with TypeInfo retaining an opaque handle and performing queries on demand. Migrated
+Raven reference metadata and examples to `.Info`. Earlier statements that a failed
+export check prevented the port were premature: the causes included parameter names,
+private constructor/static factory admission and self types inside arrays. Earlier
+documentation conflating member descriptors with TypeInfo subclasses is superseded
+by these corrections. See [the migration](raven-reflection-api.md).
+
 **Author's direction:** Keep `Type` focused on the necessary identity and shape
 information. Reflection and runtime member lookup should be separate; a future
 `Type.Info` may expose that lookup explicitly, acknowledging that it can be costly.

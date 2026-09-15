@@ -8,6 +8,11 @@ See [descriptor hierarchy](reflection-hierarchy.md) for readonly receiver contra
 base views and migration. Queries inspect declarations without executing methods
 or reading an object's field values.
 
+The Raven profile uses the Raven-authored Type with only identity/shape APIs and
+`Info`. BaseType, interface discovery and enum metadata also live on TypeInfo.
+The original Neo profile retains its Type query forwarders for the migration.
+See [Raven reflection](raven-reflection-api.md) for the current boundary and limits.
+
 ## Run the examples
 
 From the repository root:

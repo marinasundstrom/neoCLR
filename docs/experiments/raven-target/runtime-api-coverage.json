@@ -1,6 +1,6 @@
 {
   "purpose": "Explicit source-by-source API audit. Samples and signature checks are evidence, not a claim of arbitrary generic/compiler support.",
-  "declarationCount": 668,
+  "declarationCount": 683,
   "sources": [
     {
       "file": "runtime/System/Equatable.neoil",
@@ -961,7 +961,7 @@
     },
     {
       "file": "runtime/System/Type.neoil",
-      "declarations": 43,
+      "declarations": 45,
       "disposition": "reflection",
       "samples": [
         "library-reflection.rvn",
@@ -995,98 +995,133 @@
         },
         {
           "service": "neoCLR.Runtime.TypeFields",
-          "file": "runtime/System/Type.neoil",
-          "line": 55
+          "file": "runtime/System/TypeInfo.neoil",
+          "line": 54
+        },
+        {
+          "service": "neoCLR.Runtime.TypeFields",
+          "file": "runtime/System/TypeInfo.neoil",
+          "line": 62
         },
         {
           "service": "neoCLR.Runtime.TypeMethods",
-          "file": "runtime/System/Type.neoil",
-          "line": 70
+          "file": "runtime/System/TypeInfo.neoil",
+          "line": 69
+        },
+        {
+          "service": "neoCLR.Runtime.TypeMethods",
+          "file": "runtime/System/TypeInfo.neoil",
+          "line": 77
         },
         {
           "service": "neoCLR.Runtime.TypeProperties",
-          "file": "runtime/System/Type.neoil",
-          "line": 85
+          "file": "runtime/System/TypeInfo.neoil",
+          "line": 84
+        },
+        {
+          "service": "neoCLR.Runtime.TypeProperties",
+          "file": "runtime/System/TypeInfo.neoil",
+          "line": 92
         },
         {
           "service": "neoCLR.Runtime.TypeInterfaces",
           "file": "runtime/System/Type.neoil",
-          "line": 100
+          "line": 55
+        },
+        {
+          "service": "neoCLR.Runtime.TypeInterfaces",
+          "file": "runtime/System/TypeInfo.neoil",
+          "line": 35
         },
         {
           "service": "neoCLR.Runtime.TypeGenericArguments",
           "file": "runtime/System/Type.neoil",
-          "line": 106
+          "line": 61
         },
         {
           "service": "neoCLR.Runtime.TypeElementType",
           "file": "runtime/System/Type.neoil",
-          "line": 112
+          "line": 67
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/System/Type.neoil",
-          "line": 122
+          "line": 77
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/System/Type.neoil",
-          "line": 132
+          "line": 87
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/System/Type.neoil",
-          "line": 154
+          "line": 109
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/System/Type.neoil",
-          "line": 164
+          "line": 119
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/System/Type.neoil",
-          "line": 174
+          "line": 129
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/System/Type.neoil",
-          "line": 184
+          "line": 139
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/System/Type.neoil",
-          "line": 194
+          "line": 149
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/System/Type.neoil",
-          "line": 204
+          "line": 159
         },
         {
           "service": "neoCLR.Runtime.TypeDisplayName",
           "file": "runtime/System/Type.neoil",
-          "line": 214
+          "line": 222
         },
         {
           "service": "neoCLR.Runtime.TypeDisplayName",
           "file": "runtime/System/Type.neoil",
-          "line": 224
+          "line": 232
         },
         {
           "service": "neoCLR.Runtime.TypeBaseType",
           "file": "runtime/System/Type.neoil",
-          "line": 94
+          "line": 49
+        },
+        {
+          "service": "neoCLR.Runtime.TypeBaseType",
+          "file": "runtime/System/TypeInfo.neoil",
+          "line": 29
         },
         {
           "service": "neoCLR.Runtime.TypeEnumNames",
           "file": "runtime/System/Type.neoil",
-          "line": 138
+          "line": 93
+        },
+        {
+          "service": "neoCLR.Runtime.TypeEnumNames",
+          "file": "runtime/System/TypeInfo.neoil",
+          "line": 41
         },
         {
           "service": "neoCLR.Runtime.TypeEnumUnderlying",
           "file": "runtime/System/Type.neoil",
-          "line": 144
+          "line": 99
+        },
+        {
+          "service": "neoCLR.Runtime.TypeEnumUnderlying",
+          "file": "runtime/System/TypeInfo.neoil",
+          "line": 47
         }
       ]
     },
@@ -1158,6 +1193,15 @@
     {
       "file": "runtime/System/Reflection.neoil",
       "declarations": 93,
+      "disposition": "reflection",
+      "samples": [
+        "library-reflection.rvn",
+        "library-flags.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/TypeInfo.neoil",
+      "declarations": 13,
       "disposition": "reflection",
       "samples": [
         "library-reflection.rvn",
@@ -1370,6 +1414,19 @@
     }
   ],
   "targetProfileAdditions": [
+    {
+      "file": "runtime/raven/Type.neoil",
+      "disposition": "raven-authored-type",
+      "samples": [
+        "library-reflection.rvn",
+        "library-array-unified.rvn"
+      ],
+      "tests": [
+        "tests/raven_reflection.rs",
+        "docs/experiments/raven-target/verify_type_library.py"
+      ],
+      "note": "Raven Type owns identity and shape. Member, base/interface and enum metadata are queried through the NeoIL TypeInfo using the same handle. No public described-object construction API."
+    },
     {
       "file": "runtime/raven/Map.neoil",
       "disposition": "experimental-map-contracts-with-raven-implementation",

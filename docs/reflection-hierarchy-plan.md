@@ -14,11 +14,12 @@ direction is to keep Type as the inexpensive identity/shape descriptor and move
 member discovery behind a separate TypeInfo API. `Type.Info` now makes that
 potentially costly runtime lookup explicit.
 
-TypeInfo is a separate type-metadata hierarchy. MemberInfo remains the base of the
-member hierarchy, with FieldInfo, MethodInfo and PropertyInfo as its closed concrete
-descendants; they are not descendants of TypeInfo. Neither hierarchy requires every
-runtime type to derive from Object. Constructor and descriptor allocation contracts
-must be defined before porting the remaining descriptor implementations to Raven.
+System.Reflection.TypeInfo describes a type's metadata model. MemberInfo remains
+the base for FieldInfo, MethodInfo and PropertyInfo. The author subsequently noted
+that TypeInfo can also inherit MemberInfo to represent nested types. That requires
+deciding how DeclaringType represents absence for top-level types. Closed hierarchy
+enforcement and this additional base are still planned, not implemented. The current
+Type port leaves these descriptors in NeoIL and does not redesign their contracts.
 
 [Inherited class interface implementations](class-interface-dispatch.md) now bridge
 class bases and virtual overrides, preserving owner identity, readonly access and GC.

@@ -3,6 +3,37 @@
 The existing Type and Reflection APIs are being projected onto ordinary managed
 classes. This document tracks the implemented projection and its remaining boundaries.
 
+## Type source and metadata boundary (2026-09-15)
+
+`runtime/raven/src/System/Type.rvn` now owns the Raven target's Type implementation.
+Type exposes identity, names, category/shape flags, element type and closed generic
+arguments. `type.Info` returns `System.Reflection.TypeInfo`, which retains the same
+opaque RuntimeTypeHandle and exposes member enumeration, base/interface discovery
+and enum metadata. It does not eagerly build an entire member graph. Current
+queries can allocate snapshots; no allocation-free or cache guarantee is made.
+
+Use `typeof(int).Info.GetMethods()` instead of `typeof(int).GetMethods()`. The Raven
+reference surface no longer exposes these queries on Type. TypeInfo and all other
+reflection descriptors remain NeoIL-authored. The original Neo profile retains its
+Type forwarding methods only for the source migration process.
+
+Type's private constructor is emitted and checked like other class constructors.
+Its sole handle field is validated because native factories also construct Type
+snapshots. RuntimeTypeHandle has no valid default value: a constructor must assign
+it, and reading it before assignment or returning without assignment faults.
+GetTypeFromHandle remains the compiler's token-to-Type operation; Type has no public
+instance constructor or API for constructing instances of the described type.
+
+This differs from .NET's TypeInfo deriving from Type: neoCLR separates the identity
+view from metadata lookup without making them interchangeable. The broader closed
+hierarchy and TypeInfo's possible MemberInfo base remain later work; this port does
+not claim runtime enforcement of closed hierarchies. In particular, a top-level
+type's absent DeclaringType needs a defined contract before adding that base.
+
+Validation: `verify_type_library.py`, `tests/raven_reflection.rs`, and the saved
+project suite cover authoring admission, constructor initialization, base views,
+metadata queries and the migrated consumer syntax. Raven's compiler is unchanged.
+
 ## Snapshot storage
 
 The adapted library declares Type, MemberInfo, FieldInfo, MethodInfo, PropertyInfo

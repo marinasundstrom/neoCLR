@@ -164,7 +164,8 @@
     .end
     .method instance get_Info() -> System.Reflection.TypeInfo
         ldarg this
-        newobj System.Reflection.TypeInfo
+        ldfld 0
+        call System.Reflection.TypeInfo::FromHandle(System.RuntimeTypeHandle)
         ret
     .end
     .method internal instance get_Handle() -> System.RuntimeTypeHandle

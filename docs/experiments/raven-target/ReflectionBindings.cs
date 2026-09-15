@@ -4,27 +4,24 @@ using System.Text;
 // Current reflection API catalog. Placeholder metadata bodies never execute.
 static class ReflectionBindings
 {
-    public static readonly string[] Classes = ["System.Type", "System.Reflection.ParameterInfo", "System.Reflection.MemberInfo", "System.Reflection.FieldInfo", "System.Reflection.MethodInfo", "System.Reflection.PropertyInfo"];
+    public static readonly string[] Classes = ["System.Type", "System.Reflection.TypeInfo", "System.Reflection.ParameterInfo", "System.Reflection.MemberInfo", "System.Reflection.FieldInfo", "System.Reflection.MethodInfo", "System.Reflection.PropertyInfo"];
     static readonly (string Owner, string Name, string[] Args, string Result, bool Static)[] Members = [
         ("System.Type", "GetTypeFromHandle", ["System.RuntimeTypeHandle"], "System.Type", true),
+        ("System.Type", "get_Info", [], "System.Reflection.TypeInfo", false),
         ("System.Type", "get_Name", [], "String", false),
         ("System.Type", "get_GenericArgumentCount", [], "Int32", false),
         ("System.Type", "GetGenericArgument", ["Int32"], "System.Type", false),
         ("System.Type", "Equals", ["System.Type"], "Boolean", false),
-        ("System.Type", "GetFields", [], "System.Reflection.FieldInfo[]", false),
-        ("System.Type", "GetFields", ["System.Reflection.BindingFlags"], "System.Reflection.FieldInfo[]", false),
-        ("System.Type", "GetMethods", [], "System.Reflection.MethodInfo[]", false),
-        ("System.Type", "GetMethods", ["System.Reflection.BindingFlags"], "System.Reflection.MethodInfo[]", false),
-        ("System.Type", "GetProperties", [], "System.Reflection.PropertyInfo[]", false),
-        ("System.Type", "GetProperties", ["System.Reflection.BindingFlags"], "System.Reflection.PropertyInfo[]", false),
-        ("System.Type", "get_BaseType", [], "System.Option<System.Type>", false),
-        ("System.Type", "GetInterfaces", [], "System.Type[]", false),
+        ("System.Reflection.TypeInfo", "GetFields", [], "System.Reflection.FieldInfo[]", false),
+        ("System.Reflection.TypeInfo", "GetFields", ["System.Reflection.BindingFlags"], "System.Reflection.FieldInfo[]", false),
+        ("System.Reflection.TypeInfo", "GetMethods", [], "System.Reflection.MethodInfo[]", false),
+        ("System.Reflection.TypeInfo", "GetMethods", ["System.Reflection.BindingFlags"], "System.Reflection.MethodInfo[]", false),
+        ("System.Reflection.TypeInfo", "GetProperties", [], "System.Reflection.PropertyInfo[]", false),
+        ("System.Reflection.TypeInfo", "GetProperties", ["System.Reflection.BindingFlags"], "System.Reflection.PropertyInfo[]", false),
         ("System.Type", "GetGenericArguments", [], "System.Type[]", false),
         ("System.Type", "GetElementType", [], "System.Option<System.Type>", false),
         ("System.Type", "get_IsValueType", [], "Boolean", false),
         ("System.Type", "get_IsEnum", [], "Boolean", false),
-        ("System.Type", "GetEnumNames", [], "String[]", false),
-        ("System.Type", "GetEnumUnderlyingType", [], "System.Type", false),
         ("System.Type", "get_IsArray", [], "Boolean", false),
         ("System.Type", "get_IsAbstract", [], "Boolean", false),
         ("System.Type", "get_IsReadOnly", [], "Boolean", false),
@@ -70,11 +67,16 @@ static class ReflectionBindings
         ("System.Reflection.PropertyInfo", "GetGetMethod", ["Boolean"], "System.Option<System.Reflection.MethodInfo>", false),
         ("System.Reflection.PropertyInfo", "GetSetMethod", [], "System.Option<System.Reflection.MethodInfo>", false),
         ("System.Reflection.PropertyInfo", "GetSetMethod", ["Boolean"], "System.Option<System.Reflection.MethodInfo>", false),
+        ("System.Reflection.TypeInfo", "GetInterfaces", [], "System.Type[]", false),
+        ("System.Reflection.TypeInfo", "GetEnumNames", [], "String[]", false),
+        ("System.Reflection.TypeInfo", "GetEnumUnderlyingType", [], "System.Type", false),
+        ("System.Reflection.TypeInfo", "get_BaseType", [], "System.Option<System.Type>", false),
     ];
     public const string Declarations = """
         public struct RuntimeTypeHandle { }
-        public class Type { internal Type() { } public string Name => default; public int GenericArgumentCount => default; public System.Option<System.Type> BaseType => default; public bool IsEnum => default; public bool IsArray => default; public bool IsAbstract => default; public bool IsReadOnly => default; public bool IsByRef => default; public bool IsPointer => default; public bool IsValueType => default; public bool IsInterface => default; public string FullName => default; public string Namespace => default; public static System.Type GetTypeFromHandle(System.RuntimeTypeHandle arg0) => default; public System.Type GetGenericArgument(int arg0) => default; public bool Equals(System.Type arg0) => default; public System.Reflection.FieldInfo[] GetFields() => default; public System.Reflection.FieldInfo[] GetFields(System.Reflection.BindingFlags arg0) => default; public System.Reflection.MethodInfo[] GetMethods() => default; public System.Reflection.MethodInfo[] GetMethods(System.Reflection.BindingFlags arg0) => default; public System.Reflection.PropertyInfo[] GetProperties() => default; public System.Reflection.PropertyInfo[] GetProperties(System.Reflection.BindingFlags arg0) => default; public System.Type[] GetInterfaces() => default; public System.Type[] GetGenericArguments() => default; public System.Option<System.Type> GetElementType() => default; public String[] GetEnumNames() => default; public System.Type GetEnumUnderlyingType() => default; }
+        public class Type { internal Type() { } public System.Reflection.TypeInfo Info => default; public string Name => default; public int GenericArgumentCount => default; public bool IsEnum => default; public bool IsArray => default; public bool IsAbstract => default; public bool IsReadOnly => default; public bool IsByRef => default; public bool IsPointer => default; public bool IsValueType => default; public bool IsInterface => default; public string FullName => default; public string Namespace => default; public static System.Type GetTypeFromHandle(System.RuntimeTypeHandle arg0) => default; public System.Type GetGenericArgument(int arg0) => default; public bool Equals(System.Type arg0) => default; public System.Type[] GetGenericArguments() => default; public System.Option<System.Type> GetElementType() => default; }
         public static class TypeOf<T> { public static System.Type Of(T arg0) => default; }
+        namespace Reflection { public class TypeInfo { internal TypeInfo() { } public System.Option<System.Type> BaseType => default; public System.Type[] GetInterfaces() => default; public string[] GetEnumNames() => default; public System.Type GetEnumUnderlyingType() => default; public FieldInfo[] GetFields() => default; public FieldInfo[] GetFields(BindingFlags arg0) => default; public MethodInfo[] GetMethods() => default; public MethodInfo[] GetMethods(BindingFlags arg0) => default; public PropertyInfo[] GetProperties() => default; public PropertyInfo[] GetProperties(BindingFlags arg0) => default; } }
         namespace Reflection { public class ParameterInfo { internal ParameterInfo() { } public string Name => default; public int Position => default; public System.Type ParameterType => default; public bool IsOut => default; public bool IsOutWhenTrue => default; public bool IsReadOnly => default; } }
         namespace Reflection { public abstract class MemberInfo { internal MemberInfo() { } public string Name => default; public System.Type DeclaringType => default; } }
         namespace Reflection { public class FieldInfo : System.Reflection.MemberInfo { internal FieldInfo() { } public System.Type FieldType => default; public bool IsPublic => default; public bool IsPrivate => default; public bool IsAssembly => default; public bool IsStatic => default; public int DefinitionIndex => default; } }
@@ -135,7 +137,9 @@ static class ReflectionBindings
         if (!Helpers.ContainsKey(key))
         {
             var body = new StringBuilder($".function {name}({string.Join(',', inputs.Select((t,i) => t + " arg" + i))}) -> {result}\n");
-            var vector = result.StartsWith("arrayref<", StringComparison.Ordinal);
+            // Raven-authored Type already returns managed arrays. The remaining
+            // NeoIL descriptors still return snapshot arrays which need copying.
+            var vector = owner != "System.Type" && result.StartsWith("arrayref<", StringComparison.Ordinal);
             var element = vector ? result[9..^1] : "";
             if (vector) body.AppendLine($".local {element}[] source\n.local {result} destination\n.local Int32 index");
             for (var i = 0; i < inputs.Length; i++)

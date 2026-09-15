@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-15
 
+- Port System.Type to Raven for the Raven runtime profile. Type keeps identity and
+  basic shape; metadata enumeration, base/interface lookup and enum metadata are
+  exposed through System.Reflection.TypeInfo using the same opaque handle. Migrate
+  Raven consumers to `.Info`; reflection descriptors remain in NeoIL. Validate Type
+  layout and private construction, support matched class factories and self-array
+  signatures, and require handle fields to be assigned before constructor return.
+  The archived Neo profile retains forwarding APIs during migration. Descriptive
+  parameter names are planned as the next slice.
+
 - Clarify the closed reflection model: TypeInfo is a separate type-metadata view;
   MemberInfo remains the base for FieldInfo, MethodInfo and PropertyInfo.
 

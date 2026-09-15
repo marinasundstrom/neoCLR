@@ -8,6 +8,18 @@ Each declared namespace has its own folder below `src`: for example, `System/Dat
 use `Functions.rvn`; types use their type names. Do not create an assembly per utility namespace. This is an incremental source
 migration, not yet a self-hosting build of the complete core reference assembly.
 
+`src/System/Type.rvn` is also built as a selected class slice. See the
+[Type/reflection boundary](raven-reflection-api.md#type-source-and-metadata-boundary-2026-09-15).
+The importer accepts checked static factories and private constructors on matched
+classes, and matches self types inside array signatures. Reference signatures,
+visibility and the runtime-created Type layout remain validated. Reflection native
+services are available only while importing a library implementation; reference
+stub bodies are never executed. TypeInfo and member descriptors remain in NeoIL.
+
+Next slice: replace placeholder parameter names (`arg0`, `arg1`, and similar) with
+descriptive names across Raven-authored APIs and their reference metadata together.
+Parameter names are part of the checked authoring contract and named-call experience.
+
 The bootstrap currently has three distinct artifacts:
 
 - `NeoCLR.CoreProbe.dll`: compiler-facing reference metadata for the supported System

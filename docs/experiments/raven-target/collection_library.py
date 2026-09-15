@@ -30,6 +30,8 @@ def adapt(text: str, name: str) -> str:
 
 
 def build(path: Path) -> str:
+    if path == ROOT / 'runtime/System/Type.neoil':
+        return build(ROOT / 'runtime/raven/Type.neoil')
     if path == ROOT / 'runtime/System/Date.neoil':
         return build(ROOT / 'runtime/raven/Date.neoil')
     if path == ROOT / 'runtime/System/Time.neoil':
@@ -41,9 +43,9 @@ def build(path: Path) -> str:
         text = adapt(text, path.stem)
     if path.stem in {'Equatable', 'Comparable', 'Clonable', 'Closable'}:
         text = text.replace('instance readonly byref ', 'instance ').replace('instance byref ', 'instance ')
-    if path.stem in {'Type', 'Reflection'}:
+    if path.stem in {'TypeInfo', 'Reflection'}:
         # Immutable reflection snapshots use ordinary class identity in the target.
-        text = re.sub(r'^\.type (abstract )?(System\.(?:Type|Reflection\.(?:MemberInfo|FieldInfo|MethodInfo|PropertyInfo|ParameterInfo)))$',
+        text = re.sub(r'^\.type (abstract )?(System\.(?:Type|Reflection\.(?:TypeInfo|MemberInfo|FieldInfo|MethodInfo|PropertyInfo|ParameterInfo)))$',
                       lambda m: '.type class ' + (m[1] or '') + m[2], text, flags=re.M)
         # These private construction helpers are replaced by trusted snapshot factories.
         text = re.sub(r'    \.method internal instance byref \.ctor[^\n]*\n.*?    \.end\n', '', text, flags=re.S)

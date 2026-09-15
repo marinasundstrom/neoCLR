@@ -95,8 +95,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
         ('PathUnsupportedApi', 'func Main() { System.IO.Path.GetFullPath(".") }', 'RAV'),
         ('StringArgumentMismatch', 'func Main() { System.String.Concat(42, 7) }', 'RAV'),
         ('StringUnsupportedApi', 'func Main() { System.String.IsNullOrEmpty(\"\") }', 'RAV'),
-        ('ArrayImplicitCovariance', 'import System.*\nimport System.Reflection.*\nfunc Main() { let members: MemberInfo[] = typeof(int).GetMethods() }', ('RAV1504', 'identical element types')),
-        ('ArrayExplicitCovariance', 'import System.*\nimport System.Reflection.*\nfunc Main() { let members = (MemberInfo[])typeof(int).GetMethods() }', ('RAV1503', 'identical element types')),
+        ('ArrayImplicitCovariance', 'import System.*\nimport System.Reflection.*\nfunc Main() { let members: MemberInfo[] = typeof(int).Info.GetMethods() }', ('RAV1504', 'identical element types')),
+        ('ArrayExplicitCovariance', 'import System.*\nimport System.Reflection.*\nfunc Main() { let members = (MemberInfo[])typeof(int).Info.GetMethods() }', ('RAV1503', 'identical element types')),
         ('ImportFailure', 'func Negate(value: int) -> int { return -value }\nfunc Main() { Negate(2) }', 'Unsupported')]:
         before = set(root.rglob('App.neoil'))
         (root / 'Main.rvn').write_text(source)

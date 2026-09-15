@@ -1,0 +1,11 @@
+; Raven-authored Type; reflection descriptors remain authored in NeoIL.
+.include "generated/Type.methods.neoil"
+.include "generated/Type.helpers.neoil"
+
+.type System.TypeOf<T>
+    .method static Of(T value) -> System.Type
+        ldtoken T
+        call System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)
+        ret
+    .end
+.end

@@ -58,7 +58,8 @@ methods, construct inaccessible types or mutate fields.
 
 System.Type uses narrow InternalCall helpers for name, identity comparison and
 generic argument inspection. Member queries remain available for compatibility in
-this preview, but are being separated conceptually into TypeInfo. The existing
+the archived Neo profile. In the Raven profile they have moved to TypeInfo, reached
+through Type.Info. The existing
 binding registry validates their signatures. Reachability reports the TypeInspection
 runtime service for ldtoken and those imports. The original token/name/identity
 queries need no ValueStorage service; the newer Option-returning reflection queries
@@ -84,9 +85,9 @@ The sample creates a Box<Int32> value, gets its declared type and compares it wi
 statically named Box<int> token. The walkthrough acceptance test also runs its source
 and assembled artifact through the CLI.
 
-[Member enumeration](reflection.md) is implemented. The next API shape will expose
-member enumeration through an explicit TypeInfo lookup (potentially `type.Info`) and
-will model TypeInfo and its member descriptors as a closed hierarchy. Construction/invocation by
+[Member enumeration](reflection.md) is implemented. The Raven profile exposes it
+through `type.Info`; Type and TypeInfo retain the same opaque type descriptor.
+Closed reflection hierarchies remain planned. Construction/invocation by
 descriptor, custom-attribute reflection, mutable metadata
 and a comprehensive Type API remain
 outside this slice. The prototype names and API may evolve independently of .NET's

@@ -52,6 +52,11 @@ static class LibraryImplementation
                 throw new InvalidDataException("Unsupported instance library owner.");
         if (type.IsValueType != contract.IsValueType)
             throw new InvalidDataException("Library value/reference representation does not match reference contract.");
+        // Native snapshot factories construct Type from precisely one opaque handle.
+        if (owner == "System.Type" && (type.Fields.Count != 1 || type.Fields[0].Name != "Handle"
+            || type.Fields[0].FieldType.FullName != "System.RuntimeTypeHandle"
+            || !RuntimeSignatures.IsCore(type.Fields[0].FieldType.Scope)))
+            throw new InvalidDataException("Type library layout must contain exactly one core RuntimeTypeHandle.");
         if (PrimitiveLibrary.IsPrimitive(type)) PrimitiveLibrary.Validate(type, contract);
         else if (type.IsValueType)
         {
@@ -71,6 +76,9 @@ static class LibraryImplementation
         if (type.IsSealed != contract.IsSealed) throw new InvalidDataException("Instance library sealing does not match reference contract.");
         bool MatchType(TypeReference left, TypeReference right)
         {
+            if (left is ArrayType a)
+                return right is ArrayType b && a.IsVector == b.IsVector && a.Rank == b.Rank
+                    && MatchType(a.ElementType, b.ElementType);
             if (left is GenericInstanceType l)
                 return right is GenericInstanceType r && MatchType(l.ElementType, r.ElementType)
                     && l.GenericArguments.Count == r.GenericArguments.Count
@@ -95,7 +103,7 @@ static class LibraryImplementation
             && !contract.HasMethods && !type.HasProperties && !type.HasInterfaces
             && type.Methods.All(PrimitiveLibrary.IsDefaultConstructor);
         var methods = type.Methods.Where(m => !(PrimitiveLibrary.IsPrimitive(type) || declarationOnly) || !PrimitiveLibrary.IsDefaultConstructor(m)).ToArray();
-        if (methods.Length == 0 && !declarationOnly || methods.Any(m => !(m.IsPublic || m.IsPrivate && (!m.IsConstructor || type.IsValueType) && !m.IsVirtual) || (!m.HasThis && !type.IsValueType) || !m.HasBody || m.HasGenericParameters
+        if (methods.Length == 0 && !declarationOnly || methods.Any(m => !(m.IsPublic || m.IsPrivate && !m.IsVirtual) || !m.HasBody || m.HasGenericParameters
             || m.ExplicitThis || m.IsConstructor && m.IsStatic || m.CallingConvention != MethodCallingConvention.Default
             || m.Parameters.Any(p => p.IsOut || p.ParameterType.IsByReference)))
             throw new InvalidDataException("Unsupported instance library export.");
@@ -104,7 +112,7 @@ static class LibraryImplementation
         var expected = contract.Methods.Where(m => m.IsPublic).ToArray();
         var exports = methods.Where(m => m.IsPublic).ToArray();
         if (expected.Length != exports.Length || exports.Any(m => expected.Count(e => MatchMethod(e, m)) != 1))
-            throw new InvalidDataException("Instance library export does not match reference contract.");
+            throw new InvalidDataException("Instance library export does not match reference contract: missing=[" + string.Join(";", expected.Where(e => !exports.Any(m => MatchMethod(e, m))).Select(m => m.FullName)) + "]; unmatched=[" + string.Join(";", exports.Where(m => !expected.Any(e => MatchMethod(e, m))).Select(m => m.FullName)) + "]");
         if (type.Properties.Count != contract.Properties.Count || type.Properties.Any(p =>
             contract.Properties.Count(c => c.Name == p.Name && MatchType(c.PropertyType, p.PropertyType)
                 && c.Parameters.Count == p.Parameters.Count

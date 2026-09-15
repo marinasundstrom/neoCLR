@@ -13,10 +13,26 @@ static class RuntimeServiceBindings
             ("PathCombine", ["String", "String"], "String"),
             ("PathGetFileName", ["String"], "String"),
             ("WriteAllText", ["String", "String", "Int32"], "Int32"),
-            ("CharCategory", ["Char"], "Int32")
+            ("CharCategory", ["Char"], "Int32"),
+            ("TypeName", ["System.RuntimeTypeHandle"], "String"),
+            ("TypeEquals", ["System.RuntimeTypeHandle", "System.RuntimeTypeHandle"], "Boolean"),
+            ("TypeArgumentCount", ["System.RuntimeTypeHandle"], "Int32"),
+            ("TypeArgument", ["System.RuntimeTypeHandle", "Int32"], "System.RuntimeTypeHandle"),
+            ("TypeShape", ["System.RuntimeTypeHandle", "Int32"], "Boolean"),
+            ("TypeDisplayName", ["System.RuntimeTypeHandle", "Int32"], "String"),
+            ("TypeInfo", ["System.RuntimeTypeHandle"], "System.Reflection.TypeInfo"),
+            ("TypeBaseType", ["System.RuntimeTypeHandle"], "System.Option<System.Type>"),
+            ("TypeElementType", ["System.RuntimeTypeHandle"], "System.Option<System.Type>"),
+            ("TypeInterfaces", ["System.RuntimeTypeHandle"], "arrayref<System.Type>"),
+            ("TypeGenericArguments", ["System.RuntimeTypeHandle"], "arrayref<System.Type>"),
+            ("TypeEnumNames", ["System.RuntimeTypeHandle"], "arrayref<String>"),
+            ("TypeEnumUnderlying", ["System.RuntimeTypeHandle"], "System.Type")
         }).ToArray();
     static string CSharp(string type) => type switch {
         "Double" => "double", "String" => "string", "Int32" => "int", "Char" => "char",
+        "Boolean" => "bool",
+        _ when type.StartsWith("System.") => type,
+        _ when type.StartsWith("arrayref<") => CSharp(type[9..^1]) + "[]",
         _ => throw new InvalidDataException("Unsupported runtime service declaration.")
     };
     public static string Declarations => "namespace Runtime.CompilerServices { public static class RuntimeServices { "
@@ -29,9 +45,22 @@ static class RuntimeServiceBindings
             || !definition.IsPublic || !definition.IsStatic || definition.IsVirtual
             || definition.HasGenericParameters || reference is GenericInstanceMethod)
             throw new InvalidDataException("Unsupported runtime service call.");
-        var (args, result) = RuntimeSignatures.Match(reference, definition, _ => null);
+        var (args, result) = RuntimeSignatures.Match(reference, definition,
+            t => ReflectionBindings.Type(t) ?? ProcessBindings.ArrayType(t) ?? GenericUnionBindings.Type(t));
         if (!Members.Any(m => m.Name == reference.Name && m.Args.SequenceEqual(args) && m.Result == result))
             throw new InvalidDataException("Unsupported runtime service signature: " + reference.FullName);
+        if (reference.Name == "TypeInfo")
+            return new("System.Reflection.TypeInfo::FromHandle", args, result);
+        if (result.StartsWith("arrayref<"))
+        {
+            var element = result[9..^1];
+            var name = "RuntimeService" + reference.Name;
+            Helpers[name] = $".function {name}(System.RuntimeTypeHandle handle) -> {result}\n.local {element}[] source\n.local {result} destination\n.local Int32 index\nldarg handle\ncall neoCLR.Runtime.{reference.Name}(System.RuntimeTypeHandle)\nstloc source\nldloc source\nldlen\nconv.i4\nnewarr {element}\nstloc destination\nldc.i4 0\nstloc index\nbr Test\nCopy:\nldloc destination\nldloc index\nldloc source\nldloc index\nldelem {element}\nstelem {element}\nldloc index\nldc.i4 1\nadd\nstloc index\nTest:\nldloc index\nldloc source\nldlen\nconv.i4\nblt Copy\nldloc destination\nret\n.end\n";
+            return new(name, args, result);
+        }
         return new("neoCLR.Runtime." + reference.Name, args, result);
     }
+    static readonly Dictionary<string, string> Helpers = new();
+    public static void Reset() => Helpers.Clear();
+    public static string Adapters => string.Join("\n", Helpers.Values);
 }

@@ -25,7 +25,7 @@ groups = {
     'process': ('Environment Console', ['library-environment.rvn', 'library-console.rvn']),
     'files': ('File Path', ['library-files.rvn', 'library-paths.rvn']),
     'math': ('Math', ['library-floating-math.rvn', 'library-math.rvn', 'library-clamp.rvn']),
-    'reflection': ('Type Reflection RuntimeTypeHandle', ['library-reflection.rvn', 'library-flags.rvn']),
+    'reflection': ('Type TypeInfo Reflection RuntimeTypeHandle', ['library-reflection.rvn', 'library-flags.rvn']),
     'signature-markers': ('Value Void UnionAttribute', ['library-void.rvn']),
 }
 lookup = {name: (group, samples) for group, (names, samples) in groups.items() for name in names.split()}
@@ -126,6 +126,12 @@ for file in source['sourceFiles']:
 result = {'purpose': 'Explicit source-by-source API audit. Samples and signature checks are evidence, not a claim of arbitrary generic/compiler support.',
           'declarationCount': sum(r['declarations'] for r in rows), 'sources': rows}
 result['targetProfileAdditions'] = [{
+    'file': 'runtime/raven/Type.neoil',
+    'disposition': 'raven-authored-type',
+    'samples': ['library-reflection.rvn', 'library-array-unified.rvn'],
+    'tests': ['tests/raven_reflection.rs', 'docs/experiments/raven-target/verify_type_library.py'],
+    'note': 'Raven Type owns identity and shape. Member, base/interface and enum metadata are queried through the NeoIL TypeInfo using the same handle. No public described-object construction API.'
+}, {
     'file': 'runtime/raven/Map.neoil',
     'disposition': 'experimental-map-contracts-with-raven-implementation',
     'samples': ['library-maps.rvn'],

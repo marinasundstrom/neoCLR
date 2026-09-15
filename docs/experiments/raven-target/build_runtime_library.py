@@ -10,6 +10,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    'Type': 'System.Type',
     'RuntimeTypeHandle': "System.RuntimeTypeHandle",
     'Value': "System.Value",
     'Math': 'System.Math',
@@ -34,6 +35,7 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    'Type': 'runtime/raven/src/System/Type.rvn',
     'RuntimeTypeHandle': "runtime/raven/src/System/RuntimeTypeHandle.rvn",
     'Value': "runtime/raven/src/System/Value.rvn",
     'Math': 'runtime/raven/src/System/Math/Functions.rvn',
@@ -101,6 +103,12 @@ def fragments(text, name="Math", owner="System.Math"):
             assert match[1] not in helpers
             helpers[match[1]] = body
         lines = lines[end + 1:]
+    # Nongeneric classes can also own static factories. Merge their function roots
+    # into the emitted class rather than leaving top-level method fragments.
+    for body in types[:]:
+        if body.startswith('.type class ' + owner + '\n'):
+            types.remove(body)
+            methods = [body[:-len('.end\n')] + ''.join(methods) + '.end\n']
     # Retain only transitively called adapters; no application entry-point shim.
     used = set()
     pending = re.findall(r'(?m)^(?:call|ldftn) ([^(]+)\(', ''.join(methods + types))

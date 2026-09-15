@@ -10,6 +10,25 @@ fn library() -> &'static Module {
         assemble(std::str::from_utf8(&output.stdout).unwrap()).unwrap()
     })
 }
+
+#[test]
+fn handle_fields_must_be_assigned_by_class_constructors() {
+    for body in ["", "ldarg this\nldfld Holder::Handle\npop\n"] {
+        let text = format!(".module Probe\n.entry Main\n.type class Holder\n.field private Handle System.RuntimeTypeHandle\n.method instance .ctor() -> noresult\n{body}ret\n.end\n.end\n.function Main() -> Holder\nnewobj instance Holder::.ctor()\nret\n.end");
+        let app = assemble(&text).unwrap();
+        let program = LoadedProgram::with_library(&app, library()).unwrap();
+        let error = program.run(Limits::default()).err().expect("uninitialized handle must fault");
+        assert!(error.to_string().contains("uninitialized"), "{error}");
+    }
+}
+
+#[test]
+fn type_has_no_metadata_query_exports() {
+    let text = ".module Probe\n.function Query(System.Type value) -> System.Reflection.FieldInfo[]\nldarg value\ncall instance System.Type::GetFields()\nret\n.end";
+    let app = assemble(text).unwrap();
+    let result = LoadedProgram::with_library(&app, library()).and_then(|p| p.verify());
+    assert!(result.is_err());
+}
 #[test]
 fn reflection_snapshots_are_managed_classes_with_base_views() {
     let app = assemble(
@@ -23,7 +42,8 @@ fn reflection_snapshots_are_managed_classes_with_base_views() {
 .local System.Reflection.FieldInfo field
 ldtoken Item
 call System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)
-call instance System.Type::GetFields()
+call instance System.Type::get_Info()
+call instance System.Reflection.TypeInfo::GetFields()
 ldc.i4 0
 ldelem System.Reflection.FieldInfo
 stloc field
@@ -55,7 +75,8 @@ fn returned_descriptor_keeps_nested_type_snapshot_alive_and_obeys_heap_limit() {
 .function Main() -> System.Reflection.MemberInfo
 ldtoken Item
 call System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)
-call instance System.Type::GetFields()
+call instance System.Type::get_Info()
+call instance System.Reflection.TypeInfo::GetFields()
 ldc.i4 0
 ldelem System.Reflection.FieldInfo
 castclass System.Reflection.MemberInfo

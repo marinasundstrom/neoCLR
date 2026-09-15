@@ -1,6 +1,6 @@
 {
   "format": "raven-library-bootstrap-v1",
-  "owner": "System.UInt64",
+  "owner": "System.Type",
   "inputs": {
     "runtime/raven/src/System/Type.rvn": "138930a4caf9baf750f2afcddafe8fea02d737d988f05829510594c15062351d",
     "runtime/raven/src/System/RuntimeTypeHandle.rvn": "6e00ed2472076a61b7a7e670c048f6197166d8fc1e4bad7a44593eeffb4ad85b",
@@ -29,12 +29,29 @@
     "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
   },
   "outputs": {
-    "UInt64.methods.neoil": "81d6669772644a599cc2a9ed03cf7818c2ec868cabb64f97513fe196f37b11ee",
-    "UInt64.helpers.neoil": "03cf3da89c796db61fe3ee16bc05525d5a6cce317f7dd2efdcb423076901caa8"
+    "Type.methods.neoil": "852c755bb4fa197f380bba4fb9748d80f5828f9d6965e54684338bd6ea85ebf6",
+    "Type.helpers.neoil": "79884dc66b6cdbab256e690c9ea7b147e49ad3dba93aebf9404b48de9a24733d"
   },
   "compilerSha256": "744ad87d9a6ec3d8b5691e72d0cd077b154af51615387b5f6bb171daa89fb370",
   "coreSha256": "7e8c64600a6b5cd388ebd3d38238cc561d3ce26455e9582224339afef54865cd",
   "exports": [
-    "readonly byref CompareTo(UInt64) -> Int32"
+    "get_Name() -> String",
+    "get_FullName() -> String",
+    "get_Namespace() -> String",
+    "get_GenericArgumentCount() -> Int32",
+    "GetGenericArgument(Int32) -> System.Type",
+    "Equals(System.Type) -> Boolean",
+    "get_IsArray() -> Boolean",
+    "get_IsByRef() -> Boolean",
+    "get_IsPointer() -> Boolean",
+    "get_IsInterface() -> Boolean",
+    "get_IsReadOnly() -> Boolean",
+    "get_IsAbstract() -> Boolean",
+    "get_IsEnum() -> Boolean",
+    "get_IsValueType() -> Boolean",
+    "get_Info() -> System.Reflection.TypeInfo",
+    "GetGenericArguments() -> arrayref<System.Type>",
+    "GetElementType() -> System.Option<System.Type>",
+    "GetTypeFromHandle(System.RuntimeTypeHandle arg0) -> System.Type"
   ]
 }

@@ -33,7 +33,7 @@ static class UnionImport
     {
         if (dependencies.Length > 8) throw new InvalidDataException("Library input limit exceeded.");
         GenericUnionBindings.Reset();
-        CollectionBindings.Reset(); ReflectionBindings.Reset();
+        CollectionBindings.Reset(); ReflectionBindings.Reset(); RuntimeServiceBindings.Reset();
         DelegateBindings.Reset();
         var inputs = new[] { application, core }.Concat(dependencies).ToArray();
         foreach (var path in inputs)
@@ -720,6 +720,7 @@ static class UnionImport
         output.Append(ApplicationTypes.Declarations(ProfileType, instanceBodies));
         output.Append(Adapters()).Append(ResultBindings.Adapters()).Append(StringBindings.Adapters()).AppendLine(Int32Bindings.Adapters).AppendLine(DoubleBindings.Adapters).Append(PrimitiveBindings.Adapters).Append(CalendarBindings.Adapters).Append(ErrorBindings.Adapters()).Append(GenericUnionBindings.Adapters).AppendLine(ProcessBindings.Adapters).AppendLine(BooleanBindings.Adapters).AppendLine(ReflectionBindings.Adapters).AppendLine(EnumBindings.Adapters);
         foreach (var helper in coercions.Values) output.Append(helper.Body);
+        output.Append(RuntimeServiceBindings.Adapters);
         foreach (var body in delegateAdapters.Values) output.Append(body);
         var generated = libraryOwner is null ? output.ToString() : LibraryImplementation.QualifyHelpers(output.ToString(), libraryOwner);
         var labelLines = generated.Split('\n').Select((line, index) => (line, index))
