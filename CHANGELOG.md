@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-15
 
+- Record the Type/Reflection boundary for the next API iteration: Type remains a
+  cheap identity and shape descriptor, while TypeInfo will own potentially costly
+  member lookup through a closed descriptor hierarchy. Existing member queries stay
+  available during the transition.
+
 - Move the memberless Value and RuntimeTypeHandle declarations to Raven. Check
   declaration-only imports against reference shape and reject added members,
   storage or constructor behavior. Preserve runtime erasure and opaque handle

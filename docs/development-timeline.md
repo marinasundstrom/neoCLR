@@ -25,6 +25,20 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+### Ongoing Type/Reflection separation — 2026-09-15
+
+**Author's direction:** Keep `Type` focused on the necessary identity and shape
+information. Reflection and runtime member lookup should be separate; a future
+`Type.Info` may expose that lookup explicitly, acknowledging that it can be costly.
+TypeInfo and its member descriptors should form a closed algebraic hierarchy.
+
+**Assistant's response:** Accepted this as the next API boundary. Existing member
+queries remain available during the transition; the reflection hierarchy and native
+descriptor construction must be formalized before moving the implementation from
+NeoIL to Raven. The proposal and its compatibility status are recorded in
+[reflection-hierarchy-plan](reflection-hierarchy-plan.md) and
+[type inspection](type-inspection.md).
+
 ## Founding conversation — from the initial brief through Preview 1
 
 ### O1. The author sets the experiment's boundaries

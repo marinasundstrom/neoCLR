@@ -56,12 +56,13 @@ unknown, invalid-arity or unbound types are rejected. Normal module-reference an
 accessibility rules apply to the operand. A handle grants no ability to invoke private
 methods, construct inaccessible types or mutate fields.
 
-System.Type uses narrow InternalCall helpers for name, identity comparison,
-generic argument inspection and [member queries](reflection.md). The existing binding
-registry validates their signatures. Reachability reports the TypeInspection runtime
-service for ldtoken and those imports. The original token/name/identity queries need
-no ValueStorage service; the newer Option-returning reflection queries use the current
-System.Value carrier. A future JIT/AOT backend must
+System.Type uses narrow InternalCall helpers for name, identity comparison and
+generic argument inspection. Member queries remain available for compatibility in
+this preview, but are being separated conceptually into TypeInfo. The existing
+binding registry validates their signatures. Reachability reports the TypeInspection
+runtime service for ldtoken and those imports. The original token/name/identity
+queries need no ValueStorage service; the newer Option-returning reflection queries
+use the current System.Value carrier. A future JIT/AOT backend must
 retain the required metadata and supply this service. The interpreter's owned snapshots
 are not a prescribed native handle layout or an implemented AOT backend.
 
@@ -83,7 +84,9 @@ The sample creates a Box<Int32> value, gets its declared type and compares it wi
 statically named Box<int> token. The walkthrough acceptance test also runs its source
 and assembled artifact through the CLI.
 
-[Member enumeration](reflection.md) is implemented. Construction/invocation by
+[Member enumeration](reflection.md) is implemented. The next API shape will expose
+member enumeration through an explicit TypeInfo lookup (potentially `type.Info`) and
+will model TypeInfo and its member descriptors as a closed hierarchy. Construction/invocation by
 descriptor, custom-attribute reflection, mutable metadata
 and a comprehensive Type API remain
 outside this slice. The prototype names and API may evolve independently of .NET's
