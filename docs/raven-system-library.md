@@ -1,7 +1,7 @@
 # Authoring the foundational library in Raven
 
 `runtime/raven/System.rvnproj` is the shared authoring project for ordinary
-foundational runtime APIs. Its sources include `src/Math.rvn`, `src/Linq.rvn`, `src/Int32.rvn`, `src/Char.rvn`, `src/ArrayList.rvn` and `src/HashMap.rvn`; additional namespaces
+foundational runtime APIs. Its sources include `src/Math.rvn`, `src/Linq.rvn`, `src/Int32.rvn`, `src/Char.rvn`, `src/ArrayList.rvn`, `src/HashMap.rvn`, `src/Time.rvn` and `src/Date.rvn`; additional namespaces
 and types should join this project as their importing requirements are validated.
 Do not create an assembly per utility namespace. This is an incremental source
 migration, not yet a self-hosting build of the complete core reference assembly.
@@ -13,7 +13,7 @@ The bootstrap currently has three distinct artifacts:
   the normal reference surface. Placeholder bodies must never execute.
 - `NeoCLR.System.dll`: compiled Raven implementation input, currently five scalar
   Math functions, nine query overloads and their private deferred iterator classes,
-  Int32.Divide and seven character predicates, plus separately compiled ArrayList and HashMap slices.
+  Int32.Divide and seven character predicates, plus separately compiled ArrayList, HashMap, Time and Date slices.
   These implementation inputs are imported into neoIL, not loaded dynamically by the runtime.
 - `runtime/System.neoil` and its includes: the executable foundational library,
   combining generated Raven bodies with remaining handwritten bodies and intrinsics.
@@ -591,3 +591,19 @@ Validation for this slice: all 63 saved-project checks and all 10 calendar tests
 across the two profiles pass. Both scalar value-admission modes and the generic
 private-method probe pass. Clean snapshot regeneration, API inventory and coverage
 checks pass. No SDK installation or release packaging was performed.
+
+
+### Date value implementation — 2026-09-15
+
+The Raven profile now uses `src/Date.rvn` for Date, preserving the existing Gregorian
+algorithm, years 1–9999, day numbers 0–3652058, Result factories, properties and
+Equatable/Comparable contracts. Private static calendar helpers and the private
+constructor retain their ownership and visibility. Century-cycle clamps are ordinary
+conditionals in Raven; their behavior is unchanged. Existing matched value import
+support was sufficient: no importer or compiler changes were needed for this port.
+The historical Neo profile remains unchanged. Shared pinned .NET calendar cases cover
+month boundaries, leap/century cycles and maximum dates, alongside invalid inputs.
+API redesign remains deferred.
+
+Date validation: all 10 calendar tests and 63 saved-project checks pass, as do clean
+bootstrap regeneration and API inventory/coverage checks.

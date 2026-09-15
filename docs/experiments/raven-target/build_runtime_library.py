@@ -9,7 +9,7 @@ import subprocess
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
-SLICES = {"Math": "System.Math", "Linq": "System.Linq.Operators", "Int32": "System.Int32", "Char": "System.Char", "ArrayList": "System.Collections.ArrayList", "HashMap": "System.Collections.HashMap", "Time": "System.Time"}
+SLICES = {"Math": "System.Math", "Linq": "System.Linq.Operators", "Int32": "System.Int32", "Char": "System.Char", "ArrayList": "System.Collections.ArrayList", "HashMap": "System.Collections.HashMap", "Time": "System.Time", "Date": "System.Date"}
 PROJECT = ROOT / 'runtime/raven/System.rvnproj'
 GENERATED = ROOT / 'runtime/raven/generated'
 
@@ -103,7 +103,7 @@ def main():
         generated = {}
         for name, owner in SLICES.items():
             compiled = root / 'compiled'
-            if name in ('ArrayList', 'HashMap', 'Time'):
+            if name in ('ArrayList', 'HashMap', 'Time', 'Date'):
                 compiled = root / ('compiled-' + name)
                 subprocess.run(['dotnet', str(args.compiler.resolve()), str(PROJECT), '--no-project-restore',
                                 '-o', str(compiled)], env={**os.environ, 'NeoCLRBootstrapRoot': str(root),

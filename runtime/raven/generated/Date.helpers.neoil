@@ -1,0 +1,49 @@
+; Generated from runtime/raven/src/Date.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Date.RuntimeErrorSystemInvalidDateErrorNew() -> System.InvalidDateError
+newobj instance System.InvalidDateError::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Date.RuntimeUnion0(System.InvalidDateError arg0) -> System.Result.Error<System.InvalidDateError>
+ldarg arg0
+newobj instance System.Result.Error<System.InvalidDateError>::.ctor(System.InvalidDateError)
+ret
+.end
+.function neoCLR.Library.System.Date.RuntimeUnion1(System.Result.Error<System.InvalidDateError> arg0) -> System.Result<System.Date,System.InvalidDateError>
+ldarg arg0
+newobj instance System.Result<System.Date,System.InvalidDateError>::.ctor(System.Result.Error<System.InvalidDateError>)
+ret
+.end
+.function neoCLR.Library.System.Date.RuntimeUnion2(System.Date arg0) -> System.Result.Ok<System.Date>
+ldarg arg0
+newobj instance System.Result.Ok<System.Date>::.ctor(System.Date)
+ret
+.end
+.function neoCLR.Library.System.Date.RuntimeUnion3(System.Result.Ok<System.Date> arg0) -> System.Result<System.Date,System.InvalidDateError>
+ldarg arg0
+newobj instance System.Result<System.Date,System.InvalidDateError>::.ctor(System.Result.Ok<System.Date>)
+ret
+.end
+.function neoCLR.Library.System.Date.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
+.function neoCLR.Library.System.Date.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end

@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-15
 
+- Port Date to Raven, preserving Gregorian validation, day-number limits, component
+  properties, comparison and Result errors. Reuse the checked Time value-import
+  support without compiler/runtime changes. Keep API redesign separate from the port.
+
 - Port Time to Raven with its existing Result factories, tick boundaries, properties
   and comparison contracts preserved. Extend matched value-library imports with
   interfaces, owned static factories, private constructors and verified readonly

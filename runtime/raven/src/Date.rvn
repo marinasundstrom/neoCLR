@@ -1,0 +1,140 @@
+namespace System
+
+import System.Result.*
+
+public struct Date : Comparable<Date>, Equatable<Date> {
+    private field StoredDayNumber: int
+
+    private init(dayNumber: int) {
+        StoredDayNumber = dayNumber
+    }
+
+    static func Create(arg0: int, arg1: int, arg2: int) -> Result<Date, InvalidDateError> {
+        let year = arg0
+        let month = arg1
+        let day = arg2
+        if year < 1 {
+            return Error(InvalidDateError())
+        }
+        if year > 9999 {
+            return Error(InvalidDateError())
+        }
+        if month < 1 {
+            return Error(InvalidDateError())
+        }
+        if month > 12 {
+            return Error(InvalidDateError())
+        }
+        if day < 1 {
+            return Error(InvalidDateError())
+        }
+        if day > DaysInMonth(year, month) {
+            return Error(InvalidDateError())
+        }
+        return Ok(Date(DaysBeforeYear(year) + DaysBeforeMonth(year, month) + day - 1))
+    }
+
+    static func FromDayNumber(arg0: int) -> Result<Date, InvalidDateError> {
+        if arg0 < 0 {
+            return Error(InvalidDateError())
+        }
+        if arg0 > 3652058 {
+            return Error(InvalidDateError())
+        }
+        return Ok(Date(arg0))
+    }
+
+    private static func DaysBeforeYear(year: int) -> int {
+        let previous = year - 1
+        return previous * 365 + previous / 4 - previous / 100 + previous / 400
+    }
+
+    private static func DaysInMonth(year: int, month: int) -> int {
+        if month == 2 {
+            if year % 4 != 0 {
+                return 28
+            }
+            if year % 100 != 0 {
+                return 29
+            }
+            if year % 400 != 0 {
+                return 28
+            }
+            return 29
+        }
+        if month == 4 {
+            return 30
+        }
+        if month == 6 {
+            return 30
+        }
+        if month == 9 {
+            return 30
+        }
+        if month == 11 {
+            return 30
+        }
+        return 31
+    }
+
+    private static func DaysBeforeMonth(year: int, month: int) -> int {
+        var current = 1
+        var days = 0
+        while current < month {
+            days = days + DaysInMonth(year, current)
+            current = current + 1
+        }
+        return days
+    }
+
+    val DayNumber: int { get => StoredDayNumber }
+    val Year: int {
+        get {
+            var remaining = StoredDayNumber
+            var year = remaining / 146097 * 400
+            remaining = remaining % 146097
+            var cycles = remaining / 36524
+            if cycles > 3 {
+                cycles = 3
+            }
+            year = year + cycles * 100
+            remaining = remaining - cycles * 36524
+            year = year + remaining / 1461 * 4
+            cycles = remaining % 1461 / 365
+            if cycles > 3 {
+                cycles = 3
+            }
+            return year + cycles + 1
+        }
+    }
+    val DayOfYear: int { get => StoredDayNumber - DaysBeforeYear(Year) + 1 }
+    val Month: int {
+        get {
+            let year = Year
+            var remaining = DayOfYear
+            var month = 1
+            var length = DaysInMonth(year, month)
+            while remaining > length {
+                remaining = remaining - length
+                month = month + 1
+                length = DaysInMonth(year, month)
+            }
+            return month
+        }
+    }
+    val Day: int { get => DayOfYear - DaysBeforeMonth(Year, Month) }
+
+    func Equals(arg0: Date) -> bool {
+        return StoredDayNumber == arg0.StoredDayNumber
+    }
+
+    func CompareTo(arg0: Date) -> int {
+        if StoredDayNumber < arg0.StoredDayNumber {
+            return -1
+        }
+        if StoredDayNumber > arg0.StoredDayNumber {
+            return 1
+        }
+        return 0
+    }
+}

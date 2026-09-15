@@ -1020,11 +1020,19 @@
     {
       "file": "runtime/System/Date.neoil",
       "declarations": 15,
-      "disposition": "calendar",
+      "disposition": "raven-authored-value-bootstrap",
+      "replacementFiles": [
+        "runtime/raven/Date.neoil",
+        "runtime/raven/src/Date.rvn"
+      ],
       "samples": [
         "library-calendar.rvn",
         "library-clock.rvn"
-      ]
+      ],
+      "tests": [
+        "tests/raven_calendar.rs"
+      ],
+      "note": "Existing factories, calendar/tick boundaries, comparison and readonly access preserved. Historical Neo profile unchanged."
     },
     {
       "file": "runtime/System/Time.neoil",
@@ -1041,7 +1049,7 @@
       "tests": [
         "tests/raven_calendar.rs"
       ],
-      "note": "Existing factories, tick boundaries, comparison and readonly access preserved. Historical Neo profile unchanged."
+      "note": "Existing factories, calendar/tick boundaries, comparison and readonly access preserved. Historical Neo profile unchanged."
     },
     {
       "file": "runtime/System/InvalidDateError.neoil",

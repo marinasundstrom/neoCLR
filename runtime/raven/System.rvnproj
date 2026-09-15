@@ -20,4 +20,7 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Time'">
     <Compile Include="src/Time.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Date'">
+    <Compile Include="src/Date.rvn" />
+  </ItemGroup>
 </Project>

@@ -3446,3 +3446,13 @@ compiler candidate; no Raven compiler changes are included in this slice.
 **Outcome.** Source and regression coverage are recorded in
 [the library migration notes](raven-system-library.md#time-value-implementation--2026-09-15).
 Design proposals remain proposals and will be considered separately after the port.
+
+
+### 2026-09-15 — Broader implementation batches after Date
+
+**User direction.** After Date, the author requested a “bigger and safer slice” covering
+as many APIs/areas as possible, with separate commits.
+
+**Assistant response.** Finish and commit Date first, then select existing APIs whose
+contracts fit the checked importer. Preserve behavior and separate commits by area;
+API redesign remains outside this migration work.

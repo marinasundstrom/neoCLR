@@ -1,6 +1,6 @@
 {
   "format": "raven-library-bootstrap-v1",
-  "owner": "System.Math",
+  "owner": "System.Date",
   "inputs": {
     "runtime/raven/src/Math.rvn": "05fbc020828379134fbead7aefb8e19955cefc3b875991dc937e2e303c716e18",
     "runtime/raven/src/Linq.rvn": "58a60fe5ecd4f68560baf6c16bc8342992c9d32752c6b0b40140d0300251e605",
@@ -14,16 +14,20 @@
     "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
   },
   "outputs": {
-    "Math.methods.neoil": "e281fd42728e7e93ee2155e59ef299771842b2e203dd54144af2a583134f75ed",
-    "Math.helpers.neoil": "9770c4d4ed1c8ba5872061efbd504c7dc7bb808536019db0af18ab38a89249eb"
+    "Date.methods.neoil": "a15162fb15ab83eb70eb502dfae12097452631cae3bd6f76b4823899d45db839",
+    "Date.helpers.neoil": "bef78a24b5eefc0e8067506053d80bc031f40aff4514ef91657021fd2d6959ee"
   },
   "compilerSha256": "744ad87d9a6ec3d8b5691e72d0cd077b154af51615387b5f6bb171daa89fb370",
   "coreSha256": "8989c17caa60512fd553706d49c177d1d3eb052fe1910a4a459519030c8e6d0f",
   "exports": [
-    "Abs(Int32 value) -> System.Result<Int32,System.OverflowError>",
-    "Min(Int32 left,Int32 right) -> Int32",
-    "Max(Int32 left,Int32 right) -> Int32",
-    "Sign(Int32 value) -> Int32",
-    "Clamp(Int32 value,Int32 min,Int32 max) -> System.Result<Int32,System.InvalidRangeError>"
+    "Create(Int32,Int32,Int32) -> System.Result<System.Date,System.InvalidDateError>",
+    "FromDayNumber(Int32) -> System.Result<System.Date,System.InvalidDateError>",
+    "readonly byref get_DayNumber() -> Int32",
+    "readonly byref get_Year() -> Int32",
+    "readonly byref get_DayOfYear() -> Int32",
+    "readonly byref get_Month() -> Int32",
+    "readonly byref get_Day() -> Int32",
+    "readonly byref Equals(System.Date) -> Boolean",
+    "readonly byref CompareTo(System.Date) -> Int32"
   ]
 }
