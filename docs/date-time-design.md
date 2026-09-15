@@ -123,3 +123,75 @@ Clock reduces the initial API and test-double burden; its cost is later composit
 with elapsed time and timer APIs. UTC/instant versus local snapshot semantics remain
 open and must be resolved before choosing methods. This is a library design proposal;
 `Clock.GetLocalNow()` remains the implemented static API.
+
+## NeoCLR Time API v1 proposal — 2026-09-15
+
+The author proposed a more complete, deliberately layered time model. `Instant` is
+the fundamental point on a timeline and has no timezone, calendar or locale.
+`Duration` is an exact elapsed amount. Civil and presentation concepts are separate:
+
+| Type | Meaning | Primary responsibility |
+| --- | --- | --- |
+| `Date` | Calendar date | Calendar fields and arithmetic |
+| `Time` | Time of day | Clock fields and subsecond precision |
+| `LocalDateTime` | Date plus time without a zone | Civil scheduling input |
+| `Offset` | Fixed UTC displacement | Unambiguous fixed-offset representation |
+| `OffsetDateTime` | Local date/time plus offset | Local representation with an offset |
+| `TimeZone` | Named timezone rules | Offset, DST and historical transitions |
+| `ZonedDateTime` | Instant plus local projection and zone | Resolved zoned representation |
+| `Calendar` | Calendar system | Calendar fields and calendar arithmetic |
+| `Period` | Calendar-based amount | Civil arithmetic such as months and days |
+
+The intended relationship is `Instant -> TimeZone -> local projection`, with
+`Calendar` applied independently to that projection. A single instant can therefore
+be represented in different zones and calendars without conflating timezone rules
+with calendar rules. The proposal explicitly rejects introducing a new combined
+`DateTime` type merely to reproduce .NET's historical combined model.
+
+`Clock` remains a narrow provider of `Instant`:
+
+```text
+interface Clock { Now: Instant }
+SystemClock, FixedClock, ManualClock
+```
+
+Application code should receive a `Clock`; choosing a system default belongs at the
+composition boundary. `FixedClock` and `ManualClock` make deterministic tests possible
+without coupling the API to a dependency-injection container. A broader provider for
+monotonic time, timers and local snapshots remains a separate decision, consistent
+with the existing .NET `TimeProvider` comparison and the narrower Noda Time `IClock`
+precedent.
+
+Mapping a `LocalDateTime` through a `TimeZone` must represent daylight-saving gaps and
+overlaps explicitly. The proposed result is a domain union such as:
+
+```text
+LocalTimeMapping
+  = Unique(ZonedDateTime)
+  | Ambiguous(ZonedDateTime, ZonedDateTime)
+  | Skipped
+```
+
+This keeps ordinary timezone transitions out of exception-based control flow. The
+exact disambiguation and skipped-time policy remain open. Likewise, `Duration` and
+`Period` are intentionally different: adding 24 elapsed hours to an `Instant` is not
+assumed to produce the same result as adding one calendar day to a `Date`.
+
+Parsing and timezone lookup should use the existing `Result` convention, for example
+`Date.Parse`, `Instant.Parse` and `TimeZone.Find`; `Option<T>` represents absence such
+as an optional event end. The proposed public surface keeps recognizable .NET naming
+and member ergonomics (`date.Year`, `date.AddDays(3)`, `Duration.FromMinutes(30)`),
+while separating concepts that .NET commonly exposes through overlapping types and
+policies.
+
+This is a proposal, not a settled API or a claim that the Raven-shaped examples are
+currently valid Raven source. It extends the implemented `Date`/`Time` foundation but
+does not implement `Instant`, timezone data, alternate calendars, `Duration`,
+`Period`, parsing or formatting. Before adopting it, specify exact value ranges,
+precision, default and invariant behavior, arithmetic overflow/carry, leap-second
+policy, timezone database distribution and DST resolution. Validate metadata and
+reflection identity, invalid construction and bypass attempts, deterministic clocks,
+calendar boundaries, DST gaps/overlaps, offset conversions and .NET interop. Compare
+the layered model with .NET `DateOnly`/`TimeOnly`/`DateTime`/`DateTimeOffset`, Noda
+Time's `Instant`/`LocalDateTime`/`ZonedDateTime`, and the current neoCLR Date/Time
+contracts before treating the architecture as locked.

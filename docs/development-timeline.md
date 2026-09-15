@@ -3378,6 +3378,25 @@ No .NET Framework/NanoFramework execution was claimed. Checked storage and priva
 library-helper admission remain specific to the neoCLR experiment. See
 [the evaluation and validation](raven-target-evaluation.md).
 
+## 2026-09-15 — NeoCLR Time API v1 proposal
+
+**Author proposal:** Define a layered time architecture with `Instant` as the real
+timeline point, `Duration` for elapsed time, separate civil values (`Date`, `Time`,
+`LocalDateTime`), explicit offset/zone projections, independent calendars, and
+`Period` for calendar arithmetic. Keep `Clock` as a narrow injectable provider of
+`Instant`, with system, fixed and manual implementations. Model timezone gaps and
+overlaps as explicit union outcomes, and use Result for parsing and lookup failures.
+Retain recognizable .NET naming and ergonomics without creating another combined
+`DateTime` type. The supplied Raven-shaped examples are illustrative; their Raven
+validity was not asserted.
+
+**Assistant action and outcome:** Updated the [date/time design proposal](date-time-design.md#neoclr-time-api-v1-proposal--2026-09-15)
+with the type responsibilities, .NET/Noda Time comparison boundary, tradeoffs and
+validation requirements. No new time types, timezone implementation, calendar system,
+parser, formatter or runtime contract were added by this documentation update. The
+existing Date/Time core and static local-clock API remain implemented; the v1 layering,
+method signatures, defaults and DST policies remain provisional.
+
 ## 2026-09-15 — Minimal Unicode-centred text model proposal
 
 **Author proposal:** Refine the text direction to a small Unicode-centred model:

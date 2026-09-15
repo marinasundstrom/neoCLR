@@ -14,6 +14,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   notation only. Preserve the current UTF-16 code-unit Char contract until migration,
   metadata, interop and validation questions are resolved; no implementation changes.
 
+- Update the date/time design proposal as NeoCLR Time API v1: layer Instant, Duration,
+  civil values, offsets, timezones, calendars and Period; retain a narrow injectable
+  Clock; and model DST gaps/overlaps and parsing/lookup failures explicitly with
+  unions/Result. Keep the current Date/Time and local-clock implementation unchanged;
+  the Raven-shaped examples, exact members, defaults, timezone data and arithmetic
+  policies remain provisional.
+
 - Add the first matched Raven value-library gate: sequential nongeneric scalar records
   must match reference field layout, representation and public instance contracts.
   Preserve instance ownership for value constructors and constructor debug identities;
