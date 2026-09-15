@@ -1,9 +1,11 @@
 # Authoring the foundational library in Raven
 
 `runtime/raven/System.rvnproj` is the shared authoring project for ordinary
-foundational runtime APIs. Its sources include `src/Math.rvn`, `src/Linq.rvn`, `src/Int32.rvn`, `src/Char.rvn`, `src/ArrayList.rvn`, `src/HashMap.rvn`, `src/Time.rvn` and `src/Date.rvn`; additional namespaces
+foundational runtime APIs. Its sources include `src/System/Math/Functions.rvn`, `src/System/Linq/Operators.rvn`, `src/System/Int32/Functions.rvn`, `src/System/Char/Functions.rvn`, `src/System/Collections/ArrayList.rvn`, `src/System/Collections/HashMap.rvn`, `src/System/Time.rvn` and `src/System/Date.rvn`; additional namespaces
 and types should join this project as their importing requirements are validated.
-Do not create an assembly per utility namespace. This is an incremental source
+Each declared namespace has its own folder below `src`: for example, `System/Date.rvn`,
+`System/Collections/ArrayList.rvn` and `System/Math/Functions.rvn`. Namespace functions
+use `Functions.rvn`; types use their type names. Do not create an assembly per utility namespace. This is an incremental source
 migration, not yet a self-hosting build of the complete core reference assembly.
 
 The bootstrap currently has three distinct artifacts:
@@ -166,7 +168,7 @@ storage and Result<Void, E> coverage to generic unit-returning invocations.
 
 ## Collection terminal migration — 2026-09-14
 
-`src/Linq.rvn` implements `System.Linq.Operators.ToList<T>`, `First<T>`, `Last<T>`
+`src/System/Linq/Operators.rvn` implements `System.Linq.Operators.ToList<T>`, `First<T>`, `Last<T>`
 and `Single<T>`, including the three predicate overloads. `Operators` replaces the
 previous Enumerable owner; extension-call syntax and `import System.Linq.*` are
 unchanged. Existing consumer assemblies must be rebuilt against the new reference
@@ -394,7 +396,7 @@ metadata options; no .NET Framework or NanoFramework execution is claimed.
 ### Deferred query migration completed — 2026-09-15
 
 Where/Select sequences and iterators now join the seven terminal overloads in
-`src/Linq.rvn`. The build uses the bootstrap reference variant and retains reachable
+`src/System/Linq/Operators.rvn`. The build uses the bootstrap reference variant and retains reachable
 internal classes alongside generated adapter functions. `runtime/raven/Linq.neoil`
 only includes generated bodies; it no longer contains handwritten query algorithms.
 Public methods, Option/Result outcomes, callback timing, iterator caching, Dispose
@@ -418,7 +420,7 @@ ArrayList and its private iterator subsequently passed this gate; see the migrat
 
 ### ArrayList migration — 2026-09-15
 
-`src/ArrayList.rvn` now implements both constructors, Count/Capacity, the indexer,
+`src/System/Collections/ArrayList.rvn` now implements both constructors, Count/Capacity, the indexer,
 Add, Copy, GetIterator and all seven predicate-search operations. Its internal
 ArrayListIterator implements Iterator and inherited Disposable. The Raven profile
 includes generated class bodies instead of rewriting the historical ArrayList IL;
@@ -469,7 +471,7 @@ turn those into reference types.
 
 ### HashMap and private instance helpers — 2026-09-15
 
-`src/HashMap.rvn` implements the existing MutableMap contract: construction with
+`src/System/Collections/HashMap.rvn` implements the existing MutableMap contract: construction with
 explicit equality/hash callbacks, Count, key snapshots, Find, ContainsKey, TryAdd and
 Set. `Map.neoil` now retains only interface declarations and includes generated class
 bodies. Runtime Contract configuration and Raven compiler behavior are unchanged.
@@ -559,7 +561,7 @@ private construction. Their current executable IL and public behavior remain in 
 
 ### Time value implementation — 2026-09-15
 
-The Raven profile now uses `runtime/raven/src/Time.rvn`, compiled into checked-in
+The Raven profile now uses `runtime/raven/src/System/Time.rvn`, compiled into checked-in
 Time fragments. Existing Create/FromTicks Result factories, parameter names, tick
 bounds, component properties, equality and comparison remain unchanged. The original
 Neo profile still uses its existing IL implementation. Date has not been ported.
@@ -595,7 +597,7 @@ checks pass. No SDK installation or release packaging was performed.
 
 ### Date value implementation — 2026-09-15
 
-The Raven profile now uses `src/Date.rvn` for Date, preserving the existing Gregorian
+The Raven profile now uses `src/System/Date.rvn` for Date, preserving the existing Gregorian
 algorithm, years 1–9999, day numbers 0–3652058, Result factories, properties and
 Equatable/Comparable contracts. Private static calendar helpers and the private
 constructor retain their ownership and visibility. Century-cycle clamps are ordinary
@@ -611,7 +613,7 @@ bootstrap regeneration and API inventory/coverage checks.
 
 ### Typed host-service authoring and complete Math port — 2026-09-15
 
-All 15 Double Math wrappers now live in `src/Math.rvn` alongside the five Int32
+All 15 Double Math wrappers now live in `src/System/Math/Functions.rvn` alongside the five Int32
 functions. Numerical algorithms stay in the existing native services, preserving
 rounding, NaN, infinity and signed-zero behavior. No public API changed.
 
@@ -634,7 +636,7 @@ contracts and bootstrap-service guest rejection pass; clean regeneration matches
 
 ### Path wrappers — 2026-09-15
 
-`src/Path.rvn` implements Combine and GetFileName, retaining their existing public
+`src/System/IO/Path/Functions.rvn` implements Combine and GetFileName, retaining their existing public
 parameter names and lexical semantics. The checked bootstrap catalog now includes
 PathCombine and PathGetFileName; the host still performs platform-specific path
 handling. Generated methods retain the existing System.IO.Path owner for both Raven

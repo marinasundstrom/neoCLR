@@ -1,4 +1,4 @@
-; Generated from runtime/raven/src/Time.rvn. Regenerate with build_runtime_library.py.
+; Generated from runtime/raven/src/System/Time.rvn. Regenerate with build_runtime_library.py.
 .function neoCLR.Library.System.Time.RuntimeErrorSystemInvalidTimeErrorNew() -> System.InvalidTimeError
 newobj instance System.InvalidTimeError::.ctor()
 ret

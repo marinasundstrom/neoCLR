@@ -1,4 +1,4 @@
-; Generated from runtime/raven/src/HashMap.rvn. Regenerate with build_runtime_library.py.
+; Generated from runtime/raven/src/System/Collections/HashMap.rvn. Regenerate with build_runtime_library.py.
 .function neoCLR.Library.System.Collections.HashMap.RuntimeUnion0() -> System.Option.None
 newobj instance System.Option.None::.ctor()
 ret

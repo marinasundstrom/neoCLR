@@ -1,4 +1,4 @@
-; Generated from runtime/raven/src/Math.rvn. Regenerate with build_runtime_library.py.
+; Generated from runtime/raven/src/System/Math/Functions.rvn. Regenerate with build_runtime_library.py.
 .function neoCLR.Library.System.Math.RuntimeErrorSystemInvalidRangeErrorNew() -> System.InvalidRangeError
 newobj instance System.InvalidRangeError::.ctor()
 ret

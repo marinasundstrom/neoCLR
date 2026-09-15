@@ -1,4 +1,4 @@
-; Generated from runtime/raven/src/Int32.rvn. Regenerate with build_runtime_library.py.
+; Generated from runtime/raven/src/System/Int32/Functions.rvn. Regenerate with build_runtime_library.py.
 .function neoCLR.Library.System.Int32.RuntimeErrorSystemIntegerDivisionErrorNewSystemIntegerDivisionErrorDivisionByZero(System.IntegerDivisionError.DivisionByZero value) -> System.IntegerDivisionError
 ldarg value
 newobj instance System.IntegerDivisionError::.ctor(System.IntegerDivisionError.DivisionByZero)

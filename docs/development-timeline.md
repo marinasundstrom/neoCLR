@@ -3456,3 +3456,14 @@ as many APIs/areas as possible, with separate commits.
 **Assistant response.** Finish and commit Date first, then select existing APIs whose
 contracts fit the checked importer. Preserve behavior and separate commits by area;
 API redesign remains outside this migration work.
+
+
+### 2026-09-15 — Namespace folders for library sources
+
+**User direction.** The author specified that each runtime-library namespace should
+have its own folder.
+
+**Action.** Raven sources move under `src/System`, with subfolders matching declared
+namespaces. Type files retain type names; namespace-function files use Functions.rvn.
+Project inputs, generation source maps and documentation follow the new paths.
+This is source organization only, without changing APIs or assembly partitioning.

@@ -1,4 +1,4 @@
-; Generated from runtime/raven/src/Time.rvn. Regenerate with build_runtime_library.py.
+; Generated from runtime/raven/src/System/Time.rvn. Regenerate with build_runtime_library.py.
 .type System.Time
 .implements System.Comparable<System.Time>
 .implements System.Equatable<System.Time>

@@ -143,7 +143,7 @@ or packaged-release validation.
 
 ## Raven implementation — 2026-09-15
 
-The HashMap implementation now lives in `runtime/raven/src/HashMap.rvn`; the map
+The HashMap implementation now lives in `runtime/raven/src/System/Collections/HashMap.rvn`; the map
 interface declarations remain in `runtime/raven/Map.neoil`. Generated bootstrap IL
 preserves the algorithms and contracts described here. Private implementation helpers
 remain private. The class owns equality/hash delegates directly and uses the

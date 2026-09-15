@@ -1,4 +1,4 @@
-; Generated from runtime/raven/src/ArrayList.rvn. Regenerate with build_runtime_library.py.
+; Generated from runtime/raven/src/System/Collections/ArrayList.rvn. Regenerate with build_runtime_library.py.
 .type class System.Collections.ArrayList<T0>
 .implements System.Collections.List<T0>
 .implements System.Collections.MutableSequence<T0>

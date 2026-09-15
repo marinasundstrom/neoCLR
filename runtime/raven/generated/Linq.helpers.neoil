@@ -1,4 +1,4 @@
-; Generated from runtime/raven/src/Linq.rvn. Regenerate with build_runtime_library.py.
+; Generated from runtime/raven/src/System/Linq/Operators.rvn. Regenerate with build_runtime_library.py.
 .function neoCLR.Library.System.Linq.Operators.RuntimeErrorSystemLinqSingleErrorNewSystemLinqSingleErrorEmpty(System.Linq.SingleError.Empty value) -> System.Linq.SingleError
 ldarg value
 newobj instance System.Linq.SingleError::.ctor(System.Linq.SingleError.Empty)

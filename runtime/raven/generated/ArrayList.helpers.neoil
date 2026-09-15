@@ -1,4 +1,4 @@
-; Generated from runtime/raven/src/ArrayList.rvn. Regenerate with build_runtime_library.py.
+; Generated from runtime/raven/src/System/Collections/ArrayList.rvn. Regenerate with build_runtime_library.py.
 .function neoCLR.Library.System.Collections.ArrayList.RuntimeUnion0() -> System.Option.None
 newobj instance System.Option.None::.ctor()
 ret

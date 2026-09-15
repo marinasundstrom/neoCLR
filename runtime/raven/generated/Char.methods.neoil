@@ -1,4 +1,4 @@
-; Generated from runtime/raven/src/Char.rvn. Regenerate with build_runtime_library.py.
+; Generated from runtime/raven/src/System/Char/Functions.rvn. Regenerate with build_runtime_library.py.
 .method static IsSurrogate(Char value) -> Boolean
 .local Int32 local0
 ldc.i4 0

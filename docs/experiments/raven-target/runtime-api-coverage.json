@@ -418,7 +418,7 @@
         "tests/math_helpers.rs",
         "tests/math_typed.rs"
       ],
-      "note": "All twenty Math functions are Raven-authored; Double operations retain native services behind checked bootstrap-only bindings. Source authority is runtime/raven/src/Math.rvn."
+      "note": "All twenty Math functions are Raven-authored; Double operations retain native services behind checked bootstrap-only bindings. Source authority is runtime/raven/src/System/Math/Functions.rvn."
     },
     {
       "file": "runtime/raven/generated/Math.helpers.neoil",
@@ -433,7 +433,7 @@
         "tests/math_helpers.rs",
         "tests/math_typed.rs"
       ],
-      "note": "All twenty Math functions are Raven-authored; Double operations retain native services behind checked bootstrap-only bindings. Source authority is runtime/raven/src/Math.rvn."
+      "note": "All twenty Math functions are Raven-authored; Double operations retain native services behind checked bootstrap-only bindings. Source authority is runtime/raven/src/System/Math/Functions.rvn."
     },
     {
       "file": "runtime/System/InvalidRangeError.neoil",
@@ -940,7 +940,7 @@
       "disposition": "raven-authored-class-bootstrap",
       "replacementFiles": [
         "runtime/raven/ArrayList.neoil",
-        "runtime/raven/src/ArrayList.rvn"
+        "runtime/raven/src/System/Collections/ArrayList.rvn"
       ],
       "samples": [
         "library-list-filters.rvn",
@@ -1023,7 +1023,7 @@
       "disposition": "raven-authored-value-bootstrap",
       "replacementFiles": [
         "runtime/raven/Date.neoil",
-        "runtime/raven/src/Date.rvn"
+        "runtime/raven/src/System/Date.rvn"
       ],
       "samples": [
         "library-calendar.rvn",
@@ -1040,7 +1040,7 @@
       "disposition": "raven-authored-value-bootstrap",
       "replacementFiles": [
         "runtime/raven/Time.neoil",
-        "runtime/raven/src/Time.rvn"
+        "runtime/raven/src/System/Time.rvn"
       ],
       "samples": [
         "library-calendar.rvn",
@@ -1224,7 +1224,7 @@
         "tests/raven_collections.rs",
         "docs/experiments/raven-target/verify_collection_capabilities.py"
       ],
-      "note": "HashMap algorithms are authored in runtime/raven/src/HashMap.rvn; interfaces stay in IL. Private helpers retain visibility and all bodies are checked. Explicit equality/hash callbacks; no default comparer, removal or pair iteration. See docs/map-contracts.md."
+      "note": "HashMap algorithms are authored in runtime/raven/src/System/Collections/HashMap.rvn; interfaces stay in IL. Private helpers retain visibility and all bodies are checked. Explicit equality/hash callbacks; no default comparer, removal or pair iteration. See docs/map-contracts.md."
     },
     {
       "file": "runtime/raven/Linq.neoil",
@@ -1251,7 +1251,7 @@
       "note": "Operators and private deferred iterator classes are authored in Raven with generated bootstrap bodies; First/Last return Option and Single returns Result with Empty/Multiple. Checked storage retains generic cached elements. Normal-outcome cleanup only. See docs/raven-query-api.md."
     },
     {
-      "file": "runtime/raven/src/Linq.rvn",
+      "file": "runtime/raven/src/System/Linq/Operators.rvn",
       "disposition": "query-library-and-terminal-outcomes",
       "samples": [
         "library-query-terminals.rvn"

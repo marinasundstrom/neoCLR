@@ -1,4 +1,4 @@
-; Generated from runtime/raven/src/Int32.rvn. Regenerate with build_runtime_library.py.
+; Generated from runtime/raven/src/System/Int32/Functions.rvn. Regenerate with build_runtime_library.py.
 .method static Divide(Int32 dividend,Int32 divisor) -> System.Result<Int32,System.IntegerDivisionError>
 M00000001_IL_0000:
 M00000001_IL_0001:

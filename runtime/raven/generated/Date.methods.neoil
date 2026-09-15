@@ -1,4 +1,4 @@
-; Generated from runtime/raven/src/Date.rvn. Regenerate with build_runtime_library.py.
+; Generated from runtime/raven/src/System/Date.rvn. Regenerate with build_runtime_library.py.
 .type System.Date
 .implements System.Comparable<System.Date>
 .implements System.Equatable<System.Date>

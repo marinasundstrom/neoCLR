@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-15
 
+- Organize Raven library sources into namespace folders under src/System, including
+  Collections, Linq and function namespaces. Update project inputs, bootstrap source
+  maps and documentation; public contracts and generated instructions are unchanged.
+
 - Port Path.Combine and Path.GetFileName to Raven using the checked bootstrap host
   service catalog. Preserve lexical/native platform behavior, public parameter names
   and direct IL callers; no new path API or compiler special case.

@@ -1,4 +1,4 @@
-; Generated from runtime/raven/src/Math.rvn. Regenerate with build_runtime_library.py.
+; Generated from runtime/raven/src/System/Math/Functions.rvn. Regenerate with build_runtime_library.py.
 .method static Abs(Int32 value) -> System.Result<Int32,System.OverflowError>
 M00000001_IL_0000:
 M00000001_IL_0001:

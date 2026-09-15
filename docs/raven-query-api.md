@@ -346,7 +346,7 @@ tests, plus Clippy and formatting. The .NET comparison targets net10.0.
 ## Raven-authored query implementations
 
 `Where`, `Select`, `ToList`, `First`, `Last` and `Single` (including predicate overloads) are authored
-in `runtime/raven/src/Linq.rvn`. `System.Linq.Operators` holds the extension methods;
+in `runtime/raven/src/System/Linq/Operators.rvn`. `System.Linq.Operators` holds the extension methods;
 `import System.Linq.*` and receiver calls remain unchanged. This replaces the earlier
 `Enumerable` owner without an alias: rebuild consumers and reference metadata together.
 The name describes an operation container rather than a sequence contract. Compared

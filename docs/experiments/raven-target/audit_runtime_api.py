@@ -61,13 +61,13 @@ for file in source['sourceFiles']:
         continue
     if file == 'runtime/System/Collections/ArrayList.neoil':
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-class-bootstrap',
-                     'replacementFiles': ['runtime/raven/ArrayList.neoil', 'runtime/raven/src/ArrayList.rvn'],
+                     'replacementFiles': ['runtime/raven/ArrayList.neoil', 'runtime/raven/src/System/Collections/ArrayList.rvn'],
                      'samples': ['library-list-filters.rvn', 'library-delegates.rvn', 'library-maps.rvn'],
                      'note': 'The complete class and private iterator are Raven-authored. Direct checked array storage replaces the legacy state wrapper; searches preserve captured buffer/extent and Option outcomes. Historical Neo profile unchanged.'})
         continue
     if file in ('runtime/System/Time.neoil', 'runtime/System/Date.neoil'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-value-bootstrap',
-                     'replacementFiles': ['runtime/raven/' + Path(file).name, 'runtime/raven/src/' + Path(file).stem + '.rvn'],
+                     'replacementFiles': ['runtime/raven/' + Path(file).name, 'runtime/raven/src/System/' + Path(file).stem + '.rvn'],
                      'samples': ['library-calendar.rvn', 'library-clock.rvn'],
                      'tests': ['tests/raven_calendar.rs'],
                      'note': 'Existing factories, calendar/tick boundaries, comparison and readonly access preserved. Historical Neo profile unchanged.'})
@@ -93,7 +93,7 @@ for file in source['sourceFiles']:
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-math-bootstrap',
                      'samples': ['library-math.rvn', 'library-clamp.rvn'],
                      'tests': ['docs/experiments/raven-target/verify_math_library.py', 'tests/math_helpers.rs', 'tests/math_typed.rs'],
-                     'note': 'All twenty Math functions are Raven-authored; Double operations retain native services behind checked bootstrap-only bindings. Source authority is runtime/raven/src/Math.rvn.'})
+                     'note': 'All twenty Math functions are Raven-authored; Double operations retain native services behind checked bootstrap-only bindings. Source authority is runtime/raven/src/System/Math/Functions.rvn.'})
         continue
     group, samples = lookup[Path(file).stem]
     for sample in samples:
@@ -107,7 +107,7 @@ result['targetProfileAdditions'] = [{
     'disposition': 'experimental-map-contracts-with-raven-implementation',
     'samples': ['library-maps.rvn'],
     'tests': ['tests/raven_collections.rs', 'docs/experiments/raven-target/verify_collection_capabilities.py'],
-    'note': 'HashMap algorithms are authored in runtime/raven/src/HashMap.rvn; interfaces stay in IL. Private helpers retain visibility and all bodies are checked. Explicit equality/hash callbacks; no default comparer, removal or pair iteration. See docs/map-contracts.md.'
+    'note': 'HashMap algorithms are authored in runtime/raven/src/System/Collections/HashMap.rvn; interfaces stay in IL. Private helpers retain visibility and all bodies are checked. Explicit equality/hash callbacks; no default comparer, removal or pair iteration. See docs/map-contracts.md.'
 }]
 result['targetProfileAdditions'] += [{
     'file': file,
@@ -115,7 +115,7 @@ result['targetProfileAdditions'] += [{
     'samples': ['library-query-terminals.rvn'],
     'tests': ['tests/query_terminals.rs', 'docs/experiments/raven-target/verify_queries.py'],
     'note': 'Operators and private deferred iterator classes are authored in Raven with generated bootstrap bodies; First/Last return Option and Single returns Result with Empty/Multiple. Checked storage retains generic cached elements. Normal-outcome cleanup only. See docs/raven-query-api.md.'
-} for file in ('runtime/raven/Linq.neoil', 'runtime/raven/SingleError.neoil', 'runtime/raven/src/Linq.rvn',
+} for file in ('runtime/raven/Linq.neoil', 'runtime/raven/SingleError.neoil', 'runtime/raven/src/System/Linq/Operators.rvn',
                  'runtime/raven/generated/Linq.methods.neoil', 'runtime/raven/generated/Linq.helpers.neoil')]
 for addition in result['targetProfileAdditions']:
     assert (ROOT / addition['file']).is_file()

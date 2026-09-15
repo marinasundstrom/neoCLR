@@ -10,6 +10,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {"Math": "System.Math", "Linq": "System.Linq.Operators", "Int32": "System.Int32", "Char": "System.Char", "ArrayList": "System.Collections.ArrayList", "HashMap": "System.Collections.HashMap", "Time": "System.Time", "Date": "System.Date", "Path": "System.IO.Path"}
+SOURCES = {'Math': 'runtime/raven/src/System/Math/Functions.rvn', 'Int32': 'runtime/raven/src/System/Int32/Functions.rvn', 'Char': 'runtime/raven/src/System/Char/Functions.rvn', 'Linq': 'runtime/raven/src/System/Linq/Operators.rvn', 'ArrayList': 'runtime/raven/src/System/Collections/ArrayList.rvn', 'HashMap': 'runtime/raven/src/System/Collections/HashMap.rvn', 'Time': 'runtime/raven/src/System/Time.rvn', 'Date': 'runtime/raven/src/System/Date.rvn', 'Path': 'runtime/raven/src/System/IO/Path/Functions.rvn'}
 PROJECT = ROOT / 'runtime/raven/System.rvnproj'
 GENERATED = ROOT / 'runtime/raven/generated'
 
@@ -63,7 +64,7 @@ def fragments(text, name="Math", owner="System.Math"):
             continue
         used.add(helper)
         pending.extend(re.findall(r'(?m)^(?:call|ldftn) ([^(]+)\(', helpers[helper]))
-    banner = f'; Generated from runtime/raven/src/{name}.rvn. Regenerate with build_runtime_library.py.\n'
+    banner = f'; Generated from {SOURCES[name]}. Regenerate with build_runtime_library.py.\n'
     return {name + '.methods.neoil': banner + ''.join(methods),
             name + '.helpers.neoil': banner + ''.join(body for name, body in helpers.items() if name in used) + ''.join(types)}
 
@@ -117,7 +118,7 @@ def main():
                     if (GENERATED / output).read_text() != text:
                         raise SystemExit('Regenerated library differs: ' + output)
                 continue
-            inputs = [ROOT / ('runtime/raven/src/' + source + '.rvn') for source in SLICES]
+            inputs = [ROOT / SOURCES[source] for source in SLICES]
             inputs += [PROJECT, ROOT / 'build/NeoCLR.Raven.props']
             data = {'format': 'raven-library-bootstrap-v1', 'owner': owner,
                     'inputs': {str(p.relative_to(ROOT)): digest(p) for p in inputs},

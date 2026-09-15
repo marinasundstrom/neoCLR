@@ -1,4 +1,4 @@
-; Generated from runtime/raven/src/Linq.rvn. Regenerate with build_runtime_library.py.
+; Generated from runtime/raven/src/System/Linq/Operators.rvn. Regenerate with build_runtime_library.py.
 .method static Where<T0>(System.Collections.Iterable<T0> source,System.Func<T0,Boolean> predicate) -> System.Collections.Iterable<T0>
 M00000001_IL_0000:
 M00000001_IL_0001:

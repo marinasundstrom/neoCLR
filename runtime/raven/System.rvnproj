@@ -6,22 +6,22 @@
   </PropertyGroup>
   <Import Project="../../build/NeoCLR.Raven.props" />
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == ''">
-    <Compile Include="src/Math.rvn" />
-    <Compile Include="src/Linq.rvn" />
-    <Compile Include="src/Int32.rvn" />
-    <Compile Include="src/Char.rvn" />
-    <Compile Include="src/Path.rvn" />
+    <Compile Include="src/System/Math/Functions.rvn" />
+    <Compile Include="src/System/Linq/Operators.rvn" />
+    <Compile Include="src/System/Int32/Functions.rvn" />
+    <Compile Include="src/System/Char/Functions.rvn" />
+    <Compile Include="src/System/IO/Path/Functions.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'ArrayList'">
-    <Compile Include="src/ArrayList.rvn" />
+    <Compile Include="src/System/Collections/ArrayList.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'HashMap'">
-    <Compile Include="src/HashMap.rvn" />
+    <Compile Include="src/System/Collections/HashMap.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Time'">
-    <Compile Include="src/Time.rvn" />
+    <Compile Include="src/System/Time.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Date'">
-    <Compile Include="src/Date.rvn" />
+    <Compile Include="src/System/Date.rvn" />
   </ItemGroup>
 </Project>
