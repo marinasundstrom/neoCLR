@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-15
 
+- Move the memberless Value and RuntimeTypeHandle declarations to Raven. Check
+  declaration-only imports against reference shape and reject added members,
+  storage or constructor behavior. Preserve runtime erasure and opaque handle
+  representation. Void remains declared in IL because the separate implementation
+  assembly cannot define Raven's configured target-core unit type.
+
 - Complete the Char struct port in System/Char.rvn, including CompareTo and all
   sixteen predicates. Move the previously standalone functions onto the type;
   retain existing UTF-16 code-unit and Unicode-category behavior through the native

@@ -91,8 +91,11 @@ static class LibraryImplementation
         if (type.Fields.Any(f => !f.IsPrivate || f.IsStatic || f.IsInitOnly || f.HasMarshalInfo)
             || contract.Fields.Any(f => !f.IsPrivate))
             throw new InvalidDataException("Instance library requires private mutable implementation fields.");
-        var methods = type.Methods.Where(m => !PrimitiveLibrary.IsPrimitive(type) || !PrimitiveLibrary.IsDefaultConstructor(m)).ToArray();
-        if (methods.Length == 0 || methods.Any(m => !(m.IsPublic || m.IsPrivate && (!m.IsConstructor || type.IsValueType) && !m.IsVirtual) || (!m.HasThis && !type.IsValueType) || !m.HasBody || m.HasGenericParameters
+        var declarationOnly = type.IsValueType && !type.HasFields && !contract.HasFields
+            && !contract.HasMethods && !type.HasProperties && !type.HasInterfaces
+            && type.Methods.All(PrimitiveLibrary.IsDefaultConstructor);
+        var methods = type.Methods.Where(m => !(PrimitiveLibrary.IsPrimitive(type) || declarationOnly) || !PrimitiveLibrary.IsDefaultConstructor(m)).ToArray();
+        if (methods.Length == 0 && !declarationOnly || methods.Any(m => !(m.IsPublic || m.IsPrivate && (!m.IsConstructor || type.IsValueType) && !m.IsVirtual) || (!m.HasThis && !type.IsValueType) || !m.HasBody || m.HasGenericParameters
             || m.ExplicitThis || m.IsConstructor && m.IsStatic || m.CallingConvention != MethodCallingConvention.Default
             || m.Parameters.Any(p => p.IsOut || p.ParameterType.IsByReference)))
             throw new InvalidDataException("Unsupported instance library export.");
@@ -113,6 +116,7 @@ static class LibraryImplementation
                 a.AttributeType.FullName == "System.Runtime.CompilerServices.IsReadOnlyAttribute"))
                 ReadonlyReceivers.Add(method);
         ApplicationTypes.BindLibrary(type, owner);
+        if (declarationOnly) _ = ApplicationTypes.Type(type);
         foreach (var method in methods) CheckMethod(method);
         return methods;
     }

@@ -733,7 +733,7 @@ static class UnionImport
                 .Select(m => new { AssemblyIdentity = m.Module.Assembly.Name.FullName, MethodToken = m.MetadataToken.ToUInt32(), MetadataName = m.FullName,
                     RuntimeName = (libraryOwner is not null && m.DeclaringType.IsValueType) || m.HasThis && (libraryOwner is not null || !(m.IsConstructor && m.DeclaringType.IsValueType))
                         ? ApplicationTypes.Type(m.DeclaringType) + "::" + ApplicationTypes.MethodName(m) : Name(m) }),
-            Profile = libraryOwner is not null ? (exports.Any(m => m.HasThis) ? "instance-library-fragment-v1" : "namespace-library-fragment-v1") : collectionProfile ? "result-option-void-instance-libraries-v11" : "result-option-void-files-strings-arrays-v7",
+            Profile = libraryOwner is not null ? ((exports.Any(m => m.HasThis) || ApplicationTypes.IdentityMap().Length != 0) ? "instance-library-fragment-v1" : "namespace-library-fragment-v1") : collectionProfile ? "result-option-void-instance-libraries-v11" : "result-option-void-files-strings-arrays-v7",
             RequiredLibraryProfile = collectionProfile ? "raven-collections" : "bundled-system", ApplicationSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(application))),
             CoreSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(core))), DependencyImages = dependencies.Select(path => new { AssemblyIdentity = System.Reflection.AssemblyName.GetAssemblyName(path).FullName,
                 Sha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(path))) }),

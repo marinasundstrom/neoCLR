@@ -1,3 +1,2 @@
-.type System.Value
-.end
-
+.include "../raven/generated/Value.methods.neoil"
+.include "../raven/generated/Value.helpers.neoil"

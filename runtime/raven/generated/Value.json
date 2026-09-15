@@ -1,6 +1,6 @@
 {
   "format": "raven-library-bootstrap-v1",
-  "owner": "System.Collections.HashMap",
+  "owner": "System.Value",
   "inputs": {
     "runtime/raven/src/System/RuntimeTypeHandle.rvn": "6e00ed2472076a61b7a7e670c048f6197166d8fc1e4bad7a44593eeffb4ad85b",
     "runtime/raven/src/System/Value.rvn": "3d005ba17dc0c055b21e21183a857dcb23c5b34882ad26b4583234dff33d8162",
@@ -28,18 +28,10 @@
     "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
   },
   "outputs": {
-    "HashMap.methods.neoil": "ce908599bade9ec90f97840ffb927809fdba269d4452144b52cc6350c3fd3435",
-    "HashMap.helpers.neoil": "0a8edaf8bffd033509e28aacdcc26aed62d56624d179fecd08ddb88602582691"
+    "Value.methods.neoil": "3a2748a8498226aeff4c5039cc32b649ebd0c511be0877cd6395727cf63bda48",
+    "Value.helpers.neoil": "03a694f75d3bccc98848e6b0332bf93c2b398e95dd89ed1dc8ca260da55f2315"
   },
   "compilerSha256": "744ad87d9a6ec3d8b5691e72d0cd077b154af51615387b5f6bb171daa89fb370",
   "coreSha256": "906f9823d00fb456e71b6a09eb5fb48b32db3a017be5034a7519831010fa8937",
-  "exports": [
-    ".ctor(System.Func<T0,T0,Boolean>,System.Func<T0,Int32>) -> noresult",
-    "get_Count() -> Int32",
-    "get_Keys() -> System.Collections.Sequence<T0>",
-    "Find(T0) -> System.Option<T1>",
-    "ContainsKey(T0) -> Boolean",
-    "TryAdd(T0,T1) -> Boolean",
-    "Set(T0,T1) -> noresult"
-  ]
+  "exports": []
 }

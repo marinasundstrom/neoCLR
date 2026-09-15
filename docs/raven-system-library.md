@@ -15,7 +15,9 @@ The bootstrap currently has three distinct artifacts:
   the normal reference surface. Placeholder bodies must never execute.
 - `NeoCLR.System.dll`: compiled Raven implementation input, currently twenty
   Math functions, nine query overloads and their private deferred iterator classes,
-  Int32.Divide and seven character predicates, plus separately compiled ArrayList, HashMap, Time and Date slices.
+  Int32.Divide, Path and file-write functions, plus separately compiled collection,
+  calendar and primitive structs. Memberless Value and RuntimeTypeHandle declarations
+  are also Raven-authored.
   These implementation inputs are imported into neoIL, not loaded dynamically by the runtime.
 - `runtime/System.neoil` and its includes: the executable foundational library,
   combining generated Raven bodies with remaining handwritten bodies and intrinsics.
@@ -725,3 +727,29 @@ move of Char functions onto the struct is now implemented, rather than just plan
 
 Char validation: four character regressions, 203 independently compiled scalar/Boolean
 outcomes and clean snapshot regeneration pass.
+
+
+### Memberless intrinsic declarations — 2026-09-15
+
+Value and RuntimeTypeHandle now have Raven source declarations under `src/System`.
+Declaration-only value imports require matching empty reference shape: no fields,
+interfaces, properties or exported methods. Only the verified, empty compiler default
+constructor can be omitted. Added storage, methods, constructor behavior and a change
+to reference-type representation are rejected. The importer explicitly registers the
+matched type even when there are no method roots.
+
+The bootstrap removes its placeholder one-byte layout annotation for these two
+intrinsic declarations. This does not specify a native ABI or change their runtime
+representations: Value remains an erased payload, and RuntimeTypeHandle remains an
+opaque runtime-owned descriptor. Their generated declarations match the prior IL.
+
+Attempting Void itself exposed the current separate-assembly bootstrap boundary:
+Raven rejects a unit contract resolved to the implementation assembly rather than the
+configured target core (RAVT003). Its existing IL declaration therefore remains. This
+needs core-library authoring support, not a replacement Unit type or a weaker unit
+contract. No compiler change was made in this slice.
+
+Remaining primitive work: Int32 still combines Raven Divide with its existing IL/native
+parsing, formatting, equality and comparison members; IntPtr/UIntPtr need the missing
+native-integer operator/conversion surface; Void needs the core-authoring boundary
+above. These are explicit follow-ups rather than claimed completed ports.

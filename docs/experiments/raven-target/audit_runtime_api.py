@@ -85,6 +85,12 @@ for file in source['sourceFiles']:
                      'tests': ['tests/common_interfaces.rs', 'docs/experiments/raven-target/verify_primitive_library.py'],
                      'note': 'Matched private backing storage becomes intrinsic loads; no nested runtime field or new primitive constructor.'})
         continue
+    if file.startswith(('runtime/raven/generated/Value.', 'runtime/raven/generated/RuntimeTypeHandle.')):
+        rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-memberless-declaration',
+                     'tests': ['tests/erased_inputs.rs', 'tests/value_storage.rs', 'tests/raven_reflection.rs',
+                               'docs/experiments/raven-target/verify_declaration_library.py'],
+                     'note': 'Source declarations only; erased values and opaque type handles retain intrinsic runtime representations.'})
+        continue
     if file.startswith('runtime/raven/generated/Char.'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-char-struct',
                      'tests': ['tests/character_classification.rs', 'docs/experiments/raven-target/verify_scalar_library.py'],

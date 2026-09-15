@@ -57,4 +57,10 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Char'">
     <Compile Include="src/System/Char.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Value'">
+    <Compile Include="src/System/Value.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'RuntimeTypeHandle'">
+    <Compile Include="src/System/RuntimeTypeHandle.rvn" />
+  </ItemGroup>
 </Project>

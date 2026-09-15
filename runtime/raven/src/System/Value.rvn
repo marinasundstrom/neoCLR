@@ -1,0 +1,4 @@
+namespace System
+
+// Runtime representation remains intrinsic; this is the public declaration.
+public struct Value { }

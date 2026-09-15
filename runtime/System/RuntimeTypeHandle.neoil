@@ -1,3 +1,2 @@
-; Opaque owned metadata, not a guest address or an erased payload.
-.type System.RuntimeTypeHandle
-.end
+.include "../raven/generated/RuntimeTypeHandle.methods.neoil"
+.include "../raven/generated/RuntimeTypeHandle.helpers.neoil"

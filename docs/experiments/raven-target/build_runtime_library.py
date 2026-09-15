@@ -10,6 +10,8 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    'RuntimeTypeHandle': "System.RuntimeTypeHandle",
+    'Value': "System.Value",
     'Math': 'System.Math',
     'Linq': 'System.Linq.Operators',
     'Int32': 'System.Int32',
@@ -32,6 +34,8 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    'RuntimeTypeHandle': "runtime/raven/src/System/RuntimeTypeHandle.rvn",
+    'Value': "runtime/raven/src/System/Value.rvn",
     'Math': 'runtime/raven/src/System/Math/Functions.rvn',
     'Int32': 'runtime/raven/src/System/Int32/Functions.rvn',
     'Char': 'runtime/raven/src/System/Char.rvn',

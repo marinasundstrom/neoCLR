@@ -24,6 +24,15 @@ static class PrimitiveLibrary
     public static void Project(ModuleDefinition module)
     {
         var marker = module.GetType("System.Runtime.CompilerServices.IsReadOnlyAttribute").Methods.Single(m => m.IsConstructor);
+        // Empty compiler-facing declarations do not specify the runtime's opaque
+        // handle/erased-value representation or introduce a one-byte ABI.
+        foreach (var name in new[] { "System.Value", "System.RuntimeTypeHandle" })
+        {
+            var empty = module.GetType(name);
+            if (empty.HasFields || empty.HasMethods) throw new InvalidDataException("Expected memberless intrinsic declaration.");
+            empty.PackingSize = -1;
+            empty.ClassSize = -1;
+        }
         foreach (var (name, kind) in Kinds)
         {
             var type = module.GetType(name);

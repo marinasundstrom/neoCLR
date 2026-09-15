@@ -1,0 +1,3 @@
+; Generated from runtime/raven/src/System/RuntimeTypeHandle.rvn. Regenerate with build_runtime_library.py.
+.type System.RuntimeTypeHandle
+.end

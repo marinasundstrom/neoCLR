@@ -38,12 +38,16 @@
       ]
     },
     {
-      "file": "runtime/System/Value.neoil",
+      "file": "runtime/raven/generated/Value.methods.neoil",
       "declarations": 1,
-      "disposition": "signature-markers",
-      "samples": [
-        "library-void.rvn"
-      ]
+      "disposition": "raven-authored-memberless-declaration",
+      "tests": [
+        "tests/erased_inputs.rs",
+        "tests/value_storage.rs",
+        "tests/raven_reflection.rs",
+        "docs/experiments/raven-target/verify_declaration_library.py"
+      ],
+      "note": "Source declarations only; erased values and opaque type handles retain intrinsic runtime representations."
     },
     {
       "file": "runtime/System/Void.neoil",
@@ -944,13 +948,16 @@
       ]
     },
     {
-      "file": "runtime/System/RuntimeTypeHandle.neoil",
+      "file": "runtime/raven/generated/RuntimeTypeHandle.methods.neoil",
       "declarations": 1,
-      "disposition": "reflection",
-      "samples": [
-        "library-reflection.rvn",
-        "library-flags.rvn"
-      ]
+      "disposition": "raven-authored-memberless-declaration",
+      "tests": [
+        "tests/erased_inputs.rs",
+        "tests/value_storage.rs",
+        "tests/raven_reflection.rs",
+        "docs/experiments/raven-target/verify_declaration_library.py"
+      ],
+      "note": "Source declarations only; erased values and opaque type handles retain intrinsic runtime representations."
     },
     {
       "file": "runtime/System/Type.neoil",
