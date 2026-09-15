@@ -13,11 +13,34 @@ static class ApplicationTypes
     public static Func<TypeReference, string>? LibraryMap;
     static readonly Dictionary<string, TypeReference> LibraryReferenceTypes = new();
     static readonly Dictionary<string, TypeDefinition> LibraryReferences = new();
-    public static bool IsLibrary(TypeReference type) => LibraryNames.ContainsKey(type.Resolve());
+    static ModuleDefinition? LibraryModule;
+    static string? LibraryScope;
+    static readonly HashSet<TypeDefinition> LibraryDependencies = new();
+    public static void SetLibraryScope(ModuleDefinition module, string scope) { LibraryModule = module; LibraryScope = scope; }
+    static void RegisterLibraryDependency(TypeReference reference)
+    {
+        if (LibraryModule is null || reference is GenericParameter) return;
+        var element = reference.GetElementType();
+        if (element is GenericParameter || element.Scope is ModuleDefinition module && module != LibraryModule
+            || element.Scope is AssemblyNameReference assembly && assembly.FullName != LibraryModule.Assembly.Name.FullName) return;
+        var type = element.Resolve();
+        if (type is null || type.Module != LibraryModule || type.IsPublic || LibraryNames.ContainsKey(type)) return;
+        if (type.IsNested || type.IsValueType || type.IsInterface || type.IsAbstract || type.IsExplicitLayout
+            || type.BaseType?.FullName != "System.Object" || type.HasEvents
+            || type.GenericParameters.Any(p => p.HasConstraints || p.Attributes != GenericParameterAttributes.NonVariant)
+            || type.Fields.Any(f => !f.IsPrivate || f.IsStatic || f.IsInitOnly || f.HasMarshalInfo)
+            || type.Methods.Any(m => !m.IsPublic || !m.HasThis || !m.HasBody || m.HasGenericParameters
+                || m.Parameters.Any(p => p.IsOut || p.ParameterType.IsByReference)))
+            throw new InvalidDataException("Unsupported private library dependency: " + type.FullName);
+        LibraryNames.Add(type, "neoCLR.Library." + LibraryScope + ".Type_" + Convert.ToHexString(Encoding.UTF8.GetBytes(type.FullName)));
+        LibraryDependencies.Add(type);
+    }
+    public static bool IsLibraryDependency(TypeReference type) { RegisterLibraryDependency(type); return LibraryDependencies.Contains(type.Resolve()); }
+    public static bool IsLibrary(TypeReference type) { RegisterLibraryDependency(type); return LibraryNames.ContainsKey(type.Resolve()); }
     public static bool IsLibraryParameter(GenericParameter parameter) => parameter.Type == GenericParameterType.Type
         && parameter.Owner is TypeDefinition owner && LibraryNames.ContainsKey(owner);
     public static bool OnlyLibraryTypes => Types.Values.All(LibraryNames.ContainsKey);
-    public static void Reset(params ModuleDefinition[] modules) { LibraryMap = null; LibraryReferenceTypes.Clear(); LibraryReferences.Clear(); LibraryNames.Clear(); Modules.Clear(); Modules.UnionWith(modules); Types.Clear(); Expanded.Clear(); Adapters.Clear(); }
+    public static void Reset(params ModuleDefinition[] modules) { LibraryModule = null; LibraryScope = null; LibraryDependencies.Clear(); LibraryMap = null; LibraryReferenceTypes.Clear(); LibraryReferences.Clear(); LibraryNames.Clear(); Modules.Clear(); Modules.UnionWith(modules); Types.Clear(); Expanded.Clear(); Adapters.Clear(); }
     public static object[] IdentityMap() => Types.Select(p => (object)new {
         AssemblyIdentity = p.Value.Module.Assembly.Name.FullName, MetadataName = p.Value.FullName, RuntimeName = p.Key,
         Fields = p.Value.Fields.Select(f => new { MetadataName = f.Name, RuntimeName = MetadataIdentity.MemberName(f.Name) }).ToArray()
@@ -40,6 +63,7 @@ static class ApplicationTypes
     public static bool IsReference(string name) => (Types.TryGetValue(name, out var type) || LibraryReferences.TryGetValue(name, out type)) && !type.IsValueType;
     public static string? Type(TypeReference reference)
     {
+        RegisterLibraryDependency(reference);
         if (reference is ByReferenceType byref) return Type(byref.ElementType) is { } element ? element + "&" : null;
         if (reference is GenericInstanceType instance && LibraryNames.TryGetValue(instance.ElementType.Resolve(), out var libraryName))
         {
@@ -164,6 +188,7 @@ static class ApplicationTypes
         if (owner is not GenericInstanceType instance || !IsLibrary(owner)) return type;
         if (type is GenericParameter p && p.Type == GenericParameterType.Type
             && p.Owner == instance.ElementType.Resolve()) return instance.GenericArguments[p.Position];
+        if (type is ArrayType { IsVector: true } array) return new ArrayType(Close(array.ElementType, owner, depth + 1));
         if (type is GenericInstanceType generic)
         {
             var result = new GenericInstanceType(generic.ElementType);
@@ -184,7 +209,7 @@ static class ApplicationTypes
         while (Types.Any(t => !emitted.Contains(t.Key)))
         {
             var (name, type) = Types.First(t => !emitted.Contains(t.Key)); emitted.Add(name);
-            output.AppendLine(type.IsInterface ? $".interface {name}" : $".type {(type.IsValueType ? "" : "class ")}{(type.IsAbstract ? "abstract " : "")}{name}");
+            output.AppendLine(type.IsInterface ? $".interface {name}" : $".type {(LibraryDependencies.Contains(type) ? "internal " : "")}{(type.IsValueType ? "" : "class ")}{(type.IsAbstract ? "abstract " : "")}{name}");
             if (IsModule(type.BaseType?.Resolve()?.Module)) output.AppendLine(".extends " + map(type.BaseType, false));
             foreach (var contract in type.Interfaces) output.AppendLine(".implements " + map(contract.InterfaceType, false));
             foreach (var method in type.Methods.Where(m => m.IsAbstract))

@@ -105,6 +105,8 @@ static class LibraryImplementation
 
     public static bool SameType(TypeReference left, TypeReference right)
     {
+        if (left is ArrayType la)
+            return right is ArrayType ra && la.IsVector == ra.IsVector && la.Rank == ra.Rank && SameType(la.ElementType, ra.ElementType);
         if (left is GenericParameter lp)
             return right is GenericParameter rp && lp.Type == rp.Type && lp.Position == rp.Position;
         if (left is GenericInstanceType l)

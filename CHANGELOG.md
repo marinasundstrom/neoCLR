@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-15
 
+- Add bootstrap-only checked generic array storage and scoped internal helper classes
+  to matched Raven library imports. Keep consumer metadata and ordinary application
+  admission unchanged. Validate Int32/String/Void storage and private helper dispatch,
+  reject unwritten reads, invalid capacities and leaked helper contracts. Independently
+  fix imported generic calls and generic array operations in Raven main with .NET
+  execution tests and integration gates; retain neoCLR policy on its experimental track.
+
 - Permit class constructors to initialize delegate fields. Reserve those fields as
   typed uninitialized storage instead of trying to manufacture a default delegate;
   reject early reads and constructor return with an uninitialized field. Other

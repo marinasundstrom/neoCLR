@@ -10,6 +10,8 @@ from collection_library import build
 parser = argparse.ArgumentParser(description=__doc__)
 for name in ('compiler', 'bridge', 'runtime'):
     parser.add_argument('--' + name, required=True, type=Path)
+parser.add_argument("--checked-storage", action="store_true")
+parser.add_argument("--private-storage", action="store_true")
 args = parser.parse_args()
 compiler, bridge, runtime = (getattr(args, n).resolve() for n in ('compiler', 'bridge', 'runtime'))
 
@@ -61,7 +63,31 @@ public class Cell<T> : Iterable<T> {
 }
 '''
 
-    def compile(name, text):
+    if args.private_storage:
+        source = source.replace('private field stored: T', 'private field stored: Storage<T>')
+        source = source.replace('stored = value', 'stored.Set(value)')
+        source = source.replace('public init(value: T) {\n        stored.Set(value)', 'public init(value: T) {\n        stored = Storage<T>(value)')
+        source = source.replace('let value: T = stored', 'let value: T = stored.Read()')
+        source = source.replace('Cell<T>(stored)', 'Cell<T>(stored.Read())').replace('values.Add(stored)', 'values.Add(stored.Read())')
+        source += '\n' + '\n'.join([
+            'internal class Storage<T> {',
+            '    private field items: T[]',
+            '    public init(value: T) {',
+            '        items = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(1)',
+            '        items[0] = value',
+            '    }',
+            '    public func Set(value: T) { items[0] = value }',
+            '    public func Read() -> T { return items[0] }',
+            '}',
+        ])
+    elif args.checked_storage:
+        source = source.replace('private field stored: T', 'private field stored: T[]')
+        source = source.replace('stored = value', 'stored[0] = value')
+        source = source.replace('public init(value: T) {', 'public init(value: T) {\n        stored = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(1)')
+        source = source.replace('let value: T = stored', 'let value: T = stored[0]')
+        source = source.replace('Cell<T>(stored)', 'Cell<T>(stored[0])').replace('values.Add(stored)', 'values.Add(stored[0])')
+
+    def compile(name, text, success=True):
         folder = root / name
         folder.mkdir()
         (folder / 'Main.rvn').write_text(text)
@@ -70,7 +96,9 @@ public class Cell<T> : Iterable<T> {
 <AssemblyName>{name}</AssemblyName><NeoCLRRoot>{escape(str(root))}</NeoCLRRoot></PropertyGroup>
 <Import Project="{escape(str(ROOT / 'build/NeoCLR.Raven.props'))}" />
 <ItemGroup><Compile Include="Main.rvn" /></ItemGroup></Project>''')
-        run(['dotnet', compiler, project, '--no-project-restore', '-o', folder / 'compiled'])
+        diagnostic = run(['dotnet', compiler, project, '--no-project-restore', '-o', folder / 'compiled'], success)
+        if not success:
+            return diagnostic
         return folder / 'compiled' / (name + '.dll')
 
     image = compile('GenericInstance', source)
@@ -127,4 +155,40 @@ callvirt instance {iterator}::get_Current()
         diagnostic = run(['dotnet', bridge, '--library-implementation', bad, core, 'Probe.Cell', output], False)
         assert 'match reference contract' in diagnostic, diagnostic
         assert not (output / 'Implementation.neoil').exists()
+    if args.checked_storage or args.private_storage:
+        slot = 'items' if args.private_storage else 'stored'
+        for name, invalid, expected in [
+            ('Unreadable', source.replace(slot + '[0] = value', '', 1), 'uninitialized'),
+            ('ZeroCapacity', source.replace('Reserve<T>(1)', 'Reserve<T>(0)'), 'out of range'),
+            ('NegativeCapacity', source.replace('Reserve<T>(1)', 'Reserve<T>(-1)'), 'non-negative'),
+        ]:
+            bad = compile(name, invalid)
+            output = root / name / 'imported'
+            run(['dotnet', bridge, '--library-implementation', bad, core, 'Probe.Cell', output])
+            app = root / name / 'App.neoil'
+            app.write_text('.module StorageFailure\n.entry Main\n' + (output / 'Implementation.neoil').read_text() +
+                '\n.function Main() -> void\nldc.i4 42\nnewobj instance Probe.Cell<Int32>::.ctor(Int32)\ncall instance Probe.Cell<Int32>::get_Value()\npop\nret\n.end\n')
+            diagnostic = run([runtime, 'run', app, '--system', system], False)
+            assert expected in diagnostic, diagnostic
+        print('Checked storage rejects unwritten reads, zero-capacity stores and negative capacity')
+    if args.private_storage:
+        for name, invalid, expected in [
+            ('PublicDependency', source.replace('internal class Storage', 'public class Storage'), 'Unsupported application'),
+            ('PublicStorage', source.replace('private field items', 'public field items'), 'Unsupported private library dependency'),
+        ]:
+            bad = compile(name, invalid)
+            output = root / name / 'imported'
+            diagnostic = run(['dotnet', bridge, '--library-implementation', bad, core, 'Probe.Cell', output], False)
+            assert expected in diagnostic, diagnostic
+            assert not (output / 'Implementation.neoil').exists()
+        print('Public helper identities and exposed implementation state are rejected')
+    if args.checked_storage or args.private_storage:
+        saved = core.read_bytes()
+        try:
+            run(['dotnet', bridge, '--reference-core', core])
+            diagnostic = compile('ConsumerCore', source, False)
+            assert 'error RAV0234' in diagnostic, diagnostic
+        finally:
+            core.write_bytes(saved)
+        print('The ordinary consumer core does not expose checked storage')
     print('Generic instance fields, constructors, self signatures, Iterable dispatch and Int32/String/Void payloads passed; arity/interface mismatches rejected')

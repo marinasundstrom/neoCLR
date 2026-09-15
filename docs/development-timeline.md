@@ -3359,3 +3359,21 @@ aborting an embedding host and made no cleanup guarantee. The compiler's recogni
 of non-returning calls is a separate open issue; no name-specific Raven policy was added.
 See [the contract and validation](system-fault.md). This provides a library fault API;
 checked generic storage and private query implementation dependencies remain migration work.
+
+
+## 2026-09-15 — Confirming Raven fixes against .NET
+
+**User question:** “You do verify bugs in Raven with its .NET target, do you?”
+
+**Assistant response and action:** Confirmed that the imported-generic-method repro
+uses an independent C# library and executes on .NET 11 under default and explicit
+System.Runtime metadata options. Two explicit-metadata cases failed before the fix.
+A separate generic-array repro subsequently crashed its isolated .NET test host;
+typed element access repaired that general emission defect.
+
+**Outcome:** Integrated the fixes separately into Raven main as `730adc7b0` and
+`8dfb64a2b` after focused tests and the bounded integration gates passed, then retained
+the experimental cherry-picks separately. Removed the temporary general branches.
+No .NET Framework/NanoFramework execution was claimed. Checked storage and private
+library-helper admission remain specific to the neoCLR experiment. See
+[the evaluation and validation](raven-target-evaluation.md).

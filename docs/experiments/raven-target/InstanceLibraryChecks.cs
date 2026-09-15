@@ -6,7 +6,7 @@ static class InstanceLibraryChecks
 {
     public static void WriteCore(string path, bool generic = false)
     {
-        CoreDeclarations.Write(path, unionProbe: true, collectionProbe: true);
+        CoreDeclarations.Write(path, unionProbe: true, collectionProbe: true, libraryBootstrap: generic);
         using var core = AssemblyDefinition.ReadAssembly(path, new ReaderParameters { InMemory = true });
         var module = core.MainModule;
         var type = new TypeDefinition("Probe", generic ? "Cell`1" : "Counter", TypeAttributes.Public | TypeAttributes.Sealed, module.GetType("System.Object"));

@@ -27,3 +27,21 @@ using newarr. Its eventual encoding as an intrinsic/helper when the binary loade
 grows is provisional. The original Neo library keeps its existing array.alloc
 profile. Regression tests cover publication, direct/indirect unreadable-slot faults,
 union capacity and unchanged ordinary array defaults.
+
+
+## Raven library authoring — 2026-09-15
+
+The bootstrap reference assembly has a provisional
+`System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(length: int) -> T[]`
+contract. Only `--reference-library-core` includes it; the normal consumer reference
+assembly does not. Only matched library implementation imports recognize the call.
+Raven emits an ordinary generic CLI call and the library importer lowers its validated
+signature to `array.reserve T`. Compiler configuration and ordinary `newarr` behavior
+are unchanged. The reserved array uses normal indexing and length access; each element
+must be stored before reading. This exposes existing runtime behavior to library
+source rather than adding a public allocation API.
+
+The intrinsic is bootstrap machinery and its placement is provisional. The .NET
+comparison and read-check tradeoff above still apply. It is not an unsafe request to
+expose uninitialized bytes. The importer retains generic element identity across
+fields, locals and array instructions, including Void as an actual generic element.

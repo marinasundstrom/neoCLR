@@ -856,3 +856,27 @@ new Runtime Contract setting is required. `verify_fault.py` checks computed-mess
 reporting and guest termination. Non-returning-call flow analysis is not introduced;
 checked generic storage and private implementation dependency support remain necessary
 for deferred query migration.
+
+
+### Generic calls and array access verified independently on .NET — 2026-09-15
+
+Two general compiler fixes were integrated into Raven main independently of the
+neoCLR experiment:
+
+- `730adc7b0`: use metadata MethodSpec construction for imported generic calls with
+  source type/method arguments under explicit metadata-core emission. The two affected
+  cases failed before the fix; four .NET execution cases now pass (12 focused checks).
+- `8dfb64a2b`: use typed generic array access for source type/method parameters,
+  including literals and indexed iteration. The isolated .NET repro crashed before
+  the fix; six cases now preserve integers, references and wide value elements
+  (14 focused checks).
+
+Both passed the bounded integration gate: 311 compiler checks on .NET 11, 73 core
+and 249 language-server checks on .NET 10, with three existing skips. They are
+cherry-picked onto the experimental branch; the general branches were removed.
+No neoCLR-specific policy or test entered Raven main. Framework/NanoFramework
+execution was not tested.
+
+CheckedStorage and private implementation-type admission remain in the neoCLR
+library importer. They add no Runtime Contract option or Raven compiler special case.
+See [the library authoring limits and validation](raven-system-library.md).

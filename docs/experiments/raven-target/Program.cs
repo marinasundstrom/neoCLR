@@ -91,6 +91,12 @@ if (args.Length == 2 && args[0] == "--generic-library-core")
     return;
 }
 
+if (args.Length == 2 && args[0] == "--reference-library-core")
+{
+    CoreDeclarations.Write(args[1], unionProbe: true, collectionProbe: true, libraryBootstrap: true);
+    return;
+}
+
 if (args.Length == 2 && args[0] == "--reference-core")
 {
     CoreDeclarations.Write(args[1], unionProbe: true, collectionProbe: true);

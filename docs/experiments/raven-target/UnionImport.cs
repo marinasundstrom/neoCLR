@@ -50,6 +50,7 @@ static class UnionImport
             throw new InvalidDataException("Module initializers unsupported.");
         ApplicationTypes.Reset(guestLibraries.Append(app.MainModule).ToArray());
         var exports = libraryOwner is null ? [] : LibraryImplementation.Roots(app.MainModule, library.MainModule, libraryOwner);
+        if (libraryOwner is not null) ApplicationTypes.SetLibraryScope(app.MainModule, libraryOwner);
         var entry = libraryOwner is null ? app.EntryPoint ?? throw new InvalidDataException("Missing entry point.") : null;
         string Name(MethodDefinition method) => libraryOwner is null ? MetadataIdentity.FunctionName(method)
             : exports.Contains(method) ? libraryOwner + "." + LibraryImplementation.GenericName(method)
@@ -66,6 +67,8 @@ static class UnionImport
                     throw new InvalidDataException("Foreign generic parameter in library body.");
                 return "T" + parameter.Position;
             }
+            if (libraryOwner is not null && type is ArrayType { IsVector: true } array)
+                return "arrayref<" + ProfileType(array.ElementType) + ">";
             var collection = CollectionBindings.Type(type, libraryOwner is null ? null : t => ProfileType(t));
             if (collection is not null && collectionProfile) return collection;
             return ApplicationTypes.Type(type) ?? InterfaceBindings.Type(type) ?? NativeMemoryBindings.Type(type) ?? ReflectionBindings.Type(type) ?? DelegateBindings.Type(type) ?? ProcessBindings.ArrayType(type) ?? GenericUnionBindings.Type(type) ?? CalendarBindings.Type(type) ?? PrimitiveBindings.Type(type) ?? ResultBindings.Type(type) ?? Type(type, result);
@@ -102,7 +105,7 @@ static class UnionImport
             if (!seen.Add(method)) continue;
             var methodId = seen.Count;
             if (seen.Count > 128) throw new InvalidDataException("Method limit exceeded.");
-            if (libraryOwner is not null && !exports.Contains(method)) throw new InvalidDataException("Unexported library body.");
+            if (libraryOwner is not null && !exports.Contains(method) && !ApplicationTypes.IsLibraryDependency(method.DeclaringType)) throw new InvalidDataException("Unexported library body.");
             activeLibraryMethod = libraryOwner is null ? null : method;
             if (libraryOwner is null) ApplicationTypes.CheckMethod(method);
             else LibraryImplementation.CheckMethod(method);
@@ -593,13 +596,15 @@ static class UnionImport
                         {
                             if (targetMethod.IsConstructor && targetMethod.DeclaringType.FullName is "System.Object" or "System.ValueType" && targetMethod.Parameters.Count == 0 && method.IsConstructor && method.DeclaringType.BaseType?.FullName == targetMethod.DeclaringType.FullName && instruction.OpCode.Code == Code.Call)
                             { Expect(ApplicationTypes.Receiver(method)); code.AppendLine("pop"); break; }
+                            var checkedStorage = libraryOwner is null ? null : CheckedStorageBindings.Bind(reference, targetMethod, t => ProfileType(t));
                             var interfaceCall = collectionProfile ? InterfaceBindings.Bind(reference, targetMethod) : null;
                             var nativeCall = collectionProfile ? NativeMemoryBindings.Bind(reference, targetMethod) : null;
                             var reflectionCall = collectionProfile ? ReflectionBindings.Bind(reference, targetMethod) : null;
                             var queryCall = collectionProfile ? QueryBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt) : null;
                             var arrayCallback = collectionProfile ? ArrayCallbackBindings.Bind(reference, targetMethod) : null;
                             var delegateCall = DelegateBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt);
-                            if (interfaceCall is not null) call = new(interfaceCall.Name, interfaceCall.Arguments, interfaceCall.Result, Instruction: interfaceCall.Instruction);
+                            if (checkedStorage is not null) call = new(checkedStorage.Name, checkedStorage.Arguments, checkedStorage.Result, Instruction: checkedStorage.Instruction);
+                            else if (interfaceCall is not null) call = new(interfaceCall.Name, interfaceCall.Arguments, interfaceCall.Result, Instruction: interfaceCall.Instruction);
                             else if (nativeCall is not null) call = new(nativeCall.Name, nativeCall.Arguments, nativeCall.Result);
                             else if (reflectionCall is not null) call = new(reflectionCall.Name, reflectionCall.Arguments, reflectionCall.Result);
                             else if (queryCall is not null) call = new(queryCall.Name, queryCall.Arguments, queryCall.Result);

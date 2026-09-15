@@ -349,3 +349,39 @@ new Runtime Contract setting is required. `verify_fault.py` checks computed-mess
 reporting and guest termination. Non-returning-call flow analysis is not introduced;
 checked generic storage and private implementation dependency support remain necessary
 for deferred query migration.
+
+
+### Checked storage and private implementation dependencies — 2026-09-15
+
+The library importer now admits reachable nonpublic, nongeneric or unconstrained
+generic helper classes from the implementation module. They receive internal runtime
+identities scoped to the selected library owner and encoded from their metadata name.
+They must have private mutable fields, public instance bodies, an Object base and no
+nested types, events, generic methods or custom layouts. Exported signatures still
+match the separate consumer reference contract; helpers do not become public API.
+Public unmatched generic types and exposed helper state are rejected. Ordinary guest
+generic-type admission is unchanged.
+
+`--reference-library-core` produces a bootstrap-only reference surface containing
+[checked array reservation](reserved-array-capacity.md). The consumer `--reference-core`
+surface excludes that intrinsic. Generic vector signatures, field substitution and
+method-parameter substitution preserve the caller's element identity; array reads
+and writes still undergo runtime type and initialization checks. No new opcode or
+Raven target configuration is required. Private type admission is a bounded migration
+mechanism, not general CLR library loading or support for arbitrary helper shapes.
+
+The generic instance probe can exercise direct checked storage or a private Storage<T>
+helper with `--checked-storage` or `--private-storage`. Both variants execute Int32,
+String and Void payloads, copies, mutation and Iterable dispatch; they check unwritten
+reads, zero/negative capacity, invalid exported contracts and absence of the intrinsic
+from the consumer core. The private variant also rejects public helper identities and
+public storage fields. Existing generic and nongeneric instance probes still pass.
+
+Two general Raven defects were validated independently with .NET 11 execution and
+integrated separately: `730adc7b0` handles imported generic calls with source parameters
+under explicit metadata-core settings; `8dfb64a2b` preserves generic array element types
+for loads, stores, literals and iteration. Their experimental cherry-picks are
+`f507ce44a` and `cfbdefa7b`. The focused suites passed 12 and 14 tests respectively.
+Each main integration passed 311 compiler, 73 core and 249 language-server checks
+(three existing skips). The new execution tests use default and explicit System.Runtime
+metadata options; no .NET Framework or NanoFramework execution is claimed.

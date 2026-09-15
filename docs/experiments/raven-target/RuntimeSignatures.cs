@@ -18,7 +18,8 @@ static class RuntimeSignatures
                 if (method is null && allowOpenMethodParameters) return parameter;
                 if (method is null || parameter.Position < 0 || parameter.Position >= method.GenericArguments.Count)
                     throw new InvalidDataException("Unsupported open method signature parameter.");
-                return Nested(method.GenericArguments[parameter.Position]);
+                var argument = method.GenericArguments[parameter.Position];
+                return allowOpenMethodParameters ? argument : Nested(argument);
             }
             if (parameter.Type != GenericParameterType.Type || owner is not GenericInstanceType generic
                 || parameter.Position < 0 || parameter.Position >= generic.GenericArguments.Count)
