@@ -3377,3 +3377,21 @@ the experimental cherry-picks separately. Removed the temporary general branches
 No .NET Framework/NanoFramework execution was claimed. Checked storage and private
 library-helper admission remain specific to the neoCLR experiment. See
 [the evaluation and validation](raven-target-evaluation.md).
+
+## 2026-09-15 — Minimal Unicode-centred text model proposal
+
+**Author proposal:** Refine the text direction to a small Unicode-centred model:
+Unicode supplies the semantics, String uses canonical UTF-8 storage, UTF-8 and UTF-16
+are explicit representation views, and ASCII is a constrained subset rather than a
+separate text system. The proposal makes Char a Unicode scalar value, suggests
+`AsciiChar`/`AsciiString` constrained representations and explicit Result-based ASCII
+narrowing, and leaves other encodings as `Encoding` codecs. The supplied Raven-shaped
+examples are illustrative; their validity in Raven was not asserted.
+
+**Assistant action and outcome:** Recorded this as a substantive proposal in the
+[text-model review](text-model.md#minimal-unicode-centred-model-proposal-2026-09-15),
+including the conflict with the currently implemented UTF-16 code-unit Char contract,
+the .NET-compatible alternative, migration costs and validation needs. No compiler,
+runtime, metadata or String API behavior was changed. The choice between the existing
+Char/Rune split, a scalar-oriented String with a compatibility Char view, and the
+minimal scalar model remains open.

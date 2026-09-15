@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-15
 
+- Record a new provisional Unicode-centred text-model proposal: canonical UTF-8 String
+  storage, explicit UTF-8/UTF-16 representation views, constrained ASCII subset types
+  and codec-based handling of other encodings. Mark the Raven-shaped examples as design
+  notation only. Preserve the current UTF-16 code-unit Char contract until migration,
+  metadata, interop and validation questions are resolved; no implementation changes.
+
 - Add the first matched Raven value-library gate: sequential nongeneric scalar records
   must match reference field layout, representation and public instance contracts.
   Preserve instance ownership for value constructors and constructor debug identities;

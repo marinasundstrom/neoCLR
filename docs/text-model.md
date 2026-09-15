@@ -138,3 +138,44 @@ already distinguishes Char, Rune and text elements; those are useful precedents.
 [UTF8Encoding](https://learn.microsoft.com/en-us/dotnet/api/system.text.utf8encoding.-ctor?view=net-10.0)
 provides configurable invalid-input handling. Our proposed difference is a focused
 UTF-8-first surface with Result-based failures, not invention of Unicode-aware APIs.
+
+## Minimal Unicode-centred model proposal (2026-09-15)
+
+The author proposed reducing the model to one semantic foundation: Unicode text,
+with canonical UTF-8 String storage and explicit UTF-8/UTF-16 representation views.
+ASCII is a Unicode subset rather than a parallel text system; Latin-1, Windows-1252,
+Shift-JIS and similar formats remain codecs exposed through Encoding. The following
+examples are design notation only, not claims that the current Raven compiler accepts
+these declarations or literals:
+
+```text
+Unicode
+  ├─ String / Char       semantic text values
+  ├─ UTF-8               Byte representation
+  └─ UTF-16              UInt16 representation
+```
+
+The proposed core would therefore define `Char` as one Unicode scalar value, permit
+examples such as `Char('😀')`, and make `AsciiChar`/`AsciiString` constrained
+representation types. Lossless widening would be available from an ASCII subset to
+UTF-8 and then to String; narrowing would validate explicitly, for example
+`AsciiString.From(text) -> Result<AsciiString, AsciiError>`. `Encoding` would translate
+between external bytes and Unicode String rather than add formats to String itself.
+
+This is a substantive reopening of the current contract, not an implementation update.
+The implemented neoCLR `Char` and the documented .NET-compatible comparison currently
+use UTF-16 code-unit semantics, while the earlier review kept `Rune` and `Char`
+separate. The proposal's main benefit is a small, coherent semantic core: ordinary text
+operations need not expose encoding families, and ASCII guarantees can be carried by
+types. Its costs are compatibility and migration impact for existing `Char` literals,
+predicates, ordering and metadata; a scalar is also not necessarily a user-perceived
+grapheme. A constrained ASCII type adds conversion and generic/reflection surface, and
+canonical UTF-8 does not remove the need for UTF-16 copies at .NET boundaries.
+
+The alternatives remain open: retain the familiar .NET split (`Char` plus `Rune`),
+make String scalar-oriented while retaining a UTF-16-compatible Char view, or adopt the
+minimal scalar model above. No choice has been made. Before implementation, compare
+the alternatives against current .NET `Char`/`Rune`/encoding contracts and the CLI
+metadata representation, then validate literals, indexing/iteration, malformed input,
+unpaired UTF-16 surrogates, ASCII narrowing, generic constraints, reflection and
+interop. Existing String slicing and ordinal comparison must not silently change.
