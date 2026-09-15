@@ -1,0 +1,35 @@
+namespace System.IO.File
+
+import System.IO.FileWriteError
+import System.Result.*
+import System.Runtime.CompilerServices.RuntimeServices
+
+public func WriteAllText(path: string, text: string, maxBytes: int) -> System.Result<System.Void, FileWriteError> {
+    let status = RuntimeServices.WriteAllText(path, text, maxBytes)
+    if status == 0 {
+        return Ok(())
+    }
+    if status == 1 {
+        return Error(FileWriteError(FileWriteError.InvalidLimit()))
+    }
+    if status == 2 {
+        return Error(FileWriteError(FileWriteError.InvalidPath()))
+    }
+    if status == 3 {
+        return Error(FileWriteError(FileWriteError.NotFound()))
+    }
+    if status == 4 {
+        return Error(FileWriteError(FileWriteError.AccessDenied()))
+    }
+    if status == 5 {
+        return Error(FileWriteError(FileWriteError.NotRegularFile()))
+    }
+    if status == 6 {
+        return Error(FileWriteError(FileWriteError.WriteFailed()))
+    }
+    if status == 7 {
+        return Error(FileWriteError(FileWriteError.TooLarge()))
+    }
+    System.Fault("invalid native file write status")
+    return Error(FileWriteError(FileWriteError.WriteFailed()))
+}

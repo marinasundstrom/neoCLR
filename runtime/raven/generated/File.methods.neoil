@@ -1,0 +1,224 @@
+; Generated from runtime/raven/src/System/IO/File/Functions.rvn. Regenerate with build_runtime_library.py.
+.method static WriteAllText(String path,String text,Int32 maxBytes) -> System.Result<Void,System.IO.FileWriteError>
+.local Int32 local0
+.local Void local1
+ldc.i4 0
+stloc local0
+ldvoid
+stloc local1
+M00000001_IL_0000:
+M00000001_IL_0001:
+M00000001_IL_0002:
+ldarg 0
+M00000001_IL_0003:
+ldarg 1
+M00000001_IL_0004:
+ldarg 2
+M00000001_IL_0005:
+call neoCLR.Runtime.WriteAllText(String,String,Int32)
+M00000001_IL_000a:
+stloc local0
+M00000001_IL_000b:
+M00000001_IL_000c:
+ldloc local0
+M00000001_IL_000d:
+ldc.i4 0
+M00000001_IL_000e:
+ceq
+call neoCLR.Library.System.IO.File.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_0010:
+brtrue M00000001_IL_001a
+M00000001_IL_0015:
+br M00000001_IL_0034
+M00000001_IL_001a:
+M00000001_IL_001b:
+ldloca local1
+M00000001_IL_001f:
+ldvoid
+stobj Void
+M00000001_IL_0025:
+ldloc local1
+M00000001_IL_0029:
+call neoCLR.Library.System.IO.File.RuntimeUnion0(Void)
+M00000001_IL_002e:
+call neoCLR.Library.System.IO.File.RuntimeUnion1(System.Result.Ok<Void>)
+M00000001_IL_0033:
+ret
+M00000001_IL_0034:
+M00000001_IL_0035:
+M00000001_IL_0036:
+ldloc local0
+M00000001_IL_0037:
+ldc.i4 1
+M00000001_IL_0038:
+ceq
+call neoCLR.Library.System.IO.File.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_003a:
+brtrue M00000001_IL_0044
+M00000001_IL_003f:
+br M00000001_IL_0059
+M00000001_IL_0044:
+call neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorInvalidLimitNew()
+M00000001_IL_0049:
+call neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorNewSystemIOFileWriteErrorInvalidLimit(System.IO.FileWriteError.InvalidLimit)
+M00000001_IL_004e:
+call neoCLR.Library.System.IO.File.RuntimeUnion2(System.IO.FileWriteError)
+M00000001_IL_0053:
+call neoCLR.Library.System.IO.File.RuntimeUnion3(System.Result.Error<System.IO.FileWriteError>)
+M00000001_IL_0058:
+ret
+M00000001_IL_0059:
+M00000001_IL_005a:
+M00000001_IL_005b:
+ldloc local0
+M00000001_IL_005c:
+ldc.i4 2
+M00000001_IL_005d:
+ceq
+call neoCLR.Library.System.IO.File.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_005f:
+brtrue M00000001_IL_0069
+M00000001_IL_0064:
+br M00000001_IL_007e
+M00000001_IL_0069:
+call neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorInvalidPathNew()
+M00000001_IL_006e:
+call neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorNewSystemIOFileWriteErrorInvalidPath(System.IO.FileWriteError.InvalidPath)
+M00000001_IL_0073:
+call neoCLR.Library.System.IO.File.RuntimeUnion2(System.IO.FileWriteError)
+M00000001_IL_0078:
+call neoCLR.Library.System.IO.File.RuntimeUnion3(System.Result.Error<System.IO.FileWriteError>)
+M00000001_IL_007d:
+ret
+M00000001_IL_007e:
+M00000001_IL_007f:
+M00000001_IL_0080:
+ldloc local0
+M00000001_IL_0081:
+ldc.i4 3
+M00000001_IL_0082:
+ceq
+call neoCLR.Library.System.IO.File.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_0084:
+brtrue M00000001_IL_008e
+M00000001_IL_0089:
+br M00000001_IL_00a3
+M00000001_IL_008e:
+call neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorNotFoundNew()
+M00000001_IL_0093:
+call neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorNewSystemIOFileWriteErrorNotFound(System.IO.FileWriteError.NotFound)
+M00000001_IL_0098:
+call neoCLR.Library.System.IO.File.RuntimeUnion2(System.IO.FileWriteError)
+M00000001_IL_009d:
+call neoCLR.Library.System.IO.File.RuntimeUnion3(System.Result.Error<System.IO.FileWriteError>)
+M00000001_IL_00a2:
+ret
+M00000001_IL_00a3:
+M00000001_IL_00a4:
+M00000001_IL_00a5:
+ldloc local0
+M00000001_IL_00a6:
+ldc.i4 4
+M00000001_IL_00a7:
+ceq
+call neoCLR.Library.System.IO.File.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_00a9:
+brtrue M00000001_IL_00b3
+M00000001_IL_00ae:
+br M00000001_IL_00c8
+M00000001_IL_00b3:
+call neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorAccessDeniedNew()
+M00000001_IL_00b8:
+call neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorNewSystemIOFileWriteErrorAccessDenied(System.IO.FileWriteError.AccessDenied)
+M00000001_IL_00bd:
+call neoCLR.Library.System.IO.File.RuntimeUnion2(System.IO.FileWriteError)
+M00000001_IL_00c2:
+call neoCLR.Library.System.IO.File.RuntimeUnion3(System.Result.Error<System.IO.FileWriteError>)
+M00000001_IL_00c7:
+ret
+M00000001_IL_00c8:
+M00000001_IL_00c9:
+M00000001_IL_00ca:
+ldloc local0
+M00000001_IL_00cb:
+ldc.i4 5
+M00000001_IL_00cc:
+ceq
+call neoCLR.Library.System.IO.File.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_00ce:
+brtrue M00000001_IL_00d8
+M00000001_IL_00d3:
+br M00000001_IL_00ed
+M00000001_IL_00d8:
+call neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorNotRegularFileNew()
+M00000001_IL_00dd:
+call neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorNewSystemIOFileWriteErrorNotRegularFile(System.IO.FileWriteError.NotRegularFile)
+M00000001_IL_00e2:
+call neoCLR.Library.System.IO.File.RuntimeUnion2(System.IO.FileWriteError)
+M00000001_IL_00e7:
+call neoCLR.Library.System.IO.File.RuntimeUnion3(System.Result.Error<System.IO.FileWriteError>)
+M00000001_IL_00ec:
+ret
+M00000001_IL_00ed:
+M00000001_IL_00ee:
+M00000001_IL_00ef:
+ldloc local0
+M00000001_IL_00f0:
+ldc.i4 6
+M00000001_IL_00f1:
+ceq
+call neoCLR.Library.System.IO.File.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_00f3:
+brtrue M00000001_IL_00fd
+M00000001_IL_00f8:
+br M00000001_IL_0112
+M00000001_IL_00fd:
+call neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorWriteFailedNew()
+M00000001_IL_0102:
+call neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorNewSystemIOFileWriteErrorWriteFailed(System.IO.FileWriteError.WriteFailed)
+M00000001_IL_0107:
+call neoCLR.Library.System.IO.File.RuntimeUnion2(System.IO.FileWriteError)
+M00000001_IL_010c:
+call neoCLR.Library.System.IO.File.RuntimeUnion3(System.Result.Error<System.IO.FileWriteError>)
+M00000001_IL_0111:
+ret
+M00000001_IL_0112:
+M00000001_IL_0113:
+M00000001_IL_0114:
+ldloc local0
+M00000001_IL_0115:
+ldc.i4 7
+M00000001_IL_0116:
+ceq
+call neoCLR.Library.System.IO.File.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_0118:
+brtrue M00000001_IL_0122
+M00000001_IL_011d:
+br M00000001_IL_0137
+M00000001_IL_0122:
+call neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorTooLargeNew()
+M00000001_IL_0127:
+call neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorNewSystemIOFileWriteErrorTooLarge(System.IO.FileWriteError.TooLarge)
+M00000001_IL_012c:
+call neoCLR.Library.System.IO.File.RuntimeUnion2(System.IO.FileWriteError)
+M00000001_IL_0131:
+call neoCLR.Library.System.IO.File.RuntimeUnion3(System.Result.Error<System.IO.FileWriteError>)
+M00000001_IL_0136:
+ret
+M00000001_IL_0137:
+M00000001_IL_0138:
+M00000001_IL_0139:
+ldstr "invalid native file write status"
+M00000001_IL_013e:
+call System.Fault(String)
+M00000001_IL_0143:
+call neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorWriteFailedNew()
+M00000001_IL_0148:
+call neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorNewSystemIOFileWriteErrorWriteFailed(System.IO.FileWriteError.WriteFailed)
+M00000001_IL_014d:
+call neoCLR.Library.System.IO.File.RuntimeUnion2(System.IO.FileWriteError)
+M00000001_IL_0152:
+call neoCLR.Library.System.IO.File.RuntimeUnion3(System.Result.Error<System.IO.FileWriteError>)
+M00000001_IL_0157:
+ret
+.end

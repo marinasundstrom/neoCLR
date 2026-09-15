@@ -9,8 +9,8 @@ import subprocess
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
-SLICES = {"Math": "System.Math", "Linq": "System.Linq.Operators", "Int32": "System.Int32", "Char": "System.Char", "ArrayList": "System.Collections.ArrayList", "HashMap": "System.Collections.HashMap", "Time": "System.Time", "Date": "System.Date", "Path": "System.IO.Path"}
-SOURCES = {'Math': 'runtime/raven/src/System/Math/Functions.rvn', 'Int32': 'runtime/raven/src/System/Int32/Functions.rvn', 'Char': 'runtime/raven/src/System/Char/Functions.rvn', 'Linq': 'runtime/raven/src/System/Linq/Operators.rvn', 'ArrayList': 'runtime/raven/src/System/Collections/ArrayList.rvn', 'HashMap': 'runtime/raven/src/System/Collections/HashMap.rvn', 'Time': 'runtime/raven/src/System/Time.rvn', 'Date': 'runtime/raven/src/System/Date.rvn', 'Path': 'runtime/raven/src/System/IO/Path/Functions.rvn'}
+SLICES = {"Math": "System.Math", "Linq": "System.Linq.Operators", "Int32": "System.Int32", "Char": "System.Char", "ArrayList": "System.Collections.ArrayList", "HashMap": "System.Collections.HashMap", "Time": "System.Time", "Date": "System.Date", "Path": "System.IO.Path", "File": "System.IO.File"}
+SOURCES = {'Math': 'runtime/raven/src/System/Math/Functions.rvn', 'Int32': 'runtime/raven/src/System/Int32/Functions.rvn', 'Char': 'runtime/raven/src/System/Char/Functions.rvn', 'Linq': 'runtime/raven/src/System/Linq/Operators.rvn', 'ArrayList': 'runtime/raven/src/System/Collections/ArrayList.rvn', 'HashMap': 'runtime/raven/src/System/Collections/HashMap.rvn', 'Time': 'runtime/raven/src/System/Time.rvn', 'Date': 'runtime/raven/src/System/Date.rvn', 'Path': 'runtime/raven/src/System/IO/Path/Functions.rvn', 'File': 'runtime/raven/src/System/IO/File/Functions.rvn'}
 PROJECT = ROOT / 'runtime/raven/System.rvnproj'
 GENERATED = ROOT / 'runtime/raven/generated'
 

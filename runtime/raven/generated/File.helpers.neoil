@@ -1,0 +1,93 @@
+; Generated from runtime/raven/src/System/IO/File/Functions.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorNewSystemIOFileWriteErrorInvalidLimit(System.IO.FileWriteError.InvalidLimit value) -> System.IO.FileWriteError
+ldarg value
+newobj instance System.IO.FileWriteError::.ctor(System.IO.FileWriteError.InvalidLimit)
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorNewSystemIOFileWriteErrorInvalidPath(System.IO.FileWriteError.InvalidPath value) -> System.IO.FileWriteError
+ldarg value
+newobj instance System.IO.FileWriteError::.ctor(System.IO.FileWriteError.InvalidPath)
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorNewSystemIOFileWriteErrorNotFound(System.IO.FileWriteError.NotFound value) -> System.IO.FileWriteError
+ldarg value
+newobj instance System.IO.FileWriteError::.ctor(System.IO.FileWriteError.NotFound)
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorNewSystemIOFileWriteErrorAccessDenied(System.IO.FileWriteError.AccessDenied value) -> System.IO.FileWriteError
+ldarg value
+newobj instance System.IO.FileWriteError::.ctor(System.IO.FileWriteError.AccessDenied)
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorNewSystemIOFileWriteErrorNotRegularFile(System.IO.FileWriteError.NotRegularFile value) -> System.IO.FileWriteError
+ldarg value
+newobj instance System.IO.FileWriteError::.ctor(System.IO.FileWriteError.NotRegularFile)
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorNewSystemIOFileWriteErrorTooLarge(System.IO.FileWriteError.TooLarge value) -> System.IO.FileWriteError
+ldarg value
+newobj instance System.IO.FileWriteError::.ctor(System.IO.FileWriteError.TooLarge)
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorNewSystemIOFileWriteErrorWriteFailed(System.IO.FileWriteError.WriteFailed value) -> System.IO.FileWriteError
+ldarg value
+newobj instance System.IO.FileWriteError::.ctor(System.IO.FileWriteError.WriteFailed)
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorInvalidLimitNew() -> System.IO.FileWriteError.InvalidLimit
+newobj instance System.IO.FileWriteError.InvalidLimit::.ctor()
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorInvalidPathNew() -> System.IO.FileWriteError.InvalidPath
+newobj instance System.IO.FileWriteError.InvalidPath::.ctor()
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorNotFoundNew() -> System.IO.FileWriteError.NotFound
+newobj instance System.IO.FileWriteError.NotFound::.ctor()
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorAccessDeniedNew() -> System.IO.FileWriteError.AccessDenied
+newobj instance System.IO.FileWriteError.AccessDenied::.ctor()
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorNotRegularFileNew() -> System.IO.FileWriteError.NotRegularFile
+newobj instance System.IO.FileWriteError.NotRegularFile::.ctor()
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorTooLargeNew() -> System.IO.FileWriteError.TooLarge
+newobj instance System.IO.FileWriteError.TooLarge::.ctor()
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorWriteFailedNew() -> System.IO.FileWriteError.WriteFailed
+newobj instance System.IO.FileWriteError.WriteFailed::.ctor()
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeUnion0(Void arg0) -> System.Result.Ok<Void>
+ldarg arg0
+newobj instance System.Result.Ok<Void>::.ctor(Void)
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeUnion1(System.Result.Ok<Void> arg0) -> System.Result<Void,System.IO.FileWriteError>
+ldarg arg0
+newobj instance System.Result<Void,System.IO.FileWriteError>::.ctor(System.Result.Ok<Void>)
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeUnion2(System.IO.FileWriteError arg0) -> System.Result.Error<System.IO.FileWriteError>
+ldarg arg0
+newobj instance System.Result.Error<System.IO.FileWriteError>::.ctor(System.IO.FileWriteError)
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeUnion3(System.Result.Error<System.IO.FileWriteError> arg0) -> System.Result<Void,System.IO.FileWriteError>
+ldarg arg0
+newobj instance System.Result<Void,System.IO.FileWriteError>::.ctor(System.Result.Error<System.IO.FileWriteError>)
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end

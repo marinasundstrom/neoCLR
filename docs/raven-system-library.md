@@ -646,3 +646,32 @@ rooted paths, Unicode, embedded NULs, separators and runtime-service declaration
 
 Path validation: the runtime path regression and clean bootstrap regeneration pass.
 The final saved-project batch also covers Raven Path consumers.
+
+
+### File-write outcomes and generic Void matching — 2026-09-15
+
+`src/System/IO/File/Functions.rvn` now constructs the existing WriteAllText outcomes:
+Ok(Void), seven typed FileWriteError cases, and a terminal fault for an unknown host
+status. Actual UTF-8 encoding, limit checks, filesystem writes and truncation remain
+in the native service. ReadAllText retains its existing IL implementation because its
+erased native payload needs a different authoring boundary. This is a partial File
+port, not a new file API. The fallback return after Fault exists because Raven does
+not yet infer that the function never returns; the runtime faults before reaching it.
+
+Library signature matching exposed a metadata representation difference: an external
+System.Void generic argument can be read by Cecil as primitive Void, while the
+reference contract contains a nominal value token. The importer accepts these as the
+same generic argument only when both resolve to the same empty target-core value
+identity. This does not equate ordinary no-result and nominal value returns or admit
+a foreign/nonempty Void. The source compilation and status tests exercise the real
+emission path; `--library-signature-checks` separately checks the matching boundary.
+This is neoCLR importer policy, not a Raven compiler change or a change to .NET output.
+
+The current function namespaces are transitional authoring structures. As directed,
+Char's functions should eventually become members of a ported System.Char struct;
+namespace folders track the declarations in use today and do not settle that design.
+
+File-write validation: all 63 saved-project checks pass, including file operations
+and Void propagation. The status regression covers success, every typed failure and
+an unknown-status fault without relying on host permissions. Signature checks and
+clean regeneration pass.

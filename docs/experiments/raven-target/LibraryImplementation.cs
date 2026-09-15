@@ -138,10 +138,26 @@ static class LibraryImplementation
             return right is GenericInstanceType r && l.IsValueType == r.IsValueType
                 && SameType(l.ElementType, r.ElementType)
                 && l.GenericArguments.Count == r.GenericArguments.Count
-                && l.GenericArguments.Zip(r.GenericArguments).All(p => SameType(p.First, p.Second));
+                && l.GenericArguments.Zip(r.GenericArguments).All(p => SameTypeArgument(p.First, p.Second));
         return left.FullName == right.FullName && left.MetadataType == right.MetadataType && left.IsValueType == right.IsValueType
             && (left.MetadataType is not (MetadataType.Class or MetadataType.ValueType)
                 || left.Resolve()?.Module.Assembly.Name.FullName == right.Resolve()?.Module.Assembly.Name.FullName);
+    }
+
+    static bool SameTypeArgument(TypeReference left, TypeReference right)
+    {
+        if (SameType(left, right)) return true;
+        // Cecil can read an external System.Void token as primitive Void while
+        // the defining core retains ValueType. Only generic storage admits this
+        // equivalence; ordinary no-result method returns remain distinct.
+        if (left.FullName != "System.Void" || right.FullName != "System.Void"
+            || !left.IsValueType || !right.IsValueType
+            || !RuntimeSignatures.IsCore(left.Scope) || !RuntimeSignatures.IsCore(right.Scope)) return false;
+        var l = left.Resolve();
+        var r = right.Resolve();
+        return l is not null && r is not null && l.IsValueType && r.IsValueType
+            && !l.Fields.Any(f => !f.IsStatic) && !r.Fields.Any(f => !f.IsStatic)
+            && l.Module.Assembly.Name.FullName == r.Module.Assembly.Name.FullName;
     }
 
     public static TypeReference Close(TypeReference type, GenericInstanceMethod method, int depth = 0)

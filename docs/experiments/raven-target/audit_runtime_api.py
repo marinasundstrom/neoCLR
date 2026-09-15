@@ -84,6 +84,11 @@ for file in source['sourceFiles']:
                      'tests': ['tests/character_classification.rs', 'docs/experiments/raven-target/verify_scalar_library.py'],
                      'note': 'Raven implements Divide and seven Char predicates; parsing and Unicode category services stay native.'})
         continue
+    if file.startswith('runtime/raven/generated/File.'):
+        rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-file-write-bootstrap',
+                     'tests': ['tests/file_output.rs', 'tests/io_errors.rs'],
+                     'note': 'Raven maps existing native write status to typed Result<Void,FileWriteError>; reads remain IL.'})
+        continue
     if file.startswith('runtime/raven/generated/Path.'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-path-bootstrap',
                      'tests': ['tests/path.rs'],

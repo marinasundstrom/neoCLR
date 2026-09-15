@@ -3467,3 +3467,13 @@ have its own folder.
 namespaces. Type files retain type names; namespace-function files use Functions.rvn.
 Project inputs, generation source maps and documentation follow the new paths.
 This is source organization only, without changing APIs or assembly partitioning.
+
+
+### 2026-09-15 — Current folders do not settle future type ownership
+
+**User observation.** The author noted that structure may change later and that
+System.Char functions should probably belong to a ported System.Char struct.
+
+**Assistant response.** Agreed to preserve that as a later structural change. Current
+folders follow current declarations; the ongoing port does not redesign the public
+Char type or make the function namespace permanent.

@@ -1,6 +1,6 @@
 {
   "purpose": "Explicit source-by-source API audit. Samples and signature checks are evidence, not a claim of arbitrary generic/compiler support.",
-  "declarationCount": 639,
+  "declarationCount": 658,
   "sources": [
     {
       "file": "runtime/System/Equatable.neoil",
@@ -693,12 +693,32 @@
     },
     {
       "file": "runtime/System/IO/File.neoil",
-      "declarations": 3,
+      "declarations": 2,
       "disposition": "files",
       "samples": [
         "library-files.rvn",
         "library-paths.rvn"
       ]
+    },
+    {
+      "file": "runtime/raven/generated/File.methods.neoil",
+      "declarations": 1,
+      "disposition": "raven-authored-file-write-bootstrap",
+      "tests": [
+        "tests/file_output.rs",
+        "tests/io_errors.rs"
+      ],
+      "note": "Raven maps existing native write status to typed Result<Void,FileWriteError>; reads remain IL."
+    },
+    {
+      "file": "runtime/raven/generated/File.helpers.neoil",
+      "declarations": 19,
+      "disposition": "raven-authored-file-write-bootstrap",
+      "tests": [
+        "tests/file_output.rs",
+        "tests/io_errors.rs"
+      ],
+      "note": "Raven maps existing native write status to typed Result<Void,FileWriteError>; reads remain IL."
     },
     {
       "file": "runtime/neoCLR/Runtime/ReadAllText.neoil",
@@ -1207,8 +1227,8 @@
       "callers": [
         {
           "service": "neoCLR.Runtime.WriteAllText",
-          "file": "runtime/System/IO/File.neoil",
-          "line": 84
+          "file": "runtime/raven/generated/File.methods.neoil",
+          "line": 18
         }
       ]
     }

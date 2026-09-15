@@ -137,3 +137,45 @@ fn report_runs_from_artifact_and_cli() {
     );
     std::fs::remove_dir_all(directory).unwrap();
 }
+
+#[test]
+fn file_write_statuses_preserve_typed_outcomes_and_unknown_status_faults() {
+    let source = neoclr::library::system_source();
+    let service = "call neoCLR.Runtime.WriteAllText(String,String,Int32)";
+    assert_eq!(source.matches(service).count(), 1);
+    let app = neoclr::assemble(".module Probe\n.entry Main\n.function Main() -> System.Result<Void,System.IO.FileWriteError>\nldstr \"unused\"\nldstr \"text\"\nldc.i4 4\ncall System.IO.File::WriteAllText(String,String,Int32)\nret\n.end").unwrap();
+    for (status, case) in [
+        "Ok",
+        "InvalidLimit",
+        "InvalidPath",
+        "NotFound",
+        "AccessDenied",
+        "NotRegularFile",
+        "WriteFailed",
+        "TooLarge",
+        "unknown",
+    ]
+    .iter()
+    .enumerate()
+    {
+        let library =
+            neoclr::assemble(&source.replace(service, &format!("pop\npop\npop\nldc.i4 {status}")))
+                .unwrap();
+        let program = LoadedProgram::with_library(&app, &library).unwrap();
+        program.verify().unwrap();
+        let result = program.run(Limits::default());
+        if status == 8 {
+            assert!(
+                result
+                    .unwrap_err()
+                    .to_string()
+                    .contains("invalid native file write status")
+            );
+        } else {
+            assert!(
+                format!("{:?}", result.unwrap().value).contains(case),
+                "status {status}"
+            );
+        }
+    }
+}

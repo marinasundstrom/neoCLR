@@ -11,7 +11,8 @@ static class RuntimeServiceBindings
         UnaryMath.Select(n => ("Math" + n, new[] { "Double" }, "Double"))
         .Concat(BinaryMath.Select(n => ("Math" + n, new[] { "Double", "Double" }, "Double"))).Concat(new (string Name, string[] Args, string Result)[] {
             ("PathCombine", ["String", "String"], "String"),
-            ("PathGetFileName", ["String"], "String")
+            ("PathGetFileName", ["String"], "String"),
+            ("WriteAllText", ["String", "String", "Int32"], "Int32")
         }).ToArray();
     static string CSharp(string type) => type switch {
         "Double" => "double", "String" => "string", "Int32" => "int",

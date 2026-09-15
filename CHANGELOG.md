@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-15
 
+- Port File.WriteAllText outcome handling to Raven, preserving all seven typed errors,
+  Void success and the terminal fault for unknown native status. Keep native writes
+  and ReadAllText in their existing implementation layers. Match the two target Void
+  metadata encodings only in generic arguments, with core identity and empty-value
+  checks; no-result return matching stays distinct.
+
 - Organize Raven library sources into namespace folders under src/System, including
   Collections, Linq and function namespaces. Update project inputs, bootstrap source
   maps and documentation; public contracts and generated instructions are unchanged.

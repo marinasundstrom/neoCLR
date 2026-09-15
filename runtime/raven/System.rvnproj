@@ -11,6 +11,7 @@
     <Compile Include="src/System/Int32/Functions.rvn" />
     <Compile Include="src/System/Char/Functions.rvn" />
     <Compile Include="src/System/IO/Path/Functions.rvn" />
+    <Compile Include="src/System/IO/File/Functions.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'ArrayList'">
     <Compile Include="src/System/Collections/ArrayList.rvn" />
