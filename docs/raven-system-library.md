@@ -339,3 +339,13 @@ feature branch was removed after fast-forward integration. Existing nongeneric a
 static-generic library probes, 203 scalar checks and 13 cross-library checks pass.
 Regeneration changes only recorded compiler hashes; shipped library bodies remain
 identical. No SDK installation or publication is part of this slice.
+
+### Dynamic terminal fault API — 2026-09-15
+
+[System.Fault(message)](system-fault.md) is available as a namespace function through
+Raven's existing TopLevelAttribute metadata contract. The importer maps its validated
+CLI void/String signature to the public runtime function. No Raven compiler change or
+new Runtime Contract setting is required. `verify_fault.py` checks computed-message
+reporting and guest termination. Non-returning-call flow analysis is not introduced;
+checked generic storage and private implementation dependency support remain necessary
+for deferred query migration.

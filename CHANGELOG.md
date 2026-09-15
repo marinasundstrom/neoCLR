@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-15
 
+- Add System.Fault(message) as a namespace function exposed to Raven through its
+  existing CLI container contract. Preserve computed UTF-8 diagnostics and terminate
+  guest execution through the existing Fault outcome; embedding hosts are not aborted.
+  No cleanup guarantee or compiler non-returning-call analysis is introduced. Add
+  runtime and Raven consumer checks and document the FailFast comparison. Deferred
+  query migration still requires checked storage and private helper dependencies.
+
 - Extend matched Raven library class imports to unconstrained generic parameters,
   constructed fields/methods, generic locals and supported interface declarations.
   An independent Cell<T> probe validates Int32/String/Void payloads, construction,

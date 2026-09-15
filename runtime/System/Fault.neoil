@@ -1,0 +1,7 @@
+; Terminal guest failure with a dynamically computed diagnostic.
+.function System.Fault(String message) -> void
+    ldarg message
+    call neoCLR.Runtime.Fault(String)
+    pop
+    ret
+.end

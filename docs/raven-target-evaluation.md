@@ -846,3 +846,13 @@ checks; three existing skips), Raven main was fast-forwarded to `796cb3e34` and 
 temporary feature branch removed. The experimental branch remains separate at
 `ddaf1fa94`. Existing neoCLR authoring and cross-library regressions pass; regenerated
 System bodies are unchanged. Installed tools and release artifacts are not refreshed.
+
+### Dynamic terminal fault API — 2026-09-15
+
+[System.Fault(message)](system-fault.md) is available as a namespace function through
+Raven's existing TopLevelAttribute metadata contract. The importer maps its validated
+CLI void/String signature to the public runtime function. No Raven compiler change or
+new Runtime Contract setting is required. `verify_fault.py` checks computed-message
+reporting and guest termination. Non-returning-call flow analysis is not introduced;
+checked generic storage and private implementation dependency support remain necessary
+for deferred query migration.

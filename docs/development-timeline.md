@@ -3345,3 +3345,17 @@ remain proposals; clock method shape and final factory placement are open.
 `d073ee0`, with constructor/private-state/property execution and contract rejection
 checks. This does not yet port generic collection implementations or establish
 static members on interface implementations.
+
+## 2026-09-15 — A namespace function for terminal faults
+
+**User proposal:** While continuing the runtime-library migration, proposed a
+`System.Fault` function “for causing the system to fault and terminate”, then clarified
+“with a message”.
+
+**Assistant response and action:** Selected the existing terminal guest-fault boundary,
+with a computed String diagnostic, and implemented a namespace function using Raven's
+existing CLI namespace-container contract. Distinguished guest termination from forcibly
+aborting an embedding host and made no cleanup guarantee. The compiler's recognition
+of non-returning calls is a separate open issue; no name-specific Raven policy was added.
+See [the contract and validation](system-fault.md). This provides a library fault API;
+checked generic storage and private query implementation dependencies remain migration work.

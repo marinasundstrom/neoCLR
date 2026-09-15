@@ -1,6 +1,6 @@
 {
   "purpose": "Explicit source-by-source API audit. Samples and signature checks are evidence, not a claim of arbitrary generic/compiler support.",
-  "declarationCount": 637,
+  "declarationCount": 639,
   "sources": [
     {
       "file": "runtime/System/Equatable.neoil",
@@ -371,6 +371,28 @@
       "samples": [
         "library-environment.rvn",
         "library-console.rvn"
+      ]
+    },
+    {
+      "file": "runtime/System/Fault.neoil",
+      "declarations": 1,
+      "disposition": "terminal-namespace-function",
+      "tests": [
+        "tests/system_fault.rs",
+        "docs/experiments/raven-target/verify_fault.py"
+      ],
+      "note": "Computed String diagnostic; terminates guest execution, not the embedding host. No compiler non-return analysis."
+    },
+    {
+      "file": "runtime/neoCLR/Runtime/Fault.neoil",
+      "declarations": 1,
+      "disposition": "implementation-service",
+      "callers": [
+        {
+          "service": "neoCLR.Runtime.Fault",
+          "file": "runtime/System/Fault.neoil",
+          "line": 4
+        }
       ]
     },
     {

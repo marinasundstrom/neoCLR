@@ -12,6 +12,14 @@ static class NamespaceFunctions
     public static string Owner(TypeReference type) => type.MetadataType is MetadataType.Class or MetadataType.ValueType or MetadataType.GenericInstance
         ? Owner(type.Resolve()) : type.FullName;
 
+    public static void ProjectFault(ModuleDefinition module)
+    {
+        var type = module.GetType("System.FaultFunctions");
+        type.Name = "NamespaceMembers";
+        var marker = module.GetType(Marker).Methods.Single(m => m.IsConstructor && !m.HasParameters);
+        type.CustomAttributes.Add(new CustomAttribute(marker));
+    }
+
     public static void ProjectMath(ModuleDefinition module)
     {
         var type = module.GetType("System.Math");

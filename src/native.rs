@@ -20,6 +20,7 @@ pub(crate) enum Binding {
     ParseInt32,
     Int32ToString,
     WriteLine,
+    Fault,
     CharCategory,
     StringConcat,
     StringByteCount,
@@ -78,6 +79,7 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         }
         ("neoCLR.Runtime.ParseInt32", [Type::String]) => (Binding::ParseInt32, Type::Value),
         ("neoCLR.Runtime.Int32ToString", [Type::Int32]) => (Binding::Int32ToString, Type::String),
+        ("neoCLR.Runtime.Fault", [Type::String]) => (Binding::Fault, Type::Void),
         ("neoCLR.Runtime.WriteLine", [Type::String]) => (Binding::WriteLine, Type::Void),
         ("neoCLR.Runtime.CharCategory", [Type::Char]) => (Binding::CharCategory, Type::Int32),
         ("neoCLR.Runtime.StringConcat", [Type::String, Type::String]) => {
@@ -251,6 +253,7 @@ impl Binding {
                 Ok(Value::Erased(Box::new(payload)))
             }
             (Self::Int32ToString, [Value::Int32(number)]) => Ok(Value::String(number.to_string())),
+            (Self::Fault, [Value::String(message)]) => Err(Fault::new(message)),
             (Self::WriteLine, [Value::String(text)]) => {
                 if let Some(console) = console {
                     console

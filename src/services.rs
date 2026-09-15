@@ -55,6 +55,7 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
     }
     if function.is_internal_call() {
         let service = match crate::native::bind(function)? {
+            crate::native::Binding::Fault => return Ok(vec![]),
             crate::native::Binding::EnvironmentArguments
             | crate::native::Binding::EnvironmentCurrentDirectory
             | crate::native::Binding::EnvironmentVariable => RuntimeService::ProcessEnvironment,

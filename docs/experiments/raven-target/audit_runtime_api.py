@@ -48,6 +48,11 @@ for file in source['sourceFiles']:
                 raise ValueError('Service without a reviewed library caller: ' + name)
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'implementation-service', 'callers': callers})
         continue
+    if file == 'runtime/System/Fault.neoil':
+        rows.append({'file': file, 'declarations': len(entries), 'disposition': 'terminal-namespace-function',
+                     'tests': ['tests/system_fault.rs', 'docs/experiments/raven-target/verify_fault.py'],
+                     'note': 'Computed String diagnostic; terminates guest execution, not the embedding host. No compiler non-return analysis.'})
+        continue
     if file == 'runtime/System/Array.neoil':
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'replaced-in-raven-profile',
                      'replacementFiles': ['runtime/raven/Array.neoil', 'runtime/raven/NativeMemory.neoil'],
