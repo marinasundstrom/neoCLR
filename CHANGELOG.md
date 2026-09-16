@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-16
 
+- Move existing TypeInfo, member/parameter descriptors and BindingFlags from
+  System.Reflection to System.Introspection across runtime factories, reference
+  metadata, Raven/neoIL consumers and bootstrap artifacts. Rebuild System and
+  applications together and update imports; no old-name aliases are provided.
+  Query behavior is preserved. Type remains Raven-authored; descriptor bodies
+  remain neoIL and Info remains an instance property for this first slice.
+  Update website status and migration documentation.
+
 - Clarify the next release as an API-shape demo/POC across the text, time,
   globalization, async, introspection, filesystem and stream proposals. Plan Raven
   declarations and matching metadata alongside selected executable paths, with

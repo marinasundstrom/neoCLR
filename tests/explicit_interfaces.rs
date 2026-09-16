@@ -140,7 +140,7 @@ fn explicit_body_reference_return_retains_heap_owner_and_rejects_frame_escape() 
 #[test]
 fn reflection_keeps_qualified_private_names_and_public_surface_clean() {
     let p = source(
-        "interface Readable { func Read() -> int }\nrecord C(): Readable { func Readable.Read() -> int { return 42 } }\nfunc Main() -> int { let publicMethods = typeof(C).GetMethods(); let hidden = typeof(C).GetMethods(System.Reflection.BindingFlags.FromValue(36)); if publicMethods.Length != 0 { return 0 }; if hidden.Length == 1 && hidden[0].IsPrivate && hidden[0].Name.Equals(\"Readable.Read\") { return 42 }; return 0 }",
+        "interface Readable { func Read() -> int }\nrecord C(): Readable { func Readable.Read() -> int { return 42 } }\nfunc Main() -> int { let publicMethods = typeof(C).GetMethods(); let hidden = typeof(C).GetMethods(System.Introspection.BindingFlags.FromValue(36)); if publicMethods.Length != 0 { return 0 }; if hidden.Length == 1 && hidden[0].IsPrivate && hidden[0].Name.Equals(\"Readable.Read\") { return 42 }; return 0 }",
     );
     p.verify().unwrap();
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));

@@ -12,7 +12,7 @@ func Main() -> int {
     let access = Access.Read | Access.Write
     if access.HasFlag(Access.Read) { WriteLine("read") }
     WriteLine(access.Value)
-    let flags = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance
+    let flags = System.Introspection.BindingFlags.Public | System.Introspection.BindingFlags.Instance
     let fields = typeof(Item).GetFields(flags)
     WriteLine(fields.Length)
     if typeof(Access).IsEnum { WriteLine("enum") }

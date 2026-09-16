@@ -16,11 +16,11 @@ fn source_base_views_and_heterogeneous_heap_list_roundtrip() {
             "Age",
             "Counter",
             "Age",
-            "System.Reflection.FieldInfo",
+            "System.Introspection.FieldInfo",
             "Read",
-            "System.Reflection.MethodInfo",
+            "System.Introspection.MethodInfo",
             "Name",
-            "System.Reflection.PropertyInfo"
+            "System.Introspection.PropertyInfo"
         ]
     );
 }
@@ -31,13 +31,13 @@ fn inherited_properties_are_accessible_but_queries_remain_declared_only() {
 func Main() -> int {
     let fields = typeof(Model).GetFields()
     let info = fields[0]
-    let view: readonly System.Reflection.MemberInfo& = &info
-    let baseType = typeof(System.Reflection.FieldInfo).BaseType
+    let view: readonly System.Introspection.MemberInfo& = &info
+    let baseType = typeof(System.Introspection.FieldInfo).BaseType
     let inherited = baseType match { Some(let value) => value, None => typeof(Model) }
-    if !inherited.Equals(typeof(System.Reflection.MemberInfo)) { return 0 }
+    if !inherited.Equals(typeof(System.Introspection.MemberInfo)) { return 0 }
     if !inherited.IsAbstract { return 0 }
-    if view.GetType().Equals(typeof(System.Reflection.FieldInfo)) {
-        let props = typeof(System.Reflection.FieldInfo).GetProperties()
+    if view.GetType().Equals(typeof(System.Introspection.FieldInfo)) {
+        let props = typeof(System.Introspection.FieldInfo).GetProperties()
         for i in 0..<props.Length { if props[i].Name.Equals(\"Name\") { return 0 } }
         return inherited.GetProperties().Length
     }
@@ -52,7 +52,7 @@ func Main() -> int {
 fn temporary_receiver_evaluates_once_and_explicit_method_lookup_uses_base() {
     let source = "import System.Console.*
 record Model(N: int)
-func Inspect() -> System.Reflection.FieldInfo {
+func Inspect() -> System.Introspection.FieldInfo {
     WriteLine(\"once\")
     return typeof(Model).GetFields()[0]
 }
@@ -72,10 +72,10 @@ func Main() -> () {
 #[test]
 fn reference_collection_retains_complete_owners_after_factory_frames_end() {
     let source = "record Model(N: int)
-func Collect() -> System.Collections.ArrayList<readonly System.Reflection.MemberInfo&> {
+func Collect() -> System.Collections.ArrayList<readonly System.Introspection.MemberInfo&> {
     let fields = typeof(Model).GetFields()
-    let storage = new System.Reflection.FieldInfo[1] { fields[0] }
-    var list = System.Collections.ArrayList<readonly System.Reflection.MemberInfo&>(1)
+    let storage = new System.Introspection.FieldInfo[1] { fields[0] }
+    var list = System.Collections.ArrayList<readonly System.Introspection.MemberInfo&>(1)
     list.Add(&storage[0])
     return list
 }
@@ -83,7 +83,7 @@ func Main() -> int {
     let list = Collect()
     for i in 0..<10 { new int[1] }
     if list[0].DeclaringType.Equals(typeof(Model)) {
-        if list[0].GetType().Equals(typeof(System.Reflection.FieldInfo)) { return 42 }
+        if list[0].GetType().Equals(typeof(System.Introspection.FieldInfo)) { return 42 }
     }
     return 0
 }";
@@ -106,17 +106,17 @@ fn base_value_slicing_and_abstract_instantiation_remain_rejected() {
     let source = "record Model(N: int)
 func Main() -> int {
     let field = typeof(Model).GetFields()[0]
-    let copy: System.Reflection.MemberInfo = field
+    let copy: System.Introspection.MemberInfo = field
     return 0
 }";
     assert!(frontend::compile(source).is_err());
-    let text = ".module App\n.entry Main\n.function Main() -> System.Reflection.MemberInfo\nnewobj instance System.Reflection.MemberInfo::.ctor(String,System.Type)\nret\n.end";
+    let text = ".module App\n.entry Main\n.function Main() -> System.Introspection.MemberInfo\nnewobj instance System.Introspection.MemberInfo::.ctor(String,System.Type)\nret\n.end";
     assert!(assemble(text).is_err());
 }
 
 #[test]
 fn internal_descriptor_constructor_matches_trusted_snapshot_factory() {
-    let library = format!("{}\n.function ReflectionProbe(System.Type declaringType) -> System.Reflection.FieldInfo
+    let library = format!("{}\n.function ReflectionProbe(System.Type declaringType) -> System.Introspection.FieldInfo
 ldstr \"Age\"
 ldarg declaringType
 ldtoken Int32
@@ -126,11 +126,11 @@ ldc.bool false
 ldc.bool false
 ldc.bool false
 ldc.i4 0
-newobj instance System.Reflection.FieldInfo::.ctor(String,System.Type,System.Type,Boolean,Boolean,Boolean,Boolean,Int32)
+newobj instance System.Introspection.FieldInfo::.ctor(String,System.Type,System.Type,Boolean,Boolean,Boolean,Boolean,Int32)
 ret
 .end", neoclr::library::system_source());
     let library = assemble(&library).unwrap();
-    let app = ".module App\n.entry Main\n.type Counter\n.field Age Int32\n.end\n.function Main() -> System.Reflection.FieldInfo\nldtoken Counter\ncall System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)\ncall ReflectionProbe(System.Type)\nret\n.end";
+    let app = ".module App\n.entry Main\n.type Counter\n.field Age Int32\n.end\n.function Main() -> System.Introspection.FieldInfo\nldtoken Counter\ncall System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)\ncall ReflectionProbe(System.Type)\nret\n.end";
     let app =
         neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(app)], &library)
             .unwrap()
@@ -138,7 +138,7 @@ ret
     let p = LoadedProgram::with_library(&app, &library).unwrap();
     p.verify().unwrap();
     let constructed = p.run(Limits::default()).unwrap().value;
-    let query = ".module App\n.entry Main\n.type Counter\n.field Age Int32\n.end\n.function Main() -> System.Reflection.FieldInfo\nldtoken Counter\ncall System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)\ncall instance System.Type::GetFields()\nldc.i4 0\nldelem System.Reflection.FieldInfo\nret\n.end";
+    let query = ".module App\n.entry Main\n.type Counter\n.field Age Int32\n.end\n.function Main() -> System.Introspection.FieldInfo\nldtoken Counter\ncall System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)\ncall instance System.Type::GetFields()\nldc.i4 0\nldelem System.Introspection.FieldInfo\nret\n.end";
     let query =
         neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(query)], &library)
             .unwrap()
@@ -153,7 +153,7 @@ ret
         panic!()
     };
     let layout = library
-        .instantiated_fields(&Type::from_name("System.Reflection.FieldInfo"))
+        .instantiated_fields(&Type::from_name("System.Introspection.FieldInfo"))
         .unwrap();
     assert_eq!(fields.len(), layout.len());
     for (value, field) in fields.iter().zip(layout) {

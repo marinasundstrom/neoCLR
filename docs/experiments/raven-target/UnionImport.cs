@@ -378,7 +378,7 @@ static class UnionImport
                     case Code.Ldarg: case Code.Ldarg_S: Arg(((ParameterDefinition)instruction.Operand).Index + (method.HasThis ? 1 : 0)); break;
                     case Code.Ldarga: case Code.Ldarga_S:
                         var parameter = ((ParameterDefinition)instruction.Operand).Index + (method.HasThis ? 1 : 0);
-                        if (parameter < 0 || parameter >= args.Length || !(ApplicationTypes.IsType(args[parameter]) || args[parameter] == "System.Reflection.BindingFlags" || PrimitiveBindings.IsReceiver(args[parameter]) || CalendarBindings.Types.Contains(args[parameter]) || ErrorBindings.IsType(args[parameter]) || GenericUnionBindings.IsType(args[parameter])))
+                        if (parameter < 0 || parameter >= args.Length || !(ApplicationTypes.IsType(args[parameter]) || args[parameter] == "System.Introspection.BindingFlags" || PrimitiveBindings.IsReceiver(args[parameter]) || CalendarBindings.Types.Contains(args[parameter]) || ErrorBindings.IsType(args[parameter]) || GenericUnionBindings.IsType(args[parameter])))
                             throw new InvalidDataException("Only admitted primitive argument addresses supported.");
                         Push(new(args[parameter] + "&", Argument: parameter)); code.AppendLine($"ldarga {parameter}"); break;
                     case Code.Ldloc_0: case Code.Ldloc_1: case Code.Ldloc_2: case Code.Ldloc_3: Load((int)instruction.OpCode.Code - (int)Code.Ldloc_0); break;

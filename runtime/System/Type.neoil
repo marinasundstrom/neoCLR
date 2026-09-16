@@ -159,13 +159,13 @@
         call neoCLR.Runtime.TypeShape(System.RuntimeTypeHandle,Int32)
         ret
     .end
-    .property instance Info() -> System.Reflection.TypeInfo
+    .property instance Info() -> System.Introspection.TypeInfo
         .get instance System.Type::get_Info()
     .end
-    .method instance get_Info() -> System.Reflection.TypeInfo
+    .method instance get_Info() -> System.Introspection.TypeInfo
         ldarg this
         ldfld 0
-        call System.Reflection.TypeInfo::FromHandle(System.RuntimeTypeHandle)
+        call System.Introspection.TypeInfo::FromHandle(System.RuntimeTypeHandle)
         ret
     .end
     .method internal instance get_Handle() -> System.RuntimeTypeHandle
@@ -173,43 +173,43 @@
         ldfld 0
         ret
     .end
-    .method instance GetFields() -> System.Reflection.FieldInfo[]
+    .method instance GetFields() -> System.Introspection.FieldInfo[]
         ldarg this
         call instance System.Type::get_Info()
-        call instance System.Reflection.TypeInfo::GetFields()
+        call instance System.Introspection.TypeInfo::GetFields()
         ret
     .end
-    .method instance GetFields(System.Reflection.BindingFlags flags) -> System.Reflection.FieldInfo[]
+    .method instance GetFields(System.Introspection.BindingFlags flags) -> System.Introspection.FieldInfo[]
         ldarg this
         call instance System.Type::get_Info()
         ldarg flags
-        call instance System.Reflection.TypeInfo::GetFields(System.Reflection.BindingFlags)
+        call instance System.Introspection.TypeInfo::GetFields(System.Introspection.BindingFlags)
         ret
     .end
-    .method instance GetMethods() -> System.Reflection.MethodInfo[]
+    .method instance GetMethods() -> System.Introspection.MethodInfo[]
         ldarg this
         call instance System.Type::get_Info()
-        call instance System.Reflection.TypeInfo::GetMethods()
+        call instance System.Introspection.TypeInfo::GetMethods()
         ret
     .end
-    .method instance GetMethods(System.Reflection.BindingFlags flags) -> System.Reflection.MethodInfo[]
-        ldarg this
-        call instance System.Type::get_Info()
-        ldarg flags
-        call instance System.Reflection.TypeInfo::GetMethods(System.Reflection.BindingFlags)
-        ret
-    .end
-    .method instance GetProperties() -> System.Reflection.PropertyInfo[]
-        ldarg this
-        call instance System.Type::get_Info()
-        call instance System.Reflection.TypeInfo::GetProperties()
-        ret
-    .end
-    .method instance GetProperties(System.Reflection.BindingFlags flags) -> System.Reflection.PropertyInfo[]
+    .method instance GetMethods(System.Introspection.BindingFlags flags) -> System.Introspection.MethodInfo[]
         ldarg this
         call instance System.Type::get_Info()
         ldarg flags
-        call instance System.Reflection.TypeInfo::GetProperties(System.Reflection.BindingFlags)
+        call instance System.Introspection.TypeInfo::GetMethods(System.Introspection.BindingFlags)
+        ret
+    .end
+    .method instance GetProperties() -> System.Introspection.PropertyInfo[]
+        ldarg this
+        call instance System.Type::get_Info()
+        call instance System.Introspection.TypeInfo::GetProperties()
+        ret
+    .end
+    .method instance GetProperties(System.Introspection.BindingFlags flags) -> System.Introspection.PropertyInfo[]
+        ldarg this
+        call instance System.Type::get_Info()
+        ldarg flags
+        call instance System.Introspection.TypeInfo::GetProperties(System.Introspection.BindingFlags)
         ret
     .end
     .property instance FullName() -> String

@@ -272,7 +272,7 @@ try:
             (28, 'info.', ('Name', 'FullName', 'IsValueType', 'Info', 'GetElementType', 'GetGenericArguments')),
             (29, 'method.', ('Name', 'DeclaringType', 'ReturnType', 'GetParameters', 'IsPublic')),
             (30, 'property.', ('Name', 'CanRead', 'GetGetMethod', 'GetIndexParameters')),
-            (31, 'System.Reflection.BindingFlags.', ('Public', 'NonPublic', 'Instance', 'Static', 'DeclaredOnly')),
+            (31, 'System.Introspection.BindingFlags.', ('Public', 'NonPublic', 'Instance', 'Static', 'DeclaredOnly')),
             (32, 'System.Runtime.InteropServices.NativeMemory.', ('Alloc', 'Free'))):
             text = 'import System.*\nfunc Main() {\n    let info = typeof(int)\n    let method = info.Info.GetMethods()[0]\n    let property = typeof(Date).Info.GetProperties()[0]\n    ' + expression + '\n}'
             send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})
@@ -356,7 +356,7 @@ try:
                 (46, 'let members: MemberInfo[] = typeof(int).Info.GetMethods()', 'RAV1504'),
                 (47, 'let members = (MemberInfo[])typeof(int).Info.GetMethods()', 'RAV1503'),
                 (48, 'let members: MethodInfo[] = typeof(int).Info.GetMethods()', None)):
-            text = 'import System.*\nimport System.Reflection.*\nfunc Main() {\n    ' + expression + '\n}\n'
+            text = 'import System.*\nimport System.Introspection.*\nfunc Main() {\n    ' + expression + '\n}\n'
             send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version},
                 'contentChanges': [{'text': text}]})
             deadline = time.monotonic() + 90

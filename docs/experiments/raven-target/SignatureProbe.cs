@@ -65,12 +65,13 @@ static class SignatureProbe
         Reject("BindingFlags underlying type mismatch", () => EnumBindings.Validate(module));
         flagsField.FieldType = module.TypeSystem.Int32;
         ReflectionBindings.Validate(module);
-        var fieldsMethod = module.GetType("System.Type").Methods.Single(m => m.Name == "GetFields" && m.Parameters.Count == 0);
-        Check("Reflection returns managed descriptor vector", ReflectionBindings.Bind(fieldsMethod, fieldsMethod)?.Result == "arrayref<System.Reflection.FieldInfo>");
+        Check("Old reflection descriptor namespace is absent", module.GetType("System.Reflection.TypeInfo") is null);
+        var fieldsMethod = module.GetType("System.Introspection.TypeInfo").Methods.Single(m => m.Name == "GetFields" && m.Parameters.Count == 0);
+        Check("Reflection returns managed descriptor vector", ReflectionBindings.Bind(fieldsMethod, fieldsMethod)?.Result == "arrayref<System.Introspection.FieldInfo>");
         var fieldsReference = Reference(fieldsMethod, fieldsMethod.DeclaringType);
         fieldsReference.ReturnType = module.TypeSystem.Int32;
         Reject("Reflection return mismatch", () => ReflectionBindings.Bind(fieldsReference, fieldsMethod));
-        var descriptorType = module.GetType("System.Reflection.FieldInfo");
+        var descriptorType = module.GetType("System.Introspection.FieldInfo");
         var descriptorBase = descriptorType.BaseType;
         descriptorType.BaseType = module.TypeSystem.Object;
         Reject("Reflection hierarchy mismatch", () => ReflectionBindings.Validate(module));

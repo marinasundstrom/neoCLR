@@ -48,7 +48,7 @@ fn query(member: &str, flags: Option<i32>) -> String {
         "ldtoken Box<Int32&>\ncall System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)";
     match flags {
         Some(n) => format!(
-            "{prefix}\nldc.i4 {n}\ncall System.Reflection.BindingFlags::FromValue(Int32)\ncall instance System.Type::{member}(System.Reflection.BindingFlags)"
+            "{prefix}\nldc.i4 {n}\ncall System.Introspection.BindingFlags::FromValue(Int32)\ncall instance System.Type::{member}(System.Introspection.BindingFlags)"
         ),
         None => format!("{prefix}\ncall instance System.Type::{member}()"),
     }
@@ -82,9 +82,12 @@ fn fields_preserve_closed_reference_types_and_filter_visibility() {
         (Some(0), vec![]),
         (Some(16), vec![]),
     ] {
-        let result = program(&query("GetFields", flags), "System.Reflection.FieldInfo[]")
-            .run(Limits::default())
-            .unwrap();
+        let result = program(
+            &query("GetFields", flags),
+            "System.Introspection.FieldInfo[]",
+        )
+        .run(Limits::default())
+        .unwrap();
         let entries = array(&result.value);
         assert_eq!(
             entries
@@ -105,9 +108,12 @@ fn fields_preserve_closed_reference_types_and_filter_visibility() {
 
 #[test]
 fn methods_distinguish_overloads_receivers_and_output_contracts() {
-    let result = program(&query("GetMethods", None), "System.Reflection.MethodInfo[]")
-        .run(Limits::default())
-        .unwrap();
+    let result = program(
+        &query("GetMethods", None),
+        "System.Introspection.MethodInfo[]",
+    )
+    .run(Limits::default())
+    .unwrap();
     let methods = array(&result.value);
     assert_eq!(methods.len(), 4); // private Read and free Main excluded
     let write = fields(&methods[0]);
@@ -125,7 +131,7 @@ fn methods_distinguish_overloads_receivers_and_output_contracts() {
 #[test]
 fn properties_report_accessors_without_executing_them() {
     let prefix = format!(
-        ".local System.Reflection.PropertyInfo descriptor\n{}\nldc.i4 0\nldelem System.Reflection.PropertyInfo\nstloc descriptor\nldloca descriptor",
+        ".local System.Introspection.PropertyInfo descriptor\n{}\nldc.i4 0\nldelem System.Introspection.PropertyInfo\nstloc descriptor\nldloca descriptor",
         query("GetProperties", None)
     );
     for (method, argument, expected) in [
@@ -135,7 +141,7 @@ fn properties_report_accessors_without_executing_them() {
     ] {
         let signature = if argument.is_empty() { "" } else { "Boolean" };
         let body = format!(
-            "{prefix}\n{argument}call instance System.Reflection.PropertyInfo::{method}({signature})\ncall instance System.Option<System.Reflection.MethodInfo>::get_IsSome()"
+            "{prefix}\n{argument}call instance System.Introspection.PropertyInfo::{method}({signature})\ncall instance System.Option<System.Introspection.MethodInfo>::get_IsSome()"
         );
         assert_eq!(
             program(&body, "Boolean")
@@ -146,7 +152,7 @@ fn properties_report_accessors_without_executing_them() {
         );
     }
     let body = format!(
-        "{prefix}\ncall instance System.Reflection.PropertyInfo::get_PropertyType()\ncall instance System.Type::get_Name()"
+        "{prefix}\ncall instance System.Introspection.PropertyInfo::get_PropertyType()\ncall instance System.Type::get_Name()"
     );
     assert_eq!(
         program(&body, "String")
@@ -170,7 +176,7 @@ fn invalid_flags_and_descriptor_array_budgets_fault() {
     for flags in [1, 64, -1] {
         let fault = program(
             &query("GetFields", Some(flags)),
-            "System.Reflection.FieldInfo[]",
+            "System.Introspection.FieldInfo[]",
         )
         .run(Limits::default())
         .unwrap_err();
@@ -187,11 +193,14 @@ fn invalid_flags_and_descriptor_array_budgets_fault() {
         },
     ] {
         assert!(
-            program(&query("GetMethods", None), "System.Reflection.MethodInfo[]")
-                .run(limits)
-                .unwrap_err()
-                .message
-                .contains("array")
+            program(
+                &query("GetMethods", None),
+                "System.Introspection.MethodInfo[]"
+            )
+            .run(limits)
+            .unwrap_err()
+            .message
+            .contains("array")
         );
     }
 }
@@ -266,7 +275,7 @@ fn shape_queries_and_element_options_preserve_address_modes() {
 fn transitive_private_signature_metadata_does_not_grant_call_access() {
     let dependencies = ".module Dependencies\n.type Payload\n.end";
     let library = ".module Models\n.references (Dependencies)\n.type Model\n.field private Data [Dependencies]Payload\n.method private static Secret() -> Void\nldvoid\nret\n.end\n.end";
-    let app = ".module App\n.references (Models)\n.entry Main\n.function Main() -> String\n.local System.Reflection.FieldInfo descriptor\nldtoken [Models]Model\ncall System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)\nldc.i4 36\ncall System.Reflection.BindingFlags::FromValue(Int32)\ncall instance System.Type::GetFields(System.Reflection.BindingFlags)\nldc.i4 0\nldelem System.Reflection.FieldInfo\nstloc descriptor\nldloca descriptor\ncall instance System.Reflection.FieldInfo::get_FieldType()\ncall instance System.Type::get_Name()\nret\n.end";
+    let app = ".module App\n.references (Models)\n.entry Main\n.function Main() -> String\n.local System.Introspection.FieldInfo descriptor\nldtoken [Models]Model\ncall System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)\nldc.i4 36\ncall System.Introspection.BindingFlags::FromValue(Int32)\ncall instance System.Type::GetFields(System.Introspection.BindingFlags)\nldc.i4 0\nldelem System.Introspection.FieldInfo\nstloc descriptor\nldloca descriptor\ncall instance System.Introspection.FieldInfo::get_FieldType()\ncall instance System.Type::get_Name()\nret\n.end";
     let module = neoclr::assembler::assemble_modules(&[app, library, dependencies]).unwrap();
     let program =
         LoadedProgram::with_modules(&module[0], neoclr::library::system().unwrap(), &module[1..])
@@ -292,7 +301,7 @@ record Node(Next: Node&) {
 func Main() -> string {
     var fields = typeof(Node).GetFields()
     let copy = fields
-    let other = typeof(System.Type).GetFields(System.Reflection.BindingFlags.FromValue(36))
+    let other = typeof(System.Type).GetFields(System.Introspection.BindingFlags.FromValue(36))
     fields[0] = other[0]
     let holder = new array(1, copy)
     for i in 0..<12 {
@@ -327,7 +336,7 @@ fault "metadata query executed an accessor"
 .end
 .end
 .entry Main
-.function Main() -> System.Reflection.PropertyInfo[]
+.function Main() -> System.Introspection.PropertyInfo[]
 ldtoken Slots
 call System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)
 call instance System.Type::GetProperties()
@@ -349,7 +358,7 @@ ret
 #[test]
 fn library_generic_interfaces_and_conditional_outputs_are_inspectable() {
     let source = r#"
-func HasConditionalOutput(method: System.Reflection.MethodInfo) -> bool {
+func HasConditionalOutput(method: System.Introspection.MethodInfo) -> bool {
     let parameters = method.GetParameters()
     for i in 0..<parameters.Length {
         if parameters[i].IsOutWhenTrue {

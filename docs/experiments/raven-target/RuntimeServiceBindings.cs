@@ -21,7 +21,7 @@ static class RuntimeServiceBindings
             ("TypeArgument", ["System.RuntimeTypeHandle", "Int32"], "System.RuntimeTypeHandle"),
             ("TypeShape", ["System.RuntimeTypeHandle", "Int32"], "Boolean"),
             ("TypeDisplayName", ["System.RuntimeTypeHandle", "Int32"], "String"),
-            ("TypeInfo", ["System.RuntimeTypeHandle"], "System.Reflection.TypeInfo"),
+            ("TypeInfo", ["System.RuntimeTypeHandle"], "System.Introspection.TypeInfo"),
             ("TypeBaseType", ["System.RuntimeTypeHandle"], "System.Option<System.Type>"),
             ("TypeElementType", ["System.RuntimeTypeHandle"], "System.Option<System.Type>"),
             ("TypeInterfaces", ["System.RuntimeTypeHandle"], "arrayref<System.Type>"),
@@ -53,7 +53,7 @@ static class RuntimeServiceBindings
         if (reference.Name == "LocalDateTime")
             return new("System.LocalDateTime::FromUnixTimeTicks", args, result);
         if (reference.Name == "TypeInfo")
-            return new("System.Reflection.TypeInfo::FromHandle", args, result);
+            return new("System.Introspection.TypeInfo::FromHandle", args, result);
         if (result.StartsWith("arrayref<"))
         {
             var element = result[9..^1];

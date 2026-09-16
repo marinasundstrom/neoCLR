@@ -1,9 +1,9 @@
 ; Explicit metadata lookup façade. Type remains the cheap identity/shape view.
-.type System.Reflection.TypeInfo
+.type System.Introspection.TypeInfo
     .field private Handle System.RuntimeTypeHandle
-    .method internal static FromHandle(System.RuntimeTypeHandle handle) -> System.Reflection.TypeInfo
+    .method internal static FromHandle(System.RuntimeTypeHandle handle) -> System.Introspection.TypeInfo
         ldarg handle
-        newobj System.Reflection.TypeInfo
+        newobj System.Introspection.TypeInfo
         ret
     .end
     .method internal instance byref .ctor(System.RuntimeTypeHandle target) -> Void
@@ -21,7 +21,7 @@
         ret
     .end
     .property instance BaseType() -> System.Option<System.Type>
-        .get instance System.Reflection.TypeInfo::get_BaseType()
+        .get instance System.Introspection.TypeInfo::get_BaseType()
     .end
     .method instance get_BaseType() -> System.Option<System.Type>
         ldarg this
@@ -47,48 +47,48 @@
         call neoCLR.Runtime.TypeEnumUnderlying(System.RuntimeTypeHandle)
         ret
     .end
-    .method instance GetFields() -> System.Reflection.FieldInfo[]
+    .method instance GetFields() -> System.Introspection.FieldInfo[]
         ldarg this
         ldfld 0
         ldc.i4 28
         call neoCLR.Runtime.TypeFields(System.RuntimeTypeHandle,Int32)
         ret
     .end
-    .method instance GetFields(System.Reflection.BindingFlags flags) -> System.Reflection.FieldInfo[]
+    .method instance GetFields(System.Introspection.BindingFlags flags) -> System.Introspection.FieldInfo[]
         ldarg this
         ldfld 0
         ldarg flags
-        call instance System.Reflection.BindingFlags::get_Value()
+        call instance System.Introspection.BindingFlags::get_Value()
         call neoCLR.Runtime.TypeFields(System.RuntimeTypeHandle,Int32)
         ret
     .end
-    .method instance GetMethods() -> System.Reflection.MethodInfo[]
+    .method instance GetMethods() -> System.Introspection.MethodInfo[]
         ldarg this
         ldfld 0
         ldc.i4 28
         call neoCLR.Runtime.TypeMethods(System.RuntimeTypeHandle,Int32)
         ret
     .end
-    .method instance GetMethods(System.Reflection.BindingFlags flags) -> System.Reflection.MethodInfo[]
+    .method instance GetMethods(System.Introspection.BindingFlags flags) -> System.Introspection.MethodInfo[]
         ldarg this
         ldfld 0
         ldarg flags
-        call instance System.Reflection.BindingFlags::get_Value()
+        call instance System.Introspection.BindingFlags::get_Value()
         call neoCLR.Runtime.TypeMethods(System.RuntimeTypeHandle,Int32)
         ret
     .end
-    .method instance GetProperties() -> System.Reflection.PropertyInfo[]
+    .method instance GetProperties() -> System.Introspection.PropertyInfo[]
         ldarg this
         ldfld 0
         ldc.i4 28
         call neoCLR.Runtime.TypeProperties(System.RuntimeTypeHandle,Int32)
         ret
     .end
-    .method instance GetProperties(System.Reflection.BindingFlags flags) -> System.Reflection.PropertyInfo[]
+    .method instance GetProperties(System.Introspection.BindingFlags flags) -> System.Introspection.PropertyInfo[]
         ldarg this
         ldfld 0
         ldarg flags
-        call instance System.Reflection.BindingFlags::get_Value()
+        call instance System.Introspection.BindingFlags::get_Value()
         call neoCLR.Runtime.TypeProperties(System.RuntimeTypeHandle,Int32)
         ret
     .end

@@ -45,7 +45,7 @@ def build(path: Path) -> str:
         text = text.replace('instance readonly byref ', 'instance ').replace('instance byref ', 'instance ')
     if path.stem in {'TypeInfo', 'Reflection'}:
         # Immutable reflection snapshots use ordinary class identity in the target.
-        text = re.sub(r'^\.type (abstract )?(System\.(?:Type|Reflection\.(?:TypeInfo|MemberInfo|FieldInfo|MethodInfo|PropertyInfo|ParameterInfo)))$',
+        text = re.sub(r'^\.type (abstract )?(System\.(?:Type|Introspection\.(?:TypeInfo|MemberInfo|FieldInfo|MethodInfo|PropertyInfo|ParameterInfo)))$',
                       lambda m: '.type class ' + (m[1] or '') + m[2], text, flags=re.M)
         # These private construction helpers are replaced by trusted snapshot factories.
         text = re.sub(r'    \.method internal instance byref \.ctor[^\n]*\n.*?    \.end\n', '', text, flags=re.S)

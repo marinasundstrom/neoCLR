@@ -149,8 +149,8 @@ fn generic_identity_and_reflection_describe_the_existing_array() {
     assert_eq!(a.generic_arguments.len(), 1);
     assert_eq!(a.generic_arguments[0].name, "System.Int32");
     for (method, result, count) in [
-        ("GetProperties", "System.Reflection.PropertyInfo[]", 4),
-        ("GetMethods", "System.Reflection.MethodInfo[]", 6),
+        ("GetProperties", "System.Introspection.PropertyInfo[]", 4),
+        ("GetMethods", "System.Introspection.MethodInfo[]", 6),
         ("GetGenericArguments", "System.Type[]", 1),
     ] {
         let app = assemble(&format!(".module App\n.entry Main\n.function Main() -> {result}\nldtoken arrayref<Int32>\ncall System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)\ncall instance System.Type::{method}()\nret\n.end")).unwrap();

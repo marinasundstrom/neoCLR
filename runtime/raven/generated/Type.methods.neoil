@@ -38,7 +38,7 @@
 .property instance IsValueType() -> Boolean
 .get instance System.Type::get_IsValueType()
 .end
-.property instance Info() -> System.Reflection.TypeInfo
+.property instance Info() -> System.Introspection.TypeInfo
 .get instance System.Type::get_Info()
 .end
 .method private instance .ctor(System.RuntimeTypeHandle) -> noresult
@@ -271,7 +271,7 @@ M00000010_IL_000e:
 call neoCLR.Library.System.Type.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance get_Info() -> System.Reflection.TypeInfo
+.method instance get_Info() -> System.Introspection.TypeInfo
 M00000011_IL_0000:
 M00000011_IL_0001:
 M00000011_IL_0002:
@@ -279,7 +279,7 @@ ldarg 0
 M00000011_IL_0003:
 ldfld System.Type::Handle
 M00000011_IL_0008:
-call System.Reflection.TypeInfo::FromHandle(System.RuntimeTypeHandle)
+call System.Introspection.TypeInfo::FromHandle(System.RuntimeTypeHandle)
 M00000011_IL_000d:
 ret
 .end

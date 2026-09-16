@@ -25,6 +25,24 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+### First namespace migration slice — 2026-09-16
+
+**Author direction:** Start implementing the new structure, keep documentation and
+the website current, and commit each feature slice separately.
+
+**Assistant action:** Moved existing descriptors and BindingFlags into
+System.Introspection in the runtime, reference metadata, Raven Type source and
+consumers. Regenerated bootstrap artifacts and coverage inventories. Preserved
+query behavior and documented the breaking namespace migration. Info remains an
+instance property and descriptor bodies remain neoIL for this bounded slice;
+their Raven port and extension boundary are still open. Website status reflects
+this distinction. No Raven compiler changes were required.
+
+**Validation:** 49 focused runtime tests passed, along with Type authoring checks,
+signature checks, and three Raven consumers executing against the migrated
+namespace. The old descriptor namespace is rejected. Bootstrap hash and coverage
+checks and the website build validate generated records and presentation.
+
 ### Proposal-driven Raven library migration — 2026-09-16
 
 **Author direction:** Commit the proposal records and prioritize moving existing

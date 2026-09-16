@@ -29,7 +29,7 @@ fn handle_fields_must_be_assigned_by_class_constructors() {
 
 #[test]
 fn type_has_no_metadata_query_exports() {
-    let text = ".module Probe\n.function Query(System.Type value) -> System.Reflection.FieldInfo[]\nldarg value\ncall instance System.Type::GetFields()\nret\n.end";
+    let text = ".module Probe\n.function Query(System.Type value) -> System.Introspection.FieldInfo[]\nldarg value\ncall instance System.Type::GetFields()\nret\n.end";
     let app = assemble(text).unwrap();
     let result = LoadedProgram::with_library(&app, library()).and_then(|p| p.verify());
     assert!(result.is_err());
@@ -44,17 +44,17 @@ fn reflection_snapshots_are_managed_classes_with_base_views() {
 .field Count Int32
 .end
 .function Main() -> String
-.local System.Reflection.FieldInfo field
+.local System.Introspection.FieldInfo field
 ldtoken Item
 call System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)
 call instance System.Type::get_Info()
-call instance System.Reflection.TypeInfo::GetFields()
+call instance System.Introspection.TypeInfo::GetFields()
 ldc.i4 0
-ldelem System.Reflection.FieldInfo
+ldelem System.Introspection.FieldInfo
 stloc field
 ldloc field
-castclass System.Reflection.MemberInfo
-call instance System.Reflection.MemberInfo::get_Name()
+castclass System.Introspection.MemberInfo
+call instance System.Introspection.MemberInfo::get_Name()
 ret
 .end
 "#,
@@ -77,14 +77,14 @@ fn returned_descriptor_keeps_nested_type_snapshot_alive_and_obeys_heap_limit() {
 .type class Item
 .field Count Int32
 .end
-.function Main() -> System.Reflection.MemberInfo
+.function Main() -> System.Introspection.MemberInfo
 ldtoken Item
 call System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)
 call instance System.Type::get_Info()
-call instance System.Reflection.TypeInfo::GetFields()
+call instance System.Introspection.TypeInfo::GetFields()
 ldc.i4 0
-ldelem System.Reflection.FieldInfo
-castclass System.Reflection.MemberInfo
+ldelem System.Introspection.FieldInfo
+castclass System.Introspection.MemberInfo
 ret
 .end
 "#,
@@ -98,7 +98,7 @@ ret
     };
     assert_eq!(
         descriptor.target(),
-        &neoclr::metadata::Type::from_name("System.Reflection.MemberInfo")
+        &neoclr::metadata::Type::from_name("System.Introspection.MemberInfo")
     );
     let Some(Value::Object { fields, .. }) = result.heap.get(descriptor.allocation_id()) else {
         panic!("descriptor not rooted");
@@ -127,7 +127,7 @@ fn value_type_classification_uses_type_category_not_addressing_mode() {
         ("Void", true),
         ("String", false),
         ("System.Type", false),
-        ("System.Reflection.BindingFlags", true),
+        ("System.Introspection.BindingFlags", true),
         ("Item", false),
         ("Point", true),
         ("System.Collections.Iterable<Int32>", false),

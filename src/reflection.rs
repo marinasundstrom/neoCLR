@@ -22,11 +22,15 @@ pub(crate) enum Query {
 impl Query {
     pub(crate) fn binding(name: &str) -> Option<(Self, bool, Type)> {
         let (query, integer, result) = match name {
-            "neoCLR.Runtime.TypeFields" => (Self::Fields, true, "System.Reflection.FieldInfo[]"),
-            "neoCLR.Runtime.TypeMethods" => (Self::Methods, true, "System.Reflection.MethodInfo[]"),
-            "neoCLR.Runtime.TypeProperties" => {
-                (Self::Properties, true, "System.Reflection.PropertyInfo[]")
+            "neoCLR.Runtime.TypeFields" => (Self::Fields, true, "System.Introspection.FieldInfo[]"),
+            "neoCLR.Runtime.TypeMethods" => {
+                (Self::Methods, true, "System.Introspection.MethodInfo[]")
             }
+            "neoCLR.Runtime.TypeProperties" => (
+                Self::Properties,
+                true,
+                "System.Introspection.PropertyInfo[]",
+            ),
             "neoCLR.Runtime.TypeInterfaces" => (Self::Interfaces, false, "System.Type[]"),
             "neoCLR.Runtime.TypeGenericArguments" => {
                 (Self::GenericArguments, false, "System.Type[]")
@@ -190,14 +194,14 @@ impl Query {
             Self::Fields => {
                 validate_flags(argument)?;
                 array(
-                    "System.Reflection.FieldInfo",
+                    "System.Introspection.FieldInfo",
                     definition
                         .into_iter()
                         .flat_map(|d| d.fields.iter().enumerate())
                         .filter(|(_, f)| selected(argument, f.visibility, false))
                         .map(|(index, f)| {
                             Ok(record(
-                                "System.Reflection.FieldInfo",
+                                "System.Introspection.FieldInfo",
                                 vec![
                                     Value::String(f.name.clone()),
                                     wrap_type((**handle).clone()),
@@ -220,7 +224,7 @@ impl Query {
                 validate_flags(argument)?;
                 let owner = definition.map(|d| d.open_type());
                 array(
-                    "System.Reflection.MethodInfo",
+                    "System.Introspection.MethodInfo",
                     module
                         .functions
                         .iter()
@@ -237,7 +241,7 @@ impl Query {
             Self::Properties => {
                 validate_flags(argument)?;
                 array(
-                    "System.Reflection.PropertyInfo",
+                    "System.Introspection.PropertyInfo",
                     definition
                         .into_iter()
                         .flat_map(|d| d.properties.iter().enumerate())
@@ -283,7 +287,7 @@ impl Query {
                                     .map(|f| method(module, &ty, f, &[], limits))
                                     .transpose()?;
                                 Ok(Some(record(
-                                    "System.Reflection.PropertyInfo",
+                                    "System.Introspection.PropertyInfo",
                                     vec![
                                         Value::String(p.name),
                                         wrap_type((**handle).clone()),
@@ -293,8 +297,8 @@ impl Query {
                                         Value::Boolean(setter.is_some()),
                                         index_value(index)?,
                                         parameters,
-                                        option("System.Reflection.MethodInfo", get)?,
-                                        option("System.Reflection.MethodInfo", set)?,
+                                        option("System.Introspection.MethodInfo", get)?,
+                                        option("System.Introspection.MethodInfo", set)?,
                                     ],
                                 )))
                             })();
@@ -404,14 +408,14 @@ fn parameters(
     limits: &Limits,
 ) -> Result<Value, Fault> {
     array(
-        "System.Reflection.ParameterInfo",
+        "System.Introspection.ParameterInfo",
         types.iter().enumerate().map(|(i, ty)| {
             let qualified = match ty {
                 Type::ByRef(target) if readonly.contains(&i) => Type::ReadOnlyByRef(target.clone()),
                 _ => ty.clone(),
             };
             Ok(record(
-                "System.Reflection.ParameterInfo",
+                "System.Introspection.ParameterInfo",
                 vec![
                     Value::String(names.get(i).and_then(|n| n.clone()).unwrap_or_default()),
                     index_value(i)?,
@@ -443,7 +447,7 @@ fn method(
         .map(|t| t.substitute_type_parameters(arguments))
         .collect::<Result<Vec<_>, _>>()?;
     Ok(record(
-        "System.Reflection.MethodInfo",
+        "System.Introspection.MethodInfo",
         vec![
             Value::String(
                 f.name

@@ -11,13 +11,13 @@
     .methodimpl InternalCall
 .end
 
-.function neoCLR.Runtime.TypeFields(System.RuntimeTypeHandle type, Int32 flags) -> System.Reflection.FieldInfo[]
+.function neoCLR.Runtime.TypeFields(System.RuntimeTypeHandle type, Int32 flags) -> System.Introspection.FieldInfo[]
     .methodimpl InternalCall
 .end
-.function neoCLR.Runtime.TypeMethods(System.RuntimeTypeHandle type, Int32 flags) -> System.Reflection.MethodInfo[]
+.function neoCLR.Runtime.TypeMethods(System.RuntimeTypeHandle type, Int32 flags) -> System.Introspection.MethodInfo[]
     .methodimpl InternalCall
 .end
-.function neoCLR.Runtime.TypeProperties(System.RuntimeTypeHandle type, Int32 flags) -> System.Reflection.PropertyInfo[]
+.function neoCLR.Runtime.TypeProperties(System.RuntimeTypeHandle type, Int32 flags) -> System.Introspection.PropertyInfo[]
     .methodimpl InternalCall
 .end
 .function neoCLR.Runtime.TypeInterfaces(System.RuntimeTypeHandle type) -> System.Type[]

@@ -3,8 +3,8 @@
 Status: proposed architecture, updated 2026-09-16. The latest proposal is recorded
 below under Introspection and runtime reflection. The initial review that follows
 records the earlier questions; the current implementation already has TypeInfo in
-System.Reflection and an instance Type.Info property. Moving those APIs to
-System.Introspection and making Info an extension remain migration work.
+System.Introspection and an instance Type.Info property. The namespace migration is
+implemented; making Info an extension and porting descriptor bodies remain work.
 
 The author asked that neoCLR identify its needs before expanding the reflection
 model, particularly before repeating an overlapping `Type`/`TypeInfo` split. The

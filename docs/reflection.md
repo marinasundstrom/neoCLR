@@ -1,5 +1,10 @@
 # Reflection introspection
 
+Development migration (2026-09-16): the descriptor family and BindingFlags now use
+System.Introspection. Earlier System.Reflection spellings below describe the
+original contract; update imports and rebuild artifacts using the
+[namespace migration guide](raven-reflection-api.md#introspection-namespace-migration--2026-09-16).
+
 neoCLR exposes type identity and shape on `System.Type`; member metadata is obtained
 through its `Info` property as `System.Reflection.TypeInfo`. `MethodInfo`, `FieldInfo`
 and `PropertyInfo` share an abstract `MemberInfo` base; TypeInfo is separate from

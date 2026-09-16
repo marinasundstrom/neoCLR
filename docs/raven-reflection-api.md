@@ -3,11 +3,34 @@
 The existing Type and Reflection APIs are being projected onto ordinary managed
 classes. This document tracks the implemented projection and its remaining boundaries.
 
+## Introspection namespace migration — 2026-09-16
+
+The existing TypeInfo, MemberInfo, FieldInfo, MethodInfo, PropertyInfo,
+ParameterInfo and BindingFlags now belong to `System.Introspection`. Change Raven
+imports to `import System.Introspection.*` and rebuild reference metadata,
+applications and System together. The old descriptor names have no aliases. The
+bundled neoIL profile and its samples use the same new identities.
+
+This implements the namespace portion of the [proposal](reflection-model-review.md).
+Type stays in System and is Raven-authored; Info remains an instance property for
+this slice. Descriptor bodies still use neoIL. Extension Info, Raven descriptor
+bodies, optional runtime invocation and Emit are subsequent work. Existing query,
+allocation, filtering and visibility behavior is preserved.
+
+This reuses the .NET comparison below: the public namespace separates descriptive
+operations from future execution capabilities, with a source/metadata migration
+cost. Namespace changes alone add neither capabilities nor performance guarantees.
+No Raven compiler changes or Runtime Contract configuration changes are needed.
+
+Validation uses the runtime reflection/hierarchy/enum suites, the Type authoring
+gate and `verify_introspection_namespace.py` (three Raven consumers and rejection
+of the old descriptor namespace), plus regenerated bootstrap and coverage checks.
+
 ## Type source and metadata boundary (2026-09-15)
 
 `runtime/raven/src/System/Type.rvn` now owns the Raven target's Type implementation.
 Type exposes identity, names, category/shape flags, element type and closed generic
-arguments. `type.Info` returns `System.Reflection.TypeInfo`, which retains the same
+arguments. `type.Info` returns `System.Introspection.TypeInfo`, which retains the same
 opaque RuntimeTypeHandle and exposes member enumeration, base/interface discovery
 and enum metadata. It does not eagerly build an entire member graph. Current
 queries can allocate snapshots; no allocation-free or cache guarantee is made.

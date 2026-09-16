@@ -3,7 +3,7 @@ using Mono.Cecil;
 // Preserve CLI enum metadata while adapting the interpreter's nominal value layout.
 static class EnumBindings
 {
-    public const string Flags = "System.Reflection.BindingFlags";
+    public const string Flags = "System.Introspection.BindingFlags";
     static readonly (string Name, int Value)[] Literals = [("Default", 0), ("DeclaredOnly", 2), ("Instance", 4), ("Static", 8), ("Public", 16), ("NonPublic", 32)];
     public static void Validate(ModuleDefinition module)
     {

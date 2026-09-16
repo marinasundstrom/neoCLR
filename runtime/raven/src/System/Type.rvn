@@ -1,6 +1,6 @@
 namespace System
 
-import System.Reflection.*
+import System.Introspection.*
 import System.Runtime.CompilerServices.*
 
 public open class Type : Equatable<Type> {

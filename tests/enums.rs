@@ -44,12 +44,12 @@ fn binding_flags_support_constants_operators_and_existing_factories() {
         run(r#"
 record Cell(Value: int)
 func Main() -> int {
-    let flags = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance
+    let flags = System.Introspection.BindingFlags.Public | System.Introspection.BindingFlags.Instance
     let fields = typeof(Cell).GetFields(flags)
     if fields.Length != 1 { return -1 }
-    let old = System.Reflection.BindingFlags.Public().Or(System.Reflection.BindingFlags.Instance())
+    let old = System.Introspection.BindingFlags.Public().Or(System.Introspection.BindingFlags.Instance())
     if old != flags { return -2 }
-    if !flags.HasFlag(System.Reflection.BindingFlags.Public) { return -3 }
+    if !flags.HasFlag(System.Introspection.BindingFlags.Public) { return -3 }
     if flags.Value != 20 { return -4 }
     return 42
 }
@@ -61,7 +61,7 @@ func Main() -> int {
     let def = system
         .types
         .iter()
-        .find(|d| d.name == "System.Reflection.BindingFlags")
+        .find(|d| d.name == "System.Introspection.BindingFlags")
         .unwrap();
     assert!(def.enum_info.as_ref().unwrap().flags);
     assert_eq!(def.enum_info.as_ref().unwrap().members.len(), 6);
