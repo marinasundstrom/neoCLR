@@ -1,0 +1,29 @@
+namespace System.Introspection
+
+import System.*
+
+public open class ParameterInfo {
+    private field StoredName: string
+    private field StoredPosition: int
+    private field StoredParameterType: Type
+    private field StoredIsOut: bool
+    private field StoredIsOutWhenTrue: bool
+    private field StoredIsReadOnly: bool
+
+    private init(name: string, position: int, parameterType: Type,
+        isOut: bool, isOutWhenTrue: bool, isReadOnly: bool) {
+        StoredName = name
+        StoredPosition = position
+        StoredParameterType = parameterType
+        StoredIsOut = isOut
+        StoredIsOutWhenTrue = isOutWhenTrue
+        StoredIsReadOnly = isReadOnly
+    }
+
+    val Name: string { get => StoredName }
+    val Position: int { get => StoredPosition }
+    val ParameterType: Type { get => StoredParameterType }
+    val IsOut: bool { get => StoredIsOut }
+    val IsOutWhenTrue: bool { get => StoredIsOutWhenTrue }
+    val IsReadOnly: bool { get => StoredIsReadOnly }
+}

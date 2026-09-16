@@ -1,6 +1,6 @@
 {
   "format": "raven-library-bootstrap-v1",
-  "owner": "System.Date",
+  "owner": "System.Introspection.ParameterInfo",
   "inputs": {
     "runtime/raven/src/System/Introspection/ParameterInfo.rvn": "9e767dcd629ae87d3c1128531925045426d7138d2beb78f40abd2787b6e5c206",
     "runtime/raven/src/System/Duration.rvn": "321a44237e5990cf6ec7d1432a279145f84d2ecaa32675f5b95636801b0f8e44",
@@ -32,20 +32,17 @@
     "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
   },
   "outputs": {
-    "Date.methods.neoil": "5fab300442ff3ce7e539829452a8ccf2cfc20f33b7d0d4f005f69d7de8c2a7e2",
-    "Date.helpers.neoil": "72d3f052d191d2df88c1685f77d22b98bf7bd315efa3c00fcce4863bfde03d77"
+    "ParameterInfo.methods.neoil": "013128d329a39f6bca2d7e8c3c0a495a404423045bb9990eaeb772cc58097974",
+    "ParameterInfo.helpers.neoil": "4fa7b621b9ef179f33db9664f3eb146683d9231bfa31326487ee08f9daddceda"
   },
   "compilerSha256": "744ad87d9a6ec3d8b5691e72d0cd077b154af51615387b5f6bb171daa89fb370",
   "coreSha256": "b2a89af678e88d6c9a80ee4932eaa5f7b260d148ebcf29c9a1deb4c9c0d6916a",
   "exports": [
-    "Create(Int32,Int32,Int32) -> System.Result<System.Date,System.InvalidDateError>",
-    "FromDayNumber(Int32) -> System.Result<System.Date,System.InvalidDateError>",
-    "readonly byref get_DayNumber() -> Int32",
-    "readonly byref get_Year() -> Int32",
-    "readonly byref get_DayOfYear() -> Int32",
-    "readonly byref get_Month() -> Int32",
-    "readonly byref get_Day() -> Int32",
-    "readonly byref Equals(System.Date) -> Boolean",
-    "readonly byref CompareTo(System.Date) -> Int32"
+    "get_Name() -> String",
+    "get_Position() -> Int32",
+    "get_ParameterType() -> System.Type",
+    "get_IsOut() -> Boolean",
+    "get_IsOutWhenTrue() -> Boolean",
+    "get_IsReadOnly() -> Boolean"
   ]
 }

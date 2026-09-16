@@ -44,6 +44,11 @@ def build(path: Path) -> str:
     if path.stem in {'Equatable', 'Comparable', 'Clonable', 'Closable'}:
         text = text.replace('instance readonly byref ', 'instance ').replace('instance byref ', 'instance ')
     if path.stem in {'TypeInfo', 'Reflection'}:
+        if path.stem == 'Reflection':
+            # Replace the complete descriptor declaration with checked Raven bodies.
+            start = text.index('.type System.Introspection.ParameterInfo\n')
+            end = text.index('; Internal construction contract:', start)
+            text = text[:start] + build(ROOT / 'runtime/raven/ParameterInfo.neoil') + '\n' + text[end:]
         # Immutable reflection snapshots use ordinary class identity in the target.
         text = re.sub(r'^\.type (abstract )?(System\.(?:Type|Introspection\.(?:TypeInfo|MemberInfo|FieldInfo|MethodInfo|PropertyInfo|ParameterInfo)))$',
                       lambda m: '.type class ' + (m[1] or '') + m[2], text, flags=re.M)

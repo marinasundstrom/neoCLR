@@ -5,6 +5,22 @@ classes. This document tracks the implemented projection and its remaining bound
 
 ## Introspection namespace migration — 2026-09-16
 
+### ParameterInfo Raven port
+
+`runtime/raven/src/System/Introspection/ParameterInfo.rvn` now implements all six
+ParameterInfo readers in the Raven profile. Runtime factories still supply the
+snapshot data. The importer validates the exact six-field order, types and core
+Type identity before admitting the implementation; added or reordered storage is
+rejected. The constructor is private and initializes every field. Public member
+signatures and snapshot behavior are unchanged.
+
+The profile substitutes the generated Raven declaration for the complete old
+ParameterInfo declaration. The bundled historical neoIL profile retains its existing
+body. TypeInfo and the MemberInfo hierarchy remain neoIL-authored. This reuses the
+existing descriptor/.NET comparison and adds no compiler configuration or opcode.
+Run `verify_parameter_info_library.py` for positive and negative authoring checks
+and `verify_introspection_namespace.py` for executable Raven consumers.
+
 The existing TypeInfo, MemberInfo, FieldInfo, MethodInfo, PropertyInfo,
 ParameterInfo and BindingFlags now belong to `System.Introspection`. Change Raven
 imports to `import System.Introspection.*` and rebuild reference metadata,
@@ -13,7 +29,7 @@ bundled neoIL profile and its samples use the same new identities.
 
 This implements the namespace portion of the [proposal](reflection-model-review.md).
 Type stays in System and is Raven-authored; Info remains an instance property for
-this slice. Descriptor bodies still use neoIL. Extension Info, Raven descriptor
+this slice. Apart from ParameterInfo, descriptor bodies still use neoIL. Extension Info, Raven descriptor
 bodies, optional runtime invocation and Emit are subsequent work. Existing query,
 allocation, filtering and visibility behavior is preserved.
 
@@ -37,7 +53,7 @@ queries can allocate snapshots; no allocation-free or cache guarantee is made.
 
 Use `typeof(int).Info.GetMethods()` instead of `typeof(int).GetMethods()`. The Raven
 reference surface no longer exposes these queries on Type. TypeInfo and all other
-reflection descriptors remain NeoIL-authored. The original Neo profile retains its
+reflection descriptors except ParameterInfo remain NeoIL-authored. The original Neo profile retains its
 Type forwarding methods only for the source migration process.
 
 Type's private constructor is emitted and checked like other class constructors.

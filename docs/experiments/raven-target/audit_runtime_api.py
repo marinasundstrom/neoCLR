@@ -131,6 +131,12 @@ for file in source['sourceFiles']:
 result = {'purpose': 'Explicit source-by-source API audit. Samples and signature checks are evidence, not a claim of arbitrary generic/compiler support.',
           'declarationCount': sum(r['declarations'] for r in rows), 'sources': rows}
 result['targetProfileAdditions'] = [{
+    'file': 'runtime/raven/ParameterInfo.neoil',
+    'disposition': 'raven-authored-parameter-descriptor',
+    'samples': ['library-reflection.rvn'],
+    'tests': ['docs/experiments/raven-target/verify_parameter_info_library.py', 'docs/experiments/raven-target/verify_introspection_namespace.py'],
+    'note': 'Six parameter snapshot readers are Raven-authored. The importer validates field order/types; runtime factories still produce snapshots. Other descriptor bodies remain NeoIL.'
+}, {
     'file': 'runtime/raven/Type.neoil',
     'disposition': 'raven-authored-type',
     'samples': ['library-reflection.rvn', 'library-array-unified.rvn'],

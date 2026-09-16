@@ -10,6 +10,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    'ParameterInfo': 'System.Introspection.ParameterInfo',
     'Duration': 'System.Duration',
     'Instant': 'System.Instant',
     'Type': 'System.Type',
@@ -37,6 +38,7 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    'ParameterInfo': 'runtime/raven/src/System/Introspection/ParameterInfo.rvn',
     'Duration': 'runtime/raven/src/System/Duration.rvn',
     'Instant': 'runtime/raven/src/System/Instant.rvn',
     'Type': 'runtime/raven/src/System/Type.rvn',

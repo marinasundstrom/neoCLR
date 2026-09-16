@@ -25,6 +25,22 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+### ParameterInfo source migration — 2026-09-16
+
+**Author direction:** Continue the API restructuring and Raven migration in
+separately committed slices.
+
+**Assistant action:** Selected ParameterInfo as a bounded first descriptor port.
+Its six getters and private constructor are now Raven-authored, with an importer
+check protecting runtime snapshot layout. Existing factories and public contracts
+are preserved. Added positive/negative authoring checks and reused executable
+introspection consumers. TypeInfo query adapters and member inheritance remain
+subsequent work. Documentation and website status identify the completed subset.
+
+**Validation:** 21 focused runtime tests, positive/negative ParameterInfo authoring
+checks and three executable Raven consumers passed. Bootstrap hashes and the
+website build also passed; this is local development validation.
+
 ### First namespace migration slice — 2026-09-16
 
 **Author direction:** Start implementing the new structure, keep documentation and

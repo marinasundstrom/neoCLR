@@ -66,6 +66,9 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Type'">
     <Compile Include="src/System/Type.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'ParameterInfo'">
+    <Compile Include="src/System/Introspection/ParameterInfo.rvn" />
+  </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Instant'">
     <Compile Include="src/System/Instant.rvn" />
   </ItemGroup>

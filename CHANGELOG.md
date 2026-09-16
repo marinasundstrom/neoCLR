@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-16
 
+- Port System.Introspection.ParameterInfo's six read-only properties to Raven in
+  the Raven runtime profile. Check snapshot field order/types and private construction;
+  reject added/reordered fields, missing exports and public constructors. Regenerate
+  bootstrap artifacts and update the documentation and website. Public APIs are
+  unchanged; TypeInfo and member hierarchy bodies remain neoIL.
+
 - Move existing TypeInfo, member/parameter descriptors and BindingFlags from
   System.Reflection to System.Introspection across runtime factories, reference
   metadata, Raven/neoIL consumers and bootstrap artifacts. Rebuild System and

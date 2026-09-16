@@ -7,6 +7,10 @@ System.Introspection across reference metadata, the runtime and consumers.
 Type's Raven source uses that namespace; descriptor bodies remain neoIL and Info
 is still an instance property. See the [migration](raven-reflection-api.md).
 
+The next slice ports ParameterInfo's six readers to
+`src/System/Introspection/ParameterInfo.rvn` with checked snapshot layout and private
+construction. The remaining TypeInfo and member hierarchy bodies are still neoIL.
+
 The author directs the existing runtime class library to move from handwritten
 neoIL to Raven while adopting the namespaces and structure of the API proposals.
 Generated neoIL remains an execution/bootstrap artifact of Raven sources.

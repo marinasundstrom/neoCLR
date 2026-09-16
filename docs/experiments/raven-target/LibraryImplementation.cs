@@ -57,6 +57,20 @@ static class LibraryImplementation
             || type.Fields[0].FieldType.FullName != "System.RuntimeTypeHandle"
             || !RuntimeSignatures.IsCore(type.Fields[0].FieldType.Scope)))
             throw new InvalidDataException("Type library layout must contain exactly one core RuntimeTypeHandle.");
+        if (owner == "System.Introspection.ParameterInfo")
+        {
+            var layout = new (string Name, string Type)[] {
+                ("StoredName", "System.String"), ("StoredPosition", "System.Int32"),
+                ("StoredParameterType", "System.Type"), ("StoredIsOut", "System.Boolean"),
+                ("StoredIsOutWhenTrue", "System.Boolean"), ("StoredIsReadOnly", "System.Boolean")
+            };
+            if (type.Fields.Count != layout.Length || type.Fields.Zip(layout).Any(p =>
+                p.First.Name != p.Second.Name || p.First.FieldType.FullName != p.Second.Type
+                || (p.Second.Type == "System.Type" ? !RuntimeSignatures.IsCore(p.First.FieldType.Scope)
+                    : p.First.FieldType.MetadataType is not (MetadataType.String or MetadataType.Int32 or MetadataType.Boolean))))
+                throw new InvalidDataException("ParameterInfo library layout must match the runtime snapshot fields: "
+                    + string.Join(";", type.Fields.Select(f => f.Name + ":" + f.FieldType.FullName + "@" + f.FieldType.Scope)));
+        }
         if (PrimitiveLibrary.IsPrimitive(type)) PrimitiveLibrary.Validate(type, contract);
         else if (type.IsValueType)
         {
