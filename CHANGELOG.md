@@ -6,6 +6,28 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-09-16
+
+- Record the proposal-driven Raven library migration priority: recommend porting
+  existing introspection descriptors into System.Introspection next, followed by
+  the existing time family under System.Time. Namespace moves and remaining Raven
+  ports are planned; reference metadata and consumers must migrate together.
+
+- Record a provisional file-system capability proposal: keep Path as a pure value,
+  resolve it through an injectable FileSystem with a Default implementation, and
+  separate File/Directory handles from byte-oriented streams. Compare the current
+  static File/Directory APIs and System.IO.Abstractions, and leave authority,
+  lifetime, enumeration, error, sandbox and async contracts open. No existing I/O
+  API or runtime behavior changes.
+
+- Record the requested Globalization, Introspection/Reflection and Stream proposals.
+  Globalization separates immutable Culture/CultureId, resolution, contextual providers,
+  formatting and collation; Introspection separates descriptive metadata from optional
+  Reflection/Emit capabilities; Stream uses composable synchronous/asynchronous byte
+  capabilities above FileSystem. Existing APIs and runtime behavior remain unchanged;
+  ownership, data/versioning, capability availability, cancellation and exact members
+  remain provisional.
+
 ### 2026-09-15
 
 - Add the initial Clock.Now/Instant API with SystemClock, Raven-authored Instant

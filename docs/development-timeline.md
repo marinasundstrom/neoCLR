@@ -25,6 +25,52 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+### Proposal-driven Raven library migration — 2026-09-16
+
+**Author direction:** Commit the proposal records and prioritize moving existing
+APIs into their proposed namespaces and structure, with the goal of porting the
+runtime class library from neoIL to Raven.
+
+**Assistant recommendation:** Start with the existing introspection descriptors,
+following the completed Type port, then migrate the existing time family. Update
+reference metadata, importer mappings, generated artifacts and consumers with each
+slice. New globalization, stream and async implementations remain separate work.
+Recorded the sequence in the [Raven library plan](raven-system-library.md).
+This exchange records direction and a proposed sequence, not completed API moves.
+
+### File-system capability proposal — 2026-09-16
+
+**Author proposal:** Treat the file system as an explicit capability rather than a
+collection of globally ambient static gateways. Keep `Path` as a pure value, use a
+`FileSystem` context with a sensible default and injectable implementations, and
+obtain `File`, `Directory` and `FileSystemEntry` handles from it. Keep streams as the
+byte-I/O abstraction and avoid making the filesystem interface responsible for text,
+encoding or buffering.
+
+**Assistant action and outcome:** Added the [file-system capability proposal](filesystem-design.md)
+with the current static File API as baseline, alternatives including an injectable
+facade and runtime intrinsics, a System.IO.Abstractions comparison, capability/error/
+ownership boundaries and validation requirements. No implementation or existing API
+changes were made; handle lifetime, path semantics, enumeration, sandboxing,
+cancellation and async contracts remain provisional.
+
+### Globalization, introspection and streams proposals — 2026-09-16
+
+**Author proposals:** Define globalization as immutable culture data resolved from
+`CultureId` and supplied through a contextual provider; separate core type identity,
+descriptive introspection and optional runtime Reflection/Emit capabilities; and model
+streams as composable synchronous/asynchronous byte capabilities rather than one large
+`.NET Stream` class. The Stream proposal keeps partial I/O, explicit buffering,
+text-over-bytes readers, and FileSystem as the source of stream capabilities.
+
+**Assistant action and outcome:** Added [Globalization API](globalization-design.md),
+[Stream API](stream-design.md), and the new Introspection/Reflection section in the
+[reflection review](reflection-model-review.md). Compared the proposals with current
+.NET conventions and relevant independent abstractions, and recorded tradeoffs,
+validation requirements and open contracts. No runtime or public API implementation
+changed; the existing static file, bounded text, reflection and console surfaces remain
+the implementation baseline.
+
 ### Ongoing Type/Reflection separation — 2026-09-15
 
 **Subsequent corrections and scope.** The author placed TypeInfo in System.Reflection,

@@ -1,5 +1,33 @@
 # Authoring the foundational library in Raven
 
+## Migration priority — 2026-09-16
+
+The author directs the existing runtime class library to move from handwritten
+neoIL to Raven while adopting the namespaces and structure of the API proposals.
+Generated neoIL remains an execution/bootstrap artifact of Raven sources.
+
+The recommended next slice is the existing introspection family: keep System.Type
+as the core descriptor, move TypeInfo and the existing member/parameter descriptors
+to System.Introspection, and port their library bodies to Raven. Implement the
+proposed extension Info boundary with an explicit callable representation for other
+frontends. Check the importer and reference metadata support before assuming that
+extension-property syntax is available. Preserve existing query semantics while
+migrating references, generated artifacts, consumers and editor samples together.
+See the [proposal](reflection-model-review.md).
+
+Follow with the existing Date, Time, LocalDateTime, Instant, Duration, Clock and
+SystemClock family under the proposed System.Time namespace. Resolve the existing
+System.Time type versus proposed namespace collision explicitly; the eventual
+time-of-day type would be System.Time.Time. Finish remaining neoIL library bodies
+alongside that migration. Globalization, stream capabilities, runtime async and
+dynamic reflection introduce new functionality and need their own implementation
+slices; they are not prerequisites for porting existing APIs.
+
+For each slice, validate Raven compilation, reference/export identity matching,
+generated-artifact freshness and existing behavioral tests, with focused consumer
+and direct-IL coverage. Compiler-affecting changes require documentation and
+changelogs in both repositories under the Raven integration workflow.
+
 `runtime/raven/System.rvnproj` is the shared authoring project for ordinary
 foundational runtime APIs. Its sources include `src/System/Math/Functions.rvn`, `src/System/Linq/Operators.rvn`, `src/System/Int32/Functions.rvn`, `src/System/Char.rvn`, `src/System/Collections/ArrayList.rvn`, `src/System/Collections/HashMap.rvn`, `src/System/Time.rvn` and `src/System/Date.rvn`; additional namespaces
 and types should join this project as their importing requirements are validated.

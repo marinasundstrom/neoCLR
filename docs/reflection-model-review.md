@@ -1,7 +1,10 @@
 # Introspection and reflection: planned contract review
 
-Status: roadmap investigation, recorded 2026-09-14. No new descriptor hierarchy or
-reflection execution capability is selected by this document.
+Status: proposed architecture, updated 2026-09-16. The latest proposal is recorded
+below under Introspection and runtime reflection. The initial review that follows
+records the earlier questions; the current implementation already has TypeInfo in
+System.Reflection and an instance Type.Info property. Moving those APIs to
+System.Introspection and making Info an extension remain migration work.
 
 The author asked that neoCLR identify its needs before expanding the reflection
 model, particularly before repeating an overlapping `Type`/`TypeInfo` split. The
@@ -59,3 +62,37 @@ required by the [design process](design-research.md).
 Do not add `TypeInfo` or a parallel hierarchy speculatively. This review does not
 remove current APIs, commit to an interface split, implement Native AOT, or delay the
 bounded preview additions.
+
+## Introspection and runtime reflection proposal — 2026-09-16
+
+The author proposed a three-layer separation: core `System` descriptors (`Type`,
+`Assembly`, `Module`) represent identity and intrinsic shape; `System.Introspection`
+describes structure (`TypeInfo`, `MemberInfo`, `MethodInfo`, `PropertyInfo`,
+`FieldInfo` and related records); and optional `System.Runtime.Reflection` and
+`System.Runtime.Emit` capabilities operate on or construct that structure.
+
+`Type` should expose only facts available without structural discovery, such as name,
+namespace, kind, assembly, generic status and arity. Member enumeration, inheritance,
+attributes, generic constraints and parameter details belong to `Type.Info` and the
+introspection model. `.Info` is proposed as an extension supplied by the optional
+namespace, so importing core `Type` does not implicitly require full metadata.
+
+Introspection is descriptive only: it must not imply `Invoke`, `GetValue`, activation or
+mutation. The same `TypeInfo`/`MethodInfo` abstraction may be backed by compiled metadata,
+compiler tables, AOT-retained data, runtime descriptors or an open/dynamic definition.
+Reflection can provide implementations of those abstractions and add operations through
+composition or extensions, rather than forcing runtime capabilities into a deeper
+descriptor inheritance hierarchy. Emit is a sibling capability and may expose open
+structures before a final `Type` identity exists.
+
+This is a proposal, not a replacement for the current bounded `Type`/`TypeInfo` port.
+It retains the current opaque descriptor and explicit `.Info` boundary while leaving
+the exact hierarchy, top-level `MemberInfo` treatment, open-structure identity, typed
+facades, invocation access checks and capability errors unresolved. The main alternative
+is to keep one .NET-like descriptor/reflection hierarchy: easier to discover and port,
+but more likely to promise unavailable operations on AOT or metadata-only targets.
+Before adopting the model, validate declared/inherited discovery, nested types, closed
+generics, omitted metadata versus absent members, AOT retention, unavailable capability
+errors, private access rejection and any dynamic invocation/Emit implementation. The
+existing [type inspection](type-inspection.md) and [reflection hierarchy](reflection-hierarchy.md)
+remain the implementation baseline.
