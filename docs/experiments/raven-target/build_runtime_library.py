@@ -10,6 +10,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    'TypeInfo': 'System.Introspection.TypeInfo',
     'ParameterInfo': 'System.Introspection.ParameterInfo',
     'Duration': 'System.Duration',
     'Instant': 'System.Instant',
@@ -38,6 +39,7 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    'TypeInfo': 'runtime/raven/src/System/Introspection/TypeInfo.rvn',
     'ParameterInfo': 'runtime/raven/src/System/Introspection/ParameterInfo.rvn',
     'Duration': 'runtime/raven/src/System/Duration.rvn',
     'Instant': 'runtime/raven/src/System/Instant.rvn',
@@ -97,14 +99,17 @@ def fragments(text, name="Math", owner="System.Math"):
                 types.append(body)
             lines = lines[index + 1:]
             continue
-        match = re.match(r'\.function ([^(]+)\(', lines[0])
+        match = re.match(r'\.function (?:internal )?([^(]+)\(', lines[0])
         assert match, lines[0]
         end = lines.index('.end\n')
         body = ''.join(lines[:end + 1])
         if match[1].startswith(owner + '.'):
             # Retain the bootstrap owner used by direct IL and the archived Neo frontend.
             # Namespace functions use marked containers; static APIs retain their owner.
-            methods.append(body.replace('.function ' + owner + '.', '.method static ', 1))
+            if body.startswith('.function internal '):
+                methods.append(body.replace('.function internal ' + owner + '.', '.method internal static ', 1))
+            else:
+                methods.append(body.replace('.function ' + owner + '.', '.method static ', 1))
         else:
             assert match[1] not in helpers
             helpers[match[1]] = body

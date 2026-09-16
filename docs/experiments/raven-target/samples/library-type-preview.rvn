@@ -1,5 +1,6 @@
 import System.*
 import System.Console.*
+import System.Introspection.*
 
 func Main() {
     let type = typeof(int)
@@ -8,7 +9,8 @@ func Main() {
         WriteLine("Value type")
     }
 
-    let metadata = type.Info
+    // Descriptive queries use the shared Introspection model, not invocation APIs.
+    let metadata: TypeInfo = type.Info
     for method in metadata.GetMethods() {
         WriteLine(method.Name)
     }

@@ -1,0 +1,179 @@
+; Generated from runtime/raven/src/System/Introspection/TypeInfo.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Introspection.TypeInfo.RuntimeServiceTypeInterfaces(System.RuntimeTypeHandle arg0) -> arrayref<System.Type>
+.local System.Type[] source
+.local arrayref<System.Type> destination
+.local Int32 index
+ldarg arg0
+call neoCLR.Runtime.TypeInterfaces(System.RuntimeTypeHandle)
+stloc source
+ldloc source
+ldlen
+conv.i4
+newarr System.Type
+stloc destination
+ldc.i4 0
+stloc index
+br Test
+Copy:
+ldloc destination
+ldloc index
+ldloc source
+ldloc index
+ldelem System.Type
+stelem System.Type
+ldloc index
+ldc.i4 1
+add
+stloc index
+Test:
+ldloc index
+ldloc source
+ldlen
+conv.i4
+blt Copy
+ldloc destination
+ret
+.end
+.function neoCLR.Library.System.Introspection.TypeInfo.RuntimeServiceTypeEnumNames(System.RuntimeTypeHandle arg0) -> arrayref<String>
+.local String[] source
+.local arrayref<String> destination
+.local Int32 index
+ldarg arg0
+call neoCLR.Runtime.TypeEnumNames(System.RuntimeTypeHandle)
+stloc source
+ldloc source
+ldlen
+conv.i4
+newarr String
+stloc destination
+ldc.i4 0
+stloc index
+br Test
+Copy:
+ldloc destination
+ldloc index
+ldloc source
+ldloc index
+ldelem String
+stelem String
+ldloc index
+ldc.i4 1
+add
+stloc index
+Test:
+ldloc index
+ldloc source
+ldlen
+conv.i4
+blt Copy
+ldloc destination
+ret
+.end
+.function neoCLR.Library.System.Introspection.TypeInfo.RuntimeServiceTypeFields(System.RuntimeTypeHandle arg0,Int32 arg1) -> arrayref<System.Introspection.FieldInfo>
+.local System.Introspection.FieldInfo[] source
+.local arrayref<System.Introspection.FieldInfo> destination
+.local Int32 index
+ldarg arg0
+ldarg arg1
+call neoCLR.Runtime.TypeFields(System.RuntimeTypeHandle,Int32)
+stloc source
+ldloc source
+ldlen
+conv.i4
+newarr System.Introspection.FieldInfo
+stloc destination
+ldc.i4 0
+stloc index
+br Test
+Copy:
+ldloc destination
+ldloc index
+ldloc source
+ldloc index
+ldelem System.Introspection.FieldInfo
+stelem System.Introspection.FieldInfo
+ldloc index
+ldc.i4 1
+add
+stloc index
+Test:
+ldloc index
+ldloc source
+ldlen
+conv.i4
+blt Copy
+ldloc destination
+ret
+.end
+.function neoCLR.Library.System.Introspection.TypeInfo.RuntimeServiceTypeMethods(System.RuntimeTypeHandle arg0,Int32 arg1) -> arrayref<System.Introspection.MethodInfo>
+.local System.Introspection.MethodInfo[] source
+.local arrayref<System.Introspection.MethodInfo> destination
+.local Int32 index
+ldarg arg0
+ldarg arg1
+call neoCLR.Runtime.TypeMethods(System.RuntimeTypeHandle,Int32)
+stloc source
+ldloc source
+ldlen
+conv.i4
+newarr System.Introspection.MethodInfo
+stloc destination
+ldc.i4 0
+stloc index
+br Test
+Copy:
+ldloc destination
+ldloc index
+ldloc source
+ldloc index
+ldelem System.Introspection.MethodInfo
+stelem System.Introspection.MethodInfo
+ldloc index
+ldc.i4 1
+add
+stloc index
+Test:
+ldloc index
+ldloc source
+ldlen
+conv.i4
+blt Copy
+ldloc destination
+ret
+.end
+.function neoCLR.Library.System.Introspection.TypeInfo.RuntimeServiceTypeProperties(System.RuntimeTypeHandle arg0,Int32 arg1) -> arrayref<System.Introspection.PropertyInfo>
+.local System.Introspection.PropertyInfo[] source
+.local arrayref<System.Introspection.PropertyInfo> destination
+.local Int32 index
+ldarg arg0
+ldarg arg1
+call neoCLR.Runtime.TypeProperties(System.RuntimeTypeHandle,Int32)
+stloc source
+ldloc source
+ldlen
+conv.i4
+newarr System.Introspection.PropertyInfo
+stloc destination
+ldc.i4 0
+stloc index
+br Test
+Copy:
+ldloc destination
+ldloc index
+ldloc source
+ldloc index
+ldelem System.Introspection.PropertyInfo
+stelem System.Introspection.PropertyInfo
+ldloc index
+ldc.i4 1
+add
+stloc index
+Test:
+ldloc index
+ldloc source
+ldlen
+conv.i4
+blt Copy
+ldloc destination
+ret
+.end

@@ -5,6 +5,25 @@ classes. This document tracks the implemented projection and its remaining bound
 
 ## Introspection namespace migration — 2026-09-16
 
+### TypeInfo Raven port
+
+TypeInfo's existing base/interface, enum and member queries are now authored in
+`runtime/raven/src/System/Introspection/TypeInfo.rvn`. The same runtime metadata
+services produce the snapshots. Bootstrap-only adapters copy their results into
+managed arrays and retain the existing filtering behavior (default flags 28).
+Flag overloads now name their parameter `flags` instead of `arg0`; positional calls
+are unchanged. Regenerate reference metadata and consumers for named calls.
+
+The importer checks the single opaque handle layout and exact internal factory
+contract. Bootstrap generation preserves that factory's internal visibility.
+Info remains an instance property on Type; the member hierarchy remains neoIL.
+No invocation APIs, independent metadata provider, Raven compiler change or Runtime
+Contract configuration change is introduced. This follows the shared-model scope
+clarification in the [proposal](reflection-model-review.md).
+
+Validation: `verify_type_library.py --type-info`, executable introspection consumers,
+runtime reflection suites, bootstrap freshness and website checks.
+
 ### ParameterInfo Raven port
 
 `runtime/raven/src/System/Introspection/ParameterInfo.rvn` now implements all six
@@ -16,7 +35,7 @@ signatures and snapshot behavior are unchanged.
 
 The profile substitutes the generated Raven declaration for the complete old
 ParameterInfo declaration. The bundled historical neoIL profile retains its existing
-body. TypeInfo and the MemberInfo hierarchy remain neoIL-authored. This reuses the
+body. The MemberInfo hierarchy remains neoIL-authored. This reuses the
 existing descriptor/.NET comparison and adds no compiler configuration or opcode.
 Run `verify_parameter_info_library.py` for positive and negative authoring checks
 and `verify_introspection_namespace.py` for executable Raven consumers.
@@ -29,7 +48,7 @@ bundled neoIL profile and its samples use the same new identities.
 
 This implements the namespace portion of the [proposal](reflection-model-review.md).
 Type stays in System and is Raven-authored; Info remains an instance property for
-this slice. Apart from ParameterInfo, descriptor bodies still use neoIL. Extension Info, Raven descriptor
+this slice. Apart from TypeInfo and ParameterInfo, descriptor bodies still use neoIL. Extension Info, Raven descriptor
 bodies, optional runtime invocation and Emit are subsequent work. Existing query,
 allocation, filtering and visibility behavior is preserved.
 
@@ -52,8 +71,8 @@ and enum metadata. It does not eagerly build an entire member graph. Current
 queries can allocate snapshots; no allocation-free or cache guarantee is made.
 
 Use `typeof(int).Info.GetMethods()` instead of `typeof(int).GetMethods()`. The Raven
-reference surface no longer exposes these queries on Type. TypeInfo and all other
-reflection descriptors except ParameterInfo remain NeoIL-authored. The original Neo profile retains its
+reference surface no longer exposes these queries on Type. Member hierarchy
+descriptors remain NeoIL-authored; TypeInfo and ParameterInfo are Raven-authored. The original Neo profile retains its
 Type forwarding methods only for the source migration process.
 
 Type's private constructor is emitted and checked like other class constructors.

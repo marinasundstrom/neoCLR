@@ -23,11 +23,11 @@ False:
     ldc.i4 0
     ret
 .end
-.function neoCLR.Library.System.Type.RuntimeServiceTypeGenericArguments(System.RuntimeTypeHandle handle) -> arrayref<System.Type>
+.function neoCLR.Library.System.Type.RuntimeServiceTypeGenericArguments(System.RuntimeTypeHandle arg0) -> arrayref<System.Type>
 .local System.Type[] source
 .local arrayref<System.Type> destination
 .local Int32 index
-ldarg handle
+ldarg arg0
 call neoCLR.Runtime.TypeGenericArguments(System.RuntimeTypeHandle)
 stloc source
 ldloc source

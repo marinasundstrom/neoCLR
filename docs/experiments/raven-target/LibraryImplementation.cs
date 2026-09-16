@@ -53,7 +53,7 @@ static class LibraryImplementation
         if (type.IsValueType != contract.IsValueType)
             throw new InvalidDataException("Library value/reference representation does not match reference contract.");
         // Native snapshot factories construct Type from precisely one opaque handle.
-        if (owner == "System.Type" && (type.Fields.Count != 1 || type.Fields[0].Name != "Handle"
+        if (owner is "System.Type" or "System.Introspection.TypeInfo" && (type.Fields.Count != 1 || type.Fields[0].Name != "Handle"
             || type.Fields[0].FieldType.FullName != "System.RuntimeTypeHandle"
             || !RuntimeSignatures.IsCore(type.Fields[0].FieldType.Scope)))
             throw new InvalidDataException("Type library layout must contain exactly one core RuntimeTypeHandle.");
@@ -117,14 +117,18 @@ static class LibraryImplementation
             && !contract.HasMethods && !type.HasProperties && !type.HasInterfaces
             && type.Methods.All(PrimitiveLibrary.IsDefaultConstructor);
         var methods = type.Methods.Where(m => !(PrimitiveLibrary.IsPrimitive(type) || declarationOnly) || !PrimitiveLibrary.IsDefaultConstructor(m)).ToArray();
-        if (methods.Length == 0 && !declarationOnly || methods.Any(m => !(m.IsPublic || m.IsPrivate && !m.IsVirtual) || !m.HasBody || m.HasGenericParameters
+        if (methods.Length == 0 && !declarationOnly || methods.Any(m => !(m.IsPublic || m.IsPrivate && !m.IsVirtual
+            || m.IsAssembly && !m.IsVirtual && contract.Methods.Count(c => c.IsAssembly && MatchMethod(c, m)) == 1) || !m.HasBody || m.HasGenericParameters
             || m.ExplicitThis || m.IsConstructor && m.IsStatic || m.CallingConvention != MethodCallingConvention.Default
             || m.Parameters.Any(p => p.IsOut || p.ParameterType.IsByReference)))
-            throw new InvalidDataException("Unsupported instance library export.");
+            throw new InvalidDataException("Unsupported instance library export: " + string.Join(";", methods.Select(m => m.FullName + " " + m.Attributes + " matches=" + contract.Methods.Count(c => c.IsAssembly && MatchMethod(c, m)))));
         // Private implementation helpers are not exports, but remain roots so even
         // unused bodies are checked and emitted with their original visibility.
         var expected = contract.Methods.Where(m => m.IsPublic).ToArray();
         var exports = methods.Where(m => m.IsPublic).ToArray();
+        if (contract.Methods.Where(m => m.IsAssembly && !m.IsConstructor).Any(c =>
+            methods.Count(m => m.IsAssembly && MatchMethod(c, m)) != 1))
+            throw new InvalidDataException("Internal library factory does not match reference contract.");
         if (expected.Length != exports.Length || exports.Any(m => expected.Count(e => MatchMethod(e, m)) != 1))
             throw new InvalidDataException("Instance library export does not match reference contract: missing=[" + string.Join(";", expected.Where(e => !exports.Any(m => MatchMethod(e, m))).Select(m => m.FullName)) + "]; unmatched=[" + string.Join(";", exports.Where(m => !expected.Any(e => MatchMethod(e, m))).Select(m => m.FullName)) + "]");
         if (type.Properties.Count != contract.Properties.Count || type.Properties.Any(p =>
@@ -204,11 +208,11 @@ static class LibraryImplementation
 
     public static string QualifyHelpers(string text, string owner)
     {
-        var helpers = Regex.Matches(text, @"(?m)^\.function ([^\(]+)\(").Select(m => m.Groups[1].Value)
+        var helpers = Regex.Matches(text, @"(?m)^\.function (?:internal )?([^\(]+)\(").Select(m => m.Groups[1].Value)
             .Where(h => !h.StartsWith(owner + ".", StringComparison.Ordinal)).ToArray();
         // Adapters generated from open signatures must themselves declare the free
         // method parameters. Propagate through helper calls before qualifying names.
-        var bodies = Regex.Matches(text, @"(?ms)^\.function ([^\(]+)\(.*?^\.end\r?$")
+        var bodies = Regex.Matches(text, @"(?ms)^\.function (?:internal )?([^\(]+)\(.*?^\.end\r?$")
             .Where(m => helpers.Contains(m.Groups[1].Value))
             .ToDictionary(m => m.Groups[1].Value, m => m.Value);
         var parameters = helpers.ToDictionary(h => h, h => Regex.Matches(Regex.Replace(bodies[h], "\"(?:\\\\.|[^\"\\\\])*\"", ""), @"\bT[0-9]+\b")
@@ -227,7 +231,7 @@ static class LibraryImplementation
         {
             var generic = parameters[helper].Count == 0 ? "" : "<" + string.Join(',',
                 parameters[helper].OrderBy(p => int.Parse(p[1..]))) + ">";
-            text = Regex.Replace(text, @"(?m)^(\.function |call |ldftn )" + Regex.Escape(helper) + @"(?=\()",
+            text = Regex.Replace(text, @"(?m)^(\.function (?:internal )?|call |ldftn )" + Regex.Escape(helper) + @"(?=\()",
                 m => m.Groups[1].Value + "neoCLR.Library." + owner + "." + helper + generic);
         }
         return text;

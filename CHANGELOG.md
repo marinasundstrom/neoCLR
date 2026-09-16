@@ -8,6 +8,18 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-16
 
+- Port existing TypeInfo queries and its internal factory to Raven, retaining
+  runtime-backed snapshots and filtering. Validate the opaque-handle layout and
+  internal factory contract, and preserve internal visibility in generated code.
+  Flag overloads now use the parameter name `flags`; regenerate metadata and
+  update named calls using `arg0`. Clarify that Introspection need not be runtime
+  independent: Reflection and Emit compose capabilities within one descriptive
+  model. Update docs and website; member hierarchy bodies remain neoIL.
+  Record future mixed-origin descriptor binding requirements for Emit, including
+  context/provenance and identity validation, without adding new public APIs.
+  Update Raven introspection samples with named `flags` arguments, an explicit
+  TypeInfo binding and expanded readable blocks.
+
 - Port System.Introspection.ParameterInfo's six read-only properties to Raven in
   the Raven runtime profile. Check snapshot field order/types and private construction;
   reject added/reordered fields, missing exports and public constructors. Regenerate

@@ -25,6 +25,34 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+### Shared introspection model clarification — 2026-09-16
+
+**Author correction:** Limit the API to necessary concepts. Introspection need not
+be independent of the runtime. System.Runtime.Reflection and System.Runtime.Emit
+are additional capabilities that may attach operations and supply constructs within
+the same descriptive model, with clear boundaries.
+
+**Assistant response:** Acknowledged having overextended the separation into runtime
+independence. The next port retains existing runtime services and adds no offline
+provider or alternative descriptor hierarchy. The shared model remains descriptive;
+invocation and builders are additional capabilities.
+
+**Implementation follow-up:** Ported the existing TypeInfo queries and internal
+handle factory to Raven. Kept runtime metadata services and the instance Info
+property; adapted query results to managed arrays. Library import now checks
+internal factory contracts and bootstrap generation preserves their visibility.
+Flag parameters use the descriptive name `flags`. No runtime Reflection/Emit APIs
+were added. The member hierarchy remains the next source-port work.
+The author also requested sample updates. Updated the executable Raven examples
+to show the shared TypeInfo shape and named `flags` arguments, with readable blocks.
+
+**Further author requirement:** Future Emit must avoid the problems of combining
+types from runtime Reflection, MetadataLoadContext and Emit implementations.
+**Assistant response:** Recorded cross-context identity, provenance and binding as
+requirements of the shared model, with mixed-origin signatures and unfinished-builder
+tests. Common API shapes alone do not establish interoperability. Exact binding APIs
+remain future design; the current TypeInfo port does not implement Emit.
+
 ### ParameterInfo source migration — 2026-09-16
 
 **Author direction:** Continue the API restructuring and Raven migration in

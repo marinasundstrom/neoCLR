@@ -8,6 +8,7 @@ from xml.sax.saxutils import escape
 from build_runtime_library import ROOT
 
 parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--type-info', action='store_true', help='Validate the TypeInfo implementation instead of Type')
 for name in ('compiler', 'bridge'):
     parser.add_argument('--' + name, required=True, type=Path)
 args = parser.parse_args()
@@ -26,14 +27,17 @@ with tempfile.TemporaryDirectory(prefix='neoclr-declaration-library-') as tempor
     (root / 'demo').mkdir()
     core = root / 'demo/NeoCLR.CoreProbe.dll'
     run(['dotnet', args.bridge.resolve(), '--reference-library-core', core])
-    source = (ROOT / 'runtime/raven/src/System/Type.rvn').read_text()
+    owner = 'System.Introspection.TypeInfo' if args.type_info else 'System.Type'
+    source_path = 'Introspection/TypeInfo.rvn' if args.type_info else 'Type.rvn'
+    source = (ROOT / 'runtime/raven/src/System' / source_path).read_text()
     for name, text, diagnostic in [
         ('Valid', source, None),
         ('Storage', source.replace('private field Handle: RuntimeTypeHandle', 'private field Handle: RuntimeTypeHandle\n    private field Extra: int = 0'), 'Type library layout'),
         ('Constructor', source.replace('private init', 'public init'), 'does not match reference contract'),
-        ('Missing', source.replace('val Name:', 'private val Name:'), 'does not match reference contract'),
-        ('Argument', source.replace('GetTypeFromHandle(handle:', 'GetTypeFromHandle(wrongName:').replace('return Type(handle)', 'return Type(wrongName)'), 'does not match reference contract'),
-    ]:
+        ('Missing', source.replace('val BaseType:' if args.type_info else 'val Name:', 'private val BaseType:' if args.type_info else 'private val Name:'), 'does not match reference contract'),
+        ('Argument', source.replace('GetMethods(flags:', 'GetMethods(wrongName:').replace('TypeMethods(Handle, (int)flags)', 'TypeMethods(Handle, (int)wrongName)') if args.type_info else source.replace('GetTypeFromHandle(handle:', 'GetTypeFromHandle(wrongName:').replace('return Type(handle)', 'return Type(wrongName)'), 'does not match reference contract'),
+    ] + ([('FactoryVisibility', source.replace('internal static func FromHandle', 'private static func FromHandle'),
+           'does not match reference contract')] if args.type_info else []):
         folder = root / name
         folder.mkdir()
         (folder / 'Main.rvn').write_text(text)
@@ -45,11 +49,13 @@ with tempfile.TemporaryDirectory(prefix='neoclr-declaration-library-') as tempor
 </Project>''')
         run(['dotnet', args.compiler.resolve(), project, '--no-project-restore', '-o', folder / 'bin'])
         output = folder / 'imported'
-        run(['dotnet', args.bridge.resolve(), '--library-implementation', folder / 'bin' / (name + '.dll'), core, 'System.Type', output], diagnostic is None, diagnostic)
+        run(['dotnet', args.bridge.resolve(), '--library-implementation', folder / 'bin' / (name + '.dll'), core, owner, output], diagnostic is None, diagnostic)
         if diagnostic:
             assert not (output / 'Implementation.neoil').exists()
         else:
             result = (output / 'Implementation.neoil').read_text()
-            assert '.type class System.Type' in result
+            assert '.type class ' + owner in result
             assert '.method private instance .ctor(System.RuntimeTypeHandle' in result
+            if args.type_info:
+                assert '.function internal System.Introspection.TypeInfo.FromHandle(' in result
     print('Type imports; added storage, public construction, missing exports and changed parameter names rejected.')

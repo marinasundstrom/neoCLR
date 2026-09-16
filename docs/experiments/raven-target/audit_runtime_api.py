@@ -131,17 +131,23 @@ for file in source['sourceFiles']:
 result = {'purpose': 'Explicit source-by-source API audit. Samples and signature checks are evidence, not a claim of arbitrary generic/compiler support.',
           'declarationCount': sum(r['declarations'] for r in rows), 'sources': rows}
 result['targetProfileAdditions'] = [{
+    'file': 'runtime/raven/TypeInfo.neoil',
+    'disposition': 'raven-authored-type-info',
+    'samples': ['library-reflection.rvn', 'library-flags.rvn'],
+    'tests': ['docs/experiments/raven-target/verify_type_library.py', 'docs/experiments/raven-target/verify_introspection_namespace.py'],
+    'note': 'TypeInfo queries use Raven bodies and checked runtime-service adapters. The handle factory remains internal; invocation is outside the descriptive API.'
+}, {
     'file': 'runtime/raven/ParameterInfo.neoil',
     'disposition': 'raven-authored-parameter-descriptor',
     'samples': ['library-reflection.rvn'],
     'tests': ['docs/experiments/raven-target/verify_parameter_info_library.py', 'docs/experiments/raven-target/verify_introspection_namespace.py'],
-    'note': 'Six parameter snapshot readers are Raven-authored. The importer validates field order/types; runtime factories still produce snapshots. Other descriptor bodies remain NeoIL.'
+    'note': 'Six parameter snapshot readers are Raven-authored. The importer validates field order/types; runtime factories still produce snapshots. Member hierarchy bodies remain NeoIL.'
 }, {
     'file': 'runtime/raven/Type.neoil',
     'disposition': 'raven-authored-type',
     'samples': ['library-reflection.rvn', 'library-array-unified.rvn'],
     'tests': ['tests/raven_reflection.rs', 'docs/experiments/raven-target/verify_type_library.py'],
-    'note': 'Raven Type owns identity and shape. Member, base/interface and enum metadata are queried through the NeoIL TypeInfo using the same handle. No public described-object construction API.'
+    'note': 'Raven Type owns identity and shape. Member, base/interface and enum metadata are queried through the Raven-authored TypeInfo using the same handle. No public described-object construction API.'
 }, {
     'file': 'runtime/raven/Map.neoil',
     'disposition': 'experimental-map-contracts-with-raven-implementation',

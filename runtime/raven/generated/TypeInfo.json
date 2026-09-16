@@ -1,6 +1,6 @@
 {
   "format": "raven-library-bootstrap-v1",
-  "owner": "System.Value",
+  "owner": "System.Introspection.TypeInfo",
   "inputs": {
     "runtime/raven/src/System/Introspection/TypeInfo.rvn": "5869dbbd4f6a1ecac077bcc3805788e627a7964ffe8dfa2e9162a9c51c109d20",
     "runtime/raven/src/System/Introspection/ParameterInfo.rvn": "9e767dcd629ae87d3c1128531925045426d7138d2beb78f40abd2787b6e5c206",
@@ -33,10 +33,21 @@
     "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
   },
   "outputs": {
-    "Value.methods.neoil": "3a2748a8498226aeff4c5039cc32b649ebd0c511be0877cd6395727cf63bda48",
-    "Value.helpers.neoil": "03a694f75d3bccc98848e6b0332bf93c2b398e95dd89ed1dc8ca260da55f2315"
+    "TypeInfo.methods.neoil": "ee82f917fc24e1b0ded911211663f81cd0ce002036f3005815cbac5f26e1114f",
+    "TypeInfo.helpers.neoil": "62e30c063fbfd181d5c753b60bb1782f3bca76c6fd3956e5207e8f829981792e"
   },
   "compilerSha256": "744ad87d9a6ec3d8b5691e72d0cd077b154af51615387b5f6bb171daa89fb370",
   "coreSha256": "caf4440d2e77ef14ebb2005fa9dfad39829d758910305ca237415f0811799231",
-  "exports": []
+  "exports": [
+    "get_BaseType() -> System.Option<System.Type>",
+    "GetInterfaces() -> arrayref<System.Type>",
+    "GetEnumNames() -> arrayref<String>",
+    "GetEnumUnderlyingType() -> System.Type",
+    "GetFields() -> arrayref<System.Introspection.FieldInfo>",
+    "GetFields(System.Introspection.BindingFlags) -> arrayref<System.Introspection.FieldInfo>",
+    "GetMethods() -> arrayref<System.Introspection.MethodInfo>",
+    "GetMethods(System.Introspection.BindingFlags) -> arrayref<System.Introspection.MethodInfo>",
+    "GetProperties() -> arrayref<System.Introspection.PropertyInfo>",
+    "GetProperties(System.Introspection.BindingFlags) -> arrayref<System.Introspection.PropertyInfo>"
+  ]
 }

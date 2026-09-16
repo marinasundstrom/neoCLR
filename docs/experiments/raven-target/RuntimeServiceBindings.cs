@@ -22,6 +22,9 @@ static class RuntimeServiceBindings
             ("TypeShape", ["System.RuntimeTypeHandle", "Int32"], "Boolean"),
             ("TypeDisplayName", ["System.RuntimeTypeHandle", "Int32"], "String"),
             ("TypeInfo", ["System.RuntimeTypeHandle"], "System.Introspection.TypeInfo"),
+            ("TypeFields", ["System.RuntimeTypeHandle", "Int32"], "arrayref<System.Introspection.FieldInfo>"),
+            ("TypeMethods", ["System.RuntimeTypeHandle", "Int32"], "arrayref<System.Introspection.MethodInfo>"),
+            ("TypeProperties", ["System.RuntimeTypeHandle", "Int32"], "arrayref<System.Introspection.PropertyInfo>"),
             ("TypeBaseType", ["System.RuntimeTypeHandle"], "System.Option<System.Type>"),
             ("TypeElementType", ["System.RuntimeTypeHandle"], "System.Option<System.Type>"),
             ("TypeInterfaces", ["System.RuntimeTypeHandle"], "arrayref<System.Type>"),
@@ -58,7 +61,10 @@ static class RuntimeServiceBindings
         {
             var element = result[9..^1];
             var name = "RuntimeService" + reference.Name;
-            Helpers[name] = $".function {name}(System.RuntimeTypeHandle handle) -> {result}\n.local {element}[] source\n.local {result} destination\n.local Int32 index\nldarg handle\ncall neoCLR.Runtime.{reference.Name}(System.RuntimeTypeHandle)\nstloc source\nldloc source\nldlen\nconv.i4\nnewarr {element}\nstloc destination\nldc.i4 0\nstloc index\nbr Test\nCopy:\nldloc destination\nldloc index\nldloc source\nldloc index\nldelem {element}\nstelem {element}\nldloc index\nldc.i4 1\nadd\nstloc index\nTest:\nldloc index\nldloc source\nldlen\nconv.i4\nblt Copy\nldloc destination\nret\n.end\n";
+            var parameters = string.Join(",", args.Select((t, i) => t + " arg" + i));
+            var loads = string.Join("\n", args.Select((_, i) => "ldarg arg" + i));
+            var signature = string.Join(",", args);
+            Helpers[name] = $".function {name}({parameters}) -> {result}\n.local {element}[] source\n.local {result} destination\n.local Int32 index\n{loads}\ncall neoCLR.Runtime.{reference.Name}({signature})\nstloc source\nldloc source\nldlen\nconv.i4\nnewarr {element}\nstloc destination\nldc.i4 0\nstloc index\nbr Test\nCopy:\nldloc destination\nldloc index\nldloc source\nldloc index\nldelem {element}\nstelem {element}\nldloc index\nldc.i4 1\nadd\nstloc index\nTest:\nldloc index\nldloc source\nldlen\nconv.i4\nblt Copy\nldloc destination\nret\n.end\n";
             return new(name, args, result);
         }
         return new("neoCLR.Runtime." + reference.Name, args, result);

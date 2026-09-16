@@ -1,0 +1,54 @@
+namespace System.Introspection
+
+import System.*
+import System.Runtime.CompilerServices.*
+
+public open class TypeInfo {
+    private field Handle: RuntimeTypeHandle
+
+    private init(handle: RuntimeTypeHandle) {
+        Handle = handle
+    }
+
+    internal static func FromHandle(handle: RuntimeTypeHandle) -> TypeInfo {
+        return TypeInfo(handle)
+    }
+
+    val BaseType: Option<Type> { get => RuntimeServices.TypeBaseType(Handle) }
+
+    func GetInterfaces() -> Type[] {
+        return RuntimeServices.TypeInterfaces(Handle)
+    }
+
+    func GetEnumNames() -> string[] {
+        return RuntimeServices.TypeEnumNames(Handle)
+    }
+
+    func GetEnumUnderlyingType() -> Type {
+        return RuntimeServices.TypeEnumUnderlying(Handle)
+    }
+
+    func GetFields() -> FieldInfo[] {
+        return RuntimeServices.TypeFields(Handle, 28)
+    }
+
+    func GetFields(flags: BindingFlags) -> FieldInfo[] {
+        return RuntimeServices.TypeFields(Handle, (int)flags)
+    }
+
+    func GetMethods() -> MethodInfo[] {
+        return RuntimeServices.TypeMethods(Handle, 28)
+    }
+
+    func GetMethods(flags: BindingFlags) -> MethodInfo[] {
+        return RuntimeServices.TypeMethods(Handle, (int)flags)
+    }
+
+    func GetProperties() -> PropertyInfo[] {
+        return RuntimeServices.TypeProperties(Handle, 28)
+    }
+
+    func GetProperties(flags: BindingFlags) -> PropertyInfo[] {
+        return RuntimeServices.TypeProperties(Handle, (int)flags)
+    }
+}

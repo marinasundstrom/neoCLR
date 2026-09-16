@@ -1,7 +1,9 @@
 import System.*
 import System.Console.*
 import System.Introspection.*
-func Read(flags: BindingFlags) { WriteLine((int)flags) }
+func Read(flags: BindingFlags) {
+    WriteLine((int)flags)
+}
 func Main() {
     let flags: BindingFlags = .Public | .Instance | .Static
     Read(flags)
@@ -10,9 +12,13 @@ func Main() {
     Read((BindingFlags)~(int)flags)
     let zero = (BindingFlags)0
     Read(zero)
-    if flags == (BindingFlags)28 { WriteLine("Same flags") }
-    if (flags & BindingFlags.Public) == BindingFlags.Public { WriteLine("Public included") }
-    WriteLine(typeof(int).Info.GetMethods(flags).Length)
+    if flags == (BindingFlags)28 {
+        WriteLine("Same flags")
+    }
+    if (flags & BindingFlags.Public) == BindingFlags.Public {
+        WriteLine("Public included")
+    }
+    WriteLine(typeof(int).Info.GetMethods(flags: flags).Length)
     let nonPublic = BindingFlags.NonPublic | BindingFlags.Instance
-    WriteLine(typeof(Date).Info.GetFields(nonPublic)[0].Name)
+    WriteLine(typeof(Date).Info.GetFields(flags: nonPublic)[0].Name)
 }

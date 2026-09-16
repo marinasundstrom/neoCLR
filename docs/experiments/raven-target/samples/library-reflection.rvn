@@ -58,7 +58,9 @@ func Main() {
     WriteLine(property.DefinitionIndex)
     WriteLine(property.GetIndexParameters().Length)
     let getter = property.GetGetMethod()
-    if getter is Option.Some<MethodInfo> found { WriteLine(found.Value.Name) }
+    if getter is Option.Some<MethodInfo> found {
+        WriteLine(found.Value.Name)
+    }
     Show(property.GetSetMethod().IsNone)
     Show(property.GetGetMethod(true).IsSome)
     Show(property.GetSetMethod(true).IsNone)
@@ -71,7 +73,7 @@ func Main() {
     WriteLine(~(int)flags)
     WriteLine((int)BindingFlags.Default)
     WriteLine((int)BindingFlags.DeclaredOnly)
-    let fields = typeof(Date).Info.GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
+    let fields = typeof(Date).Info.GetFields(flags: BindingFlags.NonPublic | BindingFlags.Instance)
     WriteLine(fields[0].Name)
     WriteLine(fields[0].FieldType.Name)
     WriteLine(fields[0].DefinitionIndex)
@@ -80,8 +82,8 @@ func Main() {
     Show(fields[0].IsAssembly)
     Show(fields[0].IsStatic)
     WriteLine(typeof(int).Info.GetFields().Length)
-    WriteLine(typeof(int).Info.GetMethods(flags).Length)
-    WriteLine(typeof(Date).Info.GetProperties(flags).Length)
+    WriteLine(typeof(int).Info.GetMethods(flags: flags).Length)
+    WriteLine(typeof(Date).Info.GetProperties(flags: flags).Length)
     let generic = typeof(Option<int>)
     WriteLine(generic.GenericArgumentCount)
     WriteLine(generic.GetGenericArgument(index: 0).Name)
@@ -91,7 +93,9 @@ func Main() {
     Show(info.GetElementType().IsNone)
     let array = typeof(int[])
     Show(array.IsArray)
-    if array.GetElementType() is Option.Some<Type> element { WriteLine(element.Value.Name) }
+    if array.GetElementType() is Option.Some<Type> element {
+        WriteLine(element.Value.Name)
+    }
     let enumeration = typeof(BindingFlags)
     Show(enumeration.IsEnum)
     WriteLine(enumeration.Info.GetEnumNames()[0])

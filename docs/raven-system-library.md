@@ -2,14 +2,20 @@
 
 ## Migration priority — 2026-09-16
 
+TypeInfo's existing queries and internal factory are now Raven-authored alongside
+ParameterInfo. Runtime-backed descriptive services remain part of Introspection;
+runtime independence is not required. MemberInfo and its derived descriptor bodies
+are the remaining hierarchy port. Reflection and Emit can attach capabilities and
+implement constructs in this same model without adding invocation to its shapes.
+
 First slice completed: descriptor identities and BindingFlags now use
 System.Introspection across reference metadata, the runtime and consumers.
-Type's Raven source uses that namespace; descriptor bodies remain neoIL and Info
+Type's Raven source uses that namespace; member hierarchy bodies remain neoIL and Info
 is still an instance property. See the [migration](raven-reflection-api.md).
 
 The next slice ports ParameterInfo's six readers to
 `src/System/Introspection/ParameterInfo.rvn` with checked snapshot layout and private
-construction. The remaining TypeInfo and member hierarchy bodies are still neoIL.
+construction. The remaining member hierarchy bodies are still neoIL.
 
 The author directs the existing runtime class library to move from handwritten
 neoIL to Raven while adopting the namespaces and structure of the API proposals.
@@ -58,7 +64,7 @@ The importer accepts checked static factories and private constructors on matche
 classes, and matches self types inside array signatures. Reference signatures,
 visibility and the runtime-created Type layout remain validated. Reflection native
 services are available only while importing a library implementation; reference
-stub bodies are never executed. TypeInfo and member descriptors remain in NeoIL.
+stub bodies are never executed. TypeInfo and ParameterInfo are now Raven-authored; member hierarchy descriptors remain in neoIL.
 
 Raven-authored public APIs use descriptive parameter names. Date exposes `year`,
 `month`, `day`, `dayNumber` and `other`; Time exposes `hour`, `minute`, `second`,

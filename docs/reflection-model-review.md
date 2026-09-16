@@ -1,10 +1,46 @@
 # Introspection and reflection: planned contract review
 
+## Scope clarification — 2026-09-16
+
+Keep the API to the minimum needed by current consumers. Introspection may depend
+on the runtime; runtime independence is not a requirement. Its shapes describe
+structure without mixing in invocation or dynamic construction. Runtime Reflection
+can attach operations and provide its own implementations of this shared model;
+Runtime Emit can do the same through builders. These capabilities compose into one
+model with clear boundaries. The earlier offline/AOT alternatives below remain
+possible research, not required abstractions, providers or separate hierarchies.
+
+### Cross-context composition requirement
+
+The author additionally requires future Emit work to avoid the integration problems
+encountered when mixing runtime reflection types, MetadataLoadContext types and
+builders. One shared model must support meaningful composition across these origins;
+a common base type alone is insufficient.
+
+Before designing Emit, define descriptor provenance, assembly/module identity,
+resolution context and the operation that binds or imports a description into the
+target construction context. Do not infer compatibility from equal display names or
+force callers to manipulate backend-specific descriptor subclasses. A signature
+should be able to refer to existing definitions and in-progress definitions through
+the shared model, with explicit diagnostics for unresolved, conflicting or unsupported
+identities. Whether binding is automatic when unambiguous or an explicit operation
+remains to be designed. Inspection itself need not load executable code.
+
+Validate mixed-origin method signatures, generic arguments and constraints, references
+between unfinished builders, same-named types from different assemblies, equivalent
+definitions loaded in separate contexts, and incompatible assembly revisions. Require
+clear success or binding diagnostics rather than late failures caused by concrete
+descriptor representation. Compare these cases against pinned .NET Reflection,
+MetadataLoadContext and Emit probes before settling the rules. This is an author
+requirement and future validation plan, not a claim of implemented cross-context Emit
+or a decision to introduce another public type/provider family now.
+
 Status: proposed architecture, updated 2026-09-16. The latest proposal is recorded
 below under Introspection and runtime reflection. The initial review that follows
 records the earlier questions; the current implementation already has TypeInfo in
 System.Introspection and an instance Type.Info property. The namespace migration is
-implemented; making Info an extension and porting descriptor bodies remain work.
+implemented; TypeInfo and ParameterInfo bodies are Raven-authored. Making Info an
+extension and porting the member hierarchy remain work.
 
 The author asked that neoCLR identify its needs before expanding the reflection
 model, particularly before repeating an overlapping `Type`/`TypeInfo` split. The

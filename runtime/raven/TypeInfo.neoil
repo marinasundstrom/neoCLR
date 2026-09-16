@@ -1,0 +1,3 @@
+; Raven-authored descriptive metadata queries backed by runtime services.
+.include "generated/TypeInfo.methods.neoil"
+.include "generated/TypeInfo.helpers.neoil"

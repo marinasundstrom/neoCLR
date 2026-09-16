@@ -76,7 +76,7 @@ static class ReflectionBindings
         public struct RuntimeTypeHandle { }
         public class Type { internal Type() { } public System.Introspection.TypeInfo Info => default; public string Name => default; public int GenericArgumentCount => default; public bool IsEnum => default; public bool IsArray => default; public bool IsAbstract => default; public bool IsReadOnly => default; public bool IsByRef => default; public bool IsPointer => default; public bool IsValueType => default; public bool IsInterface => default; public string FullName => default; public string Namespace => default; public static System.Type GetTypeFromHandle(System.RuntimeTypeHandle handle) => default; public System.Type GetGenericArgument(int index) => default; public bool Equals(System.Type other) => default; public System.Type[] GetGenericArguments() => default; public System.Option<System.Type> GetElementType() => default; }
         public static class TypeOf<T> { public static System.Type Of(T arg0) => default; }
-        namespace Introspection { public class TypeInfo { internal TypeInfo() { } public System.Option<System.Type> BaseType => default; public System.Type[] GetInterfaces() => default; public string[] GetEnumNames() => default; public System.Type GetEnumUnderlyingType() => default; public FieldInfo[] GetFields() => default; public FieldInfo[] GetFields(BindingFlags arg0) => default; public MethodInfo[] GetMethods() => default; public MethodInfo[] GetMethods(BindingFlags arg0) => default; public PropertyInfo[] GetProperties() => default; public PropertyInfo[] GetProperties(BindingFlags arg0) => default; } }
+        namespace Introspection { public class TypeInfo { internal TypeInfo() { } internal static TypeInfo FromHandle(System.RuntimeTypeHandle handle) => default; public System.Option<System.Type> BaseType => default; public System.Type[] GetInterfaces() => default; public string[] GetEnumNames() => default; public System.Type GetEnumUnderlyingType() => default; public FieldInfo[] GetFields() => default; public FieldInfo[] GetFields(BindingFlags flags) => default; public MethodInfo[] GetMethods() => default; public MethodInfo[] GetMethods(BindingFlags flags) => default; public PropertyInfo[] GetProperties() => default; public PropertyInfo[] GetProperties(BindingFlags flags) => default; } }
         namespace Introspection { public class ParameterInfo { internal ParameterInfo() { } public string Name => default; public int Position => default; public System.Type ParameterType => default; public bool IsOut => default; public bool IsOutWhenTrue => default; public bool IsReadOnly => default; } }
         namespace Introspection { public abstract class MemberInfo { internal MemberInfo() { } public string Name => default; public System.Type DeclaringType => default; } }
         namespace Introspection { public class FieldInfo : System.Introspection.MemberInfo { internal FieldInfo() { } public System.Type FieldType => default; public bool IsPublic => default; public bool IsPrivate => default; public bool IsAssembly => default; public bool IsStatic => default; public int DefinitionIndex => default; } }
@@ -137,9 +137,9 @@ static class ReflectionBindings
         if (!Helpers.ContainsKey(key))
         {
             var body = new StringBuilder($".function {name}({string.Join(',', inputs.Select((t,i) => t + " arg" + i))}) -> {result}\n");
-            // Raven-authored Type already returns managed arrays. The remaining
+            // Raven-authored Type and TypeInfo return managed arrays. The remaining
             // NeoIL descriptors still return snapshot arrays which need copying.
-            var vector = owner != "System.Type" && result.StartsWith("arrayref<", StringComparison.Ordinal);
+            var vector = owner is not ("System.Type" or "System.Introspection.TypeInfo") && result.StartsWith("arrayref<", StringComparison.Ordinal);
             var element = vector ? result[9..^1] : "";
             if (vector) body.AppendLine($".local {element}[] source\n.local {result} destination\n.local Int32 index");
             for (var i = 0; i < inputs.Length; i++)

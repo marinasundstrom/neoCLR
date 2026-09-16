@@ -34,6 +34,18 @@ static class CoreDeclarations
             var module = image.MainModule;
             CalendarBindings.ProjectLayout(module);
             if (libraryBootstrap) PrimitiveLibrary.Project(module);
+            if (libraryBootstrap && collectionProbe)
+            {
+                var info = module.GetType("System.Introspection.TypeInfo");
+                if (!info.Methods.Any(m => m.Name == "FromHandle"))
+                {
+                    var factory = new Mono.Cecil.MethodDefinition("FromHandle",
+                        Mono.Cecil.MethodAttributes.Assembly | Mono.Cecil.MethodAttributes.Static | Mono.Cecil.MethodAttributes.HideBySig, info);
+                    factory.Parameters.Add(new Mono.Cecil.ParameterDefinition("handle", Mono.Cecil.ParameterAttributes.None,
+                        module.GetType("System.RuntimeTypeHandle")));
+                    info.Methods.Add(factory);
+                }
+            }
             NamespaceFunctions.ProjectMath(module);
             NamespaceFunctions.ProjectFault(module);
             var unit = module.GetType("System.PropagationUnit");
