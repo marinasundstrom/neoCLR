@@ -6,6 +6,13 @@ The author directs the existing runtime class library to move from handwritten
 neoIL to Raven while adopting the namespaces and structure of the API proposals.
 Generated neoIL remains an execution/bootstrap artifact of Raven sources.
 
+The author's subsequent clarification makes API shape the next release's demo/POC
+objective across all proposal families. Complete implementations are not required;
+Raven declarations, matching metadata and clear capability boundaries can precede
+backends. See the [release objective](library-preview.md#next-release-objective--2026-09-16).
+The sequence below recommends implementation slices, not a gate on exposing the
+other families' proposed structure.
+
 The recommended next slice is the existing introspection family: keep System.Type
 as the core descriptor, move TypeInfo and the existing member/parameter descriptors
 to System.Introspection, and port their library bodies to Raven. Implement the

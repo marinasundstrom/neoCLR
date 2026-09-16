@@ -1,5 +1,10 @@
 # Project website
 
+The What's next section presents the next release's API-shape demo/POC objective
+and all seven proposal families. Each proposal states its benefit and current
+implementation status and links to the design record. Keep these descriptions
+aligned with the library-preview plan as APIs become executable.
+
 A small static site presenting the current runtime/Raven experiment, its influences, implemented features and open research questions. Plain HTML/CSS,
 no browser JavaScript required for content or highlighting, and no remote fonts.
 Google Analytics loads the Google tag for measurement ID `G-SVXYRRCEEK`. Node.js 22 and two pinned

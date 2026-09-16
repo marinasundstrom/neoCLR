@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-16
 
+- Clarify the next release as an API-shape demo/POC across the text, time,
+  globalization, async, introspection, filesystem and stream proposals. Plan Raven
+  declarations and matching metadata alongside selected executable paths, with
+  incomplete capabilities explicitly identified; full implementations are not a
+  release prerequisite.
+  Reflect this objective on the website with all seven proposal families, their
+  benefits, design links and current implementation status.
+
 - Record the proposal-driven Raven library migration priority: recommend porting
   existing introspection descriptors into System.Introspection next, followed by
   the existing time family under System.Time. Namespace moves and remaining Raven

@@ -1,5 +1,40 @@
 # Library-focused next preview
 
+## Next release objective — 2026-09-16
+
+The author sets the next release's goal as a demo/POC with the shape of the proposed
+APIs in place, even where implementations are incomplete. This objective takes
+precedence over the older sequencing below. No release version or date is selected.
+
+Establish coherent namespaces, type relationships, capability interfaces, signatures
+and representative Raven usage across [text](text-model.md),
+[time](date-time-design.md), [globalization](globalization-design.md),
+[async](async-api-design.md), [introspection](reflection-model-review.md),
+[filesystems](filesystem-design.md) and [streams](stream-design.md). Move existing
+behavior into that structure and continue porting handwritten neoIL library code to
+Raven. Complete implementations of all seven families are not a release requirement.
+
+Use a small executable demo to connect the implemented paths. For incomplete areas,
+provide declaration/compilation examples and label their status clearly. Reference
+declarations must never execute as implementation bodies; unavailable operations
+must be diagnosed explicitly rather than return invented successful results.
+
+Release acceptance should establish:
+
+- The proposed API shape is represented in Raven source and matching reference
+  metadata, with imports, signatures and capability relationships checked.
+- Existing APIs moved into that shape preserve their tested behavior, with migration
+  notes for namespace, type and member changes.
+- Demonstrated executable paths run through the Raven-authored library and its
+  necessary runtime services; generated neoIL remains a bootstrap artifact.
+- Each exposed area is identified as implemented, declaration-only or still proposed,
+  with known gaps visible in the demo and coverage inventory.
+
+The recommended first migration remains introspection, followed by the time family.
+Work on the remaining families' public shape can proceed before those families have
+complete backends. Resolve only the contracts needed to make the POC coherent and
+reviewable; retain explicit open questions for later design work.
+
 Status: planned direction, recorded 2026-09-08. This does not announce a version,
 release date or completed library equivalence.
 

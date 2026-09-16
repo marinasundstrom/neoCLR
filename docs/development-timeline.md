@@ -38,6 +38,20 @@ slice. New globalization, stream and async implementations remain separate work.
 Recorded the sequence in the [Raven library plan](raven-system-library.md).
 This exchange records direction and a proposed sequence, not completed API moves.
 
+**Subsequent author clarification:** The next release should have the API shapes in
+place even without complete implementations, serving as a demo or POC.
+**Assistant response and action:** Updated the library-preview objective and Raven
+migration plan to prioritize namespaces, signatures and capability relationships
+across all seven proposal families, alongside working examples for implemented
+paths and explicit declaration-only status for unfinished areas. Full backends are
+not required before exposing the proposed structure. No API implementation changed
+as part of recording this clarification.
+
+**Website follow-up:** The author asked to show these improvements on the website.
+Updated What's next with the demo/POC objective, migration priorities and all seven
+proposal families, explaining benefits and distinguishing current implementations
+from proposed API shapes. Website publication is separate from this source update.
+
 ### File-system capability proposal — 2026-09-16
 
 **Author proposal:** Treat the file system as an explicit capability rather than a
