@@ -23,6 +23,19 @@ is now integrated and exercised by the Raven-authored Clock contract. It is a
 prerequisite for the Info interfaces, not a claim that these class-based descriptors
 have already migrated.
 
+The isolated prototype now includes a field-query path: TypeInfo.GetFields(flags)
+returns descriptive FieldInfo interfaces whose Type and DeclaringType both use
+TypeInfo. Existing filtering and invalid-flag behavior are preserved. The current
+demo uses an eagerly populated Iterable, not a settled replacement collection API;
+type acquisition still wraps the legacy runtime identity. No dynamic field access
+or production class/interface replacement is introduced.
+
+The target acquisition contract is runtime-owned handle/type-of resolution to a
+TypeInfo interface backed by a hidden RuntimeTypeInfo. RuntimeContext must yield
+the same or value-equivalent descriptor. The prototype's direct internal adapter
+construction is temporary bootstrap code, not the intended public API; resolver
+identity and context equivalence still need implementation and tests.
+
 ## Introspection namespace migration — 2026-09-16
 
 ### TypeInfo Raven port

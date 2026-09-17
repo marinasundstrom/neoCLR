@@ -1,0 +1,8 @@
+namespace System.Introspection
+
+public interface FieldInfo : MemberInfo {
+    val Type: TypeInfo { get }
+    val IsPublic: bool { get }
+    val IsPrivate: bool { get }
+    val IsStatic: bool { get }
+}

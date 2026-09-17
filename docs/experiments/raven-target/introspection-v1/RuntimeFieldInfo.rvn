@@ -2,16 +2,29 @@ namespace System.Runtime
 
 import System.Introspection.*
 
-// Only field acquisition is adapted in this probe. No new FieldInfo contract yet.
-internal class RuntimeFieldInfo : MemberInfo {
-    private field runtimeField: FieldInfo
+// Snapshot values come from the runtime adapter, never from a public legacy type.
+internal class RuntimeFieldInfo : FieldInfo {
+    private field storedName: string
+    private field declaringType: TypeInfo
+    private field fieldType: TypeInfo
+    private field isPublic: bool
+    private field isPrivate: bool
+    private field isStatic: bool
 
-    init(descriptor: FieldInfo) {
-        runtimeField = descriptor
+    init(name: string, declaring: TypeInfo, type: TypeInfo,
+         publicField: bool, privateField: bool, staticField: bool) {
+        storedName = name
+        declaringType = declaring
+        fieldType = type
+        isPublic = publicField
+        isPrivate = privateField
+        isStatic = staticField
     }
 
-    val Name: string { get => runtimeField.Name }
-    val DeclaringType: TypeInfo {
-        get => RuntimeTypeInfo(runtimeField.DeclaringType)
-    }
+    val Name: string { get => storedName }
+    val DeclaringType: TypeInfo { get => declaringType }
+    val Type: TypeInfo { get => fieldType }
+    val IsPublic: bool { get => isPublic }
+    val IsPrivate: bool { get => isPrivate }
+    val IsStatic: bool { get => isStatic }
 }

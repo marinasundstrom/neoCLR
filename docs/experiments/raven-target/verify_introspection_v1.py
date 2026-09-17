@@ -38,6 +38,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-introspection-v1-') as temporary
   <ItemGroup>
     <Compile Include="TypeInfo.rvn" />
     <Compile Include="MemberInfo.rvn" />
+    <Compile Include="FieldInfo.rvn" />
     <Compile Include="RuntimeTypeInfo.rvn" />
     <Compile Include="RuntimeFieldInfo.rvn" />
     <Compile Include="Main.rvn" />
@@ -48,23 +49,46 @@ with tempfile.TemporaryDirectory(prefix='neoclr-introspection-v1-') as temporary
     artifact = output / 'App.neoil'
     emitted = artifact.read_text()
     interfaces = re.findall(r'^\.interface (Application\.V1_T_[0-9A-F]+)$', emitted, re.M)
-    assert len(interfaces) == 2, emitted
+    assert len(interfaces) == 3, emitted
     type_info = next(name for name in interfaces if bytes.fromhex(name.split('V1_T_')[1]).decode().endswith('8:TypeInfo'))
+    field_info = next(name for name in interfaces if bytes.fromhex(name.split('V1_T_')[1]).decode().endswith('9:FieldInfo'))
+    member_info = next(name for name in interfaces if bytes.fromhex(name.split('V1_T_')[1]).decode().endswith('10:MemberInfo'))
+    assert '.interface ' + field_info + '\n.implements ' + member_info in emitted, emitted
+    assert '.method instance GetFields(System.Introspection.BindingFlags) -> System.Collections.Iterable<' + field_info + '>' in emitted, emitted
     # The structural reference is the new interface, never legacy System.Type.
     assert '.method instance get_DeclaringType() -> ' + type_info in emitted, emitted
-    run([runtime, 'verify', artifact, '--system', system])
+    assert '.method instance get_Type() -> ' + type_info in emitted, emitted
+    try:
+        run([runtime, 'verify', artifact, '--system', system])
+    except AssertionError as error:
+        raise AssertionError(str(error) + '\n' + emitted) from error
     result = run([runtime, 'run', artifact, '--system', system])
     # Preserve the current runtime's qualified Name behavior; the probe does not
     # establish a new naming or type-equality policy.
     assert result.stdout.strip().splitlines() == [
         'System.Int32', 'System', 'System.String', 'System',
-        'StoredDayNumber', 'System.Date', 'System'], result.stdout
+        'StoredDayNumber', 'System.Date', 'System', 'System.Int32', 'System',
+        'Private instance field', '0', '0', '1'], result.stdout
 
     main = (source / 'Main.rvn').read_text()
-    for name, operation in [('NoInvocation', 'integer.Invoke()'),
-                            ('NoLegacyInfo', 'integer.Info')]:
-        (root / 'Main.rvn').write_text(main.replace('Describe(integer)', operation))
+    for name, before, operation, diagnostic in [
+        ('NoInvocation', 'Describe(integer)', 'integer.Invoke()', 'Invoke'),
+        ('NoLegacyInfo', 'Describe(integer)', 'integer.Info', 'Info'),
+        ('NoFieldAccess', 'Describe(descriptor.Type)', 'descriptor.GetValue()', 'GetValue'),
+    ]:
+        (root / 'Main.rvn').write_text(main.replace(before, operation))
         rejected = run([*bridge, '--project', project, root / name], False)
-        assert ('Invoke' if name == 'NoInvocation' else 'Info') in rejected.stdout + rejected.stderr
+        assert diagnostic in rejected.stdout + rejected.stderr
         assert not (root / name / 'App.neoil').exists()
-print('Runtime-backed TypeInfo/MemberInfo consumers execute; invocation and legacy Info are absent from the new contracts.')
+
+    # Unsupported flags still fault at query time, rather than looking like an
+    # empty result or being silently discarded by the new adapter.
+    (root / 'Main.rvn').write_text(main.replace(
+        'BindingFlags.NonPublic | BindingFlags.Instance', '(BindingFlags)1'))
+    output = root / 'invalid-flags'
+    run([*bridge, '--project', project, output])
+    artifact = output / 'App.neoil'
+    run([runtime, 'verify', artifact, '--system', system])
+    rejected = run([runtime, 'run', artifact, '--system', system], False)
+    assert 'unsupported BindingFlags bits' in rejected.stdout + rejected.stderr
+print('Shared field queries execute with TypeInfo-valued structural references; filters and invalid flags retain runtime behavior.')

@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-17
 
+- Extend the isolated Introspection prototype with TypeInfo.GetFields(flags) and
+  FieldInfo interfaces. Field Type and DeclaringType use the shared TypeInfo model;
+  preserve runtime filtering, ordering and unsupported-flag faults. Verify interface
+  inheritance, structural signatures and rejection of dynamic field access. Update
+  samples, docs and website. The eager Iterable adapter is experimental; production
+  descriptor identities and RuntimeContext remain unmigrated.
+  Record the required hidden Runtime*Info implementations and shared runtime-owned
+  type-of/RuntimeContext acquisition yielding identical or value-equivalent descriptors.
+
 - Fix neoCLR importer conversion of mixed constructor arguments: convert each
   argument in an adapter rather than repeatedly converting the top stack value.
   Cover class and value constructors, multiple Boolean arguments and single

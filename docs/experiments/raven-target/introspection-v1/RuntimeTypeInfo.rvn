@@ -1,6 +1,7 @@
 namespace System.Runtime
 
 import System.*
+import System.Collections.*
 import System.Introspection.*
 
 // Transitional adapter: the legacy runtime identity stays behind the interface.
@@ -14,4 +15,19 @@ internal class RuntimeTypeInfo : TypeInfo {
 
     val Name: string { get => runtimeType.Name }
     val Namespace: string { get => runtimeType.Namespace }
+
+    func GetFields(flags: BindingFlags) -> Iterable<FieldInfo> {
+        let fields = ArrayList<FieldInfo>()
+        for descriptor in runtimeType.Info.GetFields(flags: flags) {
+            let fieldInfo: FieldInfo = RuntimeFieldInfo(
+                descriptor.Name,
+                RuntimeTypeInfo(descriptor.DeclaringType),
+                RuntimeTypeInfo(descriptor.FieldType),
+                descriptor.IsPublic,
+                descriptor.IsPrivate,
+                descriptor.IsStatic)
+            fields.Add(fieldInfo)
+        }
+        return fields
+    }
 }

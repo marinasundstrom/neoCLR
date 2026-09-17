@@ -83,6 +83,30 @@ or Raven extensions. A conceptual `runtime.Reflection.TryBind(method)` illustrat
 the boundary; neither that signature nor implicit selection of Current is settled.
 A MethodInfo alone is not sufficient authority to invoke executable code.
 
+### Hidden implementations and unified type acquisition — 2026-09-17
+
+The author clarifies that RuntimeTypeInfo and other Runtime*Info implementations
+must not be exposed as public API. Consumers use the Info interfaces, not concrete
+constructors or backend casts. The runtime nevertheless knows the implementation
+needed to resolve a type handle or equivalent type-of instruction result.
+
+Type acquisition follows a runtime-owned path: a handle/token resolves to a hidden
+RuntimeTypeInfo implementation returned as TypeInfo. RuntimeContext must obtain the
+same object or a value-equivalent description for that same runtime type. Type-of
+resolution and context discovery must not create unrelated identity models.
+
+This does not require every access to return the identical allocation. Before
+production migration, specify descriptor equivalence and lifetime in terms of the
+actual runtime type identity and context, including constructed types and modifiers;
+matching display names is insufficient. Keep the resolver/factory out of the public
+structural contracts. The precise opcode, compiler lowering, interning strategy and
+RuntimeContext lookup API are still to be chosen.
+
+Validate equivalent acquisition through type-of and RuntimeContext, hidden concrete
+implementations in public reference metadata, generic/array distinctions, and
+non-equivalence of same-named but distinct types. Cross-context executable binding
+remains Reflection's responsibility, not an operation on TypeInfo.
+
 ## Emit and cross-origin composition
 
 Reflection and Emit are sibling capabilities over the same introspection contracts.
@@ -158,6 +182,9 @@ The [isolated Raven probe](experiments/raven-target/introspection-v1/README.md)
 exercises minimal TypeInfo/MemberInfo interfaces backed by existing runtime objects.
 It keeps experimental and existing descriptors in separate assembly identities;
 production migration is still required. BindingFlags is retained for acquisition.
+The probe now also queries fields through TypeInfo and exposes FieldInfo.Type and
+MemberInfo.DeclaringType through that same interface. Its collection representation
+is experimental; filtering and invalid-flag behavior delegate to the runtime.
 
 The library importer now also admits checked nongeneric interface declarations,
 with Clock as its first integrated Raven contract. This removes the declaration

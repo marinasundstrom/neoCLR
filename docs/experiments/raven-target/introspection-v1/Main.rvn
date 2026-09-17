@@ -14,6 +14,14 @@ func DescribeMember(member: MemberInfo) {
     Describe(member.DeclaringType)
 }
 
+func CountFields(type: TypeInfo, flags: BindingFlags) -> int {
+    var count = 0
+    for descriptor in type.GetFields(flags: flags) {
+        count += 1
+    }
+    return count
+}
+
 func Main() {
     let integer: TypeInfo = RuntimeTypeInfo(typeof(int))
     let text: TypeInfo = RuntimeTypeInfo(typeof(string))
@@ -21,7 +29,15 @@ func Main() {
     Describe(text)
 
     // Legacy acquisition is explicit until RuntimeContext discovery is implemented.
-    let descriptor = typeof(Date).Info.GetFields(flags: BindingFlags.NonPublic | BindingFlags.Instance)[0]
-    let member: MemberInfo = RuntimeFieldInfo(descriptor)
-    DescribeMember(member)
+    let date: TypeInfo = RuntimeTypeInfo(typeof(Date))
+    for descriptor in date.GetFields(flags: BindingFlags.NonPublic | BindingFlags.Instance) {
+        DescribeMember(descriptor)
+        Describe(descriptor.Type)
+        if descriptor.IsPrivate && !descriptor.IsPublic && !descriptor.IsStatic {
+            WriteLine("Private instance field")
+        }
+    }
+    WriteLine(CountFields(date, BindingFlags.Public | BindingFlags.Instance))
+    WriteLine(CountFields(date, BindingFlags.NonPublic | BindingFlags.Static))
+    WriteLine(CountFields(date, BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly))
 }

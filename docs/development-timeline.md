@@ -25,6 +25,20 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+### Runtime-owned descriptor acquisition — 2026-09-17
+
+**Author clarification:** Runtime*Info implementations should not be visible, but
+the runtime must know which implementation to produce from a handle or type-of
+instruction result. RuntimeTypeInfo is returned as TypeInfo. RuntimeContext should
+obtain the same object or a value-equivalent description.
+
+**Assistant response:** Recorded hidden public implementation types, runtime-owned
+resolution and shared identity/equivalence across type-of and RuntimeContext as
+requirements. Identical allocation is not mandated. The current prototype's direct
+internal adapter construction is bootstrap-only; it does not implement the final
+resolver, context discovery or equivalence contract. Exact lowering and lifetime
+remain open, with validation requirements in the [proposal](introspection-design.md).
+
 ### Refined interface-based introspection proposal — 2026-09-17
 
 **Author direction:** Supplied a simplified proposal and asked to update the docs
