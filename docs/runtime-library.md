@@ -1,5 +1,9 @@
 # Runtime library boundary
 
+The planned [System.Runtime assembly](system-runtime-assembly.md) will own the
+minimum managed foundation now being authored through the System project.
+This is a project/assembly boundary, not a move of every type into one namespace.
+
 Try the latest local collection APIs with the [Raven .12 installation](raven-collections-local-build.md).
 
 The [API design policy and contract inventory](api-design.md) defines when System

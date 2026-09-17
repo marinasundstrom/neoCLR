@@ -25,6 +25,22 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-17 — Plan the minimal System.Runtime assembly
+
+**Author direction.** Plan a System.Runtime project/assembly supplying the minimal
+types a managed application needs, substantially those being implemented in System.
+The author keeps the next release focused on API shape and a running demonstration.
+
+**Assistant proposal and action.** Recorded a staged assembly plan: inventory actual
+dependencies, establish one foundation identity, migrate reference generation and
+runtime contracts together, then execute the POC against it. Namespaces retain their
+separate responsibilities; Reflection and Emit remain optional capabilities.
+Updated library documentation and website with explicitly planned status.
+
+**Open.** Exact minimal membership and reference/implementation identity mapping
+require the inventory. No project or assembly has been renamed in this documentation
+slice. See [the plan and .NET comparison](system-runtime-assembly.md).
+
 ## 2026-09-17 — RuntimeContext owns typeof acquisition
 
 **Author direction.** Runtime*Info implementations must remain hidden; handle-based

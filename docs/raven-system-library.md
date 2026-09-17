@@ -1,5 +1,14 @@
 # Authoring the foundational library in Raven
 
+## Planned System.Runtime assembly — 2026-09-17
+
+The author requests a minimal managed `System.Runtime` project/assembly, starting
+from the foundational types in the current System project. The
+[assembly plan](system-runtime-assembly.md) separates assembly ownership from
+namespaces and coordinates reference identity, runtime artifacts and compiler
+contracts. It does not duplicate the library or make optional Reflection/Emit
+mandatory. Inventory the working POC's dependencies before selecting the exact set.
+
 ## Constructor argument conversions — 2026-09-17
 
 The neoCLR importer now uses its per-argument coercion adapters for application

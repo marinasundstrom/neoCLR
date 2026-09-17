@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-17
 
+- Plan System.Runtime as the minimal Raven-authored managed foundation, derived
+  from the current System project. Document candidate scope, .NET comparison,
+  namespace/assembly separation and coordinated identity migration. Link the plan
+  from library docs and website; no assembly rename or new project is implemented.
+
 - Add an executable RuntimeContext POC: opt-in Raven typeof returns the shared
   TypeInfo interface through Current.GetTypeInfoFromHandle, with internal runtime
   adapters. Run the source entry unchanged and separately check repeated/distinct
