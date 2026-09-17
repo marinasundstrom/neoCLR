@@ -1,5 +1,21 @@
 # Authoring the foundational library in Raven
 
+## Constructor argument conversions — 2026-09-17
+
+The neoCLR importer now uses its per-argument coercion adapters for application
+and Raven-library constructors, as it already did for method calls. Previously,
+converting several CLI Int32 Boolean operands in place repeatedly converted the
+top stack value. Mixed constructor arguments could fail runtime verification.
+The adapter reloads and converts each argument in declaration order after source
+expressions have been evaluated, preserving values and single evaluation. Reference
+constructors and application value-constructor factories use the same path.
+
+This restores the existing CLI-stack/neoCLR Boolean boundary; it adds no language
+feature or Runtime Contract configuration and makes no change to the Raven compiler.
+`verify_constructor_arguments.py` executes mixed Boolean/integer class and value
+constructors and checks observable argument-evaluation order. The introspection
+field adapter exposed the bug, but the fix is not descriptor-specific.
+
 ## Checked interface declarations — 2026-09-17
 
 The runtime-library importer now accepts an explicitly selected public nongeneric

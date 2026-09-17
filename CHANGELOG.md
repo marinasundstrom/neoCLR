@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-17
 
+- Fix neoCLR importer conversion of mixed constructor arguments: convert each
+  argument in an adapter rather than repeatedly converting the top stack value.
+  Cover class and value constructors, multiple Boolean arguments and single
+  left-to-right source evaluation. Update integration docs; no Raven compiler or
+  public API change.
+
 - Admit checked nongeneric interface declarations in the Raven runtime-library
   importer and port the existing Clock contract to Raven. Preserve its Now property,
   System namespace and runtime-backed implementation. Reject mismatched interface

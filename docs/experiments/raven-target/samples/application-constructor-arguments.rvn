@@ -1,0 +1,54 @@
+import System.*
+import System.Console.*
+
+class Inputs {
+    var Calls: int = 0
+
+    func Next(value: bool) -> bool {
+        Calls += 1
+        WriteLine(Calls)
+        return value
+    }
+}
+
+class Flags {
+    var First: bool
+    var Number: int
+    var Second: bool
+    var Third: bool
+
+    init(first: bool, number: int, second: bool, third: bool) {
+        First = first
+        Number = number
+        Second = second
+        Third = third
+    }
+}
+
+struct ValueFlags {
+    var First: bool
+    var Number: int
+    var Last: bool
+
+    init(first: bool, number: int, last: bool) {
+        First = first
+        Number = number
+        Last = last
+    }
+}
+
+func Main() {
+    let inputs = Inputs()
+    let flags = Flags(inputs.Next(true), 42, inputs.Next(false), inputs.Next(true))
+    if flags.First && !flags.Second && flags.Third {
+        WriteLine("Class arguments preserved")
+    }
+    WriteLine(flags.Number)
+    WriteLine(inputs.Calls)
+
+    let value = ValueFlags(false, 7, true)
+    if !value.First && value.Last {
+        WriteLine("Value arguments preserved")
+    }
+    WriteLine(value.Number)
+}

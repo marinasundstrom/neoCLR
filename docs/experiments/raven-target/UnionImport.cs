@@ -419,9 +419,12 @@ static class UnionImport
                             if (!constructorDefinition.IsPublic && constructorDefinition.DeclaringType != method.DeclaringType) throw new InvalidDataException("Nonpublic application constructor unsupported.");
                             if (!constructorDefinition.IsConstructor || constructorDefinition.IsStatic || !ApplicationTypes.Matches(constructor, constructorDefinition)) throw new InvalidDataException("Invalid application constructor.");
                             var ctorArgs = constructor.Parameters.Select(p => ProfileType(ApplicationTypes.Close(p.ParameterType, constructor.DeclaringType))).ToArray();
-                            for (var n = ctorArgs.Length - 1; n >= 0; n--) ConvertTop(ctorArgs[n]);
+                            var actualCtorArgs = new string[ctorArgs.Length];
+                            for (var n = ctorArgs.Length - 1; n >= 0; n--)
+                                actualCtorArgs[n] = Argument(ctorArgs[n]).Type;
                             var owner = ProfileType(constructor.DeclaringType);
                             pending.Enqueue(constructorDefinition); Push(new(owner));
+                            Call constructionCall;
                             if (libraryOwner is null && constructorDefinition.DeclaringType.IsValueType)
                             {
                                 var factory = "Create" + Name(constructorDefinition);
@@ -429,9 +432,13 @@ static class UnionImport
                                 for (var n = 0; n < ctorArgs.Length; n++) body.AppendLine($"ldarg {n}");
                                 body.AppendLine($"call {Name(constructorDefinition)}({string.Join(',', new[] { owner + "&" }.Concat(ctorArgs))})\nldloc value\nret\n.end");
                                 delegateAdapters[factory] = body.ToString();
-                                code.AppendLine($"call {factory}({string.Join(',', ctorArgs)})");
+                                constructionCall = new(factory, ctorArgs, owner);
                             }
-                            else code.AppendLine($"newobj instance {owner}::.ctor({string.Join(',', ctorArgs)})"); break;
+                            else constructionCall = new("", ctorArgs, owner,
+                                Instruction: $"newobj instance {owner}::.ctor({string.Join(',', ctorArgs)})");
+                            constructionCall = Coerce(constructionCall, actualCtorArgs);
+                            code.AppendLine(constructionCall.Instruction ?? $"call {constructionCall.Name}({string.Join(',', constructionCall.Arguments)})");
+                            break;
                         }
                         if (constructorDefinition.Module != library.MainModule) throw new InvalidDataException("Only admitted library constructors supported.");
                         if (DelegateBindings.Type(constructor.DeclaringType) is { } delegateType)
