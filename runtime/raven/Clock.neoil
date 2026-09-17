@@ -1,0 +1,3 @@
+; Raven-authored clock contract; runtime implementation remains SystemClock.
+.include "generated/Clock.methods.neoil"
+.include "generated/Clock.helpers.neoil"

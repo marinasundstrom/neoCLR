@@ -47,3 +47,9 @@ Next: coordinate runtime/reference descriptor identity and type-acquisition lowe
 then extend the minimum contracts and RuntimeContext discovery. Keep BindingFlags
 while migrating query operations. The POC must not leak System.Type into the final
 public structural model.
+
+The checked library importer now supports nongeneric interface declarations,
+validated against the existing Clock reference contract by
+`verify_interface_library.py`. This prerequisite is integrated into the Raven
+runtime profile; the Info interfaces in this probe still use application-scoped
+identities and are not yet production library declarations.

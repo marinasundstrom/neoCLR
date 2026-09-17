@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-17
 
+- Admit checked nongeneric interface declarations in the Raven runtime-library
+  importer and port the existing Clock contract to Raven. Preserve its Now property,
+  System namespace and runtime-backed implementation. Reject mismatched interface
+  shapes, properties and referenced type identities; validate FixedClock/SystemClock
+  consumers and update samples, docs and website. This enables interface authoring
+  but does not yet migrate production Info identities or introduce RuntimeContext.
+
 - Add an isolated executable Raven probe for TypeInfo/MemberInfo interfaces with
   internal runtime-backed adapters and DeclaringType returning TypeInfo. Check
   emitted interfaces, execution and rejection of invocation/legacy Info access.

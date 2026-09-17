@@ -1,6 +1,6 @@
 {
   "format": "raven-library-bootstrap-v1",
-  "owner": "System.Boolean",
+  "owner": "System.Clock",
   "inputs": {
     "runtime/raven/src/System/Clock.rvn": "1043b7bbabbd554ae9bfab607a9ca6ac16618c76d1cdcc3dc9c69d0175ef98d2",
     "runtime/raven/src/System/Introspection/TypeInfo.rvn": "5869dbbd4f6a1ecac077bcc3805788e627a7964ffe8dfa2e9162a9c51c109d20",
@@ -34,12 +34,12 @@
     "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
   },
   "outputs": {
-    "Boolean.methods.neoil": "95ba500eaae62c12d9ad22ead25ef5a3932a8f4b0a37877630194da3b8cfe63e",
-    "Boolean.helpers.neoil": "595541371d3cbaf1eb8342abe2e3080365e6071db5da4f260007bacb93b77f1f"
+    "Clock.methods.neoil": "de42bd78ef7dc4e5b464553177933d8a31244816a3941cc213907c1a7ee2d374",
+    "Clock.helpers.neoil": "eeda6c34f4c4e23159ac7e86d1cfcbe77e06a5915d1b6f6ea9f430045eddb7f4"
   },
   "compilerSha256": "744ad87d9a6ec3d8b5691e72d0cd077b154af51615387b5f6bb171daa89fb370",
   "coreSha256": "caf4440d2e77ef14ebb2005fa9dfad39829d758910305ca237415f0811799231",
   "exports": [
-    "readonly byref CompareTo(Boolean) -> Int32"
+    "get_Now() -> System.Instant"
   ]
 }

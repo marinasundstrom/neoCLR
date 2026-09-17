@@ -12,6 +12,9 @@
     <Compile Include="src/System/IO/Path/Functions.rvn" />
     <Compile Include="src/System/IO/File/Functions.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Clock'">
+    <Compile Include="src/System/Clock.rvn" />
+  </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'ArrayList'">
     <Compile Include="src/System/Collections/ArrayList.rvn" />
   </ItemGroup>

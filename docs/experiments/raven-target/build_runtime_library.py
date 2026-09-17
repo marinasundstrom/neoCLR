@@ -10,6 +10,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    'Clock': 'System.Clock',
     'TypeInfo': 'System.Introspection.TypeInfo',
     'ParameterInfo': 'System.Introspection.ParameterInfo',
     'Duration': 'System.Duration',
@@ -39,6 +40,7 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    'Clock': 'runtime/raven/src/System/Clock.rvn',
     'TypeInfo': 'runtime/raven/src/System/Introspection/TypeInfo.rvn',
     'ParameterInfo': 'runtime/raven/src/System/Introspection/ParameterInfo.rvn',
     'Duration': 'runtime/raven/src/System/Duration.rvn',
@@ -80,11 +82,11 @@ def fragments(text, name="Math", owner="System.Math"):
         if not lines[0].strip():
             lines.pop(0)
             continue
-        if lines[0].startswith('.type '):
+        if lines[0].startswith(('.type ', '.interface ')):
             depth = 0
             for index, line in enumerate(lines):
                 token = line.strip().split(' ', 1)[0]
-                if token in ('.type', '.method', '.property'):
+                if token in ('.type', '.interface', '.method', '.property'):
                     depth += 1
                 elif token == '.end':
                     depth -= 1
@@ -93,7 +95,7 @@ def fragments(text, name="Math", owner="System.Math"):
             else:
                 raise ValueError('Unclosed private implementation type')
             body = ''.join(lines[:index + 1])
-            if lines[0].startswith('.type class ' + owner + '<') or lines[0].strip() == '.type ' + owner:
+            if lines[0].startswith('.type class ' + owner + '<') or lines[0].strip() in ('.type ' + owner, '.interface ' + owner):
                 methods.append(body)
             else:
                 types.append(body)

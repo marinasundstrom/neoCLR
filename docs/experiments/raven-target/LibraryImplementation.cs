@@ -16,6 +16,8 @@ static class LibraryImplementation
             ?? throw new InvalidDataException("Missing namespace implementation: " + owner);
         var contract = core.Types.SingleOrDefault(t => t.Namespace == owner && NamespaceFunctions.IsContainer(t)) ?? core.Types.SingleOrDefault(t => t.FullName.Split('`')[0] == owner)
             ?? throw new InvalidDataException("Missing namespace reference contract: " + owner);
+        if (type.IsInterface || contract.IsInterface)
+            return InterfaceRoots(type, contract, owner);
         if (!(type.IsAbstract && type.IsSealed))
             return InstanceRoots(type, contract, owner);
         if (!contract.IsPublic || contract.HasGenericParameters || contract.IsInterface)
@@ -39,6 +41,41 @@ static class LibraryImplementation
             if (matches.Length != 1) throw new InvalidDataException("Library export does not match reference contract: " + method.FullName);
         }
         return methods;
+    }
+
+    static MethodDefinition[] InterfaceRoots(TypeDefinition type, TypeDefinition contract, string owner)
+    {
+        // Bounded declaration authoring, not permission to replace a class with an
+        // interface or supply executable default/static interface members.
+        foreach (var candidate in new[] { type, contract })
+            if (!candidate.IsPublic || !candidate.IsInterface || !candidate.IsAbstract
+                || candidate.IsSealed || candidate.HasGenericParameters || candidate.HasFields
+                || candidate.HasNestedTypes || candidate.HasEvents || candidate.HasInterfaces
+                || candidate.BaseType is not null || candidate.IsExplicitLayout
+                || candidate.Methods.Any(m => !m.IsPublic || !m.IsAbstract || !m.IsVirtual
+                    || !m.IsNewSlot || m.IsFinal || m.IsStatic || m.IsConstructor || m.HasBody
+                    || m.HasGenericParameters || m.ExplicitThis || m.HasOverrides
+                    || m.CallingConvention != MethodCallingConvention.Default
+                    || m.Parameters.Any(p => p.IsOut || p.ParameterType.IsByReference)))
+                throw new InvalidDataException("Unsupported library interface contract.");
+        bool Match(MethodDefinition left, MethodDefinition right) =>
+            left.Name == right.Name && SameType(left.ReturnType, right.ReturnType)
+            && left.Parameters.Count == right.Parameters.Count
+            && left.Parameters.Zip(right.Parameters).All(p => p.First.Name == p.Second.Name
+                && SameType(p.First.ParameterType, p.Second.ParameterType));
+        if (type.Methods.Count != contract.Methods.Count
+            || type.Methods.Any(m => contract.Methods.Count(c => Match(c, m)) != 1)
+            || type.Properties.Count != contract.Properties.Count
+            || type.Properties.Any(p => contract.Properties.Count(c => c.Name == p.Name
+                && SameType(c.PropertyType, p.PropertyType)
+                && c.Parameters.Count == p.Parameters.Count
+                && c.Parameters.Zip(p.Parameters).All(a => a.First.Name == a.Second.Name
+                    && SameType(a.First.ParameterType, a.Second.ParameterType))
+                && c.GetMethod?.Name == p.GetMethod?.Name && c.SetMethod?.Name == p.SetMethod?.Name) != 1))
+            throw new InvalidDataException("Library interface does not match reference contract.");
+        ApplicationTypes.BindLibrary(type, owner);
+        _ = ApplicationTypes.Type(type);
+        return [];
     }
 
     static MethodDefinition[] InstanceRoots(TypeDefinition type, TypeDefinition contract, string owner)

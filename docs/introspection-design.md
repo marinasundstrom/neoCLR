@@ -159,6 +159,11 @@ exercises minimal TypeInfo/MemberInfo interfaces backed by existing runtime obje
 It keeps experimental and existing descriptors in separate assembly identities;
 production migration is still required. BindingFlags is retained for acquisition.
 
+The library importer now also admits checked nongeneric interface declarations,
+with Clock as its first integrated Raven contract. This removes the declaration
+authoring blocker; multi-descriptor identity migration and runtime acquisition
+remain separate work. See [library progress](raven-system-library.md).
+
 1. Prove the smallest interface contract and a runtime-backed implementation in
    Raven; validate source, metadata and actual execution without claiming a complete
    provider model. Keep transitional System.Type use internal to that experiment.

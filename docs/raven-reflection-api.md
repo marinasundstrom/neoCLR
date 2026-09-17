@@ -18,6 +18,11 @@ exercises TypeInfo/MemberInfo interfaces with internal runtime-backed adapters a
 DeclaringType returning TypeInfo. It uses the current runtime rather than replacing
 its descriptors. The production identity migration and RuntimeContext remain open.
 
+The [checked interface declaration path](raven-system-library.md#checked-interface-declarations--2026-09-17)
+is now integrated and exercised by the Raven-authored Clock contract. It is a
+prerequisite for the Info interfaces, not a claim that these class-based descriptors
+have already migrated.
+
 ## Introspection namespace migration — 2026-09-16
 
 ### TypeInfo Raven port

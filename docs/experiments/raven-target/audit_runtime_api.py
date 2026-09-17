@@ -131,6 +131,12 @@ for file in source['sourceFiles']:
 result = {'purpose': 'Explicit source-by-source API audit. Samples and signature checks are evidence, not a claim of arbitrary generic/compiler support.',
           'declarationCount': sum(r['declarations'] for r in rows), 'sources': rows}
 result['targetProfileAdditions'] = [{
+    'file': 'runtime/raven/Clock.neoil',
+    'disposition': 'raven-authored-interface-contract',
+    'samples': ['library-clock.rvn', 'library-instants.rvn'],
+    'tests': ['docs/experiments/raven-target/verify_interface_library.py', 'tests/instant_clock.rs'],
+    'note': 'Checked nongeneric interface declaration with unchanged Now property. SystemClock remains runtime-backed; Info interface identity migration is separate.'
+}, {
     'file': 'runtime/raven/TypeInfo.neoil',
     'disposition': 'raven-authored-type-info',
     'samples': ['library-reflection.rvn', 'library-flags.rvn'],

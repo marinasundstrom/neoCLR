@@ -1,5 +1,31 @@
 # Authoring the foundational library in Raven
 
+## Checked interface declarations — 2026-09-17
+
+The runtime-library importer now accepts an explicitly selected public nongeneric
+interface only when its abstract instance methods and properties match the supplied
+reference contract, including parameter names and referenced type identities. It
+rejects class/interface substitutions, inherited/generic interfaces, storage, events,
+default/static implementations and added or changed members. Unsupported forms remain
+out of scope rather than being copied through unchecked.
+
+`runtime/raven/src/System/Clock.rvn` is the first integrated contract: the Raven
+profile uses its generated declaration while the original neoIL profile retains
+its existing declaration. SystemClock still implements the wall-clock service;
+Clock.Now still returns Instant. The public API, namespace and runtime behavior
+are unchanged. This provides the checked library-declaration path needed before
+the new introspection interfaces can replace their production class identities.
+It does not perform that identity migration or add RuntimeContext.
+
+This is a source-ownership change, reusing the existing
+[clock/.NET comparison](date-time-design.md), not a new clock policy. Emitted neoIL
+retains the interface method and property; no executable reference-stub body is
+introduced. No Raven compiler or Runtime Contract configuration change is needed.
+
+Validation: `verify_interface_library.py` checks positive/negative authoring and
+executes FixedClock and SystemClock consumers, including host-clock comparison.
+The introspection prototype and existing consumers remain regression checks.
+
 ## Migration priority — 2026-09-17
 
 The [refined introspection proposal](introspection-design.md) now takes precedence:

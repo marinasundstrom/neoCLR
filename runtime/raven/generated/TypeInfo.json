@@ -2,6 +2,7 @@
   "format": "raven-library-bootstrap-v1",
   "owner": "System.Introspection.TypeInfo",
   "inputs": {
+    "runtime/raven/src/System/Clock.rvn": "1043b7bbabbd554ae9bfab607a9ca6ac16618c76d1cdcc3dc9c69d0175ef98d2",
     "runtime/raven/src/System/Introspection/TypeInfo.rvn": "5869dbbd4f6a1ecac077bcc3805788e627a7964ffe8dfa2e9162a9c51c109d20",
     "runtime/raven/src/System/Introspection/ParameterInfo.rvn": "9e767dcd629ae87d3c1128531925045426d7138d2beb78f40abd2787b6e5c206",
     "runtime/raven/src/System/Duration.rvn": "321a44237e5990cf6ec7d1432a279145f84d2ecaa32675f5b95636801b0f8e44",
@@ -29,7 +30,7 @@
     "runtime/raven/src/System/Single.rvn": "488efaf36e56f147c7158a5b0637f3bc4e56e84bb3f514af6c64a023dcd8598e",
     "runtime/raven/src/System/Double.rvn": "cd3ad24e4a21b7616a2937da71891618284913e26ea180ce203276f18b631f33",
     "runtime/raven/src/System/Boolean.rvn": "1f0010fe0d346fbc7f3ba29c88b2c1cf80faebf42a4c2de2f0cd6cff15335022",
-    "runtime/raven/System.rvnproj": "2f015936896c1131659149c985ba203736e4605b7da3a8128b3b98c5169f5f33",
+    "runtime/raven/System.rvnproj": "ce07b61def6db05b717b7f4bb735f8f36ab0add8e10ec1b61a27b0f80597354a",
     "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
   },
   "outputs": {
