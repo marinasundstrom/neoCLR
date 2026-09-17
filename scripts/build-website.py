@@ -65,7 +65,7 @@ def main():
     raven = 'docs/experiments/raven-target/samples/'
     samples = {
         'CLOCK_SAMPLE': (raven + 'library-instants.rvn', 'func ShowCurrentTime', '\n}', True),
-        'INTROSPECTION_SAMPLE': (raven + 'library-type-preview.rvn', 'func Main', '\n}', True),
+        'INTROSPECTION_SAMPLE': ('docs/experiments/raven-target/introspection-v1/ContextSample.rvn', 'class ContextSample', '\n}', True),
         'UNION_SAMPLE': (raven + 'library-query-terminals.rvn', 'func PrintOptional', '\nfunc OnlyPositive', False),
         'FUNC_SAMPLE': (raven + 'application-delegates.rvn', '    var shared = 7', '    WriteLine(shared)', True),
         'DATE_SAMPLE': (raven + 'library-calendar.rvn', '    CheckDate(Date.Create(day: 29', '    CheckDate(Date.FromDayNumber(-1))', True),

@@ -99,8 +99,10 @@ This does not require every access to return the identical allocation. Before
 production migration, specify descriptor equivalence and lifetime in terms of the
 actual runtime type identity and context, including constructed types and modifiers;
 matching display names is insufficient. Keep the resolver/factory out of the public
-structural contracts. The precise opcode, compiler lowering, interning strategy and
-RuntimeContext lookup API are still to be chosen.
+structural contracts. The selected compiler path is
+`RuntimeContext.Current.GetTypeInfoFromHandle(handle) -> TypeInfo`: acquire Current,
+load the type token, then invoke the resolver. Interning and full context lifetime
+remain to be specified; the handle is not a member of TypeInfo.
 
 Validate equivalent acquisition through type-of and RuntimeContext, hidden concrete
 implementations in public reference metadata, generic/array distinctions, and
@@ -175,8 +177,8 @@ proposal does not assert that all such .NET combinations fail.
 Today the runtime still uses System.Type, class-based System.Introspection descriptors,
 Type.Info and GetMethods/GetFields/GetProperties with BindingFlags. Type, TypeInfo
 queries and ParameterInfo readers have Raven-authored implementations. See the
-[implemented API](raven-reflection-api.md). RuntimeContext, dynamic Reflection, Emit
-and the complete interface migration are not implemented.
+[implemented API](raven-reflection-api.md). Dynamic Reflection, Emit and the complete
+interface migration are not implemented. RuntimeContext acquisition is an isolated POC.
 
 The [isolated Raven probe](experiments/raven-target/introspection-v1/README.md)
 exercises minimal TypeInfo/MemberInfo interfaces backed by existing runtime objects.
@@ -185,6 +187,13 @@ production migration is still required. BindingFlags is retained for acquisition
 The probe now also queries fields through TypeInfo and exposes FieldInfo.Type and
 MemberInfo.DeclaringType through that same interface. Its collection representation
 is experimental; filtering and invalid-flag behavior delegate to the runtime.
+
+The POC now includes a minimal RuntimeContext and a compiler-configured
+`typeof(Date)` sample. Raven binds the expression as TypeInfo and routes execution
+through Current.GetTypeInfoFromHandle; the private adapter alone uses the legacy
+System.Type factory. The source sample runs without an injected entry stub.
+This establishes the acquisition boundary, not assembly loading, production
+descriptor replacement, object.Type, or complete context discovery.
 
 The library importer now also admits checked nongeneric interface declarations,
 with Clock as its first integrated Raven contract. This removes the declaration

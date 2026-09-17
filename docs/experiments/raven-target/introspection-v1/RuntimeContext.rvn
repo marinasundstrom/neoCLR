@@ -1,0 +1,18 @@
+namespace System.Runtime
+
+import System.*
+import System.Introspection.*
+
+// Single execution-universe probe. Current creates a lightweight facade, not a
+// new load context; no context creation/loading API or singleton allocation claim.
+public class RuntimeContext {
+    private init() { }
+
+    static val Current: RuntimeContext {
+        get => RuntimeContext()
+    }
+
+    func GetTypeInfoFromHandle(handle: RuntimeTypeHandle) -> TypeInfo {
+        return RuntimeTypeInfo(Type.GetTypeFromHandle(handle))
+    }
+}

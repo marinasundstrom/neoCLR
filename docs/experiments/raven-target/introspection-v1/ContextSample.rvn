@@ -1,0 +1,22 @@
+import System.*
+import System.Console.*
+import System.Introspection.*
+import System.Runtime.*
+
+// The POC entry stub supplies ldtoken's handle. The consumer only uses public
+// descriptive contracts; it neither constructs nor casts Runtime*Info objects.
+class ContextSample {
+    func Run() {
+        // The neoCLR compiler contract resolves this through RuntimeContext.Current.
+        let type: TypeInfo = typeof(Date)
+        WriteLine(type.Name)
+        WriteLine(type.Namespace)
+
+        let flags = BindingFlags.NonPublic | BindingFlags.Instance
+        for descriptor in type.GetFields(flags: flags) {
+            WriteLine(descriptor.Name)
+            WriteLine(descriptor.Type.Name)
+            WriteLine(descriptor.DeclaringType.Name)
+        }
+    }
+}

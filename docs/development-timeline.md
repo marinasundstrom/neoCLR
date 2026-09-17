@@ -25,6 +25,28 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-17 — RuntimeContext owns typeof acquisition
+
+**Author direction.** Runtime*Info implementations must remain hidden; handle-based
+type acquisition and RuntimeContext should return the same or value-equivalent
+TypeInfo. The author selected `RuntimeContext.Current.GetTypeInfoFromHandle`,
+contrasting it with C#/Raven's System.Type factory, and explicitly requested the
+neoCLR Raven compiler change. The release goal is a running API-boundary POC,
+not complete implementations.
+
+**Assistant action.** Added an opt-in Raven compiler contract on the existing neoCLR
+feature branch and a minimal runtime-backed context in the isolated Raven probe.
+The sample uses actual typeof(Date), returning the descriptive interface and
+querying fields without reflection invocation. The check executes the source entry
+unchanged; separate test instrumentation compares underlying runtime identities.
+Updated the proposal, integration documentation and website excerpt.
+
+**Boundary and remaining work.** The default .NET compiler path remains System.Type.
+The POC uses a lightweight context facade and hidden adapters over existing runtime
+types, not a completed loader or replacement core. Production identity migration,
+context lifetime and full cross-origin equivalence remain open.
+See [the executable probe](experiments/raven-target/introspection-v1/README.md).
+
 ### Runtime-owned descriptor acquisition — 2026-09-17
 
 **Author clarification:** Runtime*Info implementations should not be visible, but

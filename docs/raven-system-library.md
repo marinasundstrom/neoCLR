@@ -53,7 +53,9 @@ class-port sequence below records completed work and the superseded plan.
 
 The [interface/provider probe](experiments/raven-target/introspection-v1/README.md)
 exercises TypeInfo and MemberInfo with existing runtime metadata. It is isolated
-from the shipped library, preserves BindingFlags and does not implement RuntimeContext.
+from the shipped library and preserves BindingFlags. Its minimal RuntimeContext now
+resolves compiler-generated typeof handles to the shared TypeInfo interface.
+See the [POC configuration and validation](experiments/raven-target/introspection-v1/README.md).
 
 ### Previous migration sequence — 2026-09-16
 

@@ -16,7 +16,14 @@ BindingFlags remains in use during this migration.
 An [isolated Raven probe](experiments/raven-target/introspection-v1/README.md) now
 exercises TypeInfo/MemberInfo interfaces with internal runtime-backed adapters and
 DeclaringType returning TypeInfo. It uses the current runtime rather than replacing
-its descriptors. The production identity migration and RuntimeContext remain open.
+its production descriptors. The production identity migration remains open.
+
+The follow-up [RuntimeContext POC](experiments/raven-target/introspection-v1/README.md)
+runs actual Raven `typeof(Date)` through
+`RuntimeContext.Current.GetTypeInfoFromHandle`, returning the TypeInfo interface
+with an internal RuntimeTypeInfo implementation. This opt-in compiler contract
+does not change the default compiler's System.Type behavior or migrate the installed
+core yet. The legacy Type/Info examples below still describe that installed core.
 
 The [checked interface declaration path](raven-system-library.md#checked-interface-declarations--2026-09-17)
 is now integrated and exercised by the Raven-authored Clock contract. It is a

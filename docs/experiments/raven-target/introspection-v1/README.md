@@ -26,7 +26,7 @@ the list. Runtime ordering and filtering are retained; unsupported bits still fa
 The importer preserves assembly-scoped identity: these experimental interfaces do
 not replace same-named classes from the old reference core. That isolation makes
 the probe executable but does **not** solve the production type-identity migration.
-No RuntimeContext, invocation, Emit, metadata loading, new equality contract or
+No invocation, Emit, metadata loading, new public equality contract or
 complete member model is claimed. Adapters may allocate on access. Current Name
 behavior is preserved, including qualified names.
 
@@ -47,11 +47,10 @@ on the descriptive contracts. Existing introspection consumers are tested separa
 
 This reuses the existing .NET-inspired descriptor comparison linked from the proposal.
 The experiment tests interface dispatch and structural closure, not .NET cross-context
-Emit compatibility. No compiler changes or Runtime Contract configuration changes
-are needed; general inheritance/provider loading support is not inferred from this
-bounded result.
+Emit compatibility. The original interface probe needs no compiler configuration;
+the RuntimeContext follow-up below explicitly opts into the new compiler contract.
 
-Next: coordinate runtime/reference descriptor identity and type-acquisition lowering,
+Next: coordinate production runtime/reference descriptor identity,
 then extend the minimum contracts and RuntimeContext discovery. Keep BindingFlags
 while migrating query operations. The POC must not leak System.Type into the final
 public structural model.
@@ -69,3 +68,53 @@ validated against the existing Clock reference contract by
 `verify_interface_library.py`. This prerequisite is integrated into the Raven
 runtime profile; the Info interfaces in this probe still use application-scoped
 identities and are not yet production library declarations.
+
+## RuntimeContext and actual typeof POC
+
+`ContextSample.rvn` uses `let type: TypeInfo = typeof(Date)`, then reads field
+descriptions. `RuntimeContext.rvn` owns handle resolution and returns the internal
+RuntimeTypeInfo as that interface. Its Current getter creates a lightweight facade
+over the one existing execution universe, not a new loading context. Only the
+adapter uses legacy System.Type; no such type leaks into the Info interfaces.
+
+The neoCLR Raven feature branch supports this opt-in project configuration:
+
+Compiler slice: Raven `85844c236` on `codex/neoclr-namespace-metadata`.
+
+```xml
+<RavenTypeOfAssemblyName>Probe</RavenTypeOfAssemblyName>
+<RavenTypeOfInfoType>System.Introspection.TypeInfo</RavenTypeOfInfoType>
+<RavenTypeOfContextType>System.Runtime.RuntimeContext</RavenTypeOfContextType>
+```
+
+Probe is the experimental source assembly, not the planned production core name.
+Partial/invalid contracts fail compiler validation; ordinary projects retain
+System.Type.GetTypeFromHandle. Semantic type information and emitted signatures
+use the interface. The compiler emits Current acquisition followed by the type
+token and the instance resolver call. No syntax change is required.
+
+```sh
+python3 docs/experiments/raven-target/verify_runtime_context.py \
+  --bridge docs/experiments/raven-target/bin/Release/net11.0/Probe.dll \
+  --runtime target/debug/neoclr
+```
+
+This check first compiles and runs the unmodified source entry on neoCLR, printing
+Date and its StoredDayNumber field. A separate test-only entry compares actual
+typeof with explicit context acquisition, and checks repeated and distinct
+scalar/array handles through independent Current facades; identity is
+compared using the underlying runtime types, not display names. That instrumentation
+does not implement typeof or add a public identity API. Full generic, cross-context
+and production visibility validation remain migration work.
+
+The .NET baseline resolves typeof through System.Type.GetTypeFromHandle. Moving
+resolution to a context preserves an explicit execution-universe boundary without
+putting executable capabilities on descriptive interfaces. The cost is a new compiler
+contract and coordinated reference/runtime migration. The bridge must be rebuilt
+against the updated Raven feature branch. Expression-tree and attribute encoding
+are not part of this execution POC; Reflection and Emit remain separate future work.
+
+Validation on 2026-09-17: 23 focused Raven compiler tests pass (source and referenced
+providers, semantic/operation type, hidden implementation and invalid contracts);
+the context check and existing interface/namespace consumer checks execute on
+neoCLR. The bootstrap snapshot hash check, website build and highlighting test pass.

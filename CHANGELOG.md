@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-17
 
+- Add an executable RuntimeContext POC: opt-in Raven typeof returns the shared
+  TypeInfo interface through Current.GetTypeInfoFromHandle, with internal runtime
+  adapters. Run the source entry unchanged and separately check repeated/distinct
+  scalar and array handles. Update integration docs, proposal and website sample.
+  The installed core and production descriptor identities are not migrated yet;
+  the bridge requires the updated Raven neoCLR feature branch.
+  Validate 23 focused compiler tests, the context and existing introspection
+  consumers, bootstrap snapshot consistency and the website build/highlighter.
+
 - Extend the isolated Introspection prototype with TypeInfo.GetFields(flags) and
   FieldInfo interfaces. Field Type and DeclaringType use the shared TypeInfo model;
   preserve runtime filtering, ordering and unsupported-flag faults. Verify interface
