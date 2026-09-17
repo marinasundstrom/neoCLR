@@ -1,0 +1,6 @@
+namespace System.Introspection
+
+public interface MemberInfo {
+    val Name: string { get }
+    val DeclaringType: TypeInfo { get }
+}

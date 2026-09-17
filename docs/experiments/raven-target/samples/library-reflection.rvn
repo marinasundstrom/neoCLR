@@ -1,6 +1,12 @@
 import System.*
 import System.Console.*
 import System.Introspection.*
+
+// All concrete member descriptors share these descriptive readers.
+func ShowMemberName(member: MemberInfo) {
+    WriteLine(member.Name)
+}
+
 func Show(value: bool) {
     if value {
         WriteLine("true")
@@ -28,7 +34,7 @@ func Main() {
     let methods = info.Info.GetMethods()
     let method = methods[0]
     let first: MemberInfo = method
-    WriteLine(first.Name)
+    ShowMemberName(first)
     WriteLine(first.DeclaringType.Name)
     WriteLine(method.ReturnType.Name)
     Show(method.IsStatic)
@@ -50,7 +56,7 @@ func Main() {
     Show(parameters[0].IsReadOnly)
     let property = typeof(Date).Info.GetProperties()[0]
     let member: MemberInfo = property
-    WriteLine(member.Name)
+    ShowMemberName(member)
     WriteLine(property.PropertyType.Name)
     Show(property.IsStatic)
     Show(property.CanRead)
@@ -74,7 +80,7 @@ func Main() {
     WriteLine((int)BindingFlags.Default)
     WriteLine((int)BindingFlags.DeclaredOnly)
     let fields = typeof(Date).Info.GetFields(flags: BindingFlags.NonPublic | BindingFlags.Instance)
-    WriteLine(fields[0].Name)
+    ShowMemberName(fields[0])
     WriteLine(fields[0].FieldType.Name)
     WriteLine(fields[0].DefinitionIndex)
     Show(fields[0].IsPublic)

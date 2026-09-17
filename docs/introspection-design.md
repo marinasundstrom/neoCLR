@@ -118,10 +118,14 @@ Build the dynamic structural model first.
 
 ## Query ergonomics
 
-Prefer collection properties (`type.Methods`, `type.Properties`, `type.Fields`,
+**Author follow-up — 2026-09-17:** Keep BindingFlags for now. The interface migration
+must retain existing flag-based queries and their filtering behavior. Do not remove
+flags or require collection filtering as part of this work.
+
+The refined proposal's longer-term option is collection properties (`type.Methods`, `type.Properties`, `type.Fields`,
 `method.Parameters`) and ordinary filtering such as
-`type.Methods.Where(m => m.Name == "Parse")`. BindingFlags is not the primary query
-language in the target design. Convenience Find helpers can follow concrete needs.
+`type.Methods.Where(m => m.Name == "Parse")`. This is not the immediate migration
+contract. Convenience Find helpers can follow concrete needs.
 Declared/inherited defaults, order, visibility, materialization and unavailable
 metadata errors still need explicit contracts; changing syntax must not silently
 change these semantics.
@@ -150,6 +154,11 @@ queries and ParameterInfo readers have Raven-authored implementations. See the
 [implemented API](raven-reflection-api.md). RuntimeContext, dynamic Reflection, Emit
 and the complete interface migration are not implemented.
 
+The [isolated Raven probe](experiments/raven-target/introspection-v1/README.md)
+exercises minimal TypeInfo/MemberInfo interfaces backed by existing runtime objects.
+It keeps experimental and existing descriptors in separate assembly identities;
+production migration is still required. BindingFlags is retained for acquisition.
+
 1. Prove the smallest interface contract and a runtime-backed implementation in
    Raven; validate source, metadata and actual execution without claiming a complete
    provider model. Keep transitional System.Type use internal to that experiment.
@@ -157,7 +166,8 @@ and the complete interface migration are not implemented.
    close over TypeInfo. Define typeof/value.Type lowering, equality, lifetime and
    handle access before removing System.Type and Type.Info.
 3. Add the minimum member contracts and runtime-backed RuntimeContext discovery
-   needed by working demos. Migrate query properties with tested filtering semantics.
+   needed by working demos. Preserve BindingFlags and test filtering semantics;
+   reconsider collection query properties separately.
 4. Add Reflection and Emit as separately validated capabilities. Offline metadata
    loading and typed introspection remain deferred.
 

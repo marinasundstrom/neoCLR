@@ -9,6 +9,10 @@ Raven interface/provider path, then migrate runtime identity and member signatur
 together. Offline MetadataContext and typed introspection are deferred. The earlier
 class-port sequence below records completed work and the superseded plan.
 
+The [interface/provider probe](experiments/raven-target/introspection-v1/README.md)
+exercises TypeInfo and MemberInfo with existing runtime metadata. It is isolated
+from the shipped library, preserves BindingFlags and does not implement RuntimeContext.
+
 ### Previous migration sequence — 2026-09-16
 
 TypeInfo's existing queries and internal factory are now Raven-authored alongside

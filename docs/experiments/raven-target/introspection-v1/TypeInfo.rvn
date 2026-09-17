@@ -1,0 +1,7 @@
+namespace System.Introspection
+
+// Minimal executable migration probe, not the complete public v1 contract.
+public interface TypeInfo {
+    val Name: string { get }
+    val Namespace: string { get }
+}

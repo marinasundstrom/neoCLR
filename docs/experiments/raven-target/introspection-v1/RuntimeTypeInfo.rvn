@@ -1,0 +1,17 @@
+namespace System.Runtime
+
+import System.*
+import System.Introspection.*
+
+// Transitional adapter: the legacy runtime identity stays behind the interface.
+// RuntimeContext discovery and unified type identity are separate migration steps.
+internal class RuntimeTypeInfo : TypeInfo {
+    private field runtimeType: Type
+
+    init(type: Type) {
+        runtimeType = type
+    }
+
+    val Name: string { get => runtimeType.Name }
+    val Namespace: string { get => runtimeType.Namespace }
+}

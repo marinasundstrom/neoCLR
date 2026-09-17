@@ -8,12 +8,21 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-17
 
+- Add an isolated executable Raven probe for TypeInfo/MemberInfo interfaces with
+  internal runtime-backed adapters and DeclaringType returning TypeInfo. Check
+  emitted interfaces, execution and rejection of invocation/legacy Info access.
+  Preserve BindingFlags in acquisition and expand existing member-consumer samples.
+  Update docs and website; production descriptor identity and RuntimeContext are
+  not migrated by this experiment.
+
 - Refine the Introspection proposal to one `*Info` interface model without public
   Type/TypeInfo pairs, runtime-backed v1 through RuntimeContext, separate Reflection
   binding and Emit generation, and collection-oriented queries. Defer offline
   MetadataContext and typed introspection. Update migration docs and website;
   preserve superseded designs as history. These are target contracts, not changes
   to the existing executable API.
+  Follow-up clarification retains BindingFlags during the current migration;
+  collection-oriented querying remains a future option.
 
 ### 2026-09-16
 

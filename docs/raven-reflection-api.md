@@ -11,6 +11,12 @@ The implementation described below still uses classes, System.Type and Type.Info
 it is the migration baseline, not the final design. Further class hierarchy ports
 are superseded by interface-contract/provider work. Reflection and Emit remain
 separate; offline metadata loading and typed introspection are deferred.
+BindingFlags remains in use during this migration.
+
+An [isolated Raven probe](experiments/raven-target/introspection-v1/README.md) now
+exercises TypeInfo/MemberInfo interfaces with internal runtime-backed adapters and
+DeclaringType returning TypeInfo. It uses the current runtime rather than replacing
+its descriptors. The production identity migration and RuntimeContext remain open.
 
 ## Introspection namespace migration — 2026-09-16
 

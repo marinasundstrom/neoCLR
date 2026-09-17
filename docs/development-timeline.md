@@ -41,6 +41,19 @@ it pursued the superseded public shape. Existing committed runtime APIs remain
 working migration baselines. Proposed a minimal executable interface/provider probe
 before the coordinated runtime identity migration; it is not the full v1 API.
 
+**Author follow-up:** "Keep the usage of binding flags for now".
+**Assistant response:** Retain BindingFlags and existing filtering semantics in the
+current interface migration and samples. Collection-style querying is a future
+option, not a requirement to replace flags in this slice.
+
+**Implementation outcome:** Added an isolated Raven TypeInfo/MemberInfo interface
+probe backed by current runtime types and field snapshots. Verified interface
+emission, DeclaringType returning TypeInfo, execution and rejection of Invoke/Info
+on the minimal interface. Existing three introspection consumers and eleven focused
+runtime tests pass. No production descriptor identity or RuntimeContext implementation
+is claimed. The website describes the direction and prototype status without the
+BindingFlags detail, as requested by the author.
+
 ### Shared introspection model clarification — 2026-09-16
 
 **Author correction:** Limit the API to necessary concepts. Introspection need not
