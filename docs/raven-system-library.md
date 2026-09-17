@@ -1,6 +1,15 @@
 # Authoring the foundational library in Raven
 
-## Migration priority — 2026-09-16
+## Migration priority — 2026-09-17
+
+The [refined introspection proposal](introspection-design.md) now takes precedence:
+one `*Info` interface model, no public Type/TypeInfo pair, runtime-backed v1 through
+RuntimeContext, and Reflection/Emit as separate capabilities. First prove the minimal
+Raven interface/provider path, then migrate runtime identity and member signatures
+together. Offline MetadataContext and typed introspection are deferred. The earlier
+class-port sequence below records completed work and the superseded plan.
+
+### Previous migration sequence — 2026-09-16
 
 TypeInfo's existing queries and internal factory are now Raven-authored alongside
 ParameterInfo. Runtime-backed descriptive services remain part of Introspection;

@@ -6,6 +6,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-09-17
+
+- Refine the Introspection proposal to one `*Info` interface model without public
+  Type/TypeInfo pairs, runtime-backed v1 through RuntimeContext, separate Reflection
+  binding and Emit generation, and collection-oriented queries. Defer offline
+  MetadataContext and typed introspection. Update migration docs and website;
+  preserve superseded designs as history. These are target contracts, not changes
+  to the existing executable API.
+
 ### 2026-09-16
 
 - Port existing TypeInfo queries and its internal factory to Raven, retaining

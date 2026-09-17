@@ -25,6 +25,22 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+### Refined interface-based introspection proposal — 2026-09-17
+
+**Author direction:** Supplied a simplified proposal and asked to update the docs
+before continuing work. `*Info` types are interfaces without I-prefixes. The public
+Type/TypeInfo, Assembly/AssemblyInfo and Module/ModuleInfo pairs disappear. V1 is
+runtime-backed through RuntimeContext; full MetadataContext and typed introspection
+are deferred. Reflection binds/executes against a context; Emit generates without
+implicitly loading. Prefer collection queries over BindingFlags.
+
+**Assistant action:** Recorded the [new proposal](introspection-design.md), preserved
+earlier positions as superseded history, and updated the migration docs and website.
+Set aside the uncommitted MemberInfo abstract-class source-port experiment because
+it pursued the superseded public shape. Existing committed runtime APIs remain
+working migration baselines. Proposed a minimal executable interface/provider probe
+before the coordinated runtime identity migration; it is not the full v1 API.
+
 ### Shared introspection model clarification — 2026-09-16
 
 **Author correction:** Limit the API to necessary concepts. Introspection need not

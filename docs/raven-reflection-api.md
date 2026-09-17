@@ -3,6 +3,15 @@
 The existing Type and Reflection APIs are being projected onto ordinary managed
 classes. This document tracks the implemented projection and its remaining boundaries.
 
+## Target design update — 2026-09-17
+
+The [refined proposal](introspection-design.md) replaces the planned public
+Type/TypeInfo split with `*Info` interfaces and runtime-backed RuntimeContext v1.
+The implementation described below still uses classes, System.Type and Type.Info;
+it is the migration baseline, not the final design. Further class hierarchy ports
+are superseded by interface-contract/provider work. Reflection and Emit remain
+separate; offline metadata loading and typed introspection are deferred.
+
 ## Introspection namespace migration — 2026-09-16
 
 ### TypeInfo Raven port

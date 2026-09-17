@@ -1,5 +1,10 @@
 # Introspection and reflection: planned contract review
 
+**Superseded design direction:** The [2026-09-17 refined proposal](introspection-design.md)
+uses a single interface-based `*Info` model, runtime-backed v1 via RuntimeContext,
+and defers MetadataContext. It replaces the public Type/TypeInfo split below.
+This page preserves earlier positions and research; they are not the current target.
+
 ## Scope clarification — 2026-09-16
 
 Keep the API to the minimum needed by current consumers. Introspection may depend
