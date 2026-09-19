@@ -1,0 +1,3 @@
+; Raven-authored SystemClock; generated from the existing public contract.
+.include "generated/SystemClock.methods.neoil"
+.include "generated/SystemClock.helpers.neoil"

@@ -1,0 +1,9 @@
+; Generated from runtime/raven/src/System/Collections/List.rvn. Regenerate with build_runtime_library.py.
+.interface System.Collections.List<T0>
+.implements System.Collections.MutableSequence<T0>
+.implements System.Collections.Sequence<T0>
+.implements System.Collections.Collection<T0>
+.implements System.Collections.Iterable<T0>
+.method instance Add(T0 value) -> noresult
+.end
+.end

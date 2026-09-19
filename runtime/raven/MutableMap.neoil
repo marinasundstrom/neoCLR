@@ -1,0 +1,3 @@
+; Raven-authored MutableMap contract.
+.include "generated/MutableMap.methods.neoil"
+.include "generated/MutableMap.helpers.neoil"

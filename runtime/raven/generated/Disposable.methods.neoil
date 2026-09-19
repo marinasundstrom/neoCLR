@@ -1,0 +1,5 @@
+; Generated from runtime/raven/src/System/Disposable.rvn. Regenerate with build_runtime_library.py.
+.interface System.Disposable
+.method instance Dispose() -> noresult
+.end
+.end

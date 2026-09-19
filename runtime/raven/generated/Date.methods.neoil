@@ -18,7 +18,7 @@
 .property instance Day() -> Int32
 .get instance System.Date::get_Day()
 .end
-.method private instance byref .ctor(Int32) -> Void
+.method private instance byref .ctor(Int32 dayNumber) -> Void
 .local Int32 local0
 ldc.i4 0
 stloc local0
@@ -43,7 +43,7 @@ M00000001_IL_0011:
 ldvoid
 ret
 .end
-.method static Create(Int32,Int32,Int32) -> System.Result<System.Date,System.InvalidDateError>
+.method static Create(Int32 year,Int32 month,Int32 day) -> System.Result<System.Date,System.InvalidDateError>
 M00000002_IL_0000:
 M00000002_IL_0001:
 M00000002_IL_0002:
@@ -205,7 +205,7 @@ call neoCLR.Library.System.Date.RuntimeUnion3(System.Result.Ok<System.Date>)
 M00000002_IL_00ee:
 ret
 .end
-.method static FromDayNumber(Int32) -> System.Result<System.Date,System.InvalidDateError>
+.method static FromDayNumber(Int32 dayNumber) -> System.Result<System.Date,System.InvalidDateError>
 M00000003_IL_0000:
 M00000003_IL_0001:
 M00000003_IL_0002:
@@ -261,7 +261,7 @@ call neoCLR.Library.System.Date.RuntimeUnion3(System.Result.Ok<System.Date>)
 M00000003_IL_0056:
 ret
 .end
-.method private static DaysBeforeYear(Int32) -> Int32
+.method private static DaysBeforeYear(Int32 year) -> Int32
 .local Int32 local0
 ldc.i4 0
 stloc local0
@@ -309,7 +309,7 @@ add
 M00000004_IL_001f:
 ret
 .end
-.method private static DaysInMonth(Int32,Int32) -> Int32
+.method private static DaysInMonth(Int32 year,Int32 month) -> Int32
 M00000005_IL_0000:
 M00000005_IL_0001:
 M00000005_IL_0002:
@@ -488,7 +488,7 @@ ldc.i4 31
 M00000005_IL_00ba:
 ret
 .end
-.method private static DaysBeforeMonth(Int32,Int32) -> Int32
+.method private static DaysBeforeMonth(Int32 year,Int32 month) -> Int32
 .local Int32 local0
 .local Int32 local1
 ldc.i4 0
@@ -850,7 +850,7 @@ sub
 M0000000b_IL_001a:
 ret
 .end
-.method instance readonly byref Equals(System.Date) -> Boolean
+.method instance readonly byref Equals(System.Date other) -> Boolean
 M0000000c_IL_0000:
 M0000000c_IL_0001:
 M0000000c_IL_0002:
@@ -868,7 +868,7 @@ M0000000c_IL_0011:
 call neoCLR.Library.System.Date.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance readonly byref CompareTo(System.Date) -> Int32
+.method instance readonly byref CompareTo(System.Date other) -> Int32
 M0000000d_IL_0000:
 M0000000d_IL_0001:
 M0000000d_IL_0002:

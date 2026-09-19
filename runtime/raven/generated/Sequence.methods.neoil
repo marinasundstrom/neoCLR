@@ -1,0 +1,10 @@
+; Generated from runtime/raven/src/System/Collections/Sequence.rvn. Regenerate with build_runtime_library.py.
+.interface System.Collections.Sequence<T0>
+.implements System.Collections.Collection<T0>
+.implements System.Collections.Iterable<T0>
+.method instance get_Item(Int32 index) -> T0
+.end
+.property instance Item(Int32) -> T0
+.get instance System.Collections.Sequence<T0>::get_Item(Int32)
+.end
+.end

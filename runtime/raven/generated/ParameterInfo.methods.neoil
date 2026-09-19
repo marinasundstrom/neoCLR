@@ -24,7 +24,7 @@
 .property instance IsReadOnly() -> Boolean
 .get instance System.Introspection.ParameterInfo::get_IsReadOnly()
 .end
-.method private instance .ctor(String,Int32,System.Type,Boolean,Boolean,Boolean) -> noresult
+.method private instance .ctor(String name,Int32 position,System.Type parameterType,Boolean isOut,Boolean isOutWhenTrue,Boolean isReadOnly) -> noresult
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0

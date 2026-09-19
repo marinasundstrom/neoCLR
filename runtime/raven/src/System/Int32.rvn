@@ -1,0 +1,54 @@
+namespace System
+
+import System.Result.*
+import System.Runtime.CompilerServices.RuntimeServices
+
+public struct Int32 : Comparable<int>, Equatable<int> {
+    // The runtime supplies intrinsic primitive storage.
+    #pragma warning disable-next-line RAV9032
+    private field m_value: int
+
+    static func Parse(value: string) -> Result<int, Int32ParseError> {
+        let payload = RuntimeServices.ParseInt32(value)
+        if RuntimeServices.IsValue<int>(payload) {
+            return Ok(RuntimeServices.UnpackValue<int>(payload))
+        }
+        let status = RuntimeServices.UnpackValue<byte>(payload)
+        if status == 1 {
+            return Error(Int32ParseError(Int32ParseError.InvalidFormat()))
+        }
+        if status == 2 {
+            return Error(Int32ParseError(Int32ParseError.Overflow()))
+        }
+        System.Fault("invalid native parse status")
+        return Error(Int32ParseError(Int32ParseError.InvalidFormat()))
+    }
+
+    static func Divide(dividend: int, divisor: int) -> System.Result<int, IntegerDivisionError> {
+        if divisor == 0 {
+            return Error(IntegerDivisionError(IntegerDivisionError.DivisionByZero()))
+        }
+        if dividend == -2147483648 && divisor == -1 {
+            return Error(IntegerDivisionError(IntegerDivisionError.Overflow()))
+        }
+        return Ok(dividend / divisor)
+    }
+
+    func Equals(other: int) -> bool {
+        return m_value == other
+    }
+
+    func ToString() -> string {
+        return RuntimeServices.Int32ToString(m_value)
+    }
+
+    func CompareTo(other: int) -> int {
+        if m_value < other {
+            return -1
+        }
+        if m_value > other {
+            return 1
+        }
+        return 0
+    }
+}

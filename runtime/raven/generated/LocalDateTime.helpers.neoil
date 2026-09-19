@@ -1,0 +1,60 @@
+; Generated from runtime/raven/src/System/LocalDateTime.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.LocalDateTime.RuntimeUnion0(System.Result<System.Date,System.InvalidDateError>& arg0) -> System.Result.Ok<System.Date>
+ldarg arg0
+ldobj System.Result<System.Date,System.InvalidDateError>
+call instance System.Result<System.Date,System.InvalidDateError>::GetOkCase()
+ret
+.end
+.function neoCLR.Library.System.LocalDateTime.RuntimeUnion1(System.Result.Ok<System.Date>& arg0) -> System.Date
+ldarg arg0
+ldobj System.Result.Ok<System.Date>
+call instance System.Result.Ok<System.Date>::get_Value()
+ret
+.end
+.function neoCLR.Library.System.LocalDateTime.RuntimeUnion2(System.Result<System.Time,System.InvalidTimeError>& arg0) -> System.Result.Ok<System.Time>
+ldarg arg0
+ldobj System.Result<System.Time,System.InvalidTimeError>
+call instance System.Result<System.Time,System.InvalidTimeError>::GetOkCase()
+ret
+.end
+.function neoCLR.Library.System.LocalDateTime.RuntimeUnion3(System.Result.Ok<System.Time>& arg0) -> System.Time
+ldarg arg0
+ldobj System.Result.Ok<System.Time>
+call instance System.Result.Ok<System.Time>::get_Value()
+ret
+.end
+.function neoCLR.Library.System.LocalDateTime.RuntimeServiceUnixTimeToLocal(Int64 arg0) -> arrayref<Int32>
+.local Int32[] source
+.local arrayref<Int32> destination
+.local Int32 index
+ldarg arg0
+call neoCLR.Runtime.UnixTimeToLocal(Int64)
+stloc source
+ldloc source
+ldlen
+conv.i4
+newarr Int32
+stloc destination
+ldc.i4 0
+stloc index
+br Test
+Copy:
+ldloc destination
+ldloc index
+ldloc source
+ldloc index
+ldelem Int32
+stelem Int32
+ldloc index
+ldc.i4 1
+add
+stloc index
+Test:
+ldloc index
+ldloc source
+ldlen
+conv.i4
+blt Copy
+ldloc destination
+ret
+.end

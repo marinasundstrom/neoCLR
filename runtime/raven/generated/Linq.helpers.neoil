@@ -84,7 +84,7 @@ False:
 .implements System.Collections.Iterable<T0>
 .field private source System.Collections.Iterable<T0>
 .field private callback System.Func<T0,Boolean>
-.method instance .ctor(System.Collections.Iterable<T0>,System.Func<T0,Boolean>) -> noresult
+.method instance .ctor(System.Collections.Iterable<T0> input,System.Func<T0,Boolean> action) -> noresult
 M0000000a_IL_0000:
 M0000000a_IL_0001:
 ldarg 0
@@ -130,7 +130,7 @@ ret
 .implements System.Collections.Iterable<T1>
 .field private source System.Collections.Iterable<T0>
 .field private callback System.Func<T0,T1>
-.method instance .ctor(System.Collections.Iterable<T0>,System.Func<T0,T1>) -> noresult
+.method instance .ctor(System.Collections.Iterable<T0> input,System.Func<T0,T1> action) -> noresult
 M0000000c_IL_0000:
 M0000000c_IL_0001:
 ldarg 0
@@ -183,7 +183,7 @@ ret
 .property instance Current() -> T0
 .get instance neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E57686572654974657261746F726031<T0>::get_Current()
 .end
-.method instance .ctor(System.Collections.Iterator<T0>,System.Func<T0,Boolean>) -> noresult
+.method instance .ctor(System.Collections.Iterator<T0> input,System.Func<T0,Boolean> action) -> noresult
 M0000000e_IL_0000:
 M0000000e_IL_0001:
 ldarg 0
@@ -434,7 +434,7 @@ ret
 .property instance Current() -> T1
 .get instance neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C6563744974657261746F726032<T0,T1>::get_Current()
 .end
-.method instance .ctor(System.Collections.Iterator<T0>,System.Func<T0,T1>) -> noresult
+.method instance .ctor(System.Collections.Iterator<T0> input,System.Func<T0,T1> action) -> noresult
 M00000012_IL_0000:
 M00000012_IL_0001:
 ldarg 0

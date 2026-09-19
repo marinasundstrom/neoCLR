@@ -66,7 +66,7 @@ False:
 .property instance Current() -> T0
 .get instance neoCLR.Library.System.Collections.ArrayList.Type_53797374656D2E436F6C6C656374696F6E732E41727261794C6973744974657261746F726031<T0>::get_Current()
 .end
-.method instance .ctor(arrayref<T0>,Int32) -> noresult
+.method instance .ctor(arrayref<T0> buffer,Int32 extent) -> noresult
 M00000011_IL_0000:
 M00000011_IL_0001:
 ldarg 0

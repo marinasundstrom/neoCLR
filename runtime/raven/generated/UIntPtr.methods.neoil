@@ -1,0 +1,70 @@
+; Generated from runtime/raven/src/System/UIntPtr.rvn. Regenerate with build_runtime_library.py.
+.type System.UIntPtr
+.implements System.Comparable<UIntPtr>
+.method instance readonly byref CompareTo(UIntPtr other) -> Int32
+.local UInt64 local0
+.local UInt64 local1
+ldc.i8 0
+stloc local0
+ldc.i8 0
+stloc local1
+M00000001_IL_0000:
+M00000001_IL_0001:
+M00000001_IL_0002:
+ldarg 0
+M00000001_IL_0003:
+ldobj UIntPtr
+M00000001_IL_0008:
+conv.u8
+M00000001_IL_000d:
+stloc local0
+M00000001_IL_000e:
+M00000001_IL_000f:
+ldarg 1
+M00000001_IL_0010:
+conv.u8
+M00000001_IL_0015:
+stloc local1
+M00000001_IL_0016:
+M00000001_IL_0017:
+ldloc local0
+M00000001_IL_0018:
+ldloc local1
+M00000001_IL_0019:
+clt.un
+call neoCLR.Library.System.UIntPtr.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_001b:
+brtrue M00000001_IL_0025
+M00000001_IL_0020:
+br M00000001_IL_0028
+M00000001_IL_0025:
+M00000001_IL_0026:
+ldc.i4 -1
+M00000001_IL_0027:
+ret
+M00000001_IL_0028:
+M00000001_IL_0029:
+M00000001_IL_002a:
+ldloc local0
+M00000001_IL_002b:
+ldloc local1
+M00000001_IL_002c:
+cgt.un
+call neoCLR.Library.System.UIntPtr.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_002e:
+brtrue M00000001_IL_0038
+M00000001_IL_0033:
+br M00000001_IL_003b
+M00000001_IL_0038:
+M00000001_IL_0039:
+ldc.i4 1
+M00000001_IL_003a:
+ret
+M00000001_IL_003b:
+M00000001_IL_003c:
+M00000001_IL_003d:
+ldc.i4 0
+M00000001_IL_003e:
+ret
+.end
+.end

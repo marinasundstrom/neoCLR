@@ -1,0 +1,14 @@
+; Generated from runtime/raven/src/System/Collections/MutableSequence.rvn. Regenerate with build_runtime_library.py.
+.interface System.Collections.MutableSequence<T0>
+.implements System.Collections.Sequence<T0>
+.implements System.Collections.Collection<T0>
+.implements System.Collections.Iterable<T0>
+.method instance get_Item(Int32 index) -> T0
+.end
+.method instance set_Item(Int32 index,T0 value) -> noresult
+.end
+.property instance Item(Int32) -> T0
+.get instance System.Collections.MutableSequence<T0>::get_Item(Int32)
+.set instance System.Collections.MutableSequence<T0>::set_Item(Int32,T0)
+.end
+.end

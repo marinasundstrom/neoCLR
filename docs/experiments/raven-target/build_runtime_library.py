@@ -10,6 +10,27 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    'Environment': 'System.Environment',
+    'Console': 'System.Console',
+    'IntPtr': 'System.IntPtr',
+    'UIntPtr': 'System.UIntPtr',
+    'Iterable': 'System.Collections.Iterable',
+    'Iterator': 'System.Collections.Iterator',
+    'Collection': 'System.Collections.Collection',
+    'Sequence': 'System.Collections.Sequence',
+    'MutableSequence': 'System.Collections.MutableSequence',
+    'List': 'System.Collections.List',
+    'Map': 'System.Collections.Map',
+    'MutableMap': 'System.Collections.MutableMap',
+
+    'SystemClock': 'System.SystemClock',
+    'LocalDateTime': 'System.LocalDateTime',
+    'Disposable': 'System.Disposable',
+    'Equatable': 'System.Equatable',
+    'Comparable': 'System.Comparable',
+    'Clonable': 'System.Clonable',
+    'Closable': 'System.Closable',
+
     'Clock': 'System.Clock',
     'TypeInfo': 'System.Introspection.TypeInfo',
     'ParameterInfo': 'System.Introspection.ParameterInfo',
@@ -40,6 +61,27 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    'Environment': 'runtime/raven/src/System/Environment/Functions.rvn',
+    'Console': 'runtime/raven/src/System/Console/Functions.rvn',
+    'IntPtr': 'runtime/raven/src/System/IntPtr.rvn',
+    'UIntPtr': 'runtime/raven/src/System/UIntPtr.rvn',
+    'Iterable': 'runtime/raven/src/System/Collections/Iterable.rvn',
+    'Iterator': 'runtime/raven/src/System/Collections/Iterator.rvn',
+    'Collection': 'runtime/raven/src/System/Collections/Collection.rvn',
+    'Sequence': 'runtime/raven/src/System/Collections/Sequence.rvn',
+    'MutableSequence': 'runtime/raven/src/System/Collections/MutableSequence.rvn',
+    'List': 'runtime/raven/src/System/Collections/List.rvn',
+    'Map': 'runtime/raven/src/System/Collections/Map.rvn',
+    'MutableMap': 'runtime/raven/src/System/Collections/MutableMap.rvn',
+
+    'SystemClock': 'runtime/raven/src/System/SystemClock.rvn',
+    'LocalDateTime': 'runtime/raven/src/System/LocalDateTime.rvn',
+    'Disposable': 'runtime/raven/src/System/Disposable.rvn',
+    'Equatable': 'runtime/raven/src/System/Equatable.rvn',
+    'Comparable': 'runtime/raven/src/System/Comparable.rvn',
+    'Clonable': 'runtime/raven/src/System/Clonable.rvn',
+    'Closable': 'runtime/raven/src/System/Closable.rvn',
+
     'Clock': 'runtime/raven/src/System/Clock.rvn',
     'TypeInfo': 'runtime/raven/src/System/Introspection/TypeInfo.rvn',
     'ParameterInfo': 'runtime/raven/src/System/Introspection/ParameterInfo.rvn',
@@ -49,7 +91,7 @@ SOURCES = {
     'RuntimeTypeHandle': "runtime/raven/src/System/RuntimeTypeHandle.rvn",
     'Value': "runtime/raven/src/System/Value.rvn",
     'Math': 'runtime/raven/src/System/Math/Functions.rvn',
-    'Int32': 'runtime/raven/src/System/Int32/Functions.rvn',
+    'Int32': 'runtime/raven/src/System/Int32.rvn',
     'Char': 'runtime/raven/src/System/Char.rvn',
     'Linq': 'runtime/raven/src/System/Linq/Operators.rvn',
     'ArrayList': 'runtime/raven/src/System/Collections/ArrayList.rvn',
@@ -95,7 +137,7 @@ def fragments(text, name="Math", owner="System.Math"):
             else:
                 raise ValueError('Unclosed private implementation type')
             body = ''.join(lines[:index + 1])
-            if lines[0].startswith('.type class ' + owner + '<') or lines[0].strip() in ('.type ' + owner, '.interface ' + owner):
+            if lines[0].startswith(('.type class ' + owner + '<', '.interface ' + owner + '<')) or lines[0].strip() in ('.type ' + owner, '.interface ' + owner):
                 methods.append(body)
             else:
                 types.append(body)
@@ -171,7 +213,7 @@ def main():
         generated = {}
         for name, owner in SLICES.items():
             compiled = root / 'compiled'
-            if name not in ('Math', 'Linq', 'Int32', 'Path', 'File'):
+            if name not in ('Math', 'Linq', 'Path', 'File'):
                 compiled = root / ('compiled-' + name)
                 subprocess.run(['dotnet', str(args.compiler.resolve()), str(PROJECT), '--no-project-restore',
                                 '-o', str(compiled)], env={**os.environ, 'NeoCLRBootstrapRoot': str(root),

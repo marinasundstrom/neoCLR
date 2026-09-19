@@ -1,0 +1,5 @@
+namespace System.Collections
+
+public interface Sequence<T> : Collection<T> {
+    val self[index: int]: T { get }
+}

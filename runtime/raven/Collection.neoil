@@ -1,0 +1,3 @@
+; Raven-authored Collection contract.
+.include "generated/Collection.methods.neoil"
+.include "generated/Collection.helpers.neoil"

@@ -1,7 +1,7 @@
 ; Generated from runtime/raven/src/System/Double.rvn. Regenerate with build_runtime_library.py.
 .type System.Double
 .implements System.Comparable<Double>
-.method instance readonly byref CompareTo(Double) -> Int32
+.method instance readonly byref CompareTo(Double other) -> Int32
 M00000001_IL_0000:
 M00000001_IL_0001:
 M00000001_IL_0002:

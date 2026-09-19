@@ -1,0 +1,32 @@
+namespace System.Console
+
+import System.IO.ConsoleReadError
+import System.Result.*
+import System.Runtime.CompilerServices.RuntimeServices
+
+public func ReadByte() -> System.Result<System.Option<byte>, ConsoleReadError> {
+    let payload = RuntimeServices.ConsoleReadByte()
+    if RuntimeServices.IsValue<int>(payload) {
+        let status = RuntimeServices.UnpackValue<int>(payload)
+        if status == 1 {
+            return Error(ConsoleReadError(ConsoleReadError.Unavailable()))
+        }
+        if status == 2 {
+            return Error(ConsoleReadError(ConsoleReadError.ReadFailed()))
+        }
+        System.Fault("invalid native I/O status")
+        return Error(ConsoleReadError(ConsoleReadError.ReadFailed()))
+    }
+    if RuntimeServices.IsValue<System.Void>(payload) {
+        return Ok(System.Option<byte>(System.Option.None()))
+    }
+    return Ok(System.Option<byte>(System.Option.Some<byte>(RuntimeServices.UnpackValue<byte>(payload))))
+}
+
+public func WriteLine(value0: string) {
+    RuntimeServices.WriteLine(value0)
+}
+
+public func WriteLine(value0: int) {
+    RuntimeServices.WriteLine(RuntimeServices.Int32ToString(value0))
+}

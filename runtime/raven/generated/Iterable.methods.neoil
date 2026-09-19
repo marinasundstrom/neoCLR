@@ -1,0 +1,5 @@
+; Generated from runtime/raven/src/System/Collections/Iterable.rvn. Regenerate with build_runtime_library.py.
+.interface System.Collections.Iterable<T0>
+.method instance GetIterator() -> System.Collections.Iterator<T0>
+.end
+.end

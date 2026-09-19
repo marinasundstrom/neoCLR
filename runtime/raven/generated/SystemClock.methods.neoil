@@ -1,0 +1,26 @@
+; Generated from runtime/raven/src/System/SystemClock.rvn. Regenerate with build_runtime_library.py.
+.type class System.SystemClock
+.implements System.Clock
+.property instance Now() -> System.Instant
+.get instance System.SystemClock::get_Now()
+.end
+.method instance .ctor() -> noresult
+M00000001_IL_0000:
+M00000001_IL_0001:
+ldarg 0
+M00000001_IL_0002:
+pop
+M00000001_IL_0007:
+ret
+.end
+.method instance get_Now() -> System.Instant
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+call neoCLR.Runtime.UnixTimeTicks()
+M00000002_IL_0007:
+call System.Instant::FromUnixTimeTicks(Int64)
+M00000002_IL_000c:
+ret
+.end
+.end

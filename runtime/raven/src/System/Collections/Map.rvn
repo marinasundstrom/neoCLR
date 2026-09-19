@@ -1,0 +1,8 @@
+namespace System.Collections
+
+public interface Map<K, V> {
+    val Count: int { get }
+    val Keys: Sequence<K> { get }
+    func Find(key: K) -> System.Option<V>
+    func ContainsKey(key: K) -> bool
+}

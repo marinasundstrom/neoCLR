@@ -1,0 +1,99 @@
+; Generated from runtime/raven/src/System/Environment/Functions.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Environment.RuntimeUnion0(System.EnvironmentError arg0) -> System.Result.Error<System.EnvironmentError>
+ldarg arg0
+newobj instance System.Result.Error<System.EnvironmentError>::.ctor(System.EnvironmentError)
+ret
+.end
+.function neoCLR.Library.System.Environment.RuntimeUnion1(System.Result.Error<System.EnvironmentError> arg0) -> System.Result<String,System.EnvironmentError>
+ldarg arg0
+newobj instance System.Result<String,System.EnvironmentError>::.ctor(System.Result.Error<System.EnvironmentError>)
+ret
+.end
+.function neoCLR.Library.System.Environment.RuntimeUnion2(String arg0) -> System.Result.Ok<String>
+ldarg arg0
+newobj instance System.Result.Ok<String>::.ctor(String)
+ret
+.end
+.function neoCLR.Library.System.Environment.RuntimeUnion3(System.Result.Ok<String> arg0) -> System.Result<String,System.EnvironmentError>
+ldarg arg0
+newobj instance System.Result<String,System.EnvironmentError>::.ctor(System.Result.Ok<String>)
+ret
+.end
+.function neoCLR.Library.System.Environment.RuntimeUnion4(System.Result.Error<System.EnvironmentError> arg0) -> System.Result<System.Option<String>,System.EnvironmentError>
+ldarg arg0
+newobj instance System.Result<System.Option<String>,System.EnvironmentError>::.ctor(System.Result.Error<System.EnvironmentError>)
+ret
+.end
+.function neoCLR.Library.System.Environment.RuntimeUnion5() -> System.Option.None
+newobj instance System.Option.None::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Environment.RuntimeUnion6(System.Option.None arg0) -> System.Option<String>
+ldarg arg0
+newobj instance System.Option<String>::.ctor(System.Option.None)
+ret
+.end
+.function neoCLR.Library.System.Environment.RuntimeUnion7(System.Option<String> arg0) -> System.Result.Ok<System.Option<String>>
+ldarg arg0
+newobj instance System.Result.Ok<System.Option<String>>::.ctor(System.Option<String>)
+ret
+.end
+.function neoCLR.Library.System.Environment.RuntimeUnion8(System.Result.Ok<System.Option<String>> arg0) -> System.Result<System.Option<String>,System.EnvironmentError>
+ldarg arg0
+newobj instance System.Result<System.Option<String>,System.EnvironmentError>::.ctor(System.Result.Ok<System.Option<String>>)
+ret
+.end
+.function neoCLR.Library.System.Environment.RuntimeUnion9(String arg0) -> System.Option.Some<String>
+ldarg arg0
+newobj instance System.Option.Some<String>::.ctor(String)
+ret
+.end
+.function neoCLR.Library.System.Environment.RuntimeUnion10(System.Option.Some<String> arg0) -> System.Option<String>
+ldarg arg0
+newobj instance System.Option<String>::.ctor(System.Option.Some<String>)
+ret
+.end
+.function neoCLR.Library.System.Environment.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end
+.function neoCLR.Library.System.Environment.RuntimeServiceEnvironmentArguments() -> arrayref<String>
+.local String[] source
+.local arrayref<String> destination
+.local Int32 index
+
+call neoCLR.Runtime.EnvironmentArguments()
+stloc source
+ldloc source
+ldlen
+conv.i4
+newarr String
+stloc destination
+ldc.i4 0
+stloc index
+br Test
+Copy:
+ldloc destination
+ldloc index
+ldloc source
+ldloc index
+ldelem String
+stelem String
+ldloc index
+ldc.i4 1
+add
+stloc index
+Test:
+ldloc index
+ldloc source
+ldlen
+conv.i4
+blt Copy
+ldloc destination
+ret
+.end

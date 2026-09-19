@@ -159,7 +159,8 @@ fn parse_reachability_includes_platform_construction_and_storage_services() {
     let graph = program
         .analyze_reachability(
             &[parse_function_ref("System.Int32::Parse(String)").unwrap()],
-            16,
+            // Include the Raven-generated carrier construction adapters.
+            128,
         )
         .unwrap();
     assert!(

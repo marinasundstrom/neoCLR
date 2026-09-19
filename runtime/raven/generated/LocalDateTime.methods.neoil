@@ -1,0 +1,183 @@
+; Generated from runtime/raven/src/System/LocalDateTime.rvn. Regenerate with build_runtime_library.py.
+.type System.LocalDateTime
+.field private StoredDate System.Date
+.field private StoredTime System.Time
+.property instance Date() -> System.Date
+.get instance System.LocalDateTime::get_Date()
+.end
+.property instance Time() -> System.Time
+.get instance System.LocalDateTime::get_Time()
+.end
+.method private instance byref .ctor(System.Date date,System.Time time) -> Void
+.local System.Date local0
+.local System.Time local1
+ldloca local0
+initobj System.Date
+ldloca local1
+initobj System.Time
+M00000001_IL_0000:
+M00000001_IL_0001:
+ldarg 0
+M00000001_IL_0002:
+pop
+M00000001_IL_0007:
+M00000001_IL_0008:
+ldarg 1
+M00000001_IL_0009:
+stloc local0
+M00000001_IL_000a:
+ldarg 0
+M00000001_IL_000b:
+ldloc local0
+M00000001_IL_000c:
+stfld System.LocalDateTime::StoredDate
+pop
+M00000001_IL_0011:
+M00000001_IL_0012:
+ldarg 2
+M00000001_IL_0013:
+stloc local1
+M00000001_IL_0014:
+ldarg 0
+M00000001_IL_0015:
+ldloc local1
+M00000001_IL_0016:
+stfld System.LocalDateTime::StoredTime
+pop
+M00000001_IL_001b:
+ldvoid
+ret
+.end
+.method internal static FromUnixTimeTicks(Int64 ticks) -> System.LocalDateTime
+.local arrayref<Int32> local0
+.local System.Date local1
+.local System.Time local2
+.local System.Result<System.Date,System.InvalidDateError> local3
+.local System.Result.Ok<System.Date> local4
+.local System.Result<System.Time,System.InvalidTimeError> local5
+.local System.Result.Ok<System.Time> local6
+ldloca local0
+initobj arrayref<Int32>
+ldloca local1
+initobj System.Date
+ldloca local2
+initobj System.Time
+ldloca local4
+initobj System.Result.Ok<System.Date>
+ldloca local6
+initobj System.Result.Ok<System.Time>
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldarg 0
+M00000002_IL_0003:
+call neoCLR.Library.System.LocalDateTime.RuntimeServiceUnixTimeToLocal(Int64)
+M00000002_IL_0008:
+stloc local0
+M00000002_IL_0009:
+M00000002_IL_000a:
+ldloc local0
+M00000002_IL_000b:
+ldc.i4 0
+M00000002_IL_000c:
+ldelem Int32
+M00000002_IL_000d:
+ldloc local0
+M00000002_IL_000e:
+ldc.i4 1
+M00000002_IL_000f:
+ldelem Int32
+M00000002_IL_0010:
+ldloc local0
+M00000002_IL_0011:
+ldc.i4 2
+M00000002_IL_0012:
+ldelem Int32
+M00000002_IL_0013:
+call System.Date::Create(Int32,Int32,Int32)
+M00000002_IL_0018:
+stloc local3
+M00000002_IL_0019:
+ldloca local3
+M00000002_IL_001b:
+call neoCLR.Library.System.LocalDateTime.RuntimeUnion0(System.Result<System.Date,System.InvalidDateError>&)
+M00000002_IL_0020:
+stloc local4
+M00000002_IL_0022:
+ldloca local4
+M00000002_IL_0024:
+call neoCLR.Library.System.LocalDateTime.RuntimeUnion1(System.Result.Ok<System.Date>&)
+M00000002_IL_0029:
+stloc local1
+M00000002_IL_002a:
+M00000002_IL_002b:
+ldloc local0
+M00000002_IL_002c:
+ldc.i4 3
+M00000002_IL_002d:
+ldelem Int32
+M00000002_IL_002e:
+ldloc local0
+M00000002_IL_002f:
+ldc.i4 4
+M00000002_IL_0030:
+ldelem Int32
+M00000002_IL_0031:
+ldloc local0
+M00000002_IL_0032:
+ldc.i4 5
+M00000002_IL_0033:
+ldelem Int32
+M00000002_IL_0034:
+ldloc local0
+M00000002_IL_0035:
+ldc.i4 6
+M00000002_IL_0036:
+ldelem Int32
+M00000002_IL_0037:
+call System.Time::Create(Int32,Int32,Int32,Int32)
+M00000002_IL_003c:
+stloc local5
+M00000002_IL_003e:
+ldloca local5
+M00000002_IL_0040:
+call neoCLR.Library.System.LocalDateTime.RuntimeUnion2(System.Result<System.Time,System.InvalidTimeError>&)
+M00000002_IL_0045:
+stloc local6
+M00000002_IL_0047:
+ldloca local6
+M00000002_IL_0049:
+call neoCLR.Library.System.LocalDateTime.RuntimeUnion3(System.Result.Ok<System.Time>&)
+M00000002_IL_004e:
+stloc local2
+M00000002_IL_004f:
+M00000002_IL_0050:
+ldloc local1
+M00000002_IL_0051:
+ldloc local2
+M00000002_IL_0052:
+newobj instance System.LocalDateTime::.ctor(System.Date,System.Time)
+M00000002_IL_0057:
+ret
+.end
+.method instance readonly byref get_Date() -> System.Date
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+ldfld System.LocalDateTime::StoredDate
+M00000003_IL_0008:
+ret
+.end
+.method instance readonly byref get_Time() -> System.Time
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+ldfld System.LocalDateTime::StoredTime
+M00000004_IL_0008:
+ret
+.end
+.end

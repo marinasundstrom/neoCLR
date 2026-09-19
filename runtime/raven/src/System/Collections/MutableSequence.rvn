@@ -1,0 +1,5 @@
+namespace System.Collections
+
+public interface MutableSequence<T> : Sequence<T> {
+    var self[index: int]: T { get; set }
+}

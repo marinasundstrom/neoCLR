@@ -1,4 +1,14 @@
-; Generated from runtime/raven/src/System/Int32/Functions.rvn. Regenerate with build_runtime_library.py.
+; Generated from runtime/raven/src/System/Int32.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Int32.RuntimeErrorSystemInt32ParseErrorNewSystemInt32ParseErrorInvalidFormat(System.Int32ParseError.InvalidFormat value) -> System.Int32ParseError
+ldarg value
+newobj instance System.Int32ParseError::.ctor(System.Int32ParseError.InvalidFormat)
+ret
+.end
+.function neoCLR.Library.System.Int32.RuntimeErrorSystemInt32ParseErrorNewSystemInt32ParseErrorOverflow(System.Int32ParseError.Overflow value) -> System.Int32ParseError
+ldarg value
+newobj instance System.Int32ParseError::.ctor(System.Int32ParseError.Overflow)
+ret
+.end
 .function neoCLR.Library.System.Int32.RuntimeErrorSystemIntegerDivisionErrorNewSystemIntegerDivisionErrorDivisionByZero(System.IntegerDivisionError.DivisionByZero value) -> System.IntegerDivisionError
 ldarg value
 newobj instance System.IntegerDivisionError::.ctor(System.IntegerDivisionError.DivisionByZero)
@@ -9,6 +19,14 @@ ldarg value
 newobj instance System.IntegerDivisionError::.ctor(System.IntegerDivisionError.Overflow)
 ret
 .end
+.function neoCLR.Library.System.Int32.RuntimeErrorSystemInt32ParseErrorInvalidFormatNew() -> System.Int32ParseError.InvalidFormat
+newobj instance System.Int32ParseError.InvalidFormat::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Int32.RuntimeErrorSystemInt32ParseErrorOverflowNew() -> System.Int32ParseError.Overflow
+newobj instance System.Int32ParseError.Overflow::.ctor()
+ret
+.end
 .function neoCLR.Library.System.Int32.RuntimeErrorSystemIntegerDivisionErrorDivisionByZeroNew() -> System.IntegerDivisionError.DivisionByZero
 newobj instance System.IntegerDivisionError.DivisionByZero::.ctor()
 ret
@@ -17,25 +35,55 @@ ret
 newobj instance System.IntegerDivisionError.Overflow::.ctor()
 ret
 .end
-.function neoCLR.Library.System.Int32.RuntimeUnion0(System.IntegerDivisionError arg0) -> System.Result.Error<System.IntegerDivisionError>
-ldarg arg0
-newobj instance System.Result.Error<System.IntegerDivisionError>::.ctor(System.IntegerDivisionError)
-ret
-.end
-.function neoCLR.Library.System.Int32.RuntimeUnion1(System.Result.Error<System.IntegerDivisionError> arg0) -> System.Result<Int32,System.IntegerDivisionError>
-ldarg arg0
-newobj instance System.Result<Int32,System.IntegerDivisionError>::.ctor(System.Result.Error<System.IntegerDivisionError>)
-ret
-.end
-.function neoCLR.Library.System.Int32.RuntimeUnion2(Int32 arg0) -> System.Result.Ok<Int32>
+.function neoCLR.Library.System.Int32.RuntimeUnion0(Int32 arg0) -> System.Result.Ok<Int32>
 ldarg arg0
 newobj instance System.Result.Ok<Int32>::.ctor(Int32)
 ret
 .end
-.function neoCLR.Library.System.Int32.RuntimeUnion3(System.Result.Ok<Int32> arg0) -> System.Result<Int32,System.IntegerDivisionError>
+.function neoCLR.Library.System.Int32.RuntimeUnion1(System.Result.Ok<Int32> arg0) -> System.Result<Int32,System.Int32ParseError>
+ldarg arg0
+newobj instance System.Result<Int32,System.Int32ParseError>::.ctor(System.Result.Ok<Int32>)
+ret
+.end
+.function neoCLR.Library.System.Int32.RuntimeUnion2(System.Int32ParseError arg0) -> System.Result.Error<System.Int32ParseError>
+ldarg arg0
+newobj instance System.Result.Error<System.Int32ParseError>::.ctor(System.Int32ParseError)
+ret
+.end
+.function neoCLR.Library.System.Int32.RuntimeUnion3(System.Result.Error<System.Int32ParseError> arg0) -> System.Result<Int32,System.Int32ParseError>
+ldarg arg0
+newobj instance System.Result<Int32,System.Int32ParseError>::.ctor(System.Result.Error<System.Int32ParseError>)
+ret
+.end
+.function neoCLR.Library.System.Int32.RuntimeUnion4(System.IntegerDivisionError arg0) -> System.Result.Error<System.IntegerDivisionError>
+ldarg arg0
+newobj instance System.Result.Error<System.IntegerDivisionError>::.ctor(System.IntegerDivisionError)
+ret
+.end
+.function neoCLR.Library.System.Int32.RuntimeUnion5(System.Result.Error<System.IntegerDivisionError> arg0) -> System.Result<Int32,System.IntegerDivisionError>
+ldarg arg0
+newobj instance System.Result<Int32,System.IntegerDivisionError>::.ctor(System.Result.Error<System.IntegerDivisionError>)
+ret
+.end
+.function neoCLR.Library.System.Int32.RuntimeUnion6(System.Result.Ok<Int32> arg0) -> System.Result<Int32,System.IntegerDivisionError>
 ldarg arg0
 newobj instance System.Result<Int32,System.IntegerDivisionError>::.ctor(System.Result.Ok<Int32>)
 ret
+.end
+.function neoCLR.Library.System.Int32.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
 .end
 .function neoCLR.Library.System.Int32.RuntimeBooleanToInt32(Boolean value) -> Int32
     ldarg value

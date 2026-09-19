@@ -38,6 +38,34 @@ Preserved original proposal bodies, existing document paths and published notes.
 The current project remains `System.rvnproj`; the System.Runtime assembly identity
 is still planned. Source migration will preserve the existing API in this step.
 
+**Author follow-up.** After porting, review Raven changes so bug fixes and general
+improvements are on Raven main while the neoCLR target remains separate.
+
+**Assistant response and current action.** Accepted that review as part of this
+work. The collection-contract port exposed a generic-interface base-scope error;
+three reduced cases reproduce it on an isolated branch from Raven main using
+ordinary .NET references. Integrated the independently validated fix on local Raven
+main (`2e3856a6b`, 87 focused checks) and cherry-picked it to the experimental branch.
+The branch audit also reproduced a delegate bridge InvalidProgramException with
+ordinary .NET metadata and integrated its fix on main (`5a37cd56c`, 19 focused checks).
+The neoCLR branch remains separate. Deferred general candidates and policy boundaries
+are recorded in the [branch audit](raven-library-port-validation.md#raven-branch-audit).
+
+**Author acceptance criterion.** “The criteria for the port to be done is that
+neoCLR is in a functioning state. Programs targeting neoCLR run.” The assistant
+accepted compile/import/verify/execute checks against the rebuilt library as the
+acceptance gate, rather than source conversion alone.
+
+**Assistant-reported outcome.** The documentation organization is committed separately
+as `f957b84`. The library grows from 28 to 47 Raven source slices, covering fundamental
+and collection contracts, clocks/local time, native integers, Int32, Console,
+Environment and file reads. Saved-program validation found and fixed lost parameter
+names in imported library metadata; existing introspection output now passes.
+All 64 saved-project cases pass against the rebuilt library, along with controlled
+process/file checks and clean snapshot regeneration. This demonstrates functioning
+programs, not completion of every source migration. String, unions/error carriers,
+remaining descriptors and runtime adapters still contain handwritten neoIL.
+
 **Open.** Complete and validate the remaining Raven source port, then align API
 contracts in the subsequent step. Documentation organization does not itself
 implement proposal APIs or rename assemblies. See the [documentation index](README.md)

@@ -31,7 +31,10 @@ static class ProcessBindings
     }
     // The native service currently produces an owned vector. Project a fresh managed
     // array into CLI code, preserving the existing per-call independent snapshot.
-    public const string Adapters = """
+    public static string Adapters(bool managedArguments) => managedArguments
+        ? ".function RuntimeArguments() -> arrayref<String>\ncall System.Environment::GetCommandLineArgs()\nret\n.end\n"
+        : LegacyAdapters;
+    const string LegacyAdapters = """
         .function RuntimeArguments() -> arrayref<String>
             .local String[] source
             .local arrayref<String> destination

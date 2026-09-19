@@ -153,13 +153,24 @@ fn file_service_is_visible_without_opening_files_and_faults_keep_call_site() {
     let program = LoadedProgram::new(&assemble(".module App").unwrap()).unwrap();
     let target = parse_function_ref("System.IO.File::ReadAllText(String,Int32)").unwrap();
     let graph = program
-        .analyze_reachability(std::slice::from_ref(&target), 32)
+        // Raven-generated carrier adapters are also reachable library functions.
+        .analyze_reachability(std::slice::from_ref(&target), 128)
         .unwrap();
     assert_eq!(
         graph.required_services(),
         [RuntimeService::FileInput, RuntimeService::ValueStorage]
     );
-    assert_eq!(graph.functions[1].target.name, "neoCLR.Runtime.ReadAllText");
+    assert!(
+        graph
+            .functions
+            .iter()
+            .any(|function| function.target.name == "neoCLR.Runtime.ReadAllText")
+    );
+    assert!(
+        program
+            .analyze_reachability(std::slice::from_ref(&target), 1)
+            .is_err()
+    );
     assert!(!graph.missing_services(&[]).is_empty());
     let fault = program
         .resolve_function(&target)
@@ -176,4 +187,51 @@ fn file_service_is_visible_without_opening_files_and_faults_keep_call_site() {
         fault.stack_trace.unwrap().frames[0].function.name,
         "System.IO.File.ReadAllText"
     );
+}
+
+#[test]
+fn raven_file_read_preserves_all_native_statuses_and_unknown_status_faults() {
+    let source = neoclr::library::system_source();
+    let service = "call neoCLR.Runtime.ReadAllText(String,Int32)";
+    assert_eq!(source.matches(service).count(), 1);
+    let app = assemble(".module Probe\n.entry Main\n.function Main() -> System.Result<String,System.IO.FileReadError>\nldstr \"unused\"\nldc.i4 4\ncall System.IO.File::ReadAllText(String,Int32)\nret\n.end").unwrap();
+    for (status, case) in [
+        "Ok",
+        "InvalidLimit",
+        "InvalidPath",
+        "NotFound",
+        "AccessDenied",
+        "NotRegularFile",
+        "ReadFailed",
+        "TooLarge",
+        "InvalidUtf8",
+        "unknown",
+    ]
+    .iter()
+    .enumerate()
+    {
+        let payload = if status == 0 {
+            "ldstr \"payload\"\nvalue.pack String".to_owned()
+        } else {
+            format!("ldc.i4 {status}\nconv.u1\nvalue.pack Byte")
+        };
+        let library = assemble(&source.replace(service, &format!("pop\npop\n{payload}"))).unwrap();
+        let program = LoadedProgram::with_library(&app, &library).unwrap();
+        program.verify().unwrap();
+        let result = program.run(Limits::default());
+        if status == 9 {
+            assert!(
+                result
+                    .unwrap_err()
+                    .to_string()
+                    .contains("invalid native I/O status")
+            );
+        } else {
+            let output = format!("{:?}", result.unwrap().value);
+            assert!(output.contains(case), "status {status}: {output}");
+            if status == 0 {
+                assert!(output.contains("payload"));
+            }
+        }
+    }
 }

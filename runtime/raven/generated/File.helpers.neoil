@@ -1,4 +1,44 @@
 ; Generated from runtime/raven/src/System/IO/File/Functions.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorNewSystemIOFileReadErrorInvalidLimit(System.IO.FileReadError.InvalidLimit value) -> System.IO.FileReadError
+ldarg value
+newobj instance System.IO.FileReadError::.ctor(System.IO.FileReadError.InvalidLimit)
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorNewSystemIOFileReadErrorInvalidPath(System.IO.FileReadError.InvalidPath value) -> System.IO.FileReadError
+ldarg value
+newobj instance System.IO.FileReadError::.ctor(System.IO.FileReadError.InvalidPath)
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorNewSystemIOFileReadErrorNotFound(System.IO.FileReadError.NotFound value) -> System.IO.FileReadError
+ldarg value
+newobj instance System.IO.FileReadError::.ctor(System.IO.FileReadError.NotFound)
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorNewSystemIOFileReadErrorAccessDenied(System.IO.FileReadError.AccessDenied value) -> System.IO.FileReadError
+ldarg value
+newobj instance System.IO.FileReadError::.ctor(System.IO.FileReadError.AccessDenied)
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorNewSystemIOFileReadErrorNotRegularFile(System.IO.FileReadError.NotRegularFile value) -> System.IO.FileReadError
+ldarg value
+newobj instance System.IO.FileReadError::.ctor(System.IO.FileReadError.NotRegularFile)
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorNewSystemIOFileReadErrorTooLarge(System.IO.FileReadError.TooLarge value) -> System.IO.FileReadError
+ldarg value
+newobj instance System.IO.FileReadError::.ctor(System.IO.FileReadError.TooLarge)
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorNewSystemIOFileReadErrorReadFailed(System.IO.FileReadError.ReadFailed value) -> System.IO.FileReadError
+ldarg value
+newobj instance System.IO.FileReadError::.ctor(System.IO.FileReadError.ReadFailed)
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorNewSystemIOFileReadErrorInvalidUtf8(System.IO.FileReadError.InvalidUtf8 value) -> System.IO.FileReadError
+ldarg value
+newobj instance System.IO.FileReadError::.ctor(System.IO.FileReadError.InvalidUtf8)
+ret
+.end
 .function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorNewSystemIOFileWriteErrorInvalidLimit(System.IO.FileWriteError.InvalidLimit value) -> System.IO.FileWriteError
 ldarg value
 newobj instance System.IO.FileWriteError::.ctor(System.IO.FileWriteError.InvalidLimit)
@@ -32,6 +72,38 @@ ret
 .function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorNewSystemIOFileWriteErrorWriteFailed(System.IO.FileWriteError.WriteFailed value) -> System.IO.FileWriteError
 ldarg value
 newobj instance System.IO.FileWriteError::.ctor(System.IO.FileWriteError.WriteFailed)
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorInvalidLimitNew() -> System.IO.FileReadError.InvalidLimit
+newobj instance System.IO.FileReadError.InvalidLimit::.ctor()
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorInvalidPathNew() -> System.IO.FileReadError.InvalidPath
+newobj instance System.IO.FileReadError.InvalidPath::.ctor()
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorNotFoundNew() -> System.IO.FileReadError.NotFound
+newobj instance System.IO.FileReadError.NotFound::.ctor()
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorAccessDeniedNew() -> System.IO.FileReadError.AccessDenied
+newobj instance System.IO.FileReadError.AccessDenied::.ctor()
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorNotRegularFileNew() -> System.IO.FileReadError.NotRegularFile
+newobj instance System.IO.FileReadError.NotRegularFile::.ctor()
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorTooLargeNew() -> System.IO.FileReadError.TooLarge
+newobj instance System.IO.FileReadError.TooLarge::.ctor()
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorReadFailedNew() -> System.IO.FileReadError.ReadFailed
+newobj instance System.IO.FileReadError.ReadFailed::.ctor()
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorInvalidUtf8New() -> System.IO.FileReadError.InvalidUtf8
+newobj instance System.IO.FileReadError.InvalidUtf8::.ctor()
 ret
 .end
 .function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorInvalidLimitNew() -> System.IO.FileWriteError.InvalidLimit
@@ -80,6 +152,26 @@ ret
 .function neoCLR.Library.System.IO.File.RuntimeUnion3(System.Result.Error<System.IO.FileWriteError> arg0) -> System.Result<Void,System.IO.FileWriteError>
 ldarg arg0
 newobj instance System.Result<Void,System.IO.FileWriteError>::.ctor(System.Result.Error<System.IO.FileWriteError>)
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeUnion4(String arg0) -> System.Result.Ok<String>
+ldarg arg0
+newobj instance System.Result.Ok<String>::.ctor(String)
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeUnion5(System.Result.Ok<String> arg0) -> System.Result<String,System.IO.FileReadError>
+ldarg arg0
+newobj instance System.Result<String,System.IO.FileReadError>::.ctor(System.Result.Ok<String>)
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeUnion6(System.IO.FileReadError arg0) -> System.Result.Error<System.IO.FileReadError>
+ldarg arg0
+newobj instance System.Result.Error<System.IO.FileReadError>::.ctor(System.IO.FileReadError)
+ret
+.end
+.function neoCLR.Library.System.IO.File.RuntimeUnion7(System.Result.Error<System.IO.FileReadError> arg0) -> System.Result<String,System.IO.FileReadError>
+ldarg arg0
+newobj instance System.Result<String,System.IO.FileReadError>::.ctor(System.Result.Error<System.IO.FileReadError>)
 ret
 .end
 .function neoCLR.Library.System.IO.File.RuntimeBooleanToInt32(Boolean value) -> Int32

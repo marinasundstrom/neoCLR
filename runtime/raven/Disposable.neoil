@@ -1,0 +1,3 @@
+; Raven-authored Disposable; generated from the existing public contract.
+.include "generated/Disposable.methods.neoil"
+.include "generated/Disposable.helpers.neoil"

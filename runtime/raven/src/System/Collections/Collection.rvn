@@ -1,0 +1,5 @@
+namespace System.Collections
+
+public interface Collection<T> : Iterable<T> {
+    val Count: int { get }
+}

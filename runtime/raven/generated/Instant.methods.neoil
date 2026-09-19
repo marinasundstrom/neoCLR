@@ -6,7 +6,7 @@
 .property instance UnixTimeTicks() -> Int64
 .get instance System.Instant::get_UnixTimeTicks()
 .end
-.method private instance byref .ctor(Int64) -> Void
+.method private instance byref .ctor(Int64 ticks) -> Void
 .local Int64 local0
 ldc.i8 0
 stloc local0
@@ -31,7 +31,7 @@ M00000001_IL_0011:
 ldvoid
 ret
 .end
-.method static FromUnixTimeTicks(Int64) -> System.Instant
+.method static FromUnixTimeTicks(Int64 ticks) -> System.Instant
 M00000002_IL_0000:
 M00000002_IL_0001:
 M00000002_IL_0002:
@@ -63,7 +63,7 @@ ldfld System.Instant::StoredTicks
 M00000004_IL_0008:
 ret
 .end
-.method instance readonly byref Equals(System.Instant) -> Boolean
+.method instance readonly byref Equals(System.Instant other) -> Boolean
 M00000005_IL_0000:
 M00000005_IL_0001:
 M00000005_IL_0002:
@@ -81,7 +81,7 @@ M00000005_IL_0011:
 call neoCLR.Library.System.Instant.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance readonly byref CompareTo(System.Instant) -> Int32
+.method instance readonly byref CompareTo(System.Instant other) -> Int32
 M00000006_IL_0000:
 M00000006_IL_0001:
 M00000006_IL_0002:

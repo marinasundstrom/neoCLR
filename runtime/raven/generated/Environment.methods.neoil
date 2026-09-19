@@ -1,0 +1,132 @@
+; Generated from runtime/raven/src/System/Environment/Functions.rvn. Regenerate with build_runtime_library.py.
+.method static GetCommandLineArgs() -> arrayref<String>
+M00000001_IL_0000:
+M00000001_IL_0001:
+M00000001_IL_0002:
+call neoCLR.Library.System.Environment.RuntimeServiceEnvironmentArguments()
+M00000001_IL_0007:
+ret
+.end
+.method static GetCurrentDirectory() -> System.Result<String,System.EnvironmentError>
+.local Value local0
+.local System.EnvironmentError local1
+newobj System.EnvironmentError
+stloc local1
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+call neoCLR.Runtime.EnvironmentCurrentDirectory()
+M00000002_IL_0007:
+stloc local0
+M00000002_IL_0008:
+M00000002_IL_0009:
+ldloc local0
+M00000002_IL_000a:
+value.is Int32
+call neoCLR.Library.System.Environment.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_000f:
+brtrue M00000002_IL_0019
+M00000002_IL_0014:
+br M00000002_IL_002e
+M00000002_IL_0019:
+M00000002_IL_001a:
+ldloca local1
+M00000002_IL_001c:
+newobj System.EnvironmentError
+stobj System.EnvironmentError
+M00000002_IL_0022:
+ldloc local1
+M00000002_IL_0023:
+call neoCLR.Library.System.Environment.RuntimeUnion0(System.EnvironmentError)
+M00000002_IL_0028:
+call neoCLR.Library.System.Environment.RuntimeUnion1(System.Result.Error<System.EnvironmentError>)
+M00000002_IL_002d:
+ret
+M00000002_IL_002e:
+M00000002_IL_002f:
+M00000002_IL_0030:
+ldloc local0
+M00000002_IL_0031:
+value.unpack String
+M00000002_IL_0036:
+call neoCLR.Library.System.Environment.RuntimeUnion2(String)
+M00000002_IL_003b:
+call neoCLR.Library.System.Environment.RuntimeUnion3(System.Result.Ok<String>)
+M00000002_IL_0040:
+ret
+.end
+.method static GetEnvironmentVariable(String name) -> System.Result<System.Option<String>,System.EnvironmentError>
+.local Value local0
+.local System.EnvironmentError local1
+newobj System.EnvironmentError
+stloc local1
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+call neoCLR.Runtime.EnvironmentVariable(String)
+M00000003_IL_0008:
+stloc local0
+M00000003_IL_0009:
+M00000003_IL_000a:
+ldloc local0
+M00000003_IL_000b:
+value.is Int32
+call neoCLR.Library.System.Environment.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_0010:
+brtrue M00000003_IL_001a
+M00000003_IL_0015:
+br M00000003_IL_002f
+M00000003_IL_001a:
+M00000003_IL_001b:
+ldloca local1
+M00000003_IL_001d:
+newobj System.EnvironmentError
+stobj System.EnvironmentError
+M00000003_IL_0023:
+ldloc local1
+M00000003_IL_0024:
+call neoCLR.Library.System.Environment.RuntimeUnion0(System.EnvironmentError)
+M00000003_IL_0029:
+call neoCLR.Library.System.Environment.RuntimeUnion4(System.Result.Error<System.EnvironmentError>)
+M00000003_IL_002e:
+ret
+M00000003_IL_002f:
+M00000003_IL_0030:
+M00000003_IL_0031:
+ldloc local0
+M00000003_IL_0032:
+value.is Void
+call neoCLR.Library.System.Environment.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_0037:
+brtrue M00000003_IL_0041
+M00000003_IL_003c:
+br M00000003_IL_0056
+M00000003_IL_0041:
+call neoCLR.Library.System.Environment.RuntimeUnion5()
+M00000003_IL_0046:
+call neoCLR.Library.System.Environment.RuntimeUnion6(System.Option.None)
+M00000003_IL_004b:
+call neoCLR.Library.System.Environment.RuntimeUnion7(System.Option<String>)
+M00000003_IL_0050:
+call neoCLR.Library.System.Environment.RuntimeUnion8(System.Result.Ok<System.Option<String>>)
+M00000003_IL_0055:
+ret
+M00000003_IL_0056:
+M00000003_IL_0057:
+M00000003_IL_0058:
+ldloc local0
+M00000003_IL_0059:
+value.unpack String
+M00000003_IL_005e:
+call neoCLR.Library.System.Environment.RuntimeUnion9(String)
+M00000003_IL_0063:
+call neoCLR.Library.System.Environment.RuntimeUnion10(System.Option.Some<String>)
+M00000003_IL_0068:
+call neoCLR.Library.System.Environment.RuntimeUnion7(System.Option<String>)
+M00000003_IL_006d:
+call neoCLR.Library.System.Environment.RuntimeUnion8(System.Result.Ok<System.Option<String>>)
+M00000003_IL_0072:
+ret
+.end

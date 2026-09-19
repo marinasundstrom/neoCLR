@@ -1,0 +1,6 @@
+namespace System.Collections
+
+public interface Iterator<T> : System.Disposable {
+    func MoveNext() -> bool
+    val Current: T { get }
+}

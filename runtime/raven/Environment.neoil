@@ -1,0 +1,5 @@
+; Raven-authored Environment API.
+.type System.Environment
+.include "generated/Environment.methods.neoil"
+.end
+.include "generated/Environment.helpers.neoil"

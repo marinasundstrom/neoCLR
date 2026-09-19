@@ -1,0 +1,5 @@
+; Raven-authored Console API.
+.type System.Console
+.include "generated/Console.methods.neoil"
+.end
+.include "generated/Console.helpers.neoil"

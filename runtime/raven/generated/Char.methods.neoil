@@ -1,7 +1,7 @@
 ; Generated from runtime/raven/src/System/Char.rvn. Regenerate with build_runtime_library.py.
 .type System.Char
 .implements System.Comparable<Char>
-.method instance readonly byref CompareTo(Char) -> Int32
+.method instance readonly byref CompareTo(Char other) -> Int32
 M00000001_IL_0000:
 M00000001_IL_0001:
 M00000001_IL_0002:
@@ -57,7 +57,7 @@ ldc.i4 0
 M00000001_IL_0037:
 ret
 .end
-.method static IsDigit(Char) -> Boolean
+.method static IsDigit(Char value) -> Boolean
 .local Int32 local0
 ldc.i4 0
 stloc local0
@@ -81,7 +81,7 @@ M00000002_IL_000e:
 call neoCLR.Library.System.Char.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method static IsNumber(Char) -> Boolean
+.method static IsNumber(Char value) -> Boolean
 .local Int32 local0
 ldc.i4 0
 stloc local0
@@ -128,7 +128,7 @@ M00000003_IL_0024:
 call neoCLR.Library.System.Char.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method static IsLetter(Char) -> Boolean
+.method static IsLetter(Char value) -> Boolean
 .local Int32 local0
 ldc.i4 0
 stloc local0
@@ -175,7 +175,7 @@ M00000004_IL_0023:
 call neoCLR.Library.System.Char.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method static IsUpper(Char) -> Boolean
+.method static IsUpper(Char value) -> Boolean
 .local Int32 local0
 ldc.i4 0
 stloc local0
@@ -199,7 +199,7 @@ M00000005_IL_000e:
 call neoCLR.Library.System.Char.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method static IsLower(Char) -> Boolean
+.method static IsLower(Char value) -> Boolean
 .local Int32 local0
 ldc.i4 0
 stloc local0
@@ -223,7 +223,7 @@ M00000006_IL_000e:
 call neoCLR.Library.System.Char.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method static IsSeparator(Char) -> Boolean
+.method static IsSeparator(Char value) -> Boolean
 .local Int32 local0
 ldc.i4 0
 stloc local0
@@ -270,7 +270,7 @@ M00000007_IL_0025:
 call neoCLR.Library.System.Char.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method static IsControl(Char) -> Boolean
+.method static IsControl(Char value) -> Boolean
 .local Int32 local0
 ldc.i4 0
 stloc local0
@@ -294,7 +294,7 @@ M00000008_IL_000f:
 call neoCLR.Library.System.Char.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method static IsPunctuation(Char) -> Boolean
+.method static IsPunctuation(Char value) -> Boolean
 .local Int32 local0
 ldc.i4 0
 stloc local0
@@ -341,7 +341,7 @@ M00000009_IL_0025:
 call neoCLR.Library.System.Char.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method static IsSymbol(Char) -> Boolean
+.method static IsSymbol(Char value) -> Boolean
 .local Int32 local0
 ldc.i4 0
 stloc local0
@@ -388,7 +388,7 @@ M0000000a_IL_0025:
 call neoCLR.Library.System.Char.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method static IsSurrogate(Char) -> Boolean
+.method static IsSurrogate(Char value) -> Boolean
 .local Int32 local0
 ldc.i4 0
 stloc local0
@@ -435,7 +435,7 @@ M0000000b_IL_0027:
 call neoCLR.Library.System.Char.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method static IsHighSurrogate(Char) -> Boolean
+.method static IsHighSurrogate(Char value) -> Boolean
 .local Int32 local0
 ldc.i4 0
 stloc local0
@@ -482,7 +482,7 @@ M0000000c_IL_0027:
 call neoCLR.Library.System.Char.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method static IsLowSurrogate(Char) -> Boolean
+.method static IsLowSurrogate(Char value) -> Boolean
 .local Int32 local0
 ldc.i4 0
 stloc local0
@@ -529,7 +529,7 @@ M0000000d_IL_0027:
 call neoCLR.Library.System.Char.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method static IsAscii(Char) -> Boolean
+.method static IsAscii(Char value) -> Boolean
 .local Int32 local0
 ldc.i4 0
 stloc local0
@@ -558,7 +558,7 @@ M0000000e_IL_000e:
 call neoCLR.Library.System.Char.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method static IsAsciiDigit(Char) -> Boolean
+.method static IsAsciiDigit(Char value) -> Boolean
 .local Int32 local0
 ldc.i4 0
 stloc local0
@@ -605,7 +605,7 @@ M0000000f_IL_0021:
 call neoCLR.Library.System.Char.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method static IsLetterOrDigit(Char) -> Boolean
+.method static IsLetterOrDigit(Char value) -> Boolean
 M00000010_IL_0000:
 M00000010_IL_0001:
 M00000010_IL_0002:
@@ -628,7 +628,7 @@ M00000010_IL_0019:
 call neoCLR.Library.System.Char.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method static IsWhiteSpace(Char) -> Boolean
+.method static IsWhiteSpace(Char value) -> Boolean
 .local Int32 local0
 ldc.i4 0
 stloc local0

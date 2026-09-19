@@ -1,46 +1,7 @@
-; Experimental hashed lookup. Callback equivalence and stable matching hashes are a caller contract.
-; Storage is managed and all algorithms use existing IL. No default comparer is implied.
-
-.interface System.Collections.Map<K,V>
-
-    .property instance Count() -> Int32
-        .get instance System.Collections.Map<K,V>::get_Count()
-    .end
-
-    .method instance get_Count() -> Int32
-
-    .end
-
-    .property instance Keys() -> System.Collections.Sequence<K>
-        .get instance System.Collections.Map<K,V>::get_Keys()
-    .end
-
-    .method instance get_Keys() -> System.Collections.Sequence<K>
-
-    .end
-
-    .method instance Find(K key) -> System.Option<V>
-
-    .end
-
-    .method instance ContainsKey(K key) -> Boolean
-
-    .end
-
-.end
-
-.interface System.Collections.MutableMap<K,V>
-    .implements System.Collections.Map<K,V>
-
-    .method instance TryAdd(K key,V value) -> Boolean
-
-    .end
-
-    .method instance Set(K key,V value) -> void
-
-    .end
-
-.end
-
+; Raven-authored map contracts and implementation.
+.include "generated/Map.methods.neoil"
+.include "generated/Map.helpers.neoil"
+.include "generated/MutableMap.methods.neoil"
+.include "generated/MutableMap.helpers.neoil"
 .include "generated/HashMap.methods.neoil"
 .include "generated/HashMap.helpers.neoil"

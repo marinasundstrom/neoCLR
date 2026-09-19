@@ -1,0 +1,3 @@
+; Raven-authored Sequence contract.
+.include "generated/Sequence.methods.neoil"
+.include "generated/Sequence.helpers.neoil"

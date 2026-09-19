@@ -36,6 +36,12 @@ static class CoreDeclarations
             if (libraryBootstrap) PrimitiveLibrary.Project(module);
             if (libraryBootstrap && collectionProbe)
             {
+                var local = module.GetType("System.LocalDateTime");
+                var localFactory = new Mono.Cecil.MethodDefinition("FromUnixTimeTicks",
+                    Mono.Cecil.MethodAttributes.Assembly | Mono.Cecil.MethodAttributes.Static | Mono.Cecil.MethodAttributes.HideBySig, local);
+                localFactory.Parameters.Add(new Mono.Cecil.ParameterDefinition("ticks", Mono.Cecil.ParameterAttributes.None,
+                    module.GetType("System.Instant").Methods.Single(m => m.Name == "FromUnixTimeTicks").Parameters[0].ParameterType));
+                local.Methods.Add(localFactory);
                 var info = module.GetType("System.Introspection.TypeInfo");
                 if (!info.Methods.Any(m => m.Name == "FromHandle"))
                 {

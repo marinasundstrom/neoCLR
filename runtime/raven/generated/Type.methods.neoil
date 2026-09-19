@@ -41,7 +41,7 @@
 .property instance Info() -> System.Introspection.TypeInfo
 .get instance System.Type::get_Info()
 .end
-.method private instance .ctor(System.RuntimeTypeHandle) -> noresult
+.method private instance .ctor(System.RuntimeTypeHandle handle) -> noresult
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0
@@ -109,7 +109,7 @@ call neoCLR.Runtime.TypeArgumentCount(System.RuntimeTypeHandle)
 M00000006_IL_000d:
 ret
 .end
-.method instance GetGenericArgument(Int32) -> System.Type
+.method instance GetGenericArgument(Int32 index) -> System.Type
 M00000007_IL_0000:
 M00000007_IL_0001:
 M00000007_IL_0002:
@@ -125,7 +125,7 @@ call System.Type.GetTypeFromHandle(System.RuntimeTypeHandle)
 M00000007_IL_0013:
 ret
 .end
-.method instance Equals(System.Type) -> Boolean
+.method instance Equals(System.Type other) -> Boolean
 M00000008_IL_0000:
 M00000008_IL_0001:
 M00000008_IL_0002:

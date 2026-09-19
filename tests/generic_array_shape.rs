@@ -32,13 +32,17 @@ ret
 .end
 "#;
 
+// The text assembler does not expand file includes; embed the generated contracts.
+const COLLECTION_CONTRACTS: &str = concat!(
+    include_str!("../runtime/raven/generated/Collection.methods.neoil"),
+    include_str!("../runtime/raven/generated/Sequence.methods.neoil"),
+    include_str!("../runtime/raven/generated/MutableSequence.methods.neoil")
+);
+
 fn library() -> neoclr::Module {
     assemble(&format!(
-        ".module System\n{CALLBACK}\n{ITERATION}\n{}",
-        concat!(
-            include_str!("../runtime/raven/CollectionContracts.neoil"),
-            include_str!("../runtime/raven/Array.neoil")
-        )
+        ".module System\n{CALLBACK}\n{ITERATION}\n{COLLECTION_CONTRACTS}\n{}",
+        include_str!("../runtime/raven/Array.neoil")
     ))
     .unwrap()
 }
@@ -127,11 +131,8 @@ fn reflection_library() -> neoclr::Module {
         .replace("System.Collections.Iterable", "Historical.Iterable")
         .replace("System.Collections.Iterator", "Historical.Iterator");
     assemble(&format!(
-        "{source}\n{ITERATION}\n{}",
-        concat!(
-            include_str!("../runtime/raven/CollectionContracts.neoil"),
-            include_str!("../runtime/raven/Array.neoil")
-        )
+        "{source}\n{ITERATION}\n{COLLECTION_CONTRACTS}\n{}",
+        include_str!("../runtime/raven/Array.neoil")
     ))
     .unwrap()
 }
@@ -268,8 +269,8 @@ ret
 fn array_metadata_cannot_promise_unimplemented_growth() {
     let source = format!(
         ".module System\n{ITERATION}\n{}\n{}\n{}",
-        include_str!("../runtime/raven/CollectionContracts.neoil"),
-        include_str!("../runtime/raven/List.neoil"),
+        COLLECTION_CONTRACTS,
+        include_str!("../runtime/raven/generated/List.methods.neoil"),
         include_str!("../runtime/raven/Array.neoil").replace(
             ".implements System.Collections.MutableSequence<T>",
             ".implements System.Collections.List<T>"

@@ -1,0 +1,8 @@
+; Generated from runtime/raven/src/System/Collections/MutableMap.rvn. Regenerate with build_runtime_library.py.
+.interface System.Collections.MutableMap<T0,T1>
+.implements System.Collections.Map<T0,T1>
+.method instance TryAdd(T0 key,T1 value) -> Boolean
+.end
+.method instance Set(T0 key,T1 value) -> noresult
+.end
+.end

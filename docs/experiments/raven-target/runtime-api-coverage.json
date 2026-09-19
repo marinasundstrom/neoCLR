@@ -1,6 +1,6 @@
 {
   "purpose": "Explicit source-by-source API audit. Samples and signature checks are evidence, not a claim of arbitrary generic/compiler support.",
-  "declarationCount": 704,
+  "declarationCount": 734,
   "sources": [
     {
       "file": "runtime/System/Equatable.neoil",
@@ -431,47 +431,64 @@
       "note": "Matched private backing storage becomes intrinsic loads; no nested runtime field or new primitive constructor."
     },
     {
-      "file": "runtime/System/IntPtr.neoil",
+      "file": "runtime/raven/generated/IntPtr.methods.neoil",
       "declarations": 2,
-      "disposition": "primitives",
+      "disposition": "raven-authored-primitive-struct",
       "samples": [
         "library-primitives.rvn",
-        "library-integers.rvn",
-        "library-booleans.rvn",
-        "library-strings.rvn",
-        "library-parsing.rvn",
-        "library-division.rvn"
-      ]
+        "library-booleans.rvn"
+      ],
+      "tests": [
+        "tests/common_interfaces.rs",
+        "docs/experiments/raven-target/verify_primitive_library.py"
+      ],
+      "note": "Matched private backing storage becomes intrinsic loads; no nested runtime field or new primitive constructor."
     },
     {
-      "file": "runtime/System/UIntPtr.neoil",
-      "declarations": 2,
-      "disposition": "primitives",
+      "file": "runtime/raven/generated/IntPtr.helpers.neoil",
+      "declarations": 1,
+      "disposition": "raven-authored-primitive-struct",
       "samples": [
         "library-primitives.rvn",
-        "library-integers.rvn",
-        "library-booleans.rvn",
-        "library-strings.rvn",
-        "library-parsing.rvn",
-        "library-division.rvn"
-      ]
+        "library-booleans.rvn"
+      ],
+      "tests": [
+        "tests/common_interfaces.rs",
+        "docs/experiments/raven-target/verify_primitive_library.py"
+      ],
+      "note": "Matched private backing storage becomes intrinsic loads; no nested runtime field or new primitive constructor."
     },
     {
-      "file": "runtime/System/Int32.neoil",
-      "declarations": 5,
-      "disposition": "primitives",
+      "file": "runtime/raven/generated/UIntPtr.methods.neoil",
+      "declarations": 2,
+      "disposition": "raven-authored-primitive-struct",
       "samples": [
         "library-primitives.rvn",
-        "library-integers.rvn",
-        "library-booleans.rvn",
-        "library-strings.rvn",
-        "library-parsing.rvn",
-        "library-division.rvn"
-      ]
+        "library-booleans.rvn"
+      ],
+      "tests": [
+        "tests/common_interfaces.rs",
+        "docs/experiments/raven-target/verify_primitive_library.py"
+      ],
+      "note": "Matched private backing storage becomes intrinsic loads; no nested runtime field or new primitive constructor."
+    },
+    {
+      "file": "runtime/raven/generated/UIntPtr.helpers.neoil",
+      "declarations": 1,
+      "disposition": "raven-authored-primitive-struct",
+      "samples": [
+        "library-primitives.rvn",
+        "library-booleans.rvn"
+      ],
+      "tests": [
+        "tests/common_interfaces.rs",
+        "docs/experiments/raven-target/verify_primitive_library.py"
+      ],
+      "note": "Matched private backing storage becomes intrinsic loads; no nested runtime field or new primitive constructor."
     },
     {
       "file": "runtime/raven/generated/Int32.methods.neoil",
-      "declarations": 1,
+      "declarations": 6,
       "disposition": "raven-authored-scalar-bootstrap",
       "samples": [
         "library-primitives.rvn",
@@ -481,11 +498,11 @@
         "tests/character_classification.rs",
         "docs/experiments/raven-target/verify_scalar_library.py"
       ],
-      "note": "Raven implements Divide; parsing remains in its existing native/IL layer."
+      "note": "Raven owns Parse, Divide, Equals, CompareTo and ToString. Bootstrap intrinsics decode native parse payloads; the scalar formatting receiver is preserved."
     },
     {
       "file": "runtime/raven/generated/Int32.helpers.neoil",
-      "declarations": 9,
+      "declarations": 17,
       "disposition": "raven-authored-scalar-bootstrap",
       "samples": [
         "library-primitives.rvn",
@@ -495,7 +512,7 @@
         "tests/character_classification.rs",
         "docs/experiments/raven-target/verify_scalar_library.py"
       ],
-      "note": "Raven implements Divide; parsing remains in its existing native/IL layer."
+      "note": "Raven owns Parse, Divide, Equals, CompareTo and ToString. Bootstrap intrinsics decode native parse payloads; the scalar formatting receiver is preserved."
     },
     {
       "file": "runtime/System/Console.neoil",
@@ -677,8 +694,8 @@
       "callers": [
         {
           "service": "neoCLR.Runtime.Int32ToString",
-          "file": "runtime/System/Int32.neoil",
-          "line": 50
+          "file": "runtime/raven/generated/Int32.methods.neoil",
+          "line": 211
         }
       ]
     },
@@ -689,8 +706,8 @@
       "callers": [
         {
           "service": "neoCLR.Runtime.ParseInt32",
-          "file": "runtime/System/Int32.neoil",
-          "line": 7
+          "file": "runtime/raven/generated/Int32.methods.neoil",
+          "line": 15
         }
       ]
     },
@@ -826,7 +843,7 @@
     },
     {
       "file": "runtime/System/IO/File.neoil",
-      "declarations": 2,
+      "declarations": 1,
       "disposition": "files",
       "samples": [
         "library-files.rvn",
@@ -835,23 +852,23 @@
     },
     {
       "file": "runtime/raven/generated/File.methods.neoil",
-      "declarations": 1,
+      "declarations": 2,
       "disposition": "raven-authored-file-write-bootstrap",
       "tests": [
         "tests/file_output.rs",
         "tests/io_errors.rs"
       ],
-      "note": "Raven maps existing native write status to typed Result<Void,FileWriteError>; reads remain IL."
+      "note": "Raven constructs existing read and write Results from native payload/status values. Unknown statuses still fault; public signatures are preserved."
     },
     {
       "file": "runtime/raven/generated/File.helpers.neoil",
-      "declarations": 19,
+      "declarations": 39,
       "disposition": "raven-authored-file-write-bootstrap",
       "tests": [
         "tests/file_output.rs",
         "tests/io_errors.rs"
       ],
-      "note": "Raven maps existing native write status to typed Result<Void,FileWriteError>; reads remain IL."
+      "note": "Raven constructs existing read and write Results from native payload/status values. Unknown statuses still fault; public signatures are preserved."
     },
     {
       "file": "runtime/neoCLR/Runtime/ReadAllText.neoil",
@@ -860,8 +877,8 @@
       "callers": [
         {
           "service": "neoCLR.Runtime.ReadAllText",
-          "file": "runtime/System/IO/File.neoil",
-          "line": 6
+          "file": "runtime/raven/generated/File.methods.neoil",
+          "line": 237
         }
       ]
     },
@@ -1537,7 +1554,7 @@
         "tests/raven_collections.rs",
         "docs/experiments/raven-target/verify_collection_capabilities.py"
       ],
-      "note": "HashMap algorithms are authored in runtime/raven/src/System/Collections/HashMap.rvn; interfaces stay in IL. Private helpers retain visibility and all bodies are checked. Explicit equality/hash callbacks; no default comparer, removal or pair iteration. See docs/map-contracts.md."
+      "note": "HashMap algorithms and Map/MutableMap contracts are authored in Raven. Private helpers retain visibility and all bodies are checked. Explicit equality/hash callbacks; no default comparer, removal or pair iteration. See docs/map-contracts.md."
     },
     {
       "file": "runtime/raven/Linq.neoil",
@@ -1598,6 +1615,202 @@
         "docs/experiments/raven-target/verify_queries.py"
       ],
       "note": "Operators and private deferred iterator classes are authored in Raven with generated bootstrap bodies; First/Last return Option and Single returns Result with Empty/Multiple. Checked storage retains generic cached elements. Normal-outcome cleanup only. See docs/raven-query-api.md."
+    },
+    {
+      "file": "runtime/raven/Equatable.neoil",
+      "disposition": "raven-authored-existing-contract",
+      "samples": [
+        "library-value-interfaces.rvn"
+      ],
+      "tests": [
+        "docs/experiments/raven-target/verify_foundation_library.py"
+      ],
+      "note": "Existing API preserved; generated bootstrap declarations and bodies are validated with executable consumers."
+    },
+    {
+      "file": "runtime/raven/Comparable.neoil",
+      "disposition": "raven-authored-existing-contract",
+      "samples": [
+        "library-value-interfaces.rvn"
+      ],
+      "tests": [
+        "docs/experiments/raven-target/verify_foundation_library.py"
+      ],
+      "note": "Existing API preserved; generated bootstrap declarations and bodies are validated with executable consumers."
+    },
+    {
+      "file": "runtime/raven/Clonable.neoil",
+      "disposition": "raven-authored-existing-contract",
+      "samples": [
+        "library-value-interfaces.rvn"
+      ],
+      "tests": [
+        "docs/experiments/raven-target/verify_foundation_library.py"
+      ],
+      "note": "Existing API preserved; generated bootstrap declarations and bodies are validated with executable consumers."
+    },
+    {
+      "file": "runtime/raven/Closable.neoil",
+      "disposition": "raven-authored-existing-contract",
+      "samples": [
+        "library-value-interfaces.rvn"
+      ],
+      "tests": [
+        "docs/experiments/raven-target/verify_foundation_library.py"
+      ],
+      "note": "Existing API preserved; generated bootstrap declarations and bodies are validated with executable consumers."
+    },
+    {
+      "file": "runtime/raven/Disposable.neoil",
+      "disposition": "raven-authored-existing-contract",
+      "samples": [
+        "library-value-interfaces.rvn"
+      ],
+      "tests": [
+        "docs/experiments/raven-target/verify_foundation_library.py"
+      ],
+      "note": "Existing API preserved; generated bootstrap declarations and bodies are validated with executable consumers."
+    },
+    {
+      "file": "runtime/raven/Collection.neoil",
+      "disposition": "raven-authored-existing-contract",
+      "samples": [
+        "library-collection-capabilities.rvn",
+        "library-maps.rvn"
+      ],
+      "tests": [
+        "tests/raven_collections.rs",
+        "docs/experiments/raven-target/verify_foundation_library.py"
+      ],
+      "note": "Existing API preserved; generated bootstrap declarations and bodies are validated with executable consumers."
+    },
+    {
+      "file": "runtime/raven/Sequence.neoil",
+      "disposition": "raven-authored-existing-contract",
+      "samples": [
+        "library-collection-capabilities.rvn",
+        "library-maps.rvn"
+      ],
+      "tests": [
+        "tests/raven_collections.rs",
+        "docs/experiments/raven-target/verify_foundation_library.py"
+      ],
+      "note": "Existing API preserved; generated bootstrap declarations and bodies are validated with executable consumers."
+    },
+    {
+      "file": "runtime/raven/MutableSequence.neoil",
+      "disposition": "raven-authored-existing-contract",
+      "samples": [
+        "library-collection-capabilities.rvn",
+        "library-maps.rvn"
+      ],
+      "tests": [
+        "tests/raven_collections.rs",
+        "docs/experiments/raven-target/verify_foundation_library.py"
+      ],
+      "note": "Existing API preserved; generated bootstrap declarations and bodies are validated with executable consumers."
+    },
+    {
+      "file": "runtime/raven/List.neoil",
+      "disposition": "raven-authored-existing-contract",
+      "samples": [
+        "library-collection-capabilities.rvn",
+        "library-maps.rvn"
+      ],
+      "tests": [
+        "tests/raven_collections.rs",
+        "docs/experiments/raven-target/verify_foundation_library.py"
+      ],
+      "note": "Existing API preserved; generated bootstrap declarations and bodies are validated with executable consumers."
+    },
+    {
+      "file": "runtime/raven/Iterable.neoil",
+      "disposition": "raven-authored-existing-contract",
+      "samples": [
+        "library-collection-capabilities.rvn",
+        "library-maps.rvn"
+      ],
+      "tests": [
+        "tests/raven_collections.rs",
+        "docs/experiments/raven-target/verify_foundation_library.py"
+      ],
+      "note": "Existing API preserved; generated bootstrap declarations and bodies are validated with executable consumers."
+    },
+    {
+      "file": "runtime/raven/Iterator.neoil",
+      "disposition": "raven-authored-existing-contract",
+      "samples": [
+        "library-collection-capabilities.rvn",
+        "library-maps.rvn"
+      ],
+      "tests": [
+        "tests/raven_collections.rs",
+        "docs/experiments/raven-target/verify_foundation_library.py"
+      ],
+      "note": "Existing API preserved; generated bootstrap declarations and bodies are validated with executable consumers."
+    },
+    {
+      "file": "runtime/raven/MutableMap.neoil",
+      "disposition": "raven-authored-existing-contract",
+      "samples": [
+        "library-collection-capabilities.rvn",
+        "library-maps.rvn"
+      ],
+      "tests": [
+        "tests/raven_collections.rs",
+        "docs/experiments/raven-target/verify_foundation_library.py"
+      ],
+      "note": "Existing API preserved; generated bootstrap declarations and bodies are validated with executable consumers."
+    },
+    {
+      "file": "runtime/raven/SystemClock.neoil",
+      "disposition": "raven-authored-existing-contract",
+      "samples": [
+        "library-clock.rvn",
+        "library-instants.rvn"
+      ],
+      "tests": [
+        "tests/raven_calendar.rs",
+        "docs/experiments/raven-target/verify_interface_library.py"
+      ],
+      "note": "Existing API preserved; generated bootstrap declarations and bodies are validated with executable consumers."
+    },
+    {
+      "file": "runtime/raven/LocalDateTime.neoil",
+      "disposition": "raven-authored-existing-contract",
+      "samples": [
+        "library-clock.rvn",
+        "library-instants.rvn"
+      ],
+      "tests": [
+        "tests/raven_calendar.rs",
+        "docs/experiments/raven-target/verify_interface_library.py"
+      ],
+      "note": "Existing API preserved; generated bootstrap declarations and bodies are validated with executable consumers."
+    },
+    {
+      "file": "runtime/raven/Console.neoil",
+      "disposition": "raven-authored-existing-contract",
+      "samples": [
+        "library-environment.rvn",
+        "library-console.rvn"
+      ],
+      "tests": [
+        "docs/experiments/raven-target/verify_process.py"
+      ],
+      "note": "Existing API preserved; generated bootstrap declarations and bodies are validated with executable consumers."
+    },
+    {
+      "file": "runtime/raven/Environment.neoil",
+      "disposition": "raven-authored-existing-contract",
+      "samples": [
+        "library-environment.rvn",
+        "library-console.rvn"
+      ],
+      "tests": [
+        "docs/experiments/raven-target/verify_process.py"
+      ],
+      "note": "Existing API preserved; generated bootstrap declarations and bodies are validated with executable consumers."
     }
   ]
 }

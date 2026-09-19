@@ -1,0 +1,23 @@
+namespace System
+
+import System.Runtime.CompilerServices.RuntimeServices
+
+public struct LocalDateTime {
+    private field StoredDate: Date
+    private field StoredTime: Time
+
+    private init(date: Date, time: Time) {
+        StoredDate = date
+        StoredTime = time
+    }
+
+    internal static func FromUnixTimeTicks(ticks: long) -> LocalDateTime {
+        let parts = RuntimeServices.UnixTimeToLocal(ticks)
+        let date = System.Date.Create(parts[0], parts[1], parts[2]).GetOkCase().Value
+        let time = System.Time.Create(parts[3], parts[4], parts[5], parts[6]).GetOkCase().Value
+        return LocalDateTime(date, time)
+    }
+
+    val Date: Date { get => StoredDate }
+    val Time: Time { get => StoredTime }
+}

@@ -11,10 +11,22 @@ static class RuntimeServiceBindings
         UnaryMath.Select(n => ("Math" + n, new[] { "Double" }, "Double"))
         .Concat(BinaryMath.Select(n => ("Math" + n, new[] { "Double", "Double" }, "Double"))).Concat(new (string Name, string[] Args, string Result)[] {
             ("LocalDateTime", ["Int64"], "System.LocalDateTime"),
+            ("UnixTimeTicks", [], "Int64"),
+            ("UnixTimeToLocal", ["Int64"], "arrayref<Int32>"),
             ("PathCombine", ["String", "String"], "String"),
             ("PathGetFileName", ["String"], "String"),
             ("WriteAllText", ["String", "String", "Int32"], "Int32"),
+            ("ReadAllText", ["String", "Int32"], "Value"),
+            ("ParseInt32", ["String"], "Value"),
+            ("ConsoleReadByte", [], "Value"),
+            ("WriteLine", ["String"], "noresult"),
+            ("EnvironmentArguments", [], "arrayref<String>"),
+            ("EnvironmentCurrentDirectory", [], "Value"),
+            ("EnvironmentVariable", ["String"], "Value"),
+            ("Int32ToString", ["Int32"], "String"),
             ("CharCategory", ["Char"], "Int32"),
+            ("IntPtrToInt64", ["IntPtr"], "Int64"),
+            ("UIntPtrToUInt64", ["UIntPtr"], "UInt64"),
             ("TypeName", ["System.RuntimeTypeHandle"], "String"),
             ("TypeEquals", ["System.RuntimeTypeHandle", "System.RuntimeTypeHandle"], "Boolean"),
             ("TypeArgumentCount", ["System.RuntimeTypeHandle"], "Int32"),
@@ -34,25 +46,33 @@ static class RuntimeServiceBindings
         }).ToArray();
     static string CSharp(string type) => type switch {
         "Double" => "double", "String" => "string", "Int32" => "int", "Char" => "char",
-        "Boolean" => "bool", "Int64" => "long",
+        "Boolean" => "bool", "Int64" => "long", "Value" => "System.Value", "noresult" => "void",
+        "IntPtr" => "System.IntPtr", "UIntPtr" => "System.UIntPtr", "UInt64" => "ulong",
         _ when type.StartsWith("System.") => type,
         _ when type.StartsWith("arrayref<") => CSharp(type[9..^1]) + "[]",
         _ => throw new InvalidDataException("Unsupported runtime service declaration.")
     };
     public static string Declarations => "namespace Runtime.CompilerServices { public static class RuntimeServices { "
-        + string.Join(" ", Members.Select(m => $"public static {CSharp(m.Result)} {m.Name}({string.Join(',', m.Args.Select((t, i) => CSharp(t) + " arg" + i))}) => default;")) + " } }";
+        + string.Join(" ", Members.Select(m => $"public static {CSharp(m.Result)} {m.Name}({string.Join(',', m.Args.Select((t, i) => CSharp(t) + " arg" + i))}) {(m.Result == "noresult" ? "{ }" : "=> default;")}")) + " public static bool IsValue<T>(System.Value value) => default; public static T UnpackValue<T>(System.Value value) => default; } }";
 
     public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition)
     {
         if (reference.DeclaringType.FullName != Owner) return null;
+        if (reference.Name is "IsValue" or "UnpackValue")
+            return BindValue(reference, definition);
         if (!RuntimeSignatures.IsCore(reference.DeclaringType.Scope) || reference.HasThis
             || !definition.IsPublic || !definition.IsStatic || definition.IsVirtual
             || definition.HasGenericParameters || reference is GenericInstanceMethod)
             throw new InvalidDataException("Unsupported runtime service call.");
         var (args, result) = RuntimeSignatures.Match(reference, definition,
-            t => ReflectionBindings.Type(t) ?? ProcessBindings.ArrayType(t) ?? GenericUnionBindings.Type(t));
+            t => t is ArrayType { IsVector: true, ElementType.MetadataType: MetadataType.Int32 } ? "arrayref<Int32>"
+                : ReflectionBindings.Type(t) ?? ProcessBindings.ArrayType(t) ?? GenericUnionBindings.Type(t));
         if (!Members.Any(m => m.Name == reference.Name && m.Args.SequenceEqual(args) && m.Result == result))
             throw new InvalidDataException("Unsupported runtime service signature: " + reference.FullName);
+        if (reference.Name == "WriteLine")
+            return new("", args, result, Instruction: "call neoCLR.Runtime.WriteLine(String)\npop");
+        if (reference.Name is "IntPtrToInt64" or "UIntPtrToUInt64")
+            return new("", args, result, Instruction: reference.Name == "IntPtrToInt64" ? "conv.i8" : "conv.u8");
         if (reference.Name == "LocalDateTime")
             return new("System.LocalDateTime::FromUnixTimeTicks", args, result);
         if (reference.Name == "TypeInfo")
@@ -68,6 +88,28 @@ static class RuntimeServiceBindings
             return new(name, args, result);
         }
         return new("neoCLR.Runtime." + reference.Name, args, result);
+    }
+    static ResultBindings.Binding BindValue(MethodReference reference, MethodDefinition definition)
+    {
+        if (!RuntimeSignatures.IsCore(reference.DeclaringType.Scope) || reference.HasThis
+            || reference is not GenericInstanceMethod method || method.GenericArguments.Count != 1
+            || !definition.IsStatic || definition.IsVirtual || definition.GenericParameters.Count != 1
+            || definition.GenericParameters[0].HasConstraints
+            || definition.GenericParameters[0].Attributes != GenericParameterAttributes.NonVariant
+            || definition.Parameters.Count != 1 || definition.Parameters[0].ParameterType.FullName != "System.Value"
+            || !RuntimeSignatures.IsCore(definition.Parameters[0].ParameterType.Scope)
+            || (reference.Name == "IsValue" ? definition.ReturnType.MetadataType != MetadataType.Boolean
+                : definition.ReturnType is not GenericParameter parameter || parameter.Owner != definition || parameter.Position != 0))
+            throw new InvalidDataException("Unsupported erased native value intrinsic.");
+        var element = RuntimeSignatures.Map(method.GenericArguments[0], GenericUnionBindings.Type);
+        if (element is not ("String" or "Byte" or "Int32" or "Void"))
+            throw new InvalidDataException("Unsupported erased native payload type.");
+        var shape = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type);
+        if (!shape.Args.SequenceEqual(new[] { "Value" })
+            || shape.Result != (reference.Name == "IsValue" ? "Boolean" : element))
+            throw new InvalidDataException("Invalid erased native value signature.");
+        return new("", shape.Args, shape.Result,
+            Instruction: (reference.Name == "IsValue" ? "value.is " : "value.unpack ") + element);
     }
     static readonly Dictionary<string, string> Helpers = new();
     public static void Reset() => Helpers.Clear();

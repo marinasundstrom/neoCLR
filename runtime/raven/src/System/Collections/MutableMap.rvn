@@ -1,0 +1,6 @@
+namespace System.Collections
+
+public interface MutableMap<K, V> : Map<K, V> {
+    func TryAdd(key: K, value: V) -> bool
+    func Set(key: K, value: V)
+}

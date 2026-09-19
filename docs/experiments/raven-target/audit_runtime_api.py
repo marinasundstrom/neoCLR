@@ -79,7 +79,7 @@ for file in source['sourceFiles']:
                      'note': 'Count, read indexing and replacement are inherited; List retains Add. All contracts remain invariant.'})
         continue
     if file.startswith('runtime/raven/generated/') and Path(file).name.split('.')[0] in (
-            'Boolean', 'SByte', 'Byte', 'Int16', 'UInt16', 'UInt32', 'Int64', 'UInt64', 'Single', 'Double'):
+            'Boolean', 'SByte', 'Byte', 'Int16', 'UInt16', 'UInt32', 'Int64', 'UInt64', 'Single', 'Double', 'IntPtr', 'UIntPtr'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-primitive-struct',
                      'samples': ['library-primitives.rvn', 'library-booleans.rvn'],
                      'tests': ['tests/common_interfaces.rs', 'docs/experiments/raven-target/verify_primitive_library.py'],
@@ -105,12 +105,12 @@ for file in source['sourceFiles']:
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-scalar-bootstrap',
                      'samples': ['library-primitives.rvn', 'library-division.rvn'],
                      'tests': ['tests/character_classification.rs', 'docs/experiments/raven-target/verify_scalar_library.py'],
-                     'note': 'Raven implements Divide; parsing remains in its existing native/IL layer.'})
+                     'note': 'Raven owns Parse, Divide, Equals, CompareTo and ToString. Bootstrap intrinsics decode native parse payloads; the scalar formatting receiver is preserved.'})
         continue
     if file.startswith('runtime/raven/generated/File.'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-file-write-bootstrap',
                      'tests': ['tests/file_output.rs', 'tests/io_errors.rs'],
-                     'note': 'Raven maps existing native write status to typed Result<Void,FileWriteError>; reads remain IL.'})
+                     'note': 'Raven constructs existing read and write Results from native payload/status values. Unknown statuses still fault; public signatures are preserved.'})
         continue
     if file.startswith('runtime/raven/generated/Path.'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-path-bootstrap',
@@ -159,7 +159,7 @@ result['targetProfileAdditions'] = [{
     'disposition': 'experimental-map-contracts-with-raven-implementation',
     'samples': ['library-maps.rvn'],
     'tests': ['tests/raven_collections.rs', 'docs/experiments/raven-target/verify_collection_capabilities.py'],
-    'note': 'HashMap algorithms are authored in runtime/raven/src/System/Collections/HashMap.rvn; interfaces stay in IL. Private helpers retain visibility and all bodies are checked. Explicit equality/hash callbacks; no default comparer, removal or pair iteration. See docs/map-contracts.md.'
+    'note': 'HashMap algorithms and Map/MutableMap contracts are authored in Raven. Private helpers retain visibility and all bodies are checked. Explicit equality/hash callbacks; no default comparer, removal or pair iteration. See docs/map-contracts.md.'
 }]
 result['targetProfileAdditions'] += [{
     'file': file,
@@ -169,6 +169,22 @@ result['targetProfileAdditions'] += [{
     'note': 'Operators and private deferred iterator classes are authored in Raven with generated bootstrap bodies; First/Last return Option and Single returns Result with Empty/Multiple. Checked storage retains generic cached elements. Normal-outcome cleanup only. See docs/raven-query-api.md.'
 } for file in ('runtime/raven/Linq.neoil', 'runtime/raven/SingleError.neoil', 'runtime/raven/src/System/Linq/Operators.rvn',
                  'runtime/raven/generated/Linq.methods.neoil', 'runtime/raven/generated/Linq.helpers.neoil')]
+result['targetProfileAdditions'] += [{
+    'file': 'runtime/raven/' + name + '.neoil',
+    'disposition': 'raven-authored-existing-contract',
+    'samples': samples,
+    'tests': tests,
+    'note': 'Existing API preserved; generated bootstrap declarations and bodies are validated with executable consumers.'
+} for name, samples, tests in [
+    *[(name, ['library-value-interfaces.rvn'], ['docs/experiments/raven-target/verify_foundation_library.py'])
+      for name in ('Equatable', 'Comparable', 'Clonable', 'Closable', 'Disposable')],
+    *[(name, ['library-collection-capabilities.rvn', 'library-maps.rvn'], ['tests/raven_collections.rs', 'docs/experiments/raven-target/verify_foundation_library.py'])
+      for name in ('Collection', 'Sequence', 'MutableSequence', 'List', 'Iterable', 'Iterator', 'MutableMap')],
+    *[(name, ['library-clock.rvn', 'library-instants.rvn'], ['tests/raven_calendar.rs', 'docs/experiments/raven-target/verify_interface_library.py'])
+      for name in ('SystemClock', 'LocalDateTime')],
+    *[(name, ['library-environment.rvn', 'library-console.rvn'], ['docs/experiments/raven-target/verify_process.py'])
+      for name in ('Console', 'Environment')],
+]]
 for addition in result['targetProfileAdditions']:
     assert (ROOT / addition['file']).is_file()
     for sample in addition['samples']:

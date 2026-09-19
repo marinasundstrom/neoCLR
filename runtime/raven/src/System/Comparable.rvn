@@ -1,0 +1,5 @@
+namespace System
+
+public interface Comparable<T> {
+    func CompareTo(other: T) -> int
+}

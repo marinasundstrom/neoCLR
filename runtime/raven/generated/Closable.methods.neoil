@@ -1,0 +1,5 @@
+; Generated from runtime/raven/src/System/Closable.rvn. Regenerate with build_runtime_library.py.
+.interface System.Closable<T0>
+.method instance Close() -> System.Result<Void,T0>
+.end
+.end

@@ -16,7 +16,7 @@
 .property instance Keys() -> System.Collections.Sequence<T0>
 .get instance System.Collections.HashMap<T0,T1>::get_Keys()
 .end
-.method instance .ctor(System.Func<T0,T0,Boolean>,System.Func<T0,Int32>) -> noresult
+.method instance .ctor(System.Func<T0,T0,Boolean> equal,System.Func<T0,Int32> hash) -> noresult
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0
@@ -180,7 +180,7 @@ M00000005_IL_0009:
 M00000005_IL_000a:
 ret
 .end
-.method private instance HashKey(T0) -> Int32
+.method private instance HashKey(T0 key) -> Int32
 M00000006_IL_0000:
 M00000006_IL_0001:
 M00000006_IL_0002:
@@ -198,7 +198,7 @@ call neoCLR.Library.System.Collections.HashMap.RuntimeBitsAnd(Int32,Int32)
 M00000006_IL_0014:
 ret
 .end
-.method private instance Locate(T0,Int32) -> Int32
+.method private instance Locate(T0 key,Int32 hash) -> Int32
 .local Int32 local0
 .local Int32 local1
 ldc.i4 0
@@ -321,7 +321,7 @@ ldc.i4 -1
 M00000007_IL_0083:
 ret
 .end
-.method instance Find(T0) -> System.Option<T1>
+.method instance Find(T0 key) -> System.Option<T1>
 .local Int32 local0
 ldc.i4 0
 stloc local0
@@ -384,7 +384,7 @@ call neoCLR.Library.System.Collections.HashMap.RuntimeUnion3<T1>(System.Option.S
 M00000008_IL_004f:
 ret
 .end
-.method instance ContainsKey(T0) -> Boolean
+.method instance ContainsKey(T0 key) -> Boolean
 .local Boolean local0
 ldc.bool false
 stloc local0
@@ -640,7 +640,7 @@ M0000000a_IL_00d0:
 M0000000a_IL_00d1:
 ret
 .end
-.method private instance Append(T0,T1,Int32) -> noresult
+.method private instance Append(T0 key,T1 value,Int32 hash) -> noresult
 .local Int32 local0
 ldc.i4 0
 stloc local0
@@ -725,7 +725,7 @@ M0000000b_IL_0062:
 M0000000b_IL_0063:
 ret
 .end
-.method instance TryAdd(T0,T1) -> Boolean
+.method instance TryAdd(T0 key,T1 value) -> Boolean
 .local Int32 local0
 .local Int32 local1
 ldc.i4 0
@@ -807,7 +807,7 @@ M0000000c_IL_0048:
 call neoCLR.Library.System.Collections.HashMap.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance Set(T0,T1) -> noresult
+.method instance Set(T0 key,T1 value) -> noresult
 .local Int32 local0
 .local Int32 local1
 ldc.i4 0

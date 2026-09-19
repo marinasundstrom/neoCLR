@@ -1,0 +1,9 @@
+; Generated from runtime/raven/src/System/Collections/Collection.rvn. Regenerate with build_runtime_library.py.
+.interface System.Collections.Collection<T0>
+.implements System.Collections.Iterable<T0>
+.method instance get_Count() -> Int32
+.end
+.property instance Count() -> Int32
+.get instance System.Collections.Collection<T0>::get_Count()
+.end
+.end

@@ -1,0 +1,17 @@
+; Generated from runtime/raven/src/System/Collections/Map.rvn. Regenerate with build_runtime_library.py.
+.interface System.Collections.Map<T0,T1>
+.method instance get_Count() -> Int32
+.end
+.method instance get_Keys() -> System.Collections.Sequence<T0>
+.end
+.method instance Find(T0 key) -> System.Option<T1>
+.end
+.method instance ContainsKey(T0 key) -> Boolean
+.end
+.property instance Count() -> Int32
+.get instance System.Collections.Map<T0,T1>::get_Count()
+.end
+.property instance Keys() -> System.Collections.Sequence<T0>
+.get instance System.Collections.Map<T0,T1>::get_Keys()
+.end
+.end

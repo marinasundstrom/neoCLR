@@ -30,6 +30,8 @@ def adapt(text: str, name: str) -> str:
 
 
 def build(path: Path) -> str:
+    if path.parent == ROOT / 'runtime/System' and path.stem in {'Environment', 'Console', 'Clonable', 'LocalDateTime', 'Disposable', 'Equatable', 'Comparable', 'SystemClock', 'Closable'}:
+        return build(ROOT / 'runtime/raven' / path.name)
     if path == ROOT / 'runtime/System/Clock.neoil':
         return build(ROOT / 'runtime/raven/Clock.neoil')
     if path == ROOT / 'runtime/System/TypeInfo.neoil':
@@ -42,7 +44,11 @@ def build(path: Path) -> str:
         return build(ROOT / 'runtime/raven/Time.neoil')
     if path == ROOT / 'runtime/System/Collections/ArrayList.neoil':
         return build(ROOT / 'runtime/raven/ArrayList.neoil')
+    if path == ROOT / 'runtime/System/Collections/Iterable.neoil':
+        return build(ROOT / 'runtime/raven/Iterable.neoil')
     text = path.read_text()
+    if path == ROOT / 'runtime/System/Collections/Iterator.neoil':
+        text = build(ROOT / 'runtime/raven/Iterator.neoil') + text[text.index('; Retains the original managed buffer'):]
     if path.stem in COLLECTIONS | {'Disposable'}:
         text = adapt(text, path.stem)
     if path.stem in {'Equatable', 'Comparable', 'Clonable', 'Closable'}:
@@ -60,8 +66,8 @@ def build(path: Path) -> str:
         text = re.sub(r'    \.method internal instance byref \.ctor[^\n]*\n.*?    \.end\n', '', text, flags=re.S)
         text = text.replace('instance readonly byref ', 'instance ').replace('instance byref ', 'instance ')
         text = text.replace('ldloca method', 'ldloc method')
-    if path.stem == 'List':
-        return (ROOT / 'runtime/raven/CollectionContracts.neoil').read_text() + (ROOT / 'runtime/raven/List.neoil').read_text()
+    if path == ROOT / 'runtime/System/Collections/List.neoil':
+        return build(ROOT / 'runtime/raven/CollectionContracts.neoil') + build(ROOT / 'runtime/raven/List.neoil')
     if path.stem == 'Array':
         return (ROOT / 'runtime/raven/Array.neoil').read_text() + (ROOT / 'runtime/raven/NativeMemory.neoil').read_text()
     if path.stem == 'Func':

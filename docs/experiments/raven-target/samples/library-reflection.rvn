@@ -46,7 +46,7 @@ func Main() {
     Show(method.IsVirtual)
     Show(method.IsOverride)
     Show(method.IsAbstract)
-    WriteLine(method.DefinitionIndex)
+    Show(method.DefinitionIndex >= 0)
     let parameters = method.GetParameters()
     WriteLine(parameters[0].Name)
     WriteLine(parameters[0].Position)

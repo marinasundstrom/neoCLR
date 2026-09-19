@@ -1,0 +1,3 @@
+; Raven-authored MutableSequence contract.
+.include "generated/MutableSequence.methods.neoil"
+.include "generated/MutableSequence.helpers.neoil"

@@ -8,7 +8,6 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == ''">
     <Compile Include="src/System/Math/Functions.rvn" />
     <Compile Include="src/System/Linq/Operators.rvn" />
-    <Compile Include="src/System/Int32/Functions.rvn" />
     <Compile Include="src/System/IO/Path/Functions.rvn" />
     <Compile Include="src/System/IO/File/Functions.rvn" />
   </ItemGroup>
@@ -80,5 +79,65 @@
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Duration'">
     <Compile Include="src/System/Duration.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'SystemClock'">
+    <Compile Include="src/System/SystemClock.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'LocalDateTime'">
+    <Compile Include="src/System/LocalDateTime.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Disposable'">
+    <Compile Include="src/System/Disposable.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Equatable'">
+    <Compile Include="src/System/Equatable.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Comparable'">
+    <Compile Include="src/System/Comparable.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Clonable'">
+    <Compile Include="src/System/Clonable.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Closable'">
+    <Compile Include="src/System/Closable.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Iterable'">
+    <Compile Include="src/System/Collections/Iterable.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Iterator'">
+    <Compile Include="src/System/Collections/Iterator.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Collection'">
+    <Compile Include="src/System/Collections/Collection.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Sequence'">
+    <Compile Include="src/System/Collections/Sequence.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'MutableSequence'">
+    <Compile Include="src/System/Collections/MutableSequence.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'List'">
+    <Compile Include="src/System/Collections/List.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Map'">
+    <Compile Include="src/System/Collections/Map.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'MutableMap'">
+    <Compile Include="src/System/Collections/MutableMap.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'IntPtr'">
+    <Compile Include="src/System/IntPtr.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'UIntPtr'">
+    <Compile Include="src/System/UIntPtr.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Int32'">
+    <Compile Include="src/System/Int32.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Environment'">
+    <Compile Include="src/System/Environment/Functions.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Console'">
+    <Compile Include="src/System/Console/Functions.rvn" />
   </ItemGroup>
 </Project>

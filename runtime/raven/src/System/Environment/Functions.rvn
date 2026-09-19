@@ -1,0 +1,28 @@
+namespace System.Environment
+
+import System.EnvironmentError
+import System.Result.*
+import System.Runtime.CompilerServices.RuntimeServices
+
+public func GetCommandLineArgs() -> string[] {
+    return RuntimeServices.EnvironmentArguments()
+}
+
+public func GetCurrentDirectory() -> System.Result<string, EnvironmentError> {
+    let payload = RuntimeServices.EnvironmentCurrentDirectory()
+    if RuntimeServices.IsValue<int>(payload) {
+        return Error(default(EnvironmentError))
+    }
+    return Ok(RuntimeServices.UnpackValue<string>(payload))
+}
+
+public func GetEnvironmentVariable(name: string) -> System.Result<System.Option<string>, EnvironmentError> {
+    let payload = RuntimeServices.EnvironmentVariable(name)
+    if RuntimeServices.IsValue<int>(payload) {
+        return Error(default(EnvironmentError))
+    }
+    if RuntimeServices.IsValue<System.Void>(payload) {
+        return Ok(System.Option<string>(System.Option.None()))
+    }
+    return Ok(System.Option<string>(System.Option.Some<string>(RuntimeServices.UnpackValue<string>(payload))))
+}

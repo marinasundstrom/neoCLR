@@ -8,9 +8,10 @@ Neo remains outside this migration. Package validation is recorded separately.
 ## Audited surface
 
 The [source inventory](experiments/raven-target/runtime-api-inventory.json) contains
-614 visible declaration candidates from 81 files, including the manifest. Accessors,
-fields and properties can describe the same source operation; these are not 614
-independent APIs. The [coverage record](experiments/raven-target/runtime-api-coverage.json)
+734 visible declaration candidates from 129 files, including the manifest. Accessors,
+fields and properties can describe the same source operation; these are not 734
+independent APIs. Generated fragments and adapters contribute to these counts;
+they are not a count of Raven-authored APIs. The [coverage record](experiments/raven-target/runtime-api-coverage.json)
 assigns every declaring source a disposition and evidence. Its checker fails if a
 new source is unaccounted for or a runtime service loses its reviewed library caller.
 
@@ -43,7 +44,7 @@ these checks; it provides a reviewable checklist when the library changes.
 
 ## Subsequent Raven-target APIs
 
-The original inventory above follows `runtime/System.neoil`; its 614 candidates do
+The original inventory above follows `runtime/System.neoil`; its 734 candidates do
 not include later target-specific files. The generic Where/Select/ToList surface in
 `runtime/raven/Linq.neoil` has separate [query contract and executable coverage](raven-query-api.md),
 including custom Raven Iterable implementations. This distinction keeps the existing

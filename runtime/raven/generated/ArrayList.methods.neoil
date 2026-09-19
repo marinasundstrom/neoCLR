@@ -42,7 +42,7 @@ stfld System.Collections.ArrayList<T0>::count
 M00000001_IL_001c:
 ret
 .end
-.method instance .ctor(Int32) -> noresult
+.method instance .ctor(Int32 capacity) -> noresult
 M00000002_IL_0000:
 M00000002_IL_0001:
 ldarg 0
@@ -109,7 +109,7 @@ conv.i4
 M00000004_IL_000a:
 ret
 .end
-.method instance get_Item(Int32) -> T0
+.method instance get_Item(Int32 index) -> T0
 M00000005_IL_0000:
 M00000005_IL_0001:
 M00000005_IL_0002:
@@ -158,7 +158,7 @@ ldelem T0
 M00000005_IL_003a:
 ret
 .end
-.method instance set_Item(Int32,T0) -> noresult
+.method instance set_Item(Int32 index,T0 value) -> noresult
 M00000006_IL_0000:
 M00000006_IL_0001:
 M00000006_IL_0002:
@@ -210,7 +210,7 @@ M00000006_IL_003b:
 M00000006_IL_003c:
 ret
 .end
-.method instance Add(T0) -> noresult
+.method instance Add(T0 value) -> noresult
 .local arrayref<T0> local0
 .local Int32 local1
 .local Int32 local2
@@ -494,7 +494,7 @@ newobj instance neoCLR.Library.System.Collections.ArrayList.Type_53797374656D2E4
 M00000009_IL_0013:
 ret
 .end
-.method instance Find(System.Func<T0,Boolean>) -> System.Option<T0>
+.method instance Find(System.Func<T0,Boolean> match) -> System.Option<T0>
 .local arrayref<T0> local0
 .local Int32 local1
 .local Int32 local2
@@ -588,7 +588,7 @@ call neoCLR.Library.System.Collections.ArrayList.RuntimeUnion1<T0>(System.Option
 M0000000a_IL_0062:
 ret
 .end
-.method instance FindLast(System.Func<T0,Boolean>) -> System.Option<T0>
+.method instance FindLast(System.Func<T0,Boolean> match) -> System.Option<T0>
 .local arrayref<T0> local0
 .local Int32 local1
 .local Int32 local2
@@ -691,7 +691,7 @@ call neoCLR.Library.System.Collections.ArrayList.RuntimeUnion1<T0>(System.Option
 M0000000b_IL_0067:
 ret
 .end
-.method instance FindIndex(System.Func<T0,Boolean>) -> System.Option<Int32>
+.method instance FindIndex(System.Func<T0,Boolean> match) -> System.Option<Int32>
 .local arrayref<T0> local0
 .local Int32 local1
 .local Int32 local2
@@ -785,7 +785,7 @@ call neoCLR.Library.System.Collections.ArrayList.RuntimeUnion4(System.Option.Non
 M0000000c_IL_0062:
 ret
 .end
-.method instance FindLastIndex(System.Func<T0,Boolean>) -> System.Option<Int32>
+.method instance FindLastIndex(System.Func<T0,Boolean> match) -> System.Option<Int32>
 .local arrayref<T0> local0
 .local Int32 local1
 .local Int32 local2
@@ -888,7 +888,7 @@ call neoCLR.Library.System.Collections.ArrayList.RuntimeUnion4(System.Option.Non
 M0000000d_IL_0067:
 ret
 .end
-.method instance Exists(System.Func<T0,Boolean>) -> Boolean
+.method instance Exists(System.Func<T0,Boolean> match) -> Boolean
 .local arrayref<T0> local0
 .local Int32 local1
 .local Int32 local2
@@ -973,7 +973,7 @@ M0000000e_IL_004d:
 call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance TrueForAll(System.Func<T0,Boolean>) -> Boolean
+.method instance TrueForAll(System.Func<T0,Boolean> match) -> Boolean
 .local arrayref<T0> local0
 .local Int32 local1
 .local Int32 local2
@@ -1063,7 +1063,7 @@ M0000000f_IL_0050:
 call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance FindAll(System.Func<T0,Boolean>) -> System.Collections.ArrayList<T0>
+.method instance FindAll(System.Func<T0,Boolean> match) -> System.Collections.ArrayList<T0>
 .local arrayref<T0> local0
 .local Int32 local1
 .local System.Collections.ArrayList<T0> local2

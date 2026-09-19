@@ -1,0 +1,3 @@
+; Raven-authored Closable; generated from the existing public contract.
+.include "generated/Closable.methods.neoil"
+.include "generated/Closable.helpers.neoil"

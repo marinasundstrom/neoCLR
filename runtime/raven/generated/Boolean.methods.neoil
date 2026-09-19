@@ -1,7 +1,7 @@
 ; Generated from runtime/raven/src/System/Boolean.rvn. Regenerate with build_runtime_library.py.
 .type System.Boolean
 .implements System.Comparable<Boolean>
-.method instance readonly byref CompareTo(Boolean) -> Int32
+.method instance readonly byref CompareTo(Boolean other) -> Int32
 M00000001_IL_0000:
 M00000001_IL_0001:
 M00000001_IL_0002:

@@ -156,7 +156,7 @@ static class ApplicationTypes
             throw new InvalidDataException("Unsupported application signature: " + method.FullName);
         if (method.HasThis && Type(method.DeclaringType) is null) throw new InvalidDataException("Unsupported application receiver.");
     }
-    public static string Receiver(MethodReference method) => Type(method.DeclaringType)! + (method.DeclaringType.IsValueType ? "&" : "");
+    public static string Receiver(MethodReference method) => Type(method.DeclaringType)! + (method.DeclaringType.IsValueType && !LibraryImplementation.IsByValueReceiver(method) ? "&" : "");
     public sealed record FieldShape(string Owner, string Type, string Name, bool ValueOwner);
     public static FieldShape? Field(FieldReference reference, MethodDefinition caller, Func<TypeReference, bool, string> map)
     {
@@ -213,7 +213,7 @@ static class ApplicationTypes
             if (IsModule(type.BaseType?.Resolve()?.Module)) output.AppendLine(".extends " + map(type.BaseType, false));
             foreach (var contract in type.Interfaces) output.AppendLine(".implements " + map(contract.InterfaceType, false));
             foreach (var method in type.Methods.Where(m => m.IsAbstract))
-                output.AppendLine($".method instance {(type.IsInterface ? "" : "abstract ")}{MethodName(method)}({string.Join(',', method.Parameters.Select(p => map(p.ParameterType, false)))}) -> {map(method.ReturnType, true)}\n.end");
+                output.AppendLine($".method instance {(type.IsInterface ? "" : "abstract ")}{MethodName(method)}({string.Join(',', method.Parameters.Select(p => map(p.ParameterType, false) + (LibraryNames.ContainsKey(type) ? " " + p.Name : "")))}) -> {map(method.ReturnType, true)}\n.end");
             foreach (var field in type.Fields.Where(_ => !PrimitiveLibrary.IsMatched(type)))
                 output.AppendLine($".field {(LibraryNames.ContainsKey(type) && field.IsPrivate ? "private " : "")}{MetadataIdentity.MemberName(field.Name)} {map(field.FieldType, false)}");
             if (LibraryNames.ContainsKey(type))

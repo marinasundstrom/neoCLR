@@ -1,76 +1,263 @@
-; Generated from runtime/raven/src/System/Int32/Functions.rvn. Regenerate with build_runtime_library.py.
-.method static Divide(Int32 dividend,Int32 divisor) -> System.Result<Int32,System.IntegerDivisionError>
+; Generated from runtime/raven/src/System/Int32.rvn. Regenerate with build_runtime_library.py.
+.type System.Int32
+.implements System.Comparable<Int32>
+.implements System.Equatable<Int32>
+.method static Parse(String value) -> System.Result<Int32,System.Int32ParseError>
+.local Value local0
+.local Byte local1
+ldc.i4 0
+stloc local1
 M00000001_IL_0000:
 M00000001_IL_0001:
 M00000001_IL_0002:
-ldarg 1
+ldarg 0
 M00000001_IL_0003:
-ldc.i4 0
-M00000001_IL_0004:
-ceq
-call neoCLR.Library.System.Int32.RuntimeBooleanToInt32(Boolean)
-M00000001_IL_0006:
-brtrue M00000001_IL_0010
+call neoCLR.Runtime.ParseInt32(String)
+M00000001_IL_0008:
+stloc local0
+M00000001_IL_0009:
+M00000001_IL_000a:
+ldloc local0
 M00000001_IL_000b:
-br M00000001_IL_0025
+value.is Int32
+call neoCLR.Library.System.Int32.RuntimeBooleanToInt32(Boolean)
 M00000001_IL_0010:
-call neoCLR.Library.System.Int32.RuntimeErrorSystemIntegerDivisionErrorDivisionByZeroNew()
+brtrue M00000001_IL_001a
 M00000001_IL_0015:
-call neoCLR.Library.System.Int32.RuntimeErrorSystemIntegerDivisionErrorNewSystemIntegerDivisionErrorDivisionByZero(System.IntegerDivisionError.DivisionByZero)
+br M00000001_IL_002c
 M00000001_IL_001a:
-call neoCLR.Library.System.Int32.RuntimeUnion0(System.IntegerDivisionError)
-M00000001_IL_001f:
-call neoCLR.Library.System.Int32.RuntimeUnion1(System.Result.Error<System.IntegerDivisionError>)
-M00000001_IL_0024:
-ret
-M00000001_IL_0025:
+M00000001_IL_001b:
+ldloc local0
+M00000001_IL_001c:
+value.unpack Int32
+M00000001_IL_0021:
+call neoCLR.Library.System.Int32.RuntimeUnion0(Int32)
 M00000001_IL_0026:
-M00000001_IL_0027:
-ldarg 0
-M00000001_IL_0028:
-ldc.i4 -2147483648
+call neoCLR.Library.System.Int32.RuntimeUnion1(System.Result.Ok<Int32>)
+M00000001_IL_002b:
+ret
+M00000001_IL_002c:
 M00000001_IL_002d:
-ceq
-call neoCLR.Library.System.Int32.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_002e:
+ldloc local0
 M00000001_IL_002f:
-brfalse M00000001_IL_003d
+value.unpack Byte
 M00000001_IL_0034:
-ldarg 1
+stloc local1
 M00000001_IL_0035:
-ldc.i4 -1
 M00000001_IL_0036:
+ldloc local1
+M00000001_IL_0037:
+conv.i4
+M00000001_IL_0038:
+ldc.i4 1
+M00000001_IL_0039:
 ceq
 call neoCLR.Library.System.Int32.RuntimeBooleanToInt32(Boolean)
-M00000001_IL_0038:
-br M00000001_IL_003e
-M00000001_IL_003d:
-ldc.i4 0
-M00000001_IL_003e:
-brtrue M00000001_IL_0048
-M00000001_IL_0043:
-br M00000001_IL_005d
-M00000001_IL_0048:
-call neoCLR.Library.System.Int32.RuntimeErrorSystemIntegerDivisionErrorOverflowNew()
-M00000001_IL_004d:
-call neoCLR.Library.System.Int32.RuntimeErrorSystemIntegerDivisionErrorNewSystemIntegerDivisionErrorOverflow(System.IntegerDivisionError.Overflow)
-M00000001_IL_0052:
-call neoCLR.Library.System.Int32.RuntimeUnion0(System.IntegerDivisionError)
-M00000001_IL_0057:
-call neoCLR.Library.System.Int32.RuntimeUnion1(System.Result.Error<System.IntegerDivisionError>)
+M00000001_IL_003b:
+brtrue M00000001_IL_0045
+M00000001_IL_0040:
+br M00000001_IL_005a
+M00000001_IL_0045:
+call neoCLR.Library.System.Int32.RuntimeErrorSystemInt32ParseErrorInvalidFormatNew()
+M00000001_IL_004a:
+call neoCLR.Library.System.Int32.RuntimeErrorSystemInt32ParseErrorNewSystemInt32ParseErrorInvalidFormat(System.Int32ParseError.InvalidFormat)
+M00000001_IL_004f:
+call neoCLR.Library.System.Int32.RuntimeUnion2(System.Int32ParseError)
+M00000001_IL_0054:
+call neoCLR.Library.System.Int32.RuntimeUnion3(System.Result.Error<System.Int32ParseError>)
+M00000001_IL_0059:
+ret
+M00000001_IL_005a:
+M00000001_IL_005b:
 M00000001_IL_005c:
-ret
+ldloc local1
 M00000001_IL_005d:
+conv.i4
 M00000001_IL_005e:
+ldc.i4 2
 M00000001_IL_005f:
-ldarg 0
-M00000001_IL_0060:
-ldarg 1
+ceq
+call neoCLR.Library.System.Int32.RuntimeBooleanToInt32(Boolean)
 M00000001_IL_0061:
-div
-M00000001_IL_0062:
-call neoCLR.Library.System.Int32.RuntimeUnion2(Int32)
-M00000001_IL_0067:
-call neoCLR.Library.System.Int32.RuntimeUnion3(System.Result.Ok<Int32>)
-M00000001_IL_006c:
+brtrue M00000001_IL_006b
+M00000001_IL_0066:
+br M00000001_IL_0080
+M00000001_IL_006b:
+call neoCLR.Library.System.Int32.RuntimeErrorSystemInt32ParseErrorOverflowNew()
+M00000001_IL_0070:
+call neoCLR.Library.System.Int32.RuntimeErrorSystemInt32ParseErrorNewSystemInt32ParseErrorOverflow(System.Int32ParseError.Overflow)
+M00000001_IL_0075:
+call neoCLR.Library.System.Int32.RuntimeUnion2(System.Int32ParseError)
+M00000001_IL_007a:
+call neoCLR.Library.System.Int32.RuntimeUnion3(System.Result.Error<System.Int32ParseError>)
+M00000001_IL_007f:
 ret
+M00000001_IL_0080:
+M00000001_IL_0081:
+M00000001_IL_0082:
+ldstr "invalid native parse status"
+M00000001_IL_0087:
+call System.Fault(String)
+M00000001_IL_008c:
+call neoCLR.Library.System.Int32.RuntimeErrorSystemInt32ParseErrorInvalidFormatNew()
+M00000001_IL_0091:
+call neoCLR.Library.System.Int32.RuntimeErrorSystemInt32ParseErrorNewSystemInt32ParseErrorInvalidFormat(System.Int32ParseError.InvalidFormat)
+M00000001_IL_0096:
+call neoCLR.Library.System.Int32.RuntimeUnion2(System.Int32ParseError)
+M00000001_IL_009b:
+call neoCLR.Library.System.Int32.RuntimeUnion3(System.Result.Error<System.Int32ParseError>)
+M00000001_IL_00a0:
+ret
+.end
+.method static Divide(Int32 dividend,Int32 divisor) -> System.Result<Int32,System.IntegerDivisionError>
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldarg 1
+M00000002_IL_0003:
+ldc.i4 0
+M00000002_IL_0004:
+ceq
+call neoCLR.Library.System.Int32.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_0006:
+brtrue M00000002_IL_0010
+M00000002_IL_000b:
+br M00000002_IL_0025
+M00000002_IL_0010:
+call neoCLR.Library.System.Int32.RuntimeErrorSystemIntegerDivisionErrorDivisionByZeroNew()
+M00000002_IL_0015:
+call neoCLR.Library.System.Int32.RuntimeErrorSystemIntegerDivisionErrorNewSystemIntegerDivisionErrorDivisionByZero(System.IntegerDivisionError.DivisionByZero)
+M00000002_IL_001a:
+call neoCLR.Library.System.Int32.RuntimeUnion4(System.IntegerDivisionError)
+M00000002_IL_001f:
+call neoCLR.Library.System.Int32.RuntimeUnion5(System.Result.Error<System.IntegerDivisionError>)
+M00000002_IL_0024:
+ret
+M00000002_IL_0025:
+M00000002_IL_0026:
+M00000002_IL_0027:
+ldarg 0
+M00000002_IL_0028:
+ldc.i4 -2147483648
+M00000002_IL_002d:
+ceq
+call neoCLR.Library.System.Int32.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_002f:
+brfalse M00000002_IL_003d
+M00000002_IL_0034:
+ldarg 1
+M00000002_IL_0035:
+ldc.i4 -1
+M00000002_IL_0036:
+ceq
+call neoCLR.Library.System.Int32.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_0038:
+br M00000002_IL_003e
+M00000002_IL_003d:
+ldc.i4 0
+M00000002_IL_003e:
+brtrue M00000002_IL_0048
+M00000002_IL_0043:
+br M00000002_IL_005d
+M00000002_IL_0048:
+call neoCLR.Library.System.Int32.RuntimeErrorSystemIntegerDivisionErrorOverflowNew()
+M00000002_IL_004d:
+call neoCLR.Library.System.Int32.RuntimeErrorSystemIntegerDivisionErrorNewSystemIntegerDivisionErrorOverflow(System.IntegerDivisionError.Overflow)
+M00000002_IL_0052:
+call neoCLR.Library.System.Int32.RuntimeUnion4(System.IntegerDivisionError)
+M00000002_IL_0057:
+call neoCLR.Library.System.Int32.RuntimeUnion5(System.Result.Error<System.IntegerDivisionError>)
+M00000002_IL_005c:
+ret
+M00000002_IL_005d:
+M00000002_IL_005e:
+M00000002_IL_005f:
+ldarg 0
+M00000002_IL_0060:
+ldarg 1
+M00000002_IL_0061:
+div
+M00000002_IL_0062:
+call neoCLR.Library.System.Int32.RuntimeUnion0(Int32)
+M00000002_IL_0067:
+call neoCLR.Library.System.Int32.RuntimeUnion6(System.Result.Ok<Int32>)
+M00000002_IL_006c:
+ret
+.end
+.method instance readonly byref Equals(Int32 other) -> Boolean
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+ldobj Int32
+M00000003_IL_0008:
+ldarg 1
+M00000003_IL_0009:
+ceq
+call neoCLR.Library.System.Int32.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_000b:
+call neoCLR.Library.System.Int32.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance ToString() -> String
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+M00000004_IL_0008:
+call neoCLR.Runtime.Int32ToString(Int32)
+M00000004_IL_000d:
+ret
+.end
+.method instance readonly byref CompareTo(Int32 other) -> Int32
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+ldobj Int32
+M00000005_IL_0008:
+ldarg 1
+M00000005_IL_0009:
+clt
+call neoCLR.Library.System.Int32.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_000b:
+brtrue M00000005_IL_0015
+M00000005_IL_0010:
+br M00000005_IL_0018
+M00000005_IL_0015:
+M00000005_IL_0016:
+ldc.i4 -1
+M00000005_IL_0017:
+ret
+M00000005_IL_0018:
+M00000005_IL_0019:
+M00000005_IL_001a:
+ldarg 0
+M00000005_IL_001b:
+ldobj Int32
+M00000005_IL_0020:
+ldarg 1
+M00000005_IL_0021:
+cgt
+call neoCLR.Library.System.Int32.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_0023:
+brtrue M00000005_IL_002d
+M00000005_IL_0028:
+br M00000005_IL_0030
+M00000005_IL_002d:
+M00000005_IL_002e:
+ldc.i4 1
+M00000005_IL_002f:
+ret
+M00000005_IL_0030:
+M00000005_IL_0031:
+M00000005_IL_0032:
+ldc.i4 0
+M00000005_IL_0033:
+ret
+.end
 .end

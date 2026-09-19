@@ -45,6 +45,7 @@ See also the [Raven experiment](../experiments/raven-target/README.md).
 - [Shared Raven signature projection](../raven-signature-projection.md)
 - [Try the stabilized Raven/neoCLR build](../raven-stabilization-local-build.md)
 - [Raven String helpers on neoCLR](../raven-string-api.md)
+- [Library port validation and compiler branch audit](../raven-library-port-validation.md)
 - [Authoring the foundational library in Raven](../raven-system-library.md)
 - [Normal Raven compilation and independent neoCLR import](../raven-target-compilation.md)
 - [Target-specific language contracts in Raven](../raven-target-contracts.md)

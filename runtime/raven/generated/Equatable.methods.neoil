@@ -1,0 +1,5 @@
+; Generated from runtime/raven/src/System/Equatable.rvn. Regenerate with build_runtime_library.py.
+.interface System.Equatable<T0>
+.method instance Equals(T0 other) -> Boolean
+.end
+.end

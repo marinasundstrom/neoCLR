@@ -1,0 +1,11 @@
+namespace System
+
+import System.Runtime.CompilerServices.RuntimeServices
+
+public open class SystemClock : Clock {
+    public init() {}
+
+    val Now: Instant {
+        get => Instant.FromUnixTimeTicks(RuntimeServices.UnixTimeTicks())
+    }
+}

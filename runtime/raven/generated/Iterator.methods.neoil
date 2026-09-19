@@ -1,0 +1,11 @@
+; Generated from runtime/raven/src/System/Collections/Iterator.rvn. Regenerate with build_runtime_library.py.
+.interface System.Collections.Iterator<T0>
+.implements System.Disposable
+.method instance MoveNext() -> Boolean
+.end
+.method instance get_Current() -> T0
+.end
+.property instance Current() -> T0
+.get instance System.Collections.Iterator<T0>::get_Current()
+.end
+.end

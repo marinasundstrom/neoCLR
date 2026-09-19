@@ -1,0 +1,3 @@
+; Raven-authored Clonable; generated from the existing public contract.
+.include "generated/Clonable.methods.neoil"
+.include "generated/Clonable.helpers.neoil"

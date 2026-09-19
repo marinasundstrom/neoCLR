@@ -37,8 +37,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-interface-library-') as temporar
     cases = [
         ('Valid', source, None),
         ('Class', 'namespace System\npublic class Clock {}', unsupported),
-        ('Generic', source.replace('interface Clock', 'interface Clock<T>'), unsupported),
-        ('Inherited', source.replace('interface Clock {', 'interface Clock : Extra {') + '\npublic interface Extra {}', unsupported),
+        ('Generic', source.replace('interface Clock', 'interface Clock<T>'), mismatch),
+        ('Inherited', source.replace('interface Clock {', 'interface Clock : Extra {') + '\npublic interface Extra {}', mismatch),
         ('Extra', source.replace('val Now:', 'func Extra() -> int\n    val Now:'), mismatch),
         ('ReturnType', source.replace('Now: Instant', 'Now: string'), mismatch),
         ('Property', source.replace('val Now: Instant { get }', 'func get_Now() -> Instant'), mismatch),

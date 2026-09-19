@@ -1,0 +1,3 @@
+; Raven-authored Iterator contract.
+.include "generated/Iterator.methods.neoil"
+.include "generated/Iterator.helpers.neoil"

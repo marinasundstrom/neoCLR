@@ -6,7 +6,14 @@ using System.Text.RegularExpressions;
 static class LibraryImplementation
 {
     static readonly HashSet<MethodDefinition> ReadonlyReceivers = new();
-    public static bool IsReadonlyReceiver(MethodDefinition method) => ReadonlyReceivers.Contains(method);
+    // Preserve the existing scalar neoIL formatting receiver while CIL uses a
+    // managed-byref struct receiver. Intrinsic field reads accept either form.
+    public static bool IsByValueReceiver(MethodReference method) =>
+        PrimitiveLibrary.IsMatched(method.DeclaringType.Resolve())
+        && method.DeclaringType.FullName == "System.Int32" && method.Name == "ToString"
+        && method.HasThis && !method.HasParameters && method.ReturnType.MetadataType == MetadataType.String;
+    public static bool IsReadonlyReceiver(MethodDefinition method) => ReadonlyReceivers.Contains(method)
+        && !IsByValueReceiver(method);
     public static MethodDefinition[] Roots(ModuleDefinition source, ModuleDefinition core, string owner)
     {
         ReadonlyReceivers.Clear();
@@ -32,7 +39,7 @@ static class LibraryImplementation
             if (!method.IsPublic || !method.IsStatic || method.IsConstructor || !method.HasBody
                 || !Regex.IsMatch(method.Name, @"^[A-Za-z_][A-Za-z0-9_]*$")
                 || method.Parameters.Any(p => p.IsOut || p.ParameterType.IsByReference)
-                || method.ReturnType.MetadataType == MetadataType.Void)
+                || method.ReturnType.MetadataType == MetadataType.Void && owner != "System.Console")
                 throw new InvalidDataException("Unsupported library export: " + method.FullName);
             var matches = contract.Methods.Where(m => m.IsPublic && m.IsStatic && m.Name == method.Name && m.Parameters.Count == method.Parameters.Count && m.GenericParameters.Count == method.GenericParameters.Count
                 && SameType(m.ReturnType, method.ReturnType)
@@ -45,12 +52,12 @@ static class LibraryImplementation
 
     static MethodDefinition[] InterfaceRoots(TypeDefinition type, TypeDefinition contract, string owner)
     {
-        // Bounded declaration authoring, not permission to replace a class with an
+        // Bounded invariant declaration authoring, not permission to replace a class with an
         // interface or supply executable default/static interface members.
         foreach (var candidate in new[] { type, contract })
             if (!candidate.IsPublic || !candidate.IsInterface || !candidate.IsAbstract
-                || candidate.IsSealed || candidate.HasGenericParameters || candidate.HasFields
-                || candidate.HasNestedTypes || candidate.HasEvents || candidate.HasInterfaces
+                || candidate.IsSealed || candidate.GenericParameters.Any(p => p.HasConstraints || p.Attributes != GenericParameterAttributes.NonVariant) || candidate.HasFields
+                || candidate.HasNestedTypes || candidate.HasEvents
                 || candidate.BaseType is not null || candidate.IsExplicitLayout
                 || candidate.Methods.Any(m => !m.IsPublic || !m.IsAbstract || !m.IsVirtual
                     || !m.IsNewSlot || m.IsFinal || m.IsStatic || m.IsConstructor || m.HasBody
@@ -63,7 +70,10 @@ static class LibraryImplementation
             && left.Parameters.Count == right.Parameters.Count
             && left.Parameters.Zip(right.Parameters).All(p => p.First.Name == p.Second.Name
                 && SameType(p.First.ParameterType, p.Second.ParameterType));
-        if (type.Methods.Count != contract.Methods.Count
+        if (type.GenericParameters.Count != contract.GenericParameters.Count
+            || type.Interfaces.Count != contract.Interfaces.Count
+            || type.Interfaces.Any(i => contract.Interfaces.Count(c => SameType(c.InterfaceType, i.InterfaceType)) != 1)
+            || type.Methods.Count != contract.Methods.Count
             || type.Methods.Any(m => contract.Methods.Count(c => Match(c, m)) != 1)
             || type.Properties.Count != contract.Properties.Count
             || type.Properties.Any(p => contract.Properties.Count(c => c.Name == p.Name
@@ -119,7 +129,9 @@ static class LibraryImplementation
                 || type.Fields.Count != contract.Fields.Count
                 || type.Fields.Zip(contract.Fields).Any(p => p.First.Name != p.Second.Name
                     || !SameType(p.First.FieldType, p.Second.FieldType)
-                    || p.First.FieldType.MetadataType is not (MetadataType.Int32 or MetadataType.Int64 or MetadataType.Boolean)))
+                    || (p.First.FieldType.MetadataType is not (MetadataType.Int32 or MetadataType.Int64 or MetadataType.Boolean)
+                        && !(owner == "System.LocalDateTime" && p.First.FieldType.FullName is "System.Date" or "System.Time"
+                            && RuntimeSignatures.IsCore(p.First.FieldType.Scope)))))
                 throw new InvalidDataException($"Unsupported or mismatched value library layout: source sequential={type.IsSequentialLayout}, pack={type.PackingSize}, size={type.ClassSize}, fields={string.Join(',', type.Fields.Select(f => f.Name + ":" + f.FieldType.FullName))}; reference sequential={contract.IsSequentialLayout}, pack={contract.PackingSize}, size={contract.ClassSize}, fields={string.Join(',', contract.Fields.Select(f => f.Name + ":" + f.FieldType.FullName))}.");
         }
         if (type.GenericParameters.Count != contract.GenericParameters.Count)

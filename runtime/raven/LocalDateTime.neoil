@@ -1,0 +1,3 @@
+; Raven-authored LocalDateTime; generated from the existing public contract.
+.include "generated/LocalDateTime.methods.neoil"
+.include "generated/LocalDateTime.helpers.neoil"

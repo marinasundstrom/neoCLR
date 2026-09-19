@@ -64,6 +64,13 @@ static class CalendarBindings
                 .First(t => t.MetadataType == MetadataType.Void));
         attribute.Methods.Add(constructor);
         constructor.Body.Instructions.Add(Mono.Cecil.Cil.Instruction.Create(Mono.Cecil.Cil.OpCodes.Ret));
+        var local = module.GetType("System.LocalDateTime");
+        local.PackingSize = -1;
+        local.ClassSize = -1;
+        local.Fields.Add(new FieldDefinition("StoredDate", FieldAttributes.Private, module.GetType("System.Date")));
+        local.Fields.Add(new FieldDefinition("StoredTime", FieldAttributes.Private, module.GetType("System.Time")));
+        foreach (var method in local.Methods.Where(m => m.HasThis && !m.IsConstructor))
+            method.CustomAttributes.Add(new CustomAttribute(constructor));
         foreach (var (name, field, scalar) in new[] { ("Date", "StoredDayNumber", "Int32"), ("Time", "StoredTicks", "Int64"), ("Instant", "StoredTicks", "Int64"), ("Duration", "StoredTicks", "Int64") })
         {
             var type = module.GetType("System." + name);

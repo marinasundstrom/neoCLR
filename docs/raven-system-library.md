@@ -1,5 +1,75 @@
 # Authoring the foundational library in Raven
 
+## API-preserving source port — 2026-09-19
+
+The author directs source migration first and proposal API alignment afterward.
+The acceptance gate is a functioning neoCLR: Raven programs must compile, import,
+verify and run against the regenerated library. Original proposal texts are indexed
+[separately](proposals/README.md); the current project/assembly identity is retained.
+
+This slice adds Raven sources for the fundamental and collection interfaces,
+SystemClock, LocalDateTime, IntPtr/UIntPtr comparisons, the complete Int32 member
+surface, Console and Environment. File.ReadAllText joins WriteAllText in Raven.
+The legacy Neo profile retains its receiver/array conventions where it differs;
+the Raven profile selects generated contracts and implementation bodies.
+
+Importer admission checks invariant generic arity, parameter positions, base
+interfaces, exact method/property signatures and external identities. Variant or
+constrained parameters, default/static interface bodies and unrelated shape changes
+remain rejected. LocalDateTime's nested Date/Time fields have checked order and
+identity. Library method parameter names survive import for introspection.
+Its FromUnixTimeTicks factory retains internal visibility. Clock behavior
+continues to use the existing host tick/local-calendar services.
+
+Bootstrap-only RuntimeServices bindings allow checked inspection/extraction of
+native String, Byte, Int32 and Void payloads. Erased locals require definite
+assignment; they are not initialized with fabricated default payloads. Native status
+interpretation and typed Result/Option construction are Raven code. Native integer
+comparisons widen signed/unsigned storage with the existing conv.i8/conv.u8
+instructions before ordinary comparisons. Int32.ToString retains its scalar neoIL
+receiver and Console's no-result CIL exports retain the existing neoIL Void boundary.
+Environment produces a fresh managed argument array in the Raven profile.
+No new public API, namespace migration or Runtime Contract setting is introduced.
+
+The compiler investigation found a general generic-interface base-scope bug.
+Raven main commit `2e3856a6b` fixes it independently using ordinary .NET references;
+`0b6f11bb5` applies that fix to the neoCLR feature branch. Three cases failed before
+the fix; 87 focused main tests and 99 feature-branch checks pass, including the
+context-owned typeof contract. This establishes .NET 11 metadata behavior, not
+execution on .NET Framework or NanoFramework. The subsequent branch audit reproduced
+a delegate bridge InvalidProgramException on ordinary .NET and integrated the
+independent fix as `5a37cd56c` on Raven main (19 focused delegate/unit tests pass).
+The experimental branch already contains equivalent behavior in `8e0f6cb7d`.
+
+This migration reuses the .NET comparisons in [common interfaces](common-interfaces.md),
+[collection contracts](collection-contracts.md), [integer types](integer-types.md),
+[date/time design](date-time-design.md), [console I/O](console-io.md),
+[environment](environment.md) and [file input](file-input.md). The principal cost is
+additional generated adapters and a larger reachable call graph; no performance
+improvement or new native ABI is claimed.
+
+Remaining handwritten source includes String, opaque Error, Option/Result and error
+carriers, descriptor hierarchy bodies, array/runtime adapters, delegates and Void.
+Native service declarations remain runtime-owned. Generated neoIL remains a build
+artifact rather than a competing implementation. These boundaries are not silently
+claimed to have become Raven source.
+
+The remaining migration gates are substantive work, not just moving files:
+
+| Remaining source | Required implementation admission |
+| --- | --- |
+| String and opaque Error | Intrinsic reference receivers/storage and exact native-service bindings |
+| Option/Result, Propagatable and error carriers | Union/case representation, out-parameter contracts and default/case validity |
+| MemberInfo/FieldInfo/MethodInfo/PropertyInfo | Abstract/inherited descriptor layout and runtime snapshot factory compatibility |
+| Array, iterator adapters and Func | Runtime-owned allocation/element access and delegate invocation boundaries |
+
+Complete those gates before calling the entire source port finished. Executable
+coverage of their existing neoIL implementations is necessary but does not establish
+that their managed bodies have been authored in Raven.
+
+Validation commands and recorded results are in the
+[port validation record](raven-library-port-validation.md).
+
 ## Planned System.Runtime assembly — 2026-09-17
 
 The author requests a minimal managed `System.Runtime` project/assembly, starting
@@ -117,7 +187,7 @@ and direct-IL coverage. Compiler-affecting changes require documentation and
 changelogs in both repositories under the Raven integration workflow.
 
 `runtime/raven/System.rvnproj` is the shared authoring project for ordinary
-foundational runtime APIs. Its sources include `src/System/Math/Functions.rvn`, `src/System/Linq/Operators.rvn`, `src/System/Int32/Functions.rvn`, `src/System/Char.rvn`, `src/System/Collections/ArrayList.rvn`, `src/System/Collections/HashMap.rvn`, `src/System/Time.rvn` and `src/System/Date.rvn`; additional namespaces
+foundational runtime APIs. Its sources include `src/System/Math/Functions.rvn`, `src/System/Linq/Operators.rvn`, `src/System/Int32.rvn`, `src/System/Char.rvn`, `src/System/Collections/ArrayList.rvn`, `src/System/Collections/HashMap.rvn`, `src/System/Time.rvn` and `src/System/Date.rvn`; additional namespaces
 and types should join this project as their importing requirements are validated.
 Each declared namespace has its own folder below `src`: for example, `System/Date.rvn`,
 `System/Collections/ArrayList.rvn` and `System/Math/Functions.rvn`. Namespace functions
