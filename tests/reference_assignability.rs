@@ -259,3 +259,80 @@ ret
     assert_eq!(result.value, Value::Int32(42));
     assert!(result.heap.statistics().collections > 0);
 }
+
+#[test]
+fn type_tests_use_concrete_type_through_interface_views() {
+    check(
+        r#"
+.function Main() -> Int32
+.local Read<Int32> view
+ldc.i4 42
+newobj Cell<Int32>
+stloc view
+ldloc view
+isinst Mutable<Int32>
+callvirt instance Read<Int32>::Get()
+ret
+.end
+"#,
+        Value::Int32(42),
+    );
+}
+
+#[test]
+fn failed_type_tests_and_null_inputs_produce_typed_nulls() {
+    for input in ["ldc.i4 1\nnewobj Other", "ldloc empty"] {
+        check(
+            &format!(
+                r#"
+.function Main() -> Boolean
+.local Other empty
+ldloca empty
+initobj Other
+{input}
+isinst Read<Int32>
+isinst Mutable<Int32>
+ref.isnull
+ret
+.end
+"#
+            ),
+            Value::Boolean(true),
+        );
+    }
+}
+
+#[test]
+fn type_tests_reject_value_and_byref_operands() {
+    for input in ["ldc.i4 1", "ldloca cell"] {
+        let source = format!(
+            r#"
+.function Main() -> Boolean
+.local Cell<Int32> cell
+{input}
+isinst Read<Int32>
+ref.isnull
+ret
+.end
+"#
+        );
+        assert!(verify(&module(&source)).is_err());
+    }
+}
+
+#[test]
+fn successful_type_test_preserves_object_identity() {
+    check(
+        r#"
+.function Main() -> Boolean
+ldc.i4 42
+newobj Cell<Int32>
+dup
+isinst Read<Int32>
+ref.eq
+ret
+.end
+"#,
+        Value::Boolean(true),
+    );
+}

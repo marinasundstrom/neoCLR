@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Add reference-only `isinst` and `ref.isnull` instructions for runtime type tests.
+  Successful tests preserve object identity through interface views; failed/null
+  tests return typed nulls. Boxed value-type targets remain unsupported.
+
 - Record the author's selected sealed Info hierarchy, replacing the proposed open
   implementation model. Permitted runtime providers remain internal; collection
   return contracts and RuntimeContext implementation are separate work.

@@ -950,7 +950,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                         return Err(Fault::new("box requires a System.Object class declaration"));
                     }
                 }
-                Op::CastClass(ty) => {
+                Op::IsInstance(ty) | Op::CastClass(ty) => {
                     check(ty)?;
                     if !matches!(ty, Type::ArrayRef(_) | Type::String)
                         && crate::interfaces::interface_definition(module, ty).is_err()
@@ -2122,6 +2122,51 @@ fn interpret_instructions(
                         (Some(left), Some(right)) => left.same_location(&right),
                         _ => false,
                     }));
+                }
+                Op::ReferenceIsNull => {
+                    let value = frame.pop()?;
+                    frame.stack.push(Value::Boolean(matches!(
+                        value,
+                        Value::NullObjectReference(_)
+                    )));
+                }
+                Op::IsInstance(target) => {
+                    let value = frame.pop()?;
+                    let concrete = match &value {
+                        Value::ObjectReference(object) => {
+                            object.reference.assigned()?;
+                            object.concrete_type()
+                        }
+                        Value::String(_) => Type::String,
+                        Value::NullObjectReference(_) => {
+                            frame.stack.push(Value::NullObjectReference(target.clone()));
+                            return Ok(None);
+                        }
+                        _ => return Err(Fault::new("isinst requires an object reference")),
+                    };
+                    crate::arrays::check_cast(&concrete, target)?;
+                    if concrete == *target || module.reference_assignable(&concrete, target) {
+                        let result = match value {
+                            Value::ObjectReference(mut object) => {
+                                object.view = Some(target.clone());
+                                Value::ObjectReference(object)
+                            }
+                            value if *target == Type::String => value,
+                            value => {
+                                if heap.len() >= limits.heap_objects {
+                                    return Err(Fault::new("heap object limit exceeded"));
+                                }
+                                let index = heap.allocate(value)?;
+                                Value::ObjectReference(crate::value::ObjectReference {
+                                    reference: heap.address(index)?,
+                                    view: Some(target.clone()),
+                                })
+                            }
+                        };
+                        frame.stack.push(result);
+                    } else {
+                        frame.stack.push(Value::NullObjectReference(target.clone()));
+                    }
                 }
                 Op::CastClass(target) => {
                     let source = frame.pop()?;

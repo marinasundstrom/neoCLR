@@ -671,8 +671,8 @@ fn effect(
             usize::from(!crate::vm::resolve(module, target)?.no_result),
         ),
         Construct(target) => (target.parameters.len(), 1),
-        BoxValue(_) | CastClass(_) | BorrowInterface(_) | PackValue(_) | IsValue(_)
-        | UnpackValue(_) => (1, 1),
+        IsInstance(_) | ReferenceIsNull | BoxValue(_) | CastClass(_) | BorrowInterface(_)
+        | PackValue(_) | IsValue(_) | UnpackValue(_) => (1, 1),
         ReferenceEqual | SetField(_) | PointerAdd | BitAnd | BitOr | BitXor | ShiftLeft
         | ShiftRight | ShiftRightUnsigned | Remainder | RemainderUnsigned | Add | Sub | Mul
         | AddChecked | SubChecked | MulChecked | Divide | AddCheckedUnsigned
@@ -995,6 +995,22 @@ fn typed_effect(
         BoxValue(target) => {
             stored(module, &values[0], target)?;
             one(Type::Named("System.Object".into()))
+        }
+        IsInstance(target) => {
+            require(
+                module.is_object_reference_type(exact(&values[0])?)
+                    && module.is_object_reference_type(target),
+                "isinst requires object-reference types",
+            )?;
+            crate::arrays::check_cast(exact(&values[0])?, target)?;
+            one(target.clone())
+        }
+        ReferenceIsNull => {
+            require(
+                module.is_object_reference_type(exact(&values[0])?),
+                "ref.isnull requires an object reference",
+            )?;
+            one(Type::Boolean)
         }
         CastClass(target) => {
             crate::arrays::check_cast(exact(&values[0])?, target)?;

@@ -124,3 +124,20 @@ module-level free-function queries, not a category of Type member.
 Managed references now support concrete target discovery through `ref.type` and Neo's
 GetType fallback. See [reflection introspection](reflection.md). This is distinct from
 typeof(T), which describes the declared type argument.
+
+## Reference type tests (development)
+
+`isinst T` tests an ordinary managed reference against a class or interface using
+its allocation type, including when the current reference has a base/interface
+view. A successful test preserves the allocation and exposes a T view; a failed
+test or null input produces a typed null. `ref.isnull` returns Boolean without
+dereferencing that result. The verifier rejects value, pointer and byref operands.
+Mutable array conversions retain neoCLR's invariant element-type rule.
+
+This follows the reference-type portion of CLI
+[isinst](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.isinst?view=net-10.0).
+CLI also permits boxed value-type targets; neoCLR does not admit those targets in
+this slice. This bounded support enables Raven interface type patterns without
+introducing reflection-based invocation or array covariance. Reference identity,
+null results and calls through successful interface views are checked in
+`tests/reference_assignability.rs`.

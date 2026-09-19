@@ -161,7 +161,9 @@ fn instruction_services(op: &Op) -> &'static [RuntimeService] {
         Op::LoadTypeToken(..) => &[TypeInspection],
         Op::ReferenceType => &[TypeInspection, SlotReferences],
         Op::BoxValue(_) => &[ManagedHeap, ValueStorage, SlotReferences],
-        Op::CastClass(_) => &[TypeInspection, SlotReferences],
+        Op::IsInstance(_) | Op::ReferenceIsNull | Op::CastClass(_) => {
+            &[TypeInspection, SlotReferences]
+        }
         Op::ReferenceEqual => &[SlotReferences],
         Op::LocalAddress(..) | Op::ArgumentAddress(..) | Op::Receiver { .. } => &[SlotReferences],
         Op::LoadObject(..)
