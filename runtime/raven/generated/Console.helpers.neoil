@@ -26,29 +26,29 @@ ldarg arg0
 newobj instance System.Option<Byte>::.ctor(System.Option.None)
 ret
 .end
-.function neoCLR.Library.System.Console.RuntimeUnion2(System.Option<Byte> arg0) -> System.Result.Ok<System.Option<Byte>>
-ldarg arg0
-newobj instance System.Result.Ok<System.Option<Byte>>::.ctor(System.Option<Byte>)
-ret
-.end
-.function neoCLR.Library.System.Console.RuntimeUnion3(System.Result.Ok<System.Option<Byte>> arg0) -> System.Result<System.Option<Byte>,System.IO.ConsoleReadError>
-ldarg arg0
-newobj instance System.Result<System.Option<Byte>,System.IO.ConsoleReadError>::.ctor(System.Result.Ok<System.Option<Byte>>)
-ret
-.end
-.function neoCLR.Library.System.Console.RuntimeUnion4(System.IO.ConsoleReadError arg0) -> System.Result.Error<System.IO.ConsoleReadError>
+.function neoCLR.Library.System.Console.RuntimeUnion2(System.IO.ConsoleReadError arg0) -> System.Result.Error<System.IO.ConsoleReadError>
 ldarg arg0
 newobj instance System.Result.Error<System.IO.ConsoleReadError>::.ctor(System.IO.ConsoleReadError)
 ret
 .end
-.function neoCLR.Library.System.Console.RuntimeUnion5(Byte arg0) -> System.Option.Some<Byte>
+.function neoCLR.Library.System.Console.RuntimeUnion3(System.Option<Byte> arg0) -> System.Result.Ok<System.Option<Byte>>
+ldarg arg0
+newobj instance System.Result.Ok<System.Option<Byte>>::.ctor(System.Option<Byte>)
+ret
+.end
+.function neoCLR.Library.System.Console.RuntimeUnion4(Byte arg0) -> System.Option.Some<Byte>
 ldarg arg0
 newobj instance System.Option.Some<Byte>::.ctor(Byte)
 ret
 .end
-.function neoCLR.Library.System.Console.RuntimeUnion6(System.Result.Error<System.IO.ConsoleReadError> arg0) -> System.Result<System.Option<Byte>,System.IO.ConsoleReadError>
+.function neoCLR.Library.System.Console.RuntimeUnion5(System.Result.Error<System.IO.ConsoleReadError> arg0) -> System.Result<System.Option<Byte>,System.IO.ConsoleReadError>
 ldarg arg0
 newobj instance System.Result<System.Option<Byte>,System.IO.ConsoleReadError>::.ctor(System.Result.Error<System.IO.ConsoleReadError>)
+ret
+.end
+.function neoCLR.Library.System.Console.RuntimeUnion6(System.Result.Ok<System.Option<Byte>> arg0) -> System.Result<System.Option<Byte>,System.IO.ConsoleReadError>
+ldarg arg0
+newobj instance System.Result<System.Option<Byte>,System.IO.ConsoleReadError>::.ctor(System.Result.Ok<System.Option<Byte>>)
 ret
 .end
 .function neoCLR.Library.System.Console.RuntimeUnion7(System.Option.Some<Byte> arg0) -> System.Option<Byte>

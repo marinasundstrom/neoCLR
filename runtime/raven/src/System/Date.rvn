@@ -84,7 +84,7 @@ public struct Date : Comparable<Date>, Equatable<Date> {
         return days
     }
 
-    val DayNumber: int { get => StoredDayNumber }
+    val DayNumber: int => StoredDayNumber
     val Year: int {
         get {
             var remaining = StoredDayNumber
@@ -104,7 +104,7 @@ public struct Date : Comparable<Date>, Equatable<Date> {
             return year + cycles + 1
         }
     }
-    val DayOfYear: int { get => StoredDayNumber - DaysBeforeYear(Year) + 1 }
+    val DayOfYear: int => StoredDayNumber - DaysBeforeYear(Year) + 1
     val Month: int {
         get {
             let year = Year
@@ -119,7 +119,7 @@ public struct Date : Comparable<Date>, Equatable<Date> {
             return month
         }
     }
-    val Day: int { get => DayOfYear - DaysBeforeMonth(Year, Month) }
+    val Day: int => DayOfYear - DaysBeforeMonth(Year, Month)
 
     func Equals(other: Date) -> bool {
         return StoredDayNumber == other.StoredDayNumber

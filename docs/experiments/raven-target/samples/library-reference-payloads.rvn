@@ -1,3 +1,4 @@
+import System.Option.*
 import System.Introspection.*
 import System.*
 import System.Collections.*
@@ -8,8 +9,12 @@ func Main() {
     types.Add(kind)
     types.Add(typeof(string))
     let copy = types.Copy()
-    if copy[0].Equals(kind) { WriteLine("Copied TypeInfo reference") }
-    for value in types { WriteLine(value.Name) }
+    if copy[0].Equals(kind) {
+        WriteLine("Copied TypeInfo reference")
+    }
+    for value in types {
+        WriteLine(value.Name)
+    }
     let nested = ArrayList<ArrayList<TypeInfo>>()
     nested.Add(types)
     nested[0].Add(typeof(Date))
@@ -18,10 +23,10 @@ func Main() {
     let comparisons = ArrayList<Comparable<int>>()
     comparisons.Add(42)
     WriteLine(comparisons[0].CompareTo(42))
-    let optional = Option<ArrayList<TypeInfo>>(Option.Some<ArrayList<TypeInfo>>(types))
+    let optional: Option<ArrayList<TypeInfo>> = Some(types)
     match optional {
-        Option.Some<ArrayList<TypeInfo>> some => WriteLine(some.Value.Count)
-        Option.None none => WriteLine("No list")
+        .Some(let some) => WriteLine(some.Count)
+        .None => WriteLine("No list")
     }
     let outcomes = ArrayList<Result<int, OverflowError>>(1)
     outcomes.Add(Result<int, OverflowError>.Ok(42))
@@ -31,8 +36,8 @@ func Main() {
     WriteLine(outcomesCopy.Count)
     for outcome in outcomesCopy {
         match outcome {
-            Result.Ok<int> ok => WriteLine(ok.Value)
-            Result.Error<OverflowError> error => WriteLine("Stored error")
+            .Ok(let ok) => WriteLine(ok)
+            .Error(let error) => WriteLine("Stored error")
         }
     }
     let functions = ArrayList<Func<int,int>>()
@@ -40,9 +45,11 @@ func Main() {
     WriteLine(functions[0](42))
     let result = Result<TypeInfo, OverflowError>.Ok(kind)
     match result {
-        Result.Ok<TypeInfo> ok => WriteLine(ok.Value.Name)
-        Result.Error<OverflowError> error => WriteLine("Overflow")
+        .Ok(let ok) => WriteLine(ok.Name)
+        .Error(let error) => WriteLine("Overflow")
     }
 }
 
-func Identity(value: int) -> int { return value }
+func Identity(value: int) -> int {
+    return value
+}

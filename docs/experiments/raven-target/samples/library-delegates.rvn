@@ -3,14 +3,38 @@ import System.Option.*
 import System.Console.*
 import System.Collections.*
 
-func IsAnswer(value: int) -> bool { return value == 42 }
-func Missing(value: int) -> bool { return false }
-func Number() -> int { return 42 }
-func Identity(value: int) -> int { return value }
-func First(a: int, b: int) -> int { return a }
-func Middle(a: int, b: int, c: int) -> int { return b }
-func Last(a: int, b: int, c: int, d: int) -> int { return d }
-func Done() { WriteLine("Done") }
+func IsAnswer(value: int) -> bool {
+    return value == 42
+}
+
+func Missing(value: int) -> bool {
+    return false
+}
+
+func Number() -> int {
+    return 42
+}
+
+func Identity(value: int) -> int {
+    return value
+}
+
+func First(a: int, b: int) -> int {
+    return a
+}
+
+func Middle(a: int, b: int, c: int) -> int {
+    return b
+}
+
+func Last(a: int, b: int, c: int, d: int) -> int {
+    return d
+}
+
+func Done() {
+    WriteLine("Done")
+}
+
 func Main() {
     let zero: Func<int> = Number
     let one: Func<int, int> = Identity
@@ -31,14 +55,22 @@ func Main() {
         Some(let index) => WriteLine(index)
         None => WriteLine("No index")
     }
-    if values.Exists(IsAnswer) { WriteLine("Exists") }
+    if values.Exists(IsAnswer) {
+        WriteLine("Exists")
+    }
     let found = values.Find(IsAnswer)
-    if found is Option.Some<int> some { WriteLine(some.Value) }
+    if found is .Some(let some) {
+        WriteLine(some)
+    }
     match values.FindIndex(Missing) {
         Some(let index) => WriteLine(index)
         None => WriteLine("No index")
     }
-    if values.Exists(Missing) { WriteLine("Wrong") }
+    if values.Exists(Missing) {
+        WriteLine("Wrong")
+    }
     let absent = values.Find(Missing)
-    if absent.IsNone { WriteLine("None") }
+    if absent.IsNone {
+        WriteLine("None")
+    }
 }

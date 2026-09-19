@@ -2,6 +2,7 @@ namespace System.Environment
 
 import System.EnvironmentError
 import System.Result.*
+import System.Option.*
 import System.Runtime.CompilerServices.RuntimeServices
 
 public func GetCommandLineArgs() -> string[] {
@@ -22,7 +23,9 @@ public func GetEnvironmentVariable(name: string) -> System.Result<System.Option<
         return Error(default(EnvironmentError))
     }
     if RuntimeServices.IsValue<System.Void>(payload) {
-        return Ok(System.Option<string>(System.Option.None()))
+        let absent: System.Option<string> = None()
+        return Ok(absent)
     }
-    return Ok(System.Option<string>(System.Option.Some<string>(RuntimeServices.UnpackValue<string>(payload))))
+    let present: System.Option<string> = Some(RuntimeServices.UnpackValue<string>(payload))
+    return Ok(present)
 }

@@ -4,6 +4,7 @@ import System.Introspection.*
 func Read(flags: BindingFlags) {
     WriteLine((int)flags)
 }
+
 func Main() {
     let flags: BindingFlags = .Public | .Instance | .Static
     Read(flags)

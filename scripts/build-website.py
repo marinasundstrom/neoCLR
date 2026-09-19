@@ -89,7 +89,7 @@ def main():
     raven = 'docs/experiments/raven-target/samples/'
     samples = {
         'CLOCK_SAMPLE': (raven + 'library-instants.rvn', 'func ShowCurrentTime', '\n}', True),
-        'INTROSPECTION_SAMPLE': (raven + 'library-introspection-tour.rvn', '    val assembly', '    for module', False),
+        'INTROSPECTION_SAMPLE': (raven + 'library-introspection-tour.rvn', '    let assembly', '    for module', False),
         'UNION_SAMPLE': (raven + 'library-query-terminals.rvn', 'func PrintOptional', '\nfunc OnlyPositive', False),
         'FUNC_SAMPLE': (raven + 'application-delegates.rvn', '    var shared = 7', '    WriteLine(shared)', True),
         'DATE_SAMPLE': (raven + 'library-calendar.rvn', '    CheckDate(Date.Create(day: 29', '    CheckDate(Date.FromDayNumber(-1))', True),
@@ -102,12 +102,12 @@ def main():
     }
     tour = raven + 'library-introspection-tour.rvn'
     samples.update({
-        'TOUR_ACQUISITION': (tour, '    val widget:', '\n    val assembly', False),
-        'TOUR_DISCOVERY': (tour, '    val assembly', '\n    if description.MetadataToken', False),
-        'TOUR_TOKENS': (tour, '    if description.MetadataToken', '\n    val methods:', False),
-        'TOUR_SEQUENCES': (tour, '    val methods:', '\n    val flags', False),
+        'TOUR_ACQUISITION': (tour, '    let widget:', '\n    let assembly', False),
+        'TOUR_DISCOVERY': (tour, '    let assembly', '\n    if description.MetadataToken', False),
+        'TOUR_TOKENS': (tour, '    if description.MetadataToken', '\n    let methods:', False),
+        'TOUR_SEQUENCES': (tour, '    let methods:', '\n    let flags', False),
         'TOUR_MATCH': (tour, 'func MemberKind', '\n}', True),
-        'TOUR_MEMBERS': (tour, '    val flags', '\n}', False),
+        'TOUR_MEMBERS': (tour, '    let flags', '\n}', False),
     })
     # The full expected output is shared with the saved-project execution check.
     output_text = escape((ROOT / (raven + 'library-introspection-tour.expected.txt')).read_text().rstrip())

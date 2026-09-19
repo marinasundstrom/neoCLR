@@ -1,16 +1,19 @@
+import System.Result.*
 import System.*
 import System.Console.*
 func ClampInput(value: int, min: int, max: int) -> Result<int, InvalidRangeError> {
     let bounded = Math.Clamp(value, min, max)?
     WriteLine("Clamped")
-    return Result<int, InvalidRangeError>(Result.Ok<int>(bounded))
+    return Ok(bounded)
 }
+
 func ShowClamp(result: Result<int, InvalidRangeError>) {
     match result {
-        Result.Ok<int> ok => WriteLine(ok.Value)
-        Result.Error<InvalidRangeError> error => WriteLine("Invalid range")
+        .Ok(let ok) => WriteLine(ok)
+        .Error(let error) => WriteLine("Invalid range")
     }
 }
+
 func Main() {
     ShowClamp(ClampInput(5, 0, 10))
     ShowClamp(ClampInput(-1, 0, 10))

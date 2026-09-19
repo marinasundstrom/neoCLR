@@ -9,7 +9,7 @@ public static class Option {
         init(value: T) {
             Stored = value
         }
-        val Value: T { get => Stored }
+        val Value: T => Stored
     }
 }
 
@@ -19,7 +19,7 @@ public struct Option<T> : Propagatable<Option<T>, T, System.Void> {
     init(value: System.Option.None) {
         Stored = ValueStorage.Pack(value)
     }
-    val IsNone: bool { get => ValueStorage.Is<System.Option.None>(Stored) }
+    val IsNone: bool => ValueStorage.Is<System.Option.None>(Stored)
     func GetNoneCase() -> System.Option.None {
         return ValueStorage.Unpack<System.Option.None>(Stored)
     }
@@ -35,7 +35,7 @@ public struct Option<T> : Propagatable<Option<T>, T, System.Void> {
     init(value: System.Option.Some<T>) {
         Stored = ValueStorage.Pack(value)
     }
-    val IsSome: bool { get => ValueStorage.Is<System.Option.Some<T>>(Stored) }
+    val IsSome: bool => ValueStorage.Is<System.Option.Some<T>>(Stored)
     func GetSomeCase() -> System.Option.Some<T> {
         return ValueStorage.Unpack<System.Option.Some<T>>(Stored)
     }

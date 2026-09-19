@@ -1,18 +1,19 @@
+import System.Option.*
 import System.*
 import System.Console.*
 
 func Marker(completed: int) -> Option<System.Void> {
     if completed == 1 {
-        return Option<System.Void>(Option.Some<System.Void>(()))
+        return Some(())
     }
-    return Option<System.Void>(Option.None())
+    return None()
 }
 
 func Show(completed: int) {
     let marker = Marker(completed)
-    if marker is Option.Some<System.Void> done {
+    if marker is .Some(let done) {
         WriteLine("Completed without a payload")
-    } else if marker is Option.None absent {
+    } else if marker is .None {
         WriteLine("Not completed")
     }
 }

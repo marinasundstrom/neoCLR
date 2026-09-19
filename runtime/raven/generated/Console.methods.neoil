@@ -2,6 +2,8 @@
 .method static ReadByte() -> System.Result<System.Option<Byte>,System.IO.ConsoleReadError>
 .local Value local0
 .local Int32 local1
+.local System.Option<Byte> local2
+.local System.Option<Byte> local3
 ldc.i4 0
 stloc local1
 M00000001_IL_0000:
@@ -44,9 +46,9 @@ call neoCLR.Library.System.Console.RuntimeErrorSystemIOConsoleReadErrorUnavailab
 M00000001_IL_0035:
 call neoCLR.Library.System.Console.RuntimeErrorSystemIOConsoleReadErrorNewSystemIOConsoleReadErrorUnavailable(System.IO.ConsoleReadError.Unavailable)
 M00000001_IL_003a:
-call neoCLR.Library.System.Console.RuntimeUnion4(System.IO.ConsoleReadError)
+call neoCLR.Library.System.Console.RuntimeUnion2(System.IO.ConsoleReadError)
 M00000001_IL_003f:
-call neoCLR.Library.System.Console.RuntimeUnion6(System.Result.Error<System.IO.ConsoleReadError>)
+call neoCLR.Library.System.Console.RuntimeUnion5(System.Result.Error<System.IO.ConsoleReadError>)
 M00000001_IL_0044:
 ret
 M00000001_IL_0045:
@@ -67,9 +69,9 @@ call neoCLR.Library.System.Console.RuntimeErrorSystemIOConsoleReadErrorReadFaile
 M00000001_IL_005a:
 call neoCLR.Library.System.Console.RuntimeErrorSystemIOConsoleReadErrorNewSystemIOConsoleReadErrorReadFailed(System.IO.ConsoleReadError.ReadFailed)
 M00000001_IL_005f:
-call neoCLR.Library.System.Console.RuntimeUnion4(System.IO.ConsoleReadError)
+call neoCLR.Library.System.Console.RuntimeUnion2(System.IO.ConsoleReadError)
 M00000001_IL_0064:
-call neoCLR.Library.System.Console.RuntimeUnion6(System.Result.Error<System.IO.ConsoleReadError>)
+call neoCLR.Library.System.Console.RuntimeUnion5(System.Result.Error<System.IO.ConsoleReadError>)
 M00000001_IL_0069:
 ret
 M00000001_IL_006a:
@@ -83,9 +85,9 @@ call neoCLR.Library.System.Console.RuntimeErrorSystemIOConsoleReadErrorReadFaile
 M00000001_IL_007b:
 call neoCLR.Library.System.Console.RuntimeErrorSystemIOConsoleReadErrorNewSystemIOConsoleReadErrorReadFailed(System.IO.ConsoleReadError.ReadFailed)
 M00000001_IL_0080:
-call neoCLR.Library.System.Console.RuntimeUnion4(System.IO.ConsoleReadError)
+call neoCLR.Library.System.Console.RuntimeUnion2(System.IO.ConsoleReadError)
 M00000001_IL_0085:
-call neoCLR.Library.System.Console.RuntimeUnion6(System.Result.Error<System.IO.ConsoleReadError>)
+call neoCLR.Library.System.Console.RuntimeUnion5(System.Result.Error<System.IO.ConsoleReadError>)
 M00000001_IL_008a:
 ret
 M00000001_IL_008b:
@@ -98,32 +100,42 @@ call neoCLR.Library.System.Console.RuntimeBooleanToInt32(Boolean)
 M00000001_IL_0093:
 brtrue M00000001_IL_009d
 M00000001_IL_0098:
-br M00000001_IL_00b2
+br M00000001_IL_00b5
 M00000001_IL_009d:
+M00000001_IL_009e:
 call neoCLR.Library.System.Console.RuntimeUnion0()
-M00000001_IL_00a2:
+M00000001_IL_00a3:
 call neoCLR.Library.System.Console.RuntimeUnion1(System.Option.None)
-M00000001_IL_00a7:
-call neoCLR.Library.System.Console.RuntimeUnion2(System.Option<Byte>)
-M00000001_IL_00ac:
-call neoCLR.Library.System.Console.RuntimeUnion3(System.Result.Ok<System.Option<Byte>>)
-M00000001_IL_00b1:
-ret
-M00000001_IL_00b2:
-M00000001_IL_00b3:
+M00000001_IL_00a8:
+stloc local2
+M00000001_IL_00a9:
+ldloc local2
+M00000001_IL_00aa:
+call neoCLR.Library.System.Console.RuntimeUnion3(System.Option<Byte>)
+M00000001_IL_00af:
+call neoCLR.Library.System.Console.RuntimeUnion6(System.Result.Ok<System.Option<Byte>>)
 M00000001_IL_00b4:
-ldloc local0
+ret
 M00000001_IL_00b5:
+M00000001_IL_00b6:
+M00000001_IL_00b7:
+ldloc local0
+M00000001_IL_00b8:
 value.unpack Byte
-M00000001_IL_00ba:
-call neoCLR.Library.System.Console.RuntimeUnion5(Byte)
-M00000001_IL_00bf:
+M00000001_IL_00bd:
+call neoCLR.Library.System.Console.RuntimeUnion4(Byte)
+M00000001_IL_00c2:
 call neoCLR.Library.System.Console.RuntimeUnion7(System.Option.Some<Byte>)
-M00000001_IL_00c4:
-call neoCLR.Library.System.Console.RuntimeUnion2(System.Option<Byte>)
+M00000001_IL_00c7:
+stloc local3
+M00000001_IL_00c8:
 M00000001_IL_00c9:
-call neoCLR.Library.System.Console.RuntimeUnion3(System.Result.Ok<System.Option<Byte>>)
-M00000001_IL_00ce:
+ldloc local3
+M00000001_IL_00ca:
+call neoCLR.Library.System.Console.RuntimeUnion3(System.Option<Byte>)
+M00000001_IL_00cf:
+call neoCLR.Library.System.Console.RuntimeUnion6(System.Result.Ok<System.Option<Byte>>)
+M00000001_IL_00d4:
 ret
 .end
 .method static WriteLine(String value0) -> Void

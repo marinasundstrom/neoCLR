@@ -27,9 +27,9 @@ func Main() {
     RequireInterface(typeof(MethodInfo))
     RequireInterface(typeof(PropertyInfo))
 
-    val member: MemberInfo = typeof(Date).GetProperties()[0]
+    let member: MemberInfo = typeof(Date).GetProperties()[0]
     match member.DeclaringType {
-        .Some(val owner) => WriteLine(owner.Name)
+        .Some(let owner) => WriteLine(owner.Name)
         .None => Fault("Expected a declaring type")
     }
     WriteLine(Kind(typeof(Date).GetFields(BindingFlags.Instance | BindingFlags.NonPublic)[0]))

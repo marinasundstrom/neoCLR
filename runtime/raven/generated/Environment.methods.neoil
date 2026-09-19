@@ -57,9 +57,11 @@ ret
 .end
 .method static GetEnvironmentVariable(String name) -> System.Result<System.Option<String>,System.EnvironmentError>
 .local Value local0
-.local System.EnvironmentError local1
+.local System.Option<String> local1
+.local System.Option<String> local2
+.local System.EnvironmentError local3
 newobj System.EnvironmentError
-stloc local1
+stloc local3
 M00000003_IL_0000:
 M00000003_IL_0001:
 M00000003_IL_0002:
@@ -80,12 +82,12 @@ M00000003_IL_0015:
 br M00000003_IL_002f
 M00000003_IL_001a:
 M00000003_IL_001b:
-ldloca local1
+ldloca local3
 M00000003_IL_001d:
 newobj System.EnvironmentError
 stobj System.EnvironmentError
 M00000003_IL_0023:
-ldloc local1
+ldloc local3
 M00000003_IL_0024:
 call neoCLR.Library.System.Environment.RuntimeUnion0(System.EnvironmentError)
 M00000003_IL_0029:
@@ -102,31 +104,41 @@ call neoCLR.Library.System.Environment.RuntimeBooleanToInt32(Boolean)
 M00000003_IL_0037:
 brtrue M00000003_IL_0041
 M00000003_IL_003c:
-br M00000003_IL_0056
+br M00000003_IL_0059
 M00000003_IL_0041:
+M00000003_IL_0042:
 call neoCLR.Library.System.Environment.RuntimeUnion5()
-M00000003_IL_0046:
+M00000003_IL_0047:
 call neoCLR.Library.System.Environment.RuntimeUnion6(System.Option.None)
-M00000003_IL_004b:
+M00000003_IL_004c:
+stloc local1
+M00000003_IL_004d:
+ldloc local1
+M00000003_IL_004e:
 call neoCLR.Library.System.Environment.RuntimeUnion7(System.Option<String>)
-M00000003_IL_0050:
-call neoCLR.Library.System.Environment.RuntimeUnion8(System.Result.Ok<System.Option<String>>)
-M00000003_IL_0055:
-ret
-M00000003_IL_0056:
-M00000003_IL_0057:
+M00000003_IL_0053:
+call neoCLR.Library.System.Environment.RuntimeUnion9(System.Result.Ok<System.Option<String>>)
 M00000003_IL_0058:
-ldloc local0
+ret
 M00000003_IL_0059:
+M00000003_IL_005a:
+M00000003_IL_005b:
+ldloc local0
+M00000003_IL_005c:
 value.unpack String
-M00000003_IL_005e:
-call neoCLR.Library.System.Environment.RuntimeUnion9(String)
-M00000003_IL_0063:
+M00000003_IL_0061:
+call neoCLR.Library.System.Environment.RuntimeUnion8(String)
+M00000003_IL_0066:
 call neoCLR.Library.System.Environment.RuntimeUnion10(System.Option.Some<String>)
-M00000003_IL_0068:
-call neoCLR.Library.System.Environment.RuntimeUnion7(System.Option<String>)
+M00000003_IL_006b:
+stloc local2
+M00000003_IL_006c:
 M00000003_IL_006d:
-call neoCLR.Library.System.Environment.RuntimeUnion8(System.Result.Ok<System.Option<String>>)
-M00000003_IL_0072:
+ldloc local2
+M00000003_IL_006e:
+call neoCLR.Library.System.Environment.RuntimeUnion7(System.Option<String>)
+M00000003_IL_0073:
+call neoCLR.Library.System.Environment.RuntimeUnion9(System.Result.Ok<System.Option<String>>)
+M00000003_IL_0078:
 ret
 .end

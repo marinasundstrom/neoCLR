@@ -2,6 +2,7 @@ namespace System.Console
 
 import System.IO.ConsoleReadError
 import System.Result.*
+import System.Option.*
 import System.Runtime.CompilerServices.RuntimeServices
 
 public func ReadByte() -> System.Result<System.Option<byte>, ConsoleReadError> {
@@ -18,9 +19,11 @@ public func ReadByte() -> System.Result<System.Option<byte>, ConsoleReadError> {
         return Error(ConsoleReadError(ConsoleReadError.ReadFailed()))
     }
     if RuntimeServices.IsValue<System.Void>(payload) {
-        return Ok(System.Option<byte>(System.Option.None()))
+        let absent: System.Option<byte> = None()
+        return Ok(absent)
     }
-    return Ok(System.Option<byte>(System.Option.Some<byte>(RuntimeServices.UnpackValue<byte>(payload))))
+    let present: System.Option<byte> = Some(RuntimeServices.UnpackValue<byte>(payload))
+    return Ok(present)
 }
 
 public func WriteLine(value0: string) {

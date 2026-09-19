@@ -17,7 +17,7 @@ public struct FileWriteError {
         Stored = ValueStorage.Pack(value)
     }
 
-    val IsInvalidLimit: bool { get => ValueStorage.Is<FileWriteError.InvalidLimit>(Stored) }
+    val IsInvalidLimit: bool => ValueStorage.Is<FileWriteError.InvalidLimit>(Stored)
 
     func GetInvalidLimit() -> FileWriteError.InvalidLimit {
         return ValueStorage.Unpack<FileWriteError.InvalidLimit>(Stored)
@@ -27,7 +27,7 @@ public struct FileWriteError {
         Stored = ValueStorage.Pack(value)
     }
 
-    val IsInvalidPath: bool { get => ValueStorage.Is<FileWriteError.InvalidPath>(Stored) }
+    val IsInvalidPath: bool => ValueStorage.Is<FileWriteError.InvalidPath>(Stored)
 
     func GetInvalidPath() -> FileWriteError.InvalidPath {
         return ValueStorage.Unpack<FileWriteError.InvalidPath>(Stored)
@@ -37,7 +37,7 @@ public struct FileWriteError {
         Stored = ValueStorage.Pack(value)
     }
 
-    val IsNotFound: bool { get => ValueStorage.Is<FileWriteError.NotFound>(Stored) }
+    val IsNotFound: bool => ValueStorage.Is<FileWriteError.NotFound>(Stored)
 
     func GetNotFound() -> FileWriteError.NotFound {
         return ValueStorage.Unpack<FileWriteError.NotFound>(Stored)
@@ -47,7 +47,7 @@ public struct FileWriteError {
         Stored = ValueStorage.Pack(value)
     }
 
-    val IsAccessDenied: bool { get => ValueStorage.Is<FileWriteError.AccessDenied>(Stored) }
+    val IsAccessDenied: bool => ValueStorage.Is<FileWriteError.AccessDenied>(Stored)
 
     func GetAccessDenied() -> FileWriteError.AccessDenied {
         return ValueStorage.Unpack<FileWriteError.AccessDenied>(Stored)
@@ -57,7 +57,7 @@ public struct FileWriteError {
         Stored = ValueStorage.Pack(value)
     }
 
-    val IsNotRegularFile: bool { get => ValueStorage.Is<FileWriteError.NotRegularFile>(Stored) }
+    val IsNotRegularFile: bool => ValueStorage.Is<FileWriteError.NotRegularFile>(Stored)
 
     func GetNotRegularFile() -> FileWriteError.NotRegularFile {
         return ValueStorage.Unpack<FileWriteError.NotRegularFile>(Stored)
@@ -67,7 +67,7 @@ public struct FileWriteError {
         Stored = ValueStorage.Pack(value)
     }
 
-    val IsTooLarge: bool { get => ValueStorage.Is<FileWriteError.TooLarge>(Stored) }
+    val IsTooLarge: bool => ValueStorage.Is<FileWriteError.TooLarge>(Stored)
 
     func GetTooLarge() -> FileWriteError.TooLarge {
         return ValueStorage.Unpack<FileWriteError.TooLarge>(Stored)
@@ -77,7 +77,7 @@ public struct FileWriteError {
         Stored = ValueStorage.Pack(value)
     }
 
-    val IsWriteFailed: bool { get => ValueStorage.Is<FileWriteError.WriteFailed>(Stored) }
+    val IsWriteFailed: bool => ValueStorage.Is<FileWriteError.WriteFailed>(Stored)
 
     func GetWriteFailed() -> FileWriteError.WriteFailed {
         return ValueStorage.Unpack<FileWriteError.WriteFailed>(Stored)

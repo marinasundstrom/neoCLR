@@ -3,6 +3,7 @@ import System.Console.*
 func Check(value: double, expected: double) {
     WriteLine(value.CompareTo(expected))
 }
+
 func Main() {
     Check(Math.Abs(-2.5), 2.5)
     Check(Math.Sqrt(9.0), 3.0)

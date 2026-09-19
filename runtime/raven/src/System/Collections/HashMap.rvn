@@ -23,8 +23,8 @@ public class HashMap<K, V> : MutableMap<K, V> {
         busy = false
     }
 
-    val Count: int { get => keys.Count }
-    val Keys: Sequence<K> { get => keys.Copy() }
+    val Count: int => keys.Count
+    val Keys: Sequence<K> => keys.Copy()
 
     private func Enter() {
         if busy {

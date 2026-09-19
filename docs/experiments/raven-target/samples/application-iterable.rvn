@@ -26,7 +26,9 @@ class Cursor : Iterator<int> {
         return Position == 1
     }
 
-    val Current: int { get => 42 }
+    val Current: int {
+        get => 42
+    }
 
     func Dispose() {
         Owner.Disposed = Owner.Disposed + 1

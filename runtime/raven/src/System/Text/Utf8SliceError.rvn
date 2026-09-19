@@ -12,7 +12,7 @@ public struct Utf8SliceError {
         Stored = ValueStorage.Pack(value)
     }
 
-    val IsOutOfRange: bool { get => ValueStorage.Is<Utf8SliceError.OutOfRange>(Stored) }
+    val IsOutOfRange: bool => ValueStorage.Is<Utf8SliceError.OutOfRange>(Stored)
 
     func GetOutOfRange() -> Utf8SliceError.OutOfRange {
         return ValueStorage.Unpack<Utf8SliceError.OutOfRange>(Stored)
@@ -22,7 +22,7 @@ public struct Utf8SliceError {
         Stored = ValueStorage.Pack(value)
     }
 
-    val IsInvalidBoundary: bool { get => ValueStorage.Is<Utf8SliceError.InvalidBoundary>(Stored) }
+    val IsInvalidBoundary: bool => ValueStorage.Is<Utf8SliceError.InvalidBoundary>(Stored)
 
     func GetInvalidBoundary() -> Utf8SliceError.InvalidBoundary {
         return ValueStorage.Unpack<Utf8SliceError.InvalidBoundary>(Stored)

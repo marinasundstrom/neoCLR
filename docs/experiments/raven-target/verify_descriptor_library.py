@@ -33,13 +33,13 @@ with tempfile.TemporaryDirectory(prefix='neoclr-descriptor-library-') as tempora
         ('OpenModel', source.replace('public sealed interface', 'public interface'), 'Introspection sealed hierarchy'),
         ('ExtraStorage', source.replace('private field StoredName:', 'private field Extra: int\n    private field StoredName:'), 'Descriptor storage'),
         ('RenamedStorage', source.replace('StoredDefinitionIndex', 'StoredIndex'), 'Descriptor storage'),
-        ('WrongStorage', source.replace('StoredIsPublic: bool', 'StoredIsPublic: int').replace('StoredIsPublic = isPublic', 'StoredIsPublic = 1').replace('get => StoredIsPublic', 'get => StoredIsPublic == 1'), 'Descriptor storage'),
+        ('WrongStorage', source.replace('StoredIsPublic: bool', 'StoredIsPublic: int').replace('StoredIsPublic = isPublic', 'StoredIsPublic = 1').replace('=> StoredIsPublic', '=> StoredIsPublic == 1'), 'Descriptor storage'),
         ('PublicConstructor', source.replace('protected init', 'public init'), 'Descriptor storage'),
         ('PublicProvider', source.replace('internal class RuntimeFieldInfo', 'public class RuntimeFieldInfo'), 'Runtime descriptor providers must remain internal'),
         ('OpenDescriptor', source.replace('internal class RuntimeFieldInfo', 'internal open class RuntimeFieldInfo'), 'sealing'),
         ('RenamedExport', source.replace('val CanWrite:', 'val Writable:'), 'does not match reference contract'),
         ('WrongParameterName', source.replace('arg0', 'includePrivate'), 'does not match reference contract'),
-        ('SnapshotDefault', source.replace('val count = StoredParameters.Length', 'val snapshot: ParameterSnapshot = default(ParameterSnapshot)\n        val count = snapshot.Length'), 'RAV1509'),
+        ('SnapshotDefault', source.replace('let count = StoredParameters.Length', 'let snapshot: ParameterSnapshot = default(ParameterSnapshot)\n        let count = snapshot.Length'), 'RAV1509'),
     ]
     for name, text, diagnostic in cases:
         folder = root / name

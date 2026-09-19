@@ -8,10 +8,10 @@ class Outer {
 }
 
 func Main() {
-    val nested: MemberInfo = typeof(Outer.Inner)
+    let nested: MemberInfo = typeof(Outer.Inner)
     Console.WriteLine(nested.Name)
     match nested.DeclaringType {
-        .Some(val owner) => {
+        .Some(let owner) => {
             Console.WriteLine(owner.Name)
             if owner.Equals(typeof(Outer)) {
                 Console.WriteLine("Actual declaring type")

@@ -9,9 +9,9 @@ func Normalize(value: int) -> Result<int, OverflowError> {
 
 func Show(value: int) {
     let result = Normalize(value)
-    if result is Result.Ok<int> ok {
-        WriteLine(ok.Value)
-    } else if result is Result.Error<OverflowError> error {
+    if result is .Ok(let ok) {
+        WriteLine(ok)
+    } else if result is .Error(let error) {
         WriteLine("Overflow propagated")
     }
 }

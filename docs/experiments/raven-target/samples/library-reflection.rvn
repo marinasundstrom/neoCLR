@@ -14,6 +14,7 @@ func Show(value: bool) {
         WriteLine("false")
     }
 }
+
 func Main() {
     let info = typeof(int)
     WriteLine(info.Name)
@@ -36,7 +37,7 @@ func Main() {
     let first: MemberInfo = method
     ShowMemberName(first)
     match first.DeclaringType {
-        .Some(val owner) => WriteLine(owner.Name)
+        .Some(let owner) => WriteLine(owner.Name)
         .None => Fault("Expected a declaring type")
     }
     WriteLine(method.ReturnType.Name)
@@ -67,8 +68,8 @@ func Main() {
     WriteLine(property.DefinitionIndex)
     WriteLine(property.GetIndexParameters().Count)
     let getter = property.GetGetMethod()
-    if getter is Option.Some<MethodInfo> found {
-        WriteLine(found.Value.Name)
+    if getter is .Some(let found) {
+        WriteLine(found.Name)
     }
     Show(property.GetSetMethod().IsNone)
     Show(property.GetGetMethod(true).IsSome)
@@ -102,8 +103,8 @@ func Main() {
     Show(info.GetElementType().IsNone)
     let array = typeof(int[])
     Show(array.IsArray)
-    if array.GetElementType() is Option.Some<TypeInfo> element {
-        WriteLine(element.Value.Name)
+    if array.GetElementType() is .Some(let element) {
+        WriteLine(element.Name)
     }
     let enumeration = typeof(BindingFlags)
     Show(enumeration.IsEnum)

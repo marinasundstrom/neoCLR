@@ -12,7 +12,7 @@ public struct SingleError {
         Stored = ValueStorage.Pack(value)
     }
 
-    val IsEmpty: bool { get => ValueStorage.Is<SingleError.Empty>(Stored) }
+    val IsEmpty: bool => ValueStorage.Is<SingleError.Empty>(Stored)
 
     func GetEmpty() -> SingleError.Empty {
         return ValueStorage.Unpack<SingleError.Empty>(Stored)
@@ -22,7 +22,7 @@ public struct SingleError {
         Stored = ValueStorage.Pack(value)
     }
 
-    val IsMultiple: bool { get => ValueStorage.Is<SingleError.Multiple>(Stored) }
+    val IsMultiple: bool => ValueStorage.Is<SingleError.Multiple>(Stored)
 
     func GetMultiple() -> SingleError.Multiple {
         return ValueStorage.Unpack<SingleError.Multiple>(Stored)

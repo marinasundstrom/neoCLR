@@ -10,7 +10,7 @@ static class FileProbe
         if (Directory.Exists(output)) throw new IOException("Output directory must not exist.");
         Directory.CreateDirectory(output);
         var core = Path.Combine(output, CoreDeclarations.Identity + ".dll");
-        CoreDeclarations.Write(core, unionProbe: true);
+        CoreDeclarations.Write(core, unionProbe: true, collectionProbe: true);
         var sample = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "samples/library-files.rvn"));
         Compile("Files", sample);
         var extra = sample[..sample.IndexOf("func Main()")];
@@ -20,7 +20,9 @@ static class FileProbe
             var compilation = Compilation.Create(name, [SyntaxTree.ParseText(source)],
                 [MetadataReference.CreateFromFile(core)], new CompilationOptions(OutputKind.ConsoleApplication,
                     metadataImportOptions: new MetadataImportOptions(CoreDeclarations.Identity),
-                    runtimePropagationContract: new RuntimePropagationContract(CoreDeclarations.Identity, "System.Propagatable`3")));
+                    runtimePropagationContract: new RuntimePropagationContract(CoreDeclarations.Identity, "System.Propagatable`3"))
+                    .WithTargetCoreAssemblyName(CoreDeclarations.Identity)
+                    .WithRuntimeUnitContract(new RuntimeUnitContract(CoreDeclarations.Identity, "System.Void")));
             var raw = Path.Combine(output, name + ".raw.dll");
             using (var stream = File.Create(raw))
             {
@@ -29,7 +31,7 @@ static class FileProbe
             }
             var projected = Path.Combine(output, name + ".dll");
             VoidProjection.Write(raw, core, projected);
-            UnionImport.Write(projected, core, Path.Combine(output, name + ".neoil"));
+            UnionImport.Write(projected, core, Path.Combine(output, name + ".neoil"), collectionProfile: true);
         }
         ConditionalOutputChecks.Write(Path.Combine(output, "Files.dll"), core, output, "ShowWrite", FileBindings.WriteError);
         Console.WriteLine("Imported file propagation and failure fixtures: " + output);

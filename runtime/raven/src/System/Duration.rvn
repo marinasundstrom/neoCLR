@@ -11,7 +11,7 @@ public struct Duration : Comparable<Duration>, Equatable<Duration> {
         return Duration(ticks)
     }
 
-    val Ticks: long { get => StoredTicks }
+    val Ticks: long => StoredTicks
 
     func Equals(other: Duration) -> bool {
         return StoredTicks == other.StoredTicks

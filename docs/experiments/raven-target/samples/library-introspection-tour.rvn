@@ -15,13 +15,13 @@ func MemberKind(member: MemberInfo) -> string {
 }
 
 func Main() {
-    val widget: Object = Widget()
-    val description = widget.GetType()
+    let widget: Object = Widget()
+    let description = widget.GetType()
     if description.Equals(typeof(Widget)) {
         Console.WriteLine("Instance and declared type agree")
     }
 
-    val assembly = RuntimeContext.Current.ExecutingAssembly
+    let assembly = RuntimeContext.Current.ExecutingAssembly
     Console.WriteLine(assembly.Name)
     for reference in assembly.ReferencedAssemblies {
         Console.WriteLine(reference.Name)
@@ -38,16 +38,16 @@ func Main() {
     }
     Console.WriteLine(description.Module.Name)
 
-    val methods: Sequence<MethodInfo> = typeof(int).GetMethods()
+    let methods: Sequence<MethodInfo> = typeof(int).GetMethods()
     Console.WriteLine(methods.Count)
     Console.WriteLine(MemberKind(methods[0]))
     for parameter in methods[0].GetParameters() {
         Console.WriteLine(parameter.Name)
     }
 
-    val flags = BindingFlags.Instance | BindingFlags.NonPublic
-    val fieldInfo = typeof(Date).GetFields(flags)[0]
-    val property = typeof(Date).GetProperties()[0]
+    let flags = BindingFlags.Instance | BindingFlags.NonPublic
+    let fieldInfo = typeof(Date).GetFields(flags)[0]
+    let property = typeof(Date).GetProperties()[0]
     Console.WriteLine(MemberKind(fieldInfo))
     Console.WriteLine(MemberKind(property))
     Console.WriteLine(property.GetIndexParameters().Count)

@@ -60,10 +60,10 @@ internal sealed class RuntimeMemberInfo {
         StoredMetadataToken = metadataToken
     }
 
-    val MetadataToken: int { get => StoredMetadataToken }
-    val Module: ModuleInfo { get => StoredDeclaringType.Module }
-    val Name: string { get => StoredName }
-    val DeclaringType: Option<TypeInfo> { get => Some(StoredDeclaringType) }
+    val MetadataToken: int => StoredMetadataToken
+    val Module: ModuleInfo => StoredDeclaringType.Module
+    val Name: string => StoredName
+    val DeclaringType: Option<TypeInfo> => Some(StoredDeclaringType)
 }
 
 internal class RuntimeFieldInfo : RuntimeMemberInfo, FieldInfo {
@@ -87,12 +87,12 @@ internal class RuntimeFieldInfo : RuntimeMemberInfo, FieldInfo {
         StoredDefinitionIndex = definitionIndex
     }
 
-    val FieldType: TypeInfo { get => StoredFieldType }
-    val IsPublic: bool { get => StoredIsPublic }
-    val IsPrivate: bool { get => StoredIsPrivate }
-    val IsAssembly: bool { get => StoredIsAssembly }
-    val IsStatic: bool { get => StoredIsStatic }
-    val DefinitionIndex: int { get => StoredDefinitionIndex }
+    val FieldType: TypeInfo => StoredFieldType
+    val IsPublic: bool => StoredIsPublic
+    val IsPrivate: bool => StoredIsPrivate
+    val IsAssembly: bool => StoredIsAssembly
+    val IsStatic: bool => StoredIsStatic
+    val DefinitionIndex: int => StoredDefinitionIndex
 }
 
 internal class RuntimeMethodInfo : RuntimeMemberInfo, MethodInfo {
@@ -131,17 +131,17 @@ internal class RuntimeMethodInfo : RuntimeMemberInfo, MethodInfo {
         StoredIsAbstract = isAbstract
     }
 
-    val ReturnType: TypeInfo { get => StoredReturnType }
-    val IsStatic: bool { get => StoredIsStatic }
-    val IsPublic: bool { get => StoredIsPublic }
-    val IsPrivate: bool { get => StoredIsPrivate }
-    val IsAssembly: bool { get => StoredIsAssembly }
-    val IsReceiverByRef: bool { get => StoredIsReceiverByRef }
-    val DefinitionIndex: int { get => StoredDefinitionIndex }
+    val ReturnType: TypeInfo => StoredReturnType
+    val IsStatic: bool => StoredIsStatic
+    val IsPublic: bool => StoredIsPublic
+    val IsPrivate: bool => StoredIsPrivate
+    val IsAssembly: bool => StoredIsAssembly
+    val IsReceiverByRef: bool => StoredIsReceiverByRef
+    val DefinitionIndex: int => StoredDefinitionIndex
 
     func GetParameters() -> Sequence<ParameterInfo> {
-        val count = StoredParameters.Length
-        val result = CheckedStorage.Reserve<ParameterInfo>(count)
+        let count = StoredParameters.Length
+        let result = CheckedStorage.Reserve<ParameterInfo>(count)
         var index = 0
         while index < count {
             result[index] = StoredParameters.Get(index)
@@ -149,10 +149,10 @@ internal class RuntimeMethodInfo : RuntimeMemberInfo, MethodInfo {
         }
         return result
     }
-    val IsReadOnly: bool { get => StoredIsReadOnly }
-    val IsVirtual: bool { get => StoredIsVirtual }
-    val IsOverride: bool { get => StoredIsOverride }
-    val IsAbstract: bool { get => StoredIsAbstract }
+    val IsReadOnly: bool => StoredIsReadOnly
+    val IsVirtual: bool => StoredIsVirtual
+    val IsOverride: bool => StoredIsOverride
+    val IsAbstract: bool => StoredIsAbstract
 }
 
 internal class RuntimePropertyInfo : RuntimeMemberInfo, PropertyInfo {
@@ -181,15 +181,15 @@ internal class RuntimePropertyInfo : RuntimeMemberInfo, PropertyInfo {
         StoredSetter = setter
     }
 
-    val PropertyType: TypeInfo { get => StoredPropertyType }
-    val IsStatic: bool { get => StoredIsStatic }
-    val CanRead: bool { get => StoredCanRead }
-    val CanWrite: bool { get => StoredCanWrite }
-    val DefinitionIndex: int { get => StoredDefinitionIndex }
+    val PropertyType: TypeInfo => StoredPropertyType
+    val IsStatic: bool => StoredIsStatic
+    val CanRead: bool => StoredCanRead
+    val CanWrite: bool => StoredCanWrite
+    val DefinitionIndex: int => StoredDefinitionIndex
 
     func GetIndexParameters() -> Sequence<ParameterInfo> {
-        val count = StoredIndexParameters.Length
-        val result = CheckedStorage.Reserve<ParameterInfo>(count)
+        let count = StoredIndexParameters.Length
+        let result = CheckedStorage.Reserve<ParameterInfo>(count)
         var index = 0
         while index < count {
             result[index] = StoredIndexParameters.Get(index)
@@ -203,7 +203,7 @@ internal class RuntimePropertyInfo : RuntimeMemberInfo, PropertyInfo {
     }
 
     func GetGetMethod(arg0: bool) -> Option<MethodInfo> {
-        if StoredGetter is .Some(val method) {
+        if StoredGetter is .Some(let method) {
             if arg0 || method.IsPublic {
                 return Some(method)
             }
@@ -216,7 +216,7 @@ internal class RuntimePropertyInfo : RuntimeMemberInfo, PropertyInfo {
     }
 
     func GetSetMethod(arg0: bool) -> Option<MethodInfo> {
-        if StoredSetter is .Some(val method) {
+        if StoredSetter is .Some(let method) {
             if arg0 || method.IsPublic {
                 return Some(method)
             }
@@ -265,7 +265,7 @@ internal class RuntimeTypeInfo : TypeInfo {
         return RuntimeTypeInfo(handle)
     }
 
-    val BaseType: Option<TypeInfo> { get => RuntimeServices.TypeBaseType(Handle) }
+    val BaseType: Option<TypeInfo> => RuntimeServices.TypeBaseType(Handle)
 
     func GetInterfaces() -> Sequence<TypeInfo> {
         return RuntimeServices.TypeInterfaces(Handle)
@@ -302,31 +302,31 @@ internal class RuntimeTypeInfo : TypeInfo {
     func GetProperties(flags: BindingFlags) -> Sequence<PropertyInfo> {
         return RuntimeServices.TypeProperties(Handle, (int)flags)
     }
-    val DeclaringType: Option<TypeInfo> { get => RuntimeServices.TypeDeclaringType(Handle) }
-    val MetadataToken: int { get => RuntimeServices.TypeMetadataToken(Handle) }
-    val Module: ModuleInfo { get => RuntimeServices.TypeModule(Handle) }
-    val Name: string { get => RuntimeServices.TypeName(Handle) }
-    val FullName: string { get => RuntimeServices.TypeDisplayName(Handle, 0) }
-    val Namespace: string { get => RuntimeServices.TypeDisplayName(Handle, 1) }
-    val GenericArgumentCount: int { get => RuntimeServices.TypeArgumentCount(Handle) }
+    val DeclaringType: Option<TypeInfo> => RuntimeServices.TypeDeclaringType(Handle)
+    val MetadataToken: int => RuntimeServices.TypeMetadataToken(Handle)
+    val Module: ModuleInfo => RuntimeServices.TypeModule(Handle)
+    val Name: string => RuntimeServices.TypeName(Handle)
+    val FullName: string => RuntimeServices.TypeDisplayName(Handle, 0)
+    val Namespace: string => RuntimeServices.TypeDisplayName(Handle, 1)
+    val GenericArgumentCount: int => RuntimeServices.TypeArgumentCount(Handle)
 
     func GetGenericArgument(index: int) -> TypeInfo {
         return FromHandle(RuntimeServices.TypeArgument(Handle, index))
     }
 
     func Equals(other: TypeInfo) -> bool {
-        val implementation = (RuntimeTypeInfo)other
+        let implementation = (RuntimeTypeInfo)other
         return RuntimeServices.TypeEquals(Handle, implementation.Handle)
     }
 
-    val IsArray: bool { get => RuntimeServices.TypeShape(Handle, 0) }
-    val IsByRef: bool { get => RuntimeServices.TypeShape(Handle, 1) }
-    val IsPointer: bool { get => RuntimeServices.TypeShape(Handle, 2) }
-    val IsInterface: bool { get => RuntimeServices.TypeShape(Handle, 3) }
-    val IsReadOnly: bool { get => RuntimeServices.TypeShape(Handle, 4) }
-    val IsAbstract: bool { get => RuntimeServices.TypeShape(Handle, 5) }
-    val IsEnum: bool { get => RuntimeServices.TypeShape(Handle, 6) }
-    val IsValueType: bool { get => RuntimeServices.TypeShape(Handle, 7) }
+    val IsArray: bool => RuntimeServices.TypeShape(Handle, 0)
+    val IsByRef: bool => RuntimeServices.TypeShape(Handle, 1)
+    val IsPointer: bool => RuntimeServices.TypeShape(Handle, 2)
+    val IsInterface: bool => RuntimeServices.TypeShape(Handle, 3)
+    val IsReadOnly: bool => RuntimeServices.TypeShape(Handle, 4)
+    val IsAbstract: bool => RuntimeServices.TypeShape(Handle, 5)
+    val IsEnum: bool => RuntimeServices.TypeShape(Handle, 6)
+    val IsValueType: bool => RuntimeServices.TypeShape(Handle, 7)
 
 
     func GetGenericArguments() -> Sequence<TypeInfo> {

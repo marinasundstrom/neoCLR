@@ -20,13 +20,13 @@ internal class RuntimeAssemblyInfo : AssemblyInfo {
         StoredIdentity = identity
     }
 
-    val Name: string { get => RuntimeServices.AssemblyName(StoredIdentity) }
+    val Name: string => RuntimeServices.AssemblyName(StoredIdentity)
 
-    val FullName: string { get => StoredIdentity }
+    val FullName: string => StoredIdentity
 
-    val MetadataToken: int { get => RuntimeServices.AssemblyMetadataToken(StoredIdentity) }
+    val MetadataToken: int => RuntimeServices.AssemblyMetadataToken(StoredIdentity)
 
-    val ReferencedAssemblies: Sequence<AssemblyInfo> { get => RuntimeServices.AssemblyReferences(StoredIdentity) }
+    val ReferencedAssemblies: Sequence<AssemblyInfo> => RuntimeServices.AssemblyReferences(StoredIdentity)
 
     func GetModules() -> Sequence<ModuleInfo> {
         return RuntimeServices.AssemblyModules(StoredIdentity)

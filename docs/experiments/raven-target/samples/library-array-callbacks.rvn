@@ -1,7 +1,13 @@
 import System.*
 import System.Console.*
-func ShowInt(value: int) { WriteLine(value) }
-func ShowString(value: string) { WriteLine(value) }
+func ShowInt(value: int) {
+    WriteLine(value)
+}
+
+func ShowString(value: string) {
+    WriteLine(value)
+}
+
 func Main() {
     let numbers = [7, 42]
     numbers.ForEach(ShowInt)

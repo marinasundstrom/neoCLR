@@ -8,11 +8,14 @@ func Make() -> List<string> {
     values.Add("Second")
     return values
 }
+
 func Main() {
     let values = Make()
     let alias = values
     alias[0] = "Changed"
-    for value in values { WriteLine(value) }
+    for value in values {
+        WriteLine(value)
+    }
     let source = ArrayList<long>()
     source.Add(42L)
     let copy = source.Copy()
@@ -24,5 +27,7 @@ func Main() {
     WriteLine(copy.Count)
     let dates = ArrayList<Date>()
     dates.Add(default(Date))
-    for date in dates { WriteLine(date.Year) }
+    for date in dates {
+        WriteLine(date.Year)
+    }
 }

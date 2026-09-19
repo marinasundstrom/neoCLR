@@ -18,6 +18,6 @@ public struct LocalDateTime {
         return LocalDateTime(date, time)
     }
 
-    val Date: Date { get => StoredDate }
-    val Time: Time { get => StoredTime }
+    val Date: Date => StoredDate
+    val Time: Time => StoredTime
 }

@@ -1,0 +1,150 @@
+# Idiomatic Raven in neoCLR
+
+These conventions apply to Raven runtime sources, executable samples and new code
+shown in documentation. They follow Raven's own source style and feature intent;
+neoCLR's target API and bootstrap have narrower capabilities than ordinary Raven
+on .NET. Compile examples against the target rather than assuming similar syntax
+or host APIs work here.
+
+## Sources and scope
+
+Reviewed in the Raven `neoclr` checkout on 2026-09-19, revision `9b2a558ae`:
+
+- [Raven style guide](https://github.com/marinasundstrom/raven/blob/9b2a558ae/docs/lang/style-guide.md):
+  indentation, bindings, spacing, file organization and one statement per line.
+- [Feature meaning](https://github.com/marinasundstrom/raven/blob/9b2a558ae/docs/lang/feature-meaning.md):
+  model the domain before selecting syntax; use patterns to establish facts.
+- [Absence and failure](https://github.com/marinasundstrom/raven/blob/9b2a558ae/docs/lang/features/option-and-result.md)
+  and [patterns](https://github.com/marinasundstrom/raven/blob/9b2a558ae/docs/lang/features/patterns.md):
+  Option, Result, propagation and exhaustive interpretation.
+- [Properties specification](https://github.com/marinasundstrom/raven/blob/9b2a558ae/docs/lang/spec/properties-and-events.md):
+  property-first declarations and expression-bodied computed getters.
+
+Those links identify the reviewed source revision, which may remain local until
+pushed. They document language guidance, not a claim that every Raven/.NET feature
+is admitted by neoCLR's preview importer. Examples below use the neoCLR contracts;
+for example its Result error case is named `Error`.
+
+## Bindings, properties and layout
+
+Use `let` for an immutable local binding and `var` when reassignment is needed.
+Use `val` for a read-only property. `val` remains legal for locals, but matching
+Raven's standard spelling makes the roles easier to distinguish. Neither `let`
+nor `val` promises deep immutability of an object.
+
+Prefer an expression-bodied property for a single getter expression:
+
+```raven
+val DeclaringType: Option<TypeInfo> => Some(StoredDeclaringType)
+```
+
+Use a getter block when it actually needs statements, and retain explicit accessor
+contracts when setter visibility or initialization matters. Interface declarations
+still describe the contract rather than an implementation.
+
+Use four spaces, one statement per line, a blank line between declarations and
+logical groups, and braces on multiple lines for control flow with a body. A short
+expression is useful; compressed control flow is not a goal. Infer obvious local
+types, but annotate a binding when it supplies an important expected union or
+interface type.
+
+## Construct cases and extract payloads
+
+Use case constructors rather than spelling out both the case and carrier storage:
+
+```raven
+import System.*
+import System.Option.*
+
+func FindPrice(product: int) -> Option<int> {
+    if product == 7 {
+        return Some(42)
+    }
+    return None()
+}
+
+let price: Option<int> = Some(42)
+```
+
+The return type or annotation supplies the carrier type. Keep that context: an
+unannotated case construction can infer the case type instead of the intended
+carrier. Qualify a constructor when required to disambiguate a name. The desired
+`Option<T>.Some(value)` spelling is not currently exposed by this target's Option
+reference contract; imported `Some(value)` works and is the tested spelling here.
+Do not add explicit carrier wrappers merely to compensate for a missing expected
+type. Payload-free construction currently uses `None()` in these target samples.
+
+Prefer a case pattern or destructuring over `IsSome` followed by
+`GetSomeCase().Value`:
+
+```raven
+match FindPrice(7) {
+    .Some(let price) => Console.WriteLine(price)
+    .None => Console.WriteLine("Product not found")
+}
+```
+
+Use `if value is .Some(let item)` when only the present branch needs work. Use
+`match` when every alternative needs meaning. Nested patterns can unpack nested
+carriers, such as `.Some(.Ok(let number))`. Use `_` for a payload that is genuinely
+unused; do not hide distinct meaningful cases behind a catch-all.
+
+Use `?` to propagate compatible absence or failure when the current function
+cannot add useful handling. Return typed Result errors for expected failure and
+Option for meaningful absence. A fault is not a substitute for those ordinary
+outcomes; it is appropriate when an invariant required for execution has failed.
+
+## Completion and the void spelling
+
+For the neoCLR target, `()` is the unit value and its platform type is System.Void.
+The author's current convention is to spell that type `void`, rather than `unit`,
+including completion payloads such as `Result<void, E>`. This does not mean that an
+ordinary no-result call leaves a value on the execution stack.
+
+At this cleanup checkpoint the target mapping is implemented, while the lowercase
+`void` source keyword still needs compiler support. Existing executable examples
+therefore keep System.Void until that separate slice lands. Do not claim the keyword
+is implemented merely because hover renders a System.Void type as `void`.
+
+## Model contracts rather than implementation details
+
+Use an enum for named constants, a union for a closed set of payload-bearing
+alternatives, and a sealed interface hierarchy when separate type identities are
+part of a closed model. Prefer exhaustive named cases so additions force a review.
+For MemberInfo that means TypeInfo, FieldInfo, MethodInfo and PropertyInfo. Keep
+the cases together in one source file, as Raven requires for a sealed family.
+
+Use a class for identity, lifecycle or encapsulated state; do not create one just
+to hold unrelated operations. Plain functions suit operations without an owner.
+Choose collection interfaces by the required capabilities. Introspection queries
+return Sequence<T>: Count, indexing and iteration are public, mutable array
+storage is an implementation detail.
+
+Keep ordinary .NET boundaries recognizable where they are part of an integration
+contract. neoCLR's own API choices may deliberately differ; document their meaning
+and migration instead of silently reproducing .NET shapes or treating different
+spelling as an improvement.
+
+## Bootstrap exceptions and validation
+
+The current Option/Result carrier implementation is hand-authored to satisfy the
+compiler/runtime union metadata and storage contract. Its checked case accessors,
+TryGet methods, constructors and residual/output adapters remain necessary ABI
+plumbing. Replacing their implementation with patterns that call those same methods
+could create recursion. Ordinary callers and teaching samples should use patterns;
+removing the ABI is a separate compiler/runtime change, not this style cleanup.
+
+Likewise, case-payload mutability tests intentionally manipulate case values to
+verify copy semantics. Rejection fixtures may intentionally use invalid or low-level
+syntax. Generated neoIL and historical proposals are not style-edit targets.
+
+Direct compiler probes must configure the target core and unit type just as
+`NeoCLR.Raven.props` does; otherwise `()` can denote the host unit type instead of
+neoCLR System.Void. Do not reintroduce carrier wrappers to mask that mismatch.
+
+Run edited samples through the saved-project runner, regenerate changed Raven
+runtime slices, and check source admission when declarations change. The
+[Option sample](experiments/raven-target/samples/library-option.rvn),
+[nested type sample](experiments/raven-target/samples/library-nested-type-info.rvn)
+and [runtime descriptors](../runtime/raven/src/System/Introspection/Descriptors.rvn)
+provide executable examples of these conventions.

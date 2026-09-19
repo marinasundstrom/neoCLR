@@ -4213,3 +4213,31 @@ changes are part of this slice.
 - **Assistant:** updated this slice's owner access and accessor filtering to patterns,
   and used imported Some/None case constructors. Recorded the ongoing style rule in
   AGENTS.md; the wider cleanup remains the next commit.
+
+### 2026-09-19 — Document idiomatic Raven and clean up before strings
+
+- **Author:** requested a cleanup after the TypeInfo commit and before String work,
+  then showed `val DeclaringType: Option<TypeInfo> => Some(StoredDeclaringType)` as
+  the preferred property form. Asked to document idiomatic Raven conventions and
+  look at the Raven repository for guidance.
+- **Assistant:** read Raven's style guide, feature-meaning guide, property spec and
+  pattern/Option/Result feature docs. Added a linked neoCLR conventions guide,
+  distinguished target bootstrap ABI from ordinary user code, and applied the
+  conventions to runtime properties and sample union usage.
+- **Assistant:** asked whether the String slice should begin with strict UTF-8
+  conversion or the larger proposed scalar-based Char redesign.
+- **Author:** “Do what you believe benefits us right now”.
+- **Assistant decision:** begin with strict UTF-8 conversion while preserving the
+  current String/Char semantics; scalar Char remains deferred. This is a plan for
+  the next slice, not a report of its implementation.
+
+- **Validation finding:** the wider application checks exposed a pre-existing
+  source-token mismatch for value-type constructors lowered to free functions.
+  The assistant fixed the synthetic receiver token slot separately in `346678f`;
+  the class-identity/value-copy sample now executes and the application suite passes.
+
+- **Author:** clarified that `()` maps to void and that neoCLR-targeting Raven should
+  use the `void` keyword rather than `unit`, at least for now.
+- **Assistant:** verified that the runtime-unit mapping already selects System.Void,
+  but the parser does not yet recognize lowercase void. Recorded the desired
+  spelling and the implementation gap separately in the conventions guide.

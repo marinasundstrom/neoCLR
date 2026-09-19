@@ -17,7 +17,7 @@ public struct Instant : Comparable<Instant>, Equatable<Instant> {
         return RuntimeServices.LocalDateTime(StoredTicks)
     }
 
-    val UnixTimeTicks: long { get => StoredTicks }
+    val UnixTimeTicks: long => StoredTicks
 
     func Equals(other: Instant) -> bool {
         return StoredTicks == other.StoredTicks

@@ -12,7 +12,7 @@ public struct Int32ParseError {
         Stored = ValueStorage.Pack(value)
     }
 
-    val IsInvalidFormat: bool { get => ValueStorage.Is<Int32ParseError.InvalidFormat>(Stored) }
+    val IsInvalidFormat: bool => ValueStorage.Is<Int32ParseError.InvalidFormat>(Stored)
 
     func GetInvalidFormat() -> Int32ParseError.InvalidFormat {
         return ValueStorage.Unpack<Int32ParseError.InvalidFormat>(Stored)
@@ -22,7 +22,7 @@ public struct Int32ParseError {
         Stored = ValueStorage.Pack(value)
     }
 
-    val IsOverflow: bool { get => ValueStorage.Is<Int32ParseError.Overflow>(Stored) }
+    val IsOverflow: bool => ValueStorage.Is<Int32ParseError.Overflow>(Stored)
 
     func GetOverflow() -> Int32ParseError.Overflow {
         return ValueStorage.Unpack<Int32ParseError.Overflow>(Stored)

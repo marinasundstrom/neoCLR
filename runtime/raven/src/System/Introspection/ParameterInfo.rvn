@@ -35,12 +35,12 @@ internal class RuntimeParameterInfo : ParameterInfo {
         StoredModule = module
     }
 
-    val MetadataToken: int { get => StoredMetadataToken }
-    val Module: ModuleInfo { get => StoredModule }
-    val Name: string { get => StoredName }
-    val Position: int { get => StoredPosition }
-    val ParameterType: TypeInfo { get => StoredParameterType }
-    val IsOut: bool { get => StoredIsOut }
-    val IsOutWhenTrue: bool { get => StoredIsOutWhenTrue }
-    val IsReadOnly: bool { get => StoredIsReadOnly }
+    val MetadataToken: int => StoredMetadataToken
+    val Module: ModuleInfo => StoredModule
+    val Name: string => StoredName
+    val Position: int => StoredPosition
+    val ParameterType: TypeInfo => StoredParameterType
+    val IsOut: bool => StoredIsOut
+    val IsOutWhenTrue: bool => StoredIsOutWhenTrue
+    val IsReadOnly: bool => StoredIsReadOnly
 }

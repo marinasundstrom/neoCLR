@@ -8,6 +8,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Document idiomatic Raven conventions using Raven's style and feature guides.
+  Simplify getter-only runtime properties, prefer let for local bindings, use case
+  constructors and destructuring in ordinary union callers, and expand compact
+  sample control flow. Preserve carrier ABI accessors and copy-semantics fixtures;
+  this cleanup does not remove the compiler/runtime union contract. Align the
+  direct file probe with saved projects’ core/unit and managed-array profile for
+  Ok(()); its verifier can select the matching System library. Record the desired
+  void source spelling separately from the existing () → System.Void mapping.
+  Regenerate the library; 81 saved-project checks, 15 application checks, 18 runtime
+  reflection tests, descriptor admission and process/order workflows pass.
+
 - Preserve source parameter-token alignment when the importer lowers an instance
   method to a free function. Reserve token zero for the synthetic receiver, which
   has no CLI Param row. This restores value-type constructor admission and the

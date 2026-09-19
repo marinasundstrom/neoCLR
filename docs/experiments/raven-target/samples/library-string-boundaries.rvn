@@ -3,6 +3,7 @@ import System.Console.*
 func Check(value: bool) {
     if value { WriteLine("yes") } else { WriteLine("no") }
 }
+
 func Main() {
     Check("".ContainsOrdinal(""))
     Check("text".StartsWithOrdinal(""))

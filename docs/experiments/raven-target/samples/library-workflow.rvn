@@ -1,31 +1,32 @@
+import System.Option.*
 import System.*
 import System.Collections.*
 import System.Console.*
 
 func FindPrice(product: int) -> Option<int> {
     if product == 7 {
-        return Option<int>(Option.Some<int>(-42))
+        return Some(-42)
     }
     if product == 8 {
-        return Option<int>(Option.Some<int>(-2147483648))
+        return Some(-2147483648)
     }
-    return Option<int>(Option.None())
+    return None()
 }
 
 func Process(product: int) -> Option<System.Void> {
     let price = FindPrice(product)
-    if price is Option.Some<int> found {
-        let amount = Math.Abs(found.Value)
-        if amount is Result.Ok<int> ok {
-            WriteLine(ok.Value)
-            return Option<System.Void>(Option.Some<System.Void>(()))
-        } else if amount is Result.Error<OverflowError> error {
+    if price is .Some(let found) {
+        let amount = Math.Abs(found)
+        if amount is .Ok(let ok) {
+            WriteLine(ok)
+            return Some(())
+        } else if amount is .Error(let error) {
             WriteLine("Price overflow")
         }
-    } else if price is Option.None missing {
+    } else if price is .None {
         WriteLine("Product not found")
     }
-    return Option<System.Void>(Option.None())
+    return None()
 }
 
 func Main() {
@@ -36,9 +37,9 @@ func Main() {
     let queue: List<int> = products
     for product in queue {
         let completion = Process(product)
-        if completion is Option.Some<System.Void> done {
+        if completion is .Some(let done) {
             WriteLine("Completed")
-        } else if completion is Option.None absent {
+        } else if completion is .None {
             WriteLine("Skipped")
         }
     }

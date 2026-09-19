@@ -1,7 +1,13 @@
 import System.*
 import System.Console.*
-func ShowLong(value: long, other: long) { WriteLine(value.CompareTo(other)) }
-func ShowChar(value: char, other: char) { WriteLine(value.CompareTo(other)) }
+func ShowLong(value: long, other: long) {
+    WriteLine(value.CompareTo(other))
+}
+
+func ShowChar(value: char, other: char) {
+    WriteLine(value.CompareTo(other))
+}
+
 func Main() {
     let signed: sbyte = (sbyte)-1
     let octet: byte = 255b
@@ -23,20 +29,52 @@ func Main() {
     WriteLine(unsignedNative.CompareTo(unsignedNative))
     ShowLong(-9223372036854775808L, 9223372036854775807L)
     ShowChar('a', 'z')
-    if Char.IsDigit('٣') { WriteLine("Digit") }
-    if Char.IsNumber('Ⅷ') { WriteLine("Number") }
-    if Char.IsLetter('é') { WriteLine("Letter") }
-    if Char.IsUpper('A') { WriteLine("Upper") }
-    if Char.IsLower('a') { WriteLine("Lower") }
-    if Char.IsSeparator(' ') { WriteLine("Separator") }
-    if Char.IsControl('\n') { WriteLine("Control") }
-    if Char.IsPunctuation('!') { WriteLine("Punctuation") }
-    if Char.IsSymbol('$') { WriteLine("Symbol") }
-    if Char.IsSurrogate((char)55296) { WriteLine("Surrogate") }
-    if Char.IsHighSurrogate((char)55296) { WriteLine("High") }
-    if Char.IsLowSurrogate((char)56320) { WriteLine("Low") }
-    if Char.IsAscii('A') { WriteLine("ASCII") }
-    if Char.IsAsciiDigit('3') { WriteLine("ASCII digit") }
-    if Char.IsLetterOrDigit('é') { WriteLine("Letter or digit") }
-    if Char.IsWhiteSpace('\t') { WriteLine("Whitespace") }
+    if Char.IsDigit('٣') {
+        WriteLine("Digit")
+    }
+    if Char.IsNumber('Ⅷ') {
+        WriteLine("Number")
+    }
+    if Char.IsLetter('é') {
+        WriteLine("Letter")
+    }
+    if Char.IsUpper('A') {
+        WriteLine("Upper")
+    }
+    if Char.IsLower('a') {
+        WriteLine("Lower")
+    }
+    if Char.IsSeparator(' ') {
+        WriteLine("Separator")
+    }
+    if Char.IsControl('\n') {
+        WriteLine("Control")
+    }
+    if Char.IsPunctuation('!') {
+        WriteLine("Punctuation")
+    }
+    if Char.IsSymbol('$') {
+        WriteLine("Symbol")
+    }
+    if Char.IsSurrogate((char)55296) {
+        WriteLine("Surrogate")
+    }
+    if Char.IsHighSurrogate((char)55296) {
+        WriteLine("High")
+    }
+    if Char.IsLowSurrogate((char)56320) {
+        WriteLine("Low")
+    }
+    if Char.IsAscii('A') {
+        WriteLine("ASCII")
+    }
+    if Char.IsAsciiDigit('3') {
+        WriteLine("ASCII digit")
+    }
+    if Char.IsLetterOrDigit('é') {
+        WriteLine("Letter or digit")
+    }
+    if Char.IsWhiteSpace('\t') {
+        WriteLine("Whitespace")
+    }
 }

@@ -38,15 +38,15 @@ class FileOrderStore : OrderStore {
     func Find(id: int) -> Option<Order> {
         for order in orders {
             if order.Id == id {
-                return Option<Order>(Option.Some<Order>(order))
+                return Some(order)
             }
         }
-        return Option<Order>(Option.None())
+        return None()
     }
     func Save(order: Order, limit: int) -> Result<System.Void, FileWriteError> {
         File.WriteAllText("neoclr-orders.txt", String.Concat("Order: ", order.Name), limit)?
         order.Status = "Saved"
-        return Result<System.Void, FileWriteError>(Result.Ok<System.Void>(()))
+        return Ok(())
     }
 }
 
@@ -58,8 +58,7 @@ func Process(store: OrderStore, id: int, limit: int) {
             .Error(let failure) => {
                 if failure.IsTooLarge {
                     WriteLine("Order report exceeds limit")
-                }
-                else {
+                } else {
                     WriteLine("Order report could not be written")
                 }
             }

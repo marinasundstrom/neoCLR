@@ -1,37 +1,56 @@
+import System.Option.*
 import System.*
 import System.Console.*
 
 func Find(found: int) -> Option<string> {
-    if found == 1 { return Option<string>(Option.Some<string>("Found")) }
-    return Option<string>(Option.None())
+    if found == 1 {
+        return Some("Found")
+    }
+    return None()
 }
+
 func Forward(found: int) -> Option<string> {
     let value = Find(found)?
-    return Option<string>(Option.Some<string>(value))
+    return Some(value)
 }
+
 func Main() {
     let ok = Result<long, Error>.Ok(42L)
-    if ok.IsOk { WriteLine("Ok") }
-    if ok.IsOkCase { WriteLine(ok.GetOkCase().Value.CompareTo(42L)) }
+    if ok.IsOk {
+        WriteLine("Ok")
+    }
+    if ok is .Ok(let number) {
+        WriteLine(number.CompareTo(42L))
+    }
     let error = Result<long, Error>.Error(Error.FromMessage("Failure"))
-    if error.IsErr { WriteLine("Error") }
-    if error.IsErrorCase { WriteLine(error.GetErrorCase().Value.Message) }
-    var extracted = default(Result.Ok<long>)
-    if ok.TryGet(&extracted) { WriteLine(extracted.Value.CompareTo(42L)) }
-    var residual = Error.FromMessage("Unchanged")
-    if error.TryGetResidual(&residual) {
-        let restored = Result<long, Error>.FromResidual(residual)
-        WriteLine(restored.GetErrorCase().Value.Message)
+    if error.IsErr {
+        WriteLine("Error")
+    }
+    if error is .Error(let failure) {
+        WriteLine(failure.Message)
+    }
+    if ok is .Ok(let extracted) {
+        WriteLine(extracted.CompareTo(42L))
+    }
+    if error is .Error(let residual) {
+        let restored = Result<long, Error>.Error(residual)
+        if restored is .Error(let restoredFailure) {
+            WriteLine(restoredFailure.Message)
+        }
     }
     let some = Forward(1)
-    if some.IsSome { WriteLine(some.GetSomeCase().Value) }
+    if some is .Some(let text) {
+        WriteLine(text)
+    }
     let none = Forward(0)
     if none.IsNone {
-        let restored = Option<string>(none.GetNoneCase())
-        if restored.IsNone { WriteLine("None") }
+        let restored: Option<string> = None()
+        if restored.IsNone {
+            WriteLine("None")
+        }
     }
-    let nested = Option<Result<long, Error>>(Option.Some<Result<long, Error>>(ok))
-    if nested is Option.Some<Result<long, Error>> present {
-        WriteLine(present.Value.GetOkCase().Value.CompareTo(42L))
+    let nested: Option<Result<long, Error>> = Some(ok)
+    if nested is .Some(.Ok(let nestedNumber)) {
+        WriteLine(nestedNumber.CompareTo(42L))
     }
 }

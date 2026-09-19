@@ -7,15 +7,20 @@ func Extract(text: string, start: int, count: int) -> Result<string, Utf8SliceEr
     WriteLine("Sliced")
     return Result<string, Utf8SliceError>.Ok(part)
 }
+
 func ShowSlice(result: Result<string, Utf8SliceError>) {
     match result {
-        Result.Ok<string> ok => WriteLine(ok.Value)
-        Result.Error<Utf8SliceError> error => {
-            if error.Value.IsOutOfRange { WriteLine("Out of range") }
-            else if error.Value.IsInvalidBoundary { WriteLine("Invalid boundary") }
+        .Ok(let ok) => WriteLine(ok)
+        .Error(let error) => {
+            if error.IsOutOfRange {
+                WriteLine("Out of range")
+            } else if error.IsInvalidBoundary {
+                WriteLine("Invalid boundary")
+            }
         }
     }
 }
+
 func Main() {
     let text = "Aé😀Z"
     ShowSlice(Extract(text, 1, 2))

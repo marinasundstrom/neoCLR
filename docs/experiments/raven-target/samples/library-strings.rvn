@@ -4,6 +4,7 @@ import System.Console.*
 func Check(value: bool) {
     if value { WriteLine("yes") } else { WriteLine("no") }
 }
+
 func Main() {
     let text = String.Concat("Hello, ", "värld!")
     WriteLine(text)

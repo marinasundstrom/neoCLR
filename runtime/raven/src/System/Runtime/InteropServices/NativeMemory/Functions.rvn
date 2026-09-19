@@ -7,7 +7,7 @@ public unsafe func Alloc(byteCount: nuint) -> *System.Void {
 }
 
 public unsafe func Alloc(elementCount: nuint, elementSize: nuint) -> *System.Void {
-    val byteCount = NativeAllocation.MultiplyChecked(elementCount, elementSize)
+    let byteCount = NativeAllocation.MultiplyChecked(elementCount, elementSize)
     return Alloc(byteCount)
 }
 

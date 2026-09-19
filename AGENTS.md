@@ -20,6 +20,11 @@
 
 ## Sample readability
 
+- Follow [idiomatic Raven conventions](docs/raven-conventions.md), grounded in
+  Raven’s own style and feature guides. Use `let` for immutable lexical bindings
+  and `val` for read-only properties. Compile target examples instead of assuming
+  every host Raven/.NET API or syntax spelling is supported.
+
 - Prefer readable samples over compact formatting. Expand block expressions and
   statements across lines when that makes their contents easier to follow; there is
   no requirement to fit a complete block on one line.

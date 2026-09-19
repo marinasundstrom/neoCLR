@@ -5,24 +5,24 @@ import System.Runtime.*
 class Widget { }
 
 func Main() {
-    val widget: Object = Widget()
+    let widget: Object = Widget()
     if widget.GetType().Equals(typeof(Widget)) {
         Console.WriteLine("Concrete class")
     }
-    val text: Object = "Hello"
-    val description = text.GetType()
+    let text: Object = "Hello"
+    let description = text.GetType()
     Console.WriteLine(description.FullName)
     if description.Equals(typeof(string)) {
         Console.WriteLine("Same type")
     }
-    val values = [1, 2, 3]
-    val array: Object = values
+    let values = [1, 2, 3]
+    let array: Object = values
     if array.GetType().IsArray {
         Console.WriteLine("Array type")
     }
-    val number: Object = 42
+    let number: Object = 42
     Console.WriteLine(number.GetType().FullName)
-    val comparable: Comparable<int> = 42
-    val boxed: Object = comparable
+    let comparable: Comparable<int> = 42
+    let boxed: Object = comparable
     Console.WriteLine(boxed.GetType().FullName)
 }

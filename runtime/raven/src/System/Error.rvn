@@ -8,7 +8,7 @@ public struct Error {
         return RuntimeServices.ErrorFromMessage(message)
     }
 
-    val Message: string { get => RuntimeServices.ErrorMessage(self) }
+    val Message: string => RuntimeServices.ErrorMessage(self)
 
     func ToString() -> string {
         return Message

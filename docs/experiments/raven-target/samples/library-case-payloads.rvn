@@ -5,7 +5,10 @@ func Main() {
     let carrier = Result<int, Error>(ok)
     ok.Value = 7
     WriteLine(ok.Value)
-    WriteLine(carrier.GetOkCase().Value)
+    match carrier {
+        .Ok(let value) => WriteLine(value)
+        .Error(_) => Fault("Expected success")
+    }
     var some = Option.Some<string>("Before")
     some.Value = "After"
     WriteLine(some.Value)

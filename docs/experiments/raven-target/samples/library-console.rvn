@@ -5,13 +5,20 @@ func Read() -> Result<Option<byte>, IO.ConsoleReadError> {
     let value = ReadByte()?
     return Result<Option<byte>, IO.ConsoleReadError>.Ok(value)
 }
+
 func Show() {
     let result = Read()
-    if result is Result.Ok<Option<byte>> ok {
-        if ok.Value is Option.Some<byte> some { WriteLine((int)some.Value) }
-        else { WriteLine("End of input") }
-    } else if result is Result.Error<IO.ConsoleReadError> error {
-        WriteLine(error.Value.ToString())
+    if result is .Ok(let ok) {
+        if ok is .Some(let some) {
+            WriteLine((int)some)
+        } else {
+            WriteLine("End of input")
+        }
+    } else if result is .Error(let error) {
+        WriteLine(error.ToString())
     }
 }
-func Main() { Show(); Show(); Show() }
+
+func Main() {
+    Show(); Show(); Show()
+}

@@ -20,11 +20,11 @@ internal class RuntimeModuleInfo : ModuleInfo {
         StoredName = name
     }
 
-    val Name: string { get => StoredName }
+    val Name: string => StoredName
 
-    val Assembly: AssemblyInfo { get => RuntimeServices.ModuleAssembly(StoredIdentity, StoredName) }
+    val Assembly: AssemblyInfo => RuntimeServices.ModuleAssembly(StoredIdentity, StoredName)
 
-    val MetadataToken: int { get => RuntimeServices.ModuleMetadataToken(StoredIdentity, StoredName) }
+    val MetadataToken: int => RuntimeServices.ModuleMetadataToken(StoredIdentity, StoredName)
 
     func GetTypes() -> Sequence<TypeInfo> {
         return RuntimeServices.ModuleTypes(StoredIdentity, StoredName)

@@ -5,11 +5,14 @@ func Show(value: int, other: int) {
     WriteLine(value.CompareTo(other))
     if value.Equals(other) { WriteLine("Equal") } else { WriteLine("Different") }
 }
+
 func Main() {
     let local = 42
     WriteLine(local.ToString())
     WriteLine(local.CompareTo(7))
-    if local.Equals(42) { WriteLine("Equal") }
+    if local.Equals(42) {
+        WriteLine("Equal")
+    }
     Show(-2147483648, 2147483647)
     Show(2147483647, -2147483648)
     Show(0, 0)

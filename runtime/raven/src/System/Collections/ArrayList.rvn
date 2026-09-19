@@ -19,8 +19,8 @@ public open class ArrayList<T> : List<T> {
         count = 0
     }
 
-    val Count: int { get => count }
-    val Capacity: int { get => data.Length }
+    val Count: int => count
+    val Capacity: int => data.Length
 
     var self[index: int]: T {
         get {

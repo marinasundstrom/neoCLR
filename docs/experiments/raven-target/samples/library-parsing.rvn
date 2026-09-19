@@ -1,20 +1,26 @@
+import System.Result.*
 import System.*
 import System.Console.*
 
 func ParseInput(text: string) -> Result<int, Int32ParseError> {
     let value = Int32.Parse(text)?
     WriteLine("Parsed")
-    return Result<int, Int32ParseError>(Result.Ok<int>(value))
+    return Ok(value)
 }
+
 func ShowParse(result: Result<int, Int32ParseError>) {
     match result {
-        Result.Ok<int> ok => WriteLine(ok.Value)
-        Result.Error<Int32ParseError> error => {
-            if error.Value.IsInvalidFormat { WriteLine("Invalid format") }
-            else if error.Value.IsOverflow { WriteLine("Overflow") }
+        .Ok(let ok) => WriteLine(ok)
+        .Error(let error) => {
+            if error.IsInvalidFormat {
+                WriteLine("Invalid format")
+            } else if error.IsOverflow {
+                WriteLine("Overflow")
+            }
         }
     }
 }
+
 func Main() {
     ShowParse(ParseInput("42"))
     ShowParse(ParseInput("-2147483648"))

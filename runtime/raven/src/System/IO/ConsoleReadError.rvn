@@ -12,7 +12,7 @@ public struct ConsoleReadError {
         Stored = ValueStorage.Pack(value)
     }
 
-    val IsUnavailable: bool { get => ValueStorage.Is<ConsoleReadError.Unavailable>(Stored) }
+    val IsUnavailable: bool => ValueStorage.Is<ConsoleReadError.Unavailable>(Stored)
 
     func GetUnavailable() -> ConsoleReadError.Unavailable {
         return ValueStorage.Unpack<ConsoleReadError.Unavailable>(Stored)
@@ -22,7 +22,7 @@ public struct ConsoleReadError {
         Stored = ValueStorage.Pack(value)
     }
 
-    val IsReadFailed: bool { get => ValueStorage.Is<ConsoleReadError.ReadFailed>(Stored) }
+    val IsReadFailed: bool => ValueStorage.Is<ConsoleReadError.ReadFailed>(Stored)
 
     func GetReadFailed() -> ConsoleReadError.ReadFailed {
         return ValueStorage.Unpack<ConsoleReadError.ReadFailed>(Stored)

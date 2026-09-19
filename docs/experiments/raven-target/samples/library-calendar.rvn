@@ -1,3 +1,4 @@
+import System.Result.*
 import System.*
 import System.Console.*
 func ShowDate(value: Date) {
@@ -7,19 +8,24 @@ func ShowDate(value: Date) {
     WriteLine(value.DayOfYear)
     WriteLine(value.DayNumber)
     WriteLine(value.CompareTo(other: value))
-    if value.Equals(other: value) { WriteLine("Same date") }
+    if value.Equals(other: value) {
+        WriteLine("Same date")
+    }
 }
+
 func ReadDate(result: Result<Date, InvalidDateError>) -> Result<Date, InvalidDateError> {
     let value = result?
     ShowDate(value)
-    return Result<Date, InvalidDateError>(Result.Ok<Date>(value))
+    return Ok(value)
 }
+
 func CheckDate(result: Result<Date, InvalidDateError>) {
     match ReadDate(result) {
-        Result.Ok<Date> ok => WriteLine("Date accepted")
-        Result.Error<InvalidDateError> error => WriteLine("Invalid date")
+        .Ok(let ok) => WriteLine("Date accepted")
+        .Error(let error) => WriteLine("Invalid date")
     }
 }
+
 func ShowTime(value: Time) {
     WriteLine(value.Hour)
     WriteLine(value.Minute)
@@ -29,19 +35,24 @@ func ShowTime(value: Time) {
     let ticks = value.Ticks
     WriteLine(ticks.CompareTo(452967890123L))
     WriteLine(value.CompareTo(other: value))
-    if value.Equals(other: value) { WriteLine("Same time") }
+    if value.Equals(other: value) {
+        WriteLine("Same time")
+    }
 }
+
 func ReadTime(result: Result<Time, InvalidTimeError>) -> Result<Time, InvalidTimeError> {
     let value = result?
     ShowTime(value)
-    return Result<Time, InvalidTimeError>(Result.Ok<Time>(value))
+    return Ok(value)
 }
+
 func CheckTime(result: Result<Time, InvalidTimeError>) {
     match ReadTime(result) {
-        Result.Ok<Time> ok => WriteLine("Time accepted")
-        Result.Error<InvalidTimeError> error => WriteLine("Invalid time")
+        .Ok(let ok) => WriteLine("Time accepted")
+        .Error(let error) => WriteLine("Invalid time")
     }
 }
+
 func Main() {
     CheckDate(Date.Create(day: 29, year: 2024, month: 2))
     CheckDate(Date.FromDayNumber(dayNumber: 0))

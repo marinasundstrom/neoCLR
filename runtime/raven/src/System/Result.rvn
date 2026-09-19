@@ -8,14 +8,14 @@ public static class Result {
         init(value: T) {
             Stored = value
         }
-        val Value: T { get => Stored }
+        val Value: T => Stored
     }
     public struct Error<E> {
         private field Stored: E
         init(value: E) {
             Stored = value
         }
-        val Value: E { get => Stored }
+        val Value: E => Stored
     }
 }
 
@@ -32,7 +32,7 @@ public struct Result<T, E> : Propagatable<Result<T, E>, T, E> {
     init(value: System.Result.Ok<T>) {
         Stored = ValueStorage.Pack(value)
     }
-    val IsOk: bool { get => ValueStorage.Is<System.Result.Ok<T>>(Stored) }
+    val IsOk: bool => ValueStorage.Is<System.Result.Ok<T>>(Stored)
     func GetOkCase() -> System.Result.Ok<T> {
         return ValueStorage.Unpack<System.Result.Ok<T>>(Stored)
     }
@@ -48,7 +48,7 @@ public struct Result<T, E> : Propagatable<Result<T, E>, T, E> {
     init(value: System.Result.Error<E>) {
         Stored = ValueStorage.Pack(value)
     }
-    val IsErr: bool { get => ValueStorage.Is<System.Result.Error<E>>(Stored) }
+    val IsErr: bool => ValueStorage.Is<System.Result.Error<E>>(Stored)
     func GetErrorCase() -> System.Result.Error<E> {
         return ValueStorage.Unpack<System.Result.Error<E>>(Stored)
     }
@@ -61,8 +61,8 @@ public struct Result<T, E> : Propagatable<Result<T, E>, T, E> {
         return false
     }
 
-    val IsOkCase: bool { get => IsOk }
-    val IsErrorCase: bool { get => IsErr }
+    val IsOkCase: bool => IsOk
+    val IsErrorCase: bool => IsErr
 
     func TryGetOutput(out output: T) -> bool {
         if IsOk {

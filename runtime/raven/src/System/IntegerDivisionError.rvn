@@ -12,7 +12,7 @@ public struct IntegerDivisionError {
         Stored = ValueStorage.Pack(value)
     }
 
-    val IsDivisionByZero: bool { get => ValueStorage.Is<IntegerDivisionError.DivisionByZero>(Stored) }
+    val IsDivisionByZero: bool => ValueStorage.Is<IntegerDivisionError.DivisionByZero>(Stored)
 
     func GetDivisionByZero() -> IntegerDivisionError.DivisionByZero {
         return ValueStorage.Unpack<IntegerDivisionError.DivisionByZero>(Stored)
@@ -22,7 +22,7 @@ public struct IntegerDivisionError {
         Stored = ValueStorage.Pack(value)
     }
 
-    val IsOverflow: bool { get => ValueStorage.Is<IntegerDivisionError.Overflow>(Stored) }
+    val IsOverflow: bool => ValueStorage.Is<IntegerDivisionError.Overflow>(Stored)
 
     func GetOverflow() -> IntegerDivisionError.Overflow {
         return ValueStorage.Unpack<IntegerDivisionError.Overflow>(Stored)

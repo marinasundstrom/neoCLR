@@ -56,7 +56,7 @@ dotnet run --project docs/experiments/raven-target/Probe.csproj \
   -p:RavenRoot="$RAVEN_ROOT" -p:BuildProjectReferences=false -p:WarningLevel=0 \
   -- --files /tmp/neoclr-files-check
 python3 docs/experiments/raven-target/verify_files.py /tmp/neoclr-files-check \
-  --runtime "$NEOCLR_RUNTIME"
+  --runtime "$NEOCLR_RUNTIME" --system "$NEOCLR_SYSTEM_LIBRARY"
 ```
 
 The checker runs the generated programs in a temporary directory, verifies UTF-8
@@ -67,3 +67,7 @@ extraction tests and uninitialized error reads without producing executable outp
 For saved projects, regenerate the target declarations using the current probe and
 use the neoCLR build/run task with this sample as Main.rvn. Do not run the declarations
 on .NET. [Editor setup](experiments/raven-target/VSCODE.md) describes the compiler/server setup and remaining distribution limits.
+
+The direct file probe now uses the same target core, unit and managed-array profile
+as saved projects. Set NEOCLR_SYSTEM_LIBRARY to the matching generated Raven System
+library when running its fixtures.

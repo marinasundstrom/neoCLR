@@ -1,18 +1,29 @@
+import System.Option.*
 import System.*
 import System.Console.*
 
 func Find(found: int) -> Option<int> {
-    if found == 1 { return Option<int>(Option.Some<int>(42)) }
-    return Option<int>(Option.None())
+    if found == 1 {
+        return Some(42)
+    }
+    return None()
 }
+
 func Read(found: int) -> Option<int> {
     let value = Find(found)?
     WriteLine("Value found")
-    return Option<int>(Option.Some<int>(value))
+    return Some(value)
 }
+
 func Show(found: int) {
     let result = Read(found)
-    if result is Option.Some<int> present { WriteLine(present.Value) }
-    else if result is Option.None absent { WriteLine("Absent") }
+    if result is .Some(let present) {
+        WriteLine(present)
+    } else if result is .None {
+        WriteLine("Absent")
+    }
 }
-func Main() { Show(1); Show(0) }
+
+func Main() {
+    Show(1); Show(0)
+}

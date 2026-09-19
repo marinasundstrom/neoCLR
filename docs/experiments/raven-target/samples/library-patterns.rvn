@@ -1,3 +1,4 @@
+import System.Option.*
 import System.*
 import System.Console.*
 import System.Result.*
@@ -19,6 +20,6 @@ func Number(value: Option<int>) -> int {
 func Main() {
     WriteLine(Magnitude(-42))
     WriteLine(Magnitude(-2147483648))
-    WriteLine(Number(Option<int>(Option.Some<int>(7))))
-    WriteLine(Number(Option<int>(Option.None())))
+    WriteLine(Number(Some(7)))
+    WriteLine(Number(None()))
 }

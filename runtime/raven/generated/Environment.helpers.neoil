@@ -38,14 +38,14 @@ ldarg arg0
 newobj instance System.Result.Ok<System.Option<String>>::.ctor(System.Option<String>)
 ret
 .end
-.function neoCLR.Library.System.Environment.RuntimeUnion8(System.Result.Ok<System.Option<String>> arg0) -> System.Result<System.Option<String>,System.EnvironmentError>
-ldarg arg0
-newobj instance System.Result<System.Option<String>,System.EnvironmentError>::.ctor(System.Result.Ok<System.Option<String>>)
-ret
-.end
-.function neoCLR.Library.System.Environment.RuntimeUnion9(String arg0) -> System.Option.Some<String>
+.function neoCLR.Library.System.Environment.RuntimeUnion8(String arg0) -> System.Option.Some<String>
 ldarg arg0
 newobj instance System.Option.Some<String>::.ctor(String)
+ret
+.end
+.function neoCLR.Library.System.Environment.RuntimeUnion9(System.Result.Ok<System.Option<String>> arg0) -> System.Result<System.Option<String>,System.EnvironmentError>
+ldarg arg0
+newobj instance System.Result<System.Option<String>,System.EnvironmentError>::.ctor(System.Result.Ok<System.Option<String>>)
 ret
 .end
 .function neoCLR.Library.System.Environment.RuntimeUnion10(System.Option.Some<String> arg0) -> System.Option<String>

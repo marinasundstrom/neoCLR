@@ -1,19 +1,28 @@
+import System.Result.*
 import System.*
 import System.Console.*
 
 func Complete(value: int) -> Result<System.Void, OverflowError> {
     let amount = Math.Abs(value)?
     WriteLine(amount)
-    return Result<System.Void, OverflowError>(Result.Ok<System.Void>(()))
+    return Ok(())
 }
+
 func Save(value: int) -> Result<System.Void, OverflowError> {
     Complete(value)?
     WriteLine("Saved")
-    return Result<System.Void, OverflowError>(Result.Ok<System.Void>(()))
+    return Ok(())
 }
+
 func Show(value: int) {
     let result = Save(value)
-    if result is Result.Ok<System.Void> done { WriteLine("Completed") }
-    else if result is Result.Error<OverflowError> error { WriteLine("Overflow") }
+    if result is .Ok(let done) {
+        WriteLine("Completed")
+    } else if result is .Error(let error) {
+        WriteLine("Overflow")
+    }
 }
-func Main() { Show(-42); Show(-2147483648) }
+
+func Main() {
+    Show(-42); Show(-2147483648)
+}

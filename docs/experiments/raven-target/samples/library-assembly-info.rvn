@@ -7,8 +7,8 @@ class Widget {
 }
 
 func Main() {
-    val widget: Object = Widget()
-    val assembly = RuntimeContext.Current.ExecutingAssembly
+    let widget: Object = Widget()
+    let assembly = RuntimeContext.Current.ExecutingAssembly
     Console.WriteLine(assembly.Name)
     for reference in assembly.ReferencedAssemblies {
         Console.WriteLine(reference.Name)
@@ -26,7 +26,7 @@ func Main() {
             }
         }
     }
-    val description = widget.GetType()
+    let description = widget.GetType()
     Console.WriteLine(description.Module.Assembly.Name)
     if description.MetadataToken == typeof(Widget).MetadataToken {
         Console.WriteLine("Same definition token")
