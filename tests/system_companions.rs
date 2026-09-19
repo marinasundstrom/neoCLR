@@ -25,5 +25,21 @@ fn type_descriptor_exposes_name_arguments_and_owner_read_only() {
     assert_eq!(descriptor.name, "System.Result.Ok");
     assert_eq!(descriptor.generic_arguments.len(), 1);
     assert_eq!(descriptor.generic_arguments[0].name, "System.Int32");
-    assert!(descriptor.declaring_type.is_some());
+    for (case, owner) in [
+        ("System.Result.Ok<Int32>", "System.Result"),
+        ("System.Result.Error<String>", "System.Result"),
+        ("System.Option.Some<Int32>", "System.Option"),
+        ("System.Option.None", "System.Option"),
+    ] {
+        let descriptor = program
+            .describe_type(&neoclr::assembler::parse_type(case).unwrap())
+            .unwrap();
+        let owner = program
+            .describe_type(&neoclr::assembler::parse_type(owner).unwrap())
+            .unwrap();
+        let neoclr::TypeIdentity::Definition { definition, .. } = owner.identity else {
+            panic!("case owner must be a type definition");
+        };
+        assert_eq!(descriptor.declaring_type, Some(definition));
+    }
 }

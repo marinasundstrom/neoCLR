@@ -79,8 +79,8 @@
     "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
   },
   "outputs": {
-    "Option.methods.neoil": "61e54f74b406761662f9d4dbb36046af2a173c12181b175a0a293b1b76d218dd",
-    "Option.helpers.neoil": "3bef47b6444f0eeb8bc291fba34f726283bde646813e70efab7cdf5813047574"
+    "Option.methods.neoil": "7fa2c9a680d489a1489cff6ef44bd3323be312b31f45d07f1bd3bfa5acf29f4e",
+    "Option.helpers.neoil": "fc4c080e01d21b2b552ba1ed9fa4a432939a918c192ea2f22b4ffcb5b2c84e71"
   },
   "compilerSha256": "f933e9f722ca86a60dc110532c9d7191ae20251d614930348bf2ef04e5ab252d",
   "coreSha256": "914deb1b0a1a1ced1e7bce19e0f2fa9c485aa5e770097dee4a1edb178cef7783",
@@ -95,6 +95,9 @@
     "TryGet(out(true) System.Option.Some<T0>& destination) -> Boolean",
     "readonly byref TryGetOutput(out(true) T0& destination) -> Boolean",
     "readonly byref TryGetResidual(out(true) Void& destination) -> Boolean",
-    "FromResidual(Void residual) -> System.Option<T0>"
+    "FromResidual(Void residual) -> System.Option<T0>",
+    ".ctor() -> Void",
+    ".ctor(T0 value) -> Void",
+    "get_Value() -> T0"
   ]
 }

@@ -47,38 +47,3 @@ ldobj System.Option<T0>
 call instance System.Option<T0>::get_IsNone()
 ret
 .end
-.type System.Option.None
-.method instance .ctor() -> Void
-M00000001_IL_0000:
-M00000001_IL_0001:
-ldarg 0
-M00000001_IL_0002:
-pop
-M00000001_IL_0007:
-ldvoid
-ret
-.end
-.end
-.type System.Option.Some<T0>
-.field Value T0
-.property instance Value() -> T0
-.get instance System.Option.Some<T0>::get_Value()
-.end
-.method instance .ctor(T0 value) -> Void
-ldarg value
-newobj System.Option.Some<T0>
-starg this
-ldvoid
-ret
-.end
-.method instance get_Value() -> T0
-M00000003_IL_0000:
-M00000003_IL_0001:
-M00000003_IL_0002:
-ldarg 0
-M00000003_IL_0003:
-ldfld System.Option.Some<T0>::Value
-M00000003_IL_0008:
-ret
-.end
-.end

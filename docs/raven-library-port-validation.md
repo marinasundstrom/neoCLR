@@ -1,8 +1,8 @@
 # Raven library port: execution gate and branch audit
 
 Development validation on 2026-09-19. This records the API-preserving source port;
-proposal API alignment and the System.Runtime assembly identity remain subsequent
-work. [Authoring status](raven-system-library.md) records the completed source boundary.
+proposal API alignment remains subsequent work. The System.Runtime authoring
+project and implementation identity are now established. [Authoring status](raven-system-library.md) records the completed source boundary.
 A runnable library and complete Raven source ownership are separate checks.
 
 ## String/Error follow-up
@@ -141,6 +141,23 @@ generated fragments or the explicit native-service catalog (54 service declarati
 No handwritten managed method body remains in the Raven profile. The historical
 Neo profile retains its representation-specific implementations. Final execution
 results below remain a separate acceptance gate.
+
+## Final port metadata correction
+
+The complete post-port Rust run exposed one semantic regression: generated
+Option/Result cases had qualified names but no declaring-type identity. The importer
+now preserves their lexical nesting inside the already validated companion
+containers. This restores metadata ownership without changing case storage,
+constructors, conditional outputs or managed method bodies. The regression checks
+all four cases against the exact resolved owner definition, including nongeneric
+Option.None. All 34 focused nesting, union, factory and reflection tests pass. It does not infer ownership from a display-name prefix.
+
+This is a target importer correction. Raven already emits nested CLI metadata;
+compiler semantics and Runtime Contract settings are unchanged. General application
+nested-type admission is not broadened. All 73 slices regenerate, source/snapshot
+checks pass, and all 12 generic-union admission cases pass. The API inventory retains
+768 candidates in 173 source files with 118 declaring sources; case entries now
+record the proper lexical context.
 
 ## Reproduce the program gate
 

@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Preserve declaring-type metadata for Raven-authored Option/Result cases by emitting
+  them inside their companion containers. This repairs a full-port regression without
+  changing managed method bodies or case storage. Check all four cases against their
+  resolved owner identities; regenerate all 73 slices and the API inventory. All 12
+  generic-union admission cases, 34 focused runtime tests and source ownership/snapshot
+  checks pass.
+
 - Establish System.Runtime.rvnproj and its System.Runtime managed implementation
   identity, replacing System.rvnproj/NeoCLR.System without duplicating source owners.
   All 73 slices compile/import under the new identity; generated executable bodies

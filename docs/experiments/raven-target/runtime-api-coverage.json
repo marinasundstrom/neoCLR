@@ -939,7 +939,7 @@
     },
     {
       "file": "runtime/raven/generated/Option.methods.neoil",
-      "declarations": 15,
+      "declarations": 22,
       "disposition": "raven-authored-generic-union",
       "samples": [
         "library-unions.rvn",
@@ -955,7 +955,7 @@
     },
     {
       "file": "runtime/raven/generated/Option.helpers.neoil",
-      "declarations": 13,
+      "declarations": 6,
       "disposition": "raven-authored-generic-union",
       "samples": [
         "library-unions.rvn",
@@ -971,7 +971,7 @@
     },
     {
       "file": "runtime/raven/generated/Result.methods.neoil",
-      "declarations": 19,
+      "declarations": 29,
       "disposition": "raven-authored-generic-union",
       "samples": [
         "library-unions.rvn",
@@ -987,7 +987,7 @@
     },
     {
       "file": "runtime/raven/generated/Result.helpers.neoil",
-      "declarations": 18,
+      "declarations": 8,
       "disposition": "raven-authored-generic-union",
       "samples": [
         "library-unions.rvn",

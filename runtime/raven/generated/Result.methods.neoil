@@ -1,6 +1,4 @@
 ; Generated from runtime/raven/src/System/Result.rvn. Regenerate with build_runtime_library.py.
-.type System.Result
-.end
 .type System.Result<T0,T1>
 .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
 .implements System.Propagatable<System.Result<T0,T1>,T0,T1>
@@ -302,5 +300,53 @@ M00000013_IL_0003:
 call System.Result<T0,T1>::Error(T1)
 M00000013_IL_0008:
 ret
+.end
+.end
+.type System.Result
+.type Ok<T0>
+.field Value T0
+.property instance Value() -> T0
+.get instance System.Result.Ok<T0>::get_Value()
+.end
+.method instance .ctor(T0 value) -> Void
+ldarg value
+newobj System.Result.Ok<T0>
+starg this
+ldvoid
+ret
+.end
+.method instance get_Value() -> T0
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldarg 0
+M00000002_IL_0003:
+ldfld System.Result.Ok<T0>::Value
+M00000002_IL_0008:
+ret
+.end
+.end
+.type Error<T0>
+.field Value T0
+.property instance Value() -> T0
+.get instance System.Result.Error<T0>::get_Value()
+.end
+.method instance .ctor(T0 value) -> Void
+ldarg value
+newobj System.Result.Error<T0>
+starg this
+ldvoid
+ret
+.end
+.method instance get_Value() -> T0
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+ldfld System.Result.Error<T0>::Value
+M00000004_IL_0008:
+ret
+.end
 .end
 .end

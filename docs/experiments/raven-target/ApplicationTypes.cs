@@ -217,13 +217,23 @@ static class ApplicationTypes
     {
         var output = new StringBuilder();
         var emitted = new HashSet<string>();
+        var nestedCases = new Dictionary<string, StringBuilder>();
         while (Types.Any(t => !emitted.Contains(t.Key)))
         {
             var (name, type) = Types.First(t => !emitted.Contains(t.Key)); emitted.Add(name);
             if (MarkerLibrary.IsMatched(type)) { output.Append(MarkerLibrary.Declaration(type)); continue; }
             if (FlagsLibrary.IsMatched(type)) { output.Append(EnumBindings.Declaration(type)); continue; }
             if (DelegateLibrary.IsMatched(type)) { output.Append(DelegateLibrary.Declaration(type, name, map)); continue; }
-            output.AppendLine(type.IsInterface ? $".interface {name}" : $".type {(LibraryDependencies.Contains(type) ? "internal " : "")}{(type.IsValueType || OpaqueLibrary.IsString(type) || IsLibrary(type) && GenericUnionLibrary.IsContainer(type) ? "" : "class ")}{(type.IsAbstract && !GenericUnionLibrary.IsContainer(type) ? "abstract " : "")}{name}");
+            // Union cases retain lexical ownership, not merely a dotted display name.
+            if (IsLibrary(type) && GenericUnionLibrary.IsContainer(type))
+            {
+                nestedCases.TryAdd(name, new StringBuilder());
+                continue;
+            }
+            var nestedCase = IsLibrary(type) && GenericUnionLibrary.IsCase(type);
+            var declarationStart = output.Length;
+            var declarationName = nestedCase ? name[(name.LastIndexOf('.') + 1)..] : name;
+            output.AppendLine(type.IsInterface ? $".interface {name}" : $".type {(LibraryDependencies.Contains(type) ? "internal " : "")}{(type.IsValueType || OpaqueLibrary.IsString(type) || IsLibrary(type) && GenericUnionLibrary.IsContainer(type) ? "" : "class ")}{(type.IsAbstract && !GenericUnionLibrary.IsContainer(type) ? "abstract " : "")}{declarationName}");
             if (IsModule(type.BaseType?.Resolve()?.Module)) output.AppendLine(".extends " + map(type.BaseType, false));
             if (ErrorCarrierLibrary.IsMatched(type) || GenericUnionLibrary.IsMatched(type) && GenericUnionLibrary.IsCarrier(type)) output.AppendLine(".custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()");
             foreach (var contract in type.Interfaces) output.AppendLine(".implements " + map(contract.InterfaceType, false));
@@ -243,8 +253,18 @@ static class ApplicationTypes
             foreach (var body in bodies.Where(p => p.Key.DeclaringType == type && !ArrayLibrary.IsIterator(p.Key))) output.Append(body.Value);
             if (Adapters.TryGetValue(name, out var adapters)) foreach (var body in adapters.Values) output.Append(body);
             output.AppendLine(".end");
+            if (nestedCase)
+            {
+                var containerName = type.DeclaringType.FullName;
+                if (!nestedCases.TryGetValue(containerName, out var cases))
+                    nestedCases[containerName] = cases = new StringBuilder();
+                cases.Append(output.ToString(declarationStart, output.Length - declarationStart));
+                output.Length = declarationStart;
+            }
             if (ArrayLibrary.IsMatched(type)) output.Append(ArrayLibrary.IteratorAdapter(bodies.Single(p => p.Key.DeclaringType == type && ArrayLibrary.IsIterator(p.Key)).Value));
         }
+        foreach (var (container, cases) in nestedCases)
+            output.AppendLine($".type {container}").Append(cases).AppendLine(".end");
         return output.ToString();
     }
 }

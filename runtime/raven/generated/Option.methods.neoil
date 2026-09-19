@@ -1,6 +1,4 @@
 ; Generated from runtime/raven/src/System/Option.rvn. Regenerate with build_runtime_library.py.
-.type System.Option
-.end
 .type System.Option<T0>
 .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
 .implements System.Propagatable<System.Option<T0>,T0,Void>
@@ -250,5 +248,42 @@ M0000000e_IL_0006:
 newobj instance System.Option<T0>::.ctor(System.Option.None)
 M0000000e_IL_000b:
 ret
+.end
+.end
+.type System.Option
+.type None
+.method instance .ctor() -> Void
+M00000001_IL_0000:
+M00000001_IL_0001:
+ldarg 0
+M00000001_IL_0002:
+pop
+M00000001_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type Some<T0>
+.field Value T0
+.property instance Value() -> T0
+.get instance System.Option.Some<T0>::get_Value()
+.end
+.method instance .ctor(T0 value) -> Void
+ldarg value
+newobj System.Option.Some<T0>
+starg this
+ldvoid
+ret
+.end
+.method instance get_Value() -> T0
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+ldfld System.Option.Some<T0>::Value
+M00000003_IL_0008:
+ret
+.end
 .end
 .end
