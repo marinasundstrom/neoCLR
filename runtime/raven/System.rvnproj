@@ -197,4 +197,7 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Descriptors'">
     <Compile Include="src/System/Introspection/Descriptors.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'NativeMemory'">
+    <Compile Include="src/System/Runtime/InteropServices/NativeMemory/Functions.rvn" />
+  </ItemGroup>
 </Project>

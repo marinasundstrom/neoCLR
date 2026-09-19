@@ -1,0 +1,16 @@
+namespace System.Runtime.InteropServices.NativeMemory
+
+import System.Runtime.CompilerServices.NativeAllocation
+
+public unsafe func Alloc(byteCount: nuint) -> *System.Void {
+    return NativeAllocation.Allocate(byteCount)
+}
+
+public unsafe func Alloc(elementCount: nuint, elementSize: nuint) -> *System.Void {
+    val byteCount = NativeAllocation.MultiplyChecked(elementCount, elementSize)
+    return Alloc(byteCount)
+}
+
+public unsafe func Free(pointer: *System.Void) {
+    NativeAllocation.Release(pointer)
+}

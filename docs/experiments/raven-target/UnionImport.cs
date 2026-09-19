@@ -677,7 +677,7 @@ static class UnionImport
                                     throw new InvalidDataException("Unassigned conditional output must return false immediately.");
                                 code.AppendLine("pop"); break;
                             }
-                            var runtimeService = libraryOwner is null ? null : ParameterSnapshotBindings.Bind(reference, targetMethod, t => ProfileType(t)) ?? RuntimeServiceBindings.Bind(reference, targetMethod) ?? ValueStorageBindings.Bind(reference, targetMethod, t => ProfileType(t));
+                            var runtimeService = libraryOwner is null ? null : NativeAllocationBindings.Bind(reference, targetMethod, t => ProfileType(t)) ?? ParameterSnapshotBindings.Bind(reference, targetMethod, t => ProfileType(t)) ?? RuntimeServiceBindings.Bind(reference, targetMethod) ?? ValueStorageBindings.Bind(reference, targetMethod, t => ProfileType(t));
                             var checkedStorage = libraryOwner is null ? null : CheckedStorageBindings.Bind(reference, targetMethod, t => ProfileType(t));
                             var interfaceCall = collectionProfile ? InterfaceBindings.Bind(reference, targetMethod) : null;
                             var nativeCall = collectionProfile ? NativeMemoryBindings.Bind(reference, targetMethod) : null;

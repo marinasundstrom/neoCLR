@@ -2,6 +2,7 @@
   "format": "raven-library-bootstrap-v1",
   "owner": "System.Int16",
   "inputs": {
+    "runtime/raven/src/System/Runtime/InteropServices/NativeMemory/Functions.rvn": "f4a39091ede3430f56e09823d37773c9759f0ec56e2ca54325c9ea813d3238d7",
     "runtime/raven/src/System/Introspection/Descriptors.rvn": "3db5bd3909587c4c6f81e935f603f27d9d011eb5877275b1d08c83084d08014f",
     "runtime/raven/src/System/Option.rvn": "7e6fbff6cd19d88804c5e1bc45983940c440095b5569dda3192c5ff18cbb9a3a",
     "runtime/raven/src/System/Result.rvn": "2351c6e9bb28ae647442584e91304bbbc9dd4f6eb363f934eac3e3e442ef2c06",
@@ -68,7 +69,7 @@
     "runtime/raven/src/System/Single.rvn": "488efaf36e56f147c7158a5b0637f3bc4e56e84bb3f514af6c64a023dcd8598e",
     "runtime/raven/src/System/Double.rvn": "cd3ad24e4a21b7616a2937da71891618284913e26ea180ce203276f18b631f33",
     "runtime/raven/src/System/Boolean.rvn": "1f0010fe0d346fbc7f3ba29c88b2c1cf80faebf42a4c2de2f0cd6cff15335022",
-    "runtime/raven/System.rvnproj": "0603c718eda760d75b0a6c28594d647fda1d91f95ba082880a5b0b9e1f7f3cf1",
+    "runtime/raven/System.rvnproj": "1d1845eb2692b19ed61fdd98b209b1ff975be24c958b336e7168587901980e68",
     "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
   },
   "outputs": {
@@ -76,7 +77,7 @@
     "Int16.helpers.neoil": "089d4a074f2251e1d129a2bab680be002e18f5ddbfa9cb37201c4b8f62cfbeea"
   },
   "compilerSha256": "0739cf3dad749430060acbcc1bd45af80ff2c54dc7d91403981d36d8b7c2c41f",
-  "coreSha256": "f1cefde4a59fdf491b9b6a14f718f9758e288c15e9d844f26178b36f72d12ffc",
+  "coreSha256": "cb1abf7cf4b4d4ac0a2292fa64e7f41e206b49c518081666de923770c795be81",
   "exports": [
     "readonly byref CompareTo(Int16 other) -> Int32"
   ]

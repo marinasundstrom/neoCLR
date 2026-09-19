@@ -10,6 +10,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    'NativeMemory': 'System.Runtime.InteropServices.NativeMemory',
     'Descriptors': 'System.Introspection.MemberInfo',
     'Option': 'System.Option',
     'Result': 'System.Result',
@@ -81,6 +82,7 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    'NativeMemory': 'runtime/raven/src/System/Runtime/InteropServices/NativeMemory/Functions.rvn',
     'Descriptors': 'runtime/raven/src/System/Introspection/Descriptors.rvn',
     'Option': 'runtime/raven/src/System/Option.rvn',
     'Result': 'runtime/raven/src/System/Result.rvn',

@@ -1,6 +1,6 @@
 {
   "format": "raven-library-bootstrap-v1",
-  "owner": "System.InvalidTimeError",
+  "owner": "System.Runtime.InteropServices.NativeMemory",
   "inputs": {
     "runtime/raven/src/System/Runtime/InteropServices/NativeMemory/Functions.rvn": "f4a39091ede3430f56e09823d37773c9759f0ec56e2ca54325c9ea813d3238d7",
     "runtime/raven/src/System/Introspection/Descriptors.rvn": "3db5bd3909587c4c6f81e935f603f27d9d011eb5877275b1d08c83084d08014f",
@@ -73,13 +73,14 @@
     "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
   },
   "outputs": {
-    "InvalidTimeError.methods.neoil": "041034d6bf13b8225e268b09ad46643146bbab9414630603822d299bc7ac4915",
-    "InvalidTimeError.helpers.neoil": "adc96d90de858a5e471186c758de5de89a8aef44bb7e9b8d82b134f14322a559"
+    "NativeMemory.methods.neoil": "08e7a6ee34d5bcbf96fc4081e2def50d09aa3e7f0cbe03f735ce81b1df297ab2",
+    "NativeMemory.helpers.neoil": "f119c6eebbb06eddf0be6ee3c74d17622ff5b8fe69255f0b5fd6c47ef176fe23"
   },
   "compilerSha256": "0739cf3dad749430060acbcc1bd45af80ff2c54dc7d91403981d36d8b7c2c41f",
   "coreSha256": "cb1abf7cf4b4d4ac0a2292fa64e7f41e206b49c518081666de923770c795be81",
   "exports": [
-    ".ctor() -> Void",
-    "ToString() -> String"
+    "Alloc(UIntPtr byteCount) -> Void*",
+    "Alloc(UIntPtr elementCount,UIntPtr elementSize) -> Void*",
+    "Free(Void* pointer) -> noresult"
   ]
 }

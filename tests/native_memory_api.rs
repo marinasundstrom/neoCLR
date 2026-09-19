@@ -2,8 +2,9 @@ use neoclr::{Limits, Value, assemble, run_with_library};
 
 fn run(body: &str) -> Result<neoclr::Execution, neoclr::Fault> {
     let library = assemble(&format!(
-        ".module System\n{}",
-        include_str!("../runtime/raven/NativeMemory.neoil")
+        ".module System\n.type System.Runtime.InteropServices.NativeMemory\n{}\n.end\n{}",
+        include_str!("../runtime/raven/generated/NativeMemory.methods.neoil"),
+        include_str!("../runtime/raven/generated/NativeMemory.helpers.neoil")
     ))
     .unwrap();
     let source = format!(

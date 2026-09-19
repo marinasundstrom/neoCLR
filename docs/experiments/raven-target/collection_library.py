@@ -61,7 +61,7 @@ def build(path: Path) -> str:
     if path == ROOT / 'runtime/System/Collections/List.neoil':
         return build(ROOT / 'runtime/raven/CollectionContracts.neoil') + build(ROOT / 'runtime/raven/List.neoil')
     if path.stem == 'Array':
-        return (ROOT / 'runtime/raven/Array.neoil').read_text() + (ROOT / 'runtime/raven/NativeMemory.neoil').read_text()
+        return (ROOT / 'runtime/raven/Array.neoil').read_text() + build(ROOT / 'runtime/raven/NativeMemory.neoil')
     if path.stem == 'Func':
         # The Raven profile declares instance ForEach on the managed Array<T> shape.
         text = text[:text.index('; Managed-array callback consumer')]

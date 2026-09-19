@@ -64,6 +64,14 @@ All 64 saved-project cases also pass; the final field-name preservation adjustme
 was rechecked by the seven Raven reflection tests and fresh reflection sample above.
 Snapshot hashes and source/API audits pass. The legacy Neo profile remains separate.
 
+## Native allocation follow-up
+
+The 67th source slice owns NativeMemory overload composition. Five admission cases
+check the complete export surface, parameter names/types and extra exports. All 28
+native integer/allocation/pointer tests pass, including overflow, zero allocations,
+null release, bounds and lifetime faults. The saved Raven allocation sample compiles,
+imports, verifies and runs against the regenerated library. Snapshot hashes match.
+
 ## Reproduce the program gate
 
 Use the neoCLR feature compiler, built from the Raven repository's

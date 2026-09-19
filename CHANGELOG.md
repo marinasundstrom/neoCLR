@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Port NativeMemory overload composition to Raven (67 source slices), with checked
+  bootstrap-only allocation/release/native multiplication operations. Preserve the
+  consumer API, overflow, bounds and lifetime behavior. Five admission cases, 28
+  native/pointer tests and the saved Raven allocation program pass.
+
 - Port MemberInfo, FieldInfo, MethodInfo and PropertyInfo to a checked Raven source
   slice (66 total). Preserve inherited snapshot layout and runtime field names;
   Raven now owns parameter-array copies and accessor visibility filtering. The

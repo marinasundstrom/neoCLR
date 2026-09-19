@@ -41,13 +41,15 @@ static class LibraryImplementation
             throw new InvalidDataException("Library fragment requires a public nongeneric namespace container without fields.");
         var methods = type.Methods.ToArray();
         if (methods.Length == 0) throw new InvalidDataException("Empty library implementation.");
+        if (owner == NativeMemoryBindings.Owner && methods.Length != contract.Methods.Count(m => m.IsPublic && m.IsStatic))
+            throw new InvalidDataException("NativeMemory requires its complete overload surface.");
         foreach (var method in methods)
         {
             CheckMethod(method);
             if (!method.IsPublic || !method.IsStatic || method.IsConstructor || !method.HasBody
                 || !Regex.IsMatch(method.Name, @"^[A-Za-z_][A-Za-z0-9_]*$")
                 || method.Parameters.Any(p => p.IsOut || p.ParameterType.IsByReference)
-                || method.ReturnType.MetadataType == MetadataType.Void && owner != "System.Console")
+                || method.ReturnType.MetadataType == MetadataType.Void && owner is not ("System.Console" or "System.Runtime.InteropServices.NativeMemory"))
                 throw new InvalidDataException("Unsupported library export: " + method.FullName);
             var matches = contract.Methods.Where(m => m.IsPublic && m.IsStatic && m.Name == method.Name && m.Parameters.Count == method.Parameters.Count && m.GenericParameters.Count == method.GenericParameters.Count
                 && SameType(m.ReturnType, method.ReturnType)
