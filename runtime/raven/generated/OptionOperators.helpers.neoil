@@ -1,0 +1,96 @@
+; Generated from runtime/raven/src/System/OptionOperators.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.OptionOperators.RuntimeUnion0<T0>(System.Option<T0>& arg0,out(true) System.Option.Some<T0>& arg1) -> Boolean
+ldarg arg0
+ldobj System.Option<T0>
+ldarg arg1
+call instance System.Option<T0>::TryGet(System.Option.Some<T0>&)
+ret
+.end
+.function neoCLR.Library.System.OptionOperators.RuntimeUnion1<T0>(System.Option.Some<T0>& receiver,out T0& value) -> void
+ldarg value
+ldarg receiver
+ldobj System.Option.Some<T0>
+call instance System.Option.Some<T0>::get_Value()
+stobj T0
+ret
+.end
+.function neoCLR.Library.System.OptionOperators.RuntimeUnion2<T0>(System.Option<T0>& arg0,out(true) System.Option.None& arg1) -> Boolean
+ldarg arg0
+ldobj System.Option<T0>
+ldarg arg1
+call instance System.Option<T0>::TryGet(System.Option.None&)
+ret
+.end
+.function neoCLR.Library.System.OptionOperators.RuntimeUnion3() -> System.Option.None
+newobj instance System.Option.None::.ctor()
+ret
+.end
+.function neoCLR.Library.System.OptionOperators.RuntimeUnion4<T1>(System.Option.None arg0) -> System.Option<T1>
+ldarg arg0
+newobj instance System.Option<T1>::.ctor(System.Option.None)
+ret
+.end
+.function neoCLR.Library.System.OptionOperators.RuntimeUnion5<T1>(T1 arg0) -> System.Option.Some<T1>
+ldarg arg0
+newobj instance System.Option.Some<T1>::.ctor(T1)
+ret
+.end
+.function neoCLR.Library.System.OptionOperators.RuntimeUnion6<T1>(System.Option.Some<T1> arg0) -> System.Option<T1>
+ldarg arg0
+newobj instance System.Option<T1>::.ctor(System.Option.Some<T1>)
+ret
+.end
+.function neoCLR.Library.System.OptionOperators.RuntimeUnion7<T0>(System.Option.None arg0) -> System.Option<T0>
+ldarg arg0
+newobj instance System.Option<T0>::.ctor(System.Option.None)
+ret
+.end
+.function neoCLR.Library.System.OptionOperators.RuntimeUnion8<T2>(T2 arg0) -> System.Result.Error<T2>
+ldarg arg0
+newobj instance System.Result.Error<T2>::.ctor(T2)
+ret
+.end
+.function neoCLR.Library.System.OptionOperators.RuntimeUnion9<T1,T2>(System.Result.Error<T2> arg0) -> System.Result<T1,T2>
+ldarg arg0
+newobj instance System.Result<T1,T2>::.ctor(System.Result.Error<T2>)
+ret
+.end
+.function neoCLR.Library.System.OptionOperators.RuntimeUnion10<T1>(T1 arg0) -> System.Result.Ok<T1>
+ldarg arg0
+newobj instance System.Result.Ok<T1>::.ctor(T1)
+ret
+.end
+.function neoCLR.Library.System.OptionOperators.RuntimeUnion11<T1,T2>(System.Result.Ok<T1> arg0) -> System.Result<T1,T2>
+ldarg arg0
+newobj instance System.Result<T1,T2>::.ctor(System.Result.Ok<T1>)
+ret
+.end
+.function neoCLR.Library.System.OptionOperators.RuntimeUnion12<T1>(T1 arg0) -> System.Result.Error<T1>
+ldarg arg0
+newobj instance System.Result.Error<T1>::.ctor(T1)
+ret
+.end
+.function neoCLR.Library.System.OptionOperators.RuntimeUnion13<T0,T1>(System.Result.Error<T1> arg0) -> System.Result<T0,T1>
+ldarg arg0
+newobj instance System.Result<T0,T1>::.ctor(System.Result.Error<T1>)
+ret
+.end
+.function neoCLR.Library.System.OptionOperators.RuntimeUnion14<T0>(T0 arg0) -> System.Result.Ok<T0>
+ldarg arg0
+newobj instance System.Result.Ok<T0>::.ctor(T0)
+ret
+.end
+.function neoCLR.Library.System.OptionOperators.RuntimeUnion15<T0,T1>(System.Result.Ok<T0> arg0) -> System.Result<T0,T1>
+ldarg arg0
+newobj instance System.Result<T0,T1>::.ctor(System.Result.Ok<T0>)
+ret
+.end
+.function neoCLR.Library.System.OptionOperators.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end

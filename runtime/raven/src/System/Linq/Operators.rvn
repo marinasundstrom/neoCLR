@@ -4,24 +4,24 @@ import System.Collections.*
 import System.Option.*
 import System.Result.*
 
-public static class Operators {
-    static func Filter<T>(source: Iterable<T>, predicate: System.Func<T, bool>) -> Iterable<T> {
-        return WhereSequence<T>(source, predicate)
+public extension Operators<T> for Iterable<T> {
+    func Filter(predicate: System.Func<T, bool>) -> Iterable<T> {
+        return WhereSequence<T>(self, predicate)
     }
 
-    static func Map<T, U>(source: Iterable<T>, selector: System.Func<T, U>) -> Iterable<U> {
-        return SelectSequence<T, U>(source, selector)
+    func Map<U>(selector: System.Func<T, U>) -> Iterable<U> {
+        return SelectSequence<T, U>(self, selector)
     }
 
-    static func Any<T>(source: Iterable<T>) -> bool {
-        let iterator = source.GetIterator()
+    func Any() -> bool {
+        let iterator = self.GetIterator()
         let result = iterator.MoveNext()
         iterator.Dispose()
         return result
     }
 
-    static func Any<T>(source: Iterable<T>, predicate: System.Func<T, bool>) -> bool {
-        let iterator = source.GetIterator()
+    func Any(predicate: System.Func<T, bool>) -> bool {
+        let iterator = self.GetIterator()
         while iterator.MoveNext() {
             if predicate(iterator.Current) {
                 iterator.Dispose()
@@ -32,8 +32,8 @@ public static class Operators {
         return false
     }
 
-    static func All<T>(source: Iterable<T>, predicate: System.Func<T, bool>) -> bool {
-        let iterator = source.GetIterator()
+    func All(predicate: System.Func<T, bool>) -> bool {
+        let iterator = self.GetIterator()
         while iterator.MoveNext() {
             if !predicate(iterator.Current) {
                 iterator.Dispose()
@@ -44,8 +44,8 @@ public static class Operators {
         return true
     }
 
-    static func Count<T>(source: Iterable<T>) -> int {
-        let iterator = source.GetIterator()
+    func Count() -> int {
+        let iterator = self.GetIterator()
         var count = 0
         while iterator.MoveNext() {
             if count == 2147483647 {
@@ -58,8 +58,8 @@ public static class Operators {
         return count
     }
 
-    static func Count<T>(source: Iterable<T>, predicate: System.Func<T, bool>) -> int {
-        let iterator = source.GetIterator()
+    func Count(predicate: System.Func<T, bool>) -> int {
+        let iterator = self.GetIterator()
         var count = 0
         while iterator.MoveNext() {
             if predicate(iterator.Current) {
@@ -74,8 +74,8 @@ public static class Operators {
         return count
     }
 
-    static func Fold<T, U>(source: Iterable<T>, seed: U, accumulator: System.Func<U, T, U>) -> U {
-        let iterator = source.GetIterator()
+    func Fold<U>(seed: U, accumulator: System.Func<U, T, U>) -> U {
+        let iterator = self.GetIterator()
         var result = seed
         while iterator.MoveNext() {
             result = accumulator(result, iterator.Current)
@@ -84,32 +84,32 @@ public static class Operators {
         return result
     }
 
-    static func Take<T>(source: Iterable<T>, count: int) -> Iterable<T> {
-        return TakeSequence<T>(source, count)
+    func Take(count: int) -> Iterable<T> {
+        return TakeSequence<T>(self, count)
     }
 
-    static func Skip<T>(source: Iterable<T>, count: int) -> Iterable<T> {
-        return SkipSequence<T>(source, count)
+    func Skip(count: int) -> Iterable<T> {
+        return SkipSequence<T>(self, count)
     }
 
-    static func Concat<T>(source: Iterable<T>, second: Iterable<T>) -> Iterable<T> {
-        return ConcatSequence<T>(source, second)
+    func Concat(second: Iterable<T>) -> Iterable<T> {
+        return ConcatSequence<T>(self, second)
     }
 
-    static func FlatMap<T, U>(source: Iterable<T>, selector: System.Func<T, Iterable<U>>) -> Iterable<U> {
-        return FlatMapSequence<T, U>(source, selector)
+    func FlatMap<U>(selector: System.Func<T, Iterable<U>>) -> Iterable<U> {
+        return FlatMapSequence<T, U>(self, selector)
     }
 
-    static func ToList<T>(source: Iterable<T>) -> ArrayList<T> {
+    func ToList() -> ArrayList<T> {
         let result = ArrayList<T>()
-        for item in source {
+        for item in self {
             result.Add(item)
         }
         return result
     }
 
-    static func First<T>(source: Iterable<T>) -> System.Option<T> {
-        let iterator = source.GetIterator()
+    func First() -> System.Option<T> {
+        let iterator = self.GetIterator()
         if iterator.MoveNext() {
             let value = iterator.Current
             iterator.Dispose()
@@ -119,8 +119,8 @@ public static class Operators {
         return None
     }
 
-    static func Last<T>(source: Iterable<T>) -> System.Option<T> {
-        let iterator = source.GetIterator()
+    func Last() -> System.Option<T> {
+        let iterator = self.GetIterator()
         if !iterator.MoveNext() {
             iterator.Dispose()
             return None
@@ -133,8 +133,8 @@ public static class Operators {
         return Some(value)
     }
 
-    static func Single<T>(source: Iterable<T>) -> System.Result<T, SingleError> {
-        let iterator = source.GetIterator()
+    func Single() -> System.Result<T, SingleError> {
+        let iterator = self.GetIterator()
         if !iterator.MoveNext() {
             iterator.Dispose()
             return Error(SingleError(SingleError.Empty()))
@@ -148,8 +148,8 @@ public static class Operators {
         return Ok(value)
     }
 
-    static func First<T>(source: Iterable<T>, predicate: System.Func<T, bool>) -> System.Option<T> {
-        let iterator = source.GetIterator()
+    func First(predicate: System.Func<T, bool>) -> System.Option<T> {
+        let iterator = self.GetIterator()
         while iterator.MoveNext() {
             let value = iterator.Current
             if predicate(value) {
@@ -161,8 +161,8 @@ public static class Operators {
         return None
     }
 
-    static func Last<T>(source: Iterable<T>, predicate: System.Func<T, bool>) -> System.Option<T> {
-        let iterator = source.GetIterator()
+    func Last(predicate: System.Func<T, bool>) -> System.Option<T> {
+        let iterator = self.GetIterator()
         while iterator.MoveNext() {
             var value = iterator.Current
             if predicate(value) {
@@ -180,8 +180,8 @@ public static class Operators {
         return None
     }
 
-    static func Single<T>(source: Iterable<T>, predicate: System.Func<T, bool>) -> System.Result<T, SingleError> {
-        let iterator = source.GetIterator()
+    func Single(predicate: System.Func<T, bool>) -> System.Result<T, SingleError> {
+        let iterator = self.GetIterator()
         while iterator.MoveNext() {
             let value = iterator.Current
             if predicate(value) {

@@ -59,3 +59,14 @@ alongside existing application cases. `verify_editor.py --extensions` adds membe
 completion for an integer extension; use the other profile flags matching the
 project's declaration image. The latest source language server needs no further
 compiler changes for this completion check.
+
+## Raven-authored library extensions after Preview 8
+
+Iterable, Option and Result operators now use public Raven extension containers
+with self receivers, rather than ordinary static source classes. The bootstrap
+checks the core-scoped ExtensionAttribute on both the emitted implementation and
+its reference declaration. Runtime calls remain ordinary static generic calls;
+no compiler or Runtime Contract configuration change is needed. This library
+catalog does not relax the generic application-body restriction above. The
+development query names are Filter and Map; Preview 8 retains Where and Select.
+See [outcome operators](raven-outcome-operators.md) for the bounded port.

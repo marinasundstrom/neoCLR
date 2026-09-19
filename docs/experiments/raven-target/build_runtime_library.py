@@ -73,6 +73,9 @@ SLICES = {
     'Value': "System.Value",
     'Math': 'System.Math',
     'Linq': 'System.Linq.Operators',
+    'OptionOperators': 'System.OptionOperators',
+    'OptionNestedOperators': 'System.OptionNestedOperators',
+    'ResultOperators': 'System.ResultOperators',
     'Int32': 'System.Int32',
     'Char': 'System.Char',
     'ArrayList': 'System.Collections.ArrayList',
@@ -158,6 +161,9 @@ SOURCES = {
     'Int32': 'runtime/raven/src/System/Int32.rvn',
     'Char': 'runtime/raven/src/System/Char.rvn',
     'Linq': 'runtime/raven/src/System/Linq/Operators.rvn',
+    'OptionOperators': 'runtime/raven/src/System/OptionOperators.rvn',
+    'OptionNestedOperators': 'runtime/raven/src/System/OptionOperators.rvn',
+    'ResultOperators': 'runtime/raven/src/System/ResultOperators.rvn',
     'ArrayList': 'runtime/raven/src/System/Collections/ArrayList.rvn',
     'HashMap': 'runtime/raven/src/System/Collections/HashMap.rvn',
     'Time': 'runtime/raven/src/System/Time.rvn',
@@ -288,7 +294,7 @@ def main():
         generated = {}
         for name, owner in SLICES.items():
             compiled = root / 'compiled'
-            if name not in ('Math', 'Linq', 'Path', 'File'):
+            if name not in ('Math', 'Linq', 'OptionOperators', 'OptionNestedOperators', 'ResultOperators', 'Path', 'File'):
                 compiled = root / ('compiled-' + name)
                 subprocess.run(['dotnet', str(args.compiler.resolve()), str(PROJECT), '--no-project-restore',
                                 '-o', str(compiled)], env={**os.environ, 'NeoCLRBootstrapRoot': str(root),

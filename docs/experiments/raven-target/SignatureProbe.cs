@@ -319,6 +319,44 @@ static class SignatureProbe
             call.Parameters[0].ParameterType = module.TypeSystem.Int32;
             Reject(label + " rejects forged receiver", () => QueryBindings.Bind(call, operation, false));
         }
+        using (var extensionImage = AssemblyDefinition.ReadAssembly(corePath)) {
+            var original = enumerable.Methods.First(m => m.Name == "Filter");
+            var implementation = extensionImage.MainModule.GetType("System.Linq.Operators").Methods.First(m => m.Name == "Filter");
+            LibraryImplementation.CheckExtensionContract(implementation, original);
+            Check("Library extension metadata agrees", true);
+            implementation.CustomAttributes.Clear();
+            Reject("Unmarked static implementation cannot satisfy an extension contract", () =>
+                LibraryImplementation.CheckExtensionContract(implementation, original));
+        }
+        foreach (var ownerName in new[] { "OptionOperators", "OptionNestedOperators", "ResultOperators" }) {
+            var operatorType = module.GetType("System." + ownerName);
+            var index = 0;
+            foreach (var operation in operatorType.Methods) {
+                var operatorReference = Reference(operation, operatorType);
+                operatorReference.CallingConvention = MethodCallingConvention.Generic;
+                var call = new GenericInstanceMethod(operatorReference);
+                var operatorTypeArguments = new[] { module.TypeSystem.Int32, module.TypeSystem.String, module.TypeSystem.Boolean };
+                for (var i = 0; i < operation.GenericParameters.Count; i++) call.GenericArguments.Add(operatorTypeArguments[i]);
+                var expected = (ownerName, operation.Name) switch {
+                    ("OptionOperators", "Map" or "Then") => "System.Option<String>",
+                    ("OptionOperators", "Match") => "String",
+                    ("OptionOperators", "ThenResult" or "MapResult") => "System.Result<String,Boolean>",
+                    ("OptionOperators", "OkOr") => "System.Result<Int32,String>",
+                    (_, "UnwrapOr" or "UnwrapOrElse") => "Int32",
+                    (_, "ToIterable") => "System.Collections.Iterable<Int32>",
+                    ("ResultOperators", "Map" or "Then") => "System.Result<Boolean,String>",
+                    ("ResultOperators", "MapError") => "System.Result<Int32,Boolean>",
+                    ("ResultOperators", "Match") => "Boolean",
+                    ("ResultOperators", _) => "System.Result<Int32,String>",
+                    _ => "System.Option<Int32>"
+                };
+                var label = ownerName + "." + operation.Name + " overload " + index++;
+                Check(label + " binds closed outcome", OutcomeOperatorBindings.Bind(call, operation, false)?.Result == expected);
+                Reject(label + " rejects virtual call", () => OutcomeOperatorBindings.Bind(call, operation, true));
+                call.Parameters[0].ParameterType = module.TypeSystem.Int32;
+                Reject(label + " rejects wrong receiver", () => OutcomeOperatorBindings.Bind(call, operation, false));
+            }
+        }
         MapBindings.Validate(module);
         var mapDefinition = module.GetType("System.Collections.Map`2");
         var closedMap = new GenericInstanceType(mapDefinition);

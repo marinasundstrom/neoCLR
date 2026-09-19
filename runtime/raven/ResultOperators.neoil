@@ -1,0 +1,6 @@
+; Raven-authored Result composition operators.
+.type System.ResultOperators
+    .include "generated/ResultOperators.methods.neoil"
+.end
+
+.include "generated/ResultOperators.helpers.neoil"

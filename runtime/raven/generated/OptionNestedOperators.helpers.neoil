@@ -1,0 +1,32 @@
+; Generated from runtime/raven/src/System/OptionOperators.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.OptionNestedOperators.RuntimeUnion0<T0>(System.Option<System.Option<T0>>& arg0,out(true) System.Option.Some<System.Option<T0>>& arg1) -> Boolean
+ldarg arg0
+ldobj System.Option<System.Option<T0>>
+ldarg arg1
+call instance System.Option<System.Option<T0>>::TryGet(System.Option.Some<System.Option<T0>>&)
+ret
+.end
+.function neoCLR.Library.System.OptionNestedOperators.RuntimeUnion1<T0>(System.Option.Some<System.Option<T0>>& receiver,out System.Option<T0>& value) -> void
+ldarg value
+ldarg receiver
+ldobj System.Option.Some<System.Option<T0>>
+call instance System.Option.Some<System.Option<T0>>::get_Value()
+stobj System.Option<T0>
+ret
+.end
+.function neoCLR.Library.System.OptionNestedOperators.RuntimeUnion2<T0>(System.Option<System.Option<T0>>& arg0,out(true) System.Option.None& arg1) -> Boolean
+ldarg arg0
+ldobj System.Option<System.Option<T0>>
+ldarg arg1
+call instance System.Option<System.Option<T0>>::TryGet(System.Option.None&)
+ret
+.end
+.function neoCLR.Library.System.OptionNestedOperators.RuntimeUnion3() -> System.Option.None
+newobj instance System.Option.None::.ctor()
+ret
+.end
+.function neoCLR.Library.System.OptionNestedOperators.RuntimeUnion4<T0>(System.Option.None arg0) -> System.Option<T0>
+ldarg arg0
+newobj instance System.Option<T0>::.ctor(System.Option.None)
+ret
+.end

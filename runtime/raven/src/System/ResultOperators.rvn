@@ -1,0 +1,77 @@
+namespace System
+
+import System.Option.*
+import System.Result.*
+
+public extension ResultOperators<T, E> for Result<T, E> {
+    func Map<U>(mapper: Func<T, U>) -> Result<U, E> {
+        return self match {
+            Ok(let value) => Ok(mapper(value))
+            Error(let error) => Error(error)
+        }
+    }
+
+    func Then<U>(binder: Func<T, Result<U, E>>) -> Result<U, E> {
+        return self match {
+            Ok(let value) => binder(value)
+            Error(let error) => Error(error)
+        }
+    }
+
+    func MapError<F>(mapper: Func<E, F>) -> Result<T, F> {
+        return self match {
+            Ok(let value) => Ok(value)
+            Error(let error) => Error(mapper(error))
+        }
+    }
+
+    func Match<U>(ok: Func<T, U>, error: Func<E, U>) -> U {
+        return self match {
+            Ok(let value) => ok(value)
+            Error(let errorValue) => error(errorValue)
+        }
+    }
+
+    func Tap(action: Func<T, System.Void>) -> Result<T, E> {
+        if self is Ok(let value) {
+            action(value)
+        }
+        return self
+    }
+
+    func TapError(action: Func<E, System.Void>) -> Result<T, E> {
+        if self is Error(let error) {
+            action(error)
+        }
+        return self
+    }
+
+    func OrElse(recover: Func<E, Result<T, E>>) -> Result<T, E> {
+        return self match {
+            Ok(_) => self
+            Error(let error) => recover(error)
+        }
+    }
+
+    func UnwrapOrElse(factory: Func<T>) -> T {
+        return self match {
+            Ok(let value) => value
+            Error(_) => factory()
+        }
+    }
+
+    func UnwrapOr(defaultValue: T) -> T {
+        return self match {
+            Ok(let value) => value
+            Error(_) => defaultValue
+        }
+    }
+
+    func ToIterable() -> Collections.Iterable<T> {
+        let values = Collections.ArrayList<T>()
+        if self is Ok(let value) {
+            values.Add(value)
+        }
+        return values
+    }
+}

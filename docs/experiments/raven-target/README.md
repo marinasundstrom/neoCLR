@@ -655,3 +655,14 @@ exact static signatures and supplies managed-array adapters for the two native
 services. String.IsEmpty is now a property. Runtime Contract configuration remains
 unit/() → System.Void; no Raven compiler changes are required. Rebuild reference
 metadata and generated runtime together. See [contracts, comparison and limitations](../../raven-string-api.md#strict-utf-8-conversion-2026-09-19).
+
+### Development Option and Result operators
+
+After Preview 8, regenerate the collection-profile reference core and System library
+together to use the [outcome operator port](../../../raven-outcome-operators.md).
+`verify_outcome_operators.py PROJECT.rvnproj --bridge Probe.dll --system System.neoil
+--runtime neoclr` validates the executable examples, branch selection, callback
+faults and invalid calls. `verify_editor.py --unions` now also checks outcome
+operator completion; include the other flags matching the reference profile.
+The runtime sources use Raven extension declarations, validated against the
+bootstrap extension metadata. Published Preview 8 bundles remain unchanged.

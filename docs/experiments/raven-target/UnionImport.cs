@@ -705,7 +705,8 @@ static class UnionImport
                             var interfaceCall = collectionProfile ? InterfaceBindings.Bind(reference, targetMethod) : null;
                             var nativeCall = collectionProfile ? NativeMemoryBindings.Bind(reference, targetMethod) : null;
                             var reflectionCall = collectionProfile ? ReflectionBindings.Bind(reference, targetMethod) : null;
-                            var queryCall = collectionProfile ? QueryBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt) : null;
+                            var queryCall = collectionProfile ? QueryBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt)
+                                ?? OutcomeOperatorBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt) : null;
                             var arrayCallback = collectionProfile ? ArrayCallbackBindings.Bind(reference, targetMethod, libraryOwner is null ? null : t => ProfileType(t)) : null;
                             var delegateCall = DelegateBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt);
                             if (runtimeService is not null) call = new(runtimeService.Name, runtimeService.Arguments, runtimeService.Result, Instruction: runtimeService.Instruction);

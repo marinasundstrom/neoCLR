@@ -4505,3 +4505,34 @@ updates, before Task work. The author also requested a .NET-to-neoCLR LINQ mappi
 table and an operator list or demonstrations for Option/Result. The assistant added
 the query mapping table and queued the outcome-operator port as the next separate
 slice; this note does not claim that port is complete.
+
+### Outcome operators, extension declarations and imported cases — 2026-09-19
+
+The author questioned why work continued in the Preview 8 worktree after release
+and directed development onto main. The assistant transferred the pending outcome
+changes to the original neoCLR checkout, preserving existing user edits; the old
+release worktree was left clean. Raven's neoCLR branch remains separate.
+
+The author then asked whether extension lookup was accepting ordinary classes
+without ExtensionAttribute or a this receiver, and requested Raven extension syntax.
+The assistant found that bootstrap C# declarations supplied this while the runtime
+implementations were static Raven classes. Iterable and outcome implementations
+now use public extension containers and self. The bridge validates the emitted
+extension markers rather than relying solely on the reference declaration.
+
+The author explained that importing System.Option.* and System.Result.* allows
+plain Some, None, Ok and Error patterns, then requested that this be recorded in
+the conventions. The assistant updated the guide in commit d5b7409 and used those
+patterns in the new operators and executable samples. The library slices and
+branch/callback checks compile and execute with these patterns.
+
+The [outcome contract](raven-outcome-operators.md) records the bounded Raven.Core
+port, deliberate adaptations and deferred APIs. This is development after Preview 8;
+Task/async contracts follow this operator work.
+
+The author then questioned whether the explicit OrElse lambda signature was needed
+or merely demonstration. The assistant compiled the shorter form successfully,
+simplified both OrElse callbacks, and documented the convention to prefer inference.
+The Then callback still needs explicit types in the tested SDK; the assistant
+recorded that limitation and related compiler candidates rather than presenting
+those annotations as a language or API design requirement.

@@ -46,3 +46,9 @@ previously constructed from it retains its copy. This preserves the existing run
 API rather than silently making payloads immutable during metadata projection.
 The [case-payload sample](experiments/raven-target/samples/library-case-payloads.rvn)
 covers Ok, Error and Some updates and carrier-copy independence.
+
+## Composing outcomes after Preview 8
+
+The development library adds [Option and Result operators](raven-outcome-operators.md),
+including Map, Then, recovery, branch actions and explicit iterable conversion.
+The guide lists the full bounded port and Raven.Core compatibility differences.

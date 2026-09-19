@@ -161,3 +161,38 @@ capitals. Follow [the naming principle](api-policy.md#query-operator-naming-dire
 rather than copying every .NET name or mechanically copying another language.
 Preview 8 uses `Where` and `Select`; its published samples remain unchanged.
 C# tooling still targets .NET and keeps its actual .NET method names.
+
+## Extension declarations
+
+Use Raven's extension syntax for APIs intended to be called as extensions:
+
+```raven
+public extension OptionOperators<T> for Option<T> {
+    func Map<U>(mapper: Func<T, U>) -> Option<U> {
+        return self match {
+            Some(let value) => Some(mapper(value))
+            None => None
+        }
+    }
+}
+```
+
+Import System.Option.* for these case patterns. The receiver is self; the compiler
+emits the extension marker and ordinary static call contract. Do not rely on a
+bootstrap declaration alone to turn an ordinary runtime static class into an
+extension API. See [supported extension boundaries](raven-extension-methods.md).
+
+## Lambda signatures
+
+Prefer inferred callback types when the receiving method supplies enough context:
+
+```raven
+let fallback = absent.OrElse(() => Some(7))
+```
+
+Do not annotate every lambda for demonstration. Keep explicit types when they
+clarify a non-obvious contract or are required by current inference, and explain
+compiler workarounds. For example, the development outcome sample currently needs
+`Then((value: int) -> Result<int, string> => Ok(value + 1))`; the shorter
+union-returning callback fails inference in Raven SDK .15. Both OrElse callbacks
+in that sample compile without annotations.

@@ -1,0 +1,1333 @@
+; Generated from runtime/raven/src/System/OptionOperators.rvn. Regenerate with build_runtime_library.py.
+.method static Map<T0,T1>(System.Option<T0> self,System.Func<T0,T1> mapper) -> System.Option<T1>
+.local System.Option<T0> local0
+.local System.Option<T1> local1
+.local T0 local2
+.local System.Option<T0> local3
+.local System.Option.Some<T0> local4
+.local System.Option.Some<T0> local5
+.local T0 local6
+.local System.Option<T0> local7
+.local System.Option.None local8
+ldloca local8
+initobj System.Option.None
+M00000001_IL_0000:
+M00000001_IL_0001:
+M00000001_IL_0002:
+M00000001_IL_0003:
+ldarg 0
+M00000001_IL_0004:
+stloc local0
+M00000001_IL_0005:
+ldloca local1
+M00000001_IL_0007:
+pop
+M00000001_IL_000d:
+ldloc local0
+M00000001_IL_000e:
+stloc local3
+M00000001_IL_000f:
+ldloca local3
+M00000001_IL_0011:
+ldloca local4
+M00000001_IL_0013:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion0<T0>(System.Option<T0>&,System.Option.Some<T0>&)
+M00000001_IL_0018:
+brfalse M00000001_IL_005d
+M00000001_IL_001d:
+ldloc local4
+M00000001_IL_001f:
+stloc local5
+M00000001_IL_0021:
+ldloca local5
+M00000001_IL_0023:
+ldloca local6
+M00000001_IL_0025:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion1<T0>(System.Option.Some<T0>&,T0&)
+M00000001_IL_002a:
+ldloc local6
+M00000001_IL_002c:
+stloc local2
+M00000001_IL_002d:
+ldc.i4 1
+M00000001_IL_002e:
+br M00000001_IL_0034
+M00000001_IL_0034:
+brfalse M00000001_IL_005d
+M00000001_IL_0039:
+M00000001_IL_003a:
+br M00000001_IL_0045
+M00000001_IL_0045:
+M00000001_IL_0046:
+ldarg 1
+M00000001_IL_0047:
+ldloc local2
+M00000001_IL_0048:
+callvirt instance System.Func<T0,T1>::Invoke(T0)
+M00000001_IL_004d:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion5<T1>(T1)
+M00000001_IL_0052:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion6<T1>(System.Option.Some<T1>)
+M00000001_IL_0057:
+stloc local1
+M00000001_IL_0058:
+br M00000001_IL_0094
+M00000001_IL_005d:
+M00000001_IL_005e:
+M00000001_IL_005f:
+ldloc local0
+M00000001_IL_0060:
+stloc local7
+M00000001_IL_0062:
+ldloca local7
+M00000001_IL_0064:
+ldloca local8
+M00000001_IL_0066:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion2<T0>(System.Option<T0>&,System.Option.None&)
+M00000001_IL_006b:
+brfalse M00000001_IL_008f
+M00000001_IL_0070:
+ldloc local8
+M00000001_IL_0072:
+pop
+M00000001_IL_0073:
+M00000001_IL_0074:
+br M00000001_IL_007f
+M00000001_IL_007f:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion3()
+M00000001_IL_0084:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion4<T1>(System.Option.None)
+M00000001_IL_0089:
+stloc local1
+M00000001_IL_008a:
+br M00000001_IL_0094
+M00000001_IL_008f:
+M00000001_IL_0090:
+M00000001_IL_0091:
+M00000001_IL_0092:
+M00000001_IL_0093:
+fault "Guest program reached a terminal failure"
+M00000001_IL_0094:
+M00000001_IL_0095:
+ldloc local1
+M00000001_IL_0096:
+ret
+.end
+.method static Then<T0,T1>(System.Option<T0> self,System.Func<T0,System.Option<T1>> binder) -> System.Option<T1>
+.local System.Option<T0> local0
+.local System.Option<T1> local1
+.local T0 local2
+.local System.Option<T0> local3
+.local System.Option.Some<T0> local4
+.local System.Option.Some<T0> local5
+.local T0 local6
+.local System.Option<T0> local7
+.local System.Option.None local8
+ldloca local8
+initobj System.Option.None
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+M00000002_IL_0003:
+ldarg 0
+M00000002_IL_0004:
+stloc local0
+M00000002_IL_0005:
+ldloca local1
+M00000002_IL_0007:
+pop
+M00000002_IL_000d:
+ldloc local0
+M00000002_IL_000e:
+stloc local3
+M00000002_IL_000f:
+ldloca local3
+M00000002_IL_0011:
+ldloca local4
+M00000002_IL_0013:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion0<T0>(System.Option<T0>&,System.Option.Some<T0>&)
+M00000002_IL_0018:
+brfalse M00000002_IL_0053
+M00000002_IL_001d:
+ldloc local4
+M00000002_IL_001f:
+stloc local5
+M00000002_IL_0021:
+ldloca local5
+M00000002_IL_0023:
+ldloca local6
+M00000002_IL_0025:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion1<T0>(System.Option.Some<T0>&,T0&)
+M00000002_IL_002a:
+ldloc local6
+M00000002_IL_002c:
+stloc local2
+M00000002_IL_002d:
+ldc.i4 1
+M00000002_IL_002e:
+br M00000002_IL_0034
+M00000002_IL_0034:
+brfalse M00000002_IL_0053
+M00000002_IL_0039:
+M00000002_IL_003a:
+br M00000002_IL_0045
+M00000002_IL_0045:
+M00000002_IL_0046:
+ldarg 1
+M00000002_IL_0047:
+ldloc local2
+M00000002_IL_0048:
+callvirt instance System.Func<T0,System.Option<T1>>::Invoke(T0)
+M00000002_IL_004d:
+stloc local1
+M00000002_IL_004e:
+br M00000002_IL_008a
+M00000002_IL_0053:
+M00000002_IL_0054:
+M00000002_IL_0055:
+ldloc local0
+M00000002_IL_0056:
+stloc local7
+M00000002_IL_0058:
+ldloca local7
+M00000002_IL_005a:
+ldloca local8
+M00000002_IL_005c:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion2<T0>(System.Option<T0>&,System.Option.None&)
+M00000002_IL_0061:
+brfalse M00000002_IL_0085
+M00000002_IL_0066:
+ldloc local8
+M00000002_IL_0068:
+pop
+M00000002_IL_0069:
+M00000002_IL_006a:
+br M00000002_IL_0075
+M00000002_IL_0075:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion3()
+M00000002_IL_007a:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion4<T1>(System.Option.None)
+M00000002_IL_007f:
+stloc local1
+M00000002_IL_0080:
+br M00000002_IL_008a
+M00000002_IL_0085:
+M00000002_IL_0086:
+M00000002_IL_0087:
+M00000002_IL_0088:
+M00000002_IL_0089:
+fault "Guest program reached a terminal failure"
+M00000002_IL_008a:
+M00000002_IL_008b:
+ldloc local1
+M00000002_IL_008c:
+ret
+.end
+.method static Filter<T0>(System.Option<T0> self,System.Func<T0,Boolean> predicate) -> System.Option<T0>
+.local T0 local0
+.local System.Option<T0> local1
+.local System.Option.Some<T0> local2
+.local System.Option.Some<T0> local3
+.local T0 local4
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+stloc local1
+M00000003_IL_0004:
+ldloca local1
+M00000003_IL_0006:
+ldloca local2
+M00000003_IL_0008:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion0<T0>(System.Option<T0>&,System.Option.Some<T0>&)
+M00000003_IL_000d:
+brfalse M00000003_IL_0038
+M00000003_IL_0012:
+ldloc local2
+M00000003_IL_0013:
+stloc local3
+M00000003_IL_0014:
+ldloca local3
+M00000003_IL_0016:
+ldloca local4
+M00000003_IL_0018:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion1<T0>(System.Option.Some<T0>&,T0&)
+M00000003_IL_001d:
+ldloc local4
+M00000003_IL_001f:
+stloc local0
+M00000003_IL_0020:
+ldc.i4 1
+M00000003_IL_0021:
+br M00000003_IL_0027
+M00000003_IL_0027:
+brfalse M00000003_IL_0038
+M00000003_IL_002c:
+M00000003_IL_002d:
+br M00000003_IL_003d
+M00000003_IL_0038:
+br M00000003_IL_0053
+M00000003_IL_003d:
+M00000003_IL_003e:
+ldarg 1
+M00000003_IL_003f:
+ldloc local0
+M00000003_IL_0040:
+callvirt instance System.Func<T0,Boolean>::Invoke(T0)
+call neoCLR.Library.System.OptionOperators.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_0045:
+brtrue M00000003_IL_004f
+M00000003_IL_004a:
+br M00000003_IL_0052
+M00000003_IL_004f:
+M00000003_IL_0050:
+ldarg 0
+M00000003_IL_0051:
+ret
+M00000003_IL_0052:
+M00000003_IL_0053:
+M00000003_IL_0054:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion3()
+M00000003_IL_0059:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion7<T0>(System.Option.None)
+M00000003_IL_005e:
+ret
+.end
+.method static OrElse<T0>(System.Option<T0> self,System.Func<System.Option<T0>> alternative) -> System.Option<T0>
+.local System.Option<T0> local0
+.local System.Option<T0> local1
+.local System.Option<T0> local2
+.local System.Option.Some<T0> local3
+.local System.Option.Some<T0> local4
+.local T0 local5
+.local System.Option<T0> local6
+.local System.Option.None local7
+ldloca local7
+initobj System.Option.None
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+M00000004_IL_0003:
+ldarg 0
+M00000004_IL_0004:
+stloc local0
+M00000004_IL_0005:
+ldloca local1
+M00000004_IL_0007:
+pop
+M00000004_IL_000d:
+ldloc local0
+M00000004_IL_000e:
+stloc local2
+M00000004_IL_000f:
+ldloca local2
+M00000004_IL_0011:
+ldloca local3
+M00000004_IL_0013:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion0<T0>(System.Option<T0>&,System.Option.Some<T0>&)
+M00000004_IL_0018:
+brfalse M00000004_IL_004c
+M00000004_IL_001d:
+ldloc local3
+M00000004_IL_001e:
+stloc local4
+M00000004_IL_0020:
+ldloca local4
+M00000004_IL_0022:
+ldloca local5
+M00000004_IL_0024:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion1<T0>(System.Option.Some<T0>&,T0&)
+M00000004_IL_0029:
+ldloc local5
+M00000004_IL_002b:
+pop
+M00000004_IL_002c:
+ldc.i4 1
+M00000004_IL_002d:
+br M00000004_IL_0033
+M00000004_IL_0033:
+brfalse M00000004_IL_004c
+M00000004_IL_0038:
+M00000004_IL_0039:
+br M00000004_IL_0044
+M00000004_IL_0044:
+M00000004_IL_0045:
+ldarg 0
+M00000004_IL_0046:
+stloc local1
+M00000004_IL_0047:
+br M00000004_IL_007f
+M00000004_IL_004c:
+M00000004_IL_004d:
+M00000004_IL_004e:
+ldloc local0
+M00000004_IL_004f:
+stloc local6
+M00000004_IL_0051:
+ldloca local6
+M00000004_IL_0053:
+ldloca local7
+M00000004_IL_0055:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion2<T0>(System.Option<T0>&,System.Option.None&)
+M00000004_IL_005a:
+brfalse M00000004_IL_007a
+M00000004_IL_005f:
+ldloc local7
+M00000004_IL_0061:
+pop
+M00000004_IL_0062:
+M00000004_IL_0063:
+br M00000004_IL_006e
+M00000004_IL_006e:
+ldarg 1
+M00000004_IL_006f:
+callvirt instance System.Func<System.Option<T0>>::Invoke()
+M00000004_IL_0074:
+stloc local1
+M00000004_IL_0075:
+br M00000004_IL_007f
+M00000004_IL_007a:
+M00000004_IL_007b:
+M00000004_IL_007c:
+M00000004_IL_007d:
+M00000004_IL_007e:
+fault "Guest program reached a terminal failure"
+M00000004_IL_007f:
+M00000004_IL_0080:
+ldloc local1
+M00000004_IL_0081:
+ret
+.end
+.method static UnwrapOrElse<T0>(System.Option<T0> self,System.Func<T0> factory) -> T0
+.local System.Option<T0> local0
+.local T0 local1
+.local T0 local2
+.local System.Option<T0> local3
+.local System.Option.Some<T0> local4
+.local System.Option.Some<T0> local5
+.local T0 local6
+.local System.Option<T0> local7
+.local System.Option.None local8
+ldloca local8
+initobj System.Option.None
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+M00000005_IL_0003:
+ldarg 0
+M00000005_IL_0004:
+stloc local0
+M00000005_IL_0005:
+ldloc local0
+M00000005_IL_0006:
+stloc local3
+M00000005_IL_0007:
+ldloca local3
+M00000005_IL_0009:
+ldloca local4
+M00000005_IL_000b:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion0<T0>(System.Option<T0>&,System.Option.Some<T0>&)
+M00000005_IL_0010:
+brfalse M00000005_IL_0045
+M00000005_IL_0015:
+ldloc local4
+M00000005_IL_0017:
+stloc local5
+M00000005_IL_0019:
+ldloca local5
+M00000005_IL_001b:
+ldloca local6
+M00000005_IL_001d:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion1<T0>(System.Option.Some<T0>&,T0&)
+M00000005_IL_0022:
+ldloc local6
+M00000005_IL_0024:
+stloc local2
+M00000005_IL_0025:
+ldc.i4 1
+M00000005_IL_0026:
+br M00000005_IL_002c
+M00000005_IL_002c:
+brfalse M00000005_IL_0045
+M00000005_IL_0031:
+M00000005_IL_0032:
+br M00000005_IL_003d
+M00000005_IL_003d:
+M00000005_IL_003e:
+ldloc local2
+M00000005_IL_003f:
+stloc local1
+M00000005_IL_0040:
+br M00000005_IL_0078
+M00000005_IL_0045:
+M00000005_IL_0046:
+M00000005_IL_0047:
+ldloc local0
+M00000005_IL_0048:
+stloc local7
+M00000005_IL_004a:
+ldloca local7
+M00000005_IL_004c:
+ldloca local8
+M00000005_IL_004e:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion2<T0>(System.Option<T0>&,System.Option.None&)
+M00000005_IL_0053:
+brfalse M00000005_IL_0073
+M00000005_IL_0058:
+ldloc local8
+M00000005_IL_005a:
+pop
+M00000005_IL_005b:
+M00000005_IL_005c:
+br M00000005_IL_0067
+M00000005_IL_0067:
+ldarg 1
+M00000005_IL_0068:
+callvirt instance System.Func<T0>::Invoke()
+M00000005_IL_006d:
+stloc local1
+M00000005_IL_006e:
+br M00000005_IL_0078
+M00000005_IL_0073:
+M00000005_IL_0074:
+M00000005_IL_0075:
+M00000005_IL_0076:
+M00000005_IL_0077:
+fault "Guest program reached a terminal failure"
+M00000005_IL_0078:
+M00000005_IL_0079:
+ldloc local1
+M00000005_IL_007a:
+ret
+.end
+.method static UnwrapOr<T0>(System.Option<T0> self,T0 defaultValue) -> T0
+.local System.Option<T0> local0
+.local T0 local1
+.local T0 local2
+.local System.Option<T0> local3
+.local System.Option.Some<T0> local4
+.local System.Option.Some<T0> local5
+.local T0 local6
+.local System.Option<T0> local7
+.local System.Option.None local8
+ldloca local8
+initobj System.Option.None
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+M00000006_IL_0003:
+ldarg 0
+M00000006_IL_0004:
+stloc local0
+M00000006_IL_0005:
+ldloc local0
+M00000006_IL_0006:
+stloc local3
+M00000006_IL_0007:
+ldloca local3
+M00000006_IL_0009:
+ldloca local4
+M00000006_IL_000b:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion0<T0>(System.Option<T0>&,System.Option.Some<T0>&)
+M00000006_IL_0010:
+brfalse M00000006_IL_0045
+M00000006_IL_0015:
+ldloc local4
+M00000006_IL_0017:
+stloc local5
+M00000006_IL_0019:
+ldloca local5
+M00000006_IL_001b:
+ldloca local6
+M00000006_IL_001d:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion1<T0>(System.Option.Some<T0>&,T0&)
+M00000006_IL_0022:
+ldloc local6
+M00000006_IL_0024:
+stloc local2
+M00000006_IL_0025:
+ldc.i4 1
+M00000006_IL_0026:
+br M00000006_IL_002c
+M00000006_IL_002c:
+brfalse M00000006_IL_0045
+M00000006_IL_0031:
+M00000006_IL_0032:
+br M00000006_IL_003d
+M00000006_IL_003d:
+M00000006_IL_003e:
+ldloc local2
+M00000006_IL_003f:
+stloc local1
+M00000006_IL_0040:
+br M00000006_IL_0073
+M00000006_IL_0045:
+M00000006_IL_0046:
+M00000006_IL_0047:
+ldloc local0
+M00000006_IL_0048:
+stloc local7
+M00000006_IL_004a:
+ldloca local7
+M00000006_IL_004c:
+ldloca local8
+M00000006_IL_004e:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion2<T0>(System.Option<T0>&,System.Option.None&)
+M00000006_IL_0053:
+brfalse M00000006_IL_006e
+M00000006_IL_0058:
+ldloc local8
+M00000006_IL_005a:
+pop
+M00000006_IL_005b:
+M00000006_IL_005c:
+br M00000006_IL_0067
+M00000006_IL_0067:
+ldarg 1
+M00000006_IL_0068:
+stloc local1
+M00000006_IL_0069:
+br M00000006_IL_0073
+M00000006_IL_006e:
+M00000006_IL_006f:
+M00000006_IL_0070:
+M00000006_IL_0071:
+M00000006_IL_0072:
+fault "Guest program reached a terminal failure"
+M00000006_IL_0073:
+M00000006_IL_0074:
+ldloc local1
+M00000006_IL_0075:
+ret
+.end
+.method static Match<T0,T1>(System.Option<T0> self,System.Func<T0,T1> some,System.Func<T1> none) -> T1
+.local System.Option<T0> local0
+.local T1 local1
+.local T0 local2
+.local System.Option<T0> local3
+.local System.Option.Some<T0> local4
+.local System.Option.Some<T0> local5
+.local T0 local6
+.local System.Option<T0> local7
+.local System.Option.None local8
+ldloca local8
+initobj System.Option.None
+M00000007_IL_0000:
+M00000007_IL_0001:
+M00000007_IL_0002:
+M00000007_IL_0003:
+ldarg 0
+M00000007_IL_0004:
+stloc local0
+M00000007_IL_0005:
+ldloc local0
+M00000007_IL_0006:
+stloc local3
+M00000007_IL_0007:
+ldloca local3
+M00000007_IL_0009:
+ldloca local4
+M00000007_IL_000b:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion0<T0>(System.Option<T0>&,System.Option.Some<T0>&)
+M00000007_IL_0010:
+brfalse M00000007_IL_004b
+M00000007_IL_0015:
+ldloc local4
+M00000007_IL_0017:
+stloc local5
+M00000007_IL_0019:
+ldloca local5
+M00000007_IL_001b:
+ldloca local6
+M00000007_IL_001d:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion1<T0>(System.Option.Some<T0>&,T0&)
+M00000007_IL_0022:
+ldloc local6
+M00000007_IL_0024:
+stloc local2
+M00000007_IL_0025:
+ldc.i4 1
+M00000007_IL_0026:
+br M00000007_IL_002c
+M00000007_IL_002c:
+brfalse M00000007_IL_004b
+M00000007_IL_0031:
+M00000007_IL_0032:
+br M00000007_IL_003d
+M00000007_IL_003d:
+M00000007_IL_003e:
+ldarg 1
+M00000007_IL_003f:
+ldloc local2
+M00000007_IL_0040:
+callvirt instance System.Func<T0,T1>::Invoke(T0)
+M00000007_IL_0045:
+stloc local1
+M00000007_IL_0046:
+br M00000007_IL_007e
+M00000007_IL_004b:
+M00000007_IL_004c:
+M00000007_IL_004d:
+ldloc local0
+M00000007_IL_004e:
+stloc local7
+M00000007_IL_0050:
+ldloca local7
+M00000007_IL_0052:
+ldloca local8
+M00000007_IL_0054:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion2<T0>(System.Option<T0>&,System.Option.None&)
+M00000007_IL_0059:
+brfalse M00000007_IL_0079
+M00000007_IL_005e:
+ldloc local8
+M00000007_IL_0060:
+pop
+M00000007_IL_0061:
+M00000007_IL_0062:
+br M00000007_IL_006d
+M00000007_IL_006d:
+ldarg 2
+M00000007_IL_006e:
+callvirt instance System.Func<T1>::Invoke()
+M00000007_IL_0073:
+stloc local1
+M00000007_IL_0074:
+br M00000007_IL_007e
+M00000007_IL_0079:
+M00000007_IL_007a:
+M00000007_IL_007b:
+M00000007_IL_007c:
+M00000007_IL_007d:
+fault "Guest program reached a terminal failure"
+M00000007_IL_007e:
+M00000007_IL_007f:
+ldloc local1
+M00000007_IL_0080:
+ret
+.end
+.method static Tap<T0>(System.Option<T0> self,System.Func<T0,Void> action) -> System.Option<T0>
+.local T0 local0
+.local System.Option<T0> local1
+.local System.Option.Some<T0> local2
+.local System.Option.Some<T0> local3
+.local T0 local4
+M00000008_IL_0000:
+M00000008_IL_0001:
+M00000008_IL_0002:
+ldarg 0
+M00000008_IL_0003:
+stloc local1
+M00000008_IL_0004:
+ldloca local1
+M00000008_IL_0006:
+ldloca local2
+M00000008_IL_0008:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion0<T0>(System.Option<T0>&,System.Option.Some<T0>&)
+M00000008_IL_000d:
+brfalse M00000008_IL_0038
+M00000008_IL_0012:
+ldloc local2
+M00000008_IL_0013:
+stloc local3
+M00000008_IL_0014:
+ldloca local3
+M00000008_IL_0016:
+ldloca local4
+M00000008_IL_0018:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion1<T0>(System.Option.Some<T0>&,T0&)
+M00000008_IL_001d:
+ldloc local4
+M00000008_IL_001f:
+stloc local0
+M00000008_IL_0020:
+ldc.i4 1
+M00000008_IL_0021:
+br M00000008_IL_0027
+M00000008_IL_0027:
+brfalse M00000008_IL_0038
+M00000008_IL_002c:
+M00000008_IL_002d:
+br M00000008_IL_003d
+M00000008_IL_0038:
+br M00000008_IL_0045
+M00000008_IL_003d:
+M00000008_IL_003e:
+ldarg 1
+M00000008_IL_003f:
+ldloc local0
+M00000008_IL_0040:
+callvirt instance System.Func<T0,Void>::Invoke(T0)
+pop
+M00000008_IL_0045:
+M00000008_IL_0046:
+M00000008_IL_0047:
+ldarg 0
+M00000008_IL_0048:
+ret
+.end
+.method static TapNone<T0>(System.Option<T0> self,System.Func<Void> action) -> System.Option<T0>
+.local System.Option<T0> local0
+.local System.Option.None local1
+ldloca local1
+initobj System.Option.None
+M00000009_IL_0000:
+M00000009_IL_0001:
+M00000009_IL_0002:
+ldarg 0
+M00000009_IL_0003:
+stloc local0
+M00000009_IL_0004:
+ldloca local0
+M00000009_IL_0006:
+ldloca local1
+M00000009_IL_0008:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion2<T0>(System.Option<T0>&,System.Option.None&)
+M00000009_IL_000d:
+brfalse M00000009_IL_0020
+M00000009_IL_0012:
+ldloc local1
+M00000009_IL_0013:
+pop
+M00000009_IL_0014:
+M00000009_IL_0015:
+br M00000009_IL_0025
+M00000009_IL_0020:
+br M00000009_IL_002b
+M00000009_IL_0025:
+ldarg 1
+M00000009_IL_0026:
+callvirt instance System.Func<Void>::Invoke()
+pop
+M00000009_IL_002b:
+M00000009_IL_002c:
+M00000009_IL_002d:
+ldarg 0
+M00000009_IL_002e:
+ret
+.end
+.method static ToIterable<T0>(System.Option<T0> self) -> System.Collections.Iterable<T0>
+.local System.Collections.ArrayList<T0> local0
+.local T0 local1
+.local System.Option<T0> local2
+.local System.Option.Some<T0> local3
+.local System.Option.Some<T0> local4
+.local T0 local5
+ldloca local0
+initobj System.Collections.ArrayList<T0>
+M0000000a_IL_0000:
+M0000000a_IL_0001:
+newobj instance System.Collections.ArrayList<T0>::.ctor()
+M0000000a_IL_0006:
+stloc local0
+M0000000a_IL_0007:
+M0000000a_IL_0008:
+ldarg 0
+M0000000a_IL_0009:
+stloc local2
+M0000000a_IL_000a:
+ldloca local2
+M0000000a_IL_000c:
+ldloca local3
+M0000000a_IL_000e:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion0<T0>(System.Option<T0>&,System.Option.Some<T0>&)
+M0000000a_IL_0013:
+brfalse M0000000a_IL_003f
+M0000000a_IL_0018:
+ldloc local3
+M0000000a_IL_0019:
+stloc local4
+M0000000a_IL_001b:
+ldloca local4
+M0000000a_IL_001d:
+ldloca local5
+M0000000a_IL_001f:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion1<T0>(System.Option.Some<T0>&,T0&)
+M0000000a_IL_0024:
+ldloc local5
+M0000000a_IL_0026:
+stloc local1
+M0000000a_IL_0027:
+ldc.i4 1
+M0000000a_IL_0028:
+br M0000000a_IL_002e
+M0000000a_IL_002e:
+brfalse M0000000a_IL_003f
+M0000000a_IL_0033:
+M0000000a_IL_0034:
+br M0000000a_IL_0044
+M0000000a_IL_003f:
+br M0000000a_IL_004c
+M0000000a_IL_0044:
+M0000000a_IL_0045:
+ldloc local0
+M0000000a_IL_0046:
+ldloc local1
+M0000000a_IL_0047:
+callvirt instance System.Collections.ArrayList<T0>::Add(T0)
+M0000000a_IL_004c:
+M0000000a_IL_004d:
+M0000000a_IL_004e:
+ldloc local0
+M0000000a_IL_004f:
+ret
+.end
+.method static ThenResult<T0,T1,T2>(System.Option<T0> self,System.Func<T0,System.Result<T1,T2>> binder,System.Func<T2> noneError) -> System.Result<T1,T2>
+.local System.Option<T0> local0
+.local System.Result<T1,T2> local1
+.local T0 local2
+.local System.Option<T0> local3
+.local System.Option.Some<T0> local4
+.local System.Option.Some<T0> local5
+.local T0 local6
+.local System.Option<T0> local7
+.local System.Option.None local8
+ldloca local8
+initobj System.Option.None
+M0000000b_IL_0000:
+M0000000b_IL_0001:
+M0000000b_IL_0002:
+M0000000b_IL_0003:
+ldarg 0
+M0000000b_IL_0004:
+stloc local0
+M0000000b_IL_0005:
+ldloca local1
+M0000000b_IL_0007:
+pop
+M0000000b_IL_000d:
+ldloc local0
+M0000000b_IL_000e:
+stloc local3
+M0000000b_IL_000f:
+ldloca local3
+M0000000b_IL_0011:
+ldloca local4
+M0000000b_IL_0013:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion0<T0>(System.Option<T0>&,System.Option.Some<T0>&)
+M0000000b_IL_0018:
+brfalse M0000000b_IL_0053
+M0000000b_IL_001d:
+ldloc local4
+M0000000b_IL_001f:
+stloc local5
+M0000000b_IL_0021:
+ldloca local5
+M0000000b_IL_0023:
+ldloca local6
+M0000000b_IL_0025:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion1<T0>(System.Option.Some<T0>&,T0&)
+M0000000b_IL_002a:
+ldloc local6
+M0000000b_IL_002c:
+stloc local2
+M0000000b_IL_002d:
+ldc.i4 1
+M0000000b_IL_002e:
+br M0000000b_IL_0034
+M0000000b_IL_0034:
+brfalse M0000000b_IL_0053
+M0000000b_IL_0039:
+M0000000b_IL_003a:
+br M0000000b_IL_0045
+M0000000b_IL_0045:
+M0000000b_IL_0046:
+ldarg 1
+M0000000b_IL_0047:
+ldloc local2
+M0000000b_IL_0048:
+callvirt instance System.Func<T0,System.Result<T1,T2>>::Invoke(T0)
+M0000000b_IL_004d:
+stloc local1
+M0000000b_IL_004e:
+br M0000000b_IL_0090
+M0000000b_IL_0053:
+M0000000b_IL_0054:
+M0000000b_IL_0055:
+ldloc local0
+M0000000b_IL_0056:
+stloc local7
+M0000000b_IL_0058:
+ldloca local7
+M0000000b_IL_005a:
+ldloca local8
+M0000000b_IL_005c:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion2<T0>(System.Option<T0>&,System.Option.None&)
+M0000000b_IL_0061:
+brfalse M0000000b_IL_008b
+M0000000b_IL_0066:
+ldloc local8
+M0000000b_IL_0068:
+pop
+M0000000b_IL_0069:
+M0000000b_IL_006a:
+br M0000000b_IL_0075
+M0000000b_IL_0075:
+ldarg 2
+M0000000b_IL_0076:
+callvirt instance System.Func<T2>::Invoke()
+M0000000b_IL_007b:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion8<T2>(T2)
+M0000000b_IL_0080:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion9<T1,T2>(System.Result.Error<T2>)
+M0000000b_IL_0085:
+stloc local1
+M0000000b_IL_0086:
+br M0000000b_IL_0090
+M0000000b_IL_008b:
+M0000000b_IL_008c:
+M0000000b_IL_008d:
+M0000000b_IL_008e:
+M0000000b_IL_008f:
+fault "Guest program reached a terminal failure"
+M0000000b_IL_0090:
+M0000000b_IL_0091:
+ldloc local1
+M0000000b_IL_0092:
+ret
+.end
+.method static MapResult<T0,T1,T2>(System.Option<T0> self,System.Func<T0,T1> mapper,System.Func<T2> noneError) -> System.Result<T1,T2>
+.local System.Option<T0> local0
+.local System.Result<T1,T2> local1
+.local T0 local2
+.local System.Option<T0> local3
+.local System.Option.Some<T0> local4
+.local System.Option.Some<T0> local5
+.local T0 local6
+.local System.Option<T0> local7
+.local System.Option.None local8
+ldloca local8
+initobj System.Option.None
+M0000000c_IL_0000:
+M0000000c_IL_0001:
+M0000000c_IL_0002:
+M0000000c_IL_0003:
+ldarg 0
+M0000000c_IL_0004:
+stloc local0
+M0000000c_IL_0005:
+ldloca local1
+M0000000c_IL_0007:
+pop
+M0000000c_IL_000d:
+ldloc local0
+M0000000c_IL_000e:
+stloc local3
+M0000000c_IL_000f:
+ldloca local3
+M0000000c_IL_0011:
+ldloca local4
+M0000000c_IL_0013:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion0<T0>(System.Option<T0>&,System.Option.Some<T0>&)
+M0000000c_IL_0018:
+brfalse M0000000c_IL_005d
+M0000000c_IL_001d:
+ldloc local4
+M0000000c_IL_001f:
+stloc local5
+M0000000c_IL_0021:
+ldloca local5
+M0000000c_IL_0023:
+ldloca local6
+M0000000c_IL_0025:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion1<T0>(System.Option.Some<T0>&,T0&)
+M0000000c_IL_002a:
+ldloc local6
+M0000000c_IL_002c:
+stloc local2
+M0000000c_IL_002d:
+ldc.i4 1
+M0000000c_IL_002e:
+br M0000000c_IL_0034
+M0000000c_IL_0034:
+brfalse M0000000c_IL_005d
+M0000000c_IL_0039:
+M0000000c_IL_003a:
+br M0000000c_IL_0045
+M0000000c_IL_0045:
+M0000000c_IL_0046:
+ldarg 1
+M0000000c_IL_0047:
+ldloc local2
+M0000000c_IL_0048:
+callvirt instance System.Func<T0,T1>::Invoke(T0)
+M0000000c_IL_004d:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion10<T1>(T1)
+M0000000c_IL_0052:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion11<T1,T2>(System.Result.Ok<T1>)
+M0000000c_IL_0057:
+stloc local1
+M0000000c_IL_0058:
+br M0000000c_IL_009a
+M0000000c_IL_005d:
+M0000000c_IL_005e:
+M0000000c_IL_005f:
+ldloc local0
+M0000000c_IL_0060:
+stloc local7
+M0000000c_IL_0062:
+ldloca local7
+M0000000c_IL_0064:
+ldloca local8
+M0000000c_IL_0066:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion2<T0>(System.Option<T0>&,System.Option.None&)
+M0000000c_IL_006b:
+brfalse M0000000c_IL_0095
+M0000000c_IL_0070:
+ldloc local8
+M0000000c_IL_0072:
+pop
+M0000000c_IL_0073:
+M0000000c_IL_0074:
+br M0000000c_IL_007f
+M0000000c_IL_007f:
+ldarg 2
+M0000000c_IL_0080:
+callvirt instance System.Func<T2>::Invoke()
+M0000000c_IL_0085:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion8<T2>(T2)
+M0000000c_IL_008a:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion9<T1,T2>(System.Result.Error<T2>)
+M0000000c_IL_008f:
+stloc local1
+M0000000c_IL_0090:
+br M0000000c_IL_009a
+M0000000c_IL_0095:
+M0000000c_IL_0096:
+M0000000c_IL_0097:
+M0000000c_IL_0098:
+M0000000c_IL_0099:
+fault "Guest program reached a terminal failure"
+M0000000c_IL_009a:
+M0000000c_IL_009b:
+ldloc local1
+M0000000c_IL_009c:
+ret
+.end
+.method static OkOr<T0,T1>(System.Option<T0> self,T1 error) -> System.Result<T0,T1>
+.local System.Option<T0> local0
+.local System.Result<T0,T1> local1
+.local T0 local2
+.local System.Option<T0> local3
+.local System.Option.Some<T0> local4
+.local System.Option.Some<T0> local5
+.local T0 local6
+.local System.Option<T0> local7
+.local System.Option.None local8
+ldloca local8
+initobj System.Option.None
+M0000000d_IL_0000:
+M0000000d_IL_0001:
+M0000000d_IL_0002:
+M0000000d_IL_0003:
+ldarg 0
+M0000000d_IL_0004:
+stloc local0
+M0000000d_IL_0005:
+ldloca local1
+M0000000d_IL_0007:
+pop
+M0000000d_IL_000d:
+ldloc local0
+M0000000d_IL_000e:
+stloc local3
+M0000000d_IL_000f:
+ldloca local3
+M0000000d_IL_0011:
+ldloca local4
+M0000000d_IL_0013:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion0<T0>(System.Option<T0>&,System.Option.Some<T0>&)
+M0000000d_IL_0018:
+brfalse M0000000d_IL_0057
+M0000000d_IL_001d:
+ldloc local4
+M0000000d_IL_001f:
+stloc local5
+M0000000d_IL_0021:
+ldloca local5
+M0000000d_IL_0023:
+ldloca local6
+M0000000d_IL_0025:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion1<T0>(System.Option.Some<T0>&,T0&)
+M0000000d_IL_002a:
+ldloc local6
+M0000000d_IL_002c:
+stloc local2
+M0000000d_IL_002d:
+ldc.i4 1
+M0000000d_IL_002e:
+br M0000000d_IL_0034
+M0000000d_IL_0034:
+brfalse M0000000d_IL_0057
+M0000000d_IL_0039:
+M0000000d_IL_003a:
+br M0000000d_IL_0045
+M0000000d_IL_0045:
+M0000000d_IL_0046:
+ldloc local2
+M0000000d_IL_0047:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion14<T0>(T0)
+M0000000d_IL_004c:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion15<T0,T1>(System.Result.Ok<T0>)
+M0000000d_IL_0051:
+stloc local1
+M0000000d_IL_0052:
+br M0000000d_IL_008f
+M0000000d_IL_0057:
+M0000000d_IL_0058:
+M0000000d_IL_0059:
+ldloc local0
+M0000000d_IL_005a:
+stloc local7
+M0000000d_IL_005c:
+ldloca local7
+M0000000d_IL_005e:
+ldloca local8
+M0000000d_IL_0060:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion2<T0>(System.Option<T0>&,System.Option.None&)
+M0000000d_IL_0065:
+brfalse M0000000d_IL_008a
+M0000000d_IL_006a:
+ldloc local8
+M0000000d_IL_006c:
+pop
+M0000000d_IL_006d:
+M0000000d_IL_006e:
+br M0000000d_IL_0079
+M0000000d_IL_0079:
+ldarg 1
+M0000000d_IL_007a:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion12<T1>(T1)
+M0000000d_IL_007f:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion13<T0,T1>(System.Result.Error<T1>)
+M0000000d_IL_0084:
+stloc local1
+M0000000d_IL_0085:
+br M0000000d_IL_008f
+M0000000d_IL_008a:
+M0000000d_IL_008b:
+M0000000d_IL_008c:
+M0000000d_IL_008d:
+M0000000d_IL_008e:
+fault "Guest program reached a terminal failure"
+M0000000d_IL_008f:
+M0000000d_IL_0090:
+ldloc local1
+M0000000d_IL_0091:
+ret
+.end
+.method static OkOr<T0,T1>(System.Option<T0> self,System.Func<T1> errorFactory) -> System.Result<T0,T1>
+.local System.Option<T0> local0
+.local System.Result<T0,T1> local1
+.local T0 local2
+.local System.Option<T0> local3
+.local System.Option.Some<T0> local4
+.local System.Option.Some<T0> local5
+.local T0 local6
+.local System.Option<T0> local7
+.local System.Option.None local8
+ldloca local8
+initobj System.Option.None
+M0000000e_IL_0000:
+M0000000e_IL_0001:
+M0000000e_IL_0002:
+M0000000e_IL_0003:
+ldarg 0
+M0000000e_IL_0004:
+stloc local0
+M0000000e_IL_0005:
+ldloca local1
+M0000000e_IL_0007:
+pop
+M0000000e_IL_000d:
+ldloc local0
+M0000000e_IL_000e:
+stloc local3
+M0000000e_IL_000f:
+ldloca local3
+M0000000e_IL_0011:
+ldloca local4
+M0000000e_IL_0013:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion0<T0>(System.Option<T0>&,System.Option.Some<T0>&)
+M0000000e_IL_0018:
+brfalse M0000000e_IL_0057
+M0000000e_IL_001d:
+ldloc local4
+M0000000e_IL_001f:
+stloc local5
+M0000000e_IL_0021:
+ldloca local5
+M0000000e_IL_0023:
+ldloca local6
+M0000000e_IL_0025:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion1<T0>(System.Option.Some<T0>&,T0&)
+M0000000e_IL_002a:
+ldloc local6
+M0000000e_IL_002c:
+stloc local2
+M0000000e_IL_002d:
+ldc.i4 1
+M0000000e_IL_002e:
+br M0000000e_IL_0034
+M0000000e_IL_0034:
+brfalse M0000000e_IL_0057
+M0000000e_IL_0039:
+M0000000e_IL_003a:
+br M0000000e_IL_0045
+M0000000e_IL_0045:
+M0000000e_IL_0046:
+ldloc local2
+M0000000e_IL_0047:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion14<T0>(T0)
+M0000000e_IL_004c:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion15<T0,T1>(System.Result.Ok<T0>)
+M0000000e_IL_0051:
+stloc local1
+M0000000e_IL_0052:
+br M0000000e_IL_0094
+M0000000e_IL_0057:
+M0000000e_IL_0058:
+M0000000e_IL_0059:
+ldloc local0
+M0000000e_IL_005a:
+stloc local7
+M0000000e_IL_005c:
+ldloca local7
+M0000000e_IL_005e:
+ldloca local8
+M0000000e_IL_0060:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion2<T0>(System.Option<T0>&,System.Option.None&)
+M0000000e_IL_0065:
+brfalse M0000000e_IL_008f
+M0000000e_IL_006a:
+ldloc local8
+M0000000e_IL_006c:
+pop
+M0000000e_IL_006d:
+M0000000e_IL_006e:
+br M0000000e_IL_0079
+M0000000e_IL_0079:
+ldarg 1
+M0000000e_IL_007a:
+callvirt instance System.Func<T1>::Invoke()
+M0000000e_IL_007f:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion12<T1>(T1)
+M0000000e_IL_0084:
+call neoCLR.Library.System.OptionOperators.RuntimeUnion13<T0,T1>(System.Result.Error<T1>)
+M0000000e_IL_0089:
+stloc local1
+M0000000e_IL_008a:
+br M0000000e_IL_0094
+M0000000e_IL_008f:
+M0000000e_IL_0090:
+M0000000e_IL_0091:
+M0000000e_IL_0092:
+M0000000e_IL_0093:
+fault "Guest program reached a terminal failure"
+M0000000e_IL_0094:
+M0000000e_IL_0095:
+ldloc local1
+M0000000e_IL_0096:
+ret
+.end

@@ -1,0 +1,117 @@
+namespace System
+
+import System.Option.*
+import System.Result.*
+
+public extension OptionOperators<T> for Option<T> {
+    func Map<U>(mapper: Func<T, U>) -> Option<U> {
+        return self match {
+            Some(let value) => Some(mapper(value))
+            None => None
+        }
+    }
+
+    func Then<U>(binder: Func<T, Option<U>>) -> Option<U> {
+        return self match {
+            Some(let value) => binder(value)
+            None => None
+        }
+    }
+
+    func Filter(predicate: Func<T, bool>) -> Option<T> {
+        if self is Some(let value) {
+            if predicate(value) {
+                return self
+            }
+        }
+        return None
+    }
+
+    func OrElse(alternative: Func<Option<T>>) -> Option<T> {
+        return self match {
+            Some(_) => self
+            None => alternative()
+        }
+    }
+
+    func UnwrapOrElse(factory: Func<T>) -> T {
+        return self match {
+            Some(let value) => value
+            None => factory()
+        }
+    }
+
+    func UnwrapOr(defaultValue: T) -> T {
+        return self match {
+            Some(let value) => value
+            None => defaultValue
+        }
+    }
+
+    func Match<U>(some: Func<T, U>, none: Func<U>) -> U {
+        return self match {
+            Some(let value) => some(value)
+            None => none()
+        }
+    }
+
+    func Tap(action: Func<T, System.Void>) -> Option<T> {
+        if self is Some(let value) {
+            action(value)
+        }
+        return self
+    }
+
+    func TapNone(action: Func<System.Void>) -> Option<T> {
+        if self is None {
+            action()
+        }
+        return self
+    }
+
+    func ToIterable() -> Collections.Iterable<T> {
+        let values = Collections.ArrayList<T>()
+        if self is Some(let value) {
+            values.Add(value)
+        }
+        return values
+    }
+
+    func ThenResult<U, E>(binder: Func<T, Result<U, E>>, noneError: Func<E>) -> Result<U, E> {
+        return self match {
+            Some(let value) => binder(value)
+            None => Error(noneError())
+        }
+    }
+
+    func MapResult<U, E>(mapper: Func<T, U>, noneError: Func<E>) -> Result<U, E> {
+        return self match {
+            Some(let value) => Ok(mapper(value))
+            None => Error(noneError())
+        }
+    }
+
+    func OkOr<E>(error: E) -> Result<T, E> {
+        return self match {
+            Some(let value) => Ok(value)
+            None => Error(error)
+        }
+    }
+
+    func OkOr<E>(errorFactory: Func<E>) -> Result<T, E> {
+        return self match {
+            Some(let value) => Ok(value)
+            None => Error(errorFactory())
+        }
+    }
+
+}
+
+public extension OptionNestedOperators<T> for Option<Option<T>> {
+    func Flatten() -> Option<T> {
+        return self match {
+            Some(let value) => value
+            None => None
+        }
+    }
+}

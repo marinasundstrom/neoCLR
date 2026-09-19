@@ -929,3 +929,24 @@ This is a reported general compiler-flow/emission candidate, not a fixed Raven b
 reproduce against an ordinary CLI/.NET target and inspect the emitted fallback
 before independently integrating any fix on Raven main. No compiler branch change
 was needed for the iterable slice.
+
+### Callback inference candidates exposed by outcome operators (2026-09-19)
+
+The author questioned the explicit signature in
+`absent.OrElse(() -> Option<int> => Some(7))`. The same .15 SDK compiles and runs
+`absent.OrElse(() => Some(7))`; both OrElse callbacks in the outcome sample now
+use inference. No annotation is needed for that contract.
+
+For `Result<int,string>.Then`, replacing the sample callback with
+`value => Ok(value + 1)` produces RAV1501/RAV0305. Keeping only the result
+annotation, `(value) -> Result<int,string> => Ok(value + 1)`, reports
+“Object reference not set to an instance of an object.” The fully typed callback
+compiles and runs. Separately, `value.Tap((item: int) -> unit => { WriteLine(item) })`
+on Option<int> produces RAV1501, while omitting the return annotation works. The
+project explicitly configures System.Void as the unit type. These are observed
+compiler/binding limitations, not desired API requirements.
+
+Reproduce these independently against ordinary CLI/.NET contracts before extracting
+a general Raven fix to main. The unit-return case may involve configured-unit
+policy and needs isolation. No compiler fix or .NET reproduction is claimed here;
+neoCLR samples retain only the annotations needed for working examples.

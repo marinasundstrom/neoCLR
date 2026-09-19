@@ -62,7 +62,9 @@
     "runtime/raven/src/System/Math/Functions.rvn": "7c6b80a8c549c2b1c91735bb7a325ab75472d112e81ae913d77b916ea5e22de0",
     "runtime/raven/src/System/Int32.rvn": "37187e831a9ac3bead1a72cf4c72f7922b9dce1cefd281c3785c322dd4ca7ea2",
     "runtime/raven/src/System/Char.rvn": "884057609749af9561c464e02ffcf512cfce39d5f77cd1afb9a6310c7b9098f8",
-    "runtime/raven/src/System/Linq/Operators.rvn": "39fe021c448284d79f91d507b1686d9f9bd90a78d89736e64a7273fb335a6802",
+    "runtime/raven/src/System/Linq/Operators.rvn": "20c697bd4a4aeb8fe0943c5d723206a2f2ad1375f1f064a1fb6f64748a47bd5c",
+    "runtime/raven/src/System/OptionOperators.rvn": "5cba418c282c5c22028e9b1f2772551bc77a1ce270a066c9139938e95d88fb5e",
+    "runtime/raven/src/System/ResultOperators.rvn": "591eaf533a3dd37e8e94b5d9d831ee96188887b344ad6e6670e9b8302d3f4652",
     "runtime/raven/src/System/Collections/ArrayList.rvn": "6bc4ea11b0f4d22235f5b938e5cfb4086075d4989a700a29384361e9447e4d1a",
     "runtime/raven/src/System/Collections/HashMap.rvn": "b41f6da8155ee5d9d4df62d55e18f2cc47fea1bbc9c46d9cff7fa729d955d31e",
     "runtime/raven/src/System/Time.rvn": "32057665602a216c60d011e9a6f1c9dbb3161ac0ad2b7cf041df6552baf1352c",
@@ -79,7 +81,7 @@
     "runtime/raven/src/System/Single.rvn": "488efaf36e56f147c7158a5b0637f3bc4e56e84bb3f514af6c64a023dcd8598e",
     "runtime/raven/src/System/Double.rvn": "cd3ad24e4a21b7616a2937da71891618284913e26ea180ce203276f18b631f33",
     "runtime/raven/src/System/Boolean.rvn": "1f0010fe0d346fbc7f3ba29c88b2c1cf80faebf42a4c2de2f0cd6cff15335022",
-    "runtime/raven/System.Runtime.rvnproj": "39ae012509deafac4babb1edfabcb5622b813b00c4095bff10b8ea4a15b5283d",
+    "runtime/raven/System.Runtime.rvnproj": "18138e49298e846c4629901dc651def71b6a786a6e247a4edc04b82926c99dfe",
     "build/NeoCLR.Raven.props": "fad7004f86aa6b22aedb208495920f44d1b16f07baa1caa126ef757af1112257"
   },
   "outputs": {
@@ -87,6 +89,6 @@
     "Value.helpers.neoil": "03a694f75d3bccc98848e6b0332bf93c2b398e95dd89ed1dc8ca260da55f2315"
   },
   "compilerSha256": "fd81ea896146b15d8fa66d2ba7c74b806a1dad1919012a77f7fe53242bbed105",
-  "coreSha256": "a3c9e0a198cca1cd1d107dbdcc7e0995703ea18af5a3b09eb76c006e74b05d1c",
+  "coreSha256": "6a8e384ecdea1c0d36bb7cb9c14c50b16ba63c38307e15e97fa0f554816d3b47",
   "exports": []
 }

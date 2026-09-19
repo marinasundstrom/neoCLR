@@ -263,3 +263,10 @@ Run `verify_compiler_target.py` with the rebuilt rvnc, packaged bridge/System/ru
 and a generated project, in addition to existing saved-project checks. It separately
 compiles and imports PE artifacts and tests rejection without host fallback. Packaging
 now carries the verifier; this checkpoint does not publish or install a new bundle.
+
+For development builds containing the Option/Result operators, also run
+`tools/verify_outcome_operators.py` against the bundled saved project, importer,
+System library and runtime. Require the operator completion checks in
+`verify_editor.py --unions`. Package the query verifier's `query_basic_cases.py`
+helper together with the verifier. These requirements apply to future bundles;
+published Preview 8 artifacts are unchanged.

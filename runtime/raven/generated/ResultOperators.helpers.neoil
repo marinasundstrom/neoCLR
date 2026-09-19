@@ -1,0 +1,71 @@
+; Generated from runtime/raven/src/System/ResultOperators.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.ResultOperators.RuntimeUnion0<T0,T1>(System.Result<T0,T1>& arg0,out(true) System.Result.Ok<T0>& arg1) -> Boolean
+ldarg arg0
+ldobj System.Result<T0,T1>
+ldarg arg1
+call instance System.Result<T0,T1>::TryGet(System.Result.Ok<T0>&)
+ret
+.end
+.function neoCLR.Library.System.ResultOperators.RuntimeUnion1<T0>(System.Result.Ok<T0>& receiver,out T0& value) -> void
+ldarg value
+ldarg receiver
+ldobj System.Result.Ok<T0>
+call instance System.Result.Ok<T0>::get_Value()
+stobj T0
+ret
+.end
+.function neoCLR.Library.System.ResultOperators.RuntimeUnion2<T0,T1>(System.Result<T0,T1>& arg0,out(true) System.Result.Error<T1>& arg1) -> Boolean
+ldarg arg0
+ldobj System.Result<T0,T1>
+ldarg arg1
+call instance System.Result<T0,T1>::TryGet(System.Result.Error<T1>&)
+ret
+.end
+.function neoCLR.Library.System.ResultOperators.RuntimeUnion3<T1>(System.Result.Error<T1>& receiver,out T1& value) -> void
+ldarg value
+ldarg receiver
+ldobj System.Result.Error<T1>
+call instance System.Result.Error<T1>::get_Value()
+stobj T1
+ret
+.end
+.function neoCLR.Library.System.ResultOperators.RuntimeUnion4<T2>(T2 arg0) -> System.Result.Ok<T2>
+ldarg arg0
+newobj instance System.Result.Ok<T2>::.ctor(T2)
+ret
+.end
+.function neoCLR.Library.System.ResultOperators.RuntimeUnion5<T1,T2>(System.Result.Ok<T2> arg0) -> System.Result<T2,T1>
+ldarg arg0
+newobj instance System.Result<T2,T1>::.ctor(System.Result.Ok<T2>)
+ret
+.end
+.function neoCLR.Library.System.ResultOperators.RuntimeUnion6<T1>(T1 arg0) -> System.Result.Error<T1>
+ldarg arg0
+newobj instance System.Result.Error<T1>::.ctor(T1)
+ret
+.end
+.function neoCLR.Library.System.ResultOperators.RuntimeUnion7<T1,T2>(System.Result.Error<T1> arg0) -> System.Result<T2,T1>
+ldarg arg0
+newobj instance System.Result<T2,T1>::.ctor(System.Result.Error<T1>)
+ret
+.end
+.function neoCLR.Library.System.ResultOperators.RuntimeUnion8<T0>(T0 arg0) -> System.Result.Ok<T0>
+ldarg arg0
+newobj instance System.Result.Ok<T0>::.ctor(T0)
+ret
+.end
+.function neoCLR.Library.System.ResultOperators.RuntimeUnion9<T0,T2>(System.Result.Ok<T0> arg0) -> System.Result<T0,T2>
+ldarg arg0
+newobj instance System.Result<T0,T2>::.ctor(System.Result.Ok<T0>)
+ret
+.end
+.function neoCLR.Library.System.ResultOperators.RuntimeUnion10<T2>(T2 arg0) -> System.Result.Error<T2>
+ldarg arg0
+newobj instance System.Result.Error<T2>::.ctor(T2)
+ret
+.end
+.function neoCLR.Library.System.ResultOperators.RuntimeUnion11<T0,T2>(System.Result.Error<T2> arg0) -> System.Result<T0,T2>
+ldarg arg0
+newobj instance System.Result<T0,T2>::.ctor(System.Result.Error<T2>)
+ret
+.end

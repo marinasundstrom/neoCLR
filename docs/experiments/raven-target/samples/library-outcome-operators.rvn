@@ -1,0 +1,40 @@
+import System.*
+import System.Collections.*
+import System.Linq.*
+import System.Option.*
+import System.Result.*
+import System.Console.*
+
+func Main() {
+    let input: Option<int> = Some(21)
+    let answer = input.Map(value => value * 2)
+        .Filter(value => value > 0)
+
+    match answer {
+        Some(let value) => WriteLine(value)
+        None => WriteLine("No answer")
+    }
+
+    let result = answer.OkOr("Missing input")
+        .Then((value: int) -> Result<int, string> => Ok(value + 1))
+    match result {
+        Ok(let value) => WriteLine(value)
+        Error(let error) => WriteLine(error)
+    }
+
+    let absent: Option<int> = None
+    let fallback = absent.OrElse(() => Some(7))
+    WriteLine(fallback.UnwrapOr(0))
+
+    let failure: Result<int, string> = Result<int, string>.Error("Unavailable")
+    let recovered = failure.MapError(message => String.Concat("Read: ", message))
+        .OrElse(message => {
+            WriteLine(message)
+            return Ok(9)
+        })
+    WriteLine(recovered.UnwrapOr(0))
+
+    for value in answer.ToIterable() {
+        WriteLine(value)
+    }
+}

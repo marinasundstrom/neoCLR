@@ -1,0 +1,107 @@
+; Generated from runtime/raven/src/System/OptionOperators.rvn. Regenerate with build_runtime_library.py.
+.method static Flatten<T0>(System.Option<System.Option<T0>> self) -> System.Option<T0>
+.local System.Option<System.Option<T0>> local0
+.local System.Option<T0> local1
+.local System.Option<T0> local2
+.local System.Option<System.Option<T0>> local3
+.local System.Option.Some<System.Option<T0>> local4
+.local System.Option.Some<System.Option<T0>> local5
+.local System.Option<T0> local6
+.local System.Option<System.Option<T0>> local7
+.local System.Option.None local8
+ldloca local8
+initobj System.Option.None
+M00000001_IL_0000:
+M00000001_IL_0001:
+M00000001_IL_0002:
+M00000001_IL_0003:
+ldarg 0
+M00000001_IL_0004:
+stloc local0
+M00000001_IL_0005:
+ldloca local1
+M00000001_IL_0007:
+pop
+M00000001_IL_000d:
+ldloc local0
+M00000001_IL_000e:
+stloc local3
+M00000001_IL_000f:
+ldloca local3
+M00000001_IL_0011:
+ldloca local4
+M00000001_IL_0013:
+call neoCLR.Library.System.OptionNestedOperators.RuntimeUnion0<T0>(System.Option<System.Option<T0>>&,System.Option.Some<System.Option<T0>>&)
+M00000001_IL_0018:
+brfalse M00000001_IL_004d
+M00000001_IL_001d:
+ldloc local4
+M00000001_IL_001f:
+stloc local5
+M00000001_IL_0021:
+ldloca local5
+M00000001_IL_0023:
+ldloca local6
+M00000001_IL_0025:
+call neoCLR.Library.System.OptionNestedOperators.RuntimeUnion1<T0>(System.Option.Some<System.Option<T0>>&,System.Option<T0>&)
+M00000001_IL_002a:
+ldloc local6
+M00000001_IL_002c:
+stloc local2
+M00000001_IL_002d:
+ldc.i4 1
+M00000001_IL_002e:
+br M00000001_IL_0034
+M00000001_IL_0034:
+brfalse M00000001_IL_004d
+M00000001_IL_0039:
+M00000001_IL_003a:
+br M00000001_IL_0045
+M00000001_IL_0045:
+M00000001_IL_0046:
+ldloc local2
+M00000001_IL_0047:
+stloc local1
+M00000001_IL_0048:
+br M00000001_IL_0084
+M00000001_IL_004d:
+M00000001_IL_004e:
+M00000001_IL_004f:
+ldloc local0
+M00000001_IL_0050:
+stloc local7
+M00000001_IL_0052:
+ldloca local7
+M00000001_IL_0054:
+ldloca local8
+M00000001_IL_0056:
+call neoCLR.Library.System.OptionNestedOperators.RuntimeUnion2<T0>(System.Option<System.Option<T0>>&,System.Option.None&)
+M00000001_IL_005b:
+brfalse M00000001_IL_007f
+M00000001_IL_0060:
+ldloc local8
+M00000001_IL_0062:
+pop
+M00000001_IL_0063:
+M00000001_IL_0064:
+br M00000001_IL_006f
+M00000001_IL_006f:
+call neoCLR.Library.System.OptionNestedOperators.RuntimeUnion3()
+M00000001_IL_0074:
+call neoCLR.Library.System.OptionNestedOperators.RuntimeUnion4<T0>(System.Option.None)
+M00000001_IL_0079:
+stloc local1
+M00000001_IL_007a:
+br M00000001_IL_0084
+M00000001_IL_007f:
+M00000001_IL_0080:
+M00000001_IL_0081:
+M00000001_IL_0082:
+M00000001_IL_0083:
+fault "Guest program reached a terminal failure"
+M00000001_IL_0084:
+M00000001_IL_0085:
+ldloc local1
+M00000001_IL_0086:
+ret
+.end

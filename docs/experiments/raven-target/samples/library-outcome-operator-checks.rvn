@@ -1,0 +1,201 @@
+import System.*
+import System.Linq.*
+import System.Option.*
+import System.Result.*
+import System.Console.*
+
+func Check(actual: int, expected: int, label: string) {
+    if actual != expected {
+        System.Fault(label)
+    }
+}
+
+func SomeValue(value: Option<int>, expected: int) {
+    match value {
+        Some(let actual) => Check(actual, expected, "Some payload")
+        None => System.Fault("Expected Some")
+    }
+}
+
+func NoValue(value: Option<int>) {
+    if value is Some(_) {
+        System.Fault("Expected None")
+    }
+}
+
+func Success(value: Result<int, string>, expected: int) {
+    match value {
+        Ok(let actual) => Check(actual, expected, "Ok payload")
+        Error(_) => System.Fault("Expected Ok")
+    }
+}
+
+func Failure(value: Result<int, string>, expected: string) {
+    match value {
+        Ok(_) => System.Fault("Expected Error")
+        Error(let actual) => {
+            if actual != expected {
+                System.Fault("Error payload changed")
+            }
+        }
+    }
+}
+
+func Main() {
+    let some: Option<int> = Some(0)
+    let none: Option<int> = None
+    var calls = 0
+    let mapped = some.Map((value: int) -> int => {
+        calls = calls + 1
+        return value + 42
+    })
+    SomeValue(mapped, 42)
+    NoValue(none.Map((value: int) -> int => {
+        calls = calls + 1
+        return value
+    }))
+    Check(calls, 1, "Option Map callback count")
+    SomeValue(some.Then((value: int) -> Option<int> => Some(value + 7)), 7)
+    NoValue(some.Then((value: int) -> Option<int> => None))
+    NoValue(none.Then((value: int) -> Option<int> => {
+        calls = calls + 1
+        return Some(value)
+    }))
+    SomeValue(some.Filter(value => value == 0), 0)
+    NoValue(some.Filter(value => false))
+    NoValue(none.Filter(value => {
+        calls = calls + 1
+        return true
+    }))
+    Check(calls, 1, "Absent Option callbacks")
+    SomeValue(some.OrElse(() -> Option<int> => {
+        calls = calls + 1
+        return Some(9)
+    }), 0)
+    SomeValue(none.OrElse(() -> Option<int> => {
+        calls = calls + 1
+        return Some(9)
+    }), 9)
+    Check(calls, 2, "Option alternative is lazy")
+    Check(some.UnwrapOr(99), 0, "Present zero")
+    Check(none.UnwrapOr(99), 99, "Explicit default")
+    Check(some.UnwrapOrElse(() => {
+        calls = calls + 1
+        return 8
+    }), 0, "Present fallback")
+    Check(none.UnwrapOrElse(() => {
+        calls = calls + 1
+        return 8
+    }), 8, "Absent fallback")
+    Check(calls, 3, "Option fallback is lazy")
+    Check(some.Match(value => value + 1, () => 9), 1, "Some Match")
+    Check(none.Match(value => value + 1, () => 9), 9, "None Match")
+    SomeValue(some.Tap((value: int) => {
+        calls = calls + 1
+    }), 0)
+    NoValue(none.Tap((value: int) => {
+        calls = calls + 1
+    }))
+    SomeValue(some.TapNone(() => {
+        calls = calls + 1
+    }), 0)
+    NoValue(none.TapNone(() => {
+        calls = calls + 1
+    }))
+    Check(calls, 5, "Option Tap channels")
+    Check(some.ToIterable().Count(), 1, "Some iteration")
+    Check(none.ToIterable().Count(), 0, "None iteration")
+    Check(some.ToIterable().Fold(42, (sum, value) => sum + value), 42, "Some zero retained")
+    Success(some.OkOr("missing"), 0)
+    Failure(none.OkOr("missing"), "missing")
+    let presentResult: Result<int, string> = some.OkOr(() -> string => {
+        calls = calls + 1
+        return "missing"
+    })
+    let absentResult: Result<int, string> = none.OkOr(() -> string => {
+        calls = calls + 1
+        return "missing"
+    })
+    Success(presentResult, 0)
+    Failure(absentResult, "missing")
+    Check(calls, 6, "OkOr error factory is lazy")
+    Success(some.MapResult(value => value + 2, () => "missing"), 2)
+    Failure(none.MapResult((value: int) -> int => {
+        calls = calls + 100
+        return value
+    }, () => "missing"), "missing")
+    Success(some.ThenResult((value: int) -> Result<int, string> => Ok(value + 3), () => "missing"), 3)
+    Failure(some.ThenResult((value: int) -> Result<int, string> => Result<int, string>.Error("binder"), () => "missing"), "binder")
+    Failure(none.ThenResult((value: int) -> Result<int, string> => {
+        calls = calls + 100
+        return Ok(value)
+    }, () => "missing"), "missing")
+    Check(calls, 6, "Missing Option skips conversion mapper")
+    let nested: Option<Option<int>> = Some(some)
+    let nestedNone: Option<Option<int>> = Some(none)
+    let outerNone: Option<Option<int>> = None
+    SomeValue(nested.Flatten(), 0)
+    NoValue(nestedNone.Flatten())
+    NoValue(outerNone.Flatten())
+    WriteLine("Option operators passed")
+
+    let ok: Result<int, string> = Ok(0)
+    let error: Result<int, string> = Result<int, string>.Error("problem")
+    Success(ok.Map(value => value + 42), 42)
+    Failure(error.Map((value: int) -> int => {
+        calls = calls + 100
+        return value
+    }), "problem")
+    Success(ok.Then((value: int) -> Result<int, string> => Ok(value + 7)), 7)
+    Failure(ok.Then((value: int) -> Result<int, string> => Result<int, string>.Error("binder")), "binder")
+    Failure(error.Then((value: int) -> Result<int, string> => {
+        calls = calls + 100
+        return Ok(value)
+    }), "problem")
+    match error.MapError(message => message.Length) {
+        Ok(_) => System.Fault("Expected mapped error")
+        Error(let size) => Check(size, 7, "MapError changes error type")
+    }
+    match ok.MapError((message: string) -> int => {
+        calls = calls + 100
+        return message.Length
+    }) {
+        Ok(let value) => Check(value, 0, "MapError preserves success")
+        Error(_) => System.Fault("Expected unchanged success")
+    }
+    Check(ok.Match(value => value + 1, message => 9), 1, "Ok Match")
+    Check(error.Match(value => value + 1, message => 9), 9, "Error Match")
+    Success(ok.Tap((value: int) => {
+        calls = calls + 1
+    }), 0)
+    Failure(error.Tap((value: int) => {
+        calls = calls + 100
+    }), "problem")
+    Success(ok.TapError((message: string) => {
+        calls = calls + 100
+    }), 0)
+    Failure(error.TapError((message: string) => {
+        calls = calls + 1
+    }), "problem")
+    Check(calls, 8, "Result callback channels")
+    Success(ok.OrElse((message: string) -> Result<int, string> => {
+        calls = calls + 100
+        return Ok(9)
+    }), 0)
+    Success(error.OrElse((message: string) -> Result<int, string> => Ok(9)), 9)
+    Failure(error.OrElse((message: string) -> Result<int, string> => Result<int, string>.Error("new")), "new")
+    Check(ok.UnwrapOr(99), 0, "Ok explicit fallback")
+    Check(error.UnwrapOr(99), 99, "Error explicit fallback")
+    Check(ok.UnwrapOrElse(() => {
+        calls = calls + 100
+        return 99
+    }), 0, "Ok lazy fallback")
+    Check(error.UnwrapOrElse(() => {
+        calls = calls + 1
+        return 99
+    }), 99, "Error lazy fallback")
+    Check(calls, 9, "Result fallback callback count")
+    Check(ok.ToIterable().Count(), 1, "Ok iteration")
+    Check(error.ToIterable().Count(), 0, "Error iteration")
+    WriteLine("Result operators passed")
+}

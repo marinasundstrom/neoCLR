@@ -6,25 +6,25 @@ static class QueryBindings
     public const string Declarations = """
         namespace Linq {
             public static class Operators {
-                public static Collections.Iterable<T> Filter<T>(this Collections.Iterable<T> source, Func<T, bool> predicate) => default;
-                public static Collections.Iterable<U> Map<T,U>(this Collections.Iterable<T> source, Func<T,U> selector) => default;
-                public static bool Any<T>(this Collections.Iterable<T> source) => default;
-                public static bool Any<T>(this Collections.Iterable<T> source, Func<T,bool> predicate) => default;
-                public static bool All<T>(this Collections.Iterable<T> source, Func<T,bool> predicate) => default;
-                public static int Count<T>(this Collections.Iterable<T> source) => default;
-                public static int Count<T>(this Collections.Iterable<T> source, Func<T,bool> predicate) => default;
-                public static U Fold<T,U>(this Collections.Iterable<T> source, U seed, Func<U,T,U> accumulator) => default;
-                public static Collections.Iterable<T> Take<T>(this Collections.Iterable<T> source, int count) => default;
-                public static Collections.Iterable<T> Skip<T>(this Collections.Iterable<T> source, int count) => default;
-                public static Collections.Iterable<T> Concat<T>(this Collections.Iterable<T> source, Collections.Iterable<T> second) => default;
-                public static Collections.Iterable<U> FlatMap<T,U>(this Collections.Iterable<T> source, Func<T,Collections.Iterable<U>> selector) => default;
-                public static Option<T> First<T>(this Collections.Iterable<T> source) => default;
-                public static Option<T> First<T>(this Collections.Iterable<T> source, Func<T, bool> predicate) => default;
-                public static Option<T> Last<T>(this Collections.Iterable<T> source) => default;
-                public static Option<T> Last<T>(this Collections.Iterable<T> source, Func<T, bool> predicate) => default;
-                public static Result<T, SingleError> Single<T>(this Collections.Iterable<T> source) => default;
-                public static Result<T, SingleError> Single<T>(this Collections.Iterable<T> source, Func<T, bool> predicate) => default;
-                public static Collections.ArrayList<T> ToList<T>(this Collections.Iterable<T> source) => default;
+                public static Collections.Iterable<T> Filter<T>(this Collections.Iterable<T> self, Func<T, bool> predicate) => default;
+                public static Collections.Iterable<U> Map<T,U>(this Collections.Iterable<T> self, Func<T,U> selector) => default;
+                public static bool Any<T>(this Collections.Iterable<T> self) => default;
+                public static bool Any<T>(this Collections.Iterable<T> self, Func<T,bool> predicate) => default;
+                public static bool All<T>(this Collections.Iterable<T> self, Func<T,bool> predicate) => default;
+                public static int Count<T>(this Collections.Iterable<T> self) => default;
+                public static int Count<T>(this Collections.Iterable<T> self, Func<T,bool> predicate) => default;
+                public static U Fold<T,U>(this Collections.Iterable<T> self, U seed, Func<U,T,U> accumulator) => default;
+                public static Collections.Iterable<T> Take<T>(this Collections.Iterable<T> self, int count) => default;
+                public static Collections.Iterable<T> Skip<T>(this Collections.Iterable<T> self, int count) => default;
+                public static Collections.Iterable<T> Concat<T>(this Collections.Iterable<T> self, Collections.Iterable<T> second) => default;
+                public static Collections.Iterable<U> FlatMap<T,U>(this Collections.Iterable<T> self, Func<T,Collections.Iterable<U>> selector) => default;
+                public static Option<T> First<T>(this Collections.Iterable<T> self) => default;
+                public static Option<T> First<T>(this Collections.Iterable<T> self, Func<T, bool> predicate) => default;
+                public static Option<T> Last<T>(this Collections.Iterable<T> self) => default;
+                public static Option<T> Last<T>(this Collections.Iterable<T> self, Func<T, bool> predicate) => default;
+                public static Result<T, SingleError> Single<T>(this Collections.Iterable<T> self) => default;
+                public static Result<T, SingleError> Single<T>(this Collections.Iterable<T> self, Func<T, bool> predicate) => default;
+                public static Collections.ArrayList<T> ToList<T>(this Collections.Iterable<T> self) => default;
             }
         }
         """;

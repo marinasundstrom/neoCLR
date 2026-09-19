@@ -66,8 +66,20 @@ static class LibraryImplementation
                 && m.Parameters.Zip(method.Parameters).All(p => p.First.Name == p.Second.Name && SameType(p.First.ParameterType, p.Second.ParameterType))).ToArray();
             if (matches.Length == 1) CheckMethod(matches[0]);
             if (matches.Length != 1) throw new InvalidDataException("Library export does not match reference contract: " + method.FullName);
+            if (owner is "System.Linq.Operators" or "System.OptionOperators" or "System.OptionNestedOperators" or "System.ResultOperators")
+                CheckExtensionContract(method, matches[0]);
         }
         return methods;
+    }
+
+    public static void CheckExtensionContract(MethodDefinition implementation, MethodDefinition declaration)
+    {
+        static bool Marked(MethodDefinition method) => method.CustomAttributes.Count(a =>
+            a.AttributeType.FullName == "System.Runtime.CompilerServices.ExtensionAttribute"
+            && RuntimeSignatures.IsCore(a.AttributeType.Scope)) == 1;
+        if (!implementation.IsStatic || implementation.Parameters.Count == 0 || !Marked(implementation)
+            || !declaration.IsStatic || declaration.Parameters.Count == 0 || !Marked(declaration))
+            throw new InvalidDataException("Library extension metadata mismatch: " + implementation.FullName);
     }
 
     static MethodDefinition[] InterfaceRoots(TypeDefinition type, TypeDefinition contract, string owner)

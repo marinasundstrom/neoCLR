@@ -14,6 +14,8 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == ''">
     <Compile Include="src/System/Math/Functions.rvn" />
     <Compile Include="src/System/Linq/Operators.rvn" />
+    <Compile Include="src/System/OptionOperators.rvn" />
+    <Compile Include="src/System/ResultOperators.rvn" />
     <Compile Include="src/System/IO/Path/Functions.rvn" />
     <Compile Include="src/System/IO/File/Functions.rvn" />
   </ItemGroup>

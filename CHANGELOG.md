@@ -8,6 +8,20 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Port 25 Option/Result operator overloads from Raven.Core to the development
+  library, including transformations, recovery, branch actions, conversions and
+  nested Option flattening. Use Filter and ToIterable for neoCLR's vocabulary;
+  throwing/default/context-error helpers remain deferred. Implement both iterable
+  and outcome operators with Raven extension declarations and validate their
+  extension metadata against bootstrap references. Add branch/callback, signature,
+  editor and saved-project coverage; document compatibility and allocation costs.
+  Rebuild callers, references and System together; published Preview 8 is unchanged.
+  Validate 9 outcome scenarios, 251 signatures, 86 editor sections, all 80 library
+  slices, 58 iterable regression checks and the MSBuild example. Prefer inferred
+  callback types in samples and record the remaining compiler limitations. Include
+  the outcome verifier and the query
+  verifier's helper in future bundles.
+
 - Document imported union case patterns in the Raven conventions: use Some, None,
   Ok and Error without a leading dot when their case namespaces are imported.
   Update the convention examples, including nested patterns.

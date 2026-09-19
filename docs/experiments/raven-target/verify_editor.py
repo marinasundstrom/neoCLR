@@ -238,8 +238,8 @@ try:
             results[expression] = labels
     if unions:
         for version, expression, expected in (
-            (23, 'result.', ('IsOk', 'IsErr', 'GetOkCase', 'GetErrorCase', 'TryGet', 'TryGetOutput', 'TryGetResidual')),
-            (24, 'option.', ('IsSome', 'IsNone', 'GetSomeCase', 'GetNoneCase', 'TryGet'))):
+            (23, 'result.', ('IsOk', 'IsErr', 'GetOkCase', 'GetErrorCase', 'TryGet', 'TryGetOutput', 'TryGetResidual', 'Map', 'Then', 'MapError', 'Match', 'Tap', 'TapError', 'OrElse', 'UnwrapOrElse', 'UnwrapOr', 'ToIterable')),
+            (24, 'option.', ('IsSome', 'IsNone', 'GetSomeCase', 'GetNoneCase', 'TryGet', 'Map', 'Then', 'Filter', 'OrElse', 'UnwrapOrElse', 'UnwrapOr', 'Match', 'Tap', 'TapNone', 'ToIterable', 'ThenResult', 'MapResult', 'OkOr'))):
             text = 'import System.*\nfunc Main() {\n    let result = Result<long, Error>.Ok(42L)\n    let option = Option<string>(Option.None())\n    ' + expression + '\n}'
             send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})
             result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},

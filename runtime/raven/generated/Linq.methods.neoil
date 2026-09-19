@@ -1,5 +1,5 @@
 ; Generated from runtime/raven/src/System/Linq/Operators.rvn. Regenerate with build_runtime_library.py.
-.method static Filter<T0>(System.Collections.Iterable<T0> source,System.Func<T0,Boolean> predicate) -> System.Collections.Iterable<T0>
+.method static Filter<T0>(System.Collections.Iterable<T0> self,System.Func<T0,Boolean> predicate) -> System.Collections.Iterable<T0>
 M00000001_IL_0000:
 M00000001_IL_0001:
 M00000001_IL_0002:
@@ -11,7 +11,7 @@ newobj instance neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E71
 M00000001_IL_0009:
 ret
 .end
-.method static Map<T0,T1>(System.Collections.Iterable<T0> source,System.Func<T0,T1> selector) -> System.Collections.Iterable<T1>
+.method static Map<T0,T1>(System.Collections.Iterable<T0> self,System.Func<T0,T1> selector) -> System.Collections.Iterable<T1>
 M00000002_IL_0000:
 M00000002_IL_0001:
 M00000002_IL_0002:
@@ -23,7 +23,7 @@ newobj instance neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E71
 M00000002_IL_0009:
 ret
 .end
-.method static Any<T0>(System.Collections.Iterable<T0> source) -> Boolean
+.method static Any<T0>(System.Collections.Iterable<T0> self) -> Boolean
 .local System.Collections.Iterator<T0> local0
 .local Boolean local1
 ldloca local0
@@ -60,7 +60,7 @@ M00000003_IL_001a:
 call neoCLR.Library.System.Linq.Operators.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method static Any<T0>(System.Collections.Iterable<T0> source,System.Func<T0,Boolean> predicate) -> Boolean
+.method static Any<T0>(System.Collections.Iterable<T0> self,System.Func<T0,Boolean> predicate) -> Boolean
 .local System.Collections.Iterator<T0> local0
 ldloca local0
 initobj System.Collections.Iterator<T0>
@@ -124,7 +124,7 @@ M00000004_IL_004c:
 call neoCLR.Library.System.Linq.Operators.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method static All<T0>(System.Collections.Iterable<T0> source,System.Func<T0,Boolean> predicate) -> Boolean
+.method static All<T0>(System.Collections.Iterable<T0> self,System.Func<T0,Boolean> predicate) -> Boolean
 .local System.Collections.Iterator<T0> local0
 ldloca local0
 initobj System.Collections.Iterator<T0>
@@ -193,7 +193,7 @@ M00000005_IL_004f:
 call neoCLR.Library.System.Linq.Operators.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method static Count<T0>(System.Collections.Iterable<T0> source) -> Int32
+.method static Count<T0>(System.Collections.Iterable<T0> self) -> Int32
 .local System.Collections.Iterator<T0> local0
 .local Int32 local1
 ldloca local0
@@ -270,7 +270,7 @@ ldloc local1
 M00000006_IL_0058:
 ret
 .end
-.method static Count<T0>(System.Collections.Iterable<T0> source,System.Func<T0,Boolean> predicate) -> Int32
+.method static Count<T0>(System.Collections.Iterable<T0> self,System.Func<T0,Boolean> predicate) -> Int32
 .local System.Collections.Iterator<T0> local0
 .local Int32 local1
 ldloca local0
@@ -362,7 +362,7 @@ ldloc local1
 M00000007_IL_0070:
 ret
 .end
-.method static Fold<T0,T1>(System.Collections.Iterable<T0> source,T1 seed,System.Func<T1,T0,T1> accumulator) -> T1
+.method static Fold<T0,T1>(System.Collections.Iterable<T0> self,T1 seed,System.Func<T1,T0,T1> accumulator) -> T1
 .local System.Collections.Iterator<T0> local0
 .local T1 local1
 ldloca local0
@@ -418,7 +418,7 @@ ldloc local1
 M00000008_IL_003c:
 ret
 .end
-.method static Take<T0>(System.Collections.Iterable<T0> source,Int32 count) -> System.Collections.Iterable<T0>
+.method static Take<T0>(System.Collections.Iterable<T0> self,Int32 count) -> System.Collections.Iterable<T0>
 M00000009_IL_0000:
 M00000009_IL_0001:
 M00000009_IL_0002:
@@ -430,7 +430,7 @@ newobj instance neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E71
 M00000009_IL_0009:
 ret
 .end
-.method static Skip<T0>(System.Collections.Iterable<T0> source,Int32 count) -> System.Collections.Iterable<T0>
+.method static Skip<T0>(System.Collections.Iterable<T0> self,Int32 count) -> System.Collections.Iterable<T0>
 M0000000a_IL_0000:
 M0000000a_IL_0001:
 M0000000a_IL_0002:
@@ -442,7 +442,7 @@ newobj instance neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E71
 M0000000a_IL_0009:
 ret
 .end
-.method static Concat<T0>(System.Collections.Iterable<T0> source,System.Collections.Iterable<T0> second) -> System.Collections.Iterable<T0>
+.method static Concat<T0>(System.Collections.Iterable<T0> self,System.Collections.Iterable<T0> second) -> System.Collections.Iterable<T0>
 M0000000b_IL_0000:
 M0000000b_IL_0001:
 M0000000b_IL_0002:
@@ -454,7 +454,7 @@ newobj instance neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E71
 M0000000b_IL_0009:
 ret
 .end
-.method static FlatMap<T0,T1>(System.Collections.Iterable<T0> source,System.Func<T0,System.Collections.Iterable<T1>> selector) -> System.Collections.Iterable<T1>
+.method static FlatMap<T0,T1>(System.Collections.Iterable<T0> self,System.Func<T0,System.Collections.Iterable<T1>> selector) -> System.Collections.Iterable<T1>
 M0000000c_IL_0000:
 M0000000c_IL_0001:
 M0000000c_IL_0002:
@@ -466,7 +466,7 @@ newobj instance neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E71
 M0000000c_IL_0009:
 ret
 .end
-.method static ToList<T0>(System.Collections.Iterable<T0> source) -> System.Collections.ArrayList<T0>
+.method static ToList<T0>(System.Collections.Iterable<T0> self) -> System.Collections.ArrayList<T0>
 .local System.Collections.ArrayList<T0> local0
 .local T0 local1
 .local System.Collections.Iterator<T0> local2
@@ -493,7 +493,7 @@ M0000000d_IL_0010:
 callvirt instance System.Collections.Iterator<T0>::MoveNext()
 call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
 M0000000d_IL_0015:
-brfalse M0000000d_IL_002e
+brfalse M0000000d_IL_002d
 M0000000d_IL_001a:
 ldloc local2
 M0000000d_IL_001b:
@@ -501,21 +501,20 @@ callvirt instance System.Collections.Iterator<T0>::get_Current()
 M0000000d_IL_0020:
 stloc local3
 M0000000d_IL_0021:
+ldloc local0
 M0000000d_IL_0022:
-ldloc local0
-M0000000d_IL_0023:
 ldloc local3
-M0000000d_IL_0024:
+M0000000d_IL_0023:
 callvirt instance System.Collections.ArrayList<T0>::Add(T0)
-M0000000d_IL_0029:
+M0000000d_IL_0028:
 br M0000000d_IL_000f
+M0000000d_IL_002d:
 M0000000d_IL_002e:
-M0000000d_IL_002f:
 ldloc local0
-M0000000d_IL_0030:
+M0000000d_IL_002f:
 ret
 .end
-.method static First<T0>(System.Collections.Iterable<T0> source) -> System.Option<T0>
+.method static First<T0>(System.Collections.Iterable<T0> self) -> System.Option<T0>
 .local System.Collections.Iterator<T0> local0
 .local T0 local1
 ldloca local0
@@ -572,7 +571,7 @@ call neoCLR.Library.System.Linq.Operators.RuntimeUnion1<T0>(System.Option.None)
 M0000000e_IL_0048:
 ret
 .end
-.method static Last<T0>(System.Collections.Iterable<T0> source) -> System.Option<T0>
+.method static Last<T0>(System.Collections.Iterable<T0> self) -> System.Option<T0>
 .local System.Collections.Iterator<T0> local0
 .local T0 local1
 ldloca local0
@@ -655,7 +654,7 @@ call neoCLR.Library.System.Linq.Operators.RuntimeUnion3<T0>(System.Option.Some<T
 M0000000f_IL_006b:
 ret
 .end
-.method static Single<T0>(System.Collections.Iterable<T0> source) -> System.Result<T0,System.Linq.SingleError>
+.method static Single<T0>(System.Collections.Iterable<T0> self) -> System.Result<T0,System.Linq.SingleError>
 .local System.Collections.Iterator<T0> local0
 .local T0 local1
 .local Boolean local2
@@ -752,7 +751,7 @@ call neoCLR.Library.System.Linq.Operators.RuntimeUnion7<T0>(System.Result.Ok<T0>
 M00000010_IL_007f:
 ret
 .end
-.method static First<T0>(System.Collections.Iterable<T0> source,System.Func<T0,Boolean> predicate) -> System.Option<T0>
+.method static First<T0>(System.Collections.Iterable<T0> self,System.Func<T0,Boolean> predicate) -> System.Option<T0>
 .local System.Collections.Iterator<T0> local0
 .local T0 local1
 ldloca local0
@@ -825,7 +824,7 @@ call neoCLR.Library.System.Linq.Operators.RuntimeUnion1<T0>(System.Option.None)
 M00000011_IL_0061:
 ret
 .end
-.method static Last<T0>(System.Collections.Iterable<T0> source,System.Func<T0,Boolean> predicate) -> System.Option<T0>
+.method static Last<T0>(System.Collections.Iterable<T0> self,System.Func<T0,Boolean> predicate) -> System.Option<T0>
 .local System.Collections.Iterator<T0> local0
 .local T0 local1
 .local T0 local2
@@ -938,7 +937,7 @@ call neoCLR.Library.System.Linq.Operators.RuntimeUnion1<T0>(System.Option.None)
 M00000012_IL_0097:
 ret
 .end
-.method static Single<T0>(System.Collections.Iterable<T0> source,System.Func<T0,Boolean> predicate) -> System.Result<T0,System.Linq.SingleError>
+.method static Single<T0>(System.Collections.Iterable<T0> self,System.Func<T0,Boolean> predicate) -> System.Result<T0,System.Linq.SingleError>
 .local System.Collections.Iterator<T0> local0
 .local T0 local1
 ldloca local0
