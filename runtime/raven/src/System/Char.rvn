@@ -3,81 +3,23 @@ namespace System
 import System.Runtime.CompilerServices.RuntimeServices
 
 public struct Char : Comparable<char> {
-    // The runtime supplies intrinsic primitive storage.
+    // Immutable grapheme storage is supplied by the runtime.
     #pragma warning disable-next-line RAV9032
     private field m_value: char
 
+    static func FromString(text: string) -> char {
+        return RuntimeServices.CharFromString(text)
+    }
+
+    func ToString() -> string {
+        return RuntimeServices.CharText(m_value)
+    }
+
+    func Equals(other: char) -> bool {
+        return RuntimeServices.StringEquals(RuntimeServices.CharText(m_value), RuntimeServices.CharText(other))
+    }
+
     func CompareTo(other: char) -> int {
-        if m_value < other {
-            return -1
-        }
-        if m_value > other {
-            return 1
-        }
-        return 0
-    }
-
-    static func IsDigit(value: char) -> bool {
-        let category = RuntimeServices.CharCategory(value)
-        return category == 8
-    }
-
-    static func IsNumber(value: char) -> bool {
-        let category = RuntimeServices.CharCategory(value)
-        return category >= 8 && category <= 10
-    }
-
-    static func IsLetter(value: char) -> bool {
-        let category = RuntimeServices.CharCategory(value)
-        return category >= 0 && category <= 4
-    }
-
-    static func IsUpper(value: char) -> bool {
-        let category = RuntimeServices.CharCategory(value)
-        return category == 0
-    }
-
-    static func IsLower(value: char) -> bool {
-        let category = RuntimeServices.CharCategory(value)
-        return category == 1
-    }
-
-    static func IsSeparator(value: char) -> bool {
-        let category = RuntimeServices.CharCategory(value)
-        return category >= 11 && category <= 13
-    }
-
-    static func IsControl(value: char) -> bool {
-        let category = RuntimeServices.CharCategory(value)
-        return category == 14
-    }
-
-    static func IsPunctuation(value: char) -> bool {
-        let category = RuntimeServices.CharCategory(value)
-        return category >= 18 && category <= 24
-    }
-
-    static func IsSymbol(value: char) -> bool {
-        let category = RuntimeServices.CharCategory(value)
-        return category >= 25 && category <= 28
-    }
-
-    static func IsAscii(value: char) -> bool {
-        let code: int = value
-        return code <= 127
-    }
-
-    static func IsAsciiDigit(value: char) -> bool {
-        let code: int = value
-        return code >= 48 && code <= 57
-    }
-
-    static func IsLetterOrDigit(value: char) -> bool {
-        return char.IsLetter(value) || char.IsDigit(value)
-    }
-
-    static func IsWhiteSpace(value: char) -> bool {
-        let code: int = value
-        return (code >= 9 && code <= 13) || code == 133 || char.IsSeparator(value)
+        return RuntimeServices.StringCompareOrdinal(RuntimeServices.CharText(m_value), RuntimeServices.CharText(other))
     }
 }

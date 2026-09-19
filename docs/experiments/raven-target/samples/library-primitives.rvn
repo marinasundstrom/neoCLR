@@ -1,4 +1,5 @@
 import System.*
+import System.Text.*
 import System.Console.*
 func ShowLong(value: long, other: long) {
     WriteLine(value.CompareTo(other))
@@ -29,43 +30,43 @@ func Main() {
     WriteLine(unsignedNative.CompareTo(unsignedNative))
     ShowLong(-9223372036854775808L, 9223372036854775807L)
     ShowChar('a', 'z')
-    if Char.IsDigit('٣') {
+    if UnicodeScalar.IsDigit((uint)1635) {
         WriteLine("Digit")
     }
-    if Char.IsNumber('Ⅷ') {
+    if UnicodeScalar.IsNumber((uint)8551) {
         WriteLine("Number")
     }
-    if Char.IsLetter('é') {
+    if UnicodeScalar.IsLetter((uint)233) {
         WriteLine("Letter")
     }
-    if Char.IsUpper('A') {
+    if UnicodeScalar.IsUpper((uint)65) {
         WriteLine("Upper")
     }
-    if Char.IsLower('a') {
+    if UnicodeScalar.IsLower((uint)97) {
         WriteLine("Lower")
     }
-    if Char.IsSeparator(' ') {
+    if UnicodeScalar.IsSeparator((uint)32) {
         WriteLine("Separator")
     }
-    if Char.IsControl('\n') {
+    if UnicodeScalar.IsControl((uint)10) {
         WriteLine("Control")
     }
-    if Char.IsPunctuation('!') {
+    if UnicodeScalar.IsPunctuation((uint)33) {
         WriteLine("Punctuation")
     }
-    if Char.IsSymbol('$') {
+    if UnicodeScalar.IsSymbol((uint)36) {
         WriteLine("Symbol")
     }
-    if Char.IsAscii('A') {
+    if UnicodeScalar.IsAscii((uint)65) {
         WriteLine("ASCII")
     }
-    if Char.IsAsciiDigit('3') {
+    if UnicodeScalar.IsAsciiDigit((uint)51) {
         WriteLine("ASCII digit")
     }
-    if Char.IsLetterOrDigit('é') {
+    if UnicodeScalar.IsLetterOrDigit((uint)233) {
         WriteLine("Letter or digit")
     }
-    if Char.IsWhiteSpace('\t') {
+    if UnicodeScalar.IsWhiteSpace((uint)9) {
         WriteLine("Whitespace")
     }
 }

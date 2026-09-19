@@ -1,0 +1,2 @@
+.include "generated/String.methods.neoil"
+.include "generated/String.helpers.neoil"

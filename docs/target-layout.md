@@ -8,7 +8,7 @@ already resolved signatures. The original memory::layout delegates to TargetLayo
 
 The descriptor supplies pointer size/alignment and Int64, Single, and Double alignments.
 The current subset accepts four- or eight-byte pointers. Scalar alignments must be
-nonzero powers of two no larger than the scalar size. Byte/Boolean, Int16/Char, and
+nonzero powers of two no larger than the scalar size. Byte/Boolean, Int16/UInt16, and
 Int32 retain fixed 1/2/4-byte sizes and alignments. Void is zero bytes with alignment one.
 Native integers and pointer fields use the target pointer size and alignment.
 
@@ -34,3 +34,6 @@ not a target-tagged executable allocation capability.
 `cargo run --example target_layout` compares the same Packet under explicit four-byte
 and eight-byte pointer/alignment choices. Its offsets are [0,4,8] and [0,8,16], with total
 sizes 16 and 24 respectively. This calculation performs no allocation or guest execution.
+
+Grapheme Char has no native inline layout; marshal explicit UTF-8 bytes or scalar
+values instead. See [the text contract](design/text-abstraction.md).

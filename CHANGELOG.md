@@ -8,12 +8,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
-- Record the revised text direction: grapheme-based ordinary String access with
-  explicit scalar/encoding operations. Char as a grapheme value is the recommended
-  public model, not implemented behavior; preserve the current scalar implementation
-  as provisional. Keep the temporary String-returning grapheme prototype outside
-  the checkout. Independently fix Raven expression-bodied indexer emission on main
-  and carry that general fix to neoclr, with 31 focused tests passing.
+- Implement the approved grapheme text direction: Char owns one validated Unicode
+  16 extended grapheme cluster; String.Length and iteration use graphemes, with
+  explicit GetScalars returning Sequence<uint> and UnicodeScalar classification.
+  Preserve UTF-8 storage/conversion and ordinal equality. Numeric Char casts and
+  native integer layout are removed; use the matching RavenGraphemeChar toolchain.
+  Iteration currently copies snapshots and integer indexing remains deferred.
+  Runtime character payloads count toward array limits. Record the .NET/Swift/Rust
+  comparison and migration, regenerate 77 source slices, and validate the compiler,
+  saved-project programs, signatures and editor contract. The earlier scalar-Char
+  slice below is superseded.
+  Independently fixed Raven expression-bodied indexer emission remains on main.
 
 - Route homepage sample boxes to feature pages and add a Raven language page with
   source-backed examples, explicit mutability and patterns, target distinctions and

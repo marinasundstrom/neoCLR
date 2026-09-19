@@ -91,6 +91,11 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             | crate::native::Binding::StringContainsOrdinal
             | crate::native::Binding::StringStartsWithOrdinal
             | crate::native::Binding::StringEndsWithOrdinal
+            | crate::native::Binding::StringGraphemeCount
+            | crate::native::Binding::CharFromString
+            | crate::native::Binding::CharText
+            | crate::native::Binding::StringGraphemes
+            | crate::native::Binding::StringScalars
             | crate::native::Binding::StringByteCount
             | crate::native::Binding::StringSliceUtf8 => RuntimeService::StringOperations,
         };

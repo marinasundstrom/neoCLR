@@ -61,3 +61,73 @@ False:
     ldc.i4 0
     ret
 .end
+.function neoCLR.Library.System.String.RuntimeServiceStringGraphemes(String arg0) -> arrayref<Char>
+.local Char[] source
+.local arrayref<Char> destination
+.local Int32 index
+ldarg arg0
+call neoCLR.Runtime.StringGraphemes(String)
+stloc source
+ldloc source
+ldlen
+conv.i4
+newarr Char
+stloc destination
+ldc.i4 0
+stloc index
+br Test
+Copy:
+ldloc destination
+ldloc index
+ldloc source
+ldloc index
+ldelem Char
+stelem Char
+ldloc index
+ldc.i4 1
+add
+stloc index
+Test:
+ldloc index
+ldloc source
+ldlen
+conv.i4
+blt Copy
+ldloc destination
+ret
+.end
+.function neoCLR.Library.System.String.RuntimeServiceStringScalars(String arg0) -> arrayref<UInt32>
+.local UInt32[] source
+.local arrayref<UInt32> destination
+.local Int32 index
+ldarg arg0
+call neoCLR.Runtime.StringScalars(String)
+stloc source
+ldloc source
+ldlen
+conv.i4
+newarr UInt32
+stloc destination
+ldc.i4 0
+stloc index
+br Test
+Copy:
+ldloc destination
+ldloc index
+ldloc source
+ldloc index
+ldelem UInt32
+stelem UInt32
+ldloc index
+ldc.i4 1
+add
+stloc index
+Test:
+ldloc index
+ldloc source
+ldlen
+conv.i4
+blt Copy
+ldloc destination
+ret
+.end

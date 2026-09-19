@@ -32,6 +32,8 @@ def adapt(text: str, name: str) -> str:
 def build(path: Path) -> str:
     if path.parent == ROOT / 'runtime/System' and path.stem in {'Environment', 'Console', 'Clonable', 'LocalDateTime', 'Disposable', 'Equatable', 'Comparable', 'SystemClock', 'Closable'}:
         return build(ROOT / 'runtime/raven' / path.name)
+    if path == ROOT / 'runtime/System/String.neoil':
+        return build(ROOT / 'runtime/raven/String.neoil')
     if path == ROOT / 'runtime/System/Clock.neoil':
         return build(ROOT / 'runtime/raven/Clock.neoil')
     if path == ROOT / 'runtime/System/TypeInfo.neoil':

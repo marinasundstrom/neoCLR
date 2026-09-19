@@ -1,5 +1,10 @@
 # Character classification
 
+**Current API (2026-09-19):** classification now lives on
+`System.Text.UnicodeScalar`, accepting `uint` scalar values. Char is a grapheme text
+value. The scalar-Char implementation notes below are historical; see
+[the current text contract](design/text-abstraction.md).
+
 The runtime now represents Char as a validated Unicode scalar stored in four bytes.
 String remains native valid UTF-8. Supplementary characters are classified directly;
 surrogates and values above U+10FFFF fault at Char value/storage boundaries.

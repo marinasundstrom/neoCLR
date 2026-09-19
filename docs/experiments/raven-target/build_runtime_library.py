@@ -37,6 +37,7 @@ SLICES = {
 
     'String': 'System.String',
     'Utf8': 'System.Text.Utf8',
+    'UnicodeScalar': 'System.Text.UnicodeScalar',
     'InvalidUtf8Error': 'System.Text.InvalidUtf8Error',
     'Error': 'System.Error',
     'Environment': 'System.Environment',
@@ -119,6 +120,7 @@ SOURCES = {
 
     'String': 'runtime/raven/src/System/String.rvn',
     'Utf8': 'runtime/raven/src/System/Text/Utf8.rvn',
+    'UnicodeScalar': 'runtime/raven/src/System/Text/UnicodeScalar.rvn',
     'InvalidUtf8Error': 'runtime/raven/src/System/Text/InvalidUtf8Error.rvn',
     'Error': 'runtime/raven/src/System/Error.rvn',
     'Environment': 'runtime/raven/src/System/Environment/Functions.rvn',
@@ -179,7 +181,7 @@ GENERATED = ROOT / 'runtime/raven/generated'
 def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
-def fragments(text, name="Math", owner="System.Math"):
+def fragments(text, name="Math", owner="System.Math", bootstrap=False):
     lines = text.splitlines(keepends=True)
     methods, helpers, types = [], {}, []
     while lines:
@@ -228,6 +230,11 @@ def fragments(text, name="Math", owner="System.Math"):
         if body.startswith('.type class ' + owner + '\n'):
             types.remove(body)
             methods = [body[:-len('.end\n')] + ''.join(methods) + '.end\n']
+    if name == 'String' and bootstrap:
+        # The archived Neo profile uses borrowed collection interfaces. Keep its
+        # scalar-independent String operations; Raven uses the complete source.
+        methods = [re.sub(r'(?ms)^\.method instance (?:readonly byref )?(?:GetIterator|GetScalars)\(\).*?^\.end\n', '', body)
+                   .replace('.implements System.Collections.Iterable<Char>\n', '') for body in methods]
     # Retain only transitively called adapters; no application entry-point shim.
     used = set()
     pending = re.findall(r'(?m)^(?:call|ldftn) ([^(]+)\(', ''.join(methods + types))
@@ -238,8 +245,12 @@ def fragments(text, name="Math", owner="System.Math"):
         used.add(helper)
         pending.extend(re.findall(r'(?m)^(?:call|ldftn) ([^(]+)\(', helpers[helper]))
     banner = f'; Generated from {SOURCES[name]}. Regenerate with build_runtime_library.py.\n'
-    return {name + '.methods.neoil': banner + ''.join(methods),
-            name + '.helpers.neoil': banner + ''.join(body for name, body in helpers.items() if name in used) + ''.join(types)}
+    prefix = name + ('.bootstrap' if bootstrap else '')
+    result = {prefix + '.methods.neoil': banner + ''.join(methods),
+              prefix + '.helpers.neoil': banner + ''.join(body for name, body in helpers.items() if name in used) + ''.join(types)}
+    if name == 'String' and not bootstrap:
+        result.update(fragments(text, name, owner, bootstrap=True))
+    return result
 
 def check_snapshot():
     for name in SLICES:

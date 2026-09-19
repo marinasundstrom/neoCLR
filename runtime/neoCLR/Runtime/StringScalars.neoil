@@ -1,0 +1,15 @@
+.function neoCLR.Runtime.StringGraphemeCount(String value) -> Int32
+    .methodimpl InternalCall
+.end
+.function neoCLR.Runtime.CharFromString(String value) -> Char
+    .methodimpl InternalCall
+.end
+.function neoCLR.Runtime.CharText(Char value) -> String
+    .methodimpl InternalCall
+.end
+.function neoCLR.Runtime.StringScalars(String value) -> UInt32[]
+    .methodimpl InternalCall
+.end
+.function neoCLR.Runtime.StringGraphemes(String value) -> Char[]
+    .methodimpl InternalCall
+.end

@@ -1,6 +1,6 @@
 # Fixed-width integer storage and execution
 
-The primitive set now includes System.SByte, Byte, Int16, UInt16, Char, UInt32,
+The primitive set now includes System.SByte, Byte, Int16, UInt16, UInt32,
 Int64, and UInt64 alongside the existing Int32 and native integers. Aliases are
 int8, uint8, int16, uint16, char, uint32, int64, and uint64. Canonical definitions
 live in the platform-written System library; general primitive member APIs remain
@@ -14,12 +14,11 @@ incomplete. No primitive representation selects allocation or ownership policy.
 | Byte | 1 | Int32, zero-extended |
 | Int16 | 2 | Int32, sign-extended |
 | UInt16 | 2 | Int32, zero-extended |
-| Char | 4 | Int32, validated Unicode scalar |
 | Int32 / UInt32 | 4 | Int32, same bits |
 | Int64 / UInt64 | 8 | Int64, same bits |
 
 Eight-byte integers use host u64 alignment; other fixed-width integers use alignment
-equal to their size. Native memory uses host byte order. Char is one Unicode scalar and excludes surrogate code units. This does not choose String's encoding; see
+equal to their size. Native memory uses host byte order. Char is now a grapheme text value with no integer or native inline representation. This does not choose String's encoding; see
 [text direction](text-model.md). It is not a validated Unicode scalar value.
 
 Loads from locals, arguments, fields, and native storage produce the stack category
@@ -58,7 +57,7 @@ Checked conversions are also available; see [checked conversions](checked-conver
 
 Indirect instructions now cover ldind.i1/u1/i2/u2/i4/u4/i8/i and
 stind.i1/i2/i4/i8/i. A typed pointer must name a member of the corresponding storage
-family: byte, short, 32-bit (including Char), 64-bit, or native integer. Load opcode
+family: byte, short, 32-bit, 64-bit, or native integer. Load opcode
 signedness selects sign/zero extension; stores use the destination type and truncate
 where appropriate. Native indirect operations currently preserve the declared native
 signedness, matching the existing native-integer prototype. Cast a pointer explicitly
@@ -105,3 +104,7 @@ types, and exceptional arithmetic boundaries are covered by integration tests.
 The 2026-09-19 scalar migration changes Char native layout from two to four bytes.
 Surrogates and values above U+10FFFF are invalid; Char storage no longer truncates
 to UInt16. Rebuild callers and native-layout consumers.
+
+The interim four-byte Char layout described in the historical migration notes above
+is superseded by [the grapheme text contract](design/text-abstraction.md). Unicode
+scalars use explicit uint values; Char cannot be read or written with integer opcodes.

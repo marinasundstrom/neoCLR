@@ -13,7 +13,7 @@
     <RavenTargetCoreAssemblyName>NeoCLR.CoreProbe</RavenTargetCoreAssemblyName>
     <RavenUnitAssemblyName>NeoCLR.CoreProbe</RavenUnitAssemblyName>
     <RavenUnitType>System.Void</RavenUnitType>
-    <RavenUnicodeScalarChar>true</RavenUnicodeScalarChar>
+    <RavenGraphemeChar>true</RavenGraphemeChar>
     <RavenUseHostFrameworkReferences>false</RavenUseHostFrameworkReferences>
     <RavenAllowArrayCovariance>false</RavenAllowArrayCovariance>
     <RavenPropagationAssemblyName>NeoCLR.CoreProbe</RavenPropagationAssemblyName>

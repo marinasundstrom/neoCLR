@@ -15,7 +15,7 @@ static class NamespaceMemberProbe
         var options = new CompilationOptions(OutputKind.DynamicallyLinkedLibrary,
             metadataImportOptions: new MetadataImportOptions(CoreDeclarations.Identity))
             .WithTargetCoreAssemblyName(CoreDeclarations.Identity)
-            .WithUnicodeScalarChar(true);
+            .WithGraphemeChar(true);
         var references = new List<MetadataReference> { MetadataReference.CreateFromFile(core) };
         Compilation Create(string name, string text, CompilationOptions? selected = null) => Compilation.Create(name,
             [SyntaxTree.ParseText(text)], references.ToArray(), selected ?? options);

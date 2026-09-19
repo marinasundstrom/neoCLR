@@ -1,0 +1,61 @@
+import System.*
+import System.Collections.*
+import System.Console.*
+import System.Text.*
+
+class CharacterBox {
+    private var stored: char
+
+    init(value: char) {
+        stored = value
+    }
+
+    val Value: char => stored
+}
+
+func Describe(value: char) -> string {
+    return match value {
+        'é' => "Combining character"
+        '👨‍👩‍👧‍👦' => "Family"
+        _ => "Other"
+    }
+}
+
+func ShowCharacters(text: Iterable<char>) {
+    for character in text {
+        WriteLine(character.ToString())
+    }
+}
+
+func Main() {
+    let text = "Aé👨‍👩‍👧‍👦🇸🇪"
+    WriteLine(text.Length)
+    WriteLine(text.GetScalars().Count)
+    WriteLine(text.GetUtf8ByteCount())
+    ShowCharacters(text)
+    for character in "é" {
+        WriteLine(Describe(character))
+    }
+    let characters: char[] = ['A', 'é', '👨‍👩‍👧‍👦']
+    characters[0] = Char.FromString("👍🏽")
+    for character in characters {
+        WriteLine(character.ToString())
+    }
+    WriteLine(Describe(characters[2]))
+    for scalar in "é".GetScalars() {
+        WriteLine((int)scalar)
+        if UnicodeScalar.IsLetter(scalar) {
+            WriteLine("Letter scalar")
+        }
+    }
+    WriteLine("".Length)
+    let initial: char = default(char)
+    if initial.Equals('\0') {
+        WriteLine("Default NUL")
+    }
+    let copied = characters[0]
+    characters[0] = 'A'
+    WriteLine(copied.ToString())
+    let box = CharacterBox('é')
+    WriteLine(box.Value.ToString())
+}

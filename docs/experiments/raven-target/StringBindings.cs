@@ -14,11 +14,15 @@ static class StringBindings
         new("StartsWithOrdinal", ["String"], "Boolean", true, true),
         new("EndsWithOrdinal", ["String"], "Boolean", true, true),
         new("GetUtf8ByteCount", [], "Int32", true),
+        new("get_Length", [], "Int32", true),
+        new("GetIterator", [], "System.Collections.Iterator<Char>", true, true),
+        new("GetScalars", [], "System.Collections.Sequence<UInt32>", true),
         new("get_IsEmpty", [], "Boolean", true),
         new("SliceUtf8", ["Int32", "Int32"], ResultBindings.Slice, true)
     ];
-    static string CSharp(string type) => type switch { "String" => "string", "Int32" => "int", "Boolean" => "bool", ResultBindings.Slice => "Result<string, Text.Utf8SliceError>", _ => throw new InvalidDataException(type) };
+    static string CSharp(string type) => type switch { "String" => "string", "Char" => "char", "System.Collections.Iterator<Char>" => "Collections.Iterator<char>", "System.Collections.Sequence<UInt32>" => "Collections.Sequence<uint>", "Int32" => "int", "Boolean" => "bool", ResultBindings.Slice => "Result<string, Text.Utf8SliceError>", _ => throw new InvalidDataException(type) };
     public static string Declarations(bool results) => "public sealed class String { " + string.Join(" ", Members.Where(m => results || m.Result != ResultBindings.Slice).Select(m =>
+        m.Name == "get_Length" ? "public int Length => default;" :
         m.Name == "get_IsEmpty" ? "public bool IsEmpty => default;" : m.Name is "op_Equality" or "op_Inequality"
             ? $"public static bool operator {(m.Name == "op_Equality" ? "==" : "!=")}(string left, string right) => default;"
             : $"public {(m.Instance ? "" : "static ")}{CSharp(m.Result)} {m.Name}({string.Join(',', m.Parameters.Select((p, i) => CSharp(p) + " value" + i))}) => default;")) + " }";
@@ -26,7 +30,7 @@ static class StringBindings
     public static Binding? Bind(MethodReference reference, MethodDefinition definition, bool callvirt)
     {
         if (reference.DeclaringType.FullName != "System.String" || !RuntimeSignatures.IsCore(reference.DeclaringType.Scope)) return null;
-        var signature = RuntimeSignatures.Match(reference, definition, ResultBindings.Type);
+        var signature = RuntimeSignatures.Match(reference, definition, t => CollectionBindings.Type(t) ?? ResultBindings.Type(t));
         var member = Members.SingleOrDefault(m => m.Name == reference.Name && m.Instance == reference.HasThis
             && m.Result == signature.Result && m.Parameters.SequenceEqual(signature.Args))
             ?? throw new InvalidDataException("Unsupported String member: " + reference.FullName);

@@ -24,6 +24,11 @@ static class RuntimeServiceBindings
             ("StringEndsWithOrdinal", ["String", "String"], "Boolean"),
             ("Utf8Encode", ["String"], "arrayref<Byte>"),
             ("Utf8Decode", ["arrayref<Byte>"], "Value"),
+            ("StringGraphemeCount", ["String"], "Int32"),
+            ("CharFromString", ["String"], "Char"),
+            ("CharText", ["Char"], "String"),
+            ("StringGraphemes", ["String"], "arrayref<Char>"),
+            ("StringScalars", ["String"], "arrayref<UInt32>"),
             ("StringByteCount", ["String"], "Int32"),
             ("StringSliceUtf8", ["String", "Int32", "Int32"], "Value"),
             ("ErrorFromMessage", ["String"], "System.Error"),
@@ -36,7 +41,7 @@ static class RuntimeServiceBindings
             ("EnvironmentCurrentDirectory", [], "Value"),
             ("EnvironmentVariable", ["String"], "Value"),
             ("Int32ToString", ["Int32"], "String"),
-            ("CharCategory", ["Char"], "Int32"),
+            ("CharCategory", ["UInt32"], "Int32"),
             ("IntPtrToInt64", ["IntPtr"], "Int64"),
             ("UIntPtrToUInt64", ["UIntPtr"], "UInt64"),
             ("ObjectTypeHandle", ["System.Object"], "System.RuntimeTypeHandle"),
@@ -70,7 +75,7 @@ static class RuntimeServiceBindings
             ("TypeEnumUnderlying", ["System.RuntimeTypeHandle"], "System.Introspection.TypeInfo")
         }).ToArray();
     static string CSharp(string type) => type switch {
-        "Byte" => "byte", "Double" => "double", "String" => "string", "Int32" => "int", "Char" => "char",
+        "UInt32" => "uint", "Byte" => "byte", "Double" => "double", "String" => "string", "Int32" => "int", "Char" => "char",
         "Boolean" => "bool", "Int64" => "long", "Value" => "System.Value", "noresult" => "void",
         "IntPtr" => "System.IntPtr", "UIntPtr" => "System.UIntPtr", "UInt64" => "ulong",
         _ when type.StartsWith("System.") => type,
@@ -129,7 +134,7 @@ static class RuntimeServiceBindings
                 : definition.ReturnType is not GenericParameter parameter || parameter.Owner != definition || parameter.Position != 0))
             throw new InvalidDataException("Unsupported erased native value intrinsic.");
         var element = RuntimeSignatures.Map(method.GenericArguments[0], GenericUnionBindings.Type);
-        if (element is not ("String" or "Byte" or "Int32" or "Void"))
+        if (element is not ("String" or "Char" or "UInt32" or "Byte" or "Int32" or "Void"))
             throw new InvalidDataException("Unsupported erased native payload type.");
         var shape = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type);
         if (!shape.Args.SequenceEqual(new[] { "Value" })

@@ -605,7 +605,7 @@ static class UnionImport
                         code.AppendLine(instruction.OpCode.Name).Append(BooleanBindings.Convert("Boolean", "Int32"));
                         break;
                     case Code.Ceq:
-                        if (NumericOperands())
+                        if (NumericOperands() || stack.Count >= 2 && stack[^1].Type == "Char" && stack[^2].Type == "Char")
                         {
                             Pop(); Pop(); Push(new("Int32"));
                             code.AppendLine("ceq").Append(BooleanBindings.Convert("Boolean", "Int32"));
@@ -908,7 +908,7 @@ static class UnionImport
             throw new InvalidDataException("Unsupported runtime signature.");
         // Reuse the declaration catalog for its bounded static Int32 APIs. Check
         // both sides before mapping a resolved CLI reference to the runtime library.
-        var file = FaultBindings.Bind(reference, definition) ?? BooleanBindings.Bind(reference, definition) ?? ProcessBindings.Bind(reference, definition) ?? GenericUnionBindings.Bind(reference, definition) ?? ErrorBindings.Bind(reference, definition) ?? CalendarBindings.Bind(reference, definition) ?? PrimitiveBindings.Bind(reference, definition) ?? DoubleBindings.Bind(reference, definition) ?? Int32Bindings.Bind(reference, definition) ?? Utf8Bindings.Bind(reference, definition) ?? PathBindings.Bind(reference, definition) ?? FileBindings.Bind(reference, definition) ?? ResultBindings.Bind(reference, definition);
+        var file = FaultBindings.Bind(reference, definition) ?? BooleanBindings.Bind(reference, definition) ?? ProcessBindings.Bind(reference, definition) ?? GenericUnionBindings.Bind(reference, definition) ?? ErrorBindings.Bind(reference, definition) ?? CalendarBindings.Bind(reference, definition) ?? PrimitiveBindings.Bind(reference, definition) ?? DoubleBindings.Bind(reference, definition) ?? Int32Bindings.Bind(reference, definition) ?? UnicodeScalarBindings.Bind(reference, definition) ?? Utf8Bindings.Bind(reference, definition) ?? PathBindings.Bind(reference, definition) ?? FileBindings.Bind(reference, definition) ?? ResultBindings.Bind(reference, definition);
         if (file is not null)
         {
             if (file.OutArgument >= 0 && file.Result == "Boolean" || reference.Name == "FromResidual") ValidatePropagation(definition.DeclaringType);

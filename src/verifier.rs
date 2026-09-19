@@ -777,7 +777,7 @@ fn loaded(ty: &Type) -> StackType {
     match ty {
         TypeParameter(index) => StackType::NormalizedParameter(*index),
         MethodTypeParameter(index) => StackType::NormalizedMethodParameter(*index),
-        SByte | Byte | Int16 | UInt16 | Char | UInt32 => StackType::Exact(Int32),
+        SByte | Byte | Int16 | UInt16 | UInt32 => StackType::Exact(Int32),
         UInt64 => StackType::Exact(Int64),
         Single => StackType::Exact(Double),
         ReadOnlyByRef(target) => StackType::Readonly(ByRef(target.clone())),

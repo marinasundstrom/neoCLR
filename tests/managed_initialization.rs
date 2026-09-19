@@ -17,7 +17,7 @@ fn managed_defaults_have_exact_storage_types() {
         ("Byte", Value::Byte(0)),
         ("Int16", Value::Int16(0)),
         ("UInt16", Value::UInt16(0)),
-        ("Char", Value::Char(0)),
+        ("Char", Value::Char("\0".into())),
         ("Int32", Value::Int32(0)),
         ("UInt32", Value::UInt32(0)),
         ("Int64", Value::Int64(0)),

@@ -1,0 +1,69 @@
+namespace System.Text
+
+import System.Runtime.CompilerServices.RuntimeServices
+
+public static class UnicodeScalar {
+    static func IsDigit(value: uint) -> bool {
+        let category = RuntimeServices.CharCategory(value)
+        return category == 8
+    }
+
+    static func IsNumber(value: uint) -> bool {
+        let category = RuntimeServices.CharCategory(value)
+        return category >= 8 && category <= 10
+    }
+
+    static func IsLetter(value: uint) -> bool {
+        let category = RuntimeServices.CharCategory(value)
+        return category >= 0 && category <= 4
+    }
+
+    static func IsUpper(value: uint) -> bool {
+        let category = RuntimeServices.CharCategory(value)
+        return category == 0
+    }
+
+    static func IsLower(value: uint) -> bool {
+        let category = RuntimeServices.CharCategory(value)
+        return category == 1
+    }
+
+    static func IsSeparator(value: uint) -> bool {
+        let category = RuntimeServices.CharCategory(value)
+        return category >= 11 && category <= 13
+    }
+
+    static func IsControl(value: uint) -> bool {
+        let category = RuntimeServices.CharCategory(value)
+        return category == 14
+    }
+
+    static func IsPunctuation(value: uint) -> bool {
+        let category = RuntimeServices.CharCategory(value)
+        return category >= 18 && category <= 24
+    }
+
+    static func IsSymbol(value: uint) -> bool {
+        let category = RuntimeServices.CharCategory(value)
+        return category >= 25 && category <= 28
+    }
+
+    static func IsAscii(value: uint) -> bool {
+        let code: uint = value
+        return code <= 127
+    }
+
+    static func IsAsciiDigit(value: uint) -> bool {
+        let code: uint = value
+        return code >= 48 && code <= 57
+    }
+
+    static func IsLetterOrDigit(value: uint) -> bool {
+        return UnicodeScalar.IsLetter(value) || UnicodeScalar.IsDigit(value)
+    }
+
+    static func IsWhiteSpace(value: uint) -> bool {
+        let code: uint = value
+        return (code >= 9 && code <= 13) || code == 133 || UnicodeScalar.IsSeparator(value)
+    }
+}

@@ -233,4 +233,7 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'InvalidUtf8Error'">
     <Compile Include="src/System/Text/InvalidUtf8Error.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'UnicodeScalar'">
+    <Compile Include="src/System/Text/UnicodeScalar.rvn" />
+  </ItemGroup>
 </Project>

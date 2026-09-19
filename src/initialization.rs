@@ -24,7 +24,7 @@ pub(crate) fn default_value(module: &Module, ty: &Type) -> Result<Value, Fault> 
             Type::Byte => Value::Byte(0),
             Type::Int16 => Value::Int16(0),
             Type::UInt16 => Value::UInt16(0),
-            Type::Char => Value::Char(0),
+            Type::Char => Value::Char("\0".into()),
             Type::Int32 => Value::Int32(0),
             Type::UInt32 => Value::UInt32(0),
             Type::Int64 => Value::Int64(0),

@@ -1,4 +1,4 @@
-use neoclr::{assembler::parse_function_ref, Limits, LoadedProgram, RuntimeService, Value};
+use neoclr::{Limits, LoadedProgram, RuntimeService, Value, assembler::parse_function_ref};
 
 fn program() -> LoadedProgram {
     let module = neoclr::assemble(".module App").unwrap();
@@ -65,12 +65,14 @@ fn char_predicates_observe_unicode_categories_and_unicode_scalars() {
         ),
     ] {
         let f = p
-            .resolve_function(&parse_function_ref(&format!("System.Char::{name}(Char)")).unwrap())
+            .resolve_function(
+                &parse_function_ref(&format!("System.Text.UnicodeScalar::{name}(UInt32)")).unwrap(),
+            )
             .unwrap();
         for (values, expected) in [(yes, true), (no, false)] {
             for value in values {
                 assert_eq!(
-                    f.invoke(vec![Value::Char(value)], Limits::default())
+                    f.invoke(vec![Value::UInt32(value)], Limits::default())
                         .unwrap()
                         .value,
                     Value::Boolean(expected),
@@ -110,7 +112,7 @@ fn neo_literals_and_library_calls_roundtrip() {
                 .run(Limits::default())
                 .unwrap()
                 .value,
-            Value::Char(expected)
+            Value::Char(char::from_u32(expected).unwrap().to_string())
         );
     }
 }
@@ -144,7 +146,10 @@ fn ascii_checks_are_platform_il_and_unicode_checks_declare_service() {
     ] {
         let graph = p
             .analyze_reachability(
-                &[parse_function_ref(&format!("System.Char::{name}(Char)")).unwrap()],
+                &[
+                    parse_function_ref(&format!("System.Text.UnicodeScalar::{name}(UInt32)"))
+                        .unwrap(),
+                ],
                 16,
             )
             .unwrap();
@@ -158,43 +163,29 @@ fn ascii_checks_are_platform_il_and_unicode_checks_declare_service() {
 }
 
 #[test]
-fn char_storage_rejects_non_scalars_without_truncation() {
+fn scalar_classification_rejects_invalid_values_and_char_rejects_integers() {
     let p = program();
     let classify = p
-        .resolve_function(&parse_function_ref("System.Char::IsSymbol(Char)").unwrap())
+        .resolve_function(
+            &parse_function_ref("System.Text.UnicodeScalar::IsSymbol(UInt32)").unwrap(),
+        )
         .unwrap();
     for value in [0xd800, 0xdfff, 0x110000, u32::MAX] {
-        assert!(classify
-            .invoke(vec![Value::Char(value)], Limits::default())
-            .is_err());
+        assert!(
+            classify
+                .invoke(vec![Value::UInt32(value)], Limits::default())
+                .is_err()
+        );
         let module = neoclr::assemble(&format!(
             ".module Scalars\n.entry Main\n.function Main() -> Char\nldc.i4 {}\nret\n.end",
             value as i32
         ))
         .unwrap();
-        assert!(LoadedProgram::new(&module)
-            .unwrap()
-            .run(Limits::default())
-            .is_err());
-    }
-}
-
-#[test]
-fn scalar_char_native_storage_is_four_bytes_and_roundtrips() {
-    let module = neoclr::assemble(".module Scalars\n.entry Main\n.function Main() -> Char\n.local Char* data\nldc.i4 1\nheap.alloc Char\nstloc data\nldloc data\nldc.i4 128512\nstobj Char\nldloc data\nldobj Char\nret\n.end").unwrap();
-    assert_eq!(
-        LoadedProgram::new(&module)
-            .unwrap()
-            .run(Limits::default())
-            .unwrap()
-            .value,
-        Value::Char(0x1f600)
-    );
-    for code in [0xd800, 0x110000] {
-        let module = neoclr::assemble(&format!(".module Scalars\n.entry Main\n.function Main() -> Char\n.local UInt32* data\nldc.i4 1\nheap.alloc UInt32\nstloc data\nldloc data\nldc.i4 {code}\nstobj UInt32\nldloc data\nptr.cast Char\nldobj Char\nret\n.end")).unwrap();
-        assert!(LoadedProgram::new(&module)
-            .unwrap()
-            .run(Limits::default())
-            .is_err());
+        assert!(
+            LoadedProgram::new(&module)
+                .unwrap()
+                .run(Limits::default())
+                .is_err()
+        );
     }
 }

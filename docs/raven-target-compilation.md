@@ -145,3 +145,13 @@ on main and `673291bbb` on neoclr; 31 indexer execution/diagnostic/completion ch
 passed. Runtime Contract configuration and CLI property shape are unchanged.
 No neoCLR policy or test was merged into main. The subsequent grapheme-first
 String decision is separate API design work, not implemented by this compiler fix.
+
+## Grapheme Char contract — 2026-09-19
+
+The target now selects `RavenGraphemeChar=true`. Char literals emit a validated
+`System.Char.FromString` call; array and byref operations preserve typed Char
+values, and numeric conversions are rejected. Grapheme literal patterns compare
+ordinal text. The importer admits these operations only against the matching core
+metadata. Ordinary .NET compilation is unchanged; the intermediate scalar option
+is not selected by neoCLR. See [the text design](design/text-abstraction.md) for
+Unicode-version limits, migration, .NET/Swift/Rust comparisons and validation.

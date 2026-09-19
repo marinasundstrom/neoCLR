@@ -1,0 +1,520 @@
+; Generated from runtime/raven/src/System/Text/UnicodeScalar.rvn. Regenerate with build_runtime_library.py.
+.method static IsDigit(UInt32 value) -> Boolean
+.local Int32 local0
+ldc.i4 0
+stloc local0
+M00000001_IL_0000:
+M00000001_IL_0001:
+M00000001_IL_0002:
+ldarg 0
+M00000001_IL_0003:
+call neoCLR.Runtime.CharCategory(UInt32)
+M00000001_IL_0008:
+stloc local0
+M00000001_IL_0009:
+M00000001_IL_000a:
+ldloc local0
+M00000001_IL_000b:
+ldc.i4 8
+M00000001_IL_000c:
+ceq
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_000e:
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method static IsNumber(UInt32 value) -> Boolean
+.local Int32 local0
+ldc.i4 0
+stloc local0
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldarg 0
+M00000002_IL_0003:
+call neoCLR.Runtime.CharCategory(UInt32)
+M00000002_IL_0008:
+stloc local0
+M00000002_IL_0009:
+M00000002_IL_000a:
+ldloc local0
+M00000002_IL_000b:
+ldc.i4 8
+M00000002_IL_000c:
+clt
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_000e:
+ldc.i4 0
+M00000002_IL_000f:
+ceq
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_0011:
+brfalse M00000002_IL_0023
+M00000002_IL_0016:
+ldloc local0
+M00000002_IL_0017:
+ldc.i4 10
+M00000002_IL_0019:
+cgt
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_001b:
+ldc.i4 0
+M00000002_IL_001c:
+ceq
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_001e:
+br M00000002_IL_0024
+M00000002_IL_0023:
+ldc.i4 0
+M00000002_IL_0024:
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method static IsLetter(UInt32 value) -> Boolean
+.local Int32 local0
+ldc.i4 0
+stloc local0
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+call neoCLR.Runtime.CharCategory(UInt32)
+M00000003_IL_0008:
+stloc local0
+M00000003_IL_0009:
+M00000003_IL_000a:
+ldloc local0
+M00000003_IL_000b:
+ldc.i4 0
+M00000003_IL_000c:
+clt
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_000e:
+ldc.i4 0
+M00000003_IL_000f:
+ceq
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_0011:
+brfalse M00000003_IL_0022
+M00000003_IL_0016:
+ldloc local0
+M00000003_IL_0017:
+ldc.i4 4
+M00000003_IL_0018:
+cgt
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_001a:
+ldc.i4 0
+M00000003_IL_001b:
+ceq
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_001d:
+br M00000003_IL_0023
+M00000003_IL_0022:
+ldc.i4 0
+M00000003_IL_0023:
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method static IsUpper(UInt32 value) -> Boolean
+.local Int32 local0
+ldc.i4 0
+stloc local0
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+call neoCLR.Runtime.CharCategory(UInt32)
+M00000004_IL_0008:
+stloc local0
+M00000004_IL_0009:
+M00000004_IL_000a:
+ldloc local0
+M00000004_IL_000b:
+ldc.i4 0
+M00000004_IL_000c:
+ceq
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M00000004_IL_000e:
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method static IsLower(UInt32 value) -> Boolean
+.local Int32 local0
+ldc.i4 0
+stloc local0
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+call neoCLR.Runtime.CharCategory(UInt32)
+M00000005_IL_0008:
+stloc local0
+M00000005_IL_0009:
+M00000005_IL_000a:
+ldloc local0
+M00000005_IL_000b:
+ldc.i4 1
+M00000005_IL_000c:
+ceq
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_000e:
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method static IsSeparator(UInt32 value) -> Boolean
+.local Int32 local0
+ldc.i4 0
+stloc local0
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+call neoCLR.Runtime.CharCategory(UInt32)
+M00000006_IL_0008:
+stloc local0
+M00000006_IL_0009:
+M00000006_IL_000a:
+ldloc local0
+M00000006_IL_000b:
+ldc.i4 11
+M00000006_IL_000d:
+clt
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_000f:
+ldc.i4 0
+M00000006_IL_0010:
+ceq
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_0012:
+brfalse M00000006_IL_0024
+M00000006_IL_0017:
+ldloc local0
+M00000006_IL_0018:
+ldc.i4 13
+M00000006_IL_001a:
+cgt
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_001c:
+ldc.i4 0
+M00000006_IL_001d:
+ceq
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_001f:
+br M00000006_IL_0025
+M00000006_IL_0024:
+ldc.i4 0
+M00000006_IL_0025:
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method static IsControl(UInt32 value) -> Boolean
+.local Int32 local0
+ldc.i4 0
+stloc local0
+M00000007_IL_0000:
+M00000007_IL_0001:
+M00000007_IL_0002:
+ldarg 0
+M00000007_IL_0003:
+call neoCLR.Runtime.CharCategory(UInt32)
+M00000007_IL_0008:
+stloc local0
+M00000007_IL_0009:
+M00000007_IL_000a:
+ldloc local0
+M00000007_IL_000b:
+ldc.i4 14
+M00000007_IL_000d:
+ceq
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_000f:
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method static IsPunctuation(UInt32 value) -> Boolean
+.local Int32 local0
+ldc.i4 0
+stloc local0
+M00000008_IL_0000:
+M00000008_IL_0001:
+M00000008_IL_0002:
+ldarg 0
+M00000008_IL_0003:
+call neoCLR.Runtime.CharCategory(UInt32)
+M00000008_IL_0008:
+stloc local0
+M00000008_IL_0009:
+M00000008_IL_000a:
+ldloc local0
+M00000008_IL_000b:
+ldc.i4 18
+M00000008_IL_000d:
+clt
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_000f:
+ldc.i4 0
+M00000008_IL_0010:
+ceq
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0012:
+brfalse M00000008_IL_0024
+M00000008_IL_0017:
+ldloc local0
+M00000008_IL_0018:
+ldc.i4 24
+M00000008_IL_001a:
+cgt
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_001c:
+ldc.i4 0
+M00000008_IL_001d:
+ceq
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_001f:
+br M00000008_IL_0025
+M00000008_IL_0024:
+ldc.i4 0
+M00000008_IL_0025:
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method static IsSymbol(UInt32 value) -> Boolean
+.local Int32 local0
+ldc.i4 0
+stloc local0
+M00000009_IL_0000:
+M00000009_IL_0001:
+M00000009_IL_0002:
+ldarg 0
+M00000009_IL_0003:
+call neoCLR.Runtime.CharCategory(UInt32)
+M00000009_IL_0008:
+stloc local0
+M00000009_IL_0009:
+M00000009_IL_000a:
+ldloc local0
+M00000009_IL_000b:
+ldc.i4 25
+M00000009_IL_000d:
+clt
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_000f:
+ldc.i4 0
+M00000009_IL_0010:
+ceq
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_0012:
+brfalse M00000009_IL_0024
+M00000009_IL_0017:
+ldloc local0
+M00000009_IL_0018:
+ldc.i4 28
+M00000009_IL_001a:
+cgt
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_001c:
+ldc.i4 0
+M00000009_IL_001d:
+ceq
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_001f:
+br M00000009_IL_0025
+M00000009_IL_0024:
+ldc.i4 0
+M00000009_IL_0025:
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method static IsAscii(UInt32 value) -> Boolean
+.local UInt32 local0
+ldc.i4 0
+stloc local0
+M0000000a_IL_0000:
+M0000000a_IL_0001:
+M0000000a_IL_0002:
+ldarg 0
+M0000000a_IL_0003:
+stloc local0
+M0000000a_IL_0004:
+M0000000a_IL_0005:
+ldloc local0
+M0000000a_IL_0006:
+conv.u8
+M0000000a_IL_0007:
+ldc.i4 127
+M0000000a_IL_0009:
+conv.i8
+M0000000a_IL_000a:
+cgt
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_000c:
+ldc.i4 0
+M0000000a_IL_000d:
+ceq
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_000f:
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method static IsAsciiDigit(UInt32 value) -> Boolean
+.local UInt32 local0
+ldc.i4 0
+stloc local0
+M0000000b_IL_0000:
+M0000000b_IL_0001:
+M0000000b_IL_0002:
+ldarg 0
+M0000000b_IL_0003:
+stloc local0
+M0000000b_IL_0004:
+M0000000b_IL_0005:
+ldloc local0
+M0000000b_IL_0006:
+conv.u8
+M0000000b_IL_0007:
+ldc.i4 48
+M0000000b_IL_0009:
+conv.i8
+M0000000b_IL_000a:
+clt
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M0000000b_IL_000c:
+ldc.i4 0
+M0000000b_IL_000d:
+ceq
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M0000000b_IL_000f:
+brfalse M0000000b_IL_0023
+M0000000b_IL_0014:
+ldloc local0
+M0000000b_IL_0015:
+conv.u8
+M0000000b_IL_0016:
+ldc.i4 57
+M0000000b_IL_0018:
+conv.i8
+M0000000b_IL_0019:
+cgt
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M0000000b_IL_001b:
+ldc.i4 0
+M0000000b_IL_001c:
+ceq
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M0000000b_IL_001e:
+br M0000000b_IL_0024
+M0000000b_IL_0023:
+ldc.i4 0
+M0000000b_IL_0024:
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method static IsLetterOrDigit(UInt32 value) -> Boolean
+M0000000c_IL_0000:
+M0000000c_IL_0001:
+M0000000c_IL_0002:
+ldarg 0
+M0000000c_IL_0003:
+call System.Text.UnicodeScalar.IsLetter(UInt32)
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_0008:
+brtrue M0000000c_IL_0018
+M0000000c_IL_000d:
+ldarg 0
+M0000000c_IL_000e:
+call System.Text.UnicodeScalar.IsDigit(UInt32)
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_0013:
+br M0000000c_IL_0019
+M0000000c_IL_0018:
+ldc.i4 1
+M0000000c_IL_0019:
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method static IsWhiteSpace(UInt32 value) -> Boolean
+.local UInt32 local0
+ldc.i4 0
+stloc local0
+M0000000d_IL_0000:
+M0000000d_IL_0001:
+M0000000d_IL_0002:
+ldarg 0
+M0000000d_IL_0003:
+stloc local0
+M0000000d_IL_0004:
+M0000000d_IL_0005:
+ldloc local0
+M0000000d_IL_0006:
+conv.u8
+M0000000d_IL_0007:
+ldc.i4 9
+M0000000d_IL_0009:
+conv.i8
+M0000000d_IL_000a:
+clt
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_000c:
+ldc.i4 0
+M0000000d_IL_000d:
+ceq
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_000f:
+brfalse M0000000d_IL_0023
+M0000000d_IL_0014:
+ldloc local0
+M0000000d_IL_0015:
+conv.u8
+M0000000d_IL_0016:
+ldc.i4 13
+M0000000d_IL_0018:
+conv.i8
+M0000000d_IL_0019:
+cgt
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_001b:
+ldc.i4 0
+M0000000d_IL_001c:
+ceq
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_001e:
+br M0000000d_IL_0024
+M0000000d_IL_0023:
+ldc.i4 0
+M0000000d_IL_0024:
+brtrue M0000000d_IL_0038
+M0000000d_IL_0029:
+ldloc local0
+M0000000d_IL_002a:
+conv.u8
+M0000000d_IL_002b:
+ldc.i4 133
+M0000000d_IL_0030:
+conv.i8
+M0000000d_IL_0031:
+ceq
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_0033:
+br M0000000d_IL_0039
+M0000000d_IL_0038:
+ldc.i4 1
+M0000000d_IL_0039:
+brtrue M0000000d_IL_0049
+M0000000d_IL_003e:
+ldarg 0
+M0000000d_IL_003f:
+call System.Text.UnicodeScalar.IsSeparator(UInt32)
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_0044:
+br M0000000d_IL_004a
+M0000000d_IL_0049:
+ldc.i4 1
+M0000000d_IL_004a:
+call neoCLR.Library.System.Text.UnicodeScalar.RuntimeBooleanFromInt32(Int32)
+ret
+.end

@@ -4376,3 +4376,34 @@ indexer emission bug exposed during this work was reproduced on Raven main's
 ordinary .NET target, fixed with class/struct execution tests (31 focused tests
 passed), integrated into main and cherry-picked to neoclr. The temporary Raven fix
 branch was removed. See [the revised text abstraction](design/text-abstraction.md).
+
+### Implementing the revised character model — 2026-09-19
+
+The author asked for a recommendation based on other languages and environments.
+The assistant recommended Swift-inspired grapheme characters with explicit scalar
+and encoding access, and refined its earlier indexing recommendation: provide
+iteration first and defer integer indexing. The author directed “Make it so” and
+then emphasized an improved .NET-like experience fitting modern computing.
+
+The assistant implemented owned grapheme Char storage, String Length/iteration,
+explicit uint scalar traversal and UnicodeScalar classification. A Raven program
+now executes combining sequences, emoji, literal patterns, arrays and interface
+iteration on neoCLR. Runtime testing exposed the need to count Char payload bytes
+in array limits; end-to-end testing exposed String interface receiver adaptation.
+Both were addressed in this work. The implementation keeps ordinal equality,
+Unicode 16 segmentation and snapshot iteration explicit; normalization, cursors,
+a scalar value type and host/target literal Unicode-version alignment remain open.
+See [the contract and evidence](design/text-abstraction.md). This records local
+implementation, not publication of a new preview or website deployment.
+
+The author then explicitly affirmed that a character is not a number format and
+that numeric casts should not exist merely because of its backing storage. The
+assistant confirmed that the implementation rejects those casts and keeps Unicode
+numeric access explicit through GetScalars. This is an API principle, not just an
+implementation limitation or a temporary missing conversion.
+
+The author subsequently suggested future UTF-8 and ASCII string types for
+encoding-specific functionality, while preserving String as the default neutral
+text container and Char as an encoding-independent character. The assistant
+recorded Utf8String/AsciiString as possible future specialized types, not additions
+to this minimal implementation. UTF-8 remains the canonical runtime storage choice.

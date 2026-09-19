@@ -2,7 +2,8 @@
 
 Implemented 2026-09-08. This bounded text slice supports identifier, prefix and
 suffix checks in ordinary Neo programs. It leaves culture, case folding, search
-indexes, Rune iteration and general String.Length unsettled.
+indexes and general encoding abstractions unsettled. The later
+[grapheme contract](design/text-abstraction.md) defines String.Length and iteration.
 
 ## API contract
 

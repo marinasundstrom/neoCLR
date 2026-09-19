@@ -10,47 +10,41 @@ this review publishes a runtime, extension or website.
 
 | Area | Working development surface | Evidence and limits |
 | --- | --- | --- |
-| Runtime foundation | Raven-authored System.Runtime and programs executing on neoCLR | 76 generated implementation slices reproduce cleanly; selected-profile ownership check reports 847 declarations and 69 explicit native services |
+| Runtime foundation | Raven-authored System.Runtime and programs executing on neoCLR | 77 generated implementation slices reproduce cleanly; selected-profile ownership check reports 862 declarations and 74 explicit native services |
 | Introspection | TypeInfo in the sealed MemberInfo family; Object.GetType/typeof; RuntimeContext.ExecutingAssembly; assembly references, module-scoped tokens and Sequence collections | Runnable discovery/matching samples and earlier targeted runtime/editor checks; retained loaded metadata only, without dynamic loading, invocation or emit |
-| Strings | Immutable valid UTF-8 storage, strict Utf8 Encode/Decode, byte-boundary slicing, IsEmpty property and UTF-8/scalar ordinal ordering | UTF-8 round trips, invalid sequences, BOM/NUL preservation, snapshot independence, allocation bounds, signature/editor checks and saved-project programs pass |
+| Strings | Grapheme Char, String.Length/iteration, explicit scalar traversal, canonical UTF-8 storage, strict Utf8 Encode/Decode and ordinal ordering | UTF-8 round trips, invalid sequences, BOM/NUL preservation, snapshot independence, allocation bounds, signature/editor checks and saved-project programs pass |
 | Outcomes | Option/Result, patterns and propagation | Executable examples expose recoverable outcomes without requiring carrier-specific extraction methods |
 | Collections and queries | Capability interfaces, array/list views, lazy queries and typed terminal outcomes | Existing sample-backed implementation; read-only views are not immutable snapshots |
 | Dates and clocks | Date/Time, Instant/Duration and injectable Clock/SystemClock | Fixed-clock and system-clock sample; calendar/timezone/globalization proposals are broader than the implementation |
 | Files | Bounded synchronous UTF-8 whole-file reads/writes with typed errors | Existing file verification passed earlier in this work; filesystem capabilities and streams remain proposals |
-| Tooling and explanation | Fresh local VS Code workspace, six feature pages, proposal overview and website maintenance rules | Local saved-source UTF-8 execution and completion pass; eight pages build with checked links and source excerpts |
+| Tooling and explanation | Fresh local VS Code workspace, six feature pages, proposal overview and website maintenance rules | Local saved-source grapheme execution and completion pass; ten pages build with checked links and source excerpts |
 
 The fresh local workspace is
-`~/.neoclr/experiments/native-utf8-20260919/demo`. Its manifest records runtime,
+`~/.neoclr/experiments/grapheme-text-20260919/demo`. Its manifest records runtime,
 core, bridge, compiler and server hashes. It preserves the older workspace instead
 of overwriting evaluator edits. This is a local development snapshot, not a public
 SDK release or evidence for untested hosts.
 
-## Close the text-model gap first
+## Grapheme text foundation
 
-Native UTF-8 is now the selected direction, following the original String proposal.
-String storage and ordinal ordering align with it. The scalar-Char integration is
-now committed: four-byte validated runtime values, supplementary Raven literals,
-patterns, arrays and classification pass targeted execution checks. Surrogate-only
-predicates are removed. The new local scalar workspace is recorded in
-[local tools](local-tools-20260919.md#scalar-char-follow-up).
+The approved development model now uses owned grapheme Char values, String.Length
+and Iterable<char>, with explicit Sequence<uint> scalar traversal and UnicodeScalar
+classification. UTF-8 remains canonical storage. The working Raven sample includes
+combining marks, family emoji, literal patterns, arrays and interface iteration.
+See [the contract and migration](design/text-abstraction.md).
 
-Clean regeneration of all 76 library slices matches the committed snapshots.
-Utf8, Strings, StringSlices, StringBoundaries and ArrayShapes saved-project
-regressions pass with the scalar compiler/runtime, alongside the rejection checks.
+The current profile contains 77 Raven implementation slices, with 862 declarations
+and 74 explicit native service declarations in the ownership check. The earlier
+scalar-Char snapshot is historical. Evaluators must refresh the matching compiler,
+reference metadata, library and runtime together.
 
-The author has revised the direction to grapheme-based ordinary text access.
-The next step is defining Char as a text value and explicit scalar access before
-adding default length/index/iteration; see [text abstraction](design/text-abstraction.md). Do not introduce byte-based
-String.Length accidentally. Scalar indexing over UTF-8 has different cost from
-fixed-width code-unit access, and grapheme handling remains separate. Keep a general
-Encoding hierarchy and specialized string types deferred. Numeric casts currently
-narrow to UInt32 before scalar validation; checked wide conversions remain open.
-
-This is the strongest candidate for additional preview implementation. Adding broad
-new API families would dilute the stated goal while this fundamental distinction
-remains incomplete. Compare against .NET Char/Rune and indexing behavior using the
-[text model](text-model.md), [original proposal](proposals/string-api.md) and
-[ordering decision](ordinal-text.md), without preserving UTF-16 as a platform constraint.
+Remaining text design questions are normalization/collation, a dedicated scalar
+value type, efficient iteration and cursor-based slicing. Integer string indexing
+is deferred. Literal diagnostics currently use host Unicode segmentation, while
+runtime construction enforces pinned Unicode 16 rules; this tooling difference and
+CLI constant metadata need resolution before promising a stable contract. These
+limits should be stated in the preview rather than suggesting all text processing
+or all Char language features are complete.
 
 ## Keep the demonstration small
 
@@ -67,7 +61,7 @@ contracts and runtime work beyond the current small demonstration.
 
 ## Release gates still outstanding
 
-1. Finish or explicitly resolve the remaining grapheme String/Char contract gap above before
+1. Review the documented grapheme String/Char limits above before
    presenting the native text model as complete. Re-run affected runtime and Raven
    tests; keep neoCLR policies on Raven's neoclr branch and extract general fixes
    independently if any are discovered.
@@ -79,7 +73,7 @@ contracts and runtime work beyond the current small demonstration.
    fallback. The local snapshot proves a path, not the final distribution.
 4. Review migration notes: System.Type → TypeInfo, sealed MemberInfo matches,
    Sequence returns, IsEmpty property and changed ordinal ordering. Include the
-   scalar-Char migration once implemented. Preserve published release notes.
+   grapheme-Char migration. Preserve published release notes.
 5. Select version/date and scope, then align downloads and website status with the
    actual release. Push/PR site validation is automatic; publication is manually
    dispatched on main after review. No deployment has been run here.
@@ -91,15 +85,21 @@ release maintenance.
 
 ## Local evidence from this work
 
-- 76-slice clean bootstrap regeneration and input/output hashes pass.
+- 77-slice clean bootstrap regeneration and input/output hashes pass.
+- Full runtime all-targets testing completed: 1280 tests pass after correcting
+  two outdated native-service inventory counts and rerunning their suites.
 - 3 UTF-8 runtime tests, 8 String tests and 5 disposal tests pass.
 - 5 ordinal tests and the Raven boundary sample pass after the native-order change.
 - UTF-8 plus three existing String sample programs and 23 edit/rejection checks pass.
 - Four feature-page sample checks (propagation, collection capabilities, query
   terminals and clocks), plus their 23 edit/rejection checks, pass.
 - Exact-signature admission and String/Utf8 language-server completion pass.
-- The fresh snapshot builds/runs the UTF-8 sample and passes completion checks.
-- Tokenizer test, 3 website-builder tests, all eight page builds and repository-link
+- The fresh grapheme snapshot builds/runs its expanded sample (including fields,
+  defaults and copying) and passes 20 completion sections.
+- The grapheme compiler contract passes 94 focused compiler/lexer tests. The
+  saved-project regression passes 31 outcomes; scalar checks pass 125 Boolean/numeric
+  outcomes plus four invalid classifications, and 137 signature checks pass.
+- Tokenizer test, 3 website-builder tests, all ten page builds and repository-link
   target checks pass. Workflow YAML parses; manual-only deployment guard reviewed.
 
 Introspection, file and broader library checks are earlier evidence in this task,

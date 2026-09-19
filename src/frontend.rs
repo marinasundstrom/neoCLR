@@ -2400,7 +2400,13 @@ impl Lowerer<'_> {
                 Ok(Ty::Record("System.Double".into()))
             }
             ExprKind::Char(value) => {
-                self.body.extend([format!("ldc.i4 {value}")]);
+                let text = char::from_u32(*value)
+                    .ok_or_else(|| Fault::new("invalid scalar"))?
+                    .to_string();
+                self.body
+                    .push(format!("ldstr {}", serde_json::to_string(&text).unwrap()));
+                self.body
+                    .push("call neoCLR.Runtime.CharFromString(String)".into());
                 Ok(Ty::Record("System.Char".into()))
             }
             ExprKind::String(value) => {

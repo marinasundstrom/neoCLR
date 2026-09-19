@@ -155,7 +155,7 @@ try:
     if strings:
         for version, access, prefix, expected, forbidden in (
             (11, 'text.', '    let text = "hello"\n',
-             ('Equals', 'ContainsOrdinal', 'StartsWithOrdinal', 'EndsWithOrdinal', 'GetUtf8ByteCount', 'IsEmpty', 'SliceUtf8'), ('Substring', 'Contains')),
+             ('Equals', 'ContainsOrdinal', 'StartsWithOrdinal', 'EndsWithOrdinal', 'GetUtf8ByteCount', 'Length', 'GetIterator', 'GetScalars', 'IsEmpty', 'SliceUtf8'), ('Substring', 'Contains')),
             (12, 'System.String.', '', ('Concat', 'CompareOrdinal'), ('IsNullOrEmpty', 'Join', 'Format')),
             (13, 'System.Text.Utf8.', '', ('Encode', 'Decode'), ())):
             text = 'import System.*\nfunc Main() {\n' + prefix + '    ' + access + '\n}'
@@ -201,10 +201,10 @@ try:
             'position': {'line': 1, 'character': 16}, 'context': {'triggerKind': 1}}, True))
         items = result if isinstance(result, list) else result['items']
         labels = sorted({item['label'] for item in items})
-        expected = ('IsDigit', 'IsNumber', 'IsLetter', 'IsUpper', 'IsLower', 'IsSeparator', 'IsControl', 'IsPunctuation', 'IsSymbol', 'IsAscii', 'IsAsciiDigit', 'IsLetterOrDigit', 'IsWhiteSpace')
+        expected = ('FromString',)
         if any(not any(label == name or label.startswith(name + '(') for label in labels) for name in expected):
             raise AssertionError('Missing character API: ' + str(labels))
-        if any('Surrogate' in label for label in labels):
+        if any('Surrogate' in label or label.startswith('IsDigit') for label in labels):
             raise AssertionError('Removed surrogate API remains visible: ' + str(labels))
         results['Char'] = labels
     if calendar:

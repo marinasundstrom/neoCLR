@@ -26,8 +26,8 @@ func Main() {
     WriteLine((int)bytes[0])
     let shorts: ushort[] = [(ushort)65535]
     WriteLine((int)shorts[0])
-    let chars: char[] = [(char)65535]
-    WriteLine((int)chars[0])
+    let chars: char[] = ['é']
+    WriteLine(chars[0].ToString())
     let nested: int[][] = [[42]]
     WriteLine(nested[0][0])
 }

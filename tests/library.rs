@@ -35,7 +35,7 @@ fn runtime_library_is_assembled_platform_code() {
             .iter()
             .filter(|f| f.is_internal_call())
             .count(),
-        54 // Includes reflection, enum, text, math, clock, environment, path and file I/O helpers.
+        59 // Includes grapheme/scalar text, reflection, enum, text, math, clock, environment, path and file I/O helpers.
     );
     assert!(
         module

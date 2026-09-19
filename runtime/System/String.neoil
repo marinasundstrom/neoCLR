@@ -1,2 +1,2 @@
-.include "../raven/generated/String.methods.neoil"
-.include "../raven/generated/String.helpers.neoil"
+.include "../raven/generated/String.bootstrap.methods.neoil"
+.include "../raven/generated/String.bootstrap.helpers.neoil"

@@ -1198,3 +1198,14 @@ checks, nine saved samples plus shared edit/rejection checks, and completion/que
 array-invariance editor checks pass. Snapshot ownership remains 841 declarations and
 66 runtime services across 75 source slices. The author closes this Introspection
 story here; String API and runtime behavior are a later story.
+
+### Grapheme text update — 2026-09-19
+
+The current development profile contains 77 slices. Char's earlier scalar predicate
+port is superseded: Char now owns a grapheme cluster, while UnicodeScalar owns the
+numeric classification predicates. String adds Length, Iterable<char> and explicit
+GetScalars. The generated String bootstrap fragments omit collection methods for
+the archived Neo profile; the Raven profile uses the complete authoring source.
+The ownership audit reports 862 declarations and 74 explicit native services.
+See [the text contract](design/text-abstraction.md) and
+[the runnable example](experiments/raven-target/samples/library-grapheme-strings.rvn).

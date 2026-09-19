@@ -41,7 +41,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-scalar-library-') as temporary:
             'IsWhiteSpace': code in [9, 13, 32, 133, 160, 0x2028],
         }
         for name, value in predicates.items():
-            statements.append(f'Show(Char.{name}((char){code}))')
+            statements.append(f'Show(System.Text.UnicodeScalar.{name}((uint){code}))')
             expected.append('true' if value else 'false')
     source = '''import System.*
 import System.Result.*
@@ -91,14 +91,11 @@ func Main() {
     assert actual == expected, (actual, expected)
     print(f'{len(expected)} scalar and Boolean merge outcomes passed')
 
-    # Invalid scalar values must fail even when the cast is immediately widened.
+    # Classification rejects values outside the Unicode scalar domain.
     for code in (0xd800, 0xdfff, 0x110000, -1):
         (root / 'Main.rvn').write_text(f"""import System.Console.*
-func Invalid(value: int) -> int {{
-    return (int)(char)value
-}}
 func Main() {{
-    WriteLine(Invalid({code}))
+    if System.Text.UnicodeScalar.IsLetter((uint){code}) {{ WriteLine("letter") }}
 }}
 """)
         run(['dotnet', compiler, project, '--no-project-restore', '-o', root / 'compiled'])
@@ -106,5 +103,5 @@ func Main() {{
         run(['dotnet', bridge, '--import', root / 'compiled/Consumer.dll', core, rejected])
         failure = subprocess.run([str(runtime), 'run', str(rejected / 'App.neoil'), '--system', str(system)], capture_output=True, text=True, timeout=30)
         assert failure.returncode != 0, (code, failure.stdout, failure.stderr)
-        assert 'Char requires a Unicode scalar value' in failure.stderr, (code, failure.stderr)
-    print('4 invalid scalar conversion outcomes passed')
+        assert 'invalid Unicode scalar' in failure.stderr, (code, failure.stderr)
+    print('4 invalid scalar classification outcomes passed')

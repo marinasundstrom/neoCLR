@@ -22,7 +22,7 @@ static class FileProbe
                     metadataImportOptions: new MetadataImportOptions(CoreDeclarations.Identity),
                     runtimePropagationContract: new RuntimePropagationContract(CoreDeclarations.Identity, "System.Propagatable`3"))
                     .WithTargetCoreAssemblyName(CoreDeclarations.Identity)
-            .WithUnicodeScalarChar(true)
+            .WithGraphemeChar(true)
                     .WithRuntimeUnitContract(new RuntimeUnitContract(CoreDeclarations.Identity, "System.Void")));
             var raw = Path.Combine(output, name + ".raw.dll");
             using (var stream = File.Create(raw))

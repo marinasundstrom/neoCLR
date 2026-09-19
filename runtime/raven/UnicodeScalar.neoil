@@ -1,0 +1,4 @@
+.type System.Text.UnicodeScalar
+.include "generated/UnicodeScalar.methods.neoil"
+.end
+.include "generated/UnicodeScalar.helpers.neoil"

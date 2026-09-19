@@ -39,12 +39,12 @@ Compare the existing [String contracts](raven-string-api.md), [text model](text-
 and [ordinal behavior](ordinal-text.md) with .NET's UTF-16 String/Char model before
 changing semantics. Settle the units of length, indexing and slicing, Unicode
 boundary behavior, and the minimum byte/text boundary needed by runnable examples.
-The later author clarification selects native UTF-8 and the proposal’s scalar Char
-direction. The minimal conversion slice is implemented; scalar Char requires a
-coordinated migration, while an Encoding hierarchy remains deferred. UTF-8 support can improve storage/interchange ergonomics;
-its indexing costs and .NET migration differences must be explicit. This section
-now includes strict Utf8 conversion and UTF-8/scalar ordinal ordering; it does not
-claim that scalar Char or scalar indexing is already implemented.
+The final author clarification selects encoding-independent text with UTF-8 storage
+and grapheme Char as the ordinary unit. The minimal development implementation now
+includes String.Length/iteration, explicit scalar traversal and classification,
+and strict UTF-8 conversion. Integer indexing is deferred; normalization, text
+positions and more efficient iteration remain open. See
+[the current contract and evidence](design/text-abstraction.md).
 
 ## Next-preview feature pages (2026-09-19)
 

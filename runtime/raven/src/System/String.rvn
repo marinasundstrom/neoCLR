@@ -4,7 +4,7 @@ import System.Runtime.CompilerServices.RuntimeServices
 import System.Result.*
 import System.Text.Utf8SliceError
 
-public class String : Equatable<string> {
+public class String : Equatable<string>, Collections.Iterable<char> {
     // Intrinsic storage supplied by the runtime, never an allocated class field.
     #pragma warning disable-next-line RAV9032
     private field m_value: string
@@ -35,6 +35,18 @@ public class String : Equatable<string> {
 
     func GetUtf8ByteCount() -> int {
         return RuntimeServices.StringByteCount(m_value)
+    }
+
+    val Length: int => RuntimeServices.StringGraphemeCount(m_value)
+
+
+    func GetIterator() -> Collections.Iterator<char> {
+        let elements = RuntimeServices.StringGraphemes(m_value)
+        return elements.GetIterator()
+    }
+
+    func GetScalars() -> Collections.Sequence<uint> {
+        return RuntimeServices.StringScalars(m_value)
     }
 
     val IsEmpty: bool => RuntimeServices.StringEquals(m_value, "")

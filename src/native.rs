@@ -1,8 +1,9 @@
 //! Explicit runtime binding registry. A name alone never activates host dispatch.
 use crate::{
-    metadata::{Function, Type},
     Fault, Value,
+    metadata::{Function, Type},
 };
+use unicode_segmentation::UnicodeSegmentation;
 
 pub(crate) enum Binding {
     EnvironmentArguments,
@@ -29,6 +30,11 @@ pub(crate) enum Binding {
     Utf8Encode,
     Utf8Decode,
     StringConcat,
+    StringGraphemeCount,
+    CharFromString,
+    CharText,
+    StringGraphemes,
+    StringScalars,
     StringByteCount,
     StringCompareOrdinal,
     StringContainsOrdinal,
@@ -116,7 +122,7 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         ("neoCLR.Runtime.Int32ToString", [Type::Int32]) => (Binding::Int32ToString, Type::String),
         ("neoCLR.Runtime.Fault", [Type::String]) => (Binding::Fault, Type::Void),
         ("neoCLR.Runtime.WriteLine", [Type::String]) => (Binding::WriteLine, Type::Void),
-        ("neoCLR.Runtime.CharCategory", [Type::Char]) => (Binding::CharCategory, Type::Int32),
+        ("neoCLR.Runtime.CharCategory", [Type::UInt32]) => (Binding::CharCategory, Type::Int32),
         ("neoCLR.Runtime.Utf8Encode", [Type::String]) => {
             (Binding::Utf8Encode, Type::Array(Box::new(Type::Byte)))
         }
@@ -137,6 +143,17 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         }
         ("neoCLR.Runtime.StringEndsWithOrdinal", [Type::String, Type::String]) => {
             (Binding::StringEndsWithOrdinal, Type::Boolean)
+        }
+        ("neoCLR.Runtime.StringGraphemeCount", [Type::String]) => {
+            (Binding::StringGraphemeCount, Type::Int32)
+        }
+        ("neoCLR.Runtime.CharFromString", [Type::String]) => (Binding::CharFromString, Type::Char),
+        ("neoCLR.Runtime.CharText", [Type::Char]) => (Binding::CharText, Type::String),
+        ("neoCLR.Runtime.StringGraphemes", [Type::String]) => {
+            (Binding::StringGraphemes, Type::Array(Box::new(Type::Char)))
+        }
+        ("neoCLR.Runtime.StringScalars", [Type::String]) => {
+            (Binding::StringScalars, Type::Array(Box::new(Type::UInt32)))
         }
         ("neoCLR.Runtime.StringByteCount", [Type::String]) => {
             (Binding::StringByteCount, Type::Int32)
@@ -275,7 +292,10 @@ impl Binding {
             }
             (
                 Self::TypeEquals,
-                [Value::RuntimeTypeHandle(left), Value::RuntimeTypeHandle(right)],
+                [
+                    Value::RuntimeTypeHandle(left),
+                    Value::RuntimeTypeHandle(right),
+                ],
             ) => Ok(Value::Boolean(left.identity == right.identity)),
             (Self::TypeArgumentCount, [Value::RuntimeTypeHandle(handle)]) => {
                 Ok(Value::Int32(handle.generic_arguments.len() as i32))
@@ -301,7 +321,11 @@ impl Binding {
             }
             (
                 Self::WriteAllText,
-                [Value::String(path), Value::String(text), Value::Int32(limit)],
+                [
+                    Value::String(path),
+                    Value::String(text),
+                    Value::Int32(limit),
+                ],
             ) => Ok(Value::Int32(crate::file_io::write_all_text(
                 path, text, *limit,
             ))),
@@ -334,7 +358,8 @@ impl Binding {
                 }
                 Ok(Value::Void)
             }
-            (Self::CharCategory, [Value::Char(value)]) => {
+            (Self::CharCategory, [Value::UInt32(value)]) => {
+                char::from_u32(*value).ok_or_else(|| Fault::new("invalid Unicode scalar"))?;
                 let ranges = crate::char_categories::RANGES;
                 let index = ranges.partition_point(|(end, _)| end < value);
                 Ok(Value::Int32(i32::from(ranges[index].1)))
@@ -397,6 +422,27 @@ impl Binding {
             (Self::StringEndsWithOrdinal, [Value::String(value), Value::String(pattern)]) => {
                 Ok(Value::Boolean(value.ends_with(pattern.as_str())))
             }
+            (Self::StringGraphemeCount, [Value::String(value)]) => {
+                let count = i32::try_from(value.graphemes(true).count())
+                    .map_err(|_| Fault::new("String grapheme count exceeds Int32 range"))?;
+                Ok(Value::Int32(count))
+            }
+            (Self::CharFromString, [Value::String(value)]) => {
+                let character = Value::Char(value.clone());
+                character.initialized()?;
+                Ok(character)
+            }
+            (Self::CharText, [Value::Char(value)]) => Ok(Value::String(value.clone())),
+            (Self::StringGraphemes, [Value::String(value)]) => crate::reflection::array(
+                "Char",
+                value.graphemes(true).map(|g| Ok(Value::Char(g.into()))),
+                limits,
+            ),
+            (Self::StringScalars, [Value::String(value)]) => crate::reflection::array(
+                "UInt32",
+                value.chars().map(|c| Ok(Value::UInt32(c as u32))),
+                limits,
+            ),
             (Self::StringByteCount, [Value::String(value)]) => {
                 let length = i32::try_from(value.len())
                     .map_err(|_| Fault::new("UTF-8 byte count exceeds Int32 range"))?;
@@ -404,7 +450,11 @@ impl Binding {
             }
             (
                 Self::StringSliceUtf8,
-                [Value::String(value), Value::Int32(start), Value::Int32(length)],
+                [
+                    Value::String(value),
+                    Value::Int32(start),
+                    Value::Int32(length),
+                ],
             ) => {
                 // Explicit internal statuses: 1 = OutOfRange, 2 = InvalidBoundary.
                 let error = |status| Value::Erased(Box::new(Value::Byte(status)));

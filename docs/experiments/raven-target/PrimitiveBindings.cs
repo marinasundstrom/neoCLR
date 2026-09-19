@@ -4,16 +4,15 @@ using Mono.Cecil;
 static class PrimitiveBindings
 {
     public static readonly string[] Types = ["SByte", "Byte", "Int16", "UInt16", "Char", "UInt32", "Int64", "UInt64", "Single", "IntPtr", "UIntPtr"];
-    static readonly string[] CharacterMethods = ["IsDigit", "IsNumber", "IsLetter", "IsUpper", "IsLower", "IsSeparator", "IsControl", "IsPunctuation", "IsSymbol", "IsAscii", "IsAsciiDigit", "IsLetterOrDigit", "IsWhiteSpace"];
     public static string Stack(string type) => type switch {
-        "SByte" or "Byte" or "Int16" or "UInt16" or "Char" or "UInt32" => "Int32",
+        "SByte" or "Byte" or "Int16" or "UInt16" or "UInt32" => "Int32",
         "UInt64" => "Int64", "Single" => "Double", _ => type
     };
     public static string Project(string source)
     {
         foreach (var type in Types)
             source = source.Replace($"public struct {type} {{ }}", $"public struct {type} {{ public int CompareTo({type} other) => 0; "
-                + (type == "Char" ? string.Join(" ", CharacterMethods.Select(n => $"public static bool {n}(char value) => false;")) : "") + " }");
+                + (type == "Char" ? "public static char FromString(string text) => default; public string ToString() => default; public bool Equals(char other) => default;" : "") + " }");
         return source;
     }
     public static bool IsReceiver(string type) => Types.Contains(type) || type is "Int32" or "Double" or "Boolean";
@@ -30,14 +29,19 @@ static class PrimitiveBindings
         if (reference.HasThis && (!definition.IsVirtual || definition.IsFinal) && reference.Name == "CompareTo"
             && result == "Int32" && args.SequenceEqual(new[] { owner }))
             return new("Runtime" + owner + "CompareTo", [owner + "&", owner], result);
-        if (!reference.HasThis && owner == "Char" && CharacterMethods.Contains(reference.Name)
-            && result == "Boolean" && args.SequenceEqual(new[] { "Char" }))
-            return new("System.Char::" + reference.Name, args, result);
+        if (owner == "Char") {
+            if (!reference.HasThis && reference.Name == "FromString" && result == "Char" && args.SequenceEqual(new[] { "String" }))
+                return new("System.Char::FromString", args, result);
+            if (reference.HasThis && reference.Name == "ToString" && result == "String" && args.Length == 0)
+                return new("RuntimeCharToString", ["Char&"], result);
+            if (reference.HasThis && reference.Name == "Equals" && result == "Boolean" && args.SequenceEqual(new[] { "Char" }))
+                return new("RuntimeCharEquals", ["Char&", "Char"], result);
+        }
         throw new InvalidDataException("Unsupported primitive member: " + reference.FullName);
     }
-    public static string Adapters => string.Join("\n", Types.Select(t => $".function Runtime{t}CompareTo({t}& source,{t} other) -> Int32\nldarg source\nldarg other\ncall instance System.{t}::CompareTo({t})\nret\n.end\n"));
+    public static string Adapters => ".function RuntimeCharToString(Char& source) -> String\nldarg source\ncall instance System.Char::ToString()\nret\n.end\n.function RuntimeCharEquals(Char& source,Char other) -> Boolean\nldarg source\nldarg other\ncall instance System.Char::Equals(Char)\nret\n.end\n" + string.Join("\n", Types.Select(t => $".function Runtime{t}CompareTo({t}& source,{t} other) -> Int32\nldarg source\nldarg other\ncall instance System.{t}::CompareTo({t})\nret\n.end\n"));
     public static string? Default(string type) => Types.Contains(type) ? type switch {
-        "Single" => "ldc.r4 0", "Int64" or "UInt64" => "ldc.i8 0",
+        "Char" => "ldstr \"\\u0000\"\ncall neoCLR.Runtime.CharFromString(String)", "Single" => "ldc.r4 0", "Int64" or "UInt64" => "ldc.i8 0",
         "IntPtr" => "ldc.i4 0\nconv.i", "UIntPtr" => "ldc.i4 0\nconv.u", _ => "ldc.i4 0"
     } : null;
 }

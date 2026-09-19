@@ -17,7 +17,11 @@ fn sample_uses_readonly_iterable_and_comparable_views() {
 fn integer_ordering_is_overflow_safe_and_uses_typed_interfaces() {
     for (ty, low, high) in [
         ("Boolean", "ldc.bool false", "ldc.bool true"),
-        ("Char", "ldc.i4 0", "ldc.i4 65535"),
+        (
+            "Char",
+            "ldstr \"A\"\ncall System.Char::FromString(String)",
+            "ldstr \"é\"\ncall System.Char::FromString(String)",
+        ),
         ("Int32", "ldc.i4 -2147483648", "ldc.i4 2147483647"),
         (
             "Int64",

@@ -3290,7 +3290,7 @@ fn debug_value(
             };
         }
         Value::RuntimeTypeHandle(handle) => result.value = debug_text(&handle.name),
-        Value::String(text) | Value::Error(text) => {
+        Value::String(text) | Value::Char(text) | Value::Error(text) => {
             result.value = debug_text(text);
             result.truncated = text.chars().count() > 256;
         }
