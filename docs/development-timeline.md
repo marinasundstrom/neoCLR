@@ -25,6 +25,24 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-19 — Documentation first, then the remaining Raven library port
+
+**Author direction.** “Let's port the rest of the System.Runtime library from neoIL
+to Raven code.” The author reserves API alignment with the current proposals for
+the next step, supplies the original proposals, and requests documentation
+organization first, committed as its own slice.
+
+**Assistant proposal and action.** Added categorized documentation indexes and an
+original-proposal index linking the supplied texts to maintained design notes.
+Preserved original proposal bodies, existing document paths and published notes.
+The current project remains `System.rvnproj`; the System.Runtime assembly identity
+is still planned. Source migration will preserve the existing API in this step.
+
+**Open.** Complete and validate the remaining Raven source port, then align API
+contracts in the subsequent step. Documentation organization does not itself
+implement proposal APIs or rename assemblies. See the [documentation index](README.md)
+and [original proposals](proposals/README.md).
+
 ## 2026-09-17 — Plan the minimal System.Runtime assembly
 
 **Author direction.** Plan a System.Runtime project/assembly supplying the minimal

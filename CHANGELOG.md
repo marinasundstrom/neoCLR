@@ -6,6 +6,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-09-19
+
+- Organize documentation with a top-level index and categorized guides, reference,
+  design, Raven integration, history, contribution and experiment indexes, retaining
+  existing document paths and published notes. Include the author-supplied original
+  proposals with links to maintained design notes and explicit proposed status.
+  Record source porting before the subsequent API-alignment step.
+
 ### 2026-09-17
 
 - Plan System.Runtime as the minimal Raven-authored managed foundation, derived
