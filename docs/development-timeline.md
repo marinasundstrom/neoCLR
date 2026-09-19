@@ -4658,3 +4658,18 @@ failures: four stale Error fixtures, plus three UTF-8 tests that overlapped the
 incomplete Task profile edit. All five affected test targets passed on rerun (the
 four fixture targets within the 70-test focused pass, and all three UTF-8 tests).
 This records combined validation, not a claim of an uninterrupted green full run.
+
+## 2026-09-19 — Finish async before introducing threads
+
+The author asked to continue Task work and, if practical, add a small Thread and
+ThreadPool API with a sample. The assistant identified a choice between isolated
+workers and shared guest objects: shared objects would require synchronization and
+a thread-safe completion implementation. Asked which scope to pursue, the author
+selected “Defer threads; finish async first.”
+
+The active implementation milestone is compiler-generated async methods awaiting
+pending Tasks and resuming through the existing explicit queue. Task and failure
+remain separate: Result is an ordinary payload, and state-machine machinery stays
+provisional. Thread and ThreadPool APIs are deferred. Compiler integration is in
+progress; the existing completion PoC does not yet establish generated async
+execution on neoCLR.

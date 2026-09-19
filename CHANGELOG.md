@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Record the decision to defer Thread/ThreadPool work and finish compiler-generated
+  async integration first. This is implementation direction, not shipped async
+  support or a thread-safety guarantee.
+
 - Add a provisional Raven-profile Task<T>/TaskCompletionSource<T> completion PoC
   with an explicit TaskQueue, ordinary generic payloads (including unit/Result),
   first-completion semantics and queued continuations. Preserve private storage
