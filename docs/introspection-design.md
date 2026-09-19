@@ -101,6 +101,43 @@ GenericArity may be cheap while Methods, Interfaces and Attributes require resol
 The model describes semantics, not materialization cost. Allocation, caching and
 retention guarantees must be specified and measured rather than inferred from names.
 
+## Collection return contracts under review — 2026-09-19
+
+The author asked whether APIs should return arrays at all, or a suitable interface
+that conveys the collection. No library-wide prohibition or replacement has been
+selected. The assistant recommends choosing the interface by the capabilities the
+result promises, with Sequence<T> as the leading candidate for materialized
+introspection results. Existing neoCLR contracts provide:
+
+- Iterable<T>: iteration.
+- Collection<T>: iteration and Count, without mutation operations.
+- Sequence<T>: Collection<T> plus indexed reads.
+- MutableSequence<T>: indexed writes in addition to Sequence<T>.
+
+Sequence<T> fits parameter lists and other indexed metadata snapshots while leaving
+storage private. Collection<T> is an alternative when count matters but indexed
+access should not be promised; Iterable<T> allows streaming without promising count
+or random access. An interface alone promises neither immutability nor snapshot
+semantics: specify ordering, repeat enumeration, lifetime, deferred failure and
+whether later context changes appear. A read-only view over a mutable array also
+does not prevent another alias from mutating that array.
+
+.NET ships both array-returning Assembly.GetTypes and enumerable
+[Assembly.DefinedTypes](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.assembly.definedtypes?view=net-10.0).
+Its [collection design guidance](https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/guidelines-for-collections)
+prefers collection abstractions generally while retaining low-level array uses;
+that guidance is explicitly an older, 2008-edition excerpt, not a current universal
+rule. For neoCLR, interface results buy implementation flexibility and clearer
+capability promises at the cost of dispatch/wrapper overhead and possible loss of
+array-specific operations. Measure allocation and repeated-query costs. Arrays may
+remain appropriate for explicit buffers or caller-owned storage; a universal ban
+is not justified by the introspection use case alone.
+
+The in-progress provider migration retains array signatures as a transitional
+contract. Converting those results should be a deliberate subsequent API slice,
+with tests for enumeration, indexing/count where promised, empty results, aliasing,
+GC lifetime and inability to mutate provider-owned data through the public contract.
+
 ## Runtime-backed v1
 
 The initial provider is the runtime. `System.Runtime.RuntimeContext` represents the

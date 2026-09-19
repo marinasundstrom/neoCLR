@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Record the open collection-return question and propose capability-based interfaces,
+  with Sequence<T> a candidate for materialized introspection results. Distinguish
+  read-only views from immutable snapshots; no array-return policy is implemented.
+
 - Preserve declaring-type metadata for Raven-authored Option/Result cases by emitting
   them inside their companion containers. This repairs a full-port regression without
   changing managed method bodies or case storage. Check all four cases against their

@@ -25,6 +25,20 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-19 — Collection interfaces versus array results
+
+**Author question.** During the Info-interface migration, the author asked whether
+APIs should ever return arrays, or choose an interface conveying the collection.
+
+**Assistant response.** Recommended capability-based result contracts, with existing
+Sequence<T> (iteration, Count, indexed reads) as a candidate for materialized
+introspection results. Distinguished read-only access from immutable storage and
+snapshot semantics, and retained buffers/caller-owned storage as possible array
+uses. Compared .NET's array/enumerable reflection surfaces and documented costs and
+validation needs in the [design](introspection-design.md). This is a proposal; the
+author has not yet selected a return type or a library-wide array policy. The
+ongoing provider migration retains existing array results pending that API slice.
+
 ## 2026-09-19 — Close the source-port execution gate
 
 **Author direction.** Continue implementation, retaining separately committed slices
