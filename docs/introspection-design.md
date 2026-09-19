@@ -266,6 +266,50 @@ static APIs, multiple contexts, or loading for the initial preview. Concrete
 Runtime*Info providers remain internal. These paragraphs describe the selected
 contract, not a completed production API.
 
+### Assembly references and metadata tokens — 2026-09-19
+
+The author requests `AssemblyInfo.ReferencedAssemblies` and requires the executing
+assembly to report its dependency on System.Runtime. This belongs to the assembly's
+metadata; RuntimeContext remains responsible for ambient discovery and any future
+resolution/loading operations. References are direct edges, not a transitive closure,
+and reading the property must not load assemblies. The reference model and collection
+return contract must distinguish a declared reference from a resolved/loaded assembly.
+
+.NET's [Assembly.GetReferencedAssemblies](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.assembly.getreferencedassemblies?view=net-10.0)
+returns AssemblyName identities. Retaining that distinction avoids making a metadata
+query depend on loading; returning only resolved AssemblyInfo objects would be simpler
+for traversal but could hide unavailable references. The neoCLR property spelling is
+selected; its reference element representation remains an implementation decision.
+The compiler reference name NeoCLR.CoreProbe maps explicitly to the managed foundation
+System.Runtime, not an additional runtime dependency or the host mscorlib assembly.
+
+The author also requests MetadataToken on the public Info interfaces, explicitly
+clarifying that the property belongs to the interface contracts. Internal providers
+supply its value; member interfaces inherit it from MemberInfo, while other Info
+interfaces expose it directly. Use module-scoped
+metadata definition identity, not provider-object identity or a renamed DefinitionIndex.
+.NET [MemberInfo.MetadataToken](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.memberinfo.metadatatoken?view=net-10.0)
+and [ParameterInfo.MetadataToken](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.parameterinfo.metadatatoken?view=net-10.0)
+return Int32 tokens interpreted together with their module. That is the comparison
+baseline (primary documentation checked 2026-09-19), not a promise of .NET binary
+compatibility or token stability across rebuilt artifacts.
+
+Implementation must retain assembly/module origin and source tokens where those
+metadata definitions are preserved. The bootstrap combines separately compiled
+System.Runtime slices into one executable module, so source token row numbers can
+collide: merged/synthesized definitions need explicitly assigned runtime tokens,
+with original source identity kept distinct. Do not publish a misleading token by
+copying source row numbers into a different module or using per-type field indices.
+Define behavior for arrays, constructed types and other entities without a definition
+row before exposing the property across the model. Assembly/module discovery,
+ReferencedAssemblies and MetadataToken are planned here, not reported implemented.
+
+Validation must cover a dependency that requests ExecutingAssembly, direct versus
+transitive references, System.Runtime mapping, duplicate names across modules,
+module-scoped token uniqueness, stable tokens within a saved artifact, and token
+behavior for synthesized entities. Introspection queries must not run user code or
+load dependencies as a side effect.
+
 ### Possible context capabilities — 2026-09-19
 
 The author suggested that other services might later belong to RuntimeContext,

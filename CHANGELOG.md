@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Record AssemblyInfo.ReferencedAssemblies and module-scoped MetadataToken on the
+  public Info interfaces as
+  requirements for the next discovery slice. Require the System.Runtime reference
+  mapping, distinguish reference identity from loading, and document source-token
+  collisions when combining bootstrap slices. These APIs are not yet implemented.
+
 - Replace the Raven profile's public System.Type/Type.Info split with sealed
   TypeInfo identity, shape and query contracts. Both typeof(T) and Object.GetType()
   return TypeInfo; RuntimeContext.Current supplies the configured handle resolver.

@@ -25,6 +25,22 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-19 — Assembly references and Info metadata tokens
+
+**Author additions.** Requested AssemblyInfo.ReferencedAssemblies, if that is the
+right owner, and specified that the executing assembly must show System.Runtime as
+a reference. Then requested MetadataToken on the Info classes and clarified: “MetadataToken
+should be on the interfaces.”
+
+**Assistant response and action.** Agreed that references belong to assembly metadata,
+with RuntimeContext owning runtime discovery. Committed to preserving direct references
+and the bootstrap-to-System.Runtime identity mapping without implicit loading.
+Explained that MetadataToken is module-scoped and must not be a renamed
+DefinitionIndex. Recorded primary .NET comparisons and the bootstrap complication:
+separately compiled library slices can reuse source token rows when merged. These
+requirements are part of the next discovery/metadata slice, not implemented claims.
+See [the contract and validation needs](introspection-design.md#assembly-references-and-metadata-tokens--2026-09-19).
+
 ## 2026-09-19 — Unified type acquisition implemented
 
 **Author corrections.** Remove the remaining Type class, implement Object.GetType
