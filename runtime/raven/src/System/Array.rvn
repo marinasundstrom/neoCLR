@@ -1,0 +1,65 @@
+namespace System
+
+public class Array<T> : Collections.MutableSequence<T> {
+    #pragma warning disable-next-line RAV9032
+    private field m_value: T[]
+
+    private init() {
+    }
+
+    static val Empty: T[] {
+        get => Runtime.CompilerServices.CheckedStorage.Reserve<T>(0)
+    }
+
+    val Length: int { get => m_value.Length }
+    val Count: int { get => m_value.Length }
+
+    var self[index: int]: T {
+        get => m_value[index]
+        set { m_value[index] = value }
+    }
+
+    func ForEach(action: Func<T, Void>) {
+        let buffer = m_value
+        var index = 0
+        while index < buffer.Length {
+            action(buffer[index])
+            index = index + 1
+        }
+    }
+
+    func GetIterator() -> Collections.Iterator<T> {
+        return ArrayIterator<T>(m_value)
+    }
+}
+
+internal class ArrayIterator<T> : Collections.Iterator<T> {
+    private field data: T[]
+    private field position: int
+
+    init(buffer: T[]) {
+        data = buffer
+        position = -1
+    }
+
+    func MoveNext() -> bool {
+        if position >= data.Length {
+            return false
+        }
+        position = position + 1
+        return position < data.Length
+    }
+
+    val Current: T {
+        get {
+            if position < 0 || position >= data.Length {
+                Fault("Iterator has no current element")
+            }
+            return data[position]
+        }
+    }
+
+    func Dispose() {
+        position = data.Length
+    }
+}

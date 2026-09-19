@@ -1,5 +1,18 @@
 use neoclr::{Limits, Value, assemble, run_with_library, verify_with_library};
 
+const ARRAY_ADAPTER: &str = r#"; Runtime vector interface dispatch forwards the unchanged array reference here.
+.type internal System.Collections.ArrayEnumerable
+    .method internal static GetIterator<T>(arrayref<T> source) -> System.Collections.Iterator<T>
+        ldarg source
+        dup
+        ldlen
+        conv.ovf.i4
+        call System.Collections.ArrayIterator<T>::Create(arrayref<T>,Int32)
+        ret
+    .end
+.end
+"#;
+
 const TYPES: &str = r#"
 .interface System.Collections.Iterable<T>
 .method instance GetIterator() -> System.Collections.Iterator<T>
@@ -32,7 +45,7 @@ fn module(body: &str) -> (neoclr::Module, neoclr::Module) {
     let library = assemble(".module System").unwrap();
     let source = format!(
         ".module ArrayIterable\n.entry Main\n{TYPES}\n{}\n{body}",
-        include_str!("../runtime/raven/ArrayEnumerable.neoil")
+        ARRAY_ADAPTER
     );
     let m = neoclr::assembler::read_modules(
         &[neoclr::assembler::ModuleInput::Source(&source)],

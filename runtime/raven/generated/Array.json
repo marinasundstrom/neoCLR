@@ -1,6 +1,6 @@
 {
   "format": "raven-library-bootstrap-v1",
-  "owner": "System.IntegerDivisionError",
+  "owner": "System.Array",
   "inputs": {
     "runtime/raven/src/System/Array.rvn": "cbfe898efa2525d07b7cc8d54a0d405a987d203be31d05eb0451b69bf2ac0ce3",
     "runtime/raven/src/System/Object.rvn": "d2c75f0f4e4843d68715e5c89686af1c21d023b0325079439a13124051f1be9a",
@@ -79,18 +79,17 @@
     "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
   },
   "outputs": {
-    "IntegerDivisionError.methods.neoil": "7cfc80f4508d5e4e4d9e4b67e3e8572edc3a8befca466d12fb6fadc65980c11a",
-    "IntegerDivisionError.helpers.neoil": "e0bb0be6d3fadaac44d760b69987fe752f9ca7416e33bb628f7041cf672f84cf"
+    "Array.methods.neoil": "0dd94a2b8a0e2164ab1c6f652b78286f3f229d4c88ac646e97bd267fc57fef6e",
+    "Array.helpers.neoil": "f32875aff753e8851463155a43087f6d4c5a026fc03cdcbb8e9385509bac493d"
   },
   "compilerSha256": "eb5f7834214432722f4140fcaf3b13464534f745f5db2d0bae5c565b8c2094cb",
   "coreSha256": "047ef05f81594ec50c11da73e0e529caba3f901f2f4f2d3637accc8382cbc0b7",
   "exports": [
-    ".ctor(System.IntegerDivisionError.DivisionByZero value) -> Void",
-    "get_IsDivisionByZero() -> Boolean",
-    "GetDivisionByZero() -> System.IntegerDivisionError.DivisionByZero",
-    ".ctor(System.IntegerDivisionError.Overflow value) -> Void",
-    "get_IsOverflow() -> Boolean",
-    "GetOverflow() -> System.IntegerDivisionError.Overflow",
-    "ToString() -> String"
+    "get_Empty() -> arrayref<T0>",
+    "get_Length() -> Int32",
+    "get_Count() -> Int32",
+    "get_Item(Int32 index) -> T0",
+    "set_Item(Int32 index,T0 value) -> noresult",
+    "ForEach(System.Func<T0,Void> action) -> noresult"
   ]
 }

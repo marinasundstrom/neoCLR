@@ -39,10 +39,23 @@ const COLLECTION_CONTRACTS: &str = concat!(
     include_str!("../runtime/raven/generated/MutableSequence.methods.neoil")
 );
 
+// Pair the generated array members and their scalar adapters with this test's
+// deliberately small iteration protocol; the full Raven library tests its real iterator.
+fn array_source() -> String {
+    format!(
+        "{}{}",
+        include_str!("../runtime/raven/generated/Array.methods.neoil"),
+        include_str!("../runtime/raven/generated/Array.helpers.neoil")
+            .split("\n.type ")
+            .next()
+            .unwrap()
+    )
+}
+
 fn library() -> neoclr::Module {
     assemble(&format!(
         ".module System\n{CALLBACK}\n{ITERATION}\n{COLLECTION_CONTRACTS}\n{}",
-        include_str!("../runtime/raven/Array.neoil")
+        array_source()
     ))
     .unwrap()
 }
@@ -132,7 +145,7 @@ fn reflection_library() -> neoclr::Module {
         .replace("System.Collections.Iterator", "Historical.Iterator");
     assemble(&format!(
         "{source}\n{ITERATION}\n{COLLECTION_CONTRACTS}\n{}",
-        include_str!("../runtime/raven/Array.neoil")
+        array_source()
     ))
     .unwrap()
 }
@@ -203,7 +216,9 @@ ret
         .iter()
         .find(|t| t.name == "System.Array")
         .unwrap();
-    assert_eq!(definition.implements.len(), 1);
+    assert!(definition.implements.iter().any(|contract| matches!(contract,
+        neoclr::metadata::Type::Constructed { definition, .. } if definition == "System.Collections.MutableSequence"
+    )));
 }
 
 #[test]
@@ -271,9 +286,9 @@ fn array_metadata_cannot_promise_unimplemented_growth() {
         ".module System\n{ITERATION}\n{}\n{}\n{}",
         COLLECTION_CONTRACTS,
         include_str!("../runtime/raven/generated/List.methods.neoil"),
-        include_str!("../runtime/raven/Array.neoil").replace(
-            ".implements System.Collections.MutableSequence<T>",
-            ".implements System.Collections.List<T>"
+        array_source().replace(
+            ".implements System.Collections.MutableSequence<T0>",
+            ".implements System.Collections.List<T0>"
         )
     );
     assert!(assemble(&source).is_err());

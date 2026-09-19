@@ -48,7 +48,7 @@ def build(path: Path) -> str:
         return build(ROOT / 'runtime/raven/Iterable.neoil')
     text = path.read_text()
     if path == ROOT / 'runtime/System/Collections/Iterator.neoil':
-        text = build(ROOT / 'runtime/raven/Iterator.neoil') + text[text.index('; Retains the original managed buffer'):]
+        return build(ROOT / 'runtime/raven/Iterator.neoil')
     if path.stem in COLLECTIONS | {'Disposable'}:
         text = adapt(text, path.stem)
     if path.stem in {'Equatable', 'Comparable', 'Clonable', 'Closable'}:
@@ -60,8 +60,8 @@ def build(path: Path) -> str:
                 + build(ROOT / 'runtime/raven/BindingFlags.neoil'))
     if path == ROOT / 'runtime/System/Collections/List.neoil':
         return build(ROOT / 'runtime/raven/CollectionContracts.neoil') + build(ROOT / 'runtime/raven/List.neoil')
-    if path.stem == 'Array':
-        return (ROOT / 'runtime/raven/Array.neoil').read_text() + build(ROOT / 'runtime/raven/NativeMemory.neoil')
+    if path == ROOT / 'runtime/System/Array.neoil':
+        return build(ROOT / 'runtime/raven/Array.neoil') + build(ROOT / 'runtime/raven/NativeMemory.neoil')
     if path.stem == 'Func':
         # The Raven profile declares instance ForEach on the managed Array<T> shape.
         text = text[:text.index('; Managed-array callback consumer')]
@@ -76,7 +76,6 @@ def build(path: Path) -> str:
         result += build(ROOT / 'runtime/raven/Object.neoil')
         result += build(ROOT / 'runtime/raven/SingleError.neoil')
         result += build(ROOT / 'runtime/raven/Linq.neoil')
-        result += (ROOT / 'runtime/raven/ArrayEnumerable.neoil').read_text()
         result += build(ROOT / 'runtime/raven/Map.neoil')
     return result
 

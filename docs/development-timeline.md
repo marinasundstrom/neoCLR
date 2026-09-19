@@ -97,6 +97,12 @@ an ordinary .NET regression reproduced it independently. Raven main now contains
 The source admission checks pass; the slice's execution results are recorded in
 [port validation](raven-library-port-validation.md).
 
+**Branch cleanup direction.** After the port, the author asked to clean up side
+branches created in Raven while retaining its long-lived neoCLR branch alongside
+ordinary branches. Asked about its name, the author explicitly chose “Rename it to
+neoclr”. The assistant will remove temporary integrated fix branches and rename the
+integration branch after the final review; cleanup is pending at this point.
+
 **String/Error slice.** Raven sources now own both method surfaces, with explicit
 importer checks for intrinsic storage, mixed String receivers and opaque Error
 receivers. Native ownership and the existing parameter metadata remain unchanged.

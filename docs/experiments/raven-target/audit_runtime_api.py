@@ -74,7 +74,7 @@ for file in source['sourceFiles']:
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'replaced-in-raven-profile',
                      'replacementFiles': ['runtime/raven/Array.neoil', 'runtime/raven/NativeMemory.neoil'],
                      'samples': ['library-managed-array-metadata.rvn', 'library-native-buffer.rvn'],
-                     'note': 'The native descriptor API is removed; direct IL covers typed NativeMemory access. Raven native casts remain limited.'})
+                     'note': 'The Raven profile uses source-authored Array members, callback loop and private iterator. Checked intrinsic storage and iteration-signature projection preserve identity and filtering; legacy Neo keeps its native descriptor API. NativeMemory is separately Raven-authored.'})
         continue
     if file == 'runtime/System/Collections/ArrayList.neoil':
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-class-bootstrap',

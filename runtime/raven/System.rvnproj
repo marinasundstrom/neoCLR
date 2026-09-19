@@ -215,4 +215,7 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'UnionAttribute'">
     <Compile Include="src/System/Runtime/CompilerServices/UnionAttribute.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Array'">
+    <Compile Include="src/System/Array.rvn" />
+  </ItemGroup>
 </Project>

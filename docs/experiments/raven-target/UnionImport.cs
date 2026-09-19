@@ -151,7 +151,7 @@ static class UnionImport
             var args = (method.HasThis ? new[] { ApplicationTypes.Receiver(method) } : Array.Empty<string>()).Concat(method.Parameters.Select(p => ProfileType(p.ParameterType))).ToArray();
             var valueConstructor = libraryOwner is null && method.IsConstructor && method.DeclaringType.IsValueType;
             var emitInstance = method.HasThis && !valueConstructor;
-            var emitOwnedStatic = libraryOwner is not null && method.IsStatic && (method.DeclaringType.IsValueType || OpaqueLibrary.IsString(method.DeclaringType));
+            var emitOwnedStatic = libraryOwner is not null && method.IsStatic && (method.DeclaringType.IsValueType || OpaqueLibrary.IsString(method.DeclaringType) || ArrayLibrary.IsMatched(method.DeclaringType));
             var result = ProfileType(method.ReturnType, true);
             var locals = method.Body.Variables.Select(v => ProfileType(v.VariableType)).ToArray();
             if (locals.Any(t => !(libraryOwner is not null && t is "Value" or ParameterSnapshotBindings.Vector) && !(libraryOwner is not null && method.GenericParameters.Concat(method.DeclaringType.GenericParameters).Any(p => t == "T" + p.Position)) && !ApplicationTypes.IsType(t) && !ManagedArrayBindings.IsType(t) && t != "System.Object" && !InterfaceBindings.IsInterface(t) && !NativeMemoryBindings.IsPointer(t) && !ReflectionBindings.IsType(t) && t != "arrayref<String>" && !DelegateBindings.IsType(t) && !GenericUnionBindings.IsType(t) && !CalendarBindings.IsReference(t) && !CalendarBindings.Types.Contains(t) && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
@@ -317,7 +317,7 @@ static class UnionImport
                             var receiver = Pop().Type;
                             if (!ApplicationTypes.Assignable(receiver, appRead.Owner) && receiver != appRead.Owner + "&") throw new InvalidDataException("Invalid application field receiver.");
                             Push(new(appRead.Type == "Boolean" ? "Int32" : PrimitiveBindings.Stack(appRead.Type)));
-                            if ((PrimitiveLibrary.IsMatched(readField.DeclaringType.Resolve()) || OpaqueLibrary.IsString(readField.DeclaringType.Resolve())))
+                            if ((PrimitiveLibrary.IsMatched(readField.DeclaringType.Resolve()) || OpaqueLibrary.IsString(readField.DeclaringType.Resolve()) || ArrayLibrary.IsMatched(readField.DeclaringType.Resolve())))
                             {
                                 if (receiver.EndsWith('&')) code.AppendLine("ldobj " + appRead.Type);
                             }
@@ -329,7 +329,7 @@ static class UnionImport
                     case Code.Stfld:
                         if (!collectionProfile) throw new InvalidDataException("Native fields require target profile.");
                         var writeField = (FieldReference)instruction.Operand;
-                        if ((PrimitiveLibrary.IsMatched(writeField.DeclaringType.Resolve()) || OpaqueLibrary.IsString(writeField.DeclaringType.Resolve())))
+                        if ((PrimitiveLibrary.IsMatched(writeField.DeclaringType.Resolve()) || OpaqueLibrary.IsString(writeField.DeclaringType.Resolve()) || ArrayLibrary.IsMatched(writeField.DeclaringType.Resolve())))
                             throw new InvalidDataException("Primitive library backing storage is readonly.");
                         var appWrite = ApplicationTypes.Field(writeField, method, ProfileType);
                         if (appWrite is not null)
@@ -451,6 +451,7 @@ static class UnionImport
                     case Code.Newobj:
                         var constructor = (MethodReference)instruction.Operand;
                         var constructorDefinition = constructor.Resolve() ?? throw new InvalidDataException("Unresolved constructor.");
+                        if (ArrayLibrary.IsMatched(constructorDefinition.DeclaringType)) throw new InvalidDataException("Managed arrays require intrinsic allocation.");
                         if (ApplicationTypes.IsLibrary(constructor.DeclaringType)
                             && constructor.DeclaringType.FullName is "System.Error" or "System.String")
                             throw new InvalidDataException("Opaque library storage requires a runtime factory.");
@@ -683,7 +684,7 @@ static class UnionImport
                             var nativeCall = collectionProfile ? NativeMemoryBindings.Bind(reference, targetMethod) : null;
                             var reflectionCall = collectionProfile ? ReflectionBindings.Bind(reference, targetMethod) : null;
                             var queryCall = collectionProfile ? QueryBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt) : null;
-                            var arrayCallback = collectionProfile ? ArrayCallbackBindings.Bind(reference, targetMethod) : null;
+                            var arrayCallback = collectionProfile ? ArrayCallbackBindings.Bind(reference, targetMethod, libraryOwner is null ? null : t => ProfileType(t)) : null;
                             var delegateCall = DelegateBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt);
                             if (runtimeService is not null) call = new(runtimeService.Name, runtimeService.Arguments, runtimeService.Result, Instruction: runtimeService.Instruction);
                             else if (checkedStorage is not null) call = new(checkedStorage.Name, checkedStorage.Arguments, checkedStorage.Result, Instruction: checkedStorage.Instruction);

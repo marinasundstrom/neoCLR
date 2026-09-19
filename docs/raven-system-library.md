@@ -11,7 +11,7 @@ This slice adds Raven sources for the fundamental and collection interfaces,
 SystemClock, LocalDateTime, IntPtr/UIntPtr comparisons, the complete Int32 member
 surface, Console and Environment. File.ReadAllText joins WriteAllText in Raven.
 The follow-up ports String and opaque Error, then five empty error types and Void,
-followed by seven typed error carriers, and the Propagatable declaration, then Option/Result and their cases, then the inherited descriptor family and NativeMemory, then System.Fault, Func declarations and the normal BindingFlags enum and Object/UnionAttribute markers, bringing the total to 72 slices.
+followed by seven typed error carriers, and the Propagatable declaration, then Option/Result and their cases, then the inherited descriptor family and NativeMemory, then System.Fault, Func declarations and the normal BindingFlags enum and Object/UnionAttribute markers, followed by managed Array members and iteration, bringing the total to 73 slices.
 The legacy Neo profile retains its receiver/array conventions where it differs;
 the Raven profile selects generated contracts and implementation bodies.
 
@@ -50,7 +50,7 @@ This migration reuses the .NET comparisons in [common interfaces](common-interfa
 additional generated adapters and a larger reachable call graph; no performance
 improvement or new native ABI is claimed.
 
-Remaining handwritten source includes array/runtime adapters.
+The remaining handwritten source is the TypeOf<T>.Of metadata helper.
 Native service declarations remain runtime-owned. Generated neoIL remains a build
 artifact rather than a competing implementation. These boundaries are not silently
 claimed to have become Raven source.
@@ -160,7 +160,7 @@ The remaining migration gates are substantive work, not just moving files:
 
 | Remaining source | Required implementation admission |
 | --- | --- |
-| Array and iterator adapters | Runtime-owned allocation/element access and delegate invocation boundaries |
+| TypeOf<T>.Of helper | Checked generic static type authoring and existing typeof lowering |
 
 Complete those gates before calling the entire source port finished. Executable
 coverage of their existing neoIL implementations is necessary but does not establish
@@ -1104,3 +1104,23 @@ CLR attribute instantiation. The benefit is explicit source ownership without ne
 managed behavior; the cost is a bounded declaration projection that cannot be used
 for arbitrary classes. Storage, extra methods, constructor effects, different bases
 and sealing changes are rejected. No Runtime Contract configuration changes.
+
+
+Array<T> now owns Empty, Length/Count, element access, ForEach and its private
+iterator in Raven. A single private `m_value: T[]` describes intrinsic vector
+storage, like the primitive/String authoring rules; writes to that backing field,
+ordinary construction and extra storage are rejected. Length is exposed only in
+bootstrap shape metadata and lowers to the vector intrinsic. The runtime owns
+allocation, bounds checks and delegate invocation. Raven owns the callback loop,
+iterator construction, current-position checks and terminal disposal. Later writes
+to the original array remain visible through its iterator.
+
+The checked GetIterator body is emitted under the existing internal
+ArrayEnumerable.GetIterator<T>(arrayref<T>) ABI: receiver argument zero becomes the
+single static parameter without altering the body. This preserves the public array
+method surface and existing runtime interface dispatch. The generated array lists
+the CLI base-interface closure explicitly; reflected capabilities are unchanged.
+Static property metadata now retains its static receiver, including Empty.
+The historical Neo array/vector profile remains separate. This reuses the
+[generic managed-array contract](generic-managed-arrays.md); no API redesign,
+Runtime Contract option or Raven compiler change is introduced.

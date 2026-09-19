@@ -1,0 +1,146 @@
+; Generated from runtime/raven/src/System/Array.rvn. Regenerate with build_runtime_library.py.
+.type class System.Array<T0>
+.implements System.Collections.MutableSequence<T0>
+.implements System.Collections.Sequence<T0>
+.implements System.Collections.Collection<T0>
+.implements System.Collections.Iterable<T0>
+.property static Empty() -> arrayref<T0>
+.get System.Array<T0>::get_Empty()
+.end
+.property instance Length() -> Int32
+.get instance System.Array<T0>::get_Length()
+.end
+.property instance Count() -> Int32
+.get instance System.Array<T0>::get_Count()
+.end
+.property instance Item(Int32) -> T0
+.get instance System.Array<T0>::get_Item(Int32)
+.set instance System.Array<T0>::set_Item(Int32,T0)
+.end
+.method static get_Empty() -> arrayref<T0>
+M00000001_IL_0000:
+M00000001_IL_0001:
+M00000001_IL_0002:
+ldc.i4 0
+M00000001_IL_0003:
+array.reserve T0
+M00000001_IL_0008:
+ret
+.end
+.method instance get_Length() -> Int32
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldarg 0
+M00000002_IL_0003:
+M00000002_IL_0008:
+ldlen
+conv.i4
+M00000002_IL_000d:
+ret
+.end
+.method instance get_Count() -> Int32
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+M00000003_IL_0008:
+ldlen
+conv.i4
+M00000003_IL_000d:
+ret
+.end
+.method instance get_Item(Int32 index) -> T0
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+M00000004_IL_0008:
+ldarg 1
+M00000004_IL_0009:
+ldelem T0
+M00000004_IL_000e:
+ret
+.end
+.method instance set_Item(Int32 index,T0 value) -> noresult
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+M00000005_IL_0008:
+ldarg 1
+M00000005_IL_0009:
+ldarg 2
+M00000005_IL_000a:
+stelem T0
+M00000005_IL_000f:
+M00000005_IL_0010:
+ret
+.end
+.method instance ForEach(System.Func<T0,Void> action) -> noresult
+.local arrayref<T0> local0
+.local Int32 local1
+ldloca local0
+initobj arrayref<T0>
+ldc.i4 0
+stloc local1
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+M00000006_IL_0008:
+stloc local0
+M00000006_IL_0009:
+M00000006_IL_000a:
+ldc.i4 0
+M00000006_IL_000b:
+stloc local1
+M00000006_IL_000c:
+M00000006_IL_000d:
+M00000006_IL_000e:
+ldloc local1
+M00000006_IL_000f:
+ldloc local0
+M00000006_IL_0010:
+ldlen
+conv.i4
+M00000006_IL_0015:
+clt
+call neoCLR.Library.System.Array.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_0017:
+brtrue M00000006_IL_0021
+M00000006_IL_001c:
+br M00000006_IL_0039
+M00000006_IL_0021:
+M00000006_IL_0022:
+ldarg 1
+M00000006_IL_0023:
+ldloc local0
+M00000006_IL_0024:
+ldloc local1
+M00000006_IL_0025:
+ldelem T0
+M00000006_IL_002a:
+callvirt instance System.Func<T0,Void>::Invoke(T0)
+pop
+M00000006_IL_002f:
+M00000006_IL_0030:
+ldloc local1
+M00000006_IL_0031:
+ldc.i4 1
+M00000006_IL_0032:
+add
+M00000006_IL_0033:
+stloc local1
+M00000006_IL_0034:
+br M00000006_IL_000d
+M00000006_IL_0039:
+M00000006_IL_003a:
+M00000006_IL_003b:
+ret
+.end
+.end

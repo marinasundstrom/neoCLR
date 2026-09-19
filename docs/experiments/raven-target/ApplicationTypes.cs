@@ -43,7 +43,7 @@ static class ApplicationTypes
     public static void Reset(params ModuleDefinition[] modules) { LibraryModule = null; LibraryScope = null; LibraryDependencies.Clear(); LibraryMap = null; LibraryReferenceTypes.Clear(); LibraryReferences.Clear(); LibraryNames.Clear(); Modules.Clear(); Modules.UnionWith(modules); Types.Clear(); Expanded.Clear(); Adapters.Clear(); }
     public static object[] IdentityMap() => Types.Select(p => (object)new {
         AssemblyIdentity = p.Value.Module.Assembly.Name.FullName, MetadataName = p.Value.FullName, RuntimeName = p.Key,
-        Fields = p.Value.Fields.Where(f => !PrimitiveLibrary.IsMatched(p.Value) && !OpaqueLibrary.IsString(p.Value) && (!FlagsLibrary.IsMatched(p.Value) || !f.IsStatic)).Select(f => new { MetadataName = f.Name, RuntimeName = FieldName(f) }).ToArray()
+        Fields = p.Value.Fields.Where(f => !PrimitiveLibrary.IsMatched(p.Value) && !OpaqueLibrary.IsString(p.Value) && !ArrayLibrary.IsMatched(p.Value) && (!FlagsLibrary.IsMatched(p.Value) || !f.IsStatic)).Select(f => new { MetadataName = f.Name, RuntimeName = FieldName(f) }).ToArray()
     }).ToArray();
     public static bool IsModule(ModuleDefinition? module) => module is not null && Modules.Contains(module);
     public static void CheckAccess(TypeReference reference, ModuleDefinition caller)
@@ -130,7 +130,7 @@ static class ApplicationTypes
             if (IsModule(type.BaseType?.Resolve()?.Module)) { CheckAccess(type.BaseType!, type.Module); map(type.BaseType!, false); }
             foreach (var contract in type.Interfaces) { CheckAccess(contract.InterfaceType, type.Module); map(contract.InterfaceType, false); }
             foreach (var field in type.Fields) map(field.FieldType, false);
-            foreach (var method in type.Methods.Where(m => !m.IsStatic && !(PrimitiveLibrary.IsMatched(type) && PrimitiveLibrary.IsDefaultConstructor(m)) && !(IsLibrary(type) && (OpaqueLibrary.IsOmittedConstructor(m) || EmptyLibrary.OmitConstructor(m) || (ErrorCarrierLibrary.IsCarrier(type) || GenericUnionLibrary.IsFamily(type) && type.HasFields) && PrimitiveLibrary.IsDefaultConstructor(m)))))
+            foreach (var method in type.Methods.Where(m => !m.IsStatic && !(PrimitiveLibrary.IsMatched(type) && PrimitiveLibrary.IsDefaultConstructor(m)) && !(IsLibrary(type) && (OpaqueLibrary.IsOmittedConstructor(m) || ArrayLibrary.OmitConstructor(m) || EmptyLibrary.OmitConstructor(m) || (ErrorCarrierLibrary.IsCarrier(type) || GenericUnionLibrary.IsFamily(type) && type.HasFields) && PrimitiveLibrary.IsDefaultConstructor(m)))))
             {
                 CheckMethod(method);
                 if (method.Overrides.Any(o => !method.IsPublic || o.Name != method.Name || o.DeclaringType.Resolve()?.IsInterface != true
@@ -229,19 +229,21 @@ static class ApplicationTypes
             foreach (var contract in type.Interfaces) output.AppendLine(".implements " + map(contract.InterfaceType, false));
             foreach (var method in type.Methods.Where(m => m.IsAbstract))
                 output.AppendLine($".method instance {(LibraryNames.ContainsKey(type) && PropagationLibrary.IsContract(type) ? "readonly byref " : "")}{(type.IsInterface ? "" : "abstract ")}{MethodName(method)}({string.Join(',', method.Parameters.Select(p => (LibraryNames.ContainsKey(type) && PropagationLibrary.IsConditionalOutput(method, p) ? "out(true) " : "") + map(p.ParameterType, false) + (LibraryNames.ContainsKey(type) ? " " + p.Name : "")))}) -> {map(method.ReturnType, true)}\n.end");
-            foreach (var field in type.Fields.Where(_ => !PrimitiveLibrary.IsMatched(type) && !OpaqueLibrary.IsString(type)))
+            foreach (var field in type.Fields.Where(_ => !PrimitiveLibrary.IsMatched(type) && !OpaqueLibrary.IsString(type) && !ArrayLibrary.IsMatched(type)))
                 output.AppendLine($".field {(LibraryNames.ContainsKey(type) && field.IsPrivate && !GenericUnionLibrary.IsCase(type) ? "private " : "")}{(FieldName(field))} {map(field.FieldType, false)}");
             if (LibraryNames.ContainsKey(type))
                 foreach (var property in type.Properties.Where(GenericUnionLibrary.IsRuntimeProperty))
                 {
-                    output.AppendLine($".property instance {MetadataIdentity.MemberName(property.Name)}({string.Join(',', property.Parameters.Select(p => map(p.ParameterType, false)))}) -> {map(property.PropertyType, false)}");
-                    if (property.GetMethod is { } getter) output.AppendLine($".get instance {name}::{MethodName(getter)}({string.Join(',', getter.Parameters.Select(p => map(p.ParameterType, false)))})");
-                    if (property.SetMethod is { } setter) output.AppendLine($".set instance {name}::{MethodName(setter)}({string.Join(',', setter.Parameters.Select(p => map(p.ParameterType, false)))})");
+                    var receiver = (property.GetMethod ?? property.SetMethod)!.IsStatic ? "static" : "instance";
+                    output.AppendLine($".property {receiver} {MetadataIdentity.MemberName(property.Name)}({string.Join(',', property.Parameters.Select(p => map(p.ParameterType, false)))}) -> {map(property.PropertyType, false)}");
+                    if (property.GetMethod is { } getter) output.AppendLine($".get {(getter.IsStatic ? "" : "instance ")}{name}::{MethodName(getter)}({string.Join(',', getter.Parameters.Select(p => map(p.ParameterType, false)))})");
+                    if (property.SetMethod is { } setter) output.AppendLine($".set {(setter.IsStatic ? "" : "instance ")}{name}::{MethodName(setter)}({string.Join(',', setter.Parameters.Select(p => map(p.ParameterType, false)))})");
                     output.AppendLine(".end");
                 }
-            foreach (var body in bodies.Where(p => p.Key.DeclaringType == type)) output.Append(body.Value);
+            foreach (var body in bodies.Where(p => p.Key.DeclaringType == type && !ArrayLibrary.IsIterator(p.Key))) output.Append(body.Value);
             if (Adapters.TryGetValue(name, out var adapters)) foreach (var body in adapters.Values) output.Append(body);
             output.AppendLine(".end");
+            if (ArrayLibrary.IsMatched(type)) output.Append(ArrayLibrary.IteratorAdapter(bodies.Single(p => p.Key.DeclaringType == type && ArrayLibrary.IsIterator(p.Key)).Value));
         }
         return output.ToString();
     }

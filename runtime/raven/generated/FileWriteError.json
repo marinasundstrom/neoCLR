@@ -2,6 +2,7 @@
   "format": "raven-library-bootstrap-v1",
   "owner": "System.IO.FileWriteError",
   "inputs": {
+    "runtime/raven/src/System/Array.rvn": "cbfe898efa2525d07b7cc8d54a0d405a987d203be31d05eb0451b69bf2ac0ce3",
     "runtime/raven/src/System/Object.rvn": "d2c75f0f4e4843d68715e5c89686af1c21d023b0325079439a13124051f1be9a",
     "runtime/raven/src/System/Runtime/CompilerServices/UnionAttribute.rvn": "2b5dc7aca6883217188df40ce57c31025703caa869bcdcf775309eda34c804d9",
     "runtime/raven/src/System/Introspection/BindingFlags.rvn": "d653a79edea57d664431ee9b6a1bd5e7980f873b6543308610a33286703f7d4e",
@@ -74,7 +75,7 @@
     "runtime/raven/src/System/Single.rvn": "488efaf36e56f147c7158a5b0637f3bc4e56e84bb3f514af6c64a023dcd8598e",
     "runtime/raven/src/System/Double.rvn": "cd3ad24e4a21b7616a2937da71891618284913e26ea180ce203276f18b631f33",
     "runtime/raven/src/System/Boolean.rvn": "1f0010fe0d346fbc7f3ba29c88b2c1cf80faebf42a4c2de2f0cd6cff15335022",
-    "runtime/raven/System.rvnproj": "3b4397fee3c784b6b67a0c7e1251f54255d8bba36dafae8ee02b8a155b7a2672",
+    "runtime/raven/System.rvnproj": "efc34ef4b8583ff2dc0774a5564bae3bc56c632d8aa83982a11be2cf8aac1aac",
     "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
   },
   "outputs": {
@@ -82,7 +83,7 @@
     "FileWriteError.helpers.neoil": "8f3ca489b2477169abf3405430adc4a091522b0f6083664a040d2d342ca42dfc"
   },
   "compilerSha256": "eb5f7834214432722f4140fcaf3b13464534f745f5db2d0bae5c565b8c2094cb",
-  "coreSha256": "808e0f5b2034dff5c951171fe41afcc706e96e1a3e78dd9806aa9a98d4db222b",
+  "coreSha256": "047ef05f81594ec50c11da73e0e529caba3f901f2f4f2d3637accc8382cbc0b7",
   "exports": [
     ".ctor(System.IO.FileWriteError.InvalidLimit value) -> Void",
     "get_IsInvalidLimit() -> Boolean",

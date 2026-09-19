@@ -1,0 +1,214 @@
+; Generated from runtime/raven/src/System/Array.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Array.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
+.function neoCLR.Library.System.Array.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end
+.type internal System.Collections.ArrayEnumerable
+.method internal static GetIterator<T0>(arrayref<T0> source) -> System.Collections.Iterator<T0>
+M00000007_IL_0000:
+M00000007_IL_0001:
+M00000007_IL_0002:
+ldarg 0
+M00000007_IL_0003:
+M00000007_IL_0008:
+newobj instance neoCLR.Library.System.Array.Type_53797374656D2E41727261794974657261746F726031<T0>::.ctor(arrayref<T0>)
+M00000007_IL_000d:
+ret
+.end
+.end
+.type internal class neoCLR.Library.System.Array.Type_53797374656D2E41727261794974657261746F726031<T0>
+.implements System.Collections.Iterator<T0>
+.implements System.Disposable
+.field private data arrayref<T0>
+.field private position Int32
+.property instance Current() -> T0
+.get instance neoCLR.Library.System.Array.Type_53797374656D2E41727261794974657261746F726031<T0>::get_Current()
+.end
+.method instance .ctor(arrayref<T0> buffer) -> noresult
+M00000008_IL_0000:
+M00000008_IL_0001:
+ldarg 0
+M00000008_IL_0002:
+pop
+M00000008_IL_0007:
+M00000008_IL_0008:
+ldarg 0
+M00000008_IL_0009:
+ldarg 1
+M00000008_IL_000a:
+stfld neoCLR.Library.System.Array.Type_53797374656D2E41727261794974657261746F726031<T0>::data
+M00000008_IL_000f:
+M00000008_IL_0010:
+ldarg 0
+M00000008_IL_0011:
+ldc.i4 -1
+M00000008_IL_0012:
+stfld neoCLR.Library.System.Array.Type_53797374656D2E41727261794974657261746F726031<T0>::position
+M00000008_IL_0017:
+ret
+.end
+.method instance MoveNext() -> Boolean
+M00000009_IL_0000:
+M00000009_IL_0001:
+M00000009_IL_0002:
+ldarg 0
+M00000009_IL_0003:
+ldfld neoCLR.Library.System.Array.Type_53797374656D2E41727261794974657261746F726031<T0>::position
+M00000009_IL_0008:
+ldarg 0
+M00000009_IL_0009:
+ldfld neoCLR.Library.System.Array.Type_53797374656D2E41727261794974657261746F726031<T0>::data
+M00000009_IL_000e:
+ldlen
+conv.i4
+M00000009_IL_0013:
+clt
+call neoCLR.Library.System.Array.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_0015:
+ldc.i4 0
+M00000009_IL_0016:
+ceq
+call neoCLR.Library.System.Array.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_0018:
+brtrue M00000009_IL_0022
+M00000009_IL_001d:
+br M00000009_IL_0025
+M00000009_IL_0022:
+M00000009_IL_0023:
+ldc.i4 0
+M00000009_IL_0024:
+call neoCLR.Library.System.Array.RuntimeBooleanFromInt32(Int32)
+ret
+M00000009_IL_0025:
+M00000009_IL_0026:
+M00000009_IL_0027:
+ldarg 0
+M00000009_IL_0028:
+ldarg 0
+M00000009_IL_0029:
+ldfld neoCLR.Library.System.Array.Type_53797374656D2E41727261794974657261746F726031<T0>::position
+M00000009_IL_002e:
+ldc.i4 1
+M00000009_IL_002f:
+add
+M00000009_IL_0030:
+stfld neoCLR.Library.System.Array.Type_53797374656D2E41727261794974657261746F726031<T0>::position
+M00000009_IL_0035:
+M00000009_IL_0036:
+ldarg 0
+M00000009_IL_0037:
+ldfld neoCLR.Library.System.Array.Type_53797374656D2E41727261794974657261746F726031<T0>::position
+M00000009_IL_003c:
+ldarg 0
+M00000009_IL_003d:
+ldfld neoCLR.Library.System.Array.Type_53797374656D2E41727261794974657261746F726031<T0>::data
+M00000009_IL_0042:
+ldlen
+conv.i4
+M00000009_IL_0047:
+clt
+call neoCLR.Library.System.Array.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_0049:
+call neoCLR.Library.System.Array.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance get_Current() -> T0
+M0000000a_IL_0000:
+M0000000a_IL_0001:
+M0000000a_IL_0002:
+ldarg 0
+M0000000a_IL_0003:
+ldfld neoCLR.Library.System.Array.Type_53797374656D2E41727261794974657261746F726031<T0>::position
+M0000000a_IL_0008:
+ldc.i4 0
+M0000000a_IL_0009:
+clt
+call neoCLR.Library.System.Array.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_000b:
+brtrue M0000000a_IL_002b
+M0000000a_IL_0010:
+ldarg 0
+M0000000a_IL_0011:
+ldfld neoCLR.Library.System.Array.Type_53797374656D2E41727261794974657261746F726031<T0>::position
+M0000000a_IL_0016:
+ldarg 0
+M0000000a_IL_0017:
+ldfld neoCLR.Library.System.Array.Type_53797374656D2E41727261794974657261746F726031<T0>::data
+M0000000a_IL_001c:
+ldlen
+conv.i4
+M0000000a_IL_0021:
+clt
+call neoCLR.Library.System.Array.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0023:
+ldc.i4 0
+M0000000a_IL_0024:
+ceq
+call neoCLR.Library.System.Array.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0026:
+br M0000000a_IL_002c
+M0000000a_IL_002b:
+ldc.i4 1
+M0000000a_IL_002c:
+brtrue M0000000a_IL_0036
+M0000000a_IL_0031:
+br M0000000a_IL_0041
+M0000000a_IL_0036:
+M0000000a_IL_0037:
+ldstr "Iterator has no current element"
+M0000000a_IL_003c:
+call System.Fault(String)
+M0000000a_IL_0041:
+M0000000a_IL_0042:
+M0000000a_IL_0043:
+ldarg 0
+M0000000a_IL_0044:
+ldfld neoCLR.Library.System.Array.Type_53797374656D2E41727261794974657261746F726031<T0>::data
+M0000000a_IL_0049:
+ldarg 0
+M0000000a_IL_004a:
+ldfld neoCLR.Library.System.Array.Type_53797374656D2E41727261794974657261746F726031<T0>::position
+M0000000a_IL_004f:
+ldelem T0
+M0000000a_IL_0054:
+ret
+.end
+.method instance Dispose() -> noresult
+M0000000b_IL_0000:
+M0000000b_IL_0001:
+M0000000b_IL_0002:
+ldarg 0
+M0000000b_IL_0003:
+ldarg 0
+M0000000b_IL_0004:
+ldfld neoCLR.Library.System.Array.Type_53797374656D2E41727261794974657261746F726031<T0>::data
+M0000000b_IL_0009:
+ldlen
+conv.i4
+M0000000b_IL_000e:
+stfld neoCLR.Library.System.Array.Type_53797374656D2E41727261794974657261746F726031<T0>::position
+M0000000b_IL_0013:
+M0000000b_IL_0014:
+ret
+.end
+.end

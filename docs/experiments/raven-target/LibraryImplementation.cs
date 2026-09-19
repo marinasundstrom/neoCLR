@@ -23,6 +23,7 @@ static class LibraryImplementation
         ReadonlyReceivers.Clear();
         if (owner != "System" && !Regex.IsMatch(owner, @"^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)+$"))
             throw new InvalidDataException("Invalid library owner.");
+        if (owner == "System.Array") return InstanceRoots(source.GetType("System.Array`1") ?? throw new InvalidDataException("Missing Array implementation."), core.GetType("System.Array`1"), owner);
         if (MarkerLibrary.IsOwner(owner)) return MarkerLibrary.Roots(source, core, owner);
         if (owner == EnumBindings.Flags) return FlagsLibrary.Roots(source, core);
         if (owner == "System.Func") return DelegateLibrary.Roots(source, core);
@@ -134,6 +135,7 @@ static class LibraryImplementation
                     + string.Join(";", type.Fields.Select(f => f.Name + ":" + f.FieldType.FullName + "@" + f.FieldType.Scope)));
         }
         if (owner == "System.String") OpaqueLibrary.ValidateString(type, contract);
+        if (owner == "System.Array") ArrayLibrary.Validate(type);
         if (PrimitiveLibrary.IsPrimitive(type)) PrimitiveLibrary.Validate(type, contract);
         else if (type.IsValueType)
         {
@@ -190,7 +192,7 @@ static class LibraryImplementation
         var declarationOnly = type.IsValueType && !type.HasFields && !contract.HasFields
             && !contract.HasMethods && !type.HasProperties && !type.HasInterfaces
             && type.Methods.All(PrimitiveLibrary.IsDefaultConstructor);
-        var methods = type.Methods.Where(m => !OpaqueLibrary.IsOmittedConstructor(m) && !EmptyLibrary.OmitConstructor(m) && !((ErrorCarrierLibrary.IsCarrier(type) || GenericUnionLibrary.IsFamily(type) && type.HasFields) && PrimitiveLibrary.IsDefaultConstructor(m)) && (!(PrimitiveLibrary.IsPrimitive(type) || declarationOnly) || !PrimitiveLibrary.IsDefaultConstructor(m))).ToArray();
+        var methods = type.Methods.Where(m => !OpaqueLibrary.IsOmittedConstructor(m) && !ArrayLibrary.OmitConstructor(m) && !EmptyLibrary.OmitConstructor(m) && !((ErrorCarrierLibrary.IsCarrier(type) || GenericUnionLibrary.IsFamily(type) && type.HasFields) && PrimitiveLibrary.IsDefaultConstructor(m)) && (!(PrimitiveLibrary.IsPrimitive(type) || declarationOnly) || !PrimitiveLibrary.IsDefaultConstructor(m))).ToArray();
         if (methods.Length == 0 && !declarationOnly || methods.Any(m => !(m.IsPublic || DescriptorLibrary.IsDescriptor(type) && m.IsFamily && m.IsConstructor || m.IsPrivate && !m.IsVirtual
             || m.IsAssembly && !m.IsVirtual && contract.Methods.Count(c => c.IsAssembly && MatchMethod(c, m)) == 1) || !m.HasBody || m.HasGenericParameters
             || m.ExplicitThis || m.IsConstructor && m.IsStatic || m.CallingConvention != MethodCallingConvention.Default

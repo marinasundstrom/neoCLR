@@ -529,3 +529,71 @@ ldc.i4 0
         "{error:?}"
     );
 }
+
+#[test]
+fn raven_array_iterator_observes_shared_elements_and_disposal_is_terminal() {
+    let body = r#"
+.local arrayref<Int32> data
+.local System.Collections.Iterator<Int32> iterator
+.local Int32 observed
+ldc.i4 1
+newarr Int32
+stloc data
+ldloc data
+castclass System.Collections.Iterable<Int32>
+callvirt instance System.Collections.Iterable<Int32>::GetIterator()
+stloc iterator
+ldloc data
+ldc.i4 0
+ldc.i4 42
+stelem Int32
+ldloc iterator
+callvirt instance System.Collections.Iterator<Int32>::MoveNext()
+brtrue Read
+fault "missing element"
+Read:
+ldloc iterator
+callvirt instance System.Collections.Iterator<Int32>::get_Current()
+stloc observed
+ldloc iterator
+callvirt instance System.Disposable::Dispose()
+ldloc iterator
+callvirt instance System.Collections.Iterator<Int32>::MoveNext()
+brfalse Done
+fault "disposed iterator resumed"
+Done:
+ldloc observed
+"#;
+    assert_eq!(
+        program(body, "").run(Limits::default()).unwrap().value,
+        Value::Int32(42)
+    );
+}
+
+#[test]
+fn raven_array_iterator_current_requires_a_live_position() {
+    for transition in [
+        "",
+        "ldloc iterator\ncallvirt instance System.Disposable::Dispose()\n",
+        "ldloc iterator\ncallvirt instance System.Collections.Iterator<Int32>::MoveNext()\npop\n",
+    ] {
+        let body = format!(
+            r#"
+.local System.Collections.Iterator<Int32> iterator
+ldc.i4 0
+newarr Int32
+castclass System.Collections.Iterable<Int32>
+callvirt instance System.Collections.Iterable<Int32>::GetIterator()
+stloc iterator
+{transition}
+ldloc iterator
+callvirt instance System.Collections.Iterator<Int32>::get_Current()
+"#
+        );
+        let error = program(&body, "").run(Limits::default()).unwrap_err();
+        assert!(
+            error.message.contains("Iterator has no current element"),
+            "{error:?}"
+        );
+    }
+}

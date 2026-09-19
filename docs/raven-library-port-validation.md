@@ -116,6 +116,17 @@ metadata rather than executable stub bodies. Source/artifact hashes and ownershi
 audits match. All 22 attribute/ordinary-union/reflection tests pass. This adds no
 compiler code or Runtime Contract configuration.
 
+## Managed array implementation follow-up
+
+Array brings the total to 73 slices. Eight authoring admission checks cover exact
+intrinsic storage, private empty construction, forbidden backing-field writes and
+allocation, and named-parameter contracts. All 25 array shape/iteration/collection
+Rust tests pass, including the real Raven iterator observing a later element write
+and rejecting Current before positioning, after exhaustion and after disposal.
+Four saved array programs preserve expected metadata, interface dispatch, callbacks
+and element results. Full bootstrap regeneration and snapshot hashes match.
+The source-body ownership audit leaves only the TypeOf<T>.Of helper to migrate.
+
 ## Reproduce the program gate
 
 Use the neoCLR feature compiler, built from the Raven repository's

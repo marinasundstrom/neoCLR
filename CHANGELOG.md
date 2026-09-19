@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Port managed Array members, callbacks and private iteration to Raven (73 slices).
+  Preserve intrinsic storage and adapt the source iterator factory to the existing
+  dispatch ABI. Retain static property metadata and reject fabricated array storage.
+  Eight admission checks, 25 array/collection tests and four saved array programs
+  pass. The historical Neo array profile remains unchanged.
+
 - Port empty Object and UnionAttribute declarations to Raven (72 source slices).
   Check exact empty constructor and declaration shape while preserving the existing
   runtime root/marker ABI and compiler-facing recognition metadata. Nine admission
