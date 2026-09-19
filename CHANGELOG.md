@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Preserve source parameter-token alignment when the importer lowers an instance
+  method to a free function. Reserve token zero for the synthetic receiver, which
+  has no CLI Param row. This restores value-type constructor admission and the
+  class-identity/value-copy sample after source metadata retention; Raven compiler
+  behavior and Runtime Contract settings are unchanged.
+
 - Make TypeInfo the fourth sealed MemberInfo case. Inherit Name, Module and
   MetadataToken; return Option<TypeInfo> from DeclaringType so top-level types have
   no fabricated owner. Preserve nested source ownership through module-scoped

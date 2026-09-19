@@ -25,11 +25,12 @@ static class SourceMetadata
         // projected by this importer; application properties are still omitted.
         property_tokens = Array.Empty<uint>()
     });
-    public static string Method(MethodDefinition method) => ".origin " + JsonSerializer.Serialize(new {
+    public static string Method(MethodDefinition method, bool explicitReceiver = false) => ".origin " + JsonSerializer.Serialize(new {
         assembly = method.Module.Assembly.Name.FullName,
         module = method.Module.Name,
         name = method.Name,
         token = method.MetadataToken.ToUInt32(),
-        parameter_tokens = method.Parameters.Select(p => p.MetadataToken.RID == 0 ? 0U : p.MetadataToken.ToUInt32()).ToArray()
+        parameter_tokens = (explicitReceiver ? new uint[] { 0 } : Array.Empty<uint>())
+            .Concat(method.Parameters.Select(p => p.MetadataToken.RID == 0 ? 0U : p.MetadataToken.ToUInt32())).ToArray()
     });
 }

@@ -640,3 +640,9 @@ Nested source types retain a module-scoped declaring_type_token in .origin metad
 including the owner's definition when only the nested type is used. Missing or
 cyclic ownership is rejected. The nested-type sample exercises imported ownership
 and four-way matching. This does not add nested type enumeration or dynamic loading.
+
+When an instance method is lowered to a free function (notably a value-type
+constructor), the source metadata's parameter-token list includes a zero entry
+for its explicit receiver. The receiver has no CLI Param row. Ordinary declared
+parameter tokens retain their positions after that synthetic slot. This prevents
+valid source programs from failing metadata admission after receiver lowering.
