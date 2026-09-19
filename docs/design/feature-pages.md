@@ -84,3 +84,8 @@ understand a feature or try a published bundle. Prefer .rvnproj as the evaluator
 entry point. Host complete sample downloads on the site. Update prerequisites,
 package names, build/run commands and expected output with each release; do not
 present local developer installations as public downloads.
+
+When describing prerequisites, distinguish runtime execution from development tools:
+neoCLR and its guest programs do not require .NET. Raven compilation, MSBuild, the
+import bridge and Raven Language Server use .NET; the VS Code extension connects
+to that server. Do not imply the extension itself is a .NET application.

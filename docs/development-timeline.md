@@ -4336,3 +4336,8 @@ instructions, on the website and favored the .rvnproj approach. The assistant ad
 a self-contained Preview 7 installation and project guide, moved complete feature
 sample downloads onto the site, and made repository references optional. Newer APIs
 remain labeled as development work without a published matching evaluator bundle.
+
+The author emphasized that neoCLR and its guest programs have no .NET dependency;
+the dependency belongs to surrounding tooling, including Raven Language Server
+used by VS Code. The assistant made this explicit on the homepage, Raven page and
+setup guide, and recorded the distinction in the website maintenance rules.

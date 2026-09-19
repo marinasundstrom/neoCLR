@@ -12,7 +12,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   source-backed examples, explicit mutability and patterns, target distinctions and
   an on-site .rvnproj install/build/run guide, troubleshooting and sample downloads.
   Distinguish published Preview 7 setup from development API availability; record
-  the website-first content rule for future updates.
+  the website-first content rule for future updates. Clarify that neoCLR and its
+  guest programs run without .NET; the Raven build tools and language server use
+  .NET, with the VS Code extension connecting to that server.
 
 - Migrate runtime Char values and native layout to validated Unicode scalars in
   four bytes. Reject surrogate/out-of-range values, preserve supplementary values,
