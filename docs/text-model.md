@@ -1,5 +1,10 @@
 # Text model and initial String API
 
+**Direction revised 2026-09-19:** ordinary String access should use grapheme clusters,
+with explicit scalar and encoding access. The earlier scalar-Char decisions below
+are preserved as history. See [text abstraction](design/text-abstraction.md) for the
+current direction and open Char representation questions.
+
 The selected direction is native, well-formed UTF-8 with Unicode scalar semantics,
 following the [String proposal](proposals/string-api.md). The author confirmed on
 2026-09-19 that UTF-16 is not neoCLR's native text model or a compatibility constraint.

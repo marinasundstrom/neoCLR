@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Record the revised text direction: grapheme-based ordinary String access with
+  explicit scalar/encoding operations. Char as a grapheme value is the recommended
+  public model, not implemented behavior; preserve the current scalar implementation
+  as provisional. Keep the temporary String-returning grapheme prototype outside
+  the checkout. Independently fix Raven expression-bodied indexer emission on main
+  and carry that general fix to neoclr, with 31 focused tests passing.
+
 - Route homepage sample boxes to feature pages and add a Raven language page with
   source-backed examples, explicit mutability and patterns, target distinctions and
   an on-site .rvnproj install/build/run guide, troubleshooting and sample downloads.

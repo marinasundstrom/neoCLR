@@ -4352,3 +4352,27 @@ surrogate predicates were retired. Wide numeric casts still narrow before scalar
 validation; scalar String access remains separate. General lexer candidates remain
 unextracted pending independent main-based validation. This is local development
 validation, not a published preview or a complete text proposal implementation.
+
+### Characters as text units — 2026-09-19
+
+While the assistant was implementing scalar String access, the author questioned
+whether the abstraction had gone too far toward encoding and said a character
+should mean what a developer sees as a character. The assistant distinguished
+scalars from grapheme clusters and paused the scalar public API. Asked whether
+ordinary length, indexing and iteration should use graphemes, the author answered
+“Yes—graphemes by default”.
+
+The author then emphasized encoding-independent String and character abstractions,
+with UTF-8 as the canonical encoding. The assistant recommended String as Unicode
+text, Char as one extended grapheme cluster, explicit scalar access and encoding at
+byte boundaries. It revised its interim suggestion of returning String from indexing:
+that is useful implementation scaffolding, not the intended Char abstraction.
+Char representation, normalization/equality and scalar naming remain open.
+
+A temporary grapheme implementation passed nine Rust String tests but was preserved
+outside the checkout instead of integrating its provisional public API. Earlier
+scalar implementation history is retained. The independent expression-bodied
+indexer emission bug exposed during this work was reproduced on Raven main's
+ordinary .NET target, fixed with class/struct execution tests (31 focused tests
+passed), integrated into main and cherry-picked to neoclr. The temporary Raven fix
+branch was removed. See [the revised text abstraction](design/text-abstraction.md).

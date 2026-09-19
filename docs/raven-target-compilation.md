@@ -135,3 +135,13 @@ and changelog as well as neoCLR’s integration documentation and changelog. Rec
 configuration, semantic and emission consequences, limitations and validation evidence.
 Keep the [evaluation record](raven-target-evaluation.md) current so that general fixes
 and experimental policies can be reviewed separately.
+
+## General expression-bodied indexer fix — 2026-09-19
+
+String prototyping exposed an emission exception for declaration-level
+`val self[index: int]: int => expression`. This was reproduced independently on
+Raven main with ordinary .NET class and struct receivers. The fix is `d50a6f8fa`
+on main and `673291bbb` on neoclr; 31 indexer execution/diagnostic/completion checks
+passed. Runtime Contract configuration and CLI property shape are unchanged.
+No neoCLR policy or test was merged into main. The subsequent grapheme-first
+String decision is separate API design work, not implemented by this compiler fix.

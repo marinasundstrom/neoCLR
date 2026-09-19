@@ -38,8 +38,9 @@ Clean regeneration of all 76 library slices matches the committed snapshots.
 Utf8, Strings, StringSlices, StringBoundaries and ArrayShapes saved-project
 regressions pass with the scalar compiler/runtime, alongside the rejection checks.
 
-The remaining text question is the smallest scalar length/index/iteration surface
-needed to demonstrate String as a sequence of Char. Do not introduce byte-based
+The author has revised the direction to grapheme-based ordinary text access.
+The next step is defining Char as a text value and explicit scalar access before
+adding default length/index/iteration; see [text abstraction](design/text-abstraction.md). Do not introduce byte-based
 String.Length accidentally. Scalar indexing over UTF-8 has different cost from
 fixed-width code-unit access, and grapheme handling remains separate. Keep a general
 Encoding hierarchy and specialized string types deferred. Numeric casts currently
@@ -66,7 +67,7 @@ contracts and runtime work beyond the current small demonstration.
 
 ## Release gates still outstanding
 
-1. Finish or explicitly resolve the remaining scalar String access gap above before
+1. Finish or explicitly resolve the remaining grapheme String/Char contract gap above before
    presenting the native text model as complete. Re-run affected runtime and Raven
    tests; keep neoCLR policies on Raven's neoclr branch and extract general fixes
    independently if any are discovered.
