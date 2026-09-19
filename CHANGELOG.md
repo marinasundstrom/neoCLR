@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Establish System.Runtime.rvnproj and its System.Runtime managed implementation
+  identity, replacing System.rvnproj/NeoCLR.System without duplicating source owners.
+  All 73 slices compile/import under the new identity; generated executable bodies
+  are unchanged and ownership/snapshot checks pass. The bootstrap reference and
+  executable neoIL retain their explicit mapping. RuntimeContext/interface API
+  migration remains the next slice; published release artifacts are unchanged.
+
 - Record the next API-alignment direction: establish System.Runtime, implement the
   basic RuntimeContext/provider model, retire System.Type for TypeInfo and use
   Object.GetTypeInfo for instance acquisition. This is the selected plan, not an

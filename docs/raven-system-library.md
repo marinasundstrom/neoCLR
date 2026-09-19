@@ -284,7 +284,7 @@ generated-artifact freshness and existing behavioral tests, with focused consume
 and direct-IL coverage. Compiler-affecting changes require documentation and
 changelogs in both repositories under the Raven integration workflow.
 
-`runtime/raven/System.rvnproj` is the shared authoring project for ordinary
+`runtime/raven/System.Runtime.rvnproj` is the shared authoring project for ordinary
 foundational runtime APIs. Its sources include `src/System/Math/Functions.rvn`, `src/System/Linq/Operators.rvn`, `src/System/Int32.rvn`, `src/System/Char.rvn`, `src/System/Collections/ArrayList.rvn`, `src/System/Collections/HashMap.rvn`, `src/System/Time.rvn` and `src/System/Date.rvn`; additional namespaces
 and types should join this project as their importing requirements are validated.
 Each declared namespace has its own folder below `src`: for example, `System/Date.rvn`,
@@ -314,7 +314,7 @@ The bootstrap currently has three distinct artifacts:
 - `NeoCLR.CoreProbe.dll`: compiler-facing reference metadata for the supported System
   surface. A bootstrap variant includes CheckedStorage for authoring; consumers use
   the normal reference surface. Placeholder bodies must never execute.
-- `NeoCLR.System.dll`: compiled Raven implementation input, currently twenty
+- `System.Runtime.dll`: compiled Raven implementation input, currently twenty
   Math functions, nine query overloads and their private deferred iterator classes,
   Int32.Divide, Path and file-write functions, plus separately compiled collection,
   calendar and primitive structs. Memberless Value and RuntimeTypeHandle declarations

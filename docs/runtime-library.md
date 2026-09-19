@@ -221,7 +221,7 @@ but becomes more expensive to maintain as algorithms and APIs grow.
 
 The current [System project and Math bootstrap](raven-system-library.md) resumes
 ordinary library authoring after Preview 7. Foundational Raven sources share
-`runtime/raven/System.rvnproj`; Math is its first source, not its own assembly.
+`runtime/raven/System.Runtime.rvnproj`; Math is its first source, not its own assembly.
 The stages and limitations below remain the gates for expanding that migration.
 
 ### First migration groundwork

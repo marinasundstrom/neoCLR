@@ -21,6 +21,31 @@ Preserve the current BindingFlags query behavior. The smallest working context a
 provider model precedes optional invocation, metadata-file loading and Emit. The
 project may make documented breaking changes while preserving useful .NET ergonomics.
 
+### Implementation checks for the selected acquisition API
+
+Research refreshed 2026-09-19 against the .NET 10 API documentation:
+[Object.GetType](https://learn.microsoft.com/en-us/dotnet/api/system.object.gettype?view=net-10.0)
+returns the actual instance type, including through a base-typed reference;
+[TypeInfo](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.typeinfo?view=net-10.0)
+is a class in .NET's reflection model. neoCLR deliberately chooses an interface
+and direct Object.GetTypeInfo acquisition instead of retaining the public Type/Info
+pair. This changes source and metadata compatibility and requires rebuilding callers.
+It does not claim that .NET lacks runtime type acquisition or descriptor APIs.
+
+A local comparison executed on .NET 10.0.0 checks derived-instance acquisition
+through a base reference, conversion to TypeInfo, distinct generic arguments and
+array element types, and null-instance failure. All checks pass. This is a behavioral
+baseline, not evidence for cross-context binding or a performance comparison.
+
+The production migration must preserve actual allocation type through base/interface
+views; substituting the receiver's declared type would violate the selected API.
+Typeof remains declared-type resolution. Member and parameter descriptions must
+return TypeInfo throughout. Concrete runtime providers remain internal, queries
+retain BindingFlags filtering, and descriptor identity uses resolved metadata
+identity rather than display names. A single current execution universe is the
+initial scope; multiple contexts, interning and cross-context binding need separate
+contracts before those capabilities are exposed.
+
 ## Responsibilities
 
 Introspection describes structure. RuntimeContext defines the execution universe.

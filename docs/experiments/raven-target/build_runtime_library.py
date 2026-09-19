@@ -165,7 +165,7 @@ SOURCES = {
     'Double': 'runtime/raven/src/System/Double.rvn',
     'Boolean': 'runtime/raven/src/System/Boolean.rvn',
 }
-PROJECT = ROOT / 'runtime/raven/System.rvnproj'
+PROJECT = ROOT / 'runtime/raven/System.Runtime.rvnproj'
 GENERATED = ROOT / 'runtime/raven/generated'
 
 def digest(path):
@@ -275,7 +275,7 @@ def main():
                                 '-o', str(compiled)], env={**os.environ, 'NeoCLRBootstrapRoot': str(root),
                                 'NeoCLRLibrarySlice': name}, check=True)
             imported = root / ('imported-' + name)
-            subprocess.run([*bridge, '--library-implementation', str(compiled / 'NeoCLR.System.dll'),
+            subprocess.run([*bridge, '--library-implementation', str(compiled / 'System.Runtime.dll'),
                             str(core), owner, str(imported)], check=True)
             outputs = fragments((imported / 'Implementation.neoil').read_text(), name, owner)
             if args.check:

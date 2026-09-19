@@ -157,6 +157,17 @@ The assistant accepted that sequence, began checking the proposal and executable
 context prototype, and kept the outstanding port validation running. No completed
 production context migration is claimed at this point.
 
+**Project boundary slice.** The assistant renamed the shared source project to
+System.Runtime.rvnproj and changed its implementation assembly identity to
+System.Runtime. All 73 slices compile/import with unchanged executable bodies;
+snapshot and ownership checks pass. The private compiler reference remains an
+explicit mapped contract in this slice. The author observed that the open VS Code
+sample still showed class-based Info types and no RuntimeContext; the assistant
+confirmed that snapshot was the completed source-port baseline and that production
+API migration had not yet landed, then committed to updating it after migration.
+The broad port run subsequently exposed missing declaring-type metadata for
+flattened generated union cases; that correction remains open at this point.
+
 **String/Error slice.** Raven sources now own both method surfaces, with explicit
 importer checks for intrinsic storage, mixed String receivers and opaque Error
 receivers. Native ownership and the existing parameter metadata remain unchanged.
@@ -3610,7 +3621,7 @@ resolution issue too. The assembly's historical name was context for the groupin
 question, not a selected neoCLR assembly identity.
 
 **Assistant's implementation:** Consolidated the pilot into
-[System.rvnproj](../runtime/raven/System.rvnproj), with Math as its first source.
+[System.rvnproj (now System.Runtime.rvnproj)](../runtime/raven/System.Runtime.rvnproj), with Math as its first source.
 The source exposes namespace functions through Raven's existing CLI container and
 TopLevelAttribute contract. Added fresh bootstrap reference generation, ordinary
 Raven project compilation, signature-checked importing and checked-in executable

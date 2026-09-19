@@ -1,13 +1,15 @@
 # System.Runtime: minimal managed foundation
 
-Planned direction, requested by the author on **2026-09-17**. This is an assembly
-and project boundary, not a completed rename or a namespace migration.
+Requested on **2026-09-17**, with project establishment directed on **2026-09-19**.
+The first implementation slice establishes `runtime/raven/System.Runtime.rvnproj`
+and its `System.Runtime` managed implementation identity. This is an assembly/project
+boundary, not a namespace migration or a completed RuntimeContext API migration.
 
 ## Purpose and scope
 
-Plan a Raven-authored `System.Runtime` project/assembly containing the minimal
+Use the Raven-authored `System.Runtime` project/assembly containing the minimal
 managed foundation an application needs. Start from the foundational types now
-being implemented through `runtime/raven/System.rvnproj`; do not add a second
+ported through the former `runtime/raven/System.rvnproj`; do not add a second
 competing implementation of them.
 
 Candidate contents are the existing fundamental value/reference types, strings,
@@ -39,8 +41,13 @@ compiler reference contract separate from executable implementation artifacts. T
 benefit is a smaller ownership/deployment model; the cost is less packaging flexibility
 and a future compatibility decision if the library is split. No .NET binary
 compatibility, footprint reduction or performance advantage is implied by the name.
-Whether reference and implementation artifacts use one identity or explicit mapping
-must be settled before migration, not inferred from filenames.
+The current bootstrap deliberately uses explicit mapping: NeoCLR.CoreProbe supplies
+checked compiler reference metadata, System.Runtime.dll supplies compiled Raven
+implementation inputs, and runtime/System.neoil supplies executable library code.
+The importer matches complete admitted contracts across those identities; no reference
+stub body executes. The project rename changes the implementation identity, while
+consumer reference identity and runtime module identity retain their explicit mapping.
+Replacing the production introspection contract is the next coordinated slice.
 
 ## Migration slices
 
@@ -60,5 +67,8 @@ must be settled before migration, not inferred from filenames.
 
 The immediate milestone remains **correct API boundaries and a running POC**.
 Assembly packaging, complete runtime context discovery and every library backend
-need not be finished before demonstrating the API. This plan does not rename any
-published assembly or claim the new project exists yet.
+need not be finished before demonstrating the API. No published assembly is renamed. All 73 existing source slices remain in the one
+project, including the Console, collection and I/O conveniences used by current
+working programs. Their inclusion is an explicit bootstrap choice, not a claim that
+each is irreducible or that future packaging must stay monolithic. Native services
+remain runtime-owned; the project contains the managed types and implementations.

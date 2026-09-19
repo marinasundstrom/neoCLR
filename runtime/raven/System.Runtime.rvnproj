@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <AssemblyName>NeoCLR.System</AssemblyName>
+    <AssemblyName>System.Runtime</AssemblyName>
     <NeoCLRRoot>$(NeoCLRBootstrapRoot)</NeoCLRRoot>
   </PropertyGroup>
   <Import Project="../../build/NeoCLR.Raven.props" />

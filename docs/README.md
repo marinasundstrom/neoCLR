@@ -33,5 +33,6 @@ open validation. Follow [design research](design-research.md) and the
 Organize and commit the documentation first. Then port the remaining managed System
 library implementation from neoIL to Raven with the existing API preserved. Align
 the API with the supplied proposals in a subsequent step. The
-[System.Runtime assembly plan](system-runtime-assembly.md) remains a separate
-identity/packaging migration; the current authoring project is `System.rvnproj`.
+[System.Runtime project](system-runtime-assembly.md) is now established as
+`System.Runtime.rvnproj`. The next API slice implements RuntimeContext and shared
+Info interfaces, with Object.GetTypeInfo as canonical instance acquisition.
