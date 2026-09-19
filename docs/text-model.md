@@ -250,7 +250,7 @@ STORAGE:    String ──canonical──> UTF-8 ──view──> Utf8String / B
 ENCODING:   String <── Encode / Decode ──> Bytes
 ```
 
-This proposal is deliberately different from the current UTF-16 code-unit Char
+This proposal is deliberately different from the original UTF-16 code-unit Char
 contract and from the existing UTF-8 byte-offset slicing API. Before implementation,
 define migration for Char literals, predicates, ordering, indexing and metadata;
 decide whether representation views are owned values or lifetime-bounded views; and
@@ -260,3 +260,9 @@ Do not silently reinterpret existing String offsets or claim that the Raven-shap
 examples in this proposal are currently valid Raven source.
 
 Strict byte conversion is now available through [System.Text.Utf8](raven-string-api.md#strict-utf-8-conversion-2026-09-19); broader text-model proposals above remain provisional.
+
+The 2026-09-19 scalar Char follow-up implements validated four-byte Char values and
+Raven literals, patterns, arrays and classification. Surrogate predicates are removed.
+This supersedes the original code-unit contract; it does not implement scalar String
+length/index/iteration or the proposed representation views. See the
+[scalar integration contract](raven-string-api.md#scalar-char-integration--2026-09-19).

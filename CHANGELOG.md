@@ -25,7 +25,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   the 76 library slices. Supplementary and invalid Int32 conversion programs run
   through the saved-project pipeline; compiler/runtime/editor checks pass. Wide
   numeric casts retain narrowing before validation; scalar String access remains
-  a separate slice.
+  a separate slice. Refresh the local VS Code workspace and website String status
+  with the working scalar sample and remaining String-access limits.
 
 - Record the preview-readiness review and fresh local VS Code UTF-8 snapshot.
   Identify scalar Char as the remaining text-model gap and retain full candidate,

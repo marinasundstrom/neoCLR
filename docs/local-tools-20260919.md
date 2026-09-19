@@ -28,3 +28,35 @@ neoCLR 10b68e3 and Raven 2479755e7. Later website-only commits do not alter its 
 String storage and comparison are native UTF-8. Char still has the legacy 16-bit
 representation pending the selected scalar migration. This snapshot does not claim
 that migration is complete. For release gaps, see [the readiness review](preview-readiness-2026-09-19.md).
+
+## Scalar Char follow-up
+
+A separate workspace is prepared at
+`/Users/robert/.neoclr/experiments/scalar-char-20260919/demo`, with neoCLR `0c36087`
+and Raven `3bd17488a`. Its manifest pins the binaries; the earlier UTF-8 snapshot
+above is preserved. Open this folder in the same experimental VS Code profile
+and run **neoCLR: Run saved project** against Demo.rvnproj.
+
+```sh
+"/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code" \
+  --user-data-dir /Users/robert/.neoclr/vscode/raven-port-20260919 \
+  --extensions-dir /Users/robert/.neoclr/vscode/raven-port-20260919/extensions \
+  --new-window /Users/robert/.neoclr/experiments/scalar-char-20260919/demo
+```
+
+Main.rvn now contains the scalar Char sample. Expected output is:
+
+```text
+127757
+128512
+66560
+Earth
+Smile
+Supplementary letter
+Supplementary symbol
+```
+
+The saved project builds, imports, verifies and runs on neoCLR; the matching
+language server passes the target completion checks, including absence of the
+removed surrogate predicates. The tools are local development artifacts, not a
+new public SDK release. Scalar String access remains unimplemented.

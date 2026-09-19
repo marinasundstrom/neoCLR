@@ -10,7 +10,7 @@ this review publishes a runtime, extension or website.
 
 | Area | Working development surface | Evidence and limits |
 | --- | --- | --- |
-| Runtime foundation | Raven-authored System.Runtime and programs executing on neoCLR | 76 generated implementation slices reproduce cleanly; selected-profile ownership check reports 850 declarations and 69 explicit native services |
+| Runtime foundation | Raven-authored System.Runtime and programs executing on neoCLR | 76 generated implementation slices reproduce cleanly; selected-profile ownership check reports 847 declarations and 69 explicit native services |
 | Introspection | TypeInfo in the sealed MemberInfo family; Object.GetType/typeof; RuntimeContext.ExecutingAssembly; assembly references, module-scoped tokens and Sequence collections | Runnable discovery/matching samples and earlier targeted runtime/editor checks; retained loaded metadata only, without dynamic loading, invocation or emit |
 | Strings | Immutable valid UTF-8 storage, strict Utf8 Encode/Decode, byte-boundary slicing, IsEmpty property and UTF-8/scalar ordinal ordering | UTF-8 round trips, invalid sequences, BOM/NUL preservation, snapshot independence, allocation bounds, signature/editor checks and saved-project programs pass |
 | Outcomes | Option/Result, patterns and propagation | Executable examples expose recoverable outcomes without requiring carrier-specific extraction methods |
@@ -28,18 +28,22 @@ SDK release or evidence for untested hosts.
 ## Close the text-model gap first
 
 Native UTF-8 is now the selected direction, following the original String proposal.
-String storage and ordinal ordering align with it. **Char still has the legacy
-16-bit code-unit representation.** The preview must not claim scalar Char or a
-fully migrated text model until this changes.
+String storage and ordinal ordering align with it. The scalar-Char integration is
+now committed: four-byte validated runtime values, supplementary Raven literals,
+patterns, arrays and classification pass targeted execution checks. Surrogate-only
+predicates are removed. The new local scalar workspace is recorded in
+[local tools](local-tools-20260919.md#scalar-char-follow-up).
 
-The next bounded implementation work is therefore the scalar-Char contract across
-runtime values, metadata/artifacts, conversions, classification and Raven lowering.
-Validate supplementary literals/values, reject surrogates and out-of-range scalars,
-and document migration from code-unit predicates. Decide the smallest scalar
-length/index/iteration surface required to demonstrate String as a sequence of Char;
-do not introduce byte-based String.Length accidentally. Scalar indexing over UTF-8
-has different cost from fixed-width code-unit access, and grapheme handling remains
-separate. Keep a general Encoding hierarchy and specialized string types deferred.
+Clean regeneration of all 76 library slices matches the committed snapshots.
+Utf8, Strings, StringSlices, StringBoundaries and ArrayShapes saved-project
+regressions pass with the scalar compiler/runtime, alongside the rejection checks.
+
+The remaining text question is the smallest scalar length/index/iteration surface
+needed to demonstrate String as a sequence of Char. Do not introduce byte-based
+String.Length accidentally. Scalar indexing over UTF-8 has different cost from
+fixed-width code-unit access, and grapheme handling remains separate. Keep a general
+Encoding hierarchy and specialized string types deferred. Numeric casts currently
+narrow to UInt32 before scalar validation; checked wide conversions remain open.
 
 This is the strongest candidate for additional preview implementation. Adding broad
 new API families would dilute the stated goal while this fundamental distinction
@@ -62,7 +66,7 @@ contracts and runtime work beyond the current small demonstration.
 
 ## Release gates still outstanding
 
-1. Finish or explicitly resolve the scalar-Char/text-contract gap above before
+1. Finish or explicitly resolve the remaining scalar String access gap above before
    presenting the native text model as complete. Re-run affected runtime and Raven
    tests; keep neoCLR policies on Raven's neoclr branch and extract general fixes
    independently if any are discovered.

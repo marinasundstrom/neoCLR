@@ -118,7 +118,7 @@ def main():
     output_text = escape((ROOT / (raven + 'library-introspection-tour.expected.txt')).read_text().rstrip())
     downloads = OUTPUT / 'samples'
     downloads.mkdir()
-    for name in ('library-introspection-tour.rvn', 'library-introspection-tour.expected.txt', 'library-utf8.rvn', 'library-utf8.expected.txt', 'library-instants.rvn', 'library-propagation.rvn', 'library-collection-capabilities.rvn', 'library-files.rvn'):
+    for name in ('library-introspection-tour.rvn', 'library-introspection-tour.expected.txt', 'library-utf8.rvn', 'library-utf8.expected.txt', 'library-instants.rvn', 'library-propagation.rvn', 'library-collection-capabilities.rvn', 'library-files.rvn', 'library-scalar-char.rvn'):
         shutil.copyfile(ROOT / raven / name, downloads / name)
     pages = {}
     for source in sorted(SOURCE.rglob('*.html')):
