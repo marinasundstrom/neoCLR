@@ -4600,3 +4600,13 @@ The compiler adaptation was committed as Raven b99025680 on neoclr, with 61
 focused and 119 feature-selected tests passing (overlapping sets). The assistant
 also changed the manual neoCLR probe to use ? in its application transformation,
 keeping Result case inspection out of its continuation machinery.
+
+### Generic async unit correction — 2026-09-19
+
+After the author's continuation, the assistant reproduced the unit-task gap on
+Raven main using ordinary .NET metadata. Investigation also found missing generic
+unit completion and an awaitless expression-body path bypassing async lowering.
+The assistant fixed these on an isolated main-based branch, verified 145 selected
+async/resource tests on .NET 11, and integrated the general fix into main and
+neoclr separately (fb8eb77bb and b67d1e11b). No neoCLR-only policy was merged into
+main. This closes the general compiler gap, not the guest Task/builder work.

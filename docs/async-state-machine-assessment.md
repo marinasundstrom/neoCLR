@@ -144,3 +144,20 @@ kept on neoclr. Validation passed 61 focused tests and the 119-test functions/as
 selection on .NET 11 (overlapping sets). The neoCLR manual completion probe now
 uses ordinary ? inside its resumed application transformation; its state machine
 and executor do not inspect Result cases.
+
+## Generic unit return correction — 2026-09-19
+
+An independent main-based Raven reproduction confirmed the generic-unit bug on
+ordinary .NET. The fix distinguishes nongeneric task shapes from generic unit
+payloads in return binding, supplies a unit value to generic builder completion,
+and lowers awaitless/arrow bodies through generic completion. It adds no Runtime
+Contract option or neoCLR policy. Immediate, pending, tail-expression and explicit
+unit returns are covered for Task<unit> and ValueTask<unit>, with nongeneric return
+diagnostics retained. This resolves the compiler gap above; it does not prove
+neoCLR's System.Void payload ABI or supply guest Task/builder implementations.
+
+General fix: Raven main [fb8eb77bb](https://github.com/marinasundstrom/raven/commit/fb8eb77bb),
+cherry-picked to neoclr as b67d1e11b. All 145 tests in the selected async/resource
+suite pass on .NET 11, including ten new unit-task execution cases and two
+nongeneric diagnostic checks. The temporary main-based branch is removed after
+integration; the long-lived neoCLR branch remains separate.

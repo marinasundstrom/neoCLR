@@ -964,3 +964,9 @@ Reduce and validate the generic-unit return rules independently on Raven main
 before extracting a general fix. Then verify neoCLR's configured System.Void
 payload separately; do not preserve an accidental nongeneric Task assumption as
 the public neoCLR model. No fix is claimed in the exception-capture slice.
+
+The follow-up reproduced this on a main-based Raven branch with ordinary .NET
+references and fixed generic unit return binding and completion independently.
+See the [async assessment](async-state-machine-assessment.md#generic-unit-return-correction--2026-09-19).
+No neoCLR-specific policy is part of that general fix. Target System.Void payload
+execution remains a separate integration requirement.

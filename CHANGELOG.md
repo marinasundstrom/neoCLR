@@ -28,7 +28,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Validate 61 focused and 119 feature-selected compiler tests (overlapping sets),
   and use ordinary ? in the manual neoCLR continuation probe's application body.
   All 10 neoCLR probe scenarios pass, including retained state through 46 GC cycles.
-  Refresh and validate the website proposals overview.
+  Refresh and validate the website proposals overview. Independently fix generic
+  unit-task return binding and completion in Raven main, then cherry-pick that fix
+  to neoclr; 145 async/resource tests pass on .NET. Guest builder/Task integration
+  and the configured System.Void ABI remain separate work.
 
 - Port 25 Option/Result operator overloads from Raven.Core to the development
   library, including transformations, recovery, branch actions, conversions and
