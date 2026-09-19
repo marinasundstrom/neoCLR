@@ -11,7 +11,7 @@ args = parser.parse_args()
 expected = {
     'library-array-callbacks': '7\n42\nFirst\nSecond\n',
     'library-array-foreach': 'Parse\nDivide\nEquals\nToString\nCompareTo\n42\n1\n2\n3\n',
-    'library-array-shapes': '0\n0\nBoolean elements\nSystem.Int32\nSystem.String\n0\n255\n65535\n65535\n42\n',
+    'library-array-shapes': '0\n0\nBoolean elements\nSystem.Int32\nSystem.String\n0\n255\n65535\né\n42\n',
     'library-managed-array-metadata': '42\n2\n1\nSystem.Int32\n0\nEmpty\nLength\nCount\nItem\n4\n42\n8\n50\n2\n',
 }
 for name, output in expected.items():

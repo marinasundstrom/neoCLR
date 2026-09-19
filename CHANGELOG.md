@@ -15,7 +15,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Select the release scope/date and keep actual publication evidence in the manifest;
   exact-candidate validation and publication are pending. Generate the advanced
   runner fixture from shared props with inline contracts, so packaged verification
-  can copy it to a temporary directory without breaking relative imports.
+  can copy it to a temporary directory without breaking relative imports. Update
+  the full editor matrix to expect Sequence members from Introspection queries;
+  align standalone array/match probes with current contracts. Keep the reduced
+  probe core compilable by omitting collection-returning String members when its
+  collection profile is not selected; the full runtime reference API is unchanged.
 
 ## 0.1.0-preview.8 — 2026-09-19
 

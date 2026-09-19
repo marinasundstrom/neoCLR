@@ -470,7 +470,7 @@ try:
     if array_shape:
         for version, access, required, forbidden in (
             (63, 'Array<int>.', {'Empty'}, {'ForEach'}),
-            (64, 'typeof(int).GetProperties().', {'ForEach', 'Length'}, {'Item', 'CanRead'}),
+            (64, 'typeof(int).GetProperties().', {'Count', 'GetIterator'}, {'Item', 'CanRead', 'Length'}),
             (65, 'typeof(int).GetProperties().Item.', set(), {'CanRead', 'CanWrite', 'Name'}),
             (66, 'typeof(int).GetProperties()[0].', {'CanRead', 'CanWrite', 'Name'}, set())):
             text = 'import System.*\nfunc Main() {\n    ' + access + '\n}'

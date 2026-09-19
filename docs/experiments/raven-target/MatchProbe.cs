@@ -11,7 +11,7 @@ static class MatchProbe
         if (Directory.Exists(output)) throw new IOException("Output directory must not exist.");
         Directory.CreateDirectory(output);
         var core = Path.Combine(output, CoreDeclarations.Identity + ".dll");
-        CoreDeclarations.Write(core, unionProbe: true);
+        CoreDeclarations.Write(core, unionProbe: true, collectionProbe: true);
         var cases = new Dictionary<string, string> {
             ["Forms"] = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "samples/library-match.rvn")),
             ["CaseImports"] = "import System.Result.*\nfunc Pick(value: int) -> int { return match Math.Abs(value) { Ok(let amount) => amount; Error(_) => -1 } } func Main() { WriteLine(Pick(-42)); WriteLine(Pick(-2147483648)) }",
@@ -37,7 +37,10 @@ static class MatchProbe
             var compilation = Compilation.Create(name, [SyntaxTree.ParseText("import System.*\nimport System.Console.*\n" + source)],
                 [MetadataReference.CreateFromFile(core)], new CompilationOptions(OutputKind.ConsoleApplication,
                     metadataImportOptions: new MetadataImportOptions(CoreDeclarations.Identity),
-                    runtimePropagationContract: new RuntimePropagationContract(CoreDeclarations.Identity, "System.Propagatable`3")));
+                    runtimePropagationContract: new RuntimePropagationContract(CoreDeclarations.Identity, "System.Propagatable`3"))
+                .WithTargetCoreAssemblyName(CoreDeclarations.Identity)
+                .WithGraphemeChar(true)
+                .WithRuntimeUnitContract(new RuntimeUnitContract(CoreDeclarations.Identity, "System.Void")));
             var diagnostics = compilation.GetDiagnostics().Select(d => new { d.Id, Severity = d.Severity.ToString(), Message = d.ToString() }).ToArray();
             if (compilation.GetDiagnostics().Any(d => d.Severity == DiagnosticSeverity.Error))
             { results[name] = new { Stage = "compile-rejected", Diagnostics = diagnostics }; continue; }
@@ -57,7 +60,7 @@ static class MatchProbe
             VoidProjection.Write(raw, core, projected);
             try
             {
-                UnionImport.Write(projected, core, Path.Combine(output, name + ".neoil"));
+                UnionImport.Write(projected, core, Path.Combine(output, name + ".neoil"), collectionProfile: true);
                 results[name] = new { Stage = "imported", Diagnostics = diagnostics };
             }
             catch (InvalidDataException error) { results[name] = new { Stage = "import-rejected", Diagnostics = diagnostics, Error = error.Message }; }
@@ -87,7 +90,7 @@ static class MatchProbe
         var invalid = Path.Combine(output, "UninitializedString.dll");
         var destination = Path.Combine(output, "UninitializedString.neoil");
         image.Write(invalid);
-        try { UnionImport.Write(invalid, core, destination); }
+        try { UnionImport.Write(invalid, core, destination, collectionProfile: true); }
         catch (InvalidDataException error) when (error.Message.Contains("Read of uninitialized"))
         {
             if (File.Exists(destination)) throw new Exception("Rejected string read produced output.");

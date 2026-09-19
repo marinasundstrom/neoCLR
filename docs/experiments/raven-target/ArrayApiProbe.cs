@@ -13,7 +13,12 @@ static class ArrayApiProbe
             [MetadataReference.CreateFromFile(core)], new CompilationOptions(OutputKind.ConsoleApplication,
                 metadataImportOptions: new MetadataImportOptions(CoreDeclarations.Identity),
                 runtimeIterationContract: new RuntimeIterationContract(CoreDeclarations.Identity,
-                    "System.Collections.Iterable`1", "System.Collections.Iterator`1", ArrayShapeTypeName: "System.Array`1")));
+                    "System.Collections.Iterable`1", "System.Collections.Iterator`1", ArrayShapeTypeName: "System.Array`1"))
+                .WithTargetCoreAssemblyName(CoreDeclarations.Identity)
+                .WithGraphemeChar(true)
+                .WithRuntimeUnitContract(new RuntimeUnitContract(CoreDeclarations.Identity, "System.Void"))
+                .WithRuntimeTypeOfContract(new RuntimeTypeOfContract(CoreDeclarations.Identity,
+                    "System.Introspection.TypeInfo", "System.Runtime.RuntimeContext")));
         foreach (var name in new[] { "library-array-callbacks", "library-array-foreach", "library-array-shapes", "library-managed-array-metadata" })
         {
             var source = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "samples", name + ".rvn"));

@@ -21,7 +21,8 @@ static class StringBindings
         new("SliceUtf8", ["Int32", "Int32"], ResultBindings.Slice, true)
     ];
     static string CSharp(string type) => type switch { "String" => "string", "Char" => "char", "System.Collections.Iterator<Char>" => "Collections.Iterator<char>", "System.Collections.Sequence<UInt32>" => "Collections.Sequence<uint>", "Int32" => "int", "Boolean" => "bool", ResultBindings.Slice => "Result<string, Text.Utf8SliceError>", _ => throw new InvalidDataException(type) };
-    public static string Declarations(bool results) => "public sealed class String { " + string.Join(" ", Members.Where(m => results || m.Result != ResultBindings.Slice).Select(m =>
+    public static string Declarations(bool results, bool collections) => "public sealed class String { " + string.Join(" ", Members.Where(m => (results || m.Result != ResultBindings.Slice)
+        && (collections || m.Name is not ("GetIterator" or "GetScalars"))).Select(m =>
         m.Name == "get_Length" ? "public int Length => default;" :
         m.Name == "get_IsEmpty" ? "public bool IsEmpty => default;" : m.Name is "op_Equality" or "op_Inequality"
             ? $"public static bool operator {(m.Name == "op_Equality" ? "==" : "!=")}(string left, string right) => default;"
