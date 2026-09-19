@@ -105,10 +105,12 @@ public class ResumeMachine {
             }
         }
         State = 2
-        match Source.GetResult() {
-            Ok(let value) => Destination.TryComplete(Ok(Saved + value))
-            Error(let message) => Destination.TryComplete(Result<int, string>.Error(message))
-        }
+        Destination.TryComplete(self.Transform(Source.GetResult()))
+    }
+
+    func Transform(result: Result<int, string>) -> Result<int, string> {
+        let value = result?
+        return Ok(Saved + value)
     }
 }
 

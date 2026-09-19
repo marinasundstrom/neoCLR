@@ -4580,3 +4580,23 @@ made lowering explicitly uniform in T: no Result recognition, case inspection or
 special completion path. Ordinary Result operations and ? remain separate language
 semantics. The manual probe's Result match was identified as application logic,
 and future integration validation now includes unrelated payload types.
+
+### Propagation through provisional async lowering — 2026-09-19
+
+The author emphasized that propagation is important to the developer experience
+and asked to continue. The assistant confirmed that Raven already lowers ? into
+early-return control flow before await rewriting, then added an explicit opt-out
+for async exception capture on Raven's neoclr branch. The transformation does not
+inspect Result or introduce a task-specific failure channel. Tests compare both
+policies around immediate and pending awaits and check skipped side effects after
+propagation. The .NET default remains intact.
+
+A separate attempt to exercise Task<unit> with an explicit unit return produced
+RAV2705 under both policies. The assistant recorded it as an independent compiler
+gap, not as completed coverage. Public Task/builder contracts and end-to-end neoCLR
+async remain outstanding; the exception-capture option is provisional compiler API.
+
+The compiler adaptation was committed as Raven b99025680 on neoclr, with 61
+focused and 119 feature-selected tests passing (overlapping sets). The assistant
+also changed the manual neoCLR probe to use ? in its application transformation,
+keeping Result case inspection out of its continuation machinery.

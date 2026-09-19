@@ -33,8 +33,8 @@ from an explicit yield; no ambient context capture or ConfigureAwait API is intr
 These are experimental dispatch choices, not settled UI-affinity or context policies.
 
 The completion storage and executor treat their payload as an opaque value. The
-Ok/Error match in ResumeMachine is example application logic that adds a saved
-number or forwards an error, not a proposed Result-aware lowering rule. The final
+Transform method uses ordinary ? propagation to add a saved number or return an
+error. This is example application logic, not a Result-aware lowering rule. The final
 Task<T> implementation must work identically for arbitrary T.
 
 Expected failure in this example is a completed Result value. A pending GetResult faults instead of
@@ -126,3 +126,9 @@ must address these instead of admitting or discarding unsupported exception hand
 The public Task model should not expose this sequence as permanent implementation
 requirements. Replacing state machines later may require rebuilding compiled code;
 source API continuity is a separate goal from permanent binary ABI compatibility.
+
+The propagation variant was revalidated after the compiler-policy slice: all 10
+neoCLR scenarios still pass, with 46 collections in the pending-state case. The
+resumed Transform method uses ?; failure returns from that ordinary method before
+the success computation, and the surrounding completion machinery treats its
+returned value uniformly. This still uses the manual probe, not generated async.

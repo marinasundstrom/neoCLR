@@ -116,3 +116,31 @@ does not select a special builder, error path or scheduler behavior. Ordinary
 Result handling/propagation may appear in the user's body, but its resulting return
 is lowered exactly like any other return. The manual probe's Result match is
 application logic, not part of the proposed compiler contract.
+
+## First compiler adaptation — 2026-09-19
+
+Raven's neoclr branch now has the provisional compiler API
+`CompilationOptions.WithAsyncExceptionCapture(false)`. It skips construction of the
+async exception wrapper and SetException member discovery. Default .NET compilation
+retains capture. The policy survives option copies and prevents incompatible
+incremental-state reuse. No project/CLI switch is exposed yet: this is compiler
+integration groundwork, not an enabled neoCLR async language feature.
+
+The tests execute real generated state machines on .NET with immediate and pending
+awaits. Ordinary ? propagation before and after await returns a Result value through
+the normal completion path and skips later side effects. An unrelated union also
+completes through the same mechanism. No Result-specific async code was added.
+The opt-out machines in these bounded cases have no exception handlers; explicit
+handlers and disposal regions are not silently removed.
+
+neoCLR still needs Task/builder/awaiter metadata and implementations, safe state
+ownership, target selection and diagnostics for unsupported constructs. This slice
+does not prove their execution on neoCLR. Separately, Task<unit> with explicit
+`return ()` currently reports RAV2705 under both policies; that return-binding gap
+needs independent resolution before the uniform Task contract is ready.
+
+Compiler implementation: Raven [b99025680](https://github.com/marinasundstrom/raven/commit/b9902568043f52c4d2ab8616386a92d6007591de),
+kept on neoclr. Validation passed 61 focused tests and the 119-test functions/async
+selection on .NET 11 (overlapping sets). The neoCLR manual completion probe now
+uses ordinary ? inside its resumed application transformation; its state machine
+and executor do not inspect Result cases.

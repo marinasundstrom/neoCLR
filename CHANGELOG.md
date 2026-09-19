@@ -21,6 +21,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   with the current CreateMoveNextBody entry point identified for integration.
   Clarify that Task lowering is uniform in its payload T: Result is an ordinary
   type, with no special failure/completion path or Result-aware scheduling.
+  Add Raven's provisional opt-out for generated async exception capture on its
+  neoclr branch, with compiler execution tests for propagation before/after pending
+  awaits and unrelated union payloads. Document the API-only configuration,
+  unchanged .NET default and remaining target integration and generic-unit gaps.
+  Validate 61 focused and 119 feature-selected compiler tests (overlapping sets),
+  and use ordinary ? in the manual neoCLR continuation probe's application body.
+  All 10 neoCLR probe scenarios pass, including retained state through 46 GC cycles.
+  Refresh and validate the website proposals overview.
 
 - Port 25 Option/Result operator overloads from Raven.Core to the development
   library, including transformations, recovery, branch actions, conversions and

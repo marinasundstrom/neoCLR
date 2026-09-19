@@ -950,3 +950,17 @@ Reproduce these independently against ordinary CLI/.NET contracts before extract
 a general Raven fix to main. The unit-return case may involve configured-unit
 policy and needs isolation. No compiler fix or .NET reproduction is claimed here;
 neoCLR samples retain only the annotations needed for working examples.
+
+### Generic async unit return candidate — 2026-09-19
+
+On Raven neoclr ddf10eca plus the provisional exception-capture policy change,
+`static async func Finish(gate: Task<int>) -> Task<unit> { await gate; return () }`
+reports RAV2705: the binder treats the value return as invalid for an async Task
+method. This occurs with default .NET capture and with capture disabled. It is
+independent of Result and of the exception guard. The newly added union-payload
+tests do not claim coverage of this failing unit case.
+
+Reduce and validate the generic-unit return rules independently on Raven main
+before extracting a general fix. Then verify neoCLR's configured System.Void
+payload separately; do not preserve an accidental nongeneric Task assumption as
+the public neoCLR model. No fix is claimed in the exception-capture slice.
