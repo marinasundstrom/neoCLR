@@ -1,7 +1,7 @@
 """Compare the Raven/neoCLR local-clock sample with the host wall clock."""
 import argparse
 from runner_options import add_toolchain_arguments, runner_arguments
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 from pathlib import Path
 import shutil
 import subprocess
@@ -27,11 +27,11 @@ with tempfile.TemporaryDirectory(prefix='neoclr-clock-') as temporary:
     end = time.time()
     if result.returncode:
         raise AssertionError(result.stdout + result.stderr)
-    parts = [int(value) for value in result.stdout.splitlines()[-7:]]
-    observed = datetime(*parts[:6], tzinfo=timezone(timedelta(seconds=parts[6])))
-    if not start - 2 <= observed.timestamp() <= end + 2:
+    parts = [int(value) for value in result.stdout.splitlines()[-6:]]
+    observed = datetime(*parts)
+    # LocalDateTime exposes calendar components, not an offset. Compare the host's
+    # possible local seconds across the run, including either side of a DST fold.
+    if not any(datetime.fromtimestamp(second) == observed
+               for second in range(int(start) - 2, int(end) + 3)):
         raise AssertionError((observed.isoformat(), start, end))
-    local = datetime.fromtimestamp(observed.timestamp()).astimezone()
-    if local.utcoffset() != observed.utcoffset() or local.replace(tzinfo=None) != observed.replace(tzinfo=None):
-        raise AssertionError((observed.isoformat(), local.isoformat()))
-    print('Local calendar components and UTC offset match the host clock:', observed.isoformat())
+    print('Local calendar components match the host clock:', observed.isoformat())

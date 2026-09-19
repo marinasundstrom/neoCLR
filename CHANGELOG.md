@@ -20,6 +20,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   align standalone array/match probes with current contracts. Keep the reduced
   probe core compilable by omitting collection-returning String members when its
   collection profile is not selected; the full runtime reference API is unchanged.
+  Compare the clock sample’s six local components against the host time interval,
+  including DST folds, rather than expecting the retired offset output.
 
 ## 0.1.0-preview.8 — 2026-09-19
 
