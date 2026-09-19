@@ -27,15 +27,14 @@
       "samples": []
     },
     {
-      "file": "runtime/System/Propagatable.neoil",
+      "file": "runtime/raven/generated/Propagatable.methods.neoil",
       "declarations": 3,
-      "disposition": "unions",
-      "samples": [
-        "library-case-payloads.rvn",
-        "library-unions.rvn",
-        "library-result-void-propagation.rvn",
-        "library-reference-payloads.rvn"
-      ]
+      "disposition": "raven-authored-conditional-output-contract",
+      "tests": [
+        "tests/propagation.rs",
+        "docs/experiments/raven-target/verify_propagation_library.py"
+      ],
+      "note": "Exact generic positions and out metadata preserve readonly receivers and true-only output initialization."
     },
     {
       "file": "runtime/raven/generated/Value.methods.neoil",

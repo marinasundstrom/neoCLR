@@ -1,0 +1,6 @@
+namespace System
+
+public interface Propagatable<TSelf, TOutput, TResidual> {
+    func TryGetOutput(out output: TOutput) -> bool
+    func TryGetResidual(out residual: TResidual) -> bool
+}

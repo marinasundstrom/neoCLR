@@ -67,12 +67,12 @@ static class LibraryImplementation
                     || !m.IsNewSlot || m.IsFinal || m.IsStatic || m.IsConstructor || m.HasBody
                     || m.HasGenericParameters || m.ExplicitThis || m.HasOverrides
                     || m.CallingConvention != MethodCallingConvention.Default
-                    || m.Parameters.Any(p => p.IsOut || p.ParameterType.IsByReference)))
+                    || m.Parameters.Any(p => (p.IsOut || p.ParameterType.IsByReference) && !PropagationLibrary.IsConditionalOutput(m, p))))
                 throw new InvalidDataException("Unsupported library interface contract.");
         bool Match(MethodDefinition left, MethodDefinition right) =>
             left.Name == right.Name && SameType(left.ReturnType, right.ReturnType)
             && left.Parameters.Count == right.Parameters.Count
-            && left.Parameters.Zip(right.Parameters).All(p => p.First.Name == p.Second.Name
+            && left.Parameters.Zip(right.Parameters).All(p => p.First.Name == p.Second.Name && p.First.IsOut == p.Second.IsOut
                 && SameType(p.First.ParameterType, p.Second.ParameterType));
         if (type.GenericParameters.Count != contract.GenericParameters.Count
             || type.Interfaces.Count != contract.Interfaces.Count
@@ -217,6 +217,8 @@ static class LibraryImplementation
 
     public static bool SameType(TypeReference left, TypeReference right)
     {
+        if (left is ByReferenceType lb)
+            return right is ByReferenceType rb && SameType(lb.ElementType, rb.ElementType);
         if (left is ArrayType la)
             return right is ArrayType ra && la.IsVector == ra.IsVector && la.Rank == ra.Rank && SameType(la.ElementType, ra.ElementType);
         if (left is GenericParameter lp)

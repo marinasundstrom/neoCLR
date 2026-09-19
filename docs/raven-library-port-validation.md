@@ -35,6 +35,13 @@ pass. All 64 saved-program cases pass against freshly generated consumer metadat
 the 62-slice library. These results supplement, rather than replace, the earlier full
 Rust baseline; a full final run remains required after the remaining source ports.
 
+## Propagation declaration follow-up
+
+The 63rd source slice owns Propagatable. Five admission cases pass, checking exact
+out metadata, payload positions and method names. No carrier body changes in this
+slice. All 20 Rust propagation/union-output/generic-bound tests pass, including
+non-overwriting misses and unproven-read rejection. Snapshot hashes match.
+
 ## Reproduce the program gate
 
 Use the neoCLR feature compiler, built from the Raven repository's
@@ -128,7 +135,7 @@ because the text assembler does not resolve files. All eight fixture checks pass
 - All 64 saved-project cases pass, including executable API samples, saved edits,
   compiler/import rejection without stale execution, and expected runtime faults.
 
-- All 62 slices compile and import. Inventory/coverage checks pass for 756 candidates
+- All 63 slices compile and import. Inventory/coverage checks pass for 756 candidates
   and 114 declaring sources. The final clean regeneration gate remains required.
 - All 17 foundation admission cases pass. Clock declaration rejection checks and
   fixed/system-clock execution pass, including host-local time conversion.

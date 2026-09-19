@@ -1,0 +1,7 @@
+; Generated from runtime/raven/src/System/Propagatable.rvn. Regenerate with build_runtime_library.py.
+.interface System.Propagatable<T0,T1,T2>
+.method instance readonly byref TryGetOutput(out(true) T1& output) -> Boolean
+.end
+.method instance readonly byref TryGetResidual(out(true) T2& residual) -> Boolean
+.end
+.end

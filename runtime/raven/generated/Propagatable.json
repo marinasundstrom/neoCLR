@@ -1,6 +1,6 @@
 {
   "format": "raven-library-bootstrap-v1",
-  "owner": "System.Environment",
+  "owner": "System.Propagatable",
   "inputs": {
     "runtime/raven/src/System/Propagatable.rvn": "0f8af6a1fe29ca4be08f496e5b485c762ecdf6ae8d9197700697e6203e9ba98e",
     "runtime/raven/src/System/IntegerDivisionError.rvn": "267d2367214b9aa2dfbf484a776f3d8315b1dce953e0684d1223e459dd878868",
@@ -69,14 +69,13 @@
     "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
   },
   "outputs": {
-    "Environment.methods.neoil": "52f1fce054efb4b5c2ba6aa5f94a319f4b4401f8f7cbced8da013fcfbdc677aa",
-    "Environment.helpers.neoil": "1da7eef129cea662805022d58c61141ba0de9dd02a2e82366abf89f180572558"
+    "Propagatable.methods.neoil": "fa51b6bfe2a8ff28f72e014437f974043a563d3a0ba3a3904e248d2e1bb29598",
+    "Propagatable.helpers.neoil": "06c8c54860debea74ce19eafc66212381a17f42203f940f300e52864835a1b94"
   },
   "compilerSha256": "7d55b86e719225ff2eb87fbc52854c22936e57c0658ccd9ac314513ade7b7ba5",
   "coreSha256": "b400b63796630c1dd66e15c16d15cbeee98fd8a6e4f499265c256fd3883a226e",
   "exports": [
-    "GetCommandLineArgs() -> arrayref<String>",
-    "GetCurrentDirectory() -> System.Result<String,System.EnvironmentError>",
-    "GetEnvironmentVariable(String name) -> System.Result<System.Option<String>,System.EnvironmentError>"
+    "readonly byref TryGetOutput(out(true) T1& output) -> Boolean",
+    "readonly byref TryGetResidual(out(true) T2& residual) -> Boolean"
   ]
 }

@@ -185,4 +185,7 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'IntegerDivisionError'">
     <Compile Include="src/System/IntegerDivisionError.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Propagatable'">
+    <Compile Include="src/System/Propagatable.rvn" />
+  </ItemGroup>
 </Project>

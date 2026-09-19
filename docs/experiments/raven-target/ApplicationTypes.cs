@@ -214,7 +214,7 @@ static class ApplicationTypes
             if (ErrorCarrierLibrary.IsMatched(type)) output.AppendLine(".custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()");
             foreach (var contract in type.Interfaces) output.AppendLine(".implements " + map(contract.InterfaceType, false));
             foreach (var method in type.Methods.Where(m => m.IsAbstract))
-                output.AppendLine($".method instance {(type.IsInterface ? "" : "abstract ")}{MethodName(method)}({string.Join(',', method.Parameters.Select(p => map(p.ParameterType, false) + (LibraryNames.ContainsKey(type) ? " " + p.Name : "")))}) -> {map(method.ReturnType, true)}\n.end");
+                output.AppendLine($".method instance {(LibraryNames.ContainsKey(type) && PropagationLibrary.IsContract(type) ? "readonly byref " : "")}{(type.IsInterface ? "" : "abstract ")}{MethodName(method)}({string.Join(',', method.Parameters.Select(p => (LibraryNames.ContainsKey(type) && PropagationLibrary.IsConditionalOutput(method, p) ? "out(true) " : "") + map(p.ParameterType, false) + (LibraryNames.ContainsKey(type) ? " " + p.Name : "")))}) -> {map(method.ReturnType, true)}\n.end");
             foreach (var field in type.Fields.Where(_ => !PrimitiveLibrary.IsMatched(type) && !OpaqueLibrary.IsString(type)))
                 output.AppendLine($".field {(LibraryNames.ContainsKey(type) && field.IsPrivate ? "private " : "")}{MetadataIdentity.MemberName(field.Name)} {map(field.FieldType, false)}");
             if (LibraryNames.ContainsKey(type))

@@ -11,7 +11,7 @@ This slice adds Raven sources for the fundamental and collection interfaces,
 SystemClock, LocalDateTime, IntPtr/UIntPtr comparisons, the complete Int32 member
 surface, Console and Environment. File.ReadAllText joins WriteAllText in Raven.
 The follow-up ports String and opaque Error, then five empty error types and Void,
-followed by seven typed error carriers, bringing the total to 62 slices.
+followed by seven typed error carriers, and the Propagatable declaration, bringing the total to 63 slices.
 The legacy Neo profile retains its receiver/array conventions where it differs;
 the Raven profile selects generated contracts and implementation bodies.
 
@@ -106,11 +106,18 @@ This reuses the established [error contracts and .NET comparison](errors.md); no
 exception model, Runtime Contract option or public API is changed. The reference
 assembly and importer carry this target-specific representation boundary.
 
+Propagatable is a Raven interface declaration with the exact three generic positions
+and two out parameters. Checked admission preserves its existing readonly receiver
+and conditional `out(true)` ABI; ordinary interfaces still reject byref exports.
+The [propagation contract](propagation-contract.md) explains the .NET ordinary-out
+comparison and why failed extraction must not initialize a destination. This slice
+changes declaration ownership only; carrier bodies follow separately.
+
 The remaining migration gates are substantive work, not just moving files:
 
 | Remaining source | Required implementation admission |
 | --- | --- |
-| Option/Result and Propagatable | Union/case representation, out-parameter contracts and default/case validity |
+| Option/Result | Union/case representation, out-parameter contracts and default/case validity |
 | MemberInfo/FieldInfo/MethodInfo/PropertyInfo | Abstract/inherited descriptor layout and runtime snapshot factory compatibility |
 | Array, iterator adapters and Func | Runtime-owned allocation/element access and delegate invocation boundaries |
 

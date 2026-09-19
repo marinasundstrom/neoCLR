@@ -105,6 +105,11 @@ for file in source['sourceFiles']:
                      'tests': ['tests/errors.rs', 'tests/arithmetic_errors.rs', 'docs/experiments/raven-target/verify_empty_library.py'],
                      'note': 'Empty values preserve payload-free defaults, existing constructors/formatting and nominal Void. No new constructor on EnvironmentError or Void.'})
         continue
+    if file.startswith('runtime/raven/generated/Propagatable.'):
+        rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-conditional-output-contract',
+                     'tests': ['tests/propagation.rs', 'docs/experiments/raven-target/verify_propagation_library.py'],
+                     'note': 'Exact generic positions and out metadata preserve readonly receivers and true-only output initialization.'})
+        continue
     if file.startswith(('runtime/raven/generated/String.', 'runtime/raven/generated/Error.')):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-opaque-bootstrap',
                      'samples': ['library-strings.rvn', 'library-string-slices.rvn', 'library-errors.rvn'],

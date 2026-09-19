@@ -10,6 +10,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    'Propagatable': 'System.Propagatable',
     'IntegerDivisionError': 'System.IntegerDivisionError',
     'SingleError': 'System.Linq.SingleError',
     'Int32ParseError': 'System.Int32ParseError',
@@ -77,6 +78,7 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    'Propagatable': 'runtime/raven/src/System/Propagatable.rvn',
     'IntegerDivisionError': 'runtime/raven/src/System/IntegerDivisionError.rvn',
     'SingleError': 'runtime/raven/src/System/Linq/SingleError.rvn',
     'Int32ParseError': 'runtime/raven/src/System/Int32ParseError.rvn',

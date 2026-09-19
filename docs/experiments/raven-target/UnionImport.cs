@@ -61,6 +61,8 @@ static class UnionImport
         MethodDefinition? activeLibraryMethod = null;
         string ProfileType(TypeReference type, bool result = false)
         {
+            if (libraryOwner is not null && type is ByReferenceType byref)
+                return ProfileType(byref.ElementType) + "&";
             if (libraryOwner is not null && type is GenericParameter parameter)
             {
                 if (!ApplicationTypes.IsLibraryParameter(parameter) && (parameter.Type != GenericParameterType.Method || parameter.Owner != activeLibraryMethod))
