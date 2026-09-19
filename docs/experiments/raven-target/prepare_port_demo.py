@@ -93,7 +93,8 @@ The eight Info contracts are sealed interfaces. Both typeof(T) and Object.GetTyp
 return TypeInfo directly; System.Type and the .Info hop are no longer public APIs.
 RuntimeContext.Current provides the configured handle resolver and ExecutingAssembly.
 AssemblyInfo exposes ReferencedAssemblies, GetModules() and GetTypes() through
-Sequence interfaces. MetadataToken is available on the Info contracts, scoped by
+Sequence interfaces. All other Introspection collections also return Sequence<T>;
+use Count, indexing and iteration instead of array-specific members. MetadataToken is available on the Info contracts, scoped by
 Module for type/member/parameter definitions. Discovery covers retained loaded
 metadata, including System.Runtime; it does not load assemblies. The former TypeOf<T>.Of helper has
 been removed. See examples/type-acquisition.rvn for a runnable acquisition sample, and examples/assembly-info.rvn for discovery.

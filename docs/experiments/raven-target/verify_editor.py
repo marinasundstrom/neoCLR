@@ -353,9 +353,9 @@ try:
     if array_invariance:
         import time
         for version, expression, expected_code in (
-                (46, 'let members: MemberInfo[] = typeof(int).GetMethods()', 'RAV1504'),
-                (47, 'let members = (MemberInfo[])typeof(int).GetMethods()', 'RAV1503'),
-                (48, 'let members: MethodInfo[] = typeof(int).GetMethods()', None)):
+                (46, 'let methods: MethodInfo[] = []; let members: MemberInfo[] = methods', 'RAV1504'),
+                (47, 'let methods: MethodInfo[] = []; let members = (MemberInfo[])methods', 'RAV1503'),
+                (48, 'let methods: MethodInfo[] = []; let members: MethodInfo[] = methods', None)):
             text = 'import System.*\nimport System.Introspection.*\nfunc Main() {\n    ' + expression + '\n}\n'
             send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version},
                 'contentChanges': [{'text': text}]})
@@ -509,7 +509,16 @@ try:
                 (84, 'System.Runtime.RuntimeContext.Current.', {'GetTypeInfoFromHandle', 'ExecutingAssembly'}, set()),
                 (85, 'System.Runtime.RuntimeContext.Current.ExecutingAssembly.', {'ReferencedAssemblies', 'GetModules', 'GetTypes', 'MetadataToken'}, set()),
                 (86, 'System.Runtime.RuntimeContext.Current.ExecutingAssembly.ReferencedAssemblies.', {'Count'}, {'Length', 'Add'}),
-                (87, 'typeof(int).Module.', {'Assembly', 'MetadataToken', 'GetTypes'}, set())):
+                (87, 'typeof(int).Module.', {'Assembly', 'MetadataToken', 'GetTypes'}, set()),
+                *[(88 + i, expression, {'Count', 'GetIterator'}, {'Length', 'Add', 'Clear'})
+                  for i, expression in enumerate((
+                      'typeof(int).GetFields().', 'typeof(int).GetMethods().',
+                      'typeof(System.Date).GetProperties().',
+                      'typeof(System.Option<int>).GetGenericArguments().',
+                      'typeof(int).GetInterfaces().',
+                      'typeof(System.Introspection.BindingFlags).GetEnumNames().',
+                      'typeof(int).GetMethods()[0].GetParameters().',
+                      'typeof(System.Date).GetProperties()[0].GetIndexParameters().'))]):
             text = f'func Main() {{\n    {access}\n}}'
             send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version},
                 'contentChanges': [{'text': text}]})

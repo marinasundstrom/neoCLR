@@ -92,7 +92,7 @@ frontend/library API conventions rather than loader requirements.
 ## Reflection and BindingFlags migration
 
 Type.IsEnum distinguishes an enum from its managed-reference/array forms.
-GetEnumUnderlyingType() returns typeof(int). GetEnumNames() returns an owned String[]
+GetEnumUnderlyingType() returns typeof(int). GetEnumNames() returns Sequence<string> in the Raven profile (an owned String[] in the historical Neo profile)
 snapshot ordered by unsigned integer magnitude, preserving declaration order for
 aliases. The latter two calls fault when used on a non-enum. General FieldInfo literal
 queries and GetEnumValues are not yet projected; names are available through

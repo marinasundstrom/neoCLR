@@ -1,5 +1,10 @@
 # Reflection introspection
 
+**Current Raven contract (2026-09-19):** use TypeInfo directly, with eight sealed Info
+interfaces, RuntimeContext.ExecutingAssembly, module-scoped MetadataToken and
+Sequence<T> collection results. See [the current Raven API](raven-reflection-api.md).
+The Type/Info and array-based descriptions below document the historical Neo profile.
+
 Development migration (2026-09-16): the descriptor family and BindingFlags now use
 System.Introspection. Earlier System.Reflection spellings below describe the
 original contract; update imports and rebuild artifacts using the

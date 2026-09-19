@@ -64,5 +64,5 @@ with tempfile.TemporaryDirectory(prefix='neoclr-descriptor-library-') as tempora
             emitted = (output / 'Implementation.neoil').read_text()
             assert '.extends System.Introspection.RuntimeMemberInfo' in emitted
             assert '.field private Parameters System.Introspection.ParameterInfo[]' in emitted
-            assert 'GetParameters() -> arrayref<System.Introspection.ParameterInfo>' in emitted
+            assert 'GetParameters() -> System.Collections.Sequence<System.Introspection.ParameterInfo>' in emitted
     print(f'{len(cases)} descriptor admission cases passed')

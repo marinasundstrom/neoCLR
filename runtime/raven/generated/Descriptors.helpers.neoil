@@ -128,7 +128,7 @@ ret
 .end
 .method instance get_DefinitionIndex() -> Int32
 .end
-.method instance GetParameters() -> arrayref<System.Introspection.ParameterInfo>
+.method instance GetParameters() -> System.Collections.Sequence<System.Introspection.ParameterInfo>
 .end
 .method instance get_IsReadOnly() -> Boolean
 .end
@@ -184,7 +184,7 @@ ret
 .end
 .method instance get_DefinitionIndex() -> Int32
 .end
-.method instance GetIndexParameters() -> arrayref<System.Introspection.ParameterInfo>
+.method instance GetIndexParameters() -> System.Collections.Sequence<System.Introspection.ParameterInfo>
 .end
 .method instance GetGetMethod() -> System.Option<System.Introspection.MethodInfo>
 .end
@@ -707,7 +707,7 @@ ldfld System.Introspection.RuntimeMethodInfo::DefinitionIndex
 M00000014_IL_0008:
 ret
 .end
-.method instance GetParameters() -> arrayref<System.Introspection.ParameterInfo>
+.method instance GetParameters() -> System.Collections.Sequence<System.Introspection.ParameterInfo>
 .local Int32 local0
 .local arrayref<System.Introspection.ParameterInfo> local1
 .local Int32 local2
@@ -995,7 +995,7 @@ ldfld System.Introspection.RuntimePropertyInfo::DefinitionIndex
 M0000001f_IL_0008:
 ret
 .end
-.method instance GetIndexParameters() -> arrayref<System.Introspection.ParameterInfo>
+.method instance GetIndexParameters() -> System.Collections.Sequence<System.Introspection.ParameterInfo>
 .local Int32 local0
 .local arrayref<System.Introspection.ParameterInfo> local1
 .local Int32 local2

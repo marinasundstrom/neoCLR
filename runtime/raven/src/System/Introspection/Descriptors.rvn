@@ -1,6 +1,7 @@
 namespace System.Introspection
 
 import System.*
+import System.Collections.*
 import System.Runtime.CompilerServices.*
 
 public sealed interface MemberInfo {
@@ -27,7 +28,7 @@ public sealed interface MethodInfo : MemberInfo {
     val IsAssembly: bool { get }
     val IsReceiverByRef: bool { get }
     val DefinitionIndex: int { get }
-    func GetParameters() -> ParameterInfo[]
+    func GetParameters() -> Sequence<ParameterInfo>
     val IsReadOnly: bool { get }
     val IsVirtual: bool { get }
     val IsOverride: bool { get }
@@ -40,7 +41,7 @@ public sealed interface PropertyInfo : MemberInfo {
     val CanRead: bool { get }
     val CanWrite: bool { get }
     val DefinitionIndex: int { get }
-    func GetIndexParameters() -> ParameterInfo[]
+    func GetIndexParameters() -> Sequence<ParameterInfo>
     func GetGetMethod() -> Option<MethodInfo>
     func GetGetMethod(arg0: bool) -> Option<MethodInfo>
     func GetSetMethod() -> Option<MethodInfo>
@@ -137,7 +138,7 @@ internal class RuntimeMethodInfo : RuntimeMemberInfo, MethodInfo {
     val IsReceiverByRef: bool { get => StoredIsReceiverByRef }
     val DefinitionIndex: int { get => StoredDefinitionIndex }
 
-    func GetParameters() -> ParameterInfo[] {
+    func GetParameters() -> Sequence<ParameterInfo> {
         val count = StoredParameters.Length
         val result = CheckedStorage.Reserve<ParameterInfo>(count)
         var index = 0
@@ -185,7 +186,7 @@ internal class RuntimePropertyInfo : RuntimeMemberInfo, PropertyInfo {
     val CanWrite: bool { get => StoredCanWrite }
     val DefinitionIndex: int { get => StoredDefinitionIndex }
 
-    func GetIndexParameters() -> ParameterInfo[] {
+    func GetIndexParameters() -> Sequence<ParameterInfo> {
         val count = StoredIndexParameters.Length
         val result = CheckedStorage.Reserve<ParameterInfo>(count)
         var index = 0

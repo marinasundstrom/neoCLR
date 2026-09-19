@@ -25,6 +25,30 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-19 — Close the Introspection story
+
+**Author decision.** With discovery, metadata tokens and Sequence collection contracts
+in place, close this story for now. The String API and runtime string behavior are
+a later story.
+
+**Assistant response.** Accepted that boundary. Finish validation, keep discovery
+and Sequence migration as separate commits, and refresh the runnable VS Code snapshot.
+Do not begin string implementation or dynamic loading as part of closing this story.
+
+## 2026-09-19 — Finish the Introspection collection migration
+
+**Author direction.** “Migrate the remaining Introspection contracts from returning
+array to sequence.”
+
+**Assistant action.** Committed the preceding discovery/token slice separately as
+92bd616, then changed the remaining TypeInfo/member collection contracts to
+Sequence<T>, including parameter and enum-name results. Updated reference metadata,
+Raven implementations, samples and checks together. Preserved native array storage
+internally, independent snapshots, indexing, enumeration and query extensions.
+The migration replaces Length with Count and requires consumer rebuilds; it does
+not introduce covariance or promise immutable concrete storage. Dynamic loading
+remains future context work, and strings follow the minimal Introspection boundary.
+
 ## 2026-09-19 — Dynamic loading remains context-owned future work
 
 **Author direction.** “We might need to solve dynamic assembly loading later. It does

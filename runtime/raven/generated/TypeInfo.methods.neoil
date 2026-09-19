@@ -33,29 +33,29 @@
 .end
 .method instance get_IsValueType() -> Boolean
 .end
-.method instance GetGenericArguments() -> arrayref<System.Introspection.TypeInfo>
+.method instance GetGenericArguments() -> System.Collections.Sequence<System.Introspection.TypeInfo>
 .end
 .method instance GetElementType() -> System.Option<System.Introspection.TypeInfo>
 .end
 .method instance get_BaseType() -> System.Option<System.Introspection.TypeInfo>
 .end
-.method instance GetInterfaces() -> arrayref<System.Introspection.TypeInfo>
+.method instance GetInterfaces() -> System.Collections.Sequence<System.Introspection.TypeInfo>
 .end
-.method instance GetEnumNames() -> arrayref<String>
+.method instance GetEnumNames() -> System.Collections.Sequence<String>
 .end
 .method instance GetEnumUnderlyingType() -> System.Introspection.TypeInfo
 .end
-.method instance GetFields() -> arrayref<System.Introspection.FieldInfo>
+.method instance GetFields() -> System.Collections.Sequence<System.Introspection.FieldInfo>
 .end
-.method instance GetFields(System.Introspection.BindingFlags flags) -> arrayref<System.Introspection.FieldInfo>
+.method instance GetFields(System.Introspection.BindingFlags flags) -> System.Collections.Sequence<System.Introspection.FieldInfo>
 .end
-.method instance GetMethods() -> arrayref<System.Introspection.MethodInfo>
+.method instance GetMethods() -> System.Collections.Sequence<System.Introspection.MethodInfo>
 .end
-.method instance GetMethods(System.Introspection.BindingFlags flags) -> arrayref<System.Introspection.MethodInfo>
+.method instance GetMethods(System.Introspection.BindingFlags flags) -> System.Collections.Sequence<System.Introspection.MethodInfo>
 .end
-.method instance GetProperties() -> arrayref<System.Introspection.PropertyInfo>
+.method instance GetProperties() -> System.Collections.Sequence<System.Introspection.PropertyInfo>
 .end
-.method instance GetProperties(System.Introspection.BindingFlags flags) -> arrayref<System.Introspection.PropertyInfo>
+.method instance GetProperties(System.Introspection.BindingFlags flags) -> System.Collections.Sequence<System.Introspection.PropertyInfo>
 .end
 .property instance MetadataToken() -> Int32
 .get instance System.Introspection.TypeInfo::get_MetadataToken()

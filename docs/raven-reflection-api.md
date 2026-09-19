@@ -1,8 +1,20 @@
 # Reflection migration for the Raven target
 
-The Raven profile now exposes six sealed Info interfaces with internal runtime
-providers. System.Type and Type.Info remain transitional acquisition APIs while
-RuntimeContext and the unified TypeInfo surface are implemented.
+The current Raven profile exposes eight sealed Info interfaces with internal providers.
+Both typeof(T) and Object.GetType() return TypeInfo. RuntimeContext.Current exposes
+ExecutingAssembly; AssemblyInfo supplies ReferencedAssemblies, modules and retained
+loaded types. MetadataToken is on the Info interfaces, scoped by Module for type,
+member and parameter definitions. Dynamic loading remains future RuntimeContext work.
+
+All public collection results use System.Collections.Sequence<T>, including member,
+parameter, generic-argument, interface and enum-name queries. Use Count instead of
+Length; indexing, enumeration and Iterable query extensions remain available. The
+public interface has no mutation methods, while implementations own fresh snapshots.
+Rebuild consumers and replace array result annotations with Sequence<Element>.
+See [the current contract and limits](introspection-design.md#complete-sequence-migration--2026-09-19).
+
+The sections below retain the implementation history; earlier Type/Info and array
+spellings describe superseded stages, not the current Raven contract.
 
 ## Production interface/provider slice — 2026-09-19
 

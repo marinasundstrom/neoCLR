@@ -9,7 +9,7 @@
     "runtime/raven/src/System/Func.rvn": "4720a0463a88be11a4ff213363cad1c6680cd41afd457c813e247e5c4e3cbd2e",
     "runtime/raven/src/System/Functions.rvn": "ac8c17cd3cde8cfd78b2d1214454a92120d7f65b93d27d5d8e7258981fb1a70d",
     "runtime/raven/src/System/Runtime/InteropServices/NativeMemory/Functions.rvn": "f4a39091ede3430f56e09823d37773c9759f0ec56e2ca54325c9ea813d3238d7",
-    "runtime/raven/src/System/Introspection/Descriptors.rvn": "d258bc67794cff816081d56b7d0bc44fd2b1a49db53b461077052f619d430f4a",
+    "runtime/raven/src/System/Introspection/Descriptors.rvn": "54fac18d5ea1e2d674becd5b7889f58387df89778b66dd6116d46df50b14b3a7",
     "runtime/raven/src/System/Option.rvn": "7e6fbff6cd19d88804c5e1bc45983940c440095b5569dda3192c5ff18cbb9a3a",
     "runtime/raven/src/System/Result.rvn": "2351c6e9bb28ae647442584e91304bbbc9dd4f6eb363f934eac3e3e442ef2c06",
     "runtime/raven/src/System/Propagatable.rvn": "0f8af6a1fe29ca4be08f496e5b485c762ecdf6ae8d9197700697e6203e9ba98e",
@@ -48,7 +48,7 @@
     "runtime/raven/src/System/Clonable.rvn": "fc1a3d016973c7eb5b651495f196c0a7c59c7277e8f8757299c1ae06c54f7822",
     "runtime/raven/src/System/Closable.rvn": "934d043200f2e1284005444b53e3bbeeccfad9e1069c58b7c252e543e8d126a7",
     "runtime/raven/src/System/Clock.rvn": "1043b7bbabbd554ae9bfab607a9ca6ac16618c76d1cdcc3dc9c69d0175ef98d2",
-    "runtime/raven/src/System/Introspection/TypeInfo.rvn": "28734ddb2885dc7c57de51b51a23c245f1c0e607b32169a1f1fd430820a538a0",
+    "runtime/raven/src/System/Introspection/TypeInfo.rvn": "4299d1848d54890584b377d12cec481a7a2853c855bd220c5fd9926b9b5612dc",
     "runtime/raven/src/System/Introspection/AssemblyInfo.rvn": "0b8d16fc713fe313086c5b01c41de765c3c01fd2f27ec18c13142eb3acb76ee8",
     "runtime/raven/src/System/Introspection/ModuleInfo.rvn": "4d6dff1bb83b575b9e5e60f442d95b88044d674c134003316ad96ae1d7fce389",
     "runtime/raven/src/System/Introspection/ParameterInfo.rvn": "0e71f39ffdcb7e6267ab6ff2e93f18921bc0e45d657b37028ac9879ed78554bc",
@@ -85,7 +85,7 @@
     "FileWriteError.helpers.neoil": "8f3ca489b2477169abf3405430adc4a091522b0f6083664a040d2d342ca42dfc"
   },
   "compilerSha256": "f933e9f722ca86a60dc110532c9d7191ae20251d614930348bf2ef04e5ab252d",
-  "coreSha256": "55438ed45560b0a7e9ae9b2f110272610dadb212175b8910a091482c82c9f79b",
+  "coreSha256": "ba2f06c694d35314e8351917175866913c9d51993a593b20230fca7f22608b5b",
   "exports": [
     ".ctor(System.IO.FileWriteError.InvalidLimit value) -> Void",
     "get_IsInvalidLimit() -> Boolean",

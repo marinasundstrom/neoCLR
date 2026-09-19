@@ -42,7 +42,7 @@ func Main() {
     WriteLine(copy[0])
     WriteLine(typeof(Array<int>).GenericArgumentCount)
     WriteLine(typeof(Array<int>).GetGenericArguments()[0].Name)
-    WriteLine(typeof(Array<int>).GetInterfaces().Length)
+    WriteLine(typeof(Array<int>).GetInterfaces().Count)
 
     let nested: Array<Array<int>> = [[1, 2]]
     let vectors: int[][] = nested

@@ -1,6 +1,7 @@
 namespace System.Introspection
 
 import System.*
+import System.Collections.*
 import System.Runtime.CompilerServices.*
 
 public sealed interface TypeInfo : Equatable<TypeInfo> {
@@ -20,19 +21,19 @@ public sealed interface TypeInfo : Equatable<TypeInfo> {
     val IsAbstract: bool { get }
     val IsEnum: bool { get }
     val IsValueType: bool { get }
-    func GetGenericArguments() -> TypeInfo[]
+    func GetGenericArguments() -> Sequence<TypeInfo>
     func GetElementType() -> Option<TypeInfo>
 
     val BaseType: Option<TypeInfo> { get }
-    func GetInterfaces() -> TypeInfo[]
-    func GetEnumNames() -> string[]
+    func GetInterfaces() -> Sequence<TypeInfo>
+    func GetEnumNames() -> Sequence<string>
     func GetEnumUnderlyingType() -> TypeInfo
-    func GetFields() -> FieldInfo[]
-    func GetFields(flags: BindingFlags) -> FieldInfo[]
-    func GetMethods() -> MethodInfo[]
-    func GetMethods(flags: BindingFlags) -> MethodInfo[]
-    func GetProperties() -> PropertyInfo[]
-    func GetProperties(flags: BindingFlags) -> PropertyInfo[]
+    func GetFields() -> Sequence<FieldInfo>
+    func GetFields(flags: BindingFlags) -> Sequence<FieldInfo>
+    func GetMethods() -> Sequence<MethodInfo>
+    func GetMethods(flags: BindingFlags) -> Sequence<MethodInfo>
+    func GetProperties() -> Sequence<PropertyInfo>
+    func GetProperties(flags: BindingFlags) -> Sequence<PropertyInfo>
 }
 
 internal class RuntimeTypeInfo : TypeInfo {
@@ -48,11 +49,11 @@ internal class RuntimeTypeInfo : TypeInfo {
 
     val BaseType: Option<TypeInfo> { get => RuntimeServices.TypeBaseType(Handle) }
 
-    func GetInterfaces() -> TypeInfo[] {
+    func GetInterfaces() -> Sequence<TypeInfo> {
         return RuntimeServices.TypeInterfaces(Handle)
     }
 
-    func GetEnumNames() -> string[] {
+    func GetEnumNames() -> Sequence<string> {
         return RuntimeServices.TypeEnumNames(Handle)
     }
 
@@ -60,27 +61,27 @@ internal class RuntimeTypeInfo : TypeInfo {
         return RuntimeServices.TypeEnumUnderlying(Handle)
     }
 
-    func GetFields() -> FieldInfo[] {
+    func GetFields() -> Sequence<FieldInfo> {
         return RuntimeServices.TypeFields(Handle, 28)
     }
 
-    func GetFields(flags: BindingFlags) -> FieldInfo[] {
+    func GetFields(flags: BindingFlags) -> Sequence<FieldInfo> {
         return RuntimeServices.TypeFields(Handle, (int)flags)
     }
 
-    func GetMethods() -> MethodInfo[] {
+    func GetMethods() -> Sequence<MethodInfo> {
         return RuntimeServices.TypeMethods(Handle, 28)
     }
 
-    func GetMethods(flags: BindingFlags) -> MethodInfo[] {
+    func GetMethods(flags: BindingFlags) -> Sequence<MethodInfo> {
         return RuntimeServices.TypeMethods(Handle, (int)flags)
     }
 
-    func GetProperties() -> PropertyInfo[] {
+    func GetProperties() -> Sequence<PropertyInfo> {
         return RuntimeServices.TypeProperties(Handle, 28)
     }
 
-    func GetProperties(flags: BindingFlags) -> PropertyInfo[] {
+    func GetProperties(flags: BindingFlags) -> Sequence<PropertyInfo> {
         return RuntimeServices.TypeProperties(Handle, (int)flags)
     }
     val MetadataToken: int { get => RuntimeServices.TypeMetadataToken(Handle) }
@@ -109,7 +110,7 @@ internal class RuntimeTypeInfo : TypeInfo {
     val IsValueType: bool { get => RuntimeServices.TypeShape(Handle, 7) }
 
 
-    func GetGenericArguments() -> TypeInfo[] {
+    func GetGenericArguments() -> Sequence<TypeInfo> {
         return RuntimeServices.TypeGenericArguments(Handle)
     }
 

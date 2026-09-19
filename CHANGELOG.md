@@ -8,13 +8,23 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Complete the Raven Introspection collection migration to Sequence<T>: generic
+  arguments, implemented interfaces, enum names, fields, methods, properties and
+  parameters now match assembly/module query capabilities. Use Count instead of
+  Length and Sequence<Element> instead of array annotations; indexing, iteration and
+  query extensions remain available, with no mutation members. Rebuild consumers.
+  Preserve independent snapshots and private native array storage; no compiler or
+  native-service behavior changes. Eighteen runtime tests, 19 admission cases, 130
+  signature checks, nine saved samples plus rejection checks and editor checks pass.
+  Close this Introspection story; String API/runtime behavior remains later work.
+
 - Implement RuntimeContext.ExecutingAssembly and sealed AssemblyInfo/ModuleInfo
   interfaces with direct references and module/type discovery through Sequence<T>.
   Add module-scoped MetadataToken to Info interfaces; retain source rows and assign
   tokens to merged runtime definitions. System.Runtime appears as the foundation
   reference. Queries cover retained loaded metadata, never load files, and fault on
-  unresolved references or unsupported open-generic member queries. Existing member
-  arrays remain unchanged. Rebuild consumers for the new provider layouts. Add a
+  unresolved references or unsupported open-generic member queries. Rebuild consumers
+  for the new provider layouts. Add a
   runnable assembly-info sample and editor/interface, token and discovery checks.
   Record dynamic loading as future RuntimeContext work, without adding a loader.
   All 75 slices reproduce; 61 focused runtime tests, 27 admission cases, 24 selected

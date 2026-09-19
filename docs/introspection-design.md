@@ -21,7 +21,7 @@ The Raven profile now implements unified acquisition: `typeof(T)` and
 GetTypeInfoFromHandle for Raven's configured typeof lowering. Its current facade
 uses the one loaded program; it does not yet create independent execution universes.
 ExecutingAssembly and assembly/module providers now expose loaded-program discovery.
-New discovery collections return Sequence<T>; older member/type queries retain arrays.
+All public collection-returning Introspection queries now return Sequence<T>.
 
 The public/runtime System.Type class and Type.Info hop are removed from the Raven
 profile. Its compiler reference retains an **internal**, empty System.Type metadata
@@ -565,3 +565,28 @@ The author explicitly reaffirmed on 2026-09-19 that dynamic assembly loading is 
 work owned by RuntimeContext. No Load API, search/resolution policy, unloading or
 multiple-context identity behavior is selected in this preview. AssemblyInfo remains
 descriptive; reading ReferencedAssemblies does not become a hidden loading operation.
+
+
+### Complete Sequence migration — 2026-09-19
+
+The author explicitly directed migrating the remaining Introspection array results
+to Sequence. All production Raven Info collection contracts now use Sequence<T>,
+including TypeInfo.GetGenericArguments/GetInterfaces/GetEnumNames/GetFields/
+GetMethods/GetProperties (both filtering overloads where present),
+MethodInfo.GetParameters and PropertyInfo.GetIndexParameters. Assembly/module results
+already used that contract. Internal runtime services and snapshot storage may still
+use arrays; the historical Neo profile and isolated design prototypes are unchanged.
+
+This adopts the capability comparison in [collection result discussion](#collection-return-contracts-under-review--2026-09-19)
+without promising immutability: callers can enumerate, index and read Count, but have
+no mutation members. Results remain independently owned snapshots in the current
+loaded context. Casting an implementation back to a mutable array is outside the
+public contract and cannot change retained runtime metadata. Sequence is invariant;
+iterate or project elements when a different member-interface collection is needed.
+
+Migration: replace introspection-result array annotations with Sequence<Element>,
+import System.Collections, and replace Length with Count. Indexing, for loops and
+Iterable-based query extensions remain supported. Assigning these results directly
+to arrays or writing through their indexer is rejected. Copy explicitly when mutable
+array storage is needed. Rebuild reference, implementation and consumer artifacts.
+No new native services, opcodes, Raven compiler changes or loading behavior are added.

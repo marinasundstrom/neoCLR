@@ -67,7 +67,9 @@ static class SignatureProbe
         ReflectionBindings.Validate(module);
         Check("Old reflection descriptor namespace is absent", module.GetType("System.Reflection.TypeInfo") is null);
         var fieldsMethod = module.GetType("System.Introspection.TypeInfo").Methods.Single(m => m.Name == "GetFields" && m.Parameters.Count == 0);
-        Check("Reflection returns managed descriptor vector", ReflectionBindings.Bind(fieldsMethod, fieldsMethod)?.Result == "arrayref<System.Introspection.FieldInfo>");
+        Check("Reflection returns descriptor sequence", ReflectionBindings.Bind(fieldsMethod, fieldsMethod)?.Result == "System.Collections.Sequence<System.Introspection.FieldInfo>");
+        foreach (var info in ReflectionBindings.ReferenceTypes.Where(n => n.StartsWith("System.Introspection.")))
+            Check(info + " has no array-returning methods", !module.GetType(info).Methods.Any(m => m.ReturnType is ArrayType));
         var fieldsReference = Reference(fieldsMethod, fieldsMethod.DeclaringType);
         fieldsReference.ReturnType = module.TypeSystem.Int32;
         Reject("Reflection return mismatch", () => ReflectionBindings.Bind(fieldsReference, fieldsMethod));

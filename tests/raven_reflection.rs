@@ -58,7 +58,7 @@ ldtoken Item
 call instance System.Runtime.RuntimeContext::GetTypeInfoFromHandle(System.RuntimeTypeHandle)
 callvirt instance System.Introspection.TypeInfo::GetFields()
 ldc.i4 0
-ldelem System.Introspection.FieldInfo
+callvirt instance System.Collections.Sequence<System.Introspection.FieldInfo>::get_Item(Int32)
 stloc field
 ldloc field
 castclass System.Introspection.MemberInfo
@@ -91,7 +91,7 @@ ldtoken Item
 call instance System.Runtime.RuntimeContext::GetTypeInfoFromHandle(System.RuntimeTypeHandle)
 callvirt instance System.Introspection.TypeInfo::GetFields()
 ldc.i4 0
-ldelem System.Introspection.FieldInfo
+callvirt instance System.Collections.Sequence<System.Introspection.FieldInfo>::get_Item(Int32)
 castclass System.Introspection.MemberInfo
 ret
 .end
@@ -178,7 +178,9 @@ ret
 }
 
 #[test]
-fn descriptor_parameter_arrays_are_independent_copies() {
+fn descriptor_parameter_sequences_do_not_expose_runtime_owned_storage() {
+    // The public Sequence cannot mutate. An explicit backing-array cast may only
+    // change this returned copy, never the runtime-owned parameter metadata.
     let app = assemble(
         r#"
 .module SnapshotCopies
@@ -197,10 +199,11 @@ ldtoken Item
 call instance System.Runtime.RuntimeContext::GetTypeInfoFromHandle(System.RuntimeTypeHandle)
 callvirt instance System.Introspection.TypeInfo::GetMethods()
 ldc.i4 0
-ldelem System.Introspection.MethodInfo
+callvirt instance System.Collections.Sequence<System.Introspection.MethodInfo>::get_Item(Int32)
 stloc method
 ldloc method
 callvirt instance System.Introspection.MethodInfo::GetParameters()
+castclass arrayref<System.Introspection.ParameterInfo>
 stloc parameters
 ldloc parameters
 ldc.i4 0
@@ -211,7 +214,7 @@ stelem System.Introspection.ParameterInfo
 ldloc method
 callvirt instance System.Introspection.MethodInfo::GetParameters()
 ldc.i4 0
-ldelem System.Introspection.ParameterInfo
+callvirt instance System.Collections.Sequence<System.Introspection.ParameterInfo>::get_Item(Int32)
 callvirt instance System.Introspection.ParameterInfo::get_Position()
 ret
 .end
@@ -253,7 +256,7 @@ ldc.i4 36
 call System.Introspection.BindingFlags::FromValue(Int32)
 callvirt instance System.Introspection.TypeInfo::GetProperties(System.Introspection.BindingFlags)
 ldc.i4 0
-ldelem System.Introspection.PropertyInfo
+callvirt instance System.Collections.Sequence<System.Introspection.PropertyInfo>::get_Item(Int32)
 {argument}
 callvirt instance System.Introspection.PropertyInfo::GetGetMethod(Boolean)
 call instance System.Option<System.Introspection.MethodInfo>::{predicate}()
@@ -450,15 +453,15 @@ call instance System.Runtime.RuntimeContext::GetTypeInfoFromHandle(System.Runtim
             0x02000002,
         ),
         (
-            "callvirt instance System.Introspection.TypeInfo::GetFields()\nldc.i4 0\nldelem System.Introspection.FieldInfo\ncastclass System.Introspection.MemberInfo\ncallvirt instance System.Introspection.MemberInfo::get_MetadataToken()",
+            "callvirt instance System.Introspection.TypeInfo::GetFields()\nldc.i4 0\ncallvirt instance System.Collections.Sequence<System.Introspection.FieldInfo>::get_Item(Int32)\ncastclass System.Introspection.MemberInfo\ncallvirt instance System.Introspection.MemberInfo::get_MetadataToken()",
             0x04000006,
         ),
         (
-            "callvirt instance System.Introspection.TypeInfo::GetMethods()\nldc.i4 0\nldelem System.Introspection.MethodInfo\ncastclass System.Introspection.MemberInfo\ncallvirt instance System.Introspection.MemberInfo::get_MetadataToken()",
+            "callvirt instance System.Introspection.TypeInfo::GetMethods()\nldc.i4 0\ncallvirt instance System.Collections.Sequence<System.Introspection.MethodInfo>::get_Item(Int32)\ncastclass System.Introspection.MemberInfo\ncallvirt instance System.Introspection.MemberInfo::get_MetadataToken()",
             0x06000007,
         ),
         (
-            "callvirt instance System.Introspection.TypeInfo::GetMethods()\nldc.i4 0\nldelem System.Introspection.MethodInfo\ncallvirt instance System.Introspection.MethodInfo::GetParameters()\nldc.i4 0\nldelem System.Introspection.ParameterInfo\ncallvirt instance System.Introspection.ParameterInfo::get_MetadataToken()",
+            "callvirt instance System.Introspection.TypeInfo::GetMethods()\nldc.i4 0\ncallvirt instance System.Collections.Sequence<System.Introspection.MethodInfo>::get_Item(Int32)\ncallvirt instance System.Introspection.MethodInfo::GetParameters()\nldc.i4 0\ncallvirt instance System.Collections.Sequence<System.Introspection.ParameterInfo>::get_Item(Int32)\ncallvirt instance System.Introspection.ParameterInfo::get_MetadataToken()",
             0x08000009,
         ),
     ] {
@@ -467,7 +470,7 @@ call instance System.Runtime.RuntimeContext::GetTypeInfoFromHandle(System.Runtim
             Value::Int32(expected)
         );
     }
-    let query = "callvirt instance System.Introspection.TypeInfo::GetMethods()\nldc.i4 0\nldelem System.Introspection.MethodInfo\ncallvirt instance System.Introspection.MethodInfo::GetParameters()\nldc.i4 0\nldelem System.Introspection.ParameterInfo\ncallvirt instance System.Introspection.ParameterInfo::get_Module()\ncallvirt instance System.Introspection.ModuleInfo::get_Name()";
+    let query = "callvirt instance System.Introspection.TypeInfo::GetMethods()\nldc.i4 0\ncallvirt instance System.Collections.Sequence<System.Introspection.MethodInfo>::get_Item(Int32)\ncallvirt instance System.Introspection.MethodInfo::GetParameters()\nldc.i4 0\ncallvirt instance System.Collections.Sequence<System.Introspection.ParameterInfo>::get_Item(Int32)\ncallvirt instance System.Introspection.ParameterInfo::get_Module()\ncallvirt instance System.Introspection.ModuleInfo::get_Name()";
     assert_eq!(
         run_introspection(&format!(
             "{}{query}\nret\n.end",
@@ -583,7 +586,7 @@ ldtoken System.Date
 call instance System.Runtime.RuntimeContext::GetTypeInfoFromHandle(System.RuntimeTypeHandle)
 callvirt instance System.Introspection.TypeInfo::GetProperties()
 ldc.i4 0
-ldelem System.Introspection.PropertyInfo
+callvirt instance System.Collections.Sequence<System.Introspection.PropertyInfo>::get_Item(Int32)
 castclass System.Introspection.MemberInfo
 callvirt instance System.Introspection.MemberInfo::get_MetadataToken()
 ret

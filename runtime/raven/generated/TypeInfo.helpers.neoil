@@ -323,7 +323,7 @@ call neoCLR.Runtime.TypeBaseType(System.RuntimeTypeHandle)
 M00000003_IL_000d:
 ret
 .end
-.method instance GetInterfaces() -> arrayref<System.Introspection.TypeInfo>
+.method instance GetInterfaces() -> System.Collections.Sequence<System.Introspection.TypeInfo>
 M00000004_IL_0000:
 M00000004_IL_0001:
 M00000004_IL_0002:
@@ -335,7 +335,7 @@ call neoCLR.Library.System.Introspection.TypeInfo.RuntimeServiceTypeInterfaces(S
 M00000004_IL_000d:
 ret
 .end
-.method instance GetEnumNames() -> arrayref<String>
+.method instance GetEnumNames() -> System.Collections.Sequence<String>
 M00000005_IL_0000:
 M00000005_IL_0001:
 M00000005_IL_0002:
@@ -359,7 +359,7 @@ call neoCLR.Runtime.TypeEnumUnderlying(System.RuntimeTypeHandle)
 M00000006_IL_000d:
 ret
 .end
-.method instance GetFields() -> arrayref<System.Introspection.FieldInfo>
+.method instance GetFields() -> System.Collections.Sequence<System.Introspection.FieldInfo>
 M00000007_IL_0000:
 M00000007_IL_0001:
 M00000007_IL_0002:
@@ -373,7 +373,7 @@ call neoCLR.Library.System.Introspection.TypeInfo.RuntimeServiceTypeFields(Syste
 M00000007_IL_000f:
 ret
 .end
-.method instance GetFields(System.Introspection.BindingFlags flags) -> arrayref<System.Introspection.FieldInfo>
+.method instance GetFields(System.Introspection.BindingFlags flags) -> System.Collections.Sequence<System.Introspection.FieldInfo>
 M00000008_IL_0000:
 M00000008_IL_0001:
 M00000008_IL_0002:
@@ -390,7 +390,7 @@ call neoCLR.Library.System.Introspection.TypeInfo.RuntimeServiceTypeFields(Syste
 M00000008_IL_000f:
 ret
 .end
-.method instance GetMethods() -> arrayref<System.Introspection.MethodInfo>
+.method instance GetMethods() -> System.Collections.Sequence<System.Introspection.MethodInfo>
 M00000009_IL_0000:
 M00000009_IL_0001:
 M00000009_IL_0002:
@@ -404,7 +404,7 @@ call neoCLR.Library.System.Introspection.TypeInfo.RuntimeServiceTypeMethods(Syst
 M00000009_IL_000f:
 ret
 .end
-.method instance GetMethods(System.Introspection.BindingFlags flags) -> arrayref<System.Introspection.MethodInfo>
+.method instance GetMethods(System.Introspection.BindingFlags flags) -> System.Collections.Sequence<System.Introspection.MethodInfo>
 M0000000a_IL_0000:
 M0000000a_IL_0001:
 M0000000a_IL_0002:
@@ -421,7 +421,7 @@ call neoCLR.Library.System.Introspection.TypeInfo.RuntimeServiceTypeMethods(Syst
 M0000000a_IL_000f:
 ret
 .end
-.method instance GetProperties() -> arrayref<System.Introspection.PropertyInfo>
+.method instance GetProperties() -> System.Collections.Sequence<System.Introspection.PropertyInfo>
 M0000000b_IL_0000:
 M0000000b_IL_0001:
 M0000000b_IL_0002:
@@ -435,7 +435,7 @@ call neoCLR.Library.System.Introspection.TypeInfo.RuntimeServiceTypeProperties(S
 M0000000b_IL_000f:
 ret
 .end
-.method instance GetProperties(System.Introspection.BindingFlags flags) -> arrayref<System.Introspection.PropertyInfo>
+.method instance GetProperties(System.Introspection.BindingFlags flags) -> System.Collections.Sequence<System.Introspection.PropertyInfo>
 M0000000c_IL_0000:
 M0000000c_IL_0001:
 M0000000c_IL_0002:
@@ -700,7 +700,7 @@ M0000001c_IL_000e:
 call neoCLR.Library.System.Introspection.TypeInfo.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetGenericArguments() -> arrayref<System.Introspection.TypeInfo>
+.method instance GetGenericArguments() -> System.Collections.Sequence<System.Introspection.TypeInfo>
 M0000001d_IL_0000:
 M0000001d_IL_0001:
 M0000001d_IL_0002:

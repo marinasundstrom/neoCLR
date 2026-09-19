@@ -1181,3 +1181,20 @@ Validation for this slice: 75 slices reproduce; ownership covers 841 declaration
 including 66 runtime services. Sixty-one focused runtime tests, 27 implementation
 admission cases and 24 selected saved-project/edit/rejection checks pass. The editor
 checks use a freshly generated reference core and the matching language server.
+
+
+## Sequence results throughout Introspection — 2026-09-19
+
+Following the author's direction, TypeInfo and member/parameter query results now
+use Sequence<T> consistently with assembly/module discovery. The reference catalog,
+Raven implementations and generated fragments move together. Native services retain
+their private array ABI, with the existing checked conversion to the public collection
+interface; no new native endpoint or compiler behavior is introduced. Matching samples
+use Count, indexing and iteration. Array annotations and writes through the public
+indexer are rejected. Snapshot ownership and filtering are unchanged.
+
+Validation: 18 Raven runtime checks, 19 implementation admission cases, 130 signature
+checks, nine saved samples plus shared edit/rejection checks, and completion/query/
+array-invariance editor checks pass. Snapshot ownership remains 841 declarations and
+66 runtime services across 75 source slices. The author closes this Introspection
+story here; String API and runtime behavior are a later story.

@@ -21,11 +21,11 @@ func Main() {
     let shape = typeof(int[])
     WriteLine(shape.GenericArgumentCount)
     WriteLine(shape.GetGenericArguments()[0].Name)
-    WriteLine(shape.GetFields().Length)
+    WriteLine(shape.GetFields().Count)
     for property in shape.GetProperties() {
         WriteLine(property.Name)
     }
-    WriteLine(shape.GetInterfaces().Length)
+    WriteLine(shape.GetInterfaces().Count)
 
     for value in values {
         WriteLine(value)

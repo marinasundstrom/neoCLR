@@ -66,6 +66,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
                   ('ValueInterfaces', 'library-value-interfaces.rvn', '0\n1\nEqual integer\nEqual string\nEqual type\n0\nEqual date\n0\n0\n'),
                   ('NativeBuffer', 'library-native-buffer.rvn', 'Native allocation released\n'),
                   ('Flags', 'library-flags.rvn', '28\n8\n20\n-29\n0\nSame flags\nPublic included\n5\nStoredDayNumber\n'),
+                  ('ArrayQueries', 'library-array-queries.rvn', 'Parse\nDivide\nEquals\nToString\nCompareTo\n0\n17\n13\n3\n17\n52\n6\n0\n0\n43\n'),
                   ('ArrayForEach', 'library-array-foreach.rvn', 'Parse\nDivide\nEquals\nToString\nCompareTo\n42\n1\n2\n3\n'),
                   ('ManagedArrayMetadata', 'library-managed-array-metadata.rvn', '42\n2\n1\nSystem.Int32\n0\nEmpty\nLength\nCount\nItem\n4\n42\n8\n50\n2\n'),
                   ('IntrospectionInterfaces', 'library-introspection-interfaces.rvn', 'Interface\n' * 6 + 'System.Date\nField\nMethod\nProperty\n'),
@@ -109,6 +110,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
            .replace(f'        {case} => "{label}"\n', ''), 'RAV2100')
           for case, label in [('FieldInfo', 'Field'), ('MethodInfo', 'Method'), ('PropertyInfo', 'Property')]],
         ('CompileFailure', 'func Main() { MissingCall() }', 'RAV'),
+        ('IntrospectionArrayAssignment', 'import System.Introspection.*\nfunc Main() { let methods: MethodInfo[] = typeof(int).GetMethods() }', 'RAV'),
+        ('IntrospectionMutation', 'func Main() { let methods = typeof(int).GetMethods(); methods[0] = methods[0] }', 'RAV'),
         ('ExternalIntrospectionProvider', 'import System.Introspection.*\nclass UserInfo : TypeInfo { }\nfunc Main() {}', 'RAV033'),
         ('HiddenIntrospectionProvider', 'func Main() { let info = typeof(System.Introspection.RuntimeTypeInfo) }', 'RAV'),
         ('RemovedTypeClass', 'func Main() { let value: System.Type = typeof(int) }', 'RAV'),
@@ -119,8 +122,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
         ('PathUnsupportedApi', 'func Main() { System.IO.Path.GetFullPath(".") }', 'RAV'),
         ('StringArgumentMismatch', 'func Main() { System.String.Concat(42, 7) }', 'RAV'),
         ('StringUnsupportedApi', 'func Main() { System.String.IsNullOrEmpty(\"\") }', 'RAV'),
-        ('ArrayImplicitCovariance', 'import System.*\nimport System.Introspection.*\nfunc Main() { let members: MemberInfo[] = typeof(int).GetMethods() }', ('RAV1504', 'identical element types')),
-        ('ArrayExplicitCovariance', 'import System.*\nimport System.Introspection.*\nfunc Main() { let members = (MemberInfo[])typeof(int).GetMethods() }', ('RAV1503', 'identical element types')),
+        ('ArrayImplicitCovariance', 'import System.*\nimport System.Introspection.*\nfunc Main() { let methods: MethodInfo[] = []; let members: MemberInfo[] = methods }', ('RAV1504', 'identical element types')),
+        ('ArrayExplicitCovariance', 'import System.*\nimport System.Introspection.*\nfunc Main() { let methods: MethodInfo[] = []; let members = (MemberInfo[])methods }', ('RAV1503', 'identical element types')),
         ('ImportFailure', 'func Negate(value: int) -> int { return -value }\nfunc Main() { Negate(2) }', 'Unsupported')]:
         before = set(root.rglob('App.neoil'))
         (root / 'Main.rvn').write_text(source)
