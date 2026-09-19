@@ -15,7 +15,11 @@ development-only behavior and proposals visibly separate.
 | `docs/` and release notes | Detailed contracts, research, verification and historical release behavior | Preserve published release notes; record corrections under Unreleased |
 
 Feature pages currently cover [Introspection](../../website/features/introspection/index.html)
-and [Strings](../../website/features/strings/index.html). The first is an in-depth
+and [Strings](../../website/features/strings/index.html), with additional notes for
+[Option/Result](../../website/features/outcomes/index.html),
+[collections/queries](../../website/features/collections/index.html),
+[dates/clocks](../../website/features/time/index.html) and
+[UTF-8 files](../../website/features/files/index.html). Introspection is an in-depth
 walkthrough; the second deliberately shows one working conversion example. Scale
 detail to what helps an evaluator. Do not add an API just to fill a page outline.
 

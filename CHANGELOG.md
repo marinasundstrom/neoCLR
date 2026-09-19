@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Add concise implementation pages for Option/Result, collections/queries,
+  dates/clocks and bounded UTF-8 files. Reuse executable source excerpts, describe
+  current limits and link future directions; add the feature index and collection
+  proposal summary. All eight pages build with checked links and sample extraction.
+
 - Adopt native UTF-8 as the text direction and change CompareOrdinal from UTF-16
   code-unit order to UTF-8/scalar order. U+10000 now sorts after U+E000; re-sort
   data that depends on the previous ordering. Keep the original proposal and

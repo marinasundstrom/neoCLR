@@ -4296,3 +4296,13 @@ samples and direction notes. Scalar Char is now the selected migration target,
 not merely an optional proposal; its existing 16-bit representation remains an
 explicit implementation gap requiring coordinated runtime, metadata and compiler
 changes. This slice does not claim that migration has already happened.
+
+### Further pages and the preview review
+
+The author directed the next sequence: finish the String feature, then create the
+other website feature pages, then review the whole preview to decide what it needs
+to communicate the direction. The assistant added short notes for the existing
+Option/Result, collection/query, date/clock and bounded-file APIs using tested source
+excerpts. The release review distinguishes implemented paths, the remaining scalar
+Char migration and packaging/validation gates from optional proposals. No new
+release version, date or publication has been selected.

@@ -102,3 +102,8 @@ just to appear complete. Keep the design open for user feedback.
 Publication is deliberately manual and independent of code pushes. Until this
 workflow change is pushed to GitHub, the previously configured remote workflow
 remains in effect. This local change does not publish the site.
+
+Additional current-state notes cover outcomes, collections/queries, dates/clocks
+and bounded UTF-8 files. Their snippets reuse the same executable samples as the
+homepage and target checks. The feature-page index is `/#feature-pages`; keep it
+current when adding or removing pages.

@@ -97,6 +97,7 @@ def main():
         'IL_SAMPLE': ('examples/preview/result-void.neoil', '.function Complete', '.end', True),
         'OPTION_SAMPLE': (raven + 'library-query-terminals.rvn', 'func FirstPositive', '\n}', True),
         'COLLECTION_SAMPLE': (raven + 'library-collection-capabilities.rvn', 'func Read', '\nfunc Main', False),
+        'FILE_SAMPLE': (raven + 'library-files.rvn', 'func Load', '\n}', True),
         'TEXT_SAMPLE': (raven + 'library-string-slices.rvn', 'func Extract', '\n}', True),
         'QUERY_SAMPLE': (raven + 'library-query-terminals.rvn', 'func OnlyPositive', '\n}', True),
     }
