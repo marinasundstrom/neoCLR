@@ -8,7 +8,7 @@ Neo remains outside this migration. Package validation is recorded separately.
 ## Audited surface
 
 The [source inventory](experiments/raven-target/runtime-api-inventory.json) contains
-744 visible declaration candidates from 133 files, including the manifest. Accessors,
+744 visible declaration candidates from 145 files, including the manifest. Accessors,
 fields and properties can describe the same source operation; these are not 744
 independent APIs. Generated fragments and adapters contribute to these counts;
 they are not a count of Raven-authored APIs. The [coverage record](experiments/raven-target/runtime-api-coverage.json)

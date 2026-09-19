@@ -8,12 +8,18 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
-- Extend the API-preserving Raven library port from 28 to 49 source slices: generic
+- Extend the API-preserving Raven library port from 28 to 55 source slices: generic
   fundamental/collection contracts, SystemClock/LocalDateTime, native-sized integer
   comparisons, complete Int32 methods, Console, Environment, File.ReadAllText,
-  String and opaque Error. Check intrinsic String storage and mixed receivers,
+  String, opaque Error, five empty error types and Void. Check intrinsic String storage and mixed receivers,
   preserve Error message delegation and runtime-owned payloads, and reject opaque
-  allocation/defaults and String storage writes (11 admission cases pass).
+  allocation/defaults and String storage writes (11 admission cases pass). Preserve
+  empty error defaults/constructors and nominal Void with nine further admission
+  cases. Extract a general Raven unit-assembly lookup fix onto main (`c17cb8397`):
+  same-named source types no longer shadow the configured metadata contract
+  (19 .NET checks and 24 feature-branch checks pass). The empty-value slice passes
+  14 focused Rust checks, four saved-program executions, and wrong-case/default
+  error rejection checks.
   Check generic interface inheritance and nested calendar layout against reference
   metadata, and preserve library method parameter names for introspection. Keep native
   payload decoding bootstrap-only and preserve legacy Neo receiver/process conventions.

@@ -1,0 +1,9 @@
+namespace System
+
+public struct InvalidDateError {
+    public init() { }
+
+    func ToString() -> string {
+        return "InvalidDate"
+    }
+}

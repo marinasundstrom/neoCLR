@@ -1,12 +1,2 @@
-.type System.InvalidTimeError
-    .method instance .ctor() -> Void
-        ldvoid
-        ret
-    .end
-
-    .method instance ToString() -> String
-        ldstr "InvalidTime"
-        ret
-    .end
-
-.end
+.include "../raven/generated/InvalidTimeError.methods.neoil"
+.include "../raven/generated/InvalidTimeError.helpers.neoil"

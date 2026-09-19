@@ -77,7 +77,14 @@ without starting proposal API alignment.
 importer checks for intrinsic storage, mixed String receivers and opaque Error
 receivers. Native ownership and the existing parameter metadata remain unchanged.
 Eleven admission checks pass, including rejected storage mutation and fabricated
-opaque construction. Remaining slices are still pending at this point.
+opaque construction. All 64 saved-program cases also pass against the committed String/Error library
+(`8744717`) and a fresh consumer core. The empty-declaration slice then exposed
+source shadowing of an explicitly configured unit assembly. The assistant reduced
+it independently with .NET ValueTuple, integrated the general fix on Raven main
+(`c17cb8397`, 19 passing focused checks), and cherry-picked it to the neoCLR feature
+branch (`b6f12353f`, 24 passing feature checks). Five empty errors and Void bring
+the port to 55 source slices; nine admission cases, 14 Rust checks and four saved
+programs pass. Unions/error carriers, descriptors and adapters remain pending.
 
 **Open.** Complete and validate the remaining Raven source port, then align API
 contracts in the subsequent step. Documentation organization does not itself

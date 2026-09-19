@@ -1,0 +1,7 @@
+namespace System
+
+public struct EnvironmentError {
+    func ToString() -> string {
+        return "EnvironmentUnavailable"
+    }
+}

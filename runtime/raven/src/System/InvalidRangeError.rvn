@@ -1,0 +1,9 @@
+namespace System
+
+public struct InvalidRangeError {
+    public init() { }
+
+    func ToString() -> string {
+        return "InvalidRange"
+    }
+}

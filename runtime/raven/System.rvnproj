@@ -146,4 +146,22 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'String'">
     <Compile Include="src/System/String.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'InvalidRangeError'">
+    <Compile Include="src/System/InvalidRangeError.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'InvalidDateError'">
+    <Compile Include="src/System/InvalidDateError.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'InvalidTimeError'">
+    <Compile Include="src/System/InvalidTimeError.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'OverflowError'">
+    <Compile Include="src/System/OverflowError.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'EnvironmentError'">
+    <Compile Include="src/System/EnvironmentError.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Void'">
+    <Compile Include="src/System/Void.rvn" />
+  </ItemGroup>
 </Project>

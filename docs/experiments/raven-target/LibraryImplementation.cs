@@ -9,6 +9,7 @@ static class LibraryImplementation
     // Preserve the existing scalar neoIL formatting receiver while CIL uses a
     // managed-byref struct receiver. Intrinsic field reads accept either form.
     public static bool IsByValueReceiver(MethodReference method) =>
+        EmptyLibrary.IsByValueReceiver(method) ||
         (ApplicationTypes.IsLibrary(method.DeclaringType) && method.DeclaringType.FullName == "System.Error"
             && method.Name is "get_Message" or "ToString" && method.HasThis && !method.HasParameters
             && method.ReturnType.MetadataType == MetadataType.String) ||
@@ -169,7 +170,7 @@ static class LibraryImplementation
         var declarationOnly = type.IsValueType && !type.HasFields && !contract.HasFields
             && !contract.HasMethods && !type.HasProperties && !type.HasInterfaces
             && type.Methods.All(PrimitiveLibrary.IsDefaultConstructor);
-        var methods = type.Methods.Where(m => !OpaqueLibrary.IsOmittedConstructor(m) && (!(PrimitiveLibrary.IsPrimitive(type) || declarationOnly) || !PrimitiveLibrary.IsDefaultConstructor(m))).ToArray();
+        var methods = type.Methods.Where(m => !OpaqueLibrary.IsOmittedConstructor(m) && !EmptyLibrary.OmitConstructor(m) && (!(PrimitiveLibrary.IsPrimitive(type) || declarationOnly) || !PrimitiveLibrary.IsDefaultConstructor(m))).ToArray();
         if (methods.Length == 0 && !declarationOnly || methods.Any(m => !(m.IsPublic || m.IsPrivate && !m.IsVirtual
             || m.IsAssembly && !m.IsVirtual && contract.Methods.Count(c => c.IsAssembly && MatchMethod(c, m)) == 1) || !m.HasBody || m.HasGenericParameters
             || m.ExplicitThis || m.IsConstructor && m.IsStatic || m.CallingConvention != MethodCallingConvention.Default

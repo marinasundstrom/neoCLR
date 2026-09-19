@@ -1,6 +1,2 @@
-.type System.EnvironmentError
-    .method instance ToString() -> String
-        ldstr "EnvironmentUnavailable"
-        ret
-    .end
-.end
+.include "../raven/generated/EnvironmentError.methods.neoil"
+.include "../raven/generated/EnvironmentError.helpers.neoil"

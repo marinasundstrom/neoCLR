@@ -1,10 +1,2 @@
-.type System.InvalidRangeError
-    .method instance .ctor() -> Void
-        ldvoid
-        ret
-    .end
-    .method instance ToString() -> String
-        ldstr "InvalidRange"
-        ret
-    .end
-.end
+.include "../raven/generated/InvalidRangeError.methods.neoil"
+.include "../raven/generated/InvalidRangeError.helpers.neoil"

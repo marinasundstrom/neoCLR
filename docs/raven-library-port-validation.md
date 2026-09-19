@@ -17,6 +17,15 @@ String.Equals because generated Boolean adapters are reachable; service assertio
 are retained with a larger fixture budget. No Raven compiler code changed; target
 boundary documentation is on feature commit `981301d09`.
 
+## Empty values and Void follow-up
+
+Five empty error types and Void bring the total to 55 source slices. Nine admission
+checks, 14 focused Rust error/calendar/clock tests, and four saved programs (error
+values, generic unions, Void results and Void values) pass. Wrong-case extraction
+faults and uninitialized carrier defaults are rejected. Raven main `c17cb8397` fixes
+unit-contract assembly lookup independently with .NET ValueTuple (19 checks); the
+neoCLR feature cherry-pick `b6f12353f` passes 24 focused target/unit checks.
+
 ## Reproduce the program gate
 
 Use the neoCLR feature compiler, built from the Raven repository's
@@ -71,6 +80,8 @@ The other two control input/environment and inspect real file bytes.
 
 Additional checks:
 
+- `verify_empty_library.py --compiler COMPILER --bridge BRIDGE`: nine empty-error/
+  Void declaration cases, including mismatched fields and exports.
 - `verify_opaque_library.py --compiler COMPILER --bridge BRIDGE`: 11 String/Error
   admission cases check storage, receivers, signatures, allocation/mutation rejection
   and initialized Error copies.
@@ -105,7 +116,7 @@ because the text assembler does not resolve files. All eight fixture checks pass
 - All 64 saved-project cases pass, including executable API samples, saved edits,
   compiler/import rejection without stale execution, and expected runtime faults.
 
-- All 49 slices compile and import; clean regeneration and input/snapshot hashes
+- All 55 slices compile and import; clean regeneration and input/snapshot hashes
   match. Inventory/coverage checks pass for 744 candidates and 108 declaring sources.
 - All 17 foundation admission cases pass. Clock declaration rejection checks and
   fixed/system-clock execution pass, including host-local time conversion.

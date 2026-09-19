@@ -10,6 +10,13 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    'InvalidRangeError': 'System.InvalidRangeError',
+    'InvalidDateError': 'System.InvalidDateError',
+    'InvalidTimeError': 'System.InvalidTimeError',
+    'OverflowError': 'System.OverflowError',
+    'EnvironmentError': 'System.EnvironmentError',
+    'Void': 'System.Void',
+
     'String': 'System.String',
     'Error': 'System.Error',
     'Environment': 'System.Environment',
@@ -63,6 +70,13 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    'InvalidRangeError': 'runtime/raven/src/System/InvalidRangeError.rvn',
+    'InvalidDateError': 'runtime/raven/src/System/InvalidDateError.rvn',
+    'InvalidTimeError': 'runtime/raven/src/System/InvalidTimeError.rvn',
+    'OverflowError': 'runtime/raven/src/System/OverflowError.rvn',
+    'EnvironmentError': 'runtime/raven/src/System/EnvironmentError.rvn',
+    'Void': 'runtime/raven/src/System/Void.rvn',
+
     'String': 'runtime/raven/src/System/String.rvn',
     'Error': 'runtime/raven/src/System/Error.rvn',
     'Environment': 'runtime/raven/src/System/Environment/Functions.rvn',

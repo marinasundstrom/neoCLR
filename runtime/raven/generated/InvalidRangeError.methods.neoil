@@ -1,0 +1,21 @@
+; Generated from runtime/raven/src/System/InvalidRangeError.rvn. Regenerate with build_runtime_library.py.
+.type System.InvalidRangeError
+.method instance .ctor() -> Void
+M00000001_IL_0000:
+M00000001_IL_0001:
+ldarg 0
+M00000001_IL_0002:
+pop
+M00000001_IL_0007:
+ldvoid
+ret
+.end
+.method instance ToString() -> String
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldstr "InvalidRange"
+M00000002_IL_0007:
+ret
+.end
+.end

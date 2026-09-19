@@ -1,10 +1,2 @@
-.type System.OverflowError
-    .method instance .ctor() -> Void
-        ldvoid
-        ret
-    .end
-    .method instance ToString() -> String
-        ldstr "Overflow"
-        ret
-    .end
-.end
+.include "../raven/generated/OverflowError.methods.neoil"
+.include "../raven/generated/OverflowError.helpers.neoil"

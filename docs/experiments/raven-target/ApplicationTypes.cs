@@ -124,7 +124,7 @@ static class ApplicationTypes
             if (IsModule(type.BaseType?.Resolve()?.Module)) { CheckAccess(type.BaseType!, type.Module); map(type.BaseType!, false); }
             foreach (var contract in type.Interfaces) { CheckAccess(contract.InterfaceType, type.Module); map(contract.InterfaceType, false); }
             foreach (var field in type.Fields) map(field.FieldType, false);
-            foreach (var method in type.Methods.Where(m => !m.IsStatic && !(PrimitiveLibrary.IsMatched(type) && PrimitiveLibrary.IsDefaultConstructor(m)) && !(IsLibrary(type) && OpaqueLibrary.IsOmittedConstructor(m))))
+            foreach (var method in type.Methods.Where(m => !m.IsStatic && !(PrimitiveLibrary.IsMatched(type) && PrimitiveLibrary.IsDefaultConstructor(m)) && !(IsLibrary(type) && (OpaqueLibrary.IsOmittedConstructor(m) || EmptyLibrary.OmitConstructor(m)))))
             {
                 CheckMethod(method);
                 if (method.Overrides.Any(o => !method.IsPublic || o.Name != method.Name || o.DeclaringType.Resolve()?.IsInterface != true

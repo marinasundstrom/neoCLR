@@ -1,0 +1,9 @@
+namespace System
+
+public struct OverflowError {
+    public init() { }
+
+    func ToString() -> string {
+        return "Overflow"
+    }
+}

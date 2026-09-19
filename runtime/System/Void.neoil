@@ -1,3 +1,2 @@
-.type System.Void
-.end
-
+.include "../raven/generated/Void.methods.neoil"
+.include "../raven/generated/Void.helpers.neoil"

@@ -50,12 +50,19 @@
       "note": "Source declarations only; erased values and opaque type handles retain intrinsic runtime representations."
     },
     {
-      "file": "runtime/System/Void.neoil",
+      "file": "runtime/raven/generated/Void.methods.neoil",
       "declarations": 1,
-      "disposition": "signature-markers",
+      "disposition": "raven-authored-empty-value",
       "samples": [
+        "library-errors.rvn",
         "library-void.rvn"
-      ]
+      ],
+      "tests": [
+        "tests/errors.rs",
+        "tests/arithmetic_errors.rs",
+        "docs/experiments/raven-target/verify_empty_library.py"
+      ],
+      "note": "Empty values preserve payload-free defaults, existing constructors/formatting and nominal Void. No new constructor on EnvironmentError or Void."
     },
     {
       "file": "runtime/raven/generated/Boolean.methods.neoil",
@@ -613,12 +620,19 @@
       "note": "All twenty Math functions are Raven-authored; Double operations retain native services behind checked bootstrap-only bindings. Source authority is runtime/raven/src/System/Math/Functions.rvn."
     },
     {
-      "file": "runtime/System/InvalidRangeError.neoil",
+      "file": "runtime/raven/generated/InvalidRangeError.methods.neoil",
       "declarations": 3,
-      "disposition": "errors",
+      "disposition": "raven-authored-empty-value",
       "samples": [
-        "library-errors.rvn"
-      ]
+        "library-errors.rvn",
+        "library-void.rvn"
+      ],
+      "tests": [
+        "tests/errors.rs",
+        "tests/arithmetic_errors.rs",
+        "docs/experiments/raven-target/verify_empty_library.py"
+      ],
+      "note": "Empty values preserve payload-free defaults, existing constructors/formatting and nominal Void. No new constructor on EnvironmentError or Void."
     },
     {
       "file": "runtime/neoCLR/Runtime/Math.neoil",
@@ -952,12 +966,19 @@
       ]
     },
     {
-      "file": "runtime/System/OverflowError.neoil",
+      "file": "runtime/raven/generated/OverflowError.methods.neoil",
       "declarations": 3,
-      "disposition": "errors",
+      "disposition": "raven-authored-empty-value",
       "samples": [
-        "library-errors.rvn"
-      ]
+        "library-errors.rvn",
+        "library-void.rvn"
+      ],
+      "tests": [
+        "tests/errors.rs",
+        "tests/arithmetic_errors.rs",
+        "docs/experiments/raven-target/verify_empty_library.py"
+      ],
+      "note": "Empty values preserve payload-free defaults, existing constructors/formatting and nominal Void. No new constructor on EnvironmentError or Void."
     },
     {
       "file": "runtime/System/IntegerDivisionError.neoil",
@@ -1296,20 +1317,34 @@
       "note": "Existing factories, calendar/tick boundaries, comparison and readonly access preserved. Historical Neo profile unchanged."
     },
     {
-      "file": "runtime/System/InvalidDateError.neoil",
+      "file": "runtime/raven/generated/InvalidDateError.methods.neoil",
       "declarations": 3,
-      "disposition": "errors",
+      "disposition": "raven-authored-empty-value",
       "samples": [
-        "library-errors.rvn"
-      ]
+        "library-errors.rvn",
+        "library-void.rvn"
+      ],
+      "tests": [
+        "tests/errors.rs",
+        "tests/arithmetic_errors.rs",
+        "docs/experiments/raven-target/verify_empty_library.py"
+      ],
+      "note": "Empty values preserve payload-free defaults, existing constructors/formatting and nominal Void. No new constructor on EnvironmentError or Void."
     },
     {
-      "file": "runtime/System/InvalidTimeError.neoil",
+      "file": "runtime/raven/generated/InvalidTimeError.methods.neoil",
       "declarations": 3,
-      "disposition": "errors",
+      "disposition": "raven-authored-empty-value",
       "samples": [
-        "library-errors.rvn"
-      ]
+        "library-errors.rvn",
+        "library-void.rvn"
+      ],
+      "tests": [
+        "tests/errors.rs",
+        "tests/arithmetic_errors.rs",
+        "docs/experiments/raven-target/verify_empty_library.py"
+      ],
+      "note": "Empty values preserve payload-free defaults, existing constructors/formatting and nominal Void. No new constructor on EnvironmentError or Void."
     },
     {
       "file": "runtime/raven/generated/Instant.methods.neoil",
@@ -1404,12 +1439,19 @@
       ]
     },
     {
-      "file": "runtime/System/EnvironmentError.neoil",
+      "file": "runtime/raven/generated/EnvironmentError.methods.neoil",
       "declarations": 2,
-      "disposition": "errors",
+      "disposition": "raven-authored-empty-value",
       "samples": [
-        "library-errors.rvn"
-      ]
+        "library-errors.rvn",
+        "library-void.rvn"
+      ],
+      "tests": [
+        "tests/errors.rs",
+        "tests/arithmetic_errors.rs",
+        "docs/experiments/raven-target/verify_empty_library.py"
+      ],
+      "note": "Empty values preserve payload-free defaults, existing constructors/formatting and nominal Void. No new constructor on EnvironmentError or Void."
     },
     {
       "file": "runtime/System/Environment.neoil",

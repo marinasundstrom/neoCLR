@@ -2,6 +2,12 @@
   "format": "raven-library-bootstrap-v1",
   "owner": "System.Collections.MutableSequence",
   "inputs": {
+    "runtime/raven/src/System/InvalidRangeError.rvn": "863b25e049db2a970292cb404cda670ebb08ddebc2f99d7eaa87a1b405aeac59",
+    "runtime/raven/src/System/InvalidDateError.rvn": "9b47a6f1f4b41b6e64988a61239c7ac80f6667af7325b68d6d60fcd5d91f68f8",
+    "runtime/raven/src/System/InvalidTimeError.rvn": "f845856f6f260641c2c2823deaa4565feb0ecb003932904f1bf8bd22c37f0410",
+    "runtime/raven/src/System/OverflowError.rvn": "eaa0f653ef045d8c0898baa8006d9dec11a676fa814bbe79ae277909ed6f46a8",
+    "runtime/raven/src/System/EnvironmentError.rvn": "08d7ca88cd6395e47a000c413b910c7c61b501417c9827dda7ef40b63b5c11f4",
+    "runtime/raven/src/System/Void.rvn": "cec6e383555235c0144b80860e7e384061f3a74d26e8b74178f1547d2bd12e75",
     "runtime/raven/src/System/String.rvn": "7fb0faa111f58beb947644a37fa4b5294e342ccd58ae8a38f5d23a4256550e30",
     "runtime/raven/src/System/Error.rvn": "a611b789b68e563cc169e1049796ff38c19760580ed7b8e20e4faa84b48e9766",
     "runtime/raven/src/System/Environment/Functions.rvn": "10f32b2b35546e471316a68a124065779d01fbd40233e335439b1fcfeefd2479",
@@ -51,15 +57,15 @@
     "runtime/raven/src/System/Single.rvn": "488efaf36e56f147c7158a5b0637f3bc4e56e84bb3f514af6c64a023dcd8598e",
     "runtime/raven/src/System/Double.rvn": "cd3ad24e4a21b7616a2937da71891618284913e26ea180ce203276f18b631f33",
     "runtime/raven/src/System/Boolean.rvn": "1f0010fe0d346fbc7f3ba29c88b2c1cf80faebf42a4c2de2f0cd6cff15335022",
-    "runtime/raven/System.rvnproj": "0813f3443dc53af62ededf9280f213c32c4790fe6967a725a2a7d412d2dcb033",
+    "runtime/raven/System.rvnproj": "0375b761aa0e906ac3513dafbc5e9ff647db2d7a1bfd4799601e88351f1fca9e",
     "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
   },
   "outputs": {
     "MutableSequence.methods.neoil": "89b6901524283f676c2582d44067cd86265f1234b5035bce5c060cb51c08608e",
     "MutableSequence.helpers.neoil": "f9ca033a47f218c9b14a3c908d94e3d813bd585c09206a6b9e020e8ea9ba1fa6"
   },
-  "compilerSha256": "4182dd1bc7626372406f89fc78cc5a9097fadc6db5842166179cd6f174f44514",
-  "coreSha256": "e222a66ecfd904ca9cf138bd0537f63f4eb87eddac36e4171572722fae5ef4c1",
+  "compilerSha256": "7d55b86e719225ff2eb87fbc52854c22936e57c0658ccd9ac314513ade7b7ba5",
+  "coreSha256": "5223121f40e52abc2a5105360a04d4fb793b36aa53fc927ada9b9b727de7b882",
   "exports": [
     "get_Item(Int32 index) -> T0",
     "set_Item(Int32 index,T0 value) -> noresult"

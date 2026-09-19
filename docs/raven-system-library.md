@@ -10,7 +10,8 @@ verify and run against the regenerated library. Original proposal texts are inde
 This slice adds Raven sources for the fundamental and collection interfaces,
 SystemClock, LocalDateTime, IntPtr/UIntPtr comparisons, the complete Int32 member
 surface, Console and Environment. File.ReadAllText joins WriteAllText in Raven.
-The follow-up also ports String and opaque Error, bringing the total to 49 slices.
+The follow-up ports String and opaque Error, then five empty error types and Void,
+bringing the total to 55 slices.
 The legacy Neo profile retains its receiver/array conventions where it differs;
 the Raven profile selects generated contracts and implementation bodies.
 
@@ -50,7 +51,7 @@ additional generated adapters and a larger reachable call graph; no performance
 improvement or new native ABI is claimed.
 
 Remaining handwritten source includes Option/Result and error
-carriers, descriptor hierarchy bodies, array/runtime adapters, delegates and Void.
+carriers, descriptor hierarchy bodies, array/runtime adapters and delegates.
 Native service declarations remain runtime-owned. Generated neoIL remains a build
 artifact rather than a competing implementation. These boundaries are not silently
 claimed to have become Raven source.
@@ -79,6 +80,20 @@ including their .NET comparisons. CLI class/value metadata serves Raven compilat
 neoCLR retains its own immutable string/message storage and native UTF-8 operations.
 The benefit is source ownership with checked boundaries; the cost is generated
 Boolean/union adapters and a larger call graph, without a performance claim.
+
+The payload-free error types (InvalidRangeError, InvalidDateError, InvalidTimeError,
+OverflowError and EnvironmentError) and Void are also Raven-authored.
+Their runtime defaults/constructors remain distinct from opaque Error: an empty
+error is valid, while a message Error requires a real payload. Bootstrap metadata
+normalization removes only artificial empty-struct byte sizes, then checks the
+source shape and public methods. No new error cases or proposal APIs are introduced.
+
+Void authoring exposed a general Raven configuration-lookup defect: a source type
+could shadow the unit contract's explicitly named metadata assembly. Main commit
+`c17cb8397` resolves that assembly exactly (19 independent .NET unit/target-core checks
+pass, including a regression that failed before the fix); feature commit `b6f12353f`
+applies it to neoCLR. The ordinary .NET regression uses ValueTuple and checks emitted
+identity and execution. It does not establish .NET Framework/NanoFramework execution.
 
 The remaining migration gates are substantive work, not just moving files:
 

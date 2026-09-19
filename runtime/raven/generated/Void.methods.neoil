@@ -1,0 +1,3 @@
+; Generated from runtime/raven/src/System/Void.rvn. Regenerate with build_runtime_library.py.
+.type System.Void
+.end
