@@ -55,7 +55,7 @@ Use a fresh output directory for each attempt.
   are not added).
 - Raven namespace functions use their existing emitted CLI container and target-owned
   `TopLevelAttribute` marker. Direct cross-assembly wildcard imports now work with the
-  refreshed core and Raven `codex/neoclr-namespace-metadata` compiler. No guessed
+  refreshed core and Raven `neoclr` compiler. No guessed
   container name or new namespace-function ABI is used. The earlier RAV0103 probe
   exposed both a missing core marker and Raven's host-only marker lookup; these are
   fixed in source. Existing installed tools still require an update.

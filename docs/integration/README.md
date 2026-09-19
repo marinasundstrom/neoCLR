@@ -53,3 +53,5 @@ See also the [Raven experiment](../experiments/raven-target/README.md).
 - [Raven target and binary artifact experiment](../raven-target-experiment.md)
 - [Raven target profiles, symbols and emission backends](../raven-target-profiles.md)
 - [Option and Result APIs from Raven](../raven-union-api.md)
+
+- [Try the completed Raven source port locally](../raven-port-local-build.md) — isolated VS Code workspace and saved-project task.

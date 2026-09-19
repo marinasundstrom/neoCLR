@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Complete the Raven branch review and prepare an isolated VS Code development
+  workspace with reproducible setup tooling. General editor-reference and ref-struct
+  deconstruction fixes are on Raven main (65 and 31 focused checks); neoclr retains
+  target policies. Rename its integration branch to neoclr and remove eight merged
+  fix branches. Project checks pass on main/neoclr (47/52). Fresh copied-toolchain
+  workspaces run the saved sample and pass editor checks; the installed editor logs
+  confirm successful startup. No release or global SDK installation is performed.
+
 - Refresh two validation fixtures after the source port: retain the Int64 CompareTo
   parameter name in its expected signature and allow the Console reachability graph
   to include generated carrier dependencies. Primitive admission and all 11 Console

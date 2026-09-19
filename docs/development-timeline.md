@@ -128,6 +128,25 @@ committed to documenting benefits/costs and migration consequences, and carried
 that principle into preview API alignment, including the Object.GetType candidate.
 This does not claim that the proposed preview API has already been implemented.
 
+**Final compiler review and branch cleanup.** The assistant independently reproduced
+editor host-reference injection with ordinary .NET references and integrated its
+fix on Raven main (`6c2ccb13e`, 65 workspace checks). A known-value deconstruction
+change was initially described as an optimization; independent testing instead
+showed a real ref-struct InvalidProgramException. Main `f7f3f0c6d` fixes it, with 31
+checks covering value-copy mutation, references and null/type checks. Both fixes
+were applied to the neoCLR branch without merging target policies into main.
+The integration branch is now `neoclr`; the eight temporary integrated fix branches
+were deleted. Existing ordinary branches were preserved.
+
+**Editor preparation outcome.** The assistant created an isolated local development
+snapshot and VS Code profile, tested the exact saved-project command, and opened
+Main.rvn. The initial ArrayList/Option/Result program executed with expected output.
+Headless editor checks passed across the current target APIs; actual VS Code logs
+confirm the selected server started and opened the demo. This is a local snapshot,
+not a release. Instructions and reproducible tooling are in the
+[local build guide](raven-port-local-build.md). The broad final runtime run remains
+open until its result is recorded below.
+
 **String/Error slice.** Raven sources now own both method surfaces, with explicit
 importer checks for intrinsic storage, mixed String receivers and opaque Error
 receivers. Native ownership and the existing parameter metadata remain unchanged.

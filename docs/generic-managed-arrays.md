@@ -83,7 +83,7 @@ include Empty and ForEach. Installed SDKs and extensions are not refreshed by th
 source slice.
 
 To exercise the source integration, use experimental Raven `8823261b6` or later
-on `codex/neoclr-namespace-metadata`:
+on `neoclr`:
 
 ```sh
 dotnet build docs/experiments/raven-target/Probe.csproj \

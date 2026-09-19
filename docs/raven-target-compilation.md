@@ -1,6 +1,6 @@
 # Normal Raven compilation and independent neoCLR import
 
-Source experiment, 2026-09-14. Requires Raven branch `codex/neoclr-namespace-metadata`
+Source experiment, 2026-09-14. Requires Raven branch `neoclr`
 and the matching neoCLR source tools. Installed .12 SDK/extension/bundle artifacts
 are unchanged. The runtime library migration remains paused.
 

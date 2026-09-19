@@ -2,7 +2,7 @@
 
 Development validation on 2026-09-19. This records the API-preserving source port;
 proposal API alignment and the System.Runtime assembly identity remain subsequent
-work. [Authoring status](raven-system-library.md) explicitly lists unported sources.
+work. [Authoring status](raven-system-library.md) records the completed source boundary.
 A runnable library and complete Raven source ownership are separate checks.
 
 ## String/Error follow-up
@@ -145,7 +145,7 @@ results below remain a separate acceptance gate.
 ## Reproduce the program gate
 
 Use the neoCLR feature compiler, built from the Raven repository's
-`codex/neoclr-namespace-metadata` branch. General compiler fixes are developed and
+`neoclr` branch. General compiler fixes are developed and
 validated independently against normal .NET metadata before entering Raven main.
 Set `RAVEN_ROOT` to that feature checkout; commands below run from neoCLR's root.
 
@@ -282,13 +282,32 @@ pass on main, including observable execution and conditional/deferred negative c
 The correction covers direct invocation expressions, not a redesign of all nested
 expression flow analysis. It adds no Runtime Contract option.
 
+The final review integrated editor reference isolation on main (`6c2ccb13e`):
+65 workspace integration tests pass with ordinary .NET references. Before the fix,
+the editor injected Raven host support assemblies despite explicit metadata import.
+No new Runtime Contract setting or neoCLR policy was added.
+
+Direct value deconstruction is a correctness fix, not merely an optimization:
+a reduced ordinary .NET ref-struct pattern threw InvalidProgramException before
+main `f7f3f0c6d`. All 31 focused cases pass on main and neoclr, including value-copy
+mutation and narrowed/null reference inputs. The existing general path remains for
+type parameters; no broader generic ref-struct capability is claimed. The current
+.NET [ref struct restriction](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/ref-struct)
+forbids boxing; source pattern semantics remain unchanged.
+
+The remaining production differences are target array shape/covariance and their
+project options, nominal Void value positions, target propagation, and context-owned
+typeof. The project service already enforces explicit reference isolation on main;
+the feature's extra evaluator guard was redundant. All 47 main and 52 neoclr
+project-system checks pass after retaining both unit and array policy coverage. These target policies and their
+fixtures stay on neoclr. The branches were not merged wholesale.
+
+The eight temporary fix branches created during the port were removed after checking
+that their commits are ancestors of main. The integration branch was renamed to
+`neoclr` as requested. Existing main, dev and old/* branches were preserved.
+
 General candidates requiring independent validation remain explicit:
 
-- Direct value deconstruction without boxing: an emission optimization on the
-  experimental branch; independently test value-copy/mutation and narrowed/null
-  paths before moving it to main.
-- Language-server reference injection under explicit metadata selection: verify
-  normal project/editor contracts before extracting the experimental guards.
 - Compound parenthesized comparison conditions: the previously recorded
   [parser candidate](raven-target-evaluation.md#deferred-general-parser-candidate--2026-09-15)
   remains deferred; this port uses existing valid guard syntax.
