@@ -101,6 +101,33 @@ GenericArity may be cheap while Methods, Interfaces and Attributes require resol
 The model describes semantics, not materialization cost. Allocation, caching and
 retention guarantees must be specified and measured rather than inferred from names.
 
+## Sealed model decision — 2026-09-19
+
+The author selected a sealed introspection hierarchy for the current development
+stage, using Raven's support for sealed interfaces. The Info interfaces are public
+but closed to external implementations. Runtime*Info providers remain internal;
+concrete providers are sealed leaves, and the shared runtime member base belongs
+to a closed hierarchy. No additional universal Info base is introduced merely to
+express this policy. Future AssemblyInfo and ModuleInfo contracts follow the same
+closed-model direction.
+
+This supersedes the assistant's in-progress open-interface sample and its proposed
+external implementation check. Future metadata/Emit providers require an intentional
+extension to the permitted family. The benefit is a controlled set of representations
+while runtime identity and lifetime contracts are developing; the cost is reduced
+third-party extensibility and a compatibility change when the permitted family grows.
+Structural use of Info interfaces remains independent of dynamic invocation.
+
+Raven's closed interfaces use permitted-type custom metadata rather than the CLI
+Sealed bit. The reference assembly must preserve that metadata and include internal
+permitted-type definitions for the compiler to resolve, without exposing them as
+public API. Compare Raven's
+[sealed hierarchy specification](https://github.com/marinasundstrom/raven/blob/main/docs/lang/spec/inheritance-and-partial-types.md#sealed-hierarchies-and-permits):
+ordinary CLR interfaces do not enforce this language-level closure for C# callers.
+The neoCLR target importer must independently reject external implementations of
+these known model contracts and validate the admitted provider family. This does
+not add general closed-hierarchy enforcement to raw neoIL metadata or execution.
+
 ## Collection return contracts under review — 2026-09-19
 
 The author asked whether APIs should return arrays at all, or a suitable interface

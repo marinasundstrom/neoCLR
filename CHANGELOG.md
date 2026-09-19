@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Record the author's selected sealed Info hierarchy, replacing the proposed open
+  implementation model. Permitted runtime providers remain internal; collection
+  return contracts and RuntimeContext implementation are separate work.
+
 - Record the open collection-return question and propose capability-based interfaces,
   with Sequence<T> a candidate for materialized introspection results. Distinguish
   read-only views from immutable snapshots; no array-return policy is implemented.

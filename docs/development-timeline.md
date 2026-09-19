@@ -25,6 +25,19 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-19 — Seal the introspection model
+
+**Author decision.** “At the moment, we will model the introspection model as a
+sealed hierarchy, which Raven supports also for interfaces.”
+
+**Assistant response and action.** Changed the in-progress public Info declarations
+to sealed interfaces and internal providers to closed families/leaves. Replaced the
+proposed external-provider sample with a rejection case, and began preserving and
+checking Raven's permitted-type metadata in the target reference. Recorded the
+extensibility tradeoff and the distinction between Raven/importer enforcement and
+raw neoIL runtime enforcement in the [design](introspection-design.md). This decision
+does not settle the separate collection-return question or complete RuntimeContext.
+
 ## 2026-09-19 — Collection interfaces versus array results
 
 **Author question.** During the Info-interface migration, the author asked whether
