@@ -25,7 +25,7 @@
   <div class="feature-layout">
     <aside class="feature-toc" aria-label="On this page">
       <p class="eyebrow">ON THIS PAGE</p>
-      <nav aria-label="Feature sections"><a href="#walkthrough">01 · Get a type description</a><a href="#context">02 · Explore the context</a><a href="#tokens">03 · Identify a definition</a><a href="#collections">04 · Read a sequence</a><a href="#members">05 · Match member kinds</a><a href="#try">Run the complete example</a><a href="#design">Design choices</a><a href="#limits">Current limits</a><a href="#feedback">Questions for evaluators</a></nav>
+      <nav aria-label="Feature sections"><a href="#walkthrough">01 · Get a type description</a><a href="#context">02 · Explore the context</a><a href="#tokens">03 · Identify a definition</a><a href="#collections">04 · Read a sequence</a><a href="#members">05 · Match member kinds</a><a href="#try">Run the complete example</a><a href="#design">Design choices</a><a href="#limits">Current limits</a><a href="#direction">Where we’re heading</a><a href="#feedback">Questions for evaluators</a></nav>
     </aside>
     <article class="feature-body">
       <section id="walkthrough">
@@ -82,6 +82,11 @@
         <p class="eyebrow">PREVIEW BOUNDARY</p><h2>Discovery is the current scope.</h2>
         <ul><li>There is one loaded-program context. Dynamic assembly loading and resolution belong to future RuntimeContext work.</li><li>Queries cover retained metadata. Application property projection and generic method-definition reflection remain limited.</li><li>Open generic definitions can report identity, shape, arguments, tokens and module. Their member, base-type and interface queries require a closed type and fault otherwise.</li><li>Dynamic invocation, emit and offline metadata contexts remain future work. TypeInfo is part of the sealed MemberInfo hierarchy.</li></ul>
         <p>The Introspection story closes at this boundary for now. The next slice is described in the <a href="../strings/">Strings and UTF-8 guide</a>.</p>
+      </section>
+      <section id="direction">
+        <p class="eyebrow">PROPOSED DIRECTION</p><h2>Where we’re heading.</h2>
+        <p>The aim is one descriptive model that can later support reflection and emit. Dynamic assembly loading belongs with RuntimeContext; offline metadata could use a different resolution context. These are directions to explore, not implemented APIs or release commitments. Identity, resolution and lifetime rules need further work.</p>
+        <a href="../../proposals/#introspection">See the proposals and their tradeoffs →</a>
       </section>
       <section id="feedback" class="feature-feedback">
         <p class="eyebrow">HELP SHAPE THE NEXT PREVIEW</p><h2>What would you try next?</h2>

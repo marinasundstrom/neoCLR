@@ -119,7 +119,7 @@ def main():
     for name in ('library-introspection-tour.rvn', 'library-introspection-tour.expected.txt', 'library-utf8.rvn', 'library-utf8.expected.txt'):
         shutil.copyfile(ROOT / raven / name, downloads / name)
     pages = {}
-    for source in sorted([SOURCE / 'index.html', *(SOURCE / 'features').rglob('*.html')]):
+    for source in sorted(SOURCE.rglob('*.html')):
         relative = source.relative_to(SOURCE)
         target = OUTPUT / relative
         target.parent.mkdir(parents=True, exist_ok=True)

@@ -25,7 +25,7 @@
   <div class="feature-layout">
     <aside class="feature-toc" aria-label="On this page">
       <p class="eyebrow">CURRENT STATE</p>
-      <nav aria-label="Feature sections"><a href="#conversion">A working example</a><a href="#try">Try it</a><a href="#feedback">Open questions</a></nav>
+      <nav aria-label="Feature sections"><a href="#conversion">A working example</a><a href="#try">Try it</a><a href="#direction">Where we’re heading</a><a href="#feedback">Open questions</a></nav>
     </aside>
     <article class="feature-body">
       <section id="conversion">
@@ -40,12 +40,13 @@
         <div class="example-links"><a href="../../samples/library-utf8.rvn" download>Download Raven source</a><a href="../../samples/library-utf8.expected.txt" download>Download expected output</a><a href="https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/raven-target/VSCODE.md">Toolchain setup →</a></div>
         <p>The downloadable source and expected output are the same files used by the saved-project integration check.</p>
       </section>
-      <section id="limits">
-        <p class="eyebrow">SMALL SCOPE</p><h2>The broader text design stays open.</h2>
-        <p>This slice adds explicit conversion and makes IsEmpty a property. Char and ordinal comparison retain their existing behavior. There is no specialized Utf8String or general Encoding hierarchy.</p>
+      <section id="direction">
+        <p class="eyebrow">SMALL SCOPE</p><h2>Where we’re heading.</h2>
+        <p>The immediate aim is a small usable String API. Possible follow-ups include scalar iteration, grapheme-aware operations and UTF-16 interchange. Char and ordinal comparison retain their current behavior; specialized string types and an Encoding hierarchy are deferred.</p>
         <p>.NET offers configurable UTF-8 decoding, including a strict mode. This implementation starts with a strict Result and Sequence-based byte access. Whether those are the right long-term contracts is open for feedback.</p>
         <a class="text-link" href="https://github.com/marinasundstrom/neoCLR/blob/main/docs/raven-string-api.md">Implementation details, tests and design comparisons →</a>
       </section>
+        <p><a href="../../proposals/#text">See the broader proposals and open questions →</a></p>
       <section id="feedback" class="feature-feedback">
         <p class="eyebrow">OPEN QUESTIONS</p><h2>What should change?</h2>
         <ul><li>Is strict Result-based decoding useful for your input format?</li><li>Do you need an invalid-byte offset or streaming before you can use it?</li><li>Does Sequence provide enough access for your byte-processing code?</li><li>Which operation needs scalars or graphemes rather than bytes?</li></ul>

@@ -4269,3 +4269,9 @@ shortened the String page to one executable conversion example, linked detailed
 tests and documented provisional status. The author then proposed a separate
 summary page for proposals, with feature-specific future-direction sections.
 That overview is the following documentation slice, separate from shipped behavior.
+
+The proposal overview is now implemented at `website/proposals/index.html`, with
+links from the homepage and feature pages. It summarizes existing design records,
+labels current foundations separately and records costs and unresolved questions.
+String and Introspection pages now have short future-direction sections. This
+changes documentation only and does not promote proposals into implemented APIs.
