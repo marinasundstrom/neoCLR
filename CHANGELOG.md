@@ -17,7 +17,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   experiment does not introduce a public Task<T> or generated async/await support.
   Specify exception-free target lowering: Result errors complete tasks as values,
   Faults remain terminal, and Raven must omit its generated catch wrapper rather
-  than merely omit SetException. Record cleanup and .NET regression requirements.
+  than merely omit SetException. Record cleanup and .NET regression requirements,
+  with the current CreateMoveNextBody entry point identified for integration.
 
 - Port 25 Option/Result operator overloads from Raven.Core to the development
   library, including transformations, recovery, branch actions, conversions and
