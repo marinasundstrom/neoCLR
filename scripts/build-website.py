@@ -100,6 +100,9 @@ def main():
         'TEXT_SAMPLE': (raven + 'library-string-slices.rvn', 'func Extract', '\n}', True),
         'QUERY_SAMPLE': (raven + 'library-query-terminals.rvn', 'func OnlyPositive', '\n}', True),
     }
+    samples.update({
+        'UTF8_ROUNDTRIP': (raven + 'library-utf8.rvn', 'func RoundTrip', '\n}', True),
+    })
     tour = raven + 'library-introspection-tour.rvn'
     samples.update({
         'TOUR_ACQUISITION': (tour, '    let widget:', '\n    let assembly', False),
@@ -113,7 +116,7 @@ def main():
     output_text = escape((ROOT / (raven + 'library-introspection-tour.expected.txt')).read_text().rstrip())
     downloads = OUTPUT / 'samples'
     downloads.mkdir()
-    for name in ('library-introspection-tour.rvn', 'library-introspection-tour.expected.txt'):
+    for name in ('library-introspection-tour.rvn', 'library-introspection-tour.expected.txt', 'library-utf8.rvn', 'library-utf8.expected.txt'):
         shutil.copyfile(ROOT / raven / name, downloads / name)
     pages = {}
     for source in sorted([SOURCE / 'index.html', *(SOURCE / 'features').rglob('*.html')]):

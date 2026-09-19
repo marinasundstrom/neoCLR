@@ -4259,3 +4259,13 @@ Char's code-unit behavior and deferring Encoding and specialized Utf8String type
 The implementation and tradeoffs are recorded in [the String integration notes](raven-string-api.md).
 The author's last source-keyword correction remains unit mapped to System.Void;
 this slice makes no keyword change. A String feature page follows separately.
+
+### Feature pages as implementation notes
+
+The author emphasized that the API should stay minimal, demonstrate working
+behavior and remain open to input. A feature page need not show everything and
+should describe the current implementation, which may change. The assistant
+shortened the String page to one executable conversion example, linked detailed
+tests and documented provisional status. The author then proposed a separate
+summary page for proposals, with feature-specific future-direction sections.
+That overview is the following documentation slice, separate from shipped behavior.

@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Add a concise String/UTF-8 implementation page with one executable example,
+  downloadable checks and explicit open-design status. Keep detailed edge cases
+  in technical docs and tests. Correct the Introspection page's stale hierarchy
+  limitation. Three site pages build with checked local links and source excerpts.
+
 - Add System.Text.Utf8.Encode(String) → Sequence<Byte> and strict
   Decode(Sequence<Byte>) → Result<String,InvalidUtf8Error>. Preserve BOM, NUL and
   normalization forms; reject malformed UTF-8 without replacement. Conversion
