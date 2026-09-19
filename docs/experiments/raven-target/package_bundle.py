@@ -8,6 +8,7 @@ import hashlib
 import json
 import platform
 import sys
+import xml.etree.ElementTree as ET
 from pathlib import Path
 import shutil
 import subprocess
@@ -61,7 +62,21 @@ for name in ('runtime-api-inventory.json', 'runtime-api-coverage.json', 'RELEASI
     shutil.copyfile(HERE / name, output / 'docs/experiments/raven-target' / name)
 for name in ('README.md', 'configure.py'):
     shutil.copyfile(HERE / 'bundle' / name, output / name)
-shutil.copyfile(HERE / 'bundle/Demo.rvnproj', output / 'demo/Demo.rvnproj')
+# Verification copies this advanced runner project into temporary directories.
+# Materialize its current contracts from the shared props without a relative import.
+runner = ET.Element('Project')
+properties = ET.SubElement(runner, 'PropertyGroup')
+ET.SubElement(properties, 'OutputType').text = 'Exe'
+for group in ET.parse(ROOT / 'build/NeoCLR.Raven.props').getroot().findall('PropertyGroup'):
+    for prop in group:
+        if prop.tag.startswith('Raven') or prop.tag == 'ImplicitImports':
+            properties.append(ET.fromstring(ET.tostring(prop)))
+items = ET.SubElement(runner, 'ItemGroup')
+ET.SubElement(items, 'Compile', Include='Main.rvn')
+reference = ET.SubElement(items, 'Reference', Include='NeoCLR.CoreProbe')
+ET.SubElement(reference, 'HintPath').text = 'NeoCLR.CoreProbe.dll'
+ET.indent(runner, space='  ')
+ET.ElementTree(runner).write(output / 'demo/Demo.rvnproj', encoding='unicode')
 shutil.copyfile(HERE / 'samples/library-propagation-workflow.rvn', output / 'demo/Main.rvn')
 shutil.copytree(ROOT / 'build', output / 'build')
 shutil.copytree(HERE / 'msbuild-library', output / 'project-reference-demo')

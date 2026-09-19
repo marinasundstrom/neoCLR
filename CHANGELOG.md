@@ -13,7 +13,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   calendar test's newline-dependent mutation and strict-Clippy test issues;
   document the independent parameter tables at the Introspection helper boundary.
   Select the release scope/date and keep actual publication evidence in the manifest;
-  exact-candidate validation and publication are pending.
+  exact-candidate validation and publication are pending. Generate the advanced
+  runner fixture from shared props with inline contracts, so packaged verification
+  can copy it to a temporary directory without breaking relative imports.
 
 ## 0.1.0-preview.8 — 2026-09-19
 
