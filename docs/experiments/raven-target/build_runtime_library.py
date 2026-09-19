@@ -10,6 +10,8 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    'Option': 'System.Option',
+    'Result': 'System.Result',
     'Propagatable': 'System.Propagatable',
     'IntegerDivisionError': 'System.IntegerDivisionError',
     'SingleError': 'System.Linq.SingleError',
@@ -78,6 +80,8 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    'Option': 'runtime/raven/src/System/Option.rvn',
+    'Result': 'runtime/raven/src/System/Result.rvn',
     'Propagatable': 'runtime/raven/src/System/Propagatable.rvn',
     'IntegerDivisionError': 'runtime/raven/src/System/IntegerDivisionError.rvn',
     'SingleError': 'runtime/raven/src/System/Linq/SingleError.rvn',
@@ -171,7 +175,7 @@ def fragments(text, name="Math", owner="System.Math"):
             else:
                 raise ValueError('Unclosed private implementation type')
             body = ''.join(lines[:index + 1])
-            if lines[0].startswith(('.type class ' + owner + '<', '.interface ' + owner + '<')) or lines[0].strip() in ('.type ' + owner, '.interface ' + owner):
+            if lines[0].startswith(('.type class ' + owner + '<', '.type ' + owner + '<', '.interface ' + owner + '<')) or lines[0].strip() in ('.type ' + owner, '.interface ' + owner):
                 methods.append(body)
             else:
                 types.append(body)

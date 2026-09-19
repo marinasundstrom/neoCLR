@@ -119,7 +119,7 @@ if (args.Length == 2 && args[0] == "--reference-core")
 if (args.Length == 5 && args[0] == "--library-implementation")
 {
     try { LibraryImplementation.Write(args[1], args[2], args[3], args[4]); }
-    catch (Exception error) { Console.Error.WriteLine(error.Message); Environment.ExitCode = 1; }
+    catch (Exception error) { Console.Error.WriteLine(Environment.GetEnvironmentVariable("NEOCLR_IMPORT_TRACE") == "1" ? error.ToString() : error.Message); Environment.ExitCode = 1; }
     return;
 }
 

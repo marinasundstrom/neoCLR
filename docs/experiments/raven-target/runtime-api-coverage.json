@@ -1,6 +1,6 @@
 {
   "purpose": "Explicit source-by-source API audit. Samples and signature checks are evidence, not a claim of arbitrary generic/compiler support.",
-  "declarationCount": 756,
+  "declarationCount": 770,
   "sources": [
     {
       "file": "runtime/System/Equatable.neoil",
@@ -935,26 +935,68 @@
       ]
     },
     {
-      "file": "runtime/System/Option.neoil",
-      "declarations": 22,
-      "disposition": "unions",
+      "file": "runtime/raven/generated/Option.methods.neoil",
+      "declarations": 15,
+      "disposition": "raven-authored-generic-union",
       "samples": [
-        "library-case-payloads.rvn",
         "library-unions.rvn",
-        "library-result-void-propagation.rvn",
-        "library-reference-payloads.rvn"
-      ]
+        "library-generic-unions.rvn",
+        "library-result-void-propagation.rvn"
+      ],
+      "tests": [
+        "tests/propagation.rs",
+        "tests/union_out.rs",
+        "docs/experiments/raven-target/verify_generic_union_library.py"
+      ],
+      "note": "Raven owns cases, one erased carrier payload, factories and extraction. Checked constructor/readonly receiver projections and literal Boolean returns retain true-only output assignment. Bootstrap-only LeaveUnassigned is restricted to immediate false returns."
     },
     {
-      "file": "runtime/System/Result.neoil",
-      "declarations": 29,
-      "disposition": "unions",
+      "file": "runtime/raven/generated/Option.helpers.neoil",
+      "declarations": 13,
+      "disposition": "raven-authored-generic-union",
       "samples": [
-        "library-case-payloads.rvn",
         "library-unions.rvn",
-        "library-result-void-propagation.rvn",
-        "library-reference-payloads.rvn"
-      ]
+        "library-generic-unions.rvn",
+        "library-result-void-propagation.rvn"
+      ],
+      "tests": [
+        "tests/propagation.rs",
+        "tests/union_out.rs",
+        "docs/experiments/raven-target/verify_generic_union_library.py"
+      ],
+      "note": "Raven owns cases, one erased carrier payload, factories and extraction. Checked constructor/readonly receiver projections and literal Boolean returns retain true-only output assignment. Bootstrap-only LeaveUnassigned is restricted to immediate false returns."
+    },
+    {
+      "file": "runtime/raven/generated/Result.methods.neoil",
+      "declarations": 19,
+      "disposition": "raven-authored-generic-union",
+      "samples": [
+        "library-unions.rvn",
+        "library-generic-unions.rvn",
+        "library-result-void-propagation.rvn"
+      ],
+      "tests": [
+        "tests/propagation.rs",
+        "tests/union_out.rs",
+        "docs/experiments/raven-target/verify_generic_union_library.py"
+      ],
+      "note": "Raven owns cases, one erased carrier payload, factories and extraction. Checked constructor/readonly receiver projections and literal Boolean returns retain true-only output assignment. Bootstrap-only LeaveUnassigned is restricted to immediate false returns."
+    },
+    {
+      "file": "runtime/raven/generated/Result.helpers.neoil",
+      "declarations": 18,
+      "disposition": "raven-authored-generic-union",
+      "samples": [
+        "library-unions.rvn",
+        "library-generic-unions.rvn",
+        "library-result-void-propagation.rvn"
+      ],
+      "tests": [
+        "tests/propagation.rs",
+        "tests/union_out.rs",
+        "docs/experiments/raven-target/verify_generic_union_library.py"
+      ],
+      "note": "Raven owns cases, one erased carrier payload, factories and extraction. Checked constructor/readonly receiver projections and literal Boolean returns retain true-only output assignment. Bootstrap-only LeaveUnassigned is restricted to immediate false returns."
     },
     {
       "file": "runtime/raven/generated/Int32ParseError.methods.neoil",

@@ -1,0 +1,88 @@
+namespace System
+
+import System.Runtime.CompilerServices.ValueStorage
+
+public static class Result {
+    public struct Ok<T> {
+        private field Stored: T
+        init(value: T) {
+            Stored = value
+        }
+        val Value: T { get => Stored }
+    }
+    public struct Error<E> {
+        private field Stored: E
+        init(value: E) {
+            Stored = value
+        }
+        val Value: E { get => Stored }
+    }
+}
+
+public struct Result<T, E> : Propagatable<Result<T, E>, T, E> {
+    private field Stored: System.Value
+
+    static func Ok(value: T) -> Result<T, E> {
+        return System.Result<T, E>(System.Result.Ok<T>(value))
+    }
+    static func Error(error: E) -> Result<T, E> {
+        return System.Result<T, E>(System.Result.Error<E>(error))
+    }
+
+    init(value: System.Result.Ok<T>) {
+        Stored = ValueStorage.Pack(value)
+    }
+    val IsOk: bool { get => ValueStorage.Is<System.Result.Ok<T>>(Stored) }
+    func GetOkCase() -> System.Result.Ok<T> {
+        return ValueStorage.Unpack<System.Result.Ok<T>>(Stored)
+    }
+    func TryGet(out value: System.Result.Ok<T>) -> bool {
+        if IsOk {
+            value = GetOkCase()
+            return true
+        }
+        ValueStorage.LeaveUnassigned(out value)
+        return false
+    }
+
+    init(value: System.Result.Error<E>) {
+        Stored = ValueStorage.Pack(value)
+    }
+    val IsErr: bool { get => ValueStorage.Is<System.Result.Error<E>>(Stored) }
+    func GetErrorCase() -> System.Result.Error<E> {
+        return ValueStorage.Unpack<System.Result.Error<E>>(Stored)
+    }
+    func TryGet(out value: System.Result.Error<E>) -> bool {
+        if IsErr {
+            value = GetErrorCase()
+            return true
+        }
+        ValueStorage.LeaveUnassigned(out value)
+        return false
+    }
+
+    val IsOkCase: bool { get => IsOk }
+    val IsErrorCase: bool { get => IsErr }
+
+    func TryGetOutput(out output: T) -> bool {
+        if IsOk {
+            output = GetOkCase().Value
+            return true
+        }
+        ValueStorage.LeaveUnassigned(out output)
+        return false
+    }
+
+    func TryGetResidual(out residual: E) -> bool {
+        if IsErr {
+            residual = GetErrorCase().Value
+            return true
+        }
+        ValueStorage.LeaveUnassigned(out residual)
+        return false
+    }
+
+    static func FromResidual(residual: E) -> Result<T, E> {
+        return System.Result<T, E>.Error(residual)
+    }
+}

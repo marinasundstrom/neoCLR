@@ -49,10 +49,12 @@ static class VoidProjection
         foreach (var type in module.GetTypes())
         {
             Visit(type.BaseType);
+            foreach (var contract in type.Interfaces) Visit(contract.InterfaceType);
             foreach (var field in type.Fields) Visit(field.FieldType);
             foreach (var method in type.Methods)
             {
                 Method(method);
+                foreach (var implemented in method.Overrides) Method(implemented);
                 if (!method.HasBody) continue;
                 foreach (var variable in method.Body.Variables) variable.VariableType = Storage(variable.VariableType);
                 foreach (var instruction in method.Body.Instructions)

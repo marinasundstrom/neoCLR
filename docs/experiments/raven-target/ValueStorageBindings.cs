@@ -8,6 +8,7 @@ static class ValueStorageBindings
     public const string Declarations = """
         namespace Runtime.CompilerServices {
             public static class ValueStorage {
+                public static void LeaveUnassigned<T>(out T value) { value = default; }
                 public static Value Pack<T>(T value) => default;
                 public static bool Is<T>(Value value) => default;
                 public static T Unpack<T>(Value value) => default;
@@ -24,9 +25,10 @@ static class ValueStorageBindings
             throw new InvalidDataException("Unsupported case storage intrinsic.");
         var argument = method.GenericArguments[0];
         var element = map(argument);
-        if (!ErrorBindings.Cases.Any(c => c.Value.Any(n => element == c.Key + "." + n))
+        var unionCase = element == "System.Option.None" || element.StartsWith("System.Option.Some<", StringComparison.Ordinal) || element.StartsWith("System.Result.Ok<", StringComparison.Ordinal) || element.StartsWith("System.Result.Error<", StringComparison.Ordinal);
+        if (!(unionCase || ErrorBindings.Cases.Any(c => c.Value.Any(n => element == c.Key + "." + n)))
             || !(RuntimeSignatures.IsCore(argument.Scope)
-                || ApplicationTypes.IsLibrary(argument) && ErrorCarrierLibrary.IsCase(argument.Resolve())))
+                || ApplicationTypes.IsLibrary(argument) && (ErrorCarrierLibrary.IsCase(argument.Resolve()) || GenericUnionLibrary.IsCase(argument.Resolve()))))
             throw new InvalidDataException("Unsupported case storage payload.");
         var signature = RuntimeSignatures.Match(reference, definition, t => map(t), allowOpenMethodParameters: true);
         var expected = reference.Name switch {

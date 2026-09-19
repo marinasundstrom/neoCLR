@@ -1,0 +1,254 @@
+; Generated from runtime/raven/src/System/Option.rvn. Regenerate with build_runtime_library.py.
+.type System.Option
+.end
+.type System.Option<T0>
+.custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
+.implements System.Propagatable<System.Option<T0>,T0,Void>
+.field private Stored Value
+.property instance IsNone() -> Boolean
+.get instance System.Option<T0>::get_IsNone()
+.end
+.property instance IsSome() -> Boolean
+.get instance System.Option<T0>::get_IsSome()
+.end
+.method instance .ctor(System.Option.None value) -> Void
+ldarg value
+value.pack System.Option.None
+newobj System.Option<T0>
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsNone() -> Boolean
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+ldfld System.Option<T0>::Stored
+M00000005_IL_0008:
+value.is System.Option.None
+call neoCLR.Library.System.Option.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_000d:
+call neoCLR.Library.System.Option.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetNoneCase() -> System.Option.None
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+ldfld System.Option<T0>::Stored
+M00000006_IL_0008:
+value.unpack System.Option.None
+M00000006_IL_000d:
+ret
+.end
+.method instance TryGet(out(true) System.Option.None& destination) -> Boolean
+M00000007_IL_0000:
+M00000007_IL_0001:
+M00000007_IL_0002:
+ldarg 0
+M00000007_IL_0003:
+call instance System.Option<T0>::get_IsNone()
+call neoCLR.Library.System.Option.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0008:
+brtrue M00000007_IL_0012
+M00000007_IL_000d:
+br M00000007_IL_0022
+M00000007_IL_0012:
+M00000007_IL_0013:
+ldarg 1
+M00000007_IL_0014:
+ldarg 0
+M00000007_IL_0015:
+call instance System.Option<T0>::GetNoneCase()
+M00000007_IL_001a:
+stobj System.Option.None
+M00000007_IL_001f:
+M00000007_IL_0020:
+ldc.bool true
+M00000007_IL_0021:
+ret
+M00000007_IL_0022:
+M00000007_IL_0023:
+M00000007_IL_0024:
+ldarg 1
+M00000007_IL_0025:
+pop
+M00000007_IL_002a:
+M00000007_IL_002b:
+ldc.bool false
+M00000007_IL_002c:
+ret
+.end
+.method instance .ctor(System.Option.Some<T0> value) -> Void
+ldarg value
+value.pack System.Option.Some<T0>
+newobj System.Option<T0>
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsSome() -> Boolean
+M00000009_IL_0000:
+M00000009_IL_0001:
+M00000009_IL_0002:
+ldarg 0
+M00000009_IL_0003:
+ldfld System.Option<T0>::Stored
+M00000009_IL_0008:
+value.is System.Option.Some<T0>
+call neoCLR.Library.System.Option.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_000d:
+call neoCLR.Library.System.Option.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetSomeCase() -> System.Option.Some<T0>
+M0000000a_IL_0000:
+M0000000a_IL_0001:
+M0000000a_IL_0002:
+ldarg 0
+M0000000a_IL_0003:
+ldfld System.Option<T0>::Stored
+M0000000a_IL_0008:
+value.unpack System.Option.Some<T0>
+M0000000a_IL_000d:
+ret
+.end
+.method instance TryGet(out(true) System.Option.Some<T0>& destination) -> Boolean
+M0000000b_IL_0000:
+M0000000b_IL_0001:
+M0000000b_IL_0002:
+ldarg 0
+M0000000b_IL_0003:
+call instance System.Option<T0>::get_IsSome()
+call neoCLR.Library.System.Option.RuntimeBooleanToInt32(Boolean)
+M0000000b_IL_0008:
+brtrue M0000000b_IL_0012
+M0000000b_IL_000d:
+br M0000000b_IL_0022
+M0000000b_IL_0012:
+M0000000b_IL_0013:
+ldarg 1
+M0000000b_IL_0014:
+ldarg 0
+M0000000b_IL_0015:
+call instance System.Option<T0>::GetSomeCase()
+M0000000b_IL_001a:
+stobj System.Option.Some<T0>
+M0000000b_IL_001f:
+M0000000b_IL_0020:
+ldc.bool true
+M0000000b_IL_0021:
+ret
+M0000000b_IL_0022:
+M0000000b_IL_0023:
+M0000000b_IL_0024:
+ldarg 1
+M0000000b_IL_0025:
+pop
+M0000000b_IL_002a:
+M0000000b_IL_002b:
+ldc.bool false
+M0000000b_IL_002c:
+ret
+.end
+.method instance readonly byref TryGetOutput(out(true) T0& destination) -> Boolean
+.local System.Option.Some<T0> local0
+M0000000c_IL_0000:
+M0000000c_IL_0001:
+M0000000c_IL_0002:
+ldarg 0
+M0000000c_IL_0003:
+call neoCLR.Library.System.Option.RuntimeCliCall0<T0>(System.Option<T0>&)
+call neoCLR.Library.System.Option.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_0008:
+brtrue M0000000c_IL_0012
+M0000000c_IL_000d:
+br M0000000c_IL_002a
+M0000000c_IL_0012:
+M0000000c_IL_0013:
+ldarg 1
+M0000000c_IL_0014:
+ldarg 0
+M0000000c_IL_0015:
+call neoCLR.Library.System.Option.RuntimeCliCall1<T0>(System.Option<T0>&)
+M0000000c_IL_001a:
+stloc local0
+M0000000c_IL_001b:
+ldloca local0
+M0000000c_IL_001d:
+call neoCLR.Library.System.Option.RuntimeCliCall2<T0>(System.Option.Some<T0>&)
+M0000000c_IL_0022:
+stobj T0
+M0000000c_IL_0027:
+M0000000c_IL_0028:
+ldc.bool true
+M0000000c_IL_0029:
+ret
+M0000000c_IL_002a:
+M0000000c_IL_002b:
+M0000000c_IL_002c:
+ldarg 1
+M0000000c_IL_002d:
+pop
+M0000000c_IL_0032:
+M0000000c_IL_0033:
+ldc.bool false
+M0000000c_IL_0034:
+ret
+.end
+.method instance readonly byref TryGetResidual(out(true) Void& destination) -> Boolean
+.local Void local0
+M0000000d_IL_0000:
+M0000000d_IL_0001:
+M0000000d_IL_0002:
+ldarg 0
+M0000000d_IL_0003:
+call neoCLR.Library.System.Option.RuntimeCliCall3<T0>(System.Option<T0>&)
+call neoCLR.Library.System.Option.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_0008:
+brtrue M0000000d_IL_0012
+M0000000d_IL_000d:
+br M0000000d_IL_002a
+M0000000d_IL_0012:
+M0000000d_IL_0013:
+ldarg 1
+M0000000d_IL_0014:
+ldloca local0
+M0000000d_IL_0018:
+ldvoid
+stobj Void
+M0000000d_IL_001e:
+ldloc local0
+M0000000d_IL_0022:
+stobj Void
+M0000000d_IL_0027:
+M0000000d_IL_0028:
+ldc.bool true
+M0000000d_IL_0029:
+ret
+M0000000d_IL_002a:
+M0000000d_IL_002b:
+M0000000d_IL_002c:
+ldarg 1
+M0000000d_IL_002d:
+pop
+M0000000d_IL_0032:
+M0000000d_IL_0033:
+ldc.bool false
+M0000000d_IL_0034:
+ret
+.end
+.method static FromResidual(Void residual) -> System.Option<T0>
+M0000000e_IL_0000:
+M0000000e_IL_0001:
+newobj instance System.Option.None::.ctor()
+M0000000e_IL_0006:
+newobj instance System.Option<T0>::.ctor(System.Option.None)
+M0000000e_IL_000b:
+ret
+.end
+.end

@@ -42,6 +42,16 @@ out metadata, payload positions and method names. No carrier body changes in thi
 slice. All 20 Rust propagation/union-output/generic-bound tests pass, including
 non-overwriting misses and unproven-read rejection. Snapshot hashes match.
 
+## Generic union follow-up
+
+Option and Result bring the total to 65 source slices. All 12 admission cases pass,
+including altered cases, constructor side effects, unsupported payloads, invalid
+defaults, changed output names and an unassigned success return. All 41 focused Rust
+error/generic-bound/result-factory/no-result/propagation/union-output tests pass.
+All 64 saved-project cases pass with fresh consumer metadata and the regenerated
+library. Readonly copy adapters retain source receiver promises; failed extraction
+leaves destinations untouched. A final full Rust run remains required.
+
 ## Reproduce the program gate
 
 Use the neoCLR feature compiler, built from the Raven repository's
@@ -135,8 +145,8 @@ because the text assembler does not resolve files. All eight fixture checks pass
 - All 64 saved-project cases pass, including executable API samples, saved edits,
   compiler/import rejection without stale execution, and expected runtime faults.
 
-- All 63 slices compile and import. Inventory/coverage checks pass for 756 candidates
-  and 114 declaring sources. The final clean regeneration gate remains required.
+- All 65 slices compile and import. Inventory/coverage checks pass for 770 candidates
+  and 116 declaring sources. The final clean regeneration gate remains required.
 - All 17 foundation admission cases pass. Clock declaration rejection checks and
   fixed/system-clock execution pass, including host-local time conversion.
 - Controlled process checks pass for fresh/copied arguments, environment values,
@@ -173,6 +183,14 @@ generic managed-array projection/covariance, propagation without CLR exceptions 
 context-owned `typeof`. These remain separate from main. Existing reusable metadata,
 iteration, propagation and unit configuration mechanisms on main do not authorize
 merging the neoCLR branch wholesale.
+
+The Option/Result source work exposed direct out-parameter forwarding being rejected
+as unassigned. A regression using a source generic setter and ordinary .NET Math.DivRem
+failed with RAV0269. General fix `5f6e17347` is on Raven main; feature cherry-pick
+`2d2a1d586` keeps the target isolated. All 41 focused semantic/runtime parameter checks
+pass on main, including observable execution and conditional/deferred negative cases.
+The correction covers direct invocation expressions, not a redesign of all nested
+expression flow analysis. It adds no Runtime Contract option.
 
 General candidates requiring independent validation remain explicit:
 

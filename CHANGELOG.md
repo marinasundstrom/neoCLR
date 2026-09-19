@@ -8,10 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
-- Extend the API-preserving Raven library port from 28 to 63 source slices: generic
+- Extend the API-preserving Raven library port from 28 to 65 source slices: generic
   fundamental/collection contracts, SystemClock/LocalDateTime, native-sized integer
   comparisons, complete Int32 methods, Console, Environment, File.ReadAllText,
-  String, opaque Error, five empty error types, Void, seven typed error carriers and Propagatable. Check intrinsic String storage and mixed receivers,
+  String, opaque Error, five empty error types, Void, seven typed error carriers Propagatable, Option/Result and their cases. Check intrinsic String storage and mixed receivers,
   preserve Error message delegation and runtime-owned payloads, and reject opaque
   allocation/defaults and String storage writes (11 admission cases pass). Preserve
   empty error defaults/constructors and nominal Void with nine further admission
@@ -30,7 +30,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Propagatable now has a checked Raven declaration preserving readonly receivers
   and true-only output initialization; five declaration admission checks and 20
   focused runtime propagation/union-output/generic-bound tests pass.
-  Source migration is still incomplete for generic unions, remaining
+  Extract the ordinary CLI out-forwarding assignment fix onto Raven main
+  (`5f6e17347`; 41 focused parameter checks pass); keep the target on its feature
+  branch with cherry-pick `2d2a1d586`. Port Option/Result storage, factories and
+  conditional extraction with checked generic constructors, readonly copy adapters
+  and literal Boolean return proofs. Twelve admission cases, 41 focused Rust tests
+  and all 64 fresh saved-project cases pass. A bootstrap-only miss intrinsic leaves
+  output untouched; invalid defaults remain rejected.
+  Source migration is still incomplete for remaining
   descriptors and runtime adapters; proposal API alignment remains a subsequent step.
   Pass 64 saved-project compile/import/verify/execute cases and retain native
   failure-status tests. Extract general Raven interface-binding and no-result delegate

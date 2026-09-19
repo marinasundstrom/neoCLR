@@ -38,7 +38,7 @@ static class OpaqueLibrary
             "ContainsOrdinal" or "StartsWithOrdinal" or "EndsWithOrdinal" => "value",
             "SliceUtf8" => index == 0 ? "byteStart" : "byteLength",
             _ => method.Parameters[index].Name
-        } : method.Parameters[index].Name;
+        } : GenericUnionLibrary.IsMatched(method.DeclaringType) && GenericUnionLibrary.IsConditionalOutput(method, method.Parameters[index]) ? "destination" : method.Parameters[index].Name;
     public static void Project(ModuleDefinition module)
     {
         var type = module.GetType("System.String");

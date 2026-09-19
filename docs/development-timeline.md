@@ -97,6 +97,22 @@ checks, 25 focused Rust tests and all 64 saved-program cases pass. Generic union
 descriptors and adapters remain open; continuation and separate commits remain the
 author's instruction.
 
+**Generic-union work in progress.** The propagation declaration is committed separately
+(`49e7307`), with five admission checks and 20 focused runtime checks. Authoring the
+remaining carrier bodies exposed a general Raven out-forwarding diagnostic defect.
+An independent ordinary .NET regression failed before the fix; the assistant reports
+41 checks passing and integrates `5f6e17347` on Raven main, with feature cherry-pick
+`2d2a1d586`. Carrier source migration remains in progress at this entry.
+
+**Generic-union outcome.** Raven source now owns Option/Result carriers and cases
+(65 slices total). The assistant reports 12 admission cases, 41 focused Rust tests
+and all 64 saved-program cases passing. Earlier 14 typed-carrier and 17 foundation
+admission checks still pass. Readonly adapters and literal Boolean return emission
+were corrected during verification. The separate unqualified generic constructor
+lookup investigation reproduces incorrect ordinary .NET execution (0 instead of 42);
+a namespace-arity candidate fix now passes its initial focused checks, with broader
+validation and integration still pending at this entry.
+
 ## 2026-09-17 — Plan the minimal System.Runtime assembly
 
 **Author direction.** Plan a System.Runtime project/assembly supplying the minimal

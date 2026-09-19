@@ -11,7 +11,7 @@ This slice adds Raven sources for the fundamental and collection interfaces,
 SystemClock, LocalDateTime, IntPtr/UIntPtr comparisons, the complete Int32 member
 surface, Console and Environment. File.ReadAllText joins WriteAllText in Raven.
 The follow-up ports String and opaque Error, then five empty error types and Void,
-followed by seven typed error carriers, and the Propagatable declaration, bringing the total to 63 slices.
+followed by seven typed error carriers, and the Propagatable declaration, then Option/Result and their cases, bringing the total to 65 slices.
 The legacy Neo profile retains its receiver/array conventions where it differs;
 the Raven profile selects generated contracts and implementation bodies.
 
@@ -50,7 +50,7 @@ This migration reuses the .NET comparisons in [common interfaces](common-interfa
 additional generated adapters and a larger reachable call graph; no performance
 improvement or new native ABI is claimed.
 
-Remaining handwritten source includes Option/Result, descriptor hierarchy bodies, array/runtime adapters and delegates.
+Remaining handwritten source includes descriptor hierarchy bodies, array/runtime adapters and delegates.
 Native service declarations remain runtime-owned. Generated neoIL remains a build
 artifact rather than a competing implementation. These boundaries are not silently
 claimed to have become Raven source.
@@ -113,11 +113,33 @@ The [propagation contract](propagation-contract.md) explains the .NET ordinary-o
 comparison and why failed extraction must not initialize a destination. This slice
 changes declaration ownership only; carrier bodies follow separately.
 
+Option/Result now own their case storage, constructors, factories, predicates,
+extraction and propagation in Raven. Their checked authoring family includes the
+nongeneric case containers and generic carriers; runtime case fields retain the
+existing public Value identity although Raven uses a private field and getter.
+Compiler-only recognition members in the consumer reference are not runtime exports.
+Generic case/erased-payload constructors are checked before projecting their single
+assignment onto the existing value constructor ABI.
+
+A bootstrap-only LeaveUnassigned(out T) marks a failed extraction in source. The
+importer accepts it only for the current conditional-output parameter followed
+immediately by return false, and discards the address without writing storage.
+Literal Boolean returns remain literals, preserving the runtime verifier's true-only
+assignment proof. Readonly receiver adapters copy values without requiring writable
+references. Invalid generic carrier/case defaults remain unreadable. These rules
+preserve the [existing propagation/.NET comparison](propagation-contract.md), rather
+than introducing a new exception or union API.
+
+The general direct out-forwarding compiler correction is on Raven main (`5f6e17347`)
+and the feature branch (`2d2a1d586`); both pass 41 focused parameter checks. No new
+Runtime Contract setting is introduced. A separately reproduced unqualified generic
+self-constructor lookup problem is still being investigated; source currently uses
+explicit qualification.
+
 The remaining migration gates are substantive work, not just moving files:
 
 | Remaining source | Required implementation admission |
 | --- | --- |
-| Option/Result | Union/case representation, out-parameter contracts and default/case validity |
 | MemberInfo/FieldInfo/MethodInfo/PropertyInfo | Abstract/inherited descriptor layout and runtime snapshot factory compatibility |
 | Array, iterator adapters and Func | Runtime-owned allocation/element access and delegate invocation boundaries |
 

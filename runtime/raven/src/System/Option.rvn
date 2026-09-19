@@ -1,0 +1,72 @@
+namespace System
+
+import System.Runtime.CompilerServices.ValueStorage
+
+public static class Option {
+    public struct None { }
+    public struct Some<T> {
+        private field Stored: T
+        init(value: T) {
+            Stored = value
+        }
+        val Value: T { get => Stored }
+    }
+}
+
+public struct Option<T> : Propagatable<Option<T>, T, System.Void> {
+    private field Stored: System.Value
+
+    init(value: System.Option.None) {
+        Stored = ValueStorage.Pack(value)
+    }
+    val IsNone: bool { get => ValueStorage.Is<System.Option.None>(Stored) }
+    func GetNoneCase() -> System.Option.None {
+        return ValueStorage.Unpack<System.Option.None>(Stored)
+    }
+    func TryGet(out value: System.Option.None) -> bool {
+        if IsNone {
+            value = GetNoneCase()
+            return true
+        }
+        ValueStorage.LeaveUnassigned(out value)
+        return false
+    }
+
+    init(value: System.Option.Some<T>) {
+        Stored = ValueStorage.Pack(value)
+    }
+    val IsSome: bool { get => ValueStorage.Is<System.Option.Some<T>>(Stored) }
+    func GetSomeCase() -> System.Option.Some<T> {
+        return ValueStorage.Unpack<System.Option.Some<T>>(Stored)
+    }
+    func TryGet(out value: System.Option.Some<T>) -> bool {
+        if IsSome {
+            value = GetSomeCase()
+            return true
+        }
+        ValueStorage.LeaveUnassigned(out value)
+        return false
+    }
+
+    func TryGetOutput(out output: T) -> bool {
+        if IsSome {
+            output = GetSomeCase().Value
+            return true
+        }
+        ValueStorage.LeaveUnassigned(out output)
+        return false
+    }
+
+    func TryGetResidual(out residual: System.Void) -> bool {
+        if IsNone {
+            residual = ()
+            return true
+        }
+        ValueStorage.LeaveUnassigned(out residual)
+        return false
+    }
+
+    static func FromResidual(residual: System.Void) -> Option<T> {
+        return System.Option<T>(System.Option.None())
+    }
+}

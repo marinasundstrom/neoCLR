@@ -1,6 +1,6 @@
 {
   "format": "raven-library-bootstrap-v1",
-  "owner": "System.Disposable",
+  "owner": "System.Option",
   "inputs": {
     "runtime/raven/src/System/Option.rvn": "7e6fbff6cd19d88804c5e1bc45983940c440095b5569dda3192c5ff18cbb9a3a",
     "runtime/raven/src/System/Result.rvn": "2351c6e9bb28ae647442584e91304bbbc9dd4f6eb363f934eac3e3e442ef2c06",
@@ -71,12 +71,22 @@
     "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
   },
   "outputs": {
-    "Disposable.methods.neoil": "c6f04c225de60f9782fa09d66bbb82fe3f6b82ea6e63597d1d482ff681066e51",
-    "Disposable.helpers.neoil": "be3c3034c906084670389d7abe87fd007449fef4f282445b5e434b4986075bab"
+    "Option.methods.neoil": "61e54f74b406761662f9d4dbb36046af2a173c12181b175a0a293b1b76d218dd",
+    "Option.helpers.neoil": "3bef47b6444f0eeb8bc291fba34f726283bde646813e70efab7cdf5813047574"
   },
   "compilerSha256": "43a89f8ad6aa6cac52718b7286e1581e2af8279958840854260da09ed6dde0ff",
   "coreSha256": "37442d954b2418a312b7212d97766e243e4caecb96920376d8b845f89f28b6a5",
   "exports": [
-    "Dispose() -> noresult"
+    ".ctor(System.Option.None value) -> Void",
+    "get_IsNone() -> Boolean",
+    "GetNoneCase() -> System.Option.None",
+    "TryGet(out(true) System.Option.None& destination) -> Boolean",
+    ".ctor(System.Option.Some<T0> value) -> Void",
+    "get_IsSome() -> Boolean",
+    "GetSomeCase() -> System.Option.Some<T0>",
+    "TryGet(out(true) System.Option.Some<T0>& destination) -> Boolean",
+    "readonly byref TryGetOutput(out(true) T0& destination) -> Boolean",
+    "readonly byref TryGetResidual(out(true) Void& destination) -> Boolean",
+    "FromResidual(Void residual) -> System.Option<T0>"
   ]
 }

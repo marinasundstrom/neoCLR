@@ -105,6 +105,12 @@ for file in source['sourceFiles']:
                      'tests': ['tests/errors.rs', 'tests/arithmetic_errors.rs', 'docs/experiments/raven-target/verify_empty_library.py'],
                      'note': 'Empty values preserve payload-free defaults, existing constructors/formatting and nominal Void. No new constructor on EnvironmentError or Void.'})
         continue
+    if file.startswith(('runtime/raven/generated/Option.', 'runtime/raven/generated/Result.')):
+        rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-generic-union',
+                     'samples': ['library-unions.rvn', 'library-generic-unions.rvn', 'library-result-void-propagation.rvn'],
+                     'tests': ['tests/propagation.rs', 'tests/union_out.rs', 'docs/experiments/raven-target/verify_generic_union_library.py'],
+                     'note': 'Raven owns cases, one erased carrier payload, factories and extraction. Checked constructor/readonly receiver projections and literal Boolean returns retain true-only output assignment. Bootstrap-only LeaveUnassigned is restricted to immediate false returns.'})
+        continue
     if file.startswith('runtime/raven/generated/Propagatable.'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-conditional-output-contract',
                      'tests': ['tests/propagation.rs', 'docs/experiments/raven-target/verify_propagation_library.py'],

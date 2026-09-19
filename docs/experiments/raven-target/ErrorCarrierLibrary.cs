@@ -11,7 +11,7 @@ static class ErrorCarrierLibrary
     public static bool IsCase(TypeDefinition type) => type.DeclaringType is { } owner && IsCarrier(owner)
         && ErrorBindings.Cases[owner.FullName].Contains(type.Name);
     public static bool SameCase(TypeReference left, TypeReference right, TypeDefinition source, TypeDefinition core) =>
-        right.Resolve() is { } r && left.Resolve() is { } l && r.DeclaringType == source && l.DeclaringType == core
+        IsCarrier(source) && IsCarrier(core) && right.Resolve() is { } r && left.Resolve() is { } l && r.DeclaringType == source && l.DeclaringType == core
         && IsCase(r) && IsCase(l) && r.Name == l.Name && r.IsValueType && l.IsValueType;
     public static void Project(ModuleDefinition module)
     {
@@ -53,7 +53,7 @@ static class ErrorCarrierLibrary
     }
     public static string? Constructor(MethodDefinition method, Func<TypeReference, bool, string> map)
     {
-        if (!IsMatched(method.DeclaringType) || !method.IsConstructor) return null;
+        if (!(IsMatched(method.DeclaringType) || GenericUnionLibrary.IsMatched(method.DeclaringType) && GenericUnionLibrary.IsCarrier(method.DeclaringType)) || !method.IsConstructor) return null;
         var body = method.Body.Instructions.Where(i => i.OpCode.Code != Code.Nop).ToArray();
         // Read no uninitialized receiver: lower the checked single field assignment
         // to the existing value-constructor ABI, rather than a managed CLR address.

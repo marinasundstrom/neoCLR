@@ -43,7 +43,7 @@ static class ApplicationTypes
     public static void Reset(params ModuleDefinition[] modules) { LibraryModule = null; LibraryScope = null; LibraryDependencies.Clear(); LibraryMap = null; LibraryReferenceTypes.Clear(); LibraryReferences.Clear(); LibraryNames.Clear(); Modules.Clear(); Modules.UnionWith(modules); Types.Clear(); Expanded.Clear(); Adapters.Clear(); }
     public static object[] IdentityMap() => Types.Select(p => (object)new {
         AssemblyIdentity = p.Value.Module.Assembly.Name.FullName, MetadataName = p.Value.FullName, RuntimeName = p.Key,
-        Fields = p.Value.Fields.Where(_ => !PrimitiveLibrary.IsMatched(p.Value) && !OpaqueLibrary.IsString(p.Value)).Select(f => new { MetadataName = f.Name, RuntimeName = MetadataIdentity.MemberName(f.Name) }).ToArray()
+        Fields = p.Value.Fields.Where(_ => !PrimitiveLibrary.IsMatched(p.Value) && !OpaqueLibrary.IsString(p.Value)).Select(f => new { MetadataName = f.Name, RuntimeName = LibraryNames.ContainsKey(p.Value) && GenericUnionLibrary.IsCase(p.Value) ? "Value" : MetadataIdentity.MemberName(f.Name) }).ToArray()
     }).ToArray();
     public static bool IsModule(ModuleDefinition? module) => module is not null && Modules.Contains(module);
     public static void CheckAccess(TypeReference reference, ModuleDefinition caller)
@@ -59,6 +59,11 @@ static class ApplicationTypes
             if (!(owner.IsPublic || owner.IsNestedPublic))
                 throw new InvalidDataException("Nonpublic imported type access unsupported: " + type.FullName);
     }
+    public static bool IsLibraryUnion(string name) => (Types.TryGetValue(name, out var type) || LibraryReferences.TryGetValue(name, out type))
+        && LibraryNames.ContainsKey(type) && GenericUnionLibrary.IsFamily(type);
+    public static bool LibraryUnionRequiresInitialization(string name) => (Types.TryGetValue(name, out var type) || LibraryReferences.TryGetValue(name, out type))
+        && LibraryNames.ContainsKey(type) && GenericUnionLibrary.IsFamily(type)
+        && (GenericUnionLibrary.IsCarrier(type) || type.HasGenericParameters);
     public static bool IsType(string name) => Types.ContainsKey(name) || LibraryReferences.ContainsKey(name);
     public static bool IsReference(string name) => (Types.TryGetValue(name, out var type) || LibraryReferences.TryGetValue(name, out type)) && !type.IsValueType;
     public static string? Type(TypeReference reference)
@@ -124,7 +129,7 @@ static class ApplicationTypes
             if (IsModule(type.BaseType?.Resolve()?.Module)) { CheckAccess(type.BaseType!, type.Module); map(type.BaseType!, false); }
             foreach (var contract in type.Interfaces) { CheckAccess(contract.InterfaceType, type.Module); map(contract.InterfaceType, false); }
             foreach (var field in type.Fields) map(field.FieldType, false);
-            foreach (var method in type.Methods.Where(m => !m.IsStatic && !(PrimitiveLibrary.IsMatched(type) && PrimitiveLibrary.IsDefaultConstructor(m)) && !(IsLibrary(type) && (OpaqueLibrary.IsOmittedConstructor(m) || EmptyLibrary.OmitConstructor(m) || ErrorCarrierLibrary.IsCarrier(type) && PrimitiveLibrary.IsDefaultConstructor(m)))))
+            foreach (var method in type.Methods.Where(m => !m.IsStatic && !(PrimitiveLibrary.IsMatched(type) && PrimitiveLibrary.IsDefaultConstructor(m)) && !(IsLibrary(type) && (OpaqueLibrary.IsOmittedConstructor(m) || EmptyLibrary.OmitConstructor(m) || (ErrorCarrierLibrary.IsCarrier(type) || GenericUnionLibrary.IsFamily(type) && type.HasFields) && PrimitiveLibrary.IsDefaultConstructor(m)))))
             {
                 CheckMethod(method);
                 if (method.Overrides.Any(o => !method.IsPublic || o.Name != method.Name || o.DeclaringType.Resolve()?.IsInterface != true
@@ -168,7 +173,7 @@ static class ApplicationTypes
         if (IsLibrary(field.DeclaringType) && !LibraryImplementation.SameType(
             Close(reference.FieldType, reference.DeclaringType), Close(field.FieldType, reference.DeclaringType)))
             throw new InvalidDataException("Invalid constructed library field signature.");
-        return new(owner, map(Close(field.FieldType, reference.DeclaringType), false), MetadataIdentity.MemberName(field.Name), field.DeclaringType.IsValueType);
+        return new(owner, map(Close(field.FieldType, reference.DeclaringType), false), GenericUnionLibrary.IsMatched(field.DeclaringType) && GenericUnionLibrary.IsCase(field.DeclaringType) ? "Value" : MetadataIdentity.MemberName(field.Name), field.DeclaringType.IsValueType);
     }
     public static bool Matches(MethodReference reference, MethodDefinition definition)
     {
@@ -188,6 +193,7 @@ static class ApplicationTypes
         if (owner is not GenericInstanceType instance || !IsLibrary(owner)) return type;
         if (type is GenericParameter p && p.Type == GenericParameterType.Type
             && p.Owner == instance.ElementType.Resolve()) return instance.GenericArguments[p.Position];
+        if (type is ByReferenceType byref) return new ByReferenceType(Close(byref.ElementType, owner, depth + 1));
         if (type is ArrayType { IsVector: true } array) return new ArrayType(Close(array.ElementType, owner, depth + 1));
         if (type is GenericInstanceType generic)
         {
@@ -209,16 +215,16 @@ static class ApplicationTypes
         while (Types.Any(t => !emitted.Contains(t.Key)))
         {
             var (name, type) = Types.First(t => !emitted.Contains(t.Key)); emitted.Add(name);
-            output.AppendLine(type.IsInterface ? $".interface {name}" : $".type {(LibraryDependencies.Contains(type) ? "internal " : "")}{(type.IsValueType || OpaqueLibrary.IsString(type) ? "" : "class ")}{(type.IsAbstract ? "abstract " : "")}{name}");
+            output.AppendLine(type.IsInterface ? $".interface {name}" : $".type {(LibraryDependencies.Contains(type) ? "internal " : "")}{(type.IsValueType || OpaqueLibrary.IsString(type) || IsLibrary(type) && GenericUnionLibrary.IsContainer(type) ? "" : "class ")}{(type.IsAbstract && !GenericUnionLibrary.IsContainer(type) ? "abstract " : "")}{name}");
             if (IsModule(type.BaseType?.Resolve()?.Module)) output.AppendLine(".extends " + map(type.BaseType, false));
-            if (ErrorCarrierLibrary.IsMatched(type)) output.AppendLine(".custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()");
+            if (ErrorCarrierLibrary.IsMatched(type) || GenericUnionLibrary.IsMatched(type) && GenericUnionLibrary.IsCarrier(type)) output.AppendLine(".custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()");
             foreach (var contract in type.Interfaces) output.AppendLine(".implements " + map(contract.InterfaceType, false));
             foreach (var method in type.Methods.Where(m => m.IsAbstract))
                 output.AppendLine($".method instance {(LibraryNames.ContainsKey(type) && PropagationLibrary.IsContract(type) ? "readonly byref " : "")}{(type.IsInterface ? "" : "abstract ")}{MethodName(method)}({string.Join(',', method.Parameters.Select(p => (LibraryNames.ContainsKey(type) && PropagationLibrary.IsConditionalOutput(method, p) ? "out(true) " : "") + map(p.ParameterType, false) + (LibraryNames.ContainsKey(type) ? " " + p.Name : "")))}) -> {map(method.ReturnType, true)}\n.end");
             foreach (var field in type.Fields.Where(_ => !PrimitiveLibrary.IsMatched(type) && !OpaqueLibrary.IsString(type)))
-                output.AppendLine($".field {(LibraryNames.ContainsKey(type) && field.IsPrivate ? "private " : "")}{MetadataIdentity.MemberName(field.Name)} {map(field.FieldType, false)}");
+                output.AppendLine($".field {(LibraryNames.ContainsKey(type) && field.IsPrivate && !GenericUnionLibrary.IsCase(type) ? "private " : "")}{(LibraryNames.ContainsKey(type) && GenericUnionLibrary.IsCase(type) ? "Value" : MetadataIdentity.MemberName(field.Name))} {map(field.FieldType, false)}");
             if (LibraryNames.ContainsKey(type))
-                foreach (var property in type.Properties)
+                foreach (var property in type.Properties.Where(GenericUnionLibrary.IsRuntimeProperty))
                 {
                     output.AppendLine($".property instance {MetadataIdentity.MemberName(property.Name)}({string.Join(',', property.Parameters.Select(p => map(p.ParameterType, false)))}) -> {map(property.PropertyType, false)}");
                     if (property.GetMethod is { } getter) output.AppendLine($".get instance {name}::{MethodName(getter)}({string.Join(',', getter.Parameters.Select(p => map(p.ParameterType, false)))})");

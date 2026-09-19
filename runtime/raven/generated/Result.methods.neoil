@@ -1,0 +1,306 @@
+; Generated from runtime/raven/src/System/Result.rvn. Regenerate with build_runtime_library.py.
+.type System.Result
+.end
+.type System.Result<T0,T1>
+.custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
+.implements System.Propagatable<System.Result<T0,T1>,T0,T1>
+.field private Stored Value
+.property instance IsOk() -> Boolean
+.get instance System.Result<T0,T1>::get_IsOk()
+.end
+.property instance IsErr() -> Boolean
+.get instance System.Result<T0,T1>::get_IsErr()
+.end
+.method static Ok(T0 value) -> System.Result<T0,T1>
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+newobj instance System.Result.Ok<T0>::.ctor(T0)
+M00000005_IL_0008:
+newobj instance System.Result<T0,T1>::.ctor(System.Result.Ok<T0>)
+M00000005_IL_000d:
+ret
+.end
+.method static Error(T1 error) -> System.Result<T0,T1>
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+newobj instance System.Result.Error<T1>::.ctor(T1)
+M00000006_IL_0008:
+newobj instance System.Result<T0,T1>::.ctor(System.Result.Error<T1>)
+M00000006_IL_000d:
+ret
+.end
+.method instance .ctor(System.Result.Ok<T0> value) -> Void
+ldarg value
+value.pack System.Result.Ok<T0>
+newobj System.Result<T0,T1>
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsOk() -> Boolean
+M00000008_IL_0000:
+M00000008_IL_0001:
+M00000008_IL_0002:
+ldarg 0
+M00000008_IL_0003:
+ldfld System.Result<T0,T1>::Stored
+M00000008_IL_0008:
+value.is System.Result.Ok<T0>
+call neoCLR.Library.System.Result.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_000d:
+call neoCLR.Library.System.Result.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetOkCase() -> System.Result.Ok<T0>
+M00000009_IL_0000:
+M00000009_IL_0001:
+M00000009_IL_0002:
+ldarg 0
+M00000009_IL_0003:
+ldfld System.Result<T0,T1>::Stored
+M00000009_IL_0008:
+value.unpack System.Result.Ok<T0>
+M00000009_IL_000d:
+ret
+.end
+.method instance TryGet(out(true) System.Result.Ok<T0>& destination) -> Boolean
+M0000000a_IL_0000:
+M0000000a_IL_0001:
+M0000000a_IL_0002:
+ldarg 0
+M0000000a_IL_0003:
+call instance System.Result<T0,T1>::get_IsOk()
+call neoCLR.Library.System.Result.RuntimeBooleanToInt32(Boolean)
+M0000000a_IL_0008:
+brtrue M0000000a_IL_0012
+M0000000a_IL_000d:
+br M0000000a_IL_0022
+M0000000a_IL_0012:
+M0000000a_IL_0013:
+ldarg 1
+M0000000a_IL_0014:
+ldarg 0
+M0000000a_IL_0015:
+call instance System.Result<T0,T1>::GetOkCase()
+M0000000a_IL_001a:
+stobj System.Result.Ok<T0>
+M0000000a_IL_001f:
+M0000000a_IL_0020:
+ldc.bool true
+M0000000a_IL_0021:
+ret
+M0000000a_IL_0022:
+M0000000a_IL_0023:
+M0000000a_IL_0024:
+ldarg 1
+M0000000a_IL_0025:
+pop
+M0000000a_IL_002a:
+M0000000a_IL_002b:
+ldc.bool false
+M0000000a_IL_002c:
+ret
+.end
+.method instance .ctor(System.Result.Error<T1> value) -> Void
+ldarg value
+value.pack System.Result.Error<T1>
+newobj System.Result<T0,T1>
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsErr() -> Boolean
+M0000000c_IL_0000:
+M0000000c_IL_0001:
+M0000000c_IL_0002:
+ldarg 0
+M0000000c_IL_0003:
+ldfld System.Result<T0,T1>::Stored
+M0000000c_IL_0008:
+value.is System.Result.Error<T1>
+call neoCLR.Library.System.Result.RuntimeBooleanToInt32(Boolean)
+M0000000c_IL_000d:
+call neoCLR.Library.System.Result.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetErrorCase() -> System.Result.Error<T1>
+M0000000d_IL_0000:
+M0000000d_IL_0001:
+M0000000d_IL_0002:
+ldarg 0
+M0000000d_IL_0003:
+ldfld System.Result<T0,T1>::Stored
+M0000000d_IL_0008:
+value.unpack System.Result.Error<T1>
+M0000000d_IL_000d:
+ret
+.end
+.method instance TryGet(out(true) System.Result.Error<T1>& destination) -> Boolean
+M0000000e_IL_0000:
+M0000000e_IL_0001:
+M0000000e_IL_0002:
+ldarg 0
+M0000000e_IL_0003:
+call instance System.Result<T0,T1>::get_IsErr()
+call neoCLR.Library.System.Result.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_0008:
+brtrue M0000000e_IL_0012
+M0000000e_IL_000d:
+br M0000000e_IL_0022
+M0000000e_IL_0012:
+M0000000e_IL_0013:
+ldarg 1
+M0000000e_IL_0014:
+ldarg 0
+M0000000e_IL_0015:
+call instance System.Result<T0,T1>::GetErrorCase()
+M0000000e_IL_001a:
+stobj System.Result.Error<T1>
+M0000000e_IL_001f:
+M0000000e_IL_0020:
+ldc.bool true
+M0000000e_IL_0021:
+ret
+M0000000e_IL_0022:
+M0000000e_IL_0023:
+M0000000e_IL_0024:
+ldarg 1
+M0000000e_IL_0025:
+pop
+M0000000e_IL_002a:
+M0000000e_IL_002b:
+ldc.bool false
+M0000000e_IL_002c:
+ret
+.end
+.method instance get_IsOkCase() -> Boolean
+M0000000f_IL_0000:
+M0000000f_IL_0001:
+M0000000f_IL_0002:
+ldarg 0
+M0000000f_IL_0003:
+call instance System.Result<T0,T1>::get_IsOk()
+call neoCLR.Library.System.Result.RuntimeBooleanToInt32(Boolean)
+M0000000f_IL_0008:
+call neoCLR.Library.System.Result.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance get_IsErrorCase() -> Boolean
+M00000010_IL_0000:
+M00000010_IL_0001:
+M00000010_IL_0002:
+ldarg 0
+M00000010_IL_0003:
+call instance System.Result<T0,T1>::get_IsErr()
+call neoCLR.Library.System.Result.RuntimeBooleanToInt32(Boolean)
+M00000010_IL_0008:
+call neoCLR.Library.System.Result.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance readonly byref TryGetOutput(out(true) T0& destination) -> Boolean
+.local System.Result.Ok<T0> local0
+M00000011_IL_0000:
+M00000011_IL_0001:
+M00000011_IL_0002:
+ldarg 0
+M00000011_IL_0003:
+call neoCLR.Library.System.Result.RuntimeCliCall0<T0,T1>(System.Result<T0,T1>&)
+call neoCLR.Library.System.Result.RuntimeBooleanToInt32(Boolean)
+M00000011_IL_0008:
+brtrue M00000011_IL_0012
+M00000011_IL_000d:
+br M00000011_IL_002a
+M00000011_IL_0012:
+M00000011_IL_0013:
+ldarg 1
+M00000011_IL_0014:
+ldarg 0
+M00000011_IL_0015:
+call neoCLR.Library.System.Result.RuntimeCliCall1<T0,T1>(System.Result<T0,T1>&)
+M00000011_IL_001a:
+stloc local0
+M00000011_IL_001b:
+ldloca local0
+M00000011_IL_001d:
+call neoCLR.Library.System.Result.RuntimeCliCall2<T0>(System.Result.Ok<T0>&)
+M00000011_IL_0022:
+stobj T0
+M00000011_IL_0027:
+M00000011_IL_0028:
+ldc.bool true
+M00000011_IL_0029:
+ret
+M00000011_IL_002a:
+M00000011_IL_002b:
+M00000011_IL_002c:
+ldarg 1
+M00000011_IL_002d:
+pop
+M00000011_IL_0032:
+M00000011_IL_0033:
+ldc.bool false
+M00000011_IL_0034:
+ret
+.end
+.method instance readonly byref TryGetResidual(out(true) T1& destination) -> Boolean
+.local System.Result.Error<T1> local0
+M00000012_IL_0000:
+M00000012_IL_0001:
+M00000012_IL_0002:
+ldarg 0
+M00000012_IL_0003:
+call neoCLR.Library.System.Result.RuntimeCliCall3<T0,T1>(System.Result<T0,T1>&)
+call neoCLR.Library.System.Result.RuntimeBooleanToInt32(Boolean)
+M00000012_IL_0008:
+brtrue M00000012_IL_0012
+M00000012_IL_000d:
+br M00000012_IL_002a
+M00000012_IL_0012:
+M00000012_IL_0013:
+ldarg 1
+M00000012_IL_0014:
+ldarg 0
+M00000012_IL_0015:
+call neoCLR.Library.System.Result.RuntimeCliCall4<T0,T1>(System.Result<T0,T1>&)
+M00000012_IL_001a:
+stloc local0
+M00000012_IL_001b:
+ldloca local0
+M00000012_IL_001d:
+call neoCLR.Library.System.Result.RuntimeCliCall5<T1>(System.Result.Error<T1>&)
+M00000012_IL_0022:
+stobj T1
+M00000012_IL_0027:
+M00000012_IL_0028:
+ldc.bool true
+M00000012_IL_0029:
+ret
+M00000012_IL_002a:
+M00000012_IL_002b:
+M00000012_IL_002c:
+ldarg 1
+M00000012_IL_002d:
+pop
+M00000012_IL_0032:
+M00000012_IL_0033:
+ldc.bool false
+M00000012_IL_0034:
+ret
+.end
+.method static FromResidual(T1 residual) -> System.Result<T0,T1>
+M00000013_IL_0000:
+M00000013_IL_0001:
+M00000013_IL_0002:
+ldarg 0
+M00000013_IL_0003:
+call System.Result<T0,T1>::Error(T1)
+M00000013_IL_0008:
+ret
+.end
+.end

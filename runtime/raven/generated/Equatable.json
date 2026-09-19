@@ -2,6 +2,8 @@
   "format": "raven-library-bootstrap-v1",
   "owner": "System.Equatable",
   "inputs": {
+    "runtime/raven/src/System/Option.rvn": "7e6fbff6cd19d88804c5e1bc45983940c440095b5569dda3192c5ff18cbb9a3a",
+    "runtime/raven/src/System/Result.rvn": "2351c6e9bb28ae647442584e91304bbbc9dd4f6eb363f934eac3e3e442ef2c06",
     "runtime/raven/src/System/Propagatable.rvn": "0f8af6a1fe29ca4be08f496e5b485c762ecdf6ae8d9197700697e6203e9ba98e",
     "runtime/raven/src/System/IntegerDivisionError.rvn": "267d2367214b9aa2dfbf484a776f3d8315b1dce953e0684d1223e459dd878868",
     "runtime/raven/src/System/Linq/SingleError.rvn": "2463b25d8840e4186ed8eaa519ccabdd91352d16767603fca042b954822fc852",
@@ -65,15 +67,15 @@
     "runtime/raven/src/System/Single.rvn": "488efaf36e56f147c7158a5b0637f3bc4e56e84bb3f514af6c64a023dcd8598e",
     "runtime/raven/src/System/Double.rvn": "cd3ad24e4a21b7616a2937da71891618284913e26ea180ce203276f18b631f33",
     "runtime/raven/src/System/Boolean.rvn": "1f0010fe0d346fbc7f3ba29c88b2c1cf80faebf42a4c2de2f0cd6cff15335022",
-    "runtime/raven/System.rvnproj": "3c382e69c91ac8eef791a559b7e5fa2398503fd108a1b170d3f298796baf53d5",
+    "runtime/raven/System.rvnproj": "d0b08f3ae628446fe68f12d0c873e2c6996f6b10d14e019ea90b840549dad733",
     "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
   },
   "outputs": {
     "Equatable.methods.neoil": "3955e1c4129b072ba99657a3e404d44a260ec8e1fd71760f8d28d135acefe787",
     "Equatable.helpers.neoil": "be52f23d542dddc2676e898b4c33a2cce817c0b94ae88af33c1c5726df0b4fef"
   },
-  "compilerSha256": "7d55b86e719225ff2eb87fbc52854c22936e57c0658ccd9ac314513ade7b7ba5",
-  "coreSha256": "b400b63796630c1dd66e15c16d15cbeee98fd8a6e4f499265c256fd3883a226e",
+  "compilerSha256": "43a89f8ad6aa6cac52718b7286e1581e2af8279958840854260da09ed6dde0ff",
+  "coreSha256": "37442d954b2418a312b7212d97766e243e4caecb96920376d8b845f89f28b6a5",
   "exports": [
     "Equals(T0 other) -> Boolean"
   ]

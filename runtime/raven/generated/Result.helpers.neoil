@@ -1,0 +1,107 @@
+; Generated from runtime/raven/src/System/Result.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Result.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
+.function neoCLR.Library.System.Result.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end
+.function neoCLR.Library.System.Result.RuntimeCliCall0<T0,T1>(readonly System.Result<T0,T1>& arg0) -> Boolean
+ldarg arg0
+ldobj System.Result<T0,T1>
+call instance System.Result<T0,T1>::get_IsOk()
+ret
+.end
+.function neoCLR.Library.System.Result.RuntimeCliCall1<T0,T1>(readonly System.Result<T0,T1>& arg0) -> System.Result.Ok<T0>
+ldarg arg0
+ldobj System.Result<T0,T1>
+call instance System.Result<T0,T1>::GetOkCase()
+ret
+.end
+.function neoCLR.Library.System.Result.RuntimeCliCall2<T0>(readonly System.Result.Ok<T0>& arg0) -> T0
+ldarg arg0
+ldobj System.Result.Ok<T0>
+call instance System.Result.Ok<T0>::get_Value()
+ret
+.end
+.function neoCLR.Library.System.Result.RuntimeCliCall3<T0,T1>(readonly System.Result<T0,T1>& arg0) -> Boolean
+ldarg arg0
+ldobj System.Result<T0,T1>
+call instance System.Result<T0,T1>::get_IsErr()
+ret
+.end
+.function neoCLR.Library.System.Result.RuntimeCliCall4<T0,T1>(readonly System.Result<T0,T1>& arg0) -> System.Result.Error<T1>
+ldarg arg0
+ldobj System.Result<T0,T1>
+call instance System.Result<T0,T1>::GetErrorCase()
+ret
+.end
+.function neoCLR.Library.System.Result.RuntimeCliCall5<T1>(readonly System.Result.Error<T1>& arg0) -> T1
+ldarg arg0
+ldobj System.Result.Error<T1>
+call instance System.Result.Error<T1>::get_Value()
+ret
+.end
+.type System.Result.Ok<T0>
+.field Value T0
+.property instance Value() -> T0
+.get instance System.Result.Ok<T0>::get_Value()
+.end
+.method instance .ctor(T0 value) -> Void
+ldarg value
+newobj System.Result.Ok<T0>
+starg this
+ldvoid
+ret
+.end
+.method instance get_Value() -> T0
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldarg 0
+M00000002_IL_0003:
+ldfld System.Result.Ok<T0>::Value
+M00000002_IL_0008:
+ret
+.end
+.end
+.type System.Result.Error<T0>
+.field Value T0
+.property instance Value() -> T0
+.get instance System.Result.Error<T0>::get_Value()
+.end
+.method instance .ctor(T0 value) -> Void
+ldarg value
+newobj System.Result.Error<T0>
+starg this
+ldvoid
+ret
+.end
+.method instance get_Value() -> T0
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+ldfld System.Result.Error<T0>::Value
+M00000004_IL_0008:
+ret
+.end
+.end

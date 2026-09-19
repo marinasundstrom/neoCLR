@@ -188,4 +188,10 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Propagatable'">
     <Compile Include="src/System/Propagatable.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Option'">
+    <Compile Include="src/System/Option.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Result'">
+    <Compile Include="src/System/Result.rvn" />
+  </ItemGroup>
 </Project>
