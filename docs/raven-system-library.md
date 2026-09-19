@@ -5,7 +5,9 @@
 The author directs source migration first and proposal API alignment afterward.
 The acceptance gate is a functioning neoCLR: Raven programs must compile, import,
 verify and run against the regenerated library. Original proposal texts are indexed
-[separately](proposals/README.md); the current project/assembly identity is retained.
+[separately](proposals/README.md). The authoring project is now
+[System.Runtime.rvnproj](../runtime/raven/System.Runtime.rvnproj), with the explicit
+reference/runtime mapping described in [the assembly plan](system-runtime-assembly.md).
 
 This slice adds Raven sources for the fundamental and collection interfaces,
 SystemClock, LocalDateTime, IntPtr/UIntPtr comparisons, the complete Int32 member
@@ -14,6 +16,11 @@ The follow-up ports String and opaque Error, then five empty error types and Voi
 followed by seven typed error carriers, and the Propagatable declaration, then Option/Result and their cases, then the inherited descriptor family and NativeMemory, then System.Fault, Func declarations and the normal BindingFlags enum and Object/UnionAttribute markers, followed by managed Array members and iteration, bringing the total to 73 slices.
 The legacy Neo profile retains its receiver/array conventions where it differs;
 the Raven profile selects generated contracts and implementation bodies.
+
+The [final source-port gate](raven-library-port-validation.md#final-source-port-gate--2026-09-19)
+records completed source migration and functioning programs. RuntimeContext,
+interface-based Info providers and Object.GetTypeInfo remain the separate API-alignment
+work; the current VS Code baseline still presents the prior descriptor classes.
 
 Importer admission checks invariant generic arity, parameter positions, base
 interfaces, exact method/property signatures and external identities. Variant or

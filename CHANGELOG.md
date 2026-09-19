@@ -13,7 +13,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   changing managed method bodies or case storage. Check all four cases against their
   resolved owner identities; regenerate all 73 slices and the API inventory. All 12
   generic-union admission cases, 34 focused runtime tests and source ownership/snapshot
-  checks pass.
+  checks pass. Record the final source-port Rust baseline: 1246 passing tests across
+  all 178 integration binaries plus unit tests, with corrected failures rerun. All 65
+  saved-project cases pass against the corrected library, closing the execution gate.
+  RuntimeContext and the interface-based API migration remain separate work.
 
 - Establish System.Runtime.rvnproj and its System.Runtime managed implementation
   identity, replacing System.rvnproj/NeoCLR.System without duplicating source owners.

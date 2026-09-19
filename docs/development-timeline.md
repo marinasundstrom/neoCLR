@@ -25,6 +25,26 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-19 — Close the source-port execution gate
+
+**Author direction.** Continue implementation, retaining separately committed slices
+and the requirement that programs targeting neoCLR run.
+
+**Assistant action and outcome.** The complete source-port Rust baseline exposed a
+lost declaring-type relationship on imported Option/Result cases. Preserved their
+lexical nesting in target output (`d21c6de`), verified exact owner identity for all
+four cases, regenerated 73 source slices and passed 12 union-admission and 34 focused
+runtime tests. Raven already emitted correct nested CLI metadata; only its feature
+branch documentation changed (`819e73ac6`). The final Rust batches now total 1246
+passing tests across 178 integration binaries plus unit tests, with no unresolved
+failure. All 65 saved-project cases also pass against the corrected library.
+See [the validation record](raven-library-port-validation.md) for the
+scope of reruns and the remaining API boundary.
+
+**Still open.** RuntimeContext/AssemblyInfo discovery, the public Info-interface
+migration, canonical Object.GetTypeInfo acquisition and the refreshed VS Code API
+are separate work. Source-port execution success does not establish those APIs.
+
 ## 2026-09-19 — Optional services associated with RuntimeContext
 
 **Author suggestion.** “Other things might later be tied to the runtime context.

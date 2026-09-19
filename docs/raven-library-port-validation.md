@@ -241,7 +241,7 @@ require an unknown status to fault. The full Rust run exposed an inline managed-
 fixture that still embedded wrapper includes; it now embeds the generated contracts
 because the text assembler does not resolve files. All eight fixture checks pass.
 
-## Recorded results
+## Earlier intermediate results (65 slices)
 
 - The final Rust runs cover all 178 integration-test binaries plus library/binary
   unit tests: 1241 tests pass, zero fail and zero are ignored. Documentation tests
@@ -268,6 +268,37 @@ The Python-launched Rust batches select the installed Xcode 26.2 SDK for their
 processes: Apple's Python launcher supplied a newer Command Line Tools SDK that
 the active Xcode linker could not read. No global developer-tool or repository
 configuration was changed for that host-only mismatch.
+
+## Final source-port gate — 2026-09-19
+
+The API-preserving source port now has 73 Raven slices and no handwritten managed
+method bodies in the selected Raven profile. System.Runtime.rvnproj is the authoring
+project, System.Runtime.dll is the implementation input, NeoCLR.CoreProbe remains
+the explicitly mapped bootstrap reference, and System.neoil remains the executable
+library module. This milestone does not claim that the subsequent RuntimeContext /
+Info-interface API migration is implemented.
+
+The final Rust baseline covers all 178 integration-test binaries plus library/binary
+unit tests: 1246 tests pass across batches, with no remaining failed or ignored cases.
+The Console graph-budget fixture was corrected and rerun (11 tests); the final
+system_companions failure was a real lost-declaring-type regression, fixed above
+and rechecked in a 34-test focused batch. Documentation tests complete with no cases.
+The unaffected binaries were not rerun after that bounded metadata correction.
+
+All 65 saved-project cases pass against the corrected, freshly generated library:
+compile/import/verify/execute, saved edits, rejected builds with no stale execution,
+and expected runtime faults. The post-correction fixture was generated separately
+from the user's VS Code workspace; user edits were not overwritten.
+
+All 25 source-admission suite files pass. The primitive fixture now expects the
+preserved Int64 parameter name. All 73 slices regenerate, snapshot hashes match,
+and the source-ownership gate accounts for 724 declarations: 54 explicit native
+services and the remaining declarations supplied by generated snapshots. The
+inventory/coverage gates account for 768 candidates and 118 declaring sources.
+Controlled process/file checks and the isolated VS Code baseline pass as recorded
+in [the local-build guide](raven-port-local-build.md). That workspace still exposes
+the pre-alignment descriptor classes; its successful execution is not evidence for
+the new interface-based API.
 
 ## Raven branch audit
 
