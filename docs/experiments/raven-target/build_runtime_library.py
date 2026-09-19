@@ -10,6 +10,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    'Fault': 'System',
     'NativeMemory': 'System.Runtime.InteropServices.NativeMemory',
     'Descriptors': 'System.Introspection.MemberInfo',
     'Option': 'System.Option',
@@ -82,6 +83,7 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    'Fault': 'runtime/raven/src/System/Functions.rvn',
     'NativeMemory': 'runtime/raven/src/System/Runtime/InteropServices/NativeMemory/Functions.rvn',
     'Descriptors': 'runtime/raven/src/System/Introspection/Descriptors.rvn',
     'Option': 'runtime/raven/src/System/Option.rvn',
@@ -192,7 +194,9 @@ def fragments(text, name="Math", owner="System.Math"):
         if match[1].startswith(owner + '.'):
             # Retain the bootstrap owner used by direct IL and the archived Neo frontend.
             # Namespace functions use marked containers; static APIs retain their owner.
-            if body.startswith('.function internal '):
+            if owner == "System":
+                methods.append(body)
+            elif body.startswith('.function internal '):
                 methods.append(body.replace('.function internal ' + owner + '.', '.method internal static ', 1))
             else:
                 methods.append(body.replace('.function ' + owner + '.', '.method static ', 1))

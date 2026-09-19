@@ -48,9 +48,9 @@ for file in source['sourceFiles']:
                 raise ValueError('Service without a reviewed library caller: ' + name)
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'implementation-service', 'callers': callers})
         continue
-    if file == 'runtime/System/Fault.neoil':
-        rows.append({'file': file, 'declarations': len(entries), 'disposition': 'terminal-namespace-function',
-                     'tests': ['tests/system_fault.rs', 'docs/experiments/raven-target/verify_fault.py'],
+    if file.startswith('runtime/raven/generated/Fault.'):
+        rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-terminal-namespace-function',
+                     'tests': ['tests/system_fault.rs', 'docs/experiments/raven-target/verify_fault.py', 'docs/experiments/raven-target/verify_fault_library.py'],
                      'note': 'Computed String diagnostic; terminates guest execution, not the embedding host. No compiler non-return analysis.'})
         continue
     if file == 'runtime/System/Array.neoil':
@@ -178,7 +178,7 @@ result['targetProfileAdditions'] = [{
     'disposition': 'raven-authored-parameter-descriptor',
     'samples': ['library-reflection.rvn'],
     'tests': ['docs/experiments/raven-target/verify_parameter_info_library.py', 'docs/experiments/raven-target/verify_introspection_namespace.py'],
-    'note': 'Six parameter snapshot readers are Raven-authored. The importer validates field order/types; runtime factories still produce snapshots. Member hierarchy bodies remain NeoIL.'
+    'note': 'Six parameter snapshot readers are Raven-authored. The importer validates field order/types; runtime factories still produce snapshots. The inherited member hierarchy and its array copies are Raven-authored in Descriptors.rvn.'
 }, {
     'file': 'runtime/raven/Type.neoil',
     'disposition': 'raven-authored-type',
@@ -191,6 +191,19 @@ result['targetProfileAdditions'] = [{
     'samples': ['library-maps.rvn'],
     'tests': ['tests/raven_collections.rs', 'docs/experiments/raven-target/verify_collection_capabilities.py'],
     'note': 'HashMap algorithms and Map/MutableMap contracts are authored in Raven. Private helpers retain visibility and all bodies are checked. Explicit equality/hash callbacks; no default comparer, removal or pair iteration. See docs/map-contracts.md.'
+}]
+result['targetProfileAdditions'] += [{
+    'file': 'runtime/raven/Descriptors.neoil',
+    'disposition': 'raven-authored-inherited-descriptors',
+    'samples': ['library-reflection.rvn'],
+    'tests': ['tests/raven_reflection.rs', 'docs/experiments/raven-target/verify_descriptor_library.py'],
+    'note': 'Exact inherited snapshot storage, parameter-array copies and accessor visibility filtering; native factories retain ownership.'
+}, {
+    'file': 'runtime/raven/NativeMemory.neoil',
+    'disposition': 'raven-authored-native-allocation-helpers',
+    'samples': ['library-native-buffer.rvn'],
+    'tests': ['tests/native_memory_api.rs', 'docs/experiments/raven-target/verify_native_library.py'],
+    'note': 'Overload composition is Raven code; checked native multiplication and allocation/release remain runtime instructions.'
 }]
 result['targetProfileAdditions'] += [{
     'file': file,

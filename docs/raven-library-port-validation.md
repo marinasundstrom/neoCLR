@@ -72,6 +72,13 @@ native integer/allocation/pointer tests pass, including overflow, zero allocatio
 null release, bounds and lifetime faults. The saved Raven allocation sample compiles,
 imports, verifies and runs against the regenerated library. Snapshot hashes match.
 
+## Terminal failure follow-up
+
+System.Fault brings the source total to 68. Three admission cases and seven
+fault/query tests pass. A newly compiled Raven program imports and verifies,
+then faults with its exact Unicode diagnostic. Native guest-failure semantics and
+host survival remain unchanged. Source/API audits and snapshot hashes match.
+
 ## Reproduce the program gate
 
 Use the neoCLR feature compiler, built from the Raven repository's

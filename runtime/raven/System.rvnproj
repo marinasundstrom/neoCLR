@@ -200,4 +200,7 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'NativeMemory'">
     <Compile Include="src/System/Runtime/InteropServices/NativeMemory/Functions.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Fault'">
+    <Compile Include="src/System/Functions.rvn" />
+  </ItemGroup>
 </Project>

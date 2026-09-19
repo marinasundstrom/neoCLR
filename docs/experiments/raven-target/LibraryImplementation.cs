@@ -21,7 +21,7 @@ static class LibraryImplementation
     public static MethodDefinition[] Roots(ModuleDefinition source, ModuleDefinition core, string owner)
     {
         ReadonlyReceivers.Clear();
-        if (!Regex.IsMatch(owner, @"^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)+$"))
+        if (owner != "System" && !Regex.IsMatch(owner, @"^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)+$"))
             throw new InvalidDataException("Invalid library owner.");
         if (owner == "System.Introspection.MemberInfo")
             return DescriptorLibrary.Roots(source, core, InstanceRoots);
@@ -49,7 +49,7 @@ static class LibraryImplementation
             if (!method.IsPublic || !method.IsStatic || method.IsConstructor || !method.HasBody
                 || !Regex.IsMatch(method.Name, @"^[A-Za-z_][A-Za-z0-9_]*$")
                 || method.Parameters.Any(p => p.IsOut || p.ParameterType.IsByReference)
-                || method.ReturnType.MetadataType == MetadataType.Void && owner is not ("System.Console" or "System.Runtime.InteropServices.NativeMemory"))
+                || method.ReturnType.MetadataType == MetadataType.Void && owner is not ("System.Console" or "System.Runtime.InteropServices.NativeMemory" or "System"))
                 throw new InvalidDataException("Unsupported library export: " + method.FullName);
             var matches = contract.Methods.Where(m => m.IsPublic && m.IsStatic && m.Name == method.Name && m.Parameters.Count == method.Parameters.Count && m.GenericParameters.Count == method.GenericParameters.Count
                 && SameType(m.ReturnType, method.ReturnType)

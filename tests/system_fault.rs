@@ -4,7 +4,8 @@ use neoclr::{Limits, LoadedProgram, Value, assemble};
 fn dynamic_fault_stops_guest_but_does_not_abort_host() {
     let library = assemble(concat!(
         ".module System\n",
-        include_str!("../runtime/System/Fault.neoil"),
+        include_str!("../runtime/raven/generated/Fault.methods.neoil"),
+        include_str!("../runtime/raven/generated/Fault.helpers.neoil"),
         include_str!("../runtime/neoCLR/Runtime/Fault.neoil")
     ))
     .unwrap();

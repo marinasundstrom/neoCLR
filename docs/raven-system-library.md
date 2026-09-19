@@ -11,7 +11,7 @@ This slice adds Raven sources for the fundamental and collection interfaces,
 SystemClock, LocalDateTime, IntPtr/UIntPtr comparisons, the complete Int32 member
 surface, Console and Environment. File.ReadAllText joins WriteAllText in Raven.
 The follow-up ports String and opaque Error, then five empty error types and Void,
-followed by seven typed error carriers, and the Propagatable declaration, then Option/Result and their cases, then the inherited descriptor family and NativeMemory, bringing the total to 67 slices.
+followed by seven typed error carriers, and the Propagatable declaration, then Option/Result and their cases, then the inherited descriptor family and NativeMemory, then System.Fault, bringing the total to 68 slices.
 The legacy Neo profile retains its receiver/array conventions where it differs;
 the Raven profile selects generated contracts and implementation bodies.
 
@@ -160,7 +160,7 @@ The remaining migration gates are substantive work, not just moving files:
 
 | Remaining source | Required implementation admission |
 | --- | --- |
-| BindingFlags, Fault and root/attribute markers | Checked enum/value representation, failure intrinsic and declaration metadata |
+| BindingFlags and root/attribute markers | Checked enum/value representation and declaration metadata |
 | Array, iterator adapters and Func | Runtime-owned allocation/element access and delegate invocation boundaries |
 
 Complete those gates before calling the entire source port finished. Executable
@@ -1065,3 +1065,11 @@ reference assembly just like Date and Time. Clock.Now and SystemClock use ordina
 CLI interface/class metadata. No Raven compiler changes are required. The bootstrap
 LocalDateTime service maps supplied Unix ticks to the existing runtime construction
 boundary; it does not select arbitrary host code. See [the contract and validation](instant-clock.md).
+
+
+System.Fault is now a Raven namespace function over a checked bootstrap-only
+RuntimeFailure.Terminate binding. It preserves the dynamic String diagnostic and
+existing terminal guest failure service; it does not abort the embedding host.
+The no-result consumer signature and compiler control-flow treatment are unchanged.
+Three source admission cases, seven fault/query tests and a saved Raven Unicode
+failure program pass. Native failure semantics remain owned by the runtime.

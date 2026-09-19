@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Port System.Fault to Raven (68 source slices), preserving dynamic diagnostic text
+  and terminal guest failure without aborting the host. Three admission cases and
+  seven fault/query tests pass; a compiled Raven program verifies and raises the
+  expected Unicode diagnostic. Refresh source ownership audits for Fault,
+  descriptors and native allocation.
+
 - Port NativeMemory overload composition to Raven (67 source slices), with checked
   bootstrap-only allocation/release/native multiplication operations. Preserve the
   consumer API, overflow, bounds and lifetime behavior. Five admission cases, 28

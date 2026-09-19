@@ -1,0 +1,13 @@
+; Generated from runtime/raven/src/System/Functions.rvn. Regenerate with build_runtime_library.py.
+.function System.Fault(String message) -> noresult
+M00000001_IL_0000:
+M00000001_IL_0001:
+M00000001_IL_0002:
+ldarg 0
+M00000001_IL_0003:
+call neoCLR.Runtime.Fault(String)
+pop
+M00000001_IL_0008:
+M00000001_IL_0009:
+ret
+.end
