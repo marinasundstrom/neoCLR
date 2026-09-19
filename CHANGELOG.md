@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Route homepage sample boxes to feature pages and add a Raven language page with
+  source-backed examples, explicit mutability and patterns, target distinctions and
+  an on-site .rvnproj install/build/run guide, troubleshooting and sample downloads.
+  Distinguish published Preview 7 setup from development API availability; record
+  the website-first content rule for future updates.
+
 - Migrate runtime Char values and native layout to validated Unicode scalars in
   four bytes. Reject surrogate/out-of-range values, preserve supplementary values,
   extend the pinned Unicode 16 classification table and support scalar literals in

@@ -10,6 +10,7 @@ on:
       - 'examples/preview/result-void.neoil'
       - 'docs/experiments/raven-target/samples/*.rvn'
       - 'docs/experiments/raven-target/samples/*.expected.txt'
+      - 'docs/experiments/raven-target/msbuild/Demo.rvnproj'
       - '.github/workflows/pages.yml'
   pull_request:
     paths:
@@ -19,6 +20,7 @@ on:
       - 'examples/preview/result-void.neoil'
       - 'docs/experiments/raven-target/samples/*.rvn'
       - 'docs/experiments/raven-target/samples/*.expected.txt'
+      - 'docs/experiments/raven-target/msbuild/Demo.rvnproj'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 

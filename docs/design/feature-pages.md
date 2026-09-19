@@ -11,6 +11,8 @@ development-only behavior and proposals visibly separate.
 | --- | --- | --- |
 | `website/index.html` | Product overview, release/download status and entry points | Published capabilities versus development-only examples |
 | `website/features/<name>/index.html` | What currently works, a useful example where appropriate, limits and feedback | Implemented behavior versus “Where we’re heading” |
+| `website/try/index.html` | Reader-facing installation, .rvnproj workflow, expected output and troubleshooting | Published bundle instructions versus development-only API availability |
+| `website/raven/index.html` | Introduce the Raven language, examples and the .NET/neoCLR target distinction | Language capabilities versus target-specific library support |
 | `website/proposals/index.html` | Brief summaries of ideas across the platform, linked to original proposals and maintained design records | Proposals are not promises or a release checklist |
 | `docs/` and release notes | Detailed contracts, research, verification and historical release behavior | Preserve published release notes; record corrections under Unreleased |
 
@@ -71,3 +73,14 @@ for input. They requested a proposals overview, feature-specific future directio
 a durable record of this structure and a website review with feature/release work.
 The workflow now separates continuous validation from manual publication.
 See [the development conversation record](../development-timeline.md).
+
+Homepage feature boxes link to their corresponding feature page as the primary
+next step. Repository samples and technical contracts belong as supporting links
+on the feature page, rather than replacing that explanation.
+
+Keep user-facing explanations and setup instructions on the website. Repository
+links are optional implementation/research references, never a required step to
+understand a feature or try a published bundle. Prefer .rvnproj as the evaluator
+entry point. Host complete sample downloads on the site. Update prerequisites,
+package names, build/run commands and expected output with each release; do not
+present local developer installations as public downloads.

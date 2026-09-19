@@ -4322,3 +4322,17 @@ native storage and classifies supplementary characters from the pinned Unicode d
 The Neo frontend accepts supplementary literals. Raven's targeted lexer/literal
 baseline passes (70 tests); the target-specific compiler and bridge integration is
 next. This does not yet claim a complete Raven scalar-Char experience.
+
+### Feature links and Raven language introduction
+
+During the scalar-Char integration, the author asked for feature boxes to link to
+feature pages instead of repository samples and requested a Raven language page.
+The assistant updated homepage links, added the language introduction with existing
+executable snippets, and recorded the navigation rule. Raven’s own README and style
+guide supplied the language context; target limitations remain explicit.
+
+The author then clarified that readers should find user content, including try-it
+instructions, on the website and favored the .rvnproj approach. The assistant added
+a self-contained Preview 7 installation and project guide, moved complete feature
+sample downloads onto the site, and made repository references optional. Newer APIs
+remain labeled as development work without a published matching evaluator bundle.

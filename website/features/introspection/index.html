@@ -65,7 +65,7 @@
       </section>
       <section id="try">
         <p class="eyebrow">RUN IT YOURSELF</p><h2>One complete program.</h2>
-        <p>Use a development checkout and matching tools from Raven’s <code>neoclr</code> branch. Follow the <a href="https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/raven-target/VSCODE.md">VS Code setup guide</a> to build or prepare a local workspace; these API changes require a fresh reference library. Python 3 and the matching .NET 11 toolchain are needed for the Raven bridge.</p>
+        <p>This walkthrough needs a matching development toolchain and reference library. These APIs are newer than the published Preview 7 bundle. See <a href="../../try/#development">development availability</a> and the <a href="../../try/">project-based setup guide</a>.</p>
         <ol><li><a href="../../samples/library-introspection-tour.rvn" download>Download the complete Raven sample</a>, including its imports, Widget class, helper and Main function.</li><li>Copy it into <code>Main.rvn</code> in the prepared <code>Demo</code> project and save.</li><li>Choose <strong>Terminal → Run Task → neoCLR: Run saved project</strong>. The task compiles, imports, verifies and runs the saved program on neoCLR.</li></ol>
         <p>Raven’s ordinary Run/Debug commands target .NET; use the neoCLR task for this walkthrough. For the project named Demo and the current library snapshot, the expected output is:</p>
         <pre tabindex="0" data-language="text" aria-label="Expected output of the complete program"><code>{{TOUR_OUTPUT}}</code></pre>

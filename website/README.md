@@ -42,8 +42,8 @@ Func callbacks with a Void result, calendar validation, imported union patterns,
 familiar semantics/metadata, the type system, the class library, Raven migration
 and tooling, and the planned Raven-authored library and missing API work.
 Edit the executable samples rather than duplicating code in HTML. The Pages workflow
-also rebuilds when Raven sample files change. Feature captions link to their complete
-samples and relevant contract documents; keep preview capabilities separate from
+also rebuilds when Raven sample files change. Feature captions link to on-site feature pages; those pages host complete
+sample downloads and optional contract references; keep preview capabilities separate from
 open research and avoid unsupported performance or compatibility claims.
 
 The invitation welcomes discussion in the general sense, including questions,
@@ -107,3 +107,12 @@ Additional current-state notes cover outcomes, collections/queries, dates/clocks
 and bounded UTF-8 files. Their snippets reuse the same executable samples as the
 homepage and target checks. The feature-page index is `/#feature-pages`; keep it
 current when adding or removing pages.
+
+Homepage sample boxes lead to feature pages. `raven/index.html` introduces the
+language and distinguishes ordinary .NET use from the experimental neoCLR target.
+Its examples reuse the checked propagation, pattern and closure samples.
+
+`try/index.html` is the reader-facing setup guide, centered on .rvnproj. It contains
+the complete Preview 7 install/build/run path and explains development availability.
+The project excerpt is read from the actual bundled project template. Maintain this
+page with each release rather than sending evaluators to repository instructions.
