@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Record the preview-readiness review and fresh local VS Code UTF-8 snapshot.
+  Identify scalar Char as the remaining text-model gap and retain full candidate,
+  package and cross-platform validation gates. Correct old validation-page context
+  so it does not select Preview 6 as the current candidate. No release is published.
+
 - Add concise implementation pages for Option/Result, collections/queries,
   dates/clocks and bounded UTF-8 files. Reuse executable source excerpts, describe
   current limits and link future directions; add the feature index and collection
@@ -16,7 +21,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Adopt native UTF-8 as the text direction and change CompareOrdinal from UTF-16
   code-unit order to UTF-8/scalar order. U+10000 now sorts after U+E000; re-sort
   data that depends on the previous ordering. Keep the original proposal and
-  decision history; mark scalar Char as migration work, not a compatibility goal. Twelve ordinal/String runtime tests and the Raven
+  decision history; mark scalar Char as migration work, not a compatibility goal. Thirteen ordinal/String runtime tests and the Raven
   boundary sample pass with the new ordering.
 
 - Document the homepage/feature/proposal structure and website review with each

@@ -1,10 +1,11 @@
 # Next-preview validation
 
-The selected candidate is **v0.1.0-preview.6**, dated 2026-09-14. See
-[Preview 6 notes](preview-6-release-notes.md). Its versioned commit must pass the
-six-job source CI gate before publication. Separate package validation covers the
-macOS arm64 runtime/Raven bundle and matching experimental SDK/VSIX; it does not
-claim their availability on other hosts. Published Preview 1–3 notes remain frozen.
+**Historical candidate context:** the procedure below was recorded for
+v0.1.0-preview.6 (2026-09-14). It does not select the current development candidate.
+See the [2026-09-19 readiness review](preview-readiness-2026-09-19.md) for the current
+implementation, remaining text-model migration and outstanding release gates.
+The reusable archive and platform checks below still apply to a newly selected
+candidate. Published release notes remain unchanged.
 
 ## Validation scope
 

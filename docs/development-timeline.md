@@ -4306,3 +4306,10 @@ Option/Result, collection/query, date/clock and bounded-file APIs using tested s
 excerpts. The release review distinguishes implemented paths, the remaining scalar
 Char migration and packaging/validation gates from optional proposals. No new
 release version, date or publication has been selected.
+
+The assistant's [readiness review](preview-readiness-2026-09-19.md) identifies scalar
+Char as the clearest remaining implementation gap before claiming the selected
+native text model. It recommends keeping broad proposal families deferred and
+prioritizing a pinned, validated evaluator bundle. A fresh local VS Code UTF-8
+workspace runs and completes correctly. These are local findings, not a selected
+release scope, version/date, cross-platform gate or publication.
