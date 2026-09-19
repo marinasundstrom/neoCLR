@@ -1,0 +1,7 @@
+; Generated from runtime/raven/src/System/Runtime/CompilerServices/UnionAttribute.rvn. Regenerate with build_runtime_library.py.
+.type System.Runtime.CompilerServices.UnionAttribute
+.method instance .ctor() -> Void
+ldvoid
+ret
+.end
+.end

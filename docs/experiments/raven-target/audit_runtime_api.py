@@ -48,6 +48,11 @@ for file in source['sourceFiles']:
                 raise ValueError('Service without a reviewed library caller: ' + name)
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'implementation-service', 'callers': callers})
         continue
+    if file.startswith(('runtime/raven/generated/Object.', 'runtime/raven/generated/UnionAttribute.')):
+        rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-intrinsic-marker',
+                     'tests': ['docs/experiments/raven-target/verify_marker_library.py', 'tests/raven_reflection.rs'],
+                     'note': 'Empty Raven root/attribute declarations; checked empty constructors project to the existing runtime marker ABI. Compiler-facing Object members and attribute recognition remain metadata protocol.'})
+        continue
     if file.startswith('runtime/raven/generated/BindingFlags.'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-enum-declaration',
                      'samples': ['library-flags.rvn', 'library-reflection.rvn'],

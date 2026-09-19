@@ -209,4 +209,10 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'BindingFlags'">
     <Compile Include="src/System/Introspection/BindingFlags.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Object'">
+    <Compile Include="src/System/Object.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'UnionAttribute'">
+    <Compile Include="src/System/Runtime/CompilerServices/UnionAttribute.rvn" />
+  </ItemGroup>
 </Project>

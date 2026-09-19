@@ -11,7 +11,7 @@ This slice adds Raven sources for the fundamental and collection interfaces,
 SystemClock, LocalDateTime, IntPtr/UIntPtr comparisons, the complete Int32 member
 surface, Console and Environment. File.ReadAllText joins WriteAllText in Raven.
 The follow-up ports String and opaque Error, then five empty error types and Void,
-followed by seven typed error carriers, and the Propagatable declaration, then Option/Result and their cases, then the inherited descriptor family and NativeMemory, then System.Fault, Func declarations and the normal BindingFlags enum, bringing the total to 70 slices.
+followed by seven typed error carriers, and the Propagatable declaration, then Option/Result and their cases, then the inherited descriptor family and NativeMemory, then System.Fault, Func declarations and the normal BindingFlags enum and Object/UnionAttribute markers, bringing the total to 72 slices.
 The legacy Neo profile retains its receiver/array conventions where it differs;
 the Raven profile selects generated contracts and implementation bodies.
 
@@ -50,7 +50,7 @@ This migration reuses the .NET comparisons in [common interfaces](common-interfa
 additional generated adapters and a larger reachable call graph; no performance
 improvement or new native ABI is claimed.
 
-Remaining handwritten source includes array/runtime adapters and root/attribute markers.
+Remaining handwritten source includes array/runtime adapters.
 Native service declarations remain runtime-owned. Generated neoIL remains a build
 artifact rather than a competing implementation. These boundaries are not silently
 claimed to have become Raven source.
@@ -160,7 +160,6 @@ The remaining migration gates are substantive work, not just moving files:
 
 | Remaining source | Required implementation admission |
 | --- | --- |
-| Root/attribute markers | Checked declaration metadata |
 | Array and iterator adapters | Runtime-owned allocation/element access and delegate invocation boundaries |
 
 Complete those gates before calling the entire source port finished. Executable
@@ -1092,3 +1091,16 @@ bits, equality and reflection filtering without representing the source as a str
 Consumer enum metadata remains unchanged. The general CLI backing-field flag fix
 is independently integrated on Raven main (`266b457f5`); the target declaration
 projection remains in neoCLR. No Runtime Contract configuration changes.
+
+
+Object and UnionAttribute are now empty Raven class declarations, with a checked
+parameterless base-calling constructor. Object projects to the existing fieldless
+runtime root; the source constructor is not a new runtime allocation API. Its
+compiler-facing Equals/GetHashCode/ToString reference members remain recognition
+metadata. UnionAttribute uses ordinary CLI Attribute inheritance in source; the
+checked target projection retains the existing fieldless marker and no-op Void
+constructor. Attribute recognition does not execute that source class or introduce
+CLR attribute instantiation. The benefit is explicit source ownership without new
+managed behavior; the cost is a bounded declaration projection that cannot be used
+for arbitrary classes. Storage, extra methods, constructor effects, different bases
+and sealing changes are rejected. No Runtime Contract configuration changes.

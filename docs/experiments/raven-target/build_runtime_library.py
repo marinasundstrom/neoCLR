@@ -10,6 +10,8 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    'Object': 'System.Object',
+    'UnionAttribute': 'System.Runtime.CompilerServices.UnionAttribute',
     'BindingFlags': 'System.Introspection.BindingFlags',
     'Func': 'System.Func',
     'Fault': 'System',
@@ -85,6 +87,8 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    'Object': 'runtime/raven/src/System/Object.rvn',
+    'UnionAttribute': 'runtime/raven/src/System/Runtime/CompilerServices/UnionAttribute.rvn',
     'BindingFlags': 'runtime/raven/src/System/Introspection/BindingFlags.rvn',
     'Func': 'runtime/raven/src/System/Func.rvn',
     'Fault': 'runtime/raven/src/System/Functions.rvn',

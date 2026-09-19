@@ -753,12 +753,14 @@
       ]
     },
     {
-      "file": "runtime/System/Runtime/CompilerServices/UnionAttribute.neoil",
+      "file": "runtime/raven/generated/UnionAttribute.methods.neoil",
       "declarations": 2,
-      "disposition": "signature-markers",
-      "samples": [
-        "library-void.rvn"
-      ]
+      "disposition": "raven-authored-intrinsic-marker",
+      "tests": [
+        "docs/experiments/raven-target/verify_marker_library.py",
+        "tests/raven_reflection.rs"
+      ],
+      "note": "Empty Raven root/attribute declarations; checked empty constructors project to the existing runtime marker ABI. Compiler-facing Object members and attribute recognition remain metadata protocol."
     },
     {
       "file": "runtime/neoCLR/Runtime/StringConcat.neoil",

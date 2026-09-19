@@ -1,0 +1,4 @@
+namespace System
+
+public open class Object {
+}

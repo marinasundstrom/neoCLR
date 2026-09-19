@@ -105,6 +105,17 @@ No Runtime Contract options or consumer enum semantics change. The host emitter'
 reserved-bit masking is repaired in Raven's final metadata pass; target-specific
 nominal enum lowering remains outside Raven main.
 
+## Root and attribute marker follow-up
+
+Object and UnionAttribute bring the total to 72 source slices. Nine source admission
+cases reject storage, added methods, constructor side effects, wrong bases and
+changed sealing. A fresh generic-union Raven program compiles, imports, verifies
+and executes with expected results against the rebuilt library. The fieldless root
+and marker ABI remain unchanged; compiler-facing Object members are recognition
+metadata rather than executable stub bodies. Source/artifact hashes and ownership
+audits match. All 22 attribute/ordinary-union/reflection tests pass. This adds no
+compiler code or Runtime Contract configuration.
+
 ## Reproduce the program gate
 
 Use the neoCLR feature compiler, built from the Raven repository's

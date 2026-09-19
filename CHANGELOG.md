@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Port empty Object and UnionAttribute declarations to Raven (72 source slices).
+  Check exact empty constructor and declaration shape while preserving the existing
+  runtime root/marker ABI and compiler-facing recognition metadata. Nine admission
+  checks, 22 attribute/union/reflection tests and the saved generic-union program pass.
+
 - Port BindingFlags as a normal Raven Flags enum (70 source slices), preserving
   its six Int32 values, unknown bits and reflection filtering. Checked intrinsic
   enum lowering supplies the existing runtime ABI. Seven admission checks, 31

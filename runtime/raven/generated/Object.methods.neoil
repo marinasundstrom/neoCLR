@@ -1,0 +1,3 @@
+; Generated from runtime/raven/src/System/Object.rvn. Regenerate with build_runtime_library.py.
+.type class System.Object
+.end

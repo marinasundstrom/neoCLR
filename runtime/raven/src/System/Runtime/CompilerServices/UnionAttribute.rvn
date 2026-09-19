@@ -1,0 +1,6 @@
+namespace System.Runtime.CompilerServices
+
+public class UnionAttribute : System.Attribute {
+    init() {
+    }
+}

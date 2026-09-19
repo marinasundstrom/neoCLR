@@ -1,0 +1,3 @@
+; Raven-authored intrinsic declaration; no managed storage or algorithm.
+.include "generated/UnionAttribute.methods.neoil"
+.include "generated/UnionAttribute.helpers.neoil"
