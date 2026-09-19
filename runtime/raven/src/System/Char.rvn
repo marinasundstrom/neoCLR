@@ -62,21 +62,6 @@ public struct Char : Comparable<char> {
         return category >= 25 && category <= 28
     }
 
-    static func IsSurrogate(value: char) -> bool {
-        let code: int = value
-        return code >= 55296 && code <= 57343
-    }
-
-    static func IsHighSurrogate(value: char) -> bool {
-        let code: int = value
-        return code >= 55296 && code <= 56319
-    }
-
-    static func IsLowSurrogate(value: char) -> bool {
-        let code: int = value
-        return code >= 56320 && code <= 57343
-    }
-
     static func IsAscii(value: char) -> bool {
         let code: int = value
         return code <= 127

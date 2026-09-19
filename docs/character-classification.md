@@ -3,8 +3,7 @@
 The runtime now represents Char as a validated Unicode scalar stored in four bytes.
 String remains native valid UTF-8. Supplementary characters are classified directly;
 surrogates and values above U+10FFFF fault at Char value/storage boundaries.
-This supersedes the original 2026-09-08 UTF-16 code-unit contract. Raven source
-integration and retirement of surrogate-only APIs are the next migration slice.
+This supersedes the original 2026-09-08 UTF-16 code-unit contract. Raven projects select this representation through the Unicode scalar Char contract.
 
 ## Contract and .NET comparison
 
@@ -27,15 +26,13 @@ Reuse their single-Char library contracts:
 | IsControl | Cc |
 | IsPunctuation | Pc, Pd, Ps, Pe, Pi, Pf and Po |
 | IsSymbol | Sm, Sc, Sk and So |
-| IsSurrogate / IsHighSurrogate / IsLowSurrogate | D800–DFFF / D800–DBFF / DC00–DFFF |
 | IsAscii / IsAsciiDigit | 0000–007F / ASCII 0–9 |
 
 No culture, normalization, case conversion, input mutation, retention or recoverable
 errors are involved. IsDigit does not promise that Int32.Parse accepts that character:
 the current parser intentionally accepts ASCII digits only. Use IsAsciiDigit for
 ASCII numeric protocols. A combining mark is not a letter, and a numeric fraction
-is not a decimal digit. Surrogates cannot be supplied as Char values. The legacy surrogate predicates
-are transitional and cannot accept their former inputs.
+is not a decimal digit. Surrogates cannot be supplied as Char values. The surrogate predicates have been removed.
 String/index overloads are deferred until indexing units are settled.
 
 These are library rules, not new CLR opcodes. Neo emits ordinary static calls;
@@ -60,8 +57,7 @@ must account for assignments changing between Unicode releases.
 The Neo frontend accepts one scalar, common escapes, four-digit \u and eight-digit
 \U escapes. Surrogates, out-of-range scalars and multi-scalar literals are rejected.
 The supplementary value is preserved on the Int32 evaluation stack without a
-16-bit conversion. This describes the historical Neo frontend; Raven's target
-contract is being migrated separately.
+16-bit conversion. This describes the historical Neo frontend; Raven's neoCLR target accepts the same scalar literal forms.
 
 ## Use and validation
 
@@ -73,7 +69,7 @@ python3 scripts/generate-char-categories.py /path/to/UnicodeData.txt
 ```
 
 The sample distinguishes Unicode and ASCII digits, checks a letter and whitespace,
-and demonstrates a surrogate code unit. Tests exercise static IL calls, serialized
+and classifies a supplementary symbol. Tests exercise static IL calls, serialized
 artifacts, source literals and invalid literal diagnostics. Generation verifies the
 source SHA-256, handles UnicodeData range records and defaults unassigned units to
 Cn. Unicode data licensing is retained in `third-party/unicode/LICENSE.txt`.

@@ -141,7 +141,6 @@ fn ascii_checks_are_platform_il_and_unicode_checks_declare_service() {
         ("IsDigit", true),
         ("IsWhiteSpace", true),
         ("IsAsciiDigit", false),
-        ("IsSurrogate", false),
     ] {
         let graph = p
             .analyze_reachability(

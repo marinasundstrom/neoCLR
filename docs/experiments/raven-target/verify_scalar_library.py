@@ -33,14 +33,11 @@ with tempfile.TemporaryDirectory(prefix='neoclr-scalar-library-') as temporary:
         expected.append('zero' if right == 0 else 'overflow' if (left, right) == (-2147483648, -1)
                         else str((abs(left) // abs(right)) * (-1 if (left < 0) != (right < 0) else 1)))
     for code in [0, 8, 9, 13, 14, 32, 47, 48, 57, 58, 65, 127, 128, 133, 160,
-                 233, 1639, 0x200b, 0x2028, 0xd7ff, 0xd800, 0xdbff, 0xdc00, 0xdfff, 0xe000, 0xffff]:
+                 233, 1639, 0x200b, 0x2028, 0xd7ff, 0xe000, 0xffff, 0x10400, 0x1d7ce, 0x1f600, 0x10ffff]:
         predicates = {
-            'IsSurrogate': 0xd800 <= code <= 0xdfff,
-            'IsHighSurrogate': 0xd800 <= code <= 0xdbff,
-            'IsLowSurrogate': 0xdc00 <= code <= 0xdfff,
             'IsAscii': code <= 127,
             'IsAsciiDigit': 48 <= code <= 57,
-            'IsLetterOrDigit': code in [48, 57, 65, 233, 1639],
+            'IsLetterOrDigit': code in [48, 57, 65, 233, 1639, 0x10400, 0x1d7ce],
             'IsWhiteSpace': code in [9, 13, 32, 133, 160, 0x2028],
         }
         for name, value in predicates.items():
@@ -93,3 +90,21 @@ func Main() {
     actual = run([runtime, 'run', imported / 'App.neoil', '--system', system]).splitlines()
     assert actual == expected, (actual, expected)
     print(f'{len(expected)} scalar and Boolean merge outcomes passed')
+
+    # Invalid scalar values must fail even when the cast is immediately widened.
+    for code in (0xd800, 0xdfff, 0x110000, -1):
+        (root / 'Main.rvn').write_text(f"""import System.Console.*
+func Invalid(value: int) -> int {{
+    return (int)(char)value
+}}
+func Main() {{
+    WriteLine(Invalid({code}))
+}}
+""")
+        run(['dotnet', compiler, project, '--no-project-restore', '-o', root / 'compiled'])
+        rejected = root / ('invalid-' + str(code))
+        run(['dotnet', bridge, '--import', root / 'compiled/Consumer.dll', core, rejected])
+        failure = subprocess.run([str(runtime), 'run', str(rejected / 'App.neoil'), '--system', str(system)], capture_output=True, text=True, timeout=30)
+        assert failure.returncode != 0, (code, failure.stdout, failure.stderr)
+        assert 'Char requires a Unicode scalar value' in failure.stderr, (code, failure.stderr)
+    print('4 invalid scalar conversion outcomes passed')

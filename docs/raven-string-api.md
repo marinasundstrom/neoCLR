@@ -138,3 +138,33 @@ saved-project edit/rejection checks. Three UTF-8 runtime tests and thirteen exis
 String/disposal tests pass. The signature probe, String/Utf8 editor completion,
 source ownership (850 declarations, 69 services) and clean bootstrap regeneration
 also pass. The public error remains intentionally minimal pending usage feedback.
+
+## Scalar Char integration — 2026-09-19
+
+The neoCLR project props select `RavenUnicodeScalarChar=true`. Raven keeps
+`System.Char` in CLI signatures but uses 32-bit scalar loads, stores and numeric
+conversions on this target. Supplementary literals (`'🌍'` and `'\U0001F600'`)
+have type `char`; surrogate literals are rejected. The runtime validates Char
+storage, so invalid numeric scalar values fault rather than becoming surrogates.
+The ordinary Raven .NET target retains its UTF-16 Char contract.
+
+Char classification covers supplementary Unicode values. `IsSurrogate`,
+`IsHighSurrogate` and `IsLowSurrogate` are removed: their inputs cannot be scalar
+Char values. Existing binaries and reference packs must be rebuilt together.
+This is target-specific policy and remains on Raven's `neoclr` branch.
+
+Compared with .NET Char, the benefit is one value per Unicode scalar without
+surrogate pairs; the cost is incompatible 32-bit storage and scalar validation.
+.NET Rune is the closer semantic comparison. A scalar is not a grapheme, and
+this slice does not add grapheme indexing or general encoding abstractions.
+
+Validation: 76 focused Raven lexer/literal/semantic cases; saved-project ScalarChar
+and Primitives samples plus edit/rejection checks; 125 scalar/Boolean outcomes
+and four invalid Int32-to-Char conversions; runtime classification/integer/library
+checks. The LSP exposes the remaining classification methods. Unicode escapes are
+already covered by the Raven TextMate grammar.
+
+Numeric casts retain ordinary numeric narrowing to UInt32 before scalar validation;
+this is not a checked conversion from arbitrary wide numeric inputs. Scalar String
+length/index/iteration remains a separate minimal API slice. No new source debugger
+or native FFI Char ABI is introduced.

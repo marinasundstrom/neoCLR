@@ -4341,3 +4341,14 @@ The author emphasized that neoCLR and its guest programs have no .NET dependency
 the dependency belongs to surrounding tooling, including Raven Language Server
 used by VS Code. The assistant made this explicit on the homepage, Raven page and
 setup guide, and recorded the distinction in the website maintenance rules.
+
+### Raven scalar Char integration — 2026-09-19
+
+On continuation, the assistant completed the target-specific compiler/bridge slice:
+scalar literals, patterns, array storage and classification work in Raven programs.
+Execution testing exposed 16-bit array admission and boxed supplementary patterns;
+both were corrected. Invalid Int32 scalar conversions fault at runtime, and the
+surrogate predicates were retired. Wide numeric casts still narrow before scalar
+validation; scalar String access remains separate. General lexer candidates remain
+unextracted pending independent main-based validation. This is local development
+validation, not a published preview or a complete text proposal implementation.

@@ -1,0 +1,32 @@
+import System.*
+import System.Console.*
+
+func Identity(value: char) -> char {
+    return value
+}
+
+func Describe(value: char) -> string {
+    return match value {
+        '🌍' => "Earth"
+        '\U0001F600' => "Smile"
+        _ => "Other"
+    }
+}
+
+func Main() {
+    let earth = '🌍'
+    let smile = '\U0001F600'
+    let values: char[] = [earth, smile, 'A']
+    values[2] = (char)0x10400
+    WriteLine((int)Identity(values[0]))
+    WriteLine((int)values[1])
+    WriteLine((int)values[2])
+    WriteLine(Describe(values[0]))
+    WriteLine(Describe(values[1]))
+    if Char.IsLetter(values[2]) {
+        WriteLine("Supplementary letter")
+    }
+    if Char.IsSymbol(smile) {
+        WriteLine("Supplementary symbol")
+    }
+}

@@ -19,7 +19,7 @@ incomplete. No primitive representation selects allocation or ownership policy.
 | Int64 / UInt64 | 8 | Int64, same bits |
 
 Eight-byte integers use host u64 alignment; other fixed-width integers use alignment
-equal to their size. Native memory uses host byte order. Char is one Unicode scalar and permits surrogate code units. This does not choose String's encoding; see
+equal to their size. Native memory uses host byte order. Char is one Unicode scalar and excludes surrogate code units. This does not choose String's encoding; see
 [text direction](text-model.md). It is not a validated Unicode scalar value.
 
 Loads from locals, arguments, fields, and native storage produce the stack category

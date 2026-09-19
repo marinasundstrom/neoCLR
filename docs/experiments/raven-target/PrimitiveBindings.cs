@@ -4,7 +4,7 @@ using Mono.Cecil;
 static class PrimitiveBindings
 {
     public static readonly string[] Types = ["SByte", "Byte", "Int16", "UInt16", "Char", "UInt32", "Int64", "UInt64", "Single", "IntPtr", "UIntPtr"];
-    static readonly string[] CharacterMethods = ["IsDigit", "IsNumber", "IsLetter", "IsUpper", "IsLower", "IsSeparator", "IsControl", "IsPunctuation", "IsSymbol", "IsSurrogate", "IsHighSurrogate", "IsLowSurrogate", "IsAscii", "IsAsciiDigit", "IsLetterOrDigit", "IsWhiteSpace"];
+    static readonly string[] CharacterMethods = ["IsDigit", "IsNumber", "IsLetter", "IsUpper", "IsLower", "IsSeparator", "IsControl", "IsPunctuation", "IsSymbol", "IsAscii", "IsAsciiDigit", "IsLetterOrDigit", "IsWhiteSpace"];
     public static string Stack(string type) => type switch {
         "SByte" or "Byte" or "Int16" or "UInt16" or "Char" or "UInt32" => "Int32",
         "UInt64" => "Int64", "Single" => "Double", _ => type

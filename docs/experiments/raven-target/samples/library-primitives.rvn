@@ -56,15 +56,6 @@ func Main() {
     if Char.IsSymbol('$') {
         WriteLine("Symbol")
     }
-    if Char.IsSurrogate((char)55296) {
-        WriteLine("Surrogate")
-    }
-    if Char.IsHighSurrogate((char)55296) {
-        WriteLine("High")
-    }
-    if Char.IsLowSurrogate((char)56320) {
-        WriteLine("Low")
-    }
     if Char.IsAscii('A') {
         WriteLine("ASCII")
     }

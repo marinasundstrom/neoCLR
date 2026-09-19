@@ -60,7 +60,7 @@
     "runtime/raven/src/System/Value.rvn": "3d005ba17dc0c055b21e21183a857dcb23c5b34882ad26b4583234dff33d8162",
     "runtime/raven/src/System/Math/Functions.rvn": "7c6b80a8c549c2b1c91735bb7a325ab75472d112e81ae913d77b916ea5e22de0",
     "runtime/raven/src/System/Int32.rvn": "37187e831a9ac3bead1a72cf4c72f7922b9dce1cefd281c3785c322dd4ca7ea2",
-    "runtime/raven/src/System/Char.rvn": "6ef4617518e031038c79a5703ba1718a28c8ecbbb0e157e6570598ed8c5540af",
+    "runtime/raven/src/System/Char.rvn": "10a5743dff40624245cbb8883ad26bd3693ef1963415d6a03d2c42a16ed0569e",
     "runtime/raven/src/System/Linq/Operators.rvn": "58a60fe5ecd4f68560baf6c16bc8342992c9d32752c6b0b40140d0300251e605",
     "runtime/raven/src/System/Collections/ArrayList.rvn": "6bc4ea11b0f4d22235f5b938e5cfb4086075d4989a700a29384361e9447e4d1a",
     "runtime/raven/src/System/Collections/HashMap.rvn": "b41f6da8155ee5d9d4df62d55e18f2cc47fea1bbc9c46d9cff7fa729d955d31e",
@@ -79,14 +79,14 @@
     "runtime/raven/src/System/Double.rvn": "cd3ad24e4a21b7616a2937da71891618284913e26ea180ce203276f18b631f33",
     "runtime/raven/src/System/Boolean.rvn": "1f0010fe0d346fbc7f3ba29c88b2c1cf80faebf42a4c2de2f0cd6cff15335022",
     "runtime/raven/System.Runtime.rvnproj": "9f815c5ba56c044f039c77808128fd88fbcce808638783cb198779c602d4432e",
-    "build/NeoCLR.Raven.props": "777b7b3296746094aee7c159fd33bd0b262a7493be4647f7f3a04b988544c385"
+    "build/NeoCLR.Raven.props": "7c19b1405ca61b03e4d18e49a031f711fb5c164da71faaf4b01931320ecbd2c2"
   },
   "outputs": {
     "InvalidUtf8Error.methods.neoil": "2de1a50395b543b27739c483274dde7354baa9254878974983a16ec552d2a893",
     "InvalidUtf8Error.helpers.neoil": "34cde30bcbf667e9f766d60107264ddd4c1ff8ffd0d6e8acbd3cfa960bf2ba9a"
   },
-  "compilerSha256": "f933e9f722ca86a60dc110532c9d7191ae20251d614930348bf2ef04e5ab252d",
-  "coreSha256": "7b0e051eb758e133efbe63777412bd86ae45afc06f94bf43e268515fbb2623d1",
+  "compilerSha256": "3dde85eaa95f357bb0d880ac588a1e2cd23eb70782ae76b5090fcb44fdc2a143",
+  "coreSha256": "c0c05b1a11d08fdc7464c1de95514bbd53af3151be32b568004f8a04da83d987",
   "exports": [
     "ToString() -> String",
     ".ctor() -> Void"

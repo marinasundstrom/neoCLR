@@ -201,9 +201,11 @@ try:
             'position': {'line': 1, 'character': 16}, 'context': {'triggerKind': 1}}, True))
         items = result if isinstance(result, list) else result['items']
         labels = sorted({item['label'] for item in items})
-        expected = ('IsDigit', 'IsNumber', 'IsLetter', 'IsUpper', 'IsLower', 'IsSeparator', 'IsControl', 'IsPunctuation', 'IsSymbol', 'IsSurrogate', 'IsHighSurrogate', 'IsLowSurrogate', 'IsAscii', 'IsAsciiDigit', 'IsLetterOrDigit', 'IsWhiteSpace')
+        expected = ('IsDigit', 'IsNumber', 'IsLetter', 'IsUpper', 'IsLower', 'IsSeparator', 'IsControl', 'IsPunctuation', 'IsSymbol', 'IsAscii', 'IsAsciiDigit', 'IsLetterOrDigit', 'IsWhiteSpace')
         if any(not any(label == name or label.startswith(name + '(') for label in labels) for name in expected):
             raise AssertionError('Missing character API: ' + str(labels))
+        if any('Surrogate' in label for label in labels):
+            raise AssertionError('Removed surrogate API remains visible: ' + str(labels))
         results['Char'] = labels
     if calendar:
         for version, expression, expected in (
