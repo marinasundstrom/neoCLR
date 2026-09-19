@@ -40,7 +40,12 @@ admission cases, seven TypeInfo cases, five ParameterInfo cases and 29 focused
 reflection/type-inspection tests pass. All 770 Raven-profile declarations have
 source or explicit native-service ownership (54 services). The language-server
 check reports completion kind 8 (interface) for all six public Info contracts and
-keeps Runtime*Info providers out of public completion.
+keeps Runtime*Info providers out of public completion. All 71 saved-project checks
+pass across the initial 42 samples and the resumed 29 checks after correcting the
+old FieldInfo-class-base assertion. The 21 reference/boxing checks cover successful
+and failed type tests, nulls, object identity, boxed interface implementations and
+intrinsic strings. A broader cargo run was stopped after targeted checks passed;
+this is not a new full-suite validation claim.
 
 Existing callers must rebuild: Info member calls now use interface dispatch. The
 historical Neo profile retains value descriptors. Type references in these

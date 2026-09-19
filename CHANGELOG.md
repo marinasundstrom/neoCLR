@@ -22,7 +22,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   import and execute Raven's reference type patterns, and reject missing cases.
   System.Type/Info acquisition and array-return signatures remain transitional.
   Record the subsequent proposal to add TypeInfo as a member case with optional
-  declaring-type ownership; that extension is not implemented yet.
+  declaring-type ownership; that extension is not implemented yet. The reflection
+  sample now expects no class base for FieldInfo; saved-project checks can resume
+  from a named sample after a fixture correction. All 71 saved-project checks,
+  29 reflection checks and 21 reference/boxing checks pass.
 
 - Record the author's selected sealed Info hierarchy, replacing the proposed open
   implementation model. Permitted runtime providers remain internal; collection

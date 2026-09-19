@@ -95,7 +95,7 @@ func Main() {
     WriteLine(generic.GetGenericArgument(index: 0).Name)
     WriteLine(generic.GetGenericArguments()[0].Name)
     WriteLine(generic.Info.GetInterfaces().Length)
-    Show(typeof(FieldInfo).Info.BaseType.IsSome)
+    Show(typeof(FieldInfo).Info.BaseType.IsNone)
     Show(info.GetElementType().IsNone)
     let array = typeof(int[])
     Show(array.IsArray)

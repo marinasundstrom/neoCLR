@@ -11,6 +11,7 @@ import tempfile
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('project', type=Path)
 parser.add_argument('--collections', action='store_true')
+parser.add_argument('--start-at', help='Resume positive sample checks at this label; always run edit/rejection checks')
 add_toolchain_arguments(parser)
 parser.add_argument('--runtime', required=True, type=Path)
 args = parser.parse_args()
@@ -76,6 +77,11 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
                   ('Workflow', 'library-workflow.rvn', '42\nCompleted\nPrice overflow\nSkipped\nProduct not found\nSkipped\n'),
                   ('ForEach', 'library-foreach.rvn', '41\n42\n41\n41\n'),
                  ('Aliases', 'library-collection-aliases.rvn', '7\n42\n2\n')]
+    if args.start_at:
+        labels = [label for label, _, _ in cases]
+        if args.start_at not in labels:
+            parser.error('Unknown sample label: ' + args.start_at)
+        cases = cases[labels.index(args.start_at):]
     for label, sample, expected in cases:
         (root / 'Main.rvn').write_text((bridge / 'samples' / sample).read_text())
         run = subprocess.run(command, capture_output=True, text=True, timeout=90)
