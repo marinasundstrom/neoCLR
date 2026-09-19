@@ -11,7 +11,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Add reference-only `isinst` and `ref.isnull` instructions for runtime type tests.
   Successful tests preserve object identity through interface views; failed/null
   tests return typed nulls. Interface tests also accept boxed implementations and
-  preserve intrinsic string representation. Boxed value-type targets remain unsupported.
+  preserve intrinsic string representation. Boxed values also match System.Object;
+  boxed value-type targets remain unsupported.
 
 - Migrate the Raven profile's six Info contracts to sealed interfaces with internal
   Runtime*Info providers. Preserve permitted-type metadata in the reference and

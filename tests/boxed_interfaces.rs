@@ -265,3 +265,24 @@ fault "string comparison failed"
         Value::String("hello".into())
     );
 }
+
+#[test]
+fn boxed_value_type_test_recognizes_object_root() {
+    let m = module(
+        r#"
+.function Main() -> Boolean
+ldc.i4 40
+newobj Counter
+box Counter
+isinst System.Object
+ref.isnull
+ret
+.end
+"#,
+    );
+    verify(&m).unwrap();
+    assert_eq!(
+        run(&m, Limits::default()).unwrap().value,
+        Value::Boolean(false)
+    );
+}

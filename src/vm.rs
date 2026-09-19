@@ -2146,6 +2146,7 @@ fn interpret_instructions(
                     };
                     crate::arrays::check_cast(&concrete, target)?;
                     if concrete == *target
+                        || *target == Type::Named("System.Object".into())
                         || module.reference_assignable(&concrete, target)
                         || (crate::interfaces::interface_definition(module, target).is_ok()
                             && crate::interfaces::ensure_implementation(module, &concrete, target)
