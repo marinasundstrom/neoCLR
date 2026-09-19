@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Document imported union case patterns in the Raven conventions: use Some, None,
+  Ok and Error without a leading dot when their case namespaces are imported.
+  Update the convention examples, including nested patterns.
+
 - Add the basic development Iterable operators before Task work: Any, All, Count,
   seeded Fold, Take, Skip, Concat and FlatMap. Preserve short-circuiting, empty-input
   outcomes, ordered lazy composition and normal iterator disposal. Count faults on

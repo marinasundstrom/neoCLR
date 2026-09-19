@@ -79,14 +79,19 @@ Prefer a case pattern or destructuring over `IsSome` followed by
 
 ```raven
 match FindPrice(7) {
-    .Some(let price) => Console.WriteLine(price)
-    .None => Console.WriteLine("Product not found")
+    Some(let price) => Console.WriteLine(price)
+    None => Console.WriteLine("Product not found")
 }
 ```
 
-Use `if value is .Some(let item)` when only the present branch needs work. Use
+With `import System.Option.*` and `import System.Result.*`, prefer plain case
+patterns (`Some`, `None`, `Ok`, `Error`) over member case patterns (`.Some`,
+`.None`, `.Ok`, `.Error`). The imports bring the case names into scope; a leading
+dot is unnecessary. Qualify a constructor only when name resolution requires it.
+
+Use `if value is Some(let item)` when only the present branch needs work. Use
 `match` when every alternative needs meaning. Nested patterns can unpack nested
-carriers, such as `.Some(.Ok(let number))`. Use `_` for a payload that is genuinely
+carriers, such as `Some(Ok(let number))`. Use `_` for a payload that is genuinely
 unused; do not hide distinct meaningful cases behind a catch-all.
 
 Use `?` to propagate compatible absence or failure when the current function
