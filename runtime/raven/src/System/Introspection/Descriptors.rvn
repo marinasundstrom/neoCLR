@@ -1,0 +1,188 @@
+namespace System.Introspection
+
+import System.*
+import System.Runtime.CompilerServices.*
+
+public abstract class MemberInfo {
+    private field StoredName: string
+    private field StoredDeclaringType: Type
+
+    protected init(name: string, declaringType: Type) {
+        StoredName = name
+        StoredDeclaringType = declaringType
+    }
+
+    val Name: string { get => StoredName }
+    val DeclaringType: Type { get => StoredDeclaringType }
+}
+
+public open class FieldInfo : MemberInfo {
+    private field StoredFieldType: Type
+    private field StoredIsPublic: bool
+    private field StoredIsPrivate: bool
+    private field StoredIsAssembly: bool
+    private field StoredIsStatic: bool
+    private field StoredDefinitionIndex: int
+
+    private init(
+        name: string, declaringType: Type,
+        fieldType: Type, isPublic: bool,
+        isPrivate: bool, isAssembly: bool,
+        isStatic: bool, definitionIndex: int): base(name, declaringType) {
+        StoredFieldType = fieldType
+        StoredIsPublic = isPublic
+        StoredIsPrivate = isPrivate
+        StoredIsAssembly = isAssembly
+        StoredIsStatic = isStatic
+        StoredDefinitionIndex = definitionIndex
+    }
+
+    val FieldType: Type { get => StoredFieldType }
+    val IsPublic: bool { get => StoredIsPublic }
+    val IsPrivate: bool { get => StoredIsPrivate }
+    val IsAssembly: bool { get => StoredIsAssembly }
+    val IsStatic: bool { get => StoredIsStatic }
+    val DefinitionIndex: int { get => StoredDefinitionIndex }
+}
+
+public open class MethodInfo : MemberInfo {
+    private field StoredReturnType: Type
+    private field StoredIsStatic: bool
+    private field StoredIsPublic: bool
+    private field StoredIsPrivate: bool
+    private field StoredIsAssembly: bool
+    private field StoredIsReceiverByRef: bool
+    private field StoredDefinitionIndex: int
+    private field StoredParameters: ParameterSnapshot
+    private field StoredIsReadOnly: bool
+    private field StoredIsVirtual: bool
+    private field StoredIsOverride: bool
+    private field StoredIsAbstract: bool
+
+    private init(
+        name: string, declaringType: Type,
+        returnType: Type, isStatic: bool,
+        isPublic: bool, isPrivate: bool,
+        isAssembly: bool, isReceiverByRef: bool,
+        definitionIndex: int, parameters: ParameterSnapshot,
+        isReadOnly: bool, isVirtual: bool,
+        isOverride: bool, isAbstract: bool): base(name, declaringType) {
+        StoredReturnType = returnType
+        StoredIsStatic = isStatic
+        StoredIsPublic = isPublic
+        StoredIsPrivate = isPrivate
+        StoredIsAssembly = isAssembly
+        StoredIsReceiverByRef = isReceiverByRef
+        StoredDefinitionIndex = definitionIndex
+        StoredParameters = parameters
+        StoredIsReadOnly = isReadOnly
+        StoredIsVirtual = isVirtual
+        StoredIsOverride = isOverride
+        StoredIsAbstract = isAbstract
+    }
+
+    val ReturnType: Type { get => StoredReturnType }
+    val IsStatic: bool { get => StoredIsStatic }
+    val IsPublic: bool { get => StoredIsPublic }
+    val IsPrivate: bool { get => StoredIsPrivate }
+    val IsAssembly: bool { get => StoredIsAssembly }
+    val IsReceiverByRef: bool { get => StoredIsReceiverByRef }
+    val DefinitionIndex: int { get => StoredDefinitionIndex }
+
+    func GetParameters() -> ParameterInfo[] {
+        val count = StoredParameters.Length
+        val result = CheckedStorage.Reserve<ParameterInfo>(count)
+        var index = 0
+        while index < count {
+            result[index] = StoredParameters.Get(index)
+            index += 1
+        }
+        return result
+    }
+    val IsReadOnly: bool { get => StoredIsReadOnly }
+    val IsVirtual: bool { get => StoredIsVirtual }
+    val IsOverride: bool { get => StoredIsOverride }
+    val IsAbstract: bool { get => StoredIsAbstract }
+}
+
+public open class PropertyInfo : MemberInfo {
+    private field StoredPropertyType: Type
+    private field StoredIsStatic: bool
+    private field StoredCanRead: bool
+    private field StoredCanWrite: bool
+    private field StoredDefinitionIndex: int
+    private field StoredIndexParameters: ParameterSnapshot
+    private field StoredGetter: Option<MethodInfo>
+    private field StoredSetter: Option<MethodInfo>
+
+    private init(
+        name: string, declaringType: Type,
+        propertyType: Type, isStatic: bool,
+        canRead: bool, canWrite: bool,
+        definitionIndex: int, indexParameters: ParameterSnapshot,
+        getter: Option<MethodInfo>, setter: Option<MethodInfo>): base(name, declaringType) {
+        StoredPropertyType = propertyType
+        StoredIsStatic = isStatic
+        StoredCanRead = canRead
+        StoredCanWrite = canWrite
+        StoredDefinitionIndex = definitionIndex
+        StoredIndexParameters = indexParameters
+        StoredGetter = getter
+        StoredSetter = setter
+    }
+
+    val PropertyType: Type { get => StoredPropertyType }
+    val IsStatic: bool { get => StoredIsStatic }
+    val CanRead: bool { get => StoredCanRead }
+    val CanWrite: bool { get => StoredCanWrite }
+    val DefinitionIndex: int { get => StoredDefinitionIndex }
+
+    func GetIndexParameters() -> ParameterInfo[] {
+        val count = StoredIndexParameters.Length
+        val result = CheckedStorage.Reserve<ParameterInfo>(count)
+        var index = 0
+        while index < count {
+            result[index] = StoredIndexParameters.Get(index)
+            index += 1
+        }
+        return result
+    }
+
+    func GetGetMethod() -> Option<MethodInfo> {
+        return GetGetMethod(false)
+    }
+
+    func GetGetMethod(arg0: bool) -> Option<MethodInfo> {
+        val accessor = StoredGetter
+        if accessor.IsNone {
+            return Option<MethodInfo>(System.Option.None())
+        }
+        val method = accessor.GetSomeCase().Value
+        if arg0 {
+            return Option<MethodInfo>(System.Option.Some<MethodInfo>(method))
+        }
+        if method.IsPublic {
+            return Option<MethodInfo>(System.Option.Some<MethodInfo>(method))
+        }
+        return Option<MethodInfo>(System.Option.None())
+    }
+
+    func GetSetMethod() -> Option<MethodInfo> {
+        return GetSetMethod(false)
+    }
+
+    func GetSetMethod(arg0: bool) -> Option<MethodInfo> {
+        val accessor = StoredSetter
+        if accessor.IsNone {
+            return Option<MethodInfo>(System.Option.None())
+        }
+        val method = accessor.GetSomeCase().Value
+        if arg0 {
+            return Option<MethodInfo>(System.Option.Some<MethodInfo>(method))
+        }
+        if method.IsPublic {
+            return Option<MethodInfo>(System.Option.Some<MethodInfo>(method))
+        }
+        return Option<MethodInfo>(System.Option.None())
+    }
+}

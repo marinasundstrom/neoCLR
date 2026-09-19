@@ -53,19 +53,11 @@ def build(path: Path) -> str:
         text = adapt(text, path.stem)
     if path.stem in {'Equatable', 'Comparable', 'Clonable', 'Closable'}:
         text = text.replace('instance readonly byref ', 'instance ').replace('instance byref ', 'instance ')
-    if path.stem in {'TypeInfo', 'Reflection'}:
-        if path.stem == 'Reflection':
-            # Replace the complete descriptor declaration with checked Raven bodies.
-            start = text.index('.type System.Introspection.ParameterInfo\n')
-            end = text.index('; Internal construction contract:', start)
-            text = text[:start] + build(ROOT / 'runtime/raven/ParameterInfo.neoil') + '\n' + text[end:]
-        # Immutable reflection snapshots use ordinary class identity in the target.
-        text = re.sub(r'^\.type (abstract )?(System\.(?:Type|Introspection\.(?:TypeInfo|MemberInfo|FieldInfo|MethodInfo|PropertyInfo|ParameterInfo)))$',
-                      lambda m: '.type class ' + (m[1] or '') + m[2], text, flags=re.M)
-        # These private construction helpers are replaced by trusted snapshot factories.
-        text = re.sub(r'    \.method internal instance byref \.ctor[^\n]*\n.*?    \.end\n', '', text, flags=re.S)
-        text = text.replace('instance readonly byref ', 'instance ').replace('instance byref ', 'instance ')
-        text = text.replace('ldloca method', 'ldloc method')
+    if path == ROOT / 'runtime/System/Reflection.neoil':
+        # Raven owns descriptor bodies; legacy Neo retains its value-based profile.
+        return (build(ROOT / 'runtime/raven/ParameterInfo.neoil')
+                + build(ROOT / 'runtime/raven/Descriptors.neoil')
+                + text[text.index('.type System.Introspection.BindingFlags'):])
     if path == ROOT / 'runtime/System/Collections/List.neoil':
         return build(ROOT / 'runtime/raven/CollectionContracts.neoil') + build(ROOT / 'runtime/raven/List.neoil')
     if path.stem == 'Array':

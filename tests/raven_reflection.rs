@@ -163,3 +163,97 @@ ret
         );
     }
 }
+
+#[test]
+fn descriptor_parameter_arrays_are_independent_copies() {
+    let app = assemble(
+        r#"
+.module SnapshotCopies
+.entry Main
+.type class Item
+.method static Compute(Int32 first,Int32 second) -> Int32
+ldarg first
+ret
+.end
+.end
+.function Main() -> Int32
+.local System.Introspection.MethodInfo method
+.local arrayref<System.Introspection.ParameterInfo> parameters
+ldtoken Item
+call System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)
+call instance System.Type::get_Info()
+call instance System.Introspection.TypeInfo::GetMethods()
+ldc.i4 0
+ldelem System.Introspection.MethodInfo
+stloc method
+ldloc method
+call instance System.Introspection.MethodInfo::GetParameters()
+stloc parameters
+ldloc parameters
+ldc.i4 0
+ldloc parameters
+ldc.i4 1
+ldelem System.Introspection.ParameterInfo
+stelem System.Introspection.ParameterInfo
+ldloc method
+call instance System.Introspection.MethodInfo::GetParameters()
+ldc.i4 0
+ldelem System.Introspection.ParameterInfo
+call instance System.Introspection.ParameterInfo::get_Position()
+ret
+.end
+"#,
+    )
+    .unwrap();
+    let program = LoadedProgram::with_library(&app, library()).unwrap();
+    program.verify().unwrap();
+    assert_eq!(
+        program.run(Limits::default()).unwrap().value,
+        Value::Int32(0)
+    );
+}
+
+#[test]
+fn descriptor_private_accessor_requires_explicit_inclusion() {
+    for (argument, predicate) in [
+        ("ldc.bool false", "get_IsNone"),
+        ("ldc.bool true", "get_IsSome"),
+    ] {
+        let app = assemble(&format!(
+            r#"
+.module Accessors
+.entry Main
+.type class Item
+.property instance Hidden() -> Int32
+.get instance Item::get_Hidden()
+.end
+.method private instance get_Hidden() -> Int32
+ldc.i4 42
+ret
+.end
+.end
+.function Main() -> Boolean
+ldtoken Item
+call System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)
+call instance System.Type::get_Info()
+ldc.i4 36
+call System.Introspection.BindingFlags::FromValue(Int32)
+call instance System.Introspection.TypeInfo::GetProperties(System.Introspection.BindingFlags)
+ldc.i4 0
+ldelem System.Introspection.PropertyInfo
+{argument}
+call instance System.Introspection.PropertyInfo::GetGetMethod(Boolean)
+call instance System.Option<System.Introspection.MethodInfo>::{predicate}()
+ret
+.end
+"#
+        ))
+        .unwrap();
+        let program = LoadedProgram::with_library(&app, library()).unwrap();
+        program.verify().unwrap();
+        assert_eq!(
+            program.run(Limits::default()).unwrap().value,
+            Value::Boolean(true)
+        );
+    }
+}

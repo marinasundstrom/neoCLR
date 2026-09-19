@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Port MemberInfo, FieldInfo, MethodInfo and PropertyInfo to a checked Raven source
+  slice (66 total). Preserve inherited snapshot layout and runtime field names;
+  Raven now owns parameter-array copies and accessor visibility filtering. The
+  bootstrap-only vector read view is absent from consumer metadata. Nine admission
+  checks, 23 reflection tests and the freshly compiled Raven reflection sample pass.
+  Legacy Neo descriptors retain their existing representation.
+
 - Integrate the independently validated Raven namespace/generic-constructor lookup
   correction on main (`d7292b935`) and the neoCLR feature branch (`d833ef2f3`). The
   ordinary .NET regression now returns 42 instead of silently returning 0; 78 focused

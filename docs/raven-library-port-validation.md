@@ -52,6 +52,18 @@ All 64 saved-project cases pass with fresh consumer metadata and the regenerated
 library. Readonly copy adapters retain source receiver promises; failed extraction
 leaves destinations untouched. A final full Rust run remains required.
 
+## Descriptor follow-up
+
+The descriptor hierarchy brings the source total to 66 slices. Nine admission cases
+check storage names/order/types, constructor visibility, sealing, exports, parameter
+names and invalid defaults. All 23 distinct Rust reflection/hierarchy checks pass;
+the final Raven-profile suite includes seven checks, with new array-copy independence
+and nonpublic accessor coverage. A fresh consumer reference and library compile,
+import, verify and run the saved reflection sample with its exact expected output.
+All 64 saved-project cases also pass; the final field-name preservation adjustment
+was rechecked by the seven Raven reflection tests and fresh reflection sample above.
+Snapshot hashes and source/API audits pass. The legacy Neo profile remains separate.
+
 ## Reproduce the program gate
 
 Use the neoCLR feature compiler, built from the Raven repository's

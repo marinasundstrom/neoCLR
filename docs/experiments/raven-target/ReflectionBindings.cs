@@ -137,17 +137,11 @@ static class ReflectionBindings
         if (!Helpers.ContainsKey(key))
         {
             var body = new StringBuilder($".function {name}({string.Join(',', inputs.Select((t,i) => t + " arg" + i))}) -> {result}\n");
-            // Raven-authored Type and TypeInfo return managed arrays. The remaining
-            // NeoIL descriptors still return snapshot arrays which need copying.
-            var vector = owner is not ("System.Type" or "System.Introspection.TypeInfo") && result.StartsWith("arrayref<", StringComparison.Ordinal);
-            var element = vector ? result[9..^1] : "";
-            if (vector) body.AppendLine($".local {element}[] source\n.local {result} destination\n.local Int32 index");
             for (var i = 0; i < inputs.Length; i++)
             {
                 body.AppendLine("ldarg arg" + i);
             }
             body.AppendLine($"call {(reference.HasThis ? "instance " : "")}{owner}::{reference.Name}({string.Join(',', args)})");
-            if (vector) body.AppendLine($"stloc source\nldloc source\nldlen\nconv.i4\nnewarr {element}\nstloc destination\nldc.i4 0\nstloc index\nbr Test\nCopy:\nldloc destination\nldloc index\nldloc source\nldloc index\nldelem {element}\nstelem {element}\nldloc index\nldc.i4 1\nadd\nstloc index\nTest:\nldloc index\nldloc source\nldlen\nconv.i4\nblt Copy\nldloc destination");
             body.AppendLine("ret\n.end"); Helpers.Add(key, body.ToString());
         }
         return new(name, inputs, result);

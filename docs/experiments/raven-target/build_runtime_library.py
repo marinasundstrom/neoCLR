@@ -10,6 +10,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    'Descriptors': 'System.Introspection.MemberInfo',
     'Option': 'System.Option',
     'Result': 'System.Result',
     'Propagatable': 'System.Propagatable',
@@ -80,6 +81,7 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    'Descriptors': 'runtime/raven/src/System/Introspection/Descriptors.rvn',
     'Option': 'runtime/raven/src/System/Option.rvn',
     'Result': 'runtime/raven/src/System/Result.rvn',
     'Propagatable': 'runtime/raven/src/System/Propagatable.rvn',

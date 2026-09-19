@@ -1,0 +1,3 @@
+; Raven-authored immutable metadata snapshot descriptors.
+.include "generated/Descriptors.methods.neoil"
+.include "generated/Descriptors.helpers.neoil"

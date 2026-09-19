@@ -69,6 +69,7 @@ static class UnionImport
                     throw new InvalidDataException("Foreign generic parameter in library body.");
                 return "T" + parameter.Position;
             }
+            if (libraryOwner is not null && ParameterSnapshotBindings.Type(type) is { } snapshot) return snapshot;
             if (libraryOwner is not null && type is ArrayType { IsVector: true } array)
                 return "arrayref<" + ProfileType(array.ElementType) + ">";
             if (libraryOwner is not null && type is GenericInstanceType propagation
@@ -153,7 +154,7 @@ static class UnionImport
             var emitOwnedStatic = libraryOwner is not null && method.IsStatic && (method.DeclaringType.IsValueType || OpaqueLibrary.IsString(method.DeclaringType));
             var result = ProfileType(method.ReturnType, true);
             var locals = method.Body.Variables.Select(v => ProfileType(v.VariableType)).ToArray();
-            if (locals.Any(t => !(libraryOwner is not null && t == "Value") && !(libraryOwner is not null && method.GenericParameters.Concat(method.DeclaringType.GenericParameters).Any(p => t == "T" + p.Position)) && !ApplicationTypes.IsType(t) && !ManagedArrayBindings.IsType(t) && t != "System.Object" && !InterfaceBindings.IsInterface(t) && !NativeMemoryBindings.IsPointer(t) && !ReflectionBindings.IsType(t) && t != "arrayref<String>" && !DelegateBindings.IsType(t) && !GenericUnionBindings.IsType(t) && !CalendarBindings.IsReference(t) && !CalendarBindings.Types.Contains(t) && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
+            if (locals.Any(t => !(libraryOwner is not null && t is "Value" or ParameterSnapshotBindings.Vector) && !(libraryOwner is not null && method.GenericParameters.Concat(method.DeclaringType.GenericParameters).Any(p => t == "T" + p.Position)) && !ApplicationTypes.IsType(t) && !ManagedArrayBindings.IsType(t) && t != "System.Object" && !InterfaceBindings.IsInterface(t) && !NativeMemoryBindings.IsPointer(t) && !ReflectionBindings.IsType(t) && t != "arrayref<String>" && !DelegateBindings.IsType(t) && !GenericUnionBindings.IsType(t) && !CalendarBindings.IsReference(t) && !CalendarBindings.Types.Contains(t) && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
                 throw new InvalidDataException("Unsupported local default in Result profile.");
             NormalizePatternBranches(method);
             var instructions = method.Body.Instructions.ToArray();
@@ -645,7 +646,8 @@ static class UnionImport
                             {
                                 ApplicationTypes.CheckMethod(reference); ApplicationTypes.CheckMethod(targetMethod);
                                 if (reference.HasThis != targetMethod.HasThis || instruction.OpCode.Code == Code.Callvirt && targetMethod.IsStatic) throw new InvalidDataException("Invalid application call receiver.");
-                                if (!targetMethod.IsPublic && targetMethod.DeclaringType != method.DeclaringType)
+                                if (!targetMethod.IsPublic && targetMethod.DeclaringType != method.DeclaringType
+                                    && !(DescriptorLibrary.IsBaseConstructor(targetMethod) && method.IsConstructor && method.DeclaringType.BaseType?.Resolve() == targetMethod.DeclaringType))
                                     throw new InvalidDataException("Nonpublic cross-type call unsupported.");
                                 if (!ApplicationTypes.Matches(reference, targetMethod)) throw new InvalidDataException("Resolved signature mismatch.");
                                 if (!targetMethod.IsAbstract) pending.Enqueue(targetMethod);
@@ -675,7 +677,7 @@ static class UnionImport
                                     throw new InvalidDataException("Unassigned conditional output must return false immediately.");
                                 code.AppendLine("pop"); break;
                             }
-                            var runtimeService = libraryOwner is null ? null : RuntimeServiceBindings.Bind(reference, targetMethod) ?? ValueStorageBindings.Bind(reference, targetMethod, t => ProfileType(t));
+                            var runtimeService = libraryOwner is null ? null : ParameterSnapshotBindings.Bind(reference, targetMethod, t => ProfileType(t)) ?? RuntimeServiceBindings.Bind(reference, targetMethod) ?? ValueStorageBindings.Bind(reference, targetMethod, t => ProfileType(t));
                             var checkedStorage = libraryOwner is null ? null : CheckedStorageBindings.Bind(reference, targetMethod, t => ProfileType(t));
                             var interfaceCall = collectionProfile ? InterfaceBindings.Bind(reference, targetMethod) : null;
                             var nativeCall = collectionProfile ? NativeMemoryBindings.Bind(reference, targetMethod) : null;
@@ -751,7 +753,7 @@ static class UnionImport
             // Library metadata keeps author-supplied parameter names for introspection.
             var declaredParameters = args.Skip(method.HasThis ? 1 : 0).Select((t, i) =>
                 libraryOwner is not null ? (GenericUnionLibrary.IsConditionalOutput(method, method.Parameters[i]) ? "out(true) " : "") + t + " " + OpaqueLibrary.ParameterName(method, i) : t);
-            output.AppendLine(libraryOwner is not null && !emitInstance && !emitOwnedStatic ? $".function {(method.IsAssembly ? "internal " : "")}{Name(method)}({string.Join(',', args.Select((t, i) => t + " " + method.Parameters[i].Name))}) -> {(libraryOwner == "System.Console" && result == "noresult" ? "Void" : result)}" : emitOwnedStatic ? $".method {(method.IsPrivate ? "private " : method.IsAssembly ? "internal " : "")}static {method.Name}({string.Join(',', declaredParameters)}) -> {result}" : emitInstance ? $".method {(libraryOwner is not null && method.IsPrivate ? "private " : "")}instance {(LibraryImplementation.IsReadonlyReceiver(method) ? "readonly " : "")}{((method.DeclaringType.IsValueType && !LibraryImplementation.IsByValueReceiver(method) || OpaqueLibrary.IsByRefString(method)) ? "byref " : "")}{ApplicationTypes.Modifiers(method)}{ApplicationTypes.MethodName(method)}({string.Join(',', declaredParameters)}) -> {(method.DeclaringType.IsValueType && result == "noresult" ? "Void" : result)}" : $".function {Name(method)}({string.Join(',', args)}) -> {result}");
+            output.AppendLine(libraryOwner is not null && !emitInstance && !emitOwnedStatic ? $".function {(method.IsAssembly ? "internal " : "")}{Name(method)}({string.Join(',', args.Select((t, i) => t + " " + method.Parameters[i].Name))}) -> {(libraryOwner == "System.Console" && result == "noresult" ? "Void" : result)}" : emitOwnedStatic ? $".method {(method.IsPrivate ? "private " : method.IsAssembly ? "internal " : "")}static {method.Name}({string.Join(',', declaredParameters)}) -> {result}" : emitInstance ? $".method {(libraryOwner is not null && method.IsPrivate ? "private " : DescriptorLibrary.IsBaseConstructor(method) ? "internal " : "")}instance {(LibraryImplementation.IsReadonlyReceiver(method) ? "readonly " : "")}{((method.DeclaringType.IsValueType && !LibraryImplementation.IsByValueReceiver(method) || OpaqueLibrary.IsByRefString(method)) ? "byref " : "")}{ApplicationTypes.Modifiers(method)}{ApplicationTypes.MethodName(method)}({string.Join(',', declaredParameters)}) -> {(method.DeclaringType.IsValueType && result == "noresult" ? "Void" : result)}" : $".function {Name(method)}({string.Join(',', args)}) -> {result}");
             for (var n = 0; n < locals.Length; n++) output.AppendLine($".local {locals[n]} local{n}");
             if (method.Body.InitLocals)
                 for (var n = 0; n < locals.Length; n++)
@@ -868,7 +870,7 @@ static class UnionImport
     };
     static bool Converts(string source, string target) => ApplicationTypes.IsLibraryUnion(target) && source == target + "&" || InterfaceBindings.Converts(source, target) || BooleanBindings.Converts(source, target) || EnumBindings.Converts(source, target);
     static string ConvertStack(string source, string target) => (ApplicationTypes.IsLibraryUnion(target) && source == target + "&" ? "ldobj " + target + "\n" : "") + InterfaceBindings.Convert(source, target) + BooleanBindings.Convert(source, target) + EnumBindings.Convert(source, target);
-    static bool NeedsInitialization(string type) => ApplicationTypes.LibraryUnionRequiresInitialization(type) || CalendarBindings.IsReference(type) || type == "System.Object" || InterfaceBindings.IsInterface(type) || NativeMemoryBindings.IsPointer(type) || type is "System.RuntimeTypeHandle" or "Value" || DelegateBindings.IsType(type) || (GenericUnionBindings.IsType(type)
+    static bool NeedsInitialization(string type) => ApplicationTypes.LibraryUnionRequiresInitialization(type) || CalendarBindings.IsReference(type) || type is "System.Object" or ParameterSnapshotBindings.Vector || InterfaceBindings.IsInterface(type) || NativeMemoryBindings.IsPointer(type) || type is "System.RuntimeTypeHandle" or "Value" || DelegateBindings.IsType(type) || (GenericUnionBindings.IsType(type)
         ? GenericUnionBindings.RequiresInitialization(type) : ResultBindings.RequiresInitialization(type));
     static bool HasNamedVoid(TypeReference type) => type is GenericInstanceType generic
         && generic.GenericArguments.Count == 1 && generic.GenericArguments[0].IsValueType

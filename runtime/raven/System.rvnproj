@@ -194,4 +194,7 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Result'">
     <Compile Include="src/System/Result.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Descriptors'">
+    <Compile Include="src/System/Introspection/Descriptors.rvn" />
+  </ItemGroup>
 </Project>

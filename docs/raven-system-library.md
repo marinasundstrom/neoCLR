@@ -11,7 +11,7 @@ This slice adds Raven sources for the fundamental and collection interfaces,
 SystemClock, LocalDateTime, IntPtr/UIntPtr comparisons, the complete Int32 member
 surface, Console and Environment. File.ReadAllText joins WriteAllText in Raven.
 The follow-up ports String and opaque Error, then five empty error types and Void,
-followed by seven typed error carriers, and the Propagatable declaration, then Option/Result and their cases, bringing the total to 65 slices.
+followed by seven typed error carriers, and the Propagatable declaration, then Option/Result and their cases, then the inherited descriptor family, bringing the total to 66 slices.
 The legacy Neo profile retains its receiver/array conventions where it differs;
 the Raven profile selects generated contracts and implementation bodies.
 
@@ -139,11 +139,27 @@ RAV0305. The ordinary .NET regression returned 0 before and 42 afterward. All 78
 focused main checks and 18 feature-branch checks pass. The source keeps explicit
 qualification for readability; no additional Runtime Contract option is required.
 
+MemberInfo, FieldInfo, MethodInfo and PropertyInfo now share a Raven-authored
+source slice. Import checks their exact ordered snapshot fields and inheritance;
+private source Stored fields retain the existing runtime field names and indices.
+The protected source base constructor becomes an internal runtime constructor,
+admitted only for the checked derived constructor chain. No general protected-call
+permission is granted to applications.
+
+Runtime factories still own snapshot creation. A bootstrap-only ParameterSnapshot
+read view maps precisely to the existing ParameterInfo vector; only Length/Get are
+admitted. Raven owns the managed-array allocation and copying in GetParameters and
+GetIndexParameters. Each call returns independent array storage, as on .NET reflection
+APIs, while contained descriptors retain identity. Property accessors preserve public
+filtering and the explicit nonpublic overload. This reuses the
+[reflection snapshot contract](raven-reflection-api.md); it does not add runtime invocation or
+change Runtime Contract configuration. The legacy Neo profile retains its value-based
+descriptors; the Raven profile selects these class implementations explicitly.
+
 The remaining migration gates are substantive work, not just moving files:
 
 | Remaining source | Required implementation admission |
 | --- | --- |
-| MemberInfo/FieldInfo/MethodInfo/PropertyInfo | Abstract/inherited descriptor layout and runtime snapshot factory compatibility |
 | Array, iterator adapters and Func | Runtime-owned allocation/element access and delegate invocation boundaries |
 
 Complete those gates before calling the entire source port finished. Executable

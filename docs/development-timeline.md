@@ -73,6 +73,15 @@ array/delegate adapters. The author said “Continue” and subsequently directe
 Commit separately”. The assistant accepted separate validated commits and continued
 without starting proposal API alignment.
 
+**Descriptor follow-up.** The assistant preserved runtime snapshot field order and
+names while moving the inherited MemberInfo family, parameter copying and accessor
+selection into Raven. The target importer admits a bootstrap-only vector read view;
+consumer metadata is unchanged. Nine admission cases, 23 reflection tests and the
+freshly compiled reflection program pass. This is the 66th source slice; array,
+delegate and remaining intrinsic helpers are still open. The separate ordinary .NET
+constructor-arity correction is integrated on Raven main (`d7292b935`), rather than
+merging the neoCLR branch.
+
 **String/Error slice.** Raven sources now own both method surfaces, with explicit
 importer checks for intrinsic storage, mixed String receivers and opaque Error
 receivers. Native ownership and the existing parameter metadata remain unchanged.

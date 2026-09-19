@@ -43,7 +43,7 @@ static class ApplicationTypes
     public static void Reset(params ModuleDefinition[] modules) { LibraryModule = null; LibraryScope = null; LibraryDependencies.Clear(); LibraryMap = null; LibraryReferenceTypes.Clear(); LibraryReferences.Clear(); LibraryNames.Clear(); Modules.Clear(); Modules.UnionWith(modules); Types.Clear(); Expanded.Clear(); Adapters.Clear(); }
     public static object[] IdentityMap() => Types.Select(p => (object)new {
         AssemblyIdentity = p.Value.Module.Assembly.Name.FullName, MetadataName = p.Value.FullName, RuntimeName = p.Key,
-        Fields = p.Value.Fields.Where(_ => !PrimitiveLibrary.IsMatched(p.Value) && !OpaqueLibrary.IsString(p.Value)).Select(f => new { MetadataName = f.Name, RuntimeName = LibraryNames.ContainsKey(p.Value) && GenericUnionLibrary.IsCase(p.Value) ? "Value" : MetadataIdentity.MemberName(f.Name) }).ToArray()
+        Fields = p.Value.Fields.Where(_ => !PrimitiveLibrary.IsMatched(p.Value) && !OpaqueLibrary.IsString(p.Value)).Select(f => new { MetadataName = f.Name, RuntimeName = FieldName(f) }).ToArray()
     }).ToArray();
     public static bool IsModule(ModuleDefinition? module) => module is not null && Modules.Contains(module);
     public static void CheckAccess(TypeReference reference, ModuleDefinition caller)
@@ -104,7 +104,7 @@ static class ApplicationTypes
         if (LibraryNames.ContainsKey(type))
         {
             var owner = LibraryReferenceTypes.GetValueOrDefault(from) ?? type;
-            return type.Interfaces.Any(i =>
+            return type.BaseType is { } libraryBase && IsLibrary(libraryBase) && (Type(libraryBase) == to || Assignable(Type(libraryBase)!, to)) || type.Interfaces.Any(i =>
             {
                 var shape = LibraryMap!(Close(i.InterfaceType, owner));
                 return shape == to || CollectionBindings.Assignable(shape, to);
@@ -162,6 +162,10 @@ static class ApplicationTypes
         if (method.HasThis && Type(method.DeclaringType) is null) throw new InvalidDataException("Unsupported application receiver.");
     }
     public static string Receiver(MethodReference method) => Type(method.DeclaringType)! + ((method.DeclaringType.IsValueType && !LibraryImplementation.IsByValueReceiver(method) || OpaqueLibrary.IsByRefString(method)) ? "&" : "");
+    static string FieldName(FieldDefinition field) => LibraryNames.ContainsKey(field.DeclaringType)
+        && DescriptorLibrary.IsDescriptor(field.DeclaringType) ? field.Name[6..]
+        : LibraryNames.ContainsKey(field.DeclaringType) && GenericUnionLibrary.IsCase(field.DeclaringType)
+            ? "Value" : MetadataIdentity.MemberName(field.Name);
     public sealed record FieldShape(string Owner, string Type, string Name, bool ValueOwner);
     public static FieldShape? Field(FieldReference reference, MethodDefinition caller, Func<TypeReference, bool, string> map)
     {
@@ -173,7 +177,7 @@ static class ApplicationTypes
         if (IsLibrary(field.DeclaringType) && !LibraryImplementation.SameType(
             Close(reference.FieldType, reference.DeclaringType), Close(field.FieldType, reference.DeclaringType)))
             throw new InvalidDataException("Invalid constructed library field signature.");
-        return new(owner, map(Close(field.FieldType, reference.DeclaringType), false), GenericUnionLibrary.IsMatched(field.DeclaringType) && GenericUnionLibrary.IsCase(field.DeclaringType) ? "Value" : MetadataIdentity.MemberName(field.Name), field.DeclaringType.IsValueType);
+        return new(owner, map(Close(field.FieldType, reference.DeclaringType), false), FieldName(field), field.DeclaringType.IsValueType);
     }
     public static bool Matches(MethodReference reference, MethodDefinition definition)
     {
@@ -222,7 +226,7 @@ static class ApplicationTypes
             foreach (var method in type.Methods.Where(m => m.IsAbstract))
                 output.AppendLine($".method instance {(LibraryNames.ContainsKey(type) && PropagationLibrary.IsContract(type) ? "readonly byref " : "")}{(type.IsInterface ? "" : "abstract ")}{MethodName(method)}({string.Join(',', method.Parameters.Select(p => (LibraryNames.ContainsKey(type) && PropagationLibrary.IsConditionalOutput(method, p) ? "out(true) " : "") + map(p.ParameterType, false) + (LibraryNames.ContainsKey(type) ? " " + p.Name : "")))}) -> {map(method.ReturnType, true)}\n.end");
             foreach (var field in type.Fields.Where(_ => !PrimitiveLibrary.IsMatched(type) && !OpaqueLibrary.IsString(type)))
-                output.AppendLine($".field {(LibraryNames.ContainsKey(type) && field.IsPrivate && !GenericUnionLibrary.IsCase(type) ? "private " : "")}{(LibraryNames.ContainsKey(type) && GenericUnionLibrary.IsCase(type) ? "Value" : MetadataIdentity.MemberName(field.Name))} {map(field.FieldType, false)}");
+                output.AppendLine($".field {(LibraryNames.ContainsKey(type) && field.IsPrivate && !GenericUnionLibrary.IsCase(type) ? "private " : "")}{(FieldName(field))} {map(field.FieldType, false)}");
             if (LibraryNames.ContainsKey(type))
                 foreach (var property in type.Properties.Where(GenericUnionLibrary.IsRuntimeProperty))
                 {

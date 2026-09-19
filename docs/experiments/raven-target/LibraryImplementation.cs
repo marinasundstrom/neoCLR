@@ -23,6 +23,8 @@ static class LibraryImplementation
         ReadonlyReceivers.Clear();
         if (!Regex.IsMatch(owner, @"^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)+$"))
             throw new InvalidDataException("Invalid library owner.");
+        if (owner == "System.Introspection.MemberInfo")
+            return DescriptorLibrary.Roots(source, core, InstanceRoots);
         if (owner is "System.Option" or "System.Result")
             return GenericUnionLibrary.Roots(source, core, owner, InstanceRoots);
         var type = source.Types.SingleOrDefault(t => t.Namespace == owner && NamespaceFunctions.IsContainer(t)) ?? source.Types.SingleOrDefault(t => t.FullName.Split('`')[0] == owner)
@@ -101,9 +103,9 @@ static class LibraryImplementation
         // A single explicitly selected reference/implementation pair. Never alias arbitrary
         // guest types by namespace/name, and never execute reference-assembly stub bodies.
         foreach (var candidate in new[] { type, contract })
-            if (!(candidate.IsPublic || candidate.IsNestedPublic && GenericUnionLibrary.IsCase(candidate)) || candidate.IsInterface || candidate.IsAbstract
+            if (!(candidate.IsPublic || candidate.IsNestedPublic && GenericUnionLibrary.IsCase(candidate)) || candidate.IsInterface || candidate.IsAbstract != (DescriptorLibrary.IsDescriptor(candidate) && candidate.Name == "MemberInfo")
                 || candidate.GenericParameters.Any(p => p.HasConstraints || p.Attributes != GenericParameterAttributes.NonVariant) || candidate.HasNestedTypes && !ErrorCarrierLibrary.IsCarrier(candidate) || candidate.HasEvents
-                || candidate.BaseType?.FullName != (candidate.IsValueType ? "System.ValueType" : "System.Object") || candidate.IsExplicitLayout)
+                || candidate.BaseType?.FullName != (DescriptorLibrary.IsDescriptor(candidate) ? DescriptorLibrary.Base(candidate) : candidate.IsValueType ? "System.ValueType" : "System.Object") || candidate.IsExplicitLayout)
                 throw new InvalidDataException($"Unsupported instance library owner: {candidate.FullName}, base={candidate.BaseType}, public={candidate.IsPublic}, abstract={candidate.IsAbstract}, nested={candidate.HasNestedTypes}, value={candidate.IsValueType}.");
         if (type.IsValueType != contract.IsValueType)
             throw new InvalidDataException("Library value/reference representation does not match reference contract.");
@@ -162,7 +164,7 @@ static class LibraryImplementation
             if (left.FullName is "System.Option/None" or "System.Option/Some`1" or "System.Result/Ok`1" or "System.Result/Error`1"
                 && left.FullName == right.FullName && GenericUnionLibrary.IsCase(left.Resolve()) && GenericUnionLibrary.IsCase(right.Resolve())
                 && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right)) return true;
-            return SameTypeArgument(left, right) || ErrorCarrierLibrary.SameCase(left, right, type, contract) || (left.FullName == contract.FullName && right.FullName == type.FullName
+            return DescriptorLibrary.SameType(left, right) || SameTypeArgument(left, right) || ErrorCarrierLibrary.SameCase(left, right, type, contract) || (left.FullName == contract.FullName && right.FullName == type.FullName
                 && left.Resolve() == contract && right.Resolve() == type);
         }
         if (type.Interfaces.Count != contract.Interfaces.Count || type.Interfaces.Any(i =>
@@ -184,7 +186,7 @@ static class LibraryImplementation
             && !contract.HasMethods && !type.HasProperties && !type.HasInterfaces
             && type.Methods.All(PrimitiveLibrary.IsDefaultConstructor);
         var methods = type.Methods.Where(m => !OpaqueLibrary.IsOmittedConstructor(m) && !EmptyLibrary.OmitConstructor(m) && !((ErrorCarrierLibrary.IsCarrier(type) || GenericUnionLibrary.IsFamily(type) && type.HasFields) && PrimitiveLibrary.IsDefaultConstructor(m)) && (!(PrimitiveLibrary.IsPrimitive(type) || declarationOnly) || !PrimitiveLibrary.IsDefaultConstructor(m))).ToArray();
-        if (methods.Length == 0 && !declarationOnly || methods.Any(m => !(m.IsPublic || m.IsPrivate && !m.IsVirtual
+        if (methods.Length == 0 && !declarationOnly || methods.Any(m => !(m.IsPublic || DescriptorLibrary.IsDescriptor(type) && m.IsFamily && m.IsConstructor || m.IsPrivate && !m.IsVirtual
             || m.IsAssembly && !m.IsVirtual && contract.Methods.Count(c => c.IsAssembly && MatchMethod(c, m)) == 1) || !m.HasBody || m.HasGenericParameters
             || m.ExplicitThis || m.IsConstructor && m.IsStatic || m.CallingConvention != MethodCallingConvention.Default
             || m.Parameters.Any(p => (p.IsOut || p.ParameterType.IsByReference) && !GenericUnionLibrary.IsConditionalOutput(m, p))))

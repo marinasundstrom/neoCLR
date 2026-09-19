@@ -2,6 +2,7 @@
   "format": "raven-library-bootstrap-v1",
   "owner": "System.Date",
   "inputs": {
+    "runtime/raven/src/System/Introspection/Descriptors.rvn": "3db5bd3909587c4c6f81e935f603f27d9d011eb5877275b1d08c83084d08014f",
     "runtime/raven/src/System/Option.rvn": "7e6fbff6cd19d88804c5e1bc45983940c440095b5569dda3192c5ff18cbb9a3a",
     "runtime/raven/src/System/Result.rvn": "2351c6e9bb28ae647442584e91304bbbc9dd4f6eb363f934eac3e3e442ef2c06",
     "runtime/raven/src/System/Propagatable.rvn": "0f8af6a1fe29ca4be08f496e5b485c762ecdf6ae8d9197700697e6203e9ba98e",
@@ -67,15 +68,15 @@
     "runtime/raven/src/System/Single.rvn": "488efaf36e56f147c7158a5b0637f3bc4e56e84bb3f514af6c64a023dcd8598e",
     "runtime/raven/src/System/Double.rvn": "cd3ad24e4a21b7616a2937da71891618284913e26ea180ce203276f18b631f33",
     "runtime/raven/src/System/Boolean.rvn": "1f0010fe0d346fbc7f3ba29c88b2c1cf80faebf42a4c2de2f0cd6cff15335022",
-    "runtime/raven/System.rvnproj": "d0b08f3ae628446fe68f12d0c873e2c6996f6b10d14e019ea90b840549dad733",
+    "runtime/raven/System.rvnproj": "0603c718eda760d75b0a6c28594d647fda1d91f95ba082880a5b0b9e1f7f3cf1",
     "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
   },
   "outputs": {
     "Date.methods.neoil": "d8fdd841746fd0d8d4f736b26f093556fba660ea1571eaa54180d6836bc4b76e",
     "Date.helpers.neoil": "72d3f052d191d2df88c1685f77d22b98bf7bd315efa3c00fcce4863bfde03d77"
   },
-  "compilerSha256": "43a89f8ad6aa6cac52718b7286e1581e2af8279958840854260da09ed6dde0ff",
-  "coreSha256": "37442d954b2418a312b7212d97766e243e4caecb96920376d8b845f89f28b6a5",
+  "compilerSha256": "0739cf3dad749430060acbcc1bd45af80ff2c54dc7d91403981d36d8b7c2c41f",
+  "coreSha256": "f1cefde4a59fdf491b9b6a14f718f9758e288c15e9d844f26178b36f72d12ffc",
   "exports": [
     "Create(Int32 year,Int32 month,Int32 day) -> System.Result<System.Date,System.InvalidDateError>",
     "FromDayNumber(Int32 dayNumber) -> System.Result<System.Date,System.InvalidDateError>",
