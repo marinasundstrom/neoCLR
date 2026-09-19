@@ -187,6 +187,12 @@ for file in source['sourceFiles']:
 result = {'purpose': 'Explicit source-by-source API audit. Samples and signature checks are evidence, not a claim of arbitrary generic/compiler support.',
           'declarationCount': sum(r['declarations'] for r in rows), 'sources': rows}
 result['targetProfileAdditions'] = [{
+    'file': 'runtime/raven/src/System/Threading/Tasks/Tasks.rvn',
+    'disposition': 'provisional-raven-task-completion',
+    'samples': ['library-tasks.rvn'],
+    'tests': ['tests/tasks.rs', 'docs/experiments/task-contract/verify_tasks.py'],
+    'note': 'Generic Task/TCS and explicit single-invocation queue. No generated async, thread safety or host suspension claim. See docs/task-contracts.md.'
+}, {
     'file': 'runtime/raven/Clock.neoil',
     'disposition': 'raven-authored-interface-contract',
     'samples': ['library-clock.rvn', 'library-instants.rvn'],

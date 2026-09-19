@@ -1,5 +1,9 @@
 # Completion and continuation experiment
 
+The newer [generic Task/TCS proof of concept](../../task-contracts.md) builds on
+this initial fixed-payload experiment. Run `verify_tasks.py` for the library types;
+`verify.py` below preserves the earlier manual state-machine evidence.
+
 Experimental evidence for the provisional async implementation, 2026-09-19.
 This is executable Raven application code on neoCLR, not a public Task API and not
 compiler-generated async/await support. The model specializes its payload to

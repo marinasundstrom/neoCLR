@@ -6,6 +6,14 @@ and which .NET conventions or behaviors neoCLR should retain or change. The Task
 recommendations below remain assistant proposals, not author approval or implemented
 contracts.
 
+## Current development proof of concept
+
+The [Task completion slice](task-contracts.md) now implements Raven-authored
+Task<T>, TaskCompletionSource<T> and an explicit TaskQueue in the development Raven
+profile. Generic payloads, queued continuations and producer/consumer access checks
+run on neoCLR. This is not in Preview 8. Compiler-generated async/await, automatic
+host progress and concurrency are still outstanding; the queue is provisional.
+
 ## Post-release Task foundation — 2026-09-19
 
 The author initially selected Task and compiler-generated async state-machine contracts as

@@ -1,0 +1,100 @@
+namespace System.Threading.Tasks
+
+import System.*
+import System.Collections.*
+
+// Explicit, single-invocation dispatcher for the provisional Task proof of concept.
+public class TaskQueue {
+    private field pending: ArrayList<Func<System.Void>>
+    private field running: bool
+
+    init() {
+        pending = ArrayList<Func<System.Void>>()
+        running = false
+    }
+
+    func Post(callback: Func<System.Void>) {
+        pending.Add(callback)
+    }
+
+    func Drain() {
+        if running {
+            System.Fault("Task queue cannot be pumped recursively")
+        }
+        running = true
+        while pending.Count != 0 {
+            let batch = pending
+            pending = ArrayList<Func<System.Void>>()
+            for callback in batch {
+                callback()
+            }
+        }
+        running = false
+    }
+}
+
+public class Task<T> {
+    private field source: TaskCompletionSource<T>
+
+    internal init(source: TaskCompletionSource<T>) {
+        self.source = source
+    }
+
+    val IsCompleted: bool {
+        get {
+            return source.Completed()
+        }
+    }
+
+    func GetResult() -> T => source.Read()
+
+    func OnCompleted(callback: Func<System.Void>) {
+        source.Register(callback)
+    }
+}
+
+public class TaskCompletionSource<T> {
+    private field queue: TaskQueue
+    private field slot: ArrayList<T>
+    private field callbacks: ArrayList<Func<System.Void>>
+    private field task: Task<T>
+
+    init(queue: TaskQueue) {
+        self.queue = queue
+        slot = ArrayList<T>(1)
+        callbacks = ArrayList<Func<System.Void>>()
+        task = Task<T>(self)
+    }
+
+    val Task: Task<T> => task
+
+    func TrySetResult(value: T) -> bool {
+        if self.Completed() {
+            return false
+        }
+        slot.Add(value)
+        let pending = callbacks
+        callbacks = ArrayList<Func<System.Void>>()
+        for callback in pending {
+            queue.Post(callback)
+        }
+        return true
+    }
+
+    internal func Completed() -> bool => slot.Count != 0
+
+    internal func Read() -> T {
+        if !self.Completed() {
+            System.Fault("Task is still pending")
+        }
+        return slot[0]
+    }
+
+    internal func Register(callback: Func<System.Void>) {
+        if self.Completed() {
+            queue.Post(callback)
+        } else {
+            callbacks.Add(callback)
+        }
+    }
+}

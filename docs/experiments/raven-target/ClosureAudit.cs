@@ -63,6 +63,14 @@ static class ClosureAudit
         }
         foreach (var parameter in method.Parameters) parameter.ParameterType = Storage(parameter.ParameterType);
         if (method.ReturnType is GenericInstanceType) method.ReturnType = Storage(method.ReturnType);
+        // Source-defined generic owners can contain the same nominal Void token
+        // in their definitions. Normalize both sides of Cecil's comparison.
+        if (method.DeclaringType.Resolve() is { } owner)
+            foreach (var candidate in owner.Methods)
+            {
+                foreach (var parameter in candidate.Parameters) parameter.ParameterType = Storage(parameter.ParameterType);
+                if (candidate.ReturnType is GenericInstanceType) candidate.ReturnType = Storage(candidate.ReturnType);
+            }
         return method.Resolve();
     }
 

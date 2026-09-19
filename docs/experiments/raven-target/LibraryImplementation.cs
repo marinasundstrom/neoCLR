@@ -20,6 +20,12 @@ static class LibraryImplementation
         ReadonlyReceivers.Clear();
         if (owner != "System" && !Regex.IsMatch(owner, @"^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)+$"))
             throw new InvalidDataException("Invalid library owner.");
+        if (owner == "System.Threading.Tasks.Task")
+        {
+            var names = new[] { "System.Threading.Tasks.TaskQueue", "System.Threading.Tasks.Task`1", "System.Threading.Tasks.TaskCompletionSource`1" };
+            foreach (var name in names) ApplicationTypes.BindLibrary(source.GetType(name), name.Split('`')[0]);
+            return names.SelectMany(name => InstanceRoots(source.GetType(name), core.GetType(name), name.Split('`')[0])).ToArray();
+        }
         if (owner == "System.Array") return InstanceRoots(source.GetType("System.Array`1") ?? throw new InvalidDataException("Missing Array implementation."), core.GetType("System.Array`1"), owner);
         if (MarkerLibrary.IsOwner(owner)) return MarkerLibrary.Roots(source, core, owner);
         if (owner == EnumBindings.Flags) return FlagsLibrary.Roots(source, core);
@@ -201,7 +207,7 @@ static class LibraryImplementation
             if (left.FullName is "System.Option/None" or "System.Option/Some`1" or "System.Result/Ok`1" or "System.Result/Error`1"
                 && left.FullName == right.FullName && GenericUnionLibrary.IsCase(left.Resolve()) && GenericUnionLibrary.IsCase(right.Resolve())
                 && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right)) return true;
-            return DescriptorLibrary.SameType(left, right) || SameTypeArgument(left, right) || ErrorCarrierLibrary.SameCase(left, right, type, contract) || (left.FullName == contract.FullName && right.FullName == type.FullName
+            return TaskBindings.SameType(left, right) || DescriptorLibrary.SameType(left, right) || SameTypeArgument(left, right) || ErrorCarrierLibrary.SameCase(left, right, type, contract) || (left.FullName == contract.FullName && right.FullName == type.FullName
                 && left.Resolve() == contract && right.Resolve() == type);
         }
         if (type.Interfaces.Count != contract.Interfaces.Count || type.Interfaces.Any(i =>

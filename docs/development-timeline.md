@@ -4633,3 +4633,28 @@ cases, 25 saved-project checks, the ten existing completion-model scenarios and 
 VS Code demo build/run. The wider Rust suite is still running at commit time; its
 stale removed-type/helper-count fixtures were corrected and the affected groups
 passed on rerun. This does not change published Preview 8.
+
+### Minimal Task infrastructure — 2026-09-19
+
+The author directed continuing Task work after retiring System.Error, then narrowed
+the immediate goal to Task<T> and TaskCompletionSource<T> as a PoC that can expand
+later. The author clarified that necessary supporting concepts are allowed: these
+are the foundation for upcoming APIs. The assistant proposed a consumer handle,
+producer completion authority, shared state and continuation dispatch, keeping
+Result ordinary and state machines provisional.
+
+The assistant implemented the generic types in Raven with an explicit TaskQueue,
+private storage and internal cross-type implementation calls. Fifteen source-level
+scenarios and four direct-IL tests pass, including unit, ordinary Result failure,
+first-completion behavior, queued callbacks and retention through 38/39 collections,
+including completion after the producing API has returned. A saved .rvnproj demo
+builds and runs with the matching development toolchain for VS Code.
+Compiler-generated async is not part of this result. The callback spelling and
+expression-getter limitations are recorded for independent compiler investigation.
+The website now describes this as development work after Preview 8.
+
+The earlier Error-removal full Rust run finished with 1,271 passing tests and seven
+failures: four stale Error fixtures, plus three UTF-8 tests that overlapped the
+incomplete Task profile edit. All five affected test targets passed on rerun (the
+four fixture targets within the 70-test focused pass, and all three UTF-8 tests).
+This records combined validation, not a claim of an uninterrupted green full run.

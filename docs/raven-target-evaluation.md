@@ -979,3 +979,22 @@ types as Result payloads. This removes the System.Error/Result.Error constructor
 collision in the outcome sample without changing Raven's name-resolution policy.
 Older released references still expose the old type; rebuild references and callers
 together before using the simplified imported constructor spelling.
+
+### Provisional Task library — 2026-09-19
+
+The [Task proof of concept](task-contracts.md) adds generic consumer and producer
+contracts through the existing Raven library path, without a new runtime service
+or compiler change. Runtime Contract settings remain the existing isolated core,
+System.Void unit mapping and collection profile. Task/TCS compile as a shared slice;
+internal instance methods retain their visibility in neoIL and are callable only
+inside explicitly bound library types. The Cecil closure audit normalizes nominal
+Void storage in definitions as well as references, leaving no-result returns intact.
+
+Deferred general Raven candidates: the pinned SDK emits ldnull for the expression
+getter `val IsCompleted: bool => source.Completed()` when the generic producer is
+declared later in the same slice; an explicit getter return works. Func<unit> callback
+invocation also leaves a discard not accepted by the current bridge, while the
+existing Func<System.Void> spelling works. Reproduce independently on ordinary CLI
+metadata before classifying or integrating compiler fixes. No Raven-main changes
+are made for these observations. Generated async and builder integration remain
+outside this completion PoC. See the slice document for validation and limitations.

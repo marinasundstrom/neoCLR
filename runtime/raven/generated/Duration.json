@@ -2,6 +2,7 @@
   "format": "raven-library-bootstrap-v1",
   "owner": "System.Duration",
   "inputs": {
+    "runtime/raven/src/System/Threading/Tasks/Tasks.rvn": "d19caea3318cac8926f0f27f94518dcf52aa2978ff7493f879216fd8352e7d70",
     "runtime/raven/src/System/Array.rvn": "8015702d1767e692f05502b65d5cd06939936c73f0dbb16b12ab9768d7ae0ae9",
     "runtime/raven/src/System/Object.rvn": "89a0bcdac7c6508047c8c25fd61f0038fd75446f10282264f85241bc5c238219",
     "runtime/raven/src/System/Runtime/CompilerServices/UnionAttribute.rvn": "2b5dc7aca6883217188df40ce57c31025703caa869bcdcf775309eda34c804d9",
@@ -80,7 +81,7 @@
     "runtime/raven/src/System/Single.rvn": "488efaf36e56f147c7158a5b0637f3bc4e56e84bb3f514af6c64a023dcd8598e",
     "runtime/raven/src/System/Double.rvn": "cd3ad24e4a21b7616a2937da71891618284913e26ea180ce203276f18b631f33",
     "runtime/raven/src/System/Boolean.rvn": "1f0010fe0d346fbc7f3ba29c88b2c1cf80faebf42a4c2de2f0cd6cff15335022",
-    "runtime/raven/System.Runtime.rvnproj": "ae2aadd8146ed091f141b6b67b8e003777450bb36b60989340e905bfc25a3db0",
+    "runtime/raven/System.Runtime.rvnproj": "af49e1d6214984d9ff8ef578b75034a54f0d556e49ff442e787e3b16894277c1",
     "build/NeoCLR.Raven.props": "fad7004f86aa6b22aedb208495920f44d1b16f07baa1caa126ef757af1112257"
   },
   "outputs": {
@@ -88,7 +89,7 @@
     "Duration.helpers.neoil": "13827c20f3f972315bc5eee052aee842930a785108130b6fe58e02d993d18c1d"
   },
   "compilerSha256": "fd81ea896146b15d8fa66d2ba7c74b806a1dad1919012a77f7fe53242bbed105",
-  "coreSha256": "efa89a6b822e5931112461ba45f696dd6ffe7a11e0cb50e87109e7b615074ba6",
+  "coreSha256": "79f4cb6ccf9fff4d8a818b605aa4d7f419b8f8044ea0fda86ad54e8e68726e00",
   "exports": [
     "FromTicks(Int64 ticks) -> System.Duration",
     "readonly byref get_Ticks() -> Int64",

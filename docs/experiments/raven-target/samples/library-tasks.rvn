@@ -1,0 +1,14 @@
+import System.*
+import System.Threading.Tasks.*
+import System.Console.*
+
+func Main() {
+    let queue = TaskQueue()
+    let source = TaskCompletionSource<int>(queue)
+    let task = source.Task
+
+    task.OnCompleted(() => WriteLine(task.GetResult()))
+    source.TrySetResult(42)
+    WriteLine("Completion queued")
+    queue.Drain()
+}

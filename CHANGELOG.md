@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Add a provisional Raven-profile Task<T>/TaskCompletionSource<T> completion PoC
+  with an explicit TaskQueue, ordinary generic payloads (including unit/Result),
+  first-completion semantics and queued continuations. Preserve private storage
+  and internal producer/consumer implementation access in guest metadata. Validate
+  source scenarios, direct-IL access boundaries and GC retention; document the API,
+  scheduling limits and outstanding compiler-generated async work. This development
+  API is not in Preview 8. Update the proposals page and runtime API audit.
+
 - Retire the legacy System.Error message wrapper, its native helpers, intrinsic
   runtime/host value and type, ErrorValues service and `error` instruction. Use
   ordinary strings or domain-specific Result payloads; typed error unions remain.
