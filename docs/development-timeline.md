@@ -4313,3 +4313,12 @@ native text model. It recommends keeping broad proposal families deferred and
 prioritizing a pinned, validated evaluator bundle. A fresh local VS Code UTF-8
 workspace runs and completes correctly. These are local findings, not a selected
 release scope, version/date, cross-platform gate or publication.
+
+### Scalar Char implementation begins
+
+After the author asked to continue, the assistant began the outstanding scalar-Char
+migration. The runtime now stores and validates 32-bit scalar values, uses four-byte
+native storage and classifies supplementary characters from the pinned Unicode data.
+The Neo frontend accepts supplementary literals. Raven's targeted lexer/literal
+baseline passes (70 tests); the target-specific compiler and bridge integration is
+next. This does not yet claim a complete Raven scalar-Char experience.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regenerate the checked-in BMP category table from pinned Unicode 16.0.0 data.
+"""Regenerate the checked-in Unicode scalar category table from pinned Unicode 16.0.0 data.
 Usage: python3 scripts/generate-char-categories.py /path/to/UnicodeData.txt
 Download: https://www.unicode.org/Public/16.0.0/ucd/UnicodeData.txt
 Normal builds use the generated file and require no network or Python.
@@ -14,13 +14,11 @@ if hashlib.sha256(raw).hexdigest() != expected:
     raise SystemExit("UnicodeData.txt does not match the pinned Unicode 16.0.0 SHA-256")
 # Internal values follow .NET UnicodeCategory; no public enum is introduced here.
 names = "Lu Ll Lt Lm Lo Mn Mc Me Nd Nl No Zs Zl Zp Cc Cf Cs Co Pc Pd Ps Pe Pi Pf Po Sm Sc Sk So Cn".split()
-categories = [29] * 65536
+categories = [29] * 0x110000
 first = None
 for line in raw.decode().splitlines():
     code, name, category, *_ = line.split(";")
     code = int(code, 16)
-    if code > 0xFFFF:
-        continue
     if name.endswith(", First>"):
         first = code
     else:
@@ -34,10 +32,10 @@ lines = [
     "// Unicode 16.0.0 UnicodeData.txt, SHA-256 " + expected,
     "// Unicode data license: ../third-party/unicode/LICENSE.txt",
     "// Inclusive range ends and internal .NET-compatible category IDs.",
-    "pub(super) const RANGES: &[(u16, u8)] = &[",
+    "pub(super) const RANGES: &[(u32, u8)] = &[",
 ]
 for i, category in enumerate(categories):
-    if i == 65535 or categories[i + 1] != category:
+    if i == 0x10FFFF or categories[i + 1] != category:
         lines.append(f"    (0x{i:04X}, {category}),")
 lines.append("];\n")
 Path(__file__).resolve().parents[1].joinpath("src/char_categories.rs").write_text("\n".join(lines))

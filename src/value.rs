@@ -13,7 +13,7 @@ pub enum Value {
     Byte(u8),
     Int16(i16),
     UInt16(u16),
-    Char(u16),
+    Char(u32),
     UInt32(u32),
     Int64(i64),
     UInt64(u64),
@@ -83,6 +83,9 @@ impl ObjectReference {
 
 impl Value {
     pub(crate) fn initialized(&self) -> Result<&Self, crate::Fault> {
+        if matches!(self, Self::Char(value) if char::from_u32(*value).is_none()) {
+            return Err(crate::Fault::new("Char requires a Unicode scalar value"));
+        }
         if matches!(self, Self::Uninitialized(_)) {
             Err(crate::Fault::new("read of uninitialized array element"))
         } else {
@@ -251,7 +254,11 @@ impl Value {
             (Self::Int32(n), Type::Byte) => Self::Byte(*n as u8),
             (Self::Int32(n), Type::Int16) => Self::Int16(*n as i16),
             (Self::Int32(n), Type::UInt16) => Self::UInt16(*n as u16),
-            (Self::Int32(n), Type::Char) => Self::Char(*n as u16),
+            (Self::Int32(n), Type::Char) => {
+                let scalar = Self::Char(*n as u32);
+                scalar.initialized()?;
+                scalar
+            }
             (Self::Int32(n), Type::UInt32) => Self::UInt32(*n as u32),
             (Self::Int64(n), Type::UInt64) => Self::UInt64(*n as u64),
             _ => self,

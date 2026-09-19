@@ -1,9 +1,10 @@
 # Character classification
 
-This slice adds familiar static System.Char predicates for token validation and
-text processing, plus single-quoted Neo Char literals. Char remains a UTF-16 code
-unit, including surrogate units; String remains valid UTF-8 text. A future Rune
-API is needed to classify supplementary Unicode scalars as a single value.
+The runtime now represents Char as a validated Unicode scalar stored in four bytes.
+String remains native valid UTF-8. Supplementary characters are classified directly;
+surrogates and values above U+10FFFF fault at Char value/storage boundaries.
+This supersedes the original 2026-09-08 UTF-16 code-unit contract. Raven source
+integration and retirement of surrogate-only APIs are the next migration slice.
 
 ## Contract and .NET comparison
 
@@ -33,7 +34,8 @@ No culture, normalization, case conversion, input mutation, retention or recover
 errors are involved. IsDigit does not promise that Int32.Parse accepts that character:
 the current parser intentionally accepts ASCII digits only. Use IsAsciiDigit for
 ASCII numeric protocols. A combining mark is not a letter, and a numeric fraction
-is not a decimal digit. Surrogates are not classified as the scalar their pair encodes.
+is not a decimal digit. Surrogates cannot be supplied as Char values. The legacy surrogate predicates
+are transitional and cannot accept their former inputs.
 String/index overloads are deferred until indexing units are settled.
 
 These are library rules, not new CLR opcodes. Neo emits ordinary static calls;
@@ -45,7 +47,7 @@ category IDs follow .NET UnicodeCategory; this is not yet a public enum API.
 Rather than tying behavior to Rust's changing Unicode version or its broader
 Alphabetic/Numeric properties, use a checked-in range table generated from
 [Unicode 16.0.0 data](https://www.unicode.org/Public/16.0.0/ucd/UnicodeData.txt).
-This costs table space and explicit Unicode update maintenance but makes behavior
+The table now covers U+0000 through U+10FFFF. This costs table space and explicit Unicode update maintenance but makes behavior
 reproducible across hosts. No performance advantage is claimed. Lookup uses binary
 search and no allocation, GC ownership or reference lifetime machinery. The pinned
 .NET 10.0.100 probe agrees on all 65,536 category values (FNV-1a fingerprint
@@ -54,13 +56,12 @@ must account for assignments changing between Unicode releases.
 
 ## Neo literals
 
-`'7'`, `'é'`, `'\n'` and `'\uD800'` produce Char values. Supported escapes are
-`\0`, `\n`, `\r`, `\t`, `\b`, `\f`, `\v`, `\\`, `\'`, `\"` and exactly four
-hexadecimal digits after `\u`. A literal must encode exactly one UTF-16 unit:
-empty literals, multiple characters and supplementary scalars such as `'🌍'` are
-rejected. Explicit surrogate escapes are permitted. This follows the useful bounded
-part of [C# character literals](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/char); variable-width `\x` and eight-digit `\U` escapes
-are not implemented. Literals lower to `ldc.i4` followed by `conv.u2`.
+`'7'`, `'é'`, `'🌍'`, `'\n'` and `'\U0001F600'` produce scalar Char values.
+The Neo frontend accepts one scalar, common escapes, four-digit \u and eight-digit
+\U escapes. Surrogates, out-of-range scalars and multi-scalar literals are rejected.
+The supplementary value is preserved on the Int32 evaluation stack without a
+16-bit conversion. This describes the historical Neo frontend; Raven's target
+contract is being migrated separately.
 
 ## Use and validation
 
@@ -76,3 +77,13 @@ and demonstrates a surrogate code unit. Tests exercise static IL calls, serializ
 artifacts, source literals and invalid literal diagnostics. Generation verifies the
 source SHA-256, handles UnicodeData range records and defaults unassigned units to
 Cn. Unicode data licensing is retained in `third-party/unicode/LICENSE.txt`.
+
+## Scalar migration rationale — 2026-09-19
+
+The author selected the original scalar-Char/UTF-8 direction. Compared with .NET
+Char, this accepts supplementary values as one Char and excludes surrogate units,
+closer to the validated-scalar role of .NET Rune. Char is still not a grapheme.
+Costs include four-byte native layout, incompatible surrogate inputs and rebuilding
+code that assumes 16-bit Char storage. The pinned Unicode category data is unchanged
+in version; its coverage is extended. Numeric storage validates instead of truncating
+to 16 bits, and native reads reject malformed scalar bit patterns.

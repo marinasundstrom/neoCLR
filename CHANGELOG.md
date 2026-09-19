@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Migrate runtime Char values and native layout to validated Unicode scalars in
+  four bytes. Reject surrogate/out-of-range values, preserve supplementary values,
+  extend the pinned Unicode 16 classification table and support scalar literals in
+  the Neo frontend. This breaks 16-bit Char layout; Raven integration follows as
+  its own slice. Runtime, initialization, integer and memory checks pass.
+
 - Record the preview-readiness review and fresh local VS Code UTF-8 snapshot.
   Identify scalar Char as the remaining text-model gap and retain full candidate,
   package and cross-platform validation gates. Correct old validation-page context

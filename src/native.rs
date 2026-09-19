@@ -1,7 +1,7 @@
 //! Explicit runtime binding registry. A name alone never activates host dispatch.
 use crate::{
-    Fault, Value,
     metadata::{Function, Type},
+    Fault, Value,
 };
 
 pub(crate) enum Binding {
@@ -275,10 +275,7 @@ impl Binding {
             }
             (
                 Self::TypeEquals,
-                [
-                    Value::RuntimeTypeHandle(left),
-                    Value::RuntimeTypeHandle(right),
-                ],
+                [Value::RuntimeTypeHandle(left), Value::RuntimeTypeHandle(right)],
             ) => Ok(Value::Boolean(left.identity == right.identity)),
             (Self::TypeArgumentCount, [Value::RuntimeTypeHandle(handle)]) => {
                 Ok(Value::Int32(handle.generic_arguments.len() as i32))
@@ -304,11 +301,7 @@ impl Binding {
             }
             (
                 Self::WriteAllText,
-                [
-                    Value::String(path),
-                    Value::String(text),
-                    Value::Int32(limit),
-                ],
+                [Value::String(path), Value::String(text), Value::Int32(limit)],
             ) => Ok(Value::Int32(crate::file_io::write_all_text(
                 path, text, *limit,
             ))),
@@ -411,11 +404,7 @@ impl Binding {
             }
             (
                 Self::StringSliceUtf8,
-                [
-                    Value::String(value),
-                    Value::Int32(start),
-                    Value::Int32(length),
-                ],
+                [Value::String(value), Value::Int32(start), Value::Int32(length)],
             ) => {
                 // Explicit internal statuses: 1 = OutOfRange, 2 = InvalidBoundary.
                 let error = |status| Value::Erased(Box::new(Value::Byte(status)));
@@ -460,11 +449,11 @@ mod character_tests {
         // FNV-1a over Char.GetUnicodeCategory for all 65,536 UTF-16 units.
         // docs/experiments/character-classification-dotnet, SDK 10.0.100.
         let ranges = crate::char_categories::RANGES;
-        assert_eq!(ranges.last().unwrap().0, u16::MAX);
+        assert_eq!(ranges.last().unwrap().0, 0x10FFFF);
         assert!(ranges.windows(2).all(|pair| pair[0].0 < pair[1].0));
         let mut hash = 14_695_981_039_346_656_037u64;
         for value in 0..=u16::MAX {
-            let index = ranges.partition_point(|(end, _)| *end < value);
+            let index = ranges.partition_point(|(end, _)| *end < u32::from(value));
             hash = (hash ^ u64::from(ranges[index].1)).wrapping_mul(1_099_511_628_211);
         }
         assert_eq!(hash, 0x9FB70257D9A6A292);

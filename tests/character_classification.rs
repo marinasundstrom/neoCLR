@@ -1,4 +1,4 @@
-use neoclr::{Limits, LoadedProgram, RuntimeService, Value, assembler::parse_function_ref};
+use neoclr::{assembler::parse_function_ref, Limits, LoadedProgram, RuntimeService, Value};
 
 fn program() -> LoadedProgram {
     let module = neoclr::assemble(".module App").unwrap();
@@ -6,14 +6,14 @@ fn program() -> LoadedProgram {
 }
 
 #[test]
-fn char_predicates_observe_unicode_categories_and_utf16_units() {
+fn char_predicates_observe_unicode_categories_and_unicode_scalars() {
     let p = program();
     p.verify().unwrap();
     for (name, yes, no) in [
         (
             "IsDigit",
-            vec![0x30, 0x39, 0x667, 0xff19],
-            vec![0x2f, 0x3a, 0xb2, 0x2167, 0xd800],
+            vec![0x30, 0x39, 0x667, 0xff19, 0x1d7ce],
+            vec![0x2f, 0x3a, 0xb2, 0x2167, 0x10ffff],
         ),
         (
             "IsNumber",
@@ -22,8 +22,8 @@ fn char_predicates_observe_unicode_categories_and_utf16_units() {
         ),
         (
             "IsLetter",
-            vec![0x41, 0xe9, 0x4e2d, 0x1c5, 0x2b0],
-            vec![0x301, 0x2167, 0x30, 0xd800],
+            vec![0x41, 0xe9, 0x4e2d, 0x1c5, 0x2b0, 0x10400],
+            vec![0x301, 0x2167, 0x30, 0x10ffff],
         ),
         (
             "IsLetterOrDigit",
@@ -54,20 +54,9 @@ fn char_predicates_observe_unicode_categories_and_utf16_units() {
         ),
         (
             "IsSymbol",
-            vec![0x2b, 0x24, 0x5e, 0x2603],
-            vec![0x21, 0x41, 0xd83c],
+            vec![0x2b, 0x24, 0x5e, 0x2603, 0x1f600],
+            vec![0x21, 0x41, 0x10ffff],
         ),
-        (
-            "IsSurrogate",
-            vec![0xd800, 0xdbff, 0xdc00, 0xdfff],
-            vec![0xd7ff, 0xe000, 0xffff],
-        ),
-        (
-            "IsHighSurrogate",
-            vec![0xd800, 0xdbff],
-            vec![0xd7ff, 0xdc00],
-        ),
-        ("IsLowSurrogate", vec![0xdc00, 0xdfff], vec![0xdbff, 0xe000]),
         ("IsAscii", vec![0, 0x7f], vec![0x80, 0xffff]),
         (
             "IsAsciiDigit",
@@ -104,7 +93,8 @@ fn neo_literals_and_library_calls_roundtrip() {
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
     for (literal, expected) in [
         ("'é'", 0xe9),
-        (r"'\uD800'", 0xd800),
+        ("'🌍'", 0x1f30d),
+        (r"'\U0001F600'", 0x1f600),
         (r"'\0'", 0),
         (r"'\''", 39),
         (r"'\\'", 92),
@@ -130,7 +120,8 @@ fn invalid_character_literals_have_source_diagnostics() {
     for literal in [
         "''",
         "'ab'",
-        "'🌍'",
+        r"'\uD800'",
+        r"'\U00110000'",
         r"'\x41'",
         r"'\uXYZW'",
         r"'\u123'",
@@ -164,5 +155,47 @@ fn ascii_checks_are_platform_il_and_unicode_checks_declare_service() {
                 .contains(&RuntimeService::CharacterClassification),
             unicode
         );
+    }
+}
+
+#[test]
+fn char_storage_rejects_non_scalars_without_truncation() {
+    let p = program();
+    let classify = p
+        .resolve_function(&parse_function_ref("System.Char::IsSymbol(Char)").unwrap())
+        .unwrap();
+    for value in [0xd800, 0xdfff, 0x110000, u32::MAX] {
+        assert!(classify
+            .invoke(vec![Value::Char(value)], Limits::default())
+            .is_err());
+        let module = neoclr::assemble(&format!(
+            ".module Scalars\n.entry Main\n.function Main() -> Char\nldc.i4 {}\nret\n.end",
+            value as i32
+        ))
+        .unwrap();
+        assert!(LoadedProgram::new(&module)
+            .unwrap()
+            .run(Limits::default())
+            .is_err());
+    }
+}
+
+#[test]
+fn scalar_char_native_storage_is_four_bytes_and_roundtrips() {
+    let module = neoclr::assemble(".module Scalars\n.entry Main\n.function Main() -> Char\n.local Char* data\nldc.i4 1\nheap.alloc Char\nstloc data\nldloc data\nldc.i4 128512\nstobj Char\nldloc data\nldobj Char\nret\n.end").unwrap();
+    assert_eq!(
+        LoadedProgram::new(&module)
+            .unwrap()
+            .run(Limits::default())
+            .unwrap()
+            .value,
+        Value::Char(0x1f600)
+    );
+    for code in [0xd800, 0x110000] {
+        let module = neoclr::assemble(&format!(".module Scalars\n.entry Main\n.function Main() -> Char\n.local UInt32* data\nldc.i4 1\nheap.alloc UInt32\nstloc data\nldloc data\nldc.i4 {code}\nstobj UInt32\nldloc data\nptr.cast Char\nldobj Char\nret\n.end")).unwrap();
+        assert!(LoadedProgram::new(&module)
+            .unwrap()
+            .run(Limits::default())
+            .is_err());
     }
 }

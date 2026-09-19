@@ -5,7 +5,7 @@ func Main() -> int {
     if !System.Char.IsAsciiDigit('7') { return -3 }
     if !System.Char.IsLetter('é') { return -4 }
     if !System.Char.IsWhiteSpace('\n') { return -5 }
-    if !System.Char.IsHighSurrogate('\uD800') { return -6 }
+    if !System.Char.IsSymbol('🌍') { return -6 }
     System.Console.WriteLine("Unicode digits, ASCII digits, letters and whitespace checked")
     return 42
 }

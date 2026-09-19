@@ -155,10 +155,10 @@ fn lex(source: &str) -> Result<Vec<Token>, Fault> {
     Ok(tokens)
 }
 
-fn char_literal(at: &Token) -> Result<u16, Fault> {
+fn char_literal(at: &Token) -> Result<u32, Fault> {
     let inner = &at.text[1..at.text.len() - 1];
     let invalid =
-        || at.error("character literal requires one UTF-16 code unit or a supported escape");
+        || at.error("character literal requires one Unicode scalar or a supported escape");
     if let Some(escape) = inner.strip_prefix('\\') {
         return match escape {
             "0" => Ok(0),
@@ -171,21 +171,24 @@ fn char_literal(at: &Token) -> Result<u16, Fault> {
             "\\" => Ok(92),
             "'" => Ok(39),
             "\"" => Ok(34),
-            _ if escape.starts_with('u')
-                && escape.len() == 5
+            _ if ((escape.starts_with('u') && escape.len() == 5)
+                || (escape.starts_with('U') && escape.len() == 9))
                 && escape[1..].bytes().all(|b| b.is_ascii_hexdigit()) =>
             {
-                u16::from_str_radix(&escape[1..], 16).map_err(|_| invalid())
+                u32::from_str_radix(&escape[1..], 16)
+                    .ok()
+                    .filter(|value| char::from_u32(*value).is_some())
+                    .ok_or_else(invalid)
             }
             _ => Err(invalid()),
         };
     }
-    let mut units = inner.encode_utf16();
+    let mut units = inner.chars();
     let value = units.next().ok_or_else(invalid)?;
     if units.next().is_some() {
         return Err(invalid());
     }
-    Ok(value)
+    Ok(value as u32)
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -488,7 +491,7 @@ enum ExprKind {
     Int(i32),
     Double(f64),
     String(String),
-    Char(u16),
+    Char(u32),
     Bool(bool),
     Name(String),
     Field(Box<Expr>, Token),
@@ -2397,8 +2400,7 @@ impl Lowerer<'_> {
                 Ok(Ty::Record("System.Double".into()))
             }
             ExprKind::Char(value) => {
-                self.body
-                    .extend([format!("ldc.i4 {value}"), "conv.u2".into()]);
+                self.body.extend([format!("ldc.i4 {value}")]);
                 Ok(Ty::Record("System.Char".into()))
             }
             ExprKind::String(value) => {

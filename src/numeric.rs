@@ -1,5 +1,5 @@
 //! Integer operations use opcode signedness, independently of signature spelling.
-use crate::{Fault, Value, metadata::Instruction as Op};
+use crate::{metadata::Instruction as Op, Fault, Value};
 
 pub(crate) fn binary(op: &Op, left: Value, right: Value) -> Result<Value, Fault> {
     macro_rules! calculate {
@@ -125,7 +125,7 @@ pub(crate) fn indirect_type(
             },
         ),
         Op::LoadIndirectInt16 | Op::LoadIndirectUInt16 | Op::StoreIndirectInt16 => (
-            matches!(target, T::Int16 | T::UInt16 | T::Char),
+            matches!(target, T::Int16 | T::UInt16),
             if matches!(op, Op::LoadIndirectUInt16) {
                 T::UInt16
             } else {
@@ -133,7 +133,7 @@ pub(crate) fn indirect_type(
             },
         ),
         Op::LoadIndirectInt32 | Op::LoadIndirectUInt32 | Op::StoreIndirectInt32 => {
-            (matches!(target, T::Int32 | T::UInt32), T::Int32)
+            (matches!(target, T::Int32 | T::UInt32 | T::Char), T::Int32)
         }
         Op::LoadIndirectInt64 | Op::StoreIndirectInt64 => {
             (matches!(target, T::Int64 | T::UInt64), T::Int64)

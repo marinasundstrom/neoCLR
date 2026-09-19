@@ -1,4 +1,4 @@
-use neoclr::{Limits, Value, assemble, load, metadata::Type, run};
+use neoclr::{assemble, load, metadata::Type, run, Limits, Value};
 
 fn eval(ty: &str, body: &str) -> Value {
     let source = format!(".module Test\n.entry Main\n.function Main() -> {ty}\n{body}\nret\n.end");
@@ -14,7 +14,7 @@ fn primitive_aliases_layouts_and_metadata_round_trip() {
         ("Byte", "uint8", Type::Byte, 1),
         ("Int16", "int16", Type::Int16, 2),
         ("UInt16", "uint16", Type::UInt16, 2),
-        ("Char", "char", Type::Char, 2),
+        ("Char", "char", Type::Char, 4),
         ("UInt32", "uint32", Type::UInt32, 4),
         ("Int64", "int64", Type::Int64, 8),
         ("UInt64", "uint64", Type::UInt64, 8),
@@ -26,12 +26,10 @@ fn primitive_aliases_layouts_and_metadata_round_trip() {
                 Value::Int32(size)
             );
         }
-        assert!(
-            neoclr::library::system()
-                .unwrap()
-                .type_definition(&ty)
-                .is_some()
-        );
+        assert!(neoclr::library::system()
+            .unwrap()
+            .type_definition(&ty)
+            .is_some());
         assert_eq!(
             serde_json::from_str::<Type>(&serde_json::to_string(&ty).unwrap()).unwrap(),
             ty
@@ -69,15 +67,15 @@ fn small_integer_conversions_produce_int32_stack_values() {
 
 #[test]
 fn locals_arguments_returns_and_fields_preserve_storage_width() {
-    let source = ".module Test\n.entry Main\n.type Pair\n.field b Byte\n.field c Char\n.end\n.function Narrow(Byte value) -> SByte\nldarg value\nret\n.end\n.function Main() -> int32\n.local Pair pair\n.local Int16 small\nldc.i4 65535\nstloc small\nldloc small\ncall Narrow(Byte)\nldc.i4 55296\nnewobj Pair\nstloc pair\nldloc pair\nldfld 1\nldloc pair\nldfld 0\nadd\nret\n.end";
+    let source = ".module Test\n.entry Main\n.type Pair\n.field b Byte\n.field c Char\n.end\n.function Narrow(Byte value) -> SByte\nldarg value\nret\n.end\n.function Main() -> int32\n.local Pair pair\n.local Int16 small\nldc.i4 65535\nstloc small\nldloc small\ncall Narrow(Byte)\nldc.i4 128512\nnewobj Pair\nstloc pair\nldloc pair\nldfld 1\nldloc pair\nldfld 0\nadd\nret\n.end";
     assert_eq!(
         run(&assemble(source).unwrap(), Limits::default())
             .unwrap()
             .value,
-        Value::Int32(55296 + 255)
+        Value::Int32(128512 + 255)
     );
     assert_eq!(eval("Byte", "ldc.i4 511"), Value::Byte(255));
-    assert_eq!(eval("Char", "ldc.i4 55296"), Value::Char(55296)); // UTF-16 surrogate is valid Char.
+    assert_eq!(eval("Char", "ldc.i4 128512"), Value::Char(128512)); // Supplementary Unicode scalar.
     assert_eq!(eval("UInt32", "ldc.i4 -1"), Value::UInt32(u32::MAX));
     assert_eq!(eval("UInt64", "ldc.i8 -1"), Value::UInt64(u64::MAX));
     assert_eq!(
@@ -96,7 +94,7 @@ fn indirect_access_truncates_and_uses_opcode_signedness() {
         ("SByte", "stind.i1", "ldind.u1", -1, 255),
         ("UInt16", "stind.i2", "ldind.i2", 131071, -1),
         ("Int16", "stind.i2", "ldind.u2", -1, 65535),
-        ("Char", "stind.i2", "ldind.u2", 55296, 55296),
+        ("Char", "stind.i4", "ldind.u4", 128512, 128512),
         ("UInt32", "stind.i4", "ldind.u4", -1, -1),
     ] {
         assert_eq!(
@@ -176,8 +174,8 @@ fn wide_faults_and_invalid_memory_operations_report_locations() {
         assert_eq!(fault.function.as_deref(), Some("Main"));
         assert!(fault.instruction.is_some());
     }
-    assert!(
-        assemble(".module Test\n.function F() -> int64\nldc.i8 9223372036854775808\nret\n.end")
-            .is_err()
-    );
+    assert!(assemble(
+        ".module Test\n.function F() -> int64\nldc.i8 9223372036854775808\nret\n.end"
+    )
+    .is_err());
 }

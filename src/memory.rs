@@ -1,7 +1,7 @@
 //! Explicit native heap storage, with interpreter side tables for diagnostics.
 use crate::{
-    Fault, Module, Value,
     metadata::{Representation, Type},
+    Fault, Module, Value,
 };
 
 #[derive(Debug, Clone)]
@@ -113,7 +113,8 @@ pub fn layout_for(module: &Module, ty: &Type, target: TargetLayout) -> Result<La
         }
         let (size, alignment) = match ty {
             Type::SByte | Type::Byte => (1, 1),
-            Type::Int16 | Type::UInt16 | Type::Char => (2, 2),
+            Type::Int16 | Type::UInt16 => (2, 2),
+            Type::Char => (4, 4),
             Type::Single => (4, usize::from(target.single_alignment)),
             Type::Double => (8, usize::from(target.double_alignment)),
             Type::Int32 | Type::UInt32 => (4, 4),
@@ -679,13 +680,15 @@ fn decode(
             Ok(Value::UInt16(u16::from_ne_bytes(bytes)))
         }
         Type::Char => {
-            let end = offset + std::mem::size_of::<u16>();
+            let end = offset + std::mem::size_of::<u32>();
             if !allocation.initialized[offset..end].iter().all(|b| *b) {
                 return Err(Fault::new("read of uninitialized memory"));
             }
-            let mut bytes = [0; std::mem::size_of::<u16>()];
+            let mut bytes = [0; std::mem::size_of::<u32>()];
             bytes.copy_from_slice(&allocation.bytes.slice()[offset..end]);
-            Ok(Value::Char(u16::from_ne_bytes(bytes)))
+            let value = Value::Char(u32::from_ne_bytes(bytes));
+            value.initialized()?;
+            Ok(value)
         }
         Type::UInt32 => {
             let end = offset + std::mem::size_of::<u32>();
@@ -809,7 +812,7 @@ fn encode(
             initialized[offset..end].fill(true);
         }
         Value::Char(n) => {
-            let end = offset + std::mem::size_of::<u16>();
+            let end = offset + std::mem::size_of::<u32>();
             bytes[offset..end].copy_from_slice(&n.to_ne_bytes());
             initialized[offset..end].fill(true);
         }
