@@ -19,7 +19,7 @@ func Main() {
     WriteLine(info.Name)
     WriteLine(info.FullName)
     WriteLine(info.Namespace)
-    Show(info.Equals(other: TypeOf<int>.Of(42)))
+    Show(info.Equals(other: typeof(int)))
     Show(info.IsValueType)
     Show(typeof(string).IsValueType)
     Show(typeof(Type).IsValueType)

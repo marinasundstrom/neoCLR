@@ -13,9 +13,8 @@
     call System.Console::WriteLine(String)
     pop
 
-    ldc.i4 42
-    newobj Box<Int32>
-    call System.TypeOf<Box<Int32>>::Of(Box<Int32>)
+    ldtoken Box<Int32>
+    call System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)
     stloc boxType
     ldloc boxType
     call instance System.Type::get_Name()

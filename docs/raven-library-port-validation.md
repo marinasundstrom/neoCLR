@@ -127,6 +127,21 @@ Four saved array programs preserve expected metadata, interface dispatch, callba
 and element results. Full bootstrap regeneration and snapshot hashes match.
 The source-body ownership audit leaves only the TypeOf<T>.Of helper to migrate.
 
+## Obsolete declared-type helper removal
+
+At the author's direction, TypeOf<T>.Of is removed rather than ported. typeof(T)
+provides declared-type inspection without an unused value argument. Runtime and
+consumer declarations and the importer mapping are removed, and active examples
+and tests are migrated. Existing compiled helper calls must be rebuilt. Published
+preview notes remain historical. Thirteen type/reflection tests and the saved
+reflection program pass; an attempted old helper call is rejected during compilation.
+
+The ownership gate now checks all 724 selected method/function declarations against
+generated fragments or the explicit native-service catalog (54 service declarations).
+No handwritten managed method body remains in the Raven profile. The historical
+Neo profile retains its representation-specific implementations. Final execution
+results below remain a separate acceptance gate.
+
 ## Reproduce the program gate
 
 Use the neoCLR feature compiler, built from the Raven repository's

@@ -67,7 +67,7 @@ arity and assembly-qualified formatting. `Foo&.IsByRef` describes an addressing 
 there is no inherent value/reference classification on Foo. Wrapper signatures do not
 enumerate their target's members: use GetElementType first.
 
-Use `typeof(T)` for a declared signature. `TypeOf<T>.Of(T)` also describes declared T.
+Use `typeof(T)` for a declared signature. The former `TypeOf<T>.Of(T)` helper has been removed; rebuild those callers using `typeof(T)`.
 For a live initialized managed reference, Neo's `reference.GetType()` intrinsic describes
 its target, including the concrete type behind an interface view. IL uses `ref.type`
 to produce a RuntimeTypeHandle, followed by GetTypeFromHandle. An interior reference

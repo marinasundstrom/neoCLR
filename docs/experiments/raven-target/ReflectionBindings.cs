@@ -30,7 +30,6 @@ static class ReflectionBindings
         ("System.Type", "get_IsInterface", [], "Boolean", false),
         ("System.Type", "get_FullName", [], "String", false),
         ("System.Type", "get_Namespace", [], "String", false),
-        ("System.TypeOf<T>", "Of", ["T"], "System.Type", true),
         ("System.Introspection.ParameterInfo", "get_Name", [], "String", false),
         ("System.Introspection.ParameterInfo", "get_Position", [], "Int32", false),
         ("System.Introspection.ParameterInfo", "get_ParameterType", [], "System.Type", false),
@@ -75,7 +74,6 @@ static class ReflectionBindings
     public const string Declarations = """
         public struct RuntimeTypeHandle { }
         public class Type { internal Type() { } public System.Introspection.TypeInfo Info => default; public string Name => default; public int GenericArgumentCount => default; public bool IsEnum => default; public bool IsArray => default; public bool IsAbstract => default; public bool IsReadOnly => default; public bool IsByRef => default; public bool IsPointer => default; public bool IsValueType => default; public bool IsInterface => default; public string FullName => default; public string Namespace => default; public static System.Type GetTypeFromHandle(System.RuntimeTypeHandle handle) => default; public System.Type GetGenericArgument(int index) => default; public bool Equals(System.Type other) => default; public System.Type[] GetGenericArguments() => default; public System.Option<System.Type> GetElementType() => default; }
-        public static class TypeOf<T> { public static System.Type Of(T arg0) => default; }
         namespace Introspection { public class TypeInfo { internal TypeInfo() { } internal static TypeInfo FromHandle(System.RuntimeTypeHandle handle) => default; public System.Option<System.Type> BaseType => default; public System.Type[] GetInterfaces() => default; public string[] GetEnumNames() => default; public System.Type GetEnumUnderlyingType() => default; public FieldInfo[] GetFields() => default; public FieldInfo[] GetFields(BindingFlags flags) => default; public MethodInfo[] GetMethods() => default; public MethodInfo[] GetMethods(BindingFlags flags) => default; public PropertyInfo[] GetProperties() => default; public PropertyInfo[] GetProperties(BindingFlags flags) => default; } }
         namespace Introspection { public class ParameterInfo { internal ParameterInfo() { } public string Name => default; public int Position => default; public System.Type ParameterType => default; public bool IsOut => default; public bool IsOutWhenTrue => default; public bool IsReadOnly => default; } }
         namespace Introspection { public abstract class MemberInfo { internal MemberInfo() { } public string Name => default; public System.Type DeclaringType => default; } }
@@ -113,18 +111,6 @@ static class ReflectionBindings
     public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition)
     {
         var owner = Type(reference.DeclaringType);
-        if (reference.DeclaringType is GenericInstanceType { GenericArguments.Count: 1 } generic
-            && generic.ElementType.FullName == "System.TypeOf`1" && RuntimeSignatures.IsCore(generic.Scope))
-        {
-            var element = GenericUnionBindings.Type(generic.GenericArguments[0]);
-            if (element is not null && reference.Name == "Of" && !reference.HasThis)
-            {
-                var signature = RuntimeSignatures.Match(reference, definition, t => Type(t) ?? GenericUnionBindings.Type(t));
-                if (signature.Result == "System.Type" && signature.Args.SequenceEqual(new[] { element }))
-                    return new($"System.TypeOf<{element}>::Of", signature.Args, signature.Result);
-            }
-            throw new InvalidDataException("Unsupported TypeOf signature.");
-        }
         if (owner is null || IsArray(owner) || owner == "System.RuntimeTypeHandle") return null;
         var (args, result) = RuntimeSignatures.Match(reference, definition, t => Type(t) ?? ProcessBindings.ArrayType(t) ?? GenericUnionBindings.Type(t));
         string Project(string t) => t.EndsWith("[]") ? "arrayref<" + t[..^2] + ">" : t;

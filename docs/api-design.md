@@ -197,7 +197,7 @@ mutation, GC retention/reclamation, invalid frame escapes and automatic Neo acce
 | `Option<T>` / `Result<T,E>` and case accessors | Constructors and extraction use values; keep independent extraction semantics. Review predicate receiver copying separately. Existing TryGet output contracts remain authoritative |
 | Numeric operations, Math, parsing | Scalar/value inputs and typed value results remain appropriate; parsing failure is an ordinary Result |
 | String, Error, Console, File text APIs | Current text/value inputs and results remain appropriate; host primitives and their wrappers must be changed together if reference inputs are later justified |
-| Type / RuntimeTypeHandle / TypeOf | Descriptors and handles are value results; no object base class or boxing requirement is implied. TypeOf's unused value input is a candidate for a token-only or reference-aware helper, not a reason to copy arbitrary objects |
+| Type / RuntimeTypeHandle | Descriptors and handles describe metadata identity without a boxing requirement. Use typeof(T) for declared types; TypeOf<T>.Of was removed in development on 2026-09-19. |
 | `System.Value` and internal runtime helpers | Bootstrap representation boundaries, not the model for new user-facing generic APIs; preserve explicit packing/unpacking and typed binding validation |
 
 No receiver migration should silently change equality into address comparison,
@@ -295,3 +295,29 @@ for Find, an index/-1 for FindIndex, and Boolean for Exists. The Raven profile n
 uses [direct filtering](arraylist-filtering.md), including Option<Int32> index
 results and FindLast/FindLastIndex/FindAll/TrueForAll. [LINQ](raven-query-api.md)
 is a separate library surface. These predicates do not require default comparers.
+
+
+## Preview alignment follow-up — 2026-09-19
+
+After removing TypeOf<T>.Of in favor of typeof(T), the author proposed evaluating
+Object.GetType as part of the smallest preview API. This is a candidate for the
+next alignment stage, not an implemented member or a finalized requirement. Compare
+.NET Object.GetType's runtime-object identity with typeof(T)'s declared identity,
+and reuse the existing [type inspection and reference discovery research](type-inspection.md)
+when choosing the minimum implementation. Validation must distinguish a base view
+of a derived object from its declared variable type and cover unavailable/null
+references. Adding an Object member would require an explicit runtime-reference
+contract and consumer metadata change; it is outside this API-preserving port.
+
+
+### Development compatibility principle
+
+The author's 2026-09-19 clarification sets .NET as the ergonomic comparison baseline:
+retain the minimum familiar API and developer experience where it serves neoCLR.
+Compatibility may break during development, including names, signatures and behavior,
+when that supports the smallest coherent preview surface. Record the specific .NET
+comparison, benefit, costs and caller migration for each intentional divergence;
+existing compatibility alone does not settle the design. This refines the earlier
+API-preserving migration scope for the next alignment phase and authorizes the
+explicit TypeOf<T>.Of removal above. It does not imply a commitment to the full CLR
+object model or to implementing all .NET members.

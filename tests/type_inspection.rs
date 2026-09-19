@@ -51,13 +51,13 @@ fn descriptors_use_closed_identity_and_preserve_declared_small_value_types() {
         );
         assert_eq!(execute(&body, "Boolean").unwrap(), Value::Boolean(same));
     }
-    for (ty, value, name) in [
-        ("Byte", "ldc.i4 257", "System.Byte"),
-        ("Void", "ldvoid", "System.Void"),
-        ("Int32*", "ptr.null Int32", "System.Int32*"),
+    for (ty, name) in [
+        ("Byte", "System.Byte"),
+        ("Void", "System.Void"),
+        ("Int32*", "System.Int32*"),
     ] {
         let body = format!(
-            "{value}\ncall System.TypeOf<{ty}>::Of({ty})\ncall instance System.Type::get_Name()"
+            "ldtoken {ty}\ncall System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)\ncall instance System.Type::get_Name()"
         );
         assert_eq!(
             execute(&body, "String").unwrap(),

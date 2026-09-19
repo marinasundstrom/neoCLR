@@ -50,7 +50,9 @@ This migration reuses the .NET comparisons in [common interfaces](common-interfa
 additional generated adapters and a larger reachable call graph; no performance
 improvement or new native ABI is claimed.
 
-The remaining handwritten source is the TypeOf<T>.Of metadata helper.
+Every selected Raven-profile method/function body now comes from generated Raven
+snapshots or explicit runtime services. The former TypeOf<T>.Of helper has been
+removed at the author's request; use typeof(T) and rebuild existing callers.
 Native service declarations remain runtime-owned. Generated neoIL remains a build
 artifact rather than a competing implementation. These boundaries are not silently
 claimed to have become Raven source.
@@ -156,15 +158,12 @@ filtering and the explicit nonpublic overload. This reuses the
 change Runtime Contract configuration. The legacy Neo profile retains its value-based
 descriptors; the Raven profile selects these class implementations explicitly.
 
-The remaining migration gates are substantive work, not just moving files:
-
-| Remaining source | Required implementation admission |
-| --- | --- |
-| TypeOf<T>.Of helper | Checked generic static type authoring and existing typeof lowering |
-
-Complete those gates before calling the entire source port finished. Executable
-coverage of their existing neoIL implementations is necessary but does not establish
-that their managed bodies have been authored in Raven.
+The source-body ownership gate is `verify_source_ownership.py`. It compares every
+selected method/function declaration with generated fragments or the explicit
+native-service catalog. Historical Neo implementations with different receiver and
+array conventions remain separate. Generated enum/marker/iteration ABI lowering
+is compiler-owned; it is not a second managed-library implementation. Complete
+execution validation is required in addition to this ownership check.
 
 Validation commands and recorded results are in the
 [port validation record](raven-library-port-validation.md).

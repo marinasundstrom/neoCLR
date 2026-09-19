@@ -91,6 +91,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
     results['SavedEdit'] = saved_expected
     for label, source, diagnostic in [
         ('CompileFailure', 'func Main() { MissingCall() }', 'RAV'),
+        ('RemovedTypeOfHelper', 'func Main() { System.TypeOf<int>.Of(42) }', 'RAV'),
         ('InheritedIntegerMember', 'func Main() { let value = 42\n value.GetHashCode() }', 'Unsupported'),
         ('PathArgumentMismatch', 'func Main() { System.IO.Path.Combine(42, 7) }', 'RAV'),
         ('PathUnsupportedApi', 'func Main() { System.IO.Path.GetFullPath(".") }', 'RAV'),

@@ -83,7 +83,7 @@
     "UnionAttribute.helpers.neoil": "00af8da1368f4291ff8ab766755f7befcb1a1eadde8739df89c77d20c1a885a2"
   },
   "compilerSha256": "eb5f7834214432722f4140fcaf3b13464534f745f5db2d0bae5c565b8c2094cb",
-  "coreSha256": "047ef05f81594ec50c11da73e0e529caba3f901f2f4f2d3637accc8382cbc0b7",
+  "coreSha256": "914deb1b0a1a1ced1e7bce19e0f2fa9c485aa5e770097dee4a1edb178cef7783",
   "exports": [
     ".ctor() -> Void"
   ]

@@ -1,6 +1,6 @@
 {
   "purpose": "Explicit source-by-source API audit. Samples and signature checks are evidence, not a claim of arbitrary generic/compiler support.",
-  "declarationCount": 770,
+  "declarationCount": 768,
   "sources": [
     {
       "file": "runtime/System/Equatable.neoil",
@@ -1180,7 +1180,7 @@
     },
     {
       "file": "runtime/System/Type.neoil",
-      "declarations": 45,
+      "declarations": 43,
       "disposition": "reflection",
       "samples": [
         "library-reflection.rvn",

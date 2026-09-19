@@ -183,9 +183,9 @@
     "function": 175,
     "interface": 10,
     "literal": 6,
-    "method": 382,
+    "method": 381,
     "property": 101,
-    "type": 85
+    "type": 84
   },
   "declarations": [
     {"file": "runtime/System/Equatable.neoil", "line": 2, "context": [], "declaration": ".interface System.Equatable<T>", "role": "library-api-review"},
@@ -659,8 +659,6 @@
     {"file": "runtime/System/Type.neoil", "line": 218, "context": [".type System.Type"], "declaration": ".method instance get_FullName() -> String", "role": "library-api-review"},
     {"file": "runtime/System/Type.neoil", "line": 225, "context": [".type System.Type"], "declaration": ".property instance Namespace() -> String", "role": "library-api-review"},
     {"file": "runtime/System/Type.neoil", "line": 228, "context": [".type System.Type"], "declaration": ".method instance get_Namespace() -> String", "role": "library-api-review"},
-    {"file": "runtime/System/Type.neoil", "line": 239, "context": [], "declaration": ".type System.TypeOf<T>", "role": "library-api-review"},
-    {"file": "runtime/System/Type.neoil", "line": 240, "context": [".type System.TypeOf<T>"], "declaration": ".method static Of(T value) -> System.Type", "role": "library-api-review"},
     {"file": "runtime/neoCLR/Runtime/TypeInspection.neoil", "line": 1, "context": [], "declaration": ".function neoCLR.Runtime.TypeName(System.RuntimeTypeHandle type) -> String", "role": "runtime-service-review"},
     {"file": "runtime/neoCLR/Runtime/TypeInspection.neoil", "line": 4, "context": [], "declaration": ".function neoCLR.Runtime.TypeEquals(System.RuntimeTypeHandle left, System.RuntimeTypeHandle right) -> Boolean", "role": "runtime-service-review"},
     {"file": "runtime/neoCLR/Runtime/TypeInspection.neoil", "line": 7, "context": [], "declaration": ".function neoCLR.Runtime.TypeArgumentCount(System.RuntimeTypeHandle type) -> Int32", "role": "runtime-service-review"},

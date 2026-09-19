@@ -163,8 +163,7 @@ remains required before shipping this API in the POC.
 
 ## Raven API projection
 
-The current source compiler can now use `typeof(T)`, `TypeOf<T>.Of(value)` for
-admitted closed types, all existing Type query methods, and the public getters on
+The current source compiler can now use `typeof(T)` for admitted closed types, all existing Type query methods, and the public getters on
 MemberInfo, FieldInfo, MethodInfo, PropertyInfo and ParameterInfo. Class assignment
 and base casts preserve identity. Descriptor arrays are projected as managed arrays;
 the adapter copies the owned snapshot vector while retaining descriptor references.

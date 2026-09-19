@@ -8,17 +8,18 @@ not payload erasure, reflection-based execution, or a common object base type.
 | --- | --- |
 | `ldtoken T` | Push an owned RuntimeTypeHandle for a closed type signature |
 | `System.Type.GetTypeFromHandle(RuntimeTypeHandle)` | Wrap a handle as System.Type |
-| `System.TypeOf<T>.Of(T value)` | Describe the declared T without examining or erasing the payload |
+| `typeof(T)` | Describe the declared T through a type token, without a value argument |
 | `Type.Name` | Canonical qualified definition name; pointer signatures include their target spelling |
 | `Type.GenericArgumentCount` | Number of generic arguments of a constructed type |
 | `Type.GetGenericArgument(Int32 index)` | Return the selected closed argument descriptor; invalid indices Fault |
 | `Type.Equals(Type other)` | Compare canonical type identities, not display names or object addresses |
 
-The value helper is deliberately static: Of<Byte> describes Byte even though small
-integers normalize to Int32 on the evaluation stack. Of<Void> works; pointer values
-can be described without dereferencing them. Of<System.Value> describes System.Value,
-not its erased contents. Inheritance/dynamic object dispatch is not implemented and
-this helper does not predict its future semantics.
+The declared type is independent of evaluation-stack normalization: typeof(Byte)
+describes Byte even though small integers normalize to Int32 on the stack. Void,
+pointers and erased-value container types retain their declared identities; no
+payload is evaluated or dereferenced. The former TypeOf<T>.Of(value) helper was
+removed in development on 2026-09-19; use typeof(T), or ldtoken plus
+GetTypeFromHandle in direct IL. Previously compiled helper calls must be rebuilt.
 
 Name matches the host descriptor's existing naming contract. A Box<Int32> descriptor
 has Name `Box` and a separate System.Int32 argument descriptor. This is not the CLR
@@ -122,4 +123,4 @@ module-level free-function queries, not a category of Type member.
 
 Managed references now support concrete target discovery through `ref.type` and Neo's
 GetType fallback. See [reflection introspection](reflection.md). This is distinct from
-TypeOf<T>.Of(T), which continues to describe its declared generic argument.
+typeof(T), which describes the declared type argument.

@@ -103,6 +103,31 @@ ordinary branches. Asked about its name, the author explicitly chose “Rename i
 neoclr”. The assistant will remove temporary integrated fix branches and rename the
 integration branch after the final review; cleanup is pending at this point.
 
+**Final helper decision.** The source-body audit found TypeOf<T>.Of as the last
+handwritten managed helper after the array port. The assistant proposed migrating
+it; the author instead directed removal because typeof is now supported. The
+assistant removed its runtime/reference declaration and importer mapping, updated
+active samples/tests to typeof or type tokens, and preserved published preview
+notes as historical records. Existing compiled helper calls require rebuilding.
+The ownership check now finds only generated declarations/bodies and explicit
+runtime services in the selected Raven profile; final execution validation remains
+open until the final gate below is recorded.
+
+**Object.GetType follow-up.** The author suggested that Object may need GetType,
+explicitly placing it in API alignment and the smallest feature set for the preview
+release. The assistant distinguished declared-type typeof(T) from runtime-object
+type discovery and recorded GetType as a candidate for that next stage. No Object
+GetType implementation or final API decision is claimed by this port; removing the
+old declared-type TypeOf<T>.Of helper remains the current action.
+
+**Compatibility principle.** The author clarified that .NET compatibility should
+provide the minimum familiar ergonomics and developer experience, while leaving
+neoCLR free to choose its own design. The project is still in development and may
+break compatibility. The assistant accepted .NET as the comparison baseline,
+committed to documenting benefits/costs and migration consequences, and carried
+that principle into preview API alignment, including the Object.GetType candidate.
+This does not claim that the proposed preview API has already been implemented.
+
 **String/Error slice.** Raven sources now own both method surfaces, with explicit
 importer checks for intrinsic storage, mixed String receivers and opaque Error
 receivers. Native ownership and the existing parameter metadata remain unchanged.

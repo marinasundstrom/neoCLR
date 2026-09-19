@@ -236,10 +236,3 @@
 
 ; Describes the declared T, including Byte/Void, without erasing the value.
 ; There is no subtype or dynamic-object dispatch implied by this helper.
-.type System.TypeOf<T>
-    .method static Of(T value) -> System.Type
-        ldtoken T
-        call System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)
-        ret
-    .end
-.end

@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Remove the obsolete TypeOf<T>.Of helper from runtime and Raven reference metadata;
+  use typeof(T), or ldtoken/GetTypeFromHandle in direct IL, and rebuild existing
+  helper callers. Update active samples while retaining published preview notes.
+  Thirteen type/reflection tests and the saved reflection program pass; old helper
+  calls are rejected. Add an ownership gate covering all 724 selected method/function
+  declarations (54 explicit runtime services, the remainder generated). Record
+  Object.GetType as a later preview API candidate and the development policy allowing
+  deliberate compatibility breaks while retaining useful .NET ergonomics.
+
 - Port managed Array members, callbacks and private iteration to Raven (73 slices).
   Preserve intrinsic storage and adapt the source iterator factory to the existing
   dispatch ABI. Retain static property metadata and reject fabricated array storage.
