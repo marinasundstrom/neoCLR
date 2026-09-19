@@ -20,7 +20,8 @@ static class CoreDeclarations
             .Replace("public static class Console { public static void WriteLine(string value) { } }", declarations)
             .Replace("// Union probe attribute", unionProbe ? "public sealed class UnionAttribute : System.Attribute { }" : "");
         if (unionProbe) source = PrimitiveBindings.Project(source).Replace("public struct Boolean { }", BooleanBindings.Declaration);
-        if (collectionProbe) source = InterfaceBindings.Project(source.Replace("public class Type { }", ""));
+        if (collectionProbe) source = InterfaceBindings.Project(source.Replace("public class Type { }", "")
+            .Replace("public class Object {", "public class Object { public System.Introspection.TypeInfo GetType() => default;"));
         var compilation = CSharpCompilation.Create(Identity,
             [CSharpSyntaxTree.ParseText(source)], references: [],
             options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, allowUnsafe: true));

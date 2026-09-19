@@ -17,14 +17,26 @@ instance acquisition method; typeof(T) remains declared-type acquisition through
 the selected RuntimeContext contract. The author returned to the familiar GetType spelling on 2026-09-19,
 superseding the earlier GetTypeInfo and value.Type spellings.
 
-RuntimeContext and unified acquisition remain implementation directions, not
-completed API claims. The first production slice establishes the six existing
-Info interfaces with internal providers; their signatures still refer to System.Type
-and arrays until the remaining migration. Keep concrete
+The Raven profile now implements unified acquisition: `typeof(T)` and
+`Object.GetType()` return TypeInfo directly. RuntimeContext.Current exposes
+GetTypeInfoFromHandle for Raven's configured typeof lowering. Its current facade
+uses the one loaded program; it does not yet create independent execution universes.
+ExecutingAssembly and assembly/module providers remain the next implementation
+slice. Collection query returns remain arrays pending the collection-contract review.
+
+The public/runtime System.Type class and Type.Info hop are removed from the Raven
+profile. Its compiler reference retains an **internal**, empty System.Type metadata
+shell solely for CLI custom-attribute type tokens used by closed hierarchies. That
+shell is neither an executable runtime class nor a public completion/consumer API.
+The historical Neo profile retains its old descriptor contract. Raven consumers
+must rebuild; this is a deliberate development-time compatibility break.
+
+GetType uses the allocation's concrete type, including base/interface views, boxed
+values, intrinsic strings and managed arrays. It rejects null receivers. TypeInfo
+identity equality compares resolved handles, not provider object identity. Keep
 Runtime*Info providers internal and structural signatures within the Info model.
-Preserve the current BindingFlags query behavior. The smallest working context and
-provider model precedes optional invocation, metadata-file loading and Emit. The
-project may make documented breaking changes while preserving useful .NET ergonomics.
+Preserve existing BindingFlags query behavior. Invocation, metadata-file loading
+and Emit remain deferred.
 
 ### Implementation checks for the selected acquisition API
 
@@ -383,16 +395,17 @@ proposal does not assert that all such .NET combinations fail.
 
 ## Implementation and migration plan
 
-Today the runtime still uses System.Type, class-based System.Introspection descriptors,
-Type.Info and GetMethods/GetFields/GetProperties with BindingFlags. Type, TypeInfo
-queries and ParameterInfo readers have Raven-authored implementations. See the
-[implemented API](raven-reflection-api.md). Dynamic Reflection, Emit and the complete
-interface migration are not implemented. RuntimeContext acquisition is an isolated POC.
+The production Raven profile now uses sealed Info interfaces and direct TypeInfo
+acquisition. The earlier Type/Info split is retained only in the historical Neo
+profile. Dynamic invocation, Emit and context-owned assembly/module discovery are
+not yet implemented. The probes below record the path to production migration;
+they are historical experiments, not the current consumer API.
 
 The [isolated Raven probe](experiments/raven-target/introspection-v1/README.md)
 exercises minimal TypeInfo/MemberInfo interfaces backed by existing runtime objects.
 It keeps experimental and existing descriptors in separate assembly identities;
-production migration is still required. BindingFlags is retained for acquisition.
+production migration was subsequently implemented as described above. BindingFlags
+is retained for acquisition.
 The probe now also queries fields through TypeInfo and exposes FieldInfo.Type and
 MemberInfo.DeclaringType through that same interface. Its collection representation
 is experimental; filtering and invalid-flag behavior delegate to the runtime.
@@ -406,15 +419,13 @@ descriptor replacement, object.Type, or complete context discovery.
 
 The library importer now also admits checked nongeneric interface declarations,
 with Clock as its first integrated Raven contract. This removes the declaration
-authoring blocker; multi-descriptor identity migration and runtime acquisition
-remain separate work. See [library progress](raven-system-library.md).
+authoring blocker; the subsequent descriptor and acquisition migration now uses it. See [library progress](raven-system-library.md).
 
-1. Prove the smallest interface contract and a runtime-backed implementation in
-   Raven; validate source, metadata and actual execution without claiming a complete
-   provider model. Keep transitional System.Type use internal to that experiment.
-2. Migrate the runtime/reference/consumer type identity together so public signatures
-   close over TypeInfo. Define typeof/value.Type lowering, equality, lifetime and
-   handle access before removing System.Type and Type.Info.
+1. Completed: prove the minimal interface/provider contract in Raven, then migrate
+   the six production Info contracts to sealed interfaces.
+2. Implemented: migrate runtime/reference/consumer signatures to TypeInfo; typeof
+   and Object.GetType use the selected handle resolver. Preserve identity equality
+   and object lifetime. Remove the public System.Type/Type.Info hop.
 3. Add the minimum member contracts and runtime-backed RuntimeContext discovery
    needed by working demos. Preserve BindingFlags and test filtering semantics;
    reconsider collection query properties separately.

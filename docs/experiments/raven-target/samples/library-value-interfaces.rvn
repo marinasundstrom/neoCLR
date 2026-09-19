@@ -1,3 +1,4 @@
+import System.Introspection.*
 import System.*
 import System.Console.*
 func Ordered(value: Comparable<int>) -> int { return value.CompareTo(42) }
@@ -12,7 +13,7 @@ func Main() {
     let text: Equatable<string> = "hello"
     if text.Equals("hello") { WriteLine("Equal string") }
     let kind = typeof(int)
-    let types: Equatable<Type> = kind
+    let types: Equatable<TypeInfo> = kind
     if types.Equals(typeof(int)) { WriteLine("Equal type") }
     match Date.Create(2026, 9, 13) {
         Result.Ok<Date> ok => CheckDate(ok.Value)

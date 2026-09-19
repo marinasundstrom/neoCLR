@@ -5,11 +5,11 @@ import System.Runtime.CompilerServices.*
 
 public sealed interface MemberInfo {
     val Name: string { get }
-    val DeclaringType: Type { get }
+    val DeclaringType: TypeInfo { get }
 }
 
 public sealed interface FieldInfo : MemberInfo {
-    val FieldType: Type { get }
+    val FieldType: TypeInfo { get }
     val IsPublic: bool { get }
     val IsPrivate: bool { get }
     val IsAssembly: bool { get }
@@ -18,7 +18,7 @@ public sealed interface FieldInfo : MemberInfo {
 }
 
 public sealed interface MethodInfo : MemberInfo {
-    val ReturnType: Type { get }
+    val ReturnType: TypeInfo { get }
     val IsStatic: bool { get }
     val IsPublic: bool { get }
     val IsPrivate: bool { get }
@@ -33,7 +33,7 @@ public sealed interface MethodInfo : MemberInfo {
 }
 
 public sealed interface PropertyInfo : MemberInfo {
-    val PropertyType: Type { get }
+    val PropertyType: TypeInfo { get }
     val IsStatic: bool { get }
     val CanRead: bool { get }
     val CanWrite: bool { get }
@@ -47,19 +47,19 @@ public sealed interface PropertyInfo : MemberInfo {
 
 internal sealed class RuntimeMemberInfo {
     private field StoredName: string
-    private field StoredDeclaringType: Type
+    private field StoredDeclaringType: TypeInfo
 
-    protected init(name: string, declaringType: Type) {
+    protected init(name: string, declaringType: TypeInfo) {
         StoredName = name
         StoredDeclaringType = declaringType
     }
 
     val Name: string { get => StoredName }
-    val DeclaringType: Type { get => StoredDeclaringType }
+    val DeclaringType: TypeInfo { get => StoredDeclaringType }
 }
 
 internal class RuntimeFieldInfo : RuntimeMemberInfo, FieldInfo {
-    private field StoredFieldType: Type
+    private field StoredFieldType: TypeInfo
     private field StoredIsPublic: bool
     private field StoredIsPrivate: bool
     private field StoredIsAssembly: bool
@@ -67,8 +67,8 @@ internal class RuntimeFieldInfo : RuntimeMemberInfo, FieldInfo {
     private field StoredDefinitionIndex: int
 
     private init(
-        name: string, declaringType: Type,
-        fieldType: Type, isPublic: bool,
+        name: string, declaringType: TypeInfo,
+        fieldType: TypeInfo, isPublic: bool,
         isPrivate: bool, isAssembly: bool,
         isStatic: bool, definitionIndex: int): base(name, declaringType) {
         StoredFieldType = fieldType
@@ -79,7 +79,7 @@ internal class RuntimeFieldInfo : RuntimeMemberInfo, FieldInfo {
         StoredDefinitionIndex = definitionIndex
     }
 
-    val FieldType: Type { get => StoredFieldType }
+    val FieldType: TypeInfo { get => StoredFieldType }
     val IsPublic: bool { get => StoredIsPublic }
     val IsPrivate: bool { get => StoredIsPrivate }
     val IsAssembly: bool { get => StoredIsAssembly }
@@ -88,7 +88,7 @@ internal class RuntimeFieldInfo : RuntimeMemberInfo, FieldInfo {
 }
 
 internal class RuntimeMethodInfo : RuntimeMemberInfo, MethodInfo {
-    private field StoredReturnType: Type
+    private field StoredReturnType: TypeInfo
     private field StoredIsStatic: bool
     private field StoredIsPublic: bool
     private field StoredIsPrivate: bool
@@ -102,8 +102,8 @@ internal class RuntimeMethodInfo : RuntimeMemberInfo, MethodInfo {
     private field StoredIsAbstract: bool
 
     private init(
-        name: string, declaringType: Type,
-        returnType: Type, isStatic: bool,
+        name: string, declaringType: TypeInfo,
+        returnType: TypeInfo, isStatic: bool,
         isPublic: bool, isPrivate: bool,
         isAssembly: bool, isReceiverByRef: bool,
         definitionIndex: int, parameters: ParameterSnapshot,
@@ -123,7 +123,7 @@ internal class RuntimeMethodInfo : RuntimeMemberInfo, MethodInfo {
         StoredIsAbstract = isAbstract
     }
 
-    val ReturnType: Type { get => StoredReturnType }
+    val ReturnType: TypeInfo { get => StoredReturnType }
     val IsStatic: bool { get => StoredIsStatic }
     val IsPublic: bool { get => StoredIsPublic }
     val IsPrivate: bool { get => StoredIsPrivate }
@@ -148,7 +148,7 @@ internal class RuntimeMethodInfo : RuntimeMemberInfo, MethodInfo {
 }
 
 internal class RuntimePropertyInfo : RuntimeMemberInfo, PropertyInfo {
-    private field StoredPropertyType: Type
+    private field StoredPropertyType: TypeInfo
     private field StoredIsStatic: bool
     private field StoredCanRead: bool
     private field StoredCanWrite: bool
@@ -158,8 +158,8 @@ internal class RuntimePropertyInfo : RuntimeMemberInfo, PropertyInfo {
     private field StoredSetter: Option<MethodInfo>
 
     private init(
-        name: string, declaringType: Type,
-        propertyType: Type, isStatic: bool,
+        name: string, declaringType: TypeInfo,
+        propertyType: TypeInfo, isStatic: bool,
         canRead: bool, canWrite: bool,
         definitionIndex: int, indexParameters: ParameterSnapshot,
         getter: Option<MethodInfo>, setter: Option<MethodInfo>): base(name, declaringType) {
@@ -173,7 +173,7 @@ internal class RuntimePropertyInfo : RuntimeMemberInfo, PropertyInfo {
         StoredSetter = setter
     }
 
-    val PropertyType: Type { get => StoredPropertyType }
+    val PropertyType: TypeInfo { get => StoredPropertyType }
     val IsStatic: bool { get => StoredIsStatic }
     val CanRead: bool { get => StoredCanRead }
     val CanWrite: bool { get => StoredCanWrite }

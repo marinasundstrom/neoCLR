@@ -32,7 +32,8 @@ def catalog(paths):
 
 
 generated = catalog((ROOT / 'runtime/raven/generated').glob('*.neoil'))
-native = catalog((ROOT / 'runtime/neoCLR').rglob('*.neoil'))
+native = {re.sub(r'System\.Type\b', 'System.Introspection.TypeInfo', body)
+          for body in catalog((ROOT / 'runtime/neoCLR').rglob('*.neoil'))}
 selected = list(bodies(build(ROOT / 'runtime/System.neoil')))
 unknown = [body.splitlines()[0] for body in selected if body not in generated | native]
 if unknown:

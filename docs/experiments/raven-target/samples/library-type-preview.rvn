@@ -10,7 +10,7 @@ func Main() {
     }
 
     // Descriptive queries use the shared Introspection model, not invocation APIs.
-    let metadata: TypeInfo = type.Info
+    let metadata: TypeInfo = type
     for method in metadata.GetMethods() {
         WriteLine(method.Name)
     }

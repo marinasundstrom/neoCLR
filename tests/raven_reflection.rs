@@ -14,9 +14,8 @@ fn library() -> &'static Module {
 // The selected Raven profile has interface contracts; the bundled legacy profile
 // still has value descriptors, so validate callers against the selected library.
 fn assemble(source: &str) -> Result<Module, neoclr::Fault> {
-    neoclr::assembler::read_modules(
-        &[neoclr::assembler::ModuleInput::Source(source)], library(),
-    ).map(|mut modules| modules.remove(0))
+    neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(source)], library())
+        .map(|mut modules| modules.remove(0))
 }
 
 #[test]
@@ -37,7 +36,7 @@ fn handle_fields_must_be_assigned_by_class_constructors() {
 
 #[test]
 fn type_has_no_metadata_query_exports() {
-    let text = ".module Probe\n.function Query(System.Type value) -> System.Introspection.FieldInfo[]\nldarg value\ncall instance System.Type::GetFields()\nret\n.end";
+    let text = ".module Probe\n.function Query(System.Type value) -> System.Introspection.FieldInfo[]\nldarg value\ncallvirt instance System.Introspection.TypeInfo::GetFields()\nret\n.end";
     let result = assemble(text)
         .and_then(|app| LoadedProgram::with_library(&app, library()))
         .and_then(|p| p.verify());
@@ -54,9 +53,9 @@ fn reflection_snapshots_implement_public_info_interfaces() {
 .end
 .function Main() -> String
 .local System.Introspection.FieldInfo field
+call System.Runtime.RuntimeContext::get_Current()
 ldtoken Item
-call System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)
-call instance System.Type::get_Info()
+call instance System.Runtime.RuntimeContext::GetTypeInfoFromHandle(System.RuntimeTypeHandle)
 callvirt instance System.Introspection.TypeInfo::GetFields()
 ldc.i4 0
 ldelem System.Introspection.FieldInfo
@@ -87,9 +86,9 @@ fn returned_descriptor_keeps_nested_type_snapshot_alive_and_obeys_heap_limit() {
 .field Count Int32
 .end
 .function Main() -> System.Introspection.MemberInfo
+call System.Runtime.RuntimeContext::get_Current()
 ldtoken Item
-call System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)
-call instance System.Type::get_Info()
+call instance System.Runtime.RuntimeContext::GetTypeInfoFromHandle(System.RuntimeTypeHandle)
 callvirt instance System.Introspection.TypeInfo::GetFields()
 ldc.i4 0
 ldelem System.Introspection.FieldInfo
@@ -139,7 +138,7 @@ fn value_type_classification_uses_type_category_not_addressing_mode() {
         ("Boolean", true),
         ("Void", true),
         ("String", false),
-        ("System.Type", false),
+        ("System.Introspection.TypeInfo", false),
         ("System.Introspection.BindingFlags", true),
         ("Item", false),
         ("Point", true),
@@ -159,9 +158,10 @@ fn value_type_classification_uses_type_category_not_addressing_mode() {
 .field X Int32
 .end
 .function Main() -> Boolean
+call System.Runtime.RuntimeContext::get_Current()
 ldtoken {name}
-call System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)
-call instance System.Type::get_IsValueType()
+call instance System.Runtime.RuntimeContext::GetTypeInfoFromHandle(System.RuntimeTypeHandle)
+callvirt instance System.Introspection.TypeInfo::get_IsValueType()
 ret
 .end
 "#
@@ -192,9 +192,9 @@ ret
 .function Main() -> Int32
 .local System.Introspection.MethodInfo method
 .local arrayref<System.Introspection.ParameterInfo> parameters
+call System.Runtime.RuntimeContext::get_Current()
 ldtoken Item
-call System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)
-call instance System.Type::get_Info()
+call instance System.Runtime.RuntimeContext::GetTypeInfoFromHandle(System.RuntimeTypeHandle)
 callvirt instance System.Introspection.TypeInfo::GetMethods()
 ldc.i4 0
 ldelem System.Introspection.MethodInfo
@@ -246,9 +246,9 @@ ret
 .end
 .end
 .function Main() -> Boolean
+call System.Runtime.RuntimeContext::get_Current()
 ldtoken Item
-call System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)
-call instance System.Type::get_Info()
+call instance System.Runtime.RuntimeContext::GetTypeInfoFromHandle(System.RuntimeTypeHandle)
 ldc.i4 36
 call System.Introspection.BindingFlags::FromValue(Int32)
 callvirt instance System.Introspection.TypeInfo::GetProperties(System.Introspection.BindingFlags)
@@ -269,4 +269,101 @@ ret
             Value::Boolean(true)
         );
     }
+}
+
+#[test]
+fn object_get_type_preserves_concrete_type_through_reference_views() {
+    for (body, expected) in [
+        ("ldstr \"hello\"\ncastclass System.Object", "System.String"),
+        (
+            "ldc.i4 42\nbox Int32\ncastclass System.Object",
+            "System.Int32",
+        ),
+        (
+            "ldc.i4 0\nnewarr Int32\ncastclass System.Object",
+            "arrayref<System.Int32>",
+        ),
+    ] {
+        let app = assemble(&format!(
+            ".module GetType\n.entry Main\n.function Main() -> String\n{body}\ncall instance System.Object::GetType()\ncallvirt instance System.Introspection.TypeInfo::get_FullName()\nret\n.end"
+        )).unwrap();
+        let program = LoadedProgram::with_library(&app, library()).unwrap();
+        program.verify().unwrap();
+        assert_eq!(
+            program.run(Limits::default()).unwrap().value,
+            Value::String(expected.into())
+        );
+    }
+}
+
+#[test]
+fn object_get_type_rejects_null() {
+    let app = assemble(".module GetType\n.entry Main\n.function Main() -> System.Introspection.TypeInfo\n.local System.Object value\nldloca value\ninitobj System.Object\nldloc value\ncall instance System.Object::GetType()\nret\n.end").unwrap();
+    let program = LoadedProgram::with_library(&app, library()).unwrap();
+    program.verify().unwrap();
+    assert!(program.run(Limits::default()).is_err());
+}
+
+#[test]
+fn object_get_type_reports_derived_allocation_through_base_and_interface() {
+    let app = assemble(
+        r#"
+.module GetType
+.entry Main
+.interface Tag
+.end
+.type class Base
+.end
+.type class Derived
+.extends Base
+.implements Tag
+.end
+.function Main() -> String
+.local Base base
+.local Tag tag
+newobj Derived
+stloc base
+ldloc base
+castclass Tag
+stloc tag
+ldloc tag
+castclass System.Object
+call instance System.Object::GetType()
+callvirt instance System.Introspection.TypeInfo::get_FullName()
+ret
+.end
+"#,
+    )
+    .unwrap();
+    let program = LoadedProgram::with_library(&app, library()).unwrap();
+    program.verify().unwrap();
+    assert_eq!(
+        program.run(Limits::default()).unwrap().value,
+        Value::String("Derived".into())
+    );
+}
+
+#[test]
+fn direct_native_type_result_preserves_public_interface_view() {
+    let app = assemble(
+        r#"
+.module EnumInfo
+.entry Main
+.function Main() -> String
+call System.Runtime.RuntimeContext::get_Current()
+ldtoken System.Introspection.BindingFlags
+call instance System.Runtime.RuntimeContext::GetTypeInfoFromHandle(System.RuntimeTypeHandle)
+callvirt instance System.Introspection.TypeInfo::GetEnumUnderlyingType()
+callvirt instance System.Introspection.TypeInfo::get_FullName()
+ret
+.end
+"#,
+    )
+    .unwrap();
+    let program = LoadedProgram::with_library(&app, library()).unwrap();
+    program.verify().unwrap();
+    assert_eq!(
+        program.run(Limits::default()).unwrap().value,
+        Value::String("System.Int32".into())
+    );
 }

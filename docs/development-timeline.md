@@ -25,6 +25,27 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-19 — Unified type acquisition implemented
+
+**Author corrections.** Remove the remaining Type class, implement Object.GetType
+(the selected spelling replaces GetTypeInfo), and expose ExecutingAssembly on
+RuntimeContext. Keep introspection the common foundation for later reflection and emit.
+
+**Assistant action and outcome.** Replaced the Raven public/runtime Type class with
+TypeInfo and migrated structural signatures and saved samples. Added Object.GetType
+and the production RuntimeContext.Current handle resolver. Validated allocation
+identity through base/interface, boxed, string and array references; fixed native
+snapshot materialization to preserve the public interface view. All 73 slices
+regenerate reproducibly, 62 focused runtime tests and 33 admission cases pass.
+The saved-project suite passed 43 cases before exposing the native-result defect;
+after correction, all 31 remaining cases passed. Editor checks hide public Type,
+its old Info hop and runtime providers, while identifying Info interfaces correctly.
+
+**Remaining work.** ExecutingAssembly and assembly/module discovery are not part of
+this completed acquisition slice. The compiler reference still needs an internal
+empty System.Type shell for CLI closed-hierarchy attribute tokens; it is not a
+public API or executable runtime type. The historical Neo profile remains separate.
+
 ## 2026-09-19 — A coherent API foundation for preview feedback
 
 **Author clarification.** The unified introspection API should later expand into

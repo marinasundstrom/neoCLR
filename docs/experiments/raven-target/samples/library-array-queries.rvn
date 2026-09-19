@@ -3,7 +3,7 @@ import System.Linq.*
 import System.Console.*
 
 func Main() {
-    for member in typeof(int).Info.GetMethods().ToList() {
+    for member in typeof(int).GetMethods().ToList() {
         WriteLine(member.Name)
     }
 

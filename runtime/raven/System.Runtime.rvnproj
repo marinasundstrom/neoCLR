@@ -5,6 +5,12 @@
     <NeoCLRRoot>$(NeoCLRBootstrapRoot)</NeoCLRRoot>
   </PropertyGroup>
   <Import Project="../../build/NeoCLR.Raven.props" />
+  <!-- Declaration slices shadow core types and contain no typeof expressions. -->
+  <PropertyGroup>
+    <RavenTypeOfAssemblyName></RavenTypeOfAssemblyName>
+    <RavenTypeOfInfoType></RavenTypeOfInfoType>
+    <RavenTypeOfContextType></RavenTypeOfContextType>
+  </PropertyGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == ''">
     <Compile Include="src/System/Math/Functions.rvn" />
     <Compile Include="src/System/Linq/Operators.rvn" />
@@ -65,8 +71,8 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'RuntimeTypeHandle'">
     <Compile Include="src/System/RuntimeTypeHandle.rvn" />
   </ItemGroup>
-  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Type'">
-    <Compile Include="src/System/Type.rvn" />
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'RuntimeContext'">
+    <Compile Include="src/System/Runtime/RuntimeContext.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'ParameterInfo'">
     <Compile Include="src/System/Introspection/ParameterInfo.rvn" />

@@ -5,7 +5,7 @@ import System.*
 public sealed interface ParameterInfo {
     val Name: string { get }
     val Position: int { get }
-    val ParameterType: Type { get }
+    val ParameterType: TypeInfo { get }
     val IsOut: bool { get }
     val IsOutWhenTrue: bool { get }
     val IsReadOnly: bool { get }
@@ -14,12 +14,12 @@ public sealed interface ParameterInfo {
 internal class RuntimeParameterInfo : ParameterInfo {
     private field StoredName: string
     private field StoredPosition: int
-    private field StoredParameterType: Type
+    private field StoredParameterType: TypeInfo
     private field StoredIsOut: bool
     private field StoredIsOutWhenTrue: bool
     private field StoredIsReadOnly: bool
 
-    private init(name: string, position: int, parameterType: Type,
+    private init(name: string, position: int, parameterType: TypeInfo,
         isOut: bool, isOutWhenTrue: bool, isReadOnly: bool) {
         StoredName = name
         StoredPosition = position
@@ -31,7 +31,7 @@ internal class RuntimeParameterInfo : ParameterInfo {
 
     val Name: string { get => StoredName }
     val Position: int { get => StoredPosition }
-    val ParameterType: Type { get => StoredParameterType }
+    val ParameterType: TypeInfo { get => StoredParameterType }
     val IsOut: bool { get => StoredIsOut }
     val IsOutWhenTrue: bool { get => StoredIsOutWhenTrue }
     val IsReadOnly: bool { get => StoredIsReadOnly }

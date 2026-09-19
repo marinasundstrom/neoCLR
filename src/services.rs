@@ -67,6 +67,7 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             crate::native::Binding::UnixTimeTicks => RuntimeService::WallClock,
             crate::native::Binding::Math(_) => RuntimeService::MathOperations,
             crate::native::Binding::Reflection(_)
+            | crate::native::Binding::ObjectTypeHandle
             | crate::native::Binding::TypeName
             | crate::native::Binding::TypeEquals
             | crate::native::Binding::TypeArgumentCount

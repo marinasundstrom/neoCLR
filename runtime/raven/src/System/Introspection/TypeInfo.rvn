@@ -3,11 +3,28 @@ namespace System.Introspection
 import System.*
 import System.Runtime.CompilerServices.*
 
-public sealed interface TypeInfo {
-    val BaseType: Option<Type> { get }
-    func GetInterfaces() -> Type[]
+public sealed interface TypeInfo : Equatable<TypeInfo> {
+    val Name: string { get }
+    val FullName: string { get }
+    val Namespace: string { get }
+    val GenericArgumentCount: int { get }
+    func GetGenericArgument(index: int) -> TypeInfo
+    func Equals(other: TypeInfo) -> bool
+    val IsArray: bool { get }
+    val IsByRef: bool { get }
+    val IsPointer: bool { get }
+    val IsInterface: bool { get }
+    val IsReadOnly: bool { get }
+    val IsAbstract: bool { get }
+    val IsEnum: bool { get }
+    val IsValueType: bool { get }
+    func GetGenericArguments() -> TypeInfo[]
+    func GetElementType() -> Option<TypeInfo>
+
+    val BaseType: Option<TypeInfo> { get }
+    func GetInterfaces() -> TypeInfo[]
     func GetEnumNames() -> string[]
-    func GetEnumUnderlyingType() -> Type
+    func GetEnumUnderlyingType() -> TypeInfo
     func GetFields() -> FieldInfo[]
     func GetFields(flags: BindingFlags) -> FieldInfo[]
     func GetMethods() -> MethodInfo[]
@@ -27,9 +44,9 @@ internal class RuntimeTypeInfo : TypeInfo {
         return RuntimeTypeInfo(handle)
     }
 
-    val BaseType: Option<Type> { get => RuntimeServices.TypeBaseType(Handle) }
+    val BaseType: Option<TypeInfo> { get => RuntimeServices.TypeBaseType(Handle) }
 
-    func GetInterfaces() -> Type[] {
+    func GetInterfaces() -> TypeInfo[] {
         return RuntimeServices.TypeInterfaces(Handle)
     }
 
@@ -37,7 +54,7 @@ internal class RuntimeTypeInfo : TypeInfo {
         return RuntimeServices.TypeEnumNames(Handle)
     }
 
-    func GetEnumUnderlyingType() -> Type {
+    func GetEnumUnderlyingType() -> TypeInfo {
         return RuntimeServices.TypeEnumUnderlying(Handle)
     }
 
@@ -63,5 +80,36 @@ internal class RuntimeTypeInfo : TypeInfo {
 
     func GetProperties(flags: BindingFlags) -> PropertyInfo[] {
         return RuntimeServices.TypeProperties(Handle, (int)flags)
+    }
+    val Name: string { get => RuntimeServices.TypeName(Handle) }
+    val FullName: string { get => RuntimeServices.TypeDisplayName(Handle, 0) }
+    val Namespace: string { get => RuntimeServices.TypeDisplayName(Handle, 1) }
+    val GenericArgumentCount: int { get => RuntimeServices.TypeArgumentCount(Handle) }
+
+    func GetGenericArgument(index: int) -> TypeInfo {
+        return FromHandle(RuntimeServices.TypeArgument(Handle, index))
+    }
+
+    func Equals(other: TypeInfo) -> bool {
+        val implementation = (RuntimeTypeInfo)other
+        return RuntimeServices.TypeEquals(Handle, implementation.Handle)
+    }
+
+    val IsArray: bool { get => RuntimeServices.TypeShape(Handle, 0) }
+    val IsByRef: bool { get => RuntimeServices.TypeShape(Handle, 1) }
+    val IsPointer: bool { get => RuntimeServices.TypeShape(Handle, 2) }
+    val IsInterface: bool { get => RuntimeServices.TypeShape(Handle, 3) }
+    val IsReadOnly: bool { get => RuntimeServices.TypeShape(Handle, 4) }
+    val IsAbstract: bool { get => RuntimeServices.TypeShape(Handle, 5) }
+    val IsEnum: bool { get => RuntimeServices.TypeShape(Handle, 6) }
+    val IsValueType: bool { get => RuntimeServices.TypeShape(Handle, 7) }
+
+
+    func GetGenericArguments() -> TypeInfo[] {
+        return RuntimeServices.TypeGenericArguments(Handle)
+    }
+
+    func GetElementType() -> Option<TypeInfo> {
+        return RuntimeServices.TypeElementType(Handle)
     }
 }

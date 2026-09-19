@@ -1,1 +1,11 @@
 ; Generated from runtime/raven/src/System/Object.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Object.RuntimeReflectionC67D76CC5C960860() -> System.Runtime.RuntimeContext
+call System.Runtime.RuntimeContext::get_Current()
+ret
+.end
+.function neoCLR.Library.System.Object.RuntimeReflection3A6D81CD5FF86035(System.Runtime.RuntimeContext arg0,System.RuntimeTypeHandle arg1) -> System.Introspection.TypeInfo
+ldarg arg0
+ldarg arg1
+call instance System.Runtime.RuntimeContext::GetTypeInfoFromHandle(System.RuntimeTypeHandle)
+ret
+.end

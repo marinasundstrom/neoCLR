@@ -76,7 +76,7 @@ ret
 .end
 .interface System.Introspection.FieldInfo
 .implements System.Introspection.MemberInfo
-.method instance get_FieldType() -> System.Type
+.method instance get_FieldType() -> System.Introspection.TypeInfo
 .end
 .method instance get_IsPublic() -> Boolean
 .end
@@ -88,7 +88,7 @@ ret
 .end
 .method instance get_DefinitionIndex() -> Int32
 .end
-.property instance FieldType() -> System.Type
+.property instance FieldType() -> System.Introspection.TypeInfo
 .get instance System.Introspection.FieldInfo::get_FieldType()
 .end
 .property instance IsPublic() -> Boolean
@@ -109,7 +109,7 @@ ret
 .end
 .interface System.Introspection.MethodInfo
 .implements System.Introspection.MemberInfo
-.method instance get_ReturnType() -> System.Type
+.method instance get_ReturnType() -> System.Introspection.TypeInfo
 .end
 .method instance get_IsStatic() -> Boolean
 .end
@@ -133,7 +133,7 @@ ret
 .end
 .method instance get_IsAbstract() -> Boolean
 .end
-.property instance ReturnType() -> System.Type
+.property instance ReturnType() -> System.Introspection.TypeInfo
 .get instance System.Introspection.MethodInfo::get_ReturnType()
 .end
 .property instance IsStatic() -> Boolean
@@ -169,7 +169,7 @@ ret
 .end
 .interface System.Introspection.PropertyInfo
 .implements System.Introspection.MemberInfo
-.method instance get_PropertyType() -> System.Type
+.method instance get_PropertyType() -> System.Introspection.TypeInfo
 .end
 .method instance get_IsStatic() -> Boolean
 .end
@@ -189,7 +189,7 @@ ret
 .end
 .method instance GetSetMethod(Boolean arg0) -> System.Option<System.Introspection.MethodInfo>
 .end
-.property instance PropertyType() -> System.Type
+.property instance PropertyType() -> System.Introspection.TypeInfo
 .get instance System.Introspection.PropertyInfo::get_PropertyType()
 .end
 .property instance IsStatic() -> Boolean
@@ -207,14 +207,14 @@ ret
 .end
 .type internal class abstract System.Introspection.RuntimeMemberInfo
 .field private Name String
-.field private DeclaringType System.Type
+.field private DeclaringType System.Introspection.TypeInfo
 .property instance Name() -> String
 .get instance System.Introspection.RuntimeMemberInfo::get_Name()
 .end
-.property instance DeclaringType() -> System.Type
+.property instance DeclaringType() -> System.Introspection.TypeInfo
 .get instance System.Introspection.RuntimeMemberInfo::get_DeclaringType()
 .end
-.method internal instance .ctor(String name,System.Type declaringType) -> noresult
+.method internal instance .ctor(String name,System.Introspection.TypeInfo declaringType) -> noresult
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0
@@ -247,7 +247,7 @@ ldfld System.Introspection.RuntimeMemberInfo::Name
 M00000002_IL_0008:
 ret
 .end
-.method instance get_DeclaringType() -> System.Type
+.method instance get_DeclaringType() -> System.Introspection.TypeInfo
 M00000003_IL_0000:
 M00000003_IL_0001:
 M00000003_IL_0002:
@@ -262,13 +262,13 @@ ret
 .extends System.Introspection.RuntimeMemberInfo
 .implements System.Introspection.FieldInfo
 .implements System.Introspection.MemberInfo
-.field private FieldType System.Type
+.field private FieldType System.Introspection.TypeInfo
 .field private IsPublic Boolean
 .field private IsPrivate Boolean
 .field private IsAssembly Boolean
 .field private IsStatic Boolean
 .field private DefinitionIndex Int32
-.property instance FieldType() -> System.Type
+.property instance FieldType() -> System.Introspection.TypeInfo
 .get instance System.Introspection.RuntimeFieldInfo::get_FieldType()
 .end
 .property instance IsPublic() -> Boolean
@@ -286,7 +286,7 @@ ret
 .property instance DefinitionIndex() -> Int32
 .get instance System.Introspection.RuntimeFieldInfo::get_DefinitionIndex()
 .end
-.method private instance .ctor(String name,System.Type declaringType,System.Type fieldType,Boolean isPublic,Boolean isPrivate,Boolean isAssembly,Boolean isStatic,Int32 definitionIndex) -> noresult
+.method private instance .ctor(String name,System.Introspection.TypeInfo declaringType,System.Introspection.TypeInfo fieldType,Boolean isPublic,Boolean isPrivate,Boolean isAssembly,Boolean isStatic,Int32 definitionIndex) -> noresult
 M00000004_IL_0000:
 M00000004_IL_0001:
 ldarg 0
@@ -295,7 +295,7 @@ ldarg 1
 M00000004_IL_0003:
 ldarg 2
 M00000004_IL_0004:
-call instance System.Introspection.RuntimeMemberInfo::.ctor(String,System.Type)
+call instance System.Introspection.RuntimeMemberInfo::.ctor(String,System.Introspection.TypeInfo)
 M00000004_IL_0009:
 M00000004_IL_000a:
 ldarg 0
@@ -349,7 +349,7 @@ stfld System.Introspection.RuntimeFieldInfo::DefinitionIndex
 M00000004_IL_003e:
 ret
 .end
-.method instance get_FieldType() -> System.Type
+.method instance get_FieldType() -> System.Introspection.TypeInfo
 M00000005_IL_0000:
 M00000005_IL_0001:
 M00000005_IL_0002:
@@ -422,7 +422,7 @@ ret
 .extends System.Introspection.RuntimeMemberInfo
 .implements System.Introspection.MethodInfo
 .implements System.Introspection.MemberInfo
-.field private ReturnType System.Type
+.field private ReturnType System.Introspection.TypeInfo
 .field private IsStatic Boolean
 .field private IsPublic Boolean
 .field private IsPrivate Boolean
@@ -434,7 +434,7 @@ ret
 .field private IsVirtual Boolean
 .field private IsOverride Boolean
 .field private IsAbstract Boolean
-.property instance ReturnType() -> System.Type
+.property instance ReturnType() -> System.Introspection.TypeInfo
 .get instance System.Introspection.RuntimeMethodInfo::get_ReturnType()
 .end
 .property instance IsStatic() -> Boolean
@@ -467,7 +467,7 @@ ret
 .property instance IsAbstract() -> Boolean
 .get instance System.Introspection.RuntimeMethodInfo::get_IsAbstract()
 .end
-.method private instance .ctor(String name,System.Type declaringType,System.Type returnType,Boolean isStatic,Boolean isPublic,Boolean isPrivate,Boolean isAssembly,Boolean isReceiverByRef,Int32 definitionIndex,System.Introspection.ParameterInfo[] parameters,Boolean isReadOnly,Boolean isVirtual,Boolean isOverride,Boolean isAbstract) -> noresult
+.method private instance .ctor(String name,System.Introspection.TypeInfo declaringType,System.Introspection.TypeInfo returnType,Boolean isStatic,Boolean isPublic,Boolean isPrivate,Boolean isAssembly,Boolean isReceiverByRef,Int32 definitionIndex,System.Introspection.ParameterInfo[] parameters,Boolean isReadOnly,Boolean isVirtual,Boolean isOverride,Boolean isAbstract) -> noresult
 M0000000b_IL_0000:
 M0000000b_IL_0001:
 ldarg 0
@@ -476,7 +476,7 @@ ldarg 1
 M0000000b_IL_0003:
 ldarg 2
 M0000000b_IL_0004:
-call instance System.Introspection.RuntimeMemberInfo::.ctor(String,System.Type)
+call instance System.Introspection.RuntimeMemberInfo::.ctor(String,System.Introspection.TypeInfo)
 M0000000b_IL_0009:
 M0000000b_IL_000a:
 ldarg 0
@@ -582,7 +582,7 @@ stfld System.Introspection.RuntimeMethodInfo::IsAbstract
 M0000000b_IL_0074:
 ret
 .end
-.method instance get_ReturnType() -> System.Type
+.method instance get_ReturnType() -> System.Introspection.TypeInfo
 M0000000c_IL_0000:
 M0000000c_IL_0001:
 M0000000c_IL_0002:
@@ -794,7 +794,7 @@ ret
 .extends System.Introspection.RuntimeMemberInfo
 .implements System.Introspection.PropertyInfo
 .implements System.Introspection.MemberInfo
-.field private PropertyType System.Type
+.field private PropertyType System.Introspection.TypeInfo
 .field private IsStatic Boolean
 .field private CanRead Boolean
 .field private CanWrite Boolean
@@ -802,7 +802,7 @@ ret
 .field private IndexParameters System.Introspection.ParameterInfo[]
 .field private Getter System.Option<System.Introspection.MethodInfo>
 .field private Setter System.Option<System.Introspection.MethodInfo>
-.property instance PropertyType() -> System.Type
+.property instance PropertyType() -> System.Introspection.TypeInfo
 .get instance System.Introspection.RuntimePropertyInfo::get_PropertyType()
 .end
 .property instance IsStatic() -> Boolean
@@ -817,7 +817,7 @@ ret
 .property instance DefinitionIndex() -> Int32
 .get instance System.Introspection.RuntimePropertyInfo::get_DefinitionIndex()
 .end
-.method private instance .ctor(String name,System.Type declaringType,System.Type propertyType,Boolean isStatic,Boolean canRead,Boolean canWrite,Int32 definitionIndex,System.Introspection.ParameterInfo[] indexParameters,System.Option<System.Introspection.MethodInfo> getter,System.Option<System.Introspection.MethodInfo> setter) -> noresult
+.method private instance .ctor(String name,System.Introspection.TypeInfo declaringType,System.Introspection.TypeInfo propertyType,Boolean isStatic,Boolean canRead,Boolean canWrite,Int32 definitionIndex,System.Introspection.ParameterInfo[] indexParameters,System.Option<System.Introspection.MethodInfo> getter,System.Option<System.Introspection.MethodInfo> setter) -> noresult
 M00000018_IL_0000:
 M00000018_IL_0001:
 ldarg 0
@@ -826,7 +826,7 @@ ldarg 1
 M00000018_IL_0003:
 ldarg 2
 M00000018_IL_0004:
-call instance System.Introspection.RuntimeMemberInfo::.ctor(String,System.Type)
+call instance System.Introspection.RuntimeMemberInfo::.ctor(String,System.Introspection.TypeInfo)
 M00000018_IL_0009:
 M00000018_IL_000a:
 ldarg 0
@@ -892,7 +892,7 @@ stfld System.Introspection.RuntimePropertyInfo::Setter
 M00000018_IL_0050:
 ret
 .end
-.method instance get_PropertyType() -> System.Type
+.method instance get_PropertyType() -> System.Introspection.TypeInfo
 M00000019_IL_0000:
 M00000019_IL_0001:
 M00000019_IL_0002:

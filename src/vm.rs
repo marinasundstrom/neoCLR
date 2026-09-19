@@ -2192,6 +2192,8 @@ fn interpret_instructions(
                             if crate::interfaces::interface_definition(module, target).is_ok() {
                                 crate::interfaces::ensure_implementation(module, concrete, target)?;
                                 object.view = Some(target.clone());
+                            } else if *target == Type::from_name("System.Object") {
+                                object.view = Some(target.clone());
                             } else if concrete == target {
                                 if target == &Type::String {
                                     frame.stack.push(object.reference.read()?);
@@ -2211,13 +2213,19 @@ fn interpret_instructions(
                             Value::ObjectReference(object)
                         }
                         value @ Value::String(_)
-                            if crate::interfaces::interface_definition(module, target).is_ok() =>
+                            if crate::interfaces::interface_definition(module, target).is_ok()
+                                || (*target == Type::from_name("System.Object")
+                                    && module.is_reference_type(target)) =>
                         {
-                            crate::interfaces::ensure_implementation(
-                                module,
-                                &Type::String,
-                                target,
-                            )?;
+                            if !(*target == Type::from_name("System.Object")
+                                && module.is_reference_type(target))
+                            {
+                                crate::interfaces::ensure_implementation(
+                                    module,
+                                    &Type::String,
+                                    target,
+                                )?;
+                            }
                             if heap.len() >= limits.heap_objects {
                                 return Err(Fault::new("heap object limit exceeded"));
                             }

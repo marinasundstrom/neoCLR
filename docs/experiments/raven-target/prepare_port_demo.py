@@ -45,7 +45,7 @@ subprocess.run(['dotnet', str(output / 'tools/bridge/Probe.dll'), '--reference-c
                 str(output / 'demo/NeoCLR.CoreProbe.dll')], check=True)
 shutil.copy2(source / 'samples/library-workflow.rvn', output / 'demo/Main.rvn')
 (output / 'demo/examples').mkdir()
-for name in ['flags', 'reflection', 'introspection-interfaces', 'array-shapes', 'array-callbacks']:
+for name in ['flags', 'reflection', 'introspection-interfaces', 'type-acquisition', 'array-shapes', 'array-callbacks']:
     shutil.copy2(source / f'samples/library-{name}.rvn', output / f'demo/examples/{name}.rvn')
 (output / 'demo/Demo.rvnproj').write_text('''<Project>
   <PropertyGroup><NeoCLRRoot>$(MSBuildThisFileDirectory)..</NeoCLRRoot></PropertyGroup>
@@ -89,8 +89,11 @@ one, copy its contents into Main.rvn and save; only Main.rvn is compiled by the 
 
 This is a local development snapshot. Python 3 and .NET 11 are required; the copied
 runtime executable is built for this machine. Runtime services remain intrinsic.
-The six Info contracts are sealed interfaces. RuntimeContext and the canonical
-Object.GetTypeInfo acquisition API remain pending. Use typeof(T) for type tokens; the former TypeOf<T>.Of helper has been removed.
+The six Info contracts are sealed interfaces. Both typeof(T) and Object.GetType()
+return TypeInfo directly; System.Type and the .Info hop are no longer public APIs.
+RuntimeContext.Current provides the configured handle resolver. ExecutingAssembly
+and assembly/module discovery remain pending. The former TypeOf<T>.Of helper has
+been removed. See examples/type-acquisition.rvn for a runnable acquisition sample.
 ''')
 manifest = {'kind': 'local-development', 'repositories': {}, 'sha256': {}}
 for repo, label in [(ROOT, 'neoCLR'), (raven, 'Raven')]:

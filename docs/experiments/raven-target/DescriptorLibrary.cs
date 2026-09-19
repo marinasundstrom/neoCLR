@@ -4,10 +4,10 @@ static class DescriptorLibrary
 {
     static readonly Dictionary<string, (string Name, string Type)[]> Layouts = new()
     {
-        ["MemberInfo"] = [("Name", "System.String"), ("DeclaringType", "System.Type")],
-        ["FieldInfo"] = [("FieldType", "System.Type"), ("IsPublic", "System.Boolean"), ("IsPrivate", "System.Boolean"), ("IsAssembly", "System.Boolean"), ("IsStatic", "System.Boolean"), ("DefinitionIndex", "System.Int32")],
-        ["MethodInfo"] = [("ReturnType", "System.Type"), ("IsStatic", "System.Boolean"), ("IsPublic", "System.Boolean"), ("IsPrivate", "System.Boolean"), ("IsAssembly", "System.Boolean"), ("IsReceiverByRef", "System.Boolean"), ("DefinitionIndex", "System.Int32"), ("Parameters", "System.Runtime.CompilerServices.ParameterSnapshot"), ("IsReadOnly", "System.Boolean"), ("IsVirtual", "System.Boolean"), ("IsOverride", "System.Boolean"), ("IsAbstract", "System.Boolean")],
-        ["PropertyInfo"] = [("PropertyType", "System.Type"), ("IsStatic", "System.Boolean"), ("CanRead", "System.Boolean"), ("CanWrite", "System.Boolean"), ("DefinitionIndex", "System.Int32"), ("IndexParameters", "System.Runtime.CompilerServices.ParameterSnapshot"), ("Getter", "System.Option`1<System.Introspection.MethodInfo>"), ("Setter", "System.Option`1<System.Introspection.MethodInfo>")],
+        ["MemberInfo"] = [("Name", "System.String"), ("DeclaringType", "System.Introspection.TypeInfo")],
+        ["FieldInfo"] = [("FieldType", "System.Introspection.TypeInfo"), ("IsPublic", "System.Boolean"), ("IsPrivate", "System.Boolean"), ("IsAssembly", "System.Boolean"), ("IsStatic", "System.Boolean"), ("DefinitionIndex", "System.Int32")],
+        ["MethodInfo"] = [("ReturnType", "System.Introspection.TypeInfo"), ("IsStatic", "System.Boolean"), ("IsPublic", "System.Boolean"), ("IsPrivate", "System.Boolean"), ("IsAssembly", "System.Boolean"), ("IsReceiverByRef", "System.Boolean"), ("DefinitionIndex", "System.Int32"), ("Parameters", "System.Runtime.CompilerServices.ParameterSnapshot"), ("IsReadOnly", "System.Boolean"), ("IsVirtual", "System.Boolean"), ("IsOverride", "System.Boolean"), ("IsAbstract", "System.Boolean")],
+        ["PropertyInfo"] = [("PropertyType", "System.Introspection.TypeInfo"), ("IsStatic", "System.Boolean"), ("CanRead", "System.Boolean"), ("CanWrite", "System.Boolean"), ("DefinitionIndex", "System.Int32"), ("IndexParameters", "System.Runtime.CompilerServices.ParameterSnapshot"), ("Getter", "System.Option`1<System.Introspection.MethodInfo>"), ("Setter", "System.Option`1<System.Introspection.MethodInfo>")],
     };
     public static bool IsDescriptor(TypeReference type) => type.Namespace == "System.Introspection" && type.Name.StartsWith("Runtime") && Layouts.ContainsKey(type.Name[7..]);
     public static bool IsBaseConstructor(MethodDefinition method) => IsDescriptor(method.DeclaringType)

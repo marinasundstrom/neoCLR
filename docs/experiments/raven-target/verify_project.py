@@ -23,7 +23,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
         shutil.copyfile(args.project.resolve().parent / name, root / name)
     command = [sys.executable, str(bridge / 'run_project.py'), str(root / 'Demo.rvnproj'),
                *runner_arguments(args), '--runtime', str(args.runtime.resolve())]
-    cases = [('Instants', 'library-instants.rvn', '0\n-1\n0\n-1\nSame duration\nSystem clock\n'),
+    cases = [('TypeAcquisition', 'library-type-acquisition.rvn', 'Concrete class\nSystem.String\nSame type\nArray type\nSystem.Int32\nSystem.Int32\n'),
+             ('Instants', 'library-instants.rvn', '0\n-1\n0\n-1\nSame duration\nSystem clock\n'),
              ('Basics', 'library-basics.rvn', '42\n1\n0\nLibrary calls from Raven\n'),
              ('CasePayloads', 'library-case-payloads.rvn', '7\n42\nAfter\nUpdated error\n'),
              ('GenericUnions', 'library-unions.rvn', 'Ok\n0\nError\nFailure\n0\nFailure\nFound\nNone\n0\n'),
@@ -59,7 +60,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
                   ('CollectionCapabilities', 'library-collection-capabilities.rvn', '2\n42\n2\n2\n7\n2\n9\n2\n3\n11\n'),
                   ('UnifiedArray', 'library-array-unified.rvn', '42\n2\n42\n8\n50\n42\n1\n42\n1\nSystem.Int32\n4\n9\n'),
                   ('ArrayShapes', 'library-array-shapes.rvn', '0\n0\nBoolean elements\nSystem.Int32\nSystem.String\n0\n255\n65535\n65535\n42\n'),
-                  ('ReferencePayloads', 'library-reference-payloads.rvn', 'Copied Type reference\nSystem.Int32\nSystem.String\n3\n2\n0\n3\n3\n42\nStored error\n7\n42\nSystem.Int32\n'),
+                  ('ReferencePayloads', 'library-reference-payloads.rvn', 'Copied TypeInfo reference\nSystem.Int32\nSystem.String\n3\n2\n0\n3\n3\n42\nStored error\n7\n42\nSystem.Int32\n'),
                   ('ValueInterfaces', 'library-value-interfaces.rvn', '0\n1\nEqual integer\nEqual string\nEqual type\n0\nEqual date\n0\n0\n'),
                   ('NativeBuffer', 'library-native-buffer.rvn', 'Native allocation released\n'),
                   ('Flags', 'library-flags.rvn', '28\n8\n20\n-29\n0\nSame flags\nPublic included\n5\nStoredDayNumber\n'),
@@ -103,14 +104,16 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
         ('CompileFailure', 'func Main() { MissingCall() }', 'RAV'),
         ('ExternalIntrospectionProvider', 'import System.Introspection.*\nclass UserInfo : TypeInfo { }\nfunc Main() {}', 'RAV033'),
         ('HiddenIntrospectionProvider', 'func Main() { let info = typeof(System.Introspection.RuntimeTypeInfo) }', 'RAV'),
+        ('RemovedTypeClass', 'func Main() { let value: System.Type = typeof(int) }', 'RAV'),
+        ('RemovedInfoProperty', 'func Main() { let value = typeof(int).Info }', 'RAV'),
         ('RemovedTypeOfHelper', 'func Main() { System.TypeOf<int>.Of(42) }', 'RAV'),
         ('InheritedIntegerMember', 'func Main() { let value = 42\n value.GetHashCode() }', 'Unsupported'),
         ('PathArgumentMismatch', 'func Main() { System.IO.Path.Combine(42, 7) }', 'RAV'),
         ('PathUnsupportedApi', 'func Main() { System.IO.Path.GetFullPath(".") }', 'RAV'),
         ('StringArgumentMismatch', 'func Main() { System.String.Concat(42, 7) }', 'RAV'),
         ('StringUnsupportedApi', 'func Main() { System.String.IsNullOrEmpty(\"\") }', 'RAV'),
-        ('ArrayImplicitCovariance', 'import System.*\nimport System.Introspection.*\nfunc Main() { let members: MemberInfo[] = typeof(int).Info.GetMethods() }', ('RAV1504', 'identical element types')),
-        ('ArrayExplicitCovariance', 'import System.*\nimport System.Introspection.*\nfunc Main() { let members = (MemberInfo[])typeof(int).Info.GetMethods() }', ('RAV1503', 'identical element types')),
+        ('ArrayImplicitCovariance', 'import System.*\nimport System.Introspection.*\nfunc Main() { let members: MemberInfo[] = typeof(int).GetMethods() }', ('RAV1504', 'identical element types')),
+        ('ArrayExplicitCovariance', 'import System.*\nimport System.Introspection.*\nfunc Main() { let members = (MemberInfo[])typeof(int).GetMethods() }', ('RAV1503', 'identical element types')),
         ('ImportFailure', 'func Negate(value: int) -> int { return -value }\nfunc Main() { Negate(2) }', 'Unsupported')]:
         before = set(root.rglob('App.neoil'))
         (root / 'Main.rvn').write_text(source)

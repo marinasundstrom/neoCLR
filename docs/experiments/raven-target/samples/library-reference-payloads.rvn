@@ -1,15 +1,16 @@
+import System.Introspection.*
 import System.*
 import System.Collections.*
 import System.Console.*
 func Main() {
-    let types = ArrayList<Type>()
+    let types = ArrayList<TypeInfo>()
     let kind = typeof(int)
     types.Add(kind)
     types.Add(typeof(string))
     let copy = types.Copy()
-    if copy[0].Equals(kind) { WriteLine("Copied Type reference") }
+    if copy[0].Equals(kind) { WriteLine("Copied TypeInfo reference") }
     for value in types { WriteLine(value.Name) }
-    let nested = ArrayList<ArrayList<Type>>()
+    let nested = ArrayList<ArrayList<TypeInfo>>()
     nested.Add(types)
     nested[0].Add(typeof(Date))
     WriteLine(types.Count)
@@ -17,9 +18,9 @@ func Main() {
     let comparisons = ArrayList<Comparable<int>>()
     comparisons.Add(42)
     WriteLine(comparisons[0].CompareTo(42))
-    let optional = Option<ArrayList<Type>>(Option.Some<ArrayList<Type>>(types))
+    let optional = Option<ArrayList<TypeInfo>>(Option.Some<ArrayList<TypeInfo>>(types))
     match optional {
-        Option.Some<ArrayList<Type>> some => WriteLine(some.Value.Count)
+        Option.Some<ArrayList<TypeInfo>> some => WriteLine(some.Value.Count)
         Option.None none => WriteLine("No list")
     }
     let outcomes = ArrayList<Result<int, OverflowError>>(1)
@@ -37,9 +38,9 @@ func Main() {
     let functions = ArrayList<Func<int,int>>()
     functions.Add(Identity)
     WriteLine(functions[0](42))
-    let result = Result<Type, OverflowError>.Ok(kind)
+    let result = Result<TypeInfo, OverflowError>.Ok(kind)
     match result {
-        Result.Ok<Type> ok => WriteLine(ok.Value.Name)
+        Result.Ok<TypeInfo> ok => WriteLine(ok.Value.Name)
         Result.Error<OverflowError> error => WriteLine("Overflow")
     }
 }

@@ -1,0 +1,3 @@
+.function neoCLR.Runtime.ObjectTypeHandle(System.Object value) -> System.RuntimeTypeHandle
+.methodimpl InternalCall
+.end

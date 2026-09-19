@@ -1,4 +1,11 @@
 namespace System
 
+import System.Introspection.*
+import System.Runtime.*
+import System.Runtime.CompilerServices.*
+
 public open class Object {
+    func GetType() -> TypeInfo {
+        return RuntimeContext.Current.GetTypeInfoFromHandle(RuntimeServices.ObjectTypeHandle(self))
+    }
 }

@@ -8,6 +8,18 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Replace the Raven profile's public System.Type/Type.Info split with sealed
+  TypeInfo identity, shape and query contracts. Both typeof(T) and Object.GetType()
+  return TypeInfo; RuntimeContext.Current supplies the configured handle resolver.
+  Preserve concrete types through base/interface, string, array and boxed views.
+  Native descriptor results retain their public interface view. Rebuild consumers;
+  only a hidden CLI attribute-token Type shell remains in the compiler reference,
+  and the historical Neo profile retains its old contract. All 73 slices regenerate
+  reproducibly; 62 focused runtime tests, 33 importer admission cases and 74 saved
+  project checks pass (43 before a native-result fix, 31 resumed). Editor checks
+  expose Info interfaces and RuntimeContext and hide Type/Info/private providers.
+  Assembly/module discovery and ExecutingAssembly remain the next slice.
+
 - Record string handling as the next focus after basic introspection. Limit the
   planned UTF-8 work to a minimal surface, leave encoding undecided, and defer
   specialized string classes such as Utf8String. Clarify that introspection followed

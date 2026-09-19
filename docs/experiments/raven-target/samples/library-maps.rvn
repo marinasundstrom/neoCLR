@@ -1,3 +1,4 @@
+import System.Introspection.*
 import System.*
 import System.Collections.*
 import System.Option.*
@@ -19,11 +20,11 @@ func PrintOrder(orders: Map<int, string>, number: int) {
     }
 }
 
-func SameType(left: Type, right: Type) -> bool {
+func SameType(left: TypeInfo, right: TypeInfo) -> bool {
     return left.Equals(right)
 }
 
-func TypeHash(key: Type) -> int {
+func TypeHash(key: TypeInfo) -> int {
     return 0
 }
 
@@ -60,7 +61,7 @@ func Main() {
     WriteLine(reader.Count)
 
     // Reference keys use the supplied equivalence; reference values retain aliases.
-    let types = HashMap<Type, ArrayList<int>>(SameType, TypeHash)
+    let types = HashMap<TypeInfo, ArrayList<int>>(SameType, TypeHash)
     let values = ArrayList<int>()
     values.Add(7)
     types.Set(typeof(int), values)
@@ -69,7 +70,7 @@ func Main() {
         Some(let found) => WriteLine(found.Count)
         None => WriteLine("Missing type")
     }
-    let nested = ArrayList<Map<Type, ArrayList<int>>>()
+    let nested = ArrayList<Map<TypeInfo, ArrayList<int>>>()
     nested.Add(types)
     WriteLine(nested[0].Keys.Count)
 }

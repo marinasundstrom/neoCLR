@@ -1,0 +1,17 @@
+namespace System.Runtime
+
+import System.*
+import System.Introspection.*
+import System.Runtime.CompilerServices.*
+
+public class RuntimeContext {
+    private init() { }
+
+    static val Current: RuntimeContext {
+        get => RuntimeContext()
+    }
+
+    func GetTypeInfoFromHandle(handle: RuntimeTypeHandle) -> TypeInfo {
+        return RuntimeServices.TypeInfo(handle)
+    }
+}

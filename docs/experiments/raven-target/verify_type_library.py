@@ -1,4 +1,4 @@
-"""Check Type authoring exports, constructor visibility and native descriptor layout."""
+"""Check TypeInfo authoring exports, constructor visibility and native descriptor layout."""
 import argparse
 import re
 from pathlib import Path
@@ -8,7 +8,7 @@ from xml.sax.saxutils import escape
 from build_runtime_library import ROOT
 
 parser = argparse.ArgumentParser(description=__doc__)
-parser.add_argument('--type-info', action='store_true', help='Validate the TypeInfo implementation instead of Type')
+parser.add_argument('--type-info', action='store_true', help=argparse.SUPPRESS)  # Legacy invocation alias.
 for name in ('compiler', 'bridge'):
     parser.add_argument('--' + name, required=True, type=Path)
 args = parser.parse_args()
@@ -27,18 +27,18 @@ with tempfile.TemporaryDirectory(prefix='neoclr-declaration-library-') as tempor
     (root / 'demo').mkdir()
     core = root / 'demo/NeoCLR.CoreProbe.dll'
     run(['dotnet', args.bridge.resolve(), '--reference-library-core', core])
-    owner = 'System.Introspection.TypeInfo' if args.type_info else 'System.Type'
-    source_path = 'Introspection/TypeInfo.rvn' if args.type_info else 'Type.rvn'
+    owner = 'System.Introspection.TypeInfo'
+    source_path = 'Introspection/TypeInfo.rvn'
     source = (ROOT / 'runtime/raven/src/System' / source_path).read_text()
     for name, text, diagnostic in [
         ('Valid', source, None),
         ('Storage', source.replace('private field Handle: RuntimeTypeHandle', 'private field Handle: RuntimeTypeHandle\n    private field Extra: int = 0'), 'Type library layout'),
         ('Constructor', source.replace('private init', 'public init'), 'does not match reference contract'),
-        ('Missing', source.replace('val BaseType:' if args.type_info else 'val Name:', 'val MissingBaseType:' if args.type_info else 'private val Name:'), 'does not match reference contract'),
-        ('Argument', source.replace('GetMethods(flags:', 'GetMethods(wrongName:').replace('TypeMethods(Handle, (int)flags)', 'TypeMethods(Handle, (int)wrongName)') if args.type_info else source.replace('GetTypeFromHandle(handle:', 'GetTypeFromHandle(wrongName:').replace('return Type(handle)', 'return Type(wrongName)'), 'does not match reference contract'),
-    ] + ([('ProviderVisibility', source.replace('internal class RuntimeTypeInfo', 'public class RuntimeTypeInfo'), 'Runtime descriptor providers must remain internal'),
+        ('Missing', source.replace('val BaseType:', 'val MissingBaseType:'), 'does not match reference contract'),
+        ('Argument', source.replace('GetMethods(flags:', 'GetMethods(wrongName:').replace('TypeMethods(Handle, (int)flags)', 'TypeMethods(Handle, (int)wrongName)'), 'does not match reference contract'),
+    ] + [('ProviderVisibility', source.replace('internal class RuntimeTypeInfo', 'public class RuntimeTypeInfo'), 'Runtime descriptor providers must remain internal'),
           ('FactoryVisibility', source.replace('internal static func FromHandle', 'private static func FromHandle'),
-           'does not match reference contract')] if args.type_info else []):
+           'does not match reference contract')]:
         folder = root / name
         folder.mkdir()
         (folder / 'Main.rvn').write_text(text)
@@ -46,6 +46,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-declaration-library-') as tempor
         project.write_text(f'''<Project>
   <PropertyGroup><OutputType>Library</OutputType><AssemblyName>{name}</AssemblyName><NeoCLRRoot>{escape(str(root))}</NeoCLRRoot></PropertyGroup>
   <Import Project="{escape(str(ROOT / 'build/NeoCLR.Raven.props'))}" />
+  <PropertyGroup><RavenTypeOfAssemblyName/><RavenTypeOfInfoType/><RavenTypeOfContextType/></PropertyGroup>
   <ItemGroup><Compile Include="Main.rvn" /></ItemGroup>
 </Project>''')
         run(['dotnet', args.compiler.resolve(), project, '--no-project-restore', '-o', folder / 'bin'])
@@ -55,9 +56,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-declaration-library-') as tempor
             assert not (output / 'Implementation.neoil').exists()
         else:
             result = (output / 'Implementation.neoil').read_text()
-            assert ('.interface ' if args.type_info else '.type class ') + owner in result
+            assert '.interface ' + owner in result
             assert '.method private instance .ctor(System.RuntimeTypeHandle' in result
-            if args.type_info:
-                assert '.type internal class System.Introspection.RuntimeTypeInfo' in result
-                assert '.method internal static FromHandle(' in result
-    print('Type imports; added storage, public construction, missing exports and changed parameter names rejected.')
+            assert '.type internal class System.Introspection.RuntimeTypeInfo' in result
+            assert '.method internal static FromHandle(' in result
+    print('TypeInfo imports; added storage, public construction, missing exports and changed parameter names rejected.')

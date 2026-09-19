@@ -2,7 +2,7 @@ import System.*
 import System.Console.*
 import System.Introspection.*
 
-func RequireInterface(description: Type) {
+func RequireInterface(description: TypeInfo) {
     if description.IsInterface {
         WriteLine("Interface")
     } else {
@@ -26,9 +26,9 @@ func Main() {
     RequireInterface(typeof(MethodInfo))
     RequireInterface(typeof(PropertyInfo))
 
-    val member: MemberInfo = typeof(Date).Info.GetProperties()[0]
+    val member: MemberInfo = typeof(Date).GetProperties()[0]
     WriteLine(member.DeclaringType.Name)
-    WriteLine(Kind(typeof(Date).Info.GetFields(BindingFlags.Instance | BindingFlags.NonPublic)[0]))
-    WriteLine(Kind(typeof(Date).Info.GetMethods()[0]))
+    WriteLine(Kind(typeof(Date).GetFields(BindingFlags.Instance | BindingFlags.NonPublic)[0]))
+    WriteLine(Kind(typeof(Date).GetMethods()[0]))
     WriteLine(Kind(member))
 }

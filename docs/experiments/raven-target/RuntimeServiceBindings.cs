@@ -37,6 +37,7 @@ static class RuntimeServiceBindings
             ("CharCategory", ["Char"], "Int32"),
             ("IntPtrToInt64", ["IntPtr"], "Int64"),
             ("UIntPtrToUInt64", ["UIntPtr"], "UInt64"),
+            ("ObjectTypeHandle", ["System.Object"], "System.RuntimeTypeHandle"),
             ("TypeName", ["System.RuntimeTypeHandle"], "String"),
             ("TypeEquals", ["System.RuntimeTypeHandle", "System.RuntimeTypeHandle"], "Boolean"),
             ("TypeArgumentCount", ["System.RuntimeTypeHandle"], "Int32"),
@@ -47,12 +48,12 @@ static class RuntimeServiceBindings
             ("TypeFields", ["System.RuntimeTypeHandle", "Int32"], "arrayref<System.Introspection.FieldInfo>"),
             ("TypeMethods", ["System.RuntimeTypeHandle", "Int32"], "arrayref<System.Introspection.MethodInfo>"),
             ("TypeProperties", ["System.RuntimeTypeHandle", "Int32"], "arrayref<System.Introspection.PropertyInfo>"),
-            ("TypeBaseType", ["System.RuntimeTypeHandle"], "System.Option<System.Type>"),
-            ("TypeElementType", ["System.RuntimeTypeHandle"], "System.Option<System.Type>"),
-            ("TypeInterfaces", ["System.RuntimeTypeHandle"], "arrayref<System.Type>"),
-            ("TypeGenericArguments", ["System.RuntimeTypeHandle"], "arrayref<System.Type>"),
+            ("TypeBaseType", ["System.RuntimeTypeHandle"], "System.Option<System.Introspection.TypeInfo>"),
+            ("TypeElementType", ["System.RuntimeTypeHandle"], "System.Option<System.Introspection.TypeInfo>"),
+            ("TypeInterfaces", ["System.RuntimeTypeHandle"], "arrayref<System.Introspection.TypeInfo>"),
+            ("TypeGenericArguments", ["System.RuntimeTypeHandle"], "arrayref<System.Introspection.TypeInfo>"),
             ("TypeEnumNames", ["System.RuntimeTypeHandle"], "arrayref<String>"),
-            ("TypeEnumUnderlying", ["System.RuntimeTypeHandle"], "System.Type")
+            ("TypeEnumUnderlying", ["System.RuntimeTypeHandle"], "System.Introspection.TypeInfo")
         }).ToArray();
     static string CSharp(string type) => type switch {
         "Double" => "double", "String" => "string", "Int32" => "int", "Char" => "char",
@@ -75,7 +76,7 @@ static class RuntimeServiceBindings
             || definition.HasGenericParameters || reference is GenericInstanceMethod)
             throw new InvalidDataException("Unsupported runtime service call.");
         var (args, result) = RuntimeSignatures.Match(reference, definition,
-            t => t is ArrayType { IsVector: true, ElementType.MetadataType: MetadataType.Int32 } ? "arrayref<Int32>"
+            t => t.FullName == "System.Object" && (t.MetadataType == MetadataType.Object || RuntimeSignatures.IsCore(t.Scope) || ApplicationTypes.IsLibrary(t)) ? "System.Object" : t is ArrayType { IsVector: true, ElementType.MetadataType: MetadataType.Int32 } ? "arrayref<Int32>"
                 : ReflectionBindings.Type(t) ?? ProcessBindings.ArrayType(t) ?? GenericUnionBindings.Type(t));
         if (!Members.Any(m => m.Name == reference.Name && m.Args.SequenceEqual(args) && m.Result == result))
             throw new InvalidDataException("Unsupported runtime service signature: " + reference.FullName);

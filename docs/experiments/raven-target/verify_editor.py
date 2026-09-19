@@ -269,12 +269,12 @@ try:
         results['Boolean'] = labels
     if reflection:
         for version, expression, expected in (
-            (28, 'info.', ('Name', 'FullName', 'IsValueType', 'Info', 'GetElementType', 'GetGenericArguments')),
+            (28, 'info.', ('Name', 'FullName', 'IsValueType', 'GetFields', 'GetElementType', 'GetGenericArguments')),
             (29, 'method.', ('Name', 'DeclaringType', 'ReturnType', 'GetParameters', 'IsPublic')),
             (30, 'property.', ('Name', 'CanRead', 'GetGetMethod', 'GetIndexParameters')),
             (31, 'System.Introspection.BindingFlags.', ('Public', 'NonPublic', 'Instance', 'Static', 'DeclaredOnly')),
             (32, 'System.Runtime.InteropServices.NativeMemory.', ('Alloc', 'Free'))):
-            text = 'import System.*\nfunc Main() {\n    let info = typeof(int)\n    let method = info.Info.GetMethods()[0]\n    let property = typeof(Date).Info.GetProperties()[0]\n    ' + expression + '\n}'
+            text = 'import System.*\nfunc Main() {\n    let info = typeof(int)\n    let method = info.GetMethods()[0]\n    let property = typeof(Date).GetProperties()[0]\n    ' + expression + '\n}'
             send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})
             result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
                 'position': {'line': 5, 'character': len('    ' + expression)}, 'context': {'triggerKind': 1}}, True))
@@ -284,7 +284,7 @@ try:
                 raise AssertionError('Missing reflection API: ' + str(labels))
             results[expression] = labels
     if collections:
-        for version, contract, expected in ((33, 'Comparable<int>', 'CompareTo'), (34, 'Equatable<Type>', 'Equals'), (35, 'Clonable<int>', 'Clone'), (36, 'Closable<OverflowError>', 'Close')):
+        for version, contract, expected in ((33, 'Comparable<int>', 'CompareTo'), (34, 'Equatable<System.Introspection.TypeInfo>', 'Equals'), (35, 'Clonable<int>', 'Clone'), (36, 'Closable<OverflowError>', 'Close')):
             text = 'import System.*\nfunc Check(value: ' + contract + ') {\n    value.\n}'
             send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})
             result = receive(send('textDocument/completion', {'textDocument': {'uri': uri}, 'position': {'line': 2, 'character': 10}, 'context': {'triggerKind': 1}}, True))
@@ -339,7 +339,7 @@ try:
         for version, declaration in ((42, 'let values = ArrayList<int>()'),
                                      (43, 'let values = ArrayList<int>().Where((value: int) -> bool => true)'),
                                      (44, 'let values: int[] = [1, 2]'),
-                                     (45, 'let values = typeof(int).Info.GetMethods()')):
+                                     (45, 'let values = typeof(int).GetMethods()')):
             text = ('import System.Collections.*\nimport System.Linq.*\n'
                     'func Main() {\n    ' + declaration + '\n    values.\n}')
             send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})
@@ -353,9 +353,9 @@ try:
     if array_invariance:
         import time
         for version, expression, expected_code in (
-                (46, 'let members: MemberInfo[] = typeof(int).Info.GetMethods()', 'RAV1504'),
-                (47, 'let members = (MemberInfo[])typeof(int).Info.GetMethods()', 'RAV1503'),
-                (48, 'let members: MethodInfo[] = typeof(int).Info.GetMethods()', None)):
+                (46, 'let members: MemberInfo[] = typeof(int).GetMethods()', 'RAV1504'),
+                (47, 'let members = (MemberInfo[])typeof(int).GetMethods()', 'RAV1503'),
+                (48, 'let members: MethodInfo[] = typeof(int).GetMethods()', None)):
             text = 'import System.*\nimport System.Introspection.*\nfunc Main() {\n    ' + expression + '\n}\n'
             send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version},
                 'contentChanges': [{'text': text}]})
@@ -465,9 +465,9 @@ try:
     if array_shape:
         for version, access, required, forbidden in (
             (63, 'Array<int>.', {'Empty'}, {'ForEach'}),
-            (64, 'typeof(int).Info.GetProperties().', {'ForEach', 'Length'}, {'Item', 'CanRead'}),
-            (65, 'typeof(int).Info.GetProperties().Item.', set(), {'CanRead', 'CanWrite', 'Name'}),
-            (66, 'typeof(int).Info.GetProperties()[0].', {'CanRead', 'CanWrite', 'Name'}, set())):
+            (64, 'typeof(int).GetProperties().', {'ForEach', 'Length'}, {'Item', 'CanRead'}),
+            (65, 'typeof(int).GetProperties().Item.', set(), {'CanRead', 'CanWrite', 'Name'}),
+            (66, 'typeof(int).GetProperties()[0].', {'CanRead', 'CanWrite', 'Name'}, set())):
             text = 'import System.*\nfunc Main() {\n    ' + access + '\n}'
             send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version},
                 'contentChanges': [{'text': text}]})
@@ -502,6 +502,21 @@ try:
             assert kinds.get(name) == 8, (name, kinds)  # LSP Interface
         assert not any(name.startswith('Runtime') for name in kinds), kinds
         results['Introspection interface kinds'] = kinds
+        for version, access, required, forbidden in (
+                (81, 'System.', {'Runtime', 'Introspection'}, {'Type'}),
+                (82, 'System.Runtime.', {'RuntimeContext'}, set()),
+                (83, 'typeof(int).', {'Name', 'GetFields'}, {'Info'}),
+                (84, 'System.Runtime.RuntimeContext.Current.', {'GetTypeInfoFromHandle'}, set())):
+            text = f'func Main() {{\n    {access}\n}}'
+            send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version},
+                'contentChanges': [{'text': text}]})
+            result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
+                'position': {'line': 1, 'character': len('    ' + access)},
+                'context': {'triggerKind': 2, 'triggerCharacter': '.'}}, True))
+            items = result if isinstance(result, list) else result['items']
+            labels = {item['label'] for item in items}
+            assert required.issubset(labels) and not forbidden.intersection(labels), (access, labels)
+            results['Unified acquisition ' + access] = sorted(labels)
     receive(send('shutdown', None, True))
     send('exit', None)
     print(json.dumps(results, indent=2))

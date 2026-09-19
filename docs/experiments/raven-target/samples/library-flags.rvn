@@ -18,7 +18,7 @@ func Main() {
     if (flags & BindingFlags.Public) == BindingFlags.Public {
         WriteLine("Public included")
     }
-    WriteLine(typeof(int).Info.GetMethods(flags: flags).Length)
+    WriteLine(typeof(int).GetMethods(flags: flags).Length)
     let nonPublic = BindingFlags.NonPublic | BindingFlags.Instance
-    WriteLine(typeof(Date).Info.GetFields(flags: nonPublic)[0].Name)
+    WriteLine(typeof(Date).GetFields(flags: nonPublic)[0].Name)
 }

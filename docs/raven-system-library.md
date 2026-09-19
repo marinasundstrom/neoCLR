@@ -18,9 +18,11 @@ The legacy Neo profile retains its receiver/array conventions where it differs;
 the Raven profile selects generated contracts and implementation bodies.
 
 The [final source-port gate](raven-library-port-validation.md#final-source-port-gate--2026-09-19)
-records completed source migration and functioning programs. RuntimeContext,
-interface-based Info providers and Object.GetTypeInfo remain the separate API-alignment
-work; the current VS Code baseline still presents the prior descriptor classes.
+records completed source migration and functioning programs. Subsequent API alignment
+establishes sealed Info interfaces and direct TypeInfo acquisition through typeof
+and Object.GetType. RuntimeContext.Current supplies the configured handle resolver;
+ExecutingAssembly and assembly/module discovery remain the next slice. See the
+[current contract and compatibility notes](introspection-design.md).
 
 Importer admission checks invariant generic arity, parameter positions, base
 interfaces, exact method/property signatures and external identities. Variant or
@@ -1130,3 +1132,28 @@ Static property metadata now retains its static receiver, including Empty.
 The historical Neo array/vector profile remains separate. This reuses the
 [generic managed-array contract](generic-managed-arrays.md); no API redesign,
 Runtime Contract option or Raven compiler change is introduced.
+
+## Unified TypeInfo acquisition — 2026-09-19
+
+The 73 source slices now include RuntimeContext in place of System.Type. TypeInfo
+owns identity, shape and query members; descriptor structural signatures and native
+snapshot adapters use TypeInfo throughout. The Type/Info hop is removed from Raven
+samples. Object.GetType is Raven code over a checked ObjectTypeHandle native service;
+reference upcasts preserve the concrete allocation type for its resolver.
+
+Consumer projects select the existing Raven Runtime Contract settings:
+RavenTypeOfAssemblyName=NeoCLR.CoreProbe,
+RavenTypeOfInfoType=System.Introspection.TypeInfo and
+RavenTypeOfContextType=System.Runtime.RuntimeContext. Source-authoring slices clear
+these settings because they shadow the reference types and contain no typeof.
+No Raven compiler change is required. Importer fixes retain the provider owner on
+internal factory calls and bind source/reference interface pairs before comparing
+self-referential signatures. The internal CLI-only Type metadata shell and retained
+historical Neo profile are explained in the design document.
+
+Validation: all 73 slices reproduce from source; ownership covers 790 declarations,
+including 55 explicit native services. The 33 admission cases, 62 focused Rust
+checks and all 74 saved-project checks pass (43 before the direct-native-result
+correction, then 31 resumed). The updated acquisition sample also executes an
+application class through Object. Language-server checks cover the six interface
+kinds, hidden Type/providers, direct typeof queries and RuntimeContext completion.

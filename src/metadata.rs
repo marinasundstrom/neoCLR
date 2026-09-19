@@ -819,9 +819,10 @@ impl Module {
     /// Implicit ordinary-reference upcast; byrefs and array covariance are excluded.
     pub(crate) fn reference_assignable(&self, source: &Type, target: &Type) -> bool {
         self.is_object_reference_type(source)
-            && ((self.is_reference_type(source)
-                && self.is_reference_type(target)
-                && crate::inheritance::require_base(self, source, target).is_ok())
+            && ((*target == Type::from_name("System.Object") && self.is_reference_type(target))
+                || (self.is_reference_type(source)
+                    && self.is_reference_type(target)
+                    && crate::inheritance::require_base(self, source, target).is_ok())
                 || (self
                     .type_definition(target)
                     .is_some_and(|d| d.representation == Representation::Interface)

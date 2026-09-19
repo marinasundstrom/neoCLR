@@ -221,7 +221,7 @@ static class ApplicationTypes
         while (Types.Any(t => !emitted.Contains(t.Key)))
         {
             var (name, type) = Types.First(t => !emitted.Contains(t.Key)); emitted.Add(name);
-            if (MarkerLibrary.IsMatched(type)) { output.Append(MarkerLibrary.Declaration(type)); continue; }
+            if (MarkerLibrary.IsMatched(type)) { output.Append(MarkerLibrary.Declaration(type, bodies)); continue; }
             if (FlagsLibrary.IsMatched(type)) { output.Append(EnumBindings.Declaration(type)); continue; }
             if (DelegateLibrary.IsMatched(type)) { output.Append(DelegateLibrary.Declaration(type, name, map)); continue; }
             // Union cases retain lexical ownership, not merely a dotted display name.

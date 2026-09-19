@@ -4,7 +4,7 @@
 .end
 .method instance get_Position() -> Int32
 .end
-.method instance get_ParameterType() -> System.Type
+.method instance get_ParameterType() -> System.Introspection.TypeInfo
 .end
 .method instance get_IsOut() -> Boolean
 .end
@@ -18,7 +18,7 @@
 .property instance Position() -> Int32
 .get instance System.Introspection.ParameterInfo::get_Position()
 .end
-.property instance ParameterType() -> System.Type
+.property instance ParameterType() -> System.Introspection.TypeInfo
 .get instance System.Introspection.ParameterInfo::get_ParameterType()
 .end
 .property instance IsOut() -> Boolean

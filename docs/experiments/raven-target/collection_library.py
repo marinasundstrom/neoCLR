@@ -37,7 +37,7 @@ def build(path: Path) -> str:
     if path == ROOT / 'runtime/System/TypeInfo.neoil':
         return build(ROOT / 'runtime/raven/TypeInfo.neoil')
     if path == ROOT / 'runtime/System/Type.neoil':
-        return build(ROOT / 'runtime/raven/Type.neoil')
+        return build(ROOT / 'runtime/raven/RuntimeContext.neoil')
     if path == ROOT / 'runtime/System/Date.neoil':
         return build(ROOT / 'runtime/raven/Date.neoil')
     if path == ROOT / 'runtime/System/Time.neoil':
@@ -67,6 +67,8 @@ def build(path: Path) -> str:
         text = text[:text.index('; Managed-array callback consumer')]
         text = text.replace('-> Void', '-> noresult')
         text = re.sub(r'^\s*ldvoid\n', '\n', text, flags=re.M)
+    if path.parent == ROOT / 'runtime/neoCLR/Runtime':
+        text = re.sub(r'System\.Type\b', 'System.Introspection.TypeInfo', text)
     lines = []
     for line in text.splitlines(keepends=True):
         include = re.fullmatch(r'\s*\.include "([^"]+)"\s*', line)
@@ -74,6 +76,7 @@ def build(path: Path) -> str:
     result = ''.join(lines)
     if path.name == 'System.neoil':
         result += build(ROOT / 'runtime/raven/Object.neoil')
+        result += build(ROOT / 'runtime/neoCLR/Runtime/ObjectTypeHandle.neoil')
         result += build(ROOT / 'runtime/raven/SingleError.neoil')
         result += build(ROOT / 'runtime/raven/Linq.neoil')
         result += build(ROOT / 'runtime/raven/Map.neoil')

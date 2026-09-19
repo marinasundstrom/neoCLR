@@ -14,6 +14,7 @@ pub(crate) enum Binding {
     UnixTimeToLocal,
     Math(crate::math::Operation),
     Reflection(crate::reflection::Query),
+    ObjectTypeHandle,
     TypeName,
     TypeEquals,
     TypeArgumentCount,
@@ -53,7 +54,27 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         } else {
             vec![Type::RuntimeTypeHandle]
         };
-        if function.parameters != expected || function.returns != returns {
+        // The Raven model uses TypeInfo throughout; the historical Neo profile
+        // retains Type. Admit only the corresponding exact result signature.
+        fn info_result(ty: &Type) -> Type {
+            match ty {
+                Type::Named(name) if name == "System.Type" => {
+                    Type::from_name("System.Introspection.TypeInfo")
+                }
+                Type::Array(element) => Type::Array(Box::new(info_result(element))),
+                Type::Constructed {
+                    definition,
+                    arguments,
+                } => Type::Constructed {
+                    definition: definition.clone(),
+                    arguments: arguments.iter().map(info_result).collect(),
+                },
+                _ => ty.clone(),
+            }
+        }
+        if function.parameters != expected
+            || (function.returns != returns && function.returns != info_result(&returns))
+        {
             return Err(Fault::new("reflection binding signature mismatch"));
         }
         return Ok(Binding::Reflection(query));
@@ -116,6 +137,9 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             (Binding::ReadAllText, Type::Value)
         }
         ("neoCLR.Runtime.ConsoleReadByte", []) => (Binding::ConsoleReadByte, Type::Value),
+        ("neoCLR.Runtime.ObjectTypeHandle", [Type::Named(name)]) if name == "System.Object" => {
+            (Binding::ObjectTypeHandle, Type::RuntimeTypeHandle)
+        }
         ("neoCLR.Runtime.TypeName", [Type::RuntimeTypeHandle]) => (Binding::TypeName, Type::String),
         ("neoCLR.Runtime.TypeEquals", [Type::RuntimeTypeHandle, Type::RuntimeTypeHandle]) => {
             (Binding::TypeEquals, Type::Boolean)
@@ -159,6 +183,22 @@ impl Binding {
             return query.invoke(module, &args, limits);
         }
         match (self, args.as_slice()) {
+            (Self::ObjectTypeHandle, [value]) => {
+                let concrete = match value {
+                    Value::ObjectReference(object) => {
+                        object.reference.assigned()?;
+                        object.concrete_type()
+                    }
+                    Value::String(_) => Type::String,
+                    Value::NullObjectReference(_) => {
+                        return Err(Fault::new("GetType requires a non-null instance"));
+                    }
+                    _ => return Err(Fault::new("GetType requires an object reference")),
+                };
+                Ok(Value::RuntimeTypeHandle(Box::new(
+                    crate::type_identity::describe_loaded(module, &concrete)?,
+                )))
+            }
             (Self::EnvironmentArguments, []) => Ok(Value::Array {
                 element: Type::String,
                 elements: options

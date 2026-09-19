@@ -87,6 +87,9 @@ static class LibraryImplementation
                     || m.CallingConvention != MethodCallingConvention.Default
                     || m.Parameters.Any(p => (p.IsOut || p.ParameterType.IsByReference) && !PropagationLibrary.IsConditionalOutput(m, p))))
                 throw new InvalidDataException("Unsupported library interface contract.");
+        // Self-referential interface signatures (for example Equatable<TypeInfo>)
+        // use this explicitly selected source/reference pair during validation.
+        ApplicationTypes.BindLibrary(type, owner);
         bool Match(MethodDefinition left, MethodDefinition right) =>
             left.Name == right.Name && SameType(left.ReturnType, right.ReturnType)
             && left.Parameters.Count == right.Parameters.Count
@@ -105,7 +108,6 @@ static class LibraryImplementation
                     && SameType(a.First.ParameterType, a.Second.ParameterType))
                 && c.GetMethod?.Name == p.GetMethod?.Name && c.SetMethod?.Name == p.SetMethod?.Name) != 1))
             throw new InvalidDataException("Library interface does not match reference contract.");
-        ApplicationTypes.BindLibrary(type, owner);
         _ = ApplicationTypes.Type(type);
         return [];
     }
@@ -128,7 +130,7 @@ static class LibraryImplementation
         if (type.IsValueType != contract.IsValueType)
             throw new InvalidDataException("Library value/reference representation does not match reference contract.");
         // Native snapshot factories construct Type from precisely one opaque handle.
-        if (owner is "System.Type" or "System.Introspection.RuntimeTypeInfo" && (type.Fields.Count != 1 || type.Fields[0].Name != "Handle"
+        if (owner is "System.Introspection.TypeInfo" or "System.Introspection.RuntimeTypeInfo" && (type.Fields.Count != 1 || type.Fields[0].Name != "Handle"
             || type.Fields[0].FieldType.FullName != "System.RuntimeTypeHandle"
             || !RuntimeSignatures.IsCore(type.Fields[0].FieldType.Scope)))
             throw new InvalidDataException("Type library layout must contain exactly one core RuntimeTypeHandle.");
@@ -136,12 +138,12 @@ static class LibraryImplementation
         {
             var layout = new (string Name, string Type)[] {
                 ("StoredName", "System.String"), ("StoredPosition", "System.Int32"),
-                ("StoredParameterType", "System.Type"), ("StoredIsOut", "System.Boolean"),
+                ("StoredParameterType", "System.Introspection.TypeInfo"), ("StoredIsOut", "System.Boolean"),
                 ("StoredIsOutWhenTrue", "System.Boolean"), ("StoredIsReadOnly", "System.Boolean")
             };
             if (type.Fields.Count != layout.Length || type.Fields.Zip(layout).Any(p =>
                 p.First.Name != p.Second.Name || p.First.FieldType.FullName != p.Second.Type
-                || (p.Second.Type == "System.Type" ? !RuntimeSignatures.IsCore(p.First.FieldType.Scope)
+                || (p.Second.Type == "System.Introspection.TypeInfo" ? !RuntimeSignatures.IsCore(p.First.FieldType.Scope)
                     : p.First.FieldType.MetadataType is not (MetadataType.String or MetadataType.Int32 or MetadataType.Boolean))))
                 throw new InvalidDataException("ParameterInfo library layout must match the runtime snapshot fields: "
                     + string.Join(";", type.Fields.Select(f => f.Name + ":" + f.FieldType.FullName + "@" + f.FieldType.Scope)));

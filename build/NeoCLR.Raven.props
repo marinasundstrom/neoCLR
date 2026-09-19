@@ -21,6 +21,9 @@
     <RavenIterationArrayShapeType>System.Array`1</RavenIterationArrayShapeType>
     <RavenIterationIterableType>System.Collections.Iterable`1</RavenIterationIterableType>
     <RavenIterationIteratorType>System.Collections.Iterator`1</RavenIterationIteratorType>
+    <RavenTypeOfAssemblyName>NeoCLR.CoreProbe</RavenTypeOfAssemblyName>
+    <RavenTypeOfInfoType>System.Introspection.TypeInfo</RavenTypeOfInfoType>
+    <RavenTypeOfContextType>System.Runtime.RuntimeContext</RavenTypeOfContextType>
     <ImplicitImports>disable</ImplicitImports>
     <RavenFrameworkProjections>None</RavenFrameworkProjections>
   </PropertyGroup>

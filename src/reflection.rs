@@ -151,14 +151,14 @@ impl Query {
                 )
             }
             Self::BaseType => option(
-                "System.Type",
+                type_contract(module),
                 crate::inheritance::base(module, &ty)?
                     .as_ref()
                     .map(|base| type_value(module, base))
                     .transpose()?,
             ),
             Self::ElementType => option(
-                "System.Type",
+                type_contract(module),
                 match &ty {
                     Type::Array(t)
                     | Type::ArrayRef(t)
@@ -169,11 +169,11 @@ impl Query {
                 },
             ),
             Self::GenericArguments => array(
-                "System.Type",
+                type_contract(module),
                 handle
                     .generic_arguments
                     .iter()
-                    .map(|d| Ok(wrap_type(d.clone()))),
+                    .map(|d| Ok(wrap_type(module, d.clone()))),
                 limits,
             ),
             Self::Interfaces => {
@@ -183,7 +183,7 @@ impl Query {
                     Vec::new()
                 };
                 array(
-                    "System.Type",
+                    type_contract(module),
                     interfaces
                         .iter()
                         .filter(|t| **t != ty)
@@ -204,7 +204,7 @@ impl Query {
                                 "System.Introspection.FieldInfo",
                                 vec![
                                     Value::String(f.name.clone()),
-                                    wrap_type((**handle).clone()),
+                                    wrap_type(module, (**handle).clone()),
                                     type_value(
                                         module,
                                         &f.ty.substitute_type_parameters(arguments)?,
@@ -290,7 +290,7 @@ impl Query {
                                     "System.Introspection.PropertyInfo",
                                     vec![
                                         Value::String(p.name),
-                                        wrap_type((**handle).clone()),
+                                        wrap_type(module, (**handle).clone()),
                                         type_value(module, &p.ty)?,
                                         Value::Boolean(!p.instance),
                                         Value::Boolean(getter.is_some()),
@@ -346,16 +346,27 @@ fn record(name: &str, fields: Vec<Value>) -> Value {
         fields,
     }
 }
-fn wrap_type(descriptor: TypeDescriptor) -> Value {
+fn type_contract(module: &Module) -> &'static str {
+    if module
+        .type_definition(&Type::from_name("System.Introspection.TypeInfo"))
+        .is_some_and(|d| d.representation == Representation::Interface)
+    {
+        "System.Introspection.TypeInfo"
+    } else {
+        "System.Type"
+    }
+}
+fn wrap_type(module: &Module, descriptor: TypeDescriptor) -> Value {
     record(
-        "System.Type",
+        type_contract(module),
         vec![Value::RuntimeTypeHandle(Box::new(descriptor))],
     )
 }
 fn type_value(module: &Module, ty: &Type) -> Result<Value, Fault> {
-    Ok(wrap_type(crate::type_identity::describe_loaded(
-        module, ty,
-    )?))
+    Ok(wrap_type(
+        module,
+        crate::type_identity::describe_loaded(module, ty)?,
+    ))
 }
 fn option(name: &str, value: Option<Value>) -> Result<Value, Fault> {
     let element = crate::assembler::parse_type(name)?;
@@ -535,13 +546,18 @@ pub(crate) fn materialize(
                 // Native snapshots name the descriptive contract. The Raven profile
                 // realizes it with an internal provider; the legacy value profile
                 // continues to use its declared record representation.
-                let ty = if module.type_definition(&ty).is_some_and(|definition| {
-                    definition.representation == Representation::Interface
-                }) {
+                let view = module
+                    .type_definition(&ty)
+                    .is_some_and(|definition| {
+                        definition.representation == Representation::Interface
+                    })
+                    .then(|| ty.clone());
+                let ty = if view.is_some() {
                     let name = ty
                         .definition_name()
                         .ok_or_else(|| Fault::new("missing snapshot contract"))?;
                     let provider = match name {
+                        "System.Introspection.TypeInfo" => "System.Introspection.RuntimeTypeInfo",
                         "System.Introspection.ParameterInfo" => {
                             "System.Introspection.RuntimeParameterInfo"
                         }
@@ -579,7 +595,7 @@ pub(crate) fn materialize(
                     let index = heap.allocate(value)?;
                     Ok(Value::ObjectReference(crate::value::ObjectReference {
                         reference: heap.address(index)?,
-                        view: None,
+                        view,
                     }))
                 } else {
                     Ok(value)

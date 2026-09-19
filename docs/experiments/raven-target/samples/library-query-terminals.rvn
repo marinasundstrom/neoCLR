@@ -1,3 +1,4 @@
+import System.Introspection.*
 import System.*
 import System.Collections.*
 import System.Linq.*
@@ -46,8 +47,8 @@ func Main() {
     PrintOptional(FirstPositive([0, 42]))
     PrintOptional(FirstPositive([0]))
 
-    let types: Type[] = [typeof(int), typeof(string)]
-    match types.Last((kind: Type) -> bool => true) {
+    let types: TypeInfo[] = [typeof(int), typeof(string)]
+    match types.Last((kind: TypeInfo) -> bool => true) {
         Some(let kind) => WriteLine(kind.Name)
         None => WriteLine("No type")
     }

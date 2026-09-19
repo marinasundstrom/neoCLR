@@ -674,7 +674,7 @@ static class UnionImport
                                 var parameters = reference.Parameters.Select(p => ProfileType(ApplicationTypes.Close(p.ParameterType, reference.DeclaringType))).ToArray();
                                 call = targetMethod.HasThis && (libraryOwner is not null || !(targetMethod.IsConstructor && targetMethod.DeclaringType.IsValueType))
                                     ? new("", new[] { ApplicationTypes.Receiver(reference) }.Concat(parameters).ToArray(), ProfileType(ApplicationTypes.Close(reference.ReturnType, reference.DeclaringType), true), Instruction: $"{(instruction.OpCode.Code == Code.Callvirt ? "callvirt" : "call")} instance {ProfileType(reference.DeclaringType)}::{ApplicationTypes.MethodName(targetMethod)}({string.Join(',', parameters)})" + (targetMethod.DeclaringType.IsValueType && targetMethod.ReturnType.MetadataType == MetadataType.Void ? "\npop" : ""))
-                                    : new(libraryOwner is not null && targetMethod.IsStatic && targetMethod.DeclaringType.IsValueType ? ProfileType(reference.DeclaringType) + "::" + targetMethod.Name : Name(targetMethod), targetMethod.HasThis ? new[] { ApplicationTypes.Receiver(reference) }.Concat(parameters).ToArray() : parameters, ProfileType(ApplicationTypes.Close(reference.ReturnType, reference.DeclaringType), true));
+                                    : new(libraryOwner is not null && targetMethod.IsStatic && (targetMethod.DeclaringType.IsValueType || DescriptorLibrary.IsProvider(targetMethod.DeclaringType)) ? ProfileType(reference.DeclaringType) + "::" + targetMethod.Name : Name(targetMethod), targetMethod.HasThis ? new[] { ApplicationTypes.Receiver(reference) }.Concat(parameters).ToArray() : parameters, ProfileType(ApplicationTypes.Close(reference.ReturnType, reference.DeclaringType), true));
                             }
                         }
                         else if (targetMethod.Module == library.MainModule)
@@ -870,6 +870,7 @@ static class UnionImport
             throw new InvalidDataException("Unsupported application signature.");
     }
     static string Type(TypeReference type, bool result = false) => type.FullName switch {
+        "System.Object" when type.MetadataType == MetadataType.Object || RuntimeSignatures.IsCore(type.Scope) => "System.Object",
         "System.Int32[]" when type is ArrayType { IsVector: true } array && array.ElementType.MetadataType == MetadataType.Int32 => IntArray,
         "System.Unit" when type.IsValueType && type.Resolve() is { } unit && !unit.Fields.Any(f => !f.IsStatic)
             && !unit.Methods.Any(m => m.IsConstructor && m.IsStatic) => "Void",
@@ -888,8 +889,8 @@ static class UnionImport
         "System.Result/Error`1<System.OverflowError>" when type.IsValueType => Error,
         _ => throw new InvalidDataException("Unsupported Result profile type: " + type.FullName)
     };
-    static bool Converts(string source, string target) => ApplicationTypes.IsLibraryUnion(target) && source == target + "&" || InterfaceBindings.Converts(source, target) || BooleanBindings.Converts(source, target) || EnumBindings.Converts(source, target);
-    static string ConvertStack(string source, string target) => (ApplicationTypes.IsLibraryUnion(target) && source == target + "&" ? "ldobj " + target + "\n" : "") + InterfaceBindings.Convert(source, target) + BooleanBindings.Convert(source, target) + EnumBindings.Convert(source, target);
+    static bool Converts(string source, string target) => source != target && target == "System.Object" && ManagedArrayBindings.IsReference(source) || ApplicationTypes.IsLibraryUnion(target) && source == target + "&" || InterfaceBindings.Converts(source, target) || BooleanBindings.Converts(source, target) || EnumBindings.Converts(source, target);
+    static string ConvertStack(string source, string target) => (source != target && target == "System.Object" && ManagedArrayBindings.IsReference(source) ? "castclass System.Object\n" : "") + (ApplicationTypes.IsLibraryUnion(target) && source == target + "&" ? "ldobj " + target + "\n" : "") + InterfaceBindings.Convert(source, target) + BooleanBindings.Convert(source, target) + EnumBindings.Convert(source, target);
     static bool NeedsInitialization(string type) => ApplicationTypes.LibraryUnionRequiresInitialization(type) || CalendarBindings.IsReference(type) || type is "System.Object" or ParameterSnapshotBindings.Vector || InterfaceBindings.IsInterface(type) || NativeMemoryBindings.IsPointer(type) || type is "System.RuntimeTypeHandle" or "Value" || DelegateBindings.IsType(type) || (GenericUnionBindings.IsType(type)
         ? GenericUnionBindings.RequiresInitialization(type) : ResultBindings.RequiresInitialization(type));
     static bool HasNamedVoid(TypeReference type) => type is GenericInstanceType generic
