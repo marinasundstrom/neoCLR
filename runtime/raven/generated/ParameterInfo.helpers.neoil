@@ -31,6 +31,14 @@ False:
 .field private StoredIsOut Boolean
 .field private StoredIsOutWhenTrue Boolean
 .field private StoredIsReadOnly Boolean
+.field private StoredMetadataToken Int32
+.field private StoredModule System.Introspection.ModuleInfo
+.property instance MetadataToken() -> Int32
+.get instance System.Introspection.RuntimeParameterInfo::get_MetadataToken()
+.end
+.property instance Module() -> System.Introspection.ModuleInfo
+.get instance System.Introspection.RuntimeParameterInfo::get_Module()
+.end
 .property instance Name() -> String
 .get instance System.Introspection.RuntimeParameterInfo::get_Name()
 .end
@@ -49,7 +57,7 @@ False:
 .property instance IsReadOnly() -> Boolean
 .get instance System.Introspection.RuntimeParameterInfo::get_IsReadOnly()
 .end
-.method private instance .ctor(String name,Int32 position,System.Introspection.TypeInfo parameterType,Boolean isOut,Boolean isOutWhenTrue,Boolean isReadOnly) -> noresult
+.method private instance .ctor(String name,Int32 position,System.Introspection.TypeInfo parameterType,Boolean isOut,Boolean isOutWhenTrue,Boolean isReadOnly,Int32 metadataToken,System.Introspection.ModuleInfo module) -> noresult
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0
@@ -104,71 +112,105 @@ M00000001_IL_0035:
 call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeBooleanFromInt32(Int32)
 stfld System.Introspection.RuntimeParameterInfo::StoredIsReadOnly
 M00000001_IL_003a:
+M00000001_IL_003b:
+ldarg 0
+M00000001_IL_003c:
+ldarg 7
+M00000001_IL_003e:
+stfld System.Introspection.RuntimeParameterInfo::StoredMetadataToken
+M00000001_IL_0043:
+M00000001_IL_0044:
+ldarg 0
+M00000001_IL_0045:
+ldarg 8
+M00000001_IL_0047:
+stfld System.Introspection.RuntimeParameterInfo::StoredModule
+M00000001_IL_004c:
 ret
 .end
-.method instance get_Name() -> String
+.method instance get_MetadataToken() -> Int32
 M00000002_IL_0000:
 M00000002_IL_0001:
 M00000002_IL_0002:
 ldarg 0
 M00000002_IL_0003:
-ldfld System.Introspection.RuntimeParameterInfo::StoredName
+ldfld System.Introspection.RuntimeParameterInfo::StoredMetadataToken
 M00000002_IL_0008:
 ret
 .end
-.method instance get_Position() -> Int32
+.method instance get_Module() -> System.Introspection.ModuleInfo
 M00000003_IL_0000:
 M00000003_IL_0001:
 M00000003_IL_0002:
 ldarg 0
 M00000003_IL_0003:
-ldfld System.Introspection.RuntimeParameterInfo::StoredPosition
+ldfld System.Introspection.RuntimeParameterInfo::StoredModule
 M00000003_IL_0008:
 ret
 .end
-.method instance get_ParameterType() -> System.Introspection.TypeInfo
+.method instance get_Name() -> String
 M00000004_IL_0000:
 M00000004_IL_0001:
 M00000004_IL_0002:
 ldarg 0
 M00000004_IL_0003:
-ldfld System.Introspection.RuntimeParameterInfo::StoredParameterType
+ldfld System.Introspection.RuntimeParameterInfo::StoredName
 M00000004_IL_0008:
 ret
 .end
-.method instance get_IsOut() -> Boolean
+.method instance get_Position() -> Int32
 M00000005_IL_0000:
 M00000005_IL_0001:
 M00000005_IL_0002:
 ldarg 0
 M00000005_IL_0003:
-ldfld System.Introspection.RuntimeParameterInfo::StoredIsOut
-call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeBooleanToInt32(Boolean)
+ldfld System.Introspection.RuntimeParameterInfo::StoredPosition
 M00000005_IL_0008:
-call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance get_IsOutWhenTrue() -> Boolean
+.method instance get_ParameterType() -> System.Introspection.TypeInfo
 M00000006_IL_0000:
 M00000006_IL_0001:
 M00000006_IL_0002:
 ldarg 0
 M00000006_IL_0003:
-ldfld System.Introspection.RuntimeParameterInfo::StoredIsOutWhenTrue
-call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeBooleanToInt32(Boolean)
+ldfld System.Introspection.RuntimeParameterInfo::StoredParameterType
 M00000006_IL_0008:
-call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance get_IsReadOnly() -> Boolean
+.method instance get_IsOut() -> Boolean
 M00000007_IL_0000:
 M00000007_IL_0001:
 M00000007_IL_0002:
 ldarg 0
 M00000007_IL_0003:
-ldfld System.Introspection.RuntimeParameterInfo::StoredIsReadOnly
+ldfld System.Introspection.RuntimeParameterInfo::StoredIsOut
 call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeBooleanToInt32(Boolean)
 M00000007_IL_0008:
+call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance get_IsOutWhenTrue() -> Boolean
+M00000008_IL_0000:
+M00000008_IL_0001:
+M00000008_IL_0002:
+ldarg 0
+M00000008_IL_0003:
+ldfld System.Introspection.RuntimeParameterInfo::StoredIsOutWhenTrue
+call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeBooleanToInt32(Boolean)
+M00000008_IL_0008:
+call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance get_IsReadOnly() -> Boolean
+M00000009_IL_0000:
+M00000009_IL_0001:
+M00000009_IL_0002:
+ldarg 0
+M00000009_IL_0003:
+ldfld System.Introspection.RuntimeParameterInfo::StoredIsReadOnly
+call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_0008:
 call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeBooleanFromInt32(Int32)
 ret
 .end

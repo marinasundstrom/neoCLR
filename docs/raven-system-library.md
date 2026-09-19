@@ -13,7 +13,7 @@ This slice adds Raven sources for the fundamental and collection interfaces,
 SystemClock, LocalDateTime, IntPtr/UIntPtr comparisons, the complete Int32 member
 surface, Console and Environment. File.ReadAllText joins WriteAllText in Raven.
 The follow-up ports String and opaque Error, then five empty error types and Void,
-followed by seven typed error carriers, and the Propagatable declaration, then Option/Result and their cases, then the inherited descriptor family and NativeMemory, then System.Fault, Func declarations and the normal BindingFlags enum and Object/UnionAttribute markers, followed by managed Array members and iteration, bringing the total to 73 slices.
+followed by seven typed error carriers, and the Propagatable declaration, then Option/Result and their cases, then the inherited descriptor family and NativeMemory, then System.Fault, Func declarations and the normal BindingFlags enum and Object/UnionAttribute markers, followed by managed Array members and iteration, bringing the source port to 73 slices; subsequent AssemblyInfo and ModuleInfo providers bring the current total to 75.
 The legacy Neo profile retains its receiver/array conventions where it differs;
 the Raven profile selects generated contracts and implementation bodies.
 
@@ -21,7 +21,8 @@ The [final source-port gate](raven-library-port-validation.md#final-source-port-
 records completed source migration and functioning programs. Subsequent API alignment
 establishes sealed Info interfaces and direct TypeInfo acquisition through typeof
 and Object.GetType. RuntimeContext.Current supplies the configured handle resolver;
-ExecutingAssembly and assembly/module discovery remain the next slice. See the
+ExecutingAssembly now provides assembly/module discovery, direct references and
+module-scoped tokens; new discovery collections return Sequence<T>. See the
 [current contract and compatibility notes](introspection-design.md).
 
 Importer admission checks invariant generic arity, parameter positions, base
@@ -1157,3 +1158,26 @@ checks and all 74 saved-project checks pass (43 before the direct-native-result
 correction, then 31 resumed). The updated acquisition sample also executes an
 application class through Object. Language-server checks cover the six interface
 kinds, hidden Type/providers, direct typeof queries and RuntimeContext completion.
+
+
+## Minimal assembly discovery and Info tokens — 2026-09-19
+
+AssemblyInfo and ModuleInfo add two Raven-authored interface/provider slices. The
+existing Runtime Contract typeof resolver configuration is unchanged; the target
+reference contract adds RuntimeContext.ExecutingAssembly, Sequence-based assembly
+queries and MetadataToken/Module properties. Source acquisition and public instance
+GetType still return TypeInfo directly. Rebuild matching reference, library and
+consumer artifacts; stale snapshots cannot be mixed with the new provider layouts.
+Native code supplies checked metadata values, while Raven providers expose the API.
+See [the implemented contract and limitations](introspection-design.md#minimal-discovery-and-token-apis-implemented--2026-09-19).
+
+A saved Raven assembly-info sample compiles, imports, verifies and runs, traversing
+Demo → System.Runtime and Demo → module → Widget. Language-server checks expose all
+eight Info contracts as interfaces, the token/module properties, ExecutingAssembly
+and read-only collection capabilities. No compiler semantic/emission changes or
+neoCLR policies are integrated into Raven main in this slice.
+
+Validation for this slice: 75 slices reproduce; ownership covers 841 declarations
+including 66 runtime services. Sixty-one focused runtime tests, 27 implementation
+admission cases and 24 selected saved-project/edit/rejection checks pass. The editor
+checks use a freshly generated reference core and the matching language server.

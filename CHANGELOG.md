@@ -8,19 +8,31 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Implement RuntimeContext.ExecutingAssembly and sealed AssemblyInfo/ModuleInfo
+  interfaces with direct references and module/type discovery through Sequence<T>.
+  Add module-scoped MetadataToken to Info interfaces; retain source rows and assign
+  tokens to merged runtime definitions. System.Runtime appears as the foundation
+  reference. Queries cover retained loaded metadata, never load files, and fault on
+  unresolved references or unsupported open-generic member queries. Existing member
+  arrays remain unchanged. Rebuild consumers for the new provider layouts. Add a
+  runnable assembly-info sample and editor/interface, token and discovery checks.
+  Record dynamic loading as future RuntimeContext work, without adding a loader.
+  All 75 slices reproduce; 61 focused runtime tests, 27 admission cases, 24 selected
+  saved-project checks and interface/editor checks pass.
+
 - Preserve descriptive source assembly/module identity and definition tokens through
   Raven import, neoIL assembly, JSON artifacts and linking. Record the logical
   System.Runtime dependency instead of compiler bootstrap reference names; retain
   executable IDs separately and reject invalid/duplicate module-scoped tokens.
   Library slices do not copy colliding source rows into their merged module.
   Eighteen metadata/attribute/scope checks and a saved acquisition sample pass.
-  This supports, but does not yet expose, the assembly discovery and token APIs.
+  This supplies the source identity for the discovery and token APIs above.
 
 - Record AssemblyInfo.ReferencedAssemblies and module-scoped MetadataToken on the
   public Info interfaces as
   requirements for the next discovery slice. Require the System.Runtime reference
   mapping, distinguish reference identity from loading, and document source-token
-  collisions when combining bootstrap slices. These APIs are not yet implemented.
+  collisions when combining bootstrap slices. These requirements are implemented in the discovery slice above.
 
 - Replace the Raven profile's public System.Type/Type.Info split with sealed
   TypeInfo identity, shape and query contracts. Both typeof(T) and Object.GetType()

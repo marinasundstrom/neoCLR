@@ -4,7 +4,7 @@ static class DescriptorLibrary
 {
     static readonly Dictionary<string, (string Name, string Type)[]> Layouts = new()
     {
-        ["MemberInfo"] = [("Name", "System.String"), ("DeclaringType", "System.Introspection.TypeInfo")],
+        ["MemberInfo"] = [("Name", "System.String"), ("DeclaringType", "System.Introspection.TypeInfo"), ("MetadataToken", "System.Int32")],
         ["FieldInfo"] = [("FieldType", "System.Introspection.TypeInfo"), ("IsPublic", "System.Boolean"), ("IsPrivate", "System.Boolean"), ("IsAssembly", "System.Boolean"), ("IsStatic", "System.Boolean"), ("DefinitionIndex", "System.Int32")],
         ["MethodInfo"] = [("ReturnType", "System.Introspection.TypeInfo"), ("IsStatic", "System.Boolean"), ("IsPublic", "System.Boolean"), ("IsPrivate", "System.Boolean"), ("IsAssembly", "System.Boolean"), ("IsReceiverByRef", "System.Boolean"), ("DefinitionIndex", "System.Int32"), ("Parameters", "System.Runtime.CompilerServices.ParameterSnapshot"), ("IsReadOnly", "System.Boolean"), ("IsVirtual", "System.Boolean"), ("IsOverride", "System.Boolean"), ("IsAbstract", "System.Boolean")],
         ["PropertyInfo"] = [("PropertyType", "System.Introspection.TypeInfo"), ("IsStatic", "System.Boolean"), ("CanRead", "System.Boolean"), ("CanWrite", "System.Boolean"), ("DefinitionIndex", "System.Int32"), ("IndexParameters", "System.Runtime.CompilerServices.ParameterSnapshot"), ("Getter", "System.Option`1<System.Introspection.MethodInfo>"), ("Setter", "System.Option`1<System.Introspection.MethodInfo>")],
@@ -46,8 +46,8 @@ static class DescriptorLibrary
     }
     public static string Base(TypeDefinition type) => type.Name == "RuntimeMemberInfo" ? "System.Object" : "System.Introspection.RuntimeMemberInfo";
     public static bool IsProvider(TypeReference type) => type.Namespace == "System.Introspection"
-        && (IsDescriptor(type) || type.Name is "RuntimeTypeInfo" or "RuntimeParameterInfo");
+        && (IsDescriptor(type) || type.Name is "RuntimeTypeInfo" or "RuntimeParameterInfo" or "RuntimeAssemblyInfo" or "RuntimeModuleInfo");
     public static bool SameType(TypeReference left, TypeReference right) => (IsProvider(left)
-        || left.Namespace == "System.Introspection" && left.Name is "MemberInfo" or "FieldInfo" or "MethodInfo" or "PropertyInfo" or "TypeInfo" or "ParameterInfo")
+        || left.Namespace == "System.Introspection" && left.Name is "MemberInfo" or "FieldInfo" or "MethodInfo" or "PropertyInfo" or "TypeInfo" or "ParameterInfo" or "AssemblyInfo" or "ModuleInfo")
         && left.FullName == right.FullName && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right);
 }

@@ -224,4 +224,10 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Array'">
     <Compile Include="src/System/Array.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'AssemblyInfo'">
+    <Compile Include="src/System/Introspection/AssemblyInfo.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'ModuleInfo'">
+    <Compile Include="src/System/Introspection/ModuleInfo.rvn" />
+  </ItemGroup>
 </Project>

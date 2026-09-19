@@ -15,6 +15,8 @@ pub(crate) enum Binding {
     Math(crate::math::Operation),
     Reflection(crate::reflection::Query),
     ObjectTypeHandle,
+    ExecutingAssembly,
+    AssemblyInfo(crate::assembly_info::Query),
     TypeName,
     TypeEquals,
     TypeArgumentCount,
@@ -47,6 +49,14 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             return Err(Fault::new("math binding signature mismatch"));
         }
         return Ok(Binding::Math(operation));
+    }
+    if let Some((query, count, result)) = crate::assembly_info::Query::binding(&function.name) {
+        if function.parameters != vec![Type::String; count]
+            || function.returns != crate::assembler::parse_type(result)?
+        {
+            return Err(Fault::new("assembly service signature mismatch"));
+        }
+        return Ok(Binding::AssemblyInfo(query));
     }
     if let Some((query, integer, returns)) = crate::reflection::Query::binding(&function.name) {
         let expected = if integer {
@@ -137,6 +147,10 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             (Binding::ReadAllText, Type::Value)
         }
         ("neoCLR.Runtime.ConsoleReadByte", []) => (Binding::ConsoleReadByte, Type::Value),
+        ("neoCLR.Runtime.ExecutingAssembly", []) => (
+            Binding::ExecutingAssembly,
+            Type::from_name("System.Introspection.AssemblyInfo"),
+        ),
         ("neoCLR.Runtime.ObjectTypeHandle", [Type::Named(name)]) if name == "System.Object" => {
             (Binding::ObjectTypeHandle, Type::RuntimeTypeHandle)
         }
@@ -170,6 +184,7 @@ impl Binding {
     pub(crate) fn invoke(
         &self,
         args: Vec<Value>,
+        executing_assembly: Option<&str>,
         module: &crate::Module,
         limits: &crate::Limits,
         output: &mut Vec<String>,
@@ -178,6 +193,17 @@ impl Binding {
         let console = options.console.as_deref();
         if let Self::Math(operation) = self {
             return operation.invoke(&args);
+        }
+        if let Self::AssemblyInfo(query) = self {
+            return query.invoke(module, &args, limits);
+        }
+        if let Self::ExecutingAssembly = self {
+            return crate::assembly_info::assembly_value(
+                module,
+                executing_assembly.ok_or_else(|| {
+                    Fault::new("ExecutingAssembly requires source origin metadata")
+                })?,
+            );
         }
         if let Self::Reflection(query) = self {
             return query.invoke(module, &args, limits);

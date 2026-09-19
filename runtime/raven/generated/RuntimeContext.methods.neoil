@@ -3,6 +3,9 @@
 .property static Current() -> System.Runtime.RuntimeContext
 .get System.Runtime.RuntimeContext::get_Current()
 .end
+.property instance ExecutingAssembly() -> System.Introspection.AssemblyInfo
+.get instance System.Runtime.RuntimeContext::get_ExecutingAssembly()
+.end
 .method private instance .ctor() -> noresult
 M00000001_IL_0000:
 M00000001_IL_0001:
@@ -12,14 +15,22 @@ pop
 M00000001_IL_0007:
 ret
 .end
-.method instance GetTypeInfoFromHandle(System.RuntimeTypeHandle handle) -> System.Introspection.TypeInfo
+.method instance get_ExecutingAssembly() -> System.Introspection.AssemblyInfo
 M00000003_IL_0000:
 M00000003_IL_0001:
 M00000003_IL_0002:
+call neoCLR.Runtime.ExecutingAssembly()
+M00000003_IL_0007:
+ret
+.end
+.method instance GetTypeInfoFromHandle(System.RuntimeTypeHandle handle) -> System.Introspection.TypeInfo
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
 ldarg 1
-M00000003_IL_0003:
+M00000004_IL_0003:
 call System.Introspection.RuntimeTypeInfo::FromHandle(System.RuntimeTypeHandle)
-M00000003_IL_0008:
+M00000004_IL_0008:
 ret
 .end
 .method static get_Current() -> System.Runtime.RuntimeContext

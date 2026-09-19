@@ -1619,6 +1619,26 @@ fn interpret_instructions(
                 .min(limits.heap_objects);
         }
 
+        let executing_assembly = if matches!(op, Op::Call(target) if target.name == "neoCLR.Runtime.ExecutingAssembly")
+        {
+            frames.iter().rev().find_map(|frame| {
+                if let Some(origin) = &frame.function.origin {
+                    return Some(origin.assembly.clone());
+                }
+                let id = frame.function.definition.as_ref()?;
+                if id.module == "System" {
+                    return None; // Skip the library facade and its generated adapters.
+                }
+                module
+                    .assemblies
+                    .iter()
+                    .find(|a| a.modules.contains(&id.module))
+                    .map(|a| a.full_name.clone())
+            })
+        } else {
+            None
+        };
+
         // Host Result propagates terminal faults; there is no guest exception machinery.
         let step = (|| -> Result<Option<Value>, Fault> {
             let frame = frames
@@ -2502,13 +2522,27 @@ fn interpret_instructions(
                         if matches!(
                             binding,
                             crate::native::Binding::Reflection(_)
+                                | crate::native::Binding::AssemblyInfo(_)
+                                | crate::native::Binding::ExecutingAssembly
                                 | crate::native::Binding::UnixTimeToLocal
                                 | crate::native::Binding::EnvironmentArguments
                         ) {
                             arrays_used = true;
                         }
-                        let value = binding.invoke(args, module, &limits, output, options)?;
-                        let value = if matches!(binding, crate::native::Binding::Reflection(_)) {
+                        let value = binding.invoke(
+                            args,
+                            executing_assembly.as_deref(),
+                            module,
+                            &limits,
+                            output,
+                            options,
+                        )?;
+                        let value = if matches!(
+                            binding,
+                            crate::native::Binding::Reflection(_)
+                                | crate::native::Binding::AssemblyInfo(_)
+                                | crate::native::Binding::ExecutingAssembly
+                        ) {
                             crate::reflection::materialize(module, heap, &limits, value)?
                         } else {
                             value

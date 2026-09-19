@@ -1,6 +1,10 @@
 ; Generated from runtime/raven/src/System/Introspection/TypeInfo.rvn. Regenerate with build_runtime_library.py.
 .interface System.Introspection.TypeInfo
 .implements System.Equatable<System.Introspection.TypeInfo>
+.method instance get_MetadataToken() -> Int32
+.end
+.method instance get_Module() -> System.Introspection.ModuleInfo
+.end
 .method instance get_Name() -> String
 .end
 .method instance get_FullName() -> String
@@ -52,6 +56,12 @@
 .method instance GetProperties() -> arrayref<System.Introspection.PropertyInfo>
 .end
 .method instance GetProperties(System.Introspection.BindingFlags flags) -> arrayref<System.Introspection.PropertyInfo>
+.end
+.property instance MetadataToken() -> Int32
+.get instance System.Introspection.TypeInfo::get_MetadataToken()
+.end
+.property instance Module() -> System.Introspection.ModuleInfo
+.get instance System.Introspection.TypeInfo::get_Module()
 .end
 .property instance Name() -> String
 .get instance System.Introspection.TypeInfo::get_Name()

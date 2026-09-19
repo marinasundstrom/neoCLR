@@ -1,0 +1,38 @@
+namespace System.Introspection
+
+import System.*
+import System.Collections.*
+import System.Runtime.CompilerServices.*
+
+public sealed interface AssemblyInfo {
+    val Name: string { get }
+    val FullName: string { get }
+    val MetadataToken: int { get }
+    val ReferencedAssemblies: Sequence<AssemblyInfo> { get }
+    func GetModules() -> Sequence<ModuleInfo>
+    func GetTypes() -> Sequence<TypeInfo>
+}
+
+internal class RuntimeAssemblyInfo : AssemblyInfo {
+    private field StoredIdentity: string
+
+    private init(identity: string) {
+        StoredIdentity = identity
+    }
+
+    val Name: string { get => RuntimeServices.AssemblyName(StoredIdentity) }
+
+    val FullName: string { get => StoredIdentity }
+
+    val MetadataToken: int { get => RuntimeServices.AssemblyMetadataToken(StoredIdentity) }
+
+    val ReferencedAssemblies: Sequence<AssemblyInfo> { get => RuntimeServices.AssemblyReferences(StoredIdentity) }
+
+    func GetModules() -> Sequence<ModuleInfo> {
+        return RuntimeServices.AssemblyModules(StoredIdentity)
+    }
+
+    func GetTypes() -> Sequence<TypeInfo> {
+        return RuntimeServices.AssemblyTypes(StoredIdentity)
+    }
+}

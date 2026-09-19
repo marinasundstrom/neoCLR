@@ -367,3 +367,239 @@ ret
         Value::String("System.Int32".into())
     );
 }
+
+fn run_introspection(source: &str) -> Value {
+    let app = assemble(source).unwrap();
+    let program = LoadedProgram::with_library(&app, library()).unwrap();
+    program.verify().unwrap();
+    program.run(Limits::default()).unwrap().value
+}
+
+#[test]
+fn executing_assembly_follows_source_caller_not_entry_or_runtime_facade() {
+    assert_eq!(
+        run_introspection(
+            r#"
+.module Imported
+.assembly {"name":"Entry","full_name":"Entry","modules":["Entry.dll"],"references":["Library","System.Runtime"]}
+.assembly {"name":"Library","full_name":"Library","modules":["Library.dll"],"references":["System.Runtime"]}
+.entry Main
+.function Main() -> String
+.origin {"assembly":"Entry","module":"Entry.dll","name":"Main","token":100663297}
+call LibraryContext()
+ret
+.end
+.function LibraryContext() -> String
+.origin {"assembly":"Library","module":"Library.dll","name":"LibraryContext","token":100663297}
+call System.Runtime.RuntimeContext::get_Current()
+call instance System.Runtime.RuntimeContext::get_ExecutingAssembly()
+callvirt instance System.Introspection.AssemblyInfo::get_Name()
+ret
+.end
+"#
+        ),
+        Value::String("Library".into())
+    );
+}
+
+#[test]
+fn executing_assembly_exposes_system_runtime_through_sequence() {
+    assert_eq!(
+        run_introspection(
+            r#"
+.module App
+.entry Main
+.function Main() -> String
+call System.Runtime.RuntimeContext::get_Current()
+call instance System.Runtime.RuntimeContext::get_ExecutingAssembly()
+callvirt instance System.Introspection.AssemblyInfo::get_ReferencedAssemblies()
+ldc.i4 0
+callvirt instance System.Collections.Sequence<System.Introspection.AssemblyInfo>::get_Item(Int32)
+callvirt instance System.Introspection.AssemblyInfo::get_Name()
+ret
+.end
+"#
+        ),
+        Value::String("System.Runtime".into())
+    );
+}
+
+#[test]
+fn source_tokens_reach_type_member_and_parameter_interfaces() {
+    let prefix = r#"
+.module Imported
+.assembly {"name":"App","full_name":"App","modules":["App.dll"],"references":["System.Runtime"]}
+.entry Main
+.type class Item
+.origin {"assembly":"App","module":"App.dll","name":"Example.Item","token":33554434,"field_tokens":[67108870]}
+.field Count Int32
+.method static Echo(Int32 value) -> Int32
+.origin {"assembly":"App","module":"App.dll","name":"Echo","token":100663303,"parameter_tokens":[134217737]}
+ldarg value
+ret
+.end
+.end
+.function Main() -> Int32
+call System.Runtime.RuntimeContext::get_Current()
+ldtoken Item
+call instance System.Runtime.RuntimeContext::GetTypeInfoFromHandle(System.RuntimeTypeHandle)
+"#;
+    for (query, expected) in [
+        (
+            "callvirt instance System.Introspection.TypeInfo::get_MetadataToken()",
+            0x02000002,
+        ),
+        (
+            "callvirt instance System.Introspection.TypeInfo::GetFields()\nldc.i4 0\nldelem System.Introspection.FieldInfo\ncastclass System.Introspection.MemberInfo\ncallvirt instance System.Introspection.MemberInfo::get_MetadataToken()",
+            0x04000006,
+        ),
+        (
+            "callvirt instance System.Introspection.TypeInfo::GetMethods()\nldc.i4 0\nldelem System.Introspection.MethodInfo\ncastclass System.Introspection.MemberInfo\ncallvirt instance System.Introspection.MemberInfo::get_MetadataToken()",
+            0x06000007,
+        ),
+        (
+            "callvirt instance System.Introspection.TypeInfo::GetMethods()\nldc.i4 0\nldelem System.Introspection.MethodInfo\ncallvirt instance System.Introspection.MethodInfo::GetParameters()\nldc.i4 0\nldelem System.Introspection.ParameterInfo\ncallvirt instance System.Introspection.ParameterInfo::get_MetadataToken()",
+            0x08000009,
+        ),
+    ] {
+        assert_eq!(
+            run_introspection(&format!("{prefix}{query}\nret\n.end")),
+            Value::Int32(expected)
+        );
+    }
+    let query = "callvirt instance System.Introspection.TypeInfo::GetMethods()\nldc.i4 0\nldelem System.Introspection.MethodInfo\ncallvirt instance System.Introspection.MethodInfo::GetParameters()\nldc.i4 0\nldelem System.Introspection.ParameterInfo\ncallvirt instance System.Introspection.ParameterInfo::get_Module()\ncallvirt instance System.Introspection.ModuleInfo::get_Name()";
+    assert_eq!(
+        run_introspection(&format!(
+            "{}{query}\nret\n.end",
+            prefix.replace("Main() -> Int32", "Main() -> String")
+        )),
+        Value::String("App.dll".into())
+    );
+}
+
+#[test]
+fn module_inventory_contains_open_generic_definitions() {
+    assert_eq!(
+        run_introspection(
+            r#"
+.module Catalog
+.entry Main
+.type Box<T>
+.field Value !0
+.end
+.function Main() -> Int32
+call System.Runtime.RuntimeContext::get_Current()
+call instance System.Runtime.RuntimeContext::get_ExecutingAssembly()
+callvirt instance System.Introspection.AssemblyInfo::GetModules()
+ldc.i4 0
+callvirt instance System.Collections.Sequence<System.Introspection.ModuleInfo>::get_Item(Int32)
+callvirt instance System.Introspection.ModuleInfo::GetTypes()
+ldc.i4 0
+callvirt instance System.Collections.Sequence<System.Introspection.TypeInfo>::get_Item(Int32)
+callvirt instance System.Introspection.TypeInfo::get_GenericArgumentCount()
+ret
+.end
+"#
+        ),
+        Value::Int32(1)
+    );
+}
+
+#[test]
+fn discovery_limits_and_unloaded_references_fail_without_loading() {
+    let query = r#"
+.module App
+.assembly {"name":"App","full_name":"App","modules":["App"],"references":["Missing"]}
+.entry Main
+.function Main() -> System.Collections.Sequence<System.Introspection.AssemblyInfo>
+call System.Runtime.RuntimeContext::get_Current()
+call instance System.Runtime.RuntimeContext::get_ExecutingAssembly()
+callvirt instance System.Introspection.AssemblyInfo::get_ReferencedAssemblies()
+ret
+.end
+"#;
+    let app = assemble(query).unwrap();
+    let p = LoadedProgram::with_library(&app, library()).unwrap();
+    p.verify().unwrap();
+    assert!(
+        p.run(Limits::default())
+            .unwrap_err()
+            .to_string()
+            .contains("assembly metadata is not loaded: Missing")
+    );
+    let query = query.replace("Missing", "System.Runtime").replace(
+        "callvirt instance System.Introspection.AssemblyInfo::get_ReferencedAssemblies()",
+        "callvirt instance System.Introspection.AssemblyInfo::get_ReferencedAssemblies()\nldc.i4 0\ncallvirt instance System.Collections.Sequence<System.Introspection.AssemblyInfo>::get_Item(Int32)\ncallvirt instance System.Introspection.AssemblyInfo::GetTypes()"
+    ).replace("Main() -> System.Collections.Sequence<System.Introspection.AssemblyInfo>", "Main() -> System.Collections.Sequence<System.Introspection.TypeInfo>");
+    let app = assemble(&query).unwrap();
+    let p = LoadedProgram::with_library(&app, library()).unwrap();
+    p.verify().unwrap();
+    let mut limits = Limits::default();
+    limits.array_elements = 4;
+    let fault = p.run(limits).unwrap_err().to_string();
+    assert!(
+        fault.contains("budget") || fault.contains("limit"),
+        "{fault}"
+    );
+}
+
+#[test]
+fn constructed_types_reuse_definition_tokens_and_arrays_have_no_definition_token() {
+    for (name, expected) in [
+        ("Box<Int32>", 0x02000001),
+        ("Box<String>", 0x02000001),
+        ("Int32[]", 0),
+    ] {
+        assert_eq!(
+            run_introspection(&format!(
+                r#"
+.module TokenShapes
+.entry Main
+.type Box<T>
+.field Value !0
+.end
+.function Main() -> Int32
+call System.Runtime.RuntimeContext::get_Current()
+ldtoken {name}
+call instance System.Runtime.RuntimeContext::GetTypeInfoFromHandle(System.RuntimeTypeHandle)
+callvirt instance System.Introspection.TypeInfo::get_MetadataToken()
+ret
+.end
+"#
+            )),
+            Value::Int32(expected)
+        );
+    }
+}
+
+#[test]
+fn property_tokens_are_definition_rows_scoped_to_the_declaring_module() {
+    let query = r#"
+.module PropertyTokens
+.entry Main
+.function Main() -> Int32
+call System.Runtime.RuntimeContext::get_Current()
+ldtoken System.Date
+call instance System.Runtime.RuntimeContext::GetTypeInfoFromHandle(System.RuntimeTypeHandle)
+callvirt instance System.Introspection.TypeInfo::GetProperties()
+ldc.i4 0
+ldelem System.Introspection.PropertyInfo
+castclass System.Introspection.MemberInfo
+callvirt instance System.Introspection.MemberInfo::get_MetadataToken()
+ret
+.end
+"#;
+    let Value::Int32(token) = run_introspection(query) else {
+        panic!("expected token")
+    };
+    assert_eq!(token >> 24, 0x17);
+    assert_ne!(token & 0x00ff_ffff, 0);
+    let query = query.replace("Main() -> Int32", "Main() -> String").replace(
+        "callvirt instance System.Introspection.MemberInfo::get_MetadataToken()",
+        "callvirt instance System.Introspection.MemberInfo::get_Module()\ncallvirt instance System.Introspection.ModuleInfo::get_Assembly()\ncallvirt instance System.Introspection.AssemblyInfo::get_Name()"
+    );
+    assert_eq!(
+        run_introspection(&query),
+        Value::String("System.Runtime".into())
+    );
+}

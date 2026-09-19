@@ -1,0 +1,208 @@
+; Generated from runtime/raven/src/System/Introspection/AssemblyInfo.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Introspection.AssemblyInfo.RuntimeServiceAssemblyReferences(String arg0) -> arrayref<System.Introspection.AssemblyInfo>
+.local System.Introspection.AssemblyInfo[] source
+.local arrayref<System.Introspection.AssemblyInfo> destination
+.local Int32 index
+ldarg arg0
+call neoCLR.Runtime.AssemblyReferences(String)
+stloc source
+ldloc source
+ldlen
+conv.i4
+newarr System.Introspection.AssemblyInfo
+stloc destination
+ldc.i4 0
+stloc index
+br Test
+Copy:
+ldloc destination
+ldloc index
+ldloc source
+ldloc index
+ldelem System.Introspection.AssemblyInfo
+stelem System.Introspection.AssemblyInfo
+ldloc index
+ldc.i4 1
+add
+stloc index
+Test:
+ldloc index
+ldloc source
+ldlen
+conv.i4
+blt Copy
+ldloc destination
+ret
+.end
+.function neoCLR.Library.System.Introspection.AssemblyInfo.RuntimeServiceAssemblyModules(String arg0) -> arrayref<System.Introspection.ModuleInfo>
+.local System.Introspection.ModuleInfo[] source
+.local arrayref<System.Introspection.ModuleInfo> destination
+.local Int32 index
+ldarg arg0
+call neoCLR.Runtime.AssemblyModules(String)
+stloc source
+ldloc source
+ldlen
+conv.i4
+newarr System.Introspection.ModuleInfo
+stloc destination
+ldc.i4 0
+stloc index
+br Test
+Copy:
+ldloc destination
+ldloc index
+ldloc source
+ldloc index
+ldelem System.Introspection.ModuleInfo
+stelem System.Introspection.ModuleInfo
+ldloc index
+ldc.i4 1
+add
+stloc index
+Test:
+ldloc index
+ldloc source
+ldlen
+conv.i4
+blt Copy
+ldloc destination
+ret
+.end
+.function neoCLR.Library.System.Introspection.AssemblyInfo.RuntimeServiceAssemblyTypes(String arg0) -> arrayref<System.Introspection.TypeInfo>
+.local System.Introspection.TypeInfo[] source
+.local arrayref<System.Introspection.TypeInfo> destination
+.local Int32 index
+ldarg arg0
+call neoCLR.Runtime.AssemblyTypes(String)
+stloc source
+ldloc source
+ldlen
+conv.i4
+newarr System.Introspection.TypeInfo
+stloc destination
+ldc.i4 0
+stloc index
+br Test
+Copy:
+ldloc destination
+ldloc index
+ldloc source
+ldloc index
+ldelem System.Introspection.TypeInfo
+stelem System.Introspection.TypeInfo
+ldloc index
+ldc.i4 1
+add
+stloc index
+Test:
+ldloc index
+ldloc source
+ldlen
+conv.i4
+blt Copy
+ldloc destination
+ret
+.end
+.type internal class System.Introspection.RuntimeAssemblyInfo
+.implements System.Introspection.AssemblyInfo
+.field private StoredIdentity String
+.property instance Name() -> String
+.get instance System.Introspection.RuntimeAssemblyInfo::get_Name()
+.end
+.property instance FullName() -> String
+.get instance System.Introspection.RuntimeAssemblyInfo::get_FullName()
+.end
+.property instance MetadataToken() -> Int32
+.get instance System.Introspection.RuntimeAssemblyInfo::get_MetadataToken()
+.end
+.property instance ReferencedAssemblies() -> System.Collections.Sequence<System.Introspection.AssemblyInfo>
+.get instance System.Introspection.RuntimeAssemblyInfo::get_ReferencedAssemblies()
+.end
+.method private instance .ctor(String identity) -> noresult
+M00000001_IL_0000:
+M00000001_IL_0001:
+ldarg 0
+M00000001_IL_0002:
+pop
+M00000001_IL_0007:
+M00000001_IL_0008:
+ldarg 0
+M00000001_IL_0009:
+ldarg 1
+M00000001_IL_000a:
+stfld System.Introspection.RuntimeAssemblyInfo::StoredIdentity
+M00000001_IL_000f:
+ret
+.end
+.method instance get_Name() -> String
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldarg 0
+M00000002_IL_0003:
+ldfld System.Introspection.RuntimeAssemblyInfo::StoredIdentity
+M00000002_IL_0008:
+call neoCLR.Runtime.AssemblyName(String)
+M00000002_IL_000d:
+ret
+.end
+.method instance get_FullName() -> String
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+ldfld System.Introspection.RuntimeAssemblyInfo::StoredIdentity
+M00000003_IL_0008:
+ret
+.end
+.method instance get_MetadataToken() -> Int32
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+ldfld System.Introspection.RuntimeAssemblyInfo::StoredIdentity
+M00000004_IL_0008:
+call neoCLR.Runtime.AssemblyMetadataToken(String)
+M00000004_IL_000d:
+ret
+.end
+.method instance get_ReferencedAssemblies() -> System.Collections.Sequence<System.Introspection.AssemblyInfo>
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+ldfld System.Introspection.RuntimeAssemblyInfo::StoredIdentity
+M00000005_IL_0008:
+call neoCLR.Library.System.Introspection.AssemblyInfo.RuntimeServiceAssemblyReferences(String)
+M00000005_IL_000d:
+ret
+.end
+.method instance GetModules() -> System.Collections.Sequence<System.Introspection.ModuleInfo>
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+ldfld System.Introspection.RuntimeAssemblyInfo::StoredIdentity
+M00000006_IL_0008:
+call neoCLR.Library.System.Introspection.AssemblyInfo.RuntimeServiceAssemblyModules(String)
+M00000006_IL_000d:
+ret
+.end
+.method instance GetTypes() -> System.Collections.Sequence<System.Introspection.TypeInfo>
+M00000007_IL_0000:
+M00000007_IL_0001:
+M00000007_IL_0002:
+ldarg 0
+M00000007_IL_0003:
+ldfld System.Introspection.RuntimeAssemblyInfo::StoredIdentity
+M00000007_IL_0008:
+call neoCLR.Library.System.Introspection.AssemblyInfo.RuntimeServiceAssemblyTypes(String)
+M00000007_IL_000d:
+ret
+.end
+.end

@@ -76,6 +76,9 @@ def build(path: Path) -> str:
     result = ''.join(lines)
     if path.name == 'System.neoil':
         result = result.replace('.module System\n', '.module System\n.assembly {"name":"System.Runtime","full_name":"System.Runtime","modules":["System"],"references":[]}\n', 1)
+        result += build(ROOT / 'runtime/raven/AssemblyInfo.neoil')
+        result += build(ROOT / 'runtime/raven/ModuleInfo.neoil')
+        result += build(ROOT / 'runtime/neoCLR/Runtime/AssemblyInfo.neoil')
         result += build(ROOT / 'runtime/raven/Object.neoil')
         result += build(ROOT / 'runtime/neoCLR/Runtime/ObjectTypeHandle.neoil')
         result += build(ROOT / 'runtime/raven/SingleError.neoil')

@@ -29,7 +29,7 @@ static class LibraryImplementation
         if (owner == "System.Func") return DelegateLibrary.Roots(source, core);
         if (owner == "System.Introspection.MemberInfo")
             return DescriptorLibrary.Roots(source, core, InstanceRoots, InterfaceRoots);
-        if (owner is "System.Introspection.TypeInfo" or "System.Introspection.ParameterInfo")
+        if (owner is "System.Introspection.TypeInfo" or "System.Introspection.ParameterInfo" or "System.Introspection.AssemblyInfo" or "System.Introspection.ModuleInfo")
         {
             InterfaceRoots(source.GetType(owner), core.GetType(owner), owner);
             var provider = owner.Replace(".Introspection.", ".Introspection.Runtime");
@@ -139,14 +139,21 @@ static class LibraryImplementation
             var layout = new (string Name, string Type)[] {
                 ("StoredName", "System.String"), ("StoredPosition", "System.Int32"),
                 ("StoredParameterType", "System.Introspection.TypeInfo"), ("StoredIsOut", "System.Boolean"),
-                ("StoredIsOutWhenTrue", "System.Boolean"), ("StoredIsReadOnly", "System.Boolean")
+                ("StoredIsOutWhenTrue", "System.Boolean"), ("StoredIsReadOnly", "System.Boolean"),
+                ("StoredMetadataToken", "System.Int32"), ("StoredModule", "System.Introspection.ModuleInfo")
             };
             if (type.Fields.Count != layout.Length || type.Fields.Zip(layout).Any(p =>
                 p.First.Name != p.Second.Name || p.First.FieldType.FullName != p.Second.Type
-                || (p.Second.Type == "System.Introspection.TypeInfo" ? !RuntimeSignatures.IsCore(p.First.FieldType.Scope)
+                || (p.Second.Type is "System.Introspection.TypeInfo" or "System.Introspection.ModuleInfo" ? !RuntimeSignatures.IsCore(p.First.FieldType.Scope)
                     : p.First.FieldType.MetadataType is not (MetadataType.String or MetadataType.Int32 or MetadataType.Boolean))))
                 throw new InvalidDataException("ParameterInfo library layout must match the runtime snapshot fields: "
                     + string.Join(";", type.Fields.Select(f => f.Name + ":" + f.FieldType.FullName + "@" + f.FieldType.Scope)));
+        }
+        if (owner is "System.Introspection.RuntimeAssemblyInfo" or "System.Introspection.RuntimeModuleInfo")
+        {
+            var fields = owner.EndsWith("RuntimeModuleInfo") ? new[] { "StoredIdentity", "StoredName" } : new[] { "StoredIdentity" };
+            if (!type.Fields.Select(f => f.Name).SequenceEqual(fields) || type.Fields.Any(f => f.FieldType.MetadataType != MetadataType.String))
+                throw new InvalidDataException("Assembly/module descriptor storage does not match runtime contract.");
         }
         if (owner == "System.String") OpaqueLibrary.ValidateString(type, contract);
         if (owner == "System.Array") ArrayLibrary.Validate(type);

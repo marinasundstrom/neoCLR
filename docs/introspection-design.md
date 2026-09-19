@@ -3,9 +3,8 @@
 Current author proposal, refined **2026-09-17**. This supersedes the public
 Type/TypeInfo split and class-based descriptor direction in the
 [earlier review](reflection-model-review.md). It is a target design, not a claim
-that the entire target model or RuntimeContext is implemented. The six existing
-Info contracts have now migrated to sealed interfaces in the Raven profile; the
-remaining acquisition/context migration is tracked below.
+that the entire target model or RuntimeContext is implemented. The eight Info contracts are sealed interfaces in the Raven profile; unified
+acquisition and the minimal loaded-program discovery surface are implemented below.
 
 ## Author-directed implementation step — 2026-09-19
 
@@ -21,8 +20,8 @@ The Raven profile now implements unified acquisition: `typeof(T)` and
 `Object.GetType()` return TypeInfo directly. RuntimeContext.Current exposes
 GetTypeInfoFromHandle for Raven's configured typeof lowering. Its current facade
 uses the one loaded program; it does not yet create independent execution universes.
-ExecutingAssembly and assembly/module providers remain the next implementation
-slice. Collection query returns remain arrays pending the collection-contract review.
+ExecutingAssembly and assembly/module providers now expose loaded-program discovery.
+New discovery collections return Sequence<T>; older member/type queries retain arrays.
 
 The public/runtime System.Type class and Type.Info hop are removed from the Raven
 profile. Its compiler reference retains an **internal**, empty System.Type metadata
@@ -512,3 +511,57 @@ fresh snapshots; the interface alone is not an immutability guarantee. Existing
 TypeInfo/member array-returning queries remain a separately reviewable migration.
 The author explicitly requires these minimal working introspection slices before
 moving on to strings; invocation, loading and emit are not prerequisites.
+
+### Minimal discovery and token APIs implemented — 2026-09-19
+
+`RuntimeContext.Current.ExecutingAssembly` now returns the assembly of the nearest
+source caller through the runtime facade (including calls made from a dependency).
+It is not the entry assembly. `AssemblyInfo` and `ModuleInfo` are sealed interfaces
+with internal Raven providers. AssemblyInfo exposes Name, FullName, MetadataToken,
+ReferencedAssemblies, GetModules() and GetTypes(); ModuleInfo exposes Name, Assembly,
+MetadataToken and GetTypes(). The new collections return `Sequence<T>`: enumeration,
+Count and indexed access without mutation members. Each query owns fresh storage;
+this capability contract does not guarantee that its concrete backing object is
+immutable. Existing TypeInfo/member queries still return arrays in this slice.
+
+For this closed loaded-program preview, ReferencedAssemblies returns a
+Sequence<AssemblyInfo> of the declared **direct** references, resolved against the
+loaded catalog. System.Runtime is the foundation identity. A missing catalog entry
+faults explicitly; it is neither silently omitted nor loaded from disk. This differs
+from .NET's AssemblyName[] contract above: convenient traversal costs the ability to
+inspect an unavailable reference through this property. The catalog retains declared
+identities, so an identity-only reference model remains a future option when loading
+and resolution become supported operations.
+
+GetTypes enumerates **retained, loaded definitions**, including nonpublic definitions,
+not every original PE type discarded by the bounded importer. Open generic definitions
+can report name, shape, arguments, token and module; their member/base/interface queries
+require a closed type and fault explicitly. Descriptive visibility does not authorize
+calling nonpublic members. Application property projection and generic method-definition
+reflection remain existing importer/query limitations. No invocation or emit is added.
+
+MetadataToken is an Int32 property on TypeInfo, MemberInfo (inherited by FieldInfo,
+MethodInfo and PropertyInfo), ParameterInfo, AssemblyInfo and ModuleInfo. Type/member/
+parameter interfaces also expose Module. Tokens identify definitions within that
+module, not provider instances and not builds. Imported source tokens are preserved;
+merged System.Runtime and raw neoIL definitions receive table-tagged tokens from
+module-local definition/member ordering. Assembly tokens use the Assembly row
+0x20000001; module tokens use Module row 0x00000001. Constructed generic types share
+their definition's token. Arrays, pointer/byref wrappers and generic-parameter
+placeholders return zero because this preview assigns them no definition row; a
+source parameter without a Param row also returns zero. These sentinel and synthesis
+rules are neoCLR policy, not a claim of identical CLR behavior. DefinitionIndex remains
+a separate implementation-era property.
+
+The .NET discovery/reference/token comparisons above motivate familiar access and
+module scoping. Context ownership, interface result capabilities and provisional
+zero tokens keep the preview small but require consumer rebuilds and future review.
+Retaining all source types, migrating older array-returning queries and distinguishing
+unresolved references deserve separate slices; none requires adding reflection/emit
+or an assembly loader before the string work.
+
+
+The author explicitly reaffirmed on 2026-09-19 that dynamic assembly loading is later
+work owned by RuntimeContext. No Load API, search/resolution policy, unloading or
+multiple-context identity behavior is selected in this preview. AssemblyInfo remains
+descriptive; reading ReferencedAssemblies does not become a hidden loading operation.

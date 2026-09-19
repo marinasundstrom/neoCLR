@@ -1,0 +1,33 @@
+.function neoCLR.Runtime.ExecutingAssembly() -> System.Introspection.AssemblyInfo
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.AssemblyName(String arg0) -> String
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.AssemblyMetadataToken(String arg0) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.AssemblyReferences(String arg0) -> System.Introspection.AssemblyInfo[]
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.AssemblyModules(String arg0) -> System.Introspection.ModuleInfo[]
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.AssemblyTypes(String arg0) -> System.Introspection.TypeInfo[]
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ModuleAssembly(String arg0,String arg1) -> System.Introspection.AssemblyInfo
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ModuleMetadataToken(String arg0,String arg1) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ModuleTypes(String arg0,String arg1) -> System.Introspection.TypeInfo[]
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.TypeMetadataToken(System.RuntimeTypeHandle handle) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.TypeModule(System.RuntimeTypeHandle handle) -> System.Introspection.ModuleInfo
+.methodimpl InternalCall
+.end

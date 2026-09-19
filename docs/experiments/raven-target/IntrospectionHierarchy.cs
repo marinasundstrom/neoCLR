@@ -7,6 +7,8 @@ static class IntrospectionHierarchy
     const string AttributeName = "System.Runtime.CompilerServices.ClosedHierarchyAttribute";
     static readonly Dictionary<string, string[]> Cases = new()
     {
+        ["AssemblyInfo"] = ["RuntimeAssemblyInfo"],
+        ["ModuleInfo"] = ["RuntimeModuleInfo"],
         ["TypeInfo"] = ["RuntimeTypeInfo"],
         ["ParameterInfo"] = ["RuntimeParameterInfo"],
         ["MemberInfo"] = ["FieldInfo", "MethodInfo", "PropertyInfo"],

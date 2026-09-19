@@ -25,6 +25,16 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-19 — Dynamic loading remains context-owned future work
+
+**Author direction.** “We might need to solve dynamic assembly loading later. It does
+belong to RuntimeContext”.
+
+**Assistant response.** Agreed that future loading/resolution belongs to RuntimeContext,
+while AssemblyInfo remains descriptive. Kept this preview's queries over the already
+loaded catalog; no loader, search policy, unloading or API signature was implemented
+or selected in response. Unavailable references currently produce an explicit fault.
+
 ## 2026-09-19 — Finish minimal introspection before strings
 
 **Author direction.** Implement ExecutingAssembly, ReferencedAssemblies and
@@ -39,6 +49,17 @@ and validated import/execution, artifact round trips and scope checks. Public
 assembly discovery and token interface properties remain in progress, so strings
 have not started. The completed TypeInfo acquisition slice is f8104d1; a fresh,
 verified VS Code workspace is available at ~/.neoclr/experiments/typeinfo-20260919/demo.
+
+**Subsequent implementation.** Added the two sealed assembly/module interfaces and
+Raven providers, ExecutingAssembly, direct ReferencedAssemblies and MetadataToken on
+Info interfaces. The running sample reports Demo referencing System.Runtime and its
+module's Widget type; editor checks expose all eight interfaces. New collection
+returns use Sequence<T>. The assistant selected an explicitly bounded loaded-catalog
+reference model: an unavailable reference faults, rather than loading or disappearing.
+Discovery covers retained definitions; old array returns remain for later review.
+Source-caller, token, generic-definition, resource and admission tests accompany the
+change. The [implemented contract](introspection-design.md#minimal-discovery-and-token-apis-implemented--2026-09-19)
+records these assistant implementation choices and their compatibility costs.
 
 ## 2026-09-19 — Assembly references and Info metadata tokens
 

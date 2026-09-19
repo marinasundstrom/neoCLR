@@ -60,6 +60,9 @@ SLICES = {
 
     'Clock': 'System.Clock',
     'TypeInfo': 'System.Introspection.TypeInfo',
+    'AssemblyInfo': 'System.Introspection.AssemblyInfo',
+    'ModuleInfo': 'System.Introspection.ModuleInfo',
+
     'ParameterInfo': 'System.Introspection.ParameterInfo',
     'Duration': 'System.Duration',
     'Instant': 'System.Instant',
@@ -138,6 +141,9 @@ SOURCES = {
 
     'Clock': 'runtime/raven/src/System/Clock.rvn',
     'TypeInfo': 'runtime/raven/src/System/Introspection/TypeInfo.rvn',
+    'AssemblyInfo': 'runtime/raven/src/System/Introspection/AssemblyInfo.rvn',
+    'ModuleInfo': 'runtime/raven/src/System/Introspection/ModuleInfo.rvn',
+
     'ParameterInfo': 'runtime/raven/src/System/Introspection/ParameterInfo.rvn',
     'Duration': 'runtime/raven/src/System/Duration.rvn',
     'Instant': 'runtime/raven/src/System/Instant.rvn',

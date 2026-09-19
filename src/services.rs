@@ -67,6 +67,8 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             crate::native::Binding::UnixTimeTicks => RuntimeService::WallClock,
             crate::native::Binding::Math(_) => RuntimeService::MathOperations,
             crate::native::Binding::Reflection(_)
+            | crate::native::Binding::AssemblyInfo(_)
+            | crate::native::Binding::ExecutingAssembly
             | crate::native::Binding::ObjectTypeHandle
             | crate::native::Binding::TypeName
             | crate::native::Binding::TypeEquals
@@ -103,11 +105,29 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
                 instruction: None,
             });
         }
+        if matches!(
+            crate::native::bind(function)?,
+            crate::native::Binding::AssemblyInfo(
+                crate::assembly_info::Query::References
+                    | crate::assembly_info::Query::Modules
+                    | crate::assembly_info::Query::Types
+                    | crate::assembly_info::Query::ModuleTypes
+            )
+        ) {
+            uses.push(ServiceUse {
+                service: RuntimeService::ManagedArrays,
+                instruction: None,
+            });
+        }
         if let crate::native::Binding::Reflection(query) = crate::native::bind(function)? {
             use crate::reflection::Query;
             if !matches!(
                 query,
-                Query::Shape | Query::DisplayName | Query::ElementType
+                Query::Shape
+                    | Query::DisplayName
+                    | Query::ElementType
+                    | Query::MetadataToken
+                    | Query::Module
             ) {
                 uses.push(ServiceUse {
                     service: RuntimeService::ManagedArrays,

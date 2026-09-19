@@ -3,6 +3,8 @@ namespace System.Introspection
 import System.*
 
 public sealed interface ParameterInfo {
+    val MetadataToken: int { get }
+    val Module: ModuleInfo { get }
     val Name: string { get }
     val Position: int { get }
     val ParameterType: TypeInfo { get }
@@ -18,17 +20,23 @@ internal class RuntimeParameterInfo : ParameterInfo {
     private field StoredIsOut: bool
     private field StoredIsOutWhenTrue: bool
     private field StoredIsReadOnly: bool
+    private field StoredMetadataToken: int
+    private field StoredModule: ModuleInfo
 
     private init(name: string, position: int, parameterType: TypeInfo,
-        isOut: bool, isOutWhenTrue: bool, isReadOnly: bool) {
+        isOut: bool, isOutWhenTrue: bool, isReadOnly: bool, metadataToken: int, module: ModuleInfo) {
         StoredName = name
         StoredPosition = position
         StoredParameterType = parameterType
         StoredIsOut = isOut
         StoredIsOutWhenTrue = isOutWhenTrue
         StoredIsReadOnly = isReadOnly
+        StoredMetadataToken = metadataToken
+        StoredModule = module
     }
 
+    val MetadataToken: int { get => StoredMetadataToken }
+    val Module: ModuleInfo { get => StoredModule }
     val Name: string { get => StoredName }
     val Position: int { get => StoredPosition }
     val ParameterType: TypeInfo { get => StoredParameterType }

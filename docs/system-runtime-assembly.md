@@ -47,7 +47,8 @@ implementation inputs, and runtime/System.neoil supplies executable library code
 The importer matches complete admitted contracts across those identities; no reference
 stub body executes. The project rename changes the implementation identity, while
 consumer reference identity and runtime module identity retain their explicit mapping.
-Replacing the production introspection contract is the next coordinated slice.
+The production introspection contract now uses TypeInfo and RuntimeContext, with
+assembly/module discovery over the loaded catalog; see [the current contract](introspection-design.md).
 
 ## Migration slices
 

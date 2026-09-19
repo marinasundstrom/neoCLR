@@ -4,6 +4,8 @@ import System.*
 import System.Runtime.CompilerServices.*
 
 public sealed interface MemberInfo {
+    val MetadataToken: int { get }
+    val Module: ModuleInfo { get }
     val Name: string { get }
     val DeclaringType: TypeInfo { get }
 }
@@ -48,12 +50,16 @@ public sealed interface PropertyInfo : MemberInfo {
 internal sealed class RuntimeMemberInfo {
     private field StoredName: string
     private field StoredDeclaringType: TypeInfo
+    private field StoredMetadataToken: int
 
-    protected init(name: string, declaringType: TypeInfo) {
+    protected init(name: string, declaringType: TypeInfo, metadataToken: int) {
         StoredName = name
         StoredDeclaringType = declaringType
+        StoredMetadataToken = metadataToken
     }
 
+    val MetadataToken: int { get => StoredMetadataToken }
+    val Module: ModuleInfo { get => StoredDeclaringType.Module }
     val Name: string { get => StoredName }
     val DeclaringType: TypeInfo { get => StoredDeclaringType }
 }
@@ -67,10 +73,10 @@ internal class RuntimeFieldInfo : RuntimeMemberInfo, FieldInfo {
     private field StoredDefinitionIndex: int
 
     private init(
-        name: string, declaringType: TypeInfo,
+        name: string, declaringType: TypeInfo, metadataToken: int,
         fieldType: TypeInfo, isPublic: bool,
         isPrivate: bool, isAssembly: bool,
-        isStatic: bool, definitionIndex: int): base(name, declaringType) {
+        isStatic: bool, definitionIndex: int): base(name, declaringType, metadataToken) {
         StoredFieldType = fieldType
         StoredIsPublic = isPublic
         StoredIsPrivate = isPrivate
@@ -102,13 +108,13 @@ internal class RuntimeMethodInfo : RuntimeMemberInfo, MethodInfo {
     private field StoredIsAbstract: bool
 
     private init(
-        name: string, declaringType: TypeInfo,
+        name: string, declaringType: TypeInfo, metadataToken: int,
         returnType: TypeInfo, isStatic: bool,
         isPublic: bool, isPrivate: bool,
         isAssembly: bool, isReceiverByRef: bool,
         definitionIndex: int, parameters: ParameterSnapshot,
         isReadOnly: bool, isVirtual: bool,
-        isOverride: bool, isAbstract: bool): base(name, declaringType) {
+        isOverride: bool, isAbstract: bool): base(name, declaringType, metadataToken) {
         StoredReturnType = returnType
         StoredIsStatic = isStatic
         StoredIsPublic = isPublic
@@ -158,11 +164,11 @@ internal class RuntimePropertyInfo : RuntimeMemberInfo, PropertyInfo {
     private field StoredSetter: Option<MethodInfo>
 
     private init(
-        name: string, declaringType: TypeInfo,
+        name: string, declaringType: TypeInfo, metadataToken: int,
         propertyType: TypeInfo, isStatic: bool,
         canRead: bool, canWrite: bool,
         definitionIndex: int, indexParameters: ParameterSnapshot,
-        getter: Option<MethodInfo>, setter: Option<MethodInfo>): base(name, declaringType) {
+        getter: Option<MethodInfo>, setter: Option<MethodInfo>): base(name, declaringType, metadataToken) {
         StoredPropertyType = propertyType
         StoredIsStatic = isStatic
         StoredCanRead = canRead

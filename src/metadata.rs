@@ -1137,6 +1137,38 @@ pub struct TypeDefId {
 
 impl Module {
     pub(crate) fn normalize_definition_ids(&mut self) -> Result<(), crate::Fault> {
+        if self.assemblies.is_empty() {
+            let identity = if self.name == "System" {
+                "System.Runtime"
+            } else {
+                &self.name
+            };
+            self.assemblies
+                .push(crate::metadata_origin::AssemblyMetadata {
+                    name: identity.to_owned(),
+                    full_name: identity.to_owned(),
+                    modules: vec![self.name.clone()],
+                    references: if self.name == "System" {
+                        vec![]
+                    } else {
+                        self.references.as_ref().map_or_else(
+                            || vec!["System.Runtime".into()],
+                            |refs| {
+                                refs.iter()
+                                    .map(|r| {
+                                        if r.name() == "System" {
+                                            "System.Runtime".into()
+                                        } else {
+                                            r.name().to_owned()
+                                        }
+                                    })
+                                    .collect()
+                            },
+                        )
+                    },
+                });
+        }
+
         if self
             .revision
             .as_ref()

@@ -11,6 +11,10 @@ public class RuntimeContext {
         get => RuntimeContext()
     }
 
+    val ExecutingAssembly: AssemblyInfo {
+        get => RuntimeServices.ExecutingAssembly()
+    }
+
     func GetTypeInfoFromHandle(handle: RuntimeTypeHandle) -> TypeInfo {
         return RuntimeServices.TypeInfo(handle)
     }

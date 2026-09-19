@@ -11,6 +11,7 @@ import tempfile
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('project', type=Path)
 parser.add_argument('--collections', action='store_true')
+parser.add_argument('--only', nargs='+', help='Select positive sample labels; always run edit/rejection checks')
 parser.add_argument('--start-at', help='Resume positive sample checks at this label; always run edit/rejection checks')
 add_toolchain_arguments(parser)
 parser.add_argument('--runtime', required=True, type=Path)
@@ -23,7 +24,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
         shutil.copyfile(args.project.resolve().parent / name, root / name)
     command = [sys.executable, str(bridge / 'run_project.py'), str(root / 'Demo.rvnproj'),
                *runner_arguments(args), '--runtime', str(args.runtime.resolve())]
-    cases = [('TypeAcquisition', 'library-type-acquisition.rvn', 'Concrete class\nSystem.String\nSame type\nArray type\nSystem.Int32\nSystem.Int32\n'),
+    cases = [('AssemblyInfo', 'library-assembly-info.rvn', 'Demo\nSystem.Runtime\nRuntime types available\nDemo\n1\nWidget\nType token available\nDemo\nSame definition token\n'),
+             ('TypeAcquisition', 'library-type-acquisition.rvn', 'Concrete class\nSystem.String\nSame type\nArray type\nSystem.Int32\nSystem.Int32\n'),
              ('Instants', 'library-instants.rvn', '0\n-1\n0\n-1\nSame duration\nSystem clock\n'),
              ('Basics', 'library-basics.rvn', '42\n1\n0\nLibrary calls from Raven\n'),
              ('CasePayloads', 'library-case-payloads.rvn', '7\n42\nAfter\nUpdated error\n'),
@@ -83,6 +85,11 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
         if args.start_at not in labels:
             parser.error('Unknown sample label: ' + args.start_at)
         cases = cases[labels.index(args.start_at):]
+    if args.only:
+        unknown = set(args.only) - {label for label, _, _ in cases}
+        if unknown:
+            parser.error('Unknown sample labels: ' + ', '.join(sorted(unknown)))
+        cases = [case for case in cases if case[0] in args.only]
     for label, sample, expected in cases:
         (root / 'Main.rvn').write_text((bridge / 'samples' / sample).read_text())
         run = subprocess.run(command, capture_output=True, text=True, timeout=90)

@@ -4,6 +4,8 @@ import System.*
 import System.Runtime.CompilerServices.*
 
 public sealed interface TypeInfo : Equatable<TypeInfo> {
+    val MetadataToken: int { get }
+    val Module: ModuleInfo { get }
     val Name: string { get }
     val FullName: string { get }
     val Namespace: string { get }
@@ -81,6 +83,8 @@ internal class RuntimeTypeInfo : TypeInfo {
     func GetProperties(flags: BindingFlags) -> PropertyInfo[] {
         return RuntimeServices.TypeProperties(Handle, (int)flags)
     }
+    val MetadataToken: int { get => RuntimeServices.TypeMetadataToken(Handle) }
+    val Module: ModuleInfo { get => RuntimeServices.TypeModule(Handle) }
     val Name: string { get => RuntimeServices.TypeName(Handle) }
     val FullName: string { get => RuntimeServices.TypeDisplayName(Handle, 0) }
     val Namespace: string { get => RuntimeServices.TypeDisplayName(Handle, 1) }

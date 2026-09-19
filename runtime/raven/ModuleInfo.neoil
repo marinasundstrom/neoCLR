@@ -1,0 +1,2 @@
+.include "generated/ModuleInfo.methods.neoil"
+.include "generated/ModuleInfo.helpers.neoil"

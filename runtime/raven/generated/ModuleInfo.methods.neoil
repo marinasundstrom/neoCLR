@@ -1,0 +1,20 @@
+; Generated from runtime/raven/src/System/Introspection/ModuleInfo.rvn. Regenerate with build_runtime_library.py.
+.interface System.Introspection.ModuleInfo
+.method instance get_Name() -> String
+.end
+.method instance get_Assembly() -> System.Introspection.AssemblyInfo
+.end
+.method instance get_MetadataToken() -> Int32
+.end
+.method instance GetTypes() -> System.Collections.Sequence<System.Introspection.TypeInfo>
+.end
+.property instance Name() -> String
+.get instance System.Introspection.ModuleInfo::get_Name()
+.end
+.property instance Assembly() -> System.Introspection.AssemblyInfo
+.get instance System.Introspection.ModuleInfo::get_Assembly()
+.end
+.property instance MetadataToken() -> Int32
+.get instance System.Introspection.ModuleInfo::get_MetadataToken()
+.end
+.end

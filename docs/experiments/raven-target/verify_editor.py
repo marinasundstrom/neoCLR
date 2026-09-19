@@ -498,15 +498,18 @@ try:
             'context': {'triggerKind': 2, 'triggerCharacter': '.'}}, True))
         items = result if isinstance(result, list) else result['items']
         kinds = {item['label']: item.get('kind') for item in items}
-        for name in ('TypeInfo', 'ParameterInfo', 'MemberInfo', 'FieldInfo', 'MethodInfo', 'PropertyInfo'):
+        for name in ('TypeInfo', 'ParameterInfo', 'MemberInfo', 'FieldInfo', 'MethodInfo', 'PropertyInfo', 'AssemblyInfo', 'ModuleInfo'):
             assert kinds.get(name) == 8, (name, kinds)  # LSP Interface
         assert not any(name.startswith('Runtime') for name in kinds), kinds
         results['Introspection interface kinds'] = kinds
         for version, access, required, forbidden in (
                 (81, 'System.', {'Runtime', 'Introspection'}, {'Type'}),
                 (82, 'System.Runtime.', {'RuntimeContext'}, set()),
-                (83, 'typeof(int).', {'Name', 'GetFields'}, {'Info'}),
-                (84, 'System.Runtime.RuntimeContext.Current.', {'GetTypeInfoFromHandle'}, set())):
+                (83, 'typeof(int).', {'Name', 'GetFields', 'MetadataToken', 'Module'}, {'Info'}),
+                (84, 'System.Runtime.RuntimeContext.Current.', {'GetTypeInfoFromHandle', 'ExecutingAssembly'}, set()),
+                (85, 'System.Runtime.RuntimeContext.Current.ExecutingAssembly.', {'ReferencedAssemblies', 'GetModules', 'GetTypes', 'MetadataToken'}, set()),
+                (86, 'System.Runtime.RuntimeContext.Current.ExecutingAssembly.ReferencedAssemblies.', {'Count'}, {'Length', 'Add'}),
+                (87, 'typeof(int).Module.', {'Assembly', 'MetadataToken', 'GetTypes'}, set())):
             text = f'func Main() {{\n    {access}\n}}'
             send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version},
                 'contentChanges': [{'text': text}]})

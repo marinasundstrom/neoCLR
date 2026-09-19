@@ -1,4 +1,4 @@
-//! Resolved closed signature keys, independent of an execution backend or layout.
+//! Resolved signature keys and descriptive generic definitions, independent of layout.
 use crate::{
     Fault, Module,
     metadata::{Type, TypeDefId},
@@ -7,6 +7,10 @@ use crate::{
 /// An identity within the resolved modules of one build, not a cross-build cache key.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TypeIdentity {
+    GenericParameter {
+        definition: TypeDefId,
+        index: u16,
+    },
     Definition {
         definition: TypeDefId,
         arguments: Vec<TypeIdentity>,
@@ -51,6 +55,10 @@ pub(crate) fn describe_loaded(module: &Module, normalized: &Type) -> Result<Type
             .ok_or_else(|| Fault::new("type has no metadata name"))?
             .to_owned(),
     };
+    let name = module
+        .type_definition(normalized)
+        .and_then(|d| d.origin.as_ref())
+        .map_or(name, |o| o.name.clone());
     let generic_arguments = match normalized {
         Type::ArrayRef(element) if module.type_definition(normalized).is_some() => {
             vec![describe_loaded(module, element)?]
@@ -170,4 +178,48 @@ fn reference_name(target: &Type, readonly: bool) -> Result<String, Fault> {
         "{}{name}&",
         if readonly { "readonly " } else { "" }
     ))
+}
+
+/// A definition snapshot can describe open generic metadata without making it an
+/// executable closed signature. Member substitution still requires closed types.
+pub(crate) fn describe_definition(
+    module: &Module,
+    definition: &crate::metadata::TypeDef,
+) -> Result<TypeDescriptor, Fault> {
+    if definition.generic_parameters.is_empty() {
+        return describe_loaded(module, &definition.open_type());
+    }
+    let id = definition
+        .definition
+        .clone()
+        .ok_or_else(|| Fault::new("missing type definition identity"))?;
+    let arguments = definition
+        .generic_parameters
+        .iter()
+        .enumerate()
+        .map(|(i, name)| {
+            Ok(TypeDescriptor {
+                identity: TypeIdentity::GenericParameter {
+                    definition: id.clone(),
+                    index: u16::try_from(i)
+                        .map_err(|_| Fault::new("generic parameter index overflow"))?,
+                },
+                name: name.clone().unwrap_or_else(|| format!("T{i}")),
+                generic_arguments: vec![],
+                declaring_type: None,
+            })
+        })
+        .collect::<Result<Vec<_>, Fault>>()?;
+    Ok(TypeDescriptor {
+        identity: TypeIdentity::Definition {
+            definition: id,
+            arguments: arguments.iter().map(|a| a.identity.clone()).collect(),
+        },
+        name: definition
+            .origin
+            .as_ref()
+            .map_or_else(|| definition.name.clone(), |o| o.name.clone()),
+        generic_arguments: arguments,
+        declaring_type: definition.declaring_type.clone(),
+    })
 }
