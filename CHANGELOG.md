@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Port the five Func declaration arities to Raven (69 source slices). Check exact
+  CLI runtime delegate metadata, generic positions and the complete family;
+  invocation and closure lifetime remain runtime-owned. Six admission checks,
+  28 delegate tests and the saved Raven delegate program pass.
+
 - Port System.Fault to Raven (68 source slices), preserving dynamic diagnostic text
   and terminal guest failure without aborting the host. Three admission cases and
   seven fault/query tests pass; a compiled Raven program verifies and raises the

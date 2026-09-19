@@ -1427,12 +1427,25 @@
     },
     {
       "file": "runtime/System/Func.neoil",
-      "declarations": 12,
+      "declarations": 2,
       "disposition": "delegates",
       "samples": [
         "library-delegates.rvn",
         "library-array-callbacks.rvn"
       ]
+    },
+    {
+      "file": "runtime/raven/generated/Func.methods.neoil",
+      "declarations": 10,
+      "disposition": "raven-authored-delegate-declarations",
+      "samples": [
+        "library-delegates.rvn"
+      ],
+      "tests": [
+        "tests/delegates.rs",
+        "docs/experiments/raven-target/verify_delegate_library.py"
+      ],
+      "note": "All five invariant Func arities are checked against CLI runtime delegate signatures; invocation and closure lifetime remain runtime-owned."
     },
     {
       "file": "runtime/System/Date.neoil",

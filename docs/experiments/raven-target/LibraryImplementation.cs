@@ -23,6 +23,7 @@ static class LibraryImplementation
         ReadonlyReceivers.Clear();
         if (owner != "System" && !Regex.IsMatch(owner, @"^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)+$"))
             throw new InvalidDataException("Invalid library owner.");
+        if (owner == "System.Func") return DelegateLibrary.Roots(source, core);
         if (owner == "System.Introspection.MemberInfo")
             return DescriptorLibrary.Roots(source, core, InstanceRoots);
         if (owner is "System.Option" or "System.Result")

@@ -48,6 +48,12 @@ for file in source['sourceFiles']:
                 raise ValueError('Service without a reviewed library caller: ' + name)
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'implementation-service', 'callers': callers})
         continue
+    if file.startswith('runtime/raven/generated/Func.'):
+        rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-delegate-declarations',
+                     'samples': ['library-delegates.rvn'],
+                     'tests': ['tests/delegates.rs', 'docs/experiments/raven-target/verify_delegate_library.py'],
+                     'note': 'All five invariant Func arities are checked against CLI runtime delegate signatures; invocation and closure lifetime remain runtime-owned.'})
+        continue
     if file.startswith('runtime/raven/generated/Fault.'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-terminal-namespace-function',
                      'tests': ['tests/system_fault.rs', 'docs/experiments/raven-target/verify_fault.py', 'docs/experiments/raven-target/verify_fault_library.py'],

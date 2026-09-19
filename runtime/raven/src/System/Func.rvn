@@ -1,0 +1,7 @@
+namespace System
+
+public delegate Func<TResult>() -> TResult
+public delegate Func<T1, TResult>(arg1: T1) -> TResult
+public delegate Func<T1, T2, TResult>(arg1: T1, arg2: T2) -> TResult
+public delegate Func<T1, T2, T3, TResult>(arg1: T1, arg2: T2, arg3: T3) -> TResult
+public delegate Func<T1, T2, T3, T4, TResult>(arg1: T1, arg2: T2, arg3: T3, arg4: T4) -> TResult

@@ -11,7 +11,7 @@ This slice adds Raven sources for the fundamental and collection interfaces,
 SystemClock, LocalDateTime, IntPtr/UIntPtr comparisons, the complete Int32 member
 surface, Console and Environment. File.ReadAllText joins WriteAllText in Raven.
 The follow-up ports String and opaque Error, then five empty error types and Void,
-followed by seven typed error carriers, and the Propagatable declaration, then Option/Result and their cases, then the inherited descriptor family and NativeMemory, then System.Fault, bringing the total to 68 slices.
+followed by seven typed error carriers, and the Propagatable declaration, then Option/Result and their cases, then the inherited descriptor family and NativeMemory, then System.Fault and Func declarations, bringing the total to 69 slices.
 The legacy Neo profile retains its receiver/array conventions where it differs;
 the Raven profile selects generated contracts and implementation bodies.
 
@@ -161,7 +161,7 @@ The remaining migration gates are substantive work, not just moving files:
 | Remaining source | Required implementation admission |
 | --- | --- |
 | BindingFlags and root/attribute markers | Checked enum/value representation and declaration metadata |
-| Array, iterator adapters and Func | Runtime-owned allocation/element access and delegate invocation boundaries |
+| Array and iterator adapters | Runtime-owned allocation/element access and delegate invocation boundaries |
 
 Complete those gates before calling the entire source port finished. Executable
 coverage of their existing neoIL implementations is necessary but does not establish
@@ -1073,3 +1073,11 @@ existing terminal guest failure service; it does not abort the embedding host.
 The no-result consumer signature and compiler control-flow treatment are unchanged.
 Three source admission cases, seven fault/query tests and a saved Raven Unicode
 failure program pass. Native failure semantics remain owned by the runtime.
+
+
+All five invariant Func delegate arities are declared in Raven. Admission checks
+ordinary CLI runtime constructor/Invoke metadata, exact generic positions and the
+complete arity family before emitting the existing delegate declarations. No CIL
+stub body is executed; invocation, captures and lifetime remain runtime-owned, as
+with CLR delegates. Consumer metadata and unit-result conventions are unchanged.
+Six admission checks, 28 delegate tests and the saved Raven delegate sample pass.

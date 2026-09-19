@@ -82,6 +82,11 @@ delegate and remaining intrinsic helpers are still open. The separate ordinary .
 constructor-arity correction is integrated on Raven main (`d7292b935`), rather than
 merging the neoCLR branch.
 
+**Trying the finished port.** The author asked to try the port in VS Code once it is
+finished. The assistant committed to completing migration and execution checks first,
+then preparing a workspace with the updated Raven compiler and neoCLR library.
+VS Code preparation is pending; no successful editor run is claimed yet.
+
 **String/Error slice.** Raven sources now own both method surfaces, with explicit
 importer checks for intrinsic storage, mixed String receivers and opaque Error
 receivers. Native ownership and the existing parameter metadata remain unchanged.

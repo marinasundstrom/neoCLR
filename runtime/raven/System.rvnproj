@@ -203,4 +203,7 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Fault'">
     <Compile Include="src/System/Functions.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Func'">
+    <Compile Include="src/System/Func.rvn" />
+  </ItemGroup>
 </Project>

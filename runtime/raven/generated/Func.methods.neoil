@@ -1,0 +1,21 @@
+; Generated from runtime/raven/src/System/Func.rvn. Regenerate with build_runtime_library.py.
+.delegate System.Func<T0>
+.method instance Invoke() -> T0
+.end
+.end
+.delegate System.Func<T0,T1>
+.method instance Invoke(T0 arg1) -> T1
+.end
+.end
+.delegate System.Func<T0,T1,T2>
+.method instance Invoke(T0 arg1,T1 arg2) -> T2
+.end
+.end
+.delegate System.Func<T0,T1,T2,T3>
+.method instance Invoke(T0 arg1,T1 arg2,T2 arg3) -> T3
+.end
+.end
+.delegate System.Func<T0,T1,T2,T3,T4>
+.method instance Invoke(T0 arg1,T1 arg2,T2 arg3,T3 arg4) -> T4
+.end
+.end

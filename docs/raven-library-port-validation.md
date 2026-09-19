@@ -79,6 +79,14 @@ fault/query tests pass. A newly compiled Raven program imports and verifies,
 then faults with its exact Unicode diagnostic. Native guest-failure semantics and
 host survival remain unchanged. Source/API audits and snapshot hashes match.
 
+## Delegate declaration follow-up
+
+Func brings the source total to 69 slices. Six admission cases reject missing/extra
+arities, altered return/input positions and ordinary classes posing as delegates.
+All 28 delegate/nominal-delegate tests pass. The saved Raven delegate sample compiles,
+imports, verifies and executes all five arities, a Void callback and collection
+callbacks with expected output. Snapshot hashes and source/API audits match.
+
 ## Reproduce the program gate
 
 Use the neoCLR feature compiler, built from the Raven repository's

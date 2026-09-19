@@ -10,6 +10,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    'Func': 'System.Func',
     'Fault': 'System',
     'NativeMemory': 'System.Runtime.InteropServices.NativeMemory',
     'Descriptors': 'System.Introspection.MemberInfo',
@@ -83,6 +84,7 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    'Func': 'runtime/raven/src/System/Func.rvn',
     'Fault': 'runtime/raven/src/System/Functions.rvn',
     'NativeMemory': 'runtime/raven/src/System/Runtime/InteropServices/NativeMemory/Functions.rvn',
     'Descriptors': 'runtime/raven/src/System/Introspection/Descriptors.rvn',
@@ -168,11 +170,11 @@ def fragments(text, name="Math", owner="System.Math"):
         if not lines[0].strip():
             lines.pop(0)
             continue
-        if lines[0].startswith(('.type ', '.interface ')):
+        if lines[0].startswith(('.type ', '.interface ', '.delegate ')):
             depth = 0
             for index, line in enumerate(lines):
                 token = line.strip().split(' ', 1)[0]
-                if token in ('.type', '.interface', '.method', '.property'):
+                if token in ('.type', '.interface', '.delegate', '.method', '.property'):
                     depth += 1
                 elif token == '.end':
                     depth -= 1
@@ -181,7 +183,7 @@ def fragments(text, name="Math", owner="System.Math"):
             else:
                 raise ValueError('Unclosed private implementation type')
             body = ''.join(lines[:index + 1])
-            if lines[0].startswith(('.type class ' + owner + '<', '.type ' + owner + '<', '.interface ' + owner + '<')) or lines[0].strip() in ('.type ' + owner, '.interface ' + owner):
+            if lines[0].startswith(('.delegate ' + owner + '<', '.type class ' + owner + '<', '.type ' + owner + '<', '.interface ' + owner + '<')) or lines[0].strip() in ('.type ' + owner, '.interface ' + owner):
                 methods.append(body)
             else:
                 types.append(body)
