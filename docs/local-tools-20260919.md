@@ -60,3 +60,26 @@ The saved project builds, imports, verifies and runs on neoCLR; the matching
 language server passes the target completion checks, including absence of the
 removed surrogate predicates. The tools are local development artifacts, not a
 new public SDK release. Scalar String access remains unimplemented.
+
+## Grapheme text snapshot
+
+The fresh workspace at
+`/Users/robert/.neoclr/experiments/grapheme-text-20260919/demo` supersedes the
+scalar-Char snapshot for current text work. Earlier workspaces remain intact.
+Open it using the same experimental VS Code profile above, save Main.rvn and run
+**Tasks: Run Build Task → neoCLR: Run saved project**.
+
+[Main's source](experiments/raven-target/samples/library-grapheme-strings.rvn)
+counts 4 graphemes, 12 scalars and 37 UTF-8 bytes in one string. It also exercises
+literals, matching, interface iteration, arrays, fields, copying and NUL defaults.
+The copied toolchain builds/runs it with the checked-in expected output, and 20
+completion sections pass against the copied language server/reference metadata.
+
+Char is no longer numeric. The workspace uses RavenGraphemeChar with matching
+compiler, reference core, System.Runtime library, importer and runtime. Its parent
+manifest records source revisions and binary hashes. Iteration currently allocates
+snapshots; integer string indexing, normalization and specialized encoding string
+types remain deferred. See [the text contract](design/text-abstraction.md).
+
+.NET is required by the tooling and language server, not neoCLR or its guest
+programs. This is a machine-local development snapshot, not a published SDK/VSIX.

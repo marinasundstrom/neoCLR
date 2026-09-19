@@ -19,6 +19,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   saved-project programs, signatures and editor contract. The earlier scalar-Char
   slice below is superseded.
   Independently fixed Raven expression-bodied indexer emission remains on main.
+  Refresh the String feature/proposals pages with tested grapheme samples, costs and
+  future encoding-specific types. Prepare a separate local VS Code snapshot; its
+  expanded saved program and 20 editor completion sections pass.
 
 - Route homepage sample boxes to feature pages and add a Raven language page with
   source-backed examples, explicit mutability and patterns, target distinctions and

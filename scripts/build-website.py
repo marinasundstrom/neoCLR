@@ -103,6 +103,8 @@ def main():
         'QUERY_SAMPLE': (raven + 'library-query-terminals.rvn', 'func OnlyPositive', '\n}', True),
     }
     samples.update({
+        'GRAPHEME_COUNTS': (raven + 'library-grapheme-strings.rvn', '    let text =', '    ShowCharacters(text)', False),
+        'GRAPHEME_ITERATION': (raven + 'library-grapheme-strings.rvn', 'func ShowCharacters', '\n}', True),
         'UTF8_ROUNDTRIP': (raven + 'library-utf8.rvn', 'func RoundTrip', '\n}', True),
     })
     tour = raven + 'library-introspection-tour.rvn'
@@ -118,7 +120,7 @@ def main():
     output_text = escape((ROOT / (raven + 'library-introspection-tour.expected.txt')).read_text().rstrip())
     downloads = OUTPUT / 'samples'
     downloads.mkdir()
-    for name in ('library-introspection-tour.rvn', 'library-introspection-tour.expected.txt', 'library-utf8.rvn', 'library-utf8.expected.txt', 'library-instants.rvn', 'library-propagation.rvn', 'library-collection-capabilities.rvn', 'library-files.rvn', 'library-scalar-char.rvn'):
+    for name in ('library-introspection-tour.rvn', 'library-introspection-tour.expected.txt', 'library-utf8.rvn', 'library-utf8.expected.txt', 'library-instants.rvn', 'library-propagation.rvn', 'library-collection-capabilities.rvn', 'library-files.rvn', 'library-grapheme-strings.rvn', 'library-grapheme-strings.expected.txt'):
         shutil.copyfile(ROOT / raven / name, downloads / name)
     pages = {}
     for source in sorted(SOURCE.rglob('*.html')):
