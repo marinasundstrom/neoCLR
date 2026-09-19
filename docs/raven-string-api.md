@@ -11,7 +11,7 @@ Implemented 2026-09-13. The Raven target projects these existing runtime APIs:
 | `text.StartsWithOrdinal(value)` | Boolean |
 | `text.EndsWithOrdinal(value)` | Boolean |
 | `text.GetUtf8ByteCount()` | Int32 byte count |
-| `text.IsEmpty()` | Boolean |
+| `text.IsEmpty` | Boolean |
 | `text.SliceUtf8(byteStart, byteLength)` | Result<String, Utf8SliceError> |
 
 The [String sample](experiments/raven-target/samples/library-strings.rvn) demonstrates
@@ -26,7 +26,7 @@ uses `?` and typed Result matches to handle successful byte-range copies, OutOfR
 and InvalidBoundary. Empty ranges are accepted only at code-point boundaries,
 including the end of the string. Range validation precedes boundary validation.
 
-All nine currently declared String methods are now projected. The error carrier
+All nine currently declared String members are now projected. The error carrier
 exposes IsOutOfRange and IsInvalidBoundary; [case constructors, checked accessors
 and ToString](raven-error-api.md) are also projected. Broader inherited/interface API coverage
 is still tracked separately. Inherited metadata such as Object.ToString can appear in
@@ -91,3 +91,48 @@ No SDK/VSIX was rebuilt for this slice. The installed experimental language serv
 was tested with fresh declarations; the saved-project runner still uses the source
 bridge. See [the coverage plan](raven-runtime-api-coverage.md) for remaining APIs and
 [the release procedure](experiments/raven-target/RELEASING.md) for packaging.
+
+## Strict UTF-8 conversion (2026-09-19)
+
+`System.Text.Utf8.Encode(string)` returns `Sequence<byte>`.
+`Utf8.Decode(Sequence<byte>)` returns `Result<string, InvalidUtf8Error>`.
+Use ordinary `match` patterns or `?` to extract or propagate a result; see the
+[executable UTF-8 sample](experiments/raven-target/samples/library-utf8.rvn).
+Malformed input is a typed error, with no replacement characters. Empty input is
+valid. Encoding adds no BOM; decoding preserves a present BOM as U+FEFF. NUL and
+normalization forms are preserved. `InvalidUtf8Error` currently carries no offset.
+
+The encoder returns a detached byte snapshot through the read-only Sequence
+contract. The decoder snapshots indexed input and produces an independent String;
+changing the source array afterwards cannot change the decoded text. This contract
+does not promise zero-copy conversion or deep immutability of collection providers.
+A null receiver/input, allocation limit or uninitialized byte is a runtime fault,
+not an invalid-UTF-8 result. Native services require StringOperations and ManagedArrays.
+
+The Raven implementation owns collection traversal and typed Result construction.
+Two narrow native services copy UTF-8 bytes and validate them with Rust's strict
+UTF-8 decoder. They introduce no new opcode or compiler keyword. The reference
+catalog projects the exact signatures; System.Void/unit runtime configuration is
+unchanged. Regenerate the reference core and selected System library together.
+`IsEmpty()` has been replaced by the `IsEmpty` property: rebuild callers using
+`text.IsEmpty`. No specialized Utf8String, Encoding hierarchy, lossy decoder or
+scalar Char redesign is included.
+
+### Comparison and provisional choices
+
+.NET's [UTF8Encoding constructor](https://learn.microsoft.com/en-us/dotnet/api/system.text.utf8encoding.-ctor?view=net-10.0)
+allows strict decoding via `throwOnInvalidBytes`; its default replaces invalid
+input. This preview chooses a strict typed Result so boundary failures must be
+handled without exceptions or silent replacement. Unlike .NET byte-array APIs,
+Sequence exposes the collection contract while leaving provider choices open.
+The costs are snapshot allocations and a less detailed error. Streaming, offset
+reporting, UTF-16 interchange and broader encoding policy remain future work.
+The underlying validator follows [Rust's UTF-8 validity rules](https://doc.rust-lang.org/std/str/fn.from_utf8.html).
+Sources reviewed 2026-09-19. Existing UTF-16 ordinal comparison and code-unit Char
+semantics remain unchanged; UTF-8 storage does not make Char a Unicode scalar.
+
+Validation: the UTF-8 sample and three existing String samples pass alongside 23
+saved-project edit/rejection checks. Three UTF-8 runtime tests and thirteen existing
+String/disposal tests pass. The signature probe, String/Utf8 editor completion,
+source ownership (850 declarations, 69 services) and clean bootstrap regeneration
+also pass. The public error remains intentionally minimal pending usage feedback.

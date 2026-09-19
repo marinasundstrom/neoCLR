@@ -227,4 +227,10 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'ModuleInfo'">
     <Compile Include="src/System/Introspection/ModuleInfo.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Utf8'">
+    <Compile Include="src/System/Text/Utf8.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'InvalidUtf8Error'">
+    <Compile Include="src/System/Text/InvalidUtf8Error.rvn" />
+  </ItemGroup>
 </Project>

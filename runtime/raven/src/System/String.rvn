@@ -37,9 +37,7 @@ public class String : Equatable<string> {
         return RuntimeServices.StringByteCount(m_value)
     }
 
-    func IsEmpty() -> bool {
-        return RuntimeServices.StringEquals(m_value, "")
-    }
+    val IsEmpty: bool => RuntimeServices.StringEquals(m_value, "")
 
     func SliceUtf8(value0: int, value1: int) -> Result<string, Utf8SliceError> {
         let payload = RuntimeServices.StringSliceUtf8(m_value, value0, value1)

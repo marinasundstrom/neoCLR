@@ -1,0 +1,27 @@
+namespace System.Text
+
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Runtime.CompilerServices.*
+
+public static class Utf8 {
+    static func Encode(text: string) -> Sequence<byte> {
+        return RuntimeServices.Utf8Encode(text)
+    }
+
+    static func Decode(bytes: Sequence<byte>) -> Result<string, InvalidUtf8Error> {
+        let count = bytes.Count
+        let snapshot = CheckedStorage.Reserve<byte>(count)
+        var index = 0
+        while index < count {
+            snapshot[index] = bytes[index]
+            index += 1
+        }
+        let payload = RuntimeServices.Utf8Decode(snapshot)
+        if RuntimeServices.IsValue<string>(payload) {
+            return Ok(RuntimeServices.UnpackValue<string>(payload))
+        }
+        return Result<string, InvalidUtf8Error>.Error(InvalidUtf8Error())
+    }
+}

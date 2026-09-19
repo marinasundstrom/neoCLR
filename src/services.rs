@@ -84,7 +84,9 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             crate::native::Binding::Int32ToString => RuntimeService::FormatInt32,
             crate::native::Binding::WriteLine => RuntimeService::ConsoleOutput,
             crate::native::Binding::CharCategory => RuntimeService::CharacterClassification,
-            crate::native::Binding::StringConcat
+            crate::native::Binding::Utf8Encode
+            | crate::native::Binding::Utf8Decode
+            | crate::native::Binding::StringConcat
             | crate::native::Binding::StringCompareOrdinal
             | crate::native::Binding::StringContainsOrdinal
             | crate::native::Binding::StringStartsWithOrdinal
@@ -98,7 +100,10 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
         }];
         if matches!(
             crate::native::bind(function)?,
-            crate::native::Binding::UnixTimeToLocal | crate::native::Binding::EnvironmentArguments
+            crate::native::Binding::UnixTimeToLocal
+                | crate::native::Binding::EnvironmentArguments
+                | crate::native::Binding::Utf8Encode
+                | crate::native::Binding::Utf8Decode
         ) {
             uses.push(ServiceUse {
                 service: RuntimeService::ManagedArrays,

@@ -9,6 +9,7 @@ static class ErrorBindings
         ["System.IO.FileReadError"] = ["InvalidLimit", "InvalidPath", "NotFound", "AccessDenied", "NotRegularFile", "TooLarge", "ReadFailed", "InvalidUtf8"],
         ["System.IO.FileWriteError"] = ["InvalidLimit", "InvalidPath", "NotFound", "AccessDenied", "NotRegularFile", "TooLarge", "WriteFailed"],
         ["System.IO.ConsoleReadError"] = ["Unavailable", "ReadFailed"],
+        ["System.Text.InvalidUtf8Error"] = [],
         ["System.Text.Utf8SliceError"] = ["OutOfRange", "InvalidBoundary"],
         ["System.Int32ParseError"] = ["InvalidFormat", "Overflow"],
         ["System.Linq.SingleError"] = ["Empty", "Multiple"],

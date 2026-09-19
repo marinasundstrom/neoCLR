@@ -80,7 +80,7 @@ fn equality_is_ordinal_and_empty_is_not_absence() {
         .resolve_function(&parse_function_ref("EqualText(String,String)").unwrap())
         .unwrap();
     let empty = program
-        .resolve_function(&parse_function_ref("instance System.String::IsEmpty()").unwrap())
+        .resolve_function(&parse_function_ref("instance System.String::get_IsEmpty()").unwrap())
         .unwrap();
     for (left, right, expected) in [
         ("🌍", "🌍", true),

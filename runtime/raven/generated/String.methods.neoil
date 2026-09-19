@@ -1,6 +1,9 @@
 ; Generated from runtime/raven/src/System/String.rvn. Regenerate with build_runtime_library.py.
 .type System.String
 .implements System.Equatable<String>
+.property instance IsEmpty() -> Boolean
+.get instance System.String::get_IsEmpty()
+.end
 .method static Concat(String left,String right) -> String
 M00000001_IL_0000:
 M00000001_IL_0001:
@@ -100,7 +103,7 @@ call neoCLR.Runtime.StringByteCount(String)
 M00000007_IL_000d:
 ret
 .end
-.method instance IsEmpty() -> Boolean
+.method instance get_IsEmpty() -> Boolean
 M00000008_IL_0000:
 M00000008_IL_0001:
 M00000008_IL_0002:

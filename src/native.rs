@@ -26,6 +26,8 @@ pub(crate) enum Binding {
     WriteLine,
     Fault,
     CharCategory,
+    Utf8Encode,
+    Utf8Decode,
     StringConcat,
     StringByteCount,
     StringCompareOrdinal,
@@ -115,6 +117,12 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         ("neoCLR.Runtime.Fault", [Type::String]) => (Binding::Fault, Type::Void),
         ("neoCLR.Runtime.WriteLine", [Type::String]) => (Binding::WriteLine, Type::Void),
         ("neoCLR.Runtime.CharCategory", [Type::Char]) => (Binding::CharCategory, Type::Int32),
+        ("neoCLR.Runtime.Utf8Encode", [Type::String]) => {
+            (Binding::Utf8Encode, Type::Array(Box::new(Type::Byte)))
+        }
+        ("neoCLR.Runtime.Utf8Decode", [Type::ArrayRef(element)]) if **element == Type::Byte => {
+            (Binding::Utf8Decode, Type::Value)
+        }
         ("neoCLR.Runtime.StringConcat", [Type::String, Type::String]) => {
             (Binding::StringConcat, Type::String)
         }
@@ -337,6 +345,33 @@ impl Binding {
                 let ranges = crate::char_categories::RANGES;
                 let index = ranges.partition_point(|(end, _)| end < value);
                 Ok(Value::Int32(i32::from(ranges[index].1)))
+            }
+            (Self::Utf8Encode, [Value::String(text)]) => {
+                crate::reflection::array("Byte", text.bytes().map(|b| Ok(Value::Byte(b))), limits)
+            }
+            (Self::Utf8Decode, [Value::ObjectReference(bytes)]) => {
+                let Value::Array {
+                    element: Type::Byte,
+                    elements,
+                } = bytes.reference.read()?
+                else {
+                    return Err(Fault::new("UTF-8 decoding requires a byte array"));
+                };
+                let mut buffer = Vec::new();
+                buffer
+                    .try_reserve_exact(elements.len())
+                    .map_err(|_| Fault::new("UTF-8 decoding allocation failed"))?;
+                for value in elements {
+                    let Value::Byte(byte) = value else {
+                        return Err(Fault::new("UTF-8 decoding requires initialized bytes"));
+                    };
+                    buffer.push(byte);
+                }
+                let payload = match String::from_utf8(buffer) {
+                    Ok(text) => Value::String(text),
+                    Err(_) => Value::Byte(1),
+                };
+                Ok(Value::Erased(Box::new(payload)))
             }
             (Self::StringConcat, [Value::String(left), Value::String(right)]) => {
                 let length = left

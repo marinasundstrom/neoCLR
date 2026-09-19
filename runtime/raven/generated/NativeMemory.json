@@ -26,7 +26,9 @@
     "runtime/raven/src/System/OverflowError.rvn": "eaa0f653ef045d8c0898baa8006d9dec11a676fa814bbe79ae277909ed6f46a8",
     "runtime/raven/src/System/EnvironmentError.rvn": "08d7ca88cd6395e47a000c413b910c7c61b501417c9827dda7ef40b63b5c11f4",
     "runtime/raven/src/System/Void.rvn": "cec6e383555235c0144b80860e7e384061f3a74d26e8b74178f1547d2bd12e75",
-    "runtime/raven/src/System/String.rvn": "7fb0faa111f58beb947644a37fa4b5294e342ccd58ae8a38f5d23a4256550e30",
+    "runtime/raven/src/System/String.rvn": "3283f4c6d53bc1807868291dce123500108a22a334b1449b7952777e51d634f4",
+    "runtime/raven/src/System/Text/Utf8.rvn": "fee5b25307e2b88264ef99c57f93874cf2525d69b4592611e34c57230a165e54",
+    "runtime/raven/src/System/Text/InvalidUtf8Error.rvn": "5c03b55b9af6557e60123e50600e5b968a7b0020bd5bdb2fba9d355d90391d91",
     "runtime/raven/src/System/Error.rvn": "13f262a47cbc613cc6bbff140ab2484a8ac4cd49fadeff977a4efdf4c0442558",
     "runtime/raven/src/System/Environment/Functions.rvn": "39d1fa62dcdbed3275d991716fc784ff07d617e1531a4e94becf73ba6c16157d",
     "runtime/raven/src/System/Console/Functions.rvn": "a79cf673a2f56304f99b7fe1e17e2369faa0c26629052b77391f698d716ece0c",
@@ -76,7 +78,7 @@
     "runtime/raven/src/System/Single.rvn": "488efaf36e56f147c7158a5b0637f3bc4e56e84bb3f514af6c64a023dcd8598e",
     "runtime/raven/src/System/Double.rvn": "cd3ad24e4a21b7616a2937da71891618284913e26ea180ce203276f18b631f33",
     "runtime/raven/src/System/Boolean.rvn": "1f0010fe0d346fbc7f3ba29c88b2c1cf80faebf42a4c2de2f0cd6cff15335022",
-    "runtime/raven/System.Runtime.rvnproj": "80d6c62214baac0292c3ea4248894751b27165b80d8d57fae977300791b0b383",
+    "runtime/raven/System.Runtime.rvnproj": "9f815c5ba56c044f039c77808128fd88fbcce808638783cb198779c602d4432e",
     "build/NeoCLR.Raven.props": "777b7b3296746094aee7c159fd33bd0b262a7493be4647f7f3a04b988544c385"
   },
   "outputs": {
@@ -84,7 +86,7 @@
     "NativeMemory.helpers.neoil": "f119c6eebbb06eddf0be6ee3c74d17622ff5b8fe69255f0b5fd6c47ef176fe23"
   },
   "compilerSha256": "f933e9f722ca86a60dc110532c9d7191ae20251d614930348bf2ef04e5ab252d",
-  "coreSha256": "b23a6b609fd774f4b5ac8f7c5a2d8e22ac58d607bf20f541f6f995e8947852fd",
+  "coreSha256": "7b0e051eb758e133efbe63777412bd86ae45afc06f94bf43e268515fbb2623d1",
   "exports": [
     "Alloc(UIntPtr byteCount) -> Void*",
     "Alloc(UIntPtr elementCount,UIntPtr elementSize) -> Void*",

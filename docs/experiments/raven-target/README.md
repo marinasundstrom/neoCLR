@@ -646,3 +646,12 @@ constructor), the source metadata's parameter-token list includes a zero entry
 for its explicit receiver. The receiver has no CLI Param row. Ordinary declared
 parameter tokens retain their positions after that synthetic slot. This prevents
 valid source programs from failing metadata admission after receiver lowering.
+
+### Minimal UTF-8 API (2026-09-19)
+
+The selected System.Runtime adds Utf8.Encode(String) → Sequence<Byte> and
+Utf8.Decode(Sequence<Byte>) → Result<String,InvalidUtf8Error>. The bridge checks
+exact static signatures and supplies managed-array adapters for the two native
+services. String.IsEmpty is now a property. Runtime Contract configuration remains
+unit/() → System.Void; no Raven compiler changes are required. Rebuild reference
+metadata and generated runtime together. See [contracts, comparison and limitations](../../raven-string-api.md#strict-utf-8-conversion-2026-09-19).

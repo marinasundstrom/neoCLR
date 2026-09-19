@@ -4247,3 +4247,15 @@ changes are part of this slice.
 - **Assistant:** retained Raven's existing keyword and target configuration; no
   keyword compiler change was made. Updated the conventions while preserving the
   earlier suggestion and correction in this record. String work remains next.
+
+## 2026-09-19 — Minimal String boundary API
+
+The author asked to continue with strings after the introspection and idiomatic
+Raven cleanup, leaving the feature page for the following slice. When asked whether
+to start with strict UTF-8 conversion while retaining String/Char semantics, the
+author replied, “Do what you believe benefits us right now”. The assistant chose
+System.Text.Utf8 with Sequence<byte> and a typed invalid-input Result, preserving
+Char's code-unit behavior and deferring Encoding and specialized Utf8String types.
+The implementation and tradeoffs are recorded in [the String integration notes](raven-string-api.md).
+The author's last source-keyword correction remains unit mapped to System.Void;
+this slice makes no keyword change. A String feature page follows separately.

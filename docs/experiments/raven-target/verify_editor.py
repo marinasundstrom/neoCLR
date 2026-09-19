@@ -156,7 +156,8 @@ try:
         for version, access, prefix, expected, forbidden in (
             (11, 'text.', '    let text = "hello"\n',
              ('Equals', 'ContainsOrdinal', 'StartsWithOrdinal', 'EndsWithOrdinal', 'GetUtf8ByteCount', 'IsEmpty', 'SliceUtf8'), ('Substring', 'Contains')),
-            (12, 'System.String.', '', ('Concat', 'CompareOrdinal'), ('IsNullOrEmpty', 'Join', 'Format'))):
+            (12, 'System.String.', '', ('Concat', 'CompareOrdinal'), ('IsNullOrEmpty', 'Join', 'Format')),
+            (13, 'System.Text.Utf8.', '', ('Encode', 'Decode'), ())):
             text = 'import System.*\nfunc Main() {\n' + prefix + '    ' + access + '\n}'
             send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})
             result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
@@ -167,6 +168,8 @@ try:
                 raise AssertionError('Missing target String API: ' + str(labels))
             if any(label == name or label.startswith(name + '(') for label in labels for name in forbidden):
                 raise AssertionError('Host String API leaked: ' + str(labels))
+            if access == 'text.' and not any(item['label'] == 'IsEmpty' and item.get('kind') == 10 for item in items):
+                raise AssertionError('IsEmpty must be a property')
             results[access] = labels
     if parsing:
         access = 'System.Int32.'

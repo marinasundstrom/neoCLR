@@ -36,6 +36,8 @@ SLICES = {
     'Void': 'System.Void',
 
     'String': 'System.String',
+    'Utf8': 'System.Text.Utf8',
+    'InvalidUtf8Error': 'System.Text.InvalidUtf8Error',
     'Error': 'System.Error',
     'Environment': 'System.Environment',
     'Console': 'System.Console',
@@ -116,6 +118,8 @@ SOURCES = {
     'Void': 'runtime/raven/src/System/Void.rvn',
 
     'String': 'runtime/raven/src/System/String.rvn',
+    'Utf8': 'runtime/raven/src/System/Text/Utf8.rvn',
+    'InvalidUtf8Error': 'runtime/raven/src/System/Text/InvalidUtf8Error.rvn',
     'Error': 'runtime/raven/src/System/Error.rvn',
     'Environment': 'runtime/raven/src/System/Environment/Functions.rvn',
     'Console': 'runtime/raven/src/System/Console/Functions.rvn',

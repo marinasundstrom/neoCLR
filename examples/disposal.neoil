@@ -52,7 +52,7 @@
         brtrue Disposed
         ldloc state
         ldfld Draft::Text
-        call instance System.String::IsEmpty()
+        call instance System.String::get_IsEmpty()
         brtrue Empty
         ldarg this
         ldloc state

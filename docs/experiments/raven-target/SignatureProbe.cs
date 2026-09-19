@@ -150,6 +150,18 @@ static class SignatureProbe
         var wrongStringArgument = Reference(concat, stringType);
         wrongStringArgument.Parameters[0].ParameterType = module.TypeSystem.Int32;
         Reject("String argument mismatch", () => StringBindings.Bind(wrongStringArgument, concat, false));
+        Check("String IsEmpty property", stringType.Properties.Any(p => p.Name == "IsEmpty" && p.GetMethod.Name == "get_IsEmpty"));
+        var utf8Type = module.GetType(Utf8Bindings.Owner);
+        foreach (var method in utf8Type.Methods.Where(m => m.Name is "Encode" or "Decode"))
+        {
+            Check("Utf8 " + method.Name, Utf8Bindings.Bind(Reference(method, utf8Type), method)?.Name == Utf8Bindings.Owner + "::" + method.Name);
+            var wrong = Reference(method, utf8Type);
+            wrong.Parameters[0].ParameterType = module.TypeSystem.Int32;
+            Reject("Utf8 invalid " + method.Name + " argument", () => Utf8Bindings.Bind(wrong, method));
+            wrong = Reference(method, utf8Type);
+            wrong.HasThis = true;
+            Reject("Utf8 instance " + method.Name, () => Utf8Bindings.Bind(wrong, method));
+        }
         var pathType = module.GetType("System.IO.Path");
         var combine = pathType.Methods.Single(m => m.Name == "Combine");
         var pathCall = Reference(combine, pathType);

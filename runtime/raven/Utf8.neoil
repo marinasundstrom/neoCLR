@@ -1,0 +1,4 @@
+.type System.Text.Utf8
+.include "generated/Utf8.methods.neoil"
+.end
+.include "generated/Utf8.helpers.neoil"

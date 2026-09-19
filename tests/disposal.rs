@@ -57,7 +57,7 @@ fn repeated_disposal_updates_only_the_explicitly_borrowed_value() {
         bne.un Invalid
         ldloc copied
         ldfld Draft::Text
-        call instance System.String::IsEmpty()
+        call instance System.String::get_IsEmpty()
         brfalse Invalid
         ldloc original
         ret

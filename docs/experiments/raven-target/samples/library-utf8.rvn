@@ -1,0 +1,50 @@
+import System.*
+import System.Text.*
+import System.Collections.*
+import System.Console.*
+
+func RoundTrip(text: string) {
+    let bytes: Sequence<byte> = Utf8.Encode(text)
+    match Utf8.Decode(bytes) {
+        .Ok(let decoded) => {
+            if decoded.Equals(text) {
+                WriteLine("Round trip")
+            }
+        }
+        .Error(let error) => WriteLine(error.ToString())
+    }
+}
+
+func Reject(bytes: byte[]) {
+    match Utf8.Decode(bytes) {
+        .Ok(let text) => WriteLine("Unexpected text")
+        .Error(let error) => WriteLine(error.ToString())
+    }
+}
+
+func Main() {
+    RoundTrip("")
+    RoundTrip("ASCII")
+    RoundTrip("café 🌍")
+    RoundTrip("a\u0000b")
+    RoundTrip("é")
+    RoundTrip("\uFEFFtext")
+    let encoded = Utf8.Encode("Aé🌍")
+    WriteLine(encoded.Count)
+    if encoded[0] == (byte)65 {
+        WriteLine("No preamble")
+    }
+    let source: byte[] = [(byte)65, (byte)66]
+    let result = Utf8.Decode(source)
+    source[0] = (byte)90
+    match result {
+        .Ok(let text) => WriteLine(text)
+        .Error(let error) => WriteLine(error.ToString())
+    }
+    Reject([(byte)128])
+    Reject([(byte)192, (byte)128])
+    Reject([(byte)237, (byte)160, (byte)128])
+    Reject([(byte)244, (byte)144, (byte)128, (byte)128])
+    Reject([(byte)240, (byte)159, (byte)140])
+    Reject([(byte)226, (byte)40, (byte)161])
+}

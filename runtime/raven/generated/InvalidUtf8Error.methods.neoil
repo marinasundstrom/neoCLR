@@ -1,0 +1,21 @@
+; Generated from runtime/raven/src/System/Text/InvalidUtf8Error.rvn. Regenerate with build_runtime_library.py.
+.type System.Text.InvalidUtf8Error
+.method instance ToString() -> String
+M00000001_IL_0000:
+M00000001_IL_0001:
+M00000001_IL_0002:
+ldstr "InvalidUtf8"
+M00000001_IL_0007:
+ret
+.end
+.method instance .ctor() -> Void
+M00000002_IL_0000:
+M00000002_IL_0001:
+ldarg 0
+M00000002_IL_0002:
+pop
+M00000002_IL_0007:
+ldvoid
+ret
+.end
+.end

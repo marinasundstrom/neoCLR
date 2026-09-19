@@ -22,6 +22,8 @@ static class RuntimeServiceBindings
             ("StringContainsOrdinal", ["String", "String"], "Boolean"),
             ("StringStartsWithOrdinal", ["String", "String"], "Boolean"),
             ("StringEndsWithOrdinal", ["String", "String"], "Boolean"),
+            ("Utf8Encode", ["String"], "arrayref<Byte>"),
+            ("Utf8Decode", ["arrayref<Byte>"], "Value"),
             ("StringByteCount", ["String"], "Int32"),
             ("StringSliceUtf8", ["String", "Int32", "Int32"], "Value"),
             ("ErrorFromMessage", ["String"], "System.Error"),
@@ -68,7 +70,7 @@ static class RuntimeServiceBindings
             ("TypeEnumUnderlying", ["System.RuntimeTypeHandle"], "System.Introspection.TypeInfo")
         }).ToArray();
     static string CSharp(string type) => type switch {
-        "Double" => "double", "String" => "string", "Int32" => "int", "Char" => "char",
+        "Byte" => "byte", "Double" => "double", "String" => "string", "Int32" => "int", "Char" => "char",
         "Boolean" => "bool", "Int64" => "long", "Value" => "System.Value", "noresult" => "void",
         "IntPtr" => "System.IntPtr", "UIntPtr" => "System.UIntPtr", "UInt64" => "ulong",
         _ when type.StartsWith("System.") => type,
@@ -89,7 +91,7 @@ static class RuntimeServiceBindings
             throw new InvalidDataException("Unsupported runtime service call.");
         var (args, result) = RuntimeSignatures.Match(reference, definition,
             t => t.FullName == "System.Object" && (t.MetadataType == MetadataType.Object || RuntimeSignatures.IsCore(t.Scope) || ApplicationTypes.IsLibrary(t)) ? "System.Object" : t is ArrayType { IsVector: true, ElementType.MetadataType: MetadataType.Int32 } ? "arrayref<Int32>"
-                : ReflectionBindings.Type(t) ?? ProcessBindings.ArrayType(t) ?? GenericUnionBindings.Type(t));
+                : ManagedArrayBindings.Type(t) ?? ReflectionBindings.Type(t) ?? ProcessBindings.ArrayType(t) ?? GenericUnionBindings.Type(t));
         if (!Members.Any(m => m.Name == reference.Name && m.Args.SequenceEqual(args) && m.Result == result))
             throw new InvalidDataException("Unsupported runtime service signature: " + reference.FullName);
         if (reference.Name == "StringEquals")

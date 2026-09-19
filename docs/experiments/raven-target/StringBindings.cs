@@ -14,12 +14,12 @@ static class StringBindings
         new("StartsWithOrdinal", ["String"], "Boolean", true, true),
         new("EndsWithOrdinal", ["String"], "Boolean", true, true),
         new("GetUtf8ByteCount", [], "Int32", true),
-        new("IsEmpty", [], "Boolean", true),
+        new("get_IsEmpty", [], "Boolean", true),
         new("SliceUtf8", ["Int32", "Int32"], ResultBindings.Slice, true)
     ];
     static string CSharp(string type) => type switch { "String" => "string", "Int32" => "int", "Boolean" => "bool", ResultBindings.Slice => "Result<string, Text.Utf8SliceError>", _ => throw new InvalidDataException(type) };
     public static string Declarations(bool results) => "public sealed class String { " + string.Join(" ", Members.Where(m => results || m.Result != ResultBindings.Slice).Select(m =>
-        m.Name is "op_Equality" or "op_Inequality"
+        m.Name == "get_IsEmpty" ? "public bool IsEmpty => default;" : m.Name is "op_Equality" or "op_Inequality"
             ? $"public static bool operator {(m.Name == "op_Equality" ? "==" : "!=")}(string left, string right) => default;"
             : $"public {(m.Instance ? "" : "static ")}{CSharp(m.Result)} {m.Name}({string.Join(',', m.Parameters.Select((p, i) => CSharp(p) + " value" + i))}) => default;")) + " }";
     public sealed record Binding(string[] Arguments, string Result, string Instruction);

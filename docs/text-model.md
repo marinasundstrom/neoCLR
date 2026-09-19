@@ -48,7 +48,7 @@ methods. The current methods are compiled by the same assembler as application c
 | --- | --- |
 | static Concat(String left, String right) -> String | Produce an owned concatenation, preserving all text including embedded NUL |
 | instance Equals(String other) -> Boolean | Exact ordinal equality; no culture, case folding, or normalization |
-| instance IsEmpty() -> Boolean | True only for the valid empty String |
+| instance IsEmpty: Boolean | True only for the valid empty String |
 | instance GetUtf8ByteCount() -> Int32 | Count encoded UTF-8 bytes, not UTF-16 units, scalars, or graphemes |
 | instance SliceUtf8(Int32 byteStart, Int32 byteLength) -> System.Result<String,System.Text.Utf8SliceError> | Copy a valid UTF-8 byte range into an owned String |
 
@@ -254,3 +254,5 @@ validate malformed/truncated input, unpaired UTF-16 surrogates, embedded NUL, AS
 narrowing, generic constraints, reflection, native interop and allocation behavior.
 Do not silently reinterpret existing String offsets or claim that the Raven-shaped
 examples in this proposal are currently valid Raven source.
+
+Strict byte conversion is now available through [System.Text.Utf8](raven-string-api.md#strict-utf-8-conversion-2026-09-19); broader text-model proposals above remain provisional.

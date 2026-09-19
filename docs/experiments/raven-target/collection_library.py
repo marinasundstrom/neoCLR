@@ -84,6 +84,9 @@ def build(path: Path) -> str:
         result += build(ROOT / 'runtime/raven/SingleError.neoil')
         result += build(ROOT / 'runtime/raven/Linq.neoil')
         result += build(ROOT / 'runtime/raven/Map.neoil')
+        result += build(ROOT / 'runtime/raven/Utf8.neoil')
+        result += build(ROOT / 'runtime/raven/InvalidUtf8Error.neoil')
+        result += build(ROOT / 'runtime/neoCLR/Runtime/Utf8.neoil')
     return result
 
 

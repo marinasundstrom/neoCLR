@@ -1,0 +1,6 @@
+.function neoCLR.Runtime.Utf8Encode(String text) -> Byte[]
+    .methodimpl InternalCall
+.end
+.function neoCLR.Runtime.Utf8Decode(arrayref<Byte> bytes) -> Value
+    .methodimpl InternalCall
+.end

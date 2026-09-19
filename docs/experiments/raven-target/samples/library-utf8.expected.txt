@@ -1,0 +1,15 @@
+Round trip
+Round trip
+Round trip
+Round trip
+Round trip
+Round trip
+7
+No preamble
+AB
+InvalidUtf8
+InvalidUtf8
+InvalidUtf8
+InvalidUtf8
+InvalidUtf8
+InvalidUtf8

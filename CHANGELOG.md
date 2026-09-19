@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Add System.Text.Utf8.Encode(String) → Sequence<Byte> and strict
+  Decode(Sequence<Byte>) → Result<String,InvalidUtf8Error>. Preserve BOM, NUL and
+  normalization forms; reject malformed UTF-8 without replacement. Conversion
+  snapshots bytes; no Encoding framework or Utf8String is introduced. Change
+  String.IsEmpty() to the IsEmpty property; rebuild callers and target metadata.
+  Retain Char semantics and UTF-16 ordinal ordering. Add executable boundary,
+  allocation-limit, service-dependency, signature and editor checks. Four String
+  sample programs, 23 edit/rejection checks and 16 runtime tests pass; clean
+  bootstrap regeneration reproduces all 76 implementation slices.
+
 - Clarify the final source-spelling decision: retain Raven's unit keyword and ()
   value mapped to neoCLR System.Void for now. Supersede the earlier suggested void
   keyword in the conventions guide; no compiler or runtime behavior changes.

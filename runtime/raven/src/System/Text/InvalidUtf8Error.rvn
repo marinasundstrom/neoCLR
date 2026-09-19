@@ -1,0 +1,5 @@
+namespace System.Text
+
+public struct InvalidUtf8Error {
+    func ToString() -> string => "InvalidUtf8"
+}
