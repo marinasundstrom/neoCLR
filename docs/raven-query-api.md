@@ -7,6 +7,14 @@ methods over `System.Collections.Iterable<T>` and, after Preview 5, vector array
 | --- | --- | --- |
 | `Filter<T>(Iterable<T>, Func<T, bool>)` | `Iterable<T>` | Predicate runs while advancing an iterator |
 | `Map<T, U>(Iterable<T>, Func<T, U>)` | `Iterable<U>` | Selector runs once per produced element |
+| `Any<T>(Iterable<T>)` / `Any<T>(Iterable<T>, Func<T, bool>)` | `bool` | Stops at the first element / first match |
+| `All<T>(Iterable<T>, Func<T, bool>)` | `bool` | Stops at the first failure; true for empty input |
+| `Count<T>(Iterable<T>)` / `Count<T>(Iterable<T>, Func<T, bool>)` | `int` | Counts elements / matching elements |
+| `Fold<T, U>(Iterable<T>, U, Func<U, T, U>)` | `U` | Left-to-right accumulation, beginning with the seed |
+| `Take<T>(Iterable<T>, int)` | `Iterable<T>` | Lazy prefix, without advancing past its bound |
+| `Skip<T>(Iterable<T>, int)` | `Iterable<T>` | Lazy suffix after skipping a prefix |
+| `Concat<T>(Iterable<T>, Iterable<T>)` | `Iterable<T>` | Lazy first sequence followed by second |
+| `FlatMap<T, U>(Iterable<T>, Func<T, Iterable<U>>)` | `Iterable<U>` | Lazy projection and ordered flattening |
 | `ToList<T>(Iterable<T>)` | `ArrayList<T>` | Consumes the sequence immediately into a new list |
 | `First<T>(Iterable<T>)` | `Option<T>` | Reads at most the first element |
 | `Last<T>(Iterable<T>)` | `Option<T>` | Consumes the sequence, retaining the last element |
@@ -31,8 +39,8 @@ Namespace `System.Linq` and the remaining operator names stay the same.
 This follows [the naming principle](api-policy.md#query-operator-naming-direction-2026-09-19):
 prefer terminology shared across modern languages, retaining .NET names where already
 conventional or clearer. The rename preserves laziness, order, callback counts,
-materialization and disposal. `FlatMap` is preferred for future flattening; it is not
-implemented. Fold/Reduce and Drop/Skip remain semantic decisions, not automatic renames.
+materialization and disposal. `FlatMap` and seeded `Fold` are added by the subsequent basic-operator slice below.
+`Skip` keeps its conventional name. These are semantic choices, not automatic renames.
 
 The [small executable example](experiments/raven-target/samples/library-query-names.rvn)
 filters `[1, 2, 3]`, maps the remaining values and prints `10`, then `30`.
@@ -123,7 +131,7 @@ would simplify iterator state but change callback timing and require intermediat
 storage, so it was not selected.
 
 This is a bounded API, not complete LINQ compatibility. There are no indexed overloads,
-query-expression syntax guarantees, ordering/grouping, SelectMany, providers,
+query-expression syntax guarantees, ordering/grouping, indexed or result-selector FlatMap overloads, providers,
 expression trees or async queries. Source
 mutation during an active enumeration follows the existing source iterator contract;
 ArrayList currently retains a buffer and extent, without .NET List's mutation-version
@@ -403,3 +411,114 @@ changes record refreshed source, compiler and core hashes.
 The website builds ten pages, passes its three link/build checks and tokenizer check,
 and presents the same executable sample used by the query suite. Published Preview 8
 notes and artifacts remain unchanged; its API still uses Where and Select.
+
+## Basic operators before Task contracts — 2026-09-19
+
+The development API adds Any, All, Count, seeded Fold, Take, Skip, Concat and FlatMap.
+These additions are not in published Preview 8. Rebuild source and target references
+with the matching development System library. The
+[basic sample](experiments/raven-target/samples/library-query-basics.rvn) demonstrates
+paging, tests, counting, accumulation and flattening in one runnable program.
+
+### Contract
+
+Any without a predicate advances once and never reads Current. Any with a predicate
+and All short-circuit. Empty Any is false; empty All is true. Count traverses the
+source, without reading Current unless it has a predicate. It returns an Int32 and
+faults rather than wrapping if a matching count would exceed 2,147,483,647. There is
+no collection-count shortcut: callback and traversal behavior remains predictable.
+Use a Sequence's Count property when an already available count is what is wanted.
+
+Fold takes an explicit seed and an accumulator `(state, element) -> state`. It runs
+left to right, returns the seed unchanged for empty input, and can have different
+input and state types. There is no seedless Reduce overload or numeric aggregation
+family in this slice. Every terminal disposes its iterator on normal outcomes,
+including short-circuiting. Fault unwinding remains unsupported.
+
+Take, Skip, Concat and FlatMap are lazy, preserve order and create independent state
+on each enumeration. Unlike the earlier Filter/Map wrappers, they defer acquisition
+of the upstream iterator until the first MoveNext that needs it. Take with a zero or
+negative count returns no elements and never acquires its source. Skip with a zero
+or negative count skips nothing. A larger bound simply exhausts the source. Take
+never advances beyond its limit; Skip does not read Current for skipped positions.
+
+Concat acquires the second iterator only after disposing the exhausted first one.
+FlatMap invokes its selector once for each visited outer element, consumes each
+inner sequence in order, and handles empty children. It holds at most one active
+inner iterator. Exhausted children are disposed before advancing the outer source;
+early explicit disposal closes both active inner and outer iterators. Consumers
+stopping early must still dispose their iterator, as with the existing query API.
+
+New iterators cache each yielded value, reject Current before a successful advance
+or after exhaustion/disposal, remain exhausted after completion, and make explicit
+Dispose idempotent. They use checked storage for optional cursors and cached values,
+which costs small arrays per iterator and per cursor transition. No allocation or
+performance advantage over .NET is claimed; fusion and storage optimization remain
+future work. Invalid callbacks and disposal faults remain terminal runtime faults.
+
+### Comparison and rationale
+
+Primary sources reviewed 2026-09-19: current .NET implementation of
+[Any/All](https://source.dot.net/System.Linq/System/Linq/AnyAll.cs.html),
+[Count](https://source.dot.net/System.Linq/System/Linq/Count.cs.html),
+[Take](https://source.dot.net/System.Linq/System/Linq/Take.cs.html), and
+[Aggregate](https://source.dot.net/System.Linq/System/Linq/Aggregate.cs.html), plus
+[Rust 1.98.1 Iterator](https://doc.rust-lang.org/std/iter/trait.Iterator.html).
+These are implemented APIs, not proposals. This is a library-only slice: there is no
+new runtime instruction, Task machinery or Raven compiler policy.
+
+The quantifier results, short-circuiting, bounded prefix behavior and seeded
+accumulation retain familiar .NET semantics. .NET additionally has collection/span
+fast paths, exception-based validation and exception-safe disposal; neoCLR's bounded
+implementation does not claim those guarantees. Counting overflow faults in neoCLR,
+where .NET uses OverflowException. Eager materialization was rejected because it
+would consume more input and change callback timing, especially for short-circuiting.
+
+Rust separates a seeded fold from a seedless reduce returning Option. The author
+selected Fold specifically for the seeded contract: the name communicates an explicit
+initial state and avoids conflating empty-input rules. The cost is migration from
+.NET's Aggregate spelling. Skip is already shared terminology, so changing it to
+Drop would add churn without a clearer contract. FlatMap names projection plus
+flattening directly; it uses a reusable Iterable result rather than Rust's consuming
+iterator/ownership model. The current bridge requires that result type in the
+selector contract; a helper returning Iterable<U> gives inference a clear target.
+
+No new alternative .NET framework is needed for these ordinary library operations;
+the existing API review remains applicable. Ordering, grouping, equality-sensitive
+set operators, Zip, seedless reduction and specialized numeric aggregation remain
+separate decisions. Task/async contracts follow this bounded basic set.
+
+## .NET operator mapping
+
+This table describes the development API after Preview 8, not binary compatibility.
+Only the listed overloads are admitted. Namespace System.Linq stays familiar.
+
+| .NET Enumerable | neoCLR Operators | Meaning / difference |
+| --- | --- | --- |
+| `Where(predicate)` | `Filter(predicate)` | Lazy filtering. |
+| `Select(selector)` | `Map(selector)` | Lazy projection. |
+| `SelectMany(selector)` | `FlatMap(selector)` | Lazy flattening; no indexed or result-selector overloads. |
+| `Any(), Any(predicate)` | `Any(), Any(predicate)` | False for empty input; short-circuits. |
+| `All(predicate)` | `All(predicate)` | True for empty input; short-circuits. |
+| `Count(), Count(predicate)` | `Count(), Count(predicate)` | Int32 result; overflow is a runtime fault, not OverflowException. |
+| `Aggregate(seed, accumulator)` | `Fold(seed, accumulator)` | Left-to-right, seeded accumulation; empty input returns the seed. |
+| `Take(count), Skip(count)` | `Take(count), Skip(count)` | Lazy prefix/suffix; non-positive bounds follow .NET behavior. |
+| `Concat(second)` | `Concat(second)` | Lazy concatenation in source order. |
+| `ToList()` | `ToList()` | Materializes an ArrayList rather than a .NET List. |
+| `First(), First(predicate)` | `First(), First(predicate)` | Returns Option; empty/no match is None rather than an exception. |
+| `Last(), Last(predicate)` | `Last(), Last(predicate)` | Returns Option; empty/no match is None rather than an exception. |
+| `Single(), Single(predicate)` | `Single(), Single(predicate)` | Returns Result with distinct Empty/Multiple errors. |
+| `FirstOrDefault / LastOrDefault / SingleOrDefault` | `No direct equivalent` | Use the Option/Result outcome and an explicit fallback. |
+| `Aggregate without a seed, Sum, Average, Min, Max` | `Not yet implemented` | Seeded Fold can express basic accumulation. |
+| `OrderBy, ThenBy, GroupBy, Join, Distinct, Union, Intersect, Except, Zip` | `Not yet implemented` | Ordering, equality and pairing contracts remain future work. |
+
+### Validation of the basic set
+
+The basic slice passed 58 query outcomes (including all new iterator Current-state
+fault checks), 174 signature checks, 86 editor sections, 5 normal compiler-path
+checks and 24 focused runtime tests. All 77 Raven library slices reproduced exactly
+with the released .15 compiler. The standalone compiler also builds and executes
+the basic website sample with its exact expected output. Tests cover empty inputs,
+non-positive and excessive bounds, callback counts, nested and early disposal,
+re-enumeration, reference payloads and folds with different state/element types.
+The Int32 overflow guard is reviewed but a 2-billion-element stress run is not claimed.

@@ -23,58 +23,45 @@ newobj instance neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E71
 M00000002_IL_0009:
 ret
 .end
-.method static ToList<T0>(System.Collections.Iterable<T0> source) -> System.Collections.ArrayList<T0>
-.local System.Collections.ArrayList<T0> local0
-.local T0 local1
-.local System.Collections.Iterator<T0> local2
-.local T0 local3
+.method static Any<T0>(System.Collections.Iterable<T0> source) -> Boolean
+.local System.Collections.Iterator<T0> local0
+.local Boolean local1
 ldloca local0
-initobj System.Collections.ArrayList<T0>
-ldloca local2
 initobj System.Collections.Iterator<T0>
+ldc.bool false
+stloc local1
 M00000003_IL_0000:
 M00000003_IL_0001:
-newobj instance System.Collections.ArrayList<T0>::.ctor()
-M00000003_IL_0006:
-stloc local0
-M00000003_IL_0007:
-M00000003_IL_0008:
+M00000003_IL_0002:
 ldarg 0
-M00000003_IL_0009:
+M00000003_IL_0003:
 callvirt instance System.Collections.Iterable<T0>::GetIterator()
-M00000003_IL_000e:
-stloc local2
-M00000003_IL_000f:
-ldloc local2
-M00000003_IL_0010:
+M00000003_IL_0008:
+stloc local0
+M00000003_IL_0009:
+M00000003_IL_000a:
+ldloc local0
+M00000003_IL_000b:
 callvirt instance System.Collections.Iterator<T0>::MoveNext()
 call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
-M00000003_IL_0015:
-brfalse M00000003_IL_002e
+M00000003_IL_0010:
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanFromInt32(Int32)
+stloc local1
+M00000003_IL_0011:
+M00000003_IL_0012:
+ldloc local0
+M00000003_IL_0013:
+callvirt instance System.Disposable::Dispose()
+M00000003_IL_0018:
+M00000003_IL_0019:
+ldloc local1
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
 M00000003_IL_001a:
-ldloc local2
-M00000003_IL_001b:
-callvirt instance System.Collections.Iterator<T0>::get_Current()
-M00000003_IL_0020:
-stloc local3
-M00000003_IL_0021:
-M00000003_IL_0022:
-ldloc local0
-M00000003_IL_0023:
-ldloc local3
-M00000003_IL_0024:
-callvirt instance System.Collections.ArrayList<T0>::Add(T0)
-M00000003_IL_0029:
-br M00000003_IL_000f
-M00000003_IL_002e:
-M00000003_IL_002f:
-ldloc local0
-M00000003_IL_0030:
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method static First<T0>(System.Collections.Iterable<T0> source) -> System.Option<T0>
+.method static Any<T0>(System.Collections.Iterable<T0> source,System.Func<T0,Boolean> predicate) -> Boolean
 .local System.Collections.Iterator<T0> local0
-.local T0 local1
 ldloca local0
 initobj System.Collections.Iterator<T0>
 M00000004_IL_0000:
@@ -87,51 +74,58 @@ M00000004_IL_0008:
 stloc local0
 M00000004_IL_0009:
 M00000004_IL_000a:
-ldloc local0
 M00000004_IL_000b:
+ldloc local0
+M00000004_IL_000c:
 callvirt instance System.Collections.Iterator<T0>::MoveNext()
 call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
-M00000004_IL_0010:
-brtrue M00000004_IL_001a
-M00000004_IL_0015:
-br M00000004_IL_0036
-M00000004_IL_001a:
+M00000004_IL_0011:
+brtrue M00000004_IL_001b
+M00000004_IL_0016:
+br M00000004_IL_0042
 M00000004_IL_001b:
-ldloc local0
 M00000004_IL_001c:
+ldarg 1
+M00000004_IL_001d:
+ldloc local0
+M00000004_IL_001e:
 callvirt instance System.Collections.Iterator<T0>::get_Current()
-M00000004_IL_0021:
-stloc local1
-M00000004_IL_0022:
 M00000004_IL_0023:
+callvirt instance System.Func<T0,Boolean>::Invoke(T0)
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
+M00000004_IL_0028:
+brtrue M00000004_IL_0032
+M00000004_IL_002d:
+br M00000004_IL_003c
+M00000004_IL_0032:
+M00000004_IL_0033:
 ldloc local0
-M00000004_IL_0024:
+M00000004_IL_0034:
 callvirt instance System.Disposable::Dispose()
-M00000004_IL_0029:
-M00000004_IL_002a:
-ldloc local1
-M00000004_IL_002b:
-call neoCLR.Library.System.Linq.Operators.RuntimeUnion2<T0>(T0)
-M00000004_IL_0030:
-call neoCLR.Library.System.Linq.Operators.RuntimeUnion3<T0>(System.Option.Some<T0>)
-M00000004_IL_0035:
-ret
-M00000004_IL_0036:
-M00000004_IL_0037:
-M00000004_IL_0038:
-ldloc local0
 M00000004_IL_0039:
-callvirt instance System.Disposable::Dispose()
-M00000004_IL_003e:
-call neoCLR.Library.System.Linq.Operators.RuntimeUnion0()
+M00000004_IL_003a:
+ldc.i4 1
+M00000004_IL_003b:
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanFromInt32(Int32)
+ret
+M00000004_IL_003c:
+M00000004_IL_003d:
+br M00000004_IL_000a
+M00000004_IL_0042:
 M00000004_IL_0043:
-call neoCLR.Library.System.Linq.Operators.RuntimeUnion1<T0>(System.Option.None)
-M00000004_IL_0048:
+M00000004_IL_0044:
+ldloc local0
+M00000004_IL_0045:
+callvirt instance System.Disposable::Dispose()
+M00000004_IL_004a:
+M00000004_IL_004b:
+ldc.i4 0
+M00000004_IL_004c:
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method static Last<T0>(System.Collections.Iterable<T0> source) -> System.Option<T0>
+.method static All<T0>(System.Collections.Iterable<T0> source,System.Func<T0,Boolean> predicate) -> Boolean
 .local System.Collections.Iterator<T0> local0
-.local T0 local1
 ldloca local0
 initobj System.Collections.Iterator<T0>
 M00000005_IL_0000:
@@ -144,82 +138,68 @@ M00000005_IL_0008:
 stloc local0
 M00000005_IL_0009:
 M00000005_IL_000a:
-ldloc local0
 M00000005_IL_000b:
+ldloc local0
+M00000005_IL_000c:
 callvirt instance System.Collections.Iterator<T0>::MoveNext()
 call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
-M00000005_IL_0010:
-ldc.i4 0
 M00000005_IL_0011:
+brtrue M00000005_IL_001b
+M00000005_IL_0016:
+br M00000005_IL_0045
+M00000005_IL_001b:
+M00000005_IL_001c:
+ldarg 1
+M00000005_IL_001d:
+ldloc local0
+M00000005_IL_001e:
+callvirt instance System.Collections.Iterator<T0>::get_Current()
+M00000005_IL_0023:
+callvirt instance System.Func<T0,Boolean>::Invoke(T0)
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_0028:
+ldc.i4 0
+M00000005_IL_0029:
 ceq
 call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
-M00000005_IL_0013:
-brtrue M00000005_IL_001d
-M00000005_IL_0018:
-br M00000005_IL_002f
-M00000005_IL_001d:
-M00000005_IL_001e:
-ldloc local0
-M00000005_IL_001f:
-callvirt instance System.Disposable::Dispose()
-M00000005_IL_0024:
-call neoCLR.Library.System.Linq.Operators.RuntimeUnion0()
-M00000005_IL_0029:
-call neoCLR.Library.System.Linq.Operators.RuntimeUnion1<T0>(System.Option.None)
-M00000005_IL_002e:
-ret
-M00000005_IL_002f:
+M00000005_IL_002b:
+brtrue M00000005_IL_0035
 M00000005_IL_0030:
-M00000005_IL_0031:
+br M00000005_IL_003f
+M00000005_IL_0035:
+M00000005_IL_0036:
 ldloc local0
-M00000005_IL_0032:
-callvirt instance System.Collections.Iterator<T0>::get_Current()
 M00000005_IL_0037:
-stloc local1
-M00000005_IL_0038:
-M00000005_IL_0039:
-M00000005_IL_003a:
-ldloc local0
-M00000005_IL_003b:
-callvirt instance System.Collections.Iterator<T0>::MoveNext()
-call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
-M00000005_IL_0040:
-brtrue M00000005_IL_004a
-M00000005_IL_0045:
-br M00000005_IL_0057
-M00000005_IL_004a:
-M00000005_IL_004b:
-ldloc local0
-M00000005_IL_004c:
-callvirt instance System.Collections.Iterator<T0>::get_Current()
-M00000005_IL_0051:
-stloc local1
-M00000005_IL_0052:
-br M00000005_IL_0039
-M00000005_IL_0057:
-M00000005_IL_0058:
-M00000005_IL_0059:
-ldloc local0
-M00000005_IL_005a:
 callvirt instance System.Disposable::Dispose()
-M00000005_IL_005f:
-M00000005_IL_0060:
-ldloc local1
-M00000005_IL_0061:
-call neoCLR.Library.System.Linq.Operators.RuntimeUnion2<T0>(T0)
-M00000005_IL_0066:
-call neoCLR.Library.System.Linq.Operators.RuntimeUnion3<T0>(System.Option.Some<T0>)
-M00000005_IL_006b:
+M00000005_IL_003c:
+M00000005_IL_003d:
+ldc.i4 0
+M00000005_IL_003e:
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanFromInt32(Int32)
+ret
+M00000005_IL_003f:
+M00000005_IL_0040:
+br M00000005_IL_000a
+M00000005_IL_0045:
+M00000005_IL_0046:
+M00000005_IL_0047:
+ldloc local0
+M00000005_IL_0048:
+callvirt instance System.Disposable::Dispose()
+M00000005_IL_004d:
+M00000005_IL_004e:
+ldc.i4 1
+M00000005_IL_004f:
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method static Single<T0>(System.Collections.Iterable<T0> source) -> System.Result<T0,System.Linq.SingleError>
+.method static Count<T0>(System.Collections.Iterable<T0> source) -> Int32
 .local System.Collections.Iterator<T0> local0
-.local T0 local1
-.local Boolean local2
+.local Int32 local1
 ldloca local0
 initobj System.Collections.Iterator<T0>
-ldc.bool false
-stloc local2
+ldc.i4 0
+stloc local1
 M00000006_IL_0000:
 M00000006_IL_0001:
 M00000006_IL_0002:
@@ -230,90 +210,73 @@ M00000006_IL_0008:
 stloc local0
 M00000006_IL_0009:
 M00000006_IL_000a:
-ldloc local0
+ldc.i4 0
 M00000006_IL_000b:
+stloc local1
+M00000006_IL_000c:
+M00000006_IL_000d:
+M00000006_IL_000e:
+ldloc local0
+M00000006_IL_000f:
 callvirt instance System.Collections.Iterator<T0>::MoveNext()
 call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
-M00000006_IL_0010:
-ldc.i4 0
-M00000006_IL_0011:
+M00000006_IL_0014:
+brtrue M00000006_IL_001e
+M00000006_IL_0019:
+br M00000006_IL_004e
+M00000006_IL_001e:
+M00000006_IL_001f:
+ldloc local1
+M00000006_IL_0020:
+ldc.i4 2147483647
+M00000006_IL_0025:
 ceq
 call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
-M00000006_IL_0013:
-brtrue M00000006_IL_001d
-M00000006_IL_0018:
-br M00000006_IL_0039
-M00000006_IL_001d:
-M00000006_IL_001e:
+M00000006_IL_0027:
+brtrue M00000006_IL_0031
+M00000006_IL_002c:
+br M00000006_IL_0043
+M00000006_IL_0031:
+M00000006_IL_0032:
 ldloc local0
-M00000006_IL_001f:
-callvirt instance System.Disposable::Dispose()
-M00000006_IL_0024:
-call neoCLR.Library.System.Linq.Operators.RuntimeErrorSystemLinqSingleErrorEmptyNew()
-M00000006_IL_0029:
-call neoCLR.Library.System.Linq.Operators.RuntimeErrorSystemLinqSingleErrorNewSystemLinqSingleErrorEmpty(System.Linq.SingleError.Empty)
-M00000006_IL_002e:
-call neoCLR.Library.System.Linq.Operators.RuntimeUnion4(System.Linq.SingleError)
 M00000006_IL_0033:
-call neoCLR.Library.System.Linq.Operators.RuntimeUnion5<T0>(System.Result.Error<System.Linq.SingleError>)
-M00000006_IL_0038:
-ret
-M00000006_IL_0039:
-M00000006_IL_003a:
-M00000006_IL_003b:
-ldloc local0
-M00000006_IL_003c:
-callvirt instance System.Collections.Iterator<T0>::get_Current()
-M00000006_IL_0041:
-stloc local1
-M00000006_IL_0042:
-M00000006_IL_0043:
-ldloc local0
-M00000006_IL_0044:
-callvirt instance System.Collections.Iterator<T0>::MoveNext()
-call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
-M00000006_IL_0049:
-call neoCLR.Library.System.Linq.Operators.RuntimeBooleanFromInt32(Int32)
-stloc local2
-M00000006_IL_004a:
-M00000006_IL_004b:
-ldloc local0
-M00000006_IL_004c:
 callvirt instance System.Disposable::Dispose()
-M00000006_IL_0051:
-M00000006_IL_0052:
-ldloc local2
-call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
-M00000006_IL_0053:
-brtrue M00000006_IL_005d
-M00000006_IL_0058:
-br M00000006_IL_0072
-M00000006_IL_005d:
-call neoCLR.Library.System.Linq.Operators.RuntimeErrorSystemLinqSingleErrorMultipleNew()
-M00000006_IL_0062:
-call neoCLR.Library.System.Linq.Operators.RuntimeErrorSystemLinqSingleErrorNewSystemLinqSingleErrorMultiple(System.Linq.SingleError.Multiple)
-M00000006_IL_0067:
-call neoCLR.Library.System.Linq.Operators.RuntimeUnion4(System.Linq.SingleError)
-M00000006_IL_006c:
-call neoCLR.Library.System.Linq.Operators.RuntimeUnion5<T0>(System.Result.Error<System.Linq.SingleError>)
-M00000006_IL_0071:
-ret
-M00000006_IL_0072:
-M00000006_IL_0073:
-M00000006_IL_0074:
+M00000006_IL_0038:
+M00000006_IL_0039:
+ldstr "Query count exceeds Int32 capacity"
+M00000006_IL_003e:
+call System.Fault(String)
+M00000006_IL_0043:
+M00000006_IL_0044:
+M00000006_IL_0045:
 ldloc local1
-M00000006_IL_0075:
-call neoCLR.Library.System.Linq.Operators.RuntimeUnion6<T0>(T0)
-M00000006_IL_007a:
-call neoCLR.Library.System.Linq.Operators.RuntimeUnion7<T0>(System.Result.Ok<T0>)
-M00000006_IL_007f:
+M00000006_IL_0046:
+ldc.i4 1
+M00000006_IL_0047:
+add
+M00000006_IL_0048:
+stloc local1
+M00000006_IL_0049:
+br M00000006_IL_000d
+M00000006_IL_004e:
+M00000006_IL_004f:
+M00000006_IL_0050:
+ldloc local0
+M00000006_IL_0051:
+callvirt instance System.Disposable::Dispose()
+M00000006_IL_0056:
+M00000006_IL_0057:
+ldloc local1
+M00000006_IL_0058:
 ret
 .end
-.method static First<T0>(System.Collections.Iterable<T0> source,System.Func<T0,Boolean> predicate) -> System.Option<T0>
+.method static Count<T0>(System.Collections.Iterable<T0> source,System.Func<T0,Boolean> predicate) -> Int32
 .local System.Collections.Iterator<T0> local0
-.local T0 local1
+.local Int32 local1
 ldloca local0
 initobj System.Collections.Iterator<T0>
+ldc.i4 0
+stloc local1
 M00000007_IL_0000:
 M00000007_IL_0001:
 M00000007_IL_0002:
@@ -324,68 +287,84 @@ M00000007_IL_0008:
 stloc local0
 M00000007_IL_0009:
 M00000007_IL_000a:
+ldc.i4 0
 M00000007_IL_000b:
-ldloc local0
+stloc local1
 M00000007_IL_000c:
+M00000007_IL_000d:
+M00000007_IL_000e:
+ldloc local0
+M00000007_IL_000f:
 callvirt instance System.Collections.Iterator<T0>::MoveNext()
 call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
-M00000007_IL_0011:
-brtrue M00000007_IL_001b
-M00000007_IL_0016:
-br M00000007_IL_004f
-M00000007_IL_001b:
-M00000007_IL_001c:
-ldloc local0
-M00000007_IL_001d:
-callvirt instance System.Collections.Iterator<T0>::get_Current()
-M00000007_IL_0022:
-stloc local1
-M00000007_IL_0023:
-M00000007_IL_0024:
+M00000007_IL_0014:
+brtrue M00000007_IL_001e
+M00000007_IL_0019:
+br M00000007_IL_0066
+M00000007_IL_001e:
+M00000007_IL_001f:
 ldarg 1
-M00000007_IL_0025:
-ldloc local1
+M00000007_IL_0020:
+ldloc local0
+M00000007_IL_0021:
+callvirt instance System.Collections.Iterator<T0>::get_Current()
 M00000007_IL_0026:
 callvirt instance System.Func<T0,Boolean>::Invoke(T0)
 call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
 M00000007_IL_002b:
 brtrue M00000007_IL_0035
 M00000007_IL_0030:
-br M00000007_IL_0049
+br M00000007_IL_0060
 M00000007_IL_0035:
 M00000007_IL_0036:
-ldloc local0
-M00000007_IL_0037:
-callvirt instance System.Disposable::Dispose()
-M00000007_IL_003c:
-M00000007_IL_003d:
 ldloc local1
+M00000007_IL_0037:
+ldc.i4 2147483647
+M00000007_IL_003c:
+ceq
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
 M00000007_IL_003e:
-call neoCLR.Library.System.Linq.Operators.RuntimeUnion2<T0>(T0)
+brtrue M00000007_IL_0048
 M00000007_IL_0043:
-call neoCLR.Library.System.Linq.Operators.RuntimeUnion3<T0>(System.Option.Some<T0>)
+br M00000007_IL_005a
 M00000007_IL_0048:
-ret
 M00000007_IL_0049:
+ldloc local0
 M00000007_IL_004a:
-br M00000007_IL_000a
+callvirt instance System.Disposable::Dispose()
 M00000007_IL_004f:
 M00000007_IL_0050:
-M00000007_IL_0051:
-ldloc local0
-M00000007_IL_0052:
-callvirt instance System.Disposable::Dispose()
-M00000007_IL_0057:
-call neoCLR.Library.System.Linq.Operators.RuntimeUnion0()
+ldstr "Query count exceeds Int32 capacity"
+M00000007_IL_0055:
+call System.Fault(String)
+M00000007_IL_005a:
+M00000007_IL_005b:
 M00000007_IL_005c:
-call neoCLR.Library.System.Linq.Operators.RuntimeUnion1<T0>(System.Option.None)
+ldloc local1
+M00000007_IL_005d:
+ldc.i4 1
+M00000007_IL_005e:
+add
+M00000007_IL_005f:
+stloc local1
+M00000007_IL_0060:
 M00000007_IL_0061:
+br M00000007_IL_000d
+M00000007_IL_0066:
+M00000007_IL_0067:
+M00000007_IL_0068:
+ldloc local0
+M00000007_IL_0069:
+callvirt instance System.Disposable::Dispose()
+M00000007_IL_006e:
+M00000007_IL_006f:
+ldloc local1
+M00000007_IL_0070:
 ret
 .end
-.method static Last<T0>(System.Collections.Iterable<T0> source,System.Func<T0,Boolean> predicate) -> System.Option<T0>
+.method static Fold<T0,T1>(System.Collections.Iterable<T0> source,T1 seed,System.Func<T1,T0,T1> accumulator) -> T1
 .local System.Collections.Iterator<T0> local0
-.local T0 local1
-.local T0 local2
+.local T1 local1
 ldloca local0
 initobj System.Collections.Iterator<T0>
 M00000008_IL_0000:
@@ -398,101 +377,565 @@ M00000008_IL_0008:
 stloc local0
 M00000008_IL_0009:
 M00000008_IL_000a:
+ldarg 1
 M00000008_IL_000b:
-ldloc local0
+stloc local1
 M00000008_IL_000c:
+M00000008_IL_000d:
+M00000008_IL_000e:
+ldloc local0
+M00000008_IL_000f:
 callvirt instance System.Collections.Iterator<T0>::MoveNext()
 call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
-M00000008_IL_0011:
-brtrue M00000008_IL_001b
-M00000008_IL_0016:
-br M00000008_IL_0085
-M00000008_IL_001b:
-M00000008_IL_001c:
+M00000008_IL_0014:
+brtrue M00000008_IL_001e
+M00000008_IL_0019:
+br M00000008_IL_0032
+M00000008_IL_001e:
+M00000008_IL_001f:
+ldarg 2
+M00000008_IL_0020:
+ldloc local1
+M00000008_IL_0021:
 ldloc local0
-M00000008_IL_001d:
-callvirt instance System.Collections.Iterator<T0>::get_Current()
 M00000008_IL_0022:
+callvirt instance System.Collections.Iterator<T0>::get_Current()
+M00000008_IL_0027:
+callvirt instance System.Func<T1,T0,T1>::Invoke(T1,T0)
+M00000008_IL_002c:
 stloc local1
-M00000008_IL_0023:
-M00000008_IL_0024:
-ldarg 1
-M00000008_IL_0025:
-ldloc local1
-M00000008_IL_0026:
-callvirt instance System.Func<T0,Boolean>::Invoke(T0)
-call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
-M00000008_IL_002b:
-brtrue M00000008_IL_0035
-M00000008_IL_0030:
-br M00000008_IL_007f
-M00000008_IL_0035:
-M00000008_IL_0036:
-M00000008_IL_0037:
+M00000008_IL_002d:
+br M00000008_IL_000d
+M00000008_IL_0032:
+M00000008_IL_0033:
+M00000008_IL_0034:
 ldloc local0
-M00000008_IL_0038:
+M00000008_IL_0035:
+callvirt instance System.Disposable::Dispose()
+M00000008_IL_003a:
+M00000008_IL_003b:
+ldloc local1
+M00000008_IL_003c:
+ret
+.end
+.method static Take<T0>(System.Collections.Iterable<T0> source,Int32 count) -> System.Collections.Iterable<T0>
+M00000009_IL_0000:
+M00000009_IL_0001:
+M00000009_IL_0002:
+ldarg 0
+M00000009_IL_0003:
+ldarg 1
+M00000009_IL_0004:
+newobj instance neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E54616B6553657175656E63656031<T0>::.ctor(System.Collections.Iterable<T0>,Int32)
+M00000009_IL_0009:
+ret
+.end
+.method static Skip<T0>(System.Collections.Iterable<T0> source,Int32 count) -> System.Collections.Iterable<T0>
+M0000000a_IL_0000:
+M0000000a_IL_0001:
+M0000000a_IL_0002:
+ldarg 0
+M0000000a_IL_0003:
+ldarg 1
+M0000000a_IL_0004:
+newobj instance neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E536B697053657175656E63656031<T0>::.ctor(System.Collections.Iterable<T0>,Int32)
+M0000000a_IL_0009:
+ret
+.end
+.method static Concat<T0>(System.Collections.Iterable<T0> source,System.Collections.Iterable<T0> second) -> System.Collections.Iterable<T0>
+M0000000b_IL_0000:
+M0000000b_IL_0001:
+M0000000b_IL_0002:
+ldarg 0
+M0000000b_IL_0003:
+ldarg 1
+M0000000b_IL_0004:
+newobj instance neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E436F6E63617453657175656E63656031<T0>::.ctor(System.Collections.Iterable<T0>,System.Collections.Iterable<T0>)
+M0000000b_IL_0009:
+ret
+.end
+.method static FlatMap<T0,T1>(System.Collections.Iterable<T0> source,System.Func<T0,System.Collections.Iterable<T1>> selector) -> System.Collections.Iterable<T1>
+M0000000c_IL_0000:
+M0000000c_IL_0001:
+M0000000c_IL_0002:
+ldarg 0
+M0000000c_IL_0003:
+ldarg 1
+M0000000c_IL_0004:
+newobj instance neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E466C61744D617053657175656E63656032<T0,T1>::.ctor(System.Collections.Iterable<T0>,System.Func<T0,System.Collections.Iterable<T1>>)
+M0000000c_IL_0009:
+ret
+.end
+.method static ToList<T0>(System.Collections.Iterable<T0> source) -> System.Collections.ArrayList<T0>
+.local System.Collections.ArrayList<T0> local0
+.local T0 local1
+.local System.Collections.Iterator<T0> local2
+.local T0 local3
+ldloca local0
+initobj System.Collections.ArrayList<T0>
+ldloca local2
+initobj System.Collections.Iterator<T0>
+M0000000d_IL_0000:
+M0000000d_IL_0001:
+newobj instance System.Collections.ArrayList<T0>::.ctor()
+M0000000d_IL_0006:
+stloc local0
+M0000000d_IL_0007:
+M0000000d_IL_0008:
+ldarg 0
+M0000000d_IL_0009:
+callvirt instance System.Collections.Iterable<T0>::GetIterator()
+M0000000d_IL_000e:
+stloc local2
+M0000000d_IL_000f:
+ldloc local2
+M0000000d_IL_0010:
 callvirt instance System.Collections.Iterator<T0>::MoveNext()
 call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
-M00000008_IL_003d:
-brtrue M00000008_IL_0047
-M00000008_IL_0042:
-br M00000008_IL_006a
-M00000008_IL_0047:
-M00000008_IL_0048:
-ldloc local0
-M00000008_IL_0049:
-callvirt instance System.Collections.Iterator<T0>::get_Current()
-M00000008_IL_004e:
-stloc local2
-M00000008_IL_004f:
-M00000008_IL_0050:
-ldarg 1
-M00000008_IL_0051:
+M0000000d_IL_0015:
+brfalse M0000000d_IL_002e
+M0000000d_IL_001a:
 ldloc local2
-M00000008_IL_0052:
+M0000000d_IL_001b:
+callvirt instance System.Collections.Iterator<T0>::get_Current()
+M0000000d_IL_0020:
+stloc local3
+M0000000d_IL_0021:
+M0000000d_IL_0022:
+ldloc local0
+M0000000d_IL_0023:
+ldloc local3
+M0000000d_IL_0024:
+callvirt instance System.Collections.ArrayList<T0>::Add(T0)
+M0000000d_IL_0029:
+br M0000000d_IL_000f
+M0000000d_IL_002e:
+M0000000d_IL_002f:
+ldloc local0
+M0000000d_IL_0030:
+ret
+.end
+.method static First<T0>(System.Collections.Iterable<T0> source) -> System.Option<T0>
+.local System.Collections.Iterator<T0> local0
+.local T0 local1
+ldloca local0
+initobj System.Collections.Iterator<T0>
+M0000000e_IL_0000:
+M0000000e_IL_0001:
+M0000000e_IL_0002:
+ldarg 0
+M0000000e_IL_0003:
+callvirt instance System.Collections.Iterable<T0>::GetIterator()
+M0000000e_IL_0008:
+stloc local0
+M0000000e_IL_0009:
+M0000000e_IL_000a:
+ldloc local0
+M0000000e_IL_000b:
+callvirt instance System.Collections.Iterator<T0>::MoveNext()
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
+M0000000e_IL_0010:
+brtrue M0000000e_IL_001a
+M0000000e_IL_0015:
+br M0000000e_IL_0036
+M0000000e_IL_001a:
+M0000000e_IL_001b:
+ldloc local0
+M0000000e_IL_001c:
+callvirt instance System.Collections.Iterator<T0>::get_Current()
+M0000000e_IL_0021:
+stloc local1
+M0000000e_IL_0022:
+M0000000e_IL_0023:
+ldloc local0
+M0000000e_IL_0024:
+callvirt instance System.Disposable::Dispose()
+M0000000e_IL_0029:
+M0000000e_IL_002a:
+ldloc local1
+M0000000e_IL_002b:
+call neoCLR.Library.System.Linq.Operators.RuntimeUnion2<T0>(T0)
+M0000000e_IL_0030:
+call neoCLR.Library.System.Linq.Operators.RuntimeUnion3<T0>(System.Option.Some<T0>)
+M0000000e_IL_0035:
+ret
+M0000000e_IL_0036:
+M0000000e_IL_0037:
+M0000000e_IL_0038:
+ldloc local0
+M0000000e_IL_0039:
+callvirt instance System.Disposable::Dispose()
+M0000000e_IL_003e:
+call neoCLR.Library.System.Linq.Operators.RuntimeUnion0()
+M0000000e_IL_0043:
+call neoCLR.Library.System.Linq.Operators.RuntimeUnion1<T0>(System.Option.None)
+M0000000e_IL_0048:
+ret
+.end
+.method static Last<T0>(System.Collections.Iterable<T0> source) -> System.Option<T0>
+.local System.Collections.Iterator<T0> local0
+.local T0 local1
+ldloca local0
+initobj System.Collections.Iterator<T0>
+M0000000f_IL_0000:
+M0000000f_IL_0001:
+M0000000f_IL_0002:
+ldarg 0
+M0000000f_IL_0003:
+callvirt instance System.Collections.Iterable<T0>::GetIterator()
+M0000000f_IL_0008:
+stloc local0
+M0000000f_IL_0009:
+M0000000f_IL_000a:
+ldloc local0
+M0000000f_IL_000b:
+callvirt instance System.Collections.Iterator<T0>::MoveNext()
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
+M0000000f_IL_0010:
+ldc.i4 0
+M0000000f_IL_0011:
+ceq
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
+M0000000f_IL_0013:
+brtrue M0000000f_IL_001d
+M0000000f_IL_0018:
+br M0000000f_IL_002f
+M0000000f_IL_001d:
+M0000000f_IL_001e:
+ldloc local0
+M0000000f_IL_001f:
+callvirt instance System.Disposable::Dispose()
+M0000000f_IL_0024:
+call neoCLR.Library.System.Linq.Operators.RuntimeUnion0()
+M0000000f_IL_0029:
+call neoCLR.Library.System.Linq.Operators.RuntimeUnion1<T0>(System.Option.None)
+M0000000f_IL_002e:
+ret
+M0000000f_IL_002f:
+M0000000f_IL_0030:
+M0000000f_IL_0031:
+ldloc local0
+M0000000f_IL_0032:
+callvirt instance System.Collections.Iterator<T0>::get_Current()
+M0000000f_IL_0037:
+stloc local1
+M0000000f_IL_0038:
+M0000000f_IL_0039:
+M0000000f_IL_003a:
+ldloc local0
+M0000000f_IL_003b:
+callvirt instance System.Collections.Iterator<T0>::MoveNext()
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
+M0000000f_IL_0040:
+brtrue M0000000f_IL_004a
+M0000000f_IL_0045:
+br M0000000f_IL_0057
+M0000000f_IL_004a:
+M0000000f_IL_004b:
+ldloc local0
+M0000000f_IL_004c:
+callvirt instance System.Collections.Iterator<T0>::get_Current()
+M0000000f_IL_0051:
+stloc local1
+M0000000f_IL_0052:
+br M0000000f_IL_0039
+M0000000f_IL_0057:
+M0000000f_IL_0058:
+M0000000f_IL_0059:
+ldloc local0
+M0000000f_IL_005a:
+callvirt instance System.Disposable::Dispose()
+M0000000f_IL_005f:
+M0000000f_IL_0060:
+ldloc local1
+M0000000f_IL_0061:
+call neoCLR.Library.System.Linq.Operators.RuntimeUnion2<T0>(T0)
+M0000000f_IL_0066:
+call neoCLR.Library.System.Linq.Operators.RuntimeUnion3<T0>(System.Option.Some<T0>)
+M0000000f_IL_006b:
+ret
+.end
+.method static Single<T0>(System.Collections.Iterable<T0> source) -> System.Result<T0,System.Linq.SingleError>
+.local System.Collections.Iterator<T0> local0
+.local T0 local1
+.local Boolean local2
+ldloca local0
+initobj System.Collections.Iterator<T0>
+ldc.bool false
+stloc local2
+M00000010_IL_0000:
+M00000010_IL_0001:
+M00000010_IL_0002:
+ldarg 0
+M00000010_IL_0003:
+callvirt instance System.Collections.Iterable<T0>::GetIterator()
+M00000010_IL_0008:
+stloc local0
+M00000010_IL_0009:
+M00000010_IL_000a:
+ldloc local0
+M00000010_IL_000b:
+callvirt instance System.Collections.Iterator<T0>::MoveNext()
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
+M00000010_IL_0010:
+ldc.i4 0
+M00000010_IL_0011:
+ceq
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
+M00000010_IL_0013:
+brtrue M00000010_IL_001d
+M00000010_IL_0018:
+br M00000010_IL_0039
+M00000010_IL_001d:
+M00000010_IL_001e:
+ldloc local0
+M00000010_IL_001f:
+callvirt instance System.Disposable::Dispose()
+M00000010_IL_0024:
+call neoCLR.Library.System.Linq.Operators.RuntimeErrorSystemLinqSingleErrorEmptyNew()
+M00000010_IL_0029:
+call neoCLR.Library.System.Linq.Operators.RuntimeErrorSystemLinqSingleErrorNewSystemLinqSingleErrorEmpty(System.Linq.SingleError.Empty)
+M00000010_IL_002e:
+call neoCLR.Library.System.Linq.Operators.RuntimeUnion4(System.Linq.SingleError)
+M00000010_IL_0033:
+call neoCLR.Library.System.Linq.Operators.RuntimeUnion5<T0>(System.Result.Error<System.Linq.SingleError>)
+M00000010_IL_0038:
+ret
+M00000010_IL_0039:
+M00000010_IL_003a:
+M00000010_IL_003b:
+ldloc local0
+M00000010_IL_003c:
+callvirt instance System.Collections.Iterator<T0>::get_Current()
+M00000010_IL_0041:
+stloc local1
+M00000010_IL_0042:
+M00000010_IL_0043:
+ldloc local0
+M00000010_IL_0044:
+callvirt instance System.Collections.Iterator<T0>::MoveNext()
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
+M00000010_IL_0049:
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanFromInt32(Int32)
+stloc local2
+M00000010_IL_004a:
+M00000010_IL_004b:
+ldloc local0
+M00000010_IL_004c:
+callvirt instance System.Disposable::Dispose()
+M00000010_IL_0051:
+M00000010_IL_0052:
+ldloc local2
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
+M00000010_IL_0053:
+brtrue M00000010_IL_005d
+M00000010_IL_0058:
+br M00000010_IL_0072
+M00000010_IL_005d:
+call neoCLR.Library.System.Linq.Operators.RuntimeErrorSystemLinqSingleErrorMultipleNew()
+M00000010_IL_0062:
+call neoCLR.Library.System.Linq.Operators.RuntimeErrorSystemLinqSingleErrorNewSystemLinqSingleErrorMultiple(System.Linq.SingleError.Multiple)
+M00000010_IL_0067:
+call neoCLR.Library.System.Linq.Operators.RuntimeUnion4(System.Linq.SingleError)
+M00000010_IL_006c:
+call neoCLR.Library.System.Linq.Operators.RuntimeUnion5<T0>(System.Result.Error<System.Linq.SingleError>)
+M00000010_IL_0071:
+ret
+M00000010_IL_0072:
+M00000010_IL_0073:
+M00000010_IL_0074:
+ldloc local1
+M00000010_IL_0075:
+call neoCLR.Library.System.Linq.Operators.RuntimeUnion6<T0>(T0)
+M00000010_IL_007a:
+call neoCLR.Library.System.Linq.Operators.RuntimeUnion7<T0>(System.Result.Ok<T0>)
+M00000010_IL_007f:
+ret
+.end
+.method static First<T0>(System.Collections.Iterable<T0> source,System.Func<T0,Boolean> predicate) -> System.Option<T0>
+.local System.Collections.Iterator<T0> local0
+.local T0 local1
+ldloca local0
+initobj System.Collections.Iterator<T0>
+M00000011_IL_0000:
+M00000011_IL_0001:
+M00000011_IL_0002:
+ldarg 0
+M00000011_IL_0003:
+callvirt instance System.Collections.Iterable<T0>::GetIterator()
+M00000011_IL_0008:
+stloc local0
+M00000011_IL_0009:
+M00000011_IL_000a:
+M00000011_IL_000b:
+ldloc local0
+M00000011_IL_000c:
+callvirt instance System.Collections.Iterator<T0>::MoveNext()
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
+M00000011_IL_0011:
+brtrue M00000011_IL_001b
+M00000011_IL_0016:
+br M00000011_IL_004f
+M00000011_IL_001b:
+M00000011_IL_001c:
+ldloc local0
+M00000011_IL_001d:
+callvirt instance System.Collections.Iterator<T0>::get_Current()
+M00000011_IL_0022:
+stloc local1
+M00000011_IL_0023:
+M00000011_IL_0024:
+ldarg 1
+M00000011_IL_0025:
+ldloc local1
+M00000011_IL_0026:
 callvirt instance System.Func<T0,Boolean>::Invoke(T0)
 call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
-M00000008_IL_0057:
-brtrue M00000008_IL_0061
-M00000008_IL_005c:
-br M00000008_IL_0064
-M00000008_IL_0061:
-M00000008_IL_0062:
-ldloc local2
-M00000008_IL_0063:
-stloc local1
-M00000008_IL_0064:
-M00000008_IL_0065:
-br M00000008_IL_0036
-M00000008_IL_006a:
-M00000008_IL_006b:
-M00000008_IL_006c:
+M00000011_IL_002b:
+brtrue M00000011_IL_0035
+M00000011_IL_0030:
+br M00000011_IL_0049
+M00000011_IL_0035:
+M00000011_IL_0036:
 ldloc local0
-M00000008_IL_006d:
+M00000011_IL_0037:
 callvirt instance System.Disposable::Dispose()
-M00000008_IL_0072:
-M00000008_IL_0073:
+M00000011_IL_003c:
+M00000011_IL_003d:
 ldloc local1
-M00000008_IL_0074:
+M00000011_IL_003e:
 call neoCLR.Library.System.Linq.Operators.RuntimeUnion2<T0>(T0)
-M00000008_IL_0079:
+M00000011_IL_0043:
 call neoCLR.Library.System.Linq.Operators.RuntimeUnion3<T0>(System.Option.Some<T0>)
-M00000008_IL_007e:
+M00000011_IL_0048:
 ret
-M00000008_IL_007f:
-M00000008_IL_0080:
-br M00000008_IL_000a
-M00000008_IL_0085:
-M00000008_IL_0086:
-M00000008_IL_0087:
+M00000011_IL_0049:
+M00000011_IL_004a:
+br M00000011_IL_000a
+M00000011_IL_004f:
+M00000011_IL_0050:
+M00000011_IL_0051:
 ldloc local0
-M00000008_IL_0088:
+M00000011_IL_0052:
 callvirt instance System.Disposable::Dispose()
-M00000008_IL_008d:
+M00000011_IL_0057:
 call neoCLR.Library.System.Linq.Operators.RuntimeUnion0()
-M00000008_IL_0092:
+M00000011_IL_005c:
 call neoCLR.Library.System.Linq.Operators.RuntimeUnion1<T0>(System.Option.None)
-M00000008_IL_0097:
+M00000011_IL_0061:
+ret
+.end
+.method static Last<T0>(System.Collections.Iterable<T0> source,System.Func<T0,Boolean> predicate) -> System.Option<T0>
+.local System.Collections.Iterator<T0> local0
+.local T0 local1
+.local T0 local2
+ldloca local0
+initobj System.Collections.Iterator<T0>
+M00000012_IL_0000:
+M00000012_IL_0001:
+M00000012_IL_0002:
+ldarg 0
+M00000012_IL_0003:
+callvirt instance System.Collections.Iterable<T0>::GetIterator()
+M00000012_IL_0008:
+stloc local0
+M00000012_IL_0009:
+M00000012_IL_000a:
+M00000012_IL_000b:
+ldloc local0
+M00000012_IL_000c:
+callvirt instance System.Collections.Iterator<T0>::MoveNext()
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
+M00000012_IL_0011:
+brtrue M00000012_IL_001b
+M00000012_IL_0016:
+br M00000012_IL_0085
+M00000012_IL_001b:
+M00000012_IL_001c:
+ldloc local0
+M00000012_IL_001d:
+callvirt instance System.Collections.Iterator<T0>::get_Current()
+M00000012_IL_0022:
+stloc local1
+M00000012_IL_0023:
+M00000012_IL_0024:
+ldarg 1
+M00000012_IL_0025:
+ldloc local1
+M00000012_IL_0026:
+callvirt instance System.Func<T0,Boolean>::Invoke(T0)
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
+M00000012_IL_002b:
+brtrue M00000012_IL_0035
+M00000012_IL_0030:
+br M00000012_IL_007f
+M00000012_IL_0035:
+M00000012_IL_0036:
+M00000012_IL_0037:
+ldloc local0
+M00000012_IL_0038:
+callvirt instance System.Collections.Iterator<T0>::MoveNext()
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
+M00000012_IL_003d:
+brtrue M00000012_IL_0047
+M00000012_IL_0042:
+br M00000012_IL_006a
+M00000012_IL_0047:
+M00000012_IL_0048:
+ldloc local0
+M00000012_IL_0049:
+callvirt instance System.Collections.Iterator<T0>::get_Current()
+M00000012_IL_004e:
+stloc local2
+M00000012_IL_004f:
+M00000012_IL_0050:
+ldarg 1
+M00000012_IL_0051:
+ldloc local2
+M00000012_IL_0052:
+callvirt instance System.Func<T0,Boolean>::Invoke(T0)
+call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
+M00000012_IL_0057:
+brtrue M00000012_IL_0061
+M00000012_IL_005c:
+br M00000012_IL_0064
+M00000012_IL_0061:
+M00000012_IL_0062:
+ldloc local2
+M00000012_IL_0063:
+stloc local1
+M00000012_IL_0064:
+M00000012_IL_0065:
+br M00000012_IL_0036
+M00000012_IL_006a:
+M00000012_IL_006b:
+M00000012_IL_006c:
+ldloc local0
+M00000012_IL_006d:
+callvirt instance System.Disposable::Dispose()
+M00000012_IL_0072:
+M00000012_IL_0073:
+ldloc local1
+M00000012_IL_0074:
+call neoCLR.Library.System.Linq.Operators.RuntimeUnion2<T0>(T0)
+M00000012_IL_0079:
+call neoCLR.Library.System.Linq.Operators.RuntimeUnion3<T0>(System.Option.Some<T0>)
+M00000012_IL_007e:
+ret
+M00000012_IL_007f:
+M00000012_IL_0080:
+br M00000012_IL_000a
+M00000012_IL_0085:
+M00000012_IL_0086:
+M00000012_IL_0087:
+ldloc local0
+M00000012_IL_0088:
+callvirt instance System.Disposable::Dispose()
+M00000012_IL_008d:
+call neoCLR.Library.System.Linq.Operators.RuntimeUnion0()
+M00000012_IL_0092:
+call neoCLR.Library.System.Linq.Operators.RuntimeUnion1<T0>(System.Option.None)
+M00000012_IL_0097:
 ret
 .end
 .method static Single<T0>(System.Collections.Iterable<T0> source,System.Func<T0,Boolean> predicate) -> System.Result<T0,System.Linq.SingleError>
@@ -500,119 +943,119 @@ ret
 .local T0 local1
 ldloca local0
 initobj System.Collections.Iterator<T0>
-M00000009_IL_0000:
-M00000009_IL_0001:
-M00000009_IL_0002:
+M00000013_IL_0000:
+M00000013_IL_0001:
+M00000013_IL_0002:
 ldarg 0
-M00000009_IL_0003:
+M00000013_IL_0003:
 callvirt instance System.Collections.Iterable<T0>::GetIterator()
-M00000009_IL_0008:
+M00000013_IL_0008:
 stloc local0
-M00000009_IL_0009:
-M00000009_IL_000a:
-M00000009_IL_000b:
+M00000013_IL_0009:
+M00000013_IL_000a:
+M00000013_IL_000b:
 ldloc local0
-M00000009_IL_000c:
+M00000013_IL_000c:
 callvirt instance System.Collections.Iterator<T0>::MoveNext()
 call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
-M00000009_IL_0011:
-brtrue M00000009_IL_001b
-M00000009_IL_0016:
-br M00000009_IL_009b
-M00000009_IL_001b:
-M00000009_IL_001c:
+M00000013_IL_0011:
+brtrue M00000013_IL_001b
+M00000013_IL_0016:
+br M00000013_IL_009b
+M00000013_IL_001b:
+M00000013_IL_001c:
 ldloc local0
-M00000009_IL_001d:
+M00000013_IL_001d:
 callvirt instance System.Collections.Iterator<T0>::get_Current()
-M00000009_IL_0022:
+M00000013_IL_0022:
 stloc local1
-M00000009_IL_0023:
-M00000009_IL_0024:
+M00000013_IL_0023:
+M00000013_IL_0024:
 ldarg 1
-M00000009_IL_0025:
+M00000013_IL_0025:
 ldloc local1
-M00000009_IL_0026:
+M00000013_IL_0026:
 callvirt instance System.Func<T0,Boolean>::Invoke(T0)
 call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
-M00000009_IL_002b:
-brtrue M00000009_IL_0035
-M00000009_IL_0030:
-br M00000009_IL_0095
-M00000009_IL_0035:
-M00000009_IL_0036:
-M00000009_IL_0037:
+M00000013_IL_002b:
+brtrue M00000013_IL_0035
+M00000013_IL_0030:
+br M00000013_IL_0095
+M00000013_IL_0035:
+M00000013_IL_0036:
+M00000013_IL_0037:
 ldloc local0
-M00000009_IL_0038:
+M00000013_IL_0038:
 callvirt instance System.Collections.Iterator<T0>::MoveNext()
 call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
-M00000009_IL_003d:
-brtrue M00000009_IL_0047
-M00000009_IL_0042:
-br M00000009_IL_0080
-M00000009_IL_0047:
-M00000009_IL_0048:
+M00000013_IL_003d:
+brtrue M00000013_IL_0047
+M00000013_IL_0042:
+br M00000013_IL_0080
+M00000013_IL_0047:
+M00000013_IL_0048:
 ldarg 1
-M00000009_IL_0049:
+M00000013_IL_0049:
 ldloc local0
-M00000009_IL_004a:
+M00000013_IL_004a:
 callvirt instance System.Collections.Iterator<T0>::get_Current()
-M00000009_IL_004f:
+M00000013_IL_004f:
 callvirt instance System.Func<T0,Boolean>::Invoke(T0)
 call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
-M00000009_IL_0054:
-brtrue M00000009_IL_005e
-M00000009_IL_0059:
-br M00000009_IL_007a
-M00000009_IL_005e:
-M00000009_IL_005f:
+M00000013_IL_0054:
+brtrue M00000013_IL_005e
+M00000013_IL_0059:
+br M00000013_IL_007a
+M00000013_IL_005e:
+M00000013_IL_005f:
 ldloc local0
-M00000009_IL_0060:
+M00000013_IL_0060:
 callvirt instance System.Disposable::Dispose()
-M00000009_IL_0065:
+M00000013_IL_0065:
 call neoCLR.Library.System.Linq.Operators.RuntimeErrorSystemLinqSingleErrorMultipleNew()
-M00000009_IL_006a:
+M00000013_IL_006a:
 call neoCLR.Library.System.Linq.Operators.RuntimeErrorSystemLinqSingleErrorNewSystemLinqSingleErrorMultiple(System.Linq.SingleError.Multiple)
-M00000009_IL_006f:
+M00000013_IL_006f:
 call neoCLR.Library.System.Linq.Operators.RuntimeUnion4(System.Linq.SingleError)
-M00000009_IL_0074:
+M00000013_IL_0074:
 call neoCLR.Library.System.Linq.Operators.RuntimeUnion5<T0>(System.Result.Error<System.Linq.SingleError>)
-M00000009_IL_0079:
+M00000013_IL_0079:
 ret
-M00000009_IL_007a:
-M00000009_IL_007b:
-br M00000009_IL_0036
-M00000009_IL_0080:
-M00000009_IL_0081:
-M00000009_IL_0082:
+M00000013_IL_007a:
+M00000013_IL_007b:
+br M00000013_IL_0036
+M00000013_IL_0080:
+M00000013_IL_0081:
+M00000013_IL_0082:
 ldloc local0
-M00000009_IL_0083:
+M00000013_IL_0083:
 callvirt instance System.Disposable::Dispose()
-M00000009_IL_0088:
-M00000009_IL_0089:
+M00000013_IL_0088:
+M00000013_IL_0089:
 ldloc local1
-M00000009_IL_008a:
+M00000013_IL_008a:
 call neoCLR.Library.System.Linq.Operators.RuntimeUnion6<T0>(T0)
-M00000009_IL_008f:
+M00000013_IL_008f:
 call neoCLR.Library.System.Linq.Operators.RuntimeUnion7<T0>(System.Result.Ok<T0>)
-M00000009_IL_0094:
+M00000013_IL_0094:
 ret
-M00000009_IL_0095:
-M00000009_IL_0096:
-br M00000009_IL_000a
-M00000009_IL_009b:
-M00000009_IL_009c:
-M00000009_IL_009d:
+M00000013_IL_0095:
+M00000013_IL_0096:
+br M00000013_IL_000a
+M00000013_IL_009b:
+M00000013_IL_009c:
+M00000013_IL_009d:
 ldloc local0
-M00000009_IL_009e:
+M00000013_IL_009e:
 callvirt instance System.Disposable::Dispose()
-M00000009_IL_00a3:
+M00000013_IL_00a3:
 call neoCLR.Library.System.Linq.Operators.RuntimeErrorSystemLinqSingleErrorEmptyNew()
-M00000009_IL_00a8:
+M00000013_IL_00a8:
 call neoCLR.Library.System.Linq.Operators.RuntimeErrorSystemLinqSingleErrorNewSystemLinqSingleErrorEmpty(System.Linq.SingleError.Empty)
-M00000009_IL_00ad:
+M00000013_IL_00ad:
 call neoCLR.Library.System.Linq.Operators.RuntimeUnion4(System.Linq.SingleError)
-M00000009_IL_00b2:
+M00000013_IL_00b2:
 call neoCLR.Library.System.Linq.Operators.RuntimeUnion5<T0>(System.Result.Error<System.Linq.SingleError>)
-M00000009_IL_00b7:
+M00000013_IL_00b7:
 ret
 .end

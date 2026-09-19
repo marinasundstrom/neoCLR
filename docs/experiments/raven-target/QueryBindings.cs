@@ -8,6 +8,16 @@ static class QueryBindings
             public static class Operators {
                 public static Collections.Iterable<T> Filter<T>(this Collections.Iterable<T> source, Func<T, bool> predicate) => default;
                 public static Collections.Iterable<U> Map<T,U>(this Collections.Iterable<T> source, Func<T,U> selector) => default;
+                public static bool Any<T>(this Collections.Iterable<T> source) => default;
+                public static bool Any<T>(this Collections.Iterable<T> source, Func<T,bool> predicate) => default;
+                public static bool All<T>(this Collections.Iterable<T> source, Func<T,bool> predicate) => default;
+                public static int Count<T>(this Collections.Iterable<T> source) => default;
+                public static int Count<T>(this Collections.Iterable<T> source, Func<T,bool> predicate) => default;
+                public static U Fold<T,U>(this Collections.Iterable<T> source, U seed, Func<U,T,U> accumulator) => default;
+                public static Collections.Iterable<T> Take<T>(this Collections.Iterable<T> source, int count) => default;
+                public static Collections.Iterable<T> Skip<T>(this Collections.Iterable<T> source, int count) => default;
+                public static Collections.Iterable<T> Concat<T>(this Collections.Iterable<T> source, Collections.Iterable<T> second) => default;
+                public static Collections.Iterable<U> FlatMap<T,U>(this Collections.Iterable<T> source, Func<T,Collections.Iterable<U>> selector) => default;
                 public static Option<T> First<T>(this Collections.Iterable<T> source) => default;
                 public static Option<T> First<T>(this Collections.Iterable<T> source, Func<T, bool> predicate) => default;
                 public static Option<T> Last<T>(this Collections.Iterable<T> source) => default;
@@ -27,7 +37,7 @@ static class QueryBindings
             || definition.GenericParameters.Any(p => p.HasConstraints || p.Attributes != GenericParameterAttributes.NonVariant))
             throw new InvalidDataException("Unsupported query signature.");
         var types = method.GenericArguments.Select(GenericUnionBindings.Type).ToArray();
-        var arity = reference.Name == "Map" ? 2 : 1;
+        var arity = reference.Name is "Map" or "FlatMap" or "Fold" ? 2 : 1;
         if (types.Length != arity || types.Any(t => t is null))
             throw new InvalidDataException("Unsupported query type arguments.");
         var source = $"System.Collections.Iterable<{types[0]}>";
@@ -38,6 +48,13 @@ static class QueryBindings
             "Map" => (new[] { source, $"System.Func<{types[0]},{types[1]}>" }, $"System.Collections.Iterable<{types[1]}>"),
             "First" or "Last" => (terminalArguments, $"System.Option<{types[0]}>"),
             "Single" => (terminalArguments, $"System.Result<{types[0]},System.Linq.SingleError>"),
+            "Any" => (terminalArguments, "Boolean"),
+            "All" => (new[] { source, $"System.Func<{types[0]},Boolean>" }, "Boolean"),
+            "Count" => (terminalArguments, "Int32"),
+            "Fold" => (new[] { source, types[1]!, $"System.Func<{types[1]},{types[0]},{types[1]}>" }, types[1]!),
+            "Take" or "Skip" => (new[] { source, "Int32" }, source),
+            "Concat" => (new[] { source, source }, source),
+            "FlatMap" => (new[] { source, $"System.Func<{types[0]},System.Collections.Iterable<{types[1]}>>" }, $"System.Collections.Iterable<{types[1]}>"),
             "ToList" => (new[] { source }, $"System.Collections.ArrayList<{types[0]}>"),
             _ => throw new InvalidDataException("Unsupported query operator.")
         };

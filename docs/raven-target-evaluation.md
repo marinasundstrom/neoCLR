@@ -918,3 +918,14 @@ Disabling macOS metadata sidecars in Raven's packaging script is a general packa
 candidate. Reproduce independently on main and validate archive membership before
 integrating; the script itself was not changed as part of this release. Keep this
 separate from neoCLR-specific target policies.
+
+### Candidate exposed by basic iterable operators (2026-09-19)
+
+The packaged .15 compiler emits an InvalidOperationException fallback when the
+FlatMap iterator's Boolean-returning MoveNext ends with `while true`, although every
+exit is an explicit return. Adding a terminal `return false` avoids that dependency
+but produces RAV0162. The tested neoCLR library keeps that bootstrap workaround.
+This is a reported general compiler-flow/emission candidate, not a fixed Raven bug:
+reproduce against an ordinary CLI/.NET target and inspect the emitted fallback
+before independently integrating any fix on Raven main. No compiler branch change
+was needed for the iterable slice.

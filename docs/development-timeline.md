@@ -4483,3 +4483,25 @@ The new on-site example is compiled by the query suite and prints 10 and 30.
 Execution, stale-name rejection, signature admission and completion are covered;
 see [the query validation record](raven-query-api.md#validation-after-the-naming-migration).
 No Raven compiler change was needed. Task/async contracts remain the next foundation.
+
+### A basic iterable set before Task work — 2026-09-19
+
+The author asked, “Can we add additional operators before doing the task work?” and
+clarified, “So we have the basic set”. The assistant proposed Any, All, Count, Take,
+Skip, Concat and FlatMap, plus explicitly seeded accumulation. Asked to choose its
+name, the author replied, “Fold for seeded accumulation”. This selects a bounded
+library slice before Task/async contracts, not complete LINQ compatibility.
+
+The assistant implemented the proposed operators in Raven, extended the neoCLR
+bridge for the new signatures and nested open collection arguments, and added
+execution/lifetime tests and a runnable sample. The [query contract](raven-query-api.md#basic-operators-before-task-contracts--2026-09-19)
+records .NET/Rust comparisons, normal disposal guarantees and deferred work.
+Validation results are recorded there when completed. No Raven compiler change or
+new release artifact is implied by this development slice.
+
+While this slice was being validated, the author requested a subsequent port of
+Raven.Core's Option and Result operator methods, with documentation and website
+updates, before Task work. The author also requested a .NET-to-neoCLR LINQ mapping
+table and an operator list or demonstrations for Option/Result. The assistant added
+the query mapping table and queued the outcome-operator port as the next separate
+slice; this note does not claim that port is complete.

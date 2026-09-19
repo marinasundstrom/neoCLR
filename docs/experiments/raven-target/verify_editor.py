@@ -353,7 +353,7 @@ try:
                 'context': {'triggerKind': 2, 'triggerCharacter': '.'}}, True))
             items = result if isinstance(result, list) else result['items']
             labels = sorted({item['label'] for item in items})
-            assert {'Filter', 'Map', 'ToList', 'First', 'Last', 'Single'}.issubset(labels), labels
+            assert {'Filter', 'Map', 'ToList', 'First', 'Last', 'Single', 'Any', 'All', 'Count', 'Fold', 'Take', 'Skip', 'Concat', 'FlatMap'}.issubset(labels), labels
             assert not {'Where', 'Select'}.intersection(labels), labels
             results['Query extensions ' + str(version)] = labels
     if array_invariance:

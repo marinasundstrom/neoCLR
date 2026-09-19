@@ -1,0 +1,29 @@
+import System.Collections.*
+import System.Linq.*
+import System.Console.*
+
+public func Pair(value: int) -> Iterable<int> {
+    return [value, value * 10]
+}
+
+func Main() {
+    let values: int[] = [1, 2, 3, 4]
+    let page = values.Skip(1).Take(2)
+    for value in page {
+        WriteLine(value)
+    }
+
+    if values.Any(value => value > 3) {
+        WriteLine("True")
+    }
+    if values.All(value => value > 0) {
+        WriteLine("True")
+    }
+    WriteLine(values.Count(value => value > 2))
+    WriteLine(values.Fold(0, (total, value) => total + value))
+
+    let extra: int[] = [5]
+    for value in page.Concat(extra).FlatMap(value => Pair(value)) {
+        WriteLine(value)
+    }
+}

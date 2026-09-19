@@ -62,7 +62,7 @@
     "runtime/raven/src/System/Math/Functions.rvn": "7c6b80a8c549c2b1c91735bb7a325ab75472d112e81ae913d77b916ea5e22de0",
     "runtime/raven/src/System/Int32.rvn": "37187e831a9ac3bead1a72cf4c72f7922b9dce1cefd281c3785c322dd4ca7ea2",
     "runtime/raven/src/System/Char.rvn": "884057609749af9561c464e02ffcf512cfce39d5f77cd1afb9a6310c7b9098f8",
-    "runtime/raven/src/System/Linq/Operators.rvn": "8118a85a819ad06257f3b6661ec95d20bd555ee6bfa71fab696d5233ed18891f",
+    "runtime/raven/src/System/Linq/Operators.rvn": "39fe021c448284d79f91d507b1686d9f9bd90a78d89736e64a7273fb335a6802",
     "runtime/raven/src/System/Collections/ArrayList.rvn": "6bc4ea11b0f4d22235f5b938e5cfb4086075d4989a700a29384361e9447e4d1a",
     "runtime/raven/src/System/Collections/HashMap.rvn": "b41f6da8155ee5d9d4df62d55e18f2cc47fea1bbc9c46d9cff7fa729d955d31e",
     "runtime/raven/src/System/Time.rvn": "32057665602a216c60d011e9a6f1c9dbb3161ac0ad2b7cf041df6552baf1352c",
@@ -83,14 +83,24 @@
     "build/NeoCLR.Raven.props": "fad7004f86aa6b22aedb208495920f44d1b16f07baa1caa126ef757af1112257"
   },
   "outputs": {
-    "Linq.methods.neoil": "7e5bdf5f4a9cb87663eb0fec4379029ac0cc40a54029e2136b2ea7056646cf29",
-    "Linq.helpers.neoil": "4afe1f7aa295e26ec4b19060196e948c0b72e603063ee278986762f12d407baf"
+    "Linq.methods.neoil": "53194c37d63f56f1bb008f0513e34011be1bd6c9bcae1f7498e13021a83ca40c",
+    "Linq.helpers.neoil": "603a80aa5272debc4e427711903cced4b0a0fd86d49d8906a73023735374e2b1"
   },
   "compilerSha256": "fd81ea896146b15d8fa66d2ba7c74b806a1dad1919012a77f7fe53242bbed105",
-  "coreSha256": "7f17bed9b774e28328d79b299de229acd773010145b10f29f78b7f5fc777da78",
+  "coreSha256": "a3c9e0a198cca1cd1d107dbdcc7e0995703ea18af5a3b09eb76c006e74b05d1c",
   "exports": [
     "Filter<T0>(System.Collections.Iterable<T0> source,System.Func<T0,Boolean> predicate) -> System.Collections.Iterable<T0>",
     "Map<T0,T1>(System.Collections.Iterable<T0> source,System.Func<T0,T1> selector) -> System.Collections.Iterable<T1>",
+    "Any<T0>(System.Collections.Iterable<T0> source) -> Boolean",
+    "Any<T0>(System.Collections.Iterable<T0> source,System.Func<T0,Boolean> predicate) -> Boolean",
+    "All<T0>(System.Collections.Iterable<T0> source,System.Func<T0,Boolean> predicate) -> Boolean",
+    "Count<T0>(System.Collections.Iterable<T0> source) -> Int32",
+    "Count<T0>(System.Collections.Iterable<T0> source,System.Func<T0,Boolean> predicate) -> Int32",
+    "Fold<T0,T1>(System.Collections.Iterable<T0> source,T1 seed,System.Func<T1,T0,T1> accumulator) -> T1",
+    "Take<T0>(System.Collections.Iterable<T0> source,Int32 count) -> System.Collections.Iterable<T0>",
+    "Skip<T0>(System.Collections.Iterable<T0> source,Int32 count) -> System.Collections.Iterable<T0>",
+    "Concat<T0>(System.Collections.Iterable<T0> source,System.Collections.Iterable<T0> second) -> System.Collections.Iterable<T0>",
+    "FlatMap<T0,T1>(System.Collections.Iterable<T0> source,System.Func<T0,System.Collections.Iterable<T1>> selector) -> System.Collections.Iterable<T1>",
     "ToList<T0>(System.Collections.Iterable<T0> source) -> System.Collections.ArrayList<T0>",
     "First<T0>(System.Collections.Iterable<T0> source) -> System.Option<T0>",
     "Last<T0>(System.Collections.Iterable<T0> source) -> System.Option<T0>",

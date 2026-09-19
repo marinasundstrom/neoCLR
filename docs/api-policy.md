@@ -184,7 +184,10 @@ names against their Option/Result and cardinality contracts, not only a synonym 
 For future flattening, `FlatMap` is preferred over `SelectMany`. Do not automatically
 choose `Fold` over `Reduce`, or `Drop` over `Skip`: names must follow the selected
 semantics, including seed and empty-input behavior where applicable. Those operators
-are not implemented by this decision.
+were not implemented by the naming decision alone. The subsequent basic-operator
+slice implements FlatMap and retains Skip. The author selected Fold for explicitly
+seeded, left-to-right accumulation; empty input returns the seed. Seedless reduction
+remains separate. See the [mapping table](raven-query-api.md#net-operator-mapping).
 
 [.NET Enumerable](https://learn.microsoft.com/en-us/dotnet/api/system.linq.enumerable)
 provides the current comparison. Conventional terminology also appears within .NET:

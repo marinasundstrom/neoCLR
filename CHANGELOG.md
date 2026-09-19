@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Add the basic development Iterable operators before Task work: Any, All, Count,
+  seeded Fold, Take, Skip, Concat and FlatMap. Preserve short-circuiting, empty-input
+  outcomes, ordered lazy composition and normal iterator disposal. Count faults on
+  Int32 overflow. Rebuild references and the System library together; Preview 8
+  packages remain unchanged. Add executable samples, signature and editor coverage,
+  and .NET/Rust contract comparisons. Support nested open collection arguments in
+  the neoCLR library import bridge without changing Raven's compiler. Validate
+  58 query outcomes, 174 signatures, 86 editor sections, 5 compiler-path checks,
+  24 focused runtime tests and exact reproduction of all 77 library slices.
+
 - Record the general Raven SDK AppleDouble packaging candidate and the validated
   sidecar-free Preview 8 archive workaround; no upstream script fix is claimed.
 - Rename the development query API after Preview 8: Where becomes Filter and

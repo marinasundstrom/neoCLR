@@ -241,6 +241,8 @@ func Main() {
     }
 }
 ''', '2\n3\n'))
+    from query_basic_cases import cases as basic_cases
+    cases.extend(basic_cases())
     for label, source, expected in cases:
         (root / 'Main.rvn').write_text(source)
         run = subprocess.run(command, capture_output=True, text=True, timeout=120)
@@ -276,6 +278,18 @@ func Main() {
         assert run.returncode != 0 and 'Query iterator has no current element' in run.stderr, run.stdout + run.stderr
         assert 'Must not continue' not in run.stdout
         results[label] = 'faulted'
+    for operator in ('Take(1)', 'Skip(0)', 'Concat(values)',
+                     'FlatMap((value: int) -> Iterable<int> => values)'):
+        for state, advance in [('before advance', ''),
+                               ('after exhaustion', 'while iterator.MoveNext() {}'),
+                               ('after disposal', 'iterator.Dispose()')]:
+            (root / 'Main.rvn').write_text(header + 'func Main() {\n'
+                + '    let values: int[] = [42]\n'
+                + '    let iterator = values.' + operator + '.GetIterator()\n'
+                + '    ' + advance + '\n    WriteLine(iterator.Current)\n}\n')
+            run = subprocess.run(command, capture_output=True, text=True, timeout=120)
+            assert run.returncode != 0 and 'Query iterator has no current element' in run.stderr, run.stdout + run.stderr
+            results[operator + ' Current ' + state] = 'faulted'
     (root / 'Main.rvn').write_text(header + '''
 func Main() {
     let values = ArrayList<int>()

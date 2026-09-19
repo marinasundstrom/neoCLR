@@ -108,6 +108,20 @@ static class SignatureProbe
         Check("Recursive type argument under vector and byref", RuntimeSignatures.Close(shape, owner).FullName
             == "System.Result/Ok`1<System.String[]>&");
         Check("Input signature remains unchanged", shape.FullName == before);
+        var caller = new TypeDefinition("Test", "Caller`2", TypeAttributes.Class);
+        caller.GenericParameters.Add(new GenericParameter("A", caller));
+        caller.GenericParameters.Add(new GenericParameter("B", caller));
+        var nestedCaller = new GenericInstanceType(module.GetType("System.Collections.Iterable`1"));
+        nestedCaller.GenericArguments.Add(caller.GenericParameters[1]);
+        var nestedOwner = new GenericInstanceType(result);
+        nestedOwner.GenericArguments.Add(caller.GenericParameters[0]);
+        nestedOwner.GenericArguments.Add(nestedCaller);
+        Check("Nested caller parameters are substituted simultaneously",
+            ReferenceEquals(RuntimeSignatures.Close(result.GenericParameters[1], nestedOwner,
+                allowOpenMethodParameters: true), nestedCaller));
+        Reject("Open nested caller still requires library admission", () =>
+            RuntimeSignatures.Close(result.GenericParameters[1], nestedOwner));
+
         var extraction = result.Methods.Single(m => m.Name == "TryGetResidual");
         var reference = Reference(extraction, owner);
         var matched = RuntimeSignatures.Match(reference, extraction, ResultBindings.Type);
@@ -288,6 +302,22 @@ static class SignatureProbe
             }
             call.ReturnType = module.TypeSystem.String;
             Reject(name + " arity " + count + " rejects payload-only result", () => QueryBindings.Bind(call, terminal, false));
+        }
+        foreach (var operation in enumerable.Methods.Where(m => m.Name is "Any" or "All" or "Count" or "Fold" or "Take" or "Skip" or "Concat" or "FlatMap")) {
+            var basicReference = Reference(operation, enumerable);
+            basicReference.CallingConvention = MethodCallingConvention.Generic;
+            var call = new GenericInstanceMethod(basicReference);
+            call.GenericArguments.Add(module.TypeSystem.Int32);
+            if (operation.GenericParameters.Count == 2) call.GenericArguments.Add(module.TypeSystem.String);
+            var expected = operation.Name switch {
+                "Any" or "All" => "Boolean", "Count" => "Int32", "Fold" => "String",
+                "FlatMap" => "System.Collections.Iterable<String>", _ => "System.Collections.Iterable<Int32>"
+            };
+            var label = operation.Name + " with " + operation.Parameters.Count + " arguments";
+            Check(label + " binds closed result", QueryBindings.Bind(call, operation, false)?.Result == expected);
+            Reject(label + " rejects virtual call", () => QueryBindings.Bind(call, operation, true));
+            call.Parameters[0].ParameterType = module.TypeSystem.Int32;
+            Reject(label + " rejects forged receiver", () => QueryBindings.Bind(call, operation, false));
         }
         MapBindings.Validate(module);
         var mapDefinition = module.GetType("System.Collections.Map`2");

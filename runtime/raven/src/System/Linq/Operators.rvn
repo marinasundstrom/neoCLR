@@ -13,6 +13,93 @@ public static class Operators {
         return SelectSequence<T, U>(source, selector)
     }
 
+    static func Any<T>(source: Iterable<T>) -> bool {
+        let iterator = source.GetIterator()
+        let result = iterator.MoveNext()
+        iterator.Dispose()
+        return result
+    }
+
+    static func Any<T>(source: Iterable<T>, predicate: System.Func<T, bool>) -> bool {
+        let iterator = source.GetIterator()
+        while iterator.MoveNext() {
+            if predicate(iterator.Current) {
+                iterator.Dispose()
+                return true
+            }
+        }
+        iterator.Dispose()
+        return false
+    }
+
+    static func All<T>(source: Iterable<T>, predicate: System.Func<T, bool>) -> bool {
+        let iterator = source.GetIterator()
+        while iterator.MoveNext() {
+            if !predicate(iterator.Current) {
+                iterator.Dispose()
+                return false
+            }
+        }
+        iterator.Dispose()
+        return true
+    }
+
+    static func Count<T>(source: Iterable<T>) -> int {
+        let iterator = source.GetIterator()
+        var count = 0
+        while iterator.MoveNext() {
+            if count == 2147483647 {
+                iterator.Dispose()
+                System.Fault("Query count exceeds Int32 capacity")
+            }
+            count = count + 1
+        }
+        iterator.Dispose()
+        return count
+    }
+
+    static func Count<T>(source: Iterable<T>, predicate: System.Func<T, bool>) -> int {
+        let iterator = source.GetIterator()
+        var count = 0
+        while iterator.MoveNext() {
+            if predicate(iterator.Current) {
+                if count == 2147483647 {
+                    iterator.Dispose()
+                    System.Fault("Query count exceeds Int32 capacity")
+                }
+                count = count + 1
+            }
+        }
+        iterator.Dispose()
+        return count
+    }
+
+    static func Fold<T, U>(source: Iterable<T>, seed: U, accumulator: System.Func<U, T, U>) -> U {
+        let iterator = source.GetIterator()
+        var result = seed
+        while iterator.MoveNext() {
+            result = accumulator(result, iterator.Current)
+        }
+        iterator.Dispose()
+        return result
+    }
+
+    static func Take<T>(source: Iterable<T>, count: int) -> Iterable<T> {
+        return TakeSequence<T>(source, count)
+    }
+
+    static func Skip<T>(source: Iterable<T>, count: int) -> Iterable<T> {
+        return SkipSequence<T>(source, count)
+    }
+
+    static func Concat<T>(source: Iterable<T>, second: Iterable<T>) -> Iterable<T> {
+        return ConcatSequence<T>(source, second)
+    }
+
+    static func FlatMap<T, U>(source: Iterable<T>, selector: System.Func<T, Iterable<U>>) -> Iterable<U> {
+        return FlatMapSequence<T, U>(source, selector)
+    }
+
     static func ToList<T>(source: Iterable<T>) -> ArrayList<T> {
         let result = ArrayList<T>()
         for item in source {
@@ -241,5 +328,325 @@ internal class SelectIterator<T, U> : Iterator<U> {
         active = false
         cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<U>(0)
         source.Dispose()
+    }
+}
+
+internal class TakeSequence<T> : Iterable<T> {
+    private field source: Iterable<T>
+    private field count: int
+
+    init(input: Iterable<T>, amount: int) {
+        source = input
+        count = amount
+    }
+
+    func GetIterator() -> Iterator<T> {
+        return TakeIterator<T>(source, count)
+    }
+}
+
+internal class TakeIterator<T> : Iterator<T> {
+    private field input: Iterable<T>
+    private field cursor: Iterator<T>[]
+    private field remaining: int
+    private field cached: T[]
+    private field active: bool
+    private field finished: bool
+
+    init(source: Iterable<T>, count: int) {
+        input = source
+        cursor = System.Runtime.CompilerServices.CheckedStorage.Reserve<Iterator<T>>(0)
+        remaining = count
+        cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(1)
+        active = false
+        finished = false
+    }
+
+    func MoveNext() -> bool {
+        if finished {
+            return false
+        }
+        active = false
+        if remaining <= 0 {
+            Dispose()
+            return false
+        }
+        if cursor.Length == 0 {
+            cursor = [input.GetIterator()]
+        }
+        if cursor[0].MoveNext() {
+            cached[0] = cursor[0].Current
+            active = true
+            remaining = remaining - 1
+            return true
+        }
+        Dispose()
+        return false
+    }
+
+    val Current: T {
+        get {
+            if !active {
+                System.Fault("Query iterator has no current element")
+            }
+            return cached[0]
+        }
+    }
+
+    func Dispose() {
+        if finished {
+            return
+        }
+        finished = true
+        active = false
+        cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(0)
+        if cursor.Length != 0 {
+            cursor[0].Dispose()
+            cursor = System.Runtime.CompilerServices.CheckedStorage.Reserve<Iterator<T>>(0)
+        }
+    }
+}
+
+internal class SkipSequence<T> : Iterable<T> {
+    private field source: Iterable<T>
+    private field count: int
+
+    init(input: Iterable<T>, amount: int) {
+        source = input
+        count = amount
+    }
+
+    func GetIterator() -> Iterator<T> {
+        return SkipIterator<T>(source, count)
+    }
+}
+
+internal class SkipIterator<T> : Iterator<T> {
+    private field input: Iterable<T>
+    private field cursor: Iterator<T>[]
+    private field remaining: int
+    private field cached: T[]
+    private field active: bool
+    private field finished: bool
+
+    init(source: Iterable<T>, count: int) {
+        input = source
+        cursor = System.Runtime.CompilerServices.CheckedStorage.Reserve<Iterator<T>>(0)
+        remaining = count
+        cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(1)
+        active = false
+        finished = false
+    }
+
+    func MoveNext() -> bool {
+        if finished {
+            return false
+        }
+        active = false
+        if cursor.Length == 0 {
+            cursor = [input.GetIterator()]
+        }
+        while remaining > 0 {
+            if !cursor[0].MoveNext() {
+                Dispose()
+                return false
+            }
+            remaining = remaining - 1
+        }
+        if cursor[0].MoveNext() {
+            cached[0] = cursor[0].Current
+            active = true
+            return true
+        }
+        Dispose()
+        return false
+    }
+
+    val Current: T {
+        get {
+            if !active {
+                System.Fault("Query iterator has no current element")
+            }
+            return cached[0]
+        }
+    }
+
+    func Dispose() {
+        if finished {
+            return
+        }
+        finished = true
+        active = false
+        cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(0)
+        if cursor.Length != 0 {
+            cursor[0].Dispose()
+            cursor = System.Runtime.CompilerServices.CheckedStorage.Reserve<Iterator<T>>(0)
+        }
+    }
+}
+
+internal class ConcatSequence<T> : Iterable<T> {
+    private field first: Iterable<T>
+    private field second: Iterable<T>
+
+    init(left: Iterable<T>, right: Iterable<T>) {
+        first = left
+        second = right
+    }
+
+    func GetIterator() -> Iterator<T> {
+        return ConcatIterator<T>(first, second)
+    }
+}
+
+internal class ConcatIterator<T> : Iterator<T> {
+    private field sources: Iterable<T>[]
+    private field cursor: Iterator<T>[]
+    private field index: int
+    private field cached: T[]
+    private field active: bool
+    private field finished: bool
+
+    init(first: Iterable<T>, second: Iterable<T>) {
+        sources = [first, second]
+        cursor = System.Runtime.CompilerServices.CheckedStorage.Reserve<Iterator<T>>(0)
+        index = 0
+        cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(1)
+        active = false
+        finished = false
+    }
+
+    func MoveNext() -> bool {
+        if finished {
+            return false
+        }
+        active = false
+        while index < 2 {
+            if cursor.Length == 0 {
+                cursor = [sources[index].GetIterator()]
+            }
+            if cursor[0].MoveNext() {
+                cached[0] = cursor[0].Current
+                active = true
+                return true
+            }
+            cursor[0].Dispose()
+            cursor = System.Runtime.CompilerServices.CheckedStorage.Reserve<Iterator<T>>(0)
+            index = index + 1
+        }
+        Dispose()
+        return false
+    }
+
+    val Current: T {
+        get {
+            if !active {
+                System.Fault("Query iterator has no current element")
+            }
+            return cached[0]
+        }
+    }
+
+    func Dispose() {
+        if finished {
+            return
+        }
+        finished = true
+        active = false
+        cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(0)
+        if cursor.Length != 0 {
+            cursor[0].Dispose()
+            cursor = System.Runtime.CompilerServices.CheckedStorage.Reserve<Iterator<T>>(0)
+        }
+        sources = System.Runtime.CompilerServices.CheckedStorage.Reserve<Iterable<T>>(0)
+    }
+}
+
+internal class FlatMapSequence<T, U> : Iterable<U> {
+    private field source: Iterable<T>
+    private field callback: System.Func<T, Iterable<U>>
+
+    init(input: Iterable<T>, selector: System.Func<T, Iterable<U>>) {
+        source = input
+        callback = selector
+    }
+
+    func GetIterator() -> Iterator<U> {
+        return FlatMapIterator<T, U>(source, callback)
+    }
+}
+
+internal class FlatMapIterator<T, U> : Iterator<U> {
+    private field input: Iterable<T>
+    private field callback: System.Func<T, Iterable<U>>
+    private field outer: Iterator<T>[]
+    private field inner: Iterator<U>[]
+    private field cached: U[]
+    private field active: bool
+    private field finished: bool
+
+    init(source: Iterable<T>, selector: System.Func<T, Iterable<U>>) {
+        input = source
+        callback = selector
+        outer = System.Runtime.CompilerServices.CheckedStorage.Reserve<Iterator<T>>(0)
+        inner = System.Runtime.CompilerServices.CheckedStorage.Reserve<Iterator<U>>(0)
+        cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<U>(1)
+        active = false
+        finished = false
+    }
+
+    func MoveNext() -> bool {
+        if finished {
+            return false
+        }
+        active = false
+        if outer.Length == 0 {
+            outer = [input.GetIterator()]
+        }
+        while true {
+            if inner.Length != 0 {
+                if inner[0].MoveNext() {
+                    cached[0] = inner[0].Current
+                    active = true
+                    return true
+                }
+                inner[0].Dispose()
+                inner = System.Runtime.CompilerServices.CheckedStorage.Reserve<Iterator<U>>(0)
+            }
+            if !outer[0].MoveNext() {
+                Dispose()
+                return false
+            }
+            let sequence = callback(outer[0].Current)
+            inner = [sequence.GetIterator()]
+        }
+        // The bootstrap compiler requires an explicit terminal return here.
+        return false
+    }
+
+    val Current: U {
+        get {
+            if !active {
+                System.Fault("Query iterator has no current element")
+            }
+            return cached[0]
+        }
+    }
+
+    func Dispose() {
+        if finished {
+            return
+        }
+        finished = true
+        active = false
+        cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<U>(0)
+        if inner.Length != 0 {
+            inner[0].Dispose()
+            inner = System.Runtime.CompilerServices.CheckedStorage.Reserve<Iterator<U>>(0)
+        }
+        if outer.Length != 0 {
+            outer[0].Dispose()
+            outer = System.Runtime.CompilerServices.CheckedStorage.Reserve<Iterator<T>>(0)
+        }
     }
 }

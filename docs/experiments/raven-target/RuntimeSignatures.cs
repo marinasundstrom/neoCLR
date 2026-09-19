@@ -26,8 +26,9 @@ static class RuntimeSignatures
                 throw new InvalidDataException("Unsupported open signature parameter.");
             var replacement = generic.GenericArguments[parameter.Position];
             // Substitution is simultaneous: a caller's open parameter is not another
-            // parameter of the callee owner to substitute recursively.
-            if (allowOpenMethodParameters && replacement is GenericParameter) return replacement;
+            // parameter of the callee owner to substitute recursively, including
+            // parameters nested inside a constructed caller type (e.g. Iterable<U>).
+            if (allowOpenMethodParameters) return replacement;
             return Nested(replacement);
         }
         if (type is GenericInstanceType instance)
