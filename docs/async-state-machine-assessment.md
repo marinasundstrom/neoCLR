@@ -107,3 +107,12 @@ and the rewritten body in AsyncDispatchGuard. Therefore exception-free lowering
 must bypass construction of that wrapper and catch explicitly, not only substitute
 a smaller builder. Follow the [exception-free requirement](async-api-design.md#exception-free-lowering-requirement--2026-09-19);
 no Raven code was changed by this inspection.
+
+### Payload-independent lowering
+
+The author's follow-up clarifies that the async transformation must not know about
+Result: Task<T> completion and await operate on an arbitrary T. A Result payload
+does not select a special builder, error path or scheduler behavior. Ordinary
+Result handling/propagation may appear in the user's body, but its resulting return
+is lowered exactly like any other return. The manual probe's Result match is
+application logic, not part of the proposed compiler contract.

@@ -32,7 +32,12 @@ operations can finish inline without registering. This makes awaiting different
 from an explicit yield; no ambient context capture or ConfigureAwait API is introduced.
 These are experimental dispatch choices, not settled UI-affinity or context policies.
 
-Expected failure is a completed Result value. A pending GetResult faults instead of
+The completion storage and executor treat their payload as an opaque value. The
+Ok/Error match in ResumeMachine is example application logic that adds a saved
+number or forwards an error, not a proposed Result-aware lowering rule. The final
+Task<T> implementation must work identically for arbitrary T.
+
+Expected failure in this example is a completed Result value. A pending GetResult faults instead of
 blocking; duplicate TryComplete returns false. Callback faults terminate execution.
 Cancellation, deadlines, ownership of abandoned work, fairness, logical context,
 external I/O and cleanup after faults are deliberately unresolved. An endlessly
@@ -105,7 +110,8 @@ must address these instead of admitting or discarding unsupported exception hand
 1. Introduce the smallest generic completion storage/producer implementation and
    compiler-facing reference contract, with its provisional status explicit.
 2. Make the compiler choose the target's builder and completion/error policy. Keep
-   Task<Result<T,E>> errors as ordinary return values and runtime Faults terminal.
+   completion uniform in T, without Result recognition, and runtime Faults terminal.
+   Result handling and ? belong to their ordinary language semantics.
    Omit the generated exception guard itself, not merely SetException: the current
    compiler still creates a catch when that builder method is absent. Audit normal
    and early-Result cleanup separately from unsupported exception unwinding.

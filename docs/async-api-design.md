@@ -164,8 +164,8 @@ Compiler-synthesized cleanup also needs review: retain cleanup on normal complet
 and early Result returns, but do not claim finally/unwinding behavior on a terminal
 Fault. Unsupported source constructs need diagnostics before execution.
 
-The provisional builder needs successful completion of arbitrary T, including
-Result and unit, and continuation/state ownership. It does not need a parallel
+The provisional builder needs completion with an arbitrary T and continuation/state
+ownership. Completion does not classify the value as success or failure. It does not need a parallel
 exception completion channel. Cancellation and operation abandonment remain
 separate design questions; they must not acquire exception semantics accidentally.
 
@@ -175,3 +175,22 @@ metadata for absent exception dependencies/handlers and rejected unsupported
 constructs. Run unchanged .NET async failure behavior as a compiler regression
 check. These are integration requirements, not a claim that the compiler path is
 already implemented.
+
+## Task and failure are independent — 2026-09-19
+
+The author clarified that Result<T,E> is an ordinary type even when it is a task's
+result. Async lowering must be uniform in T: completing Task<T> stores a T, and
+awaiting it produces a T. It must not recognize Result, inspect Ok/Error, unwrap
+a case, infer failure, or select a different builder path for Result payloads.
+Task owns completion; Result independently models a recoverable outcome.
+
+For Task<Result<V,E>>, substituting Result<V,E> for T is the entire relationship.
+Patterns, operator calls and ? retain their ordinary language semantics after
+awaiting. When ? causes an early return inside an async body, async lowering handles
+that return through the same completion path as any other returned T; it does not
+implement a second Result propagation mechanism. No Task-specific failure channel
+or Result-aware scheduler is implied.
+
+The exception-free target policy is independent of the payload type. Validate the
+same immediate/pending completion behavior with int, unit, an unrelated user union
+and Result payloads, so the compiler contract cannot accidentally depend on Result.

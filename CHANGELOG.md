@@ -19,6 +19,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Faults remain terminal, and Raven must omit its generated catch wrapper rather
   than merely omit SetException. Record cleanup and .NET regression requirements,
   with the current CreateMoveNextBody entry point identified for integration.
+  Clarify that Task lowering is uniform in its payload T: Result is an ordinary
+  type, with no special failure/completion path or Result-aware scheduling.
 
 - Port 25 Option/Result operator overloads from Raven.Core to the development
   library, including transformations, recovery, branch actions, conversions and

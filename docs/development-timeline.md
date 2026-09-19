@@ -4573,3 +4573,10 @@ SetException alone leaves the catch body intact. The proposed adaptation explici
 omits the async exception wrapper for neoCLR, preserves Result completion values
 and terminal Faults, and audits ordinary cleanup separately. This requirement is
 recorded in the async design; no compiler implementation is claimed by this update.
+
+The author clarified: “Result<T,E> is just a normal type in this model,” including
+when returned from a task, so Task and failure remain separate. The assistant
+made lowering explicitly uniform in T: no Result recognition, case inspection or
+special completion path. Ordinary Result operations and ? remain separate language
+semantics. The manual probe's Result match was identified as application logic,
+and future integration validation now includes unrelated payload types.
