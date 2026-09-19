@@ -100,6 +100,7 @@ def main():
         'COLLECTION_SAMPLE': (raven + 'library-collection-capabilities.rvn', 'func Read', '\nfunc Main', False),
         'FILE_SAMPLE': (raven + 'library-files.rvn', 'func Load', '\n}', True),
         'TEXT_SAMPLE': (raven + 'library-string-slices.rvn', 'func Extract', '\n}', True),
+        'QUERY_BASICS_SAMPLE': (raven + 'library-query-basics.rvn', 'import System.Collections.*', '\n    }\n}', True),
         'QUERY_NAMES_SAMPLE': (raven + 'library-query-names.rvn', 'import System.Linq.*', '\n}', True),
         'QUERY_SAMPLE': (raven + 'library-query-terminals.rvn', 'func OnlyPositive', '\n}', True),
     }
@@ -121,7 +122,7 @@ def main():
     output_text = escape((ROOT / (raven + 'library-introspection-tour.expected.txt')).read_text().rstrip())
     downloads = OUTPUT / 'samples'
     downloads.mkdir()
-    for name in ('library-query-names.rvn', 'library-query-names.expected.txt', 'library-introspection-tour.rvn', 'library-introspection-tour.expected.txt', 'library-utf8.rvn', 'library-utf8.expected.txt', 'library-instants.rvn', 'library-propagation.rvn', 'library-collection-capabilities.rvn', 'library-files.rvn', 'library-grapheme-strings.rvn', 'library-grapheme-strings.expected.txt'):
+    for name in ('library-query-basics.rvn', 'library-query-basics.expected.txt', 'library-query-names.rvn', 'library-query-names.expected.txt', 'library-introspection-tour.rvn', 'library-introspection-tour.expected.txt', 'library-utf8.rvn', 'library-utf8.expected.txt', 'library-instants.rvn', 'library-propagation.rvn', 'library-collection-capabilities.rvn', 'library-files.rvn', 'library-grapheme-strings.rvn', 'library-grapheme-strings.expected.txt'):
         shutil.copyfile(ROOT / raven / name, downloads / name)
     pages = {}
     for source in sorted(SOURCE.rglob('*.html')):

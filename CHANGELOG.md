@@ -17,6 +17,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   the neoCLR library import bridge without changing Raven's compiler. Validate
   58 query outcomes, 174 signatures, 86 editor sections, 5 compiler-path checks,
   24 focused runtime tests and exact reproduction of all 77 library slices.
+  Add a website guide with the tested basic sample and a .NET-to-neoCLR operator
+  table, including outcome differences and unsupported operators. Keep development
+  additions distinct from published Preview 8. Validate all 10 pages and review
+  the mapping table in the browser.
 
 - Record the general Raven SDK AppleDouble packaging candidate and the validated
   sidecar-free Preview 8 archive workaround; no upstream script fix is claimed.
