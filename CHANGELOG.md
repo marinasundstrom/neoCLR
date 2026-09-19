@@ -10,7 +10,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 - Record the decision to defer Thread/ThreadPool work and finish compiler-generated
   async integration first. This is implementation direction, not shipped async
-  support or a thread-safety guarantee.
+  support or a thread-safety guarantee. Independently reproduce and fix Raven's
+  struct-field receiver addressing on main; add a provisional heap state-machine
+  option only on Raven's neoCLR branch. Modern .NET compiler tests pass, while
+  neoCLR builder/importer integration remains in progress.
 
 - Add a provisional Raven-profile Task<T>/TaskCompletionSource<T> completion PoC
   with an explicit TaskQueue, ordinary generic payloads (including unit/Result),

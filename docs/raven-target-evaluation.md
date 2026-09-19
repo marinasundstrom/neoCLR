@@ -998,3 +998,26 @@ existing Func<System.Void> spelling works. Reproduce independently on ordinary C
 metadata before classifying or integrating compiler fixes. No Raven-main changes
 are made for these observations. Generated async and builder integration remain
 outside this completion PoC. See the slice document for validation and limitations.
+
+## Heap async compiler groundwork (2026-09-19)
+
+The async investigation exposed an independent Raven CLI emission bug: invoking
+a struct field's member through a class local addressed the reference slot rather
+than the object. A normal .NET fixture returned a corrupted integer instead of 42.
+The fix was developed on a main-based feature branch, validated with local,
+parameter and nested reference owners, then integrated into Raven main
+(`52d129d98`) and neoclr (`57077e526`) independently. The focused field/indexer/async
+run passed 21 checks, followed by all three final reference-owner cases. No target
+configuration or binding change is required. .NET Framework and NanoFramework
+execution were not tested.
+
+Only Raven's neoCLR branch adds `WithHeapAsyncStateMachines(true)`: generated
+state is a class, initialized through its constructor and retained over suspension.
+The default remains a struct; exception capture is configured separately. Tests
+execute two-await methods with completed and pending Tasks, force GC after kickoff,
+and verify both storage policies. All 37 focused heap/default async, exception
+capture, unit-result and field-owner checks pass on modern .NET. This validates
+compiler groundwork, not generated async execution on neoCLR. Its custom builder,
+awaiter, scheduling context and importer path remain to be connected and tested.
+No website capability claim changes: the completion PoC is still the implemented
+neoCLR behavior.
