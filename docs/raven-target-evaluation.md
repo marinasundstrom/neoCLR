@@ -904,3 +904,17 @@ reproduce on Raven main, add parser/binding coverage and validate the fix on .NE
 before integration. The main-checkout binary was unavailable during this check;
 the observation establishes .NET-target reproduction on the experimental build,
 not a tested main-branch regression or NanoFramework result.
+
+
+### Deferred general SDK packaging candidate — 2026-09-19
+
+The macOS SDK packaging script included AppleDouble `._` metadata sidecars, including
+`._*.deps.json`. The notice audit correctly rejected those as invalid dependency
+manifests. For Preview 8 the SDK archive was recreated from the unchanged staged SDK
+files, excluding the sidecars, then extracted and validated with the runtime, editor
+and notice suites. This does not change the compiler source revision.
+
+Disabling macOS metadata sidecars in Raven's packaging script is a general packaging
+candidate. Reproduce independently on main and validate archive membership before
+integrating; the script itself was not changed as part of this release. Keep this
+separate from neoCLR-specific target policies.

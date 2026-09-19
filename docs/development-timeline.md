@@ -4415,7 +4415,7 @@ The assistant selected Preview 8 and a fresh experimental Raven .15 toolchain,
 continuing the previous release's source matrix and macOS arm64 binary scope.
 The compiler, runtime and website text slices were committed separately. Release
 preparation uses an isolated clean checkout so existing local edits are preserved.
-Publication remains pending exact-candidate CI and extracted-package validation.
+At this point, publication was pending exact-candidate CI and extracted-package validation.
 
 ### Task contracts before dependent APIs — 2026-09-19
 
@@ -4450,3 +4450,17 @@ The author highlighted Where → Filter, Select → Map and SelectMany → FlatM
 strong candidates, while rejecting an automatic preference for Fold over Reduce or
 Drop over Skip. The assistant adopted that principle: the immediate implementation
 scope is the existing Where/Select pair; other operators require separate semantics.
+
+### Preview 8 publication — 2026-09-19
+
+The assistant published [Preview 8](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.8)
+at neoCLR `07ecdbe` with Raven `ddf10eca` (.15). All six source CI jobs passed
+1,280 tests each, and all validated archives matched the published source files.
+The extracted package, editor and notice checks passed; GitHub's asset digests
+matched the eight local uploads. The isolated VS Code grapheme workspace is available
+locally and its language client started successfully. See the
+[validation record](preview-8-validation.md) for scope and limitations.
+
+Release content and installation instructions were updated on the website for a
+separate manual publication. The subsequent Filter/Map migration is a separate
+post-release slice; it does not modify the published Preview 8 artifacts.

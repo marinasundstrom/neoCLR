@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Record the general Raven SDK AppleDouble packaging candidate and the validated
+  sidecar-free Preview 8 archive workaround; no upstream script fix is claimed.
 - Establish conventional query-operator terminology as the next post-release slice,
   before Task/async work; select Filter/Map for Where/Select with initial capitals.
   Prefer converged terminology while retaining .NET terms where conventional or
@@ -22,7 +24,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   calendar test's newline-dependent mutation and strict-Clippy test issues;
   document the independent parameter tables at the Introspection helper boundary.
   Select the release scope/date and keep actual publication evidence in the manifest;
-  exact-candidate validation and publication are pending. Generate the advanced
+  exact-candidate validation passed and all eight published assets were hash-verified.
+  Refresh website feature status and installation instructions for Preview 8. Generate the advanced
   runner fixture from shared props with inline contracts, so packaged verification
   can copy it to a temporary directory without breaking relative imports. Update
   the full editor matrix to expect Sequence members from Introspection queries;
