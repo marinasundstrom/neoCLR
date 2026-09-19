@@ -132,9 +132,12 @@ than introducing a new exception or union API.
 
 The general direct out-forwarding compiler correction is on Raven main (`5f6e17347`)
 and the feature branch (`2d2a1d586`); both pass 41 focused parameter checks. No new
-Runtime Contract setting is introduced. A separately reproduced unqualified generic
-self-constructor lookup problem is still being investigated; source currently uses
-explicit qualification.
+Runtime Contract setting is introduced. The independently reproduced unqualified generic constructor lookup correction is
+on Raven main (`d7292b935`) and the feature branch (`d833ef2f3`). Accessible same-name
+namespace declarations are retained across generic arities; invalid arities report
+RAV0305. The ordinary .NET regression returned 0 before and 42 afterward. All 78
+focused main checks and 18 feature-branch checks pass. The source keeps explicit
+qualification for readability; no additional Runtime Contract option is required.
 
 The remaining migration gates are substantive work, not just moving files:
 

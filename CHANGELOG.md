@@ -8,10 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Integrate the independently validated Raven namespace/generic-constructor lookup
+  correction on main (`d7292b935`) and the neoCLR feature branch (`d833ef2f3`). The
+  ordinary .NET regression now returns 42 instead of silently returning 0; 78 focused
+  main checks and 18 feature checks pass. No neoCLR policy was integrated into main.
+
 - Extend the API-preserving Raven library port from 28 to 65 source slices: generic
   fundamental/collection contracts, SystemClock/LocalDateTime, native-sized integer
   comparisons, complete Int32 methods, Console, Environment, File.ReadAllText,
-  String, opaque Error, five empty error types, Void, seven typed error carriers Propagatable, Option/Result and their cases. Check intrinsic String storage and mixed receivers,
+  String, opaque Error, five empty error types, Void, seven typed error carriers, Propagatable, Option/Result and their cases. Check intrinsic String storage and mixed receivers,
   preserve Error message delegation and runtime-owned payloads, and reject opaque
   allocation/defaults and String storage writes (11 admission cases pass). Preserve
   empty error defaults/constructors and nominal Void with nine further admission
