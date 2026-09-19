@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Adopt native UTF-8 as the text direction and change CompareOrdinal from UTF-16
+  code-unit order to UTF-8/scalar order. U+10000 now sorts after U+E000; re-sort
+  data that depends on the previous ordering. Keep the original proposal and
+  decision history; mark scalar Char as migration work, not a compatibility goal. Twelve ordinal/String runtime tests and the Raven
+  boundary sample pass with the new ordering.
+
 - Document the homepage/feature/proposal structure and website review with each
   feature and release. Separate Pages publication from code pushes: pushes and PRs
   still validate; only manual dispatch on main deploys. Isolate event concurrency

@@ -7,7 +7,7 @@ indexes, Rune iteration and general String.Length unsettled.
 ## API contract
 
 - `System.String.CompareOrdinal(String left, String right) -> Int32` compares
-  lexicographically by UTF-16 code units. Use the sign of the result, not its
+  lexicographically by UTF-8 bytes (equivalently Unicode scalar values for valid text). Use the sign of the result, not its
   magnitude. Equal text returns zero, consistent with String.Equals.
 - `readonly String.ContainsOrdinal(String value) -> Boolean` finds exact text.
 - `readonly String.StartsWithOrdinal(String value) -> Boolean` tests a prefix.
@@ -31,9 +31,10 @@ faults and execution limits still apply.
 Primary .NET 10 API sources consulted 2026-09-08:
 
 - [String.CompareOrdinal](https://learn.microsoft.com/en-us/dotnet/api/system.string.compareordinal?view=net-10.0)
-  compares numeric Char values and specifies the result's sign. Preserve that
-  ordering over our valid-text domain, including supplementary characters sorting
-  before U+E000. UTF-8 byte/scalar order would reverse that example. .NET also
+  compares numeric Char values and specifies the result's sign. The original implementation preserved that
+  ordering, including supplementary characters sorting before U+E000. The author
+  superseded this choice on 2026-09-19 with native UTF-8 semantics: supplementary
+  characters now sort after U+E000. .NET also
   accepts null inputs; our current String contract does not.
 - [String.Contains](https://learn.microsoft.com/en-us/dotnet/api/system.string.contains?view=net-10.0)
   provides ordinal matching and an explicit comparison overload.
@@ -60,7 +61,7 @@ StringOperations runtime service. No opcode, metadata format or Neo compiler cha
 is required. Readonly instance calls also require SlotReferences. There is no new
 managed allocation or retained lifetime in the helpers. The interpreter's owned
 String loads/calls can copy host buffers; readonly receivers do not promise zero-copy
-execution. UTF-16 ordering streams encoded units without constructing a UTF-16 buffer.
+execution. Ordering now compares the native UTF-8 bytes without UTF-16 transcoding.
 Exact UTF-8 matching has the same Boolean results as UTF-16 ordinal matching for
 valid-text patterns; unlike ordering, it does not need transcoding. No performance
 improvement is claimed. Host primitive work is not individually instruction-metered,
@@ -83,3 +84,20 @@ its Option result. It prints `café.neo` and returns 42. LINQ remains future wor
 
 The [Raven String projection](raven-string-api.md) exposes these operations through
 ordinary member calls and documents the executable boundary samples.
+
+## UTF-8 direction confirmed — 2026-09-19
+
+The author selected native UTF-8 and the String proposal as the platform direction,
+without a UTF-16 compatibility constraint. CompareOrdinal now follows unsigned
+UTF-8 byte order, which agrees with Unicode scalar order for valid strings. This
+is a deliberate ordering break from .NET and the earlier neoCLR implementation:
+U+10000 now sorts after U+E000. Existing sorted data that relies on the old ordering
+must be re-sorted. There is no culture collation or normalization change.
+
+The benefit is a single native ordering with no UTF-16 projection; the cost is
+compatibility with .NET ordinal sorting. Unicode recommends code-point order for
+binary sorting ([Unicode 17, implementation guidelines](https://www.unicode.org/versions/Unicode17.0.0/core-spec/chapter-5/));
+[Rust str ordering](https://doc.rust-lang.org/core/primitive.str.html#impl-Ord-for-str)
+compares byte values. Sources reviewed 2026-09-19. No speedup is claimed.
+Char still has a legacy 16-bit representation pending the coordinated scalar-Char
+migration; that is implementation debt, not the selected text model.

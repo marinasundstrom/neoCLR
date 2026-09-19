@@ -46,7 +46,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
              ('Paths', 'library-paths.rvn', 'summary.txt\nreport.txt\nreport.txt\n\n\nfinal.txt\n世界.txt\nleaf.txt\n'),
              ('StringSlices', 'library-string-slices.rvn', 'Sliced\né\nSliced\n😀\nSliced\n\nInvalid boundary\nInvalid boundary\nOut of range\nOut of range\nOut of range\nOut of range\nOut of range\nSliced\n\n'),
              ('Strings', 'library-strings.rvn', 'Hello, värld!\n14\nyes\nno\nyes\nno\nyes\nyes\nyes\nno\n-1\n0\n1\n'),
-             ('StringBoundaries', 'library-string-boundaries.rvn', 'yes\nyes\nyes\nyes\nno\n-1\n4\n'),
+             ('StringBoundaries', 'library-string-boundaries.rvn', 'yes\nyes\nyes\nyes\nno\n1\n4\n'),
              ('Patterns', 'library-patterns.rvn', '42\n-1\n7\n-1\n'),
              ('MatchForms', 'library-match.rvn', '42\n-1\nPresent\nAbsent\n42\nOverflow\n'),
              ('MatchVoid', 'library-match-void.rvn', '42\nSaved\nCompleted\nOverflow\n'),

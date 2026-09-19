@@ -18,7 +18,7 @@ The [String sample](experiments/raven-target/samples/library-strings.rvn) demons
 the first eight calls. `Hello, värld!` occupies 14 UTF-8 bytes. The
 [boundary sample](experiments/raven-target/samples/library-string-boundaries.rvn)
 checks empty patterns, embedded NUL, distinct normalized spellings, supplementary
-characters and UTF-16 ordinal ordering. Use the sign of CompareOrdinal's result,
+characters and UTF-8/scalar ordinal ordering. Use the sign of CompareOrdinal's result,
 not its magnitude; the samples use Math.Sign.
 
 The [slicing sample](experiments/raven-target/samples/library-string-slices.rvn)
@@ -39,7 +39,7 @@ This slice reuses [the existing ordinal contract and .NET comparison](ordinal-te
 and [the String model](text-model.md). Non-null text is immutable and valid Unicode. Managed String slots have a
 [typed null default](string-default-storage.md), distinct from empty text; operations
 requiring text fault on null. Searches are case-sensitive without normalization or culture processing;
-empty patterns match. CompareOrdinal retains UTF-16 code-unit ordering, while
+empty patterns match. CompareOrdinal uses UTF-8/scalar ordering, while
 GetUtf8ByteCount explicitly measures storage bytes. These are the existing library
 choices, not new runtime behavior or a claim of general .NET String compatibility.
 
@@ -116,7 +116,8 @@ catalog projects the exact signatures; System.Void/unit runtime configuration is
 unchanged. Regenerate the reference core and selected System library together.
 `IsEmpty()` has been replaced by the `IsEmpty` property: rebuild callers using
 `text.IsEmpty`. No specialized Utf8String, Encoding hierarchy, lossy decoder or
-scalar Char redesign is included.
+scalar Char implementation is included in this minimal conversion slice. The
+scalar redesign is now the selected direction, with implementation still outstanding.
 
 ### Comparison and provisional choices
 
@@ -128,8 +129,9 @@ Sequence exposes the collection contract while leaving provider choices open.
 The costs are snapshot allocations and a less detailed error. Streaming, offset
 reporting, UTF-16 interchange and broader encoding policy remain future work.
 The underlying validator follows [Rust's UTF-8 validity rules](https://doc.rust-lang.org/std/str/fn.from_utf8.html).
-Sources reviewed 2026-09-19. Existing UTF-16 ordinal comparison and code-unit Char
-semantics remain unchanged; UTF-8 storage does not make Char a Unicode scalar.
+Sources reviewed 2026-09-19. The author subsequently confirmed native UTF-8 as the selected direction.
+CompareOrdinal now uses UTF-8/scalar order; the legacy code-unit Char remains a
+known migration gap, not a compatibility requirement. See [the ordering change](ordinal-text.md#utf-8-direction-confirmed--2026-09-19).
 
 Validation: the UTF-8 sample and three existing String samples pass alongside 23
 saved-project edit/rejection checks. Three UTF-8 runtime tests and thirteen existing

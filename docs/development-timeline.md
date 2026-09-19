@@ -4285,3 +4285,14 @@ instead of publishing with pushes. The assistant documented the workflow in
 instructions and AGENTS.md, and changed Pages deployment to manual dispatch on main.
 Push and PR validation remain automatic. This is a local workflow change; no site
 publication has been performed, and the remote policy changes only after integration.
+
+### Native UTF-8 direction supersedes the compatibility carryover
+
+The author clarified: “We don't want to use UTF-16 in NeoCLR”, directing work toward
+native UTF-8 and following the String proposal. This supersedes the assistant's
+earlier suggestion to preserve UTF-16 semantics. String storage was already UTF-8;
+the assistant changed CompareOrdinal to native byte/scalar ordering and updated
+samples and direction notes. Scalar Char is now the selected migration target,
+not merely an optional proposal; its existing 16-bit representation remains an
+explicit implementation gap requiring coordinated runtime, metadata and compiler
+changes. This slice does not claim that migration has already happened.

@@ -1,4 +1,4 @@
-use neoclr::{Limits, LoadedProgram, RuntimeService, Value, assembler::parse_function_ref};
+use neoclr::{assembler::parse_function_ref, Limits, LoadedProgram, RuntimeService, Value};
 
 fn program() -> LoadedProgram {
     let mut source = String::from(".module Text\n");
@@ -13,7 +13,7 @@ fn program() -> LoadedProgram {
 }
 
 #[test]
-fn compare_preserves_dotnet_utf16_order_including_supplementary_text() {
+fn compare_uses_utf8_scalar_order_including_supplementary_text() {
     let program = program();
     let compare = program
         .resolve_function(
@@ -26,7 +26,9 @@ fn compare_preserves_dotnet_utf16_order_including_supplementary_text() {
         ("x", "", 1),
         ("A", "a", -1),
         ("é", "e\u{301}", 1),
-        ("\u{10000}", "\u{e000}", -1),
+        ("\u{10000}", "\u{e000}", 1),
+        ("\u{ffff}", "\u{10000}", -1),
+        ("\u{10ffff}", "\u{10000}", 1),
         ("🌍", "🌎", -1),
         ("a\0", "a", 1),
         ("abc", "abcd", -1),
@@ -108,16 +110,12 @@ fn service_planning_covers_all_ordinal_helpers() {
                 8,
             )
             .unwrap();
-        assert!(
-            graph
-                .required_services()
-                .contains(&RuntimeService::StringOperations)
-        );
-        assert!(
-            graph
-                .required_services()
-                .contains(&RuntimeService::SlotReferences)
-        );
+        assert!(graph
+            .required_services()
+            .contains(&RuntimeService::StringOperations));
+        assert!(graph
+            .required_services()
+            .contains(&RuntimeService::SlotReferences));
     }
     let graph = program
         .analyze_reachability(

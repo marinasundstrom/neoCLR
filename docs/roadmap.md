@@ -39,10 +39,12 @@ Compare the existing [String contracts](raven-string-api.md), [text model](text-
 and [ordinal behavior](ordinal-text.md) with .NET's UTF-16 String/Char model before
 changing semantics. Settle the units of length, indexing and slicing, Unicode
 boundary behavior, and the minimum byte/text boundary needed by runnable examples.
-Do not infer a Char representation change or an Encoding hierarchy merely from
-this sequencing request. UTF-8 support can improve storage/interchange ergonomics;
+The later author clarification selects native UTF-8 and the proposal’s scalar Char
+direction. The minimal conversion slice is implemented; scalar Char requires a
+coordinated migration, while an Encoding hierarchy remains deferred. UTF-8 support can improve storage/interchange ergonomics;
 its indexing costs and .NET migration differences must be explicit. This section
-records the next work, not completed string API changes.
+now includes strict Utf8 conversion and UTF-8/scalar ordinal ordering; it does not
+claim that scalar Char or scalar indexing is already implemented.
 
 ## Next-preview feature pages (2026-09-19)
 
@@ -50,9 +52,10 @@ The author proposes dedicated feature pages with in-depth API walkthroughs and m
 substantial examples for the next release. The [content plan](design/feature-pages.md)
 starts with Introspection as an assistant-suggested candidate, using tested Raven
 samples, expected output, .NET comparisons, preview limits and focused feedback
-questions. The String page follows the later String API/runtime-behavior story.
-The first Introspection page is now built and checked locally, with source-backed
-excerpts and sample downloads. Publication and additional pages remain separate work;
+questions. Introspection and the minimal String implementation now have checked pages, with
+a separate proposal overview and feature-specific future directions. Pages can be
+short current-state notes rather than exhaustive guides. Website content is reviewed
+with each feature and release; publication is now a separate manual workflow;
 no new release date is selected.
 
 ## Core contract and target capability planning (2026-09-14)

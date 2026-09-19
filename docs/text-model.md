@@ -1,21 +1,23 @@
 # Text model and initial String API
 
-The proposed direction is valid UTF-8 as String's default representation, with
-explicit UTF-16 conversion for migration and native interop. The initial explicitly
-UTF-8-named String methods are now implemented. This does not settle the String ABI
-or a general indexing contract. The current
-interpreter uses Rust String internally; host representation alone does not define
-the guest platform contract.
+The selected direction is native, well-formed UTF-8 with Unicode scalar semantics,
+following the [String proposal](proposals/string-api.md). The author confirmed on
+2026-09-19 that UTF-16 is not neoCLR's native text model or a compatibility constraint.
+The interpreter already stores String as valid UTF-8. Strict byte conversion and
+UTF-8 ordinal ordering are implemented; scalar-valued Char, scalar indexing and
+iteration still require coordinated runtime/compiler work. Do not describe those
+remaining changes as complete or preserve UTF-16 merely for .NET compatibility.
 
-The motivation is to make common UTF-8 interchange boundaries inexpensive, rather
-than to assume all other runtimes use the same internal representation. UTF-16
-remains relevant to .NET and foreign APIs; compatibility conversions are explicit.
+Future foreign-encoding adapters, if needed, belong at explicit interop boundaries.
+They do not change the native model. A general Encoding API and specialized
+Utf8String remain outside the minimal slice.
 
 Separate the concepts through types and APIs:
 
 - Byte holds an encoded octet, not necessarily a complete character.
-- A future System.Text.Rune should hold a validated Unicode scalar value.
-- System.Char retains its familiar UTF-16 code-unit meaning for compatibility.
+- Char is intended to hold a validated Unicode scalar value under the proposal.
+- System.Char currently still stores a UTF-16 code unit; this is migration debt,
+  not a retained compatibility goal. A separate Rune is not required by this direction.
 - Text-element APIs should handle grapheme clusters for user-facing operations.
 
 UTF-8 represents a scalar using one to four bytes. A displayed text element can
@@ -172,9 +174,11 @@ predicates, ordering and metadata; a scalar is also not necessarily a user-perce
 grapheme. A constrained ASCII type adds conversion and generic/reflection surface, and
 canonical UTF-8 does not remove the need for UTF-16 copies at .NET boundaries.
 
-The alternatives remain open: retain the familiar .NET split (`Char` plus `Rune`),
+At this earlier review, alternatives remained open: retain the familiar .NET split (`Char` plus `Rune`),
 make String scalar-oriented while retaining a UTF-16-compatible Char view, or adopt the
-minimal scalar model above. No choice has been made. Before implementation, compare
+minimal scalar model above. The author’s later 2026-09-19 clarification selects the
+scalar model and native UTF-8; the alternatives are retained here as decision history.
+Before the Char migration, compare
 the alternatives against current .NET `Char`/`Rune`/encoding contracts and the CLI
 metadata representation, then validate literals, indexing/iteration, malformed input,
 unpaired UTF-16 surrogates, ASCII narrowing, generic constraints, reflection and

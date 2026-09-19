@@ -387,8 +387,8 @@ impl Binding {
                 Ok(Value::String(value))
             }
             (Self::StringCompareOrdinal, [Value::String(left), Value::String(right)]) => {
-                // .NET ordinal ordering compares UTF-16 units, not UTF-8 bytes or scalars.
-                let order = left.encode_utf16().cmp(right.encode_utf16());
+                // Valid UTF-8 byte order agrees with Unicode scalar order.
+                let order = left.as_bytes().cmp(right.as_bytes());
                 Ok(Value::Int32(match order {
                     std::cmp::Ordering::Less => -1,
                     std::cmp::Ordering::Equal => 0,
