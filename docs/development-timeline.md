@@ -4416,3 +4416,18 @@ continuing the previous release's source matrix and macOS arm64 binary scope.
 The compiler, runtime and website text slices were committed separately. Release
 preparation uses an isolated clean checkout so existing local edits are preserved.
 Publication remains pending exact-candidate CI and extracted-package validation.
+
+### Task contracts before dependent APIs — 2026-09-19
+
+During Preview 8 preparation, the author selected Task and async state-machine
+contracts as the first priority after release, with runtime suspension as a future
+step. The author asked for a modern .NET-like developer experience without legacy
+constraints, identifying ConfigureAwait as one area to reconsider. The author then
+clarified: “The rationale is that we need the Task contract for upcoming APIs”.
+
+The assistant proposed treating completion, continuation scheduling and logical
+context flow as explicit contracts, aiming to avoid routine per-await boilerplate.
+The assistant recorded the priority and rationale in the async design, assessment
+and website proposals. This selects the order of work, not a final scheduling policy
+or a shipped Task implementation. Runtime suspension and the behavior of cancellation,
+UI affinity, cleanup and context propagation still require design and validation.

@@ -4,6 +4,14 @@ Source assessment, 2026-09-14: neoCLR `5da27a7`, Raven `ee7b2e5af` on
 `codex/neoclr-namespace-metadata`. No Raven files were changed. This is an inspection,
 not a successful compilation or execution probe.
 
+## Post-release priority — 2026-09-19
+
+The author selected these compiler-facing contracts and Task as the first work after
+Preview 8, because upcoming APIs need the completion abstraction. Runtime suspension
+remains a later step. The assessment below is historical source evidence; re-audit
+the current compiler/runtime before implementation. See the updated
+[API design priorities](async-api-design.md#first-priority-after-preview-8--2026-09-19).
+
 ## Finding
 
 Compiler-generated async is a feasible transitional direction, but neoCLR does not

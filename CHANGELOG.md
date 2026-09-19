@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Record Task and async state-machine contracts as the first post-Preview 8 priority:
+  upcoming APIs need the completion contract before runtime suspension arrives.
+  Keep continuation scheduling and logical context flow as explicit open design work,
+  including the goal of avoiding routine ConfigureAwait-style boilerplate.
 - Select Preview 8 and Raven 0.1.12-neoclr.15 as the release candidate; prepare
   notes, migration guidance and the validation checklist. Repair the Windows
   calendar test's newline-dependent mutation and strict-Clippy test issues;

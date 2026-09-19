@@ -6,6 +6,36 @@ and which .NET conventions or behaviors neoCLR should retain or change. The Task
 recommendations below remain assistant proposals, not author approval or implemented
 contracts.
 
+## First priority after Preview 8 — 2026-09-19
+
+The author selected Task and compiler-generated async state-machine contracts as
+the first post-release priority. The rationale is that upcoming APIs need a shared
+completion contract; this is foundational API work, not merely an async syntax feature.
+Runtime-owned suspension remains the later direction. The first implementation is
+transitional, and should preserve the public Task/Result model when its execution
+mechanism changes. No Task implementation is included in Preview 8.
+
+Start by specifying completion, awaiter registration, compiler/builder responsibilities,
+state ownership and continuation dispatch, then prove immediate and genuinely pending
+operations through Raven and neoCLR. Keep recoverable outcomes in Result. Cancellation,
+cleanup and terminal Fault handling must be explicit before dependent APIs rely on them.
+
+The author identified ConfigureAwait as an opportunity to improve developer experience
+without inheriting every .NET convention. The assistant proposes predictable defaults
+that avoid routine per-await boilerplate; the exact policy remains open. In .NET,
+ConfigureAwait(false) changes continuation context/scheduler capture, does not promise
+a thread switch, and does not suppress ExecutionContext flow. These are separate
+contracts, not one context switch. See the primary
+[ConfigureAwait FAQ](https://devblogs.microsoft.com/dotnet/configureawait-faq/)
+(consulted 2026-09-19).
+
+Compare implicit context capture, explicit executor selection and scoped scheduling
+before choosing defaults. Less ambient capture could simplify library code, but UI
+and other affine resources still need a clear way to resume on their owner. Specify
+logical context propagation separately. Validate completed/pending awaits, reentrancy,
+UI-like single-executor behavior and library composition; do not claim an improvement
+until the resulting experience and costs are demonstrated.
+
 ## Starting contract
 
 Task<T> represents an operation and Task<Result<T,E>> carries recoverable outcomes.
