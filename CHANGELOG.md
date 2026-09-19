@@ -28,6 +28,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   example and downloadable source/output. Link the .NET iterable mapping and
   distinguish development additions from Preview 8. Validate all 10 pages,
   cross-page links and highlighting, and review the operator table in the browser.
+  Record natural, minimally annotated Raven samples as a shared website and code
+  convention, retaining annotations required for compilation or a clear contract.
 
 - Document imported union case patterns in the Raven conventions: use Some, None,
   Ok and Error without a leading dot when their case namespaces are imported.

@@ -4536,3 +4536,10 @@ simplified both OrElse callbacks, and documented the convention to prefer infere
 The Then callback still needs explicit types in the tested SDK; the assistant
 recorded that limitation and related compiler candidates rather than presenting
 those annotations as a language or API design requirement.
+
+The author clarified that website examples and samples should show the language
+as it is, without unnecessary explanatory annotations, while retaining those
+actually needed. The assistant recorded this in both the Raven conventions and
+website maintenance guidance. The query and delegate examples were simplified
+and checked against their existing outputs; needed generic callback signatures
+remain. This is a presentation convention, not a change to Raven's type system.

@@ -190,9 +190,13 @@ Prefer inferred callback types when the receiving method supplies enough context
 let fallback = absent.OrElse(() => Some(7))
 ```
 
-Do not annotate every lambda for demonstration. Keep explicit types when they
-clarify a non-obvious contract or are required by current inference, and explain
-compiler workarounds. For example, the development outcome sample currently needs
+Website examples and samples should show Raven as it is naturally written. Do not
+add type annotations merely to explain the language or spell out what is already
+clear from the operation and surrounding code. Prefer inference for locals and
+callbacks; retain annotations only when the compiler requires them or a contract
+would otherwise be unclear. Examples must compile as shown. Record required
+compiler workarounds in the relevant technical notes without turning the example
+into a language tutorial. For example, the development outcome sample currently needs
 `Then((value: int) -> Result<int, string> => Ok(value + 1))`; the shorter
 union-returning callback fails inference in Raven SDK .15. Both OrElse callbacks
 in that sample compile without annotations.

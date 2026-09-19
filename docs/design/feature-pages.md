@@ -89,3 +89,12 @@ When describing prerequisites, distinguish runtime execution from development to
 neoCLR and its guest programs do not require .NET. Raven compilation, MSBuild, the
 import bridge and Raven Language Server use .NET; the VS Code extension connects
 to that server. Do not imply the extension itself is a .NET application.
+
+## Natural Raven examples
+
+Website samples should show idiomatic Raven as developers would write it, following
+[the code conventions](../raven-conventions.md#lambda-signatures). Avoid redundant
+type annotations and explanatory syntax when the operation and surrounding code
+already make the meaning clear. Keep annotations that current compilation requires
+or that clarify an otherwise unclear contract, and compile the exact displayed
+example. Do not add annotations merely to teach or over-explain the language.
