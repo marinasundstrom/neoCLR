@@ -19,6 +19,24 @@ binding immutability/readonly references, inheritance, nullable slots, enums/fla
 dynamic hooks, and a more useful fundamental library. Familiarity primarily means C#/.NET APIs and observable behavior, not matching
 source syntax or runtime internals. Improve contracts without legacy constraints.
 
+## Immediate sequence clarified (2026-09-19)
+
+First finish the basic [introspection model](introspection-design.md), including
+unified TypeInfo acquisition and RuntimeContext discovery. Then focus on how
+neoCLR handles strings and implement the smallest useful UTF-8-oriented surface.
+The author explicitly leaves the encoding API undecided and excludes specialized
+string types such as Utf8String from this step. The [larger string proposal](proposals/string-api.md)
+is design material, not authorization to implement its entire type catalog.
+
+Compare the existing [String contracts](raven-string-api.md), [text model](text-model.md)
+and [ordinal behavior](ordinal-text.md) with .NET's UTF-16 String/Char model before
+changing semantics. Settle the units of length, indexing and slicing, Unicode
+boundary behavior, and the minimum byte/text boundary needed by runnable examples.
+Do not infer a Char representation change or an Encoding hierarchy merely from
+this sequencing request. UTF-8 support can improve storage/interchange ergonomics;
+its indexing costs and .NET migration differences must be explicit. This section
+records the next work, not completed string API changes.
+
 ## Core contract and target capability planning (2026-09-14)
 
 Use [API planning](runtime-api-plan.md#common-platform-contract-and-target-capabilities-2026-09-14)

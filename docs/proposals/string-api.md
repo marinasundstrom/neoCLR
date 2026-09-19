@@ -1,5 +1,12 @@
 # NeoCLR Strings & Encoding Proposal
 
+**Implementation scope clarified 2026-09-19:** after the basic Introspection API,
+review string handling and implement a minimal UTF-8-oriented surface. The encoding
+API remains undecided. Specialized string classes, including Utf8String, are out
+of scope for that step. The broader proposal below is preserved as design history;
+its encoding-specific types are not a current implementation commitment. See
+[the work sequence](../roadmap.md#immediate-sequence-clarified-2026-09-19).
+
 The model has now converged on a fairly simple principle:
 
 > **Unicode defines NeoCLR's text semantics. UTF-8 is NeoCLR's native and canonical text representation. `String` and `Char` remain the familiar programming abstractions, while encoding-specific types and `Encoding` expose representation when it matters.**

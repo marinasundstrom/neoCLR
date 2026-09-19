@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Record string handling as the next focus after basic introspection. Limit the
+  planned UTF-8 work to a minimal surface, leave encoding undecided, and defer
+  specialized string classes such as Utf8String.
+
 - Add reference-only `isinst` and `ref.isnull` instructions for runtime type tests.
   Successful tests preserve object identity through interface views; failed/null
   tests return typed nulls. Interface tests also accept boxed implementations and

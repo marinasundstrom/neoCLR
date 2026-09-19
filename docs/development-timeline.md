@@ -25,6 +25,18 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-19 — String handling after basic introspection
+
+**Author direction.** After the basic Introspection API, focus on neoCLR string
+handling and implement a minimal UTF-8-related surface. The author left encoding
+undecided and explicitly said not to add specialized Utf8String classes yet.
+
+**Assistant response and action.** Preserved introspection as the current priority,
+recorded string handling as the next step, and narrowed the implementation scope of
+the larger string proposal without deleting its earlier ideas. Encoding and Char
+representation are not selected by this message. No string implementation change
+was made in response to this sequencing instruction. See [the roadmap](roadmap.md#immediate-sequence-clarified-2026-09-19).
+
 ## 2026-09-19 — TypeInfo as a member
 
 **Author proposal.** “We could technically make TypeInfo part of the MemberInfo
