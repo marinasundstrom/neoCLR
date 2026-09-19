@@ -1,6 +1,6 @@
 {
   "purpose": "Explicit source-by-source API audit. Samples and signature checks are evidence, not a claim of arbitrary generic/compiler support.",
-  "declarationCount": 734,
+  "declarationCount": 744,
   "sources": [
     {
       "file": "runtime/System/Equatable.neoil",
@@ -86,25 +86,52 @@
       "note": "Matched private backing storage becomes intrinsic loads; no nested runtime field or new primitive constructor."
     },
     {
-      "file": "runtime/System/String.neoil",
+      "file": "runtime/raven/generated/String.methods.neoil",
       "declarations": 10,
-      "disposition": "primitives",
+      "disposition": "raven-authored-opaque-bootstrap",
       "samples": [
-        "library-primitives.rvn",
-        "library-integers.rvn",
-        "library-booleans.rvn",
         "library-strings.rvn",
-        "library-parsing.rvn",
-        "library-division.rvn"
-      ]
+        "library-string-slices.rvn",
+        "library-errors.rvn"
+      ],
+      "tests": [
+        "tests/strings.rs",
+        "tests/errors.rs",
+        "docs/experiments/raven-target/verify_opaque_library.py"
+      ],
+      "note": "Checked intrinsic String storage and fieldless Error bodies retain native ownership and mixed receiver ABI. Compiler operators remain intrinsic; opaque allocation and storage mutation are rejected."
     },
     {
-      "file": "runtime/System/Error.neoil",
-      "declarations": 5,
-      "disposition": "errors",
+      "file": "runtime/raven/generated/String.helpers.neoil",
+      "declarations": 10,
+      "disposition": "raven-authored-opaque-bootstrap",
       "samples": [
+        "library-strings.rvn",
+        "library-string-slices.rvn",
         "library-errors.rvn"
-      ]
+      ],
+      "tests": [
+        "tests/strings.rs",
+        "tests/errors.rs",
+        "docs/experiments/raven-target/verify_opaque_library.py"
+      ],
+      "note": "Checked intrinsic String storage and fieldless Error bodies retain native ownership and mixed receiver ABI. Compiler operators remain intrinsic; opaque allocation and storage mutation are rejected."
+    },
+    {
+      "file": "runtime/raven/generated/Error.methods.neoil",
+      "declarations": 5,
+      "disposition": "raven-authored-opaque-bootstrap",
+      "samples": [
+        "library-strings.rvn",
+        "library-string-slices.rvn",
+        "library-errors.rvn"
+      ],
+      "tests": [
+        "tests/strings.rs",
+        "tests/errors.rs",
+        "docs/experiments/raven-target/verify_opaque_library.py"
+      ],
+      "note": "Checked intrinsic String storage and fieldless Error bodies retain native ownership and mixed receiver ABI. Compiler operators remain intrinsic; opaque allocation and storage mutation are rejected."
     },
     {
       "file": "runtime/raven/generated/SByte.methods.neoil",
@@ -726,8 +753,8 @@
       "callers": [
         {
           "service": "neoCLR.Runtime.StringConcat",
-          "file": "runtime/System/String.neoil",
-          "line": 6
+          "file": "runtime/raven/generated/String.methods.neoil",
+          "line": 12
         }
       ]
     },
@@ -738,8 +765,8 @@
       "callers": [
         {
           "service": "neoCLR.Runtime.StringByteCount",
-          "file": "runtime/System/String.neoil",
-          "line": 51
+          "file": "runtime/raven/generated/String.methods.neoil",
+          "line": 99
         }
       ]
     },
@@ -750,8 +777,8 @@
       "callers": [
         {
           "service": "neoCLR.Runtime.StringCompareOrdinal",
-          "file": "runtime/System/String.neoil",
-          "line": 21
+          "file": "runtime/raven/generated/String.methods.neoil",
+          "line": 40
         }
       ]
     },
@@ -762,8 +789,8 @@
       "callers": [
         {
           "service": "neoCLR.Runtime.StringContainsOrdinal",
-          "file": "runtime/System/String.neoil",
-          "line": 29
+          "file": "runtime/raven/generated/String.methods.neoil",
+          "line": 54
         }
       ]
     },
@@ -774,8 +801,8 @@
       "callers": [
         {
           "service": "neoCLR.Runtime.StringStartsWithOrdinal",
-          "file": "runtime/System/String.neoil",
-          "line": 37
+          "file": "runtime/raven/generated/String.methods.neoil",
+          "line": 70
         }
       ]
     },
@@ -786,8 +813,8 @@
       "callers": [
         {
           "service": "neoCLR.Runtime.StringEndsWithOrdinal",
-          "file": "runtime/System/String.neoil",
-          "line": 45
+          "file": "runtime/raven/generated/String.methods.neoil",
+          "line": 86
         }
       ]
     },
@@ -798,8 +825,8 @@
       "callers": [
         {
           "service": "neoCLR.Runtime.StringSliceUtf8",
-          "file": "runtime/System/String.neoil",
-          "line": 67
+          "file": "runtime/raven/generated/String.methods.neoil",
+          "line": 133
         }
       ]
     },
@@ -824,8 +851,8 @@
       "callers": [
         {
           "service": "neoCLR.Runtime.ErrorFromMessage",
-          "file": "runtime/System/Error.neoil",
-          "line": 8
+          "file": "runtime/raven/generated/Error.methods.neoil",
+          "line": 12
         }
       ]
     },
@@ -836,8 +863,8 @@
       "callers": [
         {
           "service": "neoCLR.Runtime.ErrorMessage",
-          "file": "runtime/System/Error.neoil",
-          "line": 14
+          "file": "runtime/raven/generated/Error.methods.neoil",
+          "line": 23
         }
       ]
     },

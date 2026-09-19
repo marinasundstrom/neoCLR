@@ -16,6 +16,16 @@ static class RuntimeServiceBindings
             ("PathCombine", ["String", "String"], "String"),
             ("PathGetFileName", ["String"], "String"),
             ("WriteAllText", ["String", "String", "Int32"], "Int32"),
+            ("StringEquals", ["String", "String"], "Boolean"),
+            ("StringConcat", ["String", "String"], "String"),
+            ("StringCompareOrdinal", ["String", "String"], "Int32"),
+            ("StringContainsOrdinal", ["String", "String"], "Boolean"),
+            ("StringStartsWithOrdinal", ["String", "String"], "Boolean"),
+            ("StringEndsWithOrdinal", ["String", "String"], "Boolean"),
+            ("StringByteCount", ["String"], "Int32"),
+            ("StringSliceUtf8", ["String", "Int32", "Int32"], "Value"),
+            ("ErrorFromMessage", ["String"], "System.Error"),
+            ("ErrorMessage", ["System.Error"], "String"),
             ("ReadAllText", ["String", "Int32"], "Value"),
             ("ParseInt32", ["String"], "Value"),
             ("ConsoleReadByte", [], "Value"),
@@ -69,6 +79,8 @@ static class RuntimeServiceBindings
                 : ReflectionBindings.Type(t) ?? ProcessBindings.ArrayType(t) ?? GenericUnionBindings.Type(t));
         if (!Members.Any(m => m.Name == reference.Name && m.Args.SequenceEqual(args) && m.Result == result))
             throw new InvalidDataException("Unsupported runtime service signature: " + reference.FullName);
+        if (reference.Name == "StringEquals")
+            return new("", args, result, Instruction: "ceq");
         if (reference.Name == "WriteLine")
             return new("", args, result, Instruction: "call neoCLR.Runtime.WriteLine(String)\npop");
         if (reference.Name is "IntPtrToInt64" or "UIntPtrToUInt64")

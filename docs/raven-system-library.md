@@ -10,6 +10,7 @@ verify and run against the regenerated library. Original proposal texts are inde
 This slice adds Raven sources for the fundamental and collection interfaces,
 SystemClock, LocalDateTime, IntPtr/UIntPtr comparisons, the complete Int32 member
 surface, Console and Environment. File.ReadAllText joins WriteAllText in Raven.
+The follow-up also ports String and opaque Error, bringing the total to 49 slices.
 The legacy Neo profile retains its receiver/array conventions where it differs;
 the Raven profile selects generated contracts and implementation bodies.
 
@@ -48,17 +49,41 @@ This migration reuses the .NET comparisons in [common interfaces](common-interfa
 additional generated adapters and a larger reachable call graph; no performance
 improvement or new native ABI is claimed.
 
-Remaining handwritten source includes String, opaque Error, Option/Result and error
+Remaining handwritten source includes Option/Result and error
 carriers, descriptor hierarchy bodies, array/runtime adapters, delegates and Void.
 Native service declarations remain runtime-owned. Generated neoIL remains a build
 artifact rather than a competing implementation. These boundaries are not silently
 claimed to have become Raven source.
 
+String authoring uses a final CLI class with exactly one private `m_value: string`
+bootstrap field. The importer checks that shape and erases the field into existing
+intrinsic storage; it does not allocate an ordinary class. Equals/ContainsOrdinal/
+StartsWithOrdinal/EndsWithOrdinal retain readonly byref neoIL receivers; byte count,
+empty and slicing retain value receivers. Primitive equality avoids recursively
+calling String.Equals. Compiler-facing operators remain intrinsic, not additional
+runtime methods. Raven named arguments retain the existing reference contract (`value0`/`value1`);
+generated runtime metadata retains the prior descriptive names (`left`, `other`,
+`byteStart`, and so on). Their pre-existing disagreement is left for API alignment.
+
+Error is a fieldless, opaque value created only by the native message factory.
+The importer removes the reference assembly's placeholder one-byte layout and
+checks exact source storage/signatures. It omits only checked implicit constructors,
+rejects direct opaque construction/default Error bodies and String field writes,
+and projects Error's CLI receiver loads onto the existing by-value neoIL ABI.
+No Raven compiler code or Runtime Contract option changes are required. These
+admission policies stay in neoCLR's importer and bootstrap reference assembly.
+
+This preserves the established behavior in [String](raven-string-api.md),
+[string default storage](string-default-storage.md), and [errors](errors.md),
+including their .NET comparisons. CLI class/value metadata serves Raven compilation;
+neoCLR retains its own immutable string/message storage and native UTF-8 operations.
+The benefit is source ownership with checked boundaries; the cost is generated
+Boolean/union adapters and a larger call graph, without a performance claim.
+
 The remaining migration gates are substantive work, not just moving files:
 
 | Remaining source | Required implementation admission |
 | --- | --- |
-| String and opaque Error | Intrinsic reference receivers/storage and exact native-service bindings |
 | Option/Result, Propagatable and error carriers | Union/case representation, out-parameter contracts and default/case validity |
 | MemberInfo/FieldInfo/MethodInfo/PropertyInfo | Abstract/inherited descriptor layout and runtime snapshot factory compatibility |
 | Array, iterator adapters and Func | Runtime-owned allocation/element access and delegate invocation boundaries |

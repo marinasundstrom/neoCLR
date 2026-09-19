@@ -1,0 +1,59 @@
+namespace System
+
+import System.Runtime.CompilerServices.RuntimeServices
+import System.Result.*
+import System.Text.Utf8SliceError
+
+public class String : Equatable<string> {
+    // Intrinsic storage supplied by the runtime, never an allocated class field.
+    #pragma warning disable-next-line RAV9032
+    private field m_value: string
+
+    static func Concat(value0: string, value1: string) -> string {
+        return RuntimeServices.StringConcat(value0, value1)
+    }
+
+    func Equals(value0: string) -> bool {
+        return RuntimeServices.StringEquals(m_value, value0)
+    }
+
+    static func CompareOrdinal(value0: string, value1: string) -> int {
+        return RuntimeServices.StringCompareOrdinal(value0, value1)
+    }
+
+    func ContainsOrdinal(value0: string) -> bool {
+        return RuntimeServices.StringContainsOrdinal(m_value, value0)
+    }
+
+    func StartsWithOrdinal(value0: string) -> bool {
+        return RuntimeServices.StringStartsWithOrdinal(m_value, value0)
+    }
+
+    func EndsWithOrdinal(value0: string) -> bool {
+        return RuntimeServices.StringEndsWithOrdinal(m_value, value0)
+    }
+
+    func GetUtf8ByteCount() -> int {
+        return RuntimeServices.StringByteCount(m_value)
+    }
+
+    func IsEmpty() -> bool {
+        return RuntimeServices.StringEquals(m_value, "")
+    }
+
+    func SliceUtf8(value0: int, value1: int) -> Result<string, Utf8SliceError> {
+        let payload = RuntimeServices.StringSliceUtf8(m_value, value0, value1)
+        if RuntimeServices.IsValue<string>(payload) {
+            return Ok(RuntimeServices.UnpackValue<string>(payload))
+        }
+        let status = RuntimeServices.UnpackValue<byte>(payload)
+        if status == 1 {
+            return Error(Utf8SliceError(Utf8SliceError.OutOfRange()))
+        }
+        if status == 2 {
+            return Error(Utf8SliceError(Utf8SliceError.InvalidBoundary()))
+        }
+        System.Fault("invalid native UTF-8 slice status")
+        return Error(Utf8SliceError(Utf8SliceError.OutOfRange()))
+    }
+}

@@ -5,6 +5,18 @@ proposal API alignment and the System.Runtime assembly identity remain subsequen
 work. [Authoring status](raven-system-library.md) explicitly lists unported sources.
 A runnable library and complete Raven source ownership are separate checks.
 
+## String/Error follow-up
+
+The separate opaque-value slice adds two source owners (49 total). All 11 admission
+checks and 21 focused Rust string/error/default/interface checks pass. Native-status
+injection covers successful slicing, both typed failures and an unknown-status fault.
+Error.ToString retains delegation through Message. String retains method order,
+receiver conventions and descriptive runtime parameter names; its Raven reference
+named arguments remain unchanged. A graph budget of one now correctly rejects
+String.Equals because generated Boolean adapters are reachable; service assertions
+are retained with a larger fixture budget. No Raven compiler code changed; target
+boundary documentation is on feature commit `981301d09`.
+
 ## Reproduce the program gate
 
 Use the neoCLR feature compiler, built from the Raven repository's
@@ -59,6 +71,9 @@ The other two control input/environment and inspect real file bytes.
 
 Additional checks:
 
+- `verify_opaque_library.py --compiler COMPILER --bridge BRIDGE`: 11 String/Error
+  admission cases check storage, receivers, signatures, allocation/mutation rejection
+  and initialized Error copies.
 - `verify_foundation_library.py --compiler COMPILER --bridge BRIDGE`: 17 source
   admission cases, including wrong generic positions/arity/base contracts, calendar
   layout/visibility and unsupported erased payloads/defaults.
@@ -90,8 +105,8 @@ because the text assembler does not resolve files. All eight fixture checks pass
 - All 64 saved-project cases pass, including executable API samples, saved edits,
   compiler/import rejection without stale execution, and expected runtime faults.
 
-- All 47 slices compile and import; clean regeneration and input/snapshot hashes
-  match. Inventory/coverage checks pass for 734 candidates and 107 declaring sources.
+- All 49 slices compile and import; clean regeneration and input/snapshot hashes
+  match. Inventory/coverage checks pass for 744 candidates and 108 declaring sources.
 - All 17 foundation admission cases pass. Clock declaration rejection checks and
   fixed/system-clock execution pass, including host-local time conversion.
 - Controlled process checks pass for fresh/copied arguments, environment values,

@@ -36,6 +36,10 @@ static class PrimitiveLibrary
             empty.PackingSize = -1;
             empty.ClassSize = -1;
         }
+        var error = module.GetType("System.Error");
+        if (error.HasFields || !error.IsValueType) throw new InvalidDataException("Expected opaque Error declaration.");
+        error.PackingSize = -1;
+        error.ClassSize = -1;
         foreach (var (name, kind) in Kinds)
         {
             var type = module.GetType(name);

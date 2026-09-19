@@ -8,14 +8,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
-- Extend the API-preserving Raven library port from 28 to 47 source slices: generic
+- Extend the API-preserving Raven library port from 28 to 49 source slices: generic
   fundamental/collection contracts, SystemClock/LocalDateTime, native-sized integer
-  comparisons, complete Int32 methods, Console, Environment and File.ReadAllText.
+  comparisons, complete Int32 methods, Console, Environment, File.ReadAllText,
+  String and opaque Error. Check intrinsic String storage and mixed receivers,
+  preserve Error message delegation and runtime-owned payloads, and reject opaque
+  allocation/defaults and String storage writes (11 admission cases pass).
   Check generic interface inheritance and nested calendar layout against reference
   metadata, and preserve library method parameter names for introspection. Keep native
   payload decoding bootstrap-only and preserve legacy Neo receiver/process conventions.
   Regenerate implementation snapshots and API audit.
-  Source migration is still incomplete for String, unions/error carriers, remaining
+  Source migration is still incomplete for unions/error carriers, remaining
   descriptors and runtime adapters; proposal API alignment remains a subsequent step.
   Pass 64 saved-project compile/import/verify/execute cases and retain native
   failure-status tests. Extract general Raven interface-binding and no-result delegate
@@ -23,7 +26,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Update the inline managed-array fixture to embed generated collection declarations;
   the text assembler does not expand the new wrapper includes. All eight fixture
   checks pass after this correction; all 1241 Rust tests pass against the final
-  library, with all 178 integration-test binaries covered.
+  foundation library, with all 178 integration-test binaries covered. The following
+  String/Error slice adds native UTF-8 status injection and preserves existing
+  introspection parameter names and String method order; all 21 focused
+  string/error/default/interface Rust checks pass.
 
 - Organize documentation with a top-level index and categorized guides, reference,
   design, Raven integration, history, contribution and experiment indexes, retaining

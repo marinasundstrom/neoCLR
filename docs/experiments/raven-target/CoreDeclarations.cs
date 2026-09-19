@@ -33,7 +33,7 @@ static class CoreDeclarations
             using var image = Mono.Cecil.AssemblyDefinition.ReadAssembly(stream);
             var module = image.MainModule;
             CalendarBindings.ProjectLayout(module);
-            if (libraryBootstrap) PrimitiveLibrary.Project(module);
+            if (libraryBootstrap) { PrimitiveLibrary.Project(module); OpaqueLibrary.Project(module); }
             if (libraryBootstrap && collectionProbe)
             {
                 var local = module.GetType("System.LocalDateTime");

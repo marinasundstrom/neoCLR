@@ -91,6 +91,12 @@ for file in source['sourceFiles']:
                                'docs/experiments/raven-target/verify_declaration_library.py'],
                      'note': 'Source declarations only; erased values and opaque type handles retain intrinsic runtime representations.'})
         continue
+    if file.startswith(('runtime/raven/generated/String.', 'runtime/raven/generated/Error.')):
+        rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-opaque-bootstrap',
+                     'samples': ['library-strings.rvn', 'library-string-slices.rvn', 'library-errors.rvn'],
+                     'tests': ['tests/strings.rs', 'tests/errors.rs', 'docs/experiments/raven-target/verify_opaque_library.py'],
+                     'note': 'Checked intrinsic String storage and fieldless Error bodies retain native ownership and mixed receiver ABI. Compiler operators remain intrinsic; opaque allocation and storage mutation are rejected.'})
+        continue
     if file.startswith('runtime/raven/generated/Char.'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-char-struct',
                      'tests': ['tests/character_classification.rs', 'docs/experiments/raven-target/verify_scalar_library.py'],

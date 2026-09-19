@@ -10,6 +10,8 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    'String': 'System.String',
+    'Error': 'System.Error',
     'Environment': 'System.Environment',
     'Console': 'System.Console',
     'IntPtr': 'System.IntPtr',
@@ -61,6 +63,8 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    'String': 'runtime/raven/src/System/String.rvn',
+    'Error': 'runtime/raven/src/System/Error.rvn',
     'Environment': 'runtime/raven/src/System/Environment/Functions.rvn',
     'Console': 'runtime/raven/src/System/Console/Functions.rvn',
     'IntPtr': 'runtime/raven/src/System/IntPtr.rvn',

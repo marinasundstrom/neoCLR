@@ -1,6 +1,6 @@
 {
   "format": "raven-library-bootstrap-v1",
-  "owner": "System.Double",
+  "owner": "System.Error",
   "inputs": {
     "runtime/raven/src/System/String.rvn": "7fb0faa111f58beb947644a37fa4b5294e342ccd58ae8a38f5d23a4256550e30",
     "runtime/raven/src/System/Error.rvn": "a611b789b68e563cc169e1049796ff38c19760580ed7b8e20e4faa84b48e9766",
@@ -55,12 +55,14 @@
     "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
   },
   "outputs": {
-    "Double.methods.neoil": "103fd1b67b40824d03d527a074fc46a882d751540fee1f3ec48199e00758af17",
-    "Double.helpers.neoil": "fc757ce3ac77e1458903b63fda5060f3bf7eb0dd3b053d66bd39d311b8c2aaad"
+    "Error.methods.neoil": "d301af74bc7c4b7ed3176188568d7c1754b3e6aabf3045f7e1a97503fdf648c8",
+    "Error.helpers.neoil": "284aae720c2fa28fbe5849c3c712233eebc3185a7c79d37f2b9cd42fb4883481"
   },
   "compilerSha256": "4182dd1bc7626372406f89fc78cc5a9097fadc6db5842166179cd6f174f44514",
   "coreSha256": "e222a66ecfd904ca9cf138bd0537f63f4eb87eddac36e4171572722fae5ef4c1",
   "exports": [
-    "readonly byref CompareTo(Double other) -> Int32"
+    "FromMessage(String message) -> System.Error",
+    "get_Message() -> String",
+    "ToString() -> String"
   ]
 }

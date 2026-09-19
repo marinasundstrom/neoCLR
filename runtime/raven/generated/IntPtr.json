@@ -2,6 +2,8 @@
   "format": "raven-library-bootstrap-v1",
   "owner": "System.IntPtr",
   "inputs": {
+    "runtime/raven/src/System/String.rvn": "7fb0faa111f58beb947644a37fa4b5294e342ccd58ae8a38f5d23a4256550e30",
+    "runtime/raven/src/System/Error.rvn": "a611b789b68e563cc169e1049796ff38c19760580ed7b8e20e4faa84b48e9766",
     "runtime/raven/src/System/Environment/Functions.rvn": "10f32b2b35546e471316a68a124065779d01fbd40233e335439b1fcfeefd2479",
     "runtime/raven/src/System/Console/Functions.rvn": "c789b598a83f1c0c691076e05d10d4a1d074b9375460f3be7130f8a00524430b",
     "runtime/raven/src/System/IntPtr.rvn": "a46f90ebb10aafb7e0a172764621a3ba066a7b1adcc372d84d7284ba54552fa8",
@@ -49,7 +51,7 @@
     "runtime/raven/src/System/Single.rvn": "488efaf36e56f147c7158a5b0637f3bc4e56e84bb3f514af6c64a023dcd8598e",
     "runtime/raven/src/System/Double.rvn": "cd3ad24e4a21b7616a2937da71891618284913e26ea180ce203276f18b631f33",
     "runtime/raven/src/System/Boolean.rvn": "1f0010fe0d346fbc7f3ba29c88b2c1cf80faebf42a4c2de2f0cd6cff15335022",
-    "runtime/raven/System.rvnproj": "fef4908dd73560f8ea941c4f83329b407542ed5de3454a830f464512bf5d2fd0",
+    "runtime/raven/System.rvnproj": "0813f3443dc53af62ededf9280f213c32c4790fe6967a725a2a7d412d2dcb033",
     "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
   },
   "outputs": {
@@ -57,7 +59,7 @@
     "IntPtr.helpers.neoil": "9af7283bdadd4dc6ae9970e86b9f9482fd15658ec2155b6d8f2d44f29c32868a"
   },
   "compilerSha256": "4182dd1bc7626372406f89fc78cc5a9097fadc6db5842166179cd6f174f44514",
-  "coreSha256": "460eb84171cb28d377d74a7b5360ebe822bc04ad903463ec2f2bbd0233ff0ea4",
+  "coreSha256": "e222a66ecfd904ca9cf138bd0537f63f4eb87eddac36e4171572722fae5ef4c1",
   "exports": [
     "readonly byref CompareTo(IntPtr other) -> Int32"
   ]

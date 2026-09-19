@@ -9,10 +9,13 @@ static class LibraryImplementation
     // Preserve the existing scalar neoIL formatting receiver while CIL uses a
     // managed-byref struct receiver. Intrinsic field reads accept either form.
     public static bool IsByValueReceiver(MethodReference method) =>
+        (ApplicationTypes.IsLibrary(method.DeclaringType) && method.DeclaringType.FullName == "System.Error"
+            && method.Name is "get_Message" or "ToString" && method.HasThis && !method.HasParameters
+            && method.ReturnType.MetadataType == MetadataType.String) ||
         PrimitiveLibrary.IsMatched(method.DeclaringType.Resolve())
         && method.DeclaringType.FullName == "System.Int32" && method.Name == "ToString"
         && method.HasThis && !method.HasParameters && method.ReturnType.MetadataType == MetadataType.String;
-    public static bool IsReadonlyReceiver(MethodDefinition method) => ReadonlyReceivers.Contains(method)
+    public static bool IsReadonlyReceiver(MethodDefinition method) => (ReadonlyReceivers.Contains(method) || OpaqueLibrary.IsByRefString(method))
         && !IsByValueReceiver(method);
     public static MethodDefinition[] Roots(ModuleDefinition source, ModuleDefinition core, string owner)
     {
@@ -96,7 +99,7 @@ static class LibraryImplementation
             if (!candidate.IsPublic || candidate.IsInterface || candidate.IsAbstract
                 || candidate.GenericParameters.Any(p => p.HasConstraints || p.Attributes != GenericParameterAttributes.NonVariant) || candidate.HasNestedTypes || candidate.HasEvents
                 || candidate.BaseType?.FullName != (candidate.IsValueType ? "System.ValueType" : "System.Object") || candidate.IsExplicitLayout)
-                throw new InvalidDataException("Unsupported instance library owner.");
+                throw new InvalidDataException($"Unsupported instance library owner: {candidate.FullName}, base={candidate.BaseType}, public={candidate.IsPublic}, abstract={candidate.IsAbstract}, nested={candidate.HasNestedTypes}, value={candidate.IsValueType}.");
         if (type.IsValueType != contract.IsValueType)
             throw new InvalidDataException("Library value/reference representation does not match reference contract.");
         // Native snapshot factories construct Type from precisely one opaque handle.
@@ -118,6 +121,7 @@ static class LibraryImplementation
                 throw new InvalidDataException("ParameterInfo library layout must match the runtime snapshot fields: "
                     + string.Join(";", type.Fields.Select(f => f.Name + ":" + f.FieldType.FullName + "@" + f.FieldType.Scope)));
         }
+        if (owner == "System.String") OpaqueLibrary.ValidateString(type, contract);
         if (PrimitiveLibrary.IsPrimitive(type)) PrimitiveLibrary.Validate(type, contract);
         else if (type.IsValueType)
         {
@@ -165,7 +169,7 @@ static class LibraryImplementation
         var declarationOnly = type.IsValueType && !type.HasFields && !contract.HasFields
             && !contract.HasMethods && !type.HasProperties && !type.HasInterfaces
             && type.Methods.All(PrimitiveLibrary.IsDefaultConstructor);
-        var methods = type.Methods.Where(m => !(PrimitiveLibrary.IsPrimitive(type) || declarationOnly) || !PrimitiveLibrary.IsDefaultConstructor(m)).ToArray();
+        var methods = type.Methods.Where(m => !OpaqueLibrary.IsOmittedConstructor(m) && (!(PrimitiveLibrary.IsPrimitive(type) || declarationOnly) || !PrimitiveLibrary.IsDefaultConstructor(m))).ToArray();
         if (methods.Length == 0 && !declarationOnly || methods.Any(m => !(m.IsPublic || m.IsPrivate && !m.IsVirtual
             || m.IsAssembly && !m.IsVirtual && contract.Methods.Count(c => c.IsAssembly && MatchMethod(c, m)) == 1) || !m.HasBody || m.HasGenericParameters
             || m.ExplicitThis || m.IsConstructor && m.IsStatic || m.CallingConvention != MethodCallingConvention.Default
@@ -173,7 +177,7 @@ static class LibraryImplementation
             throw new InvalidDataException("Unsupported instance library export: " + string.Join(";", methods.Select(m => m.FullName + " " + m.Attributes + " matches=" + contract.Methods.Count(c => c.IsAssembly && MatchMethod(c, m)))));
         // Private implementation helpers are not exports, but remain roots so even
         // unused bodies are checked and emitted with their original visibility.
-        var expected = contract.Methods.Where(m => m.IsPublic).ToArray();
+        var expected = contract.Methods.Where(m => m.IsPublic && !OpaqueLibrary.IsOmittedConstructor(m) && !OpaqueLibrary.IsStringOperator(m)).ToArray();
         var exports = methods.Where(m => m.IsPublic).ToArray();
         if (contract.Methods.Where(m => m.IsAssembly && !m.IsConstructor).Any(c =>
             methods.Count(m => m.IsAssembly && MatchMethod(c, m)) != 1))

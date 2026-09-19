@@ -1,0 +1,63 @@
+; Generated from runtime/raven/src/System/String.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.String.RuntimeErrorSystemTextUtf8SliceErrorNewSystemTextUtf8SliceErrorOutOfRange(System.Text.Utf8SliceError.OutOfRange value) -> System.Text.Utf8SliceError
+ldarg value
+newobj instance System.Text.Utf8SliceError::.ctor(System.Text.Utf8SliceError.OutOfRange)
+ret
+.end
+.function neoCLR.Library.System.String.RuntimeErrorSystemTextUtf8SliceErrorNewSystemTextUtf8SliceErrorInvalidBoundary(System.Text.Utf8SliceError.InvalidBoundary value) -> System.Text.Utf8SliceError
+ldarg value
+newobj instance System.Text.Utf8SliceError::.ctor(System.Text.Utf8SliceError.InvalidBoundary)
+ret
+.end
+.function neoCLR.Library.System.String.RuntimeErrorSystemTextUtf8SliceErrorOutOfRangeNew() -> System.Text.Utf8SliceError.OutOfRange
+newobj instance System.Text.Utf8SliceError.OutOfRange::.ctor()
+ret
+.end
+.function neoCLR.Library.System.String.RuntimeErrorSystemTextUtf8SliceErrorInvalidBoundaryNew() -> System.Text.Utf8SliceError.InvalidBoundary
+newobj instance System.Text.Utf8SliceError.InvalidBoundary::.ctor()
+ret
+.end
+.function neoCLR.Library.System.String.RuntimeUnion0(String arg0) -> System.Result.Ok<String>
+ldarg arg0
+newobj instance System.Result.Ok<String>::.ctor(String)
+ret
+.end
+.function neoCLR.Library.System.String.RuntimeUnion1(System.Result.Ok<String> arg0) -> System.Result<String,System.Text.Utf8SliceError>
+ldarg arg0
+newobj instance System.Result<String,System.Text.Utf8SliceError>::.ctor(System.Result.Ok<String>)
+ret
+.end
+.function neoCLR.Library.System.String.RuntimeUnion2(System.Text.Utf8SliceError arg0) -> System.Result.Error<System.Text.Utf8SliceError>
+ldarg arg0
+newobj instance System.Result.Error<System.Text.Utf8SliceError>::.ctor(System.Text.Utf8SliceError)
+ret
+.end
+.function neoCLR.Library.System.String.RuntimeUnion3(System.Result.Error<System.Text.Utf8SliceError> arg0) -> System.Result<String,System.Text.Utf8SliceError>
+ldarg arg0
+newobj instance System.Result<String,System.Text.Utf8SliceError>::.ctor(System.Result.Error<System.Text.Utf8SliceError>)
+ret
+.end
+.function neoCLR.Library.System.String.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
+.function neoCLR.Library.System.String.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end

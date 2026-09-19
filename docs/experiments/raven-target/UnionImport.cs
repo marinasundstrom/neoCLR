@@ -138,7 +138,7 @@ static class UnionImport
             var args = (method.HasThis ? new[] { ApplicationTypes.Receiver(method) } : Array.Empty<string>()).Concat(method.Parameters.Select(p => ProfileType(p.ParameterType))).ToArray();
             var valueConstructor = libraryOwner is null && method.IsConstructor && method.DeclaringType.IsValueType;
             var emitInstance = method.HasThis && !valueConstructor;
-            var emitOwnedStatic = libraryOwner is not null && method.IsStatic && method.DeclaringType.IsValueType;
+            var emitOwnedStatic = libraryOwner is not null && method.IsStatic && (method.DeclaringType.IsValueType || OpaqueLibrary.IsString(method.DeclaringType));
             var result = ProfileType(method.ReturnType, true);
             var locals = method.Body.Variables.Select(v => ProfileType(v.VariableType)).ToArray();
             if (locals.Any(t => !(libraryOwner is not null && t == "Value") && !(libraryOwner is not null && method.GenericParameters.Concat(method.DeclaringType.GenericParameters).Any(p => t == "T" + p.Position)) && !ApplicationTypes.IsType(t) && !ManagedArrayBindings.IsType(t) && t != "System.Object" && !InterfaceBindings.IsInterface(t) && !NativeMemoryBindings.IsPointer(t) && !ReflectionBindings.IsType(t) && t != "arrayref<String>" && !DelegateBindings.IsType(t) && !GenericUnionBindings.IsType(t) && !CalendarBindings.IsReference(t) && !CalendarBindings.Types.Contains(t) && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
@@ -196,7 +196,7 @@ static class UnionImport
                 void Arg(int n)
                 {
                     if (n < 0 || n >= args.Length) throw new InvalidDataException("Invalid parameter index.");
-                    Push(new(args[n] == "Boolean" ? "Int32" : PrimitiveBindings.Stack(args[n]), Argument: args[n].EndsWith('&') ? n : -1));
+                    Push(new(args[n] == "Boolean" ? "Int32" : PrimitiveBindings.Stack(args[n]), Argument: args[n].EndsWith('&') || n == 0 && LibraryImplementation.IsByValueReceiver(method) ? n : -1));
                     code.AppendLine($"ldarg {n}");
                     if (args[n] == "Boolean") code.Append(BooleanBindings.Convert("Boolean", "Int32"));
                 }
@@ -215,6 +215,8 @@ static class UnionImport
                     case Code.Nop: break;
                     case Code.Initobj:
                         var initializedType = ProfileType((TypeReference)instruction.Operand);
+                        if (libraryOwner == "System.Error" && initializedType == "System.Error")
+                            throw new InvalidDataException("Opaque Error requires a runtime factory.");
                         var address = Expect(initializedType + "&");
                         if (address.Local < 0) throw new InvalidDataException("Only local initialization is admitted.");
                         if (initializedType is Carrier or Option or VoidOption or VoidResult || NeedsInitialization(initializedType))
@@ -302,7 +304,7 @@ static class UnionImport
                             var receiver = Pop().Type;
                             if (!ApplicationTypes.Assignable(receiver, appRead.Owner) && receiver != appRead.Owner + "&") throw new InvalidDataException("Invalid application field receiver.");
                             Push(new(appRead.Type == "Boolean" ? "Int32" : PrimitiveBindings.Stack(appRead.Type)));
-                            if (PrimitiveLibrary.IsMatched(readField.DeclaringType.Resolve()))
+                            if ((PrimitiveLibrary.IsMatched(readField.DeclaringType.Resolve()) || OpaqueLibrary.IsString(readField.DeclaringType.Resolve())))
                             {
                                 if (receiver.EndsWith('&')) code.AppendLine("ldobj " + appRead.Type);
                             }
@@ -314,7 +316,7 @@ static class UnionImport
                     case Code.Stfld:
                         if (!collectionProfile) throw new InvalidDataException("Native fields require target profile.");
                         var writeField = (FieldReference)instruction.Operand;
-                        if (PrimitiveLibrary.IsMatched(writeField.DeclaringType.Resolve()))
+                        if ((PrimitiveLibrary.IsMatched(writeField.DeclaringType.Resolve()) || OpaqueLibrary.IsString(writeField.DeclaringType.Resolve())))
                             throw new InvalidDataException("Primitive library backing storage is readonly.");
                         var appWrite = ApplicationTypes.Field(writeField, method, ProfileType);
                         if (appWrite is not null)
@@ -330,6 +332,13 @@ static class UnionImport
                         if (libraryOwner is null || !copiedToken.IsValueType || copiedToken.Resolve()?.IsValueType != true || !ApplicationTypes.IsLibrary(copiedToken))
                             throw new InvalidDataException("Only matched library value loads are admitted.");
                         var copiedType = ProfileType(copiedToken);
+                        // Error's public neoIL receiver is an opaque value, although CLI
+                        // struct bodies load it through the managed address of this.
+                        if (LibraryImplementation.IsByValueReceiver(method) && copiedType == "System.Error"
+                            && stack.Count > 0 && stack[^1].Type == copiedType && stack[^1].Argument == 0)
+                        {
+                            Pop(); Push(new(copiedType)); break;
+                        }
                         var copiedAddress = Expect(copiedType + "&");
                         if (copiedAddress.Local >= 0 && !assigned[copiedAddress.Local])
                             throw new InvalidDataException("Read through uninitialized value address.");
@@ -413,6 +422,9 @@ static class UnionImport
                     case Code.Newobj:
                         var constructor = (MethodReference)instruction.Operand;
                         var constructorDefinition = constructor.Resolve() ?? throw new InvalidDataException("Unresolved constructor.");
+                        if (ApplicationTypes.IsLibrary(constructor.DeclaringType)
+                            && constructor.DeclaringType.FullName is "System.Error" or "System.String")
+                            throw new InvalidDataException("Opaque library storage requires a runtime factory.");
                         if (ApplicationTypes.IsModule(constructorDefinition.Module))
                         {
                             ApplicationTypes.CheckMethod(constructor);
@@ -694,13 +706,16 @@ static class UnionImport
             // Unreachable guest instructions are omitted, not admitted as executable code.
             // Library metadata keeps author-supplied parameter names for introspection.
             var declaredParameters = args.Skip(method.HasThis ? 1 : 0).Select((t, i) =>
-                libraryOwner is not null ? t + " " + method.Parameters[i].Name : t);
-            output.AppendLine(libraryOwner is not null && !emitInstance && !emitOwnedStatic ? $".function {(method.IsAssembly ? "internal " : "")}{Name(method)}({string.Join(',', args.Select((t, i) => t + " " + method.Parameters[i].Name))}) -> {(libraryOwner == "System.Console" && result == "noresult" ? "Void" : result)}" : emitOwnedStatic ? $".method {(method.IsPrivate ? "private " : method.IsAssembly ? "internal " : "")}static {method.Name}({string.Join(',', declaredParameters)}) -> {result}" : emitInstance ? $".method {(libraryOwner is not null && method.IsPrivate ? "private " : "")}instance {(LibraryImplementation.IsReadonlyReceiver(method) ? "readonly " : "")}{(method.DeclaringType.IsValueType && !LibraryImplementation.IsByValueReceiver(method) ? "byref " : "")}{ApplicationTypes.Modifiers(method)}{ApplicationTypes.MethodName(method)}({string.Join(',', declaredParameters)}) -> {(method.DeclaringType.IsValueType && result == "noresult" ? "Void" : result)}" : $".function {Name(method)}({string.Join(',', args)}) -> {result}");
+                libraryOwner is not null ? t + " " + OpaqueLibrary.ParameterName(method, i) : t);
+            output.AppendLine(libraryOwner is not null && !emitInstance && !emitOwnedStatic ? $".function {(method.IsAssembly ? "internal " : "")}{Name(method)}({string.Join(',', args.Select((t, i) => t + " " + method.Parameters[i].Name))}) -> {(libraryOwner == "System.Console" && result == "noresult" ? "Void" : result)}" : emitOwnedStatic ? $".method {(method.IsPrivate ? "private " : method.IsAssembly ? "internal " : "")}static {method.Name}({string.Join(',', declaredParameters)}) -> {result}" : emitInstance ? $".method {(libraryOwner is not null && method.IsPrivate ? "private " : "")}instance {(LibraryImplementation.IsReadonlyReceiver(method) ? "readonly " : "")}{((method.DeclaringType.IsValueType && !LibraryImplementation.IsByValueReceiver(method) || OpaqueLibrary.IsByRefString(method)) ? "byref " : "")}{ApplicationTypes.Modifiers(method)}{ApplicationTypes.MethodName(method)}({string.Join(',', declaredParameters)}) -> {(method.DeclaringType.IsValueType && result == "noresult" ? "Void" : result)}" : $".function {Name(method)}({string.Join(',', args)}) -> {result}");
             for (var n = 0; n < locals.Length; n++) output.AppendLine($".local {locals[n]} local{n}");
             if (method.Body.InitLocals)
                 for (var n = 0; n < locals.Length; n++)
+                {
+                    if (locals[n] == "System.Error") continue;
                     if (ApplicationTypes.IsType(locals[n]) || ReflectionBindings.IsType(locals[n]) && locals[n] != "System.RuntimeTypeHandle" || ManagedArrayBindings.IsType(locals[n]) || CollectionBindings.IsReference(locals[n]) || CalendarBindings.Types.Contains(locals[n]) || GenericUnionBindings.IsType(locals[n]) && !GenericUnionBindings.RequiresInitialization(locals[n])) output.AppendLine($"ldloca local{n}\ninitobj {locals[n]}");
                     else if (!method.GenericParameters.Concat(method.DeclaringType.GenericParameters).Any(p => locals[n] == "T" + p.Position) && locals[n] != Carrier && locals[n] != Option && locals[n] != VoidOption && locals[n] != VoidResult && locals[n] != "String" && !NeedsInitialization(locals[n])) output.AppendLine(Default(locals[n]) + $"\nstloc local{n}");
+                }
             foreach (var index in bodies.Keys.Order())
             {
                 mappings.Add((method, methodId, instructions[index].Offset));

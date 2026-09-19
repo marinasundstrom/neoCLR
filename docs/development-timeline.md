@@ -66,6 +66,19 @@ process/file checks and clean snapshot regeneration. This demonstrates functioni
 programs, not completion of every source migration. String, unions/error carriers,
 remaining descriptors and runtime adapters still contain handwritten neoIL.
 
+**Follow-up direction and response.** The author asked for the next step. The
+assistant proposed String/Error, followed by unions/error carriers, descriptors and
+array/delegate adapters. The author said “Continue” and subsequently directed:
+“After this work. Continue with the remaining slices and don't stop until finished.
+Commit separately”. The assistant accepted separate validated commits and continued
+without starting proposal API alignment.
+
+**String/Error slice.** Raven sources now own both method surfaces, with explicit
+importer checks for intrinsic storage, mixed String receivers and opaque Error
+receivers. Native ownership and the existing parameter metadata remain unchanged.
+Eleven admission checks pass, including rejected storage mutation and fabricated
+opaque construction. Remaining slices are still pending at this point.
+
 **Open.** Complete and validate the remaining Raven source port, then align API
 contracts in the subsequent step. Documentation organization does not itself
 implement proposal APIs or rename assemblies. See the [documentation index](README.md)

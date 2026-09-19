@@ -1,6 +1,6 @@
 {
   "format": "raven-library-bootstrap-v1",
-  "owner": "System.Double",
+  "owner": "System.String",
   "inputs": {
     "runtime/raven/src/System/String.rvn": "7fb0faa111f58beb947644a37fa4b5294e342ccd58ae8a38f5d23a4256550e30",
     "runtime/raven/src/System/Error.rvn": "a611b789b68e563cc169e1049796ff38c19760580ed7b8e20e4faa84b48e9766",
@@ -55,12 +55,20 @@
     "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
   },
   "outputs": {
-    "Double.methods.neoil": "103fd1b67b40824d03d527a074fc46a882d751540fee1f3ec48199e00758af17",
-    "Double.helpers.neoil": "fc757ce3ac77e1458903b63fda5060f3bf7eb0dd3b053d66bd39d311b8c2aaad"
+    "String.methods.neoil": "9b025994ae2ad2e3ba80bdb4c542f497832b64b268bb8db62af2ea03c8bea159",
+    "String.helpers.neoil": "b09416560872ea0d9b3c86b907a62e4c5c2cef99fcaded18d88a9ff2c609f7ff"
   },
   "compilerSha256": "4182dd1bc7626372406f89fc78cc5a9097fadc6db5842166179cd6f174f44514",
   "coreSha256": "e222a66ecfd904ca9cf138bd0537f63f4eb87eddac36e4171572722fae5ef4c1",
   "exports": [
-    "readonly byref CompareTo(Double other) -> Int32"
+    "Concat(String left,String right) -> String",
+    "readonly byref Equals(String other) -> Boolean",
+    "CompareOrdinal(String left,String right) -> Int32",
+    "readonly byref ContainsOrdinal(String value) -> Boolean",
+    "readonly byref StartsWithOrdinal(String value) -> Boolean",
+    "readonly byref EndsWithOrdinal(String value) -> Boolean",
+    "GetUtf8ByteCount() -> Int32",
+    "IsEmpty() -> Boolean",
+    "SliceUtf8(Int32 byteStart,Int32 byteLength) -> System.Result<String,System.Text.Utf8SliceError>"
   ]
 }

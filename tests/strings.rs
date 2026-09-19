@@ -218,10 +218,18 @@ fn invalid_ranges_and_boundaries_are_results_and_do_not_poison_invocation() {
 #[test]
 fn service_planning_distinguishes_il_members_from_string_runtime_helpers() {
     let program = program();
+    assert!(
+        program
+            .analyze_reachability(
+                &[parse_function_ref("instance System.String::Equals(String)").unwrap()],
+                1
+            )
+            .is_err()
+    );
     let equals = program
         .analyze_reachability(
             &[parse_function_ref("instance System.String::Equals(String)").unwrap()],
-            1,
+            16,
         )
         .unwrap();
     assert!(
@@ -237,7 +245,7 @@ fn service_planning_distinguishes_il_members_from_string_runtime_helpers() {
     let graph = program
         .analyze_reachability(
             &[parse_function_ref("instance System.String::SliceUtf8(Int32,Int32)").unwrap()],
-            16,
+            128,
         )
         .unwrap();
     assert_eq!(
@@ -347,4 +355,41 @@ fn slice_errors_have_checked_case_accessors_and_native_statuses() {
         .find(|f| f.name == "System.String.SliceUtf8")
         .unwrap();
     assert!(!function.body.is_empty());
+}
+
+#[test]
+fn raven_slice_preserves_native_statuses_and_rejects_unknown_status() {
+    let source = neoclr::library::system_source();
+    let service = "call neoCLR.Runtime.StringSliceUtf8(String,Int32,Int32)";
+    assert_eq!(source.matches(service).count(), 1);
+    let app = assemble(".module Probe\n.entry Main\n.function Main() -> System.Result<String,System.Text.Utf8SliceError>\nldstr \"unused\"\nldc.i4 0\nldc.i4 0\ncall instance System.String::SliceUtf8(Int32,Int32)\nret\n.end").unwrap();
+    for (status, case) in ["Ok", "OutOfRange", "InvalidBoundary", "unknown"]
+        .iter()
+        .enumerate()
+    {
+        let payload = if status == 0 {
+            "ldstr \"payload\"\nvalue.pack String".to_owned()
+        } else {
+            format!("ldc.i4 {status}\nconv.u1\nvalue.pack Byte")
+        };
+        let library =
+            assemble(&source.replace(service, &format!("pop\npop\npop\n{payload}"))).unwrap();
+        let program = LoadedProgram::with_library(&app, &library).unwrap();
+        program.verify().unwrap();
+        let result = program.run(Limits::default());
+        if status == 3 {
+            assert!(
+                result
+                    .unwrap_err()
+                    .message
+                    .contains("invalid native UTF-8 slice status")
+            );
+        } else {
+            let output = format!("{:?}", result.unwrap().value);
+            assert!(output.contains(case), "status {status}: {output}");
+            if status == 0 {
+                assert!(output.contains("payload"));
+            }
+        }
+    }
 }
