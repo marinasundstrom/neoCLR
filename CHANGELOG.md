@@ -18,7 +18,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Record the next API-alignment direction: establish System.Runtime, implement the
   basic RuntimeContext/provider model, retire System.Type for TypeInfo and use
   Object.GetTypeInfo for instance acquisition. This is the selected plan, not an
-  implemented API; it supersedes the tentative Object.GetType spelling.
+  implemented API; it supersedes the tentative Object.GetType spelling. RuntimeContext
+  owns context-dependent discovery formerly represented by .NET Assembly static
+  APIs; the first selected surface is executing AssemblyInfo → modules → types.
+  Exact member spelling is provisional; loading remains outside the initial scope.
 
 - Complete the Raven branch review and prepare an isolated VS Code development
   workspace with reproducible setup tooling. General editor-reference and ref-struct

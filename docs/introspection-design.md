@@ -104,10 +104,39 @@ retention guarantees must be specified and measured rather than inferred from na
 ## Runtime-backed v1
 
 The initial provider is the runtime. `System.Runtime.RuntimeContext` represents the
-execution universe; conceptually `RuntimeContext.Current.Assemblies` exposes
-AssemblyInfo, ModuleInfo, TypeInfo and member contracts from runtime metadata.
-Ordinary type acquisition should return TypeInfo directly (`value.Type` or an
-equivalent Raven operation); exact language lowering remains open.
+execution universe. The selected first discovery surface is the executing assembly,
+returned as AssemblyInfo, from which callers can query modules and types. The
+provisional spelling is `RuntimeContext.Current.ExecutingAssembly`; the author
+selected the responsibility, not this exact member spelling. An all-loaded-assemblies
+inventory remains a possible extension, not a prerequisite for the preview.
+Instance acquisition is `Object.GetTypeInfo()`; declared-type acquisition is
+`typeof(T)` through the selected context resolver.
+
+### Context-owned discovery — 2026-09-19
+
+The author clarified that RuntimeContext should own many of the static operations
+that .NET places on Assembly, making the context the actual entry point for runtime
+discovery. AssemblyInfo describes one assembly and exposes its modules and types;
+ModuleInfo describes one module and exposes its types. These interfaces do not own
+ambient runtime discovery or loading. The first implementation covers discovery of
+the executing assembly and traversal of its model. Additional resolution and loading
+operations need explicit contracts before being added to RuntimeContext.
+
+The .NET comparison is
+[Assembly.GetExecutingAssembly](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.assembly.getexecutingassembly?view=net-10.0),
+which returns the assembly containing the executing code. Executing, entry and calling
+assemblies are distinct concepts. The neoCLR implementation must identify the user
+code requesting discovery, not accidentally report the System.Runtime helper's own
+assembly or substitute the program entry assembly. Validate this across a call into
+another assembly; frame selection is a runtime concern, not a name-based lookup.
+
+The benefit of moving discovery to a context is explicit ownership of runtime
+resolution while leaving Info contracts usable by other metadata providers. The cost
+is a deliberate source/API divergence from .NET and the need to specify context
+selection and lifetime. This direction does not require implementing all Assembly
+static APIs, multiple contexts, or loading for the initial preview. Concrete
+Runtime*Info providers remain internal. These paragraphs describe the selected
+contract, not a completed production API.
 
 Runtime-backed introspection is still descriptive. MethodInfo does not gain Invoke,
 and PropertyInfo does not gain GetValue or SetValue because of its backing source.

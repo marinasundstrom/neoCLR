@@ -25,6 +25,26 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-19 — RuntimeContext owns assembly discovery
+
+**Author direction.** RuntimeContext will expose the executing assembly as
+AssemblyInfo, whose modules and types can be queried. The author then clarified:
+“In essence, RuntimeContext will hold a lot of the static methods that Assembly
+hold in .NET. Making RuntimeContext the true context.”
+
+**Assistant response.** Accepted context-owned discovery, with AssemblyInfo and
+ModuleInfo describing their entities. The assistant proposed executing-assembly
+traversal as the first preview slice and left assembly loading outside that initial
+scope; the author has not selected exact member spellings or a complete list of
+transferred .NET operations.
+
+**Action and status.** Updated the [maintained design](introspection-design.md)
+to replace the tentative all-assemblies entry point with the selected minimum and
+remove the obsolete value.Type acquisition wording. Recorded the .NET comparison,
+frame-selection validation need, benefits and compatibility costs. Production
+interface/provider migration and the refreshed VS Code API remain open; the
+System.Runtime project identity slice alone does not deliver this API.
+
 ## 2026-09-19 — Documentation first, then the remaining Raven library port
 
 **Author direction.** “Let's port the rest of the System.Runtime library from neoIL
