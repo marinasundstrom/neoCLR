@@ -94,17 +94,17 @@ cannot add useful handling. Return typed Result errors for expected failure and
 Option for meaningful absence. A fault is not a substitute for those ordinary
 outcomes; it is appropriate when an invariant required for execution has failed.
 
-## Completion and the void spelling
+## Completion and the unit spelling
 
-For the neoCLR target, `()` is the unit value and its platform type is System.Void.
-The author's current convention is to spell that type `void`, rather than `unit`,
-including completion payloads such as `Result<void, E>`. This does not mean that an
-ordinary no-result call leaves a value on the execution stack.
+Keep Raven's `unit` keyword for now. In the neoCLR target it maps to System.Void,
+with `()` as its value. Use `Result<unit, E>` for completion or an expected error.
+The target does not introduce a separate System.Unit runtime type. Ordinary calls
+with no result still leave no value on the execution stack; the compiler supplies
+the unit value when an expression or generic payload requires it.
 
-At this cleanup checkpoint the target mapping is implemented, while the lowercase
-`void` source keyword still needs compiler support. Existing executable examples
-therefore keep System.Void until that separate slice lands. Do not claim the keyword
-is implemented merely because hover renders a System.Void type as `void`.
+The author considered a lowercase `void` source keyword, then chose to keep `unit`
+for now. No new keyword or compiler policy is required. System.Void remains a valid
+explicit type spelling in existing samples and bootstrap declarations.
 
 ## Model contracts rather than implementation details
 

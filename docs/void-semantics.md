@@ -87,3 +87,10 @@ pops it when discarded, without synthesizing another unit value. The generic lib
 probe in [Raven authoring](raven-system-library.md#generic-implementation-gate--2026-09-14)
 checks both contexts with the selected Void contract. This reuses existing metadata,
 importer handling and runtime generic functions.
+
+## Source spelling clarification — 2026-09-19
+
+The author considered introducing lowercase `void` in Raven, then selected the
+existing `unit` keyword for now. On neoCLR, `unit` and the value `()` use the
+configured System.Void representation. This is not a second platform type and
+does not change no-result call behavior. See [Raven conventions](raven-conventions.md).

@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Clarify the final source-spelling decision: retain Raven's unit keyword and ()
+  value mapped to neoCLR System.Void for now. Supersede the earlier suggested void
+  keyword in the conventions guide; no compiler or runtime behavior changes.
+
 - Document idiomatic Raven conventions using Raven's style and feature guides.
   Simplify getter-only runtime properties, prefer let for local bindings, use case
   constructors and destructuring in ordinary union callers, and expand compact

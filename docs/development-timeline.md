@@ -4241,3 +4241,9 @@ changes are part of this slice.
 - **Assistant:** verified that the runtime-unit mapping already selects System.Void,
   but the parser does not yet recognize lowercase void. Recorded the desired
   spelling and the implementation gap separately in the conventions guide.
+
+- **Author, revised decision:** “Or we keep unit keyword as mapping to System.Void.
+  For now.”
+- **Assistant:** retained Raven's existing keyword and target configuration; no
+  keyword compiler change was made. Updated the conventions while preserving the
+  earlier suggestion and correction in this record. String work remains next.
