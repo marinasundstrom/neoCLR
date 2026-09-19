@@ -85,7 +85,7 @@ reproducible source-archive check and exact-commit release gates.
 
 ## Preview 8
 
-**Preview 8 (v0.1.0-preview.8), release candidate**, presents Raven-authored
+**Preview 8 (v0.1.0-preview.8)** presents Raven-authored
 System.Runtime, unified Introspection and grapheme text through
 neoIL and Raven. It includes a macOS arm64 runtime bundle, experimental Raven SDK/VSIX,
 examples, source, attribution and validation evidence. Start with the

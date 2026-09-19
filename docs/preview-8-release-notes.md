@@ -1,7 +1,8 @@
 # neoCLR Preview 8 — runtime library, Introspection and text
 
-Version: **0.1.0-preview.8** · Intended tag: **v0.1.0-preview.8**.
-Release candidate: publication is pending source CI and extracted-package checks.
+Version: **0.1.0-preview.8** · Tag: **v0.1.0-preview.8**.
+Release scope selected **2026-09-19**. The attached manifest records the actual
+publication evidence for this version.
 
 This preview ports System.Runtime to Raven and starts a unified Introspection API.
 It also makes ordinary character handling use grapheme clusters, with explicit
@@ -10,7 +11,7 @@ where neoCLR is heading and invites feedback. These contracts can still change.
 
 ## Install and try
 
-The candidate asset set is:
+The matching asset set is:
 
 - `neoclr-0.1.0-preview.8-osx-arm64.tar.gz`
 - `raven-sdk-0.1.12-neoclr.15-osx-arm64.tar.gz`
@@ -107,5 +108,5 @@ is not a normal Raven release or evidence of NanoFramework hardware testing.
 
 Publication requires the exact candidate's six stable/minimum-Rust source CI jobs,
 extracted runtime/SDK/VSIX checks and notice/hash audits. The attached manifest and
-validation archive will record the actual revisions and results; this document
+validation archive record the actual revisions and results; this document
 alone is not evidence of a passed release gate.

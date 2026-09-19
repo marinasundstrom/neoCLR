@@ -12,15 +12,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   notes, migration guidance and the validation checklist. Repair the Windows
   calendar test's newline-dependent mutation and strict-Clippy test issues;
   document the independent parameter tables at the Introspection helper boundary.
-  Exact-candidate validation and publication are pending.
+  Select the release scope/date and keep actual publication evidence in the manifest;
+  exact-candidate validation and publication are pending.
 
-## 0.1.0-preview.8 — candidate
+## 0.1.0-preview.8 — 2026-09-19
 
 Raven-authored System.Runtime, unified Introspection and grapheme text. See the
 [release notes](docs/preview-8-release-notes.md) for the resulting API and migration.
 The dated development history below preserves intermediate choices superseded by
-later entries; it is not a list of simultaneously supported contracts. Publication
-is pending exact-candidate validation.
+later entries; it is not a list of simultaneously supported contracts. The release
+manifest records the exact published candidate and its validation evidence.
 
 ### 2026-09-19
 
