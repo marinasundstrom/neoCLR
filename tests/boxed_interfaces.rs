@@ -195,3 +195,73 @@ fault "string comparison failed"
         Value::String("hello".into())
     );
 }
+
+#[test]
+fn type_test_accepts_an_interface_implemented_by_a_boxed_value() {
+    let m = module(
+        r#"
+.function Main() -> Int32
+ldc.i4 40
+newobj Counter
+box Counter
+isinst Mutable
+ldc.i4 2
+callvirt instance Mutable::Add(Int32)
+ret
+.end
+"#,
+    );
+    verify(&m).unwrap();
+    assert_eq!(run(&m, Limits::default()).unwrap().value, Value::Int32(42));
+}
+
+#[test]
+fn intrinsic_string_type_test_preserves_string_representation() {
+    let library = assemble(".module System").unwrap();
+    let m = neoclr::assembler::read_modules(
+        &[neoclr::assembler::ModuleInput::Source(
+            r#"
+.module Strings
+.entry Main
+.interface Equal
+.method instance Equals(String other) -> Boolean
+.end
+.end
+.type System.String
+.implements Equal
+.method instance readonly byref Equals(String other) -> Boolean
+ldarg this
+ldobj String
+ldarg other
+ceq
+ret
+.end
+.end
+.function Main() -> String
+.local Equal value
+ldstr "hello"
+isinst Equal
+stloc value
+ldloc value
+ldstr "hello"
+callvirt instance Equal::Equals(String)
+brfalse Failed
+ldloc value
+isinst String
+ret
+Failed:
+fault "string comparison failed"
+.end
+"#,
+        )],
+        &library,
+    )
+    .unwrap()
+    .remove(0);
+    let program = neoclr::LoadedProgram::with_library(&m, &library).unwrap();
+    program.verify().unwrap();
+    assert_eq!(
+        program.run(Limits::default()).unwrap().value,
+        Value::String("hello".into())
+    );
+}

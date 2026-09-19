@@ -2145,8 +2145,16 @@ fn interpret_instructions(
                         _ => return Err(Fault::new("isinst requires an object reference")),
                     };
                     crate::arrays::check_cast(&concrete, target)?;
-                    if concrete == *target || module.reference_assignable(&concrete, target) {
+                    if concrete == *target
+                        || module.reference_assignable(&concrete, target)
+                        || (crate::interfaces::interface_definition(module, target).is_ok()
+                            && crate::interfaces::ensure_implementation(module, &concrete, target)
+                                .is_ok())
+                    {
                         let result = match value {
+                            Value::ObjectReference(object) if *target == Type::String => {
+                                object.reference.read()?
+                            }
                             Value::ObjectReference(mut object) => {
                                 object.view = Some(target.clone());
                                 Value::ObjectReference(object)
