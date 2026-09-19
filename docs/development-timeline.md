@@ -25,6 +25,18 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-19 — In-depth feature pages for the next release
+
+**Author proposal.** Create dedicated feature pages for the next release, going into
+particular APIs in depth and showing more substantial samples.
+
+**Assistant response and action.** Proposed a page structure covering the problem,
+runnable walkthrough, API behavior/tradeoffs, preview limits and feedback questions.
+Suggested Introspection first, drawing code from tested samples, with strings after
+its later API/runtime story. Recorded a [content and delivery plan](design/feature-pages.md)
+and linked it from the roadmap/design index. No feature page or website publication
+is claimed; this documentation planning slice is separate from the closed API work.
+
 ## 2026-09-19 — Close the Introspection story
 
 **Author decision.** With discovery, metadata tokens and Sequence collection contracts

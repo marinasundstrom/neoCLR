@@ -28,3 +28,5 @@ See the [original proposals](../proposals/README.md) for the supplied source mat
 - [Runtime groundwork review](../runtime-groundwork-review.md)
 - [Stream API proposal](../stream-design.md)
 - [Designing types and APIs for NeoCLR and Neo](../type-design.md)
+
+- [Next-preview feature pages](feature-pages.md): planned API walkthroughs, tested samples and evaluator feedback.

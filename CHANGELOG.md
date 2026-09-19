@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Plan dedicated next-preview feature pages with in-depth API walkthroughs, tested
+  Raven samples, expected output, design comparisons, limits and feedback questions.
+  Suggest Introspection first and strings after its later API/runtime story; no pages
+  are built or published by this planning slice.
+
 - Complete the Raven Introspection collection migration to Sequence<T>: generic
   arguments, implemented interfaces, enum names, fields, methods, properties and
   parameters now match assembly/module query capabilities. Use Count instead of

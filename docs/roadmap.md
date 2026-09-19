@@ -44,6 +44,15 @@ this sequencing request. UTF-8 support can improve storage/interchange ergonomic
 its indexing costs and .NET migration differences must be explicit. This section
 records the next work, not completed string API changes.
 
+## Next-preview feature pages (2026-09-19)
+
+The author proposes dedicated feature pages with in-depth API walkthroughs and more
+substantial examples for the next release. The [content plan](design/feature-pages.md)
+starts with Introspection as an assistant-suggested candidate, using tested Raven
+samples, expected output, .NET comparisons, preview limits and focused feedback
+questions. The String page follows the later String API/runtime-behavior story.
+This is planned website/documentation work, not published pages or a new release date.
+
 ## Core contract and target capability planning (2026-09-14)
 
 Use [API planning](runtime-api-plan.md#common-platform-contract-and-target-capabilities-2026-09-14)
