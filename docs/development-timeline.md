@@ -4407,3 +4407,12 @@ encoding-specific functionality, while preserving String as the default neutral
 text container and Char as an encoding-independent character. The assistant
 recorded Utf8String/AsciiString as possible future specialized types, not additions
 to this minimal implementation. UTF-8 remains the canonical runtime storage choice.
+
+### Next preview release request — 2026-09-19
+
+After the grapheme implementation, the author directed that a release should follow.
+The assistant selected Preview 8 and a fresh experimental Raven .15 toolchain,
+continuing the previous release's source matrix and macOS arm64 binary scope.
+The compiler, runtime and website text slices were committed separately. Release
+preparation uses an isolated clean checkout so existing local edits are preserved.
+Publication remains pending exact-candidate CI and extracted-package validation.

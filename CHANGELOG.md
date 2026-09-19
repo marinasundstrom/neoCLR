@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Prepare Preview 8 packaging: use the current direct reference-core generator,
+  share the target props across runner and MSBuild demo projects, include nested
+  documentation and refresh text/introspection instructions. Format the existing
+  ordinal/UTF-8 tests for the stable-Rust CI gate. Publication remains pending
+  exact-candidate source and extracted-package validation.
+
 - Implement the approved grapheme text direction: Char owns one validated Unicode
   16 extended grapheme cluster; String.Length and iteration use graphemes, with
   explicit GetScalars returning Sequence<uint> and UnicodeScalar classification.

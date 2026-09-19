@@ -8,6 +8,10 @@ and VS Code VSIX are distributed separately. This is not a normal Raven release.
 Prerequisites: .NET 11 SDK/runtime (the manifest records the tested preview), Python
 3.9 or later, and VS Code with the matching experimental Raven extension for editing.
 
+neoCLR and its guest programs do not depend on .NET. The compiler, importer,
+MSBuild and Raven Language Server use .NET; the VS Code extension connects to
+that language server.
+
 You can first try the runtime directly, without the Raven tools:
 
 ```sh
@@ -25,13 +29,14 @@ Raven entry points. Continue with Raven and VS Code:
    `python3 configure.py --sdk /absolute/path/to/raven-sdk` from this folder.
 3. Open the **msbuild-demo** folder in VS Code. `Main.rvn` demonstrates Result/Option/Void
    propagation. Completion should resolve neoCLR types; for example type
-   `System.Date.` or `System.Type.` inside a function.
+   `System.Date.` or `System.Runtime.RuntimeContext.` inside a function.
 4. Use **Tasks: Run Task → neoCLR: Run (MSBuild)**. It first runs the default
    MSBuild build task, then executes the verified program. **Tasks: Run Build Task**
    compiles without running. No Microsoft.NET.Sdk import or guest .NET target framework
    is used. The compiler and importer remain separate stages.
 5. Copy another file from **tools/samples** over **msbuild-demo/Main.rvn**, save, and rerun.
-   Start with `library-files.rvn`, `library-calendar.rvn`, `library-reflection.rvn`,
+   Start with `library-grapheme-strings.rvn`, `library-introspection-tour.rvn`,
+   `library-files.rvn`, `library-calendar.rvn`, `library-reflection.rvn`,
    `library-value-interfaces.rvn`, or `library-reference-payloads.rvn`. The file sample
    creates `neoclr-file-demo.txt` in the working directory. Native buffers require an
    unsafe context and explicit Free; ordinary objects/arrays use GC.

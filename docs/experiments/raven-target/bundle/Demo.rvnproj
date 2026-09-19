@@ -1,23 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project>
   <PropertyGroup>
-    <TargetFramework>net11.0</TargetFramework>
-    <OutputType>Exe</OutputType>
-    <RavenMetadataCoreAssemblyName>NeoCLR.CoreProbe</RavenMetadataCoreAssemblyName>
-    <RavenTargetCoreAssemblyName>NeoCLR.CoreProbe</RavenTargetCoreAssemblyName>
-    <RavenUseHostFrameworkReferences>false</RavenUseHostFrameworkReferences>
-    <RavenAllowArrayCovariance>false</RavenAllowArrayCovariance>
-    <RavenPropagationAssemblyName>NeoCLR.CoreProbe</RavenPropagationAssemblyName>
-    <RavenPropagationInterfaceType>System.Propagatable`3</RavenPropagationInterfaceType>
-    <RavenIterationAssemblyName>NeoCLR.CoreProbe</RavenIterationAssemblyName>
-    <RavenIterationArrayShapeType>System.Array`1</RavenIterationArrayShapeType>
-    <RavenIterationIterableType>System.Collections.Iterable`1</RavenIterationIterableType>
-    <RavenIterationIteratorType>System.Collections.Iterator`1</RavenIterationIteratorType>
-    <ImplicitImports>disable</ImplicitImports>
-    <RavenFrameworkProjections>None</RavenFrameworkProjections>
-    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <NeoCLRRoot>$(MSBuildThisFileDirectory)..</NeoCLRRoot>
   </PropertyGroup>
+  <Import Project="$(NeoCLRRoot)/build/NeoCLR.Raven.props" />
   <ItemGroup>
     <Compile Include="Main.rvn" />
-    <Reference Include="NeoCLR.CoreProbe"><HintPath>NeoCLR.CoreProbe.dll</HintPath></Reference>
   </ItemGroup>
 </Project>

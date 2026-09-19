@@ -1,4 +1,4 @@
-use neoclr::{assembler::parse_function_ref, Limits, LoadedProgram, RuntimeService, Value};
+use neoclr::{Limits, LoadedProgram, RuntimeService, Value, assembler::parse_function_ref};
 
 fn program() -> LoadedProgram {
     let mut source = String::from(".module Text\n");
@@ -110,12 +110,16 @@ fn service_planning_covers_all_ordinal_helpers() {
                 8,
             )
             .unwrap();
-        assert!(graph
-            .required_services()
-            .contains(&RuntimeService::StringOperations));
-        assert!(graph
-            .required_services()
-            .contains(&RuntimeService::SlotReferences));
+        assert!(
+            graph
+                .required_services()
+                .contains(&RuntimeService::StringOperations)
+        );
+        assert!(
+            graph
+                .required_services()
+                .contains(&RuntimeService::SlotReferences)
+        );
     }
     let graph = program
         .analyze_reachability(

@@ -40,12 +40,13 @@ fn encoding_preserves_exact_bytes_and_obeys_array_limit() {
             elements: "Aé🌍".bytes().map(Value::Byte).collect(),
         }
     );
-    assert!(p
-        .run(Limits {
+    assert!(
+        p.run(Limits {
             array_elements: 6,
             ..Limits::default()
         })
-        .is_err());
+        .is_err()
+    );
 }
 
 #[test]

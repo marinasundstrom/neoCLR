@@ -40,9 +40,8 @@ subprocess.run(['dotnet', 'publish', str(HERE / 'Probe.csproj'), '-c', 'Release'
     '-p:RavenRoot=' + str(raven), '-p:BuildProjectReferences=false', '-p:WarningLevel=0',
     '-o', str(output / 'tools/bridge')], check=True)
 probe = output / 'tools/bridge/Probe.dll'
-probe_output = output / 'metadata-build'
-subprocess.run(['dotnet', str(probe), '--interfaces', str(probe_output)], check=True)
-shutil.copyfile(probe_output / 'NeoCLR.CoreProbe.dll', output / 'demo/NeoCLR.CoreProbe.dll')
+subprocess.run(['dotnet', str(probe), '--reference-core',
+                str(output / 'demo/NeoCLR.CoreProbe.dll')], check=True)
 shutil.copy2(runtime, output / 'bin/neoclr')
 (output / 'lib/System.neoil').write_text(build(ROOT / 'runtime/System.neoil'))
 shutil.copytree(sdk / 'tools/language-server', output / 'tools/server')
@@ -54,8 +53,10 @@ for name in ('run_project.py', 'runner_options.py', 'configure_tasks.py', 'verif
 shutil.copytree(ROOT / 'examples/preview', output / 'samples/neoil')
 shutil.copytree(HERE / 'samples', output / 'tools/samples')
 shutil.copytree(HERE / 'samples', output / 'docs/experiments/raven-target/samples')
-for path in (ROOT / 'docs').glob('*.md'):
-    shutil.copyfile(path, output / 'docs' / path.name)
+for relative in git(ROOT, 'ls-files', 'docs/*.md', 'docs/**/*.md').splitlines():
+    destination = output / relative
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(ROOT / relative, destination)
 for name in ('runtime-api-inventory.json', 'runtime-api-coverage.json', 'RELEASING.md', 'VSCODE.md', 'README.md'):
     shutil.copyfile(HERE / name, output / 'docs/experiments/raven-target' / name)
 for name in ('README.md', 'configure.py'):
@@ -74,8 +75,6 @@ shutil.copytree(ROOT / 'third-party', output / 'third-party')
 for name in ('LICENSE', 'THIRD-PARTY-NOTICES.txt'):
     shutil.copyfile(raven / name, output / 'licenses/Raven' / name)
 
-# Probe construction artifacts are not part of the runnable distribution.
-shutil.rmtree(probe_output)
 manifest = {'version': args.version, 'createdUtc': datetime.now(timezone.utc).isoformat(),
     'distribution': 'local experiment; not published', 'platform': 'osx-arm64',
     'neoCLRRevision': git(ROOT, 'rev-parse', 'HEAD'), 'ravenRevision': git(raven, 'rev-parse', 'HEAD'),
