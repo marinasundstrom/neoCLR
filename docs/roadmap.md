@@ -51,7 +51,9 @@ substantial examples for the next release. The [content plan](design/feature-pag
 starts with Introspection as an assistant-suggested candidate, using tested Raven
 samples, expected output, .NET comparisons, preview limits and focused feedback
 questions. The String page follows the later String API/runtime-behavior story.
-This is planned website/documentation work, not published pages or a new release date.
+The first Introspection page is now built and checked locally, with source-backed
+excerpts and sample downloads. Publication and additional pages remain separate work;
+no new release date is selected.
 
 ## Core contract and target capability planning (2026-09-14)
 

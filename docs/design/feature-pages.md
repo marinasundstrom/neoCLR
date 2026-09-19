@@ -2,7 +2,8 @@
 
 Planning direction recorded **2026-09-19**. The author proposes dedicated pages
 that explain individual features or APIs in depth, with more substantial samples.
-This document plans the content; it does not claim pages have been built or published.
+The first Introspection guide is now implemented locally at
+`website/features/introspection/index.html`; it has not been published by this slice.
 No release number or date is assigned.
 
 ## Purpose
@@ -50,3 +51,16 @@ implement the Introspection page and sample extraction/checks, then verify rende
 code, links, narrow-screen reading and copy/run instructions. Keep that website slice
 separate from the completed Introspection API commits. Publishing remains a distinct
 release action; this plan does not publish the site.
+
+
+## First implemented page — 2026-09-19
+
+The Introspection guide follows one saved Raven program through acquisition,
+assembly/module discovery, metadata tokens, Sequence results and sealed member
+matching. All excerpts and downloadable source derive from that program; the saved
+project gate checks the expected-output file rendered on the page. The homepage now
+links to the guide and replaces obsolete class/Type.Info migration descriptions.
+
+The static builder supports nested feature pages and validates cross-page links,
+anchors and sample downloads. Desktop and narrow layouts are checked locally.
+String pages remain future work; no dynamic loading or API expansion is included.

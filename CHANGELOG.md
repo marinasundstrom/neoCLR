@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Add the first in-depth Introspection feature guide with a runnable Raven tour,
+  source-backed highlighted excerpts, shared expected output and sample downloads.
+  Explain acquisition, discovery, scoped tokens, Sequence results and sealed member
+  matching, with current limits and feedback questions. Update stale homepage API
+  descriptions and validate nested pages, relative links and cross-page anchors.
+  The tour and 22 shared saved-project checks pass, alongside highlighting and three
+  cross-page validation tests. Desktop/narrow layouts were checked locally.
+  This development guide is built locally; it does not publish a site or release.
+
 - Plan dedicated next-preview feature pages with in-depth API walkthroughs, tested
   Raven samples, expected output, design comparisons, limits and feedback questions.
   Suggest Introspection first and strings after its later API/runtime story; no pages

@@ -36,7 +36,7 @@ The site is independent of publishing a runtime release or a Raven Marketplace e
 
 The homepage embeds eleven excerpts: Result propagation, generic Void in neoIL,
 optional query results, collection capabilities, UTF-8 slicing, query cardinality,
-Func callbacks with a Void result, calendar validation, imported union patterns, the initial Clock API and the Type/TypeInfo split. The latter two are explicitly marked as development APIs, separate from the published download. The narrative covers
+Func callbacks with a Void result, calendar validation, imported union patterns, the initial Clock API and RuntimeContext assembly discovery. The latter two are explicitly marked as development APIs, separate from the published download. The narrative covers
 familiar semantics/metadata, the type system, the class library, Raven migration
 and tooling, and the planned Raven-authored library and missing API work.
 Edit the executable samples rather than duplicating code in HTML. The Pages workflow
@@ -53,9 +53,31 @@ HTML generation in `highlight.mjs`. The vendored Raven grammar comes from
 `src/Raven.VSCode/syntaxes/raven.tmLanguage.json` at Raven revision
 `246d697bf6c69ff8cc56ca4859879edd7c081e7d`; its MIT license is preserved in
 `syntaxes/Raven-LICENSE`. Update the grammar deliberately and run the tokenizer test.
-Only HTML/CSS and the logo are published; packages and WebAssembly stay build-time.
+HTML/CSS, the logo and explicitly selected sample downloads are published; packages and WebAssembly stay build-time.
 NeoIL remains readable plain code; Raven tokens receive syntax colors.
 
 The primary order is Familiar, Runtime, Type system, Runtime class library, Migration,
 Tooling, and What's next. Library examples carry their own topic labels; extra union
 forms and deeper research are optional disclosures to keep the overview concise.
+
+## Feature guides
+
+`features/introspection/index.html` is the first in-depth development guide. It covers
+TypeInfo acquisition, RuntimeContext discovery, tokens, Sequence results and sealed
+member matching. Its code excerpts and downloadable program come from
+`library-introspection-tour.rvn`; expected output is shared with the saved-project
+check in `library-introspection-tour.expected.txt`. Run that check with a matching
+built toolchain via `verify_project.py --collections --only IntrospectionTour` and
+the usual project/runtime/bridge/system arguments.
+
+The builder emits the homepage and HTML under `website/features`, preserving paths
+and copying only the selected public samples/assets. It validates relative links,
+directory index links and cross-page fragments after every page is rendered. Raven
+blocks are highlighted; blocks marked `data-language="text"` preserve plain output.
+Run `python3 -m unittest discover -s scripts -p test_build_website.py` for the nested
+link/download checks. The Pages workflow watches expected-output files as well as
+Raven sources. Build locally and inspect desktop/mobile layouts before publishing.
+
+This guide describes development APIs, not an update to a published runtime release.
+The Introspection implementation is closed for now; dynamic loading and the String
+story remain later work. TypeInfo is still separate from MemberInfo.

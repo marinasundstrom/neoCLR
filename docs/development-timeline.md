@@ -25,6 +25,22 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-19 — Implement the first feature guide
+
+**Author direction.** Continue after recording the feature-page plan.
+
+**Assistant action.** Built the first Introspection guide with one runnable Raven
+walkthrough, generated excerpts, shared expected output, downloads, design tradeoffs,
+preview limits and feedback questions. Updated the homepage's superseded Type/Info
+and class-based descriptions, and added nested-page/anchor validation to the site
+builder. The guide is a local development artifact; no push or publication occurred.
+
+**Follow-up question.** The author asked whether TypeInfo already extends MemberInfo.
+The assistant clarified that it remains separate: the sealed MemberInfo cases are
+FieldInfo, MethodInfo and PropertyInfo. Nested-type membership is a future option
+requiring a declaring-type contract that also handles top-level types. The website
+work does not change this API boundary.
+
 ## 2026-09-19 — In-depth feature pages for the next release
 
 **Author proposal.** Create dedicated feature pages for the next release, going into

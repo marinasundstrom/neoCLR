@@ -1,0 +1,13 @@
+Instance and declared type agree
+Demo
+System.Runtime
+Demo
+Widget
+Same definition token
+Demo
+5
+Method
+value
+Field
+Property
+0

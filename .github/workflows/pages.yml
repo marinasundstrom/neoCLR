@@ -6,15 +6,19 @@ on:
     paths:
       - 'website/**'
       - 'scripts/build-website.py'
+      - 'scripts/test_build_website.py'
       - 'examples/preview/result-void.neoil'
       - 'docs/experiments/raven-target/samples/*.rvn'
+      - 'docs/experiments/raven-target/samples/*.expected.txt'
       - '.github/workflows/pages.yml'
   pull_request:
     paths:
       - 'website/**'
       - 'scripts/build-website.py'
+      - 'scripts/test_build_website.py'
       - 'examples/preview/result-void.neoil'
       - 'docs/experiments/raven-target/samples/*.rvn'
+      - 'docs/experiments/raven-target/samples/*.expected.txt'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 
@@ -42,6 +46,8 @@ jobs:
         run: npm ci --prefix website --ignore-scripts
       - name: Check Raven highlighting
         run: npm test --prefix website
+      - name: Check cross-page links
+        run: python -m unittest discover -s scripts -p test_build_website.py
       - name: Build and check project site
         run: python scripts/build-website.py
       - name: Upload site

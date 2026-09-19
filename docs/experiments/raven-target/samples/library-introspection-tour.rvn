@@ -1,0 +1,53 @@
+import System.*
+import System.Collections.*
+import System.Introspection.*
+import System.Runtime.*
+
+class Widget { }
+
+func MemberKind(member: MemberInfo) -> string {
+    return match member {
+        FieldInfo => "Field"
+        MethodInfo => "Method"
+        PropertyInfo => "Property"
+    }
+}
+
+func Main() {
+    val widget: Object = Widget()
+    val description = widget.GetType()
+    if description.Equals(typeof(Widget)) {
+        Console.WriteLine("Instance and declared type agree")
+    }
+
+    val assembly = RuntimeContext.Current.ExecutingAssembly
+    Console.WriteLine(assembly.Name)
+    for reference in assembly.ReferencedAssemblies {
+        Console.WriteLine(reference.Name)
+    }
+    for module in assembly.GetModules() {
+        Console.WriteLine(module.Name)
+        for discovered in module.GetTypes() {
+            Console.WriteLine(discovered.Name)
+        }
+    }
+
+    if description.MetadataToken == typeof(Widget).MetadataToken {
+        Console.WriteLine("Same definition token")
+    }
+    Console.WriteLine(description.Module.Name)
+
+    val methods: Sequence<MethodInfo> = typeof(int).GetMethods()
+    Console.WriteLine(methods.Count)
+    Console.WriteLine(MemberKind(methods[0]))
+    for parameter in methods[0].GetParameters() {
+        Console.WriteLine(parameter.Name)
+    }
+
+    val flags = BindingFlags.Instance | BindingFlags.NonPublic
+    val fieldInfo = typeof(Date).GetFields(flags)[0]
+    val property = typeof(Date).GetProperties()[0]
+    Console.WriteLine(MemberKind(fieldInfo))
+    Console.WriteLine(MemberKind(property))
+    Console.WriteLine(property.GetIndexParameters().Count)
+}
