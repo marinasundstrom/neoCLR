@@ -206,4 +206,7 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Func'">
     <Compile Include="src/System/Func.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'BindingFlags'">
+    <Compile Include="src/System/Introspection/BindingFlags.rvn" />
+  </ItemGroup>
 </Project>

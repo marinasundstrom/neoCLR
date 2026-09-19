@@ -1,0 +1,104 @@
+; Generated from runtime/raven/src/System/Introspection/BindingFlags.rvn. Regenerate with build_runtime_library.py.
+.type System.Introspection.BindingFlags
+.enum Int32 flags
+.field private Bits Int32
+.literal Default 0
+.literal DeclaredOnly 2
+.literal Instance 4
+.literal Static 8
+.literal Public 16
+.literal NonPublic 32
+.method static FromValue(Int32 value) -> System.Introspection.BindingFlags
+ldarg value
+newobj System.Introspection.BindingFlags
+ret
+.end
+.method instance get_Value() -> Int32
+ldarg this
+ldfld 0
+ret
+.end
+.method instance Or(System.Introspection.BindingFlags other) -> System.Introspection.BindingFlags
+ldarg this
+ldfld 0
+ldarg other
+ldfld 0
+or
+newobj System.Introspection.BindingFlags
+ret
+.end
+.method instance And(System.Introspection.BindingFlags other) -> System.Introspection.BindingFlags
+ldarg this
+ldfld 0
+ldarg other
+ldfld 0
+and
+newobj System.Introspection.BindingFlags
+ret
+.end
+.method instance Xor(System.Introspection.BindingFlags other) -> System.Introspection.BindingFlags
+ldarg this
+ldfld 0
+ldarg other
+ldfld 0
+xor
+newobj System.Introspection.BindingFlags
+ret
+.end
+.method instance Not() -> System.Introspection.BindingFlags
+ldarg this
+ldfld 0
+not
+newobj System.Introspection.BindingFlags
+ret
+.end
+.method instance HasFlag(System.Introspection.BindingFlags other) -> Boolean
+ldarg this
+ldfld 0
+ldarg other
+ldfld 0
+and
+ldarg other
+ldfld 0
+ceq
+ret
+.end
+.method instance Equals(System.Introspection.BindingFlags other) -> Boolean
+ldarg this
+ldfld 0
+ldarg other
+ldfld 0
+ceq
+ret
+.end
+.method static Default() -> System.Introspection.BindingFlags
+ldc.i4 0
+newobj System.Introspection.BindingFlags
+ret
+.end
+.method static DeclaredOnly() -> System.Introspection.BindingFlags
+ldc.i4 2
+newobj System.Introspection.BindingFlags
+ret
+.end
+.method static Instance() -> System.Introspection.BindingFlags
+ldc.i4 4
+newobj System.Introspection.BindingFlags
+ret
+.end
+.method static Static() -> System.Introspection.BindingFlags
+ldc.i4 8
+newobj System.Introspection.BindingFlags
+ret
+.end
+.method static Public() -> System.Introspection.BindingFlags
+ldc.i4 16
+newobj System.Introspection.BindingFlags
+ret
+.end
+.method static NonPublic() -> System.Introspection.BindingFlags
+ldc.i4 32
+newobj System.Introspection.BindingFlags
+ret
+.end
+.end

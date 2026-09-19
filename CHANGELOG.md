@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Port BindingFlags as a normal Raven Flags enum (70 source slices), preserving
+  its six Int32 values, unknown bits and reflection filtering. Checked intrinsic
+  enum lowering supplies the existing runtime ABI. Seven admission checks, 31
+  enum/reflection tests and the saved flags program pass. Integrate Raven's general
+  CLI enum backing-field metadata correction independently on main (266b457f5;
+  13 focused checks), keeping neoCLR-specific lowering separate.
+
 - Port the five Func declaration arities to Raven (69 source slices). Check exact
   CLI runtime delegate metadata, generic positions and the complete family;
   invocation and closure lifetime remain runtime-owned. Six admission checks,

@@ -57,7 +57,7 @@ def build(path: Path) -> str:
         # Raven owns descriptor bodies; legacy Neo retains its value-based profile.
         return (build(ROOT / 'runtime/raven/ParameterInfo.neoil')
                 + build(ROOT / 'runtime/raven/Descriptors.neoil')
-                + text[text.index('.type System.Introspection.BindingFlags'):])
+                + build(ROOT / 'runtime/raven/BindingFlags.neoil'))
     if path == ROOT / 'runtime/System/Collections/List.neoil':
         return build(ROOT / 'runtime/raven/CollectionContracts.neoil') + build(ROOT / 'runtime/raven/List.neoil')
     if path.stem == 'Array':

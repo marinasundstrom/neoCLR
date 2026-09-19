@@ -1,6 +1,6 @@
 {
   "format": "raven-library-bootstrap-v1",
-  "owner": "System.Collections.Iterator",
+  "owner": "System.Introspection.BindingFlags",
   "inputs": {
     "runtime/raven/src/System/Introspection/BindingFlags.rvn": "d653a79edea57d664431ee9b6a1bd5e7980f873b6543308610a33286703f7d4e",
     "runtime/raven/src/System/Func.rvn": "4720a0463a88be11a4ff213363cad1c6680cd41afd457c813e247e5c4e3cbd2e",
@@ -76,13 +76,25 @@
     "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
   },
   "outputs": {
-    "Iterator.methods.neoil": "79c5375f287d2ce3d000918194fe15abb341324f5e0fe43d3404577a5e316d1b",
-    "Iterator.helpers.neoil": "405b2a880d629bf4b85b50f04bc7442fbd92b3d40d9d9d98dde9e0f77da780ac"
+    "BindingFlags.methods.neoil": "0dc50e22e642e15c37f928683c9f9bbf1524ad20122e939a7bf24dadbb7a2f4b",
+    "BindingFlags.helpers.neoil": "ea0a11ddcc4095c6356d738ba622fb3d0344ee7cb4ddd337b379c26b71267188"
   },
   "compilerSha256": "eb5f7834214432722f4140fcaf3b13464534f745f5db2d0bae5c565b8c2094cb",
   "coreSha256": "808e0f5b2034dff5c951171fe41afcc706e96e1a3e78dd9806aa9a98d4db222b",
   "exports": [
-    "MoveNext() -> Boolean",
-    "get_Current() -> T0"
+    "FromValue(Int32 value) -> System.Introspection.BindingFlags",
+    "get_Value() -> Int32",
+    "Or(System.Introspection.BindingFlags other) -> System.Introspection.BindingFlags",
+    "And(System.Introspection.BindingFlags other) -> System.Introspection.BindingFlags",
+    "Xor(System.Introspection.BindingFlags other) -> System.Introspection.BindingFlags",
+    "Not() -> System.Introspection.BindingFlags",
+    "HasFlag(System.Introspection.BindingFlags other) -> Boolean",
+    "Equals(System.Introspection.BindingFlags other) -> Boolean",
+    "Default() -> System.Introspection.BindingFlags",
+    "DeclaredOnly() -> System.Introspection.BindingFlags",
+    "Instance() -> System.Introspection.BindingFlags",
+    "Static() -> System.Introspection.BindingFlags",
+    "Public() -> System.Introspection.BindingFlags",
+    "NonPublic() -> System.Introspection.BindingFlags"
   ]
 }

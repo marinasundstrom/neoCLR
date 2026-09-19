@@ -87,6 +87,24 @@ All 28 delegate/nominal-delegate tests pass. The saved Raven delegate sample com
 imports, verifies and executes all five arities, a Void callback and collection
 callbacks with expected output. Snapshot hashes and source/API audits match.
 
+## Normal BindingFlags enum follow-up
+
+BindingFlags brings the source total to 70 slices. It is declared as a normal Raven
+Flags enum. Seven admission cases cover the valid declaration, changed/missing/extra
+literals, a different underlying type, a missing Flags marker and a struct substitute.
+The compiled Raven flags program imports, verifies and executes with the expected
+bitwise, conversion, equality and reflection-filtering results. Snapshot hashes and
+source/API audits match (770 declaration candidates, 170 source files, 118 declaring
+sources). All 31 enum/reflection Rust tests pass. Enum operations are intrinsic lowering of
+the declaration, not handwritten managed-library methods.
+
+Source enum emission exposed a missing RTSpecialName on `value__`. The independent
+.NET PE-metadata regression failed before the fix. Raven main `266b457f5` and the
+neoCLR feature cherry-pick `6219343b9` each pass 13 focused enum/target-core checks.
+No Runtime Contract options or consumer enum semantics change. The host emitter's
+reserved-bit masking is repaired in Raven's final metadata pass; target-specific
+nominal enum lowering remains outside Raven main.
+
 ## Reproduce the program gate
 
 Use the neoCLR feature compiler, built from the Raven repository's

@@ -10,6 +10,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    'BindingFlags': 'System.Introspection.BindingFlags',
     'Func': 'System.Func',
     'Fault': 'System',
     'NativeMemory': 'System.Runtime.InteropServices.NativeMemory',
@@ -84,6 +85,7 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    'BindingFlags': 'runtime/raven/src/System/Introspection/BindingFlags.rvn',
     'Func': 'runtime/raven/src/System/Func.rvn',
     'Fault': 'runtime/raven/src/System/Functions.rvn',
     'NativeMemory': 'runtime/raven/src/System/Runtime/InteropServices/NativeMemory/Functions.rvn',

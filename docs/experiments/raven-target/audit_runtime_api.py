@@ -48,6 +48,12 @@ for file in source['sourceFiles']:
                 raise ValueError('Service without a reviewed library caller: ' + name)
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'implementation-service', 'callers': callers})
         continue
+    if file.startswith('runtime/raven/generated/BindingFlags.'):
+        rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-enum-declaration',
+                     'samples': ['library-flags.rvn', 'library-reflection.rvn'],
+                     'tests': ['tests/enums.rs', 'docs/experiments/raven-target/verify_flags_library.py'],
+                     'note': 'A normal Raven enum owns the named Int32 values and Flags attribute. Checked compiler lowering supplies intrinsic enum operations using the existing nominal runtime ABI, preserving unknown bits.'})
+        continue
     if file.startswith('runtime/raven/generated/Func.'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-delegate-declarations',
                      'samples': ['library-delegates.rvn'],

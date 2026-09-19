@@ -1,0 +1,3 @@
+; Normal Raven enum declaration; compiler lowering supplies intrinsic enum operations.
+.include "generated/BindingFlags.methods.neoil"
+.include "generated/BindingFlags.helpers.neoil"

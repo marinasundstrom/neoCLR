@@ -1409,12 +1409,26 @@
     },
     {
       "file": "runtime/System/Reflection.neoil",
-      "declarations": 93,
+      "declarations": 71,
       "disposition": "reflection",
       "samples": [
         "library-reflection.rvn",
         "library-flags.rvn"
       ]
+    },
+    {
+      "file": "runtime/raven/generated/BindingFlags.methods.neoil",
+      "declarations": 22,
+      "disposition": "raven-authored-enum-declaration",
+      "samples": [
+        "library-flags.rvn",
+        "library-reflection.rvn"
+      ],
+      "tests": [
+        "tests/enums.rs",
+        "docs/experiments/raven-target/verify_flags_library.py"
+      ],
+      "note": "A normal Raven enum owns the named Int32 values and Flags attribute. Checked compiler lowering supplies intrinsic enum operations using the existing nominal runtime ABI, preserving unknown bits."
     },
     {
       "file": "runtime/System/TypeInfo.neoil",

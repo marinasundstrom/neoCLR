@@ -87,6 +87,16 @@ finished. The assistant committed to completing migration and execution checks f
 then preparing a workspace with the updated Raven compiler and neoCLR library.
 VS Code preparation is pending; no successful editor run is claimed yet.
 
+**BindingFlags correction.** The author said “BindingFlags should become a normal
+Enum”. The assistant discarded an uncommitted struct-shaped authoring approach and
+changed the source to a normal `[System.Flags] public enum`, retaining the six
+existing Int32 values. Intrinsic enum operations are compiler/runtime lowering, not
+source-authored struct methods. Import exposed a missing CLI backing-field flag;
+an ordinary .NET regression reproduced it independently. Raven main now contains
+`266b457f5` (13 focused checks), cherry-picked to the neoCLR branch as `6219343b9`.
+The source admission checks pass; the slice's execution results are recorded in
+[port validation](raven-library-port-validation.md).
+
 **String/Error slice.** Raven sources now own both method surfaces, with explicit
 importer checks for intrinsic storage, mixed String receivers and opaque Error
 receivers. Native ownership and the existing parameter metadata remain unchanged.

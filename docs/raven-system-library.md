@@ -11,7 +11,7 @@ This slice adds Raven sources for the fundamental and collection interfaces,
 SystemClock, LocalDateTime, IntPtr/UIntPtr comparisons, the complete Int32 member
 surface, Console and Environment. File.ReadAllText joins WriteAllText in Raven.
 The follow-up ports String and opaque Error, then five empty error types and Void,
-followed by seven typed error carriers, and the Propagatable declaration, then Option/Result and their cases, then the inherited descriptor family and NativeMemory, then System.Fault and Func declarations, bringing the total to 69 slices.
+followed by seven typed error carriers, and the Propagatable declaration, then Option/Result and their cases, then the inherited descriptor family and NativeMemory, then System.Fault, Func declarations and the normal BindingFlags enum, bringing the total to 70 slices.
 The legacy Neo profile retains its receiver/array conventions where it differs;
 the Raven profile selects generated contracts and implementation bodies.
 
@@ -50,7 +50,7 @@ This migration reuses the .NET comparisons in [common interfaces](common-interfa
 additional generated adapters and a larger reachable call graph; no performance
 improvement or new native ABI is claimed.
 
-Remaining handwritten source includes descriptor hierarchy bodies, array/runtime adapters and delegates.
+Remaining handwritten source includes array/runtime adapters and root/attribute markers.
 Native service declarations remain runtime-owned. Generated neoIL remains a build
 artifact rather than a competing implementation. These boundaries are not silently
 claimed to have become Raven source.
@@ -160,7 +160,7 @@ The remaining migration gates are substantive work, not just moving files:
 
 | Remaining source | Required implementation admission |
 | --- | --- |
-| BindingFlags and root/attribute markers | Checked enum/value representation and declaration metadata |
+| Root/attribute markers | Checked declaration metadata |
 | Array and iterator adapters | Runtime-owned allocation/element access and delegate invocation boundaries |
 
 Complete those gates before calling the entire source port finished. Executable
@@ -1081,3 +1081,14 @@ complete arity family before emitting the existing delegate declarations. No CIL
 stub body is executed; invocation, captures and lifetime remain runtime-owned, as
 with CLR delegates. Consumer metadata and unit-result conventions are unchanged.
 Six admission checks, 28 delegate tests and the saved Raven delegate sample pass.
+
+
+BindingFlags is a normal Raven `[System.Flags] enum` with its six existing Int32
+literals. Admission requires the exact enum base, underlying field, Flags marker
+and literal values. CLI enums contain no authored operation bodies: the importer
+lowers the enum declaration to the existing nominal runtime ABI, using the same
+intrinsic bit operations as the archived Neo enum emitter. This preserves unknown
+bits, equality and reflection filtering without representing the source as a struct.
+Consumer enum metadata remains unchanged. The general CLI backing-field flag fix
+is independently integrated on Raven main (`266b457f5`); the target declaration
+projection remains in neoCLR. No Runtime Contract configuration changes.

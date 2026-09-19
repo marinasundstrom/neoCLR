@@ -43,7 +43,7 @@ static class ApplicationTypes
     public static void Reset(params ModuleDefinition[] modules) { LibraryModule = null; LibraryScope = null; LibraryDependencies.Clear(); LibraryMap = null; LibraryReferenceTypes.Clear(); LibraryReferences.Clear(); LibraryNames.Clear(); Modules.Clear(); Modules.UnionWith(modules); Types.Clear(); Expanded.Clear(); Adapters.Clear(); }
     public static object[] IdentityMap() => Types.Select(p => (object)new {
         AssemblyIdentity = p.Value.Module.Assembly.Name.FullName, MetadataName = p.Value.FullName, RuntimeName = p.Key,
-        Fields = p.Value.Fields.Where(_ => !PrimitiveLibrary.IsMatched(p.Value) && !OpaqueLibrary.IsString(p.Value)).Select(f => new { MetadataName = f.Name, RuntimeName = FieldName(f) }).ToArray()
+        Fields = p.Value.Fields.Where(f => !PrimitiveLibrary.IsMatched(p.Value) && !OpaqueLibrary.IsString(p.Value) && (!FlagsLibrary.IsMatched(p.Value) || !f.IsStatic)).Select(f => new { MetadataName = f.Name, RuntimeName = FieldName(f) }).ToArray()
     }).ToArray();
     public static bool IsModule(ModuleDefinition? module) => module is not null && Modules.Contains(module);
     public static void CheckAccess(TypeReference reference, ModuleDefinition caller)
@@ -83,10 +83,10 @@ static class ApplicationTypes
         if (reference is TypeSpecification || reference.Scope is AssemblyNameReference assembly && !Modules.Any(m => m.Assembly.Name.FullName == assembly.FullName)) return null;
         var type = reference.Resolve();
         if (type is null || !Modules.Contains(type.Module) || type.FullName == "System.Unit" || type.Name == "<Module>") return null;
-        if (type.HasGenericParameters && !LibraryNames.ContainsKey(type) || type.IsEnum
+        if (type.HasGenericParameters && !LibraryNames.ContainsKey(type) || type.IsEnum && !FlagsLibrary.IsMatched(type)
             || type.IsExplicitLayout || (type.DeclaringType?.HasGenericParameters ?? false) || type.IsValueType && type.HasInterfaces && !LibraryNames.ContainsKey(type)
-            || (!type.IsInterface && !DelegateLibrary.IsMatched(type) && type.BaseType?.FullName is not ("System.Object" or "System.ValueType") && !IsModule(type.BaseType?.Resolve()?.Module))
-            || type.Fields.Any(f => f.IsStatic || f.HasMarshalInfo || f.IsInitOnly)
+            || (!type.IsInterface && !DelegateLibrary.IsMatched(type) && !FlagsLibrary.IsMatched(type) && type.BaseType?.FullName is not ("System.Object" or "System.ValueType") && !IsModule(type.BaseType?.Resolve()?.Module))
+            || !FlagsLibrary.IsMatched(type) && type.Fields.Any(f => f.IsStatic || f.HasMarshalInfo || f.IsInitOnly)
             || type.Methods.Any(m => m.IsConstructor && m.IsStatic))
             throw new InvalidDataException("Unsupported application type: " + type.FullName);
         var name = LibraryNames.TryGetValue(type, out var libraryOwner)
@@ -126,7 +126,7 @@ static class ApplicationTypes
         while (Types.Any(t => !Expanded.Contains(t.Key)))
         {
             var (name, type) = Types.First(t => !Expanded.Contains(t.Key)); Expanded.Add(name);
-            if (DelegateLibrary.IsMatched(type)) continue;
+            if (DelegateLibrary.IsMatched(type) || FlagsLibrary.IsMatched(type)) continue;
             if (IsModule(type.BaseType?.Resolve()?.Module)) { CheckAccess(type.BaseType!, type.Module); map(type.BaseType!, false); }
             foreach (var contract in type.Interfaces) { CheckAccess(contract.InterfaceType, type.Module); map(contract.InterfaceType, false); }
             foreach (var field in type.Fields) map(field.FieldType, false);
@@ -163,7 +163,7 @@ static class ApplicationTypes
         if (method.HasThis && Type(method.DeclaringType) is null) throw new InvalidDataException("Unsupported application receiver.");
     }
     public static string Receiver(MethodReference method) => Type(method.DeclaringType)! + ((method.DeclaringType.IsValueType && !LibraryImplementation.IsByValueReceiver(method) || OpaqueLibrary.IsByRefString(method)) ? "&" : "");
-    static string FieldName(FieldDefinition field) => LibraryNames.ContainsKey(field.DeclaringType)
+    static string FieldName(FieldDefinition field) => FlagsLibrary.IsMatched(field.DeclaringType) ? "Bits" : LibraryNames.ContainsKey(field.DeclaringType)
         && DescriptorLibrary.IsDescriptor(field.DeclaringType) ? field.Name[6..]
         : LibraryNames.ContainsKey(field.DeclaringType) && GenericUnionLibrary.IsCase(field.DeclaringType)
             ? "Value" : MetadataIdentity.MemberName(field.Name);
@@ -220,6 +220,7 @@ static class ApplicationTypes
         while (Types.Any(t => !emitted.Contains(t.Key)))
         {
             var (name, type) = Types.First(t => !emitted.Contains(t.Key)); emitted.Add(name);
+            if (FlagsLibrary.IsMatched(type)) { output.Append(EnumBindings.Declaration(type)); continue; }
             if (DelegateLibrary.IsMatched(type)) { output.Append(DelegateLibrary.Declaration(type, name, map)); continue; }
             output.AppendLine(type.IsInterface ? $".interface {name}" : $".type {(LibraryDependencies.Contains(type) ? "internal " : "")}{(type.IsValueType || OpaqueLibrary.IsString(type) || IsLibrary(type) && GenericUnionLibrary.IsContainer(type) ? "" : "class ")}{(type.IsAbstract && !GenericUnionLibrary.IsContainer(type) ? "abstract " : "")}{name}");
             if (IsModule(type.BaseType?.Resolve()?.Module)) output.AppendLine(".extends " + map(type.BaseType, false));
