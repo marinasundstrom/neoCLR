@@ -25,6 +25,19 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-19 — Optional services associated with RuntimeContext
+
+**Author suggestion.** “Other things might later be tied to the runtime context.
+Perhaps an optional GC, instead of a GC class.” This is a future possibility, not a
+request to remove the existing collector or implement a GC-free execution mode now.
+
+**Assistant response and action.** Recorded an optional context-associated collector
+capability in the [maintained design](introspection-design.md), comparing it with
+.NET's static System.GC API. Proposed separating capability availability from the
+underlying memory-management policy. Heap scope, shared collectors, rooting and
+lifetime rules remain open, as do API names and representation of absence. This
+documentation update does not expand the initial assembly-discovery implementation.
+
 ## 2026-09-19 — RuntimeContext owns assembly discovery
 
 **Author direction.** RuntimeContext will expose the executing assembly as

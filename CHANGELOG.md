@@ -22,6 +22,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   owns context-dependent discovery formerly represented by .NET Assembly static
   APIs; the first selected surface is executing AssemblyInfo → modules → types.
   Exact member spelling is provisional; loading remains outside the initial scope.
+  Record a possible optional collector capability on RuntimeContext for later design,
+  including heap/lifetime questions; no GC API or execution-policy change is made.
 
 - Complete the Raven branch review and prepare an isolated VS Code development
   workspace with reproducible setup tooling. General editor-reference and ref-struct

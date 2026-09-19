@@ -138,6 +138,29 @@ static APIs, multiple contexts, or loading for the initial preview. Concrete
 Runtime*Info providers remain internal. These paragraphs describe the selected
 contract, not a completed production API.
 
+### Possible context capabilities — 2026-09-19
+
+The author suggested that other services might later belong to RuntimeContext,
+including an optional garbage collector instead of a standalone GC class. This is
+an exploratory direction, not a selected API or a change to the current collector.
+
+.NET exposes collector control and observations through the static
+[System.GC API](https://learn.microsoft.com/en-us/dotnet/api/system.gc?view=net-10.0).
+A context-associated collector capability could make availability and the affected
+runtime explicit. Keeping a standalone static facade is an alternative with familiar
+.NET ergonomics but less explicit context selection. The context capability costs
+additional availability handling and requires precise heap and lifetime semantics.
+
+Before implementation, distinguish an absent public collection-control capability
+from an execution mode without a collector. Neither implies the other. Define which
+heap collection and statistics concern, whether contexts share that heap, how
+cross-context references remain rooted, and what reclaims allocations when collection
+is unavailable. Context association alone must not promise one private collector per
+context or that a collector can be disabled or replaced safely. Validate those
+contracts before exposing control operations. No member name, optionality encoding,
+collector interface or non-GC execution mode is selected here; the discovery preview
+continues independently of this future design work.
+
 Runtime-backed introspection is still descriptive. MethodInfo does not gain Invoke,
 and PropertyInfo does not gain GetValue or SetValue because of its backing source.
 The interfaces must not require that all future implementations be runtime-backed.
