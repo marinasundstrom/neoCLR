@@ -6,11 +6,12 @@ not a successful compilation or execution probe.
 
 ## Post-release priority — 2026-09-19
 
-The author selected these compiler-facing contracts and Task as the first work after
-Preview 8, because upcoming APIs need the completion abstraction. Runtime suspension
+The author selected these compiler-facing contracts and Task as foundational work after
+Preview 8, because upcoming APIs need the completion abstraction. A subsequent
+direction places the query-operator naming pass before this work. Runtime suspension
 remains a later step. The assessment below is historical source evidence; re-audit
 the current compiler/runtime before implementation. See the updated
-[API design priorities](async-api-design.md#first-priority-after-preview-8--2026-09-19).
+[API design priorities](async-api-design.md#post-release-task-foundation--2026-09-19).
 
 ## Finding
 

@@ -8,7 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
-- Record Task and async state-machine contracts as the first post-Preview 8 priority:
+- Establish conventional query-operator terminology as the next post-release slice,
+  before Task/async work; select Filter/Map for Where/Select with initial capitals.
+  Prefer converged terminology while retaining .NET terms where conventional or
+  clearer; do not mechanically choose Fold/Reduce or Drop/Skip. Preview 8 still
+  exposes the existing names.
+- Record Task and async state-machine contracts as a post-Preview 8 foundation:
   upcoming APIs need the completion contract before runtime suspension arrives.
   Keep continuation scheduling and logical context flow as explicit open design work,
   including the goal of avoiding routine ConfigureAwait-style boilerplate.

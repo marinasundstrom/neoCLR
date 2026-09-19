@@ -21,6 +21,14 @@ type arguments from the receiver and callback; no explicit reference operators
 are needed. These are generic library methods with validated bridge bindings,
 not support for arbitrary generic application method bodies.
 
+## Naming work after Preview 8
+
+The author selected conventional operator terminology before the Task/async work.
+The first rename slice selects Filter/Map for the current Where/Select operations, with
+the same semantics. The table above remains the implemented Preview 8 contract;
+renaming, migration and updated execution/editor evidence are the next slice. See
+[the naming policy](api-policy.md#query-operator-naming-direction-2026-09-19).
+
 ## Array receivers after Preview 5
 
 Managed vectors implement `System.Collections.Iterable<T>` in the runtime. An array

@@ -6,10 +6,11 @@ and which .NET conventions or behaviors neoCLR should retain or change. The Task
 recommendations below remain assistant proposals, not author approval or implemented
 contracts.
 
-## First priority after Preview 8 — 2026-09-19
+## Post-release Task foundation — 2026-09-19
 
-The author selected Task and compiler-generated async state-machine contracts as
-the first post-release priority. The rationale is that upcoming APIs need a shared
+The author initially selected Task and compiler-generated async state-machine contracts as
+the first post-release priority, then placed the conventional query-operator naming
+pass ahead of it. The rationale is that upcoming APIs need a shared
 completion contract; this is foundational API work, not merely an async syntax feature.
 Runtime-owned suspension remains the later direction. The first implementation is
 transitional, and should preserve the public Task/Result model when its execution

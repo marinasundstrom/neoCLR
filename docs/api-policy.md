@@ -163,6 +163,43 @@ As APIs are added, tests should cover ordinary observable .NET behavior and the
 intentional neoCLR adaptations separately. Do not promise compatibility for a
 member until its supported inputs, outputs, errors, and other effects are defined.
 
+## Query operator naming direction (2026-09-19)
+
+The author supplied this naming principle:
+
+> Prefer terminology that has converged across modern languages for fundamental
+> iterable operations; retain .NET terminology where it is already broadly
+> conventional or materially clearer.
+
+Apply it to the existing query API after Preview 8, before Task/async contract work.
+This is not a mechanical adoption of Rust or JavaScript terminology.
+Keep Raven's existing method casing; this is terminology, not a casing redesign.
+
+The first rename slice uses `Map` for element projection (currently `Select`) and
+`Filter` for predicate selection (currently `Where`), with initial capitals as the
+author confirmed. Preserve deferred execution,
+order, callback counts and iterator cleanup semantics while changing those names.
+Do not rename already clear operators merely to differ from .NET. Review terminal
+names against their Option/Result and cardinality contracts, not only a synonym list.
+For future flattening, `FlatMap` is preferred over `SelectMany`. Do not automatically
+choose `Fold` over `Reduce`, or `Drop` over `Skip`: names must follow the selected
+semantics, including seed and empty-input behavior where applicable. Those operators
+are not implemented by this decision.
+
+[.NET Enumerable](https://learn.microsoft.com/en-us/dotnet/api/system.linq.enumerable)
+provides the current comparison. Conventional terminology also appears within .NET:
+[F# sequences](https://learn.microsoft.com/en-us/dotnet/fsharp/language-reference/sequences)
+use map/filter/fold, while [Rust iterators](https://doc.rust-lang.org/std/iter/trait.Iterator.html)
+provide map/filter/flat_map/fold/reduce (primary sources consulted 2026-09-19).
+These names can make the library easier to recognize across languages; the cost is
+source migration and reduced familiarity for callers expecting LINQ spellings.
+Equivalent names do not imply identical ownership or empty-sequence behavior.
+
+Validate the chosen API through source compilation, emitted metadata, editor
+completion and existing query execution tests. Update samples and the feature page
+together; document the migration rather than presenting new spellings as Preview 8
+capabilities. Whether any aliases or a namespace change are warranted remains open.
+
 ## Collection namespace and naming
 
 Place generic collections directly in System.Collections. Generic arity already

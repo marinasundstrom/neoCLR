@@ -4431,3 +4431,22 @@ The assistant recorded the priority and rationale in the async design, assessmen
 and website proposals. This selects the order of work, not a final scheduling policy
 or a shipped Task implementation. Runtime suspension and the behavior of cancellation,
 UI affinity, cleanup and context propagation still require design and validation.
+
+### Conventional query terms before async — 2026-09-19
+
+The author subsequently directed that LINQ-style operators use conventional terms,
+rather than inheriting .NET method names, and placed this work before the async model.
+The assistant recorded that revised order and recommended Map/Filter for the current
+Select/Where operations. FlatMap and Fold were examples for future semantic review,
+not claims of newly implemented operators. The selected direction is recorded in
+[API policy](api-policy.md#query-operator-naming-direction-2026-09-19); Preview 8 retains
+its existing operator names until the separate migration slice is implemented and tested.
+
+The author confirmed initial capitals and explicitly requested method renaming after
+release. The author then supplied a ChatGPT formulation: “Prefer terminology that
+has converged across modern languages for fundamental iterable operations; retain
+.NET terminology where it is already broadly conventional or materially clearer.”
+The author highlighted Where → Filter, Select → Map and SelectMany → FlatMap as
+strong candidates, while rejecting an automatic preference for Fold over Reduce or
+Drop over Skip. The assistant adopted that principle: the immediate implementation
+scope is the existing Where/Select pair; other operators require separate semantics.
