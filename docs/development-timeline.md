@@ -4549,3 +4549,20 @@ library and other code. The assistant broadened the explicit scope to all
 hand-authored Raven code and updated AGENTS.md so future work follows the same
 rules. Existing documented bootstrap ABI and intentional test exceptions remain;
 this clarification does not claim a repository-wide code cleanup.
+
+### Starting the provisional async mechanism — 2026-09-19
+
+After the iterable/outcome slices, the author asked to continue. The assistant
+re-read the Task proposal and inspected Raven's current builder and exception
+lowering, then proposed an executable pending-completion model before compiler
+integration. The author clarified that state machines are provisional, their
+supporting contracts need not last forever, and compiler adaptation may be needed.
+The assistant agreed to separate public completion behavior from replaceable
+builder, awaiter and saved-state machinery.
+
+The assistant added the [Raven completion experiment](experiments/task-contract/README.md),
+which uses a single explicit executor and manual heap-owned resume objects. It
+keeps expected errors in Result and documents the next compiler-integration steps.
+This is an experiment, not a public Task<T> implementation or generated async/await
+support. Cancellation, host-driven I/O, logical context and executor affinity remain
+open. The final execution results are recorded with the experiment.

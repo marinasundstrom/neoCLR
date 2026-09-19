@@ -125,3 +125,18 @@ exercise immediate and delayed Ok/Err, cancellation races, multiple awaiters, di
 handles, nested completions, GC while pending, invalid references, early disposal,
 combinator sibling cleanup and a host that cannot block. Compare both compiler and
 runtime suspension paths against the same observable API contract when available.
+
+## Provisional mechanism boundary — 2026-09-19
+
+The author clarified that state machines are provisional and their supporting
+contracts need not exist forever; adapting Raven is expected. Treat Task<T>'s
+completion/result semantics as the public design, while builder selection,
+state-machine interfaces, awaiter registration, state layout and ownership
+adapters are replaceable compiler/runtime implementation contracts. Their initial
+shape must not constrain future runtime-owned suspension. Even the public API is
+still developing; this separation is not a promise of permanent binary ABI.
+
+The [completion experiment](experiments/task-contract/README.md) tests queued
+continuations and heap-owned saved state within one execution. It does not introduce
+a shipped Task class or compile async/await. Its explicit single executor is a
+provisional test mechanism, not the settled scheduling/context policy.

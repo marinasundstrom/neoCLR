@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Start the provisional async mechanism with an executable Raven completion model:
+  validate pending heap-owned state across GC, multiple consumers, queued callback
+  ordering, duplicate completion, Result/unit payloads and terminal fault boundaries
+  in 10 scenarios. Record current Raven builder/exception-lowering gaps and the next
+  compiler-integration steps. Distinguish public Task semantics from replaceable
+  state-machine, builder and awaiter contracts. Update the proposals overview; this
+  experiment does not introduce a public Task<T> or generated async/await support.
+
 - Port 25 Option/Result operator overloads from Raven.Core to the development
   library, including transformations, recovery, branch actions, conversions and
   nested Option flattening. Use Filter and ToIterable for neoCLR's vocabulary;

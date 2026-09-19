@@ -82,3 +82,17 @@ compiler/library adaptation that may later be replaced. It does not require a th
 pool or parallel execution for the first demonstration. Runtime-owned suspension
 remains the intended long-term direction; no performance claim or implementation
 commitment is made by this assessment.
+
+## Re-audit and executable model — 2026-09-19
+
+Raven revision ddf10eca80d599ede28f9da59f145497a21e854e on neoclr still has the
+builder-selection and AsyncDispatchGuard/SetException assumptions identified above.
+The [new completion experiment](experiments/task-contract/README.md) replaces only
+the historical lack of execution evidence for a manual heap-owned continuation
+model. It does not establish compatibility with emitted compiler state machines.
+
+Following the author's clarification, compiler-facing builders, state-machine
+interfaces and awaiter adapters are provisional. Compiler adaptation is allowed
+and expected; they are not permanent public Task API requirements. The experiment
+records the next integration steps and keeps general Raven fixes separate from
+neoCLR-specific lowering policy.

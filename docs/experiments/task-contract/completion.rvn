@@ -1,0 +1,145 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Console.*
+
+// Experimental, single-executor model. Not the public Task API.
+public class Executor {
+    var Pending: ArrayList<Func<System.Void>>
+    var Running: bool
+
+    init() {
+        Pending = ArrayList<Func<System.Void>>()
+    }
+
+    func Post(callback: Func<System.Void>) {
+        Pending.Add(callback)
+    }
+
+    func Drain() {
+        if Running {
+            System.Fault("Executor cannot be pumped recursively")
+        }
+        Running = true
+        while Pending.Count != 0 {
+            let batch = Pending
+            Pending = ArrayList<Func<System.Void>>()
+            for callback in batch {
+                callback()
+            }
+        }
+        Running = false
+    }
+}
+
+public interface Awaitable {
+    val IsCompleted: bool { get }
+    func GetResult() -> Result<int, string>
+    func OnCompleted(callback: Func<System.Void>)
+}
+
+public class Completion : Awaitable {
+    var Owner: Executor
+    var ResultSlot: ArrayList<Result<int, string>>
+    var Continuations: ArrayList<Func<System.Void>>
+
+    init(owner: Executor) {
+        Owner = owner
+        ResultSlot = ArrayList<Result<int, string>>(1)
+        Continuations = ArrayList<Func<System.Void>>()
+    }
+
+    val IsCompleted: bool => ResultSlot.Count != 0
+
+    func GetResult() -> Result<int, string> {
+        if !IsCompleted {
+            System.Fault("Completion is still pending")
+        }
+        return ResultSlot[0]
+    }
+
+    func OnCompleted(callback: Func<System.Void>) {
+        if IsCompleted {
+            Owner.Post(callback)
+        } else {
+            Continuations.Add(callback)
+        }
+    }
+
+    func TryComplete(result: Result<int, string>) -> bool {
+        if IsCompleted {
+            return false
+        }
+        ResultSlot.Add(result)
+        let callbacks = Continuations
+        Continuations = ArrayList<Func<System.Void>>()
+        for callback in callbacks {
+            Owner.Post(callback)
+        }
+        return true
+    }
+}
+
+// Heap identity stands in for the future compiler-generated state machine box.
+public class ResumeMachine {
+    var Source: Awaitable
+    var Destination: Completion
+    var State: int
+    var Saved: int
+
+    init(source: Awaitable, destination: Completion) {
+        Source = source
+        Destination = destination
+    }
+
+    func MoveNext() {
+        if State == 2 {
+            return
+        }
+        if State == 0 {
+            Saved = 40
+            State = 1
+            if !Source.IsCompleted {
+                Source.OnCompleted(self.MoveNext)
+                return
+            }
+        }
+        State = 2
+        match Source.GetResult() {
+            Ok(let value) => Destination.TryComplete(Ok(Saved + value))
+            Error(let message) => Destination.TryComplete(Result<int, string>.Error(message))
+        }
+    }
+}
+
+public func Start(source: Awaitable, destination: Completion) {
+    let machine = ResumeMachine(source, destination)
+    machine.MoveNext()
+}
+
+public func Check(condition: bool) {
+    if !condition {
+        System.Fault("Completion contract assertion failed")
+    }
+}
+
+public func Read(task: Awaitable, expected: int) {
+    match task.GetResult() {
+        Ok(let value) => Check(value == expected)
+        Error(_) => System.Fault("Expected successful completion")
+    }
+}
+
+func Main() {
+    // Replaced by the verification driver for individual scenarios.
+    let executor = Executor()
+    let source = Completion(executor)
+    let destination = Completion(executor)
+    Start(source, destination)
+    Check(!destination.IsCompleted)
+    Check(source.TryComplete(Ok(2)))
+    Check(!destination.IsCompleted)
+    executor.Drain()
+    Read(destination, 42)
+    WriteLine("Pending state resumed")
+}
