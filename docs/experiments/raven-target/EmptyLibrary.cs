@@ -7,7 +7,7 @@ static class EmptyLibrary
     public static bool IsError(TypeDefinition type) => ErrorBindings.Cases.TryGetValue(type.FullName, out var cases)
         && cases.Length == 0;
     public static bool IsByValueReceiver(MethodReference method) => ApplicationTypes.IsLibrary(method.DeclaringType)
-        && IsError(method.DeclaringType.Resolve()) && method.HasThis;
+        && (IsError(method.DeclaringType.Resolve()) || ErrorCarrierLibrary.IsCase(method.DeclaringType.Resolve())) && method.HasThis;
     public static bool OmitConstructor(MethodDefinition method) => method.DeclaringType.FullName == "System.EnvironmentError"
         && PrimitiveLibrary.IsDefaultConstructor(method);
     public static void Project(ModuleDefinition module)

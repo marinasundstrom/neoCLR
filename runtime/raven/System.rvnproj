@@ -164,4 +164,25 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Void'">
     <Compile Include="src/System/Void.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Utf8SliceError'">
+    <Compile Include="src/System/Text/Utf8SliceError.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'FileReadError'">
+    <Compile Include="src/System/IO/FileReadError.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'FileWriteError'">
+    <Compile Include="src/System/IO/FileWriteError.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'ConsoleReadError'">
+    <Compile Include="src/System/IO/ConsoleReadError.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Int32ParseError'">
+    <Compile Include="src/System/Int32ParseError.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'SingleError'">
+    <Compile Include="src/System/Linq/SingleError.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'IntegerDivisionError'">
+    <Compile Include="src/System/IntegerDivisionError.rvn" />
+  </ItemGroup>
 </Project>

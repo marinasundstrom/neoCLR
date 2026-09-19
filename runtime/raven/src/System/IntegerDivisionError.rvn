@@ -1,0 +1,38 @@
+namespace System
+
+import System.Runtime.CompilerServices.ValueStorage
+
+public struct IntegerDivisionError {
+    private field Stored: System.Value
+
+    public struct DivisionByZero { }
+    public struct Overflow { }
+
+    init(value: IntegerDivisionError.DivisionByZero) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsDivisionByZero: bool { get => ValueStorage.Is<IntegerDivisionError.DivisionByZero>(Stored) }
+
+    func GetDivisionByZero() -> IntegerDivisionError.DivisionByZero {
+        return ValueStorage.Unpack<IntegerDivisionError.DivisionByZero>(Stored)
+    }
+
+    init(value: IntegerDivisionError.Overflow) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsOverflow: bool { get => ValueStorage.Is<IntegerDivisionError.Overflow>(Stored) }
+
+    func GetOverflow() -> IntegerDivisionError.Overflow {
+        return ValueStorage.Unpack<IntegerDivisionError.Overflow>(Stored)
+    }
+
+    func ToString() -> string {
+        if IsDivisionByZero {
+            return "DivisionByZero"
+        }
+        GetOverflow()
+        return "Overflow"
+    }
+}

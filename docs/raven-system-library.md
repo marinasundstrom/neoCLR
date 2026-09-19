@@ -11,7 +11,7 @@ This slice adds Raven sources for the fundamental and collection interfaces,
 SystemClock, LocalDateTime, IntPtr/UIntPtr comparisons, the complete Int32 member
 surface, Console and Environment. File.ReadAllText joins WriteAllText in Raven.
 The follow-up ports String and opaque Error, then five empty error types and Void,
-bringing the total to 55 slices.
+followed by seven typed error carriers, bringing the total to 62 slices.
 The legacy Neo profile retains its receiver/array conventions where it differs;
 the Raven profile selects generated contracts and implementation bodies.
 
@@ -50,8 +50,7 @@ This migration reuses the .NET comparisons in [common interfaces](common-interfa
 additional generated adapters and a larger reachable call graph; no performance
 improvement or new native ABI is claimed.
 
-Remaining handwritten source includes Option/Result and error
-carriers, descriptor hierarchy bodies, array/runtime adapters and delegates.
+Remaining handwritten source includes Option/Result, descriptor hierarchy bodies, array/runtime adapters and delegates.
 Native service declarations remain runtime-owned. Generated neoIL remains a build
 artifact rather than a competing implementation. These boundaries are not silently
 claimed to have become Raven source.
@@ -95,11 +94,23 @@ pass, including a regression that failed before the fix); feature commit `b6f123
 applies it to neoCLR. The ordinary .NET regression uses ValueTuple and checks emitted
 identity and execution. It does not establish .NET Framework/NanoFramework execution.
 
+Seven typed error carriers now own their cases, predicates, extraction and formatting
+in Raven: FileReadError, FileWriteError, ConsoleReadError, Utf8SliceError,
+Int32ParseError, IntegerDivisionError and Linq.SingleError. Each retains exactly one
+erased Stored field and the existing empty nested cases. Bootstrap-only ValueStorage
+pack/test/unpack intrinsics admit those checked cases; arbitrary payloads are rejected.
+The importer checks constructor CIL before lowering the single field assignment to
+neoCLR's existing by-value constructor ABI. It rejects constructor side effects and
+fabricated defaults, preserving wrong-case faults and current message strings.
+This reuses the established [error contracts and .NET comparison](errors.md); no
+exception model, Runtime Contract option or public API is changed. The reference
+assembly and importer carry this target-specific representation boundary.
+
 The remaining migration gates are substantive work, not just moving files:
 
 | Remaining source | Required implementation admission |
 | --- | --- |
-| Option/Result, Propagatable and error carriers | Union/case representation, out-parameter contracts and default/case validity |
+| Option/Result and Propagatable | Union/case representation, out-parameter contracts and default/case validity |
 | MemberInfo/FieldInfo/MethodInfo/PropertyInfo | Abstract/inherited descriptor layout and runtime snapshot factory compatibility |
 | Array, iterator adapters and Func | Runtime-owned allocation/element access and delegate invocation boundaries |
 

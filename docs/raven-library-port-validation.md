@@ -26,6 +26,15 @@ faults and uninitialized carrier defaults are rejected. Raven main `c17cb8397` f
 unit-contract assembly lookup independently with .NET ValueTuple (19 checks); the
 neoCLR feature cherry-pick `b6f12353f` passes 24 focused target/unit checks.
 
+## Typed error carriers follow-up
+
+Seven carriers bring the source total to 62. All 14 admission cases pass, including
+altered cases/storage, unsupported payloads, constructor side effects and invalid
+defaults. All 25 focused Rust arithmetic/error/file-input/file-output/I/O/string checks
+pass. All 64 saved-program cases pass against freshly generated consumer metadata and
+the 62-slice library. These results supplement, rather than replace, the earlier full
+Rust baseline; a full final run remains required after the remaining source ports.
+
 ## Reproduce the program gate
 
 Use the neoCLR feature compiler, built from the Raven repository's
@@ -80,6 +89,9 @@ The other two control input/environment and inspect real file bytes.
 
 Additional checks:
 
+- `verify_error_carrier_library.py --compiler COMPILER --bridge BRIDGE`: 14 carrier
+  layout, case, constructor, payload and default admission checks.
+
 - `verify_empty_library.py --compiler COMPILER --bridge BRIDGE`: nine empty-error/
   Void declaration cases, including mismatched fields and exports.
 - `verify_opaque_library.py --compiler COMPILER --bridge BRIDGE`: 11 String/Error
@@ -116,8 +128,8 @@ because the text assembler does not resolve files. All eight fixture checks pass
 - All 64 saved-project cases pass, including executable API samples, saved edits,
   compiler/import rejection without stale execution, and expected runtime faults.
 
-- All 55 slices compile and import; clean regeneration and input/snapshot hashes
-  match. Inventory/coverage checks pass for 744 candidates and 108 declaring sources.
+- All 62 slices compile and import. Inventory/coverage checks pass for 756 candidates
+  and 114 declaring sources. The final clean regeneration gate remains required.
 - All 17 foundation admission cases pass. Clock declaration rejection checks and
   fixed/system-clock execution pass, including host-local time conversion.
 - Controlled process checks pass for fresh/copied arguments, environment values,
@@ -165,6 +177,11 @@ General candidates requiring independent validation remain explicit:
 - Compound parenthesized comparison conditions: the previously recorded
   [parser candidate](raven-target-evaluation.md#deferred-general-parser-candidate--2026-09-15)
   remains deferred; this port uses existing valid guard syntax.
+
+- Unqualified nested case names in source struct method signatures: the carrier
+  authoring probe rejected them while explicit qualification compiled. Reduce this
+  against ordinary .NET references and the language scope rules before classifying
+  it as a general compiler defect; no fix is claimed.
 
 No .NET Framework or NanoFramework execution result is implied by .NET 11 checks.
 No remote branch push or release/package publication is part of this validation.

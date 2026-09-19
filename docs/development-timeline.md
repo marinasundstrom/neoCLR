@@ -91,6 +91,12 @@ contracts in the subsequent step. Documentation organization does not itself
 implement proposal APIs or rename assemblies. See the [documentation index](README.md)
 and [original proposals](proposals/README.md).
 
+**Typed error carrier slice.** The assistant reports seven more Raven source owners
+(62 total), with checked erased storage and constructor projection. Fourteen admission
+checks, 25 focused Rust tests and all 64 saved-program cases pass. Generic unions,
+descriptors and adapters remain open; continuation and separate commits remain the
+author's instruction.
+
 ## 2026-09-17 — Plan the minimal System.Runtime assembly
 
 **Author direction.** Plan a System.Runtime project/assembly supplying the minimal

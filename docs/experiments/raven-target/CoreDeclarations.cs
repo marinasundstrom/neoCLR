@@ -15,7 +15,7 @@ static class CoreDeclarations
                 "public static class Math { " + DoubleBindings.MathDeclarations + " public static Result<int, OverflowError> Abs(int value) => default; public static Result<int, InvalidRangeError> Clamp(int value, int min, int max) => default;")
                 + "public static class FaultFunctions { public static void Fault(string message) { } }" + UnionDeclarations.Source + DelegateBindings.Declarations + ProcessBindings.Declarations + CalendarBindings.Declarations + PathBindings.Declarations + FileBindings.Declarations + ResultBindings.Declarations;
         if (collectionProbe) declarations += QueryBindings.Declarations + CollectionDeclarations.Source + ReflectionBindings.Declarations + NativeMemoryBindings.Declaration + InterfaceBindings.Declarations;
-        if (libraryBootstrap) declarations += CheckedStorageBindings.Declarations + RuntimeServiceBindings.Declarations;
+        if (libraryBootstrap) declarations += CheckedStorageBindings.Declarations + RuntimeServiceBindings.Declarations + ValueStorageBindings.Declarations;
         var source = Source.Replace("public struct Double { }", unionProbe ? DoubleBindings.Declarations : "public struct Double { }").Replace("public struct Int32 { }", unionProbe ? Int32Bindings.Declarations : "public struct Int32 { }").Replace("public sealed class String { }", StringBindings.Declarations(unionProbe))
             .Replace("public static class Console { public static void WriteLine(string value) { } }", declarations)
             .Replace("// Union probe attribute", unionProbe ? "public sealed class UnionAttribute : System.Attribute { }" : "");
@@ -33,7 +33,7 @@ static class CoreDeclarations
             using var image = Mono.Cecil.AssemblyDefinition.ReadAssembly(stream);
             var module = image.MainModule;
             CalendarBindings.ProjectLayout(module);
-            if (libraryBootstrap) { PrimitiveLibrary.Project(module); OpaqueLibrary.Project(module); EmptyLibrary.Project(module); }
+            if (libraryBootstrap) { PrimitiveLibrary.Project(module); OpaqueLibrary.Project(module); EmptyLibrary.Project(module); ErrorCarrierLibrary.Project(module); }
             if (libraryBootstrap && collectionProbe)
             {
                 var local = module.GetType("System.LocalDateTime");

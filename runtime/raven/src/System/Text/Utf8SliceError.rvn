@@ -1,0 +1,38 @@
+namespace System.Text
+
+import System.Runtime.CompilerServices.ValueStorage
+
+public struct Utf8SliceError {
+    private field Stored: System.Value
+
+    public struct OutOfRange { }
+    public struct InvalidBoundary { }
+
+    init(value: Utf8SliceError.OutOfRange) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsOutOfRange: bool { get => ValueStorage.Is<Utf8SliceError.OutOfRange>(Stored) }
+
+    func GetOutOfRange() -> Utf8SliceError.OutOfRange {
+        return ValueStorage.Unpack<Utf8SliceError.OutOfRange>(Stored)
+    }
+
+    init(value: Utf8SliceError.InvalidBoundary) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsInvalidBoundary: bool { get => ValueStorage.Is<Utf8SliceError.InvalidBoundary>(Stored) }
+
+    func GetInvalidBoundary() -> Utf8SliceError.InvalidBoundary {
+        return ValueStorage.Unpack<Utf8SliceError.InvalidBoundary>(Stored)
+    }
+
+    func ToString() -> string {
+        if IsOutOfRange {
+            return "OutOfRange"
+        }
+        GetInvalidBoundary()
+        return "InvalidBoundary"
+    }
+}

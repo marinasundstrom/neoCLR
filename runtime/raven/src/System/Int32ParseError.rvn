@@ -1,0 +1,38 @@
+namespace System
+
+import System.Runtime.CompilerServices.ValueStorage
+
+public struct Int32ParseError {
+    private field Stored: System.Value
+
+    public struct InvalidFormat { }
+    public struct Overflow { }
+
+    init(value: Int32ParseError.InvalidFormat) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsInvalidFormat: bool { get => ValueStorage.Is<Int32ParseError.InvalidFormat>(Stored) }
+
+    func GetInvalidFormat() -> Int32ParseError.InvalidFormat {
+        return ValueStorage.Unpack<Int32ParseError.InvalidFormat>(Stored)
+    }
+
+    init(value: Int32ParseError.Overflow) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsOverflow: bool { get => ValueStorage.Is<Int32ParseError.Overflow>(Stored) }
+
+    func GetOverflow() -> Int32ParseError.Overflow {
+        return ValueStorage.Unpack<Int32ParseError.Overflow>(Stored)
+    }
+
+    func ToString() -> string {
+        if IsInvalidFormat {
+            return "InvalidFormat"
+        }
+        GetOverflow()
+        return "Overflow"
+    }
+}

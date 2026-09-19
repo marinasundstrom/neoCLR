@@ -1,0 +1,41 @@
+namespace System.IO
+
+import System.Runtime.CompilerServices.ValueStorage
+
+public struct ConsoleReadError {
+    private field Stored: System.Value
+
+    public struct Unavailable { }
+    public struct ReadFailed { }
+
+    init(value: ConsoleReadError.Unavailable) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsUnavailable: bool { get => ValueStorage.Is<ConsoleReadError.Unavailable>(Stored) }
+
+    func GetUnavailable() -> ConsoleReadError.Unavailable {
+        return ValueStorage.Unpack<ConsoleReadError.Unavailable>(Stored)
+    }
+
+    init(value: ConsoleReadError.ReadFailed) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsReadFailed: bool { get => ValueStorage.Is<ConsoleReadError.ReadFailed>(Stored) }
+
+    func GetReadFailed() -> ConsoleReadError.ReadFailed {
+        return ValueStorage.Unpack<ConsoleReadError.ReadFailed>(Stored)
+    }
+
+    func ToString() -> string {
+        if IsUnavailable {
+            return "ConsoleUnavailable"
+        }
+        if IsReadFailed {
+            return "ConsoleReadFailed"
+        }
+        System.Fault("invalid I/O error case")
+        return ""
+    }
+}

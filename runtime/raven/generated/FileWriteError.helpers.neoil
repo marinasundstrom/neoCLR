@@ -1,0 +1,109 @@
+; Generated from runtime/raven/src/System/IO/FileWriteError.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.IO.FileWriteError.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
+.function neoCLR.Library.System.IO.FileWriteError.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end
+.type System.IO.FileWriteError.InvalidLimit
+.method instance .ctor() -> Void
+M00000017_IL_0000:
+M00000017_IL_0001:
+ldarg 0
+M00000017_IL_0002:
+pop
+M00000017_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.IO.FileWriteError.InvalidPath
+.method instance .ctor() -> Void
+M00000018_IL_0000:
+M00000018_IL_0001:
+ldarg 0
+M00000018_IL_0002:
+pop
+M00000018_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.IO.FileWriteError.NotFound
+.method instance .ctor() -> Void
+M00000019_IL_0000:
+M00000019_IL_0001:
+ldarg 0
+M00000019_IL_0002:
+pop
+M00000019_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.IO.FileWriteError.AccessDenied
+.method instance .ctor() -> Void
+M0000001a_IL_0000:
+M0000001a_IL_0001:
+ldarg 0
+M0000001a_IL_0002:
+pop
+M0000001a_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.IO.FileWriteError.NotRegularFile
+.method instance .ctor() -> Void
+M0000001b_IL_0000:
+M0000001b_IL_0001:
+ldarg 0
+M0000001b_IL_0002:
+pop
+M0000001b_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.IO.FileWriteError.TooLarge
+.method instance .ctor() -> Void
+M0000001c_IL_0000:
+M0000001c_IL_0001:
+ldarg 0
+M0000001c_IL_0002:
+pop
+M0000001c_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type System.IO.FileWriteError.WriteFailed
+.method instance .ctor() -> Void
+M0000001d_IL_0000:
+M0000001d_IL_0001:
+ldarg 0
+M0000001d_IL_0002:
+pop
+M0000001d_IL_0007:
+ldvoid
+ret
+.end
+.end

@@ -124,7 +124,7 @@ static class ApplicationTypes
             if (IsModule(type.BaseType?.Resolve()?.Module)) { CheckAccess(type.BaseType!, type.Module); map(type.BaseType!, false); }
             foreach (var contract in type.Interfaces) { CheckAccess(contract.InterfaceType, type.Module); map(contract.InterfaceType, false); }
             foreach (var field in type.Fields) map(field.FieldType, false);
-            foreach (var method in type.Methods.Where(m => !m.IsStatic && !(PrimitiveLibrary.IsMatched(type) && PrimitiveLibrary.IsDefaultConstructor(m)) && !(IsLibrary(type) && (OpaqueLibrary.IsOmittedConstructor(m) || EmptyLibrary.OmitConstructor(m)))))
+            foreach (var method in type.Methods.Where(m => !m.IsStatic && !(PrimitiveLibrary.IsMatched(type) && PrimitiveLibrary.IsDefaultConstructor(m)) && !(IsLibrary(type) && (OpaqueLibrary.IsOmittedConstructor(m) || EmptyLibrary.OmitConstructor(m) || ErrorCarrierLibrary.IsCarrier(type) && PrimitiveLibrary.IsDefaultConstructor(m)))))
             {
                 CheckMethod(method);
                 if (method.Overrides.Any(o => !method.IsPublic || o.Name != method.Name || o.DeclaringType.Resolve()?.IsInterface != true
@@ -211,6 +211,7 @@ static class ApplicationTypes
             var (name, type) = Types.First(t => !emitted.Contains(t.Key)); emitted.Add(name);
             output.AppendLine(type.IsInterface ? $".interface {name}" : $".type {(LibraryDependencies.Contains(type) ? "internal " : "")}{(type.IsValueType || OpaqueLibrary.IsString(type) ? "" : "class ")}{(type.IsAbstract ? "abstract " : "")}{name}");
             if (IsModule(type.BaseType?.Resolve()?.Module)) output.AppendLine(".extends " + map(type.BaseType, false));
+            if (ErrorCarrierLibrary.IsMatched(type)) output.AppendLine(".custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()");
             foreach (var contract in type.Interfaces) output.AppendLine(".implements " + map(contract.InterfaceType, false));
             foreach (var method in type.Methods.Where(m => m.IsAbstract))
                 output.AppendLine($".method instance {(type.IsInterface ? "" : "abstract ")}{MethodName(method)}({string.Join(',', method.Parameters.Select(p => map(p.ParameterType, false) + (LibraryNames.ContainsKey(type) ? " " + p.Name : "")))}) -> {map(method.ReturnType, true)}\n.end");

@@ -1,0 +1,38 @@
+namespace System.Linq
+
+import System.Runtime.CompilerServices.ValueStorage
+
+public struct SingleError {
+    private field Stored: System.Value
+
+    public struct Empty { }
+    public struct Multiple { }
+
+    init(value: SingleError.Empty) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsEmpty: bool { get => ValueStorage.Is<SingleError.Empty>(Stored) }
+
+    func GetEmpty() -> SingleError.Empty {
+        return ValueStorage.Unpack<SingleError.Empty>(Stored)
+    }
+
+    init(value: SingleError.Multiple) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsMultiple: bool { get => ValueStorage.Is<SingleError.Multiple>(Stored) }
+
+    func GetMultiple() -> SingleError.Multiple {
+        return ValueStorage.Unpack<SingleError.Multiple>(Stored)
+    }
+
+    func ToString() -> string {
+        if IsEmpty {
+            return "Empty"
+        }
+        GetMultiple()
+        return "Multiple"
+    }
+}

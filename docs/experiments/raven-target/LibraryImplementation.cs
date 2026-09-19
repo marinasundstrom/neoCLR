@@ -9,7 +9,7 @@ static class LibraryImplementation
     // Preserve the existing scalar neoIL formatting receiver while CIL uses a
     // managed-byref struct receiver. Intrinsic field reads accept either form.
     public static bool IsByValueReceiver(MethodReference method) =>
-        EmptyLibrary.IsByValueReceiver(method) ||
+        EmptyLibrary.IsByValueReceiver(method) || ErrorCarrierLibrary.IsByValueReceiver(method) ||
         (ApplicationTypes.IsLibrary(method.DeclaringType) && method.DeclaringType.FullName == "System.Error"
             && method.Name is "get_Message" or "ToString" && method.HasThis && !method.HasParameters
             && method.ReturnType.MetadataType == MetadataType.String) ||
@@ -94,11 +94,12 @@ static class LibraryImplementation
 
     static MethodDefinition[] InstanceRoots(TypeDefinition type, TypeDefinition contract, string owner)
     {
+        var caseMethods = ErrorCarrierLibrary.IsCarrier(type) ? ErrorCarrierLibrary.Validate(type, contract) : [];
         // A single explicitly selected reference/implementation pair. Never alias arbitrary
         // guest types by namespace/name, and never execute reference-assembly stub bodies.
         foreach (var candidate in new[] { type, contract })
             if (!candidate.IsPublic || candidate.IsInterface || candidate.IsAbstract
-                || candidate.GenericParameters.Any(p => p.HasConstraints || p.Attributes != GenericParameterAttributes.NonVariant) || candidate.HasNestedTypes || candidate.HasEvents
+                || candidate.GenericParameters.Any(p => p.HasConstraints || p.Attributes != GenericParameterAttributes.NonVariant) || candidate.HasNestedTypes && !ErrorCarrierLibrary.IsCarrier(candidate) || candidate.HasEvents
                 || candidate.BaseType?.FullName != (candidate.IsValueType ? "System.ValueType" : "System.Object") || candidate.IsExplicitLayout)
                 throw new InvalidDataException($"Unsupported instance library owner: {candidate.FullName}, base={candidate.BaseType}, public={candidate.IsPublic}, abstract={candidate.IsAbstract}, nested={candidate.HasNestedTypes}, value={candidate.IsValueType}.");
         if (type.IsValueType != contract.IsValueType)
@@ -135,6 +136,7 @@ static class LibraryImplementation
                 || type.Fields.Zip(contract.Fields).Any(p => p.First.Name != p.Second.Name
                     || !SameType(p.First.FieldType, p.Second.FieldType)
                     || (p.First.FieldType.MetadataType is not (MetadataType.Int32 or MetadataType.Int64 or MetadataType.Boolean)
+                        && !(ErrorCarrierLibrary.IsCarrier(type) && p.First.FieldType.FullName == "System.Value" && RuntimeSignatures.IsCore(p.First.FieldType.Scope))
                         && !(owner == "System.LocalDateTime" && p.First.FieldType.FullName is "System.Date" or "System.Time"
                             && RuntimeSignatures.IsCore(p.First.FieldType.Scope)))))
                 throw new InvalidDataException($"Unsupported or mismatched value library layout: source sequential={type.IsSequentialLayout}, pack={type.PackingSize}, size={type.ClassSize}, fields={string.Join(',', type.Fields.Select(f => f.Name + ":" + f.FieldType.FullName))}; reference sequential={contract.IsSequentialLayout}, pack={contract.PackingSize}, size={contract.ClassSize}, fields={string.Join(',', contract.Fields.Select(f => f.Name + ":" + f.FieldType.FullName))}.");
@@ -151,7 +153,7 @@ static class LibraryImplementation
                 return right is GenericInstanceType r && MatchType(l.ElementType, r.ElementType)
                     && l.GenericArguments.Count == r.GenericArguments.Count
                     && l.GenericArguments.Zip(r.GenericArguments).All(p => MatchType(p.First, p.Second));
-            return SameType(left, right) || (left.FullName == contract.FullName && right.FullName == type.FullName
+            return SameType(left, right) || ErrorCarrierLibrary.SameCase(left, right, type, contract) || (left.FullName == contract.FullName && right.FullName == type.FullName
                 && left.Resolve() == contract && right.Resolve() == type);
         }
         if (type.Interfaces.Count != contract.Interfaces.Count || type.Interfaces.Any(i =>
@@ -170,7 +172,7 @@ static class LibraryImplementation
         var declarationOnly = type.IsValueType && !type.HasFields && !contract.HasFields
             && !contract.HasMethods && !type.HasProperties && !type.HasInterfaces
             && type.Methods.All(PrimitiveLibrary.IsDefaultConstructor);
-        var methods = type.Methods.Where(m => !OpaqueLibrary.IsOmittedConstructor(m) && !EmptyLibrary.OmitConstructor(m) && (!(PrimitiveLibrary.IsPrimitive(type) || declarationOnly) || !PrimitiveLibrary.IsDefaultConstructor(m))).ToArray();
+        var methods = type.Methods.Where(m => !OpaqueLibrary.IsOmittedConstructor(m) && !EmptyLibrary.OmitConstructor(m) && !(ErrorCarrierLibrary.IsCarrier(type) && PrimitiveLibrary.IsDefaultConstructor(m)) && (!(PrimitiveLibrary.IsPrimitive(type) || declarationOnly) || !PrimitiveLibrary.IsDefaultConstructor(m))).ToArray();
         if (methods.Length == 0 && !declarationOnly || methods.Any(m => !(m.IsPublic || m.IsPrivate && !m.IsVirtual
             || m.IsAssembly && !m.IsVirtual && contract.Methods.Count(c => c.IsAssembly && MatchMethod(c, m)) == 1) || !m.HasBody || m.HasGenericParameters
             || m.ExplicitThis || m.IsConstructor && m.IsStatic || m.CallingConvention != MethodCallingConvention.Default
@@ -197,8 +199,8 @@ static class LibraryImplementation
                 ReadonlyReceivers.Add(method);
         ApplicationTypes.BindLibrary(type, owner);
         if (declarationOnly) _ = ApplicationTypes.Type(type);
-        foreach (var method in methods) CheckMethod(method);
-        return methods;
+        foreach (var method in methods.Concat(caseMethods)) CheckMethod(method);
+        return methods.Concat(caseMethods).ToArray();
     }
 
     public static void CheckMethod(MethodDefinition method)

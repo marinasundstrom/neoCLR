@@ -10,6 +10,13 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
+    'IntegerDivisionError': 'System.IntegerDivisionError',
+    'SingleError': 'System.Linq.SingleError',
+    'Int32ParseError': 'System.Int32ParseError',
+    'Utf8SliceError': 'System.Text.Utf8SliceError',
+    'ConsoleReadError': 'System.IO.ConsoleReadError',
+    'FileWriteError': 'System.IO.FileWriteError',
+    'FileReadError': 'System.IO.FileReadError',
     'InvalidRangeError': 'System.InvalidRangeError',
     'InvalidDateError': 'System.InvalidDateError',
     'InvalidTimeError': 'System.InvalidTimeError',
@@ -70,6 +77,13 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    'IntegerDivisionError': 'runtime/raven/src/System/IntegerDivisionError.rvn',
+    'SingleError': 'runtime/raven/src/System/Linq/SingleError.rvn',
+    'Int32ParseError': 'runtime/raven/src/System/Int32ParseError.rvn',
+    'Utf8SliceError': 'runtime/raven/src/System/Text/Utf8SliceError.rvn',
+    'ConsoleReadError': 'runtime/raven/src/System/IO/ConsoleReadError.rvn',
+    'FileWriteError': 'runtime/raven/src/System/IO/FileWriteError.rvn',
+    'FileReadError': 'runtime/raven/src/System/IO/FileReadError.rvn',
     'InvalidRangeError': 'runtime/raven/src/System/InvalidRangeError.rvn',
     'InvalidDateError': 'runtime/raven/src/System/InvalidDateError.rvn',
     'InvalidTimeError': 'runtime/raven/src/System/InvalidTimeError.rvn',

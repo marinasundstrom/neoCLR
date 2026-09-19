@@ -82,7 +82,7 @@ def build(path: Path) -> str:
     result = ''.join(lines)
     if path.name == 'System.neoil':
         result += '\n.type class System.Object\n.end\n'
-        result += (ROOT / 'runtime/raven/SingleError.neoil').read_text()
+        result += build(ROOT / 'runtime/raven/SingleError.neoil')
         result += build(ROOT / 'runtime/raven/Linq.neoil')
         result += (ROOT / 'runtime/raven/ArrayEnumerable.neoil').read_text()
         result += build(ROOT / 'runtime/raven/Map.neoil')

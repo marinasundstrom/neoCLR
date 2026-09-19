@@ -1,6 +1,6 @@
 {
   "purpose": "Explicit source-by-source API audit. Samples and signature checks are evidence, not a claim of arbitrary generic/compiler support.",
-  "declarationCount": 744,
+  "declarationCount": 756,
   "sources": [
     {
       "file": "runtime/System/Equatable.neoil",
@@ -958,12 +958,34 @@
       ]
     },
     {
-      "file": "runtime/System/Int32ParseError.neoil",
-      "declarations": 14,
-      "disposition": "errors",
+      "file": "runtime/raven/generated/Int32ParseError.methods.neoil",
+      "declarations": 10,
+      "disposition": "raven-authored-error-carrier",
       "samples": [
-        "library-errors.rvn"
-      ]
+        "library-errors.rvn",
+        "library-string-slices.rvn"
+      ],
+      "tests": [
+        "tests/io_errors.rs",
+        "tests/strings.rs",
+        "docs/experiments/raven-target/verify_error_carrier_library.py"
+      ],
+      "note": "Raven owns nested empty cases, case constructors/predicates/extractors and formatting. Checked constructor lowering preserves one erased payload and the existing value receiver ABI."
+    },
+    {
+      "file": "runtime/raven/generated/Int32ParseError.helpers.neoil",
+      "declarations": 6,
+      "disposition": "raven-authored-error-carrier",
+      "samples": [
+        "library-errors.rvn",
+        "library-string-slices.rvn"
+      ],
+      "tests": [
+        "tests/io_errors.rs",
+        "tests/strings.rs",
+        "docs/experiments/raven-target/verify_error_carrier_library.py"
+      ],
+      "note": "Raven owns nested empty cases, case constructors/predicates/extractors and formatting. Checked constructor lowering preserves one erased payload and the existing value receiver ABI."
     },
     {
       "file": "runtime/raven/generated/OverflowError.methods.neoil",
@@ -981,36 +1003,124 @@
       "note": "Empty values preserve payload-free defaults, existing constructors/formatting and nominal Void. No new constructor on EnvironmentError or Void."
     },
     {
-      "file": "runtime/System/IntegerDivisionError.neoil",
-      "declarations": 14,
-      "disposition": "errors",
+      "file": "runtime/raven/generated/IntegerDivisionError.methods.neoil",
+      "declarations": 10,
+      "disposition": "raven-authored-error-carrier",
       "samples": [
-        "library-errors.rvn"
-      ]
+        "library-errors.rvn",
+        "library-string-slices.rvn"
+      ],
+      "tests": [
+        "tests/io_errors.rs",
+        "tests/strings.rs",
+        "docs/experiments/raven-target/verify_error_carrier_library.py"
+      ],
+      "note": "Raven owns nested empty cases, case constructors/predicates/extractors and formatting. Checked constructor lowering preserves one erased payload and the existing value receiver ABI."
     },
     {
-      "file": "runtime/System/Text/Utf8SliceError.neoil",
-      "declarations": 14,
-      "disposition": "errors",
+      "file": "runtime/raven/generated/IntegerDivisionError.helpers.neoil",
+      "declarations": 6,
+      "disposition": "raven-authored-error-carrier",
       "samples": [
-        "library-errors.rvn"
-      ]
+        "library-errors.rvn",
+        "library-string-slices.rvn"
+      ],
+      "tests": [
+        "tests/io_errors.rs",
+        "tests/strings.rs",
+        "docs/experiments/raven-target/verify_error_carrier_library.py"
+      ],
+      "note": "Raven owns nested empty cases, case constructors/predicates/extractors and formatting. Checked constructor lowering preserves one erased payload and the existing value receiver ABI."
     },
     {
-      "file": "runtime/System/IO/ConsoleReadError.neoil",
-      "declarations": 14,
-      "disposition": "errors",
+      "file": "runtime/raven/generated/Utf8SliceError.methods.neoil",
+      "declarations": 10,
+      "disposition": "raven-authored-error-carrier",
       "samples": [
-        "library-errors.rvn"
-      ]
+        "library-errors.rvn",
+        "library-string-slices.rvn"
+      ],
+      "tests": [
+        "tests/io_errors.rs",
+        "tests/strings.rs",
+        "docs/experiments/raven-target/verify_error_carrier_library.py"
+      ],
+      "note": "Raven owns nested empty cases, case constructors/predicates/extractors and formatting. Checked constructor lowering preserves one erased payload and the existing value receiver ABI."
     },
     {
-      "file": "runtime/System/IO/FileReadError.neoil",
-      "declarations": 50,
-      "disposition": "errors",
+      "file": "runtime/raven/generated/Utf8SliceError.helpers.neoil",
+      "declarations": 6,
+      "disposition": "raven-authored-error-carrier",
       "samples": [
-        "library-errors.rvn"
-      ]
+        "library-errors.rvn",
+        "library-string-slices.rvn"
+      ],
+      "tests": [
+        "tests/io_errors.rs",
+        "tests/strings.rs",
+        "docs/experiments/raven-target/verify_error_carrier_library.py"
+      ],
+      "note": "Raven owns nested empty cases, case constructors/predicates/extractors and formatting. Checked constructor lowering preserves one erased payload and the existing value receiver ABI."
+    },
+    {
+      "file": "runtime/raven/generated/ConsoleReadError.methods.neoil",
+      "declarations": 10,
+      "disposition": "raven-authored-error-carrier",
+      "samples": [
+        "library-errors.rvn",
+        "library-string-slices.rvn"
+      ],
+      "tests": [
+        "tests/io_errors.rs",
+        "tests/strings.rs",
+        "docs/experiments/raven-target/verify_error_carrier_library.py"
+      ],
+      "note": "Raven owns nested empty cases, case constructors/predicates/extractors and formatting. Checked constructor lowering preserves one erased payload and the existing value receiver ABI."
+    },
+    {
+      "file": "runtime/raven/generated/ConsoleReadError.helpers.neoil",
+      "declarations": 6,
+      "disposition": "raven-authored-error-carrier",
+      "samples": [
+        "library-errors.rvn",
+        "library-string-slices.rvn"
+      ],
+      "tests": [
+        "tests/io_errors.rs",
+        "tests/strings.rs",
+        "docs/experiments/raven-target/verify_error_carrier_library.py"
+      ],
+      "note": "Raven owns nested empty cases, case constructors/predicates/extractors and formatting. Checked constructor lowering preserves one erased payload and the existing value receiver ABI."
+    },
+    {
+      "file": "runtime/raven/generated/FileReadError.methods.neoil",
+      "declarations": 34,
+      "disposition": "raven-authored-error-carrier",
+      "samples": [
+        "library-errors.rvn",
+        "library-string-slices.rvn"
+      ],
+      "tests": [
+        "tests/io_errors.rs",
+        "tests/strings.rs",
+        "docs/experiments/raven-target/verify_error_carrier_library.py"
+      ],
+      "note": "Raven owns nested empty cases, case constructors/predicates/extractors and formatting. Checked constructor lowering preserves one erased payload and the existing value receiver ABI."
+    },
+    {
+      "file": "runtime/raven/generated/FileReadError.helpers.neoil",
+      "declarations": 18,
+      "disposition": "raven-authored-error-carrier",
+      "samples": [
+        "library-errors.rvn",
+        "library-string-slices.rvn"
+      ],
+      "tests": [
+        "tests/io_errors.rs",
+        "tests/strings.rs",
+        "docs/experiments/raven-target/verify_error_carrier_library.py"
+      ],
+      "note": "Raven owns nested empty cases, case constructors/predicates/extractors and formatting. Checked constructor lowering preserves one erased payload and the existing value receiver ABI."
     },
     {
       "file": "runtime/raven/generated/RuntimeTypeHandle.methods.neoil",
@@ -1541,12 +1651,34 @@
       ]
     },
     {
-      "file": "runtime/System/IO/FileWriteError.neoil",
-      "declarations": 44,
-      "disposition": "errors",
+      "file": "runtime/raven/generated/FileWriteError.methods.neoil",
+      "declarations": 30,
+      "disposition": "raven-authored-error-carrier",
       "samples": [
-        "library-errors.rvn"
-      ]
+        "library-errors.rvn",
+        "library-string-slices.rvn"
+      ],
+      "tests": [
+        "tests/io_errors.rs",
+        "tests/strings.rs",
+        "docs/experiments/raven-target/verify_error_carrier_library.py"
+      ],
+      "note": "Raven owns nested empty cases, case constructors/predicates/extractors and formatting. Checked constructor lowering preserves one erased payload and the existing value receiver ABI."
+    },
+    {
+      "file": "runtime/raven/generated/FileWriteError.helpers.neoil",
+      "declarations": 16,
+      "disposition": "raven-authored-error-carrier",
+      "samples": [
+        "library-errors.rvn",
+        "library-string-slices.rvn"
+      ],
+      "tests": [
+        "tests/io_errors.rs",
+        "tests/strings.rs",
+        "docs/experiments/raven-target/verify_error_carrier_library.py"
+      ],
+      "note": "Raven owns nested empty cases, case constructors/predicates/extractors and formatting. Checked constructor lowering preserves one erased payload and the existing value receiver ABI."
     },
     {
       "file": "runtime/neoCLR/Runtime/WriteAllText.neoil",
@@ -1635,7 +1767,7 @@
         "tests/query_terminals.rs",
         "docs/experiments/raven-target/verify_queries.py"
       ],
-      "note": "Operators and private deferred iterator classes are authored in Raven with generated bootstrap bodies; First/Last return Option and Single returns Result with Empty/Multiple. Checked storage retains generic cached elements. Normal-outcome cleanup only. See docs/raven-query-api.md."
+      "note": "Operators, SingleError case/formatting bodies and private deferred iterator classes are authored in Raven with generated bootstrap bodies; First/Last return Option and Single returns Result with Empty/Multiple. Checked storage retains generic cached elements. Normal-outcome cleanup only. See docs/raven-query-api.md."
     },
     {
       "file": "runtime/raven/SingleError.neoil",
@@ -1647,7 +1779,7 @@
         "tests/query_terminals.rs",
         "docs/experiments/raven-target/verify_queries.py"
       ],
-      "note": "Operators and private deferred iterator classes are authored in Raven with generated bootstrap bodies; First/Last return Option and Single returns Result with Empty/Multiple. Checked storage retains generic cached elements. Normal-outcome cleanup only. See docs/raven-query-api.md."
+      "note": "Operators, SingleError case/formatting bodies and private deferred iterator classes are authored in Raven with generated bootstrap bodies; First/Last return Option and Single returns Result with Empty/Multiple. Checked storage retains generic cached elements. Normal-outcome cleanup only. See docs/raven-query-api.md."
     },
     {
       "file": "runtime/raven/src/System/Linq/Operators.rvn",
@@ -1659,7 +1791,7 @@
         "tests/query_terminals.rs",
         "docs/experiments/raven-target/verify_queries.py"
       ],
-      "note": "Operators and private deferred iterator classes are authored in Raven with generated bootstrap bodies; First/Last return Option and Single returns Result with Empty/Multiple. Checked storage retains generic cached elements. Normal-outcome cleanup only. See docs/raven-query-api.md."
+      "note": "Operators, SingleError case/formatting bodies and private deferred iterator classes are authored in Raven with generated bootstrap bodies; First/Last return Option and Single returns Result with Empty/Multiple. Checked storage retains generic cached elements. Normal-outcome cleanup only. See docs/raven-query-api.md."
     },
     {
       "file": "runtime/raven/generated/Linq.methods.neoil",
@@ -1671,7 +1803,7 @@
         "tests/query_terminals.rs",
         "docs/experiments/raven-target/verify_queries.py"
       ],
-      "note": "Operators and private deferred iterator classes are authored in Raven with generated bootstrap bodies; First/Last return Option and Single returns Result with Empty/Multiple. Checked storage retains generic cached elements. Normal-outcome cleanup only. See docs/raven-query-api.md."
+      "note": "Operators, SingleError case/formatting bodies and private deferred iterator classes are authored in Raven with generated bootstrap bodies; First/Last return Option and Single returns Result with Empty/Multiple. Checked storage retains generic cached elements. Normal-outcome cleanup only. See docs/raven-query-api.md."
     },
     {
       "file": "runtime/raven/generated/Linq.helpers.neoil",
@@ -1683,7 +1815,7 @@
         "tests/query_terminals.rs",
         "docs/experiments/raven-target/verify_queries.py"
       ],
-      "note": "Operators and private deferred iterator classes are authored in Raven with generated bootstrap bodies; First/Last return Option and Single returns Result with Empty/Multiple. Checked storage retains generic cached elements. Normal-outcome cleanup only. See docs/raven-query-api.md."
+      "note": "Operators, SingleError case/formatting bodies and private deferred iterator classes are authored in Raven with generated bootstrap bodies; First/Last return Option and Single returns Result with Empty/Multiple. Checked storage retains generic cached elements. Normal-outcome cleanup only. See docs/raven-query-api.md."
     },
     {
       "file": "runtime/raven/Equatable.neoil",

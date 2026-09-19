@@ -8,10 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
-- Extend the API-preserving Raven library port from 28 to 55 source slices: generic
+- Extend the API-preserving Raven library port from 28 to 62 source slices: generic
   fundamental/collection contracts, SystemClock/LocalDateTime, native-sized integer
   comparisons, complete Int32 methods, Console, Environment, File.ReadAllText,
-  String, opaque Error, five empty error types and Void. Check intrinsic String storage and mixed receivers,
+  String, opaque Error, five empty error types, Void and seven typed error carriers. Check intrinsic String storage and mixed receivers,
   preserve Error message delegation and runtime-owned payloads, and reject opaque
   allocation/defaults and String storage writes (11 admission cases pass). Preserve
   empty error defaults/constructors and nominal Void with nine further admission
@@ -24,7 +24,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   metadata, and preserve library method parameter names for introspection. Keep native
   payload decoding bootstrap-only and preserve legacy Neo receiver/process conventions.
   Regenerate implementation snapshots and API audit.
-  Source migration is still incomplete for unions/error carriers, remaining
+  Typed carrier checks preserve case storage, value constructors, wrong-case faults
+  and invalid-default rejection: 14 admission checks, 25 focused Rust tests and all
+  64 saved-program cases pass with a fresh consumer core.
+  Source migration is still incomplete for generic unions, remaining
   descriptors and runtime adapters; proposal API alignment remains a subsequent step.
   Pass 64 saved-project compile/import/verify/execute cases and retain native
   failure-status tests. Extract general Raven interface-binding and no-result delegate

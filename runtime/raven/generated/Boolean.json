@@ -2,6 +2,13 @@
   "format": "raven-library-bootstrap-v1",
   "owner": "System.Boolean",
   "inputs": {
+    "runtime/raven/src/System/IntegerDivisionError.rvn": "267d2367214b9aa2dfbf484a776f3d8315b1dce953e0684d1223e459dd878868",
+    "runtime/raven/src/System/Linq/SingleError.rvn": "2463b25d8840e4186ed8eaa519ccabdd91352d16767603fca042b954822fc852",
+    "runtime/raven/src/System/Int32ParseError.rvn": "d91505709393af8f69b6b44727e9477cc4016e162cafef3033e27066a78d1ec7",
+    "runtime/raven/src/System/Text/Utf8SliceError.rvn": "50cdbe0e3256ade4178e07297b884a096166bf0155ed47e43785fcd3517425b3",
+    "runtime/raven/src/System/IO/ConsoleReadError.rvn": "730f8f353dd563670646ac835b68e5823827eaa1919ad6f031d9768f5699fd2c",
+    "runtime/raven/src/System/IO/FileWriteError.rvn": "becb9ab562277ae556a38fb01bfe80a29c4560e0057a2686e18e7f0ed6806abe",
+    "runtime/raven/src/System/IO/FileReadError.rvn": "7241d056f20144917ffb9bbe950f2479726e311f35041110cf4c27e5be8cecf0",
     "runtime/raven/src/System/InvalidRangeError.rvn": "863b25e049db2a970292cb404cda670ebb08ddebc2f99d7eaa87a1b405aeac59",
     "runtime/raven/src/System/InvalidDateError.rvn": "9b47a6f1f4b41b6e64988a61239c7ac80f6667af7325b68d6d60fcd5d91f68f8",
     "runtime/raven/src/System/InvalidTimeError.rvn": "f845856f6f260641c2c2823deaa4565feb0ecb003932904f1bf8bd22c37f0410",
@@ -57,7 +64,7 @@
     "runtime/raven/src/System/Single.rvn": "488efaf36e56f147c7158a5b0637f3bc4e56e84bb3f514af6c64a023dcd8598e",
     "runtime/raven/src/System/Double.rvn": "cd3ad24e4a21b7616a2937da71891618284913e26ea180ce203276f18b631f33",
     "runtime/raven/src/System/Boolean.rvn": "1f0010fe0d346fbc7f3ba29c88b2c1cf80faebf42a4c2de2f0cd6cff15335022",
-    "runtime/raven/System.rvnproj": "0375b761aa0e906ac3513dafbc5e9ff647db2d7a1bfd4799601e88351f1fca9e",
+    "runtime/raven/System.rvnproj": "892d72f41ca874bb8cd561b16beaac319ec02efed99f9c0575b125150e5517ea",
     "build/NeoCLR.Raven.props": "3b90670a7ecb19b0a6feed001debe4f611fd429805411894b7087cf06b395afd"
   },
   "outputs": {
@@ -65,7 +72,7 @@
     "Boolean.helpers.neoil": "595541371d3cbaf1eb8342abe2e3080365e6071db5da4f260007bacb93b77f1f"
   },
   "compilerSha256": "7d55b86e719225ff2eb87fbc52854c22936e57c0658ccd9ac314513ade7b7ba5",
-  "coreSha256": "5223121f40e52abc2a5105360a04d4fb793b36aa53fc927ada9b9b727de7b882",
+  "coreSha256": "b400b63796630c1dd66e15c16d15cbeee98fd8a6e4f499265c256fd3883a226e",
   "exports": [
     "readonly byref CompareTo(Boolean other) -> Int32"
   ]

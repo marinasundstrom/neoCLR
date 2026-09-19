@@ -1,0 +1,124 @@
+; Generated from runtime/raven/src/System/IO/ConsoleReadError.rvn. Regenerate with build_runtime_library.py.
+.type System.IO.ConsoleReadError
+.custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
+.field private Stored Value
+.property instance IsUnavailable() -> Boolean
+.get instance System.IO.ConsoleReadError::get_IsUnavailable()
+.end
+.property instance IsReadFailed() -> Boolean
+.get instance System.IO.ConsoleReadError::get_IsReadFailed()
+.end
+.method instance .ctor(System.IO.ConsoleReadError.Unavailable value) -> Void
+ldarg value
+value.pack System.IO.ConsoleReadError.Unavailable
+newobj System.IO.ConsoleReadError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsUnavailable() -> Boolean
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldarg 0
+M00000002_IL_0003:
+ldfld System.IO.ConsoleReadError::Stored
+M00000002_IL_0008:
+value.is System.IO.ConsoleReadError.Unavailable
+call neoCLR.Library.System.IO.ConsoleReadError.RuntimeBooleanToInt32(Boolean)
+M00000002_IL_000d:
+call neoCLR.Library.System.IO.ConsoleReadError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetUnavailable() -> System.IO.ConsoleReadError.Unavailable
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+ldfld System.IO.ConsoleReadError::Stored
+M00000003_IL_0008:
+value.unpack System.IO.ConsoleReadError.Unavailable
+M00000003_IL_000d:
+ret
+.end
+.method instance .ctor(System.IO.ConsoleReadError.ReadFailed value) -> Void
+ldarg value
+value.pack System.IO.ConsoleReadError.ReadFailed
+newobj System.IO.ConsoleReadError
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsReadFailed() -> Boolean
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+ldfld System.IO.ConsoleReadError::Stored
+M00000005_IL_0008:
+value.is System.IO.ConsoleReadError.ReadFailed
+call neoCLR.Library.System.IO.ConsoleReadError.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_000d:
+call neoCLR.Library.System.IO.ConsoleReadError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetReadFailed() -> System.IO.ConsoleReadError.ReadFailed
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+ldfld System.IO.ConsoleReadError::Stored
+M00000006_IL_0008:
+value.unpack System.IO.ConsoleReadError.ReadFailed
+M00000006_IL_000d:
+ret
+.end
+.method instance ToString() -> String
+M00000007_IL_0000:
+M00000007_IL_0001:
+M00000007_IL_0002:
+ldarg 0
+M00000007_IL_0003:
+call instance System.IO.ConsoleReadError::get_IsUnavailable()
+call neoCLR.Library.System.IO.ConsoleReadError.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0008:
+brtrue M00000007_IL_0012
+M00000007_IL_000d:
+br M00000007_IL_0019
+M00000007_IL_0012:
+M00000007_IL_0013:
+ldstr "ConsoleUnavailable"
+M00000007_IL_0018:
+ret
+M00000007_IL_0019:
+M00000007_IL_001a:
+M00000007_IL_001b:
+ldarg 0
+M00000007_IL_001c:
+call instance System.IO.ConsoleReadError::get_IsReadFailed()
+call neoCLR.Library.System.IO.ConsoleReadError.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0021:
+brtrue M00000007_IL_002b
+M00000007_IL_0026:
+br M00000007_IL_0032
+M00000007_IL_002b:
+M00000007_IL_002c:
+ldstr "ConsoleReadFailed"
+M00000007_IL_0031:
+ret
+M00000007_IL_0032:
+M00000007_IL_0033:
+M00000007_IL_0034:
+ldstr "invalid I/O error case"
+M00000007_IL_0039:
+call System.Fault(String)
+M00000007_IL_003e:
+M00000007_IL_003f:
+ldstr ""
+M00000007_IL_0044:
+ret
+.end
+.end

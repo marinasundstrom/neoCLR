@@ -1,0 +1,111 @@
+namespace System.IO
+
+import System.Runtime.CompilerServices.ValueStorage
+
+public struct FileWriteError {
+    private field Stored: System.Value
+
+    public struct InvalidLimit { }
+    public struct InvalidPath { }
+    public struct NotFound { }
+    public struct AccessDenied { }
+    public struct NotRegularFile { }
+    public struct TooLarge { }
+    public struct WriteFailed { }
+
+    init(value: FileWriteError.InvalidLimit) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsInvalidLimit: bool { get => ValueStorage.Is<FileWriteError.InvalidLimit>(Stored) }
+
+    func GetInvalidLimit() -> FileWriteError.InvalidLimit {
+        return ValueStorage.Unpack<FileWriteError.InvalidLimit>(Stored)
+    }
+
+    init(value: FileWriteError.InvalidPath) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsInvalidPath: bool { get => ValueStorage.Is<FileWriteError.InvalidPath>(Stored) }
+
+    func GetInvalidPath() -> FileWriteError.InvalidPath {
+        return ValueStorage.Unpack<FileWriteError.InvalidPath>(Stored)
+    }
+
+    init(value: FileWriteError.NotFound) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsNotFound: bool { get => ValueStorage.Is<FileWriteError.NotFound>(Stored) }
+
+    func GetNotFound() -> FileWriteError.NotFound {
+        return ValueStorage.Unpack<FileWriteError.NotFound>(Stored)
+    }
+
+    init(value: FileWriteError.AccessDenied) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsAccessDenied: bool { get => ValueStorage.Is<FileWriteError.AccessDenied>(Stored) }
+
+    func GetAccessDenied() -> FileWriteError.AccessDenied {
+        return ValueStorage.Unpack<FileWriteError.AccessDenied>(Stored)
+    }
+
+    init(value: FileWriteError.NotRegularFile) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsNotRegularFile: bool { get => ValueStorage.Is<FileWriteError.NotRegularFile>(Stored) }
+
+    func GetNotRegularFile() -> FileWriteError.NotRegularFile {
+        return ValueStorage.Unpack<FileWriteError.NotRegularFile>(Stored)
+    }
+
+    init(value: FileWriteError.TooLarge) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsTooLarge: bool { get => ValueStorage.Is<FileWriteError.TooLarge>(Stored) }
+
+    func GetTooLarge() -> FileWriteError.TooLarge {
+        return ValueStorage.Unpack<FileWriteError.TooLarge>(Stored)
+    }
+
+    init(value: FileWriteError.WriteFailed) {
+        Stored = ValueStorage.Pack(value)
+    }
+
+    val IsWriteFailed: bool { get => ValueStorage.Is<FileWriteError.WriteFailed>(Stored) }
+
+    func GetWriteFailed() -> FileWriteError.WriteFailed {
+        return ValueStorage.Unpack<FileWriteError.WriteFailed>(Stored)
+    }
+
+    func ToString() -> string {
+        if IsInvalidLimit {
+            return "InvalidLimit"
+        }
+        if IsInvalidPath {
+            return "InvalidPath"
+        }
+        if IsNotFound {
+            return "NotFound"
+        }
+        if IsAccessDenied {
+            return "AccessDenied"
+        }
+        if IsNotRegularFile {
+            return "NotRegularFile"
+        }
+        if IsTooLarge {
+            return "TooLarge"
+        }
+        if IsWriteFailed {
+            return "WriteFailed"
+        }
+        System.Fault("invalid file write error")
+        return ""
+    }
+}

@@ -92,6 +92,13 @@ for file in source['sourceFiles']:
                      'note': 'Source declarations only; erased values and opaque type handles retain intrinsic runtime representations.'})
         continue
     if any(file.startswith('runtime/raven/generated/' + name + '.') for name in
+           ('FileReadError', 'FileWriteError', 'ConsoleReadError', 'Utf8SliceError', 'Int32ParseError', 'IntegerDivisionError')):
+        rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-error-carrier',
+                     'samples': ['library-errors.rvn', 'library-string-slices.rvn'],
+                     'tests': ['tests/io_errors.rs', 'tests/strings.rs', 'docs/experiments/raven-target/verify_error_carrier_library.py'],
+                     'note': 'Raven owns nested empty cases, case constructors/predicates/extractors and formatting. Checked constructor lowering preserves one erased payload and the existing value receiver ABI.'})
+        continue
+    if any(file.startswith('runtime/raven/generated/' + name + '.') for name in
            ('InvalidRangeError', 'InvalidDateError', 'InvalidTimeError', 'OverflowError', 'EnvironmentError', 'Void')):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-empty-value',
                      'samples': ['library-errors.rvn', 'library-void.rvn'],
@@ -179,7 +186,7 @@ result['targetProfileAdditions'] += [{
     'disposition': 'query-library-and-terminal-outcomes',
     'samples': ['library-query-terminals.rvn'],
     'tests': ['tests/query_terminals.rs', 'docs/experiments/raven-target/verify_queries.py'],
-    'note': 'Operators and private deferred iterator classes are authored in Raven with generated bootstrap bodies; First/Last return Option and Single returns Result with Empty/Multiple. Checked storage retains generic cached elements. Normal-outcome cleanup only. See docs/raven-query-api.md.'
+    'note': 'Operators, SingleError case/formatting bodies and private deferred iterator classes are authored in Raven with generated bootstrap bodies; First/Last return Option and Single returns Result with Empty/Multiple. Checked storage retains generic cached elements. Normal-outcome cleanup only. See docs/raven-query-api.md.'
 } for file in ('runtime/raven/Linq.neoil', 'runtime/raven/SingleError.neoil', 'runtime/raven/src/System/Linq/Operators.rvn',
                  'runtime/raven/generated/Linq.methods.neoil', 'runtime/raven/generated/Linq.helpers.neoil')]
 result['targetProfileAdditions'] += [{

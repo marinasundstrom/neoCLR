@@ -135,6 +135,12 @@ static class UnionImport
                     case TypeReference referencedType: ApplicationTypes.CheckAccess(referencedType, method.Module); break;
                 }
             }
+            if (libraryOwner is not null && ErrorCarrierLibrary.Constructor(method, ProfileType) is { } constructorBody)
+            {
+                instanceBodies[method] = constructorBody;
+                ApplicationTypes.Expand(ProfileType, pending);
+                continue;
+            }
             var args = (method.HasThis ? new[] { ApplicationTypes.Receiver(method) } : Array.Empty<string>()).Concat(method.Parameters.Select(p => ProfileType(p.ParameterType))).ToArray();
             var valueConstructor = libraryOwner is null && method.IsConstructor && method.DeclaringType.IsValueType;
             var emitInstance = method.HasThis && !valueConstructor;
@@ -631,7 +637,7 @@ static class UnionImport
                         {
                             if (targetMethod.IsConstructor && targetMethod.DeclaringType.FullName is "System.Object" or "System.ValueType" && targetMethod.Parameters.Count == 0 && method.IsConstructor && method.DeclaringType.BaseType?.FullName == targetMethod.DeclaringType.FullName && instruction.OpCode.Code == Code.Call)
                             { Expect(ApplicationTypes.Receiver(method)); code.AppendLine("pop"); break; }
-                            var runtimeService = libraryOwner is null ? null : RuntimeServiceBindings.Bind(reference, targetMethod);
+                            var runtimeService = libraryOwner is null ? null : RuntimeServiceBindings.Bind(reference, targetMethod) ?? ValueStorageBindings.Bind(reference, targetMethod, t => ProfileType(t));
                             var checkedStorage = libraryOwner is null ? null : CheckedStorageBindings.Bind(reference, targetMethod, t => ProfileType(t));
                             var interfaceCall = collectionProfile ? InterfaceBindings.Bind(reference, targetMethod) : null;
                             var nativeCall = collectionProfile ? NativeMemoryBindings.Bind(reference, targetMethod) : null;
@@ -712,7 +718,7 @@ static class UnionImport
             if (method.Body.InitLocals)
                 for (var n = 0; n < locals.Length; n++)
                 {
-                    if (locals[n] == "System.Error") continue;
+                    if (locals[n] == "System.Error" || ErrorBindings.Cases.TryGetValue(locals[n], out var errorCases) && errorCases.Length > 0) continue;
                     if (ApplicationTypes.IsType(locals[n]) || ReflectionBindings.IsType(locals[n]) && locals[n] != "System.RuntimeTypeHandle" || ManagedArrayBindings.IsType(locals[n]) || CollectionBindings.IsReference(locals[n]) || CalendarBindings.Types.Contains(locals[n]) || GenericUnionBindings.IsType(locals[n]) && !GenericUnionBindings.RequiresInitialization(locals[n])) output.AppendLine($"ldloca local{n}\ninitobj {locals[n]}");
                     else if (!method.GenericParameters.Concat(method.DeclaringType.GenericParameters).Any(p => locals[n] == "T" + p.Position) && locals[n] != Carrier && locals[n] != Option && locals[n] != VoidOption && locals[n] != VoidResult && locals[n] != "String" && !NeedsInitialization(locals[n])) output.AppendLine(Default(locals[n]) + $"\nstloc local{n}");
                 }
