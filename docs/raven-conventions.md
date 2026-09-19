@@ -1,7 +1,10 @@
 # Idiomatic Raven in neoCLR
 
-These conventions apply to Raven runtime sources, executable samples and new code
-shown in documentation. They follow Raven's own source style and feature intent;
+These conventions apply to all hand-authored Raven code in the project: runtime
+library implementations, application code, tooling, tests, experiments, samples,
+and code shown in documentation or on the website. Apply them when writing or
+editing code, not only when preparing examples. The specific bootstrap and test
+exceptions below remain applicable. They follow Raven's own source style and feature intent;
 neoCLR's target API and bootstrap have narrower capabilities than ordinary Raven
 on .NET. Compile examples against the target rather than assuming similar syntax
 or host APIs work here.
@@ -190,8 +193,8 @@ Prefer inferred callback types when the receiving method supplies enough context
 let fallback = absent.OrElse(() => Some(7))
 ```
 
-Website examples and samples should show Raven as it is naturally written. Do not
-add type annotations merely to explain the language or spell out what is already
+Write idiomatic Raven throughout the project, including the runtime library.
+Do not add type annotations merely to explain the language or spell out what is already
 clear from the operation and surrounding code. Prefer inference for locals and
 callbacks; retain annotations only when the compiler requires them or a contract
 would otherwise be unclear. Examples must compile as shown. Record required

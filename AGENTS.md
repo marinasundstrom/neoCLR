@@ -18,14 +18,18 @@
   is not permanently experimental just because neoCLR exposed it. Record deferred
   general candidates explicitly until they can be validated independently.
 
-## Sample readability
+## Raven code conventions
 
 - Follow [idiomatic Raven conventions](docs/raven-conventions.md), grounded in
-  Raven’s own style and feature guides. Use `let` for immutable lexical bindings
+  Raven’s own style and feature guides. Apply them to all hand-authored Raven code,
+  including the runtime library, applications, tooling, tests, experiments, samples,
+  documentation and website examples. Prefer inferred local and callback types;
+  retain annotations when required by the compiler or an otherwise unclear contract.
+  Use `let` for immutable lexical bindings
   and `val` for read-only properties. Compile target examples instead of assuming
   every host Raven/.NET API or syntax spelling is supported.
 
-- Prefer readable samples over compact formatting. Expand block expressions and
+- Prefer readable code over compact formatting. Expand block expressions and
   statements across lines when that makes their contents easier to follow; there is
   no requirement to fit a complete block on one line.
 

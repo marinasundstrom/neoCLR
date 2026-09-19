@@ -4543,3 +4543,9 @@ actually needed. The assistant recorded this in both the Raven conventions and
 website maintenance guidance. The query and delegate examples were simplified
 and checked against their existing outputs; needed generic callback signatures
 remain. This is a presentation convention, not a change to Raven's type system.
+
+The author further clarified that these conventions also apply to the runtime
+library and other code. The assistant broadened the explicit scope to all
+hand-authored Raven code and updated AGENTS.md so future work follows the same
+rules. Existing documented bootstrap ABI and intentional test exceptions remain;
+this clarification does not claim a repository-wide code cleanup.
