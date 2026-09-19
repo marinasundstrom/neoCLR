@@ -96,3 +96,14 @@ interfaces and awaiter adapters are provisional. Compiler adaptation is allowed
 and expected; they are not permanent public Task API requirements. The experiment
 records the next integration steps and keeps general Raven fixes separate from
 neoCLR-specific lowering policy.
+
+### Why omitting SetException is insufficient
+
+The 2026-09-19 inspection of Raven ddf10eca found that CreateExceptionCatchClause
+always creates an exception local and catch body. CreateBuilderSetExceptionStatement
+returns null when the builder has no SetException member, but the catch still sets
+the machine to completed state and returns. BuildMoveNextBody still wraps dispatch
+and the rewritten body in AsyncDispatchGuard. Therefore exception-free lowering
+must bypass construction of that wrapper and catch explicitly, not only substitute
+a smaller builder. Follow the [exception-free requirement](async-api-design.md#exception-free-lowering-requirement--2026-09-19);
+no Raven code was changed by this inspection.

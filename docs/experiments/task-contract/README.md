@@ -106,6 +106,9 @@ must address these instead of admitting or discarding unsupported exception hand
    compiler-facing reference contract, with its provisional status explicit.
 2. Make the compiler choose the target's builder and completion/error policy. Keep
    Task<Result<T,E>> errors as ordinary return values and runtime Faults terminal.
+   Omit the generated exception guard itself, not merely SetException: the current
+   compiler still creates a catch when that builder method is absent. Audit normal
+   and early-Result cleanup separately from unsupported exception unwinding.
 3. Ensure pending state is heap-owned and builder copies share completion identity;
    never retain a byref into a returned activation. Validate Task<unit> explicitly.
 4. Execute actual generated async code through immediate and pending cases using

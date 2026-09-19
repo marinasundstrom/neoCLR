@@ -4566,3 +4566,10 @@ keeps expected errors in Result and documents the next compiler-integration step
 This is an experiment, not a public Task<T> implementation or generated async/await
 support. Cancellation, host-driven I/O, logical context and executor affinity remain
 open. The final execution results are recorded with the experiment.
+
+The author then emphasized that neoCLR lacks exceptions and async must work without
+them. The assistant inspected Raven's generated catch and found that removing
+SetException alone leaves the catch body intact. The proposed adaptation explicitly
+omits the async exception wrapper for neoCLR, preserves Result completion values
+and terminal Faults, and audits ordinary cleanup separately. This requirement is
+recorded in the async design; no compiler implementation is claimed by this update.

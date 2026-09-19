@@ -140,3 +140,38 @@ The [completion experiment](experiments/task-contract/README.md) tests queued
 continuations and heap-owned saved state within one execution. It does not introduce
 a shipped Task class or compile async/await. Its explicit single executor is a
 provisional test mechanism, not the settled scheduling/context policy.
+
+## Exception-free lowering requirement — 2026-09-19
+
+The author explicitly requires no exceptions in neoCLR async: the runtime does not
+support them, so Raven must adapt rather than introduce an exception compatibility
+layer. The selected completion model remains Pending -> Completed(T). For
+Task<Result<V,E>>, both Ok and Error are ordinary completed values. Await obtains
+the Result; explicit patterns or ? handle its recoverable error. Runtime Faults
+terminate the current execution and are not caught, boxed or stored in a task.
+
+The compiler integration must select this behavior explicitly through the target
+contract. Do not infer it merely from a missing Exception type or SetException
+member: Raven currently constructs its async catch even when SetException lookup
+fails. That would leave unsupported handlers and, on an exception-capable target,
+could swallow failure without completing the task.
+
+For the neoCLR policy, generate the dispatch/body/completion path without the
+AsyncDispatchGuard exception wrapper or System.Exception/SetException dependency.
+Preserve the ordinary .NET policy for .NET targets. The importer must continue
+rejecting reachable exception handlers rather than removing them after emission.
+Compiler-synthesized cleanup also needs review: retain cleanup on normal completion
+and early Result returns, but do not claim finally/unwinding behavior on a terminal
+Fault. Unsupported source constructs need diagnostics before execution.
+
+The provisional builder needs successful completion of arbitrary T, including
+Result and unit, and continuation/state ownership. It does not need a parallel
+exception completion channel. Cancellation and operation abandonment remain
+separate design questions; they must not acquire exception semantics accidentally.
+
+Validation must execute immediate/delayed Ok and Error, Result propagation, normal
+cleanup, and terminal faults before and after a pending resume. Check emitted
+metadata for absent exception dependencies/handlers and rejected unsupported
+constructs. Run unchanged .NET async failure behavior as a compiler regression
+check. These are integration requirements, not a claim that the compiler path is
+already implemented.
