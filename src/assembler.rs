@@ -76,6 +76,7 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
 
 fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
     let mut module = Module {
+        assemblies: vec![],
         format: 5,
         name: String::new(),
         revision: None,
@@ -255,6 +256,16 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     def.generic_constraints.extend(constraints);
                     return Ok(());
                 }
+                if word == ".origin" {
+                    if def.origin.is_some() {
+                        return Err(Fault::new("duplicate .origin"));
+                    }
+                    def.origin = Some(
+                        serde_json::from_str(rest)
+                            .map_err(|e| Fault::new(format!("invalid .origin: {e}")))?,
+                    );
+                    return Ok(());
+                }
                 if word == ".custom" {
                     def.custom_attributes
                         .push(crate::metadata::CustomAttribute {
@@ -359,6 +370,19 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                             rest,
                             &pending.function.generic_parameters,
                         )?);
+                    return Ok(());
+                }
+                if word == ".origin" {
+                    if pending.function.origin.is_some()
+                        || !pending.function.body.is_empty()
+                        || !pending.labels.is_empty()
+                    {
+                        return Err(Fault::new("duplicate .origin or origin after instructions"));
+                    }
+                    pending.function.origin = Some(
+                        serde_json::from_str(rest)
+                            .map_err(|e| Fault::new(format!("invalid .origin: {e}")))?,
+                    );
                     return Ok(());
                 }
                 if word == ".custom" {
@@ -598,6 +622,12 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                 return Ok(());
             }
             match word {
+                ".assembly" => {
+                    module.assemblies.push(
+                        serde_json::from_str(rest)
+                            .map_err(|e| Fault::new(format!("invalid .assembly: {e}")))?,
+                    );
+                }
                 ".module" => {
                     identifier(rest)?;
                     if !module.name.is_empty() {
@@ -687,6 +717,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         definition: None,
                         declaring_type: None,
                         custom_attributes: vec![],
+                        origin: None,
                         name: ty.definition_name().unwrap_or(&name).into(),
                         generic_parameters,
                         generic_constraints: vec![],
@@ -814,6 +845,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                             visibility,
                             definition: None,
                             custom_attributes: vec![],
+                            origin: None,
                             name,
                             owner,
                             instance,
@@ -889,6 +921,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
             }
         }
     }
+    crate::metadata_origin::validate(&module)?;
     Ok((module, field_fixups))
 }
 

@@ -480,3 +480,35 @@ Compile declarations for the POC only when they describe an intentional contract
 label unimplemented operations. Preserve existing working samples during the
 transition, and update them with each integrated breaking slice. Do not merely
 rename the old classes as interfaces or publish placeholder execution APIs.
+
+### Source metadata foundation implemented — 2026-09-19
+
+The importer now emits descriptive `.assembly` catalog records and `.origin`
+records for admitted application types and method bodies. Assembly references map
+NeoCLR.CoreProbe and the admitted primitive mscorlib metadata scope to System.Runtime.
+Source TypeDef/MethodDef/Field/Param tokens retain their original module scope;
+application properties are not yet projected by this bounded importer. Generated
+adapters have no source origin. Separately compiled library slices deliberately
+receive no copied source tokens, avoiding collisions in their merged runtime module.
+The generated System profile declares its logical System.Runtime assembly identity.
+
+These optional format-5 metadata fields survive JSON round trips and linking.
+The loader validates token table kinds, nonzero definition rows, duplicate tokens
+within a source module, field/parameter counts and catalog ownership. Zero parameter
+tokens denote missing Param rows. Executable definition IDs and access/binding checks
+remain unchanged; descriptive origins do not authorize access or loading. Assembly
+catalog conflicts are rejected when linking. Referenced identities may be recorded
+without being loaded, as with the .NET reference-name distinction discussed above.
+
+Validation: six new metadata tests cover round trips, scope, malformed artifacts
+and duplicate tokens; twelve existing attribute/scoped-type checks also pass. A saved
+Raven acquisition sample imports, verifies and executes with Demo source origins and
+a direct System.Runtime reference. This is supporting metadata, not yet the public
+ExecutingAssembly/ReferencedAssemblies/MetadataToken API implementation.
+
+For the next API slice, use Sequence<T> for assembly/module result collections:
+enumeration, Count and indexing without mutation methods. Internal arrays may back
+fresh snapshots; the interface alone is not an immutability guarantee. Existing
+TypeInfo/member array-returning queries remain a separately reviewable migration.
+The author explicitly requires these minimal working introspection slices before
+moving on to strings; invocation, loading and emit are not prerequisites.

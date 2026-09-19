@@ -137,3 +137,5 @@ pub mod verifier;
 pub use verifier::{Verification, verify, verify_with_library};
 
 pub mod source;
+
+pub mod metadata_origin;

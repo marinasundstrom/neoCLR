@@ -25,6 +25,21 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-19 — Finish minimal introspection before strings
+
+**Author direction.** Implement ExecutingAssembly, ReferencedAssemblies and
+MetadataToken before moving to strings; finish the minimal Introspection slices.
+The author reiterated considering interface collection returns rather than arrays.
+
+**Assistant response and action.** Kept these as the remaining preview boundary and
+selected Sequence<T> for the new assembly/module collections because it supports
+iteration, Count and indexing without mutation methods. Internal snapshot arrays
+remain permitted. Implemented the supporting source assembly/module/token metadata
+and validated import/execution, artifact round trips and scope checks. Public
+assembly discovery and token interface properties remain in progress, so strings
+have not started. The completed TypeInfo acquisition slice is f8104d1; a fresh,
+verified VS Code workspace is available at ~/.neoclr/experiments/typeinfo-20260919/demo.
+
 ## 2026-09-19 — Assembly references and Info metadata tokens
 
 **Author additions.** Requested AssemblyInfo.ReferencedAssemblies, if that is the

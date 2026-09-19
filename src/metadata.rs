@@ -149,6 +149,8 @@ impl Type {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Module {
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub assemblies: Vec<crate::metadata_origin::AssemblyMetadata>,
     pub format: u32,
     pub name: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -181,6 +183,8 @@ pub struct GenericConstraint {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct TypeDef {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub origin: Option<crate::metadata_origin::MetadataOrigin>,
     /// Internal nominal classification; a future CLI reader derives this from standard metadata.
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub is_reference_type: bool,
@@ -314,6 +318,8 @@ pub struct Field {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Function {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub origin: Option<crate::metadata_origin::MetadataOrigin>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub sequence_points: Vec<SequencePoint>,
     #[serde(default, skip_serializing_if = "Visibility::is_public")]

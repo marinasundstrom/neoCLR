@@ -234,6 +234,7 @@ static class ApplicationTypes
             var declarationStart = output.Length;
             var declarationName = nestedCase ? name[(name.LastIndexOf('.') + 1)..] : name;
             output.AppendLine(type.IsInterface ? $".interface {name}" : $".type {((LibraryDependencies.Contains(type) || IsLibrary(type) && type.IsNotPublic) ? "internal " : "")}{(type.IsValueType || OpaqueLibrary.IsString(type) || IsLibrary(type) && GenericUnionLibrary.IsContainer(type) ? "" : "class ")}{(type.IsAbstract && !GenericUnionLibrary.IsContainer(type) ? "abstract " : "")}{declarationName}");
+            if (!IsLibrary(type)) output.AppendLine(SourceMetadata.Type(type));
             if (IsModule(type.BaseType?.Resolve()?.Module)) output.AppendLine(".extends " + map(type.BaseType, false));
             if (ErrorCarrierLibrary.IsMatched(type) || GenericUnionLibrary.IsMatched(type) && GenericUnionLibrary.IsCarrier(type)) output.AppendLine(".custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()");
             foreach (var contract in type.Interfaces) output.AppendLine(".implements " + map(contract.InterfaceType, false));

@@ -244,6 +244,7 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
 }
 
 pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
+    crate::metadata_origin::validate(module)?;
     if module.name.is_empty() {
         return Err(Fault::new("module name must not be empty"));
     }

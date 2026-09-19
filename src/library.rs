@@ -57,11 +57,13 @@ pub(crate) fn link_modules(
     }
     let mut linked = application.clone();
     linked.normalize_definition_ids()?;
+    crate::metadata_origin::merge(&mut linked, &library)?;
     linked.types.extend(library.types.iter().cloned());
     linked.functions.extend(library.functions.iter().cloned());
     for dependency in dependencies {
         let mut dependency = dependency.clone();
         dependency.normalize_definition_ids()?;
+        crate::metadata_origin::merge(&mut linked, &dependency)?;
         linked.types.extend(dependency.types);
         linked.functions.extend(dependency.functions);
     }

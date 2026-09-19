@@ -75,6 +75,7 @@ def build(path: Path) -> str:
         lines.append(build(path.parent / include[1]) if include else line)
     result = ''.join(lines)
     if path.name == 'System.neoil':
+        result = result.replace('.module System\n', '.module System\n.assembly {"name":"System.Runtime","full_name":"System.Runtime","modules":["System"],"references":[]}\n', 1)
         result += build(ROOT / 'runtime/raven/Object.neoil')
         result += build(ROOT / 'runtime/neoCLR/Runtime/ObjectTypeHandle.neoil')
         result += build(ROOT / 'runtime/raven/SingleError.neoil')

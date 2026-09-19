@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Preserve descriptive source assembly/module identity and definition tokens through
+  Raven import, neoIL assembly, JSON artifacts and linking. Record the logical
+  System.Runtime dependency instead of compiler bootstrap reference names; retain
+  executable IDs separately and reject invalid/duplicate module-scoped tokens.
+  Library slices do not copy colliding source rows into their merged module.
+  Eighteen metadata/attribute/scope checks and a saved acquisition sample pass.
+  This supports, but does not yet expose, the assembly discovery and token APIs.
+
 - Record AssemblyInfo.ReferencedAssemblies and module-scoped MetadataToken on the
   public Info interfaces as
   requirements for the next discovery slice. Require the System.Runtime reference

@@ -87,6 +87,9 @@ static class UnionImport
             ApplicationTypes.LibraryMap = type => ProfileType(type);
         }
         var output = new StringBuilder(entry is not null ? $".module ImportedUnion\n.entry {Name(entry)}\n" : "");
+        if (libraryOwner is null)
+            foreach (var module in new[] { app.MainModule }.Concat(guestLibraries))
+                output.AppendLine(SourceMetadata.Assembly(module));
         var coercions = new Dictionary<string, (string Name, string Body)>();
         Call Coerce(Call call, string[] actual)
         {
@@ -774,6 +777,7 @@ static class UnionImport
             var declaredParameters = args.Skip(method.HasThis ? 1 : 0).Select((t, i) =>
                 libraryOwner is not null ? (GenericUnionLibrary.IsConditionalOutput(method, method.Parameters[i]) ? "out(true) " : "") + t + " " + OpaqueLibrary.ParameterName(method, i) : t);
             output.AppendLine(libraryOwner is not null && !emitInstance && !emitOwnedStatic ? $".function {(method.IsAssembly ? "internal " : "")}{Name(method)}({string.Join(',', args.Select((t, i) => t + " " + method.Parameters[i].Name))}) -> {(libraryOwner == "System.Console" && result == "noresult" ? "Void" : result)}" : emitOwnedStatic ? $".method {(method.IsPrivate ? "private " : method.IsAssembly ? "internal " : "")}static {method.Name}({string.Join(',', declaredParameters)}) -> {result}" : emitInstance ? $".method {(libraryOwner is not null && method.IsPrivate ? "private " : DescriptorLibrary.IsBaseConstructor(method) ? "internal " : "")}instance {(LibraryImplementation.IsReadonlyReceiver(method) ? "readonly " : "")}{((method.DeclaringType.IsValueType && !LibraryImplementation.IsByValueReceiver(method) || OpaqueLibrary.IsByRefString(method)) ? "byref " : "")}{ApplicationTypes.Modifiers(method)}{ApplicationTypes.MethodName(method)}({string.Join(',', declaredParameters)}) -> {(method.DeclaringType.IsValueType && result == "noresult" ? "Void" : result)}" : $".function {Name(method)}({string.Join(',', args)}) -> {result}");
+            if (libraryOwner is null) output.AppendLine(SourceMetadata.Method(method));
             for (var n = 0; n < locals.Length; n++) output.AppendLine($".local {locals[n]} local{n}");
             if (method.Body.InitLocals)
                 for (var n = 0; n < locals.Length; n++)
