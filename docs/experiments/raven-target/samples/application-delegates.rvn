@@ -33,7 +33,7 @@ class Counter {
 
 func MakeCounter(start: int) -> Func<int, int> {
     var current = start
-    return (step: int) -> int => {
+    return step => {
         current = current + step
         return current
     }
@@ -46,14 +46,14 @@ func Main() {
     let set: Func<int, System.Void> = counter.Set
     set(42)
     WriteLine(counter.Age)
-    let identity: Func<int, int> = (value: int) -> int => value
+    let identity: Func<int, int> = value => value
     WriteLine(identity(99))
     let next = MakeCounter(10)
     WriteLine(next(2))
     WriteLine(next(3))
     var shared = 7
-    let read: Func<int> = () -> int => shared
-    let write: Func<int, System.Void> = (value: int) => {
+    let read: Func<int> = () => shared
+    let write: Func<int, System.Void> = value => {
         shared = value
     }
     write(42)
@@ -68,10 +68,10 @@ func Main() {
     let values = ArrayList<int>()
     values.Add(7)
     values.Add(42)
-    match values.FindIndex((value: int) -> bool => value == 42) {
+    match values.FindIndex(value => value == 42) {
         Some(let index) => WriteLine(index)
         None => WriteLine("No index")
     }
-    let increment: Func<int, int> = (value: int) -> int => value + 1
+    let increment: Func<int, int> = value => value + 1
     WriteLine(increment(2147483647))
 }

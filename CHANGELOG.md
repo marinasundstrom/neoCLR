@@ -21,6 +21,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   callback types in samples and record the remaining compiler limitations. Include
   the outcome verifier and the query
   verifier's helper in future bundles.
+  Simplify redundant lambda signatures in query-terminal, deferred-query and
+  delegate samples; retain the generic Map callback signature required by current
+  inference. All three edited examples retain their checked execution output.
 
 - Document imported union case patterns in the Raven conventions: use Some, None,
   Ok and Error without a leading dot when their case namespaces are imported.

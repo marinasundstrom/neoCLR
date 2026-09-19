@@ -21,12 +21,12 @@ func PrintSingle(value: Result<int, SingleError>) {
 }
 
 func OnlyPositive(values: Iterable<int>) -> Result<int, SingleError> {
-    let value = values.Single((number: int) -> bool => number > 0)?
+    let value = values.Single(number => number > 0)?
     return .Ok(value)
 }
 
 func FirstPositive(values: Iterable<int>) -> Option<int> {
-    let value = values.First((number: int) -> bool => number > 0)?
+    let value = values.First(number => number > 0)?
     return Some(value)
 }
 
@@ -38,7 +38,7 @@ func Main() {
     PrintOptional(empty.Last())
     PrintOptional(one.First())
     PrintOptional(many.Last())
-    PrintOptional(many.Filter((value: int) -> bool => value > 100).First())
+    PrintOptional(many.Filter(value => value > 100).First())
     PrintSingle(empty.Single())
     PrintSingle(one.Single())
     PrintSingle(many.Single())
@@ -48,7 +48,7 @@ func Main() {
     PrintOptional(FirstPositive([0]))
 
     let types: TypeInfo[] = [typeof(int), typeof(string)]
-    match types.Last((kind: TypeInfo) -> bool => true) {
+    match types.Last(kind => true) {
         Some(let kind) => WriteLine(kind.Name)
         None => WriteLine("No type")
     }
@@ -65,11 +65,11 @@ func Main() {
         None => WriteLine("No result")
     }
     // Predicate overloads distinguish missing matches from present zero values.
-    PrintOptional(empty.First((value: int) -> bool => true))
-    PrintOptional(many.First((value: int) -> bool => value > 100))
-    PrintOptional(many.First((value: int) -> bool => value == 0))
-    PrintOptional(many.Last((value: int) -> bool => value == 0))
-    PrintSingle(many.Single((value: int) -> bool => value > 100))
-    PrintSingle(many.Single((value: int) -> bool => value >= 0))
-    PrintSingle(many.Single((value: int) -> bool => value == 42))
+    PrintOptional(empty.First(value => true))
+    PrintOptional(many.First(value => value > 100))
+    PrintOptional(many.First(value => value == 0))
+    PrintOptional(many.Last(value => value == 0))
+    PrintSingle(many.Single(value => value > 100))
+    PrintSingle(many.Single(value => value >= 0))
+    PrintSingle(many.Single(value => value == 42))
 }
