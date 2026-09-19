@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Refresh two validation fixtures after the source port: retain the Int64 CompareTo
+  parameter name in its expected signature and allow the Console reachability graph
+  to include generated carrier dependencies. Primitive admission and all 11 Console
+  tests pass; runtime graph limits and service assertions are unchanged.
+
 - Remove the obsolete TypeOf<T>.Of helper from runtime and Raven reference metadata;
   use typeof(T), or ldtoken/GetTypeFromHandle in direct IL, and rebuild existing
   helper callers. Update active samples while retaining published preview notes.

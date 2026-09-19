@@ -51,6 +51,6 @@ with tempfile.TemporaryDirectory(prefix='neoclr-primitive-library-') as temporar
         else:
             result = (output / 'Implementation.neoil').read_text()
             assert '.field' not in result and 'ldobj Int64' in result
-            assert '.method instance readonly byref CompareTo(Int64)' in result
+            assert '.method instance readonly byref CompareTo(Int64 other)' in result
             assert not re.search(r'(?m)^\.method[^\n]*\.ctor', result)
     print('Primitive wrapper admitted; wrong/extra storage, writes and effectful constructors rejected.')

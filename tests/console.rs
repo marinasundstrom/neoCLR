@@ -174,7 +174,8 @@ fn bytes_and_eof_have_exact_owned_union_types_and_shared_host_position() {
 #[test]
 fn console_dependencies_are_discovered_without_executing_host_io() {
     let graph = program()
-        .analyze_reachability(&[parse_function_ref("Main()").unwrap()], 64)
+        // Raven-authored carrier operations add managed dependencies to this graph.
+        .analyze_reachability(&[parse_function_ref("Main()").unwrap()], 1024)
         .unwrap();
     assert!(
         graph
