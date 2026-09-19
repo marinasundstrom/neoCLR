@@ -147,6 +147,16 @@ not a release. Instructions and reproducible tooling are in the
 [local build guide](raven-port-local-build.md). The broad final runtime run remains
 open until its result is recorded below.
 
+**Next implementation direction.** After the local port workspace was prepared,
+the author directed establishing the System.Runtime project (currently System),
+then completing the basic System.Runtime.RuntimeContext with model implementations.
+The author explicitly retires System.Type in favor of System.Introspection.TypeInfo
+and selects Object.GetTypeInfo() as the canonical instance method. This replaces
+the earlier tentative Object.GetType name; the earlier discussion remains recorded.
+The assistant accepted that sequence, began checking the proposal and executable
+context prototype, and kept the outstanding port validation running. No completed
+production context migration is claimed at this point.
+
 **String/Error slice.** Raven sources now own both method surfaces, with explicit
 importer checks for intrinsic storage, mixed String receivers and opaque Error
 receivers. Native ownership and the existing parameter metadata remain unchanged.

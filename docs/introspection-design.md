@@ -5,6 +5,22 @@ Type/TypeInfo split and class-based descriptor direction in the
 [earlier review](reflection-model-review.md). It is a target design, not a claim
 that the current runtime already exposes these interfaces or RuntimeContext.
 
+## Author-directed implementation step — 2026-09-19
+
+After completing the Raven source port, establish the System.Runtime project
+(currently System), then implement the basic System.Runtime.RuntimeContext with
+runtime-backed model implementations. Retire the public System.Type/Type.Info split
+in favor of System.Introspection.TypeInfo. Object.GetTypeInfo() is the canonical
+instance acquisition method; typeof(T) remains declared-type acquisition through
+the selected RuntimeContext contract. This supersedes the tentative Object.GetType
+and value.Type spellings discussed earlier.
+
+These are implementation directions, not completed API claims. Keep concrete
+Runtime*Info providers internal and structural signatures within the Info model.
+Preserve the current BindingFlags query behavior. The smallest working context and
+provider model precedes optional invocation, metadata-file loading and Emit. The
+project may make documented breaking changes while preserving useful .NET ergonomics.
+
 ## Responsibilities
 
 Introspection describes structure. RuntimeContext defines the execution universe.

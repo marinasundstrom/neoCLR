@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Record the next API-alignment direction: establish System.Runtime, implement the
+  basic RuntimeContext/provider model, retire System.Type for TypeInfo and use
+  Object.GetTypeInfo for instance acquisition. This is the selected plan, not an
+  implemented API; it supersedes the tentative Object.GetType spelling.
+
 - Complete the Raven branch review and prepare an isolated VS Code development
   workspace with reproducible setup tooling. General editor-reference and ref-struct
   deconstruction fixes are on Raven main (65 and 31 focused checks); neoclr retains
