@@ -489,6 +489,19 @@ try:
         labels = sorted({item['label'] for item in items})
         assert 'Double' in labels, labels
         results['Referenced project members'] = labels
+    if reflection:
+        text = 'func Main() {\n    System.Introspection.\n}'
+        send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': 80},
+            'contentChanges': [{'text': text}]})
+        result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
+            'position': {'line': 1, 'character': len('    System.Introspection.')},
+            'context': {'triggerKind': 2, 'triggerCharacter': '.'}}, True))
+        items = result if isinstance(result, list) else result['items']
+        kinds = {item['label']: item.get('kind') for item in items}
+        for name in ('TypeInfo', 'ParameterInfo', 'MemberInfo', 'FieldInfo', 'MethodInfo', 'PropertyInfo'):
+            assert kinds.get(name) == 8, (name, kinds)  # LSP Interface
+        assert not any(name.startswith('Runtime') for name in kinds), kinds
+        results['Introspection interface kinds'] = kinds
     receive(send('shutdown', None, True))
     send('exit', None)
     print(json.dumps(results, indent=2))

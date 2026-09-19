@@ -45,7 +45,7 @@ subprocess.run(['dotnet', str(output / 'tools/bridge/Probe.dll'), '--reference-c
                 str(output / 'demo/NeoCLR.CoreProbe.dll')], check=True)
 shutil.copy2(source / 'samples/library-workflow.rvn', output / 'demo/Main.rvn')
 (output / 'demo/examples').mkdir()
-for name in ['flags', 'reflection', 'array-shapes', 'array-callbacks']:
+for name in ['flags', 'reflection', 'introspection-interfaces', 'array-shapes', 'array-callbacks']:
     shutil.copy2(source / f'samples/library-{name}.rvn', output / f'demo/examples/{name}.rvn')
 (output / 'demo/Demo.rvnproj').write_text('''<Project>
   <PropertyGroup><NeoCLRRoot>$(MSBuildThisFileDirectory)..</NeoCLRRoot></PropertyGroup>
@@ -83,13 +83,14 @@ Skipped
 The task compiles, imports, verifies and runs your saved source on neoCLR. The
 Raven extension's ordinary Run/Debug commands target .NET; use this task for neoCLR.
 Completion and hover use this folder's matching language server and reference core.
-The examples folder contains flags, typeof/reflection and array examples. To try
+The examples folder contains flags, typeof/reflection, sealed introspection matching
+and array examples. To try
 one, copy its contents into Main.rvn and save; only Main.rvn is compiled by the task.
 
 This is a local development snapshot. Python 3 and .NET 11 are required; the copied
 runtime executable is built for this machine. Runtime services remain intrinsic.
-API alignment (including a possible Object.GetType) is a later slice. Use typeof(T)
-for type tokens; the former TypeOf<T>.Of helper has been removed.
+The six Info contracts are sealed interfaces. RuntimeContext and the canonical
+Object.GetTypeInfo acquisition API remain pending. Use typeof(T) for type tokens; the former TypeOf<T>.Of helper has been removed.
 ''')
 manifest = {'kind': 'local-development', 'repositories': {}, 'sha256': {}}
 for repo, label in [(ROOT, 'neoCLR'), (raven, 'Raven')]:

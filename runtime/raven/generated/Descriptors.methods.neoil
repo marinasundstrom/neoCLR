@@ -1,1 +1,13 @@
 ; Generated from runtime/raven/src/System/Introspection/Descriptors.rvn. Regenerate with build_runtime_library.py.
+.interface System.Introspection.MemberInfo
+.method instance get_Name() -> String
+.end
+.method instance get_DeclaringType() -> System.Type
+.end
+.property instance Name() -> String
+.get instance System.Introspection.MemberInfo::get_Name()
+.end
+.property instance DeclaringType() -> System.Type
+.get instance System.Introspection.MemberInfo::get_DeclaringType()
+.end
+.end

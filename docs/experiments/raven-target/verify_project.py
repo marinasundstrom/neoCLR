@@ -64,6 +64,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
                   ('Flags', 'library-flags.rvn', '28\n8\n20\n-29\n0\nSame flags\nPublic included\n5\nStoredDayNumber\n'),
                   ('ArrayForEach', 'library-array-foreach.rvn', 'Parse\nDivide\nEquals\nToString\nCompareTo\n42\n1\n2\n3\n'),
                   ('ManagedArrayMetadata', 'library-managed-array-metadata.rvn', '42\n2\n1\nSystem.Int32\n0\nEmpty\nLength\nCount\nItem\n4\n42\n8\n50\n2\n'),
+                  ('IntrospectionInterfaces', 'library-introspection-interfaces.rvn', 'Interface\n' * 6 + 'System.Date\nField\nMethod\nProperty\n'),
                   ('Reflection', 'library-reflection.rvn', (bridge / 'samples/library-reflection.expected.txt').read_text()),
                   ('ArrayCallbacks', 'library-array-callbacks.rvn', '7\n42\nFirst\nSecond\n'),
                   ('Delegates', 'library-delegates.rvn', '42\n' * 5 + 'Done\n1\nExists\n42\nNo index\nNone\n'),
@@ -90,7 +91,12 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
         raise AssertionError(run.stdout + run.stderr)
     results['SavedEdit'] = saved_expected
     for label, source, diagnostic in [
+        *[(f'Missing{case}Match', (bridge / 'samples/library-introspection-interfaces.rvn').read_text()
+           .replace(f'        {case} => "{label}"\n', ''), 'RAV2100')
+          for case, label in [('FieldInfo', 'Field'), ('MethodInfo', 'Method'), ('PropertyInfo', 'Property')]],
         ('CompileFailure', 'func Main() { MissingCall() }', 'RAV'),
+        ('ExternalIntrospectionProvider', 'import System.Introspection.*\nclass UserInfo : TypeInfo { }\nfunc Main() {}', 'RAV033'),
+        ('HiddenIntrospectionProvider', 'func Main() { let info = typeof(System.Introspection.RuntimeTypeInfo) }', 'RAV'),
         ('RemovedTypeOfHelper', 'func Main() { System.TypeOf<int>.Of(42) }', 'RAV'),
         ('InheritedIntegerMember', 'func Main() { let value = 42\n value.GetHashCode() }', 'Unsupported'),
         ('PathArgumentMismatch', 'func Main() { System.IO.Path.Combine(42, 7) }', 'RAV'),

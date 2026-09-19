@@ -2,7 +2,16 @@ namespace System.Introspection
 
 import System.*
 
-public open class ParameterInfo {
+public sealed interface ParameterInfo {
+    val Name: string { get }
+    val Position: int { get }
+    val ParameterType: Type { get }
+    val IsOut: bool { get }
+    val IsOutWhenTrue: bool { get }
+    val IsReadOnly: bool { get }
+}
+
+internal class RuntimeParameterInfo : ParameterInfo {
     private field StoredName: string
     private field StoredPosition: int
     private field StoredParameterType: Type

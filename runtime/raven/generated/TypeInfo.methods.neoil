@@ -1,174 +1,26 @@
 ; Generated from runtime/raven/src/System/Introspection/TypeInfo.rvn. Regenerate with build_runtime_library.py.
-.type class System.Introspection.TypeInfo
-.field private Handle System.RuntimeTypeHandle
-.property instance BaseType() -> System.Option<System.Type>
-.get instance System.Introspection.TypeInfo::get_BaseType()
-.end
-.method private instance .ctor(System.RuntimeTypeHandle handle) -> noresult
-M00000001_IL_0000:
-M00000001_IL_0001:
-ldarg 0
-M00000001_IL_0002:
-pop
-M00000001_IL_0007:
-M00000001_IL_0008:
-ldarg 0
-M00000001_IL_0009:
-ldarg 1
-M00000001_IL_000a:
-stfld System.Introspection.TypeInfo::Handle
-M00000001_IL_000f:
-ret
-.end
+.interface System.Introspection.TypeInfo
 .method instance get_BaseType() -> System.Option<System.Type>
-M00000003_IL_0000:
-M00000003_IL_0001:
-M00000003_IL_0002:
-ldarg 0
-M00000003_IL_0003:
-ldfld System.Introspection.TypeInfo::Handle
-M00000003_IL_0008:
-call neoCLR.Runtime.TypeBaseType(System.RuntimeTypeHandle)
-M00000003_IL_000d:
-ret
 .end
 .method instance GetInterfaces() -> arrayref<System.Type>
-M00000004_IL_0000:
-M00000004_IL_0001:
-M00000004_IL_0002:
-ldarg 0
-M00000004_IL_0003:
-ldfld System.Introspection.TypeInfo::Handle
-M00000004_IL_0008:
-call neoCLR.Library.System.Introspection.TypeInfo.RuntimeServiceTypeInterfaces(System.RuntimeTypeHandle)
-M00000004_IL_000d:
-ret
 .end
 .method instance GetEnumNames() -> arrayref<String>
-M00000005_IL_0000:
-M00000005_IL_0001:
-M00000005_IL_0002:
-ldarg 0
-M00000005_IL_0003:
-ldfld System.Introspection.TypeInfo::Handle
-M00000005_IL_0008:
-call neoCLR.Library.System.Introspection.TypeInfo.RuntimeServiceTypeEnumNames(System.RuntimeTypeHandle)
-M00000005_IL_000d:
-ret
 .end
 .method instance GetEnumUnderlyingType() -> System.Type
-M00000006_IL_0000:
-M00000006_IL_0001:
-M00000006_IL_0002:
-ldarg 0
-M00000006_IL_0003:
-ldfld System.Introspection.TypeInfo::Handle
-M00000006_IL_0008:
-call neoCLR.Runtime.TypeEnumUnderlying(System.RuntimeTypeHandle)
-M00000006_IL_000d:
-ret
 .end
 .method instance GetFields() -> arrayref<System.Introspection.FieldInfo>
-M00000007_IL_0000:
-M00000007_IL_0001:
-M00000007_IL_0002:
-ldarg 0
-M00000007_IL_0003:
-ldfld System.Introspection.TypeInfo::Handle
-M00000007_IL_0008:
-ldc.i4 28
-M00000007_IL_000a:
-call neoCLR.Library.System.Introspection.TypeInfo.RuntimeServiceTypeFields(System.RuntimeTypeHandle,Int32)
-M00000007_IL_000f:
-ret
 .end
 .method instance GetFields(System.Introspection.BindingFlags flags) -> arrayref<System.Introspection.FieldInfo>
-M00000008_IL_0000:
-M00000008_IL_0001:
-M00000008_IL_0002:
-ldarg 0
-M00000008_IL_0003:
-ldfld System.Introspection.TypeInfo::Handle
-M00000008_IL_0008:
-ldarg 1
-M00000008_IL_0009:
-call instance System.Introspection.BindingFlags::get_Value()
-conv.i4
-M00000008_IL_000a:
-call neoCLR.Library.System.Introspection.TypeInfo.RuntimeServiceTypeFields(System.RuntimeTypeHandle,Int32)
-M00000008_IL_000f:
-ret
 .end
 .method instance GetMethods() -> arrayref<System.Introspection.MethodInfo>
-M00000009_IL_0000:
-M00000009_IL_0001:
-M00000009_IL_0002:
-ldarg 0
-M00000009_IL_0003:
-ldfld System.Introspection.TypeInfo::Handle
-M00000009_IL_0008:
-ldc.i4 28
-M00000009_IL_000a:
-call neoCLR.Library.System.Introspection.TypeInfo.RuntimeServiceTypeMethods(System.RuntimeTypeHandle,Int32)
-M00000009_IL_000f:
-ret
 .end
 .method instance GetMethods(System.Introspection.BindingFlags flags) -> arrayref<System.Introspection.MethodInfo>
-M0000000a_IL_0000:
-M0000000a_IL_0001:
-M0000000a_IL_0002:
-ldarg 0
-M0000000a_IL_0003:
-ldfld System.Introspection.TypeInfo::Handle
-M0000000a_IL_0008:
-ldarg 1
-M0000000a_IL_0009:
-call instance System.Introspection.BindingFlags::get_Value()
-conv.i4
-M0000000a_IL_000a:
-call neoCLR.Library.System.Introspection.TypeInfo.RuntimeServiceTypeMethods(System.RuntimeTypeHandle,Int32)
-M0000000a_IL_000f:
-ret
 .end
 .method instance GetProperties() -> arrayref<System.Introspection.PropertyInfo>
-M0000000b_IL_0000:
-M0000000b_IL_0001:
-M0000000b_IL_0002:
-ldarg 0
-M0000000b_IL_0003:
-ldfld System.Introspection.TypeInfo::Handle
-M0000000b_IL_0008:
-ldc.i4 28
-M0000000b_IL_000a:
-call neoCLR.Library.System.Introspection.TypeInfo.RuntimeServiceTypeProperties(System.RuntimeTypeHandle,Int32)
-M0000000b_IL_000f:
-ret
 .end
 .method instance GetProperties(System.Introspection.BindingFlags flags) -> arrayref<System.Introspection.PropertyInfo>
-M0000000c_IL_0000:
-M0000000c_IL_0001:
-M0000000c_IL_0002:
-ldarg 0
-M0000000c_IL_0003:
-ldfld System.Introspection.TypeInfo::Handle
-M0000000c_IL_0008:
-ldarg 1
-M0000000c_IL_0009:
-call instance System.Introspection.BindingFlags::get_Value()
-conv.i4
-M0000000c_IL_000a:
-call neoCLR.Library.System.Introspection.TypeInfo.RuntimeServiceTypeProperties(System.RuntimeTypeHandle,Int32)
-M0000000c_IL_000f:
-ret
 .end
-.method internal static FromHandle(System.RuntimeTypeHandle handle) -> System.Introspection.TypeInfo
-M00000002_IL_0000:
-M00000002_IL_0001:
-M00000002_IL_0002:
-ldarg 0
-M00000002_IL_0003:
-newobj instance System.Introspection.TypeInfo::.ctor(System.RuntimeTypeHandle)
-M00000002_IL_0008:
-ret
+.property instance BaseType() -> System.Option<System.Type>
+.get instance System.Introspection.TypeInfo::get_BaseType()
 .end
 .end

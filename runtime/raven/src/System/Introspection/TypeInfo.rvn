@@ -3,7 +3,20 @@ namespace System.Introspection
 import System.*
 import System.Runtime.CompilerServices.*
 
-public open class TypeInfo {
+public sealed interface TypeInfo {
+    val BaseType: Option<Type> { get }
+    func GetInterfaces() -> Type[]
+    func GetEnumNames() -> string[]
+    func GetEnumUnderlyingType() -> Type
+    func GetFields() -> FieldInfo[]
+    func GetFields(flags: BindingFlags) -> FieldInfo[]
+    func GetMethods() -> MethodInfo[]
+    func GetMethods(flags: BindingFlags) -> MethodInfo[]
+    func GetProperties() -> PropertyInfo[]
+    func GetProperties(flags: BindingFlags) -> PropertyInfo[]
+}
+
+internal class RuntimeTypeInfo : TypeInfo {
     private field Handle: RuntimeTypeHandle
 
     private init(handle: RuntimeTypeHandle) {
@@ -11,7 +24,7 @@ public open class TypeInfo {
     }
 
     internal static func FromHandle(handle: RuntimeTypeHandle) -> TypeInfo {
-        return TypeInfo(handle)
+        return RuntimeTypeInfo(handle)
     }
 
     val BaseType: Option<Type> { get => RuntimeServices.TypeBaseType(Handle) }

@@ -88,7 +88,7 @@ static class RuntimeServiceBindings
         if (reference.Name == "LocalDateTime")
             return new("System.LocalDateTime::FromUnixTimeTicks", args, result);
         if (reference.Name == "TypeInfo")
-            return new("System.Introspection.TypeInfo::FromHandle", args, result);
+            return new("System.Introspection.RuntimeTypeInfo::FromHandle", args, result);
         if (result.StartsWith("arrayref<"))
         {
             var element = result[9..^1];

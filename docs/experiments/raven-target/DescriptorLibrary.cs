@@ -9,17 +9,20 @@ static class DescriptorLibrary
         ["MethodInfo"] = [("ReturnType", "System.Type"), ("IsStatic", "System.Boolean"), ("IsPublic", "System.Boolean"), ("IsPrivate", "System.Boolean"), ("IsAssembly", "System.Boolean"), ("IsReceiverByRef", "System.Boolean"), ("DefinitionIndex", "System.Int32"), ("Parameters", "System.Runtime.CompilerServices.ParameterSnapshot"), ("IsReadOnly", "System.Boolean"), ("IsVirtual", "System.Boolean"), ("IsOverride", "System.Boolean"), ("IsAbstract", "System.Boolean")],
         ["PropertyInfo"] = [("PropertyType", "System.Type"), ("IsStatic", "System.Boolean"), ("CanRead", "System.Boolean"), ("CanWrite", "System.Boolean"), ("DefinitionIndex", "System.Int32"), ("IndexParameters", "System.Runtime.CompilerServices.ParameterSnapshot"), ("Getter", "System.Option`1<System.Introspection.MethodInfo>"), ("Setter", "System.Option`1<System.Introspection.MethodInfo>")],
     };
-    public static bool IsDescriptor(TypeReference type) => type.Namespace == "System.Introspection" && Layouts.ContainsKey(type.Name);
+    public static bool IsDescriptor(TypeReference type) => type.Namespace == "System.Introspection" && type.Name.StartsWith("Runtime") && Layouts.ContainsKey(type.Name[7..]);
     public static bool IsBaseConstructor(MethodDefinition method) => IsDescriptor(method.DeclaringType)
-        && ApplicationTypes.IsLibrary(method.DeclaringType) && method.DeclaringType.Name == "MemberInfo"
+        && ApplicationTypes.IsLibrary(method.DeclaringType) && method.DeclaringType.Name == "RuntimeMemberInfo"
         && method.IsConstructor && method.IsFamily && !method.IsStatic;
     public static MethodDefinition[] Roots(ModuleDefinition source, ModuleDefinition core,
-        Func<TypeDefinition, TypeDefinition, string, MethodDefinition[]> roots)
+        Func<TypeDefinition, TypeDefinition, string, MethodDefinition[]> roots,
+        Func<TypeDefinition, TypeDefinition, string, MethodDefinition[]> interfaces)
     {
         var result = new List<MethodDefinition>();
         foreach (var name in Layouts.Keys)
+            interfaces(source.GetType("System.Introspection." + name), core.GetType("System.Introspection." + name), "System.Introspection." + name);
+        foreach (var name in Layouts.Keys)
         {
-            var fullName = "System.Introspection." + name;
+            var fullName = "System.Introspection.Runtime" + name;
             var type = source.GetType(fullName) ?? throw new InvalidDataException("Missing descriptor " + name);
             var contract = core.GetType(fullName) ?? throw new InvalidDataException("Missing descriptor contract " + name);
             var layout = Layouts[name];
@@ -41,7 +44,10 @@ static class DescriptorLibrary
         return type.MetadataType is MetadataType.String or MetadataType.Int32 or MetadataType.Boolean
             || RuntimeSignatures.IsCore(type.Scope) || type.FullName == "System.Introspection.MethodInfo" && type.Resolve()?.Module == source;
     }
-    public static string Base(TypeDefinition type) => type.Name == "MemberInfo" ? "System.Object" : "System.Introspection.MemberInfo";
-    public static bool SameType(TypeReference left, TypeReference right) => IsDescriptor(left)
+    public static string Base(TypeDefinition type) => type.Name == "RuntimeMemberInfo" ? "System.Object" : "System.Introspection.RuntimeMemberInfo";
+    public static bool IsProvider(TypeReference type) => type.Namespace == "System.Introspection"
+        && (IsDescriptor(type) || type.Name is "RuntimeTypeInfo" or "RuntimeParameterInfo");
+    public static bool SameType(TypeReference left, TypeReference right) => (IsProvider(left)
+        || left.Namespace == "System.Introspection" && left.Name is "MemberInfo" or "FieldInfo" or "MethodInfo" or "PropertyInfo" or "TypeInfo" or "ParameterInfo")
         && left.FullName == right.FullName && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right);
 }

@@ -13,6 +13,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   tests return typed nulls. Interface tests also accept boxed implementations and
   preserve intrinsic string representation. Boxed value-type targets remain unsupported.
 
+- Migrate the Raven profile's six Info contracts to sealed interfaces with internal
+  Runtime*Info providers. Preserve permitted-type metadata in the reference and
+  reject external implementations in the target importer. Materialize native
+  snapshots as implementing classes and emit interface dispatch; rebuild callers.
+  MemberInfo matches exhaustively over FieldInfo, MethodInfo and PropertyInfo;
+  import and execute Raven's reference type patterns, and reject missing cases.
+  System.Type/Info acquisition and array-return signatures remain transitional.
+  Record the subsequent proposal to add TypeInfo as a member case with optional
+  declaring-type ownership; that extension is not implemented yet.
+
 - Record the author's selected sealed Info hierarchy, replacing the proposed open
   implementation model. Permitted runtime providers remain internal; collection
   return contracts and RuntimeContext implementation are separate work.

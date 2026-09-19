@@ -3,7 +3,49 @@ namespace System.Introspection
 import System.*
 import System.Runtime.CompilerServices.*
 
-public abstract class MemberInfo {
+public sealed interface MemberInfo {
+    val Name: string { get }
+    val DeclaringType: Type { get }
+}
+
+public sealed interface FieldInfo : MemberInfo {
+    val FieldType: Type { get }
+    val IsPublic: bool { get }
+    val IsPrivate: bool { get }
+    val IsAssembly: bool { get }
+    val IsStatic: bool { get }
+    val DefinitionIndex: int { get }
+}
+
+public sealed interface MethodInfo : MemberInfo {
+    val ReturnType: Type { get }
+    val IsStatic: bool { get }
+    val IsPublic: bool { get }
+    val IsPrivate: bool { get }
+    val IsAssembly: bool { get }
+    val IsReceiverByRef: bool { get }
+    val DefinitionIndex: int { get }
+    func GetParameters() -> ParameterInfo[]
+    val IsReadOnly: bool { get }
+    val IsVirtual: bool { get }
+    val IsOverride: bool { get }
+    val IsAbstract: bool { get }
+}
+
+public sealed interface PropertyInfo : MemberInfo {
+    val PropertyType: Type { get }
+    val IsStatic: bool { get }
+    val CanRead: bool { get }
+    val CanWrite: bool { get }
+    val DefinitionIndex: int { get }
+    func GetIndexParameters() -> ParameterInfo[]
+    func GetGetMethod() -> Option<MethodInfo>
+    func GetGetMethod(arg0: bool) -> Option<MethodInfo>
+    func GetSetMethod() -> Option<MethodInfo>
+    func GetSetMethod(arg0: bool) -> Option<MethodInfo>
+}
+
+internal sealed class RuntimeMemberInfo {
     private field StoredName: string
     private field StoredDeclaringType: Type
 
@@ -16,7 +58,7 @@ public abstract class MemberInfo {
     val DeclaringType: Type { get => StoredDeclaringType }
 }
 
-public open class FieldInfo : MemberInfo {
+internal class RuntimeFieldInfo : RuntimeMemberInfo, FieldInfo {
     private field StoredFieldType: Type
     private field StoredIsPublic: bool
     private field StoredIsPrivate: bool
@@ -45,7 +87,7 @@ public open class FieldInfo : MemberInfo {
     val DefinitionIndex: int { get => StoredDefinitionIndex }
 }
 
-public open class MethodInfo : MemberInfo {
+internal class RuntimeMethodInfo : RuntimeMemberInfo, MethodInfo {
     private field StoredReturnType: Type
     private field StoredIsStatic: bool
     private field StoredIsPublic: bool
@@ -105,7 +147,7 @@ public open class MethodInfo : MemberInfo {
     val IsAbstract: bool { get => StoredIsAbstract }
 }
 
-public open class PropertyInfo : MemberInfo {
+internal class RuntimePropertyInfo : RuntimeMemberInfo, PropertyInfo {
     private field StoredPropertyType: Type
     private field StoredIsStatic: bool
     private field StoredCanRead: bool

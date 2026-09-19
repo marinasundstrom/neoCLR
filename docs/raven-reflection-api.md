@@ -1,14 +1,61 @@
 # Reflection migration for the Raven target
 
-The existing Type and Reflection APIs are being projected onto ordinary managed
-classes. This document tracks the implemented projection and its remaining boundaries.
+The Raven profile now exposes six sealed Info interfaces with internal runtime
+providers. System.Type and Type.Info remain transitional acquisition APIs while
+RuntimeContext and the unified TypeInfo surface are implemented.
+
+## Production interface/provider slice — 2026-09-19
+
+TypeInfo, ParameterInfo, MemberInfo, FieldInfo, MethodInfo and PropertyInfo are
+Raven-authored sealed interfaces. RuntimeTypeInfo and the other Runtime*Info classes
+are internal implementations; concrete providers are sealed leaves and their
+shared RuntimeMemberInfo base is a closed hierarchy. Native metadata snapshots are
+materialized into these providers while existing filters, storage order, accessor
+selection and independent parameter-array copies are preserved.
+
+The reference carries Raven's ClosedHierarchyAttribute with its exact permitted
+family. Internal provider definitions remain in reference metadata so Raven can
+resolve those entries, but applications cannot name or construct them. Compiler
+checks reject outside implementations; the target importer independently rejects
+foreign implementation metadata and validates the library's permitted family.
+This does not add general raw-neoIL closed-hierarchy enforcement.
+
+MemberInfo's direct permitted cases are the public FieldInfo, MethodInfo and
+PropertyInfo interfaces. The shared provider base does not implement MemberInfo;
+callers need no internal-provider arm. The consumer sample
+`docs/experiments/raven-target/samples/library-introspection-interfaces.rvn` executes
+all three cases without a fallback. The saved-project gate rejects each missing
+arm with RAV2100. Raven's current diagnostic names the hidden leaf; accessible-case
+wording remains a [general compiler candidate](introspection-design.md#exhaustiveness-over-memberinfo).
+
+The target importer now translates reference `isinst`, reference conditional branches
+and the emitted non-null comparison into checked neoIL type tests. There is no new
+Runtime Contract configuration and no change to Raven's type-pattern emission.
+C# reference generation promotes inherited interface accessors to virtual/final;
+the reference projection normalizes only RuntimeMemberInfo's shared accessors to
+Raven's ordinary method flags. Admission still checks exact method contracts.
+
+Validation: all 73 source slices regenerate and snapshot hashes match; 12 descriptor
+admission cases, seven TypeInfo cases, five ParameterInfo cases and 29 focused
+reflection/type-inspection tests pass. All 770 Raven-profile declarations have
+source or explicit native-service ownership (54 services). The language-server
+check reports completion kind 8 (interface) for all six public Info contracts and
+keeps Runtime*Info providers out of public completion.
+
+Existing callers must rebuild: Info member calls now use interface dispatch. The
+historical Neo profile retains value descriptors. Type references in these
+interfaces still use System.Type and collection results still use arrays in this
+intermediate slice. Retiring Type/Info, establishing RuntimeContext assembly discovery
+and Object.GetTypeInfo, and deciding collection result contracts remain open.
+The historical descriptions below must not be read as the current Raven declaration
+kind. See the [maintained design](introspection-design.md) for the selected target.
 
 ## Target design update — 2026-09-17
 
 The [refined proposal](introspection-design.md) replaces the planned public
 Type/TypeInfo split with `*Info` interfaces and runtime-backed RuntimeContext v1.
-The implementation described below still uses classes, System.Type and Type.Info;
-it is the migration baseline, not the final design. Further class hierarchy ports
+The historical implementation described below uses classes, System.Type and Type.Info;
+it is the earlier migration baseline, superseded in part by the production slice above. Further class hierarchy ports
 are superseded by interface-contract/provider work. Reflection and Emit remain
 separate; offline metadata loading and typed introspection are deferred.
 BindingFlags remains in use during this migration.

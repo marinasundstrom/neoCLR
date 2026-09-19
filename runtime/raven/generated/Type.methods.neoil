@@ -279,7 +279,7 @@ ldarg 0
 M00000011_IL_0003:
 ldfld System.Type::Handle
 M00000011_IL_0008:
-call System.Introspection.TypeInfo::FromHandle(System.RuntimeTypeHandle)
+call System.Introspection.RuntimeTypeInfo::FromHandle(System.RuntimeTypeHandle)
 M00000011_IL_000d:
 ret
 .end

@@ -14,7 +14,7 @@ static class CoreDeclarations
             declarations = declarations.Replace("public static class Console {", "public static class Console { " + ProcessBindings.ConsoleDeclaration).Replace("public static class Math {",
                 "public static class Math { " + DoubleBindings.MathDeclarations + " public static Result<int, OverflowError> Abs(int value) => default; public static Result<int, InvalidRangeError> Clamp(int value, int min, int max) => default;")
                 + "public static class FaultFunctions { public static void Fault(string message) { } }" + UnionDeclarations.Source + DelegateBindings.Declarations + ProcessBindings.Declarations + CalendarBindings.Declarations + PathBindings.Declarations + FileBindings.Declarations + ResultBindings.Declarations;
-        if (collectionProbe) declarations += QueryBindings.Declarations + CollectionDeclarations.Source + ReflectionBindings.Declarations + NativeMemoryBindings.Declaration + InterfaceBindings.Declarations;
+        if (collectionProbe) declarations += QueryBindings.Declarations + CollectionDeclarations.Source + ReflectionBindings.Declarations + ReflectionBindings.ProviderDeclarations + NativeMemoryBindings.Declaration + InterfaceBindings.Declarations;
         if (libraryBootstrap) declarations += RuntimeFailureBindings.Declarations + NativeAllocationBindings.Declarations + ParameterSnapshotBindings.Declarations + CheckedStorageBindings.Declarations + RuntimeServiceBindings.Declarations + ValueStorageBindings.Declarations;
         var source = Source.Replace("public struct Double { }", unionProbe ? DoubleBindings.Declarations : "public struct Double { }").Replace("public struct Int32 { }", unionProbe ? Int32Bindings.Declarations : "public struct Int32 { }").Replace("public sealed class String { }", StringBindings.Declarations(unionProbe))
             .Replace("public static class Console { public static void WriteLine(string value) { } }", declarations)
@@ -43,16 +43,17 @@ static class CoreDeclarations
                 localFactory.Parameters.Add(new Mono.Cecil.ParameterDefinition("ticks", Mono.Cecil.ParameterAttributes.None,
                     module.GetType("System.Instant").Methods.Single(m => m.Name == "FromUnixTimeTicks").Parameters[0].ParameterType));
                 local.Methods.Add(localFactory);
-                var info = module.GetType("System.Introspection.TypeInfo");
+                var info = module.GetType("System.Introspection.RuntimeTypeInfo");
                 if (!info.Methods.Any(m => m.Name == "FromHandle"))
                 {
                     var factory = new Mono.Cecil.MethodDefinition("FromHandle",
-                        Mono.Cecil.MethodAttributes.Assembly | Mono.Cecil.MethodAttributes.Static | Mono.Cecil.MethodAttributes.HideBySig, info);
+                        Mono.Cecil.MethodAttributes.Assembly | Mono.Cecil.MethodAttributes.Static | Mono.Cecil.MethodAttributes.HideBySig, module.GetType("System.Introspection.TypeInfo"));
                     factory.Parameters.Add(new Mono.Cecil.ParameterDefinition("handle", Mono.Cecil.ParameterAttributes.None,
                         module.GetType("System.RuntimeTypeHandle")));
                     info.Methods.Add(factory);
                 }
             }
+            if (collectionProbe) IntrospectionHierarchy.Project(module);
             NamespaceFunctions.ProjectMath(module);
             NamespaceFunctions.ProjectFault(module);
             var unit = module.GetType("System.PropagationUnit");

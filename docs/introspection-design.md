@@ -3,7 +3,9 @@
 Current author proposal, refined **2026-09-17**. This supersedes the public
 Type/TypeInfo split and class-based descriptor direction in the
 [earlier review](reflection-model-review.md). It is a target design, not a claim
-that the current runtime already exposes these interfaces or RuntimeContext.
+that the entire target model or RuntimeContext is implemented. The six existing
+Info contracts have now migrated to sealed interfaces in the Raven profile; the
+remaining acquisition/context migration is tracked below.
 
 ## Author-directed implementation step — 2026-09-19
 
@@ -15,7 +17,10 @@ instance acquisition method; typeof(T) remains declared-type acquisition through
 the selected RuntimeContext contract. This supersedes the tentative Object.GetType
 and value.Type spellings discussed earlier.
 
-These are implementation directions, not completed API claims. Keep concrete
+RuntimeContext and unified acquisition remain implementation directions, not
+completed API claims. The first production slice establishes the six existing
+Info interfaces with internal providers; their signatures still refer to System.Type
+and arrays until the remaining migration. Keep concrete
 Runtime*Info providers internal and structural signatures within the Info model.
 Preserve the current BindingFlags query behavior. The smallest working context and
 provider model precedes optional invocation, metadata-file loading and Emit. The
@@ -127,6 +132,53 @@ ordinary CLR interfaces do not enforce this language-level closure for C# caller
 The neoCLR target importer must independently reject external implementations of
 these known model contracts and validate the admitted provider family. This does
 not add general closed-hierarchy enforcement to raw neoIL metadata or execution.
+
+### Exhaustiveness over MemberInfo
+
+The author clarified that matching a MemberInfo must cover its inheriting interface
+types. The current public cases are FieldInfo, MethodInfo and PropertyInfo. Three
+unguarded type arms are exhaustive without a fallback; omitting any one is a
+RAV2100 error. A catch-all also covers remaining cases. Future public cases will
+therefore require callers with explicit exhaustive matches to update.
+
+RuntimeMemberInfo is a storage base, not a direct MemberInfo implementation. Its
+concrete leaves implement the public case interfaces; internal implementation
+classes must not introduce extra arms callers need to write. The generated reference
+preserves this same three-case root. A consumer sample runs all three arms and the
+saved-project gate removes each arm in turn to check rejection.
+
+Current Raven diagnostics flatten the closed family to concrete leaves and name
+RuntimeFieldInfo/RuntimeMethodInfo/RuntimePropertyInfo in RAV2100 messages. The public
+interface arms satisfy those cases, but the diagnostic wording needs a general Raven
+improvement to suggest accessible types. This is a deferred general compiler
+candidate, not a neoCLR-specific diagnostic policy; no Raven compiler change is
+included here.
+
+### Proposed TypeInfo member case — 2026-09-19
+
+The author then suggested making TypeInfo part of MemberInfo so it can represent a
+nested type. This is a proposed extension to the currently implemented three-case
+root. It would add TypeInfo as a fourth public match case; no public NestedTypeInfo
+wrapper is necessary just to place a nested type in a member result.
+
+The assistant recommends `TypeInfo : MemberInfo` with optional declaring-type
+ownership in the unified model: `MemberInfo.DeclaringType: Option<TypeInfo>`.
+Nested types and ordinary type members have an owner; top-level types do not.
+This should land with the retirement of the public System.Type/Type.Info split,
+rather than inventing a non-null owner for a top-level type. Existing field/method/
+property callers would unwrap a now-optional owner, a deliberate breaking change.
+A separate NestedTypeInfo member wrapper is an alternative that preserves a
+required owner, at the cost of another identity/descriptor layer and match case.
+
+.NET uses a related arrangement: TypeInfo derives from Type, which derives from
+MemberInfo. Type descriptors distinguish nested types, and Type.DeclaringType can
+be null. Sources: [TypeInfo](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.typeinfo?view=net-10.0),
+[Type.MemberType](https://learn.microsoft.com/en-us/dotnet/api/system.type.membertype?view=net-10.0),
+[Type.DeclaringType](https://learn.microsoft.com/en-us/dotnet/api/system.type.declaringtype?view=net-10.0).
+neoCLR can preserve that useful relationship using its own sealed interface model
+and Option ownership, without copying the class hierarchy or null contract.
+Validation must cover a nested type, a top-level type without an owner, and an
+exhaustive four-case MemberInfo match. This extension is not implemented yet.
 
 ## Collection return contracts under review — 2026-09-19
 

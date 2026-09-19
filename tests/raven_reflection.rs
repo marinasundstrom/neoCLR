@@ -1,4 +1,4 @@
-use neoclr::{Limits, LoadedProgram, Module, Value, assemble};
+use neoclr::{Limits, LoadedProgram, Module, Value};
 use std::{process::Command, sync::OnceLock};
 fn library() -> &'static Module {
     static LIBRARY: OnceLock<Module> = OnceLock::new();
@@ -7,8 +7,16 @@ fn library() -> &'static Module {
             .args(["-c", "import runpy; m=runpy.run_path('docs/experiments/raven-target/collection_library.py'); print(m['build'](m['ROOT'] / 'runtime/System.neoil'))"])
             .output().unwrap();
         assert!(output.status.success());
-        assemble(std::str::from_utf8(&output.stdout).unwrap()).unwrap()
+        neoclr::assemble(std::str::from_utf8(&output.stdout).unwrap()).unwrap()
     })
+}
+
+// The selected Raven profile has interface contracts; the bundled legacy profile
+// still has value descriptors, so validate callers against the selected library.
+fn assemble(source: &str) -> Result<Module, neoclr::Fault> {
+    neoclr::assembler::read_modules(
+        &[neoclr::assembler::ModuleInput::Source(source)], library(),
+    ).map(|mut modules| modules.remove(0))
 }
 
 #[test]
@@ -30,12 +38,13 @@ fn handle_fields_must_be_assigned_by_class_constructors() {
 #[test]
 fn type_has_no_metadata_query_exports() {
     let text = ".module Probe\n.function Query(System.Type value) -> System.Introspection.FieldInfo[]\nldarg value\ncall instance System.Type::GetFields()\nret\n.end";
-    let app = assemble(text).unwrap();
-    let result = LoadedProgram::with_library(&app, library()).and_then(|p| p.verify());
+    let result = assemble(text)
+        .and_then(|app| LoadedProgram::with_library(&app, library()))
+        .and_then(|p| p.verify());
     assert!(result.is_err());
 }
 #[test]
-fn reflection_snapshots_are_managed_classes_with_base_views() {
+fn reflection_snapshots_implement_public_info_interfaces() {
     let app = assemble(
         r#"
 .module Reflect
@@ -48,13 +57,13 @@ fn reflection_snapshots_are_managed_classes_with_base_views() {
 ldtoken Item
 call System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)
 call instance System.Type::get_Info()
-call instance System.Introspection.TypeInfo::GetFields()
+callvirt instance System.Introspection.TypeInfo::GetFields()
 ldc.i4 0
 ldelem System.Introspection.FieldInfo
 stloc field
 ldloc field
 castclass System.Introspection.MemberInfo
-call instance System.Introspection.MemberInfo::get_Name()
+callvirt instance System.Introspection.MemberInfo::get_Name()
 ret
 .end
 "#,
@@ -81,7 +90,7 @@ fn returned_descriptor_keeps_nested_type_snapshot_alive_and_obeys_heap_limit() {
 ldtoken Item
 call System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)
 call instance System.Type::get_Info()
-call instance System.Introspection.TypeInfo::GetFields()
+callvirt instance System.Introspection.TypeInfo::GetFields()
 ldc.i4 0
 ldelem System.Introspection.FieldInfo
 castclass System.Introspection.MemberInfo
@@ -96,6 +105,10 @@ ret
     let Value::ObjectReference(descriptor) = result.value else {
         panic!("expected descriptor class");
     };
+    assert_eq!(
+        descriptor.concrete_type(),
+        neoclr::metadata::Type::from_name("System.Introspection.RuntimeFieldInfo")
+    );
     assert_eq!(
         descriptor.target(),
         &neoclr::metadata::Type::from_name("System.Introspection.MemberInfo")
@@ -182,12 +195,12 @@ ret
 ldtoken Item
 call System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)
 call instance System.Type::get_Info()
-call instance System.Introspection.TypeInfo::GetMethods()
+callvirt instance System.Introspection.TypeInfo::GetMethods()
 ldc.i4 0
 ldelem System.Introspection.MethodInfo
 stloc method
 ldloc method
-call instance System.Introspection.MethodInfo::GetParameters()
+callvirt instance System.Introspection.MethodInfo::GetParameters()
 stloc parameters
 ldloc parameters
 ldc.i4 0
@@ -196,10 +209,10 @@ ldc.i4 1
 ldelem System.Introspection.ParameterInfo
 stelem System.Introspection.ParameterInfo
 ldloc method
-call instance System.Introspection.MethodInfo::GetParameters()
+callvirt instance System.Introspection.MethodInfo::GetParameters()
 ldc.i4 0
 ldelem System.Introspection.ParameterInfo
-call instance System.Introspection.ParameterInfo::get_Position()
+callvirt instance System.Introspection.ParameterInfo::get_Position()
 ret
 .end
 "#,
@@ -238,11 +251,11 @@ call System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)
 call instance System.Type::get_Info()
 ldc.i4 36
 call System.Introspection.BindingFlags::FromValue(Int32)
-call instance System.Introspection.TypeInfo::GetProperties(System.Introspection.BindingFlags)
+callvirt instance System.Introspection.TypeInfo::GetProperties(System.Introspection.BindingFlags)
 ldc.i4 0
 ldelem System.Introspection.PropertyInfo
 {argument}
-call instance System.Introspection.PropertyInfo::GetGetMethod(Boolean)
+callvirt instance System.Introspection.PropertyInfo::GetGetMethod(Boolean)
 call instance System.Option<System.Introspection.MethodInfo>::{predicate}()
 ret
 .end

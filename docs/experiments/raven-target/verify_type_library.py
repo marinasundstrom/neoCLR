@@ -34,9 +34,10 @@ with tempfile.TemporaryDirectory(prefix='neoclr-declaration-library-') as tempor
         ('Valid', source, None),
         ('Storage', source.replace('private field Handle: RuntimeTypeHandle', 'private field Handle: RuntimeTypeHandle\n    private field Extra: int = 0'), 'Type library layout'),
         ('Constructor', source.replace('private init', 'public init'), 'does not match reference contract'),
-        ('Missing', source.replace('val BaseType:' if args.type_info else 'val Name:', 'private val BaseType:' if args.type_info else 'private val Name:'), 'does not match reference contract'),
+        ('Missing', source.replace('val BaseType:' if args.type_info else 'val Name:', 'val MissingBaseType:' if args.type_info else 'private val Name:'), 'does not match reference contract'),
         ('Argument', source.replace('GetMethods(flags:', 'GetMethods(wrongName:').replace('TypeMethods(Handle, (int)flags)', 'TypeMethods(Handle, (int)wrongName)') if args.type_info else source.replace('GetTypeFromHandle(handle:', 'GetTypeFromHandle(wrongName:').replace('return Type(handle)', 'return Type(wrongName)'), 'does not match reference contract'),
-    ] + ([('FactoryVisibility', source.replace('internal static func FromHandle', 'private static func FromHandle'),
+    ] + ([('ProviderVisibility', source.replace('internal class RuntimeTypeInfo', 'public class RuntimeTypeInfo'), 'Runtime descriptor providers must remain internal'),
+          ('FactoryVisibility', source.replace('internal static func FromHandle', 'private static func FromHandle'),
            'does not match reference contract')] if args.type_info else []):
         folder = root / name
         folder.mkdir()
@@ -54,8 +55,9 @@ with tempfile.TemporaryDirectory(prefix='neoclr-declaration-library-') as tempor
             assert not (output / 'Implementation.neoil').exists()
         else:
             result = (output / 'Implementation.neoil').read_text()
-            assert '.type class ' + owner in result
+            assert ('.interface ' if args.type_info else '.type class ') + owner in result
             assert '.method private instance .ctor(System.RuntimeTypeHandle' in result
             if args.type_info:
-                assert '.function internal System.Introspection.TypeInfo.FromHandle(' in result
+                assert '.type internal class System.Introspection.RuntimeTypeInfo' in result
+                assert '.method internal static FromHandle(' in result
     print('Type imports; added storage, public construction, missing exports and changed parameter names rejected.')

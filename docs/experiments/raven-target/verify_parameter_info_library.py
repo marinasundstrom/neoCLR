@@ -32,7 +32,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-parameter-info-') as temporary:
         ('Extra', source.replace('private field StoredName:', 'private field Extra: int = 0\n    private field StoredName:'), 'ParameterInfo library layout'),
         ('Reordered', source.replace('private field StoredIsOut: bool\n    private field StoredIsOutWhenTrue: bool', 'private field StoredIsOutWhenTrue: bool\n    private field StoredIsOut: bool'), 'ParameterInfo library layout'),
         ('Constructor', source.replace('private init', 'public init'), 'does not match reference contract'),
-        ('Missing', source.replace('val Position:', 'private val Position:'), 'does not match reference contract'),
+        ('Missing', source.replace('val Position:', 'val MissingPosition:'), 'does not match reference contract'),
     ]:
         folder = root / name
         folder.mkdir()
@@ -51,6 +51,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-parameter-info-') as temporary:
             assert not (output / 'Implementation.neoil').exists()
         else:
             result = (output / 'Implementation.neoil').read_text()
-            assert '.type class System.Introspection.ParameterInfo' in result
+            assert '.interface System.Introspection.ParameterInfo' in result
+            assert '.type internal class System.Introspection.RuntimeParameterInfo' in result
             assert '.method private instance .ctor(' in result
 print('ParameterInfo imports; extra/reordered storage, public construction and missing exports rejected.')

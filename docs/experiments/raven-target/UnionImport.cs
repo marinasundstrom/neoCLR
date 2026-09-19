@@ -48,6 +48,7 @@ static class UnionImport
         var guestLibraries = resolver.Images.Where(a => a != app && a != library).Select(a => a.MainModule).ToHashSet();
         if (guestLibraries.Append(app.MainModule).Any(module => module.Types.Any(t => t.Name == "<Module>" && t.Methods.Any(m => m.IsConstructor && m.IsStatic))))
             throw new InvalidDataException("Module initializers unsupported.");
+        if (libraryOwner is null) IntrospectionHierarchy.RejectExternalProviders(guestLibraries.Append(app.MainModule));
         ApplicationTypes.Reset(guestLibraries.Append(app.MainModule).ToArray());
         var exports = libraryOwner is null ? [] : LibraryImplementation.Roots(app.MainModule, library.MainModule, libraryOwner);
         if (libraryOwner is not null) ApplicationTypes.SetLibraryScope(app.MainModule, libraryOwner);
@@ -151,7 +152,7 @@ static class UnionImport
             var args = (method.HasThis ? new[] { ApplicationTypes.Receiver(method) } : Array.Empty<string>()).Concat(method.Parameters.Select(p => ProfileType(p.ParameterType))).ToArray();
             var valueConstructor = libraryOwner is null && method.IsConstructor && method.DeclaringType.IsValueType;
             var emitInstance = method.HasThis && !valueConstructor;
-            var emitOwnedStatic = libraryOwner is not null && method.IsStatic && (method.DeclaringType.IsValueType || OpaqueLibrary.IsString(method.DeclaringType) || ArrayLibrary.IsMatched(method.DeclaringType));
+            var emitOwnedStatic = libraryOwner is not null && method.IsStatic && (method.DeclaringType.IsValueType || OpaqueLibrary.IsString(method.DeclaringType) || ArrayLibrary.IsMatched(method.DeclaringType) || DescriptorLibrary.IsProvider(method.DeclaringType));
             var result = ProfileType(method.ReturnType, true);
             var locals = method.Body.Variables.Select(v => ProfileType(v.VariableType)).ToArray();
             if (locals.Any(t => !(libraryOwner is not null && t is "Value" or ParameterSnapshotBindings.Vector) && !(libraryOwner is not null && method.GenericParameters.Concat(method.DeclaringType.GenericParameters).Any(p => t == "T" + p.Position)) && !ApplicationTypes.IsType(t) && !ManagedArrayBindings.IsType(t) && t != "System.Object" && !InterfaceBindings.IsInterface(t) && !NativeMemoryBindings.IsPointer(t) && !ReflectionBindings.IsType(t) && t != "arrayref<String>" && !DelegateBindings.IsType(t) && !GenericUnionBindings.IsType(t) && !CalendarBindings.IsReference(t) && !CalendarBindings.Types.Contains(t) && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
@@ -252,6 +253,15 @@ static class UnionImport
                     case Code.Box:
                         var boxedType = ProfileType((TypeReference)instruction.Operand);
                         ConvertTop(boxedType); Push(new("System.Object")); code.AppendLine("box " + boxedType); break;
+                    case Code.Isinst:
+                        var testedTarget = ProfileType((TypeReference)instruction.Operand);
+                        var testedSource = Pop().Type;
+                        if (!ManagedArrayBindings.IsReference(testedSource) || !ManagedArrayBindings.IsReference(testedTarget))
+                            throw new InvalidDataException("Only reference type tests are supported.");
+                        if (ManagedArrayBindings.IsType(testedSource) && ManagedArrayBindings.IsType(testedTarget)
+                            && testedSource != testedTarget)
+                            throw new InvalidDataException("Mutable array tests require identical element types.");
+                        Push(new(testedTarget)); code.AppendLine("isinst " + testedTarget); break;
                     case Code.Castclass:
                         var castTarget = ProfileType((TypeReference)instruction.Operand);
                         var castSource = Pop().Type;
@@ -580,6 +590,13 @@ static class UnionImport
                     case Code.Not:
                         ConvertTop("Int32"); Push(new("Int32")); code.AppendLine("not"); break;
                     case Code.Cgt: case Code.Cgt_Un: case Code.Clt: case Code.Clt_Un:
+                        if (instruction.OpCode.Code == Code.Cgt_Un && stack.Count >= 2
+                            && stack[^1].Type == "FaultNull" && ManagedArrayBindings.IsReference(stack[^2].Type))
+                        {
+                            Pop(); Pop(); Push(new("Int32"));
+                            code.AppendLine("ref.isnull\nldc.bool false\nceq").Append(BooleanBindings.Convert("Boolean", "Int32"));
+                            break;
+                        }
                         if (!NumericOperands()) throw new InvalidDataException("Unsupported comparison operands.");
                         Pop(); Pop(); Push(new("Int32"));
                         code.AppendLine(instruction.OpCode.Name).Append(BooleanBindings.Convert("Boolean", "Int32"));
@@ -612,14 +629,16 @@ static class UnionImport
                         break;
                     case Code.Brtrue: case Code.Brtrue_S: case Code.Brfalse: case Code.Brfalse_S:
                         var condition = Pop();
-                        if (condition.Type is not ("Int32" or "Boolean")) throw new InvalidDataException("Invalid branch condition.");
+                        var referenceCondition = ManagedArrayBindings.IsReference(condition.Type);
+                        if (referenceCondition) code.AppendLine("ref.isnull");
+                        if (!referenceCondition && condition.Type is not ("Int32" or "Boolean")) throw new InvalidDataException("Invalid branch condition.");
                         var conditional = Target(); successors.Add(conditional);
                         if (condition.ConditionalOut >= 0 && conditional != index + 1)
                         {
                             var success = (bool[])assigned.Clone(); success[condition.ConditionalOut] = true;
                             assignmentEdges[instruction.OpCode.Code is Code.Brtrue or Code.Brtrue_S ? conditional : index + 1] = success;
                         }
-                        code.AppendLine($"{(instruction.OpCode.Code is Code.Brtrue or Code.Brtrue_S ? "brtrue" : "brfalse")} M{methodId:x8}_IL_{instructions[conditional].Offset:x4}"); break;
+                        code.AppendLine($"{((instruction.OpCode.Code is Code.Brtrue or Code.Brtrue_S) != referenceCondition ? "brtrue" : "brfalse")} M{methodId:x8}_IL_{instructions[conditional].Offset:x4}"); break;
                     case Code.Call:
                     case Code.Callvirt:
                         var reference = (MethodReference)instruction.Operand;

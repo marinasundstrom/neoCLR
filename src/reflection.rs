@@ -532,6 +532,38 @@ pub(crate) fn materialize(
         }
         match value {
             Value::Object { ty, fields } => {
+                // Native snapshots name the descriptive contract. The Raven profile
+                // realizes it with an internal provider; the legacy value profile
+                // continues to use its declared record representation.
+                let ty = if module.type_definition(&ty).is_some_and(|definition| {
+                    definition.representation == Representation::Interface
+                }) {
+                    let name = ty
+                        .definition_name()
+                        .ok_or_else(|| Fault::new("missing snapshot contract"))?;
+                    let provider = match name {
+                        "System.Introspection.ParameterInfo" => {
+                            "System.Introspection.RuntimeParameterInfo"
+                        }
+                        "System.Introspection.FieldInfo" => "System.Introspection.RuntimeFieldInfo",
+                        "System.Introspection.MethodInfo" => {
+                            "System.Introspection.RuntimeMethodInfo"
+                        }
+                        "System.Introspection.PropertyInfo" => {
+                            "System.Introspection.RuntimePropertyInfo"
+                        }
+                        _ => return Err(Fault::new("unsupported runtime snapshot contract")),
+                    };
+                    let provider = Type::from_name(provider);
+                    if !module.is_reference_type(&provider)
+                        || !module.reference_assignable(&provider, &ty)
+                    {
+                        return Err(Fault::new("missing runtime snapshot provider"));
+                    }
+                    provider
+                } else {
+                    ty
+                };
                 let fields = fields
                     .into_iter()
                     .map(|v| build(module, heap, limits, v, depth + 1))

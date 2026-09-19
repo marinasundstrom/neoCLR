@@ -25,6 +25,33 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-19 — TypeInfo as a member
+
+**Author proposal.** “We could technically make TypeInfo part of the MemberInfo
+hierarchy so it can represent a nested type.”
+
+**Assistant response.** Agreed that this would allow nested types in member queries
+and add TypeInfo as a fourth public match case. Identified the required ownership
+change: top-level types have no declaring type, unlike nested types. Recommended
+optional ownership in the unified TypeInfo model, compared .NET's corresponding
+inheritance and nullable DeclaringType, and recorded a separate wrapper as an
+alternative. The existing three-case implementation is not evidence that this
+extension or the unified acquisition API is complete. See [the proposal](introspection-design.md#proposed-typeinfo-member-case--2026-09-19).
+
+## 2026-09-19 — Exhaustive matching over the public member cases
+
+**Author clarification.** “So if you have a MemberInfo and you do a match, then you
+must cover all inheriting interface types.”
+
+**Assistant action and evidence.** Removed the shared storage base from MemberInfo's
+direct implementations so its permitted cases are exactly FieldInfo, MethodInfo
+and PropertyInfo. Compiled a separate consumer with three public interface arms
+and ran it against real descriptors. Removing each arm produces RAV2100. Added
+reference type-test execution to neoCLR because the importer previously rejected
+Raven's emitted isinst instruction. Recorded the remaining generic Raven diagnostic
+issue: errors currently name hidden leaves rather than the public covering interfaces.
+See [the contract and limitation](introspection-design.md#exhaustiveness-over-memberinfo).
+
 ## 2026-09-19 — Seal the introspection model
 
 **Author decision.** “At the moment, we will model the introspection model as a

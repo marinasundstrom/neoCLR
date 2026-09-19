@@ -1,0 +1,34 @@
+import System.*
+import System.Console.*
+import System.Introspection.*
+
+func RequireInterface(description: Type) {
+    if description.IsInterface {
+        WriteLine("Interface")
+    } else {
+        Fault("Expected an introspection interface")
+    }
+}
+
+func Kind(member: MemberInfo) -> string {
+    return match member {
+        FieldInfo => "Field"
+        MethodInfo => "Method"
+        PropertyInfo => "Property"
+    }
+}
+
+func Main() {
+    RequireInterface(typeof(TypeInfo))
+    RequireInterface(typeof(ParameterInfo))
+    RequireInterface(typeof(MemberInfo))
+    RequireInterface(typeof(FieldInfo))
+    RequireInterface(typeof(MethodInfo))
+    RequireInterface(typeof(PropertyInfo))
+
+    val member: MemberInfo = typeof(Date).Info.GetProperties()[0]
+    WriteLine(member.DeclaringType.Name)
+    WriteLine(Kind(typeof(Date).Info.GetFields(BindingFlags.Instance | BindingFlags.NonPublic)[0]))
+    WriteLine(Kind(typeof(Date).Info.GetMethods()[0]))
+    WriteLine(Kind(member))
+}

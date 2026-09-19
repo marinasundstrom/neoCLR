@@ -28,7 +28,13 @@ static class LibraryImplementation
         if (owner == EnumBindings.Flags) return FlagsLibrary.Roots(source, core);
         if (owner == "System.Func") return DelegateLibrary.Roots(source, core);
         if (owner == "System.Introspection.MemberInfo")
-            return DescriptorLibrary.Roots(source, core, InstanceRoots);
+            return DescriptorLibrary.Roots(source, core, InstanceRoots, InterfaceRoots);
+        if (owner is "System.Introspection.TypeInfo" or "System.Introspection.ParameterInfo")
+        {
+            InterfaceRoots(source.GetType(owner), core.GetType(owner), owner);
+            var provider = owner.Replace(".Introspection.", ".Introspection.Runtime");
+            return InstanceRoots(source.GetType(provider), core.GetType(provider), provider);
+        }
         if (owner is "System.Option" or "System.Result")
             return GenericUnionLibrary.Roots(source, core, owner, InstanceRoots);
         var type = source.Types.SingleOrDefault(t => t.Namespace == owner && NamespaceFunctions.IsContainer(t)) ?? source.Types.SingleOrDefault(t => t.FullName.Split('`')[0] == owner)
@@ -66,6 +72,8 @@ static class LibraryImplementation
 
     static MethodDefinition[] InterfaceRoots(TypeDefinition type, TypeDefinition contract, string owner)
     {
+        IntrospectionHierarchy.Validate(type);
+        IntrospectionHierarchy.Validate(contract);
         // Bounded invariant declaration authoring, not permission to replace a class with an
         // interface or supply executable default/static interface members.
         foreach (var candidate in new[] { type, contract })
@@ -104,23 +112,27 @@ static class LibraryImplementation
 
     static MethodDefinition[] InstanceRoots(TypeDefinition type, TypeDefinition contract, string owner)
     {
+        IntrospectionHierarchy.Validate(type);
+        IntrospectionHierarchy.Validate(contract);
+        if (DescriptorLibrary.IsProvider(type) && (!type.IsNotPublic || !contract.IsNotPublic))
+            throw new InvalidDataException("Runtime descriptor providers must remain internal.");
         if (GenericUnionLibrary.IsFamily(type)) GenericUnionLibrary.Validate(type, contract);
         var caseMethods = ErrorCarrierLibrary.IsCarrier(type) ? ErrorCarrierLibrary.Validate(type, contract) : [];
         // A single explicitly selected reference/implementation pair. Never alias arbitrary
         // guest types by namespace/name, and never execute reference-assembly stub bodies.
         foreach (var candidate in new[] { type, contract })
-            if (!(candidate.IsPublic || candidate.IsNestedPublic && GenericUnionLibrary.IsCase(candidate)) || candidate.IsInterface || candidate.IsAbstract != (DescriptorLibrary.IsDescriptor(candidate) && candidate.Name == "MemberInfo")
+            if (!(candidate.IsPublic || candidate.IsNotPublic && DescriptorLibrary.IsProvider(candidate) || candidate.IsNestedPublic && GenericUnionLibrary.IsCase(candidate)) || candidate.IsInterface || candidate.IsAbstract != (DescriptorLibrary.IsDescriptor(candidate) && candidate.Name == "RuntimeMemberInfo")
                 || candidate.GenericParameters.Any(p => p.HasConstraints || p.Attributes != GenericParameterAttributes.NonVariant) || candidate.HasNestedTypes && !ErrorCarrierLibrary.IsCarrier(candidate) || candidate.HasEvents
                 || candidate.BaseType?.FullName != (DescriptorLibrary.IsDescriptor(candidate) ? DescriptorLibrary.Base(candidate) : candidate.IsValueType ? "System.ValueType" : "System.Object") || candidate.IsExplicitLayout)
                 throw new InvalidDataException($"Unsupported instance library owner: {candidate.FullName}, base={candidate.BaseType}, public={candidate.IsPublic}, abstract={candidate.IsAbstract}, nested={candidate.HasNestedTypes}, value={candidate.IsValueType}.");
         if (type.IsValueType != contract.IsValueType)
             throw new InvalidDataException("Library value/reference representation does not match reference contract.");
         // Native snapshot factories construct Type from precisely one opaque handle.
-        if (owner is "System.Type" or "System.Introspection.TypeInfo" && (type.Fields.Count != 1 || type.Fields[0].Name != "Handle"
+        if (owner is "System.Type" or "System.Introspection.RuntimeTypeInfo" && (type.Fields.Count != 1 || type.Fields[0].Name != "Handle"
             || type.Fields[0].FieldType.FullName != "System.RuntimeTypeHandle"
             || !RuntimeSignatures.IsCore(type.Fields[0].FieldType.Scope)))
             throw new InvalidDataException("Type library layout must contain exactly one core RuntimeTypeHandle.");
-        if (owner == "System.Introspection.ParameterInfo")
+        if (owner == "System.Introspection.RuntimeParameterInfo")
         {
             var layout = new (string Name, string Type)[] {
                 ("StoredName", "System.String"), ("StoredPosition", "System.Int32"),
@@ -206,7 +218,7 @@ static class LibraryImplementation
             methods.Count(m => m.IsAssembly && MatchMethod(c, m)) != 1))
             throw new InvalidDataException("Internal library factory does not match reference contract.");
         if (expected.Length != exports.Length || exports.Any(m => expected.Count(e => MatchMethod(e, m)) != 1))
-            throw new InvalidDataException("Instance library export does not match reference contract: missing=[" + string.Join(";", expected.Where(e => !exports.Any(m => MatchMethod(e, m))).Select(m => m.FullName)) + "]; unmatched=[" + string.Join(";", exports.Where(m => !expected.Any(e => MatchMethod(e, m))).Select(m => m.FullName)) + "]");
+            throw new InvalidDataException("Instance library export does not match reference contract: missing=[" + string.Join(";", expected.Where(e => !exports.Any(m => MatchMethod(e, m))).Select(m => m.FullName + " " + m.Attributes)) + "]; unmatched=[" + string.Join(";", exports.Where(m => !expected.Any(e => MatchMethod(e, m))).Select(m => m.FullName + " " + m.Attributes)) + "]");
         if (type.Properties.Count(p => p.Name != "Value" || !GenericUnionLibrary.IsCarrier(type)) != contract.Properties.Count(p => p.Name != "Value" || !GenericUnionLibrary.IsCarrier(contract)) || type.Properties.Any(p =>
             contract.Properties.Count(c => c.Name == p.Name && MatchType(c.PropertyType, p.PropertyType)
                 && c.Parameters.Count == p.Parameters.Count
@@ -237,6 +249,7 @@ static class LibraryImplementation
 
     public static bool SameType(TypeReference left, TypeReference right)
     {
+        if (DescriptorLibrary.SameType(left, right)) return true;
         if (left is ByReferenceType lb)
             return right is ByReferenceType rb && SameType(lb.ElementType, rb.ElementType);
         if (left is ArrayType la)

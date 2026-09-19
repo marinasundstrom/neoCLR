@@ -29,13 +29,16 @@ with tempfile.TemporaryDirectory(prefix='neoclr-descriptor-library-') as tempora
     source = (ROOT / 'runtime/raven/src/System/Introspection/Descriptors.rvn').read_text()
     cases = [
         ('Descriptors', source, None),
+        ('MissingPermittedCase', source.replace('RuntimeMemberInfo, FieldInfo', 'RuntimeMemberInfo'), 'Introspection sealed hierarchy'),
+        ('OpenModel', source.replace('public sealed interface', 'public interface'), 'Introspection sealed hierarchy'),
         ('ExtraStorage', source.replace('private field StoredName:', 'private field Extra: int\n    private field StoredName:'), 'Descriptor storage'),
         ('RenamedStorage', source.replace('StoredDefinitionIndex', 'StoredIndex'), 'Descriptor storage'),
         ('WrongStorage', source.replace('StoredIsPublic: bool', 'StoredIsPublic: int').replace('StoredIsPublic = isPublic', 'StoredIsPublic = 1').replace('get => StoredIsPublic', 'get => StoredIsPublic == 1'), 'Descriptor storage'),
         ('PublicConstructor', source.replace('protected init', 'public init'), 'Descriptor storage'),
-        ('SealedDescriptor', source.replace('public open class FieldInfo', 'public class FieldInfo'), 'sealing'),
-        ('RenamedExport', source.replace('val CanWrite:', 'val Writable:'), 'export does not match'),
-        ('WrongParameterName', source.replace('arg0', 'includePrivate'), 'export does not match'),
+        ('PublicProvider', source.replace('internal class RuntimeFieldInfo', 'public class RuntimeFieldInfo'), 'Runtime descriptor providers must remain internal'),
+        ('OpenDescriptor', source.replace('internal class RuntimeFieldInfo', 'internal open class RuntimeFieldInfo'), 'sealing'),
+        ('RenamedExport', source.replace('val CanWrite:', 'val Writable:'), 'does not match reference contract'),
+        ('WrongParameterName', source.replace('arg0', 'includePrivate'), 'does not match reference contract'),
         ('SnapshotDefault', source.replace('val count = StoredParameters.Length', 'val snapshot: ParameterSnapshot = default(ParameterSnapshot)\n        val count = snapshot.Length'), 'RAV1509'),
     ]
     for name, text, diagnostic in cases:
@@ -48,7 +51,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-descriptor-library-') as tempora
   <Import Project="{escape(str(ROOT / 'build/NeoCLR.Raven.props'))}" />
   <ItemGroup><Compile Include="Main.rvn" /></ItemGroup>
 </Project>''')
-        compile_diagnostic = diagnostic if name == 'SnapshotDefault' else None
+        compile_diagnostic = 'RAV0501' if name == 'PublicProvider' else diagnostic if name == 'SnapshotDefault' else None
         run(['dotnet', args.compiler.resolve(), project, '--no-project-restore', '-o', folder / 'bin'], compile_diagnostic)
         if compile_diagnostic:
             continue
@@ -59,7 +62,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-descriptor-library-') as tempora
             assert not (output / 'Implementation.neoil').exists()
         else:
             emitted = (output / 'Implementation.neoil').read_text()
-            assert '.extends System.Introspection.MemberInfo' in emitted
+            assert '.extends System.Introspection.RuntimeMemberInfo' in emitted
             assert '.field private Parameters System.Introspection.ParameterInfo[]' in emitted
             assert 'GetParameters() -> arrayref<System.Introspection.ParameterInfo>' in emitted
     print(f'{len(cases)} descriptor admission cases passed')
