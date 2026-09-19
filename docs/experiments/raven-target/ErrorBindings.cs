@@ -4,7 +4,6 @@ using System.Text;
 // Existing error-value APIs. Empty cases have valid defaults; carriers do not.
 static class ErrorBindings
 {
-    const string MessageError = "System.Error";
     public static readonly Dictionary<string, string[]> Cases = new() {
         ["System.IO.FileReadError"] = ["InvalidLimit", "InvalidPath", "NotFound", "AccessDenied", "NotRegularFile", "TooLarge", "ReadFailed", "InvalidUtf8"],
         ["System.IO.FileWriteError"] = ["InvalidLimit", "InvalidPath", "NotFound", "AccessDenied", "NotRegularFile", "TooLarge", "WriteFailed"],
@@ -19,11 +18,11 @@ static class ErrorBindings
     };
     public static IEnumerable<string> Errors => Cases.Keys;
     static IEnumerable<string> CaseTypes => Cases.SelectMany(e => e.Value.Select(c => e.Key + "." + c));
-    public static bool IsType(string type) => type == MessageError || Errors.Contains(type) || CaseTypes.Contains(type);
+    public static bool IsType(string type) => Errors.Contains(type) || CaseTypes.Contains(type);
     public static bool IsEmpty(string type) => CaseTypes.Contains(type) || Cases.TryGetValue(type, out var cases) && cases.Length == 0;
     public static string? Type(TypeReference type) => type.IsValueType && RuntimeSignatures.IsCore(type.Scope)
         && IsType(type.FullName.Replace('/', '.')) ? type.FullName.Replace('/', '.') : null;
-    public static string Declarations => "public struct Error { public static Error FromMessage(string message) => default; public string Message => default; public string ToString() => default; } " + string.Join("\n", Cases.Select(entry => {
+    public static string Declarations => string.Join("\n", Cases.Select(entry => {
         var error = entry.Key; var name = error.Split('.').Last();
         var declaration = "public struct " + name + " { public string ToString() => default; "
             + (entry.Value.Length == 0 && error != "System.EnvironmentError" ? $"public {name}() {{ }} " : "")
@@ -37,13 +36,6 @@ static class ErrorBindings
         var owner = Type(reference.DeclaringType);
         if (owner is null) return null;
         var signature = RuntimeSignatures.Match(reference, definition, Type);
-        if (owner == MessageError)
-        {
-            if (!reference.HasThis && reference.Name == "FromMessage" && signature.Result == MessageError && signature.Args.SequenceEqual(new[] { "String" }))
-                return new("System.Error::FromMessage", signature.Args, signature.Result);
-            if (reference.HasThis && !definition.IsVirtual && reference.Name is "get_Message" or "ToString" && signature.Result == "String" && signature.Args.Length == 0)
-                return new(Helper(owner, reference.Name), [owner + "&"], "String");
-        }
         if (Errors.Contains(owner) && reference.HasThis && !definition.IsVirtual && signature.Args.Length == 0
             && (reference.Name == "ToString" && signature.Result == "String"
                 || Cases[owner].Any(c => reference.Name == "get_Is" + c && signature.Result == "Boolean"
@@ -74,8 +66,6 @@ static class ErrorBindings
         }
         foreach (var owner in Errors.Concat(CaseTypes).Where(t => IsEmpty(t) && t != "System.EnvironmentError"))
             text.AppendLine($".function {Helper(owner, "New")}() -> {owner}\nnewobj instance {owner}::.ctor()\nret\n.end");
-        foreach (var name in new[] { "get_Message", "ToString" })
-            text.AppendLine($".function {Helper(MessageError, name)}({MessageError}& source) -> String\nldarg source\nldobj {MessageError}\ncall instance {MessageError}::{name}()\nret\n.end");
         return text.ToString();
     }
 }

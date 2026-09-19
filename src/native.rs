@@ -41,8 +41,6 @@ pub(crate) enum Binding {
     StringStartsWithOrdinal,
     StringEndsWithOrdinal,
     StringSliceUtf8,
-    ErrorFromMessage,
-    ErrorMessage,
     ReadAllText,
     WriteAllText,
     ConsoleReadByte,
@@ -161,10 +159,6 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         ("neoCLR.Runtime.StringSliceUtf8", [Type::String, Type::Int32, Type::Int32]) => {
             (Binding::StringSliceUtf8, Type::Value)
         }
-        ("neoCLR.Runtime.ErrorFromMessage", [Type::String]) => {
-            (Binding::ErrorFromMessage, Type::Error)
-        }
-        ("neoCLR.Runtime.ErrorMessage", [Type::Error]) => (Binding::ErrorMessage, Type::String),
         ("neoCLR.Runtime.WriteAllText", [Type::String, Type::String, Type::Int32]) => {
             (Binding::WriteAllText, Type::Int32)
         }
@@ -474,18 +468,6 @@ impl Binding {
                     .map_err(|_| Fault::new("string allocation failed"))?;
                 result.push_str(slice);
                 Ok(Value::Erased(Box::new(Value::String(result))))
-            }
-            (Self::ErrorFromMessage, [Value::String(message)])
-            | (Self::ErrorMessage, [Value::Error(message)]) => {
-                let mut text = String::new();
-                text.try_reserve_exact(message.len())
-                    .map_err(|_| Fault::new("error text allocation failed"))?;
-                text.push_str(message);
-                Ok(if matches!(self, Self::ErrorFromMessage) {
-                    Value::Error(text)
-                } else {
-                    Value::String(text)
-                })
             }
             _ => Err(Fault::new("invalid native arguments")),
         }

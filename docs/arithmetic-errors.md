@@ -7,7 +7,7 @@ The canonical library methods use ordinary typed Results:
 
 Abs fails only for minimum Int32, whose positive magnitude cannot be represented.
 OverflowError is a single-purpose, fieldless ordinary type with a constructor and
-ToString returning `Overflow`. It does not require a union or inherit from System.Error.
+ToString returning `Overflow`. It does not require a union or an error base class.
 
 IntegerDivisionError is a non-generic ordinary carrier with directly nested fieldless
 DivisionByZero and Overflow cases. It has constructor overloads, IsDivisionByZero and

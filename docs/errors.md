@@ -1,8 +1,7 @@
 # Error values and terminal Faults
 
-Recoverable application failures are data carried by Result<T,TError>. System.Error is
-the prototype's message-bearing Error value; it is distinct from a terminal runtime or
-system Fault. Guest code handles a Result case explicitly and can continue. It cannot
+Recoverable application failures are ordinary data carried by Result<T,TError>.
+Use a string for a simple message or a domain-specific type for structured failure. Guest code handles a Result case explicitly and can continue. It cannot
 catch a Fault or resume the failed execution.
 
 ## Platform policy clarified 2026-09-12
@@ -27,29 +26,31 @@ cleanup and future async failure boundaries still need explicit contracts; this 
 does not claim they are solved. An external host may have its own exceptions without
 making them neoCLR guest objects.
 
-## Initial Error library API
+## Ordinary error payloads
 
-| Member | Contract |
-| --- | --- |
-| static System.Error.FromMessage(String message) -> Error | Create an owned Error from runtime text |
-| instance get_Message() -> String | Return the stored message |
-| instance ToString() -> String | Return the message through the library accessor |
+The development library retires `System.Error`, the message wrapper from before the
+union convention. `Result.Error(...)` is a union case, not that old type. There is
+no common error base type and Task treats a Result as an ordinary payload.
 
-These are ordinary methods in System.neoil. [Property metadata](properties.md) now
-associates the Message property explicitly with get_Message. FromMessage and get_Message call two validated
-InternalCall helpers; ToString calls get_Message through IL. Runtime-service planning
-identifies those helpers as ErrorValues. There are no new instructions or type categories.
+```raven
+import System.*
+import System.Result.*
 
-The existing `error "literal"` instruction and errors returned by parsing, slicing,
-and arithmetic library methods use the same Error representation. Empty messages and
-embedded NULs remain valid text. Construction and message access preserve UTF-8 content
-without normalization or interpretation as a format string. Messages are owned values,
-not borrowed interpreter storage or native string pointers.
+let failure: Result<int, string> = Error("Unavailable")
+```
 
-This is a small bootstrap representation, not the final structured error taxonomy.
-Result<T,TError> does not require TError to inherit from System.Error: domain-specific
-records can represent structured failures under the supported type contracts. No base
-exception class, implicit error conversion, stack capture, or unwinding is introduced.
+This is a breaking development change after Preview 8: replace message-wrapper
+payloads with `string`, remove `Error.FromMessage` and `.Message`, and rebuild
+references, libraries and callers together. Domain-specific error unions remain.
+The wrapper's native helpers, host Value/Type variants, ErrorValues service and
+legacy `error "literal"` instruction are removed; neoIL uses `ldstr` for text.
+Published Preview 8 bundles are unchanged.
+
+Compared with .NET's exception hierarchy, expected failure remains an explicit
+Result value without stack capture or catch/unwind semantics. Removing the wrapper
+reduces special runtime support and avoids an imported Result case name collision.
+The cost is source/metadata migration; a string alone does not classify failures,
+so APIs requiring branches should continue to use specific error cases.
 
 ## Demonstration
 
@@ -58,13 +59,13 @@ cargo run --locked -- verify examples/errors.neoil
 cargo run --locked -- run examples/errors.neoil
 ```
 
-ReadPositive returns the parse Error unchanged for invalid text. A non-positive integer
-produces a new Error with a message constructed from the input. Report explicitly branches
-on Ok/Err, printing either the number or the Error's ToString result. Output is:
+ReadPositive formats the typed parse error for invalid text. A non-positive integer
+produces a message constructed from the input. Report explicitly branches on the
+Result cases, printing either the number or the message. Output is:
 
 ```text
 42
-InvalidInt32
+InvalidFormat
 Expected a positive number: -1
 Execution continued
 => Void
@@ -73,12 +74,12 @@ Execution continued
 The program uses free functions, primitive-backed library methods, and Result values;
 its signatures and operations now use ordinary System.Result and wrapper members,
 including the [migrated Int32.Parse boundary](int32-parse.md).
-It needs no exception handling or extensive object model. Returned Error/Result values
+It needs no exception handling or extensive object model. Returned Result values
 can also be validated and imported into subsequent host invocations as owned data.
 
 Malformed host inputs, execution limits, and failures of explicit helper allocation
 reservations remain Faults. Execution Faults preserve the existing logical stack traces;
-ordinary Error values have no automatic trace and are not turned into terminal failures
+ordinary error payloads have no automatic trace and are not turned into terminal failures
 by reading or formatting them. Catastrophic host/native process failures retain their
 existing limitations. Rich diagnostics, error codes, localization, and structured payload
 conventions can be developed separately.

@@ -125,7 +125,7 @@ func Main() {
         return value
     }, () => "missing"), "missing")
     Success(some.ThenResult((value: int) -> Result<int, string> => Ok(value + 3), () => "missing"), 3)
-    Failure(some.ThenResult((value: int) -> Result<int, string> => Result<int, string>.Error("binder"), () => "missing"), "binder")
+    Failure(some.ThenResult((value: int) -> Result<int, string> => Error("binder"), () => "missing"), "binder")
     Failure(none.ThenResult((value: int) -> Result<int, string> => {
         calls = calls + 100
         return Ok(value)
@@ -140,14 +140,14 @@ func Main() {
     WriteLine("Option operators passed")
 
     let ok: Result<int, string> = Ok(0)
-    let error: Result<int, string> = Result<int, string>.Error("problem")
+    let error: Result<int, string> = Error("problem")
     Success(ok.Map(value => value + 42), 42)
     Failure(error.Map((value: int) -> int => {
         calls = calls + 100
         return value
     }), "problem")
     Success(ok.Then((value: int) -> Result<int, string> => Ok(value + 7)), 7)
-    Failure(ok.Then((value: int) -> Result<int, string> => Result<int, string>.Error("binder")), "binder")
+    Failure(ok.Then((value: int) -> Result<int, string> => Error("binder")), "binder")
     Failure(error.Then((value: int) -> Result<int, string> => {
         calls = calls + 100
         return Ok(value)
@@ -183,7 +183,7 @@ func Main() {
         return Ok(9)
     }), 0)
     Success(error.OrElse((message: string) -> Result<int, string> => Ok(9)), 9)
-    Failure(error.OrElse((message: string) -> Result<int, string> => Result<int, string>.Error("new")), "new")
+    Failure(error.OrElse((message: string) -> Result<int, string> => Error("new")), "new")
     Check(ok.UnwrapOr(99), 0, "Ok explicit fallback")
     Check(error.UnwrapOr(99), 99, "Error explicit fallback")
     Check(ok.UnwrapOrElse(() => {

@@ -188,7 +188,7 @@ fn pointer_inputs_and_direct_native_targets_fail_at_resolution() {
 
 #[test]
 fn outputs_and_result_values_belong_to_each_invocation() {
-    let module = assemble(".module App\n.function Report(Int32 value) -> System.Result<Int32,Error>\nldarg value\ncall System.Console::WriteLine(Int32)\npop\nldarg value\nnewobj instance System.Result.Ok<Int32>::.ctor(Int32)\nnewobj instance System.Result<Int32,Error>::.ctor(System.Result.Ok<Int32>)\nret\n.end").unwrap();
+    let module = assemble(".module App\n.function Report(Int32 value) -> System.Result<Int32,String>\nldarg value\ncall System.Console::WriteLine(Int32)\npop\nldarg value\nnewobj instance System.Result.Ok<Int32>::.ctor(Int32)\nnewobj instance System.Result<Int32,String>::.ctor(System.Result.Ok<Int32>)\nret\n.end").unwrap();
     let program = LoadedProgram::new(&module).unwrap();
     let report = program
         .resolve_function(&parse_function_ref("Report(Int32)").unwrap())
@@ -201,7 +201,7 @@ fn outputs_and_result_values_belong_to_each_invocation() {
         assert_eq!(
             result.value,
             Value::Object {
-                ty: neoclr::assembler::parse_type("System.Result<Int32,Error>").unwrap(),
+                ty: neoclr::assembler::parse_type("System.Result<Int32,String>").unwrap(),
                 fields: vec![Value::Erased(Box::new(Value::Object {
                     ty: neoclr::assembler::parse_type("System.Result.Ok<Int32>").unwrap(),
                     fields: vec![Value::Int32(value)]

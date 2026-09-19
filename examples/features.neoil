@@ -14,7 +14,7 @@
     ret
 .end
 
-.function Main() -> System.Result<Void,Error>
+.function Main() -> System.Result<Void,String>
     .local Point
     .local Point
     .local Point&
@@ -107,11 +107,11 @@ ParseHandled:
     fault "division failed"
 DivisionPassed:
     ; Construct both Result cases with Void as success type.
-    error "Demonstration"
-    newobj instance System.Result.Error<Error>::.ctor(Error)
-    newobj instance System.Result<Void,Error>::.ctor(System.Result.Error<Error>)
-    call instance System.Result<Void,Error>::GetErrorCase()
-    call instance System.Result.Error<Error>::get_Value()
+    ldstr "Demonstration"
+    newobj instance System.Result.Error<String>::.ctor(String)
+    newobj instance System.Result<Void,String>::.ctor(System.Result.Error<String>)
+    call instance System.Result<Void,String>::GetErrorCase()
+    call instance System.Result.Error<String>::get_Value()
     pop
 
     ldc.i4 0
@@ -162,6 +162,6 @@ IntegerDivisionPassed:
     ldstr "All feature checks passed."
     call System.Console.WriteLine(string)
     newobj instance System.Result.Ok<Void>::.ctor(Void)
-    newobj instance System.Result<Void,Error>::.ctor(System.Result.Ok<Void>)
+    newobj instance System.Result<Void,String>::.ctor(System.Result.Ok<Void>)
     ret
 .end

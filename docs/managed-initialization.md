@@ -40,7 +40,7 @@ Zero-field records are supported. Pointer fields can refer to recursive record
 types without recursively constructing pointed-to values. Recursive by-value shapes
 are rejected; construction is bounded to 64 levels and 16,384 value nodes.
 
-String, Error, System.Value, RuntimeTypeHandle, legacy Ref, managed references and
+String, System.Value, RuntimeTypeHandle, legacy Ref, managed references and
 interface views have no default in this subset. A record containing such a field
 also has no default. No null managed reference, empty erased payload or default
 String is silently invented. Broader defaults need their own semantic decision.

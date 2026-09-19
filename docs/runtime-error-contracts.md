@@ -14,8 +14,7 @@ decide what to do next.
 | System.IO.File.ReadAllText(String, Int32) | ArgumentOutOfRange, InvalidPath, FileNotFound, AccessDenied, NotRegularFile, FileReadFailed, FileTooLarge, InvalidUtf8 | System.IO.FileReadError: InvalidLimit, InvalidPath, NotFound, AccessDenied, NotRegularFile, ReadFailed, TooLarge, InvalidUtf8 (implemented) | Yes: bounded file input can fail for expected environmental, limit and content reasons |
 
 Names are provisional preview choices. Keep the set of cases tied to observable behavior;
-there is no need to reproduce an exception hierarchy. Error types do not inherit from
-System.Error. Multi-case errors use ordinary non-generic carriers with directly nested
+there is no need to reproduce an exception hierarchy or require a shared error base type. Multi-case errors use ordinary non-generic carriers with directly nested
 case types; the generic Result carrier uses its existing companion/case convention.
 A future language can project those types as unions without new union opcodes.
 
@@ -25,8 +24,8 @@ Start with cases that let callers branch correctly. Add data when it helps an ac
 caller: for example, the byte limit for TooLarge, or the requested start/length for
 OutOfRange. The caller already has the original path/text; retaining a full copy is not
 required merely to identify the failure. A Message or ToString member is presentation,
-not a discriminant. Generic System.Error can remain available for application-defined
-messages; these library operations should expose their specific error contracts.
+not a discriminant. Use ordinary strings for application-defined messages; library operations should
+expose their specific error contracts. The legacy System.Error wrapper is retired.
 
 Parse must distinguish malformed text from range overflow at the native parsing
 boundary. Empty text and an invalid sign/digit sequence count as InvalidFormat;

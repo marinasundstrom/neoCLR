@@ -27,19 +27,13 @@ with tempfile.TemporaryDirectory(prefix='neoclr-foundation-library-') as tempora
     core = root / 'demo/NeoCLR.CoreProbe.dll'
     run(['dotnet', args.bridge.resolve(), '--reference-library-core', core])
     strings = (ROOT / 'runtime/raven/src/System/String.rvn').read_text()
-    errors = (ROOT / 'runtime/raven/src/System/Error.rvn').read_text()
     cases = [
         ('String', 'String', strings, None),
-        ('Error', 'Error', errors, None),
-        ('ErrorCopy', 'Error', errors.replace('return RuntimeServices.ErrorFromMessage(message)', 'let copied = RuntimeServices.ErrorFromMessage(message)\n        return copied'), None),
         ('StringStorage', 'String', strings.replace('m_value', 'other_storage'), 'String storage'),
         ('StringExtraStorage', 'String', strings.replace('private field m_value:', 'private field extra: int\n    private field m_value:'), 'String storage'),
         ('StringWrite', 'String', strings.replace('return RuntimeServices.StringByteCount(m_value)', 'm_value = "changed"\n        return 0'), 'backing storage is readonly'),
         ('StringConstruct', 'String', strings.replace('return RuntimeServices.StringByteCount(m_value)', 'let value = String()\n        return 0'), 'requires a runtime factory'),
         ('StringSignature', 'String', strings.replace('Concat(value0:', 'Concat(renamed:').replace('StringConcat(value0,', 'StringConcat(renamed,'), 'export does not match'),
-        ('ErrorStorage', 'Error', errors.replace('public struct Error {', 'public struct Error {\n    private field extra: int'), 'value library layout'),
-        ('ErrorDefault', 'Error', errors.replace('RuntimeServices.ErrorFromMessage(message)', 'default(Error)'), 'requires a runtime factory'),
-        ('ErrorSignature', 'Error', errors.replace('FromMessage(message:', 'FromMessage(renamed:').replace('ErrorFromMessage(message)', 'ErrorFromMessage(renamed)'), 'export does not match'),
     ]
     for name, owner, text, diagnostic in cases:
         folder = root / name
@@ -62,11 +56,5 @@ with tempfile.TemporaryDirectory(prefix='neoclr-foundation-library-') as tempora
             assert '.type System.String\n' in emitted
             assert '.method instance readonly byref Equals(String other)' in emitted
             assert '.method instance GetUtf8ByteCount()' in emitted
-            assert '.field ' not in emitted
-        elif owner == 'Error':
-            emitted = (output / 'Implementation.neoil').read_text()
-            assert 'initobj System.Error' not in emitted
-            assert '.method instance get_Message()' in emitted
-            assert '.method instance ToString()' in emitted
             assert '.field ' not in emitted
     print(f'{len(cases)} opaque library admission cases passed')

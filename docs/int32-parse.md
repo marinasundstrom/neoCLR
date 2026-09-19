@@ -50,7 +50,7 @@ get_IsErrorCase, then extract System.Result.Error<System.Int32ParseError>.Value 
 inspect the parsing error's case. Message text is not a discriminant.
 
 The errors and file-input samples deliberately translate parsing errors into their
-application-level System.Error messages when combining parsing with domain or file
+application-level string messages when combining parsing with domain or file
 failures. This conversion is explicit in application IL; the library preserves the
 specific error type. Their malformed-input output is now `InvalidFormat`.
 

@@ -11,13 +11,13 @@ fn generic_parameter_names_map_to_indices_and_closed_fields_substitute() {
     assert_eq!(module.types[0].fields[0].ty, Type::TypeParameter(0));
     assert_eq!(module.types[0].fields[1].ty, Type::TypeParameter(1));
     let fields = module
-        .instantiated_fields(&parse_type("Pair<Void, Error>").unwrap())
+        .instantiated_fields(&parse_type("Pair<Void, String>").unwrap())
         .unwrap();
     assert_eq!(fields[0].ty, Type::Void);
-    assert_eq!(fields[1].ty, Type::Error);
+    assert_eq!(fields[1].ty, Type::String);
     assert_eq!(
         fields[2].ty,
-        parse_type("System.Result<System.Option<Void>, Error>").unwrap()
+        parse_type("System.Result<System.Option<Void>, String>").unwrap()
     );
     let numeric = assemble(
         &source

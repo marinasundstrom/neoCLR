@@ -19,7 +19,7 @@ receiver, parameter, and return-type accessors expose the resolved contract with
 
 ## Argument and execution contract
 
-Inputs include primitives (numeric types, Boolean, String, Error, and inhabited Void),
+Inputs include primitives (numeric types, Boolean, String, and inhabited Void),
 [validated owned records](record-inputs.md), and ordinary Option/Result records.
 Arguments must be their exact storage Values. A Byte parameter
 requires Value::Byte, not Value::Int32; Single requires Value::Single, not Double.

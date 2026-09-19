@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Retire the legacy System.Error message wrapper, its native helpers, intrinsic
+  runtime/host value and type, ErrorValues service and `error` instruction. Use
+  ordinary strings or domain-specific Result payloads; typed error unions remain.
+  This breaks old message-wrapper metadata/host APIs: rebuild references, library
+  and callers together. Published Preview 8 artifacts are unchanged. Simplify the
+  outcome samples to imported `Error(...)`, document the convention and migration,
+  refresh the library inventory and update the outcomes feature page.
+
 - Start the provisional async mechanism with an executable Raven completion model:
   validate pending heap-owned state across GC, multiple consumers, queued callback
   ordering, duplicate completion, Result/unit payloads and terminal fault boundaries

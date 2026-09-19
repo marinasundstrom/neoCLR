@@ -970,3 +970,12 @@ references and fixed generic unit return binding and completion independently.
 See the [async assessment](async-state-machine-assessment.md#generic-unit-return-correction--2026-09-19).
 No neoCLR-specific policy is part of that general fix. Target System.Void payload
 execution remains a separate integration requirement.
+
+### Legacy Error name collision retired — 2026-09-19
+
+The author identified System.Error as predating the union convention and selected
+its removal. The development library now uses ordinary strings or specific error
+types as Result payloads. This removes the System.Error/Result.Error constructor
+collision in the outcome sample without changing Raven's name-resolution policy.
+Older released references still expose the old type; rebuild references and callers
+together before using the simplified imported constructor spelling.

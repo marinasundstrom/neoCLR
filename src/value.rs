@@ -22,7 +22,6 @@ pub enum Value {
     UIntPtr(usize),
     Boolean(bool),
     String(String),
-    Error(String),
     /// Interpreter storage for explicit erasure, not a guest heap reference.
     Erased(Box<Value>),
     /// Owned metadata snapshot, not an arbitrary-value container or native pointer.
@@ -184,7 +183,6 @@ impl Value {
             Self::UIntPtr(_) => Type::UIntPtr,
             Self::Boolean(_) => Type::Boolean,
             Self::String(_) => Type::String,
-            Self::Error(_) => Type::Error,
             Self::Erased(_) => Type::Value,
             Self::RuntimeTypeHandle(_) => Type::RuntimeTypeHandle,
             Self::Object { ty, .. } => ty.clone(),

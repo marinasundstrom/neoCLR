@@ -114,7 +114,7 @@ fn abs_overflow_is_an_ordinary_error_value_and_old_result_type_is_rejected() {
     );
     let old = assemble(&source.replace(
         "System.Result<Int32,System.OverflowError>",
-        "System.Result<Int32,Error>",
+        "System.Result<Int32,String>",
     ))
     .unwrap();
     assert!(LoadedProgram::new(&old).unwrap().verify().is_err());

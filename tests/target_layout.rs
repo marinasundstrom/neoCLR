@@ -155,7 +155,7 @@ fn closedness_scopes_and_unsupported_storage_keep_existing_checks() {
         "String",
         "Int32&",
         "System.Option<Int32>",
-        "System.Result<Int32,Error>",
+        "System.Result<Int32,String>",
     ] {
         assert!(
             program

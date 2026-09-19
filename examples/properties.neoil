@@ -20,8 +20,6 @@
     call System.Console::WriteLine(Int32)
     pop
     ldstr "Properties describe ordinary methods"
-    call System.Error::FromMessage(String)
-    call instance System.Error::get_Message()
     call System.Console::WriteLine(String)
     ret
 .end

@@ -499,7 +499,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                             rest.parse::<bool>()
                                 .map_err(|_| Fault::new("expected true or false"))?
                         )),
-                        "ldstr" | "error" | "fault" => Some(serde_json::json!(
+                        "ldstr" | "fault" => Some(serde_json::json!(
                             serde_json::from_str::<String>(rest)
                                 .map_err(|_| Fault::new("expected JSON-quoted string"))?
                         )),

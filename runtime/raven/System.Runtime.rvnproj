@@ -145,9 +145,6 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Console'">
     <Compile Include="src/System/Console/Functions.rvn" />
   </ItemGroup>
-  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Error'">
-    <Compile Include="src/System/Error.rvn" />
-  </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'String'">
     <Compile Include="src/System/String.rvn" />
   </ItemGroup>

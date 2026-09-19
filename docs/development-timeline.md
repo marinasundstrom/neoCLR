@@ -4610,3 +4610,26 @@ The assistant fixed these on an isolated main-based branch, verified 145 selecte
 async/resource tests on .NET 11, and integrated the general fix into main and
 neoclr separately (fb8eb77bb and b67d1e11b). No neoCLR-only policy was merged into
 main. This closes the general compiler gap, not the guest Task/builder work.
+
+### Imported union cases and retiring the old Error wrapper — 2026-09-19
+
+The author pointed out that with `import System.Result.*`, a typed binding can use
+`Error("Unavailable")` instead of repeating `Result<int,string>.Error(...)`, with
+the same principle applying to Option and other imported cases. The assistant
+agreed and tried the simpler spelling. The current reference library exposed a
+collision with System.Error; narrower imports also lost extension visibility.
+The assistant initially proposed documenting a temporary qualified spelling.
+
+The author then said “We should probably not keep System.Error” and explained that
+it predates the union convention. The assistant selected removal of the legacy
+message wrapper and its runtime support, while retaining the Result.Error union
+case and domain-specific error types. Simple message examples migrate to string
+payloads. This avoids adding a compiler name-resolution policy to preserve an
+obsolete API. Matching rebuilt references accept the imported Error constructor;
+all nine outcome-operator checks pass. The website and conventions now describe
+ordinary payloads and the breaking development migration. Validation includes 70
+focused Rust tests, 251 signature checks, nine outcome checks, six String admission
+cases, 25 saved-project checks, the ten existing completion-model scenarios and the
+VS Code demo build/run. The wider Rust suite is still running at commit time; its
+stale removed-type/helper-count fixtures were corrected and the affected groups
+passed on rerun. This does not change published Preview 8.

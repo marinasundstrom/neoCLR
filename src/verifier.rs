@@ -654,8 +654,7 @@ fn effect(
         | LoadTypeToken(_)
         | SizeOf(_)
         | AlignOf(_)
-        | NullPointer(_)
-        | Error(_) => (0, 1),
+        | NullPointer(_) => (0, 1),
         Return => (usize::from(!function.no_result), 0),
         Pop | Store(_) | StoreArg(_) | BranchTrue(_) | BranchFalse(_) | Switch(_)
         | InitializeObject(_) => (1, 0),
@@ -941,7 +940,6 @@ fn typed_effect(
         Float32 { .. } | Float64 { .. } => one(T::Double),
         Bool(_) => one(T::Boolean),
         String(_) => one(T::String),
-        Error(_) => one(T::Error),
         Void => one(T::Void),
         Receiver {
             argument,

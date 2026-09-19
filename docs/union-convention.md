@@ -82,7 +82,7 @@ identity and ordinary nesting must be implemented before that library migration.
 
 Some<Void> contains a real Void payload and differs from None. Ok<Void> is valid.
 Ok<T> and Err<T> remain distinct for Result<T,T>. Error parameters are unconstrained;
-they need not derive from System.Error. Nested carriers retain their closed type and
+they do not require an error base class. Nested carriers retain their closed type and
 copy semantics. Each carrier stores one private System.Value and composes ordinary
 constructors, fields and [explicit type-erasure operations](value-storage.md). It has
 no tag table, union-specific opcodes or runtime service binding by carrier name.

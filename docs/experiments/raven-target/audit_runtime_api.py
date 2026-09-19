@@ -15,7 +15,7 @@ args = parser.parse_args()
 source = json.loads((HERE / 'runtime-api-inventory.json').read_text())
 groups = {
     'primitives': ('Boolean String SByte Byte Int16 UInt16 Char UInt32 Int64 UInt64 Single Double IntPtr UIntPtr Int32', ['library-primitives.rvn', 'library-integers.rvn', 'library-booleans.rvn', 'library-strings.rvn', 'library-parsing.rvn', 'library-division.rvn']),
-    'errors': ('Error InvalidRangeError Int32ParseError OverflowError IntegerDivisionError Utf8SliceError ConsoleReadError FileReadError FileWriteError InvalidDateError InvalidTimeError EnvironmentError', ['library-errors.rvn']),
+    'errors': ('InvalidRangeError Int32ParseError OverflowError IntegerDivisionError Utf8SliceError ConsoleReadError FileReadError FileWriteError InvalidDateError InvalidTimeError EnvironmentError', ['library-errors.rvn']),
     'unions': ('Option Result Propagatable', ['library-case-payloads.rvn', 'library-unions.rvn', 'library-result-void-propagation.rvn', 'library-reference-payloads.rvn']),
     'interfaces': ('Equatable Comparable Disposable', ['library-value-interfaces.rvn', 'library-interfaces.rvn']),
     'unimplemented-contracts': ('Clonable Closable', []),
@@ -38,7 +38,10 @@ for file in source['sourceFiles']:
         callers = []
         for entry in entries:
             name = entry['declaration'].split('(')[0].split()[-1]
-            for candidate in source['sourceFiles']:
+            # The source inventory starts at System.neoil; the Raven profile also
+            # supplies generated adapters (for example String scalar access).
+            candidates = dict.fromkeys([*source['sourceFiles'], *[str(p.relative_to(ROOT)) for p in (ROOT / 'runtime/raven/generated').glob('*.helpers.neoil')]])
+            for candidate in candidates:
                 if candidate == file:
                     continue
                 for line, text in enumerate((ROOT / candidate).read_text().splitlines(), 1):
@@ -52,6 +55,11 @@ for file in source['sourceFiles']:
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-intrinsic-marker',
                      'tests': ['docs/experiments/raven-target/verify_marker_library.py', 'tests/raven_reflection.rs'],
                      'note': 'Empty Raven root/attribute declarations; checked empty constructors project to the existing runtime marker ABI. Compiler-facing Object members and attribute recognition remain metadata protocol.'})
+        continue
+    if file == 'runtime/raven/UnicodeScalar.neoil' or file.startswith('runtime/raven/generated/UnicodeScalar.'):
+        rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-unicode-scalar',
+                     'samples': ['library-grapheme-strings.rvn'], 'tests': ['tests/grapheme_chars.rs'],
+                     'note': 'Explicit Unicode scalar access complements grapheme-based Char; it is not an encoding-specific String type.'})
         continue
     if file.startswith('runtime/raven/generated/BindingFlags.'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-enum-declaration',
@@ -133,11 +141,11 @@ for file in source['sourceFiles']:
                      'tests': ['tests/propagation.rs', 'docs/experiments/raven-target/verify_propagation_library.py'],
                      'note': 'Exact generic positions and out metadata preserve readonly receivers and true-only output initialization.'})
         continue
-    if file.startswith(('runtime/raven/generated/String.', 'runtime/raven/generated/Error.')):
+    if file.startswith('runtime/raven/generated/String.'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-opaque-bootstrap',
                      'samples': ['library-strings.rvn', 'library-string-slices.rvn', 'library-errors.rvn'],
                      'tests': ['tests/strings.rs', 'tests/errors.rs', 'docs/experiments/raven-target/verify_opaque_library.py'],
-                     'note': 'Checked intrinsic String storage and fieldless Error bodies retain native ownership and mixed receiver ABI. Compiler operators remain intrinsic; opaque allocation and storage mutation are rejected.'})
+                     'note': 'Checked intrinsic String storage retains native ownership and its receiver ABI. Compiler operators remain intrinsic; opaque allocation and storage mutation are rejected.'})
         continue
     if file.startswith('runtime/raven/generated/Char.'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-char-struct',
@@ -185,7 +193,7 @@ result['targetProfileAdditions'] = [{
     'tests': ['docs/experiments/raven-target/verify_interface_library.py', 'tests/instant_clock.rs'],
     'note': 'Checked nongeneric interface declaration with unchanged Now property. SystemClock remains runtime-backed; Info interface identity migration is separate.'
 }, {
-    'file': 'runtime/raven/TypeInfo.neoil',
+    'file': 'runtime/raven/src/System/Introspection/Descriptors.rvn',
     'disposition': 'raven-authored-type-info',
     'samples': ['library-reflection.rvn', 'library-flags.rvn'],
     'tests': ['docs/experiments/raven-target/verify_type_library.py', 'docs/experiments/raven-target/verify_introspection_namespace.py'],
@@ -197,11 +205,11 @@ result['targetProfileAdditions'] = [{
     'tests': ['docs/experiments/raven-target/verify_parameter_info_library.py', 'docs/experiments/raven-target/verify_introspection_namespace.py'],
     'note': 'Six parameter snapshot readers are Raven-authored. The importer validates field order/types; runtime factories still produce snapshots. The inherited member hierarchy and its array copies are Raven-authored in Descriptors.rvn.'
 }, {
-    'file': 'runtime/raven/Type.neoil',
-    'disposition': 'raven-authored-type',
+    'file': 'runtime/raven/RuntimeContext.neoil',
+    'disposition': 'raven-authored-runtime-context',
     'samples': ['library-reflection.rvn', 'library-array-unified.rvn'],
     'tests': ['tests/raven_reflection.rs', 'docs/experiments/raven-target/verify_type_library.py'],
-    'note': 'Raven Type owns identity and shape. Member, base/interface and enum metadata are queried through the Raven-authored TypeInfo using the same handle. No public described-object construction API.'
+    'note': 'RuntimeContext exposes ExecutingAssembly and type lookup. Object.GetType returns TypeInfo; the old public Type class is retired. Descriptive queries do not construct described objects.'
 }, {
     'file': 'runtime/raven/Map.neoil',
     'disposition': 'experimental-map-contracts-with-raven-implementation',

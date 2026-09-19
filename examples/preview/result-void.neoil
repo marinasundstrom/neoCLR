@@ -2,30 +2,28 @@
 .entry Main
 
 ; Void is a generic unit payload. An ordinary void call has no evaluation-stack result.
-.function Complete() -> System.Result<Void,Error>
+.function Complete() -> System.Result<Void,String>
     ldvoid
     newobj instance System.Result.Ok<Void>::.ctor(Void)
-    newobj instance System.Result<Void,Error>::.ctor(System.Result.Ok<Void>)
+    newobj instance System.Result<Void,String>::.ctor(System.Result.Ok<Void>)
     ret
 .end
-.function Reject() -> System.Result<Void,Error>
+.function Reject() -> System.Result<Void,String>
     ldstr "Not saved"
-    call System.Error::FromMessage(String)
-    newobj instance System.Result.Error<Error>::.ctor(Error)
-    newobj instance System.Result<Void,Error>::.ctor(System.Result.Error<Error>)
+    newobj instance System.Result.Error<String>::.ctor(String)
+    newobj instance System.Result<Void,String>::.ctor(System.Result.Error<String>)
     ret
 .end
 .function Main() -> void
     call Complete()
-    call instance System.Result<Void,Error>::get_IsOkCase()
+    call instance System.Result<Void,String>::get_IsOkCase()
     brfalse Unexpected
     ldstr "Completed"
     call System.Console::WriteLine(String)
     pop
     call Reject()
-    call instance System.Result<Void,Error>::GetErrorCase()
-    call instance System.Result.Error<Error>::get_Value()
-    call instance System.Error::ToString()
+    call instance System.Result<Void,String>::GetErrorCase()
+    call instance System.Result.Error<String>::get_Value()
     call System.Console::WriteLine(String)
     pop
     ret

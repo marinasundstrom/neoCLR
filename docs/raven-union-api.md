@@ -7,12 +7,16 @@ String, Date/Time/LocalDateTime, error values and nested Option/Result shapes ar
 supported; arbitrary application types and reference payloads remain separate work.
 
 ```raven
-let outcome = Result<long, Error>.Ok(42L)
-if outcome.IsOk {
-    let value = outcome.GetOkCase().Value
+import System.*
+import System.Result.*
+import System.Option.*
+
+let outcome: Result<long, string> = Ok(42L)
+if outcome is Ok(let value) {
+    Console.WriteLine(value)
 }
-let failure = Result<long, Error>.Error(Error.FromMessage("Failure"))
-let missing = Option<string>(Option.None())
+let failure: Result<long, string> = Error("Failure")
+let missing: Option<string> = None
 ```
 
 The surface includes case constructors and Value access, carrier constructors,

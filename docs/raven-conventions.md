@@ -69,6 +69,25 @@ func FindPrice(product: int) -> Option<int> {
 let price: Option<int> = Some(42)
 ```
 
+Imported cases also avoid qualified Result factories when the expected carrier is
+known:
+
+```raven
+import System.*
+import System.Result.*
+
+let failure: Result<int, string> = Error("Unavailable")
+```
+
+Prefer this to repeating `Result<int, string>.Error("Unavailable")` on the right.
+The same rule applies to Option and other imported union cases throughout runtime
+code, samples, tests and website content. Keep qualification when required to
+resolve a name or provide type information that cannot otherwise be inferred.
+
+The development library removes the legacy `System.Error` message wrapper that
+collided with this case name. Rebuild the reference library and callers together;
+older SDK/reference bundles can still require qualification.
+
 The return type or annotation supplies the carrier type. Keep that context: an
 unannotated case construction can infer the case type instead of the intended
 carrier. Qualify a constructor when required to disambiguate a name. The desired

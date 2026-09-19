@@ -6,7 +6,7 @@
     .field Y int32
 .end
 
-.function Main() -> System.Result<Void,Error>
+.function Main() -> System.Result<Void,String>
     .local Point* point
     .local Point copy
 
@@ -72,6 +72,6 @@ CopyPassed:
     ptr.null Point
     heap.free
     newobj instance System.Result.Ok<Void>::.ctor(Void)
-    newobj instance System.Result<Void,Error>::.ctor(System.Result.Ok<Void>)
+    newobj instance System.Result<Void,String>::.ctor(System.Result.Ok<Void>)
     ret
 .end

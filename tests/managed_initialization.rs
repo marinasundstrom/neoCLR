@@ -104,8 +104,8 @@ fn initobj_fulfills_outputs_without_reading_uninitialized_destinations() {
     // its body is specialized and executed without running the verifier.
     let bad = program(
         extra,
-        ".local Error value\nldloca value\ncall Defaults<Error>::Reset(Error&)\npop\nldloc value",
-        "Error",
+        ".local System.Value value\nldloca value\ncall Defaults<System.Value>::Reset(System.Value&)\npop\nldloc value",
+        "System.Value",
     )
     .unwrap();
     assert!(
@@ -137,7 +137,6 @@ fn field_initialization_respects_output_paths() {
 #[test]
 fn invalid_defaults_and_mismatched_destinations_are_rejected() {
     for ty in [
-        "Error",
         "System.Value",
         "RuntimeTypeHandle",
         "Int32&",

@@ -10,9 +10,6 @@ static class LibraryImplementation
     // managed-byref struct receiver. Intrinsic field reads accept either form.
     public static bool IsByValueReceiver(MethodReference method) =>
         EmptyLibrary.IsByValueReceiver(method) || GenericUnionLibrary.IsByValueReceiver(method) || ErrorCarrierLibrary.IsByValueReceiver(method) ||
-        (ApplicationTypes.IsLibrary(method.DeclaringType) && method.DeclaringType.FullName == "System.Error"
-            && method.Name is "get_Message" or "ToString" && method.HasThis && !method.HasParameters
-            && method.ReturnType.MetadataType == MetadataType.String) ||
         PrimitiveLibrary.IsMatched(method.DeclaringType.Resolve())
         && method.DeclaringType.FullName == "System.Int32" && method.Name == "ToString"
         && method.HasThis && !method.HasParameters && method.ReturnType.MetadataType == MetadataType.String;

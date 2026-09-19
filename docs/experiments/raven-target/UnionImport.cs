@@ -232,8 +232,6 @@ static class UnionImport
                     case Code.Nop: break;
                     case Code.Initobj:
                         var initializedType = ProfileType((TypeReference)instruction.Operand);
-                        if (libraryOwner == "System.Error" && initializedType == "System.Error")
-                            throw new InvalidDataException("Opaque Error requires a runtime factory.");
                         var address = Expect(initializedType + "&");
                         if (address.Local < 0) throw new InvalidDataException("Only local initialization is admitted.");
                         if (initializedType is Carrier or Option or VoidOption or VoidResult || NeedsInitialization(initializedType))
@@ -358,9 +356,7 @@ static class UnionImport
                         if (libraryOwner is null || !copiedToken.IsValueType || copiedToken.Resolve()?.IsValueType != true || !ApplicationTypes.IsLibrary(copiedToken))
                             throw new InvalidDataException("Only matched library value loads are admitted.");
                         var copiedType = ProfileType(copiedToken);
-                        // Error's public neoIL receiver is an opaque value, although CLI
-                        // struct bodies load it through the managed address of this.
-                        if (LibraryImplementation.IsByValueReceiver(method) && (copiedType == "System.Error" || GenericUnionLibrary.IsMatched(method.DeclaringType))
+                        if (LibraryImplementation.IsByValueReceiver(method) && GenericUnionLibrary.IsMatched(method.DeclaringType)
                             && stack.Count > 0 && stack[^1].Type == copiedType && stack[^1].Argument == 0)
                         {
                             Pop(); Push(new(copiedType)); break;
@@ -466,7 +462,7 @@ static class UnionImport
                         var constructorDefinition = constructor.Resolve() ?? throw new InvalidDataException("Unresolved constructor.");
                         if (ArrayLibrary.IsMatched(constructorDefinition.DeclaringType)) throw new InvalidDataException("Managed arrays require intrinsic allocation.");
                         if (ApplicationTypes.IsLibrary(constructor.DeclaringType)
-                            && constructor.DeclaringType.FullName is "System.Error" or "System.String")
+                            && constructor.DeclaringType.FullName == "System.String")
                             throw new InvalidDataException("Opaque library storage requires a runtime factory.");
                         if (ApplicationTypes.IsModule(constructorDefinition.Module))
                         {
@@ -783,7 +779,7 @@ static class UnionImport
             if (method.Body.InitLocals)
                 for (var n = 0; n < locals.Length; n++)
                 {
-                    if (ApplicationTypes.LibraryUnionRequiresInitialization(locals[n]) || locals[n] == "System.Error" || ErrorBindings.Cases.TryGetValue(locals[n], out var errorCases) && errorCases.Length > 0) continue;
+                    if (ApplicationTypes.LibraryUnionRequiresInitialization(locals[n]) || ErrorBindings.Cases.TryGetValue(locals[n], out var errorCases) && errorCases.Length > 0) continue;
                     if (ApplicationTypes.IsType(locals[n]) || ReflectionBindings.IsType(locals[n]) && locals[n] != "System.RuntimeTypeHandle" || ManagedArrayBindings.IsType(locals[n]) || CollectionBindings.IsReference(locals[n]) || CalendarBindings.Types.Contains(locals[n]) || GenericUnionBindings.IsType(locals[n]) && !GenericUnionBindings.RequiresInitialization(locals[n])) output.AppendLine($"ldloca local{n}\ninitobj {locals[n]}");
                     else if (!method.GenericParameters.Concat(method.DeclaringType.GenericParameters).Any(p => locals[n] == "T" + p.Position) && locals[n] != Carrier && locals[n] != Option && locals[n] != VoidOption && locals[n] != VoidResult && locals[n] != "String" && !NeedsInitialization(locals[n])) output.AppendLine(Default(locals[n]) + $"\nstloc local{n}");
                 }

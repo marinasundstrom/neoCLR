@@ -225,8 +225,7 @@ try:
     if errors:
         for version, expression, expected in (
             (20, 'System.IO.FileReadError.', ('NotFound', 'AccessDenied')),
-            (21, 'error.', ('IsNotFound', 'GetNotFound', 'ToString')),
-            (22, 'System.Error.', ('FromMessage',))):
+            (21, 'error.', ('IsNotFound', 'GetNotFound', 'ToString'))):
             text = 'func Main() {\n    let error = System.IO.FileReadError(System.IO.FileReadError.NotFound())\n    ' + expression + '\n}'
             send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})
             result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},

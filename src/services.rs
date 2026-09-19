@@ -21,7 +21,6 @@ pub enum RuntimeService {
     WallClock,
     ProcessEnvironment,
     PathOperations,
-    ErrorValues,
     FileInput,
     FileOutput,
     ConsoleInput,
@@ -77,9 +76,6 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             crate::native::Binding::ConsoleReadByte => RuntimeService::ConsoleInput,
             crate::native::Binding::WriteAllText => RuntimeService::FileOutput,
             crate::native::Binding::ReadAllText => RuntimeService::FileInput,
-            crate::native::Binding::ErrorFromMessage | crate::native::Binding::ErrorMessage => {
-                RuntimeService::ErrorValues
-            }
             crate::native::Binding::ParseInt32 => RuntimeService::ParseInt32,
             crate::native::Binding::Int32ToString => RuntimeService::FormatInt32,
             crate::native::Binding::WriteLine => RuntimeService::ConsoleOutput,
@@ -325,7 +321,6 @@ fn instruction_services(op: &Op) -> &'static [RuntimeService] {
         | Op::AlignOf(..)
         | Op::NullPointer(..)
         | Op::PointerCast(..)
-        | Op::Error(..)
         | Op::Fault(..) => &[],
     }
 }

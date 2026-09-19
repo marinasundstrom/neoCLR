@@ -95,7 +95,8 @@ Boolean/union adapters and a larger call graph, without a performance claim.
 The payload-free error types (InvalidRangeError, InvalidDateError, InvalidTimeError,
 OverflowError and EnvironmentError) and Void are also Raven-authored.
 Their runtime defaults/constructors remain distinct from opaque Error: an empty
-error is valid, while a message Error requires a real payload. Bootstrap metadata
+error is valid. Message failures use ordinary strings; the legacy Error wrapper is
+retired. Bootstrap metadata
 normalization removes only artificial empty-struct byte sizes, then checks the
 source shape and public methods. No new error cases or proposal APIs are introduced.
 
@@ -406,8 +407,8 @@ on Raven main independently of the experimental target; the System migration mus
 not compensate with target-specific binding rules.
 
 The source imports `System.Result.*` and constructs `Ok`/`Error` directly. It uses
-specific error-type imports to avoid a collision with the separate `System.Error`
-type, and fully qualifies `System.Result<...>` in return annotations. The observed
+specific error-type imports (originally needed to avoid the now-retired `System.Error`
+name), and fully qualifies `System.Result<...>` in return annotations. The observed
 unqualified-return diagnostic issue was fixed independently; see the
 [resolution follow-up](raven-target-evaluation.md#resolution-follow-up--2026-09-14).
 

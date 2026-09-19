@@ -8,8 +8,7 @@ static class OpaqueLibrary
     public static bool IsByRefString(MethodReference method) => IsString(method.DeclaringType.Resolve())
         && method.HasThis && method.Name is "Equals" or "ContainsOrdinal" or "StartsWithOrdinal" or "EndsWithOrdinal" or "GetIterator";
     public static bool IsOmittedConstructor(MethodDefinition method) =>
-        method.DeclaringType.FullName == "System.Error" && PrimitiveLibrary.IsDefaultConstructor(method)
-        || method.DeclaringType.FullName == "System.String" && IsStringConstructor(method);
+        method.DeclaringType.FullName == "System.String" && IsStringConstructor(method);
     static bool IsStringConstructor(MethodDefinition method)
     {
         if (!method.IsConstructor || !method.IsPublic || method.IsStatic || method.HasParameters

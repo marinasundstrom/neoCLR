@@ -62,7 +62,7 @@ The prototype now uses System.Result.Error<T>, System.Result.Ok<T>,
 System.Option.Some<T> and System.Option.None as ordinary nested case types.
 The older top-level wrappers and their extraction methods have been removed, and
 callers must reassemble against the new library. The nested Result.Error case is
-distinct from the message-bearing System.Error payload type.
+independent of the error payload type (the legacy System.Error message wrapper is retired).
 
 ## Required ordinary metadata foundation
 

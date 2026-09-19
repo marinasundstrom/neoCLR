@@ -39,7 +39,7 @@ fn numeric_and_named_operands_emit_identical_instruction_bodies() {
 
 #[test]
 fn mixed_unnamed_and_named_slots_and_legacy_params_are_supported() {
-    let source = ".module Test\n.entry Main\n.function F(System.Result<Void,Error>, System.Option<Ptr<Int32>> p) -> Void\nldarg p\npop\nldvoid\nret\n.end\n.function Legacy -> Int32\n.param int32 value\n.local int32\n.local int32 value\nldarg value\nstloc value\nldloc 1\nret\n.end\n.function Main() -> Int32\nldc.i4 42\ncall Legacy(int32)\nret\n.end";
+    let source = ".module Test\n.entry Main\n.function F(System.Result<Void,String>, System.Option<Ptr<Int32>> p) -> Void\nldarg p\npop\nldvoid\nret\n.end\n.function Legacy -> Int32\n.param int32 value\n.local int32\n.local int32 value\nldarg value\nstloc value\nldloc 1\nret\n.end\n.function Main() -> Int32\nldc.i4 42\ncall Legacy(int32)\nret\n.end";
     let module = assemble(source).unwrap();
     assert_eq!(
         module.functions[0].parameter_names,
@@ -129,7 +129,7 @@ fn loader_validates_name_tables_and_accepts_omitted_legacy_tables() {
 
 #[test]
 fn type_first_slots_preserve_nested_types_and_whitespace() {
-    let source = ".module Test\n.function F(System.Result<Int32, Error> result, System.Option<Ptr<Int32>> , Int32 * pointer) -> Void\n.local System.Result<Int32, Error> copy\n.local System.Option<Ptr<Int32>>\n.local Int32 *   address\nldarg result\nstloc copy\nldarg pointer\nstloc address\nldvoid\nret\n.end";
+    let source = ".module Test\n.function F(System.Result<Int32, String> result, System.Option<Ptr<Int32>> , Int32 * pointer) -> Void\n.local System.Result<Int32, String> copy\n.local System.Option<Ptr<Int32>>\n.local Int32 *   address\nldarg result\nstloc copy\nldarg pointer\nstloc address\nldvoid\nret\n.end";
     let module = assemble(source).unwrap();
     let f = &module.functions[0];
     assert_eq!(
@@ -145,7 +145,7 @@ fn type_first_slots_preserve_nested_types_and_whitespace() {
         f.parameters[0],
         Type::Constructed {
             definition: "System.Result".into(),
-            arguments: vec![Type::Int32, Type::Error]
+            arguments: vec![Type::Int32, Type::String]
         }
     );
     let loaded = load(&serde_json::to_string(&module).unwrap()).unwrap();
@@ -189,6 +189,6 @@ fn unnamed_type_first_parameters_and_locals_execute_by_index() {
 }
 
 fn ordinary_success() -> Value {
-    let module = assemble(".module Expected\n.entry Main\n.function Main() -> System.Result<Void,Error>\nldvoid\nnewobj instance System.Result.Ok<Void>::.ctor(Void)\nnewobj instance System.Result<Void,Error>::.ctor(System.Result.Ok<Void>)\nret\n.end").unwrap();
+    let module = assemble(".module Expected\n.entry Main\n.function Main() -> System.Result<Void,String>\nldvoid\nnewobj instance System.Result.Ok<Void>::.ctor(Void)\nnewobj instance System.Result<Void,String>::.ctor(System.Result.Ok<Void>)\nret\n.end").unwrap();
     neoclr::run(&module, Limits::default()).unwrap().value
 }

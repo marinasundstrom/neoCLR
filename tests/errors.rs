@@ -1,6 +1,4 @@
-use neoclr::{
-    Limits, LoadedProgram, RuntimeService, Value, assemble, assembler::parse_function_ref,
-};
+use neoclr::{Limits, LoadedProgram, Value, assemble, assembler::parse_function_ref};
 
 #[test]
 fn sample_handles_parse_and_domain_errors_and_continues() {
@@ -23,42 +21,6 @@ fn sample_handles_parse_and_domain_errors_and_continues() {
 }
 
 #[test]
-fn owned_error_messages_preserve_empty_unicode_and_embedded_nul() {
-    let program = LoadedProgram::new(&assemble(".module App").unwrap()).unwrap();
-    let create = program
-        .resolve_function(&parse_function_ref("System.Error::FromMessage(String)").unwrap())
-        .unwrap();
-    let message = program
-        .resolve_function(&parse_function_ref("instance System.Error::get_Message()").unwrap())
-        .unwrap();
-    let format = program
-        .resolve_function(&parse_function_ref("instance System.Error::ToString()").unwrap())
-        .unwrap();
-    for text in ["", "bad value", "é 🌍", "before\0after"] {
-        let original = Value::String(text.into());
-        let error = create
-            .invoke(vec![original.clone()], Limits::default())
-            .unwrap()
-            .value;
-        assert_eq!(error, Value::Error(text.into()));
-        assert_eq!(
-            message
-                .invoke_instance(error.clone(), vec![], Limits::default())
-                .unwrap()
-                .value,
-            original
-        );
-        assert_eq!(
-            format
-                .invoke_instance(error, vec![], Limits::default())
-                .unwrap()
-                .value,
-            original
-        );
-    }
-}
-
-#[test]
 fn result_error_payloads_can_be_imported_and_formatted_without_faults() {
     let program =
         LoadedProgram::new(&assemble(include_str!("../examples/errors.neoil")).unwrap()).unwrap();
@@ -66,7 +28,7 @@ fn result_error_payloads_can_be_imported_and_formatted_without_faults() {
         .resolve_function(&parse_function_ref("ReadPositive(String)").unwrap())
         .unwrap();
     let report = program
-        .resolve_function(&parse_function_ref("Report(System.Result<Int32,Error>)").unwrap())
+        .resolve_function(&parse_function_ref("Report(System.Result<Int32,String>)").unwrap())
         .unwrap();
     let result = read
         .invoke(vec![Value::String("0".into())], Limits::default())
@@ -74,12 +36,12 @@ fn result_error_payloads_can_be_imported_and_formatted_without_faults() {
         .value;
     let get_error = program
         .resolve_function(
-            &parse_function_ref("instance System.Result<Int32,Error>::GetErrorCase()").unwrap(),
+            &parse_function_ref("instance System.Result<Int32,String>::GetErrorCase()").unwrap(),
         )
         .unwrap();
     let get_value = program
         .resolve_function(
-            &parse_function_ref("instance System.Result.Error<Error>::get_Value()").unwrap(),
+            &parse_function_ref("instance System.Result.Error<String>::get_Value()").unwrap(),
         )
         .unwrap();
     let wrapper = get_error
@@ -91,7 +53,7 @@ fn result_error_payloads_can_be_imported_and_formatted_without_faults() {
             .invoke_instance(wrapper, vec![], Limits::default())
             .unwrap()
             .value,
-        Value::Error("Expected a positive number: 0".into())
+        Value::String("Expected a positive number: 0".into())
     );
     assert_eq!(
         report
@@ -107,58 +69,19 @@ fn result_error_payloads_can_be_imported_and_formatted_without_faults() {
 }
 
 #[test]
-fn input_errors_and_execution_faults_stay_separate_from_error_values() {
+fn legacy_message_error_api_and_instruction_are_retired() {
     let program = LoadedProgram::new(&assemble(".module App").unwrap()).unwrap();
-    let create = program
-        .resolve_function(&parse_function_ref("System.Error::FromMessage(String)").unwrap())
-        .unwrap();
-    let invalid = create
-        .invoke(vec![Value::Error("not a String".into())], Limits::default())
-        .unwrap_err();
-    assert!(invalid.stack_trace.is_none());
-    let fault = create
-        .invoke(
-            vec![Value::String("message".into())],
-            Limits {
-                instructions: 0,
-                ..Limits::default()
-            },
-        )
-        .unwrap_err();
-    assert_eq!(
-        fault.stack_trace.unwrap().frames[0].function.name,
-        "System.Error.FromMessage"
-    );
-    assert_eq!(
-        create
-            .invoke(vec![Value::String("still valid".into())], Limits::default())
+    assert!(
+        neoclr::library::system()
             .unwrap()
-            .value,
-        Value::Error("still valid".into())
-    );
-}
-
-#[test]
-fn error_methods_are_il_wrappers_over_declared_services() {
-    let program = LoadedProgram::new(&assemble(".module App").unwrap()).unwrap();
-    let graph = program
-        .analyze_reachability(
-            &[parse_function_ref("instance System.Error::ToString()").unwrap()],
-            3,
-        )
-        .unwrap();
-    assert_eq!(
-        graph
-            .functions
+            .types
             .iter()
-            .map(|f| f.target.name.as_str())
-            .collect::<Vec<_>>(),
-        [
-            "System.Error.ToString",
-            "System.Error.get_Message",
-            "neoCLR.Runtime.ErrorMessage"
-        ]
+            .all(|ty| ty.name != "System.Error")
     );
-    assert_eq!(graph.required_services(), [RuntimeService::ErrorValues]);
-    assert_eq!(graph.missing_services(&[])[0].instruction, None);
+    assert!(
+        program
+            .resolve_function(&parse_function_ref("System.Error::FromMessage(String)").unwrap())
+            .is_err()
+    );
+    assert!(assemble(".module App\n.function Main() -> Void\nerror \"old\"\nret\n.end").is_err());
 }

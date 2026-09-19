@@ -51,7 +51,6 @@ Duplicate entries in the supplied service set have no additional effect.
 | ConsoleInput | Validated ConsoleReadByte InternalCall |
 | FileOutput | Bounded UTF-8 file creation/replacement through WriteAllText |
 | FileInput | Validated bounded ReadAllText InternalCall |
-| ErrorValues | Validated ErrorFromMessage and ErrorMessage InternalCalls |
 
 heap.alloc/free report both NativeAllocation and PointerMemory; localloc reports both
 FrameAllocation and PointerMemory. PointerMemory names the current pointer-access and

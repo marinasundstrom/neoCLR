@@ -225,7 +225,7 @@ The [type arity sample](docs/type-arities.md) lets a non-generic companion coexi
 The [console sample](docs/console-io.md) prompts for a number, reads input, and doubles it.
 The string sample demonstrates Unicode text and recoverable slice Errors. The
 [file-input sample](docs/file-input.md) reads text, computes a result, and handles invalid input. The
-[error sample](docs/errors.md) constructs and reports Error messages, then continues. The array
+[error sample](docs/errors.md) constructs and reports Result error messages, then continues. The array
 sample prints `10`, `42`, `10` and frees its buffer. The bounds sample deliberately
 terminates with a nonzero exit code and a Fault stack trace; that failure is expected.
 
@@ -248,7 +248,7 @@ to select a runtime library; see the [CLI module workflow](docs/cli-module-sets.
 ### More samples
 
 The feature tour checks record copying, explicit heap identity, free functions,
-loops, arithmetic, Option<Void>, and Result<Void,Error>. The additional samples
+loops, arithmetic, Option<Void>, and Result<Void,String>. The additional samples
 cover the implemented instruction set:
 
 ```sh
@@ -339,7 +339,7 @@ See [module sets](docs/module-sets.md) and [runtime library design](docs/runtime
   conversions, and native storage; see [native integers](docs/native-integers.md).
 - Native `Ptr<T>`/`T*` values, explicit heap allocation/free, casts, byte offsets,
   field addresses, typed loads/stores, and native-sized pointer fields.
-- `Void`, `Int32`, `Boolean`, `String`, `Error`, records, and constructed
+- `Void`, `Int32`, `Boolean`, `String`, records, and constructed
   `Option<T>` and `Result<T,E>` types, including nested uses of `Void`, plus managed `T&` references.
 - An iterative interpreter with explicit call frames and an IL-style evaluation stack.
 - Frame-owned aggregate copying and explicit heap allocation/sharing.
@@ -349,7 +349,7 @@ See [module sets](docs/module-sets.md) and [runtime library design](docs/runtime
   `System.Console.WriteLine`, `System.Int32.Parse`, `System.Int32.Divide`, and
   `System.Math.Abs`, plus instance `Int32.ToString()`, assembled into the same metadata/IL representation as apps.
 - Explicit `.pinvoke` imports with dynamic library loading and scalar/pointer C-ABI calls.
-- Explicit bootstrap host bindings for console I/O, text, Error values, file input, and numeric conversion,
+- Explicit bootstrap host bindings for console I/O, text, file input, and numeric conversion,
   explicitly declared with CLR-style `MethodImpl`/`InternalCall` metadata.
 - Configurable limits on instruction count, call depth, stack slots per frame,
   explicit heap object count, native payload bytes, and allocation identities.

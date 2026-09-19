@@ -58,8 +58,8 @@ fn void_is_a_value_and_a_generic_argument() {
         Type::Constructed { definition: "System.Result".into(), arguments: vec![Type::Void, Type::Void] }
     );
     assert_eq!(
-        eval("System.Option<System.Result<Void,Error>>", "ldvoid\nnewobj instance System.Result.Ok<Void>::.ctor(Void)\nnewobj instance System.Result<Void,Error>::.ctor(System.Result.Ok<Void>)\nnewobj instance System.Option.Some<System.Result<Void,Error>>::.ctor(System.Result<Void,Error>)\nnewobj instance System.Option<System.Result<Void,Error>>::.ctor(System.Option.Some<System.Result<Void,Error>>)\nret").ty(),
-        Type::Constructed { definition: "System.Option".into(), arguments: vec![Type::Constructed { definition: "System.Result".into(), arguments: vec![Type::Void, Type::Error] }] }
+        eval("System.Option<System.Result<Void,String>>", "ldvoid\nnewobj instance System.Result.Ok<Void>::.ctor(Void)\nnewobj instance System.Result<Void,String>::.ctor(System.Result.Ok<Void>)\nnewobj instance System.Option.Some<System.Result<Void,String>>::.ctor(System.Result<Void,String>)\nnewobj instance System.Option<System.Result<Void,String>>::.ctor(System.Option.Some<System.Result<Void,String>>)\nret").ty(),
+        Type::Constructed { definition: "System.Option".into(), arguments: vec![Type::Constructed { definition: "System.Result".into(), arguments: vec![Type::Void, Type::String] }] }
     );
 }
 
@@ -67,19 +67,19 @@ fn void_is_a_value_and_a_generic_argument() {
 fn arithmetic_failures_are_errors_when_requested() {
     for (body, expected) in [
         (
-            "ldc.i4 1\nldc.i4 0\ncall System.Int32.Divide(int32, int32)\ncall instance System.Result<Int32,System.IntegerDivisionError>::GetErrorCase()\ncall instance System.Result.Error<System.IntegerDivisionError>::get_Value()\ncall instance System.IntegerDivisionError::ToString()\ncall System.Error::FromMessage(String)\nret",
+            "ldc.i4 1\nldc.i4 0\ncall System.Int32.Divide(int32, int32)\ncall instance System.Result<Int32,System.IntegerDivisionError>::GetErrorCase()\ncall instance System.Result.Error<System.IntegerDivisionError>::get_Value()\ncall instance System.IntegerDivisionError::ToString()\nret",
             "DivisionByZero",
         ),
         (
-            "ldc.i4 -2147483648\nldc.i4 -1\ncall System.Int32.Divide(int32, int32)\ncall instance System.Result<Int32,System.IntegerDivisionError>::GetErrorCase()\ncall instance System.Result.Error<System.IntegerDivisionError>::get_Value()\ncall instance System.IntegerDivisionError::ToString()\ncall System.Error::FromMessage(String)\nret",
+            "ldc.i4 -2147483648\nldc.i4 -1\ncall System.Int32.Divide(int32, int32)\ncall instance System.Result<Int32,System.IntegerDivisionError>::GetErrorCase()\ncall instance System.Result.Error<System.IntegerDivisionError>::get_Value()\ncall instance System.IntegerDivisionError::ToString()\nret",
             "Overflow",
         ),
         (
-            "ldstr \"2147483648\"\ncall System.Int32.Parse(string)\ncall instance System.Result<Int32,System.Int32ParseError>::GetErrorCase()\ncall instance System.Result.Error<System.Int32ParseError>::get_Value()\ncall instance System.Int32ParseError::ToString()\ncall System.Error::FromMessage(String)\nret",
+            "ldstr \"2147483648\"\ncall System.Int32.Parse(string)\ncall instance System.Result<Int32,System.Int32ParseError>::GetErrorCase()\ncall instance System.Result.Error<System.Int32ParseError>::get_Value()\ncall instance System.Int32ParseError::ToString()\nret",
             "Overflow",
         ),
     ] {
-        assert_eq!(eval("Error", body), Value::Error(expected.into()));
+        assert_eq!(eval("String", body), Value::String(expected.into()));
     }
     assert_eq!(
         eval(
@@ -410,7 +410,6 @@ fn all_implemented_opcodes_have_a_sample() {
         "ldind.i4",
         "stind.i4",
         "heap.new",
-        "error",
         "fault",
     ] {
         assert!(covered.contains(op), "sample missing {op}");
@@ -445,6 +444,6 @@ fn ordinary_arithmetic_preserves_cil_wrapping_behavior() {
 }
 
 fn ordinary_success() -> Value {
-    let module = assemble(".module Expected\n.entry Main\n.function Main() -> System.Result<Void,Error>\nldvoid\nnewobj instance System.Result.Ok<Void>::.ctor(Void)\nnewobj instance System.Result<Void,Error>::.ctor(System.Result.Ok<Void>)\nret\n.end").unwrap();
+    let module = assemble(".module Expected\n.entry Main\n.function Main() -> System.Result<Void,String>\nldvoid\nnewobj instance System.Result.Ok<Void>::.ctor(Void)\nnewobj instance System.Result<Void,String>::.ctor(System.Result.Ok<Void>)\nret\n.end").unwrap();
     neoclr::run(&module, Limits::default()).unwrap().value
 }

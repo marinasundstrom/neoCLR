@@ -26,7 +26,7 @@ func Main() {
     let fallback = absent.OrElse(() => Some(7))
     WriteLine(fallback.UnwrapOr(0))
 
-    let failure: Result<int, string> = Result<int, string>.Error("Unavailable")
+    let failure: Result<int, string> = Error("Unavailable")
     let recovered = failure.MapError(message => String.Concat("Read: ", message))
         .OrElse(message => {
             WriteLine(message)

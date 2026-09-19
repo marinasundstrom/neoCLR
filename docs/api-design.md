@@ -196,7 +196,7 @@ mutation, GC retention/reclamation, invalid frame escapes and automatic Neo acce
 | `Equatable<T>` | Readonly managed receiver and T input, aligned with Comparable. Preserve value equality, not reference identity; see [migration](equality.md). A separate reference-input comparison strategy remains future work |
 | `Option<T>` / `Result<T,E>` and case accessors | Constructors and extraction use values; keep independent extraction semantics. Review predicate receiver copying separately. Existing TryGet output contracts remain authoritative |
 | Numeric operations, Math, parsing | Scalar/value inputs and typed value results remain appropriate; parsing failure is an ordinary Result |
-| String, Error, Console, File text APIs | Current text/value inputs and results remain appropriate; host primitives and their wrappers must be changed together if reference inputs are later justified |
+| String, Console, File text APIs | Current text/value inputs and results remain appropriate; host primitives and their wrappers must be changed together if reference inputs are later justified |
 | Type / RuntimeTypeHandle | Descriptors and handles describe metadata identity without a boxing requirement. Use typeof(T) for declared types; TypeOf<T>.Of was removed in development on 2026-09-19. |
 | `System.Value` and internal runtime helpers | Bootstrap representation boundaries, not the model for new user-facing generic APIs; preserve explicit packing/unpacking and typed binding validation |
 

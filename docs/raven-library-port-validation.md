@@ -1,5 +1,11 @@
 # Raven library port: execution gate and branch audit
 
+Development follow-up (2026-09-19): the legacy System.Error wrapper and its runtime
+support are retired. Historical Error port notes below describe the earlier slice.
+Current opaque admission coverage has six String cases; simple message errors are
+ordinary strings carried by Result. See [the migration](errors.md).
+
+
 Development validation on 2026-09-19. This records the API-preserving source port;
 proposal API alignment remains subsequent work. The System.Runtime authoring
 project and implementation identity are now established. [Authoring status](raven-system-library.md) records the completed source boundary.

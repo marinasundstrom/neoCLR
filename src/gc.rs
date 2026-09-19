@@ -193,7 +193,6 @@ pub(crate) fn trace(value: &Value, references: &mut Vec<usize>) {
             | Value::UIntPtr(_)
             | Value::Boolean(_)
             | Value::String(_)
-            | Value::Error(_)
             | Value::RuntimeTypeHandle(_)
             | Value::Pointer(_)
             | Value::InterfaceRef { .. } => (),

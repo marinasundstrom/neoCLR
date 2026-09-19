@@ -155,7 +155,6 @@ impl Query {
                     | Type::IntPtr
                     | Type::UIntPtr
                     | Type::Boolean
-                    | Type::Error
                     | Type::Value
                     | Type::RuntimeTypeHandle
                     | Type::Array(_) => true,

@@ -16,7 +16,7 @@ Record packing caps field placement alignment; each nested layout retains its ow
 alignment and offsets. Minimum size is rounded to the record alignment. Closed generic
 field substitution uses the same target recursively. Pointers do not expand pointee
 layouts, so recursive pointer-bearing records remain finite. Existing recursion, depth,
-complexity, and prototype Int32 size limits still apply. String, Error, Ref, and bootstrap
+complexity, and prototype Int32 size limits still apply. String, Ref, and bootstrap
 union byte layouts remain unsupported; this does not prevent their interpreter value use.
 
 Descriptors are explicit numeric inputs, not named CPU profiles or a claim of matching

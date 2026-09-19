@@ -26,7 +26,7 @@ fn overload_sample_resolves_by_type_and_arity_and_round_trips() {
 #[test]
 fn signatures_parse_aliases_and_nested_generic_commas() {
     let target = parse_function_ref(
-        "Choose ( System.Result<System.Option<void>, Error>, Int32&, string, bool, int )",
+        "Choose ( System.Result<System.Option<void>, String>, Int32&, string, bool, int )",
     )
     .unwrap();
     assert_eq!(target.name, "Choose");
@@ -40,7 +40,7 @@ fn signatures_parse_aliases_and_nested_generic_commas() {
                         definition: "System.Option".into(),
                         arguments: vec![Type::Void]
                     },
-                    Type::Error
+                    Type::String
                 ]
             },
             Type::ByRef(Box::new(Type::Int32)),
@@ -123,7 +123,7 @@ fn entry_selects_parameterless_overload_regardless_of_definition_order() {
 
 #[test]
 fn parameter_order_and_constructed_types_are_part_of_identity() {
-    let module = assemble(".module Test\n.entry Main\n.function Choose -> Int32\n.param System.Option<Void>\n.param System.Result<Int32,Error>\nldc.i4 1\nret\n.end\n.function Choose -> Int32\n.param System.Result<Int32,Error>\n.param System.Option<Void>\nldc.i4 2\nret\n.end\n.function Main -> Int32\nldc.i4 42\nnewobj instance System.Result.Ok<Int32>::.ctor(Int32)\nnewobj instance System.Result<Int32,Error>::.ctor(System.Result.Ok<Int32>)\nnewobj instance System.Option.None::.ctor()\nnewobj instance System.Option<Void>::.ctor(System.Option.None)\ncall Choose(System.Result<int32,Error>, System.Option<void>)\nret\n.end").unwrap();
+    let module = assemble(".module Test\n.entry Main\n.function Choose -> Int32\n.param System.Option<Void>\n.param System.Result<Int32,String>\nldc.i4 1\nret\n.end\n.function Choose -> Int32\n.param System.Result<Int32,String>\n.param System.Option<Void>\nldc.i4 2\nret\n.end\n.function Main -> Int32\nldc.i4 42\nnewobj instance System.Result.Ok<Int32>::.ctor(Int32)\nnewobj instance System.Result<Int32,String>::.ctor(System.Result.Ok<Int32>)\nnewobj instance System.Option.None::.ctor()\nnewobj instance System.Option<Void>::.ctor(System.Option.None)\ncall Choose(System.Result<int32,String>, System.Option<void>)\nret\n.end").unwrap();
     assert_eq!(
         run(&module, Limits::default()).unwrap().value,
         Value::Int32(2)
@@ -184,7 +184,7 @@ fn inline_declaration_signature_matches_call_signature() {
 
 #[test]
 fn inline_parameters_support_nested_types_and_reject_mixed_declarations() {
-    let source = ".module Test\n.entry Main\n.function Accept(System.Result<System.Option<void>, Error>, int32&) -> Void\nldvoid\nret\n.end\n.function Main -> Void\nldvoid\nret\n.end";
+    let source = ".module Test\n.entry Main\n.function Accept(System.Result<System.Option<void>, String>, int32&) -> Void\nldvoid\nret\n.end\n.function Main -> Void\nldvoid\nret\n.end";
     let module = assemble(source).unwrap();
     assert_eq!(module.functions[0].parameters.len(), 2);
     for header in ["Accept(int32)", "Accept()"] {

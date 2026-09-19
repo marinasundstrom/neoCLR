@@ -7,7 +7,6 @@ accessors and ToString methods for:
 - Utf8SliceError, Int32ParseError and IntegerDivisionError
 - InvalidRangeError, InvalidDateError, InvalidTimeError and OverflowError
 - EnvironmentError's ToString (it has no declared constructor)
-- Error.FromMessage, Error.Message and Error.ToString
 
 Nested error cases retain their ordinary value types and parameterless constructors.
 For example:
@@ -21,7 +20,7 @@ System.Console.WriteLine(missing.ToString())
 
 `GetNotFound` faults when called on a different case; use IsNotFound before checked
 extraction when the case is uncertain. Empty error/case values have valid defaults.
-An error carrier with case storage, or a message Error, must be initialized with a
+An error carrier with case storage must be initialized with a
 real value before use. The importer does not invent a default case or message.
 
 These are value errors, not an Exception hierarchy. They preserve the
@@ -36,7 +35,7 @@ are the admitted runtime contract here.
 
 The [error API sample](experiments/raven-target/samples/library-errors.rvn) constructs
 all 23 nested cases, round-trips their checked accessors and prints descriptions,
-then exercises simple errors and message errors. Its
+then exercises simple errors and ordinary string messages. Its
 [expected output](experiments/raven-target/samples/library-errors.expected.txt) is
 checked by the saved-project suite. Use a fresh
 [prepared target project](experiments/raven-target/README.md).
@@ -48,5 +47,6 @@ python3 docs/experiments/raven-target/verify_error_values.py /tmp/PROBE/editor/D
 
 This checks a wrong-case runtime fault and rejection of an uninitialized carrier
 before executable output is produced. `verify_editor.py --errors` checks nested cases,
-accessors and message factories. The shared catalog supplies declarations and checked
-bindings; runtime behavior and installed SDK/VSIX assets are unchanged.
+and accessors. The shared catalog supplies declarations and checked
+bindings. The development library removes the legacy System.Error wrapper and
+requires matching rebuilt references; installed Preview 8 bundles are unchanged.

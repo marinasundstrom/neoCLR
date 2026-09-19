@@ -68,7 +68,7 @@ escapes. Identifiers contain ASCII letters, digits, underscores, and dots.
   function; labels can be forward references. A label past the last instruction
   cannot be a branch target.
 - Types include `Void`, `SByte`, `Byte`, `Int16`, `UInt16`, `Char`, `Int32`,
-  `UInt32`, `Int64`, `UInt64`, `Single`, `Double`, `IntPtr`, `UIntPtr`, `Boolean`, `String`, `Error`, a record name,
+  `UInt32`, `Int64`, `UInt64`, `Single`, `Double`, `IntPtr`, `UIntPtr`, `Boolean`, `String`, a record name,
   `Option<T>`, `Result<T,E>`, `T&`, or `Ptr<T>` (also spelled `T*`). Spaces inside generic signatures are allowed.
   Primitive aliases `int8`, `uint8`, `int16`, `uint16`, `char`, `uint32`,
   `int64`, `uint64`, `float32`/`single`, `float64`/`double`, `void`, `int32`/`int`, `nint`, `nuint`, `boolean`/`bool`, and `string`
@@ -84,13 +84,13 @@ The CLI displays the return value in a diagnostic Rust-style representation.
 Use `Type name` consistently in declarations:
 
 ```text
-.method static Parse(string value) -> Result<Int32,Error>
+.method static Parse(string value) -> Result<Int32,String>
     ldarg value
     call neoCLR.Runtime.ParseInt32(string)
     ret
 .end
 
-.function Main() -> Result<Void,Error>
+.function Main() -> Result<Void,String>
     .local Point point
     ...
 .end
@@ -124,7 +124,7 @@ zero parameters:
 call System.Console.WriteLine(string)
 call System.Int32.Divide(int32, int32)
 call Initialize()
-call Handle(Result<Option<Void>, Error>, Point&)
+call Handle(Result<Option<Void>, String>, Point&)
 ```
 
 Overloads are identified by name plus exact ordered parameter types. Arity, type,
@@ -272,7 +272,6 @@ and given a format-version and runtime-service note when applicable.
 | `stind.i8` | `Ptr<Int64 or UInt64>,Int64 →` | Store 64 bits |
 | `stind.i` | `Ptr<Native>,Native →` | Store native integer |
 | `heap.new` | `T → T&` | Allocate managed heap storage with GC-rooted identity; read/write using ldobj/stobj |
-| `error "code"` | `→ Error` | Construct bootstrap error value |
 | `fault "message"` | `→ termination` | End guest execution |
 
 `F` is represented by binary64 internally. add/sub/mul/div/rem, neg, ceq, clt, and
@@ -392,7 +391,7 @@ nor establishes that it is safe to access. Both paths consume exactly one condit
 and preserve older stack entries. These zero/null tests follow the familiar
 [CLR conditional branch contract](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.brfalse).
 
-String, records, Error, unions, Void, and floating-point values are not conditions.
+String, records, unions, Void, and floating-point values are not conditions.
 neoCLR does not infer reference semantics for value types based on their .NET names,
 or infer truth from string length or Option/Result cases. Use ordinary discriminator methods for unions
 and explicit comparisons for floats. Managed byrefs are not accepted as branch

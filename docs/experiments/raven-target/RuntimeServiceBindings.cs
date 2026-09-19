@@ -31,8 +31,6 @@ static class RuntimeServiceBindings
             ("StringScalars", ["String"], "arrayref<UInt32>"),
             ("StringByteCount", ["String"], "Int32"),
             ("StringSliceUtf8", ["String", "Int32", "Int32"], "Value"),
-            ("ErrorFromMessage", ["String"], "System.Error"),
-            ("ErrorMessage", ["System.Error"], "String"),
             ("ReadAllText", ["String", "Int32"], "Value"),
             ("ParseInt32", ["String"], "Value"),
             ("ConsoleReadByte", [], "Value"),

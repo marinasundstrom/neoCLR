@@ -57,7 +57,7 @@ fn void_success_and_arbitrary_error_payloads_use_ordinary_wrappers() {
 
 #[test]
 fn nested_option_result_preserves_the_complete_closed_payload() {
-    let body = "ldc.i4 257\nnewobj instance System.Option.Some<Byte>::.ctor(Byte)\nnewobj instance System.Option<Byte>::.ctor(System.Option.Some<Byte>)\nnewobj instance System.Result.Ok<System.Option<Byte>>::.ctor(System.Option<Byte>)\nnewobj instance System.Result<System.Option<Byte>,Error>::.ctor(System.Result.Ok<System.Option<Byte>>)\ncall instance System.Result<System.Option<Byte>,Error>::GetOkCase()\ncall instance System.Result.Ok<System.Option<Byte>>::get_Value()\ncall instance System.Option<Byte>::GetSomeCase()\ncall instance System.Option.Some<Byte>::get_Value()";
+    let body = "ldc.i4 257\nnewobj instance System.Option.Some<Byte>::.ctor(Byte)\nnewobj instance System.Option<Byte>::.ctor(System.Option.Some<Byte>)\nnewobj instance System.Result.Ok<System.Option<Byte>>::.ctor(System.Option<Byte>)\nnewobj instance System.Result<System.Option<Byte>,String>::.ctor(System.Result.Ok<System.Option<Byte>>)\ncall instance System.Result<System.Option<Byte>,String>::GetOkCase()\ncall instance System.Result.Ok<System.Option<Byte>>::get_Value()\ncall instance System.Option<Byte>::GetSomeCase()\ncall instance System.Option.Some<Byte>::get_Value()";
     assert_eq!(evaluate(body, "Int32").unwrap(), Value::Int32(1));
 }
 
@@ -121,7 +121,7 @@ fn unqualified_carrier_names_have_no_special_runtime_meaning() {
         matches!(neoclr::assembler::parse_type("Option<Int32>").unwrap(), Type::Constructed { definition, .. } if definition == "Option")
     );
     assert!(
-        matches!(neoclr::assembler::parse_type("Result<Int32,Error>").unwrap(), Type::Constructed { definition, .. } if definition == "Result")
+        matches!(neoclr::assembler::parse_type("Result<Int32,String>").unwrap(), Type::Constructed { definition, .. } if definition == "Result")
     );
 }
 
@@ -145,5 +145,5 @@ fn bundled_carriers_only_accept_the_nested_case_family() {
         );
     }
     assert!(assemble(".module App\n.function F() -> Void\nnewobj instance System.None::.ctor()\npop\nldvoid\nret\n.end").is_err());
-    assert!(assemble(".module App\n.function F(System.Result<Int32,Error> value) -> Void\nldarg value\ncall instance System.Result<Int32,Error>::GetOk()\npop\nldvoid\nret\n.end").is_err());
+    assert!(assemble(".module App\n.function F(System.Result<Int32,String> value) -> Void\nldarg value\ncall instance System.Result<Int32,String>::GetOk()\npop\nldvoid\nret\n.end").is_err());
 }

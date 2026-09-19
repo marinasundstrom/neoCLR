@@ -16,7 +16,7 @@ fn primitives_share_canonical_type_identity_and_library_definitions() {
         assert_eq!(def.representation, Representation::Runtime);
         assert!(def.fields.is_empty());
     }
-    for ty in [Type::Void, Type::Boolean, Type::String, Type::Error] {
+    for ty in [Type::Void, Type::Boolean, Type::String] {
         assert!(library::system().unwrap().type_definition(&ty).is_some());
     }
     assert_eq!(

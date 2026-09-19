@@ -39,7 +39,7 @@ needs and the primitives required to implement them in platform code.
 - `System.IO.File` provides bounded ReadAllText; see [file input](file-input.md).
 - `System.IO.File.ReadAllText` adapts bounded file failures to the ordinary
   `System.Result<String,System.IO.FileReadError>` carrier; the canonical method now uses nested cases.
-- `System.Error` provides FromMessage, get_Message, and ToString, with explicit Message property metadata; see [Error values](errors.md).
+- Recoverable failures use ordinary Result payloads: strings or specific error types; see [Error values](errors.md).
 - `System.Array<T>` provides six IL methods for explicit allocation, length, checked
   access, element addresses, and free, with explicit Length property metadata; see [arrays and pointers](arrays-and-pointers.md).
 - `System.String` provides Concat, Equals, IsEmpty, GetUtf8ByteCount, and SliceUtf8;
@@ -64,7 +64,7 @@ needs and the primitives required to implement them in platform code.
 The remaining host calls are `neoCLR.Runtime.WriteLine(string) -> Void`,
 `neoCLR.Runtime.Int32ToString(int32) -> String`, and
 `neoCLR.Runtime.ParseInt32(string) -> System.Value`, plus StringConcat,
-StringByteCount, StringSliceUtf8, ErrorFromMessage, ErrorMessage, ReadAllText, and ConsoleReadByte. Parsing and formatting
+StringByteCount, StringSliceUtf8, ReadAllText, and ConsoleReadByte. Parsing and formatting
 are temporary host implementations until character/string operations can support
 their platform versions. Console output is captured by default in Rust embedding, or delivered immediately to
 an explicitly supplied host console. The CLI uses live output.

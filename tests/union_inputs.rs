@@ -35,7 +35,7 @@ fn format_four_rejects_old_union_encodings_and_instructions() {
     for op in [
         "some",
         "none Int32",
-        "ok Error",
+        "ok String",
         "err Int32",
         "is.case Some",
         "ldcase Ok",
@@ -55,7 +55,7 @@ fn format_four_rejects_old_union_encodings_and_instructions() {
             .is_err()
         );
     }
-    for ty in [r#"{"Option":"Int32"}"#, r#"{"Result":["Int32","Error"]}"#] {
+    for ty in [r#"{"Option":"Int32"}"#, r#"{"Result":["Int32","String"]}"#] {
         assert!(serde_json::from_str::<neoclr::metadata::Type>(ty).is_err());
     }
 }

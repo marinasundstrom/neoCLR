@@ -149,7 +149,7 @@ func Main() {
     WriteLine(overflowerror.ToString())
     let unavailable = default(EnvironmentError)
     WriteLine(unavailable.ToString())
-    let message = Error.FromMessage("A domain error")
-    WriteLine(message.Message)
-    WriteLine(message.ToString())
+    let message = "A domain error"
+    WriteLine(message)
+    WriteLine(message)
 }

@@ -80,7 +80,7 @@ Supported storage layouts:
 
 Scalars use native byte order. Boolean reads accept only 0 or 1. Record reads require
 initialized fields, but not padding. Pointer fields support recursive structures;
-recursive by-value layouts are rejected. String, Error, Ref, System.Value and the
+recursive by-value layouts are rejected. String, Ref, System.Value and the
 current System.Option/Result carriers do not have native storage layouts. Their pointers can be represented and cast,
 but the unsupported pointee layouts cannot be allocated or dereferenced. Layout is
 computed on the execution host, not serialized as a fixed architecture's offsets.
@@ -151,7 +151,7 @@ Typed operations require matching pointee types and natural type alignment. Thei
 layouts are the same as `sizeof`, `ldobj`, and `stobj`: native scalars, pointers,
 Void, and records composed of supported fields. Zero initialization produces numeric
 zero, false, null pointers, and recursively zeroed records. It initializes padding
-as well. It does not allocate storage or imply ownership. String, Error, unions,
+as well. It does not allocate storage or imply ownership. String, unions,
 and Ref still lack native layouts and cannot use these operations. This is not a
 promise that every future type has a valid all-zero representation.
 

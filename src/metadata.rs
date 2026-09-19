@@ -21,7 +21,6 @@ pub enum Type {
     UIntPtr,
     Boolean,
     String,
-    Error,
     /// One explicitly erased, complete value; no reference identity or allocation policy.
     Value,
     /// Opaque read-only metadata descriptor, with no native address or payload storage.
@@ -75,7 +74,6 @@ impl Type {
             "UIntPtr" | "nuint" | "System.UIntPtr" => Self::UIntPtr,
             "Boolean" | "boolean" | "bool" | "System.Boolean" => Self::Boolean,
             "String" | "string" | "System.String" => Self::String,
-            "Error" | "System.Error" => Self::Error,
             "Value" | "System.Value" => Self::Value,
             "RuntimeTypeHandle" | "System.RuntimeTypeHandle" => Self::RuntimeTypeHandle,
             _ => Self::Named(name.into()),
@@ -109,7 +107,6 @@ impl Type {
             Self::UIntPtr => Some("System.UIntPtr"),
             Self::Boolean => Some("System.Boolean"),
             Self::String => Some("System.String"),
-            Self::Error => Some("System.Error"),
             Self::Value => Some("System.Value"),
             Self::RuntimeTypeHandle => Some("System.RuntimeTypeHandle"),
             Self::Named(name)
@@ -139,7 +136,6 @@ impl Type {
                 | Self::UIntPtr
                 | Self::Boolean
                 | Self::String
-                | Self::Error
                 | Self::Value
                 | Self::RuntimeTypeHandle
         )
@@ -798,8 +794,6 @@ pub enum Instruction {
     StoreIndirectInt32,
     #[serde(rename = "heap.new")]
     HeapNew,
-    #[serde(rename = "error")]
-    Error(String),
     #[serde(rename = "fault")]
     Fault(String),
 }

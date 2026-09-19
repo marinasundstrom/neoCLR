@@ -1,6 +1,6 @@
 {
   "purpose": "Explicit source-by-source API audit. Samples and signature checks are evidence, not a claim of arbitrary generic/compiler support.",
-  "declarationCount": 768,
+  "declarationCount": 772,
   "sources": [
     {
       "file": "runtime/System/Equatable.neoil",
@@ -92,7 +92,23 @@
       "note": "Matched private backing storage becomes intrinsic loads; no nested runtime field or new primitive constructor."
     },
     {
-      "file": "runtime/raven/generated/String.methods.neoil",
+      "file": "runtime/raven/generated/String.bootstrap.methods.neoil",
+      "declarations": 13,
+      "disposition": "raven-authored-opaque-bootstrap",
+      "samples": [
+        "library-strings.rvn",
+        "library-string-slices.rvn",
+        "library-errors.rvn"
+      ],
+      "tests": [
+        "tests/strings.rs",
+        "tests/errors.rs",
+        "docs/experiments/raven-target/verify_opaque_library.py"
+      ],
+      "note": "Checked intrinsic String storage retains native ownership and its receiver ABI. Compiler operators remain intrinsic; opaque allocation and storage mutation are rejected."
+    },
+    {
+      "file": "runtime/raven/generated/String.bootstrap.helpers.neoil",
       "declarations": 10,
       "disposition": "raven-authored-opaque-bootstrap",
       "samples": [
@@ -105,39 +121,7 @@
         "tests/errors.rs",
         "docs/experiments/raven-target/verify_opaque_library.py"
       ],
-      "note": "Checked intrinsic String storage and fieldless Error bodies retain native ownership and mixed receiver ABI. Compiler operators remain intrinsic; opaque allocation and storage mutation are rejected."
-    },
-    {
-      "file": "runtime/raven/generated/String.helpers.neoil",
-      "declarations": 10,
-      "disposition": "raven-authored-opaque-bootstrap",
-      "samples": [
-        "library-strings.rvn",
-        "library-string-slices.rvn",
-        "library-errors.rvn"
-      ],
-      "tests": [
-        "tests/strings.rs",
-        "tests/errors.rs",
-        "docs/experiments/raven-target/verify_opaque_library.py"
-      ],
-      "note": "Checked intrinsic String storage and fieldless Error bodies retain native ownership and mixed receiver ABI. Compiler operators remain intrinsic; opaque allocation and storage mutation are rejected."
-    },
-    {
-      "file": "runtime/raven/generated/Error.methods.neoil",
-      "declarations": 5,
-      "disposition": "raven-authored-opaque-bootstrap",
-      "samples": [
-        "library-strings.rvn",
-        "library-string-slices.rvn",
-        "library-errors.rvn"
-      ],
-      "tests": [
-        "tests/strings.rs",
-        "tests/errors.rs",
-        "docs/experiments/raven-target/verify_opaque_library.py"
-      ],
-      "note": "Checked intrinsic String storage and fieldless Error bodies retain native ownership and mixed receiver ABI. Compiler operators remain intrinsic; opaque allocation and storage mutation are rejected."
+      "note": "Checked intrinsic String storage retains native ownership and its receiver ABI. Compiler operators remain intrinsic; opaque allocation and storage mutation are rejected."
     },
     {
       "file": "runtime/raven/generated/SByte.methods.neoil",
@@ -253,7 +237,7 @@
     },
     {
       "file": "runtime/raven/generated/Char.methods.neoil",
-      "declarations": 18,
+      "declarations": 5,
       "disposition": "raven-authored-char-struct",
       "tests": [
         "tests/character_classification.rs",
@@ -272,54 +256,90 @@
       "note": "System/Char.rvn owns comparison and all sixteen predicates; UTF-16 units and native Unicode category behavior are unchanged."
     },
     {
+      "file": "runtime/raven/UnicodeScalar.neoil",
+      "declarations": 1,
+      "disposition": "raven-authored-unicode-scalar",
+      "samples": [
+        "library-grapheme-strings.rvn"
+      ],
+      "tests": [
+        "tests/grapheme_chars.rs"
+      ],
+      "note": "Explicit Unicode scalar access complements grapheme-based Char; it is not an encoding-specific String type."
+    },
+    {
+      "file": "runtime/raven/generated/UnicodeScalar.methods.neoil",
+      "declarations": 13,
+      "disposition": "raven-authored-unicode-scalar",
+      "samples": [
+        "library-grapheme-strings.rvn"
+      ],
+      "tests": [
+        "tests/grapheme_chars.rs"
+      ],
+      "note": "Explicit Unicode scalar access complements grapheme-based Char; it is not an encoding-specific String type."
+    },
+    {
+      "file": "runtime/raven/generated/UnicodeScalar.helpers.neoil",
+      "declarations": 2,
+      "disposition": "raven-authored-unicode-scalar",
+      "samples": [
+        "library-grapheme-strings.rvn"
+      ],
+      "tests": [
+        "tests/grapheme_chars.rs"
+      ],
+      "note": "Explicit Unicode scalar access complements grapheme-based Char; it is not an encoding-specific String type."
+    },
+    {
       "file": "runtime/neoCLR/Runtime/CharCategory.neoil",
       "declarations": 1,
       "disposition": "implementation-service",
       "callers": [
         {
           "service": "neoCLR.Runtime.CharCategory",
-          "file": "runtime/raven/generated/Char.methods.neoil",
-          "line": 69
+          "file": "runtime/raven/generated/UnicodeScalar.methods.neoil",
+          "line": 11
         },
         {
           "service": "neoCLR.Runtime.CharCategory",
-          "file": "runtime/raven/generated/Char.methods.neoil",
-          "line": 93
+          "file": "runtime/raven/generated/UnicodeScalar.methods.neoil",
+          "line": 35
         },
         {
           "service": "neoCLR.Runtime.CharCategory",
-          "file": "runtime/raven/generated/Char.methods.neoil",
-          "line": 140
+          "file": "runtime/raven/generated/UnicodeScalar.methods.neoil",
+          "line": 82
         },
         {
           "service": "neoCLR.Runtime.CharCategory",
-          "file": "runtime/raven/generated/Char.methods.neoil",
-          "line": 187
+          "file": "runtime/raven/generated/UnicodeScalar.methods.neoil",
+          "line": 129
         },
         {
           "service": "neoCLR.Runtime.CharCategory",
-          "file": "runtime/raven/generated/Char.methods.neoil",
-          "line": 211
+          "file": "runtime/raven/generated/UnicodeScalar.methods.neoil",
+          "line": 153
         },
         {
           "service": "neoCLR.Runtime.CharCategory",
-          "file": "runtime/raven/generated/Char.methods.neoil",
-          "line": 235
+          "file": "runtime/raven/generated/UnicodeScalar.methods.neoil",
+          "line": 177
         },
         {
           "service": "neoCLR.Runtime.CharCategory",
-          "file": "runtime/raven/generated/Char.methods.neoil",
-          "line": 282
+          "file": "runtime/raven/generated/UnicodeScalar.methods.neoil",
+          "line": 224
         },
         {
           "service": "neoCLR.Runtime.CharCategory",
-          "file": "runtime/raven/generated/Char.methods.neoil",
-          "line": 306
+          "file": "runtime/raven/generated/UnicodeScalar.methods.neoil",
+          "line": 248
         },
         {
           "service": "neoCLR.Runtime.CharCategory",
-          "file": "runtime/raven/generated/Char.methods.neoil",
-          "line": 353
+          "file": "runtime/raven/generated/UnicodeScalar.methods.neoil",
+          "line": 295
         }
       ]
     },
@@ -769,8 +789,8 @@
       "callers": [
         {
           "service": "neoCLR.Runtime.StringConcat",
-          "file": "runtime/raven/generated/String.methods.neoil",
-          "line": 12
+          "file": "runtime/raven/generated/String.bootstrap.methods.neoil",
+          "line": 18
         }
       ]
     },
@@ -781,8 +801,60 @@
       "callers": [
         {
           "service": "neoCLR.Runtime.StringByteCount",
-          "file": "runtime/raven/generated/String.methods.neoil",
-          "line": 99
+          "file": "runtime/raven/generated/String.bootstrap.methods.neoil",
+          "line": 105
+        }
+      ]
+    },
+    {
+      "file": "runtime/neoCLR/Runtime/StringScalars.neoil",
+      "declarations": 5,
+      "disposition": "implementation-service",
+      "callers": [
+        {
+          "service": "neoCLR.Runtime.StringGraphemeCount",
+          "file": "runtime/raven/generated/String.bootstrap.methods.neoil",
+          "line": 116
+        },
+        {
+          "service": "neoCLR.Runtime.CharFromString",
+          "file": "runtime/raven/generated/Char.methods.neoil",
+          "line": 10
+        },
+        {
+          "service": "neoCLR.Runtime.CharText",
+          "file": "runtime/raven/generated/Char.methods.neoil",
+          "line": 22
+        },
+        {
+          "service": "neoCLR.Runtime.CharText",
+          "file": "runtime/raven/generated/Char.methods.neoil",
+          "line": 34
+        },
+        {
+          "service": "neoCLR.Runtime.CharText",
+          "file": "runtime/raven/generated/Char.methods.neoil",
+          "line": 38
+        },
+        {
+          "service": "neoCLR.Runtime.CharText",
+          "file": "runtime/raven/generated/Char.methods.neoil",
+          "line": 54
+        },
+        {
+          "service": "neoCLR.Runtime.CharText",
+          "file": "runtime/raven/generated/Char.methods.neoil",
+          "line": 58
+        },
+        {
+          "service": "neoCLR.Runtime.StringScalars",
+          "file": "runtime/raven/generated/String.helpers.neoil",
+          "line": 104
+        },
+        {
+          "service": "neoCLR.Runtime.StringGraphemes",
+          "file": "runtime/raven/generated/String.helpers.neoil",
+          "line": 69
         }
       ]
     },
@@ -793,8 +865,13 @@
       "callers": [
         {
           "service": "neoCLR.Runtime.StringCompareOrdinal",
-          "file": "runtime/raven/generated/String.methods.neoil",
-          "line": 40
+          "file": "runtime/raven/generated/String.bootstrap.methods.neoil",
+          "line": 46
+        },
+        {
+          "service": "neoCLR.Runtime.StringCompareOrdinal",
+          "file": "runtime/raven/generated/Char.methods.neoil",
+          "line": 60
         }
       ]
     },
@@ -805,8 +882,8 @@
       "callers": [
         {
           "service": "neoCLR.Runtime.StringContainsOrdinal",
-          "file": "runtime/raven/generated/String.methods.neoil",
-          "line": 54
+          "file": "runtime/raven/generated/String.bootstrap.methods.neoil",
+          "line": 60
         }
       ]
     },
@@ -817,8 +894,8 @@
       "callers": [
         {
           "service": "neoCLR.Runtime.StringStartsWithOrdinal",
-          "file": "runtime/raven/generated/String.methods.neoil",
-          "line": 70
+          "file": "runtime/raven/generated/String.bootstrap.methods.neoil",
+          "line": 76
         }
       ]
     },
@@ -829,8 +906,8 @@
       "callers": [
         {
           "service": "neoCLR.Runtime.StringEndsWithOrdinal",
-          "file": "runtime/raven/generated/String.methods.neoil",
-          "line": 86
+          "file": "runtime/raven/generated/String.bootstrap.methods.neoil",
+          "line": 92
         }
       ]
     },
@@ -841,8 +918,8 @@
       "callers": [
         {
           "service": "neoCLR.Runtime.StringSliceUtf8",
-          "file": "runtime/raven/generated/String.methods.neoil",
-          "line": 133
+          "file": "runtime/raven/generated/String.bootstrap.methods.neoil",
+          "line": 150
         }
       ]
     },
@@ -859,30 +936,6 @@
         "library-native-buffer.rvn"
       ],
       "note": "The Raven profile uses source-authored Array members, callback loop and private iterator. Checked intrinsic storage and iteration-signature projection preserve identity and filtering; legacy Neo keeps its native descriptor API. NativeMemory is separately Raven-authored."
-    },
-    {
-      "file": "runtime/neoCLR/Runtime/ErrorFromMessage.neoil",
-      "declarations": 1,
-      "disposition": "implementation-service",
-      "callers": [
-        {
-          "service": "neoCLR.Runtime.ErrorFromMessage",
-          "file": "runtime/raven/generated/Error.methods.neoil",
-          "line": 12
-        }
-      ]
-    },
-    {
-      "file": "runtime/neoCLR/Runtime/ErrorMessage.neoil",
-      "declarations": 1,
-      "disposition": "implementation-service",
-      "callers": [
-        {
-          "service": "neoCLR.Runtime.ErrorMessage",
-          "file": "runtime/raven/generated/Error.methods.neoil",
-          "line": 23
-        }
-      ]
     },
     {
       "file": "runtime/System/IO/File.neoil",
@@ -1198,9 +1251,19 @@
           "line": 15
         },
         {
+          "service": "neoCLR.Runtime.TypeName",
+          "file": "runtime/raven/generated/Descriptors.helpers.neoil",
+          "line": 1850
+        },
+        {
           "service": "neoCLR.Runtime.TypeEquals",
           "file": "runtime/System/Type.neoil",
           "line": 40
+        },
+        {
+          "service": "neoCLR.Runtime.TypeEquals",
+          "file": "runtime/raven/generated/Descriptors.helpers.neoil",
+          "line": 1932
         },
         {
           "service": "neoCLR.Runtime.TypeArgumentCount",
@@ -1208,9 +1271,19 @@
           "line": 24
         },
         {
+          "service": "neoCLR.Runtime.TypeArgumentCount",
+          "file": "runtime/raven/generated/Descriptors.helpers.neoil",
+          "line": 1890
+        },
+        {
           "service": "neoCLR.Runtime.TypeArgument",
           "file": "runtime/System/Type.neoil",
           "line": 31
+        },
+        {
+          "service": "neoCLR.Runtime.TypeArgument",
+          "file": "runtime/raven/generated/Descriptors.helpers.neoil",
+          "line": 1904
         },
         {
           "service": "neoCLR.Runtime.TypeFields",
@@ -1223,6 +1296,11 @@
           "line": 62
         },
         {
+          "service": "neoCLR.Runtime.TypeFields",
+          "file": "runtime/raven/generated/Descriptors.helpers.neoil",
+          "line": 160
+        },
+        {
           "service": "neoCLR.Runtime.TypeMethods",
           "file": "runtime/System/TypeInfo.neoil",
           "line": 69
@@ -1231,6 +1309,11 @@
           "service": "neoCLR.Runtime.TypeMethods",
           "file": "runtime/System/TypeInfo.neoil",
           "line": 77
+        },
+        {
+          "service": "neoCLR.Runtime.TypeMethods",
+          "file": "runtime/raven/generated/Descriptors.helpers.neoil",
+          "line": 196
         },
         {
           "service": "neoCLR.Runtime.TypeProperties",
@@ -1243,6 +1326,11 @@
           "line": 92
         },
         {
+          "service": "neoCLR.Runtime.TypeProperties",
+          "file": "runtime/raven/generated/Descriptors.helpers.neoil",
+          "line": 232
+        },
+        {
           "service": "neoCLR.Runtime.TypeInterfaces",
           "file": "runtime/System/Type.neoil",
           "line": 55
@@ -1253,14 +1341,29 @@
           "line": 35
         },
         {
+          "service": "neoCLR.Runtime.TypeInterfaces",
+          "file": "runtime/raven/generated/Descriptors.helpers.neoil",
+          "line": 89
+        },
+        {
           "service": "neoCLR.Runtime.TypeGenericArguments",
           "file": "runtime/System/Type.neoil",
           "line": 61
         },
         {
+          "service": "neoCLR.Runtime.TypeGenericArguments",
+          "file": "runtime/raven/generated/Descriptors.helpers.neoil",
+          "line": 267
+        },
+        {
           "service": "neoCLR.Runtime.TypeElementType",
           "file": "runtime/System/Type.neoil",
           "line": 67
+        },
+        {
+          "service": "neoCLR.Runtime.TypeElementType",
+          "file": "runtime/raven/generated/Descriptors.helpers.neoil",
+          "line": 2086
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
@@ -1303,6 +1406,46 @@
           "line": 159
         },
         {
+          "service": "neoCLR.Runtime.TypeShape",
+          "file": "runtime/raven/generated/Descriptors.helpers.neoil",
+          "line": 1948
+        },
+        {
+          "service": "neoCLR.Runtime.TypeShape",
+          "file": "runtime/raven/generated/Descriptors.helpers.neoil",
+          "line": 1964
+        },
+        {
+          "service": "neoCLR.Runtime.TypeShape",
+          "file": "runtime/raven/generated/Descriptors.helpers.neoil",
+          "line": 1980
+        },
+        {
+          "service": "neoCLR.Runtime.TypeShape",
+          "file": "runtime/raven/generated/Descriptors.helpers.neoil",
+          "line": 1996
+        },
+        {
+          "service": "neoCLR.Runtime.TypeShape",
+          "file": "runtime/raven/generated/Descriptors.helpers.neoil",
+          "line": 2012
+        },
+        {
+          "service": "neoCLR.Runtime.TypeShape",
+          "file": "runtime/raven/generated/Descriptors.helpers.neoil",
+          "line": 2028
+        },
+        {
+          "service": "neoCLR.Runtime.TypeShape",
+          "file": "runtime/raven/generated/Descriptors.helpers.neoil",
+          "line": 2044
+        },
+        {
+          "service": "neoCLR.Runtime.TypeShape",
+          "file": "runtime/raven/generated/Descriptors.helpers.neoil",
+          "line": 2060
+        },
+        {
           "service": "neoCLR.Runtime.TypeDisplayName",
           "file": "runtime/System/Type.neoil",
           "line": 222
@@ -1311,6 +1454,16 @@
           "service": "neoCLR.Runtime.TypeDisplayName",
           "file": "runtime/System/Type.neoil",
           "line": 232
+        },
+        {
+          "service": "neoCLR.Runtime.TypeDisplayName",
+          "file": "runtime/raven/generated/Descriptors.helpers.neoil",
+          "line": 1864
+        },
+        {
+          "service": "neoCLR.Runtime.TypeDisplayName",
+          "file": "runtime/raven/generated/Descriptors.helpers.neoil",
+          "line": 1878
         },
         {
           "service": "neoCLR.Runtime.TypeBaseType",
@@ -1323,6 +1476,11 @@
           "line": 29
         },
         {
+          "service": "neoCLR.Runtime.TypeBaseType",
+          "file": "runtime/raven/generated/Descriptors.helpers.neoil",
+          "line": 1673
+        },
+        {
           "service": "neoCLR.Runtime.TypeEnumNames",
           "file": "runtime/System/Type.neoil",
           "line": 93
@@ -1333,6 +1491,11 @@
           "line": 41
         },
         {
+          "service": "neoCLR.Runtime.TypeEnumNames",
+          "file": "runtime/raven/generated/Descriptors.helpers.neoil",
+          "line": 124
+        },
+        {
           "service": "neoCLR.Runtime.TypeEnumUnderlying",
           "file": "runtime/System/Type.neoil",
           "line": 99
@@ -1341,6 +1504,11 @@
           "service": "neoCLR.Runtime.TypeEnumUnderlying",
           "file": "runtime/System/TypeInfo.neoil",
           "line": 47
+        },
+        {
+          "service": "neoCLR.Runtime.TypeEnumUnderlying",
+          "file": "runtime/raven/generated/Descriptors.helpers.neoil",
+          "line": 1709
         }
       ]
     },
@@ -1607,6 +1775,11 @@
           "service": "neoCLR.Runtime.UnixTimeToLocal",
           "file": "runtime/System/LocalDateTime.neoil",
           "line": 6
+        },
+        {
+          "service": "neoCLR.Runtime.UnixTimeToLocal",
+          "file": "runtime/raven/generated/LocalDateTime.helpers.neoil",
+          "line": 31
         }
       ]
     },
@@ -1652,6 +1825,11 @@
           "service": "neoCLR.Runtime.EnvironmentArguments",
           "file": "runtime/System/Environment.neoil",
           "line": 3
+        },
+        {
+          "service": "neoCLR.Runtime.EnvironmentArguments",
+          "file": "runtime/raven/generated/Environment.helpers.neoil",
+          "line": 70
         }
       ]
     },
@@ -1779,7 +1957,7 @@
       "note": "Checked nongeneric interface declaration with unchanged Now property. SystemClock remains runtime-backed; Info interface identity migration is separate."
     },
     {
-      "file": "runtime/raven/TypeInfo.neoil",
+      "file": "runtime/raven/src/System/Introspection/Descriptors.rvn",
       "disposition": "raven-authored-type-info",
       "samples": [
         "library-reflection.rvn",
@@ -1804,8 +1982,8 @@
       "note": "Six parameter snapshot readers are Raven-authored. The importer validates field order/types; runtime factories still produce snapshots. The inherited member hierarchy and its array copies are Raven-authored in Descriptors.rvn."
     },
     {
-      "file": "runtime/raven/Type.neoil",
-      "disposition": "raven-authored-type",
+      "file": "runtime/raven/RuntimeContext.neoil",
+      "disposition": "raven-authored-runtime-context",
       "samples": [
         "library-reflection.rvn",
         "library-array-unified.rvn"
@@ -1814,7 +1992,7 @@
         "tests/raven_reflection.rs",
         "docs/experiments/raven-target/verify_type_library.py"
       ],
-      "note": "Raven Type owns identity and shape. Member, base/interface and enum metadata are queried through the Raven-authored TypeInfo using the same handle. No public described-object construction API."
+      "note": "RuntimeContext exposes ExecutingAssembly and type lookup. Object.GetType returns TypeInfo; the old public Type class is retired. Descriptive queries do not construct described objects."
     },
     {
       "file": "runtime/raven/Map.neoil",

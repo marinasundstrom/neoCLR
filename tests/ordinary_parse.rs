@@ -137,7 +137,7 @@ fn native_parse_protocol_carries_only_erased_primitive_payloads() {
         .unwrap()
         .returns = Type::Constructed {
         definition: "System.Result".into(),
-        arguments: vec![Type::Int32, Type::Error],
+        arguments: vec![Type::Int32, Type::String],
     };
     assert!(
         LoadedProgram::with_library(&module, &library)

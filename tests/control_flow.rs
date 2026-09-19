@@ -192,8 +192,7 @@ fn conditional_branches_do_not_infer_truth_from_other_values() {
         "ldc.r8 NaN",
         "ldstr \"\"",
         "newobj instance System.Option.None::.ctor()\nnewobj instance System.Option<Int32>::.ctor(System.Option.None)",
-        "ldvoid\nnewobj instance System.Result.Ok<Void>::.ctor(Void)\nnewobj instance System.Result<Void,Error>::.ctor(System.Result.Ok<Void>)",
-        "error \"failure\"",
+        "ldvoid\nnewobj instance System.Result.Ok<Void>::.ctor(Void)\nnewobj instance System.Result<Void,String>::.ctor(System.Result.Ok<Void>)",
     ] {
         for branch in ["brtrue", "brfalse"] {
             let module = program(&format!("{operand}\n{branch} End\nEnd:\nldc.i4 42\nret"));

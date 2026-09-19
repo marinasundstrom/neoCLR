@@ -119,5 +119,5 @@ preserves ConsoleUnavailable/ConsoleReadFailed for display. Those strings do not
 case identity. Its native helper uses erased Int32 status 1 for Unavailable and 2 for
 ReadFailed; Byte remains reserved for successful data, including 0 and 255. Unknown
 statuses or payload types Fault. The interactive sample explicitly converts these errors
-into its application-level System.Error when combining input and validation failures.
+into an application-level string message when combining input and validation failures.
 Reassemble applications and System together for the new error parameter and native payload.

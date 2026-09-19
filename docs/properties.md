@@ -82,7 +82,7 @@ mutation and construction/initialization remain separate prerequisites. [Method 
 Ordinary field access also enforces visibility. Top-level type access is also checked. Automatic properties,
 property attributes, and a guest reflection API remain unimplemented.
 
-System.Error.Message and System.Array<T>.Length now explicitly associate their existing
+System.Array<T>.Length explicitly associates its existing
 get_Message and get_Length methods. Their implementations and signatures are unchanged.
 Properties are one ordinary-type foundation used by carrier/variant unions. Their
 storage and invariants are supplied by ordinary fields and methods; no union instructions remain.

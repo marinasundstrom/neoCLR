@@ -7,7 +7,7 @@ fn main() -> Result<(), neoclr::Fault> {
         .invoke(vec![], Limits::default())?
         .value;
     let output = program
-        .resolve_function(&parse_function_ref("Describe(System.Result<Void,Error>)")?)?
+        .resolve_function(&parse_function_ref("Describe(System.Result<Void,String>)")?)?
         .invoke(vec![success], Limits::default())?;
     println!("{:?}", output.value);
     Ok(())
