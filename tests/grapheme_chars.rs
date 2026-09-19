@@ -109,11 +109,13 @@ fn character_snapshots_enforce_element_and_payload_limits() {
     let snapshot = p
         .resolve_function(&parse_function_ref("StringGraphemes(String)").unwrap())
         .unwrap();
-    let mut limits = Limits::default();
-    limits.array_elements = 2;
+    let limits = Limits {
+        array_elements: 2,
+        ..Limits::default()
+    };
     assert!(
         snapshot
-            .invoke(vec![Value::String("abc".into())], limits.clone())
+            .invoke(vec![Value::String("abc".into())], limits)
             .is_err()
     );
     assert!(
@@ -121,8 +123,10 @@ fn character_snapshots_enforce_element_and_payload_limits() {
             .invoke(vec![Value::String("é🇸🇪".into())], limits)
             .is_ok()
     );
-    let mut limits = Limits::default();
-    limits.array_bytes = std::mem::size_of::<Value>() + 5;
+    let limits = Limits {
+        array_bytes: std::mem::size_of::<Value>() + 5,
+        ..Limits::default()
+    };
     assert!(
         snapshot
             .invoke(vec![Value::String("👨‍👩‍👧‍👦".into())], limits)

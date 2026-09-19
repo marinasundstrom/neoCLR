@@ -18,7 +18,7 @@ checks, not a guarantee that every possible secret or provenance issue is detect
 Fixture files deliberately include invalid/empty text for I/O tests and must remain.
 
 The original dependency inventory covered 20 registry packages. The current
-Unreleased inventory covers 47 locked registry packages, including Chrono and its
+Unreleased inventory covers 48 locked registry packages, including Chrono and its
 target-specific dependencies. Preserved license texts are byte-hashed in the
 [notice manifest](../third-party/manifest.json). Native libffi and its separately
 licensed build/test tooling are recorded explicitly. No dependency source is copied

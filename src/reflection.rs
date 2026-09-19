@@ -521,6 +521,8 @@ pub(crate) fn array(
     }
     Ok(Value::Array { element, elements })
 }
+// Keep the independent CLI parameter tables explicit at this metadata boundary.
+#[allow(clippy::too_many_arguments)]
 fn parameters(
     module: &Module,
     function: Option<&Function>,

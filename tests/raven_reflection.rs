@@ -28,8 +28,7 @@ fn handle_fields_must_be_assigned_by_class_constructors() {
         let program = LoadedProgram::with_library(&app, library()).unwrap();
         let error = program
             .run(Limits::default())
-            .err()
-            .expect("uninitialized handle must fault");
+            .expect_err("uninitialized handle must fault");
         assert!(error.to_string().contains("uninitialized"), "{error}");
     }
 }
@@ -537,8 +536,10 @@ ret
     let app = assemble(&query).unwrap();
     let p = LoadedProgram::with_library(&app, library()).unwrap();
     p.verify().unwrap();
-    let mut limits = Limits::default();
-    limits.array_elements = 4;
+    let limits = Limits {
+        array_elements: 4,
+        ..Limits::default()
+    };
     let fault = p.run(limits).unwrap_err().to_string();
     assert!(
         fault.contains("budget") || fault.contains("limit"),

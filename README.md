@@ -1,7 +1,7 @@
 # neoCLR
 
 [![CI](https://github.com/marinasundstrom/neoCLR/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/marinasundstrom/neoCLR/actions/workflows/ci.yml)
-[![Preview 7](https://img.shields.io/badge/release-v0.1.0--preview.7-blue)](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.7)
+[![Preview 8](https://img.shields.io/badge/release-v0.1.0--preview.8-blue)](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.8)
 [![MIT license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Rust 1.85+](https://img.shields.io/badge/Rust-1.85%2B-orange)](Cargo.toml)
 
@@ -52,12 +52,12 @@ direct neoIL execution and Raven against the same library.
 The current [MSBuild workflow](docs/raven-msbuild.md) uses familiar Raven project
 files with standalone neoCLR build assets. It provides completion and explicit
 **neoCLR: Build with MSBuild** / **neoCLR: Run (MSBuild)** tasks, including a bounded
-application-plus-library example. This is the Preview 7 workflow.
+application-plus-library example. This is the Preview 8 workflow.
 The normal Raven toolbar build/run/debug commands do not implement this target.
 See [runtime API coverage](docs/raven-runtime-api-coverage.md) for supported contracts
 and importer limits, and [the packaging procedure](docs/experiments/raven-target/RELEASING.md)
-for producing a matching experimental toolchain. Preview 7 packages these entry points together; see the
-[release notes](docs/preview-7-release-notes.md) for assets, prerequisites and limits.
+for producing a matching experimental toolchain. Preview 8 packages these entry points together; see the
+[release notes](docs/preview-8-release-notes.md) for assets, prerequisites and limits.
 
 ## Earlier Neo language experiment
 
@@ -83,12 +83,13 @@ separates unreleased work from published capabilities. Every commit updates it u
 The [next-preview validation guide](docs/next-preview-validation.md) documents the
 reproducible source-archive check and exact-commit release gates.
 
-## Preview 7
+## Preview 8
 
-**Preview 7 (v0.1.0-preview.7)** presents the runtime and its System library through
+**Preview 8 (v0.1.0-preview.8), release candidate**, presents Raven-authored
+System.Runtime, unified Introspection and grapheme text through
 neoIL and Raven. It includes a macOS arm64 runtime bundle, experimental Raven SDK/VSIX,
 examples, source, attribution and validation evidence. Start with the
-[release notes](docs/preview-7-release-notes.md). Publication is gated on the exact
+[release notes](docs/preview-8-release-notes.md). Publication is gated on the exact
 source revision passing CI; the GitHub prerelease is the asset source of truth.
 
 ## Earlier previews

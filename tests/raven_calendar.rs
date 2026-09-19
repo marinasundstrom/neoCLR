@@ -6,7 +6,9 @@ fn calendar_library() -> String {
         .args(["-c", "import runpy; m=runpy.run_path('docs/experiments/raven-target/collection_library.py'); print(m['build'](m['ROOT'] / 'runtime/System.neoil'))"])
         .output().unwrap();
     assert!(output.status.success());
-    String::from_utf8(output.stdout).unwrap()
+    String::from_utf8(output.stdout)
+        .unwrap()
+        .replace("\r\n", "\n")
 }
 
 fn with_library(source: &str, text: &str) -> LoadedProgram {
@@ -42,6 +44,6 @@ fn time_private_constructor_is_inaccessible_outside_its_type() {
     let library = neoclr::assemble(&calendar_library()).unwrap();
     let error = neoclr::assembler::read_modules(
         &[neoclr::assembler::ModuleInput::Source(".module Probe\n.function Make() -> System.Time\nldc.i8 -1\nnewobj instance System.Time::.ctor(Int64)\nret\n.end")],
-        &library).err().expect("private construction must be rejected").to_string();
+        &library).expect_err("private construction must be rejected").to_string();
     assert!(error.contains("access denied"), "{error}");
 }

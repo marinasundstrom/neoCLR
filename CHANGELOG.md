@@ -8,6 +8,22 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Select Preview 8 and Raven 0.1.12-neoclr.15 as the release candidate; prepare
+  notes, migration guidance and the validation checklist. Repair the Windows
+  calendar test's newline-dependent mutation and strict-Clippy test issues;
+  document the independent parameter tables at the Introspection helper boundary.
+  Exact-candidate validation and publication are pending.
+
+## 0.1.0-preview.8 — candidate
+
+Raven-authored System.Runtime, unified Introspection and grapheme text. See the
+[release notes](docs/preview-8-release-notes.md) for the resulting API and migration.
+The dated development history below preserves intermediate choices superseded by
+later entries; it is not a list of simultaneously supported contracts. Publication
+is pending exact-candidate validation.
+
+### 2026-09-19
+
 - Prepare Preview 8 packaging: use the current direct reference-core generator,
   share the target props across runner and MSBuild demo projects, include nested
   documentation and refresh text/introspection instructions. Format the existing
