@@ -28,6 +28,13 @@ The author explicitly leaves the encoding API undecided and excludes specialized
 string types such as Utf8String from this step. The [larger string proposal](proposals/string-api.md)
 is design material, not authorization to implement its entire type catalog.
 
+The purpose of this sequence is a coherent basic API structure for the next
+preview. Evaluators should be able to run examples, see where the platform is
+heading, and give feedback on acquisition, discovery and everyday text operations.
+Document implemented behavior separately from provisional choices and future
+reflection/invocation or emit capabilities. Preview feedback may lead to breaking
+changes; this milestone does not freeze the API or promise .NET compatibility.
+
 Compare the existing [String contracts](raven-string-api.md), [text model](text-model.md)
 and [ordinal behavior](ordinal-text.md) with .NET's UTF-16 String/Char model before
 changing semantics. Settle the units of length, indexing and slicing, Unicode

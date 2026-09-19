@@ -10,7 +10,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 - Record string handling as the next focus after basic introspection. Limit the
   planned UTF-8 work to a minimal surface, leave encoding undecided, and defer
-  specialized string classes such as Utf8String.
+  specialized string classes such as Utf8String. Clarify that introspection followed
+  by strings should provide a coherent API foundation for next-preview evaluation
+  and feedback; reflection/invocation and emit remain future extensions. Record
+  the selected Object.GetType spelling and ExecutingAssembly property as design
+  directions; the acquisition/context migration is not reported complete.
 
 - Add reference-only `isinst` and `ref.isnull` instructions for runtime type tests.
   Successful tests preserve object identity through interface views; failed/null

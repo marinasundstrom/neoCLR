@@ -25,6 +25,23 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-19 — A coherent API foundation for preview feedback
+
+**Author clarification.** The unified introspection API should later expand into
+reflection and emit. The author reaffirmed string APIs as the next step after this
+foundation: the next preview should let evaluators understand the API direction
+and give feedback about what could work better. In the preceding corrections,
+the author requested removal of System.Type, selected `Object.GetType()` (replacing
+the earlier GetTypeInfo spelling), and requested `RuntimeContext.ExecutingAssembly`.
+
+**Assistant response and action.** Kept type acquisition and assembly discovery in
+the current implementation scope, with invocation and emit deferred. Recorded
+introspection followed by a minimal string surface as the preview sequence, with
+runnable examples and explicit provisional contracts as the basis for evaluation.
+Updated the current design spelling while preserving earlier decisions in this
+record. The acquisition migration is in progress; this entry does not report its
+completion, a finished string API, or a published preview.
+
 ## 2026-09-19 — String handling after basic introspection
 
 **Author direction.** After the basic Introspection API, focus on neoCLR string

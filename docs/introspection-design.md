@@ -12,10 +12,10 @@ remaining acquisition/context migration is tracked below.
 After completing the Raven source port, establish the System.Runtime project
 (currently System), then implement the basic System.Runtime.RuntimeContext with
 runtime-backed model implementations. Retire the public System.Type/Type.Info split
-in favor of System.Introspection.TypeInfo. Object.GetTypeInfo() is the canonical
+in favor of System.Introspection.TypeInfo. Object.GetType() is the canonical
 instance acquisition method; typeof(T) remains declared-type acquisition through
-the selected RuntimeContext contract. This supersedes the tentative Object.GetType
-and value.Type spellings discussed earlier.
+the selected RuntimeContext contract. The author returned to the familiar GetType spelling on 2026-09-19,
+superseding the earlier GetTypeInfo and value.Type spellings.
 
 RuntimeContext and unified acquisition remain implementation directions, not
 completed API claims. The first production slice establishes the six existing
@@ -33,7 +33,7 @@ Research refreshed 2026-09-19 against the .NET 10 API documentation:
 returns the actual instance type, including through a base-typed reference;
 [TypeInfo](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.typeinfo?view=net-10.0)
 is a class in .NET's reflection model. neoCLR deliberately chooses an interface
-and direct Object.GetTypeInfo acquisition instead of retaining the public Type/Info
+and direct Object.GetType acquisition instead of retaining the public Type/Info
 pair. This changes source and metadata compatibility and requires rebuilding callers.
 It does not claim that .NET lacks runtime type acquisition or descriptor APIs.
 
@@ -222,10 +222,10 @@ GC lifetime and inability to mutate provider-owned data through the public contr
 The initial provider is the runtime. `System.Runtime.RuntimeContext` represents the
 execution universe. The selected first discovery surface is the executing assembly,
 returned as AssemblyInfo, from which callers can query modules and types. The
-provisional spelling is `RuntimeContext.Current.ExecutingAssembly`; the author
-selected the responsibility, not this exact member spelling. An all-loaded-assemblies
+selected property name is `ExecutingAssembly`; access through
+`RuntimeContext.Current.ExecutingAssembly` follows the selected context entry point. An all-loaded-assemblies
 inventory remains a possible extension, not a prerequisite for the preview.
-Instance acquisition is `Object.GetTypeInfo()`; declared-type acquisition is
+Instance acquisition is `Object.GetType()`; declared-type acquisition is
 `typeof(T)` through the selected context resolver.
 
 ### Context-owned discovery — 2026-09-19
