@@ -88,8 +88,8 @@ func Main() {
     PrintPending(orders)
 
     // Interface queries compose; array iteration uses the same Iterable contract.
-    let numbers = batch.Where((order: Order) -> bool => order.Pending)
-        .Select((order: Order) -> int => order.Number).ToList()
+    let numbers = batch.Filter((order: Order) -> bool => order.Pending)
+        .Map((order: Order) -> int => order.Number).ToList()
     for number in numbers {
         WriteLine(number)
     }

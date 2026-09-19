@@ -5,11 +5,11 @@ import System.Option.*
 import System.Result.*
 
 public static class Operators {
-    static func Where<T>(source: Iterable<T>, predicate: System.Func<T, bool>) -> Iterable<T> {
+    static func Filter<T>(source: Iterable<T>, predicate: System.Func<T, bool>) -> Iterable<T> {
         return WhereSequence<T>(source, predicate)
     }
 
-    static func Select<T, U>(source: Iterable<T>, selector: System.Func<T, U>) -> Iterable<U> {
+    static func Map<T, U>(source: Iterable<T>, selector: System.Func<T, U>) -> Iterable<U> {
         return SelectSequence<T, U>(source, selector)
     }
 

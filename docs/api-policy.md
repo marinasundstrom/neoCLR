@@ -175,8 +175,8 @@ Apply it to the existing query API after Preview 8, before Task/async contract w
 This is not a mechanical adoption of Rust or JavaScript terminology.
 Keep Raven's existing method casing; this is terminology, not a casing redesign.
 
-The first rename slice uses `Map` for element projection (currently `Select`) and
-`Filter` for predicate selection (currently `Where`), with initial capitals as the
+The first post-release slice uses `Map` for element projection (Preview 8: `Select`) and
+`Filter` for predicate selection (Preview 8: `Where`), with initial capitals as the
 author confirmed. Preserve deferred execution,
 order, callback counts and iterator cleanup semantics while changing those names.
 Do not rename already clear operators merely to differ from .NET. Review terminal
@@ -198,7 +198,8 @@ Equivalent names do not imply identical ownership or empty-sequence behavior.
 Validate the chosen API through source compilation, emitted metadata, editor
 completion and existing query execution tests. Update samples and the feature page
 together; document the migration rather than presenting new spellings as Preview 8
-capabilities. Whether any aliases or a namespace change are warranted remains open.
+capabilities. This slice removes the old names without aliases and retains System.Linq;
+a namespace redesign is separate work.
 
 ## Collection namespace and naming
 

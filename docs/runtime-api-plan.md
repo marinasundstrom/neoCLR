@@ -85,7 +85,7 @@ or runs. The following is a planning summary, not a new completeness claim.
 | Primitive values and mathematics | Bounded numeric, Boolean, Char, parsing and Math APIs | Fill overload/behavior gaps exposed by normal Raven programs before adding unrelated utilities |
 | Errors and absence | Result, Option, Void and propagation | Consistent typed failures and useful error context across new APIs; preserve ordinary call ergonomics |
 | Text and encoding | UTF-8 storage, explicit byte counting/slicing, ordinal operations and Char predicates | Scalar iteration and validated construction; strict UTF-8/UTF-16 conversion; settle indexing before adding ambiguous Length/search-offset APIs |
-| Collections | Arrays, ArrayList, Iterable/Iterator and prototype Where/Select/ToList | Follow the immediate priorities above: generic array mapping, minimal contracts, existing implementation alignment, then keyed lookup/uniqueness |
+| Collections | Arrays, ArrayList, Iterable/Iterator and prototype Filter/Map/ToList | Follow the immediate priorities above: generic array mapping, minimal contracts, existing implementation alignment, then keyed lookup/uniqueness |
 | Files and console | Bounded text-file and console operations with Result outcomes | Byte I/O and streaming only when whole-file processing is insufficient; define resource cleanup before adding long-lived readers/writers |
 | Date/time | Date, Time, LocalDateTime and local-clock acquisition | An injectable clock when tests need controlled time; duration/instant and timezone work as scenarios require, with no immediate globalization expansion |
 | Metadata and reflection | Type/member introspection and a bounded reflection surface | Fill discovery gaps needed by tools and serialization; dynamic invocation requires separate access/type/fault contracts |
@@ -145,7 +145,7 @@ separate from the following LINQ terminal outcome slice.
 
 Implemented First/Last returning Option<T>, and Single returning
 Result<T,SingleError> with Empty and Multiple cases, in the Raven profile.
-Filtering composes through Where; the [query API](raven-query-api.md) records the
+Filtering composes through Filter; the [query API](raven-query-api.md) records the
 .NET comparison, normal-outcome disposal and terminal-fault limits. Predicate overloads were added
 in a subsequent slice; aggregation and specialized paths remain open. This implementation is
 separate from Map and the subsequently completed ArrayList filtering work.

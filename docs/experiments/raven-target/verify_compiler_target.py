@@ -40,7 +40,7 @@ func Main() {
     let orders: List<string> = ArrayList<string>()
     orders.Add("test")
     orders.Add("2")
-    for item in orders.Where(x => x == "2") {
+    for item in orders.Filter(x => x == "2") {
         WriteLine(item)
     }
 }

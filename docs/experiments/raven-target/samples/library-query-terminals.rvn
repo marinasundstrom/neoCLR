@@ -38,7 +38,7 @@ func Main() {
     PrintOptional(empty.Last())
     PrintOptional(one.First())
     PrintOptional(many.Last())
-    PrintOptional(many.Where((value: int) -> bool => value > 100).First())
+    PrintOptional(many.Filter((value: int) -> bool => value > 100).First())
     PrintSingle(empty.Single())
     PrintSingle(one.Single())
     PrintSingle(many.Single())

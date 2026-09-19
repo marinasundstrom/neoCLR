@@ -5,8 +5,8 @@ methods over `System.Collections.Iterable<T>` and, after Preview 5, vector array
 
 | Method | Result | Evaluation |
 | --- | --- | --- |
-| `Where<T>(Iterable<T>, Func<T, bool>)` | `Iterable<T>` | Predicate runs while advancing an iterator |
-| `Select<T, U>(Iterable<T>, Func<T, U>)` | `Iterable<U>` | Selector runs once per produced element |
+| `Filter<T>(Iterable<T>, Func<T, bool>)` | `Iterable<T>` | Predicate runs while advancing an iterator |
+| `Map<T, U>(Iterable<T>, Func<T, U>)` | `Iterable<U>` | Selector runs once per produced element |
 | `ToList<T>(Iterable<T>)` | `ArrayList<T>` | Consumes the sequence immediately into a new list |
 | `First<T>(Iterable<T>)` | `Option<T>` | Reads at most the first element |
 | `Last<T>(Iterable<T>)` | `Option<T>` | Consumes the sequence, retaining the last element |
@@ -21,13 +21,24 @@ type arguments from the receiver and callback; no explicit reference operators
 are needed. These are generic library methods with validated bridge bindings,
 not support for arbitrary generic application method bodies.
 
-## Naming work after Preview 8
+## Naming migration after Preview 8 — 2026-09-19
 
-The author selected conventional operator terminology before the Task/async work.
-The first rename slice selects Filter/Map for the current Where/Select operations, with
-the same semantics. The table above remains the implemented Preview 8 contract;
-renaming, migration and updated execution/editor evidence are the next slice. See
-[the naming policy](api-policy.md#query-operator-naming-direction-2026-09-19).
+The development API renames `Where` to `Filter` and `Select` to `Map`, with initial
+capitals. Preview 8 keeps its published names. Rebuild source and target references
+together; the development API provides no Where/Select compatibility aliases.
+Namespace `System.Linq` and the remaining operator names stay the same.
+
+This follows [the naming principle](api-policy.md#query-operator-naming-direction-2026-09-19):
+prefer terminology shared across modern languages, retaining .NET names where already
+conventional or clearer. The rename preserves laziness, order, callback counts,
+materialization and disposal. `FlatMap` is preferred for future flattening; it is not
+implemented. Fold/Reduce and Drop/Skip remain semantic decisions, not automatic renames.
+
+The [small executable example](experiments/raven-target/samples/library-query-names.rvn)
+filters `[1, 2, 3]`, maps the remaining values and prints `10`, then `30`.
+The query suite checks the new spelling and rejects both retired names. Editor checks
+require Filter/Map completion and reject Where/Select completion. Earlier dated
+notes below record implementation milestones; the table above is the current API.
 
 ## Array receivers after Preview 5
 
@@ -39,7 +50,7 @@ vector type preserves identity. Each `GetIterator()` returns independent positio
 state retaining the original buffer. Changes to unvisited elements remain visible.
 `ToList()` copies elements into independent storage while preserving object references.
 
-Consequently, `typeof(int).GetMethods().ToList()`, `Where` and `Select` use the same
+Consequently, `typeof(int).GetMethods().ToList()`, `Filter` and `Map` use the same
 Iterable extension methods as lists. No array-specific query overloads are needed.
 See the [array query sample](experiments/raven-target/samples/library-array-queries.rvn).
 
@@ -107,7 +118,7 @@ and [ToList](https://learn.microsoft.com/en-us/dotnet/api/system.linq.enumerable
 The familiar deferred filter/projection and eager list materialization contracts are
 retained. neoCLR substitutes Iterable/Iterator and ArrayList for the corresponding
 .NET names. Compiler extension lookup and ordinary generic calls are sufficient;
-there is no query opcode or new runtime primitive. An eager Where/Select alternative
+there is no query opcode or new runtime primitive. An eager Filter/Map alternative
 would simplify iterator state but change callback timing and require intermediate
 storage, so it was not selected.
 
@@ -121,7 +132,7 @@ do not have .NET's eager ArgumentNullException contract: invalid receivers/callb
 are subject to runtime validation when used. No exception classes or nullability
 model were added by this slice.
 
-`Select` can produce `System.Void` when its callback has an explicit
+`Map` can produce `System.Void` when its callback has an explicit
 `Func<T, System.Void>` target. This exercises Void as a generic argument and one unit
 result per element; it is not a recommended replacement for ordinary iteration.
 An unannotated no-result lambda may infer Raven's `System.Unit`, which is not admitted
@@ -187,7 +198,7 @@ Error(SingleError.Multiple) for more than one. SingleError is a value union with
 IsEmpty/IsMultiple, checked GetEmpty/GetMultiple and ToString; it is not an exception
 class. There is no requirement to default-initialize T to express absence.
 
-Use either `values.Where(predicate).First()` or the subsequently added
+Use either `values.Filter(predicate).First()` or the subsequently added
 `values.First(predicate)` (likewise Last/Single) for filtered selection.
 OrDefault aliases, count/aggregation operators, ordering and specialized collection
 paths remain outside this implementation.
@@ -268,7 +279,7 @@ that the concrete API is always faster. LINQ specialization remains a valid
 optimization; this guideline does not forbid it.
 
 The initial terminal-slice measurement in `tests/query_terminals.rs` was five
-managed allocations for ArrayList.Find and nine for Where(...).First(), including
+managed allocations for ArrayList.Find and nine for Filter(...).First(), including
 identical list setup. The subsequent [ArrayList filtering slice](arraylist-filtering.md)
 removed Find's iterator and now measures four versus nine. These are interpreter
 heap-object counts, not host allocations, allocated bytes or elapsed-time results.
@@ -312,8 +323,8 @@ not promise unwinding cleanup. Dispose faults do not become union errors. Empty
 sources do not invoke the predicate; null predicates fault only if invoked.
 
 The implementation scans directly through the iterator instead of allocating a
-Where sequence and its filtering iterator. Direct IL tests compare callback order,
-reads, cardinality and disposal against Where(predicate) followed by each terminal,
+filter sequence and its filtering iterator. Direct IL tests compare callback order,
+reads, cardinality and disposal against Filter(predicate) followed by each terminal,
 and measure fewer managed allocations for the direct overload in those cases.
 This is not an elapsed-time performance claim, and does not eliminate the source's
 own iterator or callback allocations. Initial-match search and subsequent scanning
@@ -335,7 +346,7 @@ last positive value, versus three through a forward iterator. This is evidence
 against claiming identical callback timing or universal speed equivalence with .NET.
 
 Adopting those specializations can be evaluated later, with their observable
-callback/fault differences explicit. Implementing the overloads as Where composition
+callback/fault differences explicit. Implementing the overloads as Filter composition
 would reduce library loops but retain wrapper allocations; new runtime intrinsics
 are unnecessary. Existing metadata/IL represents the overloads, and Raven requires
 no compiler changes. The sample's OnlyPositive and the order workflow's OnlyPending
@@ -353,7 +364,7 @@ tests, plus Clippy and formatting. The .NET comparison targets net10.0.
 
 ## Raven-authored query implementations
 
-`Where`, `Select`, `ToList`, `First`, `Last` and `Single` (including predicate overloads) are authored
+`Filter`, `Map`, `ToList`, `First`, `Last` and `Single` (including predicate overloads) are authored
 in `runtime/raven/src/System/Linq/Operators.rvn`. `System.Linq.Operators` holds the extension methods;
 `import System.Linq.*` and receiver calls remain unchanged. This replaces the earlier
 `Enumerable` owner without an alias: rebuild consumers and reference metadata together.
@@ -363,7 +374,7 @@ with .NET's Enumerable class, this is a naming difference, not a new query proto
 Generated bootstrap bodies retain the existing Option/Result outcomes and Dispose
 boundaries. Iterator/predicate faults still terminate execution rather than becoming
 error outcomes; this migration does not introduce exception unwinding. Deferred
-Where/Select sequences and iterators are also authored in Raven. Their private helper
+Filter/Map sequences and iterators are also authored in Raven. Their private helper
 classes are emitted with internal, owner-scoped identities. Cached elements use checked
 generic storage; no default element is manufactured. `Current` guards access with
 `System.Fault("Query iterator has no current element")`, then reads the initialized
@@ -376,3 +387,19 @@ bodies have been removed. This is a source-language migration, not a change to p
 query signatures, callback timing, repeat iteration or collection contracts. The 30
 Raven query cases and five runtime terminal/cleanup/allocation tests pass. See
 [library authoring](raven-system-library.md).
+
+
+## Validation after the naming migration
+
+The post-Preview 8 Filter/Map slice uses the released Raven .15 compiler and language
+server with fresh development core metadata and runtime library. Validation passed
+83 saved-project outcomes, 33 query outcomes, 142 signature checks (including stale
+references), 86 editor
+sections, 5 normal compiler-path checks, 15 application checks and 24 focused runtime
+tests. All 77 Raven implementation slices regenerated reproducibly. The generated
+executable library diff contains only the two public method names; the other snapshot
+changes record refreshed source, compiler and core hashes.
+
+The website builds ten pages, passes its three link/build checks and tokenizer check,
+and presents the same executable sample used by the query suite. Published Preview 8
+notes and artifacts remain unchanged; its API still uses Where and Select.

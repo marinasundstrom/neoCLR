@@ -1,5 +1,5 @@
 ; Generated from runtime/raven/src/System/Linq/Operators.rvn. Regenerate with build_runtime_library.py.
-.method static Where<T0>(System.Collections.Iterable<T0> source,System.Func<T0,Boolean> predicate) -> System.Collections.Iterable<T0>
+.method static Filter<T0>(System.Collections.Iterable<T0> source,System.Func<T0,Boolean> predicate) -> System.Collections.Iterable<T0>
 M00000001_IL_0000:
 M00000001_IL_0001:
 M00000001_IL_0002:
@@ -11,7 +11,7 @@ newobj instance neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E71
 M00000001_IL_0009:
 ret
 .end
-.method static Select<T0,T1>(System.Collections.Iterable<T0> source,System.Func<T0,T1> selector) -> System.Collections.Iterable<T1>
+.method static Map<T0,T1>(System.Collections.Iterable<T0> source,System.Func<T0,T1> selector) -> System.Collections.Iterable<T1>
 M00000002_IL_0000:
 M00000002_IL_0001:
 M00000002_IL_0002:

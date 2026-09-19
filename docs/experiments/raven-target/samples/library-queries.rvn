@@ -11,10 +11,10 @@ func Main() {
 
     var tested = 0
     var selected = 0
-    let query = numbers.Where((value: int) -> bool => {
+    let query = numbers.Filter((value: int) -> bool => {
         tested = tested + 1
         return value != 7
-    }).Select((value: int) -> string => {
+    }).Map((value: int) -> string => {
         selected = selected + 1
         return if value == 42 {
             "Forty two"

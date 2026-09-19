@@ -4464,3 +4464,22 @@ locally and its language client started successfully. See the
 Release content and installation instructions were updated on the website for a
 separate manual publication. The subsequent Filter/Map migration is a separate
 post-release slice; it does not modify the published Preview 8 artifacts.
+
+The Preview 8 website was published through the separate manual
+[Pages run](https://github.com/marinasundstrom/neoCLR/actions/runs/35456186059),
+and the live installation page was checked for the .8/.15 asset set.
+
+### Query operator rename after publication — 2026-09-19
+
+After Preview 8 was published, the assistant renamed Where to Filter and Select to
+Map in the Raven-authored API, reference declarations and importer bindings.
+The implementation retains System.Linq and the existing iterator bodies. First,
+Last, Single and ToList keep their names; FlatMap is a future direction, not a new
+operator in this slice. There are no legacy aliases, so callers must rebuild with
+the matching development references and runtime library.
+
+Samples and the website now distinguish the new development names from Preview 8.
+The new on-site example is compiled by the query suite and prints 10 and 30.
+Execution, stale-name rejection, signature admission and completion are covered;
+see [the query validation record](raven-query-api.md#validation-after-the-naming-migration).
+No Raven compiler change was needed. Task/async contracts remain the next foundation.

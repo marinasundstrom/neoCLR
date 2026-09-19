@@ -37,8 +37,8 @@ class Cursor : Iterator<int> {
 
 func Main() {
     let source = Source()
-    let query = source.Where((value: int) -> bool => true)
-        .Select((value: int) -> int => value + 1)
+    let query = source.Filter((value: int) -> bool => true)
+        .Map((value: int) -> int => value + 1)
     WriteLine(source.Acquired)
     let iterator = query.GetIterator()
     WriteLine(source.Acquired)

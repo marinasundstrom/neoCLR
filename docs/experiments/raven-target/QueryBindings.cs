@@ -6,8 +6,8 @@ static class QueryBindings
     public const string Declarations = """
         namespace Linq {
             public static class Operators {
-                public static Collections.Iterable<T> Where<T>(this Collections.Iterable<T> source, Func<T, bool> predicate) => default;
-                public static Collections.Iterable<U> Select<T,U>(this Collections.Iterable<T> source, Func<T,U> selector) => default;
+                public static Collections.Iterable<T> Filter<T>(this Collections.Iterable<T> source, Func<T, bool> predicate) => default;
+                public static Collections.Iterable<U> Map<T,U>(this Collections.Iterable<T> source, Func<T,U> selector) => default;
                 public static Option<T> First<T>(this Collections.Iterable<T> source) => default;
                 public static Option<T> First<T>(this Collections.Iterable<T> source, Func<T, bool> predicate) => default;
                 public static Option<T> Last<T>(this Collections.Iterable<T> source) => default;
@@ -27,15 +27,15 @@ static class QueryBindings
             || definition.GenericParameters.Any(p => p.HasConstraints || p.Attributes != GenericParameterAttributes.NonVariant))
             throw new InvalidDataException("Unsupported query signature.");
         var types = method.GenericArguments.Select(GenericUnionBindings.Type).ToArray();
-        var arity = reference.Name == "Select" ? 2 : 1;
+        var arity = reference.Name == "Map" ? 2 : 1;
         if (types.Length != arity || types.Any(t => t is null))
             throw new InvalidDataException("Unsupported query type arguments.");
         var source = $"System.Collections.Iterable<{types[0]}>";
         var terminalArguments = definition.Parameters.Count == 2
             ? new[] { source, $"System.Func<{types[0]},Boolean>" } : new[] { source };
         var (expected, returns) = reference.Name switch {
-            "Where" => (new[] { source, $"System.Func<{types[0]},Boolean>" }, source),
-            "Select" => (new[] { source, $"System.Func<{types[0]},{types[1]}>" }, $"System.Collections.Iterable<{types[1]}>"),
+            "Filter" => (new[] { source, $"System.Func<{types[0]},Boolean>" }, source),
+            "Map" => (new[] { source, $"System.Func<{types[0]},{types[1]}>" }, $"System.Collections.Iterable<{types[1]}>"),
             "First" or "Last" => (terminalArguments, $"System.Option<{types[0]}>"),
             "Single" => (terminalArguments, $"System.Result<{types[0]},System.Linq.SingleError>"),
             "ToList" => (new[] { source }, $"System.Collections.ArrayList<{types[0]}>"),

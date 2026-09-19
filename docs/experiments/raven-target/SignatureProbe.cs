@@ -253,6 +253,23 @@ static class SignatureProbe
             Reject(name + " rejects an old or forged result", () => CollectionBindings.Bind(searchReference, search, true));
         }
         var enumerable = module.GetType("System.Linq.Operators");
+        Check("Query metadata exposes only conventional filter/projection names",
+            enumerable.Methods.Any(m => m.Name == "Filter") && enumerable.Methods.Any(m => m.Name == "Map")
+            && !enumerable.Methods.Any(m => m.Name is "Where" or "Select"));
+        foreach (var (name, retired) in new[] { ("Filter", "Where"), ("Map", "Select") }) {
+            var operation = enumerable.Methods.Single(m => m.Name == name);
+            var operationReference = Reference(operation, enumerable);
+            operationReference.CallingConvention = MethodCallingConvention.Generic;
+            var call = new GenericInstanceMethod(operationReference);
+            call.GenericArguments.Add(module.TypeSystem.String);
+            if (name == "Map") call.GenericArguments.Add(module.TypeSystem.Int32);
+            var binding = QueryBindings.Bind(call, operation, false);
+            Check(name + " binds its renamed generic library method", binding is not null
+                && binding.Name.StartsWith("System.Linq.Operators::" + name + "<", StringComparison.Ordinal)
+                && binding.Result == (name == "Map" ? "System.Collections.Iterable<Int32>" : "System.Collections.Iterable<String>"));
+            operationReference.Name = retired;
+            Reject(retired + " rejects a stale method reference", () => QueryBindings.Bind(call, operation, false));
+        }
         foreach (var name in new[] { "First", "Last", "Single" })
         foreach (var count in new[] { 1, 2 }) {
             var terminal = enumerable.Methods.Single(m => m.Name == name && m.Parameters.Count == count);

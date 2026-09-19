@@ -9,10 +9,10 @@ func Main() {
 
     let values: int[] = [1, 2, 3]
     var calls = 0
-    let selected = values.Where((value: int) -> bool => {
+    let selected = values.Filter((value: int) -> bool => {
         calls = calls + 1
         return value != 2
-    }).Select((value: int) -> int => value + 10)
+    }).Map((value: int) -> int => value + 10)
     WriteLine(calls)
     values[0] = 7
     let snapshot = selected.ToList()
@@ -27,7 +27,7 @@ func Main() {
 
     let empty: int[] = []
     WriteLine(empty.ToList().Count)
-    WriteLine(empty.Where((value: int) -> bool => true).ToList().Count)
+    WriteLine(empty.Filter((value: int) -> bool => true).ToList().Count)
     let singleton: int[] = [42]
-    WriteLine(singleton.Select((value: int) -> int => value + 1).ToList()[0])
+    WriteLine(singleton.Map((value: int) -> int => value + 1).ToList()[0])
 }

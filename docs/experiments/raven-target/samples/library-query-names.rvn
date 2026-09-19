@@ -1,0 +1,12 @@
+import System.Linq.*
+import System.Console.*
+
+func Main() {
+    let values: int[] = [1, 2, 3]
+    let query = values.Filter(value => value != 2)
+        .Map(value => value * 10)
+
+    for value in query {
+        WriteLine(value)
+    }
+}

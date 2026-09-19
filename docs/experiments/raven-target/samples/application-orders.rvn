@@ -33,7 +33,7 @@ class FileOrderStore : OrderStore {
         orders.Add(order)
     }
     func Pending() -> Iterable<Order> {
-        return orders.Where((order: Order) -> bool => order.Status.Equals("Queued"))
+        return orders.Filter((order: Order) -> bool => order.Status.Equals("Queued"))
     }
     func Find(id: int) -> Option<Order> {
         for order in orders {
@@ -84,7 +84,7 @@ func Main() {
         Ok(let text) => WriteLine(text)
         Error(let error) => WriteLine("Order report could not be read")
     }
-    let pendingNames = pending.Select((order: Order) -> string => order.Name).ToList()
+    let pendingNames = pending.Map((order: Order) -> string => order.Name).ToList()
     WriteLine("Pending orders")
     for name in pendingNames {
         WriteLine(name)

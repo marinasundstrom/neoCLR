@@ -215,7 +215,7 @@ fn concrete_find_avoids_query_chain_allocations_for_the_same_result() {
     let mut allocations = Vec::new();
     for query in [false, true] {
         let operation = if query {
-            "call System.Linq.Operators::Where<Int32>(System.Collections.Iterable<Int32>,System.Func<Int32,Boolean>)\ncall System.Linq.Operators::First<Int32>(System.Collections.Iterable<Int32>)"
+            "call System.Linq.Operators::Filter<Int32>(System.Collections.Iterable<Int32>,System.Func<Int32,Boolean>)\ncall System.Linq.Operators::First<Int32>(System.Collections.Iterable<Int32>)"
         } else {
             "call instance System.Collections.ArrayList<Int32>::Find(System.Func<Int32,Boolean>)"
         };
@@ -258,7 +258,7 @@ ret
         allocations.push(result.heap.statistics().allocated_objects);
     }
     println!(
-        "Managed allocations: ArrayList.Find={}, Where.First={}",
+        "Managed allocations: ArrayList.Find={}, Filter.First={}",
         allocations[0], allocations[1]
     );
     assert!(allocations[0] < allocations[1]);
@@ -274,7 +274,7 @@ fn predicate_start(count: i32, mode: i32, fail_move: i32, fail_dispose: bool) ->
 fn predicate_call(operator: &str, via_where: bool) -> String {
     if via_where {
         format!(
-            "call System.Linq.Operators::Where<Int32>(System.Collections.Iterable<Int32>,System.Func<Int32,Boolean>)\ncall System.Linq.Operators::{operator}<Int32>(System.Collections.Iterable<Int32>)\n"
+            "call System.Linq.Operators::Filter<Int32>(System.Collections.Iterable<Int32>,System.Func<Int32,Boolean>)\ncall System.Linq.Operators::{operator}<Int32>(System.Collections.Iterable<Int32>)\n"
         )
     } else {
         format!(

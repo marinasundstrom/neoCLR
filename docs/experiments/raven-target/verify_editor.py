@@ -342,7 +342,7 @@ try:
         results['Extension receiver'] = labels
     if queries:
         for version, declaration in ((42, 'let values = ArrayList<int>()'),
-                                     (43, 'let values = ArrayList<int>().Where((value: int) -> bool => true)'),
+                                     (43, 'let values = ArrayList<int>().Filter((value: int) -> bool => true)'),
                                      (44, 'let values: int[] = [1, 2]'),
                                      (45, 'let values = typeof(int).GetMethods()')):
             text = ('import System.Collections.*\nimport System.Linq.*\n'
@@ -353,7 +353,8 @@ try:
                 'context': {'triggerKind': 2, 'triggerCharacter': '.'}}, True))
             items = result if isinstance(result, list) else result['items']
             labels = sorted({item['label'] for item in items})
-            assert {'Where', 'Select', 'ToList', 'First', 'Last', 'Single'}.issubset(labels), labels
+            assert {'Filter', 'Map', 'ToList', 'First', 'Last', 'Single'}.issubset(labels), labels
+            assert not {'Where', 'Select'}.intersection(labels), labels
             results['Query extensions ' + str(version)] = labels
     if array_invariance:
         import time
@@ -396,7 +397,7 @@ try:
             'context': {'triggerKind': 2, 'triggerCharacter': '.'}}, True))
         items = result if isinstance(result, list) else result['items']
         labels = sorted({item['label'] for item in items})
-        assert {'Length', 'GetIterator', 'Where', 'ToList', 'ForEach'}.issubset(labels), labels
+        assert {'Length', 'GetIterator', 'Filter', 'ToList', 'ForEach'}.issubset(labels), labels
         assert 'Item' not in labels, labels
         results['Generic array members'] = labels
         text = ('import System.*\nfunc Inspect(values: Array<int>) -> int {\n'

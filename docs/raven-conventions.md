@@ -148,3 +148,11 @@ runtime slices, and check source admission when declarations change. The
 [nested type sample](experiments/raven-target/samples/library-nested-type-info.rvn)
 and [runtime descriptors](../runtime/raven/src/System/Introspection/Descriptors.rvn)
 provide executable examples of these conventions.
+
+## Query operator terminology
+
+For the neoCLR development API after Preview 8, use `Filter` and `Map` with initial
+capitals. Follow [the naming principle](api-policy.md#query-operator-naming-direction-2026-09-19)
+rather than copying every .NET name or mechanically copying another language.
+Preview 8 uses `Where` and `Select`; its published samples remain unchanged.
+C# tooling still targets .NET and keeps its actual .NET method names.

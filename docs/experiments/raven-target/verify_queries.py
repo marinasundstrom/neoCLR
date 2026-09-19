@@ -24,20 +24,23 @@ with tempfile.TemporaryDirectory(prefix='neoclr-queries-') as temporary:
     command = [sys.executable, str(bridge / 'run_project.py'), str(root / 'Demo.rvnproj'),
                *runner_arguments(args), '--runtime', str(args.runtime.resolve())]
     cases = [
+        ('Conventional operator names with inferred callbacks',
+         (bridge / 'samples/library-query-names.rvn').read_text(),
+         (bridge / 'samples/library-query-names.expected.txt').read_text()),
         ('String equality in interface query predicates', header + """
 func Main() {
     let orders: List<string> = ArrayList<string>()
     orders.Add("test")
     orders.Add("2")
-    let items = orders.Where(x => x == "2")
+    let items = orders.Filter(x => x == "2")
     for item in items {
         WriteLine(item)
     }
     let expected = System.String.Concat("te", "st")
-    for item in orders.Where(x => x == expected) {
+    for item in orders.Filter(x => x == expected) {
         WriteLine(item)
     }
-    for item in orders.Where(x => x != expected) {
+    for item in orders.Filter(x => x != expected) {
         WriteLine(item)
     }
     if expected == "test" {
@@ -88,7 +91,7 @@ func Main() {
         ('Array query retained across GC', header + '''
 func Make() -> Iterable<int> {
     let values: int[] = [7, 42]
-    return values.Select((value: int) -> int => value + 1)
+    return values.Map((value: int) -> int => value + 1)
 }
 func Main() {
     let query = Make()
@@ -109,10 +112,10 @@ func Main() {
 func Main() {
     let empty = ArrayList<int>()
     var calls = 0
-    let query = empty.Where((value: int) -> bool => {
+    let query = empty.Filter((value: int) -> bool => {
         calls = calls + 1
         return true
-    }).Select((value: int) -> int => {
+    }).Map((value: int) -> int => {
         calls = calls + 1
         return value
     })
@@ -129,7 +132,7 @@ func Main() {
     let values = ArrayList<int>()
     values.Add(7)
     var accept = false
-    let query = values.Where((value: int) -> bool => accept)
+    let query = values.Filter((value: int) -> bool => accept)
     WriteLine(query.ToList().Count)
     accept = true
     values.Add(42)
@@ -145,7 +148,7 @@ func Make() -> Iterable<int> {
     let values = ArrayList<int>()
     values.Add(7)
     var offset = 1
-    let query = values.Select((value: int) -> int => value + offset)
+    let query = values.Map((value: int) -> int => value + offset)
     offset = 2
     return query
 }
@@ -173,18 +176,18 @@ func Main() {
     let boxes = ArrayList<Box>()
     let original = Box(7)
     boxes.Add(original)
-    let copied = boxes.Where((value: Box) -> bool => true).ToList()
+    let copied = boxes.Filter((value: Box) -> bool => true).ToList()
     original.Value = 42
     WriteLine(copied[0].Value)
     copied.Add(Box(99))
     WriteLine(boxes.Count)
-    let flags = boxes.Select((value: Box) -> bool => value.Value == 42).ToList()
+    let flags = boxes.Map((value: Box) -> bool => value.Value == 42).ToList()
     if flags[0] { WriteLine("Boolean") }
     let dates = ArrayList<Date>()
     dates.Add(Date.FromDayNumber(0).GetOkCase().Value)
-    WriteLine(dates.Select((value: Date) -> int => value.DayNumber).ToList()[0])
+    WriteLine(dates.Map((value: Date) -> int => value.DayNumber).ToList()[0])
     let visit: Func<Box, System.Void> = (value: Box) => { WriteLine(value.Value) }
-    let units = boxes.Select(visit).ToList()
+    let units = boxes.Map(visit).ToList()
     WriteLine(units.Count)
 }
 ''', '42\n1\nBoolean\n0\n42\n1\n'))
@@ -233,7 +236,7 @@ func Main() {
     cases.append(('Ordered query predicate', header + '''
 func Main() {
     let values: int[] = [1, 2, 3]
-    for value in values.Where((value: int) -> bool => value > 1) {
+    for value in values.Filter((value: int) -> bool => value > 1) {
         WriteLine(value)
     }
 }
@@ -262,7 +265,7 @@ func Main() {
 func Main() {
     let values = ArrayList<int>()
     values.Add(42)
-    let iterator = values.Select((value: int) -> int => value).GetIterator()
+    let iterator = values.Map((value: int) -> int => value).GetIterator()
 ''' + advance + '''
     WriteLine(iterator.Current)
     WriteLine("Must not continue")
@@ -277,7 +280,7 @@ func Main() {
 func Main() {
     let values = ArrayList<int>()
     values.Add(42)
-    let query = values.Select((value: int) -> int => {
+    let query = values.Map((value: int) -> int => {
         Result<int, Error>.Ok(value).GetErrorCase()
         return value
     })
@@ -291,8 +294,10 @@ func Main() {
     assert 'Deferred\n' in run.stdout and 'Must not continue' not in run.stdout
     results['Callback fault is terminal and deferred'] = 'passed'
     for label, expression in (
-        ('Indexed predicate overload', 'values.Where((value: int, index: int) -> bool => true)'),
-        ('Wrong predicate result', 'values.Where((value: int) -> int => value)'),
+        ('Retired Where name', 'values.Where((value: int) -> bool => true)'),
+        ('Retired Select name', 'values.Select((value: int) -> int => value)'),
+        ('Indexed predicate overload', 'values.Filter((value: int, index: int) -> bool => true)'),
+        ('Wrong predicate result', 'values.Filter((value: int) -> int => value)'),
         ('Unimplemented operator', 'values.OrderBy((value: int) -> int => value)')):
         (root / 'Main.rvn').write_text(header + 'func Main() { let values = ArrayList<int>()\n' + expression + '\n}')
         run = subprocess.run(command, capture_output=True, text=True, timeout=120)

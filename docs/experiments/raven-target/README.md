@@ -621,8 +621,8 @@ checked extraction, descriptions, message errors and `--errors` completion check
 
 ## Prototype queries (source experiment)
 
-The current collection profile adds `import System.Linq.*` with deferred `Where` and
-`Select` and eager `ToList`. See [the query contract](../../raven-query-api.md),
+The current collection profile adds `import System.Linq.*` with deferred `Filter` and
+`Map` and eager `ToList`. See [the query contract](../../raven-query-api.md),
 `samples/library-queries.rvn`, and `verify_queries.py`. Use fresh declaration metadata
 and the matching generated library; archived .7 packages do not contain this API.
 `verify_editor.py --queries` checks completion on lists and query results.

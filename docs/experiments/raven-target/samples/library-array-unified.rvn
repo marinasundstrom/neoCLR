@@ -37,7 +37,7 @@ func Main() {
     }
     iterator.Dispose()
 
-    let copy = same.Where((value: int) -> bool => value > 10).ToList()
+    let copy = same.Filter((value: int) -> bool => value > 10).ToList()
     WriteLine(copy.Count)
     WriteLine(copy[0])
     WriteLine(typeof(Array<int>).GenericArgumentCount)

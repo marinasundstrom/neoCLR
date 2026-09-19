@@ -14,7 +14,7 @@ imports and executes them against its own runtime library.
 - `OrderStore`, an application interface for adding, finding, saving and querying orders.
 - `FileOrderStore`, with an `ArrayList<Order>` and a bounded text-file report.
 - `Process`, which handles Option absence and Result outcomes using case patterns.
-- A deferred `Pending()` query, projected to names with Select and materialized with ToList.
+- A deferred `Pending()` query, projected to names with Map and materialized with ToList.
 
 `Save` uses `?` to propagate `FileWriteError` before changing the order status. Its
 success type is `Result<System.Void, FileWriteError>`: completion has no payload.
@@ -121,7 +121,7 @@ This distinction is intentional and is visible in the sample's output.
 
 OnlyPending accepts Iterable<Order>, calls Single with a predicate, and propagates the
 Result. Initially two pending orders yield Multiple, then one yields order 303,
-then none yield Empty. An Order[] also supports Where/Select/ToList through the array's
+then none yield Empty. An Order[] also supports Filter/Map/ToList through the array's
 Iterable contract. FindIndex demonstrates Some(0), distinguishing the first position
 from absence. Imported Some/None and Ok/Error patterns destructure application-class
 payloads without managed-reference syntax or manual casts.
@@ -163,5 +163,5 @@ this scenario; this source slice does not itself build, install or publish a rel
 
 The later predicate-overload source slice simplifies OnlyPending to
 `orders.Single(predicate)?`. The installed .12 sample retains its equivalent
-Where(predicate).Single() spelling; do not copy this newer source into .12 without
+Filter(predicate).Single() spelling; do not copy this newer source into .12 without
 refreshing its matching core metadata and System library.

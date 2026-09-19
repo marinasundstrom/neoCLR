@@ -10,8 +10,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 - Record the general Raven SDK AppleDouble packaging candidate and the validated
   sidecar-free Preview 8 archive workaround; no upstream script fix is claimed.
-- Establish conventional query-operator terminology as the next post-release slice,
-  before Task/async work; select Filter/Map for Where/Select with initial capitals.
+- Rename the development query API after Preview 8: Where becomes Filter and
+  Select becomes Map, with initial capitals and no legacy aliases. Rebuild callers
+  and target references together; deferred execution and iterator behavior are retained.
+  Update samples, metadata bindings, editor checks and the website migration guide.
+  Validate 83 saved-project outcomes, 33 query outcomes, 142 signatures, 86 editor
+  sections, 5 compiler-path checks, 15 application checks, 24 focused runtime tests
+  and reproducible regeneration of all 77 library slices.
   Prefer converged terminology while retaining .NET terms where conventional or
   clearer; do not mechanically choose Fold/Reduce or Drop/Skip. Preview 8 still
   exposes the existing names.
