@@ -449,7 +449,7 @@ call instance System.Runtime.RuntimeContext::GetTypeInfoFromHandle(System.Runtim
 "#;
     for (query, expected) in [
         (
-            "callvirt instance System.Introspection.TypeInfo::get_MetadataToken()",
+            "castclass System.Introspection.MemberInfo\ncallvirt instance System.Introspection.MemberInfo::get_MetadataToken()",
             0x02000002,
         ),
         (
@@ -565,7 +565,8 @@ fn constructed_types_reuse_definition_tokens_and_arrays_have_no_definition_token
 call System.Runtime.RuntimeContext::get_Current()
 ldtoken {name}
 call instance System.Runtime.RuntimeContext::GetTypeInfoFromHandle(System.RuntimeTypeHandle)
-callvirt instance System.Introspection.TypeInfo::get_MetadataToken()
+castclass System.Introspection.MemberInfo
+callvirt instance System.Introspection.MemberInfo::get_MetadataToken()
 ret
 .end
 "#

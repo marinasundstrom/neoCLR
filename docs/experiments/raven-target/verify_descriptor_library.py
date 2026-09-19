@@ -49,6 +49,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-descriptor-library-') as tempora
         project.write_text(f'''<Project>
   <PropertyGroup><OutputType>Library</OutputType><AssemblyName>{name}</AssemblyName><NeoCLRRoot>{escape(str(root))}</NeoCLRRoot></PropertyGroup>
   <Import Project="{escape(str(ROOT / 'build/NeoCLR.Raven.props'))}" />
+  <PropertyGroup><RavenTypeOfAssemblyName/><RavenTypeOfInfoType/><RavenTypeOfContextType/></PropertyGroup>
   <ItemGroup><Compile Include="Main.rvn" /></ItemGroup>
 </Project>''')
         compile_diagnostic = 'RAV0501' if name == 'PublicProvider' else diagnostic if name == 'SnapshotDefault' else None

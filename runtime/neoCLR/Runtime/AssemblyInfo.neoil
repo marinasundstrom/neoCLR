@@ -31,3 +31,6 @@
 .function neoCLR.Runtime.TypeModule(System.RuntimeTypeHandle handle) -> System.Introspection.ModuleInfo
 .methodimpl InternalCall
 .end
+.function neoCLR.Runtime.TypeDeclaringType(System.RuntimeTypeHandle handle) -> System.Option<System.Introspection.TypeInfo>
+.methodimpl InternalCall
+.end

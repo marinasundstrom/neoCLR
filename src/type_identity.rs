@@ -71,7 +71,8 @@ pub(crate) fn describe_loaded(module: &Module, normalized: &Type) -> Result<Type
     };
     let declaring_type = module
         .type_definition(normalized)
-        .and_then(|definition| definition.declaring_type.clone());
+        .and_then(|definition| declaring_definition(module, definition))
+        .and_then(|parent| parent.definition.clone());
     Ok(TypeDescriptor {
         identity,
         name,
@@ -220,6 +221,25 @@ pub(crate) fn describe_definition(
             .as_ref()
             .map_or_else(|| definition.name.clone(), |o| o.name.clone()),
         generic_arguments: arguments,
-        declaring_type: definition.declaring_type.clone(),
+        declaring_type: declaring_definition(module, definition).and_then(|p| p.definition.clone()),
+    })
+}
+
+pub(crate) fn declaring_definition<'a>(
+    module: &'a Module,
+    definition: &crate::metadata::TypeDef,
+) -> Option<&'a crate::metadata::TypeDef> {
+    if let Some(id) = &definition.declaring_type {
+        return module
+            .types
+            .iter()
+            .find(|d| d.definition.as_ref() == Some(id));
+    }
+    let origin = definition.origin.as_ref()?;
+    let token = origin.declaring_type_token?;
+    module.types.iter().find(|d| {
+        d.origin.as_ref().is_some_and(|p| {
+            p.assembly == origin.assembly && p.module == origin.module && p.token == token
+        })
     })
 }

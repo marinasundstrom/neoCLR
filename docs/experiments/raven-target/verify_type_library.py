@@ -28,8 +28,10 @@ with tempfile.TemporaryDirectory(prefix='neoclr-declaration-library-') as tempor
     core = root / 'demo/NeoCLR.CoreProbe.dll'
     run(['dotnet', args.bridge.resolve(), '--reference-library-core', core])
     owner = 'System.Introspection.TypeInfo'
-    source_path = 'Introspection/TypeInfo.rvn'
+    source_path = 'Introspection/Descriptors.rvn'
     source = (ROOT / 'runtime/raven/src/System' / source_path).read_text()
+    prefix, source = source.split('public sealed interface TypeInfo', 1)
+    source = 'public sealed interface TypeInfo' + source
     for name, text, diagnostic in [
         ('Valid', source, None),
         ('Storage', source.replace('private field Handle: RuntimeTypeHandle', 'private field Handle: RuntimeTypeHandle\n    private field Extra: int = 0'), 'Type library layout'),
@@ -41,7 +43,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-declaration-library-') as tempor
            'does not match reference contract')]:
         folder = root / name
         folder.mkdir()
-        (folder / 'Main.rvn').write_text(text)
+        (folder / 'Main.rvn').write_text(prefix + text)
         project = folder / 'Probe.rvnproj'
         project.write_text(f'''<Project>
   <PropertyGroup><OutputType>Library</OutputType><AssemblyName>{name}</AssemblyName><NeoCLRRoot>{escape(str(root))}</NeoCLRRoot></PropertyGroup>
@@ -51,7 +53,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-declaration-library-') as tempor
 </Project>''')
         run(['dotnet', args.compiler.resolve(), project, '--no-project-restore', '-o', folder / 'bin'])
         output = folder / 'imported'
-        run(['dotnet', args.bridge.resolve(), '--library-implementation', folder / 'bin' / (name + '.dll'), core, owner, output], diagnostic is None, diagnostic)
+        run(['dotnet', args.bridge.resolve(), '--library-implementation', folder / 'bin' / (name + '.dll'), core, 'System.Introspection.MemberInfo', output], diagnostic is None, diagnostic)
         if diagnostic:
             assert not (output / 'Implementation.neoil').exists()
         else:

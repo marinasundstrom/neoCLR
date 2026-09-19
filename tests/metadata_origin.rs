@@ -82,3 +82,41 @@ fn duplicate_tokens_within_one_source_module_are_rejected() {
 "#;
     assert!(assemble(&(source() + duplicate)).is_err());
 }
+
+#[test]
+fn nested_source_owner_survives_roundtrip_and_rejects_missing_or_cyclic_owners() {
+    let nested = r#".type Inner
+.origin {"assembly":"App, Version=1.0.0.0","module":"App.dll","name":"Example.Item.Inner","token":33554435,"declaring_type_token":33554434}
+.end
+"#;
+    let text = source() + nested;
+    let module = assemble(&text).unwrap();
+    let loaded = load(&serde_json::to_string(&module).unwrap()).unwrap();
+    assert_eq!(
+        loaded.types[1]
+            .origin
+            .as_ref()
+            .unwrap()
+            .declaring_type_token,
+        Some(33554434)
+    );
+    for invalid in [
+        text.replace(
+            "\"declaring_type_token\":33554434",
+            "\"declaring_type_token\":33554436",
+        ),
+        text.replace(
+            "\"declaring_type_token\":33554434",
+            "\"declaring_type_token\":33554435",
+        ),
+        text.replace(
+            "\"field_tokens\":[67108865]",
+            "\"field_tokens\":[67108865],\"declaring_type_token\":33554435",
+        ),
+    ] {
+        assert!(assemble(&invalid).is_err());
+    }
+    let mut artifact = serde_json::to_value(module).unwrap();
+    artifact["types"][1]["origin"]["declaring_type_token"] = serde_json::json!(33554436);
+    assert!(load(&artifact.to_string()).is_err());
+}

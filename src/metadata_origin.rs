@@ -19,6 +19,8 @@ pub struct MetadataOrigin {
     pub module: String,
     pub name: String,
     pub token: u32,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub declaring_type_token: Option<u32>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub field_tokens: Vec<u32>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -85,6 +87,11 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
                 "metadata origin does not match its definition or assembly",
             ));
         }
+        if table != 0x02 && origin.declaring_type_token.is_some() {
+            return Err(Fault::new(
+                "declaring type origin applies only to type definitions",
+            ));
+        }
         check(origin, origin.token, table)?;
         for &token in &origin.field_tokens {
             check(origin, token, 0x04)?;
@@ -98,6 +105,23 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             if token != 0 {
                 check(origin, token, 0x08)?;
             }
+        }
+    }
+    for origin in module.types.iter().filter_map(|t| t.origin.as_ref()) {
+        let mut current = origin;
+        let mut visited = HashSet::from([origin.token]);
+        while let Some(parent) = current.declaring_type_token {
+            if !visited.insert(parent) {
+                return Err(Fault::new("cyclic source declaring type metadata"));
+            }
+            current = module
+                .types
+                .iter()
+                .filter_map(|t| t.origin.as_ref())
+                .find(|p| {
+                    p.assembly == origin.assembly && p.module == origin.module && p.token == parent
+                })
+                .ok_or_else(|| Fault::new("missing source declaring type definition"))?;
         }
     }
     Ok(())

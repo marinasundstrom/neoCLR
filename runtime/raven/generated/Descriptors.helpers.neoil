@@ -1,37 +1,44 @@
 ; Generated from runtime/raven/src/System/Introspection/Descriptors.rvn. Regenerate with build_runtime_library.py.
-.function neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion0(System.Option<System.Introspection.MethodInfo>& arg0) -> Boolean
+.function neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion0(System.Introspection.TypeInfo arg0) -> System.Option.Some<System.Introspection.TypeInfo>
 ldarg arg0
-ldobj System.Option<System.Introspection.MethodInfo>
-call instance System.Option<System.Introspection.MethodInfo>::get_IsNone()
+newobj instance System.Option.Some<System.Introspection.TypeInfo>::.ctor(System.Introspection.TypeInfo)
 ret
 .end
-.function neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion1() -> System.Option.None
+.function neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion1(System.Option.Some<System.Introspection.TypeInfo> arg0) -> System.Option<System.Introspection.TypeInfo>
+ldarg arg0
+newobj instance System.Option<System.Introspection.TypeInfo>::.ctor(System.Option.Some<System.Introspection.TypeInfo>)
+ret
+.end
+.function neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion2(System.Option<System.Introspection.MethodInfo>& arg0,out(true) System.Option.Some<System.Introspection.MethodInfo>& arg1) -> Boolean
+ldarg arg0
+ldobj System.Option<System.Introspection.MethodInfo>
+ldarg arg1
+call instance System.Option<System.Introspection.MethodInfo>::TryGet(System.Option.Some<System.Introspection.MethodInfo>&)
+ret
+.end
+.function neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion3() -> System.Option.None
 newobj instance System.Option.None::.ctor()
 ret
 .end
-.function neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion2(System.Option.None arg0) -> System.Option<System.Introspection.MethodInfo>
+.function neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion4(System.Option.None arg0) -> System.Option<System.Introspection.MethodInfo>
 ldarg arg0
 newobj instance System.Option<System.Introspection.MethodInfo>::.ctor(System.Option.None)
 ret
 .end
-.function neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion3(System.Option<System.Introspection.MethodInfo>& arg0) -> System.Option.Some<System.Introspection.MethodInfo>
-ldarg arg0
-ldobj System.Option<System.Introspection.MethodInfo>
-call instance System.Option<System.Introspection.MethodInfo>::GetSomeCase()
-ret
-.end
-.function neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion4(System.Option.Some<System.Introspection.MethodInfo>& arg0) -> System.Introspection.MethodInfo
-ldarg arg0
+.function neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion5(System.Option.Some<System.Introspection.MethodInfo>& receiver,out System.Introspection.MethodInfo& value) -> void
+ldarg value
+ldarg receiver
 ldobj System.Option.Some<System.Introspection.MethodInfo>
 call instance System.Option.Some<System.Introspection.MethodInfo>::get_Value()
+stobj System.Introspection.MethodInfo
 ret
 .end
-.function neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion5(System.Introspection.MethodInfo arg0) -> System.Option.Some<System.Introspection.MethodInfo>
+.function neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion6(System.Introspection.MethodInfo arg0) -> System.Option.Some<System.Introspection.MethodInfo>
 ldarg arg0
 newobj instance System.Option.Some<System.Introspection.MethodInfo>::.ctor(System.Introspection.MethodInfo)
 ret
 .end
-.function neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion6(System.Option.Some<System.Introspection.MethodInfo> arg0) -> System.Option<System.Introspection.MethodInfo>
+.function neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion7(System.Option.Some<System.Introspection.MethodInfo> arg0) -> System.Option<System.Introspection.MethodInfo>
 ldarg arg0
 newobj instance System.Option<System.Introspection.MethodInfo>::.ctor(System.Option.Some<System.Introspection.MethodInfo>)
 ret
@@ -60,11 +67,6 @@ False:
     ldc.i4 0
     ret
 .end
-.function neoCLR.Library.System.Introspection.MemberInfo.RuntimeReflectionA51CCD269F0B3695(System.Introspection.TypeInfo arg0) -> System.Introspection.ModuleInfo
-ldarg arg0
-callvirt instance System.Introspection.TypeInfo::get_Module()
-ret
-.end
 .function neoCLR.Library.System.Introspection.MemberInfo.RuntimeCliCall0(System.Introspection.RuntimePropertyInfo arg0,Int32 arg1) -> System.Option<System.Introspection.MethodInfo>
 ldarg arg0
 ldarg arg1
@@ -77,6 +79,219 @@ ldarg arg0
 ldarg arg1
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanFromInt32(Int32)
 callvirt instance System.Introspection.RuntimePropertyInfo::GetSetMethod(Boolean)
+ret
+.end
+.function neoCLR.Library.System.Introspection.MemberInfo.RuntimeServiceTypeInterfaces(System.RuntimeTypeHandle arg0) -> arrayref<System.Introspection.TypeInfo>
+.local System.Introspection.TypeInfo[] source
+.local arrayref<System.Introspection.TypeInfo> destination
+.local Int32 index
+ldarg arg0
+call neoCLR.Runtime.TypeInterfaces(System.RuntimeTypeHandle)
+stloc source
+ldloc source
+ldlen
+conv.i4
+newarr System.Introspection.TypeInfo
+stloc destination
+ldc.i4 0
+stloc index
+br Test
+Copy:
+ldloc destination
+ldloc index
+ldloc source
+ldloc index
+ldelem System.Introspection.TypeInfo
+stelem System.Introspection.TypeInfo
+ldloc index
+ldc.i4 1
+add
+stloc index
+Test:
+ldloc index
+ldloc source
+ldlen
+conv.i4
+blt Copy
+ldloc destination
+ret
+.end
+.function neoCLR.Library.System.Introspection.MemberInfo.RuntimeServiceTypeEnumNames(System.RuntimeTypeHandle arg0) -> arrayref<String>
+.local String[] source
+.local arrayref<String> destination
+.local Int32 index
+ldarg arg0
+call neoCLR.Runtime.TypeEnumNames(System.RuntimeTypeHandle)
+stloc source
+ldloc source
+ldlen
+conv.i4
+newarr String
+stloc destination
+ldc.i4 0
+stloc index
+br Test
+Copy:
+ldloc destination
+ldloc index
+ldloc source
+ldloc index
+ldelem String
+stelem String
+ldloc index
+ldc.i4 1
+add
+stloc index
+Test:
+ldloc index
+ldloc source
+ldlen
+conv.i4
+blt Copy
+ldloc destination
+ret
+.end
+.function neoCLR.Library.System.Introspection.MemberInfo.RuntimeServiceTypeFields(System.RuntimeTypeHandle arg0,Int32 arg1) -> arrayref<System.Introspection.FieldInfo>
+.local System.Introspection.FieldInfo[] source
+.local arrayref<System.Introspection.FieldInfo> destination
+.local Int32 index
+ldarg arg0
+ldarg arg1
+call neoCLR.Runtime.TypeFields(System.RuntimeTypeHandle,Int32)
+stloc source
+ldloc source
+ldlen
+conv.i4
+newarr System.Introspection.FieldInfo
+stloc destination
+ldc.i4 0
+stloc index
+br Test
+Copy:
+ldloc destination
+ldloc index
+ldloc source
+ldloc index
+ldelem System.Introspection.FieldInfo
+stelem System.Introspection.FieldInfo
+ldloc index
+ldc.i4 1
+add
+stloc index
+Test:
+ldloc index
+ldloc source
+ldlen
+conv.i4
+blt Copy
+ldloc destination
+ret
+.end
+.function neoCLR.Library.System.Introspection.MemberInfo.RuntimeServiceTypeMethods(System.RuntimeTypeHandle arg0,Int32 arg1) -> arrayref<System.Introspection.MethodInfo>
+.local System.Introspection.MethodInfo[] source
+.local arrayref<System.Introspection.MethodInfo> destination
+.local Int32 index
+ldarg arg0
+ldarg arg1
+call neoCLR.Runtime.TypeMethods(System.RuntimeTypeHandle,Int32)
+stloc source
+ldloc source
+ldlen
+conv.i4
+newarr System.Introspection.MethodInfo
+stloc destination
+ldc.i4 0
+stloc index
+br Test
+Copy:
+ldloc destination
+ldloc index
+ldloc source
+ldloc index
+ldelem System.Introspection.MethodInfo
+stelem System.Introspection.MethodInfo
+ldloc index
+ldc.i4 1
+add
+stloc index
+Test:
+ldloc index
+ldloc source
+ldlen
+conv.i4
+blt Copy
+ldloc destination
+ret
+.end
+.function neoCLR.Library.System.Introspection.MemberInfo.RuntimeServiceTypeProperties(System.RuntimeTypeHandle arg0,Int32 arg1) -> arrayref<System.Introspection.PropertyInfo>
+.local System.Introspection.PropertyInfo[] source
+.local arrayref<System.Introspection.PropertyInfo> destination
+.local Int32 index
+ldarg arg0
+ldarg arg1
+call neoCLR.Runtime.TypeProperties(System.RuntimeTypeHandle,Int32)
+stloc source
+ldloc source
+ldlen
+conv.i4
+newarr System.Introspection.PropertyInfo
+stloc destination
+ldc.i4 0
+stloc index
+br Test
+Copy:
+ldloc destination
+ldloc index
+ldloc source
+ldloc index
+ldelem System.Introspection.PropertyInfo
+stelem System.Introspection.PropertyInfo
+ldloc index
+ldc.i4 1
+add
+stloc index
+Test:
+ldloc index
+ldloc source
+ldlen
+conv.i4
+blt Copy
+ldloc destination
+ret
+.end
+.function neoCLR.Library.System.Introspection.MemberInfo.RuntimeServiceTypeGenericArguments(System.RuntimeTypeHandle arg0) -> arrayref<System.Introspection.TypeInfo>
+.local System.Introspection.TypeInfo[] source
+.local arrayref<System.Introspection.TypeInfo> destination
+.local Int32 index
+ldarg arg0
+call neoCLR.Runtime.TypeGenericArguments(System.RuntimeTypeHandle)
+stloc source
+ldloc source
+ldlen
+conv.i4
+newarr System.Introspection.TypeInfo
+stloc destination
+ldc.i4 0
+stloc index
+br Test
+Copy:
+ldloc destination
+ldloc index
+ldloc source
+ldloc index
+ldelem System.Introspection.TypeInfo
+stelem System.Introspection.TypeInfo
+ldloc index
+ldc.i4 1
+add
+stloc index
+Test:
+ldloc index
+ldloc source
+ldlen
+conv.i4
+blt Copy
+ldloc destination
 ret
 .end
 .interface System.Introspection.FieldInfo
@@ -210,6 +425,96 @@ ret
 .get instance System.Introspection.PropertyInfo::get_DefinitionIndex()
 .end
 .end
+.interface System.Introspection.TypeInfo
+.implements System.Introspection.MemberInfo
+.implements System.Equatable<System.Introspection.TypeInfo>
+.method instance get_FullName() -> String
+.end
+.method instance get_Namespace() -> String
+.end
+.method instance get_GenericArgumentCount() -> Int32
+.end
+.method instance GetGenericArgument(Int32 index) -> System.Introspection.TypeInfo
+.end
+.method instance Equals(System.Introspection.TypeInfo other) -> Boolean
+.end
+.method instance get_IsArray() -> Boolean
+.end
+.method instance get_IsByRef() -> Boolean
+.end
+.method instance get_IsPointer() -> Boolean
+.end
+.method instance get_IsInterface() -> Boolean
+.end
+.method instance get_IsReadOnly() -> Boolean
+.end
+.method instance get_IsAbstract() -> Boolean
+.end
+.method instance get_IsEnum() -> Boolean
+.end
+.method instance get_IsValueType() -> Boolean
+.end
+.method instance GetGenericArguments() -> System.Collections.Sequence<System.Introspection.TypeInfo>
+.end
+.method instance GetElementType() -> System.Option<System.Introspection.TypeInfo>
+.end
+.method instance get_BaseType() -> System.Option<System.Introspection.TypeInfo>
+.end
+.method instance GetInterfaces() -> System.Collections.Sequence<System.Introspection.TypeInfo>
+.end
+.method instance GetEnumNames() -> System.Collections.Sequence<String>
+.end
+.method instance GetEnumUnderlyingType() -> System.Introspection.TypeInfo
+.end
+.method instance GetFields() -> System.Collections.Sequence<System.Introspection.FieldInfo>
+.end
+.method instance GetFields(System.Introspection.BindingFlags flags) -> System.Collections.Sequence<System.Introspection.FieldInfo>
+.end
+.method instance GetMethods() -> System.Collections.Sequence<System.Introspection.MethodInfo>
+.end
+.method instance GetMethods(System.Introspection.BindingFlags flags) -> System.Collections.Sequence<System.Introspection.MethodInfo>
+.end
+.method instance GetProperties() -> System.Collections.Sequence<System.Introspection.PropertyInfo>
+.end
+.method instance GetProperties(System.Introspection.BindingFlags flags) -> System.Collections.Sequence<System.Introspection.PropertyInfo>
+.end
+.property instance FullName() -> String
+.get instance System.Introspection.TypeInfo::get_FullName()
+.end
+.property instance Namespace() -> String
+.get instance System.Introspection.TypeInfo::get_Namespace()
+.end
+.property instance GenericArgumentCount() -> Int32
+.get instance System.Introspection.TypeInfo::get_GenericArgumentCount()
+.end
+.property instance IsArray() -> Boolean
+.get instance System.Introspection.TypeInfo::get_IsArray()
+.end
+.property instance IsByRef() -> Boolean
+.get instance System.Introspection.TypeInfo::get_IsByRef()
+.end
+.property instance IsPointer() -> Boolean
+.get instance System.Introspection.TypeInfo::get_IsPointer()
+.end
+.property instance IsInterface() -> Boolean
+.get instance System.Introspection.TypeInfo::get_IsInterface()
+.end
+.property instance IsReadOnly() -> Boolean
+.get instance System.Introspection.TypeInfo::get_IsReadOnly()
+.end
+.property instance IsAbstract() -> Boolean
+.get instance System.Introspection.TypeInfo::get_IsAbstract()
+.end
+.property instance IsEnum() -> Boolean
+.get instance System.Introspection.TypeInfo::get_IsEnum()
+.end
+.property instance IsValueType() -> Boolean
+.get instance System.Introspection.TypeInfo::get_IsValueType()
+.end
+.property instance BaseType() -> System.Option<System.Introspection.TypeInfo>
+.get instance System.Introspection.TypeInfo::get_BaseType()
+.end
+.end
 .type internal class abstract System.Introspection.RuntimeMemberInfo
 .field private Name String
 .field private DeclaringType System.Introspection.TypeInfo
@@ -223,7 +528,7 @@ ret
 .property instance Name() -> String
 .get instance System.Introspection.RuntimeMemberInfo::get_Name()
 .end
-.property instance DeclaringType() -> System.Introspection.TypeInfo
+.property instance DeclaringType() -> System.Option<System.Introspection.TypeInfo>
 .get instance System.Introspection.RuntimeMemberInfo::get_DeclaringType()
 .end
 .method internal instance .ctor(String name,System.Introspection.TypeInfo declaringType,Int32 metadataToken) -> noresult
@@ -274,7 +579,7 @@ ldarg 0
 M00000003_IL_0003:
 ldfld System.Introspection.RuntimeMemberInfo::DeclaringType
 M00000003_IL_0008:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeReflectionA51CCD269F0B3695(System.Introspection.TypeInfo)
+callvirt instance System.Introspection.MemberInfo::get_Module()
 M00000003_IL_000d:
 ret
 .end
@@ -288,14 +593,17 @@ ldfld System.Introspection.RuntimeMemberInfo::Name
 M00000004_IL_0008:
 ret
 .end
-.method instance get_DeclaringType() -> System.Introspection.TypeInfo
+.method instance get_DeclaringType() -> System.Option<System.Introspection.TypeInfo>
 M00000005_IL_0000:
 M00000005_IL_0001:
-M00000005_IL_0002:
 ldarg 0
-M00000005_IL_0003:
+M00000005_IL_0002:
 ldfld System.Introspection.RuntimeMemberInfo::DeclaringType
-M00000005_IL_0008:
+M00000005_IL_0007:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion0(System.Introspection.TypeInfo)
+M00000005_IL_000c:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion1(System.Option.Some<System.Introspection.TypeInfo>)
+M00000005_IL_0011:
 ret
 .end
 .end
@@ -1087,10 +1395,14 @@ M00000021_IL_0009:
 ret
 .end
 .method instance GetGetMethod(Boolean arg0) -> System.Option<System.Introspection.MethodInfo>
-.local System.Option<System.Introspection.MethodInfo> local0
-.local System.Introspection.MethodInfo local1
+.local System.Introspection.MethodInfo local0
+.local System.Option<System.Introspection.MethodInfo> local1
 .local System.Option.Some<System.Introspection.MethodInfo> local2
-ldloca local1
+.local System.Option.Some<System.Introspection.MethodInfo> local3
+.local System.Introspection.MethodInfo local4
+ldloca local0
+initobj System.Introspection.MethodInfo
+ldloca local4
 initobj System.Introspection.MethodInfo
 M00000022_IL_0000:
 M00000022_IL_0001:
@@ -1099,80 +1411,75 @@ ldarg 0
 M00000022_IL_0003:
 ldfld System.Introspection.RuntimePropertyInfo::Getter
 M00000022_IL_0008:
-stloc local0
-M00000022_IL_0009:
-M00000022_IL_000a:
-ldloca local0
-M00000022_IL_000c:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion0(System.Option<System.Introspection.MethodInfo>&)
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanToInt32(Boolean)
-M00000022_IL_0011:
-brtrue M00000022_IL_001b
-M00000022_IL_0016:
-br M00000022_IL_0026
-M00000022_IL_001b:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion1()
-M00000022_IL_0020:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion2(System.Option.None)
-M00000022_IL_0025:
-ret
-M00000022_IL_0026:
-M00000022_IL_0027:
-M00000022_IL_0028:
-ldloca local0
-M00000022_IL_002a:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion3(System.Option<System.Introspection.MethodInfo>&)
-M00000022_IL_002f:
-stloc local2
-M00000022_IL_0030:
-ldloca local2
-M00000022_IL_0032:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion4(System.Option.Some<System.Introspection.MethodInfo>&)
-M00000022_IL_0037:
 stloc local1
-M00000022_IL_0038:
-M00000022_IL_0039:
+M00000022_IL_0009:
+ldloca local1
+M00000022_IL_000b:
+ldloca local2
+M00000022_IL_000d:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion2(System.Option<System.Introspection.MethodInfo>&,System.Option.Some<System.Introspection.MethodInfo>&)
+M00000022_IL_0012:
+brfalse M00000022_IL_003d
+M00000022_IL_0017:
+ldloc local2
+M00000022_IL_0018:
+stloc local3
+M00000022_IL_0019:
+ldloca local3
+M00000022_IL_001b:
+ldloca local4
+M00000022_IL_001d:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion5(System.Option.Some<System.Introspection.MethodInfo>&,System.Introspection.MethodInfo&)
+M00000022_IL_0022:
+ldloc local4
+M00000022_IL_0024:
+stloc local0
+M00000022_IL_0025:
+ldc.i4 1
+M00000022_IL_0026:
+br M00000022_IL_002c
+M00000022_IL_002c:
+brfalse M00000022_IL_003d
+M00000022_IL_0031:
+M00000022_IL_0032:
+br M00000022_IL_0042
+M00000022_IL_003d:
+br M00000022_IL_006d
+M00000022_IL_0042:
+M00000022_IL_0043:
 ldarg 1
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanToInt32(Boolean)
-M00000022_IL_003a:
-brtrue M00000022_IL_0044
-M00000022_IL_003f:
-br M00000022_IL_0051
 M00000022_IL_0044:
-M00000022_IL_0045:
-ldloc local1
-M00000022_IL_0046:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion5(System.Introspection.MethodInfo)
-M00000022_IL_004b:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion6(System.Option.Some<System.Introspection.MethodInfo>)
-M00000022_IL_0050:
-ret
-M00000022_IL_0051:
-M00000022_IL_0052:
-M00000022_IL_0053:
-ldloc local1
-M00000022_IL_0054:
+brtrue M00000022_IL_0054
+M00000022_IL_0049:
+ldloc local0
+M00000022_IL_004a:
 callvirt instance System.Introspection.MethodInfo::get_IsPublic()
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanToInt32(Boolean)
-M00000022_IL_0059:
-brtrue M00000022_IL_0063
-M00000022_IL_005e:
-br M00000022_IL_0070
-M00000022_IL_0063:
-M00000022_IL_0064:
-ldloc local1
-M00000022_IL_0065:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion5(System.Introspection.MethodInfo)
-M00000022_IL_006a:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion6(System.Option.Some<System.Introspection.MethodInfo>)
-M00000022_IL_006f:
+M00000022_IL_004f:
+br M00000022_IL_0055
+M00000022_IL_0054:
+ldc.i4 1
+M00000022_IL_0055:
+brtrue M00000022_IL_005f
+M00000022_IL_005a:
+br M00000022_IL_006c
+M00000022_IL_005f:
+M00000022_IL_0060:
+ldloc local0
+M00000022_IL_0061:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion6(System.Introspection.MethodInfo)
+M00000022_IL_0066:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion7(System.Option.Some<System.Introspection.MethodInfo>)
+M00000022_IL_006b:
 ret
-M00000022_IL_0070:
-M00000022_IL_0071:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion1()
-M00000022_IL_0076:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion2(System.Option.None)
-M00000022_IL_007b:
+M00000022_IL_006c:
+M00000022_IL_006d:
+M00000022_IL_006e:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion3()
+M00000022_IL_0073:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion4(System.Option.None)
+M00000022_IL_0078:
 ret
 .end
 .method instance GetSetMethod() -> System.Option<System.Introspection.MethodInfo>
@@ -1188,10 +1495,14 @@ M00000023_IL_0009:
 ret
 .end
 .method instance GetSetMethod(Boolean arg0) -> System.Option<System.Introspection.MethodInfo>
-.local System.Option<System.Introspection.MethodInfo> local0
-.local System.Introspection.MethodInfo local1
+.local System.Introspection.MethodInfo local0
+.local System.Option<System.Introspection.MethodInfo> local1
 .local System.Option.Some<System.Introspection.MethodInfo> local2
-ldloca local1
+.local System.Option.Some<System.Introspection.MethodInfo> local3
+.local System.Introspection.MethodInfo local4
+ldloca local0
+initobj System.Introspection.MethodInfo
+ldloca local4
 initobj System.Introspection.MethodInfo
 M00000024_IL_0000:
 M00000024_IL_0001:
@@ -1200,80 +1511,580 @@ ldarg 0
 M00000024_IL_0003:
 ldfld System.Introspection.RuntimePropertyInfo::Setter
 M00000024_IL_0008:
-stloc local0
-M00000024_IL_0009:
-M00000024_IL_000a:
-ldloca local0
-M00000024_IL_000c:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion0(System.Option<System.Introspection.MethodInfo>&)
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanToInt32(Boolean)
-M00000024_IL_0011:
-brtrue M00000024_IL_001b
-M00000024_IL_0016:
-br M00000024_IL_0026
-M00000024_IL_001b:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion1()
-M00000024_IL_0020:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion2(System.Option.None)
-M00000024_IL_0025:
-ret
-M00000024_IL_0026:
-M00000024_IL_0027:
-M00000024_IL_0028:
-ldloca local0
-M00000024_IL_002a:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion3(System.Option<System.Introspection.MethodInfo>&)
-M00000024_IL_002f:
-stloc local2
-M00000024_IL_0030:
-ldloca local2
-M00000024_IL_0032:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion4(System.Option.Some<System.Introspection.MethodInfo>&)
-M00000024_IL_0037:
 stloc local1
-M00000024_IL_0038:
-M00000024_IL_0039:
+M00000024_IL_0009:
+ldloca local1
+M00000024_IL_000b:
+ldloca local2
+M00000024_IL_000d:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion2(System.Option<System.Introspection.MethodInfo>&,System.Option.Some<System.Introspection.MethodInfo>&)
+M00000024_IL_0012:
+brfalse M00000024_IL_003d
+M00000024_IL_0017:
+ldloc local2
+M00000024_IL_0018:
+stloc local3
+M00000024_IL_0019:
+ldloca local3
+M00000024_IL_001b:
+ldloca local4
+M00000024_IL_001d:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion5(System.Option.Some<System.Introspection.MethodInfo>&,System.Introspection.MethodInfo&)
+M00000024_IL_0022:
+ldloc local4
+M00000024_IL_0024:
+stloc local0
+M00000024_IL_0025:
+ldc.i4 1
+M00000024_IL_0026:
+br M00000024_IL_002c
+M00000024_IL_002c:
+brfalse M00000024_IL_003d
+M00000024_IL_0031:
+M00000024_IL_0032:
+br M00000024_IL_0042
+M00000024_IL_003d:
+br M00000024_IL_006d
+M00000024_IL_0042:
+M00000024_IL_0043:
 ldarg 1
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanToInt32(Boolean)
-M00000024_IL_003a:
-brtrue M00000024_IL_0044
-M00000024_IL_003f:
-br M00000024_IL_0051
 M00000024_IL_0044:
-M00000024_IL_0045:
-ldloc local1
-M00000024_IL_0046:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion5(System.Introspection.MethodInfo)
-M00000024_IL_004b:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion6(System.Option.Some<System.Introspection.MethodInfo>)
-M00000024_IL_0050:
-ret
-M00000024_IL_0051:
-M00000024_IL_0052:
-M00000024_IL_0053:
-ldloc local1
-M00000024_IL_0054:
+brtrue M00000024_IL_0054
+M00000024_IL_0049:
+ldloc local0
+M00000024_IL_004a:
 callvirt instance System.Introspection.MethodInfo::get_IsPublic()
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanToInt32(Boolean)
-M00000024_IL_0059:
-brtrue M00000024_IL_0063
-M00000024_IL_005e:
-br M00000024_IL_0070
-M00000024_IL_0063:
-M00000024_IL_0064:
-ldloc local1
-M00000024_IL_0065:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion5(System.Introspection.MethodInfo)
-M00000024_IL_006a:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion6(System.Option.Some<System.Introspection.MethodInfo>)
-M00000024_IL_006f:
+M00000024_IL_004f:
+br M00000024_IL_0055
+M00000024_IL_0054:
+ldc.i4 1
+M00000024_IL_0055:
+brtrue M00000024_IL_005f
+M00000024_IL_005a:
+br M00000024_IL_006c
+M00000024_IL_005f:
+M00000024_IL_0060:
+ldloc local0
+M00000024_IL_0061:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion6(System.Introspection.MethodInfo)
+M00000024_IL_0066:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion7(System.Option.Some<System.Introspection.MethodInfo>)
+M00000024_IL_006b:
 ret
-M00000024_IL_0070:
-M00000024_IL_0071:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion1()
-M00000024_IL_0076:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion2(System.Option.None)
-M00000024_IL_007b:
+M00000024_IL_006c:
+M00000024_IL_006d:
+M00000024_IL_006e:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion3()
+M00000024_IL_0073:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion4(System.Option.None)
+M00000024_IL_0078:
+ret
+.end
+.end
+.type internal class System.Introspection.RuntimeTypeInfo
+.implements System.Introspection.TypeInfo
+.implements System.Introspection.MemberInfo
+.implements System.Equatable<System.Introspection.TypeInfo>
+.field private Handle System.RuntimeTypeHandle
+.property instance BaseType() -> System.Option<System.Introspection.TypeInfo>
+.get instance System.Introspection.RuntimeTypeInfo::get_BaseType()
+.end
+.property instance DeclaringType() -> System.Option<System.Introspection.TypeInfo>
+.get instance System.Introspection.RuntimeTypeInfo::get_DeclaringType()
+.end
+.property instance MetadataToken() -> Int32
+.get instance System.Introspection.RuntimeTypeInfo::get_MetadataToken()
+.end
+.property instance Module() -> System.Introspection.ModuleInfo
+.get instance System.Introspection.RuntimeTypeInfo::get_Module()
+.end
+.property instance Name() -> String
+.get instance System.Introspection.RuntimeTypeInfo::get_Name()
+.end
+.property instance FullName() -> String
+.get instance System.Introspection.RuntimeTypeInfo::get_FullName()
+.end
+.property instance Namespace() -> String
+.get instance System.Introspection.RuntimeTypeInfo::get_Namespace()
+.end
+.property instance GenericArgumentCount() -> Int32
+.get instance System.Introspection.RuntimeTypeInfo::get_GenericArgumentCount()
+.end
+.property instance IsArray() -> Boolean
+.get instance System.Introspection.RuntimeTypeInfo::get_IsArray()
+.end
+.property instance IsByRef() -> Boolean
+.get instance System.Introspection.RuntimeTypeInfo::get_IsByRef()
+.end
+.property instance IsPointer() -> Boolean
+.get instance System.Introspection.RuntimeTypeInfo::get_IsPointer()
+.end
+.property instance IsInterface() -> Boolean
+.get instance System.Introspection.RuntimeTypeInfo::get_IsInterface()
+.end
+.property instance IsReadOnly() -> Boolean
+.get instance System.Introspection.RuntimeTypeInfo::get_IsReadOnly()
+.end
+.property instance IsAbstract() -> Boolean
+.get instance System.Introspection.RuntimeTypeInfo::get_IsAbstract()
+.end
+.property instance IsEnum() -> Boolean
+.get instance System.Introspection.RuntimeTypeInfo::get_IsEnum()
+.end
+.property instance IsValueType() -> Boolean
+.get instance System.Introspection.RuntimeTypeInfo::get_IsValueType()
+.end
+.method private instance .ctor(System.RuntimeTypeHandle handle) -> noresult
+M00000025_IL_0000:
+M00000025_IL_0001:
+ldarg 0
+M00000025_IL_0002:
+pop
+M00000025_IL_0007:
+M00000025_IL_0008:
+ldarg 0
+M00000025_IL_0009:
+ldarg 1
+M00000025_IL_000a:
+stfld System.Introspection.RuntimeTypeInfo::Handle
+M00000025_IL_000f:
+ret
+.end
+.method internal static FromHandle(System.RuntimeTypeHandle handle) -> System.Introspection.TypeInfo
+M00000026_IL_0000:
+M00000026_IL_0001:
+M00000026_IL_0002:
+ldarg 0
+M00000026_IL_0003:
+newobj instance System.Introspection.RuntimeTypeInfo::.ctor(System.RuntimeTypeHandle)
+M00000026_IL_0008:
+ret
+.end
+.method instance get_BaseType() -> System.Option<System.Introspection.TypeInfo>
+M00000027_IL_0000:
+M00000027_IL_0001:
+M00000027_IL_0002:
+ldarg 0
+M00000027_IL_0003:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M00000027_IL_0008:
+call neoCLR.Runtime.TypeBaseType(System.RuntimeTypeHandle)
+M00000027_IL_000d:
+ret
+.end
+.method instance GetInterfaces() -> System.Collections.Sequence<System.Introspection.TypeInfo>
+M00000028_IL_0000:
+M00000028_IL_0001:
+M00000028_IL_0002:
+ldarg 0
+M00000028_IL_0003:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M00000028_IL_0008:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeServiceTypeInterfaces(System.RuntimeTypeHandle)
+M00000028_IL_000d:
+ret
+.end
+.method instance GetEnumNames() -> System.Collections.Sequence<String>
+M00000029_IL_0000:
+M00000029_IL_0001:
+M00000029_IL_0002:
+ldarg 0
+M00000029_IL_0003:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M00000029_IL_0008:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeServiceTypeEnumNames(System.RuntimeTypeHandle)
+M00000029_IL_000d:
+ret
+.end
+.method instance GetEnumUnderlyingType() -> System.Introspection.TypeInfo
+M0000002a_IL_0000:
+M0000002a_IL_0001:
+M0000002a_IL_0002:
+ldarg 0
+M0000002a_IL_0003:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M0000002a_IL_0008:
+call neoCLR.Runtime.TypeEnumUnderlying(System.RuntimeTypeHandle)
+M0000002a_IL_000d:
+ret
+.end
+.method instance GetFields() -> System.Collections.Sequence<System.Introspection.FieldInfo>
+M0000002b_IL_0000:
+M0000002b_IL_0001:
+M0000002b_IL_0002:
+ldarg 0
+M0000002b_IL_0003:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M0000002b_IL_0008:
+ldc.i4 28
+M0000002b_IL_000a:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeServiceTypeFields(System.RuntimeTypeHandle,Int32)
+M0000002b_IL_000f:
+ret
+.end
+.method instance GetFields(System.Introspection.BindingFlags flags) -> System.Collections.Sequence<System.Introspection.FieldInfo>
+M0000002c_IL_0000:
+M0000002c_IL_0001:
+M0000002c_IL_0002:
+ldarg 0
+M0000002c_IL_0003:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M0000002c_IL_0008:
+ldarg 1
+M0000002c_IL_0009:
+call instance System.Introspection.BindingFlags::get_Value()
+conv.i4
+M0000002c_IL_000a:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeServiceTypeFields(System.RuntimeTypeHandle,Int32)
+M0000002c_IL_000f:
+ret
+.end
+.method instance GetMethods() -> System.Collections.Sequence<System.Introspection.MethodInfo>
+M0000002d_IL_0000:
+M0000002d_IL_0001:
+M0000002d_IL_0002:
+ldarg 0
+M0000002d_IL_0003:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M0000002d_IL_0008:
+ldc.i4 28
+M0000002d_IL_000a:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeServiceTypeMethods(System.RuntimeTypeHandle,Int32)
+M0000002d_IL_000f:
+ret
+.end
+.method instance GetMethods(System.Introspection.BindingFlags flags) -> System.Collections.Sequence<System.Introspection.MethodInfo>
+M0000002e_IL_0000:
+M0000002e_IL_0001:
+M0000002e_IL_0002:
+ldarg 0
+M0000002e_IL_0003:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M0000002e_IL_0008:
+ldarg 1
+M0000002e_IL_0009:
+call instance System.Introspection.BindingFlags::get_Value()
+conv.i4
+M0000002e_IL_000a:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeServiceTypeMethods(System.RuntimeTypeHandle,Int32)
+M0000002e_IL_000f:
+ret
+.end
+.method instance GetProperties() -> System.Collections.Sequence<System.Introspection.PropertyInfo>
+M0000002f_IL_0000:
+M0000002f_IL_0001:
+M0000002f_IL_0002:
+ldarg 0
+M0000002f_IL_0003:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M0000002f_IL_0008:
+ldc.i4 28
+M0000002f_IL_000a:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeServiceTypeProperties(System.RuntimeTypeHandle,Int32)
+M0000002f_IL_000f:
+ret
+.end
+.method instance GetProperties(System.Introspection.BindingFlags flags) -> System.Collections.Sequence<System.Introspection.PropertyInfo>
+M00000030_IL_0000:
+M00000030_IL_0001:
+M00000030_IL_0002:
+ldarg 0
+M00000030_IL_0003:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M00000030_IL_0008:
+ldarg 1
+M00000030_IL_0009:
+call instance System.Introspection.BindingFlags::get_Value()
+conv.i4
+M00000030_IL_000a:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeServiceTypeProperties(System.RuntimeTypeHandle,Int32)
+M00000030_IL_000f:
+ret
+.end
+.method instance get_DeclaringType() -> System.Option<System.Introspection.TypeInfo>
+M00000031_IL_0000:
+M00000031_IL_0001:
+M00000031_IL_0002:
+ldarg 0
+M00000031_IL_0003:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M00000031_IL_0008:
+call neoCLR.Runtime.TypeDeclaringType(System.RuntimeTypeHandle)
+M00000031_IL_000d:
+ret
+.end
+.method instance get_MetadataToken() -> Int32
+M00000032_IL_0000:
+M00000032_IL_0001:
+M00000032_IL_0002:
+ldarg 0
+M00000032_IL_0003:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M00000032_IL_0008:
+call neoCLR.Runtime.TypeMetadataToken(System.RuntimeTypeHandle)
+M00000032_IL_000d:
+ret
+.end
+.method instance get_Module() -> System.Introspection.ModuleInfo
+M00000033_IL_0000:
+M00000033_IL_0001:
+M00000033_IL_0002:
+ldarg 0
+M00000033_IL_0003:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M00000033_IL_0008:
+call neoCLR.Runtime.TypeModule(System.RuntimeTypeHandle)
+M00000033_IL_000d:
+ret
+.end
+.method instance get_Name() -> String
+M00000034_IL_0000:
+M00000034_IL_0001:
+M00000034_IL_0002:
+ldarg 0
+M00000034_IL_0003:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M00000034_IL_0008:
+call neoCLR.Runtime.TypeName(System.RuntimeTypeHandle)
+M00000034_IL_000d:
+ret
+.end
+.method instance get_FullName() -> String
+M00000035_IL_0000:
+M00000035_IL_0001:
+M00000035_IL_0002:
+ldarg 0
+M00000035_IL_0003:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M00000035_IL_0008:
+ldc.i4 0
+M00000035_IL_0009:
+call neoCLR.Runtime.TypeDisplayName(System.RuntimeTypeHandle,Int32)
+M00000035_IL_000e:
+ret
+.end
+.method instance get_Namespace() -> String
+M00000036_IL_0000:
+M00000036_IL_0001:
+M00000036_IL_0002:
+ldarg 0
+M00000036_IL_0003:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M00000036_IL_0008:
+ldc.i4 1
+M00000036_IL_0009:
+call neoCLR.Runtime.TypeDisplayName(System.RuntimeTypeHandle,Int32)
+M00000036_IL_000e:
+ret
+.end
+.method instance get_GenericArgumentCount() -> Int32
+M00000037_IL_0000:
+M00000037_IL_0001:
+M00000037_IL_0002:
+ldarg 0
+M00000037_IL_0003:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M00000037_IL_0008:
+call neoCLR.Runtime.TypeArgumentCount(System.RuntimeTypeHandle)
+M00000037_IL_000d:
+ret
+.end
+.method instance GetGenericArgument(Int32 index) -> System.Introspection.TypeInfo
+M00000038_IL_0000:
+M00000038_IL_0001:
+M00000038_IL_0002:
+ldarg 0
+M00000038_IL_0003:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M00000038_IL_0008:
+ldarg 1
+M00000038_IL_0009:
+call neoCLR.Runtime.TypeArgument(System.RuntimeTypeHandle,Int32)
+M00000038_IL_000e:
+call System.Introspection.RuntimeTypeInfo::FromHandle(System.RuntimeTypeHandle)
+M00000038_IL_0013:
+ret
+.end
+.method instance Equals(System.Introspection.TypeInfo other) -> Boolean
+.local System.Introspection.RuntimeTypeInfo local0
+ldloca local0
+initobj System.Introspection.RuntimeTypeInfo
+M00000039_IL_0000:
+M00000039_IL_0001:
+M00000039_IL_0002:
+ldarg 1
+M00000039_IL_0003:
+castclass System.Introspection.RuntimeTypeInfo
+M00000039_IL_0008:
+stloc local0
+M00000039_IL_0009:
+M00000039_IL_000a:
+ldarg 0
+M00000039_IL_000b:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M00000039_IL_0010:
+ldloc local0
+M00000039_IL_0011:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M00000039_IL_0016:
+call neoCLR.Runtime.TypeEquals(System.RuntimeTypeHandle,System.RuntimeTypeHandle)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanToInt32(Boolean)
+M00000039_IL_001b:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance get_IsArray() -> Boolean
+M0000003a_IL_0000:
+M0000003a_IL_0001:
+M0000003a_IL_0002:
+ldarg 0
+M0000003a_IL_0003:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M0000003a_IL_0008:
+ldc.i4 0
+M0000003a_IL_0009:
+call neoCLR.Runtime.TypeShape(System.RuntimeTypeHandle,Int32)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanToInt32(Boolean)
+M0000003a_IL_000e:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance get_IsByRef() -> Boolean
+M0000003b_IL_0000:
+M0000003b_IL_0001:
+M0000003b_IL_0002:
+ldarg 0
+M0000003b_IL_0003:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M0000003b_IL_0008:
+ldc.i4 1
+M0000003b_IL_0009:
+call neoCLR.Runtime.TypeShape(System.RuntimeTypeHandle,Int32)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanToInt32(Boolean)
+M0000003b_IL_000e:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance get_IsPointer() -> Boolean
+M0000003c_IL_0000:
+M0000003c_IL_0001:
+M0000003c_IL_0002:
+ldarg 0
+M0000003c_IL_0003:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M0000003c_IL_0008:
+ldc.i4 2
+M0000003c_IL_0009:
+call neoCLR.Runtime.TypeShape(System.RuntimeTypeHandle,Int32)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanToInt32(Boolean)
+M0000003c_IL_000e:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance get_IsInterface() -> Boolean
+M0000003d_IL_0000:
+M0000003d_IL_0001:
+M0000003d_IL_0002:
+ldarg 0
+M0000003d_IL_0003:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M0000003d_IL_0008:
+ldc.i4 3
+M0000003d_IL_0009:
+call neoCLR.Runtime.TypeShape(System.RuntimeTypeHandle,Int32)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanToInt32(Boolean)
+M0000003d_IL_000e:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance get_IsReadOnly() -> Boolean
+M0000003e_IL_0000:
+M0000003e_IL_0001:
+M0000003e_IL_0002:
+ldarg 0
+M0000003e_IL_0003:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M0000003e_IL_0008:
+ldc.i4 4
+M0000003e_IL_0009:
+call neoCLR.Runtime.TypeShape(System.RuntimeTypeHandle,Int32)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanToInt32(Boolean)
+M0000003e_IL_000e:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance get_IsAbstract() -> Boolean
+M0000003f_IL_0000:
+M0000003f_IL_0001:
+M0000003f_IL_0002:
+ldarg 0
+M0000003f_IL_0003:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M0000003f_IL_0008:
+ldc.i4 5
+M0000003f_IL_0009:
+call neoCLR.Runtime.TypeShape(System.RuntimeTypeHandle,Int32)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanToInt32(Boolean)
+M0000003f_IL_000e:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance get_IsEnum() -> Boolean
+M00000040_IL_0000:
+M00000040_IL_0001:
+M00000040_IL_0002:
+ldarg 0
+M00000040_IL_0003:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M00000040_IL_0008:
+ldc.i4 6
+M00000040_IL_0009:
+call neoCLR.Runtime.TypeShape(System.RuntimeTypeHandle,Int32)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanToInt32(Boolean)
+M00000040_IL_000e:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance get_IsValueType() -> Boolean
+M00000041_IL_0000:
+M00000041_IL_0001:
+M00000041_IL_0002:
+ldarg 0
+M00000041_IL_0003:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M00000041_IL_0008:
+ldc.i4 7
+M00000041_IL_0009:
+call neoCLR.Runtime.TypeShape(System.RuntimeTypeHandle,Int32)
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanToInt32(Boolean)
+M00000041_IL_000e:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetGenericArguments() -> System.Collections.Sequence<System.Introspection.TypeInfo>
+M00000042_IL_0000:
+M00000042_IL_0001:
+M00000042_IL_0002:
+ldarg 0
+M00000042_IL_0003:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M00000042_IL_0008:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeServiceTypeGenericArguments(System.RuntimeTypeHandle)
+M00000042_IL_000d:
+ret
+.end
+.method instance GetElementType() -> System.Option<System.Introspection.TypeInfo>
+M00000043_IL_0000:
+M00000043_IL_0001:
+M00000043_IL_0002:
+ldarg 0
+M00000043_IL_0003:
+ldfld System.Introspection.RuntimeTypeInfo::Handle
+M00000043_IL_0008:
+call neoCLR.Runtime.TypeElementType(System.RuntimeTypeHandle)
+M00000043_IL_000d:
 ret
 .end
 .end

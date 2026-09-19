@@ -1,0 +1,32 @@
+import System.*
+import System.Introspection.*
+
+class Outer {
+    public class Inner {
+        var Value: int = 0
+    }
+}
+
+func Main() {
+    val nested: MemberInfo = typeof(Outer.Inner)
+    Console.WriteLine(nested.Name)
+    match nested.DeclaringType {
+        .Some(val owner) => {
+            Console.WriteLine(owner.Name)
+            if owner.Equals(typeof(Outer)) {
+                Console.WriteLine("Actual declaring type")
+            }
+        }
+        .None => Fault("Expected a declaring type")
+    }
+    match typeof(Outer).DeclaringType {
+        .Some(_) => Fault("Top-level type has an owner")
+        .None => Console.WriteLine("Top-level type")
+    }
+    match nested {
+        TypeInfo => Console.WriteLine("Type member")
+        FieldInfo => Fault("Unexpected field")
+        MethodInfo => Fault("Unexpected method")
+        PropertyInfo => Fault("Unexpected property")
+    }
+}

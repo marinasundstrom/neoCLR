@@ -4192,3 +4192,24 @@ substitution. Website excerpts come from executable Raven samples and distinguis
 current development APIs from the published preview. See [the minimal contract](instant-clock.md)
 and [the broader proposal](date-time-design.md). No Raven compiler or .NET target
 changes are part of this slice.
+
+### 2026-09-19 — Put TypeInfo in the member hierarchy, then address strings
+
+- **Author:** explicitly selected “Make TypeInfo extend MemberInfo” after asking
+  whether that relationship had already been implemented. This reopens the earlier
+  closed Introspection story for that bounded change.
+- **Assistant:** implemented the fourth sealed case and optional declaring-type
+  ownership, preserving nested source ownership through metadata rather than names.
+  Co-located the declarations to satisfy Raven's existing same-file rule.
+- **Author:** directed the following order: “strings API - minimal API adjustments
+  and behavior implementation”, then the feature page.
+- **Assistant:** accepted separate commits in that order. String work and its page
+  remain subsequent slices; this entry does not report them as completed.
+
+- **Author, subsequent correction:** asked that APIs and samples favor union
+  patterns/destructuring over GetSomeCase-style extraction and idiomatic case
+  construction over explicit carrier wrapping. Requested a separate cleanup after
+  this hierarchy slice and before strings.
+- **Assistant:** updated this slice's owner access and accessor filtering to patterns,
+  and used imported Some/None case constructors. Recorded the ongoing style rule in
+  AGENTS.md; the wider cleanup remains the next commit.

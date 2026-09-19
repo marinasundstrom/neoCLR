@@ -6,6 +6,7 @@ use crate::{
 
 #[derive(Clone, Copy)]
 pub(crate) enum Query {
+    DeclaringType,
     MetadataToken,
     Module,
     Fields,
@@ -24,6 +25,11 @@ pub(crate) enum Query {
 impl Query {
     pub(crate) fn binding(name: &str) -> Option<(Self, bool, Type)> {
         let (query, integer, result) = match name {
+            "neoCLR.Runtime.TypeDeclaringType" => (
+                Self::DeclaringType,
+                false,
+                "System.Option<System.Introspection.TypeInfo>",
+            ),
             "neoCLR.Runtime.TypeMetadataToken" => (Self::MetadataToken, false, "Int32"),
             "neoCLR.Runtime.TypeModule" => (Self::Module, false, "System.Introspection.ModuleInfo"),
             "neoCLR.Runtime.TypeFields" => (Self::Fields, true, "System.Introspection.FieldInfo[]"),
@@ -89,6 +95,32 @@ impl Query {
         let definition = module.type_definition(&ty);
         let arguments = type_arguments(&ty);
         match self {
+            Self::DeclaringType => {
+                let parent = match &handle.identity {
+                    TypeIdentity::Definition { .. } => {
+                        handle.declaring_type.as_ref().and_then(|id| {
+                            module
+                                .types
+                                .iter()
+                                .find(|d| d.definition.as_ref() == Some(id))
+                        })
+                    }
+                    TypeIdentity::GenericParameter { definition, .. } => module
+                        .types
+                        .iter()
+                        .find(|d| d.definition.as_ref() == Some(definition)),
+                    _ => None,
+                };
+                option(
+                    type_contract(module),
+                    parent
+                        .map(|d| {
+                            crate::type_identity::describe_definition(module, d)
+                                .map(|v| wrap_type(module, v))
+                        })
+                        .transpose()?,
+                )
+            }
             Self::MetadataToken => Ok(Value::Int32(crate::metadata_tokens::type_token(
                 module,
                 &handle.identity,
@@ -167,11 +199,10 @@ impl Query {
                 0 => crate::type_identity::signature_name(&ty)?,
                 1 => {
                     let mut outer = definition;
-                    while let Some(parent) = outer.and_then(|d| d.declaring_type.as_ref()) {
-                        outer = module
-                            .types
-                            .iter()
-                            .find(|d| d.definition.as_ref() == Some(parent));
+                    while let Some(parent) =
+                        outer.and_then(|d| crate::type_identity::declaring_definition(module, d))
+                    {
+                        outer = Some(parent);
                     }
                     outer
                         .and_then(|d| {

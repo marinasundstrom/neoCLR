@@ -54,6 +54,7 @@ static class RuntimeServiceBindings
             ("ModuleMetadataToken", ["String", "String"], "Int32"),
             ("ModuleTypes", ["String", "String"], "arrayref<System.Introspection.TypeInfo>"),
             ("TypeMetadataToken", ["System.RuntimeTypeHandle"], "Int32"),
+            ("TypeDeclaringType", ["System.RuntimeTypeHandle"], "System.Option<System.Introspection.TypeInfo>"),
             ("TypeModule", ["System.RuntimeTypeHandle"], "System.Introspection.ModuleInfo"),
             ("TypeInfo", ["System.RuntimeTypeHandle"], "System.Introspection.TypeInfo"),
             ("TypeFields", ["System.RuntimeTypeHandle", "Int32"], "arrayref<System.Introspection.FieldInfo>"),

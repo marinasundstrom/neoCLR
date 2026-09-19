@@ -128,6 +128,7 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
                     | Query::ElementType
                     | Query::MetadataToken
                     | Query::Module
+                    | Query::DeclaringType
             ) {
                 uses.push(ServiceUse {
                     service: RuntimeService::ManagedArrays,

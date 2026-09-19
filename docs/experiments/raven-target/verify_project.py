@@ -24,7 +24,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
         shutil.copyfile(args.project.resolve().parent / name, root / name)
     command = [sys.executable, str(bridge / 'run_project.py'), str(root / 'Demo.rvnproj'),
                *runner_arguments(args), '--runtime', str(args.runtime.resolve())]
-    cases = [('IntrospectionTour', 'library-introspection-tour.rvn', (bridge / 'samples/library-introspection-tour.expected.txt').read_text()),
+    cases = [('NestedTypeInfo', 'library-nested-type-info.rvn', 'Outer/Inner\nOuter\nActual declaring type\nTop-level type\nType member\n'),
+             ('IntrospectionTour', 'library-introspection-tour.rvn', (bridge / 'samples/library-introspection-tour.expected.txt').read_text()),
              ('AssemblyInfo', 'library-assembly-info.rvn', 'Demo\nSystem.Runtime\nRuntime types available\nDemo\n1\nWidget\nType token available\nDemo\nSame definition token\n'),
              ('TypeAcquisition', 'library-type-acquisition.rvn', 'Concrete class\nSystem.String\nSame type\nArray type\nSystem.Int32\nSystem.Int32\n'),
              ('Instants', 'library-instants.rvn', '0\n-1\n0\n-1\nSame duration\nSystem clock\n'),
@@ -70,7 +71,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
                   ('ArrayQueries', 'library-array-queries.rvn', 'Parse\nDivide\nEquals\nToString\nCompareTo\n0\n17\n13\n3\n17\n52\n6\n0\n0\n43\n'),
                   ('ArrayForEach', 'library-array-foreach.rvn', 'Parse\nDivide\nEquals\nToString\nCompareTo\n42\n1\n2\n3\n'),
                   ('ManagedArrayMetadata', 'library-managed-array-metadata.rvn', '42\n2\n1\nSystem.Int32\n0\nEmpty\nLength\nCount\nItem\n4\n42\n8\n50\n2\n'),
-                  ('IntrospectionInterfaces', 'library-introspection-interfaces.rvn', 'Interface\n' * 6 + 'System.Date\nField\nMethod\nProperty\n'),
+                  ('IntrospectionInterfaces', 'library-introspection-interfaces.rvn', 'Interface\n' * 6 + 'System.Date\nField\nMethod\nProperty\nType\n'),
                   ('Reflection', 'library-reflection.rvn', (bridge / 'samples/library-reflection.expected.txt').read_text()),
                   ('ArrayCallbacks', 'library-array-callbacks.rvn', '7\n42\nFirst\nSecond\n'),
                   ('Delegates', 'library-delegates.rvn', '42\n' * 5 + 'Done\n1\nExists\n42\nNo index\nNone\n'),
@@ -109,7 +110,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-project-check-') as temporary:
     for label, source, diagnostic in [
         *[(f'Missing{case}Match', (bridge / 'samples/library-introspection-interfaces.rvn').read_text()
            .replace(f'        {case} => "{label}"\n', ''), 'RAV2100')
-          for case, label in [('FieldInfo', 'Field'), ('MethodInfo', 'Method'), ('PropertyInfo', 'Property')]],
+          for case, label in [('FieldInfo', 'Field'), ('MethodInfo', 'Method'), ('PropertyInfo', 'Property'), ('TypeInfo', 'Type')]],
         ('CompileFailure', 'func Main() { MissingCall() }', 'RAV'),
         ('IntrospectionArrayAssignment', 'import System.Introspection.*\nfunc Main() { let methods: MethodInfo[] = typeof(int).GetMethods() }', 'RAV'),
         ('IntrospectionMutation', 'func Main() { let methods = typeof(int).GetMethods(); methods[0] = methods[0] }', 'RAV'),

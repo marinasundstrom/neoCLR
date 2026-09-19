@@ -189,7 +189,7 @@ be null. Sources: [TypeInfo](https://learn.microsoft.com/en-us/dotnet/api/system
 neoCLR can preserve that useful relationship using its own sealed interface model
 and Option ownership, without copying the class hierarchy or null contract.
 Validation must cover a nested type, a top-level type without an owner, and an
-exhaustive four-case MemberInfo match. This extension is not implemented yet.
+exhaustive four-case MemberInfo match. This extension was subsequently selected by the author; the implementation below supersedes that proposal status.
 
 ## Collection return contracts under review — 2026-09-19
 
@@ -590,3 +590,20 @@ Iterable-based query extensions remain supported. Assigning these results direct
 to arrays or writing through their indexer is rejected. Copy explicitly when mutable
 array storage is needed. Rebuild reference, implementation and consumer artifacts.
 No new native services, opcodes, Raven compiler changes or loading behavior are added.
+
+## TypeInfo as a member — 2026-09-19
+
+`TypeInfo : MemberInfo` is now the fourth sealed member case. Name, Module and
+MetadataToken are inherited. `DeclaringType: Option<TypeInfo>` represents ownership
+without inventing an owner for a top-level type. Ordinary fields, methods and
+properties return Some; nested types return their retained declaring definition.
+Arrays, pointers and by-reference wrappers have no declaring type. This deliberately
+breaks three-arm matches and callers that assumed a required DeclaringType.
+
+The implementation follows the .NET comparison above while retaining sealed
+interfaces and Option. The whole family is authored in Descriptors.rvn because
+Raven requires sealed cases in the same source file. Source metadata preserves a
+module-scoped declaring TypeDef token; it is not inferred from dotted display names.
+Import retains the owner even when only the nested type is used. Missing owners
+and ownership cycles are rejected in source and serialized artifacts. No nested-type
+query, dynamic loading or reflection invocation is added by this slice.

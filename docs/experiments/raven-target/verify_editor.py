@@ -505,7 +505,7 @@ try:
         for version, access, required, forbidden in (
                 (81, 'System.', {'Runtime', 'Introspection'}, {'Type'}),
                 (82, 'System.Runtime.', {'RuntimeContext'}, set()),
-                (83, 'typeof(int).', {'Name', 'GetFields', 'MetadataToken', 'Module'}, {'Info'}),
+                (83, 'typeof(int).', {'Name', 'GetFields', 'MetadataToken', 'Module', 'DeclaringType'}, {'Info'}),
                 (84, 'System.Runtime.RuntimeContext.Current.', {'GetTypeInfoFromHandle', 'ExecutingAssembly'}, set()),
                 (85, 'System.Runtime.RuntimeContext.Current.ExecutingAssembly.', {'ReferencedAssemblies', 'GetModules', 'GetTypes', 'MetadataToken'}, set()),
                 (86, 'System.Runtime.RuntimeContext.Current.ExecutingAssembly.ReferencedAssemblies.', {'Count'}, {'Length', 'Add'}),
@@ -518,7 +518,8 @@ try:
                       'typeof(int).GetInterfaces().',
                       'typeof(System.Introspection.BindingFlags).GetEnumNames().',
                       'typeof(int).GetMethods()[0].GetParameters().',
-                      'typeof(System.Date).GetProperties()[0].GetIndexParameters().'))]):
+                      'typeof(System.Date).GetProperties()[0].GetIndexParameters().'))],
+                (96, 'typeof(int).DeclaringType.', {'IsSome', 'IsNone'}, {'Name', 'Module'})):
             text = f'func Main() {{\n    {access}\n}}'
             send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version},
                 'contentChanges': [{'text': text}]})

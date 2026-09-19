@@ -24,6 +24,13 @@
   statements across lines when that makes their contents easier to follow; there is
   no requirement to fit a complete block on one line.
 
+- Prefer union patterns or destructuring to extract case payloads, rather than
+  case accessors such as GetSomeCase(). Use idiomatic case construction, such as
+  Option<TypeInfo>.Some(owner) or Some(owner) when the target is known; avoid
+  explicit carrier wrappers in ordinary API implementations and samples.
+- Prefer expression-bodied properties (`val Name: string => expression`) when
+  a property has only a getter expression.
+
 ## Changelog required for every commit
 
 - Include a staged `CHANGELOG.md` update in every commit, including code, tests,

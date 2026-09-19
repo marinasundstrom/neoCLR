@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Make TypeInfo the fourth sealed MemberInfo case. Inherit Name, Module and
+  MetadataToken; return Option<TypeInfo> from DeclaringType so top-level types have
+  no fabricated owner. Preserve nested source ownership through module-scoped
+  metadata and reject missing/cyclic owners. Consumers must rebuild, add the
+  TypeInfo match arm and unwrap ordinary member owners. Author the sealed family
+  together in Descriptors.rvn; use union patterns and case constructors in the
+  changed APIs/samples and record that readability rule. Update the feature guide.
+  Validate 25 runtime/metadata tests, 19 admission cases, 130 signature checks,
+  38 editor checks and five saved samples plus 23 edit/rejection checks.
+
 - Add the first in-depth Introspection feature guide with a runnable Raven tour,
   source-backed highlighted excerpts, shared expected output and sample downloads.
   Explain acquisition, discovery, scoped tokens, Sequence results and sealed member

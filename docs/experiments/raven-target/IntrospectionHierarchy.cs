@@ -11,7 +11,7 @@ static class IntrospectionHierarchy
         ["ModuleInfo"] = ["RuntimeModuleInfo"],
         ["TypeInfo"] = ["RuntimeTypeInfo"],
         ["ParameterInfo"] = ["RuntimeParameterInfo"],
-        ["MemberInfo"] = ["FieldInfo", "MethodInfo", "PropertyInfo"],
+        ["MemberInfo"] = ["FieldInfo", "MethodInfo", "PropertyInfo", "TypeInfo"],
         ["FieldInfo"] = ["RuntimeFieldInfo"],
         ["MethodInfo"] = ["RuntimeMethodInfo"],
         ["PropertyInfo"] = ["RuntimePropertyInfo"],

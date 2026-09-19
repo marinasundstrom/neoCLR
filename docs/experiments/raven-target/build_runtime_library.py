@@ -59,7 +59,6 @@ SLICES = {
     'Closable': 'System.Closable',
 
     'Clock': 'System.Clock',
-    'TypeInfo': 'System.Introspection.TypeInfo',
     'AssemblyInfo': 'System.Introspection.AssemblyInfo',
     'ModuleInfo': 'System.Introspection.ModuleInfo',
 
@@ -140,7 +139,6 @@ SOURCES = {
     'Closable': 'runtime/raven/src/System/Closable.rvn',
 
     'Clock': 'runtime/raven/src/System/Clock.rvn',
-    'TypeInfo': 'runtime/raven/src/System/Introspection/TypeInfo.rvn',
     'AssemblyInfo': 'runtime/raven/src/System/Introspection/AssemblyInfo.rvn',
     'ModuleInfo': 'runtime/raven/src/System/Introspection/ModuleInfo.rvn',
 
@@ -289,7 +287,7 @@ def main():
                     if (GENERATED / output).read_text() != text:
                         raise SystemExit('Regenerated library differs: ' + output)
                 continue
-            inputs = [ROOT / SOURCES[source] for source in SLICES]
+            inputs = [ROOT / path for path in SOURCES.values()]
             inputs += [PROJECT, ROOT / 'build/NeoCLR.Raven.props']
             data = {'format': 'raven-library-bootstrap-v1', 'owner': owner,
                     'inputs': {str(p.relative_to(ROOT)): digest(p) for p in inputs},

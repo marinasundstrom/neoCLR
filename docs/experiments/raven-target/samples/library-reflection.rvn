@@ -35,7 +35,10 @@ func Main() {
     let method = methods[0]
     let first: MemberInfo = method
     ShowMemberName(first)
-    WriteLine(first.DeclaringType.Name)
+    match first.DeclaringType {
+        .Some(val owner) => WriteLine(owner.Name)
+        .None => Fault("Expected a declaring type")
+    }
     WriteLine(method.ReturnType.Name)
     Show(method.IsStatic)
     Show(method.IsPublic)

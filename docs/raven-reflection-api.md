@@ -112,7 +112,7 @@ identity and context equivalence still need implementation and tests.
 ### TypeInfo Raven port
 
 TypeInfo's existing base/interface, enum and member queries are now authored in
-`runtime/raven/src/System/Introspection/TypeInfo.rvn`. The same runtime metadata
+`runtime/raven/src/System/Introspection/Descriptors.rvn`. The same runtime metadata
 services produce the snapshots. Bootstrap-only adapters copy their results into
 managed arrays and retain the existing filtering behavior (default flags 28).
 Flag overloads now name their parameter `flags` instead of `arg0`; positional calls

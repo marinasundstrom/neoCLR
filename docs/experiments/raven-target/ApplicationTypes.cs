@@ -9,7 +9,12 @@ static class ApplicationTypes
     static readonly HashSet<string> Expanded = new();
     static readonly Dictionary<string, Dictionary<string, string>> Adapters = new();
     static readonly Dictionary<TypeDefinition, string> LibraryNames = new();
-    public static void BindLibrary(TypeDefinition type, string name) => LibraryNames.Add(type, name);
+    public static void BindLibrary(TypeDefinition type, string name)
+    {
+        if (LibraryNames.TryGetValue(type, out var existing) && existing != name)
+            throw new InvalidDataException("Conflicting library type binding.");
+        LibraryNames[type] = name;
+    }
     public static Func<TypeReference, string>? LibraryMap;
     static readonly Dictionary<string, TypeReference> LibraryReferenceTypes = new();
     static readonly Dictionary<string, TypeDefinition> LibraryReferences = new();
@@ -93,6 +98,8 @@ static class ApplicationTypes
             ? libraryOwner + (type.HasGenericParameters ? "<" + string.Join(',', type.GenericParameters.Select(p => "T" + p.Position)) + ">" : "")
             : MetadataIdentity.TypeName(type);
         Types[name] = type;
+        if (!IsLibrary(type) && type.DeclaringType is { } declaring)
+            _ = Type(declaring);
         if (Types.Count > 128) throw new InvalidDataException("Application type limit exceeded.");
         return name;
     }

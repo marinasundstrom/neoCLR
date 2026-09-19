@@ -18,7 +18,12 @@ static class DescriptorLibrary
         Func<TypeDefinition, TypeDefinition, string, MethodDefinition[]> interfaces)
     {
         var result = new List<MethodDefinition>();
-        foreach (var name in Layouts.Keys)
+        var contracts = Layouts.Keys.Append("TypeInfo").ToArray();
+        // The closed family is authored together; bind the explicit source/core
+        // pairs before checking its mutually referring signatures.
+        foreach (var name in contracts)
+            ApplicationTypes.BindLibrary(source.GetType("System.Introspection." + name), "System.Introspection." + name);
+        foreach (var name in contracts)
             interfaces(source.GetType("System.Introspection." + name), core.GetType("System.Introspection." + name), "System.Introspection." + name);
         foreach (var name in Layouts.Keys)
         {
@@ -35,6 +40,8 @@ static class DescriptorLibrary
                 throw new InvalidDataException("Descriptor storage or construction contract mismatch: " + name);
             result.AddRange(roots(type, contract, fullName));
         }
+        result.AddRange(roots(source.GetType("System.Introspection.RuntimeTypeInfo"),
+            core.GetType("System.Introspection.RuntimeTypeInfo"), "System.Introspection.RuntimeTypeInfo"));
         return result.ToArray();
     }
     static bool CoreStorage(TypeReference type, ModuleDefinition source)
@@ -42,7 +49,7 @@ static class DescriptorLibrary
         if (type is GenericInstanceType generic)
             return RuntimeSignatures.IsCore(generic.ElementType.Scope) && generic.GenericArguments.All(t => CoreStorage(t, source));
         return type.MetadataType is MetadataType.String or MetadataType.Int32 or MetadataType.Boolean
-            || RuntimeSignatures.IsCore(type.Scope) || type.FullName == "System.Introspection.MethodInfo" && type.Resolve()?.Module == source;
+            || RuntimeSignatures.IsCore(type.Scope) || type.FullName is "System.Introspection.MethodInfo" or "System.Introspection.TypeInfo" && type.Resolve()?.Module == source;
     }
     public static string Base(TypeDefinition type) => type.Name == "RuntimeMemberInfo" ? "System.Object" : "System.Introspection.RuntimeMemberInfo";
     public static bool IsProvider(TypeReference type) => type.Namespace == "System.Introspection"

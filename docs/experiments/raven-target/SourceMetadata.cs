@@ -19,6 +19,7 @@ static class SourceMetadata
         module = type.Module.Name,
         name = type.FullName,
         token = type.MetadataToken.ToUInt32(),
+        declaring_type_token = type.DeclaringType is { } parent ? (uint?)parent.MetadataToken.ToUInt32() : null,
         field_tokens = type.Fields.Select(f => f.MetadataToken.ToUInt32()).ToArray(),
         // Only implementation-owned properties currently have executable accessors
         // projected by this importer; application properties are still omitted.

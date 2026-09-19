@@ -57,9 +57,9 @@
       </section>
       <section id="members">
         <p class="eyebrow">05 · A SEALED MODEL</p><h2>Handle each kind of member.</h2>
-        <p>The public Info contracts are sealed interfaces. The current <code>MemberInfo</code> hierarchy has three public cases, so Raven can check that this match covers the whole hierarchy.</p>
+        <p>The public Info contracts are sealed interfaces. The current <code>MemberInfo</code> hierarchy has four public cases, so Raven can check that this match covers the whole hierarchy.</p>
         <pre tabindex="0" aria-label="Exhaustive matching over MemberInfo"><code>{{TOUR_MATCH}}</code></pre>
-        <p>Callers work with those public cases, without matching private runtime implementation classes. <code>TypeInfo</code> and <code>ParameterInfo</code> are currently separate from the MemberInfo hierarchy.</p>
+        <p>Callers work with those public cases, without matching private runtime implementation classes. <code>TypeInfo</code> is a member case, so a nested type can be described as a member. <code>DeclaringType</code> returns <code>Option&lt;TypeInfo&gt;</code>: nested types and ordinary members have an owner; top-level types do not. <code>ParameterInfo</code> remains separate.</p>
         <pre tabindex="0" aria-label="Inspect a field and a property without executing accessors"><code>{{TOUR_MEMBERS}}</code></pre>
         <p><code>BindingFlags</code> is an ordinary enum. Here its combined flags include nonpublic instance fields of <code>Date</code>. Metadata visibility does not grant access to read those fields or invoke private methods. Describing a property does not execute its accessor.</p>
       </section>

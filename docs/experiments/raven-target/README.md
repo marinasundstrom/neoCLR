@@ -626,3 +626,17 @@ The current collection profile adds `import System.Linq.*` with deferred `Where`
 `samples/library-queries.rvn`, and `verify_queries.py`. Use fresh declaration metadata
 and the matching generated library; archived .7 packages do not contain this API.
 `verify_editor.py --queries` checks completion on lists and query results.
+
+### TypeInfo member hierarchy (2026-09-19)
+
+The reference profile and importer now expose TypeInfo as the fourth sealed
+MemberInfo case. DeclaringType is Option<TypeInfo>; unwrap ordinary member owners,
+and handle None for top-level types. Name, Module and MetadataToken are inherited.
+Rebuild consumers and update exhaustive matches. Runtime Contract typeof settings
+are unchanged. Raven's same-file sealed-family rule is satisfied by compiling all
+member contracts and providers together in Descriptors.rvn (74 generated slices).
+
+Nested source types retain a module-scoped declaring_type_token in .origin metadata,
+including the owner's definition when only the nested type is used. Missing or
+cyclic ownership is rejected. The nested-type sample exercises imported ownership
+and four-way matching. This does not add nested type enumeration or dynamic loading.

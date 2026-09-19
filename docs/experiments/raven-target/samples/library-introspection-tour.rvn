@@ -10,6 +10,7 @@ func MemberKind(member: MemberInfo) -> string {
         FieldInfo => "Field"
         MethodInfo => "Method"
         PropertyInfo => "Property"
+        TypeInfo => "Type"
     }
 }
 
