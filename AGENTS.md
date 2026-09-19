@@ -79,3 +79,14 @@ See [the changelog workflow](docs/changelog.md) for consolidation and release ha
   distinguish quotations, summaries and assistant-reported implementation outcomes.
 - Keep routine changes in the changelog. A routine "continue" need not receive its own
   entry; do not infer approval of every implementation choice from continuation or silence.
+
+## Website maintenance
+
+- Review website content with each feature change and before release. Follow
+  [website structure and maintenance](docs/design/feature-pages.md): homepage for
+  the product overview, feature pages for current behavior and short future
+  directions, and a separate proposals overview for open ideas.
+- Keep pages as small as useful; examples should come from tested samples. Label
+  development work and proposals distinctly from published product capabilities.
+- Website validation runs on relevant pushes/PRs. Publication is a separate manual
+  workflow on main; do not treat a code push or successful local build as deployment.

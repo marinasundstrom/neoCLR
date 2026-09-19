@@ -1,7 +1,7 @@
 # Project website
 
 The What's next section presents the next release's API-shape demo/POC objective
-and all seven proposal families. Each proposal states its benefit and current
+and links to the separate proposal overview. Each proposal states its benefit and current
 implementation status and links to the design record. Keep these descriptions
 aligned with the library-preview plan as APIs become executable.
 
@@ -24,7 +24,9 @@ Update the release-status paragraph when the runtime/Raven assets are actually
 published; do not imply that the local candidate is already downloadable.
 
 `.github/workflows/pages.yml` is separate from runtime CI. Relevant pushes to main
-and manual dispatch build and deploy; pull requests build/check without deployment.
+and pull requests build/check without deployment. Manual dispatch on main builds
+and deploys; pushes never publish. In GitHub Actions, choose Project website → Run
+workflow → main only after reviewing the revision and release status.
 Only the deployment job receives Pages/OIDC permissions. Publication uses the
 `github-pages` environment and GitHub Actions as the repository's Pages source.
 The expected project URL is https://marinasundstrom.github.io/neoCLR/.
@@ -70,7 +72,8 @@ check in `library-introspection-tour.expected.txt`. Run that check with a matchi
 built toolchain via `verify_project.py --collections --only IntrospectionTour` and
 the usual project/runtime/bridge/system arguments.
 
-The builder emits the homepage and HTML under `website/features`, preserving paths
+The builder emits HTML throughout `website`, including the homepage, feature pages
+and proposals overview, preserving paths
 and copying only the selected public samples/assets. It validates relative links,
 directory index links and cross-page fragments after every page is rendered. Raven
 blocks are highlighted; blocks marked `data-language="text"` preserve plain output.
@@ -79,5 +82,23 @@ link/download checks. The Pages workflow watches expected-output files as well a
 Raven sources. Build locally and inspect desktop/mobile layouts before publishing.
 
 This guide describes development APIs, not an update to a published runtime release.
-The Introspection implementation is closed for now; dynamic loading and the String
-story remain later work. TypeInfo is still separate from MemberInfo.
+TypeInfo is part of the sealed MemberInfo hierarchy. The String page shows the
+minimal strict UTF-8 conversion slice; dynamic loading and broader text design
+remain open.
+
+## Keep the site aligned with the product
+
+Follow [website structure and feature maintenance](../docs/design/feature-pages.md)
+when changing features or preparing a release. Review site content with each feature:
+update current behavior and limits, move implemented proposals into the appropriate
+status, and keep development examples separate from published downloads.
+
+The homepage is the overview. Feature pages explain the current implementation
+(with examples where useful), plus a short “Where we’re heading” section.
+`proposals/index.html` gathers open ideas and links their design records. It is not
+a release checklist. Short pages are welcome: do not expand the API or documentation
+just to appear complete. Keep the design open for user feedback.
+
+Publication is deliberately manual and independent of code pushes. Until this
+workflow change is pushed to GitHub, the previously configured remote workflow
+remains in effect. This local change does not publish the site.

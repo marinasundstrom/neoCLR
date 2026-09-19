@@ -4275,3 +4275,13 @@ links from the homepage and feature pages. It summarizes existing design records
 labels current foundations separately and records costs and unresolved questions.
 String and Introspection pages now have short future-direction sections. This
 changes documentation only and does not promote proposals into implemented APIs.
+
+### Website upkeep and publication
+
+The author asked to document the structure for later updates, keep the site aligned
+with feature work and the product at release, and suggested manual publication
+instead of publishing with pushes. The assistant documented the workflow in
+[feature-page maintenance](design/feature-pages.md), linked it from contributor
+instructions and AGENTS.md, and changed Pages deployment to manual dispatch on main.
+Push and PR validation remain automatic. This is a local workflow change; no site
+publication has been performed, and the remote policy changes only after integration.

@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-19
 
+- Document the homepage/feature/proposal structure and website review with each
+  feature and release. Separate Pages publication from code pushes: pushes and PRs
+  still validate; only manual dispatch on main deploys. Isolate event concurrency
+  so a push cannot cancel manual publication. No deployment is performed here.
+
 - Add a separate proposals overview and feature-specific “Where we’re heading”
   sections. Distinguish working foundations, open designs and deferred work;
   link source proposals and .NET comparisons without release commitments.
