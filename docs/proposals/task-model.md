@@ -1,368 +1,774 @@
-# NeoCLR Task and Async Model Proposal
+# NeoCLR Task Model
 
-## 1. Goals
+## Status
 
-NeoCLR should provide a modern asynchronous execution model that cleanly separates three concerns:
+**Proposal**
 
-```text
-Task<T>         asynchronous completion
-Result<T, E>    recoverable failure
-async / await   language-level suspension
-```
+This document defines the initial asynchronous Task model for NeoCLR, including task completion, cancellation, faults, `await` semantics, and promise-style composition.
 
-The runtime should provide the primitives necessary for efficient suspension and resumption, while languages remain responsible for their own async syntax and lowering strategies.
+The design assumes the broader NeoCLR error model:
 
-Raven will initially implement `async` using compiler-generated state machines. NeoCLR's runtime suspension facilities allow this implementation to evolve later without changing the public task model.
+- Expected operational errors are represented explicitly as values, typically through `Result<T, E>`.
+- Cancellation is part of asynchronous computation and is represented by the Task abstraction.
+- Faults represent unrecoverable runtime or program failures and cannot be caught or recovered from through normal application code.
 
----
-
-## 2. Task as the asynchronous abstraction
-
-`Task<T>` represents an asynchronous operation that eventually produces a value of type `T`.
-
-```raven
-func ReadAsync() -> Task<Data>
-```
-
-`Task<T>` represents **completion**, not failure.
-
-Errors that are part of the expected contract of an operation should therefore not be encoded as a faulted task. They are represented explicitly using `Result<T, E>`:
-
-```raven
-func LoadUser(id: UserId)
-    -> Task<Result<User, LoadError>>
-```
-
-This gives NeoCLR orthogonal composition:
-
-```text
-Task<T>                 asynchronous value
-Result<T, E>            fallible value
-Task<Result<T, E>>      asynchronous fallible value
-```
+These mechanisms are intentionally separate.
 
 ---
 
-## 3. Explicit async signatures in Raven
+## Goals
 
-Raven does not implicitly transform the declared return type of an `async` function.
+The Task model should:
 
-The complete return type remains visible:
+- provide a small language-neutral abstraction for asynchronous operations;
+- support efficient `async`/`await`;
+- provide first-class cancellation without exceptions;
+- compose naturally with `Result<T, E>`;
+- support promise-like functional composition;
+- avoid encoding ordinary errors into Task itself;
+- distinguish cancellation from operation failure;
+- avoid exposing scheduler and runtime implementation details;
+- support future runtime-level suspension without changing the public programming model.
+
+The initial Raven implementation may use compiler-generated state machines. NeoCLR may later provide runtime suspension as an optimization or runtime capability.
+
+---
+
+# 1. Task
+
+`Task<T>` represents an asynchronous computation that may eventually produce a value of type `T`.
+
+Conceptually:
 
 ```raven
-async func LoadUser(id: UserId) -> Task<Result<User, LoadError>>
-{
-    let data = await database.Load(id)?;
-    return User.Parse(data);
+class Task<T> {
+    State: TaskState
+    Outcome: Option<TaskOutcome<T>>
 }
 ```
 
-Here:
+A task begins in the `Pending` state and eventually reaches one terminal state:
 
 ```text
-async
-    ↓
-The implementation is allowed to suspend.
-
-Task<...>
-    ↓
-The function's asynchronous API contract.
-
-Result<User, LoadError>
-    ↓
-The operation's success/failure contract.
+             ┌─── Completed(T)
+Pending ─────┤
+             └─── Cancelled
 ```
 
-This avoids making `async` part of the type transformation rules.
+Once terminal, a Task cannot transition to another state.
 
-A caller sees the same `Task<Result<User, LoadError>>` contract regardless of whether the implementation uses `async`, manually constructs a task, or is implemented by another NeoCLR language.
+Tasks are immutable from the perspective of their consumers.
 
 ---
 
-## 4. `await`
+# 2. Task State
 
-`await` operates exclusively on the asynchronous layer.
+The public state describes only the externally meaningful lifecycle of a task.
+
+```raven
+enum TaskState {
+    Pending,
+    Completed,
+    Cancelled
+}
+```
+
+The Task API intentionally does not expose runtime scheduling states such as:
+
+```text
+Created
+Scheduled
+Running
+Suspended
+Waiting
+Completing
+```
+
+These are implementation details and may differ between runtimes, schedulers, or execution strategies.
+
+`Pending` therefore means only:
+
+> The Task has not yet produced a terminal outcome.
+
+It does not imply whether the computation is currently executing.
+
+---
+
+# 3. Task Outcome
+
+The outcome describes the terminal result of a Task.
+
+```raven
+enum TaskOutcome<T> {
+    Completed(T),
+    Cancelled
+}
+```
+
+`Task.Outcome` is unavailable while the Task remains pending:
+
+```raven
+Outcome: Option<TaskOutcome<T>>
+```
+
+For example:
+
+```raven
+match task.Outcome {
+    None =>
+        // Task is still pending.
+
+    Some(.Completed(value)) =>
+        // Task completed with a value.
+
+    Some(.Cancelled) =>
+        // Task terminated due to cancellation.
+}
+```
+
+`TaskOutcome<T>` contains the completion value directly. This preserves the invariant that a completed `Task<T>` always has a value.
+
+There is therefore no independent nullable or optional `Task.Result` property.
+
+---
+
+# 4. Errors Are Values
+
+Task does not have an error state.
+
+An operation that can fail in an expected and recoverable manner expresses that failure through its result type:
+
+```raven
+func LoadUser(id: UserId) -> Task<Result<User, LoadError>>
+```
+
+The possible outcomes are therefore:
+
+```text
+Completed(Ok(User))
+Completed(Err(LoadError))
+Cancelled
+```
+
+The Task itself knows nothing about `LoadError` or `Result`.
+
+This separation is fundamental to the model.
+
+For example:
+
+```raven
+Task<int>
+Task<Option<User>>
+Task<Result<User, LoadError>>
+Task<Result<Option<User>, QueryError>>
+```
+
+are all ordinary Tasks.
+
+`Task<T>` does not impose an error protocol on `T`.
+
+---
+
+# 5. Faults
+
+Faults are not Task outcomes.
+
+A Fault represents an unrecoverable failure such as a violated runtime invariant or another condition from which normal program execution cannot safely recover.
+
+Faults propagate according to NeoCLR fault semantics and cannot be caught through Task APIs.
+
+Consequently, there is no:
+
+```text
+TaskState.Faulted
+TaskOutcome.Faulted
+Task.Error
+Task.Exception
+Catch(...)
+RecoverFault(...)
+```
+
+A Task therefore has only two terminal outcomes:
+
+```text
+Completed(T)
+Cancelled
+```
+
+This produces three distinct semantic channels across asynchronous application code:
+
+```text
+Value
+    Successful computation
+
+Result<T, E>
+    Expected operation failure
+
+Task cancellation
+    Asynchronous computation did not complete
+
+Fault
+    Unrecoverable execution failure
+```
+
+These channels should not be collapsed into one another.
+
+---
+
+# 6. Cancellation
+
+Cancellation is part of Task semantics rather than error semantics.
+
+A cancellable operation accepts a `CancellationToken`:
+
+```raven
+async func LoadUser(
+    id: UserId,
+    cancellation: CancellationToken
+) -> Task<Result<User, LoadError>>
+```
+
+A cancellation token represents a request for cancellation.
+
+Cancellation of the token does not itself transition the Task into the `Cancelled` state. The operation must observe the request and terminate.
+
+This distinguishes:
+
+```text
+Cancellation requested
+```
+
+from:
+
+```text
+Computation cancelled
+```
+
+The latter is represented by:
+
+```raven
+TaskOutcome.Cancelled
+```
+
+---
+
+# 7. Cancellation Token
+
+The initial cancellation API may take the following general shape:
+
+```raven
+struct CancellationToken {
+    IsCancellationRequested: bool
+
+    func Register(
+        callback: func()
+    ) -> CancellationRegistration
+}
+```
+
+Cancellation is initiated through a source:
+
+```raven
+class CancellationSource {
+    Token: CancellationToken
+
+    func Cancel()
+}
+```
+
+A default non-cancellable token may be provided:
+
+```raven
+CancellationToken.None
+```
+
+Linked cancellation may be supported:
+
+```raven
+CancellationSource.Link(
+    parent: CancellationToken,
+    other: CancellationToken
+)
+```
+
+The exact cancellation API is separable from the Task ABI and may be specified independently.
+
+---
+
+# 8. Await
+
+`await` is the normal language-level mechanism for consuming a Task.
 
 Given:
 
 ```raven
-let result = await database.Load(id);
+let value = await task;
+```
+
+where:
+
+```raven
+task: Task<T>
+```
+
+the expression evaluates to:
+
+```raven
+T
+```
+
+Conceptually, `await` behaves as:
+
+```text
+Pending
+    suspend until an outcome exists
+
+Completed(value)
+    continue with value
+
+Cancelled
+    propagate cancellation
+```
+
+Cancellation propagation is automatic.
+
+Application code therefore normally does not inspect `Task.State` or `Task.Outcome`.
+
+For example:
+
+```raven
+async func LoadProfile(
+    id: UserId,
+    cancellation: CancellationToken
+) -> Task<Result<Profile, ProfileError>>
+{
+    let user = await LoadUser(id, cancellation)?;
+    let avatar = await LoadAvatar(user.AvatarId, cancellation)?;
+
+    return Profile(user, avatar);
+}
+```
+
+Two independent propagation mechanisms operate here:
+
+```text
+await
+    Task<T> -> T
+    propagates cancellation
+
+?
+    Result<T, E> -> T
+    propagates expected errors
+```
+
+Therefore:
+
+```raven
+let user = await LoadUser(id, cancellation)?;
+```
+
+can be read as:
+
+1. await the asynchronous operation;
+2. propagate cancellation if the Task was cancelled;
+3. obtain its `Result<User, LoadError>`;
+4. propagate the error if the Result contains an error;
+5. otherwise obtain the `User`.
+
+Neither mechanism depends upon exceptions.
+
+---
+
+# 9. Explicit Outcome Inspection
+
+Although normal `await` automatically propagates cancellation, some code needs to observe Task termination explicitly.
+
+Examples include:
+
+- task combinators;
+- orchestration;
+- races;
+- schedulers;
+- diagnostics;
+- interoperability;
+- fallback behavior.
+
+`Task.Outcome` provides this lower-level view.
+
+For example:
+
+```raven
+match task.Outcome {
+    Some(.Completed(value)) =>
+        Handle(value),
+
+    Some(.Cancelled) =>
+        HandleCancellation(),
+
+    None =>
+        HandlePending()
+}
+```
+
+The distinction is intentional:
+
+```text
+await task
+    Consume the computation.
+
+task.Outcome
+    Inspect the computation.
+```
+
+---
+
+# 10. Promise-Style Composition
+
+Task supports composition independently of `async`/`await`.
+
+The fundamental operators are proposed as:
+
+```raven
+Task<T>.Map<U>(
+    transform: func(T) -> U
+) -> Task<U>
 ```
 
 and:
 
-```text
-database.Load(id)
-    : Task<Result<Data, LoadError>>
+```raven
+Task<T>.Then<U>(
+    continuation: func(T) -> Task<U>
+) -> Task<U>
 ```
 
-the expression:
+## Map
+
+`Map` transforms a successfully completed value:
 
 ```raven
-await database.Load(id)
+LoadUser(id)
+    .Map(user => user.Name)
 ```
 
-has type:
+Semantics:
 
 ```text
-Result<Data, LoadError>
+Pending
+    resulting Task remains pending
+
+Completed(value)
+    invoke transform(value)
+    complete with transformed value
+
+Cancelled
+    resulting Task becomes cancelled
 ```
 
-Conceptually:
-
-```text
-Task<T>
-   │
- await
-   ↓
-   T
-```
-
-`await` does not perform error propagation.
+The transform is never invoked for a cancelled Task.
 
 ---
 
-## 5. `Result` and `?`
+## Then
 
-Recoverable errors are represented explicitly:
-
-```text
-Result<T, E>
-```
-
-Raven's `?` operator handles propagation through the `Result` layer:
+`Then` chains asynchronous computations:
 
 ```raven
-let data = await database.Load(id)?;
+LoadUser(id)
+    .Then(user => LoadProfile(user.Id))
+    .Then(profile => LoadAvatar(profile))
 ```
 
-This composes naturally:
+Its type transformation is:
 
 ```text
-Task<Result<Data, LoadError>>
-          │
-        await
-          ↓
- Result<Data, LoadError>
-          │
-          ?
-          ↓
-        Data
+Task<T> × (T -> Task<U>)
+    -> Task<U>
 ```
 
-The two operators therefore have independent meanings:
+`Then` performs asynchronous flattening and therefore does not produce:
 
 ```text
-await    suspend until the asynchronous value is available
-?        propagate a recoverable error
+Task<Task<U>>
 ```
 
-This distinction should remain fundamental to Raven and NeoCLR.
+Cancellation propagates through the chain automatically.
 
 ---
 
-## 6. Runtime suspension
+# 11. Composition Invariant
 
-NeoCLR should provide runtime primitives for suspending and resuming asynchronous execution.
+The fundamental Task combinators follow one rule:
 
-The runtime's responsibility is the underlying mechanism rather than prescribing how every language must expose asynchronous programming.
+> Task combinators operate on completed values. Cancellation propagates unless an API explicitly states otherwise.
 
-Conceptually:
+Thus:
 
 ```text
-Language
-   │
-   │ async/await semantics
-   ↓
-Task model
-   │
-   │ suspension/resumption
-   ↓
-NeoCLR runtime
+Map / Then
+
+Completed(value)
+    -> invoke continuation
+
+Cancelled
+    -> Cancelled
+
+Fault
+    -> fault propagation
 ```
 
-This allows Raven and other NeoCLR languages to share the runtime infrastructure while presenting different language abstractions.
+This makes promise-style composition consistent with `await`.
 
 ---
 
-## 7. Initial Raven implementation
+# 12. Task and Result Composition
 
-Initially, Raven will compile `async` functions into generated state machines.
+Task combinators do not understand `Result`.
 
-For:
+Given:
 
 ```raven
-async func LoadUser(id: UserId)
-    -> Task<Result<User, LoadError>>
-{
-    let data = await database.Load(id)?;
-    return User.Parse(data);
+Task<Result<User, LoadError>>
+```
+
+calling:
+
+```raven
+task.Map(...)
+```
+
+maps:
+
+```raven
+Result<User, LoadError>
+```
+
+because that is the Task's value.
+
+Task does not implicitly inspect `Ok` or `Err`.
+
+Result-aware convenience APIs may be provided separately, for example:
+
+```raven
+Task<Result<T, E>>.MapResult(...)
+Task<Result<T, E>>.ThenResult(...)
+```
+
+but these would be composition helpers rather than fundamental Task behavior.
+
+This maintains the abstraction boundary:
+
+```text
+Task
+    asynchronous completion and cancellation
+
+Result
+    expected success and failure
+```
+
+---
+
+# 13. Async/Await and Promise Composition
+
+`async`/`await` and promise-style Task composition are not separate asynchronous models.
+
+They are two ways of composing the same abstraction.
+
+Imperative style:
+
+```raven
+let user = await LoadUser(id, cancellation)?;
+let profile = await LoadProfile(user, cancellation)?;
+
+return profile;
+```
+
+Compositional style:
+
+```raven
+return LoadUser(id, cancellation)
+    .Then(...);
+```
+
+The language may lower `async` methods into compiler-generated state machines initially.
+
+A future NeoCLR runtime may implement suspension directly.
+
+Neither implementation strategy changes the semantics of `Task<T>`.
+
+---
+
+# 14. Task Completion
+
+The public `Task<T>` abstraction should not itself expose arbitrary mutation.
+
+Task producers require an internal or separately exposed completion mechanism analogous to a promise/completion source:
+
+```raven
+class TaskCompletionSource<T> {
+    Task: Task<T>
+
+    func Complete(value: T) -> bool
+    func Cancel() -> bool
 }
 ```
 
-the compiler can conceptually produce:
+Only one terminal transition succeeds:
 
 ```text
-LoadUser(...)
-      │
-      ↓
-generated async state machine
-      │
-      ├── execute
-      │
-      ├── suspend at await
-      │
-      ├── register continuation
-      │
-      └── resume
-              │
-              ↓
-     Task<Result<User, LoadError>>
+Pending -> Completed(T)
+Pending -> Cancelled
 ```
 
-The exact generated representation is an implementation detail and should not leak into the public type system.
+Attempts to complete an already terminal Task have no effect and report failure.
+
+This mechanism supports integration with callbacks, operating-system APIs, event loops, and foreign runtimes without making Task itself mutable.
+
+The exact naming and visibility of the completion-source abstraction should be specified separately.
 
 ---
 
-## 8. Evolution toward runtime-managed async
+# 15. Concurrency Combinators
 
-Because NeoCLR itself understands suspension, Raven does not need to remain dependent on generated state machines forever.
-
-The implementation can evolve:
-
-```text
-Raven v1
-
-async func
-    ↓
-compiler-generated state machine
-    ↓
-NeoCLR suspension primitives
-    ↓
-Task<T>
-```
-
-toward:
-
-```text
-Future Raven
-
-async func
-    ↓
-NeoCLR runtime suspension
-    ↓
-Task<T>
-```
-
-without changing:
+The model is intended to support higher-level operations such as:
 
 ```raven
-Task<T>
-await
-async
-Result<T, E>
-?
+Task.WhenAll(...)
+Task.WhenAny(...)
+Task.Race(...)
+Task.Delay(...)
 ```
 
-or existing library signatures.
+Their precise cancellation semantics require separate specification.
 
-This makes runtime async an implementation evolution rather than a new application programming model.
+In particular, APIs involving multiple Tasks must explicitly define:
+
+- whether cancellation of one Task affects sibling Tasks;
+- whether parent cancellation propagates to child operations;
+- what outcome results from mixtures of completion and cancellation;
+- ownership of cancellation sources;
+- whether losing Tasks in a race continue executing.
+
+These questions should not complicate the core `Task<T>` abstraction.
+
+They belong to the concurrency/composition layer.
 
 ---
 
-## 9. Task completion states
+# 16. Structured Concurrency
 
-The normal semantic model should remain deliberately small:
+The initial Task model does not require structured concurrency, but it should not prevent it.
 
-```text
-Task<T>
+A future structured concurrency API may define scopes that:
 
-Pending
-   ↓
-Completed(T)
-```
+- own child Tasks;
+- propagate cancellation;
+- wait for children before leaving the scope;
+- define lifetime relationships between asynchronous operations.
 
-For an operation with expected failure:
-
-```text
-Task<Result<T, E>>
-
-Pending
-   ↓
-Completed
-   ├── Ok(T)
-   └── Error(E)
-```
-
-This is importantly different from making failure another ordinary `Task` completion channel:
-
-```text
-Pending
- ├── Success(T)
- └── Fault(Exception)
-```
-
-NeoCLR libraries should use `Result` for failures that callers are expected to handle.
-
-Runtime catastrophes, cancellation, and other non-domain termination conditions should be designed separately rather than prematurely forcing them into either `Result` or a .NET-style exception/fault model.
+Such APIs can be layered on top of the same Task cancellation model.
 
 ---
 
-## 10. `Void` and non-value-producing tasks
+# 17. Runtime Contract
 
-Because NeoCLR/Raven treats `Void` as a real type, a task that produces no meaningful value does not require a separate non-generic `Task` abstraction:
+The minimal conceptual runtime contract for a Task is therefore:
 
 ```raven
-async func Delay(duration: Duration) -> Task<Void>
+Task<T> {
+    State: TaskState
+    Outcome: Option<TaskOutcome<T>>
+}
 ```
 
-A fallible operation without a produced value becomes naturally:
+with:
 
 ```raven
-async func Save(user: User)
-    -> Task<Result<Void, SaveError>>
+enum TaskState {
+    Pending,
+    Completed,
+    Cancelled
+}
+
+enum TaskOutcome<T> {
+    Completed(T),
+    Cancelled
+}
 ```
 
-This keeps the task model uniform:
+and the following invariants:
 
 ```text
-Task<T>
-```
+1. A Task begins Pending.
 
-rather than requiring both `Task` and `Task<T>`.
+2. A Task may transition exactly once from Pending
+   to Completed(T) or Cancelled.
+
+3. A terminal Task never changes outcome.
+
+4. Completed always contains a T.
+
+5. Cancellation is not an error.
+
+6. Expected errors are represented by T itself,
+   commonly Result<T, E>.
+
+7. Faults are not Task outcomes.
+
+8. await propagates cancellation automatically.
+
+9. Map and Then operate only on completed values
+   and propagate cancellation.
+
+10. Scheduler states are not part of the public Task model.
+```
 
 ---
 
-## 11. Core design principle
+# 18. Design Summary
 
-The important separation is:
+NeoCLR deliberately keeps asynchronous completion, expected errors, cancellation, and faults as separate concepts.
 
 ```text
-                 ┌─────────────────────┐
-                 │       async         │
-                 │ implementation mode │
-                 └──────────┬──────────┘
-                            │
-                            ↓
-                    ┌───────────────┐
-                    │    Task<T>    │
-                    │ async contract│
-                    └───────┬───────┘
-                            │ await
-                            ↓
-                            T
+                    ┌─────────────────────────────┐
+                    │ Fault                       │
+                    │ unrecoverable               │
+                    │ runtime propagation         │
+                    └─────────────────────────────┘
 
-When T = Result<V, E>:
+                    ┌─────────────────────────────┐
+Task<T>             │ Pending                     │
+                    │          │                  │
+                    │     ┌────┴────┐             │
+                    │     ▼         ▼             │
+                    │ Completed   Cancelled        │
+                    │    T                        │
+                    └─────────────────────────────┘
+                           │
+                           ▼
+                 T may itself be:
 
-                  Result<V, E>
-                       │
-                       │ ?
-                       ↓
-                       V
+                 Result<T, E>
+                 Option<T>
+                 or any other value
 ```
 
-**Task answers *when*. Result answers *whether*.**
+This allows ordinary asynchronous application code to remain concise:
 
-Raven's `async`/`await` provides the language ergonomics, `Task<T>` provides the stable asynchronous API contract, `Result<T, E>` provides explicit recoverable failure, and NeoCLR provides the underlying suspension/resumption mechanism.
+```raven
+let user = await LoadUser(id, cancellation)?;
+```
 
-That gives NeoCLR a task model that can start with conventional compiler-generated async state machines without baking that implementation strategy permanently into the platform.
+while the underlying Task remains explicit enough for runtimes, libraries, orchestration, and interoperability:
+
+```raven
+task.State
+task.Outcome
+
+task.Map(...)
+task.Then(...)
+```
+
+The resulting model has one central rule:
+
+> **Task describes whether an asynchronous computation produced a value. Result describes whether an operation represented by that value succeeded. Cancellation terminates the Task without producing a value. Faults exist outside the recoverable Task model.**
