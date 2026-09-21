@@ -158,10 +158,10 @@ static class UnionImport
             var args = (method.HasThis ? new[] { ApplicationTypes.Receiver(method) } : Array.Empty<string>()).Concat(method.Parameters.Select(p => ProfileType(p.ParameterType))).ToArray();
             var valueConstructor = libraryOwner is null && method.IsConstructor && method.DeclaringType.IsValueType;
             var emitInstance = method.HasThis && !valueConstructor;
-            var emitOwnedStatic = libraryOwner is not null && method.IsStatic && (AsyncBindings.IsName(method.DeclaringType.FullName) || method.DeclaringType.IsValueType || OpaqueLibrary.IsString(method.DeclaringType) || ArrayLibrary.IsMatched(method.DeclaringType) || DescriptorLibrary.IsProvider(method.DeclaringType));
+            var emitOwnedStatic = libraryOwner is not null && method.IsStatic && (WorkerBindings.IsName(method.DeclaringType.FullName) || AsyncBindings.IsName(method.DeclaringType.FullName) || method.DeclaringType.IsValueType || OpaqueLibrary.IsString(method.DeclaringType) || ArrayLibrary.IsMatched(method.DeclaringType) || DescriptorLibrary.IsProvider(method.DeclaringType));
             var result = ProfileType(method.ReturnType, true);
             var locals = method.Body.Variables.Select(v => ProfileType(v.VariableType)).ToArray();
-            if (locals.Any(t => !(libraryOwner is not null && t is "Value" or ParameterSnapshotBindings.Vector) && !(libraryOwner is not null && method.GenericParameters.Concat(method.DeclaringType.GenericParameters).Any(p => t == "T" + p.Position)) && !AsyncBindings.IsType(t) && !TaskBindings.IsType(t) && !ApplicationTypes.IsType(t) && !ManagedArrayBindings.IsType(t) && t != "System.Object" && !InterfaceBindings.IsInterface(t) && !NativeMemoryBindings.IsPointer(t) && !ReflectionBindings.IsType(t) && t != "arrayref<String>" && !DelegateBindings.IsType(t) && !GenericUnionBindings.IsType(t) && !CalendarBindings.IsReference(t) && !CalendarBindings.Types.Contains(t) && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
+            if (locals.Any(t => !(libraryOwner is not null && t is "Value" or ParameterSnapshotBindings.Vector) && !(libraryOwner is not null && method.GenericParameters.Concat(method.DeclaringType.GenericParameters).Any(p => t == "T" + p.Position)) && !WorkerBindings.IsName(t) && !AsyncBindings.IsType(t) && !TaskBindings.IsType(t) && !ApplicationTypes.IsType(t) && !ManagedArrayBindings.IsType(t) && t != "System.Object" && !InterfaceBindings.IsInterface(t) && !NativeMemoryBindings.IsPointer(t) && !ReflectionBindings.IsType(t) && t != "arrayref<String>" && !DelegateBindings.IsType(t) && !GenericUnionBindings.IsType(t) && !CalendarBindings.IsReference(t) && !CalendarBindings.Types.Contains(t) && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
                 throw new InvalidDataException("Unsupported local default in Result profile.");
             NormalizePatternBranches(method);
             var instructions = method.Body.Instructions.ToArray();
@@ -206,7 +206,7 @@ static class UnionImport
                 Slot ConvertTop(string type)
                 {
                     if (stack.Count > 0 && stack[^1].Type == "FaultNull"
-                        && (TaskBindings.IsType(type) || AsyncBindings.IsType(type) || ApplicationTypes.IsReference(type)))
+                        && (WorkerBindings.IsName(type) || TaskBindings.IsType(type) || AsyncBindings.IsType(type) || ApplicationTypes.IsReference(type)))
                     {
                         var nullValue = Pop();
                         var key = "DefaultReference" + Convert.ToHexString(Encoding.UTF8.GetBytes(type));
@@ -457,7 +457,8 @@ static class UnionImport
                             || functionTarget.IsConstructor || (!functionTarget.HasBody && !virtualFunction)
                             || functionTarget.DeclaringType.IsValueType && functionTarget.HasThis)
                             throw new InvalidDataException("Only static or class application delegate targets are admitted: " + functionReference.FullName + "; " + instruction.OpCode);
-                        if (!functionTarget.IsPublic && functionTarget.DeclaringType != method.DeclaringType)
+                        if (!functionTarget.IsPublic && functionTarget.DeclaringType != method.DeclaringType
+                            && !(functionTarget.IsAssembly && functionTarget.Module == method.Module))
                             throw new InvalidDataException("Nonpublic cross-type delegate target unsupported.");
                         if (virtualFunction)
                         {
@@ -554,7 +555,7 @@ static class UnionImport
                             code.AppendLine($"delegate.bind {delegateType} = {targetName}({string.Join(',', targetArguments)})");
                             Push(new(delegateType)); break;
                         }
-                        if (collectionProfile && (AsyncBindings.Bind(constructor, constructorDefinition, true) ?? TaskBindings.Bind(constructor, constructorDefinition, true, libraryOwner is not null)) is { } taskConstruction)
+                        if (collectionProfile && (WorkerBindings.Bind(constructor, constructorDefinition, true, libraryOwner is not null) ?? AsyncBindings.Bind(constructor, constructorDefinition, true) ?? TaskBindings.Bind(constructor, constructorDefinition, true, libraryOwner is not null)) is { } taskConstruction)
                         {
                             for (var n = taskConstruction.Arguments.Length - 1; n >= 0; n--) Argument(taskConstruction.Arguments[n]);
                             Push(new(taskConstruction.Result));
@@ -692,7 +693,7 @@ static class UnionImport
                                 var parameters = reference.Parameters.Select(p => ProfileType(ApplicationTypes.Close(p.ParameterType, reference.DeclaringType))).ToArray();
                                 call = targetMethod.HasThis && (libraryOwner is not null || !(targetMethod.IsConstructor && targetMethod.DeclaringType.IsValueType))
                                     ? new("", new[] { ApplicationTypes.Receiver(reference) }.Concat(parameters).ToArray(), ProfileType(ApplicationTypes.Close(reference.ReturnType, reference.DeclaringType), true), Instruction: $"{(instruction.OpCode.Code == Code.Callvirt ? "callvirt" : "call")} instance {ProfileType(reference.DeclaringType)}::{ApplicationTypes.MethodName(targetMethod)}({string.Join(',', parameters)})" + (targetMethod.DeclaringType.IsValueType && targetMethod.ReturnType.MetadataType == MetadataType.Void ? "\npop" : ""))
-                                    : new(libraryOwner is not null && targetMethod.IsStatic && (AsyncBindings.IsName(targetMethod.DeclaringType.FullName) || targetMethod.DeclaringType.IsValueType || DescriptorLibrary.IsProvider(targetMethod.DeclaringType)) ? ProfileType(reference.DeclaringType) + "::" + targetMethod.Name : Name(targetMethod), targetMethod.HasThis ? new[] { ApplicationTypes.Receiver(reference) }.Concat(parameters).ToArray() : parameters, ProfileType(ApplicationTypes.Close(reference.ReturnType, reference.DeclaringType), true));
+                                    : new(libraryOwner is not null && targetMethod.IsStatic && (WorkerBindings.IsName(targetMethod.DeclaringType.FullName) || AsyncBindings.IsName(targetMethod.DeclaringType.FullName) || targetMethod.DeclaringType.IsValueType || DescriptorLibrary.IsProvider(targetMethod.DeclaringType)) ? ProfileType(reference.DeclaringType) + "::" + targetMethod.Name : Name(targetMethod), targetMethod.HasThis ? new[] { ApplicationTypes.Receiver(reference) }.Concat(parameters).ToArray() : parameters, ProfileType(ApplicationTypes.Close(reference.ReturnType, reference.DeclaringType), true));
                             }
                         }
                         else if (targetMethod.Module == library.MainModule)
@@ -735,7 +736,7 @@ static class UnionImport
                             else
                             {
                                 var binding = collectionProfile ? CollectionBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt, libraryOwner is null ? null : t => ProfileType(t)) : null;
-                                var taskBinding = collectionProfile ? AsyncBindings.Bind(reference, targetMethod, false) ?? TaskBindings.Bind(reference, targetMethod, false, libraryOwner is not null) : null;
+                                var taskBinding = collectionProfile ? WorkerBindings.Bind(reference, targetMethod, false, libraryOwner is not null) ?? AsyncBindings.Bind(reference, targetMethod, false) ?? TaskBindings.Bind(reference, targetMethod, false, libraryOwner is not null) : null;
                                 var textBinding = StringBindings.Bind(reference, targetMethod, instruction.OpCode.Code == Code.Callvirt);
                                 if (taskBinding is not null) call = new("", taskBinding.Arguments, taskBinding.Result, Instruction: taskBinding.Instruction);
                                 else if (textBinding is not null) call = new("", textBinding.Arguments, textBinding.Result, Instruction: textBinding.Instruction);

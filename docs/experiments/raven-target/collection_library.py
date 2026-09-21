@@ -90,6 +90,8 @@ def build(path: Path) -> str:
         result += build(ROOT / 'runtime/raven/ResultOperators.neoil')
         result += build(ROOT / 'runtime/raven/Map.neoil')
         result += build(ROOT / 'runtime/raven/Utf8.neoil')
+        result += build(ROOT / 'runtime/raven/Workers.neoil')
+        result += build(ROOT / 'runtime/neoCLR/Runtime/Workers.neoil')
         result += build(ROOT / 'runtime/raven/Tasks.neoil')
         result += build(ROOT / 'runtime/neoCLR/Runtime/Tasks.neoil')
         result += build(ROOT / 'runtime/raven/InvalidUtf8Error.neoil')

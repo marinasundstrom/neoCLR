@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-21
 
+- Add an isolated-worker PoC in System.Threading: Thread.Start and ThreadPool.Queue
+  exchange text through static callbacks and return Task<string> on the caller queue.
+  Use separate interpreter heaps, a two-thread pool, bounded submissions and joined
+  invocation cleanup. Queue pumping may block for results; guest objects and Task
+  state are not shared across threads.
+
 - Execute provisional compiler-generated async/await in the Raven profile using
   System.Tasks.Task<T>, TaskCompletionSource<T> and explicit TaskQueue.Run/Drain.
   Rebuild references and replace System.Threading.Tasks imports. Result remains an

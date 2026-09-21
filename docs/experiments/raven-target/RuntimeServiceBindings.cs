@@ -10,6 +10,9 @@ static class RuntimeServiceBindings
     static readonly (string Name, string[] Args, string Result)[] Members =
         UnaryMath.Select(n => ("Math" + n, new[] { "Double" }, "Double"))
         .Concat(BinaryMath.Select(n => ("Math" + n, new[] { "Double", "Double" }, "Double"))).Concat(new (string Name, string[] Args, string Result)[] {
+            ("StartWorker", ["System.Func<String,String>", "String"], "Int32"),
+            ("QueueWorker", ["System.Func<String,String>", "String"], "Int32"),
+            ("JoinWorker", ["Int32"], "String"),
             ("LocalDateTime", ["Int64"], "System.LocalDateTime"),
             ("UnixTimeTicks", [], "Int64"),
             ("UnixTimeToLocal", ["Int64"], "arrayref<Int32>"),
@@ -77,6 +80,7 @@ static class RuntimeServiceBindings
         "UInt32" => "uint", "Byte" => "byte", "Double" => "double", "String" => "string", "Int32" => "int", "Char" => "char",
         "Boolean" => "bool", "Int64" => "long", "Value" => "System.Value", "noresult" => "void",
         "IntPtr" => "System.IntPtr", "UIntPtr" => "System.UIntPtr", "UInt64" => "ulong",
+        "System.Func<String,String>" => "System.Func<string,string>",
         _ when type.StartsWith("System.") => type,
         _ when type.StartsWith("arrayref<") => CSharp(type[9..^1]) + "[]",
         _ => throw new InvalidDataException("Unsupported runtime service declaration.")

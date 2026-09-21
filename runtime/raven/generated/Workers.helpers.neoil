@@ -1,0 +1,138 @@
+; Generated from runtime/raven/src/System/Threading/Workers.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Threading.Thread.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end
+.type class System.Threading.ThreadPool
+.method static Queue(System.Func<String,String> callback,String input) -> System.Tasks.Task<String>
+.local System.Tasks.TaskQueue local0
+.local System.Tasks.TaskCompletionSource<String> local1
+.local Int32 local2
+.local System.Threading.WorkerCompletion local3
+ldloca local0
+initobj System.Tasks.TaskQueue
+ldloca local1
+initobj System.Tasks.TaskCompletionSource<String>
+ldc.i4 0
+stloc local2
+ldloca local3
+initobj System.Threading.WorkerCompletion
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+call neoCLR.Runtime.CurrentTaskQueue()
+M00000003_IL_0007:
+stloc local0
+M00000003_IL_0008:
+M00000003_IL_0009:
+ldloc local0
+M00000003_IL_000a:
+newobj instance System.Tasks.TaskCompletionSource<String>::.ctor(System.Tasks.TaskQueue)
+M00000003_IL_000f:
+stloc local1
+M00000003_IL_0010:
+M00000003_IL_0011:
+ldarg 0
+M00000003_IL_0012:
+ldarg 1
+M00000003_IL_0013:
+call neoCLR.Runtime.QueueWorker(System.Func<String,String>,String)
+M00000003_IL_0018:
+stloc local2
+M00000003_IL_0019:
+M00000003_IL_001a:
+ldloc local2
+M00000003_IL_001b:
+ldloc local1
+M00000003_IL_001c:
+newobj instance System.Threading.WorkerCompletion::.ctor(Int32,System.Tasks.TaskCompletionSource<String>)
+M00000003_IL_0021:
+stloc local3
+M00000003_IL_0022:
+M00000003_IL_0023:
+ldloc local0
+M00000003_IL_0024:
+ldloc local3
+M00000003_IL_0025:
+M00000003_IL_002b:
+delegate.bind System.Func<Void> = instance System.Threading.WorkerCompletion::DelegateTarget_Application_V1_M_363A6D6574686F643131363A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31363A53797374656D2E546872656164696E6731363A576F726B6572436F6D706C6574696F6E383A436F6D706C657465343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect()
+M00000003_IL_0030:
+call instance System.Tasks.TaskQueue::Post(System.Func<Void>)
+M00000003_IL_0035:
+M00000003_IL_0036:
+ldloc local1
+M00000003_IL_0037:
+call instance System.Tasks.TaskCompletionSource<String>::get_Task()
+M00000003_IL_003c:
+ret
+.end
+.method instance .ctor() -> noresult
+M00000004_IL_0000:
+M00000004_IL_0001:
+ldarg 0
+M00000004_IL_0002:
+pop
+M00000004_IL_0007:
+ret
+.end
+.end
+.type internal class System.Threading.WorkerCompletion
+.field private handle Int32
+.field private source System.Tasks.TaskCompletionSource<String>
+.method internal instance .ctor(Int32 handle,System.Tasks.TaskCompletionSource<String> source) -> noresult
+M00000005_IL_0000:
+M00000005_IL_0001:
+ldarg 0
+M00000005_IL_0002:
+pop
+M00000005_IL_0007:
+M00000005_IL_0008:
+ldarg 0
+M00000005_IL_0009:
+ldarg 1
+M00000005_IL_000a:
+stfld System.Threading.WorkerCompletion::handle
+M00000005_IL_000f:
+M00000005_IL_0010:
+ldarg 0
+M00000005_IL_0011:
+ldarg 2
+M00000005_IL_0012:
+stfld System.Threading.WorkerCompletion::source
+M00000005_IL_0017:
+ret
+.end
+.method internal instance Complete() -> noresult
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+ldfld System.Threading.WorkerCompletion::source
+M00000006_IL_0008:
+ldarg 0
+M00000006_IL_0009:
+ldfld System.Threading.WorkerCompletion::handle
+M00000006_IL_000e:
+call neoCLR.Runtime.JoinWorker(Int32)
+M00000006_IL_0013:
+call instance System.Tasks.TaskCompletionSource<String>::TrySetResult(String)
+call neoCLR.Library.System.Threading.Thread.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_0018:
+pop
+M00000006_IL_0019:
+M00000006_IL_001a:
+ret
+.end
+.method instance DelegateTarget_Application_V1_M_363A6D6574686F643131363A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31363A53797374656D2E546872656164696E6731363A576F726B6572436F6D706C6574696F6E383A436F6D706C657465343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect() -> Void
+ldarg 0
+call instance System.Threading.WorkerCompletion::Complete()
+ldvoid
+ret
+.end
+.end

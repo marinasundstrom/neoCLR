@@ -30,6 +30,7 @@ pub enum RuntimeService {
     SlotReferences,
     ManagedArrays,
     TaskDispatch,
+    IsolatedWorkers,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -56,6 +57,9 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
     }
     if function.is_internal_call() {
         let service = match crate::native::bind(function)? {
+            crate::native::Binding::StartWorker(_) | crate::native::Binding::JoinWorker => {
+                RuntimeService::IsolatedWorkers
+            }
             crate::native::Binding::CurrentTaskQueue => RuntimeService::TaskDispatch,
             crate::native::Binding::Fault => return Ok(vec![]),
             crate::native::Binding::EnvironmentArguments

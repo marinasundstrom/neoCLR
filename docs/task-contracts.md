@@ -174,3 +174,7 @@ python3 docs/experiments/task-contract/verify_async.py /path/to/Demo.rvnproj \
   --bridge /path/to/Probe.dll --system /path/to/System.neoil \
   --runtime /path/to/neoclr
 ```
+
+The subsequent [isolated worker PoC](isolated-workers.md) runs on OS threads with
+separate heaps. It returns Tasks owned by the caller and completes them through the explicit queue.
+The queue may block while waiting for worker results; Task storage is not shared.

@@ -44,6 +44,7 @@ pub use stack_trace::{CodeLocation, StackFrame, StackTrace};
 mod type_identity;
 pub mod value;
 mod vm;
+mod workers;
 
 pub use type_identity::{
     TypeDescriptor, TypeIdentity, resolve_type_identity, resolve_type_identity_with_library,

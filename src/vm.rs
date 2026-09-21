@@ -1506,6 +1506,7 @@ fn interpret_instructions(
     let limits = options.limits;
     let mut collection_threshold = limits.heap_objects.min(64);
     let mut arrays_used = false;
+    let mut workers = crate::workers::Workers::default();
     for _ in 0..limits.instructions {
         if let (Some(debugger), Some(frame)) = (&options.debugger, frames.last()) {
             let before_host_call = matches!(frame.function.body.get(frame.pc), Some(Op::Call(target))
@@ -2551,6 +2552,10 @@ fn interpret_instructions(
                                     "Async work requires an active TaskQueue.Run or Drain scope",
                                 )
                             })?
+                        } else if let crate::native::Binding::StartWorker(pooled) = binding {
+                            workers.start(module, args, options, pooled)?
+                        } else if matches!(binding, crate::native::Binding::JoinWorker) {
+                            workers.join(args, output, options)?
                         } else {
                             binding.invoke(
                                 args,

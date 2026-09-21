@@ -1,0 +1,19 @@
+import System.*
+import System.Threading.*
+import System.Tasks.*
+import System.Console.*
+
+public func Greet(name: string) -> string => "Hello, " + name
+
+public async func RunWorkers() -> Task<unit> {
+    let first = Thread.Start(Greet, "thread")
+    let second = ThreadPool.Queue(Greet, "pool")
+    WriteLine(await first)
+    WriteLine(await second)
+    return ()
+}
+
+func Main() {
+    let queue = TaskQueue()
+    queue.Run(() => { _ = RunWorkers() })
+}

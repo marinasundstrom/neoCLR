@@ -18,6 +18,8 @@ pub(crate) enum Binding {
     ObjectTypeHandle,
     ExecutingAssembly,
     CurrentTaskQueue,
+    StartWorker(bool),
+    JoinWorker,
     AssemblyInfo(crate::assembly_info::Query),
     TypeName,
     TypeEquals,
@@ -167,6 +169,13 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             (Binding::ReadAllText, Type::Value)
         }
         ("neoCLR.Runtime.ConsoleReadByte", []) => (Binding::ConsoleReadByte, Type::Value),
+        ("neoCLR.Runtime.StartWorker", [callback, Type::String]) if matches!(callback, Type::Constructed { definition, arguments } if definition == "System.Func" && arguments == &[Type::String, Type::String]) => {
+            (Binding::StartWorker(false), Type::Int32)
+        }
+        ("neoCLR.Runtime.QueueWorker", [callback, Type::String]) if matches!(callback, Type::Constructed { definition, arguments } if definition == "System.Func" && arguments == &[Type::String, Type::String]) => {
+            (Binding::StartWorker(true), Type::Int32)
+        }
+        ("neoCLR.Runtime.JoinWorker", [Type::Int32]) => (Binding::JoinWorker, Type::String),
         ("neoCLR.Runtime.CurrentTaskQueue", []) => (
             Binding::CurrentTaskQueue,
             Type::from_name("System.Tasks.TaskQueue"),

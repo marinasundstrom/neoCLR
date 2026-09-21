@@ -4697,3 +4697,15 @@ renaming System.IO to System.Storage in anticipation of storage providers, and a
 new locally installed build. This supersedes the earlier deferral of threads after
 async completion. The assistant accepted separate implementation slices; worker
 isolation versus shared-object semantics remains to be settled before implementation.
+
+The author selected “Isolated workers for the first PoC”, then emphasized choosing
+a modern, familiar API without copying .NET for its own sake. The assistant chose
+Thread.Start and ThreadPool.Queue with static text-to-text callbacks and a common
+Worker result handle. Heap sharing and Task integration are excluded from this
+worker slice; the implementation uses actual OS threads and a reusable bounded pool.
+
+The author clarified: “Our goal is to be able to start a task on a new thread.”
+The assistant revised the API to return Task<string> directly from both Thread.Start
+and ThreadPool.Queue. Workers send owned text back to the caller; its queue completes
+the local Task. The assistant identified blocking completion waits while pumping the
+queue as a current PoC limitation, leaving nonblocking dispatch for later work.

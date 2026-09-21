@@ -103,3 +103,9 @@ TaskQueue.Run/Drain receiver. Calling outside such a scope is a terminal Fault;
 there is no process-global default queue. Existing frame roots retain the receiver.
 The service does not start threads or provide progress after an invocation. See
 [Task contracts](task-contracts.md) for the current scheduling limits.
+
+## Isolated workers
+
+IsolatedWorkers covers the bootstrap StartWorker, QueueWorker and JoinWorker
+services. Handles are scoped to one invocation. See [isolated workers](isolated-workers.md)
+for lifecycle, resource bounds, transfer restrictions and blocking behavior.

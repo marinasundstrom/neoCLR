@@ -20,6 +20,12 @@ static class LibraryImplementation
         ReadonlyReceivers.Clear();
         if (owner != "System" && !Regex.IsMatch(owner, @"^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)+$"))
             throw new InvalidDataException("Invalid library owner.");
+        if (owner == "System.Threading.Thread")
+        {
+            var names = new[] { "System.Threading.Thread", "System.Threading.ThreadPool", "System.Threading.WorkerCompletion" };
+            foreach (var name in names) ApplicationTypes.BindLibrary(source.GetType(name), name);
+            return names.SelectMany(name => InstanceRoots(source.GetType(name), core.GetType(name), name)).ToArray();
+        }
         if (owner == "System.Tasks.Task")
         {
             var names = new[] { "System.Tasks.TaskQueue", "System.Tasks.Task`1", "System.Tasks.TaskCompletionSource`1", "System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1", "System.Runtime.CompilerServices.IAsyncStateMachine", "System.Runtime.CompilerServices.ITaskAwaiter" };
@@ -138,7 +144,7 @@ static class LibraryImplementation
         // A single explicitly selected reference/implementation pair. Never alias arbitrary
         // guest types by namespace/name, and never execute reference-assembly stub bodies.
         foreach (var candidate in new[] { type, contract })
-            if (!(candidate.IsPublic || candidate.IsNotPublic && DescriptorLibrary.IsProvider(candidate) || candidate.IsNestedPublic && GenericUnionLibrary.IsCase(candidate)) || candidate.IsInterface || candidate.IsAbstract != (DescriptorLibrary.IsDescriptor(candidate) && candidate.Name == "RuntimeMemberInfo")
+            if (!(candidate.IsPublic || candidate.IsNotPublic && (DescriptorLibrary.IsProvider(candidate) || WorkerBindings.IsProvider(candidate)) || candidate.IsNestedPublic && GenericUnionLibrary.IsCase(candidate)) || candidate.IsInterface || candidate.IsAbstract != (DescriptorLibrary.IsDescriptor(candidate) && candidate.Name == "RuntimeMemberInfo")
                 || candidate.GenericParameters.Any(p => p.HasConstraints || p.Attributes != GenericParameterAttributes.NonVariant) || candidate.HasNestedTypes && !ErrorCarrierLibrary.IsCarrier(candidate) || candidate.HasEvents
                 || candidate.BaseType?.FullName != (DescriptorLibrary.IsDescriptor(candidate) ? DescriptorLibrary.Base(candidate) : candidate.IsValueType ? "System.ValueType" : "System.Object") || candidate.IsExplicitLayout)
                 throw new InvalidDataException($"Unsupported instance library owner: {candidate.FullName}, base={candidate.BaseType}, public={candidate.IsPublic}, abstract={candidate.IsAbstract}, nested={candidate.HasNestedTypes}, value={candidate.IsValueType}.");
@@ -273,7 +279,7 @@ static class LibraryImplementation
 
     public static bool SameType(TypeReference left, TypeReference right)
     {
-        if (AsyncBindings.SameType(left, right) || TaskBindings.SameType(left, right) || DescriptorLibrary.SameType(left, right)) return true;
+        if (WorkerBindings.SameType(left, right) || AsyncBindings.SameType(left, right) || TaskBindings.SameType(left, right) || DescriptorLibrary.SameType(left, right)) return true;
         if (left is ByReferenceType lb)
             return right is ByReferenceType rb && SameType(lb.ElementType, rb.ElementType);
         if (left is ArrayType la)

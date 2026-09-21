@@ -3,6 +3,7 @@
   "owner": "System.Void",
   "inputs": {
     "runtime/raven/src/System/Tasks/Tasks.rvn": "d8fef53e0c1c3f4fda614456f54091f4aeb2a8d94b47652a637b550898603b04",
+    "runtime/raven/src/System/Threading/Workers.rvn": "3090cc929cb3023b00cae03913c1affdf8b40c9136629373f1c7a0bdb14a1c49",
     "runtime/raven/src/System/Array.rvn": "8015702d1767e692f05502b65d5cd06939936c73f0dbb16b12ab9768d7ae0ae9",
     "runtime/raven/src/System/Object.rvn": "89a0bcdac7c6508047c8c25fd61f0038fd75446f10282264f85241bc5c238219",
     "runtime/raven/src/System/Runtime/CompilerServices/UnionAttribute.rvn": "2b5dc7aca6883217188df40ce57c31025703caa869bcdcf775309eda34c804d9",
@@ -81,7 +82,7 @@
     "runtime/raven/src/System/Single.rvn": "488efaf36e56f147c7158a5b0637f3bc4e56e84bb3f514af6c64a023dcd8598e",
     "runtime/raven/src/System/Double.rvn": "cd3ad24e4a21b7616a2937da71891618284913e26ea180ce203276f18b631f33",
     "runtime/raven/src/System/Boolean.rvn": "1f0010fe0d346fbc7f3ba29c88b2c1cf80faebf42a4c2de2f0cd6cff15335022",
-    "runtime/raven/System.Runtime.rvnproj": "8600880d05af3ed15d000512ac61fc9a5c67b319ec810dd5a38dab9321757cbe",
+    "runtime/raven/System.Runtime.rvnproj": "4a5c3fa7a171a19d547d3e1880b6a631e0244dce87be65a09f6938ac486bf96e",
     "build/NeoCLR.Raven.props": "fad7004f86aa6b22aedb208495920f44d1b16f07baa1caa126ef757af1112257"
   },
   "outputs": {
@@ -89,6 +90,6 @@
     "Void.helpers.neoil": "f4a187735feadd65ee37ef9c2392a284d2b230e2496153c30c62faf5a055e7fe"
   },
   "compilerSha256": "fd81ea896146b15d8fa66d2ba7c74b806a1dad1919012a77f7fe53242bbed105",
-  "coreSha256": "822ad13f87e563888d3a13d5b795ff4a783e70d4cf0804213e65bb580fd523a9",
+  "coreSha256": "f6fce9ab4812c6bdf4bce92fc34f0c036a882418f7a8352544f1fd458128137e",
   "exports": []
 }

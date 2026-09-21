@@ -1038,3 +1038,12 @@ methods, async lambdas, hoisted non-default aggregates and broad disposal need
 further validation. Nested lambda capture failures are deferred general compiler
 candidates for independent main-based reproduction; target metadata policy remains
 on neoclr. No .NET Framework or NanoFramework execution is claimed.
+
+### Isolated worker integration
+
+The bridge admits the bounded System.Threading factories and their internal
+completion adapter, including same-module internal delegate targets. Runtime
+visibility remains authoritative; private cross-type targets remain rejected.
+Thread.Start and ThreadPool.Queue return Task<string>, using the caller's explicit
+queue. Worker callbacks must be static and exchange only owned text. See
+[isolated workers](isolated-workers.md) for lifecycle and blocking limitations.

@@ -11,6 +11,7 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
     'Tasks': 'System.Tasks.Task',
+    'Workers': 'System.Threading.Thread',
 
     'Array': 'System.Array',
     'Object': 'System.Object',
@@ -98,6 +99,7 @@ SLICES = {
 }
 SOURCES = {
     'Tasks': 'runtime/raven/src/System/Tasks/Tasks.rvn',
+    'Workers': 'runtime/raven/src/System/Threading/Workers.rvn',
 
     'Array': 'runtime/raven/src/System/Array.rvn',
     'Object': 'runtime/raven/src/System/Object.rvn',

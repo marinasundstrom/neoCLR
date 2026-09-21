@@ -1,0 +1,9 @@
+.function neoCLR.Runtime.StartWorker(System.Func<String,String> callback, String input) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.QueueWorker(System.Func<String,String> callback, String input) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.JoinWorker(Int32 handle) -> String
+.methodimpl InternalCall
+.end
