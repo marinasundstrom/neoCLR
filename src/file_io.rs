@@ -3,7 +3,7 @@ use std::io::{ErrorKind, Read, Write};
 
 use crate::{Fault, Value};
 
-// Explicit internal Byte protocol consumed by System.IO.File's IL wrapper.
+// Explicit internal Byte protocol consumed by System.Storage.File's IL wrapper.
 #[repr(u8)]
 enum ReadStatus {
     InvalidLimit = 1,

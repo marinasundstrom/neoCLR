@@ -71,3 +71,7 @@ python3 docs/experiments/task-contract/verify_workers.py /path/to/Demo.rvnproj \
 
 These cover awaiting dedicated and pooled results, multiple queued jobs, captured
 callback rejection and the required TaskQueue scope.
+
+The author intends to shape this API further with Task integrated from the outset.
+Potential public synchronous counterparts remain a future design question; the
+internal blocking completion wait is not a settled synchronous API design.

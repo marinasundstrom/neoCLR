@@ -132,3 +132,13 @@ enumeration behavior, symlinks, permissions, limits, cancellation and async form
   an unavailable filesystem must be distinguishable from an empty directory or absent
   file. Compare the selected behavior with .NET's static/object APIs and record
   migration adapters before changing existing consumers.
+
+## Direction recorded 2026-09-21
+
+The development API namespace is now System.Storage. The author intends a future
+Storage model with StorageItem, File, Directory and storage providers; File
+operations should use Task as part of that work. Today's local whole-file methods
+remain synchronous, bounded and Result-returning. Renaming the namespace does not
+implement providers, directory objects or async I/O. The existing .NET comparison
+above remains the baseline; evaluate Task and provider lifetime/error contracts
+together when implementing that model.

@@ -1,7 +1,7 @@
 # Bounded UTF-8 file output
 
 Implemented 2026-09-08:
-`System.IO.File.WriteAllText(String path, String text, Int32 maxBytes) -> Result<Void,FileWriteError>`.
+`System.Storage.File.WriteAllText(String path, String text, Int32 maxBytes) -> Result<Void,FileWriteError>`.
 
 Writes valid UTF-8 without adding a BOM or newline, creating a regular file or
 truncating an existing file. An empty string creates/truncates to an empty file.

@@ -1,4 +1,4 @@
-.type System.IO.Path
+.type System.Storage.Path
     .include "../../raven/generated/Path.methods.neoil"
 .end
 

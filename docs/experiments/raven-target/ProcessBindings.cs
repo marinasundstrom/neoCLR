@@ -4,12 +4,12 @@ using Mono.Cecil;
 static class ProcessBindings
 {
     static readonly (string Owner, string Name, string[] Args, string Result)[] Members = [
-        ("System.Console", "ReadByte", [], "System.Result<System.Option<Byte>,System.IO.ConsoleReadError>"),
+        ("System.Console", "ReadByte", [], "System.Result<System.Option<Byte>,System.ConsoleReadError>"),
         ("System.Environment", "GetCommandLineArgs", [], "arrayref<String>"),
         ("System.Environment", "GetCurrentDirectory", [], "System.Result<String,System.EnvironmentError>"),
         ("System.Environment", "GetEnvironmentVariable", ["String"], "System.Result<System.Option<String>,System.EnvironmentError>")
     ];
-    public const string ConsoleDeclaration = "public static Result<Option<byte>, IO.ConsoleReadError> ReadByte() => default;";
+    public const string ConsoleDeclaration = "public static Result<Option<byte>, ConsoleReadError> ReadByte() => default;";
     public const string Declarations = """
         public static class Environment {
             public static string[] GetCommandLineArgs() => default;

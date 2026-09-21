@@ -1,17 +1,17 @@
-; Generated from runtime/raven/src/System/IO/ConsoleReadError.rvn. Regenerate with build_runtime_library.py.
-.type System.IO.ConsoleReadError
+; Generated from runtime/raven/src/System/ConsoleReadError.rvn. Regenerate with build_runtime_library.py.
+.type System.ConsoleReadError
 .custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
 .field private Stored Value
 .property instance IsUnavailable() -> Boolean
-.get instance System.IO.ConsoleReadError::get_IsUnavailable()
+.get instance System.ConsoleReadError::get_IsUnavailable()
 .end
 .property instance IsReadFailed() -> Boolean
-.get instance System.IO.ConsoleReadError::get_IsReadFailed()
+.get instance System.ConsoleReadError::get_IsReadFailed()
 .end
-.method instance .ctor(System.IO.ConsoleReadError.Unavailable value) -> Void
+.method instance .ctor(System.ConsoleReadError.Unavailable value) -> Void
 ldarg value
-value.pack System.IO.ConsoleReadError.Unavailable
-newobj System.IO.ConsoleReadError
+value.pack System.ConsoleReadError.Unavailable
+newobj System.ConsoleReadError
 starg this
 ldvoid
 ret
@@ -22,30 +22,30 @@ M00000002_IL_0001:
 M00000002_IL_0002:
 ldarg 0
 M00000002_IL_0003:
-ldfld System.IO.ConsoleReadError::Stored
+ldfld System.ConsoleReadError::Stored
 M00000002_IL_0008:
-value.is System.IO.ConsoleReadError.Unavailable
-call neoCLR.Library.System.IO.ConsoleReadError.RuntimeBooleanToInt32(Boolean)
+value.is System.ConsoleReadError.Unavailable
+call neoCLR.Library.System.ConsoleReadError.RuntimeBooleanToInt32(Boolean)
 M00000002_IL_000d:
-call neoCLR.Library.System.IO.ConsoleReadError.RuntimeBooleanFromInt32(Int32)
+call neoCLR.Library.System.ConsoleReadError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetUnavailable() -> System.IO.ConsoleReadError.Unavailable
+.method instance GetUnavailable() -> System.ConsoleReadError.Unavailable
 M00000003_IL_0000:
 M00000003_IL_0001:
 M00000003_IL_0002:
 ldarg 0
 M00000003_IL_0003:
-ldfld System.IO.ConsoleReadError::Stored
+ldfld System.ConsoleReadError::Stored
 M00000003_IL_0008:
-value.unpack System.IO.ConsoleReadError.Unavailable
+value.unpack System.ConsoleReadError.Unavailable
 M00000003_IL_000d:
 ret
 .end
-.method instance .ctor(System.IO.ConsoleReadError.ReadFailed value) -> Void
+.method instance .ctor(System.ConsoleReadError.ReadFailed value) -> Void
 ldarg value
-value.pack System.IO.ConsoleReadError.ReadFailed
-newobj System.IO.ConsoleReadError
+value.pack System.ConsoleReadError.ReadFailed
+newobj System.ConsoleReadError
 starg this
 ldvoid
 ret
@@ -56,23 +56,23 @@ M00000005_IL_0001:
 M00000005_IL_0002:
 ldarg 0
 M00000005_IL_0003:
-ldfld System.IO.ConsoleReadError::Stored
+ldfld System.ConsoleReadError::Stored
 M00000005_IL_0008:
-value.is System.IO.ConsoleReadError.ReadFailed
-call neoCLR.Library.System.IO.ConsoleReadError.RuntimeBooleanToInt32(Boolean)
+value.is System.ConsoleReadError.ReadFailed
+call neoCLR.Library.System.ConsoleReadError.RuntimeBooleanToInt32(Boolean)
 M00000005_IL_000d:
-call neoCLR.Library.System.IO.ConsoleReadError.RuntimeBooleanFromInt32(Int32)
+call neoCLR.Library.System.ConsoleReadError.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance GetReadFailed() -> System.IO.ConsoleReadError.ReadFailed
+.method instance GetReadFailed() -> System.ConsoleReadError.ReadFailed
 M00000006_IL_0000:
 M00000006_IL_0001:
 M00000006_IL_0002:
 ldarg 0
 M00000006_IL_0003:
-ldfld System.IO.ConsoleReadError::Stored
+ldfld System.ConsoleReadError::Stored
 M00000006_IL_0008:
-value.unpack System.IO.ConsoleReadError.ReadFailed
+value.unpack System.ConsoleReadError.ReadFailed
 M00000006_IL_000d:
 ret
 .end
@@ -82,8 +82,8 @@ M00000007_IL_0001:
 M00000007_IL_0002:
 ldarg 0
 M00000007_IL_0003:
-call instance System.IO.ConsoleReadError::get_IsUnavailable()
-call neoCLR.Library.System.IO.ConsoleReadError.RuntimeBooleanToInt32(Boolean)
+call instance System.ConsoleReadError::get_IsUnavailable()
+call neoCLR.Library.System.ConsoleReadError.RuntimeBooleanToInt32(Boolean)
 M00000007_IL_0008:
 brtrue M00000007_IL_0012
 M00000007_IL_000d:
@@ -98,8 +98,8 @@ M00000007_IL_001a:
 M00000007_IL_001b:
 ldarg 0
 M00000007_IL_001c:
-call instance System.IO.ConsoleReadError::get_IsReadFailed()
-call neoCLR.Library.System.IO.ConsoleReadError.RuntimeBooleanToInt32(Boolean)
+call instance System.ConsoleReadError::get_IsReadFailed()
+call neoCLR.Library.System.ConsoleReadError.RuntimeBooleanToInt32(Boolean)
 M00000007_IL_0021:
 brtrue M00000007_IL_002b
 M00000007_IL_0026:

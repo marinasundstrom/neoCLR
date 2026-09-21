@@ -1,6 +1,6 @@
 namespace System.Console
 
-import System.IO.ConsoleReadError
+import System.ConsoleReadError
 import System.Result.*
 import System.Option.*
 import System.Runtime.CompilerServices.RuntimeServices

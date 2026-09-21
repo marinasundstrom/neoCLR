@@ -6,7 +6,7 @@
 .function ReadNumber() -> System.Result<System.Option<Int32>,String>
     .local System.Result.Ok<System.Option<Byte>> success
     .local System.Option.Some<Byte> some
-    .local System.Result.Error<System.IO.ConsoleReadError> failure
+    .local System.Result.Error<System.ConsoleReadError> failure
     .local Int32 number
     .local Int32 digits
     .local Byte byte
@@ -18,7 +18,7 @@ Read:
     call System.Console::ReadByte()
     dup
     ldloca success
-    call instance System.Result<System.Option<Byte>,System.IO.ConsoleReadError>::TryGet(System.Result.Ok<System.Option<Byte>>&)
+    call instance System.Result<System.Option<Byte>,System.ConsoleReadError>::TryGet(System.Result.Ok<System.Option<Byte>>&)
     brfalse InputFailed
     pop
     ldloc success
@@ -79,13 +79,13 @@ Finish:
     ret
 InputFailed:
     ldloca failure
-    call instance System.Result<System.Option<Byte>,System.IO.ConsoleReadError>::TryGet(System.Result.Error<System.IO.ConsoleReadError>&)
+    call instance System.Result<System.Option<Byte>,System.ConsoleReadError>::TryGet(System.Result.Error<System.ConsoleReadError>&)
     brtrue ErrorExtracted
     fault "Expected Error case"
 ErrorExtracted:
     ldloc failure
-    call instance System.Result.Error<System.IO.ConsoleReadError>::get_Value()
-    call instance System.IO.ConsoleReadError::ToString()
+    call instance System.Result.Error<System.ConsoleReadError>::get_Value()
+    call instance System.ConsoleReadError::ToString()
     newobj instance System.Result.Error<String>::.ctor(String)
     newobj instance System.Result<System.Option<Int32>,String>::.ctor(System.Result.Error<String>)
     ret

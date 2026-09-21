@@ -950,10 +950,10 @@ contracts and bootstrap-service guest rejection pass; clean regeneration matches
 
 ### Path wrappers — 2026-09-15
 
-`src/System/IO/Path/Functions.rvn` implements Combine and GetFileName, retaining their existing public
+`src/System/Storage/Path/Functions.rvn` implements Combine and GetFileName, retaining their existing public
 parameter names and lexical semantics. The checked bootstrap catalog now includes
 PathCombine and PathGetFileName; the host still performs platform-specific path
-handling. Generated methods retain the existing System.IO.Path owner for both Raven
+handling. Generated methods retain the existing System.Storage.Path owner for both Raven
 and direct IL consumers. There is no normalization, filesystem access or new API
 contract hidden in this source migration. Existing path tests exercise empty paths,
 rooted paths, Unicode, embedded NULs, separators and runtime-service declarations.
@@ -964,7 +964,7 @@ The final saved-project batch also covers Raven Path consumers.
 
 ### File-write outcomes and generic Void matching — 2026-09-15
 
-`src/System/IO/File/Functions.rvn` now constructs the existing WriteAllText outcomes:
+`src/System/Storage/File/Functions.rvn` now constructs the existing WriteAllText outcomes:
 Ok(Void), seven typed FileWriteError cases, and a terminal fault for an unknown host
 status. Actual UTF-8 encoding, limit checks, filesystem writes and truncation remain
 in the native service. ReadAllText retains its existing IL implementation because its

@@ -1,7 +1,7 @@
-namespace System.IO.File
+namespace System.Storage.File
 
-import System.IO.FileReadError
-import System.IO.FileWriteError
+import System.Storage.FileReadError
+import System.Storage.FileWriteError
 import System.Result.*
 import System.Runtime.CompilerServices.RuntimeServices
 

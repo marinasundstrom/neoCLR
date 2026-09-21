@@ -4,14 +4,14 @@ use neoclr::{Limits, LoadedProgram, Value, assemble, assembler::parse_function_r
 fn io_error_cases_round_trip_format_and_reject_wrong_extraction() {
     for (owner, cases) in [
         (
-            "System.IO.ConsoleReadError",
+            "System.ConsoleReadError",
             vec![
                 ("Unavailable", "ConsoleUnavailable"),
                 ("ReadFailed", "ConsoleReadFailed"),
             ],
         ),
         (
-            "System.IO.FileReadError",
+            "System.Storage.FileReadError",
             vec![
                 ("InvalidLimit", "ArgumentOutOfRange"),
                 ("InvalidPath", "InvalidPath"),

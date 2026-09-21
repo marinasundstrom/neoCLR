@@ -1,20 +1,20 @@
 ; Generated from runtime/raven/src/System/Console/Functions.rvn. Regenerate with build_runtime_library.py.
-.function neoCLR.Library.System.Console.RuntimeErrorSystemIOConsoleReadErrorNewSystemIOConsoleReadErrorUnavailable(System.IO.ConsoleReadError.Unavailable value) -> System.IO.ConsoleReadError
+.function neoCLR.Library.System.Console.RuntimeErrorSystemConsoleReadErrorNewSystemConsoleReadErrorUnavailable(System.ConsoleReadError.Unavailable value) -> System.ConsoleReadError
 ldarg value
-newobj instance System.IO.ConsoleReadError::.ctor(System.IO.ConsoleReadError.Unavailable)
+newobj instance System.ConsoleReadError::.ctor(System.ConsoleReadError.Unavailable)
 ret
 .end
-.function neoCLR.Library.System.Console.RuntimeErrorSystemIOConsoleReadErrorNewSystemIOConsoleReadErrorReadFailed(System.IO.ConsoleReadError.ReadFailed value) -> System.IO.ConsoleReadError
+.function neoCLR.Library.System.Console.RuntimeErrorSystemConsoleReadErrorNewSystemConsoleReadErrorReadFailed(System.ConsoleReadError.ReadFailed value) -> System.ConsoleReadError
 ldarg value
-newobj instance System.IO.ConsoleReadError::.ctor(System.IO.ConsoleReadError.ReadFailed)
+newobj instance System.ConsoleReadError::.ctor(System.ConsoleReadError.ReadFailed)
 ret
 .end
-.function neoCLR.Library.System.Console.RuntimeErrorSystemIOConsoleReadErrorUnavailableNew() -> System.IO.ConsoleReadError.Unavailable
-newobj instance System.IO.ConsoleReadError.Unavailable::.ctor()
+.function neoCLR.Library.System.Console.RuntimeErrorSystemConsoleReadErrorUnavailableNew() -> System.ConsoleReadError.Unavailable
+newobj instance System.ConsoleReadError.Unavailable::.ctor()
 ret
 .end
-.function neoCLR.Library.System.Console.RuntimeErrorSystemIOConsoleReadErrorReadFailedNew() -> System.IO.ConsoleReadError.ReadFailed
-newobj instance System.IO.ConsoleReadError.ReadFailed::.ctor()
+.function neoCLR.Library.System.Console.RuntimeErrorSystemConsoleReadErrorReadFailedNew() -> System.ConsoleReadError.ReadFailed
+newobj instance System.ConsoleReadError.ReadFailed::.ctor()
 ret
 .end
 .function neoCLR.Library.System.Console.RuntimeUnion0() -> System.Option.None
@@ -26,9 +26,9 @@ ldarg arg0
 newobj instance System.Option<Byte>::.ctor(System.Option.None)
 ret
 .end
-.function neoCLR.Library.System.Console.RuntimeUnion2(System.IO.ConsoleReadError arg0) -> System.Result.Error<System.IO.ConsoleReadError>
+.function neoCLR.Library.System.Console.RuntimeUnion2(System.ConsoleReadError arg0) -> System.Result.Error<System.ConsoleReadError>
 ldarg arg0
-newobj instance System.Result.Error<System.IO.ConsoleReadError>::.ctor(System.IO.ConsoleReadError)
+newobj instance System.Result.Error<System.ConsoleReadError>::.ctor(System.ConsoleReadError)
 ret
 .end
 .function neoCLR.Library.System.Console.RuntimeUnion3(System.Option<Byte> arg0) -> System.Result.Ok<System.Option<Byte>>
@@ -41,14 +41,14 @@ ldarg arg0
 newobj instance System.Option.Some<Byte>::.ctor(Byte)
 ret
 .end
-.function neoCLR.Library.System.Console.RuntimeUnion5(System.Result.Error<System.IO.ConsoleReadError> arg0) -> System.Result<System.Option<Byte>,System.IO.ConsoleReadError>
+.function neoCLR.Library.System.Console.RuntimeUnion5(System.Result.Error<System.ConsoleReadError> arg0) -> System.Result<System.Option<Byte>,System.ConsoleReadError>
 ldarg arg0
-newobj instance System.Result<System.Option<Byte>,System.IO.ConsoleReadError>::.ctor(System.Result.Error<System.IO.ConsoleReadError>)
+newobj instance System.Result<System.Option<Byte>,System.ConsoleReadError>::.ctor(System.Result.Error<System.ConsoleReadError>)
 ret
 .end
-.function neoCLR.Library.System.Console.RuntimeUnion6(System.Result.Ok<System.Option<Byte>> arg0) -> System.Result<System.Option<Byte>,System.IO.ConsoleReadError>
+.function neoCLR.Library.System.Console.RuntimeUnion6(System.Result.Ok<System.Option<Byte>> arg0) -> System.Result<System.Option<Byte>,System.ConsoleReadError>
 ldarg arg0
-newobj instance System.Result<System.Option<Byte>,System.IO.ConsoleReadError>::.ctor(System.Result.Ok<System.Option<Byte>>)
+newobj instance System.Result<System.Option<Byte>,System.ConsoleReadError>::.ctor(System.Result.Ok<System.Option<Byte>>)
 ret
 .end
 .function neoCLR.Library.System.Console.RuntimeUnion7(System.Option.Some<Byte> arg0) -> System.Option<Byte>

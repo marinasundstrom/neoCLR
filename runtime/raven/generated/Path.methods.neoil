@@ -1,4 +1,4 @@
-; Generated from runtime/raven/src/System/IO/Path/Functions.rvn. Regenerate with build_runtime_library.py.
+; Generated from runtime/raven/src/System/Storage/Path/Functions.rvn. Regenerate with build_runtime_library.py.
 .method static Combine(String value0,String value1) -> String
 M00000001_IL_0000:
 M00000001_IL_0001:

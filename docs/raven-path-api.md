@@ -1,6 +1,6 @@
 # Raven lexical path APIs
 
-The experimental target exposes both existing `System.IO.Path` methods:
+The experimental target exposes both existing `System.Storage.Path` methods:
 
 | Method | Return | Behavior |
 | --- | --- | --- |

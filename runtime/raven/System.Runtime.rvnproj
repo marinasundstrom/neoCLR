@@ -16,8 +16,8 @@
     <Compile Include="src/System/Linq/Operators.rvn" />
     <Compile Include="src/System/OptionOperators.rvn" />
     <Compile Include="src/System/ResultOperators.rvn" />
-    <Compile Include="src/System/IO/Path/Functions.rvn" />
-    <Compile Include="src/System/IO/File/Functions.rvn" />
+    <Compile Include="src/System/Storage/Path/Functions.rvn" />
+    <Compile Include="src/System/Storage/File/Functions.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Clock'">
     <Compile Include="src/System/Clock.rvn" />
@@ -170,13 +170,13 @@
     <Compile Include="src/System/Text/Utf8SliceError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'FileReadError'">
-    <Compile Include="src/System/IO/FileReadError.rvn" />
+    <Compile Include="src/System/Storage/FileReadError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'FileWriteError'">
-    <Compile Include="src/System/IO/FileWriteError.rvn" />
+    <Compile Include="src/System/Storage/FileWriteError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'ConsoleReadError'">
-    <Compile Include="src/System/IO/ConsoleReadError.rvn" />
+    <Compile Include="src/System/ConsoleReadError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Int32ParseError'">
     <Compile Include="src/System/Int32ParseError.rvn" />

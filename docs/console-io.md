@@ -6,7 +6,7 @@ are ordinary platform IL; line decoding and a general text reader are deferred.
 
 ## Platform methods
 
-`System.Console.ReadByte() -> System.Result<System.Option<Byte>,System.IO.ConsoleReadError>` provides raw byte input.
+`System.Console.ReadByte() -> System.Result<System.Option<Byte>,System.ConsoleReadError>` provides raw byte input.
 Its IL body calls the explicitly declared `neoCLR.Runtime.ConsoleReadByte` InternalCall.
 The host returns an explicitly erased Byte, Void (EOF), or Int32 status. Platform IL
 constructs the ordinary nested cases with exact Byte storage:

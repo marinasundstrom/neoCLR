@@ -4,7 +4,7 @@ using System.Text;
 // Shared bounded Result/error catalog for existing runtime-library operations.
 static class ResultBindings
 {
-    public const string ReadError = "System.IO.FileReadError", WriteError = "System.IO.FileWriteError";
+    public const string ReadError = "System.Storage.FileReadError", WriteError = "System.Storage.FileWriteError";
     const string Int32Ok = "System.Result.Ok<Int32>";
     public const string RangeError = "System.InvalidRangeError";
     public const string DivisionError = "System.IntegerDivisionError";

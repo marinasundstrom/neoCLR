@@ -1,4 +1,4 @@
-import System.IO.*
+import System.Storage.*
 import System.Console.*
 
 func Main() {

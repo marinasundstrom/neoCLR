@@ -1,7 +1,7 @@
 import System.*
 import System.Collections.*
 import System.Linq.*
-import System.IO.*
+import System.Storage.*
 import System.Console.*
 import System.Result.*
 import System.Option.*

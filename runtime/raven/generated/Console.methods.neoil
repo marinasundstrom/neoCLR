@@ -1,5 +1,5 @@
 ; Generated from runtime/raven/src/System/Console/Functions.rvn. Regenerate with build_runtime_library.py.
-.method static ReadByte() -> System.Result<System.Option<Byte>,System.IO.ConsoleReadError>
+.method static ReadByte() -> System.Result<System.Option<Byte>,System.ConsoleReadError>
 .local Value local0
 .local Int32 local1
 .local System.Option<Byte> local2
@@ -42,13 +42,13 @@ brtrue M00000001_IL_0030
 M00000001_IL_002b:
 br M00000001_IL_0045
 M00000001_IL_0030:
-call neoCLR.Library.System.Console.RuntimeErrorSystemIOConsoleReadErrorUnavailableNew()
+call neoCLR.Library.System.Console.RuntimeErrorSystemConsoleReadErrorUnavailableNew()
 M00000001_IL_0035:
-call neoCLR.Library.System.Console.RuntimeErrorSystemIOConsoleReadErrorNewSystemIOConsoleReadErrorUnavailable(System.IO.ConsoleReadError.Unavailable)
+call neoCLR.Library.System.Console.RuntimeErrorSystemConsoleReadErrorNewSystemConsoleReadErrorUnavailable(System.ConsoleReadError.Unavailable)
 M00000001_IL_003a:
-call neoCLR.Library.System.Console.RuntimeUnion2(System.IO.ConsoleReadError)
+call neoCLR.Library.System.Console.RuntimeUnion2(System.ConsoleReadError)
 M00000001_IL_003f:
-call neoCLR.Library.System.Console.RuntimeUnion5(System.Result.Error<System.IO.ConsoleReadError>)
+call neoCLR.Library.System.Console.RuntimeUnion5(System.Result.Error<System.ConsoleReadError>)
 M00000001_IL_0044:
 ret
 M00000001_IL_0045:
@@ -65,13 +65,13 @@ brtrue M00000001_IL_0055
 M00000001_IL_0050:
 br M00000001_IL_006a
 M00000001_IL_0055:
-call neoCLR.Library.System.Console.RuntimeErrorSystemIOConsoleReadErrorReadFailedNew()
+call neoCLR.Library.System.Console.RuntimeErrorSystemConsoleReadErrorReadFailedNew()
 M00000001_IL_005a:
-call neoCLR.Library.System.Console.RuntimeErrorSystemIOConsoleReadErrorNewSystemIOConsoleReadErrorReadFailed(System.IO.ConsoleReadError.ReadFailed)
+call neoCLR.Library.System.Console.RuntimeErrorSystemConsoleReadErrorNewSystemConsoleReadErrorReadFailed(System.ConsoleReadError.ReadFailed)
 M00000001_IL_005f:
-call neoCLR.Library.System.Console.RuntimeUnion2(System.IO.ConsoleReadError)
+call neoCLR.Library.System.Console.RuntimeUnion2(System.ConsoleReadError)
 M00000001_IL_0064:
-call neoCLR.Library.System.Console.RuntimeUnion5(System.Result.Error<System.IO.ConsoleReadError>)
+call neoCLR.Library.System.Console.RuntimeUnion5(System.Result.Error<System.ConsoleReadError>)
 M00000001_IL_0069:
 ret
 M00000001_IL_006a:
@@ -81,13 +81,13 @@ ldstr "invalid native I/O status"
 M00000001_IL_0071:
 call System.Fault(String)
 M00000001_IL_0076:
-call neoCLR.Library.System.Console.RuntimeErrorSystemIOConsoleReadErrorReadFailedNew()
+call neoCLR.Library.System.Console.RuntimeErrorSystemConsoleReadErrorReadFailedNew()
 M00000001_IL_007b:
-call neoCLR.Library.System.Console.RuntimeErrorSystemIOConsoleReadErrorNewSystemIOConsoleReadErrorReadFailed(System.IO.ConsoleReadError.ReadFailed)
+call neoCLR.Library.System.Console.RuntimeErrorSystemConsoleReadErrorNewSystemConsoleReadErrorReadFailed(System.ConsoleReadError.ReadFailed)
 M00000001_IL_0080:
-call neoCLR.Library.System.Console.RuntimeUnion2(System.IO.ConsoleReadError)
+call neoCLR.Library.System.Console.RuntimeUnion2(System.ConsoleReadError)
 M00000001_IL_0085:
-call neoCLR.Library.System.Console.RuntimeUnion5(System.Result.Error<System.IO.ConsoleReadError>)
+call neoCLR.Library.System.Console.RuntimeUnion5(System.Result.Error<System.ConsoleReadError>)
 M00000001_IL_008a:
 ret
 M00000001_IL_008b:

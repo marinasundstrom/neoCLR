@@ -1,4 +1,4 @@
-namespace System.IO.Path
+namespace System.Storage.Path
 
 import System.Runtime.CompilerServices.RuntimeServices
 

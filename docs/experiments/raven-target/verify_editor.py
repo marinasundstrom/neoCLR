@@ -98,8 +98,10 @@ try:
             raise AssertionError(f'{owner}: missing target completions: {labels}')
         if any(label == name or label.startswith(name+'(') for label in labels for name in ('ReadLine', 'Atan', 'Cosh')):
             raise AssertionError(f'{owner}: unexpected host API: {labels}')
-        if not owner and 'IO' in labels and not files:
+        if not owner and 'IO' in labels:
             raise AssertionError('Host System.IO leaked into target namespace')
+        if files and not owner and 'ConsoleReadError' not in labels:
+            raise AssertionError('ConsoleReadError must be in System')
         results[owner or 'System'] = labels
     if collections:
         text = 'import System.Collections.*\nfunc Inspect(values: List<int>) {\n    values.\n}'
@@ -137,9 +139,9 @@ try:
         results['ArrayList'] = labels
     if files:
         for version, owner, expected, forbidden in (
-            (8, 'IO', ('Path', 'File', 'FileReadError', 'FileWriteError'), ('Directory', 'Stream')),
-            (9, 'IO.File', ('ReadAllText', 'WriteAllText'), ('Delete', 'ReadAllBytes', 'Open')),
-            (10, 'IO.Path', ('Combine', 'GetFileName'), ('GetFullPath', 'GetExtension'))):
+            (8, 'Storage', ('Path', 'File', 'FileReadError', 'FileWriteError'), ('Directory', 'Stream', 'ConsoleReadError')),
+            (9, 'Storage.File', ('ReadAllText', 'WriteAllText'), ('Delete', 'ReadAllBytes', 'Open')),
+            (10, 'Storage.Path', ('Combine', 'GetFileName'), ('GetFullPath', 'GetExtension'))):
             access = 'System.' + owner + '.'
             text = f'import System.*\nfunc Main() {{\n    {access}\n}}'
             send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})
@@ -224,9 +226,9 @@ try:
             results[expression] = labels
     if errors:
         for version, expression, expected in (
-            (20, 'System.IO.FileReadError.', ('NotFound', 'AccessDenied')),
+            (20, 'System.Storage.FileReadError.', ('NotFound', 'AccessDenied')),
             (21, 'error.', ('IsNotFound', 'GetNotFound', 'ToString'))):
-            text = 'func Main() {\n    let error = System.IO.FileReadError(System.IO.FileReadError.NotFound())\n    ' + expression + '\n}'
+            text = 'func Main() {\n    let error = System.Storage.FileReadError(System.Storage.FileReadError.NotFound())\n    ' + expression + '\n}'
             send('textDocument/didChange', {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})
             result = receive(send('textDocument/completion', {'textDocument': {'uri': uri},
                 'position': {'line': 2, 'character': len('    ' + expression)}, 'context': {'triggerKind': 1}}, True))

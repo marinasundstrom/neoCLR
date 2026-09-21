@@ -5,13 +5,13 @@
     .local System.Result.Ok<String> fileText
     .local System.Result.Ok<Int32> parsedNumber
     .local System.Result.Error<System.Int32ParseError> parseFailure
-    .local System.Result.Error<System.IO.FileReadError> readFailure
+    .local System.Result.Error<System.Storage.FileReadError> readFailure
     ldarg path
     ldc.i4 1024
-    call System.IO.File::ReadAllText(String,Int32)
+    call System.Storage.File::ReadAllText(String,Int32)
     dup
     ldloca fileText
-    call instance System.Result<String,System.IO.FileReadError>::TryGet(System.Result.Ok<String>&)
+    call instance System.Result<String,System.Storage.FileReadError>::TryGet(System.Result.Ok<String>&)
     brfalse Failed
     pop
     ldloc fileText
@@ -41,13 +41,13 @@ ParseErrorExtracted:
     ret
 Failed:
     ldloca readFailure
-    call instance System.Result<String,System.IO.FileReadError>::TryGet(System.Result.Error<System.IO.FileReadError>&)
+    call instance System.Result<String,System.Storage.FileReadError>::TryGet(System.Result.Error<System.Storage.FileReadError>&)
     brtrue ReadErrorExtracted
     fault "Expected Error case"
 ReadErrorExtracted:
     ldloc readFailure
-    call instance System.Result.Error<System.IO.FileReadError>::get_Value()
-    call instance System.IO.FileReadError::ToString()
+    call instance System.Result.Error<System.Storage.FileReadError>::get_Value()
+    call instance System.Storage.FileReadError::ToString()
     newobj instance System.Result.Error<System.String>::.ctor(System.String)
     newobj instance System.Result<Int32,System.String>::.ctor(System.Result.Error<System.String>)
     ret

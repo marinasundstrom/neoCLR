@@ -1,5 +1,5 @@
-; Generated from runtime/raven/src/System/IO/FileWriteError.rvn. Regenerate with build_runtime_library.py.
-.function neoCLR.Library.System.IO.FileWriteError.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+; Generated from runtime/raven/src/System/Storage/FileWriteError.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanFromInt32(Int32 value) -> Boolean
     ldarg value
     ldc.i4 0
     beq False
@@ -14,7 +14,7 @@ True:
     ldc.bool true
     ret
 .end
-.function neoCLR.Library.System.IO.FileWriteError.RuntimeBooleanToInt32(Boolean value) -> Int32
+.function neoCLR.Library.System.Storage.FileWriteError.RuntimeBooleanToInt32(Boolean value) -> Int32
     ldarg value
     brfalse False
     ldc.i4 1
@@ -23,7 +23,7 @@ False:
     ldc.i4 0
     ret
 .end
-.type System.IO.FileWriteError.InvalidLimit
+.type System.Storage.FileWriteError.InvalidLimit
 .method instance .ctor() -> Void
 M00000017_IL_0000:
 M00000017_IL_0001:
@@ -35,7 +35,7 @@ ldvoid
 ret
 .end
 .end
-.type System.IO.FileWriteError.InvalidPath
+.type System.Storage.FileWriteError.InvalidPath
 .method instance .ctor() -> Void
 M00000018_IL_0000:
 M00000018_IL_0001:
@@ -47,7 +47,7 @@ ldvoid
 ret
 .end
 .end
-.type System.IO.FileWriteError.NotFound
+.type System.Storage.FileWriteError.NotFound
 .method instance .ctor() -> Void
 M00000019_IL_0000:
 M00000019_IL_0001:
@@ -59,7 +59,7 @@ ldvoid
 ret
 .end
 .end
-.type System.IO.FileWriteError.AccessDenied
+.type System.Storage.FileWriteError.AccessDenied
 .method instance .ctor() -> Void
 M0000001a_IL_0000:
 M0000001a_IL_0001:
@@ -71,7 +71,7 @@ ldvoid
 ret
 .end
 .end
-.type System.IO.FileWriteError.NotRegularFile
+.type System.Storage.FileWriteError.NotRegularFile
 .method instance .ctor() -> Void
 M0000001b_IL_0000:
 M0000001b_IL_0001:
@@ -83,7 +83,7 @@ ldvoid
 ret
 .end
 .end
-.type System.IO.FileWriteError.TooLarge
+.type System.Storage.FileWriteError.TooLarge
 .method instance .ctor() -> Void
 M0000001c_IL_0000:
 M0000001c_IL_0001:
@@ -95,7 +95,7 @@ ldvoid
 ret
 .end
 .end
-.type System.IO.FileWriteError.WriteFailed
+.type System.Storage.FileWriteError.WriteFailed
 .method instance .ctor() -> Void
 M0000001d_IL_0000:
 M0000001d_IL_0001:

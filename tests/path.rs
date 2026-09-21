@@ -5,8 +5,8 @@ fn lexical_path_contract_roundtrips_through_library_and_artifact() {
     let module = neoclr::frontend::compile(
         r#"
 func Main() -> int {
-    let path = System.IO.Path.Combine("reports", "result.txt")
-    let name = System.IO.Path.GetFileName(path)
+    let path = System.Storage.Path.Combine("reports", "result.txt")
+    let name = System.Storage.Path.GetFileName(path)
     if !name.Equals("result.txt") { return 1 }
     return 0
 }
@@ -18,7 +18,7 @@ func Main() -> int {
     p.verify().unwrap();
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(0));
     let combine = p
-        .resolve_function(&parse_function_ref("System.IO.Path::Combine(String,String)").unwrap())
+        .resolve_function(&parse_function_ref("System.Storage.Path::Combine(String,String)").unwrap())
         .unwrap();
     for (left, right, expected) in [
         ("", "a", "a".to_owned()),
@@ -44,7 +44,7 @@ func Main() -> int {
         );
     }
     let filename = p
-        .resolve_function(&parse_function_ref("System.IO.Path::GetFileName(String)").unwrap())
+        .resolve_function(&parse_function_ref("System.Storage.Path::GetFileName(String)").unwrap())
         .unwrap();
     for (path, expected) in [
         ("", ""),
@@ -101,7 +101,7 @@ func Main() -> int {
     }
     assert_eq!(
         p.analyze_reachability(
-            &[parse_function_ref("System.IO.Path::Combine(String,String)").unwrap()],
+            &[parse_function_ref("System.Storage.Path::Combine(String,String)").unwrap()],
             8
         )
         .unwrap()

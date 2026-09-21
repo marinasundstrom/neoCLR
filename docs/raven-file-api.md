@@ -1,5 +1,10 @@
 # Raven text files on neoCLR
 
+Development after Preview 8 uses System.Storage, renamed from System.IO. Rebuild
+references, runtime libraries and applications together. This namespace makes room
+for future storage providers; the current APIs still access the local filesystem
+synchronously. It does not add a provider abstraction or change file behavior.
+
 The experimental target now projects the existing synchronous, bounded UTF-8 APIs:
 
 ```text
@@ -7,7 +12,7 @@ File.ReadAllText(string path, int maxBytes) -> Result<string, FileReadError>
 File.WriteAllText(string path, string text, int maxBytes) -> Result<Void, FileWriteError>
 ```
 
-Use `import System.IO.*`. The [sample](experiments/raven-target/samples/library-files.rvn)
+Use `import System.Storage.*`. The [sample](experiments/raven-target/samples/library-files.rvn)
 propagates read/write errors with `?`, matches typed Result cases, and prints the
 returned text. It creates or replaces `neoclr-file-demo.txt` in the process working
 directory. Its second write exceeds the byte limit and leaves the first contents

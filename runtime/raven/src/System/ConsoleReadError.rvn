@@ -1,4 +1,4 @@
-namespace System.IO
+namespace System
 
 import System.Runtime.CompilerServices.ValueStorage
 

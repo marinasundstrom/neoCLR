@@ -36,9 +36,9 @@ needs and the primitives required to implement them in platform code.
   and managed ArrayList traversal, implemented entirely in platform IL. List<T>
   inherits Iterable<T>; Iterator<T> inherits Disposable.
 - Ordinary `System.Option<T>` and `System.Result<T,E>` provide variant constructors, predicates and checked accessors. Their Option.None/Some and Result.Ok/Error cases are ordinary nested types. The carrier methods are platform IL; see the [member convention](union-convention.md).
-- `System.IO.File` provides bounded ReadAllText; see [file input](file-input.md).
-- `System.IO.File.ReadAllText` adapts bounded file failures to the ordinary
-  `System.Result<String,System.IO.FileReadError>` carrier; the canonical method now uses nested cases.
+- `System.Storage.File` provides bounded ReadAllText; see [file input](file-input.md).
+- `System.Storage.File.ReadAllText` adapts bounded file failures to the ordinary
+  `System.Result<String,System.Storage.FileReadError>` carrier; the canonical method now uses nested cases.
 - Recoverable failures use ordinary Result payloads: strings or specific error types; see [Error values](errors.md).
 - `System.Array<T>` provides six IL methods for explicit allocation, length, checked
   access, element addresses, and free, with explicit Length property metadata; see [arrays and pointers](arrays-and-pointers.md).
@@ -46,8 +46,8 @@ needs and the primitives required to implement them in platform code.
   see [the text contract](text-model.md).
 - The UnionAttribute marker has an ordinary IL constructor.
 - `System.Console.ReadByte()` adapts the host console boundary to the ordinary nested
-  `System.Result<System.Option<Byte>,System.IO.ConsoleReadError>` carrier. EOF is `Option.None`,
-  a byte is `Option.Some<Byte>`, and host read failures are `Result.Error<System.IO.ConsoleReadError>`.
+  `System.Result<System.Option<Byte>,System.ConsoleReadError>` carrier. EOF is `Option.None`,
+  a byte is `Option.Some<Byte>`, and host read failures are `Result.Error<System.ConsoleReadError>`.
 - `System.Console.WriteLine(string)` calls the host output primitive.
 - `System.Console.WriteLine(int32)` calls the Int32 receiver's `ToString()` and then
   the string overload.
@@ -82,7 +82,7 @@ and proposed operation-specific error types. All six reviewed Result APIs now us
 
 `runtime/System.neoil` is an ordered `.include` manifest. Class and feature sources
 live under namespace folders: for example, `System/Console.neoil`,
-`System/IO/File.neoil`, and `System/Runtime/CompilerServices/UnionAttribute.neoil`.
+`System/Storage/File.neoil`, and `System/Runtime/CompilerServices/UnionAttribute.neoil`.
 Generic carriers and their companions share `System/Option.neoil` and
 `System/Result.neoil`. InternalCall declarations live under `neoCLR/Runtime/`.
 
@@ -188,7 +188,7 @@ Run its Neo sample with `cargo run --locked -- run examples/source/local-clock.n
 The [Environment API](environment.md) exposes guest arguments, current directory and
 optional process variables; see `examples/source/environment.neo`.
 
-[Lexical paths](path.md) provide System.IO.Path.Combine and GetFileName.
+[Lexical paths](path.md) provide System.Storage.Path.Combine and GetFileName.
 
 The [file report example](file-output.md) combines guest arguments, paths and bounded
 UTF-8 input/output with typed Results.

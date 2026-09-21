@@ -28,7 +28,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-foundation-library-') as tempora
     run(['dotnet', args.bridge.resolve(), '--reference-library-core', core])
     source = (ROOT / 'runtime/raven/src/System/Equatable.rvn').read_text()
     local = (ROOT / 'runtime/raven/src/System/LocalDateTime.rvn').read_text()
-    file_source = (ROOT / 'runtime/raven/src/System/IO/File/Functions.rvn').read_text()
+    file_source = (ROOT / 'runtime/raven/src/System/Storage/File/Functions.rvn').read_text()
     mapping = (ROOT / 'runtime/raven/src/System/Collections/Map.rvn').read_text()
     mutable = (ROOT / 'runtime/raven/src/System/Collections/MutableMap.rvn').read_text()
     mismatch = 'Library interface does not match reference contract'

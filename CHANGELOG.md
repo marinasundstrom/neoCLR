@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-21
 
+- Rename the development System.IO namespace and source folders to System.Storage,
+  including File, Path and file errors; move ConsoleReadError to System. Update
+  references, samples and current
+  documentation. Rebuild callers and library artifacts together; local synchronous
+  file behavior is unchanged and storage providers remain future work. Validate
+  27 runtime checks, 257 signature checks, website generation and LSP completions.
+
 - Add an isolated-worker PoC in System.Threading: Thread.Start and ThreadPool.Queue
   exchange text through static callbacks and return Task<string> on the caller queue.
   Use separate interpreter heaps, a two-thread pool, bounded submissions and joined

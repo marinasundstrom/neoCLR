@@ -1,180 +1,180 @@
-; Generated from runtime/raven/src/System/IO/File/Functions.rvn. Regenerate with build_runtime_library.py.
-.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorNewSystemIOFileReadErrorInvalidLimit(System.IO.FileReadError.InvalidLimit value) -> System.IO.FileReadError
+; Generated from runtime/raven/src/System/Storage/File/Functions.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Storage.File.RuntimeErrorSystemStorageFileReadErrorNewSystemStorageFileReadErrorInvalidLimit(System.Storage.FileReadError.InvalidLimit value) -> System.Storage.FileReadError
 ldarg value
-newobj instance System.IO.FileReadError::.ctor(System.IO.FileReadError.InvalidLimit)
+newobj instance System.Storage.FileReadError::.ctor(System.Storage.FileReadError.InvalidLimit)
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorNewSystemIOFileReadErrorInvalidPath(System.IO.FileReadError.InvalidPath value) -> System.IO.FileReadError
+.function neoCLR.Library.System.Storage.File.RuntimeErrorSystemStorageFileReadErrorNewSystemStorageFileReadErrorInvalidPath(System.Storage.FileReadError.InvalidPath value) -> System.Storage.FileReadError
 ldarg value
-newobj instance System.IO.FileReadError::.ctor(System.IO.FileReadError.InvalidPath)
+newobj instance System.Storage.FileReadError::.ctor(System.Storage.FileReadError.InvalidPath)
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorNewSystemIOFileReadErrorNotFound(System.IO.FileReadError.NotFound value) -> System.IO.FileReadError
+.function neoCLR.Library.System.Storage.File.RuntimeErrorSystemStorageFileReadErrorNewSystemStorageFileReadErrorNotFound(System.Storage.FileReadError.NotFound value) -> System.Storage.FileReadError
 ldarg value
-newobj instance System.IO.FileReadError::.ctor(System.IO.FileReadError.NotFound)
+newobj instance System.Storage.FileReadError::.ctor(System.Storage.FileReadError.NotFound)
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorNewSystemIOFileReadErrorAccessDenied(System.IO.FileReadError.AccessDenied value) -> System.IO.FileReadError
+.function neoCLR.Library.System.Storage.File.RuntimeErrorSystemStorageFileReadErrorNewSystemStorageFileReadErrorAccessDenied(System.Storage.FileReadError.AccessDenied value) -> System.Storage.FileReadError
 ldarg value
-newobj instance System.IO.FileReadError::.ctor(System.IO.FileReadError.AccessDenied)
+newobj instance System.Storage.FileReadError::.ctor(System.Storage.FileReadError.AccessDenied)
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorNewSystemIOFileReadErrorNotRegularFile(System.IO.FileReadError.NotRegularFile value) -> System.IO.FileReadError
+.function neoCLR.Library.System.Storage.File.RuntimeErrorSystemStorageFileReadErrorNewSystemStorageFileReadErrorNotRegularFile(System.Storage.FileReadError.NotRegularFile value) -> System.Storage.FileReadError
 ldarg value
-newobj instance System.IO.FileReadError::.ctor(System.IO.FileReadError.NotRegularFile)
+newobj instance System.Storage.FileReadError::.ctor(System.Storage.FileReadError.NotRegularFile)
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorNewSystemIOFileReadErrorTooLarge(System.IO.FileReadError.TooLarge value) -> System.IO.FileReadError
+.function neoCLR.Library.System.Storage.File.RuntimeErrorSystemStorageFileReadErrorNewSystemStorageFileReadErrorTooLarge(System.Storage.FileReadError.TooLarge value) -> System.Storage.FileReadError
 ldarg value
-newobj instance System.IO.FileReadError::.ctor(System.IO.FileReadError.TooLarge)
+newobj instance System.Storage.FileReadError::.ctor(System.Storage.FileReadError.TooLarge)
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorNewSystemIOFileReadErrorReadFailed(System.IO.FileReadError.ReadFailed value) -> System.IO.FileReadError
+.function neoCLR.Library.System.Storage.File.RuntimeErrorSystemStorageFileReadErrorNewSystemStorageFileReadErrorReadFailed(System.Storage.FileReadError.ReadFailed value) -> System.Storage.FileReadError
 ldarg value
-newobj instance System.IO.FileReadError::.ctor(System.IO.FileReadError.ReadFailed)
+newobj instance System.Storage.FileReadError::.ctor(System.Storage.FileReadError.ReadFailed)
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorNewSystemIOFileReadErrorInvalidUtf8(System.IO.FileReadError.InvalidUtf8 value) -> System.IO.FileReadError
+.function neoCLR.Library.System.Storage.File.RuntimeErrorSystemStorageFileReadErrorNewSystemStorageFileReadErrorInvalidUtf8(System.Storage.FileReadError.InvalidUtf8 value) -> System.Storage.FileReadError
 ldarg value
-newobj instance System.IO.FileReadError::.ctor(System.IO.FileReadError.InvalidUtf8)
+newobj instance System.Storage.FileReadError::.ctor(System.Storage.FileReadError.InvalidUtf8)
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorNewSystemIOFileWriteErrorInvalidLimit(System.IO.FileWriteError.InvalidLimit value) -> System.IO.FileWriteError
+.function neoCLR.Library.System.Storage.File.RuntimeErrorSystemStorageFileWriteErrorNewSystemStorageFileWriteErrorInvalidLimit(System.Storage.FileWriteError.InvalidLimit value) -> System.Storage.FileWriteError
 ldarg value
-newobj instance System.IO.FileWriteError::.ctor(System.IO.FileWriteError.InvalidLimit)
+newobj instance System.Storage.FileWriteError::.ctor(System.Storage.FileWriteError.InvalidLimit)
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorNewSystemIOFileWriteErrorInvalidPath(System.IO.FileWriteError.InvalidPath value) -> System.IO.FileWriteError
+.function neoCLR.Library.System.Storage.File.RuntimeErrorSystemStorageFileWriteErrorNewSystemStorageFileWriteErrorInvalidPath(System.Storage.FileWriteError.InvalidPath value) -> System.Storage.FileWriteError
 ldarg value
-newobj instance System.IO.FileWriteError::.ctor(System.IO.FileWriteError.InvalidPath)
+newobj instance System.Storage.FileWriteError::.ctor(System.Storage.FileWriteError.InvalidPath)
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorNewSystemIOFileWriteErrorNotFound(System.IO.FileWriteError.NotFound value) -> System.IO.FileWriteError
+.function neoCLR.Library.System.Storage.File.RuntimeErrorSystemStorageFileWriteErrorNewSystemStorageFileWriteErrorNotFound(System.Storage.FileWriteError.NotFound value) -> System.Storage.FileWriteError
 ldarg value
-newobj instance System.IO.FileWriteError::.ctor(System.IO.FileWriteError.NotFound)
+newobj instance System.Storage.FileWriteError::.ctor(System.Storage.FileWriteError.NotFound)
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorNewSystemIOFileWriteErrorAccessDenied(System.IO.FileWriteError.AccessDenied value) -> System.IO.FileWriteError
+.function neoCLR.Library.System.Storage.File.RuntimeErrorSystemStorageFileWriteErrorNewSystemStorageFileWriteErrorAccessDenied(System.Storage.FileWriteError.AccessDenied value) -> System.Storage.FileWriteError
 ldarg value
-newobj instance System.IO.FileWriteError::.ctor(System.IO.FileWriteError.AccessDenied)
+newobj instance System.Storage.FileWriteError::.ctor(System.Storage.FileWriteError.AccessDenied)
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorNewSystemIOFileWriteErrorNotRegularFile(System.IO.FileWriteError.NotRegularFile value) -> System.IO.FileWriteError
+.function neoCLR.Library.System.Storage.File.RuntimeErrorSystemStorageFileWriteErrorNewSystemStorageFileWriteErrorNotRegularFile(System.Storage.FileWriteError.NotRegularFile value) -> System.Storage.FileWriteError
 ldarg value
-newobj instance System.IO.FileWriteError::.ctor(System.IO.FileWriteError.NotRegularFile)
+newobj instance System.Storage.FileWriteError::.ctor(System.Storage.FileWriteError.NotRegularFile)
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorNewSystemIOFileWriteErrorTooLarge(System.IO.FileWriteError.TooLarge value) -> System.IO.FileWriteError
+.function neoCLR.Library.System.Storage.File.RuntimeErrorSystemStorageFileWriteErrorNewSystemStorageFileWriteErrorTooLarge(System.Storage.FileWriteError.TooLarge value) -> System.Storage.FileWriteError
 ldarg value
-newobj instance System.IO.FileWriteError::.ctor(System.IO.FileWriteError.TooLarge)
+newobj instance System.Storage.FileWriteError::.ctor(System.Storage.FileWriteError.TooLarge)
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorNewSystemIOFileWriteErrorWriteFailed(System.IO.FileWriteError.WriteFailed value) -> System.IO.FileWriteError
+.function neoCLR.Library.System.Storage.File.RuntimeErrorSystemStorageFileWriteErrorNewSystemStorageFileWriteErrorWriteFailed(System.Storage.FileWriteError.WriteFailed value) -> System.Storage.FileWriteError
 ldarg value
-newobj instance System.IO.FileWriteError::.ctor(System.IO.FileWriteError.WriteFailed)
+newobj instance System.Storage.FileWriteError::.ctor(System.Storage.FileWriteError.WriteFailed)
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorInvalidLimitNew() -> System.IO.FileReadError.InvalidLimit
-newobj instance System.IO.FileReadError.InvalidLimit::.ctor()
+.function neoCLR.Library.System.Storage.File.RuntimeErrorSystemStorageFileReadErrorInvalidLimitNew() -> System.Storage.FileReadError.InvalidLimit
+newobj instance System.Storage.FileReadError.InvalidLimit::.ctor()
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorInvalidPathNew() -> System.IO.FileReadError.InvalidPath
-newobj instance System.IO.FileReadError.InvalidPath::.ctor()
+.function neoCLR.Library.System.Storage.File.RuntimeErrorSystemStorageFileReadErrorInvalidPathNew() -> System.Storage.FileReadError.InvalidPath
+newobj instance System.Storage.FileReadError.InvalidPath::.ctor()
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorNotFoundNew() -> System.IO.FileReadError.NotFound
-newobj instance System.IO.FileReadError.NotFound::.ctor()
+.function neoCLR.Library.System.Storage.File.RuntimeErrorSystemStorageFileReadErrorNotFoundNew() -> System.Storage.FileReadError.NotFound
+newobj instance System.Storage.FileReadError.NotFound::.ctor()
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorAccessDeniedNew() -> System.IO.FileReadError.AccessDenied
-newobj instance System.IO.FileReadError.AccessDenied::.ctor()
+.function neoCLR.Library.System.Storage.File.RuntimeErrorSystemStorageFileReadErrorAccessDeniedNew() -> System.Storage.FileReadError.AccessDenied
+newobj instance System.Storage.FileReadError.AccessDenied::.ctor()
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorNotRegularFileNew() -> System.IO.FileReadError.NotRegularFile
-newobj instance System.IO.FileReadError.NotRegularFile::.ctor()
+.function neoCLR.Library.System.Storage.File.RuntimeErrorSystemStorageFileReadErrorNotRegularFileNew() -> System.Storage.FileReadError.NotRegularFile
+newobj instance System.Storage.FileReadError.NotRegularFile::.ctor()
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorTooLargeNew() -> System.IO.FileReadError.TooLarge
-newobj instance System.IO.FileReadError.TooLarge::.ctor()
+.function neoCLR.Library.System.Storage.File.RuntimeErrorSystemStorageFileReadErrorTooLargeNew() -> System.Storage.FileReadError.TooLarge
+newobj instance System.Storage.FileReadError.TooLarge::.ctor()
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorReadFailedNew() -> System.IO.FileReadError.ReadFailed
-newobj instance System.IO.FileReadError.ReadFailed::.ctor()
+.function neoCLR.Library.System.Storage.File.RuntimeErrorSystemStorageFileReadErrorReadFailedNew() -> System.Storage.FileReadError.ReadFailed
+newobj instance System.Storage.FileReadError.ReadFailed::.ctor()
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileReadErrorInvalidUtf8New() -> System.IO.FileReadError.InvalidUtf8
-newobj instance System.IO.FileReadError.InvalidUtf8::.ctor()
+.function neoCLR.Library.System.Storage.File.RuntimeErrorSystemStorageFileReadErrorInvalidUtf8New() -> System.Storage.FileReadError.InvalidUtf8
+newobj instance System.Storage.FileReadError.InvalidUtf8::.ctor()
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorInvalidLimitNew() -> System.IO.FileWriteError.InvalidLimit
-newobj instance System.IO.FileWriteError.InvalidLimit::.ctor()
+.function neoCLR.Library.System.Storage.File.RuntimeErrorSystemStorageFileWriteErrorInvalidLimitNew() -> System.Storage.FileWriteError.InvalidLimit
+newobj instance System.Storage.FileWriteError.InvalidLimit::.ctor()
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorInvalidPathNew() -> System.IO.FileWriteError.InvalidPath
-newobj instance System.IO.FileWriteError.InvalidPath::.ctor()
+.function neoCLR.Library.System.Storage.File.RuntimeErrorSystemStorageFileWriteErrorInvalidPathNew() -> System.Storage.FileWriteError.InvalidPath
+newobj instance System.Storage.FileWriteError.InvalidPath::.ctor()
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorNotFoundNew() -> System.IO.FileWriteError.NotFound
-newobj instance System.IO.FileWriteError.NotFound::.ctor()
+.function neoCLR.Library.System.Storage.File.RuntimeErrorSystemStorageFileWriteErrorNotFoundNew() -> System.Storage.FileWriteError.NotFound
+newobj instance System.Storage.FileWriteError.NotFound::.ctor()
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorAccessDeniedNew() -> System.IO.FileWriteError.AccessDenied
-newobj instance System.IO.FileWriteError.AccessDenied::.ctor()
+.function neoCLR.Library.System.Storage.File.RuntimeErrorSystemStorageFileWriteErrorAccessDeniedNew() -> System.Storage.FileWriteError.AccessDenied
+newobj instance System.Storage.FileWriteError.AccessDenied::.ctor()
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorNotRegularFileNew() -> System.IO.FileWriteError.NotRegularFile
-newobj instance System.IO.FileWriteError.NotRegularFile::.ctor()
+.function neoCLR.Library.System.Storage.File.RuntimeErrorSystemStorageFileWriteErrorNotRegularFileNew() -> System.Storage.FileWriteError.NotRegularFile
+newobj instance System.Storage.FileWriteError.NotRegularFile::.ctor()
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorTooLargeNew() -> System.IO.FileWriteError.TooLarge
-newobj instance System.IO.FileWriteError.TooLarge::.ctor()
+.function neoCLR.Library.System.Storage.File.RuntimeErrorSystemStorageFileWriteErrorTooLargeNew() -> System.Storage.FileWriteError.TooLarge
+newobj instance System.Storage.FileWriteError.TooLarge::.ctor()
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeErrorSystemIOFileWriteErrorWriteFailedNew() -> System.IO.FileWriteError.WriteFailed
-newobj instance System.IO.FileWriteError.WriteFailed::.ctor()
+.function neoCLR.Library.System.Storage.File.RuntimeErrorSystemStorageFileWriteErrorWriteFailedNew() -> System.Storage.FileWriteError.WriteFailed
+newobj instance System.Storage.FileWriteError.WriteFailed::.ctor()
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeUnion0(Void arg0) -> System.Result.Ok<Void>
+.function neoCLR.Library.System.Storage.File.RuntimeUnion0(Void arg0) -> System.Result.Ok<Void>
 ldarg arg0
 newobj instance System.Result.Ok<Void>::.ctor(Void)
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeUnion1(System.Result.Ok<Void> arg0) -> System.Result<Void,System.IO.FileWriteError>
+.function neoCLR.Library.System.Storage.File.RuntimeUnion1(System.Result.Ok<Void> arg0) -> System.Result<Void,System.Storage.FileWriteError>
 ldarg arg0
-newobj instance System.Result<Void,System.IO.FileWriteError>::.ctor(System.Result.Ok<Void>)
+newobj instance System.Result<Void,System.Storage.FileWriteError>::.ctor(System.Result.Ok<Void>)
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeUnion2(System.IO.FileWriteError arg0) -> System.Result.Error<System.IO.FileWriteError>
+.function neoCLR.Library.System.Storage.File.RuntimeUnion2(System.Storage.FileWriteError arg0) -> System.Result.Error<System.Storage.FileWriteError>
 ldarg arg0
-newobj instance System.Result.Error<System.IO.FileWriteError>::.ctor(System.IO.FileWriteError)
+newobj instance System.Result.Error<System.Storage.FileWriteError>::.ctor(System.Storage.FileWriteError)
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeUnion3(System.Result.Error<System.IO.FileWriteError> arg0) -> System.Result<Void,System.IO.FileWriteError>
+.function neoCLR.Library.System.Storage.File.RuntimeUnion3(System.Result.Error<System.Storage.FileWriteError> arg0) -> System.Result<Void,System.Storage.FileWriteError>
 ldarg arg0
-newobj instance System.Result<Void,System.IO.FileWriteError>::.ctor(System.Result.Error<System.IO.FileWriteError>)
+newobj instance System.Result<Void,System.Storage.FileWriteError>::.ctor(System.Result.Error<System.Storage.FileWriteError>)
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeUnion4(String arg0) -> System.Result.Ok<String>
+.function neoCLR.Library.System.Storage.File.RuntimeUnion4(String arg0) -> System.Result.Ok<String>
 ldarg arg0
 newobj instance System.Result.Ok<String>::.ctor(String)
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeUnion5(System.Result.Ok<String> arg0) -> System.Result<String,System.IO.FileReadError>
+.function neoCLR.Library.System.Storage.File.RuntimeUnion5(System.Result.Ok<String> arg0) -> System.Result<String,System.Storage.FileReadError>
 ldarg arg0
-newobj instance System.Result<String,System.IO.FileReadError>::.ctor(System.Result.Ok<String>)
+newobj instance System.Result<String,System.Storage.FileReadError>::.ctor(System.Result.Ok<String>)
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeUnion6(System.IO.FileReadError arg0) -> System.Result.Error<System.IO.FileReadError>
+.function neoCLR.Library.System.Storage.File.RuntimeUnion6(System.Storage.FileReadError arg0) -> System.Result.Error<System.Storage.FileReadError>
 ldarg arg0
-newobj instance System.Result.Error<System.IO.FileReadError>::.ctor(System.IO.FileReadError)
+newobj instance System.Result.Error<System.Storage.FileReadError>::.ctor(System.Storage.FileReadError)
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeUnion7(System.Result.Error<System.IO.FileReadError> arg0) -> System.Result<String,System.IO.FileReadError>
+.function neoCLR.Library.System.Storage.File.RuntimeUnion7(System.Result.Error<System.Storage.FileReadError> arg0) -> System.Result<String,System.Storage.FileReadError>
 ldarg arg0
-newobj instance System.Result<String,System.IO.FileReadError>::.ctor(System.Result.Error<System.IO.FileReadError>)
+newobj instance System.Result<String,System.Storage.FileReadError>::.ctor(System.Result.Error<System.Storage.FileReadError>)
 ret
 .end
-.function neoCLR.Library.System.IO.File.RuntimeBooleanToInt32(Boolean value) -> Int32
+.function neoCLR.Library.System.Storage.File.RuntimeBooleanToInt32(Boolean value) -> Int32
     ldarg value
     brfalse False
     ldc.i4 1

@@ -5,11 +5,11 @@
 .function Main() -> Void
     .local System.Result.Ok<System.Option<Byte>> success
     .local System.Option.Some<Byte> some
-    .local System.Result.Error<System.IO.ConsoleReadError> failure
+    .local System.Result.Error<System.ConsoleReadError> failure
     call System.Console::ReadByte()
     dup
     ldloca success
-    call instance System.Result<System.Option<Byte>,System.IO.ConsoleReadError>::TryGet(System.Result.Ok<System.Option<Byte>>&)
+    call instance System.Result<System.Option<Byte>,System.ConsoleReadError>::TryGet(System.Result.Ok<System.Option<Byte>>&)
     brfalse Failed
     pop
     ldloc success
@@ -25,13 +25,13 @@
     ret
 Failed:
     ldloca failure
-    call instance System.Result<System.Option<Byte>,System.IO.ConsoleReadError>::TryGet(System.Result.Error<System.IO.ConsoleReadError>&)
+    call instance System.Result<System.Option<Byte>,System.ConsoleReadError>::TryGet(System.Result.Error<System.ConsoleReadError>&)
     brtrue ErrorExtracted
     fault "Expected Error case"
 ErrorExtracted:
     ldloc failure
-    call instance System.Result.Error<System.IO.ConsoleReadError>::get_Value()
-    call instance System.IO.ConsoleReadError::ToString()
+    call instance System.Result.Error<System.ConsoleReadError>::get_Value()
+    call instance System.ConsoleReadError::ToString()
     call System.Console::WriteLine(String)
     ret
 EndOfInput:

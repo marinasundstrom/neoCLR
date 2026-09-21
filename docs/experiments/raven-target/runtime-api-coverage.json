@@ -938,7 +938,7 @@
       "note": "The Raven profile uses source-authored Array members, callback loop and private iterator. Checked intrinsic storage and iteration-signature projection preserve identity and filtering; legacy Neo keeps its native descriptor API. NativeMemory is separately Raven-authored."
     },
     {
-      "file": "runtime/System/IO/File.neoil",
+      "file": "runtime/System/Storage/File.neoil",
       "declarations": 1,
       "disposition": "files",
       "samples": [
@@ -1858,7 +1858,7 @@
       ]
     },
     {
-      "file": "runtime/System/IO/Path.neoil",
+      "file": "runtime/System/Storage/Path.neoil",
       "declarations": 1,
       "disposition": "files",
       "samples": [

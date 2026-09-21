@@ -157,7 +157,7 @@ static class SignatureProbe
         voidOwner.GenericArguments.Add(namedVoid);
         voidOwner.GenericArguments.Add(module.GetType(FileBindings.WriteError));
         Check("Generic Void result remains a carrier", RuntimeSignatures.Map(voidOwner, ResultBindings.Type, returns: true)
-            == "System.Result<Void,System.IO.FileWriteError>");
+            == "System.Result<Void,System.Storage.FileWriteError>");
         var stringType = module.GetType("System.String");
         var concat = stringType.Methods.Single(m => m.Name == "Concat");
         Reject("Static String callvirt", () => StringBindings.Bind(Reference(concat, stringType), concat, true));
@@ -176,10 +176,10 @@ static class SignatureProbe
             wrong.HasThis = true;
             Reject("Utf8 instance " + method.Name, () => Utf8Bindings.Bind(wrong, method));
         }
-        var pathType = module.GetType("System.IO.Path");
+        var pathType = module.GetType("System.Storage.Path");
         var combine = pathType.Methods.Single(m => m.Name == "Combine");
         var pathCall = Reference(combine, pathType);
-        Check("Path static mapping", PathBindings.Bind(pathCall, combine)?.Name == "System.IO.Path::Combine");
+        Check("Path static mapping", PathBindings.Bind(pathCall, combine)?.Name == "System.Storage.Path::Combine");
         pathCall.Parameters[0].ParameterType = module.TypeSystem.Int32;
         Reject("Path argument mismatch", () => PathBindings.Bind(pathCall, combine));
         pathCall = Reference(combine, pathType);
@@ -225,10 +225,10 @@ static class SignatureProbe
         Check("Time ticks stay Int64", CalendarBindings.Bind(ticksCall, fromTicks)?.Arguments.SequenceEqual(new[] { "Int64" }) == true);
         ticksCall.Parameters[0].ParameterType = module.TypeSystem.Int32;
         Reject("Time ticks reject Int32 signature", () => CalendarBindings.Bind(ticksCall, fromTicks));
-        var readError = module.GetType("System.IO.FileReadError");
+        var readError = module.GetType("System.Storage.FileReadError");
         var notFound = readError.NestedTypes.Single(t => t.Name == "NotFound");
         var notFoundConstructor = notFound.Methods.Single(m => m.IsConstructor);
-        Check("Error case constructor mapping", ErrorBindings.Construct(Reference(notFoundConstructor, notFound), notFoundConstructor)?.Result == "System.IO.FileReadError.NotFound");
+        Check("Error case constructor mapping", ErrorBindings.Construct(Reference(notFoundConstructor, notFound), notFoundConstructor)?.Result == "System.Storage.FileReadError.NotFound");
         Check("Only empty errors have defaults", ErrorBindings.IsEmpty("System.InvalidDateError") && !ErrorBindings.IsEmpty("System.Int32ParseError"));
         var checkedGetter = readError.Methods.Single(m => m.Name == "GetNotFound");
         var getterReference = Reference(checkedGetter, readError);
@@ -244,7 +244,7 @@ static class SignatureProbe
         Reject("Environment name signature mismatch", () => ProcessBindings.Bind(variableCall, variable));
         var console = module.GetType("System.Console");
         var readByte = console.Methods.Single(m => m.Name == "ReadByte");
-        Check("Console retains Byte payload", ProcessBindings.Bind(Reference(readByte, console), readByte)?.Result == "System.Result<System.Option<Byte>,System.IO.ConsoleReadError>");
+        Check("Console retains Byte payload", ProcessBindings.Bind(Reference(readByte, console), readByte)?.Result == "System.Result<System.Option<Byte>,System.ConsoleReadError>");
         Check("Process vectors exclude multidimensional arrays", ProcessBindings.ArrayType(new ArrayType(module.TypeSystem.String, 2)) is null);
         var arrayListDefinition = module.GetType("System.Collections.ArrayList`1");
         var stringList = new GenericInstanceType(arrayListDefinition);

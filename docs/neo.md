@@ -238,7 +238,7 @@ Use block arms in a standalone match statement for actions, return or loop contr
 Both forms require all cases to be covered; `_` can cover the remainder. Payload
 bindings are immutable copies scoped to their arm. Match a nested union with another
 match, as demonstrated by `Console.ReadByte()` returning
-`Result<Option<byte>, System.IO.ConsoleReadError>`. Without a supplied console,
+`Result<Option<byte>, System.ConsoleReadError>`. Without a supplied console,
 input reports the recoverable Unavailable case. The CLI supplies process stdin/stdout.
 
 Public System methods use known parameter context where unique and otherwise exact

@@ -4709,3 +4709,22 @@ The assistant revised the API to return Task<string> directly from both Thread.S
 and ThreadPool.Queue. Workers send owned text back to the caller; its queue completes
 the local Task. The assistant identified blocking completion waits while pumping the
 queue as a current PoC limitation, leaving nonblocking dispatch for later work.
+
+The assistant renamed the current System.IO API and implementation folders to
+System.Storage, following the author's storage-provider direction. The existing
+File, Path and error contracts retain their behavior, including ConsoleReadError
+from the former namespace. Provider selection remains future work; no provider
+interface was invented as part of this rename. Published history remains unchanged.
+
+The author emphasized that the API will be shaped further, that having Task from
+the start should improve its integration with Thread, and that synchronous versions
+remain a future design question. The assistant retained Task completion for this
+PoC and did not add a parallel public synchronous API.
+
+The author clarified that File is intended to use Task later, when implementing the
+Storage model: StorageItem, File, Directory and storage providers. The assistant
+kept this slice to the namespace migration and recorded asynchronous storage as
+future work, without changing today's synchronous File operations.
+
+The author corrected the error placement: ConsoleReadError belongs in System.
+The assistant moved it there, while file errors remain in System.Storage.

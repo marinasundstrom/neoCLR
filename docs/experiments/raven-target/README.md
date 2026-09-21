@@ -273,7 +273,7 @@ This is staged API coverage, not a change to those runtime implementations.
 
 The probe also invokes Raven's existing `Compilation.GetCompletions` with the **same
 explicit-only core reference**. Math completion returns Max, Min and Sign; Console
-returns WriteLine. Abs, Clamp, ReadLine and host System.IO.File are absent. The report
+returns WriteLine. Abs, Clamp, ReadLine and host System.Storage.File are absent. The report
 records these results under `TargetCompletions`. This demonstrates target-aware completion
 in the compiler API, not VS Code integration.
 

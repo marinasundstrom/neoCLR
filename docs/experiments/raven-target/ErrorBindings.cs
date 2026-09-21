@@ -5,9 +5,9 @@ using System.Text;
 static class ErrorBindings
 {
     public static readonly Dictionary<string, string[]> Cases = new() {
-        ["System.IO.FileReadError"] = ["InvalidLimit", "InvalidPath", "NotFound", "AccessDenied", "NotRegularFile", "TooLarge", "ReadFailed", "InvalidUtf8"],
-        ["System.IO.FileWriteError"] = ["InvalidLimit", "InvalidPath", "NotFound", "AccessDenied", "NotRegularFile", "TooLarge", "WriteFailed"],
-        ["System.IO.ConsoleReadError"] = ["Unavailable", "ReadFailed"],
+        ["System.Storage.FileReadError"] = ["InvalidLimit", "InvalidPath", "NotFound", "AccessDenied", "NotRegularFile", "TooLarge", "ReadFailed", "InvalidUtf8"],
+        ["System.Storage.FileWriteError"] = ["InvalidLimit", "InvalidPath", "NotFound", "AccessDenied", "NotRegularFile", "TooLarge", "WriteFailed"],
+        ["System.ConsoleReadError"] = ["Unavailable", "ReadFailed"],
         ["System.Text.InvalidUtf8Error"] = [],
         ["System.Text.Utf8SliceError"] = ["OutOfRange", "InvalidBoundary"],
         ["System.Int32ParseError"] = ["InvalidFormat", "Overflow"],

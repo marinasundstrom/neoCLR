@@ -32,7 +32,7 @@ impl Drop for Fixture {
 fn read(path: &str, limit: i32) -> Value {
     let program = LoadedProgram::new(&assemble(".module App").unwrap()).unwrap();
     program
-        .resolve_function(&parse_function_ref("System.IO.File::ReadAllText(String,Int32)").unwrap())
+        .resolve_function(&parse_function_ref("System.Storage.File::ReadAllText(String,Int32)").unwrap())
         .unwrap()
         .invoke(
             vec![Value::String(path.into()), Value::Int32(limit)],
@@ -53,7 +53,7 @@ fn carrier(name: &str, case: &str, fields: Vec<Value>) -> Value {
 }
 fn ok(text: &str) -> Value {
     carrier(
-        "System.Result<String,System.IO.FileReadError>",
+        "System.Result<String,System.Storage.FileReadError>",
         "System.Result.Ok<String>",
         vec![Value::String(text.into())],
     )
@@ -67,13 +67,13 @@ fn err(text: &str) -> Value {
         other => other,
     };
     let error = carrier(
-        "System.IO.FileReadError",
-        &format!("System.IO.FileReadError.{case}"),
+        "System.Storage.FileReadError",
+        &format!("System.Storage.FileReadError.{case}"),
         vec![],
     );
     carrier(
-        "System.Result<String,System.IO.FileReadError>",
-        "System.Result.Error<System.IO.FileReadError>",
+        "System.Result<String,System.Storage.FileReadError>",
+        "System.Result.Error<System.Storage.FileReadError>",
         vec![error],
     )
 }
@@ -151,7 +151,7 @@ fn sample_round_trips_verifies_computes_and_handles_parse_errors() {
 #[test]
 fn file_service_is_visible_without_opening_files_and_faults_keep_call_site() {
     let program = LoadedProgram::new(&assemble(".module App").unwrap()).unwrap();
-    let target = parse_function_ref("System.IO.File::ReadAllText(String,Int32)").unwrap();
+    let target = parse_function_ref("System.Storage.File::ReadAllText(String,Int32)").unwrap();
     let graph = program
         // Raven-generated carrier adapters are also reachable library functions.
         .analyze_reachability(std::slice::from_ref(&target), 128)
@@ -185,7 +185,7 @@ fn file_service_is_visible_without_opening_files_and_faults_keep_call_site() {
         .unwrap_err();
     assert_eq!(
         fault.stack_trace.unwrap().frames[0].function.name,
-        "System.IO.File.ReadAllText"
+        "System.Storage.File.ReadAllText"
     );
 }
 
@@ -194,7 +194,7 @@ fn raven_file_read_preserves_all_native_statuses_and_unknown_status_faults() {
     let source = neoclr::library::system_source();
     let service = "call neoCLR.Runtime.ReadAllText(String,Int32)";
     assert_eq!(source.matches(service).count(), 1);
-    let app = assemble(".module Probe\n.entry Main\n.function Main() -> System.Result<String,System.IO.FileReadError>\nldstr \"unused\"\nldc.i4 4\ncall System.IO.File::ReadAllText(String,Int32)\nret\n.end").unwrap();
+    let app = assemble(".module Probe\n.entry Main\n.function Main() -> System.Result<String,System.Storage.FileReadError>\nldstr \"unused\"\nldc.i4 4\ncall System.Storage.File::ReadAllText(String,Int32)\nret\n.end").unwrap();
     for (status, case) in [
         "Ok",
         "InvalidLimit",

@@ -52,7 +52,7 @@ impl Console for Input {
 
 #[test]
 fn nested_result_option_handles_input_eof_and_unavailable() {
-    let source = "func Read() -> Result<Option<byte>,System.IO.ConsoleReadError> { return Console.ReadByte() }\nfunc Main() -> int { return Read() match { Ok(let option) => option match { Some(_) => 1, None => 0 }, Error(let e) => e match { Unavailable => -1, ReadFailed => -2 } } }";
+    let source = "func Read() -> Result<Option<byte>,System.ConsoleReadError> { return Console.ReadByte() }\nfunc Main() -> int { return Read() match { Ok(let option) => option match { Some(_) => 1, None => 0 }, Error(let e) => e match { Unavailable => -1, ReadFailed => -2 } } }";
     let module = frontend::compile(source).unwrap();
     let program = LoadedProgram::new(&module).unwrap();
     assert_eq!(
