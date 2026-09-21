@@ -210,3 +210,29 @@ pending awaits through an explicit TaskQueue. Result is still an ordinary payloa
 no exceptions or ConfigureAwait policy are introduced. The builder/state protocol
 is provisional and may be replaced by runtime suspension. Threading is a subsequent
 slice, not a guarantee of this completion implementation.
+
+## Promise-style composition direction — 2026-09-21
+
+The author wants Task to resemble a Promise API, with methods for composing and
+continuing tasks. .NET terminology is a reference, not a naming requirement.
+Retain the project's initial-capital method convention. Exact operator names,
+overloads and scheduling rules are still open; this records direction rather than
+newly implemented operators.
+
+Compared with .NET's
+[Task<T>.ContinueWith](https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1.continuewith?view=net-10.0),
+Promise-style chaining offers another vocabulary for expressing dependent work.
+[ECMAScript 2025 Promise.prototype.then](https://tc39.es/ecma262/2025/multipage/control-abstraction-objects.html#sec-promise.prototype.then)
+is a useful composition reference, but also includes rejection handling. Sources
+reviewed 2026-09-21. neoCLR's existing decision remains: Task<T> supplies eventual
+completion with an ordinary T; Result<T,E> independently models recoverable failure.
+Promise-inspired composition does not introduce a rejection channel, exceptions,
+implicit Result unwrapping or JavaScript scheduling semantics.
+
+Evaluate value transformation, chaining a callback that returns another Task, and
+combining multiple Tasks as distinct operations. Choose names for their meaning
+and consistency with collection/Option/Result operators, not mechanical parity
+with either .NET or JavaScript. Benefits sought are readable pipelines and direct
+composition alongside await; costs include reduced .NET API familiarity and the
+need to define callback ordering, reentrancy, queue ownership and pending/completed
+behavior explicitly. Validate those contracts before implementing the operators.

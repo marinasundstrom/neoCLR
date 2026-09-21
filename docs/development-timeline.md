@@ -4740,3 +4740,12 @@ and 257 signature checks, and the actual language server exposes Storage members
 and System.ConsoleReadError. Raven project/heap-policy validation passes eight
 checks; website generation and its focused tests pass. This is a local development
 installation, not a published release or website deployment.
+
+## 2026-09-21 — Promise-style Task composition
+
+The author said the Task API should be reminiscent of a Promise API, with methods
+for composing and continuing tasks, and need not use .NET terminology. The assistant
+recorded this as API direction, preserving initial-capital method names and the
+existing separation between Task completion and ordinary Result payloads. Exact
+operator names and scheduling semantics remain open. No composition methods were
+implemented or installed in this documentation slice.

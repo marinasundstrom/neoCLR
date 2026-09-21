@@ -183,3 +183,9 @@ Shared neoCLR project props select RavenHeapAsyncStateMachines=true and
 RavenCaptureAsyncExceptions=false in the matching development compiler. Build
 the .rvnproj through MSBuild for the same policy used by the editor and bridge.
 The published Preview 8 SDK does not implement these new project settings.
+
+The intended public API will grow Promise-style composition and continuation
+methods, using terminology appropriate to neoCLR rather than requiring .NET names.
+Exact operators remain to be designed; OnCompleted is the current provisional
+protocol, not the complete composition API. See the
+[recorded direction](async-api-design.md#promise-style-composition-direction--2026-09-21).

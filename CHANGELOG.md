@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-21
 
+- Record Promise-style Task composition and continuation as API direction, with
+  names chosen for neoCLR rather than .NET parity. Keep Result failure independent;
+  operator names and semantics remain open. Update the proposals overview.
+
 - Select provisional heap async states and exception-free lowering in the neoCLR
   project props, matching the development compiler and language server. Keep the
   installed development build separate from published Preview 8 artifacts. Verify
