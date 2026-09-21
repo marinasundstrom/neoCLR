@@ -8,10 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-21
 
+- Select provisional heap async states and exception-free lowering in the neoCLR
+  project props, matching the development compiler and language server. Keep the
+  installed development build separate from published Preview 8 artifacts. Verify
+  the async, worker and storage projects through MSBuild and the language server.
+
 - Rename the development System.IO namespace and source folders to System.Storage,
   including File, Path and file errors; move ConsoleReadError to System. Update
-  references, samples and current
-  documentation. Rebuild callers and library artifacts together; local synchronous
+  references, samples and current documentation. Rebuild callers and library
+  artifacts together; local synchronous
   file behavior is unchanged and storage providers remain future work. Validate
   27 runtime checks, 257 signature checks, website generation and LSP completions.
 

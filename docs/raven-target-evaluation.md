@@ -1047,3 +1047,14 @@ visibility remains authoritative; private cross-type targets remain rejected.
 Thread.Start and ThreadPool.Queue return Task<string>, using the caller's explicit
 queue. Worker callbacks must be static and exchange only owned text. See
 [isolated workers](isolated-workers.md) for lifecycle and blocking limitations.
+
+### Matching project builds and editor — 2026-09-21
+
+Raven neoclr commit a7b728aa4 adds RavenHeapAsyncStateMachines and
+RavenCaptureAsyncExceptions project properties. neoCLR's shared props select
+true/false respectively. Eight focused compiler/project tests pass (including
+two new project-policy cases), following a three-case project baseline.
+The ordinary CLI build and language server now select the same provisional async
+policies as the bridge. Published SDK .15 predates these settings; use the matching
+development compiler, importer and reference pack. This is target-specific policy,
+not a change integrated into Raven main.

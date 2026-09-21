@@ -475,11 +475,11 @@ The current namespace vocabulary is:
 System
 ├── Collections
 ├── Configuration
-├── Cryptography
 ├── Data
 │   ├── Compression
 │   ├── Json
-│   └── Xml
+│   ├── Xml
+│   └── Serialization
 ├── DependencyInjection
 ├── Globalization
 ├── Introspection
@@ -495,7 +495,8 @@ System
 ├── Runtime
 │   ├── Reflection
 │   └── Emit
-├── Serialization
+├── Security
+│   └── Cryptography (or System.Cryptography)
 ├── Storage
 ├── Tasks
 ├── Text

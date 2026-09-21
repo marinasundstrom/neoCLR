@@ -187,11 +187,17 @@ for file in source['sourceFiles']:
 result = {'purpose': 'Explicit source-by-source API audit. Samples and signature checks are evidence, not a claim of arbitrary generic/compiler support.',
           'declarationCount': sum(r['declarations'] for r in rows), 'sources': rows}
 result['targetProfileAdditions'] = [{
+    'file': 'runtime/raven/src/System/Threading/Workers.rvn',
+    'disposition': 'provisional-isolated-workers',
+    'samples': ['library-workers.rvn'],
+    'tests': ['tests/workers.rs', 'docs/experiments/task-contract/verify_workers.py'],
+    'note': 'Dedicated and pooled OS workers exchange text and return caller-owned Tasks. Queue pumping may block for results; no shared guest state. See docs/isolated-workers.md.'
+}, {
     'file': 'runtime/raven/src/System/Tasks/Tasks.rvn',
     'disposition': 'provisional-raven-task-completion',
-    'samples': ['library-tasks.rvn'],
-    'tests': ['tests/tasks.rs', 'docs/experiments/task-contract/verify_tasks.py'],
-    'note': 'Generic Task/TCS and explicit single-invocation queue. No generated async, thread safety or host suspension claim. See docs/task-contracts.md.'
+    'samples': ['library-tasks.rvn', 'library-async.rvn'],
+    'tests': ['tests/tasks.rs', 'docs/experiments/task-contract/verify_tasks.py', 'docs/experiments/task-contract/verify_async.py'],
+    'note': 'Generic Task/TCS and generated async on an explicit single-invocation queue. No shared-object thread safety or runtime suspension claim. See docs/task-contracts.md.'
 }, {
     'file': 'runtime/raven/Clock.neoil',
     'disposition': 'raven-authored-interface-contract',

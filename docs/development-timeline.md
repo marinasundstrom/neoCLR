@@ -4728,3 +4728,15 @@ future work, without changing today's synchronous File operations.
 
 The author corrected the error placement: ConsoleReadError belongs in System.
 The assistant moved it there, while file errors remain in System.Storage.
+
+The assistant installed a separate development build at
+`~/.neoclr/experiments/tasks-storage-20260921`, with matching Raven compiler, language
+server, importer, core reference and runtime. Its async, worker and storage .rvnproj
+samples build through MSBuild. The worker sample prints “Hello, thread” and
+“Hello, pool”; the async sample prints “Suspended” then 42; the file sample verifies
+UTF-8 round-trip and size limits. Ten async and four worker source scenarios pass
+against the installed runtime. Storage/console migration passes 27 runtime checks
+and 257 signature checks, and the actual language server exposes Storage members
+and System.ConsoleReadError. Raven project/heap-policy validation passes eight
+checks; website generation and its focused tests pass. This is a local development
+installation, not a published release or website deployment.

@@ -14,6 +14,8 @@
     <RavenUnitAssemblyName>NeoCLR.CoreProbe</RavenUnitAssemblyName>
     <RavenUnitType>System.Void</RavenUnitType>
     <RavenGraphemeChar>true</RavenGraphemeChar>
+    <RavenHeapAsyncStateMachines>true</RavenHeapAsyncStateMachines>
+    <RavenCaptureAsyncExceptions>false</RavenCaptureAsyncExceptions>
     <RavenUseHostFrameworkReferences>false</RavenUseHostFrameworkReferences>
     <RavenAllowArrayCovariance>false</RavenAllowArrayCovariance>
     <RavenPropagationAssemblyName>NeoCLR.CoreProbe</RavenPropagationAssemblyName>

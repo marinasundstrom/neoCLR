@@ -178,3 +178,8 @@ python3 docs/experiments/task-contract/verify_async.py /path/to/Demo.rvnproj \
 The subsequent [isolated worker PoC](isolated-workers.md) runs on OS threads with
 separate heaps. It returns Tasks owned by the caller and completes them through the explicit queue.
 The queue may block while waiting for worker results; Task storage is not shared.
+
+Shared neoCLR project props select RavenHeapAsyncStateMachines=true and
+RavenCaptureAsyncExceptions=false in the matching development compiler. Build
+the .rvnproj through MSBuild for the same policy used by the editor and bridge.
+The published Preview 8 SDK does not implement these new project settings.
