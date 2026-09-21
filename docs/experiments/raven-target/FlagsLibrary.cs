@@ -4,13 +4,13 @@ using Mono.Cecil;
 // are target lowering, like the runtime's existing generic enum emitter.
 static class FlagsLibrary
 {
-    public static bool IsMatched(TypeDefinition type) => type.FullName == EnumBindings.Flags && ApplicationTypes.IsLibrary(type);
-    public static MethodDefinition[] Roots(ModuleDefinition source, ModuleDefinition core)
+    public static bool IsMatched(TypeDefinition type) => EnumBindings.IsType(type.FullName) && ApplicationTypes.IsLibrary(type);
+    public static MethodDefinition[] Roots(ModuleDefinition source, ModuleDefinition core, string owner)
     {
-        EnumBindings.Validate(core);
-        EnumBindings.Validate(source);
-        var type = source.GetType(EnumBindings.Flags);
-        ApplicationTypes.BindLibrary(type, EnumBindings.Flags);
+        EnumBindings.Validate(core, owner);
+        EnumBindings.Validate(source, owner);
+        var type = source.GetType(owner);
+        ApplicationTypes.BindLibrary(type, owner);
         _ = ApplicationTypes.Type(type);
         return [];
     }

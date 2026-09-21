@@ -8,8 +8,9 @@ namespace is now System.Tasks: completion is independent of threading. Rebuild
 references and replace earlier System.Threading.Tasks imports.
 
 The [Task model alignment assessment](task-model-alignment.md) records the next
-contract: explicit State/Outcome, cancellation and Map/Then. These are implementation
-targets, not capabilities of the validated PoC described below.
+contract. The core State/Outcome and producer cancellation slice is now implemented;
+Map/Then, cancellation tokens and automatic await cancellation propagation remain
+follow-up work. Rebuild reference/library artifacts and callers together.
 
 ## Consumer and producer
 
@@ -17,18 +18,31 @@ The Raven-authored types live provisionally in System.Tasks:
 
 | Type | Current surface | Responsibility |
 | --- | --- | --- |
-| Task<T> | IsCompleted, GetAwaiter(), GetResult(), OnCompleted(callback) | Observe one eventual value; register consumers. |
-| TaskCompletionSource<T> | constructor(queue), Task, TrySetResult(value) | Own completion authority; first completion wins. |
+| Task<T> | State, Outcome, IsCompleted, GetAwaiter(), GetResult(), OnCompleted(callback) | Observe completion or cancellation; register consumers. |
+| Promise<T> | constructor(queue), Task, Complete(value), Cancel() | Own completion authority; first completion wins. |
+| TaskState | Pending, Completed, Cancelled | Normal enum for the public lifecycle. |
+| TaskOutcome<T> | Completed(T), Cancelled | Union containing the terminal value or cancellation. |
 | TaskQueue | Run(callback), Post(callback), Drain() | Explicit single-invocation continuation dispatch for the PoC. |
 
 Task is a stable reference: repeated reads of a source's Task property return the
 same object. Completion publishes its value before enqueueing callbacks. Consumers
 registered before completion are queued in registration order; late registrations
-are also queued. TrySetResult returns false after the first completion and cannot
-replace its value. Repeated GetResult calls return the stored value. Value payloads
+are also queued. Complete returns false after the first completion and cannot
+replace its value. Cancel likewise returns false after either terminal transition.
+IsCompleted is the provisional awaiter readiness flag: it is true for both terminal
+states. State distinguishes Completed from Cancelled. Repeated GetResult calls return the stored value. Value payloads
 follow ordinary value semantics; reference payloads retain their identity.
 
-GetResult on a pending task faults immediately; it never blocks. Expected API
+Outcome is None while pending, Some(Completed(value)) after completion, or
+Some(Cancelled) after cancellation. No default T is created for a cancelled task.
+Use ordinary nested patterns to inspect those cases. Cancel publishes its state
+before enqueueing callbacks; late callbacks are queued too.
+
+GetResult on a pending or cancelled task faults immediately; it never blocks.
+Automatic cancellation propagation through await is **not implemented yet**. Consume
+cancellable tasks through Outcome and OnCompleted until Raven lowering supports the
+model. Calling Cancel on a producer completes that Task; this is distinct from a
+future token source requesting cancellation of an operation. Expected API
 failure is represented by an ordinary payload such as Result<T,E>. There is no
 SetException, faulted-task state or special Result-aware completion path. Runtime
 Faults remain terminal. Task<unit> uses the same implementation and storage as other
@@ -50,11 +64,11 @@ import System.Console.*
 
 func Main() {
     let queue = TaskQueue()
-    let source = TaskCompletionSource<int>(queue)
+    let source = Promise<int>(queue)
     let task = source.Task
 
     task.OnCompleted(() => WriteLine(task.GetResult()))
-    source.TrySetResult(42)
+    source.Complete(42)
     WriteLine("Completion queued")
     queue.Drain()
 }
@@ -67,11 +81,11 @@ Completion queued
 42
 ```
 
-A real API can return the Task while retaining its TaskCompletionSource for later
+A real API can return the Task while retaining its Promise for later
 completion. For this PoC, the caller owns and pumps the queue. There is no automatic host
 progress. Run starts work in an active queue scope and then drains that queue. Drain processes queued batches and rejects
 recursive pumping. Nested completion appends work instead of calling the next
-consumer inside TrySetResult. A callback Fault terminates execution; there is no
+consumer inside Complete. A callback Fault terminates execution; there is no
 recovery or cleanup guarantee after it.
 
 ## Comparison and provisional choices
@@ -79,8 +93,8 @@ recovery or cleanup guarantee after it.
 This slice reuses the [completion experiment's primary-source comparison](experiments/task-contract/README.md#comparison-and-tradeoffs)
 and [async design assessment](async-api-design.md). .NET's
 [TaskCompletionSource<T>](https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.taskcompletionsource-1?view=net-10.0)
-also separates producer control from the Task given to consumers. Its exception,
-cancellation and thread-safe completion states are broader than this PoC.
+also separates producer control from the Task given to consumers. Its exception and thread-safe completion contracts are broader than this PoC.
+This slice uses an explicit cancellation outcome without an exception channel.
 
 Keeping producer/consumer separation gives upcoming APIs a common return contract.
 Using ordinary Result payloads fits neoCLR's exception-free execution model, at the
@@ -91,7 +105,8 @@ claim. No ConfigureAwait policy is introduced.
 
 TaskQueue, callback registration and nonblocking result access are provisional
 supporting mechanisms. The builder and awaiter protocol is compiler-facing infrastructure added in the
-September 21 slice. Runtime-owned suspension may replace later compiler machinery. Cancellation,
+September 21 slice. Runtime-owned suspension may replace later compiler machinery.
+Cancellation requests and await propagation,
 timeouts, combinators, cross-thread races, host completion after an invocation,
 UI affinity, logical context and fairness remain open. An endlessly replenished
 queue can starve its caller. APIs requiring those guarantees must wait for the
@@ -153,11 +168,12 @@ where its callbacks are drained; this is not UI affinity or automatic context fl
 Nested Run scopes on different queues select the nearest active queue, then restore
 the outer scope naturally. Reentering Run or Drain on the same active queue faults
 before running another callback. Cross-queue programs must drive every relevant
-queue explicitly. A Task has no exception or cancellation state.
+queue explicitly. Tasks have cancellation state but no exception state. The current
+awaiter adapter cannot yet propagate cancellation to an enclosing async method.
 
 The provisional System.Runtime.CompilerServices protocol consists of
 IAsyncStateMachine, ITaskAwaiter and AsyncTaskMethodBuilder<T>. The builder receives
-reference state and awaiters by value, stores a TCS and registers MoveNext as a
+reference state and awaiters by value, stores a Promise and registers MoveNext as a
 continuation. Compared with .NET's generic by-reference builder protocol, this is
 smaller for neoCLR's current object model but allocates heap state, including for
 awaitless calls. These compiler-facing signatures may be replaced by runtime
@@ -193,3 +209,42 @@ methods, using terminology appropriate to neoCLR rather than requiring .NET name
 The updated proposal selects Map and Then as the fundamental operators; they are
 not implemented by the validated PoC. OnCompleted remains provisional protocol
 machinery. See the [alignment sequence](task-model-alignment.md).
+
+
+## Core Task model migration — 2026-09-21
+
+Rename TaskCompletionSource<T> to Promise<T> and producer calls from
+TrySetResult(value) to Complete(value), and use Cancel()
+for an operation's explicit cancelled completion. Both return bool and preserve the
+first terminal outcome. TaskState is a normal enum; TaskOutcome<T> uses the same
+bootstrap union metadata/storage protocol as Option and Result. The proposal's union
+notation is conceptual; consumers use Raven case construction and nested patterns.
+No Propagatable contract is attached to TaskOutcome: it does not overload `?`.
+
+The pinned compiler mis-emits fully qualified nested case types in the new carrier's
+constructor signatures as Object. Importing System.Tasks.TaskOutcome.* and using
+unqualified constructor parameter types emits the correct signatures. This is a
+bounded bootstrap workaround and a deferred general Raven compiler candidate; it
+was reproduced with both the pinned bootstrap and installed development compiler.
+The compiler repository was not modified in this slice.
+
+
+For explicit cancellation, [library-task-outcomes.rvn](experiments/raven-target/samples/library-task-outcomes.rvn)
+uses Promise<int>, queues an observer, cancels the producer and matches
+Cancelled inside Some(outcome) when the queue drains. It prints `Cancelled`. Promise is producer
+ownership, not an additional asynchronous result or a rejection/error channel.
+
+The installed compiler's exhaustiveness analysis does not combine nested
+Some(Completed(...)) and Some(Cancelled) match arms to cover Some. The sample first
+extracts Some(outcome), then matches the outcome exhaustively. Nested `is` patterns
+work directly. A nested match with no-result/Fault arms also produced incompatible
+unit stacks in the importer; the sample instead computes its message with a
+value-returning match. These are deferred Raven integration candidates, not new
+restrictions on the Task model. Literal payload patterns can request unavailable
+Object.Equals; extracted values use ordinary comparisons in the tests.
+
+Validation for this core slice: 24 source contract scenarios, ten async regressions,
+four worker scenarios, nine direct runtime checks and 263 signature checks pass.
+The cancellation retention probe completed 38 garbage collections. Bootstrap
+snapshot hashes, runtime API inventory/audit and website checks pass. This does not
+validate cancelled await or multi-threaded Promise mutation.

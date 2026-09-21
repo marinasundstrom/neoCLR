@@ -127,6 +127,7 @@ static class ReflectionBindings
     public static void Validate(ModuleDefinition module)
     {
         EnumBindings.Validate(module);
+        EnumBindings.Validate(module, EnumBindings.TaskState);
         foreach (var name in ReferenceTypes)
         {
             var type = module.GetType(name) ?? throw new InvalidDataException("Missing reflection type: " + name);

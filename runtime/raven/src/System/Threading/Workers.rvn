@@ -7,7 +7,7 @@ import System.Runtime.CompilerServices.*
 public class Thread {
     static func Start(callback: Func<string, string>, input: string) -> Task<string> {
         let queue = RuntimeServices.CurrentTaskQueue()
-        let source = TaskCompletionSource<string>(queue)
+        let source = Promise<string>(queue)
         let handle = RuntimeServices.StartWorker(callback, input)
         let completion = WorkerCompletion(handle, source)
         queue.Post(completion.Complete)
@@ -18,7 +18,7 @@ public class Thread {
 public class ThreadPool {
     static func Queue(callback: Func<string, string>, input: string) -> Task<string> {
         let queue = RuntimeServices.CurrentTaskQueue()
-        let source = TaskCompletionSource<string>(queue)
+        let source = Promise<string>(queue)
         let handle = RuntimeServices.QueueWorker(callback, input)
         let completion = WorkerCompletion(handle, source)
         queue.Post(completion.Complete)
@@ -28,14 +28,14 @@ public class ThreadPool {
 
 internal class WorkerCompletion {
     private field handle: int
-    private field source: TaskCompletionSource<string>
+    private field source: Promise<string>
 
-    internal init(handle: int, source: TaskCompletionSource<string>) {
+    internal init(handle: int, source: Promise<string>) {
         self.handle = handle
         self.source = source
     }
 
     internal func Complete() {
-        _ = source.TrySetResult(RuntimeServices.JoinWorker(handle))
+        _ = source.Complete(RuntimeServices.JoinWorker(handle))
     }
 }

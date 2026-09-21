@@ -2,6 +2,8 @@ namespace System.Tasks {
 
 import System.*
 import System.Collections.*
+import System.Option.*
+import System.Tasks.TaskOutcome.*
 
 // Explicit, single-invocation dispatcher for the provisional Task proof of concept.
 public class TaskQueue {
@@ -44,15 +46,37 @@ public class TaskQueue {
 }
 
 public class Task<T> : System.Runtime.CompilerServices.ITaskAwaiter {
-    private field source: TaskCompletionSource<T>
+    private field source: Promise<T>
 
-    internal init(source: TaskCompletionSource<T>) {
+    internal init(source: Promise<T>) {
         self.source = source
     }
 
     val IsCompleted: bool {
         get {
             return source.Completed()
+        }
+    }
+
+    val State: TaskState {
+        get {
+            if source.Cancelled() { return TaskState.Cancelled }
+            if source.Completed() { return TaskState.Completed }
+            return TaskState.Pending
+        }
+    }
+
+    val Outcome: Option<TaskOutcome<T>> {
+        get {
+            if source.Cancelled() {
+                let outcome: TaskOutcome<T> = Cancelled()
+                return Some(outcome)
+            }
+            if source.Completed() {
+                let outcome: TaskOutcome<T> = Completed(source.Read())
+                return Some(outcome)
+            }
+            return None()
         }
     }
 
@@ -65,14 +89,16 @@ public class Task<T> : System.Runtime.CompilerServices.ITaskAwaiter {
     }
 }
 
-public class TaskCompletionSource<T> {
+public class Promise<T> {
     private field queue: TaskQueue
     private field slot: ArrayList<T>
     private field callbacks: ArrayList<Func<System.Void>>
     private field task: Task<T>
+    private field cancelled: bool
 
     init(queue: TaskQueue) {
         self.queue = queue
+        cancelled = false
         slot = ArrayList<T>(1)
         callbacks = ArrayList<Func<System.Void>>()
         task = Task<T>(self)
@@ -80,7 +106,7 @@ public class TaskCompletionSource<T> {
 
     val Task: Task<T> => task
 
-    func TrySetResult(value: T) -> bool {
+    func Complete(value: T) -> bool {
         if self.Completed() {
             return false
         }
@@ -93,9 +119,27 @@ public class TaskCompletionSource<T> {
         return true
     }
 
-    internal func Completed() -> bool => slot.Count != 0
+    func Cancel() -> bool {
+        if self.Completed() {
+            return false
+        }
+        cancelled = true
+        let pending = callbacks
+        callbacks = ArrayList<Func<System.Void>>()
+        for callback in pending {
+            queue.Post(callback)
+        }
+        return true
+    }
+
+    internal func Cancelled() -> bool => cancelled
+
+    internal func Completed() -> bool => cancelled || slot.Count != 0
 
     internal func Read() -> T {
+        if cancelled {
+            System.Fault("Task is cancelled; consume its Outcome")
+        }
         if !self.Completed() {
             System.Fault("Task is still pending")
         }
@@ -127,10 +171,10 @@ namespace System.Runtime.CompilerServices {
     }
 
     public class AsyncTaskMethodBuilder<T> {
-        private field source: TaskCompletionSource<T>
+        private field source: Promise<T>
 
         init(queue: TaskQueue) {
-            source = TaskCompletionSource<T>(queue)
+            source = Promise<T>(queue)
         }
 
         static func Create() -> AsyncTaskMethodBuilder<T> {
@@ -146,7 +190,7 @@ namespace System.Runtime.CompilerServices {
         func SetStateMachine(stateMachine: IAsyncStateMachine) { }
 
         func SetResult(value: T) {
-            _ = source.TrySetResult(value)
+            _ = source.Complete(value)
         }
 
         func AwaitOnCompleted(awaiter: ITaskAwaiter, stateMachine: IAsyncStateMachine) {

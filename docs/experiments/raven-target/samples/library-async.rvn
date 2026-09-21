@@ -10,10 +10,10 @@ public async func PrintAnswer(input: Task<int>) -> Task<unit> {
 
 func Main() {
     let queue = TaskQueue()
-    let source = TaskCompletionSource<int>(queue)
+    let source = Promise<int>(queue)
     queue.Run(() => {
         _ = PrintAnswer(source.Task)
         WriteLine("Suspended")
-        _ = source.TrySetResult(41)
+        _ = source.Complete(41)
     })
 }

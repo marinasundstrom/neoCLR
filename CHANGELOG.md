@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-21
 
+- Add the core development Task model: normal TaskState enum, TaskOutcome<T> union,
+  and Task.State/Outcome. Rename TaskCompletionSource<T> to Promise<T> and
+  TrySetResult to Complete; add Cancel with first-terminal-transition semantics and
+  queued observers. Result.Error remains an ordinary completed payload. Rebuild
+  references, library and callers together. Tokens, Map/Then and automatic await
+  cancellation propagation remain outstanding; inspect cancellation through Outcome.
+  Validate 24 source contract scenarios, 10 async and four worker regressions, nine
+  direct runtime checks, 263 metadata checks and the website.
+
 - Record Promise-style Task composition and continuation as API direction, with
   names chosen for neoCLR rather than .NET parity. Keep Result failure independent;
   the updated Task model proposes State/Outcome, distinct cancellation and Map/Then.

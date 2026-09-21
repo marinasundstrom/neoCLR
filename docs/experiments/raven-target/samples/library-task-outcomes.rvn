@@ -1,0 +1,25 @@
+import System.*
+import System.Tasks.*
+import System.Option.*
+import System.Tasks.TaskOutcome.*
+import System.Console.*
+
+func Main() {
+    let queue = TaskQueue()
+    let promise = Promise<int>(queue)
+    let task = promise.Task
+
+    task.OnCompleted(() => {
+        let message = task.Outcome match {
+            Some(let outcome) => outcome match {
+                Completed(let value) => value.ToString()
+                Cancelled => "Cancelled"
+            }
+            None => "Pending"
+        }
+        WriteLine(message)
+    })
+
+    promise.Cancel()
+    queue.Drain()
+}

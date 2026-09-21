@@ -11,13 +11,13 @@ False:
 .type class System.Threading.ThreadPool
 .method static Queue(System.Func<String,String> callback,String input) -> System.Tasks.Task<String>
 .local System.Tasks.TaskQueue local0
-.local System.Tasks.TaskCompletionSource<String> local1
+.local System.Tasks.Promise<String> local1
 .local Int32 local2
 .local System.Threading.WorkerCompletion local3
 ldloca local0
 initobj System.Tasks.TaskQueue
 ldloca local1
-initobj System.Tasks.TaskCompletionSource<String>
+initobj System.Tasks.Promise<String>
 ldc.i4 0
 stloc local2
 ldloca local3
@@ -32,7 +32,7 @@ M00000003_IL_0008:
 M00000003_IL_0009:
 ldloc local0
 M00000003_IL_000a:
-newobj instance System.Tasks.TaskCompletionSource<String>::.ctor(System.Tasks.TaskQueue)
+newobj instance System.Tasks.Promise<String>::.ctor(System.Tasks.TaskQueue)
 M00000003_IL_000f:
 stloc local1
 M00000003_IL_0010:
@@ -50,7 +50,7 @@ ldloc local2
 M00000003_IL_001b:
 ldloc local1
 M00000003_IL_001c:
-newobj instance System.Threading.WorkerCompletion::.ctor(Int32,System.Tasks.TaskCompletionSource<String>)
+newobj instance System.Threading.WorkerCompletion::.ctor(Int32,System.Tasks.Promise<String>)
 M00000003_IL_0021:
 stloc local3
 M00000003_IL_0022:
@@ -67,7 +67,7 @@ M00000003_IL_0035:
 M00000003_IL_0036:
 ldloc local1
 M00000003_IL_0037:
-call instance System.Tasks.TaskCompletionSource<String>::get_Task()
+call instance System.Tasks.Promise<String>::get_Task()
 M00000003_IL_003c:
 ret
 .end
@@ -83,8 +83,8 @@ ret
 .end
 .type internal class System.Threading.WorkerCompletion
 .field private handle Int32
-.field private source System.Tasks.TaskCompletionSource<String>
-.method internal instance .ctor(Int32 handle,System.Tasks.TaskCompletionSource<String> source) -> noresult
+.field private source System.Tasks.Promise<String>
+.method internal instance .ctor(Int32 handle,System.Tasks.Promise<String> source) -> noresult
 M00000005_IL_0000:
 M00000005_IL_0001:
 ldarg 0
@@ -121,7 +121,7 @@ ldfld System.Threading.WorkerCompletion::handle
 M00000006_IL_000e:
 call neoCLR.Runtime.JoinWorker(Int32)
 M00000006_IL_0013:
-call instance System.Tasks.TaskCompletionSource<String>::TrySetResult(String)
+call instance System.Tasks.Promise<String>::Complete(String)
 call neoCLR.Library.System.Threading.Thread.RuntimeBooleanToInt32(Boolean)
 M00000006_IL_0018:
 pop

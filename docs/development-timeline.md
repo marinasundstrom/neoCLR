@@ -4771,3 +4771,24 @@ had been requested; that must change to explicit operation-level acknowledgement
 This assessment updates design and website direction only. Cancellation code remains
 in progress and unvalidated end to end; no Raven cancellation lowering or new local
 installation is claimed. The proposal remains preserved as supplied by the author.
+
+
+### Core outcome implementation and Promise naming
+
+The assistant started the runtime-first core slice: normal TaskState enum,
+TaskOutcome<T> union, State/Outcome observation and first-terminal-transition producer
+completion. Unfinished token/worker cancellation changes were preserved separately
+while this contract was established. The author suggested considering the name
+Promise instead of TaskCompletionSource. The assistant adopted Promise<T> for the
+producer, exposing Task, Complete(value) and Cancel(), with Task<T> remaining the
+consumer handle. This naming does not introduce Promise rejection or Result-aware
+completion. Token requests, Map/Then and automatic await cancellation propagation
+remain later slices.
+
+The core slice passed 24 source scenarios, ten generated-async regressions, four
+worker scenarios, nine direct runtime/access checks and 263 signature checks.
+Cancelled outcome retention was also confirmed across 38 garbage collections. The
+explicit outcome sample prints Cancelled, and library snapshot/API audits and
+website checks pass. No cancelled-await lowering or new installed SDK is included.
+The compiler/bootstrap pattern limitations found during validation are recorded
+in the current Task contracts as deferred Raven candidates.

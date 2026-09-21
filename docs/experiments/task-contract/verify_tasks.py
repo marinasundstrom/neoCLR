@@ -22,6 +22,8 @@ prelude = '''import System.*
 import System.Collections.*
 import System.Tasks.*
 import System.Result.*
+import System.Option.*
+import System.Tasks.TaskOutcome.*
 import System.Console.*
 
 public func Check(value: bool) {
@@ -31,28 +33,107 @@ public func Check(value: bool) {
 }
 
 public func Begin(queue: TaskQueue) -> Task<int> {
-    let source = TaskCompletionSource<int>(queue)
-    queue.Post(() => { source.TrySetResult(42) })
+    let source = Promise<int>(queue)
+    queue.Post(() => { source.Complete(42) })
     return source.Task
 }
 '''
 cases = {
+    'State and nested outcome patterns agree': """
+    let source = Promise<int>(TaskQueue())
+    Check(source.Task.State == TaskState.Pending)
+    Check(source.Task.Outcome is None)
+    Check(source.Complete(42))
+    Check(source.Task.State == TaskState.Completed)
+    let observed = source.Task.Outcome match {
+        Some(let outcome) => outcome match {
+            Completed(let value) => value
+            Cancelled => -1
+        }
+        None => -2
+    }
+    Check(observed == 42)
+    Check(!source.Cancel())
+    Check(source.Task.State == TaskState.Completed)
+""",
+    'Cancellation is terminal without a fabricated payload': """
+    let source = Promise<string>(TaskQueue())
+    let task = source.Task
+    Check(source.Cancel())
+    Check(task.State == TaskState.Cancelled)
+    Check(task.IsCompleted)
+    Check(task.Outcome is Some(Cancelled))
+    Check(!source.Complete("Too late"))
+    Check(!source.Cancel())
+    Check(task.Outcome is Some(Cancelled))
+""",
+    'Cancellation publishes before queued observers and late registration': """
+    let queue = TaskQueue()
+    let source = Promise<int>(queue)
+    var order = 0
+    source.Task.OnCompleted(() => {
+        Check(source.Task.State == TaskState.Cancelled)
+        Check(source.Task.Outcome is Some(Cancelled))
+        order = order * 10 + 1
+    })
+    source.Cancel()
+    source.Task.OnCompleted(() => { order = order * 10 + 2 })
+    Check(order == 0)
+    queue.Drain()
+    Check(order == 12)
+    queue.Drain()
+    Check(order == 12)
+""",
+    'Result failure is a completed ordinary payload': """
+    let source = Promise<Result<int, string>>(TaskQueue())
+    source.Complete(Error("Unavailable"))
+    Check(source.Task.State == TaskState.Completed)
+    if source.Task.Outcome is Some(Completed(Error(let message))) {
+        Check(message == "Unavailable")
+    } else {
+        System.Fault("Missing Result error payload")
+    }
+    Check(!source.Cancel())
+""",
+    'Unit and Option preserve distinct completed payloads': """
+    let queue = TaskQueue()
+    let unitSource = Promise<unit>(queue)
+    unitSource.Complete(())
+    Check(unitSource.Task.Outcome is Some(Completed(_)))
+    let optional = Promise<Option<int>>(queue)
+    optional.Complete(None())
+    Check(optional.Task.Outcome is Some(Completed(None)))
+    Check(optional.Task.State == TaskState.Completed)
+""",
+    'Cancelled outcomes survive collection': """
+    let queue = TaskQueue()
+    let source = Promise<string>(queue)
+    source.Cancel()
+    let outcome = source.Task.Outcome
+    var remaining = 1000
+    while remaining != 0 {
+        ArrayList<int>()
+        remaining = remaining - 1
+    }
+    Check(outcome is Some(Cancelled))
+    Check(source.Task.Outcome is Some(Cancelled))
+""",
     'Consumer identity and first completion wins': '''
     let queue = TaskQueue()
-    let source = TaskCompletionSource<int>(queue)
+    let source = Promise<int>(queue)
     let task = source.Task
     let alias = source.Task
     Check(!task.IsCompleted)
-    Check(source.TrySetResult(42))
+    Check(source.Complete(42))
     Check(task.IsCompleted)
     Check(alias.IsCompleted)
-    Check(!source.TrySetResult(99))
+    Check(!source.Complete(99))
     Check(task.GetResult() == 42)
     Check(task.GetResult() == 42)
 ''',
     'Pending, multiple and late callbacks are queued in order': '''
     let queue = TaskQueue()
-    let source = TaskCompletionSource<int>(queue)
+    let source = Promise<int>(queue)
     let task = source.Task
     var order = 0
     task.OnCompleted(() => {
@@ -60,7 +141,7 @@ cases = {
         order = order * 10 + 1
     })
     task.OnCompleted(() => { order = order * 10 + 2 })
-    Check(source.TrySetResult(42))
+    Check(source.Complete(42))
     task.OnCompleted(() => { order = order * 10 + 3 })
     Check(order == 0)
     queue.Drain()
@@ -70,17 +151,17 @@ cases = {
 ''',
     'Nested completion does not reenter a consumer': '''
     let queue = TaskQueue()
-    let first = TaskCompletionSource<int>(queue)
-    let second = TaskCompletionSource<int>(queue)
+    let first = Promise<int>(queue)
+    let second = Promise<int>(queue)
     var order = 0
     second.Task.OnCompleted(() => { order = order * 10 + 3 })
     first.Task.OnCompleted(() => {
         order = order * 10 + 1
-        second.TrySetResult(2)
+        second.Complete(2)
         Check(order == 1)
     })
     first.Task.OnCompleted(() => { order = order * 10 + 2 })
-    first.TrySetResult(1)
+    first.Complete(1)
     queue.Drain()
     Check(order == 123)
 ''',
@@ -99,16 +180,16 @@ cases = {
 ''',
     'String and Boolean payloads': '''
     let queue = TaskQueue()
-    let text = TaskCompletionSource<string>(queue)
-    let flag = TaskCompletionSource<bool>(queue)
-    text.TrySetResult("Ready")
-    flag.TrySetResult(true)
+    let text = Promise<string>(queue)
+    let flag = Promise<bool>(queue)
+    text.Complete("Ready")
+    flag.Complete(true)
     Check(text.Task.GetResult() == "Ready")
     Check(flag.Task.GetResult())
 ''',
     'Result failure is an ordinary completed payload': '''
     let queue = TaskQueue()
-    let source = TaskCompletionSource<Result<int, string>>(queue)
+    let source = Promise<Result<int, string>>(queue)
     var called = false
     source.Task.OnCompleted(() => {
         match source.Task.GetResult() {
@@ -117,7 +198,7 @@ cases = {
         }
         called = true
     })
-    Check(source.TrySetResult(Error("Unavailable")))
+    Check(source.Complete(Error("Unavailable")))
     Check(source.Task.IsCompleted)
     Check(!called)
     queue.Drain()
@@ -125,18 +206,18 @@ cases = {
 ''',
     'Unit is a normal payload': '''
     let queue = TaskQueue()
-    let source = TaskCompletionSource<unit>(queue)
+    let source = Promise<unit>(queue)
     var called = false
     source.Task.OnCompleted(() => { called = true })
-    Check(source.TrySetResult(()))
-    Check(!source.TrySetResult(()))
+    Check(source.Complete(()))
+    Check(!source.Complete(()))
     source.Task.GetResult()
     queue.Drain()
     Check(called)
 ''',
     'Reference payload and pending continuation survive collection': '''
     let queue = TaskQueue()
-    let source = TaskCompletionSource<ArrayList<int>>(queue)
+    let source = Promise<ArrayList<int>>(queue)
     let task = source.Task
     var called = false
     task.OnCompleted(() => {
@@ -145,7 +226,7 @@ cases = {
     })
     let value = ArrayList<int>()
     value.Add(42)
-    source.TrySetResult(value)
+    source.Complete(value)
     var remaining = 1000
     while remaining != 0 {
         ArrayList<int>()
@@ -158,8 +239,13 @@ cases = {
 ''',
 }
 faults = {
+    'Cancelled read does not fabricate a value': ('Task is cancelled; consume its Outcome', """
+    let source = Promise<int>(TaskQueue())
+    source.Cancel()
+    source.Task.GetResult()
+"""),
     'Pending read faults without blocking': ('Task is still pending', '''
-    let source = TaskCompletionSource<int>(TaskQueue())
+    let source = Promise<int>(TaskQueue())
     source.Task.GetResult()
 '''),
     'Recursive pumping faults': ('Task queue cannot be pumped recursively', '''
@@ -174,7 +260,9 @@ faults = {
 '''),
 }
 rejections = {
-    'Consumers cannot complete a Task': 'source.Task.TrySetResult(42)',
+    'Consumers cannot cancel a Task': 'source.Task.Cancel()',
+    'Consumers cannot assign state': 'source.Task.State = TaskState.Completed',
+    'Consumers cannot complete a Task': 'source.Task.Complete(42)',
     'Task constructor is internal': 'Task<int>(source)',
     'Completion storage methods are internal': 'source.Read()',
     'Completion storage fields are private': 'source.slot.Add(42)',
@@ -201,6 +289,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-generic-tasks-') as temporary:
                               capture_output=True, text=True, timeout=30)
 
     for label, body in cases.items():
+        print("Checking: " + label, file=sys.stderr, flush=True)
         run = execute(body)
         assert run.returncode == 0 and run.stdout == 'Passed\n', label + ': ' + run.stdout + run.stderr
         results[label] = 'passed'
@@ -213,7 +302,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-generic-tasks-') as temporary:
         assert run.returncode != 0 and message in run.stderr and 'Passed' not in run.stdout, run.stdout + run.stderr
         results[label] = 'faulted as expected'
     for label, expression in rejections.items():
-        built = build('    let source = TaskCompletionSource<int>(TaskQueue())\n    ' + expression)
+        built = build('    let source = Promise<int>(TaskQueue())\n    ' + expression)
         assert built.returncode != 0 and ('RAV' in built.stdout + built.stderr), built.stdout + built.stderr
         results[label] = 'rejected'
 print(json.dumps(results, indent=2))

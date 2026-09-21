@@ -28,9 +28,9 @@ fn load(body: &str) -> Result<LoadedProgram, String> {
     Ok(program)
 }
 const SOURCE: &str = r#"
-.local Tasks.TaskCompletionSource<Int32> source
+.local Tasks.Promise<Int32> source
 newobj instance Tasks.TaskQueue::.ctor()
-newobj instance Tasks.TaskCompletionSource<Int32>::.ctor(Tasks.TaskQueue)
+newobj instance Tasks.Promise<Int32>::.ctor(Tasks.TaskQueue)
 stloc source
 "#;
 
@@ -39,9 +39,9 @@ fn repeated_task_property_preserves_reference_identity() {
     let body = format!(
         r#"{SOURCE}
 ldloc source
-call instance Tasks.TaskCompletionSource<Int32>::get_Task()
+call instance Tasks.Promise<Int32>::get_Task()
 ldloc source
-call instance Tasks.TaskCompletionSource<Int32>::get_Task()
+call instance Tasks.Promise<Int32>::get_Task()
 ref.eq
 brtrue Same
 fault "Task identity changed"
@@ -58,10 +58,12 @@ ldc.i4 42
 #[test]
 fn guest_il_cannot_bypass_completion_capabilities() {
     for body in [
-        "ldloc source\nnewobj instance Tasks.Task<Int32>::.ctor(Tasks.TaskCompletionSource<Int32>)\npop\nldc.i4 0",
-        "ldloc source\ncall instance Tasks.TaskCompletionSource<Int32>::Read()",
-        "ldloc source\ncall instance Tasks.TaskCompletionSource<Int32>::Completed()\npop\nldc.i4 0",
-        "ldloc source\nldfld Tasks.TaskCompletionSource<Int32>::slot\npop\nldc.i4 0",
+        "ldloc source\nnewobj instance Tasks.Task<Int32>::.ctor(Tasks.Promise<Int32>)\npop\nldc.i4 0",
+        "ldloc source\ncall instance Tasks.Promise<Int32>::Read()",
+        "ldloc source\ncall instance Tasks.Promise<Int32>::Completed()\npop\nldc.i4 0",
+        "ldloc source\ncall instance Tasks.Promise<Int32>::Cancelled()\npop\nldc.i4 0",
+        "ldloc source\nldfld Tasks.Promise<Int32>::cancelled\npop\nldc.i4 0",
+        "ldloc source\nldfld Tasks.Promise<Int32>::slot\npop\nldc.i4 0",
     ] {
         let error = load(&format!("{SOURCE}{body}"))
             .err()
@@ -76,20 +78,20 @@ fn guest_il_cannot_bypass_completion_capabilities() {
 #[test]
 fn unit_payload_uses_ordinary_generic_storage_and_first_completion_wins() {
     let body = r#"
-.local Tasks.TaskCompletionSource<Void> source
+.local Tasks.Promise<Void> source
 newobj instance Tasks.TaskQueue::.ctor()
-newobj instance Tasks.TaskCompletionSource<Void>::.ctor(Tasks.TaskQueue)
+newobj instance Tasks.Promise<Void>::.ctor(Tasks.TaskQueue)
 stloc source
 ldloc source
 ldvoid
-call instance Tasks.TaskCompletionSource<Void>::TrySetResult(Void)
+call instance Tasks.Promise<Void>::Complete(Void)
 brfalse Bad
 ldloc source
 ldvoid
-call instance Tasks.TaskCompletionSource<Void>::TrySetResult(Void)
+call instance Tasks.Promise<Void>::Complete(Void)
 brtrue Bad
 ldloc source
-call instance Tasks.TaskCompletionSource<Void>::get_Task()
+call instance Tasks.Promise<Void>::get_Task()
 call instance Tasks.Task<Void>::GetResult()
 pop
 ldc.i4 42
@@ -109,7 +111,7 @@ fn task_payload_types_remain_invariant() {
         r#".local Tasks.Task<String> wrong
 {SOURCE}
 ldloc source
-call instance Tasks.TaskCompletionSource<Int32>::get_Task()
+call instance Tasks.Promise<Int32>::get_Task()
 stloc wrong
 ldc.i4 0
 "#
@@ -122,4 +124,44 @@ fn active_task_queue_is_not_a_process_global_default() {
     let program = load("call neoCLR.Runtime.CurrentTaskQueue()\npop\nldc.i4 0").unwrap();
     let error = program.run(Limits::default()).unwrap_err().to_string();
     assert!(error.contains("requires an active TaskQueue"), "{error}");
+}
+
+#[test]
+fn cancellation_is_terminal_and_completion_cannot_replace_it() {
+    let body = format!(
+        r#"{SOURCE}
+ldloc source
+call instance Tasks.Promise<Int32>::Cancel()
+brfalse Failed
+ldloc source
+ldc.i4 42
+call instance Tasks.Promise<Int32>::Complete(Int32)
+brtrue Failed
+ldloc source
+call instance Tasks.Promise<Int32>::Cancel()
+brtrue Failed
+ldloc source
+call instance Tasks.Promise<Int32>::get_Task()
+call instance Tasks.Task<Int32>::get_State()
+call instance Tasks.TaskState::get_Value()
+ldc.i4 2
+ceq
+brfalse Failed
+ldloc source
+call instance Tasks.Promise<Int32>::get_Task()
+call instance Tasks.Task<Int32>::get_Outcome()
+call instance System.Option<Tasks.TaskOutcome<Int32>>::GetSomeCase()
+call instance System.Option.Some<Tasks.TaskOutcome<Int32>>::get_Value()
+call instance Tasks.TaskOutcome<Int32>::get_IsCancelled()
+brfalse Failed
+ldc.i4 1
+ret
+Failed:
+fault "Cancellation contract failed"
+"#
+    );
+    assert_eq!(
+        load(&body).unwrap().run(Limits::default()).unwrap().value,
+        Value::Int32(1)
+    );
 }

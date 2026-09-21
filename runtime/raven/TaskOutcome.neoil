@@ -1,0 +1,3 @@
+; Raven-authored Task model.
+.include "generated/TaskOutcome.methods.neoil"
+.include "generated/TaskOutcome.helpers.neoil"

@@ -4,11 +4,11 @@ import System.Console.*
 
 func Main() {
     let queue = TaskQueue()
-    let source = TaskCompletionSource<int>(queue)
+    let source = Promise<int>(queue)
     let task = source.Task
 
     task.OnCompleted(() => WriteLine(task.GetResult()))
-    source.TrySetResult(42)
+    source.Complete(42)
     WriteLine("Completion queued")
     queue.Drain()
 }

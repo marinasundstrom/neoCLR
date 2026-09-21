@@ -10,7 +10,7 @@ static class WorkerBindings
     public const string Declarations = """
         namespace Threading {
             public sealed class WorkerCompletion {
-                public WorkerCompletion(int handle, Tasks.TaskCompletionSource<string> source) { }
+                public WorkerCompletion(int handle, Tasks.Promise<string> source) { }
                 public void Complete() { }
             }
             public sealed class Thread {
@@ -35,7 +35,7 @@ static class WorkerBindings
         if (owner is null) return null;
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type);
         var expected = (owner, definition.Name) switch {
-            (Prefix + "WorkerCompletion", ".ctor") when library => ("Int32,System.Tasks.TaskCompletionSource<String>", "noresult", false),
+            (Prefix + "WorkerCompletion", ".ctor") when library => ("Int32,System.Tasks.Promise<String>", "noresult", false),
             (Prefix + "WorkerCompletion", "Complete") when library => ("", "noresult", false),
             (Prefix + "Thread", "Start") or (Prefix + "ThreadPool", "Queue") => ("System.Func<String,String>,String", "System.Tasks.Task<String>", true),
             _ => throw new InvalidDataException("Unsupported worker member.")

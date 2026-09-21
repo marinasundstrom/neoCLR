@@ -9,14 +9,15 @@ contracts.
 ## Current development proof of concept
 
 The [Task completion slice](task-contracts.md) now implements Raven-authored
-Task<T>, TaskCompletionSource<T> and an explicit TaskQueue in the development Raven
+Task<T>, Promise<T> and an explicit TaskQueue in the development Raven
 profile. Generic payloads, queued continuations and producer/consumer access checks
 run on neoCLR. This is not in Preview 8. Named compiler-generated async functions
 and isolated workers now run in the development PoC; automatic host progress and
 shared Task state across threads remain outstanding. The queue is provisional.
 
 The updated [Task model proposal](proposals/task-model.md) is the target for the
-next slices: State/Outcome, explicit cancellation and Map/Then composition. Follow
+ongoing slices. State/Outcome and explicit producer cancellation are implemented;
+Map/Then, token requests and cancelled-await lowering remain outstanding. Follow
 the [runtime-first alignment sequence](task-model-alignment.md); older open questions
 below record how the design evolved, not alternatives to this latest direction.
 

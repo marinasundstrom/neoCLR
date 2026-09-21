@@ -161,7 +161,7 @@ static class UnionImport
             var emitOwnedStatic = libraryOwner is not null && method.IsStatic && (WorkerBindings.IsName(method.DeclaringType.FullName) || AsyncBindings.IsName(method.DeclaringType.FullName) || method.DeclaringType.IsValueType || OpaqueLibrary.IsString(method.DeclaringType) || ArrayLibrary.IsMatched(method.DeclaringType) || DescriptorLibrary.IsProvider(method.DeclaringType));
             var result = ProfileType(method.ReturnType, true);
             var locals = method.Body.Variables.Select(v => ProfileType(v.VariableType)).ToArray();
-            if (locals.Any(t => !(libraryOwner is not null && t is "Value" or ParameterSnapshotBindings.Vector) && !(libraryOwner is not null && method.GenericParameters.Concat(method.DeclaringType.GenericParameters).Any(p => t == "T" + p.Position)) && !WorkerBindings.IsName(t) && !AsyncBindings.IsType(t) && !TaskBindings.IsType(t) && !ApplicationTypes.IsType(t) && !ManagedArrayBindings.IsType(t) && t != "System.Object" && !InterfaceBindings.IsInterface(t) && !NativeMemoryBindings.IsPointer(t) && !ReflectionBindings.IsType(t) && t != "arrayref<String>" && !DelegateBindings.IsType(t) && !GenericUnionBindings.IsType(t) && !CalendarBindings.IsReference(t) && !CalendarBindings.Types.Contains(t) && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
+            if (locals.Any(t => !(libraryOwner is not null && t is "Value" or ParameterSnapshotBindings.Vector) && !(libraryOwner is not null && method.GenericParameters.Concat(method.DeclaringType.GenericParameters).Any(p => t == "T" + p.Position)) && !WorkerBindings.IsName(t) && !EnumBindings.IsType(t) && !AsyncBindings.IsType(t) && !TaskBindings.IsType(t) && !ApplicationTypes.IsType(t) && !ManagedArrayBindings.IsType(t) && t != "System.Object" && !InterfaceBindings.IsInterface(t) && !NativeMemoryBindings.IsPointer(t) && !ReflectionBindings.IsType(t) && t != "arrayref<String>" && !DelegateBindings.IsType(t) && !GenericUnionBindings.IsType(t) && !CalendarBindings.IsReference(t) && !CalendarBindings.Types.Contains(t) && !PrimitiveBindings.Types.Contains(t) && !ResultBindings.IsType(t) && !CollectionBindings.IsReference(t) && t is not ("Boolean" or "Int32" or "Double" or "String" or IntArray or Carrier or Ok or Error or Option or Some or None or VoidOption or VoidSome or Overflow or "Void" or VoidResult or VoidOk)))
                 throw new InvalidDataException("Unsupported local default in Result profile.");
             NormalizePatternBranches(method);
             var instructions = method.Body.Instructions.ToArray();
@@ -409,7 +409,7 @@ static class UnionImport
                     case Code.Conv_I4: case Code.Conv_U4: case Code.Conv_I8: case Code.Conv_U8:
                     case Code.Conv_I: case Code.Conv_U: case Code.Conv_R4: case Code.Conv_R8: case Code.Conv_R_Un:
                         var converted = Pop();
-                        if (converted.Type == EnumBindings.Flags) { code.Append(EnumBindings.Convert(converted.Type, "Int32")); converted = new("Int32"); }
+                        if (EnumBindings.IsType(converted.Type)) { code.Append(EnumBindings.Convert(converted.Type, "Int32")); converted = new("Int32"); }
                         if (converted.Type is not ("Int32" or "Int64" or "IntPtr" or "UIntPtr" or "Double"))
                             throw new InvalidDataException("Unsupported numeric conversion source.");
                         var convertedType = instruction.OpCode.Code switch {
@@ -437,7 +437,7 @@ static class UnionImport
                     case Code.Ldarg: case Code.Ldarg_S: Arg(((ParameterDefinition)instruction.Operand).Index + (method.HasThis ? 1 : 0)); break;
                     case Code.Ldarga: case Code.Ldarga_S:
                         var parameter = ((ParameterDefinition)instruction.Operand).Index + (method.HasThis ? 1 : 0);
-                        if (parameter < 0 || parameter >= args.Length || !(ApplicationTypes.IsType(args[parameter]) || args[parameter] == "System.Introspection.BindingFlags" || PrimitiveBindings.IsReceiver(args[parameter]) || CalendarBindings.Types.Contains(args[parameter]) || ErrorBindings.IsType(args[parameter]) || GenericUnionBindings.IsType(args[parameter])))
+                        if (parameter < 0 || parameter >= args.Length || !(ApplicationTypes.IsType(args[parameter]) || EnumBindings.IsType(args[parameter]) || PrimitiveBindings.IsReceiver(args[parameter]) || CalendarBindings.Types.Contains(args[parameter]) || ErrorBindings.IsType(args[parameter]) || GenericUnionBindings.IsType(args[parameter])))
                             throw new InvalidDataException("Only admitted primitive argument addresses supported.");
                         Push(new(args[parameter] + "&", Argument: parameter)); code.AppendLine($"ldarga {parameter}"); break;
                     case Code.Ldloc_0: case Code.Ldloc_1: case Code.Ldloc_2: case Code.Ldloc_3: Load((int)instruction.OpCode.Code - (int)Code.Ldloc_0); break;
@@ -820,7 +820,7 @@ static class UnionImport
                 if (index < 0 || index >= instructions.Length) throw new InvalidDataException("Method falls through.");
                 if (!states.TryGetValue(index, out var previous))
                 { states[index] = new(next.Stack.ToList(), (bool[])next.Assigned.Clone()); work.Enqueue(index); return; }
-                if (!previous.Stack.SequenceEqual(next.Stack)) throw new InvalidDataException("Incompatible branch stack merge.");
+                if (!previous.Stack.SequenceEqual(next.Stack)) throw new InvalidDataException($"Incompatible branch stack merge in {method.FullName} at {instructions[index]}: [{string.Join(",", previous.Stack)}] versus [{string.Join(",", next.Stack)}].");
                 var changed = false;
                 for (var n = 0; n < previous.Assigned.Length; n++)
                     if (previous.Assigned[n] && !next.Assigned[n]) { previous.Assigned[n] = false; changed = true; }
@@ -930,7 +930,8 @@ static class UnionImport
         var file = FaultBindings.Bind(reference, definition) ?? BooleanBindings.Bind(reference, definition) ?? ProcessBindings.Bind(reference, definition) ?? GenericUnionBindings.Bind(reference, definition) ?? ErrorBindings.Bind(reference, definition) ?? CalendarBindings.Bind(reference, definition) ?? PrimitiveBindings.Bind(reference, definition) ?? DoubleBindings.Bind(reference, definition) ?? Int32Bindings.Bind(reference, definition) ?? UnicodeScalarBindings.Bind(reference, definition) ?? Utf8Bindings.Bind(reference, definition) ?? PathBindings.Bind(reference, definition) ?? FileBindings.Bind(reference, definition) ?? ResultBindings.Bind(reference, definition);
         if (file is not null)
         {
-            if (file.OutArgument >= 0 && file.Result == "Boolean" || reference.Name == "FromResidual") ValidatePropagation(definition.DeclaringType);
+            if ((file.OutArgument >= 0 && file.Result == "Boolean" || reference.Name == "FromResidual")
+                && definition.DeclaringType.FullName != "System.Tasks.TaskOutcome`1") ValidatePropagation(definition.DeclaringType);
             return new(file.Name, file.Arguments, file.Result, file.OutArgument, file.Instruction, file.OutArgument >= 0 && file.Result == "Boolean");
         }
         if (NamespaceFunctions.Owner(reference.DeclaringType) == "System.Math" && reference.Name == "Clamp")
@@ -1118,7 +1119,7 @@ static class UnionImport
             return new("RuntimeVoidOptionNone", [None], VoidOption);
         throw new InvalidDataException("Unsupported constructor: " + reference.FullName + " definition=" + key);
     }
-    static string Default(string type) => (ErrorBindings.IsEmpty(type) ? "newobj " + type : null) ?? PrimitiveBindings.Default(type) ?? (type switch {
+    static string Default(string type) => (EnumBindings.IsType(type) ? "ldc.i4 0\ncall " + type + "::FromValue(Int32)" : null) ?? (ErrorBindings.IsEmpty(type) ? "newobj " + type : null) ?? PrimitiveBindings.Default(type) ?? (type switch {
         VoidOk => $"ldvoid\nnewobj {VoidOk}",
         "Void" => "ldvoid",
         Overflow => "newobj System.OverflowError",

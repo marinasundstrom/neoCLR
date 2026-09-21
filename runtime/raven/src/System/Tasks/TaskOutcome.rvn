@@ -1,0 +1,52 @@
+namespace System.Tasks
+
+import System.Runtime.CompilerServices.ValueStorage
+import System.Tasks.TaskOutcome.*
+
+public static class TaskOutcome {
+    public struct Cancelled { }
+    public struct Completed<T> {
+        private field Stored: T
+        init(value: T) {
+            Stored = value
+        }
+        val Value: T => Stored
+    }
+}
+
+public struct TaskOutcome<T> {
+    private field Stored: System.Value
+
+    init(value: Cancelled) {
+        Stored = ValueStorage.Pack(value)
+    }
+    val IsCancelled: bool => ValueStorage.Is<System.Tasks.TaskOutcome.Cancelled>(Stored)
+    func GetCancelledCase() -> System.Tasks.TaskOutcome.Cancelled {
+        return ValueStorage.Unpack<System.Tasks.TaskOutcome.Cancelled>(Stored)
+    }
+    func TryGet(out value: System.Tasks.TaskOutcome.Cancelled) -> bool {
+        if IsCancelled {
+            value = GetCancelledCase()
+            return true
+        }
+        ValueStorage.LeaveUnassigned(out value)
+        return false
+    }
+
+    init(value: Completed<T>) {
+        Stored = ValueStorage.Pack(value)
+    }
+    val IsCompleted: bool => ValueStorage.Is<System.Tasks.TaskOutcome.Completed<T>>(Stored)
+    func GetCompletedCase() -> System.Tasks.TaskOutcome.Completed<T> {
+        return ValueStorage.Unpack<System.Tasks.TaskOutcome.Completed<T>>(Stored)
+    }
+    func TryGet(out value: System.Tasks.TaskOutcome.Completed<T>) -> bool {
+        if IsCompleted {
+            value = GetCompletedCase()
+            return true
+        }
+        ValueStorage.LeaveUnassigned(out value)
+        return false
+    }
+
+}

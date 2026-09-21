@@ -1,0 +1,192 @@
+; Generated from runtime/raven/src/System/Tasks/TaskOutcome.rvn. Regenerate with build_runtime_library.py.
+.type System.Tasks.TaskOutcome<T0>
+.custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
+.field private Stored Value
+.property instance IsCancelled() -> Boolean
+.get instance System.Tasks.TaskOutcome<T0>::get_IsCancelled()
+.end
+.property instance IsCompleted() -> Boolean
+.get instance System.Tasks.TaskOutcome<T0>::get_IsCompleted()
+.end
+.method instance .ctor(System.Tasks.TaskOutcome.Cancelled value) -> Void
+ldarg value
+value.pack System.Tasks.TaskOutcome.Cancelled
+newobj System.Tasks.TaskOutcome<T0>
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsCancelled() -> Boolean
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+ldfld System.Tasks.TaskOutcome<T0>::Stored
+M00000005_IL_0008:
+value.is System.Tasks.TaskOutcome.Cancelled
+call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_000d:
+call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetCancelledCase() -> System.Tasks.TaskOutcome.Cancelled
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+ldfld System.Tasks.TaskOutcome<T0>::Stored
+M00000006_IL_0008:
+value.unpack System.Tasks.TaskOutcome.Cancelled
+M00000006_IL_000d:
+ret
+.end
+.method instance TryGet(out(true) System.Tasks.TaskOutcome.Cancelled& destination) -> Boolean
+M00000007_IL_0000:
+M00000007_IL_0001:
+M00000007_IL_0002:
+ldarg 0
+M00000007_IL_0003:
+call instance System.Tasks.TaskOutcome<T0>::get_IsCancelled()
+call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0008:
+brtrue M00000007_IL_0012
+M00000007_IL_000d:
+br M00000007_IL_0022
+M00000007_IL_0012:
+M00000007_IL_0013:
+ldarg 1
+M00000007_IL_0014:
+ldarg 0
+M00000007_IL_0015:
+call instance System.Tasks.TaskOutcome<T0>::GetCancelledCase()
+M00000007_IL_001a:
+stobj System.Tasks.TaskOutcome.Cancelled
+M00000007_IL_001f:
+M00000007_IL_0020:
+ldc.bool true
+M00000007_IL_0021:
+ret
+M00000007_IL_0022:
+M00000007_IL_0023:
+M00000007_IL_0024:
+ldarg 1
+M00000007_IL_0025:
+pop
+M00000007_IL_002a:
+M00000007_IL_002b:
+ldc.bool false
+M00000007_IL_002c:
+ret
+.end
+.method instance .ctor(System.Tasks.TaskOutcome.Completed<T0> value) -> Void
+ldarg value
+value.pack System.Tasks.TaskOutcome.Completed<T0>
+newobj System.Tasks.TaskOutcome<T0>
+starg this
+ldvoid
+ret
+.end
+.method instance get_IsCompleted() -> Boolean
+M00000009_IL_0000:
+M00000009_IL_0001:
+M00000009_IL_0002:
+ldarg 0
+M00000009_IL_0003:
+ldfld System.Tasks.TaskOutcome<T0>::Stored
+M00000009_IL_0008:
+value.is System.Tasks.TaskOutcome.Completed<T0>
+call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_000d:
+call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.method instance GetCompletedCase() -> System.Tasks.TaskOutcome.Completed<T0>
+M0000000a_IL_0000:
+M0000000a_IL_0001:
+M0000000a_IL_0002:
+ldarg 0
+M0000000a_IL_0003:
+ldfld System.Tasks.TaskOutcome<T0>::Stored
+M0000000a_IL_0008:
+value.unpack System.Tasks.TaskOutcome.Completed<T0>
+M0000000a_IL_000d:
+ret
+.end
+.method instance TryGet(out(true) System.Tasks.TaskOutcome.Completed<T0>& destination) -> Boolean
+M0000000b_IL_0000:
+M0000000b_IL_0001:
+M0000000b_IL_0002:
+ldarg 0
+M0000000b_IL_0003:
+call instance System.Tasks.TaskOutcome<T0>::get_IsCompleted()
+call neoCLR.Library.System.Tasks.TaskOutcome.RuntimeBooleanToInt32(Boolean)
+M0000000b_IL_0008:
+brtrue M0000000b_IL_0012
+M0000000b_IL_000d:
+br M0000000b_IL_0022
+M0000000b_IL_0012:
+M0000000b_IL_0013:
+ldarg 1
+M0000000b_IL_0014:
+ldarg 0
+M0000000b_IL_0015:
+call instance System.Tasks.TaskOutcome<T0>::GetCompletedCase()
+M0000000b_IL_001a:
+stobj System.Tasks.TaskOutcome.Completed<T0>
+M0000000b_IL_001f:
+M0000000b_IL_0020:
+ldc.bool true
+M0000000b_IL_0021:
+ret
+M0000000b_IL_0022:
+M0000000b_IL_0023:
+M0000000b_IL_0024:
+ldarg 1
+M0000000b_IL_0025:
+pop
+M0000000b_IL_002a:
+M0000000b_IL_002b:
+ldc.bool false
+M0000000b_IL_002c:
+ret
+.end
+.end
+.type System.Tasks.TaskOutcome
+.type Cancelled
+.method instance .ctor() -> Void
+M00000001_IL_0000:
+M00000001_IL_0001:
+ldarg 0
+M00000001_IL_0002:
+pop
+M00000001_IL_0007:
+ldvoid
+ret
+.end
+.end
+.type Completed<T0>
+.field Value T0
+.property instance Value() -> T0
+.get instance System.Tasks.TaskOutcome.Completed<T0>::get_Value()
+.end
+.method instance .ctor(T0 value) -> Void
+ldarg value
+newobj System.Tasks.TaskOutcome.Completed<T0>
+starg this
+ldvoid
+ret
+.end
+.method instance get_Value() -> T0
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
+ldfld System.Tasks.TaskOutcome.Completed<T0>::Value
+M00000003_IL_0008:
+ret
+.end
+.end
+.end

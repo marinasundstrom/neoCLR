@@ -28,13 +28,13 @@ static class LibraryImplementation
         }
         if (owner == "System.Tasks.Task")
         {
-            var names = new[] { "System.Tasks.TaskQueue", "System.Tasks.Task`1", "System.Tasks.TaskCompletionSource`1", "System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1", "System.Runtime.CompilerServices.IAsyncStateMachine", "System.Runtime.CompilerServices.ITaskAwaiter" };
+            var names = new[] { "System.Tasks.TaskQueue", "System.Tasks.Task`1", "System.Tasks.Promise`1", "System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1", "System.Runtime.CompilerServices.IAsyncStateMachine", "System.Runtime.CompilerServices.ITaskAwaiter" };
             foreach (var name in names) ApplicationTypes.BindLibrary(source.GetType(name), name.Split('`')[0]);
             return names.SelectMany(name => source.GetType(name).IsInterface ? InterfaceRoots(source.GetType(name), core.GetType(name), name) : InstanceRoots(source.GetType(name), core.GetType(name), name.Split('`')[0])).ToArray();
         }
         if (owner == "System.Array") return InstanceRoots(source.GetType("System.Array`1") ?? throw new InvalidDataException("Missing Array implementation."), core.GetType("System.Array`1"), owner);
         if (MarkerLibrary.IsOwner(owner)) return MarkerLibrary.Roots(source, core, owner);
-        if (owner == EnumBindings.Flags) return FlagsLibrary.Roots(source, core);
+        if (EnumBindings.IsType(owner)) return FlagsLibrary.Roots(source, core, owner);
         if (owner == "System.Func") return DelegateLibrary.Roots(source, core);
         if (owner == "System.Introspection.MemberInfo")
             return DescriptorLibrary.Roots(source, core, InstanceRoots, InterfaceRoots);
@@ -44,7 +44,7 @@ static class LibraryImplementation
             var provider = owner.Replace(".Introspection.", ".Introspection.Runtime");
             return InstanceRoots(source.GetType(provider), core.GetType(provider), provider);
         }
-        if (owner is "System.Option" or "System.Result")
+        if (owner is "System.Option" or "System.Result" or "System.Tasks.TaskOutcome")
             return GenericUnionLibrary.Roots(source, core, owner, InstanceRoots);
         var type = source.Types.SingleOrDefault(t => t.Namespace == owner && NamespaceFunctions.IsContainer(t)) ?? source.Types.SingleOrDefault(t => t.FullName.Split('`')[0] == owner)
             ?? throw new InvalidDataException("Missing namespace implementation: " + owner);
@@ -210,7 +210,7 @@ static class LibraryImplementation
                 return right is GenericInstanceType r && MatchType(l.ElementType, r.ElementType)
                     && l.GenericArguments.Count == r.GenericArguments.Count
                     && l.GenericArguments.Zip(r.GenericArguments).All(p => MatchType(p.First, p.Second));
-            if (left.FullName is "System.Option/None" or "System.Option/Some`1" or "System.Result/Ok`1" or "System.Result/Error`1"
+            if (left.FullName is "System.Option/None" or "System.Option/Some`1" or "System.Result/Ok`1" or "System.Result/Error`1" or "System.Tasks.TaskOutcome/Completed`1" or "System.Tasks.TaskOutcome/Cancelled"
                 && left.FullName == right.FullName && GenericUnionLibrary.IsCase(left.Resolve()) && GenericUnionLibrary.IsCase(right.Resolve())
                 && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right)) return true;
             return AsyncBindings.SameType(left, right) || TaskBindings.SameType(left, right) || DescriptorLibrary.SameType(left, right) || SameTypeArgument(left, right) || ErrorCarrierLibrary.SameCase(left, right, type, contract) || (left.FullName == contract.FullName && right.FullName == type.FullName

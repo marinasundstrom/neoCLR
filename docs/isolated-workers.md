@@ -19,7 +19,7 @@ The tested sample is [library-workers.rvn](experiments/raven-target/samples/libr
 Both APIs require an active TaskQueue.Run/Drain scope. Start submits work before
 returning a pending Task; the caller can use ordinary `await`. Completion is posted
 to the caller's queue, which waits for the worker result and completes its local
-TaskCompletionSource. Task objects remain entirely in the caller's heap. Pumping
+Promise. Task objects remain entirely in the caller's heap. Pumping
 the queue may block on a worker; completions are processed in submission order,
 not readiness order. This is an explicit PoC limitation, not a nonblocking scheduler.
 There is no context capture, affinity, thread naming, priority or guest cancellation

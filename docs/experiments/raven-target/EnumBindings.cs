@@ -5,17 +5,21 @@ using System.Text;
 static class EnumBindings
 {
     public const string Flags = "System.Introspection.BindingFlags";
+    public const string TaskState = "System.Tasks.TaskState";
+    public static bool IsType(string name) => name is Flags or TaskState;
+    public static string? Type(TypeReference type) => IsType(type.FullName) && type.IsValueType && RuntimeSignatures.IsCore(type.Scope) ? type.FullName : null;
+    static readonly (string Name, int Value)[] TaskLiterals = [("Pending", 0), ("Completed", 1), ("Cancelled", 2)];
     static readonly (string Name, int Value)[] Literals = [("Default", 0), ("DeclaredOnly", 2), ("Instance", 4), ("Static", 8), ("Public", 16), ("NonPublic", 32)];
-    public static void Validate(ModuleDefinition module)
+    public static void Validate(ModuleDefinition module, string name = Flags)
     {
-        var type = module.GetType(Flags);
+        var type = module.GetType(name);
         if (type is null || !type.IsPublic || !type.IsSealed || type.IsNested || type.HasProperties || type.HasEvents || type.HasNestedTypes
             || type.BaseType?.FullName != "System.Enum" || !RuntimeSignatures.IsCore(type.BaseType.Scope) || !type.IsEnum || type.HasGenericParameters || type.Interfaces.Count != 0 || type.Methods.Count != 0
-            || type.CustomAttributes.Count(a => a.AttributeType.FullName == "System.FlagsAttribute") != 1
+            || type.CustomAttributes.Count(a => a.AttributeType.FullName == "System.FlagsAttribute") != (name == Flags ? 1 : 0)
             || type.Fields.Count(f => !f.IsStatic) != 1
             || type.Fields.Single(f => !f.IsStatic) is not { Name: "value__", IsSpecialName: true, IsRuntimeSpecialName: true, FieldType.MetadataType: MetadataType.Int32 }
-            || !type.Fields.Where(f => f.IsStatic).Select(f => (f.Name, f.IsLiteral && f.Constant is int n ? n : int.MinValue)).Order().SequenceEqual(Literals.Order()))
-            throw new InvalidDataException("Unsupported BindingFlags enum metadata.");
+            || !type.Fields.Where(f => f.IsStatic).Select(f => (f.Name, f.IsLiteral && f.Constant is int n ? n : int.MinValue)).Order().SequenceEqual((name == Flags ? Literals : TaskLiterals).Order()))
+            throw new InvalidDataException("Unsupported enum metadata: " + name + ".");
     }
     // CLI enums have literals and an underlying value field, not authored method
     // bodies. Lower their common operations to the existing nominal enum ABI,
@@ -23,7 +27,7 @@ static class EnumBindings
     public static string Declaration(TypeDefinition type)
     {
         var name = type.FullName;
-        var result = new StringBuilder($".type {name}\n.enum Int32 flags\n.field private Bits Int32\n");
+        var result = new StringBuilder($".type {name}\n.enum Int32{(name == Flags ? " flags" : "")}\n.field private Bits Int32\n");
         foreach (var member in type.Fields.Where(f => f.IsLiteral))
             result.AppendLine($".literal {member.Name} {member.Constant}");
         void Method(string signature, string body) => result.AppendLine($".method {signature}\n{body}\nret\n.end");
@@ -39,9 +43,9 @@ static class EnumBindings
         result.AppendLine(".end");
         return result.ToString();
     }
-    public static bool Converts(string source, string target) => source == Flags && target == "Int32" || source == "Int32" && target == Flags;
-    public static string Convert(string source, string target) => source == Flags && target == "Int32"
-        ? $"call instance {Flags}::get_Value()\n" : source == "Int32" && target == Flags ? $"call {Flags}::FromValue(Int32)\n" : "";
+    public static bool Converts(string source, string target) => IsType(source) && target == "Int32" || source == "Int32" && IsType(target);
+    public static string Convert(string source, string target) => IsType(source) && target == "Int32"
+        ? $"call instance {source}::get_Value()\n" : source == "Int32" && IsType(target) ? $"call {target}::FromValue(Int32)\n" : "";
     public const string Adapters = """
         .function RuntimeBitsOr(Int32 left,Int32 right) -> Int32
         ldarg left

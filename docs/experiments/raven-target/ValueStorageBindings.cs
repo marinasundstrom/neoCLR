@@ -25,7 +25,7 @@ static class ValueStorageBindings
             throw new InvalidDataException("Unsupported case storage intrinsic.");
         var argument = method.GenericArguments[0];
         var element = map(argument);
-        var unionCase = element == "System.Option.None" || element.StartsWith("System.Option.Some<", StringComparison.Ordinal) || element.StartsWith("System.Result.Ok<", StringComparison.Ordinal) || element.StartsWith("System.Result.Error<", StringComparison.Ordinal);
+        var unionCase = element == "System.Tasks.TaskOutcome.Cancelled" || element.StartsWith("System.Tasks.TaskOutcome.Completed<", StringComparison.Ordinal) || element == "System.Option.None" || element.StartsWith("System.Option.Some<", StringComparison.Ordinal) || element.StartsWith("System.Result.Ok<", StringComparison.Ordinal) || element.StartsWith("System.Result.Error<", StringComparison.Ordinal);
         if (!(unionCase || ErrorBindings.Cases.Any(c => c.Value.Any(n => element == c.Key + "." + n)))
             || !(RuntimeSignatures.IsCore(argument.Scope)
                 || ApplicationTypes.IsLibrary(argument) && (ErrorCarrierLibrary.IsCase(argument.Resolve()) || GenericUnionLibrary.IsCase(argument.Resolve()))))

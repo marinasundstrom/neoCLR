@@ -32,12 +32,12 @@ public async func Add(input: Task<int>) -> Task<int> {
 }
 ''', '''
     let queue = TaskQueue()
-    let source = TaskCompletionSource<int>(queue)
+    let source = Promise<int>(queue)
     var answer = source.Task
     queue.Run(() => {
         answer = Add(source.Task)
         Check(!answer.IsCompleted)
-        source.TrySetResult(1)
+        source.Complete(1)
         Check(!answer.IsCompleted)
     })
     Check(answer.GetResult() == 42)
@@ -54,17 +54,17 @@ public async func Add(first: Task<int>, second: Task<int>) -> Task<int> {
 }
 ''', '''
     let queue = TaskQueue()
-    let first = TaskCompletionSource<int>(queue)
-    let second = TaskCompletionSource<int>(queue)
+    let first = Promise<int>(queue)
+    let second = Promise<int>(queue)
     var answer = first.Task
     queue.Run(() => { answer = Add(first.Task, second.Task) })
     Check(!answer.IsCompleted)
     for i in 0..<1000 { let garbage = TaskQueue() }
-    first.TrySetResult(20)
+    first.Complete(20)
     queue.Drain()
     Check(!answer.IsCompleted)
     for i in 0..<1000 { let garbage = TaskQueue() }
-    second.TrySetResult(22)
+    second.Complete(22)
     queue.Drain()
     Check(answer.GetResult() == 42)
 '''),
@@ -75,12 +75,12 @@ public async func Complete(input: Task<unit>) -> Task<unit> {
 }
 ''', '''
     let queue = TaskQueue()
-    let source = TaskCompletionSource<unit>(queue)
+    let source = Promise<unit>(queue)
     var answer = source.Task
     queue.Run(() => {
         answer = Complete(source.Task)
         Check(!answer.IsCompleted)
-        source.TrySetResult(())
+        source.Complete(())
     })
     Check(answer.IsCompleted)
     answer.GetResult()
@@ -93,11 +93,11 @@ public async func Read(input: Task<Result<int, string>>) -> Task<Result<int, str
 }
 ''', '''
     let queue = TaskQueue()
-    let source = TaskCompletionSource<Result<int, string>>(queue)
+    let source = Promise<Result<int, string>>(queue)
     var answer = source.Task
     queue.Run(() => {
         answer = Read(source.Task)
-        source.TrySetResult(Error("Unavailable"))
+        source.Complete(Error("Unavailable"))
     })
     match answer.GetResult() {
         Ok(_) => System.Fault("Failure was lost")
@@ -115,11 +115,11 @@ public async func Outer(input: Task<int>) -> Task<int> {
 }
 ''', '''
     let queue = TaskQueue()
-    let source = TaskCompletionSource<int>(queue)
+    let source = Promise<int>(queue)
     var answer = source.Task
     queue.Run(() => {
         answer = Outer(source.Task)
-        source.TrySetResult(40)
+        source.Complete(40)
     })
     Check(answer.GetResult() == 42)
 '''),
@@ -127,7 +127,7 @@ public async func Outer(input: Task<int>) -> Task<int> {
 public async func Ready() -> Task<int> { return 42 }
 ''', '''
     let queue = TaskQueue()
-    let placeholder = TaskCompletionSource<int>(queue)
+    let placeholder = Promise<int>(queue)
     var answer = placeholder.Task
     queue.Run(() => { answer = Ready() })
     Check(answer.GetResult() == 42)
@@ -142,8 +142,8 @@ public async func Read(initial: Result<int, string>, input: Task<int>) -> Task<R
 }
 ''', '''
     let queue = TaskQueue()
-    let input = TaskCompletionSource<int>(queue)
-    let placeholder = TaskCompletionSource<Result<int, string>>(queue)
+    let input = Promise<int>(queue)
+    let placeholder = Promise<Result<int, string>>(queue)
     var answer = placeholder.Task
     queue.Run(() => { answer = Read(Error("early"), input.Task) })
     Check(answer.IsCompleted)
@@ -158,7 +158,7 @@ public async func Ready() -> Task<int> { return 42 }
 ''', '''
     let outer = TaskQueue()
     let inner = TaskQueue()
-    let placeholder = TaskCompletionSource<int>(outer)
+    let placeholder = Promise<int>(outer)
     var answer = placeholder.Task
     outer.Run(() => {
         inner.Run(() => { Ready() })

@@ -5,9 +5,9 @@ using Mono.Cecil.Cil;
 // recognition members, while generated runtime exports preserve the existing ABI.
 static class GenericUnionLibrary
 {
-    public static bool IsCarrier(TypeDefinition? type) => type?.FullName is "System.Option`1" or "System.Result`2";
-    public static bool IsContainer(TypeDefinition? type) => type?.FullName is "System.Option" or "System.Result";
-    public static bool IsCase(TypeDefinition? type) => type?.FullName is "System.Option/None" or "System.Option/Some`1" or "System.Result/Ok`1" or "System.Result/Error`1";
+    public static bool IsCarrier(TypeDefinition? type) => type?.FullName is "System.Option`1" or "System.Result`2" or "System.Tasks.TaskOutcome`1";
+    public static bool IsContainer(TypeDefinition? type) => type?.FullName is "System.Option" or "System.Result" or "System.Tasks.TaskOutcome";
+    public static bool IsCase(TypeDefinition? type) => type?.FullName is "System.Option/None" or "System.Option/Some`1" or "System.Result/Ok`1" or "System.Result/Error`1" or "System.Tasks.TaskOutcome/Completed`1" or "System.Tasks.TaskOutcome/Cancelled";
     public static bool IsFamily(TypeDefinition type) => IsCarrier(type) || IsCase(type);
     public static bool IsMatched(TypeDefinition type) => IsFamily(type) && ApplicationTypes.IsLibrary(type);
     public static bool IsByValueReceiver(MethodReference method) => IsMatched(method.DeclaringType.Resolve()) && method.HasThis
@@ -58,7 +58,7 @@ static class GenericUnionLibrary
         foreach (var type in container.NestedTypes)
             methods.AddRange(instanceRoots(type, reference.NestedTypes.Single(t => t.Name == type.Name),
                 type.FullName.Split('`')[0].Replace('/', '.')));
-        var name = owner + (owner == "System.Option" ? "`1" : "`2");
+        var name = owner + (owner == "System.Result" ? "`2" : "`1");
         methods.AddRange(instanceRoots(source.GetType(name) ?? throw new InvalidDataException("Missing union carrier with expected arity."), core.GetType(name), owner));
         return methods.ToArray();
     }
@@ -70,7 +70,7 @@ static class GenericUnionLibrary
             || source.Fields.Zip(core.Fields).Any(p => p.First.Name != "Stored" || p.Second.Name != "Stored"
                 || !LibraryImplementation.SameType(p.First.FieldType, p.Second.FieldType)))
             throw new InvalidDataException("Unsupported union storage layout.");
-        if (source.FullName == "System.Option/None" && (source.Methods.Count != 1 || !PrimitiveLibrary.IsDefaultConstructor(source.Methods[0])))
+        if ((source.FullName is "System.Option/None" or "System.Tasks.TaskOutcome/Cancelled") && (source.Methods.Count != 1 || !PrimitiveLibrary.IsDefaultConstructor(source.Methods[0])))
             throw new InvalidDataException("Option.None requires an empty constructor.");
     }
     public static string? CaseConstructor(MethodDefinition method, Func<TypeReference, bool, string> map)

@@ -10,6 +10,29 @@ static class TaskBindings
     public static bool IsType(string type) => Shapes.ContainsKey(type);
     public const string Declarations = """
         namespace Tasks {
+            public enum TaskState { Pending = 0, Completed = 1, Cancelled = 2 }
+            public static class TaskOutcome {
+                public struct Cancelled { public Cancelled() { } }
+                public struct Completed<T> {
+                    public Completed(T value) { Value = value; }
+                    public T Value { get; set; }
+                    public void Deconstruct(out T value) { value = Value; }
+                }
+            }
+            [System.Runtime.CompilerServices.Union]
+            public struct TaskOutcome<T> {
+                public TaskOutcome(TaskOutcome.Completed<T> value) { }
+                public TaskOutcome(TaskOutcome.Cancelled value) { }
+                public bool IsCompleted => false;
+                public bool IsCancelled => false;
+                public TaskOutcome.Completed<T> GetCompletedCase() => default;
+                public TaskOutcome.Cancelled GetCancelledCase() => default;
+                public bool TryGet(out TaskOutcome.Completed<T> value) { value = default; return false; }
+                public bool TryGet(out TaskOutcome.Cancelled value) { value = default; return false; }
+                public object Value => default;
+                public bool TryGetValue(out TaskOutcome.Completed<T> value) { value = default; return false; }
+                public bool TryGetValue(out TaskOutcome.Cancelled value) { value = default; return false; }
+            }
             public sealed class TaskQueue {
                 public TaskQueue() { }
                 public void Post(Func<PropagationUnit> callback) { }
@@ -17,16 +40,20 @@ static class TaskBindings
                 public void Run(Func<PropagationUnit> callback) { }
             }
             public sealed class Task<T> : Runtime.CompilerServices.ITaskAwaiter {
-                public Task(TaskCompletionSource<T> source) { }
+                public Task(Promise<T> source) { }
+                public TaskState State => default;
+                public Option<TaskOutcome<T>> Outcome => default;
                 public bool IsCompleted => default;
                 public T GetResult() => default;
                 public Task<T> GetAwaiter() => default;
                 public void OnCompleted(Func<PropagationUnit> callback) { }
             }
-            public sealed class TaskCompletionSource<T> {
-                public TaskCompletionSource(TaskQueue queue) { }
+            public sealed class Promise<T> {
+                public Promise(TaskQueue queue) { }
                 public Task<T> Task => default;
-                public bool TrySetResult(T value) => default;
+                public bool Complete(T value) => default;
+                public bool Cancel() => default;
+                public bool Cancelled() => default;
                 public bool Completed() => default;
                 public T Read() => default;
                 public void Register(Func<PropagationUnit> callback) { }
@@ -53,12 +80,12 @@ static class TaskBindings
     public static void Project(ModuleDefinition module)
     {
         foreach (var method in module.GetType(Prefix + "Task`1").Methods.Where(m => m.IsConstructor)
-            .Concat(module.GetType(Prefix + "TaskCompletionSource`1").Methods.Where(m => m.Name is "Completed" or "Read" or "Register")))
+            .Concat(module.GetType(Prefix + "Promise`1").Methods.Where(m => m.Name is "Completed" or "Cancelled" or "Read" or "Register")))
             method.Attributes = (method.Attributes & ~MethodAttributes.MemberAccessMask) | MethodAttributes.Assembly;
     }
 
     public static bool SameType(TypeReference left, TypeReference right) =>
-        left.FullName == right.FullName && left.FullName is Prefix + "Task`1" or Prefix + "TaskCompletionSource`1" or Queue
+        left.FullName == right.FullName && left.FullName is Prefix + "Task`1" or Prefix + "Promise`1" or Queue
         && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right);
 
     public static string? Type(TypeReference type)
@@ -69,7 +96,7 @@ static class TaskBindings
         var kind = g.ElementType.FullName switch
         {
             Prefix + "Task`1" => "Task",
-            Prefix + "TaskCompletionSource`1" => "TaskCompletionSource",
+            Prefix + "Promise`1" => "Promise",
             _ => null
         };
         if (kind is null) return null;
@@ -87,7 +114,7 @@ static class TaskBindings
         if (owner is null) return null;
         var (kind, payload) = Shapes[owner];
         var internalMember = kind == "Task" && definition.IsConstructor
-            || kind == "TaskCompletionSource" && definition.Name is "Completed" or "Read" or "Register";
+            || kind == "Promise" && definition.Name is "Completed" or "Cancelled" or "Read" or "Register";
         if (internalMember ? !library || !definition.IsAssembly : !definition.IsPublic)
             throw new InvalidDataException("Invalid Task member visibility.");
         if (kind == "Task" && (definition.DeclaringType.Interfaces.Count != 1
@@ -106,17 +133,20 @@ static class TaskBindings
             ("TaskQueue", ".ctor") => ("", "noresult"),
             ("TaskQueue", "Post" or "Run") => ("System.Func<Void>", "noresult"),
             ("TaskQueue", "Drain") => ("", "noresult"),
-            ("Task", ".ctor") => (Prefix + "TaskCompletionSource<" + payload + ">", "noresult"),
+            ("Task", ".ctor") => (Prefix + "Promise<" + payload + ">", "noresult"),
+            ("Task", "get_State") => ("", EnumBindings.TaskState),
+            ("Task", "get_Outcome") => ("", "System.Option<System.Tasks.TaskOutcome<" + payload + ">>"),
             ("Task", "get_IsCompleted") => ("", "Boolean"),
             ("Task", "GetAwaiter") => ("", owner),
             ("Task", "GetResult") => ("", payload),
             ("Task", "OnCompleted") => ("System.Func<Void>", "noresult"),
-            ("TaskCompletionSource", ".ctor") => (Queue, "noresult"),
-            ("TaskCompletionSource", "get_Task") => ("", Prefix + "Task<" + payload + ">"),
-            ("TaskCompletionSource", "TrySetResult") => (payload, "Boolean"),
-            ("TaskCompletionSource", "Completed") when library => ("", "Boolean"),
-            ("TaskCompletionSource", "Read") when library => ("", payload),
-            ("TaskCompletionSource", "Register") when library => ("System.Func<Void>", "noresult"),
+            ("Promise", ".ctor") => (Queue, "noresult"),
+            ("Promise", "get_Task") => ("", Prefix + "Task<" + payload + ">"),
+            ("Promise", "Cancel") => ("", "Boolean"),
+            ("Promise", "Complete") => (payload, "Boolean"),
+            ("Promise", "Completed" or "Cancelled") when library => ("", "Boolean"),
+            ("Promise", "Read") when library => ("", payload),
+            ("Promise", "Register") when library => ("System.Func<Void>", "noresult"),
             _ => throw new InvalidDataException("Unsupported Task member: " + definition.FullName)
         };
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type,

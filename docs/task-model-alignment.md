@@ -33,7 +33,14 @@ exception storage or recovery operator. Use the existing Raven Error case spelli
 in implementation samples; the proposal's conceptual Err spelling does not rename
 Result.
 
-## Gaps in the current implementation
+## Assessment baseline and subsequent progress
+
+The following gap analysis records the state before implementation. The first core
+slice now adds TaskState, TaskOutcome<T>, State/Outcome and Complete/Cancel; see
+[current contracts](task-contracts.md). Composition, tokens and cancelled-await
+propagation remain outstanding.
+
+## Gaps identified at assessment
 
 The [validated completion PoC](task-contracts.md) supports pending/completed values,
 queued callbacks and generated async, but does not implement the proposed public

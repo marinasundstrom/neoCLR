@@ -1,0 +1,25 @@
+; Generated from runtime/raven/src/System/Tasks/TaskOutcome.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Tasks.TaskOutcome.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
+.function neoCLR.Library.System.Tasks.TaskOutcome.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end
