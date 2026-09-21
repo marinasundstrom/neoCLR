@@ -756,6 +756,159 @@ There is no need to invent an abstraction simply because the operation happens t
 
 ---
 
+### Generic operation results
+
+NeoCLR's generic type system may allow collection contracts to express operations whose result depends on the modification model of the implementation.
+
+For example, the generalized list contract could have the form:
+
+```raven
+interface List<T, TChangeResult> :
+    Sequence<T>,
+    Collection<T>
+{
+    this[int index]: T
+
+    func Add(value: T) -> TChangeResult
+
+    func Insert(
+        index: int,
+        value: T
+    ) -> TChangeResult
+
+    func RemoveAt(
+        index: int
+    ) -> TChangeResult
+
+    func Clear() -> TChangeResult
+}
+```
+
+The ordinary `List<T>` contract can then represent the conventional in-place form:
+
+```raven
+interface List<T> : List<T, void>
+{
+}
+```
+
+This relies on the NeoCLR type system permitting `void` as a normal generic type argument.
+
+A mutable implementation can therefore expose:
+
+```raven
+class ArrayList<T> : List<T>
+{
+    func Add(value: T) -> void
+    {
+        // modifies this instance
+    }
+}
+```
+
+while a persistent implementation can use its own type as the change result:
+
+```raven
+class ImmutableList<T> :
+    List<T, ImmutableList<T>>
+{
+    func Add(value: T) -> ImmutableList<T>
+    {
+        // returns a new list
+    }
+}
+```
+
+Conceptually:
+
+```text
+List<T>
+    = List<T, void>
+
+List<T, ImmutableList<T>>
+    structural operations produce a new immutable list
+```
+
+This does **not** mean that mutable and persistent modification have identical semantics.
+
+For:
+
+```raven
+List<T, void>
+```
+
+`Add` means:
+
+> Apply the change to this collection.
+
+For:
+
+```raven
+List<T, ImmutableList<T>>
+```
+
+`Add` means:
+
+> Produce another collection containing the change.
+
+The common contract describes the **collection operation**. The result type describes how the result of performing that operation is represented.
+
+### Relationship to `Self`
+
+If NeoCLR later introduces a first-class `Self` type, persistent contracts could potentially be expressed without explicitly repeating the concrete type:
+
+```raven
+interface PersistentList<T> :
+    List<T, Self>
+{
+}
+```
+
+This should be treated as a related type-system extension rather than a requirement of the initial collections API.
+
+### This does not replace capability contracts
+
+The generic form should not make capability distinctions disappear.
+
+In particular, `MutableList<T>` remains useful when an API specifically requires permission to modify an existing collection:
+
+```raven
+func Append<T>(
+    values: MutableList<T>,
+    value: T
+)
+```
+
+Likewise, accepting:
+
+```raven
+List<T>
+```
+
+should continue to mean that the consumer requires list shape rather than arbitrary modification capabilities.
+
+The generic-result form instead provides a way to describe collection operations across modification models when doing so is useful.
+
+### Avoid parameterizing every operation
+
+The result parameter should represent a coherent family of operations. NeoCLR should not evolve contracts such as:
+
+```raven
+List<
+    T,
+    TAddResult,
+    TInsertResult,
+    TRemoveResult,
+    TClearResult
+>
+```
+
+If different operations require unrelated result types, the abstraction has probably been parameterized at the wrong level.
+
+Separate capabilities, operation-specific contracts, or future type-system mechanisms are preferable.
+
+---
+
 # 18. `FrozenList<T>`
 
 Frozen collections have another purpose.
