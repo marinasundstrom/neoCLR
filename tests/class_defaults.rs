@@ -71,3 +71,55 @@ fn null_is_distinct_from_uninitialized_storage() {
     assert!(verify(&m).is_err());
     assert!(run(&m, Limits::default()).is_err());
 }
+
+#[test]
+fn nested_erased_fields_are_unreadable_until_assigned() {
+    const TYPES: &str = r#"
+.type Payload
+.field Raw Value
+.end
+.type class Envelope
+.field Item Payload
+.method instance .ctor(Payload item) -> noresult
+ldarg 0
+ldarg item
+stfld Envelope::Item
+ret
+.end
+.method instance .ctor() -> noresult
+ret
+.end
+.end
+"#;
+    for (body, succeeds) in [
+        (
+            "ldc.i4 42\nvalue.pack Int32\nnewobj Payload\nnewobj instance Envelope::.ctor(Payload)\nldfld Envelope::Item\nldfld Payload::Raw\nvalue.unpack Int32",
+            true,
+        ),
+        (
+            "newobj instance Envelope::.ctor()\nldfld Envelope::Item\nldfld Payload::Raw\nvalue.unpack Int32",
+            false,
+        ),
+        (
+            ".local Payload item\nldloca item\ninitobj Payload\nldloc item\nldfld Payload::Raw\nvalue.unpack Int32",
+            false,
+        ),
+    ] {
+        let result = assemble(&format!(
+            ".module Defaults\n.entry Main\n{TYPES}\n.function Main() -> Int32\n{body}\nret\n.end"
+        ))
+        .and_then(|m| {
+            verify(&m)?;
+            run(&m, Limits::default())
+        });
+        if succeeds {
+            assert_eq!(result.unwrap().value, Value::Int32(42));
+        } else {
+            let error = result.unwrap_err().message;
+            assert!(
+                error.contains("uninitialized") || error.contains("default initialization"),
+                "{error}"
+            );
+        }
+    }
+}

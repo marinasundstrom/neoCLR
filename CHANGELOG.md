@@ -6,6 +6,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-09-21
+
+- Permit constructors to initialize fields containing erased values without inventing
+  a default payload. Unassigned fields remain unreadable and constructor publication
+  still requires initialization; explicit invalid defaults remain rejected.
+
 ### 2026-09-19
 
 - Record the decision to defer Thread/ThreadPool work and finish compiler-generated

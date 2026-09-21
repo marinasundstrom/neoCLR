@@ -79,3 +79,14 @@ Runtime-service analysis conservatively reports PointerMemory and SlotReferences
 There is no format change, newval instruction or new managed heap allocation here.
 See the [heap strategy](managed-heap-strategy.md) for the next construction and
 allocation decisions.
+
+## Constructor storage for non-default payloads
+
+Reference allocation can reserve an unreadable field when its payload has no
+valid default, including aggregates containing erased values. The constructor
+must assign that whole field before returning. This does not introduce a default
+union case or make explicit `initobj` valid for such payloads. Nested uninitialized
+storage remains unreadable as a whole, preserving the constructor publication check.
+Unlike CLR zero-initialized storage, neoCLR does not invent a valid erased payload
+from zero bits. Regression checks cover assignment, omitted assignment and rejected
+explicit defaults.

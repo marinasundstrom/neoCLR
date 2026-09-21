@@ -2327,15 +2327,7 @@ fn interpret_instructions(
                         let fields = definitions
                             .iter()
                             .map(|field| {
-                                if field.ty == Type::RuntimeTypeHandle
-                                    || module.type_definition(&field.ty).is_some_and(|definition| {
-                                        definition.representation == Representation::Delegate
-                                    })
-                                {
-                                    Ok(Value::Uninitialized(field.ty.clone()))
-                                } else {
-                                    crate::initialization::default_value(module, &field.ty)
-                                }
+                                crate::initialization::object_field_value(module, &field.ty)
                             })
                             .collect::<Result<Vec<_>, _>>()?;
                         let identity = heap.allocate(Value::Object {

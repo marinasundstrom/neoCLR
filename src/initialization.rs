@@ -2,11 +2,22 @@
 use crate::{Fault, Module, Value, metadata::Type};
 
 pub(crate) fn default_value(module: &Module, ty: &Type) -> Result<Value, Fault> {
+    build_default(module, ty, false)
+}
+
+// A reference object can exist while its constructor assigns its fields.
+// Types without a readable default retain checked, uninitialized storage instead.
+pub(crate) fn object_field_value(module: &Module, ty: &Type) -> Result<Value, Fault> {
+    build_default(module, ty, true)
+}
+
+fn build_default(module: &Module, ty: &Type, allow_uninitialized: bool) -> Result<Value, Fault> {
     fn build(
         module: &Module,
         ty: &Type,
         path: &mut Vec<Type>,
         remaining: &mut usize,
+        allow_uninitialized: bool,
     ) -> Result<Value, Fault> {
         if *remaining == 0 || path.len() >= 64 {
             return Err(Fault::new(
@@ -16,6 +27,13 @@ pub(crate) fn default_value(module: &Module, ty: &Type) -> Result<Value, Fault> 
         *remaining -= 1;
         if module.is_object_reference_type(ty) {
             return Ok(Value::NullObjectReference(ty.clone()));
+        }
+        if allow_uninitialized
+            && module.type_definition(ty).is_some_and(|definition| {
+                definition.representation == crate::metadata::Representation::Delegate
+            })
+        {
+            return Ok(Value::Uninitialized(ty.clone()));
         }
         Ok(match ty {
             Type::Void => Value::Void,
@@ -43,14 +61,22 @@ pub(crate) fn default_value(module: &Module, ty: &Type) -> Result<Value, Fault> 
                 path.push(ty.clone());
                 let fields = definitions
                     .iter()
-                    .map(|field| build(module, &field.ty, path, remaining))
+                    .map(|field| build(module, &field.ty, path, remaining, allow_uninitialized))
                     .collect::<Result<Vec<_>, _>>()?;
                 path.pop();
+                if allow_uninitialized
+                    && fields
+                        .iter()
+                        .any(|field| matches!(field, Value::Uninitialized(_)))
+                {
+                    return Ok(Value::Uninitialized(ty.clone()));
+                }
                 Value::Object {
                     ty: ty.clone(),
                     fields,
                 }
             }
+            _ if allow_uninitialized => Value::Uninitialized(ty.clone()),
             _ => {
                 return Err(Fault::new(format!(
                     "managed default initialization is not defined for {ty:?}"
@@ -58,5 +84,5 @@ pub(crate) fn default_value(module: &Module, ty: &Type) -> Result<Value, Fault> 
             }
         })
     }
-    build(module, ty, &mut vec![], &mut 16_384)
+    build(module, ty, &mut vec![], &mut 16_384, allow_uninitialized)
 }
