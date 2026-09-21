@@ -7,6 +7,10 @@ compiler-generated async/await on neoCLR through an explicit TaskQueue. The publ
 namespace is now System.Tasks: completion is independent of threading. Rebuild
 references and replace earlier System.Threading.Tasks imports.
 
+The [Task model alignment assessment](task-model-alignment.md) records the next
+contract: explicit State/Outcome, cancellation and Map/Then. These are implementation
+targets, not capabilities of the validated PoC described below.
+
 ## Consumer and producer
 
 The Raven-authored types live provisionally in System.Tasks:
@@ -186,6 +190,6 @@ The published Preview 8 SDK does not implement these new project settings.
 
 The intended public API will grow Promise-style composition and continuation
 methods, using terminology appropriate to neoCLR rather than requiring .NET names.
-Exact operators remain to be designed; OnCompleted is the current provisional
-protocol, not the complete composition API. See the
-[recorded direction](async-api-design.md#promise-style-composition-direction--2026-09-21).
+The updated proposal selects Map and Then as the fundamental operators; they are
+not implemented by the validated PoC. OnCompleted remains provisional protocol
+machinery. See the [alignment sequence](task-model-alignment.md).

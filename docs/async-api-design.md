@@ -11,8 +11,14 @@ contracts.
 The [Task completion slice](task-contracts.md) now implements Raven-authored
 Task<T>, TaskCompletionSource<T> and an explicit TaskQueue in the development Raven
 profile. Generic payloads, queued continuations and producer/consumer access checks
-run on neoCLR. This is not in Preview 8. Compiler-generated async/await, automatic
-host progress and concurrency are still outstanding; the queue is provisional.
+run on neoCLR. This is not in Preview 8. Named compiler-generated async functions
+and isolated workers now run in the development PoC; automatic host progress and
+shared Task state across threads remain outstanding. The queue is provisional.
+
+The updated [Task model proposal](proposals/task-model.md) is the target for the
+next slices: State/Outcome, explicit cancellation and Map/Then composition. Follow
+the [runtime-first alignment sequence](task-model-alignment.md); older open questions
+below record how the design evolved, not alternatives to this latest direction.
 
 ## Post-release Task foundation — 2026-09-19
 
@@ -236,3 +242,15 @@ with either .NET or JavaScript. Benefits sought are readable pipelines and direc
 composition alongside await; costs include reduced .NET API familiarity and the
 need to define callback ordering, reentrancy, queue ownership and pending/completed
 behavior explicitly. Validate those contracts before implementing the operators.
+
+
+## Task model takes priority — 2026-09-21
+
+The author selected cancellation as Task state, with expected failure in Result.Error
+and Faults outside the recoverable model, then directed alignment with the updated
+Task model proposal before further Raven lowering work. Map and Then now have
+proposed semantics; their scheduling and implementation still need validation.
+Tokens request cancellation; operations decide whether to terminate as Cancelled.
+The [alignment assessment](task-model-alignment.md) distinguishes the validated PoC,
+unvalidated cancellation work and required public contracts. Raven may need a
+separate lowering, but its implementation must follow the Task model.

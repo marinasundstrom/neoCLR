@@ -10,7 +10,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 - Record Promise-style Task composition and continuation as API direction, with
   names chosen for neoCLR rather than .NET parity. Keep Result failure independent;
-  operator names and semantics remain open. Update the proposals overview.
+  the updated Task model proposes State/Outcome, distinct cancellation and Map/Then.
+  Record runtime-first implementation slices and Raven lowering gaps; distinguish
+  cancellation requests from terminal outcomes. Update the proposals overview
+  without claiming implementation of cancellation or composition.
 
 - Select provisional heap async states and exception-free lowering in the neoCLR
   project props, matching the development compiler and language server. Keep the

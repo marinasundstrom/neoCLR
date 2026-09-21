@@ -4749,3 +4749,25 @@ recorded this as API direction, preserving initial-capital method names and the
 existing separation between Task completion and ordinary Result payloads. Exact
 operator names and scheduling semantics remain open. No composition methods were
 implemented or installed in this documentation slice.
+
+
+## 2026-09-21 — Cancellation belongs to Task; establish the model first
+
+The author requested CancellationToken support. The assistant proposed cooperative
+requests with ordinary value/Result completion and asked whether cancellation should
+also be a distinct Task completion state. The author replied: “Cancellation state
+belongs to Task. Failure is modelled via Result.Error. Otherwise Faults.” The
+assistant began cancellation plumbing and considered adding a cancellation branch
+to Raven's current await lowering.
+
+The author then directed reading the updated Task model proposal, emphasized that
+Raven integration may require a separate lowering, and said: “Our primary goal is
+the Task model.” The assistant reviewed the proposal and current Raven await path,
+prioritized public State/Outcome and composition before lowering, and recorded the
+[implementation sequence and gaps](task-model-alignment.md). The review identified
+that the draft worker code could discard a completed value merely because a token
+had been requested; that must change to explicit operation-level acknowledgement.
+
+This assessment updates design and website direction only. Cancellation code remains
+in progress and unvalidated end to end; no Raven cancellation lowering or new local
+installation is claimed. The proposal remains preserved as supplied by the author.
