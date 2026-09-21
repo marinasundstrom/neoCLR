@@ -1,74 +1,88 @@
-# NeoCLR Streams API v1
+# NeoCLR Streams API
 
-## 1. Design goals
+## 1. Purpose
 
-The API should preserve the useful parts of .NET's stream model:
+Streams represent **sequential byte flow**.
 
-* familiar `Read`, `Write`, `Flush`, `Seek` concepts;
-* streams compose naturally;
-* efficient buffer-oriented I/O;
-* wrappers for buffering, compression, encryption, text, etc.;
-* both memory-backed and OS-backed implementations.
+They are not inherently files, network connections, memory buffers, or devices. Those systems may expose streams as a common way of reading or writing bytes.
 
-But NeoCLR should remove historical baggage:
+NeoCLR therefore treats streams as a small independent platform abstraction:
 
-* no `Read` + `ReadAsync` duplication;
-* no `Write` + `WriteAsync` duplication;
-* no `CanRead`, `CanWrite`, `CanSeek`;
-* no unsupported-operation exceptions;
-* no expected I/O failures represented as exceptions;
-* no requirement that every stream expose every capability;
-* no artificial asynchronous work just because an API returns `Task`.
+```text
+System.Streams
+```
 
-The basic rule becomes:
+The API follows familiar .NET stream concepts while adapting them to NeoCLR's type system, Task model, and capability-oriented API design.
 
-> **Potentially waiting I/O returns `Task<Result<T, E>>`.**
+The major differences from .NET are:
 
-An immediately available operation simply returns an already-completed task.
+```text
+.NET Stream                     NeoCLR
+
+Stream                          no universal Stream required
+CanRead                         InputStream type
+CanWrite                        OutputStream type
+CanSeek                         Seekable capability
+Read / ReadAsync                Read
+Write / WriteAsync              Write
+exceptions                      Result<T, E>
+CancellationToken parameters    Task cancellation
+System.IO ownership             System.Streams
+```
+
+The central principle is:
+
+> **Direction and capabilities are expressed by types rather than runtime state.**
 
 ---
 
 # 2. Namespace
 
-Initially:
+The core abstractions live in:
 
-```text
-System.IO
+```raven
+namespace System.Streams;
 ```
 
-This is broad enough for:
+This is intentionally independent of:
 
 ```text
-ReadableStream
-WritableStream
-BufferedReader
-BufferedWriter
-MemoryStream
-TextReader
-TextWriter
-IOError
-SeekOrigin
+System.Storage
+System.Networking
+System.Data
+System.Security
+System.Text
 ```
 
-The filesystem is a related but separate domain:
+because streams cross all of those domains.
+
+For example:
 
 ```text
-System.IO.FileSystem
+Storage.File
+    ↓
+InputStream
+
+Networking.Connection
+    ↓
+InputStream + OutputStream
+
+Data.Compression.GzipReader
+    ↓
+InputStream → InputStream
+
+Security.Cryptography
+    ↓
+InputStream → InputStream
 ```
 
-or potentially another namespace once we settle the overall filesystem proposal.
-
-Streams model **byte transport**.
-
-Filesystems model **files, paths, directories, metadata and storage namespaces**.
+No one subsystem owns streams.
 
 ---
 
-# 3. There does not need to be a universal `Stream`
+# 3. There is no universal `Stream`
 
-I would revise the earlier proposal here.
-
-We don't necessarily gain anything from:
+NeoCLR does not begin with:
 
 ```raven
 interface Stream
@@ -76,254 +90,264 @@ interface Stream
 }
 ```
 
-The meaningful concepts are its capabilities.
-
-The fundamental ones are:
+The fundamental concepts are instead the two directions of byte flow:
 
 ```raven
-interface ReadableStream
+interface InputStream
 {
     func Read(buffer: Memory<Byte>)
-        -> Task<Result<Size, IOError>>;
+        -> Task<Result<Size, StreamError>>;
 }
 
-interface WritableStream
+interface OutputStream
 {
     func Write(buffer: ReadOnlyMemory<Byte>)
-        -> Task<Result<Size, IOError>>;
+        -> Task<Result<Size, StreamError>>;
 
     func Flush()
-        -> Task<Result<Void, IOError>>;
+        -> Task<Result<(), StreamError>>;
 }
 ```
 
-Something that supports both simply implements both:
+An object supporting both directions simply implements both:
 
 ```raven
-class SomeStream :
-    ReadableStream,
-    WritableStream
+class Connection :
+    InputStream,
+    OutputStream
 {
     ...
 }
 ```
 
-This is preferable to:
+There is consequently no need for:
 
 ```raven
 stream.CanRead
 stream.CanWrite
 ```
 
-The type itself expresses the capability.
+An API requiring input asks for an `InputStream`.
+
+An API requiring output asks for an `OutputStream`.
+
+This also prevents APIs from unnecessarily requesting capabilities they do not use.
 
 ---
 
-# 4. Asynchrony is the default
+# 4. Input and output are semantic roles
 
-There is deliberately no:
+The names `InputStream` and `OutputStream` describe the direction from the perspective of the consumer.
+
+An `InputStream` is something from which bytes can be obtained:
 
 ```raven
-ReadAsync(...)
-WriteAsync(...)
-FlushAsync(...)
+func Parse(input: InputStream)
+    -> Task<Result<Document, ParseError>>;
+```
+
+An `OutputStream` is something to which bytes can be sent:
+
+```raven
+func Encode(
+    document: Document,
+    output: OutputStream
+) -> Task<Result<(), EncodeError>>;
+```
+
+This makes direction visible directly in API signatures.
+
+It also allows implementations to expose only the appropriate side of a resource.
+
+---
+
+# 5. Task-based I/O is the default
+
+NeoCLR does not duplicate operations into synchronous and asynchronous variants.
+
+There is no:
+
+```text
+Read
+ReadAsync
+
+Write
+WriteAsync
+
+Flush
+FlushAsync
 ```
 
 Instead:
 
 ```raven
-let count = await stream.Read(buffer)?;
-await stream.Write(buffer)?;
-await stream.Flush()?;
+let count = await input.Read(buffer)?;
+await output.WriteAll(data)?;
+await output.Flush()?;
 ```
 
-The method name describes the operation.
-
-Its return type describes its completion semantics.
+Potentially waiting operations return:
 
 ```raven
-func Read(...)
-    -> Task<Result<Size, IOError>>
+Task<Result<T, E>>
 ```
 
-And importantly, `Task` does **not** mean that a thread must be scheduled or that suspension must occur.
+`Task` describes completion semantics. It does **not** imply that another thread must execute the operation.
 
-For example, a memory-backed implementation can complete immediately:
+A memory-backed input stream may simply return an already-completed task:
 
 ```raven
 func Read(buffer: Memory<Byte>)
-    -> Task<Result<Size, IOError>>
+    -> Task<Result<Size, StreamError>>
 {
     let count = CopyAvailableBytes(buffer);
     return Ok(count);
 }
 ```
 
-A socket implementation may suspend:
+An OS-backed implementation may genuinely suspend.
 
-```raven
-async func Read(buffer: Memory<Byte>)
-    -> Task<Result<Size, IOError>>
-{
-    let count = await runtime.ReadSocket(handle, buffer)?;
-    return count;
-}
-```
+Today Raven may implement that suspension using a compiler-generated state machine.
 
-This gives us an important distinction:
+The long-term NeoCLR model may instead suspend execution directly in the runtime.
 
-> `Task<T>` is part of the contract. `async` is an implementation mechanism.
+Neither mechanism changes the public stream contract.
 
-An interface therefore generally declares:
-
-```raven
-func Read(...) -> Task<...>;
-```
-
-rather than:
-
-```raven
-async func Read(...) -> Task<...>;
-```
-
-unless Raven ultimately gives `async` some additional contract-level meaning.
+> **Task is part of the API model; suspension strategy is an implementation detail.**
 
 ---
 
-# 5. `Memory<T>` rather than `Span<T>` at suspension boundaries
+# 6. Buffers across suspension boundaries
 
-The core asynchronous API takes:
+The fundamental operations use:
 
 ```raven
 Memory<Byte>
 ReadOnlyMemory<Byte>
 ```
 
-rather than:
+rather than stack-bound spans:
 
 ```raven
 Span<Byte>
 ReadOnlySpan<Byte>
 ```
 
-because a stream operation may outlive the current stack frame while suspended.
+because an operation may remain suspended after its caller's current stack frame has yielded.
 
 Therefore:
 
 ```raven
-ReadableStream.Read(Memory<Byte>)
-WritableStream.Write(ReadOnlyMemory<Byte>)
+InputStream.Read(Memory<Byte>)
+
+OutputStream.Write(ReadOnlyMemory<Byte>)
 ```
 
-while purely synchronous parsing and memory manipulation can continue using spans.
+while immediate memory processing can continue using spans.
 
-This creates a useful boundary:
+This establishes a useful distinction:
 
 ```text
-Span        → immediate computation
-Memory      → potentially suspended operation
+Span<T>
+    ↓
+immediate computation
+
+Memory<T>
+    ↓
+potentially suspended operation
 ```
 
-without making streams themselves responsible for memory ownership.
+Streams themselves do not thereby take ownership of the supplied memory.
 
 ---
 
-# 6. Read semantics
+# 7. Reading
 
-The fundamental read operation is:
+The primitive input operation is:
 
 ```raven
 func Read(buffer: Memory<Byte>)
-    -> Task<Result<Size, IOError>>;
+    -> Task<Result<Size, StreamError>>;
 ```
 
 It means:
 
 > Read up to `buffer.Length` bytes into the supplied memory.
 
-A successful result of zero means EOF.
+The operation may return fewer bytes than requested.
+
+A successful result of zero indicates the end of the stream:
 
 ```raven
-let count = await stream.Read(buffer)?;
+let count = await input.Read(buffer)?;
 
-if count == 0
-{
-    // end of stream
+if count == 0 {
+    // End of input.
 }
 ```
 
-I would **not** use:
+This remains preferable to:
 
 ```raven
-Result<Option<Size>, IOError>
+Result<Option<Size>, StreamError>
 ```
 
-here.
+at the raw byte-stream level.
 
-Although NeoCLR embraces `Option`, EOF is part of the fundamental streaming protocol and zero is an efficient, well-understood representation of "no more bytes."
+EOF is part of the byte-stream protocol.
 
-`Option` remains appropriate at semantic layers above raw byte I/O.
-
-For example:
+Semantic readers layered above streams may use `Option` where absence has domain meaning:
 
 ```raven
 func ReadLine()
-    -> Task<Result<Option<String>, IOError>>;
+    -> Task<Result<Option<String>, TextError>>;
 ```
-
-Here `None` genuinely means:
-
-> There is no next line.
 
 ---
 
-# 7. Partial I/O is fundamental
+# 8. Writing
 
-`Read` does not promise to fill the buffer.
-
-Likewise:
+The primitive output operation is:
 
 ```raven
 func Write(buffer: ReadOnlyMemory<Byte>)
-    -> Task<Result<Size, IOError>>;
+    -> Task<Result<Size, StreamError>>;
 ```
 
-may consume fewer bytes than supplied.
+A successful write may consume fewer bytes than supplied.
 
-This allows the lowest-level API to map cleanly onto OS, device and network behavior.
+Partial I/O remains part of the low-level contract because it maps naturally onto operating-system, device, and network behavior.
 
-Higher-level helpers provide the normal ergonomic operations.
+Most application code should use higher-level operations:
 
 ```raven
 func ReadExactly(
-    this ReadableStream stream,
+    this InputStream input,
     buffer: Memory<Byte>
-) -> Task<Result<Void, IOError>>;
-```
+) -> Task<Result<(), StreamError>>;
 
-and:
-
-```raven
 func WriteAll(
-    this WritableStream stream,
+    this OutputStream output,
     buffer: ReadOnlyMemory<Byte>
-) -> Task<Result<Void, IOError>>;
+) -> Task<Result<(), StreamError>>;
 ```
 
-Usage:
+giving:
 
 ```raven
-await stream.ReadExactly(header)?;
-await stream.WriteAll(payload)?;
+await input.ReadExactly(header)?;
+await output.WriteAll(payload)?;
 ```
 
-Most application code will probably use these rather than implementing partial-I/O loops itself.
+The primitive contract remains efficient while normal code remains ergonomic.
 
 ---
 
-# 8. Seeking is a separate capability
+# 9. Seeking is orthogonal
 
-Not every stream is seekable.
+Direction does not imply seeking.
+
+Seeking is therefore another capability:
 
 ```raven
 interface Seekable
@@ -331,11 +355,11 @@ interface Seekable
     func Seek(
         offset: Int64,
         origin: SeekOrigin
-    ) -> Task<Result<UInt64, IOError>>;
+    ) -> Task<Result<UInt64, StreamError>>;
 }
 ```
 
-With:
+with:
 
 ```raven
 enum SeekOrigin
@@ -346,90 +370,66 @@ enum SeekOrigin
 }
 ```
 
-This means there is no:
+A file-backed input stream might implement:
 
-```raven
-CanSeek
+```text
+InputStream
+Seekable
+Sized
 ```
 
-A function requiring seeking asks for it explicitly:
+while a TCP input stream implements only:
+
+```text
+InputStream
+```
+
+An API requiring both reading and seeking expresses both requirements:
 
 ```raven
-func ReadIndex(stream: ReadableStream & Seekable)
+func ReadIndex(input: InputStream & Seekable)
 {
     ...
 }
 ```
 
-depending on the intersection/capability syntax we eventually settle on.
+The exact intersection syntax remains a Raven language question.
 
 ---
 
-# 9. Size is also a capability
+# 10. Size is independent
 
-Knowing a stream's size isn't the same thing as seeking it.
+Knowing the total size of a resource is not equivalent to seeking through it.
+
+It can therefore be represented independently:
 
 ```raven
 interface Sized
 {
     func GetLength()
-        -> Task<Result<UInt64, IOError>>;
+        -> Task<Result<UInt64, StreamError>>;
 }
 ```
 
-I'm deliberately leaning toward a method rather than:
+This is deliberately an operation rather than necessarily a property.
 
-```raven
-let Length: UInt64;
-```
+For an external resource, determining its length may require I/O or may fail.
 
-because retrieving length from an external resource may involve I/O and may fail.
+For an in-memory implementation, the returned Task can complete immediately.
 
-An in-memory implementation simply completes immediately.
-
-This follows a broader NeoCLR principle:
-
-> Properties should generally represent cheap, immediately available state rather than hidden potentially-suspending operations.
+This follows the broader NeoCLR API principle that properties should generally represent immediately available state rather than hide potentially suspending work.
 
 ---
 
-# 10. Position needs similar treatment
+# 11. Copying between directions
 
-I would avoid automatically putting:
-
-```raven
-Position
-```
-
-onto `Seekable`.
-
-Some streams can conceptually seek without position necessarily being cheap local state.
-
-We could eventually define:
-
-```raven
-interface Positioned
-{
-    func GetPosition()
-        -> Task<Result<UInt64, IOError>>;
-}
-```
-
-But I wouldn't include it in the absolute minimum API until we find concrete use cases.
-
-`Seek(0, Current)` shouldn't become the accidental way of querying it either.
-
----
-
-# 11. Copying is a standard operation
-
-A very common operation should be built in:
+The relationship between input and output naturally gives us:
 
 ```raven
 func CopyTo(
-    this ReadableStream source,
-    destination: WritableStream
-) -> Task<Result<UInt64, IOError>>;
+    this InputStream source,
+    destination: OutputStream
+) -> Task<Result<UInt64, StreamError>>;
 ```
 
 Usage:
@@ -438,119 +438,92 @@ Usage:
 let copied = await source.CopyTo(destination)?;
 ```
 
-Potential options:
+The implementation may initially use an ordinary buffer loop.
 
-```raven
-record CopyOptions
-{
-    BufferSize: Size;
-}
-```
-
-giving:
-
-```raven
-await source.CopyTo(destination, options)?;
-```
-
-The implementation can later take advantage of runtime/platform optimizations such as zero-copy transfers when the concrete stream implementations support them.
-
-The abstraction shouldn't prevent that optimization.
+NeoCLR or platform-specific implementations may later optimize compatible endpoints using zero-copy or other native transfer mechanisms without changing the API.
 
 ---
 
-# 12. Buffering is explicit
+# 12. Directional wrappers
 
-Streams aren't implicitly buffered.
+The directional model should continue into higher-level stream types.
 
-Instead:
-
-```raven
-let source = BufferedReader(stream);
-```
-
-and:
-
-```raven
-let destination = BufferedWriter(stream);
-```
-
-These expose the same capabilities:
-
-```raven
-class BufferedReader : ReadableStream
-{
-    init(source: ReadableStream);
-}
-
-class BufferedWriter : WritableStream
-{
-    init(destination: WritableStream);
-}
-```
-
-I prefer separate reader/writer types over a single mode-dependent:
+Rather than a mode-dependent:
 
 ```text
 BufferedStream
 ```
 
-although a bidirectional buffered stream could exist if real use cases justify it.
+prefer:
 
-Again, capabilities make direction explicit.
+```text
+BufferedInputStream
+BufferedOutputStream
+```
 
----
+or, if we want reader/writer terminology at that layer:
 
-# 13. Transform streams compose
-
-Compression, encryption, checksumming and similar transformations operate on the capability they actually need.
+```text
+BufferedReader
+BufferedWriter
+```
 
 For example:
 
 ```raven
-let compressed =
-    GzipReader(source);
-
-let buffered =
-    BufferedReader(compressed);
-```
-
-Rather than one class:
-
-```text
-GZipStream
-```
-
-with construction modes controlling whether it reads or writes, we'd prefer:
-
-```text
-GzipReader
-GzipWriter
-```
-
-Conceptually:
-
-```raven
-class GzipReader : ReadableStream
+class BufferedInputStream : InputStream
 {
-    init(source: ReadableStream);
+    init(source: InputStream);
 }
 
-class GzipWriter : WritableStream
+class BufferedOutputStream : OutputStream
 {
-    init(destination: WritableStream);
+    init(destination: OutputStream);
 }
 ```
 
-This removes a whole category of runtime mode checks.
+There is no mode flag and no unsupported direction.
+
+The type tells us what it does.
 
 ---
 
-# 14. Memory I/O
+# 13. Transform streams
 
-We shouldn't force every operation involving bytes through the Stream abstraction.
+Transformations follow the same rule.
 
-For immediate memory manipulation, use:
+Compression should not require a single mode-dependent equivalent of .NET's `GZipStream`.
+
+Instead:
+
+```raven
+class GzipReader : InputStream
+{
+    init(source: InputStream);
+}
+
+class GzipWriter : OutputStream
+{
+    init(destination: OutputStream);
+}
+```
+
+This allows natural composition:
+
+```raven
+let compressed = GzipReader(source);
+let buffered = BufferedReader(compressed);
+```
+
+Likewise, encryption, checksumming, encoding and other transformations can expose precisely the direction they implement.
+
+---
+
+# 14. Streams and memory are different abstractions
+
+Not every sequence of bytes should become a stream.
+
+Immediate memory processing uses the memory abstractions:
 
 ```text
 Span<Byte>
@@ -560,7 +533,7 @@ ReadOnlyMemory<Byte>
 Buffer
 ```
 
-A parser can therefore be completely synchronous:
+For example:
 
 ```raven
 let reader = BinaryReader(data.Span);
@@ -569,431 +542,326 @@ let version = reader.Read<UInt16>()?;
 let flags = reader.Read<UInt32>()?;
 ```
 
-No Task is involved because nothing can suspend.
+No Task is necessary because nothing waits.
 
-For stream-backed data:
+Streams enter the model when sequential I/O is required:
 
 ```raven
 let buffer = Memory<Byte>(size);
 
-await stream.ReadExactly(buffer)?;
+await input.ReadExactly(buffer)?;
 
 let reader = BinaryReader(buffer.Span);
 ```
 
-This gives NeoCLR a useful conceptual division:
+This produces three distinct layers:
 
 ```text
-Memory operations
-      ↓
+Memory manipulation
+        ↓
 Span / Memory / Buffer
 
-External sequential I/O
-      ↓
-ReadableStream / WritableStream
+Sequential byte flow
+        ↓
+InputStream / OutputStream
 
 Structured interpretation
-      ↓
-TextReader / BinaryReader / codecs
+        ↓
+Text / binary readers and writers / codecs
 ```
 
 ---
 
-# 15. Memory-backed streams still make sense
+# 15. Memory-backed streams
 
-Sometimes an API requires a `ReadableStream`, while the data already exists in memory.
+Adapters remain useful when an API expects a stream but the source or destination is memory.
 
-So we should still provide adapters.
-
-Something approximately like:
+For example:
 
 ```raven
-let stream = MemoryReader(data);
+let input = MemoryReader(data);
 ```
 
 and:
 
 ```raven
-let buffer = MemoryBuffer();
-
-await buffer.Write(data)?;
+let output = MemoryBuffer();
+await output.WriteAll(data)?;
 ```
 
-Potential types:
+A memory reader may implement:
 
 ```text
-MemoryReader
-MemoryWriter
-MemoryBuffer
-```
-
-`MemoryReader` can implement:
-
-```text
-ReadableStream
+InputStream
 Seekable
 Sized
 ```
 
-and every returned Task can complete synchronously.
+Every Task may complete immediately.
 
-The Task abstraction makes that cheap conceptually: asynchronous *compatibility* doesn't imply asynchronous *execution*.
+Again:
+
+> **Asynchronous compatibility does not imply asynchronous execution.**
 
 ---
 
-# 16. Text is layered above bytes
+# 16. Storage integration
 
-A stream has no encoding.
+Streams are not part of `System.Storage`, but Storage can expose them.
 
-It transports bytes.
-
-This fits directly with our NeoCLR text model where `String` is Unicode text and UTF-8 is the platform expectation.
-
-Text decoding happens explicitly above the stream:
+Conceptually:
 
 ```raven
-let reader = TextReader(
-    stream,
-    Encoding.Utf8
-);
-```
+namespace System.Storage;
 
-Then:
-
-```raven
-let line = await reader.ReadLine()?;
-
-match line
+interface File
 {
-    Some(line) => Process(line),
-    None       => break
+    func OpenRead()
+        -> Task<Result<InputStream, FileError>>;
+
+    func OpenWrite(...)
+        -> Task<Result<OutputStream, FileError>>;
 }
 ```
 
-Likewise:
-
-```raven
-let writer = TextWriter(
-    stream,
-    Encoding.Utf8
-);
-
-await writer.WriteLine("Hello 🌍")?;
-```
-
-UTF-8 can be the default:
-
-```raven
-let reader = TextReader(stream);
-```
-
-meaning:
-
-```raven
-TextReader(stream, Encoding.Utf8)
-```
-
-without making the underlying byte stream encoding-aware.
-
----
-
-# 17. Binary I/O is also layered
-
-Similarly, binary interpretation isn't a responsibility of streams.
-
-We can later design:
+This gives Storage responsibility for:
 
 ```text
-BinaryReader
-BinaryWriter
-ByteOrder
-VarInt
-...
+File
+Directory
+Path
+StorageProvider
+StorageUnit
+permissions
+metadata
+opening resources
 ```
 
-around spans and/or streams.
+while `System.Streams` takes over once sequential byte transfer begins.
 
-For example:
-
-```raven
-let reader = BinaryReader(
-    data,
-    ByteOrder.LittleEndian
-);
-
-let version = reader.Read<UInt16>()?;
-```
-
-But binary serialization deserves its own proposal rather than being stuffed into the Stream API.
-
----
-
-# 18. Errors are values
-
-Expected I/O failures use `Result`.
-
-```raven
-await stream.Read(buffer)?
-```
-
-rather than exception-based control flow.
-
-An initial error family could look approximately like:
-
-```raven
-enum IOError
-{
-    Closed,
-    Interrupted,
-    TimedOut,
-    Cancelled,
-
-    PermissionDenied,
-
-    InvalidPosition,
-
-    Device(IOErrorCode),
-    Other(IOErrorCode)
-}
-```
-
-But I'd keep this provisional.
-
-In particular, filesystem-specific failures belong to the filesystem domain:
-
-```raven
-FileSystem.OpenRead(path)
-    -> Task<Result<ReadableStream, FileError>>
-```
-
-Opening a nonexistent path is a filesystem failure.
-
-Failure while consuming the already-open byte stream is an I/O failure.
-
-That distinction prevents `IOError` from becoming another enormous `IOException` bucket.
-
----
-
-# 19. Cancellation should integrate with Task
-
-This is an area where NeoCLR shouldn't automatically copy .NET.
-
-Rather than:
-
-```raven
-stream.Read(buffer, cancellationToken)
-```
-
-everywhere, the Task model should ideally support structured cancellation.
-
-Then:
-
-```raven
-await stream.Read(buffer)
-```
-
-executes within the current task context.
-
-Cancelling that task propagates cancellation to the suspended I/O operation where supported.
-
-That could eliminate the enormous amount of:
+That boundary is useful:
 
 ```text
-CancellationToken cancellationToken = default
+System.Storage
+      │
+      │ OpenRead()
+      ▼
+System.Streams.InputStream
 ```
 
-API surface that modern .NET needs.
-
-Explicit cancellation scopes could still exist:
-
-```raven
-using scope = CancellationScope(timeout: 30.seconds);
-
-await stream.Read(buffer);
-```
-
-The exact syntax belongs to the Task/concurrency proposal, but **Streams should be designed assuming structured cancellation is available**.
+A storage error opening a nonexistent file is not necessarily the same thing as an error encountered while consuming an already-open stream.
 
 ---
 
-# 20. Timeouts should probably follow the same model
+# 17. Networking integration
 
-Likewise, I'm skeptical of:
+Networking uses exactly the same capabilities.
 
-```text
-ReadTimeout
-WriteTimeout
-```
-
-being properties of every stream.
-
-Timeouts are really execution policy.
-
-Something conceptually like:
-
-```raven
-await Task.Timeout(
-    stream.Read(buffer),
-    30.seconds
-)?;
-```
-
-or a cancellation scope is more composable than modifying stream state.
-
-That also works consistently across:
-
-```text
-filesystem
-network
-HTTP
-database
-process I/O
-```
-
-instead of each subsystem inventing its own timeout model.
-
----
-
-# 21. Resource lifetime
-
-Streams represent resources, so they need deterministic lifetime management.
-
-Exactly how:
-
-```raven
-using stream = ...
-```
-
-works should follow NeoCLR's general resource/disposal model rather than inventing stream-specific lifetime management.
-
-I would therefore **not** put:
-
-```raven
-Close()
-```
-
-on every stream merely because .NET does.
-
-The resource protocol should handle this.
-
-Something like:
-
-```raven
-using stream = await fileSystem.OpenRead(path)?;
-
-await Process(stream);
-```
-
-should release the underlying resource when the scope ends.
-
-This also needs to account for async cleanup where necessary.
-
----
-
-# 22. Filesystem integration
-
-The filesystem API can expose capabilities rather than concrete `FileStream` classes.
-
-```raven
-interface FileSystem
-{
-    func OpenRead(path: Path)
-        -> Task<Result<ReadableStream, FileError>>;
-
-    func OpenWrite(
-        path: Path,
-        options: WriteOptions = default
-    ) -> Task<Result<WritableStream, FileError>>;
-}
-```
-
-Then:
-
-```raven
-let source =
-    await fileSystem.OpenRead(sourcePath)?;
-
-let destination =
-    await fileSystem.OpenWrite(destinationPath)?;
-
-await source.CopyTo(destination)?;
-```
-
-A memory filesystem can implement exactly the same interface with immediately completed Tasks.
-
-A remote filesystem can genuinely suspend.
-
-The consumer doesn't care.
-
-This is one of the strongest reasons for making asynchronous I/O the platform default.
-
----
-
-# 23. Network integration
-
-The same abstraction naturally fits the Network API we're designing.
-
-A TCP connection might expose:
+A TCP connection could expose both directions:
 
 ```raven
 interface Connection :
-    ReadableStream,
-    WritableStream
+    InputStream,
+    OutputStream
 {
     ...
 }
 ```
 
-Then higher-level protocols can consume stream capabilities rather than know anything about sockets:
+Higher-level protocols can then operate on stream capabilities without depending on sockets:
 
 ```text
-Socket
-  ↓
-TCP Connection
-  ↓
-BufferedReader/Writer
-  ↓
-TLS
-  ↓
+Socket / Connection
+        ↓
+InputStream + OutputStream
+        ↓
+buffering / TLS
+        ↓
 HTTP
 ```
 
-This gives us the same composability that streams traditionally provide without tying the abstraction to files.
+This is one reason streams deserve their own namespace rather than living under Storage or Networking.
 
 ---
 
-# 24. Proposed core surface
+# 18. Text is layered above streams
 
-So the first cut could actually be remarkably small:
+Streams transport bytes.
+
+They do not inherently have a text encoding.
+
+Text decoding belongs to the text layer:
 
 ```raven
-namespace System.IO;
+let reader = TextReader(
+    input,
+    Encoding.Utf8
+);
+```
 
-interface ReadableStream
+and:
+
+```raven
+let writer = TextWriter(
+    output,
+    Encoding.Utf8
+);
+```
+
+UTF-8 can naturally be the NeoCLR default:
+
+```raven
+let reader = TextReader(input);
+```
+
+without making `InputStream` itself text-aware.
+
+Whether `TextReader`/`TextWriter` ultimately belong in `System.Text`, `System.Streams`, or a more specialized namespace can be decided with the Text API.
+
+---
+
+# 19. Errors
+
+Expected stream-operation failures are values:
+
+```raven
+await input.Read(buffer)?
+```
+
+rather than catchable exceptions.
+
+A provisional error family could be:
+
+```raven
+enum StreamError
+{
+    Closed,
+    Interrupted,
+    TimedOut,
+
+    PermissionDenied,
+
+    InvalidPosition,
+
+    Device(StreamErrorCode),
+    Other(StreamErrorCode)
+}
+```
+
+The important point is that **cancellation is not a `StreamError`**.
+
+With the NeoCLR Task model:
+
+```text
+Task<Result<Size, StreamError>>
+```
+
+can conceptually complete as:
+
+```text
+Completed(Ok(size))
+Completed(Err(streamError))
+Cancelled
+```
+
+Cancellation belongs to Task execution rather than being reported as an I/O failure.
+
+Likewise, domain-specific errors should remain with their originating domain. Failure to locate or open a file belongs to Storage; failure while reading from an already-open byte source belongs to the stream operation.
+
+---
+
+# 20. Cancellation and timeouts
+
+Streams should not repeat:
+
+```text
+CancellationToken cancellationToken = default
+```
+
+throughout their API.
+
+Cancellation belongs to the Task execution model.
+
+Thus:
+
+```raven
+await input.Read(buffer)
+```
+
+participates in the surrounding Task cancellation context, and a suspended underlying operation should be cancelled where the runtime/provider supports it.
+
+Timeouts should similarly be treated primarily as execution policy rather than mutable properties of every stream.
+
+This allows the same Task mechanisms to apply consistently to:
+
+```text
+Streams
+Storage
+Networking
+HTTP
+database operations
+processes
+```
+
+The precise mechanism belongs to the Task proposal rather than the Streams API.
+
+---
+
+# 21. Resource lifetime
+
+Some stream implementations represent resources requiring deterministic cleanup.
+
+Streams should use NeoCLR's general resource-lifetime mechanism rather than inventing a stream-specific `Close()` protocol.
+
+Conceptually:
+
+```raven
+using input = await file.OpenRead()?;
+await Process(input);
+```
+
+should release the underlying resource at the end of its lifetime.
+
+The general resource model must eventually account for resources requiring asynchronous cleanup.
+
+This remains deliberately outside the core Streams proposal.
+
+---
+
+# 22. Initial core surface
+
+The first version can consequently remain very small:
+
+```raven
+namespace System.Streams;
+
+interface InputStream
 {
     func Read(buffer: Memory<Byte>)
-        -> Task<Result<Size, IOError>>;
+        -> Task<Result<Size, StreamError>>;
 }
 
-interface WritableStream
+interface OutputStream
 {
     func Write(buffer: ReadOnlyMemory<Byte>)
-        -> Task<Result<Size, IOError>>;
+        -> Task<Result<Size, StreamError>>;
 
     func Flush()
-        -> Task<Result<Void, IOError>>;
+        -> Task<Result<(), StreamError>>;
 }
 
 interface Seekable
 {
-    func Seek(offset: Int64, origin: SeekOrigin)
-        -> Task<Result<UInt64, IOError>>;
+    func Seek(
+        offset: Int64,
+        origin: SeekOrigin
+    ) -> Task<Result<UInt64, StreamError>>;
 }
 
 interface Sized
 {
     func GetLength()
-        -> Task<Result<UInt64, IOError>>;
+        -> Task<Result<UInt64, StreamError>>;
 }
 
 enum SeekOrigin
@@ -1008,45 +876,186 @@ Standard operations:
 
 ```raven
 func ReadExactly(
-    this ReadableStream stream,
+    this InputStream input,
     buffer: Memory<Byte>
-) -> Task<Result<Void, IOError>>;
+) -> Task<Result<(), StreamError>>;
 
 func WriteAll(
-    this WritableStream stream,
+    this OutputStream output,
     buffer: ReadOnlyMemory<Byte>
-) -> Task<Result<Void, IOError>>;
+) -> Task<Result<(), StreamError>>;
 
 func CopyTo(
-    this ReadableStream source,
-    destination: WritableStream
-) -> Task<Result<UInt64, IOError>>;
+    this InputStream source,
+    destination: OutputStream
+) -> Task<Result<UInt64, StreamError>>;
 ```
 
-And implementations/adapters initially:
-
-```text
-MemoryReader
-MemoryBuffer
-
-BufferedReader
-BufferedWriter
-
-TextReader
-TextWriter
-```
-
-with compression, crypto, binary I/O, etc. layered independently.
+Everything else can grow around these primitives as real application requirements appear.
 
 ---
 
-# 25. The overall model
+# 23. Platform architecture
 
-The architecture then becomes:
+This gives us a rather clean place for Streams in the larger NeoCLR API:
 
 ```text
-                 ┌───────────────────────┐
-                 │   Files / Sockets /   │
-                 │ Devices / Processes   │
-                 └
+System
+├── Collections
+├── Concurrency
+├── Data
+├── Networking ─────────────┐
+├── Security               │
+├── Storage ────────────┐   │
+├── Streams             │   │
+├── Tasks               │   │
+├── Text                │   │
+└── Time                │   │
+                        ▼   ▼
+                    InputStream
+                    OutputStream
+                         │
+             ┌───────────┼────────────┐
+             ▼           ▼            ▼
+          buffering   transforms   text/binary
 ```
+
+The dependency relationship is deliberately not represented through namespace nesting.
+
+`System.Storage` can use `System.Streams`.
+
+`System.Networking` can use `System.Streams`.
+
+`System.Data.Compression` can use `System.Streams`.
+
+`System.Security.Cryptography` can use `System.Streams`.
+
+And all of them can use `System.Tasks`.
+
+---
+
+# 24. Design principle
+
+The resulting model retains what is useful and recognizable about .NET streams:
+
+```text
+Read
+Write
+Flush
+Seek
+byte-oriented sequential I/O
+buffering
+composition
+memory streams
+transform streams
+```
+
+but does not inherit the assumption that all of those capabilities must hang from one `Stream` base class.
+
+The NeoCLR principle becomes:
+
+> **A stream represents one direction of sequential byte flow. Additional capabilities are composed explicitly.**
+
+That gives us APIs which still *feel*
+
+
+---
+
+## MemoryStream demonstrates capability composition
+
+`InputStream` and `OutputStream` describe capabilities. They do not imply that an object must represent only one direction of data flow.
+
+A memory-backed stream naturally supports several capabilities at once:
+
+```raven
+class MemoryStream :
+    InputStream,
+    OutputStream,
+    Seekable,
+    Sized
+{
+    ...
+}
+```
+
+When used as a `MemoryStream`, the complete interface of the concrete type is available:
+
+```raven
+let stream = MemoryStream();
+
+await stream.WriteAll(data)?;
+await stream.Seek(0, SeekOrigin.Start)?;
+
+let buffer = Memory<Byte>(data.Length);
+await stream.ReadExactly(buffer)?;
+```
+
+There is no need to choose between a separate input or output object merely because the stream interfaces are directional.
+
+Instead, capabilities are narrowed at API boundaries.
+
+An operation that only consumes bytes should request an `InputStream`:
+
+```raven
+func Decode(input: InputStream)
+    -> Task<Result<Document, DecodeError>>
+{
+    ...
+}
+```
+
+An operation that only produces bytes should request an `OutputStream`:
+
+```raven
+func Encode(
+    document: Document,
+    output: OutputStream
+) -> Task<Result<(), EncodeError>>
+{
+    ...
+}
+```
+
+The same `MemoryStream` can be passed to both:
+
+```raven
+let stream = MemoryStream();
+
+await Encode(document, stream)?;
+await stream.Seek(0, SeekOrigin.Start)?;
+
+let decoded = await Decode(stream)?;
+```
+
+When passed to `Encode`, the relevant contract is `OutputStream`. When passed to `Decode`, it is `InputStream`. The underlying `MemoryStream` itself still supports both.
+
+An operation that genuinely requires several capabilities can express that requirement explicitly:
+
+```raven
+func RewriteHeader(
+    stream: InputStream & OutputStream & Seekable
+) -> Task<Result<(), RewriteError>>
+{
+    ...
+}
+```
+
+This avoids introducing interfaces for every possible combination:
+
+```text
+InputStream
+OutputStream
+InputOutputStream
+SeekableInputStream
+SeekableOutputStream
+SeekableInputOutputStream
+...
+```
+
+Instead, individual capabilities compose independently.
+
+This is an important distinction between **concrete stream types** and **stream contracts**:
+
+> **Concrete types expose the capabilities they support. API contracts request only the capabilities they require.**
+
+`MemoryStream` therefore remains a useful and familiar concrete type even though NeoCLR has no universal `Stream` base interface.

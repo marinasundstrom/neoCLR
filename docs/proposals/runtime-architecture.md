@@ -474,6 +474,8 @@ The current namespace vocabulary is:
 ```text id="iztzg8"
 System
 ├── Collections
+│   └── Linq
+├── Concurrency
 ├── Configuration
 ├── Data
 │   ├── Compression
@@ -496,11 +498,11 @@ System
 │   ├── Reflection
 │   └── Emit
 ├── Security
-│   └── Cryptography (or System.Cryptography)
+│   └── Cryptography
+├── Streams
 ├── Storage
 ├── Tasks
 ├── Text
-├── Threading
 └── Time
 ```
 
@@ -577,9 +579,9 @@ For example, fundamental types may include:
 ```text id="5jv49f"
 System.Object
 System.String
-System.Type
 System.Option<T>
 System.Result<T,E>
+System.RuntimeTypeHandle
 ```
 
 while physically being supplied by the `System.Runtime` package.
@@ -587,6 +589,7 @@ while physically being supplied by the `System.Runtime` package.
 Meanwhile:
 
 ```text id="85tz69"
+System.Introspection (includes TypeInfo)
 System.Runtime.Reflection
 System.Runtime.Emit
 ```

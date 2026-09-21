@@ -459,7 +459,130 @@ explicit generic relationships
 
 ---
 
-# 12. Functions become more regular
+# 12. Intersection types and capability composition
+
+Interfaces frequently describe independent capabilities that may be implemented together by the same type.
+
+For example:
+
+```raven
+interface InputStream
+{
+    ...
+}
+
+interface OutputStream
+{
+    ...
+}
+
+interface Seekable
+{
+    ...
+}
+```
+
+A concrete type may implement any meaningful combination:
+
+```raven
+class MemoryStream :
+    InputStream,
+    OutputStream,
+    Seekable
+{
+    ...
+}
+```
+
+Sometimes an API itself needs to express that its argument must provide several of these capabilities.
+
+NeoCLR should therefore investigate **intersection types**, conceptually expressing:
+
+```raven
+InputStream & OutputStream & Seekable
+```
+
+meaning:
+
+> A value whose type satisfies `InputStream`, `OutputStream`, and `Seekable`.
+
+Possible future Raven syntax could therefore allow:
+
+```raven
+func RewriteHeader(
+    stream: InputStream & OutputStream & Seekable
+) -> Task<Result<(), RewriteError>>
+{
+    ...
+}
+```
+
+This avoids introducing artificial interfaces solely to name combinations of otherwise independent capabilities:
+
+```text
+InputOutputStream
+SeekableInputStream
+SeekableOutputStream
+SeekableInputOutputStream
+```
+
+The same concept is useful in generic constraints.
+
+Instead of requiring a dedicated aggregate interface:
+
+```raven
+interface Number :
+    Additive,
+    Subtractive,
+    Multiplicative
+{
+}
+```
+
+an algorithm could potentially request exactly the capabilities it requires:
+
+```raven
+func Calculate<T>(value: T)
+    where T : Additive & Multiplicative
+{
+    ...
+}
+```
+
+The two uses should be distinguished:
+
+```text
+T : A & B
+    constrains a generic type parameter
+
+A & B
+    represents a value satisfying both contracts
+```
+
+NeoCLR could support generic multiple constraints without necessarily supporting first-class intersection types. First-class intersections introduce additional questions around representation, assignment, dispatch, variance, metadata, and interface values.
+
+The exact semantics therefore require a separate design.
+
+The important principle for this proposal is:
+
+> **Independent capabilities should be composable without requiring a named interface for every useful combination.**
+
+This complements `self` and ordinary generic parameters:
+
+```text
+self
+    the implementing type
+
+T
+    an independently variable type
+
+A & B
+    the simultaneous satisfaction of multiple type contracts
+```
+
+---
+
+# 13. Functions become more regular
 
 Allowing `void` as a generic argument also raises the possibility of simplifying function abstractions.
 
@@ -496,7 +619,7 @@ The important point is that the type system should not force two abstraction fam
 
 ---
 
-# 13. Tasks and asynchronous operations
+# 14. Tasks and asynchronous operations
 
 The same regularity applies to asynchronous operations.
 
@@ -528,7 +651,7 @@ This fits NeoCLR's broader task and explicit-error model without requiring speci
 
 ---
 
-# 14. `void` is not necessarily a runtime value
+# 15. `void` is not necessarily a runtime value
 
 Allowing:
 
@@ -564,7 +687,7 @@ The precise IL and runtime representation should be specified separately.
 
 ---
 
-# 15. `self` is not an ordinary generic parameter
+# 16. `self` is not an ordinary generic parameter
 
 Likewise, `self` should not merely be compiler sugar for an invisible `TSelf` parameter unless that turns out to provide the correct runtime semantics.
 
@@ -590,7 +713,7 @@ These semantics need explicit design.
 
 ---
 
-# 16. Open question: interface values and `self`
+# 17. Open question: interface values and `self`
 
 Consider:
 
@@ -622,7 +745,7 @@ This should be resolved before `self` becomes part of the runtime contract model
 
 ---
 
-# 17. Design principle
+# 18. Design principle
 
 These features point toward a broader NeoCLR principle:
 
@@ -662,7 +785,7 @@ naturally represents operations whose changes occur in place, `void` should not 
 
 ---
 
-# 18. Anti-goals
+# 19. Anti-goals
 
 This proposal does **not** mean that every difference between APIs should be encoded through generic parameters.
 
@@ -690,7 +813,7 @@ The goal is:
 
 ---
 
-# 19. Proposed direction
+# 20. Proposed direction
 
 NeoCLR should investigate and, where runtime semantics permit, support:
 
