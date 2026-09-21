@@ -236,6 +236,6 @@
     <Compile Include="src/System/Text/UnicodeScalar.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Tasks'">
-    <Compile Include="src/System/Threading/Tasks/Tasks.rvn" />
+    <Compile Include="src/System/Tasks/Tasks.rvn" />
   </ItemGroup>
 </Project>

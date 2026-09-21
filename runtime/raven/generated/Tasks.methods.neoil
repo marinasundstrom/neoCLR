@@ -1,64 +1,73 @@
-; Generated from runtime/raven/src/System/Threading/Tasks/Tasks.rvn. Regenerate with build_runtime_library.py.
-.type class System.Threading.Tasks.Task<T0>
-.field private source System.Threading.Tasks.TaskCompletionSource<T0>
+; Generated from runtime/raven/src/System/Tasks/Tasks.rvn. Regenerate with build_runtime_library.py.
+.type class System.Tasks.Task<T0>
+.implements System.Runtime.CompilerServices.ITaskAwaiter
+.field private source System.Tasks.TaskCompletionSource<T0>
 .property instance IsCompleted() -> Boolean
-.get instance System.Threading.Tasks.Task<T0>::get_IsCompleted()
+.get instance System.Tasks.Task<T0>::get_IsCompleted()
 .end
-.method internal instance .ctor(System.Threading.Tasks.TaskCompletionSource<T0> source) -> noresult
-M00000004_IL_0000:
-M00000004_IL_0001:
+.method internal instance .ctor(System.Tasks.TaskCompletionSource<T0> source) -> noresult
+M00000005_IL_0000:
+M00000005_IL_0001:
 ldarg 0
-M00000004_IL_0002:
+M00000005_IL_0002:
 pop
-M00000004_IL_0007:
-M00000004_IL_0008:
+M00000005_IL_0007:
+M00000005_IL_0008:
 ldarg 0
-M00000004_IL_0009:
+M00000005_IL_0009:
 ldarg 1
-M00000004_IL_000a:
-stfld System.Threading.Tasks.Task<T0>::source
-M00000004_IL_000f:
+M00000005_IL_000a:
+stfld System.Tasks.Task<T0>::source
+M00000005_IL_000f:
 ret
 .end
 .method instance get_IsCompleted() -> Boolean
-M00000005_IL_0000:
-M00000005_IL_0001:
-M00000005_IL_0002:
-ldarg 0
-M00000005_IL_0003:
-ldfld System.Threading.Tasks.Task<T0>::source
-M00000005_IL_0008:
-callvirt instance System.Threading.Tasks.TaskCompletionSource<T0>::Completed()
-call neoCLR.Library.System.Threading.Tasks.Task.RuntimeBooleanToInt32(Boolean)
-M00000005_IL_000d:
-call neoCLR.Library.System.Threading.Tasks.Task.RuntimeBooleanFromInt32(Int32)
-ret
-.end
-.method instance GetResult() -> T0
 M00000006_IL_0000:
 M00000006_IL_0001:
 M00000006_IL_0002:
 ldarg 0
 M00000006_IL_0003:
-ldfld System.Threading.Tasks.Task<T0>::source
+ldfld System.Tasks.Task<T0>::source
 M00000006_IL_0008:
-callvirt instance System.Threading.Tasks.TaskCompletionSource<T0>::Read()
+callvirt instance System.Tasks.TaskCompletionSource<T0>::Completed()
+call neoCLR.Library.System.Tasks.Task.RuntimeBooleanToInt32(Boolean)
 M00000006_IL_000d:
+call neoCLR.Library.System.Tasks.Task.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance OnCompleted(System.Func<Void> callback) -> noresult
+.method instance GetAwaiter() -> System.Tasks.Task<T0>
 M00000007_IL_0000:
 M00000007_IL_0001:
 M00000007_IL_0002:
 ldarg 0
 M00000007_IL_0003:
-ldfld System.Threading.Tasks.Task<T0>::source
-M00000007_IL_0008:
+ret
+.end
+.method instance GetResult() -> T0
+M00000008_IL_0000:
+M00000008_IL_0001:
+M00000008_IL_0002:
+ldarg 0
+M00000008_IL_0003:
+ldfld System.Tasks.Task<T0>::source
+M00000008_IL_0008:
+callvirt instance System.Tasks.TaskCompletionSource<T0>::Read()
+M00000008_IL_000d:
+ret
+.end
+.method instance OnCompleted(System.Func<Void> callback) -> noresult
+M00000009_IL_0000:
+M00000009_IL_0001:
+M00000009_IL_0002:
+ldarg 0
+M00000009_IL_0003:
+ldfld System.Tasks.Task<T0>::source
+M00000009_IL_0008:
 ldarg 1
-M00000007_IL_0009:
-callvirt instance System.Threading.Tasks.TaskCompletionSource<T0>::Register(System.Func<Void>)
-M00000007_IL_000e:
-M00000007_IL_000f:
+M00000009_IL_0009:
+callvirt instance System.Tasks.TaskCompletionSource<T0>::Register(System.Func<Void>)
+M00000009_IL_000e:
+M00000009_IL_000f:
 ret
 .end
 .end

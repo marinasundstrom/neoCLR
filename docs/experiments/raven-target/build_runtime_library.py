@@ -10,7 +10,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[3]
 SLICES = {
-    'Tasks': 'System.Threading.Tasks.Task',
+    'Tasks': 'System.Tasks.Task',
 
     'Array': 'System.Array',
     'Object': 'System.Object',
@@ -97,7 +97,7 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
-    'Tasks': 'runtime/raven/src/System/Threading/Tasks/Tasks.rvn',
+    'Tasks': 'runtime/raven/src/System/Tasks/Tasks.rvn',
 
     'Array': 'runtime/raven/src/System/Array.rvn',
     'Object': 'runtime/raven/src/System/Object.rvn',

@@ -20,7 +20,7 @@ parser.add_argument('--runtime', type=Path, required=True)
 args = parser.parse_args()
 prelude = '''import System.*
 import System.Collections.*
-import System.Threading.Tasks.*
+import System.Tasks.*
 import System.Result.*
 import System.Console.*
 

@@ -180,7 +180,7 @@ static class ApplicationTypes
         var field = reference.Resolve();
         if (field is null || !Modules.Contains(field.Module)) return null;
         var owner = Type(reference.DeclaringType)!;
-        if (field.IsStatic || (!IsLibrary(field.DeclaringType) && reference.FullName != field.FullName) || (!field.IsPublic && caller.DeclaringType != field.DeclaringType))
+        if (field.IsStatic || (!IsLibrary(field.DeclaringType) && reference.FullName != field.FullName) || (!field.IsPublic && caller.DeclaringType != field.DeclaringType && !(field.IsAssembly && field.Module == caller.Module)))
             throw new InvalidDataException("Unsupported application field access.");
         if (IsLibrary(field.DeclaringType) && !LibraryImplementation.SameType(
             Close(reference.FieldType, reference.DeclaringType), Close(field.FieldType, reference.DeclaringType)))

@@ -31,6 +31,8 @@ static class ProjectBuild
         var propagation = project.CompilationOptions.RuntimePropagationContract;
         if (propagation is not null && propagation != new RuntimePropagationContract(CoreDeclarations.Identity, "System.Propagatable`3"))
             throw new InvalidDataException("Unsupported neoCLR project propagation contract.");
+        workspace.TryApplyChanges(project.WithCompilationOptions(project.CompilationOptions
+            .WithHeapAsyncStateMachines(true).WithAsyncExceptionCapture(false)).Solution);
         var compilation = workspace.GetCompilation(id)!;
         using var image = new MemoryStream();
         var emitted = compilation.Emit(image);

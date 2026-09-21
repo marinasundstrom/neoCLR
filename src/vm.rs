@@ -1639,6 +1639,31 @@ fn interpret_instructions(
             None
         };
 
+        let current_task_queue = if matches!(op, Op::Call(target) if target.name == "neoCLR.Runtime.CurrentTaskQueue")
+        {
+            frames
+                .iter()
+                .rev()
+                .find_map(|frame| {
+                    let id = frame.function.definition.as_ref()?;
+                    if id.module != "System"
+                        || !frame.function.instance
+                        || frame.function.owner.as_ref()
+                            != Some(&Type::from_name("System.Tasks.TaskQueue"))
+                        || !matches!(
+                            frame.function.name.as_str(),
+                            "System.Tasks.TaskQueue.Run" | "System.Tasks.TaskQueue.Drain"
+                        )
+                    {
+                        return None;
+                    }
+                    frame.args.first().map(|slot| slot.borrow().get())
+                })
+                .transpose()?
+        } else {
+            None
+        };
+
         // Host Result propagates terminal faults; there is no guest exception machinery.
         let step = (|| -> Result<Option<Value>, Fault> {
             let frame = frames
@@ -2520,14 +2545,22 @@ fn interpret_instructions(
                         ) {
                             arrays_used = true;
                         }
-                        let value = binding.invoke(
-                            args,
-                            executing_assembly.as_deref(),
-                            module,
-                            &limits,
-                            output,
-                            options,
-                        )?;
+                        let value = if matches!(binding, crate::native::Binding::CurrentTaskQueue) {
+                            current_task_queue.clone().ok_or_else(|| {
+                                Fault::new(
+                                    "Async work requires an active TaskQueue.Run or Drain scope",
+                                )
+                            })?
+                        } else {
+                            binding.invoke(
+                                args,
+                                executing_assembly.as_deref(),
+                                module,
+                                &limits,
+                                output,
+                                options,
+                            )?
+                        };
                         let value = if matches!(
                             binding,
                             crate::native::Binding::Reflection(_)

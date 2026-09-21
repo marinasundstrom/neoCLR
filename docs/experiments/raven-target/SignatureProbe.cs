@@ -385,7 +385,7 @@ static class SignatureProbe
         Check("Generic Void return stays a value signature", RuntimeSignatures.Match(voidInvoke, invoke, GenericUnionBindings.Type).Result == "Void");
         Check("Completion delegate call discards interpreter unit", DelegateBindings.Bind(voidInvoke, invoke, true)?.Result == "noresult");
         Reject("Delegate requires virtual invocation", () => DelegateBindings.Bind(voidInvoke, invoke, false));
-        var taskDefinition = module.GetType("System.Threading.Tasks.Task`1");
+        var taskDefinition = module.GetType("System.Tasks.Task`1");
         var taskInt = new GenericInstanceType(taskDefinition);
         taskInt.GenericArguments.Add(module.TypeSystem.Int32);
         var getResult = taskDefinition.Methods.Single(m => m.Name == "GetResult");

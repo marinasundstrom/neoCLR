@@ -1,0 +1,19 @@
+import System.*
+import System.Tasks.*
+import System.Console.*
+
+public async func PrintAnswer(input: Task<int>) -> Task<unit> {
+    let value = await input
+    WriteLine(value + 1)
+    return ()
+}
+
+func Main() {
+    let queue = TaskQueue()
+    let source = TaskCompletionSource<int>(queue)
+    queue.Run(() => {
+        _ = PrintAnswer(source.Task)
+        WriteLine("Suspended")
+        _ = source.TrySetResult(41)
+    })
+}

@@ -3,22 +3,24 @@ using Mono.Cecil;
 // Provisional single-invocation completion API. No exception or async lowering policy.
 static class TaskBindings
 {
-    const string Prefix = "System.Threading.Tasks.";
+    const string Prefix = "System.Tasks.";
     const string Queue = Prefix + "TaskQueue";
     static readonly Dictionary<string, (string Kind, string Payload)> Shapes = new();
     public static void Reset() => Shapes.Clear();
     public static bool IsType(string type) => Shapes.ContainsKey(type);
     public const string Declarations = """
-        namespace Threading.Tasks {
+        namespace Tasks {
             public sealed class TaskQueue {
                 public TaskQueue() { }
                 public void Post(Func<PropagationUnit> callback) { }
                 public void Drain() { }
+                public void Run(Func<PropagationUnit> callback) { }
             }
-            public sealed class Task<T> {
+            public sealed class Task<T> : Runtime.CompilerServices.ITaskAwaiter {
                 public Task(TaskCompletionSource<T> source) { }
                 public bool IsCompleted => default;
                 public T GetResult() => default;
+                public Task<T> GetAwaiter() => default;
                 public void OnCompleted(Func<PropagationUnit> callback) { }
             }
             public sealed class TaskCompletionSource<T> {
@@ -28,6 +30,22 @@ static class TaskBindings
                 public bool Completed() => default;
                 public T Read() => default;
                 public void Register(Func<PropagationUnit> callback) { }
+            }
+        }
+        namespace Runtime.CompilerServices {
+            public interface IAsyncStateMachine {
+                void MoveNext();
+                void SetStateMachine(IAsyncStateMachine stateMachine);
+            }
+            public interface ITaskAwaiter { void OnCompleted(Func<PropagationUnit> callback); }
+            public sealed class AsyncTaskMethodBuilder<T> {
+                public AsyncTaskMethodBuilder(Tasks.TaskQueue queue) { }
+                public static AsyncTaskMethodBuilder<T> Create() => default;
+                public Tasks.Task<T> Task => default;
+                public void Start(IAsyncStateMachine stateMachine) { }
+                public void SetStateMachine(IAsyncStateMachine stateMachine) { }
+                public void SetResult(T value) { }
+                public void AwaitOnCompleted(ITaskAwaiter awaiter, IAsyncStateMachine stateMachine) { }
             }
         }
         """;
@@ -72,8 +90,12 @@ static class TaskBindings
             || kind == "TaskCompletionSource" && definition.Name is "Completed" or "Read" or "Register";
         if (internalMember ? !library || !definition.IsAssembly : !definition.IsPublic)
             throw new InvalidDataException("Invalid Task member visibility.");
+        if (kind == "Task" && (definition.DeclaringType.Interfaces.Count != 1
+            || definition.DeclaringType.Interfaces[0].InterfaceType.FullName != "System.Runtime.CompilerServices.ITaskAwaiter"
+            || !RuntimeSignatures.IsCore(definition.DeclaringType.Interfaces[0].InterfaceType.Scope)))
+            throw new InvalidDataException("Invalid Task awaiter interface.");
         if (!definition.DeclaringType.IsSealed || definition.DeclaringType.IsInterface
-            || definition.DeclaringType.HasInterfaces
+            || (kind != "Task" && definition.DeclaringType.HasInterfaces)
             || definition.DeclaringType.GenericParameters.Any(p => p.HasConstraints || p.Attributes != GenericParameterAttributes.NonVariant)
             || !reference.HasThis || definition.IsStatic || definition.HasGenericParameters
             || !definition.IsPublic && !(library && definition.IsAssembly)
@@ -82,10 +104,11 @@ static class TaskBindings
         var expected = (kind, definition.Name) switch
         {
             ("TaskQueue", ".ctor") => ("", "noresult"),
-            ("TaskQueue", "Post") => ("System.Func<Void>", "noresult"),
+            ("TaskQueue", "Post" or "Run") => ("System.Func<Void>", "noresult"),
             ("TaskQueue", "Drain") => ("", "noresult"),
             ("Task", ".ctor") => (Prefix + "TaskCompletionSource<" + payload + ">", "noresult"),
             ("Task", "get_IsCompleted") => ("", "Boolean"),
+            ("Task", "GetAwaiter") => ("", owner),
             ("Task", "GetResult") => ("", payload),
             ("Task", "OnCompleted") => ("System.Func<Void>", "noresult"),
             ("TaskCompletionSource", ".ctor") => (Queue, "noresult"),

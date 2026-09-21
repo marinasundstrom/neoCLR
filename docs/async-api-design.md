@@ -202,3 +202,11 @@ or Result-aware scheduler is implied.
 The exception-free target policy is independent of the payload type. Validate the
 same immediate/pending completion behavior with int, unit, an unrelated user union
 and Result payloads, so the compiler contract cannot accidentally depend on Result.
+
+## Implemented PoC — 2026-09-21
+
+[System.Tasks contracts](task-contracts.md) now execute named async functions with
+pending awaits through an explicit TaskQueue. Result is still an ordinary payload;
+no exceptions or ConfigureAwait policy are introduced. The builder/state protocol
+is provisional and may be replaced by runtime suspension. Threading is a subsequent
+slice, not a guarantee of this completion implementation.

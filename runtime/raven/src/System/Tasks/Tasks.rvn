@@ -1,4 +1,4 @@
-namespace System.Threading.Tasks
+namespace System.Tasks {
 
 import System.*
 import System.Collections.*
@@ -17,6 +17,16 @@ public class TaskQueue {
         pending.Add(callback)
     }
 
+    func Run(callback: Func<System.Void>) {
+        if running {
+            System.Fault("Task queue cannot be pumped recursively")
+        }
+        running = true
+        callback()
+        running = false
+        self.Drain()
+    }
+
     func Drain() {
         if running {
             System.Fault("Task queue cannot be pumped recursively")
@@ -33,7 +43,7 @@ public class TaskQueue {
     }
 }
 
-public class Task<T> {
+public class Task<T> : System.Runtime.CompilerServices.ITaskAwaiter {
     private field source: TaskCompletionSource<T>
 
     internal init(source: TaskCompletionSource<T>) {
@@ -45,6 +55,8 @@ public class Task<T> {
             return source.Completed()
         }
     }
+
+    func GetAwaiter() -> Task<T> => self
 
     func GetResult() -> T => source.Read()
 
@@ -95,6 +107,50 @@ public class TaskCompletionSource<T> {
             queue.Post(callback)
         } else {
             callbacks.Add(callback)
+        }
+    }
+}
+
+}
+
+namespace System.Runtime.CompilerServices {
+    import System.*
+    import System.Tasks.*
+
+    public interface IAsyncStateMachine {
+        func MoveNext()
+        func SetStateMachine(stateMachine: IAsyncStateMachine)
+    }
+
+    public interface ITaskAwaiter {
+        func OnCompleted(callback: Func<System.Void>)
+    }
+
+    public class AsyncTaskMethodBuilder<T> {
+        private field source: TaskCompletionSource<T>
+
+        init(queue: TaskQueue) {
+            source = TaskCompletionSource<T>(queue)
+        }
+
+        static func Create() -> AsyncTaskMethodBuilder<T> {
+            return AsyncTaskMethodBuilder<T>(RuntimeServices.CurrentTaskQueue())
+        }
+
+        val Task: Task<T> => source.Task
+
+        func Start(stateMachine: IAsyncStateMachine) {
+            stateMachine.MoveNext()
+        }
+
+        func SetStateMachine(stateMachine: IAsyncStateMachine) { }
+
+        func SetResult(value: T) {
+            _ = source.TrySetResult(value)
+        }
+
+        func AwaitOnCompleted(awaiter: ITaskAwaiter, stateMachine: IAsyncStateMachine) {
+            awaiter.OnCompleted(stateMachine.MoveNext)
         }
     }
 }

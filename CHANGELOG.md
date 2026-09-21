@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-21
 
+- Execute provisional compiler-generated async/await in the Raven profile using
+  System.Tasks.Task<T>, TaskCompletionSource<T> and explicit TaskQueue.Run/Drain.
+  Rebuild references and replace System.Threading.Tasks imports. Result remains an
+  ordinary payload; exception capture and threading are not introduced. Validate
+  ten async scenarios, fifteen completion scenarios and 47 focused runtime checks.
+  This development behavior is not part of the published Preview 8 artifacts.
+
 - Permit constructors to initialize fields containing erased values without inventing
   a default payload. Unassigned fields remain unreadable and constructor publication
   still requires initialization; explicit invalid defaults remain rejected.

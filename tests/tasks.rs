@@ -15,7 +15,7 @@ fn library() -> &'static Module {
 }
 fn load(body: &str) -> Result<LoadedProgram, String> {
     let source = format!(".module App\n.entry Main\n.function Main() -> Int32\n{body}\nret\n.end")
-        .replace("Tasks.", "System.Threading.Tasks.");
+        .replace("Tasks.", "System.Tasks.");
     let app = neoclr::assembler::read_modules(
         &[neoclr::assembler::ModuleInput::Source(&source)],
         library(),
@@ -115,4 +115,11 @@ ldc.i4 0
 "#
     );
     assert!(load(&body).is_err());
+}
+
+#[test]
+fn active_task_queue_is_not_a_process_global_default() {
+    let program = load("call neoCLR.Runtime.CurrentTaskQueue()\npop\nldc.i4 0").unwrap();
+    let error = program.run(Limits::default()).unwrap_err().to_string();
+    assert!(error.contains("requires an active TaskQueue"), "{error}");
 }

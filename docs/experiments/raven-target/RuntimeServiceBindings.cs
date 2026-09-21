@@ -49,6 +49,7 @@ static class RuntimeServiceBindings
             ("TypeArgument", ["System.RuntimeTypeHandle", "Int32"], "System.RuntimeTypeHandle"),
             ("TypeShape", ["System.RuntimeTypeHandle", "Int32"], "Boolean"),
             ("TypeDisplayName", ["System.RuntimeTypeHandle", "Int32"], "String"),
+            ("CurrentTaskQueue", [], "System.Tasks.TaskQueue"),
             ("ExecutingAssembly", [], "System.Introspection.AssemblyInfo"),
             ("AssemblyName", ["String"], "String"),
             ("AssemblyMetadataToken", ["String"], "Int32"),

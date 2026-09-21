@@ -17,6 +17,7 @@ pub(crate) enum Binding {
     Reflection(crate::reflection::Query),
     ObjectTypeHandle,
     ExecutingAssembly,
+    CurrentTaskQueue,
     AssemblyInfo(crate::assembly_info::Query),
     TypeName,
     TypeEquals,
@@ -166,6 +167,10 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             (Binding::ReadAllText, Type::Value)
         }
         ("neoCLR.Runtime.ConsoleReadByte", []) => (Binding::ConsoleReadByte, Type::Value),
+        ("neoCLR.Runtime.CurrentTaskQueue", []) => (
+            Binding::CurrentTaskQueue,
+            Type::from_name("System.Tasks.TaskQueue"),
+        ),
         ("neoCLR.Runtime.ExecutingAssembly", []) => (
             Binding::ExecutingAssembly,
             Type::from_name("System.Introspection.AssemblyInfo"),

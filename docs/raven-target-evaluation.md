@@ -1021,3 +1021,20 @@ compiler groundwork, not generated async execution on neoCLR. Its custom builder
 awaiter, scheduling context and importer path remain to be connected and tested.
 No website capability claim changes: the completion PoC is still the implemented
 neoCLR behavior.
+
+## Generated async PoC — 2026-09-21
+
+Raven neoclr commit 56543aecf connects target Task/builder metadata and by-value
+reference protocols. The bridge sets WithHeapAsyncStateMachines(true) and
+WithAsyncExceptionCapture(false); System.Tasks is the public completion namespace.
+Captured parameters are initialized in state constructors before publication;
+awaiter clearing uses typed null storage. Same-module internal members retain their
+visibility in imported metadata. Task<Result<T,E>> is ordinary generic completion.
+
+Ten source scenarios pass on neoCLR, alongside fifteen completion scenarios and
+47 focused runtime tests. Raven passes 38 focused modern .NET checks. See
+[Task contracts](task-contracts.md) for exact scope and commands. Generic async
+methods, async lambdas, hoisted non-default aggregates and broad disposal need
+further validation. Nested lambda capture failures are deferred general compiler
+candidates for independent main-based reproduction; target metadata policy remains
+on neoclr. No .NET Framework or NanoFramework execution is claimed.

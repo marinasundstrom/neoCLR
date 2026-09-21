@@ -41,7 +41,7 @@ static class GenericUnionBindings
         if (type.FullName == "System.Option/None" && type.IsValueType && RuntimeSignatures.IsCore(type.Scope)) return Register("Option.None");
         if (type.FullName == "System.Value" && type.IsValueType && RuntimeSignatures.IsCore(type.Scope)) return "Value";
         if (type.FullName == "System.Void" && type.IsValueType && RuntimeSignatures.IsCore(type.Scope)) return "Void";
-        return ApplicationTypes.Type(type) ?? TaskBindings.Type(type) ?? ReflectionBindings.Type(type) ?? CollectionBindings.Type(type) ?? InterfaceBindings.Type(type) ?? DelegateBindings.Type(type) ?? NativeMemoryBindings.Type(type) ?? ManagedArrayBindings.Type(type) ?? CalendarBindings.Type(type) ?? ErrorBindings.Type(type) ?? PrimitiveBindings.Type(type) ?? type.MetadataType switch {
+        return ApplicationTypes.Type(type) ?? TaskBindings.Type(type) ?? AsyncBindings.Type(type) ?? ReflectionBindings.Type(type) ?? CollectionBindings.Type(type) ?? InterfaceBindings.Type(type) ?? DelegateBindings.Type(type) ?? NativeMemoryBindings.Type(type) ?? ManagedArrayBindings.Type(type) ?? CalendarBindings.Type(type) ?? ErrorBindings.Type(type) ?? PrimitiveBindings.Type(type) ?? type.MetadataType switch {
             MetadataType.Int32 => "Int32", MetadataType.Double => "Double", MetadataType.Boolean => "Boolean", MetadataType.String => "String", _ => null
         };
     }

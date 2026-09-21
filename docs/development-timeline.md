@@ -4673,3 +4673,27 @@ remain separate: Result is an ordinary payload, and state-machine machinery stay
 provisional. Thread and ThreadPool APIs are deferred. Compiler integration is in
 progress; the existing completion PoC does not yet establish generated async
 execution on neoCLR.
+
+## 2026-09-20 — Task belongs to completion, not threading
+
+The author directed finishing the active async slice and placing Task-related APIs
+in `System.Tasks`, explaining that they are not tied to threading specifically.
+The assistant adopted that namespace for Task, TaskCompletionSource and TaskQueue.
+The compiler-facing state-machine interfaces and builder remain provisional
+CompilerServices machinery. Threads remain deferred; Result stays an ordinary Task
+payload rather than a task failure state. End-to-end validation is in progress.
+
+## 2026-09-21 — Async execution and next platform slices
+
+The assistant completed ten end-to-end generated-async scenarios, including pending
+and completed awaits, GC across two suspensions, unit, Result propagation before
+and after await, composition and queue scope failures. Fifteen completion scenarios
+and 47 focused runtime checks pass. Raven's neoclr branch contains the target builder
+integration (56543aecf); 38 focused compiler checks pass. The namespace is System.Tasks.
+The runtime constructor-storage correction was committed separately as d062a04.
+
+The author then asked for a small Thread and ThreadPool API after the Task PoC,
+renaming System.IO to System.Storage in anticipation of storage providers, and a
+new locally installed build. This supersedes the earlier deferral of threads after
+async completion. The assistant accepted separate implementation slices; worker
+isolation versus shared-object semantics remains to be settled before implementation.

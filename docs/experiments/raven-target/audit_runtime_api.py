@@ -187,7 +187,7 @@ for file in source['sourceFiles']:
 result = {'purpose': 'Explicit source-by-source API audit. Samples and signature checks are evidence, not a claim of arbitrary generic/compiler support.',
           'declarationCount': sum(r['declarations'] for r in rows), 'sources': rows}
 result['targetProfileAdditions'] = [{
-    'file': 'runtime/raven/src/System/Threading/Tasks/Tasks.rvn',
+    'file': 'runtime/raven/src/System/Tasks/Tasks.rvn',
     'disposition': 'provisional-raven-task-completion',
     'samples': ['library-tasks.rvn'],
     'tests': ['tests/tasks.rs', 'docs/experiments/task-contract/verify_tasks.py'],

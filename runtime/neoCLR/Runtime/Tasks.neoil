@@ -1,0 +1,3 @@
+.function neoCLR.Runtime.CurrentTaskQueue() -> System.Tasks.TaskQueue
+.methodimpl InternalCall
+.end

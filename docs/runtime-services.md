@@ -94,3 +94,12 @@ analysis does not yet distinguish their operand kinds.
 
 The preliminary `ref.eq` managed-location comparison uses SlotReferences; it neither
 requires an Object root nor invokes value equality. See [reference identity](reference-identity.md).
+
+## Provisional Task dispatch
+
+The development Raven profile declares TaskDispatch for the bootstrap-only
+neoCLR.Runtime.CurrentTaskQueue service. It returns the nearest live System library
+TaskQueue.Run/Drain receiver. Calling outside such a scope is a terminal Fault;
+there is no process-global default queue. Existing frame roots retain the receiver.
+The service does not start threads or provide progress after an invocation. See
+[Task contracts](task-contracts.md) for the current scheduling limits.
