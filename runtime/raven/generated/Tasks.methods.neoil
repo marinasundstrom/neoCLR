@@ -162,27 +162,27 @@ call neoCLR.Library.System.Tasks.Task.RuntimeUnion5<T0>(System.Option.None)
 M00000008_IL_0075:
 ret
 .end
-.method instance GetAwaiter() -> System.Tasks.Task<T0>
+.method internal instance Dispatcher() -> System.Tasks.TaskQueue
 M00000009_IL_0000:
 M00000009_IL_0001:
 M00000009_IL_0002:
 ldarg 0
 M00000009_IL_0003:
+ldfld System.Tasks.Task<T0>::source
+M00000009_IL_0008:
+callvirt instance System.Tasks.Promise<T0>::Dispatcher()
+M00000009_IL_000d:
 ret
 .end
-.method instance GetResult() -> T0
+.method instance GetAwaiter() -> System.Tasks.Task<T0>
 M0000000a_IL_0000:
 M0000000a_IL_0001:
 M0000000a_IL_0002:
 ldarg 0
 M0000000a_IL_0003:
-ldfld System.Tasks.Task<T0>::source
-M0000000a_IL_0008:
-callvirt instance System.Tasks.Promise<T0>::Read()
-M0000000a_IL_000d:
 ret
 .end
-.method instance OnCompleted(System.Func<Void> callback) -> noresult
+.method instance GetResult() -> T0
 M0000000b_IL_0000:
 M0000000b_IL_0001:
 M0000000b_IL_0002:
@@ -190,11 +190,23 @@ ldarg 0
 M0000000b_IL_0003:
 ldfld System.Tasks.Task<T0>::source
 M0000000b_IL_0008:
+callvirt instance System.Tasks.Promise<T0>::Read()
+M0000000b_IL_000d:
+ret
+.end
+.method instance OnCompleted(System.Func<Void> callback) -> noresult
+M0000000c_IL_0000:
+M0000000c_IL_0001:
+M0000000c_IL_0002:
+ldarg 0
+M0000000c_IL_0003:
+ldfld System.Tasks.Task<T0>::source
+M0000000c_IL_0008:
 ldarg 1
-M0000000b_IL_0009:
+M0000000c_IL_0009:
 callvirt instance System.Tasks.Promise<T0>::Register(System.Func<Void>)
-M0000000b_IL_000e:
-M0000000b_IL_000f:
+M0000000c_IL_000e:
+M0000000c_IL_000f:
 ret
 .end
 .end

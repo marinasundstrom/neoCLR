@@ -4,6 +4,12 @@ using Mono.Cecil;
 static class OutcomeOperatorBindings
 {
     public const string Declarations = """
+        namespace Tasks {
+            public static class TaskOperators {
+                public static Task<U> Map<T,U>(this Task<T> self, Func<T,U> transform) => default;
+                public static Task<U> Then<T,U>(this Task<T> self, Func<T,Task<U>> continuation) => default;
+            }
+        }
         public static class OptionOperators {
             public static Option<U> Map<T,U>(this Option<T> self, Func<T,U> mapper) => default;
             public static Option<U> Then<T,U>(this Option<T> self, Func<T,Option<U>> binder) => default;
@@ -39,6 +45,8 @@ static class OutcomeOperatorBindings
 
     sealed record Contract(string Owner, string Name, int Arity, string[] Arguments, string Result);
     static readonly Contract[] Contracts = [
+        new("System.Tasks.TaskOperators", "Map", 2, ["System.Tasks.Task<@0>", "System.Func<@0,@1>"], "System.Tasks.Task<@1>"),
+        new("System.Tasks.TaskOperators", "Then", 2, ["System.Tasks.Task<@0>", "System.Func<@0,System.Tasks.Task<@1>>"], "System.Tasks.Task<@1>"),
         new("System.OptionOperators", "Map", 2, ["System.Option<@0>", "System.Func<@0,@1>"], "System.Option<@1>"),
         new("System.OptionOperators", "Then", 2, ["System.Option<@0>", "System.Func<@0,System.Option<@1>>"], "System.Option<@1>"),
         new("System.OptionOperators", "Filter", 1, ["System.Option<@0>", "System.Func<@0,Boolean>"], "System.Option<@0>"),
@@ -68,7 +76,7 @@ static class OutcomeOperatorBindings
 
     public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition, bool callvirt)
     {
-        if (reference.DeclaringType.FullName is not ("System.OptionOperators" or "System.ResultOperators" or "System.OptionNestedOperators")) return null;
+        if (reference.DeclaringType.FullName is not ("System.OptionOperators" or "System.ResultOperators" or "System.OptionNestedOperators" or "System.Tasks.TaskOperators")) return null;
         if (!RuntimeSignatures.IsCore(reference.DeclaringType.Scope) || reference.HasThis || callvirt
             || reference is not GenericInstanceMethod method
             || definition.GenericParameters.Any(p => p.HasConstraints || p.Attributes != GenericParameterAttributes.NonVariant))

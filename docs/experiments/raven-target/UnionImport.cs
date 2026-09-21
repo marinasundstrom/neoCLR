@@ -19,7 +19,7 @@ static class UnionImport
     const string Carrier = "System.Result<Int32,System.OverflowError>";
     const string Ok = "System.Result.Ok<Int32>";
     const string Error = "System.Result.Error<System.OverflowError>";
-    sealed record Slot(string Type, int Local = -1, int ConditionalOut = -1, int Argument = -1, MethodDefinition? Function = null, bool VirtualFunction = false);
+    sealed record Slot(string Type, int Local = -1, int ConditionalOut = -1, int Argument = -1, MethodDefinition? Function = null, bool VirtualFunction = false, string? FunctionReceiver = null);
     sealed record State(List<Slot> Stack, bool[] Assigned);
     sealed record Call(string Name, string[] Arguments, string Result, int OutArgument = -1, string? Instruction = null, bool ConditionalOutput = false);
 
@@ -54,7 +54,7 @@ static class UnionImport
         if (libraryOwner is not null) ApplicationTypes.SetLibraryScope(app.MainModule, libraryOwner);
         var entry = libraryOwner is null ? app.EntryPoint ?? throw new InvalidDataException("Missing entry point.") : null;
         string Name(MethodDefinition method) => libraryOwner is null ? MetadataIdentity.FunctionName(method)
-            : exports.Contains(method) ? libraryOwner + "." + LibraryImplementation.GenericName(method)
+            : exports.Contains(method) ? (method.DeclaringType.FullName == "System.Tasks.TaskOperators" ? method.DeclaringType.FullName : libraryOwner) + "." + LibraryImplementation.GenericName(method)
             : throw new InvalidDataException("Unexported implementation dependency: " + method.FullName);
         if (entry is not null && (entry.Parameters.Count != 0 || entry.ReturnType.MetadataType != MetadataType.Void))
             throw new InvalidDataException("Result profile requires a parameterless no-result entry.");
@@ -453,7 +453,15 @@ static class UnionImport
                         ApplicationTypes.CheckMethod(functionReference);
                         var functionTarget = ClosureAudit.ResolveMethod(functionReference) ?? throw new InvalidDataException("Unresolved delegate target.");
                         var virtualFunction = instruction.OpCode.Code == Code.Ldvirtftn;
-                        if (!ApplicationTypes.IsModule(functionTarget.Module) || functionReference.FullName != functionTarget.FullName
+                        // A bounded generic library callback retains its constructed receiver.
+                        // The adapter itself is emitted once on the generic type definition.
+                        var genericLibraryCallback = libraryOwner is not null && !virtualFunction
+                            && functionReference.DeclaringType is GenericInstanceType
+                            && ApplicationTypes.IsLibrary(functionReference.DeclaringType)
+                            && functionTarget.HasThis && !functionTarget.HasParameters
+                            && functionTarget.ReturnType.MetadataType == MetadataType.Void
+                            && ApplicationTypes.Matches(functionReference, functionTarget);
+                        if (!ApplicationTypes.IsModule(functionTarget.Module) || (!genericLibraryCallback && functionReference.FullName != functionTarget.FullName)
                             || functionTarget.IsConstructor || (!functionTarget.HasBody && !virtualFunction)
                             || functionTarget.DeclaringType.IsValueType && functionTarget.HasThis)
                             throw new InvalidDataException("Only static or class application delegate targets are admitted: " + functionReference.FullName + "; " + instruction.OpCode);
@@ -469,7 +477,8 @@ static class UnionImport
                             delegateAdapters[checkName] = $".function {checkName}({receiverType}) -> void\n.local {receiverType} empty\nldloca empty\ninitobj {receiverType}\nldarg 0\nldloc empty\nref.eq\nbrfalse Valid\nfault \"null delegate receiver\"\nValid:\nret\n.end\n";
                             code.AppendLine($"call {checkName}({receiverType})");
                         }
-                        Push(new("FunctionAddress", Function: functionTarget, VirtualFunction: virtualFunction)); break;
+                        Push(new("FunctionAddress", Function: functionTarget, VirtualFunction: virtualFunction,
+                            FunctionReceiver: genericLibraryCallback ? ApplicationTypes.Receiver(functionReference) : null)); break;
                     case Code.Newobj:
                         var constructor = (MethodReference)instruction.Operand;
                         var constructorDefinition = constructor.Resolve() ?? throw new InvalidDataException("Unresolved constructor.");
@@ -510,7 +519,7 @@ static class UnionImport
                             DelegateBindings.Constructor(constructor, constructorDefinition);
                             var addressSlot = Pop();
                             var function = addressSlot.Function ?? throw new InvalidDataException("Delegate requires an admitted function address.");
-                            if (function.HasThis) Expect(ApplicationTypes.Receiver(function));
+                            if (function.HasThis) Expect(addressSlot.FunctionReceiver ?? ApplicationTypes.Receiver(function));
                             else Expect("FaultNull");
                             var signature = DelegateBindings.Signature(delegateType);
                             var targetArguments = function.Parameters.Select(p => ProfileType(p.ParameterType)).ToArray();
@@ -540,7 +549,7 @@ static class UnionImport
                                     code.AppendLine("newobj " + adapterOwner);
                                 }
                                 else ApplicationTypes.AddAdapter(owner, adapterName, body.ToString());
-                                code.AppendLine($"delegate.bind {delegateType} = instance {adapterOwner}::{adapterName}({string.Join(',', targetArguments)})");
+                                code.AppendLine($"delegate.bind {delegateType} = instance {addressSlot.FunctionReceiver ?? adapterOwner}::{adapterName}({string.Join(',', targetArguments)})");
                                 Push(new(delegateType)); break;
                             }
                             var targetName = Name(function);

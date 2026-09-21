@@ -80,6 +80,8 @@ public class Task<T> : System.Runtime.CompilerServices.ITaskAwaiter {
         }
     }
 
+    internal func Dispatcher() -> TaskQueue => source.Dispatcher()
+
     func GetAwaiter() -> Task<T> => self
 
     func GetResult() -> T => source.Read()
@@ -131,6 +133,8 @@ public class Promise<T> {
         }
         return true
     }
+
+    internal func Dispatcher() -> TaskQueue => queue
 
     internal func Cancelled() -> bool => cancelled
 

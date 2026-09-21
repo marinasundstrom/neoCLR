@@ -37,8 +37,8 @@ Result.
 
 The following gap analysis records the state before implementation. The first core
 slice now adds TaskState, TaskOutcome<T>, State/Outcome and Complete/Cancel; see
-[current contracts](task-contracts.md). Composition, tokens and cancelled-await
-propagation remain outstanding.
+[current contracts](task-contracts.md). Map/Then composition is also implemented in the following slice; tokens and
+cancelled-await propagation remain outstanding.
 
 ## Gaps identified at assessment
 

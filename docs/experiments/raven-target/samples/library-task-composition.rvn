@@ -1,0 +1,21 @@
+import System.*
+import System.Tasks.*
+import System.Console.*
+
+func Format(queue: TaskQueue, value: int) -> Task<string> {
+    let promise = Promise<string>(queue)
+    promise.Complete(value.ToString())
+    return promise.Task
+}
+
+func Main() {
+    let queue = TaskQueue()
+    let promise = Promise<int>(queue)
+    let answer = promise.Task
+        .Map(value => value + 1)
+        .Then(value => Format(queue, value))
+
+    answer.OnCompleted(() => WriteLine(answer.GetResult()))
+    promise.Complete(41)
+    queue.Drain()
+}

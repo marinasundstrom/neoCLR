@@ -243,6 +243,7 @@
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Tasks'">
     <Compile Include="src/System/Tasks/Tasks.rvn" />
+    <Compile Include="src/System/Tasks/TaskOperators.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Workers'">
     <Compile Include="src/System/Threading/Workers.rvn" />

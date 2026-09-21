@@ -70,3 +70,7 @@ no compiler or Runtime Contract configuration change is needed. This library
 catalog does not relax the generic application-body restriction above. The
 development query names are Filter and Map; Preview 8 retains Where and Select.
 See [outcome operators](raven-outcome-operators.md) for the bounded port.
+
+Task Map/Then also use Raven extension declarations under System.Tasks. They compose
+the existing Task model through queued callbacks; see the
+[Task composition contract](task-contracts.md#task-composition--2026-09-21).

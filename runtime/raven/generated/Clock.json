@@ -4,7 +4,7 @@
   "inputs": {
     "runtime/raven/src/System/Tasks/TaskOutcome.rvn": "746ea27b2d33c5840214ce6ca154e969205b45880aef4e1959a5c65b35e5b5e6",
     "runtime/raven/src/System/Tasks/TaskState.rvn": "297cecd35247b5d8b83e6b9c2d7288a556bd6ec81071f4c0d269d251b64acc87",
-    "runtime/raven/src/System/Tasks/Tasks.rvn": "d6045edc7ae9ed862186514e92f0407bf969f1064b585c9ba9ada20aec2e2ffc",
+    "runtime/raven/src/System/Tasks/Tasks.rvn": "4bdc007eaca547f106a4b4451970446401ac9fc1dd69482f6eaf8c7d87f68755",
     "runtime/raven/src/System/Threading/Workers.rvn": "7c0cddf9bf92e6169b4e2e3d90e679734df8f4aa004b7010c711a96d654d5a15",
     "runtime/raven/src/System/Array.rvn": "8015702d1767e692f05502b65d5cd06939936c73f0dbb16b12ab9768d7ae0ae9",
     "runtime/raven/src/System/Object.rvn": "89a0bcdac7c6508047c8c25fd61f0038fd75446f10282264f85241bc5c238219",
@@ -84,7 +84,8 @@
     "runtime/raven/src/System/Single.rvn": "488efaf36e56f147c7158a5b0637f3bc4e56e84bb3f514af6c64a023dcd8598e",
     "runtime/raven/src/System/Double.rvn": "cd3ad24e4a21b7616a2937da71891618284913e26ea180ce203276f18b631f33",
     "runtime/raven/src/System/Boolean.rvn": "1f0010fe0d346fbc7f3ba29c88b2c1cf80faebf42a4c2de2f0cd6cff15335022",
-    "runtime/raven/System.Runtime.rvnproj": "95bb3a59dd6611da587178f3fed669883369a1583edcc97266e48ec47e703f80",
+    "runtime/raven/src/System/Tasks/TaskOperators.rvn": "fb288d2176dd601e2e3d10dd5efdb9a12fe4f37c4eb1a154b7a1a8930ea4b7e4",
+    "runtime/raven/System.Runtime.rvnproj": "72d540a568e1a5cec14347e405be867af2c6e7d75dac99dd8d6ff90a65123de1",
     "build/NeoCLR.Raven.props": "efa105dcaeeb6d06d739ea14f5b44c9dcb310c4ccb82d69ba30bbd73a573fa28"
   },
   "outputs": {
@@ -92,7 +93,7 @@
     "Clock.helpers.neoil": "eeda6c34f4c4e23159ac7e86d1cfcbe77e06a5915d1b6f6ea9f430045eddb7f4"
   },
   "compilerSha256": "fd81ea896146b15d8fa66d2ba7c74b806a1dad1919012a77f7fe53242bbed105",
-  "coreSha256": "df2c84d2d6e285b22f73ef8e245d61aa60aa6a4aa8f4bc01cea2060e32f0cb9c",
+  "coreSha256": "a897d015f217fbb6f64fe5ec3d6b5d8693de083fbdde3ec06df81dd60d617856",
   "exports": [
     "get_Now() -> System.Instant"
   ]

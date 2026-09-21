@@ -136,3 +136,11 @@ neoCLR scenarios still pass, with 46 collections in the pending-state case. The
 resumed Transform method uses ?; failure returns from that ordinary method before
 the success computation, and the surrounding completion machinery treats its
 returned value uniformly. This still uses the manual probe, not generated async.
+
+## Task composition follow-up
+
+`verify_composition.py` exercises Map and Then against the current Task/Promise
+library. It covers queued callbacks on pending and terminal inputs, value-changing
+flattening, both stages of cancellation, Result.Error payloads, generic unit,
+cross-queue progress, GC retention, terminal callback Faults and private dispatcher
+access. See the [current Task contracts](../../task-contracts.md#task-composition--2026-09-21).

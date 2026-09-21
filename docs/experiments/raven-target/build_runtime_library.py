@@ -198,6 +198,7 @@ def digest(path):
 def fragments(text, name="Math", owner="System.Math", bootstrap=False):
     lines = text.splitlines(keepends=True)
     methods, helpers, types = [], {}, []
+    task_operators = []
     while lines:
         if not lines[0].strip():
             lines.pop(0)
@@ -225,7 +226,9 @@ def fragments(text, name="Math", owner="System.Math", bootstrap=False):
         assert match, lines[0]
         end = lines.index('.end\n')
         body = ''.join(lines[:end + 1])
-        if match[1].startswith(owner + '.'):
+        if name == 'Tasks' and match[1].startswith('System.Tasks.TaskOperators.'):
+            task_operators.append(body.replace('.function System.Tasks.TaskOperators.', '.method static ', 1))
+        elif match[1].startswith(owner + '.'):
             # Retain the bootstrap owner used by direct IL and the archived Neo frontend.
             # Namespace functions use marked containers; static APIs retain their owner.
             if owner == "System":
@@ -238,6 +241,8 @@ def fragments(text, name="Math", owner="System.Math", bootstrap=False):
             assert match[1] not in helpers
             helpers[match[1]] = body
         lines = lines[end + 1:]
+    if task_operators:
+        types.append('.type System.Tasks.TaskOperators\n' + ''.join(task_operators) + '.end\n')
     # Nongeneric classes can also own static factories. Merge their function roots
     # into the emitted class rather than leaving top-level method fragments.
     for body in types[:]:
@@ -317,6 +322,7 @@ def main():
                         raise SystemExit('Regenerated library differs: ' + output)
                 continue
             inputs = [ROOT / path for path in SOURCES.values()]
+            inputs += [ROOT / "runtime/raven/src/System/Tasks/TaskOperators.rvn"]
             inputs += [PROJECT, ROOT / 'build/NeoCLR.Raven.props']
             data = {'format': 'raven-library-bootstrap-v1', 'owner': owner,
                     'inputs': {str(p.relative_to(ROOT)): digest(p) for p in inputs},

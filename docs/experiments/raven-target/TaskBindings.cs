@@ -45,6 +45,7 @@ static class TaskBindings
                 public Option<TaskOutcome<T>> Outcome => default;
                 public bool IsCompleted => default;
                 public T GetResult() => default;
+                public TaskQueue Dispatcher() => default;
                 public Task<T> GetAwaiter() => default;
                 public void OnCompleted(Func<PropagationUnit> callback) { }
             }
@@ -53,6 +54,7 @@ static class TaskBindings
                 public Task<T> Task => default;
                 public bool Complete(T value) => default;
                 public bool Cancel() => default;
+                public TaskQueue Dispatcher() => default;
                 public bool Cancelled() => default;
                 public bool Completed() => default;
                 public T Read() => default;
@@ -79,8 +81,8 @@ static class TaskBindings
 
     public static void Project(ModuleDefinition module)
     {
-        foreach (var method in module.GetType(Prefix + "Task`1").Methods.Where(m => m.IsConstructor)
-            .Concat(module.GetType(Prefix + "Promise`1").Methods.Where(m => m.Name is "Completed" or "Cancelled" or "Read" or "Register")))
+        foreach (var method in module.GetType(Prefix + "Task`1").Methods.Where(m => m.IsConstructor || m.Name == "Dispatcher")
+            .Concat(module.GetType(Prefix + "Promise`1").Methods.Where(m => m.Name is "Completed" or "Cancelled" or "Read" or "Register" or "Dispatcher")))
             method.Attributes = (method.Attributes & ~MethodAttributes.MemberAccessMask) | MethodAttributes.Assembly;
     }
 
@@ -113,8 +115,8 @@ static class TaskBindings
         var owner = Type(reference.DeclaringType);
         if (owner is null) return null;
         var (kind, payload) = Shapes[owner];
-        var internalMember = kind == "Task" && definition.IsConstructor
-            || kind == "Promise" && definition.Name is "Completed" or "Cancelled" or "Read" or "Register";
+        var internalMember = kind == "Task" && (definition.IsConstructor || definition.Name == "Dispatcher")
+            || kind == "Promise" && definition.Name is "Completed" or "Cancelled" or "Read" or "Register" or "Dispatcher";
         if (internalMember ? !library || !definition.IsAssembly : !definition.IsPublic)
             throw new InvalidDataException("Invalid Task member visibility.");
         if (kind == "Task" && (definition.DeclaringType.Interfaces.Count != 1
@@ -137,6 +139,7 @@ static class TaskBindings
             ("Task", "get_State") => ("", EnumBindings.TaskState),
             ("Task", "get_Outcome") => ("", "System.Option<System.Tasks.TaskOutcome<" + payload + ">>"),
             ("Task", "get_IsCompleted") => ("", "Boolean"),
+            ("Task" or "Promise", "Dispatcher") when library => ("", Queue),
             ("Task", "GetAwaiter") => ("", owner),
             ("Task", "GetResult") => ("", payload),
             ("Task", "OnCompleted") => ("System.Func<Void>", "noresult"),

@@ -60,6 +60,8 @@ fn guest_il_cannot_bypass_completion_capabilities() {
     for body in [
         "ldloc source\nnewobj instance Tasks.Task<Int32>::.ctor(Tasks.Promise<Int32>)\npop\nldc.i4 0",
         "ldloc source\ncall instance Tasks.Promise<Int32>::Read()",
+        "ldloc source\ncall instance Tasks.Promise<Int32>::Dispatcher()\npop\nldc.i4 0",
+        "ldloc source\ncall instance Tasks.Promise<Int32>::get_Task()\ncall instance Tasks.Task<Int32>::Dispatcher()\npop\nldc.i4 0",
         "ldloc source\ncall instance Tasks.Promise<Int32>::Completed()\npop\nldc.i4 0",
         "ldloc source\ncall instance Tasks.Promise<Int32>::Cancelled()\npop\nldc.i4 0",
         "ldloc source\nldfld Tasks.Promise<Int32>::cancelled\npop\nldc.i4 0",

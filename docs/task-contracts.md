@@ -9,7 +9,7 @@ references and replace earlier System.Threading.Tasks imports.
 
 The [Task model alignment assessment](task-model-alignment.md) records the next
 contract. The core State/Outcome and producer cancellation slice is now implemented;
-Map/Then, cancellation tokens and automatic await cancellation propagation remain
+Cancellation tokens and automatic await cancellation propagation remain
 follow-up work. Rebuild reference/library artifacts and callers together.
 
 ## Consumer and producer
@@ -107,7 +107,7 @@ TaskQueue, callback registration and nonblocking result access are provisional
 supporting mechanisms. The builder and awaiter protocol is compiler-facing infrastructure added in the
 September 21 slice. Runtime-owned suspension may replace later compiler machinery.
 Cancellation requests and await propagation,
-timeouts, combinators, cross-thread races, host completion after an invocation,
+timeouts, concurrency combinators, cross-thread races, host completion after an invocation,
 UI affinity, logical context and fairness remain open. An endlessly replenished
 queue can starve its caller. APIs requiring those guarantees must wait for the
 corresponding contracts.
@@ -206,9 +206,9 @@ The published Preview 8 SDK does not implement these new project settings.
 
 The intended public API will grow Promise-style composition and continuation
 methods, using terminology appropriate to neoCLR rather than requiring .NET names.
-The updated proposal selects Map and Then as the fundamental operators; they are
-not implemented by the validated PoC. OnCompleted remains provisional protocol
-machinery. See the [alignment sequence](task-model-alignment.md).
+Map and Then now provide these fundamental operators. OnCompleted remains
+provisional protocol machinery. See the composition contract below and the
+[alignment sequence](task-model-alignment.md).
 
 
 ## Core Task model migration — 2026-09-21
@@ -248,3 +248,66 @@ four worker scenarios, nine direct runtime checks and 263 signature checks pass.
 The cancellation retention probe completed 38 garbage collections. Bootstrap
 snapshot hashes, runtime API inventory/audit and website checks pass. This does not
 validate cancelled await or multi-threaded Promise mutation.
+
+
+## Task composition — 2026-09-21
+
+Task operators use Raven extension declarations in System.Tasks. Import that
+namespace to write `task.Map(transform)` and `task.Then(continuation)`. The
+[composition sample](experiments/raven-target/samples/library-task-composition.rvn)
+starts with a pending Promise<int>, maps 41 to 42, chains a Task<string>, and prints
+42 when the queue drains. It needs no callback annotations.
+
+| Operator | Completed input | Cancelled input |
+| --- | --- | --- |
+| Map<U>(Func<T,U>) -> Task<U> | Invoke the transform once; complete with its value. | Cancel the returned Task without invoking the transform. |
+| Then<U>(Func<T,Task<U>>) -> Task<U> | Invoke the continuation once, then transfer the returned Task's eventual value or cancellation. | Cancel the returned Task without invoking the continuation. |
+
+Both operators register queued callbacks, including when their input is already
+terminal. Calling an operator does not execute user code inline. A new result stays
+Pending until those callbacks run. Then also queues observation of an already
+terminal inner Task. It flattens the asynchronous completion into Task<U>, not
+Task<Task<U>>. Separate consumers can compose the same input independently.
+
+The result Promise belongs to the input Task's queue. Map runs on that queue. Then
+runs its first continuation there; observation of the inner Task runs on the inner
+Task's queue. Completing the result enqueues its downstream observers on the
+original queue. When these differ, the caller must drive both queues. This is
+serialized single-invocation dispatch, not shared-state thread safety or automatic
+context flow. No active TaskQueue.Run scope is required just to compose Tasks.
+
+A Result.Error payload is passed to callbacks unchanged like any other T. Callback
+Faults remain terminal execution failures; they do not create a Task fault/error
+outcome. Cancellation travels downstream only: cancelling an input does not cancel
+unrelated operations or introduce parent/sibling ownership. Tokens, structured
+concurrency and automatic cancellation propagation through await remain separate.
+
+Implementation uses private generic continuation classes and ordinary managed
+callbacks. Their references are retained by queued registrations and traced by GC.
+The bounded importer admits parameterless, no-result callbacks on validated generic
+library reference classes, preserving the constructed receiver while emitting one
+adapter on the generic definition. This does not admit arbitrary generic application
+methods, byref receivers or virtual generic callbacks. No Raven compiler or Runtime
+Contract configuration change is part of this slice.
+
+The installed compiler needs complete parameter/return annotations on block-bodied
+callbacks whose generic result cannot be inferred. Supplying only the return type
+also failed in this toolchain. The regression tests keep the required annotations;
+ordinary expression callbacks and the user sample remain inferred. This is a
+compiler limitation to revisit, not a requirement of Task composition.
+
+Run the composition checks with the matching reference core, bridge and library:
+
+```sh
+python3 docs/experiments/task-contract/verify_composition.py /path/to/Demo.rvnproj \
+  --bridge /path/to/Probe.dll --system /path/to/System.neoil \
+  --runtime /path/to/neoclr
+```
+
+Compared with .NET ContinueWith's Task-valued callback, these operators receive the
+completed value directly and propagate cancellation without calling user code.
+This follows the selected Task model and reuses the
+[recorded comparison](async-api-design.md#promise-style-composition-direction--2026-09-21).
+It simplifies value pipelines but provides no scheduler-selection, fault-recovery or
+multi-task orchestration API. Continuation objects and queueing add allocations and
+dispatch work; no performance advantage is claimed.

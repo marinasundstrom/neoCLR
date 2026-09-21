@@ -1,0 +1,87 @@
+namespace System.Tasks
+
+import System.*
+import System.Option.*
+import System.Tasks.TaskOutcome.*
+
+public extension TaskOperators<T> for Task<T> {
+    func Map<U>(transform: Func<T, U>) -> Task<U> {
+        let promise = Promise<U>(self.Dispatcher())
+        let continuation = MapContinuation<T, U>(self, promise, transform)
+        self.OnCompleted(continuation.Run)
+        return promise.Task
+    }
+
+    func Then<U>(continuation: Func<T, Task<U>>) -> Task<U> {
+        let promise = Promise<U>(self.Dispatcher())
+        let state = ThenContinuation<T, U>(self, promise, continuation)
+        self.OnCompleted(state.Run)
+        return promise.Task
+    }
+}
+
+internal class MapContinuation<T, U> {
+    private field input: Task<T>
+    private field output: Promise<U>
+    private field transform: Func<T, U>
+
+    init(input: Task<T>, output: Promise<U>, transform: Func<T, U>) {
+        self.input = input
+        self.output = output
+        self.transform = transform
+    }
+
+    func Run() {
+        if input.Outcome is Some(Completed(let value)) {
+            _ = output.Complete(transform(value))
+        } else if input.Outcome is Some(Cancelled) {
+            _ = output.Cancel()
+        } else {
+            System.Fault("Task continuation ran while pending")
+        }
+    }
+}
+
+internal class ThenContinuation<T, U> {
+    private field input: Task<T>
+    private field output: Promise<U>
+    private field continuation: Func<T, Task<U>>
+
+    init(input: Task<T>, output: Promise<U>, continuation: Func<T, Task<U>>) {
+        self.input = input
+        self.output = output
+        self.continuation = continuation
+    }
+
+    func Run() {
+        if input.Outcome is Some(Completed(let value)) {
+            let next = continuation(value)
+            let transfer = OutcomeTransfer<U>(next, output)
+            next.OnCompleted(transfer.Run)
+        } else if input.Outcome is Some(Cancelled) {
+            _ = output.Cancel()
+        } else {
+            System.Fault("Task continuation ran while pending")
+        }
+    }
+}
+
+internal class OutcomeTransfer<T> {
+    private field input: Task<T>
+    private field output: Promise<T>
+
+    init(input: Task<T>, output: Promise<T>) {
+        self.input = input
+        self.output = output
+    }
+
+    func Run() {
+        if input.Outcome is Some(Completed(let value)) {
+            _ = output.Complete(value)
+        } else if input.Outcome is Some(Cancelled) {
+            _ = output.Cancel()
+        } else {
+            System.Fault("Task continuation ran while pending")
+        }
+    }
+}
