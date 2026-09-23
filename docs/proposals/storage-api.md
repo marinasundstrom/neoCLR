@@ -1,5 +1,26 @@
 # NeoCLR Storage API
 
+## Selected object model — 2026-09-23
+
+The author selects this proposal's storage model as the implementation goal, with
+an explicit correction: **StorageItem, File and Directory are interfaces**.
+StorageItem has the two permitted branches File and Directory. Concrete providers
+implement those branches; they do not add unrelated direct StorageItem branches.
+The existing development File/Directory classes are implementation material for
+provider-specific objects, not the final public abstractions.
+
+StorageProvider resolves paths into these objects. GetItem returns one StorageItem;
+Directory.GetItems enumerates StorageItem values, allowing files and directories in
+the same result. The sequence/async-sequence and task signatures remain to be settled
+with the operations; the common element model is selected.
+
+This is a direction decision, not a claim that these interfaces are shipped.
+The development library currently has concrete File/Directory descriptors and a
+separate StorageLookup interface. That intermediate shape must be aligned before
+promoting a host adapter. The [roadmap](../platform-roadmap.md) governs the bounded
+implementation sequence. Optional topology, rich metadata and unneeded mutations
+in this proposal are not prerequisites for the initial POC.
+
 ## Overview
 
 NeoCLR models **storage as an explicit platform capability**.
@@ -319,12 +340,12 @@ sealed interface StorageItem
     Path: Path;
 }
 
-class File : StorageItem
+interface File : StorageItem
 {
     ...
 }
 
-class Directory : StorageItem
+interface Directory : StorageItem
 {
     ...
 }
@@ -337,6 +358,23 @@ StorageItem
    ├── File
    └── Directory
 ```
+
+The hierarchy is closed at the **kind** boundary, not at the provider implementation
+boundary. File and Directory remain implementable by providers. For example,
+filesystem-backed and memory-backed File implementations can expose different
+internal state while consumers depend only on File. Do not seal the File branch
+to a fixed set of built-in concrete classes.
+
+Provider-specific implementations own resolution and opening behavior. Public
+constructors on the File/Directory interfaces are not part of the target model.
+Ordinary consumers obtain objects from provider resolution, directory traversal or
+explicit creation operations. Construction of a provider implementation is separate
+from resolving an accessible item; an address alone is not proof of access.
+
+Validate the compiler metadata and importer contract for both requirements together:
+reject an unrelated direct StorageItem branch, and allow a separately compiled
+provider to implement File or Directory. Do not advertise this closure as enforced
+by the runtime until that layer has been checked too.
 
 Because the hierarchy is closed, callers can naturally pattern-match over storage objects:
 
@@ -422,7 +460,7 @@ let child =
 Conceptually:
 
 ```raven
-class Directory : StorageItem
+interface Directory : StorageItem
 {
     func GetItem(name: String)
         -> Result<StorageItem, StorageError>;
@@ -443,6 +481,27 @@ class Directory : StorageItem
         -> Result<Directory, StorageError>;
 }
 ```
+
+---
+
+# Mixed-item enumeration
+
+A directory can enumerate files and subdirectories through the common interface:
+
+```text
+Directory.GetItems
+    → collection/sequence of StorageItem
+        → File implementation
+        → Directory implementation
+```
+
+This differs from GetItem, which resolves one named or relative item. The common
+element is StorageItem, not a provider-specific descriptor or an untyped object.
+An empty directory produces an empty successful enumeration; failure is a separate
+outcome. Ordering, eager versus incremental enumeration, failure timing and
+cancellation need definition alongside the first implementation. The
+[asynchronous extension](storage-api-extensions.md#enumeration) discusses task and
+async-sequence alternatives; the author has not selected a container signature here.
 
 ---
 
@@ -1415,7 +1474,8 @@ The NeoCLR Storage API follows these principles:
 
 9. **Files and directories form the common object model.**
 
-   `StorageItem` is a sealed hierarchy over `File` and `Directory`.
+   `StorageItem` is a sealed interface hierarchy over the `File` and `Directory`
+   interfaces; concrete implementations are supplied by providers.
 
 10. **Topology is optional.**
 

@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Record the author's selected Storage model: StorageItem is a closed interface
+  hierarchy over provider-implemented File and Directory interfaces; providers
+  resolve paths and GetItems enumerates StorageItem values. Correct proposal class
+  examples, update roadmap priority and distinguish the target from current concrete
+  descriptors on the website/API guide. Interface migration and enumeration remain
+  planned; no new runtime API is implemented by this direction update.
+
 - Integrate development System.Storage.File and Directory descriptors and the optional
   StorageLookup provider capability. File retains provider/Path, derives Name and
   opens directional streams; Directory constructs child addresses and explicitly

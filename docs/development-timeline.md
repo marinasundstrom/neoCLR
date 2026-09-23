@@ -25,6 +25,33 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-23 — Select the proposal's interface-based Storage model
+
+**Author.** Directed continued work toward the model in the Storage proposal, then
+clarified: “File and Directory are interfaces extending StorageItem. They form a
+closed hierarchy.” Existing classes should become provider-specific implementations.
+Also identified GetItems returning StorageItem values and endorsed this as the
+modern abstraction for different kinds of storage.
+
+**Assistant response.** Recognized that the current byte-first StorageProvider and
+separate StorageLookup do not express that model. Initially began moving lookup
+onto a renamed provider contract, then discarded the unfinished edits after the
+interface clarification; those edits were not committed. The last working descriptor
+implementation remains intact. Clarified the distinction between a closed set of
+item kinds and extensible provider implementations, and between single GetItem and
+mixed-item GetItems enumeration.
+
+**Action.** Updated the proposal and authoritative roadmap to select the public
+interface hierarchy and provider-resolution model. Corrected the proposal's class
+examples. Recorded the next migration and the required closed-root/open-branch
+validation. Updated the website/API guide to distinguish the selected direction
+from the current concrete implementation. No interface migration or GetItems
+implementation is claimed by this direction update.
+
+**Open.** Concrete enumeration/task signatures, enforcement across compiler/importer/
+runtime layers, and static helper compatibility during migration require implementation
+validation. Optional filesystem topology and rich metadata remain deferred.
+
 ## 2026-09-23 — Minimal Storage surface and Windows Runtime lessons
 
 **Author direction.** Learn from Windows Runtime APIs without adopting their full

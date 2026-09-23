@@ -1,5 +1,13 @@
 # File and Directory descriptors
 
+**Selected direction, not yet implemented:** StorageItem will be a closed interface
+hierarchy with File and Directory as its two branches. Providers will implement
+those interfaces; StorageProvider will resolve paths into items. GetItems will
+enumerate StorageItem values. The concrete descriptor API documented below is the
+current development implementation, not the final public object model. The next
+slice migrates it while preserving the disk/memory sample. Enumeration and task
+signatures remain open.
+
 **Development after Preview 9.** [File](xref:System.Storage.File) and
 [Directory](xref:System.Storage.Directory) are platform-owned addresses. Construction
 and Path/Name access do not query storage, create entries or open streams. A descriptor

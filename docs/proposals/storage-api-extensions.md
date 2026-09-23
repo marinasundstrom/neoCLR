@@ -4,6 +4,14 @@
 
 Extension proposal to the core `System.Storage` object model.
 
+The author selected the interface-based object model on 2026-09-23: StorageItem
+has File and Directory as its two permitted interface branches, with provider-specific
+implementations. GetItems enumerates StorageItem values. That model is the target;
+the current concrete development descriptors are an intermediate implementation.
+Async signatures and enumeration strategy below remain proposals. In particular,
+the current Task implementation has no faulted state; the conceptual fault examples
+below do not describe a shipped Task outcome.
+
 This proposal does not redefine:
 
 ```text
@@ -104,7 +112,7 @@ The same principle applies to traversal through a `Directory`.
 Conceptually:
 
 ```raven
-class Directory : StorageItem
+interface Directory : StorageItem
 {
     func GetItem(name: String)
         -> Task<Result<StorageItem, StorageError>>;
@@ -377,7 +385,7 @@ Opening a file may itself require provider interaction and should therefore be c
 Convenience operations may include:
 
 ```raven
-class File : StorageItem
+interface File : StorageItem
 {
     func OpenRead()
         -> Task<Result<Stream, StorageError>>;

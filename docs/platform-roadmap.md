@@ -181,11 +181,26 @@ extends the byte contract with GetFile; byte-only providers remain supported.
 Directory.FileAt now returns StorageLookupError, replacing the sample's FileReadError.
 Existing static native string-based File helpers remain compatible. All public
 members have on-site reference coverage, including a manual WriteAllText entry.
-The concrete host/memory providers remain sample implementations. **Next:** promote
-the minimal host provider so an application can use this integrated surface without
-copying its disk adapter, then reassess the Storage POC before adding metadata.
-Path-taking Combine/helper overloads, parent hierarchy and replacement identity
-remain follow-ups. Keep async scheduling and richer metadata outside this blocking POC.
+**Author-selected target, 2026-09-23:** align with the
+[Storage proposal's object model](proposals/storage-api.md#selected-object-model--2026-09-23).
+StorageItem, File and Directory are interfaces. StorageItem has exactly the two
+permitted branches File and Directory; providers supply concrete implementations.
+StorageProvider resolves paths. GetItem returns one StorageItem; Directory.GetItems
+enumerates StorageItem values. The existing descriptor classes and separate
+StorageLookup/byte-provider split are intermediate implementation choices, not the goal.
+
+**Next:** replace the public descriptor-class shape with that interface hierarchy
+and move implementation state/behavior into provider implementations. Verify that
+external providers can implement File/Directory while unrelated direct StorageItem
+branches are rejected. Then align provider GetItem/GetFile/GetDirectory and directory
+traversal, integrate the minimal host provider, and add mixed GetItems enumeration
+with explicit bounds and failure semantics. Keep the disk/memory read/write consumer
+working throughout; document any development API migration and update `/docs/` in
+the same change. Do not expand the previous StorageLookup split as an alternative model.
+Task-based interaction is the intended extension direction; its scheduling and
+cancellation contract must be established before claiming nonblocking I/O. GetItems'
+eager/incremental representation remains open. Rich metadata, topology, Path format
+expansion and unneeded mutations remain outside the initial POC.
 **API design clarification, 2026-09-23:** learn from WinRT StorageFile/StorageFolder
 without importing their breadth. Start with address properties (Path and File.Name),
 explicit lookup and byte-stream access. Add metadata properties only for a concrete
