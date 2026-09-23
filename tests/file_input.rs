@@ -32,7 +32,9 @@ impl Drop for Fixture {
 fn read(path: &str, limit: i32) -> Value {
     let program = LoadedProgram::new(&assemble(".module App").unwrap()).unwrap();
     program
-        .resolve_function(&parse_function_ref("System.Storage.File::ReadAllText(String,Int32)").unwrap())
+        .resolve_function(
+            &parse_function_ref("System.Storage.File::ReadAllText(String,Int32)").unwrap(),
+        )
         .unwrap()
         .invoke(
             vec![Value::String(path.into()), Value::Int32(limit)],

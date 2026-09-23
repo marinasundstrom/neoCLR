@@ -18,7 +18,9 @@ func Main() -> int {
     p.verify().unwrap();
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(0));
     let combine = p
-        .resolve_function(&parse_function_ref("System.Storage.Path::Combine(String,String)").unwrap())
+        .resolve_function(
+            &parse_function_ref("System.Storage.Path::Combine(String,String)").unwrap(),
+        )
         .unwrap();
     for (left, right, expected) in [
         ("", "a", "a".to_owned()),

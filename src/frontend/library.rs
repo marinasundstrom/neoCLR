@@ -2,8 +2,8 @@
 //! Union coverage requires its marker, constructor cases and typed public accessors.
 use super::Ty;
 use crate::{
-    metadata::{Type, Visibility},
     Fault,
+    metadata::{Type, Visibility},
 };
 
 pub(super) struct Case {
