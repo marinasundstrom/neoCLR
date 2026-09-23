@@ -2,8 +2,9 @@
 
 **Historical candidate context:** the procedure below was recorded for
 v0.1.0-preview.6 (2026-09-14). It does not select the current development candidate.
-See the [2026-09-19 readiness review](preview-readiness-2026-09-19.md) for the current
-implementation, remaining text-model migration and outstanding release gates.
+Use [the async/Tasks preview plan](async-preview-plan.md) for the current working
+release scope and readiness gates. The [2026-09-19 readiness review](preview-readiness-2026-09-19.md)
+is earlier evidence, not the current candidate selection.
 The reusable archive and platform checks below still apply to a newly selected
 candidate. Published release notes remain unchanged.
 

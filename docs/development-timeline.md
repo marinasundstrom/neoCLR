@@ -25,6 +25,41 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-23 — Plan an async and Tasks release checkpoint
+
+**Author request.** “We should also decide when to make a new release focused around
+async and task bits”. This arrived while the assistant was validating host
+cancellation during worker-result delivery.
+
+**Assistant recommendation.** Start stabilization of the current supported Task
+surface now and release when a fresh extracted evaluator bundle and exact-candidate
+validation pass. Do not wait for HTTP or all of M1. Keep the ordinary isolated-worker
+APIs with their documented blocking joins; leave the notification adapter, guest
+operation cancellation tokens and real I/O experimental or unimplemented.
+
+**Actions.** Committed the bounded runtime fix as `13c41ed` after 60 targeted tests,
+a host/guest-IL sample and website checks. Added [a release checkpoint plan](async-preview-plan.md),
+linked it into the authoritative roadmap, recorded package/platform/documentation
+gates and corrected stale Task documentation about cancelled await and default dispatch.
+The website now explains the planned release boundary.
+
+**Author follow-up decisions.** Suggested focusing on Streams and Storage APIs,
+perhaps Encoding, before networking. Then accepted the proposed release scope:
+“But your scope for the release looks great. Make that the immediate priority”.
+The roadmap now places release stabilization first and those API foundations before
+networking afterward; this does not adopt the proposal texts as final contracts.
+
+**Website maturity wording.** The author requested a “preview” label beside neoCLR
+in the header, then suggested “experiment” as the better term. The assistant used
+“Experimental” beside the name on every page, retaining preview terminology for
+individual releases. The author also clarified that neoCLR encompasses application
+and development workflows, not only the runtime and class library, and selected
+the phrase “Experimental application platform”. The homepage and overview now use
+that framing while separating implemented components from future aims.
+
+**Open.** Candidate revisions, version/date, clean packaged evidence and final release
+validation remain unset or open. No tag, push, package publication or website deployment is implied.
+
 ## 2026-09-19 — Implement the first feature guide
 
 **Author direction.** Continue after recording the feature-page plan.

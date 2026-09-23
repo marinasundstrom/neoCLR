@@ -22,9 +22,10 @@ An explicit author instruction takes precedence, including a bounded task outsid
 the current milestone. Such a task does not silently reorder the entire roadmap;
 record a lasting change in direction when the author makes one.
 
-When choosing work autonomously, select the next useful bounded case within the
-active milestone, currently M1. Start with its in-memory byte-copy checkpoint, not
-sockets or HTTP. Use the progression below and its detailed plan for validation.
+When choosing work autonomously, follow the immediate checkpoint below: stabilize
+the async/Tasks preview, then resume the next useful bounded case within M1.
+The early memory-copy checkpoint has evidence; sockets and HTTP remain later.
+Use the progression below and its detailed plan for validation.
 Later milestone candidates remain provisional: listing them here does not authorize
 wholesale implementation of their proposals or freeze their order. Update completion
 status with evidence and record significant direction changes in the development timeline.
@@ -60,6 +61,26 @@ before taking on the next kind of complexity. HTTP is the first major applicatio
 destination, not the first API to implement. M2–M6 identify
 useful destinations, not a promise to complete all proposals. Progress through them
 by the dependency of the next runnable case, not by completing entire API families.
+
+## Release checkpoint — Async and Tasks
+
+Following the author's 2026-09-23 request and subsequent acceptance of the scope,
+use [the async preview plan](async-preview-plan.md) as the immediate stabilization
+checkpoint. Ship the existing Task/Promise, async/await, composition, producer cancellation, default dispatch and isolated-worker
+surface after a fresh evaluator bundle and exact-candidate release gates pass.
+HTTP and completion of M1 are not prerequisites. The experimental nonblocking worker
+adapter and guest operation cancellation tokens are not part of the supported scope.
+
+This is a release checkpoint within the foundations work, not a replacement for M1
+or a declaration that S0 is complete. Version/date remain unset.
+After the release, focus on Streams, Storage and Encoding before networking, as
+requested by the author. Reuse memory-backed and file-backed transformation samples;
+start Storage with bounded local file operations rather than a full provider model.
+Resolve cancellation/lifetime gaps as those cases require. Networking still follows
+these foundations, and proposals remain exploratory rather than API specifications.
+
+Start with a readiness inventory and one fresh local bundle; fix release blockers
+before expanding features. Published release notes stay unchanged and publication remains separate.
 
 ## Progressive delivery before networking — revised 2026-09-23
 
@@ -345,8 +366,11 @@ its feature plan, and update changelog, relevant feature pages and integration d
 Samples begin as small programs, not miniature frameworks. Existing release/debugging
 requirements and Raven branch/integration rules continue to apply.
 
-**Next:** select a small guest operation cancellation contract and extend the real
-delayed-copy evidence to its completion races and queue affinity.
+**Next:** run the [async preview readiness inventory](async-preview-plan.md#next-action-and-exit)
+and prepare a fresh local evaluator bundle. After the release checkpoint, prioritize
+Streams, Storage and Encoding through the bounded file-transformer progression.
+Select the needed small guest operation cancellation contract and extend the real
+delayed-copy evidence to its completion races and queue affinity before pending I/O.
 [Host invocation cancellation orderings](cancellation.md#worker-completion-boundaries--development)
 now cover ready results before/after notification dispatch, interrupted output delivery
 and producer acknowledgement during teardown. This does not implement guest operation

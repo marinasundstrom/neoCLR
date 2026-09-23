@@ -1,5 +1,12 @@
 # Roadmap: prove neoCLR with HTTP applications
 
+**Current priority (2026-09-23):** the author has selected the
+[async/Tasks release checkpoint](async-preview-plan.md) first. After stabilization,
+focus on Streams, Storage and Encoding before networking, using the bounded memory
+and file-transformer cases below. This does not select the full proposal APIs. The
+[platform roadmap](platform-roadmap.md) remains authoritative.
+
+
 Detailed M1 plan subordinate to the [authoritative platform roadmap](platform-roadmap.md).
 Broader themes, candidate milestones and sample products are maintained there;
 explicit author directions take precedence over either plan.

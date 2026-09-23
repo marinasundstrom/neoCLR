@@ -11,7 +11,7 @@
 <body class="feature-page">
 <a class="skip" href="#main">Skip to content</a>
 <header class="header wrap">
-  <a class="brand" href="../../">neo<span>CLR</span></a>
+  <a class="brand" href="../../">neo<span>CLR</span><small class="project-status">Experimental</small></a>
   <nav aria-label="Main navigation"><a href="../../about/">About</a><a href="../../#feature-pages">Features</a><a href="../../raven/">Raven</a><a href="#try">Try it</a><a href="#direction">Direction</a></nav>
 </header>
 <main id="main" class="wrap">
@@ -23,7 +23,7 @@
     <div class="actions"><a class="button" href="#await">See a working example <span aria-hidden="true">↓</span></a><a class="text-link" href="../../samples/library-async-default-queue.rvn" download>Download the complete example</a></div>
   </div>
   <div class="feature-layout">
-    <aside class="feature-toc" aria-label="On this page"><p class="eyebrow">CURRENT STATE</p><nav aria-label="Feature sections"><a href="#await">Await an operation</a><a href="#promise">Produce a value</a><a href="#outcomes">Cancellation and errors</a><a href="#worker-limits">Worker limits</a><a href="#host-cancellation">Host cancellation</a><a href="#dispatch">Automatic progress</a><a href="#try">Try it</a><a href="#direction">Where we’re heading</a></nav></aside>
+    <aside class="feature-toc" aria-label="On this page"><p class="eyebrow">CURRENT STATE</p><nav aria-label="Feature sections"><a href="#await">Await an operation</a><a href="#promise">Produce a value</a><a href="#outcomes">Cancellation and errors</a><a href="#worker-limits">Worker limits</a><a href="#host-cancellation">Host cancellation</a><a href="#dispatch">Automatic progress</a><a href="#try">Try it</a><a href="#release-checkpoint">Next preview</a><a href="#direction">Where we’re heading</a></nav></aside>
     <article class="feature-body">
       <section id="await">
         <h2>Starting and awaiting a worker</h2>
@@ -80,6 +80,11 @@
         <p>With the current development SDK, open a prepared <code>.rvnproj</code> in VS Code, replace <code>Main.rvn</code> with one of the complete downloads above, and run the neoCLR build/run task. Refresh the compiler, reference core and runtime library together. These examples require development changes beyond Preview 8.</p>
         <p>neoCLR and the programs it runs do not require .NET. The Raven compiler, build tools and Raven Language Server run on .NET.</p>
         <p><a href="../../try/#development">Development setup and release status →</a></p>
+      </section>
+      <section id="release-checkpoint">
+        <h2>Next release checkpoint: async and Tasks</h2>
+        <p>The immediate release priority focuses on the current Task/Promise model, named async functions, await, composition, Result propagation, producer cancellation and automatic default-queue dispatch. Isolated workers are included with their current limits: ordinary worker joins can block the queue.</p>
+        <p>Release readiness means these examples build and run from a fresh, matching SDK/runtime/editor bundle, the selected candidate passes its platform checks, and migration notes and website examples match those packages. No release date is selected. HTTP, guest cancellation tokens and the experimental nonblocking worker adapter do not need to be completed for this preview.</p>
       </section>
       <section id="direction">
         <p class="eyebrow">PROPOSED DIRECTION</p><h2>Comparison with .NET and planned work</h2>

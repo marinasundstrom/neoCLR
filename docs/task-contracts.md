@@ -39,9 +39,10 @@ Use ordinary nested patterns to inspect those cases. Cancel publishes its state
 before enqueueing callbacks; late callbacks are queued too.
 
 GetResult on a pending or cancelled task faults immediately; it never blocks.
-Automatic cancellation propagation through await is **not implemented yet**. Consume
-cancellable tasks through Outcome and OnCompleted until Raven lowering supports the
-model. Calling Cancel on a producer completes that Task; this is distinct from a
+Cancellation now propagates through await in named async functions: the enclosing
+Task becomes Cancelled and the remaining body is skipped. Outcome and OnCompleted
+also support explicit observation; see the September 23 lowering evidence below.
+Calling Cancel on a producer completes that Task; this is distinct from a
 future token source requesting cancellation of an operation. Expected API
 failure is represented by an ordinary payload such as Result<T,E>. There is no
 SetException, faulted-task state or special Result-aware completion path. Runtime
@@ -82,8 +83,10 @@ Completion queued
 ```
 
 A real API can return the Task while retaining its Promise for later
-completion. For this PoC, the caller owns and pumps the queue. There is no automatic host
-progress. Run starts work in an active queue scope and then drains that queue. Drain processes queued batches and rejects
+completion. This example chooses an explicit queue and drains it manually. Ordinary
+Promise construction and async calls use the active queue or TaskQueue.Default;
+the runtime drains default-queue work before returning from the invocation.
+Run starts work in an active queue scope and then drains that queue. Drain processes queued batches and rejects
 recursive pumping. Nested completion appends work instead of calling the next
 consumer inside Complete. A callback Fault terminates execution; there is no
 recovery or cleanup guarantee after it.

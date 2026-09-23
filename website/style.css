@@ -74,3 +74,11 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere}
 .table-scroll th { font-weight: 600; }
 .table-scroll code { white-space: normal; overflow-wrap: anywhere; }
 .table-scroll th:nth-child(1), .table-scroll th:nth-child(2) { width: 30%; }
+
+/* Project maturity is visible beside the name on every page. */
+.header .brand { flex-shrink: 0; }
+.project-status { font: 11px var(--mono); letter-spacing: .02em; color: var(--muted); padding: 3px 7px; border: 1px solid var(--line); border-radius: 4px; }
+@media(max-width:720px) {
+  .header { height: auto; min-height: 108px; flex-wrap: wrap; justify-content: flex-start; gap: 12px; padding-top: 18px; padding-bottom: 18px; }
+  .header nav { width: 100%; }
+}

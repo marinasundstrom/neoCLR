@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="neoCLR is an experimental managed runtime and class library. Current implementation, Raven integration, .NET comparisons, limitations and platform roadmap.">
+  <meta name="description" content="neoCLR is an experimental application platform combining a managed runtime, APIs, Raven language integration and development tools. Explore its current state and direction.">
   <meta name="theme-color" content="#142b36">
-  <title>neoCLR — Runtime, class library and project status</title>
+  <title>neoCLR — Experimental application platform</title>
   <link rel="icon" href="mark.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
   <!-- Google tag (gtag.js) -->
@@ -20,15 +20,15 @@
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="header wrap">
-  <a class="brand" href="./" aria-label="neoCLR home"><img src="mark.svg" width="32" height="32" alt="">neo<span>CLR</span></a>
+  <a class="brand" href="./" aria-label="neoCLR Experimental home"><img src="mark.svg" width="32" height="32" alt="">neo<span>CLR</span><small class="project-status">Experimental</small></a>
   <nav aria-label="Main navigation"><a href="about/">About</a><a href="#runtime">Runtime</a><a href="#type-system">Types</a><a href="#features">Library</a><a href="features/introspection/">Feature guide</a><a href="raven/">Raven</a><a href="try/">Try it</a><a href="#tooling">Tooling</a><a href="proposals/">Proposals</a><a href="#feedback">Contributing</a></nav>
 </header>
 <main id="main">
   <section class="hero wrap" aria-labelledby="hero-title">
     <div class="hero-copy">
       <p class="eyebrow"><span class="dot"></span> Preview 8 · Runtime + Raven</p>
-      <h1 id="hero-title">Experimental runtime<br><em>and class library</em></h1>
-      <p class="intro">neoCLR implements a managed interpreter, a tracing garbage collector and a System class library. Raven programs compile to CLI metadata and IL, then pass through an importer for the supported neoCLR subset.</p>
+      <h1 id="hero-title">Experimental<br><em>application platform</em></h1>
+      <p class="intro">neoCLR brings together a managed runtime, application APIs, Raven language integration and developer tools for building and running programs. These parts evolve together through small, executable applications.</p>
       <p class="hero-detail">The project evaluates changes to .NET-style runtime and library contracts, including generic Void, typed outcomes, UTF-8 text and invariant arrays. Preview 8 is the published baseline; development examples and proposals are labeled separately.</p>
       <div class="actions"><a class="button" href="#examples">API examples <span aria-hidden="true">↗</span></a><a class="text-link" href="try/">Build and run instructions →</a><a class="text-link" href="about/">Project background and goals →</a></div>
     </div>
@@ -61,7 +61,7 @@
       <article><span class="number">INITIAL DEBUGGER</span><h3>Runtime inspection</h3><p>The terminal debugger supports stepping, breakpoints and inspection of call stacks, locals, heap objects and GC statistics. Raven source debugging in VS Code remains separate future work.</p><a class="text-link" href="https://github.com/marinasundstrom/neoCLR/blob/main/docs/debugger.md">Debugger command reference →</a></article>
     </div>
 
-    <p class="implementation-note"><strong>Current priority:</strong> validate object lifetimes and completion dispatch with small programs. JIT compilation and changes to the collector remain separate research topics; there is no selected replacement for the interpreter or collector. <a href="#exploring">Read the open questions →</a></p>
+    <p class="implementation-note"><strong>Current priority:</strong> stabilize an async and Tasks preview, including object-lifetime and completion checks. JIT compilation and changes to the collector remain separate research topics; there is no selected replacement for the interpreter or collector. <a href="#exploring">Read the open questions →</a></p>
   </section>
   <section id="type-system" class="section wrap library-section">
     <div class="section-heading"><p class="eyebrow">03 — TYPE SYSTEM</p><h2>Type system: Void in generic APIs</h2><p>Void has one logical value and can be used as a type argument. That lets the same generic API represent a useful result or completion without a payload.</p><p><code>Func&lt;T, void&gt;</code> expresses a callback with no useful result. neoCLR uses one Func family, including <code>Func&lt;Void&gt;</code> and <code>Func&lt;T, Void&gt;</code>, where .NET uses Action. <code>Result&lt;Void, E&gt;</code> similarly represents completion or a recoverable error.</p><p>The Raven sample spells the unit type <code>System.Void</code>. Ordinary void-returning calls still leave no result on the IL stack; the compiler bridges the unit-value contexts.</p><a class="text-link" href="features/outcomes/">Generic outcomes and Void →</a></div>
@@ -119,8 +119,9 @@ import System.Result.*
   <section id="next" class="features-section">
     <div class="wrap"><div class="section-heading"><p class="eyebrow">07 — PLATFORM ROADMAP</p><h2>Foundations, then an HTTP application pair</h2><p>The active milestone is a minimal Raven HTTP client and server running on neoCLR. They should exchange UTF-8 text and a small JSON document using shared stream and socket APIs. The runtime and buffer primitives are being tested first through smaller programs.</p><p>Memory byte copy, chunked UTF-8 decoding and bounded JSON experiments run today. A controlled delayed-copy sample now exercises real VM completion dispatch, Raven await and GC retention. These are development checkpoints; general stream APIs, sockets and HTTP remain unimplemented.</p><a class="text-link" href="proposals/#http-poc">Roadmap and milestone scope →</a></div>
     <div class="next-grid">
+      <article><h3>Next preview: async and Tasks</h3><p>The immediate release priority packages the current Task/Promise, await, composition, producer cancellation and isolated-worker features. Release follows fresh-bundle sample checks and validation of the selected candidate. HTTP and the experimental nonblocking worker adapter remain later work; no release date is set.</p><a href="features/tasks/#release-checkpoint">Release scope and readiness →</a></article>
       <article><h3>Current work: lifetimes and completion</h3><p>The delayed-copy experiment retains pending receivers through collection and delivers worker results through the default TaskQueue. Completion now progresses between callbacks even while they repost work. Successful worker text/output payloads now have a default 1 MiB limit per worker. Host cancellation now has controlled completion and output-delivery checks. Guest operation cancellation, queue affinity and broader host-memory accounting need further validation before this becomes a general I/O mechanism.</p><a href="features/tasks/">Task implementation and limits →</a></article>
-      <article><h3>Next application cases</h3><p>A bounded file transformer should reuse the byte, text and JSON work. TCP echo follows, then the HTTP client/server pair with independent interoperability checks. Later candidates include a file catalog, download queue, time-aware report, assembly explorer and portable samples; their scope and order remain provisional.</p><a href="proposals/#http-poc">Milestone scope and proposals →</a></article>
+      <article><h3>Next application cases</h3><p>After the async/Tasks preview, Streams, Storage and Encoding take priority. A bounded file transformer should reuse the byte, text and JSON work. TCP echo follows, then the HTTP client/server pair with independent interoperability checks. Later candidates include a file catalog, download queue, time-aware report, assembly explorer and portable samples; their scope and order remain provisional.</p><a href="proposals/#http-poc">Milestone scope and proposals →</a></article>
     </div>
     <div id="api-proposals" class="section-heading"><h3>API proposals and implementation status</h3><p><a href="proposals/">Explore the proposal overview and open questions →</a></p><p>The following designs are inputs to the roadmap. Their listed status distinguishes working subsets from unimplemented proposals; the list does not commit them to a release.</p></div>
     <div class="research-grid">

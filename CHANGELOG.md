@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-23
 
+- Make the author-approved async/Tasks preview checkpoint the immediate
+  priority: stabilize the existing completion/await/composition and isolated-worker surface, require a
+  fresh evaluator bundle and exact-candidate release gates, and leave HTTP and the
+  notification adapter outside the supported release scope. Record the author’s
+  release-timing question, update website direction and correct stale Task contract
+  descriptions. Prioritize Streams, Storage and Encoding before networking afterward.
+  Mark the website header Experimental across all pages and describe neoCLR as an
+  experimental application platform, including APIs, language integration and
+  development tools. No release version/date or publication is selected.
+
 - Revise the website toward technical project documentation: current capabilities,
   limits, .NET tradeoffs and the active foundations-to-HTTP roadmap. Add a project
   overview with background, goals and contribution paths; keep general information

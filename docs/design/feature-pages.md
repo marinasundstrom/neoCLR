@@ -7,6 +7,9 @@ development-only behavior and proposals visibly separate.
 
 ## Editorial direction — 2026-09-23
 
+Present neoCLR as an **experimental application platform**: application APIs, runtime,
+language integration and development tools together. Keep “Experimental” visible
+beside the header name; “preview” describes individual releases.
 Use a technical, approachable tone. Explain the current implementation, useful
 features, limits, relevant differences from .NET and the intended direction. Prefer
 subject headings and concrete behavior over slogans, sales copy or unqualified
