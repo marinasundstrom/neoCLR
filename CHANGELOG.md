@@ -40,8 +40,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   teardown. Add eight test-only delayed Byte Copy checks against the real managed
   heap, array slots and delegate receiver tracing: pending-to-ready root handoff,
   collection/reclamation, invalid-input rejection and terminal cleanup. Record
-  owned-byte delivery as a candidate; VM/TaskQueue integration, a Raven delayed-copy
-  consumer and real I/O remain open. Normal runtime builds are unchanged.
+  owned-byte delivery as a candidate. Add experimental worker completion notification
+  to the real VM, rooting callbacks at both GC paths and posting ready outcomes to
+  the default TaskQueue. Validate a Raven await/copy consumer using an isolated
+  worker-library adapter, failure/cancellation teardown and one-shot delivery. Normal
+  Thread/ThreadPool implementations retain queued joins; fairness, per-operation
+  cancellation, bounded native I/O ownership and real I/O remain open.
 
 - Prioritize an HTTP client/server application POC in the roadmap, with smaller
   stream, encoding, JSON and TCP cases, explicit acceptance criteria and complete
@@ -61,8 +65,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Add a development Tasks feature page with tested, downloadable worker, Promise,
   cancellation, MapResult and awaited-propagation examples. Link it from the
   homepage and proposals, distinguishing current behavior from future scheduling
-  and cancellation-token work. Validate 11 pages, website tests, five locally
-  installed .rvnproj build/run examples and Task editor completions. Prepare a
+  and cancellation-token work. Add a dedicated homepage Tasks box with a tested
+  async worker excerpt and a direct feature-page link. Validate 12 pages and website
+  tests; retain the five locally installed .rvnproj build/run checks and Task editor
+  completion evidence. Prepare a
   matching local VS Code development workspace without changing release selection.
 
 - Integrate Raven's propagation-temporary lifetime fix for `(await input)?`, with

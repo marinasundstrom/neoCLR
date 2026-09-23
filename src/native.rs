@@ -22,6 +22,7 @@ pub(crate) enum Binding {
     RegisterDefaultTaskQueue,
     StartWorker(bool),
     JoinWorker,
+    NotifyWorker,
     AssemblyInfo(crate::assembly_info::Query),
     TypeName,
     TypeEquals,
@@ -178,6 +179,11 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             (Binding::StartWorker(true), Type::Int32)
         }
         ("neoCLR.Runtime.JoinWorker", [Type::Int32]) => (Binding::JoinWorker, Type::String),
+        ("neoCLR.Runtime.NotifyWorker", [Type::Int32, callback])
+            if *callback == crate::assembler::parse_type("System.Func<Void>")? =>
+        {
+            (Binding::NotifyWorker, Type::Void)
+        }
         ("neoCLR.Runtime.DefaultTaskQueue", []) => (
             Binding::DefaultTaskQueue,
             Type::from_name("System.Tasks.TaskQueue"),

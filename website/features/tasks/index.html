@@ -62,7 +62,7 @@
       <section id="dispatch">
         <h2>No queue setup or manual drain.</h2>
         <p><code>Promise&lt;T&gt;()</code>, async functions and worker APIs select the active queue or the invocation’s <code>TaskQueue.Default</code>. The runtime runs default-queue callbacks automatically before the invocation returns, including callbacks posted by other callbacks. Explicit queues remain available for controlled dispatch.</p>
-        <p>This dispatcher is small and serialized. Worker joins can block it. An unresolved Promise with no queued work does not keep the invocation alive; external I/O completion is not implemented yet. Await inside for loops is diagnosed until iterator state and cleanup are suspension-aware. Protected cleanup and async disposal are outside the current subset.</p>
+        <p>This dispatcher is small and serialized. Worker joins can block it. An unresolved Promise with no queued work does not keep the invocation alive; OS I/O completion is not implemented yet. Await inside for loops is diagnosed until iterator state and cleanup are suspension-aware. Protected cleanup and async disposal are outside the current subset.</p>
       </section>
       <section id="try">
         <h2>Use a matching development toolchain.</h2>
@@ -75,7 +75,7 @@
         <p>The producer/consumer split and await syntax will feel familiar to .NET developers. neoCLR separates expected failure from Task completion and uses Promise-style composition. That requires its own runtime and compiler contracts rather than copying .NET’s exception-based completion protocol.</p>
         <p>Raven currently emits state machines. They are provisional machinery: the strategy is to move toward runtime suspension while keeping application code focused on operations and completion. A scheduler concept may support that strategy when its responsibilities become clear.</p>
         <p>Cancellation tokens, host I/O completion, stream operations, scheduling policies and broader cleanup support remain development work. This page demonstrates the current direction, not a final design.</p>
-        <p>A <a href="https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/external-io-progress/GC-OWNERSHIP.md">delayed Byte Copy ownership probe</a> now tests pending buffers and completion receivers against the real tracing heap. It is a test-only experiment; connecting host completion to the interpreter and TaskQueue remains open.</p>
+        <p>A development <a href="https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/delayed-copy/README.md">Delayed Copy experiment</a> now connects worker completion to the interpreter and default TaskQueue. A Raven consumer retains its byte array through collection and resumes to copy the result. This uses an isolated worker-library adapter; the normal Thread APIs above still use queued joins. Queue fairness, per-operation cancellation and real I/O remain open.</p>
         <p><a href="../../proposals/#async">Related proposals and open questions →</a></p>
       </section>
       <section id="feedback" class="feature-feedback"><h2>What would you build on this?</h2><p>Bring a small API or application scenario. Where does completion feel clear, and where would cancellation or scheduling need a different shape?</p><a class="button" href="https://github.com/marinasundstrom/neoCLR/issues">Share feedback on GitHub ↗</a></section>

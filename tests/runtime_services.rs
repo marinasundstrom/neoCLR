@@ -151,3 +151,24 @@ fn unreachable_memory_operations_and_native_imports_remain_conservative_requirem
             .is_empty()
     );
 }
+
+#[test]
+fn worker_notification_requires_worker_and_dispatch_services() {
+    let module = assemble(concat!(
+        ".module System\n",
+        include_str!("../runtime/raven/generated/Func.methods.neoil"),
+        include_str!("../runtime/neoCLR/Runtime/Workers.neoil")
+    ))
+    .unwrap();
+    let graph = LoadedProgram::new(&module)
+        .unwrap()
+        .analyze_reachability(
+            &[parse_function_ref("neoCLR.Runtime.NotifyWorker(Int32,System.Func<Void>)").unwrap()],
+            1,
+        )
+        .unwrap();
+    assert_eq!(
+        graph.required_services(),
+        [Service::TaskDispatch, Service::IsolatedWorkers]
+    );
+}

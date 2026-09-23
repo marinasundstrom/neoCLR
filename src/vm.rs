@@ -1510,6 +1510,7 @@ fn interpret_instructions(
     // An invocation-local guest root; isolated workers have their own registry.
     let mut default_task_queue: Option<Value> = None;
     let mut invocation_result: Option<Value> = None;
+    let mut drain_required = true;
     for _ in 0..limits.instructions {
         if let (Some(debugger), Some(frame)) = (&options.debugger, frames.last()) {
             let before_host_call = matches!(frame.function.body.get(frame.pc), Some(Op::Call(target))
@@ -1546,6 +1547,7 @@ fn interpret_instructions(
             };
             if check(frames, heap).is_err() {
                 let mut roots = vec![];
+                workers.trace_roots(&mut roots);
                 if let Some(queue) = &default_task_queue {
                     crate::gc::trace(queue, &mut roots);
                 }
@@ -1608,6 +1610,7 @@ fn interpret_instructions(
             && heap.len() >= collection_threshold
         {
             let mut roots = vec![];
+            workers.trace_roots(&mut roots);
             if let Some(queue) = &default_task_queue {
                 crate::gc::trace(queue, &mut roots);
             }
@@ -2594,6 +2597,13 @@ fn interpret_instructions(
                             Value::Void
                         } else if let crate::native::Binding::StartWorker(pooled) = binding {
                             workers.start(module, args, options, pooled)?
+                        } else if matches!(binding, crate::native::Binding::NotifyWorker) {
+                            if default_task_queue.is_none() {
+                                return Err(Fault::new(
+                                    "Worker notification requires the default TaskQueue",
+                                ));
+                            }
+                            workers.notify(args)?
                         } else if matches!(binding, crate::native::Binding::JoinWorker) {
                             workers.join(args, output, options)?
                         } else {
@@ -3189,10 +3199,14 @@ fn interpret_instructions(
         })();
         match step {
             Ok(Some(value)) => {
-                // A minimal invocation event loop: after entry returns, run the
-                // default queue to quiescence on this same interpreter and budget.
-                // Explicit queues remain caller-owned; no guest objects cross workers.
+                // Run ready default-queue work before waiting for registered host
+                // results. A notification is transferred directly into a traced
+                // Post frame, then drained on this invocation and instruction budget.
                 if invocation_result.is_none() {
+                    invocation_result = Some(value.clone());
+                }
+                if drain_required {
+                    drain_required = false;
                     if let Some(queue) = &default_task_queue {
                         let drain = resolve(
                             module,
@@ -3213,10 +3227,36 @@ fn interpret_instructions(
                         {
                             return Err(Fault::new("Invalid default TaskQueue dispatch contract"));
                         }
-                        invocation_result = Some(value);
                         frames.push(Frame::new(drain, vec![queue.clone()])?);
                         continue;
                     }
+                }
+                if let Some(callback) = workers.wait_notification(options)? {
+                    let queue = default_task_queue
+                        .as_ref()
+                        .ok_or_else(|| Fault::new("Missing default TaskQueue"))?;
+                    let post = resolve(
+                        module,
+                        &FunctionRef {
+                            definition: None,
+                            name: "System.Tasks.TaskQueue.Post".into(),
+                            owner: Some(Type::from_name("System.Tasks.TaskQueue")),
+                            instance: true,
+                            generic_arguments: vec![],
+                            parameters: vec![crate::assembler::parse_type("System.Func<Void>")?],
+                        },
+                    )?;
+                    if !post.no_result
+                        || post
+                            .definition
+                            .as_ref()
+                            .is_none_or(|id| id.module != "System")
+                    {
+                        return Err(Fault::new("Invalid default TaskQueue post contract"));
+                    }
+                    frames.push(Frame::new(post, vec![queue.clone(), callback])?);
+                    drain_required = true;
+                    continue;
                 }
                 let value = invocation_result.take().unwrap_or(value);
                 let mut roots = vec![];

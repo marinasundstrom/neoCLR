@@ -7,3 +7,7 @@
 .function neoCLR.Runtime.JoinWorker(Int32 handle) -> String
 .methodimpl InternalCall
 .end
+
+.function neoCLR.Runtime.NotifyWorker(Int32 handle,System.Func<Void> callback) -> Void
+.methodimpl InternalCall
+.end

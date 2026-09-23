@@ -1,0 +1,6 @@
+Entry finished
+Unrelated ready work
+First copied byte (H):
+72
+Copied byte count:
+3

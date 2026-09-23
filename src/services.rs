@@ -57,9 +57,9 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
     }
     if function.is_internal_call() {
         let service = match crate::native::bind(function)? {
-            crate::native::Binding::StartWorker(_) | crate::native::Binding::JoinWorker => {
-                RuntimeService::IsolatedWorkers
-            }
+            crate::native::Binding::StartWorker(_)
+            | crate::native::Binding::JoinWorker
+            | crate::native::Binding::NotifyWorker => RuntimeService::IsolatedWorkers,
             crate::native::Binding::CurrentTaskQueue
             | crate::native::Binding::DefaultTaskQueue
             | crate::native::Binding::RegisterDefaultTaskQueue => RuntimeService::TaskDispatch,
@@ -107,6 +107,15 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             service,
             instruction: None,
         }];
+        if matches!(
+            crate::native::bind(function)?,
+            crate::native::Binding::NotifyWorker
+        ) {
+            uses.push(ServiceUse {
+                service: RuntimeService::TaskDispatch,
+                instruction: None,
+            });
+        }
         if matches!(
             crate::native::bind(function)?,
             crate::native::Binding::UnixTimeToLocal

@@ -1,0 +1,42 @@
+// Experimental default-queue adapter; not the shipped worker implementation.
+namespace System.Threading
+
+import System.*
+import System.Tasks.*
+import System.Runtime.CompilerServices.*
+
+public class Thread {
+    static func Start(callback: Func<string, string>, input: string) -> Task<string> {
+        let source = Promise<string>()
+        _ = TaskQueue.Default
+        let handle = RuntimeServices.StartWorker(callback, input)
+        let completion = WorkerCompletion(handle, source)
+        RuntimeServices.NotifyWorker(handle, completion.Complete)
+        return source.Task
+    }
+}
+
+public class ThreadPool {
+    static func Queue(callback: Func<string, string>, input: string) -> Task<string> {
+        let source = Promise<string>()
+        _ = TaskQueue.Default
+        let handle = RuntimeServices.QueueWorker(callback, input)
+        let completion = WorkerCompletion(handle, source)
+        RuntimeServices.NotifyWorker(handle, completion.Complete)
+        return source.Task
+    }
+}
+
+internal class WorkerCompletion {
+    private field handle: int
+    private field source: Promise<string>
+
+    internal init(handle: int, source: Promise<string>) {
+        self.handle = handle
+        self.source = source
+    }
+
+    internal func Complete() {
+        _ = source.Complete(RuntimeServices.JoinWorker(handle))
+    }
+}

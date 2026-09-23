@@ -1,0 +1,49 @@
+import System.*
+import System.Console.*
+import System.Tasks.*
+import System.Text.*
+import System.Threading.*
+
+// The isolated producer exchanges owned text. It never receives guest storage.
+func Produce(input: string) -> string => input
+
+async func BeginCopy() -> Task<int> {
+    let destination: byte[] = [(byte)0, (byte)0, (byte)0]
+    let text = await Thread.Start(Produce, "Hi!")
+    let bytes = Utf8.Encode(text)
+    if bytes.Count > destination.Length {
+        return 0
+    }
+    var index = 0
+    while index < bytes.Count {
+        destination[index] = bytes[index]
+        index = index + 1
+    }
+    WriteLine("First copied byte (H):")
+    WriteLine(destination[0])
+    return bytes.Count
+}
+
+async func Show() -> Task<unit> {
+    let count = await BeginCopy()
+    WriteLine("Copied byte count:")
+    WriteLine(count)
+    return ()
+}
+
+func Ready() {
+    WriteLine("Unrelated ready work")
+}
+
+func Main() {
+    _ = Show()
+    TaskQueue.Default.Post(Ready)
+    // BeginCopy has returned. Its suspended state machine retains the destination.
+    var index = 0
+    while index < 1200 {
+        let garbage: byte[] = [(byte)0]
+        _ = garbage
+        index = index + 1
+    }
+    WriteLine("Entry finished")
+}

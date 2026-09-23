@@ -13,6 +13,7 @@ static class RuntimeServiceBindings
             ("StartWorker", ["System.Func<String,String>", "String"], "Int32"),
             ("QueueWorker", ["System.Func<String,String>", "String"], "Int32"),
             ("JoinWorker", ["Int32"], "String"),
+            ("NotifyWorker", ["Int32", "System.Func<Void>"], "noresult"),
             ("LocalDateTime", ["Int64"], "System.LocalDateTime"),
             ("UnixTimeTicks", [], "Int64"),
             ("UnixTimeToLocal", ["Int64"], "arrayref<Int32>"),
@@ -83,6 +84,7 @@ static class RuntimeServiceBindings
         "Boolean" => "bool", "Int64" => "long", "Value" => "System.Value", "noresult" => "void",
         "IntPtr" => "System.IntPtr", "UIntPtr" => "System.UIntPtr", "UInt64" => "ulong",
         "System.Func<String,String>" => "System.Func<string,string>",
+        "System.Func<Void>" => "System.Func<System.PropagationUnit>",
         _ when type.StartsWith("System.") => type,
         _ when type.StartsWith("arrayref<") => CSharp(type[9..^1]) + "[]",
         _ => throw new InvalidDataException("Unsupported runtime service declaration.")
@@ -107,6 +109,8 @@ static class RuntimeServiceBindings
             throw new InvalidDataException("Unsupported runtime service signature: " + reference.FullName);
         if (reference.Name == "StringEquals")
             return new("", args, result, Instruction: "ceq");
+        if (reference.Name == "NotifyWorker")
+            return new("", args, result, Instruction: "call neoCLR.Runtime.NotifyWorker(Int32,System.Func<Void>)\npop");
         if (reference.Name == "RegisterDefaultTaskQueue")
             return new("", args, result, Instruction: "call neoCLR.Runtime.RegisterDefaultTaskQueue(System.Tasks.TaskQueue)\npop");
         if (reference.Name == "WriteLine")

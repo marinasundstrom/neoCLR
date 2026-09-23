@@ -666,3 +666,23 @@ faults and invalid calls. `verify_editor.py --unions` now also checks outcome
 operator completion; include the other flags matching the reference profile.
 The runtime sources use Raven extension declarations, validated against the
 bootstrap extension metadata. Published Preview 8 bundles remain unchanged.
+
+
+## Experimental worker notification (2026-09-23)
+
+[Delayed Copy](../delayed-copy/README.md) builds a temporary worker-library adapter
+that calls bootstrap-only `RuntimeServices.NotifyWorker(handle, callback)`. The
+importer binds the exact Int32/Func<Void> signature to the new runtime service and
+discards its Void value for the CIL no-result call. The bootstrap C# declaration
+uses the existing PropagationUnit-to-Void metadata projection. Rebuild the bridge,
+bootstrap core and runtime together; old bundles cannot run the adapter.
+
+Normal application references still omit RuntimeServices. Normal worker-library
+snapshots are unchanged: the experiment replaces their generated methods/helpers
+only in a temporary System library. It supports the default TaskQueue and retains
+callback graphs until VM dispatch; explicit queues and public worker migration
+remain open. No Raven compiler semantic/emission changes or Runtime Contract flags
+are added. Existing heap async state machines and cancellation propagation settings
+remain in use. The sample verifier compiles both the library adapter and ordinary
+application, checks exact output and requires actual guest collections. Runtime
+worker/Task tests cover admission, roots, dispatch and teardown.

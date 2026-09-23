@@ -312,8 +312,11 @@ M1 remains active. Its first [host-side S0 experiment](experiments/external-io-p
 passes seven ownership/progress/cancellation checks. This is a reduced Rust model,
 not a guest networking API or completed S0. A [real-heap ownership follow-up](experiments/external-io-progress/GC-OWNERSHIP.md)
 now verifies pending and ready roots, receiver graphs, reclamation and terminal
-cleanup in eight test-only cases. The next S0 case must integrate those roots into
-the actual interpreter invocation and deliver completion to a Raven consumer.
+cleanup in eight test-only cases. A [VM Delayed Copy checkpoint](experiments/delayed-copy/README.md)
+now retains real invocation roots, posts ready worker notifications to TaskQueue and
+resumes a Raven consumer through GC pressure. Its worker-library adapter is isolated;
+normal worker APIs still use queued joins. S0 remains partial: queue fairness,
+operation cancellation races and bounded native I/O ownership remain open.
 S1 now has a [runnable Byte Copy checkpoint](experiments/byte-copy/README.md):
 checked ranges, overlapping copies and short reads/writes over ordinary managed
 arrays, with synchronous GC-retention checks. It is an application-local experiment,
@@ -341,12 +344,11 @@ its feature plan, and update changelog, relevant feature pages and integration d
 Samples begin as small programs, not miniature frameworks. Existing release/debugging
 requirements and Raven branch/integration rules continue to apply.
 
-**Next:** integrate the checked pending/ready ownership protocol into the real VM
-collection and TaskQueue dispatch paths, using a controlled delayed-copy Raven
-consumer. The real-heap fixture is supporting evidence, not completion of that
-checkpoint. Verify invocation failure and cancellation teardown before reusing the
-pipeline for files and then sockets. Keep the application-enum and protected-constructor importer
-limitations exposed by the JSON experiment as explicit follow-up probes; they do
+**Next:** extend the real delayed-copy invocation evidence to cancellation/completion
+races, queue affinity, progress under sustained ready work and bounded result storage.
+Select a small operation cancellation contract before generalizing the experimental
+worker adapter or reusing the pipeline for files and then sockets. Keep the
+application-enum and protected-constructor importer limitations exposed by the JSON experiment as explicit follow-up probes; they do
 not require a metadata redesign or block this next lifetime checkpoint. Reassess
 priorities at each checkpoint and M2 onward after the first major HTTP application
 milestone.

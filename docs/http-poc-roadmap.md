@@ -122,7 +122,7 @@ and a short contract/comparison note. The isolated S0 host probe is only partial
 
 | Slice / status | Small case and dependency | Exit evidence |
 | --- | --- | --- |
-| S0 — in exploration; host and real-heap probes pass, VM bridge open | Fake delayed I/O producer plus a buffer and native-resource stand-in; reuse Task | Empty-queue wakeup, immediate/delayed completion, unrelated continuation progress, GC retention, cancellation/completion race and teardown; record backend choice and rejected alternatives |
+| S0 — in exploration; host, real-heap and reduced VM bridge pass | Fake delayed I/O producer plus a buffer and native-resource stand-in; reuse Task | Empty-queue wakeup, immediate/delayed completion, unrelated continuation progress, GC retention, cancellation/completion race and teardown; record backend choice and rejected alternatives |
 | S1 — partial; checked memory-copy fixture runs | In-memory input/output and copy case; can start alongside S0 | Directional contracts, partial transfers, empty-buffer rules, EOF only for nonempty reads, truncated ReadExactly, no-progress WriteAll, bounds errors, repeated cleanup and injected failures; copy helpers require no sockets |
 | S2 — partial; strict chunk decoder experiment | Encode/decode a multilingual message split at every UTF-8 byte boundary; depends on S1 | Strict invalid/truncated input outcomes, carried decoder state, final-flush behavior and byte counts; reuse current whole-buffer conversions rather than change Char again |
 | S3 — partial; document consumer runs | Small JSON round trip in memory; depends on S2 | Read/write object, array, string, number, boolean and null; escaped strings and Unicode, malformed syntax, duplicate-key policy, numeric limits/precision and nesting/size bounds are explicit. Prefer explicit field access and construction; benchmark only if making performance claims |
@@ -152,8 +152,11 @@ uses the actual collector, managed array slots and delegate receiver tracing. Ei
 checks establish pending destination/receiver roots, their handoff into a modeled
 ready owner, actual reclamation, checked ranges, atomic failed delivery and terminal
 cleanup. This is test-only code; it does not connect the VM loop, TaskQueue or a
-Raven consumer. Real invocation integration remains the next checkpoint. No public
-I/O contract or backend is selected by these results.
+Raven consumer. The [VM Delayed Copy follow-up](experiments/delayed-copy/README.md)
+now exercises real invocation roots, default TaskQueue notification and a Raven await
+through an isolated worker-library adapter. Queue affinity/fairness, operation-level
+cancellation races and bounded native payloads remain open. No public I/O contract
+or backend is selected by these results.
 
 ## S3 document evidence — 2026-09-23
 
@@ -212,9 +215,10 @@ The isolated [host-side progress probe](experiments/external-io-progress/README.
 passes seven checks for delayed completion, retained local destinations, unrelated
 ready work, cancellation acknowledgement, both terminal orderings and teardown.
 It tests an owned-byte transfer boundary without sharing guest state across threads.
-This is partial S0 evidence, not a runtime or API implementation. Actual guest GC
-rooting, Task delivery, a Raven caller and OS cancellation remain open; S0 is not
-complete. The reduced producer/backend choice is still provisional.
+This host probe alone is partial S0 evidence, not a runtime or API implementation.
+The [VM follow-up](experiments/delayed-copy/README.md) adds actual guest GC rooting,
+Task delivery and a Raven caller. OS cancellation remains open; S0 is not complete.
+The reduced producer/backend choice is still provisional.
 
 ## Proposal triage
 

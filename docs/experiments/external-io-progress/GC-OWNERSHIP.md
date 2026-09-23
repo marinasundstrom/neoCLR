@@ -108,9 +108,14 @@ host-event-loop checks remain separately reproducible as described in [README](R
 No sleeps control the outcomes; commands and acknowledgements set their ordering.
 The five-second receive timeout is a test watchdog, not an I/O deadline.
 
-## Next integration boundary
+## Integration follow-up
 
-Wire a reduced producer into the **real invocation**, including both allocation-pressure
+The [VM Delayed Copy checkpoint](../delayed-copy/README.md) now connects a reduced
+worker producer, actual TaskQueue and Raven consumer. The original acceptance scope
+below remains broader than that checkpoint; cancellation races and native payload
+limits still need end-to-end evidence.
+
+Integrate the full ownership protocol into the **real invocation**, including both allocation-pressure
 and array-budget collection paths. Keep pending roots through completion application,
 then retain the actual Promise/continuation in TaskQueue until dispatch. Demonstrate
 empty-queue wakeup, unrelated guest progress, a runnable Raven delayed-copy consumer,
