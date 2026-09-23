@@ -21,7 +21,7 @@ static class UnionImport
     const string Error = "System.Result.Error<System.OverflowError>";
     sealed record Slot(string Type, int Local = -1, int ConditionalOut = -1, int Argument = -1, MethodDefinition? Function = null, bool VirtualFunction = false, string? FunctionReceiver = null);
     sealed record State(List<Slot> Stack, bool[] Assigned);
-    sealed record Call(string Name, string[] Arguments, string Result, int OutArgument = -1, string? Instruction = null, bool ConditionalOutput = false);
+    sealed record Call(string Name, string[] Arguments, string Result, int OutArgument = -1, string? Instruction = null, bool ConditionalOutput = false, int[]? Outputs = null);
 
     public static void Write(string application, string core, string destination, bool collectionProfile = false, params string[] dependencies)
         => WriteImplementation(application, core, destination, collectionProfile, dependencies, null);
@@ -70,7 +70,7 @@ static class UnionImport
         string ProfileType(TypeReference type, bool result = false)
         {
             if (result && ApplicationTypes.IsInitReturn(type)) return "noresult";
-            if ((libraryOwner is not null || type is ByReferenceType { ElementType.MetadataType: MetadataType.Int32 }) && type is ByReferenceType byref)
+            if ((libraryOwner is not null || type is ByReferenceType { ElementType.MetadataType: MetadataType.Int32 or MetadataType.String }) && type is ByReferenceType byref)
                 return ProfileType(byref.ElementType) + "&";
             if (libraryOwner is not null && type is GenericParameter parameter)
             {
@@ -102,11 +102,11 @@ static class UnionImport
         Call Coerce(Call call, string[] actual)
         {
             if (!actual.Where((t, i) => Converts(t, call.Arguments[i])).Any()) return call;
-            var key = (call.Instruction ?? call.Name) + string.Join(',', call.Arguments) + string.Join(',', actual) + call.Result + call.OutArgument;
+            var key = (call.Instruction ?? call.Name) + string.Join(',', call.Arguments) + string.Join(',', actual) + call.Result + call.OutArgument + ":" + string.Join(',', call.Outputs ?? []);
             if (!coercions.TryGetValue(key, out var helper))
             {
                 var name = "RuntimeCliCall" + coercions.Count;
-                var parameters = actual.Select((t, i) => (i == call.OutArgument ? (call.ConditionalOutput ? "out(true) " : "out ") : ApplicationTypes.IsLibraryUnion(call.Arguments[i]) && t == call.Arguments[i] + "&" ? "readonly " : "") + t + " arg" + i);
+                var parameters = actual.Select((t, i) => (i == call.OutArgument ? (call.ConditionalOutput ? "out(true) " : "out ") : call.Outputs?.Contains(i) == true ? "out " : ApplicationTypes.IsLibraryUnion(call.Arguments[i]) && t == call.Arguments[i] + "&" ? "readonly " : "") + t + " arg" + i);
                 var body = new StringBuilder($".function {name}({string.Join(',', parameters)}) -> {call.Result}\n");
                 for (var i = 0; i < actual.Length; i++) body.AppendLine("ldarg arg" + i).Append(ConvertStack(actual[i], call.Arguments[i]));
                 body.AppendLine(call.Instruction ?? $"call {call.Name}({string.Join(',', call.Arguments)})").AppendLine("ret\n.end");
@@ -393,6 +393,19 @@ static class UnionImport
                         code.AppendLine("stobj " + storedOutput); break;
                     case Code.Ldind_I4:
                         Expect("Int32*"); Push(new("Int32")); code.AppendLine("ldobj Int32"); break;
+                    case Code.Stind_Ref:
+                        var referenceValue = Pop();
+                        var referenceDestination = Pop();
+                        if (!method.HasThis || referenceDestination.Argument <= 0
+                            || referenceDestination.Argument > method.Parameters.Count
+                            || !method.Parameters[referenceDestination.Argument - 1].IsOut
+                            || !referenceDestination.Type.EndsWith("&", StringComparison.Ordinal))
+                            throw new InvalidDataException("Reference indirect stores require a declared instance output argument.");
+                        var referenceOutput = referenceDestination.Type[..^1];
+                        if ((referenceOutput != "String" && !ApplicationTypes.IsReference(referenceOutput))
+                            || referenceValue.Type != referenceOutput)
+                            throw new InvalidDataException("Reference output stores require an exact supported value type.");
+                        code.AppendLine("stobj " + referenceOutput); break;
                     case Code.Stind_I4:
                         Expect("Int32");
                         var intDestination = Pop();
@@ -730,6 +743,9 @@ static class UnionImport
                                 call = targetMethod.HasThis && (libraryOwner is not null || !(targetMethod.IsConstructor && targetMethod.DeclaringType.IsValueType))
                                     ? new("", new[] { ApplicationTypes.Receiver(reference) }.Concat(parameters).ToArray(), ProfileType(ApplicationTypes.Close(reference.ReturnType, reference.DeclaringType), true), Instruction: $"{(instruction.OpCode.Code == Code.Callvirt ? "callvirt" : "call")} instance {ProfileType(reference.DeclaringType)}::{ApplicationTypes.MethodName(targetMethod)}({string.Join(',', parameters)})" + (targetMethod.DeclaringType.IsValueType && targetMethod.ReturnType.MetadataType == MetadataType.Void ? "\npop" : ""))
                                     : new(libraryOwner is not null && targetMethod.IsStatic && ((((StorageItemBindings.IsName(targetMethod.DeclaringType.FullName) || PathBindings.IsName(targetMethod.DeclaringType.FullName)) || StreamBindings.IsName(targetMethod.DeclaringType.FullName)) || WorkerBindings.IsName(targetMethod.DeclaringType.FullName)) || AsyncBindings.IsName(targetMethod.DeclaringType.FullName) || targetMethod.DeclaringType.FullName == "System.Tasks.TaskQueue" || targetMethod.DeclaringType.IsValueType || DescriptorLibrary.IsProvider(targetMethod.DeclaringType)) ? ProfileType(reference.DeclaringType) + "::" + targetMethod.Name : Name(targetMethod), targetMethod.HasThis ? new[] { ApplicationTypes.Receiver(reference) }.Concat(parameters).ToArray() : parameters, ProfileType(ApplicationTypes.Close(reference.ReturnType, reference.DeclaringType), true));
+                                if (libraryOwner is null)
+                                    call = call with { Outputs = targetMethod.Parameters.Select((p, i) => (p, i))
+                                        .Where(x => x.p.IsOut).Select(x => x.i + (targetMethod.HasThis ? 1 : 0)).ToArray() };
                                 if (libraryOwner == "System.Console" && targetMethod.IsStatic && targetMethod.ReturnType.MetadataType == MetadataType.Void)
                                     call = call with { Instruction = $"call {call.Name}({string.Join(',', call.Arguments)})\npop" };
                             }
@@ -814,6 +830,7 @@ static class UnionImport
                                     if (call.ConditionalOutput) conditionalOut = argument.Local;
                                     else assigned[argument.Local] = true;
                                 }
+                                else if (call.Outputs?.Contains(n) == true) assigned[argument.Local] = true;
                                 else if (!assigned[argument.Local]) throw new InvalidDataException($"Read through uninitialized carrier address in {method.Name} at {instruction.Offset:x4}, local {argument.Local}: {reference.FullName}.");
                             }
                         }

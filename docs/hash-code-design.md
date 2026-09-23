@@ -41,3 +41,30 @@ retain distinct identities, typed and Object equality agree, operators agree, an
 equal components produce equal hashes. Record structs, inheritance, generic records,
 nullable components and arbitrary component types require explicit validation and
 must not be inferred from a passing integer record-class example.
+
+## String and nested-record components — 2026-09-24
+
+The next checked case is Person(Name: string, Age: int), wrapped by an Entry record.
+The interface remains Equatable<Record>; a separate concern is comparing each
+component. The [.NET record specification](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/proposals/csharp-9.0/records)
+uses EqualityComparer<T>.Default for fields. [String equality](https://learn.microsoft.com/en-us/dotnet/api/system.string.equals?view=net-10.0)
+is ordinal; these sources were reviewed on 24 September 2026. A general target
+comparer would cover more types but would require settling boxed values, null
+representations and comparer selection first.
+
+This bounded adaptation uses the target String equality operator and HashCode.Add(string),
+and invokes typed Equals/GetHashCode on same-compilation record-class components.
+It retains the target's UTF-8 string content semantics with no normalization; it does
+not promise .NET hash values or support invalid UTF-16 data. Nested hash values enter
+Add(int). Formatting passes strings directly and invokes nested ToString, avoiding
+host reflection formatting. Deconstruction copies string contents/reference values
+through declared outputs; nested class references preserve identity.
+
+The benefit is a useful domain sample without boxing or a new public comparer API.
+Costs: generated policy is specialized, external record metadata is not yet recognized,
+string hashing allocates, and recursive graphs have no cycle detection. Nullable
+components, arbitrary objects, inheritance and record structs remain diagnosed.
+Defensive null handling for nested class values is tested through metadata invocation;
+this does not add nullable Raven component support or null-string runtime support.
+The normal Raven/.NET synthesis path is unchanged. The experimental hash contract now
+requires Add(string) as well as Add(int) and ToHashCode; incomplete providers receive RAVT003.

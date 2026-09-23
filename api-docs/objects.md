@@ -89,9 +89,9 @@ and returns false. Static two-argument Object.Equals is not yet available.
 The intended baseline is .NET-compatible reference/value semantics. Class display,
 reference identity and class equality/hash now have bounded implementations. String
 identity and boxed-value dispatch remain representation gaps. Raven record syntax
-now passes an end-to-end integer record-class sample with generated equality,
+now passes an end-to-end record-class sample with integer, string and nested components with generated equality,
 hashing, display and deconstruction. Record structs, generic/inherited records and
-other component types are not supported by this initial target contract. See Microsoft's
+nullable/arbitrary component types are not supported by this target contract. See Microsoft's
 [Object contract](https://learn.microsoft.com/en-us/dotnet/api/system.object?view=net-10.0)
 for the comparison baseline; neoCLR does not yet provide that entire surface.
 
@@ -116,8 +116,12 @@ The <a href="/samples/records.zip">checked record sample</a> uses `record class
 Key(Number: int)` and a two-component Pair. Separate instances compare equal by
 components while ReferenceEquals distinguishes their allocations. Equals through
 Object, generated operators and hashes agree. Display prints `Key { Number = 42 }`;
-deconstruction retrieves the components. Current record components are Int32 only,
-even though the standalone hash accumulator also accepts strings.
+deconstruction retrieves the components. Person(Name: string, Age: int) adds string
+content equality, and Entry(Owner: Person, Number: int) compares a nested record via
+typed Equals and hashes its value. Nested display calls ToString; deconstruction
+preserves the nested reference. Components may be Int32, non-null String or supported
+record classes declared in the same compilation. Nullable components and externally
+compiled record components remain unsupported; this is not general graph equality.
 
 Raven's target configuration selects System.Equatable and System.HashCode. Unsupported
 record shapes report RAVT004. Init-only property assignment remains a compiler rule;

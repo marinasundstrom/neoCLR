@@ -1,3 +1,4 @@
+Entry { Owner = Person { Name = Raven, Age = 42 }, Number = 7 }
 Key { Number = 42 }
 Records retain reference identity and compare their components
 Deconstruction and ordered hashes agree

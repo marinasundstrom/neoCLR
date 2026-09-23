@@ -23,7 +23,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-records-') as folder:
     assert run.returncode == 0, run.stdout + run.stderr
     assert run.stdout == (HERE / 'expected.txt').read_text(), repr(run.stdout)
     assert not run.stderr, run.stderr
-    for declaration in ('record struct Unsupported(Number: int)', 'record class Unsupported(Name: string)'):
+    for declaration in ('record struct Unsupported(Number: int)', 'record class Unsupported(Name: string?)', 'record class Unsupported(Value: object)'):
         (root / 'Main.rvn').write_text('import System.*\n' + declaration + '\nfunc Main() { }\n')
         rejected = subprocess.run(['dotnet', 'msbuild', str(root / 'Records.rvnproj'), '-nologo', '-v:minimal'], env=env, capture_output=True, text=True, timeout=120)
         assert rejected.returncode != 0 and 'RAVT004' in rejected.stdout + rejected.stderr, rejected.stdout + rejected.stderr

@@ -321,3 +321,12 @@ application-property reflection remain gaps. See the [integration contract](expe
 A same-compilation generic provider fixture exposed a separate reentrant lookup-cache
 issue in Raven. The accepted tests use a referenced provider assembly, matching neoCLR's
 boundary. That general compiler candidate must be reduced/tested independently on main.
+
+### String and nested record components — 2026-09-24
+
+The next slice extends the checked record sample to Person and Entry. It preserves
+Equatable<Record>, uses content equality for strings, and typed equality/hash/display
+for nested same-compilation record classes. Output deconstruction now handles strings
+and application references. Nullable components, metadata-only record components,
+boxed equality and record structs remain open. See the
+[component comparison and tradeoffs](hash-code-design.md#string-and-nested-record-components--2026-09-24).

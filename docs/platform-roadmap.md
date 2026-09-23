@@ -672,8 +672,9 @@ The repair restores the existing Console regression suite without changing publi
 The [Object/Value review](object-model-review.md) now records those dependencies and
 missing members. The bounded class display/override case now preserves
 .NET-style class reference sharing and value copying. Class equality/hash and the first integer record-class gate now have checked evidence.
-The next bounded Object review should address the component/null and boxed-value gaps
-before broadening record support. Value retirement remains a separate storage migration.
+The record sample now also covers non-null strings and nested same-compilation record
+classes, including deconstruction. The next bounded Object review should address
+nullable component representation and boxed-value equality before record structs. Value retirement remains a separate storage migration.
 This is a bounded foundation review; networking remains later. Console ownership,
 cleanup on propagated errors and buffering remain follow-up questions, not selected
 redesigns. The scheduling/operation-cancellation work below remains open.

@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-24
 
+- Extend experimental Raven record components to non-null strings and nested
+  same-compilation record classes. Preserve Equatable<Record>, use content/typed
+  equality and matching hashes, and support string/reference deconstruction outputs.
+  Nullable components, external record components and record structs remain
+  unsupported. The configured hash provider now requires Add(string) as well as
+  Add(int). Expand the checked sample, design comparison, API guide and website. Validation:
+  45 compiler tests, 32 reference-slot tests, Unicode/nested-record sample, editor
+  completion and the combined site/API build. Prepare a separate matching local
+  SDK snapshot, preserving the previous workspace.
+
 - Prepare a matching local neoCLR/Raven development SDK workspace for VS Code,
   with records, Storage and Console projects and pinned compiler/server paths.
   Verify all three build/run paths and HashCode/Concurrency editor completions.

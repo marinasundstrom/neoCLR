@@ -2,6 +2,10 @@ import System.*
 
 record class Key(Number: int)
 record class Pair(Left: int, Right: int)
+record class Person(Name: string, Age: int)
+record class Entry(Owner: Person, Number: int)
+
+func BuildName(prefix: string) -> string => prefix + "ven"
 
 func Main() {
     let first = Key(42)
@@ -40,6 +44,31 @@ func Main() {
     if hash.ToHashCode() != pair.GetHashCode() || independent.ToHashCode() == hash.ToHashCode() {
         System.Fault("Hash accumulator copies must retain independent state")
     }
+    let person = Person("Raven", 42)
+    let samePerson = Person(BuildName("Ra"), 42)
+    let entry = Entry(person, 7)
+    let sameEntry = Entry(samePerson, 7)
+    let view: Equatable<Entry> = entry
+    if !view.Equals(sameEntry) || entry != sameEntry || entry.GetHashCode() != sameEntry.GetHashCode() {
+        System.Fault("Nested records must use component equality and hashes")
+    }
+    if entry == Entry(Person("Other", 42), 7) || entry == Entry(Person("Raven", 43), 7) {
+        System.Fault("Different nested components must compare unequal")
+    }
+    let unicode = Person("Å", 42)
+    let unicodeCopy = Person("Å", 42)
+    if unicode != unicodeCopy || unicode.GetHashCode() != unicodeCopy.GetHashCode() || unicode == Person("Å", 42) {
+        System.Fault("String equality and hashing must preserve contents without normalization")
+    }
+    let (name, age) = person
+    let (owner, number) = entry
+    if name != "Raven" || age != 42 || number != 7 || !Object.ReferenceEquals(owner, person) {
+        System.Fault("Deconstruction must preserve string contents and reference identity")
+    }
+    if entry.ToString() != "Entry { Owner = Person { Name = Raven, Age = 42 }, Number = 7 }" {
+        System.Fault("Unexpected nested record display")
+    }
+    Console.WriteLine(entry.ToString())
     Console.WriteLine(first.ToString())
     Console.WriteLine("Records retain reference identity and compare their components")
     Console.WriteLine("Deconstruction and ordered hashes agree")

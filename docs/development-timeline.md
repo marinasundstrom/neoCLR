@@ -25,6 +25,26 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-24 — Map record interfaces and extend component semantics
+
+**Author question and direction.** Asked whether Raven should map the right
+interfaces for records, then directed continuing the next slice.
+
+**Assistant proposal.** Explained that Equatable<Record> was already mapped;
+component comparison was the next gap. Proposed strings and nested record classes,
+with nullable/boxed semantics and record structs to follow as separate work.
+
+**Action.** Extended the target-specific synthesis on Raven's experimental branch:
+string content equality/hash, typed nested equality/hash/display and declared
+reference outputs for deconstruction. Added forward-reference and metadata-injected
+null regression cases. Retained explicit diagnostics for nullable and unsupported
+component types. Validation passed: 45 compiler tests, 32 reference-slot tests, the expanded neoCLR
+sample, nested-record editor completions and the combined site/API build. A separate
+local SDK workspace preserves the prior snapshot. No general comparer API or Raven
+main integration is claimed.
+See [the decision and tradeoffs](hash-code-design.md#string-and-nested-record-components--2026-09-24)
+and [the executable sample](experiments/records/README.md).
+
 ## 2026-09-24 — Refresh the SDKs for VS Code testing
 
 **Author direction.** Said it was soon time to update the neoCLR and Raven SDKs
